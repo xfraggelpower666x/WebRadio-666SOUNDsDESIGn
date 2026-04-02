@@ -1,0 +1,27 @@
+{
+  "build": "STABILIZED_FINAL",
+  "base": "666SOUNDsDESIGn_GESAMTSYSTEM_BUILD_2026-03-18_FULLY_INTEGRATED",
+  "changed_files": [
+    "js/config.js",
+    "js/radio-config.js",
+    "js/audio-source-router.js",
+    "js/audio-source-router-ui.js",
+    "js/mp3-transcription-addon.js",
+    "sticky-player/sticky-player.js",
+    "worker/cors-proxy-worker.js",
+    "cors-proxy-worker.js",
+    "README_START_HERE.md",
+    "WORKER_EXTRA_README.md",
+    "worker/README_WORKER_START_HERE.md",
+    "WORKER_AENDERUNGEN_WICHTIG.txt",
+    "docs/WORKER_AENDERUNGEN_WICHTIG.md",
+    "HANDOFF_ANWEISUNG_FUER_WEITERE_CHATS.md",
+    "MASTER_PROJECT_GOVERNANCE.md"
+  ],
+  "notes": [
+    "Add-only / extend-first beibehalten",
+    "Keine vorhandenen Kernordner entfernt",
+    "Worker-Aenderungen sind erforderlich und dokumentiert",
+    "SoundCloud-Quelle bleibt Platzhalter, bis eine echte permalinkUrl gesetzt wird"
+  ]
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3DXChat Lab</title>
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="brand">⚡ 3DXChat Lab ⚡</div>
+      <div class="sub">Chat tools, Unicode demos, RP helpers, dividers and banners</div>
+    </div>
+    <nav>
+      <a href="../../index.html">Home</a>
+      <a href="../../labs/3dxchat/index.html">3DXChat</a>
+      <a href="../../labs/secondlife/index.html">Second Life</a>
+      <a href="../../labs/universal/index.html">Universal</a>
+    </nav>
+  </div>
+  
+<div class="grid">
+  <section class="card">
+    <h2>Unicode Generator</h2>
+    <label for="txt">Input</label>
+    <textarea id="txt" placeholder="DJ FRAGGLE TECHNO ROOM"></textarea>
+    <div style="margin-top:12px"><button class="btn" onclick="fillGenerator('txt',{bold:'o1',full:'o2',small:'o3',gothic:'o4',banner1:'o5',banner2:'o6'})">Generate</button></div>
+    <hr>
+    <h3>Bold</h3><div id="o1" class="output"></div><button class="btn" onclick="copyText('o1')">Copy</button>
+    <h3>Fullwidth</h3><div id="o2" class="output"></div><button class="btn" onclick="copyText('o2')">Copy</button>
+    <h3>Small Caps</h3><div id="o3" class="output"></div><button class="btn" onclick="copyText('o3')">Copy</button>
+    <h3>Gothic</h3><div id="o4" class="output"></div><button class="btn" onclick="copyText('o4')">Copy</button>
+    <h3>Banner A</h3><div id="o5" class="output"></div><button class="btn" onclick="copyText('o5')">Copy</button>
+    <h3>Banner B</h3><div id="o6" class="output"></div><button class="btn" onclick="copyText('o6')">Copy</button>
+  </section>
+
+  <section class="card">
+    <h2>RP / Chat Examples</h2>
+    <pre>/me smiles slowly
+/me dances against the laser glow
+/me looks at you and grins</pre>
+    <h3>Divider Ideas</h3>
+    <pre>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+═══════ 3DX ROOM ═══════
+████████████████
+☠⋆⋆⋆☠⋆⋆⋆☠</pre>
+    <h3>Symbol Packs</h3>
+    <div>
+      <span class="tag">❤ ♥ ❥ ♡ ღ</span>
+      <span class="tag">♫ ♬ ♪</span>
+      <span class="tag">☻ ☺ ツ</span>
+      <span class="tag">⚡ ☠ ✝ ⛧</span>
+      <span class="tag">! ? : ; / \ [ ] { } + - * =</span>
+    </div>
+  </section>
+</div>
+
+</div>
+<script src="../../js/generator.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "base": "666SOUNDsDESIGn_FINAL_FULL_v170_DOUBLE_RING_EQ.zip",
+  "integrated": [
+    "666soundsdesign_addon_v2.zip",
+    "666soundsdesign_final_addon.zip (without demo)",
+    "virtual_world_chat_addon_integration_pack.zip",
+    "FRAGGLE_ALL_IN_ONE_MAIN_PROJECT_ADDON.zip (selected visual/system files)",
+    "radio-worker-bundle.zip / sticky-radio-complete-bundle.zip (source-selector files only)"
+  ],
+  "new_menu_points": [
+    "CHAT LAB",
+    "FX CONTROL",
+    "HUD LAB"
+  ],
+  "mainradio_label": "WebRadio 666SOUNDsDESIGn",
+  "worker_changed": false,
+  "notes": [
+    "Visual integration merged without reintroducing duplicate player cores.",
+    "Current worker/CORS addresses from the desired state were kept in config.js.",
+    "Demo files were excluded."
+  ]
+}

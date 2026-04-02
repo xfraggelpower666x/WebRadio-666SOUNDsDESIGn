@@ -1,0 +1,32 @@
+{
+  "reports": [
+    "AUDIO_SCAN.json",
+    "AUDIO_STABILITY_FIX_REPORT.json",
+    "js/fx-extra/audio-reactive-tiles.js"
+  ],
+  "player_js": [
+    "addon/js/sticky-player.js",
+    "js/player-extra/dj-deck-fx-player.js",
+    "js/player-extra/dual-deck-mode.js",
+    "js/player-extra/spectrum-eq-pro.js",
+    "js/radio-config-loader.js",
+    "js/radio-config.js",
+    "js/sticky-player-integration-example.js",
+    "sticky-player/assets/covers/default-cover.png",
+    "sticky-player/assets/fonts/space-age.ttf",
+    "sticky-player/assets/logos/brand-logo.png",
+    "sticky-player/assets/rails/leiste-bottom.png",
+    "sticky-player/assets/rails/leiste-brand.png",
+    "sticky-player/assets/rails/leiste-top.png",
+    "sticky-player/sticky-player.css",
+    "sticky-player/sticky-player.js"
+  ],
+  "worker_related": [
+    "cors-proxy-worker.js",
+    "cors-proxy-worker_README.txt",
+    "worker/README_CORS_PROXY.txt",
+    "worker/SONGLAB_ENV_EXAMPLE.txt",
+    "worker/cors-proxy-worker.js",
+    "worker/songlab-api-worker.js"
+  ]
+}

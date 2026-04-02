@@ -1,0 +1,25 @@
+{
+  "base_project": "666soundsdesign_api_activated",
+  "added_runtime_files": [
+    "soundlab.html",
+    "js/sd-system.js",
+    "js/soundlab-api.js",
+    "js/soundlab-page.js",
+    "js/lyrics-index.js",
+    "worker/songlab-api-worker.js"
+  ],
+  "data_files": [
+    "data/lyrics_archive_database_clean.txt",
+    "data/lyrics_archive_index_clean.csv",
+    "data/duplicate_clean_report.txt",
+    "data/final_einfaches_merge_system_mit_reconstructor.txt"
+  ],
+  "source_reference_dirs": [
+    "framework_sources",
+    "workspace_sources",
+    "packages"
+  ],
+  "security_changes": [
+    "Removed frontend admin password from js/config.js; use worker secrets"
+  ]
+}

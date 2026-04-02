@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Second Life Lab</title>
+<link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="brand">⚡ Second Life Lab ⚡</div>
+      <div class="sub">Chat tools, Unicode demos, RP helpers, dividers and banners</div>
+    </div>
+    <nav>
+      <a href="../../index.html">Home</a>
+      <a href="../../labs/3dxchat/index.html">3DXChat</a>
+      <a href="../../labs/secondlife/index.html">Second Life</a>
+      <a href="../../labs/universal/index.html">Universal</a>
+    </nav>
+  </div>
+  
+<div class="grid">
+  <section class="card">
+    <h2>Command Reference</h2>
+    <pre>/me dances
+/whisper hello
+/shout party tonight</pre>
+    <h3>Range Memory Aid</h3>
+    <ul>
+      <li><strong>Whisper</strong>: 10 m</li>
+      <li><strong>Normal chat</strong>: 20 m</li>
+      <li><strong>Shout</strong>: 100 m</li>
+    </ul>
+    <h3>RP Formatting</h3>
+    <pre>*smiles softly*
+/me steps closer
+(( out of character note ))</pre>
+  </section>
+
+  <section class="card">
+    <h2>Gesture-style Helper</h2>
+    <p class="muted">Simple preview for trigger text plus action and sound note.</p>
+    <label for="g1">Trigger</label>
+    <input id="g1" value="/cheer">
+    <label for="g2">Displayed text</label>
+    <input id="g2" value="Fraggle cheers and throws both hands up.">
+    <label for="g3">Optional action note</label>
+    <input id="g3" value="Animation: cheer">
+    <label for="g4">Optional sound note</label>
+    <input id="g4" value="Sound: crowd_hit_01">
+    <div id="gestureOut" class="output">/cheer
+Fraggle cheers and throws both hands up.
+Animation: cheer
+Sound: crowd_hit_01</div>
+    <button class="btn" onclick="document.getElementById('gestureOut').innerText = [document.getElementById('g1').value,document.getElementById('g2').value,document.getElementById('g3').value,document.getElementById('g4').value].filter(Boolean).join('\n')">Build Preview</button>
+    <button class="btn" onclick="copyText('gestureOut')">Copy</button>
+  </section>
+
+  <section class="card">
+    <h2>Unicode Titles</h2>
+    <label for="sltxt">Input</label>
+    <textarea id="sltxt" placeholder="Second Life RP Hub"></textarea>
+    <div style="margin-top:12px"><button class="btn" onclick="fillGenerator('sltxt',{bold:'sl1',full:'sl2',small:'sl3',gothic:'sl4'})">Generate</button></div>
+    <hr>
+    <h3>Bold</h3><div id="sl1" class="output"></div>
+    <h3>Fullwidth</h3><div id="sl2" class="output"></div>
+    <h3>Small Caps</h3><div id="sl3" class="output"></div>
+    <h3>Gothic</h3><div id="sl4" class="output"></div>
+  </section>
+</div>
+
+</div>
+<script src="../../js/generator.js"></script>
+</body>
+</html>

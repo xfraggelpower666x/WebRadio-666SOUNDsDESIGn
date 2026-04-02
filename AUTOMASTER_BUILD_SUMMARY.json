@@ -1,0 +1,58 @@
+{
+  "build_date": "2026-03-18",
+  "selected_base": "666SOUNDsDESIGn_FINAL_MERGED_PROJECT_FULL.zip",
+  "superset_of": [
+    "666SOUNDsDESIGn_MASTER_RECOVERY_INTEGRATED.zip",
+    "666SOUNDsDESIGn_Neocities_NoAudio_Part1.zip.part + Part2.zip.part"
+  ],
+  "js_syntax_check": "passed",
+  "systems": {
+    "master_prompt_system": [
+      "framework_sources",
+      "packages",
+      "workspace_sources"
+    ],
+    "content_lyrics_database": [
+      "data/lyrics_archive_database_clean.txt",
+      "data/lyrics_archive_index_clean.csv",
+      "data/duplicate_clean_report.txt"
+    ],
+    "audio_analysis_structure": [
+      "sticky-player",
+      "worker",
+      "AUDIO_STABILITY_FIX_REPORT.json",
+      "AUDIO_SCAN.json"
+    ],
+    "html_master_system": [
+      "index.html",
+      "soundlab.html",
+      "css",
+      "js",
+      "assets"
+    ]
+  },
+  "counts": {
+    ".txt": 17,
+    ".ico": 2,
+    ".js": 50,
+    ".html": 28,
+    ".json": 6,
+    ".png": 33,
+    ".ttf": 6,
+    ".jpg": 10,
+    ".webmanifest": 1,
+    ".css": 8,
+    ".md": 8,
+    ".csv": 1,
+    ".zip": 28
+  },
+  "lyrics_entries_clean_index": 155,
+  "runtime_entrypoints": [
+    "index.html",
+    "soundlab.html",
+    "js/sd-system.js",
+    "js/soundlab-api.js",
+    "js/soundlab-page.js",
+    "worker/songlab-api-worker.js"
+  ]
+}

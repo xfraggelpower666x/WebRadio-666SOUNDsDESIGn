@@ -1,0 +1,42 @@
+{
+  "added_files": [
+    "css/audio-source-router.css",
+    "js/audio-source-router.js",
+    "js/audio-source-router-ui.js",
+    "js/mp3-transcription-addon.js",
+    "docs/AUDIO_SOURCE_ROUTER_ADDON.md",
+    "data/audio-router-manifest.json"
+  ],
+  "patched_files": [
+    "js/config.js",
+    "js/radio-config.js",
+    "js/soundlab-api.js",
+    "js/site.js",
+    "worker/songlab-api-worker.js",
+    "worker/cors-proxy-worker.js",
+    "cors-proxy-worker.js",
+    "admin.html",
+    "galerie.html",
+    "index.html",
+    "kontakt.html",
+    "musik-sets.html",
+    "youtube-visuals.html",
+    "info.html",
+    "systeminfo.html",
+    "impressum.html",
+    "datenschutz.html",
+    "404.html",
+    "soundlab.html",
+    "dateisystem.html",
+    "gesamtsystem.html"
+  ],
+  "deleted_files": [],
+  "principle": "addon-only",
+  "notes": [
+    "Sticky player preserved as visible primary UI",
+    "Hidden SoundCloud engine added as optional router layer",
+    "Sunshine sources routed through same sticky audio element",
+    "IDJ listener stats URL added as worker-proxied metadata supplement",
+    "Temporary MP3 transcription endpoint and UI added; requires OPENAI_API_KEY in worker to function"
+  ]
+}

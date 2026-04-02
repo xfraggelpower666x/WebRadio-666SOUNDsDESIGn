@@ -1,0 +1,12 @@
+AUDIO SOURCE ROUTER ADD-ON REPORT
+Principle: ADD-ON ONLY
+Deleted files: 0
+Added files: css/audio-source-router.css, js/audio-source-router.js, js/audio-source-router-ui.js, js/mp3-transcription-addon.js, docs/AUDIO_SOURCE_ROUTER_ADDON.md, data/audio-router-manifest.json
+Patched files: js/config.js, js/radio-config.js, js/soundlab-api.js, js/site.js, worker/songlab-api-worker.js, worker/cors-proxy-worker.js, cors-proxy-worker.js, admin.html, galerie.html, index.html, kontakt.html, musik-sets.html, youtube-visuals.html, info.html, systeminfo.html, impressum.html, datenschutz.html, 404.html, soundlab.html, dateisystem.html, gesamtsystem.html
+
+Core rules applied:
+- Sticky Player remains visible primary control surface.
+- Radio + Sunshine reuse sticky audio element.
+- SoundCloud prepared as hidden background widget engine.
+- MP3 transcription uses temporary upload path only; transcript persists, audio should not.
+- IDJ metadata remains worker-first; listener stats route added as supplemental source.

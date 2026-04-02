@@ -1,0 +1,9 @@
+js/config.js: ok
+js/radio-config.js: ok
+js/audio-source-router.js: ok
+js/audio-source-router-ui.js: ok
+js/mp3-transcription-addon.js: ok
+sticky-player/sticky-player.js: ok
+worker/cors-proxy-worker.js: ok
+worker/songlab-api-worker.js: ok
+cors-proxy-worker.js: ok

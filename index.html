@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-src 'self' https: data: blob:;">
+  <title>666SOUNDsDESIGn — WebRadio HUD</title>
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="css/v10-hud.css?v=10">
+</head>
+<body>
+<div class="hud-shell" data-panel="home">
+  <div class="hud-bg-layer"></div>
+  <div class="hud-scan"></div>
+  <div class="hud-noise"></div>
+
+  <header class="hud-top">
+    <div class="hud-orb left"></div>
+    <div class="hud-brand">
+      <div class="hud-brand-title">666SOUNDsDESIGn</div>
+      <div class="hud-brand-subtitle">DIGITAL UNDERGROUND CONNECTED</div>
+    </div>
+    <div class="hud-actions">
+      <button class="hud-icon-btn" id="openSourceOverlay" type="button" title="Audio Overlay">◈</button>
+      <button class="hud-icon-btn" id="openAdminOverlay" type="button" title="Admin">☰</button>
+    </div>
+    <div class="hud-orb right"></div>
+  </header>
+
+  <nav class="hud-nav" aria-label="Main HUD Navigation">
+    <button class="hud-nav-btn active" data-panel-target="home" type="button">HOME</button>
+    <button class="hud-nav-btn" data-panel-target="songlab" type="button">SONGLAB</button>
+    <button class="hud-nav-btn" data-panel-target="chat" type="button">CHAT</button>
+    <button class="hud-nav-btn" data-panel-target="lyrics" type="button">LYRICS</button>
+    <button class="hud-nav-btn" data-panel-target="tools" type="button">TOOLS</button>
+    <button class="hud-nav-btn" data-panel-target="info" type="button">INFO</button>
+  </nav>
+
+  <section class="hud-statusbar">
+    <div class="status-cell wide">
+      <span class="label">NOW PLAYING</span>
+      <strong id="npTitle">Waiting for signal…</strong>
+    </div>
+    <div class="status-cell">
+      <span class="label">LISTENERS</span>
+      <strong id="npListeners">0</strong>
+    </div>
+    <div class="status-cell">
+      <span class="label">BITRATE</span>
+      <strong id="npBitrate">0 kbps</strong>
+    </div>
+    <div class="status-cell">
+      <span class="label">DJ</span>
+      <strong id="npDj">AUTO</strong>
+    </div>
+    <div class="status-cell">
+      <span class="label">SOURCE</span>
+      <strong id="npSource">main</strong>
+    </div>
+    <div class="status-cell">
+      <span class="label">WORKER</span>
+      <strong id="npWorker">checking</strong>
+    </div>
+  </section>
+
+  <section class="hud-stage">
+    <aside class="side-tower left" aria-hidden="true">
+      <div class="tower-frame" id="leftMeter"></div>
+    </aside>
+
+    <main class="hero-console">
+      <div class="hero-main-frame">
+        <img src="assets/hero/hero-primary.jpeg" alt="666SOUNDsDESIGn Hero" class="hero-image" id="heroImage">
+        <div class="hero-frame-overlay"></div>
+        <div class="hero-panel-layer">
+          <section class="hero-panel active" data-panel="home">
+            <div class="panel-head">
+              <h1>WELCOME TO THE TRANSMISSION</h1>
+              <p>Single-Page Hero System · Sticky Player only · Clean Audio Path · Intro via GitHub asset</p>
+            </div>
+            <div class="home-grid">
+              <article class="glass-card home-card">
+                <h2>Signal</h2>
+                <p id="heroNowPlaying">Waiting for metadata…</p>
+                <div class="mini-line" id="heroMetaLine">Worker sync pending</div>
+                <div class="hero-action-row">
+                  <button class="primary-action" id="playRadioBtn" type="button">PLAY RADIO</button>
+                  <button class="secondary-action" id="playIntroBtn" type="button">PLAY INTRO</button>
+                  <button class="secondary-action" id="openStreamsBtn" type="button">SOURCES</button>
+                </div>
+              </article>
+              <article class="glass-card home-card">
+                <h2>Live Backend</h2>
+                <ul class="key-value-list">
+                  <li><span>Worker Base</span><strong>666soundsdesign.fraggelpower666.workers.dev</strong></li>
+                  <li><span>Main Stream</span><strong>/stream</strong></li>
+                  <li><span>Sunshine Stream</span><strong>/stream-sunshine</strong></li>
+                  <li><span>Status API</span><strong>/status</strong></li>
+                  <li><span>Now Playing</span><strong>/nowplaying</strong></li>
+                  <li><span>Listeners</span><strong>/listeners</strong></li>
+                </ul>
+              </article>
+              <article class="glass-card home-card">
+                <h2>Architecture Lock</h2>
+                <ul class="bullet-grid">
+                  <li>No direct HTML navigation</li>
+                  <li>Single Audio Path only</li>
+                  <li>No KV binding</li>
+                  <li>No R2 binding</li>
+                  <li>Intro served from GitHub asset</li>
+                  <li>Everything UI controlled</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="hero-panel" data-panel="songlab">
+            <div class="panel-head">
+              <h1>SONGLAB + MP3 TOOLS</h1>
+              <p>Mastering, transcription, situating, upload-to-worker, archive routing.</p>
+            </div>
+            <div class="dual-grid">
+              <article class="glass-card">
+                <h2>Mastering Backend</h2>
+                <p>Render backend detected from your notes. Frontend uses the Cloudflare mastering worker as entry point and keeps the backend hidden behind that worker route.</p>
+                <div class="tool-row">
+                  <button class="secondary-action" data-open-tool="mastering" type="button">OPEN MASTERING TOOL</button>
+                  <button class="secondary-action" data-open-tool="transcribe" type="button">OPEN TRANSCRIBE TOOL</button>
+                  <button class="secondary-action" data-open-tool="situate" type="button">OPEN SITUATE TOOL</button>
+                </div>
+                <form id="mp3ToolForm" class="tool-form">
+                  <label>Datei
+                    <input type="file" id="mp3Input" accept=".mp3,.wav,.m4a,.ogg,.flac,.webm,.mp4,.mpeg,.mpga">
+                  </label>
+                  <label>Mode
+                    <select id="mp3Mode">
+                      <option value="master">Master</option>
+                      <option value="transcribe">Transcribe</option>
+                      <option value="situate">Situate</option>
+                    </select>
+                  </label>
+                  <label>Admin Password
+                    <input type="password" id="mp3AdminPassword" autocomplete="off">
+                  </label>
+                  <button class="primary-action" type="submit">SEND TO MASTERING WORKER</button>
+                </form>
+                <pre class="result-box" id="mp3Result">No request sent yet.</pre>
+              </article>
+              <article class="glass-card">
+                <h2>Media Library Overlay</h2>
+                <p>Sticky Player can switch between direct radio streams and media targets. External SoundCloud / Mixcloud / YouTube sources are opened inside the hero viewport or external tab depending on browser policy.</p>
+                <div id="mediaLibraryList" class="source-list compact"></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="hero-panel" data-panel="chat">
+            <div class="panel-head">
+              <h1>CHAT / VIRTUAL MODULE</h1>
+              <p>Internal hero panel instead of hard page switching.</p>
+            </div>
+            <div class="dual-grid">
+              <article class="glass-card">
+                <h2>Connected Workers</h2>
+                <ul class="key-value-list" id="workerList"></ul>
+              </article>
+              <article class="glass-card">
+                <h2>Embed Area</h2>
+                <div class="embed-frame">
+                  <iframe id="heroEmbedFrame" title="Hero Embedded View" loading="lazy" referrerpolicy="no-referrer" allow="autoplay; encrypted-media"></iframe>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="hero-panel" data-panel="lyrics">
+            <div class="panel-head">
+              <h1>LYRICS / DATABASE</h1>
+              <p>Archive files remain bundled in this package. Source database can be edited from the UI and exported/imported as JSON.</p>
+            </div>
+            <div class="dual-grid">
+              <article class="glass-card">
+                <h2>Quick Access</h2>
+                <div class="tool-row">
+                  <button class="secondary-action" data-load-doc="data/lyrics_archive_database_clean.txt" type="button">Open Lyrics Archive</button>
+                  <button class="secondary-action" data-load-doc="data/system-manifest.json" type="button">Open Manifest</button>
+                  <button class="secondary-action" data-load-doc="database/stream_sources.sql" type="button">Open SQL Schema</button>
+                </div>
+                <pre class="result-box doc-box" id="docViewer">Select a bundled file to preview.</pre>
+              </article>
+              <article class="glass-card">
+                <h2>About / Social / Impressum</h2>
+                <div class="rich-text">
+                  <p><strong>WebRadio 666SOUNDsDESIGn</strong> is digital underground connected — dark electronic sound, 24/7 stream energy, original productions and curated underground selections.</p>
+                  <p>SoundCloud, Mixcloud, YouTube and other sources can be routed through the sticky player workflow as source selections. Native browser transport controls remain available for direct audio sources; third-party embeds obey the host platform limitations.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="hero-panel" data-panel="tools">
+            <div class="panel-head">
+              <h1>TOOLS / SOURCE ROUTER</h1>
+              <p>UI-controlled stream switching, source DB editing, system-password-aware admin operations.</p>
+            </div>
+            <div class="dual-grid">
+              <article class="glass-card">
+                <h2>Stream Router</h2>
+                <div id="sourceList" class="source-list"></div>
+              </article>
+              <article class="glass-card">
+                <h2>Source Database Admin</h2>
+                <form id="sourceForm" class="tool-form">
+                  <input type="hidden" id="sourceId">
+                  <label>Label<input type="text" id="sourceLabel" required></label>
+                  <label>Type
+                    <select id="sourceType">
+                      <option value="radio">Radio Stream</option>
+                      <option value="stream">Direct Audio / MP3</option>
+                      <option value="soundcloud">SoundCloud</option>
+                      <option value="mixcloud">Mixcloud</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="external">External URL</option>
+                    </select>
+                  </label>
+                  <label>URL<input type="url" id="sourceUrl" required></label>
+                  <label>Meta URL<input type="url" id="sourceMetaUrl"></label>
+                  <label>Artwork URL<input type="url" id="sourceArtworkUrl"></label>
+                  <label>Group<input type="text" id="sourceGroup" value="custom"></label>
+                  <label>Password for system worker<input type="password" id="systemPassword"></label>
+                  <div class="tool-row">
+                    <button class="primary-action" type="submit">SAVE SOURCE</button>
+                    <button class="secondary-action" id="exportSourcesBtn" type="button">EXPORT JSON</button>
+                    <button class="secondary-action" id="resetDefaultsBtn" type="button">RESET DEFAULTS</button>
+                  </div>
+                </form>
+              </article>
+            </div>
+          </section>
+
+          <section class="hero-panel" data-panel="info">
+            <div class="panel-head">
+              <h1>INFO / IMPRESSUM / LINKS</h1>
+              <p>Bundled from your provided project data block.</p>
+            </div>
+            <div class="triple-grid">
+              <article class="glass-card">
+                <h2>Social Links</h2>
+                <ul class="link-list">
+                  <li><a href="https://soundcloud.com/fraggelpower666" target="_blank" rel="noreferrer">SoundCloud</a></li>
+                  <li><a href="https://www.mixcloud.com/Fraggelpower666/" target="_blank" rel="noreferrer">Mixcloud</a></li>
+                  <li><a href="https://music.youtube.com/@fraggelpower666" target="_blank" rel="noreferrer">YouTube Music</a></li>
+                  <li><a href="https://www.facebook.com/PsyTranceFraggeL2k" target="_blank" rel="noreferrer">Facebook</a></li>
+                  <li><a href="https://discord.com/users/1332026823168757776" target="_blank" rel="noreferrer">Discord</a></li>
+                </ul>
+              </article>
+              <article class="glass-card">
+                <h2>Contact / Impressum</h2>
+                <ul class="key-value-list">
+                  <li><span>Name</span><strong>DJ Fraggel / FraggelPower666</strong></li>
+                  <li><span>Country</span><strong>Deutschland</strong></li>
+                  <li><span>Email</span><strong><a href="mailto:fraggelpower666@googlemail.com">fraggelpower666@googlemail.com</a></strong></li>
+                  <li><span>Website</span><strong><a href="https://666soundsdesign.neocities.org/" target="_blank" rel="noreferrer">666soundsdesign.neocities.org</a></strong></li>
+                </ul>
+              </article>
+              <article class="glass-card">
+                <h2>Source Notes</h2>
+                <ul class="bullet-grid">
+                  <li>Recovery build used as functional base</li>
+                  <li>Snapshot rules preserved</li>
+                  <li>Current worker structure normalized</li>
+                  <li>No KV binding</li>
+                  <li>No R2 binding</li>
+                  <li>Intro moved to GitHub-served asset</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <aside class="side-tower right" aria-hidden="true">
+      <div class="tower-frame" id="rightMeter"></div>
+    </aside>
+  </section>
+
+  <footer class="sticky-player">
+    <div class="sticky-glow"></div>
+    <div class="sticky-left">
+      <div class="cover-wrap">
+        <img src="assets/logo/logo-primary.jpg" alt="Logo" id="stickyCover">
+      </div>
+      <div class="sticky-meta">
+        <div class="sticky-topline">666SOUNDsDESIGn CONTROL CONSOLE</div>
+        <div class="sticky-title" id="stickyTitle">Waiting for signal…</div>
+        <div class="sticky-subline" id="stickyMeta">Digital underground connected</div>
+      </div>
+    </div>
+    <div class="sticky-center">
+      <button class="control-btn" id="prevSourceBtn" type="button">⏮</button>
+      <button class="control-btn primary" id="playPauseBtn" type="button">▶</button>
+      <button class="control-btn" id="stopBtn" type="button">■</button>
+      <button class="control-btn" id="nextSourceBtn" type="button">⏭</button>
+      <button class="control-btn" id="sourceOverlayBtn" type="button">SOURCES</button>
+    </div>
+    <div class="sticky-right">
+      <div class="stat-block"><span>VOL</span><strong id="volumeValue">85%</strong></div>
+      <input type="range" id="volumeSlider" min="0" max="100" value="85">
+      <div class="stat-block"><span>SRC</span><strong id="stickySourceLabel">Main Radio</strong></div>
+      <div class="stat-block"><span>STATE</span><strong id="stickyState">STOP</strong></div>
+    </div>
+  </footer>
+</div>
+
+<div class="overlay hidden" id="sourceOverlay">
+  <div class="overlay-backdrop" data-close-overlay="sourceOverlay"></div>
+  <div class="overlay-card">
+    <div class="overlay-head">
+      <h2>Audio / Media Sources</h2>
+      <button class="close-btn" data-close-overlay="sourceOverlay" type="button">×</button>
+    </div>
+    <div id="overlaySourceList" class="source-list"></div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="adminOverlay">
+  <div class="overlay-backdrop" data-close-overlay="adminOverlay"></div>
+  <div class="overlay-card large">
+    <div class="overlay-head">
+      <h2>Admin / System Password / Source Database</h2>
+      <button class="close-btn" data-close-overlay="adminOverlay" type="button">×</button>
+    </div>
+    <div class="admin-grid">
+      <article class="glass-card">
+        <h3>Central System Password Worker</h3>
+        <p>All protected operations can be routed through the central system password worker. Frontend stores no permanent admin token by default.</p>
+        <label>System PW Worker URL
+          <input id="systemWorkerUrl" type="url">
+        </label>
+        <label>Admin Password
+          <input id="systemWorkerPassword" type="password" autocomplete="off">
+        </label>
+        <div class="tool-row">
+          <button class="secondary-action" id="saveSystemConfigBtn" type="button">SAVE SYSTEM CONFIG</button>
+          <button class="secondary-action" id="testSystemConfigBtn" type="button">TEST /health</button>
+        </div>
+        <pre class="result-box" id="systemConfigResult">No test executed.</pre>
+      </article>
+      <article class="glass-card">
+        <h3>Bundled Build Notes</h3>
+        <ul class="bullet-grid">
+          <li>Intro loaded from GitHub asset path <code>assets/audio/WebRadio_666SOUNDsDESIGn_Intro.mp3</code></li>
+          <li>Main radio stream remains worker alias <code>/stream</code></li>
+          <li>Metadata fields expected: song, listeners, bitrate, dj, djstatus, art, active_source</li>
+          <li>Local source database uses IndexedDB in browser and JSON export/import for transport</li>
+          <li>Optional SQL schema included for future backend persistence</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</div>
+
+<audio id="mainAudio" preload="none" crossorigin="anonymous"></audio>
+
+<script src="js/v10-config.js?v=10"></script>
+<script src="js/v10-db.js?v=10"></script>
+<script src="js/v10-app.js?v=10"></script>
+</body>
+</html>

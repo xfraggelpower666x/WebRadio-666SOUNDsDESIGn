@@ -1,0 +1,12 @@
+API-Ready Add-on Build
+
+Ergänzt:
+- wrangler.toml.example
+- .dev.vars.example
+- docs/OPENAI_API_EINBAU.md
+- Deploy-Doku erweitert um /api/songlab/transcribe und OPENAI_AUDIO_MODEL
+
+Wichtig:
+- OPENAI_API_KEY bleibt Secret und wurde absichtlich NICHT in Frontend-Dateien eingetragen.
+- Der Worker ist bereits auf env.OPENAI_API_KEY verdrahtet.
+- Echte Aktivierung erfordert nur noch Secret-Setzung + Deploy.

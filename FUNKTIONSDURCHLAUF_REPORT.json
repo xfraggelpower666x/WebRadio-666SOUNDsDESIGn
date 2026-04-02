@@ -1,0 +1,150 @@
+{
+  "build": "666SOUNDsDESIGn_GESAMTSYSTEM_BUILD_2026-03-18",
+  "fixes_applied": [
+    {
+      "file": "index.html",
+      "removed_sections": 1
+    },
+    {
+      "file": "admin.html",
+      "removed_sections": 1
+    },
+    {
+      "file": "info.html",
+      "removed_sections": 1
+    },
+    {
+      "file": "systeminfo.html",
+      "removed_sections": 1
+    }
+  ],
+  "page_checks": [
+    {
+      "page": "index.html",
+      "title": "666SOUNDsDESIGn — Home",
+      "missing_local_assets": [],
+      "has_sticky_player": true,
+      "system_launchpad_count": 1,
+      "integration_bridge_count": 0,
+      "nav_links": 16,
+      "links": 7,
+      "scripts": 7,
+      "images": 8
+    },
+    {
+      "page": "gesamtsystem.html",
+      "title": "666SOUNDsDESIGn — Gesamtsystem",
+      "missing_local_assets": [],
+      "has_sticky_player": false,
+      "system_launchpad_count": 0,
+      "integration_bridge_count": 0,
+      "nav_links": 7,
+      "links": 7,
+      "scripts": 1,
+      "images": 6
+    },
+    {
+      "page": "dateisystem.html",
+      "title": "666SOUNDsDESIGn — Dateisystem",
+      "missing_local_assets": [],
+      "has_sticky_player": false,
+      "system_launchpad_count": 0,
+      "integration_bridge_count": 0,
+      "nav_links": 7,
+      "links": 7,
+      "scripts": 1,
+      "images": 6
+    },
+    {
+      "page": "soundlab.html",
+      "title": "666SOUNDsDESIGn — SoundLab",
+      "missing_local_assets": [],
+      "has_sticky_player": false,
+      "system_launchpad_count": 0,
+      "integration_bridge_count": 1,
+      "nav_links": 16,
+      "links": 7,
+      "scripts": 6,
+      "images": 6
+    },
+    {
+      "page": "systeminfo.html",
+      "title": "666SOUNDsDESIGn — SystemInfo",
+      "missing_local_assets": [],
+      "has_sticky_player": true,
+      "system_launchpad_count": 0,
+      "integration_bridge_count": 1,
+      "nav_links": 16,
+      "links": 7,
+      "scripts": 7,
+      "images": 6
+    },
+    {
+      "page": "admin.html",
+      "title": "666SOUNDsDESIGn — Admin",
+      "missing_local_assets": [],
+      "has_sticky_player": true,
+      "system_launchpad_count": 0,
+      "integration_bridge_count": 1,
+      "nav_links": 16,
+      "links": 7,
+      "scripts": 7,
+      "images": 6
+    },
+    {
+      "page": "info.html",
+      "title": "666SOUNDsDESIGn — Info",
+      "missing_local_assets": [],
+      "has_sticky_player": true,
+      "system_launchpad_count": 0,
+      "integration_bridge_count": 1,
+      "nav_links": 16,
+      "links": 7,
+      "scripts": 7,
+      "images": 6
+    }
+  ],
+  "js_checks": [
+    {
+      "file": "js/site.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "js/system-hubs.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "js/soundlab-page.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "js/sd-system.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "js/radio-config.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "js/radio-config-loader.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "js/lyrics-index.js",
+      "ok": true,
+      "stderr": ""
+    },
+    {
+      "file": "sticky-player/sticky-player.js",
+      "ok": true,
+      "stderr": ""
+    }
+  ],
+  "overall_static_status": "ok"
+}

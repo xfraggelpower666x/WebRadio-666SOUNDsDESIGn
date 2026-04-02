@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-src 'self' https:;">
+  <title>666SOUNDsDESIGn — SoundLab</title>
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="shortcut icon" href="assets/icons/favicon.ico">
+  <link rel="stylesheet" href="css/site.css?v=173">
+  <link rel="stylesheet" href="css/audio-source-router.css">
+  <link rel="stylesheet" href="sticky-player/sticky-player.css?v=173">
+  <link rel="stylesheet" href="addon/css/cyber-ui.css">
+  <link rel="stylesheet" href="css/sticky-source-selector-cyberpunk.css">
+  <link rel="stylesheet" href="css/system-hubs.css">
+  <link rel="stylesheet" href="css/audio-source-router.css">
+  <style>
+    .soundlab-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+    .soundlab-form .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .soundlab-form label{display:block;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:#93ecff;margin-bottom:6px}
+    .soundlab-form input,.soundlab-form select,.soundlab-form textarea{
+      width:100%;padding:12px 14px;border-radius:14px;border:1px solid rgba(109,235,255,.22);
+      background:rgba(6,11,24,.92);color:#e5fbff;box-shadow:inset 0 0 0 1px rgba(96,185,255,.06)
+    }
+    .soundlab-form textarea{min-height:170px;resize:vertical}
+    .soundlab-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .soundlab-actions .control-btn{min-width:140px}
+    .soundlab-output .codebox{min-height:120px}
+    .soundlab-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .soundlab-status{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .soundlab-status .badge-row{margin:0}
+    .soundlab-form .span-2{grid-column:1 / -1}
+    @media (max-width:980px){
+      .soundlab-grid,.soundlab-form .form-grid,.soundlab-mini-grid{grid-template-columns:1fr}
+      .soundlab-form .span-2{grid-column:auto}
+    }
+  </style>
+</head>
+<body data-page="soundlab">
+
+<div id="crawlerOverlay" aria-hidden="true">
+  <button class="control-btn crawler-close" id="crawlerClose" type="button">Close</button>
+  <canvas id="starCanvas"></canvas>
+  <div id="crawlerGrid"></div>
+  <div id="crawlContainer"><div id="crawl"><p class="intro">DIGITAL UNDERGROUND CONNECTED</p><h1>666SOUNDsDESIGn</h1><p>DJ FRAGGEL / FRAGGELPOWER666</p><p>SoundLab API und Worker Layer aktivierbar über Cloudflare Worker. Fallback lokal im Browser.</p><p class="system">SYSTEM ONLINE</p></div></div>
+  <div class="lightning-flash" id="crawlerFlash"></div>
+</div>
+
+<div class="site-shell">
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="header-brand-panel"><img src="assets/logos/header-left.png" alt="Fraggle Logo"></div>
+      <div class="header-center"><div class="header-kicker">SoundLab</div><img src="assets/hero/header-new.jpg" alt="666SOUNDsDESIGn Header"><div class="header-slogan">DIGITAL UNDERGROUND CONNECTED</div></div>
+      <div class="header-side-panel"><img src="assets/logos/header-right.png" alt="Fraggelpower666 Logo"></div>
+    </div>
+    <nav class="top-menu" aria-label="Hauptnavigation"><a class="menu-btn" data-page="index" href="index.html">HOME</a><a class="menu-btn" data-page="info" href="info.html">INFO</a><a class="menu-btn" data-page="systeminfo" href="systeminfo.html">SYSTEMINFO</a><a class="menu-btn" data-page="musik-sets" href="musik-sets.html">MUSIC &amp; SETS</a><a class="menu-btn" data-page="youtube-visuals" href="youtube-visuals.html">YOUTUBE VISUALS</a><a class="menu-btn" data-page="galerie" href="galerie.html">GALLERY</a><a class="menu-btn" data-page="kontakt" href="kontakt.html">KONTAKT</a><a class="menu-btn" data-page="impressum" href="impressum.html">IMPRESSUM</a><a class="menu-btn" data-page="datenschutz" href="datenschutz.html">DATENSCHUTZ</a><a class="menu-btn admin-link" data-page="admin" href="admin.html">ADMIN</a><a class="menu-btn" data-page="chat-lab" href="chat-addon/index.html">CHAT LAB</a><a class="menu-btn" data-page="fx-control" href="addon/ui/control-panel.html">FX CONTROL</a><a class="menu-btn" data-page="hud-lab" href="addon/ui/hud-editor.html">HUD LAB</a><a class="menu-btn" data-page="soundlab" href="soundlab.html">SOUND LAB</a><a class="menu-btn" data-page="dateisystem" href="dateisystem.html">DATEISYSTEM</a><a class="menu-btn" data-page="gesamtsystem" href="gesamtsystem.html">GESAMTSYSTEM</a></nav>
+  </div>
+</header>
+
+<main class="page-main page-grid">
+  <section class="section-card">
+    <div class="card-pad soundlab-status">
+      <div>
+        <h2 class="card-title">SoundLab API Activation</h2>
+        <p class="card-sub">Worker-first Build mit lokalem Fallback. Generate / Save / Load / Project List laufen über denselben API-Layer.</p>
+      </div>
+      <div class="badge-row">
+        <span class="badge">WORKER READY</span>
+        <span class="badge">API PREFERRED</span>
+        <span class="badge">LOCAL FALLBACK</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="soundlab-grid">
+    <section class="section-card soundlab-form">
+      <div class="card-pad">
+        <h2 class="card-title">Builder</h2>
+        <div class="form-grid">
+          <div>
+            <label for="authToken">Worker Token / Passwort</label>
+            <input id="authToken" type="password" placeholder="SONGLAB_PASSWORD">
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="control-btn hot" id="authBtn" type="button">Worker Auth</button>
+          </div>
+
+          <div>
+            <label for="engine">Engine</label>
+            <select id="engine">
+              <option value="S45">Suno 4.5</option>
+              <option value="S5" selected>Suno V5</option>
+            </select>
+          </div>
+          <div>
+            <label for="mode">Mode</label>
+            <select id="mode">
+              <option value="lyrics" selected>Lyrics → Optimize</option>
+              <option value="idea">Idea → Expand</option>
+              <option value="intro">Radio Intro</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="lyricsEntry">Lyrics Archive Entry</label>
+            <select id="lyricsEntry"><option value="">Archiv-Eintrag wählen…</option></select>
+          </div>
+          <div>
+            <label for="genre">Genre</label>
+            <input id="genre" placeholder="Hard Techno / Psytrance / DnB">
+          </div>
+
+          <div>
+            <label for="bpm">BPM</label>
+            <input id="bpm" placeholder="150">
+          </div>
+          <div>
+            <label for="language">Sprache</label>
+            <input id="language" placeholder="DE / EN / ES">
+          </div>
+
+          <div class="span-2">
+            <label for="mood">Mood</label>
+            <input id="mood" placeholder="dark / aggressive / cinematic / erotic / ritual">
+          </div>
+
+          <div class="span-2">
+            <label for="titleHint">Title Hint</label>
+            <input id="titleHint" placeholder="optional">
+          </div>
+
+          <div class="span-2">
+            <label for="inputText">Input / Keywords</label>
+            <textarea id="inputText" placeholder="Keywords, Konzept oder Hook eingeben"></textarea>
+          </div>
+
+          <div class="span-2">
+            <label for="lyricsText">Lyrics</label>
+            <textarea id="lyricsText" placeholder="Lyrics oder Radio-Intro-Text eingeben"></textarea>
+          </div>
+
+          <div class="span-2">
+            <label for="stylePrompt">Style Prompt</label>
+            <textarea id="stylePrompt" placeholder="Styleprompt oder Produktionsnotizen"></textarea>
+          </div>
+        </div>
+
+        <input id="projectId" type="hidden">
+
+        <div class="soundlab-actions">
+          <button class="control-btn hot" id="generateBtn" type="button">Generate</button>
+          <button class="control-btn" id="saveBtn" type="button">Save</button>
+          <button class="control-btn" id="loadBtn" type="button">Load</button>
+          <button class="control-btn" id="statusBtn" type="button">Status</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card soundlab-output">
+      <div class="card-pad">
+        <h2 class="card-title">Output + Projekte</h2>
+
+        <div class="soundlab-mini-grid">
+          <div>
+            <h3 class="card-title" style="font-size:1rem">Gespeicherte Projekte</h3>
+            <select id="projectList"><option value="">Projekt wählen…</option></select>
+            <p class="card-sub">Save / Load nutzt zuerst die API. Wenn die API nicht erreichbar ist, fällt das System auf lokalen Browser-Speicher zurück.</p>
+          </div>
+          <div>
+            <h3 class="card-title" style="font-size:1rem">Action State</h3>
+            <div class="codebox" id="actionState">IDLE</div>
+          </div>
+        </div>
+
+        <h3 class="card-title" style="font-size:1rem;margin-top:18px">Title</h3>
+        <div class="codebox" id="titleBox"></div>
+
+        <h3 class="card-title" style="font-size:1rem;margin-top:18px">Style Prompt</h3>
+        <div class="codebox" id="styleBox"></div>
+
+        <h3 class="card-title" style="font-size:1rem;margin-top:18px">Suno Prompt</h3>
+        <div class="codebox" id="sunoPromptBox"></div>
+
+        <h3 class="card-title" style="font-size:1rem;margin-top:18px">Lyrics Output</h3>
+        <div class="codebox" id="lyricsBox"></div>
+
+        <h3 class="card-title" style="font-size:1rem;margin-top:18px">Structure</h3>
+        <div class="codebox" id="structureBox"></div>
+
+        <h3 class="card-title" style="font-size:1rem;margin-top:18px">Projektstatus</h3>
+        <div class="codebox" id="projectStatusDump"></div>
+      </div>
+    </section>
+  </section>
+<section class="section-card integration-bridge-panel"><div class="card-pad"><h2 class="card-title">System-Integration</h2><p>Die Grundsysteme sind jetzt sowohl als Dateisystem als auch als HTML-Gesamtsystem verfügbar.</p><div class="system-actions"><a class="system-btn" href="dateisystem.html">Dateisystem</a><a class="system-btn" href="gesamtsystem.html">Gesamtsystem</a><a class="system-btn" href="data/system-manifest.json">Manifest</a></div></div></section>
+</main>
+
+<footer class="footer-hud"><div class="footer-row"><img class="footer-logo" src="assets/footer/logo.png" alt="Logo"><div class="footer-copy">© 2026 666SOUNDsDESIGn — DIGITAL UNDERGROUND CONNECTED</div><img class="footer-logo" src="assets/footer/logo.png" alt="Logo"></div><div class="footer-pulse"></div><div class="footer-neo"><img src="assets/footer/neocities-banner.png" alt="Neocities"></div></footer>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/sd-system.js"></script>
+<script src="js/lyrics-index.js"></script>
+<script src="js/soundlab-api.js"></script>
+<script src="js/site.js"></script>
+<script src="js/soundlab-page.js"></script>
+<script src="js/radio-config.js"></script>
+<script src="js/audio-source-router.js"></script>
+<script src="js/audio-source-router-ui.js"></script>
+<script src="js/mp3-transcription-addon.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-src 'self' https:;">
+  <title>666SOUNDsDESIGn — Music & Sets</title>
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="shortcut icon" href="assets/icons/favicon.ico">
+  <link rel="stylesheet" href="css/site.css?v=172">
+  <link rel="stylesheet" href="css/audio-source-router.css">
+  <link rel="stylesheet" href="sticky-player/sticky-player.css?v=172">
+  <link rel="stylesheet" href="addon/css/cyber-ui.css">
+  <link rel="stylesheet" href="css/sticky-source-selector-cyberpunk.css">
+</head>
+<body data-page="musik-sets">
+
+<div id="crawlerOverlay" aria-hidden="true">
+  <button class="control-btn crawler-close" id="crawlerClose" type="button">Close</button>
+  <canvas id="starCanvas"></canvas>
+  <div id="crawlerGrid"></div>
+  <div id="crawlContainer"><div id="crawl"><p class="intro">DIGITAL UNDERGROUND CONNECTED</p><h1>666SOUNDsDESIGn</h1><p>DJ FRAGGEL / FRAGGELPOWER666</p><p>Cyberpunk Psytrance Webradio Platform</p><p>Stream und Crawler starten parallel. Kein TTS. Kein zusätzliches Voice-Intro. Nur Neon, Storm, Bass und Radio-Energie.</p><p>Cloudflare Worker als CORS Pass-Through. Keine Re-Encodes. Keine Worker-Artefakte.</p><p class="system">SYSTEM ONLINE</p></div></div>
+  <div class="lightning-flash" id="crawlerFlash"></div>
+</div>
+<div class="site-shell">
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="header-brand-panel"><img src="assets/logos/header-left.png" alt="Fraggle Logo"></div>
+      <div class="header-center"><div class="header-kicker">Music & Sets</div><img src="assets/hero/header-new.jpg" alt="666SOUNDsDESIGn Header"><div class="header-slogan">DIGITAL UNDERGROUND CONNECTED</div></div>
+      <div class="header-side-panel"><img src="assets/logos/header-right.png" alt="Fraggelpower666 Logo"></div>
+    </div>
+    <nav class="top-menu" aria-label="Hauptnavigation"><a class="menu-btn" data-page="index" href="index.html">HOME</a><a class="menu-btn" data-page="info" href="info.html">INFO</a><a class="menu-btn" data-page="systeminfo" href="systeminfo.html">SYSTEMINFO</a><a class="menu-btn" data-page="musik-sets" href="musik-sets.html">MUSIC & SETS</a><a class="menu-btn" data-page="youtube-visuals" href="youtube-visuals.html">YOUTUBE VISUALS</a><a class="menu-btn" data-page="galerie" href="galerie.html">GALLERY</a><a class="menu-btn" data-page="kontakt" href="kontakt.html">KONTAKT</a><a class="menu-btn" data-page="impressum" href="impressum.html">IMPRESSUM</a><a class="menu-btn" data-page="datenschutz" href="datenschutz.html">DATENSCHUTZ</a><a class="menu-btn admin-link" data-page="admin" href="admin.html">ADMIN</a><a class="menu-btn" data-page="chat-lab" href="chat-addon/index.html">CHAT LAB</a><a class="menu-btn" data-page="fx-control" href="addon/ui/control-panel.html">FX CONTROL</a><a class="menu-btn" data-page="hud-lab" href="addon/ui/hud-editor.html">HUD LAB</a><a class="menu-btn" data-page="soundlab" href="soundlab.html">SOUND LAB</a></nav>
+  </div>
+</header>
+<main class="page-main page-grid">
+<section class="section-card"><div class="card-pad copy-block"><h2 class="card-title">Music &amp; Sets</h2><p>Diese Seite bleibt als eigener Bereich erhalten. Die frühere doppelte HTML-Struktur wurde konsolidiert; Layout, Header, Footer und Player kommen jetzt aus demselben System wie die Startseite.</p><div class="list-grid"><div class="media-card"><h3>Live Sets</h3><p>Kuratiere hier deine Psytrance-, Dark-Techno- oder Special-Mix-Einträge mit direkten Links, Artwork und Set-Längen.</p></div><div class="media-card"><h3>Feature Drops</h3><p>Platz für Release-Hinweise, Event-Specials oder archivierte Broadcast-Sessions.</p></div><div class="media-card"><h3>Direct Stream Links</h3><p>Verweise bei Bedarf auf die StreamLinks innerhalb SystemInfo oder auf separate Download-/Playlist-Ziele.</p></div></div></div></section>
+</main>
+<footer class="footer-hud"><div class="footer-row"><img class="footer-logo" src="assets/footer/logo.png" alt="Logo"><div class="footer-copy">© 2026 666SOUNDsDESIGn — DIGITAL UNDERGROUND CONNECTED</div><img class="footer-logo" src="assets/footer/logo.png" alt="Logo"></div><div class="footer-pulse"></div><div class="footer-neo"><img src="assets/footer/neocities-banner.png" alt="Neocities"></div></footer>
+</div>
+<div class="bottom-meter-panel" aria-hidden="true"><div class="level-meter"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+<div class="sticky-radio" id="stickyRadio">
+    <div class="sticky-radio__frame">
+      <div class="sticky-radio__inner">
+        <div class="rail rail--top" aria-hidden="true"></div>
+
+        <section class="player-core">
+          <div class="hud-lines" aria-hidden="true">
+            <svg viewBox="0 0 1600 400" preserveAspectRatio="none">
+              <g fill="none" stroke="rgba(103,234,255,.82)" stroke-width="2">
+                <path d="M48 76 H258 L306 28 H1294 L1340 76 H1552" />
+                <path d="M44 100 H240 L288 52 H1312 L1360 100 H1556" opacity=".6" />
+                <path d="M22 118 H194 L218 88 H1382 L1406 118 H1578" opacity=".52" />
+                <path d="M54 324 H404 L438 360 H1162 L1196 324 H1546" />
+                <path d="M96 344 H420" opacity=".6" />
+                <path d="M1180 344 H1504" opacity=".6" />
+                <path d="M74 102 V292 L118 338 H390" />
+                <path d="M1526 102 V292 L1482 338 H1210" />
+                <path d="M298 66 H1302" opacity=".44" />
+                <path d="M444 338 H1158" opacity=".42" />
+              </g>
+            </svg>
+          </div>
+
+          <div class="hud-corners" aria-hidden="true">
+            <svg viewBox="0 0 1600 400" preserveAspectRatio="none">
+              <g fill="none" stroke="rgba(93,225,255,.7)" stroke-width="2">
+                <path d="M18 86 h94 l38 -38" />
+                <path d="M18 118 h66" opacity=".55" />
+                <path d="M1582 86 h-94 l-38 -38" />
+                <path d="M1582 118 h-66" opacity=".55" />
+                <path d="M18 314 h64 l24 24" />
+                <path d="M1582 314 h-64 l-24 24" />
+              </g>
+            </svg>
+          </div>
+
+          <aside class="panel panel--cover">
+            <div class="fallback-logo" aria-hidden="true"></div>
+            <img class="cover-art" id="coverArt" alt="Now playing Bild" src="" />
+            <div class="cover-overlay"></div>
+            <div class="status-chip"><span class="status-dot"></span><span id="liveState">LIVE</span></div>
+          </aside>
+
+          <main class="meta">
+            <div class="topline"><span class="strong">Live // Now Playing:</span>&nbsp;<span id="nowPlayingLine">· LIVE · © 666SOUNDsDESIGn · WebRadio · Online ·</span></div>
+
+            <div class="title-box">
+              <h2 class="track-title" id="trackTitle">· LIVE · © 666SOUNDsDESIGn · WebRadio · Online ·</h2>
+              <div class="track-subtitle" id="trackMetaLine">Webradio • 666SOUNDsDESIGn • Neon Cyber Stream</div>
+            </div>
+
+            <div class="stats-bar">
+              <div class="stat">
+                <span class="stat__label">Listeners</span>
+                <span class="stat__value" id="listenersValue">—</span>
+              </div>
+              <div class="stat">
+                <span class="stat__label">Stream Qualität</span>
+                <span class="stat__value" id="qualityValue">—</span>
+              </div>
+              <div class="stat">
+                <span class="stat__label">Status</span>
+                <span class="stat__value" id="connectionValue">LIVE</span>
+              </div>
+            </div>
+
+            <div class="control-strip">
+              <div class="buttons" role="group" aria-label="Player Steuerung">
+                <button class="btn" id="playBtn" title="Play" aria-label="Play">
+                  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M210 170 L360 256 L210 342 Z"></path></svg>
+                </button>
+                <button class="btn" id="pauseBtn" title="Pause" aria-label="Pause">
+                  <svg viewBox="0 0 512 512" aria-hidden="true"><rect x="200" y="170" width="40" height="172" rx="10"></rect><rect x="272" y="170" width="40" height="172" rx="10"></rect></svg>
+                </button>
+                <button class="btn" id="stopBtn" title="Stop" aria-label="Stop">
+                  <svg viewBox="0 0 512 512" aria-hidden="true"><rect x="200" y="200" width="112" height="112" rx="12"></rect></svg>
+                </button>
+                <button class="btn" id="muteBtn" title="Stumm schalten" aria-label="Stumm schalten">
+                  <svg viewBox="0 0 512 512" aria-hidden="true">
+                    <path d="M170 290 L220 290 L270 340 L270 172 L220 222 L170 222 Z"></path>
+                    <path d="M305 220 C330 240 330 272 305 292"></path>
+                    <path d="M335 190 C375 225 375 287 335 322"></path>
+                    <path d="M170 170 L342 342"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="center-bank">
+                <div class="volume-panel">
+                  <div class="panel-head">
+                    <span>Volume</span>
+                    <span id="volumeLabel">78%</span>
+                  </div>
+                  <div class="volume-row">
+                    <span class="icon-laser" aria-hidden="true">
+                      <svg viewBox="0 0 512 512"><path d="M170 290 L220 290 L270 340 L270 172 L220 222 L170 222 Z"></path><path d="M305 220 C330 240 330 272 305 292"></path><path d="M335 190 C375 225 375 287 335 322"></path></svg>
+                    </span>
+                    <label class="sr-only" for="volumeSlider">Lautstärke</label>
+                    <input id="volumeSlider" type="range" min="0" max="100" value="78" />
+                    <div class="volume-value" id="volumeValue">78</div>
+                  </div>
+                </div>
+
+                <div class="eq-panel">
+                  <div class="panel-head">
+                    <span>Equalizer</span>
+                    <span id="eqMode">FFT</span>
+                  </div>
+                  <div class="eq-wrap" id="eqWrap" aria-label="FFT Equalizer"></div>
+                </div>
+              </div>
+
+              <aside class="right-stack">
+                <div class="timer-panel">
+                  <div class="timer-label">On Air</div>
+                  <div class="timer-value" id="timerValue">LIVE</div>
+                </div>
+                <div class="logo-mini">
+                  <div class="logo-mini__icon"></div>
+                  <div class="logo-mini__text"><strong id="djValue">WebRadio</strong>© 666SOUNDsDESIGn</div>
+                </div>
+              </aside>
+            </div>
+          </main>
+        </section>
+
+        <div class="rail rail--bottom" aria-hidden="true"></div>
+        <div class="rail rail--brand" aria-hidden="true">
+          <div class="brand-layer">
+            <div class="brand-logo"></div>
+            <div class="brand-title">WebRadio  ©  666SOUNDsDESIGn</div>
+            <div class="brand-sub">FragglePower666</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="js/config.js?v=172"></script>
+<script src="js/crawler.js?v=172"></script>
+<script src="sticky-player/sticky-player.js?v=172"></script>
+<script src="js/site.js?v=172"></script>
+  <script src="js/radio-config.js"></script>
+  <script src="js/radio-config-loader.js"></script>
+  <script src="js/sticky-source-selector-cyberpunk.js"></script>
+<script src="js/radio-config.js"></script>
+<script src="js/audio-source-router.js"></script>
+<script src="js/audio-source-router-ui.js"></script>
+</body>
+</html>

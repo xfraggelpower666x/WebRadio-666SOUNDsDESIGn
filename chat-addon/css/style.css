@@ -1,0 +1,50 @@
+
+:root{
+  --bg:#05070b; --panel:#0c1118; --line:#1ef2ff; --line2:#ff38d1; --text:#dffcff; --muted:#7ea7b1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    linear-gradient(rgba(30,242,255,.06), rgba(30,242,255,.02)),
+    repeating-linear-gradient(0deg, rgba(30,242,255,.04) 0, rgba(30,242,255,.04) 1px, transparent 1px, transparent 24px),
+    repeating-linear-gradient(90deg, rgba(30,242,255,.04) 0, rgba(30,242,255,.04) 1px, transparent 1px, transparent 24px),
+    var(--bg);
+  color:var(--text); font-family:Arial, Helvetica, sans-serif; line-height:1.5;
+}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  border:1px solid rgba(30,242,255,.35);
+  background:linear-gradient(180deg, rgba(30,242,255,.08), rgba(255,56,209,.04));
+  box-shadow:0 0 24px rgba(30,242,255,.12), inset 0 0 18px rgba(30,242,255,.04);
+  padding:16px 18px;border-radius:14px;
+}
+.brand{font-size:28px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.sub{color:var(--muted);font-size:13px}
+nav{display:flex;gap:10px;flex-wrap:wrap}
+nav a,.btn{
+  color:var(--text); text-decoration:none; padding:10px 14px; border:1px solid rgba(30,242,255,.35);
+  border-radius:10px; background:rgba(7,12,18,.7); display:inline-block;
+}
+nav a:hover,.btn:hover{border-color:var(--line2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:22px}
+.card{
+  background:linear-gradient(180deg, rgba(13,18,26,.94), rgba(8,12,18,.96));
+  border:1px solid rgba(30,242,255,.22); border-radius:14px; padding:18px;
+}
+pre,.output{
+  white-space:pre-wrap; word-break:break-word; background:#04070b;
+  border:1px solid rgba(30,242,255,.18); border-radius:10px; padding:14px; min-height:74px;
+}
+textarea,input{
+  width:100%; background:#03060a; color:var(--text); border:1px solid rgba(30,242,255,.26);
+  border-radius:10px; padding:12px;
+}
+label{display:block;margin:12px 0 8px;font-weight:700}
+hr{border:none;border-top:1px solid rgba(30,242,255,.15);margin:18px 0}
+.muted{color:var(--muted)}
+.tag{
+  display:inline-block;padding:4px 8px;margin:4px 6px 0 0;border:1px solid rgba(255,56,209,.35);
+  border-radius:999px;color:#ffd8f5;background:rgba(255,56,209,.08)
+}

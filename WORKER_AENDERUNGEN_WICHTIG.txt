@@ -1,0 +1,18 @@
+WORKER ÄNDERUNGEN – WICHTIG
+
+Dieser Build enthält Worker-Änderungen.
+
+Geändert:
+- worker/cors-proxy-worker.js
+- cors-proxy-worker.js
+- worker/songlab-api-worker.js
+
+Zweck der Worker-Änderungen:
+- Radio-Metadaten stabiler aggregieren
+- Listener-/Stats-Daten aus IDJ `stats?sid=1` mit einbeziehen
+- Frontend nur normalisierte Worker-Daten liefern
+- OpenAI- und Passwortlogik komplett worker-seitig halten
+- MP3 → Text nur über Worker ausführen
+
+Hinweis:
+Wenn ein bestehender Cloudflare Worker bereits live ist, diese Änderungen bewusst gegen den Live-Worker abgleichen. Nicht blind nur die Frontend-Dateien hochladen.

@@ -1,0 +1,55 @@
+DUPLICATE CLEAN REPORT
+SYSTEM VERSION 1.1 CLEAN
+ORIGINAL ENTRIES: 170
+KEPT ENTRIES: 155
+REMOVED AS DUPLICATES: 15
+
+GROUPS
+
+KEEP 003 — 666 psy asylum lyrics! Fraggelpower666!  Continuos Mix
+Reason: longest content in duplicate group 003, 080
+REMOVE 080 — I am an extraterrestrial being in human form!
+
+KEEP 170 — Wummerland
+Reason: longest content in duplicate group 007, 170
+REMOVE 007 — alice in Wummerland
+
+KEEP 008 — Alpha
+Reason: longest content in duplicate group 008, 084, 091
+REMOVE 084 — Ich bin Alpha
+REMOVE 091 — Leer
+
+KEEP 034 — dj fraggelpower666 intro club bunker
+Reason: longest content in duplicate group 034, 035, 036
+REMOVE 035 — dj fraggelpower666 intro club numinastic Psychedelic Trance
+REMOVE 036 — dj fraggelpower666 intro club numinastic techno
+
+KEEP 062 — Final  Our Virtual World  Techno Artwork!
+Reason: longest content in duplicate group 062, 109, 110
+REMOVE 109 — Our Virtual World  PsyTrance Artwork!
+REMOVE 110 — Our Virtual World  Techno Artwork!
+
+KEEP 096 — lost in psy trance
+Reason: longest content in duplicate group 096, 097, 098
+REMOVE 097 — lost in techno
+REMOVE 098 — lost in trance
+
+KEEP 119 — PsyTechno Chemata for AI creating the Track with a excisting Audio MP3 File (2)
+Reason: longest content in duplicate group 119, 120
+REMOVE 120 — PsyTechno Chemata for AI creating the Track with a excisting Audio MP3 File
+
+KEEP 144 — Techno Bunker rede an die Menschheit
+Reason: longest content in duplicate group 123, 144
+REMOVE 123 — Psytrance rede an die Menschheit
+
+KEEP 131 — Riders of the Storm – Modern Remix
+Reason: longest content in duplicate group 130, 131
+REMOVE 130 — Riders of the Storm – Modern Remix psytechno
+
+KEEP 135 — second life psytechno world
+Reason: longest content in duplicate group 135, 136
+REMOVE 136 — second life techno world
+
+KEEP 151 — They Are losing Control
+Reason: longest content in duplicate group 151, 152
+REMOVE 152 — They Are losing Control…!!!
