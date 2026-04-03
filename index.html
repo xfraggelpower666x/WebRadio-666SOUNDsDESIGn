@@ -1,30 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>666SOUNDsDESIGn ULTRA HUD</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>666SOUNDsDESIGn CYBER HUD</title>
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; media-src * data: blob:;">
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-a"></div>
+  <div class="bg-glow glow-b"></div>
 
-<header class="header">666SOUNDsDESIGn</header>
-
-<div class="hero">
-  <div class="panel">
-    <div id="status">CHECKING...</div>
-    <div id="song">---</div>
-
-    <div class="controls">
-      <button onclick="play()">PLAY</button>
-      <button onclick="stop()">STOP</button>
+  <header class="top-hud">
+    <div class="brand-box">
+      <div class="brand-title">666SOUNDsDESIGn</div>
+      <div class="brand-sub">DIGITAL UNDERGROUND CONNECTED</div>
     </div>
-  </div>
-</div>
 
-<footer class="player">
-  <audio id="audio" controls></audio>
-</footer>
+    <nav class="nav-bar">
+      <button class="nav-btn active" data-panel="home">HOME</button>
+      <button class="nav-btn" data-panel="radio">RADIO</button>
+      <button class="nav-btn" data-panel="system">SYSTEM</button>
+      <button class="nav-btn" data-panel="info">INFO</button>
+    </nav>
 
-<script src="js/app.js"></script>
+    <div class="top-status">
+      <div class="mini-stat">
+        <span>WORKER</span>
+        <strong id="workerMini">CHECKING</strong>
+      </div>
+    </div>
+  </header>
+
+  <aside class="side-meter left">
+    <div class="side-label">LEFT</div>
+    <div id="leftMeter" class="meter-stack"></div>
+  </aside>
+
+  <aside class="side-meter right">
+    <div class="side-label">RIGHT</div>
+    <div id="rightMeter" class="meter-stack"></div>
+  </aside>
+
+  <main class="main-shell">
+    <section class="stats-row">
+      <div class="stat-box">
+        <span>WORKER</span>
+        <strong id="workerStatus">CHECKING</strong>
+      </div>
+      <div class="stat-box">
+        <span>ACTIVE SOURCE</span>
+        <strong id="sourceValue">main</strong>
+      </div>
+      <div class="stat-box">
+        <span>LISTENERS</span>
+        <strong id="listenersValue">0</strong>
+      </div>
+      <div class="stat-box">
+        <span>BITRATE</span>
+        <strong id="bitrateValue">0</strong>
+      </div>
+      <div class="stat-box">
+        <span>DJ</span>
+        <strong id="djValue">---</strong>
+      </div>
+    </section>
+
+    <section class="hero-frame">
+      <section class="panel active" id="panel-home">
+        <div class="panel-heading">CONTROL COCKPIT</div>
+        <div class="hero-center">
+          <div class="hero-core">
+            <div class="hero-ring"></div>
+            <div class="hero-card">
+              <div class="hero-live" id="heroLive">ONLINE SIGNAL</div>
+              <div class="hero-song" id="songTitle">Awaiting transmission…</div>
+
+              <div class="hero-controls">
+                <button id="playMainBtn" class="cyber-btn">PLAY MAIN</button>
+                <button id="playBackupBtn" class="cyber-btn">PLAY BACKUP</button>
+                <button id="stopBtnCenter" class="cyber-btn">STOP</button>
+              </div>
+
+              <div class="hero-readout">
+                <div><span>Source</span><strong id="heroSource">main</strong></div>
+                <div><span>DJ</span><strong id="heroDj">---</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-radio">
+        <div class="panel-heading">RADIO SOURCES</div>
+        <div class="source-grid" id="sourceGrid"></div>
+      </section>
+
+      <section class="panel" id="panel-system">
+        <div class="panel-heading">SYSTEM STATUS</div>
+        <div class="system-grid">
+          <div class="system-card">
+            <h3>Worker URL</h3>
+            <p id="workerUrlBox">https://webradio-666soundsdesign-worker.fraggelpower666.workers.dev</p>
+          </div>
+          <div class="system-card">
+            <h3>Status Feed</h3>
+            <pre id="statusJsonBox">waiting...</pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-info">
+        <div class="panel-heading">INFO</div>
+        <div class="system-grid">
+          <div class="system-card">
+            <h3>Project</h3>
+            <p>Final cyber HUD layer for the live worker-driven radio frontend.</p>
+          </div>
+          <div class="system-card">
+            <h3>Mode</h3>
+            <p>Root-ready GitHub Pages build.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="sticky-player">
+    <div class="player-left">
+      <div class="player-caption">MASTER PLAYER</div>
+      <div class="player-track" id="playerTrack">NO SOURCE LOADED</div>
+    </div>
+
+    <div class="player-center">
+      <button id="playBtn" class="transport-btn">PLAY</button>
+      <button id="pauseBtn" class="transport-btn">PAUSE</button>
+      <button id="stopBtn" class="transport-btn">STOP</button>
+    </div>
+
+    <div class="player-progress-wrap">
+      <span id="timeCurrent">00:00</span>
+      <input id="progressRange" type="range" min="0" max="100" value="0" />
+      <span id="timeDuration">LIVE</span>
+    </div>
+
+    <div class="player-right">
+      <label for="volumeRange">VOL</label>
+      <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="0.85" />
+    </div>
+
+    <audio id="audioPlayer" preload="none"></audio>
+  </footer>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
