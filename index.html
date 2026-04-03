@@ -1,44 +1,26 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn — Repo Root Ready</title>
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; media-src * data: blob:;">
-  <link rel="stylesheet" href="css/hud.css" />
+<meta charset="UTF-8">
+<title>666SOUNDsDESIGn HUD</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">666SOUNDsDESIGn</div>
-    <div class="sub">Repo Root Ready</div>
-  </header>
 
-  <main class="hero">
-    <section class="status">
-      <div><span>WORKER</span><strong id="workerStatus">CHECKING</strong></div>
-      <div><span>ACTIVE SOURCE</span><strong id="activeSource">main</strong></div>
-      <div><span>LISTENERS</span><strong id="listenersValue">0</strong></div>
-      <div><span>BITRATE</span><strong id="bitrateValue">0</strong></div>
-      <div><span>DJ</span><strong id="djValue">---</strong></div>
-    </section>
+<header class="header">666SOUNDsDESIGn</header>
 
-    <section class="card">
-      <h1>666SOUNDsDESIGn</h1>
-      <p>GitHub Pages Root Build. Diese Version ist direkt für /root aufgebaut.</p>
-      <div class="actions">
-        <button id="playBtn">PLAY</button>
-        <button id="stopBtn">STOP</button>
-      </div>
-      <label>VOL <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="0.85" /></label>
-      <p id="songValue">Awaiting transmission…</p>
-    </section>
-  </main>
+<div class="main">
+  <div id="status">LOADING...</div>
+  <div id="song">---</div>
 
-  <footer class="player">
-    <audio id="audio" controls style="width:100%"></audio>
-  </footer>
+  <button onclick="play()">PLAY</button>
+  <button onclick="stop()">STOP</button>
+</div>
 
-  <script src="js/app.js?v=2"></script>
+<footer class="player">
+  <audio id="audio" controls></audio>
+</footer>
+
+<script src="js/app.js"></script>
 </body>
 </html>

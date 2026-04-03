@@ -1,0 +1,6 @@
+
+body { background:black; color:#0ff; font-family:Arial; text-align:center; }
+.header { padding:20px; font-size:24px; }
+.main { margin-top:50px; }
+button { margin:10px; padding:10px; }
+.player { position:fixed; bottom:0; width:100%; }
