@@ -1,5 +1,5 @@
-const STREAM_URL = "https://666soundsdesign.fraggelpower666.workers.dev/stream";
-const STATUS_URL = "https://666soundsdesign.fraggelpower666.workers.dev/status";
+const STREAM_URL = "https://webradio-666soundsdesign-worker.fraggelpower666.workers.dev/stream";
+const STATUS_URL = "https://webradio-666soundsdesign-worker.fraggelpower666.workers.dev/status";
 
 const audio = document.getElementById("audio");
 audio.src = STREAM_URL;
