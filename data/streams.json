@@ -1,0 +1,23 @@
+[
+  {
+    "key": "main",
+    "label": "Main Stream",
+    "type": "stream",
+    "category": "radio",
+    "url": "https://666soundsdesign.fraggelpower666.workers.dev/stream"
+  },
+  {
+    "key": "backup",
+    "label": "Backup Stream",
+    "type": "stream",
+    "category": "radio",
+    "url": "https://my.idjstream.com/8686/stream"
+  },
+  {
+    "key": "sunshine",
+    "label": "Sunshine Stream",
+    "type": "stream",
+    "category": "radio",
+    "url": "https://stream.sunshine-live.de/live/aac-64/utm_source=radio.menu/"
+  }
+]
