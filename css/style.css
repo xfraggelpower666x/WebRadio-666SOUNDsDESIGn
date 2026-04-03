@@ -1,6 +1,44 @@
 
-body { background:black; color:#0ff; font-family:Arial; text-align:center; }
-.header { padding:20px; font-size:24px; }
-.main { margin-top:50px; }
-button { margin:10px; padding:10px; }
-.player { position:fixed; bottom:0; width:100%; }
+body {
+  margin:0;
+  background:#050510;
+  color:#00ffff;
+  font-family:Arial;
+}
+
+.header {
+  padding:20px;
+  text-align:center;
+  font-size:28px;
+  border-bottom:1px solid #0ff;
+}
+
+.hero {
+  height:calc(100vh - 140px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.panel {
+  border:1px solid #0ff;
+  padding:40px;
+  text-align:center;
+  box-shadow:0 0 20px #0ff;
+}
+
+.controls button {
+  margin:10px;
+  padding:10px 20px;
+  background:black;
+  color:#0ff;
+  border:1px solid #0ff;
+  cursor:pointer;
+}
+
+.player {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#000;
+}
