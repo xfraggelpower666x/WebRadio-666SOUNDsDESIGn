@@ -1,16 +1,11 @@
-FINAL_HUD_CYBER_SYSTEM
+LEVEL 6 ULTRA VISUAL PLAYER
 
-ROOT READY PACKAGE FOR GITHUB PAGES
-
-CONTENTS:
-- index.html
-- css/style.css
-- js/app.js
-
-PURPOSE:
-- cyber neon HUD
-- fixed header
-- fixed side meters
+FEATURES
+- live stream artwork integration
+- fallback cover image
+- cover blur background
+- hero background image
+- DJ text replacement if source says 'No DJ'
+- audio reactive side meters
+- overlay menu
 - sticky player
-- live worker status
-- live song / bitrate / listeners / dj
