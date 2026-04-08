@@ -190,3 +190,35 @@ pre{white-space:pre-wrap;word-break:break-word;color:#b8f9ff;font-size:13px}
   .system-grid,.overlay-grid{grid-template-columns:1fr}
   .sticky-player{grid-template-columns:1fr;height:auto}
 }
+
+
+:root{
+  --player-volume:85%;
+}
+.meter-bar{
+  transition:opacity .12s linear, transform .12s linear, box-shadow .12s linear, background .12s linear;
+  transform-origin:center bottom;
+}
+.meter-bar.active{
+  transform:scaleY(1.04);
+}
+.cover-frame,
+.vinyl-ring,
+#progressRange,
+#volumeRange{
+  transition:transform .12s linear, box-shadow .12s linear, filter .16s linear, opacity .16s linear;
+}
+#progressRange{
+  background:linear-gradient(90deg, rgba(85,232,255,.85) 0 var(--player-volume), rgba(255,66,217,.45) var(--player-volume) 100%);
+}
+#progressRange:disabled{
+  cursor:not-allowed;
+}
+.player-track{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.transport-btn{
+  min-width:86px;
+}

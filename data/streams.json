@@ -1,23 +1,23 @@
-[
-  {
-    "key": "main",
-    "label": "Main Stream",
-    "type": "stream",
-    "category": "radio",
-    "url": "https://666soundsdesign.fraggelpower666.workers.dev/stream"
+{
+  "default": "radio",
+  "sources": {
+    "radio": "https://666soundsdesign.fraggelpower666.workers.dev/radio",
+    "stream": "https://666soundsdesign.fraggelpower666.workers.dev/stream",
+    "main": "https://666soundsdesign.fraggelpower666.workers.dev/stream",
+    "sunshine-live": "https://stream.sunshine-live.de/live/aac-64/utm_source=radio.menu/",
+    "sunshine-techhouse": "https://stream.sunshine-live.de/sp4/mp3-192/utm_source=radio.menu/",
+    "sunshine-bunker": "https://stream.sunshine-live.de/amsterdam/mp3-192/stream.sunshine-live.de/",
+    "sunshine-club": "https://stream.sunshine-live.de/club/mp3-192/stream.sunshine-live.de/",
+    "sunshine-clubsounds": "https://stream.sunshine-live.de/playlist1/mp3-192/stream.sunshine-live.de/",
+    "sunshine-iamraving": "https://stream.sunshine-live.de/iamraving/mp3-192/stream.sunshine-live.de/",
+    "sunshine-melodic-techno": "https://stream.sunshine-live.de/melodic-techno/mp3-192/stream.sunshine-live.de/"
   },
-  {
-    "key": "backup",
-    "label": "Backup Stream",
-    "type": "stream",
-    "category": "radio",
-    "url": "https://my.idjstream.com/8686/stream"
-  },
-  {
-    "key": "sunshine",
-    "label": "Sunshine Stream",
-    "type": "stream",
-    "category": "radio",
-    "url": "https://stream.sunshine-live.de/live/aac-64/utm_source=radio.menu/"
+  "meta": {
+    "status": "https://666soundsdesign.fraggelpower666.workers.dev/status",
+    "nowplaying": "https://666soundsdesign.fraggelpower666.workers.dev/nowplaying",
+    "listeners": "https://666soundsdesign.fraggelpower666.workers.dev/listeners",
+    "history": "https://666soundsdesign.fraggelpower666.workers.dev/history",
+    "dj": "https://666soundsdesign.fraggelpower666.workers.dev/dj",
+    "meta": "https://666soundsdesign.fraggelpower666.workers.dev/meta"
   }
-]
+}
