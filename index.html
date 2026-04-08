@@ -8,6 +8,7 @@
     content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src * data: blob:; img-src * data: blob:; media-src * data: blob:;">
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/audio-reactive-engine.css" />
+  <script src="config/radio.config.js"></script>
 </head>
 <body>
   <div class="hero-bg">
@@ -193,9 +194,12 @@
     <audio id="audioPlayer" preload="none"></audio>
   </footer>
 
+  <script src="js/system-state.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/boost-control.js"></script>
+  <script src="js/auto-boost-pro.js"></script>
 
-<div id="audioReactiveHud" class="audio-reactive-hud">
+  <div id="audioReactiveHud" class="audio-reactive-hud">
   <div class="audio-reactive-side left reactive-glow-target"><canvas id="meterLCanvas"></canvas></div>
   <div class="audio-reactive-center reactive-glow-target"><canvas id="eqCanvas"></canvas></div>
   <div class="audio-reactive-side right reactive-glow-target"><canvas id="meterRCanvas"></canvas></div>
