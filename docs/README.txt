@@ -1,1 +1,7 @@
-Upload and replace the included files. This package fixes iPhone boot unlock and prevents instant main->backup switching.
+This build restores:
+- metadata
+- level meters
+- equalizer
+- iPhone-safe audio unlock
+- slower iPhone failover
+Upload and replace the included files.
