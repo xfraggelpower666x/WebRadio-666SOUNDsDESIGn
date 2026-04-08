@@ -1,0 +1,16 @@
+666SOUNDsDESIGn MASTER PASS BUILD REAL FULL
+
+Base:
+- COMPLETE-with-current-worker
+
+Merged in:
+- COMPLETE-AudioReactive-Patched
+- patched-hud-history
+
+Applied:
+- HUD history index/app/style updates
+- audio reactive css/js
+- upgraded root worker.js with legacy + /api/radio aliases
+- SoundCloud worker references added
+
+No secrets embedded.

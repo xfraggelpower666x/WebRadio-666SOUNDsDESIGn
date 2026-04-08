@@ -95,6 +95,7 @@
           <div class="visual-left">
             <div class="art-stack">
               <div class="vinyl-ring spin" id="vinylRing"></div>
+              <canvas id="circularEqCanvas" class="circular-eq-canvas" aria-hidden="true"></canvas>
               <div class="cover-frame pulse" id="coverFrame">
                 <img id="coverImage" src="assets/fallback.jpg" alt="Cover" />
               </div>
@@ -125,6 +126,10 @@
       <section class="panel" id="panel-radio">
         <div class="panel-heading">RADIO SOURCES</div>
         <div class="source-grid" id="sourceGrid"></div>
+        <div class="history-card">
+          <h3>TRACK HISTORY</h3>
+          <div id="historyList" class="history-list"></div>
+        </div>
       </section>
 
       <section class="panel" id="panel-visual">
@@ -196,6 +201,6 @@
   <div class="audio-reactive-side right reactive-glow-target"><canvas id="meterRCanvas"></canvas></div>
 </div>
 
-  <script src="js/audio-reactive-engine.js"></script>
+<script src="js/audio-reactive-engine.js"></script>
 </body>
 </html>
