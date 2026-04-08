@@ -4,6 +4,7 @@ const META_URL = `${WORKER_BASE}/meta`;
 const NOWPLAYING_URL = `${WORKER_BASE}/nowplaying`;
 const LISTENERS_URL = `${WORKER_BASE}/listeners`;
 const HEALTH_URL = `${WORKER_BASE}/health`;
+const HISTORY_URL = `${WORKER_BASE}/history`;
 const DEFAULT_COVER = "assets/fallback.jpg";
 const STATUS_POLL_MS = 7000;
 const STALL_TIMEOUT_MS = 15000;
@@ -31,6 +32,8 @@ const visualCoverPreview = document.getElementById("visualCoverPreview");
 const workerUrlBox = document.getElementById("workerUrlBox");
 const vinylRing = document.getElementById("vinylRing");
 const coverFrame = document.getElementById("coverFrame");
+const circularEqCanvas = document.getElementById("circularEqCanvas");
+const circularEqCtx = circularEqCanvas ? circularEqCanvas.getContext("2d") : null;
 
 const els = {
   workerMini: document.getElementById("workerMini"),
@@ -54,7 +57,8 @@ const els = {
   sourceGrid: document.getElementById("sourceGrid"),
   overlaySources: document.getElementById("overlaySources"),
   statusJsonBox: document.getElementById("statusJsonBox"),
-  reconnectState: document.getElementById("reconnectState")
+  reconnectState: document.getElementById("reconnectState"),
+  historyList: document.getElementById("historyList")
 };
 
 let currentSourceKey = "main";
@@ -193,13 +197,73 @@ async function fetchJson(url, timeoutMs = 4500) {
 }
 
 async function fetchWorkerBundle() {
-  const [health, status, nowplaying, listenerInfo] = await Promise.all([
+  const [health, status, nowplaying, listenerInfo, history] = await Promise.all([
     fetchJson(HEALTH_URL, 3500).catch((err) => ({ ok: false, error: String(err) })),
     fetchJson(STATUS_URL, 4500),
     fetchJson(NOWPLAYING_URL, 4500).catch(() => ({})),
-    fetchJson(LISTENERS_URL, 4500).catch(() => ({}))
+    fetchJson(LISTENERS_URL, 4500).catch(() => ({})),
+    fetchJson(HISTORY_URL, 4500).catch(() => ([]))
   ]);
-  return { health, status, nowplaying, listenerInfo };
+  return { health, status, nowplaying, listenerInfo, history };
+}
+
+
+function renderHistory(history) {
+  if (!els.historyList) return;
+  if (!Array.isArray(history) || history.length === 0) {
+    els.historyList.innerHTML = '<div class="history-item"><strong>Keine History</strong><span>Worker liefert aktuell keine Verlaufsdaten.</span></div>';
+    return;
+  }
+  els.historyList.innerHTML = history.slice(0, 10).map((track) => {
+    const title = track.title || track.song || track.track || "Unknown Track";
+    const when = track.started_at || track.played_at || track.time || track.ts || "";
+    return `<div class="history-item"><strong>${title}</strong><span>${when}</span></div>`;
+  }).join("");
+}
+
+function resizeCircularEqCanvas() {
+  if (!circularEqCanvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const size = Math.max(320, Math.floor(circularEqCanvas.clientWidth || 320));
+  circularEqCanvas.width = Math.floor(size * dpr);
+  circularEqCanvas.height = Math.floor(size * dpr);
+  circularEqCtx.setTransform(1,0,0,1,0,0);
+  circularEqCtx.scale(dpr, dpr);
+}
+
+function drawCircularEq(freqData, mixLevel) {
+  if (!circularEqCanvas || !circularEqCtx) return;
+  const w = circularEqCanvas.clientWidth || 320;
+  const h = circularEqCanvas.clientHeight || 320;
+  const cx = w / 2;
+  const cy = h / 2;
+  const baseRadius = Math.min(w, h) * 0.29;
+  circularEqCtx.clearRect(0, 0, w, h);
+
+  circularEqCtx.beginPath();
+  circularEqCtx.arc(cx, cy, baseRadius + 16 + mixLevel * 18, 0, Math.PI * 2);
+  circularEqCtx.strokeStyle = 'rgba(85,232,255,0.18)';
+  circularEqCtx.lineWidth = 2;
+  circularEqCtx.stroke();
+
+  if (!freqData || !freqData.length) return;
+  const bars = Math.min(96, freqData.length);
+  for (let i = 0; i < bars; i += 1) {
+    const value = freqData[i] / 255;
+    const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
+    const inner = baseRadius + 8;
+    const outer = inner + 26 + value * 70;
+    const x1 = cx + Math.cos(angle) * inner;
+    const y1 = cy + Math.sin(angle) * inner;
+    const x2 = cx + Math.cos(angle) * outer;
+    const y2 = cy + Math.sin(angle) * outer;
+    circularEqCtx.beginPath();
+    circularEqCtx.moveTo(x1, y1);
+    circularEqCtx.lineTo(x2, y2);
+    circularEqCtx.strokeStyle = value > 0.72 ? 'rgba(255,66,217,0.92)' : 'rgba(85,232,255,0.95)';
+    circularEqCtx.lineWidth = value > 0.5 ? 3 : 2;
+    circularEqCtx.stroke();
+  }
 }
 
 function applyCover(url) {
@@ -216,7 +280,8 @@ async function updateStatus() {
     const meta = data.meta || {};
     const nowplaying = bundle.nowplaying || {};
     const listeners = bundle.listenerInfo || {};
-    const djName = sanitizeDjName(nowplaying.dj || meta.dj);
+    const djName = sanitizeDjName(nowplaying.dj || meta.dj || "AutoDJ");
+    const songTitle = nowplaying.song || meta.song || "Live Stream";
     setWorkerState(Boolean(bundle.health?.ok && data.ok));
     els.listenersValue.textContent = listeners.listeners ?? meta.listeners ?? 0;
     els.bitrateValue.textContent = listeners.bitrate ?? meta.bitrate ?? 0;
@@ -224,13 +289,18 @@ async function updateStatus() {
     els.heroDj.textContent = djName;
     els.heroListeners.textContent = listeners.listeners ?? meta.listeners ?? 0;
     els.heroBitrate.textContent = listeners.bitrate ?? meta.bitrate ?? 0;
-    els.songTitle.textContent = nowplaying.song || meta.song || "---";
+    els.songTitle.textContent = songTitle;
     els.statusJsonBox.textContent = JSON.stringify(bundle, null, 2);
-    applyCover(nowplaying.art || meta.art);
+    applyCover(nowplaying.art || meta.art || DEFAULT_COVER);
+    renderHistory(bundle.history);
   } catch (err) {
     setWorkerState(false);
     els.statusJsonBox.textContent = String(err);
+    els.songTitle.textContent = "Live Stream";
+    els.djValue.textContent = "AutoDJ";
+    els.heroDj.textContent = "AutoDJ";
     applyCover("");
+    renderHistory([]);
   }
 }
 
@@ -361,12 +431,15 @@ function tickMeters() {
 
     updateMeterVisual(leftLevelSmoothed, rightLevelSmoothed);
     setReactiveVisuals(mixLevelSmoothed);
+    drawCircularEq(null, mixLevelSmoothed);
+    drawCircularEq(meterDataMix, mixLevelSmoothed);
   } else {
     leftLevelSmoothed = smoothLevel(leftLevelSmoothed, 0.03);
     rightLevelSmoothed = smoothLevel(rightLevelSmoothed, 0.03);
     mixLevelSmoothed = smoothLevel(mixLevelSmoothed, 0.03);
     updateMeterVisual(leftLevelSmoothed, rightLevelSmoothed);
     setReactiveVisuals(mixLevelSmoothed);
+    drawCircularEq(meterDataMix, mixLevelSmoothed);
   }
   requestAnimationFrame(tickMeters);
 }
@@ -532,6 +605,8 @@ function init() {
   workerUrlBox.textContent = WORKER_BASE;
   document.documentElement.style.setProperty("--player-volume", `${Math.round(audio.volume * 100)}%`);
   buildMeters();
+  resizeCircularEqCanvas();
+  window.addEventListener("resize", resizeCircularEqCanvas);
   renderSources();
   bindNav();
   bindTransport();
