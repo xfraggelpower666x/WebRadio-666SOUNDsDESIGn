@@ -1,6 +1,6 @@
 window.RADIO_CONFIG = {
   radioBase: "https://webradio-666soundsdesign-worker.fraggelpower666.workers.dev",
-  soundcloudBase: "https://soundcloud-proxy-worker.fraggelpower666.workers.dev",
+  soundcloudBase: "https://soundcloud-hybrid-worker.fraggelpower666.workers.dev/",
 
   endpoints: {
     stream: "/stream",
