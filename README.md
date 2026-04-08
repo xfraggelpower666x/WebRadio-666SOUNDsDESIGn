@@ -1,15 +1,11 @@
-# WebRadio 666SOUNDsDESIGn - Stabilized Build
+# 666SOUNDsDESIGn — CLEAN BUILD
 
-## Applied fixes
-- safer stream switching to reduce `play()` / `pause()` race conditions
-- fallback handling for `error`, `ended`, `waiting`, `stalled`, `abort`
-- status endpoint timeout handling in frontend and worker
-- worker URL unified in frontend display
-- safer stop behavior for live streams (clears `src` instead of forcing `currentTime = 0`)
-- DJ name normalization fixes:
-  - `Radio Luxury` -> `Web.Radio Luxury`
-  - `diablovimay` -> `Diablo Wee Mai`
-- improved worker `/health` JSON response and `/stream` headers
+Primary:
+https://my.idjstream.com/666soundsdesign/stream
 
-## Notes
-This build is stabilized, not fully redesigned. It focuses on playback robustness and cleaner failover behavior.
+Backup:
+https://my.idjstream.com/8686/stream
+
+Cleaned:
+- removed foreign radio references
+- fixed naming
