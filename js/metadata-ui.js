@@ -14,6 +14,13 @@ window.MetadataUI = {
       document.getElementById("dj").textContent =
         isAuto ? RADIO_CONFIG.djFallbackName : "LIVE: " + data.djusername;
 
-    } catch {}
+      SystemState.set({
+        metadataOk: true,
+        djMode: isAuto ? "auto" : "live"
+      });
+
+    } catch {
+      SystemState.set({ metadataOk: false });
+    }
   }
 };
