@@ -1,0 +1,29 @@
+FULL PRO FIX + FINAL IOS HOTFIX + BOOST GR
+
+Upload and replace these files in your repo:
+
+/config/radio.config.js
+/css/live-experience.css
+/js/system-state.js
+/js/player-core.js
+/js/failover-engine.js
+/js/metadata-ui.js
+/js/led-system.js
+/js/audio-reactive-engine.js
+/js/ios-fix.js
+/js/soundcloud-fallback.js
+/js/auto-dj-engine.js
+/js/smart-failover.js
+/js/boost-control.js
+/js/app.js
+
+This package fixes:
+- iPhone audio unlock
+- missing metadata updates
+- wrong WORKER OFFLINE label while backup plays
+- wrong SIGNAL LOST label while backup plays
+- dead levelmeters on iPhone
+- reactive bars / panel pulse
+- clipped overlong player title
+- boost switch with GR 0 / 1 / 2 / 3
+- boost status with tri-color LED
