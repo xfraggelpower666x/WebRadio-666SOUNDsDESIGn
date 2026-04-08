@@ -1,11 +1,17 @@
-LEVEL 6 ULTRA VISUAL PLAYER
+AUTO BOOST PRO ENGINE
 
-FEATURES
-- live stream artwork integration
-- fallback cover image
-- cover blur background
-- hero background image
-- DJ text replacement if source says 'No DJ'
-- audio reactive side meters
-- overlay menu
-- sticky player
+This module adds:
+
+✔ automatic gain up + down
+✔ anti clipping behavior
+✔ smooth transitions (no pumping)
+✔ works with iPhone
+
+Install:
+
+1. Put js/auto-boost-pro.js into your project
+2. Load after audio system
+3. Call AutoBoostPro.start()
+
+Optional:
+AutoBoostPro.enabled = false (to disable)
