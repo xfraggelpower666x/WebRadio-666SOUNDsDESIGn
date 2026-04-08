@@ -222,32 +222,3 @@ pre{white-space:pre-wrap;word-break:break-word;color:#b8f9ff;font-size:13px}
 .transport-btn{
   min-width:86px;
 }
-
-
-.circular-eq-canvas{
-  position:absolute;
-  inset:10px;
-  width:320px;
-  height:320px;
-  z-index:1;
-  pointer-events:none;
-  opacity:.95;
-  filter:drop-shadow(0 0 18px rgba(85,232,255,.18));
-}
-.history-card{
-  margin-top:18px;
-  border:1px solid rgba(85,232,255,.18);
-  border-radius:18px;
-  padding:16px;
-  background:rgba(8,14,27,.7)
-}
-.history-card h3{margin:0 0 12px;color:var(--line)}
-.history-list{display:grid;gap:10px}
-.history-item{
-  border:1px solid rgba(85,232,255,.12);
-  border-radius:14px;
-  padding:12px 14px;
-  background:rgba(10,18,34,.55)
-}
-.history-item strong{display:block}
-.history-item span{display:block;color:var(--muted);margin-top:4px;font-size:12px}

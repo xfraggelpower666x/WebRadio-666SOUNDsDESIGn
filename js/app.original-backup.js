@@ -1,4 +1,4 @@
-const WORKER_BASE = "https://666soundsdesign-radio-worker.fraggelpower666.workers.dev/api/radio";
+const WORKER_BASE = "https://666soundsdesign.fraggelpower666.workers.dev";
 const STATUS_URL = `${WORKER_BASE}/status`;
 const META_URL = `${WORKER_BASE}/meta`;
 const NOWPLAYING_URL = `${WORKER_BASE}/nowplaying`;
