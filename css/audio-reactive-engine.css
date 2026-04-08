@@ -90,3 +90,8 @@
     max-height:42vh;
   }
 }
+
+@media (max-width: 900px){
+  .audio-reactive-side{height:min(42vh,360px);}
+  .audio-reactive-center{width:min(78vw,420px);height:min(78vw,420px);max-height:46vh;}
+}
