@@ -1,43 +1,25 @@
+
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn iPhone Hard Fix</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/audio-reactive-engine.css" />
-  <script src="config/radio.config.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>666 FIX</title>
 </head>
 <body>
-  <div id="bootOverlay" class="boot-overlay active">
-    <div class="boot-card">
-      <div class="boot-title">666SOUNDsDESIGn</div>
-      <div class="boot-sub">DIGITAL UNDERGROUND… CONNECTED…</div>
-      <div id="bootStatus" class="boot-status">INITIALIZING VISUAL AUDIO SYSTEM...</div>
-      <div class="boot-signature-box">
-        <div class="boot-dj">DJ Fraggel<br>Aka<br>DJ Fraggelpower666</div>
-        <div class="boot-manifest">
-          Freak DJs believe:<br>
-          better to die standing —<br>
-          with music in our ears<br>
-          and dancing souls before our eyes —<br>
-          than to live on our knees<br>
-          and submit to the system.
-        </div>
-        <div class="boot-links">
-          <a href="https://soundcloud.com/fraggelpower666" target="_blank" rel="noreferrer">SoundCloud</a>
-          <a href="https://github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn" target="_blank" rel="noreferrer">GitHub Radio</a>
-        </div>
-      </div>
-      <button id="bootEnterBtn" class="cyber-btn primary">ENTER SYSTEM</button>
-    </div>
-  </div>
 
-  <script src="js/device-mode.js"></script>
-  <script src="js/system-state.js"></script>
-  <script src="js/boost-control.js"></script>
-  <script src="js/auto-boost-pro.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/audio-reactive-engine.js"></script>
+<div id="bootOverlay">
+  <h1>666SOUNDsDESIGn</h1>
+  <p id="bootStatus">READY</p>
+  <button id="bootEnterBtn">ENTER SYSTEM</button>
+</div>
+
+<button id="playBtn">PLAY</button>
+<button id="pauseBtn">PAUSE</button>
+<button id="stopBtn">STOP</button>
+
+<audio id="audioPlayer" playsinline></audio>
+
+<script src="js/app.js"></script>
+
 </body>
 </html>
