@@ -1,19 +1,24 @@
-// iPhone Audio + Visual Fix
-
 window.iOSFix = {
-  init() {
-    const btn = document.body;
+  armed: false,
 
-    btn.addEventListener("touchstart", async () => {
+  init() {
+    if (this.armed) return;
+    this.armed = true;
+
+    const unlock = async () => {
       try {
-        if (window._audioCtx && _audioCtx.state !== "running") {
-          await _audioCtx.resume();
+        if (window.RadioCore && RadioCore.unlockAudio) {
+          await RadioCore.unlockAudio();
         }
-      } catch(e){}
-    }, { once: true });
+        if (window.AudioReactive) {
+          AudioReactive.start();
+        }
+      } catch (e) {
+        console.log("iOS unlock fail", e);
+      }
+    };
+
+    document.addEventListener("touchstart", unlock, { once: true, passive: true });
+    document.addEventListener("click", unlock, { once: true });
   }
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  iOSFix.init();
-});
