@@ -1,6 +1,6 @@
 window.RADIO_CONFIG = {
-  radioBase: "https://DEIN-RADIO-WORKER.workers.dev",
-  soundcloudBase: "https://DEIN-SOUNDCLOUD-HYBRID-WORKER.workers.dev",
+  radioBase: "https://webradio-666soundsdesign-worker.fraggelpower666.workers.dev",
+  soundcloudBase: "https://soundcloud-proxy-worker.fraggelpower666.workers.dev",
 
   endpoints: {
     stream: "/stream",
@@ -18,4 +18,10 @@ window.RADIO_CONFIG = {
   metadataPollMs: 5000,
   historyPollMs: 10000,
   retryCooldownMs: 2500
+
+  soundcloudFallbackSources: [
+  "https://soundcloud.com/DEIN-ALBUM-1",
+  "https://soundcloud.com/DEIN-ALBUM-2",
+  "https://soundcloud.com/DEIN-ALBUM-3"
+],
 };
