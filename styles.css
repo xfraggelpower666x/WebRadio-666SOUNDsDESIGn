@@ -1,0 +1,41 @@
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0a0a0a;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.app { width:100%; max-width:900px; text-align:center; }
+
+.topbar { display:flex; justify-content:space-between; padding:10px; }
+
+.status {
+  width:10px; height:10px; border-radius:50%;
+}
+.status.online { background:#00ff88; }
+
+.circle {
+  width:200px;
+  height:200px;
+  border:4px solid #00f0ff;
+  border-radius:50%;
+  margin:20px auto;
+  animation:spin 10s linear infinite;
+}
+
+@keyframes spin {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+
+button {
+  margin:5px;
+  padding:10px 15px;
+  background:#111;
+  color:#0ff;
+  border:1px solid #0ff;
+}
