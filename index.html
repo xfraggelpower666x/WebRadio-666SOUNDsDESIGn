@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn V4</title>
+  <title>666SOUNDsDESIGn REAL PRO ENGINE</title>
   <link rel="stylesheet" href="css/style.css" />
   <script src="config/radio.config.js"></script>
 </head>
@@ -15,14 +15,7 @@
       <div id="bootStatus" class="boot-status">INITIALIZING VISUAL AUDIO SYSTEM...</div>
       <div class="boot-signature">
         <div class="boot-dj">DJ Fraggel<br>Aka<br>DJ Fraggelpower666</div>
-        <div class="boot-manifest">
-          Freak DJs believe:<br>
-          better to die standing —<br>
-          with music in our ears<br>
-          and dancing souls before our eyes —<br>
-          than to live on our knees<br>
-          and submit to the system.
-        </div>
+        <div class="boot-manifest">Freak DJs believe:<br>better to die standing —<br>with music in our ears<br>and dancing souls before our eyes —<br>than to live on our knees<br>and submit to the system.</div>
         <div class="boot-links">
           <a href="https://soundcloud.com/fraggelpower666" target="_blank" rel="noreferrer">SoundCloud</a>
           <a href="https://github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn" target="_blank" rel="noreferrer">GitHub Radio</a>
@@ -76,12 +69,14 @@
       <div>
         <div id="eq7Host"></div>
         <div class="debug-wrap" style="margin-top:12px">
-          <div class="debug-title">V4 DEBUG</div>
+          <div class="debug-title">REAL PRO DEBUG</div>
           <div class="debug-grid">
             <div class="debug-box"><span>MODE</span><strong id="debugMode">-</strong></div>
             <div class="debug-box"><span>SOURCE</span><strong id="debugSource">-</strong></div>
-            <div class="debug-box"><span>HEALTH RAW</span><strong id="debugHealth">-</strong></div>
-            <div class="debug-box"><span>META RAW</span><strong id="debugMeta">-</strong></div>
+            <div class="debug-box"><span>HEALTH PATH</span><strong id="debugHealth">-</strong></div>
+            <div class="debug-box"><span>META PATH</span><strong id="debugMeta">-</strong></div>
+            <div class="debug-box"><span>VOLUME NODE</span><strong id="debugVolume">-</strong></div>
+            <div class="debug-box"><span>EQ CHAIN</span><strong id="debugEq">-</strong></div>
           </div>
         </div>
       </div>
@@ -90,14 +85,14 @@
 
   <div class="player">
     <div id="playerTrack" class="player-track">Live Stream</div>
-    <div class="player-sub">V4 SPLIT EQ + DEBUG + LIMITER BASE</div>
+    <div class="player-sub">REAL PRO ENGINE</div>
     <div class="transport">
       <button id="playBtn" class="btn">PLAY</button>
       <button id="pauseBtn" class="btn">PAUSE</button>
       <button id="stopBtn" class="btn">STOP</button>
     </div>
     <div class="row"><span>VOL</span><input id="vol" type="range" min="0" max="1" step="0.01" value="0.85" /></div>
-    <div class="status-line">Enter System → Play → Debug overlay shows endpoint state</div>
+    <div class="status-line">Worker-aligned endpoints + real audio graph</div>
     <audio id="audioPlayer" preload="none" playsinline webkit-playsinline="true"></audio>
   </div>
 
@@ -109,9 +104,15 @@
   <script src="js/audio-reactive-engine.js"></script>
   <script src="js/app.js"></script>
   <script>
-    document.getElementById("vol")?.addEventListener("input", e => {
-      const a = document.getElementById("audioPlayer");
-      if (a) a.volume = Number(e.target.value);
+    document.getElementById('vol')?.addEventListener('input', e => {
+      if (window._postGainNode) {
+        window._postGainNode.gain.value = Number(e.target.value);
+        if (window.SystemState) SystemState.set({ volumeNode: 'postGain active' });
+      } else {
+        const a = document.getElementById('audioPlayer');
+        if (a) a.volume = Number(e.target.value);
+        if (window.SystemState) SystemState.set({ volumeNode: 'html audio volume fallback' });
+      }
     });
   </script>
 </body>
