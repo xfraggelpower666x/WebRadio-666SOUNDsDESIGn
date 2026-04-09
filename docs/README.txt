@@ -1,7 +1,12 @@
-This build restores:
+FULL PRO SAFE BUILD
+
+This package includes:
+- safe iPhone audio unlock
 - metadata
-- level meters
 - equalizer
-- iPhone-safe audio unlock
-- slower iPhone failover
-Upload and replace the included files.
+- side level meters
+- boost GR 0/1/2/3
+- boost LED
+- delayed fallback to backup
+
+Upload and replace included files.
