@@ -1,1 +1,0 @@
-V4 build: 7-band EQ, split layout, debug overlay, hard limiter base, same iPhone-safe boot flow.
