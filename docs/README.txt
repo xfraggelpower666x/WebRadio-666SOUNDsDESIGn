@@ -1,2 +1,1 @@
-FULL PRO SAFE V3 AUDIO CORE FIX
-Includes: iPhone-safe audio unlock, metadata, equalizer, side meters, boost GR buttons, delayed fallback.
+V4 build: 7-band EQ, split layout, debug overlay, hard limiter base, same iPhone-safe boot flow.
