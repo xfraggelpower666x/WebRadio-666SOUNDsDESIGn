@@ -1,0 +1,4 @@
+{
+  "primary": "/stream",
+  "backup": "/stream-emergency"
+}
