@@ -1,15 +1,22 @@
-# WebRadio 666SOUNDsDESIGn - Stabilized Build
+# WebRadio 666SOUNDsDESIGn — Clean Live Build
 
-## Applied fixes
-- safer stream switching to reduce `play()` / `pause()` race conditions
-- fallback handling for `error`, `ended`, `waiting`, `stalled`, `abort`
-- status endpoint timeout handling in frontend and worker
-- worker URL unified in frontend display
-- safer stop behavior for live streams (clears `src` instead of forcing `currentTime = 0`)
-- DJ name normalization fixes:
-  - `Radio Luxury` -> `Web.Radio Luxury`
-  - `diablovimay` -> `Diablo Wee Mai`
-- improved worker `/health` JSON response and `/stream` headers
+## Primary
+/stream
+
+## Backup
+/stream-emergency
+
+## Included
+- main worker radio source
+- backup stream fallback
+- sunshine source label corrected
+- mobile / iPhone playback fixes
+- metadata polling fix
+- worker status fix
+- backup-active state fix
+- audio reactive HUD
+- auto boost pro engine
+- boost GR switch with tri-color LED
 
 ## Notes
-This build is stabilized, not fully redesigned. It focuses on playback robustness and cleaner failover behavior.
+This package removes foreign-radio naming and keeps the system focused on 666SOUNDsDESIGn only.
