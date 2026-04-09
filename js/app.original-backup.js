@@ -11,7 +11,7 @@ const LEVEL_SMOOTHING = 0.82;
 
 const SOURCES = [
   { key: "main", label: "Main Worker Radio", url: `${WORKER_BASE}/radio`, description: "Primary worker pass-through" },
-  { key: "backup", label: "Backup Stream", url: "https://my.idjstream.com/8686/stream", description: "Direct backup stream" },
+  { key: "backup", label: "Backup Stream", url: "/stream-emergency", description: "Direct backup stream" },
   { key: "sunshine", label: "Web.Radio Luxury", url: "https://stream.sunshine-live.de/live/aac-64/utm_source=radio.menu/", description: "Additional source" }
 ];
 
