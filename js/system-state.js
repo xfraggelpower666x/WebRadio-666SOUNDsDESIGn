@@ -7,10 +7,7 @@ window.SystemState = {
   listeners:0,
   bitrate:0,
   boostLevel:(window.RADIO_CONFIG?.boostDefault || 1),
-  set(patch){
-    Object.assign(this, patch);
-    this.apply();
-  },
+  set(patch){ Object.assign(this, patch); this.apply(); },
   apply(){
     const byId = (id) => document.getElementById(id);
     const setTxt = (ids, txt) => ids.forEach(id => { const el = byId(id); if (el) el.textContent = txt; });
