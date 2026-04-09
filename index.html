@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn FULL PRO SAFE V3</title>
+  <title>666SOUNDsDESIGn V4</title>
   <link rel="stylesheet" href="css/style.css" />
   <script src="config/radio.config.js"></script>
 </head>
@@ -53,42 +53,58 @@
       </div>
     </div>
 
-    <div class="eq-wrap">
-      <div class="eq-layout">
-        <div class="side-meter-box"><canvas id="meterLCanvas"></canvas></div>
-        <div class="eq-center"><canvas id="eqCanvas"></canvas></div>
-        <div class="side-meter-box"><canvas id="meterRCanvas"></canvas></div>
+    <div class="split-wrap">
+      <div class="eq-wrap">
+        <div class="eq-layout">
+          <div class="side-meter-box"><canvas id="meterLCanvas"></canvas></div>
+          <div class="eq-center"><canvas id="eqCanvas"></canvas></div>
+          <div class="side-meter-box"><canvas id="meterRCanvas"></canvas></div>
+        </div>
+        <div class="controls">
+          <button id="playMainBtn" class="btn">PLAY MAIN</button>
+          <button id="playBackupBtn" class="btn">PLAY BACKUP</button>
+        </div>
+        <div class="boost-panel">
+          <button data-boost-level="0">GR 0</button>
+          <button data-boost-level="1">GR 1</button>
+          <button data-boost-level="2">GR 2</button>
+          <button data-boost-level="3">GR 3</button>
+        </div>
+        <div id="boostStatus">BOOST GR 1 <span id="boostLed"></span></div>
       </div>
-      <div class="controls">
-        <button id="playMainBtn" class="btn">PLAY MAIN</button>
-        <button id="playBackupBtn" class="btn">PLAY BACKUP</button>
+
+      <div>
+        <div id="eq7Host"></div>
+        <div class="debug-wrap" style="margin-top:12px">
+          <div class="debug-title">V4 DEBUG</div>
+          <div class="debug-grid">
+            <div class="debug-box"><span>MODE</span><strong id="debugMode">-</strong></div>
+            <div class="debug-box"><span>SOURCE</span><strong id="debugSource">-</strong></div>
+            <div class="debug-box"><span>HEALTH RAW</span><strong id="debugHealth">-</strong></div>
+            <div class="debug-box"><span>META RAW</span><strong id="debugMeta">-</strong></div>
+          </div>
+        </div>
       </div>
-      <div class="boost-panel">
-        <button data-boost-level="0">GR 0</button>
-        <button data-boost-level="1">GR 1</button>
-        <button data-boost-level="2">GR 2</button>
-        <button data-boost-level="3">GR 3</button>
-      </div>
-      <div id="boostStatus">BOOST GR 1 <span id="boostLed"></span></div>
     </div>
   </div>
 
   <div class="player">
     <div id="playerTrack" class="player-track">Live Stream</div>
-    <div class="player-sub">FULL PRO SAFE V3 PLAYER</div>
+    <div class="player-sub">V4 SPLIT EQ + DEBUG + LIMITER BASE</div>
     <div class="transport">
       <button id="playBtn" class="btn">PLAY</button>
       <button id="pauseBtn" class="btn">PAUSE</button>
       <button id="stopBtn" class="btn">STOP</button>
     </div>
     <div class="row"><span>VOL</span><input id="vol" type="range" min="0" max="1" step="0.01" value="0.85" /></div>
-    <div class="status-line">Enter System → Play → Metadata + EQ + Meter</div>
+    <div class="status-line">Enter System → Play → Debug overlay shows endpoint state</div>
     <audio id="audioPlayer" preload="none" playsinline webkit-playsinline="true"></audio>
   </div>
 
   <script src="js/device-mode.js"></script>
   <script src="js/system-state.js"></script>
   <script src="js/boost-control.js"></script>
+  <script src="js/eq-7band.js"></script>
   <script src="js/auto-boost-pro.js"></script>
   <script src="js/audio-reactive-engine.js"></script>
   <script src="js/app.js"></script>
