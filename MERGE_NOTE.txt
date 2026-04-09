@@ -1,0 +1,44 @@
+666 REBUILD STARTER MERGE
+
+Basis:
+- 666_DEVICE_SPLIT_BUILD.zip
+
+Zusätzlich übernommen aus:
+- WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (2).zip
+
+Ziel:
+- stabilere Device-Split-Basis behalten
+- ältere/richtere Zusatzmodule wieder mit reinnehmen
+- nichts an Core-Dateien blind überschreiben
+
+Beibehaltene Core-Dateien:
+- index.html
+- js/app.js
+- js/audio-reactive-engine.js
+- js/system-state.js
+- js/auto-boost-pro.js
+- js/boost-control.js
+- js/device-mode.js
+- config/radio.config.js
+- css/style.css
+- css/audio-reactive-engine.css
+
+Zusätzliche Module aus dem WebRadio-Build:
+- js/player-core.js
+- js/metadata-ui.js
+- js/failover-engine.js
+- js/smart-failover.js
+- js/soundcloud-fallback.js
+- js/auto-dj-engine.js
+- js/auto-dj-intelligence.js
+- js/visual-boost-pro.js
+- js/god-mode.js
+- js/led-system.js
+- js/mixcloud-panel.js
+- js/youtube-overlay.js
+- css/god-mode.css
+- css/visual-boost-pro.css
+- README_GOD_MODE_PATCH.txt
+- workers/radio worker.js
+
+Das ist bewusst ein Start-/Merge-Paket, kein blindes Komplett-Rewrite.
