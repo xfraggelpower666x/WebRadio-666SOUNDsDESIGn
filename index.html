@@ -1,119 +1,51 @@
+
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn REAL PRO ENGINE</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script src="config/radio.config.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>666 Player FIX</title>
+<script src="config/radio.config.js"></script>
 </head>
-<body>
-  <div id="bootOverlay" class="boot-overlay">
-    <div class="boot-card">
-      <div class="boot-title">666SOUNDsDESIGn</div>
-      <div class="boot-sub">DIGITAL UNDERGROUND… CONNECTED…</div>
-      <div id="bootStatus" class="boot-status">INITIALIZING VISUAL AUDIO SYSTEM...</div>
-      <div class="boot-signature">
-        <div class="boot-dj">DJ Fraggel<br>Aka<br>DJ Fraggelpower666</div>
-        <div class="boot-manifest">Freak DJs believe:<br>better to die standing —<br>with music in our ears<br>and dancing souls before our eyes —<br>than to live on our knees<br>and submit to the system.</div>
-        <div class="boot-links">
-          <a href="https://soundcloud.com/fraggelpower666" target="_blank" rel="noreferrer">SoundCloud</a>
-          <a href="https://github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn" target="_blank" rel="noreferrer">GitHub Radio</a>
-        </div>
-      </div>
-      <button id="bootEnterBtn" class="btn primary">ENTER SYSTEM</button>
-    </div>
-  </div>
+<body style="background:#000;color:#0ff;font-family:sans-serif;text-align:center">
 
-  <div class="app">
-    <div class="header">
-      <div class="logo">666SOUNDsDESIGn</div>
-      <div class="tag">DIGITAL UNDERGROUND DETECTED</div>
-      <div class="meta-grid">
-        <div class="card"><span>WORKER</span><strong id="workerState">OFFLINE</strong></div>
-        <div class="card"><span>SIGNAL</span><strong id="signalState">IDLE</strong></div>
-        <div class="card"><span>SOURCE</span><strong id="sourceState">-</strong></div>
-        <div class="card"><span>DJ</span><strong id="djState">666SOUNDsDESIGn DJ</strong></div>
-      </div>
-    </div>
+<h1>666 PLAYER FIX</h1>
 
-    <div class="title-card card">
-      <p>LIVE STREAM</p>
-      <h2 id="songTitle">Live Stream</h2>
-      <div class="meta-grid" style="margin-top:14px">
-        <div class="card"><span>Listeners</span><strong id="listenersState">0</strong></div>
-        <div class="card"><span>Bitrate</span><strong id="bitrateState">0</strong></div>
-      </div>
-    </div>
+<button onclick="start()">ENTER SYSTEM</button>
+<br><br>
 
-    <div class="split-wrap">
-      <div class="eq-wrap">
-        <div class="eq-layout">
-          <div class="side-meter-box"><canvas id="meterLCanvas"></canvas></div>
-          <div class="eq-center"><canvas id="eqCanvas"></canvas></div>
-          <div class="side-meter-box"><canvas id="meterRCanvas"></canvas></div>
-        </div>
-        <div class="controls">
-          <button id="playMainBtn" class="btn">PLAY MAIN</button>
-          <button id="playBackupBtn" class="btn">PLAY BACKUP</button>
-        </div>
-        <div class="boost-panel">
-          <button data-boost-level="0">GR 0</button>
-          <button data-boost-level="1">GR 1</button>
-          <button data-boost-level="2">GR 2</button>
-          <button data-boost-level="3">GR 3</button>
-        </div>
-        <div id="boostStatus">BOOST GR 1 <span id="boostLed"></span></div>
-      </div>
+<button onclick="play()">PLAY</button>
+<button onclick="pause()">PAUSE</button>
 
-      <div>
-        <div id="eq7Host"></div>
-        <div class="debug-wrap" style="margin-top:12px">
-          <div class="debug-title">REAL PRO DEBUG</div>
-          <div class="debug-grid">
-            <div class="debug-box"><span>MODE</span><strong id="debugMode">-</strong></div>
-            <div class="debug-box"><span>SOURCE</span><strong id="debugSource">-</strong></div>
-            <div class="debug-box"><span>HEALTH PATH</span><strong id="debugHealth">-</strong></div>
-            <div class="debug-box"><span>META PATH</span><strong id="debugMeta">-</strong></div>
-            <div class="debug-box"><span>VOLUME NODE</span><strong id="debugVolume">-</strong></div>
-            <div class="debug-box"><span>EQ CHAIN</span><strong id="debugEq">-</strong></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<p id="meta">Loading...</p>
 
-  <div class="player">
-    <div id="playerTrack" class="player-track">Live Stream</div>
-    <div class="player-sub">REAL PRO ENGINE</div>
-    <div class="transport">
-      <button id="playBtn" class="btn">PLAY</button>
-      <button id="pauseBtn" class="btn">PAUSE</button>
-      <button id="stopBtn" class="btn">STOP</button>
-    </div>
-    <div class="row"><span>VOL</span><input id="vol" type="range" min="0" max="1" step="0.01" value="0.85" /></div>
-    <div class="status-line">Worker-aligned endpoints + real audio graph</div>
-    <audio id="audioPlayer" preload="none" playsinline webkit-playsinline="true"></audio>
-  </div>
+<audio id="audio" controls></audio>
 
-  <script src="js/device-mode.js"></script>
-  <script src="js/system-state.js"></script>
-  <script src="js/boost-control.js"></script>
-  <script src="js/eq-7band.js"></script>
-  <script src="js/auto-boost-pro.js"></script>
-  <script src="js/audio-reactive-engine.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    document.getElementById('vol')?.addEventListener('input', e => {
-      if (window._postGainNode) {
-        window._postGainNode.gain.value = Number(e.target.value);
-        if (window.SystemState) SystemState.set({ volumeNode: 'postGain active' });
-      } else {
-        const a = document.getElementById('audioPlayer');
-        if (a) a.volume = Number(e.target.value);
-        if (window.SystemState) SystemState.set({ volumeNode: 'html audio volume fallback' });
-      }
-    });
-  </script>
+<script>
+const cfg = window.RADIO_CONFIG;
+const audio = document.getElementById("audio");
+
+function start(){
+  alert("System Ready");
+}
+
+async function play(){
+  audio.src = cfg.apiBase + cfg.streamPath;
+  await audio.play();
+}
+
+function pause(){
+  audio.pause();
+}
+
+async function meta(){
+  const res = await fetch(cfg.apiBase + cfg.metadataPath);
+  const j = await res.json();
+  document.getElementById("meta").innerText = j.title || "No Data";
+}
+
+setInterval(meta,3000);
+meta();
+</script>
+
 </body>
 </html>
