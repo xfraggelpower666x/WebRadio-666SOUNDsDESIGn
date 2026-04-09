@@ -37,8 +37,7 @@
   }
 
   function drawMeters(avg){
-    const ids = ["meterLCanvas","meterRCanvas"];
-    ids.forEach(id => {
+    ["meterLCanvas","meterRCanvas"].forEach(id => {
       const canvas = document.getElementById(id);
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
@@ -72,50 +71,23 @@
     const w = rect.width, h = rect.height;
     ctx.clearRect(0,0,w,h);
 
-    if (DeviceMode.mode === "iphone") {
-      const bars = Math.min(28, data.length);
-      const barW = (w / bars) * 0.68;
-      const gap = (w - bars * barW) / (bars + 1);
-      for (let i=0;i<bars;i++){
-        const v = data[i] / 255;
-        const bh = Math.max(8, v * h * 0.9);
-        const x = gap + i * (barW + gap);
-        const y = h - bh;
-        const grad = ctx.createLinearGradient(0, y, 0, h);
-        grad.addColorStop(0, "#55e8ff");
-        grad.addColorStop(1, "#ff2fd1");
-        ctx.fillStyle = grad;
-        ctx.globalAlpha = 0.9;
-        ctx.fillRect(x, y, barW, bh);
-      }
-      ctx.globalAlpha = 1;
-    } else {
-      const cx = w/2, cy = h/2, base = Math.min(w,h) * 0.18;
-      let sum = 0; for (let i=0;i<data.length;i++) sum += data[i];
-      const avg = (sum / data.length) / 255;
-      ctx.beginPath();
-      ctx.arc(cx, cy, base + 10 + avg * 22, 0, Math.PI*2);
-      ctx.strokeStyle = "rgba(85,232,255,.22)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      const bars = Math.min(48, data.length);
-      for (let i=0;i<bars;i++){
-        const v = data[i]/255;
-        const angle = (i/bars)*Math.PI*2 - Math.PI/2;
-        const inner = base + 8;
-        const outer = inner + 14 + v*38;
-        const x1 = cx + Math.cos(angle)*inner;
-        const y1 = cy + Math.sin(angle)*inner;
-        const x2 = cx + Math.cos(angle)*outer;
-        const y2 = cy + Math.sin(angle)*outer;
-        ctx.beginPath();
-        ctx.strokeStyle = i % 2 === 0 ? "#55e8ff" : "#ff42d9";
-        ctx.lineWidth = 2;
-        ctx.moveTo(x1,y1);
-        ctx.lineTo(x2,y2);
-        ctx.stroke();
-      }
+    const bars = DeviceMode.mode === "iphone" ? 28 : 40;
+    const barW = (w / bars) * 0.68;
+    const gap = (w - bars * barW) / (bars + 1);
+
+    for (let i=0;i<bars;i++){
+      const v = (data[i] || 0) / 255;
+      const bh = Math.max(8, v * h * 0.9);
+      const x = gap + i * (barW + gap);
+      const y = h - bh;
+      const grad = ctx.createLinearGradient(0, y, 0, h);
+      grad.addColorStop(0, "#55e8ff");
+      grad.addColorStop(1, "#ff2fd1");
+      ctx.fillStyle = grad;
+      ctx.globalAlpha = 0.9;
+      ctx.fillRect(x, y, barW, bh);
     }
+    ctx.globalAlpha = 1;
   }
 
   function frame(){
@@ -128,10 +100,8 @@
     const avg = (sum / data.length) / 255;
     drawMeters(avg);
     drawEq(data);
-    if (avg > 0.35) document.body.classList.add("live-beat-pulse");
-    else document.body.classList.remove("live-beat-pulse");
-    if (avg > 0.58) document.body.classList.add("live-drop-flash");
-    else document.body.classList.remove("live-drop-flash");
+    if (avg > 0.35) document.body.classList.add("beat"); else document.body.classList.remove("beat");
+    if (avg > 0.58) document.body.classList.add("drop"); else document.body.classList.remove("drop");
     requestAnimationFrame(frame);
   }
 
