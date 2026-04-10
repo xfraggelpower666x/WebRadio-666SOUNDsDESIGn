@@ -1,0 +1,8 @@
+{
+  "name": "webradio-666soundsdesign-worker",
+  "main": "worker.js",
+  "compatibility_date": "2026-04-10",
+  "vars": {
+    "META_JSON_URL": "https://my.idjstream.com/cp/get_info.php?p=8686"
+  }
+}
