@@ -1,8 +1,0 @@
-body.drop-explosion {
-  animation: dropExplosion 200ms linear 2;
-}
-@keyframes dropExplosion {
-  0% { filter: brightness(1); }
-  50% { filter: brightness(2.5); }
-  100% { filter: brightness(1); }
-}
