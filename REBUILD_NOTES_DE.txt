@@ -1,0 +1,23 @@
+666SOUNDsDESIGn REBUILD B+C
+
+Direkt gefixt:
+- alte kaputte Worker-Domain ersetzt
+- config/radio.config.js als zentrale Basis aktiviert
+- app.js auf konfigurierbare Worker-URL umgebaut
+- Main Source nutzt jetzt /stream statt altem /radio-Pfad
+- legacy audio-reactive-engine.js in index deaktiviert, weil falsches Audio-Element + doppelte AudioContext-Routing-Gefahr
+- index Worker-Anzeige aktualisiert
+- data/streams.json auf neue Domain umgestellt
+
+Wahrscheinliche Originalfehler:
+- alte Domain fraggelpower666.workers.dev
+- doppeltes Audio-Handling
+- falsches Audio-Element in legacy reactive script
+- Wildwuchs aus alten/finalen/patched Dateien
+
+Dateien für direkten Worker/Frontend-Deploy:
+- index.html
+- config/radio.config.js
+- js/app.js
+- data/streams.json
+- SCRIPTABLE_GITHUB_DEPLOY.js
