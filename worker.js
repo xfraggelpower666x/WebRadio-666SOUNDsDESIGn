@@ -797,7 +797,18 @@ export default {
         history: HISTORY
       }, origin);
     }
-
+    /**
+     * INTRO
+     */
+    if (url.pathname === "/intro" || url.pathname === "/api/radio/intro") {
+      return json({
+        ok: true,
+        worker: WORKER_NAME,
+        build: BUILD,
+        message: "Intro route reserved",
+        soundcloud: "https://soundcloud.com/fraggelpower666"
+      }, origin);
+    }
     /**
      * DEFAULT
      */
