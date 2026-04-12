@@ -1,11 +1,11 @@
 /**
- * ==========================================================
- * 666SOUNDsDESIGn — WORKER: webradio-666soundsdesign-worker-v6
- * ==========================================================
+ * =========================================================
+ * 666SOUNDsDESIGn — WORKER: webradio-666soundsdesign-worker
+ * =========================================================
  *
  * TYPE:        radio
- * VERSION:     v6.0.0
- * BUILD:       SELF_HEAL_FINAL
+ * VERSION:     v6.1.0
+ * BUILD:       V6_1_RADIO_PRIORITY_FIXED
  *
  * DESCRIPTION:
  * Zentraler RADIO CORE Worker mit:
@@ -14,59 +14,24 @@
  * - SonicPanel/Webhook-Metadaten
  * - Provider-JSON-Fallback
  * - History im RAM
- * - Sunshine-/SoundCloud-/interne Quellen als Kandidaten
- * - harter finaler Main-/Backup-Fallback
+ * - optionale Sunshine-/SoundCloud-Fallbacks
+ * - harte finale Main-/Backup-Fallbacks
  *
  * WICHTIG:
  * - Keine Transkodierung
  * - Nur Proxy / Routing / Auswahl / Fallback
  * - Audio-Pfad bleibt schlank
- *
- * ROUTES:
- * /health
- * /debug
- * /stream
- * /backup
- * /metadata
- * /status
- * /listeners
- * /history
- * /radio
- *
- * /api/radio/health
- * /api/radio/debug
- * /api/radio/stream
- * /api/radio/backup
- * /api/radio/metadata
- * /api/radio/status
- * /api/radio/listeners
- * /api/radio/history
- * /api/radio/radio
- * /api/radio/webhook
- *
- * =========================================================
+ * - SoundCloud ist standardmäßig DEAKTIVIERT
+ * - Sunshine ist standardmäßig DEAKTIVIERT
  */
 
-const WORKER_NAME = "webradio-666soundsdesign-worker-v6";
-const BUILD = "V6_SELF_HEAL_FINAL";
+const WORKER_NAME = "webradio-666soundsdesign-worker";
+const BUILD = "V6_1_RADIO_PRIORITY_FIXED";
 
-/**
- * =========================================================
- * HARTE LETZTE NOTFALL-STREAMS
- * Diese beiden bleiben IMMER die finalen Fallbacks.
- * =========================================================
- */
 const DEFAULT_PROVIDER_MAIN = "https://my.idjstream.com/666soundsdesign/stream";
 const DEFAULT_PROVIDER_BACKUP = "https://my.idjstream.com:8686/stream";
-
-/**
- * JSON / Metadata Fallback
- */
 const DEFAULT_META_JSON_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
 
-/**
- * Sunshine Presets
- */
 const DEFAULT_SUNSHINE_STREAMS = {
   sunshine_live: "https://stream.sunshine-live.de/live/aac-64/utm_source=radio.menu/",
   sunshine_techhouse: "https://stream.sunshine-live.de/sp4/mp3-192/utm_source=radio.menu/",
@@ -77,40 +42,28 @@ const DEFAULT_SUNSHINE_STREAMS = {
   sunshine_melodic_techno: "https://stream.sunshine-live.de/melodic-techno/mp3-192/stream.sunshine-live.de/"
 };
 
-/**
- * Timing
- */
 const DEFAULT_WEBHOOK_CACHE_TTL_MS = 10 * 60 * 1000;
 const DEFAULT_META_FETCH_CACHE_MS = 15 * 1000;
 const DEFAULT_STREAM_CHECK_TIMEOUT_MS = 5000;
 
-/**
- * =========================================================
- * RAM STATE
- * =========================================================
- */
 let RADIO_STATE = {
   updatedAt: 0,
   source: "bootstrap",
-
   stream: "offline",
   djstatus: "false",
   djusername: null,
   song: null,
   art: null,
   type: null,
-
   listeners: 0,
   unique: 0,
   bitrate: null,
-
   sslplay: null,
   sslurl: null,
   domain: null,
   sslport: null,
   radioip: null,
   port: null,
-
   raw: null
 };
 
@@ -125,11 +78,6 @@ let STREAM_STATUS = {
   candidates: []
 };
 
-/**
- * =========================================================
- * UTILS
- * =========================================================
- */
 function now() {
   return Date.now();
 }
@@ -150,6 +98,12 @@ function sanitizeUrl(value) {
   if (!s) return null;
   if (!/^https?:\/\//i.test(s)) return null;
   return s;
+}
+
+function isEnabled(value, fallback = false) {
+  if (value == null) return fallback;
+  const s = String(value).trim().toLowerCase();
+  return s === "1" || s === "true" || s === "yes" || s === "on";
 }
 
 function cors(origin = "*") {
@@ -191,37 +145,28 @@ function buildSslPlayFromParts(state) {
   const domain = safeString(state?.domain);
   const sslport = safeString(state?.sslport);
   if (!domain || !sslport) return null;
-  return `https://${domain}:${sslport}/`;
+  return `https://${domain}:${sslport}/stream`;
 }
 
-/**
- * =========================================================
- * NORMALIZER
- * =========================================================
- */
 function normalizeWebhookPayload(data) {
   return {
     updatedAt: now(),
     source: "sonicpanel-webhook",
-
     stream: data?.stream ?? "offline",
     djstatus: data?.djstatus ?? "false",
     djusername: data?.djusername ?? null,
     song: data?.song ?? data?.title ?? null,
     art: data?.art ?? null,
     type: data?.type ?? null,
-
     listeners: Number(data?.listeners ?? 0) || 0,
     unique: Number(data?.ulistener ?? data?.unique ?? 0) || 0,
     bitrate: data?.bitrate ?? null,
-
     sslplay: sanitizeUrl(data?.sslplay),
     sslurl: sanitizeUrl(data?.sslurl),
     domain: safeString(data?.domain),
     sslport: safeString(data?.sslport),
     radioip: safeString(data?.radioip),
     port: safeString(data?.port),
-
     raw: data ?? null
   };
 }
@@ -230,32 +175,27 @@ function normalizeProviderPayload(data) {
   return {
     updatedAt: now(),
     source: "provider-json",
-
     stream: data?.stream ?? "offline",
     djstatus: data?.djstatus ?? "false",
     djusername: data?.djusername ?? null,
     song: data?.title ?? data?.song ?? null,
     art: data?.art ?? null,
     type: data?.type ?? null,
-
     listeners: Number(data?.listeners ?? 0) || 0,
     unique: Number(data?.ulistener ?? data?.unique ?? 0) || 0,
     bitrate: data?.bitrate ?? null,
-
     sslplay: sanitizeUrl(data?.sslplay),
     sslurl: sanitizeUrl(data?.sslurl),
     domain: safeString(data?.domain),
     sslport: safeString(data?.sslport),
     radioip: safeString(data?.radioip),
     port: safeString(data?.port),
-
     raw: data ?? null
   };
 }
 
 function saveHistory(item) {
   if (!item?.song) return;
-
   const latest = HISTORY[0];
   if (latest && latest.song === item.song) return;
 
@@ -277,38 +217,28 @@ function metadataJson(sourceState, sourceLabel = "memory") {
     worker: WORKER_NAME,
     build: BUILD,
     source: sourceLabel,
-
     title: sourceState.song || null,
     song: sourceState.song || null,
     art: sourceState.art || null,
     image: sourceState.art || null,
     cover: sourceState.art || null,
-
     dj: sourceState.djusername || null,
     djusername: sourceState.djusername || null,
-
     listeners: Number(sourceState.listeners || 0),
     unique: Number(sourceState.unique || 0),
     bitrate: sourceState.bitrate || null,
     stream: sourceState.stream || "offline",
     type: sourceState.type || null,
-
     sslplay: sourceState.sslplay || null,
     sslurl: sourceState.sslurl || null,
     domain: sourceState.domain || null,
     sslport: sourceState.sslport || null,
     radioip: sourceState.radioip || null,
     port: sourceState.port || null,
-
     updatedAt: sourceState.updatedAt || 0
   };
 }
 
-/**
- * =========================================================
- * METADATA
- * =========================================================
- */
 async function getProviderMetadata(metaJsonUrl, metaFetchCacheMs) {
   if (META_CACHE.data && (now() - META_CACHE.updatedAt) < metaFetchCacheMs) {
     return META_CACHE.data;
@@ -318,7 +248,7 @@ async function getProviderMetadata(metaJsonUrl, metaFetchCacheMs) {
     method: "GET",
     headers: {
       "Accept": "application/json,text/plain,*/*",
-      "User-Agent": "666SOUNDsDESIGn Radio Worker V6"
+      "User-Agent": "666SOUNDsDESIGn Radio Worker V6.1"
     },
     cf: { cacheTtl: 0, cacheEverything: false }
   });
@@ -333,11 +263,11 @@ async function getProviderMetadata(metaJsonUrl, metaFetchCacheMs) {
   if (ct.includes("json")) {
     normalized = normalizeProviderPayload(await res.json());
   } else {
-    const text = await res.text();
+    const txt = await res.text();
     try {
-      normalized = normalizeProviderPayload(JSON.parse(text));
+      normalized = normalizeProviderPayload(JSON.parse(txt));
     } catch {
-      normalized = normalizeProviderPayload({ title: text?.trim() || null });
+      normalized = normalizeProviderPayload({ title: txt?.trim() || null });
     }
   }
 
@@ -363,20 +293,10 @@ async function resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs) 
   }
 }
 
-/**
- * =========================================================
- * SOURCE CANDIDATES
- * Reihenfolge:
- * 1) interne Worker / interne URLs
- * 2) SoundCloud / Album-Fallbacks
- * 3) Webhook sslplay / sslurl / domain+sslport
- * 4) Sunshine Presets
- * 5) harter Main
- * 6) harter Backup
- * =========================================================
- */
 function buildSourceCandidates(state, env) {
   const candidates = [];
+  const enableSoundcloud = isEnabled(env?.ENABLE_SOUNDCLOUD_FALLBACK, false);
+  const enableSunshine = isEnabled(env?.ENABLE_SUNSHINE_FALLBACK, false);
 
   function add(label, url, category = "custom") {
     const clean = sanitizeUrl(url);
@@ -385,54 +305,40 @@ function buildSourceCandidates(state, env) {
     candidates.push({ label, url: clean, category });
   }
 
-  /**
-   * Interne Worker / Hybrid / AutoDJ
-   */
   add("worker_internal_primary", env?.INTERNAL_STREAM_URL_1, "internal");
   add("worker_internal_secondary", env?.INTERNAL_STREAM_URL_2, "internal");
   add("worker_internal_tertiary", env?.INTERNAL_STREAM_URL_3, "internal");
   add("worker_internal_quaternary", env?.INTERNAL_STREAM_URL_4, "internal");
 
-  /**
-   * SoundCloud / Album-Fallbacks
-   * Diese URLs bitte später per ENV sauber setzen.
-   */
-  add("soundcloud_album_1", env?.SOUNDCLOUD_ALBUM_URL_1, "soundcloud");
-  add("soundcloud_album_2", env?.SOUNDCLOUD_ALBUM_URL_2, "soundcloud");
-  add("soundcloud_album_3", env?.SOUNDCLOUD_ALBUM_URL_3, "soundcloud");
-
-  /**
-   * Dynamische SonicPanel Ziele
-   */
   add("webhook_sslplay", state?.sslplay, "dynamic");
   add("webhook_sslurl", state?.sslurl, "dynamic");
   add("webhook_domain_sslport", buildSslPlayFromParts(state), "dynamic");
 
-  /**
-   * Sunshine Quellen
-   */
-  add("sunshine_live", env?.SUNSHINE_STREAM_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_live, "sunshine");
-  add("sunshine_techhouse", env?.SUNSHINE_TECHHOUSE_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_techhouse, "sunshine");
-  add("sunshine_bunker", env?.SUNSHINE_BUNKER_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_bunker, "sunshine");
-  add("sunshine_club", env?.SUNSHINE_CLUB_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_club, "sunshine");
-  add("sunshine_clubsounds", env?.SUNSHINE_CLUBSOUNDS_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_clubsounds, "sunshine");
-  add("sunshine_iamraving", env?.SUNSHINE_IAMRAVING_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_iamraving, "sunshine");
-  add("sunshine_melodic_techno", env?.SUNSHINE_MELODIC_TECHNO_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_melodic_techno, "sunshine");
+  add("radio_main_env", env?.STREAM_MAIN, "provider");
+  add("radio_backup_env", env?.STREAM_BACKUP, "provider");
 
-  /**
-   * Harte letzte Fallbacks
-   */
-  add("provider_main_final_fallback", env?.STREAM_MAIN || DEFAULT_PROVIDER_MAIN, "provider");
-  add("provider_backup_final_fallback", env?.STREAM_BACKUP || DEFAULT_PROVIDER_BACKUP, "provider");
+  if (enableSunshine) {
+    add("sunshine_live", env?.SUNSHINE_STREAM_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_live, "sunshine");
+    add("sunshine_techhouse", env?.SUNSHINE_TECHHOUSE_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_techhouse, "sunshine");
+    add("sunshine_bunker", env?.SUNSHINE_BUNKER_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_bunker, "sunshine");
+    add("sunshine_club", env?.SUNSHINE_CLUB_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_club, "sunshine");
+    add("sunshine_clubsounds", env?.SUNSHINE_CLUBSOUNDS_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_clubsounds, "sunshine");
+    add("sunshine_iamraving", env?.SUNSHINE_IAMRAVING_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_iamraving, "sunshine");
+    add("sunshine_melodic_techno", env?.SUNSHINE_MELODIC_TECHNO_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_melodic_techno, "sunshine");
+  }
+
+  if (enableSoundcloud) {
+    add("soundcloud_album_1", env?.SOUNDCLOUD_ALBUM_URL_1, "soundcloud");
+    add("soundcloud_album_2", env?.SOUNDCLOUD_ALBUM_URL_2, "soundcloud");
+    add("soundcloud_album_3", env?.SOUNDCLOUD_ALBUM_URL_3, "soundcloud");
+  }
+
+  add("provider_main_final_fallback", DEFAULT_PROVIDER_MAIN, "provider");
+  add("provider_backup_final_fallback", DEFAULT_PROVIDER_BACKUP, "provider");
 
   return candidates;
 }
 
-/**
- * =========================================================
- * SELF HEAL PROBE
- * =========================================================
- */
 async function quickStreamProbe(url, timeoutMs) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -489,14 +395,8 @@ async function selectBestStream(state, env, timeoutMs) {
   throw new Error("NO_STREAM_CANDIDATES");
 }
 
-/**
- * =========================================================
- * STREAM PROXY
- * =========================================================
- */
 async function streamProxy(request, targetUrl, origin) {
   const upstreamHeaders = new Headers();
-
   const range = request.headers.get("Range");
   const accept = request.headers.get("Accept");
 
@@ -512,7 +412,6 @@ async function streamProxy(request, targetUrl, origin) {
   });
 
   const headers = new Headers(upstream.headers);
-
   Object.entries(cors(origin)).forEach(([k, v]) => headers.set(k, v));
 
   if (!headers.get("Content-Type")) {
@@ -524,13 +423,7 @@ async function streamProxy(request, targetUrl, origin) {
   headers.set("X-Worker-Build", BUILD);
   headers.set("X-Active-Stream-Target", targetUrl);
 
-  [
-    "connection",
-    "keep-alive",
-    "proxy-connection",
-    "transfer-encoding",
-    "upgrade"
-  ].forEach((h) => headers.delete(h));
+  ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade"].forEach((h) => headers.delete(h));
 
   return new Response(request.method === "HEAD" ? null : upstream.body, {
     status: upstream.status,
@@ -539,11 +432,6 @@ async function streamProxy(request, targetUrl, origin) {
   });
 }
 
-/**
- * =========================================================
- * PLAYER CONFIG JSON
- * =========================================================
- */
 function buildRadioConfig(origin) {
   return {
     ok: true,
@@ -551,12 +439,10 @@ function buildRadioConfig(origin) {
     build: BUILD,
     branding: "666SOUNDsDESIGn",
     owner: "DJ Fraggel / DJ Fraggelpower666",
-
     intro: `${origin}/intro`,
     stream: `${origin}/stream`,
     stream_main: `${origin}/stream`,
     stream_backup: `${origin}/backup`,
-
     presets: {
       main: `${origin}/stream`,
       backup: `${origin}/backup`,
@@ -568,7 +454,6 @@ function buildRadioConfig(origin) {
       sunshine_6: `${origin}/stream-sunshine/6`,
       sunshine_7: `${origin}/stream-sunshine/7`
     },
-
     metadata: `${origin}/metadata`,
     status: `${origin}/status`,
     listeners: `${origin}/listeners`,
@@ -589,15 +474,9 @@ function sunshineUrlByPreset(env, id) {
     "6": env?.SUNSHINE_IAMRAVING_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_iamraving,
     "7": env?.SUNSHINE_MELODIC_TECHNO_URL || DEFAULT_SUNSHINE_STREAMS.sunshine_melodic_techno
   };
-
   return map[String(id)] || null;
 }
 
-/**
- * =========================================================
- * MAIN FETCH
- * =========================================================
- */
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -609,15 +488,9 @@ export default {
     const streamCheckTimeoutMs = toMs(env?.STREAM_CHECK_TIMEOUT_MS, DEFAULT_STREAM_CHECK_TIMEOUT_MS);
 
     if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: cors(origin)
-      });
+      return new Response(null, { status: 204, headers: cors(origin) });
     }
 
-    /**
-     * HEALTH
-     */
     if (url.pathname === "/health" || url.pathname === "/api/radio/health") {
       return json({
         ok: true,
@@ -628,12 +501,8 @@ export default {
       }, origin);
     }
 
-    /**
-     * DEBUG
-     */
     if (url.pathname === "/debug" || url.pathname === "/api/radio/debug") {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
-
       return json({
         ok: true,
         worker: WORKER_NAME,
@@ -647,41 +516,20 @@ export default {
       }, origin);
     }
 
-    /**
-     * ROOT
-     */
     if (url.pathname === "/") {
       return text("Worker läuft", origin, 200);
     }
 
-    /**
-     * RADIO CONFIG
-     */
-    if (
-      url.pathname === "/radio" ||
-      url.pathname === "/api/radio" ||
-      url.pathname === "/api/radio/radio"
-    ) {
+    if (url.pathname === "/radio" || url.pathname === "/api/radio" || url.pathname === "/api/radio/radio") {
       return json(buildRadioConfig(url.origin), origin);
     }
 
-    /**
-     * WEBHOOK
-     */
-    if (
-      (url.pathname === "/webhook" || url.pathname === "/api/radio/webhook") &&
-      request.method === "POST"
-    ) {
+    if ((url.pathname === "/webhook" || url.pathname === "/api/radio/webhook") && request.method === "POST") {
       let data;
-
       try {
         data = await request.json();
       } catch {
-        return json({
-          ok: false,
-          error: "invalid json",
-          worker: WORKER_NAME
-        }, origin, 400);
+        return json({ ok: false, error: "invalid json", worker: WORKER_NAME }, origin, 400);
       }
 
       RADIO_STATE = normalizeWebhookPayload(data);
@@ -705,32 +553,17 @@ export default {
       }, origin);
     }
 
-    /**
-     * STREAM SELF-HEAL
-     */
-    if (
-      (url.pathname === "/stream" || url.pathname === "/api/radio/stream") &&
-      (request.method === "GET" || request.method === "HEAD")
-    ) {
+    if ((url.pathname === "/stream" || url.pathname === "/api/radio/stream") && (request.method === "GET" || request.method === "HEAD")) {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
       const best = await selectBestStream(resolved.state, env, streamCheckTimeoutMs);
       return streamProxy(request, best.url, origin);
     }
 
-    /**
-     * BACKUP DIREKT
-     */
-    if (
-      (url.pathname === "/backup" || url.pathname === "/api/radio/backup") &&
-      (request.method === "GET" || request.method === "HEAD")
-    ) {
+    if ((url.pathname === "/backup" || url.pathname === "/api/radio/backup") && (request.method === "GET" || request.method === "HEAD")) {
       const backup = env?.STREAM_BACKUP || DEFAULT_PROVIDER_BACKUP;
       return streamProxy(request, backup, origin);
     }
 
-    /**
-     * SUNSHINE PRESETS 1-7
-     */
     const sunshineMatch = url.pathname.match(/^\/stream-sunshine\/([1-7])$/);
     if (sunshineMatch && (request.method === "GET" || request.method === "HEAD")) {
       const target = sunshineUrlByPreset(env, sunshineMatch[1]);
@@ -740,25 +573,13 @@ export default {
       return streamProxy(request, target, origin);
     }
 
-    /**
-     * METADATA
-     */
-    if (
-      url.pathname === "/metadata" ||
-      url.pathname === "/meta" ||
-      url.pathname === "/api/radio/metadata" ||
-      url.pathname === "/api/radio/meta"
-    ) {
+    if (url.pathname === "/metadata" || url.pathname === "/meta" || url.pathname === "/api/radio/metadata" || url.pathname === "/api/radio/meta") {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
       return json(metadataJson(resolved.state, resolved.source), origin);
     }
 
-    /**
-     * STATUS
-     */
     if (url.pathname === "/status" || url.pathname === "/api/radio/status") {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
-
       return json({
         ok: true,
         worker: WORKER_NAME,
@@ -768,12 +589,8 @@ export default {
       }, origin);
     }
 
-    /**
-     * LISTENERS
-     */
     if (url.pathname === "/listeners" || url.pathname === "/api/radio/listeners") {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
-
       return json({
         ok: true,
         worker: WORKER_NAME,
@@ -786,9 +603,6 @@ export default {
       }, origin);
     }
 
-    /**
-     * HISTORY
-     */
     if (url.pathname === "/history" || url.pathname === "/api/radio/history") {
       return json({
         ok: true,
@@ -797,21 +611,17 @@ export default {
         history: HISTORY
       }, origin);
     }
-    /**
-     * INTRO
-     */
+
     if (url.pathname === "/intro" || url.pathname === "/api/radio/intro") {
       return json({
         ok: true,
         worker: WORKER_NAME,
         build: BUILD,
         message: "Intro route reserved",
-        soundcloud: "https://soundcloud.com/fraggelpower666"
+        introMode: "reserved"
       }, origin);
     }
-    /**
-     * DEFAULT
-     */
+
     return text("Worker läuft", origin, 200);
   }
 };
