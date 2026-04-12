@@ -1,8 +1,28 @@
 {
+  // 666SOUNDsDESIGn — Worker config
   "name": "webradio-666soundsdesign-worker",
-  "main": "worker.js",
+  "main": "./worker.js",
   "compatibility_date": "2026-04-10",
+
   "vars": {
-    "META_JSON_URL": "https://my.idjstream.com/cp/get_info.php?p=8686"
+    "META_JSON_URL": "https://my.idjstream.com/cp/get_info.php?p=8686",
+    "STREAM_MAIN": "https://my.idjstream.com/666soundsdesign/stream",
+    "STREAM_BACKUP": "https://my.idjstream.com:8686/stream",
+    "ENABLE_SOUNDCLOUD_FALLBACK": "false",
+    "ENABLE_SUNSHINE_FALLBACK": "false",
+    "WEBHOOK_CACHE_TTL_MS": "600000",
+    "META_FETCH_CACHE_MS": "15000",
+    "STREAM_CHECK_TIMEOUT_MS": "5000"
+  },
+
+  "routes": [
+    {
+      "pattern": "webradio.666soundsdesign-broadcaster.com/*",
+      "custom_domain": true
+    }
+  ],
+
+  "observability": {
+    "enabled": false
   }
 }
