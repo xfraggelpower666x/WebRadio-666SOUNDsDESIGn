@@ -1,63 +1,75 @@
 /**
  * =========================================================
- * 666SOUNDsDESIGn — RADIO WORKER V5 STABLE SELF-HEAL
+ * 666SOUNDsDESIGn — RADIO WORKER RECOVERY (Webhook First)
  * =========================================================
  *
- * ROOT RULE:
- * - Frontend lives in repo root
- * - Worker lives in /workers/webradio-666soundsdesign-worker/
+ * Ziel:
+ * - bestehenden Radio-Worker wiederherstellen
+ * - Audio-Pfad unverändert stabil halten
+ * - Metadaten primär aus Webhook nutzen
+ * - INFO_API nur als Fallback
  *
- * ENDPOINTS:
- * GET/HEAD  /stream
- * GET/HEAD  /api/radio/stream
- * GET/HEAD  /backup
- * GET/HEAD  /api/radio/backup
- * GET       /metadata
- * GET       /api/radio/metadata
- * GET       /status
- * GET       /api/radio/status
- * GET       /listeners
- * GET       /api/radio/listeners
- * GET       /history
- * GET       /api/radio/history
- * POST      /api/radio/webhook
- * GET       /debug
- * GET       /api/radio/debug
- * GET       /health
- * GET       /api/radio/health
+ * Routen:
+ * /health
+ * /debug
+ * /stream
+ * /backup
+ * /metadata
+ * /status
+ * /listeners
+ * /history
+ *
+ * /api/radio/health
+ * /api/radio/debug
+ * /api/radio/stream
+ * /api/radio/backup
+ * /api/radio/metadata
+ * /api/radio/status
+ * /api/radio/listeners
+ * /api/radio/history
+ * /api/radio/webhook
  */
 
-const BUILD = "RADIO_V5_STABLE_SELF_HEAL";
+const WORKER_NAME = "webradio-666soundsdesign-worker";
+const BUILD = "RECOVERY_WEBHOOK_FIRST";
 
 const DEFAULT_STREAM_MAIN = "https://my.idjstream.com/666soundsdesign/stream";
 const DEFAULT_STREAM_BACKUP = "https://my.idjstream.com:8686/stream";
 const DEFAULT_META_JSON_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
 
-const DEFAULT_WEBHOOK_CACHE_TTL_MS = 10 * 60 * 1000;
+const DEFAULT_WEBHOOK_CACHE_TTL_MS = 90 * 1000; // 1-Minuten-Webhook + Puffer
 const DEFAULT_META_FETCH_CACHE_MS = 15 * 1000;
 const DEFAULT_STREAM_CHECK_TIMEOUT_MS = 5000;
 
 let RADIO_STATE = {
   updatedAt: 0,
+  source: "bootstrap",
+  stream: "offline",
+  djstatus: "false",
+  djusername: null,
   song: null,
   art: null,
-  djusername: null,
+  type: null,
   listeners: 0,
   unique: 0,
   bitrate: null,
-  stream: "offline",
+  sslplay: null,
+  sslurl: null,
+  domain: null,
+  sslport: null,
+  radioip: null,
+  port: null,
   raw: null
 };
 
 let HISTORY = [];
 let META_CACHE = { updatedAt: 0, data: null };
+
 let STREAM_STATUS = {
   lastCheckedAt: 0,
-  primaryOk: null,
-  backupOk: null,
-  activeSource: "unknown",
-  lastError: null,
-  lastTargetUrl: null
+  selectedSource: "none",
+  lastTargetUrl: null,
+  lastError: null
 };
 
 function now() {
@@ -69,12 +81,26 @@ function toMs(value, fallback) {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
+function safeString(value) {
+  if (value == null) return null;
+  const s = String(value).trim();
+  return s || null;
+}
+
+function sanitizeUrl(value) {
+  const s = safeString(value);
+  if (!s) return null;
+  if (!/^https?:\/\//i.test(s)) return null;
+  return s;
+}
+
 function cors(origin = "*") {
   return {
     "Access-Control-Allow-Origin": origin || "*",
     "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type,Authorization,Range,X-Admin-Password",
     "Access-Control-Expose-Headers": "Content-Length,Content-Range,Accept-Ranges,Content-Type",
+    "Cache-Control": "no-store",
     "Vary": "Origin"
   };
 }
@@ -84,8 +110,7 @@ function json(data, origin = "*", status = 200) {
     status,
     headers: {
       ...cors(origin),
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store"
+      "Content-Type": "application/json; charset=utf-8"
     }
   });
 }
@@ -95,73 +120,70 @@ function text(body, origin = "*", status = 200) {
     status,
     headers: {
       ...cors(origin),
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store"
+      "Content-Type": "text/plain; charset=utf-8"
     }
   });
-}
-
-function normalizeStreamState(state) {
-  const raw = String(state?.stream || "").toLowerCase().trim();
-  const listeners = Number(state?.listeners || 0);
-  const title = String(state?.song || "").trim();
-  const dj = String(state?.djusername || "").trim().toLowerCase();
-
-  if (raw === "live") return "live";
-  if (raw === "autodj") return "autodj";
-
-  if (raw === "offline") {
-    if (listeners > 0 || title || state?.art) return "autodj";
-    if (["autodj", "auto dj", "no dj", "false", "none", ""].includes(dj)) return "autodj";
-  }
-
-  return raw || "offline";
 }
 
 function isFreshWebhookState(webhookTtlMs) {
   return RADIO_STATE.updatedAt > 0 && (now() - RADIO_STATE.updatedAt) < webhookTtlMs;
 }
 
+function buildSslPlayFromParts(state) {
+  const domain = safeString(state?.domain);
+  const sslport = safeString(state?.sslport);
+  if (!domain || !sslport) return null;
+  return `https://${domain}:${sslport}/`;
+}
+
 function normalizeWebhookPayload(data) {
   return {
     updatedAt: now(),
+    source: "sonicpanel-webhook",
+    stream: data?.stream ?? "offline",
+    djstatus: data?.djstatus ?? "false",
+    djusername: data?.djusername ?? null,
     song: data?.song ?? data?.title ?? null,
     art: data?.art ?? null,
-    djusername: data?.djusername ?? null,
+    type: data?.type ?? null,
     listeners: Number(data?.listeners ?? 0) || 0,
     unique: Number(data?.ulistener ?? data?.unique ?? 0) || 0,
     bitrate: data?.bitrate ?? null,
-    stream: data?.stream ?? "offline",
+    sslplay: sanitizeUrl(data?.sslplay),
+    sslurl: sanitizeUrl(data?.sslurl),
+    domain: safeString(data?.domain),
+    sslport: safeString(data?.sslport),
+    radioip: safeString(data?.radioip),
+    port: safeString(data?.port),
     raw: data ?? null
   };
 }
 
 function normalizeProviderPayload(data) {
-  const djRaw = String(data?.djusername ?? "").trim().toLowerCase();
-  let stream = "offline";
-
-  if (djRaw && !["autodj", "auto dj", "none", "false"].includes(djRaw)) {
-    stream = "live";
-  } else if (data?.title || Number(data?.listeners || 0) > 0) {
-    stream = "autodj";
-  }
-
   return {
     updatedAt: now(),
+    source: "provider-json",
+    stream: data?.stream ?? "offline",
+    djstatus: data?.djstatus ?? "false",
+    djusername: data?.djusername ?? null,
     song: data?.title ?? data?.song ?? null,
     art: data?.art ?? null,
-    djusername: data?.djusername ?? null,
+    type: data?.type ?? null,
     listeners: Number(data?.listeners ?? 0) || 0,
     unique: Number(data?.ulistener ?? data?.unique ?? 0) || 0,
     bitrate: data?.bitrate ?? null,
-    stream,
+    sslplay: sanitizeUrl(data?.sslplay),
+    sslurl: sanitizeUrl(data?.sslurl),
+    domain: safeString(data?.domain),
+    sslport: safeString(data?.sslport),
+    radioip: safeString(data?.radioip),
+    port: safeString(data?.port),
     raw: data ?? null
   };
 }
 
 function saveHistory(item) {
   if (!item?.song) return;
-
   const latest = HISTORY[0];
   if (latest && latest.song === item.song) return;
 
@@ -170,17 +192,17 @@ function saveHistory(item) {
     song: item.song,
     art: item.art || null,
     djusername: item.djusername || null,
-    listeners: Number(item.listeners || 0)
+    listeners: Number(item.listeners || 0),
+    source: item.source || null
   });
 
-  HISTORY = HISTORY.slice(0, 20);
+  HISTORY = HISTORY.slice(0, 30);
 }
 
 function metadataJson(sourceState, sourceLabel = "memory") {
-  const normalizedStream = normalizeStreamState(sourceState);
-
   return {
     ok: true,
+    worker: WORKER_NAME,
     build: BUILD,
     source: sourceLabel,
     title: sourceState.song || null,
@@ -193,13 +215,14 @@ function metadataJson(sourceState, sourceLabel = "memory") {
     listeners: Number(sourceState.listeners || 0),
     unique: Number(sourceState.unique || 0),
     bitrate: sourceState.bitrate || null,
-    stream: normalizedStream,
-    mode:
-      normalizedStream === "live"
-        ? "LIVE_DJ"
-        : normalizedStream === "autodj"
-          ? "AUTO_DJ"
-          : "OFFLINE",
+    stream: sourceState.stream || "offline",
+    type: sourceState.type || null,
+    sslplay: sourceState.sslplay || null,
+    sslurl: sourceState.sslurl || null,
+    domain: sourceState.domain || null,
+    sslport: sourceState.sslport || null,
+    radioip: sourceState.radioip || null,
+    port: sourceState.port || null,
     updatedAt: sourceState.updatedAt || 0
   };
 }
@@ -212,8 +235,8 @@ async function getProviderMetadata(metaJsonUrl, metaFetchCacheMs) {
   const res = await fetch(metaJsonUrl, {
     method: "GET",
     headers: {
-      "Accept": "application/json",
-      "User-Agent": "666SOUNDsDESIGn Radio Worker V5"
+      "Accept": "application/json,text/plain,*/*",
+      "User-Agent": "666SOUNDsDESIGn Radio Worker Recovery"
     },
     cf: { cacheTtl: 0, cacheEverything: false }
   });
@@ -222,7 +245,20 @@ async function getProviderMetadata(metaJsonUrl, metaFetchCacheMs) {
     throw new Error(`META_HTTP_${res.status}`);
   }
 
-  const normalized = normalizeProviderPayload(await res.json());
+  const ct = res.headers.get("content-type") || "";
+  let normalized;
+
+  if (ct.includes("json")) {
+    normalized = normalizeProviderPayload(await res.json());
+  } else {
+    const rawText = await res.text();
+    try {
+      normalized = normalizeProviderPayload(JSON.parse(rawText));
+    } catch {
+      normalized = normalizeProviderPayload({ title: rawText?.trim() || null });
+    }
+  }
+
   META_CACHE = { updatedAt: now(), data: normalized };
   saveHistory(normalized);
   return normalized;
@@ -235,9 +271,13 @@ async function resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs) 
 
   try {
     const providerState = await getProviderMetadata(metaJsonUrl, metaFetchCacheMs);
-    return { state: providerState, source: "fallback_provider" };
-  } catch {
-    return { state: RADIO_STATE, source: "stale_memory" };
+    return { state: providerState, source: "provider_json" };
+  } catch (err) {
+    return {
+      state: RADIO_STATE,
+      source: "stale_memory",
+      error: String(err)
+    };
   }
 }
 
@@ -265,67 +305,69 @@ async function quickStreamProbe(url, timeoutMs) {
   }
 }
 
-async function selectBestStream(mainStream, backupStream, timeoutMs) {
-  const primaryOk = await quickStreamProbe(mainStream, timeoutMs);
+async function selectBestStream(state, env, timeoutMs) {
+  const mainStream = env?.STREAM_MAIN || DEFAULT_STREAM_MAIN;
+  const backupStream = env?.STREAM_BACKUP || DEFAULT_STREAM_BACKUP;
 
   STREAM_STATUS.lastCheckedAt = now();
-  STREAM_STATUS.primaryOk = primaryOk;
+  STREAM_STATUS.selectedSource = "none";
   STREAM_STATUS.lastTargetUrl = null;
+  STREAM_STATUS.lastError = null;
 
-  if (primaryOk) {
-    STREAM_STATUS.backupOk = null;
-    STREAM_STATUS.activeSource = "main";
-    STREAM_STATUS.lastError = null;
+  const mainOk = await quickStreamProbe(mainStream, timeoutMs);
+  if (mainOk) {
+    STREAM_STATUS.selectedSource = "main";
     STREAM_STATUS.lastTargetUrl = mainStream;
-    return { url: mainStream, source: "main" };
+    return { label: "main", url: mainStream };
   }
 
   const backupOk = await quickStreamProbe(backupStream, timeoutMs);
-  STREAM_STATUS.backupOk = backupOk;
-
   if (backupOk) {
-    STREAM_STATUS.activeSource = "backup";
-    STREAM_STATUS.lastError = "PRIMARY_FAILED";
+    STREAM_STATUS.selectedSource = "backup";
     STREAM_STATUS.lastTargetUrl = backupStream;
-    return { url: backupStream, source: "backup" };
+    STREAM_STATUS.lastError = "PRIMARY_FAILED";
+    return { label: "backup", url: backupStream };
   }
 
-  STREAM_STATUS.activeSource = "emergency_main";
-  STREAM_STATUS.lastError = "PRIMARY_AND_BACKUP_PROBE_FAILED";
+  STREAM_STATUS.selectedSource = "emergency_main";
   STREAM_STATUS.lastTargetUrl = mainStream;
-
-  return { url: mainStream, source: "emergency_main" };
+  STREAM_STATUS.lastError = "ALL_PROBES_FAILED";
+  return { label: "emergency_main", url: mainStream };
 }
 
-async function streamProxy(req, targetUrl, origin) {
-  const headers = new Headers();
-  const range = req.headers.get("Range");
-  const accept = req.headers.get("Accept");
+async function streamProxy(request, targetUrl, origin) {
+  const upstreamHeaders = new Headers();
+  const range = request.headers.get("Range");
+  const accept = request.headers.get("Accept");
 
-  if (range) headers.set("Range", range);
-  if (accept) headers.set("Accept", accept);
-  headers.set("Accept-Encoding", "identity");
+  if (range) upstreamHeaders.set("Range", range);
+  if (accept) upstreamHeaders.set("Accept", accept);
+  upstreamHeaders.set("Accept-Encoding", "identity");
 
   const upstream = await fetch(targetUrl, {
-    method: req.method === "HEAD" ? "HEAD" : "GET",
-    headers,
+    method: request.method === "HEAD" ? "HEAD" : "GET",
+    headers: upstreamHeaders,
     cf: { cacheTtl: 0, cacheEverything: false }
   });
 
-  const h = new Headers(upstream.headers);
-  Object.entries(cors(origin)).forEach(([k, v]) => h.set(k, v));
+  const headers = new Headers(upstream.headers);
+  Object.entries(cors(origin)).forEach(([k, v]) => headers.set(k, v));
 
-  if (!h.get("Content-Type")) h.set("Content-Type", "audio/mpeg");
-  h.set("Cache-Control", "no-store");
-  h.set("X-Radio-Build", BUILD);
-  h.set("X-Active-Stream-Target", targetUrl);
+  if (!headers.get("Content-Type")) {
+    headers.set("Content-Type", "audio/mpeg");
+  }
 
-  ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade"].forEach((x) => h.delete(x));
+  headers.set("Cache-Control", "no-store");
+  headers.set("X-Worker-Name", WORKER_NAME);
+  headers.set("X-Worker-Build", BUILD);
+  headers.set("X-Active-Stream-Target", targetUrl);
 
-  return new Response(upstream.body, {
+  ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade"].forEach((h) => headers.delete(h));
+
+  return new Response(request.method === "HEAD" ? null : upstream.body, {
     status: upstream.status,
     statusText: upstream.statusText,
-    headers: h
+    headers
   });
 }
 
@@ -334,10 +376,7 @@ export default {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin") || "*";
 
-    const mainStream = env?.STREAM_MAIN || DEFAULT_STREAM_MAIN;
-    const backupStream = env?.STREAM_BACKUP || DEFAULT_STREAM_BACKUP;
     const metaJsonUrl = env?.META_JSON_URL || DEFAULT_META_JSON_URL;
-
     const webhookTtlMs = toMs(env?.WEBHOOK_CACHE_TTL_MS, DEFAULT_WEBHOOK_CACHE_TTL_MS);
     const metaFetchCacheMs = toMs(env?.META_FETCH_CACHE_MS, DEFAULT_META_FETCH_CACHE_MS);
     const streamCheckTimeoutMs = toMs(env?.STREAM_CHECK_TIMEOUT_MS, DEFAULT_STREAM_CHECK_TIMEOUT_MS);
@@ -346,45 +385,36 @@ export default {
       return new Response(null, { status: 204, headers: cors(origin) });
     }
 
-    if (
-      url.pathname === "/" ||
-      url.pathname === "/health" ||
-      url.pathname === "/api/radio/health"
-    ) {
-      const metaResolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
+    if (url.pathname === "/" || url.pathname === "/health" || url.pathname === "/api/radio/health") {
       return json({
         ok: true,
+        worker: WORKER_NAME,
         build: BUILD,
-        main: mainStream,
-        backup: backupStream,
         webhookFresh: isFreshWebhookState(webhookTtlMs),
-        metaSource: metaResolved.source,
-        streamSource: STREAM_STATUS.activeSource,
         streamStatus: STREAM_STATUS
       }, origin);
     }
 
-    if (
-      (url.pathname === "/stream" || url.pathname === "/api/radio/stream") &&
-      (request.method === "GET" || request.method === "HEAD")
-    ) {
-      const best = await selectBestStream(mainStream, backupStream, streamCheckTimeoutMs);
-      return streamProxy(request, best.url, origin);
+    if (url.pathname === "/debug" || url.pathname === "/api/radio/debug") {
+      const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
+      return json({
+        ok: true,
+        worker: WORKER_NAME,
+        build: BUILD,
+        resolvedSource: resolved.source,
+        webhookFresh: isFreshWebhookState(webhookTtlMs),
+        resolvedState: resolved.state,
+        streamStatus: STREAM_STATUS,
+        historyCount: HISTORY.length
+      }, origin);
     }
 
-    if (
-      (url.pathname === "/backup" || url.pathname === "/api/radio/backup") &&
-      (request.method === "GET" || request.method === "HEAD")
-    ) {
-      return streamProxy(request, backupStream, origin);
-    }
-
-    if (url.pathname === "/api/radio/webhook" && request.method === "POST") {
+    if ((url.pathname === "/webhook" || url.pathname === "/api/radio/webhook") && request.method === "POST") {
       let data;
       try {
         data = await request.json();
       } catch {
-        return json({ ok: false, error: "invalid json" }, origin, 400);
+        return json({ ok: false, error: "invalid json", worker: WORKER_NAME }, origin, 400);
       }
 
       RADIO_STATE = normalizeWebhookPayload(data);
@@ -392,27 +422,58 @@ export default {
 
       return json({
         ok: true,
-        received: true,
+        worker: WORKER_NAME,
         build: BUILD,
-        updatedAt: RADIO_STATE.updatedAt
+        received: true,
+        updatedAt: RADIO_STATE.updatedAt,
+        extracted: {
+          song: RADIO_STATE.song,
+          listeners: RADIO_STATE.listeners,
+          sslplay: RADIO_STATE.sslplay,
+          sslurl: RADIO_STATE.sslurl,
+          domain: RADIO_STATE.domain,
+          sslport: RADIO_STATE.sslport,
+          stream: RADIO_STATE.stream
+        }
       }, origin);
     }
 
-    if (url.pathname === "/metadata" || url.pathname === "/api/radio/metadata") {
+    if ((url.pathname === "/stream" || url.pathname === "/api/radio/stream") &&
+        (request.method === "GET" || request.method === "HEAD")) {
+      const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
+      const best = await selectBestStream(resolved.state, env, streamCheckTimeoutMs);
+      return streamProxy(request, best.url, origin);
+    }
+
+    if ((url.pathname === "/backup" || url.pathname === "/api/radio/backup") &&
+        (request.method === "GET" || request.method === "HEAD")) {
+      const backup = env?.STREAM_BACKUP || DEFAULT_STREAM_BACKUP;
+      return streamProxy(request, backup, origin);
+    }
+
+    if (
+      url.pathname === "/metadata" ||
+      url.pathname === "/meta" ||
+      url.pathname === "/api/radio/metadata" ||
+      url.pathname === "/api/radio/meta"
+    ) {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
       return json(metadataJson(resolved.state, resolved.source), origin);
     }
 
-    if (url.pathname === "/status" || url.pathname === "/api/radio/status") {
+    if (
+      url.pathname === "/status" ||
+      url.pathname === "/nowplaying" ||
+      url.pathname === "/api/radio/status" ||
+      url.pathname === "/api/radio/nowplaying"
+    ) {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
       return json({
         ok: true,
+        worker: WORKER_NAME,
         build: BUILD,
-        stream: mainStream,
-        backup: backupStream,
-        metaUrl: metaJsonUrl,
-        streamStatus: STREAM_STATUS,
-        state: metadataJson(resolved.state, resolved.source)
+        metadata: metadataJson(resolved.state, resolved.source),
+        streamStatus: STREAM_STATUS
       }, origin);
     }
 
@@ -420,34 +481,25 @@ export default {
       const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
       return json({
         ok: true,
+        worker: WORKER_NAME,
         build: BUILD,
         source: resolved.source,
         listeners: Number(resolved.state.listeners || 0),
         unique: Number(resolved.state.unique || 0),
         bitrate: resolved.state.bitrate || null,
-        stream: normalizeStreamState(resolved.state),
         updatedAt: resolved.state.updatedAt || 0
       }, origin);
     }
 
     if (url.pathname === "/history" || url.pathname === "/api/radio/history") {
-      return json({ ok: true, build: BUILD, source: "memory", history: HISTORY }, origin);
-    }
-
-    if (url.pathname === "/debug" || url.pathname === "/api/radio/debug") {
-      const resolved = await resolveBestMetadata(metaJsonUrl, webhookTtlMs, metaFetchCacheMs);
       return json({
         ok: true,
+        worker: WORKER_NAME,
         build: BUILD,
-        webhookFresh: isFreshWebhookState(webhookTtlMs),
-        radioState: RADIO_STATE,
-        resolvedSource: resolved.source,
-        resolvedState: resolved.state,
-        streamStatus: STREAM_STATUS,
-        historyCount: HISTORY.length
+        history: HISTORY
       }, origin);
     }
 
-    return text("Not found", origin, 404);
+    return text("Worker läuft", origin, 200);
   }
 };
