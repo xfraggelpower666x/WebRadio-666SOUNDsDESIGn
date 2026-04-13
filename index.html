@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>666SOUNDsDESIGn — Cyber Radio Core Player V2</title>
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
+        <h1>666SOUNDsDESIGn</h1>
+        <div class="brand-sub">Cyber Radio Core Player V2</div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-chip"><span class="led led-off" id="ledStream"></span><span>STREAM</span></div>
+        <div class="status-chip"><span class="led led-off" id="ledMeta"></span><span>META</span></div>
+        <div class="status-chip"><span class="led led-off" id="ledReconnect"></span><span>RECONNECT</span></div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="main-panel glass-panel">
+        <div class="panel-head">
+          <span>NOW PLAYING</span>
+          <span id="sourceInfo">worker stream</span>
+        </div>
+
+        <div class="hero-grid">
+          <div class="cover-box">
+            <img id="coverImage" alt="cover" hidden />
+            <div class="cover-fallback" id="coverFallback">
+              <div class="cover-logo">666</div>
+              <div class="cover-text">NO COVER / WORKER SOURCE</div>
+            </div>
+          </div>
+
+          <div class="meta-box">
+            <div class="meta-line kicker">LIVE SIGNAL</div>
+            <div class="track-title" id="trackTitle">Verbinde…</div>
+            <div class="track-dj" id="trackDj">Metadaten werden geladen</div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="label">Listeners</div>
+                <div class="value" id="listenerInfo">--</div>
+              </div>
+              <div class="stat-card">
+                <div class="label">Bitrate</div>
+                <div class="value" id="bitrateInfo">--</div>
+              </div>
+              <div class="stat-card">
+                <div class="label">Mode</div>
+                <div class="value" id="modeInfo">--</div>
+              </div>
+              <div class="stat-card">
+                <div class="label">Status</div>
+                <div class="value" id="statusText">IDLE</div>
+              </div>
+            </div>
+
+            <div class="controls">
+              <button class="btn btn-primary" id="btnPlay">Play</button>
+              <button class="btn" id="btnPause">Pause</button>
+              <button class="btn btn-danger" id="btnStop">Stop</button>
+            </div>
+
+            <div class="volume-row">
+              <label for="volumeSlider">Volume</label>
+              <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="0.85" />
+              <span id="volumeValue">85%</span>
+            </div>
+
+            <div class="endpoint-box">
+              <div><span class="endpoint-label">Stream</span> <span id="streamEndpoint">/stream</span></div>
+              <div><span class="endpoint-label">Meta</span> <span id="metaEndpoint">/metadata</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <section class="glass-panel meter-panel">
+          <div class="panel-head">
+            <span>SIGNAL</span>
+            <span>WEB AUDIO</span>
+          </div>
+
+          <div class="meter-wrap">
+            <div class="meter-labels">
+              <span>LEFT</span>
+              <span>RIGHT</span>
+            </div>
+
+            <div class="stereo-meters">
+              <div class="meter">
+                <div class="meter-fill left-fill" id="meterLeft"></div>
+              </div>
+              <div class="meter">
+                <div class="meter-fill right-fill" id="meterRight"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini-stats">
+            <div class="mini-card">
+              <div class="label">Reconnect</div>
+              <div class="value" id="reconnectCounter">0</div>
+            </div>
+            <div class="mini-card">
+              <div class="label">Audio</div>
+              <div class="value" id="audioState">stopped</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass-panel history-panel">
+          <div class="panel-head">
+            <span>HISTORY</span>
+            <span>last memory</span>
+          </div>
+          <ul id="historyList" class="history-list">
+            <li class="empty">Noch keine History geladen</li>
+          </ul>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <audio id="radioAudio" preload="none" crossorigin="anonymous"></audio>
+  <script src="./js/app.js"></script>
+</body>
+</html>
