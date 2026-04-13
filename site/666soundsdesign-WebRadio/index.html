@@ -3,152 +3,124 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn — Cyber Radio Core Player V1</title>
-  <meta name="theme-color" content="#0b0f1c" />
-  <link rel="stylesheet" href="css/style.css" />
+  <title>666SOUNDsDESIGn — Player V1</title>
+  <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="bg-glow bg-glow-a"></div>
-  <div class="bg-glow bg-glow-b"></div>
-
-  <div class="shell">
-    <header class="hud-frame brand-frame">
-      <div class="brand-left">
-        <img src="assets/images/logo-mark.jpg" alt="Logo" class="brand-logo" />
-        <div>
-          <div class="eyebrow">DIGITAL UNDERGROUND CONNECTED</div>
-          <h1>666SOUNDsDESIGn</h1>
-          <p class="subline">CYBER RADIO CORE PLAYER · V1 STABLE BUILD</p>
-        </div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
+        <h1>666SOUNDsDESIGn</h1>
+        <div class="brand-sub">Radio Player V1</div>
       </div>
-      <div class="brand-right">
-        <div class="mini-chip"><span class="led led-ok" id="ledClock"></span><span id="clockText">SYSTEM TIME</span></div>
-        <div class="mini-chip"><span class="led led-warn" id="ledFullscreen"></span><span id="fullscreenState">WINDOW MODE</span></div>
+
+      <div class="status-row">
+        <div class="status-chip"><span class="led led-off" id="ledStream"></span><span>STREAM</span></div>
+        <div class="status-chip"><span class="led led-off" id="ledMeta"></span><span>META</span></div>
+        <div class="status-chip"><span class="led led-off" id="ledGain"></span><span>GAIN</span></div>
       </div>
     </header>
 
     <main class="layout">
-      <section class="column left-column">
-        <div class="hud-frame panel-card">
-          <div class="panel-title">SYSTEM PANELS</div>
-          <div class="status-stack">
-            <div class="status-row"><span class="led" id="ledWorker"></span><span>WORKER</span><strong id="workerState">CHECKING</strong></div>
-            <div class="status-row"><span class="led" id="ledHealth"></span><span>HEALTH</span><strong id="healthState">WAITING</strong></div>
-            <div class="status-row"><span class="led" id="ledStatusApi"></span><span>STATUS API</span><strong id="statusApiState">WAITING</strong></div>
-            <div class="status-row"><span class="led" id="ledMetadata"></span><span>METADATA</span><strong id="metadataState">WAITING</strong></div>
-            <div class="status-row"><span class="led" id="ledListeners"></span><span>LISTENERS API</span><strong id="listenersApiState">WAITING</strong></div>
-            <div class="status-row"><span class="led" id="ledHistory"></span><span>HISTORY API</span><strong id="historyApiState">WAITING</strong></div>
-            <div class="status-row"><span class="led" id="ledAudio"></span><span>AUDIO ENGINE</span><strong id="audioState">IDLE</strong></div>
-            <div class="status-row"><span class="led" id="ledStream"></span><span>STREAM PATH</span><strong id="streamState">STANDBY</strong></div>
-            <div class="status-row"><span class="led" id="ledFallback"></span><span>FAILSAFE</span><strong id="failsafeState">ARMED</strong></div>
+      <section class="main-panel">
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span>NOW PLAYING</span>
+            <span id="sourceInfo">worker stream</span>
           </div>
-        </div>
 
-        <div class="hud-frame panel-card compact-card">
-          <div class="panel-title">LIVE TELEMETRY</div>
-          <div class="telemetry-grid">
-            <div class="telemetry-box"><span>ACTIVE SOURCE</span><strong id="sourceText">MAIN</strong></div>
-            <div class="telemetry-box"><span>LISTENERS</span><strong id="listenersText">0</strong></div>
-            <div class="telemetry-box"><span>UNIQUE</span><strong id="uniqueText">0</strong></div>
-            <div class="telemetry-box"><span>BITRATE</span><strong id="bitrateText">—</strong></div>
-            <div class="telemetry-box"><span>DJ</span><strong id="djText">—</strong></div>
-            <div class="telemetry-box"><span>BUILD</span><strong id="buildText">V1</strong></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="column center-column">
-        <div class="hud-frame player-card">
-          <div class="player-head">
-            <div>
-              <div class="eyebrow">RADIO CORE OUTPUT</div>
-              <h2 id="trackTitle">Awaiting transmission…</h2>
-              <p id="trackMeta">Worker front active · Stream idle</p>
+          <div class="hero-grid">
+            <div class="cover-box">
+              <img id="coverImage" alt="Cover" />
+              <div class="cover-fallback" id="coverFallback">666</div>
             </div>
-            <div class="signal-badge" id="signalBadge">STANDBY</div>
-          </div>
 
-          <div class="visual-wrap">
-            <div class="hero-screen">
-              <img src="assets/hero.jpg" alt="Hero" class="hero-image" />
-              <div class="hero-overlay"></div>
-            </div>
-            <div class="art-core">
-              <div class="orbital-ring orbital-a"></div>
-              <div class="orbital-ring orbital-b"></div>
-              <img src="assets/fallback.jpg" alt="Cover" id="coverImage" class="cover-image" />
-              <canvas id="ringMeter" class="ring-meter"></canvas>
+            <div class="track-box">
+              <div class="track-title" id="trackTitle">Warte auf Stream …</div>
+              <div class="track-dj" id="trackDj">Quelle unbekannt</div>
+              <div class="track-extra">
+                <span id="listenerInfo">0 Listener</span>
+                <span id="bitrateInfo">— kbps</span>
+                <span id="modeInfo">OFFLINE</span>
+              </div>
+
+              <div class="control-row">
+                <button id="playBtn" class="btn btn-accent">PLAY</button>
+                <button id="pauseBtn" class="btn">PAUSE</button>
+                <button id="retryBtn" class="btn">RETRY</button>
+              </div>
+
+              <div class="boost-row">
+                <span class="row-label">BOOST</span>
+                <button class="boost-btn active" data-boost="0">OFF</button>
+                <button class="boost-btn" data-boost="1">B1</button>
+                <button class="boost-btn" data-boost="2">B2</button>
+                <button class="boost-btn" data-boost="3">B3</button>
+              </div>
+
+              <div class="stats-grid">
+                <div class="stat-card"><span class="small-label">AUTO GAIN</span><span id="autoGainValue">1.00x</span></div>
+                <div class="stat-card"><span class="small-label">GR</span><span id="grValue">0.0 dB</span></div>
+                <div class="stat-card"><span class="small-label">STATUS</span><span id="statusText">idle</span></div>
+                <div class="stat-card"><span class="small-label">ENDPOINT</span><span id="streamEndpoint">/stream</span></div>
+              </div>
             </div>
           </div>
 
-          <div class="transport-row">
-            <button class="cyber-btn primary" id="playMainBtn">PLAY MAIN</button>
-            <button class="cyber-btn" id="playBackupBtn">PLAY BACKUP</button>
-            <button class="cyber-btn" id="pauseBtn">PAUSE</button>
-            <button class="cyber-btn danger" id="stopBtn">STOP</button>
-            <button class="cyber-btn" id="fullscreenBtn">FULLSCREEN</button>
-          </div>
-
-          <div class="control-row">
-            <div class="slider-box wide-box">
-              <label for="volumeRange">MASTER VOLUME</label>
-              <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="0.82" />
+          <div class="meter-section">
+            <div class="meter-card">
+              <div class="meter-head">LEVEL L</div>
+              <div class="dot-meter" id="meterL"></div>
             </div>
-            <div class="slider-box">
-              <label for="boostToggle">SAFE MODE</label>
-              <button class="tiny-btn active" id="safeModeBtn">ON</button>
+            <div class="meter-card">
+              <div class="meter-head">SPECTRUM / EQ</div>
+              <div class="eq-visual" id="eqVisual"></div>
             </div>
-            <div class="slider-box">
-              <label for="muteBtn">MUTE</label>
-              <button class="tiny-btn" id="muteBtn">OFF</button>
+            <div class="meter-card">
+              <div class="meter-head">LEVEL R</div>
+              <div class="dot-meter" id="meterR"></div>
             </div>
           </div>
-
-          <div class="meter-zone">
-            <div class="meter-labels">
-              <span>LEFT</span>
-              <span>MASTER REACTIVE BAR</span>
-              <span>RIGHT</span>
-            </div>
-            <div class="meter-grid">
-              <canvas id="meterLeft"></canvas>
-              <canvas id="meterCenter"></canvas>
-              <canvas id="meterRight"></canvas>
-            </div>
-          </div>
-
-          <audio id="audioPlayer" preload="none" playsinline></audio>
         </div>
       </section>
 
-      <section class="column right-column">
-        <div class="hud-frame panel-card compact-card">
-          <div class="panel-title">ROUTES</div>
-          <div class="route-list">
-            <div class="route-item"><span>/stream</span><strong id="routeStream">PENDING</strong></div>
-            <div class="route-item"><span>/backup</span><strong id="routeBackup">PENDING</strong></div>
-            <div class="route-item"><span>/status</span><strong id="routeStatus">PENDING</strong></div>
-            <div class="route-item"><span>/metadata</span><strong id="routeMetadata">PENDING</strong></div>
-            <div class="route-item"><span>/listeners</span><strong id="routeListeners">PENDING</strong></div>
-            <div class="route-item"><span>/history</span><strong id="routeHistory">PENDING</strong></div>
+      <aside class="side-panel">
+        <div class="glass-panel side-card">
+          <div class="panel-head"><span>HISTORY</span><span>last tracks</span></div>
+          <div class="history-list" id="historyList">
+            <div class="history-item">Keine Einträge</div>
           </div>
         </div>
 
-        <div class="hud-frame panel-card compact-card">
-          <div class="panel-title">TRACK HISTORY</div>
-          <div id="historyList" class="history-list"></div>
+        <div class="glass-panel side-card">
+          <div class="panel-head"><span>SETTINGS</span><span>runtime</span></div>
+          <label class="toggle-line">
+            <span>Auto Retry</span>
+            <input type="checkbox" id="autoRetry" checked />
+          </label>
+          <label class="toggle-line">
+            <span>Auto Gain</span>
+            <input type="checkbox" id="autoGainToggle" checked />
+          </label>
         </div>
 
-        <div class="hud-frame panel-card json-card">
-          <div class="panel-title">SYSTEM DEBUG SNAPSHOT</div>
-          <pre id="debugBox">waiting for worker data…</pre>
+        <div class="glass-panel side-card">
+          <div class="panel-head"><span>WORKER</span><span>live</span></div>
+          <div class="endpoint-list">
+            <div><strong>Health:</strong> <span id="healthUrl"></span></div>
+            <div><strong>Meta:</strong> <span id="metaUrl"></span></div>
+            <div><strong>History:</strong> <span id="historyUrl"></span></div>
+          </div>
         </div>
-      </section>
+      </aside>
     </main>
   </div>
 
-  <script src="config/radio.config.js"></script>
-  <script src="js/app.js"></script>
+  <audio id="radioAudio" crossorigin="anonymous" preload="none"></audio>
+
+  <script src="./js/core/audioEngine.js"></script>
+  <script src="./js/ui/uiController.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>
