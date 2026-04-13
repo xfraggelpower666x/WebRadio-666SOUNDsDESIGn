@@ -1,0 +1,5 @@
+{
+  "name": "system-pw-worker",
+  "main": "worker.js",
+  "compatibility_date": "2026-04-10"
+}
