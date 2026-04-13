@@ -1,21 +1,32 @@
-# 666soundsdesign-system
+# 666SOUNDsDESIGn — Root Player + Radio Worker
 
-Monorepo-Baustein mit:
-- `site/666soundsdesign-WebRadio/` → Cyber Player V1
-- `workers/webradio-666soundsdesign-worker/` → RADIO CORE Worker
+## Produktionsregel
+- Frontend / Player liegt im **Repo Root**
+- Worker liegt in: `workers/webradio-666soundsdesign-worker/`
+- Keine direkten Provider-Streams im Frontend
+- Frontend spricht nur mit dem Worker
 
-## Wichtig
-- Keine Secrets im Repo speichern
-- Worker nutzt ENV / Secrets
-- Player soll öffentlich nur über den Worker laufen
-
-## Erwartete Worker-Endpunkte
-- `/health`
-- `/debug`
+## Frontend-Endpoints
 - `/stream`
-- `/backup`
 - `/metadata`
 - `/status`
-- `/listeners`
 - `/history`
-- `/api/radio/webhook`
+- `/health`
+
+## Worker ENV
+Pflicht:
+- `META_JSON_URL`
+
+Optional:
+- `STREAM_MAIN`
+- `STREAM_BACKUP`
+- `WEBHOOK_CACHE_TTL_MS`
+- `META_FETCH_CACHE_MS`
+- `STREAM_CHECK_TIMEOUT_MS`
+
+## Aktueller Default-Meta-Endpunkt
+`https://my.idjstream.com/cp/get_info.php?p=8686`
+
+## Upload
+Dieses Paket ist für den GitHub-Scriptable-Upload vorbereitet.
+Wähle beim Upload **den Ordner `UPLOAD_PACKAGE_V2_REAL`** aus.
