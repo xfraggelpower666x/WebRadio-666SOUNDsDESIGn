@@ -1,11 +1,5 @@
 {
   "name": "webradio-666soundsdesign-worker",
   "main": "worker.js",
-  "compatibility_date": "2026-04-10",
-  "routes": [
-    {
-      "pattern": "webradio.666soundsdesign-broadcaster.com/*",
-      "custom_domain": true
-    }
-  ]
+  "compatibility_date": "2026-04-10"
 }
