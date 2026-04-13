@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>666SOUNDsDESIGn — Player V1</title>
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
+        <h1>666SOUNDsDESIGn</h1>
+        <div class="brand-sub">Radio Player V1</div>
+      </div>
+
+      <div class="status-row">
+        <div class="status-chip"><span class="led led-off" id="ledStream"></span><span>STREAM</span></div>
+        <div class="status-chip"><span class="led led-off" id="ledMeta"></span><span>META</span></div>
+        <div class="status-chip"><span class="led led-off" id="ledGain"></span><span>GAIN</span></div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="main-panel">
+        <div class="glass-panel">
+          <div class="panel-head">
+            <span>NOW PLAYING</span>
+            <span id="sourceInfo">worker stream</span>
+          </div>
+
+          <div class="hero-grid">
+            <div class="cover-box">
+              <img id="coverImage" alt="Cover" />
+              <div class="cover-fallback" id="coverFallback">666</div>
+            </div>
+
+            <div class="track-box">
+              <div class="track-title" id="trackTitle">Warte auf Stream …</div>
+              <div class="track-dj" id="trackDj">Quelle unbekannt</div>
+              <div class="track-extra">
+                <span id="listenerInfo">0 Listener</span>
+                <span id="bitrateInfo">— kbps</span>
+                <span id="modeInfo">OFFLINE</span>
+              </div>
+
+              <div class="control-row">
+                <button id="playBtn" class="btn btn-accent">PLAY</button>
+                <button id="pauseBtn" class="btn">PAUSE</button>
+                <button id="retryBtn" class="btn">RETRY</button>
+              </div>
+
+              <div class="boost-row">
+                <span class="row-label">BOOST</span>
+                <button class="boost-btn active" data-boost="0">OFF</button>
+                <button class="boost-btn" data-boost="1">B1</button>
+                <button class="boost-btn" data-boost="2">B2</button>
+                <button class="boost-btn" data-boost="3">B3</button>
+              </div>
+
+              <div class="stats-grid">
+                <div class="stat-card"><span class="small-label">AUTO GAIN</span><span id="autoGainValue">1.00x</span></div>
+                <div class="stat-card"><span class="small-label">GR</span><span id="grValue">0.0 dB</span></div>
+                <div class="stat-card"><span class="small-label">STATUS</span><span id="statusText">idle</span></div>
+                <div class="stat-card"><span class="small-label">ENDPOINT</span><span id="streamEndpoint">/stream</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="meter-section">
+            <div class="meter-card">
+              <div class="meter-head">LEVEL L</div>
+              <div class="dot-meter" id="meterL"></div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-head">SPECTRUM / EQ</div>
+              <div class="eq-visual" id="eqVisual"></div>
+            </div>
+            <div class="meter-card">
+              <div class="meter-head">LEVEL R</div>
+              <div class="dot-meter" id="meterR"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="glass-panel side-card">
+          <div class="panel-head"><span>HISTORY</span><span>last tracks</span></div>
+          <div class="history-list" id="historyList">
+            <div class="history-item">Keine Einträge</div>
+          </div>
+        </div>
+
+        <div class="glass-panel side-card">
+          <div class="panel-head"><span>SETTINGS</span><span>runtime</span></div>
+          <label class="toggle-line">
+            <span>Auto Retry</span>
+            <input type="checkbox" id="autoRetry" checked />
+          </label>
+          <label class="toggle-line">
+            <span>Auto Gain</span>
+            <input type="checkbox" id="autoGainToggle" checked />
+          </label>
+        </div>
+
+        <div class="glass-panel side-card">
+          <div class="panel-head"><span>WORKER</span><span>live</span></div>
+          <div class="endpoint-list">
+            <div><strong>Health:</strong> <span id="healthUrl"></span></div>
+            <div><strong>Meta:</strong> <span id="metaUrl"></span></div>
+            <div><strong>History:</strong> <span id="historyUrl"></span></div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <audio id="radioAudio" crossorigin="anonymous" preload="none"></audio>
+
+  <script src="./js/core/audioEngine.js"></script>
+  <script src="./js/ui/uiController.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
