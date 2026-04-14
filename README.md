@@ -1,13 +1,19 @@
-# RADIO_PLAYER_V2_PROXY_FIX
+# RADIO_PLAYER_V2_PROXY_FIX_R2
 
-A-Version:
-- Worker macht Stream-Proxy
-- Worker macht Metadata-Proxy
-- Player ruft nur gleiche Domain auf
+Korrigierte A-Version mit exakt deinen Stream-URLs.
 
-Routen:
+Primary:
+https://my.idjstream.com/666soundsdesign/stream
+
+Fallback:
+https://my.idjstream.com:8686/stream
+
+Metadata:
+https://my.idjstream.com/cp/get_info.php?p=8686
+
+Worker-Routen:
 - / -> Player
 - /health -> OK
-- /stream -> Primary Stream Proxy mit Fallback
-- /fallback-stream -> Fallback Stream Proxy
+- /stream -> Primary Proxy, bei Fehler Fallback
+- /fallback-stream -> Fallback Proxy
 - /api/nowplaying -> Metadata Proxy
