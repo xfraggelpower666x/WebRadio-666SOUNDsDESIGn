@@ -1,20 +1,18 @@
-# RADIO_PLAYER_V1_FIXED
+# RADIO_PLAYER_V1_2
 
-Korrigierte V1 mit Root-`index.html`.
+V1.2 mit Root-Index, Worker-`/stream`-Route und erweitertem Cyber-Player.
 
-## Wichtig
-- `index.html` liegt im Root.
-- Cyber-Player für Desktop und iPhone.
-- Welcome-Overlay mit OK-Start.
-- Kleine Self-Healing-Logik:
-  - Primary Stream
-  - Fallback Stream
-  - Reconnect
-  - Metadaten behalten bei API-Ausfall
+## Neu in V1.2
+- `/stream` im Worker für App-Eintrag über die Domain
+- Statuslampen:
+  - Health
+  - Audio
+  - Meta
+- Now Playing als Laufschrift
+- Hover-Overlay mit zuletzt gespielten Tracks
+- Anzeige `Listeners / 250`
+- Stream Quality Feld
+- Worker liefert die Seite auch direkt selbst aus
 
-## Relevante Dateien
-- `index.html`
-- `css/main.css`
-- `js/app.js`
-- `config/stream.config.js`
-- `workers/webradio-666soundsdesign-worker/worker.js`
+## App-URL für iPhone / Stream-App
+`https://666soundsdesign-broadcaster.com/stream`
