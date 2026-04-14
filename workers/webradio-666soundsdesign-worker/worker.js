@@ -1,814 +1,414 @@
-const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
-const FALLBACK_STREAM_URL = "https://my.idjstream.com/8686/stream";
-const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
+/**
+ * RADIO PLAYER V2 REAL FIX — WORKER CORE PATCH
+ *
+ * Ziel:
+ * - /stream = stabiler Hauptstream (Custom Mount)
+ * - /fallback-stream = direkter Originalstream
+ * - /metadata = JSON für Frontend
+ * - /health = schneller JSON-Check
+ * - /debug = Diagnose JSON
+ * - statische Assets weiter aus dem Worker auslieferbar
+ *
+ * WICHTIG:
+ * - Kein Frontend-HTML-Umbau hier
+ * - Keine Dashboard-Abhängigkeit
+ * - Frontend soll NUR noch /metadata vom Worker holen
+ */
 
-const HTML = `<!DOCTYPE html>
+const BUILD = "WORKER_CORE_FIX_PATCH_V1";
+
+const HTML_CONTENT = `<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>666SOUNDsDESIGn Radio</title>
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
-  <div id="bootOverlay" class="overlay">
-    <div class="boot-panel">
-      <div class="boot-title">666SOUNDsDESIGn</div>
-      <div class="boot-subtitle">Starting Audio Systems</div>
-      <button id="bootButton" class="neon-button">OK</button>
-      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
-      <div id="progressText" class="progress-text">0%</div>
-      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
-    </div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
+        <h1>666SOUNDsDESIGn</h1>
+        <div class="brand-sub">Radio Player</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="main-panel glass-panel">
+        <div class="panel-head">
+          <span>NOW PLAYING</span>
+          <span id="sourceInfo">worker stream</span>
+        </div>
+        <div class="hero-grid">
+          <div class="cover-box">
+            <img id="coverImage" alt="cover" hidden />
+            <div class="cover-fallback" id="coverFallback">
+              <div class="cover-logo">666</div>
+              <div class="cover-text">NO COVER / WORKER SOURCE</div>
+            </div>
+          </div>
+          <div class="meta-box">
+            <div class="meta-line kicker">LIVE SIGNAL</div>
+            <div class="track-title" id="trackTitle">Verbinde…</div>
+            <div class="track-dj" id="trackDj">Metadaten werden geladen</div>
+            <div class="stats-grid">
+              <div class="stat-card"><div class="label">Listeners</div><div class="value" id="listenerInfo">--</div></div>
+              <div class="stat-card"><div class="label">Bitrate</div><div class="value" id="bitrateInfo">--</div></div>
+              <div class="stat-card"><div class="label">Mode</div><div class="value" id="modeInfo">--</div></div>
+              <div class="stat-card"><div class="label">Status</div><div class="value" id="statusText">IDLE</div></div>
+            </div>
+            <div class="controls">
+              <button class="btn btn-primary" id="btnPlay">Play</button>
+              <button class="btn" id="btnPause">Pause</button>
+              <button class="btn btn-danger" id="btnStop">Stop</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
-
-  <main class="app-shell">
-    <section class="player-card">
-      <header class="topbar">
-        <div class="topbar-line"></div>
-        <div class="brand">666SOUNDsDESIGn</div>
-        <div class="topbar-line"></div>
-      </header>
-
-      <div class="status-grid">
-        <div class="lamp-box">
-          <span id="metaLamp" class="lamp lamp-red"></span>
-          <span class="lamp-label">Meta</span>
-        </div>
-        <div class="lamp-box">
-          <span id="audioLamp" class="lamp lamp-red"></span>
-          <span class="lamp-label">Audio</span>
-        </div>
-        <div class="lamp-box">
-          <span id="sourceLamp" class="lamp lamp-cyan"></span>
-          <span class="lamp-label">Source</span>
-        </div>
-      </div>
-
-      <div class="pill-row">
-        <span id="streamStatus" class="pill">Ready</span>
-        <span id="sourceLabel" class="pill pill-dim">Primary</span>
-      </div>
-
-      <div class="display-block">
-        <div class="display-head">
-          <div class="display-label">Now Playing</div>
-          <button id="historyToggle" class="tiny-btn" type="button">History</button>
-        </div>
-        <div class="display-window">
-          <div id="nowPlaying" class="marquee-track">Loading metadata...</div>
-        </div>
-        <div id="historyOverlay" class="history-overlay hidden">
-          <div class="history-title">Last Tracks</div>
-          <ul id="historyList" class="history-list">
-            <li>No history loaded</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="mini-grid">
-        <div class="mini-box">
-          <div class="mini-label">Listeners</div>
-          <div id="listenersText" class="mini-value">0 / 250</div>
-        </div>
-        <div class="mini-box">
-          <div class="mini-label">Bitrate</div>
-          <div id="bitrateText" class="mini-value">Unknown</div>
-        </div>
-        <div class="mini-box">
-          <div class="mini-label">DJ / Status</div>
-          <div id="djText" class="mini-value">Unknown</div>
-        </div>
-        <div class="mini-box">
-          <div class="mini-label">Volume</div>
-          <div id="volumeHint" class="mini-value">Use iPhone buttons</div>
-        </div>
-      </div>
-
-      <div class="control-strip">
-        <button id="playBtn" class="control-btn main" type="button">Play</button>
-        <button id="pauseBtn" class="control-btn" type="button">Pause</button>
-        <button id="reconnectBtn" class="control-btn" type="button">Reconnect</button>
-      </div>
-
-      <div class="audio-tools">
-        <button id="muteBtn" class="small-btn" type="button">Mute</button>
-        <div class="volume-wrap">
-          <label for="volumeRange">Volume</label>
-          <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
-        </div>
-      </div>
-
-      <audio id="radio" preload="none" playsinline></audio>
-    </section>
-  </main>
-
-  <script type="module" src="/js/app.js"></script>
+  <audio id="radioAudio" preload="none" crossorigin="anonymous"></audio>
+  <script src="/js/app.js"></script>
 </body>
-</html>
+</html>`;
+
+const CSS_CONTENT = `
+* { box-sizing: border-box; }
+:root{
+  --bg:#14171c; --bg2:#1a1f26; --panel:rgba(19,22,28,.88); --border:rgba(255,255,255,.10);
+  --text:#f5f7fb; --muted:#9aa5b5; --pink:#ff2fd2; --turquoise:#21f7ff; --green:#7cff7f; --red:#ff5f74;
+}
+html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:Inter,Arial,sans-serif;}
+body{padding:18px}.app-shell{width:min(1200px,100%);margin:0 auto}.topbar,.glass-panel{background:rgba(18,21,27,.95);border:1px solid var(--border);border-radius:24px;padding:18px}
+.brand-kicker,.brand-sub,.panel-head,.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.14em}
+.brand-block h1{margin:6px 0;font-size:42px}.layout{display:grid;grid-template-columns:1fr;gap:18px}.hero-grid{display:grid;grid-template-columns:minmax(260px,420px) 1fr;gap:18px}
+.cover-box{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#0f1116,#171b22)}
+.cover-box img{width:100%;height:100%;object-fit:cover;display:block}.cover-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.cover-logo{width:110px;height:110px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);color:var(--pink);font-weight:900;font-size:34px}
+.track-title{font-size:34px;font-weight:800;line-height:1.05;margin-bottom:10px}.track-dj{color:var(--muted);font-size:15px;margin-bottom:16px}
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}.stat-card{border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.025);padding:14px}
+.value{margin-top:8px;font-size:22px;font-weight:700}.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.btn{appearance:none;border:none;cursor:pointer;border-radius:14px;padding:14px 18px;background:#10131a;color:var(--text);border:1px solid rgba(255,255,255,.09);font-weight:700}
+.btn-primary{color:#041316;background:linear-gradient(90deg,var(--turquoise),#8ffcff)}.btn-danger{background:linear-gradient(90deg,rgba(255,95,116,.20),rgba(255,95,116,.32))}
+@media (max-width:760px){.hero-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}}
 `;
-const CSS = `* { box-sizing: border-box; }
 
-:root {
-  --bg: #1d2128;
-  --bg2: #12151b;
-  --cyan: #20f2ff;
-  --pink: #ff4db3;
-  --green: #47ff8a;
-  --red: #ff5570;
-  --text: #eef7ff;
-  --muted: #afbfcc;
-  --border: rgba(32, 242, 255, 0.28);
-  --shadow-cyan: 0 0 18px rgba(32, 242, 255, 0.18);
-  --shadow-pink: 0 0 18px rgba(255, 77, 179, 0.14);
-}
+const JS_CONTENT = `
+const WORKER_BASE = window.location.origin;
+const ENDPOINTS = {
+  stream: \`\${WORKER_BASE}/stream\`,
+  fallback: \`\${WORKER_BASE}/fallback-stream\`,
+  metadata: \`\${WORKER_BASE}/metadata\`,
+  status: \`\${WORKER_BASE}/status\`,
+  debug: \`\${WORKER_BASE}/debug\`,
+  health: \`\${WORKER_BASE}/health\`
+};
 
-html, body {
-  margin: 0;
-  min-height: 100%;
-  background:
-    radial-gradient(circle at top left, rgba(255, 77, 179, 0.10), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(32, 242, 255, 0.11), transparent 30%),
-    linear-gradient(180deg, var(--bg), var(--bg2));
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-}
+const META_INTERVAL_MS = 10000;
+const audio = document.getElementById("radioAudio");
+const coverImage = document.getElementById("coverImage");
+const coverFallback = document.getElementById("coverFallback");
+const trackTitle = document.getElementById("trackTitle");
+const trackDj = document.getElementById("trackDj");
+const listenerInfo = document.getElementById("listenerInfo");
+const bitrateInfo = document.getElementById("bitrateInfo");
+const modeInfo = document.getElementById("modeInfo");
+const statusText = document.getElementById("statusText");
+const sourceInfo = document.getElementById("sourceInfo");
 
-body { min-height: 100vh; }
-
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-}
-
-.player-card,
-.boot-panel {
-  width: min(94vw, 560px);
-  background: linear-gradient(180deg, rgba(21,25,32,0.98), rgba(18,21,27,0.98));
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  box-shadow: var(--shadow-cyan), var(--shadow-pink);
-  backdrop-filter: blur(10px);
-}
-
-.player-card { padding: 16px; }
-
-.topbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.topbar-line {
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  box-shadow: 0 0 12px rgba(32, 242, 255, 0.25);
-}
-
-.brand,
-.boot-title {
-  text-align: center;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--cyan);
-  text-shadow: 0 0 12px rgba(32, 242, 255, 0.34);
-}
-
-.brand { font-size: 1.55rem; }
-.boot-title { font-size: 1.5rem; margin-bottom: 8px; }
-
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.lamp-box,
-.pill,
-.mini-box,
-.display-window,
-.control-btn,
-.small-btn,
-.volume-wrap {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-}
-
-.lamp-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  min-height: 50px;
-}
-
-.lamp {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 0 10px currentColor;
-}
-.lamp-green { color: var(--green); background: var(--green); }
-.lamp-red { color: var(--red); background: var(--red); }
-.lamp-cyan { color: var(--cyan); background: var(--cyan); }
-
-.lamp-label,
-.display-label,
-.boot-subtitle,
-.boot-note,
-.mini-label,
-.volume-wrap label {
-  color: var(--muted);
-}
-
-.pill-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.pill {
-  padding: 8px 12px;
-  font-size: 0.92rem;
-}
-.pill-dim { color: var(--muted); }
-
-.display-block {
-  position: relative;
-  margin-bottom: 12px;
-}
-.display-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.display-window {
-  height: 54px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  border-color: rgba(32, 242, 255, 0.22);
-}
-
-.marquee-track {
-  white-space: nowrap;
-  display: inline-block;
-  padding-left: 100%;
-  font-size: 1.08rem;
-  font-weight: 700;
-  color: var(--pink);
-  text-shadow: 0 0 10px rgba(255, 77, 179, 0.3);
-  animation: marquee 12s linear infinite;
-}
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-
-.tiny-btn {
-  appearance: none;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  background: rgba(255,255,255,0.05);
-  color: var(--text);
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.history-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 8px);
-  z-index: 10;
-  border-radius: 16px;
-  padding: 12px;
-  background: rgba(13, 16, 22, 0.98);
-  border: 1px solid rgba(255, 77, 179, 0.25);
-  box-shadow: var(--shadow-pink);
-}
-.history-overlay.hidden { display: none; }
-.history-title { color: var(--cyan); font-weight: 700; margin-bottom: 8px; }
-.history-list {
-  margin: 0;
-  padding-left: 18px;
-  max-height: 200px;
-  overflow: auto;
-}
-.history-list li { margin-bottom: 6px; }
-
-.mini-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.mini-box { padding: 10px 12px; min-height: 68px; }
-.mini-value { margin-top: 6px; font-weight: 700; }
-
-.control-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.control-btn,
-.small-btn {
-  appearance: none;
-  border: 1px solid rgba(32, 242, 255, 0.35);
-  color: var(--text);
-  padding: 14px 12px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow-cyan);
-  background: linear-gradient(180deg, rgba(32,242,255,0.14), rgba(255,77,179,0.06));
-}
-
-.control-btn.main {
-  border-color: rgba(255, 77, 179, 0.35);
-  box-shadow: var(--shadow-pink);
-}
-
-.audio-tools {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 10px;
-  align-items: stretch;
-}
-
-.small-btn {
-  border-color: rgba(255, 77, 179, 0.28);
-  box-shadow: var(--shadow-pink);
-}
-
-.volume-wrap {
-  padding: 10px 12px;
-  display: grid;
-  gap: 8px;
-}
-
-input[type="range"] { width: 100%; }
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 22px;
-  background: rgba(7, 10, 14, 0.86);
-}
-.overlay.hidden { display: none; }
-
-.boot-panel { padding: 22px; text-align: center; }
-
-.neon-button {
-  appearance: none;
-  border: 1px solid rgba(32, 242, 255, 0.45);
-  border-radius: 16px;
-  padding: 14px 18px;
-  background: linear-gradient(180deg, rgba(32,242,255,0.16), rgba(255,77,179,0.08));
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow-cyan);
-}
-
-.progress-wrap {
-  width: 100%;
-  height: 12px;
-  margin-top: 18px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.06);
-  overflow: hidden;
-}
-.progress-bar {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--pink), var(--cyan));
-  transition: width 0.12s linear;
-}
-.progress-text { margin-top: 10px; font-weight: 700; }
-
-@media (max-width: 560px) {
-  .app-shell { padding: 10px; }
-  .player-card { padding: 14px; width: min(96vw, 96vw); }
-  .brand { font-size: 1.28rem; }
-  .lamp-box { min-height: 44px; padding: 8px 10px; }
-  .status-grid { gap: 8px; }
-  .pill-row { gap: 8px; }
-  .display-window { height: 48px; }
-  .mini-box { min-height: 58px; padding: 8px 10px; }
-  .control-btn { padding: 12px 8px; }
-  .audio-tools { grid-template-columns: 92px 1fr; }
-  .boot-panel { width: 100%; }
-}
-`;
-const APP_JS = `import { STREAM_CONFIG } from "../config/stream.config.js";
-
-const overlay = document.getElementById("bootOverlay");
-const bootButton = document.getElementById("bootButton");
-const progressBar = document.getElementById("progressBar");
-const progressText = document.getElementById("progressText");
-
-const playBtn = document.getElementById("playBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-const reconnectBtn = document.getElementById("reconnectBtn");
-const muteBtn = document.getElementById("muteBtn");
-const volumeRange = document.getElementById("volumeRange");
-const historyToggle = document.getElementById("historyToggle");
-
-const metaLamp = document.getElementById("metaLamp");
-const audioLamp = document.getElementById("audioLamp");
-const sourceLamp = document.getElementById("sourceLamp");
-const streamStatus = document.getElementById("streamStatus");
-const sourceLabel = document.getElementById("sourceLabel");
-const fallbackText = document.getElementById("fallbackText");
-const nowPlaying = document.getElementById("nowPlaying");
-const metaText = document.getElementById("metaText");
-const listenersText = document.getElementById("listenersText");
-const bitrateText = document.getElementById("bitrateText");
-const djText = document.getElementById("djText");
-const historyOverlay = document.getElementById("historyOverlay");
-const historyList = document.getElementById("historyList");
-const volumeHint = document.getElementById("volumeHint");
-
-const audio = document.getElementById("radio");
-
-let booted = false;
-let usingFallback = false;
-let muted = false;
-let metadataTimer = null;
-let lastTitle = "Loading metadata...";
-let historyOpen = false;
-
-function setLamp(el, state) {
-  el.classList.remove("lamp-green", "lamp-red", "lamp-cyan");
-  el.classList.add(state);
-}
-
-function setStatus(text) {
-  streamStatus.textContent = text;
-}
-
-function setSource(isFallback) {
-  usingFallback = isFallback;
-  sourceLabel.textContent = isFallback ? "Fallback" : "Primary";
-  fallbackText.textContent = isFallback ? "Active" : "Standby";
-  setLamp(sourceLamp, isFallback ? "lamp-red" : "lamp-cyan");
-}
-
-function setMetadataStatus(text) {
-  metaText.textContent = text;
-}
-
-function pickValue(obj, keys, fallback = "") {
-  for (const key of keys) {
-    const value = obj?.[key];
-    if (value !== undefined && value !== null && String(value).trim() !== "") {
-      return value;
-    }
+document.getElementById("btnPlay")?.addEventListener("click", async () => {
+  try {
+    audio.src = ENDPOINTS.stream;
+    audio.load();
+    await audio.play();
+    statusText.textContent = "PLAYING";
+  } catch (e) {
+    statusText.textContent = "PLAY ERROR";
   }
-  return fallback;
+});
+document.getElementById("btnPause")?.addEventListener("click", () => {
+  audio.pause();
+  statusText.textContent = "PAUSED";
+});
+document.getElementById("btnStop")?.addEventListener("click", () => {
+  audio.pause();
+  audio.removeAttribute("src");
+  audio.load();
+  statusText.textContent = "STOPPED";
+});
+
+function splitTrack(raw) {
+  const txt = String(raw || "").trim();
+  if (!txt) return { title: "No Track", artist: "---" };
+  if (txt.includes(" - ")) {
+    const [artist, ...rest] = txt.split(" - ");
+    return { artist: artist.trim(), title: rest.join(" - ").trim() || txt };
+  }
+  return { title: txt, artist: "---" };
 }
 
-function normalizeTitle(data) {
-  return String(
-    pickValue(data, ["song", "title", "songtitle", "currentSong", "track", "now_playing"], lastTitle || "Live Stream")
-  );
-}
-
-function renderHistory(items) {
-  historyList.innerHTML = "";
-  if (!Array.isArray(items) || !items.length) {
-    const li = document.createElement("li");
-    li.textContent = "No history loaded";
-    historyList.appendChild(li);
+function applyCover(url) {
+  if (!url) {
+    coverImage.hidden = true;
+    coverImage.removeAttribute("src");
+    coverFallback.hidden = false;
     return;
   }
-
-  items.slice(0, 12).forEach((item) => {
-    const li = document.createElement("li");
-    if (typeof item === "string") {
-      li.textContent = item;
-    } else {
-      li.textContent = String(
-        pickValue(item, ["song", "title", "track", "name"], "Unknown track")
-      );
-    }
-    historyList.appendChild(li);
-  });
+  coverImage.src = url;
+  coverImage.hidden = false;
+  coverFallback.hidden = true;
 }
+coverImage?.addEventListener("error", () => {
+  coverImage.hidden = true;
+  coverFallback.hidden = false;
+});
 
-async function fetchMetadata() {
+async function refreshMetadata() {
   try {
-    const res = await fetch(STREAM_CONFIG.metadata_url, { cache: "no-store" });
-    if (!res.ok) throw new Error("metadata fetch failed");
-    const data = await res.json();
-
-    const title = normalizeTitle(data);
-    lastTitle = title;
-    nowPlaying.textContent = title;
-
-    const listeners = Number.parseInt(pickValue(data, ["listeners"], 0), 10);
-    const bitrate = pickValue(data, ["bitrate"], "Unknown");
-    const djStatus = pickValue(data, ["djusername", "djstatus", "client"], "AutoDJ");
-
-    listenersText.textContent = \`\${Number.isFinite(listeners) ? listeners : 0} / \${STREAM_CONFIG.listener_capacity}\`;
-    bitrateText.textContent = bitrate ? \`\${String(bitrate)} kbps\` : "Unknown";
-    djText.textContent = String(djStatus);
-    renderHistory(pickValue(data, ["history"], []));
-
-    setMetadataStatus("Online");
-    setLamp(metaLamp, "lamp-green");
-  } catch (err) {
-    nowPlaying.textContent = lastTitle || "Metadata unavailable";
-    setMetadataStatus("Offline");
-    setLamp(metaLamp, "lamp-red");
+    const res = await fetch(ENDPOINTS.metadata, { cache: "no-store" });
+    if (!res.ok) throw new Error("metadata http " + res.status);
+    const meta = await res.json();
+    const split = splitTrack(meta.song || meta.title);
+    trackTitle.textContent = split.title;
+    trackDj.textContent = meta.djusername ? ("DJ: " + meta.djusername) : split.artist;
+    listenerInfo.textContent = String(meta.listeners ?? 0);
+    bitrateInfo.textContent = String(meta.bitrate ?? "--");
+    modeInfo.textContent = String(meta.mode || meta.stream || "--");
+    sourceInfo.textContent = String(meta.source || "worker");
+    statusText.textContent = "READY";
+    applyCover(meta.art || meta.image || meta.cover || "");
+  } catch (e) {
+    statusText.textContent = "META ERROR";
+    sourceInfo.textContent = "metadata offline";
   }
 }
-
-function startMetadataLoop() {
-  if (metadataTimer) clearInterval(metadataTimer);
-  fetchMetadata();
-  metadataTimer = setInterval(fetchMetadata, STREAM_CONFIG.poll_interval_ms);
-}
-
-async function tryPlayPrimary() {
-  audio.src = STREAM_CONFIG.stream_url;
-  await audio.play();
-  setSource(false);
-}
-
-async function tryPlayFallback() {
-  audio.src = STREAM_CONFIG.fallback_stream_url;
-  await audio.play();
-  setSource(true);
-}
-
-async function safePlay() {
-  try {
-    await tryPlayPrimary();
-    setStatus("Playing");
-    setLamp(audioLamp, "lamp-green");
-    startMetadataLoop();
-    return true;
-  } catch (e1) {
-    try {
-      await tryPlayFallback();
-      setStatus("Playing");
-      setLamp(audioLamp, "lamp-green");
-      startMetadataLoop();
-      return true;
-    } catch (e2) {
-      setStatus("Audio Error");
-      setLamp(audioLamp, "lamp-red");
-      return false;
-    }
-  }
-}
-
-function runBootSequence() {
-  return new Promise((resolve) => {
-    let percent = 0;
-    const timer = setInterval(() => {
-      percent += 4;
-      if (percent > 100) percent = 100;
-      progressBar.style.width = \`\${percent}%\`;
-      progressText.textContent = \`\${percent}%\`;
-      if (percent >= 100) {
-        clearInterval(timer);
-        resolve();
-      }
-    }, 42);
-  });
-}
-
-bootButton.addEventListener("click", async () => {
-  if (booted) return;
-  booted = true;
-  bootButton.disabled = true;
-  await runBootSequence();
-  overlay.classList.add("hidden");
-  await safePlay();
-});
-
-playBtn.addEventListener("click", async () => {
-  await safePlay();
-});
-
-pauseBtn.addEventListener("click", () => {
-  audio.pause();
-  setStatus("Paused");
-  setLamp(audioLamp, "lamp-red");
-});
-
-reconnectBtn.addEventListener("click", async () => {
-  audio.pause();
-  audio.src = "";
-  await safePlay();
-});
-
-muteBtn.addEventListener("click", () => {
-  muted = !muted;
-  audio.muted = muted;
-  muteBtn.textContent = muted ? "Unmute" : "Mute";
-});
-
-volumeRange.addEventListener("input", () => {
-  audio.volume = Number(volumeRange.value);
-});
-
-historyToggle.addEventListener("click", () => {
-  historyOpen = !historyOpen;
-  historyOverlay.classList.toggle("hidden", !historyOpen);
-});
-
-audio.addEventListener("playing", () => {
-  setStatus("Playing");
-  setLamp(audioLamp, "lamp-green");
-});
-
-audio.addEventListener("error", async () => {
-  if (!usingFallback) {
-    try {
-      await tryPlayFallback();
-      setStatus("Playing");
-      setLamp(audioLamp, "lamp-green");
-      startMetadataLoop();
-      return;
-    } catch (e) {}
-  }
-  setStatus("Audio Error");
-  setLamp(audioLamp, "lamp-red");
-});
-
-const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-if (isiOS) {
-  volumeHint.textContent = "Use iPhone buttons";
-}
-
-setLamp(metaLamp, "lamp-red");
-setLamp(audioLamp, "lamp-red");
-setLamp(sourceLamp, "lamp-cyan");
-setSource(false);
-setMetadataStatus("Loading...");
-fetchMetadata();
-`;
-const CONFIG_JS = `export const STREAM_CONFIG = {
-  "stream_url": "/stream",
-  "fallback_stream_url": "/fallback-stream",
-  "metadata_url": "/api/nowplaying",
-  "poll_interval_ms": 8000,
-  "listener_capacity": 250,
-  "use_webhook": false
-};
+refreshMetadata();
+setInterval(refreshMetadata, META_INTERVAL_MS);
 `;
 
-function passthroughHeaders(sourceHeaders) {
-  const headers = new Headers();
-  const allow = [
-    "content-type",
-    "content-length",
-    "accept-ranges",
-    "content-range",
-    "cache-control",
-    "icy-br",
-    "icy-description",
-    "icy-genre",
-    "icy-metaint",
-    "icy-name",
-    "icy-notice1",
-    "icy-notice2",
-    "icy-pub",
-    "icy-url",
-    "transfer-encoding"
-  ];
-  for (const key of allow) {
-    const value = sourceHeaders.get(key);
-    if (value) headers.set(key, value);
-  }
-  headers.set("access-control-allow-origin", "*");
-  headers.set("x-radio-proxy", "666soundsdesign-worker");
-  return headers;
-}
-
-async function proxyStream(request, upstream) {
-  const init = {
-    method: request.method,
-    headers: new Headers()
+function cors(origin = "*") {
+  return {
+    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization,Range,X-Admin-Password",
+    "Access-Control-Expose-Headers": "Content-Length,Content-Range,Accept-Ranges,Content-Type",
+    "Vary": "Origin",
+    "Cache-Control": "no-store"
   };
+}
 
-  const range = request.headers.get("range");
-  const userAgent = request.headers.get("user-agent");
-  const accept = request.headers.get("accept");
-  const icyMeta = request.headers.get("icy-metadata");
+function json(data, origin = "*", status = 200) {
+  return new Response(JSON.stringify(data, null, 2), {
+    status,
+    headers: {
+      ...cors(origin),
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  });
+}
 
-  if (range) init.headers.set("range", range);
-  if (userAgent) init.headers.set("user-agent", userAgent);
-  if (accept) init.headers.set("accept", accept);
-  if (icyMeta) init.headers.set("icy-metadata", icyMeta);
+function text(body, origin = "*", status = 200, contentType = "text/plain; charset=utf-8") {
+  return new Response(body, {
+    status,
+    headers: {
+      ...cors(origin),
+      "Content-Type": contentType
+    }
+  });
+}
 
-  const response = await fetch(upstream, init);
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: passthroughHeaders(response.headers)
+const DEFAULT_STREAM_MAIN = "https://my.idjstream.com/666soundsdesign/stream";
+const DEFAULT_STREAM_FALLBACK = "https://my.idjstream.com:8686/stream";
+const DEFAULT_META_JSON_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
+const DEFAULT_META_FETCH_CACHE_MS = 15000;
+
+let META_CACHE = { updatedAt: 0, data: null };
+
+function now() { return Date.now(); }
+
+function normalizeProviderPayload(data) {
+  const djRaw = String(data?.djusername ?? "").trim().toLowerCase();
+  let stream = "offline";
+  if (djRaw && !["autodj", "auto dj", "none", "false"].includes(djRaw)) {
+    stream = "live";
+  } else if (data?.title || Number(data?.listeners || 0) > 0) {
+    stream = "autodj";
+  }
+  return {
+    updatedAt: now(),
+    source: "provider_json",
+    title: data?.title ?? data?.song ?? null,
+    song: data?.title ?? data?.song ?? null,
+    art: data?.art ?? data?.image ?? data?.cover ?? null,
+    image: data?.art ?? data?.image ?? data?.cover ?? null,
+    cover: data?.art ?? data?.image ?? data?.cover ?? null,
+    dj: data?.djusername ?? data?.dj ?? null,
+    djusername: data?.djusername ?? data?.dj ?? null,
+    listeners: Number(data?.listeners ?? 0) || 0,
+    unique: Number(data?.ulistener ?? data?.unique ?? 0) || 0,
+    bitrate: data?.bitrate ?? null,
+    stream,
+    mode: stream === "live" ? "LIVE_DJ" : stream === "autodj" ? "AUTO_DJ" : "OFFLINE",
+    raw: data ?? null
+  };
+}
+
+async function getMetadata(metaJsonUrl, metaFetchCacheMs) {
+  if (META_CACHE.data && (now() - META_CACHE.updatedAt) < metaFetchCacheMs) {
+    return META_CACHE.data;
+  }
+  const res = await fetch(metaJsonUrl, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json,text/plain,*/*",
+      "User-Agent": "RADIO_PLAYER_V2_REAL_FIX Worker"
+    },
+    cf: { cacheTtl: 0, cacheEverything: false }
+  });
+  if (!res.ok) {
+    throw new Error("META_HTTP_" + res.status);
+  }
+  const ct = res.headers.get("content-type") || "";
+  let normalized;
+  if (ct.includes("json")) {
+    normalized = normalizeProviderPayload(await res.json());
+  } else {
+    const rawText = await res.text();
+    try {
+      normalized = normalizeProviderPayload(JSON.parse(rawText));
+    } catch {
+      normalized = normalizeProviderPayload({ title: rawText?.trim() || null });
+    }
+  }
+  META_CACHE = { updatedAt: now(), data: normalized };
+  return normalized;
+}
+
+async function proxyStream(request, targetUrl, origin) {
+  const headers = new Headers();
+  const range = request.headers.get("Range");
+  const accept = request.headers.get("Accept");
+  if (range) headers.set("Range", range);
+  if (accept) headers.set("Accept", accept);
+  headers.set("Accept-Encoding", "identity");
+
+  const upstream = await fetch(targetUrl, {
+    method: request.method === "HEAD" ? "HEAD" : "GET",
+    headers,
+    cf: { cacheTtl: 0, cacheEverything: false }
+  });
+
+  const out = new Headers(upstream.headers);
+  Object.entries(cors(origin)).forEach(([k, v]) => out.set(k, v));
+  if (!out.get("Content-Type")) out.set("Content-Type", "audio/mpeg");
+  ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade"].forEach((h) => out.delete(h));
+
+  return new Response(request.method === "HEAD" ? null : upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: out
   });
 }
 
 export default {
-  async fetch(request) {
-    const url = new URL(request.url);
+  async fetch(request, env) {
+    try {
+      const url = new URL(request.url);
+      const origin = request.headers.get("Origin") || "*";
+      const mainStream = env?.STREAM_MAIN || DEFAULT_STREAM_MAIN;
+      const fallbackStream = env?.STREAM_FALLBACK || DEFAULT_STREAM_FALLBACK;
+      const metaJsonUrl = env?.META_JSON_URL || DEFAULT_META_JSON_URL;
+      const metaFetchCacheMs = Number(env?.META_FETCH_CACHE_MS || DEFAULT_META_FETCH_CACHE_MS) || DEFAULT_META_FETCH_CACHE_MS;
 
-    if (url.pathname === "/health") {
-      return new Response("OK", {
-        status: 200,
-        headers: {
-          "content-type": "text/plain; charset=UTF-8",
-          "cache-control": "no-store",
-          "access-control-allow-origin": "*"
-        }
-      });
-    }
-
-    if (url.pathname === "/api/nowplaying") {
-      try {
-        const upstream = await fetch(METADATA_URL, {
-          headers: { "cache-control": "no-store" }
-        });
-        const body = await upstream.text();
-        return new Response(body, {
-          status: upstream.status,
-          headers: {
-            "content-type": "application/json; charset=UTF-8",
-            "cache-control": "no-store",
-            "access-control-allow-origin": "*",
-            "x-radio-proxy": "666soundsdesign-worker"
-          }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: "metadata_proxy_failed" }), {
-          status: 502,
-          headers: {
-            "content-type": "application/json; charset=UTF-8",
-            "cache-control": "no-store",
-            "access-control-allow-origin": "*"
-          }
-        });
+      if (request.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: cors(origin) });
       }
-    }
 
-    if (url.pathname === "/stream") {
-      try {
-        return await proxyStream(request, PRIMARY_STREAM_URL);
-      } catch (err) {
-        return await proxyStream(request, FALLBACK_STREAM_URL);
+      // JSON endpoints
+      if (url.pathname === "/health") {
+        return json({
+          ok: true,
+          build: BUILD,
+          worker: "RADIO_PLAYER_V2_REAL_FIX",
+          mainStream,
+          fallbackStream,
+          metaJsonUrl
+        }, origin);
       }
-    }
 
-    if (url.pathname === "/fallback-stream") {
-      return await proxyStream(request, FALLBACK_STREAM_URL);
-    }
+      if (url.pathname === "/debug") {
+        return json({
+          ok: true,
+          build: BUILD,
+          worker: "RADIO_PLAYER_V2_REAL_FIX",
+          cacheAgeMs: META_CACHE.updatedAt ? (now() - META_CACHE.updatedAt) : null,
+          hasCache: Boolean(META_CACHE.data),
+          mainStream,
+          fallbackStream,
+          metaJsonUrl
+        }, origin);
+      }
 
-    if (url.pathname === "/css/main.css") {
-      return new Response(CSS, {
-        headers: { "content-type": "text/css; charset=UTF-8" }
-      });
-    }
+      if (url.pathname === "/metadata") {
+        const meta = await getMetadata(metaJsonUrl, metaFetchCacheMs);
+        return json(meta, origin);
+      }
 
-    if (url.pathname === "/js/app.js") {
-      return new Response(APP_JS, {
-        headers: { "content-type": "application/javascript; charset=UTF-8" }
-      });
-    }
+      if (url.pathname === "/status") {
+        const meta = await getMetadata(metaJsonUrl, metaFetchCacheMs);
+        return json({
+          ok: true,
+          build: BUILD,
+          mainStream,
+          fallbackStream,
+          state: meta
+        }, origin);
+      }
 
-    if (url.pathname === "/config/stream.config.js") {
-      return new Response(CONFIG_JS, {
-        headers: { "content-type": "application/javascript; charset=UTF-8" }
-      });
-    }
+      // stream endpoints
+      if (url.pathname === "/stream") {
+        return proxyStream(request, mainStream, origin);
+      }
 
-    return new Response(HTML, {
-      status: 200,
-      headers: { "content-type": "text/html; charset=UTF-8" }
-    });
+      if (url.pathname === "/fallback-stream") {
+        return proxyStream(request, fallbackStream, origin);
+      }
+
+      // static files from worker package
+      if (url.pathname === "/css/main.css") {
+        return text(CSS_CONTENT, origin, 200, "text/css; charset=utf-8");
+      }
+
+      if (url.pathname === "/js/app.js") {
+        return text(JS_CONTENT, origin, 200, "application/javascript; charset=utf-8");
+      }
+
+      if (url.pathname === "/config/stream.config.js") {
+        const cfg = {
+          stream_url: "/stream",
+          fallback_stream_url: "/fallback-stream",
+          metadata_url: "/metadata",
+          status_url: "/status",
+          debug_url: "/debug",
+          health_url: "/health"
+        };
+        return text("window.STREAM_CONFIG = " + JSON.stringify(cfg, null, 2) + ";", origin, 200, "application/javascript; charset=utf-8");
+      }
+
+      if (url.pathname === "/" || url.pathname === "/index.html") {
+        return text(HTML_CONTENT, origin, 200, "text/html; charset=utf-8");
+      }
+
+      return text("Not Found", origin, 404);
+    } catch (err) {
+      return json({
+        ok: false,
+        build: BUILD,
+        error: "worker_runtime_error",
+        message: String(err)
+      }, "*", 500);
+    }
   }
 };
