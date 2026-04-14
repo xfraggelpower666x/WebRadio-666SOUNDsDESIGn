@@ -109,7 +109,7 @@ async function fetchMetadata() {
     const djStatus = pickValue(data, ["djusername", "djstatus", "client"], "AutoDJ");
 
     listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${STREAM_CONFIG.listener_capacity}`;
-    bitrateText.textContent = bitrate ? String(bitrate) : "Unknown";
+    bitrateText.textContent = bitrate ? `${String(bitrate)} kbps` : "Unknown";
     djText.textContent = String(djStatus);
     renderHistory(pickValue(data, ["history"], []));
 
@@ -129,7 +129,7 @@ function startMetadataLoop() {
 }
 
 async function tryPlayPrimary() {
-  audio.src = STREAM_CONFIG.primary_stream_url;
+  audio.src = STREAM_CONFIG.stream_url;
   await audio.play();
   setSource(false);
 }
