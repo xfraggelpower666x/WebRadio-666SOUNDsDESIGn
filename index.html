@@ -12,36 +12,65 @@
       <div class="boot-title">666SOUNDsDESIGn</div>
       <div class="boot-subtitle">Starting Audio Systems</div>
       <button id="bootButton" class="neon-button">OK</button>
-      <div class="progress-wrap" aria-hidden="true">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
+      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
       <div id="progressText" class="progress-text">0%</div>
-      <div class="boot-note">Tap once to initialize audio on iPhone / iPad.</div>
+      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
     </div>
   </div>
 
   <main class="app-shell">
     <section class="player-card">
       <div class="brand">666SOUNDsDESIGn</div>
+
+      <div class="lamp-row">
+        <div class="lamp-box">
+          <span id="healthLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Health</span>
+        </div>
+        <div class="lamp-box">
+          <span id="audioLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Audio</span>
+        </div>
+        <div class="lamp-box">
+          <span id="metaLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Meta</span>
+        </div>
+      </div>
+
       <div class="status-row">
         <span id="streamStatus" class="pill">Ready</span>
         <span id="fallbackStatus" class="pill pill-dim">Primary</span>
       </div>
 
-      <div class="meta-block">
-        <div class="meta-label">Now Playing</div>
-        <div id="trackTitle" class="track-title">Waiting for stream data...</div>
-        <div id="djInfo" class="dj-info">DJ status unavailable</div>
+      <div id="historyWrap" class="display-block">
+        <div class="display-label">Now Playing</div>
+        <div class="display-window">
+          <div id="marquee" class="marquee-track">Waiting for stream data...</div>
+        </div>
+        <div id="historyOverlay" class="history-overlay">
+          <div class="history-title">Zuletzt gespielt</div>
+          <ul id="historyList" class="history-list">
+            <li>Keine History geladen</li>
+          </ul>
+        </div>
       </div>
 
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-label">Listeners</div>
-          <div id="listeners" class="stat-value">0</div>
+      <div class="meta-grid">
+        <div class="meta-box">
+          <div class="meta-label">DJ / Server</div>
+          <div id="djInfo" class="meta-value">Unbekannt</div>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">Source</div>
-          <div id="sourceLabel" class="stat-value">Primary</div>
+        <div class="meta-box">
+          <div class="meta-label">Stream Quality</div>
+          <div id="streamQuality" class="meta-value">Unbekannt</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Listeners</div>
+          <div id="listeners" class="meta-value">0 / 250</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-label">Source</div>
+          <div id="sourceLabel" class="meta-value">Primary</div>
         </div>
       </div>
 
@@ -50,6 +79,8 @@
         <button id="pauseBtn" class="neon-button alt">Pause</button>
         <button id="reconnectBtn" class="neon-button alt">Reconnect</button>
       </div>
+
+      <div class="footer-note">App-Stream-URL: <strong>/stream</strong></div>
 
       <audio id="radio" preload="none" playsinline></audio>
     </section>
