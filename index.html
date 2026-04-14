@@ -1,41 +1,87 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>666SOUNDsDESIGn</title>
-<style>
-body{background:#111;color:#0ff;font-family:sans-serif;text-align:center;padding:20px}
-.btn{padding:20px;background:#222;border:2px solid #0ff;color:#fff;border-radius:10px;font-size:20px}
-.lamp{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
-.green{background:#0f0} .red{background:#f00}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>666SOUNDsDESIGn Radio</title>
+  <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
+  <div id="bootOverlay" class="overlay">
+    <div class="boot-panel">
+      <div class="boot-title">666SOUNDsDESIGn</div>
+      <div class="boot-subtitle">Starting Audio Systems</div>
+      <button id="bootButton" class="neon-button">OK</button>
+      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+      <div id="progressText" class="progress-text">0%</div>
+      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
+    </div>
+  </div>
 
-<h1>666SOUNDsDESIGn</h1>
+  <main class="app-shell">
+    <section class="player-card">
+      <header class="topbar">
+        <div class="topbar-line"></div>
+        <div class="brand">666SOUNDsDESIGn</div>
+        <div class="topbar-line"></div>
+      </header>
 
-<div><span id="healthLamp" class="lamp red"></span>Health</div>
-<div><span id="audioLamp" class="lamp red"></span>Audio</div>
+      <div class="status-grid">
+        <div class="lamp-box">
+          <span id="healthLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Health</span>
+        </div>
+        <div class="lamp-box">
+          <span id="audioLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Audio</span>
+        </div>
+        <div class="lamp-box">
+          <span id="sourceLamp" class="lamp lamp-cyan"></span>
+          <span class="lamp-label">Source</span>
+        </div>
+      </div>
 
-<br>
+      <div class="pill-row">
+        <span id="streamStatus" class="pill">Ready</span>
+        <span id="sourceLabel" class="pill pill-dim">Primary</span>
+      </div>
 
-<button class="btn" onclick="start()">PLAY</button>
+      <div class="display-block">
+        <div class="display-label">Now Playing</div>
+        <div class="display-window">
+          <div class="marquee-track">666SOUNDsDESIGn live stream online</div>
+        </div>
+      </div>
 
-<audio id="player" controls style="width:100%;margin-top:20px"></audio>
+      <div class="mini-grid">
+        <div class="mini-box">
+          <div class="mini-label">Mode</div>
+          <div class="mini-value">Live Stream</div>
+        </div>
+        <div class="mini-box">
+          <div class="mini-label">Fallback</div>
+          <div id="fallbackText" class="mini-value">Standby</div>
+        </div>
+      </div>
 
-<script>
-function start(){
-  let audio = document.getElementById('player');
-  audio.src = '/stream';
-  audio.play();
-  document.getElementById('audioLamp').className='lamp green';
-}
+      <div class="control-strip">
+        <button id="playBtn" class="control-btn main">Play</button>
+        <button id="pauseBtn" class="control-btn">Pause</button>
+        <button id="reconnectBtn" class="control-btn">Reconnect</button>
+      </div>
 
-fetch('/health').then(()=> {
-  document.getElementById('healthLamp').className='lamp green';
-}).catch(()=>{});
-</script>
+      <div class="audio-tools">
+        <button id="muteBtn" class="small-btn">Mute</button>
+        <div class="volume-wrap">
+          <label for="volumeRange">Volume</label>
+          <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
+        </div>
+      </div>
 
+      <audio id="radio" preload="none" playsinline></audio>
+    </section>
+  </main>
+
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
