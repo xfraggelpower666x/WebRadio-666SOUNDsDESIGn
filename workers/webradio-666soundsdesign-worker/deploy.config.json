@@ -1,0 +1,10 @@
+{
+  "worker_name": "webradio-666soundsdesign-worker",
+  "entry_file": "worker.js",
+  "route": "666soundsdesign-broadcaster.com/*",
+  "deploy_mode": "github_auto",
+  "primary_stream_url": "https://my.idjstream.com/666soundsdesign/stream",
+  "fallback_stream_url": "https://my.idjstream.com/8686/stream",
+  "api_url": "https://my.idjstream.com/cp/get_info.php?p=8686",
+  "use_webhook": false
+}
