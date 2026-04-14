@@ -1,20 +1,15 @@
-# RADIO_PLAYER_V1_FIXED
+# RADIO_PLAYER_V2_REAL_FIX
 
-Korrigierte V1 mit Root-`index.html`.
+Komplette Version mit:
+- direktem Stream
+- direkter JSON-Metadatenquelle
+- History-Overlay
+- Source/Fallback
+- Mute / Volume
+- iPhone Start-Overlay
 
-## Wichtig
-- `index.html` liegt im Root.
-- Cyber-Player für Desktop und iPhone.
-- Welcome-Overlay mit OK-Start.
-- Kleine Self-Healing-Logik:
-  - Primary Stream
-  - Fallback Stream
-  - Reconnect
-  - Metadaten behalten bei API-Ausfall
+JSON-Datenquelle:
+https://my.idjstream.com/cp/get_info.php?p=8686
 
-## Relevante Dateien
-- `index.html`
-- `css/main.css`
-- `js/app.js`
-- `config/stream.config.js`
-- `workers/webradio-666soundsdesign-worker/worker.js`
+Stream:
+https://my.idjstream.com/666soundsdesign/stream
