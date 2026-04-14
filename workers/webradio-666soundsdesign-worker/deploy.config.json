@@ -4,6 +4,6 @@
   "route": "666soundsdesign-broadcaster.com/*",
   "deploy_mode": "github_auto",
   "public_stream_url": "/stream",
-  "metadata_url": "https://my.idjstream.com/cp/get_info.php?p=8686",
+  "metadata_url": "/api/nowplaying",
   "use_webhook": false
 }
