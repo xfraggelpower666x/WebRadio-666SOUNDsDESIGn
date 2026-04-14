@@ -8,68 +8,99 @@ const progressText = document.getElementById("progressText");
 const playBtn = document.getElementById("playBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const reconnectBtn = document.getElementById("reconnectBtn");
-const muteBtn = document.getElementById("muteBtn");
-const volumeRange = document.getElementById("volumeRange");
 
-const healthLamp = document.getElementById("healthLamp");
-const audioLamp = document.getElementById("audioLamp");
-const sourceLamp = document.getElementById("sourceLamp");
 const streamStatus = document.getElementById("streamStatus");
+const fallbackStatus = document.getElementById("fallbackStatus");
+const trackTitle = document.getElementById("trackTitle");
+const djInfo = document.getElementById("djInfo");
+const listeners = document.getElementById("listeners");
 const sourceLabel = document.getElementById("sourceLabel");
-const fallbackText = document.getElementById("fallbackText");
 
 const audio = document.getElementById("radio");
 
+let currentSource = "primary";
+let lastMeta = null;
 let booted = false;
-let usingFallback = false;
-let muted = false;
+let reconnectAttempts = 0;
 
-function setLamp(el, state) {
-  el.classList.remove("lamp-green", "lamp-red", "lamp-cyan");
-  el.classList.add(state);
+function setAudioSource(source) {
+  currentSource = source;
+  audio.src = source === "primary"
+    ? STREAM_CONFIG.primary_stream_url
+    : STREAM_CONFIG.fallback_stream_url;
+
+  fallbackStatus.textContent = source === "primary" ? "Primary" : "Fallback Active";
+  sourceLabel.textContent = source === "primary" ? "Primary" : "Fallback";
 }
 
 function setStatus(text) {
   streamStatus.textContent = text;
 }
 
-function setSource(isFallback) {
-  usingFallback = isFallback;
-  sourceLabel.textContent = isFallback ? "Fallback" : "Primary";
-  fallbackText.textContent = isFallback ? "Active" : "Standby";
-  setLamp(sourceLamp, isFallback ? "lamp-red" : "lamp-cyan");
-}
-
-async function tryPlayPrimary() {
-  audio.src = STREAM_CONFIG.primary_stream_url;
-  await audio.play();
-  setSource(false);
-}
-
-async function tryPlayFallback() {
-  audio.src = STREAM_CONFIG.fallback_stream_url;
-  await audio.play();
-  setSource(true);
-}
-
-async function safePlay() {
+async function tryPlay() {
   try {
-    await tryPlayPrimary();
+    await audio.play();
     setStatus("Playing");
-    setLamp(audioLamp, "lamp-green");
+    reconnectAttempts = 0;
     return true;
-  } catch (e1) {
-    try {
-      await tryPlayFallback();
-      setStatus("Playing");
-      setLamp(audioLamp, "lamp-green");
-      return true;
-    } catch (e2) {
-      setStatus("Audio Error");
-      setLamp(audioLamp, "lamp-red");
-      return false;
+  } catch (error) {
+    setStatus("Tap to Start");
+    return false;
+  }
+}
+
+async function switchToFallbackAndPlay() {
+  if (currentSource === "fallback") return false;
+  setStatus("Switching to Fallback");
+  setAudioSource("fallback");
+  return await tryPlay();
+}
+
+async function reconnect() {
+  setStatus("Reconnecting");
+  const played = await tryPlay();
+  if (played) return;
+
+  const fallbackPlayed = await switchToFallbackAndPlay();
+  if (!fallbackPlayed) {
+    setStatus("Reconnect Failed");
+  }
+}
+
+async function fetchMeta() {
+  try {
+    const response = await fetch(STREAM_CONFIG.api_url, { cache: "no-store" });
+    if (!response.ok) throw new Error("API error");
+    const data = await response.json();
+    lastMeta = data;
+    renderMeta(data);
+  } catch (error) {
+    if (lastMeta) {
+      renderMeta(lastMeta);
+    } else {
+      trackTitle.textContent = "Metadata temporarily unavailable";
+      djInfo.textContent = "Retrying...";
     }
   }
+}
+
+function pickValue(obj, candidates, fallback = "") {
+  for (const key of candidates) {
+    if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+      return obj[key];
+    }
+  }
+  return fallback;
+}
+
+function renderMeta(data) {
+  const title = pickValue(data, ["title", "songtitle", "currentSong", "track"], "Live Stream");
+  const dj = pickValue(data, ["dj", "dj_name", "server_name", "server"], "DJ status unavailable");
+  const listenerCount = pickValue(data, ["listeners", "listener", "currentlisteners"], "0");
+
+  trackTitle.textContent = String(title);
+  djInfo.textContent = String(dj);
+  listeners.textContent = String(listenerCount);
 }
 
 function runBootSequence() {
@@ -84,7 +115,7 @@ function runBootSequence() {
         clearInterval(timer);
         resolve();
       }
-    }, 42);
+    }, 45);
   });
 }
 
@@ -92,65 +123,44 @@ bootButton.addEventListener("click", async () => {
   if (booted) return;
   booted = true;
   bootButton.disabled = true;
+  setAudioSource("primary");
   await runBootSequence();
   overlay.classList.add("hidden");
-  await safePlay();
+  await tryPlay();
+  fetchMeta();
 });
 
 playBtn.addEventListener("click", async () => {
-  await safePlay();
+  await tryPlay();
 });
 
 pauseBtn.addEventListener("click", () => {
   audio.pause();
   setStatus("Paused");
-  setLamp(audioLamp, "lamp-red");
 });
 
 reconnectBtn.addEventListener("click", async () => {
-  audio.pause();
-  audio.src = "";
-  await safePlay();
-});
-
-muteBtn.addEventListener("click", () => {
-  muted = !muted;
-  audio.muted = muted;
-  muteBtn.textContent = muted ? "Unmute" : "Mute";
-});
-
-volumeRange.addEventListener("input", () => {
-  audio.volume = Number(volumeRange.value);
-});
-
-audio.addEventListener("playing", () => {
-  setStatus("Playing");
-  setLamp(audioLamp, "lamp-green");
+  await reconnect();
 });
 
 audio.addEventListener("error", async () => {
-  if (!usingFallback) {
-    try {
-      await tryPlayFallback();
-      setStatus("Playing");
-      setLamp(audioLamp, "lamp-green");
-      return;
-    } catch (e) {}
+  reconnectAttempts += 1;
+  if (currentSource === "primary") {
+    const ok = await switchToFallbackAndPlay();
+    if (!ok) setStatus("Audio Error");
+    return;
   }
-  setStatus("Audio Error");
-  setLamp(audioLamp, "lamp-red");
+  if (reconnectAttempts <= 1) {
+    await reconnect();
+  } else {
+    setStatus("Audio Error");
+  }
 });
 
-fetch("/health", { cache: "no-store" })
-  .then((res) => {
-    if (!res.ok) throw new Error("health failed");
-    setLamp(healthLamp, "lamp-green");
-  })
-  .catch(() => {
-    setLamp(healthLamp, "lamp-red");
-  });
+audio.addEventListener("playing", () => setStatus("Playing"));
+audio.addEventListener("pause", () => {
+  if (!audio.ended) setStatus("Paused");
+});
+audio.addEventListener("waiting", () => setStatus("Buffering"));
 
-setLamp(healthLamp, "lamp-red");
-setLamp(audioLamp, "lamp-red");
-setLamp(sourceLamp, "lamp-cyan");
-setSource(false);
+setInterval(fetchMeta, STREAM_CONFIG.poll_interval_ms);
