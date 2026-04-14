@@ -1,18 +1,18 @@
-# RADIO_PLAYER_V1_4_RESTORE
+# RADIO_PLAYER_V1_FIXED
 
-Wiederhergestellte Version auf Basis des letzten brauchbaren Looks.
+Korrigierte V1 mit Root-`index.html`.
 
 ## Wichtig
-- Worker ist absichtlich simpel:
-  - `/` -> Player
-  - `/health` -> OK
-  - `/stream` -> Redirect auf Hauptstream
-  - `/fallback-stream` -> Redirect auf Fallback
-- Kein API-Kram
-- Kein Webhook
-- Play ist wieder auf Stabilität priorisiert
+- `index.html` liegt im Root.
+- Cyber-Player für Desktop und iPhone.
+- Welcome-Overlay mit OK-Start.
+- Kleine Self-Healing-Logik:
+  - Primary Stream
+  - Fallback Stream
+  - Reconnect
+  - Metadaten behalten bei API-Ausfall
 
-## Dateien
+## Relevante Dateien
 - `index.html`
 - `css/main.css`
 - `js/app.js`
