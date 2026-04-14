@@ -8,99 +8,158 @@ const progressText = document.getElementById("progressText");
 const playBtn = document.getElementById("playBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const reconnectBtn = document.getElementById("reconnectBtn");
+const muteBtn = document.getElementById("muteBtn");
+const volumeRange = document.getElementById("volumeRange");
+const historyToggle = document.getElementById("historyToggle");
 
+const metaLamp = document.getElementById("metaLamp");
+const audioLamp = document.getElementById("audioLamp");
+const sourceLamp = document.getElementById("sourceLamp");
 const streamStatus = document.getElementById("streamStatus");
-const fallbackStatus = document.getElementById("fallbackStatus");
-const trackTitle = document.getElementById("trackTitle");
-const djInfo = document.getElementById("djInfo");
-const listeners = document.getElementById("listeners");
 const sourceLabel = document.getElementById("sourceLabel");
+const fallbackText = document.getElementById("fallbackText");
+const nowPlaying = document.getElementById("nowPlaying");
+const metaText = document.getElementById("metaText");
+const listenersText = document.getElementById("listenersText");
+const bitrateText = document.getElementById("bitrateText");
+const djText = document.getElementById("djText");
+const historyOverlay = document.getElementById("historyOverlay");
+const historyList = document.getElementById("historyList");
+const volumeHint = document.getElementById("volumeHint");
 
 const audio = document.getElementById("radio");
 
-let currentSource = "primary";
-let lastMeta = null;
 let booted = false;
-let reconnectAttempts = 0;
+let usingFallback = false;
+let muted = false;
+let metadataTimer = null;
+let lastTitle = "Loading metadata...";
+let historyOpen = false;
 
-function setAudioSource(source) {
-  currentSource = source;
-  audio.src = source === "primary"
-    ? STREAM_CONFIG.primary_stream_url
-    : STREAM_CONFIG.fallback_stream_url;
-
-  fallbackStatus.textContent = source === "primary" ? "Primary" : "Fallback Active";
-  sourceLabel.textContent = source === "primary" ? "Primary" : "Fallback";
+function setLamp(el, state) {
+  el.classList.remove("lamp-green", "lamp-red", "lamp-cyan");
+  el.classList.add(state);
 }
 
 function setStatus(text) {
   streamStatus.textContent = text;
 }
 
-async function tryPlay() {
-  try {
-    await audio.play();
-    setStatus("Playing");
-    reconnectAttempts = 0;
-    return true;
-  } catch (error) {
-    setStatus("Tap to Start");
-    return false;
-  }
+function setSource(isFallback) {
+  usingFallback = isFallback;
+  sourceLabel.textContent = isFallback ? "Fallback" : "Primary";
+  fallbackText.textContent = isFallback ? "Active" : "Standby";
+  setLamp(sourceLamp, isFallback ? "lamp-red" : "lamp-cyan");
 }
 
-async function switchToFallbackAndPlay() {
-  if (currentSource === "fallback") return false;
-  setStatus("Switching to Fallback");
-  setAudioSource("fallback");
-  return await tryPlay();
+function setMetadataStatus(text) {
+  metaText.textContent = text;
 }
 
-async function reconnect() {
-  setStatus("Reconnecting");
-  const played = await tryPlay();
-  if (played) return;
-
-  const fallbackPlayed = await switchToFallbackAndPlay();
-  if (!fallbackPlayed) {
-    setStatus("Reconnect Failed");
-  }
-}
-
-async function fetchMeta() {
-  try {
-    const response = await fetch(STREAM_CONFIG.api_url, { cache: "no-store" });
-    if (!response.ok) throw new Error("API error");
-    const data = await response.json();
-    lastMeta = data;
-    renderMeta(data);
-  } catch (error) {
-    if (lastMeta) {
-      renderMeta(lastMeta);
-    } else {
-      trackTitle.textContent = "Metadata temporarily unavailable";
-      djInfo.textContent = "Retrying...";
-    }
-  }
-}
-
-function pickValue(obj, candidates, fallback = "") {
-  for (const key of candidates) {
-    if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
-      return obj[key];
+function pickValue(obj, keys, fallback = "") {
+  for (const key of keys) {
+    const value = obj?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
+      return value;
     }
   }
   return fallback;
 }
 
-function renderMeta(data) {
-  const title = pickValue(data, ["title", "songtitle", "currentSong", "track"], "Live Stream");
-  const dj = pickValue(data, ["dj", "dj_name", "server_name", "server"], "DJ status unavailable");
-  const listenerCount = pickValue(data, ["listeners", "listener", "currentlisteners"], "0");
+function normalizeTitle(data) {
+  return String(
+    pickValue(data, ["song", "title", "songtitle", "currentSong", "track", "now_playing"], lastTitle || "Live Stream")
+  );
+}
 
-  trackTitle.textContent = String(title);
-  djInfo.textContent = String(dj);
-  listeners.textContent = String(listenerCount);
+function renderHistory(items) {
+  historyList.innerHTML = "";
+  if (!Array.isArray(items) || !items.length) {
+    const li = document.createElement("li");
+    li.textContent = "No history loaded";
+    historyList.appendChild(li);
+    return;
+  }
+
+  items.slice(0, 12).forEach((item) => {
+    const li = document.createElement("li");
+    if (typeof item === "string") {
+      li.textContent = item;
+    } else {
+      li.textContent = String(
+        pickValue(item, ["song", "title", "track", "name"], "Unknown track")
+      );
+    }
+    historyList.appendChild(li);
+  });
+}
+
+async function fetchMetadata() {
+  try {
+    const res = await fetch(STREAM_CONFIG.metadata_url, { cache: "no-store" });
+    if (!res.ok) throw new Error("metadata fetch failed");
+    const data = await res.json();
+
+    const title = normalizeTitle(data);
+    lastTitle = title;
+    nowPlaying.textContent = title;
+
+    const listeners = Number.parseInt(pickValue(data, ["listeners"], 0), 10);
+    const bitrate = pickValue(data, ["bitrate"], "Unknown");
+    const djStatus = pickValue(data, ["djusername", "djstatus", "client"], "AutoDJ");
+
+    listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${STREAM_CONFIG.listener_capacity}`;
+    bitrateText.textContent = bitrate ? String(bitrate) : "Unknown";
+    djText.textContent = String(djStatus);
+    renderHistory(pickValue(data, ["history"], []));
+
+    setMetadataStatus("Online");
+    setLamp(metaLamp, "lamp-green");
+  } catch (err) {
+    nowPlaying.textContent = lastTitle || "Metadata unavailable";
+    setMetadataStatus("Offline");
+    setLamp(metaLamp, "lamp-red");
+  }
+}
+
+function startMetadataLoop() {
+  if (metadataTimer) clearInterval(metadataTimer);
+  fetchMetadata();
+  metadataTimer = setInterval(fetchMetadata, STREAM_CONFIG.poll_interval_ms);
+}
+
+async function tryPlayPrimary() {
+  audio.src = STREAM_CONFIG.primary_stream_url;
+  await audio.play();
+  setSource(false);
+}
+
+async function tryPlayFallback() {
+  audio.src = STREAM_CONFIG.fallback_stream_url;
+  await audio.play();
+  setSource(true);
+}
+
+async function safePlay() {
+  try {
+    await tryPlayPrimary();
+    setStatus("Playing");
+    setLamp(audioLamp, "lamp-green");
+    startMetadataLoop();
+    return true;
+  } catch (e1) {
+    try {
+      await tryPlayFallback();
+      setStatus("Playing");
+      setLamp(audioLamp, "lamp-green");
+      startMetadataLoop();
+      return true;
+    } catch (e2) {
+      setStatus("Audio Error");
+      setLamp(audioLamp, "lamp-red");
+      return false;
+    }
+  }
 }
 
 function runBootSequence() {
@@ -115,7 +174,7 @@ function runBootSequence() {
         clearInterval(timer);
         resolve();
       }
-    }, 45);
+    }, 42);
   });
 }
 
@@ -123,44 +182,69 @@ bootButton.addEventListener("click", async () => {
   if (booted) return;
   booted = true;
   bootButton.disabled = true;
-  setAudioSource("primary");
   await runBootSequence();
   overlay.classList.add("hidden");
-  await tryPlay();
-  fetchMeta();
+  await safePlay();
 });
 
 playBtn.addEventListener("click", async () => {
-  await tryPlay();
+  await safePlay();
 });
 
 pauseBtn.addEventListener("click", () => {
   audio.pause();
   setStatus("Paused");
+  setLamp(audioLamp, "lamp-red");
 });
 
 reconnectBtn.addEventListener("click", async () => {
-  await reconnect();
+  audio.pause();
+  audio.src = "";
+  await safePlay();
+});
+
+muteBtn.addEventListener("click", () => {
+  muted = !muted;
+  audio.muted = muted;
+  muteBtn.textContent = muted ? "Unmute" : "Mute";
+});
+
+volumeRange.addEventListener("input", () => {
+  audio.volume = Number(volumeRange.value);
+});
+
+historyToggle.addEventListener("click", () => {
+  historyOpen = !historyOpen;
+  historyOverlay.classList.toggle("hidden", !historyOpen);
+});
+
+audio.addEventListener("playing", () => {
+  setStatus("Playing");
+  setLamp(audioLamp, "lamp-green");
 });
 
 audio.addEventListener("error", async () => {
-  reconnectAttempts += 1;
-  if (currentSource === "primary") {
-    const ok = await switchToFallbackAndPlay();
-    if (!ok) setStatus("Audio Error");
-    return;
+  if (!usingFallback) {
+    try {
+      await tryPlayFallback();
+      setStatus("Playing");
+      setLamp(audioLamp, "lamp-green");
+      startMetadataLoop();
+      return;
+    } catch (e) {}
   }
-  if (reconnectAttempts <= 1) {
-    await reconnect();
-  } else {
-    setStatus("Audio Error");
-  }
+  setStatus("Audio Error");
+  setLamp(audioLamp, "lamp-red");
 });
 
-audio.addEventListener("playing", () => setStatus("Playing"));
-audio.addEventListener("pause", () => {
-  if (!audio.ended) setStatus("Paused");
-});
-audio.addEventListener("waiting", () => setStatus("Buffering"));
+const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+if (isiOS) {
+  volumeHint.textContent = "Use iPhone buttons";
+}
 
-setInterval(fetchMeta, STREAM_CONFIG.poll_interval_ms);
+setLamp(metaLamp, "lamp-red");
+setLamp(audioLamp, "lamp-red");
+setLamp(sourceLamp, "lamp-cyan");
+setSource(false);
+setMetadataStatus("Loading...");
+fetchMetadata();
