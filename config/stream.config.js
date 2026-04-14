@@ -1,10 +1,8 @@
 export const STREAM_CONFIG = {
-  "stream_url": "/stream",
-  "fallback_stream_url": "/fallback-stream",
-  "metadata_url": "/metadata",
-  "poll_interval_ms": 8000,
-  "listener_capacity": 250,
-  "use_webhook": false,
-  "primary_upstream": "https://my.idjstream.com/666soundsdesign/stream",
-  "fallback_upstream": "https://my.idjstream.com:8686/stream"
+  stream_url: "https://webradio-666soundsdesign-worker.digital-underground-connected.workers.dev/stream",
+  fallback_stream_url: "https://webradio-666soundsdesign-worker.digital-underground-connected.workers.dev/fallback-stream",
+  metadata_url: "https://webradio-666soundsdesign-worker.digital-underground-connected.workers.dev/api/nowplaying",
+  poll_interval_ms: 8000,
+  listener_capacity: 250,
+  use_webhook: false
 };
