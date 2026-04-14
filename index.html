@@ -1,91 +1,41 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>666SOUNDsDESIGn Radio</title>
-  <link rel="stylesheet" href="./css/main.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>666SOUNDsDESIGn</title>
+<style>
+body{background:#111;color:#0ff;font-family:sans-serif;text-align:center;padding:20px}
+.btn{padding:20px;background:#222;border:2px solid #0ff;color:#fff;border-radius:10px;font-size:20px}
+.lamp{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.green{background:#0f0} .red{background:#f00}
+</style>
 </head>
 <body>
-  <div id="bootOverlay" class="overlay">
-    <div class="boot-panel">
-      <div class="boot-title">666SOUNDsDESIGn</div>
-      <div class="boot-subtitle">Starting Audio Systems</div>
-      <button id="bootButton" class="neon-button">OK</button>
-      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
-      <div id="progressText" class="progress-text">0%</div>
-      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
-    </div>
-  </div>
 
-  <main class="app-shell">
-    <section class="player-card">
-      <div class="brand">666SOUNDsDESIGn</div>
+<h1>666SOUNDsDESIGn</h1>
 
-      <div class="lamp-row">
-        <div class="lamp-box">
-          <span id="healthLamp" class="lamp lamp-red"></span>
-          <span class="lamp-label">Health</span>
-        </div>
-        <div class="lamp-box">
-          <span id="audioLamp" class="lamp lamp-red"></span>
-          <span class="lamp-label">Audio</span>
-        </div>
-        <div class="lamp-box">
-          <span id="metaLamp" class="lamp lamp-red"></span>
-          <span class="lamp-label">Meta</span>
-        </div>
-      </div>
+<div><span id="healthLamp" class="lamp red"></span>Health</div>
+<div><span id="audioLamp" class="lamp red"></span>Audio</div>
 
-      <div class="status-row">
-        <span id="streamStatus" class="pill">Ready</span>
-        <span id="fallbackStatus" class="pill pill-dim">Primary</span>
-      </div>
+<br>
 
-      <div id="historyWrap" class="display-block">
-        <div class="display-label">Now Playing</div>
-        <div class="display-window">
-          <div id="marquee" class="marquee-track">Waiting for stream data...</div>
-        </div>
-        <div id="historyOverlay" class="history-overlay">
-          <div class="history-title">Zuletzt gespielt</div>
-          <ul id="historyList" class="history-list">
-            <li>Keine History geladen</li>
-          </ul>
-        </div>
-      </div>
+<button class="btn" onclick="start()">PLAY</button>
 
-      <div class="meta-grid">
-        <div class="meta-box">
-          <div class="meta-label">DJ / Server</div>
-          <div id="djInfo" class="meta-value">Unbekannt</div>
-        </div>
-        <div class="meta-box">
-          <div class="meta-label">Stream Quality</div>
-          <div id="streamQuality" class="meta-value">Unbekannt</div>
-        </div>
-        <div class="meta-box">
-          <div class="meta-label">Listeners</div>
-          <div id="listeners" class="meta-value">0 / 250</div>
-        </div>
-        <div class="meta-box">
-          <div class="meta-label">Source</div>
-          <div id="sourceLabel" class="meta-value">Primary</div>
-        </div>
-      </div>
+<audio id="player" controls style="width:100%;margin-top:20px"></audio>
 
-      <div class="controls">
-        <button id="playBtn" class="neon-button">Play</button>
-        <button id="pauseBtn" class="neon-button alt">Pause</button>
-        <button id="reconnectBtn" class="neon-button alt">Reconnect</button>
-      </div>
+<script>
+function start(){
+  let audio = document.getElementById('player');
+  audio.src = '/stream';
+  audio.play();
+  document.getElementById('audioLamp').className='lamp green';
+}
 
-      <div class="footer-note">App-Stream-URL: <strong>/stream</strong></div>
+fetch('/health').then(()=> {
+  document.getElementById('healthLamp').className='lamp green';
+}).catch(()=>{});
+</script>
 
-      <audio id="radio" preload="none" playsinline></audio>
-    </section>
-  </main>
-
-  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
