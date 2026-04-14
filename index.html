@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>666SOUNDsDESIGn Radio</title>
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<body>
+  <div id="bootOverlay" class="overlay">
+    <div class="boot-panel">
+      <div class="boot-title">666SOUNDsDESIGn</div>
+      <div class="boot-subtitle">Starting Audio Systems</div>
+      <button id="bootButton" class="neon-button">OK</button>
+      <div class="progress-wrap" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <div id="progressText" class="progress-text">0%</div>
+      <div class="boot-note">Tap once to initialize audio on iPhone / iPad.</div>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <section class="player-card">
+      <div class="brand">666SOUNDsDESIGn</div>
+      <div class="status-row">
+        <span id="streamStatus" class="pill">Ready</span>
+        <span id="fallbackStatus" class="pill pill-dim">Primary</span>
+      </div>
+
+      <div class="meta-block">
+        <div class="meta-label">Now Playing</div>
+        <div id="trackTitle" class="track-title">Waiting for stream data...</div>
+        <div id="djInfo" class="dj-info">DJ status unavailable</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Listeners</div>
+          <div id="listeners" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Source</div>
+          <div id="sourceLabel" class="stat-value">Primary</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="playBtn" class="neon-button">Play</button>
+        <button id="pauseBtn" class="neon-button alt">Pause</button>
+        <button id="reconnectBtn" class="neon-button alt">Reconnect</button>
+      </div>
+
+      <audio id="radio" preload="none" playsinline></audio>
+    </section>
+  </main>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
