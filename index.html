@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio</title>
   <link rel="stylesheet" href="./css/main.css" />
 </head>
@@ -12,43 +12,87 @@
       <div class="boot-title">666SOUNDsDESIGn</div>
       <div class="boot-subtitle">Starting Audio Systems</div>
       <button id="bootButton" class="neon-button">OK</button>
-      <div class="progress-wrap" aria-hidden="true">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
+      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
       <div id="progressText" class="progress-text">0%</div>
-      <div class="boot-note">Tap once to initialize audio on iPhone / iPad.</div>
+      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
     </div>
   </div>
 
   <main class="app-shell">
     <section class="player-card">
-      <div class="brand">666SOUNDsDESIGn</div>
-      <div class="status-row">
+      <header class="topbar">
+        <div class="topbar-line"></div>
+        <div class="brand">666SOUNDsDESIGn</div>
+        <div class="topbar-line"></div>
+      </header>
+
+      <div class="status-grid">
+        <div class="lamp-box">
+          <span id="metaLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Meta</span>
+        </div>
+        <div class="lamp-box">
+          <span id="audioLamp" class="lamp lamp-red"></span>
+          <span class="lamp-label">Audio</span>
+        </div>
+        <div class="lamp-box">
+          <span id="sourceLamp" class="lamp lamp-cyan"></span>
+          <span class="lamp-label">Source</span>
+        </div>
+      </div>
+
+      <div class="pill-row">
         <span id="streamStatus" class="pill">Ready</span>
-        <span id="fallbackStatus" class="pill pill-dim">Primary</span>
+        <span id="sourceLabel" class="pill pill-dim">Primary</span>
       </div>
 
-      <div class="meta-block">
-        <div class="meta-label">Now Playing</div>
-        <div id="trackTitle" class="track-title">Waiting for stream data...</div>
-        <div id="djInfo" class="dj-info">DJ status unavailable</div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-label">Listeners</div>
-          <div id="listeners" class="stat-value">0</div>
+      <div id="historyBlock" class="display-block">
+        <div class="display-head">
+          <div class="display-label">Now Playing</div>
+          <button id="historyToggle" class="tiny-btn" type="button">History</button>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">Source</div>
-          <div id="sourceLabel" class="stat-value">Primary</div>
+        <div class="display-window">
+          <div id="nowPlaying" class="marquee-track">Loading metadata...</div>
+        </div>
+        <div id="historyOverlay" class="history-overlay hidden">
+          <div class="history-title">Last Tracks</div>
+          <ul id="historyList" class="history-list">
+            <li>No history loaded</li>
+          </ul>
         </div>
       </div>
 
-      <div class="controls">
-        <button id="playBtn" class="neon-button">Play</button>
-        <button id="pauseBtn" class="neon-button alt">Pause</button>
-        <button id="reconnectBtn" class="neon-button alt">Reconnect</button>
+      <div class="mini-grid">
+        <div class="mini-box">
+          <div class="mini-label">Listeners</div>
+          <div id="listenersText" class="mini-value">0 / 250</div>
+        </div>
+        <div class="mini-box">
+          <div class="mini-label">Bitrate</div>
+          <div id="bitrateText" class="mini-value">Unknown</div>
+        </div>
+        <div class="mini-box">
+          <div class="mini-label">DJ / Status</div>
+          <div id="djText" class="mini-value">Unknown</div>
+        </div>
+        <div class="mini-box">
+          <div class="mini-label">Volume</div>
+          <div id="volumeHint" class="mini-value">Use device buttons on iPhone</div>
+        </div>
+      </div>
+
+      <div class="control-strip">
+        <button id="playBtn" class="control-btn main" type="button">Play</button>
+        <button id="pauseBtn" class="control-btn" type="button">Pause</button>
+        <button id="reconnectBtn" class="control-btn" type="button">Reconnect</button>
+      </div>
+
+      <div class="audio-tools">
+        <button id="muteBtn" class="small-btn" type="button">Mute</button>
+        <div class="volume-wrap">
+          <label for="volumeRange">Volume</label>
+          <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
+        </div>
       </div>
 
       <audio id="radio" preload="none" playsinline></audio>
