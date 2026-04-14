@@ -1,5 +1,6 @@
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com/8686/stream";
+const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
 
 const HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -49,7 +50,7 @@ const HTML = `<!DOCTYPE html>
         <span id="sourceLabel" class="pill pill-dim">Primary</span>
       </div>
 
-      <div id="historyBlock" class="display-block">
+      <div class="display-block">
         <div class="display-head">
           <div class="display-label">Now Playing</div>
           <button id="historyToggle" class="tiny-btn" type="button">History</button>
@@ -80,7 +81,7 @@ const HTML = `<!DOCTYPE html>
         </div>
         <div class="mini-box">
           <div class="mini-label">Volume</div>
-          <div id="volumeHint" class="mini-value">Use device buttons on iPhone</div>
+          <div id="volumeHint" class="mini-value">Use iPhone buttons</div>
         </div>
       </div>
 
@@ -531,7 +532,7 @@ async function fetchMetadata() {
     const djStatus = pickValue(data, ["djusername", "djstatus", "client"], "AutoDJ");
 
     listenersText.textContent = \`\${Number.isFinite(listeners) ? listeners : 0} / \${STREAM_CONFIG.listener_capacity}\`;
-    bitrateText.textContent = bitrate ? String(bitrate) : "Unknown";
+    bitrateText.textContent = bitrate ? \`\${String(bitrate)} kbps\` : "Unknown";
     djText.textContent = String(djStatus);
     renderHistory(pickValue(data, ["history"], []));
 
@@ -551,7 +552,7 @@ function startMetadataLoop() {
 }
 
 async function tryPlayPrimary() {
-  audio.src = STREAM_CONFIG.primary_stream_url;
+  audio.src = STREAM_CONFIG.stream_url;
   await audio.play();
   setSource(false);
 }
@@ -672,26 +673,119 @@ setMetadataStatus("Loading...");
 fetchMetadata();
 `;
 const CONFIG_JS = `export const STREAM_CONFIG = {
-  "primary_stream_url": "https://my.idjstream.com/666soundsdesign/stream",
-  "fallback_stream_url": "https://my.idjstream.com/8686/stream",
-  "app_stream_url": "https://666soundsdesign-broadcaster.com/stream",
-  "metadata_url": "https://my.idjstream.com/cp/get_info.php?p=8686",
+  "stream_url": "/stream",
+  "fallback_stream_url": "/fallback-stream",
+  "metadata_url": "/api/nowplaying",
   "poll_interval_ms": 8000,
   "listener_capacity": 250,
   "use_webhook": false
 };
 `;
 
+function passthroughHeaders(sourceHeaders) {
+  const headers = new Headers();
+  const allow = [
+    "content-type",
+    "content-length",
+    "accept-ranges",
+    "content-range",
+    "cache-control",
+    "icy-br",
+    "icy-description",
+    "icy-genre",
+    "icy-metaint",
+    "icy-name",
+    "icy-notice1",
+    "icy-notice2",
+    "icy-pub",
+    "icy-url",
+    "transfer-encoding"
+  ];
+  for (const key of allow) {
+    const value = sourceHeaders.get(key);
+    if (value) headers.set(key, value);
+  }
+  headers.set("access-control-allow-origin", "*");
+  headers.set("x-radio-proxy", "666soundsdesign-worker");
+  return headers;
+}
+
+async function proxyStream(request, upstream) {
+  const init = {
+    method: request.method,
+    headers: new Headers()
+  };
+
+  const range = request.headers.get("range");
+  const userAgent = request.headers.get("user-agent");
+  const accept = request.headers.get("accept");
+  const icyMeta = request.headers.get("icy-metadata");
+
+  if (range) init.headers.set("range", range);
+  if (userAgent) init.headers.set("user-agent", userAgent);
+  if (accept) init.headers.set("accept", accept);
+  if (icyMeta) init.headers.set("icy-metadata", icyMeta);
+
+  const response = await fetch(upstream, init);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: passthroughHeaders(response.headers)
+  });
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/health") {
+      return new Response("OK", {
+        status: 200,
+        headers: {
+          "content-type": "text/plain; charset=UTF-8",
+          "cache-control": "no-store",
+          "access-control-allow-origin": "*"
+        }
+      });
+    }
+
+    if (url.pathname === "/api/nowplaying") {
+      try {
+        const upstream = await fetch(METADATA_URL, {
+          headers: { "cache-control": "no-store" }
+        });
+        const body = await upstream.text();
+        return new Response(body, {
+          status: upstream.status,
+          headers: {
+            "content-type": "application/json; charset=UTF-8",
+            "cache-control": "no-store",
+            "access-control-allow-origin": "*",
+            "x-radio-proxy": "666soundsdesign-worker"
+          }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: "metadata_proxy_failed" }), {
+          status: 502,
+          headers: {
+            "content-type": "application/json; charset=UTF-8",
+            "cache-control": "no-store",
+            "access-control-allow-origin": "*"
+          }
+        });
+      }
+    }
+
     if (url.pathname === "/stream") {
-      return Response.redirect(PRIMARY_STREAM_URL, 302);
+      try {
+        return await proxyStream(request, PRIMARY_STREAM_URL);
+      } catch (err) {
+        return await proxyStream(request, FALLBACK_STREAM_URL);
+      }
     }
 
     if (url.pathname === "/fallback-stream") {
-      return Response.redirect(FALLBACK_STREAM_URL, 302);
+      return await proxyStream(request, FALLBACK_STREAM_URL);
     }
 
     if (url.pathname === "/css/main.css") {
