@@ -1,15 +1,13 @@
-# RADIO_PLAYER_V2_REAL_FIX
+# RADIO_PLAYER_V2_PROXY_FIX
 
-Komplette Version mit:
-- direktem Stream
-- direkter JSON-Metadatenquelle
-- History-Overlay
-- Source/Fallback
-- Mute / Volume
-- iPhone Start-Overlay
+A-Version:
+- Worker macht Stream-Proxy
+- Worker macht Metadata-Proxy
+- Player ruft nur gleiche Domain auf
 
-JSON-Datenquelle:
-https://my.idjstream.com/cp/get_info.php?p=8686
-
-Stream:
-https://my.idjstream.com/666soundsdesign/stream
+Routen:
+- / -> Player
+- /health -> OK
+- /stream -> Primary Stream Proxy mit Fallback
+- /fallback-stream -> Fallback Stream Proxy
+- /api/nowplaying -> Metadata Proxy
