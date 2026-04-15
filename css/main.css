@@ -1,12 +1,3 @@
-html,body{
-margin:0;height:100svh;overflow:hidden;background:#000;color:#0ff;
-font-family:Arial;display:flex;align-items:center;justify-content:center;
-}
-.player{
-border:1px solid #0ff;padding:20px;border-radius:16px;
-box-shadow:0 0 20px rgba(0,255,255,0.3);
-}
-.controls{display:flex;gap:10px;margin-top:10px;}
-button{flex:1;padding:12px;background:#002;border:1px solid #0ff;color:#0ff;}
-.meter{margin-top:15px;height:10px;background:#111;border-radius:6px;overflow:hidden;}
-#level{height:100%;width:10%;background:#0ff;}
+body{background:#111;color:#fff;text-align:center}
+button{padding:10px;margin:5px}
+#bar{height:10px;background:#0ff;width:0%}
