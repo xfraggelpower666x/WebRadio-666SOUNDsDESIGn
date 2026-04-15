@@ -1,13 +1,12 @@
-ASSET FIX BUILD
+SAME URL FIX
 
-Goal:
-- Keep stream / metadata / health routes intact.
+Purpose:
 - Keep player separated in repo files.
-- Fix current white-page issue by explicitly serving the separated files from worker routes.
+- Avoid broken extra-path delivery on the public URL.
+- Serve CSS/JS/CONFIG through the same root URL using query markers.
 
-This build does NOT change player design or features.
-It only repairs delivery of:
-- /
-- /css/main.css
-- /js/app.js
-- /config/stream.config.js
+New runtime URLs:
+- /           -> index.html
+- /?asset=css -> css/main.css content
+- /?asset=js  -> js/app.js content
+- /?asset=config -> config/stream.config.js content
