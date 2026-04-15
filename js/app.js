@@ -1,41 +1,24 @@
-const audio=new Audio();
-const cfg=window.STREAM_CONFIG||{};
-const status=document.getElementById('status');
-const level=document.getElementById('level');
+const a=document.getElementById("a");
+let m=false;
 
-let ctx, analyser, source;
-
-document.getElementById('play').onclick=async()=>{
- try{
-  status.textContent='Verbinde…';
-  audio.src=cfg.streamUrl;
-  await audio.play();
-  setupAudio();
-  status.textContent='Live';
- }catch(e){status.textContent='Fehler';}
-};
-
-document.getElementById('stop').onclick=()=>{
- audio.pause();audio.src='';
- status.textContent='Bereit';
-};
-
-function setupAudio(){
- if(!ctx){
-  ctx=new AudioContext();
-  analyser=ctx.createAnalyser();
-  source=ctx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(ctx.destination);
-  loop();
- }
+function start(){
+let p=0;
+const bar=document.getElementById("bar");
+const t=setInterval(()=>{
+p+=5;
+bar.style.width=p+"%";
+if(p>=100){
+clearInterval(t);
+document.getElementById("boot").style.display="none";
+document.getElementById("player").style.display="block";
+}
+},50);
 }
 
-function loop(){
- requestAnimationFrame(loop);
- if(!analyser)return;
- const data=new Uint8Array(analyser.frequencyBinCount);
- analyser.getByteFrequencyData(data);
- let avg=data.reduce((a,b)=>a+b,0)/data.length;
- level.style.width=(avg/255*100)+'%';
+function play(){
+a.src="/stream";
+a.play();
 }
+
+function pause(){a.pause();}
+function mute(){m=!m;a.muted=m;}
