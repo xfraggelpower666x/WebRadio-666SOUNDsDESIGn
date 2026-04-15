@@ -7,6 +7,19 @@
   <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
+  <div id="bootOverlay" class="boot-overlay">
+    <div class="boot-card">
+      <div class="boot-brand">666SOUNDsDESIGn</div>
+      <div class="boot-sub">Starting Audio Systems</div>
+      <button id="bootBtn" class="boot-btn" type="button">OK</button>
+      <div class="boot-progress-wrap">
+        <div id="bootProgress" class="boot-progress-bar"></div>
+      </div>
+      <div id="bootPercent" class="boot-percent">0%</div>
+      <div class="boot-note">Auf iPhone zuerst OK drücken. Danach startet der Player.</div>
+    </div>
+  </div>
+
   <main class="app-shell">
     <section class="player-card">
       <header class="topbar">
@@ -106,6 +119,6 @@
     </section>
   </main>
 
-  <script type="module" src="js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
