@@ -1,15 +1,16 @@
 *{box-sizing:border-box}
 :root{
-  --bg-top:#0f1318;--bg-bottom:#1b2027;--panel:rgba(20,25,32,.92);--panel-2:rgba(28,34,44,.92);
+  --bg-top:#12161d;--bg-bottom:#1b212a;--panel:rgba(22,27,35,.94);--panel-2:rgba(30,36,46,.94);
   --text:#eef7ff;--muted:#aebdca;--cyan:#22f0ff;--pink:#ff49b7;--green:#47ff8a;--red:#ff5b73;
   --border-cyan:rgba(34,240,255,.26);--border-pink:rgba(255,73,183,.24);
   --shadow-cyan:0 0 22px rgba(34,240,255,.18);--shadow-pink:0 0 22px rgba(255,73,183,.14)
 }
 html,body{
   margin:0;min-height:100%;color:var(--text);font-family:Arial,Helvetica,sans-serif;
-  background:radial-gradient(circle at top left, rgba(255,73,183,.12), transparent 24%),
-             radial-gradient(circle at bottom right, rgba(34,240,255,.14), transparent 26%),
-             linear-gradient(180deg,var(--bg-top),var(--bg-bottom))
+  background:
+    radial-gradient(circle at top left, rgba(255,73,183,.12), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(34,240,255,.14), transparent 26%),
+    linear-gradient(180deg,var(--bg-top),var(--bg-bottom))
 }
 body{min-height:100vh}
 .app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
@@ -57,6 +58,31 @@ body{min-height:100vh}
 .slider-label{display:block;margin-bottom:10px}
 .volume-slider{width:100%}
 audio{width:100%;margin-top:12px}
+.boot-overlay{
+  position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:18px;
+  background:rgba(6,8,12,.88)
+}
+.boot-overlay.hidden{display:none}
+.boot-card{
+  width:min(92vw,520px);padding:24px;border-radius:24px;
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--border-cyan);box-shadow:var(--shadow-cyan),var(--shadow-pink);text-align:center
+}
+.boot-brand{color:var(--cyan);font-size:1.5rem;font-weight:700;letter-spacing:.06em;text-shadow:0 0 12px rgba(34,240,255,.34)}
+.boot-sub{color:var(--muted);margin:10px 0 18px}
+.boot-btn{
+  appearance:none;border:1px solid var(--border-pink);border-radius:16px;padding:14px 20px;
+  background:linear-gradient(180deg,rgba(34,240,255,.14),rgba(255,73,183,.08));color:var(--text);
+  font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-pink)
+}
+.boot-progress-wrap{
+  width:100%;height:12px;margin-top:18px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden
+}
+.boot-progress-bar{
+  width:0;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .12s linear
+}
+.boot-percent{margin-top:10px;font-weight:700}
+.boot-note{margin-top:12px;color:var(--muted);font-size:.9rem}
 @media (max-width:720px){
   .player-card{width:min(96vw,96vw);padding:14px;border-radius:20px}
   .system-grid,.meta-grid,.control-panel,.status-strip{grid-template-columns:1fr}
