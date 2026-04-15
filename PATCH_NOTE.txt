@@ -1,0 +1,6 @@
+This build preserves the original repo structure and keeps both worker.js files identical.
+Patch scope:
+- iPhone-safe first play attempt is triggered directly inside the boot button tap.
+- No worker routes were removed.
+- No player extraction/refactor was done.
+Use this ZIP as a full snapshot.
