@@ -1,6 +1,17 @@
-This build preserves the original repo structure and keeps both worker.js files identical.
-Patch scope:
-- iPhone-safe first play attempt is triggered directly inside the boot button tap.
-- No worker routes were removed.
-- No player extraction/refactor was done.
-Use this ZIP as a full snapshot.
+REPAIR + SWITCH BUILD
+
+What changed:
+- The original embedded player was extracted 1:1 from the worker into:
+  - index.html
+  - css/main.css
+  - js/app.js
+  - config/stream.config.js
+- Active worker now serves the frontend from external static assets.
+- Stream/API/health routes remain in the worker.
+- Original embedded-player worker is preserved as:
+  - worker.ORIGINAL.js
+  - workers/webradio-666soundsdesign-worker/worker.ORIGINAL.js
+
+Important:
+- Active worker.js in root and active worker.js in workers/... are identical.
+- Original backup worker files are identical to the original uploaded worker.
