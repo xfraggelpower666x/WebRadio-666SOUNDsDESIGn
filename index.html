@@ -1,106 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn Radio</title>
-  <link rel="stylesheet" href="css/main.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>666 Player</title>
+<link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
-  <div id="bootOverlay" class="boot-overlay">
-    <div class="boot-card">
-      <div class="boot-brand">666SOUNDsDESIGn</div>
-      <div class="boot-subtitle">Starting Audio Systems</div>
-      <button id="bootButton" class="boot-button" type="button">OK</button>
-      <div class="boot-progress-wrap"><div id="bootProgress" class="boot-progress-bar"></div></div>
-      <div id="bootPercent" class="boot-percent">0%</div>
-      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
+<div class="app">
+  <div class="player">
+    <h1>666SOUNDsDESIGn</h1>
+    <div id="status">Bereit</div>
+    <div class="controls">
+      <button id="play">Play</button>
+      <button id="stop">Stop</button>
     </div>
+    <div class="meter"><div id="level"></div></div>
   </div>
-
-  <main class="app-shell">
-    <section class="player-card">
-      <header class="topbar">
-        <div class="topbar-line"></div>
-        <div class="brand-wrap">
-          <div class="brand">666SOUNDsDESIGn</div>
-          <div class="brand-sub">DIGITAL UNDERGROUND CONNECTED</div>
-        </div>
-        <div class="topbar-line"></div>
-      </header>
-
-      <section class="status-grid">
-        <div class="status-box">
-          <div class="status-head"><span id="healthLamp" class="lamp lamp-red"></span><span class="status-title">Worker</span></div>
-          <div id="healthText" class="status-value">Checking…</div>
-        </div>
-        <div class="status-box">
-          <div class="status-head"><span id="audioLamp" class="lamp lamp-red"></span><span class="status-title">Audio</span></div>
-          <div id="audioText" class="status-value">Idle</div>
-        </div>
-        <div class="status-box">
-          <div class="status-head"><span id="metaLamp" class="lamp lamp-red"></span><span class="status-title">Metadata</span></div>
-          <div id="metaText" class="status-value">Waiting…</div>
-        </div>
-      </section>
-
-      <section class="pill-row">
-        <div class="pill"><span class="pill-label">Source</span><span id="sourceText" class="pill-value">Primary</span></div>
-        <div class="pill"><span class="pill-label">State</span><span id="stateText" class="pill-value">Ready</span></div>
-      </section>
-
-      <section class="display-panel">
-        <div class="display-head">
-          <div class="display-head-copy">
-            <div class="panel-kicker">Now Playing</div>
-            <div id="trackTitle" class="track-title">Loading metadata…</div>
-          </div>
-          <button id="historyToggle" class="tiny-button" type="button">History</button>
-        </div>
-
-        <div class="meta-grid">
-          <div class="meta-box">
-            <div class="meta-label">Listeners</div>
-            <div id="listenersText" class="meta-value">0 / 250</div>
-          </div>
-          <div class="meta-box">
-            <div class="meta-label">Bitrate</div>
-            <div id="bitrateText" class="meta-value">Unknown</div>
-          </div>
-          <div class="meta-box">
-            <div class="meta-label">DJ / Status</div>
-            <div id="djText" class="meta-value">Unknown</div>
-          </div>
-          <div class="meta-box">
-            <div class="meta-label">Volume</div>
-            <div id="volumeHint" class="meta-value">Standby</div>
-          </div>
-        </div>
-
-        <div id="historyPanel" class="history-panel hidden">
-          <div class="panel-kicker">Last Tracks</div>
-          <ul id="historyList" class="history-list">
-            <li>No history loaded</li>
-          </ul>
-        </div>
-      </section>
-
-      <section class="control-strip">
-        <button id="playBtn" class="control-button main" type="button">Play</button>
-        <button id="pauseBtn" class="control-button" type="button">Pause</button>
-        <button id="muteBtn" class="control-button secondary" type="button">Mute</button>
-        <button id="reconnectBtn" class="control-button" type="button">Reconnect</button>
-      </section>
-
-      <section class="volume-panel">
-        <label class="volume-label" for="volumeRange">Volume</label>
-        <input id="volumeRange" class="volume-slider" type="range" min="0" max="1" step="0.01" value="1" />
-      </section>
-
-      <audio id="radio" preload="none" playsinline></audio>
-    </section>
-  </main>
-
-  <script src="js/app.js"></script>
+</div>
+<script src="./config/stream.config.js"></script>
+<script src="./js/app.js"></script>
 </body>
 </html>
