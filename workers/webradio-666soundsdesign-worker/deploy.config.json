@@ -1,6 +1,6 @@
 {
   "worker_name": "webradio-666soundsdesign-worker",
-  "entry_file": "worker.js",
+  "entry_file": "workers/webradio-666soundsdesign-worker/worker.js",
   "deploy_mode": "github_auto",
   "primary_upstream": "https://my.idjstream.com/666soundsdesign/stream",
   "fallback_upstream": "https://my.idjstream.com:8686/stream",
