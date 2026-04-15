@@ -2,21 +2,24 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>666 Radio</title>
-<style>
-body{background:#111;color:#fff;font-family:Arial;text-align:center;padding:40px}
-button{padding:15px;margin:10px}
-</style>
+<title>666 Player</title>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-<h1>666SOUNDsDESIGn</h1>
+
+<div id="boot">
+<button onclick="start()">OK</button>
+<div id="bar"></div>
+</div>
+
+<div id="player" style="display:none">
+<h2>666SOUNDsDESIGn</h2>
 <button onclick="play()">PLAY</button>
-<button onclick="stop()">STOP</button>
+<button onclick="pause()">PAUSE</button>
+<button onclick="mute()">MUTE</button>
 <audio id="a" playsinline></audio>
-<script>
-const a=document.getElementById("a");
-function play(){a.src="/stream";a.play();}
-function stop(){a.pause();}
-</script>
+</div>
+
+<script src="js/app.js"></script>
 </body>
 </html>
