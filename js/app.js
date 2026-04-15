@@ -1,4 +1,10 @@
-import { STREAM_CONFIG } from "../config/stream.config.js";
+const STREAM_CONFIG = {
+  stream_url: "/stream",
+  fallback_stream_url: "/fallback-stream",
+  metadata_url: "/api/nowplaying",
+  poll_interval_ms: 8000,
+  listener_capacity: 250
+};
 
 const radio = document.getElementById("radio");
 const playBtn = document.getElementById("playBtn");
@@ -25,12 +31,18 @@ const bitrateText = document.getElementById("bitrateText");
 const djText = document.getElementById("djText");
 const volumeHint = document.getElementById("volumeHint");
 
+const bootOverlay = document.getElementById("bootOverlay");
+const bootBtn = document.getElementById("bootBtn");
+const bootProgress = document.getElementById("bootProgress");
+const bootPercent = document.getElementById("bootPercent");
+
 let usingFallback = false;
 let muted = false;
 let metadataTimer = null;
 let healthTimer = null;
 let historyOpen = false;
 let lastTitle = "Loading metadata…";
+let booted = false;
 
 function setLamp(el, state) {
   if (!el) return;
@@ -147,6 +159,30 @@ async function safePlay() {
     }
   }
 }
+
+function runBootSequence() {
+  return new Promise((resolve) => {
+    let p = 0;
+    const timer = setInterval(() => {
+      p += 4;
+      if (p > 100) p = 100;
+      bootProgress.style.width = p + "%";
+      bootPercent.textContent = p + "%";
+      if (p >= 100) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, 42);
+  });
+}
+
+bootBtn.addEventListener("click", async () => {
+  if (booted) return;
+  booted = true;
+  bootBtn.disabled = true;
+  await runBootSequence();
+  bootOverlay.classList.add("hidden");
+});
 
 playBtn.addEventListener("click", safePlay);
 
