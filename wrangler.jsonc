@@ -1,5 +1,4 @@
 {
-  "name": "webradio-666soundsdesign-worker",
-  "main": "workers/webradio-666soundsdesign-worker/worker.js",
-  "compatibility_date": "2024-05-15"
+  "name": "webradio-666soundsdesign",
+  "main": "worker.js"
 }
