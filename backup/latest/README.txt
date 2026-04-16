@@ -1,7 +1,11 @@
-666SOUNDsDESIGn External Player Levelmeter Package
+666SOUNDsDESIGn — WORKER MINI PATCH READY FINAL
 
-- fixed left + right side levelmeters
-- realtime audio-reactive via Web Audio API
-- starts from the existing OK button / boot overlay
-- no worker changes
-- test via hosted URL, not file:// local
+This ZIP already contains the real player URL.
+
+Root redirect target:
+https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/
+
+Use:
+1. unzip
+2. upload worker.js with Scriptable
+3. done
