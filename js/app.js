@@ -1,4 +1,4 @@
-import { STREAM_CONFIG } from "/?asset=config";
+const STREAM_CONFIG = window.STREAM_CONFIG || {};
 const overlay=document.getElementById("bootOverlay");
 const bootButton=document.getElementById("bootButton");
 const progressBar=document.getElementById("progressBar");
