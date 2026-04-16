@@ -133,10 +133,20 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
 
       <div id="infoBubble" class="info-bubble hidden" role="status" aria-live="polite"></div>
 
-      <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
+      <audio id="radio" preload="none" playsinline webkit-playsinline crossorigin="anonymous"></audio>
     </section>
   </main>
 
-  <script type="module" src="./js/app.js"></script>
-</body>
+  <script src="./js/app.bundle.js"></script>
+  <script>
+    window.addEventListener('error', function (event) {
+      var txt = document.getElementById('progressText');
+      var note = document.getElementById('volumeHint');
+      var btn = document.getElementById('bootButton');
+      if (txt) txt.textContent = 'SCRIPT ERROR';
+      if (note) note.textContent = 'Frontend-Fehler: ' + (event && event.message ? event.message : 'Unbekannter Fehler');
+      if (btn) btn.disabled = false;
+    });
+  </script>
+  </body>
 </html>
