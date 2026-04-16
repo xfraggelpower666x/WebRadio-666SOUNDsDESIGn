@@ -1,12 +1,8 @@
-SAME URL FIX
+JS FIX FINAL
 
-Purpose:
-- Keep player separated in repo files.
-- Avoid broken extra-path delivery on the public URL.
-- Serve CSS/JS/CONFIG through the same root URL using query markers.
-
-New runtime URLs:
-- /           -> index.html
-- /?asset=css -> css/main.css content
-- /?asset=js  -> js/app.js content
-- /?asset=config -> config/stream.config.js content
+Only change:
+- Removed ES module import dependency from app.js
+- Config is loaded as plain global JS before app.js
+- Same-URL asset delivery retained
+- No player redesign
+- Stream / metadata / health routes unchanged
