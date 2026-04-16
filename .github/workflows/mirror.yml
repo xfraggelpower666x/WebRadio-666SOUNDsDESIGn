@@ -1,0 +1,21 @@
+name: Mirror Backup
+
+on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Mirror Repo
+        run: |
+          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn-Backup-Mirror.git
+          git push mirror --mirror
