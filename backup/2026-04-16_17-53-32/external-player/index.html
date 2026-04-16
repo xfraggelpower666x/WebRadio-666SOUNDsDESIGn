@@ -1,0 +1,122 @@
+<!-- ==========================================
+DATEI: external-player/index.html
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-16
+ZWECK: Startseite des externen Standard-Players.
+ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+========================================== -->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>666SOUNDsDESIGn Radio — External</title>
+  <link rel="icon" type="image/png" href="./assets/icons/external-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/external-icon.png" />
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<body>
+  <div class="player-badge player-badge-external"><span class="player-badge-dot"></span><span>EXTERNAL</span></div>
+  <div class="hud-top-strip hud-top-strip-a" aria-hidden="true"></div>
+  <div class="hud-top-strip hud-top-strip-b" aria-hidden="true"></div>
+  <div class="hud-top-strip hud-top-strip-c" aria-hidden="true"></div>
+
+  <div class="side-meter side-meter-left" aria-hidden="true">
+    <div class="side-meter-track"><div id="leftMeterFill" class="side-meter-fill"></div></div>
+  </div>
+  <div class="side-meter side-meter-right" aria-hidden="true">
+    <div class="side-meter-track"><div id="rightMeterFill" class="side-meter-fill"></div></div>
+  </div>
+
+  <div id="bootOverlay" class="overlay">
+    <div class="boot-panel">
+      <div class="boot-title">666SOUNDsDESIGn</div>
+      <div class="boot-subtitle">Starting Audio Systems</div>
+      <button id="bootButton" class="neon-button">OK</button>
+      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+      <div id="progressText" class="progress-text">0%</div>
+      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <section class="player-card">
+      <header class="hero-header">
+        <img class="hero-logo" src="./assets/images/logo-neon.png" alt="666SOUNDsDESIGn Logo" />
+      </header>
+
+      <section class="meta-hero">
+        <div class="cover-shell">
+          <div class="cover-frame"></div>
+          <img id="coverImage" class="cover-image" src="./assets/images/fallback-cover.png" alt="Stream Cover" />
+        </div>
+
+        <div class="meta-stack">
+          <div class="meta-chip-row">
+            <div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">Meta</span></div>
+            <div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">Audio</span></div>
+            <div class="lamp-box"><span id="sourceLamp" class="lamp lamp-cyan"></span><span class="lamp-label">Source</span></div>
+          </div>
+
+          <div class="pill-row">
+            <span id="streamStatus" class="pill">Ready</span>
+            <span id="sourceLabel" class="pill pill-dim">Primary</span>
+            <span id="fallbackText" class="pill pill-dim">Standby</span>
+          </div>
+
+          <div class="headline-block">
+            <div class="headline-label">Now Playing</div>
+            <div id="metaText" class="headline-state">Loading...</div>
+            <div id="titleText" class="headline-title">Loading metadata...</div>
+            <div id="artistText" class="headline-artist">666SOUNDsDESIGn DJ</div>
+          </div>
+
+          <div class="hud-mini-grid">
+            <div class="mini-box"><div class="mini-label">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
+            <div class="mini-box"><div class="mini-label">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
+            <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">666SOUNDsDESIGn DJ</div></div>
+            <div class="mini-box"><div class="mini-label">Stream</div><div id="streamNameText" class="mini-value">666SOUNDsDESIGn Radio</div></div>
+            <div class="mini-box"><div class="mini-label">Genre</div><div id="genreText" class="mini-value">Unknown</div></div>
+            <div class="mini-box"><div class="mini-label">Server / Info</div><div id="serverText" class="mini-value">Live Stream</div></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="display-block">
+        <div class="display-head">
+          <div class="display-label">Track Flow</div>
+          <button id="historyToggle" class="tiny-btn" type="button">History</button>
+        </div>
+        <div class="display-window">
+          <div id="nowPlaying" class="marquee-track">Loading metadata...</div>
+        </div>
+        <div id="historyOverlay" class="history-overlay hidden">
+          <div class="history-title">Last Tracks</div>
+          <ul id="historyList" class="history-list">
+            <li>No history loaded</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="control-strip">
+        <button id="playBtn" class="control-btn main" type="button">Play</button>
+        <button id="pauseBtn" class="control-btn" type="button">Pause</button>
+        <button id="reconnectBtn" class="control-btn" type="button">Reconnect</button>
+      </div>
+
+      <div class="audio-tools">
+        <button id="muteBtn" class="small-btn" type="button">Mute</button>
+        <div class="volume-wrap">
+          <label for="volumeRange">Volume</label>
+          <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
+        </div>
+      </div>
+
+      <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
+    </section>
+  </main>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
