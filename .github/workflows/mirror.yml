@@ -1,4 +1,29 @@
-name: Mirror Backup
+# ==========================================
+# 666SOUNDsDESIGn — VERSION BACKUP WORKFLOW
+# ==========================================
+#
+# TYPE:        GitHub Actions Workflow
+# PURPOSE:     Spiegelung des Haupt-Branches in einen internen
+#              Backup-Branch inkl. versionierter Snapshots
+# SCOPE:       Gleiches Repository / Branch-Backup-System
+#
+# VERSION:     v1.0
+#
+# CREATED:     2026-04-16
+# UPDATED:     2026-04-16
+#
+# CHANGELOG:
+# - v1.0: Erstversion mit current/, backup/latest/ und Zeitstempel-Snapshot
+#
+# NOTES:
+# - Hauptbranch: WebRadio-666SOUNDsDESIGn
+# - Backup-Branch: 666BackupMirror
+# - Der Workflow überschreibt current/ und backup/latest/ bewusst
+# - Zeitstempel-Snapshots bleiben erhalten
+#
+# ==========================================
+
+name: Version Backup
 
 on:
   push:
@@ -9,20 +34,121 @@ permissions:
   contents: write
 
 jobs:
-  mirror:
+  version-backup:
     runs-on: ubuntu-latest
 
     steps:
+      # ==========================================
+      # Quell-Branch vollständig auschecken
+      # ==========================================
       - name: Checkout source branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: WebRadio-666SOUNDsDESIGn
 
-      - name: Push to backup branch in same repo
+      # ==========================================
+      # Git-Identität für den Action-Commit setzen
+      # ==========================================
+      - name: Configure git identity
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
 
-          git checkout -B 666BackupMirror
+      # ==========================================
+      # Backup-Branch vorbereiten
+      # - Falls Branch existiert: auschecken
+      # - Falls nicht: neu anlegen
+      # ==========================================
+      - name: Prepare backup branch
+        run: |
+          if git ls-remote --heads origin 666BackupMirror | grep 666BackupMirror; then
+            git fetch origin 666BackupMirror
+            git checkout 666BackupMirror
+            git reset --hard origin/666BackupMirror
+          else
+            git checkout --orphan 666BackupMirror
+            git rm -rf . || true
+            echo "Initial backup branch" > BACKUP_INFO.txt
+            git add BACKUP_INFO.txt
+            git commit -m "Initialize backup branch"
+            git push origin 666BackupMirror
+          fi
+
+      # ==========================================
+      # Quellstand separat exportieren
+      # So vermeiden wir Chaos beim Branch-Wechsel
+      # ==========================================
+      - name: Export source snapshot
+        run: |
+          mkdir -p /tmp/source-export
+          git archive --format=tar WebRadio-666SOUNDsDESIGn | tar -xf - -C /tmp/source-export
+
+      # ==========================================
+      # Zeitstempel für versionierte Backups erzeugen
+      # ==========================================
+      - name: Create timestamp
+        id: ts
+        run: |
+          echo "value=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+
+      # ==========================================
+      # Backup-Struktur aufbauen
+      # - current/         = aktueller Stand
+      # - backup/latest/   = letzter Stand
+      # - backup/<stamp>/  = historischer Snapshot
+      # ==========================================
+      - name: Build backup structure
+        run: |
+          SNAPSHOT="backup/${{ steps.ts.outputs.value }}"
+
+          mkdir -p current
+          mkdir -p backup/latest
+          mkdir -p "$SNAPSHOT"
+
+          # current leeren und neu befüllen
+          find current -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+          cp -R /tmp/source-export/. current/
+
+          # latest leeren und neu befüllen
+          find backup/latest -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+          cp -R /tmp/source-export/. backup/latest/
+
+          # Zeitstempel-Snapshot anlegen
+          cp -R /tmp/source-export/. "$SNAPSHOT"/
+
+          # Info-Datei aktualisieren
+          cat > BACKUP_INFO.txt <<EOF
+          ==========================================
+          666SOUNDsDESIGn — VERSION BACKUP INFO
+          ==========================================
+
+          TYPE:        Backup Branch Info
+          PURPOSE:     Dokumentiert den aktuellen Stand des Backup-Branches
+          VERSION:     v1.0
+
+          SOURCE_BRANCH: WebRadio-666SOUNDsDESIGn
+          BACKUP_BRANCH: 666BackupMirror
+
+          LAST_BACKUP:  ${{ steps.ts.outputs.value }}
+
+          STRUCTURE:
+          - current/       = aktueller kompletter Stand
+          - backup/latest/ = letzte gespiegelte Version
+          - backup/<time>/ = historische Snapshot-Versionen
+          EOF
+
+      # ==========================================
+      # Alles committen und auf Backup-Branch pushen
+      # ==========================================
+      - name: Commit and push backup
+        run: |
+          git add current backup BACKUP_INFO.txt
+
+          if git diff --cached --quiet; then
+            echo "No backup changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Version backup: ${{ steps.ts.outputs.value }}"
           git push origin 666BackupMirror --force
