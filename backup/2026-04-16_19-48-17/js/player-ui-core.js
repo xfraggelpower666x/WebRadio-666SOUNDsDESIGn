@@ -16,7 +16,7 @@ function bindPress(target, handler) {
 }
 
 // ==========================================
-// DATEI: external-player/js/player-ui-core.js
+// DATEI: js/player-ui-core.js
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-16
 // ZWECK: Gemeinsame Frontend-Logik für externen Haupt-Player und internen Worker-Fallback.
