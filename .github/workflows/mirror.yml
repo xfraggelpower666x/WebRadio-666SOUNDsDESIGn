@@ -15,6 +15,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      name: Mirror Backup
+
+on:
+  push:
+    branches:
+      - main   # <- WICHTIG
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Push to Mirror Repo
         run: |
           git config --global user.name "github-actions"
@@ -22,4 +39,4 @@ jobs:
 
           git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn-Backup-Mirror.git
 
-          git push mirror HEAD:WebRadio-666SOUNDsDESIGn
+          git push mirror HEAD:main --force
