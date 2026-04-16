@@ -1,0 +1,1 @@
+Self-healing package added. Last-known-good stores the original stable internal worker. Root path now checks external-player and falls back to internal worker player automatically.
