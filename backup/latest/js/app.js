@@ -2,31 +2,17 @@
 // DATEI: js/app.js
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-16
-// ZWECK: Frontend-Logik des internen Repo-Players.
-// ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+// ZWECK: Startet den internen Fallback-Player mit gemeinsamer Player-Logik.
+// ÄNDERUNG: Auf das gemeinsame One-Page-Cyber-Frontend umgestellt.
 // ==========================================
 
-const a=document.getElementById("a");
-let m=false;
+import { STREAM_CONFIG } from '../config/stream.config.js';
+import { UI_CONFIG } from '../config/ui.config.js';
+import { initPlayer } from './player-ui-core.js';
 
-function start(){
-let p=0;
-const bar=document.getElementById("bar");
-const t=setInterval(()=>{
-p+=5;
-bar.style.width=p+"%";
-if(p>=100){
-clearInterval(t);
-document.getElementById("boot").style.display="none";
-document.getElementById("player").style.display="block";
-}
-},50);
-}
-
-function play(){
-a.src="/stream";
-a.play();
-}
-
-function pause(){a.pause();}
-function mute(){m=!m;a.muted=m;}
+initPlayer({
+  streamConfig: STREAM_CONFIG,
+  uiConfig: UI_CONFIG,
+  mode: 'internal',
+  assetPrefix: '.'
+});
