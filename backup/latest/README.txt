@@ -1,8 +1,8 @@
-666SOUNDsDESIGn — FINAL FIX ZIP
+666SOUNDsDESIGn — PLAYER FIX ZIP
 
-This ZIP already contains the corrected redirect target:
+This ZIP redirects the domain root "/" to:
 
-https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/
+https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/index.html
 
 Use:
 1. unzip
