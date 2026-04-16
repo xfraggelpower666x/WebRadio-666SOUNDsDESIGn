@@ -1,4 +1,4 @@
-export const STREAM_CONFIG = {
+window.STREAM_CONFIG = {
   "stream_url": "/stream",
   "fallback_stream_url": "/fallback-stream",
   "metadata_url": "/api/nowplaying",
