@@ -1,11 +1,7 @@
-666SOUNDsDESIGn External Player Package
+666SOUNDsDESIGn External Player Levelmeter Package
 
-Additive package only.
-No worker changes.
-External player uses the live worker endpoints for stream and metadata.
-
-Path:
-external-player/
-
-Test this separately first.
-Only after successful testing should fallback/switch logic be added to the worker.
+- fixed left + right side levelmeters
+- realtime audio-reactive via Web Audio API
+- starts from the existing OK button / boot overlay
+- no worker changes
+- test via hosted URL, not file:// local
