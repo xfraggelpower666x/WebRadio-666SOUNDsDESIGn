@@ -5,6 +5,8 @@
 // ZWECK: Gemeinsame Frontend-Logik für externen Haupt-Player und internen Worker-Fallback.
 // ÄNDERUNG: Tap-Infos für Statuslampen, kompakter Header, Logo-/Panel-UI und iPhone-sicheres
 //           Touch-Verhalten ergänzt, ohne den Worker oder seine Endpunkte umzubauen.
+//           2026-04-16 FINAL FIX: iPhone-Startfreigabe jetzt direkt im User-Gesture-Pfad,
+//           damit AudioContext/HTMLAudio nicht erst NACH der Boot-Animation initialisiert werden.
 // ==========================================
 
 export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
@@ -94,16 +96,21 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
     elements.volumeHint.textContent = 'Auf iPhone / iPad: erst Audio Start tippen, dann laufen Stream und Meter sauber.';
   }
 
-  elements.bootButton?.addEventListener('click', async () => {
+  bindPress(elements.bootButton, async () => {
     if (state.booted) return;
     state.booted = true;
-    elements.bootButton.disabled = true;
+    if (elements.bootButton) {
+      elements.bootButton.disabled = true;
+      elements.bootButton.textContent = 'Initialisiere...';
+    }
+    await unlockAudioFromGesture();
     await runBootSequence();
     elements.overlay?.classList.add('hidden');
     await safePlay();
   });
 
-  elements.playBtn?.addEventListener('click', async () => {
+  bindPress(elements.playBtn, async () => {
+    await unlockAudioFromGesture();
     await safePlay();
   });
 
@@ -186,6 +193,71 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
       if (uiConfig.labels[key]) node.textContent = uiConfig.labels[key];
     });
   }
+  function bindPress(node, handler) {
+    if (!node) return;
+    let lastTouchTs = 0;
+    const run = async (event) => {
+      if (event) {
+        if (event.type === 'click' && Date.now() - lastTouchTs < 700) return;
+        if (event.type === 'touchend' || event.type === 'pointerup') lastTouchTs = Date.now();
+        event.preventDefault?.();
+        event.stopPropagation?.();
+      }
+      try {
+        await handler(event);
+      } catch (error) {
+        showInfo('Start fehlgeschlagen. Bitte erneut tippen.');
+      }
+    };
+    node.style.touchAction = 'manipulation';
+    node.addEventListener('touchend', run, { passive: false });
+    node.addEventListener('pointerup', run);
+    node.addEventListener('click', run);
+    node.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') run(event);
+    });
+  }
+
+  async function unlockAudioFromGesture() {
+    try {
+      if (!state.audioContext) {
+        state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (state.audioContext.state === 'suspended') {
+        await state.audioContext.resume();
+      }
+    } catch (error) {
+      // AudioContext kann auf einzelnen Geräten verzögert kommen; HTMLAudio wird unten zusätzlich geprimt.
+    }
+
+    try {
+      elements.audio.playsInline = true;
+      elements.audio.setAttribute('playsinline', '');
+      elements.audio.setAttribute('webkit-playsinline', '');
+      const previousMuted = elements.audio.muted;
+      const previousVolume = elements.audio.volume;
+      const previousSrc = elements.audio.getAttribute('src') || '';
+      elements.audio.muted = true;
+      elements.audio.volume = 0;
+      if (!elements.audio.src) {
+        elements.audio.src = streamConfig.stream_url;
+      }
+      const playPromise = elements.audio.play();
+      if (playPromise && typeof playPromise.then === 'function') {
+        await playPromise.then(() => elements.audio.pause()).catch(() => {});
+      }
+      elements.audio.currentTime = 0;
+      elements.audio.muted = previousMuted || state.muted;
+      elements.audio.volume = Number(elements.volumeRange?.value ?? previousVolume ?? 1);
+      if (!previousSrc) {
+        elements.audio.removeAttribute('src');
+        elements.audio.load();
+      }
+    } catch (error) {
+      // Auf manchen iPhones reicht schon das Touch-Resume des AudioContext; harter Fehler ist hier nicht kritisch.
+    }
+  }
+
 
   function bindInfoTriggers() {
     document.querySelectorAll('.info-trigger').forEach((button) => {
