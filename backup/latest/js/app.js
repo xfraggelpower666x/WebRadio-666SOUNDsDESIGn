@@ -1,3 +1,11 @@
+// ==========================================
+// DATEI: js/app.js
+// ERSTELLT: 2026-04-16
+// GEÄNDERT: 2026-04-16
+// ZWECK: Frontend-Logik des internen Repo-Players.
+// ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+// ==========================================
+
 const a=document.getElementById("a");
 let m=false;
 
