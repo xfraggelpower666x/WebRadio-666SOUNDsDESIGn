@@ -3,7 +3,7 @@ name: Mirror Backup
 on:
   push:
     branches:
-      - WebRadio-666SOUNDsDESIGn
+      - BACKUP-MIRROR
 
 jobs:
   mirror:
