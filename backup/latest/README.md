@@ -1,3 +1,11 @@
+==========================================
+DATEI: README.md
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-16
+ZWECK: Kurzbeschreibung des Projekts und der Repo-Struktur.
+ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+==========================================
+
 # RADIO_PLAYER_V2_PROXY_FIX_R2
 
 Korrigierte A-Version mit exakt deinen Stream-URLs.

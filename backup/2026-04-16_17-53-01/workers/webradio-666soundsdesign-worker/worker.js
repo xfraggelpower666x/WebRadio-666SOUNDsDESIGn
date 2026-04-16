@@ -1,16 +1,3 @@
-// ==========================================
-// DATEI: AKTIVER_WORKER_MIRROR
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// STATUS: AKTIV
-// ZWECK: Gespiegelter Haupt-Worker für 666SOUNDsDESIGn Radio mit externem Standard-Player,
-//        internem Notfall-Fallback, Stream-/Metadaten-Proxy und stabiler Domain-Auslieferung.
-// ÄNDERUNG: Redirect auf github.io entfernt; externer Player wird jetzt per Proxy unter
-//           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
-//           bleiben bewusst unangetastet.
-// HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
-// ==========================================
-
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
@@ -210,88 +197,18 @@ async function proxyStream(request,upstream){
   return new Response(response.body,{status:response.status,statusText:response.statusText,headers:passthroughHeaders(response.headers)});
 }
 
-
-function buildExternalProxyHeaders(sourceHeaders){
-  // Relevante Header des externen Players sauber an den Browser weiterreichen.
-  const headers = new Headers(sourceHeaders);
-  headers.set("cache-control", "no-store");
-  headers.delete("content-security-policy");
-  headers.delete("x-frame-options");
-  headers.delete("content-length");
-  headers.set("x-player-mode", "external-proxy");
-  return headers;
-}
-
-async function fetchExternalAsset(pathname, request){
-  // Externe Player-Dateien unter derselben Domain ausliefern, damit github.io nicht sichtbar wird.
-  const suffix = pathname.replace(/^\/external-player\/?/, "");
-  const upstreamUrl = new URL(suffix || "", EXTERNAL_PLAYER_URL).toString();
-  const init = {
-    method: request.method,
-    headers: {
-      "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",
-      "cache-control": "no-store"
-    },
-    redirect: "follow"
-  };
-  const response = await fetch(upstreamUrl, init);
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: buildExternalProxyHeaders(response.headers)
-  });
-}
-
-async function serveExternalIndex(request){
-  // Startseite des externen Players laden und mit Base-Tag versehen.
-  // Dadurch bleiben Asset-Pfade stabil, obwohl die Domain oben gleich bleibt.
-  const response = await fetch(EXTERNAL_PLAYER_URL, {
-    method: "GET",
-    headers: {
-      "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",
-      "cache-control": "no-store"
-    },
-    redirect: "follow"
-  });
-  let html = await response.text();
-  if (!html.includes('<base href="/external-player/">')) {
-    html = html.replace("<head>", '<head>\n  <base href="/external-player/">');
-  }
-  const headers = buildExternalProxyHeaders(response.headers);
-  headers.set("content-type", "text/html; charset=UTF-8");
-  return new Response(html, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
-}
-
 export default {
   async fetch(request){
     const url=new URL(request.url);
-
-    // Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       const externalOk = await checkExternal();
       if(externalOk){
-        return await serveExternalIndex(request);
+        return Response.redirect(EXTERNAL_PLAYER_URL, 302);
       }
     }
-
-    // Direkte Proxy-Auslieferung für alle externen Player-Assets unter derselben Domain.
-    if(url.pathname==="/external-player" || url.pathname==="/external-player/"){
-      return await serveExternalIndex(request);
-    }
-    if(url.pathname.startsWith("/external-player/")){
-      return await fetchExternalAsset(url.pathname, request);
-    }
-
-    // Gesundheitscheck unverändert lassen.
     if(url.pathname==="/health"){
       return new Response("OK",{status:200,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
     }
-
-    // Metadaten-Proxy NICHT umbauen, damit iPhone-App und bestehende Clients stabil bleiben.
     if(url.pathname==="/api/nowplaying"){
       try{
         const upstream=await fetch(METADATA_URL,{headers:{"cache-control":"no-store"}});
@@ -301,16 +218,12 @@ export default {
         return new Response(JSON.stringify({error:"metadata_proxy_failed"}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
       }
     }
-
-    // Stream-Routen unverändert lassen.
     if(url.pathname==="/stream"){
       try{return await proxyStream(request,PRIMARY_STREAM_URL)}catch(err){return await proxyStream(request,FALLBACK_STREAM_URL)}
     }
     if(url.pathname==="/fallback-stream"){
       return await proxyStream(request,FALLBACK_STREAM_URL)
     }
-
-    // Interner Notfall-Player bleibt komplett erhalten.
     if(url.pathname==="/icons/internal-icon.png"){
       return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
     }
