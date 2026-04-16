@@ -1,8 +1,8 @@
 <!-- ==========================================
-DATEI: external-player/index.html
+DATEI: index.html
 ERSTELLT: 2026-04-16
 GEÄNDERT: 2026-04-16
-ZWECK: Externer Standard-Player als One-Page-Cyber-UI.
+ZWECK: Interner Fallback-Player als One-Page-Cyber-UI.
 ÄNDERUNG: One-Page-Layout ohne Scrollen, Statuslampen, kompaktes Bild und gemeinsame Player-Logik integriert.
 ========================================== -->
 
@@ -11,13 +11,13 @@ ZWECK: Externer Standard-Player als One-Page-Cyber-UI.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn Radio — External</title>
-  <link rel="icon" type="image/png" href="./assets/icons/external-icon.png" />
-  <link rel="apple-touch-icon" href="./assets/icons/external-icon.png" />
+  <title>666SOUNDsDESIGn Radio — Internal</title>
+  <link rel="icon" type="image/png" href="./icons/internal-icon.png" />
+  <link rel="apple-touch-icon" href="./icons/internal-icon.png" />
   <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
-  <div class="player-badge player-badge-external"><span class="player-badge-dot"></span><span>EXTERNAL</span></div>
+  <div class="player-badge player-badge-internal"><span class="player-badge-dot"></span><span>INTERNAL</span></div>
 
   <div class="side-meter side-meter-left" aria-hidden="true">
     <div class="side-meter-track"><div id="leftMeterFill" class="side-meter-fill"></div></div>
@@ -45,7 +45,7 @@ ZWECK: Externer Standard-Player als One-Page-Cyber-UI.
         </div>
         <div class="status-row top-status-row">
           <div class="lamp-box compact"><span id="healthLamp" class="lamp lamp-red"></span><span class="lamp-label" data-label="health">Health</span><span id="healthText" class="lamp-state">Ready</span></div>
-          <div class="lamp-box compact"><span id="playerLamp" class="lamp lamp-cyan"></span><span class="lamp-label" data-label="player">Player</span><span id="playerText" class="lamp-state">External</span></div>
+          <div class="lamp-box compact"><span id="playerLamp" class="lamp lamp-pink"></span><span class="lamp-label" data-label="player">Player</span><span id="playerText" class="lamp-state">Internal</span></div>
         </div>
       </header>
 
