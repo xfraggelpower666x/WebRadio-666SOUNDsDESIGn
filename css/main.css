@@ -338,7 +338,7 @@ input[type="range"] { width: 100%; }
 }
 .history-overlay.hidden,
 .info-bubble.hidden,
-.overlay.hidden { display: none; }
+.overlay.hidden { display: none !important; pointer-events: none; }
 .history-title { color: var(--cyan); font-weight: 800; }
 .history-list {
   margin: 8px 0 0;
