@@ -10,16 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout source branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: WebRadio-666SOUNDsDESIGn
 
-      - name: Push to Mirror Repo
+      - name: Push to backup branch in same repo
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
 
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/xfraggelpower666x/666BackupMirror.git
-
-          git push mirror HEAD:main --force
+          git checkout -B 666BackupMirror
+          git push origin 666BackupMirror --force
