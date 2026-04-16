@@ -1,3 +1,11 @@
+// ==========================================
+// DATEI: external-player/js/app.js
+// ERSTELLT: 2026-04-16
+// GEÄNDERT: 2026-04-16
+// ZWECK: Frontend-Logik des externen Standard-Players.
+// ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+// ==========================================
+
 import { STREAM_CONFIG } from "../config/stream.config.js";
 
 const overlay=document.getElementById("bootOverlay");
