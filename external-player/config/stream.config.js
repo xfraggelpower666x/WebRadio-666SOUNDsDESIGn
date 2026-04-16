@@ -1,3 +1,11 @@
+// ==========================================
+// DATEI: external-player/config/stream.config.js
+// ERSTELLT: 2026-04-16
+// GEÄNDERT: 2026-04-16
+// ZWECK: Stream-Konfiguration des externen Players.
+// ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+// ==========================================
+
 export const STREAM_CONFIG = {
   stream_url: "https://webradio.666soundsdesign-broadcaster.com/stream",
   fallback_stream_url: "https://webradio.666soundsdesign-broadcaster.com/fallback-stream",
