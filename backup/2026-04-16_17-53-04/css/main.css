@@ -1,0 +1,11 @@
+/* ==========================================
+   DATEI: css/main.css
+   ERSTELLT: 2026-04-16
+   GEÄNDERT: 2026-04-16
+   ZWECK: Stylesheet des internen Worker-Fallback-Players.
+   ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+   ========================================== */
+
+body{background:#111;color:#fff;text-align:center}
+button{padding:10px;margin:5px}
+#bar{height:10px;background:#0ff;width:0%}
