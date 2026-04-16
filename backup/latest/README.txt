@@ -1,9 +1,8 @@
-666SOUNDsDESIGn — WORKER MINI PATCH READY FINAL
+666SOUNDsDESIGn — FINAL FIX ZIP
 
-This ZIP already contains the real player URL.
+This ZIP already contains the corrected redirect target:
 
-Root redirect target:
-https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/
+https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/
 
 Use:
 1. unzip

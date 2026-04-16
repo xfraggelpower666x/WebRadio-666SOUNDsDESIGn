@@ -1,19 +1,19 @@
 // ==========================================
-// 666SOUNDsDESIGn — MINI ROOT FIX PATCH
+// 666SOUNDsDESIGn — FINAL FIX ZIP
 // ==========================================
 //
-// TYPE:        Cloudflare Worker
-// PURPOSE:     Fixes broken domain entry "/" without touching
-//              stream / metadata / fallback logic.
-// SCOPE:       Emergency root redirect only
+// TYPE:        Cloudflare Worker mini patch
+// PURPOSE:     Fix broken "/" root handling only
+// SCOPE:       Redirect root path to the correct GitHub Pages player URL
 //
-// VERSION:     v1.1
+// VERSION:     v1.2
 // CREATED:     2026-04-16
 // UPDATED:     2026-04-16
 //
-// NOTES:
-// - Root path "/" redirects to the external player
-// - Intended for fast Scriptable upload while mobile
+// IMPORTANT:
+// - This is the corrected target URL
+// - No GitHub custom domain needed
+// - No DNS changes needed
 //
 // ==========================================
 
@@ -21,12 +21,27 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // ===== MINI FIX =====
+    // ===== FINAL ROOT FIX =====
     if (url.pathname === "/") {
-      return Response.redirect("https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/", 302);
+      return Response.redirect("https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/", 302);
     }
 
-    // ===== FALLBACK =====
+    // ===== BASIC HEALTH CHECK =====
+    if (url.pathname === "/health") {
+      return new Response(JSON.stringify({
+        ok: true,
+        mode: "final-fix-zip",
+        target: "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/"
+      }, null, 2), {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store"
+        }
+      });
+    }
+
+    // ===== SAFE FALLBACK =====
     return new Response("Worker OK", {
       status: 200,
       headers: {
