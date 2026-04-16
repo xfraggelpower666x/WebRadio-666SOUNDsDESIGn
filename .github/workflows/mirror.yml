@@ -3,24 +3,7 @@ name: Mirror Backup
 on:
   push:
     branches:
-      - BACKUP_MIRROR
-
-jobs:
-  mirror:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      name: Mirror Backup
-
-on:
-  push:
-    branches:
-      - main   # <- WICHTIG
+      - BACKUP_MIRROR   # <- WICHTIG
 
 jobs:
   mirror:
