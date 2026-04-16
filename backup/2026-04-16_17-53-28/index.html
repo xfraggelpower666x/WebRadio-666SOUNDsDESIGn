@@ -1,0 +1,33 @@
+<!-- ==========================================
+DATEI: index.html
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-16
+ZWECK: Projekt-Startseite im Repo-Kontext.
+ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+========================================== -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>666 Player</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<div id="boot">
+<button onclick="start()">OK</button>
+<div id="bar"></div>
+</div>
+
+<div id="player" style="display:none">
+<h2>666SOUNDsDESIGn</h2>
+<button onclick="play()">PLAY</button>
+<button onclick="pause()">PAUSE</button>
+<button onclick="mute()">MUTE</button>
+<audio id="a" playsinline></audio>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
