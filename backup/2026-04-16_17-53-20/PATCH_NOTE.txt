@@ -1,0 +1,8 @@
+JS FIX FINAL
+
+Only change:
+- Removed ES module import dependency from app.js
+- Config is loaded as plain global JS before app.js
+- Same-URL asset delivery retained
+- No player redesign
+- Stream / metadata / health routes unchanged
