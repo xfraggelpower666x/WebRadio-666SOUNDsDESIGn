@@ -1,20 +1,3 @@
-
-function bindPress(target, handler) {
-  if (!target || typeof handler !== 'function') return;
-  let lastTouchStamp = 0;
-  const onTouchEnd = async (event) => {
-    lastTouchStamp = Date.now();
-    event.preventDefault();
-    await handler(event);
-  };
-  const onClick = async (event) => {
-    if (Date.now() - lastTouchStamp < 700) return;
-    await handler(event);
-  };
-  target.addEventListener('touchend', onTouchEnd, { passive: false });
-  target.addEventListener('click', onClick);
-}
-
 // ==========================================
 // DATEI: js/player-ui-core.js
 // ERSTELLT: 2026-04-16
@@ -111,7 +94,7 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
     elements.volumeHint.textContent = 'Auf iPhone / iPad: erst Audio Start tippen, dann laufen Stream und Meter sauber.';
   }
 
-  bindPress(elements.bootButton, async () => {
+  elements.bootButton?.addEventListener('click', async () => {
     if (state.booted) return;
     state.booted = true;
     elements.bootButton.disabled = true;
@@ -120,23 +103,23 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
     await safePlay();
   });
 
-  bindPress(elements.playBtn, async () => {
+  elements.playBtn?.addEventListener('click', async () => {
     await safePlay();
   });
 
-  bindPress(elements.pauseBtn, () => {
+  elements.pauseBtn?.addEventListener('click', () => {
     elements.audio.pause();
     setAudioInfo(uiConfig.labels.audioPaused, 'lamp-red', uiConfig.infoTexts.audioPaused);
     setStatus(uiConfig.labels.audioPaused);
   });
 
-  bindPress(elements.reconnectBtn, async () => {
+  elements.reconnectBtn?.addEventListener('click', async () => {
     elements.audio.pause();
     elements.audio.src = '';
     await safePlay();
   });
 
-  bindPress(elements.muteBtn, () => {
+  elements.muteBtn?.addEventListener('click', () => {
     state.muted = !state.muted;
     elements.audio.muted = state.muted;
     elements.muteBtn.textContent = state.muted ? 'Unmute' : 'Mute';
@@ -147,7 +130,7 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
     elements.audio.volume = Number(elements.volumeRange.value);
   });
 
-  bindPress(elements.historyToggle, () => {
+  elements.historyToggle?.addEventListener('click', () => {
     state.historyOpen = !state.historyOpen;
     elements.historyOverlay?.classList.toggle('hidden', !state.historyOpen);
   });
@@ -206,7 +189,7 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
 
   function bindInfoTriggers() {
     document.querySelectorAll('.info-trigger').forEach((button) => {
-      bindPress(button, (event) => {
+      button.addEventListener('click', (event) => {
         event.stopPropagation();
         showInfo(button.dataset.info || 'Keine Zusatzinfo hinterlegt.');
       });
