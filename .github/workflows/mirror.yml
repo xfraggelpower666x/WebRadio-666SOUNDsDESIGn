@@ -18,4 +18,4 @@ jobs:
       - name: Push to Mirror Repo
         run: |
           git remote add mirror https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn-Backup-Mirror.git
-          git push mirror --mirror
+          git push mirror WebRadio-666SOUNDsDESIGn
