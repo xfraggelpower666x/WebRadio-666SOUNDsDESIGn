@@ -3,7 +3,7 @@ name: Mirror Backup
 on:
   push:
     branches:
-      - BACKUPMIRROR   # <- WICHTIG
+      - BACKUPMIRROR
 
 jobs:
   mirror:
