@@ -1,5 +1,5 @@
 /* ==========================================
-   DATEI: css/main.css
+   DATEI: external-player/css/main.css
    ERSTELLT: 2026-04-16
    GEÄNDERT: 2026-04-16
    ZWECK: Gemeinsames One-Page-Cyber-Stylesheet für internen und externen Player.
@@ -338,7 +338,7 @@ input[type="range"] { width: 100%; }
 }
 .history-overlay.hidden,
 .info-bubble.hidden,
-.overlay.hidden { display: none !important; pointer-events: none; }
+.overlay.hidden { display: none; }
 .history-title { color: var(--cyan); font-weight: 800; }
 .history-list {
   margin: 8px 0 0;
