@@ -1,3 +1,11 @@
+==========================================
+DATEI: PATCH_NOTE_SELF_HEALING.txt
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-16
+ZWECK: Kurzer Patch-Hinweis zur Self-Healing-Erweiterung.
+ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+==========================================
+
 SELF-HEALING SWITCH PACKAGE
 - external-player added
 - root route checks external-player health and redirects
