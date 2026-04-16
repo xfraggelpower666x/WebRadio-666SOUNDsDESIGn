@@ -1,0 +1,6 @@
+worker.js
+worker.ORIGINAL.js
+wrangler.jsonc
+README.md
+PATCH_NOTE.txt
+workers/**
