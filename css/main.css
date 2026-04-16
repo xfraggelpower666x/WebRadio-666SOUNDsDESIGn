@@ -41,6 +41,7 @@ html, body {
 }
 body { min-height: 100dvh; }
 button, input, label, audio { pointer-events: auto; }
+button { -webkit-appearance: none; appearance: none; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
 
 .app-shell {
   position: relative;
@@ -364,6 +365,7 @@ input[type="range"] { width: 100%; }
 }
 .overlay {
   position: fixed;
+  touch-action: manipulation;
   inset: 0;
   z-index: 40;
   display: flex;
@@ -376,7 +378,9 @@ input[type="range"] { width: 100%; }
   max-width: 520px;
   padding: 22px;
   text-align: center;
+  pointer-events: auto;
 }
+#bootButton { position: relative; z-index: 60; }
 .boot-title {
   font-family: 'Orbitron', 'Rajdhani', sans-serif;
   color: var(--cyan);
