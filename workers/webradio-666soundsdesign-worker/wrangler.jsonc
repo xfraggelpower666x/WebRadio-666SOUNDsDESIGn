@@ -1,3 +1,11 @@
+// ==========================================
+// DATEI: workers/webradio-666soundsdesign-worker/wrangler.jsonc
+// ERSTELLT: 2026-04-16
+// GEÄNDERT: 2026-04-16
+// ZWECK: Worker-Konfiguration im JSONC-Format.
+// ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+// ==========================================
+
 {
   "name": "webradio-666soundsdesign",
   "main": "worker.js"
