@@ -1,8 +1,6 @@
-666SOUNDsDESIGn — PLAYER FIX ZIP
+DOMAIN KEEP FIX
 
-This ZIP redirects the domain root "/" to:
-
-https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/index.html
+This ZIP keeps the custom domain visible by proxying the GitHub Pages root HTML.
 
 Use:
 1. unzip
