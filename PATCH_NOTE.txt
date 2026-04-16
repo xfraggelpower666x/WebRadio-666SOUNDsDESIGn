@@ -1,3 +1,11 @@
+==========================================
+DATEI: PATCH_NOTE.txt
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-16
+ZWECK: Kurzer Patch-Hinweis zum Repo-Stand.
+ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+==========================================
+
 JS FIX FINAL
 
 Only change:
