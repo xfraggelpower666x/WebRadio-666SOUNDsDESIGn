@@ -4,9 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio</title>
-  <link rel="stylesheet" href="/?asset=css" />
+  <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
+  <div class="side-meter side-meter-left" aria-hidden="true"><div class="side-meter-track"><div id="leftMeterFill" class="side-meter-fill"></div></div></div>
+  <div class="side-meter side-meter-right" aria-hidden="true"><div class="side-meter-track"><div id="rightMeterFill" class="side-meter-fill"></div></div></div>
+
   <div id="bootOverlay" class="overlay">
     <div class="boot-panel">
       <div class="boot-title">666SOUNDsDESIGn</div>
@@ -49,9 +52,7 @@
         </div>
         <div id="historyOverlay" class="history-overlay hidden">
           <div class="history-title">Last Tracks</div>
-          <ul id="historyList" class="history-list">
-            <li>No history loaded</li>
-          </ul>
+          <ul id="historyList" class="history-list"><li>No history loaded</li></ul>
         </div>
       </div>
 
@@ -76,10 +77,10 @@
         </div>
       </div>
 
-      <audio id="radio" preload="none" playsinline></audio>
+      <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
     </section>
   </main>
 
-  <script type="module" src="/?asset=js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>
