@@ -1,0 +1,11 @@
+SWITCH V2 PACKAGE
+- worker internal player left functionally unchanged
+- worker only adds switch logic:
+  / or /index.html -> external if reachable, otherwise internal fallback
+- external player is NOT embedded in worker
+- browser/player icons split:
+  external = turquoise
+  internal = pink
+- minimal player activity badges:
+  EXTERNAL on external-player
+  INTERNAL on worker fallback player

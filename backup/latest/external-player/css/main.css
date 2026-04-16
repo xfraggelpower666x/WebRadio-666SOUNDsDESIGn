@@ -1,3 +1,11 @@
+/* ==========================================
+   DATEI: external-player/css/main.css
+   ERSTELLT: 2026-04-16
+   GEÄNDERT: 2026-04-16
+   ZWECK: Stylesheet des externen Standard-Players.
+   ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+   ========================================== */
+
 *{box-sizing:border-box}:root{--bg:#090d14;--bg2:#131923;--cyan:#20f2ff;--pink:#ff4db3;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(32,242,255,.28);--shadow-cyan:0 0 18px rgba(32,242,255,.18);--shadow-pink:0 0 18px rgba(255,77,179,.14)}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,77,179,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(32,242,255,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:Arial,Helvetica,sans-serif}body{min-height:100vh;overflow-x:hidden}
 .hud-top-strip{position:fixed;left:50%;transform:translateX(-50%);background-repeat:no-repeat;background-size:contain;background-position:center top;opacity:.88;pointer-events:none;z-index:1}.hud-top-strip-a{top:0;width:min(96vw,1400px);height:120px;background-image:url('../assets/hud/leiste-1.png')}.hud-top-strip-b{top:22px;width:min(92vw,1380px);height:70px;background-image:url('../assets/hud/leiste-2.png')}.hud-top-strip-c{top:50px;width:min(86vw,1380px);height:70px;background-image:url('../assets/hud/leiste-3.png')}
 .app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:116px 22px 34px 22px;position:relative;z-index:2}
