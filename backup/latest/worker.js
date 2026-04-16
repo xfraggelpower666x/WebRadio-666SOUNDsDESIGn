@@ -1,43 +1,46 @@
 // ==========================================
-// 666SOUNDsDESIGn — PLAYER FIX ZIP
+// DOMAIN KEEP FIX
 // ==========================================
+// PURPOSE:
+// Keeps the custom domain visible in the browser by
+// proxy-fetching the GitHub Pages HTML instead of redirecting.
 //
-// TYPE:        Cloudflare Worker mini patch
-// PURPOSE:     Redirect root "/" to the external player HTML page
-// SCOPE:       Minimal root fix only
+// TARGET:
+// https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/
 //
-// VERSION:     v1.0
-// CREATED:     2026-04-16
-// UPDATED:     2026-04-16
-//
-// IMPORTANT:
-// - Redirect target is the external player HTML page
-// - No DNS changes needed
-// - No GitHub custom domain needed
-//
+// NOTES:
+// - Root "/" is proxied
+// - /health stays local
+// - Other paths fall back to local "Worker OK"
 // ==========================================
+
+const UPSTREAM_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/";
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // ===== PLAYER FIX =====
-    if (url.pathname === "/") {
-      return Response.redirect("https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/index.html", 302);
+    if (url.pathname === "/health") {
+      return new Response("OK", { status: 200 });
     }
 
-    // ===== HEALTH =====
-    if (url.pathname === "/health") {
-      return new Response(JSON.stringify({
-        ok: true,
-        mode: "player-fix-zip",
-        target: "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/index.html"
-      }, null, 2), {
-        status: 200,
+    if (url.pathname === "/") {
+      const upstream = await fetch(UPSTREAM_URL, {
         headers: {
-          "content-type": "application/json; charset=utf-8",
-          "cache-control": "no-store"
+          "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker"
         }
+      });
+
+      const headers = new Headers(upstream.headers);
+      headers.set("cache-control", "no-store");
+      headers.delete("content-security-policy");
+      headers.delete("x-frame-options");
+      headers.delete("content-length");
+
+      return new Response(upstream.body, {
+        status: upstream.status,
+        statusText: upstream.statusText,
+        headers
       });
     }
 
