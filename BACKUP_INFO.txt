@@ -1,0 +1,17 @@
+==========================================
+666SOUNDsDESIGn — VERSION BACKUP INFO
+==========================================
+
+TYPE:        Backup Branch Info
+PURPOSE:     Dokumentiert den aktuellen Stand des Backup-Branches
+VERSION:     v1.0
+
+SOURCE_BRANCH: WebRadio-666SOUNDsDESIGn
+BACKUP_BRANCH: 666BackupMirror
+
+LAST_BACKUP:  2026-04-16_15-50-09
+
+STRUCTURE:
+- current/       = aktueller kompletter Stand
+- backup/latest/ = letzte gespiegelte Version
+- backup/<time>/ = historische Snapshot-Versionen

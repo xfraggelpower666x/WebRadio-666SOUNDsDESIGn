@@ -1,0 +1,5 @@
+SELF-HEALING SWITCH PACKAGE
+- external-player added
+- root route checks external-player health and redirects
+- fallback returns internal worker player
+- original stable worker preserved in recovery/last-known-good and snapshots
