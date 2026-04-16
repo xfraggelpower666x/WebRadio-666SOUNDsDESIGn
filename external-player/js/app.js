@@ -1,16 +1,17 @@
 // ==========================================
 // DATEI: external-player/js/app.js
 // ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Startet den externen Haupt-Player mit gemeinsamer Player-Logik.
-// ÄNDERUNG: Auf kompaktes One-Page-Cyber-Frontend mit Tap-Infos und iPhone-Touch-Fix umgestellt.
+// GEÄNDERT: 2026-04-16 | AUDIO PRO + AUTO CHAIN HOT DEFAULT
+// STATUS: AUDIO PRO AKTIV
+// ZWECK: Startet den externen Standard-Player mit eigenem Audio-Pro-Modul.
+// ÄNDERUNG: Echter Web-Audio-Signalweg mit Hot-Default-Auto-Chain, Boost-Reserve, GR-/Peak-/Limit-HUD.
 // ==========================================
 
 import { STREAM_CONFIG } from '../config/stream.config.js';
 import { UI_CONFIG } from '../../config/ui.config.js';
-import { initPlayer } from './player-ui-core.js';
+import { initExternalAudioProPlayer } from './player-ui-audio-pro.js';
 
-initPlayer({
+initExternalAudioProPlayer({
   streamConfig: STREAM_CONFIG,
   uiConfig: UI_CONFIG,
   mode: 'external',
