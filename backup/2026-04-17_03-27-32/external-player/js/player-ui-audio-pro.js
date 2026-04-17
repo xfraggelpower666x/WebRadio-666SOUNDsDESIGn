@@ -1,99 +1,4 @@
 // ==========================================
-// DATEI: js/app.bundle.js
-// ERSTELLT: 2026-04-17
-// GEÄNDERT: 2026-04-17
-// ZWECK: Echter DSP-Rebuild auf stabiler No-Module-Basis mit realer Auto-Chain, echter Boost-/GR-Anzeige und festem EQ-Pfad.
-// ÄNDERUNG: Echter DSP-Pfad neu verdrahtet. Web-Audio-Graph mit EQ-Kette, robuster Analyse, echter GR-Auswertung und History-Bereinigung ergänzt.
-// ==========================================
-(function(){
-// ==========================================
-// DATEI: config/ui.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Zentrale UI-/Theme-Konfiguration für internen und externen WebRadio-Player.
-// ÄNDERUNG: Cyber-Header, Lampen-Tap-Infos, neon-türkise Info-Panels und Laser-Outlines ergänzt.
-// ==========================================
-
-const UI_CONFIG = {
-  theme: {
-    backgroundBase: '#1c1f24',
-    backgroundDeep: '#11141a',
-    neonPink: '#ff3fb7',
-    neonTurquoise: '#00f5df',
-    okGreen: '#53ff98',
-    errorRed: '#ff557d',
-    textMain: '#eef7ff',
-    textMuted: '#8ea2b3',
-    panelBorder: 'rgba(0,245,223,0.24)',
-    panelGlass: 'rgba(255,255,255,0.04)',
-    panelSolid: '#00f5df',
-    panelText: '#1c1f24'
-  },
-  labels: {
-    metadata: 'Meta',
-    audio: 'Audio',
-    source: 'Source',
-    health: 'Health',
-    player: 'Player',
-    nowPlaying: 'Now Playing',
-    listeners: 'Listeners',
-    bitrate: 'Bitrate',
-    djStatus: 'DJ / Status',
-    stream: 'Stream',
-    genre: 'Genre',
-    serverInfo: 'Server / Info',
-    modeExternal: 'External',
-    modeInternal: 'Internal',
-    sourcePrimary: 'Main',
-    sourceFallback: 'Fallback',
-    healthReady: 'Ready',
-    healthOnline: 'Online',
-    healthOffline: 'Offline',
-    audioPlaying: 'Playing',
-    audioPaused: 'Paused',
-    audioError: 'Error'
-  },
-  infoTexts: {
-    playerExternal: 'Externer Haupt-Player aktiv. Türkis bedeutet: Standard-Player läuft.',
-    playerInternal: 'Interner Worker-Fallback aktiv. Pink bedeutet: Notfall-Player läuft.',
-    sourcePrimary: 'Main-Stream aktiv. Aktuell läuft der Hauptstream.',
-    sourceFallback: 'Fallback-Stream aktiv. Der Hauptstream war nicht erreichbar.',
-    healthReady: 'Health wird gerade geprüft.',
-    healthOnline: 'Health ist online. Worker und Stream-Antwort sind erreichbar.',
-    healthOffline: 'Health ist offline oder liefert gerade keine saubere Antwort.',
-    metadataOnline: 'Metadaten werden sauber aus dem Worker gelesen und angezeigt.',
-    metadataOffline: 'Metadaten konnten gerade nicht geladen werden.',
-    audioPlaying: 'Audio läuft. Der Player gibt Ton aus.',
-    audioPaused: 'Audio ist pausiert.',
-    audioError: 'Audio konnte nicht abgespielt werden.'
-  },
-  defaults: {
-    djName: '666SOUNDsDESIGn DJ',
-    stationName: '666SOUNDsDESIGn Radio'
-  }
-};
-
-// ==========================================
-// DATEI: config/stream.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Stream-Konfiguration des internen Fallback-Players.
-// ÄNDERUNG: Health-Endpunkt ergänzt und Konfiguration für gemeinsamen One-Page-Player vorbereitet.
-// ==========================================
-
-const STREAM_CONFIG = {
-  stream_url: "/stream",
-  fallback_stream_url: "/fallback-stream",
-  metadata_url: "/api/nowplaying",
-  health_url: "/health",
-  poll_interval_ms: 8000,
-  listener_capacity: 250,
-  use_webhook: false,
-  primary_upstream: "https://my.idjstream.com/666soundsdesign/stream",
-  fallback_upstream: "https://my.idjstream.com:8686/stream"
-};
-
-// ==========================================
 // DATEI: external-player/js/player-ui-audio-pro.js
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-16 | AUDIO PRO + AUTO CHAIN HOT DEFAULT
@@ -105,23 +10,31 @@ const STREAM_CONFIG = {
 const FALLBACK_COVER = './assets/images/fallback-cover.png';
 const DEFAULT_DJ = '666SOUNDsDESIGn DJ';
 const BOOST_STAGES_DB = [0, 3, 6, 9];
-const HOT_DRIVE_DB = 2.8;
-const AUTO_TARGET_DB = -17.0;
-const AUTO_LIFT_MAX_DB = 6.2;
-const LIMIT_TRIGGER_DB = 2.2;
+const HOT_DRIVE_DB = 2.5;
+const AUTO_TARGET_DB = -18;
+const AUTO_LIFT_MAX_DB = 6;
+const LIMIT_TRIGGER_DB = 2.8;
 const CLIP_TRIGGER_DB = -0.35;
 const MINUS_INF_TEXT = '-∞ dB';
-const EQ_BANDS = [
-  { type: 'lowshelf', frequency: 60, gain: 2.0, q: 0.707 },
-  { type: 'peaking', frequency: 125, gain: 1.2, q: 1.0 },
-  { type: 'peaking', frequency: 250, gain: -0.8, q: 1.0 },
-  { type: 'peaking', frequency: 1000, gain: 0.6, q: 1.0 },
-  { type: 'peaking', frequency: 2500, gain: 1.4, q: 1.0 },
-  { type: 'peaking', frequency: 6000, gain: 1.0, q: 0.9 },
-  { type: 'highshelf', frequency: 11000, gain: 1.6, q: 0.707 }
-];
 
-function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
+function bindPress(target, handler) {
+  if (!target || typeof handler !== 'function') return;
+  let lastTouchStamp = 0;
+  const onTouchEnd = async (event) => {
+    lastTouchStamp = Date.now();
+    event.preventDefault();
+    await handler(event);
+  };
+  const onClick = async (event) => {
+    if (Date.now() - lastTouchStamp < 700) return;
+    await handler(event);
+  };
+  target.addEventListener('touchend', onTouchEnd, { passive: false });
+  target.addEventListener('click', onClick);
+}
+
+
+export function initExternalAudioProPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
   const doc = document.documentElement;
   const state = {
     booted: false,
@@ -138,7 +51,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     dynamicsNode: null,
     gainNode: null,
     masterGainNode: null,
-    eqNodes: [],
     inputData: null,
     outputData: null,
     inputWaveData: null,
@@ -153,9 +65,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grDb: 0,
     peakDb: -100,
     peakHoldDb: -100,
-    lastLimitState: 'Standby',
-    graphMode: 'INIT',
-    desiredVolume: 1
+    lastLimitState: 'Standby'
   };
 
   const elements = {
@@ -207,8 +117,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grBarFill: document.getElementById('grBarFill'),
     limitLamp: document.getElementById('limitLamp'),
     limitStateText: document.getElementById('limitStateText'),
-    audioEngineStatus: document.getElementById('audioEngineStatus'),
-    eqBars: Array.from({ length: 10 }, (_, index) => document.getElementById(`eqBar${index}`))
+    audioEngineStatus: document.getElementById('audioEngineStatus')
   };
 
   applyThemeVars();
@@ -225,11 +134,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   if (isiOS && elements.volumeHint) {
     elements.volumeHint.textContent = 'Ein Tipp auf OK initialisiert Audio. Lautstärke zusätzlich über iPhone-Tasten möglich.';
   }
-  if (elements.audio) {
-    elements.audio.crossOrigin = 'anonymous';
-    elements.audio.preload = 'auto';
-    elements.audio.playsInline = true;
-  }
 
   setLamp(elements.metaLamp, 'lamp-red');
   setLamp(elements.audioLamp, 'lamp-red');
@@ -244,7 +148,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   bindPress(elements.bootButton, async () => {
     if (state.booted) return;
     state.booted = true;
-    if (elements.bootButton) elements.bootButton.disabled = true;
+    elements.bootButton.disabled = true;
     await runBootSequence();
     elements.overlay?.classList.add('hidden');
     await safePlay();
@@ -270,14 +174,13 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   bindPress(elements.muteBtn, () => {
     state.muted = !state.muted;
-    applyOutputVolume();
+    elements.audio.muted = state.muted;
     elements.muteBtn.textContent = state.muted ? 'Unmute' : 'Mute';
   });
 
   elements.volumeRange?.addEventListener('input', () => {
     const value = Number(elements.volumeRange.value);
-    state.desiredVolume = Number.isFinite(value) ? value : 1;
-    applyOutputVolume();
+    elements.audio.volume = Number.isFinite(value) ? value : 1;
   });
 
   bindPress(elements.historyToggle, () => {
@@ -291,14 +194,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       await ensureAudioGraph();
       setBoostStage(stage);
     });
-  });
-
-  elements.audio?.addEventListener('loadedmetadata', async () => {
-    await ensureAudioGraph();
-  });
-
-  elements.audio?.addEventListener('canplay', async () => {
-    await ensureAudioGraph();
   });
 
   elements.audio?.addEventListener('playing', async () => {
@@ -334,27 +229,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   fetchMetadata();
   checkHealth();
-
-  function bindPress(element, handler) {
-    if (!element) return;
-    let pressed = false;
-    const run = async (event) => {
-      if (event) {
-        if (event.type === 'touchend') event.preventDefault();
-      }
-      const now = Date.now();
-      if (pressed && (now - pressed) < 450) return;
-      pressed = now;
-      try {
-        await handler(event);
-      } catch (error) {
-        console.error('PRESS HANDLER ERROR', error);
-      }
-    };
-    element.addEventListener('pointerup', run);
-    element.addEventListener('touchend', run, { passive: false });
-    element.addEventListener('click', run);
-  }
 
   function applyViewportHeight() {
     const vh = window.innerHeight || document.documentElement.clientHeight || screen.height;
@@ -424,10 +298,8 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   }
 
   function setMeterHeights(left, right) {
-    const leftHeight = Math.max(8, Math.min(100, left * 1.16));
-    const rightHeight = Math.max(8, Math.min(100, right * 1.16));
-    if (elements.leftMeterFill) elements.leftMeterFill.style.height = `${leftHeight}%`;
-    if (elements.rightMeterFill) elements.rightMeterFill.style.height = `${rightHeight}%`;
+    if (elements.leftMeterFill) elements.leftMeterFill.style.height = `${Math.max(2, Math.min(100, left))}%`;
+    if (elements.rightMeterFill) elements.rightMeterFill.style.height = `${Math.max(2, Math.min(100, right))}%`;
   }
 
   function safeText(value, fallback = '') {
@@ -547,79 +419,64 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     state.healthTimer = setInterval(checkHealth, streamConfig.poll_interval_ms);
   }
 
-  
-async function ensureAudioGraph() {
-  if (!elements.audio) return false;
-  try {
-    if (!state.audioContext) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) throw new Error('AudioContext nicht unterstützt');
-      state.audioContext = new AudioCtx();
+  async function ensureAudioGraph() {
+    if (!elements.audio) return false;
+    try {
+      if (!state.audioContext) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) throw new Error('AudioContext nicht unterstützt');
+        state.audioContext = new AudioCtx();
+      }
+      if (state.audioContext.state === 'suspended') {
+        await state.audioContext.resume();
+      }
+      if (!state.mediaSourceNode) {
+        state.mediaSourceNode = state.audioContext.createMediaElementSource(elements.audio);
+        state.inputAnalyser = state.audioContext.createAnalyser();
+        state.outputAnalyser = state.audioContext.createAnalyser();
+        state.preGainNode = state.audioContext.createGain();
+        state.gainNode = state.audioContext.createGain();
+        state.masterGainNode = state.audioContext.createGain();
+        state.dynamicsNode = state.audioContext.createDynamicsCompressor();
+
+        state.inputAnalyser.fftSize = 2048;
+        state.outputAnalyser.fftSize = 2048;
+        state.inputAnalyser.smoothingTimeConstant = 0.82;
+        state.outputAnalyser.smoothingTimeConstant = 0.86;
+
+        state.inputData = new Uint8Array(state.inputAnalyser.frequencyBinCount);
+        state.outputData = new Uint8Array(state.outputAnalyser.frequencyBinCount);
+        state.inputWaveData = new Float32Array(state.inputAnalyser.fftSize);
+        state.outputWaveData = new Float32Array(state.outputAnalyser.fftSize);
+
+        state.preGainNode.gain.value = dbToGain(state.hotDriveDb);
+        state.gainNode.gain.value = dbToGain(BOOST_STAGES_DB[state.currentBoostStage]);
+        state.masterGainNode.gain.value = 0.98;
+        state.dynamicsNode.threshold.value = -20;
+        state.dynamicsNode.knee.value = 18;
+        state.dynamicsNode.ratio.value = 4.2;
+        state.dynamicsNode.attack.value = 0.003;
+        state.dynamicsNode.release.value = 0.22;
+
+        state.mediaSourceNode.connect(state.inputAnalyser);
+        state.inputAnalyser.connect(state.preGainNode);
+        state.preGainNode.connect(state.gainNode);
+        state.gainNode.connect(state.dynamicsNode);
+        state.dynamicsNode.connect(state.outputAnalyser);
+        state.outputAnalyser.connect(state.masterGainNode);
+        state.masterGainNode.connect(state.audioContext.destination);
+      }
+      setBoostStage(state.currentBoostStage);
+      updateEngineState('LIVE', true, false);
+      return true;
+    } catch (error) {
+      updateEngineState('BYPASS', false, false);
+      setMeterHeights(6, 6);
+      return false;
     }
-    if (state.audioContext.state === 'suspended') {
-      await state.audioContext.resume();
-    }
-    if (!state.mediaSourceNode) {
-      state.mediaSourceNode = state.audioContext.createMediaElementSource(elements.audio);
-      state.inputAnalyser = state.audioContext.createAnalyser();
-      state.outputAnalyser = state.audioContext.createAnalyser();
-      state.preGainNode = state.audioContext.createGain();
-      state.gainNode = state.audioContext.createGain();
-      state.masterGainNode = state.audioContext.createGain();
-      state.dynamicsNode = state.audioContext.createDynamicsCompressor();
-      state.eqNodes = EQ_BANDS.map((band) => {
-        const node = state.audioContext.createBiquadFilter();
-        node.type = band.type;
-        node.frequency.value = band.frequency;
-        node.gain.value = band.gain;
-        node.Q.value = band.q;
-        return node;
-      });
-
-      state.inputAnalyser.fftSize = 2048;
-      state.outputAnalyser.fftSize = 2048;
-      state.inputAnalyser.smoothingTimeConstant = 0.82;
-      state.outputAnalyser.smoothingTimeConstant = 0.86;
-
-      state.inputData = new Uint8Array(state.inputAnalyser.frequencyBinCount);
-      state.outputData = new Uint8Array(state.outputAnalyser.frequencyBinCount);
-      state.inputWaveData = new Float32Array(state.inputAnalyser.fftSize);
-      state.outputWaveData = new Float32Array(state.outputAnalyser.fftSize);
-
-      state.preGainNode.gain.value = dbToGain(state.hotDriveDb);
-      state.gainNode.gain.value = dbToGain(BOOST_STAGES_DB[state.currentBoostStage]);
-      state.masterGainNode.gain.value = 0.98;
-      state.dynamicsNode.threshold.value = -20;
-      state.dynamicsNode.knee.value = 18;
-      state.dynamicsNode.ratio.value = 4.2;
-      state.dynamicsNode.attack.value = 0.003;
-      state.dynamicsNode.release.value = 0.22;
-
-      state.mediaSourceNode.connect(state.inputAnalyser);
-      state.inputAnalyser.connect(state.preGainNode);
-      state.preGainNode.connect(state.gainNode);
-      let lastNode = state.gainNode;
-      state.eqNodes.forEach((node) => {
-        lastNode.connect(node);
-        lastNode = node;
-      });
-      lastNode.connect(state.dynamicsNode);
-      state.dynamicsNode.connect(state.outputAnalyser);
-      state.outputAnalyser.connect(state.masterGainNode);
-      state.masterGainNode.connect(state.audioContext.destination);
-    }
-    setBoostStage(state.currentBoostStage);
-    updateEngineState('LIVE', true, false);
-    return true;
-  } catch (error) {
-    console.error('DSP GRAPH ERROR', error);
-    updateEngineState('BYPASS', false, false);
-    setMeterHeights(6, 6);
-    return false;
   }
-}
 
-function startMeterLoop() {
+  function startMeterLoop() {
     if (state.meterAnim) return;
     const tick = () => {
       if (!state.inputAnalyser || !state.outputAnalyser || !state.inputData || !state.outputData) {
@@ -652,7 +509,6 @@ function startMeterLoop() {
       const left = outputStats.leftPercent;
       const right = outputStats.rightPercent;
       setMeterHeights(left, right);
-      updateEqualizerBars(state.outputData);
       updateAutoChainHud({
         driveDb: state.hotDriveDb,
         liftDb: state.autoLiftDb,
@@ -731,27 +587,6 @@ function startMeterLoop() {
     return Math.max(0, Math.min(AUTO_LIFT_MAX_DB, needed));
   }
 
-  function updateEqualizerBars(data) {
-    if (!elements.eqBars || !elements.eqBars.length || !data || !data.length) return;
-    const bins = elements.eqBars.length;
-    const slice = Math.max(1, Math.floor(data.length / bins));
-    elements.eqBars.forEach((bar, index) => {
-      if (!bar) return;
-      let sum = 0;
-      let count = 0;
-      const start = index * slice;
-      const end = Math.min(data.length, index === bins - 1 ? data.length : start + slice);
-      for (let i = start; i < end; i += 1) {
-        sum += data[i];
-        count += 1;
-      }
-      const avg = count ? (sum / count) / 255 : 0;
-      const weighted = Math.min(1, Math.pow(avg, 0.78) * 1.18);
-      const height = 10 + (weighted * 90);
-      bar.style.height = `${height.toFixed(2)}%`;
-    });
-  }
-
   function updateBoostHud(boostDb) {
     if (elements.boostValueText) {
       elements.boostValueText.textContent = `${boostDb.toFixed(1)} dB`;
@@ -805,24 +640,18 @@ function startMeterLoop() {
 
   async function safePlay() {
     try {
-      if (!state.audioContext) await ensureAudioGraph();
-      await tryPlayPrimary();
       await ensureAudioGraph();
-      applyOutputVolume();
+      await tryPlayPrimary();
       setStatus('Playing');
       setLamp(elements.audioLamp, 'lamp-green');
-      startMeterLoop();
       startPolling();
       return true;
     } catch (primaryError) {
       try {
-        if (!state.audioContext) await ensureAudioGraph();
-        await tryPlayFallback();
         await ensureAudioGraph();
-        applyOutputVolume();
+        await tryPlayFallback();
         setStatus('Playing');
         setLamp(elements.audioLamp, 'lamp-green');
-        startMeterLoop();
         startPolling();
         return true;
       } catch (fallbackError) {
@@ -851,25 +680,6 @@ function startMeterLoop() {
   }
 }
 
-
-function applyOutputVolume() {
-  const baseVolume = Number.isFinite(state.desiredVolume) ? Math.max(0, Math.min(1, state.desiredVolume)) : 1;
-  if (state.masterGainNode && state.audioContext) {
-    const target = state.muted ? 0 : (baseVolume * 0.98);
-    state.masterGainNode.gain.setTargetAtTime(target, state.audioContext.currentTime || 0, 0.015);
-    if (state.graphMode === 'CAPTURE') {
-      elements.audio.muted = true;
-      elements.audio.volume = 1;
-    } else {
-      elements.audio.muted = state.muted;
-      elements.audio.volume = baseVolume;
-    }
-  } else {
-    elements.audio.muted = state.muted;
-    elements.audio.volume = baseVolume;
-  }
-}
-
 function dbToGain(db) {
   return Math.pow(10, db / 20);
 }
@@ -883,24 +693,3 @@ function smoothValue(current, target, factor) {
   if (!Number.isFinite(current)) return target;
   return current + ((target - current) * factor);
 }
-
-
-try {
-  initPlayer({
-    streamConfig: STREAM_CONFIG,
-    uiConfig: UI_CONFIG,
-    mode: 'external',
-    assetPrefix: '.'
-  });
-  window.__RADIO_BOOT_OK__ = true;
-} catch (error) {
-  window.__RADIO_BOOT_OK__ = false;
-  console.error('PLAYER INIT ERROR', error);
-  var txt = document.getElementById('progressText');
-  var note = document.getElementById('volumeHint');
-  var btn = document.getElementById('bootButton');
-  if (txt) txt.textContent = 'BOOT ERROR';
-  if (note) note.textContent = 'JS-Init Fehler: ' + (error && error.message ? error.message : error);
-  if (btn) { btn.disabled = false; btn.textContent = 'Reload'; btn.addEventListener('click', function(){ location.reload(); }); }
-}
-})();
