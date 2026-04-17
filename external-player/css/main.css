@@ -1,5 +1,5 @@
 /* ==========================================
-   DATEI: external-player/css/main.css
+   DATEI: css/main.css
    ERSTELLT: 2026-04-16
    GEÄNDERT: 2026-04-16
    ZWECK: Gemeinsames One-Page-Cyber-Stylesheet für internen und externen Player.
@@ -406,50 +406,35 @@ input[type="range"] { width: 100%; }
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 30px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
   pointer-events: none;
 }
-.side-meter-left { left: 4px; }
-.side-meter-right { right: 4px; }
+.side-meter-left { left: 2px; }
+.side-meter-right { right: 2px; }
 .side-meter-track {
   position: relative;
-  width: 14px;
-  height: min(80dvh, 780px);
+  width: 9px;
+  height: min(78dvh, 760px);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,245,223,.08));
-  border: 1px solid rgba(0,245,223,.58);
-  box-shadow:
-    0 0 14px rgba(0,245,223,.30),
-    0 0 22px rgba(0,245,223,.18),
-    inset 0 0 14px rgba(255,63,183,.14),
-    inset 0 0 8px rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(0,245,223,.4);
+  box-shadow: 0 0 10px rgba(0,245,223,.2), inset 0 0 8px rgba(255,63,183,.08);
   overflow: hidden;
-}
-.side-meter-track::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(0,245,223,.02) 45%, rgba(255,63,183,.04));
-  pointer-events: none;
 }
 .side-meter-fill {
   position: absolute;
-  left: 1px;
-  right: 1px;
-  bottom: 1px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   height: 2%;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(103,255,170,1) 0%, rgba(0,245,223,1) 52%, rgba(255,63,183,.96) 100%);
-  box-shadow:
-    0 0 14px rgba(0,245,223,.58),
-    0 0 22px rgba(0,245,223,.28),
-    0 0 30px rgba(255,63,183,.18);
-  transition: height .05s linear;
+  background: linear-gradient(180deg, var(--green), var(--cyan) 55%, var(--pink));
+  box-shadow: 0 0 10px rgba(0,245,223,.38), 0 0 12px rgba(255,63,183,.22);
+  transition: height .06s linear;
 }
 
 @media (max-width: 980px) {
@@ -522,8 +507,8 @@ input[type="range"] { width: 100%; }
     left: auto;
     font-size: .8rem;
   }
-  .side-meter { width: 22px; }
-  .side-meter-track { width: 10px; height: min(74dvh, 560px); }
+  .side-meter { width: 14px; }
+  .side-meter-track { width: 6px; height: min(72dvh, 520px); }
 }
 
 
@@ -555,3 +540,142 @@ AUDIO PRO + AUTO CHAIN HUD
 .meter-value-chain{color:var(--pink);text-shadow:0 0 12px rgba(255,77,184,.24)}
 @media (max-width:900px){.auto-chain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.audio-pro-meters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.boost-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.audio-pro-meters{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.meter-box{min-height:58px;padding:8px 9px}.auto-chain-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.meter-value-chain{font-size:.98rem}}
+
+
+/* ==========================================
+   FINAL HYBRID HUD BUILD — 2026-04-17
+   ZWECK: Hybrid-HUD-Look mit sichtbarer Boost/GR/Auto-Chain/Equalizer-Anzeige,
+          stärkeren Seitenmetern und klarerem Maschinen/Cockpit-Stil.
+   ========================================== */
+:root {
+  --hud-cut: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px);
+}
+.player-card {
+  background:
+    linear-gradient(180deg, rgba(12,18,28,.98), rgba(6,10,18,.98)),
+    radial-gradient(circle at 50% 0%, rgba(0,245,223,.08), transparent 42%);
+  box-shadow: 0 0 0 1px rgba(0,245,223,.36), 0 0 28px rgba(0,245,223,.16), inset 0 0 0 1px rgba(255,63,183,.14);
+}
+.player-card::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  clip-path: var(--hud-cut);
+  border: 1px solid rgba(0,245,223,.18);
+  pointer-events: none;
+}
+.brand-line,
+.status-chip,
+.cover-shell,
+.headline-block,
+.display-window,
+.mini-box,
+.control-btn,
+.small-btn,
+.volume-wrap,
+.audio-pro-panel,
+.history-overlay,
+.boot-panel {
+  clip-path: var(--hud-cut);
+  border-radius: 0;
+}
+.status-chip,
+.control-btn,
+.small-btn,
+.volume-wrap,
+.headline-block,
+.display-window,
+.mini-box,
+.audio-pro-panel {
+  background: linear-gradient(180deg, rgba(10,17,28,.92), rgba(5,11,18,.94));
+}
+.brand-line {
+  background: linear-gradient(180deg, rgba(8,17,24,.96), rgba(6,11,18,.96));
+}
+.cover-shell {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,245,223,.08), transparent 58%),
+    linear-gradient(180deg, rgba(9,15,24,.95), rgba(5,10,17,.98));
+}
+.hud-audio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 10px;
+}
+.hud-panel-cut,
+.hud-stat-cut {
+  position: relative;
+}
+.hud-panel-cut::after,
+.hud-stat-cut::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 1px solid rgba(255,63,183,.10);
+  clip-path: inherit;
+  pointer-events: none;
+}
+.limit-inline { display:flex; align-items:center; gap:8px; }
+.eq-cluster {
+  display:grid;
+  grid-template-columns:repeat(10,minmax(0,1fr));
+  align-items:end;
+  gap:8px;
+  min-height:132px;
+}
+.eq-bar-wrap {
+  min-width:0;
+  display:grid;
+  grid-template-rows:minmax(96px,1fr) auto;
+  gap:8px;
+  align-items:end;
+}
+.eq-bar-wrap::before {
+  content:"";
+  grid-row:1;
+  border-radius:10px;
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(0,245,223,.14);
+  box-shadow: inset 0 0 10px rgba(255,255,255,.03);
+}
+.eq-bar {
+  grid-row:1;
+  align-self:end;
+  width:100%;
+  height:12%;
+  border-radius:10px;
+  background:linear-gradient(180deg, rgba(0,245,223,.98), rgba(255,63,183,.90));
+  box-shadow:0 0 14px rgba(0,245,223,.22),0 0 16px rgba(255,63,183,.18);
+  transition:height .07s linear;
+}
+.eq-label {
+  font-size:.66rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  text-align:center;
+}
+.side-meter { width: 22px; z-index: 1; }
+.side-meter-track {
+  width: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,245,223,.24);
+  box-shadow: 0 0 18px rgba(0,245,223,.18), inset 0 0 12px rgba(255,255,255,.04);
+}
+.side-meter-fill {
+  background: linear-gradient(180deg, #5affaa 0%, #00f5df 44%, #ff3fb7 100%);
+  box-shadow: 0 0 16px rgba(0,245,223,.42), 0 0 20px rgba(255,63,183,.24);
+  transition: height .045s linear;
+}
+#leftMeterFill,
+#rightMeterFill { min-height: 8%; }
+@media (max-width: 980px) {
+  .hud-audio-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .hud-audio-grid { gap: 8px; }
+  .eq-cluster { gap: 5px; min-height: 112px; }
+  .eq-label { font-size: .55rem; }
+  .side-meter { width: 16px; }
+  .side-meter-track { width: 8px; }
+}
