@@ -1,0 +1,21 @@
+==========================================
+DATEI: PATCH_NOTE_SWITCH_V2.txt
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-16
+ZWECK: Kurzer Patch-Hinweis zum Player-Switch-Stand.
+ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
+==========================================
+
+SWITCH V2 PACKAGE
+- worker internal player left functionally unchanged
+- worker only adds switch logic:
+  / or /index.html -> external if reachable, otherwise internal fallback
+- external player is NOT embedded in worker
+- browser/player icons split:
+  external = turquoise
+  internal = pink
+- minimal player activity badges:
+  EXTERNAL on external-player
+  INTERNAL on worker fallback player
+
+2026-04-16: Domain-Proxy-Fix aktiv. Externer Player bleibt Standard, interner Worker-Player bleibt Fallback.
