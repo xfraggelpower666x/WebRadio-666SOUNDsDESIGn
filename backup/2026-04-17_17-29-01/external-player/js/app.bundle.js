@@ -899,7 +899,7 @@ try {
   initPlayer({
     streamConfig: STREAM_CONFIG,
     uiConfig: UI_CONFIG,
-    mode: 'internal',
+    mode: 'external',
     assetPrefix: '.'
   });
   window.__RADIO_BOOT_OK__ = true;
