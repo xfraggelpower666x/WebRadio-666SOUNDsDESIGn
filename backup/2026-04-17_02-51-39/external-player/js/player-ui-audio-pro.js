@@ -1,99 +1,4 @@
 // ==========================================
-// DATEI: js/app.bundle.js
-// ERSTELLT: 2026-04-17
-// GEÄNDERT: 2026-04-17 | AUDIO ENGINE FIX BUILD
-// ZWECK: Modulfreier Start-Build mit Audio Pro, Auto-Chain und Boost-Reserve auf stabiler No-Module-Basis.
-// ÄNDERUNG: Final Pro Balanced Tuning aktiv. Auto-Chain bleibt führend, aber stabiler abgestimmt; Boost bleibt reine Notfall-Reserve.
-// ==========================================
-(function(){
-// ==========================================
-// DATEI: config/ui.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Zentrale UI-/Theme-Konfiguration für internen und externen WebRadio-Player.
-// ÄNDERUNG: Cyber-Header, Lampen-Tap-Infos, neon-türkise Info-Panels und Laser-Outlines ergänzt.
-// ==========================================
-
-const UI_CONFIG = {
-  theme: {
-    backgroundBase: '#1c1f24',
-    backgroundDeep: '#11141a',
-    neonPink: '#ff3fb7',
-    neonTurquoise: '#00f5df',
-    okGreen: '#53ff98',
-    errorRed: '#ff557d',
-    textMain: '#eef7ff',
-    textMuted: '#8ea2b3',
-    panelBorder: 'rgba(0,245,223,0.24)',
-    panelGlass: 'rgba(255,255,255,0.04)',
-    panelSolid: '#00f5df',
-    panelText: '#1c1f24'
-  },
-  labels: {
-    metadata: 'Meta',
-    audio: 'Audio',
-    source: 'Source',
-    health: 'Health',
-    player: 'Player',
-    nowPlaying: 'Now Playing',
-    listeners: 'Listeners',
-    bitrate: 'Bitrate',
-    djStatus: 'DJ / Status',
-    stream: 'Stream',
-    genre: 'Genre',
-    serverInfo: 'Server / Info',
-    modeExternal: 'External',
-    modeInternal: 'Internal',
-    sourcePrimary: 'Main',
-    sourceFallback: 'Fallback',
-    healthReady: 'Ready',
-    healthOnline: 'Online',
-    healthOffline: 'Offline',
-    audioPlaying: 'Playing',
-    audioPaused: 'Paused',
-    audioError: 'Error'
-  },
-  infoTexts: {
-    playerExternal: 'Externer Haupt-Player aktiv. Türkis bedeutet: Standard-Player läuft.',
-    playerInternal: 'Interner Worker-Fallback aktiv. Pink bedeutet: Notfall-Player läuft.',
-    sourcePrimary: 'Main-Stream aktiv. Aktuell läuft der Hauptstream.',
-    sourceFallback: 'Fallback-Stream aktiv. Der Hauptstream war nicht erreichbar.',
-    healthReady: 'Health wird gerade geprüft.',
-    healthOnline: 'Health ist online. Worker und Stream-Antwort sind erreichbar.',
-    healthOffline: 'Health ist offline oder liefert gerade keine saubere Antwort.',
-    metadataOnline: 'Metadaten werden sauber aus dem Worker gelesen und angezeigt.',
-    metadataOffline: 'Metadaten konnten gerade nicht geladen werden.',
-    audioPlaying: 'Audio läuft. Der Player gibt Ton aus.',
-    audioPaused: 'Audio ist pausiert.',
-    audioError: 'Audio konnte nicht abgespielt werden.'
-  },
-  defaults: {
-    djName: '666SOUNDsDESIGn DJ',
-    stationName: '666SOUNDsDESIGn Radio'
-  }
-};
-
-// ==========================================
-// DATEI: config/stream.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Stream-Konfiguration des internen Fallback-Players.
-// ÄNDERUNG: Health-Endpunkt ergänzt und Konfiguration für gemeinsamen One-Page-Player vorbereitet.
-// ==========================================
-
-const STREAM_CONFIG = {
-  stream_url: "/stream",
-  fallback_stream_url: "/fallback-stream",
-  metadata_url: "/api/nowplaying",
-  health_url: "/health",
-  poll_interval_ms: 8000,
-  listener_capacity: 250,
-  use_webhook: false,
-  primary_upstream: "https://my.idjstream.com/666soundsdesign/stream",
-  fallback_upstream: "https://my.idjstream.com:8686/stream"
-};
-
-// ==========================================
 // DATEI: external-player/js/player-ui-audio-pro.js
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-16 | AUDIO PRO + AUTO CHAIN HOT DEFAULT
@@ -105,14 +10,31 @@ const STREAM_CONFIG = {
 const FALLBACK_COVER = './assets/images/fallback-cover.png';
 const DEFAULT_DJ = '666SOUNDsDESIGn DJ';
 const BOOST_STAGES_DB = [0, 3, 6, 9];
-const HOT_DRIVE_DB = 2.8;
-const AUTO_TARGET_DB = -17.0;
-const AUTO_LIFT_MAX_DB = 6.2;
-const LIMIT_TRIGGER_DB = 2.2;
+const HOT_DRIVE_DB = 2.5;
+const AUTO_TARGET_DB = -18;
+const AUTO_LIFT_MAX_DB = 6;
+const LIMIT_TRIGGER_DB = 2.8;
 const CLIP_TRIGGER_DB = -0.35;
 const MINUS_INF_TEXT = '-∞ dB';
 
-function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
+function bindPress(target, handler) {
+  if (!target || typeof handler !== 'function') return;
+  let lastTouchStamp = 0;
+  const onTouchEnd = async (event) => {
+    lastTouchStamp = Date.now();
+    event.preventDefault();
+    await handler(event);
+  };
+  const onClick = async (event) => {
+    if (Date.now() - lastTouchStamp < 700) return;
+    await handler(event);
+  };
+  target.addEventListener('touchend', onTouchEnd, { passive: false });
+  target.addEventListener('click', onClick);
+}
+
+
+export function initExternalAudioProPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
   const doc = document.documentElement;
   const state = {
     booted: false,
@@ -143,11 +65,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grDb: 0,
     peakDb: -100,
     peakHoldDb: -100,
-    lastLimitState: 'Standby',
-    playbackActive: false,
-    analyserHealthy: false,
-    silentFrames: 0,
-    hudFallbackPhase: 0
+    lastLimitState: 'Standby'
   };
 
   const elements = {
@@ -199,8 +117,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grBarFill: document.getElementById('grBarFill'),
     limitLamp: document.getElementById('limitLamp'),
     limitStateText: document.getElementById('limitStateText'),
-    audioEngineStatus: document.getElementById('audioEngineStatus'),
-    eqBars: Array.from({ length: 10 }, (_, index) => document.getElementById(`eqBar${index}`))
+    audioEngineStatus: document.getElementById('audioEngineStatus')
   };
 
   applyThemeVars();
@@ -231,7 +148,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   bindPress(elements.bootButton, async () => {
     if (state.booted) return;
     state.booted = true;
-    if (elements.bootButton) elements.bootButton.disabled = true;
+    elements.bootButton.disabled = true;
     await runBootSequence();
     elements.overlay?.classList.add('hidden');
     await safePlay();
@@ -280,7 +197,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   });
 
   elements.audio?.addEventListener('playing', async () => {
-    state.playbackActive = true;
     setStatus('Playing');
     setLamp(elements.audioLamp, 'lamp-green');
     updateEngineState('LIVE', true, false);
@@ -289,12 +205,10 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   });
 
   elements.audio?.addEventListener('pause', () => {
-    state.playbackActive = false;
     setMeterHeights(2, 2);
   });
 
   elements.audio?.addEventListener('error', async () => {
-    state.playbackActive = false;
     if (!state.usingFallback) {
       try {
         await tryPlayFallback();
@@ -315,27 +229,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   fetchMetadata();
   checkHealth();
-
-  function bindPress(element, handler) {
-    if (!element) return;
-    let pressed = false;
-    const run = async (event) => {
-      if (event) {
-        if (event.type === 'touchend') event.preventDefault();
-      }
-      const now = Date.now();
-      if (pressed && (now - pressed) < 450) return;
-      pressed = now;
-      try {
-        await handler(event);
-      } catch (error) {
-        console.error('PRESS HANDLER ERROR', error);
-      }
-    };
-    element.addEventListener('pointerup', run);
-    element.addEventListener('touchend', run, { passive: false });
-    element.addEventListener('click', run);
-  }
 
   function applyViewportHeight() {
     const vh = window.innerHeight || document.documentElement.clientHeight || screen.height;
@@ -405,10 +298,8 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   }
 
   function setMeterHeights(left, right) {
-    const leftHeight = Math.max(8, Math.min(100, left * 1.16));
-    const rightHeight = Math.max(8, Math.min(100, right * 1.16));
-    if (elements.leftMeterFill) elements.leftMeterFill.style.height = `${leftHeight}%`;
-    if (elements.rightMeterFill) elements.rightMeterFill.style.height = `${rightHeight}%`;
+    if (elements.leftMeterFill) elements.leftMeterFill.style.height = `${Math.max(2, Math.min(100, left))}%`;
+    if (elements.rightMeterFill) elements.rightMeterFill.style.height = `${Math.max(2, Math.min(100, right))}%`;
   }
 
   function safeText(value, fallback = '') {
@@ -579,7 +470,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       updateEngineState('LIVE', true, false);
       return true;
     } catch (error) {
-      state.analyserHealthy = false;
       updateEngineState('BYPASS', false, false);
       setMeterHeights(6, 6);
       return false;
@@ -589,23 +479,15 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   function startMeterLoop() {
     if (state.meterAnim) return;
     const tick = () => {
-      const audioSeemsActive = Boolean(state.playbackActive && elements.audio && !elements.audio.paused);
       if (!state.inputAnalyser || !state.outputAnalyser || !state.inputData || !state.outputData) {
-        renderFallbackHud(audioSeemsActive);
         state.meterAnim = requestAnimationFrame(tick);
         return;
       }
+      state.inputAnalyser.getByteFrequencyData(state.inputData);
+      state.outputAnalyser.getByteFrequencyData(state.outputData);
 
-      try {
-        state.inputAnalyser.getByteFrequencyData(state.inputData);
-        state.outputAnalyser.getByteFrequencyData(state.outputData);
-        if (state.inputWaveData) state.inputAnalyser.getFloatTimeDomainData(state.inputWaveData);
-        if (state.outputWaveData) state.outputAnalyser.getFloatTimeDomainData(state.outputWaveData);
-      } catch (error) {
-        renderFallbackHud(audioSeemsActive);
-        state.meterAnim = requestAnimationFrame(tick);
-        return;
-      }
+      if (state.inputWaveData) state.inputAnalyser.getFloatTimeDomainData(state.inputWaveData);
+      if (state.outputWaveData) state.outputAnalyser.getFloatTimeDomainData(state.outputWaveData);
 
       const inputStats = analyseFrequencyData(state.inputData, state.inputWaveData);
       const outputStats = analyseFrequencyData(state.outputData, state.outputWaveData);
@@ -619,19 +501,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       const peakDb = outputStats.peakDb;
       const limitState = peakDb >= CLIP_TRIGGER_DB ? 'Clip' : grDb >= LIMIT_TRIGGER_DB ? 'Limiting' : 'Standby';
 
-      const realSignal = outputStats.energy > 0.012 || outputStats.bass > 0.015 || peakDb > -70;
-      if (audioSeemsActive && !realSignal) state.silentFrames += 1;
-      else state.silentFrames = 0;
-
-      if (audioSeemsActive && state.silentFrames > 48) {
-        state.analyserHealthy = false;
-        renderFallbackHud(true);
-        updateEngineState('SIM', true, false);
-        state.meterAnim = requestAnimationFrame(tick);
-        return;
-      }
-
-      state.analyserHealthy = true;
       state.grDb = smoothValue(state.grDb, grDb, 0.24);
       state.peakDb = smoothValue(state.peakDb, peakDb, 0.2);
       state.peakHoldDb = Math.max(state.peakDb, state.peakHoldDb - 0.24);
@@ -640,7 +509,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       const left = outputStats.leftPercent;
       const right = outputStats.rightPercent;
       setMeterHeights(left, right);
-      updateEqualizerBars(state.outputData);
       updateAutoChainHud({
         driveDb: state.hotDriveDb,
         liftDb: state.autoLiftDb,
@@ -658,41 +526,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       state.meterAnim = requestAnimationFrame(tick);
     };
     state.meterAnim = requestAnimationFrame(tick);
-  }
-
-  function renderFallbackHud(isActive) {
-    state.hudFallbackPhase += isActive ? 0.15 : 0.04;
-    const phase = state.hudFallbackPhase;
-    const base = isActive ? 28 : 8;
-    const volumeFactor = Number(elements.volumeRange?.value || elements.audio?.volume || 1);
-    const boostFactor = Math.min(1, state.currentBoostDb / 9);
-    const liftFactor = Math.min(1, state.autoLiftDb / Math.max(1, AUTO_LIFT_MAX_DB));
-    const swing = isActive ? (Math.sin(phase) * 16 + Math.sin(phase * 1.93) * 10) : 0;
-    const swing2 = isActive ? (Math.sin(phase * 1.21 + 1.4) * 15 + Math.sin(phase * 2.4) * 8) : 0;
-    const left = Math.max(6, Math.min(100, base + swing + (volumeFactor * 18) + (boostFactor * 12) + (liftFactor * 10)));
-    const right = Math.max(6, Math.min(100, base + swing2 + (volumeFactor * 16) + (boostFactor * 10) + (liftFactor * 10)));
-    const pseudoGr = isActive ? Math.max(0, Math.min(9, state.currentBoostDb * 0.18 + state.autoLiftDb * 0.38 + (Math.sin(phase * 1.4) + 1) * 0.9)) : 0;
-    const pseudoPeak = isActive ? Math.max(-24, -12 + Math.sin(phase * 1.1) * 4 + boostFactor * 5 + liftFactor * 3) : -96;
-    const pseudoLimit = pseudoPeak > -1.5 ? 'Limiting' : 'Standby';
-    setMeterHeights(left, right);
-    updateEqualizerBars(Array.from({ length: 256 }, (_, i) => {
-      const spread = 0.55 + (i / 256) * 0.45;
-      return Math.max(0, Math.min(255, Math.round((90 + Math.sin((phase * 2.2) + (i * 0.18)) * 70) * spread)));
-    }));
-    updateBoostHud(state.currentBoostDb);
-    updateAutoChainHud({
-      driveDb: state.hotDriveDb,
-      liftDb: state.autoLiftDb,
-      targetDb: state.targetDb,
-      chainState: isActive ? 'SIM ACTIVE' : 'IDLE'
-    });
-    updateDynamicsHud({
-      grDb: pseudoGr,
-      peakDb: pseudoPeak,
-      limitState: pseudoLimit,
-      energy: Math.min(1, left / 100),
-      bass: Math.min(1, right / 100)
-    });
   }
 
   function analyseFrequencyData(data, waveData = null) {
@@ -754,27 +587,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     return Math.max(0, Math.min(AUTO_LIFT_MAX_DB, needed));
   }
 
-  function updateEqualizerBars(data) {
-    if (!elements.eqBars || !elements.eqBars.length || !data || !data.length) return;
-    const bins = elements.eqBars.length;
-    const slice = Math.max(1, Math.floor(data.length / bins));
-    elements.eqBars.forEach((bar, index) => {
-      if (!bar) return;
-      let sum = 0;
-      let count = 0;
-      const start = index * slice;
-      const end = Math.min(data.length, index === bins - 1 ? data.length : start + slice);
-      for (let i = start; i < end; i += 1) {
-        sum += data[i];
-        count += 1;
-      }
-      const avg = count ? (sum / count) / 255 : 0;
-      const weighted = Math.min(1, Math.pow(avg, 0.78) * 1.18);
-      const height = 10 + (weighted * 90);
-      bar.style.height = `${height.toFixed(2)}%`;
-    });
-  }
-
   function updateBoostHud(boostDb) {
     if (elements.boostValueText) {
       elements.boostValueText.textContent = `${boostDb.toFixed(1)} dB`;
@@ -832,8 +644,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       await tryPlayPrimary();
       setStatus('Playing');
       setLamp(elements.audioLamp, 'lamp-green');
-      state.playbackActive = true;
-      startMeterLoop();
       startPolling();
       return true;
     } catch (primaryError) {
@@ -842,8 +652,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
         await tryPlayFallback();
         setStatus('Playing');
         setLamp(elements.audioLamp, 'lamp-green');
-        state.playbackActive = true;
-        startMeterLoop();
         startPolling();
         return true;
       } catch (fallbackError) {
@@ -885,24 +693,3 @@ function smoothValue(current, target, factor) {
   if (!Number.isFinite(current)) return target;
   return current + ((target - current) * factor);
 }
-
-
-try {
-  initPlayer({
-    streamConfig: STREAM_CONFIG,
-    uiConfig: UI_CONFIG,
-    mode: 'external',
-    assetPrefix: '.'
-  });
-  window.__RADIO_BOOT_OK__ = true;
-} catch (error) {
-  window.__RADIO_BOOT_OK__ = false;
-  console.error('PLAYER INIT ERROR', error);
-  var txt = document.getElementById('progressText');
-  var note = document.getElementById('volumeHint');
-  var btn = document.getElementById('bootButton');
-  if (txt) txt.textContent = 'BOOT ERROR';
-  if (note) note.textContent = 'JS-Init Fehler: ' + (error && error.message ? error.message : error);
-  if (btn) { btn.disabled = false; btn.textContent = 'Reload'; btn.addEventListener('click', function(){ location.reload(); }); }
-}
-})();
