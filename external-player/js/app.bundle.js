@@ -105,9 +105,9 @@ const STREAM_CONFIG = {
 const FALLBACK_COVER = './assets/images/fallback-cover.png';
 const DEFAULT_DJ = '666SOUNDsDESIGn DJ';
 const BOOST_STAGES_DB = [0, 6, 12, 18];
-const HOT_DRIVE_DB = 2.0;
-const AUTO_TARGET_DB = -18.0;
-const AUTO_LIFT_MAX_DB = 10.0;
+const HOT_DRIVE_DB = 0.0;
+const AUTO_TARGET_DB = -24.0;
+const AUTO_LIFT_MAX_DB = 0.0;
 const LIMIT_TRIGGER_DB = 2.2;
 const CLIP_TRIGGER_DB = -0.35;
 const MINUS_INF_TEXT = '-∞ dB';
@@ -561,11 +561,11 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
         state.preGainNode.gain.value = dbToGain(state.hotDriveDb);
         state.gainNode.gain.value = dbToGain(BOOST_STAGES_DB[state.currentBoostStage]);
         state.masterGainNode.gain.value = 0.98;
-        state.dynamicsNode.threshold.value = -30;
-        state.dynamicsNode.knee.value = 30;
-        state.dynamicsNode.ratio.value = 8.0;
-        state.dynamicsNode.attack.value = 0.001;
-        state.dynamicsNode.release.value = 0.12;
+        state.dynamicsNode.threshold.value = -20;
+        state.dynamicsNode.knee.value = 18;
+        state.dynamicsNode.ratio.value = 4.2;
+        state.dynamicsNode.attack.value = 0.003;
+        state.dynamicsNode.release.value = 0.22;
 
         state.mediaSourceNode.connect(state.inputAnalyser);
         state.inputAnalyser.connect(state.preGainNode);
@@ -609,15 +609,13 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
       const inputStats = analyseFrequencyData(state.inputData, state.inputWaveData);
       const outputStats = analyseFrequencyData(state.outputData, state.outputWaveData);
-      const targetLiftDb = computeAutoLiftTarget(inputStats.rmsDb);
-      state.autoLiftDb = smoothValue(state.autoLiftDb || 0, targetLiftDb, 0.18);
+      state.autoLiftDb = 0;
       applyAutoChainGain();
 
-      const rawReduction = Number(state.dynamicsNode?.reduction ?? 0);
-      const compressorReduction = Math.max(0, Math.abs(rawReduction));
+      const compressorReduction = Math.abs(Number(state.dynamicsNode?.reduction || 0));
       const grDb = compressorReduction;
       const peakDb = outputStats.peakDb;
-      const limitState = peakDb >= CLIP_TRIGGER_DB ? 'Clip' : grDb >= 0.8 ? 'Limiting' : grDb >= 0.1 ? 'Active' : 'Standby';
+      const limitState = peakDb >= CLIP_TRIGGER_DB ? 'Clip' : grDb >= LIMIT_TRIGGER_DB ? 'Limiting' : 'Standby';
 
       const realSignal = outputStats.energy > 0.012 || outputStats.bass > 0.015 || peakDb > -70;
       if (audioSeemsActive && !realSignal) state.silentFrames += 1;
@@ -751,7 +749,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   function applyAutoChainGain() {
     if (!state.preGainNode) return;
-    const totalDb = (state.hotDriveDb || 0) + (state.autoLiftDb || 0);
+    const totalDb = 0;
     const now = state.audioContext?.currentTime || 0;
     state.preGainNode.gain.setTargetAtTime(dbToGain(totalDb), now, 0.08);
   }
