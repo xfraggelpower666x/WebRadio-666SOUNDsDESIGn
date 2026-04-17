@@ -1,9 +1,9 @@
 // ==========================================
 // DATEI: js/app.bundle.js
 // ERSTELLT: 2026-04-17
-// GEÄNDERT: 2026-04-17 | AUDIO ENGINE FIX BUILD
-// ZWECK: Modulfreier Start-Build mit Audio Pro, Auto-Chain und Boost-Reserve auf stabiler No-Module-Basis.
-// ÄNDERUNG: Final Pro Balanced Tuning aktiv. Auto-Chain bleibt führend, aber stabiler abgestimmt; Boost bleibt reine Notfall-Reserve.
+// GEÄNDERT: 2026-04-17
+// ZWECK: Echter DSP-Rebuild auf stabiler No-Module-Basis mit realer Auto-Chain, echter Boost-/GR-Anzeige und festem EQ-Pfad.
+// ÄNDERUNG: Echter DSP-Pfad neu verdrahtet. Web-Audio-Graph mit EQ-Kette, robuster Analyse, echter GR-Auswertung und History-Bereinigung ergänzt.
 // ==========================================
 (function(){
 // ==========================================
@@ -111,6 +111,15 @@ const AUTO_LIFT_MAX_DB = 6.2;
 const LIMIT_TRIGGER_DB = 2.2;
 const CLIP_TRIGGER_DB = -0.35;
 const MINUS_INF_TEXT = '-∞ dB';
+const EQ_BANDS = [
+  { type: 'lowshelf', frequency: 60, gain: 2.0, q: 0.707 },
+  { type: 'peaking', frequency: 125, gain: 1.2, q: 1.0 },
+  { type: 'peaking', frequency: 250, gain: -0.8, q: 1.0 },
+  { type: 'peaking', frequency: 1000, gain: 0.6, q: 1.0 },
+  { type: 'peaking', frequency: 2500, gain: 1.4, q: 1.0 },
+  { type: 'peaking', frequency: 6000, gain: 1.0, q: 0.9 },
+  { type: 'highshelf', frequency: 11000, gain: 1.6, q: 0.707 }
+];
 
 function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
   const doc = document.documentElement;
@@ -129,6 +138,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     dynamicsNode: null,
     gainNode: null,
     masterGainNode: null,
+    eqNodes: [],
     inputData: null,
     outputData: null,
     inputWaveData: null,
@@ -143,11 +153,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grDb: 0,
     peakDb: -100,
     peakHoldDb: -100,
-    lastLimitState: 'Standby',
-    playbackActive: false,
-    analyserHealthy: false,
-    silentFrames: 0,
-    hudFallbackPhase: 0
+    lastLimitState: 'Standby'
   };
 
   const elements = {
@@ -217,6 +223,11 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   if (isiOS && elements.volumeHint) {
     elements.volumeHint.textContent = 'Ein Tipp auf OK initialisiert Audio. Lautstärke zusätzlich über iPhone-Tasten möglich.';
   }
+  if (elements.audio) {
+    elements.audio.crossOrigin = 'anonymous';
+    elements.audio.preload = 'auto';
+    elements.audio.playsInline = true;
+  }
 
   setLamp(elements.metaLamp, 'lamp-red');
   setLamp(elements.audioLamp, 'lamp-red');
@@ -279,8 +290,15 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     });
   });
 
+  elements.audio?.addEventListener('loadedmetadata', async () => {
+    await ensureAudioGraph();
+  });
+
+  elements.audio?.addEventListener('canplay', async () => {
+    await ensureAudioGraph();
+  });
+
   elements.audio?.addEventListener('playing', async () => {
-    state.playbackActive = true;
     setStatus('Playing');
     setLamp(elements.audioLamp, 'lamp-green');
     updateEngineState('LIVE', true, false);
@@ -289,12 +307,10 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   });
 
   elements.audio?.addEventListener('pause', () => {
-    state.playbackActive = false;
     setMeterHeights(2, 2);
   });
 
   elements.audio?.addEventListener('error', async () => {
-    state.playbackActive = false;
     if (!state.usingFallback) {
       try {
         await tryPlayFallback();
@@ -528,84 +544,90 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     state.healthTimer = setInterval(checkHealth, streamConfig.poll_interval_ms);
   }
 
-  async function ensureAudioGraph() {
-    if (!elements.audio) return false;
-    try {
-      if (!state.audioContext) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) throw new Error('AudioContext nicht unterstützt');
-        state.audioContext = new AudioCtx();
-      }
-      if (state.audioContext.state === 'suspended') {
-        await state.audioContext.resume();
-      }
-      if (!state.mediaSourceNode) {
-        state.mediaSourceNode = state.audioContext.createMediaElementSource(elements.audio);
-        state.inputAnalyser = state.audioContext.createAnalyser();
-        state.outputAnalyser = state.audioContext.createAnalyser();
-        state.preGainNode = state.audioContext.createGain();
-        state.gainNode = state.audioContext.createGain();
-        state.masterGainNode = state.audioContext.createGain();
-        state.dynamicsNode = state.audioContext.createDynamicsCompressor();
-
-        state.inputAnalyser.fftSize = 2048;
-        state.outputAnalyser.fftSize = 2048;
-        state.inputAnalyser.smoothingTimeConstant = 0.82;
-        state.outputAnalyser.smoothingTimeConstant = 0.86;
-
-        state.inputData = new Uint8Array(state.inputAnalyser.frequencyBinCount);
-        state.outputData = new Uint8Array(state.outputAnalyser.frequencyBinCount);
-        state.inputWaveData = new Float32Array(state.inputAnalyser.fftSize);
-        state.outputWaveData = new Float32Array(state.outputAnalyser.fftSize);
-
-        state.preGainNode.gain.value = dbToGain(state.hotDriveDb);
-        state.gainNode.gain.value = dbToGain(BOOST_STAGES_DB[state.currentBoostStage]);
-        state.masterGainNode.gain.value = 0.98;
-        state.dynamicsNode.threshold.value = -20;
-        state.dynamicsNode.knee.value = 18;
-        state.dynamicsNode.ratio.value = 4.2;
-        state.dynamicsNode.attack.value = 0.003;
-        state.dynamicsNode.release.value = 0.22;
-
-        state.mediaSourceNode.connect(state.inputAnalyser);
-        state.inputAnalyser.connect(state.preGainNode);
-        state.preGainNode.connect(state.gainNode);
-        state.gainNode.connect(state.dynamicsNode);
-        state.dynamicsNode.connect(state.outputAnalyser);
-        state.outputAnalyser.connect(state.masterGainNode);
-        state.masterGainNode.connect(state.audioContext.destination);
-      }
-      setBoostStage(state.currentBoostStage);
-      updateEngineState('LIVE', true, false);
-      return true;
-    } catch (error) {
-      state.analyserHealthy = false;
-      updateEngineState('BYPASS', false, false);
-      setMeterHeights(6, 6);
-      return false;
+  
+async function ensureAudioGraph() {
+  if (!elements.audio) return false;
+  try {
+    if (!state.audioContext) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) throw new Error('AudioContext nicht unterstützt');
+      state.audioContext = new AudioCtx();
     }
-  }
+    if (state.audioContext.state === 'suspended') {
+      await state.audioContext.resume();
+    }
+    if (!state.mediaSourceNode) {
+      state.mediaSourceNode = state.audioContext.createMediaElementSource(elements.audio);
+      state.inputAnalyser = state.audioContext.createAnalyser();
+      state.outputAnalyser = state.audioContext.createAnalyser();
+      state.preGainNode = state.audioContext.createGain();
+      state.gainNode = state.audioContext.createGain();
+      state.masterGainNode = state.audioContext.createGain();
+      state.dynamicsNode = state.audioContext.createDynamicsCompressor();
+      state.eqNodes = EQ_BANDS.map((band) => {
+        const node = state.audioContext.createBiquadFilter();
+        node.type = band.type;
+        node.frequency.value = band.frequency;
+        node.gain.value = band.gain;
+        node.Q.value = band.q;
+        return node;
+      });
 
-  function startMeterLoop() {
+      state.inputAnalyser.fftSize = 2048;
+      state.outputAnalyser.fftSize = 2048;
+      state.inputAnalyser.smoothingTimeConstant = 0.82;
+      state.outputAnalyser.smoothingTimeConstant = 0.86;
+
+      state.inputData = new Uint8Array(state.inputAnalyser.frequencyBinCount);
+      state.outputData = new Uint8Array(state.outputAnalyser.frequencyBinCount);
+      state.inputWaveData = new Float32Array(state.inputAnalyser.fftSize);
+      state.outputWaveData = new Float32Array(state.outputAnalyser.fftSize);
+
+      state.preGainNode.gain.value = dbToGain(state.hotDriveDb);
+      state.gainNode.gain.value = dbToGain(BOOST_STAGES_DB[state.currentBoostStage]);
+      state.masterGainNode.gain.value = 0.98;
+      state.dynamicsNode.threshold.value = -20;
+      state.dynamicsNode.knee.value = 18;
+      state.dynamicsNode.ratio.value = 4.2;
+      state.dynamicsNode.attack.value = 0.003;
+      state.dynamicsNode.release.value = 0.22;
+
+      state.mediaSourceNode.connect(state.inputAnalyser);
+      state.inputAnalyser.connect(state.preGainNode);
+      state.preGainNode.connect(state.gainNode);
+      let lastNode = state.gainNode;
+      state.eqNodes.forEach((node) => {
+        lastNode.connect(node);
+        lastNode = node;
+      });
+      lastNode.connect(state.dynamicsNode);
+      state.dynamicsNode.connect(state.outputAnalyser);
+      state.outputAnalyser.connect(state.masterGainNode);
+      state.masterGainNode.connect(state.audioContext.destination);
+    }
+    setBoostStage(state.currentBoostStage);
+    updateEngineState('LIVE', true, false);
+    return true;
+  } catch (error) {
+    console.error('DSP GRAPH ERROR', error);
+    updateEngineState('BYPASS', false, false);
+    setMeterHeights(6, 6);
+    return false;
+  }
+}
+
+function startMeterLoop() {
     if (state.meterAnim) return;
     const tick = () => {
-      const audioSeemsActive = Boolean(state.playbackActive && elements.audio && !elements.audio.paused);
       if (!state.inputAnalyser || !state.outputAnalyser || !state.inputData || !state.outputData) {
-        renderFallbackHud(audioSeemsActive);
         state.meterAnim = requestAnimationFrame(tick);
         return;
       }
+      state.inputAnalyser.getByteFrequencyData(state.inputData);
+      state.outputAnalyser.getByteFrequencyData(state.outputData);
 
-      try {
-        state.inputAnalyser.getByteFrequencyData(state.inputData);
-        state.outputAnalyser.getByteFrequencyData(state.outputData);
-        if (state.inputWaveData) state.inputAnalyser.getFloatTimeDomainData(state.inputWaveData);
-        if (state.outputWaveData) state.outputAnalyser.getFloatTimeDomainData(state.outputWaveData);
-      } catch (error) {
-        renderFallbackHud(audioSeemsActive);
-        state.meterAnim = requestAnimationFrame(tick);
-        return;
-      }
+      if (state.inputWaveData) state.inputAnalyser.getFloatTimeDomainData(state.inputWaveData);
+      if (state.outputWaveData) state.outputAnalyser.getFloatTimeDomainData(state.outputWaveData);
 
       const inputStats = analyseFrequencyData(state.inputData, state.inputWaveData);
       const outputStats = analyseFrequencyData(state.outputData, state.outputWaveData);
@@ -619,19 +641,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       const peakDb = outputStats.peakDb;
       const limitState = peakDb >= CLIP_TRIGGER_DB ? 'Clip' : grDb >= LIMIT_TRIGGER_DB ? 'Limiting' : 'Standby';
 
-      const realSignal = outputStats.energy > 0.012 || outputStats.bass > 0.015 || peakDb > -70;
-      if (audioSeemsActive && !realSignal) state.silentFrames += 1;
-      else state.silentFrames = 0;
-
-      if (audioSeemsActive && state.silentFrames > 48) {
-        state.analyserHealthy = false;
-        renderFallbackHud(true);
-        updateEngineState('SIM', true, false);
-        state.meterAnim = requestAnimationFrame(tick);
-        return;
-      }
-
-      state.analyserHealthy = true;
       state.grDb = smoothValue(state.grDb, grDb, 0.24);
       state.peakDb = smoothValue(state.peakDb, peakDb, 0.2);
       state.peakHoldDb = Math.max(state.peakDb, state.peakHoldDb - 0.24);
@@ -658,41 +667,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       state.meterAnim = requestAnimationFrame(tick);
     };
     state.meterAnim = requestAnimationFrame(tick);
-  }
-
-  function renderFallbackHud(isActive) {
-    state.hudFallbackPhase += isActive ? 0.15 : 0.04;
-    const phase = state.hudFallbackPhase;
-    const base = isActive ? 28 : 8;
-    const volumeFactor = Number(elements.volumeRange?.value || elements.audio?.volume || 1);
-    const boostFactor = Math.min(1, state.currentBoostDb / 9);
-    const liftFactor = Math.min(1, state.autoLiftDb / Math.max(1, AUTO_LIFT_MAX_DB));
-    const swing = isActive ? (Math.sin(phase) * 16 + Math.sin(phase * 1.93) * 10) : 0;
-    const swing2 = isActive ? (Math.sin(phase * 1.21 + 1.4) * 15 + Math.sin(phase * 2.4) * 8) : 0;
-    const left = Math.max(6, Math.min(100, base + swing + (volumeFactor * 18) + (boostFactor * 12) + (liftFactor * 10)));
-    const right = Math.max(6, Math.min(100, base + swing2 + (volumeFactor * 16) + (boostFactor * 10) + (liftFactor * 10)));
-    const pseudoGr = isActive ? Math.max(0, Math.min(9, state.currentBoostDb * 0.18 + state.autoLiftDb * 0.38 + (Math.sin(phase * 1.4) + 1) * 0.9)) : 0;
-    const pseudoPeak = isActive ? Math.max(-24, -12 + Math.sin(phase * 1.1) * 4 + boostFactor * 5 + liftFactor * 3) : -96;
-    const pseudoLimit = pseudoPeak > -1.5 ? 'Limiting' : 'Standby';
-    setMeterHeights(left, right);
-    updateEqualizerBars(Array.from({ length: 256 }, (_, i) => {
-      const spread = 0.55 + (i / 256) * 0.45;
-      return Math.max(0, Math.min(255, Math.round((90 + Math.sin((phase * 2.2) + (i * 0.18)) * 70) * spread)));
-    }));
-    updateBoostHud(state.currentBoostDb);
-    updateAutoChainHud({
-      driveDb: state.hotDriveDb,
-      liftDb: state.autoLiftDb,
-      targetDb: state.targetDb,
-      chainState: isActive ? 'SIM ACTIVE' : 'IDLE'
-    });
-    updateDynamicsHud({
-      grDb: pseudoGr,
-      peakDb: pseudoPeak,
-      limitState: pseudoLimit,
-      energy: Math.min(1, left / 100),
-      bass: Math.min(1, right / 100)
-    });
   }
 
   function analyseFrequencyData(data, waveData = null) {
@@ -832,7 +806,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       await tryPlayPrimary();
       setStatus('Playing');
       setLamp(elements.audioLamp, 'lamp-green');
-      state.playbackActive = true;
       startMeterLoop();
       startPolling();
       return true;
@@ -842,7 +815,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
         await tryPlayFallback();
         setStatus('Playing');
         setLamp(elements.audioLamp, 'lamp-green');
-        state.playbackActive = true;
         startMeterLoop();
         startPolling();
         return true;
