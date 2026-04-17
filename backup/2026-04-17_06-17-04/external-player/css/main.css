@@ -16,9 +16,9 @@
   --bg2: #11141a;
   --panel: #00f5df;
   --panel-2: #04d7d7;
-  --text: #cffff9;
-  --text-dark: #7fffee;
-  --muted: #66f2e3;
+  --text: #eef7ff;
+  --text-dark: #1c1f24;
+  --muted: #8ea2b3;
   --pink: #ff3fb7;
   --cyan: #00f5df;
   --green: #53ff98;
@@ -678,39 +678,4 @@ AUDIO PRO + AUTO CHAIN HUD
   .eq-label { font-size: .55rem; }
   .side-meter { width: 16px; }
   .side-meter-track { width: 8px; }
-}
-
-
-/* 2026-04-17 NEON TEXT FIX: komplette Schrift auf Cyan/Tuerkis ziehen */
-body, .player-card, .boot-panel, .info-panel, .mini-box, .display-window, .history-overlay, .info-bubble,
-label, span, p, li, .history-list, .history-list li, .track-title, .track-artist, .stream-name,
-.meter-value, .meter-label, .eq-label, .audio-engine-status, .boost-btn, .control-btn, .meta-value,
-.meta-label, .headline-label, .chip-label, .mini-label, .volume-wrap label {
-  color: var(--text);
-}
-.chip-label,
-.mini-label,
-.headline-label,
-.volume-wrap label,
-.meta-label,
-.meter-label,
-.eq-label,
-.audio-engine-status {
-  color: var(--muted) !important;
-  text-shadow: 0 0 8px rgba(0,245,223,.18), 0 0 14px rgba(0,245,223,.10);
-}
-.meter-value,
-.meta-value,
-.history-title,
-.track-title,
-.track-artist,
-.stream-name,
-.brand-word-left,
-.boost-btn,
-.control-btn,
-.info-panel,
-.info-bubble,
-.history-overlay {
-  color: var(--text) !important;
-  text-shadow: 0 0 10px rgba(0,245,223,.24), 0 0 18px rgba(0,245,223,.12);
 }
