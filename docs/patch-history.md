@@ -22,3 +22,7 @@ Die Domain bleibt sichtbar, weil der Worker den externen Player als Proxy/Passth
 - Tap-Infos für Lampen statt Hover
 - Türkis-Panels mit dunkler Schrift
 - Neon-Pink-/Neon-Türkis-Laser-Outlines
+
+- 2026-04-17: Audio Pro + Auto-Chain Hot Default in No-Module-Basis integriert. Drive erhöht, Target angehoben, Boost bleibt Reserve.
+
+- 2026-04-17: Final Pro Balanced Build aus No-Module-Basis + Audio Pro erstellt. Auto-Chain auf stabile Lautheit abgestimmt (Drive 2.8 dB / Target -17.0 dB / Lift max 6.2 dB), Boost bleibt Notfall-Reserve.
