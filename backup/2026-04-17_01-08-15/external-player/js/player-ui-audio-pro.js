@@ -1,99 +1,4 @@
 // ==========================================
-// DATEI: js/app.bundle.js
-// ERSTELLT: 2026-04-17
-// GEÄNDERT: 2026-04-17
-// ZWECK: Modulfreier Start-Build mit Audio Pro, Auto-Chain und Boost-Reserve auf stabiler No-Module-Basis.
-// ÄNDERUNG: Final Pro Balanced Tuning aktiv. Auto-Chain bleibt führend, aber stabiler abgestimmt; Boost bleibt reine Notfall-Reserve.
-// ==========================================
-(function(){
-// ==========================================
-// DATEI: config/ui.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Zentrale UI-/Theme-Konfiguration für internen und externen WebRadio-Player.
-// ÄNDERUNG: Cyber-Header, Lampen-Tap-Infos, neon-türkise Info-Panels und Laser-Outlines ergänzt.
-// ==========================================
-
-const UI_CONFIG = {
-  theme: {
-    backgroundBase: '#1c1f24',
-    backgroundDeep: '#11141a',
-    neonPink: '#ff3fb7',
-    neonTurquoise: '#00f5df',
-    okGreen: '#53ff98',
-    errorRed: '#ff557d',
-    textMain: '#eef7ff',
-    textMuted: '#8ea2b3',
-    panelBorder: 'rgba(0,245,223,0.24)',
-    panelGlass: 'rgba(255,255,255,0.04)',
-    panelSolid: '#00f5df',
-    panelText: '#1c1f24'
-  },
-  labels: {
-    metadata: 'Meta',
-    audio: 'Audio',
-    source: 'Source',
-    health: 'Health',
-    player: 'Player',
-    nowPlaying: 'Now Playing',
-    listeners: 'Listeners',
-    bitrate: 'Bitrate',
-    djStatus: 'DJ / Status',
-    stream: 'Stream',
-    genre: 'Genre',
-    serverInfo: 'Server / Info',
-    modeExternal: 'External',
-    modeInternal: 'Internal',
-    sourcePrimary: 'Main',
-    sourceFallback: 'Fallback',
-    healthReady: 'Ready',
-    healthOnline: 'Online',
-    healthOffline: 'Offline',
-    audioPlaying: 'Playing',
-    audioPaused: 'Paused',
-    audioError: 'Error'
-  },
-  infoTexts: {
-    playerExternal: 'Externer Haupt-Player aktiv. Türkis bedeutet: Standard-Player läuft.',
-    playerInternal: 'Interner Worker-Fallback aktiv. Pink bedeutet: Notfall-Player läuft.',
-    sourcePrimary: 'Main-Stream aktiv. Aktuell läuft der Hauptstream.',
-    sourceFallback: 'Fallback-Stream aktiv. Der Hauptstream war nicht erreichbar.',
-    healthReady: 'Health wird gerade geprüft.',
-    healthOnline: 'Health ist online. Worker und Stream-Antwort sind erreichbar.',
-    healthOffline: 'Health ist offline oder liefert gerade keine saubere Antwort.',
-    metadataOnline: 'Metadaten werden sauber aus dem Worker gelesen und angezeigt.',
-    metadataOffline: 'Metadaten konnten gerade nicht geladen werden.',
-    audioPlaying: 'Audio läuft. Der Player gibt Ton aus.',
-    audioPaused: 'Audio ist pausiert.',
-    audioError: 'Audio konnte nicht abgespielt werden.'
-  },
-  defaults: {
-    djName: '666SOUNDsDESIGn DJ',
-    stationName: '666SOUNDsDESIGn Radio'
-  }
-};
-
-// ==========================================
-// DATEI: config/stream.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Stream-Konfiguration des internen Fallback-Players.
-// ÄNDERUNG: Health-Endpunkt ergänzt und Konfiguration für gemeinsamen One-Page-Player vorbereitet.
-// ==========================================
-
-const STREAM_CONFIG = {
-  stream_url: "/stream",
-  fallback_stream_url: "/fallback-stream",
-  metadata_url: "/api/nowplaying",
-  health_url: "/health",
-  poll_interval_ms: 8000,
-  listener_capacity: 250,
-  use_webhook: false,
-  primary_upstream: "https://my.idjstream.com/666soundsdesign/stream",
-  fallback_upstream: "https://my.idjstream.com:8686/stream"
-};
-
-// ==========================================
 // DATEI: external-player/js/player-ui-audio-pro.js
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-16 | AUDIO PRO + AUTO CHAIN HOT DEFAULT
@@ -105,14 +10,31 @@ const STREAM_CONFIG = {
 const FALLBACK_COVER = './assets/images/fallback-cover.png';
 const DEFAULT_DJ = '666SOUNDsDESIGn DJ';
 const BOOST_STAGES_DB = [0, 3, 6, 9];
-const HOT_DRIVE_DB = 2.8;
-const AUTO_TARGET_DB = -17.0;
-const AUTO_LIFT_MAX_DB = 6.2;
-const LIMIT_TRIGGER_DB = 2.2;
+const HOT_DRIVE_DB = 2.5;
+const AUTO_TARGET_DB = -18;
+const AUTO_LIFT_MAX_DB = 6;
+const LIMIT_TRIGGER_DB = 2.8;
 const CLIP_TRIGGER_DB = -0.35;
 const MINUS_INF_TEXT = '-∞ dB';
 
-function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
+function bindPress(target, handler) {
+  if (!target || typeof handler !== 'function') return;
+  let lastTouchStamp = 0;
+  const onTouchEnd = async (event) => {
+    lastTouchStamp = Date.now();
+    event.preventDefault();
+    await handler(event);
+  };
+  const onClick = async (event) => {
+    if (Date.now() - lastTouchStamp < 700) return;
+    await handler(event);
+  };
+  target.addEventListener('touchend', onTouchEnd, { passive: false });
+  target.addEventListener('click', onClick);
+}
+
+
+export function initExternalAudioProPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
   const doc = document.documentElement;
   const state = {
     booted: false,
@@ -226,7 +148,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   bindPress(elements.bootButton, async () => {
     if (state.booted) return;
     state.booted = true;
-    if (elements.bootButton) elements.bootButton.disabled = true;
+    elements.bootButton.disabled = true;
     await runBootSequence();
     elements.overlay?.classList.add('hidden');
     await safePlay();
@@ -307,27 +229,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   fetchMetadata();
   checkHealth();
-
-  function bindPress(element, handler) {
-    if (!element) return;
-    let pressed = false;
-    const run = async (event) => {
-      if (event) {
-        if (event.type === 'touchend') event.preventDefault();
-      }
-      const now = Date.now();
-      if (pressed && (now - pressed) < 450) return;
-      pressed = now;
-      try {
-        await handler(event);
-      } catch (error) {
-        console.error('PRESS HANDLER ERROR', error);
-      }
-    };
-    element.addEventListener('pointerup', run);
-    element.addEventListener('touchend', run, { passive: false });
-    element.addEventListener('click', run);
-  }
 
   function applyViewportHeight() {
     const vh = window.innerHeight || document.documentElement.clientHeight || screen.height;
@@ -792,24 +693,3 @@ function smoothValue(current, target, factor) {
   if (!Number.isFinite(current)) return target;
   return current + ((target - current) * factor);
 }
-
-
-try {
-  initPlayer({
-    streamConfig: STREAM_CONFIG,
-    uiConfig: UI_CONFIG,
-    mode: 'external',
-    assetPrefix: '.'
-  });
-  window.__RADIO_BOOT_OK__ = true;
-} catch (error) {
-  window.__RADIO_BOOT_OK__ = false;
-  console.error('PLAYER INIT ERROR', error);
-  var txt = document.getElementById('progressText');
-  var note = document.getElementById('volumeHint');
-  var btn = document.getElementById('bootButton');
-  if (txt) txt.textContent = 'BOOT ERROR';
-  if (note) note.textContent = 'JS-Init Fehler: ' + (error && error.message ? error.message : error);
-  if (btn) { btn.disabled = false; btn.textContent = 'Reload'; btn.addEventListener('click', function(){ location.reload(); }); }
-}
-})();
