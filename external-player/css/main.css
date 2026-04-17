@@ -679,3 +679,12 @@ AUDIO PRO + AUTO CHAIN HUD
   .side-meter { width: 16px; }
   .side-meter-track { width: 8px; }
 }
+
+/* ==========================================
+   GEÄNDERT: 2026-04-17
+   ZWECK: DSP-Rebuild HUD Lesbarkeit + Neon-Typografie
+   ========================================== */
+.player-card, .player-card * { color: #b8fff9; }
+.brand-word, .history-title, .headline-title, .chip-value, .meter-value, .audio-engine-status, .mini-value, .mini-label, .headline-label { color: #76fff3; text-shadow: 0 0 6px rgba(0,255,230,.28), 0 0 12px rgba(0,255,255,.16); }
+.history-list li { margin-bottom: 8px; color: #9dfff7; }
+.eq-bar { min-height: 10%; }
