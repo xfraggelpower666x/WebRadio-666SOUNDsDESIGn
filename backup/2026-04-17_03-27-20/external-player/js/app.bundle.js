@@ -153,9 +153,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grDb: 0,
     peakDb: -100,
     peakHoldDb: -100,
-    lastLimitState: 'Standby',
-    graphMode: 'INIT',
-    desiredVolume: 1
+    lastLimitState: 'Standby'
   };
 
   const elements = {
@@ -270,14 +268,13 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   bindPress(elements.muteBtn, () => {
     state.muted = !state.muted;
-    applyOutputVolume();
+    elements.audio.muted = state.muted;
     elements.muteBtn.textContent = state.muted ? 'Unmute' : 'Mute';
   });
 
   elements.volumeRange?.addEventListener('input', () => {
     const value = Number(elements.volumeRange.value);
-    state.desiredVolume = Number.isFinite(value) ? value : 1;
-    applyOutputVolume();
+    elements.audio.volume = Number.isFinite(value) ? value : 1;
   });
 
   bindPress(elements.historyToggle, () => {
@@ -805,10 +802,8 @@ function startMeterLoop() {
 
   async function safePlay() {
     try {
-      if (!state.audioContext) await ensureAudioGraph();
-      await tryPlayPrimary();
       await ensureAudioGraph();
-      applyOutputVolume();
+      await tryPlayPrimary();
       setStatus('Playing');
       setLamp(elements.audioLamp, 'lamp-green');
       startMeterLoop();
@@ -816,10 +811,8 @@ function startMeterLoop() {
       return true;
     } catch (primaryError) {
       try {
-        if (!state.audioContext) await ensureAudioGraph();
-        await tryPlayFallback();
         await ensureAudioGraph();
-        applyOutputVolume();
+        await tryPlayFallback();
         setStatus('Playing');
         setLamp(elements.audioLamp, 'lamp-green');
         startMeterLoop();
@@ -851,25 +844,6 @@ function startMeterLoop() {
   }
 }
 
-
-function applyOutputVolume() {
-  const baseVolume = Number.isFinite(state.desiredVolume) ? Math.max(0, Math.min(1, state.desiredVolume)) : 1;
-  if (state.masterGainNode && state.audioContext) {
-    const target = state.muted ? 0 : (baseVolume * 0.98);
-    state.masterGainNode.gain.setTargetAtTime(target, state.audioContext.currentTime || 0, 0.015);
-    if (state.graphMode === 'CAPTURE') {
-      elements.audio.muted = true;
-      elements.audio.volume = 1;
-    } else {
-      elements.audio.muted = state.muted;
-      elements.audio.volume = baseVolume;
-    }
-  } else {
-    elements.audio.muted = state.muted;
-    elements.audio.volume = baseVolume;
-  }
-}
-
 function dbToGain(db) {
   return Math.pow(10, db / 20);
 }
@@ -889,7 +863,7 @@ try {
   initPlayer({
     streamConfig: STREAM_CONFIG,
     uiConfig: UI_CONFIG,
-    mode: 'internal',
+    mode: 'external',
     assetPrefix: '.'
   });
   window.__RADIO_BOOT_OK__ = true;
