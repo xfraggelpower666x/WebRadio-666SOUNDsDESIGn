@@ -1,16 +1,10 @@
-==========================================
-DATEI: README.txt
-ERSTELLT: 2026-04-16
-GEÄNDERT: 2026-04-16
-ZWECK: Kurzhinweis für schnelle Repo-Orientierung.
-ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
-==========================================
 
-DOMAIN KEEP FIX
+AUTO DJ CYBER TOOL V1.2 CLEAN FIX
 
-This ZIP keeps the custom domain visible by proxying the GitHub Pages root HTML.
+- Syntax Fehler gefixt
+- GUI startet stabil
+- Test-Button integriert
 
-Use:
-1. unzip
-2. upload worker.js with Scriptable
-3. done
+START:
+1. ZIP entpacken
+2. start_autodj_tool.bat starten
