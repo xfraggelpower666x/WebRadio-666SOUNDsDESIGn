@@ -609,12 +609,10 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
       const inputStats = analyseFrequencyData(state.inputData, state.inputWaveData);
       const outputStats = analyseFrequencyData(state.outputData, state.outputWaveData);
-      const targetLiftDb = computeAutoLiftTarget(inputStats.rmsDb);
-state.autoLiftDb = Math.max(0, Math.min(6, targetLiftDb));
+      state.autoLiftDb = 0;
       applyAutoChainGain();
 
-      const rawReduction = Number(state.dynamicsNode?.reduction ?? 0);
-const compressorReduction = Math.max(0, Math.abs(rawReduction));
+      const compressorReduction = Math.abs(Number(state.dynamicsNode?.reduction || 0));
       const grDb = compressorReduction;
       const peakDb = outputStats.peakDb;
       const limitState = peakDb >= CLIP_TRIGGER_DB ? 'Clip' : grDb >= LIMIT_TRIGGER_DB ? 'Limiting' : 'Standby';
@@ -751,7 +749,7 @@ const compressorReduction = Math.max(0, Math.abs(rawReduction));
 
   function applyAutoChainGain() {
     if (!state.preGainNode) return;
-    const totalDb = (state.currentBoostDb || 0) + (state.autoLiftDb || 0);
+    const totalDb = 0;
     const now = state.audioContext?.currentTime || 0;
     state.preGainNode.gain.setTargetAtTime(dbToGain(totalDb), now, 0.08);
   }
@@ -899,7 +897,7 @@ try {
   initPlayer({
     streamConfig: STREAM_CONFIG,
     uiConfig: UI_CONFIG,
-    mode: 'external',
+    mode: 'internal',
     assetPrefix: '.'
   });
   window.__RADIO_BOOT_OK__ = true;
