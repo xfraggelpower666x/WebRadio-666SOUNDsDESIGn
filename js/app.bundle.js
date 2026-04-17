@@ -1,3 +1,15 @@
+
+// === +12 BOOST MODE ===
+state.boostPlus12Enabled = false;
+function toggleBoostPlus12(){
+  if(!state.boostPlus12Enabled){
+    if(!confirm("WARNING: +12 dB can damage speakers. Continue?")) return;
+    state.boostPlus12Enabled = true;
+  } else {
+    state.boostPlus12Enabled = false;
+  }
+}
+
 // ==========================================
 // DATEI: js/app.bundle.js
 // ERSTELLT: 2026-04-17
@@ -751,7 +763,7 @@ const compressorReduction = Math.max(0, Math.abs(rawReduction));
 
   function applyAutoChainGain() {
     if (!state.preGainNode) return;
-    const totalDb = (state.currentBoostDb || 0) + (state.autoLiftDb || 0);
+    const totalDb = (state.currentBoostDb || 0) + (state.autoLiftDb || 0) + (state.boostPlus12Enabled ? 12 : 0);
     const now = state.audioContext?.currentTime || 0;
     state.preGainNode.gain.setTargetAtTime(dbToGain(totalDb), now, 0.08);
   }
@@ -914,3 +926,11 @@ try {
   if (btn) { btn.disabled = false; btn.textContent = 'Reload'; btn.addEventListener('click', function(){ location.reload(); }); }
 }
 })();
+
+// === GR + METER FIX ===
+const rawReduction = Number(state.dynamicsNode?.reduction ?? 0);
+const grDb = Math.max(0, Math.abs(rawReduction));
+const boostDb = Number(state.currentBoostDb || 0) + (state.boostPlus12Enabled ? 12 : 0);
+const level = Math.max(0, Math.min(1, (boostDb/12)*0.6 + (grDb/12)*0.8));
+state.grMeterLevel = level;
+state.grDb = grDb;
