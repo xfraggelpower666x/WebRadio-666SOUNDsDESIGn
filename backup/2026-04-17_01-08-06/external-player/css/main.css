@@ -1,5 +1,5 @@
 /* ==========================================
-   DATEI: css/main.css
+   DATEI: external-player/css/main.css
    ERSTELLT: 2026-04-16
    GEÄNDERT: 2026-04-16
    ZWECK: Gemeinsames One-Page-Cyber-Stylesheet für internen und externen Player.
@@ -406,50 +406,35 @@ input[type="range"] { width: 100%; }
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 30px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
   pointer-events: none;
 }
-.side-meter-left { left: 4px; }
-.side-meter-right { right: 4px; }
+.side-meter-left { left: 2px; }
+.side-meter-right { right: 2px; }
 .side-meter-track {
   position: relative;
-  width: 14px;
-  height: min(80dvh, 780px);
+  width: 9px;
+  height: min(78dvh, 760px);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,245,223,.08));
-  border: 1px solid rgba(0,245,223,.58);
-  box-shadow:
-    0 0 14px rgba(0,245,223,.30),
-    0 0 22px rgba(0,245,223,.18),
-    inset 0 0 14px rgba(255,63,183,.14),
-    inset 0 0 8px rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(0,245,223,.4);
+  box-shadow: 0 0 10px rgba(0,245,223,.2), inset 0 0 8px rgba(255,63,183,.08);
   overflow: hidden;
-}
-.side-meter-track::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(0,245,223,.02) 45%, rgba(255,63,183,.04));
-  pointer-events: none;
 }
 .side-meter-fill {
   position: absolute;
-  left: 1px;
-  right: 1px;
-  bottom: 1px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   height: 2%;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(103,255,170,1) 0%, rgba(0,245,223,1) 52%, rgba(255,63,183,.96) 100%);
-  box-shadow:
-    0 0 14px rgba(0,245,223,.58),
-    0 0 22px rgba(0,245,223,.28),
-    0 0 30px rgba(255,63,183,.18);
-  transition: height .05s linear;
+  background: linear-gradient(180deg, var(--green), var(--cyan) 55%, var(--pink));
+  box-shadow: 0 0 10px rgba(0,245,223,.38), 0 0 12px rgba(255,63,183,.22);
+  transition: height .06s linear;
 }
 
 @media (max-width: 980px) {
@@ -522,36 +507,6 @@ input[type="range"] { width: 100%; }
     left: auto;
     font-size: .8rem;
   }
-  .side-meter { width: 22px; }
-  .side-meter-track { width: 10px; height: min(74dvh, 560px); }
+  .side-meter { width: 14px; }
+  .side-meter-track { width: 6px; height: min(72dvh, 520px); }
 }
-
-
-/* ==========================================
-AUDIO PRO + AUTO CHAIN HUD
-========================================== */
-.headline-block,.display-window,.cover-shell,.mini-box,.lamp-box,.volume-wrap,.audio-pro-panel{box-shadow:0 0 calc(8px + (var(--audio-energy,0) * 16px)) rgba(30,242,255,.10),0 0 calc(6px + (var(--audio-bass,0) * 18px)) rgba(255,77,184,.08)}
-.audio-pro-panel{background:linear-gradient(180deg,rgba(14,18,25,.92),rgba(14,18,25,.82));border:1px solid rgba(30,242,255,.18);border-radius:18px;padding:12px 14px;display:grid;gap:10px;position:relative;overflow:hidden}
-.audio-pro-panel::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(30,242,255,.06),transparent 26%,transparent 74%,rgba(255,77,184,.06));pointer-events:none}
-.audio-pro-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.audio-pro-title{font-weight:800;letter-spacing:.06em;color:var(--cyan);text-transform:uppercase;text-shadow:0 0 14px rgba(30,242,255,.28)}
-.audio-engine-status{font-size:.8rem;font-weight:800;letter-spacing:.08em;color:var(--muted)}
-.audio-engine-status.is-live{color:var(--green);text-shadow:0 0 12px rgba(72,255,143,.28)}
-.audio-engine-status.is-limit{color:var(--pink);text-shadow:0 0 14px rgba(255,77,184,.34)}
-.boost-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.boost-btn{appearance:none;border:1px solid rgba(30,242,255,.26);border-radius:14px;background:linear-gradient(180deg,rgba(30,242,255,.10),rgba(255,77,184,.04));color:var(--text);padding:10px 8px;font-size:.88rem;font-weight:800;cursor:pointer;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
-.boost-btn:hover{transform:translateY(-1px)}
-.boost-btn.is-active{border-color:rgba(255,77,184,.52);box-shadow:0 0 16px rgba(255,77,184,.20),0 0 18px rgba(30,242,255,.10);background:linear-gradient(180deg,rgba(255,77,184,.16),rgba(30,242,255,.10))}
-.audio-pro-meters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.meter-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 10px 9px;min-height:62px}
-.meter-label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.meter-value{margin-top:6px;font-size:1rem;font-weight:800;color:var(--text);text-shadow:0 0 14px rgba(30,242,255,.14)}
-.meter-box-limit .limit-wrap{display:flex;align-items:center;gap:8px;margin-top:6px}
-.gr-bar-shell{display:grid}
-.gr-bar-track{height:14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(30,242,255,.18);overflow:hidden;box-shadow:inset 0 0 10px rgba(255,255,255,.04)}
-.gr-bar-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan) 55%,var(--pink));box-shadow:0 0 16px rgba(30,242,255,.26),0 0 14px rgba(255,77,184,.22);transition:width .08s linear}
-.auto-chain-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
-.meter-box-chain{border-color:rgba(255,77,184,.28);box-shadow:0 0 18px rgba(255,77,184,.10)}
-.meter-value-chain{color:var(--pink);text-shadow:0 0 12px rgba(255,77,184,.24)}
-@media (max-width:900px){.auto-chain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.audio-pro-meters{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){.boost-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.audio-pro-meters{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.meter-box{min-height:58px;padding:8px 9px}.auto-chain-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.meter-value-chain{font-size:.98rem}}
