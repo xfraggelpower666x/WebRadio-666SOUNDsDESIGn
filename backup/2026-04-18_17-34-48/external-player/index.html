@@ -11,9 +11,9 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn WebRadio — Internal Fallback</title>
-  <link rel="icon" type="image/png" href="./icons/internal-icon.png" />
-  <link rel="apple-touch-icon" href="./icons/internal-icon.png" />
+  <title>666SOUNDsDESIGn WebRadio — External</title>
+  <link rel="icon" type="image/png" href="./assets/icons/external-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/external-icon.png" />
   <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
@@ -44,8 +44,8 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           <span class="brand-word brand-word-right">WebRadio</span>
         </div>
 
-        <button id="playerModeOrb" class="player-mode-orb info-trigger" type="button" data-info="Interner Worker-Fallback-Player aktiv." aria-label="Player-Modus anzeigen">
-          <span id="playerLamp" class="lamp lamp-pink"></span>
+        <button id="playerModeOrb" class="player-mode-orb info-trigger" type="button" data-info="Externer Haupt-Player aktiv." aria-label="Player-Modus anzeigen">
+          <span id="playerLamp" class="lamp lamp-cyan"></span>
         </button>
       </header>
 
@@ -83,7 +83,7 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
 
           <div class="pill-row">
             <span id="fallbackText" class="pill laser-frame">Standby</span>
-            <span id="playerText" class="pill laser-frame">Internal</span>
+            <span id="playerText" class="pill laser-frame">External</span>
           </div>
         </div>
 
@@ -110,7 +110,6 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           <section class="control-strip">
             <button id="playBtn" class="control-btn main laser-frame" type="button">Play</button>
             <button id="pauseBtn" class="control-btn laser-frame" type="button">Pause</button>
-            <button id="stopBtn" class="control-btn laser-frame" type="button">Stop</button>
             <button id="reconnectBtn" class="control-btn laser-frame" type="button">Reconnect</button>
           </section>
 
@@ -127,7 +126,6 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
                 <button class="boost-btn" type="button" data-boost-stage="1">+3 dB</button>
                 <button class="boost-btn" type="button" data-boost-stage="2">+6 dB</button>
                 <button class="boost-btn" type="button" data-boost-stage="3">+9 dB</button>
-                <button class="boost-btn boost-btn-plus12" type="button" data-boost-stage="4">+12 dB</button>
               </div>
               <div class="meter-box meter-box-chain hud-stat-cut">
                 <div class="meter-label">Boost Active</div>
