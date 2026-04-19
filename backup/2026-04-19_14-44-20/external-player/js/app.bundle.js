@@ -1,5 +1,5 @@
 /* ##################################################
-   FILE: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn/js/app.bundle.js
+   FILE: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn/external-player/js/app.bundle.js
    PROJECT: 666SOUNDsDESIGn WebRadio Player
 
    CREATED: existing project file
@@ -141,7 +141,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   const state = {
     booted: false,
     usingFallback: false,
-    streamMode: 'main',
     muted: false,
     metadataTimer: null,
     healthTimer: null,
@@ -189,14 +188,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     muteBtn: document.getElementById('muteBtn'),
     volumeRange: document.getElementById('volumeRange'),
     historyToggle: document.getElementById('historyToggle'),
-    streamMainBtn: document.getElementById('streamMainBtn'),
-    streamBackupBtn: document.getElementById('streamBackupBtn'),
-    infoBubble: document.getElementById('infoBubble'),
-    playerModeOrb: document.getElementById('playerModeOrb'),
-    sourceInfoBtn: document.getElementById('sourceInfoBtn'),
-    healthInfoBtn: document.getElementById('healthInfoBtn'),
-    metaInfoBtn: document.getElementById('metaInfoBtn'),
-    audioInfoBtn: document.getElementById('audioInfoBtn'),
     metaLamp: document.getElementById('metaLamp'),
     audioLamp: document.getElementById('audioLamp'),
     sourceLamp: document.getElementById('sourceLamp'),
@@ -242,8 +233,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   applyThemeVars();
   applyLabels();
   applyModeLamp();
-  updateStreamModeUi();
-  attachInfoTriggers();
   applyViewportHeight();
   window.addEventListener('resize', applyViewportHeight, { passive: true });
   window.addEventListener('orientationchange', applyViewportHeight, { passive: true });
@@ -273,26 +262,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     await runBootSequence();
     elements.overlay?.classList.add('hidden');
     await safePlay();
-  });
-
-  bindPress(elements.streamMainBtn, async () => {
-    state.streamMode = 'main';
-    updateStreamModeUi();
-    showInfoBubble('Main-Stream ausgewählt.');
-    if (state.playbackActive) {
-      hardDisconnectStream('stop');
-      await safePlay();
-    }
-  });
-
-  bindPress(elements.streamBackupBtn, async () => {
-    state.streamMode = 'backup';
-    updateStreamModeUi();
-    showInfoBubble('Fallback-Stream ausgewählt.');
-    if (state.playbackActive) {
-      hardDisconnectStream('stop');
-      await safePlay();
-    }
   });
 
   bindPress(elements.playBtn, async () => {
@@ -423,37 +392,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     }
   }
 
-  function updateStreamModeUi() {
-    if (elements.streamMainBtn) elements.streamMainBtn.classList.toggle('is-active', state.streamMode === 'main');
-    if (elements.streamBackupBtn) elements.streamBackupBtn.classList.toggle('is-active', state.streamMode === 'backup');
-    if (elements.sourceInfoBtn) {
-      elements.sourceInfoBtn.dataset.info = state.streamMode === 'backup'
-        ? 'Source: Fallback-Stream manuell gewählt.'
-        : 'Source: Main-Stream manuell gewählt.';
-    }
-  }
-
-  function showInfoBubble(message) {
-    if (!elements.infoBubble) return;
-    elements.infoBubble.textContent = message || '';
-    elements.infoBubble.classList.remove('hidden');
-    elements.infoBubble.classList.add('is-visible');
-    clearTimeout(state.infoBubbleTimer);
-    state.infoBubbleTimer = setTimeout(() => {
-      elements.infoBubble.classList.remove('is-visible');
-      elements.infoBubble.classList.add('hidden');
-    }, 2400);
-  }
-
-  function attachInfoTriggers() {
-    document.querySelectorAll('.info-trigger').forEach((node) => {
-      bindPress(node, () => {
-        const msg = node.dataset.info || node.getAttribute('aria-label') || 'Keine Info verfügbar.';
-        showInfoBubble(msg);
-      });
-    });
-  }
-
   function bindPress(element, handler) {
     if (!element) return;
     let pressed = false;
@@ -505,11 +443,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     if (!elements.playerText) return;
     const isExternal = mode === 'external';
     elements.playerText.textContent = isExternal ? uiConfig.labels.modeExternal : uiConfig.labels.modeInternal;
-    if (elements.playerModeOrb) {
-      elements.playerModeOrb.dataset.info = isExternal
-        ? 'EXTERN: normaler Hauptpfad läuft.'
-        : 'INTERN: Worker-Fallback-Player aktiv.';
-    }
     setLamp(elements.playerLamp, isExternal ? 'lamp-pink' : 'lamp-purple');
   }
 
@@ -527,11 +460,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     state.usingFallback = isFallback;
     if (elements.sourceLabel) elements.sourceLabel.textContent = isFallback ? uiConfig.labels.sourceFallback : uiConfig.labels.sourcePrimary;
     if (elements.fallbackText) elements.fallbackText.textContent = isFallback ? 'Active' : 'Standby';
-    if (elements.sourceInfoBtn) {
-      elements.sourceInfoBtn.dataset.info = isFallback
-        ? 'Source: Fallback-Stream aktiv.'
-        : 'Source: Main-Stream aktiv.';
-    }
     setLamp(elements.sourceLamp, isFallback ? 'lamp-purple' : 'lamp-pink');
   }
 
@@ -1081,13 +1009,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   async function safePlay() {
     try {
       await ensureAudioGraph();
-
-      if (state.streamMode === 'backup') {
-        await tryPlayFallback();
-      } else {
-        await tryPlayPrimary();
-      }
-
+      await tryPlayPrimary();
       setStatus('Playing');
       setLamp(elements.audioLamp, 'lamp-green');
       state.playbackActive = true;
@@ -1095,13 +1017,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       startPolling();
       return true;
     } catch (primaryError) {
-      if (state.streamMode === 'backup') {
-        setStatus('Audio Error');
-        setLamp(elements.audioLamp, 'lamp-red');
-        updateEngineState('ERROR', false, false);
-        return false;
-      }
-
       try {
         await ensureAudioGraph();
         await tryPlayFallback();
@@ -1156,7 +1071,7 @@ try {
   initPlayer({
     streamConfig: STREAM_CONFIG,
     uiConfig: UI_CONFIG,
-    mode: 'internal',
+    mode: 'external',
     assetPrefix: '.'
   });
   window.__RADIO_BOOT_OK__ = true;

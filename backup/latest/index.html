@@ -56,6 +56,17 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           <span id="sourceLabel" class="chip-value">Main</span>
         </button>
 
+        <div class="stream-select laser-frame" aria-label="Manuelle Stream-Auswahl">
+          <button id="streamMainBtn" class="stream-mini-btn is-active" type="button" aria-label="Hauptstream wählen">
+            <span class="lamp lamp-pink"></span>
+            <span class="stream-mini-label">M</span>
+          </button>
+          <button id="streamBackupBtn" class="stream-mini-btn" type="button" aria-label="Fallback-Stream wählen">
+            <span class="lamp lamp-purple"></span>
+            <span class="stream-mini-label">B</span>
+          </button>
+        </div>
+
         <button id="healthInfoBtn" class="status-chip info-trigger laser-frame" type="button" data-info="Health: Verbindung wird geprüft.">
           <span id="healthLamp" class="lamp lamp-red"></span>
           <span class="chip-label" data-label="health">Health</span>
@@ -108,10 +119,10 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           </section>
 
           <section class="control-strip">
-            <button id="playBtn" class="control-btn main laser-frame" type="button">Play</button>
-            <button id="pauseBtn" class="control-btn laser-frame" type="button">Pause</button>
-            <button id="stopBtn" class="control-btn laser-frame" type="button">Stop</button>
-            <button id="reconnectBtn" class="control-btn laser-frame" type="button">Reconnect</button>
+            <button id="playBtn" class="control-btn main laser-frame round-btn" type="button" aria-label="Play">▶</button>
+            <button id="pauseBtn" class="control-btn laser-frame round-btn" type="button" aria-label="Pause">❚❚</button>
+            <button id="stopBtn" class="control-btn laser-frame round-btn" type="button" aria-label="Stop">■</button>
+            <button id="reconnectBtn" class="control-btn laser-frame round-btn" type="button" aria-label="Reconnect">↻</button>
           </section>
 
 
@@ -202,12 +213,12 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           </section>
 
           <section class="audio-tools">
-            <button id="muteBtn" class="small-btn laser-frame" type="button">Mute</button>
+            <button id="muteBtn" class="small-btn laser-frame round-btn small-round-btn" type="button" aria-label="Mute">🔇</button>
             <div class="volume-wrap laser-frame">
               <label for="volumeRange">Volume</label>
               <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
             </div>
-            <button id="historyToggle" class="small-btn laser-frame" type="button">History</button>
+            <button id="historyToggle" class="small-btn laser-frame round-btn small-round-btn" type="button" aria-label="History">☰</button>
           </section>
         </div>
       </section>

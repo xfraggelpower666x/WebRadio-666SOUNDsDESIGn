@@ -11,9 +11,9 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn WebRadio — Internal Fallback</title>
-  <link rel="icon" type="image/png" href="./icons/internal-icon.png" />
-  <link rel="apple-touch-icon" href="./icons/internal-icon.png" />
+  <title>666SOUNDsDESIGn WebRadio — External</title>
+  <link rel="icon" type="image/png" href="./assets/icons/external-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/external-icon.png" />
   <link rel="stylesheet" href="./css/main.css" />
 </head>
 <body>
@@ -44,8 +44,8 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           <span class="brand-word brand-word-right">WebRadio</span>
         </div>
 
-        <button id="playerModeOrb" class="player-mode-orb info-trigger" type="button" data-info="Interner Worker-Fallback-Player aktiv." aria-label="Player-Modus anzeigen">
-          <span id="playerLamp" class="lamp lamp-pink"></span>
+        <button id="playerModeOrb" class="player-mode-orb info-trigger" type="button" data-info="Externer Haupt-Player aktiv." aria-label="Player-Modus anzeigen">
+          <span id="playerLamp" class="lamp lamp-cyan"></span>
         </button>
       </header>
 
@@ -55,17 +55,6 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           <span class="chip-label" data-label="source">Source</span>
           <span id="sourceLabel" class="chip-value">Main</span>
         </button>
-
-        <div class="stream-select laser-frame" aria-label="Manuelle Stream-Auswahl">
-          <button id="streamMainBtn" class="stream-mini-btn is-active" type="button" aria-label="Hauptstream wählen">
-            <span class="lamp lamp-pink"></span>
-            <span class="stream-mini-label">M</span>
-          </button>
-          <button id="streamBackupBtn" class="stream-mini-btn" type="button" aria-label="Fallback-Stream wählen">
-            <span class="lamp lamp-purple"></span>
-            <span class="stream-mini-label">B</span>
-          </button>
-        </div>
 
         <button id="healthInfoBtn" class="status-chip info-trigger laser-frame" type="button" data-info="Health: Verbindung wird geprüft.">
           <span id="healthLamp" class="lamp lamp-red"></span>
@@ -94,7 +83,7 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
 
           <div class="pill-row">
             <span id="fallbackText" class="pill laser-frame">Standby</span>
-            <span id="playerText" class="pill laser-frame">Internal</span>
+            <span id="playerText" class="pill laser-frame">External</span>
           </div>
         </div>
 
@@ -119,10 +108,10 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           </section>
 
           <section class="control-strip">
-            <button id="playBtn" class="control-btn main laser-frame round-btn" type="button" aria-label="Play">▶</button>
-            <button id="pauseBtn" class="control-btn laser-frame round-btn" type="button" aria-label="Pause">❚❚</button>
-            <button id="stopBtn" class="control-btn laser-frame round-btn" type="button" aria-label="Stop">■</button>
-            <button id="reconnectBtn" class="control-btn laser-frame round-btn" type="button" aria-label="Reconnect">↻</button>
+            <button id="playBtn" class="control-btn main laser-frame" type="button">Play</button>
+            <button id="pauseBtn" class="control-btn laser-frame" type="button">Pause</button>
+            <button id="stopBtn" class="control-btn laser-frame" type="button">Stop</button>
+            <button id="reconnectBtn" class="control-btn laser-frame" type="button">Reconnect</button>
           </section>
 
 
@@ -213,12 +202,12 @@ ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
           </section>
 
           <section class="audio-tools">
-            <button id="muteBtn" class="small-btn laser-frame round-btn small-round-btn" type="button" aria-label="Mute">🔇</button>
+            <button id="muteBtn" class="small-btn laser-frame" type="button">Mute</button>
             <div class="volume-wrap laser-frame">
               <label for="volumeRange">Volume</label>
               <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
             </div>
-            <button id="historyToggle" class="small-btn laser-frame round-btn small-round-btn" type="button" aria-label="History">☰</button>
+            <button id="historyToggle" class="small-btn laser-frame" type="button">History</button>
           </section>
         </div>
       </section>
