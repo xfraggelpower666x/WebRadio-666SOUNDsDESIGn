@@ -6,23 +6,20 @@
    LAST MODIFIED: 2026-04-18
 
    PURPOSE:
-   Frontend Player Runtime / Step 4B+4C / Core Stability + Visual Engine
+   Frontend Player Runtime / Step 4 / Freeze-sichere AutoChain
 
    CHANGELOG (2026-04-18):
-   - FIX: Pause/Stop/Reconnect behalten jetzt die User-Lautstärke sauber bei
-   - FIX: Boost ändert nicht mehr heimlich audio.volume
-   - FIX: absichtliche Stream-Trennung löst keinen falschen Error-/Fallback-Pfad mehr aus
-   - FIX: Reconnect/Resume synchronisiert Slider und Audio-Element wieder korrekt
-   - FIX: Side-Meter reagieren musikalisch glaubhafter auf Gesamtenergie + Bass + Peaks
-   - FIX: GR-Visual basiert auf echter Reduction plus glaubhafter Energie-/Bass-Stütze
-   - FIX: EQ-Visual reagiert kräftiger und geglättet auf grobe Frequenzbereiche
-   - NO CHANGES: Worker, Repo-Struktur, HTML-Struktur, Deploy-Pfade
+   - FIX: AutoChain Lift wird erst nach erfolgreichem Playback aktiv
+   - FIX: AutoLift reagiert auf Input-RMS statt fest auf 0 zu bleiben
+   - FIX: AutoChain Gain summiert Boost + Lift sauber
+   - FIX: AutoChain HUD zeigt echten Lift/State statt Dummy-Werte
+   - NO CHANGES: Worker, Deploy, Repo-Struktur, Boot-Overlay-Struktur
 
    NOTES:
-   - Step 4B + 4C build
+   - Step 4 build
    - Frontend only
    - Repo-Struktur unverändert
-   - Keine Laboranzeige, sondern musikalisch glaubhafte Visualisierung
+   - Freeze-sicher: AutoChain nur late attach nach erfolgreichem Audio-Start
 ################################################## */
 
 // ==========================================
@@ -131,7 +128,7 @@ const STREAM_CONFIG = {
 
 const FALLBACK_COVER = './assets/images/fallback-cover.png';
 const DEFAULT_DJ = '666SOUNDsDESIGn DJ';
-const BOOST_STAGES_DB = [0, 3, 6, 9, 12];
+const BOOST_STAGES_DB = [0, 6, 12, 18];
 const HOT_DRIVE_DB = 0.0;
 const AUTO_TARGET_DB = -18.0;
 const AUTO_LIFT_MAX_DB = 6.0;
@@ -164,14 +161,9 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     meterAnim: null,
     currentBoostStage: 0,
     currentBoostDb: 0,
-    userVolume: 1,
-    intentionalDisconnect: false,
     autoLiftDb: 0,
     autoChainReady: false,
     autoChainActive: false,
-    leftMeterValue: 8,
-    rightMeterValue: 8,
-    eqVisualCache: Array(10).fill(0),
     hotDriveDb: HOT_DRIVE_DB,
     targetDb: AUTO_TARGET_DB,
     grDb: 0,
@@ -238,14 +230,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     eqBars: Array.from({ length: 10 }, (_, index) => document.getElementById(`eqBar${index}`))
   };
 
-  if (elements.volumeRange) {
-    const bootVolume = Number(elements.volumeRange.value);
-    state.userVolume = Number.isFinite(bootVolume) ? bootVolume : 1;
-  }
-  if (elements.audio) {
-    elements.audio.volume = state.userVolume;
-  }
-
   applyThemeVars();
   applyLabels();
   applyModeLamp();
@@ -305,8 +289,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   elements.volumeRange?.addEventListener('input', () => {
     const value = Number(elements.volumeRange.value);
-    state.userVolume = Number.isFinite(value) ? value : 1;
-    applyUserVolume();
+    elements.audio.volume = Number.isFinite(value) ? value : 1;
   });
 
   bindPress(elements.historyToggle, () => {
@@ -324,10 +307,8 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   elements.audio?.addEventListener('playing', async () => {
     state.playbackActive = true;
-    state.intentionalDisconnect = false;
     state.autoChainReady = true;
     state.autoChainActive = true;
-    applyUserVolume();
     setStatus('Playing');
     setLamp(elements.audioLamp, 'lamp-green');
     updateEngineState('LIVE', true, false);
@@ -338,15 +319,10 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   elements.audio?.addEventListener('pause', () => {
     state.playbackActive = false;
     state.autoChainActive = false;
-    applyUserVolume();
     setMeterHeights(2, 2);
   });
 
   elements.audio?.addEventListener('error', async () => {
-    if (state.intentionalDisconnect) {
-      state.intentionalDisconnect = false;
-      return;
-    }
     state.playbackActive = false;
     state.autoChainActive = false;
     if (!state.usingFallback) {
@@ -387,8 +363,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   function hardDisconnectStream(mode = 'pause') {
     try {
-      rememberUserVolume();
-      state.intentionalDisconnect = true;
       stopPolling();
       stopMeterLoop();
 
@@ -401,8 +375,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
       state.playbackActive = false;
       state.autoChainActive = false;
-
-      applyUserVolume();
 
       if (mode === 'stop') {
         setStatus('Stopped');
@@ -418,29 +390,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     } catch (error) {
       console.error('hardDisconnectStream failed', error);
     }
-  }
-
-  function syncVolumeUi(value) {
-    if (elements.volumeRange) {
-      elements.volumeRange.value = String(value);
-    }
-  }
-
-  function applyUserVolume() {
-    const safeVolume = Math.max(0, Math.min(1, Number(state.userVolume ?? 1)));
-    state.userVolume = safeVolume;
-    if (elements.audio) {
-      elements.audio.volume = safeVolume;
-      elements.audio.muted = state.muted;
-    }
-    syncVolumeUi(safeVolume);
-  }
-
-  function rememberUserVolume() {
-    const sliderValue = Number(elements.volumeRange?.value);
-    const audioValue = Number(elements.audio?.volume);
-    const nextVolume = Number.isFinite(sliderValue) ? sliderValue : (Number.isFinite(audioValue) ? audioValue : state.userVolume);
-    state.userVolume = Math.max(0, Math.min(1, Number(nextVolume ?? 1)));
   }
 
   function bindPress(element, handler) {
@@ -855,31 +804,20 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       }
 
       state.analyserHealthy = true;
-
-      const bassPunch = outputStats.bass * 52;
-      const peakPunch = outputStats.peakNorm * 12;
-      const boostPunch = Number(state.currentBoostDb || 0) * 0.9;
-      const leftTarget = Math.min(100, outputStats.leftPercent * 0.58 + bassPunch + peakPunch + boostPunch);
-      const rightTarget = Math.min(100, outputStats.rightPercent * 0.58 + bassPunch + peakPunch + boostPunch);
-
-      state.leftMeterValue = smoothValue(state.leftMeterValue || 8, leftTarget, 0.28);
-      state.rightMeterValue = smoothValue(state.rightMeterValue || 8, rightTarget, 0.28);
-
-      const grSupport = Math.max(0, Math.min(12, outputStats.energy * 3.6 + outputStats.bass * 4.8 + (Number(state.currentBoostDb || 0) * 0.12) - 0.55));
-      const visualGr = Math.max(grDb, grSupport);
-
-      state.grDb = smoothValue(state.grDb, visualGr, 0.24);
+      state.grDb = smoothValue(state.grDb, grDb, 0.24);
       state.peakDb = smoothValue(state.peakDb, peakDb, 0.2);
       state.peakHoldDb = Math.max(state.peakDb, state.peakHoldDb - 0.24);
       state.lastLimitState = limitState;
 
-      setMeterHeights(state.leftMeterValue, state.rightMeterValue);
+      const left = outputStats.leftPercent;
+      const right = outputStats.rightPercent;
+      setMeterHeights((left) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8), (right) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8));
       updateEqualizerBars(state.outputData);
       updateAutoChainHud({
         driveDb: state.hotDriveDb,
         liftDb: state.autoLiftDb,
         targetDb: state.targetDb,
-        chainState: limitState === 'Limiting' ? 'BOOST LIMIT' : (state.autoChainActive ? 'AUTOCHAIN ACTIVE' : 'BOOST ACTIVE')
+        chainState: limitState === 'Limiting' ? 'BOOST LIMIT' : 'BOOST ACTIVE'
       });
       updateDynamicsHud({
         grDb: state.grDb,
@@ -898,8 +836,8 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     state.hudFallbackPhase += isActive ? 0.15 : 0.04;
     const phase = state.hudFallbackPhase;
     const base = isActive ? 28 : 8;
-    const volumeFactor = Number(state.userVolume ?? elements.volumeRange?.value ?? elements.audio?.volume ?? 1);
-    const boostFactor = Math.min(1, state.currentBoostDb / 12);
+    const volumeFactor = Number(elements.volumeRange?.value || elements.audio?.volume || 1);
+    const boostFactor = Math.min(1, state.currentBoostDb / 18);
     const liftFactor = Math.min(1, state.autoLiftDb / Math.max(1, AUTO_LIFT_MAX_DB));
     const swing = isActive ? (Math.sin(phase) * 16 + Math.sin(phase * 1.93) * 10) : 0;
     const swing2 = isActive ? (Math.sin(phase * 1.21 + 1.4) * 15 + Math.sin(phase * 2.4) * 8) : 0;
@@ -933,50 +871,33 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     const length = data.length || 1;
     const third = Math.max(1, Math.floor(length / 3));
     const half = Math.max(1, Math.floor(length / 2));
-    const quarter = Math.max(1, Math.floor(length / 4));
-
     let total = 0;
     let left = 0;
     let right = 0;
     let bass = 0;
-    let mids = 0;
-    let highs = 0;
     let peak = 0;
-
     for (let i = 0; i < length; i += 1) {
       const value = data[i];
       total += value;
       if (i < half) left += value;
       else right += value;
-
-      if (i < quarter) bass += value;
-      else if (i < half + Math.floor(quarter / 2)) mids += value;
-      else highs += value;
-
+      if (i < third) bass += value;
       if (value > peak) peak = value;
     }
-
     const overall = (total / length) / 255;
-    const bassAvg = (bass / quarter) / 255;
-    const midsAvg = (mids / Math.max(1, (half + Math.floor(quarter / 2)) - quarter)) / 255;
-    const highsAvg = (highs / Math.max(1, length - (half + Math.floor(quarter / 2)))) / 255;
+    const bassAvg = (bass / third) / 255;
     const leftAvg = (left / half) / 255;
     const rightAvg = (right / Math.max(1, length - half)) / 255;
     const rms = computeRms(waveData);
-    const peakNorm = peak / 255;
-
     return {
       overall,
       overallDb: linearToDb(overall),
       rms,
       rmsDb: linearToDb(rms),
       bass: bassAvg,
-      mids: midsAvg,
-      highs: highsAvg,
       peak,
-      peakNorm,
-      peakDb: linearToDb(peakNorm),
-      energy: Math.min(1, overall * 1.85),
+      peakDb: linearToDb(peak / 255),
+      energy: Math.min(1, overall * 1.65),
       leftPercent: leftAvg * 100,
       rightPercent: rightAvg * 100
     };
@@ -984,10 +905,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   function setBoostStage(stageIndex) {
     const safeStage = Math.max(0, Math.min(BOOST_STAGES_DB.length - 1, Number(stageIndex) || 0));
-    if (safeStage === 4 && state.currentBoostStage !== 4) {
-      const ok = window.confirm('WARNING: +12 dB can damage headphones, phone speakers or other devices. Continue?');
-      if (!ok) return;
-    }
     state.currentBoostStage = safeStage;
     state.currentBoostDb = BOOST_STAGES_DB[safeStage];
     const now = state.audioContext?.currentTime || 0;
@@ -998,7 +915,9 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       const masterTrimDb = state.currentBoostDb >= 12 ? -2.5 : state.currentBoostDb >= 6 ? -1.2 : 0;
       state.masterGainNode.gain.setTargetAtTime(dbToGain(masterTrimDb), now, 0.03);
     }
-    applyUserVolume();
+    if (elements.audio) {
+      elements.audio.volume = state.currentBoostDb >= 18 ? 1 : state.currentBoostDb >= 12 ? 0.98 : state.currentBoostDb >= 6 ? 0.94 : 0.9;
+    }
     updateBoostHud(state.currentBoostDb);
   }
 
@@ -1017,46 +936,21 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   function updateEqualizerBars(data) {
     if (!elements.eqBars || !elements.eqBars.length || !data || !data.length) return;
-
     const bins = elements.eqBars.length;
-    const ranges = [
-      [0.00, 0.03, 1.80],
-      [0.03, 0.06, 1.65],
-      [0.06, 0.12, 1.45],
-      [0.12, 0.20, 1.28],
-      [0.20, 0.30, 1.12],
-      [0.30, 0.42, 1.06],
-      [0.42, 0.56, 1.00],
-      [0.56, 0.72, 1.06],
-      [0.72, 0.86, 1.14],
-      [0.86, 1.00, 1.22]
-    ];
-
+    const slice = Math.max(1, Math.floor(data.length / bins));
     elements.eqBars.forEach((bar, index) => {
       if (!bar) return;
-
-      const range = ranges[index] || [index / bins, (index + 1) / bins, 1];
-      const start = Math.max(0, Math.floor(data.length * range[0]));
-      const end = Math.max(start + 1, Math.floor(data.length * range[1]));
-
       let sum = 0;
       let count = 0;
-      let localPeak = 0;
-
+      const start = index * slice;
+      const end = Math.min(data.length, index === bins - 1 ? data.length : start + slice);
       for (let i = start; i < end; i += 1) {
-        const value = data[i] / 255;
-        sum += value;
+        sum += data[i];
         count += 1;
-        if (value > localPeak) localPeak = value;
       }
-
-      const avg = count ? (sum / count) : 0;
-      const musical = Math.min(1, (avg * 0.75 + localPeak * 0.50) * range[2]);
-      const smoothPrev = state.eqVisualCache[index] || 0;
-      const smoothNext = smoothValue(smoothPrev, musical, 0.34);
-      state.eqVisualCache[index] = smoothNext;
-
-      const height = 14 + (smoothNext * 86);
+      const avg = count ? (sum / count) / 255 : 0;
+      const weighted = Math.min(1, Math.pow(avg, 0.78) * 1.18);
+      const height = 10 + (weighted * 90);
       bar.style.height = `${height.toFixed(2)}%`;
     });
   }
@@ -1102,24 +996,17 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   async function tryPlayPrimary() {
     elements.audio.src = streamConfig.stream_url;
-    applyUserVolume();
     await elements.audio.play();
-    applyUserVolume();
     setSource(false);
   }
 
   async function tryPlayFallback() {
     elements.audio.src = streamConfig.fallback_stream_url;
-    applyUserVolume();
     await elements.audio.play();
-    applyUserVolume();
     setSource(true);
   }
 
   async function safePlay() {
-    state.intentionalDisconnect = false;
-    rememberUserVolume();
-    applyUserVolume();
     try {
       await ensureAudioGraph();
       await tryPlayPrimary();
