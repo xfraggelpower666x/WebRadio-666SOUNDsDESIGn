@@ -22,12 +22,13 @@ const HTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn Radio — Internal</title>
+  <title>INTERNAL W3.2 LIVE</title>
   <link rel="icon" type="image/png" href="/icons/internal-icon.png" />
   <link rel="apple-touch-icon" href="/icons/internal-icon.png" />
   <link rel="stylesheet" href="/css/main.css" />
 </head>
-<body>
+<body data-debug-build="W3.2">
+  <div class="hard-marker-top">W3.2 LIVE / INTERNAL DEBUG MARKER</div>
   <div id="bootOverlay" class="overlay">
     <div class="boot-panel">
       <div class="boot-title">666SOUNDsDESIGn</div>
@@ -43,30 +44,21 @@ const HTML = `<!DOCTYPE html>
     <section class="player-card">
       <header class="topbar">
         <div class="topbar-line"></div>
-        <div class="brand-wrap">
-          <div class="brand">666SOUNDsDESIGn</div>
-          <div class="build-tag">W3.1 ACTIVE</div>
-        </div>
+        <div class="brand">666SOUNDsDESIGn — INTERNAL W3.2 LIVE</div>
         <div class="topbar-line"></div>
       </header>
+      <div class="hard-marker-box">W3.2 LIVE / INTERNAL ROUTE ACTIVE</div>
 
-      <div class="status-inline">
-        <button id="playerModeOrb" class="mode-orb" type="button" title="Interner Fallback-Player">
-          <span id="playerModeLamp" class="mode-orb-dot mode-orb-dot-purple"></span>
-          <span id="playerModeText">INT</span>
-        </button>
-        <button id="streamModeOrb" class="mode-orb" type="button" title="Hauptstream aktiv">
-          <span id="streamModeLamp" class="mode-orb-dot mode-orb-dot-cyan"></span>
-          <span id="streamModeText">MAIN</span>
-        </button>
-        <button id="audioModeOrb" class="mode-orb" type="button" title="Audio nicht aktiv">
-          <span id="audioModeLamp" class="mode-orb-dot mode-orb-dot-pink"></span>
-          <span id="audioModeText">AUD</span>
-        </button>
-        <button id="metaModeOrb" class="mode-orb" type="button" title="Metadaten werden geladen">
-          <span id="metaModeLamp" class="mode-orb-dot mode-orb-dot-off"></span>
-          <span id="metaModeText">META</span>
-        </button>
+      <div class="status-grid">
+        <div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">Meta</span></div>
+        <div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">Audio</span></div>
+        <div class="lamp-box"><span id="sourceLamp" class="lamp lamp-cyan"></span><span class="lamp-label">Source</span></div>
+      </div>
+
+      <div class="pill-row">
+        <span id="streamStatus" class="pill">Ready</span>
+        <span id="sourceLabel" class="pill pill-dim">Primary</span>
+        <span id="fallbackText" class="pill pill-dim">Standby</span>
       </div>
 
       <div class="display-block">
@@ -74,7 +66,7 @@ const HTML = `<!DOCTYPE html>
           <div class="display-label">Now Playing</div>
           <button id="historyToggle" class="tiny-btn" type="button">History</button>
         </div>
-        <div id="metaText" class="display-label meta-line">Loading...</div>
+        <div id="metaText" class="display-label" style="margin-bottom:6px;">Loading...</div>
         <div class="display-window">
           <div id="nowPlaying" class="marquee-track">Loading metadata...</div>
         </div>
@@ -87,42 +79,25 @@ const HTML = `<!DOCTYPE html>
       </div>
 
       <div class="mini-grid">
-        <div class="mini-box">
-          <div class="mini-label">Listeners</div>
-          <div id="listenersText" class="mini-value">0 / 250</div>
-        </div>
-        <div class="mini-box">
-          <div class="mini-label">Bitrate</div>
-          <div id="bitrateText" class="mini-value">Unknown</div>
-        </div>
-        <div class="mini-box">
-          <div class="mini-label">DJ / Status</div>
-          <div id="djText" class="mini-value">666SOUNDsDESIGn DJ</div>
-        </div>
+        <div class="mini-box"><div class="mini-label">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
+        <div class="mini-box"><div class="mini-label">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
+        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">Unknown</div></div>
+        <div class="mini-box"><div class="mini-label">Volume</div><div id="volumeHint" class="mini-value">Use iPhone buttons</div></div>
       </div>
 
       <div class="control-strip">
         <button id="playBtn" class="control-btn main" type="button">Play</button>
         <button id="pauseBtn" class="control-btn" type="button">Pause</button>
         <button id="stopBtn" class="control-btn" type="button">Stop</button>
+        <button id="reconnectBtn" class="control-btn" type="button">Reconnect</button>
       </div>
 
       <div class="audio-tools">
-        <button id="reconnectBtn" class="small-btn" type="button">Reconnect</button>
         <button id="muteBtn" class="small-btn" type="button">Mute</button>
-        <button id="streamMainBtn" class="small-btn stream-mini-btn is-active" type="button">MAIN</button>
-        <button id="streamBackBtn" class="small-btn stream-mini-btn" type="button">BACK</button>
-      </div>
-
-      <div class="volume-meter-row">
+        <div class="stream-mini-switch"><button id="streamMainBtn" class="small-btn stream-mini-btn is-active" type="button">MAIN</button><button id="streamBackBtn" class="small-btn stream-mini-btn" type="button">BACK</button></div>
         <div class="volume-wrap">
           <label for="volumeRange">Volume</label>
           <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
-          <div id="volumeHint" class="volume-hint hidden">Use iPhone buttons</div>
-        </div>
-        <div class="mini-level-wrap" aria-hidden="true">
-          <div class="mini-level-track"><div id="miniMeterLeft" class="mini-level-fill"></div></div>
-          <div class="mini-level-track"><div id="miniMeterRight" class="mini-level-fill"></div></div>
         </div>
       </div>
 
@@ -134,114 +109,10 @@ const HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const CSS = `*{box-sizing:border-box}
-:root{
-  --bg:#1d2128;--bg2:#12151b;--cyan:#20f2ff;--pink:#ff4db3;--purple:#b366ff;
-  --text:#eef7ff;--muted:#afbfcc;--border:rgba(32,242,255,.28);
-  --shadow-cyan:0 0 18px rgba(32,242,255,.18);--shadow-pink:0 0 18px rgba(255,77,179,.14)
-}
-html,body{
-  margin:0;min-height:100%;
-  background:
-    radial-gradient(circle at top left,rgba(255,77,179,.10),transparent 28%),
-    radial-gradient(circle at bottom right,rgba(32,242,255,.11),transparent 30%),
-    linear-gradient(180deg,var(--bg),var(--bg2));
-  color:var(--text);font-family:Arial,Helvetica,sans-serif
-}
-body{min-height:100vh}
-.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-.player-card,.boot-panel{
-  width:min(94vw,560px);
-  background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));
-  border:1px solid var(--border);border-radius:24px;
-  box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)
-}
-.player-card{padding:16px}
-.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:12px}
-.topbar-line{height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.8}
-.brand-wrap{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
-.brand{font-size:1.15rem;font-weight:800;color:var(--cyan);letter-spacing:.02em}
-.build-tag{font-size:.68rem;padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);color:var(--muted);background:rgba(255,255,255,.04)}
-.status-inline{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}
-.mode-orb,.tiny-btn,.control-btn,.small-btn{
-  appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
-  color:var(--text);cursor:pointer;transition:.15s ease
-}
-.mode-orb{
-  border-radius:999px;padding:6px 10px;display:inline-flex;align-items:center;gap:6px
-}
-.mode-orb:hover,.tiny-btn:hover,.control-btn:hover,.small-btn:hover{transform:translateY(-1px)}
-.mode-orb-dot{
-  width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid transparent
-}
-.mode-orb-dot-cyan{background:var(--cyan);box-shadow:0 0 10px rgba(32,242,255,.45)}
-.mode-orb-dot-purple{background:var(--purple);box-shadow:0 0 10px rgba(179,102,255,.45)}
-.mode-orb-dot-pink{background:var(--pink);box-shadow:0 0 10px rgba(255,77,179,.45)}
-.mode-orb-dot-off{background:transparent;border-color:rgba(255,255,255,.24);box-shadow:0 0 8px rgba(255,255,255,.12)}
-.display-block{position:relative;margin-bottom:12px}
-.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.display-label,.boot-subtitle,.boot-note,.mini-label,.volume-wrap label,.meta-line,.history-title{color:var(--muted)}
-.display-window{
-  height:54px;overflow:hidden;display:flex;align-items:center;border:1px solid rgba(32,242,255,.22);
-  border-radius:14px;padding:0 12px;background:rgba(255,255,255,.03)
-}
-.marquee-track{
-  white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;
-  color:var(--pink);text-shadow:0 0 10px rgba(255,77,179,.3);animation:marquee 12s linear infinite
-}
-@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-.tiny-btn{border-radius:12px;padding:6px 10px;font-size:.85rem}
-.history-overlay{
-  position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;
-  background:rgba(13,16,22,.98);border:1px solid rgba(255,77,179,.25);box-shadow:var(--shadow-pink)
-}
-.history-overlay.hidden{display:none}
-.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}
-.mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
-.mini-box{
-  border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(255,255,255,.03);padding:10px 12px
-}
-.mini-value{font-weight:700;margin-top:2px}
-.control-strip,.audio-tools{display:grid;gap:8px;margin-bottom:10px}
-.control-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
-.audio-tools{grid-template-columns:repeat(4,minmax(0,1fr))}
-.control-btn,.small-btn{
-  border-radius:14px;padding:10px 12px;font-weight:700
-}
-.control-btn.main{border-color:rgba(255,77,179,.45);box-shadow:0 0 10px rgba(255,77,179,.16) inset}
-.stream-mini-btn.is-active{box-shadow:0 0 12px rgba(32,242,255,.16) inset}
-.volume-meter-row{display:grid;grid-template-columns:minmax(0,1fr) 74px;gap:10px;align-items:end}
-.volume-wrap{display:flex;flex-direction:column;gap:6px}
-.volume-wrap input[type="range"]{width:100%}
-.volume-hint{font-size:.72rem;color:var(--muted);line-height:1.2}
-.volume-hint.hidden{display:none}
-.mini-level-wrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:end;height:56px}
-.mini-level-track{
-  height:56px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
-  padding:4px;display:flex;align-items:flex-end
-}
-.mini-level-fill{
-  width:100%;height:10%;border-radius:8px;background:linear-gradient(180deg,var(--purple) 0%,var(--cyan) 100%);
-  box-shadow:0 0 10px rgba(179,102,255,.35)
-}
-.overlay{position:fixed;inset:0;background:rgba(10,12,16,.92);display:flex;align-items:center;justify-content:center;z-index:50}
-.overlay.hidden{display:none}
-.boot-panel{padding:18px;display:grid;gap:10px;text-align:center}
-.boot-title{font-size:1.2rem;font-weight:800;color:var(--cyan)}
-.neon-button{
-  appearance:none;border:1px solid rgba(255,77,179,.45);background:rgba(255,255,255,.04);color:var(--text);
-  border-radius:16px;padding:12px 14px;font-weight:800;cursor:pointer
-}
-.progress-wrap{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
-.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--cyan))}
-.progress-text{font-size:.9rem;color:var(--muted)}
-@media (max-width:520px){
-  .mini-grid{grid-template-columns:1fr}
-  .audio-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .volume-meter-row{grid-template-columns:1fr 64px}
-}`;
+const CSS = `*{box-sizing:border-box}:root{--bg:#1d2128;--bg2:#12151b;--cyan:#20f2ff;--pink:#ff4db3;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(32,242,255,.28);--shadow-cyan:0 0 18px rgba(32,242,255,.18);--shadow-pink:0 0 18px rgba(255,77,179,.14)}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,77,179,.24),transparent 32%),radial-gradient(circle at bottom right,rgba(32,242,255,.18),transparent 34%),linear-gradient(180deg,#251132,var(--bg2));color:var(--text);font-family:Arial,Helvetica,sans-serif}.hard-marker-top{position:fixed;top:0;left:0;right:0;z-index:120;background:#ff4db3;color:#120814;font-weight:900;text-align:center;padding:10px 12px;font-size:18px;letter-spacing:.06em;box-shadow:0 0 24px rgba(255,77,179,.45)}.hard-marker-box{margin:8px 0 14px;border:2px solid #ff4db3;border-radius:16px;padding:10px 12px;text-align:center;color:#120814;background:linear-gradient(90deg,#ff4db3,#20f2ff);font-weight:900;box-shadow:0 0 22px rgba(255,77,179,.28)}body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}.player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(32,242,255,.25)}.brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(32,242,255,.34)}.brand{font-size:1.55rem}.boot-title{font-size:1.5rem;margin-bottom:8px}.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn,.volume-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}.lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp{width:12px;height:12px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.lamp-green{color:var(--green);background:var(--green)}.lamp-red{color:var(--red);background:var(--red)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label,.volume-wrap label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.pill{padding:8px 12px;font-size:.92rem}.pill-dim{color:var(--muted)}.display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(32,242,255,.22)}.marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,77,179,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}.tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,77,179,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}.history-list li{margin-bottom:6px}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.mini-box{padding:10px 12px;min-height:68px}.mini-value{margin-top:6px;font-weight:700}.control-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.control-btn,.small-btn{appearance:none;border:1px solid rgba(32,242,255,.35);color:var(--text);padding:14px 12px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan);background:linear-gradient(180deg,rgba(32,242,255,.14),rgba(255,77,179,.06))}.control-btn.main{border-color:rgba(255,77,179,.35);box-shadow:var(--shadow-pink)}.audio-tools{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:stretch}.small-btn{border-color:rgba(255,77,179,.28);box-shadow:var(--shadow-pink)}.volume-wrap{padding:10px 12px;display:grid;gap:8px}input[type=range]{width:100%}.player-badge{position:fixed;top:12px;right:12px;z-index:30;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(10,14,22,.84);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(8px);font-size:.82rem;font-weight:700;letter-spacing:.04em}.player-badge-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.player-badge-internal{color:var(--pink);box-shadow:0 0 12px rgba(255,77,179,.18)}.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.86)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(32,242,255,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(32,242,255,.16),rgba(255,77,179,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.progress-wrap{width:100%;height:12px;margin-top:18px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}.progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .12s linear}.progress-text{margin-top:10px;font-weight:700}.status-strip{display:flex;justify-content:center;gap:10px;margin:8px 0 12px}.mode-orb{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--text);font:700 12px/1 Arial,Helvetica,sans-serif;letter-spacing:.06em}.mode-orb-dot{width:9px;height:9px;border-radius:999px;background:var(--pink);box-shadow:0 0 10px rgba(255,77,179,.5)}.mode-orb-dot-cyan{background:var(--cyan);box-shadow:0 0 10px rgba(32,242,255,.5)}.stream-mini-switch{display:flex;gap:6px;align-items:center}.stream-mini-btn{min-width:62px}.stream-mini-btn.is-active{border-color:rgba(32,242,255,.55);box-shadow:0 0 12px rgba(32,242,255,.2);background:rgba(32,242,255,.08)}`;
 
 const APP_JS = `import { STREAM_CONFIG } from "../config/stream.config.js";
+document.title="INTERNAL W3.2 LIVE";
 const overlay=document.getElementById("bootOverlay");
 const bootButton=document.getElementById("bootButton");
 const progressBar=document.getElementById("progressBar");
@@ -255,16 +126,15 @@ const streamMainBtn=document.getElementById("streamMainBtn");
 const streamBackBtn=document.getElementById("streamBackBtn");
 const volumeRange=document.getElementById("volumeRange");
 const historyToggle=document.getElementById("historyToggle");
-const playerModeOrb=document.getElementById("playerModeOrb");
-const playerModeLamp=document.getElementById("playerModeLamp");
-const playerModeText=document.getElementById("playerModeText");
-const streamModeOrb=document.getElementById("streamModeOrb");
+const metaLamp=document.getElementById("metaLamp");
+const audioLamp=document.getElementById("audioLamp");
+const sourceLamp=document.getElementById("sourceLamp");
 const streamModeLamp=document.getElementById("streamModeLamp");
+const playerModeText=document.getElementById("playerModeText");
 const streamModeText=document.getElementById("streamModeText");
-const audioModeOrb=document.getElementById("audioModeOrb");
-const audioModeLamp=document.getElementById("audioModeLamp");
-const metaModeOrb=document.getElementById("metaModeOrb");
-const metaModeLamp=document.getElementById("metaModeLamp");
+const streamStatus=document.getElementById("streamStatus");
+const sourceLabel=document.getElementById("sourceLabel");
+const fallbackText=document.getElementById("fallbackText");
 const nowPlaying=document.getElementById("nowPlaying");
 const metaText=document.getElementById("metaText");
 const listenersText=document.getElementById("listenersText");
@@ -273,366 +143,61 @@ const djText=document.getElementById("djText");
 const historyOverlay=document.getElementById("historyOverlay");
 const historyList=document.getElementById("historyList");
 const volumeHint=document.getElementById("volumeHint");
-const miniMeterLeft=document.getElementById("miniMeterLeft");
-const miniMeterRight=document.getElementById("miniMeterRight");
 const audio=document.getElementById("radio");
-
-let booted=false;
-let muted=false;
-let metadataTimer=null;
-let lastTitle="Loading metadata...";
-let historyOpen=false;
-let streamMode="main";
-let usingFallback=false;
-let userVolume=1;
-let intentionalDisconnect=false;
-let audioCtx=null;
-let mediaNode=null;
-let analyser=null;
-let meterBuffer=null;
-let meterRaf=null;
-
-function setLamp(el,state){
-  if(!el) return;
-  el.className = el.className
-    .split(" ")
-    .filter(cls => !cls.startsWith("mode-orb-dot-"))
-    .join(" ")
-    .trim();
-  el.className = (el.className ? el.className + " " : "") + state;
-}
-
-function updateAudioIndicator(isActive){
-  if(audioModeOrb) audioModeOrb.title=isActive?"Audio aktiv":"Audio nicht aktiv";
-  if(audioModeLamp) setLamp(audioModeLamp,isActive?"mode-orb-dot-purple":"mode-orb-dot-pink");
-}
-
-function updateMetaIndicator(state){
-  if(metaModeOrb) metaModeOrb.title = state==="online" ? "Metadaten online" : state==="offline" ? "Metadaten offline" : "Metadaten laden";
-  if(metaModeLamp) setLamp(metaModeLamp, state==="online" ? "mode-orb-dot-cyan" : state==="offline" ? "mode-orb-dot-pink" : "mode-orb-dot-off");
-}
-
+let booted=false,usingFallback=false,muted=false,metadataTimer=null,lastTitle="Loading metadata...",historyOpen=false,streamMode="main",userVolume=1,intentionalDisconnect=false;
+function setLamp(el,state){if(!el)return;el.classList.remove("lamp-green","lamp-red","lamp-cyan","lamp-pink","lamp-purple");el.classList.add(state)}
+function setStatus(text){if(streamStatus)streamStatus.textContent=text}
 function updateStreamModeUi(){
-  const backup = streamMode==="backup";
-  if(streamModeText) streamModeText.textContent = backup ? "BACK" : "MAIN";
-  if(streamMainBtn) streamMainBtn.classList.toggle("is-active", !backup);
-  if(streamBackBtn) streamBackBtn.classList.toggle("is-active", backup);
-  if(streamModeLamp) setLamp(streamModeLamp, backup ? "mode-orb-dot-purple" : "mode-orb-dot-cyan");
-  if(streamModeOrb) streamModeOrb.title = backup ? "Fallback-Stream aktiv" : "Hauptstream aktiv";
+  if(streamModeText)streamModeText.textContent=streamMode==="backup"?"BACK":"MAIN";
+  if(streamMainBtn)streamMainBtn.classList.toggle("is-active",streamMode==="main");
+  if(streamBackBtn)streamBackBtn.classList.toggle("is-active",streamMode==="backup");
+  if(streamModeLamp)setLamp(streamModeLamp,streamMode==="backup"?"lamp-purple":"lamp-cyan");
 }
-
 function setSource(isFallback){
-  usingFallback = !!isFallback;
+  usingFallback=isFallback;
+  if(sourceLabel)sourceLabel.textContent=isFallback?"Fallback":"Primary";
+  if(fallbackText)fallbackText.textContent=isFallback?"Active":"Standby";
+  setLamp(sourceLamp,isFallback?"lamp-purple":"lamp-cyan");
   updateStreamModeUi();
 }
-
 function rememberUserVolume(){
-  const fromSlider = Number(volumeRange?.value);
-  const fromAudio = Number(audio?.volume);
-  const next = Number.isFinite(fromSlider) ? fromSlider : (Number.isFinite(fromAudio) ? fromAudio : userVolume);
-  userVolume = Math.max(0, Math.min(1, next || 1));
+  const fromSlider=Number(volumeRange?.value);
+  const fromAudio=Number(audio?.volume);
+  const next=Number.isFinite(fromSlider)?fromSlider:(Number.isFinite(fromAudio)?fromAudio:userVolume);
+  userVolume=Math.max(0,Math.min(1,next||1));
 }
-
 function applyUserVolume(){
-  const safe = Math.max(0, Math.min(1, Number(userVolume || 1)));
-  userVolume = safe;
-  if(volumeRange) volumeRange.value = String(safe);
+  const safe=Math.max(0,Math.min(1,Number(userVolume||1)));
+  userVolume=safe;
+  if(volumeRange)volumeRange.value=String(safe);
   if(audio){
-    audio.volume = safe;
-    audio.muted = muted;
+    audio.volume=safe;
+    audio.muted=muted;
   }
 }
-
 function stopMetadataLoop(){
-  if(metadataTimer) clearInterval(metadataTimer);
-  metadataTimer = null;
+  if(metadataTimer)clearInterval(metadataTimer);
+  metadataTimer=null;
 }
-
-function stopMiniMeter(){
-  if(meterRaf) cancelAnimationFrame(meterRaf);
-  meterRaf = null;
-  if(miniMeterLeft) miniMeterLeft.style.height = "10%";
-  if(miniMeterRight) miniMeterRight.style.height = "10%";
-}
-
-async function ensureMeter(){
-  if(audioCtx || !audio) return;
-  try{
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if(!AudioCtx) return;
-    audioCtx = new AudioCtx();
-    mediaNode = audioCtx.createMediaElementSource(audio);
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 128;
-    meterBuffer = new Uint8Array(analyser.frequencyBinCount);
-    mediaNode.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }catch(err){}
-}
-
-function startMiniMeter(){
-  if(!analyser) return;
-  if(meterRaf) cancelAnimationFrame(meterRaf);
-  const tick = () => {
-    if(!analyser || audio.paused){
-      meterRaf = null;
-      return;
-    }
-    analyser.getByteFrequencyData(meterBuffer);
-    const len = meterBuffer.length || 1;
-    const half = Math.max(1, Math.floor(len/2));
-    const quarter = Math.max(1, Math.floor(len/4));
-    let left=0,right=0,bass=0;
-    for(let i=0;i<len;i++){
-      const v = meterBuffer[i]/255;
-      if(i<half) left += v; else right += v;
-      if(i<quarter) bass += v;
-    }
-    left = (left/half)*0.70 + (bass/quarter)*0.55;
-    right = (right/Math.max(1,len-half))*0.70 + (bass/quarter)*0.55;
-    const lh = Math.max(10, Math.min(100, left*100));
-    const rh = Math.max(10, Math.min(100, right*100));
-    if(miniMeterLeft) miniMeterLeft.style.height = \`\${lh.toFixed(1)}%\`;
-    if(miniMeterRight) miniMeterRight.style.height = \`\${rh.toFixed(1)}%\`;
-    meterRaf = requestAnimationFrame(tick);
-  };
-  meterRaf = requestAnimationFrame(tick);
-}
-
 function hardDisconnect(mode="pause"){
   rememberUserVolume();
-  intentionalDisconnect = true;
+  intentionalDisconnect=true;
   stopMetadataLoop();
-  stopMiniMeter();
   if(audio){
     audio.pause();
     audio.removeAttribute("src");
-    audio.src = "";
+    audio.src="";
     audio.load();
   }
   applyUserVolume();
-  updateAudioIndicator(false);
+  setStatus(mode==="stop"?"Stopped":"Paused");
+  setLamp(audioLamp,"lamp-pink");
 }
-
-function setMetadataStatus(text){
-  if(metaText) metaText.textContent = text;
-}
-
-function pickValue(obj,keys,fallback=""){
-  for(const key of keys){
-    const value = obj?.[key];
-    if(value!==undefined && value!==null && String(value).trim()!=="") return value;
-  }
-  return fallback;
-}
-
-function normalizeTitle(data){
-  return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"], lastTitle || "Live Stream"));
-}
-
-function normalizeDjStatus(raw){
-  const value = String(raw || "").trim();
-  const lower = value.toLowerCase();
-  if(!value || lower==="autodj" || lower==="auto dj" || lower==="unknown" || lower==="none" || lower==="client" || lower==="no dj"){
-    return "666SOUNDsDESIGn DJ";
-  }
-  return value;
-}
-
-function renderHistory(items){
-  if(!historyList) return;
-  historyList.innerHTML = "";
-  if(!Array.isArray(items) || !items.length){
-    const li=document.createElement("li");
-    li.textContent="No history loaded";
-    historyList.appendChild(li);
-    return;
-  }
-  items.slice(0,12).forEach((item)=>{
-    const li=document.createElement("li");
-    li.textContent=typeof item==="string" ? item : String(pickValue(item,["song","title","track","name"],"Unknown track"));
-    historyList.appendChild(li);
-  });
-}
-
-async function fetchMetadata(){
-  try{
-    const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});
-    if(!res.ok) throw new Error("metadata fetch failed");
-    const data=await res.json();
-    const title=normalizeTitle(data);
-    lastTitle=title;
-    if(nowPlaying) nowPlaying.textContent=title;
-
-    const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);
-    const bitrate=pickValue(data,["bitrate"],"Unknown");
-    const djStatus=normalizeDjStatus(pickValue(data,["djusername","djstatus","client"],"AutoDJ"));
-
-    if(listenersText) listenersText.textContent=\`\${Number.isFinite(listeners)?listeners:0} / \${STREAM_CONFIG.listener_capacity}\`;
-    if(bitrateText) bitrateText.textContent = bitrate ? \`\${String(bitrate)} kbps\` : "Unknown";
-    if(djText) djText.textContent = String(djStatus);
-
-    renderHistory(pickValue(data,["history"],[]));
-    setMetadataStatus("Online");
-    updateMetaIndicator("online");
-  }catch(err){
-    if(nowPlaying) nowPlaying.textContent = lastTitle || "Metadata unavailable";
-    setMetadataStatus("Offline");
-    updateMetaIndicator("offline");
-  }
-}
-
-function startMetadataLoop(){
-  if(metadataTimer) clearInterval(metadataTimer);
-  fetchMetadata();
-  metadataTimer = setInterval(fetchMetadata, STREAM_CONFIG.poll_interval_ms);
-}
-
-async function tryPlayPrimary(){
-  audio.src = STREAM_CONFIG.stream_url;
-  applyUserVolume();
-  await audio.play();
-  applyUserVolume();
-  setSource(false);
-}
-
-async function tryPlayFallback(){
-  audio.src = STREAM_CONFIG.fallback_stream_url;
-  applyUserVolume();
-  await audio.play();
-  applyUserVolume();
-  setSource(true);
-}
-
-async function safePlay(){
-  intentionalDisconnect = false;
-  rememberUserVolume();
-  applyUserVolume();
-  try{
-    if(streamMode==="backup"){
-      await tryPlayFallback();
-    }else{
-      await tryPlayPrimary();
-    }
-    updateAudioIndicator(true);
-    await ensureMeter();
-    if(audioCtx && audioCtx.state==="suspended"){
-      try{ await audioCtx.resume(); }catch(err){}
-    }
-    startMiniMeter();
-    startMetadataLoop();
-    return true;
-  }catch(err){
-    updateAudioIndicator(false);
-    stopMiniMeter();
-    return false;
-  }
-}
-
-function runBootSequence(){
-  return new Promise((resolve)=>{
-    let percent=0;
-    const timer=setInterval(()=>{
-      percent+=4;
-      if(percent>100) percent=100;
-      if(progressBar) progressBar.style.width=\`\${percent}%\`;
-      if(progressText) progressText.textContent=\`\${percent}%\`;
-      if(percent>=100){
-        clearInterval(timer);
-        resolve();
-      }
-    },42);
-  });
-}
-
-bootButton?.addEventListener("click", async()=>{
-  if(booted) return;
-  booted = true;
-  bootButton.disabled = true;
-  await runBootSequence();
-  overlay?.classList.add("hidden");
-  await safePlay();
-});
-
-playBtn?.addEventListener("click", async()=>{ await safePlay(); });
-pauseBtn?.addEventListener("click", ()=>{ hardDisconnect("pause"); });
-stopBtn?.addEventListener("click", ()=>{ hardDisconnect("stop"); });
-reconnectBtn?.addEventListener("click", async()=>{ hardDisconnect("stop"); await safePlay(); });
-
-muteBtn?.addEventListener("click", ()=>{
-  muted = !muted;
-  applyUserVolume();
-  muteBtn.textContent = muted ? "Unmute" : "Mute";
-});
-
-streamMainBtn?.addEventListener("click", async()=>{
-  streamMode="main";
-  updateStreamModeUi();
-  if(audio && !audio.paused){
-    hardDisconnect("stop");
-    await safePlay();
-  }
-});
-
-streamBackBtn?.addEventListener("click", async()=>{
-  streamMode="backup";
-  updateStreamModeUi();
-  if(audio && !audio.paused){
-    hardDisconnect("stop");
-    await safePlay();
-  }
-});
-
-streamModeOrb?.addEventListener("click", async()=>{
-  streamMode = streamMode==="backup" ? "main" : "backup";
-  updateStreamModeUi();
-  if(audio && !audio.paused){
-    hardDisconnect("stop");
-    await safePlay();
-  }
-});
-
-volumeRange?.addEventListener("input", ()=>{
-  userVolume = Number(volumeRange.value);
-  applyUserVolume();
-});
-
-historyToggle?.addEventListener("click", ()=>{
-  historyOpen = !historyOpen;
-  historyOverlay?.classList.toggle("hidden", !historyOpen);
-});
-
-audio?.addEventListener("playing", async()=>{
-  intentionalDisconnect = false;
-  applyUserVolume();
-  updateAudioIndicator(true);
-  await ensureMeter();
-  if(audioCtx && audioCtx.state==="suspended"){
-    try{ await audioCtx.resume(); }catch(err){}
-  }
-  startMiniMeter();
-});
-
-audio?.addEventListener("error", ()=>{
-  if(intentionalDisconnect){
-    intentionalDisconnect = false;
-    return;
-  }
-  updateAudioIndicator(false);
-  stopMiniMeter();
-});
-
-const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-if(isiOS && volumeHint) volumeHint.classList.remove("hidden");
-if(playerModeText) playerModeText.textContent="INT";
-if(playerModeOrb) playerModeOrb.title="Interner Fallback-Player";
-updateMetaIndicator("loading");
-updateAudioIndicator(false);
-updateStreamModeUi();
-setSource(false);
-setMetadataStatus("Loading...");
-applyUserVolume();
-fetchMetadata();`;if(bitrateText)bitrateText.textContent=bitrate?\`\${String(bitrate)} kbps\`:"Unknown";if(djText)djText.textContent=String(djStatus);renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
+function setMetadataStatus(text){if(metaText)metaText.textContent=text}
+function pickValue(obj,keys,fallback=""){for(const key of keys){const value=obj?.[key];if(value!==undefined&&value!==null&&String(value).trim()!=="")return value}return fallback}
+function normalizeTitle(data){return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"],lastTitle||"Live Stream"))}
+function renderHistory(items){if(!historyList)return;historyList.innerHTML="";if(!Array.isArray(items)||!items.length){const li=document.createElement("li");li.textContent="No history loaded";historyList.appendChild(li);return}items.slice(0,12).forEach((item)=>{const li=document.createElement("li");li.textContent=typeof item==="string"?item:String(pickValue(item,["song","title","track","name"],"Unknown track"));historyList.appendChild(li)})}
+async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=pickValue(data,["djusername","djstatus","client"],"AutoDJ");if(listenersText)listenersText.textContent=\`\${Number.isFinite(listeners)?listeners:0} / \${STREAM_CONFIG.listener_capacity}\`;if(bitrateText)bitrateText.textContent=bitrate?\`\${String(bitrate)} kbps\`:"Unknown";if(djText)djText.textContent=String(djStatus);renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
 function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetchMetadata();metadataTimer=setInterval(fetchMetadata,STREAM_CONFIG.poll_interval_ms)}
 async function tryPlayPrimary(){audio.src=STREAM_CONFIG.stream_url;applyUserVolume();await audio.play();applyUserVolume();setSource(false)}
 async function tryPlayFallback(){audio.src=STREAM_CONFIG.fallback_stream_url;applyUserVolume();await audio.play();applyUserVolume();setSource(true)}
@@ -669,7 +234,7 @@ volumeRange?.addEventListener("input",()=>{userVolume=Number(volumeRange.value);
 historyToggle?.addEventListener("click",()=>{historyOpen=!historyOpen;historyOverlay?.classList.toggle("hidden",!historyOpen)});
 audio?.addEventListener("playing",()=>{intentionalDisconnect=false;applyUserVolume();setStatus("Playing");setLamp(audioLamp,"lamp-green")});
 audio?.addEventListener("error",async()=>{if(intentionalDisconnect){intentionalDisconnect=false;return}setStatus("Audio Error");setLamp(audioLamp,"lamp-pink")});
-const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(isiOS&&volumeHint)volumeHint.textContent="Use iPhone buttons";if(playerModeText)playerModeText.textContent="INT";setLamp(metaLamp,"lamp-red");setLamp(audioLamp,"lamp-pink");setLamp(sourceLamp,"lamp-cyan");updateStreamModeUi();setSource(false);setMetadataStatus("Loading...");applyUserVolume();fetchMetadata();`;
+const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);document.body?.setAttribute("data-live-marker","W3.2");if(isiOS&&volumeHint)volumeHint.textContent="Use iPhone buttons";if(playerModeText)playerModeText.textContent="INT";setLamp(metaLamp,"lamp-red");setLamp(audioLamp,"lamp-pink");setLamp(sourceLamp,"lamp-cyan");updateStreamModeUi();setSource(false);setMetadataStatus("Loading...");applyUserVolume();fetchMetadata();`;
 
 const CONFIG_JS = `export const STREAM_CONFIG = {
   "stream_url": "/stream",
