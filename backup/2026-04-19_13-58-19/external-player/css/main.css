@@ -1,5 +1,5 @@
 /* ##################################################
-   FILE: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn/css/main.css
+   FILE: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn/external-player/css/main.css
    PROJECT: 666SOUNDsDESIGn WebRadio Player
 
    CREATED: existing project file
@@ -804,50 +804,4 @@ label, span, p, li, .history-list, .history-list li, .track-title, .track-artist
 .gr-bar-fill {
   background: linear-gradient(90deg, #b366ff 0%, #30e3ca 58%, #ff1493 100%);
   box-shadow: 0 0 12px rgba(48,227,202,0.3), 0 0 18px rgba(255,20,147,0.25);
-}
-
-/* ===== STEP 4B COMPACT LAYOUT ===== */
-.control-btn {
-  padding: 6px 10px !important;
-  font-size: 12px !important;
-  min-height: 28px !important;
-}
-
-.control-strip {
-  gap: 6px !important;
-  padding: 6px !important;
-}
-
-.volume-container input[type="range"] {
-  height: 4px !important;
-}
-
-.player-container {
-  max-width: 100% !important;
-  padding-left: 6px !important;
-  padding-right: 6px !important;
-}
-
-.panel, .info-panel {
-  padding: 6px !important;
-}
-
-.cover-image {
-  max-height: 180px !important;
-}
-
-@media (min-width: 768px) {
-  .cover-image {
-    max-height: 260px !important;
-  }
-}
-
-/* fix overlapping */
-.control-strip {
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-.info-container {
-  z-index: 1 !important;
 }
