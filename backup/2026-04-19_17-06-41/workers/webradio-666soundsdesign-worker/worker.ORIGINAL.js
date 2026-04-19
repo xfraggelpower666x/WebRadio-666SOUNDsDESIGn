@@ -1,8 +1,8 @@
 // ==========================================
-// DATEI: worker.ORIGINAL.js
+// DATEI: workers/webradio-666soundsdesign-worker/worker.ORIGINAL.js
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-16
-// ZWECK: Historische Worker-Referenzdatei.
+// ZWECK: Historische Worker-Referenzdatei im Worker-Unterordner.
 // ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
 // ==========================================
 
