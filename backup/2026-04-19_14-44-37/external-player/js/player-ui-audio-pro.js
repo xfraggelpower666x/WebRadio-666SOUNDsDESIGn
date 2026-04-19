@@ -1,122 +1,3 @@
-/* ##################################################
-   FILE: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn/external-player/js/app.bundle.js
-   PROJECT: 666SOUNDsDESIGn WebRadio Player
-
-   CREATED: existing project file
-   LAST MODIFIED: 2026-04-18
-
-   PURPOSE:
-   Frontend Player Runtime / Step 4 / Freeze-sichere AutoChain
-
-   CHANGELOG (2026-04-18):
-   - FIX: AutoChain Lift wird erst nach erfolgreichem Playback aktiv
-   - FIX: AutoLift reagiert auf Input-RMS statt fest auf 0 zu bleiben
-   - FIX: AutoChain Gain summiert Boost + Lift sauber
-   - FIX: AutoChain HUD zeigt echten Lift/State statt Dummy-Werte
-   - NO CHANGES: Worker, Deploy, Repo-Struktur, Boot-Overlay-Struktur
-
-   NOTES:
-   - Step 4 build
-   - Frontend only
-   - Repo-Struktur unverändert
-   - Freeze-sicher: AutoChain nur late attach nach erfolgreichem Audio-Start
-################################################## */
-
-// ==========================================
-// DATEI: js/app.bundle.js
-// ERSTELLT: 2026-04-17
-// GEÄNDERT: 2026-04-17 | AUDIO ENGINE FIX BUILD
-// ZWECK: Modulfreier Start-Build mit Audio Pro, Auto-Chain und Boost-Reserve auf stabiler No-Module-Basis.
-// ÄNDERUNG: Final Pro Balanced Tuning aktiv. Auto-Chain bleibt führend, aber stabiler abgestimmt; Boost bleibt reine Notfall-Reserve.
-// ==========================================
-(function(){
-// ==========================================
-// DATEI: config/ui.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Zentrale UI-/Theme-Konfiguration für internen und externen WebRadio-Player.
-// ÄNDERUNG: Cyber-Header, Lampen-Tap-Infos, neon-türkise Info-Panels und Laser-Outlines ergänzt.
-// ==========================================
-
-const UI_CONFIG = {
-  theme: {
-    backgroundBase: '#1c1f24',
-    backgroundDeep: '#11141a',
-    neonPink: '#ff3fb7',
-    neonTurquoise: '#00f5df',
-    okGreen: '#53ff98',
-    errorRed: '#ff557d',
-    textMain: '#eef7ff',
-    textMuted: '#8ea2b3',
-    panelBorder: 'rgba(0,245,223,0.24)',
-    panelGlass: 'rgba(255,255,255,0.04)',
-    panelSolid: '#00f5df',
-    panelText: '#1c1f24'
-  },
-  labels: {
-    metadata: 'Meta',
-    audio: 'Audio',
-    source: 'Source',
-    health: 'Health',
-    player: 'Player',
-    nowPlaying: 'Now Playing',
-    listeners: 'Listeners',
-    bitrate: 'Bitrate',
-    djStatus: 'DJ / Status',
-    stream: 'Stream',
-    genre: 'Genre',
-    serverInfo: 'Server / Info',
-    modeExternal: 'External',
-    modeInternal: 'Internal',
-    sourcePrimary: 'Main',
-    sourceFallback: 'Fallback',
-    healthReady: 'Ready',
-    healthOnline: 'Online',
-    healthOffline: 'Offline',
-    audioPlaying: 'Playing',
-    audioPaused: 'Paused',
-    audioError: 'Error'
-  },
-  infoTexts: {
-    playerExternal: 'Externer Haupt-Player aktiv. Türkis bedeutet: Standard-Player läuft.',
-    playerInternal: 'Interner Worker-Fallback aktiv. Pink bedeutet: Notfall-Player läuft.',
-    sourcePrimary: 'Main-Stream aktiv. Aktuell läuft der Hauptstream.',
-    sourceFallback: 'Fallback-Stream aktiv. Der Hauptstream war nicht erreichbar.',
-    healthReady: 'Health wird gerade geprüft.',
-    healthOnline: 'Health ist online. Worker und Stream-Antwort sind erreichbar.',
-    healthOffline: 'Health ist offline oder liefert gerade keine saubere Antwort.',
-    metadataOnline: 'Metadaten werden sauber aus dem Worker gelesen und angezeigt.',
-    metadataOffline: 'Metadaten konnten gerade nicht geladen werden.',
-    audioPlaying: 'Audio läuft. Der Player gibt Ton aus.',
-    audioPaused: 'Audio ist pausiert.',
-    audioError: 'Audio konnte nicht abgespielt werden.'
-  },
-  defaults: {
-    djName: '666SOUNDsDESIGn DJ',
-    stationName: '666SOUNDsDESIGn Radio'
-  }
-};
-
-// ==========================================
-// DATEI: config/stream.config.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Stream-Konfiguration des internen Fallback-Players.
-// ÄNDERUNG: Health-Endpunkt ergänzt und Konfiguration für gemeinsamen One-Page-Player vorbereitet.
-// ==========================================
-
-const STREAM_CONFIG = {
-  stream_url: "/stream",
-  fallback_stream_url: "/fallback-stream",
-  metadata_url: "/api/nowplaying",
-  health_url: "/health",
-  poll_interval_ms: 8000,
-  listener_capacity: 250,
-  use_webhook: false,
-  primary_upstream: "https://my.idjstream.com/666soundsdesign/stream",
-  fallback_upstream: "https://my.idjstream.com:8686/stream"
-};
-
 // ==========================================
 // DATEI: external-player/js/player-ui-audio-pro.js
 // ERSTELLT: 2026-04-16
@@ -128,20 +9,36 @@ const STREAM_CONFIG = {
 
 const FALLBACK_COVER = './assets/images/fallback-cover.png';
 const DEFAULT_DJ = '666SOUNDsDESIGn DJ';
-const BOOST_STAGES_DB = [0, 6, 12, 18];
-const HOT_DRIVE_DB = 0.0;
-const AUTO_TARGET_DB = -18.0;
-const AUTO_LIFT_MAX_DB = 6.0;
-const LIMIT_TRIGGER_DB = 2.2;
+const BOOST_STAGES_DB = [0, 3, 6, 9];
+const HOT_DRIVE_DB = 2.5;
+const AUTO_TARGET_DB = -18;
+const AUTO_LIFT_MAX_DB = 6;
+const LIMIT_TRIGGER_DB = 2.8;
 const CLIP_TRIGGER_DB = -0.35;
 const MINUS_INF_TEXT = '-∞ dB';
 
-function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
+function bindPress(target, handler) {
+  if (!target || typeof handler !== 'function') return;
+  let lastTouchStamp = 0;
+  const onTouchEnd = async (event) => {
+    lastTouchStamp = Date.now();
+    event.preventDefault();
+    await handler(event);
+  };
+  const onClick = async (event) => {
+    if (Date.now() - lastTouchStamp < 700) return;
+    await handler(event);
+  };
+  target.addEventListener('touchend', onTouchEnd, { passive: false });
+  target.addEventListener('click', onClick);
+}
+
+
+export function initExternalAudioProPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '.' }) {
   const doc = document.documentElement;
   const state = {
     booted: false,
     usingFallback: false,
-    streamMode: 'main',
     muted: false,
     metadataTimer: null,
     healthTimer: null,
@@ -163,18 +60,12 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     currentBoostStage: 0,
     currentBoostDb: 0,
     autoLiftDb: 0,
-    autoChainReady: false,
-    autoChainActive: false,
     hotDriveDb: HOT_DRIVE_DB,
     targetDb: AUTO_TARGET_DB,
     grDb: 0,
     peakDb: -100,
     peakHoldDb: -100,
-    lastLimitState: 'Standby',
-    playbackActive: false,
-    analyserHealthy: false,
-    silentFrames: 0,
-    hudFallbackPhase: 0
+    lastLimitState: 'Standby'
   };
 
   const elements = {
@@ -184,19 +75,10 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     progressText: document.getElementById('progressText'),
     playBtn: document.getElementById('playBtn'),
     pauseBtn: document.getElementById('pauseBtn'),
-    stopBtn: document.getElementById('stopBtn'),
     reconnectBtn: document.getElementById('reconnectBtn'),
     muteBtn: document.getElementById('muteBtn'),
     volumeRange: document.getElementById('volumeRange'),
     historyToggle: document.getElementById('historyToggle'),
-    streamMainBtn: document.getElementById('streamMainBtn'),
-    streamBackupBtn: document.getElementById('streamBackupBtn'),
-    infoBubble: document.getElementById('infoBubble'),
-    playerModeOrb: document.getElementById('playerModeOrb'),
-    sourceInfoBtn: document.getElementById('sourceInfoBtn'),
-    healthInfoBtn: document.getElementById('healthInfoBtn'),
-    metaInfoBtn: document.getElementById('metaInfoBtn'),
-    audioInfoBtn: document.getElementById('audioInfoBtn'),
     metaLamp: document.getElementById('metaLamp'),
     audioLamp: document.getElementById('audioLamp'),
     sourceLamp: document.getElementById('sourceLamp'),
@@ -235,15 +117,12 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     grBarFill: document.getElementById('grBarFill'),
     limitLamp: document.getElementById('limitLamp'),
     limitStateText: document.getElementById('limitStateText'),
-    audioEngineStatus: document.getElementById('audioEngineStatus'),
-    eqBars: Array.from({ length: 10 }, (_, index) => document.getElementById(`eqBar${index}`))
+    audioEngineStatus: document.getElementById('audioEngineStatus')
   };
 
   applyThemeVars();
   applyLabels();
   applyModeLamp();
-  updateStreamModeUi();
-  attachInfoTriggers();
   applyViewportHeight();
   window.addEventListener('resize', applyViewportHeight, { passive: true });
   window.addEventListener('orientationchange', applyViewportHeight, { passive: true });
@@ -263,36 +142,16 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   setSource(false);
   setMetadataStatus('Loading...');
   updateBoostHud(0);
-  updateAutoChainHud({ driveDb: state.hotDriveDb, liftDb: state.autoLiftDb, targetDb: state.targetDb, chainState: state.autoChainActive ? 'AUTOCHAIN ACTIVE' : 'BOOST READY' });
+  updateAutoChainHud({ driveDb: state.hotDriveDb, liftDb: state.autoLiftDb, targetDb: state.targetDb, chainState: 'HOT AUTO' });
   updateDynamicsHud({ grDb: 0, peakDb: -100, limitState: 'Standby', energy: 0.08, bass: 0.06 });
 
   bindPress(elements.bootButton, async () => {
     if (state.booted) return;
     state.booted = true;
-    if (elements.bootButton) elements.bootButton.disabled = true;
+    elements.bootButton.disabled = true;
     await runBootSequence();
     elements.overlay?.classList.add('hidden');
     await safePlay();
-  });
-
-  bindPress(elements.streamMainBtn, async () => {
-    state.streamMode = 'main';
-    updateStreamModeUi();
-    showInfoBubble('Main-Stream ausgewählt.');
-    if (state.playbackActive) {
-      hardDisconnectStream('stop');
-      await safePlay();
-    }
-  });
-
-  bindPress(elements.streamBackupBtn, async () => {
-    state.streamMode = 'backup';
-    updateStreamModeUi();
-    showInfoBubble('Fallback-Stream ausgewählt.');
-    if (state.playbackActive) {
-      hardDisconnectStream('stop');
-      await safePlay();
-    }
   });
 
   bindPress(elements.playBtn, async () => {
@@ -300,15 +159,16 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   });
 
   bindPress(elements.pauseBtn, () => {
-    hardDisconnectStream('pause');
-  });
-
-  bindPress(elements.stopBtn, () => {
-    hardDisconnectStream('stop');
+    elements.audio.pause();
+    setStatus('Paused');
+    setLamp(elements.audioLamp, 'lamp-red');
+    setMeterHeights(2, 2);
+    updateEngineState('ARMED', false, false);
   });
 
   bindPress(elements.reconnectBtn, async () => {
-    hardDisconnectStream('stop');
+    elements.audio.pause();
+    elements.audio.src = '';
     await safePlay();
   });
 
@@ -337,9 +197,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   });
 
   elements.audio?.addEventListener('playing', async () => {
-    state.playbackActive = true;
-    state.autoChainReady = true;
-    state.autoChainActive = true;
     setStatus('Playing');
     setLamp(elements.audioLamp, 'lamp-green');
     updateEngineState('LIVE', true, false);
@@ -348,14 +205,10 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   });
 
   elements.audio?.addEventListener('pause', () => {
-    state.playbackActive = false;
-    state.autoChainActive = false;
     setMeterHeights(2, 2);
   });
 
   elements.audio?.addEventListener('error', async () => {
-    state.playbackActive = false;
-    state.autoChainActive = false;
     if (!state.usingFallback) {
       try {
         await tryPlayFallback();
@@ -370,110 +223,12 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     }
     setStatus('Audio Error');
     setLamp(elements.audioLamp, 'lamp-red');
-    setMeterHeights((3) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8), (3) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8));
+    setMeterHeights(3, 3);
     updateEngineState('ERROR', false, false);
   });
 
   fetchMetadata();
   checkHealth();
-
-  function stopPolling() {
-    if (state.metadataTimer) clearInterval(state.metadataTimer);
-    if (state.healthTimer) clearInterval(state.healthTimer);
-    state.metadataTimer = null;
-    state.healthTimer = null;
-  }
-
-  function stopMeterLoop() {
-    if (state.meterAnim) {
-      cancelAnimationFrame(state.meterAnim);
-      state.meterAnim = null;
-    }
-    setMeterHeights(2, 2);
-  }
-
-  function hardDisconnectStream(mode = 'pause') {
-    try {
-      stopPolling();
-      stopMeterLoop();
-
-      if (elements.audio) {
-        elements.audio.pause();
-        elements.audio.removeAttribute('src');
-        elements.audio.src = '';
-        elements.audio.load();
-      }
-
-      state.playbackActive = false;
-      state.autoChainActive = false;
-
-      if (mode === 'stop') {
-        setStatus('Stopped');
-        if (elements.fallbackText) elements.fallbackText.textContent = 'Stopped';
-        updateEngineState('STOPPED', false, false);
-      } else {
-        setStatus('Paused');
-        if (elements.fallbackText) elements.fallbackText.textContent = 'Paused';
-        updateEngineState('PAUSED', false, false);
-      }
-
-      setLamp(elements.audioLamp, 'lamp-pink');
-    } catch (error) {
-      console.error('hardDisconnectStream failed', error);
-    }
-  }
-
-  function updateStreamModeUi() {
-    if (elements.streamMainBtn) elements.streamMainBtn.classList.toggle('is-active', state.streamMode === 'main');
-    if (elements.streamBackupBtn) elements.streamBackupBtn.classList.toggle('is-active', state.streamMode === 'backup');
-    if (elements.sourceInfoBtn) {
-      elements.sourceInfoBtn.dataset.info = state.streamMode === 'backup'
-        ? 'Source: Fallback-Stream manuell gewählt.'
-        : 'Source: Main-Stream manuell gewählt.';
-    }
-  }
-
-  function showInfoBubble(message) {
-    if (!elements.infoBubble) return;
-    elements.infoBubble.textContent = message || '';
-    elements.infoBubble.classList.remove('hidden');
-    elements.infoBubble.classList.add('is-visible');
-    clearTimeout(state.infoBubbleTimer);
-    state.infoBubbleTimer = setTimeout(() => {
-      elements.infoBubble.classList.remove('is-visible');
-      elements.infoBubble.classList.add('hidden');
-    }, 2400);
-  }
-
-  function attachInfoTriggers() {
-    document.querySelectorAll('.info-trigger').forEach((node) => {
-      bindPress(node, () => {
-        const msg = node.dataset.info || node.getAttribute('aria-label') || 'Keine Info verfügbar.';
-        showInfoBubble(msg);
-      });
-    });
-  }
-
-  function bindPress(element, handler) {
-    if (!element) return;
-    let pressed = false;
-    const run = async (event) => {
-      if (event) {
-        if (event.type === 'touchend') event.preventDefault();
-      }
-      const now = Date.now();
-      if (pressed && (now - pressed) < 450) return;
-      pressed = now;
-      try {
-        await handler(event);
-      } catch (error) {
-        console.error('PRESS HANDLER ERROR', error);
-      }
-    };
-    element.addEventListener('pointerup', run);
-    element.addEventListener('touchend', run, { passive: false });
-    element.addEventListener('click', run);
-  }
 
   function applyViewportHeight() {
     const vh = window.innerHeight || document.documentElement.clientHeight || screen.height;
@@ -505,17 +260,12 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     if (!elements.playerText) return;
     const isExternal = mode === 'external';
     elements.playerText.textContent = isExternal ? uiConfig.labels.modeExternal : uiConfig.labels.modeInternal;
-    if (elements.playerModeOrb) {
-      elements.playerModeOrb.dataset.info = isExternal
-        ? 'EXTERN: normaler Hauptpfad läuft.'
-        : 'INTERN: Worker-Fallback-Player aktiv.';
-    }
-    setLamp(elements.playerLamp, isExternal ? 'lamp-pink' : 'lamp-purple');
+    setLamp(elements.playerLamp, isExternal ? 'lamp-cyan' : 'lamp-pink');
   }
 
   function setLamp(el, stateName) {
     if (!el) return;
-    el.classList.remove('lamp-green', 'lamp-red', 'lamp-cyan', 'lamp-pink', 'lamp-purple');
+    el.classList.remove('lamp-green', 'lamp-red', 'lamp-cyan', 'lamp-pink');
     el.classList.add(stateName);
   }
 
@@ -527,12 +277,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     state.usingFallback = isFallback;
     if (elements.sourceLabel) elements.sourceLabel.textContent = isFallback ? uiConfig.labels.sourceFallback : uiConfig.labels.sourcePrimary;
     if (elements.fallbackText) elements.fallbackText.textContent = isFallback ? 'Active' : 'Standby';
-    if (elements.sourceInfoBtn) {
-      elements.sourceInfoBtn.dataset.info = isFallback
-        ? 'Source: Fallback-Stream aktiv.'
-        : 'Source: Main-Stream aktiv.';
-    }
-    setLamp(elements.sourceLamp, isFallback ? 'lamp-purple' : 'lamp-pink');
+    setLamp(elements.sourceLamp, isFallback ? 'lamp-pink' : 'lamp-cyan');
   }
 
   function setHealth(kind, text) {
@@ -545,40 +290,16 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   }
 
   function pickValue(obj, keys, fallback = '') {
-    const visited = new Set();
-
-    function deepFind(target, key) {
-      if (!target || typeof target !== 'object') return undefined;
-      if (visited.has(target)) return undefined;
-      visited.add(target);
-
-      if (target[key] !== undefined && target[key] !== null && String(target[key]).trim() !== '') {
-        return target[key];
-      }
-
-      for (const value of Object.values(target)) {
-        if (value && typeof value === 'object') {
-          const found = deepFind(value, key);
-          if (found !== undefined && found !== null && String(found).trim() !== '') return found;
-        }
-      }
-
-      return undefined;
-    }
-
     for (const key of keys) {
-      const value = deepFind(obj, key);
+      const value = obj?.[key];
       if (value !== undefined && value !== null && String(value).trim() !== '') return value;
     }
-
     return fallback;
   }
 
   function setMeterHeights(left, right) {
-    const leftHeight = Math.max(6, Math.min(100, left * 1.95));
-    const rightHeight = Math.max(6, Math.min(100, right * 1.95));
-    if (elements.leftMeterFill) elements.leftMeterFill.style.height = `${leftHeight}%`;
-    if (elements.rightMeterFill) elements.rightMeterFill.style.height = `${rightHeight}%`;
+    if (elements.leftMeterFill) elements.leftMeterFill.style.height = `${Math.max(2, Math.min(100, left))}%`;
+    if (elements.rightMeterFill) elements.rightMeterFill.style.height = `${Math.max(2, Math.min(100, right))}%`;
   }
 
   function safeText(value, fallback = '') {
@@ -596,31 +317,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   }
 
   function detectDJ(data) {
-    const raw = safeText(
-      pickValue(
-        data,
-        [
-          'djusername',
-          'dj',
-          'dj_name',
-          'djstatus',
-          'client',
-          'source',
-          'live_dj',
-          'liveDj',
-          'live_dj_name',
-          'djuser',
-          'username',
-          'broadcaster',
-          'presenter',
-          'autodj',
-          'servergenre'
-        ],
-        ''
-      ),
-      ''
-    );
-
+    const raw = safeText(pickValue(data, ['djusername', 'dj', 'dj_name', 'djstatus', 'client', 'source', 'autodj', 'servergenre'], ''), '');
     const lower = raw.toLowerCase();
     if (!raw) return DEFAULT_DJ;
     if (lower.includes('autodj') || lower.includes('auto dj') || lower === 'none' || lower === 'unknown' || lower === 'no dj') return DEFAULT_DJ;
@@ -628,34 +325,7 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   }
 
   function pickImageUrl(data) {
-    return safeText(
-      pickValue(
-        data,
-        [
-          'artwork',
-          'cover',
-          'cover_url',
-          'coverUrl',
-          'image',
-          'imageurl',
-          'image_url',
-          'thumbnail',
-          'thumb',
-          'logo',
-          'picture',
-          'dj_image',
-          'djImage',
-          'dj_picture',
-          'album_art',
-          'albumart',
-          'art',
-          'avatar',
-          'photo'
-        ],
-        ''
-      ),
-      ''
-    );
+    return safeText(pickValue(data, ['artwork', 'cover', 'cover_url', 'image', 'imageurl', 'thumbnail', 'thumb', 'logo', 'picture', 'dj_image', 'album_art', 'albumart', 'art'], ''), '');
   }
 
   function normalizeTitle(data) {
@@ -680,21 +350,8 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
   function applyCover(url) {
     if (!elements.coverImage) return;
-
-    const cleanUrl = safeText(url, FALLBACK_COVER);
-    const isFallback = cleanUrl === FALLBACK_COVER || cleanUrl.endsWith('/fallback-cover.png');
-
-    let finalUrl = cleanUrl;
-    if (!isFallback) {
-      const stamp = `coverts=${Date.now()}`;
-      finalUrl += cleanUrl.includes('?') ? `&${stamp}` : `?${stamp}`;
-    }
-
-    if (elements.coverImage.dataset.currentSrc === finalUrl) return;
-    elements.coverImage.dataset.currentSrc = finalUrl;
-    elements.coverImage.src = finalUrl;
+    elements.coverImage.src = safeText(url, FALLBACK_COVER);
     elements.coverImage.onerror = () => {
-      elements.coverImage.dataset.currentSrc = FALLBACK_COVER;
       elements.coverImage.src = FALLBACK_COVER;
     };
   }
@@ -813,9 +470,8 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       updateEngineState('LIVE', true, false);
       return true;
     } catch (error) {
-      state.analyserHealthy = false;
       updateEngineState('BYPASS', false, false);
-      setMeterHeights((6) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8), (6) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8));
+      setMeterHeights(6, 6);
       return false;
     }
   }
@@ -823,59 +479,28 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   function startMeterLoop() {
     if (state.meterAnim) return;
     const tick = () => {
-      const audioSeemsActive = Boolean(state.playbackActive && elements.audio && !elements.audio.paused);
       if (!state.inputAnalyser || !state.outputAnalyser || !state.inputData || !state.outputData) {
-        renderFallbackHud(audioSeemsActive);
         state.meterAnim = requestAnimationFrame(tick);
         return;
       }
+      state.inputAnalyser.getByteFrequencyData(state.inputData);
+      state.outputAnalyser.getByteFrequencyData(state.outputData);
 
-      try {
-        state.inputAnalyser.getByteFrequencyData(state.inputData);
-        state.outputAnalyser.getByteFrequencyData(state.outputData);
-        if (state.inputWaveData) state.inputAnalyser.getFloatTimeDomainData(state.inputWaveData);
-        if (state.outputWaveData) state.outputAnalyser.getFloatTimeDomainData(state.outputWaveData);
-      } catch (error) {
-        renderFallbackHud(audioSeemsActive);
-        state.meterAnim = requestAnimationFrame(tick);
-        return;
-      }
+      if (state.inputWaveData) state.inputAnalyser.getFloatTimeDomainData(state.inputWaveData);
+      if (state.outputWaveData) state.outputAnalyser.getFloatTimeDomainData(state.outputWaveData);
 
       const inputStats = analyseFrequencyData(state.inputData, state.inputWaveData);
       const outputStats = analyseFrequencyData(state.outputData, state.outputWaveData);
-
-      if (state.autoChainReady && state.playbackActive) {
-        const targetLiftDb = computeAutoLiftTarget(inputStats.rmsDb);
-        const nextLift = Math.max(0, Math.min(AUTO_LIFT_MAX_DB, targetLiftDb));
-        state.autoLiftDb = smoothValue(state.autoLiftDb || 0, nextLift, 0.18);
-        state.autoChainActive = state.autoLiftDb > 0.08 || (state.currentBoostDb || 0) > 0;
-      } else {
-        state.autoLiftDb = 0;
-        state.autoChainActive = false;
-      }
-
+      const autoTargetDb = computeAutoLiftTarget(inputStats.rmsDb);
+      const autoSpeed = autoTargetDb > state.autoLiftDb ? 0.06 : 0.025;
+      state.autoLiftDb = smoothValue(state.autoLiftDb, autoTargetDb, autoSpeed);
       applyAutoChainGain();
 
       const compressorReduction = Math.abs(Number(state.dynamicsNode?.reduction || 0));
       const grDb = compressorReduction;
-      const boostVisual = Math.max(0, Math.min(12, Number(state.currentBoostDb || 0)));
-      const grVisual = Math.max(grDb, boostVisual * 0.22);
       const peakDb = outputStats.peakDb;
       const limitState = peakDb >= CLIP_TRIGGER_DB ? 'Clip' : grDb >= LIMIT_TRIGGER_DB ? 'Limiting' : 'Standby';
 
-      const realSignal = outputStats.energy > 0.012 || outputStats.bass > 0.015 || peakDb > -70;
-      if (audioSeemsActive && !realSignal) state.silentFrames += 1;
-      else state.silentFrames = 0;
-
-      if (audioSeemsActive && state.silentFrames > 48) {
-        state.analyserHealthy = false;
-        renderFallbackHud(true);
-        updateEngineState('SIM', true, false);
-        state.meterAnim = requestAnimationFrame(tick);
-        return;
-      }
-
-      state.analyserHealthy = true;
       state.grDb = smoothValue(state.grDb, grDb, 0.24);
       state.peakDb = smoothValue(state.peakDb, peakDb, 0.2);
       state.peakHoldDb = Math.max(state.peakDb, state.peakHoldDb - 0.24);
@@ -883,13 +508,12 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
 
       const left = outputStats.leftPercent;
       const right = outputStats.rightPercent;
-      setMeterHeights((left) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8), (right) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8));
-      updateEqualizerBars(state.outputData);
+      setMeterHeights(left, right);
       updateAutoChainHud({
         driveDb: state.hotDriveDb,
         liftDb: state.autoLiftDb,
         targetDb: state.targetDb,
-        chainState: limitState === 'Limiting' ? 'BOOST LIMIT' : 'BOOST ACTIVE'
+        chainState: autoTargetDb > 0.35 ? 'LIFTING' : limitState === 'Limiting' ? 'LOCKING' : 'HOT AUTO'
       });
       updateDynamicsHud({
         grDb: state.grDb,
@@ -902,41 +526,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
       state.meterAnim = requestAnimationFrame(tick);
     };
     state.meterAnim = requestAnimationFrame(tick);
-  }
-
-  function renderFallbackHud(isActive) {
-    state.hudFallbackPhase += isActive ? 0.15 : 0.04;
-    const phase = state.hudFallbackPhase;
-    const base = isActive ? 28 : 8;
-    const volumeFactor = Number(elements.volumeRange?.value || elements.audio?.volume || 1);
-    const boostFactor = Math.min(1, state.currentBoostDb / 18);
-    const liftFactor = Math.min(1, state.autoLiftDb / Math.max(1, AUTO_LIFT_MAX_DB));
-    const swing = isActive ? (Math.sin(phase) * 16 + Math.sin(phase * 1.93) * 10) : 0;
-    const swing2 = isActive ? (Math.sin(phase * 1.21 + 1.4) * 15 + Math.sin(phase * 2.4) * 8) : 0;
-    const left = Math.max(6, Math.min(100, base + swing + (volumeFactor * 18) + (boostFactor * 12) + (liftFactor * 10)));
-    const right = Math.max(6, Math.min(100, base + swing2 + (volumeFactor * 16) + (boostFactor * 10) + (liftFactor * 10)));
-    const pseudoGr = isActive ? Math.max(0, Math.min(9, state.currentBoostDb * 0.28 + (Math.sin(phase * 1.4) + 1) * 0.7)) : 0;
-    const pseudoPeak = isActive ? Math.max(-24, -12 + Math.sin(phase * 1.1) * 4 + boostFactor * 5 + liftFactor * 3) : -96;
-    const pseudoLimit = pseudoPeak > -1.5 ? 'Limiting' : 'Standby';
-    setMeterHeights((left) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8), (right) + Math.max(0, Number(state.currentBoostDb || 0) * 2.8));
-    updateEqualizerBars(Array.from({ length: 256 }, (_, i) => {
-      const spread = 0.55 + (i / 256) * 0.45;
-      return Math.max(0, Math.min(255, Math.round((90 + Math.sin((phase * 2.2) + (i * 0.18)) * 70) * spread)));
-    }));
-    updateBoostHud(state.currentBoostDb);
-    updateAutoChainHud({
-      driveDb: state.hotDriveDb,
-      liftDb: state.autoLiftDb,
-      targetDb: state.targetDb,
-      chainState: isActive ? 'BOOST SIM' : 'IDLE'
-    });
-    updateDynamicsHud({
-      grDb: pseudoGr,
-      peakDb: pseudoPeak,
-      limitState: pseudoLimit,
-      energy: Math.min(1, left / 100),
-      bass: Math.min(1, right / 100)
-    });
   }
 
   function analyseFrequencyData(data, waveData = null) {
@@ -979,23 +568,15 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     const safeStage = Math.max(0, Math.min(BOOST_STAGES_DB.length - 1, Number(stageIndex) || 0));
     state.currentBoostStage = safeStage;
     state.currentBoostDb = BOOST_STAGES_DB[safeStage];
-    const now = state.audioContext?.currentTime || 0;
     if (state.gainNode) {
-      state.gainNode.gain.setTargetAtTime(dbToGain(state.currentBoostDb), now, 0.018);
-    }
-    if (state.masterGainNode) {
-      const masterTrimDb = state.currentBoostDb >= 12 ? -2.5 : state.currentBoostDb >= 6 ? -1.2 : 0;
-      state.masterGainNode.gain.setTargetAtTime(dbToGain(masterTrimDb), now, 0.03);
-    }
-    if (elements.audio) {
-      elements.audio.volume = state.currentBoostDb >= 18 ? 1 : state.currentBoostDb >= 12 ? 0.98 : state.currentBoostDb >= 6 ? 0.94 : 0.9;
+      state.gainNode.gain.setTargetAtTime(dbToGain(state.currentBoostDb), state.audioContext?.currentTime || 0, 0.018);
     }
     updateBoostHud(state.currentBoostDb);
   }
 
   function applyAutoChainGain() {
     if (!state.preGainNode) return;
-    const totalDb = (state.currentBoostDb || 0) + (state.autoLiftDb || 0);
+    const totalDb = state.hotDriveDb + state.autoLiftDb;
     const now = state.audioContext?.currentTime || 0;
     state.preGainNode.gain.setTargetAtTime(dbToGain(totalDb), now, 0.08);
   }
@@ -1004,27 +585,6 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     if (!Number.isFinite(inputRmsDb)) return 0;
     const needed = state.targetDb - inputRmsDb;
     return Math.max(0, Math.min(AUTO_LIFT_MAX_DB, needed));
-  }
-
-  function updateEqualizerBars(data) {
-    if (!elements.eqBars || !elements.eqBars.length || !data || !data.length) return;
-    const bins = elements.eqBars.length;
-    const slice = Math.max(1, Math.floor(data.length / bins));
-    elements.eqBars.forEach((bar, index) => {
-      if (!bar) return;
-      let sum = 0;
-      let count = 0;
-      const start = index * slice;
-      const end = Math.min(data.length, index === bins - 1 ? data.length : start + slice);
-      for (let i = start; i < end; i += 1) {
-        sum += data[i];
-        count += 1;
-      }
-      const avg = count ? (sum / count) / 255 : 0;
-      const weighted = Math.min(1, Math.pow(avg, 0.78) * 1.18);
-      const height = 10 + (weighted * 90);
-      bar.style.height = `${height.toFixed(2)}%`;
-    });
   }
 
   function updateBoostHud(boostDb) {
@@ -1050,13 +610,13 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
     if (elements.peakValueText) elements.peakValueText.textContent = safePeak <= -96 ? MINUS_INF_TEXT : `${safePeak.toFixed(1)} dB`;
     if (elements.limitStateText) elements.limitStateText.textContent = limitState;
     if (elements.grBarFill) {
-      const width = Math.max(0, Math.min(100, (safeGr / 12) * 100));
+      const width = Math.max(0, Math.min(100, (safeGr / 9) * 100));
       elements.grBarFill.style.width = `${width}%`;
     }
-    setLamp(elements.limitLamp, limitState === 'Clip' ? 'lamp-pink' : limitState === 'Limiting' ? 'lamp-pink' : safeGr > 0.15 ? 'lamp-purple' : 'lamp-cyan');
+    setLamp(elements.limitLamp, limitState === 'Clip' ? 'lamp-red' : limitState === 'Limiting' ? 'lamp-pink' : 'lamp-cyan');
     doc.style.setProperty('--audio-energy', energy.toFixed(3));
     doc.style.setProperty('--audio-bass', bass.toFixed(3));
-    doc.style.setProperty('--gr-depth', safeGr.toFixed(3));
+    doc.style.setProperty('--gr-level', Math.min(1, safeGr / 9).toFixed(3));
   }
 
   function updateEngineState(label, isLive, isLimit) {
@@ -1081,34 +641,17 @@ function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPrefix = '
   async function safePlay() {
     try {
       await ensureAudioGraph();
-
-      if (state.streamMode === 'backup') {
-        await tryPlayFallback();
-      } else {
-        await tryPlayPrimary();
-      }
-
+      await tryPlayPrimary();
       setStatus('Playing');
       setLamp(elements.audioLamp, 'lamp-green');
-      state.playbackActive = true;
-      startMeterLoop();
       startPolling();
       return true;
     } catch (primaryError) {
-      if (state.streamMode === 'backup') {
-        setStatus('Audio Error');
-        setLamp(elements.audioLamp, 'lamp-red');
-        updateEngineState('ERROR', false, false);
-        return false;
-      }
-
       try {
         await ensureAudioGraph();
         await tryPlayFallback();
         setStatus('Playing');
         setLamp(elements.audioLamp, 'lamp-green');
-        state.playbackActive = true;
-        startMeterLoop();
         startPolling();
         return true;
       } catch (fallbackError) {
@@ -1150,24 +693,3 @@ function smoothValue(current, target, factor) {
   if (!Number.isFinite(current)) return target;
   return current + ((target - current) * factor);
 }
-
-
-try {
-  initPlayer({
-    streamConfig: STREAM_CONFIG,
-    uiConfig: UI_CONFIG,
-    mode: 'external',
-    assetPrefix: '.'
-  });
-  window.__RADIO_BOOT_OK__ = true;
-} catch (error) {
-  window.__RADIO_BOOT_OK__ = false;
-  console.error('PLAYER INIT ERROR', error);
-  var txt = document.getElementById('progressText');
-  var note = document.getElementById('volumeHint');
-  var btn = document.getElementById('bootButton');
-  if (txt) txt.textContent = 'BOOT ERROR';
-  if (note) note.textContent = 'JS-Init Fehler: ' + (error && error.message ? error.message : error);
-  if (btn) { btn.disabled = false; btn.textContent = 'Reload'; btn.addEventListener('click', function(){ location.reload(); }); }
-}
-})();
