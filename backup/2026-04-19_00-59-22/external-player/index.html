@@ -1,0 +1,240 @@
+<!-- ==========================================
+DATEI: index.html
+ERSTELLT: 2026-04-16
+GEÄNDERT: 2026-04-17
+ZWECK: Interner Worker-Fallback-Player als kompakte One-Page-Cyber-Oberfläche.
+ÄNDERUNG: Header mit Schriftzug + User-Logo, Tap-Infos für Statuslampen, knallige Türkis-Panels,
+           Neon-Pink/Neon-Türkis-Laser-Outlines und iPhone-sicheres No-Scroll-Layout ergänzt.
+========================================== -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>666SOUNDsDESIGn WebRadio — External</title>
+  <link rel="icon" type="image/png" href="./assets/icons/external-icon.png" />
+  <link rel="apple-touch-icon" href="./assets/icons/external-icon.png" />
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
+<body>
+  <div class="side-meter side-meter-left" aria-hidden="true">
+    <div class="side-meter-track"><div id="leftMeterFill" class="side-meter-fill"></div></div>
+  </div>
+  <div class="side-meter side-meter-right" aria-hidden="true">
+    <div class="side-meter-track"><div id="rightMeterFill" class="side-meter-fill"></div></div>
+  </div>
+
+  <div id="bootOverlay" class="overlay">
+    <div class="boot-panel laser-frame laser-frame-heavy">
+      <div class="boot-title">666SOUNDsDESIGn</div>
+      <div class="boot-subtitle">Audio-System wird für iPhone / Desktop initialisiert.</div>
+      <button id="bootButton" class="neon-button" type="button">Audio Start</button>
+      <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+      <div id="progressText" class="progress-text">0%</div>
+      <div id="volumeHint" class="boot-note">Auf iPhone initialisiert der Button die Audio-Ausgabe.</div>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <section class="player-card laser-frame laser-frame-heavy">
+      <header class="player-header">
+        <div class="brand-line laser-frame">
+          <span class="brand-word brand-word-left">666SOUNDsDESIGn</span>
+          <img class="brand-logo" src="./assets/images/user-logo-clean.png" alt="Fraggelpower 666 Logo" />
+          <span class="brand-word brand-word-right">WebRadio</span>
+        </div>
+
+        <button id="playerModeOrb" class="player-mode-orb info-trigger" type="button" data-info="Externer Haupt-Player aktiv." aria-label="Player-Modus anzeigen">
+          <span id="playerLamp" class="lamp lamp-cyan"></span>
+        </button>
+      </header>
+
+      <div class="top-strip">
+        <button id="sourceInfoBtn" class="status-chip info-trigger laser-frame" type="button" data-info="Source: Main-Stream aktiv.">
+          <span id="sourceLamp" class="lamp lamp-cyan"></span>
+          <span class="chip-label" data-label="source">Source</span>
+          <span id="sourceLabel" class="chip-value">Main</span>
+        </button>
+
+        <button id="healthInfoBtn" class="status-chip info-trigger laser-frame" type="button" data-info="Health: Verbindung wird geprüft.">
+          <span id="healthLamp" class="lamp lamp-red"></span>
+          <span class="chip-label" data-label="health">Health</span>
+          <span id="healthText" class="chip-value">Ready</span>
+        </button>
+
+        <button id="metaInfoBtn" class="status-chip info-trigger laser-frame" type="button" data-info="Metadaten werden aus dem Worker gelesen.">
+          <span id="metaLamp" class="lamp lamp-red"></span>
+          <span class="chip-label" data-label="metadata">Meta</span>
+          <span id="metaText" class="chip-value">Loading...</span>
+        </button>
+
+        <button id="audioInfoBtn" class="status-chip info-trigger laser-frame" type="button" data-info="Audio noch nicht gestartet.">
+          <span id="audioLamp" class="lamp lamp-red"></span>
+          <span class="chip-label" data-label="audio">Audio</span>
+          <span id="streamStatus" class="chip-value">Ready</span>
+        </button>
+      </div>
+
+      <section class="main-layout">
+        <div class="media-column">
+          <div class="cover-shell laser-frame laser-frame-heavy">
+            <img id="coverImage" class="cover-image" src="./assets/images/fallback-cover.png" alt="Stream Cover" />
+          </div>
+
+          <div class="pill-row">
+            <span id="fallbackText" class="pill laser-frame">Standby</span>
+            <span id="playerText" class="pill laser-frame">External</span>
+          </div>
+        </div>
+
+        <div class="content-column">
+          <section class="headline-block laser-frame laser-frame-heavy info-panel">
+            <div class="headline-label" data-label="nowPlaying">Now Playing</div>
+            <div id="titleText" class="headline-title">Loading metadata...</div>
+            <div id="artistText" class="headline-artist">666SOUNDsDESIGn DJ</div>
+          </section>
+
+          <section class="display-window laser-frame info-panel">
+            <div id="nowPlaying" class="marquee-track">Loading metadata...</div>
+          </section>
+
+          <section class="info-grid">
+            <div class="mini-box laser-frame info-panel"><div class="mini-label" data-label="listeners">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
+            <div class="mini-box laser-frame info-panel"><div class="mini-label" data-label="bitrate">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
+            <div class="mini-box laser-frame info-panel"><div class="mini-label" data-label="djStatus">DJ / Status</div><div id="djText" class="mini-value">666SOUNDsDESIGn DJ</div></div>
+            <div class="mini-box laser-frame info-panel"><div class="mini-label" data-label="stream">Stream</div><div id="streamNameText" class="mini-value">666SOUNDsDESIGn Radio</div></div>
+            <div class="mini-box laser-frame info-panel"><div class="mini-label" data-label="genre">Genre</div><div id="genreText" class="mini-value">Unknown</div></div>
+            <div class="mini-box laser-frame info-panel"><div class="mini-label" data-label="serverInfo">Server / Info</div><div id="serverText" class="mini-value">Live Stream</div></div>
+          </section>
+
+          <section class="control-strip">
+            <button id="playBtn" class="control-btn main laser-frame" type="button">Play</button>
+            <button id="pauseBtn" class="control-btn laser-frame" type="button">Pause</button>
+            <button id="stopBtn" class="control-btn laser-frame" type="button">Stop</button>
+            <button id="reconnectBtn" class="control-btn laser-frame" type="button">Reconnect</button>
+          </section>
+
+
+
+          <section class="hud-audio-grid">
+            <section class="audio-pro-panel laser-frame laser-frame-heavy hud-panel-cut">
+              <div class="audio-pro-head">
+                <div class="audio-pro-title">Boost Control</div>
+                <div id="audioEngineStatus" class="audio-engine-status">STANDBY</div>
+              </div>
+              <div class="boost-grid">
+                <button class="boost-btn" type="button" data-boost-stage="0">0 dB</button>
+                <button class="boost-btn" type="button" data-boost-stage="1">+3 dB</button>
+                <button class="boost-btn" type="button" data-boost-stage="2">+6 dB</button>
+                <button class="boost-btn" type="button" data-boost-stage="3">+9 dB</button>
+                <button class="boost-btn boost-btn-plus12" type="button" data-boost-stage="4">+12 dB</button>
+              </div>
+              <div class="meter-box meter-box-chain hud-stat-cut">
+                <div class="meter-label">Boost Active</div>
+                <div id="boostValueText" class="meter-value meter-value-chain">0.0 dB</div>
+              </div>
+            </section>
+
+            <section class="audio-pro-panel laser-frame laser-frame-heavy hud-panel-cut">
+              <div class="audio-pro-head">
+                <div class="audio-pro-title">Dynamics / GR</div>
+                <div class="limit-inline"><span id="limitLamp" class="lamp lamp-cyan"></span><span id="limitStateText" class="audio-engine-status">Standby</span></div>
+              </div>
+              <div class="audio-pro-meters">
+                <div class="meter-box hud-stat-cut">
+                  <div class="meter-label">GR</div>
+                  <div id="grValueText" class="meter-value">0.0 dB</div>
+                </div>
+                <div class="meter-box hud-stat-cut">
+                  <div class="meter-label">Peak</div>
+                  <div id="peakValueText" class="meter-value">-∞</div>
+                </div>
+              </div>
+              <div class="gr-bar-shell">
+                <div class="meter-label">Gain Reduction</div>
+                <div class="gr-bar-track"><div id="grBarFill" class="gr-bar-fill"></div></div>
+              </div>
+            </section>
+
+            <section class="audio-pro-panel laser-frame laser-frame-heavy hud-panel-cut">
+              <div class="audio-pro-head">
+                <div class="audio-pro-title">Auto Chain</div>
+                <div id="chainStateText" class="audio-engine-status">HOT AUTO</div>
+              </div>
+              <div class="auto-chain-grid">
+                <div class="meter-box meter-box-chain hud-stat-cut">
+                  <div class="meter-label">Drive</div>
+                  <div id="driveValueText" class="meter-value meter-value-chain">+2.8 dB</div>
+                </div>
+                <div class="meter-box meter-box-chain hud-stat-cut">
+                  <div class="meter-label">Lift</div>
+                  <div id="liftValueText" class="meter-value meter-value-chain">+0.0 dB</div>
+                </div>
+                <div class="meter-box meter-box-chain hud-stat-cut">
+                  <div class="meter-label">Target</div>
+                  <div id="targetValueText" class="meter-value meter-value-chain">-17.0 dB</div>
+                </div>
+                <div class="meter-box meter-box-chain hud-stat-cut">
+                  <div class="meter-label">Mode</div>
+                  <div class="meter-value meter-value-chain" id="chainModeText">Auto</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="audio-pro-panel laser-frame laser-frame-heavy hud-panel-cut">
+              <div class="audio-pro-head">
+                <div class="audio-pro-title">Equalizer</div>
+                <div class="audio-engine-status">VISUAL</div>
+              </div>
+              <div class="eq-cluster" id="eqCluster" aria-hidden="true">
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar0"></div><span class="eq-label">32</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar1"></div><span class="eq-label">64</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar2"></div><span class="eq-label">125</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar3"></div><span class="eq-label">250</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar4"></div><span class="eq-label">500</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar5"></div><span class="eq-label">1k</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar6"></div><span class="eq-label">2k</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar7"></div><span class="eq-label">4k</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar8"></div><span class="eq-label">8k</span></div>
+                <div class="eq-bar-wrap"><div class="eq-bar" id="eqBar9"></div><span class="eq-label">16k</span></div>
+              </div>
+            </section>
+          </section>
+
+          <section class="audio-tools">
+            <button id="muteBtn" class="small-btn laser-frame" type="button">Mute</button>
+            <div class="volume-wrap laser-frame">
+              <label for="volumeRange">Volume</label>
+              <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
+            </div>
+            <button id="historyToggle" class="small-btn laser-frame" type="button">History</button>
+          </section>
+        </div>
+      </section>
+
+      <div id="historyOverlay" class="history-overlay hidden laser-frame">
+        <div class="history-title">Last Tracks</div>
+        <ul id="historyList" class="history-list">
+          <li>No history loaded</li>
+        </ul>
+      </div>
+
+      <div id="infoBubble" class="info-bubble hidden" role="status" aria-live="polite"></div>
+
+      <audio id="radio" preload="none" playsinline webkit-playsinline crossorigin="anonymous"></audio>
+    </section>
+  </main>
+
+  <script src="./js/app.bundle.js"></script>
+  <script>
+    window.addEventListener('error', function (event) {
+      var txt = document.getElementById('progressText');
+      var note = document.getElementById('volumeHint');
+      var btn = document.getElementById('bootButton');
+      if (txt) txt.textContent = 'SCRIPT ERROR';
+      if (note) note.textContent = 'Frontend-Fehler: ' + (event && event.message ? event.message : 'Unbekannter Fehler');
+      if (btn) btn.disabled = false;
+    });
+  </script>
+  </body>
+</html>
