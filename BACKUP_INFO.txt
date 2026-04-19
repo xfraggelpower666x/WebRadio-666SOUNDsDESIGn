@@ -9,7 +9,7 @@ VERSION:     v1.0
 SOURCE_BRANCH: WebRadio-666SOUNDsDESIGn
 BACKUP_BRANCH: 666BackupMirror
 
-LAST_BACKUP:  2026-04-19_17-28-30
+LAST_BACKUP:  2026-04-19_17-47-01
 
 STRUCTURE:
 - current/       = aktueller kompletter Stand
