@@ -1,0 +1,6 @@
+{
+  "external_player_enabled": true,
+  "internal_player_enabled": true,
+  "metadata_enabled": true,
+  "stream_failover_enabled": true
+}
