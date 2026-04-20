@@ -14,8 +14,9 @@
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
-const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/";
+const EXTERNAL_PLAYER_URL = "https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/";
 const SWITCH_TIMEOUT_MS = 2000;
+const EXTERNAL_PLAYER_PREFIX = "/extern";
 
 const HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -223,7 +224,7 @@ async function proxyStream(request,upstream){
 }
 
 
-function buildExternalProxyHeaders(sourceHeaders){
+function buildExternalProxyHeaders(sourceHeaders, pathname = ""){
   // Relevante Header des externen Players sauber an den Browser weiterreichen.
   const headers = new Headers(sourceHeaders);
   headers.set("cache-control", "no-store");
@@ -231,13 +232,36 @@ function buildExternalProxyHeaders(sourceHeaders){
   headers.delete("x-frame-options");
   headers.delete("content-length");
   headers.set("x-player-mode", "external-proxy");
+
+  // Content-Type für Raw-GitHub-Antworten auf sinnvolle Werte setzen.
+  if (pathname.endsWith(".html") || pathname === "/" || pathname === "/extern") {
+    headers.set("content-type", "text/html; charset=UTF-8");
+  } else if (pathname.endsWith(".css")) {
+    headers.set("content-type", "text/css; charset=UTF-8");
+  } else if (pathname.endsWith(".js")) {
+    headers.set("content-type", "application/javascript; charset=UTF-8");
+  }
+
   return headers;
 }
 
+function getExternalUpstreamPath(pathname){
+  if (pathname === "/" || pathname === "/index.html" || pathname === "/extern") return "index.html";
+  if (pathname.startsWith("/extern/")) return pathname.replace(/^\/extern\//, "");
+  if (pathname === "/css/extern.css") return "css/extern.css";
+  if (pathname === "/js/extern.js") return "js/extern.js";
+  if (pathname.startsWith("/assets/")) return pathname.replace(/^\//, "");
+  return null;
+}
+
 async function fetchExternalAsset(pathname, request){
-  // Externe Player-Dateien unter derselben Domain ausliefern, damit github.io nicht sichtbar wird.
-  const suffix = pathname.replace(/^\/external-player\/?/, "");
-  const upstreamUrl = new URL(suffix || "", EXTERNAL_PLAYER_URL).toString();
+  // Externe Player-Dateien unter derselben Domain ausliefern, damit github/raw nicht sichtbar wird.
+  const upstreamPath = getExternalUpstreamPath(pathname);
+  if(!upstreamPath){
+    return null;
+  }
+
+  const upstreamUrl = new URL(upstreamPath, EXTERNAL_PLAYER_URL).toString();
   const init = {
     method: request.method,
     headers: {
@@ -250,32 +274,14 @@ async function fetchExternalAsset(pathname, request){
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers: buildExternalProxyHeaders(response.headers)
+    headers: buildExternalProxyHeaders(response.headers, pathname)
   });
 }
 
-async function serveExternalIndex(request){
-  // Startseite des externen Players laden und mit Base-Tag versehen.
-  // Dadurch bleiben Asset-Pfade stabil, obwohl die Domain oben gleich bleibt.
-  const response = await fetch(EXTERNAL_PLAYER_URL, {
-    method: "GET",
-    headers: {
-      "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",
-      "cache-control": "no-store"
-    },
-    redirect: "follow"
-  });
-  let html = await response.text();
-  if (!html.includes('<base href="/external-player/">')) {
-    html = html.replace("<head>", '<head>\n  <base href="/external-player/">');
-  }
-  const headers = buildExternalProxyHeaders(response.headers);
-  headers.set("content-type", "text/html; charset=UTF-8");
-  return new Response(html, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
+async function serveExternalIndex(request, pathname = "/"){
+  const response = await fetchExternalAsset(pathname, request);
+  if(response) return response;
+  return null;
 }
 
 export default {
@@ -286,16 +292,19 @@ export default {
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       const externalOk = await checkExternal();
       if(externalOk){
-        return await serveExternalIndex(request);
+        const externalResponse = await serveExternalIndex(request, "/");
+        if(externalResponse) return externalResponse;
       }
     }
 
-    // Direkte Proxy-Auslieferung für alle externen Player-Assets unter derselben Domain.
-    if(url.pathname==="/external-player" || url.pathname==="/external-player/"){
-      return await serveExternalIndex(request);
+    // Externer Player direkt unter /extern und seine Root-Dateien über dieselbe Domain ausliefern.
+    if(url.pathname==="/extern" || url.pathname==="/extern/"){
+      const externalResponse = await serveExternalIndex(request, "/extern");
+      if(externalResponse) return externalResponse;
     }
-    if(url.pathname.startsWith("/external-player/")){
-      return await fetchExternalAsset(url.pathname, request);
+    if(url.pathname==="/css/extern.css" || url.pathname==="/js/extern.js" || url.pathname.startsWith("/assets/")){
+      const externalAsset = await fetchExternalAsset(url.pathname, request);
+      if(externalAsset) return externalAsset;
     }
 
     // Gesundheitscheck unverändert lassen.
