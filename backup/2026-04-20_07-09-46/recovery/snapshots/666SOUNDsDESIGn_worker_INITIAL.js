@@ -1,11 +1,3 @@
-// ==========================================
-// DATEI: workers/webradio-666soundsdesign-worker/worker.ORIGINAL.js
-// ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
-// ZWECK: Historische Worker-Referenzdatei im Worker-Unterordner.
-// ÄNDERUNG: Kopfzeile ergänzt für bessere Nachvollziehbarkeit im Projekt.
-// ==========================================
-
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
