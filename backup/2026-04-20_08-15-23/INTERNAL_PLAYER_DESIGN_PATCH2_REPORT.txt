@@ -1,0 +1,26 @@
+CHANGE REPORT
+
+ÄNDERUNG:
+- interner Player:
+  - Stop-Button ergänzt
+  - Primary/Backup Buttons ergänzt
+  - Pause unterbricht Audio sauber
+  - Stop unterbricht Audio komplett
+  - Play startet nach Pause oder Stop wieder sauber
+  - Reconnect stoppt und verbindet neu
+  - Lautstärke bleibt beim Weiterstart erhalten
+  - "Use iPhone buttons" aus der Volume-Box entfernt
+  - neuer iPhone-Hinweis nur unter Mute/Volume und nur auf iPhone
+
+WARUM:
+- sichere Bedienung mit echter Anlage
+- keine Lautstärke-Sprünge mehr
+- manuelle Wahl Primary/Backup direkt im internen Player
+
+BETROFFEN:
+- /worker.js
+
+STATUS:
+- nur interner Player angepasst
+- Root-Worker-Struktur bleibt
+- Fallback-/Stream-Grundlogik bleibt
