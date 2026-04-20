@@ -1,4 +1,4 @@
-// ==========================================
+// ============W5==LIVE==TEST==============================
 // DATEI: AKTIVER_WORKER_MIRROR
 // ERSTELLT: 2026-04-16
 // GEÄNDERT: 2026-04-20
@@ -9,7 +9,7 @@
 //           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
 //           bleiben bewusst unangetastet.
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
-// ==========================================
+// =========================================================
 
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
