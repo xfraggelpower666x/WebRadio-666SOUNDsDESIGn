@@ -1,33 +1,20 @@
 // ==========================================
-// DATEI: worker.js
-// PFAD: /
+// DATEI: AKTIVER_WORKER_MIRROR
 // ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-20
-// VERSION: WRP4_FINAL
-// ZWECK: Stabilisierter Haupt-Worker für 666SOUNDsDESIGn Radio mit externem Haupt-Player
-//        aus dem GitHub-ROOT, internem Notfall-Fallback, Stream-/Metadaten-Proxy
-//        und deploy-sicherer Syntax.
-// INHALT:
-// - externer Player auf "/" und "/index.html"
-// - interner Fallback-Player im Worker
-// - Stream-Proxy für MAIN und BACK
-// - Metadaten-Proxy
-// - Health-Route
-//
-// ÄNDERUNGEN:
-// - 2026-04-20 — External Player URL auf GitHub-ROOT umgestellt
-// - 2026-04-20 — alte "/external-player"-Unterordnerlogik entfernt
-// - 2026-04-20 — stabilen Internal-Player-Stand als Fallback beibehalten
-// - 2026-04-20 — Base-Tag für externen Player auf GitHub-ROOT gesetzt
-// HINWEISE:
-// - Root-Worker, Worker-Unterordner und Recovery-Worker identisch halten
-// - PATCH ONLY: keine Stream-/Proxy-Architektur neu erfunden
+// GEÄNDERT: 2026-04-16
+// STATUS: AKTIV
+// ZWECK: Gespiegelter Haupt-Worker für 666SOUNDsDESIGn Radio mit externem Standard-Player,
+//        internem Notfall-Fallback, Stream-/Metadaten-Proxy und stabiler Domain-Auslieferung.
+// ÄNDERUNG: Redirect auf github.io entfernt; externer Player wird jetzt per Proxy unter
+//           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
+//           bleiben bewusst unangetastet.
+// HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
-const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/";
+const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/";
 const SWITCH_TIMEOUT_MS = 2000;
 
 const HTML = `<!DOCTYPE html>
@@ -155,12 +142,12 @@ function setMetadataStatus(text){if(metaText)metaText.textContent=text}
 function pickValue(obj,keys,fallback=""){for(const key of keys){const value=obj?.[key];if(value!==undefined&&value!==null&&String(value).trim()!=="")return value}return fallback}
 function normalizeTitle(data){return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"],lastTitle||"Live Stream"))}
 function renderHistory(items){if(!historyList)return;historyList.innerHTML="";if(!Array.isArray(items)||!items.length){const li=document.createElement("li");li.textContent="No history loaded";historyList.appendChild(li);return}items.slice(0,12).forEach((item)=>{const li=document.createElement("li");li.textContent=typeof item==="string"?item:String(pickValue(item,["song","title","track","name"],"Unknown track"));historyList.appendChild(li)})}
-async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=pickValue(data,["djusername","djstatus","client"],"AutoDJ");if(listenersText)listenersText.textContent=\`${Number.isFinite(listeners)?listeners:0} / ${STREAM_CONFIG.listener_capacity}\`;if(bitrateText)bitrateText.textContent=bitrate?\`${String(bitrate)} kbps\`:"Unknown";if(djText)djText.textContent=String(djStatus);renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
+async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=pickValue(data,["djusername","djstatus","client"],"AutoDJ");if(listenersText)listenersText.textContent=\`\${Number.isFinite(listeners)?listeners:0} / \${STREAM_CONFIG.listener_capacity}\`;if(bitrateText)bitrateText.textContent=bitrate?\`\${String(bitrate)} kbps\`:"Unknown";if(djText)djText.textContent=String(djStatus);renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
 function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetchMetadata();metadataTimer=setInterval(fetchMetadata,STREAM_CONFIG.poll_interval_ms)}
 async function tryPlayPrimary(){audio.src=STREAM_CONFIG.stream_url;await audio.play();setSource(false)}
 async function tryPlayFallback(){audio.src=STREAM_CONFIG.fallback_stream_url;await audio.play();setSource(true)}
 async function safePlay(){try{await tryPlayPrimary();setStatus("Playing");setLamp(audioLamp,"lamp-green");startMetadataLoop();return true}catch(e1){try{await tryPlayFallback();setStatus("Playing");setLamp(audioLamp,"lamp-green");startMetadataLoop();return true}catch(e2){setStatus("Audio Error");setLamp(audioLamp,"lamp-red");return false}}}
-function runBootSequence(){return new Promise((resolve)=>{let percent=0;const timer=setInterval(()=>{percent+=4;if(percent>100)percent=100;if(progressBar)progressBar.style.width=\`${percent}%\`;if(progressText)progressText.textContent=\`${percent}%\`;if(percent>=100){clearInterval(timer);resolve()}},42)})}
+function runBootSequence(){return new Promise((resolve)=>{let percent=0;const timer=setInterval(()=>{percent+=4;if(percent>100)percent=100;if(progressBar)progressBar.style.width=\`\${percent}%\`;if(progressText)progressText.textContent=\`\${percent}%\`;if(percent>=100){clearInterval(timer);resolve()}},42)})}
 bootButton?.addEventListener("click",async()=>{if(booted)return;booted=true;bootButton.disabled=true;await runBootSequence();overlay?.classList.add("hidden");await safePlay()});
 playBtn?.addEventListener("click",async()=>{await safePlay()});
 pauseBtn?.addEventListener("click",()=>{audio.pause();setStatus("Paused");setLamp(audioLamp,"lamp-red")});
@@ -183,6 +170,7 @@ const CONFIG_JS = `export const STREAM_CONFIG = {
   "fallback_upstream": "https://my.idjstream.com:8686/stream"
 };`;
 
+
 async function checkExternal(){
   try{
     const controller = new AbortController();
@@ -203,15 +191,11 @@ async function checkExternal(){
 function passthroughHeaders(sourceHeaders){
   const headers=new Headers();
   const allow=["content-type","content-length","accept-ranges","content-range","cache-control","icy-br","icy-description","icy-genre","icy-metaint","icy-name","icy-notice1","icy-notice2","icy-pub","icy-url","transfer-encoding"];
-  for(const key of allow){
-    const value=sourceHeaders.get(key);
-    if(value)headers.set(key,value);
-  }
+  for(const key of allow){const value=sourceHeaders.get(key);if(value)headers.set(key,value)}
   headers.set("access-control-allow-origin","*");
   headers.set("x-radio-proxy","666soundsdesign-worker");
   return headers;
 }
-
 async function proxyStream(request,upstream){
   const init={method:request.method,headers:new Headers()};
   const range=request.headers.get("range");
@@ -223,14 +207,12 @@ async function proxyStream(request,upstream){
   if(accept)init.headers.set("accept",accept);
   if(icyMeta)init.headers.set("icy-metadata",icyMeta);
   const response=await fetch(upstream,init);
-  return new Response(response.body,{
-    status:response.status,
-    statusText:response.statusText,
-    headers:passthroughHeaders(response.headers)
-  });
+  return new Response(response.body,{status:response.status,statusText:response.statusText,headers:passthroughHeaders(response.headers)});
 }
 
+
 function buildExternalProxyHeaders(sourceHeaders){
+  // Relevante Header des externen Players sauber an den Browser weiterreichen.
   const headers = new Headers(sourceHeaders);
   headers.set("cache-control", "no-store");
   headers.delete("content-security-policy");
@@ -240,7 +222,29 @@ function buildExternalProxyHeaders(sourceHeaders){
   return headers;
 }
 
+async function fetchExternalAsset(pathname, request){
+  // Externe Player-Dateien unter derselben Domain ausliefern, damit github.io nicht sichtbar wird.
+  const suffix = pathname.replace(/^\/external-player\/?/, "");
+  const upstreamUrl = new URL(suffix || "", EXTERNAL_PLAYER_URL).toString();
+  const init = {
+    method: request.method,
+    headers: {
+      "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",
+      "cache-control": "no-store"
+    },
+    redirect: "follow"
+  };
+  const response = await fetch(upstreamUrl, init);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: buildExternalProxyHeaders(response.headers)
+  });
+}
+
 async function serveExternalIndex(request){
+  // Startseite des externen Players laden und mit Base-Tag versehen.
+  // Dadurch bleiben Asset-Pfade stabil, obwohl die Domain oben gleich bleibt.
   const response = await fetch(EXTERNAL_PLAYER_URL, {
     method: "GET",
     headers: {
@@ -249,20 +253,12 @@ async function serveExternalIndex(request){
     },
     redirect: "follow"
   });
-
   let html = await response.text();
-
-  // Externen Player aus GitHub-ROOT laden.
-  // Assets sollen direkt relativ zum GitHub-ROOT aufgelöst werden.
-  if (/<base\s/i.test(html)) {
-    html = html.replace(/<base\s+href=["'][^"']*["']\s*\/?>/i, `<base href="${EXTERNAL_PLAYER_URL}">`);
-  } else {
-    html = html.replace("<head>", `<head>\n  <base href="${EXTERNAL_PLAYER_URL}">`);
+  if (!html.includes('<base href="/external-player/">')) {
+    html = html.replace("<head>", '<head>\n  <base href="/external-player/">');
   }
-
   const headers = buildExternalProxyHeaders(response.headers);
   headers.set("content-type", "text/html; charset=UTF-8");
-
   return new Response(html, {
     status: response.status,
     statusText: response.statusText,
@@ -270,110 +266,63 @@ async function serveExternalIndex(request){
   });
 }
 
-function serveInternalHtml(){
-  return new Response(HTML,{
-    status:200,
-    headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store"}
-  });
-}
-
 export default {
   async fetch(request){
     const url=new URL(request.url);
 
-    // Interner Player kann gezielt aufgerufen werden.
-    if(
-      url.pathname==="/internal" ||
-      url.pathname==="/internal/" ||
-      url.pathname==="/internal-test" ||
-      url.pathname==="/internal-test/" ||
-      url.searchParams.get("player")==="internal"
-    ){
-      return serveInternalHtml();
-    }
-
-    // Startseite: externer Player direkt aus GitHub-ROOT.
-    // Nur wenn extern nicht erreichbar ist, auf den internen Fallback gehen.
-    if(url.pathname==="/" || url.pathname==="/index.html"){
+    // Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
+    if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       const externalOk = await checkExternal();
       if(externalOk){
         return await serveExternalIndex(request);
       }
-      return serveInternalHtml();
     }
 
-    // Gesundheitscheck unverändert.
+    // Direkte Proxy-Auslieferung für alle externen Player-Assets unter derselben Domain.
+    if(url.pathname==="/external-player" || url.pathname==="/external-player/"){
+      return await serveExternalIndex(request);
+    }
+    if(url.pathname.startsWith("/external-player/")){
+      return await fetchExternalAsset(url.pathname, request);
+    }
+
+    // Gesundheitscheck unverändert lassen.
     if(url.pathname==="/health"){
-      return new Response("OK",{
-        status:200,
-        headers:{
-          "content-type":"text/plain; charset=UTF-8",
-          "cache-control":"no-store",
-          "access-control-allow-origin":"*"
-        }
-      });
+      return new Response("OK",{status:200,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
     }
 
-    // Metadaten-Proxy unverändert.
+    // Metadaten-Proxy NICHT umbauen, damit iPhone-App und bestehende Clients stabil bleiben.
     if(url.pathname==="/api/nowplaying"){
       try{
         const upstream=await fetch(METADATA_URL,{headers:{"cache-control":"no-store"}});
         const body=await upstream.text();
-        return new Response(body,{
-          status:upstream.status,
-          headers:{
-            "content-type":"application/json; charset=UTF-8",
-            "cache-control":"no-store",
-            "access-control-allow-origin":"*",
-            "x-radio-proxy":"666soundsdesign-worker"
-          }
-        });
+        return new Response(body,{status:upstream.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker"}});
       }catch(err){
-        return new Response(JSON.stringify({error:"metadata_proxy_failed"}),{
-          status:502,
-          headers:{
-            "content-type":"application/json; charset=UTF-8",
-            "cache-control":"no-store",
-            "access-control-allow-origin":"*"
-          }
-        });
+        return new Response(JSON.stringify({error:"metadata_proxy_failed"}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
       }
     }
 
-    // Stream-Routen unverändert.
+    // Stream-Routen unverändert lassen.
     if(url.pathname==="/stream"){
-      try{
-        return await proxyStream(request,PRIMARY_STREAM_URL);
-      }catch(err){
-        return await proxyStream(request,FALLBACK_STREAM_URL);
-      }
+      try{return await proxyStream(request,PRIMARY_STREAM_URL)}catch(err){return await proxyStream(request,FALLBACK_STREAM_URL)}
     }
-
     if(url.pathname==="/fallback-stream"){
-      return await proxyStream(request,FALLBACK_STREAM_URL);
+      return await proxyStream(request,FALLBACK_STREAM_URL)
     }
 
-    // Interne Fallback-Assets lokal ausliefern.
+    // Interner Notfall-Player bleibt komplett erhalten.
     if(url.pathname==="/icons/internal-icon.png"){
-      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/icons/internal-icon.png", {
-        headers: {"cache-control":"no-store"}
-      });
+      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
     }
-
     if(url.pathname==="/css/main.css"){
-      return new Response(CSS,{headers:{"content-type":"text/css; charset=UTF-8","cache-control":"no-store"}});
+      return new Response(CSS,{headers:{"content-type":"text/css; charset=UTF-8"}});
     }
-
     if(url.pathname==="/js/app.js"){
-      return new Response(APP_JS,{headers:{"content-type":"application/javascript; charset=UTF-8","cache-control":"no-store"}});
+      return new Response(APP_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
-
     if(url.pathname==="/config/stream.config.js"){
-      return new Response(CONFIG_JS,{headers:{"content-type":"application/javascript; charset=UTF-8","cache-control":"no-store"}});
+      return new Response(CONFIG_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
-
-    // Alle anderen Pfade, die keine Worker-API oder internen Assets sind:
-    // bewusst kein altes "/external-player"-Routing mehr.
-    return serveInternalHtml();
+    return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
   }
 };

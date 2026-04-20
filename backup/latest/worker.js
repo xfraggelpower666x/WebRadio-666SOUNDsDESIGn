@@ -13,6 +13,7 @@
 // - Stream-Proxy für MAIN und BACK
 // - Metadaten-Proxy
 // - Health-Route
+//
 // ÄNDERUNGEN:
 // - 2026-04-20 — External Player URL auf GitHub-ROOT umgestellt
 // - 2026-04-20 — alte "/external-player"-Unterordnerlogik entfernt
