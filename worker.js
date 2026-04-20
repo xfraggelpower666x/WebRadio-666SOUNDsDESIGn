@@ -1,15 +1,13 @@
 // ==========================================
 // DATEI: AKTIVER_WORKER_MIRROR
 // ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-21
+// GEÄNDERT: 2026-04-20
 // STATUS: AKTIV
 // ZWECK: Gespiegelter Haupt-Worker für 666SOUNDsDESIGn Radio mit externem Standard-Player,
 //        internem Notfall-Fallback, Stream-/Metadaten-Proxy und stabiler Domain-Auslieferung.
 // ÄNDERUNG: Redirect auf github.io entfernt; externer Player wird jetzt per Proxy unter
-//           derselben Domain ausgeliefert. Neu in V3: /extern wird sauber auf den externen
-//           Player geroutet, /internal explizit auf den internen Fallback-Player. Zusätzlich
-//           wird beim externen Player ein Mobile-Overflow-Fix injiziert. Streams und
-//           Metadaten bleiben bewusst unangetastet.
+//           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
+//           bleiben bewusst unangetastet.
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
@@ -238,7 +236,7 @@ function buildExternalProxyHeaders(sourceHeaders){
 
 async function fetchExternalAsset(pathname, request){
   // Externe Player-Dateien unter derselben Domain ausliefern, damit github.io nicht sichtbar wird.
-  const suffix = pathname.replace(/^\/external-player\/?/, "");
+  const suffix = pathname.replace(/^\/(?:extern|external-player)\/?/, "");
   const upstreamUrl = new URL(suffix || "", EXTERNAL_PLAYER_URL).toString();
   const init = {
     method: request.method,
@@ -268,19 +266,8 @@ async function serveExternalIndex(request){
     redirect: "follow"
   });
   let html = await response.text();
-  if (!html.includes('<base href="/external-player/">')) {
-    html = html.replace("<head>", '<head>
-  <base href="/external-player/">');
-  }
-  if (!html.includes('data-overflow-fix="worker-v3"')) {
-    html = html.replace("</head>", `
-  <style data-overflow-fix="worker-v3">
-    html, body { max-width: 100%; overflow-x: hidden !important; }
-    body { position: relative; }
-    img, video, canvas, svg { max-width: 100%; height: auto; }
-    * { box-sizing: border-box; }
-  </style>
-</head>`);
+  if (!html.includes('<base href="/extern/">')) {
+    html = html.replace("<head>", '<head>\n  <base href="/extern/">');
   }
   const headers = buildExternalProxyHeaders(response.headers);
   headers.set("content-type", "text/html; charset=UTF-8");
@@ -296,24 +283,31 @@ export default {
     const url=new URL(request.url);
 
     // Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
-    if((url.pathname==="/" || url.pathname==="/index.html" || url.pathname==="/extern") && url.searchParams.get("player")!=="internal"){
+    if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       const externalOk = await checkExternal();
       if(externalOk){
         return await serveExternalIndex(request);
       }
     }
 
-    // Interner Player muss explizit erreichbar sein und darf NICHT über den externen Pfad laufen.
-    if(url.pathname==="/internal"){
-      return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
+    // Direkte Proxy-Auslieferung für den externen Player unter derselben Domain.
+    if(url.pathname==="/extern" || url.pathname==="/extern/"){
+      return await serveExternalIndex(request);
     }
-
-    // Direkte Proxy-Auslieferung für alle externen Player-Assets unter derselben Domain.
+    if(url.pathname.startsWith("/extern/")){
+      return await fetchExternalAsset(url.pathname, request);
+    }
+    // Alte Route als Alias bewusst erhalten, damit bestehende Links nicht brechen.
     if(url.pathname==="/external-player" || url.pathname==="/external-player/"){
       return await serveExternalIndex(request);
     }
     if(url.pathname.startsWith("/external-player/")){
       return await fetchExternalAsset(url.pathname, request);
+    }
+
+    // Interner Player explizit direkt erreichbar halten.
+    if(url.pathname==="/internal" || url.pathname==="/internal/"){
+      return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
     }
 
     // Gesundheitscheck unverändert lassen.

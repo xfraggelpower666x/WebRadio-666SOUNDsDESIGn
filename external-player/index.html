@@ -2,11 +2,11 @@
 ==========================================
 DATEI: external-player/index.html
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Externer Hauptplayer für 666SOUNDsDESIGn Radio.
-ÄNDERUNG: Kompakte Icon-Controls und zentrales LED-Statussystem integriert,
-           ohne neue Worker-Mechaniken oder neue externe Datenquellen.
-HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
+GEÄNDERT: 2026-04-21
+ZWECK: Externer Hauptplayer für 666SOUNDsDESIGn Radio unter derselben Domain.
+ÄNDERUNG: FULLPACK v5 Frame Integration mit HQ-Frame-Hintergrund, kompakter Cockpit-Geometrie,
+           LED-Statussystem, rechter/ linker Außenmeter, Desktop-Volume und Main/Backup-Steuerung.
+HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Stream-Mechaniken.
 ==========================================
 -->
 <!DOCTYPE html>
@@ -14,7 +14,7 @@ HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn Radio</title>
+  <title>666SOUNDsDESIGn Radio — External Main Player</title>
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/shared-status.css" />
   <link rel="stylesheet" href="./css/layout.css" />
@@ -23,19 +23,22 @@ HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
   <link rel="stylesheet" href="./css/desktop.css" />
 </head>
 <body>
-  <div class="app-grid">
-    <aside class="side-meter left">
+  <div class="frame-stage">
+    <div class="frame-overlay"></div>
+
+    <aside class="side-meter left" aria-label="Left meter">
       <div class="side-meter-label">L</div>
       <div class="side-meter-track"><div id="leftMeter" class="side-meter-fill"></div></div>
     </aside>
 
-    <main class="player-shell">
-      <header class="top-hud panel-glass">
+    <main class="player-shell panel-glass neon-frame-shell">
+      <header class="top-hud">
         <div class="brand-wrap">
           <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
           <h1 class="brand-title">666SOUNDsDESIGn</h1>
           <div class="brand-sub">External Main Player</div>
         </div>
+
         <div class="status-cluster status-bar" aria-label="Systemstatus">
           <button id="statusStream" class="status-chip led-state state-main" type="button" title="Main Stream aktiv">
             <span class="status-dot"></span><span class="status-code">STR</span>
@@ -49,19 +52,16 @@ HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
         </div>
       </header>
 
-      <section class="hero panel-glass neon-outline-cyan">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-          <div class="hero-label-row">
-            <span class="hero-badge">LIVE</span>
-            <span id="streamState" class="hero-badge dim">READY</span>
-          </div>
-          <div class="hero-title">Cyber Stream Cockpit</div>
-          <div class="hero-subtitle">Kompakter Hauptplayer für iPhone und Desktop</div>
+      <section class="hero">
+        <div class="hero-label-row">
+          <span class="hero-badge hero-live">LIVE</span>
+          <span id="streamState" class="hero-badge dim">READY</span>
         </div>
+        <div class="hero-title">Cyber Stream Cockpit</div>
+        <div class="hero-subtitle">Kompakter Hauptplayer für iPhone und Desktop</div>
       </section>
 
-      <section class="now-playing panel-glass neon-outline-pink">
+      <section class="now-playing">
         <div class="section-topline">
           <div>
             <div class="section-kicker">NOW PLAYING</div>
@@ -80,27 +80,27 @@ HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
         </div>
       </section>
 
-      <section class="info-grid compact-grid">
-        <article class="info-card panel-glass compact-card">
+      <section class="info-grid">
+        <article class="info-card">
           <div class="info-label">Listeners</div>
           <div id="listenersText" class="info-value">0 / 250</div>
         </article>
-        <article class="info-card panel-glass compact-card">
+        <article class="info-card">
           <div class="info-label">Bitrate</div>
           <div id="bitrateText" class="info-value">Unknown</div>
         </article>
-        <article class="info-card panel-glass compact-card">
+        <article class="info-card">
           <div class="info-label">DJ / Status</div>
           <div id="djText" class="info-value">666SOUNDsDESIGn DJ</div>
         </article>
       </section>
 
-      <section class="visualizer panel-glass neon-outline-purple compact-visualizer">
+      <section class="visualizer">
         <div class="section-kicker">EQ</div>
         <div id="eqBars" class="eq-bars" aria-hidden="true"></div>
       </section>
 
-      <section class="controls panel-glass compact-controls">
+      <section class="bottom-console">
         <div class="control-toolbar" aria-label="Player-Steuerung">
           <button id="playBtn" class="icon-btn icon-btn-main" type="button" title="Play" aria-label="Play">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
@@ -117,10 +117,23 @@ HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
           <button id="mainBtn" class="icon-btn source-chip is-active" type="button" title="Main Stream aktivieren" aria-label="Main Stream">M</button>
           <button id="fallbackBtn" class="icon-btn source-chip" type="button" title="Backup Stream aktivieren" aria-label="Backup Stream">B</button>
         </div>
+
+        <div class="timeline-wrap desktop-only">
+          <div class="time-chip" id="currentTimeText">0:00</div>
+          <div class="timeline-bar">
+            <div id="timelineProgress" class="timeline-progress"></div>
+          </div>
+          <div class="time-chip" id="durationText">LIVE</div>
+        </div>
+
+        <div class="volume-wrap desktop-only">
+          <label class="volume-label" for="volumeSlider">VOL</label>
+          <input id="volumeSlider" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.75" />
+        </div>
       </section>
     </main>
 
-    <aside class="side-meter right">
+    <aside class="side-meter right" aria-label="Right meter">
       <div class="side-meter-label">R</div>
       <div class="side-meter-track"><div id="rightMeter" class="side-meter-fill"></div></div>
     </aside>

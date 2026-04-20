@@ -2,9 +2,10 @@
 ==========================================
 DATEI: external-player/js/equalizer.js
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Visualizer- und Pegelmeter-Steuerung des externen Players.
-ÄNDERUNG: Audio-Analyser mit Simulations-Fallback ergänzt.
+GEÄNDERT: 2026-04-21
+ZWECK: Visualizer- und Pegelmeter-Steuerung.
+ÄNDERUNG: Rechter Außenmeter-Fix: beide Außenmeter werden an denselben Live-Pegel gespiegelt,
+           damit die rechte Seite nicht tot wirkt. Kein Umbau an Stream-/Audio-Routen.
 ==========================================
 */
 export function createBars(container, count = 24) {
@@ -14,7 +15,7 @@ export function createBars(container, count = 24) {
   for (let i = 0; i < count; i += 1) {
     const bar = document.createElement('div');
     bar.className = 'eq-bar';
-    bar.style.height = `${18 + ((i * 9) % 84)}px`;
+    bar.style.height = `${14 + ((i * 8) % 72)}px`;
     container.appendChild(bar);
     bars.push(bar);
   }
@@ -28,17 +29,24 @@ export function startVisualizer({ audio, bars, leftMeter, rightMeter }) {
   let data = null;
   let rafId = 0;
   let fallbackTimer = 0;
+  let smoothMeter = 24;
+
+  const setMeters = (valuePercent) => {
+    const bounded = Math.max(12, Math.min(96, valuePercent));
+    const next = (smoothMeter * 0.72) + (bounded * 0.28);
+    smoothMeter = next;
+    if (leftMeter) leftMeter.style.height = `${next}%`;
+    if (rightMeter) rightMeter.style.height = `${next}%`;
+  };
 
   const renderFallback = () => {
     fallbackTimer = window.setInterval(() => {
       bars.forEach((bar, i) => {
-        const h = 22 + Math.abs(Math.sin((Date.now() / 220) + i * 0.32)) * 120;
+        const h = 18 + Math.abs(Math.sin((Date.now() / 240) + i * 0.24)) * 70;
         bar.style.height = `${h}px`;
       });
-      const l = 18 + Math.abs(Math.sin(Date.now() / 260)) * 74;
-      const r = 18 + Math.abs(Math.cos(Date.now() / 250)) * 74;
-      if (leftMeter) leftMeter.style.height = `${l}%`;
-      if (rightMeter) rightMeter.style.height = `${r}%`;
+      const v = 22 + Math.abs(Math.sin(Date.now() / 260)) * 68;
+      setMeters(v);
     }, 120);
   };
 
@@ -56,19 +64,18 @@ export function startVisualizer({ audio, bars, leftMeter, rightMeter }) {
     const frame = () => {
       analyser.getByteFrequencyData(data);
       const slice = Math.max(1, Math.floor(data.length / bars.length));
-      let leftMax = 0;
-      let rightMax = 0;
+      let globalMax = 0;
+
       bars.forEach((bar, i) => {
         let total = 0;
         for (let j = 0; j < slice; j += 1) total += data[(i * slice + j) % data.length];
         const avg = total / slice;
-        const px = 18 + (avg / 255) * 150;
+        globalMax = Math.max(globalMax, avg);
+        const px = 12 + (avg / 255) * 88;
         bar.style.height = `${px}px`;
-        if (i < bars.length / 2) leftMax = Math.max(leftMax, avg);
-        else rightMax = Math.max(rightMax, avg);
       });
-      if (leftMeter) leftMeter.style.height = `${12 + (leftMax / 255) * 88}%`;
-      if (rightMeter) rightMeter.style.height = `${12 + (rightMax / 255) * 88}%`;
+
+      setMeters(14 + (globalMax / 255) * 82);
       rafId = requestAnimationFrame(frame);
     };
 

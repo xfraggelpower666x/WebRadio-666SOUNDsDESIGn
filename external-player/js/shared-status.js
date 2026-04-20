@@ -2,9 +2,9 @@
 ==========================================
 DATEI: external-player/js/shared-status.js
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
+GEÄNDERT: 2026-04-21
 ZWECK: Zentrale Zustandsumschaltung für STR/META/SRC-Chips.
-ÄNDERUNG: Tooltip- und Farbzustände für Main/Backup/API/Error/External ergänzt.
+ÄNDERUNG: Tooltip- und Farbzustände für Main/Backup/API/Error/External zentral gehalten.
 ==========================================
 */
 const STATE_CLASS_MAP = {

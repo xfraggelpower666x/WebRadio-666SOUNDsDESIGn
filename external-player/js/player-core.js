@@ -2,10 +2,10 @@
 ==========================================
 DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Hauptlogik des externen Players mit Anbindung an bestehende Worker-Endpunkte.
-ÄNDERUNG: Kompakte Icon-Steuerung und zentrales LED-Statussystem integriert.
-HINWEIS: Audio, Metadaten und Fallback laufen weiterhin nur über bestehende Worker-Routen.
+GEÄNDERT: 2026-04-21
+ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
+ÄNDERUNG: FULLPACK v5 Frame Integration, Desktop-Volume, Fortschrittsanzeige und Meter-Fix ergänzt.
+HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js';
@@ -42,6 +42,10 @@ const fallbackBtn = document.getElementById('fallbackBtn');
 const statusStream = document.getElementById('statusStream');
 const statusMeta = document.getElementById('statusMeta');
 const statusSource = document.getElementById('statusSource');
+const volumeSlider = document.getElementById('volumeSlider');
+const timelineProgress = document.getElementById('timelineProgress');
+const currentTimeText = document.getElementById('currentTimeText');
+const durationText = document.getElementById('durationText');
 
 let currentSource = 'main';
 let userStopped = false;
@@ -55,9 +59,26 @@ applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
 applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
 markSourceButtons(mainBtn, fallbackBtn, currentSource);
+audio.volume = Number(volumeSlider?.value || 0.75);
 
 function setStatus(text) {
   setText(streamState, text);
+}
+
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function updateTimeline() {
+  const current = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+  const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+  setText(currentTimeText, formatTime(current));
+  setText(durationText, duration > 0 ? formatTime(duration) : 'LIVE');
+  const progress = duration > 0 ? Math.max(0, Math.min(100, (current / duration) * 100)) : 34;
+  if (timelineProgress) timelineProgress.style.width = `${progress}%`;
 }
 
 function setSource(source) {
@@ -90,15 +111,15 @@ function parseMetadata(payload) {
     };
   }
 
-  const title = payload.title || payload.now_playing || payload.song || payload.currenttrack || 'Unknown title';
-  const artist = payload.artist || payload.dj || '';
-  const listeners = payload.listeners || payload.currentlisteners || payload.listener_count || '0';
+  const title = payload.title || payload.now_playing || payload.song || payload.currenttrack || payload.currentSong || 'Unknown title';
+  const artist = payload.artist || payload.dj || payload.djusername || '';
+  const listeners = payload.listeners || payload.currentlisteners || payload.listener_count || 0;
   const bitrate = payload.bitrate || payload.stream_bitrate || 'Unknown';
   const max = payload.maxlisteners || payload.listener_capacity || 250;
-  const dj = payload.dj || artist || '666SOUNDsDESIGn DJ';
+  const dj = payload.dj || payload.djusername || artist || '666SOUNDsDESIGn DJ';
 
   return {
-    title: artist ? `${artist} — ${title}` : title,
+    title: artist && !String(title).includes(artist) ? `${artist} - ${title}` : String(title),
     listeners: `${listeners} / ${max}`,
     bitrate: String(bitrate),
     dj: dj
@@ -133,13 +154,15 @@ function startMetadataLoop() {
 function stopPlayback(status = 'STOPPED') {
   audio.pause();
   audio.removeAttribute('src');
+  audio.src = '';
   audio.load();
   setStatus(status);
+  updateTimeline();
 }
 
 async function playCurrent() {
   userStopped = false;
-  setStatus(currentSource === 'main' ? 'CONNECT MAIN' : 'CONNECT BACKUP');
+  setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
   audio.src = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
   try {
     await visualizer.start();
@@ -196,6 +219,9 @@ fallbackBtn?.addEventListener('click', async () => {
   setSource('fallback');
   if (!userStopped) await playCurrent();
 });
+volumeSlider?.addEventListener('input', () => {
+  audio.volume = Number(volumeSlider.value);
+});
 audio?.addEventListener('error', async () => {
   if (userStopped) return;
   if (currentSource === 'main') {
@@ -209,7 +235,10 @@ audio?.addEventListener('error', async () => {
 audio?.addEventListener('playing', () => {
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
 });
+audio?.addEventListener('timeupdate', updateTimeline);
+audio?.addEventListener('loadedmetadata', updateTimeline);
 
 healthPing();
 fetchMetadata();
 startMetadataLoop();
+updateTimeline();

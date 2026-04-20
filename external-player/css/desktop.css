@@ -2,24 +2,16 @@
 ==========================================
 DATEI: external-player/css/desktop.css
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Desktop-Feinschliff für breite Layouts.
-ÄNDERUNG: Kompakte HUD-Leisten und reduzierte vertikale Höhe ergänzt.
+GEÄNDERT: 2026-04-21
+ZWECK: Desktop-Feinschliff.
+ÄNDERUNG: Frame-Geometrie an große Monitore angepasst.
 ==========================================
 */
 @media (min-width: 861px) {
-  .player-shell {
-    padding-top: 6px;
-    padding-bottom: 6px;
+  body[data-device="desktop"] .frame-stage {
+    min-height: 100vh;
   }
-  .hero {
-    min-height: 172px;
-    padding: 20px;
-  }
-  .info-card,
-  .now-playing,
-  .visualizer,
-  .controls {
-    padding: 16px 18px;
+  body[data-device="desktop"] .player-shell {
+    width: min(82vw, 1180px);
   }
 }

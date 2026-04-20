@@ -2,20 +2,25 @@
 ==========================================
 DATEI: external-player/css/effects.css
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Neon-Rahmen, Glows und subtile Cyber-Effekte.
-ÄNDERUNG: Mehrfarbige Outline-Varianten und leichte Pulsanimation ergänzt.
+GEÄNDERT: 2026-04-21
+ZWECK: Neon-Rahmen und subtile Glows.
+ÄNDERUNG: Frame-kompatible ruhige Glows statt aggressiver Überfrachtung.
 ==========================================
 */
-.neon-outline-cyan { box-shadow: inset 0 0 0 1px rgba(0,245,223,0.16), 0 0 18px rgba(0,245,223,0.14); }
-.neon-outline-pink { box-shadow: inset 0 0 0 1px rgba(255,62,181,0.18), 0 0 18px rgba(255,62,181,0.15); }
-.neon-outline-purple { box-shadow: inset 0 0 0 1px rgba(184,77,255,0.18), 0 0 18px rgba(184,77,255,0.15); }
-.eq-bar, .side-meter-fill, .lamp { animation: pulseGlow 1.8s ease-in-out infinite alternate; }
+.neon-frame-shell {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.03),
+    0 0 18px rgba(0,245,223,0.18),
+    0 0 18px rgba(255,62,181,0.18);
+}
+.eq-bar, .side-meter-fill, .status-dot {
+  animation: pulseGlow 1.8s ease-in-out infinite alternate;
+}
 @keyframes pulseGlow {
   from { filter: brightness(0.96); }
   to { filter: brightness(1.12); }
 }
-.ctrl-btn:hover, .sub-btn:hover, .ghost-btn:hover {
+.icon-btn:hover, .ghost-btn:hover {
   transform: translateY(-1px);
   transition: transform 0.16s ease;
 }

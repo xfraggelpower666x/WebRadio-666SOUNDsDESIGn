@@ -2,9 +2,9 @@
 ==========================================
 DATEI: external-player/js/controls.js
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Text- und Button-Helfer für den externen Player.
-ÄNDERUNG: Quellbuttons auf kompakte M/B-Buttons umgestellt.
+GEÄNDERT: 2026-04-21
+ZWECK: Text- und Button-Helfer.
+ÄNDERUNG: M/B-Steuerung und kleine Text-Updates unverändert zentral gehalten.
 ==========================================
 */
 export function setText(el, text) {

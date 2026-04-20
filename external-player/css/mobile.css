@@ -2,42 +2,63 @@
 ==========================================
 DATEI: external-player/css/mobile.css
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-20
-ZWECK: Mobile-Anpassungen für iPhone und kleine Displays.
-ÄNDERUNG: Ein-Seiten-orientierte Kompaktansicht mit Icon-Leiste ergänzt.
+GEÄNDERT: 2026-04-21
+ZWECK: Mobile-Anpassungen.
+ÄNDERUNG: Frame-Hintergrund bleibt, Player wird normal ins Viewport gelegt, Außenmeter und Desktop-Volume aus.
 ==========================================
 */
 @media (max-width: 860px) {
-  .app-grid {
-    grid-template-columns: 1fr;
-    padding: 10px;
-    gap: 10px;
+  .desktop-only { display: none !important; }
+  .frame-stage {
+    min-height: 100vh;
+    overflow-y: auto;
+    padding: 14px 10px 16px;
+    background-position: center top;
+  }
+  .player-shell {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    min-height: auto;
+    margin: 250px auto 0;
+    padding: 14px 14px 16px;
   }
   .side-meter { display: none; }
-  .player-shell { gap: 10px; }
   .top-hud {
     flex-direction: column;
     align-items: stretch;
-    padding: 14px;
+    gap: 10px;
+    margin-bottom: 10px;
   }
-  .status-cluster { justify-content: flex-start; }
-  .hero { min-height: 132px; padding: 14px; }
-  .info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .brand-title { font-size: clamp(1.3rem, 7vw, 2rem); }
+  .hero {
+    min-height: 112px;
+    padding: 12px 12px;
+  }
+  .hero-title { font-size: clamp(1.2rem, 7vw, 1.8rem); }
+  .info-grid {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
+  }
   .info-card { padding: 10px 10px; }
   .info-value { font-size: 0.92rem; }
-  .ticker-window { height: 46px; }
   .eq-bars {
-    gap: 4px;
-    grid-template-columns: repeat(16, minmax(0, 1fr));
     height: 76px;
+    gap: 4px;
+    grid-template-columns: repeat(16, minmax(0,1fr));
   }
-  .control-toolbar { gap: 8px; }
+  .bottom-console {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .control-toolbar {
+    gap: 8px;
+    justify-content: flex-start;
+  }
   .icon-btn {
     width: 42px;
     height: 42px;
-  }
-  .icon-btn svg {
-    width: 18px;
-    height: 18px;
   }
 }
