@@ -226,5 +226,22 @@ HINWEISE:
 
   <audio id="radio" crossorigin="anonymous" preload="none"></audio>
   <script type="module" src="./js/app.bundle.js"></script>
+
+<div class="ctrl-row secondary">
+  <button id="reconnectBtn" class="ctrl-btn">Reconnect</button>
+  <button id="muteBtn" class="ctrl-btn">Mute</button>
+  <button id="mainBtn" class="ctrl-btn">MAIN</button>
+  <button id="backBtn" class="ctrl-btn">BACK</button>
+</div>
+
+<div class="volume-block">
+  <input id="volumeRange" type="range" min="0" max="1" step="0.01">
+  <div id="levelMini" class="level-mini"></div>
+  <div id="iphoneHint" class="iphone-hint hidden">Use iPhone buttons</div>
+</div>
+
+<div class="player-ident">INTERNAL</div>
+<div id="djText">666SOUNDsDESIGn DJ</div>
+
 </body>
 </html>
