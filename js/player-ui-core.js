@@ -485,3 +485,46 @@ export function initPlayer({ streamConfig, uiConfig, mode = 'external', assetPre
     });
   }
 }
+
+
+// W5 PATCH 1 — Internal UI hooks (add-only)
+(function(){
+  const stopBtn = document.getElementById('stopBtn');
+  const mainBtn = document.getElementById('mainBtn');
+  const backBtn = document.getElementById('backBtn');
+  const iphoneHint = document.getElementById('iphoneHint');
+  const djText = document.getElementById('djText');
+  const levelMini = document.getElementById('levelMini');
+
+  // iPhone hint
+  const isiPhone = /iPhone/.test(navigator.userAgent);
+  if (iphoneHint){ iphoneHint.classList.toggle('hidden', !isiPhone); }
+
+  if (djText){ djText.textContent = '666SOUNDsDESIGn DJ'; }
+
+  // stop
+  if (stopBtn){
+    stopBtn.addEventListener('click', ()=>{
+      try{ window.audio?.pause(); }catch(e){}
+    });
+  }
+
+  // main/back (visual only; no worker change)
+  if (mainBtn){
+    mainBtn.addEventListener('click', ()=>{
+      document.getElementById('sourceLabel')?.textContent = 'MAIN';
+    });
+  }
+  if (backBtn){
+    backBtn.addEventListener('click', ()=>{
+      document.getElementById('sourceLabel')?.textContent = 'BACK';
+    });
+  }
+
+  // simple level meter from volume (fallback)
+  setInterval(()=>{
+    if (!levelMini) return;
+    const v = document.getElementById('volumeRange')?.value || 0;
+    if (v > 0.05) levelMini.classList.add('active'); else levelMini.classList.remove('active');
+  }, 200);
+})();
