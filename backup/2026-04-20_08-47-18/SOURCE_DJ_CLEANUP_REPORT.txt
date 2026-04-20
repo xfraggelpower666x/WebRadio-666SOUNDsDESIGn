@@ -1,0 +1,22 @@
+CHANGE REPORT
+
+ÄNDERUNG:
+- SOURCE Anzeige bereinigt:
+  nur noch Primary / Backup
+- INTERNAL entfernt
+- DJ Anzeige:
+  → echter DJ Name ODER
+  → 666SOUNDsDESIGn DJ
+
+WARUM:
+- klare Trennung:
+  Source = Technik
+  DJ = Inhalt
+- keine Verwirrung mehr
+
+BETROFFEN:
+- /worker.js
+
+STATUS:
+- nur Anzeige angepasst
+- keine Streamlogik verändert
