@@ -1,13 +1,14 @@
 // ==========================================
 // DATEI: AKTIVER_WORKER_MIRROR
 // ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-16
+// GEÄNDERT: 2026-04-20
 // STATUS: AKTIV
 // ZWECK: Gespiegelter Haupt-Worker für 666SOUNDsDESIGn Radio mit externem Standard-Player,
 //        internem Notfall-Fallback, Stream-/Metadaten-Proxy und stabiler Domain-Auslieferung.
 // ÄNDERUNG: Redirect auf github.io entfernt; externer Player wird jetzt per Proxy unter
 //           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
 //           bleiben bewusst unangetastet.
+// PATCH: W5 PATCH 2 — Internal Player Status-/LED-Layout bereinigt und doppelte Inline-JS-Logik entfernt.
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
@@ -22,20 +23,20 @@ const HTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>666SOUNDsDESIGn Radio — Internal W4</title>
+  <title>666SOUNDsDESIGn Radio — Internal W5 P2</title>
   <link rel="icon" type="image/png" href="/icons/internal-icon.png" />
   <link rel="apple-touch-icon" href="/icons/internal-icon.png" />
   <link rel="stylesheet" href="/css/main.css" />
 </head>
-<body data-internal-build="W4">
+<body data-internal-build="W5-P2">
   <div id="bootOverlay" class="overlay">
     <div class="boot-panel">
       <div class="boot-title">666SOUNDsDESIGn</div>
       <div class="boot-subtitle">Internal Fallback Player</div>
-      <button id="bootButton" class="neon-button">OK</button>
+      <button id="bootButton" class="neon-button">Audio Start</button>
       <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
       <div id="progressText" class="progress-text">0%</div>
-      <div class="boot-note">Ein Tipp auf OK initialisiert Audio für iPhone / iPad.</div>
+      <div class="boot-note">Ein Tipp auf Audio Start initialisiert Audio für iPhone / iPad.</div>
     </div>
   </div>
 
@@ -46,22 +47,10 @@ const HTML = `<!DOCTYPE html>
           <div class="brand">666SOUNDsDESIGn</div>
           <div class="player-sub">INTERNAL FALLBACK PLAYER</div>
         </div>
-        <div class="status-orbs">
-          <button id="playerModeOrb" class="status-orb" type="button" title="Interner Fallback-Player">
+        <div class="identity-wrap">
+          <button id="playerModeOrb" class="status-orb status-orb-identity" type="button" title="Interner Fallback-Player">
             <span id="playerModeLamp" class="status-orb-dot status-orb-dot-purple"></span>
             <span id="playerModeText">INT</span>
-          </button>
-          <button id="streamModeOrb" class="status-orb" type="button" title="Hauptstream aktiv">
-            <span id="streamModeLamp" class="status-orb-dot status-orb-dot-cyan"></span>
-            <span id="streamModeText">MAIN</span>
-          </button>
-          <button id="audioModeOrb" class="status-orb" type="button" title="Audio nicht aktiv">
-            <span id="audioModeLamp" class="status-orb-dot status-orb-dot-pink"></span>
-            <span id="audioModeText">AUD</span>
-          </button>
-          <button id="metaModeOrb" class="status-orb" type="button" title="Metadaten werden geladen">
-            <span id="metaModeLamp" class="status-orb-dot status-orb-dot-off"></span>
-            <span id="metaModeText">META</span>
           </button>
         </div>
       </header>
@@ -107,6 +96,39 @@ const HTML = `<!DOCTYPE html>
         </div>
       </section>
 
+      <section class="status-panel" aria-label="Internal Player Status">
+        <div class="status-row status-row-head">
+          <div class="status-head-left">Internal Status</div>
+          <div id="streamStatus" class="status-head-right">STOPPED</div>
+        </div>
+
+        <div class="status-grid">
+          <button id="metaModeOrb" class="status-tile" type="button" title="Metadatenstatus">
+            <span id="metaModeLamp" class="status-orb-dot status-orb-dot-off"></span>
+            <span class="status-tile-label">META</span>
+            <span id="metaModeText" class="status-tile-value">STANDBY</span>
+          </button>
+
+          <button id="audioModeOrb" class="status-tile" type="button" title="Audiostatus">
+            <span id="audioModeLamp" class="status-orb-dot status-orb-dot-pink"></span>
+            <span class="status-tile-label">AUDIO</span>
+            <span id="audioModeText" class="status-tile-value">OFF</span>
+          </button>
+
+          <button id="streamModeOrb" class="status-tile" type="button" title="Quellstatus">
+            <span id="streamModeLamp" class="status-orb-dot status-orb-dot-off"></span>
+            <span class="status-tile-label">SOURCE</span>
+            <span id="streamModeText" class="status-tile-value">MAIN</span>
+          </button>
+
+          <button class="status-tile status-tile-static" type="button" title="Player-Identität">
+            <span class="status-orb-dot status-orb-dot-purple"></span>
+            <span class="status-tile-label">PLAYER</span>
+            <span id="playerIdentityText" class="status-tile-value">INTERNAL</span>
+          </button>
+        </div>
+      </section>
+
       <div class="controls-row controls-row-main">
         <button id="playBtn" class="control-btn control-btn-main" type="button">Play</button>
         <button id="pauseBtn" class="control-btn" type="button">Pause</button>
@@ -124,11 +146,13 @@ const HTML = `<!DOCTYPE html>
         <div class="volume-panel">
           <label for="volumeRange">Volume</label>
           <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
-          <div id="volumeHint" class="volume-hint hidden">Use iPhone buttons</div>
-        </div>
-        <div class="mini-meter-panel" aria-hidden="true">
-          <div class="mini-meter-track"><div id="miniMeterLeft" class="mini-meter-fill"></div></div>
-          <div class="mini-meter-track"><div id="miniMeterRight" class="mini-meter-fill"></div></div>
+          <div class="volume-line">
+            <div class="volume-meter-wrap" aria-hidden="true">
+              <div class="mini-meter-track"><div id="miniMeterLeft" class="mini-meter-fill"></div></div>
+              <div class="mini-meter-track"><div id="miniMeterRight" class="mini-meter-fill"></div></div>
+            </div>
+            <div id="volumeHint" class="volume-hint hidden">Use iPhone buttons</div>
+          </div>
         </div>
       </div>
 
@@ -175,15 +199,20 @@ body{min-height:100vh}
 .brand-wrap{display:flex;flex-direction:column;gap:4px}
 .brand{font-size:1.45rem;font-weight:900;color:var(--cyan);letter-spacing:.02em}
 .player-sub{font-size:.72rem;letter-spacing:.16em;color:var(--pink)}
-.status-orbs{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-.status-orb,.control-btn,.small-btn,.history-btn,.neon-button{
+.identity-wrap{display:flex;justify-content:flex-end;align-items:flex-start}
+.status-orb,.status-tile,.control-btn,.small-btn,.history-btn,.neon-button{
   appearance:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
   color:var(--text);cursor:pointer;transition:.16s ease
 }
-.status-orb{
-  border-radius:999px;padding:7px 11px;display:inline-flex;align-items:center;gap:7px;font-weight:700
+.status-orb{border-radius:999px;padding:7px 11px;display:inline-flex;align-items:center;gap:7px;font-weight:700}
+.status-tile{
+  border-radius:18px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;
+  column-gap:10px;row-gap:3px;align-items:center;text-align:left;background:rgba(255,255,255,.03)
 }
-.status-orb:hover,.control-btn:hover,.small-btn:hover,.history-btn:hover,.neon-button:hover{transform:translateY(-1px)}
+.status-tile .status-orb-dot{grid-row:1 / span 2}
+.status-tile-label{font-size:.72rem;letter-spacing:.12em;color:var(--muted)}
+.status-tile-value{font-size:.92rem;font-weight:800;color:var(--text)}
+.status-orb:hover,.status-tile:hover,.control-btn:hover,.small-btn:hover,.history-btn:hover,.neon-button:hover{transform:translateY(-1px)}
 .status-orb-dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid transparent}
 .status-orb-dot-cyan{background:var(--cyan);box-shadow:0 0 12px rgba(0,234,255,.48)}
 .status-orb-dot-purple{background:var(--purple);box-shadow:0 0 12px rgba(179,102,255,.48)}
@@ -201,43 +230,38 @@ body{min-height:100vh}
   height:132px;border-radius:18px;border:1px solid rgba(255,255,255,.10);padding:12px;
   background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01))
 }
-.visual-grid{height:100%;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end}
+.visual-grid{height:100%;display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:end}
 .visual-col{
-  border-radius:999px 999px 6px 6px;min-height:18%;height:28%;
-  background:linear-gradient(180deg,var(--pink) 0%,var(--purple) 48%,var(--cyan) 100%);
-  box-shadow:0 0 10px rgba(255,43,214,.18)
+  border-radius:999px 999px 10px 10px;background:linear-gradient(180deg,var(--pink),var(--cyan));
+  box-shadow:0 0 16px rgba(0,234,255,.16);min-height:18%;height:34%
 }
 .info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.info-box{
-  border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(255,255,255,.03);padding:10px 12px
-}
+.info-box{border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:12px;background:rgba(255,255,255,.02)}
 .info-box-wide{grid-column:span 1}
-.info-value{font-weight:800;margin-top:2px}
-.controls-row{display:grid;gap:8px}
-.controls-row-main{grid-template-columns:repeat(3,minmax(0,1fr))}
-.controls-row-secondary{grid-template-columns:repeat(4,minmax(0,1fr))}
-.control-btn,.small-btn{border-radius:15px;padding:10px 12px;font-weight:800}
-.control-btn-main{border-color:rgba(255,43,214,.45);box-shadow:0 0 12px rgba(255,43,214,.16) inset}
-.stream-btn.is-active{box-shadow:0 0 12px rgba(0,234,255,.18) inset}
-.bottom-row{display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:12px;align-items:end}
+.info-value{margin-top:4px;font-weight:800}
+.status-panel{
+  border:1px solid rgba(255,255,255,.10);border-radius:22px;padding:12px 12px 10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));display:grid;gap:10px
+}
+.status-row-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.status-head-left{font-size:.78rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.status-head-right{font-size:1rem;font-weight:900;color:var(--cyan);text-align:right}
+.status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.controls-row{display:grid;gap:10px}.controls-row-main{grid-template-columns:repeat(3,minmax(0,1fr))}.controls-row-secondary{grid-template-columns:repeat(4,minmax(0,1fr))}
+.control-btn,.small-btn,.history-btn,.neon-button{border-radius:16px;padding:12px 14px;font-weight:800}.control-btn-main{background:rgba(179,102,255,.12);border-color:rgba(179,102,255,.34)}
+.small-btn.stream-btn.is-active{background:rgba(0,234,255,.12);border-color:rgba(0,234,255,.34);color:var(--cyan)}
+.bottom-row{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-items:center}
 .volume-panel{
-  border:1px solid rgba(255,255,255,.10);border-radius:18px;background:rgba(255,255,255,.03);padding:10px 12px;
-  display:flex;flex-direction:column;gap:6px
+  border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:12px;background:rgba(255,255,255,.02);
+  display:grid;gap:8px
 }
-.volume-panel input[type="range"]{width:100%}
-.volume-hint{font-size:.72rem;color:var(--muted);line-height:1.2}
+#volumeRange{width:100%}
+.volume-line{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:18px}
+.volume-meter-wrap{display:flex;gap:6px;align-items:end;min-width:54px}
+.mini-meter-track{width:10px;height:24px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.mini-meter-fill{width:100%;height:10%;background:linear-gradient(180deg,var(--pink),var(--cyan));border-radius:999px}
+.volume-hint{font-size:.74rem;color:var(--muted);text-align:right}
 .volume-hint.hidden{display:none}
-.mini-meter-panel{
-  border:1px solid rgba(255,255,255,.10);border-radius:18px;background:rgba(255,255,255,.03);padding:8px;
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;height:74px
-}
-.mini-meter-track{
-  border-radius:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);padding:4px;display:flex;align-items:flex-end
-}
-.mini-meter-fill{
-  width:100%;height:10%;border-radius:8px;background:linear-gradient(180deg,var(--purple) 0%,var(--cyan) 100%);
-  box-shadow:0 0 10px rgba(179,102,255,.35)
-}
 .history-btn{justify-self:end;border-radius:12px;padding:8px 12px;font-size:.85rem}
 .history-overlay{
   position:absolute;left:18px;right:18px;bottom:18px;z-index:12;border-radius:18px;padding:12px;
@@ -257,6 +281,7 @@ body{min-height:100vh}
   .player-card,.boot-panel{width:min(94vw,560px)}
   .now-top{grid-template-columns:1fr}
   .visual-shell{height:104px}
+  .status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:520px){
   .player-card{padding:14px}
@@ -264,137 +289,461 @@ body{min-height:100vh}
   .player-sub{font-size:.64rem}
   .info-grid{grid-template-columns:1fr}
   .controls-row-secondary{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .bottom-row{grid-template-columns:1fr 70px}
 }`;
 
 const APP_JS = `import { STREAM_CONFIG } from "../config/stream.config.js";
-document.title="666SOUNDsDESIGn Internal W4";
-const overlay=document.getElementById("bootOverlay");
-const bootButton=document.getElementById("bootButton");
-const progressBar=document.getElementById("progressBar");
-const progressText=document.getElementById("progressText");
-const playBtn=document.getElementById("playBtn");
-const pauseBtn=document.getElementById("pauseBtn");
-const stopBtn=document.getElementById("stopBtn");
-const reconnectBtn=document.getElementById("reconnectBtn");
-const muteBtn=document.getElementById("muteBtn");
-const streamMainBtn=document.getElementById("streamMainBtn");
-const streamBackBtn=document.getElementById("streamBackBtn");
-const volumeRange=document.getElementById("volumeRange");
-const historyToggle=document.getElementById("historyToggle");
-const playerModeOrb=document.getElementById("playerModeOrb");
-const playerModeLamp=document.getElementById("playerModeLamp");
-const playerModeText=document.getElementById("playerModeText");
-const streamModeOrb=document.getElementById("streamModeOrb");
-const streamModeLamp=document.getElementById("streamModeLamp");
-const streamModeText=document.getElementById("streamModeText");
-const audioModeOrb=document.getElementById("audioModeOrb");
-const audioModeLamp=document.getElementById("audioModeLamp");
-const metaModeOrb=document.getElementById("metaModeOrb");
-const metaModeLamp=document.getElementById("metaModeLamp");
-const nowPlaying=document.getElementById("nowPlaying");
-const metaText=document.getElementById("metaText");
-const listenersText=document.getElementById("listenersText");
-const bitrateText=document.getElementById("bitrateText");
-const djText=document.getElementById("djText");
-const historyOverlay=document.getElementById("historyOverlay");
-const historyList=document.getElementById("historyList");
-const volumeHint=document.getElementById("volumeHint");
-const miniMeterLeft=document.getElementById("miniMeterLeft");
-const miniMeterRight=document.getElementById("miniMeterRight");
-const eqBars=Array.from({length:12},(_,i)=>document.getElementById("eqBar"+i));
-const audio=document.getElementById("radio");
+document.title = "666SOUNDsDESIGn Internal W5 P2";
 
-let booted=false,muted=false,metadataTimer=null,lastTitle="Loading metadata...",historyOpen=false,streamMode="main",usingFallback=false,userVolume=1,intentionalDisconnect=false,audioCtx=null,mediaNode=null,analyser=null,meterBuffer=null,meterRaf=null;
+const overlay = document.getElementById("bootOverlay");
+const bootButton = document.getElementById("bootButton");
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+const playBtn = document.getElementById("playBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const stopBtn = document.getElementById("stopBtn");
+const reconnectBtn = document.getElementById("reconnectBtn");
+const muteBtn = document.getElementById("muteBtn");
+const streamMainBtn = document.getElementById("streamMainBtn");
+const streamBackBtn = document.getElementById("streamBackBtn");
+const volumeRange = document.getElementById("volumeRange");
+const historyToggle = document.getElementById("historyToggle");
+const playerModeOrb = document.getElementById("playerModeOrb");
+const playerModeLamp = document.getElementById("playerModeLamp");
+const playerModeText = document.getElementById("playerModeText");
+const streamModeOrb = document.getElementById("streamModeOrb");
+const streamModeLamp = document.getElementById("streamModeLamp");
+const streamModeText = document.getElementById("streamModeText");
+const metaModeOrb = document.getElementById("metaModeOrb");
+const metaModeLamp = document.getElementById("metaModeLamp");
+const metaModeText = document.getElementById("metaModeText");
+const audioModeOrb = document.getElementById("audioModeOrb");
+const audioModeLamp = document.getElementById("audioModeLamp");
+const audioModeText = document.getElementById("audioModeText");
+const streamStatus = document.getElementById("streamStatus");
+const nowPlaying = document.getElementById("nowPlaying");
+const metaText = document.getElementById("metaText");
+const listenersText = document.getElementById("listenersText");
+const bitrateText = document.getElementById("bitrateText");
+const djText = document.getElementById("djText");
+const historyOverlay = document.getElementById("historyOverlay");
+const historyList = document.getElementById("historyList");
+const volumeHint = document.getElementById("volumeHint");
+const miniMeterLeft = document.getElementById("miniMeterLeft");
+const miniMeterRight = document.getElementById("miniMeterRight");
+const eqBars = Array.from({ length: 12 }, (_, i) => document.getElementById(`eqBar${i}`));
+const audio = document.getElementById("radio");
 
-function setLamp(el,state){
-  if(!el) return;
-  el.className=el.className.split(" ").filter(cls=>!cls.startsWith("status-orb-dot-")).join(" ").trim();
-  el.className=(el.className?el.className+" ":"")+state;
+let booted = false;
+let muted = false;
+let metadataTimer = null;
+let historyOpen = false;
+let streamMode = "main";
+let userVolume = 1;
+let lastTitle = "Loading metadata...";
+let intentionalDisconnect = false;
+let audioCtx = null;
+let mediaNode = null;
+let analyser = null;
+let meterBuffer = null;
+let meterRaf = null;
+
+const DEFAULT_DJ = "666SOUNDsDESIGn DJ";
+const STATUS_TEXT = {
+  stopped: "STOPPED",
+  paused: "PAUSED",
+  playing: "PLAYING",
+  reconnecting: "RECONNECT",
+  error: "ERROR"
+};
+
+function setDotState(element, state) {
+  if (!element) return;
+  element.classList.remove("status-orb-dot-cyan", "status-orb-dot-purple", "status-orb-dot-pink", "status-orb-dot-off");
+  element.classList.add(state);
 }
-function updateAudioIndicator(isActive){
-  if(audioModeOrb) audioModeOrb.title=isActive?"Audio aktiv":"Audio nicht aktiv";
-  if(audioModeLamp) setLamp(audioModeLamp,isActive?"status-orb-dot-purple":"status-orb-dot-pink");
-}
-function updateMetaIndicator(state){
-  if(metaModeOrb) metaModeOrb.title=state==="online"?"Metadaten online":state==="offline"?"Metadaten offline":"Metadaten laden";
-  if(metaModeLamp) setLamp(metaModeLamp,state==="online"?"status-orb-dot-cyan":state==="offline"?"status-orb-dot-pink":"status-orb-dot-off");
-}
-function updateStreamModeUi(){
-  const backup=streamMode==="backup";
-  if(streamModeText) streamModeText.textContent=backup?"BACK":"MAIN";
-  if(streamMainBtn) streamMainBtn.classList.toggle("is-active",!backup);
-  if(streamBackBtn) streamBackBtn.classList.toggle("is-active",backup);
-  if(streamModeLamp) setLamp(streamModeLamp,backup?"status-orb-dot-purple":"status-orb-dot-cyan");
-  if(streamModeOrb) streamModeOrb.title=backup?"Fallback-Stream aktiv":"Hauptstream aktiv";
-}
-function setSource(isFallback){
-  usingFallback=!!isFallback;
-  updateStreamModeUi();
-}
-function rememberUserVolume(){
-  const fromSlider=Number(volumeRange?.value);
-  const fromAudio=Number(audio?.volume);
-  const next=Number.isFinite(fromSlider)?fromSlider:(Number.isFinite(fromAudio)?fromAudio:userVolume);
-  userVolume=Math.max(0,Math.min(1,next||1));
-}
-function applyUserVolume(){
-  const safe=Math.max(0,Math.min(1,Number(userVolume||1)));
-  userVolume=safe;
-  if(volumeRange) volumeRange.value=String(safe);
-  if(audio){
-    audio.volume=safe;
-    audio.muted=muted;
+
+function setHeadStatus(text, stateClass = "status-orb-dot-cyan") {
+  if (streamStatus) streamStatus.textContent = text;
+  if (streamStatus) {
+    streamStatus.style.color = stateClass === "status-orb-dot-pink" ? "var(--pink)" : stateClass === "status-orb-dot-purple" ? "var(--purple)" : stateClass === "status-orb-dot-off" ? "var(--muted)" : "var(--cyan)";
   }
 }
-function stopMetadataLoop(){
-  if(metadataTimer) clearInterval(metadataTimer);
-  metadataTimer=null;
+
+function setPlayerIdentity() {
+  if (playerModeText) playerModeText.textContent = "INT";
+  if (playerModeOrb) playerModeOrb.title = "Interner Fallback-Player";
+  setDotState(playerModeLamp, "status-orb-dot-purple");
 }
-function stopMiniMeter(){
-  if(meterRaf) cancelAnimationFrame(meterRaf);
-  meterRaf=null;
-  if(miniMeterLeft) miniMeterLeft.style.height="10%";
-  if(miniMeterRight) miniMeterRight.style.height="10%";
-  eqBars.forEach((bar,idx)=>{ if(bar) bar.style.height=((idx%3)*8+20)+"%"; });
+
+function setMetaState(mode) {
+  if (mode === "online") {
+    setDotState(metaModeLamp, "status-orb-dot-cyan");
+    if (metaModeText) metaModeText.textContent = "OK";
+    if (metaModeOrb) metaModeOrb.title = "Metadaten verfügbar";
+    return;
+  }
+  if (mode === "error") {
+    setDotState(metaModeLamp, "status-orb-dot-pink");
+    if (metaModeText) metaModeText.textContent = "ERROR";
+    if (metaModeOrb) metaModeOrb.title = "Metadatenfehler";
+    return;
+  }
+  setDotState(metaModeLamp, "status-orb-dot-off");
+  if (metaModeText) metaModeText.textContent = "STANDBY";
+  if (metaModeOrb) metaModeOrb.title = "Metadaten Standby";
 }
-async function ensureMeter(){
-  if(audioCtx||!audio) return;
-  try{
-    const AudioCtx=window.AudioContext||window.webkitAudioContext;
-    if(!AudioCtx) return;
-    audioCtx=new AudioCtx();
-    mediaNode=audioCtx.createMediaElementSource(audio);
-    analyser=audioCtx.createAnalyser();
-    analyser.fftSize=128;
-    meterBuffer=new Uint8Array(analyser.frequencyBinCount);
+
+function setAudioState(mode) {
+  if (mode === "playing") {
+    setDotState(audioModeLamp, "status-orb-dot-purple");
+    if (audioModeText) audioModeText.textContent = "LIVE";
+    setHeadStatus(STATUS_TEXT.playing, "status-orb-dot-purple");
+    return;
+  }
+  if (mode === "paused") {
+    setDotState(audioModeLamp, "status-orb-dot-off");
+    if (audioModeText) audioModeText.textContent = "PAUSE";
+    setHeadStatus(STATUS_TEXT.paused, "status-orb-dot-off");
+    return;
+  }
+  if (mode === "error") {
+    setDotState(audioModeLamp, "status-orb-dot-pink");
+    if (audioModeText) audioModeText.textContent = "ERROR";
+    setHeadStatus(STATUS_TEXT.error, "status-orb-dot-pink");
+    return;
+  }
+  setDotState(audioModeLamp, "status-orb-dot-pink");
+  if (audioModeText) audioModeText.textContent = "OFF";
+  setHeadStatus(STATUS_TEXT.stopped, "status-orb-dot-pink");
+}
+
+function updateSourceUi() {
+  const isBackup = streamMode === "backup";
+  if (streamModeText) streamModeText.textContent = isBackup ? "BACK" : "MAIN";
+  setDotState(streamModeLamp, isBackup ? "status-orb-dot-purple" : "status-orb-dot-cyan");
+  if (streamModeOrb) streamModeOrb.title = isBackup ? "Fallback-Quelle aktiv" : "Hauptquelle aktiv";
+  if (streamMainBtn) streamMainBtn.classList.toggle("is-active", !isBackup);
+  if (streamBackBtn) streamBackBtn.classList.toggle("is-active", isBackup);
+}
+
+function rememberUserVolume() {
+  const next = Number(volumeRange?.value ?? audio?.volume ?? userVolume);
+  userVolume = Math.max(0, Math.min(1, Number.isFinite(next) ? next : 1));
+}
+
+function applyUserVolume() {
+  const safe = Math.max(0, Math.min(1, Number(userVolume || 1)));
+  userVolume = safe;
+  if (volumeRange) volumeRange.value = String(safe);
+  if (audio) {
+    audio.volume = safe;
+    audio.muted = muted;
+  }
+}
+
+function stopMetadataLoop() {
+  if (metadataTimer) clearInterval(metadataTimer);
+  metadataTimer = null;
+}
+
+function stopMiniMeter() {
+  if (meterRaf) cancelAnimationFrame(meterRaf);
+  meterRaf = null;
+  if (miniMeterLeft) miniMeterLeft.style.height = "10%";
+  if (miniMeterRight) miniMeterRight.style.height = "10%";
+  eqBars.forEach((bar, idx) => {
+    if (bar) bar.style.height = `${(idx % 3) * 8 + 20}%`;
+  });
+}
+
+async function ensureMeter() {
+  if (audioCtx || !audio) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    audioCtx = new AudioCtx();
+    mediaNode = audioCtx.createMediaElementSource(audio);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 128;
+    meterBuffer = new Uint8Array(analyser.frequencyBinCount);
     mediaNode.connect(analyser);
     analyser.connect(audioCtx.destination);
-  }catch(err){}
+  } catch (error) {}
 }
-function startMiniMeter(){
-  if(!analyser) return;
-  if(meterRaf) cancelAnimationFrame(meterRaf);
-  const tick=()=>{
-    if(!analyser||audio.paused){
-      meterRaf=null;
+
+function startMiniMeter() {
+  if (!analyser) return;
+  if (meterRaf) cancelAnimationFrame(meterRaf);
+  const tick = () => {
+    if (!analyser || audio.paused) {
+      meterRaf = null;
       return;
     }
     analyser.getByteFrequencyData(meterBuffer);
-    const len=meterBuffer.length||1;
-    const half=Math.max(1,Math.floor(len/2));
-    const quarter=Math.max(1,Math.floor(len/4));
-    let left=0,right=0,bass=0;
-    for(let i=0;i<len;i++){
-      const v=meterBuffer[i]/255;
-      if(i<half) left+=v; else right+=v;
-      if(i<quarter) bass+=v;
+    const len = meterBuffer.length || 1;
+    const half = Math.max(1, Math.floor(len / 2));
+    const quarter = Math.max(1, Math.floor(len / 4));
+    let left = 0;
+    let right = 0;
+    let bass = 0;
+    for (let i = 0; i < len; i += 1) {
+      const value = meterBuffer[i] / 255;
+      if (i < half) left += value;
+      else right += value;
+      if (i < quarter) bass += value;
     }
-    left=(left/half)*0.70+(bass/quarter)*0.55;
-    right=(right/Math.max(1,len-half))*0.70+(bass/quarter)*0.55;
-    const lh=Math.max(10,Math.min(100,left*100));
-    const rh=Math.max(10,Math.min(100,right*100));
-    if(miniMeterLeft) miniMeterLeft.style.height=\`\${lh.toFixed(1)}%\`;
+    left = left / half * 0.70 + bass / quarter * 0.55;
+    right = right / Math.max(1, len - half) * 0.70 + bass / quarter * 0.55;
+    const leftHeight = Math.max(10, Math.min(100, left * 100));
+    const rightHeight = Math.max(10, Math.min(100, right * 100));
+    if (miniMeterLeft) miniMeterLeft.style.height = `${leftHeight.toFixed(1)}%`;
+    if (miniMeterRight) miniMeterRight.style.height = `${rightHeight.toFixed(1)}%`;
+    eqBars.forEach((bar, idx) => {
+      if (!bar) return;
+      const value = (meterBuffer[Math.min(meterBuffer.length - 1, idx * 4)] || 0) / 255;
+      const height = Math.max(18, Math.min(100, value * 82 + (idx % 3) * 4));
+      bar.style.height = `${height.toFixed(1)}%`;
+    });
+    meterRaf = requestAnimationFrame(tick);
+  };
+  meterRaf = requestAnimationFrame(tick);
+}
+
+function hardDisconnect(mode = "stop") {
+  rememberUserVolume();
+  intentionalDisconnect = true;
+  stopMetadataLoop();
+  stopMiniMeter();
+  if (audio) {
+    audio.pause();
+    if (mode === "stop") {
+      audio.removeAttribute("src");
+      audio.src = "";
+      audio.load();
+    }
+  }
+  applyUserVolume();
+  setAudioState(mode === "pause" ? "paused" : "stopped");
+}
+
+function pickValue(obj, keys, fallback = "") {
+  for (const key of keys) {
+    const value = obj?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") return value;
+  }
+  return fallback;
+}
+
+function normalizeTitle(data) {
+  return String(pickValue(data, ["song", "title", "songtitle", "currentSong", "track", "now_playing"], lastTitle || "Live Stream"));
+}
+
+function normalizeDjStatus(raw) {
+  const value = String(raw || "").trim();
+  const lower = value.toLowerCase();
+  if (!value || lower === "autodj" || lower === "auto dj" || lower === "unknown" || lower === "none" || lower === "client" || lower === "no dj") {
+    return DEFAULT_DJ;
+  }
+  return value;
+}
+
+function renderHistory(items) {
+  if (!historyList) return;
+  historyList.innerHTML = "";
+  if (!Array.isArray(items) || !items.length) {
+    const li = document.createElement("li");
+    li.textContent = "No history loaded";
+    historyList.appendChild(li);
+    return;
+  }
+  items.slice(0, 12).forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = typeof item === "string" ? item : String(pickValue(item, ["song", "title", "track", "name"], "Unknown track"));
+    historyList.appendChild(li);
+  });
+}
+
+async function fetchMetadata() {
+  setMetaState("loading");
+  try {
+    const response = await fetch(STREAM_CONFIG.metadata_url, { cache: "no-store" });
+    if (!response.ok) throw new Error("metadata fetch failed");
+    const data = await response.json();
+    const title = normalizeTitle(data);
+    const listeners = Number.parseInt(pickValue(data, ["listeners"], 0), 10);
+    const bitrate = pickValue(data, ["bitrate"], "Unknown");
+    const djStatus = normalizeDjStatus(pickValue(data, ["djusername", "djstatus", "client", "dj"], "AutoDJ"));
+    lastTitle = title;
+    if (nowPlaying) nowPlaying.textContent = title;
+    if (metaText) metaText.textContent = "Metadata online";
+    if (listenersText) listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${STREAM_CONFIG.listener_capacity}`;
+    if (bitrateText) bitrateText.textContent = bitrate ? `${String(bitrate)} kbps` : "Unknown";
+    if (djText) djText.textContent = String(djStatus);
+    renderHistory(pickValue(data, ["history"], []));
+    setMetaState("online");
+  } catch (error) {
+    if (nowPlaying) nowPlaying.textContent = lastTitle || "Metadata unavailable";
+    if (metaText) metaText.textContent = "Metadata offline";
+    if (djText && !String(djText.textContent || "").trim()) djText.textContent = DEFAULT_DJ;
+    setMetaState("error");
+  }
+}
+
+function startMetadataLoop() {
+  if (metadataTimer) clearInterval(metadataTimer);
+  fetchMetadata();
+  metadataTimer = setInterval(fetchMetadata, STREAM_CONFIG.poll_interval_ms);
+}
+
+async function tryPlayCurrentSource() {
+  if (!audio) return;
+  audio.src = streamMode === "backup" ? STREAM_CONFIG.fallback_stream_url : STREAM_CONFIG.stream_url;
+  applyUserVolume();
+  await audio.play();
+  applyUserVolume();
+}
+
+async function safePlay() {
+  intentionalDisconnect = false;
+  rememberUserVolume();
+  applyUserVolume();
+  try {
+    await tryPlayCurrentSource();
+    await ensureMeter();
+    if (audioCtx && audioCtx.state === "suspended") {
+      try { await audioCtx.resume(); } catch (error) {}
+    }
+    startMiniMeter();
+    startMetadataLoop();
+    setAudioState("playing");
+    return true;
+  } catch (error) {
+    stopMiniMeter();
+    setAudioState("error");
+    return false;
+  }
+}
+
+function runBootSequence() {
+  return new Promise((resolve) => {
+    let percent = 0;
+    const timer = setInterval(() => {
+      percent += 4;
+      if (percent > 100) percent = 100;
+      if (progressBar) progressBar.style.width = `${percent}%`;
+      if (progressText) progressText.textContent = `${percent}%`;
+      if (percent >= 100) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, 42);
+  });
+}
+
+bootButton?.addEventListener("click", async () => {
+  if (booted) return;
+  booted = true;
+  bootButton.disabled = true;
+  await runBootSequence();
+  overlay?.classList.add("hidden");
+  await safePlay();
+});
+
+playBtn?.addEventListener("click", async () => {
+  await safePlay();
+});
+
+pauseBtn?.addEventListener("click", () => {
+  hardDisconnect("pause");
+});
+
+stopBtn?.addEventListener("click", () => {
+  hardDisconnect("stop");
+});
+
+reconnectBtn?.addEventListener("click", async () => {
+  setHeadStatus(STATUS_TEXT.reconnecting, "status-orb-dot-cyan");
+  hardDisconnect("stop");
+  await safePlay();
+});
+
+muteBtn?.addEventListener("click", () => {
+  muted = !muted;
+  applyUserVolume();
+  muteBtn.textContent = muted ? "Unmute" : "Mute";
+});
+
+streamMainBtn?.addEventListener("click", async () => {
+  streamMode = "main";
+  updateSourceUi();
+  if (audio && !audio.paused) {
+    hardDisconnect("stop");
+    await safePlay();
+  }
+});
+
+streamBackBtn?.addEventListener("click", async () => {
+  streamMode = "backup";
+  updateSourceUi();
+  if (audio && !audio.paused) {
+    hardDisconnect("stop");
+    await safePlay();
+  }
+});
+
+streamModeOrb?.addEventListener("click", async () => {
+  streamMode = streamMode === "backup" ? "main" : "backup";
+  updateSourceUi();
+  if (audio && !audio.paused) {
+    hardDisconnect("stop");
+    await safePlay();
+  }
+});
+
+volumeRange?.addEventListener("input", () => {
+  userVolume = Number(volumeRange.value);
+  applyUserVolume();
+});
+
+historyToggle?.addEventListener("click", () => {
+  historyOpen = !historyOpen;
+  historyOverlay?.classList.toggle("hidden", !historyOpen);
+});
+
+audio?.addEventListener("playing", async () => {
+  intentionalDisconnect = false;
+  applyUserVolume();
+  setAudioState("playing");
+  await ensureMeter();
+  if (audioCtx && audioCtx.state === "suspended") {
+    try { await audioCtx.resume(); } catch (error) {}
+  }
+  startMiniMeter();
+});
+
+audio?.addEventListener("pause", () => {
+  if (!intentionalDisconnect) setAudioState("paused");
+});
+
+audio?.addEventListener("error", () => {
+  if (intentionalDisconnect) {
+    intentionalDisconnect = false;
+    return;
+  }
+  stopMiniMeter();
+  setAudioState("error");
+});
+
+const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+if (isiOS && volumeHint) volumeHint.classList.remove("hidden");
+setPlayerIdentity();
+updateSourceUi();
+setMetaState("loading");
+setAudioState("stopped");
+applyUserVolume();
+if (djText) djText.textContent = DEFAULT_DJ;
+fetchMetadata();
+stopMiniMeter();`;
     if(miniMeterRight) miniMeterRight.style.height=\`\${rh.toFixed(1)}%\`;
     eqBars.forEach((bar,idx)=>{
       if(!bar) return;

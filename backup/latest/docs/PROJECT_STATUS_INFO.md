@@ -4,112 +4,66 @@ DATEI: PROJECT_STATUS_INFO.md
 PFAD: /docs/
 
 ERSTELLT: 2026-04-19
-GEÄNDERT: 2026-04-19
+GEÄNDERT: 2026-04-20
 
-VERSION: v2.0
+VERSION: v2.1
 
 ZWECK:
-Kurze Projekt-Informationsdatei für aktuellen Stand, Regeln und nächste Schritte.
+Kurze Projekt-Informationsdatei für aktuellen Stand,
+Regeln und nächste Schritte.
 
 INHALT:
-- aktueller Stand
-- was bisher gemacht wurde
-- was als Nächstes geplant ist
-- verbindlicher Datei-/Kommentarstandard
+- aktueller Fokus
+- Internal-Player-Stand
+- Rollenlogik Internal / External
+- Arbeitsregel Vollversionen / ZIP
+- nächste Schritte
 
 ÄNDERUNGEN:
-- 2026-04-19 — auf neuen Repo-/Frontend-Neustart angepasst
-- 2026-04-19 — Header-/Kommentarstandard als feste Projektregel ergänzt
-
-HINWEISE:
-- dient als zentrale Kurzreferenz
-- ersetzt altes verteiltes docs-Chaos
+- 2026-04-20 — auf Internal-Player-Finalfokus aktualisiert
+- 2026-04-20 — Scriptable-Thema aus diesem Build bewusst ausgeklammert
+- 2026-04-20 — Vollversions-Regel explizit festgehalten
 ###############################################
 -->
 
 # 666SOUNDsDESIGn — Projektstatus / Kurzinfo
 
-## 1. Aktueller Stand
-- Repo wurde auf Kernstruktur reduziert.
-- Altes Frontend-Chaos wird nicht weiter geflickt, sondern sauber neu aufgebaut.
-- Worker / Deploy / Recovery / Mirror bleiben unangetastet.
-- Das neue Frontend wird im Root aufgebaut.
-- Design-Freeze ist gesetzt:
-  - Desktop = breites Cyber-Layout
-  - iPhone = kompaktes Layout mit gleicher Design-DNA
+## 1. Aktueller Fokus
+Der Fokus liegt wieder sauber auf dem **Radio / Player**.  
+Scriptable-/Uploader-Themen gehören nicht in diesen Build-Schritt.
 
-## 2. Was bisher gemacht wurde
-- Stable-Stand identifiziert.
-- Freeze-Probleme auf Frontend-/Init-/Visual-Logik eingegrenzt.
-- Pause / Stop / Reconnect / Lautstärke / Layout / Visuals / Stream-Status analysiert.
-- Doppelte Frontend-Strukturen als Hauptchaosquelle erkannt.
-- Neues Ziel festgelegt:
-  - ein Frontend
-  - kein One-HTML
-  - keine großen Technik-Kästen
-  - Cover + Visualizer als Kern des Players
+## 2. Player-Rollen
+- **External Player** = Hauptsystem
+- **Internal Player** = produktiver Fallback-Player
 
-## 3. Was als Nächstes geplant ist
-### Frontend-Neubau
-- `index.html`
-- `css/main.css`
-- `js/app.bundle.js`
-- saubere Asset-Nutzung
+Der Internal Player muss zuverlässig stehen, bevor der External Player separat weiterentwickelt wird.
 
-### Design
-- Header mit Kürzeln + LED:
-  - `EXT / INT`
-  - `MAIN / BACK`
-- Cover klein bis mittel links
-- Visualizer groß rechts
-- Titel / DJ / Listener / Bitrate sauber darunter
-- runde, kompakte Controls
-- Technik klein und logisch im unteren Bereich
+## 3. Internal Player – aktueller Stand
+Technisch vorhanden:
+- Play
+- Pause
+- Stop
+- Reconnect
+- Volume stabil
+- MAIN / BACK Umschaltung
 
-### Technik
-- bestehende Logik stabil halten
-- danach saubere Integration für:
-  - Pause / Stop / Reconnect
-  - Lautstärke-Sync
-  - glaubhafte Visuals (Meter / GR / EQ)
+UI-Stand:
+- kompakter W4-Designstand eingebaut
+- Internal-Player-Fokus als aktueller Vollstand
 
-## 4. Verbindlicher Datei- und Kommentarstandard
-Ab jetzt gilt für **jede Datei** im Projekt:
+## 4. Infrastruktur-Regeln
+- Worker bleibt zentrale Infrastruktur
+- Root-Worker und Worker im Unterordner müssen identisch bleiben
+- Recovery / last-known-good bleibt synchronisierte Sicherheitskopie
 
-### Kopfzeile Pflicht
-- Dateiname
-- Pfad
-- Erstellt
-- Geändert
-- Version
-- Zweck
-- Inhalt
-- Änderungen
-- Hinweise
+## 5. Output-Regel
+Für dieses Projekt gilt:
+- finale Ergebnisse immer als **Vollversion**
+- bevorzugt als **komplette ZIP**
+- keine abgespeckten Teilstände als finaler Deliverable
 
-### Im Code selbst Pflicht
-- kurze Zwischenkommentare
-- Abschnittsmarker
-- keine unkommentierten Logikblöcke
-- keine kryptischen Schnellschuss-Namen
-
-### Ziel
-- alles einheitlich
-- sofort verständlich
-- wartbar
-- nachvollziehbar
-
-## 5. Feste Regeln
-- Worker tabu
-- Backup-Worker tabu
-- Deploy-/Mirror-/Recovery-Struktur tabu
-- Repo-Struktur sauber halten
-- kleine Fehler nur punktgenau korrigieren
-- keine unnötigen Altlasten sammeln
-- keine One-HTML-Lösung
-- keine künstlich aufgeblasenen Dateien
-
-## 6. Kurzfazit
-Das alte Frontend wird nicht weiter geflickt.
-Die technische Basis bleibt erhalten.
-Das Ziel ist ein aufgeräumter, professioneller Cyber-Player mit klarer Struktur und wartbarer Mehrdatei-Architektur.
+## 6. Nächster Schritt
+Nach diesem Vollstand:
+1. Internal Player optisch/funktional final bewerten
+2. danach External Player als separates Hauptplayer-Design ausbauen
+3. beide Systeme sauber zusammenführen
