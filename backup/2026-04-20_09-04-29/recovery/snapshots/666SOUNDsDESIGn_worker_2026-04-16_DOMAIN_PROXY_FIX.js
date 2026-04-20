@@ -28,6 +28,7 @@ const HTML = `<!DOCTYPE html>
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
+  <div class="player-badge player-badge-internal"><span class="player-badge-dot"></span><span>INTERNAL</span></div>
   <div id="bootOverlay" class="overlay">
     <div class="boot-panel">
       <div class="boot-title">666SOUNDsDESIGn</div>
@@ -43,26 +44,20 @@ const HTML = `<!DOCTYPE html>
     <section class="player-card">
       <header class="topbar">
         <div class="topbar-line"></div>
-        <div class="brand">666SOUNDsDESIGn DJ</div>
+        <div class="brand">666SOUNDsDESIGn</div>
         <div class="topbar-line"></div>
       </header>
 
       <div class="status-grid">
         <div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">Meta</span></div>
         <div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">Audio</span></div>
-        <div class="lamp-box lamp-box-source">
-          <span id="sourceLamp" class="lamp lamp-cyan"></span>
-          <span class="lamp-label">Source</span>
-          <span id="playerTypeLabel" class="lamp-side-label">INTERNAL</span>
-        </div>
+        <div class="lamp-box"><span id="sourceLamp" class="lamp lamp-cyan"></span><span class="lamp-label">Source</span></div>
       </div>
 
       <div class="pill-row">
         <span id="streamStatus" class="pill">Ready</span>
         <span id="sourceLabel" class="pill pill-dim">Primary</span>
         <span id="fallbackText" class="pill pill-dim">Standby</span>
-        <button id="primaryBtn" class="tiny-btn pill-action" type="button">Primary</button>
-        <button id="backupBtn" class="tiny-btn pill-action" type="button">Backup</button>
       </div>
 
       <div class="display-block">
@@ -85,14 +80,13 @@ const HTML = `<!DOCTYPE html>
       <div class="mini-grid">
         <div class="mini-box"><div class="mini-label">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
         <div class="mini-box"><div class="mini-label">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
-        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">666SOUNDsDESIGn DJ</div></div>
-        <div class="mini-box"><div class="mini-label">Volume</div><div class="mini-value">Mute + Slider</div></div>
+        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">Unknown</div></div>
+        <div class="mini-box"><div class="mini-label">Volume</div><div id="volumeHint" class="mini-value">Use iPhone buttons</div></div>
       </div>
 
       <div class="control-strip">
         <button id="playBtn" class="control-btn main" type="button">Play</button>
         <button id="pauseBtn" class="control-btn" type="button">Pause</button>
-        <button id="stopBtn" class="control-btn" type="button">Stop</button>
         <button id="reconnectBtn" class="control-btn" type="button">Reconnect</button>
       </div>
 
@@ -101,7 +95,6 @@ const HTML = `<!DOCTYPE html>
         <div class="volume-wrap">
           <label for="volumeRange">Volume</label>
           <input id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" />
-          <div id="iphoneVolumeHint" class="iphone-volume-hint hidden">Use iPhone buttons for volume.</div>
         </div>
       </div>
 
@@ -113,7 +106,7 @@ const HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const CSS = `*{box-sizing:border-box}:root{--bg:#1d2128;--bg2:#12151b;--cyan:#20f2ff;--pink:#ff4db3;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(32,242,255,.28);--shadow-cyan:0 0 18px rgba(32,242,255,.18);--shadow-pink:0 0 18px rgba(255,77,179,.14)}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,77,179,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(32,242,255,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:Arial,Helvetica,sans-serif}body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}.player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(32,242,255,.25)}.brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(32,242,255,.34)}.brand{font-size:1.55rem}.boot-title{font-size:1.5rem;margin-bottom:8px}.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn,.volume-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}.lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp-box-source{justify-content:flex-start}.lamp-side-label{margin-left:auto;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:var(--pink);text-shadow:0 0 10px rgba(255,77,179,.28)}.lamp{width:12px;height:12px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.lamp-green{color:var(--green);background:var(--green)}.lamp-red{color:var(--red);background:var(--red)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label,.volume-wrap label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}.pill{padding:8px 12px;font-size:.92rem}.pill-dim{color:var(--muted)}.display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(32,242,255,.22)}.marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,77,179,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}.tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,77,179,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}.history-list li{margin-bottom:6px}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.mini-box{padding:10px 12px;min-height:68px}.mini-value{margin-top:6px;font-weight:700}.control-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.control-btn,.small-btn{appearance:none;border:1px solid rgba(32,242,255,.35);color:var(--text);padding:14px 12px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan);background:linear-gradient(180deg,rgba(32,242,255,.14),rgba(255,77,179,.06))}.control-btn.main{border-color:rgba(255,77,179,.35);box-shadow:var(--shadow-pink)}.audio-tools{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:stretch}.small-btn{border-color:rgba(255,77,179,.28);box-shadow:var(--shadow-pink)}.volume-wrap{padding:10px 12px;display:grid;gap:8px}.pill-action{padding:8px 10px}.iphone-volume-hint{font-size:.82rem;color:var(--muted)}.iphone-volume-hint.hidden{display:none}input[type=range]{width:100%}.player-badge{position:fixed;top:12px;right:12px;z-index:30;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(10,14,22,.84);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(8px);font-size:.82rem;font-weight:700;letter-spacing:.04em}.player-badge-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.player-badge-internal{color:var(--pink);box-shadow:0 0 12px rgba(255,77,179,.18)}.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.86)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(32,242,255,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(32,242,255,.16),rgba(255,77,179,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.progress-wrap{width:100%;height:12px;margin-top:18px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}.progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .12s linear}.progress-text{margin-top:10px;font-weight:700}`;
+const CSS = `*{box-sizing:border-box}:root{--bg:#1d2128;--bg2:#12151b;--cyan:#20f2ff;--pink:#ff4db3;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(32,242,255,.28);--shadow-cyan:0 0 18px rgba(32,242,255,.18);--shadow-pink:0 0 18px rgba(255,77,179,.14)}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,77,179,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(32,242,255,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:Arial,Helvetica,sans-serif}body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}.player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(32,242,255,.25)}.brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(32,242,255,.34)}.brand{font-size:1.55rem}.boot-title{font-size:1.5rem;margin-bottom:8px}.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn,.volume-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}.lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp{width:12px;height:12px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.lamp-green{color:var(--green);background:var(--green)}.lamp-red{color:var(--red);background:var(--red)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label,.volume-wrap label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.pill{padding:8px 12px;font-size:.92rem}.pill-dim{color:var(--muted)}.display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(32,242,255,.22)}.marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,77,179,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}.tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,77,179,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}.history-list li{margin-bottom:6px}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.mini-box{padding:10px 12px;min-height:68px}.mini-value{margin-top:6px;font-weight:700}.control-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.control-btn,.small-btn{appearance:none;border:1px solid rgba(32,242,255,.35);color:var(--text);padding:14px 12px;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan);background:linear-gradient(180deg,rgba(32,242,255,.14),rgba(255,77,179,.06))}.control-btn.main{border-color:rgba(255,77,179,.35);box-shadow:var(--shadow-pink)}.audio-tools{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:stretch}.small-btn{border-color:rgba(255,77,179,.28);box-shadow:var(--shadow-pink)}.volume-wrap{padding:10px 12px;display:grid;gap:8px}input[type=range]{width:100%}.player-badge{position:fixed;top:12px;right:12px;z-index:30;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(10,14,22,.84);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(8px);font-size:.82rem;font-weight:700;letter-spacing:.04em}.player-badge-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 10px currentColor}.player-badge-internal{color:var(--pink);box-shadow:0 0 12px rgba(255,77,179,.18)}.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.86)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(32,242,255,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(32,242,255,.16),rgba(255,77,179,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.progress-wrap{width:100%;height:12px;margin-top:18px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}.progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .12s linear}.progress-text{margin-top:10px;font-weight:700}`;
 
 const APP_JS = `import { STREAM_CONFIG } from "../config/stream.config.js";
 const overlay=document.getElementById("bootOverlay");
@@ -123,10 +116,7 @@ const progressText=document.getElementById("progressText");
 const playBtn=document.getElementById("playBtn");
 const pauseBtn=document.getElementById("pauseBtn");
 const reconnectBtn=document.getElementById("reconnectBtn");
-const stopBtn=document.getElementById("stopBtn");
 const muteBtn=document.getElementById("muteBtn");
-const primaryBtn=document.getElementById("primaryBtn");
-const backupBtn=document.getElementById("backupBtn");
 const volumeRange=document.getElementById("volumeRange");
 const historyToggle=document.getElementById("historyToggle");
 const metaLamp=document.getElementById("metaLamp");
@@ -142,9 +132,9 @@ const bitrateText=document.getElementById("bitrateText");
 const djText=document.getElementById("djText");
 const historyOverlay=document.getElementById("historyOverlay");
 const historyList=document.getElementById("historyList");
-const iphoneVolumeHint=document.getElementById("iphoneVolumeHint");
+const volumeHint=document.getElementById("volumeHint");
 const audio=document.getElementById("radio");
-let booted=false,usingFallback=false,muted=false,metadataTimer=null,lastTitle="Loading metadata...",historyOpen=false,manualSource="auto",savedVolume=1;
+let booted=false,usingFallback=false,muted=false,metadataTimer=null,lastTitle="Loading metadata...",historyOpen=false;
 function setLamp(el,state){if(!el)return;el.classList.remove("lamp-green","lamp-red","lamp-cyan");el.classList.add(state)}
 function setStatus(text){if(streamStatus)streamStatus.textContent=text}
 function setSource(isFallback){usingFallback=isFallback;if(sourceLabel)sourceLabel.textContent=isFallback?"Fallback":"Primary";if(fallbackText)fallbackText.textContent=isFallback?"Active":"Standby";setLamp(sourceLamp,isFallback?"lamp-red":"lamp-cyan")}
@@ -152,7 +142,7 @@ function setMetadataStatus(text){if(metaText)metaText.textContent=text}
 function pickValue(obj,keys,fallback=""){for(const key of keys){const value=obj?.[key];if(value!==undefined&&value!==null&&String(value).trim()!=="")return value}return fallback}
 function normalizeTitle(data){return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"],lastTitle||"Live Stream"))}
 function renderHistory(items){if(!historyList)return;historyList.innerHTML="";if(!Array.isArray(items)||!items.length){const li=document.createElement("li");li.textContent="No history loaded";historyList.appendChild(li);return}items.slice(0,12).forEach((item)=>{const li=document.createElement("li");li.textContent=typeof item==="string"?item:String(pickValue(item,["song","title","track","name"],"Unknown track"));historyList.appendChild(li)})}
-async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const rawDjStatus=pickValue(data,["djusername","djstatus","client"],"");const djStatus=(rawDjStatus&&String(rawDjStatus).trim()!==""&&String(rawDjStatus)!=="No DJ"&&String(rawDjStatus)!=="AutoDJ")?String(rawDjStatus):"666SOUNDsDESIGn DJ";if(listenersText)listenersText.textContent=(data&&data.listeners?data.listeners:0)+" / "+STREAM_CONFIG.listener_capacity;if(bitrateText)bitrateText.textContent=bitrate?String(bitrate)+" kbps":"Unknown";if(djText)djText.textContent=djStatus;renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
+async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=pickValue(data,["djusername","djstatus","client"],"AutoDJ");if(listenersText)listenersText.textContent=\`\${Number.isFinite(listeners)?listeners:0} / \${STREAM_CONFIG.listener_capacity}\`;if(bitrateText)bitrateText.textContent=bitrate?\`\${String(bitrate)} kbps\`:"Unknown";if(djText)djText.textContent=String(djStatus);renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
 function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetchMetadata();metadataTimer=setInterval(fetchMetadata,STREAM_CONFIG.poll_interval_ms)}
 async function tryPlayPrimary(){audio.src=STREAM_CONFIG.stream_url;await audio.play();setSource(false)}
 async function tryPlayFallback(){audio.src=STREAM_CONFIG.fallback_stream_url;await audio.play();setSource(true)}

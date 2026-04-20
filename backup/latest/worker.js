@@ -53,7 +53,7 @@ const HTML = `<!DOCTYPE html>
         <div class="lamp-box lamp-box-source">
           <span id="sourceLamp" class="lamp lamp-cyan"></span>
           <span class="lamp-label">Source</span>
-          <span id="playerTypeLabel" class="lamp-side-label"></span>
+          <span id="playerTypeLabel" class="lamp-side-label">INTERNAL</span>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ function setMetadataStatus(text){if(metaText)metaText.textContent=text}
 function pickValue(obj,keys,fallback=""){for(const key of keys){const value=obj?.[key];if(value!==undefined&&value!==null&&String(value).trim()!=="")return value}return fallback}
 function normalizeTitle(data){return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"],lastTitle||"Live Stream"))}
 function renderHistory(items){if(!historyList)return;historyList.innerHTML="";if(!Array.isArray(items)||!items.length){const li=document.createElement("li");li.textContent="No history loaded";historyList.appendChild(li);return}items.slice(0,12).forEach((item)=>{const li=document.createElement("li");li.textContent=typeof item==="string"?item:String(pickValue(item,["song","title","track","name"],"Unknown track"));historyList.appendChild(li)})}
-async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const rawDjStatus=pickValue(data,["djusername","djstatus","client"],"");const rawDjStatus=pickValue(data,["djusername","djstatus","client"],"");const djStatus=(rawDjStatus&&String(rawDjStatus).trim()!==""&&String(rawDjStatus)!=="No DJ"&&String(rawDjStatus)!=="AutoDJ")?String(rawDjStatus):"666SOUNDsDESIGn DJ";if(listenersText)listenersText.textContent=(data&&data.listeners?data.listeners:0)+" / "+STREAM_CONFIG.listener_capacity;if(bitrateText)bitrateText.textContent=bitrate?String(bitrate)+" kbps":"Unknown";if(djText)djText.textContent=djStatus;renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
+async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const rawDjStatus=pickValue(data,["djusername","djstatus","client"],"");const djStatus=(rawDjStatus&&String(rawDjStatus).trim()!==""&&String(rawDjStatus)!=="No DJ"&&String(rawDjStatus)!=="AutoDJ")?String(rawDjStatus):"666SOUNDsDESIGn DJ";if(listenersText)listenersText.textContent=(data&&data.listeners?data.listeners:0)+" / "+STREAM_CONFIG.listener_capacity;if(bitrateText)bitrateText.textContent=bitrate?String(bitrate)+" kbps":"Unknown";if(djText)djText.textContent=djStatus;renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-green")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
 function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetchMetadata();metadataTimer=setInterval(fetchMetadata,STREAM_CONFIG.poll_interval_ms)}
 async function tryPlayPrimary(){audio.src=STREAM_CONFIG.stream_url;await audio.play();setSource(false)}
 async function tryPlayFallback(){audio.src=STREAM_CONFIG.fallback_stream_url;await audio.play();setSource(true)}
@@ -167,7 +167,7 @@ volumeRange?.addEventListener("input",()=>{audio.volume=Number(volumeRange.value
 historyToggle?.addEventListener("click",()=>{historyOpen=!historyOpen;historyOverlay?.classList.toggle("hidden",!historyOpen)});
 audio?.addEventListener("playing",()=>{setStatus("Playing");setLamp(audioLamp,"lamp-green")});
 audio?.addEventListener("error",async()=>{if(!usingFallback){try{await tryPlayFallback();setStatus("Playing");setLamp(audioLamp,"lamp-green");startMetadataLoop();return}catch(e){}}setStatus("Audio Error");setLamp(audioLamp,"lamp-red")});
-const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(isiOS&&volumeHint)volumeHint.textContent="Use iPhone buttons";setLamp(metaLamp,"lamp-red");setLamp(audioLamp,"lamp-red");setLamp(sourceLamp,"lamp-cyan");setSource(false); sourceLabel.textContent="Primary";setMetadataStatus("Loading...");fetchMetadata();`;
+const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);if(isiOS&&volumeHint)volumeHint.textContent="Use iPhone buttons";setLamp(metaLamp,"lamp-red");setLamp(audioLamp,"lamp-red");setLamp(sourceLamp,"lamp-cyan");setSource(false);setMetadataStatus("Loading...");fetchMetadata();`;
 
 const CONFIG_JS = `export const STREAM_CONFIG = {
   "stream_url": "/stream",
