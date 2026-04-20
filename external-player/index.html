@@ -1,0 +1,133 @@
+<!--
+==========================================
+DATEI: external-player/index.html
+ERSTELLT: 2026-04-20
+GEÄNDERT: 2026-04-20
+ZWECK: Externer Hauptplayer für 666SOUNDsDESIGn Radio.
+ÄNDERUNG: Kompakte Icon-Controls und zentrales LED-Statussystem integriert,
+           ohne neue Worker-Mechaniken oder neue externe Datenquellen.
+HINWEIS: Keine CORS-Experimente. Nur bestehende Worker-Endpunkte verwenden.
+==========================================
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>666SOUNDsDESIGn Radio</title>
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/shared-status.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/effects.css" />
+  <link rel="stylesheet" href="./css/mobile.css" />
+  <link rel="stylesheet" href="./css/desktop.css" />
+</head>
+<body>
+  <div class="app-grid">
+    <aside class="side-meter left">
+      <div class="side-meter-label">L</div>
+      <div class="side-meter-track"><div id="leftMeter" class="side-meter-fill"></div></div>
+    </aside>
+
+    <main class="player-shell">
+      <header class="top-hud panel-glass">
+        <div class="brand-wrap">
+          <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
+          <h1 class="brand-title">666SOUNDsDESIGn</h1>
+          <div class="brand-sub">External Main Player</div>
+        </div>
+        <div class="status-cluster status-bar" aria-label="Systemstatus">
+          <button id="statusStream" class="status-chip led-state state-main" type="button" title="Main Stream aktiv">
+            <span class="status-dot"></span><span class="status-code">STR</span>
+          </button>
+          <button id="statusMeta" class="status-chip led-state state-api" type="button" title="Metadaten über API aktiv">
+            <span class="status-dot"></span><span class="status-code">META</span>
+          </button>
+          <button id="statusSource" class="status-chip led-state state-external" type="button" title="Externer Hauptplayer aktiv">
+            <span class="status-dot"></span><span class="status-code">SRC</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="hero panel-glass neon-outline-cyan">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-label-row">
+            <span class="hero-badge">LIVE</span>
+            <span id="streamState" class="hero-badge dim">READY</span>
+          </div>
+          <div class="hero-title">Cyber Stream Cockpit</div>
+          <div class="hero-subtitle">Kompakter Hauptplayer für iPhone und Desktop</div>
+        </div>
+      </section>
+
+      <section class="now-playing panel-glass neon-outline-pink">
+        <div class="section-topline">
+          <div>
+            <div class="section-kicker">NOW PLAYING</div>
+            <div id="metaLine" class="meta-line">Metadaten werden geladen …</div>
+          </div>
+          <button id="historyToggle" class="ghost-btn" type="button">History</button>
+        </div>
+        <div class="ticker-window">
+          <div id="nowPlayingTicker" class="ticker-text">Loading stream metadata …</div>
+        </div>
+        <div id="historyPanel" class="history-panel hidden">
+          <div class="history-title">Letzte Tracks</div>
+          <ul id="historyList" class="history-list">
+            <li>Noch keine History geladen.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="info-grid compact-grid">
+        <article class="info-card panel-glass compact-card">
+          <div class="info-label">Listeners</div>
+          <div id="listenersText" class="info-value">0 / 250</div>
+        </article>
+        <article class="info-card panel-glass compact-card">
+          <div class="info-label">Bitrate</div>
+          <div id="bitrateText" class="info-value">Unknown</div>
+        </article>
+        <article class="info-card panel-glass compact-card">
+          <div class="info-label">DJ / Status</div>
+          <div id="djText" class="info-value">666SOUNDsDESIGn DJ</div>
+        </article>
+      </section>
+
+      <section class="visualizer panel-glass neon-outline-purple compact-visualizer">
+        <div class="section-kicker">EQ</div>
+        <div id="eqBars" class="eq-bars" aria-hidden="true"></div>
+      </section>
+
+      <section class="controls panel-glass compact-controls">
+        <div class="control-toolbar" aria-label="Player-Steuerung">
+          <button id="playBtn" class="icon-btn icon-btn-main" type="button" title="Play" aria-label="Play">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button id="pauseBtn" class="icon-btn" type="button" title="Pause" aria-label="Pause">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+          </button>
+          <button id="stopBtn" class="icon-btn" type="button" title="Stop" aria-label="Stop">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>
+          </button>
+          <button id="reconnectBtn" class="icon-btn" type="button" title="Reconnect" aria-label="Reconnect">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-4.9 6h-2.02A7 7 0 1017.65 6.35z"/></svg>
+          </button>
+          <button id="mainBtn" class="icon-btn source-chip is-active" type="button" title="Main Stream aktivieren" aria-label="Main Stream">M</button>
+          <button id="fallbackBtn" class="icon-btn source-chip" type="button" title="Backup Stream aktivieren" aria-label="Backup Stream">B</button>
+        </div>
+      </section>
+    </main>
+
+    <aside class="side-meter right">
+      <div class="side-meter-label">R</div>
+      <div class="side-meter-track"><div id="rightMeter" class="side-meter-fill"></div></div>
+    </aside>
+  </div>
+
+  <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
+
+  <script type="module" src="./js/player-core.js"></script>
+</body>
+</html>

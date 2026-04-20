@@ -1,0 +1,61 @@
+/*
+==========================================
+DATEI: external-player/css/base.css
+ERSTELLT: 2026-04-20
+GEÄNDERT: 2026-04-20
+ZWECK: Basisfarben, Reset und Grundtypografie des externen Players.
+ÄNDERUNG: Neon-Cyber-Farbvariablen und globale Grundregeln ergänzt.
+==========================================
+*/
+:root {
+  --bg-1: #090b12;
+  --bg-2: #111522;
+  --bg-3: #171b2c;
+  --panel: rgba(16, 20, 32, 0.78);
+  --panel-2: rgba(11, 14, 24, 0.92);
+  --border: rgba(0, 245, 223, 0.22);
+  --text: #ecf8ff;
+  --muted: #91a4b7;
+  --pink: #ff3eb5;
+  --cyan: #00f5df;
+  --purple: #b84dff;
+  --danger: #ff5f83;
+  --ok: #59ffa7;
+  --shadow-cyan: 0 0 18px rgba(0, 245, 223, 0.25);
+  --shadow-pink: 0 0 18px rgba(255, 62, 181, 0.22);
+  --shadow-purple: 0 0 18px rgba(184, 77, 255, 0.2);
+  --radius-xl: 28px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255, 62, 181, 0.13), transparent 24%),
+    radial-gradient(circle at top right, rgba(0, 245, 223, 0.12), transparent 25%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+  overflow-x: hidden;
+}
+button, input { font: inherit; }
+.hidden { display: none !important; }
+.panel-glass {
+  background: linear-gradient(180deg, rgba(19, 24, 38, 0.88), rgba(12, 16, 27, 0.9));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+}
+.lamp {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+  box-shadow: 0 0 12px currentColor;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.lamp.cyan { background: var(--cyan); color: var(--cyan); }
+.lamp.pink { background: var(--pink); color: var(--pink); }
+.lamp.purple { background: var(--purple); color: var(--purple); }
+.lamp.red { background: var(--danger); color: var(--danger); }

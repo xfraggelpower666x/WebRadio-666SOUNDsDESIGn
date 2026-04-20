@@ -1,0 +1,234 @@
+/*
+==========================================
+DATEI: external-player/css/layout.css
+ERSTELLT: 2026-04-20
+GEÄNDERT: 2026-04-20
+ZWECK: Hauptlayout des externen Players für Desktop und allgemeine Struktur.
+ÄNDERUNG: Kompaktere HUD-/Info-/Control-Anordnung mit Icon-Steuerung ergänzt.
+==========================================
+*/
+.app-grid {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 72px;
+  gap: 16px;
+  padding: 16px;
+  align-items: stretch;
+}
+.player-shell {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+.top-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+}
+.brand-kicker, .section-kicker, .info-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+}
+.brand-title {
+  margin: 4px 0;
+  font-size: clamp(1.5rem, 3.4vw, 2.7rem);
+  color: var(--cyan);
+  text-shadow: 0 0 18px rgba(0, 245, 223, 0.35);
+}
+.brand-sub { color: var(--pink); }
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 164px;
+  padding: 18px 20px;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(transparent 0 92%, rgba(0,245,223,0.16) 92% 93%, transparent 93% 100%),
+    linear-gradient(90deg, transparent 0 96%, rgba(255,62,181,0.14) 96% 97%, transparent 97% 100%),
+    radial-gradient(circle at center, rgba(184, 77, 255, 0.15), transparent 42%);
+  background-size: 100% 24px, 24px 100%, auto;
+  opacity: 0.9;
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,62,181,0.12), transparent 38%, rgba(0,245,223,0.08));
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-label-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.hero-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  font-size: 0.82rem;
+}
+.hero-badge.dim { color: var(--muted); }
+.hero-title {
+  font-size: clamp(1.18rem, 3.1vw, 2.3rem);
+  font-weight: 700;
+  color: var(--text);
+}
+.hero-subtitle { margin-top: 6px; color: var(--muted); max-width: 720px; }
+.now-playing, .visualizer, .controls { padding: 16px 18px; }
+.section-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.meta-line {
+  margin-top: 6px;
+  color: var(--pink);
+  font-weight: 700;
+}
+.ghost-btn, .icon-btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+  cursor: pointer;
+}
+.ghost-btn {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.ticker-window {
+  position: relative;
+  overflow: hidden;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,245,223,0.2);
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+}
+.ticker-text {
+  white-space: nowrap;
+  display: inline-block;
+  padding-left: 100%;
+  font-size: 1.04rem;
+  font-weight: 700;
+  color: var(--pink);
+  text-shadow: 0 0 12px rgba(255, 62, 181, 0.28);
+  animation: tickerMove 15s linear infinite;
+}
+@keyframes tickerMove { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+.history-panel {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 62, 181, 0.2);
+  border-radius: 16px;
+  background: rgba(7,10,18,0.8);
+}
+.history-title { color: var(--cyan); font-weight: 700; margin-bottom: 8px; }
+.history-list { margin: 0; padding-left: 18px; max-height: 180px; overflow: auto; }
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.info-card { padding: 14px 16px; }
+.info-value {
+  margin-top: 6px;
+  font-size: 1.06rem;
+  font-weight: 700;
+}
+.eq-bars {
+  height: 120px;
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  align-items: end;
+  gap: 6px;
+  margin-top: 10px;
+}
+.eq-bar {
+  min-height: 14px;
+  border-radius: 999px 999px 10px 10px;
+  background: linear-gradient(180deg, var(--purple), var(--pink) 55%, var(--cyan));
+  box-shadow: 0 0 12px rgba(184, 77, 255, 0.22);
+  transform-origin: bottom;
+}
+.controls { display: grid; gap: 10px; }
+.control-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), var(--shadow-cyan);
+}
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.icon-btn-main {
+  border-color: rgba(255, 62, 181, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), var(--shadow-pink);
+}
+.source-chip {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 0.86rem;
+}
+.source-chip.is-active {
+  border-color: rgba(0, 245, 223, 0.38);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), var(--shadow-cyan);
+}
+.side-meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 10px;
+  border-radius: 22px;
+  border: 1px solid rgba(0,245,223,0.16);
+  background: linear-gradient(180deg, rgba(10,12,20,0.74), rgba(17, 22, 34, 0.84));
+}
+.side-meter-label {
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+.side-meter-track {
+  position: relative;
+  flex: 1;
+  width: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.side-meter-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--purple), var(--pink), var(--cyan));
+}

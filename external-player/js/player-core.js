@@ -1,0 +1,215 @@
+/*
+==========================================
+DATEI: external-player/js/player-core.js
+ERSTELLT: 2026-04-20
+GEÄNDERT: 2026-04-20
+ZWECK: Hauptlogik des externen Players mit Anbindung an bestehende Worker-Endpunkte.
+ÄNDERUNG: Kompakte Icon-Steuerung und zentrales LED-Statussystem integriert.
+HINWEIS: Audio, Metadaten und Fallback laufen weiterhin nur über bestehende Worker-Routen.
+==========================================
+*/
+import { setText, markSourceButtons } from './controls.js';
+import { createBars, startVisualizer } from './equalizer.js';
+import { installResponsiveHelpers } from './responsive-ui.js';
+import { applyStatusChip } from './shared-status.js';
+
+const ENDPOINTS = {
+  main: '/stream',
+  fallback: '/fallback-stream',
+  metadata: '/api/nowplaying',
+  health: '/health'
+};
+
+const POLL_MS = 8000;
+const audio = document.getElementById('radio');
+const nowPlayingTicker = document.getElementById('nowPlayingTicker');
+const metaLine = document.getElementById('metaLine');
+const listenersText = document.getElementById('listenersText');
+const bitrateText = document.getElementById('bitrateText');
+const djText = document.getElementById('djText');
+const streamState = document.getElementById('streamState');
+const historyList = document.getElementById('historyList');
+const historyToggle = document.getElementById('historyToggle');
+const historyPanel = document.getElementById('historyPanel');
+const leftMeter = document.getElementById('leftMeter');
+const rightMeter = document.getElementById('rightMeter');
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const stopBtn = document.getElementById('stopBtn');
+const reconnectBtn = document.getElementById('reconnectBtn');
+const mainBtn = document.getElementById('mainBtn');
+const fallbackBtn = document.getElementById('fallbackBtn');
+const statusStream = document.getElementById('statusStream');
+const statusMeta = document.getElementById('statusMeta');
+const statusSource = document.getElementById('statusSource');
+
+let currentSource = 'main';
+let userStopped = false;
+let metadataTimer = 0;
+let historyItems = [];
+
+const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 16 : 20);
+const visualizer = startVisualizer({ audio, bars, leftMeter, rightMeter });
+installResponsiveHelpers(historyToggle, historyPanel);
+applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
+applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
+applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
+markSourceButtons(mainBtn, fallbackBtn, currentSource);
+
+function setStatus(text) {
+  setText(streamState, text);
+}
+
+function setSource(source) {
+  currentSource = source;
+  audio.src = source === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
+  markSourceButtons(mainBtn, fallbackBtn, source);
+  if (source === 'main') {
+    applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
+  } else {
+    applyStatusChip(statusStream, 'backup', 'Backup Stream aktiv');
+  }
+}
+
+function updateHistory(title) {
+  if (!title || historyItems[0] === title) return;
+  historyItems.unshift(title);
+  historyItems = historyItems.slice(0, 8);
+  historyList.innerHTML = '';
+  historyItems.forEach((item) => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    historyList.appendChild(li);
+  });
+}
+
+function parseMetadata(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return {
+      title: 'No metadata', listeners: '0 / 250', bitrate: 'Unknown', dj: '666SOUNDsDESIGn DJ'
+    };
+  }
+
+  const title = payload.title || payload.now_playing || payload.song || payload.currenttrack || 'Unknown title';
+  const artist = payload.artist || payload.dj || '';
+  const listeners = payload.listeners || payload.currentlisteners || payload.listener_count || '0';
+  const bitrate = payload.bitrate || payload.stream_bitrate || 'Unknown';
+  const max = payload.maxlisteners || payload.listener_capacity || 250;
+  const dj = payload.dj || artist || '666SOUNDsDESIGn DJ';
+
+  return {
+    title: artist ? `${artist} — ${title}` : title,
+    listeners: `${listeners} / ${max}`,
+    bitrate: String(bitrate),
+    dj: dj
+  };
+}
+
+async function fetchMetadata() {
+  try {
+    const response = await fetch(`${ENDPOINTS.metadata}?t=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error('metadata_http_error');
+    const raw = await response.json();
+    const data = parseMetadata(raw);
+    setText(metaLine, data.title);
+    setText(nowPlayingTicker, data.title);
+    setText(listenersText, data.listeners);
+    setText(bitrateText, data.bitrate);
+    setText(djText, data.dj);
+    applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
+    updateHistory(data.title);
+  } catch (err) {
+    setText(metaLine, 'Metadaten gerade nicht erreichbar');
+    applyStatusChip(statusMeta, 'error', 'Metadaten aktuell nicht erreichbar');
+  }
+}
+
+function startMetadataLoop() {
+  window.clearInterval(metadataTimer);
+  fetchMetadata();
+  metadataTimer = window.setInterval(fetchMetadata, POLL_MS);
+}
+
+function stopPlayback(status = 'STOPPED') {
+  audio.pause();
+  audio.removeAttribute('src');
+  audio.load();
+  setStatus(status);
+}
+
+async function playCurrent() {
+  userStopped = false;
+  setStatus(currentSource === 'main' ? 'CONNECT MAIN' : 'CONNECT BACKUP');
+  audio.src = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
+  try {
+    await visualizer.start();
+    await audio.play();
+    setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+    startMetadataLoop();
+  } catch (err) {
+    if (currentSource === 'main') {
+      setSource('fallback');
+      try {
+        await visualizer.start();
+        await audio.play();
+        setStatus('AUTO SWITCH → BACKUP');
+        startMetadataLoop();
+      } catch (err2) {
+        applyStatusChip(statusStream, 'error', 'Audio- oder Streamfehler');
+        setStatus('AUDIO ERROR');
+      }
+    } else {
+      applyStatusChip(statusStream, 'error', 'Audio- oder Streamfehler');
+      setStatus('AUDIO ERROR');
+    }
+  }
+}
+
+async function healthPing() {
+  try {
+    const response = await fetch(`${ENDPOINTS.health}?t=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error('health_http_error');
+    applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
+  } catch (err) {
+    applyStatusChip(statusSource, 'error', 'Externer Hauptplayer meldet Fehler');
+  }
+}
+
+playBtn?.addEventListener('click', async () => { await playCurrent(); });
+pauseBtn?.addEventListener('click', () => {
+  audio.pause();
+  setStatus('PAUSED');
+});
+stopBtn?.addEventListener('click', () => {
+  userStopped = true;
+  stopPlayback('STOPPED');
+});
+reconnectBtn?.addEventListener('click', async () => {
+  stopPlayback('RECONNECT');
+  await playCurrent();
+});
+mainBtn?.addEventListener('click', async () => {
+  setSource('main');
+  if (!userStopped) await playCurrent();
+});
+fallbackBtn?.addEventListener('click', async () => {
+  setSource('fallback');
+  if (!userStopped) await playCurrent();
+});
+audio?.addEventListener('error', async () => {
+  if (userStopped) return;
+  if (currentSource === 'main') {
+    setSource('fallback');
+    await playCurrent();
+  } else {
+    applyStatusChip(statusStream, 'error', 'Streamfehler auf Main und Backup');
+    setStatus('STREAM ERROR');
+  }
+});
+audio?.addEventListener('playing', () => {
+  setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+});
+
+healthPing();
+fetchMetadata();
+startMetadataLoop();
