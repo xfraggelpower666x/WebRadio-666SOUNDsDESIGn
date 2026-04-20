@@ -157,6 +157,7 @@ function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetch
 async function tryPlayPrimary(){audio.src=STREAM_CONFIG.stream_url;await audio.play();setSource(false)}
 async function tryPlayFallback(){audio.src=STREAM_CONFIG.fallback_stream_url;await audio.play();setSource(true)}
 async function safePlay(){try{await tryPlayPrimary();setStatus("Playing");setLamp(audioLamp,"lamp-green");startMetadataLoop();return true}catch(e1){try{await tryPlayFallback();setStatus("Playing");setLamp(audioLamp,"lamp-green");startMetadataLoop();return true}catch(e2){setStatus("Audio Error");setLamp(audioLamp,"lamp-red");return false}}}
+function hardStop(){try{audio.pause()}catch(e){} audio.removeAttribute("src"); try{audio.load()}catch(e){} if(metadataTimer){clearInterval(metadataTimer);metadataTimer=null} setStatus("Stopped"); setLamp(audioLamp,"lamp-red")}
 function runBootSequence(){return new Promise((resolve)=>{let percent=0;const timer=setInterval(()=>{percent+=4;if(percent>100)percent=100;if(progressBar)progressBar.style.width=\`\${percent}%\`;if(progressText)progressText.textContent=\`\${percent}%\`;if(percent>=100){clearInterval(timer);resolve()}},42)})}
 bootButton?.addEventListener("click",async()=>{if(booted)return;booted=true;bootButton.disabled=true;await runBootSequence();overlay?.classList.add("hidden");await safePlay()});
 playBtn?.addEventListener("click",async()=>{await safePlay()});
