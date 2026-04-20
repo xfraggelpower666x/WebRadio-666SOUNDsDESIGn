@@ -1,13 +1,15 @@
 // ==========================================
 // DATEI: AKTIVER_WORKER_MIRROR
 // ERSTELLT: 2026-04-16
-// GEÄNDERT: 2026-04-20
+// GEÄNDERT: 2026-04-21
 // STATUS: AKTIV
 // ZWECK: Gespiegelter Haupt-Worker für 666SOUNDsDESIGn Radio mit externem Standard-Player,
 //        internem Notfall-Fallback, Stream-/Metadaten-Proxy und stabiler Domain-Auslieferung.
 // ÄNDERUNG: Redirect auf github.io entfernt; externer Player wird jetzt per Proxy unter
-//           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
-//           bleiben bewusst unangetastet.
+//           derselben Domain ausgeliefert. Neu in V3: /extern wird sauber auf den externen
+//           Player geroutet, /internal explizit auf den internen Fallback-Player. Zusätzlich
+//           wird beim externen Player ein Mobile-Overflow-Fix injiziert. Streams und
+//           Metadaten bleiben bewusst unangetastet.
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
@@ -267,7 +269,18 @@ async function serveExternalIndex(request){
   });
   let html = await response.text();
   if (!html.includes('<base href="/external-player/">')) {
-    html = html.replace("<head>", '<head>\n  <base href="/external-player/">');
+    html = html.replace("<head>", '<head>
+  <base href="/external-player/">');
+  }
+  if (!html.includes('data-overflow-fix="worker-v3"')) {
+    html = html.replace("</head>", `
+  <style data-overflow-fix="worker-v3">
+    html, body { max-width: 100%; overflow-x: hidden !important; }
+    body { position: relative; }
+    img, video, canvas, svg { max-width: 100%; height: auto; }
+    * { box-sizing: border-box; }
+  </style>
+</head>`);
   }
   const headers = buildExternalProxyHeaders(response.headers);
   headers.set("content-type", "text/html; charset=UTF-8");
@@ -283,11 +296,16 @@ export default {
     const url=new URL(request.url);
 
     // Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
-    if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
+    if((url.pathname==="/" || url.pathname==="/index.html" || url.pathname==="/extern") && url.searchParams.get("player")!=="internal"){
       const externalOk = await checkExternal();
       if(externalOk){
         return await serveExternalIndex(request);
       }
+    }
+
+    // Interner Player muss explizit erreichbar sein und darf NICHT über den externen Pfad laufen.
+    if(url.pathname==="/internal"){
+      return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
     }
 
     // Direkte Proxy-Auslieferung für alle externen Player-Assets unter derselben Domain.

@@ -44,9 +44,3 @@ Dieses Repo enthält den **Cloudflare-Worker**, den **externen Haupt-Player**, d
 ## Hinweis zur Konfiguration
 - `wrangler.toml` wird **nicht** genutzt.
 - Maßgeblich ist `wrangler.jsonc` bzw. im Worker-Unterordner `wrangler.jsonc`.
-
-## Externer Hauptplayer ergänzt
-- `external-player/` mit echter HTML/CSS/JS-Dateistruktur hinzugefügt
-- nutzt ausschließlich bestehende Worker-Routen: `/stream`, `/fallback-stream`, `/api/nowplaying`, `/health`
-- Worker nicht für Metadaten/Endpunkte erweitert
-
