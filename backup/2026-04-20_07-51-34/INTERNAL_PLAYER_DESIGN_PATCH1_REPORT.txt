@@ -1,0 +1,21 @@
+CHANGE REPORT
+
+ÄNDERUNG:
+- pinkes INTERNAL oben rechts entfernt
+- Statuszeile oben angepasst
+- Meta / Audio / Source bleiben
+- Player-Kennung jetzt neben Source:
+  INTERNAL
+
+WARUM:
+- INTERNAL soll nicht mehr als separater Badge oben rechts stehen
+- Identität soll direkt im Statusblock integriert sein
+
+BETROFFEN:
+- /worker.js
+
+STATUS:
+- nur Header-/Status-Design des internen Players geändert
+- keine Streamlogik geändert
+- keine Fallbacklogik geändert
+- keine Worker-Struktur geändert
