@@ -16,6 +16,7 @@ const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
 const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/";
 const SWITCH_TIMEOUT_MS = 2000;
+const EXTERNAL_BUILD_ID = "v10-playfix";
 
 const HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -187,7 +188,9 @@ async function checkExternal(){
   try{
     const controller = new AbortController();
     const timer = setTimeout(()=>controller.abort(), SWITCH_TIMEOUT_MS);
-    const response = await fetch(EXTERNAL_PLAYER_URL, {
+    const indexUrl = new URL(EXTERNAL_PLAYER_URL);
+  indexUrl.searchParams.set("v", EXTERNAL_BUILD_ID);
+  const response = await fetch(indexUrl.toString(), {
       method: "HEAD",
       redirect: "follow",
       signal: controller.signal,
@@ -237,7 +240,9 @@ function buildExternalProxyHeaders(sourceHeaders){
 async function fetchExternalAsset(pathname, request){
   // Externe Player-Dateien unter derselben Domain ausliefern, damit github.io nicht sichtbar wird.
   const suffix = pathname.replace(/^\/(?:extern|external-player)\/?/, "");
-  const upstreamUrl = new URL(suffix || "", EXTERNAL_PLAYER_URL).toString();
+  const upstreamObject = new URL(suffix || "", EXTERNAL_PLAYER_URL);
+  upstreamObject.searchParams.set("v", EXTERNAL_BUILD_ID);
+  const upstreamUrl = upstreamObject.toString();
   const init = {
     method: request.method,
     headers: {
@@ -257,7 +262,9 @@ async function fetchExternalAsset(pathname, request){
 async function serveExternalIndex(request){
   // Startseite des externen Players laden und mit Base-Tag versehen.
   // Dadurch bleiben Asset-Pfade stabil, obwohl die Domain oben gleich bleibt.
-  const response = await fetch(EXTERNAL_PLAYER_URL, {
+  const indexUrl = new URL(EXTERNAL_PLAYER_URL);
+  indexUrl.searchParams.set("v", EXTERNAL_BUILD_ID);
+  const response = await fetch(indexUrl.toString(), {
     method: "GET",
     headers: {
       "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",

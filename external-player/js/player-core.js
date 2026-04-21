@@ -4,7 +4,7 @@ DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
-ÄNDERUNG: FULLPACK v8 METADATA + EQ. DJ-Default bereinigt, No-DJ aus Now-Playing entfernt, Ticker auf Neon-Cyan umgestellt, filigraner EQ mit mehr Bewegung und rechts korrekt gespiegelt.
+ÄNDERUNG: FULLPACK v10 PLAY-STATE FIX. Audio-Play ist jetzt strikt von Background/Layout entkoppelt; beim Playen werden nur Audio/EQ/Status aktualisiert und keine visuellen Bühnenzustände mehr aktiviert. Zusätzlich Cache-Busting über Worker-Proxy.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
@@ -64,6 +64,16 @@ audio.volume = Number(volumeSlider?.value || 0.75);
 function setStatus(text) {
   setText(streamState, text);
 }
+
+function lockVisualStage() {
+  const targets = [document.documentElement, document.body, document.querySelector('.frame-stage'), document.querySelector('.player-shell')].filter(Boolean);
+  const forbidden = ['playing','is-playing','live','is-live','active','is-active','visual-live','play-mode','is-booted'];
+  targets.forEach((el) => {
+    forbidden.forEach((cls) => el.classList.remove(cls));
+    el.setAttribute('data-visual-mode', 'static-frame');
+  });
+}
+
 
 function formatTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
@@ -194,6 +204,8 @@ async function playCurrent() {
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
   audio.src = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
   try {
+    lockVisualStage();
+    visualizer.stop?.();
     await visualizer.start();
     await audio.play();
     setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
@@ -202,6 +214,8 @@ async function playCurrent() {
     if (currentSource === 'main') {
       setSource('fallback');
       try {
+        lockVisualStage();
+        visualizer.stop?.();
         await visualizer.start();
         await audio.play();
         setStatus('AUTO SWITCH → BACKUP');
@@ -230,10 +244,13 @@ async function healthPing() {
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
   audio.pause();
+  lockVisualStage();
   setStatus('PAUSED');
 });
 stopBtn?.addEventListener('click', () => {
   userStopped = true;
+  lockVisualStage();
+  visualizer.stop?.();
   stopPlayback('STOPPED');
 });
 reconnectBtn?.addEventListener('click', async () => {
@@ -262,11 +279,13 @@ audio?.addEventListener('error', async () => {
   }
 });
 audio?.addEventListener('playing', () => {
+  lockVisualStage();
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
 });
 audio?.addEventListener('timeupdate', updateTimeline);
 audio?.addEventListener('loadedmetadata', updateTimeline);
 
+lockVisualStage();
 healthPing();
 fetchMetadata();
 startMetadataLoop();

@@ -4,9 +4,7 @@ DATEI: external-player/css/base.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Basisfarben, Reset und globales Cockpit-Fundament des externen Players.
-ÄNDERUNG: FULLPACK v7 FINAL POLISH. Sauberer Frame ohne eingebauten Player, getrennte
-           Clean-Backgrounds für Desktop und iPhone, Header oben lesbar und echtes
-           Fullscreen-Stage-Verhalten ohne Scroll.
+ÄNDERUNG: FULLPACK v10 PLAY-STATE FIX. Background bleibt jetzt statisch und unabhängig vom Audiozustand; keine visuellen Play-/Live-State-Swaps mehr.
 ==========================================
 */
 :root {
@@ -70,4 +68,18 @@ button, input { font: inherit; }
   background: transparent;
   border: none;
   backdrop-filter: none;
+}
+
+
+html[data-visual-mode="static-frame"],
+body[data-visual-mode="static-frame"],
+.frame-stage[data-visual-mode="static-frame"],
+.player-shell[data-visual-mode="static-frame"] {
+  background-blend-mode: normal;
+}
+
+.frame-stage,
+.player-shell,
+.frame-overlay {
+  will-change: auto !important;
 }
