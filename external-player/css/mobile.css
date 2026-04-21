@@ -4,8 +4,8 @@ DATEI: external-player/css/mobile.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Mobile-Anpassungen.
-ÄNDERUNG: FULLPACK v7 FINAL POLISH. Clean-Mobile-Frame ohne eingebauten Player,
-           Branding oben vollständig sichtbar und echter Fullscreen ohne Scroll.
+ÄNDERUNG: FULLPACK v9 EQ DRIFT FIX. Mobile-EQ-Rahmen ebenfalls fixiert, damit die
+           Animation nur die Balken bewegt und nicht den gesamten EQ-Block verschiebt.
 ==========================================
 */
 @media (max-width: 860px) {
@@ -80,6 +80,8 @@ ZWECK: Mobile-Anpassungen.
   }
   .eq-bars {
     height: 72px;
+    min-height: 72px;
+    max-height: 72px;
     grid-template-columns: repeat(20, minmax(0,1fr));
     gap: 4px;
   }

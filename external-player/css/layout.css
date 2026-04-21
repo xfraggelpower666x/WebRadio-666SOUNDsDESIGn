@@ -4,7 +4,8 @@ DATEI: external-player/css/layout.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlayout des externen Players.
-ÄNDERUNG: FULLPACK v8 METADATA + EQ. No-DJ-Bereinigung, Ticker in Neon-Cyan, höherer filigraner EQ, freie Control-Zone und rechts intern gespiegelte Außenmeter.
+ÄNDERUNG: FULLPACK v9 EQ DRIFT FIX. EQ-Rahmen fixiert, EQ-Animation nur noch innerhalb
+           fester Slots; kein Nach-unten-Rutschen des gesamten Equalizers mehr.
 ==========================================
 */
 .player-shell {
@@ -151,21 +152,36 @@ ZWECK: Hauptlayout des externen Players.
   border-radius: 16px;
   background: rgba(6, 8, 18, 0.66);
   border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
 }
 .eq-bars {
+  position: relative;
   height: 124px;
+  min-height: 124px;
+  max-height: 124px;
   display: grid;
   grid-template-columns: repeat(28, minmax(0, 1fr));
-  align-items: end;
+  align-items: stretch;
   gap: 4px;
   margin-top: 12px;
+  overflow: hidden;
 }
-.eq-bar {
-  min-height: 10px;
+.eq-bar-slot {
+  position: relative;
+  height: 100%;
+  min-height: 100%;
+}
+.eq-bar-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 12px;
   border-radius: 999px 999px 6px 6px;
   background: linear-gradient(180deg, var(--purple), var(--pink) 58%, var(--cyan));
   box-shadow: 0 0 10px rgba(184,77,255,0.18);
-  transform-origin: bottom;
+  transform-origin: bottom center;
+  will-change: height;
 }
 .bottom-console {
   display: grid;
