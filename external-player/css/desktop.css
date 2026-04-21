@@ -4,7 +4,8 @@ DATEI: external-player/css/desktop.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Desktop-Feinschliff.
-ÄNDERUNG: Frame-Geometrie an große Monitore angepasst.
+ÄNDERUNG: FULLPACK v7 FINAL POLISH. Player kleiner, sauber in der unteren Bildhälfte,
+           Branding oben vollständig lesbar.
 ==========================================
 */
 @media (min-width: 861px) {
@@ -12,12 +13,11 @@ ZWECK: Desktop-Feinschliff.
     min-height: 100vh;
   }
   body[data-device="desktop"] .player-shell {
-    width: min(82vw, 1180px);
+    width: min(56vw, 960px);
   }
-}
-
-/* FULLPACK v6 FINAL UI */
-@media (min-width: 861px) {
-  .frame-stage { background-position: center top; }
+  .frame-stage {
+    background-position: center top;
+    background-size: contain;
+  }
   .status-cluster { justify-content: flex-end; }
 }

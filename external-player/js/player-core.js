@@ -52,7 +52,7 @@ let userStopped = false;
 let metadataTimer = 0;
 let historyItems = [];
 
-const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 14 : 16);
+const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 16 : 18);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');

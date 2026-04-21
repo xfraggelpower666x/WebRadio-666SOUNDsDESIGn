@@ -4,16 +4,17 @@ DATEI: external-player/css/base.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Basisfarben, Reset und globales Cockpit-Fundament des externen Players.
-ÄNDERUNG: FULLPACK v6 FINAL UI. Getrennte Desktop-/Mobile-Frames, besser lesbares Branding,
-           Fullscreen iPhone ohne Scroll und schwarze Bühnenfläche statt beschnittener Cover-Darstellung.
+ÄNDERUNG: FULLPACK v7 FINAL POLISH. Sauberer Frame ohne eingebauten Player, getrennte
+           Clean-Backgrounds für Desktop und iPhone, Header oben lesbar und echtes
+           Fullscreen-Stage-Verhalten ohne Scroll.
 ==========================================
 */
 :root {
   --bg-1: #05060c;
   --bg-2: #0b0f18;
-  --panel: rgba(10, 12, 20, 0.92);
-  --panel-2: rgba(5, 7, 14, 0.96);
-  --border: rgba(255, 255, 255, 0.08);
+  --panel: rgba(8, 10, 20, 0.92);
+  --panel-2: rgba(4, 6, 12, 0.96);
+  --border: rgba(255, 255, 255, 0.09);
   --text: #ecf8ff;
   --muted: #93a7bc;
   --pink: #ff3eb5;
@@ -24,8 +25,8 @@ ZWECK: Basisfarben, Reset und globales Cockpit-Fundament des externen Players.
   --radius-xl: 28px;
   --radius-lg: 22px;
   --radius-md: 16px;
-  --desktop-frame: url("../assets/images/frame-v6-desktop.png");
-  --mobile-frame: url("../assets/images/frame-v6-mobile.png");
+  --desktop-frame: url("../assets/images/frame-v7-clean-desktop.jpeg");
+  --mobile-frame: url("../assets/images/frame-v7-clean-mobile.jpeg");
 }
 * { box-sizing: border-box; }
 html, body {
@@ -51,7 +52,9 @@ button, input { font: inherit; }
   height: 100dvh;
   overflow: hidden;
   background-color: #02030a;
-  background-image: linear-gradient(180deg, rgba(2,3,10,0.08), rgba(2,3,10,0.18)), var(--desktop-frame);
+  background-image:
+    radial-gradient(circle at 50% 70%, rgba(2,3,10,0.00), rgba(2,3,10,0.18) 42%, rgba(2,3,10,0.32) 100%),
+    var(--desktop-frame);
   background-repeat: no-repeat;
   background-position: center top;
   background-size: contain;
@@ -60,8 +63,7 @@ button, input { font: inherit; }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 66%, rgba(0,0,0,0.00), rgba(0,0,0,0.18) 38%, rgba(0,0,0,0.34) 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.04) 28%, rgba(0,0,0,0.18) 100%);
+    linear-gradient(180deg, rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.04) 35%, rgba(0,0,0,0.16) 100%);
   pointer-events: none;
 }
 .panel-glass {
