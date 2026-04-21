@@ -28,7 +28,7 @@ ZWECK: Mobile-Anpassungen.
   .player-shell {
     position: absolute;
     left: 50%;
-    top: 68.8%;
+    top: 66.9%;
     transform: translate(-50%, -50%);
     width: min(88vw, 700px);
     min-height: auto;
@@ -79,11 +79,10 @@ ZWECK: Mobile-Anpassungen.
     margin: 0 12px 8px;
   }
   .eq-bars {
-    height: 72px;
-    min-height: 72px;
-    max-height: 72px;
-    grid-template-columns: repeat(20, minmax(0,1fr));
-    gap: 4px;
+    height: 92px;
+    min-height: 92px;
+    max-height: 92px;
+    gap: 3px;
   }
   .bottom-console {
     grid-template-columns: 1fr;
