@@ -4,7 +4,7 @@ DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
-ÄNDERUNG: FULLPACK v5 Frame Integration, Desktop-Volume, Fortschrittsanzeige und Meter-Fix ergänzt.
+ÄNDERUNG: FULLPACK v6 FINAL UI. Kompaktere EQ-Geometrie, doppelte Außenmeter und Fullscreen-Mobile-Panel ergänzt.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
@@ -31,8 +31,8 @@ const streamState = document.getElementById('streamState');
 const historyList = document.getElementById('historyList');
 const historyToggle = document.getElementById('historyToggle');
 const historyPanel = document.getElementById('historyPanel');
-const leftMeter = document.getElementById('leftMeter');
-const rightMeter = document.getElementById('rightMeter');
+const leftMeters = [document.getElementById('leftMeterA'), document.getElementById('leftMeterB')].filter(Boolean);
+const rightMeters = [document.getElementById('rightMeterA'), document.getElementById('rightMeterB')].filter(Boolean);
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const stopBtn = document.getElementById('stopBtn');
@@ -52,8 +52,8 @@ let userStopped = false;
 let metadataTimer = 0;
 let historyItems = [];
 
-const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 16 : 20);
-const visualizer = startVisualizer({ audio, bars, leftMeter, rightMeter });
+const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 14 : 16);
+const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');

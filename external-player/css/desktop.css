@@ -15,3 +15,9 @@ ZWECK: Desktop-Feinschliff.
     width: min(82vw, 1180px);
   }
 }
+
+/* FULLPACK v6 FINAL UI */
+@media (min-width: 861px) {
+  .frame-stage { background-position: center top; }
+  .status-cluster { justify-content: flex-end; }
+}

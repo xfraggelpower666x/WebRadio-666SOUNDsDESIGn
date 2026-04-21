@@ -4,8 +4,9 @@ DATEI: external-player/index.html
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Externer Hauptplayer für 666SOUNDsDESIGn Radio unter derselben Domain.
-ÄNDERUNG: FULLPACK v5 Frame Integration mit HQ-Frame-Hintergrund, kompakter Cockpit-Geometrie,
-           LED-Statussystem, rechter/ linker Außenmeter, Desktop-Volume und Main/Backup-Steuerung.
+ÄNDERUNG: FULLPACK v6 FINAL UI. Player-Header im Panel entfernt, Frame-Branding oben ist jetzt der sichtbare Haupttitel.
+           Desktop- und Mobile-Hintergründe getrennt, iPhone ohne Scroll, Levelmeter außen vollflächig,
+           kleinere Panel-Geometrie und kompaktere EQ-/Control-Zone.
 HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Stream-Mechaniken.
 ==========================================
 -->
@@ -27,18 +28,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <div class="frame-overlay"></div>
 
     <aside class="side-meter left" aria-label="Left meter">
-      <div class="side-meter-label">L</div>
-      <div class="side-meter-track"><div id="leftMeter" class="side-meter-fill"></div></div>
+      <div class="side-meter-stack">
+        <div class="side-meter-track"><div id="leftMeterA" class="side-meter-fill"></div></div>
+        <div class="side-meter-track secondary"><div id="leftMeterB" class="side-meter-fill"></div></div>
+      </div>
     </aside>
 
-    <main class="player-shell panel-glass neon-frame-shell">
+    <main class="player-shell">
       <header class="top-hud">
-        <div class="brand-wrap">
-          <div class="brand-kicker">DIGITAL UNDERGROUND CONNECTED</div>
-          <h1 class="brand-title">666SOUNDsDESIGn</h1>
-          <div class="brand-sub">External Main Player</div>
-        </div>
-
         <div class="status-cluster status-bar" aria-label="Systemstatus">
           <button id="statusStream" class="status-chip led-state state-main" type="button" title="Main Stream aktiv">
             <span class="status-dot"></span><span class="status-code">STR</span>
@@ -134,8 +131,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     </main>
 
     <aside class="side-meter right" aria-label="Right meter">
-      <div class="side-meter-label">R</div>
-      <div class="side-meter-track"><div id="rightMeter" class="side-meter-fill"></div></div>
+      <div class="side-meter-stack">
+        <div class="side-meter-track"><div id="rightMeterA" class="side-meter-fill"></div></div>
+        <div class="side-meter-track secondary"><div id="rightMeterB" class="side-meter-fill"></div></div>
+      </div>
     </aside>
   </div>
 

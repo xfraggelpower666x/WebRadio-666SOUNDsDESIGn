@@ -4,35 +4,30 @@ DATEI: external-player/css/layout.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlayout des externen Players.
-ÄNDERUNG: HQ-Frame-Integration anhand der gelieferten Geometrie umgesetzt:
-           Player sitzt fest im schwarzen Panel; Außenmeter links/rechts separat.
+ÄNDERUNG: FULLPACK v6 FINAL UI. Innere Player-Header entfernt, Panel kleiner gesetzt,
+           Full-Height-Seitenmeter verdoppelt und Player optisch auf den Frame begrenzt.
 ==========================================
 */
 .player-shell {
   position: absolute;
   left: 50%;
-  top: 59.2%;
+  top: 60.8%;
   transform: translate(-50%, -50%);
-  width: min(83vw, 1180px);
-  min-height: min(42vh, 540px);
-  border-radius: 20px;
-  padding: 18px 20px 16px;
-  box-shadow:
-    0 0 0 2px rgba(255, 255, 255, 0.03),
-    0 0 24px rgba(0, 245, 223, 0.20),
-    0 0 26px rgba(255, 62, 181, 0.20);
+  width: min(60vw, 910px);
+  min-height: min(34vh, 430px);
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
   z-index: 2;
 }
-.neon-frame-shell {
-  border: 1px solid rgba(0,245,223,0.24);
-}
+.neon-frame-shell { border: none; }
 
 .top-hud {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 14px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
 }
 .brand-kicker, .section-kicker, .info-label, .volume-label {
   color: var(--muted);
@@ -40,20 +35,13 @@ ZWECK: Hauptlayout des externen Players.
   letter-spacing: 0.14em;
   font-size: 0.70rem;
 }
-.brand-title {
-  margin: 2px 0 4px;
-  font-size: clamp(1.45rem, 2.4vw, 2.4rem);
-  color: var(--cyan);
-  text-shadow: 0 0 18px rgba(0, 245, 223, 0.28);
-}
-.brand-sub { color: var(--pink); }
 .hero {
-  margin-bottom: 12px;
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255,62,181,0.06), rgba(0,245,223,0.03));
-  border: 1px solid rgba(0,245,223,0.16);
-  min-height: 122px;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(5, 7, 16, 0.74);
+  border: 1px solid rgba(255,255,255,0.10);
+  min-height: 104px;
 }
 .hero-label-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .hero-badge {
@@ -61,7 +49,7 @@ ZWECK: Hauptlayout des externen Players.
   border-radius: 999px;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.10);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   letter-spacing: 0.04em;
 }
 .hero-live {
@@ -71,16 +59,16 @@ ZWECK: Hauptlayout des externen Players.
 }
 .hero-badge.dim { color: var(--muted); }
 .hero-title {
-  font-size: clamp(1.35rem, 2.6vw, 3rem);
+  font-size: clamp(1.15rem, 2vw, 2.25rem);
   font-weight: 700;
 }
-.hero-subtitle { margin-top: 6px; color: var(--muted); }
+.hero-subtitle { margin-top: 6px; color: var(--muted); font-size: 0.95rem; }
 
 .now-playing {
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  border-radius: 18px;
-  background: rgba(7, 10, 18, 0.42);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  background: rgba(5, 7, 16, 0.70);
   border: 1px solid rgba(255,62,181,0.16);
 }
 .section-topline {
@@ -91,9 +79,10 @@ ZWECK: Hauptlayout des externen Players.
   margin-bottom: 8px;
 }
 .meta-line {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--pink);
   font-weight: 700;
+  font-size: 1rem;
 }
 .ghost-btn, .icon-btn {
   appearance: none;
@@ -109,8 +98,8 @@ ZWECK: Hauptlayout des externen Players.
 .ticker-window {
   position: relative;
   overflow: hidden;
-  height: 52px;
-  border-radius: 16px;
+  height: 46px;
+  border-radius: 14px;
   border: 1px solid rgba(255,62,181,0.18);
   background: rgba(255,255,255,0.03);
   display: flex;
@@ -120,10 +109,10 @@ ZWECK: Hauptlayout des externen Players.
   white-space: nowrap;
   display: inline-block;
   padding-left: 100%;
-  font-size: 1.06rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: var(--pink);
-  animation: tickerMove 16s linear infinite;
+  animation: tickerMove 14s linear infinite;
 }
 @keyframes tickerMove { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 .history-panel {
@@ -138,56 +127,56 @@ ZWECK: Hauptlayout des externen Players.
 
 .info-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr 1.1fr;
-  gap: 12px;
-  margin-bottom: 12px;
+  grid-template-columns: 1fr 0.9fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 .info-card {
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(8, 10, 17, 0.42);
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(5, 7, 16, 0.68);
   border: 1px solid rgba(255,255,255,0.08);
 }
-.info-value { margin-top: 6px; font-size: 1.04rem; font-weight: 700; }
+.info-value { margin-top: 6px; font-size: 1rem; font-weight: 700; }
 
 .visualizer {
-  padding: 12px 16px 10px;
-  margin-bottom: 12px;
-  border-radius: 18px;
-  background: rgba(8, 10, 17, 0.36);
-  border: 1px solid rgba(0,245,223,0.14);
+  padding: 10px 14px 10px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  background: rgba(5, 7, 16, 0.68);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 .eq-bars {
-  height: 96px;
+  height: 78px;
   display: grid;
-  grid-template-columns: repeat(20, minmax(0, 1fr));
+  grid-template-columns: repeat(16, minmax(0, 1fr));
   align-items: end;
-  gap: 6px;
+  gap: 8px;
   margin-top: 8px;
 }
 .eq-bar {
-  min-height: 10px;
-  border-radius: 999px 999px 10px 10px;
-  background: linear-gradient(180deg, var(--purple), var(--pink) 58%, var(--cyan));
+  min-height: 12px;
+  border-radius: 999px 999px 8px 8px;
+  background: linear-gradient(180deg, var(--purple), var(--pink) 60%, var(--cyan));
   box-shadow: 0 0 10px rgba(184,77,255,0.22);
   transform-origin: bottom;
 }
 .bottom-console {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
-  padding: 10px 0 0;
+  padding: 4px 0 0;
 }
 .control-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 .icon-btn {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -195,17 +184,15 @@ ZWECK: Hauptlayout des externen Players.
   background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
 }
 .icon-btn svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   fill: currentColor;
 }
-.icon-btn-main {
-  border-color: rgba(255,62,181,0.28);
-}
+.icon-btn-main { border-color: rgba(255,62,181,0.28); }
 .source-chip {
   font-weight: 700;
-  letter-spacing: 0.12em;
-  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  font-size: 0.82rem;
 }
 .source-chip.is-active {
   border-color: rgba(0,245,223,0.40);
@@ -226,7 +213,7 @@ ZWECK: Hauptlayout des externen Players.
 }
 .timeline-bar {
   position: relative;
-  height: 6px;
+  height: 5px;
   border-radius: 999px;
   background: rgba(255,255,255,0.10);
   overflow: hidden;
@@ -242,44 +229,44 @@ ZWECK: Hauptlayout des externen Players.
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 170px;
+  min-width: 160px;
   justify-content: flex-end;
 }
-.volume-slider {
-  width: 120px;
-  accent-color: var(--pink);
-}
+.volume-slider { width: 110px; accent-color: var(--pink); }
+
 .side-meter {
   position: absolute;
-  top: 17.2%;
-  height: 62%;
-  width: 58px;
+  top: 0;
+  bottom: 0;
+  height: 100dvh;
+  width: 42px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 8px 12px;
-  border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: linear-gradient(180deg, rgba(8,10,18,0.66), rgba(12, 16, 27, 0.84));
-  box-shadow: 0 0 18px rgba(0,245,223,0.10);
+  align-items: stretch;
+  justify-content: center;
   z-index: 2;
+  pointer-events: none;
 }
-.side-meter.left { left: 2.4%; }
-.side-meter.right { right: 2.4%; }
-.side-meter-label {
-  color: var(--cyan);
-  font-weight: 700;
-  letter-spacing: 0.18em;
+.side-meter.left { left: 14px; }
+.side-meter.right { right: 14px; }
+.side-meter-stack {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+  align-items: stretch;
 }
 .side-meter-track {
   position: relative;
-  flex: 1;
-  width: 14px;
+  width: 12px;
+  height: 100%;
   border-radius: 999px;
   overflow: hidden;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset 0 0 12px rgba(255,255,255,0.04), 0 0 20px rgba(0,245,223,0.12);
+}
+.side-meter-track.secondary {
+  width: 10px;
+  opacity: 0.88;
 }
 .side-meter-fill {
   position: absolute;
