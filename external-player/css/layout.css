@@ -4,8 +4,7 @@ DATEI: external-player/css/layout.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlayout des externen Players.
-ÄNDERUNG: FULLPACK v9 EQ DRIFT FIX. EQ-Rahmen fixiert, EQ-Animation nur noch innerhalb
-           fester Slots; kein Nach-unten-Rutschen des gesamten Equalizers mehr.
+ÄNDERUNG: FULLPACK v12 DESKTOP POSITION + RIGHT SIDE METER + EQ. Desktop-Player leicht nach links, rechter Seitenmeter/Laser intern gespiegelt und EQ-Bereich mit fester höherer Basis für sauberere Bewegung.
 ==========================================
 */
 .player-shell {
@@ -146,31 +145,36 @@ ZWECK: Hauptlayout des externen Players.
 }
 .info-value { margin-top: 6px; font-size: 1rem; font-weight: 700; }
 
+
 .visualizer {
-  padding: 10px 14px 14px;
-  margin: 0 16px 12px;
+  padding: 10px 14px 12px;
+  margin: 0 16px 0;
   border-radius: 16px;
-  background: rgba(6, 8, 18, 0.66);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(6, 8, 18, 0.64);
+  border: 1px solid rgba(0,245,223,0.14);
+  min-height: 146px;
   overflow: hidden;
 }
+
+
 .eq-bars {
-  position: relative;
-  height: 124px;
-  min-height: 124px;
-  max-height: 124px;
-  display: grid;
-  grid-template-columns: repeat(28, minmax(0, 1fr));
-  align-items: stretch;
+  display: flex;
+  align-items: end;
   gap: 4px;
-  margin-top: 12px;
+  min-height: 104px;
+  padding: 14px 2px 6px;
   overflow: hidden;
 }
+
+
 .eq-bar-slot {
-  position: relative;
-  height: 100%;
-  min-height: 100%;
+  flex: 1 1 0;
+  min-width: 10px;
+  height: 94px;
+  display: flex;
+  align-items: flex-end;
 }
+
 .eq-bar-fill {
   position: absolute;
   left: 0;

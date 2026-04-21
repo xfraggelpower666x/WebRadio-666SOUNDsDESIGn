@@ -4,7 +4,7 @@ DATEI: external-player/css/desktop.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Desktop-Feinschliff.
-ÄNDERUNG: FULLPACK v8 METADATA + EQ. EQ höher und filigraner, Volume sauberer im Bottom-Console-Bereich, No-DJ-Bereinigung in den Playerdaten.
+ÄNDERUNG: FULLPACK v12 DESKTOP POSITION + RIGHT SIDE METER + EQ. Desktop-Player leicht nach links verschoben; rechter Seitenmeter/Laser intern gespiegelt; Equalizer auf Desktop höher, lebendiger und mit mehr Bewegungsreserve.
 ==========================================
 */
 @media (min-width: 861px) {
@@ -20,3 +20,23 @@ ZWECK: Desktop-Feinschliff.
   }
   .status-cluster { justify-content: flex-end; }
 }
+
+  body[data-device="desktop"] .player-shell {
+    left: 49.2%;
+  }
+  body[data-device="desktop"] .visualizer {
+    min-height: 158px;
+  }
+  body[data-device="desktop"] .eq-bars {
+    min-height: 118px;
+    align-items: end;
+  }
+  body[data-device="desktop"] .eq-bar-slot {
+    height: 110px;
+  }
+  body[data-device="desktop"] .bottom-console {
+    margin-top: 6px;
+  }
+  body[data-device="desktop"] .side-meter.right .side-meter-stack {
+    flex-direction: row-reverse;
+  }
