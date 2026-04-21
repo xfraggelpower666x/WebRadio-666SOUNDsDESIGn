@@ -4,8 +4,8 @@ DATEI: external-player/css/mobile.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Mobile-Anpassungen.
-ÄNDERUNG: FULLPACK v9 EQ DRIFT FIX. Mobile-EQ-Rahmen ebenfalls fixiert, damit die
-           Animation nur die Balken bewegt und nicht den gesamten EQ-Block verschiebt.
+ÄNDERUNG: FULLPACK v11 MOBILE POSITION + DJ LABEL. Mobile-Player leicht nach oben verschoben;
+           kompakter DJ-Fallback-Label für iPhone/kleine Viewports.
 ==========================================
 */
 @media (max-width: 860px) {
@@ -28,7 +28,7 @@ ZWECK: Mobile-Anpassungen.
   .player-shell {
     position: absolute;
     left: 50%;
-    top: 70.5%;
+    top: 68.8%;
     transform: translate(-50%, -50%);
     width: min(88vw, 700px);
     min-height: auto;

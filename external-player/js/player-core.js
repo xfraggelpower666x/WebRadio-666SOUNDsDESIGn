@@ -4,7 +4,7 @@ DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
-ÄNDERUNG: FULLPACK v10 PLAY-STATE FIX. Audio-Play ist jetzt strikt von Background/Layout entkoppelt; beim Playen werden nur Audio/EQ/Status aktualisiert und keine visuellen Bühnenzustände mehr aktiviert. Zusätzlich Cache-Busting über Worker-Proxy.
+ÄNDERUNG: FULLPACK v11 MOBILE POSITION + DJ LABEL. Für kleine Viewports wird der DJ-Fallback kompakter als DJ666 angezeigt; Desktop behält 666SOUNDsDESIGn. Audio/Layout-Entkopplung aus v10 bleibt bestehen.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
@@ -115,11 +115,16 @@ function updateHistory(title) {
 }
 
 
+function getDefaultDjName() {
+  return window.innerWidth <= 860 ? 'DJ666' : '666SOUNDsDESIGn';
+}
+
 function normalizeDjName(raw) {
+  const fallback = getDefaultDjName();
   const value = String(raw || '').trim();
-  if (!value) return '666SOUNDsDESIGn';
+  if (!value) return fallback;
   const lowered = value.toLowerCase();
-  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no-dj' || lowered === '-') return '666SOUNDsDESIGn';
+  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no-dj' || lowered === '-') return fallback;
   return value;
 }
 
@@ -140,7 +145,7 @@ function parseMetadata(payload) {
       title: 'Unknown title',
       listeners: '0 / 250',
       bitrate: 'Unknown',
-      dj: '666SOUNDsDESIGn'
+      dj: getDefaultDjName()
     };
   }
 
