@@ -4,7 +4,8 @@ DATEI: external-player/js/equalizer.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Equalizer- und Seitenmeter-Visualisierung.
-ÄNDERUNG: FULLPACK v12 DESKTOP POSITION + RIGHT SIDE METER + EQ. Desktop-EQ lebendiger und höher; rechter Seitenmeter/Laser intern gespiegelt; nur Balken/Füllung animieren, Container bleibt fix.
+ÄNDERUNG: FULLPACK v9 EQ DRIFT FIX. EQ-Container und EQ-Animation strikt getrennt;
+          nur die Balkenfüllung wird animiert, nicht mehr die Layout-Position.
 ==========================================
 */
 export function createBars(container, count = 24) {
@@ -16,9 +17,8 @@ export function createBars(container, count = 24) {
 
     const fill = document.createElement('div');
     fill.className = 'eq-bar-fill';
-    const edgeCurve = 1 - Math.min(1, i / Math.max(1, count - 1));
-    const seed = 14 + (edgeCurve * 22);
-    fill.style.height = `${seed}px`;
+    const edgeBias = Math.max(0, 1 - (i / count) * 0.82);
+    fill.style.height = `${12 + edgeBias * 18}px`;
 
     slot.appendChild(fill);
     container.appendChild(slot);
@@ -37,7 +37,7 @@ function applyMeters(targets, valuePercent, side = 'left') {
     } else {
       offset = index === 0 ? -10 : 0;
     }
-    el.style.height = `${Math.max(10, Math.min(98, bounded + offset))}%`;
+    el.style.height = `${Math.max(10, bounded + offset)}%`;
   });
 }
 
@@ -66,14 +66,13 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     fallbackTimer = window.setInterval(() => {
       const t = Date.now() / 180;
       bars.forEach((bar, i) => {
-        const wave = Math.abs(Math.sin(t + i * 0.28));
-        const flutter = 0.28 + Math.abs(Math.sin(t * 0.74 + i * 0.17));
-        const edgeWeight = 1 - Math.min(1, i / Math.max(1, bars.length - 1));
-        const contour = 0.34 + (edgeWeight * 0.72);
-        const h = 14 + (wave * contour * 104) + (flutter * 16);
+        const wave = Math.abs(Math.sin(t + i * 0.34));
+        const flutter = 0.20 + Math.abs(Math.sin(t * 0.72 + i * 0.13));
+        const contour = 0.22 + Math.max(0.20, 1 - (i / bars.length) * 0.74);
+        const h = 12 + (wave * contour * 96) + (flutter * 10);
         setBarHeight(bar, h);
       });
-      const v = 26 + Math.abs(Math.sin(Date.now() / 220)) * 70;
+      const v = 24 + Math.abs(Math.sin(Date.now() / 220)) * 72;
       setMeters(v);
     }, 110);
   };
@@ -100,15 +99,13 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         for (let j = 0; j < slice; j += 1) total += data[(i * slice + j) % data.length];
         const avg = total / slice;
         globalMax = Math.max(globalMax, avg);
-        const shaped = Math.pow(avg / 255, 0.60);
-        const edgeWeight = 1 - Math.min(1, i / Math.max(1, bars.length - 1));
-        const contour = 0.30 + (edgeWeight * 0.78);
-        const shimmer = 6 + (Math.sin((Date.now() / 170) + i * 0.42) + 1) * 4;
-        const px = 14 + (shaped * contour * 108) + shimmer;
+        const shaped = Math.pow(avg / 255, 0.66);
+        const contour = 0.28 + Math.max(0.16, 1 - (i / bars.length) * 0.84);
+        const px = 12 + (shaped * contour * 102);
         setBarHeight(bar, px);
       });
 
-      setMeters(18 + (globalMax / 255) * 78);
+      setMeters(14 + (globalMax / 255) * 84);
       rafId = requestAnimationFrame(frame);
     };
 
