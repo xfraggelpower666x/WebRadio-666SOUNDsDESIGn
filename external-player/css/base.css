@@ -83,3 +83,6 @@ body[data-visual-mode="static-frame"],
 .frame-overlay {
   will-change: auto !important;
 }
+
+
+.mobile-only { display: none; }

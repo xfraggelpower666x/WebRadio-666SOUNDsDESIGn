@@ -102,3 +102,45 @@ ZWECK: Mobile-Anpassungen.
   }
   .source-chip { font-size: 0.82rem; }
 }
+
+
+.mobile-only { display: block !important; }
+
+.mobile-boost {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 2px;
+}
+.mobile-boost-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.64rem;
+  white-space: nowrap;
+}
+.mobile-boost-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 6px;
+}
+.boost-chip {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(6, 10, 22, 0.78);
+  color: var(--text);
+  border-radius: 12px;
+  height: 34px;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 10px rgba(0,245,223,0.06);
+}
+.boost-chip.is-active {
+  color: #08121a;
+  background: linear-gradient(90deg, var(--cyan), #7fffe7);
+  border-color: rgba(0,245,223,0.42);
+  box-shadow: 0 0 14px rgba(0,245,223,0.20);
+}

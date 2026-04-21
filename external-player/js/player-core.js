@@ -3,6 +3,7 @@
 DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v14.2 UNKNOWN TITLE CLEANUP. Now Playing und Ticker bereinigen führende Platzhalter wie "Unknown title -" und ähnliche Rohpräfixe konsequent.
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 ÄNDERUNG: FULLPACK v11 MOBILE POSITION + DJ LABEL. Für kleine Viewports wird der DJ-Fallback kompakter als DJ666 angezeigt; Desktop behält 666SOUNDsDESIGn. Audio/Layout-Entkopplung aus v10 bleibt bestehen.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
@@ -43,6 +44,7 @@ const statusStream = document.getElementById('statusStream');
 const statusMeta = document.getElementById('statusMeta');
 const statusSource = document.getElementById('statusSource');
 const volumeSlider = document.getElementById('volumeSlider');
+const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'));
 const timelineProgress = document.getElementById('timelineProgress');
 const currentTimeText = document.getElementById('currentTimeText');
 const durationText = document.getElementById('durationText');
@@ -54,12 +56,27 @@ let historyItems = [];
 
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
+setBoostStage(0);
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
 applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
 markSourceButtons(mainBtn, fallbackBtn, currentSource);
 audio.volume = Number(volumeSlider?.value || 0.75);
+const isMobileViewport = () => window.innerWidth <= 860;
+
+
+function applyBoostButtons(stage) {
+  boostButtons.forEach((btn) => {
+    btn.classList.toggle('is-active', Number(btn.dataset.boostStage) === Number(stage));
+  });
+}
+
+function setBoostStage(stage) {
+  const next = visualizer.setBoostStage ? visualizer.setBoostStage(stage) : Number(stage) || 0;
+  applyBoostButtons(next);
+  return next;
+}
 
 function setStatus(text) {
   setText(streamState, text);
@@ -131,11 +148,18 @@ function normalizeDjName(raw) {
 function cleanNowPlayingText(raw) {
   let value = String(raw || '').trim();
   if (!value) return 'Unknown title';
+
+  value = value.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*666soundsdesign\s*dj\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*dj\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/^\s*artist\s*[-:|–—]*\s*track\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/\s+[-:|–—]\s+[-:|–—]\s+/g, ' - ');
   value = value.replace(/^\s*[-:|–—]+\s*/, '');
-  return value.trim() || 'Unknown title';
+  value = value.replace(/\s{2,}/g, ' ').trim();
+
+  if (!value || /^unknown\s*title$/i.test(value)) return 'Unknown title';
+  return value;
 }
 
 
@@ -250,6 +274,7 @@ playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
   audio.pause();
   lockVisualStage();
+  visualizer.stop?.();
   setStatus('PAUSED');
 });
 stopBtn?.addEventListener('click', () => {
@@ -283,8 +308,9 @@ audio?.addEventListener('error', async () => {
     setStatus('STREAM ERROR');
   }
 });
-audio?.addEventListener('playing', () => {
+audio?.addEventListener('playing', async () => {
   lockVisualStage();
+  await visualizer.start?.();
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
 });
 audio?.addEventListener('timeupdate', updateTimeline);
@@ -296,4 +322,14 @@ fetchMetadata();
 startMetadataLoop();
 updateTimeline();
 
-// v15 EQ sync ensured
+
+audio?.addEventListener('pause', () => {
+  if (!userStopped) {
+    visualizer.stop?.();
+  }
+});
+
+audio?.addEventListener('ended', () => {
+  visualizer.stop?.();
+  setStatus('STOPPED');
+});
