@@ -295,3 +295,5 @@ healthPing();
 fetchMetadata();
 startMetadataLoop();
 updateTimeline();
+
+// v15 EQ sync ensured
