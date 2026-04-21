@@ -86,3 +86,84 @@ body[data-visual-mode="static-frame"],
 
 
 .mobile-only { display: none; }
+
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v17 MOBILE CLICKABILITY FIX.
+ZWECK: Deko-/Overlay-Layer dürfen auf Mobile keine Touch-Events mehr fangen.
+        Interaktive Player-Zonen werden bewusst nach vorne geholt.
+==========================================
+*/
+.frame-stage::before,
+.frame-stage::after,
+.frame-overlay,
+.side-meter,
+.side-meter *,
+.visualizer::before,
+.visualizer::after,
+.eq-bars,
+.eq-bar-slot,
+.eq-bar-fill {
+  pointer-events: none !important;
+}
+
+.player-shell,
+.player-shell *,
+.top-hud,
+.top-hud *,
+.hero,
+.hero *,
+.now-playing,
+.now-playing *,
+.info-grid,
+.info-grid *,
+.bottom-console,
+.bottom-console *,
+.control-toolbar,
+.control-toolbar *,
+.mobile-boost,
+.mobile-boost *,
+.icon-btn,
+.source-chip,
+.ghost-btn,
+button,
+input,
+a {
+  pointer-events: auto;
+}
+
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v18 HARD TOUCH FIX.
+ZWECK: Mobile Touch-Zonen hart freistellen. Deko- und Visual-Layer
+        dürfen keine Touch-Events mehr fangen. Interaktive Elemente
+        bleiben vorne und klickbar.
+==========================================
+*/
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, input {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 9999 !important;
+  touch-action: manipulation;
+}
+
+.frame-overlay,
+.side-meter,
+.side-meter *,
+.visualizer,
+.visualizer *,
+.eq,
+.eq *,
+.eq-bars,
+.eq-bar-slot,
+.eq-bar-fill {
+  pointer-events: none !important;
+}

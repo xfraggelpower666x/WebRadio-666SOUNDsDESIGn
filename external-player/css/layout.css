@@ -300,3 +300,36 @@ ZWECK: Hauptlayout des externen Players.
   box-shadow: 0 0 22px rgba(255,62,181,0.30);
   border-radius: 999px 999px 0 0;
 }
+
+
+/* v17-layout-overlay-cleanup */
+.visualizer,
+.eq-bars,
+.eq-bar-slot,
+.eq-bar-fill {
+  pointer-events: none !important;
+}
+
+.bottom-console,
+.control-toolbar,
+.timeline-wrap,
+.volume-wrap {
+  position: relative;
+  z-index: 6;
+}
+
+
+/* v18 hard-touch-layout */
+.bottom-console,
+.control-toolbar,
+.timeline-wrap,
+.volume-wrap,
+.mobile-boost,
+.player-shell,
+.top-hud,
+.hero,
+.now-playing,
+.info-grid {
+  position: relative;
+  z-index: 20;
+}
