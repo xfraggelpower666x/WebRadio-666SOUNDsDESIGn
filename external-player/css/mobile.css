@@ -65,7 +65,7 @@ ZWECK: Mobile-Anpassungen.
   .meta-line { font-size: 0.86rem; line-height: 1.15; }
   .ghost-btn { padding: 6px 10px; font-size: 0.9rem; }
   .ticker-window { height: 42px; }
-  .ticker-text { font-size: 0.88rem; }
+  .ticker-text { font-size: 0.88rem; color: var(--cyan); }
   .info-grid {
     grid-template-columns: repeat(3, minmax(0,1fr));
     gap: 8px;
@@ -79,9 +79,9 @@ ZWECK: Mobile-Anpassungen.
     margin: 0 12px 8px;
   }
   .eq-bars {
-    height: 56px;
-    grid-template-columns: repeat(16, minmax(0,1fr));
-    gap: 5px;
+    height: 72px;
+    grid-template-columns: repeat(20, minmax(0,1fr));
+    gap: 4px;
   }
   .bottom-console {
     grid-template-columns: 1fr;

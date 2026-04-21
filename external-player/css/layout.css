@@ -4,8 +4,7 @@ DATEI: external-player/css/layout.css
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlayout des externen Players.
-ÄNDERUNG: FULLPACK v7 FINAL POLISH. Clean-Frame-Integration ohne eingebauten Fake-Player,
-           kleineres echtes Panel, starke Seitenmeter und ruhigeres Cockpit-Layout.
+ÄNDERUNG: FULLPACK v8 METADATA + EQ. No-DJ-Bereinigung, Ticker in Neon-Cyan, höherer filigraner EQ, freie Control-Zone und rechts intern gespiegelte Außenmeter.
 ==========================================
 */
 .player-shell {
@@ -117,7 +116,8 @@ ZWECK: Hauptlayout des externen Players.
   padding-left: 100%;
   font-size: 0.98rem;
   font-weight: 700;
-  color: var(--pink);
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(0,245,223,0.24);
   animation: tickerMove 14s linear infinite;
 }
 @keyframes tickerMove { from { transform: translateX(0); } to { transform: translateX(-100%); } }
@@ -146,33 +146,34 @@ ZWECK: Hauptlayout des externen Players.
 .info-value { margin-top: 6px; font-size: 1rem; font-weight: 700; }
 
 .visualizer {
-  padding: 10px 14px 10px;
-  margin: 0 16px 10px;
+  padding: 10px 14px 14px;
+  margin: 0 16px 12px;
   border-radius: 16px;
   background: rgba(6, 8, 18, 0.66);
   border: 1px solid rgba(255,255,255,0.08);
 }
 .eq-bars {
-  height: 86px;
+  height: 124px;
   display: grid;
-  grid-template-columns: repeat(18, minmax(0, 1fr));
+  grid-template-columns: repeat(28, minmax(0, 1fr));
   align-items: end;
-  gap: 7px;
-  margin-top: 8px;
+  gap: 4px;
+  margin-top: 12px;
 }
 .eq-bar {
-  min-height: 12px;
-  border-radius: 999px 999px 8px 8px;
-  background: linear-gradient(180deg, var(--purple), var(--pink) 60%, var(--cyan));
-  box-shadow: 0 0 10px rgba(184,77,255,0.22);
+  min-height: 10px;
+  border-radius: 999px 999px 6px 6px;
+  background: linear-gradient(180deg, var(--purple), var(--pink) 58%, var(--cyan));
+  box-shadow: 0 0 10px rgba(184,77,255,0.18);
   transform-origin: bottom;
 }
 .bottom-console {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 12px;
+  gap: 16px;
   align-items: center;
-  padding: 0 16px 16px;
+  padding: 0 16px 18px;
+  margin-top: 4px;
 }
 .control-toolbar {
   display: flex;
@@ -209,6 +210,7 @@ ZWECK: Hauptlayout des externen Players.
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
+  align-self: end;
 }
 .time-chip {
   font-variant-numeric: tabular-nums;
@@ -235,10 +237,11 @@ ZWECK: Hauptlayout des externen Players.
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 160px;
+  min-width: 170px;
   justify-content: flex-end;
+  padding-bottom: 2px;
 }
-.volume-slider { width: 110px; accent-color: var(--pink); }
+.volume-slider { width: 118px; accent-color: var(--pink); }
 
 .side-meter {
   position: absolute;

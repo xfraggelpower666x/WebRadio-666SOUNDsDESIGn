@@ -4,7 +4,7 @@ DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
-ÄNDERUNG: FULLPACK v6 FINAL UI. Kompaktere EQ-Geometrie, doppelte Außenmeter und Fullscreen-Mobile-Panel ergänzt.
+ÄNDERUNG: FULLPACK v8 METADATA + EQ. DJ-Default bereinigt, No-DJ aus Now-Playing entfernt, Ticker auf Neon-Cyan umgestellt, filigraner EQ mit mehr Bewegung und rechts korrekt gespiegelt.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
@@ -52,7 +52,7 @@ let userStopped = false;
 let metadataTimer = 0;
 let historyItems = [];
 
-const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 16 : 18);
+const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
@@ -104,25 +104,54 @@ function updateHistory(title) {
   });
 }
 
+
+function normalizeDjName(raw) {
+  const value = String(raw || '').trim();
+  if (!value) return '666SOUNDsDESIGn';
+  const lowered = value.toLowerCase();
+  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no-dj' || lowered === '-') return '666SOUNDsDESIGn';
+  return value;
+}
+
+function cleanNowPlayingText(raw) {
+  let value = String(raw || '').trim();
+  if (!value) return 'Unknown title';
+  value = value.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/^\s*666soundsdesign\s*dj\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/^\s*dj\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/^\s*[-:|–—]+\s*/, '');
+  return value.trim() || 'Unknown title';
+}
+
+
 function parseMetadata(payload) {
   if (!payload || typeof payload !== 'object') {
     return {
-      title: 'No metadata', listeners: '0 / 250', bitrate: 'Unknown', dj: '666SOUNDsDESIGn DJ'
+      title: 'Unknown title',
+      listeners: '0 / 250',
+      bitrate: 'Unknown',
+      dj: '666SOUNDsDESIGn'
     };
   }
 
-  const title = payload.title || payload.now_playing || payload.song || payload.currenttrack || payload.currentSong || 'Unknown title';
-  const artist = payload.artist || payload.dj || payload.djusername || '';
+  const rawTitle = payload.title || payload.now_playing || payload.song || payload.currenttrack || payload.currentSong || '';
+  const rawArtist = payload.artist || payload.dj || payload.djusername || '';
   const listeners = payload.listeners || payload.currentlisteners || payload.listener_count || 0;
   const bitrate = payload.bitrate || payload.stream_bitrate || 'Unknown';
   const max = payload.maxlisteners || payload.listener_capacity || 250;
-  const dj = payload.dj || payload.djusername || artist || '666SOUNDsDESIGn DJ';
+  const dj = normalizeDjName(payload.dj || payload.djusername || rawArtist || '');
+
+  const cleanedTitle = cleanNowPlayingText(rawTitle);
+  const cleanedArtist = cleanNowPlayingText(rawArtist);
+  const finalTitle = cleanedArtist && !cleanedTitle.toLowerCase().includes(cleanedArtist.toLowerCase())
+    ? `${cleanedArtist} - ${cleanedTitle}`
+    : cleanedTitle;
 
   return {
-    title: artist && !String(title).includes(artist) ? `${artist} - ${title}` : String(title),
+    title: finalTitle,
     listeners: `${listeners} / ${max}`,
     bitrate: String(bitrate),
-    dj: dj
+    dj
   };
 }
 

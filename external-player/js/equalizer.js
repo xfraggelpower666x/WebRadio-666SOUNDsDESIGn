@@ -4,28 +4,33 @@ DATEI: external-player/js/equalizer.js
 ERSTELLT: 2026-04-20
 GEÄNDERT: 2026-04-21
 ZWECK: Equalizer- und Seitenmeter-Visualisierung.
-ÄNDERUNG: FULLPACK v7 FINAL POLISH. Mehr Dynamik, ruhigere Balkenzahl und stärkere
-           full-height Außenmeter links/rechts.
+ÄNDERUNG: FULLPACK v8 METADATA + EQ. Höherer, filigranerer EQ mit mehr Bewegung; rechter Außenmeter intern gespiegelt.
 ==========================================
 */
-export function createBars(container, count = 18) {
+export function createBars(container, count = 24) {
   const bars = [];
   container.innerHTML = '';
   for (let i = 0; i < count; i += 1) {
     const bar = document.createElement('div');
     bar.className = 'eq-bar';
-    bar.style.height = `${12 + Math.max(0, 8 - i) * 6}px`;
+    const edgeBias = Math.max(0, 1 - (i / count) * 0.82);
+    bar.style.height = `${10 + edgeBias * 18}px`;
     container.appendChild(bar);
     bars.push(bar);
   }
   return bars;
 }
 
-function applyMeters(targets, valuePercent) {
+function applyMeters(targets, valuePercent, side = 'left') {
   const bounded = Math.max(10, Math.min(98, valuePercent));
   targets.forEach((el, index) => {
     if (!el) return;
-    const offset = index % 2 === 0 ? 0 : -10;
+    let offset = 0;
+    if (side === 'left') {
+      offset = index === 0 ? 0 : -10;
+    } else {
+      offset = index === 0 ? -10 : 0;
+    }
     el.style.height = `${Math.max(10, bounded + offset)}%`;
   });
 }
@@ -39,21 +44,21 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   let fallbackTimer = 0;
   let smoothMeter = 22;
 
-  const allMeters = [...leftMeters, ...rightMeters].filter(Boolean);
-
   const setMeters = (valuePercent) => {
-    const next = (smoothMeter * 0.64) + (Math.max(12, Math.min(98, valuePercent)) * 0.36);
+    const next = (smoothMeter * 0.56) + (Math.max(12, Math.min(98, valuePercent)) * 0.44);
     smoothMeter = next;
-    applyMeters(allMeters, next);
+    applyMeters(leftMeters, next, 'left');
+    applyMeters(rightMeters, next, 'right');
   };
 
   const renderFallback = () => {
     fallbackTimer = window.setInterval(() => {
       const t = Date.now() / 180;
       bars.forEach((bar, i) => {
-        const wave = Math.abs(Math.sin(t + i * 0.38));
-        const contour = 0.30 + Math.max(0.18, 1 - (i / bars.length) * 0.86);
-        const h = 12 + (wave * contour * 80);
+        const wave = Math.abs(Math.sin(t + i * 0.34));
+        const flutter = 0.20 + Math.abs(Math.sin(t * 0.72 + i * 0.13));
+        const contour = 0.22 + Math.max(0.20, 1 - (i / bars.length) * 0.74);
+        const h = 10 + (wave * contour * 96) + (flutter * 10);
         bar.style.height = `${h}px`;
       });
       const v = 24 + Math.abs(Math.sin(Date.now() / 220)) * 72;
