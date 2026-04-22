@@ -57,12 +57,20 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <span id="streamState" class="hero-badge dim">READY</span>
         </div>
 <div class="mobile-boost mobile-only" aria-label="Mobile Booster">
-  <div class="mobile-boost-label">BOOST</div>
+  <div class="mobile-boost-label"><span class="boost-master-dot" aria-hidden="true"></span><span>BOOST</span></div>
   <div class="mobile-boost-grid" role="group" aria-label="Booster-Stufen">
-    <button class="boost-chip is-active" type="button" data-boost-stage="0" title="Boost 0">0</button>
-    <button class="boost-chip" type="button" data-boost-stage="1" title="Boost 1">1</button>
-    <button class="boost-chip" type="button" data-boost-stage="2" title="Boost 2">2</button>
-    <button class="boost-chip" type="button" data-boost-stage="3" title="Boost 3">3</button>
+    <button class="boost-chip is-active" type="button" data-boost-stage="0" title="Boost 0 · Normal" aria-label="Boost 0 Normal">
+      <span class="boost-dot" aria-hidden="true"></span><span class="boost-code">0</span>
+    </button>
+    <button class="boost-chip" type="button" data-boost-stage="1" title="Boost 1 · Leicht" aria-label="Boost 1 Leicht">
+      <span class="boost-dot" aria-hidden="true"></span><span class="boost-code">1</span>
+    </button>
+    <button class="boost-chip" type="button" data-boost-stage="2" title="Boost 2 · Mittel" aria-label="Boost 2 Mittel">
+      <span class="boost-dot" aria-hidden="true"></span><span class="boost-code">2</span>
+    </button>
+    <button class="boost-chip" type="button" data-boost-stage="3" title="Boost 3 · Stark" aria-label="Boost 3 Stark">
+      <span class="boost-dot" aria-hidden="true"></span><span class="boost-code">3</span>
+    </button>
   </div>
 </div>
         
@@ -144,15 +152,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <input id="volumeSlider" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.75" />
         </div>
       </section>
-    
-<div class="v28-boost">
-  <button data-level="0">0</button>
-  <button data-level="1">1</button>
-  <button data-level="2">2</button>
-  <button data-level="3">3</button>
-</div>
-</main>
-
+    </main>
 
     <aside class="side-meter right" aria-label="Right meter">
       <div class="side-meter-stack">
@@ -162,14 +162,19 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     </aside>
   </div>
 
+    <div class="bottom-center-meter mobile-only" aria-hidden="true">
+      <div class="bottom-center-row primary">
+        <div class="bottom-center-track left"><div id="bottomMeterLeftA" class="bottom-center-fill"></div></div>
+        <div class="bottom-center-track right"><div id="bottomMeterRightA" class="bottom-center-fill"></div></div>
+      </div>
+      <div class="bottom-center-row secondary">
+        <div class="bottom-center-track left"><div id="bottomMeterLeftB" class="bottom-center-fill secondary"></div></div>
+        <div class="bottom-center-track right"><div id="bottomMeterRightB" class="bottom-center-fill secondary"></div></div>
+      </div>
+    </div>
+
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
   <script type="module" src="./js/player-core.js"></script>
-
-<div class="v28-bottom-meter">
-  <div class="meter-left"></div>
-  <div class="meter-right"></div>
-</div>
 </body>
-
 </html>

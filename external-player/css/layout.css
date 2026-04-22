@@ -503,51 +503,20 @@ ZWECK: Desktop-Player wieder auf letzte gute Geometrie bringen,
 }
 
 
-/* ===== v28 additions ===== */
-
-.v28-boost{
-  position:fixed;
-  top:80px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:6px;
-  z-index:50;
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v29 CLEAN MOBILE BOOSTER + CENTER-OUT METERS.
+ZWECK: Saubere Mobile-Integration ohne Dopplungen. Bestehenden Booster
+       verkleinern, LED-Status ergänzen und unteres Doppel-Levelmeter
+       außerhalb des Players führen.
+==========================================
+*/
+.bottom-center-meter {
+  display: none;
 }
-.v28-boost button{
-  width:36px;
-  height:36px;
-  font-size:12px;
-  border-radius:8px;
+@media (min-width: 861px) {
+  .bottom-center-meter {
+    display: none !important;
+  }
 }
-
-/* bottom meter */
-.v28-bottom-meter{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:40px;
-  display:flex;
-  justify-content:center;
-  align-items:flex-end;
-  pointer-events:none;
-}
-.v28-bottom-meter .meter-left,
-.v28-bottom-meter .meter-right{
-  width:40%;
-  height:100%;
-  background:linear-gradient(to top, rgba(0,255,255,0.6), transparent);
-}
-
-/* side meters */
-.v28-side-left,
-.v28-side-right{
-  position:fixed;
-  top:0;
-  width:10px;
-  height:100%;
-  background:linear-gradient(to top, rgba(0,255,255,0.4), transparent);
-}
-.v28-side-left{left:0;}
-.v28-side-right{right:0;}
