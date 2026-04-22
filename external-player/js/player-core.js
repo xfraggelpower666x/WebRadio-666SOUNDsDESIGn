@@ -145,9 +145,22 @@ function normalizeDjName(raw) {
   return value;
 }
 
+
+function normalizeMetadataTitleV22(value) {
+  let text = String(value || '').trim();
+  text = text.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/^\s*loading metadata\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/^\s*metadata unavailable\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/\s{2,}/g, ' ').trim();
+  text = text.replace(/^[-:|–—\s]+/, '').replace(/[-:|–—\s]+$/, '').trim();
+  if (!text) return 'Live Stream';
+  return text;
+}
+
 function cleanNowPlayingText(raw) {
   let value = String(raw || '').trim();
-  if (!value) return 'Unknown title';
+  if (!value) return 'Live Stream';
 
   value = value.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
@@ -158,7 +171,7 @@ function cleanNowPlayingText(raw) {
   value = value.replace(/^\s*[-:|–—]+\s*/, '');
   value = value.replace(/\s{2,}/g, ' ').trim();
 
-  if (!value || /^unknown\s*title$/i.test(value)) return 'Unknown title';
+  if (!value || /^unknown\s*title$/i.test(value)) return 'Live Stream';
   return value;
 }
 
@@ -180,7 +193,7 @@ function parseMetadata(payload) {
   const max = payload.maxlisteners || payload.listener_capacity || 250;
   const dj = normalizeDjName(payload.dj || payload.djusername || rawArtist || '');
 
-  const cleanedTitle = cleanNowPlayingText(rawTitle);
+  const cleanedTitle = normalizeMetadataTitleV22(cleanNowPlayingText(rawTitle));
   const cleanedArtist = cleanNowPlayingText(rawArtist);
   const finalTitle = cleanedArtist && !cleanedTitle.toLowerCase().includes(cleanedArtist.toLowerCase())
     ? `${cleanedArtist} - ${cleanedTitle}`

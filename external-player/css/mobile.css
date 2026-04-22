@@ -372,3 +372,12 @@ ZWECK: Mobile-Anpassungen.
     margin-right: 10px;
   }
 }
+
+
+/* v22 mobile-only title hiding confirmation */
+@media (max-width: 860px) {
+  .hero-title,
+  .hero-subtitle {
+    display: none !important;
+  }
+}

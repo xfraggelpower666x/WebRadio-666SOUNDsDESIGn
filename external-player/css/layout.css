@@ -382,3 +382,55 @@ ZWECK: Logo sauber im Hero-/Header-Bereich integrieren; vollständiger Schriftzu
   height: auto;
   object-fit: contain;
 }
+
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v22 METADATA REPAIR + PC LAYOUT RECOVERY.
+ZWECK: PC wieder auf den letzten guten Layout-Stand zurückführen.
+       Mobile-v21 bleibt erhalten.
+==========================================
+*/
+@media (min-width: 861px) {
+  .hero-brand {
+    display: none !important;
+  }
+
+  .hero-title,
+  .hero-subtitle {
+    display: block !important;
+  }
+
+  .player-shell {
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: min(92vw, 1180px) !important;
+    max-width: 1180px !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    border-radius: 28px !important;
+    box-shadow: 0 0 28px rgba(0,245,223,0.10), 0 0 24px rgba(255,77,179,0.08) !important;
+  }
+
+  .top-hud {
+    padding: 14px 18px 0 !important;
+    margin: 0 !important;
+  }
+
+  .hero {
+    margin: 0 18px 10px !important;
+    padding: 14px 16px 14px !important;
+    min-height: 0 !important;
+  }
+
+  .now-playing,
+  .info-grid,
+  .visualizer,
+  .bottom-console {
+    margin-left: 18px !important;
+    margin-right: 18px !important;
+  }
+}
