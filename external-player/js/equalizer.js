@@ -103,7 +103,6 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       ? 26 + (Math.abs(Math.sin(Date.now() / 210)) * 62)
       : 18 + (Math.abs(Math.sin(Date.now() / 300)) * 18);
     setMeters(meter);
-    try { v25DesktopEqCenterLift(bars); } catch (e) {}
 
     if (!fromInterval && !fallbackTimer) {
       fallbackTimer = window.setInterval(() => renderFallback(true), 110);
@@ -133,7 +132,6 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       setBarHeight(bar, 12 + contour * 14);
     });
     setMeters(18);
-    try { v25DesktopEqCenterLift(bars); } catch (e) {}
   };
 
   try {
@@ -210,7 +208,6 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         : 14 + ((globalMax / 255) * 84);
 
       setMeters(meterValue);
-      try { v25DesktopEqCenterLift(bars); } catch (e) {}
       rafId = window.requestAnimationFrame(frame);
     };
 
@@ -257,20 +254,20 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
 /*
 ==========================================
-ZUSATZ: v25DesktopEqCenterLift
-ZWECK: Desktop-Mitte leicht anheben, ohne die funktionierende Mobile-
-       Logik anzutasten. Greift nur auf Desktop.
+ZUSATZ: v26DesktopCenterFloor
+ZWECK: Desktop-Mitte des Equalizers leicht anheben, ohne Geometrie,
+       Grid oder Balkenbreite zu verändern. Mobile bleibt unberührt.
 ==========================================
 */
-export function v25DesktopEqCenterLift(bars) {
+function v26DesktopCenterFloor(bars) {
   if (!Array.isArray(bars) || window.innerWidth <= 860) return;
-  const centerIndices = [9, 10, 11, 12, 13, 14];
+  const centerIndices = [10, 11, 12, 13];
   centerIndices.forEach((i) => {
     const bar = bars[i];
     if (!bar) return;
-    const current = parseFloat(String(bar.style.height || '14').replace('px','')) || 14;
-    if (current < 20) {
-      bar.style.height = '20px';
+    const current = parseFloat(String(bar.style.height || '14').replace('px', '')) || 14;
+    if (current < 18) {
+      bar.style.height = '18px';
     }
   });
 }

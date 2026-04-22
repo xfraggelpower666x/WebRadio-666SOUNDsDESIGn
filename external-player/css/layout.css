@@ -457,22 +457,20 @@ ZWECK: Desktop zeigt keinen Booster mehr. Booster bleibt ausschließlich
 /*
 ==========================================
 GEÄNDERT: 2026-04-21
-ÄNDERUNG: FULLPACK v25 PC LAYOUT + PC EQ.
-ZWECK: Desktop-Player wieder sauber zentrieren und Fullscreen-/Inset-
-       Leckagen von Mobile hart abfangen. Mobile bleibt unangetastet.
+ÄNDERUNG: FULLPACK v26 PC GEOMETRY RESET + EQ CENTER FIX.
+ZWECK: Desktop-Player wieder auf letzte gute Geometrie bringen,
+       Branding oben sichtbar halten und nur die EQ-Mitte korrigieren,
+       ohne Grid-/Breitenänderungen.
 ==========================================
 */
 @media (min-width: 861px) {
-  html, body {
-    overflow-x: hidden;
-  }
-
   .frame-stage {
     position: relative !important;
-    min-height: 100vh !important;
     display: flex !important;
-    align-items: center !important;
     justify-content: center !important;
+    align-items: flex-start !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
   }
 
   .player-shell {
@@ -481,7 +479,7 @@ ZWECK: Desktop-Player wieder sauber zentrieren und Fullscreen-/Inset-
     left: auto !important;
     top: auto !important;
     transform: none !important;
-    margin: 0 auto !important;
+    margin: 78px auto 36px auto !important;
     width: min(92vw, 1180px) !important;
     max-width: 1180px !important;
     min-width: 0 !important;
@@ -495,38 +493,11 @@ ZWECK: Desktop-Player wieder sauber zentrieren und Fullscreen-/Inset-
   .info-grid,
   .visualizer,
   .bottom-console {
-    width: auto !important;
-  }
-}
-
-
-/* v25 desktop-eq-center-lift */
-@media (min-width: 861px) {
-  .eq-bars {
-    display: grid !important;
-    grid-template-columns: repeat(24, minmax(0,1fr)) !important;
-    align-items: end !important;
-    column-gap: 4px !important;
+    margin-left: 18px !important;
+    margin-right: 18px !important;
   }
 
-  .eq-bar-slot {
-    display: flex !important;
-    align-items: end !important;
-    justify-content: center !important;
-  }
-
-  .eq-bar-fill {
-    width: 100% !important;
-    min-height: 14px !important;
-    transform-origin: bottom center !important;
-  }
-
-  .eq-bar-slot:nth-child(10) .eq-bar-fill,
-  .eq-bar-slot:nth-child(11) .eq-bar-fill,
-  .eq-bar-slot:nth-child(12) .eq-bar-fill,
-  .eq-bar-slot:nth-child(13) .eq-bar-fill,
-  .eq-bar-slot:nth-child(14) .eq-bar-fill,
-  .eq-bar-slot:nth-child(15) .eq-bar-fill {
-    min-height: 20px !important;
+  .hero {
+    padding-top: 14px !important;
   }
 }
