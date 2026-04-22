@@ -333,3 +333,29 @@ ZWECK: Hauptlayout des externen Players.
   position: relative;
   z-index: 20;
 }
+
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v20 LAYOUT ORDER FIX.
+ZWECK: Trennung oben/unten sauber halten.
+       Booster sitzt jetzt strukturell im Hero-Bereich.
+       Bottom-Console bleibt reine Bedienzone.
+==========================================
+*/
+.mobile-boost {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 0;
+}
+
+.hero .mobile-boost {
+  margin-top: 2px;
+}
+
+.bottom-console .mobile-boost {
+  display: none !important;
+}

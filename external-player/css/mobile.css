@@ -266,12 +266,37 @@ ZWECK: Mobile-Anpassungen.
 }
 
 
-/* v19 BOOST POSITION FIX */
+
+}
+
+
+/* v20 mobile layout order */
 @media (max-width: 860px) {
-  .mobile-boost {
+  .hero {
+    padding: 10px 12px 12px;
+    margin: 0 12px 8px;
+  }
+
+  .hero-label-row {
+    margin-bottom: 6px;
+  }
+
+  .hero .mobile-boost {
+    margin-top: 0;
+    margin-bottom: 8px;
     position: relative;
-    z-index: 60 !important;
-    margin-top: -80px;
-    margin-bottom: 10px;
+    z-index: 55 !important;
+  }
+
+  .bottom-console {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 0 12px 12px;
+  }
+
+  .control-toolbar {
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
 }
