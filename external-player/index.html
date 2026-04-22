@@ -144,7 +144,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <input id="volumeSlider" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.75" />
         </div>
       </section>
-    </main>
+    
+<div class="v28-boost">
+  <button data-level="0">0</button>
+  <button data-level="1">1</button>
+  <button data-level="2">2</button>
+  <button data-level="3">3</button>
+</div>
+</main>
+
 
     <aside class="side-meter right" aria-label="Right meter">
       <div class="side-meter-stack">
@@ -157,5 +165,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
   <script type="module" src="./js/player-core.js"></script>
+
+<div class="v28-bottom-meter">
+  <div class="meter-left"></div>
+  <div class="meter-right"></div>
+</div>
 </body>
+
 </html>

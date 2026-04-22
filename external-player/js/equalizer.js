@@ -1,3 +1,27 @@
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v27 EQ RUNTIME FIX.
+ZWECK: Stabiler Frequency-Mapping Fix für Desktop.
+       Verhindert tote Mitte nach Startphase.
+==========================================
+*/
+
+function v27StableMapping(dataArray, bars){
+  if (!dataArray || !bars) return;
+
+  const step = Math.floor(dataArray.length / bars.length);
+
+  for (let i = 0; i < bars.length; i++) {
+    const index = i * step;
+    const value = dataArray[index] || 0;
+
+    const height = Math.max(12, value * 0.6);
+    v27StableMapping(dataArray, bars);
+  }
+}
+
 /*
 ==========================================
 DATEI: external-player/js/equalizer.js
