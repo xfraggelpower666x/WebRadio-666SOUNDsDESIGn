@@ -3,7 +3,7 @@
 DATEI: external-player/js/equalizer.js
 GEÄNDERT: 2026-04-21
 ZWECK: Equalizer- und Seitenmeter-Visualisierung.
-ÄNDERUNG: FULLPACK v16 AUDIO ANALYZER + HYBRID FALLBACK + MOBILE BOOSTER.
+ÄNDERUNG: FULLPACK v23 PC BOOST OUT + EQ CENTER FIX.
           Echter Audio-Analyzer wenn stabil verfügbar; bei iPhone-/Safari-/Stream-Schwäche
           automatisch Hybrid-Fallback mit lebendiger Bewegung. Zusätzlich mobile Boost-Stufen
           über GainNode, ohne den Desktop-Volume-Regler anzutasten.
@@ -157,16 +157,17 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
       analyser.getByteFrequencyData(data);
 
-      const halfBars = Math.max(1, Math.floor(bars.length / 2));
-      const analysisWindow = Math.max(8, Math.floor(data.length * 0.72));
-      const slice = Math.max(1, Math.floor(analysisWindow / halfBars));
+      const totalBars = Math.max(1, bars.length);
+      const analysisWindow = Math.max(16, Math.floor(data.length * 0.82));
+      const slice = Math.max(1, Math.floor(analysisWindow / totalBars));
       const shapedValues = [];
       let globalMax = 0;
 
-      for (let i = 0; i < halfBars; i += 1) {
+      for (let i = 0; i < totalBars; i += 1) {
         let total = 0;
         let count = 0;
-        const start = Math.floor(Math.pow(i / Math.max(1, halfBars - 1), 1.65) * Math.max(1, analysisWindow - slice));
+        const normalized = i / Math.max(1, totalBars - 1);
+        const start = Math.floor(Math.pow(normalized, 1.28) * Math.max(1, analysisWindow - slice));
         const end = Math.min(analysisWindow, start + slice);
 
         for (let j = start; j < end; j += 1) {
@@ -177,9 +178,11 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         const avg = count ? (total / count) : 0;
         globalMax = Math.max(globalMax, avg);
 
-        const shaped = Math.pow(avg / 255, 0.72);
-        const contour = 1.16 - ((i / Math.max(1, halfBars - 1)) * 0.36);
-        const px = 12 + (shaped * contour * (mobileLike() ? 84 : 98));
+        const shaped = Math.pow(avg / 255, 0.74);
+        const centerDistance = Math.abs((i - ((totalBars - 1) / 2)) / Math.max(1, totalBars / 2));
+        const centerLift = 1.0 - (centerDistance * 0.28);
+        const edgeTaper = 1.08 - (normalized * 0.10);
+        const px = 12 + (shaped * centerLift * edgeTaper * (mobileLike() ? 84 : 102));
         shapedValues.push(px);
       }
 
@@ -192,8 +195,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       const useHybrid = weakFrameCounter > 6;
 
       for (let i = 0; i < bars.length; i += 1) {
-        const mirroredIndex = i < halfBars ? i : (bars.length - 1 - i);
-        let px = shapedValues[Math.min(mirroredIndex, shapedValues.length - 1)] || 14;
+        let px = shapedValues[Math.min(i, shapedValues.length - 1)] || 14;
 
         if (useHybrid) {
           const hybrid = getFallbackBarValue(i, bars.length, audio && !audio.paused ? 0.72 : 0.34);

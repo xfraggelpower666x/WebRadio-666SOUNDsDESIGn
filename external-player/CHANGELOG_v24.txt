@@ -1,0 +1,1 @@
+v24: Restore equalizer.js from v19 (known-good full-width EQ). No other changes.
