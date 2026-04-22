@@ -264,3 +264,14 @@ ZWECK: Mobile-Anpassungen.
     min-height: 44px;
   }
 }
+
+
+/* v19 BOOST POSITION FIX */
+@media (max-width: 860px) {
+  .mobile-boost {
+    position: relative;
+    z-index: 60 !important;
+    margin-top: -80px;
+    margin-bottom: 10px;
+  }
+}
