@@ -359,3 +359,26 @@ ZWECK: Trennung oben/unten sauber halten.
 .bottom-console .mobile-boost {
   display: none !important;
 }
+
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v21 MOBILE FULLSCREEN + HERO LOGO.
+ZWECK: Logo sauber im Hero-/Header-Bereich integrieren; vollständiger Schriftzug
+       wird über ein eingebettetes Header-Logo dargestellt.
+==========================================
+*/
+.hero-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 10px;
+}
+.hero-brand-image {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  object-fit: contain;
+}
