@@ -434,3 +434,21 @@ ZWECK: PC wieder auf den letzten guten Layout-Stand zurückführen.
     margin-right: 18px !important;
   }
 }
+
+
+/*
+==========================================
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v23 PC BOOST OUT + EQ CENTER FIX.
+ZWECK: Desktop zeigt keinen Booster mehr. Booster bleibt ausschließlich
+       auf Mobile sichtbar. Außerdem visuelle Bereinigung für Desktop.
+==========================================
+*/
+@media (min-width: 861px) {
+  .mobile-boost,
+  .mobile-only {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
