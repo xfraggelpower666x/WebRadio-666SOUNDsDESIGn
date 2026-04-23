@@ -100,3 +100,46 @@ document.getElementById('outBtn').addEventListener('click', () => setProgress(50
 
 audio.addEventListener('playing', () => { playing = true; playBtn.textContent = 'PAUSE'; });
 audio.addEventListener('pause', () => { playing = false; playBtn.textContent = 'PLAY'; });
+
+// ==============================
+// v32 AUDIO STALL + RECOVERY
+// ==============================
+let lastAudioTime = 0;
+let stallTimer = null;
+let reconnecting = false;
+
+function startStallMonitor(){
+  if(stallTimer) clearInterval(stallTimer);
+  stallTimer = setInterval(()=>{
+    if(!audio.paused){
+      if(audio.currentTime === lastAudioTime){
+        console.warn("STALL DETECTED → reconnecting");
+        recoverStream();
+      }
+      lastAudioTime = audio.currentTime;
+    }
+  }, 3000);
+}
+
+async function recoverStream(){
+  if(reconnecting) return;
+  reconnecting = true;
+  try{
+    audio.pause();
+    audio.src = "";
+    await new Promise(r => setTimeout(r, 800));
+    audio.src = "/stream";
+    await audio.play();
+    console.log("RECONNECTED");
+  }catch(e){
+    console.warn("RECONNECT FAILED, retry...");
+    setTimeout(()=>recoverStream(), 2000);
+  }
+  reconnecting = false;
+}
+
+audio.addEventListener("stalled", recoverStream);
+audio.addEventListener("waiting", ()=>console.warn("WAITING → possible stall"));
+audio.addEventListener("error", recoverStream);
+audio.addEventListener("playing", startStallMonitor);
+// ==============================
