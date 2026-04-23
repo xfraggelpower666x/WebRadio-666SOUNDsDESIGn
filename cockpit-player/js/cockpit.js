@@ -151,21 +151,34 @@ audio.addEventListener("playing", startStallMonitor);
 
 let audioCtx, analyser, sourceNode, dataArray;
 
+
 async function initAudioSystem(){
-  let progress = 0;
-  updateBoot(progress);
+  let started = false;
+
+  const finish = () => {
+    if (started) return;
+    started = true;
+    updateBoot(100);
+    setTimeout(() => hideBoot(), 350);
+    startAnalyzer();
+  };
+
+  const failSafe = () => {
+    if (started) return;
+    console.warn("BOOT FAILSAFE TRIGGERED");
+    finish();
+  };
 
   try{
-    progress = 20;
-    updateBoot(progress);
+    updateBoot(0);
+
+    updateBoot(20);
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    progress = 40;
-    updateBoot(progress);
+    updateBoot(40);
     sourceNode = audioCtx.createMediaElementSource(audio);
 
-    progress = 60;
-    updateBoot(progress);
+    updateBoot(60);
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 64;
     dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -173,43 +186,37 @@ async function initAudioSystem(){
     sourceNode.connect(analyser);
     analyser.connect(audioCtx.destination);
 
-    progress = 80;
-    updateBoot(progress);
-    await audio.play();
+    const onPlayable = () => {
+      if (!started) {
+        updateBoot(90);
+        finish();
+      }
+    };
 
-    progress = 100;
-    updateBoot(progress);
+    audio.addEventListener("playing", onPlayable, { once: true });
+    audio.addEventListener("canplay", onPlayable, { once: true });
+    audio.addEventListener("timeupdate", onPlayable, { once: true });
 
-    setTimeout(()=>hideBoot(), 400);
+    updateBoot(80);
+    audio.play().catch((e) => {
+      console.warn("PLAY PENDING / BLOCKED", e);
+    });
 
-    startAnalyzer();
+    setTimeout(() => {
+      if (!started && !audio.paused) {
+        console.warn("BOOT TIMEOUT -> forcing finish");
+        finish();
+      }
+    }, 1800);
+
+    setTimeout(() => {
+      if (!started) failSafe();
+    }, 3800);
 
   }catch(e){
     console.error("INIT FAILED", e);
+    failSafe();
   }
-}
-
-function startAnalyzer(){
-  function loop(){
-    if(analyser){
-      analyser.getByteFrequencyData(dataArray);
-
-      const left = dataArray.slice(0, dataArray.length/2);
-      const right = dataArray.slice(dataArray.length/2);
-
-      leftBars.forEach((bar,i)=>{
-        const v = left[i] || 0;
-        bar.style.height = (v/255*100)+"%";
-      });
-
-      rightBars.forEach((bar,i)=>{
-        const v = right[i] || 0;
-        bar.style.height = (v/255*100)+"%";
-      });
-    }
-    requestAnimationFrame(loop);
-  }
-  loop();
 }
 
 // ==============================
@@ -233,8 +240,9 @@ let firstStart = true;
 playBtn.addEventListener("click", async ()=>{
   if(firstStart){
     firstStart = false;
-    document.getElementById("bootOverlay").style.display="flex";
-    await initAudioSystem();
+    const boot = document.getElementById("bootOverlay");
+    if(boot) boot.style.display="flex";
+    initAudioSystem();
   }
 });
 
@@ -242,3 +250,5 @@ playBtn.addEventListener("click", async ()=>{
 // END v33
 // ==============================
 
+
+// v33.1 BOOT FIX APPLIED
