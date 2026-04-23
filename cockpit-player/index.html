@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>666SOUNDsDESIGn Cockpit Player v31</title>
+  <link rel="stylesheet" href="./css/cockpit.css" />
+</head>
+<body>
+  <main class="cockpit-shell">
+    <header class="cockpit-header">
+      <div class="brand-line"></div>
+      <div class="brand-text">666SOUNDsDESIGn</div>
+      <div class="brand-line"></div>
+    </header>
+
+    <section class="status-row" aria-label="Systemstatus">
+      <div class="status-chip"><span class="status-dot ok"></span><span>STR</span></div>
+      <div class="status-chip"><span class="status-dot idle"></span><span>META</span></div>
+      <div class="status-chip"><span class="status-dot idle"></span><span>SRC</span></div>
+      <div class="status-chip"><span class="status-dot idle"></span><span>LIV</span></div>
+      <div class="status-chip"><span class="status-dot idle"></span><span>PLY</span></div>
+    </section>
+
+    <section class="screen-row">
+      <div class="side-bars left" id="leftBars" aria-hidden="true">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </div>
+
+      <div class="visual-core">
+        <div class="visual-frame">
+          <img id="coverImage" class="cover-image hidden" alt="Cover" />
+          <div id="fallbackVisual" class="fallback-visual">666</div>
+          <div class="visual-caption">
+            <div class="label">Now Playing</div>
+            <div id="trackText" class="track-text">Live Stream</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-bars right" id="rightBars" aria-hidden="true">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </div>
+    </section>
+
+    <section class="controls-row">
+      <button id="muteBtn" class="control-btn small" type="button" aria-label="Mute">VOL</button>
+      <button id="prevBtn" class="control-btn small" type="button" aria-label="Vorher">PRE</button>
+      <button id="playBtn" class="control-btn main" type="button" aria-label="Play Pause">PLAY</button>
+      <button id="nextBtn" class="control-btn small" type="button" aria-label="Weiter">NXT</button>
+      <button id="outBtn" class="control-btn small" type="button" aria-label="Output">OUT</button>
+    </section>
+
+    <section class="slider-row" aria-label="Level">
+      <div class="slider-track"><div id="sliderFill" class="slider-fill"></div><div id="sliderKnob" class="slider-knob"></div></div>
+    </section>
+
+    <audio id="radio" preload="auto" playsinline></audio>
+  </main>
+
+  <script src="./js/cockpit.js"></script>
+</body>
+</html>

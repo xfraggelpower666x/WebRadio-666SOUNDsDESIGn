@@ -501,22 +501,3 @@ ZWECK: Desktop-Player wieder auf letzte gute Geometrie bringen,
     padding-top: 14px !important;
   }
 }
-
-
-/*
-==========================================
-GEÄNDERT: 2026-04-21
-ÄNDERUNG: FULLPACK v29 CLEAN MOBILE BOOSTER + CENTER-OUT METERS.
-ZWECK: Saubere Mobile-Integration ohne Dopplungen. Bestehenden Booster
-       verkleinern, LED-Status ergänzen und unteres Doppel-Levelmeter
-       außerhalb des Players führen.
-==========================================
-*/
-.bottom-center-meter {
-  display: none;
-}
-@media (min-width: 861px) {
-  .bottom-center-meter {
-    display: none !important;
-  }
-}

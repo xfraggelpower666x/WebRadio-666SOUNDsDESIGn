@@ -82,18 +82,7 @@ function applyMeters(targets, valuePercent, side = 'left') {
   });
 }
 
-
-function applyBottomMeters(targets, valuePercent, side = 'left') {
-  const bounded = clamp(valuePercent, 8, 98);
-  targets.forEach((el, index) => {
-    if (!el) return;
-    const offset = index === 0 ? 0 : -12;
-    const width = Math.max(8, bounded + offset);
-    el.style.width = `${width}%`;
-  });
-}
-
-export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = [], bottomMetersLeft = [], bottomMetersRight = [] }) {
+export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = [] }) {
   let ctx = null;
   let analyser = null;
   let source = null;
@@ -118,8 +107,6 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     smoothMeter = next;
     applyMeters(leftMeters, next, 'left');
     applyMeters(rightMeters, next, 'right');
-    applyBottomMeters(bottomMetersLeft, next, 'left');
-    applyBottomMeters(bottomMetersRight, next, 'right');
   };
 
   const getFallbackBarValue = (index, total, intensity = 1) => {

@@ -34,9 +34,6 @@ const historyToggle = document.getElementById('historyToggle');
 const historyPanel = document.getElementById('historyPanel');
 const leftMeters = [document.getElementById('leftMeterA'), document.getElementById('leftMeterB')].filter(Boolean);
 const rightMeters = [document.getElementById('rightMeterA'), document.getElementById('rightMeterB')].filter(Boolean);
-const bottomMetersLeft = [document.getElementById('bottomMeterLeftA'), document.getElementById('bottomMeterLeftB')].filter(Boolean);
-const bottomMetersRight = [document.getElementById('bottomMeterRightA'), document.getElementById('bottomMeterRightB')].filter(Boolean);
-const mobileBoostWrap = document.querySelector('.mobile-boost');
 const playBtn = document.getElementById('playBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const stopBtn = document.getElementById('stopBtn');
@@ -58,7 +55,7 @@ let metadataTimer = 0;
 let historyItems = [];
 
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
-const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters, bottomMetersLeft, bottomMetersRight });
+const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
 setBoostStage(0);
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
@@ -71,10 +68,8 @@ const isMobileViewport = () => window.innerWidth <= 860;
 
 function applyBoostButtons(stage) {
   boostButtons.forEach((btn) => {
-    const active = Number(btn.dataset.boostStage) === Number(stage);
-    btn.classList.toggle('is-active', active);
+    btn.classList.toggle('is-active', Number(btn.dataset.boostStage) === Number(stage));
   });
-  mobileBoostWrap?.classList.toggle('is-boost-active', Number(stage) > 0);
 }
 
 function setBoostStage(stage) {
