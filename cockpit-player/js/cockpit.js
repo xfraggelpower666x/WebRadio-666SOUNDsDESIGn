@@ -252,3 +252,39 @@ playBtn.addEventListener("click", async ()=>{
 
 
 // v33.1 BOOT FIX APPLIED
+
+
+// v33.2 START FIX
+let initialized=false;
+async function startSystem(){
+ if(initialized)return;
+ initialized=true;
+ document.getElementById("startOverlay").style.display="none";
+ document.getElementById("bootOverlay").style.display="flex";
+ try{
+  if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)();}
+  if(audioCtx.state==="suspended"){await audioCtx.resume();}
+  if(!sourceNode){sourceNode=audioCtx.createMediaElementSource(audio);}
+  if(!analyser){
+    analyser=audioCtx.createAnalyser();
+    analyser.fftSize=64;
+    dataArray=new Uint8Array(analyser.frequencyBinCount);
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+  audio.src="/stream";
+  audio.load();
+  audio.play().catch(()=>{});
+  startAnalyzer();
+  setInterval(async ()=>{
+    try{
+      const res=await fetch("/api/nowplaying");
+      const data=await res.json();
+      document.getElementById("trackText").textContent=data.title||data.song||"Live";
+    }catch(e){}
+  },5000);
+  setTimeout(()=>{updateBoot(100);setTimeout(()=>hideBoot(),300);},600);
+ }catch(e){console.error(e);}
+}
+document.addEventListener("click",()=>{startSystem();},{once:true});
+
