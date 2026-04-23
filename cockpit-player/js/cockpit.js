@@ -25,7 +25,22 @@ const rightBars = Array.from(document.querySelectorAll('#rightBars .bar'));
 const startOverlay = document.getElementById('startOverlay');
 const bootOverlay = document.getElementById('bootOverlay');
 
-audio.src = '/stream';
+/*
+==========================================
+ZUSATZ: v33.5 ENDPOINT FIX
+ZWECK: Cockpit-Player kann auf GitHub Pages laufen und trotzdem die
+       Worker-Endpunkte nutzen. Relative /stream funktioniert auf
+       xfraggelpower666x.github.io nicht, weil dort kein Worker liegt.
+==========================================
+*/
+const WORKER_BASE = location.hostname.includes('github.io')
+  ? 'https://webradio.666soundsdesign-broadcaster.com'
+  : '';
+
+const STREAM_ENDPOINT = `${WORKER_BASE}/stream`;
+const META_ENDPOINT = `${WORKER_BASE}/api/nowplaying`;
+
+audio.src = STREAM_ENDPOINT;
 audio.volume = 1;
 
 let playing = false;
@@ -138,7 +153,7 @@ function startVisualizerLoop(){
 
 async function refreshMeta(){
   try{
-    const res = await fetch('/api/nowplaying', { cache: 'no-store' });
+    const res = await fetch(META_ENDPOINT, { cache: 'no-store' });
     if(!res.ok) throw new Error('meta failed');
     const data = await res.json();
 
@@ -186,7 +201,7 @@ async function recoverStream(){
     audio.pause();
     audio.src = '';
     await new Promise(r => setTimeout(r, 800));
-    audio.src = '/stream';
+    audio.src = STREAM_ENDPOINT;
     audio.load();
 
     if (audioCtx && audioCtx.state === 'suspended') {
@@ -237,7 +252,7 @@ async function startSystem(){
     await ensureAudioChain();
 
     updateBoot(40);
-    audio.src = '/stream';
+    audio.src = STREAM_ENDPOINT;
     audio.load();
 
     updateBoot(70);
