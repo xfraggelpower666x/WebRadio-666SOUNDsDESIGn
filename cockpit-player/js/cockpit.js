@@ -254,16 +254,17 @@ playBtn.addEventListener("click", async ()=>{
 // v33.1 BOOT FIX APPLIED
 
 
-// v33.2 START FIX
-let initialized=false;
-async function startSystem(){
- if(initialized)return;
- initialized=true;
- document.getElementById("startOverlay").style.display="none";
- document.getElementById("bootOverlay").style.display="flex";
+// v33.3 SAFE BOOT
+let bootStarted=false;
+async function safeStart(){
+ if(bootStarted)return;
+ bootStarted=true;
  try{
+  updateBoot(10);
   if(!audioCtx){audioCtx=new (window.AudioContext||window.webkitAudioContext)();}
+  updateBoot(30);
   if(audioCtx.state==="suspended"){await audioCtx.resume();}
+  updateBoot(50);
   if(!sourceNode){sourceNode=audioCtx.createMediaElementSource(audio);}
   if(!analyser){
     analyser=audioCtx.createAnalyser();
@@ -272,19 +273,18 @@ async function startSystem(){
     sourceNode.connect(analyser);
     analyser.connect(audioCtx.destination);
   }
+  updateBoot(70);
   audio.src="/stream";
   audio.load();
-  audio.play().catch(()=>{});
+  await audio.play().catch(()=>{});
+  updateBoot(90);
   startAnalyzer();
-  setInterval(async ()=>{
-    try{
-      const res=await fetch("/api/nowplaying");
-      const data=await res.json();
-      document.getElementById("trackText").textContent=data.title||data.song||"Live";
-    }catch(e){}
-  },5000);
-  setTimeout(()=>{updateBoot(100);setTimeout(()=>hideBoot(),300);},600);
- }catch(e){console.error(e);}
+  setTimeout(()=>{updateBoot(100);setTimeout(()=>hideBoot(),300);},400);
+ }catch(e){
+  console.error(e);
+  updateBoot(100);
+  setTimeout(()=>hideBoot(),300);
+ }
 }
-document.addEventListener("click",()=>{startSystem();},{once:true});
+document.addEventListener("click",()=>{safeStart();},{once:true});
 
