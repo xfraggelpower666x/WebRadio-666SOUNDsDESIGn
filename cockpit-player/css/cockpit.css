@@ -213,3 +213,11 @@ body{min-height:100dvh}
   width:0%;
   background:linear-gradient(90deg,cyan,pink);
 }
+
+/* v33.4 overlay readability */
+#startOverlay{
+  text-align:center;
+  padding:24px;
+  font-weight:700;
+  letter-spacing:.03em;
+}
