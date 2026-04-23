@@ -184,3 +184,32 @@ body{min-height:100dvh}
   }
   .visual-frame{min-height:46vh}
 }
+
+/* v33 boot overlay */
+.boot-overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.6);
+  z-index:999;
+}
+.boot-box{
+  padding:20px;
+  border:1px solid cyan;
+  border-radius:12px;
+  background:#000;
+  text-align:center;
+}
+.boot-progress{
+  width:200px;
+  height:8px;
+  background:#222;
+  margin:10px auto;
+}
+#bootBar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,cyan,pink);
+}

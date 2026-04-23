@@ -143,3 +143,102 @@ audio.addEventListener("waiting", ()=>console.warn("WAITING → possible stall")
 audio.addEventListener("error", recoverStream);
 audio.addEventListener("playing", startStallMonitor);
 // ==============================
+
+
+// ==============================
+// v33 AUDIO ANALYZER + INIT BOOT
+// ==============================
+
+let audioCtx, analyser, sourceNode, dataArray;
+
+async function initAudioSystem(){
+  let progress = 0;
+  updateBoot(progress);
+
+  try{
+    progress = 20;
+    updateBoot(progress);
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    progress = 40;
+    updateBoot(progress);
+    sourceNode = audioCtx.createMediaElementSource(audio);
+
+    progress = 60;
+    updateBoot(progress);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    progress = 80;
+    updateBoot(progress);
+    await audio.play();
+
+    progress = 100;
+    updateBoot(progress);
+
+    setTimeout(()=>hideBoot(), 400);
+
+    startAnalyzer();
+
+  }catch(e){
+    console.error("INIT FAILED", e);
+  }
+}
+
+function startAnalyzer(){
+  function loop(){
+    if(analyser){
+      analyser.getByteFrequencyData(dataArray);
+
+      const left = dataArray.slice(0, dataArray.length/2);
+      const right = dataArray.slice(dataArray.length/2);
+
+      leftBars.forEach((bar,i)=>{
+        const v = left[i] || 0;
+        bar.style.height = (v/255*100)+"%";
+      });
+
+      rightBars.forEach((bar,i)=>{
+        const v = right[i] || 0;
+        bar.style.height = (v/255*100)+"%";
+      });
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ==============================
+// BOOT UI
+// ==============================
+
+function updateBoot(p){
+  const bar = document.getElementById("bootBar");
+  const txt = document.getElementById("bootText");
+  if(bar) bar.style.width = p+"%";
+  if(txt) txt.textContent = p+"%";
+}
+
+function hideBoot(){
+  const el = document.getElementById("bootOverlay");
+  if(el) el.style.display="none";
+}
+
+// override play button first click
+let firstStart = true;
+playBtn.addEventListener("click", async ()=>{
+  if(firstStart){
+    firstStart = false;
+    document.getElementById("bootOverlay").style.display="flex";
+    await initAudioSystem();
+  }
+});
+
+// ==============================
+// END v33
+// ==============================
+
