@@ -2,11 +2,11 @@
 ==========================================
 DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-24
+GEÄNDERT: 2026-04-21
+ÄNDERUNG: FULLPACK v34.4 CONTROL UNLOCK. Play darf die Oberfläche nicht mehr blockieren; Audio-Start bekommt Timeout/Token-Schutz, Stop/Pause bleiben klickbar, Metadaten-Fetch bekommt Timeout.
 ÄNDERUNG: FULLPACK v14.2 UNKNOWN TITLE CLEANUP. Now Playing und Ticker bereinigen führende Platzhalter wie "Unknown title -" und ähnliche Rohpräfixe konsequent.
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 ÄNDERUNG: FULLPACK v11 MOBILE POSITION + DJ LABEL. Für kleine Viewports wird der DJ-Fallback kompakter als DJ666 angezeigt; Desktop behält 666SOUNDsDESIGn. Audio/Layout-Entkopplung aus v10 bleibt bestehen.
-ÄNDERUNG: FULLPACK v16 REAL ANALYZER + HYBRID FALLBACK + MOBILE BOOSTER. Mobile Boost-Stufen 0-3, echter Analyzer wenn stabil möglich, sonst sichtbarer Fallback.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
@@ -49,7 +49,6 @@ const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'))
 const boostStepButtons = Array.from(document.querySelectorAll('[data-boost-step]'));
 const boostLeds = Array.from(document.querySelectorAll('[data-boost-led]'));
 let currentBoostStage = 0;
-const MOBILE_BOOST_VOLUMES = [0.75, 0.86, 0.94, 1.0];
 const timelineProgress = document.getElementById('timelineProgress');
 const currentTimeText = document.getElementById('currentTimeText');
 const durationText = document.getElementById('durationText');
@@ -58,6 +57,10 @@ let currentSource = 'main';
 let userStopped = false;
 let metadataTimer = 0;
 let historyItems = [];
+let playRequestToken = 0;
+let switchingStream = false;
+const PLAY_START_TIMEOUT_MS = 6500;
+const METADATA_TIMEOUT_MS = 4500;
 
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
@@ -69,14 +72,6 @@ applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
 markSourceButtons(mainBtn, fallbackBtn, currentSource);
 audio.volume = Number(volumeSlider?.value || 0.75);
 const isMobileViewport = () => window.innerWidth <= 860;
-
-function applyMobileBoostVolumeFallback(stage) {
-  // iPhone: kein brauchbarer Browser-Volume-Regler. GainNode macht den echten Booster;
-  // diese sichere Volume-Basis sorgt zusätzlich dafür, dass die Stufen hörbar sind.
-  if (!audio || !isMobileViewport()) return;
-  const safeStage = Math.max(0, Math.min(3, Number(stage) || 0));
-  audio.volume = MOBILE_BOOST_VOLUMES[safeStage] ?? 0.75;
-}
 
 
 function applyBoostButtons(stage) {
@@ -96,7 +91,6 @@ function applyBoostButtons(stage) {
 function setBoostStage(stage) {
   const safeStage = Math.max(0, Math.min(3, Number(stage) || 0));
   const next = visualizer.setBoostStage ? visualizer.setBoostStage(safeStage) : safeStage;
-  applyMobileBoostVolumeFallback(next);
   applyBoostButtons(next);
   return next;
 }
@@ -235,8 +229,13 @@ function parseMetadata(payload) {
 }
 
 async function fetchMetadata() {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), METADATA_TIMEOUT_MS);
   try {
-    const response = await fetch(`${ENDPOINTS.metadata}?t=${Date.now()}`, { cache: 'no-store' });
+    const response = await fetch(`${ENDPOINTS.metadata}?t=${Date.now()}`, {
+      cache: 'no-store',
+      signal: controller.signal
+    });
     if (!response.ok) throw new Error('metadata_http_error');
     const raw = await response.json();
     const data = parseMetadata(raw);
@@ -250,9 +249,11 @@ async function fetchMetadata() {
   } catch (err) {
     setText(metaLine, 'Metadaten gerade nicht erreichbar');
     applyStatusChip(statusMeta, 'error', 'Metadaten aktuell nicht erreichbar');
+  } finally {
+    window.clearTimeout(timer);
+    keepControlsUnlocked();
   }
 }
-
 function startMetadataLoop() {
   window.clearInterval(metadataTimer);
   fetchMetadata();
@@ -260,48 +261,95 @@ function startMetadataLoop() {
 }
 
 function stopPlayback(status = 'STOPPED') {
+  playRequestToken += 1;
+  userStopped = true;
   audio.pause();
   audio.removeAttribute('src');
   audio.src = '';
-  audio.load();
+  try { audio.load(); } catch (err) {}
+  visualizer.stop?.();
   setStatus(status);
   updateTimeline();
+  keepControlsUnlocked();
 }
 
-async function playCurrent() {
-  userStopped = false;
-  setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
-  audio.src = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
-  try {
-    lockVisualStage();
-    visualizer.stop?.();
-    await audio.play();
-    await visualizer.start();
-    setBoostStage(currentBoostStage);
-    setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
-    startMetadataLoop();
-  } catch (err) {
-    if (currentSource === 'main') {
-      setSource('fallback');
-      try {
-        lockVisualStage();
-        visualizer.stop?.();
-        await audio.play();
-        await visualizer.start();
-        setBoostStage(currentBoostStage);
-        setStatus('AUTO SWITCH → BACKUP');
-        startMetadataLoop();
-      } catch (err2) {
-        applyStatusChip(statusStream, 'error', 'Audio- oder Streamfehler');
-        setStatus('AUDIO ERROR');
-      }
-    } else {
-      applyStatusChip(statusStream, 'error', 'Audio- oder Streamfehler');
-      setStatus('AUDIO ERROR');
-    }
+
+function withTimeout(promise, timeoutMs, label = 'timeout') {
+  let timer = 0;
+  const timeout = new Promise((_, reject) => {
+    timer = window.setTimeout(() => reject(new Error(label)), timeoutMs);
+  });
+  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timer));
+}
+
+async function playAudioWithTimeout(token) {
+  const playPromise = audio.play();
+  await withTimeout(playPromise, PLAY_START_TIMEOUT_MS, 'audio_play_timeout');
+  if (token !== playRequestToken || userStopped) {
+    audio.pause();
+    throw new Error('stale_play_request');
   }
 }
 
+function keepControlsUnlocked() {
+  [playBtn, pauseBtn, stopBtn, reconnectBtn, mainBtn, fallbackBtn, historyToggle, volumeSlider, ...boostStepButtons, ...boostButtons].filter(Boolean).forEach((el) => {
+    el.disabled = false;
+    el.removeAttribute('aria-disabled');
+    el.style.pointerEvents = 'auto';
+  });
+}
+
+async function playCurrent() {
+  keepControlsUnlocked();
+  userStopped = false;
+  const token = ++playRequestToken;
+  const target = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
+
+  setStatus(currentSource === 'main' ? 'STARTING MAIN' : 'STARTING BACKUP');
+  audio.src = target;
+  audio.load();
+
+  try {
+    lockVisualStage();
+    await playAudioWithTimeout(token);
+    if (token !== playRequestToken || userStopped) return;
+    await visualizer.start?.();
+    setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+    startMetadataLoop();
+  } catch (err) {
+    keepControlsUnlocked();
+    if (token !== playRequestToken || userStopped) return;
+
+    if (currentSource === 'main' && !switchingStream) {
+      switchingStream = true;
+      setSource('fallback');
+      setStatus('MAIN TIMEOUT → BACKUP');
+      try {
+        const retryToken = ++playRequestToken;
+        audio.src = ENDPOINTS.fallback;
+        audio.load();
+        await playAudioWithTimeout(retryToken);
+        if (retryToken !== playRequestToken || userStopped) return;
+        await visualizer.start?.();
+        setStatus('PLAYING BACKUP');
+        startMetadataLoop();
+      } catch (err2) {
+        keepControlsUnlocked();
+        applyStatusChip(statusStream, 'error', 'Audio-Start hängt oder Stream nicht erreichbar');
+        setStatus('AUDIO TIMEOUT');
+        visualizer.stop?.();
+      } finally {
+        switchingStream = false;
+      }
+    } else {
+      applyStatusChip(statusStream, 'error', 'Audio-Start hängt oder Stream nicht erreichbar');
+      setStatus('AUDIO TIMEOUT');
+      visualizer.stop?.();
+    }
+  } finally {
+    keepControlsUnlocked();
+  }
+}
 async function healthPing() {
   try {
     const response = await fetch(`${ENDPOINTS.health}?t=${Date.now()}`, { cache: 'no-store' });
@@ -314,10 +362,12 @@ async function healthPing() {
 
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
+  playRequestToken += 1;
   audio.pause();
   lockVisualStage();
   visualizer.stop?.();
   setStatus('PAUSED');
+  keepControlsUnlocked();
 });
 stopBtn?.addEventListener('click', () => {
   userStopped = true;
@@ -327,6 +377,7 @@ stopBtn?.addEventListener('click', () => {
 });
 reconnectBtn?.addEventListener('click', async () => {
   stopPlayback('RECONNECT');
+  userStopped = false;
   await playCurrent();
 });
 mainBtn?.addEventListener('click', async () => {
@@ -340,7 +391,6 @@ fallbackBtn?.addEventListener('click', async () => {
 
 boostStepButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
-    if (!isMobileViewport()) return;
     changeBoostStage(Number(btn.dataset.boostStep || 0));
   });
 });
@@ -383,3 +433,9 @@ audio?.addEventListener('ended', () => {
   visualizer.stop?.();
   setStatus('STOPPED');
 });
+
+
+// v34.4 CONTROL UNLOCK WATCHDOG: egal ob Stream/API hängt, die UI bleibt bedienbar.
+window.setInterval(keepControlsUnlocked, 1500);
+window.addEventListener('pageshow', keepControlsUnlocked);
+window.addEventListener('focus', keepControlsUnlocked);
