@@ -2,10 +2,11 @@
 ==========================================
 DATEI: external-player/js/player-core.js
 ERSTELLT: 2026-04-20
-GEÄNDERT: 2026-04-21
+GEÄNDERT: 2026-04-24
 ÄNDERUNG: FULLPACK v14.2 UNKNOWN TITLE CLEANUP. Now Playing und Ticker bereinigen führende Platzhalter wie "Unknown title -" und ähnliche Rohpräfixe konsequent.
 ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 ÄNDERUNG: FULLPACK v11 MOBILE POSITION + DJ LABEL. Für kleine Viewports wird der DJ-Fallback kompakter als DJ666 angezeigt; Desktop behält 666SOUNDsDESIGn. Audio/Layout-Entkopplung aus v10 bleibt bestehen.
+ÄNDERUNG: FULLPACK v16 REAL ANALYZER + HYBRID FALLBACK + MOBILE BOOSTER. Mobile Boost-Stufen 0-3, echter Analyzer wenn stabil möglich, sonst sichtbarer Fallback.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
@@ -48,6 +49,7 @@ const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'))
 const boostStepButtons = Array.from(document.querySelectorAll('[data-boost-step]'));
 const boostLeds = Array.from(document.querySelectorAll('[data-boost-led]'));
 let currentBoostStage = 0;
+const MOBILE_BOOST_VOLUMES = [0.75, 0.86, 0.94, 1.0];
 const timelineProgress = document.getElementById('timelineProgress');
 const currentTimeText = document.getElementById('currentTimeText');
 const durationText = document.getElementById('durationText');
@@ -68,6 +70,14 @@ markSourceButtons(mainBtn, fallbackBtn, currentSource);
 audio.volume = Number(volumeSlider?.value || 0.75);
 const isMobileViewport = () => window.innerWidth <= 860;
 
+function applyMobileBoostVolumeFallback(stage) {
+  // iPhone: kein brauchbarer Browser-Volume-Regler. GainNode macht den echten Booster;
+  // diese sichere Volume-Basis sorgt zusätzlich dafür, dass die Stufen hörbar sind.
+  if (!audio || !isMobileViewport()) return;
+  const safeStage = Math.max(0, Math.min(3, Number(stage) || 0));
+  audio.volume = MOBILE_BOOST_VOLUMES[safeStage] ?? 0.75;
+}
+
 
 function applyBoostButtons(stage) {
   currentBoostStage = Math.max(0, Math.min(3, Number(stage) || 0));
@@ -86,6 +96,7 @@ function applyBoostButtons(stage) {
 function setBoostStage(stage) {
   const safeStage = Math.max(0, Math.min(3, Number(stage) || 0));
   const next = visualizer.setBoostStage ? visualizer.setBoostStage(safeStage) : safeStage;
+  applyMobileBoostVolumeFallback(next);
   applyBoostButtons(next);
   return next;
 }
@@ -264,8 +275,9 @@ async function playCurrent() {
   try {
     lockVisualStage();
     visualizer.stop?.();
-    await visualizer.start();
     await audio.play();
+    await visualizer.start();
+    setBoostStage(currentBoostStage);
     setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
     startMetadataLoop();
   } catch (err) {
@@ -274,8 +286,9 @@ async function playCurrent() {
       try {
         lockVisualStage();
         visualizer.stop?.();
-        await visualizer.start();
         await audio.play();
+        await visualizer.start();
+        setBoostStage(currentBoostStage);
         setStatus('AUTO SWITCH → BACKUP');
         startMetadataLoop();
       } catch (err2) {
@@ -327,6 +340,7 @@ fallbackBtn?.addEventListener('click', async () => {
 
 boostStepButtons.forEach((btn) => {
   btn.addEventListener('click', () => {
+    if (!isMobileViewport()) return;
     changeBoostStage(Number(btn.dataset.boostStep || 0));
   });
 });

@@ -1,0 +1,8 @@
+666SOUNDsDESIGn — FULLPACK v16 ANALYZER BOOST
+Datum: 2026-04-24
+Basis: aktuelle hochgeladene 13-MB-Repo
+Änderungen:
+1) external-player/js/equalizer.js: echter Audio Analyzer mit Hybrid-Fallback und spiegelnder EQ-Verteilung.
+2) Mobile Booster 0-3: GainNode-Verstärkung, zusätzlich sichere Mobile-Volume-Stufen als Fallback.
+3) CSS-Fix: mobile-only bleibt wirklich nur Mobile; Desktop-Volume bleibt unangetastet.
+Nicht geändert: Worker-Endpunkte, Stream-URLs, API, Routing, interner Player.
