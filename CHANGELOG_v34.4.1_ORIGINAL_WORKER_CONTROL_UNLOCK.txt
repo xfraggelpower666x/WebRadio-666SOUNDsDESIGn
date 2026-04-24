@@ -1,0 +1,10 @@
+666SOUNDsDESIGn FULLPACK v34.4.1 ORIGINAL WORKER CONTROL UNLOCK
+Purpose: Correct v34.4 packaging mistake. This package is based on the real uploaded repo root.
+Worker: worker.js preserved byte-for-byte from uploaded base repo.
+worker.js sha256: ca7e39c65b661d0ce3c3a65d05091cf937487dbd317b119410b1daad748062fc
+wrangler.jsonc sha256: 4b340fd497fbf0f9c1b88b6942da1e3a9b0a7a6b2318459032d3e1ace1d9ce60
+Changed files only:
+- external-player/js/player-core.js
+- external-player/css/base.css
+- external-player/CHANGELOG_v34.4_CONTROL_UNLOCK.txt
+Not changed: worker.js, wrangler.jsonc, stream endpoints, API endpoints, routing, internal player.
