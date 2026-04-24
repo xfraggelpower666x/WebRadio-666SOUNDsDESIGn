@@ -143,9 +143,20 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   const setBoostStage = (stage = 0) => {
     const nextStage = clamp(Number(stage) || 0, 0, BOOST_MULTIPLIERS.length - 1);
     boostStage = nextStage;
+
     if (gainNode) {
-      gainNode.gain.value = BOOST_MULTIPLIERS[boostStage];
+      const targetGain = BOOST_MULTIPLIERS[boostStage];
+      const now = ctx?.currentTime || 0;
+
+      try {
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+        gainNode.gain.linearRampToValueAtTime(targetGain, now + 0.16);
+      } catch (err) {
+        gainNode.gain.value = targetGain;
+      }
     }
+
     return boostStage;
   };
 
