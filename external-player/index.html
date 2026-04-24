@@ -57,13 +57,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <span id="streamState" class="hero-badge dim">READY</span>
         </div>
 <div class="mobile-boost mobile-only" aria-label="Mobile Booster">
-  <div class="mobile-boost-label">BOOST</div>
-  <div class="mobile-boost-grid" role="group" aria-label="Booster-Stufen">
-    <button class="boost-chip is-active" type="button" data-boost-stage="0" title="Boost 0">0</button>
-    <button class="boost-chip" type="button" data-boost-stage="1" title="Boost 1">1</button>
-    <button class="boost-chip" type="button" data-boost-stage="2" title="Boost 2">2</button>
-    <button class="boost-chip" type="button" data-boost-stage="3" title="Boost 3">3</button>
+  <button class="boost-step boost-step-down" type="button" data-boost-step="-1" title="Boost Stufe senken">−</button>
+  <div class="mobile-boost-core" role="group" aria-label="Booster-Stufen">
+    <span class="mobile-boost-label">BST</span>
+    <span class="boost-led" data-boost-led="0" title="Boost 0"></span>
+    <span class="boost-led" data-boost-led="1" title="Boost 1"></span>
+    <span class="boost-led" data-boost-led="2" title="Boost 2"></span>
+    <span class="boost-led" data-boost-led="3" title="Boost 3"></span>
   </div>
+  <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen">+</button>
 </div>
         
         <div class="hero-brand" aria-label="666SOUNDsDESIGn BroadCaster v6.66">

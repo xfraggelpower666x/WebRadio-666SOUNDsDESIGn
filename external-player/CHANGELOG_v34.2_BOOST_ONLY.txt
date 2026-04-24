@@ -1,0 +1,22 @@
+FULLPACK v34.2 BOOST ONLY
+
+Geändert:
+- external-player/index.html
+  Mobile-Booster von [0][1][2][3] auf [-] BST LEDs [+] umgestellt.
+
+- external-player/js/player-core.js
+  Boost-UI-Logik erweitert:
+  + Button erhöht Stufe maximal bis 3.
+  - Button senkt Stufe minimal bis 0.
+  Bestehende visualizer.setBoostStage()-Logik bleibt erhalten.
+
+- external-player/css/mobile.css
+  Kleine runde Booster-Tasten und LED-Anzeige ergänzt.
+  Alte großen Boost-Chips werden auf Mobile ausgeblendet.
+
+Nicht geändert:
+- Kein Worker.
+- Kein Audio-Core.
+- Keine Stream-Endpunkte.
+- Keine Equalizer-Engine.
+- Kein Desktop-Layout.

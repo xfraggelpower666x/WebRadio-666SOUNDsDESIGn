@@ -45,6 +45,9 @@ const statusMeta = document.getElementById('statusMeta');
 const statusSource = document.getElementById('statusSource');
 const volumeSlider = document.getElementById('volumeSlider');
 const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'));
+const boostStepButtons = Array.from(document.querySelectorAll('[data-boost-step]'));
+const boostLeds = Array.from(document.querySelectorAll('[data-boost-led]'));
+let currentBoostStage = 0;
 const timelineProgress = document.getElementById('timelineProgress');
 const currentTimeText = document.getElementById('currentTimeText');
 const durationText = document.getElementById('durationText');
@@ -67,15 +70,28 @@ const isMobileViewport = () => window.innerWidth <= 860;
 
 
 function applyBoostButtons(stage) {
+  currentBoostStage = Math.max(0, Math.min(3, Number(stage) || 0));
+
   boostButtons.forEach((btn) => {
-    btn.classList.toggle('is-active', Number(btn.dataset.boostStage) === Number(stage));
+    btn.classList.toggle('is-active', Number(btn.dataset.boostStage) === currentBoostStage);
+  });
+
+  boostLeds.forEach((led) => {
+    const ledStage = Number(led.dataset.boostLed);
+    led.classList.toggle('is-active', ledStage <= currentBoostStage);
+    led.classList.toggle('is-current', ledStage === currentBoostStage);
   });
 }
 
 function setBoostStage(stage) {
-  const next = visualizer.setBoostStage ? visualizer.setBoostStage(stage) : Number(stage) || 0;
+  const safeStage = Math.max(0, Math.min(3, Number(stage) || 0));
+  const next = visualizer.setBoostStage ? visualizer.setBoostStage(safeStage) : safeStage;
   applyBoostButtons(next);
   return next;
+}
+
+function changeBoostStage(delta) {
+  return setBoostStage(currentBoostStage + Number(delta || 0));
 }
 
 function setStatus(text) {
@@ -308,6 +324,13 @@ fallbackBtn?.addEventListener('click', async () => {
   setSource('fallback');
   if (!userStopped) await playCurrent();
 });
+
+boostStepButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    changeBoostStage(Number(btn.dataset.boostStep || 0));
+  });
+});
+
 volumeSlider?.addEventListener('input', () => {
   audio.volume = Number(volumeSlider.value);
 });
