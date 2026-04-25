@@ -1,0 +1,27 @@
+666SOUNDsDESIGn FULLPACK v34.6 MOBILE HEADER + SYSTEM PANELS
+
+Datum: 2026-04-24
+
+Zweck:
+- iPhone/Ganzseitenplayer sauberer ordnen
+- Logo oben in den Header/Kopfbereich
+- System-Panels direkt unter das Logo
+- STR/META/SRC oben sichtbar halten
+- Booster-Status oben in die Systemzone
+- Unten nur Play/Pause/Stop/Reconnect anzeigen
+- Main/Backup-Buttons auf Mobile unten ausblenden, damit dort kein Streamstatus mehr sitzt
+
+Geänderte Dateien:
+- external-player/index.html
+- external-player/css/mobile.css
+- external-player/CHANGELOG_v34.6_MOBILE_HEADER_SYSTEMPANELS.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Endpunkte
+- API-Endpunkte
+- Routing
+- interner Player
+- CORS
+- Desktop-Layout
