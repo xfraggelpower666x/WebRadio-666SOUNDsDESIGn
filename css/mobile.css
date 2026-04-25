@@ -741,3 +741,129 @@ body[data-boost-graph="GRAPH_FAIL"] .mobile-boost-core {
   border-color: rgba(255,51,85,0.48) !important;
   box-shadow: 0 0 16px rgba(255,51,85,0.22), inset 0 0 16px rgba(0,0,0,0.28) !important;
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-25
+ÄNDERUNG: MOBILE_TOUCH_CONTROLS_REPAIR_v1
+ZWECK: iPhone-Bedienelemente wieder sichtbar/klickbar machen.
+==========================================
+*/
+@media (max-width: 760px) {
+  html,
+  body {
+    min-height: 100%;
+    overflow-x: hidden;
+    touch-action: manipulation;
+  }
+
+  .bg,
+  .background,
+  .site-bg,
+  .hero-bg,
+  .frame-bg,
+  .hud-bg,
+  .decor,
+  .fx,
+  .glow,
+  .scanline,
+  .scanlines,
+  .noise,
+  .laser,
+  .hud-lines,
+  .side-meter,
+  .side-meters,
+  .edge-meter,
+  .edge-meters,
+  .meter-side,
+  .mobile-bg,
+  .mobile-shell::before,
+  .mobile-shell::after,
+  .player-shell::before,
+  .player-shell::after,
+  .panel::before,
+  .panel::after,
+  .hud-panel::before,
+  .hud-panel::after {
+    pointer-events: none !important;
+  }
+
+  main,
+  .app,
+  .mobile-shell,
+  .player-shell,
+  .player,
+  .hud,
+  .hud-panel,
+  .controls,
+  .transport,
+  .transport-controls,
+  .player-controls,
+  .mobile-controls,
+  .control-row,
+  .boost-panel,
+  .mobile-boost-core,
+  button,
+  [role="button"],
+  input,
+  audio {
+    pointer-events: auto !important;
+  }
+
+  .controls,
+  .transport,
+  .transport-controls,
+  .player-controls,
+  .mobile-controls,
+  .control-row {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 54px !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: relative !important;
+    z-index: 50 !important;
+    transform: none !important;
+  }
+
+  button,
+  .control-btn,
+  .transport-btn,
+  .player-btn,
+  .icon-btn,
+  .boost-btn,
+  .round-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    position: relative !important;
+    z-index: 60 !important;
+    -webkit-tap-highlight-color: rgba(255, 0, 200, 0.22);
+    touch-action: manipulation;
+  }
+
+  .hide-mobile-controls,
+  .desktop-only-controls {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .player-shell,
+  .hud-panel,
+  .panel,
+  .mobile-shell {
+    overflow: visible !important;
+  }
+
+  body {
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  }
+}

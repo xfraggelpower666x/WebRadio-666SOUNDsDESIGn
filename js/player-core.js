@@ -70,6 +70,83 @@ const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
 audio?.addEventListener('boost-diagnostic', (event) => updateBoostDiagnosticLabel(event.detail || {}));
 setBoostStage(0);
+
+/*
+==========================================
+GEÄNDERT: 2026-04-25
+ÄNDERUNG: MOBILE_TOUCH_CONTROLS_REPAIR_v1
+ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
+==========================================
+*/
+function installMobileTouchControlsRepair() {
+  const root = document;
+
+  const nearestActionTarget = (target) => target?.closest?.('button, [role="button"], .control-btn, .transport-btn, .player-btn, .boost-btn, .round-btn');
+
+  const detectAction = (el) => {
+    const text = (el?.textContent || '').trim().toLowerCase();
+    const id = (el?.id || '').toLowerCase();
+    const cls = (el?.className || '').toString().toLowerCase();
+    const data = (el?.dataset?.action || el?.dataset?.control || el?.dataset?.cmd || '').toLowerCase();
+    const label = (el?.getAttribute?.('aria-label') || el?.getAttribute?.('title') || '').toLowerCase();
+    const hay = `${id} ${cls} ${data} ${label} ${text}`;
+
+    if (hay.includes('play') || hay.includes('▶')) return 'play';
+    if (hay.includes('pause') || hay.includes('⏸')) return 'pause';
+    if (hay.includes('stop') || hay.includes('■') || hay.includes('square')) return 'stop';
+    if (hay === '+' || hay.includes('plus') || hay.includes('boost-up')) return 'boost-up';
+    if (hay === '-' || hay.includes('minus') || hay.includes('boost-down')) return 'boost-down';
+    if (hay.includes('boost') || hay.includes('bst')) return 'boost-up';
+    return '';
+  };
+
+  const runAction = async (action) => {
+    if (action === 'play' && typeof startPlayback === 'function') {
+      await startPlayback();
+      return true;
+    }
+    if (action === 'pause' && audio) {
+      audio.pause();
+      if (typeof setState === 'function') setState('paused');
+      return true;
+    }
+    if (action === 'stop' && audio) {
+      audio.pause();
+      try { audio.currentTime = 0; } catch (err) {}
+      if (typeof setState === 'function') setState('stopped');
+      return true;
+    }
+    if (action === 'boost-up' && typeof setBoostStage === 'function') {
+      const nextStage = Math.min(3, (Number(currentBoostStage) || 0) + 1);
+      currentBoostStage = setBoostStage(nextStage);
+      return true;
+    }
+    if (action === 'boost-down' && typeof setBoostStage === 'function') {
+      const nextStage = Math.max(0, (Number(currentBoostStage) || 0) - 1);
+      currentBoostStage = setBoostStage(nextStage);
+      return true;
+    }
+    return false;
+  };
+
+  const handler = async (event) => {
+    const el = nearestActionTarget(event.target);
+    if (!el) return;
+    const action = detectAction(el);
+    if (!action) return;
+    const handled = await runAction(action);
+    if (handled) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
+
+  root.addEventListener('touchend', handler, { passive: false, capture: true });
+  root.addEventListener('click', handler, { passive: false, capture: true });
+  document.body?.setAttribute('data-mobile-touch-repair', 'v1');
+}
+
+installMobileTouchControlsRepair();
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
