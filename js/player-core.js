@@ -1,3 +1,4 @@
+/* BOOST_DIAGNOSTIC_PATCH_v1: BST zeigt Boost-Stufe und Graphzustand. */
 /*
 ==========================================
 DATEI: external-player/js/player-core.js
@@ -67,6 +68,7 @@ const isMobileViewport = () => window.innerWidth <= 860;
 
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters });
+audio?.addEventListener('boost-diagnostic', (event) => updateBoostDiagnosticLabel(event.detail || {}));
 setBoostStage(0);
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
@@ -96,6 +98,23 @@ function applyMobileBoostFallback(stage) {
   return safeStage;
 }
 
+function updateBoostDiagnosticLabel(detail = {}) {
+  const stage = Number(detail.stage ?? audio?.dataset?.boostStage ?? currentBoostStage ?? 0);
+  const gain = detail.gain ?? audio?.dataset?.boostGain ?? '1';
+  const graph = detail.graph ?? audio?.dataset?.boostGraph ?? 'GRAPH_WAIT';
+  const context = detail.context ?? audio?.dataset?.boostContext ?? 'NO_CONTEXT';
+
+  document.body?.setAttribute('data-boost-graph', String(graph));
+  document.body?.setAttribute('data-boost-stage', String(stage));
+
+  if (streamState) {
+    const shortGraph = String(graph).replace('GRAPH_', '');
+    streamState.textContent = `BST ${stage} ${shortGraph}`;
+    streamState.title = `Boost Diagnose: Stage ${stage}, Gain ${gain}, Graph ${graph}, AudioContext ${context}`;
+    streamState.dataset.tooltip = `Boost Diagnose: Stage ${stage}, Gain ${gain}, Graph ${graph}, AudioContext ${context}`;
+  }
+}
+
 
 
 function applyBoostButtons(stage) {
@@ -117,6 +136,12 @@ function setBoostStage(stage) {
   const next = visualizer.setBoostStage ? visualizer.setBoostStage(safeStage) : safeStage;
   applyMobileBoostFallback(next);
   applyBoostButtons(next);
+  updateBoostDiagnosticLabel({
+    stage: next,
+    gain: audio?.dataset?.boostGain || '1',
+    graph: audio?.dataset?.boostGraph || 'GRAPH_WAIT',
+    context: audio?.dataset?.boostContext || 'NO_CONTEXT'
+  });
   return next;
 }
 

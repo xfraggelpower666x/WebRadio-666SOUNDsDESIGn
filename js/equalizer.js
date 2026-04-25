@@ -1,3 +1,4 @@
+/* BOOST_DIAGNOSTIC_PATCH_v1: Boost-Diagnosewerte + boost-diagnostic Event. */
 
 /*
 ==========================================
@@ -147,6 +148,8 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     boostStage = nextStage;
 
     const targetGain = BOOST_MULTIPLIERS[boostStage];
+    let graphState = gainNode ? 'GRAPH_OK' : 'GRAPH_WAIT';
+    let appliedGain = targetGain;
 
     if (gainNode) {
       const now = ctx?.currentTime || 0;
@@ -156,13 +159,38 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         gainNode.gain.setValueAtTime(gainNode.gain.value, now);
         gainNode.gain.linearRampToValueAtTime(targetGain, now + 0.08);
       } catch (err) {
-        try { gainNode.gain.value = targetGain; } catch (err2) {}
+        try {
+          gainNode.gain.value = targetGain;
+        } catch (err2) {
+          graphState = 'GRAPH_FAIL';
+        }
+      }
+
+      try {
+        appliedGain = Number(gainNode.gain.value || targetGain);
+      } catch (err) {
+        appliedGain = targetGain;
       }
     }
 
     if (audio) {
       audio.dataset.boostStage = String(boostStage);
       audio.dataset.boostGain = String(targetGain);
+      audio.dataset.boostAppliedGain = String(appliedGain);
+      audio.dataset.boostGraph = graphState;
+      audio.dataset.boostContext = ctx?.state || 'NO_CONTEXT';
+
+      try {
+        audio.dispatchEvent(new CustomEvent('boost-diagnostic', {
+          detail: {
+            stage: boostStage,
+            gain: targetGain,
+            appliedGain,
+            graph: graphState,
+            context: ctx?.state || 'NO_CONTEXT'
+          }
+        }));
+      } catch (err) {}
     }
 
     return boostStage;

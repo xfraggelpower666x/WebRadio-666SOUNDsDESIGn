@@ -722,3 +722,22 @@ ZWECK: Booster-Zustand optisch klarer anzeigen.
     box-shadow: 0 0 18px rgba(255,62,181,0.18), 0 0 22px rgba(0,245,223,0.12) !important;
   }
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-25
+ÄNDERUNG: BOOST_DIAGNOSTIC_PATCH_v1.
+ZWECK: Boost-Diagnose sichtbar machen, ohne Layout/Player-Struktur zu verändern.
+==========================================
+*/
+body[data-boost-graph="GRAPH_OK"] #statusSource,
+body[data-boost-graph="GRAPH_OK"] .mobile-boost-core {
+  border-color: rgba(0,255,153,0.38) !important;
+  box-shadow: 0 0 14px rgba(0,255,153,0.16), inset 0 0 16px rgba(0,0,0,0.28) !important;
+}
+
+body[data-boost-graph="GRAPH_FAIL"] #statusSource,
+body[data-boost-graph="GRAPH_FAIL"] .mobile-boost-core {
+  border-color: rgba(255,51,85,0.48) !important;
+  box-shadow: 0 0 16px rgba(255,51,85,0.22), inset 0 0 16px rgba(0,0,0,0.28) !important;
+}
