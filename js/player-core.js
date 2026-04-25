@@ -147,6 +147,81 @@ function installMobileTouchControlsRepair() {
 }
 
 installMobileTouchControlsRepair();
+
+/*
+==========================================
+GEÄNDERT: 2026-04-25
+ÄNDERUNG: MOBILE_LEVELMETER_GESTURE_GUARD_PATCH_v1
+ZWECK:
+- Mobile-Gesten-Schutzstatus setzen.
+- Unterer Center-Out-Levelmeter bleibt unter Player und nicht im iPhone-Gestenbereich.
+==========================================
+*/
+function installMobileLevelmeterGestureGuard() {
+  const apply = () => {
+    const isMobile = window.matchMedia?.('(max-width: 760px)').matches || window.innerWidth <= 760;
+    document.body?.setAttribute('data-gesture-guard', isMobile ? 'mobile' : 'desktop');
+    document.documentElement.style.setProperty('--gesture-guard-height', isMobile ? '76px' : '34px');
+  };
+  apply();
+  window.addEventListener('resize', apply, { passive: true });
+  window.addEventListener('orientationchange', apply, { passive: true });
+}
+
+installMobileLevelmeterGestureGuard();
+
+/* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
+function installMobileHudDomMeterRepair() {
+  if (document.getElementById('mobileHudDomMeterRepair')) return;
+
+  const shell = document.createElement('div');
+  shell.id = 'mobileHudDomMeterRepair';
+  shell.className = 'mobile-hud-dom-meter-repair';
+  shell.setAttribute('aria-hidden', 'true');
+  shell.innerHTML = '<div class="mobile-dom-side-meter mobile-dom-side-meter-left"><i></i></div><div class="mobile-dom-side-meter mobile-dom-side-meter-right"><i></i></div><div class="mobile-dom-bottom-guard"><div class="mobile-dom-bottom-track"><i class="mobile-dom-bottom-left"></i><i class="mobile-dom-bottom-right"></i></div></div>';
+  document.body.appendChild(shell);
+
+  const controls = document.createElement('div');
+  controls.id = 'mobileTransportRepair';
+  controls.className = 'mobile-transport-repair';
+  controls.innerHTML = '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="play" aria-label="Play">▶</button><button type="button" class="mobile-repair-btn" data-mobile-repair-action="pause" aria-label="Pause">Ⅱ</button><button type="button" class="mobile-repair-btn" data-mobile-repair-action="stop" aria-label="Stop">■</button><button type="button" class="mobile-repair-btn" data-mobile-repair-action="boost-down" aria-label="Boost weniger">−</button><button type="button" class="mobile-repair-btn mobile-repair-boost" data-mobile-repair-action="boost-up" aria-label="Boost mehr">BST +</button>';
+
+  const anchor = document.querySelector('.boost-panel, .mobile-boost-core, .mobile-shell, main');
+  if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(controls, anchor.nextSibling);
+  else document.body.appendChild(controls);
+
+  const setMobileHudState = () => {
+    const mobile = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+    document.body.setAttribute('data-mobile-dom-meter-repair', mobile ? 'on' : 'off');
+    document.documentElement.style.setProperty('--mobile-dom-guard-height', mobile ? '78px' : '0px');
+  };
+
+  const run = async (action) => {
+    try {
+      if (action === 'play' && typeof startPlayback === 'function') return await startPlayback();
+      if (action === 'pause' && audio) { audio.pause(); if (typeof setState === 'function') setState('paused'); return; }
+      if (action === 'stop' && audio) { audio.pause(); try { audio.currentTime = 0; } catch(e) {} if (typeof setState === 'function') setState('stopped'); return; }
+      if (action === 'boost-up' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.min(3, (Number(currentBoostStage)||0)+1)); return; }
+      if (action === 'boost-down' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.max(0, (Number(currentBoostStage)||0)-1)); return; }
+    } catch (err) { console.warn('[MOBILE_HUD_DOM_METER_REPAIR_v1]', action, err); }
+  };
+
+  const handler = (event) => {
+    const btn = event.target.closest && event.target.closest('[data-mobile-repair-action]');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    run(btn.dataset.mobileRepairAction);
+  };
+  controls.addEventListener('click', handler, {capture:true});
+  controls.addEventListener('touchend', handler, {passive:false, capture:true});
+
+  setMobileHudState();
+  window.addEventListener('resize', setMobileHudState, {passive:true});
+  window.addEventListener('orientationchange', setMobileHudState, {passive:true});
+}
+
+installMobileHudDomMeterRepair();
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');

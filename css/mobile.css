@@ -867,3 +867,156 @@ ZWECK: iPhone-Bedienelemente wieder sichtbar/klickbar machen.
     padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
   }
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-25
+ÄNDERUNG: MOBILE_LEVELMETER_GESTURE_GUARD_PATCH_v1
+ZWECK:
+- Links/rechts neben dem Player je ein vertikaler Levelmeter.
+- Unter dem Player ein doppelter Center-Out-Levelmeter.
+- iPhone-Gestenbereich unten schützen.
+- Meter werden über zentrale CSS-Variablen gespeist:
+  --audio-level, --audio-peak, --meter-left, --meter-right,
+  --meter-bottom-left, --meter-bottom-right.
+==========================================
+*/
+:root {
+  --audio-level: 0;
+  --audio-peak: 0;
+  --meter-left: 0;
+  --meter-right: 0;
+  --meter-bottom-left: 0;
+  --meter-bottom-right: 0;
+  --gesture-guard-height: 34px;
+}
+
+.mobile-levelmeter-guard,
+.mobile-levelmeter-side-left,
+.mobile-levelmeter-side-right,
+.mobile-levelmeter-bottom {
+  pointer-events: none !important;
+}
+
+@media (max-width: 760px) {
+  body[data-gesture-guard="mobile"] {
+    padding-bottom: calc(var(--gesture-guard-height, 76px) + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Links/rechts neben dem sichtbaren Player: echte HUD-Meter ohne Touch-Blockade. */
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    top: 33vh;
+    width: 11px;
+    height: 38vh;
+    z-index: 18;
+    pointer-events: none !important;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 255, 255, 0.34);
+    background:
+      linear-gradient(to top,
+        rgba(0,255,255,0.95) 0%,
+        rgba(0,255,255,0.95) calc(var(--audio-level) * 100%),
+        rgba(0, 30, 44, 0.28) calc(var(--audio-level) * 100%),
+        rgba(0, 30, 44, 0.28) 100%);
+    box-shadow:
+      0 0 10px rgba(0,255,255,0.38),
+      inset 0 0 8px rgba(255,0,220,0.18);
+    opacity: 0.96;
+  }
+
+  body::before {
+    left: max(6px, env(safe-area-inset-left));
+  }
+
+  body::after {
+    right: max(6px, env(safe-area-inset-right));
+  }
+
+  /* Bottom Center-Out Meter: schützt Gestenbereich und schlägt aus der Mitte nach außen aus. */
+  .mobile-shell::after,
+  .player-shell::after,
+  main::after {
+    content: "";
+    position: fixed;
+    left: max(14px, env(safe-area-inset-left));
+    right: max(14px, env(safe-area-inset-right));
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    height: 22px;
+    z-index: 20;
+    pointer-events: none !important;
+    border-radius: 999px;
+    border: 1px solid rgba(0,255,255,0.28);
+    background:
+      linear-gradient(to right,
+        rgba(0,255,255,0.9) 0%,
+        rgba(0,255,255,0.9) calc(50% - (var(--audio-peak) * 48%)),
+        rgba(5,10,20,0.18) calc(50% - (var(--audio-peak) * 48%)),
+        rgba(5,10,20,0.18) calc(50% + (var(--audio-peak) * 48%)),
+        rgba(255,0,220,0.9) calc(50% + (var(--audio-peak) * 48%)),
+        rgba(255,0,220,0.9) 100%);
+    box-shadow:
+      0 0 13px rgba(0,255,255,0.22),
+      0 0 18px rgba(255,0,220,0.18),
+      inset 0 0 10px rgba(255,255,255,0.05);
+    opacity: 0.98;
+  }
+
+  /* Extra Abstand unter dem Player, damit Controls nicht in die iPhone-Gesten kommen. */
+  .player-shell,
+  .hud-panel,
+  .panel,
+  .mobile-shell,
+  main {
+    margin-bottom: max(28px, calc(var(--gesture-guard-height, 76px) * 0.72)) !important;
+  }
+
+  /* Meter dürfen Touch-Fix nicht wieder kaputtmachen. */
+  button,
+  [role="button"],
+  input,
+  .controls,
+  .transport,
+  .player-controls,
+  .mobile-controls,
+  .control-row,
+  .boost-panel,
+  .mobile-boost-core {
+    position: relative;
+    z-index: 60 !important;
+    pointer-events: auto !important;
+  }
+}
+
+@media (min-width: 761px) {
+  body::before,
+  body::after,
+  .mobile-shell::after,
+  .player-shell::after,
+  main::after {
+    pointer-events: none !important;
+  }
+}
+
+/* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter statt Pseudo-Meter. */
+:root{--mobile-dom-guard-height:78px}
+.mobile-hud-dom-meter-repair,.mobile-hud-dom-meter-repair *,.mobile-dom-bottom-guard,.mobile-dom-side-meter{pointer-events:none!important}
+@media(max-width:760px){
+body[data-mobile-dom-meter-repair="on"]::before,body[data-mobile-dom-meter-repair="on"]::after,body[data-mobile-dom-meter-repair="on"] main::after,body[data-mobile-dom-meter-repair="on"] .mobile-shell::after,body[data-mobile-dom-meter-repair="on"] .player-shell::after{content:none!important;display:none!important}
+body[data-mobile-dom-meter-repair="on"]{padding-bottom:calc(var(--mobile-dom-guard-height,78px) + env(safe-area-inset-bottom))!important}
+.mobile-hud-dom-meter-repair{display:block!important;position:fixed!important;inset:0!important;z-index:28!important;pointer-events:none!important}
+.mobile-dom-side-meter{position:fixed!important;top:46vh!important;width:12px!important;height:32vh!important;border-radius:999px!important;border:1px solid rgba(0,255,255,.42)!important;background:rgba(0,10,22,.54)!important;box-shadow:0 0 10px rgba(0,255,255,.36),inset 0 0 8px rgba(255,0,220,.16)!important;overflow:hidden!important;opacity:.95!important}
+.mobile-dom-side-meter-left{left:max(6px,env(safe-area-inset-left))!important}.mobile-dom-side-meter-right{right:max(6px,env(safe-area-inset-right))!important}
+.mobile-dom-side-meter>i{display:block!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:calc(var(--audio-level,0) * 100%)!important;min-height:6px!important;border-radius:999px!important;background:linear-gradient(to top,rgba(0,255,255,.98),rgba(0,255,255,.84) 48%,rgba(255,0,220,.9))!important;box-shadow:0 0 12px rgba(0,255,255,.56),0 0 18px rgba(255,0,220,.22)!important}
+.mobile-dom-bottom-guard{position:fixed!important;left:max(18px,env(safe-area-inset-left))!important;right:max(18px,env(safe-area-inset-right))!important;bottom:calc(24px + env(safe-area-inset-bottom))!important;height:30px!important;z-index:32!important;border-radius:999px!important;pointer-events:none!important}
+.mobile-dom-bottom-track{position:absolute!important;left:0!important;right:0!important;top:8px!important;height:14px!important;border-radius:999px!important;border:1px solid rgba(0,255,255,.38)!important;background:rgba(2,8,18,.78)!important;box-shadow:0 0 12px rgba(0,255,255,.20),0 0 18px rgba(255,0,220,.16),inset 0 0 10px rgba(255,255,255,.04)!important;overflow:hidden!important}
+.mobile-dom-bottom-left,.mobile-dom-bottom-right{position:absolute!important;top:0!important;height:100%!important;width:calc(var(--audio-peak,0) * 50%)!important;display:block!important;border-radius:999px!important;transition:width 80ms linear!important}
+.mobile-dom-bottom-left{right:50%!important;background:linear-gradient(to left,rgba(0,255,255,.98),rgba(255,0,220,.76))!important;box-shadow:0 0 14px rgba(0,255,255,.36)!important}.mobile-dom-bottom-right{left:50%!important;background:linear-gradient(to right,rgba(0,255,255,.98),rgba(255,0,220,.76))!important;box-shadow:0 0 14px rgba(255,0,220,.34)!important}
+.mobile-transport-repair{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;width:calc(100% - 32px)!important;margin:10px auto 16px!important;min-height:56px!important;position:relative!important;z-index:80!important;pointer-events:auto!important}
+.mobile-repair-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:46px!important;min-height:46px!important;padding:0 14px!important;border-radius:16px!important;border:1px solid rgba(0,255,255,.24)!important;background:rgba(8,12,28,.88)!important;color:rgba(255,255,255,.94)!important;font-weight:900!important;letter-spacing:.08em!important;box-shadow:0 0 12px rgba(0,255,255,.12),inset 0 0 14px rgba(255,0,220,.08)!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:rgba(255,0,220,.28)!important}
+.mobile-repair-boost{color:rgba(0,255,230,.96)!important;border-color:rgba(255,0,220,.34)!important}
+.player-shell,.hud-panel,.panel,.mobile-shell,main{margin-bottom:calc(var(--mobile-dom-guard-height,78px) + 10px)!important}
+}
+@media(min-width:761px){.mobile-hud-dom-meter-repair,.mobile-transport-repair{display:none!important}}

@@ -1,0 +1,31 @@
+666SOUNDsDESIGn — MOBILE LEVELMETER GESTURE GUARD PATCH v1
+
+Zweck:
+- Links neben dem Player ein vertikaler Levelmeter.
+- Rechts neben dem Player ein vertikaler Levelmeter.
+- Unter dem Player ein doppelter Center-Out-Levelmeter.
+- iPhone-Gestensteuerung unten schützen.
+- Keine Worker-/Stream-/Boost-/Root-Änderung.
+
+Geändert:
+- css/mobile.css
+- js/equalizer.js
+- js/player-core.js
+
+Zentrale Variablen:
+- --audio-level
+- --audio-peak
+- --meter-left
+- --meter-right
+- --meter-bottom-left
+- --meter-bottom-right
+- --gesture-guard-height
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- index.html
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers
+- Design-Neubau

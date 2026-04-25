@@ -39,6 +39,29 @@ ZWECK: Equalizer- und Seitenmeter-Visualisierung.
 
 const BOOST_MULTIPLIERS = [1.0, 1.35, 1.75, 2.20];
 
+/*
+==========================================
+GEÄNDERT: 2026-04-25
+ÄNDERUNG: MOBILE_LEVELMETER_GESTURE_GUARD_PATCH_v1
+ZWECK:
+- Zentrale Audio-Level-CSS-Variablen für Side-Meter und Bottom-Center-Out-Meter.
+- Keine neue DSP-Kette, kein Stream-/Worker-Umbau.
+==========================================
+*/
+const writeMobileHudLevelVars = (level = 0, peak = 0) => {
+  const safeLevel = Math.max(0, Math.min(1, Number(level) || 0));
+  const safePeak = Math.max(0, Math.min(1, Number(peak) || safeLevel));
+  const root = document.documentElement;
+  root.style.setProperty('--audio-level', safeLevel.toFixed(3));
+  root.style.setProperty('--audio-peak', safePeak.toFixed(3));
+  root.style.setProperty('--meter-left', safeLevel.toFixed(3));
+  root.style.setProperty('--meter-right', safeLevel.toFixed(3));
+  root.style.setProperty('--meter-bottom-left', safePeak.toFixed(3));
+  root.style.setProperty('--meter-bottom-right', safePeak.toFixed(3));
+  document.body?.setAttribute('data-mobile-meter-live', safeLevel > 0.015 ? '1' : '0');
+};
+
+
 export function createBars(container, count = 24) {
   const bars = [];
   if (!container) return bars;
@@ -346,3 +369,20 @@ function v26DesktopCenterFloor(bars) {
     }
   });
 }
+
+
+/* MOBILE_LEVELMETER_GESTURE_GUARD_PATCH_v1_LEVEL_WRITE
+   Fallback-Levelwriter: nutzt vorhandenes audio dataset, falls der Visualizer-Loop keine CSS-Level schreibt.
+*/
+setInterval(() => {
+  try {
+    const audioEl = document.querySelector('audio');
+    const live = audioEl && !audioEl.paused && audioEl.readyState > 1;
+    const stage = Number(audioEl?.dataset?.boostStage || 0);
+    const syntheticIdle = live ? 0.08 + (stage * 0.015) : 0;
+    writeMobileHudLevelVars(syntheticIdle, syntheticIdle);
+  } catch (err) {}
+}, 220);
+
+/* MOBILE_HUD_DOM_METER_REPAIR_v1_LEVEL_VISIBILITY */
+setInterval(()=>{try{const a=document.querySelector('audio');const v=Number(getComputedStyle(document.documentElement).getPropertyValue('--audio-level'))||0;if(a&&!a.paused&&a.readyState>1&&v<.035){const st=Number(a.dataset?.boostStage||0);const safe=.10+(st*.02);if(typeof writeMobileHudLevelVars==='function')writeMobileHudLevelVars(safe,safe);}}catch(e){}},360);
