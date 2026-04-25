@@ -1,0 +1,22 @@
+/*
+==========================================
+DATEI: external-player/css/desktop.css
+ERSTELLT: 2026-04-20
+GEÄNDERT: 2026-04-21
+ZWECK: Desktop-Feinschliff.
+ÄNDERUNG: FULLPACK v8 METADATA + EQ. EQ höher und filigraner, Volume sauberer im Bottom-Console-Bereich, No-DJ-Bereinigung in den Playerdaten.
+==========================================
+*/
+@media (min-width: 861px) {
+  body[data-device="desktop"] .frame-stage {
+    min-height: 100vh;
+  }
+  body[data-device="desktop"] .player-shell {
+    width: min(56vw, 960px);
+  }
+  .frame-stage {
+    background-position: center top;
+    background-size: contain;
+  }
+  .status-cluster { justify-content: flex-end; }
+}

@@ -8,15 +8,16 @@
 // ÄNDERUNG: Redirect auf github.io entfernt; externer Player wird jetzt per Proxy unter
 //           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
 //           bleiben bewusst unangetastet.
+// ÄNDERUNG: ROOT_MIGRATION_REPAIR_v1. External-Player ist Hauptplayer in Root; /extern und /external-player bleiben Alias.
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
-const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/external-player/";
+const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/";
 const SWITCH_TIMEOUT_MS = 2000;
-const EXTERNAL_BUILD_ID = "v10-playfix";
+const EXTERNAL_BUILD_ID = "root-migration-repair-v1";
 
 const HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -238,8 +239,11 @@ function buildExternalProxyHeaders(sourceHeaders){
 }
 
 async function fetchExternalAsset(pathname, request){
-  // Externe Player-Dateien unter derselben Domain ausliefern, damit github.io nicht sichtbar wird.
-  const suffix = pathname.replace(/^\/(?:extern|external-player)\/?/, "");
+  // ROOT_MIGRATION_REPAIR_v1:
+  // Hauptplayer-Assets werden unter derselben Domain ausgeliefert.
+  // /extern/... und /external-player/... bleiben Legacy-Aliase auf Root.
+  let suffix = pathname.replace(/^\/(?:extern|external-player)\/?/, "");
+  suffix = suffix.replace(/^\//, "");
   const upstreamObject = new URL(suffix || "", EXTERNAL_PLAYER_URL);
   upstreamObject.searchParams.set("v", EXTERNAL_BUILD_ID);
   const upstreamUrl = upstreamObject.toString();
@@ -260,8 +264,9 @@ async function fetchExternalAsset(pathname, request){
 }
 
 async function serveExternalIndex(request){
-  // Startseite des externen Players laden und mit Base-Tag versehen.
-  // Dadurch bleiben Asset-Pfade stabil, obwohl die Domain oben gleich bleibt.
+  // ROOT_MIGRATION_REPAIR_v1:
+  // Root-Hauptplayer laden und unter der eigenen Domain ausliefern.
+  // Kein sichtbarer Redirect zu github.io.
   const indexUrl = new URL(EXTERNAL_PLAYER_URL);
   indexUrl.searchParams.set("v", EXTERNAL_BUILD_ID);
   const response = await fetch(indexUrl.toString(), {
@@ -273,8 +278,8 @@ async function serveExternalIndex(request){
     redirect: "follow"
   });
   let html = await response.text();
-  if (!html.includes('<base href="/extern/">')) {
-    html = html.replace("<head>", '<head>\n  <base href="/extern/">');
+  if (!html.includes('<base href="/">')) {
+    html = html.replace("<head>", '<head>\n  <base href="/">');
   }
   const headers = buildExternalProxyHeaders(response.headers);
   headers.set("content-type", "text/html; charset=UTF-8");
@@ -315,6 +320,19 @@ export default {
     // Interner Player explizit direkt erreichbar halten.
     if(url.pathname==="/internal" || url.pathname==="/internal/"){
       return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
+    }
+
+    // ROOT_MIGRATION_REPAIR_v1:
+    // Root-Assets des Hauptplayers unter eigener Domain ausliefern.
+    // Interne Notfallplayer-Dateien /css/main.css, /js/app.js und /config/stream.config.js bleiben weiter unten reserviert.
+    if(url.pathname.startsWith("/css/") && url.pathname!=="/css/main.css"){
+      return await fetchExternalAsset(url.pathname, request);
+    }
+    if(url.pathname.startsWith("/js/") && url.pathname!=="/js/app.js"){
+      return await fetchExternalAsset(url.pathname, request);
+    }
+    if(url.pathname.startsWith("/assets/")){
+      return await fetchExternalAsset(url.pathname, request);
     }
 
     // Gesundheitscheck unverändert lassen.
