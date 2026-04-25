@@ -9,11 +9,13 @@
 //           derselben Domain ausgeliefert. Interner Fallback-Player, Streams und Metadaten
 //           bleiben bewusst unangetastet.
 // ÄNDERUNG: ROOT_MIGRATION_REPAIR_v1. External-Player ist Hauptplayer in Root; /extern und /external-player bleiben Alias.
+// ÄNDERUNG: STREAM_FAILOVER_REPAIR_v1. /stream schaltet bei HTTP-Fehler/Timeout auf Backup-Varianten um.
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
+const FALLBACK_STREAM_URL_ALT = "https://my.idjstream.com/8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
 const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/";
 const SWITCH_TIMEOUT_MS = 2000;
@@ -212,8 +214,13 @@ function passthroughHeaders(sourceHeaders){
   headers.set("x-radio-proxy","666soundsdesign-worker");
   return headers;
 }
-async function proxyStream(request,upstream){
-  const init={method:request.method,headers:new Headers()};
+async function proxyStream(request, upstream, targetName = "unknown"){
+  // STREAM_FAILOVER_REPAIR_v1:
+  // Ein HTTP-Fehler vom Upstream zählt als echter Failover-Grund.
+  // Vorher wurde nur bei fetch-Exception umgeschaltet; ein 520 konnte direkt bis zum Player durchfallen.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+  const init={method:request.method,headers:new Headers(),signal:controller.signal};
   const range=request.headers.get("range");
   const userAgent=request.headers.get("user-agent");
   const accept=request.headers.get("accept");
@@ -222,8 +229,76 @@ async function proxyStream(request,upstream){
   if(userAgent)init.headers.set("user-agent",userAgent);
   if(accept)init.headers.set("accept",accept);
   if(icyMeta)init.headers.set("icy-metadata",icyMeta);
-  const response=await fetch(upstream,init);
-  return new Response(response.body,{status:response.status,statusText:response.statusText,headers:passthroughHeaders(response.headers)});
+
+  try {
+    const response=await fetch(upstream,init);
+    if(!response.ok && response.status >= 400){
+      throw new Error(`upstream_${targetName}_http_${response.status}`);
+    }
+    const headers=passthroughHeaders(response.headers);
+    headers.set("x-active-stream-target", targetName);
+    headers.set("x-failover-state", targetName === "main" ? "primary" : "fallback");
+    return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function proxyStreamFailover(request){
+  // MAIN versuchen, bei HTTP-Fehler/Timeout direkt BACKUP versuchen.
+  try{
+    return await proxyStream(request, PRIMARY_STREAM_URL, "main");
+  }catch(primaryErr){
+    try{
+      return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
+    }catch(backupErr){
+      try{
+        return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
+      }catch(backupAltErr){
+        return new Response(JSON.stringify({
+          error:"stream_proxy_failed",
+          main:String(primaryErr && primaryErr.message ? primaryErr.message : primaryErr),
+          backup:String(backupErr && backupErr.message ? backupErr.message : backupErr),
+          backup_alt:String(backupAltErr && backupAltErr.message ? backupAltErr.message : backupAltErr)
+        }),{
+          status:502,
+          headers:{
+            "content-type":"application/json; charset=UTF-8",
+            "cache-control":"no-store",
+            "access-control-allow-origin":"*",
+            "x-radio-proxy":"666soundsdesign-worker",
+            "x-failover-state":"failed"
+          }
+        });
+      }
+    }
+  }
+}
+
+async function proxyFallbackStream(request){
+  // Direkte Backup-Route: erst alte Port-Variante, dann Pfad-Variante.
+  try{
+    return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
+  }catch(backupErr){
+    try{
+      return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
+    }catch(backupAltErr){
+      return new Response(JSON.stringify({
+        error:"fallback_stream_proxy_failed",
+        backup:String(backupErr && backupErr.message ? backupErr.message : backupErr),
+        backup_alt:String(backupAltErr && backupAltErr.message ? backupAltErr.message : backupAltErr)
+      }),{
+        status:502,
+        headers:{
+          "content-type":"application/json; charset=UTF-8",
+          "cache-control":"no-store",
+          "access-control-allow-origin":"*",
+          "x-radio-proxy":"666soundsdesign-worker",
+          "x-failover-state":"failed"
+        }
+      });
+    }
+  }
 }
 
 
@@ -351,12 +426,14 @@ export default {
       }
     }
 
-    // Stream-Routen unverändert lassen.
+    // STREAM_FAILOVER_REPAIR_v1:
+    // /stream versucht MAIN und fällt bei HTTP-Fehler/Timeout automatisch auf BACKUP zurück.
+    // /fallback-stream versucht Backup-Varianten gezielt.
     if(url.pathname==="/stream"){
-      try{return await proxyStream(request,PRIMARY_STREAM_URL)}catch(err){return await proxyStream(request,FALLBACK_STREAM_URL)}
+      return await proxyStreamFailover(request)
     }
     if(url.pathname==="/fallback-stream"){
-      return await proxyStream(request,FALLBACK_STREAM_URL)
+      return await proxyFallbackStream(request)
     }
 
     // Interner Notfall-Player bleibt komplett erhalten.
