@@ -1059,3 +1059,31 @@ body[data-mobile-top-controls="on"] .player-shell,body[data-mobile-top-controls=
     outline-offset: -2px !important;
   }
 }
+
+/* MOBILE_UI_ORDER_CONSOLIDATION_v1 */
+@media(max-width:760px){
+#runtimeCacheBustProof{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+body[data-mobile-ui-order="v1"] [data-mobile-ui-order-hide="v1"],
+body[data-mobile-ui-order="v1"] [data-inline-controls-host="v1"]>*:not(#mobileInlineTopControlsForce),
+body[data-mobile-ui-order="v1"] .mobile-boost-top-controls-host>*:not(#mobileInlineTopControlsForce){
+display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;width:0!important;height:0!important;max-width:0!important;max-height:0!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body[data-mobile-ui-order="v1"] [data-inline-controls-host="v1"],
+body[data-mobile-ui-order="v1"] .mobile-boost-top-controls-host,
+body[data-mobile-ui-order="v1"] .boost-panel,
+body[data-mobile-ui-order="v1"] .mobile-boost-core{
+box-sizing:border-box!important;width:calc(100% - 32px)!important;max-width:100%!important;min-height:76px!important;height:auto!important;padding:9px 10px!important;margin:0 auto 10px!important;overflow:visible!important;display:block!important;position:relative!important;z-index:95!important;border-radius:22px!important}
+body[data-mobile-ui-order="v1"] #mobileInlineTopControlsForce{
+box-sizing:border-box!important;display:grid!important;grid-template-columns:42px 42px 42px 42px minmax(46px,1fr) 42px!important;gap:7px!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:7px!important;min-height:58px!important;border-radius:18px!important;overflow:hidden!important;transform:none!important;left:auto!important;right:auto!important;position:relative!important;z-index:180!important}
+body[data-mobile-ui-order="v1"] #mobileInlineTopControlsForce button{
+box-sizing:border-box!important;width:42px!important;min-width:42px!important;max-width:42px!important;height:42px!important;min-height:42px!important;max-height:42px!important;padding:0!important;margin:0!important;border-radius:14px!important;font-size:15px!important}
+body[data-mobile-ui-order="v1"] #mobileInlineTopControlsForce .mi-bst{
+box-sizing:border-box!important;width:100%!important;min-width:44px!important;max-width:100%!important;height:40px!important;min-height:40px!important;margin:0!important;padding:0 4px!important;font-size:11px!important;letter-spacing:.12em!important;white-space:normal!important;text-align:center!important;line-height:1.05!important}
+body[data-mobile-ui-order="v1"] #mobileTransportRepair,
+body[data-mobile-ui-order="v1"] .mobile-transport-repair,
+body[data-mobile-ui-order="v1"] #mobileTopControlsInBoostPanel{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body[data-mobile-ui-order="v1"] .mobile-dom-side-meter{top:45vh!important;height:31vh!important;width:10px!important;z-index:24!important;opacity:.88!important}
+body[data-mobile-ui-order="v1"] .mobile-dom-bottom-guard{bottom:calc(8px + env(safe-area-inset-bottom))!important;height:18px!important;z-index:26!important;left:max(28px,env(safe-area-inset-left))!important;right:max(28px,env(safe-area-inset-right))!important;opacity:.86!important}
+body[data-mobile-ui-order="v1"] .mobile-dom-bottom-track{top:4px!important;height:10px!important;opacity:.88!important}
+body[data-mobile-ui-order="v1"] .player-shell,body[data-mobile-ui-order="v1"] .hud-panel,body[data-mobile-ui-order="v1"] .panel,body[data-mobile-ui-order="v1"] .mobile-shell,body[data-mobile-ui-order="v1"] main{overflow:visible!important}
+body[data-mobile-ui-order="v1"] .eq,body[data-mobile-ui-order="v1"] .equalizer,body[data-mobile-ui-order="v1"] [class*="equalizer"],body[data-mobile-ui-order="v1"] [class*="eq"]{min-height:116px!important;padding-bottom:18px!important;overflow:visible!important}
+}

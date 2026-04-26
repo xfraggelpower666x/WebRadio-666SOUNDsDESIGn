@@ -273,6 +273,29 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+
+<!-- MOBILE_UI_ORDER_CONSOLIDATION_v1 -->
+<style id="mobileUiOrderConsolidationStyle">@media(max-width:760px){#runtimeCacheBustProof{display:none!important}}</style>
+<script id="mobileUiOrderConsolidationScript">
+(function(){
+function m(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
+function a(){
+ if(!document.body)return;
+ document.body.setAttribute('data-mobile-ui-order',m()?'v1':'desktop');
+ var c=document.getElementById('mobileInlineTopControlsForce');
+ var h=document.querySelector('[data-inline-controls-host="v1"],.mobile-boost-top-controls-host,.boost-panel,.mobile-boost-core,[class*="boost"]');
+ if(c&&h&&c.parentNode!==h)h.insertBefore(c,h.firstChild);
+ if(h){
+  h.setAttribute('data-mobile-ui-order-host','v1');
+  Array.prototype.slice.call(h.children).forEach(function(x){if(x.id!=='mobileInlineTopControlsForce')x.setAttribute('data-mobile-ui-order-hide','v1')});
+  Array.prototype.slice.call(h.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]')).forEach(function(x){if(!x.closest('#mobileInlineTopControlsForce'))x.setAttribute('data-mobile-ui-order-hide','v1')});
+ }
+}
+document.addEventListener('DOMContentLoaded',function(){a();setTimeout(a,300);setTimeout(a,1200);setTimeout(a,2500)});
+window.addEventListener('resize',a,{passive:true});window.addEventListener('orientationchange',a,{passive:true});
+})();
+</script>
+
 </head>
 <body>
   <div class="frame-stage">
