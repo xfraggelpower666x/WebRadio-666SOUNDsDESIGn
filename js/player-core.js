@@ -274,6 +274,41 @@ function installMobileTransportPinRepair() {
 }
 
 installMobileTransportPinRepair();
+
+/* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
+function installMobileTopControlsInBoostPanel(){
+  let c=document.getElementById('mobileTopControlsInBoostPanel');
+  if(!c){
+    c=document.createElement('div');
+    c.id='mobileTopControlsInBoostPanel';
+    c.className='mobile-top-controls-in-boost';
+    c.innerHTML='<button type="button" class="mobile-top-btn mobile-top-play" data-mobile-top-action="play" aria-label="Play">▶</button><button type="button" class="mobile-top-btn" data-mobile-top-action="pause" aria-label="Pause">Ⅱ</button><button type="button" class="mobile-top-btn mobile-top-stop" data-mobile-top-action="stop" aria-label="Stop">■</button><button type="button" class="mobile-top-btn" data-mobile-top-action="boost-down" aria-label="Boost weniger">−</button><span class="mobile-top-bst-label">BST</span><button type="button" class="mobile-top-btn" data-mobile-top-action="boost-up" aria-label="Boost mehr">+</button>';
+  }
+  const b=document.querySelector('.boost-panel,.mobile-boost-core,[class*="boost"]');
+  if(b){
+    b.classList.add('mobile-boost-top-controls-host');
+    b.setAttribute('data-mobile-top-controls-host','v1');
+    b.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]').forEach(n=>{if(!n.closest('#mobileTopControlsInBoostPanel'))n.setAttribute('data-mobile-boost-logo-hide','v1')});
+    b.insertBefore(c,b.firstChild);
+  }else{
+    const panel=document.querySelector('.hud-panel,.player-shell,.mobile-shell,main')||document.body;
+    panel.insertBefore(c,panel.firstChild);
+  }
+  const run=async(a)=>{try{
+    if(a==='play'&&typeof startPlayback==='function')return await startPlayback();
+    if(a==='pause'&&audio){audio.pause(); if(typeof setState==='function')setState('paused'); return;}
+    if(a==='stop'&&audio){audio.pause(); try{audio.currentTime=0}catch(e){} if(typeof setState==='function')setState('stopped'); return;}
+    if(a==='boost-up'&&typeof setBoostStage==='function'){currentBoostStage=setBoostStage(Math.min(3,(Number(currentBoostStage)||0)+1)); return;}
+    if(a==='boost-down'&&typeof setBoostStage==='function'){currentBoostStage=setBoostStage(Math.max(0,(Number(currentBoostStage)||0)-1)); return;}
+  }catch(e){console.warn('[MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1]',a,e)}};
+  const h=e=>{const btn=e.target.closest&&e.target.closest('[data-mobile-top-action]'); if(!btn)return; e.preventDefault(); e.stopPropagation(); run(btn.dataset.mobileTopAction);};
+  c.addEventListener('click',h,{capture:true});
+  c.addEventListener('touchend',h,{passive:false,capture:true});
+  const apply=()=>{const m=(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760; document.body.setAttribute('data-mobile-top-controls',m?'on':'off');};
+  apply(); window.addEventListener('resize',apply,{passive:true}); window.addEventListener('orientationchange',apply,{passive:true});
+}
+
+installMobileTopControlsInBoostPanel();
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');

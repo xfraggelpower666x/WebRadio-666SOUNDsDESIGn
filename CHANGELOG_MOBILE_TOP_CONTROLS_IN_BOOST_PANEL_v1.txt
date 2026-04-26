@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — MOBILE TOP CONTROLS IN BOOST PANEL v1
+
+Zweck:
+- Play/Pause/Stop direkt oben in das Boost-Feld setzen.
+- Kleines Logo im Boost-Feld auf Mobile ausblenden.
+- Alte mobile Transportleiste ausblenden.
+- EQ unten mit Mindesthöhe sichtbar halten.
+
+Geändert:
+- js/player-core.js
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- index.html
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers
