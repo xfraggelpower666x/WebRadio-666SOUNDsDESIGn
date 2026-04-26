@@ -736,3 +736,9 @@ audio?.addEventListener('ended', () => {
 window.setInterval(keepControlsUnlocked, 1500);
 window.addEventListener('pageshow', keepControlsUnlocked);
 window.addEventListener('focus', keepControlsUnlocked);
+
+/* MOBILE_RUNTIME_CACHE_BUST_PROOF_v1 */
+try {
+  document.documentElement.setAttribute('data-player-core-runtime-proof','mobile-runtime-cache-bust-proof-v1-20260426');
+  console.info('[666SOUNDsDESIGn] player-core runtime proof:', 'mobile-runtime-cache-bust-proof-v1-20260426');
+} catch (err) {}

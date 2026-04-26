@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — MOBILE RUNTIME CACHE BUST PROOF v1
+
+Zweck:
+- Beweisen, ob iPhone wirklich den neuen Build lädt.
+- Cache-Busting an lokalen CSS/JS-Referenzen in index.html.
+- Sichtbarer Mobile-Marker: RUNTIME v1.
+- Wenn Marker nicht erscheint: falsche Route / alter Cache vor index.html / anderer aktiver Build.
+- Wenn Marker erscheint: index.html ist aktuell und CSS/JS werden mit neuer Query geladen.
+
+Geändert:
+- index.html
+- js/player-core.js
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers
+
+Version:
+mobile-runtime-cache-bust-proof-v1-20260426

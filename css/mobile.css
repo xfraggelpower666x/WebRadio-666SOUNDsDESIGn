@@ -1048,3 +1048,14 @@ body[data-mobile-top-controls="on"] .eq,body[data-mobile-top-controls="on"] .equ
 body[data-mobile-top-controls="on"] .player-shell,body[data-mobile-top-controls="on"] .hud-panel,body[data-mobile-top-controls="on"] .panel,body[data-mobile-top-controls="on"] .mobile-shell,body[data-mobile-top-controls="on"] main{overflow:visible!important}
 }
 @media(min-width:761px){#mobileTopControlsInBoostPanel{display:none!important}}
+
+/* MOBILE_RUNTIME_CACHE_BUST_PROOF_v1 | mobile-runtime-cache-bust-proof-v1-20260426 */
+@media (max-width:760px){
+  body::selection { background: rgba(0,255,255,.35); }
+  html[data-runtime-cache-bust-proof="mobile-runtime-cache-bust-proof-v1-20260426"] .mobile-boost-top-controls-host,
+  html[data-runtime-cache-bust-proof="mobile-runtime-cache-bust-proof-v1-20260426"] .boost-panel,
+  html[data-runtime-cache-bust-proof="mobile-runtime-cache-bust-proof-v1-20260426"] .mobile-boost-core {
+    outline: 1px solid rgba(0,255,232,.55) !important;
+    outline-offset: -2px !important;
+  }
+}

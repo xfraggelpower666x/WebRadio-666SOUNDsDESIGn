@@ -20,12 +20,46 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css" />
-  <link rel="stylesheet" href="/css/shared-status.css" />
-  <link rel="stylesheet" href="/css/layout.css" />
-  <link rel="stylesheet" href="/css/effects.css" />
-  <link rel="stylesheet" href="/css/mobile.css" />
-  <link rel="stylesheet" href="/css/desktop.css" />
+  <link rel="stylesheet" href="/css/base.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
+  <link rel="stylesheet" href="/css/layout.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
+  <link rel="stylesheet" href="/css/effects.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
+  <link rel="stylesheet" href="/css/mobile.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
+  <link rel="stylesheet" href="/css/desktop.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
+
+<!-- MOBILE_RUNTIME_CACHE_BUST_PROOF_v1 | mobile-runtime-cache-bust-proof-v1-20260426 -->
+<style id="runtimeCacheBustProofStyle">
+@media (max-width:760px){
+  #runtimeCacheBustProof {
+    position: fixed;
+    top: calc(72px + env(safe-area-inset-top));
+    right: 8px;
+    z-index: 99999;
+    padding: 4px 7px;
+    border-radius: 9px;
+    border: 1px solid rgba(0,255,255,.45);
+    background: rgba(5,8,20,.88);
+    color: rgba(0,255,232,.98);
+    font: 700 10px/1.1 system-ui,-apple-system,Segoe UI,sans-serif;
+    letter-spacing: .08em;
+    box-shadow: 0 0 10px rgba(0,255,255,.24);
+    pointer-events: none;
+  }
+}
+@media (min-width:761px){#runtimeCacheBustProof{display:none!important;}}
+</style>
+<script id="runtimeCacheBustProofScript">
+document.addEventListener('DOMContentLoaded', function(){
+  if(!document.getElementById('runtimeCacheBustProof')){
+    var el=document.createElement('div');
+    el.id='runtimeCacheBustProof';
+    el.textContent='RUNTIME v1';
+    document.body.appendChild(el);
+  }
+  document.documentElement.setAttribute('data-runtime-cache-bust-proof','mobile-runtime-cache-bust-proof-v1-20260426');
+});
+</script>
+
 </head>
 <body>
   <div class="frame-stage">
@@ -160,6 +194,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js"></script>
+  <script type="module" src="/js/player-core.js?v=mobile-runtime-cache-bust-proof-v1-20260426"></script>
 </body>
 </html>
