@@ -1,0 +1,9 @@
+666SOUNDsDESIGn — MOBILE TRANSPORT PIN REPAIR v1
+
+Zweck:
+- Play/Pause/Stop/Boost-Leiste auf iPhone sichtbar in den Playerbereich pinnen.
+- Kein Worker, kein Stream, kein index.html, kein Boost-Multiplier.
+
+Geändert:
+- js/player-core.js
+- css/mobile.css

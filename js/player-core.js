@@ -222,6 +222,58 @@ function installMobileHudDomMeterRepair() {
 }
 
 installMobileHudDomMeterRepair();
+
+/* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
+function installMobileTransportPinRepair() {
+  let controls = document.getElementById('mobileTransportRepair');
+  if (!controls) {
+    controls = document.createElement('div');
+    controls.id = 'mobileTransportRepair';
+    controls.className = 'mobile-transport-repair';
+    controls.innerHTML =
+      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="play" aria-label="Play">▶</button>' +
+      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="pause" aria-label="Pause">Ⅱ</button>' +
+      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="stop" aria-label="Stop">■</button>' +
+      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="boost-down" aria-label="Boost weniger">−</button>' +
+      '<button type="button" class="mobile-repair-btn mobile-repair-boost" data-mobile-repair-action="boost-up" aria-label="Boost mehr">BST +</button>';
+  }
+  controls.setAttribute('data-pin-repair','v1');
+
+  const boostRow = document.querySelector('.boost-panel, .mobile-boost-core, [class*="boost"]');
+  const statusRow = document.querySelector('.system-panels, .status-panels, [class*="system"], [class*="status"]');
+  const playerPanel = document.querySelector('.hud-panel, .player-shell, .mobile-shell, main') || document.body;
+
+  if (boostRow && boostRow.parentNode) boostRow.parentNode.insertBefore(controls, boostRow.nextSibling);
+  else if (statusRow && statusRow.parentNode) statusRow.parentNode.insertBefore(controls, statusRow);
+  else playerPanel.insertBefore(controls, playerPanel.firstChild);
+
+  const run = async (action) => {
+    try {
+      if (action === 'play' && typeof startPlayback === 'function') return await startPlayback();
+      if (action === 'pause' && audio) { audio.pause(); if (typeof setState === 'function') setState('paused'); return; }
+      if (action === 'stop' && audio) { audio.pause(); try { audio.currentTime=0; } catch(e) {} if (typeof setState === 'function') setState('stopped'); return; }
+      if (action === 'boost-up' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.min(3,(Number(currentBoostStage)||0)+1)); return; }
+      if (action === 'boost-down' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.max(0,(Number(currentBoostStage)||0)-1)); return; }
+    } catch(e) { console.warn('[MOBILE_TRANSPORT_PIN_REPAIR_v1]', action, e); }
+  };
+  const handler = (event) => {
+    const btn = event.target.closest && event.target.closest('[data-mobile-repair-action]');
+    if (!btn) return;
+    event.preventDefault(); event.stopPropagation();
+    run(btn.dataset.mobileRepairAction);
+  };
+  controls.addEventListener('click', handler, {capture:true});
+  controls.addEventListener('touchend', handler, {passive:false, capture:true});
+  const apply = () => {
+    const mobile = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+    document.body.setAttribute('data-mobile-transport-pin', mobile ? 'on' : 'off');
+  };
+  apply();
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+}
+
+installMobileTransportPinRepair();
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');

@@ -1020,3 +1020,16 @@ body[data-mobile-dom-meter-repair="on"]{padding-bottom:calc(var(--mobile-dom-gua
 .player-shell,.hud-panel,.panel,.mobile-shell,main{margin-bottom:calc(var(--mobile-dom-guard-height,78px) + 10px)!important}
 }
 @media(min-width:761px){.mobile-hud-dom-meter-repair,.mobile-transport-repair{display:none!important}}
+
+/* MOBILE_TRANSPORT_PIN_REPAIR_v1: iPhone-Transportleiste sichtbar im Playerbereich. */
+@media(max-width:760px){
+body[data-mobile-transport-pin="on"] .mobile-transport-repair,#mobileTransportRepair[data-pin-repair="v1"]{
+display:flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:center!important;flex-wrap:nowrap!important;gap:8px!important;width:calc(100% - 40px)!important;max-width:520px!important;min-height:54px!important;margin:8px auto 10px!important;padding:6px 8px!important;position:relative!important;z-index:120!important;pointer-events:auto!important;transform:none!important;overflow:visible!important;border-radius:18px!important;border:1px solid rgba(0,255,255,.18)!important;background:rgba(4,8,20,.72)!important;box-shadow:0 0 14px rgba(0,255,255,.10),inset 0 0 16px rgba(255,0,220,.06)!important}
+#mobileTransportRepair[data-pin-repair="v1"] .mobile-repair-btn{
+display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;min-width:44px!important;width:auto!important;min-height:44px!important;height:44px!important;padding:0 12px!important;border-radius:14px!important;pointer-events:auto!important;position:relative!important;z-index:121!important;touch-action:manipulation!important;color:rgba(255,255,255,.96)!important;background:rgba(10,14,32,.94)!important;border:1px solid rgba(0,255,255,.28)!important;box-shadow:0 0 10px rgba(0,255,255,.12),inset 0 0 12px rgba(255,0,220,.10)!important;font-weight:900!important;font-size:14px!important;line-height:1!important}
+#mobileTransportRepair[data-pin-repair="v1"] .mobile-repair-boost{color:rgba(0,255,232,.98)!important;border-color:rgba(255,0,220,.38)!important}
+.boost-panel,.mobile-boost-core,[class*="boost"]{position:relative!important;z-index:80!important}
+.system-panels,.status-panels,[class*="system"],[class*="status"]{position:relative!important;z-index:70!important}
+.player-shell,.hud-panel,.panel,.mobile-shell{overflow:visible!important}
+}
+@media(min-width:761px){#mobileTransportRepair[data-pin-repair="v1"]{display:none!important}}
