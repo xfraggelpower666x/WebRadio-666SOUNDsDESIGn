@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK
 GEÄNDERT: 2026-04-27
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v11-realanalyser-20260427-2125
-- EQ: echter WebAudio AnalyserNode.
+- Cache-Proof: smfp-v12-analyserfallback-20260427-2138
+- EQ: Analyser-Diagnose + Fallback-Motion.
 ============================================================
 */
 @media (min-width:761px){

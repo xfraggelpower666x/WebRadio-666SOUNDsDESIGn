@@ -1,0 +1,25 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v12 ANALYSER DIAGNOSTIC FALLBACK
+
+Zweck:
+- v11 zeigte auf iPhone keine echte Meterbewegung.
+- Ursache wahrscheinlich: AnalyserNode vorhanden, aber wegen Safari/CORS/MediaElement-Schutz nur Nullwerte.
+- v12 erkennt diesen Zustand.
+- EQ-Header zeigt:
+  - 20 BANDS · LIVE
+  - 20 BANDS · CORS/SILENT
+  - 20 BANDS · FALLBACK
+- Bei CORS/SILENT oder FALLBACK werden EQ, Bottom-Meter und Side-Meter sichtbar bewegt.
+- Boost-Ramp bleibt erhalten.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration
