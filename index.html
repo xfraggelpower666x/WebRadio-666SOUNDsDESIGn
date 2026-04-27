@@ -242,6 +242,54 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
+
+<!-- MOBILE_PLAYER_RAISE_LOGO_PURGE_v1 -->
+<script id="mobilePlayerRaiseLogoPurgeScript">
+(function(){
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+  function apply(){
+    if(!document.body) return;
+    document.body.setAttribute('data-mobile-player-raise-logo-purge', isMobile() ? 'v1' : 'desktop');
+
+    var killSelectors = [
+      '.boost-panel img',
+      '.mobile-boost-core img',
+      '.player-shell img',
+      '.hud-panel img',
+      '.mobile-shell img',
+      '[class*="logo"]',
+      '[class*="brand-mark"]',
+      '[class*="player-logo"]'
+    ];
+
+    killSelectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(node){
+        if(node.closest('#mobileControlsLayerReset')) return;
+        /* Header/Hero-Grafiken nicht anfassen: nur kleine interne Logos unter ca. 180px */
+        var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+        var small = !r || (r.width <= 180 && r.height <= 120);
+        if(small){
+          node.setAttribute('data-mobile-logo-purge','v1');
+        }
+      });
+    });
+
+    var main = document.querySelector('main,.mobile-shell,.player-shell,.hud-panel');
+    if(main) main.setAttribute('data-mobile-raised-player','v1');
+
+    var ctrl = document.getElementById('mobileControlsLayerReset');
+    if(ctrl) ctrl.setAttribute('data-mobile-raised-controls','v1');
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    apply(); setTimeout(apply,250); setTimeout(apply,1000); setTimeout(apply,2400);
+  });
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
+
 </head>
 <body>
   <div class="frame-stage">

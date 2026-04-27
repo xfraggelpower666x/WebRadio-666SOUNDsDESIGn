@@ -1194,3 +1194,126 @@ ZWECK:
     margin-bottom:110px!important;
   }
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-26
+ÄNDERUNG: MOBILE_PLAYER_RAISE_LOGO_PURGE_v1
+ZWECK:
+- iPhone-Playerblock weiter nach oben ziehen.
+- internes Mini-Logo im Player/Boostbereich ausblenden.
+- feste Control-Leiste kompakter setzen.
+- EQ/Bottom-Meter entzerren.
+==========================================
+*/
+@media(max-width:760px){
+  body[data-mobile-player-raise-logo-purge="v1"]{
+    padding-bottom:calc(86px + env(safe-area-inset-bottom))!important;
+  }
+
+  body[data-mobile-player-raise-logo-purge="v1"] [data-mobile-logo-purge="v1"]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  /* Großen Header nicht verändern; nur Player/HUD weiter hochziehen. */
+  body[data-mobile-player-raise-logo-purge="v1"] main,
+  body[data-mobile-player-raise-logo-purge="v1"] .mobile-shell,
+  body[data-mobile-player-raise-logo-purge="v1"] .player-shell,
+  body[data-mobile-player-raise-logo-purge="v1"] .hud-panel,
+  body[data-mobile-player-raise-logo-purge="v1"] .panel{
+    transform:translateY(-42px)!important;
+    margin-bottom:-28px!important;
+    overflow:visible!important;
+  }
+
+  /* Boost/oberes Panel flacher, damit nicht so viel Leerraum entsteht. */
+  body[data-mobile-player-raise-logo-purge="v1"] .boost-panel,
+  body[data-mobile-player-raise-logo-purge="v1"] .mobile-boost-core,
+  body[data-mobile-player-raise-logo-purge="v1"] [class*="boost"]{
+    min-height:36px!important;
+    max-height:58px!important;
+    padding-top:4px!important;
+    padding-bottom:4px!important;
+    overflow:hidden!important;
+  }
+
+  /* Side-Meter mit hochziehen und dezenter halten. */
+  body[data-mobile-player-raise-logo-purge="v1"] .mobile-dom-side-meter{
+    top:39vh!important;
+    height:32vh!important;
+    opacity:.38!important;
+    width:7px!important;
+    z-index:12!important;
+  }
+
+  /* Feste Control-Leiste kompakter. */
+  body[data-mobile-player-raise-logo-purge="v1"] #mobileControlsLayerReset{
+    left:14px!important;
+    right:14px!important;
+    bottom:calc(14px + env(safe-area-inset-bottom))!important;
+    min-height:58px!important;
+    padding:6px!important;
+    grid-template-columns:48px 48px 48px 48px minmax(54px,1fr) 48px!important;
+    gap:6px!important;
+    border-radius:20px!important;
+  }
+
+  body[data-mobile-player-raise-logo-purge="v1"] #mobileControlsLayerReset button{
+    width:46px!important;
+    height:44px!important;
+    min-width:46px!important;
+    min-height:44px!important;
+    border-radius:15px!important;
+    font-size:15px!important;
+  }
+
+  body[data-mobile-player-raise-logo-purge="v1"] #mobileControlsLayerReset .mclr-bst{
+    height:44px!important;
+    font-size:11px!important;
+    letter-spacing:.11em!important;
+  }
+
+  /* Bottom-Meter nicht mehr mitten in Karten/EQ drücken. */
+  body[data-mobile-player-raise-logo-purge="v1"] .mobile-dom-bottom-guard{
+    bottom:calc(78px + env(safe-area-inset-bottom))!important;
+    left:34px!important;
+    right:34px!important;
+    height:8px!important;
+    opacity:.34!important;
+    z-index:16!important;
+  }
+
+  body[data-mobile-player-raise-logo-purge="v1"] .mobile-dom-bottom-track{
+    height:6px!important;
+    top:1px!important;
+  }
+
+  /* Status/EQ etwas nach oben kompensieren, aber Abstand zur festen Leiste lassen. */
+  body[data-mobile-player-raise-logo-purge="v1"] .eq,
+  body[data-mobile-player-raise-logo-purge="v1"] .equalizer,
+  body[data-mobile-player-raise-logo-purge="v1"] [class*="equalizer"]{
+    min-height:130px!important;
+    margin-bottom:92px!important;
+    padding-bottom:16px!important;
+  }
+
+  body[data-mobile-player-raise-logo-purge="v1"] .now-playing,
+  body[data-mobile-player-raise-logo-purge="v1"] [class*="now"],
+  body[data-mobile-player-raise-logo-purge="v1"] [class*="playing"],
+  body[data-mobile-player-raise-logo-purge="v1"] [class*="metadata"]{
+    position:relative!important;
+    z-index:48!important;
+  }
+}
