@@ -1317,3 +1317,20 @@ ZWECK:
     z-index:48!important;
   }
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-26
+ÄNDERUNG: MOBILE_INTERNAL_LOGO_REMOVE_v1
+ZWECK:
+- Internes Mini-Logo im Mobile-Player wird nicht nur ausgeblendet,
+  sondern per Runtime aus dem DOM entfernt.
+- Header/Hero-Logo bleibt geschützt.
+==========================================
+*/
+@media(max-width:760px){
+  body[data-mobile-internal-logo-remove="v1"] [data-mobile-logo-purge="v1"],
+  body[data-mobile-internal-logo-remove="v1"] [data-mobile-boost-logo-hide]{
+    display:none!important;
+  }
+}

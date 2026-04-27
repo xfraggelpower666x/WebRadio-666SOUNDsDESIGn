@@ -1,0 +1,18 @@
+666SOUNDsDESIGn — MOBILE INTERNAL LOGO REMOVE v1
+
+Zweck:
+- Das kleine interne Logo im Mobile-Player/Boostbereich wird komplett aus dem DOM entfernt.
+- Nicht nur CSS-Ausblendung.
+- Große Header-/Hero-Grafiken bleiben geschützt.
+- Control-Leiste und Stream bleiben unverändert.
+
+Geändert:
+- index.html
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers
