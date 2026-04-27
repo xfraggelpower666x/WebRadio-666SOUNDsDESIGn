@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — MOBILE FINAL MATCH POSITION METER FIX v1
+
+Zweck:
+- Korrektur nach Nutzertext und festgelegtem Zielbild.
+- Player deutlich weiter hoch.
+- Hauptplayer sitzt sauber zwischen linkem und rechtem Side-Levelmeter.
+- Control-Leiste bleibt innerhalb der Playerbreite.
+- Control-Leiste liegt nicht mehr auf dem Bottom-Levelmeter.
+- Bottom-Levelmeter liegt unter der Control-Leiste.
+- Bottom-Levelmeter erhält Segment-Design wie die Side-Meter.
+- Bottom-Levelmeter arbeitet optisch von innen nach außen.
+
+Geändert:
+- index.html
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers

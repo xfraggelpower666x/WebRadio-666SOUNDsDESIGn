@@ -2910,3 +2910,376 @@ ZWECK:
 @media (min-width:761px){
   #mffApp{display:none!important;}
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — MOBILE_FINAL_MATCH_POSITION_METER_FIX_v1
+GEÄNDERT: 2026-04-27
+ZWECK:
+- Korrektur anhand Zielbild 2 und Nutzertext.
+- Player höher.
+- Hauptcontent exakt zwischen Side-Metern.
+- Controls nicht über Bottom-Meter.
+- Bottom-Meter als Segmentmeter wie Side-Meter, von innen nach außen.
+============================================================
+*/
+@media (max-width:760px){
+  :root{
+    --mff-side-reserve: 36px;
+    --mff-shell-top: 82px;
+    --mff-gap: 12px;
+    --mff-control-h: 92px;
+    --mff-bottom-h: 104px;
+    --mff-bottom-gap: 14px;
+    --mff-safe-b: env(safe-area-inset-bottom);
+  }
+
+  body[data-mff-active="1"],
+  body[data-mff-position-meter-fix="v1"]{
+    padding-top:calc(4px + env(safe-area-inset-top))!important;
+    padding-bottom:calc(14px + env(safe-area-inset-bottom))!important;
+    background:#02040d!important;
+  }
+
+  /*
+    Hauptplayer höher und schmaler:
+    Er sitzt jetzt sauber zwischen den linken/rechten Side-Metern.
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-shell,
+  #mffApp[data-mff-position-meter-fix="v1"] .mff-shell,
+  #mffApp .mff-shell[data-mff-shell-position-fix="v1"]{
+    width:calc(100% - (var(--mff-side-reserve) * 2))!important;
+    max-width:720px!important;
+    margin:0 auto!important;
+    padding-top:var(--mff-shell-top)!important;
+    padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;
+    gap:var(--mff-gap)!important;
+  }
+
+  /*
+    Top-Panel kompakter, damit der ganze Player ein Stück höher wirkt.
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-now{
+    min-height:138px!important;
+    padding:16px 18px!important;
+    grid-template-columns:86px minmax(0,1fr) 94px!important;
+    gap:12px!important;
+    border-radius:24px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-symbol{
+    width:80px!important;
+    height:80px!important;
+    border-radius:18px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-symbol span{
+    width:46px!important;
+    height:46px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-title small{
+    font-size:12px!important;
+    margin-bottom:8px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-title h1{
+    font-size:20px!important;
+    margin-bottom:7px!important;
+    max-width:100%!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-title h2{
+    font-size:15px!important;
+    max-width:100%!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-history{
+    min-width:86px!important;
+    width:86px!important;
+    height:48px!important;
+    padding:0 8px!important;
+    font-size:14px!important;
+    border-radius:17px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-cards{
+    gap:10px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-card{
+    min-height:96px!important;
+    padding:12px 8px!important;
+    border-radius:18px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-card small{
+    font-size:10px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-ico{
+    font-size:20px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-card strong{
+    font-size:18px!important;
+    line-height:1.12!important;
+  }
+
+  /*
+    EQ kompakter, aber weiterhin groß und lesbar.
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-eq{
+    min-height:220px!important;
+    padding:16px!important;
+    border-radius:22px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-eq header{
+    margin-bottom:12px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-eq-bars{
+    height:150px!important;
+    gap:7px!important;
+    padding:14px 10px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-eq footer{
+    margin-top:10px!important;
+    font-size:12px!important;
+  }
+
+  /*
+    Controls bleiben im Flow zwischen EQ und Bottom-Meter.
+    Kein fixed, kein Überdecken. Exakt innerhalb der Playerbreite.
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-controls,
+  #mffApp .mff-controls[data-mff-controls-position-fix="v1"]{
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-height:var(--mff-control-h)!important;
+    height:var(--mff-control-h)!important;
+    padding:12px!important;
+    border-radius:24px!important;
+    display:grid!important;
+    grid-template-columns:repeat(4, minmax(42px, 1fr)) minmax(72px, 1.45fr) repeat(2, minmax(42px, 1fr))!important;
+    gap:8px!important;
+    z-index:100!important;
+    overflow:hidden!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-controls button{
+    height:60px!important;
+    min-height:60px!important;
+    width:100%!important;
+    min-width:0!important;
+    border-radius:18px!important;
+    font-size:22px!important;
+    padding:0!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp #mffBoost{
+    font-size:17px!important;
+    letter-spacing:.04em!important;
+  }
+
+  /*
+    Bottom-Levelmeter:
+    - unter Controls
+    - gleiche Segment-Anmutung wie Side-Meter
+    - von innen nach außen
+    - nicht von Control-Leiste überdeckt
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom,
+  #mffApp .mff-bottom[data-mff-bottom-meter-fix="v1"]{
+    position:relative!important;
+    width:100%!important;
+    min-height:var(--mff-bottom-h)!important;
+    height:var(--mff-bottom-h)!important;
+    padding:14px 14px 12px 14px!important;
+    margin:0!important;
+    border-radius:22px!important;
+    overflow:hidden!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom header{
+    margin-bottom:9px!important;
+    font-size:12px!important;
+    gap:12px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom header i{
+    width:52px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom-bars{
+    position:relative!important;
+    height:34px!important;
+    display:grid!important;
+    grid-template-columns:repeat(60,1fr)!important;
+    gap:4px!important;
+    align-items:center!important;
+    padding:0 2px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom-bars i{
+    display:block!important;
+    height:28px!important;
+    border-radius:7px!important;
+    background:linear-gradient(to top, var(--mff-cyan), #4d72ff 42%, var(--mff-purple) 68%, var(--mff-pink))!important;
+    opacity:.94!important;
+    box-shadow:0 0 8px rgba(22,255,243,.18), 0 0 8px rgba(255,61,187,.14)!important;
+    transform-origin:center center!important;
+    transform:scaleY(calc(.50 + var(--mff-level) * .50))!important;
+  }
+
+  /*
+    Center-out Logik:
+    mittig stärker, außen dynamisch verteilt. Dadurch wirkt es innen-nach-außen.
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom-bars i.mff-bottom-left{
+    transform-origin:right center!important;
+    opacity:calc(.42 + (var(--mff-level) * .58))!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom-bars i.mff-bottom-right{
+    transform-origin:left center!important;
+    opacity:calc(.42 + (var(--mff-level) * .58))!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-db{
+    display:flex!important;
+    margin-top:6px!important;
+    font-size:11px!important;
+    color:rgba(235,240,255,.76)!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom small{
+    margin-top:8px!important;
+    font-size:10px!important;
+    letter-spacing:.20em!important;
+  }
+
+  /*
+    Side-Meter sauber außerhalb der Hauptbreite, aligned über Playerhöhe.
+  */
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-side{
+    top:calc(var(--mff-shell-top) + 186px)!important;
+    bottom:calc(var(--mff-bottom-h) + var(--mff-control-h) + 36px + env(safe-area-inset-bottom))!important;
+    width:22px!important;
+    border-radius:16px!important;
+    opacity:.98!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-left{
+    left:5px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-right{
+    right:5px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-side:before{
+    left:6px!important;
+    right:6px!important;
+    bottom:12px!important;
+    border-radius:8px!important;
+  }
+}
+
+/* Sehr schmale iPhones: nochmals enger, aber gleiche Ordnung. */
+@media (max-width:430px){
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-shell,
+  #mffApp .mff-shell[data-mff-shell-position-fix="v1"]{
+    width:calc(100% - 42px)!important;
+    padding-top:76px!important;
+    gap:11px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-now{
+    min-height:130px!important;
+    grid-template-columns:76px minmax(0,1fr) 78px!important;
+    padding:14px!important;
+    gap:10px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-symbol{
+    width:72px!important;
+    height:72px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-symbol span{
+    width:42px!important;
+    height:42px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-title h1{
+    font-size:18px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-title h2{
+    font-size:14px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-history{
+    min-width:74px!important;
+    width:74px!important;
+    font-size:13px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-card{
+    min-height:90px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-eq{
+    min-height:205px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-eq-bars{
+    height:138px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-controls{
+    height:82px!important;
+    min-height:82px!important;
+    padding:10px!important;
+    gap:7px!important;
+    grid-template-columns:repeat(4, minmax(38px, 1fr)) minmax(66px, 1.45fr) repeat(2, minmax(38px, 1fr))!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-controls button{
+    height:56px!important;
+    min-height:56px!important;
+    border-radius:16px!important;
+    font-size:20px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp #mffBoost{
+    font-size:15px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-bottom{
+    height:98px!important;
+    min-height:98px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-side{
+    top:calc(76px + 168px)!important;
+    bottom:calc(98px + 82px + 34px + env(safe-area-inset-bottom))!important;
+    width:20px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-left{
+    left:3px!important;
+  }
+
+  body[data-mff-position-meter-fix="v1"] #mffApp .mff-right{
+    right:3px!important;
+  }
+}

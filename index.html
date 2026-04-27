@@ -237,6 +237,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       var b = document.createElement('i');
       var h = 30 + ((i*37)%48);
       if(id === '#mffEqBars') b.style.setProperty('--h', h+'%');
+      if(id === '#mffBottomBars'){
+        b.className = i < (count/2) ? 'mff-bottom-left' : 'mff-bottom-right';
+        var dist = Math.abs(i - ((count - 1) / 2));
+        b.style.setProperty('--center-dist', dist.toFixed(2));
+      }
       b.style.setProperty('--d', (i*13)+'ms');
       el.appendChild(b);
     }
@@ -350,6 +355,47 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load', install, {passive:true});
   window.addEventListener('resize', install, {passive:true});
   window.addEventListener('orientationchange', install, {passive:true});
+})();
+</script>
+
+
+<!-- MOBILE_FINAL_MATCH_POSITION_METER_FIX_v1 -->
+<script id="mobileFinalMatchPositionMeterFixScript">
+(function(){
+  function apply(){
+    if(!document.body) return;
+    var mobile = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+    document.body.setAttribute('data-mff-position-meter-fix', mobile ? 'v1' : 'desktop');
+
+    var app = document.getElementById('mffApp');
+    if(app) app.setAttribute('data-mff-position-meter-fix','v1');
+
+    var shell = document.querySelector('#mffApp .mff-shell');
+    if(shell) shell.setAttribute('data-mff-shell-position-fix','v1');
+
+    var controls = document.querySelector('#mffApp .mff-controls');
+    if(controls) controls.setAttribute('data-mff-controls-position-fix','v1');
+
+    var bottom = document.querySelector('#mffApp .mff-bottom');
+    if(bottom) bottom.setAttribute('data-mff-bottom-meter-fix','v1');
+
+    var bottomBars = document.querySelector('#mffBottomBars');
+    if(bottomBars){
+      var bars = Array.prototype.slice.call(bottomBars.children);
+      if(bars.length){
+        bars.forEach(function(bar, idx){
+          bar.classList.toggle('mff-bottom-left', idx < bars.length / 2);
+          bar.classList.toggle('mff-bottom-right', idx >= bars.length / 2);
+          bar.style.setProperty('--center-dist', Math.abs(idx - ((bars.length - 1) / 2)).toFixed(2));
+        });
+      }
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    apply(); setTimeout(apply,160); setTimeout(apply,700); setTimeout(apply,1600); setTimeout(apply,3200);
+  });
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
 })();
 </script>
 
