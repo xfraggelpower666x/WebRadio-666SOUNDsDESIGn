@@ -1,0 +1,10 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK
+CACHE_TAG=smfp-v10-boostvisual-20260427-2110
+
+BOOST VISUAL FEEDBACK:
+- sichtbares v10 Badge
+- BST-Button bekommt Stufenleuchten
+- Boost-Readout: BST n · x.xx×
+- Ramp-Status setzt data-mff-boost-ramping für ca. 520 ms
+- Meter reagieren optisch leicht auf BST 1–3
+- WebAudio-Ramp-Boost aus v9 bleibt erhalten

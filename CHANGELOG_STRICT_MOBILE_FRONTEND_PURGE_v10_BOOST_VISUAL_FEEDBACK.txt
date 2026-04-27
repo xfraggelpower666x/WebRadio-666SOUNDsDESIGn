@@ -1,0 +1,24 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v10 BOOST VISUAL FEEDBACK
+
+Zweck:
+- Boost ist jetzt optisch prüfbar.
+- Wenn BST / + / - gedrückt wird, zeigt der Player:
+  - Boost-Stufe
+  - Ziel-Gain als Faktor
+  - kurzen Ramp-Status
+- BST-Button leuchtet je nach Stufe stärker.
+- EQ/Bottom-Meter reagieren optisch auf Boost-Stufe.
+- WebAudio GainNode + DynamicsCompressor aus v9 bleibt erhalten.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration
