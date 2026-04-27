@@ -1127,3 +1127,70 @@ body[data-mobile-visual-order-cleanup="v1"] .panel,
 body[data-mobile-visual-order-cleanup="v1"] .mobile-shell,
 body[data-mobile-visual-order-cleanup="v1"] main{overflow:visible!important}
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-26
+ÄNDERUNG: MOBILE_CONTROLS_LAYER_RESET_v1
+ZWECK:
+- Alte Mobile-Control-Layer stilllegen.
+- Eine feste, klickbare Control-Bar gewinnt immer.
+==========================================
+*/
+@media (max-width:760px){
+  #runtimeCacheBustProof,
+  #mobileInlineTopControlsForce,
+  #mobileTopControlsInBoostPanel,
+  #mobileTransportRepair,
+  .mobile-transport-repair,
+  [data-mclr-disabled="v1"]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;
+    height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  body[data-mobile-controls-layer-reset="v1"] .boost-panel,
+  body[data-mobile-controls-layer-reset="v1"] .mobile-boost-core,
+  body[data-mobile-controls-layer-reset="v1"] [class*="boost"]{
+    min-height:42px!important;
+    max-height:72px!important;
+    overflow:hidden!important;
+  }
+
+  body[data-mobile-controls-layer-reset="v1"] .mobile-dom-bottom-guard{
+    position:fixed!important;
+    left:28px!important;
+    right:28px!important;
+    bottom:calc(96px + env(safe-area-inset-bottom))!important;
+    height:10px!important;
+    opacity:.42!important;
+    z-index:20!important;
+    pointer-events:none!important;
+  }
+
+  body[data-mobile-controls-layer-reset="v1"] .mobile-dom-bottom-track{
+    height:7px!important;
+    top:2px!important;
+  }
+
+  body[data-mobile-controls-layer-reset="v1"] .mobile-dom-side-meter{
+    opacity:.42!important;
+    width:7px!important;
+    z-index:14!important;
+  }
+
+  body[data-mobile-controls-layer-reset="v1"] .eq,
+  body[data-mobile-controls-layer-reset="v1"] .equalizer,
+  body[data-mobile-controls-layer-reset="v1"] [class*="equalizer"]{
+    min-height:128px!important;
+    margin-bottom:110px!important;
+  }
+}

@@ -27,165 +27,128 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <link rel="stylesheet" href="/css/mobile.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
   <link rel="stylesheet" href="/css/desktop.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
 
-<!-- MOBILE_RUNTIME_CACHE_BUST_PROOF_v1 | mobile-runtime-cache-bust-proof-v1-20260426 -->
-<style id="runtimeCacheBustProofStyle">
+<!-- MOBILE_CONTROLS_LAYER_RESET_v1 -->
+<style id="mobileControlsLayerResetStyle">
 @media (max-width:760px){
-  #runtimeCacheBustProof {
-    position: fixed;
-    top: calc(72px + env(safe-area-inset-top));
-    right: 8px;
-    z-index: 99999;
-    padding: 4px 7px;
-    border-radius: 9px;
-    border: 1px solid rgba(0,255,255,.45);
-    background: rgba(5,8,20,.88);
-    color: rgba(0,255,232,.98);
-    font: 700 10px/1.1 system-ui,-apple-system,Segoe UI,sans-serif;
-    letter-spacing: .08em;
-    box-shadow: 0 0 10px rgba(0,255,255,.24);
-    pointer-events: none;
-  }
-}
-@media (min-width:761px){#runtimeCacheBustProof{display:none!important;}}
-</style>
-<script id="runtimeCacheBustProofScript">
-document.addEventListener('DOMContentLoaded', function(){
-  if(!document.getElementById('runtimeCacheBustProof')){
-    var el=document.createElement('div');
-    el.id='runtimeCacheBustProof';
-    el.textContent='RUNTIME v1';
-    document.body.appendChild(el);
-  }
-  document.documentElement.setAttribute('data-runtime-cache-bust-proof','mobile-runtime-cache-bust-proof-v1-20260426');
-});
-</script>
-
-
-<!-- MOBILE_INLINE_TOP_CONTROLS_FORCE_v1 -->
-<style id="mobileInlineTopControlsForceStyle">
-@media (max-width:760px){
-  #mobileInlineTopControlsForce{
+  #mobileControlsLayerReset{
+    position:fixed!important;
+    left:12px!important;
+    right:12px!important;
+    bottom:calc(18px + env(safe-area-inset-bottom))!important;
+    z-index:2147483000!important;
     display:grid!important;
-    grid-template-columns:44px 44px 44px 44px 1fr 44px!important;
-    gap:8px!important;
+    grid-template-columns:52px 52px 52px 52px minmax(58px,1fr) 52px!important;
+    gap:7px!important;
     align-items:center!important;
     justify-items:center!important;
-    width:calc(100% - 54px)!important;
-    max-width:720px!important;
-    margin:10px auto 8px auto!important;
-    padding:7px 8px!important;
-    min-height:56px!important;
-    border-radius:18px!important;
-    border:1px solid rgba(0,255,255,.30)!important;
-    background:rgba(3,7,20,.86)!important;
-    box-shadow:0 0 16px rgba(0,255,255,.14),inset 0 0 18px rgba(255,0,220,.08)!important;
-    position:relative!important;
-    z-index:9999!important;
+    box-sizing:border-box!important;
+    min-height:64px!important;
+    padding:8px!important;
+    border-radius:22px!important;
+    border:1px solid rgba(0,255,255,.32)!important;
+    background:rgba(3,7,20,.92)!important;
+    box-shadow:0 0 22px rgba(0,255,255,.18),0 0 28px rgba(255,0,220,.10),inset 0 0 18px rgba(255,0,220,.08)!important;
+    backdrop-filter:blur(10px)!important;
+    -webkit-backdrop-filter:blur(10px)!important;
     pointer-events:auto!important;
   }
-  #mobileInlineTopControlsForce button{
-    display:inline-flex!important;
+  #mobileControlsLayerReset button{
+    display:flex!important;
     align-items:center!important;
     justify-content:center!important;
-    width:44px!important;
-    height:44px!important;
-    min-width:44px!important;
-    min-height:44px!important;
+    width:50px!important;
+    height:48px!important;
+    min-width:50px!important;
+    min-height:48px!important;
+    margin:0!important;
     padding:0!important;
-    border-radius:14px!important;
+    border-radius:16px!important;
     border:1px solid rgba(0,255,255,.36)!important;
     background:rgba(9,13,32,.98)!important;
-    color:rgba(255,255,255,.96)!important;
+    color:rgba(255,255,255,.97)!important;
     font:900 16px/1 system-ui,-apple-system,Segoe UI,sans-serif!important;
     box-shadow:0 0 12px rgba(0,255,255,.14),inset 0 0 12px rgba(255,0,220,.10)!important;
     pointer-events:auto!important;
     touch-action:manipulation!important;
     -webkit-tap-highlight-color:rgba(255,0,220,.28)!important;
   }
-  #mobileInlineTopControlsForce .mi-play{color:rgba(0,255,232,.98)!important;border-color:rgba(0,255,255,.52)!important}
-  #mobileInlineTopControlsForce .mi-stop{color:rgba(255,80,180,.98)!important;border-color:rgba(255,0,220,.42)!important}
-  #mobileInlineTopControlsForce .mi-bst{
+  #mobileControlsLayerReset .mclr-play{
+    color:rgba(0,255,232,.98)!important;
+    border-color:rgba(0,255,255,.55)!important;
+  }
+  #mobileControlsLayerReset .mclr-stop{
+    color:rgba(255,72,172,.98)!important;
+    border-color:rgba(255,0,220,.45)!important;
+  }
+  #mobileControlsLayerReset .mclr-bst{
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
-    height:40px!important;
     width:100%!important;
-    border-radius:14px!important;
-    border:1px solid rgba(255,0,220,.28)!important;
-    color:rgba(210,225,255,.94)!important;
-    background:rgba(8,12,28,.78)!important;
-    font:900 12px/1 system-ui,-apple-system,Segoe UI,sans-serif!important;
-    letter-spacing:.18em!important;
-    text-shadow:0 0 8px rgba(0,255,255,.32)!important;
+    height:48px!important;
+    border-radius:16px!important;
+    border:1px solid rgba(255,0,220,.30)!important;
+    background:rgba(8,12,28,.72)!important;
+    color:rgba(210,225,255,.96)!important;
+    font:900 12px/1.05 system-ui,-apple-system,Segoe UI,sans-serif!important;
+    letter-spacing:.12em!important;
+    text-align:center!important;
     pointer-events:none!important;
   }
-  body[data-inline-mobile-controls="on"] [data-mobile-boost-logo-hide="force"],
-  body[data-inline-mobile-controls="on"] .mobile-boost-core img,
-  body[data-inline-mobile-controls="on"] .boost-panel img,
-  body[data-inline-mobile-controls="on"] [class*="boost"] img{
-    display:none!important;
-    visibility:hidden!important;
-    opacity:0!important;
+  body{
+    padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
   }
 }
-@media (min-width:761px){#mobileInlineTopControlsForce{display:none!important}}
+@media (min-width:761px){
+  #mobileControlsLayerReset{display:none!important}
+}
 </style>
-<script id="mobileInlineTopControlsForceScript">
+<script id="mobileControlsLayerResetScript">
 (function(){
-  var VERSION='MOBILE_INLINE_TOP_CONTROLS_FORCE_v1';
-  function isMobile(){ return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760; }
+  var VERSION='MOBILE_CONTROLS_LAYER_RESET_v1';
+  var STREAM_URL='/stream';
+  var boostStage=0;
 
-  function findBoostHost(){
-    var exact = document.querySelector('.boost-panel,.mobile-boost-core,[data-mobile-top-controls-host]');
-    if(exact) return exact;
-
-    var all = Array.prototype.slice.call(document.querySelectorAll('div,section,article,main'));
-    var candidates = all.filter(function(el){
-      var t=(el.textContent||'').trim();
-      return /\bBST\b/.test(t) && el.getBoundingClientRect && el.getBoundingClientRect().height > 40;
-    });
-    if(candidates.length){
-      candidates.sort(function(a,b){
-        var ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
-        return Math.abs(ra.top-520)-Math.abs(rb.top-520);
-      });
-      return candidates[0];
-    }
-    return document.querySelector('.hud-panel,.player-shell,.mobile-shell,main') || document.body;
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
   }
 
-  function ensureAudio(){
+  function getAudio(){
     var a=document.querySelector('audio');
     if(!a){
       a=document.createElement('audio');
-      a.id='inlineMobileAudio';
-      a.crossOrigin='anonymous';
+      a.id='mobileControlsLayerResetAudio';
       a.preload='none';
+      a.crossOrigin='anonymous';
       a.playsInline=true;
       a.style.display='none';
       document.body.appendChild(a);
     }
-    if(!a.getAttribute('src')){
-      a.setAttribute('src','/stream');
-    }
+    if(!a.getAttribute('src')) a.setAttribute('src', STREAM_URL);
     return a;
   }
 
-  function nativePlay(){
-    var a=ensureAudio();
-    try{
-      if(!a.getAttribute('src')) a.setAttribute('src','/stream');
-      var r=a.play();
-      if(r && typeof r.catch==='function') r.catch(function(err){ console.warn('[666 inline play]', err); });
-    }catch(err){ console.warn('[666 inline play]', err); }
+  function setLabel(){
+    var el=document.querySelector('#mobileControlsLayerReset .mclr-bst');
+    if(el) el.textContent='BST ' + boostStage;
+    document.documentElement.setAttribute('data-mobile-layer-reset-boost', String(boostStage));
   }
 
-  function nativePause(){
+  function play(){
+    var a=getAudio();
+    try{
+      if(!a.getAttribute('src')) a.setAttribute('src', STREAM_URL);
+      var r=a.play();
+      if(r && typeof r.catch==='function') r.catch(function(err){ console.warn('[MCLR play]', err); });
+    }catch(err){ console.warn('[MCLR play]', err); }
+  }
+
+  function pause(){
     var a=document.querySelector('audio');
     if(a) a.pause();
   }
 
-  function nativeStop(){
+  function stop(){
     var a=document.querySelector('audio');
     if(a){
       a.pause();
@@ -194,130 +157,88 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   function boost(delta){
-    var root=document.documentElement;
-    var current=Number(root.getAttribute('data-inline-boost-stage')||'0');
-    var next=Math.max(0,Math.min(3,current+delta));
-    root.setAttribute('data-inline-boost-stage',String(next));
-    var a=ensureAudio();
+    boostStage=Math.max(0,Math.min(3,boostStage+delta));
+    var a=getAudio();
     var volumes=[0.86,0.94,1.0,1.0];
-    try{ a.volume=volumes[next]; }catch(e){}
-    var label=document.querySelector('#mobileInlineTopControlsForce .mi-bst');
-    if(label) label.textContent='BST '+next;
-    // vorhandene Boost-Buttons zusätzlich triggern, falls vorhanden
-    var existing = delta>0
-      ? document.querySelector('.boost-up,[data-action="boost-up"],[aria-label*="Boost mehr"],button[aria-label*="Boost mehr"]')
-      : document.querySelector('.boost-down,[data-action="boost-down"],[aria-label*="Boost weniger"],button[aria-label*="Boost weniger"]');
-    if(existing && !existing.closest('#mobileInlineTopControlsForce')){
-      try{ existing.click(); }catch(e){}
+    try{ a.volume=volumes[boostStage]; }catch(e){}
+    setLabel();
+
+    // Bestehende Boost-Logik zusätzlich anstoßen, falls der alte Player sie bereitstellt.
+    var selector = delta > 0
+      ? '[data-mobile-top-action="boost-up"],[data-mi="bup"],[data-mobile-repair-action="boost-up"],button[aria-label*="Boost mehr"]'
+      : '[data-mobile-top-action="boost-down"],[data-mi="bdown"],[data-mobile-repair-action="boost-down"],button[aria-label*="Boost weniger"]';
+    var oldBtn=document.querySelector(selector);
+    if(oldBtn && !oldBtn.closest('#mobileControlsLayerReset')){
+      try{ oldBtn.click(); }catch(e){}
     }
   }
 
   function install(){
-    if(!isMobile()){
-      document.body && document.body.setAttribute('data-inline-mobile-controls','off');
-      return;
-    }
-    document.body.setAttribute('data-inline-mobile-controls','on');
-    document.documentElement.setAttribute('data-inline-mobile-controls-version',VERSION);
+    if(!document.body) return;
+    document.body.setAttribute('data-mobile-controls-layer-reset', isMobile() ? 'v1' : 'desktop');
+    document.documentElement.setAttribute('data-mobile-controls-layer-reset-version', VERSION);
 
-    var controls=document.getElementById('mobileInlineTopControlsForce');
-    if(!controls){
-      controls=document.createElement('div');
-      controls.id='mobileInlineTopControlsForce';
-      controls.innerHTML=
-        '<button type="button" class="mi-play" data-mi="play" aria-label="Play">▶</button>'+
-        '<button type="button" data-mi="pause" aria-label="Pause">Ⅱ</button>'+
-        '<button type="button" class="mi-stop" data-mi="stop" aria-label="Stop">■</button>'+
-        '<button type="button" data-mi="bdown" aria-label="Boost weniger">−</button>'+
-        '<span class="mi-bst">BST 0</span>'+
-        '<button type="button" data-mi="bup" aria-label="Boost mehr">+</button>';
-    }
-
-    var host=findBoostHost();
-    if(host){
-      host.setAttribute('data-inline-controls-host','v1');
-      Array.prototype.slice.call(host.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]')).forEach(function(n){
-        if(!n.closest('#mobileInlineTopControlsForce')) n.setAttribute('data-mobile-boost-logo-hide','force');
+    var oldSelectors=[
+      '#runtimeCacheBustProof',
+      '#mobileInlineTopControlsForce',
+      '#mobileTopControlsInBoostPanel',
+      '#mobileTransportRepair',
+      '.mobile-transport-repair'
+    ];
+    oldSelectors.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(n){
+        if(n.id!=='mobileControlsLayerReset'){
+          n.setAttribute('data-mclr-disabled','v1');
+          n.style.display='none';
+          n.style.visibility='hidden';
+          n.style.opacity='0';
+          n.style.pointerEvents='none';
+        }
       });
-      if(controls.parentNode!==host) host.insertBefore(controls, host.firstChild);
-    }else{
-      document.body.insertBefore(controls, document.body.firstChild);
+    });
+
+    if(!isMobile()) return;
+
+    var bar=document.getElementById('mobileControlsLayerReset');
+    if(!bar){
+      bar=document.createElement('div');
+      bar.id='mobileControlsLayerReset';
+      bar.innerHTML=
+        '<button type="button" class="mclr-play" data-mclr="play" aria-label="Play">▶</button>'+
+        '<button type="button" data-mclr="pause" aria-label="Pause">Ⅱ</button>'+
+        '<button type="button" class="mclr-stop" data-mclr="stop" aria-label="Stop">■</button>'+
+        '<button type="button" data-mclr="bdown" aria-label="Boost weniger">−</button>'+
+        '<span class="mclr-bst">BST 0</span>'+
+        '<button type="button" data-mclr="bup" aria-label="Boost mehr">+</button>';
+      document.body.appendChild(bar);
     }
 
-    if(!controls.__miBound){
-      controls.__miBound=true;
+    if(!bar.__mclrBound){
+      bar.__mclrBound=true;
       var handler=function(ev){
-        var b=ev.target.closest && ev.target.closest('[data-mi]');
-        if(!b) return;
-        ev.preventDefault(); ev.stopPropagation();
-        var a=b.getAttribute('data-mi');
-        if(a==='play') nativePlay();
-        if(a==='pause') nativePause();
-        if(a==='stop') nativeStop();
-        if(a==='bup') boost(1);
-        if(a==='bdown') boost(-1);
+        var btn=ev.target.closest && ev.target.closest('[data-mclr]');
+        if(!btn) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        var cmd=btn.getAttribute('data-mclr');
+        if(cmd==='play') play();
+        if(cmd==='pause') pause();
+        if(cmd==='stop') stop();
+        if(cmd==='bup') boost(1);
+        if(cmd==='bdown') boost(-1);
       };
-      controls.addEventListener('click',handler,{capture:true});
-      controls.addEventListener('touchend',handler,{passive:false,capture:true});
+      bar.addEventListener('click',handler,{capture:true});
+      bar.addEventListener('touchend',handler,{passive:false,capture:true});
     }
+
+    setLabel();
   }
 
   document.addEventListener('DOMContentLoaded',function(){
-    install();
-    setTimeout(install,250);
-    setTimeout(install,1000);
-    setTimeout(install,2200);
+    install(); setTimeout(install,250); setTimeout(install,900); setTimeout(install,2200);
   });
   window.addEventListener('resize',install,{passive:true});
   window.addEventListener('orientationchange',install,{passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_UI_ORDER_CONSOLIDATION_v1 -->
-<style id="mobileUiOrderConsolidationStyle">@media(max-width:760px){#runtimeCacheBustProof{display:none!important}}</style>
-<script id="mobileUiOrderConsolidationScript">
-(function(){
-function m(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
-function a(){
- if(!document.body)return;
- document.body.setAttribute('data-mobile-ui-order',m()?'v1':'desktop');
- var c=document.getElementById('mobileInlineTopControlsForce');
- var h=document.querySelector('[data-inline-controls-host="v1"],.mobile-boost-top-controls-host,.boost-panel,.mobile-boost-core,[class*="boost"]');
- if(c&&h&&c.parentNode!==h)h.insertBefore(c,h.firstChild);
- if(h){
-  h.setAttribute('data-mobile-ui-order-host','v1');
-  Array.prototype.slice.call(h.children).forEach(function(x){if(x.id!=='mobileInlineTopControlsForce')x.setAttribute('data-mobile-ui-order-hide','v1')});
-  Array.prototype.slice.call(h.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]')).forEach(function(x){if(!x.closest('#mobileInlineTopControlsForce'))x.setAttribute('data-mobile-ui-order-hide','v1')});
- }
-}
-document.addEventListener('DOMContentLoaded',function(){a();setTimeout(a,300);setTimeout(a,1200);setTimeout(a,2500)});
-window.addEventListener('resize',a,{passive:true});window.addEventListener('orientationchange',a,{passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_VISUAL_ORDER_CLEANUP_v1 -->
-<script id="mobileVisualOrderCleanupScript">
-(function(){
-function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
-function apply(){
- if(!document.body)return;
- document.body.setAttribute('data-mobile-visual-order-cleanup',isMobile()?'v1':'desktop');
- var c=document.getElementById('mobileInlineTopControlsForce');
- if(c){c.setAttribute('data-mobile-clean-controls','v1');}
- var h=document.querySelector('[data-inline-controls-host="v1"],[data-mobile-ui-order-host="v1"],.mobile-boost-top-controls-host,.boost-panel,.mobile-boost-core,[class*="boost"]');
- if(h){
-  h.setAttribute('data-mobile-clean-boost-host','v1');
-  Array.prototype.slice.call(h.children).forEach(function(x){if(x.id!=='mobileInlineTopControlsForce')x.setAttribute('data-mobile-clean-hide','v1')});
-  Array.prototype.slice.call(h.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]')).forEach(function(x){if(!x.closest('#mobileInlineTopControlsForce'))x.setAttribute('data-mobile-clean-hide','v1')});
- }
- var eq=document.querySelector('.eq,.equalizer,[class*="equalizer"],[class*="eq"]');
- if(eq)eq.setAttribute('data-mobile-clean-eq','v1');
-}
-document.addEventListener('DOMContentLoaded',function(){apply();setTimeout(apply,250);setTimeout(apply,1000);setTimeout(apply,2400)});
-window.addEventListener('resize',apply,{passive:true});
-window.addEventListener('orientationchange',apply,{passive:true});
 })();
 </script>
 
