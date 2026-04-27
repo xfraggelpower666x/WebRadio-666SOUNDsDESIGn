@@ -16,18 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
-  <link rel="stylesheet" href="/css/layout.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
-  <link rel="stylesheet" href="/css/effects.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
-  <link rel="stylesheet" href="/css/mobile.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
-  <link rel="stylesheet" href="/css/desktop.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
-
-<!-- MOBILE_FINAL_MOCKUP_MATCH_v1 -->
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v8-20260427-2035" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v8-20260427-2035" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v8-20260427-2035" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v8-20260427-2035" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v8-20260427-2035" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v8-20260427-2035" />
 </head>
 <body>
   <div class="frame-stage">
@@ -162,750 +161,383 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=mobile-runtime-cache-bust-proof-v1-20260426"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v8-20260427-2035"></script>
 
-<!-- MOBILE_FINAL_FORCE_ROOT_OVERRIDE_v1 -->
-<script id="mobileFinalForceRootOverrideScript">
-(function(){
-  var VERSION = 'MOBILE_FINAL_FORCE_ROOT_OVERRIDE_v1';
-  var STREAM_URL = '/stream';
-  var boostStage = 0;
-  var rafStarted = false;
 
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF -->
+<style id="strictMobileFrontendPurgeV8Style">
+@media(max-width:760px){
+  :root{
+    --mff-bg:#02040d;
+    --mff-panel:rgba(5,10,28,.82);
+    --mff-cyan:#16fff3;
+    --mff-pink:#ff3dbb;
+    --mff-purple:#8d45ff;
+    --mff-text:#f7f8ff;
+    --mff-level:.20;
+    --mff-side-w:20px;
+    --mff-side-gap:16px;
+    --mff-shell-w:calc(100% - ((var(--mff-side-w) + var(--mff-side-gap)) * 2));
   }
+  html,body{
+    margin:0!important;
+    padding:0!important;
+    min-height:100dvh!important;
+    overflow-x:hidden!important;
+    background:radial-gradient(circle at 55% 20%,rgba(22,255,243,.08),transparent 34%),radial-gradient(circle at 25% 70%,rgba(255,61,187,.07),transparent 32%),#02040d!important;
+    color:var(--mff-text)!important;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  }
+  body[data-smfp-active="1"]::before,
+  body[data-smfp-active="1"]::after,
+  html[data-smfp-version]::before,
+  html[data-smfp-version]::after{
+    content:none!important;
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    background:none!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    border:0!important;
+    width:0!important;
+    height:0!important;
+  }
+  body[data-smfp-active="1"]{
+    padding:calc(4px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom)) 0!important;
+  }
+  body[data-smfp-active="1"] > *:not(#mffApp):not(script):not(style):not(link):not(#mffAudio){
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;height:0!important;min-width:0!important;min-height:0!important;max-width:0!important;max-height:0!important;
+    margin:0!important;padding:0!important;overflow:hidden!important;background:none!important;background-image:none!important;box-shadow:none!important;border:0!important;
+  }
+  body[data-smfp-active="1"] [data-smfp-hidden="1"],
+  body[data-smfp-active="1"] [data-v8-old-bottom="1"],
+  body[data-smfp-active="1"] .mobile-dom-bottom-guard,
+  body[data-smfp-active="1"] .mobile-dom-bottom-track,
+  body[data-smfp-active="1"] .mobile-dom-bottom-left,
+  body[data-smfp-active="1"] .mobile-dom-bottom-right,
+  body[data-smfp-active="1"] #mobileHudDomMeterRepair,
+  body[data-smfp-active="1"] #mobileTransportRepair,
+  body[data-smfp-active="1"] #mobileTopControlsInBoostPanel,
+  body[data-smfp-active="1"] .mobile-hud-dom-meter-repair,
+  body[data-smfp-active="1"] .mobile-transport-repair,
+  body[data-smfp-active="1"] .mobile-top-controls-in-boost,
+  body[data-smfp-active="1"] .bottom-meter,
+  body[data-smfp-active="1"] .bottom-levelmeter,
+  body[data-smfp-active="1"] .mobile-bottom-meter,
+  body[data-smfp-active="1"] .gesture-guard,
+  body[data-smfp-active="1"] [class*="bottom"][class*="meter"]:not(#mffApp *),
+  body[data-smfp-active="1"] [class*="bottom"][class*="guard"]:not(#mffApp *),
+  body[data-smfp-active="1"] [class*="gesture"][class*="guard"]:not(#mffApp *){
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;height:0!important;min-width:0!important;min-height:0!important;max-width:0!important;max-height:0!important;
+    margin:0!important;padding:0!important;overflow:hidden!important;background:none!important;background-image:none!important;box-shadow:none!important;border:0!important;
+  }
+  #mffApp{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:2147482000!important;width:100%!important;min-height:100dvh!important;pointer-events:none!important;}
+  #mffApp::before,#mffApp::after,.mff-shell::before,.mff-shell::after{content:none!important;display:none!important;}
+  .mff-shell{width:var(--mff-shell-w)!important;max-width:680px!important;margin:0 auto!important;padding:74px 0 calc(18px + env(safe-area-inset-bottom)) 0!important;display:flex!important;flex-direction:column!important;gap:10px!important;box-sizing:border-box!important;pointer-events:none!important;}
+  .mff-shell *{box-sizing:border-box!important;}
+  .mff-now,.mff-card,.mff-eq,.mff-controls,.mff-bottom{background:linear-gradient(135deg,rgba(255,61,187,.065),rgba(22,255,243,.035)),rgba(5,10,28,.82)!important;border:1px solid rgba(22,255,243,.30)!important;box-shadow:0 0 20px rgba(22,255,243,.10),0 0 24px rgba(255,61,187,.07),inset 0 0 24px rgba(255,255,255,.025)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;}
+  .mff-now{min-height:122px!important;padding:12px!important;border-radius:24px!important;display:grid!important;grid-template-columns:68px minmax(0,1fr) 72px!important;gap:9px!important;align-items:center!important;pointer-events:auto!important;overflow:hidden!important;}
+  .mff-symbol{width:64px!important;height:64px!important;border-radius:18px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(3,8,20,.68)!important;border:1px solid rgba(255,61,187,.34)!important;box-shadow:inset 0 0 20px rgba(255,61,187,.07)!important;overflow:hidden!important;}
+  .mff-symbol span{width:38px!important;height:38px!important;border:3px solid var(--mff-pink)!important;border-radius:50%!important;position:relative!important;box-shadow:0 0 18px rgba(255,61,187,.75)!important;}
+  .mff-symbol span:after{content:""!important;position:absolute!important;left:50%!important;top:50%!important;width:4px!important;height:60px!important;transform:translate(-50%,-4%)!important;background:linear-gradient(var(--mff-pink),var(--mff-cyan))!important;box-shadow:-14px 24px 0 -1px var(--mff-purple),14px 24px 0 -1px var(--mff-cyan)!important;}
+  .mff-symbol img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;border-radius:14px!important;}
+  .mff-symbol[data-has-artwork="1"] span{display:none!important;}
+  .mff-title{min-width:0!important;overflow:hidden!important;}
+  .mff-title small{display:block!important;color:var(--mff-cyan)!important;font-size:12px!important;font-weight:850!important;letter-spacing:.13em!important;margin-bottom:8px!important;white-space:nowrap!important;}
+  .mff-title h1{margin:0 0 7px 0!important;color:var(--mff-pink)!important;font-size:17px!important;line-height:1.12!important;font-weight:850!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;position:relative!important;}
+  .mff-title h1 span{display:inline-block!important;min-width:100%!important;padding-left:100%!important;animation:mffMarquee 13s linear infinite!important;}
+  @keyframes mffMarquee{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
+  .mff-title h2{margin:0!important;color:var(--mff-cyan)!important;font-size:13px!important;line-height:1.2!important;font-weight:760!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  .mff-history{min-width:68px!important;width:68px!important;height:44px!important;padding:0 7px!important;border-radius:17px!important;border:1px solid rgba(255,61,187,.55)!important;color:var(--mff-text)!important;background:rgba(4,8,20,.72)!important;font-size:12px!important;pointer-events:auto!important;}
+  .mff-cards{display:grid!important;grid-template-columns:0.78fr 0.78fr 1.44fr!important;gap:8px!important;pointer-events:auto!important;}
+  .mff-card{min-height:86px!important;min-width:0!important;padding:10px 7px!important;border-radius:18px!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;overflow:hidden!important;}
+  .mff-card div{display:flex!important;align-items:center!important;gap:6px!important;color:var(--mff-cyan)!important;min-width:0!important;}
+  .mff-card small{font-size:9px!important;letter-spacing:.08em!important;font-weight:850!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  .mff-ico{color:var(--mff-pink)!important;font-size:18px!important;flex:0 0 auto!important;}
+  .mff-card strong{display:block!important;text-align:center!important;color:var(--mff-text)!important;font-size:16px!important;line-height:1.12!important;font-weight:760!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  .mff-card:nth-child(3) strong{font-size:15px!important;}
+  .mff-card p{display:flex!important;justify-content:center!important;gap:8px!important;margin:0!important;}
+  .mff-card p i{width:6px!important;height:6px!important;border-radius:50%!important;background:var(--mff-cyan)!important;opacity:.75!important;}
+  .mff-card p i:first-child{background:var(--mff-pink)!important;}
+  .mff-eq{min-height:198px!important;padding:14px!important;border-radius:22px!important;pointer-events:auto!important;}
+  .mff-eq header{display:flex!important;justify-content:space-between!important;align-items:center!important;margin-bottom:10px!important;color:var(--mff-cyan)!important;}
+  .mff-eq header span{font-size:15px!important;font-weight:850!important;letter-spacing:.13em!important;}
+  .mff-eq header b{font-size:12px!important;letter-spacing:.13em!important;}
+  .mff-eq-bars{height:132px!important;display:grid!important;grid-template-columns:repeat(20,1fr)!important;gap:6px!important;align-items:end!important;padding:12px 8px!important;border-radius:18px!important;background:repeating-linear-gradient(to bottom,transparent 0 29px,rgba(130,150,255,.12) 30px 31px),radial-gradient(circle at 50% 100%,rgba(22,255,243,.10),transparent 68%)!important;}
+  .mff-eq-bars i{display:block!important;height:var(--h)!important;border-radius:8px 8px 3px 3px!important;background:linear-gradient(to top,var(--mff-cyan),#547bff 34%,#b744ff 58%,var(--mff-pink))!important;box-shadow:0 0 10px rgba(255,61,187,.18),0 0 10px rgba(22,255,243,.15)!important;animation:mffEqPulse 1.35s ease-in-out infinite alternate!important;animation-delay:var(--d)!important;}
+  @keyframes mffEqPulse{from{height:calc(var(--h) * .72);}to{height:min(100%,calc(var(--h) * 1.12));}}
+  .mff-eq footer{margin-top:10px!important;color:var(--mff-cyan)!important;text-align:center!important;letter-spacing:.14em!important;font-size:12px!important;}
+  .mff-controls{min-height:78px!important;height:78px!important;padding:9px!important;border-radius:24px!important;display:grid!important;grid-template-columns:repeat(4,minmax(34px,1fr)) minmax(58px,1.24fr) repeat(2,minmax(34px,1fr))!important;gap:6px!important;pointer-events:auto!important;overflow:hidden!important;}
+  .mff-controls button{height:52px!important;min-height:52px!important;width:100%!important;min-width:0!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.45)!important;background:rgba(6,11,30,.88)!important;color:var(--mff-text)!important;font-size:18px!important;font-weight:900!important;box-shadow:0 0 14px rgba(22,255,243,.12),inset 0 0 12px rgba(255,61,187,.06)!important;pointer-events:auto!important;touch-action:manipulation!important;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,color .16s ease,transform .08s ease!important;}
+  .mff-play{color:var(--mff-cyan)!important;} .mff-stop{color:var(--mff-pink)!important;} #mffBoost{font-size:14px!important;line-height:1.05!important;white-space:normal!important;}
+  .mff-controls button.mff-active,.mff-controls button.mff-transient,#mffApp[data-mff-transport-state="play"] .mff-controls [data-mff="play"],#mffApp[data-mff-transport-state="pause"] .mff-controls [data-mff="pause"],#mffApp[data-mff-transport-state="stop"] .mff-controls [data-mff="stop"]{color:#fff!important;background:linear-gradient(135deg,rgba(255,61,187,.42),rgba(122,60,255,.30)),rgba(18,10,34,.96)!important;border-color:rgba(255,61,187,.92)!important;box-shadow:0 0 18px rgba(255,61,187,.55),0 0 26px rgba(255,61,187,.22),inset 0 0 18px rgba(255,61,187,.18)!important;}
+  .mff-controls button:active{transform:scale(.96)!important;}
+  .mff-bottom{height:66px!important;min-height:66px!important;padding:10px 12px!important;border-radius:22px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;overflow:hidden!important;}
+  .mff-bottom-bars{height:38px!important;display:grid!important;grid-template-columns:repeat(60,1fr)!important;gap:3px!important;align-items:center!important;width:100%!important;}
+  .mff-bottom-bars i{display:block!important;height:30px!important;border-radius:6px!important;background:linear-gradient(to top,var(--mff-cyan) 0%,var(--mff-cyan) 34%,#516dff 45%,var(--mff-purple) 66%,var(--mff-pink) 100%)!important;box-shadow:0 0 8px rgba(22,255,243,.28),0 0 8px rgba(255,61,187,.20)!important;opacity:calc(.46 + var(--mff-level) * .54)!important;transform:scaleY(calc(.48 + var(--mff-level) * .52))!important;animation:mffCenterOutPulse 1.05s ease-in-out infinite alternate!important;animation-delay:calc(var(--mff-center-distance,0) * 18ms)!important;}
+  @keyframes mffCenterOutPulse{0%{transform:scaleY(calc(.42 + var(--mff-level) * .42));opacity:calc(.38 + var(--mff-level) * .46);}100%{transform:scaleY(calc(.62 + var(--mff-level) * .38));opacity:calc(.58 + var(--mff-level) * .42);}}
+  .mff-side{position:fixed!important;top:236px!important;bottom:142px!important;width:20px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.45)!important;background:rgba(3,8,20,.68)!important;z-index:2147482100!important;overflow:hidden!important;pointer-events:none!important;box-shadow:0 0 18px rgba(22,255,243,.18),inset 0 0 14px rgba(255,61,187,.06)!important;}
+  .mff-left{left:3px!important;} .mff-right{right:3px!important;}
+  .mff-side:before{content:""!important;position:absolute!important;left:6px!important;right:6px!important;bottom:12px!important;height:calc(76% * var(--mff-level))!important;border-radius:8px!important;background:repeating-linear-gradient(to top,var(--mff-cyan) 0 9px,transparent 9px 14px,var(--mff-purple) 14px 23px,transparent 23px 28px,var(--mff-pink) 28px 37px,transparent 37px 42px)!important;box-shadow:0 0 12px rgba(22,255,243,.55)!important;}
+  .smfp-version-badge{position:fixed!important;right:8px!important;top:calc(6px + env(safe-area-inset-top))!important;z-index:2147483647!important;padding:4px 7px!important;border-radius:999px!important;background:rgba(255,61,187,.92)!important;color:#fff!important;font-size:9px!important;font-weight:900!important;letter-spacing:.08em!important;pointer-events:none!important;box-shadow:0 0 12px rgba(255,61,187,.55)!important;}
+}
+@media(min-width:761px){#mffApp{display:none!important;}}
+</style>
 
-  function q(sel, root){ return (root || document).querySelector(sel); }
-  function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF -->
+<script id="strictMobileFrontendPurgeV8Script">
+(function(){
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF';
+  var STREAM_URL='/stream';
+  var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
+  var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
+
+  function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
+  function q(s,r){return(r||document).querySelector(s)}
+  function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
 
   function getAudio(){
-    var audio = q('#mffAudio') || q('audio');
-    if(!audio){
-      audio = document.createElement('audio');
-      audio.id = 'mffAudio';
-      audio.preload = 'none';
-      audio.crossOrigin = 'anonymous';
-      audio.playsInline = true;
-      audio.style.display = 'none';
-      document.body.appendChild(audio);
+    var a=q('#mffAudio')||q('audio');
+    if(!a){
+      a=document.createElement('audio');
+      a.id='mffAudio'; a.preload='none'; a.crossOrigin='anonymous'; a.playsInline=true; a.style.display='none';
+      document.body.appendChild(a);
     }
-    if(!audio.getAttribute('src')) audio.setAttribute('src', STREAM_URL);
-    return audio;
+    if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);
+    return a;
   }
 
-  function setPlaying(v){
-    document.documentElement.setAttribute('data-mff-playing', v ? '1' : '0');
-    var led = q('#mffLiveState');
-    if(led) led.textContent = v ? 'LIVE' : 'READY';
+  function setTransportState(state){
+    var app=q('#mffApp');
+    if(app)app.setAttribute('data-mff-transport-state',state);
+    qa('#mffApp .mff-controls button').forEach(function(b){b.classList.remove('mff-active','mff-transient')});
+    var key=state==='play'?'play':state==='pause'?'pause':'stop';
+    var btn=q('#mffApp .mff-controls [data-mff="'+key+'"]');
+    if(btn)btn.classList.add('mff-active');
+    document.documentElement.setAttribute('data-mff-playing',state==='play'?'1':'0');
   }
 
-  function play(){
-    var a = getAudio();
-    try{
-      if(!a.getAttribute('src')) a.setAttribute('src', STREAM_URL);
-      var r = a.play();
-      if(r && typeof r.catch === 'function') r.catch(function(err){ console.warn('[MFF play]', err); });
-      setPlaying(true);
-    }catch(e){ console.warn('[MFF play]', e); }
-  }
-  function pause(){
-    try{ getAudio().pause(); }catch(e){}
-    setPlaying(false);
-  }
-  function stop(){
-    var a = getAudio();
-    try{ a.pause(); try{ a.currentTime = 0; }catch(e){} }catch(e){}
-    setPlaying(false);
-  }
-  function boost(d){
-    boostStage = Math.max(0, Math.min(3, boostStage + d));
-    try{ getAudio().volume = [0.86,0.94,1,1][boostStage]; }catch(e){}
-    var b = q('#mffBoost');
-    if(b) b.textContent = 'BST ' + boostStage;
-    document.documentElement.setAttribute('data-mff-boost', String(boostStage));
+  function flash(cmd){
+    var btn=q('#mffApp .mff-controls [data-mff="'+cmd+'"]');
+    if(!btn)return;
+    btn.classList.add('mff-transient');
+    clearTimeout(transientTimer);
+    transientTimer=setTimeout(function(){qa('#mffApp .mff-controls .mff-transient').forEach(function(n){n.classList.remove('mff-transient')})},1200);
   }
 
-  function card(title, value, icon){
-    return '<section class="mff-card"><div><span class="mff-ico">'+icon+'</span><small>'+title+'</small></div><strong>'+value+'</strong><p><i></i><i></i><i></i></p></section>';
-  }
+  function play(){var a=getAudio();try{if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);var r=a.play();if(r&&typeof r.catch==='function')r.catch(function(e){console.warn('[666 mobile play]',e)});setTransportState('play')}catch(e){console.warn('[666 mobile play]',e)}}
+  function pause(){try{getAudio().pause()}catch(e){}setTransportState('pause')}
+  function stop(){var a=getAudio();try{a.pause();try{a.currentTime=0}catch(e){}}catch(e){}setTransportState('stop')}
+  function boost(d){boostStage=Math.max(0,Math.min(3,boostStage+d));try{getAudio().volume=[0.86,0.94,1,1][boostStage]}catch(e){}var b=q('#mffBoost');if(b)b.textContent='BST '+boostStage;document.documentElement.setAttribute('data-mff-boost',String(boostStage))}
 
-  function makeBars(id, count){
-    var el = q(id);
-    if(!el || el.children.length) return;
+  function card(t,v,i){return'<section class="mff-card"><div><span class="mff-ico">'+i+'</span><small>'+t+'</small></div><strong>'+v+'</strong><p><i></i><i></i><i></i></p></section>'}
+
+  function buildBars(id,count){
+    var el=q(id); if(!el||el.children.length)return;
+    var mid=(count-1)/2;
     for(var i=0;i<count;i++){
-      var b = document.createElement('i');
-      var h = 30 + ((i*37)%48);
-      if(id === '#mffEqBars') b.style.setProperty('--h', h+'%');
-      if(id === '#mffBottomBars'){
-        b.className = i < (count/2) ? 'mff-bottom-left' : 'mff-bottom-right';
-        var dist = Math.abs(i - ((count - 1) / 2));
-        b.style.setProperty('--center-dist', dist.toFixed(2));
+      var b=document.createElement('i');
+      if(id==='#mffEqBars')b.style.setProperty('--h',(30+((i*37)%48))+'%');
+      if(id==='#mffBottomBars'){
+        b.className=i<count/2?'mff-bottom-left':'mff-bottom-right';
+        b.style.setProperty('--mff-center-distance',Math.abs(i-mid).toFixed(2));
       }
-      b.style.setProperty('--d', (i*13)+'ms');
+      b.style.setProperty('--d',(i*13)+'ms');
       el.appendChild(b);
     }
   }
 
-  function build(){
-    var app = q('#mffApp');
-    if(app) return app;
+  function setMarqueeTitle(text){
+    var h1=q('#mffApp .mff-title h1');
+    if(!h1)return;
+    h1.innerHTML='';
+    var span=document.createElement('span');
+    span.textContent=text||'Metadaten werden geladen ...';
+    h1.appendChild(span);
+  }
 
-    app = document.createElement('div');
-    app.id = 'mffApp';
-    app.setAttribute('data-version', VERSION);
-    app.innerHTML =
-      '<div class="mff-side mff-left"><i></i></div>' +
-      '<div class="mff-side mff-right"><i></i></div>' +
-      '<main class="mff-shell">' +
-        '<section class="mff-now">' +
-          '<div class="mff-symbol"><span></span></div>' +
-          '<div class="mff-title"><small>NOW PLAYING</small><h1>Metadaten werden geladen ...</h1><h2>Loading stream metadata ...</h2></div>' +
-          '<button class="mff-history" type="button">↺ History</button>' +
-        '</section>' +
-        '<section class="mff-cards">' +
-          card('LISTENERS','0 / 250','♚') +
-          card('BITRATE','Unknown','≋') +
-          card('DJ / STATUS','666SOUNDsDESIGn<br>DJ','◖') +
-        '</section>' +
-        '<section class="mff-eq"><header><span>EQ</span><b id="mffLiveState">READY</b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>' +
-        '<section class="mff-controls">' +
-          '<button type="button" data-mff="play" class="mff-play">▶</button>' +
-          '<button type="button" data-mff="pause">Ⅱ</button>' +
-          '<button type="button" data-mff="stop" class="mff-stop">■</button>' +
-          '<button type="button" data-mff="reset">↺</button>' +
-          '<button type="button" data-mff="down">−</button>' +
-          '<button type="button" data-mff="boost" id="mffBoost">BST 0</button>' +
-          '<button type="button" data-mff="up">+</button>' +
-        '</section>' +
-        '<section class="mff-bottom"><header><i></i><span>LEVEL METER</span><i></i></header><div id="mffBottomBars" class="mff-bottom-bars"></div><div class="mff-db mff-db-hidden" aria-hidden="true"></div><small class="mff-swipe-hidden" aria-hidden="true"></small></section>' +
-      '</main>';
+  function setArtwork(url){
+    var box=q('#mffApp .mff-symbol');
+    if(!box)return;
+    var old=q('img',box);
+    if(old)old.remove();
+    if(!url){box.removeAttribute('data-has-artwork');return;}
+    var img=document.createElement('img');
+    img.alt='Stream Icon';
+    img.src=url;
+    img.loading='lazy';
+    img.onerror=function(){img.remove();box.removeAttribute('data-has-artwork')};
+    box.appendChild(img);
+    box.setAttribute('data-has-artwork','1');
+  }
 
-    // Direkt als erstes Element im Body, damit nichts darüber liegt.
-    document.body.insertBefore(app, document.body.firstChild);
-
-    makeBars('#mffEqBars', 20);
-    makeBars('#mffBottomBars', 60);
-
-    var controls = q('.mff-controls', app);
-    var handler = function(ev){
-      var btn = ev.target.closest && ev.target.closest('[data-mff]');
-      if(!btn) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      var c = btn.getAttribute('data-mff');
-      if(c === 'play') play();
-      if(c === 'pause') pause();
-      if(c === 'stop') stop();
-      if(c === 'reset') { stop(); setTimeout(play, 120); }
-      if(c === 'down') boost(-1);
-      if(c === 'up') boost(1);
-      if(c === 'boost') boost(1);
+  function buildApp(){
+    var app=q('#mffApp');
+    if(app)return app;
+    app=document.createElement('div');
+    app.id='mffApp';
+    app.setAttribute('data-version',VERSION);
+    app.innerHTML='<div class="smfp-version-badge">v8</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+      '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
+      '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
+      '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS</b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
+      '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
+      '<section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
+    document.body.insertBefore(app,document.body.firstChild);
+    buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
+    var controls=q('.mff-controls',app);
+    var handler=function(ev){
+      var btn=ev.target.closest&&ev.target.closest('[data-mff]'); if(!btn)return;
+      ev.preventDefault(); ev.stopPropagation();
+      var c=btn.getAttribute('data-mff');
+      if(c==='play')play(); if(c==='pause')pause(); if(c==='stop')stop();
+      if(c==='reset'){flash('reset');stop();setTimeout(play,120)}
+      if(c==='down'){flash('down');boost(-1)}
+      if(c==='up'){flash('up');boost(1)}
+      if(c==='boost'){flash('boost');boost(1)}
     };
-    controls.addEventListener('click', handler, {capture:true});
-    controls.addEventListener('touchend', handler, {passive:false, capture:true});
-
+    controls.addEventListener('click',handler,{capture:true});
+    controls.addEventListener('touchend',handler,{passive:false,capture:true});
+    setTransportState('stop');
     return app;
   }
 
-  function hideEverythingExceptApp(){
-    if(!document.body) return;
-    qa('body > *').forEach(function(node){
-      if(node.id === 'mffApp') return;
-      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
-      if(node.id === 'mffAudio') return;
-      node.setAttribute('data-mff-force-hidden','1');
+  function killOldDom(){
+    if(!isMobile())return;
+    qa('body > *').forEach(function(n){
+      if(n.id==='mffApp'||n.id==='mffAudio')return;
+      if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
+      n.setAttribute('data-smfp-hidden','1');
+      try{n.remove()}catch(e){}
     });
-
-    // Speziell alle alten Player/Layer direkt erwischen.
-    qa('header,main,.hero,.hero-image,.site-header,.main-header,.mobile-shell,.player-shell,.hud-panel,.panel,#mfmApp,#mobileControlsLayerReset,#mobileInlineTopControlsForce,#mobileTopControlsInBoostPanel,#mobileTransportRepair,.mobile-transport-repair,.mobile-dom-side-meter,.mobile-dom-bottom-guard').forEach(function(node){
-      if(node.closest && node.closest('#mffApp')) return;
-      node.setAttribute('data-mff-force-hidden','1');
+    qa('header,main:not(.mff-shell),.hero,.hero-image,.site-header,.main-header,.mobile-shell,.player-shell,.hud-panel,.panel:not(.mff-now):not(.mff-card):not(.mff-eq):not(.mff-controls):not(.mff-bottom),#mfmApp,#mobileHudDomMeterRepair,#mobileControlsLayerReset,#mobileInlineTopControlsForce,#mobileTopControlsInBoostPanel,#mobileTransportRepair,.mobile-hud-dom-meter-repair,.mobile-transport-repair,.mobile-top-controls-in-boost,.mobile-dom-side-meter,.mobile-dom-bottom-guard,.mobile-dom-bottom-track,.mobile-dom-bottom-left,.mobile-dom-bottom-right,.bottom-meter,.bottom-levelmeter,.gesture-guard,.mobile-bottom-meter,[class*="bottom"][class*="meter"],[class*="bottom"][class*="guard"],[class*="gesture"][class*="guard"]').forEach(function(n){
+      if(n.closest&&n.closest('#mffApp'))return;
+      n.setAttribute('data-smfp-hidden','1');
+      try{n.remove()}catch(e){}
     });
-  }
-
-  function animate(){
-    var t = Date.now()/1000;
-    var playing = document.documentElement.getAttribute('data-mff-playing') === '1';
-    var base = playing ? 0.38 : 0.18;
-    var level = base + (playing ? Math.abs(Math.sin(t*2.3))*0.42 : Math.abs(Math.sin(t*.8))*0.08);
-    document.documentElement.style.setProperty('--mff-level', level.toFixed(3));
-    requestAnimationFrame(animate);
-  }
-
-  function install(){
-    if(!document.body) return;
-    document.documentElement.setAttribute('data-mff-version', VERSION);
-    document.body.setAttribute('data-mff-active', isMobile() ? '1' : '0');
-
-    if(isMobile()){
-      build();
-      hideEverythingExceptApp();
-      if(!rafStarted){ rafStarted = true; requestAnimationFrame(animate); }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    install();
-    setTimeout(install, 150);
-    setTimeout(install, 600);
-    setTimeout(install, 1500);
-    setTimeout(install, 3000);
-  });
-  window.addEventListener('load', install, {passive:true});
-  window.addEventListener('resize', install, {passive:true});
-  window.addEventListener('orientationchange', install, {passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_FINAL_MATCH_POSITION_METER_FIX_v1 -->
-<script id="mobileFinalMatchPositionMeterFixScript">
-(function(){
-  function apply(){
-    if(!document.body) return;
-    var mobile = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-    document.body.setAttribute('data-mff-position-meter-fix', mobile ? 'v1' : 'desktop');
-
-    var app = document.getElementById('mffApp');
-    if(app) app.setAttribute('data-mff-position-meter-fix','v1');
-
-    var shell = document.querySelector('#mffApp .mff-shell');
-    if(shell) shell.setAttribute('data-mff-shell-position-fix','v1');
-
-    var controls = document.querySelector('#mffApp .mff-controls');
-    if(controls) controls.setAttribute('data-mff-controls-position-fix','v1');
-
-    var bottom = document.querySelector('#mffApp .mff-bottom');
-    if(bottom) bottom.setAttribute('data-mff-bottom-meter-fix','v1');
-
-    var bottomBars = document.querySelector('#mffBottomBars');
-    if(bottomBars){
-      var bars = Array.prototype.slice.call(bottomBars.children);
-      if(bars.length){
-        bars.forEach(function(bar, idx){
-          bar.classList.toggle('mff-bottom-left', idx < bars.length / 2);
-          bar.classList.toggle('mff-bottom-right', idx >= bars.length / 2);
-          bar.style.setProperty('--center-dist', Math.abs(idx - ((bars.length - 1) / 2)).toFixed(2));
-        });
-      }
-    }
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-    apply(); setTimeout(apply,160); setTimeout(apply,700); setTimeout(apply,1600); setTimeout(apply,3200);
-  });
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_FINAL_CLEAN_METERS_PANELS_v2 -->
-<script id="mobileFinalCleanMetersPanelsScript">
-(function(){
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function apply(){
-    if(!document.body) return;
-    document.body.setAttribute('data-mff-clean-meters-panels', isMobile() ? 'v2' : 'desktop');
-    if(!isMobile()) return;
-
-    var app = document.getElementById('mffApp');
-    if(app) app.setAttribute('data-mff-clean-meters-panels','v2');
-
-    /* Alte/zweite Meter-Layer außerhalb des finalen Players hart markieren. */
-    document.querySelectorAll(
-      '.mobile-dom-bottom-guard,.mobile-dom-bottom-track,.mobile-dom-side-meter,' +
-      '#mobileHudDomMeterRepair,.mobile-hud-dom-meter-repair,.mobile-dom-bottom-left,.mobile-dom-bottom-right,' +
-      '[id*="Levelmeter"],[class*="gesture-guard"],[class*="bottom-guard"]'
-    ).forEach(function(node){
-      if(node.closest && node.closest('#mffApp')) return;
-      node.setAttribute('data-mff-old-meter-remove','v2');
-    });
-
-    /* Alle alten Meter-ähnlichen Balken am unteren Rand markieren, außer dem finalen mff-bottom. */
-    document.querySelectorAll('body > div, body > section, body > aside').forEach(function(node){
-      if(node.id === 'mffApp') return;
-      if(node.closest && node.closest('#mffApp')) return;
-      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
-      if(!r) return;
-      var bottomish = r.top > window.innerHeight * 0.72;
-      var wide = r.width > window.innerWidth * 0.55;
-      if(bottomish && wide){
-        var txt = (node.textContent || '').trim();
-        var looksLikeOldMeter = !txt || /level|meter|swipe|bst|loading/i.test(txt);
-        if(looksLikeOldMeter) node.setAttribute('data-mff-old-meter-remove','v2');
-      }
-    });
-
-    /* Swipe-Text entfernen, falls aus alter Runtime noch vorhanden. */
-    document.querySelectorAll('#mffApp .mff-bottom small, #mffApp .mff-swipe-hidden').forEach(function(node){
-      node.textContent = '';
-      node.setAttribute('aria-hidden','true');
-    });
-
-    var shell = document.querySelector('#mffApp .mff-shell');
-    if(shell) shell.setAttribute('data-mff-panels-inside-meters','v2');
-
-    var cards = document.querySelector('#mffApp .mff-cards');
-    if(cards) cards.setAttribute('data-mff-cards-inside-meters','v2');
-
-    var controls = document.querySelector('#mffApp .mff-controls');
-    if(controls) controls.setAttribute('data-mff-controls-inside-meters','v2');
-
-    var bottom = document.querySelector('#mffApp .mff-bottom');
-    if(bottom) bottom.setAttribute('data-mff-single-bottom-meter','v2');
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    apply(); setTimeout(apply,150); setTimeout(apply,700); setTimeout(apply,1600); setTimeout(apply,3200);
-  });
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_FINAL_METER_BUTTON_STATE_FIX_v3 -->
-<script id="mobileFinalMeterButtonStateFixScript">
-(function(){
-  var VERSION = 'MOBILE_FINAL_METER_BUTTON_STATE_FIX_v3';
-  var transientTimer = null;
-
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function q(sel, root){ return (root || document).querySelector(sel); }
-  function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-
-  function setTransportState(state){
-    var app = q('#mffApp');
-    if(!app) return;
-    app.setAttribute('data-mff-transport-state', state);
-
-    qa('#mffApp .mff-controls button').forEach(function(btn){
-      btn.classList.remove('mff-active','mff-transient');
-    });
-
-    var selector = null;
-    if(state === 'play') selector = '[data-mff="play"]';
-    if(state === 'pause') selector = '[data-mff="pause"]';
-    if(state === 'stop') selector = '[data-mff="stop"]';
-
-    if(selector){
-      var active = q('#mffApp .mff-controls ' + selector);
-      if(active) active.classList.add('mff-active');
-    }
-  }
-
-  function flashButton(cmd){
-    var btn = q('#mffApp .mff-controls [data-mff="' + cmd + '"]');
-    if(!btn) return;
-    btn.classList.add('mff-transient');
-    clearTimeout(transientTimer);
-    transientTimer = setTimeout(function(){
-      qa('#mffApp .mff-controls .mff-transient').forEach(function(n){
-        n.classList.remove('mff-transient');
-      });
-    }, 1300);
-  }
-
-  function markOldBottomMeters(){
-    /*
-      Ziel: Der alte untere cyan/magenta Balken außerhalb #mffApp muss raus.
-      Er kann je nach Vorversion unterschiedliche Klassen haben, daher:
-      1. bekannte Klassen
-      2. breite fixed/absolute Elemente im unteren Bereich außerhalb #mffApp
-      3. Canvas/SVG/Div-Balken ohne Text unten
-    */
-    var known = [
-      '.mobile-dom-bottom-guard',
-      '.mobile-dom-bottom-track',
-      '.mobile-dom-bottom-left',
-      '.mobile-dom-bottom-right',
-      '.bottom-levelmeter',
-      '.bottom-meter',
-      '.gesture-meter',
-      '.gesture-guard',
-      '.mobile-bottom-meter',
-      '[class*="bottom"][class*="meter"]',
-      '[class*="level"][class*="meter"]',
-      '[class*="gesture"][class*="guard"]'
-    ];
-
-    known.forEach(function(sel){
-      qa(sel).forEach(function(node){
-        if(node.closest && node.closest('#mffApp')) return;
-        node.setAttribute('data-mff-v3-remove-old-bottom-meter','1');
-      });
-    });
-
-    qa('body *').forEach(function(node){
-      if(node.closest && node.closest('#mffApp')) return;
-      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
-      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
-      if(!r) return;
-
-      var cs = window.getComputedStyle ? window.getComputedStyle(node) : null;
-      var pos = cs ? cs.position : '';
-      var bottomArea = r.top > window.innerHeight * 0.78;
-      var wide = r.width > window.innerWidth * 0.55;
-      var lowHeight = r.height <= 80;
-      var hasLittleText = ((node.textContent || '').trim().length < 20);
-      var colorful = false;
-
-      if(cs){
-        var bg = (cs.background || '') + ' ' + (cs.backgroundImage || '') + ' ' + (cs.boxShadow || '');
-        colorful = /rgb|linear-gradient|cyan|magenta|255,\s*0|0,\s*255|pink/i.test(bg);
-      }
-
-      if(bottomArea && wide && lowHeight && (hasLittleText || colorful || pos === 'fixed' || pos === 'absolute')){
-        node.setAttribute('data-mff-v3-remove-old-bottom-meter','1');
+    qa('body *').forEach(function(n){
+      if(n.closest&&n.closest('#mffApp'))return;
+      if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
+      var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
+      if(!r)return;
+      var cs=window.getComputedStyle?window.getComputedStyle(n):null;
+      var bg=cs?((cs.background||'')+' '+(cs.backgroundImage||'')+' '+(cs.boxShadow||'')):'';
+      var bottomish=r.top>window.innerHeight*.72;
+      var wide=r.width>window.innerWidth*.55;
+      var flat=r.height>6&&r.height<95;
+      var lowText=((n.textContent||'').trim().length<24);
+      var colored=/linear-gradient|cyan|magenta|pink|rgba|rgb|255,\s*0|0,\s*255/i.test(bg);
+      if(bottomish&&wide&&flat&&(lowText||colored)){
+        n.setAttribute('data-v8-old-bottom','1');
+        try{n.remove()}catch(e){}
       }
     });
   }
 
-  function repairBottomMeter(){
-    var app = q('#mffApp');
-    var bottom = q('#mffApp .mff-bottom');
-    var bars = qa('#mffBottomBars i');
-    if(!app || !bottom || !bars.length) return;
-
-    app.setAttribute('data-mff-meter-button-fix','v3');
-    bottom.setAttribute('data-mff-bottom-segment-meter','v3');
-
-    var mid = (bars.length - 1) / 2;
-    bars.forEach(function(bar, idx){
-      bar.classList.add('mff-segment-bar');
-      bar.classList.toggle('mff-from-left', idx < bars.length / 2);
-      bar.classList.toggle('mff-from-right', idx >= bars.length / 2);
-      bar.style.setProperty('--mff-center-distance', Math.abs(idx - mid).toFixed(2));
-      bar.style.setProperty('--mff-index', String(idx));
-    });
-
-    qa('#mffApp .mff-db, #mffApp .mff-bottom small, #mffApp .mff-swipe-hidden').forEach(function(node){
-      node.setAttribute('aria-hidden','true');
-      node.textContent = '';
-      node.classList.add('mff-force-hidden-text');
-    });
+  function invalidMetaText(x){
+    if(!x)return true;
+    var s=String(x).trim();
+    if(!s)return true;
+    if(s.indexOf('<!DOCTYPE')>=0||s.indexOf('<!doctype')>=0||s.indexOf('<html')>=0||s.indexOf('<body')>=0||s.indexOf('<script')>=0)return true;
+    if(s.length>260&&/<\/?[a-z][\s\S]*>/i.test(s))return true;
+    return false;
   }
 
-  function bindControls(){
-    var controls = q('#mffApp .mff-controls');
-    if(!controls || controls.__mffV3Bound) return;
-    controls.__mffV3Bound = true;
-
-    var handler = function(ev){
-      var btn = ev.target.closest && ev.target.closest('[data-mff]');
-      if(!btn) return;
-      var cmd = btn.getAttribute('data-mff');
-
-      if(cmd === 'play') setTransportState('play');
-      if(cmd === 'pause') setTransportState('pause');
-      if(cmd === 'stop') setTransportState('stop');
-      if(cmd === 'reset') {
-        flashButton('reset');
-        setTimeout(function(){ setTransportState('play'); }, 160);
-      }
-      if(cmd === 'up') flashButton('up');
-      if(cmd === 'down') flashButton('down');
-      if(cmd === 'boost') flashButton('boost');
-    };
-
-    controls.addEventListener('click', handler, {capture:true});
-    controls.addEventListener('touchend', handler, {passive:true, capture:true});
-  }
-
-  function apply(){
-    if(!document.body) return;
-    document.body.setAttribute('data-mff-meter-button-state-fix', isMobile() ? 'v3' : 'desktop');
-    if(!isMobile()) return;
-
-    markOldBottomMeters();
-    repairBottomMeter();
-    bindControls();
-
-    var app = q('#mffApp');
-    if(app && !app.getAttribute('data-mff-transport-state')){
-      app.setAttribute('data-mff-transport-state','stop');
-      var stop = q('#mffApp .mff-controls [data-mff="stop"]');
-      if(stop) stop.classList.add('mff-active');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    apply();
-    setTimeout(apply,150);
-    setTimeout(apply,650);
-    setTimeout(apply,1500);
-    setTimeout(apply,3200);
-  });
-  window.addEventListener('load', apply, {passive:true});
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_FINAL_REMOVE_OLD_BOTTOM_AND_RESTORE_META_v4 -->
-<script id="mobileFinalRemoveOldBottomAndRestoreMetaScript">
-(function(){
-  var VERSION = 'MOBILE_FINAL_REMOVE_OLD_BOTTOM_AND_RESTORE_META_v4';
-  var metaTimer = null;
-
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function q(sel, root){ return (root || document).querySelector(sel); }
-  function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-
-  function markOldBottomLayer(){
-    if(!isMobile()) return;
-
-    /*
-      Der rot markierte Balken ist eine alte breite Bottom-Leiste außerhalb des finalen Players.
-      Nicht verstecken:
-      - #mffApp
-      - .mff-bottom im finalen Player
-      - iOS Browser UI ist kein DOM und wird nicht berührt
-    */
-    var knownSelectors = [
-      '.mobile-dom-bottom-guard',
-      '.mobile-dom-bottom-track',
-      '.mobile-dom-bottom-left',
-      '.mobile-dom-bottom-right',
-      '.mobile-bottom-guard',
-      '.bottom-guard',
-      '.gesture-guard',
-      '.bottom-levelmeter',
-      '.mobile-bottom-meter',
-      '.bottom-meter',
-      '.center-out-meter',
-      '.mobile-center-out-meter',
-      '[class*="bottom"][class*="guard"]',
-      '[class*="bottom"][class*="meter"]',
-      '[class*="center"][class*="meter"]',
-      '[class*="gesture"][class*="guard"]',
-      '[id*="bottom"][id*="meter"]',
-      '[id*="bottom"][id*="guard"]'
-    ];
-
-    knownSelectors.forEach(function(sel){
-      qa(sel).forEach(function(node){
-        if(node.closest && node.closest('#mffApp')) return;
-        node.setAttribute('data-mff-v4-kill-old-bottom','1');
-        try { node.remove(); } catch(e) {}
-      });
-    });
-
-    qa('body > *').forEach(function(node){
-      if(!node || node.id === 'mffApp') return;
-      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
-      if(node.id === 'mffAudio' || node.id === 'mfmAudio') return;
-      if(node.closest && node.closest('#mffApp')) return;
-
-      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
-      if(!r) return;
-
-      var cs = window.getComputedStyle ? window.getComputedStyle(node) : null;
-      var bg = cs ? ((cs.background || '') + ' ' + (cs.backgroundImage || '') + ' ' + (cs.boxShadow || '')) : '';
-      var pos = cs ? cs.position : '';
-
-      var nearBottom = r.top > window.innerHeight * 0.80;
-      var wide = r.width > window.innerWidth * 0.60;
-      var short = r.height > 6 && r.height < 90;
-      var text = (node.textContent || '').trim();
-      var lowText = text.length < 30;
-      var colored = /linear-gradient|rgb|rgba|cyan|magenta|pink|255,\s*0|0,\s*255|22,\s*255/i.test(bg);
-
-      if(nearBottom && wide && short && (lowText || colored || pos === 'fixed' || pos === 'absolute')){
-        node.setAttribute('data-mff-v4-kill-old-bottom','1');
-        try { node.remove(); } catch(e) {}
-      }
-    });
-
-    /*
-      Falls der Balken als Kind tiefer im alten DOM liegt: breite Elemente im unteren Bereich außerhalb #mffApp markieren.
-      Hier wird absichtlich nur Bottom-Bereich getroffen.
-    */
-    qa('body *').forEach(function(node){
-      if(!node || (node.closest && node.closest('#mffApp'))) return;
-      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
-
-      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
-      if(!r) return;
-
-      var nearBottom = r.top > window.innerHeight * 0.82;
-      var veryWide = r.width > window.innerWidth * 0.70;
-      var meterHeight = r.height >= 8 && r.height <= 70;
-      var txt = (node.textContent || '').trim();
-
-      if(nearBottom && veryWide && meterHeight && txt.length < 40){
-        node.setAttribute('data-mff-v4-kill-old-bottom','1');
-        try { node.remove(); } catch(e) {}
-      }
-    });
+  function normalizeDj(raw){
+    var dj=String(raw||'').trim();
+    if(!dj)return 'DJ-666';
+    if(/auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined/i.test(dj))return 'DJ-666';
+    return dj;
   }
 
   function normalizeMeta(data){
-    if(!data) return null;
-
-    if(typeof data === 'string'){
-      return { title: data };
-    }
-
-    var title =
-      data.title || data.song || data.nowplaying || data.nowPlaying ||
-      data.current_song || data.currentSong ||
-      (data.icestats && data.icestats.source && (data.icestats.source.title || data.icestats.source.server_name)) ||
-      (data.now_playing && data.now_playing.song && data.now_playing.song.text) ||
-      (data.now_playing && data.now_playing.song && data.now_playing.song.title) ||
-      '';
-
-    var artist =
-      data.artist ||
-      (data.now_playing && data.now_playing.song && data.now_playing.song.artist) ||
-      '';
-
-    var listeners =
-      data.listeners || data.listener_count || data.currentlisteners ||
-      data.current_listeners ||
-      (data.icestats && data.icestats.source && data.icestats.source.listeners) ||
-      (data.listeners_current) ||
-      '';
-
-    var bitrate =
-      data.bitrate || data.kbps || data.stream_bitrate ||
-      (data.icestats && data.icestats.source && data.icestats.source.bitrate) ||
-      '';
-
-    var dj =
-      data.dj || data.dj_status || data.server_name || data.station ||
-      data.stream_name || data.name || '666SOUNDsDESIGn DJ';
-
-    return {
-      title: String(title || '').trim(),
-      artist: String(artist || '').trim(),
-      listeners: String(listeners || '').trim(),
-      bitrate: String(bitrate || '').trim(),
-      dj: String(dj || '').trim()
-    };
+    if(!data)return null;
+    if(typeof data==='string'){if(invalidMetaText(data))return null;return{title:data,dj:'DJ-666'};}
+    var np=data.now_playing||data.nowPlaying||{};
+    var song=np.song||data.song||{};
+    var station=data.station||{};
+    var title=data.title||data.current_title||data.nowplaying||data.nowPlaying||data.current_song||data.currentSong||song.text||song.title||'';
+    var artist=data.artist||song.artist||'';
+    var listeners=data.listeners||data.listener_count||data.currentlisteners||data.current_listeners||data.listeners_current||(data.stats&&data.stats.listeners)||'';
+    var bitrate=data.bitrate||data.kbps||data.stream_bitrate||(data.stats&&data.stats.bitrate)||'';
+    var dj=data.dj||data.dj_status||data.live_dj||data.streamer||data.server_name||station.name||data.station_name||data.stream_name||data.name||'';
+    var artwork=data.icon||data.logo||data.artwork||data.image||data.cover||data.cover_url||data.art||station.icon||station.logo||station.image||song.art||'';
+    title=String(title||'').trim();
+    if(invalidMetaText(title))title='';
+    return{title:title,artist:String(artist||'').trim(),listeners:String(listeners||'').trim(),bitrate:String(bitrate||'').trim(),dj:normalizeDj(dj),artwork:String(artwork||'').trim()};
   }
 
   async function fetchOne(url){
-    var res = await fetch(url, {
-      cache: 'no-store',
-      headers: { 'Accept': 'application/json,text/plain,*/*' }
-    });
-    if(!res.ok) throw new Error(url + ' ' + res.status);
-
-    var ct = (res.headers.get('content-type') || '').toLowerCase();
-    if(ct.indexOf('application/json') >= 0 || ct.indexOf('+json') >= 0){
-      return await res.json();
-    }
-
-    var text = await res.text();
-
-    try { return JSON.parse(text); } catch(e) {}
+    var res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json,*/*'}});
+    if(!res.ok)throw new Error(url+' '+res.status);
+    var ct=(res.headers.get('content-type')||'').toLowerCase();
+    var text=await res.text();
+    if(invalidMetaText(text)&&ct.indexOf('json')<0)throw new Error('HTML response '+url);
+    try{return JSON.parse(text)}catch(e){}
+    if(invalidMetaText(text))throw new Error('invalid meta text '+url);
     return text;
   }
 
   async function fetchMeta(){
-    var endpoints = [
-      '/streammeta?ts=' + Date.now(),
-      '/nowplaying?ts=' + Date.now(),
-      '/meta?ts=' + Date.now(),
-      '/status?ts=' + Date.now(),
-      '/streaminfo?ts=' + Date.now(),
-      '/7.html?ts=' + Date.now()
-    ];
-
-    for(var i=0;i<endpoints.length;i++){
+    for(var i=0;i<META_ENDPOINTS.length;i++){
       try{
-        var raw = await fetchOne(endpoints[i]);
-        var meta = normalizeMeta(raw);
-        if(meta && (meta.title || meta.listeners || meta.bitrate || meta.dj)){
-          meta.source = endpoints[i].split('?')[0];
-          return meta;
-        }
+        var raw=await fetchOne(META_ENDPOINTS[i]+'?ts='+Date.now());
+        var meta=normalizeMeta(raw);
+        if(meta&&(meta.title||meta.listeners||meta.bitrate||meta.dj||meta.artwork)){meta.source=META_ENDPOINTS[i];return meta}
       }catch(e){}
     }
     return null;
   }
 
-  function setText(el, value){
-    if(!el) return;
-    el.textContent = value;
-  }
-
   function applyMeta(meta){
-    var app = q('#mffApp');
-    if(!app) return;
-
-    var title = meta && meta.title ? meta.title : 'Metadaten werden geladen ...';
-    var subtitle = meta && meta.artist ? meta.artist : (meta && meta.source ? 'Quelle: ' + meta.source : 'Loading stream metadata ...');
-    var listeners = meta && meta.listeners ? meta.listeners : '0';
-    var bitrate = meta && meta.bitrate ? meta.bitrate : 'Unknown';
-    var dj = meta && meta.dj ? meta.dj : '666SOUNDsDESIGn DJ';
-
-    var h1 = q('#mffApp .mff-title h1');
-    var h2 = q('#mffApp .mff-title h2');
-    setText(h1, title);
-    setText(h2, subtitle);
-
-    var cards = qa('#mffApp .mff-card strong');
-    if(cards[0]) cards[0].innerHTML = String(listeners).indexOf('/') >= 0 ? listeners : (listeners + ' / 250');
-    if(cards[1]) cards[1].textContent = bitrate;
-    if(cards[2]) cards[2].innerHTML = dj.replace(/\s+DJ$/i,'') + '<br>DJ';
-
-    app.setAttribute('data-mff-meta-source', meta && meta.source ? meta.source : 'none');
-    app.setAttribute('data-mff-meta-loaded', meta ? '1' : '0');
+    if(!meta)return;
+    setMarqueeTitle(meta.title||'Metadaten werden geladen ...');
+    var h2=q('#mffApp .mff-title h2');
+    if(h2)h2.textContent=meta.artist||'Quelle: '+(meta.source||'API');
+    setArtwork(meta.artwork||'');
+    var cards=qa('#mffApp .mff-card strong');
+    if(cards[0])cards[0].innerHTML=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / 250'):'0 / 250';
+    if(cards[1])cards[1].textContent=meta.bitrate||'Unknown';
+    if(cards[2])cards[2].innerHTML=normalizeDj(meta.dj);
   }
 
-  async function tickMeta(){
-    if(!isMobile()) return;
-    try{
-      var meta = await fetchMeta();
-      if(meta) applyMeta(meta);
-    }catch(e){}
+  async function tickMeta(){try{var meta=await fetchMeta();if(meta)applyMeta(meta)}catch(e){}}
+  function startMeta(){if(metaTimer)return;tickMeta();metaTimer=setInterval(tickMeta,12000)}
+
+  function animate(){
+    var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
+    var t=Date.now()/1000;
+    var base=playing?0.38:0.18;
+    var level=base+(playing?Math.abs(Math.sin(t*2.3))*0.42:Math.abs(Math.sin(t*.8))*0.08);
+    document.documentElement.style.setProperty('--mff-level',level.toFixed(3));
+    requestAnimationFrame(animate);
   }
 
-  function startMetaLoop(){
-    if(metaTimer) return;
-    tickMeta();
-    metaTimer = setInterval(tickMeta, 12000);
+  function install(){
+    if(!document.body)return;
+    document.documentElement.setAttribute('data-smfp-version',VERSION);
+    document.body.setAttribute('data-smfp-active',isMobile()?'1':'0');
+    if(!isMobile())return;
+    buildApp();
+    killOldDom();
+    startMeta();
+    if(!rafStarted){rafStarted=true;requestAnimationFrame(animate)}
   }
 
-  function apply(){
-    if(!document.body) return;
-    document.body.setAttribute('data-mff-remove-bottom-restore-meta', isMobile() ? 'v4' : 'desktop');
-
-    if(!isMobile()) return;
-
-    markOldBottomLayer();
-
-    var app = q('#mffApp');
-    if(app){
-      app.setAttribute('data-mff-remove-bottom-restore-meta','v4');
-      startMetaLoop();
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    apply();
-    setTimeout(apply,150);
-    setTimeout(apply,700);
-    setTimeout(apply,1600);
-    setTimeout(apply,3200);
-    setTimeout(apply,5200);
-  });
-  window.addEventListener('load', apply, {passive:true});
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
+  document.addEventListener('DOMContentLoaded',function(){install();setTimeout(install,150);setTimeout(install,650);setTimeout(install,1500);setTimeout(install,3200);setTimeout(install,6000)});
+  window.addEventListener('load',install,{passive:true});
+  window.addEventListener('resize',install,{passive:true});
+  window.addEventListener('orientationchange',install,{passive:true});
 })();
 </script>
 

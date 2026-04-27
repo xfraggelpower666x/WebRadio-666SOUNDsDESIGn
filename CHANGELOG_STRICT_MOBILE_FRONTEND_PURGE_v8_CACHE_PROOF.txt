@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v8 CACHE PROOF
+
+Zweck:
+- v7 war im iPhone-Screenshot offensichtlich nicht aktiv, weil weiterhin /streammeta angezeigt wurde.
+- v8 entfernt /streammeta hart aus der Metadatenlogik.
+- v8 zeigt temporär/klein eine sichtbare v8-Version im Mobile-UI, damit Cache/Deployment eindeutig prüfbar ist.
+- CSS/JS-Links erhalten Cache-Buster: smfp-v8-20260427-2035
+- Alte Mobile-Generatoren in js/player-core.js bleiben deaktiviert.
+- DJ-Panel breiter, DJ-Fallback DJ-666, NowPlaying-Titel als Laufschrift.
+
+Geändert:
+- index.html
+- css/mobile.css
+- js/player-core.js
+- STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers

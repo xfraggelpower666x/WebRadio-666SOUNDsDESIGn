@@ -79,75 +79,15 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 ==========================================
 */
 function installMobileTouchControlsRepair() {
-  const root = document;
-
-  const nearestActionTarget = (target) => target?.closest?.('button, [role="button"], .control-btn, .transport-btn, .player-btn, .boost-btn, .round-btn');
-
-  const detectAction = (el) => {
-    const text = (el?.textContent || '').trim().toLowerCase();
-    const id = (el?.id || '').toLowerCase();
-    const cls = (el?.className || '').toString().toLowerCase();
-    const data = (el?.dataset?.action || el?.dataset?.control || el?.dataset?.cmd || '').toLowerCase();
-    const label = (el?.getAttribute?.('aria-label') || el?.getAttribute?.('title') || '').toLowerCase();
-    const hay = `${id} ${cls} ${data} ${label} ${text}`;
-
-    if (hay.includes('play') || hay.includes('▶')) return 'play';
-    if (hay.includes('pause') || hay.includes('⏸')) return 'pause';
-    if (hay.includes('stop') || hay.includes('■') || hay.includes('square')) return 'stop';
-    if (hay === '+' || hay.includes('plus') || hay.includes('boost-up')) return 'boost-up';
-    if (hay === '-' || hay.includes('minus') || hay.includes('boost-down')) return 'boost-down';
-    if (hay.includes('boost') || hay.includes('bst')) return 'boost-up';
-    return '';
-  };
-
-  const runAction = async (action) => {
-    if (action === 'play' && typeof startPlayback === 'function') {
-      await startPlayback();
-      return true;
-    }
-    if (action === 'pause' && audio) {
-      audio.pause();
-      if (typeof setState === 'function') setState('paused');
-      return true;
-    }
-    if (action === 'stop' && audio) {
-      audio.pause();
-      try { audio.currentTime = 0; } catch (err) {}
-      if (typeof setState === 'function') setState('stopped');
-      return true;
-    }
-    if (action === 'boost-up' && typeof setBoostStage === 'function') {
-      const nextStage = Math.min(3, (Number(currentBoostStage) || 0) + 1);
-      currentBoostStage = setBoostStage(nextStage);
-      return true;
-    }
-    if (action === 'boost-down' && typeof setBoostStage === 'function') {
-      const nextStage = Math.max(0, (Number(currentBoostStage) || 0) - 1);
-      currentBoostStage = setBoostStage(nextStage);
-      return true;
-    }
-    return false;
-  };
-
-  const handler = async (event) => {
-    const el = nearestActionTarget(event.target);
-    if (!el) return;
-    const action = detectAction(el);
-    if (!action) return;
-    const handled = await runAction(action);
-    if (handled) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  };
-
-  root.addEventListener('touchend', handler, { passive: false, capture: true });
-  root.addEventListener('click', handler, { passive: false, capture: true });
-  document.body?.setAttribute('data-mobile-touch-repair', 'v1');
+/*
+   * STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF:
+   * Alter mobiler Generator physisch deaktiviert.
+   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
+   */
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF');
+  return;
 }
-
-installMobileTouchControlsRepair();
-
+/* STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -158,157 +98,48 @@ ZWECK:
 ==========================================
 */
 function installMobileLevelmeterGestureGuard() {
-  const apply = () => {
-    const isMobile = window.matchMedia?.('(max-width: 760px)').matches || window.innerWidth <= 760;
-    document.body?.setAttribute('data-gesture-guard', isMobile ? 'mobile' : 'desktop');
-    document.documentElement.style.setProperty('--gesture-guard-height', isMobile ? '76px' : '34px');
-  };
-  apply();
-  window.addEventListener('resize', apply, { passive: true });
-  window.addEventListener('orientationchange', apply, { passive: true });
+/*
+   * STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF:
+   * Alter mobiler Generator physisch deaktiviert.
+   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
+   */
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF');
+  return;
 }
-
-installMobileLevelmeterGestureGuard();
-
+/* STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
-  if (document.getElementById('mobileHudDomMeterRepair')) return;
-
-  const shell = document.createElement('div');
-  shell.id = 'mobileHudDomMeterRepair';
-  shell.className = 'mobile-hud-dom-meter-repair';
-  shell.setAttribute('aria-hidden', 'true');
-  shell.innerHTML = '<div class="mobile-dom-side-meter mobile-dom-side-meter-left"><i></i></div><div class="mobile-dom-side-meter mobile-dom-side-meter-right"><i></i></div><div class="mobile-dom-bottom-guard"><div class="mobile-dom-bottom-track"><i class="mobile-dom-bottom-left"></i><i class="mobile-dom-bottom-right"></i></div></div>';
-  document.body.appendChild(shell);
-
-  const controls = document.createElement('div');
-  controls.id = 'mobileTransportRepair';
-  controls.className = 'mobile-transport-repair';
-  controls.innerHTML = '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="play" aria-label="Play">▶</button><button type="button" class="mobile-repair-btn" data-mobile-repair-action="pause" aria-label="Pause">Ⅱ</button><button type="button" class="mobile-repair-btn" data-mobile-repair-action="stop" aria-label="Stop">■</button><button type="button" class="mobile-repair-btn" data-mobile-repair-action="boost-down" aria-label="Boost weniger">−</button><button type="button" class="mobile-repair-btn mobile-repair-boost" data-mobile-repair-action="boost-up" aria-label="Boost mehr">BST +</button>';
-
-  const anchor = document.querySelector('.boost-panel, .mobile-boost-core, .mobile-shell, main');
-  if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(controls, anchor.nextSibling);
-  else document.body.appendChild(controls);
-
-  const setMobileHudState = () => {
-    const mobile = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-    document.body.setAttribute('data-mobile-dom-meter-repair', mobile ? 'on' : 'off');
-    document.documentElement.style.setProperty('--mobile-dom-guard-height', mobile ? '78px' : '0px');
-  };
-
-  const run = async (action) => {
-    try {
-      if (action === 'play' && typeof startPlayback === 'function') return await startPlayback();
-      if (action === 'pause' && audio) { audio.pause(); if (typeof setState === 'function') setState('paused'); return; }
-      if (action === 'stop' && audio) { audio.pause(); try { audio.currentTime = 0; } catch(e) {} if (typeof setState === 'function') setState('stopped'); return; }
-      if (action === 'boost-up' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.min(3, (Number(currentBoostStage)||0)+1)); return; }
-      if (action === 'boost-down' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.max(0, (Number(currentBoostStage)||0)-1)); return; }
-    } catch (err) { console.warn('[MOBILE_HUD_DOM_METER_REPAIR_v1]', action, err); }
-  };
-
-  const handler = (event) => {
-    const btn = event.target.closest && event.target.closest('[data-mobile-repair-action]');
-    if (!btn) return;
-    event.preventDefault();
-    event.stopPropagation();
-    run(btn.dataset.mobileRepairAction);
-  };
-  controls.addEventListener('click', handler, {capture:true});
-  controls.addEventListener('touchend', handler, {passive:false, capture:true});
-
-  setMobileHudState();
-  window.addEventListener('resize', setMobileHudState, {passive:true});
-  window.addEventListener('orientationchange', setMobileHudState, {passive:true});
+/*
+   * STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF:
+   * Alter mobiler Generator physisch deaktiviert.
+   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
+   */
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF');
+  return;
 }
-
-installMobileHudDomMeterRepair();
-
+/* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
-  let controls = document.getElementById('mobileTransportRepair');
-  if (!controls) {
-    controls = document.createElement('div');
-    controls.id = 'mobileTransportRepair';
-    controls.className = 'mobile-transport-repair';
-    controls.innerHTML =
-      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="play" aria-label="Play">▶</button>' +
-      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="pause" aria-label="Pause">Ⅱ</button>' +
-      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="stop" aria-label="Stop">■</button>' +
-      '<button type="button" class="mobile-repair-btn" data-mobile-repair-action="boost-down" aria-label="Boost weniger">−</button>' +
-      '<button type="button" class="mobile-repair-btn mobile-repair-boost" data-mobile-repair-action="boost-up" aria-label="Boost mehr">BST +</button>';
-  }
-  controls.setAttribute('data-pin-repair','v1');
-
-  const boostRow = document.querySelector('.boost-panel, .mobile-boost-core, [class*="boost"]');
-  const statusRow = document.querySelector('.system-panels, .status-panels, [class*="system"], [class*="status"]');
-  const playerPanel = document.querySelector('.hud-panel, .player-shell, .mobile-shell, main') || document.body;
-
-  if (boostRow && boostRow.parentNode) boostRow.parentNode.insertBefore(controls, boostRow.nextSibling);
-  else if (statusRow && statusRow.parentNode) statusRow.parentNode.insertBefore(controls, statusRow);
-  else playerPanel.insertBefore(controls, playerPanel.firstChild);
-
-  const run = async (action) => {
-    try {
-      if (action === 'play' && typeof startPlayback === 'function') return await startPlayback();
-      if (action === 'pause' && audio) { audio.pause(); if (typeof setState === 'function') setState('paused'); return; }
-      if (action === 'stop' && audio) { audio.pause(); try { audio.currentTime=0; } catch(e) {} if (typeof setState === 'function') setState('stopped'); return; }
-      if (action === 'boost-up' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.min(3,(Number(currentBoostStage)||0)+1)); return; }
-      if (action === 'boost-down' && typeof setBoostStage === 'function') { currentBoostStage = setBoostStage(Math.max(0,(Number(currentBoostStage)||0)-1)); return; }
-    } catch(e) { console.warn('[MOBILE_TRANSPORT_PIN_REPAIR_v1]', action, e); }
-  };
-  const handler = (event) => {
-    const btn = event.target.closest && event.target.closest('[data-mobile-repair-action]');
-    if (!btn) return;
-    event.preventDefault(); event.stopPropagation();
-    run(btn.dataset.mobileRepairAction);
-  };
-  controls.addEventListener('click', handler, {capture:true});
-  controls.addEventListener('touchend', handler, {passive:false, capture:true});
-  const apply = () => {
-    const mobile = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-    document.body.setAttribute('data-mobile-transport-pin', mobile ? 'on' : 'off');
-  };
-  apply();
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
+/*
+   * STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF:
+   * Alter mobiler Generator physisch deaktiviert.
+   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
+   */
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF');
+  return;
 }
-
-installMobileTransportPinRepair();
-
+/* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
-  let c=document.getElementById('mobileTopControlsInBoostPanel');
-  if(!c){
-    c=document.createElement('div');
-    c.id='mobileTopControlsInBoostPanel';
-    c.className='mobile-top-controls-in-boost';
-    c.innerHTML='<button type="button" class="mobile-top-btn mobile-top-play" data-mobile-top-action="play" aria-label="Play">▶</button><button type="button" class="mobile-top-btn" data-mobile-top-action="pause" aria-label="Pause">Ⅱ</button><button type="button" class="mobile-top-btn mobile-top-stop" data-mobile-top-action="stop" aria-label="Stop">■</button><button type="button" class="mobile-top-btn" data-mobile-top-action="boost-down" aria-label="Boost weniger">−</button><span class="mobile-top-bst-label">BST</span><button type="button" class="mobile-top-btn" data-mobile-top-action="boost-up" aria-label="Boost mehr">+</button>';
-  }
-  const b=document.querySelector('.boost-panel,.mobile-boost-core,[class*="boost"]');
-  if(b){
-    b.classList.add('mobile-boost-top-controls-host');
-    b.setAttribute('data-mobile-top-controls-host','v1');
-    b.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]').forEach(n=>{if(!n.closest('#mobileTopControlsInBoostPanel'))n.setAttribute('data-mobile-boost-logo-hide','v1')});
-    b.insertBefore(c,b.firstChild);
-  }else{
-    const panel=document.querySelector('.hud-panel,.player-shell,.mobile-shell,main')||document.body;
-    panel.insertBefore(c,panel.firstChild);
-  }
-  const run=async(a)=>{try{
-    if(a==='play'&&typeof startPlayback==='function')return await startPlayback();
-    if(a==='pause'&&audio){audio.pause(); if(typeof setState==='function')setState('paused'); return;}
-    if(a==='stop'&&audio){audio.pause(); try{audio.currentTime=0}catch(e){} if(typeof setState==='function')setState('stopped'); return;}
-    if(a==='boost-up'&&typeof setBoostStage==='function'){currentBoostStage=setBoostStage(Math.min(3,(Number(currentBoostStage)||0)+1)); return;}
-    if(a==='boost-down'&&typeof setBoostStage==='function'){currentBoostStage=setBoostStage(Math.max(0,(Number(currentBoostStage)||0)-1)); return;}
-  }catch(e){console.warn('[MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1]',a,e)}};
-  const h=e=>{const btn=e.target.closest&&e.target.closest('[data-mobile-top-action]'); if(!btn)return; e.preventDefault(); e.stopPropagation(); run(btn.dataset.mobileTopAction);};
-  c.addEventListener('click',h,{capture:true});
-  c.addEventListener('touchend',h,{passive:false,capture:true});
-  const apply=()=>{const m=(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760; document.body.setAttribute('data-mobile-top-controls',m?'on':'off');};
-  apply(); window.addEventListener('resize',apply,{passive:true}); window.addEventListener('orientationchange',apply,{passive:true});
+/*
+   * STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF:
+   * Alter mobiler Generator physisch deaktiviert.
+   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
+   */
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF');
+  return;
 }
-
-installMobileTopControlsInBoostPanel();
+/* STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'main', 'Main Stream aktiv');

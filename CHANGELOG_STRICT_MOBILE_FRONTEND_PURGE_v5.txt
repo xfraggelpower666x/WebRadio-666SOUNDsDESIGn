@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v5
+
+Zweck:
+- Strenge Bereinigung der Mobile-Frontend-Reste.
+- Alte Mobile-Runtime-Blöcke aus index.html entfernt.
+- css/mobile.css komplett auf eine saubere finale Mobile-UI reduziert.
+- Alte Levelmeter-, Bottom-Guard-, Gesture-Guard-, Hero- und Player-Reste werden auf Mobile hart ausgeblendet.
+- Der finale Mobile-Player #mffApp ist die einzige sichtbare Mobile-UI.
+- Metadaten-Parsing repariert:
+  HTML/DOCTYPE-Antworten werden nicht mehr als Tracktitel übernommen.
+
+Geändert:
+- index.html
+- css/mobile.css
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v5.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers

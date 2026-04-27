@@ -1,0 +1,27 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v7
+
+Zweck:
+- Hartnäckigen alten unteren Levelmeter-/Balken-Rest weiter an der Quelle entfernen.
+- Zusätzlich Pseudo-Elemente body/html ::before/::after auf Mobile neutralisieren.
+- V7 Bottom-Bar-Hunter entfernt breite, flache, bunte Bottom-Elemente außerhalb #mffApp.
+- DJ-Panel verbreitert, Listeners/Bitrate kleiner.
+- DJ-Fallback:
+  - leer / unknown / offline / AutoDJ -> DJ-666
+  - echter Stream-DJ wird übernommen.
+- NowPlaying-Icon:
+  - nutzt Stream-Artwork/Icon/Logo, falls Metadaten das liefern
+  - sonst Fallback-Icon.
+- NowPlaying-Titel läuft als Laufschrift.
+
+Geändert:
+- index.html
+- css/mobile.css
+- js/player-core.js
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v7.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers
