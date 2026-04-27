@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW
 GEÄNDERT: 2026-04-27
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v14-hybridmeter-20260427-2205
-- Meter: Hybrid Real/Fallback Engine.
+- Cache-Proof: smfp-v15-history-meter-boostled-20260427-2225
+- History Overlay + horizontales Bottom-Meter + Boost LED Row.
 ============================================================
 */
 @media (min-width:761px){

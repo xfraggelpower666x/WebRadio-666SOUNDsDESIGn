@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v14-hybridmeter-20260427-2205" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v14-hybridmeter-20260427-2205" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v14-hybridmeter-20260427-2205" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v14-hybridmeter-20260427-2205" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v14-hybridmeter-20260427-2205" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v14-hybridmeter-20260427-2205" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v15-history-meter-boostled-20260427-2225" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v15-history-meter-boostled-20260427-2225" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v15-history-meter-boostled-20260427-2225" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v15-history-meter-boostled-20260427-2225" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v15-history-meter-boostled-20260427-2225" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v15-history-meter-boostled-20260427-2225" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v14-hybridmeter-20260427-2205"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v15-history-meter-boostled-20260427-2225"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE -->
-<style id="strictMobileFrontendPurgeV14Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW -->
+<style id="strictMobileFrontendPurgeV15Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -294,13 +294,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE -->
-<script id="strictMobileFrontendPurgeV14Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW -->
+<script id="strictMobileFrontendPurgeV15Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
+  var HISTORY_ENDPOINTS=['/history','/api/history','/recent','/api/recent'];
+  var localHistory=[];
+  var lastHistoryTitle='';
 
   function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
   function q(s,r){return(r||document).querySelector(s)}
@@ -402,7 +405,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
 
     var b=q('#mffBoost');
-    if(b) b.innerHTML='BST '+boostStage+'<small>'+target.toFixed(2)+'×</small>';
+    if(b) b.textContent='BST '+boostStage;
+    var bg=q('#mffBoostGain');
+    if(bg) bg.textContent=target.toFixed(2)+'×';
 
     document.documentElement.setAttribute('data-mff-boost',String(boostStage));
     document.documentElement.setAttribute('data-mff-boost-gain',String(target));
@@ -506,11 +511,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v14</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v15</div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
-      '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
+      '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section>'+
       '<section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
     document.body.insertBefore(app,document.body.firstChild);
     buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
@@ -527,6 +532,18 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     };
     controls.addEventListener('click',handler,{capture:true});
     controls.addEventListener('touchend',handler,{passive:false,capture:true});
+
+    var hbtn=q('.mff-history',app);
+    if(hbtn){
+      hbtn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{capture:true});
+      hbtn.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{passive:false,capture:true});
+    }
+    var hclose=q('[data-mff-history-close]',app);
+    if(hclose){
+      hclose.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
+      hclose.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
+    }
+
     setTransportState('stop');
     applyBoostRamp(0);
     setAnalyserMode('init');
@@ -609,6 +626,93 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return text;
   }
 
+
+  function normalizeHistoryItems(raw){
+    var arr=[];
+    if(!raw) return arr;
+    if(Array.isArray(raw)) arr=raw;
+    else if(Array.isArray(raw.history)) arr=raw.history;
+    else if(Array.isArray(raw.recent)) arr=raw.recent;
+    else if(Array.isArray(raw.songs)) arr=raw.songs;
+    else if(Array.isArray(raw.tracks)) arr=raw.tracks;
+    else if(raw.items && Array.isArray(raw.items)) arr=raw.items;
+    return arr.map(function(item){
+      if(typeof item==='string') return {title:item,artist:''};
+      var song=item.song||item.track||item.now_playing&&item.now_playing.song||{};
+      var title=item.title||item.name||item.text||item.current_song||song.text||song.title||'';
+      var artist=item.artist||song.artist||item.dj||item.streamer||'';
+      var time=item.time||item.played_at||item.timestamp||item.date||'';
+      return {title:String(title||'').trim(),artist:String(artist||'').trim(),time:String(time||'').trim()};
+    }).filter(function(x){return x.title;}).slice(0,18);
+  }
+
+  function pushLocalHistory(meta){
+    if(!meta || !meta.title) return;
+    var title=String(meta.title||'').trim();
+    if(!title || title===lastHistoryTitle) return;
+    lastHistoryTitle=title;
+    localHistory.unshift({
+      title:title,
+      artist:String(meta.artist||'').trim(),
+      time:new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    });
+    localHistory=localHistory.slice(0,18);
+  }
+
+  function renderHistory(items,source){
+    var box=q('#mffHistoryList');
+    if(!box) return;
+    var list=(items&&items.length)?items:localHistory;
+    if(!list || !list.length){
+      box.innerHTML='<div class="mff-history-empty">Noch keine History-Daten vorhanden.</div>';
+      return;
+    }
+    box.innerHTML=list.slice(0,18).map(function(item,idx){
+      var sub=(item.artist||item.time||source||'');
+      return '<div class="mff-history-item">'+
+        '<div class="mff-history-num">'+String(idx+1).padStart(2,'0')+'</div>'+
+        '<div><div class="mff-history-title">'+escapeHtml(item.title||'Unbekannter Titel')+'</div>'+
+        '<div class="mff-history-sub">'+escapeHtml(sub||'played')+'</div></div></div>';
+    }).join('');
+  }
+
+  function escapeHtml(str){
+    return String(str||'').replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  async function fetchHistory(){
+    for(var i=0;i<HISTORY_ENDPOINTS.length;i++){
+      try{
+        var raw=await fetchOne(HISTORY_ENDPOINTS[i]+'?ts='+Date.now());
+        var items=normalizeHistoryItems(raw);
+        if(items.length) return {items:items,source:HISTORY_ENDPOINTS[i]};
+      }catch(e){}
+    }
+    return {items:localHistory,source:'local'};
+  }
+
+  async function toggleHistory(force){
+    var app=q('#mffApp');
+    if(!app) return;
+    var open=app.getAttribute('data-history-open')==='1';
+    var next=(typeof force==='boolean')?force:!open;
+    app.setAttribute('data-history-open',next?'1':'0');
+    var overlay=q('#mffHistoryOverlay');
+    if(overlay) overlay.setAttribute('aria-hidden',next?'false':'true');
+    if(next){
+      renderHistory(localHistory,'local');
+      try{
+        var h=await fetchHistory();
+        renderHistory(h.items,h.source);
+      }catch(e){
+        renderHistory(localHistory,'local');
+      }
+    }
+  }
+
+
   async function fetchMeta(){
     for(var i=0;i<META_ENDPOINTS.length;i++){
       try{
@@ -622,6 +726,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   function applyMeta(meta){
     if(!meta)return;
+    pushLocalHistory(meta);
     setMarqueeTitle(meta.title||'Metadaten werden geladen ...');
     var h2=q('#mffApp .mff-title h2');
     if(h2)h2.textContent=meta.artist||'Quelle: '+(meta.source||'API');
@@ -724,8 +829,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         var roll=smoothPulse(t,.72,l*.055);
         var shaped2=Math.min(1,energy*.56 + center*.20 + sideWave*.18 + roll*.08);
         var bh=18+shaped2*70;
-        bottomBars[l].style.height=bh.toFixed(1)+'%';
-        bottomBars[l].style.opacity=(.46+shaped2*.52).toFixed(2);
+        bottomBars[l].style.setProperty('--mff-bar-x',(Math.max(.18,shaped2)).toFixed(3));
+        bottomBars[l].style.setProperty('--mff-bar-opacity',(.46+shaped2*.52).toFixed(2));
         bottomBars[l].style.filter='saturate('+(1+boost*.10).toFixed(2)+')';
       }
     }
@@ -809,8 +914,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         var dist=Math.abs(j-midIndex)/midIndex;
         var wave=Math.max(.14,liveLevel*(1-dist*.34));
         var bh=18+wave*74;
-        bottomBars[j].style.height=bh.toFixed(1)+'%';
-        bottomBars[j].style.opacity=(.46+wave*.54).toFixed(2);
+        bottomBars[j].style.setProperty('--mff-bar-x',(Math.max(.18,wave)).toFixed(3));
+        bottomBars[j].style.setProperty('--mff-bar-opacity',(.46+wave*.54).toFixed(2));
       }
     }
 

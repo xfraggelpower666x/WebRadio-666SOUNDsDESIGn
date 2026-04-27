@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v15 HISTORY OVERLAY BOTTOM METER BOOST LED ROW
+
+Zweck:
+- History-Overlay wiederherstellen.
+- Unteres Meter optisch horizontal machen.
+- Boost-Anzeige aus dem Button rausnehmen und sauber unter den Controls darstellen.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration
