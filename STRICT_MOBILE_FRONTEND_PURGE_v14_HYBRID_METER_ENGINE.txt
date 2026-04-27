@@ -1,0 +1,12 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE
+CACHE_TAG=smfp-v14-hybridmeter-20260427-2205
+
+HYBRID METER ENGINE:
+- Wenn echte WebAudio-Analyserdaten verfügbar sind, nutzt der Player sie.
+- Wenn iPhone/Safari/Stream-CORS nur Nullwerte liefert, aktiviert der Player automatisch Hybrid-Visual-Motion.
+- Für normale Nutzer wird kein CORS/SILENT/FALLBACK-Label angezeigt.
+- Interne Diagnose bleibt:
+  html[data-mff-analyser="live"] = echter Analyser
+  html[data-mff-analyser="hybrid"] = hochwertige visuelle Ersatzbewegung
+- EQ, Bottom-Meter und Side-Meter bewegen sich in beiden Fällen.
+- Boost beeinflusst die sichtbare Energie.

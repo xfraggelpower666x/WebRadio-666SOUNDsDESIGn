@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v14 HYBRID METER ENGINE
+
+Zweck:
+- Levelmeter/EQ sollen für Nutzer immer wie aktive Audio-Meter wirken.
+- Wenn echte Audio-Daten verfügbar sind, bleiben sie aktiv.
+- Wenn echte Daten blockiert sind, läuft eine hochwertige visuelle Hybrid-Bewegung.
+- Keine sichtbaren Techniklabels wie CORS/SILENT/FALLBACK mehr.
+- Diagnose bleibt intern im DOM.
+- Boost-Stufe beeinflusst Meter-Energie sichtbar.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration

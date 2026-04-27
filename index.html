@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v12-analyserfallback-20260427-2138" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v12-analyserfallback-20260427-2138" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v12-analyserfallback-20260427-2138" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v12-analyserfallback-20260427-2138" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v12-analyserfallback-20260427-2138" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v12-analyserfallback-20260427-2138" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v14-hybridmeter-20260427-2205" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v14-hybridmeter-20260427-2205" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v14-hybridmeter-20260427-2205" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v14-hybridmeter-20260427-2205" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v14-hybridmeter-20260427-2205" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v14-hybridmeter-20260427-2205" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v12-analyserfallback-20260427-2138"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v14-hybridmeter-20260427-2205"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK -->
-<style id="strictMobileFrontendPurgeV12Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE -->
+<style id="strictMobileFrontendPurgeV14Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -294,10 +294,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK -->
-<script id="strictMobileFrontendPurgeV12Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE -->
+<script id="strictMobileFrontendPurgeV14Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -402,9 +402,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
 
     var b=q('#mffBoost');
-    if(b) b.textContent='BST '+boostStage;
-    var ro=q('#mffBoostReadout');
-    if(ro) ro.textContent='BST '+boostStage+' · '+target.toFixed(2)+'×';
+    if(b) b.innerHTML='BST '+boostStage+'<small>'+target.toFixed(2)+'×</small>';
 
     document.documentElement.setAttribute('data-mff-boost',String(boostStage));
     document.documentElement.setAttribute('data-mff-boost-gain',String(target));
@@ -508,11 +506,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v12</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v14</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
-      '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button><div class="mff-boost-readout" id="mffBoostReadout">BST 0 · 1.00×</div></section>'+
+      '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
       '<section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
     document.body.insertBefore(app,document.body.firstChild);
     buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
@@ -643,43 +641,97 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     document.documentElement.setAttribute('data-mff-analyser',mode);
     var label=q('#mffAnalyserMode');
     if(label){
-      if(mode==='live') label.textContent='· LIVE';
-      else if(mode==='silent') label.textContent='· CORS/SILENT';
-      else if(mode==='fallback') label.textContent='· FALLBACK';
-      else label.textContent='· INIT';
+      label.textContent='';
+      label.setAttribute('data-mode',mode);
     }
   }
+
+
+  function pseudoNoise(seed){
+    var x=Math.sin(seed*12.9898+78.233)*43758.5453;
+    return x-Math.floor(x);
+  }
+
+  function smoothPulse(t, speed, phase){
+    var v=(Math.sin(t*speed+phase)+1)/2;
+    return v*v*(3-2*v);
+  }
+
 
   function syntheticMeterMotion(playing,reason){
     var eqBars=qa('#mffEqBars i');
     var bottomBars=qa('#mffBottomBars i');
+    var app=q('#mffApp');
     var t=Date.now()/1000;
-    var boost=(boostStage||0)*.08;
-    var base=playing?0.34:0.16;
-    var liveLevel=base+boost+(playing?Math.abs(Math.sin(t*2.05))*.36:Math.abs(Math.sin(t*.85))*.08);
+    var boost=(boostStage||0);
+    var boostLift=boost*.075;
+
+    /*
+      v14 Hybrid-Fallback:
+      Kein wildes Zufallsgezappel.
+      Erzeugt musikalisch wirkende Energie:
+      - langsame Basswelle
+      - mittlere Groove-Welle
+      - schnelle HiHat-Flimmerbewegung
+      - kleine Drift pro Band
+      - Boost erhöht Intensität
+    */
+    var bass=smoothPulse(t,1.35,.2);
+    var groove=smoothPulse(t,2.75,1.1);
+    var hat=smoothPulse(t,7.8,2.0);
+    var phrase=smoothPulse(t,0.22,.4);
+
+    var base=playing?.28:.13;
+    var energy=base + bass*.22 + groove*.18 + hat*.06 + phrase*.12 + boostLift;
+    energy=Math.max(.10,Math.min(.96,energy));
+
+    if(app){
+      app.setAttribute('data-mff-meter-energy',energy>.62?'high':'normal');
+      app.setAttribute('data-mff-meter-mode','hybrid');
+    }
 
     if(eqBars.length){
       for(var k=0;k<eqBars.length;k++){
-        var p=.22+.66*Math.abs(Math.sin(t*(1.35+boost*.9)+k*.47));
-        var p2=.18*Math.abs(Math.sin(t*.73+k*.91));
-        var shaped=Math.min(1,p+p2+boost);
-        eqBars[k].style.height=(16+shaped*78).toFixed(1)+'%';
-        eqBars[k].style.opacity=(.48+shaped*.50).toFixed(2);
+        var pos=k/(Math.max(1,eqBars.length-1));
+        var bandBias=1.0;
+
+        // Bassbereich mehr Gewicht links, Höhen mehr Flimmern rechts.
+        if(pos<.22) bandBias=.85+bass*.75+phrase*.22;
+        else if(pos<.62) bandBias=.72+groove*.62+bass*.18;
+        else bandBias=.58+hat*.52+groove*.18;
+
+        var drift=smoothPulse(t,0.55+k*.033,k*.71)*.18;
+        var micro=pseudoNoise(Math.floor(t*8)+k*17)*.09;
+        var shaped=Math.min(1,(energy*.62+bandBias*.34+drift+micro));
+
+        // Nicht alle Bars gleich: rhythmische Täler erhalten.
+        var notch=.82+.18*Math.sin(k*.93+t*.35);
+        shaped*=notch;
+
+        var h=14+Math.max(.08,shaped)*82;
+        eqBars[k].style.height=h.toFixed(1)+'%';
+        eqBars[k].style.opacity=(.50+Math.min(1,shaped)*.48).toFixed(2);
+        eqBars[k].style.filter='saturate('+(1+boost*.12).toFixed(2)+') brightness('+(1+energy*.08).toFixed(2)+')';
       }
     }
 
     if(bottomBars.length){
+      var mid=(bottomBars.length-1)/2;
       for(var l=0;l<bottomBars.length;l++){
-        var center=1-Math.abs((l-(bottomBars.length-1)/2)/((bottomBars.length-1)/2));
-        var wave=.20+.58*Math.abs(Math.sin(t*(1.25+boost)+l*.13));
-        var shaped2=Math.min(1,wave*.65+center*.25+boost);
-        bottomBars[l].style.height=(18+shaped2*68).toFixed(1)+'%';
-        bottomBars[l].style.opacity=(.45+shaped2*.52).toFixed(2);
+        var dist=Math.abs(l-mid)/mid;
+        var center=1-dist;
+        var sideWave=smoothPulse(t,2.2+boost*.32,l*.095);
+        var roll=smoothPulse(t,.72,l*.055);
+        var shaped2=Math.min(1,energy*.56 + center*.20 + sideWave*.18 + roll*.08);
+        var bh=18+shaped2*70;
+        bottomBars[l].style.height=bh.toFixed(1)+'%';
+        bottomBars[l].style.opacity=(.46+shaped2*.52).toFixed(2);
+        bottomBars[l].style.filter='saturate('+(1+boost*.10).toFixed(2)+')';
       }
     }
 
-    setAnalyserMode(reason||'fallback');
-    return Math.min(.96,liveLevel);
+    setAnalyserMode('hybrid');
+    return energy;
   }
 
 
@@ -692,10 +744,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function updateEqFromAnalyser(graph,playing){
     var eqBars=qa('#mffEqBars i');
     var bottomBars=qa('#mffBottomBars i');
+    var app=q('#mffApp');
     var hasAnalyser=graph&&graph.ok&&graph.analyser&&graph.freqData;
 
     if(!hasAnalyser){
-      return syntheticMeterMotion(playing,'fallback');
+      return syntheticMeterMotion(playing,'hybrid');
     }
 
     graph.analyser.getByteFrequencyData(graph.freqData);
@@ -711,15 +764,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var avg=sum/(bins.length||1);
 
     /*
-      iPhone/Safari/CORS-Fall:
-      MediaElementSource existiert, aber Frequenzdaten bleiben fast 0.
-      Dann automatisch sichtbare Fallback-Motion, statt toter EQ.
+      Wenn echte Daten da sind: REAL MODE.
+      Wenn iPhone/Safari/CORS nur Nullen gibt: HYBRID MODE.
+      Für User bleibt das visuell konsistent und nicht als Fehler sichtbar.
     */
     if(peak<3 && avg<1.2){
       analyserSilentFrames++;
       analyserLiveFrames=0;
-      if(analyserSilentFrames>35 || playing){
-        return syntheticMeterMotion(playing,'silent');
+      if(analyserSilentFrames>18 || playing){
+        return syntheticMeterMotion(playing,'hybrid');
       }
     }else{
       analyserLiveFrames++;
@@ -729,17 +782,24 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var low=averageRange(bins,2,18);
     var mid=averageRange(bins,18,86);
     var high=averageRange(bins,86,220);
-    var liveLevel=Math.min(1,((low*1.15+mid*.95+high*.70)/255)/1.15);
+    var boost=(boostStage||0);
+    var liveLevel=Math.min(1,((low*1.15+mid*.95+high*.70)/255)/1.15 + boost*.035);
+
+    if(app){
+      app.setAttribute('data-mff-meter-energy',liveLevel>.62?'high':'normal');
+      app.setAttribute('data-mff-meter-mode','real');
+    }
 
     if(eqBars.length){
       for(var i=0;i<eqBars.length;i++){
         var start=Math.floor(2+i*(bins.length*.42/eqBars.length));
         var end=Math.floor(2+(i+1)*(bins.length*.42/eqBars.length));
         var v=averageRange(bins,start,end)/255;
-        var shaped=Math.pow(Math.min(1,v*1.85+.06),.68);
+        var shaped=Math.pow(Math.min(1,v*1.85+.06+boost*.025),.68);
         var h=Math.max(14,Math.min(100,shaped*100));
         eqBars[i].style.height=h.toFixed(1)+'%';
         eqBars[i].style.opacity=(.50+shaped*.50).toFixed(2);
+        eqBars[i].style.filter='saturate('+(1+boost*.12).toFixed(2)+') brightness('+(1+shaped*.06).toFixed(2)+')';
       }
     }
 

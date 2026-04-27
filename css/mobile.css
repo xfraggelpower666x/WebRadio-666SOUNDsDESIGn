@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v14_HYBRID_METER_ENGINE
 GEÄNDERT: 2026-04-27
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v12-analyserfallback-20260427-2138
-- EQ: Analyser-Diagnose + Fallback-Motion.
+- Cache-Proof: smfp-v14-hybridmeter-20260427-2205
+- Meter: Hybrid Real/Fallback Engine.
 ============================================================
 */
 @media (min-width:761px){

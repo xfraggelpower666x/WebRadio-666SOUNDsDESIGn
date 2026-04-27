@@ -1,0 +1,14 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v13_UI_LABELS_BOOST_READOUT_FIX
+CACHE_TAG=smfp-v13-labelsboost-20260427-2148
+
+ÄNDERUNG:
+- Sichtbares CORS/SILENT wurde in VISUAL MODE umbenannt.
+- Bedeutung:
+  Der Stream ist hörbar, aber iPhone/Safari liefert dem Audio-Analyser keine Frequenzdaten.
+  Deshalb läuft eine sichtbare Visualisierung statt echter Frequenzanalyse.
+- Falsch positioniertes Boost-Readout wurde entfernt.
+- Boost-Faktor steht direkt im BST-Button:
+  BST 0 = 1.00×
+  BST 1 = 1.14×
+  BST 2 = 1.31×
+  BST 3 = 1.52×
