@@ -383,6 +383,47 @@ window.addEventListener('orientationchange',apply,{passive:true});
 })();
 </script>
 
+
+<!-- MOBILE_SPACE_METER_LAYOUT_FIX_v1 -->
+<script id="mobileSpaceMeterLayoutFixScript">
+(function(){
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+
+  function apply(){
+    if(!document.body) return;
+    document.body.setAttribute('data-mobile-space-meter-layout-fix', isMobile() ? 'v1' : 'desktop');
+    if(!isMobile()) return;
+
+    var main = document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
+    if(main) main.setAttribute('data-mobile-player-space-host','v1');
+
+    var controls = document.getElementById('mobileControlsLayerReset');
+    if(controls) controls.setAttribute('data-mobile-controls-above-meter','v1');
+
+    var bottomMeter = document.querySelector('.mobile-dom-bottom-guard');
+    if(bottomMeter) bottomMeter.setAttribute('data-mobile-bottom-meter-spacer','v1');
+
+    var eq = document.querySelector('.eq,.equalizer,[class*="equalizer"]');
+    if(eq) eq.setAttribute('data-mobile-eq-space-fix','v1');
+
+    var status = document.querySelector('.status-panels,.system-panels,[class*="status"],[class*="system"]');
+    if(status) status.setAttribute('data-mobile-status-space-fix','v1');
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    apply();
+    setTimeout(apply, 180);
+    setTimeout(apply, 800);
+    setTimeout(apply, 1800);
+    setTimeout(apply, 3400);
+  });
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
+
 </head>
 <body>
   <div class="frame-stage">

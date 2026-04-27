@@ -1,0 +1,25 @@
+666SOUNDsDESIGn — MOBILE SPACE METER LAYOUT FIX v1
+
+Zweck:
+- Freien Mittelraum als Player-/Cockpit-Fläche nutzen.
+- Bottom-Levelmeter als echten Abstandshalter ganz unten positionieren.
+- Control-Leiste oberhalb des Bottom-Levelmeters setzen.
+- Keine Überlappung Control-Leiste / Levelmeter / iPhone-Gestenbereich.
+
+Geändert:
+- index.html
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers
+
+Layout-Reihenfolge:
+- Playerfläche / HUD
+- Status / EQ
+- Control-Leiste
+- Bottom-Levelmeter
+- iPhone-Gestenbereich
