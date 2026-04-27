@@ -296,6 +296,31 @@ window.addEventListener('resize',a,{passive:true});window.addEventListener('orie
 })();
 </script>
 
+
+<!-- MOBILE_VISUAL_ORDER_CLEANUP_v1 -->
+<script id="mobileVisualOrderCleanupScript">
+(function(){
+function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
+function apply(){
+ if(!document.body)return;
+ document.body.setAttribute('data-mobile-visual-order-cleanup',isMobile()?'v1':'desktop');
+ var c=document.getElementById('mobileInlineTopControlsForce');
+ if(c){c.setAttribute('data-mobile-clean-controls','v1');}
+ var h=document.querySelector('[data-inline-controls-host="v1"],[data-mobile-ui-order-host="v1"],.mobile-boost-top-controls-host,.boost-panel,.mobile-boost-core,[class*="boost"]');
+ if(h){
+  h.setAttribute('data-mobile-clean-boost-host','v1');
+  Array.prototype.slice.call(h.children).forEach(function(x){if(x.id!=='mobileInlineTopControlsForce')x.setAttribute('data-mobile-clean-hide','v1')});
+  Array.prototype.slice.call(h.querySelectorAll('img,svg,.logo,[class*="logo"],[class*="brand"],[class*="mark"]')).forEach(function(x){if(!x.closest('#mobileInlineTopControlsForce'))x.setAttribute('data-mobile-clean-hide','v1')});
+ }
+ var eq=document.querySelector('.eq,.equalizer,[class*="equalizer"],[class*="eq"]');
+ if(eq)eq.setAttribute('data-mobile-clean-eq','v1');
+}
+document.addEventListener('DOMContentLoaded',function(){apply();setTimeout(apply,250);setTimeout(apply,1000);setTimeout(apply,2400)});
+window.addEventListener('resize',apply,{passive:true});
+window.addEventListener('orientationchange',apply,{passive:true});
+})();
+</script>
+
 </head>
 <body>
   <div class="frame-stage">
