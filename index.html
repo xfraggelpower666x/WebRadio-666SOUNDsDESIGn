@@ -27,459 +27,223 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <link rel="stylesheet" href="/css/mobile.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
   <link rel="stylesheet" href="/css/desktop.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
 
-<!-- MOBILE_CONTROLS_LAYER_RESET_v1 -->
-<style id="mobileControlsLayerResetStyle">
-@media (max-width:760px){
-  #mobileControlsLayerReset{
-    position:fixed!important;
-    left:12px!important;
-    right:12px!important;
-    bottom:calc(18px + env(safe-area-inset-bottom))!important;
-    z-index:2147483000!important;
-    display:grid!important;
-    grid-template-columns:52px 52px 52px 52px minmax(58px,1fr) 52px!important;
-    gap:7px!important;
-    align-items:center!important;
-    justify-items:center!important;
-    box-sizing:border-box!important;
-    min-height:64px!important;
-    padding:8px!important;
-    border-radius:22px!important;
-    border:1px solid rgba(0,255,255,.32)!important;
-    background:rgba(3,7,20,.92)!important;
-    box-shadow:0 0 22px rgba(0,255,255,.18),0 0 28px rgba(255,0,220,.10),inset 0 0 18px rgba(255,0,220,.08)!important;
-    backdrop-filter:blur(10px)!important;
-    -webkit-backdrop-filter:blur(10px)!important;
-    pointer-events:auto!important;
-  }
-  #mobileControlsLayerReset button{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    width:50px!important;
-    height:48px!important;
-    min-width:50px!important;
-    min-height:48px!important;
-    margin:0!important;
-    padding:0!important;
-    border-radius:16px!important;
-    border:1px solid rgba(0,255,255,.36)!important;
-    background:rgba(9,13,32,.98)!important;
-    color:rgba(255,255,255,.97)!important;
-    font:900 16px/1 system-ui,-apple-system,Segoe UI,sans-serif!important;
-    box-shadow:0 0 12px rgba(0,255,255,.14),inset 0 0 12px rgba(255,0,220,.10)!important;
-    pointer-events:auto!important;
-    touch-action:manipulation!important;
-    -webkit-tap-highlight-color:rgba(255,0,220,.28)!important;
-  }
-  #mobileControlsLayerReset .mclr-play{
-    color:rgba(0,255,232,.98)!important;
-    border-color:rgba(0,255,255,.55)!important;
-  }
-  #mobileControlsLayerReset .mclr-stop{
-    color:rgba(255,72,172,.98)!important;
-    border-color:rgba(255,0,220,.45)!important;
-  }
-  #mobileControlsLayerReset .mclr-bst{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    width:100%!important;
-    height:48px!important;
-    border-radius:16px!important;
-    border:1px solid rgba(255,0,220,.30)!important;
-    background:rgba(8,12,28,.72)!important;
-    color:rgba(210,225,255,.96)!important;
-    font:900 12px/1.05 system-ui,-apple-system,Segoe UI,sans-serif!important;
-    letter-spacing:.12em!important;
-    text-align:center!important;
-    pointer-events:none!important;
-  }
-  body{
-    padding-bottom:calc(96px + env(safe-area-inset-bottom))!important;
-  }
-}
-@media (min-width:761px){
-  #mobileControlsLayerReset{display:none!important}
-}
-</style>
-<script id="mobileControlsLayerResetScript">
+<!-- MOBILE_FINAL_MOCKUP_MATCH_v1 -->
+<script id="mobileFinalMockupMatchScript">
 (function(){
-  var VERSION='MOBILE_CONTROLS_LAYER_RESET_v1';
-  var STREAM_URL='/stream';
-  var boostStage=0;
+  var VERSION = 'MOBILE_FINAL_MOCKUP_MATCH_v1';
+  var STREAM_URL = '/stream';
+  var boostStage = 0;
+  var rafId = null;
 
   function isMobile(){
     return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
   }
 
-  function getAudio(){
-    var a=document.querySelector('audio');
-    if(!a){
-      a=document.createElement('audio');
-      a.id='mobileControlsLayerResetAudio';
-      a.preload='none';
-      a.crossOrigin='anonymous';
-      a.playsInline=true;
-      a.style.display='none';
-      document.body.appendChild(a);
-    }
-    if(!a.getAttribute('src')) a.setAttribute('src', STREAM_URL);
-    return a;
-  }
+  function qs(sel, root){ return (root || document).querySelector(sel); }
+  function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 
-  function setLabel(){
-    var el=document.querySelector('#mobileControlsLayerReset .mclr-bst');
-    if(el) el.textContent='BST ' + boostStage;
-    document.documentElement.setAttribute('data-mobile-layer-reset-boost', String(boostStage));
+  function getAudio(){
+    var audio = qs('#mfmAudio') || qs('audio');
+    if(!audio){
+      audio = document.createElement('audio');
+      audio.id = 'mfmAudio';
+      audio.preload = 'none';
+      audio.crossOrigin = 'anonymous';
+      audio.playsInline = true;
+      audio.style.display = 'none';
+      document.body.appendChild(audio);
+    }
+    if(!audio.getAttribute('src')) audio.setAttribute('src', STREAM_URL);
+    return audio;
   }
 
   function play(){
-    var a=getAudio();
-    try{
-      if(!a.getAttribute('src')) a.setAttribute('src', STREAM_URL);
-      var r=a.play();
-      if(r && typeof r.catch==='function') r.catch(function(err){ console.warn('[MCLR play]', err); });
-    }catch(err){ console.warn('[MCLR play]', err); }
+    var audio = getAudio();
+    try {
+      if(!audio.getAttribute('src')) audio.setAttribute('src', STREAM_URL);
+      var r = audio.play();
+      if(r && typeof r.catch === 'function'){
+        r.catch(function(err){ console.warn('[MFM play]', err); });
+      }
+      document.documentElement.setAttribute('data-mfm-playing', '1');
+    } catch(err){
+      console.warn('[MFM play]', err);
+    }
   }
 
   function pause(){
-    var a=document.querySelector('audio');
-    if(a) a.pause();
+    var audio = getAudio();
+    try { audio.pause(); } catch(err){}
+    document.documentElement.setAttribute('data-mfm-playing', '0');
   }
 
   function stop(){
-    var a=document.querySelector('audio');
-    if(a){
-      a.pause();
-      try{ a.currentTime=0; }catch(e){}
-    }
+    var audio = getAudio();
+    try {
+      audio.pause();
+      try { audio.currentTime = 0; } catch(e){}
+    } catch(err){}
+    document.documentElement.setAttribute('data-mfm-playing', '0');
   }
 
   function boost(delta){
-    boostStage=Math.max(0,Math.min(3,boostStage+delta));
-    var a=getAudio();
-    var volumes=[0.86,0.94,1.0,1.0];
-    try{ a.volume=volumes[boostStage]; }catch(e){}
-    setLabel();
+    boostStage = Math.max(0, Math.min(3, boostStage + delta));
+    var audio = getAudio();
+    var vols = [0.86, 0.94, 1.0, 1.0];
+    try { audio.volume = vols[boostStage]; } catch(e){}
+    var label = qs('#mfmBoostLabel');
+    if(label) label.innerHTML = 'BST ' + boostStage + '<small></small>';
+    document.documentElement.setAttribute('data-mfm-boost', String(boostStage));
+  }
 
-    // Bestehende Boost-Logik zusätzlich anstoßen, falls der alte Player sie bereitstellt.
-    var selector = delta > 0
-      ? '[data-mobile-top-action="boost-up"],[data-mi="bup"],[data-mobile-repair-action="boost-up"],button[aria-label*="Boost mehr"]'
-      : '[data-mobile-top-action="boost-down"],[data-mi="bdown"],[data-mobile-repair-action="boost-down"],button[aria-label*="Boost weniger"]';
-    var oldBtn=document.querySelector(selector);
-    if(oldBtn && !oldBtn.closest('#mobileControlsLayerReset')){
-      try{ oldBtn.click(); }catch(e){}
+  function card(title, value, icon){
+    return '<section class="mfm-card">' +
+      '<div class="mfm-card-top"><span class="mfm-icon">' + icon + '</span><span>' + title + '</span></div>' +
+      '<strong>' + value + '</strong><div class="mfm-card-dots"><i></i><i></i><i></i></div>' +
+      '</section>';
+  }
+
+  function buildUI(){
+    if(qs('#mfmApp')) return;
+
+    var app = document.createElement('div');
+    app.id = 'mfmApp';
+    app.setAttribute('data-version', VERSION);
+    app.innerHTML =
+      '<div class="mfm-side-meter mfm-side-left"><i></i></div>' +
+      '<div class="mfm-side-meter mfm-side-right"><i></i></div>' +
+      '<main class="mfm-shell">' +
+        '<section class="mfm-now">' +
+          '<div class="mfm-radio-icon"><span></span></div>' +
+          '<div class="mfm-now-text">' +
+            '<small>NOW PLAYING</small>' +
+            '<h1>Metadaten werden geladen ...</h1>' +
+            '<p>Loading stream metadata ...</p>' +
+          '</div>' +
+          '<button class="mfm-history" type="button">↺ History</button>' +
+          '<div class="mfm-now-line"><i></i></div>' +
+        '</section>' +
+        '<section class="mfm-cards">' +
+          card('LISTENERS', '0 / 250', '👥') +
+          card('BITRATE', 'Unknown', '≋') +
+          card('DJ / STATUS', '666SOUNDsDESIGn<br>DJ', '◖') +
+        '</section>' +
+        '<section class="mfm-eq">' +
+          '<div class="mfm-panel-head"><span>EQ</span><b>20 BANDS</b></div>' +
+          '<div class="mfm-eq-grid" id="mfmEqBars"></div>' +
+        '</section>' +
+        '<section class="mfm-controls" id="mfmControls">' +
+          '<button type="button" data-mfm="play" class="mfm-play">▶</button>' +
+          '<button type="button" data-mfm="pause">Ⅱ</button>' +
+          '<button type="button" data-mfm="stop" class="mfm-stop">■</button>' +
+          '<button type="button" data-mfm="back">↺</button>' +
+          '<button type="button" data-mfm="down">−</button>' +
+          '<button type="button" data-mfm="boost" id="mfmBoostLabel">BST 0<small></small></button>' +
+          '<button type="button" data-mfm="up">+</button>' +
+        '</section>' +
+        '<section class="mfm-bottom-meter">' +
+          '<div class="mfm-meter-title"><i></i><span>LEVEL METER</span><i></i></div>' +
+          '<div class="mfm-meter-strip" id="mfmBottomBars"></div>' +
+          '<div class="mfm-db"><span>-∞</span><span>-24</span><span>-12</span><span>-6</span><span>-3</span><span>0 dB</span></div>' +
+          '<div class="mfm-swipe">SWIPE AREA</div>' +
+        '</section>' +
+      '</main>';
+
+    document.body.appendChild(app);
+
+    var eq = qs('#mfmEqBars');
+    var heights = [62,74,48,44,68,52,36,50,32,28,54,68,56,48,52,46,58,42,50,60];
+    heights.forEach(function(h, i){
+      var b = document.createElement('i');
+      b.style.setProperty('--h', h + '%');
+      b.style.setProperty('--d', (i * 17) + 'ms');
+      eq.appendChild(b);
+    });
+
+    var bottom = qs('#mfmBottomBars');
+    for(var i=0;i<58;i++){
+      var s = document.createElement('i');
+      s.style.setProperty('--d', (i * 9) + 'ms');
+      bottom.appendChild(s);
     }
+
+    qs('#mfmControls').addEventListener('click', handleControl, {capture:true});
+    qs('#mfmControls').addEventListener('touchend', handleControl, {passive:false,capture:true});
+  }
+
+  function handleControl(ev){
+    var btn = ev.target.closest && ev.target.closest('[data-mfm]');
+    if(!btn) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    var cmd = btn.getAttribute('data-mfm');
+    if(cmd === 'play') play();
+    if(cmd === 'pause') pause();
+    if(cmd === 'stop') stop();
+    if(cmd === 'back') { stop(); setTimeout(play, 120); }
+    if(cmd === 'down') boost(-1);
+    if(cmd === 'up') boost(1);
+    if(cmd === 'boost') boost(1);
+  }
+
+  function hideOldMobileLayers(){
+    var selectors = [
+      'header', '.hero', '.hero-image', '.site-header', '.main-header',
+      '#mobileControlsLayerReset', '#mobileInlineTopControlsForce',
+      '#mobileTopControlsInBoostPanel', '#mobileTransportRepair',
+      '.mobile-transport-repair',
+      '.mobile-dom-side-meter', '.mobile-dom-bottom-guard'
+    ];
+
+    selectors.forEach(function(sel){
+      qsa(sel).forEach(function(n){
+        if(n.closest && n.closest('#mfmApp')) return;
+        n.setAttribute('data-mfm-hidden-old', '1');
+      });
+    });
+
+    // Hauptinhalte der alten Mobile-Ansicht stilllegen, aber Desktop nicht zerstören.
+    qsa('main,.mobile-shell,.player-shell,.hud-panel,.panel').forEach(function(n){
+      if(n.closest && n.closest('#mfmApp')) return;
+      n.setAttribute('data-mfm-hidden-old', '1');
+    });
+
+    // Große Bilder/Logos oben weg.
+    qsa('img,[class*="logo"],[class*="hero"],[class*="header"]').forEach(function(n){
+      if(n.closest && n.closest('#mfmApp')) return;
+      n.setAttribute('data-mfm-hidden-old', '1');
+    });
+  }
+
+  function loop(){
+    var playing = document.documentElement.getAttribute('data-mfm-playing') === '1';
+    var t = Date.now() / 1000;
+    var level = playing ? (0.36 + 0.32 * Math.abs(Math.sin(t * 2.7))) : 0.18;
+    document.documentElement.style.setProperty('--mfm-level', level.toFixed(3));
+    rafId = requestAnimationFrame(loop);
   }
 
   function install(){
     if(!document.body) return;
-    document.body.setAttribute('data-mobile-controls-layer-reset', isMobile() ? 'v1' : 'desktop');
-    document.documentElement.setAttribute('data-mobile-controls-layer-reset-version', VERSION);
+    document.documentElement.setAttribute('data-mfm-version', VERSION);
+    document.body.setAttribute('data-mfm-mobile', isMobile() ? '1' : '0');
 
-    var oldSelectors=[
-      '#runtimeCacheBustProof',
-      '#mobileInlineTopControlsForce',
-      '#mobileTopControlsInBoostPanel',
-      '#mobileTransportRepair',
-      '.mobile-transport-repair'
-    ];
-    oldSelectors.forEach(function(sel){
-      document.querySelectorAll(sel).forEach(function(n){
-        if(n.id!=='mobileControlsLayerReset'){
-          n.setAttribute('data-mclr-disabled','v1');
-          n.style.display='none';
-          n.style.visibility='hidden';
-          n.style.opacity='0';
-          n.style.pointerEvents='none';
-        }
-      });
-    });
-
-    if(!isMobile()) return;
-
-    var bar=document.getElementById('mobileControlsLayerReset');
-    if(!bar){
-      bar=document.createElement('div');
-      bar.id='mobileControlsLayerReset';
-      bar.innerHTML=
-        '<button type="button" class="mclr-play" data-mclr="play" aria-label="Play">▶</button>'+
-        '<button type="button" data-mclr="pause" aria-label="Pause">Ⅱ</button>'+
-        '<button type="button" class="mclr-stop" data-mclr="stop" aria-label="Stop">■</button>'+
-        '<button type="button" data-mclr="bdown" aria-label="Boost weniger">−</button>'+
-        '<span class="mclr-bst">BST 0</span>'+
-        '<button type="button" data-mclr="bup" aria-label="Boost mehr">+</button>';
-      document.body.appendChild(bar);
+    if(isMobile()){
+      buildUI();
+      hideOldMobileLayers();
+      if(!rafId) loop();
     }
-
-    if(!bar.__mclrBound){
-      bar.__mclrBound=true;
-      var handler=function(ev){
-        var btn=ev.target.closest && ev.target.closest('[data-mclr]');
-        if(!btn) return;
-        ev.preventDefault();
-        ev.stopPropagation();
-        var cmd=btn.getAttribute('data-mclr');
-        if(cmd==='play') play();
-        if(cmd==='pause') pause();
-        if(cmd==='stop') stop();
-        if(cmd==='bup') boost(1);
-        if(cmd==='bdown') boost(-1);
-      };
-      bar.addEventListener('click',handler,{capture:true});
-      bar.addEventListener('touchend',handler,{passive:false,capture:true});
-    }
-
-    setLabel();
-  }
-
-  document.addEventListener('DOMContentLoaded',function(){
-    install(); setTimeout(install,250); setTimeout(install,900); setTimeout(install,2200);
-  });
-  window.addEventListener('resize',install,{passive:true});
-  window.addEventListener('orientationchange',install,{passive:true});
-})();
-</script>
-
-<!-- MOBILE_INTERNAL_LOGO_REMOVE_v1 -->
-<script id="mobileInternalLogoRemoveScript">
-(function(){
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function removeInternalLogo(){
-    if(!document.body) return;
-    document.body.setAttribute('data-mobile-internal-logo-remove', isMobile() ? 'v1' : 'desktop');
-    if(!isMobile()) return;
-
-    var protectedAreas = [
-      'header',
-      '.hero',
-      '.site-header',
-      '.main-header',
-      '.brand-header'
-    ];
-
-    function isProtected(node){
-      return protectedAreas.some(function(sel){
-        try { return !!node.closest(sel); } catch(e){ return false; }
-      });
-    }
-
-    var selectors = [
-      '.boost-panel img',
-      '.mobile-boost-core img',
-      '.player-shell img',
-      '.hud-panel img',
-      '.mobile-shell img',
-      '[data-mobile-boost-logo-hide]',
-      '[data-mobile-logo-purge]',
-      '[class*="player-logo"]',
-      '[class*="mini-logo"]',
-      '[class*="brand-mark"]'
-    ];
-
-    selectors.forEach(function(sel){
-      document.querySelectorAll(sel).forEach(function(node){
-        if(!node || !node.parentNode) return;
-        if(node.closest('#mobileControlsLayerReset')) return;
-        if(isProtected(node)) return;
-
-        var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
-        var small = !r || (r.width <= 220 && r.height <= 160);
-
-        if(small){
-          node.parentNode.removeChild(node);
-        }
-      });
-    });
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    removeInternalLogo();
-    setTimeout(removeInternalLogo, 200);
-    setTimeout(removeInternalLogo, 900);
-    setTimeout(removeInternalLogo, 2200);
+    install();
+    setTimeout(install, 200);
+    setTimeout(install, 800);
+    setTimeout(install, 1800);
   });
-  window.addEventListener('resize', removeInternalLogo, {passive:true});
-  window.addEventListener('orientationchange', removeInternalLogo, {passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_FULLSCREEN_PLAYER_BASE_v1 -->
-<script id="mobileFullscreenPlayerBaseScript">
-(function(){
-function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
-function apply(){
- if(!document.body)return;
- document.body.setAttribute('data-mobile-fullscreen-player-base',isMobile()?'v1':'desktop');
- if(!isMobile())return;
- var selectors=['header','.site-header','.main-header','.hero','.hero-image','.header-logo','.brand-header','.top-logo','.logo-header','[class*="hero"]','[class*="header"] img','[class*="logo"]'];
- selectors.forEach(function(sel){
-  document.querySelectorAll(sel).forEach(function(n){
-   if(n.closest&&n.closest('#mobileControlsLayerReset,#mobileControlsLayerReset *'))return;
-   if(n.id==='mobileControlsLayerReset')return;
-   var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
-   var remove=false;
-   if(n.tagName&&n.tagName.toLowerCase()==='header')remove=true;
-   else if(r&&r.top<360&&(r.height>80||r.width>220))remove=true;
-   if(remove)n.setAttribute('data-mobile-top-logo-remove','v1');
-  });
- });
- var main=document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
- if(main)main.setAttribute('data-mobile-fullscreen-main','v1');
- var controls=document.getElementById('mobileControlsLayerReset');
- if(controls)controls.setAttribute('data-mobile-fullscreen-controls','v1');
-}
-document.addEventListener('DOMContentLoaded',function(){apply();setTimeout(apply,200);setTimeout(apply,900);setTimeout(apply,2200)});
-window.addEventListener('resize',apply,{passive:true});
-window.addEventListener('orientationchange',apply,{passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_SINGLE_PLAYER_CLEAN_BASE_v1 -->
-<script id="mobileSinglePlayerCleanBaseScript">
-(function(){
-function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
-function apply(){
- if(!document.body)return;
- document.body.setAttribute('data-mobile-single-player-clean',isMobile()?'v1':'desktop');
- if(!isMobile())return;
- var topSelectors=['header','.site-header','.main-header','.hero','.hero-image','.header-logo','.brand-header','.top-logo','.logo-header','[class*="hero"]','[class*="header"]','[class*="logo"]','img'];
- topSelectors.forEach(function(sel){
-  document.querySelectorAll(sel).forEach(function(n){
-   if(!n||!n.setAttribute)return;
-   if(n.closest&&n.closest('#mobileControlsLayerReset,#mobileControlsLayerReset *,.now-playing,.status-panels,.system-panels,.eq,.equalizer'))return;
-   var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
-   if(!r)return;
-   var inTop=r.top<(window.innerHeight*.58);
-   var big=r.width>(window.innerWidth*.32)||r.height>80;
-   var txt=(n.textContent||'').trim();
-   if((inTop&&big)||(/666|broadcaster|soundsdesign/i.test(txt)&&r.top<420)){
-    n.setAttribute('data-mobile-remove-top-visual','v1');
-   }
-  });
- });
- document.querySelectorAll('.controls,.transport,.transport-controls,.player-controls,.mobile-controls,.control-row,#mobileTransportRepair,#mobileTopControlsInBoostPanel,#mobileInlineTopControlsForce,[class*="transport"],[class*="control"]').forEach(function(n){
-  if(!n||!n.setAttribute)return;
-  if(n.id==='mobileControlsLayerReset'||(n.closest&&n.closest('#mobileControlsLayerReset')))return;
-  var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
-  var hasBtn=n.querySelector&&n.querySelector('button,[role="button"]');
-  var isStatus=/status|system|meta|src|str/i.test(n.textContent||'');
-  if(r&&hasBtn&&r.top<(window.innerHeight*.80)&&!isStatus)n.setAttribute('data-mobile-disable-duplicate-controls','v1');
- });
- var main=document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
- if(main)main.setAttribute('data-mobile-single-player-main','v1');
- var eq=document.querySelector('.eq,.equalizer,[class*="equalizer"]');
- if(eq)eq.setAttribute('data-mobile-single-player-eq','v1');
-}
-document.addEventListener('DOMContentLoaded',function(){apply();setTimeout(apply,160);setTimeout(apply,700);setTimeout(apply,1600);setTimeout(apply,3200)});
-window.addEventListener('resize',apply,{passive:true});
-window.addEventListener('orientationchange',apply,{passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_SPACE_METER_LAYOUT_FIX_v1 -->
-<script id="mobileSpaceMeterLayoutFixScript">
-(function(){
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function apply(){
-    if(!document.body) return;
-    document.body.setAttribute('data-mobile-space-meter-layout-fix', isMobile() ? 'v1' : 'desktop');
-    if(!isMobile()) return;
-
-    var main = document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
-    if(main) main.setAttribute('data-mobile-player-space-host','v1');
-
-    var controls = document.getElementById('mobileControlsLayerReset');
-    if(controls) controls.setAttribute('data-mobile-controls-above-meter','v1');
-
-    var bottomMeter = document.querySelector('.mobile-dom-bottom-guard');
-    if(bottomMeter) bottomMeter.setAttribute('data-mobile-bottom-meter-spacer','v1');
-
-    var eq = document.querySelector('.eq,.equalizer,[class*="equalizer"]');
-    if(eq) eq.setAttribute('data-mobile-eq-space-fix','v1');
-
-    var status = document.querySelector('.status-panels,.system-panels,[class*="status"],[class*="system"]');
-    if(status) status.setAttribute('data-mobile-status-space-fix','v1');
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    apply();
-    setTimeout(apply, 180);
-    setTimeout(apply, 800);
-    setTimeout(apply, 1800);
-    setTimeout(apply, 3400);
-  });
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
-})();
-</script>
-
-
-<!-- MOBILE_VERTICAL_STACK_REORDER_v1 -->
-<script id="mobileVerticalStackReorderScript">
-(function(){
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function markPanel(node, type){
-    if(node && node.setAttribute) node.setAttribute('data-mobile-stack-' + type, 'v1');
-  }
-
-  function apply(){
-    if(!document.body) return;
-    document.body.setAttribute('data-mobile-vertical-stack-reorder', isMobile() ? 'v1' : 'desktop');
-    if(!isMobile()) return;
-
-    var main = document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
-    markPanel(main, 'host');
-
-    var now = document.querySelector('.now-playing,[class*="now"],[class*="playing"],[class*="metadata"]');
-    markPanel(now, 'now');
-
-    var status = document.querySelector('.status-panels,.system-panels,[class*="status"],[class*="system"]');
-    markPanel(status, 'status');
-
-    var eq = document.querySelector('.eq,.equalizer,[class*="equalizer"]');
-    markPanel(eq, 'eq');
-
-    var controls = document.getElementById('mobileControlsLayerReset');
-    markPanel(controls, 'controls');
-
-    var bottom = document.querySelector('.mobile-dom-bottom-guard');
-    markPanel(bottom, 'bottommeter');
-
-    /* altes großes Logo/Hero als Hintergrund/Element erneut hart markieren */
-    document.querySelectorAll('header,.hero,.hero-image,[class*="hero"],[class*="header"],[class*="logo"],img').forEach(function(node){
-      if(!node || !node.getBoundingClientRect) return;
-      if(node.closest && node.closest('#mobileControlsLayerReset')) return;
-      if(node.closest && node.closest('[data-mobile-stack-now],[data-mobile-stack-status],[data-mobile-stack-eq]')) return;
-      var r = node.getBoundingClientRect();
-      if(r.top < window.innerHeight * 0.50 && (r.width > window.innerWidth * 0.28 || r.height > 70)){
-        node.setAttribute('data-mobile-stack-remove-visual','v1');
-      }
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    apply();
-    setTimeout(apply, 150);
-    setTimeout(apply, 700);
-    setTimeout(apply, 1600);
-    setTimeout(apply, 3200);
-  });
-  window.addEventListener('resize', apply, {passive:true});
-  window.addEventListener('orientationchange', apply, {passive:true});
+  window.addEventListener('resize', install, {passive:true});
+  window.addEventListener('orientationchange', install, {passive:true});
 })();
 </script>
 
