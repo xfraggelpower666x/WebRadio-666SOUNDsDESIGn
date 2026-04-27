@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — MOBILE FULLSCREEN PLAYER BASE v1
+
+Zweck:
+- Oberes Kopfzeilen-/Hero-Logo auf Mobile entfernen.
+- Player/HUD als ganzseitiges Mobile-Cockpit stabilisieren.
+- Große vertikale Leere durch Header/Hero-Bereich reduzieren.
+- Feste Control-Leiste bleibt erhalten.
+- Meter/EQ/Status bleiben erhalten, aber dezenter.
+
+Geändert:
+- index.html
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers

@@ -308,6 +308,38 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
+
+<!-- MOBILE_FULLSCREEN_PLAYER_BASE_v1 -->
+<script id="mobileFullscreenPlayerBaseScript">
+(function(){
+function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
+function apply(){
+ if(!document.body)return;
+ document.body.setAttribute('data-mobile-fullscreen-player-base',isMobile()?'v1':'desktop');
+ if(!isMobile())return;
+ var selectors=['header','.site-header','.main-header','.hero','.hero-image','.header-logo','.brand-header','.top-logo','.logo-header','[class*="hero"]','[class*="header"] img','[class*="logo"]'];
+ selectors.forEach(function(sel){
+  document.querySelectorAll(sel).forEach(function(n){
+   if(n.closest&&n.closest('#mobileControlsLayerReset,#mobileControlsLayerReset *'))return;
+   if(n.id==='mobileControlsLayerReset')return;
+   var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
+   var remove=false;
+   if(n.tagName&&n.tagName.toLowerCase()==='header')remove=true;
+   else if(r&&r.top<360&&(r.height>80||r.width>220))remove=true;
+   if(remove)n.setAttribute('data-mobile-top-logo-remove','v1');
+  });
+ });
+ var main=document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
+ if(main)main.setAttribute('data-mobile-fullscreen-main','v1');
+ var controls=document.getElementById('mobileControlsLayerReset');
+ if(controls)controls.setAttribute('data-mobile-fullscreen-controls','v1');
+}
+document.addEventListener('DOMContentLoaded',function(){apply();setTimeout(apply,200);setTimeout(apply,900);setTimeout(apply,2200)});
+window.addEventListener('resize',apply,{passive:true});
+window.addEventListener('orientationchange',apply,{passive:true});
+})();
+</script>
+
 </head>
 <body>
   <div class="frame-stage">

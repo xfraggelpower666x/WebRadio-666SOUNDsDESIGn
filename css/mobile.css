@@ -1334,3 +1334,43 @@ ZWECK:
     display:none!important;
   }
 }
+
+/* MOBILE_FULLSCREEN_PLAYER_BASE_v1 */
+@media(max-width:760px){
+html,body{min-height:100vh!important;background:#02040d!important;overflow-x:hidden!important}
+body[data-mobile-fullscreen-player-base="v1"]{padding-top:calc(6px + env(safe-area-inset-top))!important;padding-bottom:calc(92px + env(safe-area-inset-bottom))!important}
+body[data-mobile-fullscreen-player-base="v1"] [data-mobile-top-logo-remove="v1"]{
+display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;max-width:0!important;max-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body[data-mobile-fullscreen-player-base="v1"] main,
+body[data-mobile-fullscreen-player-base="v1"] .mobile-shell,
+body[data-mobile-fullscreen-player-base="v1"] .player-shell,
+body[data-mobile-fullscreen-player-base="v1"] .hud-panel,
+body[data-mobile-fullscreen-player-base="v1"] .panel{
+transform:none!important;margin-top:0!important;padding-top:0!important;top:auto!important;min-height:auto!important;overflow:visible!important}
+body[data-mobile-fullscreen-player-base="v1"] [data-mobile-fullscreen-main="v1"]{width:calc(100% - 20px)!important;max-width:100%!important;margin:0 auto!important;border-radius:22px!important}
+body[data-mobile-fullscreen-player-base="v1"] .boost-panel,
+body[data-mobile-fullscreen-player-base="v1"] .mobile-boost-core,
+body[data-mobile-fullscreen-player-base="v1"] [class*="boost"]{
+min-height:24px!important;max-height:50px!important;margin-top:0!important;padding-top:2px!important;padding-bottom:2px!important;overflow:hidden!important}
+body[data-mobile-fullscreen-player-base="v1"] .system-panels,
+body[data-mobile-fullscreen-player-base="v1"] .status-panels,
+body[data-mobile-fullscreen-player-base="v1"] [class*="system"],
+body[data-mobile-fullscreen-player-base="v1"] [class*="status"]{margin-top:7px!important;margin-bottom:7px!important}
+body[data-mobile-fullscreen-player-base="v1"] .now-playing,
+body[data-mobile-fullscreen-player-base="v1"] [class*="now"],
+body[data-mobile-fullscreen-player-base="v1"] [class*="playing"],
+body[data-mobile-fullscreen-player-base="v1"] [class*="metadata"]{margin-top:6px!important;margin-bottom:8px!important;position:relative!important;z-index:50!important}
+body[data-mobile-fullscreen-player-base="v1"] .mobile-dom-side-meter{top:28vh!important;height:48vh!important;opacity:.34!important;width:7px!important;z-index:12!important}
+body[data-mobile-fullscreen-player-base="v1"] .mobile-dom-side-meter-left{left:4px!important}
+body[data-mobile-fullscreen-player-base="v1"] .mobile-dom-side-meter-right{right:4px!important}
+body[data-mobile-fullscreen-player-base="v1"] .mobile-dom-bottom-guard{bottom:calc(78px + env(safe-area-inset-bottom))!important;left:32px!important;right:32px!important;height:8px!important;opacity:.32!important;z-index:16!important}
+body[data-mobile-fullscreen-player-base="v1"] .mobile-dom-bottom-track{height:6px!important;top:1px!important}
+body[data-mobile-fullscreen-player-base="v1"] #mobileControlsLayerReset{
+left:14px!important;right:14px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;min-height:58px!important;padding:6px!important;grid-template-columns:46px 46px 46px 46px minmax(54px,1fr) 46px!important;gap:6px!important;border-radius:20px!important}
+body[data-mobile-fullscreen-player-base="v1"] #mobileControlsLayerReset button{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;border-radius:15px!important;font-size:15px!important}
+body[data-mobile-fullscreen-player-base="v1"] #mobileControlsLayerReset .mclr-bst{height:44px!important;font-size:11px!important;letter-spacing:.10em!important}
+body[data-mobile-fullscreen-player-base="v1"] .eq,
+body[data-mobile-fullscreen-player-base="v1"] .equalizer,
+body[data-mobile-fullscreen-player-base="v1"] [class*="equalizer"]{
+min-height:140px!important;margin-bottom:92px!important;padding-top:8px!important;padding-bottom:18px!important;overflow:visible!important}
+}
