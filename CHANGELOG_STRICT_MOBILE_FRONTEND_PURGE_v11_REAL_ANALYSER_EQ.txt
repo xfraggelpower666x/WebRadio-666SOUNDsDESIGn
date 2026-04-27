@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v11 REAL ANALYSER EQ
+
+Zweck:
+- EQ war bisher optisch zu statisch.
+- v11 setzt einen WebAudio AnalyserNode in die Audio-/Boost-Kette.
+- EQ-Bars werden aus echten Frequenzdaten bewegt.
+- Bottom-Meter und Side-Meter reagieren ebenfalls auf das echte Audiolevel.
+- Fallback-Animation nur noch, wenn der Browser/AudioContext keinen Analyser liefert.
+- Boost-Ramp aus v9/v10 bleibt erhalten.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration

@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v10-boostvisual-20260427-2110" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v10-boostvisual-20260427-2110" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v10-boostvisual-20260427-2110" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v10-boostvisual-20260427-2110" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v10-boostvisual-20260427-2110" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v10-boostvisual-20260427-2110" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v11-realanalyser-20260427-2125" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v11-realanalyser-20260427-2125" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v11-realanalyser-20260427-2125" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v11-realanalyser-20260427-2125" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v11-realanalyser-20260427-2125" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v11-realanalyser-20260427-2125" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v10-boostvisual-20260427-2110"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v11-realanalyser-20260427-2125"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK -->
-<style id="strictMobileFrontendPurgeV10Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ -->
+<style id="strictMobileFrontendPurgeV11Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -294,10 +294,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK -->
-<script id="strictMobileFrontendPurgeV10Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ -->
+<script id="strictMobileFrontendPurgeV11Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -342,6 +342,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       var gain=ctx.createGain();
       gain.gain.value=BOOST_GAINS[boostStage] || 1;
 
+      var analyser=ctx.createAnalyser();
+      analyser.fftSize=1024;
+      analyser.smoothingTimeConstant=0.78;
+      analyser.minDecibels=-86;
+      analyser.maxDecibels=-18;
+
       var comp=ctx.createDynamicsCompressor();
       comp.threshold.value=-7;
       comp.knee.value=10;
@@ -351,12 +357,24 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       try{source.disconnect()}catch(e){}
       source.connect(gain);
-      gain.connect(comp);
+      gain.connect(analyser);
+      analyser.connect(comp);
       comp.connect(ctx.destination);
 
       audio.volume=1;
-      audioGraph={audio:audio,ctx:ctx,source:source,gain:gain,compressor:comp,ok:true,lastGain:gain.gain.value};
-      document.documentElement.setAttribute('data-mff-boost-engine','webaudio-ramp');
+      audioGraph={
+        audio:audio,
+        ctx:ctx,
+        source:source,
+        gain:gain,
+        analyser:analyser,
+        compressor:comp,
+        ok:true,
+        lastGain:gain.gain.value,
+        freqData:new Uint8Array(analyser.frequencyBinCount),
+        timeData:new Uint8Array(analyser.fftSize)
+      };
+      document.documentElement.setAttribute('data-mff-boost-engine','webaudio-ramp-analyser');
       return audioGraph;
     }catch(e){
       console.warn('[666 boost] WebAudio fallback',e);
@@ -487,7 +505,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v10</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v11</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS</b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -615,13 +633,84 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   async function tickMeta(){try{var meta=await fetchMeta();if(meta)applyMeta(meta)}catch(e){}}
   function startMeta(){if(metaTimer)return;tickMeta();metaTimer=setInterval(tickMeta,12000)}
 
+  function averageRange(arr,start,end){
+    var sum=0,count=0;
+    for(var i=start;i<end&&i<arr.length;i++){sum+=arr[i];count++;}
+    return count?sum/count:0;
+  }
+
+  function updateEqFromAnalyser(graph,playing){
+    var eqBars=qa('#mffEqBars i');
+    var bottomBars=qa('#mffBottomBars i');
+    var liveLevel=0;
+    var hasAnalyser=graph&&graph.ok&&graph.analyser&&graph.freqData;
+
+    if(hasAnalyser){
+      graph.analyser.getByteFrequencyData(graph.freqData);
+      graph.analyser.getByteTimeDomainData(graph.timeData);
+
+      var bins=graph.freqData;
+      var low=averageRange(bins,2,18);
+      var mid=averageRange(bins,18,86);
+      var high=averageRange(bins,86,220);
+      liveLevel=Math.min(1,((low*1.15+mid*.95+high*.70)/255)/1.15);
+
+      if(eqBars.length){
+        for(var i=0;i<eqBars.length;i++){
+          var start=Math.floor(2+i*(bins.length*.42/eqBars.length));
+          var end=Math.floor(2+(i+1)*(bins.length*.42/eqBars.length));
+          var v=averageRange(bins,start,end)/255;
+          var shaped=Math.pow(Math.min(1,v*1.55+.08),.72);
+          var h=Math.max(12,Math.min(100,shaped*100));
+          eqBars[i].style.height=h.toFixed(1)+'%';
+          eqBars[i].style.opacity=(.55+shaped*.45).toFixed(2);
+        }
+      }
+
+      if(bottomBars.length){
+        var midIndex=(bottomBars.length-1)/2;
+        for(var j=0;j<bottomBars.length;j++){
+          var dist=Math.abs(j-midIndex)/midIndex;
+          var wave=Math.max(.12,liveLevel*(1-dist*.38));
+          var bh=18+wave*72;
+          bottomBars[j].style.height=bh.toFixed(1)+'%';
+          bottomBars[j].style.opacity=(.48+wave*.52).toFixed(2);
+        }
+      }
+
+      document.documentElement.setAttribute('data-mff-analyser','live');
+    }else{
+      var t=Date.now()/1000;
+      liveLevel=playing?(0.34+Math.abs(Math.sin(t*2.3))*.42):(.12+Math.abs(Math.sin(t*.8))*.08);
+
+      if(eqBars.length){
+        for(var k=0;k<eqBars.length;k++){
+          var pseudo=.22+.60*Math.abs(Math.sin(t*1.4+k*.47));
+          eqBars[k].style.height=(18+pseudo*72).toFixed(1)+'%';
+          eqBars[k].style.opacity=(.50+pseudo*.45).toFixed(2);
+        }
+      }
+
+      if(bottomBars.length){
+        for(var l=0;l<bottomBars.length;l++){
+          var pseudo2=.20+.54*Math.abs(Math.sin(t*1.1+l*.15));
+          bottomBars[l].style.height=(18+pseudo2*55).toFixed(1)+'%';
+          bottomBars[l].style.opacity=(.45+pseudo2*.45).toFixed(2);
+        }
+      }
+
+      document.documentElement.setAttribute('data-mff-analyser','fallback');
+    }
+
+    return liveLevel;
+  }
+
   function animate(){
     var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
-    var t=Date.now()/1000;
-    var base=playing?0.38:0.18;
-    var level=base+(playing?Math.abs(Math.sin(t*2.3))*0.42:Math.abs(Math.sin(t*.8))*0.08);
+    var graph=audioGraph;
+    var level=updateEqFromAnalyser(graph,playing);
     var visualBoost=(boostStage||0)*0.045;
-    level=Math.min(.92,level+visualBoost);
+    level=Math.min(.96,level+visualBoost);
     document.documentElement.style.setProperty('--mff-level',level.toFixed(3));
     requestAnimationFrame(animate);
   }

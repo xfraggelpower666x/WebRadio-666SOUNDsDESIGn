@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v10_BOOST_VISUAL_FEEDBACK
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ
 GEÄNDERT: 2026-04-27
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v10-boostvisual-20260427-2110
-- Boost: ramp-protected WebAudio GainNode + sichtbare Boost-Rückmeldung.
+- Cache-Proof: smfp-v11-realanalyser-20260427-2125
+- EQ: echter WebAudio AnalyserNode.
 ============================================================
 */
 @media (min-width:761px){

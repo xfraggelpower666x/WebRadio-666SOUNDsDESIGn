@@ -1,0 +1,12 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v11_REAL_ANALYSER_EQ
+CACHE_TAG=smfp-v11-realanalyser-20260427-2125
+
+REAL ANALYSER EQ:
+- WebAudio AnalyserNode in die Boost-Kette eingebaut.
+- EQ-Bars werden pro Frame aus Frequenzdaten aktualisiert.
+- Bottom-Meter wird aus Live-Level/Frequenzdaten aktualisiert.
+- Side-Meter nutzt --mff-level aus echtem Audiolevel.
+- Fallback läuft nur, wenn Analyser nicht verfügbar ist.
+- Anzeige:
+  20 BANDS · LIVE = echter Analyser aktiv
+  20 BANDS · FALLBACK = kein echter Analyser verfügbar
