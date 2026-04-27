@@ -649,5 +649,265 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
+
+<!-- MOBILE_FINAL_REMOVE_OLD_BOTTOM_AND_RESTORE_META_v4 -->
+<script id="mobileFinalRemoveOldBottomAndRestoreMetaScript">
+(function(){
+  var VERSION = 'MOBILE_FINAL_REMOVE_OLD_BOTTOM_AND_RESTORE_META_v4';
+  var metaTimer = null;
+
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+
+  function q(sel, root){ return (root || document).querySelector(sel); }
+  function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function markOldBottomLayer(){
+    if(!isMobile()) return;
+
+    /*
+      Der rot markierte Balken ist eine alte breite Bottom-Leiste außerhalb des finalen Players.
+      Nicht verstecken:
+      - #mffApp
+      - .mff-bottom im finalen Player
+      - iOS Browser UI ist kein DOM und wird nicht berührt
+    */
+    var knownSelectors = [
+      '.mobile-dom-bottom-guard',
+      '.mobile-dom-bottom-track',
+      '.mobile-dom-bottom-left',
+      '.mobile-dom-bottom-right',
+      '.mobile-bottom-guard',
+      '.bottom-guard',
+      '.gesture-guard',
+      '.bottom-levelmeter',
+      '.mobile-bottom-meter',
+      '.bottom-meter',
+      '.center-out-meter',
+      '.mobile-center-out-meter',
+      '[class*="bottom"][class*="guard"]',
+      '[class*="bottom"][class*="meter"]',
+      '[class*="center"][class*="meter"]',
+      '[class*="gesture"][class*="guard"]',
+      '[id*="bottom"][id*="meter"]',
+      '[id*="bottom"][id*="guard"]'
+    ];
+
+    knownSelectors.forEach(function(sel){
+      qa(sel).forEach(function(node){
+        if(node.closest && node.closest('#mffApp')) return;
+        node.setAttribute('data-mff-v4-kill-old-bottom','1');
+        try { node.remove(); } catch(e) {}
+      });
+    });
+
+    qa('body > *').forEach(function(node){
+      if(!node || node.id === 'mffApp') return;
+      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
+      if(node.id === 'mffAudio' || node.id === 'mfmAudio') return;
+      if(node.closest && node.closest('#mffApp')) return;
+
+      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+      if(!r) return;
+
+      var cs = window.getComputedStyle ? window.getComputedStyle(node) : null;
+      var bg = cs ? ((cs.background || '') + ' ' + (cs.backgroundImage || '') + ' ' + (cs.boxShadow || '')) : '';
+      var pos = cs ? cs.position : '';
+
+      var nearBottom = r.top > window.innerHeight * 0.80;
+      var wide = r.width > window.innerWidth * 0.60;
+      var short = r.height > 6 && r.height < 90;
+      var text = (node.textContent || '').trim();
+      var lowText = text.length < 30;
+      var colored = /linear-gradient|rgb|rgba|cyan|magenta|pink|255,\s*0|0,\s*255|22,\s*255/i.test(bg);
+
+      if(nearBottom && wide && short && (lowText || colored || pos === 'fixed' || pos === 'absolute')){
+        node.setAttribute('data-mff-v4-kill-old-bottom','1');
+        try { node.remove(); } catch(e) {}
+      }
+    });
+
+    /*
+      Falls der Balken als Kind tiefer im alten DOM liegt: breite Elemente im unteren Bereich außerhalb #mffApp markieren.
+      Hier wird absichtlich nur Bottom-Bereich getroffen.
+    */
+    qa('body *').forEach(function(node){
+      if(!node || (node.closest && node.closest('#mffApp'))) return;
+      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
+
+      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+      if(!r) return;
+
+      var nearBottom = r.top > window.innerHeight * 0.82;
+      var veryWide = r.width > window.innerWidth * 0.70;
+      var meterHeight = r.height >= 8 && r.height <= 70;
+      var txt = (node.textContent || '').trim();
+
+      if(nearBottom && veryWide && meterHeight && txt.length < 40){
+        node.setAttribute('data-mff-v4-kill-old-bottom','1');
+        try { node.remove(); } catch(e) {}
+      }
+    });
+  }
+
+  function normalizeMeta(data){
+    if(!data) return null;
+
+    if(typeof data === 'string'){
+      return { title: data };
+    }
+
+    var title =
+      data.title || data.song || data.nowplaying || data.nowPlaying ||
+      data.current_song || data.currentSong ||
+      (data.icestats && data.icestats.source && (data.icestats.source.title || data.icestats.source.server_name)) ||
+      (data.now_playing && data.now_playing.song && data.now_playing.song.text) ||
+      (data.now_playing && data.now_playing.song && data.now_playing.song.title) ||
+      '';
+
+    var artist =
+      data.artist ||
+      (data.now_playing && data.now_playing.song && data.now_playing.song.artist) ||
+      '';
+
+    var listeners =
+      data.listeners || data.listener_count || data.currentlisteners ||
+      data.current_listeners ||
+      (data.icestats && data.icestats.source && data.icestats.source.listeners) ||
+      (data.listeners_current) ||
+      '';
+
+    var bitrate =
+      data.bitrate || data.kbps || data.stream_bitrate ||
+      (data.icestats && data.icestats.source && data.icestats.source.bitrate) ||
+      '';
+
+    var dj =
+      data.dj || data.dj_status || data.server_name || data.station ||
+      data.stream_name || data.name || '666SOUNDsDESIGn DJ';
+
+    return {
+      title: String(title || '').trim(),
+      artist: String(artist || '').trim(),
+      listeners: String(listeners || '').trim(),
+      bitrate: String(bitrate || '').trim(),
+      dj: String(dj || '').trim()
+    };
+  }
+
+  async function fetchOne(url){
+    var res = await fetch(url, {
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json,text/plain,*/*' }
+    });
+    if(!res.ok) throw new Error(url + ' ' + res.status);
+
+    var ct = (res.headers.get('content-type') || '').toLowerCase();
+    if(ct.indexOf('application/json') >= 0 || ct.indexOf('+json') >= 0){
+      return await res.json();
+    }
+
+    var text = await res.text();
+
+    try { return JSON.parse(text); } catch(e) {}
+    return text;
+  }
+
+  async function fetchMeta(){
+    var endpoints = [
+      '/streammeta?ts=' + Date.now(),
+      '/nowplaying?ts=' + Date.now(),
+      '/meta?ts=' + Date.now(),
+      '/status?ts=' + Date.now(),
+      '/streaminfo?ts=' + Date.now(),
+      '/7.html?ts=' + Date.now()
+    ];
+
+    for(var i=0;i<endpoints.length;i++){
+      try{
+        var raw = await fetchOne(endpoints[i]);
+        var meta = normalizeMeta(raw);
+        if(meta && (meta.title || meta.listeners || meta.bitrate || meta.dj)){
+          meta.source = endpoints[i].split('?')[0];
+          return meta;
+        }
+      }catch(e){}
+    }
+    return null;
+  }
+
+  function setText(el, value){
+    if(!el) return;
+    el.textContent = value;
+  }
+
+  function applyMeta(meta){
+    var app = q('#mffApp');
+    if(!app) return;
+
+    var title = meta && meta.title ? meta.title : 'Metadaten werden geladen ...';
+    var subtitle = meta && meta.artist ? meta.artist : (meta && meta.source ? 'Quelle: ' + meta.source : 'Loading stream metadata ...');
+    var listeners = meta && meta.listeners ? meta.listeners : '0';
+    var bitrate = meta && meta.bitrate ? meta.bitrate : 'Unknown';
+    var dj = meta && meta.dj ? meta.dj : '666SOUNDsDESIGn DJ';
+
+    var h1 = q('#mffApp .mff-title h1');
+    var h2 = q('#mffApp .mff-title h2');
+    setText(h1, title);
+    setText(h2, subtitle);
+
+    var cards = qa('#mffApp .mff-card strong');
+    if(cards[0]) cards[0].innerHTML = String(listeners).indexOf('/') >= 0 ? listeners : (listeners + ' / 250');
+    if(cards[1]) cards[1].textContent = bitrate;
+    if(cards[2]) cards[2].innerHTML = dj.replace(/\s+DJ$/i,'') + '<br>DJ';
+
+    app.setAttribute('data-mff-meta-source', meta && meta.source ? meta.source : 'none');
+    app.setAttribute('data-mff-meta-loaded', meta ? '1' : '0');
+  }
+
+  async function tickMeta(){
+    if(!isMobile()) return;
+    try{
+      var meta = await fetchMeta();
+      if(meta) applyMeta(meta);
+    }catch(e){}
+  }
+
+  function startMetaLoop(){
+    if(metaTimer) return;
+    tickMeta();
+    metaTimer = setInterval(tickMeta, 12000);
+  }
+
+  function apply(){
+    if(!document.body) return;
+    document.body.setAttribute('data-mff-remove-bottom-restore-meta', isMobile() ? 'v4' : 'desktop');
+
+    if(!isMobile()) return;
+
+    markOldBottomLayer();
+
+    var app = q('#mffApp');
+    if(app){
+      app.setAttribute('data-mff-remove-bottom-restore-meta','v4');
+      startMetaLoop();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    apply();
+    setTimeout(apply,150);
+    setTimeout(apply,700);
+    setTimeout(apply,1600);
+    setTimeout(apply,3200);
+    setTimeout(apply,5200);
+  });
+  window.addEventListener('load', apply, {passive:true});
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
+
 </body>
 </html>

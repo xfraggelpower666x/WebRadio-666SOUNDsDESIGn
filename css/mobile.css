@@ -3801,3 +3801,100 @@ ZWECK:
     border-radius:6px!important;
   }
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — MOBILE_FINAL_REMOVE_OLD_BOTTOM_AND_RESTORE_META_v4
+GEÄNDERT: 2026-04-27
+ZWECK:
+- Rot markierten alten Bottom-Balken entfernen.
+- Nur finales Bottom-Segmentmeter im Player behalten.
+- Metadaten im neuen Mobile-Root optisch sauber halten.
+============================================================
+*/
+@media(max-width:760px){
+  /*
+    Kill-Zone für den alten roten/cyan/magenta Bottom-Layer.
+    Wichtig: #mffApp .mff-bottom bleibt ausdrücklich erhalten.
+  */
+  body[data-mff-remove-bottom-restore-meta="v4"] [data-mff-v4-kill-old-bottom="1"],
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-dom-bottom-guard,
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-dom-bottom-track,
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-dom-bottom-left,
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-dom-bottom-right,
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-bottom-guard,
+  body[data-mff-remove-bottom-restore-meta="v4"] .bottom-guard,
+  body[data-mff-remove-bottom-restore-meta="v4"] .gesture-guard,
+  body[data-mff-remove-bottom-restore-meta="v4"] .bottom-levelmeter,
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-bottom-meter,
+  body[data-mff-remove-bottom-restore-meta="v4"] .bottom-meter,
+  body[data-mff-remove-bottom-restore-meta="v4"] .center-out-meter,
+  body[data-mff-remove-bottom-restore-meta="v4"] .mobile-center-out-meter,
+  body[data-mff-remove-bottom-restore-meta="v4"] [class*="bottom"][class*="guard"]:not(#mffApp *),
+  body[data-mff-remove-bottom-restore-meta="v4"] [class*="bottom"][class*="meter"]:not(#mffApp *),
+  body[data-mff-remove-bottom-restore-meta="v4"] [class*="center"][class*="meter"]:not(#mffApp *),
+  body[data-mff-remove-bottom-restore-meta="v4"] [class*="gesture"][class*="guard"]:not(#mffApp *){
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:none!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    border:0!important;
+  }
+
+  /*
+    Zusätzliche Absicherung:
+    Keine fremden breiten fixen Balken im unteren Bereich sichtbar lassen.
+  */
+  body[data-mff-remove-bottom-restore-meta="v4"] > div:not(#mffApp)[data-mff-v4-kill-old-bottom="1"],
+  body[data-mff-remove-bottom-restore-meta="v4"] > section:not(#mffApp)[data-mff-v4-kill-old-bottom="1"],
+  body[data-mff-remove-bottom-restore-meta="v4"] > aside:not(#mffApp)[data-mff-v4-kill-old-bottom="1"]{
+    display:none!important;
+  }
+
+  /*
+    Finale Player-Unterkante:
+    Nur #mffApp .mff-bottom ist erlaubt.
+  */
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-bottom{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    height:72px!important;
+    min-height:72px!important;
+    margin-bottom:0!important;
+  }
+
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-bottom-bars{
+    display:grid!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+
+  /*
+    Metadaten nicht wieder überlaufen lassen.
+  */
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-title h1,
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-title h2,
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-card strong{
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-title h1,
+  body[data-mff-remove-bottom-restore-meta="v4"] #mffApp .mff-title h2{
+    white-space:nowrap!important;
+  }
+}
