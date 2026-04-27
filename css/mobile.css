@@ -3588,3 +3588,216 @@ ZWECK:
     right:3px!important;
   }
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — MOBILE_FINAL_METER_BUTTON_STATE_FIX_v3
+GEÄNDERT: 2026-04-27
+ZWECK:
+- Zweite/alte untere Meter-Ebene raus.
+- Bottom-Meter im finalen Player als Segmentmeter wie Side-Meter.
+- Statische dB-/Swipe-Anzeige raus.
+- Buttonzustände pink anzeigen.
+============================================================
+*/
+@media(max-width:760px){
+  /*
+    Alten unteren cyan/magenta Balken wirklich entfernen.
+    Das betrifft nur Elemente außerhalb #mffApp.
+  */
+  body[data-mff-meter-button-state-fix="v3"] [data-mff-v3-remove-old-bottom-meter="1"],
+  body[data-mff-meter-button-state-fix="v3"] .mobile-dom-bottom-guard,
+  body[data-mff-meter-button-state-fix="v3"] .mobile-dom-bottom-track,
+  body[data-mff-meter-button-state-fix="v3"] .mobile-dom-bottom-left,
+  body[data-mff-meter-button-state-fix="v3"] .mobile-dom-bottom-right,
+  body[data-mff-meter-button-state-fix="v3"] .bottom-levelmeter,
+  body[data-mff-meter-button-state-fix="v3"] .bottom-meter,
+  body[data-mff-meter-button-state-fix="v3"] .gesture-meter,
+  body[data-mff-meter-button-state-fix="v3"] .gesture-guard,
+  body[data-mff-meter-button-state-fix="v3"] .mobile-bottom-meter,
+  body[data-mff-meter-button-state-fix="v3"] [class*="bottom"][class*="meter"]:not(#mffApp *),
+  body[data-mff-meter-button-state-fix="v3"] [class*="level"][class*="meter"]:not(#mffApp *),
+  body[data-mff-meter-button-state-fix="v3"] [class*="gesture"][class*="guard"]:not(#mffApp *){
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:none!important;
+    background-image:none!important;
+    box-shadow:none!important;
+  }
+
+  /*
+    Der finale Bottom-Meter bleibt direkt im Player.
+    Keine dB-/Swipe-Floskeln mehr, weil statisch und irreführend.
+  */
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom{
+    height:72px!important;
+    min-height:72px!important;
+    padding:12px 14px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    gap:8px!important;
+  }
+
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom header,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-db,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom small,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-force-hidden-text,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-swipe-hidden{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    height:0!important;
+    min-height:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+  }
+
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars{
+    height:44px!important;
+    display:grid!important;
+    grid-template-columns:repeat(60, 1fr)!important;
+    gap:4px!important;
+    align-items:center!important;
+    padding:0!important;
+    width:100%!important;
+  }
+
+  /*
+    Segmentdesign wie links/rechts:
+    einzelne bunte Segmente, nicht diese große statische Skala.
+  */
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars i,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars i.mff-segment-bar{
+    display:block!important;
+    height:34px!important;
+    border-radius:7px!important;
+    background:
+      linear-gradient(to top,
+        var(--mff-cyan) 0%,
+        var(--mff-cyan) 34%,
+        #516dff 45%,
+        var(--mff-purple) 66%,
+        var(--mff-pink) 100%)!important;
+    box-shadow:
+      0 0 8px rgba(22,255,243,.28),
+      0 0 8px rgba(255,61,187,.20)!important;
+    opacity:calc(.46 + var(--mff-level) * .54)!important;
+    transform:scaleY(calc(.48 + var(--mff-level) * .52))!important;
+    transition:
+      transform 90ms linear,
+      opacity 90ms linear,
+      filter 90ms linear!important;
+    filter:saturate(1.16)!important;
+  }
+
+  /*
+    Innen-nach-außen-Wirkung:
+    Bars nahe Mitte wirken minimal präsenter, außen etwas ruhiger.
+  */
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars i.mff-from-left,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars i.mff-from-right{
+    animation:mffCenterOutPulse 1.05s ease-in-out infinite alternate!important;
+    animation-delay:calc(var(--mff-center-distance, 0) * 18ms)!important;
+  }
+
+  @keyframes mffCenterOutPulse{
+    0%{
+      transform:scaleY(calc(.42 + var(--mff-level) * .42));
+      opacity:calc(.38 + var(--mff-level) * .46);
+    }
+    100%{
+      transform:scaleY(calc(.62 + var(--mff-level) * .38));
+      opacity:calc(.58 + var(--mff-level) * .42);
+    }
+  }
+
+  /*
+    Button Active States:
+    Play/Pause/Stop dauerhaft nach Klick.
+    Plus/Minus/Boost/Reset transient per Klasse.
+  */
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-controls button{
+    transition:
+      background .16s ease,
+      border-color .16s ease,
+      box-shadow .16s ease,
+      color .16s ease,
+      transform .08s ease!important;
+  }
+
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-controls button.mff-active,
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-controls button.mff-transient{
+    color:#ffffff!important;
+    background:
+      linear-gradient(135deg, rgba(255,61,187,.42), rgba(122,60,255,.30)),
+      rgba(18,10,34,.96)!important;
+    border-color:rgba(255,61,187,.92)!important;
+    box-shadow:
+      0 0 18px rgba(255,61,187,.55),
+      0 0 26px rgba(255,61,187,.22),
+      inset 0 0 18px rgba(255,61,187,.18)!important;
+  }
+
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-controls button:active{
+    transform:scale(.96)!important;
+  }
+
+  /*
+    Zusätzlich Zustand über Root: falls Klassen durch Rebuild verloren gehen.
+  */
+  body[data-mff-meter-button-state-fix="v3"] #mffApp[data-mff-transport-state="play"] .mff-controls [data-mff="play"],
+  body[data-mff-meter-button-state-fix="v3"] #mffApp[data-mff-transport-state="pause"] .mff-controls [data-mff="pause"],
+  body[data-mff-meter-button-state-fix="v3"] #mffApp[data-mff-transport-state="stop"] .mff-controls [data-mff="stop"]{
+    color:#ffffff!important;
+    background:
+      linear-gradient(135deg, rgba(255,61,187,.42), rgba(122,60,255,.30)),
+      rgba(18,10,34,.96)!important;
+    border-color:rgba(255,61,187,.92)!important;
+    box-shadow:
+      0 0 18px rgba(255,61,187,.55),
+      0 0 26px rgba(255,61,187,.22),
+      inset 0 0 18px rgba(255,61,187,.18)!important;
+  }
+
+  /*
+    Da der untere alte Layer entfernt ist, darf das Player-Ende etwas kompakter sein.
+  */
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-shell{
+    padding-bottom:calc(18px + env(safe-area-inset-bottom))!important;
+  }
+}
+
+/* Schmale iPhones */
+@media(max-width:430px){
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom{
+    height:66px!important;
+    min-height:66px!important;
+    padding:10px 12px!important;
+  }
+
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars{
+    height:38px!important;
+    gap:3px!important;
+  }
+
+  body[data-mff-meter-button-state-fix="v3"] #mffApp .mff-bottom-bars i{
+    height:30px!important;
+    border-radius:6px!important;
+  }
+}

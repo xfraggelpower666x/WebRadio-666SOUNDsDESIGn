@@ -1,0 +1,24 @@
+666SOUNDsDESIGn — MOBILE FINAL METER BUTTON STATE FIX v3
+
+Zweck:
+- Alte/zweite untere Levelmeter-Schicht hart entfernen.
+- Finales Bottom-Levelmeter im Player behalten.
+- dB-Anzeige und Swipe-Area entfernen, da statisch/irreführend.
+- Bottom-Levelmeter im Segmentdesign wie die Side-Levelmeter.
+- Bottom-Levelmeter animiert mit gleichem Runtime-Level wie Side-Meter.
+- Buttonzustände:
+  - Play bleibt pink markiert solange Play aktiv ist.
+  - Pause bleibt pink markiert solange Pause aktiv ist.
+  - Stop bleibt pink markiert nach Stop.
+  - Plus/Minus/Boost/Reset blinken kurz pink und gehen wieder zurück.
+
+Geändert:
+- index.html
+- css/mobile.css
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers

@@ -278,7 +278,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           '<button type="button" data-mff="boost" id="mffBoost">BST 0</button>' +
           '<button type="button" data-mff="up">+</button>' +
         '</section>' +
-        '<section class="mff-bottom"><header><i></i><span>LEVEL METER</span><i></i></header><div id="mffBottomBars" class="mff-bottom-bars"></div><div class="mff-db"><span>-∞</span><span>-24</span><span>-12</span><span>-6</span><span>-3</span><span>0 dB</span></div><small class="mff-swipe-hidden" aria-hidden="true"></small></section>' +
+        '<section class="mff-bottom"><header><i></i><span>LEVEL METER</span><i></i></header><div id="mffBottomBars" class="mff-bottom-bars"></div><div class="mff-db mff-db-hidden" aria-hidden="true"></div><small class="mff-swipe-hidden" aria-hidden="true"></small></section>' +
       '</main>';
 
     // Direkt als erstes Element im Body, damit nichts darüber liegt.
@@ -462,6 +462,188 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   document.addEventListener('DOMContentLoaded', function(){
     apply(); setTimeout(apply,150); setTimeout(apply,700); setTimeout(apply,1600); setTimeout(apply,3200);
   });
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
+
+
+<!-- MOBILE_FINAL_METER_BUTTON_STATE_FIX_v3 -->
+<script id="mobileFinalMeterButtonStateFixScript">
+(function(){
+  var VERSION = 'MOBILE_FINAL_METER_BUTTON_STATE_FIX_v3';
+  var transientTimer = null;
+
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+
+  function q(sel, root){ return (root || document).querySelector(sel); }
+  function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function setTransportState(state){
+    var app = q('#mffApp');
+    if(!app) return;
+    app.setAttribute('data-mff-transport-state', state);
+
+    qa('#mffApp .mff-controls button').forEach(function(btn){
+      btn.classList.remove('mff-active','mff-transient');
+    });
+
+    var selector = null;
+    if(state === 'play') selector = '[data-mff="play"]';
+    if(state === 'pause') selector = '[data-mff="pause"]';
+    if(state === 'stop') selector = '[data-mff="stop"]';
+
+    if(selector){
+      var active = q('#mffApp .mff-controls ' + selector);
+      if(active) active.classList.add('mff-active');
+    }
+  }
+
+  function flashButton(cmd){
+    var btn = q('#mffApp .mff-controls [data-mff="' + cmd + '"]');
+    if(!btn) return;
+    btn.classList.add('mff-transient');
+    clearTimeout(transientTimer);
+    transientTimer = setTimeout(function(){
+      qa('#mffApp .mff-controls .mff-transient').forEach(function(n){
+        n.classList.remove('mff-transient');
+      });
+    }, 1300);
+  }
+
+  function markOldBottomMeters(){
+    /*
+      Ziel: Der alte untere cyan/magenta Balken außerhalb #mffApp muss raus.
+      Er kann je nach Vorversion unterschiedliche Klassen haben, daher:
+      1. bekannte Klassen
+      2. breite fixed/absolute Elemente im unteren Bereich außerhalb #mffApp
+      3. Canvas/SVG/Div-Balken ohne Text unten
+    */
+    var known = [
+      '.mobile-dom-bottom-guard',
+      '.mobile-dom-bottom-track',
+      '.mobile-dom-bottom-left',
+      '.mobile-dom-bottom-right',
+      '.bottom-levelmeter',
+      '.bottom-meter',
+      '.gesture-meter',
+      '.gesture-guard',
+      '.mobile-bottom-meter',
+      '[class*="bottom"][class*="meter"]',
+      '[class*="level"][class*="meter"]',
+      '[class*="gesture"][class*="guard"]'
+    ];
+
+    known.forEach(function(sel){
+      qa(sel).forEach(function(node){
+        if(node.closest && node.closest('#mffApp')) return;
+        node.setAttribute('data-mff-v3-remove-old-bottom-meter','1');
+      });
+    });
+
+    qa('body *').forEach(function(node){
+      if(node.closest && node.closest('#mffApp')) return;
+      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
+      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+      if(!r) return;
+
+      var cs = window.getComputedStyle ? window.getComputedStyle(node) : null;
+      var pos = cs ? cs.position : '';
+      var bottomArea = r.top > window.innerHeight * 0.78;
+      var wide = r.width > window.innerWidth * 0.55;
+      var lowHeight = r.height <= 80;
+      var hasLittleText = ((node.textContent || '').trim().length < 20);
+      var colorful = false;
+
+      if(cs){
+        var bg = (cs.background || '') + ' ' + (cs.backgroundImage || '') + ' ' + (cs.boxShadow || '');
+        colorful = /rgb|linear-gradient|cyan|magenta|255,\s*0|0,\s*255|pink/i.test(bg);
+      }
+
+      if(bottomArea && wide && lowHeight && (hasLittleText || colorful || pos === 'fixed' || pos === 'absolute')){
+        node.setAttribute('data-mff-v3-remove-old-bottom-meter','1');
+      }
+    });
+  }
+
+  function repairBottomMeter(){
+    var app = q('#mffApp');
+    var bottom = q('#mffApp .mff-bottom');
+    var bars = qa('#mffBottomBars i');
+    if(!app || !bottom || !bars.length) return;
+
+    app.setAttribute('data-mff-meter-button-fix','v3');
+    bottom.setAttribute('data-mff-bottom-segment-meter','v3');
+
+    var mid = (bars.length - 1) / 2;
+    bars.forEach(function(bar, idx){
+      bar.classList.add('mff-segment-bar');
+      bar.classList.toggle('mff-from-left', idx < bars.length / 2);
+      bar.classList.toggle('mff-from-right', idx >= bars.length / 2);
+      bar.style.setProperty('--mff-center-distance', Math.abs(idx - mid).toFixed(2));
+      bar.style.setProperty('--mff-index', String(idx));
+    });
+
+    qa('#mffApp .mff-db, #mffApp .mff-bottom small, #mffApp .mff-swipe-hidden').forEach(function(node){
+      node.setAttribute('aria-hidden','true');
+      node.textContent = '';
+      node.classList.add('mff-force-hidden-text');
+    });
+  }
+
+  function bindControls(){
+    var controls = q('#mffApp .mff-controls');
+    if(!controls || controls.__mffV3Bound) return;
+    controls.__mffV3Bound = true;
+
+    var handler = function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-mff]');
+      if(!btn) return;
+      var cmd = btn.getAttribute('data-mff');
+
+      if(cmd === 'play') setTransportState('play');
+      if(cmd === 'pause') setTransportState('pause');
+      if(cmd === 'stop') setTransportState('stop');
+      if(cmd === 'reset') {
+        flashButton('reset');
+        setTimeout(function(){ setTransportState('play'); }, 160);
+      }
+      if(cmd === 'up') flashButton('up');
+      if(cmd === 'down') flashButton('down');
+      if(cmd === 'boost') flashButton('boost');
+    };
+
+    controls.addEventListener('click', handler, {capture:true});
+    controls.addEventListener('touchend', handler, {passive:true, capture:true});
+  }
+
+  function apply(){
+    if(!document.body) return;
+    document.body.setAttribute('data-mff-meter-button-state-fix', isMobile() ? 'v3' : 'desktop');
+    if(!isMobile()) return;
+
+    markOldBottomMeters();
+    repairBottomMeter();
+    bindControls();
+
+    var app = q('#mffApp');
+    if(app && !app.getAttribute('data-mff-transport-state')){
+      app.setAttribute('data-mff-transport-state','stop');
+      var stop = q('#mffApp .mff-controls [data-mff="stop"]');
+      if(stop) stop.classList.add('mff-active');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    apply();
+    setTimeout(apply,150);
+    setTimeout(apply,650);
+    setTimeout(apply,1500);
+    setTimeout(apply,3200);
+  });
+  window.addEventListener('load', apply, {passive:true});
   window.addEventListener('resize', apply, {passive:true});
   window.addEventListener('orientationchange', apply, {passive:true});
 })();
