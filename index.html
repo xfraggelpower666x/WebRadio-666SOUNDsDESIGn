@@ -28,225 +28,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <link rel="stylesheet" href="/css/desktop.css?v=mobile-runtime-cache-bust-proof-v1-20260426" />
 
 <!-- MOBILE_FINAL_MOCKUP_MATCH_v1 -->
-<script id="mobileFinalMockupMatchScript">
-(function(){
-  var VERSION = 'MOBILE_FINAL_MOCKUP_MATCH_v1';
-  var STREAM_URL = '/stream';
-  var boostStage = 0;
-  var rafId = null;
-
-  function isMobile(){
-    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
-  }
-
-  function qs(sel, root){ return (root || document).querySelector(sel); }
-  function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
-
-  function getAudio(){
-    var audio = qs('#mfmAudio') || qs('audio');
-    if(!audio){
-      audio = document.createElement('audio');
-      audio.id = 'mfmAudio';
-      audio.preload = 'none';
-      audio.crossOrigin = 'anonymous';
-      audio.playsInline = true;
-      audio.style.display = 'none';
-      document.body.appendChild(audio);
-    }
-    if(!audio.getAttribute('src')) audio.setAttribute('src', STREAM_URL);
-    return audio;
-  }
-
-  function play(){
-    var audio = getAudio();
-    try {
-      if(!audio.getAttribute('src')) audio.setAttribute('src', STREAM_URL);
-      var r = audio.play();
-      if(r && typeof r.catch === 'function'){
-        r.catch(function(err){ console.warn('[MFM play]', err); });
-      }
-      document.documentElement.setAttribute('data-mfm-playing', '1');
-    } catch(err){
-      console.warn('[MFM play]', err);
-    }
-  }
-
-  function pause(){
-    var audio = getAudio();
-    try { audio.pause(); } catch(err){}
-    document.documentElement.setAttribute('data-mfm-playing', '0');
-  }
-
-  function stop(){
-    var audio = getAudio();
-    try {
-      audio.pause();
-      try { audio.currentTime = 0; } catch(e){}
-    } catch(err){}
-    document.documentElement.setAttribute('data-mfm-playing', '0');
-  }
-
-  function boost(delta){
-    boostStage = Math.max(0, Math.min(3, boostStage + delta));
-    var audio = getAudio();
-    var vols = [0.86, 0.94, 1.0, 1.0];
-    try { audio.volume = vols[boostStage]; } catch(e){}
-    var label = qs('#mfmBoostLabel');
-    if(label) label.innerHTML = 'BST ' + boostStage + '<small></small>';
-    document.documentElement.setAttribute('data-mfm-boost', String(boostStage));
-  }
-
-  function card(title, value, icon){
-    return '<section class="mfm-card">' +
-      '<div class="mfm-card-top"><span class="mfm-icon">' + icon + '</span><span>' + title + '</span></div>' +
-      '<strong>' + value + '</strong><div class="mfm-card-dots"><i></i><i></i><i></i></div>' +
-      '</section>';
-  }
-
-  function buildUI(){
-    if(qs('#mfmApp')) return;
-
-    var app = document.createElement('div');
-    app.id = 'mfmApp';
-    app.setAttribute('data-version', VERSION);
-    app.innerHTML =
-      '<div class="mfm-side-meter mfm-side-left"><i></i></div>' +
-      '<div class="mfm-side-meter mfm-side-right"><i></i></div>' +
-      '<main class="mfm-shell">' +
-        '<section class="mfm-now">' +
-          '<div class="mfm-radio-icon"><span></span></div>' +
-          '<div class="mfm-now-text">' +
-            '<small>NOW PLAYING</small>' +
-            '<h1>Metadaten werden geladen ...</h1>' +
-            '<p>Loading stream metadata ...</p>' +
-          '</div>' +
-          '<button class="mfm-history" type="button">↺ History</button>' +
-          '<div class="mfm-now-line"><i></i></div>' +
-        '</section>' +
-        '<section class="mfm-cards">' +
-          card('LISTENERS', '0 / 250', '👥') +
-          card('BITRATE', 'Unknown', '≋') +
-          card('DJ / STATUS', '666SOUNDsDESIGn<br>DJ', '◖') +
-        '</section>' +
-        '<section class="mfm-eq">' +
-          '<div class="mfm-panel-head"><span>EQ</span><b>20 BANDS</b></div>' +
-          '<div class="mfm-eq-grid" id="mfmEqBars"></div>' +
-        '</section>' +
-        '<section class="mfm-controls" id="mfmControls">' +
-          '<button type="button" data-mfm="play" class="mfm-play">▶</button>' +
-          '<button type="button" data-mfm="pause">Ⅱ</button>' +
-          '<button type="button" data-mfm="stop" class="mfm-stop">■</button>' +
-          '<button type="button" data-mfm="back">↺</button>' +
-          '<button type="button" data-mfm="down">−</button>' +
-          '<button type="button" data-mfm="boost" id="mfmBoostLabel">BST 0<small></small></button>' +
-          '<button type="button" data-mfm="up">+</button>' +
-        '</section>' +
-        '<section class="mfm-bottom-meter">' +
-          '<div class="mfm-meter-title"><i></i><span>LEVEL METER</span><i></i></div>' +
-          '<div class="mfm-meter-strip" id="mfmBottomBars"></div>' +
-          '<div class="mfm-db"><span>-∞</span><span>-24</span><span>-12</span><span>-6</span><span>-3</span><span>0 dB</span></div>' +
-          '<div class="mfm-swipe">SWIPE AREA</div>' +
-        '</section>' +
-      '</main>';
-
-    document.body.appendChild(app);
-
-    var eq = qs('#mfmEqBars');
-    var heights = [62,74,48,44,68,52,36,50,32,28,54,68,56,48,52,46,58,42,50,60];
-    heights.forEach(function(h, i){
-      var b = document.createElement('i');
-      b.style.setProperty('--h', h + '%');
-      b.style.setProperty('--d', (i * 17) + 'ms');
-      eq.appendChild(b);
-    });
-
-    var bottom = qs('#mfmBottomBars');
-    for(var i=0;i<58;i++){
-      var s = document.createElement('i');
-      s.style.setProperty('--d', (i * 9) + 'ms');
-      bottom.appendChild(s);
-    }
-
-    qs('#mfmControls').addEventListener('click', handleControl, {capture:true});
-    qs('#mfmControls').addEventListener('touchend', handleControl, {passive:false,capture:true});
-  }
-
-  function handleControl(ev){
-    var btn = ev.target.closest && ev.target.closest('[data-mfm]');
-    if(!btn) return;
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    var cmd = btn.getAttribute('data-mfm');
-    if(cmd === 'play') play();
-    if(cmd === 'pause') pause();
-    if(cmd === 'stop') stop();
-    if(cmd === 'back') { stop(); setTimeout(play, 120); }
-    if(cmd === 'down') boost(-1);
-    if(cmd === 'up') boost(1);
-    if(cmd === 'boost') boost(1);
-  }
-
-  function hideOldMobileLayers(){
-    var selectors = [
-      'header', '.hero', '.hero-image', '.site-header', '.main-header',
-      '#mobileControlsLayerReset', '#mobileInlineTopControlsForce',
-      '#mobileTopControlsInBoostPanel', '#mobileTransportRepair',
-      '.mobile-transport-repair',
-      '.mobile-dom-side-meter', '.mobile-dom-bottom-guard'
-    ];
-
-    selectors.forEach(function(sel){
-      qsa(sel).forEach(function(n){
-        if(n.closest && n.closest('#mfmApp')) return;
-        n.setAttribute('data-mfm-hidden-old', '1');
-      });
-    });
-
-    // Hauptinhalte der alten Mobile-Ansicht stilllegen, aber Desktop nicht zerstören.
-    qsa('main,.mobile-shell,.player-shell,.hud-panel,.panel').forEach(function(n){
-      if(n.closest && n.closest('#mfmApp')) return;
-      n.setAttribute('data-mfm-hidden-old', '1');
-    });
-
-    // Große Bilder/Logos oben weg.
-    qsa('img,[class*="logo"],[class*="hero"],[class*="header"]').forEach(function(n){
-      if(n.closest && n.closest('#mfmApp')) return;
-      n.setAttribute('data-mfm-hidden-old', '1');
-    });
-  }
-
-  function loop(){
-    var playing = document.documentElement.getAttribute('data-mfm-playing') === '1';
-    var t = Date.now() / 1000;
-    var level = playing ? (0.36 + 0.32 * Math.abs(Math.sin(t * 2.7))) : 0.18;
-    document.documentElement.style.setProperty('--mfm-level', level.toFixed(3));
-    rafId = requestAnimationFrame(loop);
-  }
-
-  function install(){
-    if(!document.body) return;
-    document.documentElement.setAttribute('data-mfm-version', VERSION);
-    document.body.setAttribute('data-mfm-mobile', isMobile() ? '1' : '0');
-
-    if(isMobile()){
-      buildUI();
-      hideOldMobileLayers();
-      if(!rafId) loop();
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    install();
-    setTimeout(install, 200);
-    setTimeout(install, 800);
-    setTimeout(install, 1800);
-  });
-  window.addEventListener('resize', install, {passive:true});
-  window.addEventListener('orientationchange', install, {passive:true});
-})();
-</script>
-
 </head>
 <body>
   <div class="frame-stage">
@@ -382,5 +163,195 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
   <script type="module" src="/js/player-core.js?v=mobile-runtime-cache-bust-proof-v1-20260426"></script>
+
+<!-- MOBILE_FINAL_FORCE_ROOT_OVERRIDE_v1 -->
+<script id="mobileFinalForceRootOverrideScript">
+(function(){
+  var VERSION = 'MOBILE_FINAL_FORCE_ROOT_OVERRIDE_v1';
+  var STREAM_URL = '/stream';
+  var boostStage = 0;
+  var rafStarted = false;
+
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+
+  function q(sel, root){ return (root || document).querySelector(sel); }
+  function qa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function getAudio(){
+    var audio = q('#mffAudio') || q('audio');
+    if(!audio){
+      audio = document.createElement('audio');
+      audio.id = 'mffAudio';
+      audio.preload = 'none';
+      audio.crossOrigin = 'anonymous';
+      audio.playsInline = true;
+      audio.style.display = 'none';
+      document.body.appendChild(audio);
+    }
+    if(!audio.getAttribute('src')) audio.setAttribute('src', STREAM_URL);
+    return audio;
+  }
+
+  function setPlaying(v){
+    document.documentElement.setAttribute('data-mff-playing', v ? '1' : '0');
+    var led = q('#mffLiveState');
+    if(led) led.textContent = v ? 'LIVE' : 'READY';
+  }
+
+  function play(){
+    var a = getAudio();
+    try{
+      if(!a.getAttribute('src')) a.setAttribute('src', STREAM_URL);
+      var r = a.play();
+      if(r && typeof r.catch === 'function') r.catch(function(err){ console.warn('[MFF play]', err); });
+      setPlaying(true);
+    }catch(e){ console.warn('[MFF play]', e); }
+  }
+  function pause(){
+    try{ getAudio().pause(); }catch(e){}
+    setPlaying(false);
+  }
+  function stop(){
+    var a = getAudio();
+    try{ a.pause(); try{ a.currentTime = 0; }catch(e){} }catch(e){}
+    setPlaying(false);
+  }
+  function boost(d){
+    boostStage = Math.max(0, Math.min(3, boostStage + d));
+    try{ getAudio().volume = [0.86,0.94,1,1][boostStage]; }catch(e){}
+    var b = q('#mffBoost');
+    if(b) b.textContent = 'BST ' + boostStage;
+    document.documentElement.setAttribute('data-mff-boost', String(boostStage));
+  }
+
+  function card(title, value, icon){
+    return '<section class="mff-card"><div><span class="mff-ico">'+icon+'</span><small>'+title+'</small></div><strong>'+value+'</strong><p><i></i><i></i><i></i></p></section>';
+  }
+
+  function makeBars(id, count){
+    var el = q(id);
+    if(!el || el.children.length) return;
+    for(var i=0;i<count;i++){
+      var b = document.createElement('i');
+      var h = 30 + ((i*37)%48);
+      if(id === '#mffEqBars') b.style.setProperty('--h', h+'%');
+      b.style.setProperty('--d', (i*13)+'ms');
+      el.appendChild(b);
+    }
+  }
+
+  function build(){
+    var app = q('#mffApp');
+    if(app) return app;
+
+    app = document.createElement('div');
+    app.id = 'mffApp';
+    app.setAttribute('data-version', VERSION);
+    app.innerHTML =
+      '<div class="mff-side mff-left"><i></i></div>' +
+      '<div class="mff-side mff-right"><i></i></div>' +
+      '<main class="mff-shell">' +
+        '<section class="mff-now">' +
+          '<div class="mff-symbol"><span></span></div>' +
+          '<div class="mff-title"><small>NOW PLAYING</small><h1>Metadaten werden geladen ...</h1><h2>Loading stream metadata ...</h2></div>' +
+          '<button class="mff-history" type="button">↺ History</button>' +
+        '</section>' +
+        '<section class="mff-cards">' +
+          card('LISTENERS','0 / 250','♚') +
+          card('BITRATE','Unknown','≋') +
+          card('DJ / STATUS','666SOUNDsDESIGn<br>DJ','◖') +
+        '</section>' +
+        '<section class="mff-eq"><header><span>EQ</span><b id="mffLiveState">READY</b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>' +
+        '<section class="mff-controls">' +
+          '<button type="button" data-mff="play" class="mff-play">▶</button>' +
+          '<button type="button" data-mff="pause">Ⅱ</button>' +
+          '<button type="button" data-mff="stop" class="mff-stop">■</button>' +
+          '<button type="button" data-mff="reset">↺</button>' +
+          '<button type="button" data-mff="down">−</button>' +
+          '<button type="button" data-mff="boost" id="mffBoost">BST 0</button>' +
+          '<button type="button" data-mff="up">+</button>' +
+        '</section>' +
+        '<section class="mff-bottom"><header><i></i><span>LEVEL METER</span><i></i></header><div id="mffBottomBars" class="mff-bottom-bars"></div><div class="mff-db"><span>-∞</span><span>-24</span><span>-12</span><span>-6</span><span>-3</span><span>0 dB</span></div><small>SWIPE AREA</small></section>' +
+      '</main>';
+
+    // Direkt als erstes Element im Body, damit nichts darüber liegt.
+    document.body.insertBefore(app, document.body.firstChild);
+
+    makeBars('#mffEqBars', 20);
+    makeBars('#mffBottomBars', 60);
+
+    var controls = q('.mff-controls', app);
+    var handler = function(ev){
+      var btn = ev.target.closest && ev.target.closest('[data-mff]');
+      if(!btn) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      var c = btn.getAttribute('data-mff');
+      if(c === 'play') play();
+      if(c === 'pause') pause();
+      if(c === 'stop') stop();
+      if(c === 'reset') { stop(); setTimeout(play, 120); }
+      if(c === 'down') boost(-1);
+      if(c === 'up') boost(1);
+      if(c === 'boost') boost(1);
+    };
+    controls.addEventListener('click', handler, {capture:true});
+    controls.addEventListener('touchend', handler, {passive:false, capture:true});
+
+    return app;
+  }
+
+  function hideEverythingExceptApp(){
+    if(!document.body) return;
+    qa('body > *').forEach(function(node){
+      if(node.id === 'mffApp') return;
+      if(node.tagName === 'SCRIPT' || node.tagName === 'STYLE' || node.tagName === 'LINK') return;
+      if(node.id === 'mffAudio') return;
+      node.setAttribute('data-mff-force-hidden','1');
+    });
+
+    // Speziell alle alten Player/Layer direkt erwischen.
+    qa('header,main,.hero,.hero-image,.site-header,.main-header,.mobile-shell,.player-shell,.hud-panel,.panel,#mfmApp,#mobileControlsLayerReset,#mobileInlineTopControlsForce,#mobileTopControlsInBoostPanel,#mobileTransportRepair,.mobile-transport-repair,.mobile-dom-side-meter,.mobile-dom-bottom-guard').forEach(function(node){
+      if(node.closest && node.closest('#mffApp')) return;
+      node.setAttribute('data-mff-force-hidden','1');
+    });
+  }
+
+  function animate(){
+    var t = Date.now()/1000;
+    var playing = document.documentElement.getAttribute('data-mff-playing') === '1';
+    var base = playing ? 0.38 : 0.18;
+    var level = base + (playing ? Math.abs(Math.sin(t*2.3))*0.42 : Math.abs(Math.sin(t*.8))*0.08);
+    document.documentElement.style.setProperty('--mff-level', level.toFixed(3));
+    requestAnimationFrame(animate);
+  }
+
+  function install(){
+    if(!document.body) return;
+    document.documentElement.setAttribute('data-mff-version', VERSION);
+    document.body.setAttribute('data-mff-active', isMobile() ? '1' : '0');
+
+    if(isMobile()){
+      build();
+      hideEverythingExceptApp();
+      if(!rafStarted){ rafStarted = true; requestAnimationFrame(animate); }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    install();
+    setTimeout(install, 150);
+    setTimeout(install, 600);
+    setTimeout(install, 1500);
+    setTimeout(install, 3000);
+  });
+  window.addEventListener('load', install, {passive:true});
+  window.addEventListener('resize', install, {passive:true});
+  window.addEventListener('orientationchange', install, {passive:true});
+})();
+</script>
+
 </body>
 </html>
