@@ -424,6 +424,65 @@ window.addEventListener('orientationchange',apply,{passive:true});
 })();
 </script>
 
+
+<!-- MOBILE_VERTICAL_STACK_REORDER_v1 -->
+<script id="mobileVerticalStackReorderScript">
+(function(){
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+
+  function markPanel(node, type){
+    if(node && node.setAttribute) node.setAttribute('data-mobile-stack-' + type, 'v1');
+  }
+
+  function apply(){
+    if(!document.body) return;
+    document.body.setAttribute('data-mobile-vertical-stack-reorder', isMobile() ? 'v1' : 'desktop');
+    if(!isMobile()) return;
+
+    var main = document.querySelector('main,.mobile-shell,.player-shell,.hud-panel,.panel');
+    markPanel(main, 'host');
+
+    var now = document.querySelector('.now-playing,[class*="now"],[class*="playing"],[class*="metadata"]');
+    markPanel(now, 'now');
+
+    var status = document.querySelector('.status-panels,.system-panels,[class*="status"],[class*="system"]');
+    markPanel(status, 'status');
+
+    var eq = document.querySelector('.eq,.equalizer,[class*="equalizer"]');
+    markPanel(eq, 'eq');
+
+    var controls = document.getElementById('mobileControlsLayerReset');
+    markPanel(controls, 'controls');
+
+    var bottom = document.querySelector('.mobile-dom-bottom-guard');
+    markPanel(bottom, 'bottommeter');
+
+    /* altes großes Logo/Hero als Hintergrund/Element erneut hart markieren */
+    document.querySelectorAll('header,.hero,.hero-image,[class*="hero"],[class*="header"],[class*="logo"],img').forEach(function(node){
+      if(!node || !node.getBoundingClientRect) return;
+      if(node.closest && node.closest('#mobileControlsLayerReset')) return;
+      if(node.closest && node.closest('[data-mobile-stack-now],[data-mobile-stack-status],[data-mobile-stack-eq]')) return;
+      var r = node.getBoundingClientRect();
+      if(r.top < window.innerHeight * 0.50 && (r.width > window.innerWidth * 0.28 || r.height > 70)){
+        node.setAttribute('data-mobile-stack-remove-visual','v1');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    apply();
+    setTimeout(apply, 150);
+    setTimeout(apply, 700);
+    setTimeout(apply, 1600);
+    setTimeout(apply, 3200);
+  });
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
+
 </head>
 <body>
   <div class="frame-stage">

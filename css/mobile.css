@@ -1626,3 +1626,213 @@ ZWECK:
     right:4px!important;
   }
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-04-26
+ÄNDERUNG: MOBILE_VERTICAL_STACK_REORDER_v1
+ZWECK:
+- Playerdaten nicht oben kleben lassen.
+- NowPlaying / Status / EQ als zusammenhängenden Block nach unten ziehen.
+- Control-Leiste über Bottom-Levelmeter.
+- Bottom-Levelmeter ganz unten als echter Abstandshalter.
+- Großes altes Hero-/Logo-Bild auf Mobile ausblenden.
+==========================================
+*/
+@media(max-width:760px){
+  :root{
+    --mvsr-bottom-meter-h: 14px;
+    --mvsr-meter-gap: 10px;
+    --mvsr-control-h: 64px;
+    --mvsr-bottom-zone: calc(
+      var(--mvsr-control-h)
+      + var(--mvsr-bottom-meter-h)
+      + var(--mvsr-meter-gap)
+      + 24px
+      + env(safe-area-inset-bottom)
+    );
+  }
+
+  html,
+  body{
+    min-height:100dvh!important;
+    background:#02040d!important;
+    overflow-x:hidden!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"]{
+    padding-top:calc(8px + env(safe-area-inset-top))!important;
+    padding-bottom:var(--mvsr-bottom-zone)!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-remove-visual="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-remove-top-visual="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-top-logo-remove="v1"]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:none!important;
+    background-image:none!important;
+  }
+
+  /*
+    Hauptreparatur:
+    Der Host wird eine echte vertikale Stack-Fläche.
+    Inhalt wird nach unten gezogen, statt oben zu kleben.
+  */
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-host="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] main,
+  body[data-mobile-vertical-stack-reorder="v1"] .mobile-shell,
+  body[data-mobile-vertical-stack-reorder="v1"] .player-shell,
+  body[data-mobile-vertical-stack-reorder="v1"] .hud-panel,
+  body[data-mobile-vertical-stack-reorder="v1"] .panel{
+    box-sizing:border-box!important;
+    width:calc(100% - 20px)!important;
+    max-width:100%!important;
+    min-height:calc(100dvh - var(--mvsr-bottom-zone) - env(safe-area-inset-top) - 10px)!important;
+    margin:0 auto!important;
+    padding:0 0 0 0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-end!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    overflow:visible!important;
+    background:none!important;
+    background-image:none!important;
+    transform:none!important;
+  }
+
+  /*
+    Die "tote Mitte" wird oben gelassen; die echten Playerdaten wandern geschlossen nach unten.
+    Dadurch ist unten: Daten -> EQ -> Controls -> Meter.
+  */
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-now="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] .now-playing,
+  body[data-mobile-vertical-stack-reorder="v1"] [class*="now"],
+  body[data-mobile-vertical-stack-reorder="v1"] [class*="playing"],
+  body[data-mobile-vertical-stack-reorder="v1"] [class*="metadata"]{
+    flex:0 0 auto!important;
+    order:10!important;
+    margin-top:auto!important;
+    margin-bottom:6px!important;
+    position:relative!important;
+    z-index:62!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-status="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] .status-panels,
+  body[data-mobile-vertical-stack-reorder="v1"] .system-panels,
+  body[data-mobile-vertical-stack-reorder="v1"] [class*="status"],
+  body[data-mobile-vertical-stack-reorder="v1"] [class*="system"]{
+    flex:0 0 auto!important;
+    order:20!important;
+    margin-top:4px!important;
+    margin-bottom:4px!important;
+    position:relative!important;
+    z-index:61!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-eq="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] .eq,
+  body[data-mobile-vertical-stack-reorder="v1"] .equalizer,
+  body[data-mobile-vertical-stack-reorder="v1"] [class*="equalizer"]{
+    flex:0 0 auto!important;
+    order:30!important;
+    min-height:128px!important;
+    margin-top:6px!important;
+    margin-bottom:calc(var(--mvsr-control-h) + var(--mvsr-bottom-meter-h) + var(--mvsr-meter-gap) + 22px + env(safe-area-inset-bottom))!important;
+    padding-top:8px!important;
+    padding-bottom:14px!important;
+    position:relative!important;
+    z-index:60!important;
+    overflow:visible!important;
+  }
+
+  /*
+    Die Control-Leiste ist unten fix,
+    ABER über dem Bottom-Levelmeter.
+  */
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-controls="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] #mobileControlsLayerReset{
+    position:fixed!important;
+    left:14px!important;
+    right:14px!important;
+    bottom:calc(10px + var(--mvsr-bottom-meter-h) + var(--mvsr-meter-gap) + env(safe-area-inset-bottom))!important;
+    height:var(--mvsr-control-h)!important;
+    min-height:var(--mvsr-control-h)!important;
+    padding:6px!important;
+    display:grid!important;
+    grid-template-columns:46px 46px 46px 46px minmax(54px,1fr) 46px!important;
+    gap:6px!important;
+    border-radius:20px!important;
+    z-index:2147483000!important;
+    pointer-events:auto!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] #mobileControlsLayerReset button{
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+    border-radius:15px!important;
+    font-size:15px!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] #mobileControlsLayerReset .mclr-bst{
+    height:44px!important;
+    font-size:11px!important;
+    letter-spacing:.10em!important;
+  }
+
+  /*
+    Bottom-Levelmeter ist GANZ unten:
+    unter der Control-Leiste, als Abstandshalter vor Gestenbereich.
+  */
+  body[data-mobile-vertical-stack-reorder="v1"] [data-mobile-stack-bottommeter="v1"],
+  body[data-mobile-vertical-stack-reorder="v1"] .mobile-dom-bottom-guard{
+    position:fixed!important;
+    left:28px!important;
+    right:28px!important;
+    bottom:calc(8px + env(safe-area-inset-bottom))!important;
+    height:var(--mvsr-bottom-meter-h)!important;
+    width:auto!important;
+    margin:0!important;
+    opacity:.58!important;
+    z-index:2147482900!important;
+    pointer-events:none!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] .mobile-dom-bottom-track{
+    top:3px!important;
+    height:8px!important;
+    border-radius:999px!important;
+  }
+
+  /* Side-Meter laufen jetzt über die Cockpit-Höhe, nicht nur neben dem oberen Block. */
+  body[data-mobile-vertical-stack-reorder="v1"] .mobile-dom-side-meter{
+    top:16vh!important;
+    height:calc(100dvh - 16vh - var(--mvsr-bottom-zone) - 10px)!important;
+    opacity:.36!important;
+    width:7px!important;
+    z-index:18!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] .mobile-dom-side-meter-left{
+    left:4px!important;
+  }
+
+  body[data-mobile-vertical-stack-reorder="v1"] .mobile-dom-side-meter-right{
+    right:4px!important;
+  }
+}
