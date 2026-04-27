@@ -278,7 +278,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           '<button type="button" data-mff="boost" id="mffBoost">BST 0</button>' +
           '<button type="button" data-mff="up">+</button>' +
         '</section>' +
-        '<section class="mff-bottom"><header><i></i><span>LEVEL METER</span><i></i></header><div id="mffBottomBars" class="mff-bottom-bars"></div><div class="mff-db"><span>-∞</span><span>-24</span><span>-12</span><span>-6</span><span>-3</span><span>0 dB</span></div><small>SWIPE AREA</small></section>' +
+        '<section class="mff-bottom"><header><i></i><span>LEVEL METER</span><i></i></header><div id="mffBottomBars" class="mff-bottom-bars"></div><div class="mff-db"><span>-∞</span><span>-24</span><span>-12</span><span>-6</span><span>-3</span><span>0 dB</span></div><small class="mff-swipe-hidden" aria-hidden="true"></small></section>' +
       '</main>';
 
     // Direkt als erstes Element im Body, damit nichts darüber liegt.
@@ -393,6 +393,74 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   document.addEventListener('DOMContentLoaded', function(){
     apply(); setTimeout(apply,160); setTimeout(apply,700); setTimeout(apply,1600); setTimeout(apply,3200);
+  });
+  window.addEventListener('resize', apply, {passive:true});
+  window.addEventListener('orientationchange', apply, {passive:true});
+})();
+</script>
+
+
+<!-- MOBILE_FINAL_CLEAN_METERS_PANELS_v2 -->
+<script id="mobileFinalCleanMetersPanelsScript">
+(function(){
+  function isMobile(){
+    return (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || window.innerWidth <= 760;
+  }
+
+  function apply(){
+    if(!document.body) return;
+    document.body.setAttribute('data-mff-clean-meters-panels', isMobile() ? 'v2' : 'desktop');
+    if(!isMobile()) return;
+
+    var app = document.getElementById('mffApp');
+    if(app) app.setAttribute('data-mff-clean-meters-panels','v2');
+
+    /* Alte/zweite Meter-Layer außerhalb des finalen Players hart markieren. */
+    document.querySelectorAll(
+      '.mobile-dom-bottom-guard,.mobile-dom-bottom-track,.mobile-dom-side-meter,' +
+      '#mobileHudDomMeterRepair,.mobile-hud-dom-meter-repair,.mobile-dom-bottom-left,.mobile-dom-bottom-right,' +
+      '[id*="Levelmeter"],[class*="gesture-guard"],[class*="bottom-guard"]'
+    ).forEach(function(node){
+      if(node.closest && node.closest('#mffApp')) return;
+      node.setAttribute('data-mff-old-meter-remove','v2');
+    });
+
+    /* Alle alten Meter-ähnlichen Balken am unteren Rand markieren, außer dem finalen mff-bottom. */
+    document.querySelectorAll('body > div, body > section, body > aside').forEach(function(node){
+      if(node.id === 'mffApp') return;
+      if(node.closest && node.closest('#mffApp')) return;
+      var r = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+      if(!r) return;
+      var bottomish = r.top > window.innerHeight * 0.72;
+      var wide = r.width > window.innerWidth * 0.55;
+      if(bottomish && wide){
+        var txt = (node.textContent || '').trim();
+        var looksLikeOldMeter = !txt || /level|meter|swipe|bst|loading/i.test(txt);
+        if(looksLikeOldMeter) node.setAttribute('data-mff-old-meter-remove','v2');
+      }
+    });
+
+    /* Swipe-Text entfernen, falls aus alter Runtime noch vorhanden. */
+    document.querySelectorAll('#mffApp .mff-bottom small, #mffApp .mff-swipe-hidden').forEach(function(node){
+      node.textContent = '';
+      node.setAttribute('aria-hidden','true');
+    });
+
+    var shell = document.querySelector('#mffApp .mff-shell');
+    if(shell) shell.setAttribute('data-mff-panels-inside-meters','v2');
+
+    var cards = document.querySelector('#mffApp .mff-cards');
+    if(cards) cards.setAttribute('data-mff-cards-inside-meters','v2');
+
+    var controls = document.querySelector('#mffApp .mff-controls');
+    if(controls) controls.setAttribute('data-mff-controls-inside-meters','v2');
+
+    var bottom = document.querySelector('#mffApp .mff-bottom');
+    if(bottom) bottom.setAttribute('data-mff-single-bottom-meter','v2');
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    apply(); setTimeout(apply,150); setTimeout(apply,700); setTimeout(apply,1600); setTimeout(apply,3200);
   });
   window.addEventListener('resize', apply, {passive:true});
   window.addEventListener('orientationchange', apply, {passive:true});

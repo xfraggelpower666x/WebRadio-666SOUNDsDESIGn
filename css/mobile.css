@@ -3283,3 +3283,308 @@ ZWECK:
     right:3px!important;
   }
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — MOBILE_FINAL_CLEAN_METERS_PANELS_v2
+GEÄNDERT: 2026-04-27
+ZWECK:
+- Alte/zweite Levelmeter-Schichten entfernen.
+- Player-/Systempanels sauber zwischen linkem/rechtem Side-Meter.
+- Unteres altes cyan/magenta Meter komplett raus.
+- "SWIPE AREA" entfernen.
+- Bottom-Levelmeter bleibt nur als ein Segmentmeter im finalen Player.
+============================================================
+*/
+@media (max-width:760px){
+  :root{
+    --mff-side-meter-w:22px;
+    --mff-side-clearance:16px;
+    --mff-outer-gap:calc(var(--mff-side-meter-w) + var(--mff-side-clearance));
+  }
+
+  /*
+    Alte Meter-Layer:
+    Das war die zweite Ebene, die unten als cyan/magenta Balken und seitlich doppelt sichtbar war.
+  */
+  body[data-mff-clean-meters-panels="v2"] [data-mff-old-meter-remove="v2"],
+  body[data-mff-clean-meters-panels="v2"] .mobile-dom-bottom-guard,
+  body[data-mff-clean-meters-panels="v2"] .mobile-dom-bottom-track,
+  body[data-mff-clean-meters-panels="v2"] .mobile-dom-bottom-left,
+  body[data-mff-clean-meters-panels="v2"] .mobile-dom-bottom-right,
+  body[data-mff-clean-meters-panels="v2"] .mobile-dom-side-meter,
+  body[data-mff-clean-meters-panels="v2"] #mobileHudDomMeterRepair,
+  body[data-mff-clean-meters-panels="v2"] .mobile-hud-dom-meter-repair,
+  body[data-mff-clean-meters-panels="v2"] [class*="gesture-guard"],
+  body[data-mff-clean-meters-panels="v2"] [class*="bottom-guard"]{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:none!important;
+    background-image:none!important;
+    box-shadow:none!important;
+  }
+
+  /*
+    Hauptbreite:
+    Alles muss zwischen den Side-Metern sitzen, nicht darunter.
+  */
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-shell,
+  #mffApp[data-mff-clean-meters-panels="v2"] .mff-shell,
+  #mffApp .mff-shell[data-mff-panels-inside-meters="v2"]{
+    width:calc(100% - (var(--mff-outer-gap) * 2))!important;
+    max-width:680px!important;
+    margin:0 auto!important;
+    padding-top:78px!important;
+    gap:12px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-now,
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-cards,
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-eq,
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-controls,
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /*
+    Statuskarten nicht unter den rechten Side-Meter laufen lassen.
+  */
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-cards,
+  #mffApp .mff-cards[data-mff-cards-inside-meters="v2"]{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:9px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-card{
+    overflow:hidden!important;
+    min-width:0!important;
+    padding:12px 8px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-card strong{
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:17px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-card small{
+    font-size:9px!important;
+    letter-spacing:.08em!important;
+    white-space:nowrap!important;
+  }
+
+  /*
+    Controls exakt in der Playerbreite, nicht in die Side-Meter rein.
+  */
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-controls,
+  #mffApp .mff-controls[data-mff-controls-inside-meters="v2"]{
+    grid-template-columns:repeat(4,minmax(38px,1fr)) minmax(62px,1.25fr) repeat(2,minmax(38px,1fr))!important;
+    gap:7px!important;
+    height:82px!important;
+    min-height:82px!important;
+    padding:10px!important;
+    overflow:hidden!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-controls button{
+    height:56px!important;
+    min-height:56px!important;
+    border-radius:16px!important;
+    font-size:20px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp #mffBoost{
+    font-size:14px!important;
+    line-height:1.05!important;
+    white-space:normal!important;
+  }
+
+  /*
+    Ein einziges Bottom-Levelmeter im Player.
+    Keine Swipe-Area mehr.
+  */
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom,
+  #mffApp .mff-bottom[data-mff-single-bottom-meter="v2"]{
+    height:86px!important;
+    min-height:86px!important;
+    padding:13px 14px 10px 14px!important;
+    overflow:hidden!important;
+    margin-bottom:0!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom small,
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-swipe-hidden{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom header{
+    margin-bottom:8px!important;
+    font-size:12px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom-bars{
+    height:30px!important;
+    gap:4px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom-bars i{
+    height:25px!important;
+    border-radius:7px!important;
+    background:linear-gradient(to top, var(--mff-cyan), #4d72ff 42%, var(--mff-purple) 68%, var(--mff-pink))!important;
+    transform:scaleY(calc(.52 + var(--mff-level) * .48))!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-db{
+    margin-top:5px!important;
+    font-size:10px!important;
+  }
+
+  /*
+    Side-Meter behalten: nur die finalen mff-side Meter.
+    Position so, dass die Hauptspalte wirklich dazwischen liegt.
+  */
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-side{
+    display:block!important;
+    visibility:visible!important;
+    opacity:.98!important;
+    width:var(--mff-side-meter-w)!important;
+    top:252px!important;
+    bottom:154px!important;
+    z-index:2147482100!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-left{
+    left:4px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-right{
+    right:4px!important;
+  }
+}
+
+/* Kleine iPhones: Panels weiter zwischen die Meter einklemmen, keine Überläufe. */
+@media (max-width:430px){
+  :root{
+    --mff-side-meter-w:20px;
+    --mff-side-clearance:16px;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-shell,
+  #mffApp .mff-shell[data-mff-panels-inside-meters="v2"]{
+    width:calc(100% - 72px)!important;
+    padding-top:74px!important;
+    gap:10px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-now{
+    grid-template-columns:68px minmax(0,1fr) 72px!important;
+    min-height:122px!important;
+    padding:12px!important;
+    gap:9px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-symbol{
+    width:64px!important;
+    height:64px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-symbol span{
+    width:38px!important;
+    height:38px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-title h1{
+    font-size:17px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-title h2{
+    font-size:13px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-history{
+    min-width:68px!important;
+    width:68px!important;
+    height:44px!important;
+    font-size:12px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-cards{
+    gap:8px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-card{
+    min-height:86px!important;
+    padding:10px 7px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-card strong{
+    font-size:16px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-eq{
+    min-height:198px!important;
+    padding:14px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-eq-bars{
+    height:132px!important;
+    gap:6px!important;
+    padding:12px 8px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-controls{
+    height:78px!important;
+    min-height:78px!important;
+    padding:9px!important;
+    gap:6px!important;
+    grid-template-columns:repeat(4,minmax(34px,1fr)) minmax(58px,1.24fr) repeat(2,minmax(34px,1fr))!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-controls button{
+    height:52px!important;
+    min-height:52px!important;
+    font-size:18px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-bottom{
+    height:82px!important;
+    min-height:82px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-side{
+    top:236px!important;
+    bottom:142px!important;
+    width:20px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-left{
+    left:3px!important;
+  }
+
+  body[data-mff-clean-meters-panels="v2"] #mffApp .mff-right{
+    right:3px!important;
+  }
+}
