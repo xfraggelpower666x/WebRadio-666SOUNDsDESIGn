@@ -1,11 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST
 GEÄNDERT: 2026-04-27
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v8-20260427-2035
+- Cache-Proof: smfp-v9-rampboost-20260427-2055
+- Boost: ramp-protected WebAudio GainNode.
 ============================================================
 */
 @media (min-width:761px){

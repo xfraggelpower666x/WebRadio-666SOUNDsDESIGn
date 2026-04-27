@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v8-20260427-2035" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v8-20260427-2035" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v8-20260427-2035" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v8-20260427-2035" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v8-20260427-2035" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v8-20260427-2035" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v9-rampboost-20260427-2055" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v9-rampboost-20260427-2055" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v9-rampboost-20260427-2055" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v9-rampboost-20260427-2055" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v9-rampboost-20260427-2055" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v9-rampboost-20260427-2055" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v8-20260427-2035"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v9-rampboost-20260427-2055"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF -->
-<style id="strictMobileFrontendPurgeV8Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST -->
+<style id="strictMobileFrontendPurgeV9Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -294,10 +294,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF -->
-<script id="strictMobileFrontendPurgeV8Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST -->
+<script id="strictMobileFrontendPurgeV9Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -317,6 +317,96 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return a;
   }
 
+
+  var audioGraph=null;
+  var BOOST_GAINS=[1.00,1.14,1.31,1.52];
+  var RAMP_UP=0.38;
+  var RAMP_DOWN=0.26;
+
+  function ensureAudioGraph(){
+    var audio=getAudio();
+    if(audioGraph && audioGraph.audio===audio) return audioGraph;
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC) throw new Error('WebAudio unavailable');
+
+      var ctx=window.__mffAudioContext || new AC();
+      window.__mffAudioContext=ctx;
+
+      var source=window.__mffMediaElementSource;
+      if(!source){
+        source=ctx.createMediaElementSource(audio);
+        window.__mffMediaElementSource=source;
+      }
+
+      var gain=ctx.createGain();
+      gain.gain.value=BOOST_GAINS[boostStage] || 1;
+
+      var comp=ctx.createDynamicsCompressor();
+      comp.threshold.value=-7;
+      comp.knee.value=10;
+      comp.ratio.value=7;
+      comp.attack.value=0.004;
+      comp.release.value=0.22;
+
+      try{source.disconnect()}catch(e){}
+      source.connect(gain);
+      gain.connect(comp);
+      comp.connect(ctx.destination);
+
+      audio.volume=1;
+      audioGraph={audio:audio,ctx:ctx,source:source,gain:gain,compressor:comp,ok:true,lastGain:gain.gain.value};
+      document.documentElement.setAttribute('data-mff-boost-engine','webaudio-ramp');
+      return audioGraph;
+    }catch(e){
+      console.warn('[666 boost] WebAudio fallback',e);
+      try{audio.volume=Math.min(1,BOOST_GAINS[boostStage]||1)}catch(_){}
+      audioGraph={audio:audio,ok:false,error:String(e)};
+      document.documentElement.setAttribute('data-mff-boost-engine','volume-fallback');
+      return audioGraph;
+    }
+  }
+
+  function applyBoostRamp(previousStage){
+    var target=BOOST_GAINS[boostStage] || 1;
+    var app=q('#mffApp');
+    if(app) app.setAttribute('data-mff-boost-stage',String(boostStage));
+
+    var b=q('#mffBoost');
+    if(b) b.textContent='BST '+boostStage;
+
+    document.documentElement.setAttribute('data-mff-boost',String(boostStage));
+    document.documentElement.setAttribute('data-mff-boost-gain',String(target));
+
+    var graph=ensureAudioGraph();
+    if(graph && graph.ok && graph.gain && graph.ctx){
+      try{
+        if(graph.ctx.state==='suspended') graph.ctx.resume();
+        var now=graph.ctx.currentTime;
+        var current=graph.gain.gain.value || graph.lastGain || 1;
+        var ramp=(target>current)?RAMP_UP:RAMP_DOWN;
+
+        graph.gain.gain.cancelScheduledValues(now);
+        graph.gain.gain.setValueAtTime(current,now);
+        graph.gain.gain.linearRampToValueAtTime(target,now+ramp);
+        graph.lastGain=target;
+      }catch(e){
+        try{graph.gain.gain.setTargetAtTime(target,graph.ctx.currentTime,0.08)}catch(_){}
+      }
+    }else{
+      try{getAudio().volume=Math.min(1,target)}catch(e){}
+    }
+  }
+
+  async function resumeAudioGraph(){
+    var graph=ensureAudioGraph();
+    if(graph && graph.ok && graph.ctx && graph.ctx.state==='suspended'){
+      try{await graph.ctx.resume()}catch(e){}
+    }
+    applyBoostRamp(boostStage);
+  }
+
+
   function setTransportState(state){
     var app=q('#mffApp');
     if(app)app.setAttribute('data-mff-transport-state',state);
@@ -335,10 +425,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     transientTimer=setTimeout(function(){qa('#mffApp .mff-controls .mff-transient').forEach(function(n){n.classList.remove('mff-transient')})},1200);
   }
 
-  function play(){var a=getAudio();try{if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);var r=a.play();if(r&&typeof r.catch==='function')r.catch(function(e){console.warn('[666 mobile play]',e)});setTransportState('play')}catch(e){console.warn('[666 mobile play]',e)}}
+  async function play(){await resumeAudioGraph();var a=getAudio();try{if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);var r=a.play();if(r&&typeof r.catch==='function')r.catch(function(e){console.warn('[666 mobile play]',e)});setTransportState('play')}catch(e){console.warn('[666 mobile play]',e)}}
   function pause(){try{getAudio().pause()}catch(e){}setTransportState('pause')}
   function stop(){var a=getAudio();try{a.pause();try{a.currentTime=0}catch(e){}}catch(e){}setTransportState('stop')}
-  function boost(d){boostStage=Math.max(0,Math.min(3,boostStage+d));try{getAudio().volume=[0.86,0.94,1,1][boostStage]}catch(e){}var b=q('#mffBoost');if(b)b.textContent='BST '+boostStage;document.documentElement.setAttribute('data-mff-boost',String(boostStage))}
+  function boost(d){var prev=boostStage;boostStage=Math.max(0,Math.min(3,boostStage+d));applyBoostRamp(prev)}
 
   function card(t,v,i){return'<section class="mff-card"><div><span class="mff-ico">'+i+'</span><small>'+t+'</small></div><strong>'+v+'</strong><p><i></i><i></i><i></i></p></section>'}
 
@@ -387,7 +477,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v8</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v9</div><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS</b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -409,6 +499,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     controls.addEventListener('click',handler,{capture:true});
     controls.addEventListener('touchend',handler,{passive:false,capture:true});
     setTransportState('stop');
+    applyBoostRamp(0);
     return app;
   }
 

@@ -1,0 +1,25 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v9 RAMP PROTECTED BOOST
+
+Zweck:
+- Boost-Funktion repariert.
+- Browser audio.volume kann nicht über 1.0 hinaus.
+- v9 nutzt WebAudio GainNode für echten Boost.
+- Gain wird über Millisekunden gerampt:
+  - Hochfahren: ca. 380 ms
+  - Runterfahren: ca. 260 ms
+- DynamicsCompressor/Limiter schützt vor abruptem Clipping.
+- UI zeigt weiter BST 0–3.
+- Worker/Stream/Wrangler unverändert.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Root-Migration
+- Boost-Multipliers

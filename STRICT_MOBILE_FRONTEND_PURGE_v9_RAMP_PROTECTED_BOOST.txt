@@ -1,0 +1,14 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v9_RAMP_PROTECTED_BOOST
+CACHE_TAG=smfp-v9-rampboost-20260427-2055
+
+BOOST:
+- Browser audio.volume ist auf 1.0 begrenzt.
+- v9 nutzt WebAudio GainNode + DynamicsCompressor/Limiter.
+- Stufen:
+  BST 0 = Gain 1.00
+  BST 1 = Gain 1.14
+  BST 2 = Gain 1.31
+  BST 3 = Gain 1.52
+- Ramp up: 380 ms
+- Ramp down: 260 ms
+- Zweck: hörbarer Boost ohne abrupten Pegelsprung.
