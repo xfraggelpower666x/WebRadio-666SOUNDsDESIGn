@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v21 BOTTOM CENTER OUT SEGMENT METER EQ FORCE MOTION
+
+Zweck:
+- Unteres Levelmeter war als dünne Mini-Striche optisch falsch.
+- Gewünscht: gleiches Segment-Design wie Side-Meter, aber horizontal und von Mitte nach außen.
+- EQ wirkte wie Standbild.
+- v21 erzwingt sichtbare, geglättete EQ-Höhen pro Tick.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v21_BOTTOM_CENTER_OUT_SEGMENT_METER_EQ_FORCE_MOTION.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v21_BOTTOM_CENTER_OUT_SEGMENT_METER_EQ_FORCE_MOTION.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

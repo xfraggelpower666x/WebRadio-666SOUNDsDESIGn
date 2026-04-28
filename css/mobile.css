@@ -1,12 +1,13 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v20_PC_EQ_BEHAVIOR_NO_FLICKER
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v21_BOTTOM_CENTER_OUT_SEGMENT_METER_EQ_FORCE_MOTION
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v20-pceq-noflicker-20260428-1425
-- v20: PC-EQ-Verhalten ohne Flicker/Doppelengine.
+- Cache-Proof: smfp-v21-bottomcenter-eqforce-20260428-1715
+- v21: Bottom-Levelmeter als horizontales Center-Out-Segmentmeter.
+- v21: EQ-Motion sichtbar pro Tick erzwungen, ohne Flicker-Doppelengine.
 ============================================================
 */
 @media (min-width:761px){
