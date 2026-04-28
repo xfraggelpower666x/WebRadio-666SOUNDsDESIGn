@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v16-historymodal-boostrow-20260428-0001" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v16-historymodal-boostrow-20260428-0001" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v16-historymodal-boostrow-20260428-0001" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v16-historymodal-boostrow-20260428-0001" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v16-historymodal-boostrow-20260428-0001" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v16-historymodal-boostrow-20260428-0001" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v17-modal-ledhardfix-20260428-1335" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v17-modal-ledhardfix-20260428-1335" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v17-modal-ledhardfix-20260428-1335" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v17-modal-ledhardfix-20260428-1335" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v17-modal-ledhardfix-20260428-1335" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v17-modal-ledhardfix-20260428-1335" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v16-historymodal-boostrow-20260428-0001"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v17-modal-ledhardfix-20260428-1335"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX -->
-<style id="strictMobileFrontendPurgeV16Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX -->
+<style id="strictMobileFrontendPurgeV17Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -290,14 +290,42 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   .mff-side:before{content:""!important;position:absolute!important;left:6px!important;right:6px!important;bottom:12px!important;height:calc(76% * var(--mff-level))!important;border-radius:8px!important;background:repeating-linear-gradient(to top,var(--mff-cyan) 0 9px,transparent 9px 14px,var(--mff-purple) 14px 23px,transparent 23px 28px,var(--mff-pink) 28px 37px,transparent 37px 42px)!important;box-shadow:0 0 12px rgba(22,255,243,.55)!important;}
   .smfp-version-badge{position:fixed!important;right:8px!important;top:calc(6px + env(safe-area-inset-top))!important;z-index:2147483647!important;padding:4px 7px!important;border-radius:999px!important;background:rgba(255,61,187,.92)!important;color:#fff!important;font-size:9px!important;font-weight:900!important;letter-spacing:.08em!important;pointer-events:none!important;box-shadow:0 0 12px rgba(255,61,187,.55)!important;}
 }
+
+  /* v17 HARD FIX — TRUE MODAL + LED ROW */
+  #mffApp .mff-history-backdrop{position:fixed!important;inset:0!important;z-index:2147483200!important;background:rgba(0,0,0,.64)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important;display:none!important;opacity:0!important;pointer-events:auto!important;}
+  #mffApp[data-history-open="1"] .mff-history-backdrop{display:block!important;opacity:1!important;}
+  #mffApp .mff-history-overlay{position:fixed!important;left:50%!important;top:calc(94px + env(safe-area-inset-top))!important;right:auto!important;bottom:auto!important;width:calc(100vw - 56px)!important;max-width:540px!important;max-height:68dvh!important;transform:translateX(-50%)!important;z-index:2147483300!important;display:none!important;overflow:hidden!important;border-radius:24px!important;border:1px solid rgba(255,61,187,.62)!important;background:radial-gradient(circle at 18% 0%,rgba(255,61,187,.18),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.13),transparent 38%),rgba(3,7,20,.97)!important;color:var(--mff-text)!important;box-shadow:0 0 36px rgba(255,61,187,.32),0 0 28px rgba(22,255,243,.18),inset 0 0 26px rgba(255,255,255,.035)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;pointer-events:auto!important;}
+  #mffApp[data-history-open="1"] .mff-history-overlay{display:block!important;animation:mffHistoryModalV17 .16s ease-out both!important;}
+  @keyframes mffHistoryModalV17{from{opacity:0;transform:translateX(-50%) translateY(-12px) scale(.985);}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}}
+  #mffApp .mff-history-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:14px!important;border-bottom:1px solid rgba(22,255,243,.20)!important;}
+  #mffApp .mff-history-head strong{color:var(--mff-cyan)!important;font-size:13px!important;font-weight:950!important;letter-spacing:.14em!important;white-space:nowrap!important;}
+  #mffApp .mff-history-close{width:42px!important;height:36px!important;min-width:42px!important;border-radius:15px!important;border:1px solid rgba(255,61,187,.58)!important;background:rgba(247,248,255,.92)!important;color:#050816!important;font-size:18px!important;font-weight:950!important;pointer-events:auto!important;}
+  #mffApp .mff-history-list{max-height:calc(68dvh - 62px)!important;overflow:auto!important;-webkit-overflow-scrolling:touch!important;padding:10px 12px 14px!important;}
+  #mffApp .mff-history-item{display:grid!important;grid-template-columns:34px minmax(0,1fr)!important;gap:10px!important;align-items:center!important;padding:10px 8px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.18)!important;background:rgba(5,10,28,.62)!important;margin-bottom:8px!important;}
+  #mffApp .mff-history-num{width:30px!important;height:30px!important;border-radius:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(255,61,187,.18)!important;border:1px solid rgba(255,61,187,.38)!important;color:var(--mff-cyan)!important;font-size:11px!important;font-weight:950!important;}
+  #mffApp .mff-history-title{min-width:0!important;color:#fff!important;font-size:13px!important;line-height:1.18!important;font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  #mffApp .mff-history-sub{color:rgba(22,255,243,.82)!important;font-size:10px!important;line-height:1.18!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-top:3px!important;}
+  #mffApp .mff-history-empty{padding:24px 10px!important;text-align:center!important;color:rgba(247,248,255,.72)!important;font-size:13px!important;}
+  #mffApp .mff-controls{min-height:78px!important;height:78px!important;grid-template-rows:none!important;padding:9px!important;overflow:hidden!important;}
+  #mffApp .mff-controls button{height:52px!important;min-height:52px!important;}
+  #mffApp #mffBoost{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;font-size:13px!important;line-height:1!important;}
+  #mffApp #mffBoost small,#mffApp .mff-controls small{display:none!important;}
+  #mffApp .mff-boost-row-panel{width:100%!important;min-height:44px!important;height:44px!important;border-radius:22px!important;border:1px solid rgba(22,255,243,.34)!important;background:linear-gradient(135deg,rgba(255,61,187,.06),rgba(22,255,243,.04)),rgba(5,10,28,.82)!important;box-shadow:0 0 18px rgba(22,255,243,.12),0 0 18px rgba(255,61,187,.08),inset 0 0 20px rgba(255,255,255,.024)!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:7px 10px!important;box-sizing:border-box!important;pointer-events:none!important;}
+  #mffApp .mff-boost-led-row{width:100%!important;height:30px!important;min-height:30px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;padding:0 12px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.26)!important;background:rgba(3,8,20,.58)!important;box-shadow:inset 0 0 14px rgba(22,255,243,.08)!important;}
+  #mffApp .mff-boost-led-label{color:rgba(247,248,255,.86)!important;font-size:10px!important;font-weight:950!important;letter-spacing:.14em!important;margin-right:2px!important;white-space:nowrap!important;}
+  #mffApp .mff-boost-led-wrap{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;}
+  #mffApp .mff-boost-led{display:block!important;width:11px!important;height:11px!important;min-width:11px!important;min-height:11px!important;border-radius:50%!important;border:1px solid rgba(247,248,255,.34)!important;background:rgba(247,248,255,.13)!important;box-shadow:inset 0 0 6px rgba(255,255,255,.05)!important;flex:0 0 11px!important;}
+  #mffApp[data-mff-boost-stage="1"] .mff-boost-led[data-led="1"],#mffApp[data-mff-boost-stage="2"] .mff-boost-led[data-led="1"],#mffApp[data-mff-boost-stage="2"] .mff-boost-led[data-led="2"],#mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="1"],#mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="2"],#mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="3"]{background:var(--mff-pink)!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 10px rgba(255,61,187,.80),0 0 18px rgba(255,61,187,.38)!important;}
+  #mffApp .mff-boost-gain{min-width:50px!important;text-align:left!important;color:var(--mff-cyan)!important;font-size:11px!important;font-weight:950!important;letter-spacing:.07em!important;white-space:nowrap!important;}
+
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX -->
-<script id="strictMobileFrontendPurgeV16Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX -->
+<script id="strictMobileFrontendPurgeV17Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -505,18 +533,34 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     box.setAttribute('data-has-artwork','1');
   }
 
+
+  function bindHistoryModalV17(app){
+    var hbtn=q('.mff-history',app);
+    if(hbtn && !hbtn.__mffHistoryBound){
+      hbtn.__mffHistoryBound=true;
+      hbtn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{capture:true});
+      hbtn.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{passive:false,capture:true});
+    }
+    qa('[data-mff-history-close]',app).forEach(function(el){
+      if(el.__mffHistoryCloseBound)return;
+      el.__mffHistoryCloseBound=true;
+      el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
+      el.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
+    });
+  }
+
   function buildApp(){
     var app=q('#mffApp');
     if(app)return app;
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v16</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v17</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
       '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
-      '<section class="mff-boost-row-panel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
+      '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
     document.body.insertBefore(app,document.body.firstChild);
     buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
     var controls=q('.mff-controls',app);
@@ -550,6 +594,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       hclose.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
     }
 
+    bindHistoryModalV17(app);
     setTransportState('stop');
     applyBoostRamp(0);
     setAnalyserMode('init');

@@ -1,0 +1,14 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v17 TRUE MODAL AND LED ROW HARD FIX
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration
