@@ -1,13 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v21_BOTTOM_CENTER_OUT_SEGMENT_METER_EQ_FORCE_MOTION
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v21-bottomcenter-eqforce-20260428-1715
-- v21: Bottom-Levelmeter als horizontales Center-Out-Segmentmeter.
-- v21: EQ-Motion sichtbar pro Tick erzwungen, ohne Flicker-Doppelengine.
+- Cache-Proof: smfp-v22-pc-eq-direct-20260428-1735
+- v22: iPhone-EQ direkter PC-Verhaltensport.
 ============================================================
 */
 @media (min-width:761px){

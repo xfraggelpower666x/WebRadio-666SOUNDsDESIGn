@@ -1,0 +1,26 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v22 PC EQUALIZER DIRECT BEHAVIOR PORT
+
+Zweck:
+- Der iPhone-EQ soll wieder wie der PC-Player wirken.
+- Vorherige Ansätze waren nur angenähert oder wirkten statisch/flackernd.
+- v22 setzt eine direkte PC-Verhaltenslogik in die Mobile-Inline-Runtime:
+  - mirrored bars
+  - halfBars
+  - analysisWindow 72%
+  - Desktop-pow-Mapping
+  - smooth/inertia
+  - PC-artiger Fallback
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration
