@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v18_PC_METER_BEHAVIOR_PORT" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v19_PC_EQ_TIMER_ENGINE_HARD_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v18-pcmeterbehavior-20260428-1355" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v18-pcmeterbehavior-20260428-1355" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v18-pcmeterbehavior-20260428-1355" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v18-pcmeterbehavior-20260428-1355" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v18-pcmeterbehavior-20260428-1355" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v18-pcmeterbehavior-20260428-1355" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v19-pceqtimer-20260428-1410" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v19-pceqtimer-20260428-1410" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v19-pceqtimer-20260428-1410" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v19-pceqtimer-20260428-1410" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v19-pceqtimer-20260428-1410" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v19-pceqtimer-20260428-1410" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v18-pcmeterbehavior-20260428-1355"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v19-pceqtimer-20260428-1410"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v18_PC_METER_BEHAVIOR_PORT -->
-<style id="strictMobileFrontendPurgeV18Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v19_PC_EQ_TIMER_ENGINE_HARD_FIX -->
+<style id="strictMobileFrontendPurgeV19Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -335,14 +335,39 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #mffApp .mff-bottom-bars i.mff-bottom-left{transform-origin:right center!important;}
   #mffApp .mff-bottom-bars i.mff-bottom-right{transform-origin:left center!important;}
 
+
+  /* v19 PC EQ TIMER ENGINE HARD FIX */
+  #mffApp .mff-eq-bars{
+    height:132px!important;
+    align-items:end!important;
+  }
+
+  #mffApp .mff-eq-bars i{
+    animation:none!important;
+    transition:height 96ms linear, opacity 96ms linear, filter 96ms linear!important;
+    will-change:height,opacity,filter!important;
+    min-height:12px!important;
+    max-height:112px!important;
+  }
+
+  #mffApp .mff-bottom-bars i{
+    animation:none!important;
+    transition:transform 96ms linear, opacity 96ms linear, filter 96ms linear!important;
+    will-change:transform,opacity,filter!important;
+  }
+
+  html[data-mff-mobile-eq-engine="pc-timer-v19"] #mffApp .mff-eq{
+    border-color:rgba(22,255,243,.38)!important;
+  }
+
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v18_PC_METER_BEHAVIOR_PORT -->
-<script id="strictMobileFrontendPurgeV18Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v19_PC_EQ_TIMER_ENGINE_HARD_FIX -->
+<script id="strictMobileFrontendPurgeV19Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v18_PC_METER_BEHAVIOR_PORT';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v19_PC_EQ_TIMER_ENGINE_HARD_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -372,6 +397,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var analyserMode='init';
   var pcSmoothMeter=18;
   var pcWeakFrameCounter=0;
+  var pcMobileEqTimer=0;
+  var pcMobileEqLastTick=0;
   var BOOST_GAINS=[1.00,1.14,1.31,1.52];
   var RAMP_UP=0.38;
   var RAMP_DOWN=0.26;
@@ -574,7 +601,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v18</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v19</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -848,7 +875,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function pcPxToPercent(px){
-    return pcClamp((px/112)*100,12,100);
+    return pcClamp(px,12,112);
   }
 
   function pcSetSideMeterFromPercent(valuePercent){
@@ -889,9 +916,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       for(var i=0;i<eqBars.length;i++){
         var px=pcFallbackBarValue(i,eqBars.length,intensity*boostIntensity);
         var pct=pcPxToPercent(px);
-        eqBars[i].style.height=pct.toFixed(1)+'%';
-        eqBars[i].style.opacity=(.48+(pct/100)*.50).toFixed(2);
-        eqBars[i].style.filter='saturate('+(1+boost*.10).toFixed(2)+') brightness('+(1+(pct/100)*.05).toFixed(2)+')';
+        eqBars[i].style.height=pct.toFixed(1)+'px';
+        eqBars[i].style.opacity=(.48+(pct/112)*.50).toFixed(2);
+        eqBars[i].style.filter='saturate('+(1+boost*.10).toFixed(2)+') brightness('+(1+(pct/112)*.05).toFixed(2)+')';
       }
     }
 
@@ -900,6 +927,43 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var sideLevel=pcSetSideMeterFromPercent(meterPercent);
     setAnalyserMode('hybrid');
     return sideLevel;
+  }
+
+
+
+  function pcMobileEqTimerTick(){
+    if(!isMobile()) return;
+    var audio=null;
+    try{audio=getAudio();}catch(e){}
+    var attrPlaying=document.documentElement.getAttribute('data-mff-playing')==='1';
+    var audioPlaying=!!(audio && !audio.paused && !audio.ended);
+    var playing=attrPlaying || audioPlaying;
+
+    /*
+      v19:
+      Desktop-Equalizer hat zusätzlich zum RAF eine echte Fallback-Timer-Logik.
+      Auf iPhone erzwingen wir die gleiche Art Bewegung alle 110 ms,
+      damit Hybrid/Visual-Meter nicht statisch bleiben, wenn RAF/Analyser schwach ist.
+    */
+    try{
+      var level=updateEqFromAnalyser(audioGraph,playing);
+      var visualBoost=(boostStage||0)*0.045;
+      level=Math.min(.96,level+visualBoost);
+      document.documentElement.style.setProperty('--mff-level',level.toFixed(3));
+      pcMobileEqLastTick=Date.now();
+    }catch(err){
+      try{
+        var level2=syntheticMeterMotion(playing,'pc-timer-fallback');
+        document.documentElement.style.setProperty('--mff-level',Math.min(.96,level2).toFixed(3));
+      }catch(e){}
+    }
+  }
+
+  function startPcMobileEqTimer(){
+    if(pcMobileEqTimer) return;
+    pcMobileEqTimer=window.setInterval(pcMobileEqTimerTick,110);
+    pcMobileEqTimerTick();
+    document.documentElement.setAttribute('data-mff-mobile-eq-engine','pc-timer-v19');
   }
 
 
@@ -962,9 +1026,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           px=Math.max(px,hybrid);
         }
         var pct=pcPxToPercent(px);
-        eqBars[b].style.height=pct.toFixed(1)+'%';
-        eqBars[b].style.opacity=(.48+(pct/100)*.50).toFixed(2);
-        eqBars[b].style.filter='saturate('+(1+boost*.10).toFixed(2)+') brightness('+(1+(pct/100)*.05).toFixed(2)+')';
+        eqBars[b].style.height=pct.toFixed(1)+'px';
+        eqBars[b].style.opacity=(.48+(pct/112)*.50).toFixed(2);
+        eqBars[b].style.filter='saturate('+(1+boost*.10).toFixed(2)+') brightness('+(1+(pct/112)*.05).toFixed(2)+')';
       }
     }
 
@@ -999,6 +1063,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     killOldDom();
     startMeta();
     if(!rafStarted){rafStarted=true;requestAnimationFrame(animate)}
+    startPcMobileEqTimer();
   }
 
   document.addEventListener('DOMContentLoaded',function(){install();setTimeout(install,150);setTimeout(install,650);setTimeout(install,1500);setTimeout(install,3200);setTimeout(install,6000)});

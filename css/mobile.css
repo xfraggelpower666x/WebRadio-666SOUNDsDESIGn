@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v18_PC_METER_BEHAVIOR_PORT
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v19_PC_EQ_TIMER_ENGINE_HARD_FIX
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v18-pcmeterbehavior-20260428-1355
-- v18: iPhone-Meterverhalten an PC-Visualizer-Algorithmus angepasst.
+- Cache-Proof: smfp-v19-pceqtimer-20260428-1410
+- v19: PC-artige EQ-/Meter-Timer-Engine für iPhone.
 ============================================================
 */
 @media (min-width:761px){
