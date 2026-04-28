@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v22-pc-eq-direct-20260428-1735" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v22-pc-eq-direct-20260428-1735" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v22-pc-eq-direct-20260428-1735" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v22-pc-eq-direct-20260428-1735" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v22-pc-eq-direct-20260428-1735" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v22-pc-eq-direct-20260428-1735" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v24-boost-headroom-20260428-1825" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v24-boost-headroom-20260428-1825" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v24-boost-headroom-20260428-1825" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v24-boost-headroom-20260428-1825" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v24-boost-headroom-20260428-1825" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v24-boost-headroom-20260428-1825" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v22-pc-eq-direct-20260428-1735"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v24-boost-headroom-20260428-1825"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT -->
-<style id="strictMobileFrontendPurgeV22Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX -->
+<style id="strictMobileFrontendPurgeV24Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -336,68 +336,37 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #mffApp .mff-bottom-bars i.mff-bottom-right{transform-origin:left center!important;}
 
 
-  /* v19 PC EQ TIMER ENGINE HARD FIX */
+
+  /* v23 CLEAN EQ ENGINE PURGE REPLACE */
   #mffApp .mff-eq-bars{
     height:132px!important;
     align-items:end!important;
+    gap:7px!important;
   }
 
   #mffApp .mff-eq-bars i{
-    animation:none!important;
-    transition:height 96ms linear, opacity 96ms linear, filter 96ms linear!important;
-    will-change:height,opacity,filter!important;
-    min-height:12px!important;
+    height:112px!important;
+    min-height:112px!important;
     max-height:112px!important;
-  }
-
-  #mffApp .mff-bottom-bars i{
+    transform-origin:bottom center!important;
+    transform:scaleY(var(--mff-eq-scale,.28))!important;
+    opacity:var(--mff-eq-opacity,.64)!important;
     animation:none!important;
-    transition:transform 96ms linear, opacity 96ms linear, filter 96ms linear!important;
-    will-change:transform,opacity,filter!important;
-  }
-
-  html[data-mff-mobile-eq-engine="pc-timer-v19"] #mffApp .mff-eq{
-    border-color:rgba(22,255,243,.38)!important;
-  }
-
-
-  /* v20 PC EQ NO FLICKER */
-  #mffApp .mff-eq-bars{
-    height:132px!important;
-    align-items:end!important;
-  }
-
-  #mffApp .mff-eq-bars i{
-    animation:none!important;
-    transition:height 108ms linear, opacity 108ms linear, filter 108ms linear!important;
-    min-height:12px!important;
-    max-height:112px!important;
-    will-change:height,opacity!important;
-  }
-
-  #mffApp .mff-bottom-bars i{
-    animation:none!important;
-    transition:transform 108ms linear, opacity 108ms linear!important;
+    transition:
+      transform 110ms cubic-bezier(.22,.61,.36,1),
+      opacity 110ms linear,
+      filter 110ms linear!important;
     will-change:transform,opacity!important;
   }
 
-  html[data-mff-mobile-eq-engine="pc-single-loop-v20"] #mffApp .mff-eq{
-    border-color:rgba(22,255,243,.38)!important;
+  html[data-mff-mobile-eq-engine="clean-eq-single-loop-v23"] #mffApp .mff-eq{
+    border-color:rgba(22,255,243,.44)!important;
   }
 
-
-  /* v21 BOTTOM CENTER-OUT SEGMENT METER + EQ FORCE MOTION */
-  #mffApp .mff-eq-bars{
-    height:132px!important;
-    align-items:end!important;
-  }
-
-  #mffApp .mff-eq-bars i{
-    animation:none!important;
-    transition:height 108ms linear, opacity 108ms linear, filter 108ms linear!important;
-    min-height:14px!important;
-    max-height:112px!important;
-    will-change:height,opacity!important;
+  html[data-mff-mobile-eq-engine="clean-eq-single-loop-v23"] #mffApp .mff-eq-bars i{
+    box-shadow:
+      0 0 10px rgba(22,255,243,.17),
+      0 0 10px rgba(255,61,187,.13)!important;
   }
 
   #mffApp .mff-bottom{
@@ -425,7 +394,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     border-radius:6px!important;
     transform:scaleX(var(--mff-bar-scale,.55))!important;
     opacity:var(--mff-bar-opacity,.24)!important;
-    transition:transform 108ms linear, opacity 108ms linear, filter 108ms linear, box-shadow 108ms linear!important;
+    transition:transform 110ms linear, opacity 110ms linear, filter 110ms linear, box-shadow 110ms linear!important;
     background:rgba(20,255,245,.22)!important;
     box-shadow:inset 0 0 4px rgba(255,255,255,.05)!important;
     will-change:transform,opacity!important;
@@ -446,47 +415,20 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       0 0 12px rgba(255,61,187,.28)!important;
   }
 
-  html[data-mff-mobile-eq-engine="pc-single-loop-v21"] #mffApp .mff-eq{
-    border-color:rgba(22,255,243,.40)!important;
-  }
 
-
-  /* v22 PC EQUALIZER DIRECT BEHAVIOR PORT */
-  #mffApp .mff-eq-bars{
-    height:132px!important;
-    align-items:end!important;
-    gap:7px!important;
-  }
-
-  #mffApp .mff-eq-bars i{
-    animation:none!important;
-    transition:
-      height 110ms cubic-bezier(.22,.61,.36,1),
-      opacity 110ms linear,
-      filter 110ms linear!important;
-    min-height:14px!important;
-    max-height:112px!important;
-    will-change:height,opacity,filter!important;
-  }
-
-  html[data-mff-mobile-eq-engine="pc-direct-loop-v22"] #mffApp .mff-eq{
-    border-color:rgba(22,255,243,.42)!important;
-  }
-
-  html[data-mff-mobile-eq-engine="pc-direct-loop-v22"] #mffApp .mff-eq-bars i{
-    box-shadow:
-      0 0 10px rgba(22,255,243,.16),
-      0 0 10px rgba(255,61,187,.12)!important;
+  /* v24 BOOST METER HEADROOM FIX */
+  html[data-mff-mobile-eq-engine] #mffApp{
+    --mff-meter-max-headroom:.84;
   }
 
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT -->
-<script id="strictMobileFrontendPurgeV22Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX -->
+<script id="strictMobileFrontendPurgeV24Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -525,6 +467,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var pcEqDirectBars=[];
   var pcEqDirectPhase=0;
   var pcEqDirectLastLevel=0.18;
+  var mffCleanEqValues=[];
+  var mffCleanEqPhase=0;
+  var mffCleanEqLoop=0;
   var BOOST_GAINS=[1.00,1.14,1.31,1.52];
   var RAMP_UP=0.38;
   var RAMP_DOWN=0.26;
@@ -733,7 +678,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v22</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v24</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -1006,9 +951,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return 14+((waveA*68)+(waveB*18))*contour*intensity;
   }
 
-  function pcPxToPercent(px){
-    return pcClamp(px,12,112);
-  }
+  /* v23 removed old mobile EQ helper: pcPxToPercent */
+
 
   function pcSetSideMeterFromPercent(valuePercent){
     var next=(pcSmoothMeter*.58)+(pcClamp(valuePercent,12,98)*.42);
@@ -1033,98 +977,150 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-  function pcEqDirectClamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  /* v23 removed old mobile EQ helper: pcEqDirectClamp */
 
-  function pcEqDirectEnsure(eqBars){
-    if(!pcEqDirectBars.length || pcEqDirectBars.length!==eqBars.length){
-      pcEqDirectBars=new Array(eqBars.length).fill(26);
+
+  /* v23 removed old mobile EQ helper: pcEqDirectEnsure */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectFallbackValue */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectWriteBars */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectFallback */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectFromAnalyser */
+
+
+
+
+  function mffClamp(v,min,max){return Math.max(min,Math.min(max,v));}
+
+  function mffBoostVisualOffset(){
+    // Boost darf Meter nicht auf Anschlag drücken.
+    // Nur kleine optische Energieanhebung mit Headroom.
+    return (boostStage||0)*0.014;
+  }
+
+  function mffMeterHeadroom(v){
+    // harter Headroom, damit BST 3 weiter Bewegung zulässt.
+    return mffClamp(v,0.08,0.84);
+  }
+
+
+  function mffCleanEqBars(){
+    return qa('#mffEqBars i');
+  }
+
+  function mffCleanEqEnsure(bars){
+    if(!mffCleanEqValues.length || mffCleanEqValues.length!==bars.length){
+      mffCleanEqValues=new Array(bars.length).fill(.28);
     }
   }
 
-  function pcEqDirectFallbackValue(index,total,playing,boost){
-    var half=Math.max(1,Math.floor(total/2));
-    var mirror=index<half?index:(total-1-index);
-    var pos=mirror/Math.max(1,half-1);
-
-    /*
-      PC-artiger Fallback:
-      Keine Zufallswerte.
-      Gespiegelte Wellen, träge, Bass/Mitte stärker.
-    */
-    var t=pcEqDirectPhase;
-    var waveA=Math.abs(Math.sin(t + mirror*0.31));
-    var waveB=Math.abs(Math.sin(t*0.63 + mirror*0.19));
-    var waveC=Math.abs(Math.sin(t*0.29 + mirror*0.47));
-    var contour=1.18-(pos*0.38);
-    var energy=(playing?1.0:0.38)+(boost||0)*0.075;
-
-    return pcEqDirectClamp(15 + ((waveA*60)+(waveB*21)+(waveC*8))*contour*energy, 14, 112);
+  function mffCleanEqReadAnalyser(){
+    try{
+      if(audioGraph && audioGraph.ok && audioGraph.analyser && audioGraph.freqData){
+        audioGraph.analyser.getByteFrequencyData(audioGraph.freqData);
+        var peak=0;
+        for(var i=0;i<audioGraph.freqData.length;i++){
+          if((audioGraph.freqData[i]||0)>peak) peak=audioGraph.freqData[i]||0;
+        }
+        if(peak>8) return audioGraph.freqData;
+      }
+    }catch(e){}
+    return null;
   }
 
-  function pcEqDirectWriteBars(eqBars, values, boost, inertia){
-    pcEqDirectEnsure(eqBars);
-    var peak=0;
-    for(var i=0;i<eqBars.length;i++){
-      var target=pcEqDirectClamp(values[i]||14,14,112);
-      peak=Math.max(peak,target);
-      var prev=pcEqDirectBars[i]||target;
-      var next=(prev*inertia)+(target*(1-inertia));
-      pcEqDirectBars[i]=next;
-
-      eqBars[i].style.height=next.toFixed(1)+'px';
-      eqBars[i].style.opacity=(0.50+Math.min(1,next/112)*0.48).toFixed(2);
-      eqBars[i].style.filter='saturate('+(1+(boost||0)*0.08).toFixed(2)+') brightness('+(1+Math.min(1,next/112)*0.035).toFixed(2)+')';
-    }
-    return peak;
-  }
-
-  function pcEqDirectFallback(eqBars,playing,boost){
-    pcEqDirectPhase += playing ? 0.115 : 0.055;
-    var values=[];
-    for(var i=0;i<eqBars.length;i++){
-      values.push(pcEqDirectFallbackValue(i,eqBars.length,playing,boost));
-    }
-    return pcEqDirectWriteBars(eqBars,values,boost,0.64);
-  }
-
-  function pcEqDirectFromAnalyser(eqBars,data,boost){
-    var halfBars=Math.max(1,Math.floor(eqBars.length/2));
-    var analysisWindow=Math.max(8,Math.floor(data.length*0.72));
-    var slice=Math.max(1,Math.floor(analysisWindow/halfBars));
+  function mffCleanEqTargetsFromAnalyser(data,count,boost){
+    var half=Math.max(1,Math.floor(count/2));
+    var analysisWindow=Math.max(8,Math.floor(data.length*.72));
+    var slice=Math.max(1,Math.floor(analysisWindow/half));
     var halfValues=[];
     var globalMax=0;
 
-    for(var i=0;i<halfBars;i++){
-      var total=0;
-      var count=0;
-      var start=Math.floor(Math.pow(i/Math.max(1,halfBars-1),1.65)*Math.max(1,analysisWindow-slice));
+    for(var i=0;i<half;i++){
+      var total=0,c=0;
+      var start=Math.floor(Math.pow(i/Math.max(1,half-1),1.65)*Math.max(1,analysisWindow-slice));
       var end=Math.min(analysisWindow,start+slice);
-
       for(var j=start;j<end;j++){
         var v=data[j]||0;
-        total+=v;
-        count++;
+        total+=v;c++;
       }
-
-      var avg=count?(total/count):0;
+      var avg=c?total/c:0;
       globalMax=Math.max(globalMax,avg);
-
-      var shaped=Math.pow(avg/255,0.72);
-      var contour=1.16-((i/Math.max(1,halfBars-1))*0.36);
-      var px=15+(shaped*contour*96)+(boost||0)*2.4;
-      halfValues.push(pcEqDirectClamp(px,14,112));
+      var shaped=Math.pow(avg/255,.72);
+      var contour=1.15-(i/Math.max(1,half-1))*.34;
+      halfValues.push(mffClamp(.16 + shaped*contour*1.04 + (boost||0)*.010,.14,.88));
     }
 
-    var values=[];
-    for(var b=0;b<eqBars.length;b++){
-      var mirror=b<halfBars?b:(eqBars.length-1-b);
-      values.push(halfValues[Math.min(mirror,halfValues.length-1)]||14);
+    var targets=[];
+    for(var b=0;b<count;b++){
+      var mirror=b<half?b:(count-1-b);
+      targets.push(halfValues[Math.min(mirror,halfValues.length-1)]||.16);
+    }
+    return {targets:targets, level:mffClamp(globalMax/255,.12,.98), mode:'real'};
+  }
+
+  function mffCleanEqTargetsSynthetic(count,playing,boost){
+    var half=Math.max(1,Math.floor(count/2));
+    var targets=[];
+    var energy=(playing?1:.42)+(boost||0)*.018;
+    var peak=.16;
+    mffCleanEqPhase += playing ? .105 : .045;
+
+    for(var i=0;i<count;i++){
+      var mirror=i<half?i:(count-1-i);
+      var pos=mirror/Math.max(1,half-1);
+      var waveA=(Math.sin(mffCleanEqPhase + mirror*.31)+1)/2;
+      var waveB=(Math.sin(mffCleanEqPhase*.61 + mirror*.19)+1)/2;
+      var waveC=(Math.sin(mffCleanEqPhase*.27 + mirror*.43)+1)/2;
+      var contour=1.12-pos*.32;
+      var value=mffClamp(.15 + (waveA*.52 + waveB*.20 + waveC*.07)*contour*energy,.14,.84);
+      targets.push(value);
+      peak=Math.max(peak,value);
+    }
+    return {targets:targets, level:peak, mode:'hybrid'};
+  }
+
+  function mffCleanEqRender(playing){
+    var bars=mffCleanEqBars();
+    if(!bars.length) return .14;
+
+    mffCleanEqEnsure(bars);
+    var boost=boostStage||0;
+    var data=mffCleanEqReadAnalyser();
+    var pack=data
+      ? mffCleanEqTargetsFromAnalyser(data,bars.length,boost)
+      : mffCleanEqTargetsSynthetic(bars.length,playing,boost);
+
+    var peak=.14;
+    for(var i=0;i<bars.length;i++){
+      var prev=mffCleanEqValues[i]||.22;
+      var target=pack.targets[i]||.16;
+      var next=(prev*.66)+(target*.34);
+      mffCleanEqValues[i]=next;
+      peak=Math.max(peak,next);
+
+      bars[i].style.setProperty('--mff-eq-scale',next.toFixed(3));
+      bars[i].style.setProperty('--mff-eq-opacity',(0.48+next*.50).toFixed(3));
+      bars[i].style.transform='scaleY('+next.toFixed(3)+')';
+      bars[i].style.opacity=(0.48+next*.50).toFixed(3);
     }
 
-    return {
-      peak: pcEqDirectWriteBars(eqBars,values,boost,0.58),
-      globalMax: globalMax
-    };
+    var app=q('#mffApp');
+    if(app){
+      app.setAttribute('data-mff-eq-engine','clean-v23');
+      app.setAttribute('data-mff-meter-mode',pack.mode==='real'?'clean-eq-real-v23':'clean-eq-hybrid-v23');
+    }
+
+    var bottomLevel=mffMeterHeadroom((peak*.74)+mffBoostVisualOffset());
+    updateBottomCenterOutSegments(bottomLevel,boost);
+    document.documentElement.style.setProperty('--mff-level',bottomLevel.toFixed(3));
+    return bottomLevel;
   }
 
 
@@ -1133,9 +1129,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(!bars.length) return;
     var n=bars.length;
     var half=Math.floor(n/2);
-    var active=Math.max(1,Math.min(half,Math.round(level*half)));
+    var active=Math.max(1,Math.min(half-2,Math.round(Math.min(level,.84)*half)));
     var pulse=(Math.sin(Date.now()/210)+1)/2;
-    var boosted=(boost||0)*0.06;
+    var boosted=(boost||0)*0.018;
 
     for(var i=0;i<n;i++){
       var isLeft=i<half;
@@ -1151,57 +1147,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
   }
 
-  function forceEqVisibleMotion(eqBars, playing, boost){
-    // Sicherheitsnetz: wenn echte Daten schwach sind, bewegt sich der EQ trotzdem sichtbar,
-    // aber geglättet und PC-artig, nicht flackernd.
-    pcEqPhase += 0.115;
-    if(!pcEqSmoothBars.length || pcEqSmoothBars.length!==eqBars.length){
-      pcEqSmoothBars=new Array(eqBars.length).fill(28);
-    }
-    var half=Math.max(1,Math.floor(eqBars.length/2));
-    var intensity=(playing?1.0:0.42)+(boost||0)*0.07;
-    var peak=0;
+  /* v23 removed old mobile EQ helper: forceEqVisibleMotion */
 
-    for(var i=0;i<eqBars.length;i++){
-      var mirror=i<half?i:(eqBars.length-1-i);
-      var pos=mirror/Math.max(1,half-1);
-      var bassWave=Math.abs(Math.sin(pcEqPhase + mirror*0.33));
-      var slowWave=Math.abs(Math.sin(pcEqPhase*0.47 + mirror*0.19));
-      var contour=1.18-(pos*0.34);
-      var target=16+((bassWave*62)+(slowWave*22))*contour*intensity;
-      target=Math.max(14,Math.min(112,target));
-      peak=Math.max(peak,target);
-      var prev=pcEqSmoothBars[i]||target;
-      var next=(prev*0.70)+(target*0.30);
-      pcEqSmoothBars[i]=next;
-      eqBars[i].style.height=next.toFixed(1)+'px';
-      eqBars[i].style.opacity=(0.54+Math.min(1,next/112)*0.42).toFixed(2);
-      eqBars[i].style.filter='saturate('+(1+(boost||0)*0.09).toFixed(2)+')';
-    }
-    return Math.max(.12,Math.min(.96,peak/112));
-  }
 
 
   function syntheticMeterMotion(playing,reason){
-    var eqBars=qa('#mffEqBars i');
-    var app=q('#mffApp');
-    var boost=(boostStage||0);
-
-    if(app){
-      app.setAttribute('data-mff-meter-mode','pc-direct-hybrid-v22');
-      app.setAttribute('data-mff-meter-energy',playing?'normal':'idle');
-    }
-
-    var peak=pcEqDirectFallback(eqBars,playing,boost);
-    var targetLevel=pcEqDirectClamp((peak/112)+(boost*0.025),0.10,0.96);
-    pcEqDirectLastLevel=(pcEqDirectLastLevel*0.62)+(targetLevel*0.38);
-
-    pcSmoothMeter=(pcSmoothMeter*0.62)+((pcEqDirectLastLevel*98)*0.38);
-    var bottomLevel=pcEqDirectClamp(pcSmoothMeter/98,0.10,0.96);
-    updateBottomCenterOutSegments(bottomLevel,boost);
-
-    setAnalyserMode('pc-direct-hybrid-v22');
-    return bottomLevel;
+    return mffCleanEqRender(!!playing);
   }
 
 
@@ -1213,22 +1164,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var attrPlaying=document.documentElement.getAttribute('data-mff-playing')==='1';
     var audioPlaying=!!(audio && !audio.paused && !audio.ended);
     var playing=attrPlaying || audioPlaying;
-
-    try{
-      var level=updateEqFromAnalyser(audioGraph,playing);
-      document.documentElement.style.setProperty('--mff-level',Math.max(.08,Math.min(.96,level)).toFixed(3));
-      pcMobileEqLastTick=Date.now();
-    }catch(err){
-      var level2=syntheticMeterMotion(playing,'pc-hybrid');
-      document.documentElement.style.setProperty('--mff-level',Math.max(.08,Math.min(.96,level2)).toFixed(3));
-    }
+    mffCleanEqRender(playing);
+    pcMobileEqLastTick=Date.now();
   }
 
   function startPcMobileEqTimer(){
     if(pcMobileEqTimer) return;
     pcMobileEqTimer=window.setInterval(pcMobileEqTimerTick,110);
     pcMobileEqTimerTick();
-    document.documentElement.setAttribute('data-mff-mobile-eq-engine','pc-direct-loop-v22');
+    document.documentElement.setAttribute('data-mff-mobile-eq-engine','clean-eq-single-loop-v23');
   }
 
 
@@ -1239,42 +1183,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function updateEqFromAnalyser(graph,playing){
-    var eqBars=qa('#mffEqBars i');
-    var app=q('#mffApp');
-    var boost=(boostStage||0);
-    var hasAnalyser=graph&&graph.ok&&graph.analyser&&graph.freqData;
-
-    if(!hasAnalyser){
-      return syntheticMeterMotion(playing,'pc-direct-hybrid-v22');
-    }
-
-    graph.analyser.getByteFrequencyData(graph.freqData);
-    var result=pcEqDirectFromAnalyser(eqBars,graph.freqData,boost);
-
-    if(result.globalMax<10){ pcWeakFrameCounter++; } else { pcWeakFrameCounter=0; }
-
-    /*
-      Wenn Safari/iPhone keine echten Daten liefert:
-      Nicht Standbild, sondern PC-Direct-Hybrid.
-    */
-    if(pcWeakFrameCounter>3 || result.globalMax<3){
-      return syntheticMeterMotion(playing,'pc-direct-hybrid-v22');
-    }
-
-    if(app){
-      app.setAttribute('data-mff-meter-mode','pc-direct-real-v22');
-      app.setAttribute('data-mff-meter-energy',result.globalMax>55?'high':'normal');
-    }
-
-    var targetLevel=pcEqDirectClamp((result.peak/112)+(boost*0.02),0.10,0.96);
-    pcEqDirectLastLevel=(pcEqDirectLastLevel*0.58)+(targetLevel*0.42);
-    pcSmoothMeter=(pcSmoothMeter*0.58)+((pcEqDirectLastLevel*98)*0.42);
-
-    var bottomLevel=pcEqDirectClamp(pcSmoothMeter/98,0.10,0.96);
-    updateBottomCenterOutSegments(bottomLevel,boost);
-
-    setAnalyserMode('pc-direct-real-v22');
-    return bottomLevel;
+    return mffCleanEqRender(!!playing);
   }
 
   function animate(){

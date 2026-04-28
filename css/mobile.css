@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v22_PC_EQUALIZER_DIRECT_BEHAVIOR_PORT
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v22-pc-eq-direct-20260428-1735
-- v22: iPhone-EQ direkter PC-Verhaltensport.
+- Cache-Proof: smfp-v24-boost-headroom-20260428-1825
+- v24: Boost-Meter-Headroom-Fix.
 ============================================================
 */
 @media (min-width:761px){

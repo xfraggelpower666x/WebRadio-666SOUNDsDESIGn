@@ -1,0 +1,10 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX
+CACHE_TAG=smfp-v24-boost-headroom-20260428-1825
+
+FIX:
+- BST 3 darf Levelmeter nicht mehr auf Vollanschlag einfrieren.
+- Boost erhöht Meterenergie nur minimal.
+- Bottom-Segmentmeter behält Headroom.
+- EQ-Zielwerte bleiben unter Sättigung.
+- Meter bleiben bei Boost 1/2/3 dynamisch.
+- Worker/Wrangler/Desktop-Dateien unverändert.

@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v23 CLEAN EQ ENGINE PURGE REPLACE
+
+Zweck:
+- Kein weiteres Layer-Chaos.
+- Der alte Mobile-EQ wurde nicht mehr geflickt, sondern gezielt ersetzt.
+- Alte Hilfsfunktionen und alte CSS-Blöcke wurden entfernt, soweit eindeutig identifizierbar.
+- Es gibt nur noch eine Mobile-EQ-Renderlogik:
+  mffCleanEqRender()
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v23_CLEAN_EQ_ENGINE_PURGE_REPLACE.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v23_CLEAN_EQ_ENGINE_PURGE_REPLACE.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

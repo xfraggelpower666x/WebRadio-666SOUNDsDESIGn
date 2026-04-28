@@ -1,0 +1,20 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v24 BOOST METER HEADROOM FIX
+
+Zweck:
+- Bei BST 3 gingen die Meter auf Vollanschlag und bewegten sich nicht mehr.
+- Ursache: Boost wurde zu stark auf die Meter-Energie addiert.
+- v24 begrenzt die visuelle Boost-Kopplung und erhält Headroom.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

@@ -1,0 +1,13 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v23_CLEAN_EQ_ENGINE_PURGE_REPLACE
+CACHE_TAG=smfp-v23-clean-eq-purge-20260428-1815
+
+FIX:
+- Alte Mobile-EQ-Helfer wurden physisch entfernt, soweit eindeutig identifizierbar.
+- Alte EQ-Einstiegspunkte wurden ersetzt, nicht überlagert.
+- Der Timer-Tick ruft nur noch einen einzigen Clean-EQ-Renderer.
+- Alte v19-v22 EQ-CSS-Blöcke wurden entfernt, soweit eindeutig per Kommentar identifizierbar.
+- Ein einziger v23 EQ/Bottom-CSS-Block ist aktiv.
+- EQ wird per transform:scaleY(...) gesteuert.
+- Echte Analyserdaten bleiben bevorzugt.
+- Wenn keine echten Daten kommen, läuft ein glatter PC-artiger Hybrid.
+- Worker/Wrangler/Desktop-EQ bleiben unverändert.
