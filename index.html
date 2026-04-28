@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v24-boost-headroom-20260428-1825" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v24-boost-headroom-20260428-1825" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v24-boost-headroom-20260428-1825" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v24-boost-headroom-20260428-1825" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v24-boost-headroom-20260428-1825" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v24-boost-headroom-20260428-1825" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v25-boost-organic-20260428-1845" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v25-boost-organic-20260428-1845" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v25-boost-organic-20260428-1845" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v25-boost-organic-20260428-1845" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v25-boost-organic-20260428-1845" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v25-boost-organic-20260428-1845" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v24-boost-headroom-20260428-1825"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v25-boost-organic-20260428-1845"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX -->
-<style id="strictMobileFrontendPurgeV24Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER -->
+<style id="strictMobileFrontendPurgeV25Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -421,14 +421,27 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     --mff-meter-max-headroom:.84;
   }
 
+
+  /* v25 AUDIBLE BOOST + ORGANIC HYBRID METER */
+  html[data-mff-mobile-eq-engine="clean-organic-eq-v25"] #mffApp .mff-eq-bars i{
+    transition:
+      transform 128ms cubic-bezier(.20,.70,.28,1),
+      opacity 128ms linear,
+      filter 128ms linear!important;
+  }
+
+  html[data-mff-mobile-eq-engine="clean-organic-eq-v25"] #mffApp .mff-eq{
+    border-color:rgba(22,255,243,.46)!important;
+  }
+
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX -->
-<script id="strictMobileFrontendPurgeV24Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER -->
+<script id="strictMobileFrontendPurgeV25Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
@@ -470,9 +483,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var mffCleanEqValues=[];
   var mffCleanEqPhase=0;
   var mffCleanEqLoop=0;
-  var BOOST_GAINS=[1.00,1.14,1.31,1.52];
-  var RAMP_UP=0.38;
-  var RAMP_DOWN=0.26;
+  var BOOST_GAINS=[1.00,1.22,1.48,1.78];
+  var RAMP_UP=0.62;
+  var RAMP_DOWN=0.36;
 
   function ensureAudioGraph(){
     var audio=getAudio();
@@ -500,11 +513,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       analyser.maxDecibels=-18;
 
       var comp=ctx.createDynamicsCompressor();
-      comp.threshold.value=-7;
-      comp.knee.value=10;
-      comp.ratio.value=7;
-      comp.attack.value=0.004;
-      comp.release.value=0.22;
+      comp.threshold.value=-3.5;
+      comp.knee.value=14;
+      comp.ratio.value=3.6;
+      comp.attack.value=0.008;
+      comp.release.value=0.30;
 
       try{source.disconnect()}catch(e){}
       source.connect(gain);
@@ -568,6 +581,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         graph.gain.gain.cancelScheduledValues(now);
         graph.gain.gain.setValueAtTime(current,now);
         graph.gain.gain.linearRampToValueAtTime(target,now+ramp);
+        graph.gain.gain.setTargetAtTime(target,now+ramp,0.045);
         graph.lastGain=target;
       }catch(e){
         try{graph.gain.gain.setTargetAtTime(target,graph.ctx.currentTime,0.08)}catch(_){}
@@ -678,7 +692,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v24</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v25</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -1000,13 +1014,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function mffClamp(v,min,max){return Math.max(min,Math.min(max,v));}
 
   function mffBoostVisualOffset(){
-    // Boost darf Meter nicht auf Anschlag drücken.
-    // Nur kleine optische Energieanhebung mit Headroom.
-    return (boostStage||0)*0.014;
+    // Boost ist hörbar über WebAudio, visuell nur minimaler Offset.
+    return (boostStage||0)*0.008;
   }
 
   function mffMeterHeadroom(v){
-    // harter Headroom, damit BST 3 weiter Bewegung zulässt.
     return mffClamp(v,0.08,0.84);
   }
 
@@ -1054,36 +1066,76 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       globalMax=Math.max(globalMax,avg);
       var shaped=Math.pow(avg/255,.72);
       var contour=1.15-(i/Math.max(1,half-1))*.34;
-      halfValues.push(mffClamp(.16 + shaped*contour*1.04 + (boost||0)*.010,.14,.88));
+
+      // Boost darf Real-Meter nicht auf Anschlag drücken.
+      halfValues.push(mffClamp(.15 + shaped*contour*1.10 + (boost||0)*.006,.13,.88));
     }
 
     var targets=[];
     for(var b=0;b<count;b++){
       var mirror=b<half?b:(count-1-b);
-      targets.push(halfValues[Math.min(mirror,halfValues.length-1)]||.16);
+      targets.push(halfValues[Math.min(mirror,halfValues.length-1)]||.15);
     }
-    return {targets:targets, level:mffClamp(globalMax/255,.12,.98), mode:'real'};
+    return {targets:targets, level:mffClamp(globalMax/255,.12,.88), mode:'real'};
   }
 
   function mffCleanEqTargetsSynthetic(count,playing,boost){
     var half=Math.max(1,Math.floor(count/2));
     var targets=[];
-    var energy=(playing?1:.42)+(boost||0)*.018;
-    var peak=.16;
-    mffCleanEqPhase += playing ? .105 : .045;
+    var stageBoost=(boost||0);
+
+    /*
+      v25 Organic Hybrid:
+      Keine gleichförmige Sinus-Dauerschleife.
+      Kombination aus:
+      - Kick-Pulse
+      - Bass-Welle
+      - Mid-Groove
+      - kontrolliertem High-Flicker
+      - langsamer Phrase-Energie
+      - minimaler asymmetrischer Drift
+      Alles deterministisch/glatt, kein Zufallsflackern.
+    */
+    mffCleanEqPhase += playing ? (0.082 + stageBoost*0.004) : 0.032;
+
+    var t=mffCleanEqPhase;
+    var phrase=(Math.sin(t*0.071)+1)/2;
+    var phrase2=(Math.sin(t*0.037+1.7)+1)/2;
+    var kick=Math.pow((Math.sin(t*1.42)+1)/2,5.2);
+    var bass=(Math.sin(t*0.48+.4)+1)/2;
+    var groove=(Math.sin(t*0.91+1.2)+1)/2;
+    var air=(Math.sin(t*2.15+2.4)+1)/2;
+
+    var baseEnergy=(playing?0.34:0.18) + phrase*0.10 + phrase2*0.06 + stageBoost*0.010;
 
     for(var i=0;i<count;i++){
       var mirror=i<half?i:(count-1-i);
       var pos=mirror/Math.max(1,half-1);
-      var waveA=(Math.sin(mffCleanEqPhase + mirror*.31)+1)/2;
-      var waveB=(Math.sin(mffCleanEqPhase*.61 + mirror*.19)+1)/2;
-      var waveC=(Math.sin(mffCleanEqPhase*.27 + mirror*.43)+1)/2;
-      var contour=1.12-pos*.32;
-      var value=mffClamp(.15 + (waveA*.52 + waveB*.20 + waveC*.07)*contour*energy,.14,.84);
+
+      // Frequenzzonen: Bass links/center stärker, Mitte groovt, Höhen flimmern kontrolliert.
+      var zoneBass=Math.max(0,1-(pos/0.34));
+      var zoneMid=1-Math.abs(pos-0.46)/0.46;
+      zoneMid=Math.max(0,Math.min(1,zoneMid));
+      var zoneHigh=Math.max(0,(pos-0.55)/0.45);
+
+      var localDrift=(Math.sin(t*0.23 + i*0.67)+1)/2;
+      var micro=(Math.sin(t*1.83 + i*0.41)+1)/2;
+
+      var value=baseEnergy;
+      value += zoneBass*(bass*0.22 + kick*0.34);
+      value += zoneMid*(groove*0.24 + kick*0.10 + localDrift*0.08);
+      value += zoneHigh*(air*0.16 + micro*0.08);
+
+      // leichte Nicht-Perfekt-Symmetrie, aber weiterhin PC-artig gespiegelt.
+      value += (Math.sin(t*0.19 + i*0.29)*0.022);
+
+      // Headroom: Boost darf nicht sättigen.
+      value=mffClamp(value,0.13,0.82);
       targets.push(value);
-      peak=Math.max(peak,value);
     }
-    return {targets:targets, level:peak, mode:'hybrid'};
+
+    var peak=targets.reduce(function(a,b){return Math.max(a,b);},0.14);
+    return {targets:targets, level:peak, mode:'organic-hybrid'};
   }
 
   function mffCleanEqRender(playing){
@@ -1172,7 +1224,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(pcMobileEqTimer) return;
     pcMobileEqTimer=window.setInterval(pcMobileEqTimerTick,110);
     pcMobileEqTimerTick();
-    document.documentElement.setAttribute('data-mff-mobile-eq-engine','clean-eq-single-loop-v23');
+    document.documentElement.setAttribute('data-mff-mobile-eq-engine','clean-organic-eq-v25');
   }
 
 

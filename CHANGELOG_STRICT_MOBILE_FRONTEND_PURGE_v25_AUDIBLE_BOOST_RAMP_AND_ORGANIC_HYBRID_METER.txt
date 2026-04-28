@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v25 AUDIBLE BOOST RAMP AND ORGANIC HYBRID METER
+
+Zweck:
+- Boost wurde in v24 optisch korrekt angezeigt, war aber kaum hörbar.
+- Hybrid-Meterbewegung wirkte zu gleichförmig.
+- v25 trennt Audio-Boost und Meter-Boost sauber:
+  - Audio bekommt hörbar stärkere WebAudio-Gain-Stufen.
+  - Meter bekommen nur minimalen visuellen Offset.
+  - Hybrid-Motion wird organischer und weniger algorithmisch.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

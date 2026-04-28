@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v24_BOOST_METER_HEADROOM_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v24-boost-headroom-20260428-1825
-- v24: Boost-Meter-Headroom-Fix.
+- Cache-Proof: smfp-v25-boost-organic-20260428-1845
+- v25: hörbarer Boost-Ramp + organischer Hybrid-Meter.
 ============================================================
 */
 @media (min-width:761px){
