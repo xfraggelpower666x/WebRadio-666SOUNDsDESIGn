@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v19_PC_EQ_TIMER_ENGINE_HARD_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v20_PC_EQ_BEHAVIOR_NO_FLICKER
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v19-pceqtimer-20260428-1410
-- v19: PC-artige EQ-/Meter-Timer-Engine für iPhone.
+- Cache-Proof: smfp-v20-pceq-noflicker-20260428-1425
+- v20: PC-EQ-Verhalten ohne Flicker/Doppelengine.
 ============================================================
 */
 @media (min-width:761px){

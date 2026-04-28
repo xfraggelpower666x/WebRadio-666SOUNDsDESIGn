@@ -1,0 +1,15 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v20_PC_EQ_BEHAVIOR_NO_FLICKER
+CACHE_TAG=smfp-v20-pceq-noflicker-20260428-1425
+
+FIX:
+- v19 war falsch: Timer + RAF schrieben gleichzeitig auf dieselben Bars.
+- Das erzeugte audioreaktives Flackern statt Equalizer-Verhalten.
+- v20 nutzt nur noch eine 110ms-PC-artige Meter-Schleife.
+- Fallback ist jetzt Desktop-artig:
+  mirroredIndex
+  waveA/waveB
+  contour
+  smoothMeter
+  keine Zufalls-/Flackerbewegung
+- echte Analyserdaten bleiben bevorzugt.
+- js/equalizer.js wurde gelesen, aber nicht verändert.
