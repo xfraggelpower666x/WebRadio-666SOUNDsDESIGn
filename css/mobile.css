@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v17_TRUE_MODAL_AND_LED_ROW_HARD_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v18_PC_METER_BEHAVIOR_PORT
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v17-modal-ledhardfix-20260428-1335
-- v17: History echtes Modal + sichtbare Boost LEDs.
+- Cache-Proof: smfp-v18-pcmeterbehavior-20260428-1355
+- v18: iPhone-Meterverhalten an PC-Visualizer-Algorithmus angepasst.
 ============================================================
 */
 @media (min-width:761px){
