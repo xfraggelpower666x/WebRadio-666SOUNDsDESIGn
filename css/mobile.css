@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v25_AUDIBLE_BOOST_RAMP_AND_ORGANIC_HYBRID_METER
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v26_PC_EQ_CODE_MATCH_NO_LAYER
 GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v25-boost-organic-20260428-1845
-- v25: hörbarer Boost-Ramp + organischer Hybrid-Meter.
+- Cache-Proof: smfp-v26-pceq-match-20260428-1910
+- v26: PC-EQ-Code-Match ohne neue Layer.
 ============================================================
 */
 @media (min-width:761px){

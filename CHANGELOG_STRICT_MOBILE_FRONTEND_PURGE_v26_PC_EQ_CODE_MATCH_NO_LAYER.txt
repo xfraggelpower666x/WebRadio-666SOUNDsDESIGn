@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v26 PC EQ CODE MATCH NO LAYER
+
+Zweck:
+- v25 bewegte sich zwar, wirkte aber künstlich/gleichförmig.
+- User-Hinweis: PC-Player wirkt organisierter und echter.
+- v26 ersetzt vorhandene Clean-EQ-Funktionen direkt.
+- Kein neues Layern, kein zusätzlicher Timer, keine neuen Overlay-Regeln.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v26_PC_EQ_CODE_MATCH_NO_LAYER.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v26_PC_EQ_CODE_MATCH_NO_LAYER.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration
