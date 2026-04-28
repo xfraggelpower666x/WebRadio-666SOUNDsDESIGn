@@ -1,0 +1,20 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v16 TRUE HISTORY MODAL AND BOOST ROW FIX
+
+Zweck:
+- v15 History wirkte nicht wie echtes Overlay.
+- v15 Boost-LED-Zeile saß im Control-Grid und quetschte die Buttons.
+- v16 macht History zum echten fixed Modal.
+- v16 setzt Boost-LEDs in ein eigenes Panel unter den Controls.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- Stream-Routen
+- Root-Migration

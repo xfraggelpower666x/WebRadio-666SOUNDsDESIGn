@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v15_HISTORY_OVERLAY_BOTTOM_METER_BOOST_LED_ROW
-GEÄNDERT: 2026-04-27
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v16_TRUE_HISTORY_MODAL_AND_BOOST_ROW_FIX
+GEÄNDERT: 2026-04-28
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v15-history-meter-boostled-20260427-2225
-- History Overlay + horizontales Bottom-Meter + Boost LED Row.
+- Cache-Proof: smfp-v16-historymodal-boostrow-20260428-0001
+- v16: echtes History Modal + separate Boost-Zeile.
 ============================================================
 */
 @media (min-width:761px){
