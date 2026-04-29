@@ -1,0 +1,9 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX
+CACHE_TAG=smfp-v28-main-led-play-20260429-1425
+
+FIX:
+- H/Hauptstream wird türkis, sobald Play aktiv ist und eine Audioquelle gesetzt ist.
+- Ohne eindeutiges Backup-Signal gilt Play+Source als Hauptstream aktiv.
+- B/Backup bleibt leer/weiß, solange kein Backup/Fallback erkannt wurde.
+- LED-Status wird jetzt auch bei Play/Playing/Pause/LoadedMetadata aktualisiert.
+- Worker/Wrangler/Desktop-Dateien unverändert.

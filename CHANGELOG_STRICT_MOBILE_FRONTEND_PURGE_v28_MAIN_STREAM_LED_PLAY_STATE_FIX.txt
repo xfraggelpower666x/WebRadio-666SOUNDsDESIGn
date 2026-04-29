@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v28 MAIN STREAM LED PLAY STATE FIX
+
+Zweck:
+- In v27 blieb H/Hauptstream pink/off, obwohl Play aktiv war.
+- Ursache: Stream-LED-Erkennung hing zu stark an Metadaten/URL-Text.
+- v28 koppelt H zusätzlich an Runtime-Status:
+  Play aktiv + Audioquelle gesetzt + kein Backup erkannt = Hauptstream OK.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v27_PANEL_LED_STATUS_ROW_TOOLTIP_STREAM_STATE
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v27-panel-leds-stream-20260429-1415
-- v27: eigene Panel-LED-Reihe unter Now Playing, Tooltip, Streamstatus, DJ-Status-Shift.
+- Cache-Proof: smfp-v28-main-led-play-20260429-1425
+- v28: Hauptstream-LED reagiert auf Play/Source-Zustand.
 ============================================================
 */
 @media (min-width:761px){
