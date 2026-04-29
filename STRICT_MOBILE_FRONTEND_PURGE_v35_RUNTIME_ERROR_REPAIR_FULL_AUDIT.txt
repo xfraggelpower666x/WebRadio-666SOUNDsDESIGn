@@ -1,0 +1,27 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT
+CACHE_TAG=smfp-v35-runtime-repair-audit-20260429-1725
+
+CODE-ANALYSE:
+- KRITISCH: META_ENDPOINTS enthält sichtbaren Text 'Quelle: /api/nowplaying' statt echter URL '/api/nowplaying'. Dadurch schlägt der erste Meta-Fetch sicher fehl.
+- KRITISCH: buildApp ruft setPlayerAddressLine auf, aber die Funktion wurde in v34 entfernt. Das erzeugt Runtime ReferenceError und kann Build/Audio/Meta abbrechen.
+- WARN: Referenz auf schedulePanelLedUpdate ohne Funktionsdefinition gefunden.
+- WARN: Referenz auf normalizePanelMeta ohne Funktionsdefinition gefunden.
+- WARN: Referenz auf mffTextOf ohne Funktionsdefinition gefunden.
+- AUFRÄUMEN: buildApp enthält doppelte Initialisierung setPanelLedsOffline/ensurePlayerUrlRow.
+
+KORREKTUREN:
+- META_ENDPOINTS repariert: echte URLs statt sichtbarem Labeltext
+- fehlende/entfernte setPlayerAddressLine als sicherer No-Op wiederhergestellt
+- ensurePlayerUrlRow gehärtet: eigene Link-Reihe ohne Meta-Überschreibung
+- applyMeta stabilisiert: v27-Verhalten + URL-Reihe, keine Quelle-Überschreibung
+- fetchMeta stabilisiert: Quelle ist Endpoint, nicht sichtbarer Text
+- LED-Logik korrigiert: v27-nah, aber Play/Source setzt S/H korrekt
+- buildApp bereinigt: doppelter Initialstatus entfernt, kein unsicherer Timeout auf alte Funktion
+- play() stabilisiert: Source setzen, LED-Status nach Play aktualisieren, Fehler sauber abfangen
+
+WICHTIG:
+- Keine neue UI-Schicht eingebaut.
+- Vorhandene kaputte Funktionen/Strings wurden korrigiert.
+- Meta-/Quelle-Zeile bleibt normal.
+- Player-URL bleibt eigene Link-Reihe.
+- Worker/Wrangler/Desktop-Dateien unverändert.

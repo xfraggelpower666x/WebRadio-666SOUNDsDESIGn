@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v35 RUNTIME ERROR REPAIR FULL AUDIT
+
+Zweck:
+- v34 zeigte kein Audio, Meta blieb Loading, LEDs leer.
+- Ursache im Code:
+  1. META_ENDPOINTS war kaputt: 'Quelle: /api/nowplaying' statt '/api/nowplaying'.
+  2. buildApp rief setPlayerAddressLine auf, obwohl die Funktion entfernt wurde.
+  3. doppelte Initialisierung und spätere Mischreste aus v27/v33.
+- v35 korrigiert diese Stellen direkt.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

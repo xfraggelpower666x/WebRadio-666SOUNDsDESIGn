@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v34_LED_META_RESTORE_FROM_V27_REFERENCE
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v34-led-meta-from-v27-20260429-1705
-- v34: LED- und Metadaten-Logik aus v27-Referenz wiederhergestellt.
+- Cache-Proof: smfp-v35-runtime-repair-audit-20260429-1725
+- v35: Runtime-Fehlerreparatur nach kompletter Codeanalyse.
 ============================================================
 */
 @media (min-width:761px){
