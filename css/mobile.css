@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v39_STATUS_CARD_ICON_LABEL_ALIGNMENT
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v40_STATUS_ROW_REDESIGN_CLEAN
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v39-card-icon-label-align-20260429-1650
-- v39: Statuskarten-Symbole und Überschriften sauber in einer Linie.
+- Cache-Proof: smfp-v40-status-row-redesign-clean-20260429-1715
+- v40: komplette Statuskarten-Reihe neu aufgebaut, alte fehlerhafte Card-CSS-Blöcke entfernt.
 ============================================================
 */
 @media (min-width:761px){

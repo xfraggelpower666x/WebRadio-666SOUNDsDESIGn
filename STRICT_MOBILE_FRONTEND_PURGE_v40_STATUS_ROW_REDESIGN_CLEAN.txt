@@ -1,0 +1,13 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v40_STATUS_ROW_REDESIGN_CLEAN
+CACHE_TAG=smfp-v40-status-row-redesign-clean-20260429-1715
+
+FIX:
+- Statuskarten-Reihe komplett neu aufgebaut statt weiter an verrutschtem Layout zu flicken.
+- Alte fehlerhafte Card-/DJ-Shift-CSS-Blöcke physisch entfernt:
+  v27 PANEL LED STATUS ROW + DJ STATUS SHIFT, v30 PANEL LED LOGIC + LABEL CENTER FIX, v31 CARD CENTER + PLAYER URL + LED FIX, v32 CARD GRID URL AND LED DOM FIX, v36 BRAND ROW + STREAM SWITCH + LED STOP FIX, v39 STATUS CARD ICON LABEL ALIGNMENT
+- Neue Kartenstruktur:
+  .mff-stat-head = Icon + Label exakt in einer Linie
+  .mff-stat-value = Wert mittig
+  .mff-stat-dots = Punkte unten mittig
+- LED-/Brand-/Stream-CSS aus entfernten Blöcken sauber in v40 gesammelt.
+- Worker/Wrangler/Desktop-Dateien unverändert.
