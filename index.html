@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v36_BRAND_ROW_STREAM_SWITCH_LED_STOP_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v35-runtime-repair-audit-20260429-1725" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v35-runtime-repair-audit-20260429-1725" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v35-runtime-repair-audit-20260429-1725" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v35-runtime-repair-audit-20260429-1725" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v35-runtime-repair-audit-20260429-1725" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v35-runtime-repair-audit-20260429-1725" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v36-brand-stream-ledstop-20260429-1810" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v36-brand-stream-ledstop-20260429-1810" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v36-brand-stream-ledstop-20260429-1810" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v36-brand-stream-ledstop-20260429-1810" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v36-brand-stream-ledstop-20260429-1810" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v36-brand-stream-ledstop-20260429-1810" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v35-runtime-repair-audit-20260429-1725"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v36-brand-stream-ledstop-20260429-1810"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT -->
-<style id="strictMobileFrontendPurgeV35Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v36_BRAND_ROW_STREAM_SWITCH_LED_STOP_FIX -->
+<style id="strictMobileFrontendPurgeV36Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -781,22 +781,22 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
   /* v33 METADATA SOURCE RESTORE + CLICKABLE PLAYER URL + LED RESET */
-  #mffApp .mff-player-url-row{
+  #mffApp .mff-brand-row{
     width:100%!important;min-height:31px!important;height:31px!important;border-radius:999px!important;
     border:1px solid rgba(22,255,243,.32)!important;background:rgba(5,10,28,.70)!important;
     box-shadow:0 0 14px rgba(22,255,243,.10), inset 0 0 16px rgba(255,255,255,.018)!important;
     display:flex!important;align-items:center!important;justify-content:center!important;padding:4px 12px!important;box-sizing:border-box!important;
   }
-  #mffApp .mff-player-url-row a{
+  #mffApp .mff-brand-row a{
     display:block!important;max-width:100%!important;color:var(--mff-cyan)!important;text-decoration:none!important;
     font-size:11px!important;font-weight:950!important;letter-spacing:.035em!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
     text-shadow:0 0 10px rgba(22,255,243,.45)!important;pointer-events:auto!important;
   }
-  #mffApp .mff-player-url-row a:active{color:var(--mff-pink)!important;}
+  #mffApp .mff-brand-row a:active{color:var(--mff-pink)!important;}
 
 
   /* v34 URL ROW ONLY — LED/META LOGIC RESTORED FROM v27 */
-  #mffApp .mff-player-url-row{
+  #mffApp .mff-brand-row{
     width:100%!important;
     min-height:31px!important;
     height:31px!important;
@@ -810,7 +810,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     padding:4px 12px!important;
     box-sizing:border-box!important;
   }
-  #mffApp .mff-player-url-row a{
+  #mffApp .mff-brand-row a{
     display:block!important;
     max-width:100%!important;
     color:var(--mff-cyan)!important;
@@ -824,16 +824,49 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 10px rgba(22,255,243,.45)!important;
     pointer-events:auto!important;
   }
-  #mffApp .mff-player-url-row a:active{color:var(--mff-pink)!important;}
+  #mffApp .mff-brand-row a:active{color:var(--mff-pink)!important;}
+
+
+  /* v36 BRAND ROW + STREAM SWITCH + LED STOP FIX */
+  #mffApp .mff-brand-row{
+    width:100%!important;min-height:31px!important;height:31px!important;border-radius:999px!important;
+    border:1px solid rgba(22,255,243,.32)!important;background:rgba(5,10,28,.70)!important;
+    box-shadow:0 0 14px rgba(22,255,243,.10), inset 0 0 16px rgba(255,255,255,.018)!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;padding:4px 12px!important;box-sizing:border-box!important;pointer-events:none!important;
+  }
+  #mffApp .mff-brand-row span{
+    color:var(--mff-cyan)!important;font-size:12px!important;font-weight:950!important;letter-spacing:.06em!important;
+    text-shadow:0 0 10px rgba(22,255,243,.45)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  }
+  #mffApp .mff-stream-switch{
+    width:100%!important;min-height:32px!important;height:32px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;padding:0 10px!important;box-sizing:border-box!important;
+  }
+  #mffApp .mff-stream-btn{
+    border-radius:999px!important;border:1px solid rgba(22,255,243,.35)!important;background:rgba(5,10,28,.68)!important;color:rgba(247,248,255,.82)!important;
+    font-weight:950!important;letter-spacing:.11em!important;font-size:10px!important;box-shadow:inset 0 0 12px rgba(22,255,243,.05)!important;pointer-events:auto!important;touch-action:manipulation!important;
+  }
+  #mffApp .mff-stream-btn.is-active{
+    color:var(--mff-cyan)!important;border-color:rgba(22,255,243,.85)!important;box-shadow:0 0 10px rgba(22,255,243,.30), inset 0 0 16px rgba(22,255,243,.08)!important;
+  }
+  #mffApp .mff-card > div{
+    display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;width:100%!important;
+  }
+  #mffApp .mff-card .mff-ico{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;width:16px!important;min-width:16px!important;height:16px!important;
+    line-height:1!important;transform:none!important;margin:0!important;padding:0!important;color:var(--mff-pink)!important;
+  }
+  #mffApp .mff-card:nth-child(3) .mff-ico{display:inline-flex!important;}
+  #mffApp .mff-card:nth-child(3) .mff-ico::before{content:'◖';color:var(--mff-pink)!important;font-size:16px!important;line-height:1!important;}
+  #mffApp .mff-card small{padding:0!important;margin:0!important;text-align:center!important;}
 
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT -->
-<script id="strictMobileFrontendPurgeV35Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v36_BRAND_ROW_STREAM_SWITCH_LED_STOP_FIX -->
+<script id="strictMobileFrontendPurgeV36Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v35_RUNTIME_ERROR_REPAIR_FULL_AUDIT';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v36_BRAND_ROW_STREAM_SWITCH_LED_STOP_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -997,14 +1030,19 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
   function setTransportState(state){
-    var app=q('#mffApp');
-    if(app)app.setAttribute('data-mff-transport-state',state);
-    qa('#mffApp .mff-controls button').forEach(function(b){b.classList.remove('mff-active','mff-transient')});
-    var key=state==='play'?'play':state==='pause'?'pause':'stop';
-    var btn=q('#mffApp .mff-controls [data-mff="'+key+'"]');
-    if(btn)btn.classList.add('mff-active');
+    transportState=state;
+    qa('.mff-control').forEach(function(btn){
+      var a=btn.getAttribute('data-action');
+      btn.classList.toggle('is-active',
+        (state==='play'&&a==='play')||
+        (state==='pause'&&a==='pause')||
+        (state==='stop'&&a==='stop')
+      );
+    });
     document.documentElement.setAttribute('data-mff-playing',state==='play'?'1':'0');
-    
+    if(state==='stop' || state==='pause'){
+      setTimeout(setPanelLedsOffline,60);
+    }
   }
 
   function flash(cmd){
@@ -1019,14 +1057,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     await resumeAudioGraph();
     var a=getAudio();
     try{
-      if(!a.getAttribute('src')) a.setAttribute('src',STREAM_URL);
+      var nextUrl=getStreamUrlForTarget(manualStreamTarget);
+      if(!a.getAttribute('src') || a.getAttribute('src')!==nextUrl) a.setAttribute('src',nextUrl);
       var r=a.play();
       if(r&&typeof r.catch==='function') r.catch(function(e){console.warn('[666 mobile play]',e)});
       setTransportState('play');
-      try{setPanelLedsFromMeta({source:STREAM_URL,dj:'DJ-666'});}catch(_){}
+      setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
     }catch(e){
       console.warn('[666 mobile play]',e);
       setTransportState('stop');
+      setPanelLedsOffline();
     }
   }
   function pause(){try{getAudio().pause()}catch(e){}setTransportState('pause')}
@@ -1102,7 +1142,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v35</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v36</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -1143,10 +1183,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     bindHistoryModalV17(app);
     bindPanelLedTips(app);
+    bindStreamSwitch(app);
     setTransportState('stop');
     applyBoostRamp(0);
     setPanelLedsOffline();
-    ensurePlayerUrlRow();
+    ensureBrandRow();
 
     setAnalyserMode('init');
     return app;
@@ -1327,6 +1368,61 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
+  var manualStreamTarget='main';
+
+  function getStreamUrlForTarget(target){
+    if(target==='backup'){
+      return (typeof BACKUP_STREAM_URL!=='undefined' && BACKUP_STREAM_URL) ? BACKUP_STREAM_URL : STREAM_URL;
+    }
+    return (typeof PRIMARY_STREAM_URL!=='undefined' && PRIMARY_STREAM_URL) ? PRIMARY_STREAM_URL : STREAM_URL;
+  }
+
+  function setManualStreamTarget(target){
+    manualStreamTarget=(target==='backup')?'backup':'main';
+    document.documentElement.setAttribute('data-manual-stream-target',manualStreamTarget);
+    updateStreamSwitchButtons();
+
+    var a=getAudio();
+    var wasPlaying=false;
+    try{wasPlaying=!!(a && !a.paused && !a.ended);}catch(e){}
+
+    try{
+      if(a){
+        a.pause();
+        a.removeAttribute('src');
+        a.load();
+        a.setAttribute('src',getStreamUrlForTarget(manualStreamTarget));
+      }
+    }catch(e){}
+
+    setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});
+    if(wasPlaying){setTimeout(play,120);}
+  }
+
+  function updateStreamSwitchButtons(){
+    qa('#mffStreamSwitch .mff-stream-btn').forEach(function(btn){
+      var target=btn.getAttribute('data-stream-target')||'main';
+      btn.classList.toggle('is-active',target===manualStreamTarget);
+      btn.setAttribute('aria-pressed',target===manualStreamTarget?'true':'false');
+    });
+  }
+
+  function bindStreamSwitch(app){
+    qa('#mffStreamSwitch .mff-stream-btn',app).forEach(function(btn){
+      if(btn.__mffStreamBound)return;
+      btn.__mffStreamBound=true;
+      var fn=function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        setManualStreamTarget(btn.getAttribute('data-stream-target')||'main');
+      };
+      btn.addEventListener('click',fn,{capture:true});
+      btn.addEventListener('touchend',fn,{passive:false,capture:true});
+    });
+    updateStreamSwitchButtons();
+  }
+
+
   function setPanelLed(name,state,info){
     var el=q('#mffPanelLedPanel [data-led="'+name+'"]');
     if(!el) return;
@@ -1387,11 +1483,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
   function inferActiveStream(meta){
+    if(manualStreamTarget==='backup') return 'backup';
     var text='';
     try{
       text=[
         document.documentElement.getAttribute('data-active-stream')||'',
         document.documentElement.getAttribute('data-stream-target')||'',
+        document.documentElement.getAttribute('data-active-stream-target')||'',
         meta&&meta.source||'',
         meta&&meta.stream||'',
         meta&&meta.stream_url||'',
@@ -1401,33 +1499,35 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       ].join(' ').toLowerCase();
     }catch(e){}
     if(/backup|8686|fallback|secondary/.test(text)) return 'backup';
-    if(/primary|haupt|main|666soundsdesign|stream/.test(text)) return 'main';
-    return 'unknown';
+    return 'main';
   }
 
   function setPanelLedsFromMeta(meta){
     setPanelLed('worker','ok','Mobile UI Runtime läuft');
 
-    var sourceOk=false;
     var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
+    var sourceOk=false;
     try{
       var a=getAudio();
       sourceOk=!!(a && (a.getAttribute('src') || a.src || a.currentSrc));
     }catch(e){}
-    setPanelLed('source',(sourceOk||playing)?'ok':'warn',(sourceOk||playing)?'Audioquelle gesetzt / Play aktiv':'keine Audioquelle erkannt');
+
+    setPanelLed('source',(playing && sourceOk)?'ok':'warn',(playing && sourceOk)?'Audioquelle läuft':'Streamquelle nicht aktiv');
 
     var metaOk=!!(meta && (meta.title || meta.artist || meta.dj || meta.bitrate || meta.listeners || meta.artwork));
-    setPanelLed('meta',metaOk?'ok':'warn',metaOk?'Metadaten empfangen':'Metadaten fehlen/leer');
+    setPanelLed('meta',metaOk?'ok':(playing?'warn':'off'),metaOk?'Metadaten empfangen':(playing?'Metadaten fehlen/leer':'noch keine Metadaten'));
 
     var active=inferActiveStream(meta);
-    if(active==='backup'){
-      setPanelLed('main','off','Hauptstream nicht aktiv');
-      setPanelLed('backup','ok','Backupstream aktiv');
-    }else if(active==='main' || sourceOk || playing){
-      setPanelLed('main','ok','Hauptstream aktiv/gesetzt');
-      setPanelLed('backup','off','Backupstream nicht aktiv');
+    if(playing && sourceOk){
+      if(manualStreamTarget==='backup' || active==='backup'){
+        setPanelLed('main','off','Hauptstream nicht aktiv');
+        setPanelLed('backup','ok','Backupstream aktiv');
+      }else{
+        setPanelLed('main','ok','Hauptstream aktiv');
+        setPanelLed('backup','off','Backupstream nicht aktiv');
+      }
     }else{
-      setPanelLed('main','warn','Streamzustand nicht eindeutig');
+      setPanelLed('main','off','Hauptstream nicht aktiv');
       setPanelLed('backup','off','Backupstream nicht aktiv');
     }
   }
@@ -1439,26 +1539,26 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   function setPanelLedsOffline(){
     setPanelLed('worker','ok','Mobile UI Runtime läuft');
-    setPanelLed('source','warn','Streamquelle noch nicht bestätigt');
+    setPanelLed('source','warn','Streamquelle nicht aktiv');
     setPanelLed('meta','off','noch keine Metadaten');
-    setPanelLed('main','off','Hauptstream nicht bestätigt');
+    setPanelLed('main','off','Hauptstream nicht aktiv');
     setPanelLed('backup','off','Backupstream nicht aktiv');
   }
 
 
   function setPlayerAddressLine(){
     // v35: sicherer No-Op. Die Playeradresse wird NICHT in die Meta-/Quelle-Zeile geschrieben.
-    ensurePlayerUrlRow();
+    ensureBrandRow();
   }
 
-  function ensurePlayerUrlRow(){
+  function ensureBrandRow(){
     var app=q('#mffApp');
     if(!app) return;
-    if(q('#mffPlayerUrlRow')) return;
+    if(q('#mffBrandRow')) return;
     var row=document.createElement('section');
-    row.className='mff-player-url-row';
-    row.id='mffPlayerUrlRow';
-    row.innerHTML='<a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer">webradio.666soundsdesign-broadcaster.com</a>';
+    row.className='mff-brand-row';
+    row.id='mffBrandRow';
+    row.innerHTML='<span>666SOUNDsDESIGn WebRadio</span>';
     var led=q('#mffPanelLedPanel');
     if(led && led.parentNode) led.parentNode.insertBefore(row,led);
   }
@@ -1501,7 +1601,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(cards[0]) cards[0].innerHTML=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / 250'):'0 / 250';
     if(cards[1]) cards[1].textContent=meta.bitrate||'Unknown';
     if(cards[2]) cards[2].innerHTML=normalizeDj(meta.dj);
-    ensurePlayerUrlRow();
+    ensureBrandRow();
   }
 
   async function tickMeta(){try{var meta=await fetchMeta();if(meta)applyMeta(meta)}catch(e){}}
