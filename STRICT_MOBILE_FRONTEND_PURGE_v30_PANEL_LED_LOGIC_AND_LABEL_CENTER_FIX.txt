@@ -1,0 +1,14 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v30_PANEL_LED_LOGIC_AND_LABEL_CENTER_FIX
+CACHE_TAG=smfp-v30-led-label-center-20260429-1510
+
+FIX:
+- DJ / STATUS Überschrift und DJ-Wert zentriert.
+- DJ-Icon in der Statuskarte ausgeblendet, damit nichts verdeckt.
+- Listener-Label auf LSTN gekürzt.
+- Panel-LED-Logik korrigiert:
+  W ok bei Runtime
+  S ok bei laufendem/gesetztem Stream
+  M ok bei sichtbarem NowPlaying oder Meta
+  H ok bei Play + Source, wenn kein Backup erkannt
+  B off, solange kein Backup erkannt
+- Ruhiger 3,5s LED-Poll ohne Audioevent-Hooks.

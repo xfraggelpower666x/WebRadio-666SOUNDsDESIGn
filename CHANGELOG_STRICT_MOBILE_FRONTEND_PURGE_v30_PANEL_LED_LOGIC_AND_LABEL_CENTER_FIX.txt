@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v30 PANEL LED LOGIC AND LABEL CENTER FIX
+
+Zweck:
+- DJ Status war optisch nicht sauber.
+- Listener-Label war zu lang.
+- Panel-LEDs zeigten trotz laufendem Player falsche Zustände.
+- v30 korrigiert LED-Status anhand der Runtime statt zu streng nach Metaobjekt.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v30_PANEL_LED_LOGIC_AND_LABEL_CENTER_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v30_PANEL_LED_LOGIC_AND_LABEL_CENTER_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration
