@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v32 CARD GRID URL AND LED DOM FIX
+
+Zweck:
+- Statuskarten sahen durcheinander/unförmig aus.
+- Quelle-Zeile zeigte immer noch /api/nowplaying.
+- LEDs funktionierten nicht zuverlässig.
+- v32 erzwingt Player-Adresse in der Quelle-Zeile und macht die LED-Logik DOM-basiert.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

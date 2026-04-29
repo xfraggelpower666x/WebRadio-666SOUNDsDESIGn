@@ -1,0 +1,14 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX
+CACHE_TAG=smfp-v32-card-url-leddom-20260429-1605
+
+FIX:
+- Statuskarten als einheitliches 3-Zeilen-Grid:
+  Label oben, Wert mittig, Punkte unten.
+- Player-Adresse wird hart in die Quelle-Zeile geschrieben:
+  Player: webradio.666soundsdesign-broadcaster.com
+- Quelle-Text wird auch nach Meta-Update erneut überschrieben.
+- LED-Logik DOM-basiert gehärtet:
+  sichtbarer Titel => Meta OK
+  sichtbare/gesetzte Quelle => Source OK
+  Play+Source ohne Backup => Hauptstream OK
+- Worker/Wrangler/Desktop-Dateien unverändert.

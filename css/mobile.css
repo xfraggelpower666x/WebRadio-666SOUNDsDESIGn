@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v31-card-url-led-20260429-1535
-- v31: Statuskarten zentriert, Player-Adresse in Quelle-Zeile, LED-Logik gehärtet.
+- Cache-Proof: smfp-v32-card-url-leddom-20260429-1605
+- v32: Karten-Grid, Player-URL-Zeile und DOM-basierte LED-Logik.
 ============================================================
 */
 @media (min-width:761px){

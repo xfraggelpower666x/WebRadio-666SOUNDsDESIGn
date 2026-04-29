@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v31-card-url-led-20260429-1535" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v31-card-url-led-20260429-1535" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v31-card-url-led-20260429-1535" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v31-card-url-led-20260429-1535" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v31-card-url-led-20260429-1535" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v31-card-url-led-20260429-1535" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v32-card-url-leddom-20260429-1605" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v32-card-url-leddom-20260429-1605" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v32-card-url-leddom-20260429-1605" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v32-card-url-leddom-20260429-1605" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v32-card-url-leddom-20260429-1605" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v32-card-url-leddom-20260429-1605" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v31-card-url-led-20260429-1535"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v32-card-url-leddom-20260429-1605"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX -->
-<style id="strictMobileFrontendPurgeV31Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX -->
+<style id="strictMobileFrontendPurgeV32Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -686,17 +686,110 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-overflow:ellipsis!important;
   }
 
+
+  /* v32 CARD GRID URL AND LED DOM FIX */
+  #mffApp .mff-cards{
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1.45fr!important;
+    gap:10px!important;
+    align-items:stretch!important;
+  }
+
+  #mffApp .mff-card{
+    min-height:80px!important;
+    height:80px!important;
+    display:grid!important;
+    grid-template-rows:20px 28px 12px!important;
+    align-items:center!important;
+    justify-items:center!important;
+    text-align:center!important;
+    padding:10px 8px 9px!important;
+    box-sizing:border-box!important;
+  }
+
+  #mffApp .mff-card > div{
+    grid-row:1!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+
+  #mffApp .mff-card .mff-ico{
+    flex:0 0 auto!important;
+    width:14px!important;
+    min-width:14px!important;
+    text-align:center!important;
+  }
+
+  #mffApp .mff-card small{
+    max-width:100%!important;
+    padding:0!important;
+    margin:0!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:10px!important;
+    line-height:1!important;
+    letter-spacing:.13em!important;
+  }
+
+  #mffApp .mff-card strong{
+    grid-row:2!important;
+    display:block!important;
+    width:100%!important;
+    padding:0!important;
+    margin:0!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:18px!important;
+    line-height:1.05!important;
+  }
+
+  #mffApp .mff-card .mff-dots,
+  #mffApp .mff-card > span:last-child{
+    grid-row:3!important;
+    align-self:end!important;
+    justify-self:center!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) .mff-ico{
+    display:none!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) strong{
+    font-size:16px!important;
+  }
+
+  #mffApp .mff-now #mffArtist,
+  #mffApp .mff-now #mffSource,
+  #mffApp .mff-now .mff-artist,
+  #mffApp .mff-now .mff-source,
+  #mffApp .mff-now [data-source-line]{
+    color:var(--mff-cyan)!important;
+    font-weight:950!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX -->
-<script id="strictMobileFrontendPurgeV31Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX -->
+<script id="strictMobileFrontendPurgeV32Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
-  var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
+  var META_ENDPOINTS=['Player: webradio.666soundsdesign-broadcaster.com','/nowplaying','/meta','/status'];
   var HISTORY_ENDPOINTS=['/history','/api/history','/recent','/api/recent'];
   var localHistory=[];
   var lastHistoryTitle='';
@@ -949,7 +1042,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v31</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v32</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -1273,10 +1366,15 @@ setAnalyserMode('init');
   function mffIsPlayingRuntime(){
     if(document.documentElement.getAttribute('data-mff-playing')==='1') return true;
     try{
+      var playBtn=q('[data-mff-action="play"], #mffPlay, .mff-play, button[aria-label*="Play" i]');
+      if(playBtn && playBtn.classList && playBtn.classList.contains('active')) return true;
+    }catch(e){}
+    try{
       var a=getAudio();
       if(a && !a.paused && !a.ended) return true;
     }catch(e){}
-    return false;
+    // v32: Wenn der sichtbare Playbutton pink/aktiv wirkt und ein Titel läuft, behandeln wir Runtime als aktiv.
+    return mffHasVisibleNowPlaying();
   }
 
   function mffHasVisibleNowPlaying(){
@@ -1290,24 +1388,26 @@ setAnalyserMode('init');
 
     if(!txt) return false;
     if(/loading stream metadata|metadaten werden geladen|metadata werden geladen|unknown|unbekannt|offline|not playing/i.test(txt)) return false;
-
-    // v31: Jeder sichtbare Track-/Titelrest zählt als Meta, auch wenn er durch Marquee abgeschnitten ist.
+    // abgeschnittener Titel wie "frag" reicht als sichtbar laufender NowPlaying-Text.
     return txt.length>=2;
   }
 
   function mffHasRuntimeSource(){
-    var playing=mffIsPlayingRuntime();
-    if(playing) return true;
+    if(mffIsPlayingRuntime()) return true;
     try{
       var a=getAudio();
       if(a && (a.currentSrc || a.src || a.getAttribute('src'))) return true;
     }catch(e){}
-    var srcText=[
+    var txt=[
       document.documentElement.getAttribute('data-active-stream')||'',
       document.documentElement.getAttribute('data-stream-target')||'',
-      document.documentElement.getAttribute('data-active-stream-target')||''
+      document.documentElement.getAttribute('data-active-stream-target')||'',
+      mffTextOf('#mffArtist'),
+      mffTextOf('#mffSource'),
+      mffTextOf('.mff-artist'),
+      mffTextOf('.mff-source')
     ].join(' ');
-    return !!srcText.trim();
+    return /player:|webradio|stream|666soundsdesign|idjstream|api\/nowplaying/i.test(txt);
   }
 
   function mffIsBackupRuntime(meta){
@@ -1342,20 +1442,19 @@ setAnalyserMode('init');
     meta=normalizePanelMeta(meta||{});
 
     var playing=mffIsPlayingRuntime();
-    var sourceOk=mffHasRuntimeSource() || playing;
-    var visibleMeta=mffHasVisibleNowPlaying();
-    var metaOk=!!(meta && meta.__hasMeta) || visibleMeta;
+    var sourceOk=mffHasRuntimeSource();
+    var metaOk=!!(meta && meta.__hasMeta) || mffHasVisibleNowPlaying();
     var backup=mffIsBackupRuntime(meta);
 
     setPanelLed('worker','ok','Mobile UI Runtime läuft');
     setPanelLed('source',sourceOk?'ok':'warn',sourceOk?'Streamquelle aktiv/gesetzt':'keine Streamquelle erkannt');
-    setPanelLed('meta',metaOk?'ok':(playing?'warn':'off'),metaOk?'NowPlaying/Metadaten erkannt':(playing?'Metadaten noch nicht verwertbar':'noch keine Metadaten'));
+    setPanelLed('meta',metaOk?'ok':(playing?'warn':'off'),metaOk?'sichtbarer NowPlaying/Metadaten erkannt':(playing?'Metadaten noch nicht verwertbar':'noch keine Metadaten'));
 
     if(backup){
       setPanelLed('main','off','Hauptstream nicht aktiv');
       setPanelLed('backup','ok','Backupstream aktiv');
     }else{
-      setPanelLed('main',(playing || sourceOk)?'ok':'off',(playing || sourceOk)?'Hauptstream aktiv/gesetzt':'Hauptstream nicht aktiv');
+      setPanelLed('main',(playing && sourceOk)?'ok':(sourceOk?'warn':'off'),(playing&&sourceOk)?'Hauptstream aktiv':'Hauptstream nicht aktiv');
       setPanelLed('backup','off','Backupstream nicht aktiv');
     }
   }
@@ -1400,12 +1499,24 @@ setAnalyserMode('init');
 
   function setPlayerAddressLine(){
     var label='Player: webradio.666soundsdesign-broadcaster.com';
-    ['#mffArtist','#mffSource','.mff-artist','.mff-source'].forEach(function(sel){
+    ['#mffArtist','#mffSource','.mff-artist','.mff-source','[data-source-line]','[data-now-source]'].forEach(function(sel){
       try{
-        var el=q(sel);
-        if(el) el.textContent=label;
+        qa(sel).forEach(function(el){
+          el.textContent=label;
+          el.setAttribute('data-source-line','player-url');
+        });
       }catch(e){}
     });
+    try{
+      qa('#mffApp *').forEach(function(el){
+        if(!el || !el.childNodes || el.children.length>0) return;
+        var t=String(el.textContent||'');
+        if(/Quelle:\s*\/api\/nowplaying|Quelle:\s*\/streammeta|\/api\/nowplaying|stream metadata/i.test(t)){
+          el.textContent=label;
+          el.setAttribute('data-source-line','player-url');
+        }
+      });
+    }catch(e){}
   }
 
 
@@ -1413,6 +1524,7 @@ setAnalyserMode('init');
     setPlayerAddressLine();
     if(!meta){setPanelLedsOffline();return;}
     schedulePanelLedUpdate(meta,120);
+    setTimeout(setPlayerAddressLine,250);
     pushLocalHistory(meta);
     setMarqueeTitle(meta.title||'Metadaten werden geladen ...');
     var h2=q('#mffApp .mff-title h2');
