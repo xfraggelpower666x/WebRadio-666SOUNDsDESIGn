@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v43_LOGO_VISIBLE_DJ_STATUS_REPAIR
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v43-logo-visible-dj-repair-20260429-2125
-- v43: Logo sichtbar im Playerbereich + DJ-Status-Icon repariert.
+- Cache-Proof: smfp-v42-logo-icon-fullpack-20260429-2035
+- v42: App/Icon + Header-Logo integriert.
 ============================================================
 */
 @media (min-width:761px){
