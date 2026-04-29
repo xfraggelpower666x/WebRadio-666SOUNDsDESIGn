@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v39 STATUS CARD ICON LABEL ALIGNMENT
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v39_STATUS_CARD_ICON_LABEL_ALIGNMENT.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v39_STATUS_CARD_ICON_LABEL_ALIGNMENT.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

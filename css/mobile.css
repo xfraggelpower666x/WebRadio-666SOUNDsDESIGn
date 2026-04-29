@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v38_TRANSPORT_BUTTON_STATE_HARD_BIND
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v39_STATUS_CARD_ICON_LABEL_ALIGNMENT
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v38-transport-hard-bind-20260429-1915
-- v38: Play/Pause/Stop aktive Buttonzustände hart gebunden.
+- Cache-Proof: smfp-v39-card-icon-label-align-20260429-1650
+- v39: Statuskarten-Symbole und Überschriften sauber in einer Linie.
 ============================================================
 */
 @media (min-width:761px){
