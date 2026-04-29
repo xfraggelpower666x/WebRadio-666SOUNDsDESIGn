@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v30_PANEL_LED_LOGIC_AND_LABEL_CENTER_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v30-led-label-center-20260429-1510
-- v30: Panel-LED-Logik, DJ-Zentrierung, Listener-Kürzel.
+- Cache-Proof: smfp-v31-card-url-led-20260429-1535
+- v31: Statuskarten zentriert, Player-Adresse in Quelle-Zeile, LED-Logik gehärtet.
 ============================================================
 */
 @media (min-width:761px){

@@ -1,0 +1,20 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v31 CARD CENTER PLAYER URL LED FIX
+
+Zweck:
+- Statuskarten wirkten unförmig.
+- Quelle-Zeile sollte Player-Adresse zeigen.
+- Panel-LEDs funktionierten noch nicht zuverlässig genug.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

@@ -1,0 +1,14 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v31_CARD_CENTER_PLAYER_URL_LED_FIX
+CACHE_TAG=smfp-v31-card-url-led-20260429-1535
+
+FIX:
+- Listener / Bitrate / DJ-Status Karten werden einheitlicher zentriert.
+- DJ-Status bleibt zentriert.
+- Quelle-Zeile zeigt Player-Adresse:
+  webradio.666soundsdesign-broadcaster.com
+- Panel-LED-Logik gehärtet:
+  S ok bei Runtime/Source
+  M ok bei sichtbarem NowPlaying
+  H ok bei Runtime/Source, solange kein Backup erkannt
+  B nur ok bei Backup/Fallback
+- Worker/Wrangler/Desktop-Dateien unverändert.
