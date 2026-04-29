@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v40_STATUS_ROW_REDESIGN_CLEAN" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v40-status-row-redesign-clean-20260429-1715" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v40-status-row-redesign-clean-20260429-1715" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v40-status-row-redesign-clean-20260429-1715" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v40-status-row-redesign-clean-20260429-1715" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v40-status-row-redesign-clean-20260429-1715" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v40-status-row-redesign-clean-20260429-1715" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v40-status-row-redesign-clean-20260429-1715"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v41-audio-interrupt-recovery-20260429-1935"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v40_STATUS_ROW_REDESIGN_CLEAN -->
-<style id="strictMobileFrontendPurgeV40Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX -->
+<style id="strictMobileFrontendPurgeV41Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -435,6 +435,350 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
 
+  /* v27 PANEL LED STATUS ROW + DJ STATUS SHIFT */
+  #mffApp .mff-panel-led-panel{
+    width:100%!important;
+    min-height:34px!important;
+    height:34px!important;
+    border-radius:20px!important;
+    border:1px solid rgba(22,255,243,.32)!important;
+    background:
+      linear-gradient(135deg,rgba(255,61,187,.045),rgba(22,255,243,.035)),
+      rgba(5,10,28,.78)!important;
+    box-shadow:
+      0 0 16px rgba(22,255,243,.10),
+      0 0 14px rgba(255,61,187,.06),
+      inset 0 0 18px rgba(255,255,255,.022)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    padding:5px 9px!important;
+    pointer-events:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  #mffApp .mff-panel-led{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:4px!important;
+    height:23px!important;
+    min-width:38px!important;
+    border:1px solid rgba(247,248,255,.18)!important;
+    border-radius:999px!important;
+    background:rgba(3,8,20,.52)!important;
+    color:rgba(247,248,255,.84)!important;
+    font-size:10px!important;
+    font-weight:950!important;
+    letter-spacing:.08em!important;
+    padding:0 7px!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  #mffApp .mff-panel-led i{
+    display:block!important;
+    width:9px!important;
+    height:9px!important;
+    min-width:9px!important;
+    border-radius:50%!important;
+    border:1px solid rgba(255,255,255,.72)!important;
+    background:transparent!important;
+    box-shadow:0 0 7px rgba(255,255,255,.55)!important;
+  }
+
+  #mffApp .mff-panel-led[data-state="ok"] i{
+    background:var(--mff-cyan)!important;
+    border-color:rgba(22,255,243,.95)!important;
+    box-shadow:0 0 8px rgba(22,255,243,.85),0 0 15px rgba(22,255,243,.35)!important;
+  }
+
+  #mffApp .mff-panel-led[data-state="warn"] i{
+    background:var(--mff-pink)!important;
+    border-color:rgba(255,61,187,.95)!important;
+    box-shadow:0 0 8px rgba(255,61,187,.82),0 0 15px rgba(255,61,187,.35)!important;
+  }
+
+  #mffApp .mff-panel-led[data-state="off"] i{
+    background:transparent!important;
+    border-color:rgba(255,255,255,.82)!important;
+    box-shadow:0 0 8px rgba(255,255,255,.58)!important;
+  }
+
+  #mffApp .mff-panel-led b{
+    display:block!important;
+    font-size:10px!important;
+    line-height:1!important;
+  }
+
+  #mffApp .mff-led-tip{
+    position:fixed!important;
+    z-index:2147483400!important;
+    display:none;
+    max-width:220px!important;
+    padding:8px 10px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(22,255,243,.42)!important;
+    background:rgba(3,8,20,.96)!important;
+    color:#fff!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+    box-shadow:0 0 18px rgba(22,255,243,.18),0 0 18px rgba(255,61,187,.12)!important;
+    pointer-events:none!important;
+  }
+
+  #mffApp .mff-cards{
+    grid-template-columns:0.72fr 0.72fr 1.56fr!important;
+  }
+
+  #mffApp .mff-card:nth-child(3){
+    padding-left:11px!important;
+    padding-right:9px!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) div{
+    display:grid!important;
+    grid-template-columns:22px minmax(0,1fr)!important;
+    column-gap:8px!important;
+    align-items:center!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) .mff-ico{
+    width:22px!important;
+    min-width:22px!important;
+    text-align:center!important;
+    justify-self:center!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) small{
+    padding-left:3px!important;
+    text-align:left!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) strong{
+    padding-left:22px!important;
+    text-align:left!important;
+    font-size:14px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+
+  /* v30 PANEL LED LOGIC + LABEL CENTER FIX */
+  #mffApp .mff-card:nth-child(1) small{
+    font-size:10px!important;
+    letter-spacing:.13em!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+
+  #mffApp .mff-card:nth-child(3){
+    text-align:center!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) div{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    justify-items:center!important;
+    align-items:center!important;
+    row-gap:4px!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) .mff-ico{
+    display:none!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) small{
+    width:100%!important;
+    padding-left:0!important;
+    text-align:center!important;
+    justify-self:center!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) strong{
+    width:100%!important;
+    padding-left:0!important;
+    text-align:center!important;
+    justify-self:center!important;
+    font-size:15px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+
+  /* v31 CARD CENTER + PLAYER URL + LED FIX */
+  #mffApp .mff-cards{
+    grid-template-columns:1fr 1fr 1.45fr!important;
+    gap:10px!important;
+    align-items:stretch!important;
+  }
+
+  #mffApp .mff-card{
+    min-height:78px!important;
+    height:78px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    padding:10px 7px!important;
+  }
+
+  #mffApp .mff-card div{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  #mffApp .mff-card .mff-ico{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:0!important;
+  }
+
+  #mffApp .mff-card small{
+    max-width:100%!important;
+    padding:0!important;
+    text-align:center!important;
+    justify-self:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:10px!important;
+    letter-spacing:.13em!important;
+  }
+
+  #mffApp .mff-card strong{
+    width:100%!important;
+    padding:0!important;
+    margin-top:7px!important;
+    text-align:center!important;
+    justify-self:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:17px!important;
+    line-height:1.05!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) .mff-ico{
+    display:none!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) strong{
+    font-size:15px!important;
+  }
+
+  #mffApp .mff-now .mff-artist,
+  #mffApp #mffArtist,
+  #mffApp #mffSource{
+    color:var(--mff-cyan)!important;
+    font-weight:900!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+
+  /* v32 CARD GRID URL AND LED DOM FIX */
+  #mffApp .mff-cards{
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1.45fr!important;
+    gap:10px!important;
+    align-items:stretch!important;
+  }
+
+  #mffApp .mff-card{
+    min-height:80px!important;
+    height:80px!important;
+    display:grid!important;
+    grid-template-rows:20px 28px 12px!important;
+    align-items:center!important;
+    justify-items:center!important;
+    text-align:center!important;
+    padding:10px 8px 9px!important;
+    box-sizing:border-box!important;
+  }
+
+  #mffApp .mff-card > div{
+    grid-row:1!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    width:100%!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+
+  #mffApp .mff-card .mff-ico{
+    flex:0 0 auto!important;
+    width:14px!important;
+    min-width:14px!important;
+    text-align:center!important;
+  }
+
+  #mffApp .mff-card small{
+    max-width:100%!important;
+    padding:0!important;
+    margin:0!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:10px!important;
+    line-height:1!important;
+    letter-spacing:.13em!important;
+  }
+
+  #mffApp .mff-card strong{
+    grid-row:2!important;
+    display:block!important;
+    width:100%!important;
+    padding:0!important;
+    margin:0!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:18px!important;
+    line-height:1.05!important;
+  }
+
+  #mffApp .mff-card .mff-dots,
+  #mffApp .mff-card > span:last-child{
+    grid-row:3!important;
+    align-self:end!important;
+    justify-self:center!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) .mff-ico{
+    display:none!important;
+  }
+
+  #mffApp .mff-card:nth-child(3) strong{
+    font-size:16px!important;
+  }
+
+  #mffApp .mff-now #mffArtist,
+  #mffApp .mff-now #mffSource,
+  #mffApp .mff-now .mff-artist,
+  #mffApp .mff-now .mff-source,
+  #mffApp .mff-now [data-source-line]{
+    color:var(--mff-cyan)!important;
+    font-weight:950!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
 
   /* v33 METADATA SOURCE RESTORE + CLICKABLE PLAYER URL + LED RESET */
   #mffApp .mff-brand-row{
@@ -482,6 +826,38 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   #mffApp .mff-brand-row a:active{color:var(--mff-pink)!important;}
 
+
+  /* v36 BRAND ROW + STREAM SWITCH + LED STOP FIX */
+  #mffApp .mff-brand-row{
+    width:100%!important;min-height:31px!important;height:31px!important;border-radius:999px!important;
+    border:1px solid rgba(22,255,243,.32)!important;background:rgba(5,10,28,.70)!important;
+    box-shadow:0 0 14px rgba(22,255,243,.10), inset 0 0 16px rgba(255,255,255,.018)!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;padding:4px 12px!important;box-sizing:border-box!important;pointer-events:none!important;
+  }
+  #mffApp .mff-brand-row span{
+    color:var(--mff-cyan)!important;font-size:12px!important;font-weight:950!important;letter-spacing:.06em!important;
+    text-shadow:0 0 10px rgba(22,255,243,.45)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  }
+  #mffApp .mff-stream-switch{
+    width:100%!important;min-height:32px!important;height:32px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;padding:0 10px!important;box-sizing:border-box!important;
+  }
+  #mffApp .mff-stream-btn{
+    border-radius:999px!important;border:1px solid rgba(22,255,243,.35)!important;background:rgba(5,10,28,.68)!important;color:rgba(247,248,255,.82)!important;
+    font-weight:950!important;letter-spacing:.11em!important;font-size:10px!important;box-shadow:inset 0 0 12px rgba(22,255,243,.05)!important;pointer-events:auto!important;touch-action:manipulation!important;
+  }
+  #mffApp .mff-stream-btn.is-active{
+    color:var(--mff-cyan)!important;border-color:rgba(22,255,243,.85)!important;box-shadow:0 0 10px rgba(22,255,243,.30), inset 0 0 16px rgba(22,255,243,.08)!important;
+  }
+  #mffApp .mff-card > div{
+    display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;width:100%!important;
+  }
+  #mffApp .mff-card .mff-ico{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;width:16px!important;min-width:16px!important;height:16px!important;
+    line-height:1!important;transform:none!important;margin:0!important;padding:0!important;color:var(--mff-pink)!important;
+  }
+  #mffApp .mff-card:nth-child(3) .mff-ico{display:inline-flex!important;}
+  #mffApp .mff-card:nth-child(3) .mff-ico::before{content:'◖';color:var(--mff-pink)!important;font-size:16px!important;line-height:1!important;}
+  #mffApp .mff-card small{padding:0!important;margin:0!important;text-align:center!important;}
 
 
   /* v37 CONTROL ACTIVE STATE RESTORE */
@@ -561,46 +937,23 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
 
-
-  /* v40 STATUS ROW REDESIGN CLEAN — single authoritative replacement */
-  #mffApp .mff-brand-row{
-    width:100%!important;min-height:31px!important;height:31px!important;border-radius:999px!important;
-    border:1px solid rgba(22,255,243,.32)!important;background:rgba(5,10,28,.70)!important;
-    box-shadow:0 0 14px rgba(22,255,243,.10), inset 0 0 16px rgba(255,255,255,.018)!important;
-    display:flex!important;align-items:center!important;justify-content:center!important;padding:4px 12px!important;box-sizing:border-box!important;pointer-events:none!important;
+  /* v41 AUDIO INTERRUPTION RECOVERY STATE MARKERS — no visible UI layer */
+  html[data-mff-audio-recovering="1"] #mffApp .mff-control[data-action="play"],
+  html[data-mff-audio-recovering="1"] #mffApp button.mff-transport-active{
+    box-shadow:
+      0 0 18px rgba(22,255,243,.46),
+      0 0 28px rgba(255,61,187,.18),
+      inset 0 0 18px rgba(22,255,243,.10)!important;
   }
-  #mffApp .mff-brand-row span{color:var(--mff-cyan)!important;font-size:12px!important;font-weight:950!important;letter-spacing:.06em!important;text-shadow:0 0 10px rgba(22,255,243,.45)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
-  #mffApp .mff-stream-switch{width:100%!important;min-height:32px!important;height:32px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;padding:0 10px!important;box-sizing:border-box!important;}
-  #mffApp .mff-stream-btn{border-radius:999px!important;border:1px solid rgba(22,255,243,.35)!important;background:rgba(5,10,28,.68)!important;color:rgba(247,248,255,.82)!important;font-weight:950!important;letter-spacing:.11em!important;font-size:10px!important;box-shadow:inset 0 0 12px rgba(22,255,243,.05)!important;pointer-events:auto!important;touch-action:manipulation!important;}
-  #mffApp .mff-stream-btn.is-active{color:var(--mff-cyan)!important;border-color:rgba(22,255,243,.85)!important;box-shadow:0 0 10px rgba(22,255,243,.30), inset 0 0 16px rgba(22,255,243,.08)!important;}
-  #mffApp .mff-panel-led-panel{width:100%!important;min-height:34px!important;height:34px!important;border-radius:20px!important;border:1px solid rgba(22,255,243,.32)!important;background:linear-gradient(135deg,rgba(255,61,187,.045),rgba(22,255,243,.035)),rgba(5,10,28,.78)!important;box-shadow:0 0 16px rgba(22,255,243,.10),0 0 14px rgba(255,61,187,.06),inset 0 0 18px rgba(255,255,255,.022)!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;padding:5px 9px!important;pointer-events:auto!important;box-sizing:border-box!important;}
-  #mffApp .mff-panel-led{display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;height:23px!important;min-width:38px!important;border:1px solid rgba(247,248,255,.18)!important;border-radius:999px!important;background:rgba(3,8,20,.52)!important;color:rgba(247,248,255,.84)!important;font-size:10px!important;font-weight:950!important;letter-spacing:.08em!important;padding:0 7px!important;pointer-events:auto!important;touch-action:manipulation!important;}
-  #mffApp .mff-panel-led i{display:block!important;width:9px!important;height:9px!important;min-width:9px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.72)!important;background:transparent!important;box-shadow:0 0 7px rgba(255,255,255,.55)!important;}
-  #mffApp .mff-panel-led[data-state="ok"] i{background:var(--mff-cyan)!important;border-color:rgba(22,255,243,.95)!important;box-shadow:0 0 8px rgba(22,255,243,.85),0 0 15px rgba(22,255,243,.35)!important;}
-  #mffApp .mff-panel-led[data-state="warn"] i{background:var(--mff-pink)!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 8px rgba(255,61,187,.82),0 0 15px rgba(255,61,187,.35)!important;}
-  #mffApp .mff-panel-led[data-state="off"] i{background:transparent!important;border-color:rgba(255,255,255,.82)!important;box-shadow:0 0 8px rgba(255,255,255,.58)!important;}
-  #mffApp .mff-panel-led b{display:block!important;font-size:10px!important;line-height:1!important;}
-  #mffApp .mff-led-tip{position:fixed!important;z-index:2147483400!important;display:none;max-width:220px!important;padding:8px 10px!important;border-radius:14px!important;border:1px solid rgba(22,255,243,.42)!important;background:rgba(3,8,20,.96)!important;color:#fff!important;font-size:11px!important;line-height:1.25!important;box-shadow:0 0 18px rgba(22,255,243,.18),0 0 18px rgba(255,61,187,.12)!important;pointer-events:none!important;}
-
-  #mffApp .mff-cards{display:grid!important;grid-template-columns:1fr 1fr 1.44fr!important;gap:9px!important;align-items:stretch!important;width:100%!important;}
-  #mffApp .mff-card,#mffApp .mff-stat-card{min-width:0!important;height:86px!important;min-height:86px!important;padding:10px 9px 9px!important;border-radius:20px!important;box-sizing:border-box!important;display:grid!important;grid-template-rows:20px 31px 11px!important;align-items:center!important;justify-items:center!important;text-align:center!important;overflow:hidden!important;background:linear-gradient(180deg,rgba(12,16,40,.86),rgba(5,8,23,.78))!important;border:1px solid rgba(22,255,243,.31)!important;box-shadow:inset 0 0 18px rgba(255,255,255,.018),0 0 14px rgba(22,255,243,.055)!important;}
-  #mffApp .mff-card .mff-stat-head{grid-row:1!important;display:inline-grid!important;grid-template-columns:15px auto!important;column-gap:7px!important;align-items:center!important;justify-content:center!important;justify-items:center!important;width:100%!important;max-width:100%!important;height:20px!important;min-height:20px!important;line-height:1!important;overflow:hidden!important;}
-  #mffApp .mff-card .mff-ico{display:inline-flex!important;position:static!important;width:15px!important;min-width:15px!important;height:15px!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;transform:none!important;line-height:1!important;color:var(--mff-pink)!important;font-size:13px!important;text-align:center!important;vertical-align:middle!important;}
-  #mffApp .mff-card small{display:inline-block!important;height:15px!important;line-height:15px!important;margin:0!important;padding:0!important;color:var(--mff-cyan)!important;font-size:10px!important;font-weight:950!important;letter-spacing:.16em!important;text-align:left!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
-  #mffApp .mff-card .mff-stat-value,#mffApp .mff-card strong{grid-row:2!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;height:31px!important;margin:0!important;padding:0!important;color:var(--mff-text)!important;font-size:19px!important;line-height:1!important;font-weight:850!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
-  #mffApp .mff-card:nth-child(3) .mff-stat-value,#mffApp .mff-card:nth-child(3) strong{font-size:18px!important;}
-  #mffApp .mff-card .mff-stat-dots,#mffApp .mff-card p{grid-row:3!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;width:100%!important;height:11px!important;margin:0!important;padding:0!important;}
-  #mffApp .mff-card .mff-stat-dots i,#mffApp .mff-card p i{display:block!important;width:7px!important;height:7px!important;border-radius:50%!important;background:var(--mff-cyan)!important;opacity:.85!important;box-shadow:0 0 8px rgba(22,255,243,.34)!important;}
-  #mffApp .mff-card .mff-stat-dots i:first-child,#mffApp .mff-card p i:first-child{background:var(--mff-pink)!important;box-shadow:0 0 8px rgba(255,61,187,.42)!important;}
 
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v40_STATUS_ROW_REDESIGN_CLEAN -->
-<script id="strictMobileFrontendPurgeV40Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX -->
+<script id="strictMobileFrontendPurgeV41Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v40_STATUS_ROW_REDESIGN_CLEAN';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -896,34 +1249,243 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-  async function play(){
-    await resumeAudioGraph();
-    var a=getAudio();
+  var mffAudioInterrupted=false;
+  var mffLastUserPlay=false;
+  var mffLastRecoveryAt=0;
+  var mffRecoveringAudio=false;
+
+  function mffNow(){return Date.now ? Date.now() : (new Date()).getTime();}
+
+  function mffGetAudioContext(){
     try{
-      var nextUrl=getStreamUrlForTarget(manualStreamTarget);
-      if(!a.getAttribute('src') || a.getAttribute('src')!==nextUrl) a.setAttribute('src',nextUrl);
-      var r=a.play();
-      if(r&&typeof r.catch==='function') r.catch(function(e){console.warn('[666 mobile play]',e)});
-      setTransportState('play');
-      setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
-    }catch(e){
-      console.warn('[666 mobile play]',e);
-      setTransportState('stop');
-      setPanelLedsOffline();
+      if(typeof audioCtx!=='undefined' && audioCtx) return audioCtx;
+      if(typeof ctx!=='undefined' && ctx) return ctx;
+      if(window.__mffAudioCtx) return window.__mffAudioCtx;
+    }catch(e){}
+    return null;
+  }
+
+  function mffIsAudioContextBad(){
+    var c=mffGetAudioContext();
+    if(!c) return false;
+    return c.state==='suspended' || c.state==='interrupted' || c.state==='closed';
+  }
+
+  function mffIsAudioElementBad(a){
+    if(!a) return true;
+    if(a.error) return true;
+    if(a.networkState===3) return true; // NETWORK_NO_SOURCE
+    if(a.readyState===0 && document.documentElement.getAttribute('data-mff-playing')==='1') return true;
+    return false;
+  }
+
+  function mffSoftMute(ms){
+    try{
+      var g = (typeof gainNode!=='undefined' && gainNode) ? gainNode :
+              (typeof masterGain!=='undefined' && masterGain) ? masterGain :
+              (typeof boostGain!=='undefined' && boostGain) ? boostGain : null;
+      var c=mffGetAudioContext();
+      if(g && g.gain && c){
+        var t=c.currentTime;
+        g.gain.cancelScheduledValues(t);
+        g.gain.setTargetAtTime(0.0001,t,0.012);
+      }
+    }catch(e){}
+  }
+
+  function mffRestoreGainRamp(){
+    try{
+      if(typeof applyBoostRamp==='function'){
+        applyBoostRamp(typeof boostStage==='number'?boostStage:0);
+        return;
+      }
+    }catch(e){}
+    try{
+      var g = (typeof gainNode!=='undefined' && gainNode) ? gainNode :
+              (typeof masterGain!=='undefined' && masterGain) ? masterGain :
+              (typeof boostGain!=='undefined' && boostGain) ? boostGain : null;
+      var c=mffGetAudioContext();
+      if(g && g.gain && c){
+        var t=c.currentTime;
+        g.gain.cancelScheduledValues(t);
+        g.gain.setValueAtTime(Math.max(0.0001,g.gain.value||0.0001),t);
+        g.gain.linearRampToValueAtTime(1,t+0.28);
+      }
+    }catch(e){}
+  }
+
+  function mffCurrentStreamUrl(){
+    try{
+      if(typeof getStreamUrlForTarget==='function'){
+        return getStreamUrlForTarget(typeof manualStreamTarget==='string'?manualStreamTarget:'main');
+      }
+    }catch(e){}
+    try{return STREAM_URL;}catch(e){}
+    return '';
+  }
+
+  function mffResetAudioElement(reason){
+    var a=getAudio();
+    if(!a) return null;
+    try{a.pause();}catch(e){}
+    try{a.removeAttribute('src');}catch(e){}
+    try{a.load();}catch(e){}
+    try{
+      var u=mffCurrentStreamUrl();
+      if(u) a.setAttribute('src',u);
+    }catch(e){}
+    document.documentElement.setAttribute('data-mff-audio-reset-reason',reason||'unknown');
+    return a;
+  }
+
+  async function mffRecoverAudioPath(reason){
+    if(mffRecoveringAudio) return getAudio();
+    mffRecoveringAudio=true;
+    mffLastRecoveryAt=mffNow();
+    document.documentElement.setAttribute('data-mff-audio-recovering','1');
+    try{
+      mffSoftMute(80);
+      var c=mffGetAudioContext();
+      if(c && c.state && c.state!=='running' && c.state!=='closed'){
+        try{await c.resume();}catch(e){}
+      }
+      var a=getAudio();
+      if(!a || mffIsAudioElementBad(a) || mffAudioInterrupted){
+        a=mffResetAudioElement(reason||'recover');
+      }else{
+        try{
+          var u=mffCurrentStreamUrl();
+          if(u && (!a.getAttribute('src') || a.getAttribute('src')!==u)) a.setAttribute('src',u);
+        }catch(e){}
+      }
+      mffAudioInterrupted=false;
+      return a;
+    }finally{
+      setTimeout(function(){
+        mffRecoveringAudio=false;
+        document.documentElement.setAttribute('data-mff-audio-recovering','0');
+      },180);
     }
   }
-  function pause(){try{getAudio().pause()}catch(e){}setTransportState('pause')}
-  function stop(){var a=getAudio();try{a.pause();try{a.currentTime=0}catch(e){}}catch(e){}setTransportState('stop')}
+
+  function mffMarkAudioInterrupted(reason){
+    mffAudioInterrupted=true;
+    document.documentElement.setAttribute('data-mff-audio-interrupted','1');
+    document.documentElement.setAttribute('data-mff-audio-interrupt-reason',reason||'unknown');
+  }
+
+  function bindAudioInterruptionRecovery(app){
+    if(window.__mffAudioRecoveryBound) return;
+    window.__mffAudioRecoveryBound=true;
+
+    function mark(reason){
+      mffMarkAudioInterrupted(reason);
+    }
+
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden){
+        mark('visibility-hidden');
+      }else{
+        if(mffLastUserPlay){
+          setTimeout(function(){mffRecoverAudioPath('visibility-return');},120);
+        }
+      }
+    });
+
+    window.addEventListener('pageshow',function(){
+      if(mffLastUserPlay){
+        setTimeout(function(){mffRecoverAudioPath('pageshow');},120);
+      }
+    });
+
+    window.addEventListener('focus',function(){
+      if(mffLastUserPlay && mffNow()-mffLastRecoveryAt>900){
+        setTimeout(function(){mffRecoverAudioPath('focus');},120);
+      }
+    });
+
+    try{
+      var a=getAudio();
+      ['stalled','suspend','abort','emptied','error','ended'].forEach(function(ev){
+        a.addEventListener(ev,function(){mark('audio-'+ev);},{passive:true});
+      });
+      a.addEventListener('pause',function(){
+        if(document.hidden) mark('pause-hidden');
+      },{passive:true});
+      a.addEventListener('playing',function(){
+        mffAudioInterrupted=false;
+        document.documentElement.setAttribute('data-mff-audio-interrupted','0');
+        setTimeout(mffRestoreGainRamp,80);
+      },{passive:true});
+    }catch(e){}
+  }
+
+
+
+  async function play(){
+    mffLastUserPlay=true;
+    try{
+      await resumeAudioGraph();
+    }catch(e){}
+    var a=null;
+    try{
+      if(mffAudioInterrupted || mffIsAudioContextBad()){
+        a=await mffRecoverAudioPath('play-after-interrupt');
+      }else{
+        a=getAudio();
+      }
+
+      if(!a) a=await mffRecoverAudioPath('missing-audio');
+
+      var nextUrl=mffCurrentStreamUrl();
+      if(nextUrl && (!a.getAttribute('src') || a.getAttribute('src')!==nextUrl)){
+        a.setAttribute('src',nextUrl);
+      }
+
+      mffSoftMute(40);
+      var r=a.play();
+      if(r&&typeof r.then==='function'){
+        await r;
+      }else if(r&&typeof r.catch==='function'){
+        r.catch(function(e){console.warn('[666 mobile play]',e);});
+      }
+
+      setTransportState('play');
+      try{setPanelLedsFromMeta({source:(typeof manualStreamTarget==='string'?manualStreamTarget:'main'),dj:'DJ-666'});}catch(_){}
+      setTimeout(mffRestoreGainRamp,120);
+    }catch(e){
+      console.warn('[666 mobile play recovery]',e);
+      try{
+        a=mffResetAudioElement('play-error-retry');
+        await resumeAudioGraph();
+        var r2=a.play();
+        if(r2&&typeof r2.then==='function') await r2;
+        setTransportState('play');
+        setTimeout(mffRestoreGainRamp,140);
+      }catch(e2){
+        console.warn('[666 mobile play final fail]',e2);
+        setTransportState('stop');
+        setPanelLedsOffline();
+      }
+    }
+  }
+  function pause(){
+    var a=getAudio();
+    try{a.pause();}catch(e){}
+    mffLastUserPlay=false;
+    setTransportState('pause');
+  }
+  function stop(){
+    var a=getAudio();
+    try{a.pause();}catch(e){}
+    try{a.currentTime=0;}catch(e){}
+    mffLastUserPlay=false;
+    mffAudioInterrupted=false;
+    setTransportState('stop');
+  }
   function boost(d){var prev=boostStage;boostStage=Math.max(0,Math.min(3,boostStage+d));applyBoostRamp(prev)}
 
-  function card(t,v,i){
-    var key=String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    return '<section class="mff-card mff-stat-card mff-stat-'+key+'">'+
-      '<div class="mff-stat-head"><span class="mff-ico" aria-hidden="true">'+i+'</span><small>'+t+'</small></div>'+
-      '<strong class="mff-stat-value">'+v+'</strong>'+
-      '<p class="mff-stat-dots"><i></i><i></i><i></i></p>'+
-    '</section>'
-  }
+  function card(t,v,i){return'<section class="mff-card"><div><span class="mff-ico">'+i+'</span><small>'+t+'</small></div><strong>'+v+'</strong><p><i></i><i></i><i></i></p></section>'}
 
   function buildBars(id,count){
     var el=q(id); if(!el||el.children.length)return;
@@ -992,7 +1554,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v40</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v41</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -1032,11 +1594,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
 
     bindHistoryModalV17(app);
-    normalizeStatusCardHeaders();
     bindPanelLedTips(app);
     bindStreamSwitch(app);
     bindControlActiveFeedback(app);
     bindTransportHardFeedback(app);
+    bindAudioInterruptionRecovery(app);
     setTransportState('stop');
     applyBoostRamp(0);
     setPanelLedsOffline();
@@ -1369,31 +1931,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     clearTimeout(window.__mffLedTipTimer);
     window.__mffLedTipTimer=setTimeout(function(){setPanelLedTip('',null)},2600);
   }
-
-  function normalizeStatusCardHeaders(){
-    var cards=qa('#mffApp .mff-card');
-    cards.forEach(function(card,idx){
-      var head=card.querySelector('.mff-stat-head') || card.querySelector('div');
-      if(!head) return;
-      head.classList.add('mff-stat-head');
-      var small=head.querySelector('small');
-      if(!small) return;
-      var ico=head.querySelector('.mff-ico');
-      if(!ico){
-        ico=document.createElement('span');
-        ico.className='mff-ico';
-        ico.setAttribute('aria-hidden','true');
-        head.insertBefore(ico,small);
-      }
-      if(idx===0){ico.textContent='♚';}
-      if(idx===1){ico.textContent='≋';}
-      if(idx===2){ico.textContent='◖';}
-      var strong=card.querySelector('strong'); if(strong) strong.classList.add('mff-stat-value');
-      var dots=card.querySelector('p'); if(dots) dots.classList.add('mff-stat-dots');
-    });
-  }
-
-
 
   function bindPanelLedTips(app){
     qa('#mffPanelLedPanel .mff-panel-led',app).forEach(function(btn){
