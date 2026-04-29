@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v37_CONTROL_ACTIVE_STATE_RESTORE
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v38_TRANSPORT_BUTTON_STATE_HARD_BIND
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v37-control-active-restore-20260429-1845
-- v37: aktive Buttonzustände für Play/Pause/Stop und Boost +/- wiederhergestellt.
+- Cache-Proof: smfp-v38-transport-hard-bind-20260429-1915
+- v38: Play/Pause/Stop aktive Buttonzustände hart gebunden.
 ============================================================
 */
 @media (min-width:761px){

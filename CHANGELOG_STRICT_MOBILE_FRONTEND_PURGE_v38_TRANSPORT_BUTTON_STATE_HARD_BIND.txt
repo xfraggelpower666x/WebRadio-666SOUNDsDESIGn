@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v38 TRANSPORT BUTTON STATE HARD BIND
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v38_TRANSPORT_BUTTON_STATE_HARD_BIND.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v38_TRANSPORT_BUTTON_STATE_HARD_BIND.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration
