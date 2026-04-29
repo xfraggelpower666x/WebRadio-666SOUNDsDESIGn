@@ -1,0 +1,14 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX
+CACHE_TAG=smfp-v29-meta-led-stable-20260429-1445
+
+FIX:
+- v28 LED-Update war zu aggressiv an Audioevents gekoppelt.
+- Audioevent-LED-Hooks wurden entfernt.
+- LED-Updates werden jetzt gedrosselt.
+- Meta-LED nutzt robuste Erkennung:
+  - Meta-Objekt
+  - DOM-Fallback
+  - letzte gute Meta bis 180 Sekunden
+- Meta bleibt nicht mehr dauerhaft pink, wenn Titel/NowPlaying sichtbar ist.
+- H/B Streamstatus bleibt erhalten.
+- Worker/Wrangler/Desktop-Dateien unverändert.

@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v29 METADATA LED STABILITY FIX
+
+Zweck:
+- Seit v28 startete der Player öfter neu / zeigte später Fehler.
+- Meta blieb dauerhaft pink.
+- Ursache wahrscheinlich: zu aggressive LED-Updates auf Audioevents und zu strenge Meta-Erkennung.
+- v29 entkoppelt LED-Updates vom Audio-Reconnect und stabilisiert META.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

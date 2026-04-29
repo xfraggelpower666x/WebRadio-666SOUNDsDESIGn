@@ -16,17 +16,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v28-main-led-play-20260429-1425" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v28-main-led-play-20260429-1425" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v28-main-led-play-20260429-1425" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v28-main-led-play-20260429-1425" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v28-main-led-play-20260429-1425" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v28-main-led-play-20260429-1425" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v29-meta-led-stable-20260429-1445" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v29-meta-led-stable-20260429-1445" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v29-meta-led-stable-20260429-1445" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v29-meta-led-stable-20260429-1445" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v29-meta-led-stable-20260429-1445" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v29-meta-led-stable-20260429-1445" />
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +161,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v28-main-led-play-20260429-1425"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v29-meta-led-stable-20260429-1445"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX -->
-<style id="strictMobileFrontendPurgeV28Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX -->
+<style id="strictMobileFrontendPurgeV29Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -569,16 +569,19 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX -->
-<script id="strictMobileFrontendPurgeV28Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX -->
+<script id="strictMobileFrontendPurgeV29Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/nowplaying','/meta','/status'];
   var HISTORY_ENDPOINTS=['/history','/api/history','/recent','/api/recent'];
   var localHistory=[];
   var lastHistoryTitle='';
+  var mffLastGoodMeta={};
+  var mffPanelLedUpdateTimer=0;
+  var mffPanelLedLastRun=0;
 
   function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
   function q(s,r){return(r||document).querySelector(s)}
@@ -592,7 +595,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       document.body.appendChild(a);
     }
     if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);
-      setTimeout(updatePanelLedsFromRuntime,40);
+      schedulePanelLedUpdate({},220);
     return a;
   }
 
@@ -740,7 +743,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var btn=q('#mffApp .mff-controls [data-mff="'+key+'"]');
     if(btn)btn.classList.add('mff-active');
     document.documentElement.setAttribute('data-mff-playing',state==='play'?'1':'0');
-    setTimeout(updatePanelLedsFromRuntime,60);
+    schedulePanelLedUpdate({},220);
   }
 
   function flash(cmd){
@@ -825,7 +828,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v28</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v29</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LISTENERS','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -869,16 +872,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     setTransportState('stop');
     applyBoostRamp(0);
     setPanelLedsOffline();
-
-    try{
-      var audioForLeds=getAudio();
-      audioForLeds.addEventListener('playing',updatePanelLedsFromRuntime);
-      audioForLeds.addEventListener('play',updatePanelLedsFromRuntime);
-      audioForLeds.addEventListener('pause',updatePanelLedsFromRuntime);
-      audioForLeds.addEventListener('loadedmetadata',updatePanelLedsFromRuntime);
-    }catch(e){}
-
-    setAnalyserMode('init');
+setAnalyserMode('init');
     return app;
   }
 
@@ -1046,6 +1040,63 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
+
+  function mffTextOf(sel){
+    try{
+      var el=q(sel);
+      return el ? String(el.textContent||'').trim() : '';
+    }catch(e){return '';}
+  }
+
+  function normalizePanelMeta(meta){
+    var out=meta&&typeof meta==='object'?Object.assign({},meta):{};
+    var domTitle=
+      mffTextOf('#mffTitle') ||
+      mffTextOf('[data-now-title]') ||
+      mffTextOf('.mff-title') ||
+      mffTextOf('.mff-marquee') ||
+      mffTextOf('.nowplaying') ||
+      mffTextOf('#nowplaying');
+    var domArtist=
+      mffTextOf('#mffArtist') ||
+      mffTextOf('[data-now-artist]') ||
+      mffTextOf('.mff-artist') ||
+      mffTextOf('.artist');
+
+    if(!out.title && domTitle) out.title=domTitle;
+    if(!out.artist && domArtist) out.artist=domArtist;
+
+    var combined=[
+      out.title||'',
+      out.artist||'',
+      out.current_song||'',
+      out.song||'',
+      out.nowplaying||'',
+      out.now_playing&&out.now_playing.song&&out.now_playing.song.text||'',
+      out.raw||''
+    ].join(' ').trim();
+
+    if(combined && !/loading|laden|unknown|unbekannt|no playing|not playing/i.test(combined)){
+      out.__hasMeta=true;
+      mffLastGoodMeta=Object.assign({},mffLastGoodMeta,out,{__lastMetaAt:Date.now()});
+    }else if(mffLastGoodMeta && mffLastGoodMeta.__hasMeta && Date.now()-(mffLastGoodMeta.__lastMetaAt||0)<180000){
+      out=Object.assign({},mffLastGoodMeta,out,{__hasMeta:true,__fromCache:true});
+    }
+
+    return out;
+  }
+
+  function schedulePanelLedUpdate(meta,delay){
+    clearTimeout(mffPanelLedUpdateTimer);
+    mffPanelLedUpdateTimer=setTimeout(function(){
+      try{
+        setPanelLedsFromMeta(normalizePanelMeta(meta||{}));
+        mffPanelLedLastRun=Date.now();
+      }catch(e){}
+    }, typeof delay==='number'?delay:160);
+  }
+
+
   function setPanelLed(name,state,info){
     var el=q('#mffPanelLedPanel [data-led="'+name+'"]');
     if(!el) return;
@@ -1129,7 +1180,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function setPanelLedsFromMeta(meta){
+    meta=normalizePanelMeta(meta||{});
+
     setPanelLed('worker','ok','Mobile UI Runtime läuft');
+
     var sourceOk=false;
     var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
     try{
@@ -1138,8 +1192,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }catch(e){}
     setPanelLed('source',sourceOk?'ok':'warn',sourceOk?'Audioquelle gesetzt':'keine Audioquelle erkannt');
 
-    var metaOk=!!(meta && (meta.title || meta.artist || meta.dj || meta.bitrate || meta.listeners));
-    setPanelLed('meta',metaOk?'ok':'warn',metaOk?'Metadaten empfangen':'Metadaten fehlen/leer');
+    var metaOk=!!(meta && meta.__hasMeta);
+    setPanelLed('meta',metaOk?'ok':(playing?'warn':'off'),metaOk?(meta.__fromCache?'letzte Metadaten behalten':'Metadaten empfangen'):(playing?'Metadaten noch nicht empfangen':'noch keine Metadaten'));
 
     var active=inferActiveStream(meta);
     if(active==='backup'){
@@ -1159,11 +1213,18 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
   function updatePanelLedsFromRuntime(){
-    var meta={
-      title:(q('#mffTitle')&&q('#mffTitle').textContent)||'',
-      artist:(q('#mffArtist')&&q('#mffArtist').textContent)||''
-    };
-    setPanelLedsFromMeta(meta);
+    schedulePanelLedUpdate({
+      title:
+        mffTextOf('#mffTitle') ||
+        mffTextOf('.mff-title') ||
+        mffTextOf('.mff-marquee') ||
+        mffTextOf('#nowplaying') ||
+        mffTextOf('.nowplaying'),
+      artist:
+        mffTextOf('#mffArtist') ||
+        mffTextOf('.mff-artist') ||
+        mffTextOf('.artist')
+    },180);
   }
 
 
@@ -1189,7 +1250,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   function applyMeta(meta){
     if(!meta){setPanelLedsOffline();return;}
-    setPanelLedsFromMeta(meta);
+    schedulePanelLedUpdate(meta,120);
     pushLocalHistory(meta);
     setMarqueeTitle(meta.title||'Metadaten werden geladen ...');
     var h2=q('#mffApp .mff-title h2');

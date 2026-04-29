@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v28_MAIN_STREAM_LED_PLAY_STATE_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v29_METADATA_LED_STABILITY_FIX
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v28-main-led-play-20260429-1425
-- v28: Hauptstream-LED reagiert auf Play/Source-Zustand.
+- Cache-Proof: smfp-v29-meta-led-stable-20260429-1445
+- v29: Meta-LED stabilisiert, LED-Updates gedrosselt.
 ============================================================
 */
 @media (min-width:761px){
