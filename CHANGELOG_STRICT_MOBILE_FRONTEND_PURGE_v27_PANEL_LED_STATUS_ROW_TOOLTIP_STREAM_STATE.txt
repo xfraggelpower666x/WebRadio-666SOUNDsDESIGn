@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v27 PANEL LED STATUS ROW TOOLTIP STREAM STATE
+
+Zweck:
+- DJ Status war vom Symbol verdeckt.
+- Panel-LEDs für Worker/Source/Meta/Hauptstream/Backupstream sollten wieder rein.
+- LED-Reihe soll nicht in NowPlaying gequetscht werden, sondern als eigene Reihe darunter sitzen.
+- LED-Tap zeigt Kurzinfo als Tooltip/Overlay.
+- Alte Layer-Reste werden gezielt entfernt.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v27_PANEL_LED_STATUS_ROW_TOOLTIP_STREAM_STATE.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v27_PANEL_LED_STATUS_ROW_TOOLTIP_STREAM_STATE.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

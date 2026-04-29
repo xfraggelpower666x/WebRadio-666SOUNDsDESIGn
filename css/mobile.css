@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v26_PC_EQ_CODE_MATCH_NO_LAYER
-GEÄNDERT: 2026-04-28
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v27_PANEL_LED_STATUS_ROW_TOOLTIP_STREAM_STATE
+GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v26-pceq-match-20260428-1910
-- v26: PC-EQ-Code-Match ohne neue Layer.
+- Cache-Proof: smfp-v27-panel-leds-stream-20260429-1415
+- v27: eigene Panel-LED-Reihe unter Now Playing, Tooltip, Streamstatus, DJ-Status-Shift.
 ============================================================
 */
 @media (min-width:761px){
