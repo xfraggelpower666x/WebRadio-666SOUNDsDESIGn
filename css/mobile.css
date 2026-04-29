@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v32_CARD_GRID_URL_AND_LED_DOM_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v33_METADATA_SOURCE_RESTORE_CLICKABLE_URL_LED_RESET
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v32-card-url-leddom-20260429-1605
-- v32: Karten-Grid, Player-URL-Zeile und DOM-basierte LED-Logik.
+- Cache-Proof: smfp-v33-meta-source-url-led-reset-20260429-1625
+- v33: Meta-/Quelle-Zeile restauriert, klickbare Player-URL eigene Reihe, LED-Reset.
 ============================================================
 */
 @media (min-width:761px){
