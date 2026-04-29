@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v33_METADATA_SOURCE_RESTORE_CLICKABLE_URL_LED_RESET
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v34_LED_META_RESTORE_FROM_V27_REFERENCE
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v33-meta-source-url-led-reset-20260429-1625
-- v33: Meta-/Quelle-Zeile restauriert, klickbare Player-URL eigene Reihe, LED-Reset.
+- Cache-Proof: smfp-v34-led-meta-from-v27-20260429-1705
+- v34: LED- und Metadaten-Logik aus v27-Referenz wiederhergestellt.
 ============================================================
 */
 @media (min-width:761px){

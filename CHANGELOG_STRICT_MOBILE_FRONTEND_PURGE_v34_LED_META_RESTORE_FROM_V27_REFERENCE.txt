@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v34 LED META RESTORE FROM V27 REFERENCE
+
+Zweck:
+- User hat v27 als Version geliefert, bei der LEDs fast alle richtig liefen und Metadaten funktionierten.
+- v34 übernimmt gezielt LED- und Meta-Funktionen aus v27 in die aktuelle Struktur.
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v34_LED_META_RESTORE_FROM_V27_REFERENCE.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v34_LED_META_RESTORE_FROM_V27_REFERENCE.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration
