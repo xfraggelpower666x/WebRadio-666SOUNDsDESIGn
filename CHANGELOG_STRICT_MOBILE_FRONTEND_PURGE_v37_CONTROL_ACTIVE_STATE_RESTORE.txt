@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v37 CONTROL ACTIVE STATE RESTORE
+
+Geändert:
+- index.html
+- css/mobile.css
+- STRICT_MOBILE_FRONTEND_PURGE_v37_CONTROL_ACTIVE_STATE_RESTORE.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v37_CONTROL_ACTIVE_STATE_RESTORE.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

@@ -1,0 +1,9 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v37_CONTROL_ACTIVE_STATE_RESTORE
+CACHE_TAG=smfp-v37-control-active-restore-20260429-1845
+
+FIX:
+- Play bleibt pink umrandet/unterlegt, solange Transport-State = play.
+- Pause bleibt pink umrandet/unterlegt bei Pause.
+- Stop bekommt kurzes pinkes Feedback und setzt danach LEDs zurück.
+- Boost Plus/Minus bekommen temporäres pinkes Feedback.
+- Keine Worker/Wrangler/Desktop-Dateien geändert.
