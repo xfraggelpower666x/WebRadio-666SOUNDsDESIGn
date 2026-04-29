@@ -1,12 +1,12 @@
 /*
 ============================================================
-666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX
+666SOUNDsDESIGn — STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION
 GEÄNDERT: 2026-04-29
 ZWECK:
 - Mobile-CSS bewusst minimal.
 - Autoritative Mobile-Regeln stehen inline am Ende von index.html.
-- Cache-Proof: smfp-v41-audio-interrupt-recovery-20260429-1935
-- v41: iPhone/Edge Audio-Unterbrechung Recovery + Artefakt-Schutz.
+- Cache-Proof: smfp-v42-logo-icon-fullpack-20260429-2035
+- v42: App/Icon + Header-Logo integriert.
 ============================================================
 */
 @media (min-width:761px){

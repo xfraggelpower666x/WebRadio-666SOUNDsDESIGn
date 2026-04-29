@@ -1,0 +1,18 @@
+666SOUNDsDESIGn — STRICT MOBILE FRONTEND PURGE v42 FULLPACK LOGO ICON INTEGRATION
+
+Geändert:
+- index.html
+- css/mobile.css
+- site.webmanifest
+- assets/icons/*
+- assets/logos/*
+- STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION.txt
+- CHANGELOG_STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION.txt
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration

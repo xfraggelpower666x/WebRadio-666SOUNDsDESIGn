@@ -1,3 +1,4 @@
+<section class="mff-top-logo" id="mffTopLogo" aria-label="666SOUNDsDESIGn Header Logo"><img src="/assets/logos/player-header-logo.png?v=smfp-v42-logo-icon-fullpack-20260429-2035" srcset="/assets/logos/player-header-logo-480.png?v=smfp-v42-logo-icon-fullpack-20260429-2035 480w, /assets/logos/player-header-logo-720.png?v=smfp-v42-logo-icon-fullpack-20260429-2035 720w, /assets/logos/player-header-logo-960.png?v=smfp-v42-logo-icon-fullpack-20260429-2035 960w, /assets/logos/player-header-logo-1280.png?v=smfp-v42-logo-icon-fullpack-20260429-2035 1280w" sizes="min(92vw, 760px)" alt="SOUNDs 666 DESIGn" loading="eager" decoding="async"></section>
 <!--
 ÄNDERUNG: FULLPACK v17 MOBILE CLICKABILITY FIX + OVERLAY/Z-INDEX CLEANUP.
 
@@ -16,17 +17,28 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v41-audio-interrupt-recovery-20260429-1935" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v42-logo-icon-fullpack-20260429-2035" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v42-logo-icon-fullpack-20260429-2035" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v42-logo-icon-fullpack-20260429-2035" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v42-logo-icon-fullpack-20260429-2035" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v42-logo-icon-fullpack-20260429-2035" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v42-logo-icon-fullpack-20260429-2035" />
+
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v42-logo-icon-fullpack-20260429-2035" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v42-logo-icon-fullpack-20260429-2035">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v42-logo-icon-fullpack-20260429-2035">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v42-logo-icon-fullpack-20260429-2035">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v42-logo-icon-fullpack-20260429-2035">
+<meta name="theme-color" content="#ff3dbb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="666 WebRadio">
+<meta name="application-name" content="666 WebRadio">
+
 </head>
 <body>
   <div class="frame-stage">
@@ -161,11 +173,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v41-audio-interrupt-recovery-20260429-1935"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v42-logo-icon-fullpack-20260429-2035"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX -->
-<style id="strictMobileFrontendPurgeV41Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION -->
+<style id="strictMobileFrontendPurgeV42Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -937,23 +949,49 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
 
-  /* v41 AUDIO INTERRUPTION RECOVERY STATE MARKERS — no visible UI layer */
-  html[data-mff-audio-recovering="1"] #mffApp .mff-control[data-action="play"],
-  html[data-mff-audio-recovering="1"] #mffApp button.mff-transport-active{
-    box-shadow:
-      0 0 18px rgba(22,255,243,.46),
-      0 0 28px rgba(255,61,187,.18),
-      inset 0 0 18px rgba(22,255,243,.10)!important;
+  /* v42 LOGO + APP ICON INTEGRATION */
+  .mff-top-logo{
+    width:min(94vw,760px)!important;
+    margin:calc(env(safe-area-inset-top,0px) + 12px) auto 10px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    pointer-events:none!important;
+    user-select:none!important;
+    position:relative!important;
+    z-index:3!important;
+  }
+
+  .mff-top-logo img{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:132px!important;
+    object-fit:contain!important;
+    filter:
+      drop-shadow(0 0 16px rgba(22,255,243,.24))
+      drop-shadow(0 0 18px rgba(255,61,187,.22))!important;
+  }
+
+  @media(max-width:430px){
+    .mff-top-logo{
+      width:92vw!important;
+      margin-top:calc(env(safe-area-inset-top,0px) + 10px)!important;
+      margin-bottom:8px!important;
+    }
+    .mff-top-logo img{
+      max-height:108px!important;
+    }
   }
 
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX -->
-<script id="strictMobileFrontendPurgeV41Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION -->
+<script id="strictMobileFrontendPurgeV42Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v41_AUDIO_INTERRUPTION_RECOVERY_FIX';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1249,240 +1287,24 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-  var mffAudioInterrupted=false;
-  var mffLastUserPlay=false;
-  var mffLastRecoveryAt=0;
-  var mffRecoveringAudio=false;
-
-  function mffNow(){return Date.now ? Date.now() : (new Date()).getTime();}
-
-  function mffGetAudioContext(){
-    try{
-      if(typeof audioCtx!=='undefined' && audioCtx) return audioCtx;
-      if(typeof ctx!=='undefined' && ctx) return ctx;
-      if(window.__mffAudioCtx) return window.__mffAudioCtx;
-    }catch(e){}
-    return null;
-  }
-
-  function mffIsAudioContextBad(){
-    var c=mffGetAudioContext();
-    if(!c) return false;
-    return c.state==='suspended' || c.state==='interrupted' || c.state==='closed';
-  }
-
-  function mffIsAudioElementBad(a){
-    if(!a) return true;
-    if(a.error) return true;
-    if(a.networkState===3) return true; // NETWORK_NO_SOURCE
-    if(a.readyState===0 && document.documentElement.getAttribute('data-mff-playing')==='1') return true;
-    return false;
-  }
-
-  function mffSoftMute(ms){
-    try{
-      var g = (typeof gainNode!=='undefined' && gainNode) ? gainNode :
-              (typeof masterGain!=='undefined' && masterGain) ? masterGain :
-              (typeof boostGain!=='undefined' && boostGain) ? boostGain : null;
-      var c=mffGetAudioContext();
-      if(g && g.gain && c){
-        var t=c.currentTime;
-        g.gain.cancelScheduledValues(t);
-        g.gain.setTargetAtTime(0.0001,t,0.012);
-      }
-    }catch(e){}
-  }
-
-  function mffRestoreGainRamp(){
-    try{
-      if(typeof applyBoostRamp==='function'){
-        applyBoostRamp(typeof boostStage==='number'?boostStage:0);
-        return;
-      }
-    }catch(e){}
-    try{
-      var g = (typeof gainNode!=='undefined' && gainNode) ? gainNode :
-              (typeof masterGain!=='undefined' && masterGain) ? masterGain :
-              (typeof boostGain!=='undefined' && boostGain) ? boostGain : null;
-      var c=mffGetAudioContext();
-      if(g && g.gain && c){
-        var t=c.currentTime;
-        g.gain.cancelScheduledValues(t);
-        g.gain.setValueAtTime(Math.max(0.0001,g.gain.value||0.0001),t);
-        g.gain.linearRampToValueAtTime(1,t+0.28);
-      }
-    }catch(e){}
-  }
-
-  function mffCurrentStreamUrl(){
-    try{
-      if(typeof getStreamUrlForTarget==='function'){
-        return getStreamUrlForTarget(typeof manualStreamTarget==='string'?manualStreamTarget:'main');
-      }
-    }catch(e){}
-    try{return STREAM_URL;}catch(e){}
-    return '';
-  }
-
-  function mffResetAudioElement(reason){
-    var a=getAudio();
-    if(!a) return null;
-    try{a.pause();}catch(e){}
-    try{a.removeAttribute('src');}catch(e){}
-    try{a.load();}catch(e){}
-    try{
-      var u=mffCurrentStreamUrl();
-      if(u) a.setAttribute('src',u);
-    }catch(e){}
-    document.documentElement.setAttribute('data-mff-audio-reset-reason',reason||'unknown');
-    return a;
-  }
-
-  async function mffRecoverAudioPath(reason){
-    if(mffRecoveringAudio) return getAudio();
-    mffRecoveringAudio=true;
-    mffLastRecoveryAt=mffNow();
-    document.documentElement.setAttribute('data-mff-audio-recovering','1');
-    try{
-      mffSoftMute(80);
-      var c=mffGetAudioContext();
-      if(c && c.state && c.state!=='running' && c.state!=='closed'){
-        try{await c.resume();}catch(e){}
-      }
-      var a=getAudio();
-      if(!a || mffIsAudioElementBad(a) || mffAudioInterrupted){
-        a=mffResetAudioElement(reason||'recover');
-      }else{
-        try{
-          var u=mffCurrentStreamUrl();
-          if(u && (!a.getAttribute('src') || a.getAttribute('src')!==u)) a.setAttribute('src',u);
-        }catch(e){}
-      }
-      mffAudioInterrupted=false;
-      return a;
-    }finally{
-      setTimeout(function(){
-        mffRecoveringAudio=false;
-        document.documentElement.setAttribute('data-mff-audio-recovering','0');
-      },180);
-    }
-  }
-
-  function mffMarkAudioInterrupted(reason){
-    mffAudioInterrupted=true;
-    document.documentElement.setAttribute('data-mff-audio-interrupted','1');
-    document.documentElement.setAttribute('data-mff-audio-interrupt-reason',reason||'unknown');
-  }
-
-  function bindAudioInterruptionRecovery(app){
-    if(window.__mffAudioRecoveryBound) return;
-    window.__mffAudioRecoveryBound=true;
-
-    function mark(reason){
-      mffMarkAudioInterrupted(reason);
-    }
-
-    document.addEventListener('visibilitychange',function(){
-      if(document.hidden){
-        mark('visibility-hidden');
-      }else{
-        if(mffLastUserPlay){
-          setTimeout(function(){mffRecoverAudioPath('visibility-return');},120);
-        }
-      }
-    });
-
-    window.addEventListener('pageshow',function(){
-      if(mffLastUserPlay){
-        setTimeout(function(){mffRecoverAudioPath('pageshow');},120);
-      }
-    });
-
-    window.addEventListener('focus',function(){
-      if(mffLastUserPlay && mffNow()-mffLastRecoveryAt>900){
-        setTimeout(function(){mffRecoverAudioPath('focus');},120);
-      }
-    });
-
-    try{
-      var a=getAudio();
-      ['stalled','suspend','abort','emptied','error','ended'].forEach(function(ev){
-        a.addEventListener(ev,function(){mark('audio-'+ev);},{passive:true});
-      });
-      a.addEventListener('pause',function(){
-        if(document.hidden) mark('pause-hidden');
-      },{passive:true});
-      a.addEventListener('playing',function(){
-        mffAudioInterrupted=false;
-        document.documentElement.setAttribute('data-mff-audio-interrupted','0');
-        setTimeout(mffRestoreGainRamp,80);
-      },{passive:true});
-    }catch(e){}
-  }
-
-
-
   async function play(){
-    mffLastUserPlay=true;
+    await resumeAudioGraph();
+    var a=getAudio();
     try{
-      await resumeAudioGraph();
-    }catch(e){}
-    var a=null;
-    try{
-      if(mffAudioInterrupted || mffIsAudioContextBad()){
-        a=await mffRecoverAudioPath('play-after-interrupt');
-      }else{
-        a=getAudio();
-      }
-
-      if(!a) a=await mffRecoverAudioPath('missing-audio');
-
-      var nextUrl=mffCurrentStreamUrl();
-      if(nextUrl && (!a.getAttribute('src') || a.getAttribute('src')!==nextUrl)){
-        a.setAttribute('src',nextUrl);
-      }
-
-      mffSoftMute(40);
+      var nextUrl=getStreamUrlForTarget(manualStreamTarget);
+      if(!a.getAttribute('src') || a.getAttribute('src')!==nextUrl) a.setAttribute('src',nextUrl);
       var r=a.play();
-      if(r&&typeof r.then==='function'){
-        await r;
-      }else if(r&&typeof r.catch==='function'){
-        r.catch(function(e){console.warn('[666 mobile play]',e);});
-      }
-
+      if(r&&typeof r.catch==='function') r.catch(function(e){console.warn('[666 mobile play]',e)});
       setTransportState('play');
-      try{setPanelLedsFromMeta({source:(typeof manualStreamTarget==='string'?manualStreamTarget:'main'),dj:'DJ-666'});}catch(_){}
-      setTimeout(mffRestoreGainRamp,120);
+      setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
     }catch(e){
-      console.warn('[666 mobile play recovery]',e);
-      try{
-        a=mffResetAudioElement('play-error-retry');
-        await resumeAudioGraph();
-        var r2=a.play();
-        if(r2&&typeof r2.then==='function') await r2;
-        setTransportState('play');
-        setTimeout(mffRestoreGainRamp,140);
-      }catch(e2){
-        console.warn('[666 mobile play final fail]',e2);
-        setTransportState('stop');
-        setPanelLedsOffline();
-      }
+      console.warn('[666 mobile play]',e);
+      setTransportState('stop');
+      setPanelLedsOffline();
     }
   }
-  function pause(){
-    var a=getAudio();
-    try{a.pause();}catch(e){}
-    mffLastUserPlay=false;
-    setTransportState('pause');
-  }
-  function stop(){
-    var a=getAudio();
-    try{a.pause();}catch(e){}
-    try{a.currentTime=0;}catch(e){}
-    mffLastUserPlay=false;
-    mffAudioInterrupted=false;
-    setTransportState('stop');
-  }
+  function pause(){try{getAudio().pause()}catch(e){}setTransportState('pause')}
+  function stop(){var a=getAudio();try{a.pause();try{a.currentTime=0}catch(e){}}catch(e){}setTransportState('stop')}
   function boost(d){var prev=boostStage;boostStage=Math.max(0,Math.min(3,boostStage+d));applyBoostRamp(prev)}
 
   function card(t,v,i){return'<section class="mff-card"><div><span class="mff-ico">'+i+'</span><small>'+t+'</small></div><strong>'+v+'</strong><p><i></i><i></i><i></i></p></section>'}
@@ -1554,7 +1376,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v41</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v42</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -1598,7 +1420,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     bindStreamSwitch(app);
     bindControlActiveFeedback(app);
     bindTransportHardFeedback(app);
-    bindAudioInterruptionRecovery(app);
     setTransportState('stop');
     applyBoostRamp(0);
     setPanelLedsOffline();

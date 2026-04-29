@@ -1,0 +1,28 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION
+CACHE_TAG=smfp-v42-logo-icon-fullpack-20260429-2035
+
+BASIS:
+WebRadio-666SOUNDsDESIGn_FULLPACK_STRICT_MOBILE_FRONTEND_PURGE_v38_TRANSPORT_BUTTON_STATE_HARD_BIND.zip
+
+INTEGRIERT:
+- Browser favicon.ico
+- favicon-16x16.png
+- favicon-32x32.png
+- apple-touch-icon.png
+- android-chrome-192x192.png
+- android-chrome-512x512.png
+- PWA site.webmanifest
+- Header-Logo über dem Player:
+  assets/logos/player-header-logo.png
+
+WICHTIG:
+- v42 ist ein FULLPACK.
+- Die letzte Basis-Version ist enthalten.
+- Es muss keine vorige Version extra hochgeladen werden.
+- Header-Logo ist nicht klickbar.
+- Keine neue Player-Instanz.
+- Keine Worker/Wrangler/Stream-Routen verändert.
+
+QUELLBILDER:
+App Icon Quelle: /mnt/data/ghostwriter_images/generated/square_app_icon_style_digital_illustration_overal_1.png
+Header Logo Quelle: /mnt/data/ghostwriter_images/generated/a_wide_horizontal_cyberpunk_neon_sci_fi_emblem_l_2.png
