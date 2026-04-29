@@ -1,0 +1,21 @@
+VERSION=STRICT_MOBILE_FRONTEND_PURGE_v43_LOGO_VISIBLE_DJ_STATUS_REPAIR
+CACHE_TAG=smfp-v43-logo-visible-dj-repair-20260429-2125
+
+BASIS:
+WebRadio-666SOUNDsDESIGn_FULLPACK_STRICT_MOBILE_FRONTEND_PURGE_v42_FULLPACK_LOGO_ICON_INTEGRATION.zip
+
+FIX:
+- Logo war im v42-Paket vorhanden, aber nicht sichtbar im aktiven Playerbereich.
+- Logo wird jetzt direkt innerhalb #mffApp als erste sichtbare Player-Zeile eingefügt.
+- Logo ist nicht klickbar.
+- Alte externe .mff-top-logo Position wird entfernt/ausgeblendet.
+- DJ / STATUS hatte ein doppeltes/verrutschtes Symbol.
+- DJ-Icon ist jetzt exakt ein Symbol direkt vor dem Label.
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- Stream-Routen
+- Root-Migration
