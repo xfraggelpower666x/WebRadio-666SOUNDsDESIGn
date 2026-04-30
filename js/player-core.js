@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST:
+   * STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST:
+   * STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST:
+   * STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST:
+   * STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST:
+   * STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');

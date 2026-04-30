@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v64 PC PANEL WIDTH AUDIO LOGO EQ BOOST
+666SOUNDsDESIGn — v65 PC CSS LAYER CLEANUP TICKER CENTER FIX
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v64-pc-panel-width-audio-logo-eq-boost-20260430-1400') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v65-pc-css-layer-cleanup-ticker-center-fix-20260430-1435') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -462,7 +462,8 @@ ZWECK:
 }
 
 
-/* v62 header-logo collected patch */
+
+
 @media (min-width: 761px) {
   /* Hintergrund auf komplette Seitenbreite strecken */
   html,
@@ -568,7 +569,8 @@ ZWECK:
 }
 
 
-/* v63 header logo gap fix */
+
+
 @media (min-width: 761px) {
   .pc-header-brand-logo {
     width: min(72%, 720px) !important;
@@ -588,7 +590,8 @@ ZWECK:
 }
 
 
-/* v64 panel width audio logo eq boost */
+
+
 @media (min-width: 761px) {
   /*
     Systempanel-Bereich bündig mit Hauptkarten.
@@ -652,6 +655,179 @@ ZWECK:
   .equalizer-card,
   .visualizer-card {
     overflow: hidden !important;
+  }
+}
+
+
+/* v65 css cleanup ticker center fix */
+@media (min-width: 761px) {
+  /*
+    KANONISCHE PC-REGEL FÜR HEADER / SYSTEMPANELS / TICKER
+    Alte v62/v63/v64 Zusatzblöcke wurden physisch entfernt.
+    Ziel: keine Layer-Konkurrenz mehr.
+  */
+
+  html,
+  body {
+    width: 100% !important;
+    min-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  body {
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+  }
+
+  .player-shell {
+    width: min(74vw, 1140px) !important;
+    max-width: calc(100vw - 190px) !important;
+    min-width: 820px !important;
+    margin-top: 22px !important;
+    margin-bottom: 112px !important;
+    gap: 12px !important;
+  }
+
+  /*
+    Header ganz oben, Logo kleiner und mit sichtbarerem Zwischenraum.
+    EQ darf nicht verdrängt werden.
+  */
+  .hero {
+    order: 0 !important;
+    width: 100% !important;
+    min-height: 116px !important;
+    max-height: 152px !important;
+    padding: 10px 18px 8px !important;
+    margin: 0 0 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    gap: clamp(22px, 2.8vw, 42px) !important;
+    box-shadow:
+      0 0 calc(10px + (var(--pc-audio-energy, .18) * 24px)) rgba(255,61,187,.08),
+      0 0 calc(8px + (var(--pc-audio-energy, .18) * 18px)) rgba(22,255,243,.06) !important;
+  }
+
+  .hero h1,
+  .hero .hero-title,
+  .hero .hero-subtitle,
+  .hero p {
+    display: none !important;
+  }
+
+  .pc-header-brand-logo {
+    --logo-energy: var(--pc-audio-energy, .18);
+    display: block !important;
+    width: min(70%, 700px) !important;
+    max-width: 700px !important;
+    height: auto !important;
+    max-height: 128px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    margin: 0 auto !important;
+    padding-left: clamp(18px, 1.8vw, 34px) !important;
+    padding-right: clamp(18px, 1.8vw, 34px) !important;
+    box-sizing: border-box !important;
+    filter:
+      brightness(calc(1.02 + (var(--logo-energy) * .42)))
+      saturate(calc(1.04 + (var(--logo-energy) * .66)))
+      drop-shadow(0 0 calc(12px + (var(--logo-energy) * 22px)) rgba(255,61,187,.38))
+      drop-shadow(0 0 calc(10px + (var(--logo-energy) * 18px)) rgba(22,255,243,.28)) !important;
+    transform: scale(calc(1 + (var(--logo-energy) * .020))) !important;
+    transition: filter .08s linear, transform .08s linear !important;
+    will-change: filter, transform !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  /*
+    Systempanel-Bereich bündig mit Hauptkarten.
+    Kein schmaleres eigenes Kästchen mehr.
+  */
+  .top-hud {
+    order: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  .status-cluster,
+  .status-bar {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 48px !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    align-self: stretch !important;
+    justify-content: center !important;
+  }
+
+  /*
+    Ticker-Feld: wirklich mittig, nicht nur line-height.
+    Das Feld bleibt an seiner Position neben Cover und History.
+  */
+  .now-playing .ticker-window {
+    grid-column: 2 / 3 !important;
+    grid-row: 2 !important;
+    min-height: 52px !important;
+    height: 52px !important;
+    display: grid !important;
+    align-items: center !important;
+    justify-items: start !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    align-self: center !important;
+  }
+
+  .now-playing .ticker,
+  .now-playing .ticker-text,
+  #nowPlayingTicker {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    line-height: 1.05 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+    transform: translateY(1px) !important;
+    will-change: transform !important;
+  }
+
+  /*
+    EQ bleibt sichtbar und darf etwas stärker arbeiten.
+    Keine Layout-Verdrängung.
+  */
+  .meter-card,
+  .eq-card,
+  .equalizer-card,
+  .visualizer-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+  }
+
+  .eq-bar-fill,
+  .eq-bar,
+  .eq-band,
+  [data-eq-band] {
+    min-height: 16px !important;
+    transform-origin: 50% 100% !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .pc-header-brand-logo {
+    display: none !important;
   }
 }
 

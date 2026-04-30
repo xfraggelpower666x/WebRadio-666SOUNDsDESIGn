@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — v65 PC CSS LAYER CLEANUP + TICKER CENTER FIX
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: alte v62/v63/v64 Incremental-Blöcke entfernt, v65 kanonisch gesetzt
+- js/equalizer.js Versionsmarker
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- docs/REPORT_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX.txt
+- docs/CHANGELOG_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX.txt
+- docs/AUDIT_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/responsive-ui.js
+- LED-Logik
+- Audio-/Player-Logik

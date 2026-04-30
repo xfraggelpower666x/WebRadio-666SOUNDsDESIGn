@@ -1,0 +1,47 @@
+666SOUNDsDESIGn — v65 PC CSS LAYER CLEANUP + TICKER CENTER FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST.zip
+
+UMGESETZTE SAMMELLISTE:
+1. v64 wirkte kaum sichtbar: alte konkurrierende v62/v63/v64 CSS-Blöcke entfernt.
+2. Header/Logo, Systempanel-Breite und Ticker-Zentrierung in eine kanonische v65-Regel gesetzt.
+3. Laufschrift vertikal stärker mittig im vorgesehenen Feld ausgerichtet.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v65 aktualisiert
+- css/desktop.css: alte konkurrierende v62/v63/v64 Blöcke entfernt: 3
+- css/desktop.css: eine kanonische v65-Regel für Header, Panels und Ticker geschrieben
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/responsive-ui.js
+- LED-Logik
+- Audio-/Player-Logik
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST.zip
+- before_file_count: 95
+- after_file_count_pre_report: 95
+- version_v65: True
+- removed_old_blocks_count: 3
+- old_v62_v63_v64_incremental_markers_absent: True
+- canonical_v65_block_present: True
+- ticker_center_stronger_css: True
+- panel_full_width_css: True
+- audio_logo_css_present: True
+- audio_energy_var_kept_in_equalizer: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 98
