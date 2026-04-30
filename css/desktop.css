@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v62 PC HEADER LOGO LAYOUT COLLECTED
+666SOUNDsDESIGn — v63 PC HEADER LOGO GAP FIX
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v62-pc-header-logo-layout-collected-20260430-1305') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v63-pc-header-logo-gap-fix-20260430-1330') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -564,6 +564,26 @@ ZWECK:
 @media (max-width: 760px) {
   .pc-header-brand-logo {
     display: none !important;
+  }
+}
+
+
+/* v63 header logo gap fix */
+@media (min-width: 761px) {
+  .pc-header-brand-logo {
+    width: min(72%, 720px) !important;
+    max-width: 720px !important;
+    max-height: 132px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    padding-left: clamp(10px, 1.2vw, 22px) !important;
+    padding-right: clamp(10px, 1.2vw, 22px) !important;
+    box-sizing: border-box !important;
+  }
+
+  .hero {
+    column-gap: clamp(18px, 2.2vw, 34px) !important;
+    gap: clamp(18px, 2.2vw, 34px) !important;
   }
 }
 

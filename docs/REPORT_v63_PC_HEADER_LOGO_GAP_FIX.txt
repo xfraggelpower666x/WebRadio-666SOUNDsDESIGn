@@ -1,0 +1,42 @@
+666SOUNDsDESIGn — v63 PC HEADER LOGO GAP FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.zip
+
+UMGESETZTE SAMMELLISTE:
+1. Zwischen den beiden Logos in der obersten Reihe etwas mehr optischer Abstand.
+2. Header-Logo minimal kleiner gesetzt, damit nichts zusammenklebt.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v63 aktualisiert
+- css/desktop.css: Header-Logo etwas kleiner + optischer Abstand/Padding in oberster Logo-Reihe
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+- Audio-/Player-Logik
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.zip
+- before_file_count: 89
+- after_file_count_pre_report: 89
+- version_v63: True
+- header_logo_dom_present: True
+- gap_css_present: True
+- logo_smaller_css: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- equalizer_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 92

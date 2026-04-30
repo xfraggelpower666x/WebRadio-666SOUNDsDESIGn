@@ -1,0 +1,35 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v63_PC_HEADER_LOGO_GAP_FIX",
+  "cache_tag": "smfp-v63-pc-header-logo-gap-fix-20260430-1330",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.zip",
+  "changes": [
+    "index.html: Version/Cache auf v63 aktualisiert",
+    "css/desktop.css: Header-Logo etwas kleiner + optischer Abstand/Padding in oberster Logo-Reihe"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.zip",
+    "before_file_count": 89,
+    "after_file_count_pre_report": 89,
+    "version_v63": true,
+    "header_logo_dom_present": true,
+    "gap_css_present": true,
+    "logo_smaller_css": true,
+    "worker_unchanged": true,
+    "stream_routes_unchanged": true,
+    "equalizer_unchanged": true,
+    "responsive_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 92
+  }
+}

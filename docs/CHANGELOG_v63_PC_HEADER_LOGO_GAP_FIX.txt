@@ -1,0 +1,18 @@
+666SOUNDsDESIGn — v63 PC HEADER LOGO GAP FIX
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: Header-Logo kleiner + optischer Abstand/Padding
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- docs/REPORT_v63_PC_HEADER_LOGO_GAP_FIX.txt
+- docs/CHANGELOG_v63_PC_HEADER_LOGO_GAP_FIX.txt
+- docs/AUDIT_v63_PC_HEADER_LOGO_GAP_FIX.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+- Audio-/Player-Logik
