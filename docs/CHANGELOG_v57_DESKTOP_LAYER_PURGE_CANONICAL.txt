@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — v57 DESKTOP LAYER PURGE CANONICAL
+
+Geändert:
+- index.html
+- css/desktop.css
+- js/player-core.js falls applyStatusChip fehlte
+- js/equalizer.js Versionsheader
+- js/responsive-ui.js Versionsheader
+- docs/REPORT_v57_DESKTOP_LAYER_PURGE_CANONICAL.txt
+- docs/CHANGELOG_v57_DESKTOP_LAYER_PURGE_CANONICAL.txt
+- docs/AUDIT_v57_DESKTOP_LAYER_PURGE_CANONICAL.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+Wichtig:
+- Alte v51/v52/v53/v55/v56 Desktop-CSS-Blöcke entfernt.
+- Keine neue Schicht über alten Schichten.
+- Eine kanonische Desktop-CSS-Regel.

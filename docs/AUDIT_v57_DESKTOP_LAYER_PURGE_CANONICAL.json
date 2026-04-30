@@ -1,0 +1,37 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL",
+  "cache_tag": "smfp-v57-desktop-layer-purge-canonical-20260430-0855",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.zip",
+  "changes": [
+    "css/desktop.css: alte Desktop-Patchblöcke physisch entfernt: 6",
+    "css/desktop.css: eine einzige kanonische v57 Desktop-Schicht geschrieben",
+    "player-core.js: applyStatusChip Farblogik nachgezogen"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.zip",
+    "before_file_count": 70,
+    "after_file_count_pre_report": 70,
+    "removed_old_desktop_blocks": 6,
+    "only_one_v57_desktop_block": true,
+    "old_v51_v52_v53_v55_v56_css_markers_absent": true,
+    "bottom_meter_present_once": true,
+    "history_portal_to_body": true,
+    "status_chip_data_led_state": false,
+    "bottom_meter_visualizer_sync": true,
+    "worker_unchanged": true,
+    "stream_routes_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 73
+  }
+}

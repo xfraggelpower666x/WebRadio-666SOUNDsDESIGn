@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v57 DESKTOP LAYER PURGE CANONICAL
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.zip
+
+DIREKT AUFGERÄUMT:
+- Alte Desktop-CSS-Patchblöcke v51/v52/v53/v55/v56 physisch entfernt.
+- Nur eine kanonische v57-Desktop-Schicht bleibt.
+- Bottom-Levelmeter nur einmal vorhanden.
+- History bleibt Overlay/Portal.
+- Side-Levelmeter bleiben original.
+
+GEÄNDERT:
+- css/desktop.css: alte Desktop-Patchblöcke physisch entfernt: 6
+- css/desktop.css: eine einzige kanonische v57 Desktop-Schicht geschrieben
+- player-core.js: applyStatusChip Farblogik nachgezogen
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.zip
+- before_file_count: 70
+- after_file_count_pre_report: 70
+- removed_old_desktop_blocks: 6
+- only_one_v57_desktop_block: True
+- old_v51_v52_v53_v55_v56_css_markers_absent: True
+- bottom_meter_present_once: True
+- history_portal_to_body: True
+- status_chip_data_led_state: False
+- bottom_meter_visualizer_sync: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 73

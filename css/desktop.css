@@ -24,30 +24,24 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v51 DESKTOP MATCH MOBILE KEEP PC SIDE METERS
+666SOUNDsDESIGn — v57 DESKTOP LAYER PURGE CANONICAL
 GEÄNDERT: 2026-04-30
 ZWECK:
-- Desktop optisch näher an iPhone/Mobile-Design bringen.
-- Seitliche PC-Levelmeter bleiben original: keine Side-Meter-Selektoren werden verändert.
-- Keine Audio-/Worker-/Stream-Routen-Änderung.
+- Eine einzige kanonische Desktop-Layout-Schicht.
+- Keine alten v51/v52/v53/v55/v56 Schichten mehr.
+- Side-Levelmeter bleiben original.
 ============================================================
 */
 
 @media (min-width: 761px) {
   :root {
-    --v51-bg-panel: rgba(7, 10, 29, .78);
-    --v51-bg-panel-soft: rgba(11, 15, 40, .64);
-    --v51-border-cyan: rgba(22, 255, 243, .42);
-    --v51-border-pink: rgba(255, 61, 187, .34);
-    --v51-cyan: #28fff4;
-    --v51-pink: #ff3dbb;
-    --v51-text: #f7f8ff;
-    --v51-muted: #aeb6cc;
-    --v51-radius-xl: 28px;
-    --v51-radius-lg: 22px;
-    --v51-radius-md: 16px;
-    --v51-glow-cyan: 0 0 18px rgba(22,255,243,.18), 0 0 42px rgba(22,255,243,.08);
-    --v51-glow-pink: 0 0 18px rgba(255,61,187,.20), 0 0 42px rgba(255,61,187,.08);
+    --pc-cyan: #28fff4;
+    --pc-pink: #ff3dbb;
+    --pc-text: #f7f8ff;
+    --pc-muted: #aeb6cc;
+    --pc-panel: rgba(7,10,29,.78);
+    --pc-border-cyan: rgba(22,255,243,.42);
+    --pc-border-pink: rgba(255,61,187,.34);
   }
 
   body {
@@ -55,801 +49,30 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v51-desktop-match-mobile-keep-side-20260430-0535') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v57-desktop-layer-purge-canonical-20260430-0855') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
     background-repeat: no-repeat !important;
   }
 
-  /* Hauptcontainer: iPhone-artige Center-Spalte, aber Desktop-breit genug */
-  #app,
-  .app,
-  .player,
-  .radio-player,
-  .desktop-player,
-  .main-player,
-  #player,
-  main {
-    box-sizing: border-box;
-  }
-
-  .player-shell,
-  .radio-shell,
-  .cockpit,
-  .player-wrap,
-  .player-wrapper,
-  .main-player,
-  #mffApp {
-    max-width: min(980px, calc(100vw - 160px)) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-
-  /* Karten/Paneele wie Mobile: Glas, Cyan-Rand, dunkle Fläche */
-  .now-playing,
-  .nowplaying,
-  .now-card,
-  .status-card,
-  .stat-card,
-  .panel,
-  .card,
-  .eq-panel,
-  .equalizer-panel,
-  .controls,
-  .control-panel,
-  .boost-panel,
-  .boost-row,
-  #nowPlaying,
-  #statusCards,
-  #equalizer,
-  #controls {
-    border: 1px solid var(--v51-border-cyan) !important;
-    border-radius: var(--v51-radius-xl) !important;
-    background:
-      linear-gradient(145deg, rgba(255,61,187,.055), rgba(22,255,243,.035)),
-      var(--v51-bg-panel) !important;
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,.025),
-      var(--v51-glow-cyan),
-      0 18px 54px rgba(0,0,0,.30) !important;
-    backdrop-filter: blur(14px) saturate(1.15) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
-  }
-
-  /* Now Playing im Mobile-Stil */
-  .now-playing,
-  .nowplaying,
-  .now-card,
-  #nowPlaying {
-    min-height: 138px !important;
-    padding: 22px 26px !important;
-    display: grid !important;
-    grid-template-columns: 112px 1fr auto !important;
-    align-items: center !important;
-    gap: 24px !important;
-  }
-
-  .now-playing img,
-  .nowplaying img,
-  .now-card img,
-  #nowPlaying img,
-  .cover,
-  .cover-art {
-    width: 96px !important;
-    height: 96px !important;
-    border-radius: 20px !important;
-    object-fit: cover !important;
-    border: 1px solid rgba(255,61,187,.48) !important;
-    box-shadow: 0 0 18px rgba(255,61,187,.24), 0 0 22px rgba(22,255,243,.12) !important;
-  }
-
-  .now-playing h1,
-  .now-playing h2,
-  .now-playing .title,
-  .nowplaying h1,
-  .nowplaying h2,
-  .nowplaying .title,
-  .track-title,
-  #trackTitle {
-    color: var(--v51-pink) !important;
-    font-weight: 900 !important;
-    letter-spacing: -.025em !important;
-    text-shadow: 0 0 12px rgba(255,61,187,.34) !important;
-  }
-
-  .now-playing small,
-  .now-playing .label,
-  .nowplaying small,
-  .nowplaying .label,
-  .source,
-  .meta-source {
-    color: var(--v51-cyan) !important;
-    font-weight: 850 !important;
-    letter-spacing: .12em !important;
-    text-transform: uppercase !important;
-    text-shadow: 0 0 10px rgba(22,255,243,.28) !important;
-  }
-
-  /* Statusreihe: einheitlich wie iPhone-Karten */
-  .status-row,
-  .stats-row,
-  .system-panels,
-  .stat-grid,
-  #statusCards {
-    display: grid !important;
-    grid-template-columns: .9fr .9fr 1.25fr !important;
-    gap: 18px !important;
-    align-items: stretch !important;
-  }
-
-  .status-card,
-  .stat-card,
-  .system-panel,
-  .listener-card,
-  .bitrate-card,
-  .dj-card {
-    min-height: 112px !important;
-    padding: 18px 18px 16px !important;
-    text-align: center !important;
-    display: grid !important;
-    grid-template-rows: 24px 1fr 14px !important;
-    align-items: center !important;
-    justify-items: center !important;
-    border-radius: 24px !important;
-  }
-
-  .status-card .label,
-  .stat-card .label,
-  .system-panel .label,
-  .status-card small,
-  .stat-card small,
-  .system-panel small {
-    color: var(--v51-cyan) !important;
-    font-size: 13px !important;
-    font-weight: 900 !important;
-    letter-spacing: .16em !important;
-    text-transform: uppercase !important;
-  }
-
-  .status-card strong,
-  .stat-card strong,
-  .system-panel strong,
-  .stat-value,
-  .listener-value,
-  .bitrate-value,
-  .dj-value {
-    color: var(--v51-text) !important;
-    font-size: clamp(24px, 2.2vw, 36px) !important;
-    line-height: 1.05 !important;
-    font-weight: 900 !important;
-    text-align: center !important;
-  }
-
-  /* EQ Panel */
-  .eq-panel,
-  .equalizer-panel,
-  #equalizer {
-    min-height: 330px !important;
-    padding: 24px 34px 26px !important;
-    border-radius: 30px !important;
-  }
-
-  .eq-title,
-  .equalizer-title,
-  #equalizer .label,
-  .bands-label {
-    color: var(--v51-cyan) !important;
-    font-weight: 950 !important;
-    letter-spacing: .18em !important;
-    text-transform: uppercase !important;
-    text-shadow: 0 0 10px rgba(22,255,243,.32) !important;
-  }
-
-  .eq-bar,
-  .eq-band,
-  .bar,
-  [data-eq-band] {
-    border-radius: 999px !important;
-    background: linear-gradient(to top, #20fff4 0%, #2de5ff 34%, #9555ff 64%, #ff3dbb 100%) !important;
-    box-shadow: 0 0 12px rgba(22,255,243,.22), 0 0 14px rgba(255,61,187,.18) !important;
-  }
-
-  /* Controls: Mobile-Button-Look auf PC */
-  .controls,
-  .control-panel,
-  #controls {
-    min-height: 110px !important;
-    padding: 18px 22px !important;
-    border-radius: 28px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 18px !important;
-  }
-
-  button,
-  .control-btn,
-  .btn,
-  .play-btn,
-  .pause-btn,
-  .stop-btn,
-  [data-action] {
-    border-radius: 22px !important;
-    border: 1px solid var(--v51-border-cyan) !important;
-    background: linear-gradient(145deg, rgba(8,12,34,.86), rgba(8,12,34,.62)) !important;
-    color: var(--v51-text) !important;
-    box-shadow: inset 0 0 16px rgba(22,255,243,.045), 0 0 16px rgba(22,255,243,.10) !important;
-  }
-
-  button.is-active,
-  .control-btn.is-active,
-  .btn.is-active,
-  [data-action].is-active,
-  .mff-transport-active {
-    border-color: rgba(255,61,187,1) !important;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(255,61,187,.36), rgba(255,61,187,.13) 48%, rgba(8,12,34,.72) 78%) !important;
-    box-shadow: 0 0 20px rgba(255,61,187,.54), inset 0 0 18px rgba(255,61,187,.16) !important;
-  }
-
-  /* Boost-Reihe im Mobile-Stil */
-  .boost-panel,
-  .boost-row,
-  .boost {
-    min-height: 58px !important;
-    border-radius: 22px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 18px !important;
-    color: var(--v51-cyan) !important;
-    letter-spacing: .18em !important;
-    text-transform: uppercase !important;
-  }
-
-  .boost .led,
-  .boost-led,
-  .boost-dot {
-    width: 14px !important;
-    height: 14px !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,.34) !important;
-    background: rgba(255,255,255,.10) !important;
-  }
-
-  .boost .led.on,
-  .boost-led.on,
-  .boost-dot.on,
-  .boost .is-on,
-  .boost-led.is-on {
-    background: var(--v51-pink) !important;
-    border-color: rgba(255,61,187,.95) !important;
-    box-shadow: 0 0 16px rgba(255,61,187,.55) !important;
-  }
-
-  /* Header-Logo Asset auf Desktop anzeigen, falls vorhandene Struktur es referenziert */
-  .header-logo,
-  .player-logo,
-  .brand-logo img,
-  .logo img {
-    filter: drop-shadow(0 0 14px rgba(22,255,243,.22)) drop-shadow(0 0 16px rgba(255,61,187,.22)) !important;
-  }
-
-  /* WICHTIG:
-     Keine Regeln für seitliche PC-Levelmeter.
-     Bewusst NICHT angefasst:
-     .side-meter, .left-meter, .right-meter, .mff-side-left, .mff-side-right,
-     .mff-level-left, .mff-level-right, [data-side-meter]
-  */
-}
-
-
-/*
-============================================================
-666SOUNDsDESIGn — v52 PC PANEL LED + NOWPLAYING LAYOUT FIX
-GEÄNDERT: 2026-04-30
-ZWECK:
-- PC Kopfbereich aufräumen.
-- Panel-LEDs in die oberste Reihe bündeln.
-- LIVE/BST OK als Header-Störer ausblenden.
-- NOW PLAYING als eigene Reihe.
-- History unter Laufschrift unten rechts.
-- Seitliche PC-Levelmeter bleiben original.
-============================================================
-*/
-
-@media (min-width: 761px) {
-  /* ---------- PC Header / Shell sauber stapeln ---------- */
-  .player-shell,
-  .radio-shell,
-  .cockpit,
-  .player-wrap,
-  .player-wrapper,
-  .main-player,
-  #mffApp {
+  /* Hauptplayer: eine klare Spalte, nicht mehr vertauschte Reihenfolge */
+  .player-shell {
+    width: min(74vw, 1140px) !important;
+    max-width: calc(100vw - 190px) !important;
+    min-width: 820px !important;
+    margin: 32px auto 112px !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
     align-items: stretch !important;
   }
 
-  /* ---------- Oberste Reihe: nur Panel LEDs ---------- */
-  .panel-led-row,
-  .led-row,
-  .system-led-row,
-  .status-led-row,
-  .health-led-row,
-  .panel-leds,
-  .system-leds,
-  .top-leds,
-  [data-panel-led-row],
-  [data-led-row] {
-    order: 0 !important;
-    width: 100% !important;
-    min-height: 46px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 12px !important;
-    margin: 0 0 2px 0 !important;
-    padding: 7px 12px !important;
-    border: 1px solid rgba(22,255,243,.38) !important;
-    border-radius: 999px !important;
-    background:
-      linear-gradient(145deg, rgba(22,255,243,.045), rgba(255,61,187,.035)),
-      rgba(7,10,29,.72) !important;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 0 22px rgba(22,255,243,.10) !important;
-    box-sizing: border-box !important;
-  }
-
-  .panel-led-row .led,
-  .led-row .led,
-  .system-led-row .led,
-  .status-led-row .led,
-  .health-led-row .led,
-  .panel-leds .led,
-  .system-leds .led,
-  .top-leds .led,
-  [data-panel-led-row] .led,
-  [data-led-row] .led,
-  .panel-led,
-  .system-led {
-    min-width: 76px !important;
-    height: 30px !important;
-    padding: 0 12px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,255,255,.22) !important;
-    background: rgba(5,8,22,.72) !important;
-    color: #dfe7ff !important;
-    font-size: 11px !important;
-    font-weight: 900 !important;
-    letter-spacing: .14em !important;
-    text-transform: uppercase !important;
-    box-shadow: inset 0 0 14px rgba(0,0,0,.25), 0 0 13px rgba(22,255,243,.10) !important;
-  }
-
-  .panel-led-row .led::before,
-  .led-row .led::before,
-  .system-led-row .led::before,
-  .status-led-row .led::before,
-  .health-led-row .led::before,
-  .panel-leds .led::before,
-  .system-leds .led::before,
-  .top-leds .led::before,
-  .panel-led::before,
-  .system-led::before {
-    content: '' !important;
-    width: 9px !important;
-    height: 9px !important;
-    border-radius: 50% !important;
-    display: inline-block !important;
-    flex: 0 0 9px !important;
-    background: rgba(255,255,255,.14) !important;
-    box-shadow: 0 0 8px rgba(255,255,255,.24) !important;
-  }
-
-  .panel-led-row .led.ok::before,
-  .panel-led-row .led.is-ok::before,
-  .panel-led-row .led.active::before,
-  .panel-led-row .led.is-active::before,
-  .led-row .led.ok::before,
-  .led-row .led.is-ok::before,
-  .led-row .led.active::before,
-  .led-row .led.is-active::before,
-  .panel-led.ok::before,
-  .panel-led.is-ok::before,
-  .panel-led.active::before,
-  .panel-led.is-active::before {
-    background: #28fff4 !important;
-    box-shadow: 0 0 10px rgba(22,255,243,.95), 0 0 18px rgba(22,255,243,.34) !important;
-  }
-
-  .panel-led-row .led.warn::before,
-  .panel-led-row .led.error::before,
-  .panel-led-row .led.bad::before,
-  .panel-led-row .led.off::before,
-  .led-row .led.warn::before,
-  .led-row .led.error::before,
-  .led-row .led.bad::before,
-  .led-row .led.off::before,
-  .panel-led.warn::before,
-  .panel-led.error::before,
-  .panel-led.bad::before,
-  .panel-led.off::before {
-    background: #ff3dbb !important;
-    box-shadow: 0 0 10px rgba(255,61,187,.95), 0 0 18px rgba(255,61,187,.34) !important;
-  }
-
-  /* ---------- LIVE / BST OK aus oberem Kopfbereich entfernen ---------- */
-  .live-badge,
-  .live-pill,
-  .status-live,
-  .live-status,
-  .bst-ok,
-  .boost-ok,
-  .bst-status,
-  .boost-status,
-  .top-live-row,
-  .header-live-row,
-  .cockpit-badges,
-  .hero-badges {
-    display: none !important;
-  }
-
-  /* Falls LIVE/BST als einzelne Buttons im Header stehen, aber nicht die Player-Control-Buttons sind */
-  header .live,
-  header .bst,
-  .hero .live,
-  .hero .bst,
-  .cockpit-header .live,
-  .cockpit-header .bst {
-    display: none !important;
-  }
-
-  /* ---------- Titel/Hero kompakter; NOW PLAYING soll eigene Reihe bekommen ---------- */
-  .hero,
-  .cockpit-header,
-  .player-hero,
-  .intro-panel,
-  .brand-panel {
-    order: 1 !important;
-    min-height: 82px !important;
-    padding: 18px 22px !important;
-    border-radius: 24px !important;
-  }
-
-  .hero h1,
-  .cockpit-header h1,
-  .player-hero h1,
-  .intro-panel h1,
-  .brand-panel h1 {
-    margin: 0 !important;
-    font-size: clamp(22px, 2.4vw, 34px) !important;
-    line-height: 1.05 !important;
-  }
-
-  .hero p,
-  .cockpit-header p,
-  .player-hero p,
-  .intro-panel p,
-  .brand-panel p {
-    margin: 6px 0 0 !important;
-    color: #aeb6cc !important;
-  }
-
-  /* ---------- NOW PLAYING eigene Reihe ---------- */
-  .now-playing,
-  .nowplaying,
-  .now-card,
-  #nowPlaying {
-    order: 2 !important;
-    display: grid !important;
-    grid-template-columns: 1fr auto !important;
-    grid-template-rows: auto auto auto !important;
-    gap: 8px 18px !important;
-    min-height: 142px !important;
-    padding: 20px 24px !important;
-    align-items: center !important;
-    position: relative !important;
-  }
-
-  .now-playing::before,
-  .nowplaying::before,
-  .now-card::before,
-  #nowPlaying::before {
-    content: 'NOW PLAYING' !important;
-    grid-column: 1 / -1 !important;
-    grid-row: 1 !important;
-    color: #28fff4 !important;
-    font-size: 12px !important;
-    font-weight: 950 !important;
-    letter-spacing: .22em !important;
-    text-transform: uppercase !important;
-    text-shadow: 0 0 10px rgba(22,255,243,.30) !important;
-    display: block !important;
-    margin-bottom: 4px !important;
-  }
-
-  .now-playing .title,
-  .nowplaying .title,
-  .now-card .title,
-  #nowPlaying .title,
-  .track-title,
-  #trackTitle {
-    grid-column: 1 / 2 !important;
-    grid-row: 2 !important;
-    min-width: 0 !important;
-    width: 100% !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-    text-overflow: clip !important;
-    color: #ff3dbb !important;
-    font-weight: 950 !important;
-    font-size: clamp(18px, 1.9vw, 27px) !important;
-    line-height: 1.08 !important;
-  }
-
-  .now-playing .ticker,
-  .nowplaying .ticker,
-  .now-card .ticker,
-  #nowPlaying .ticker,
-  .marquee,
-  .track-marquee {
-    grid-column: 1 / 2 !important;
-    grid-row: 2 !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-  }
-
-  .now-playing .source,
-  .nowplaying .source,
-  .now-card .source,
-  #nowPlaying .source,
-  .meta-source,
-  .stream-source {
-    grid-column: 1 / 2 !important;
-    grid-row: 3 !important;
-    min-width: 0 !important;
-    color: #28fff4 !important;
-    font-size: 15px !important;
-    font-weight: 900 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  /* ---------- History unter die Laufschrift unten rechts ---------- */
-  .history-btn,
-  .history-button,
-  #historyBtn,
-  button[data-action="history"],
-  [data-action="history"] {
-    grid-column: 2 / 3 !important;
-    grid-row: 3 !important;
-    align-self: end !important;
-    justify-self: end !important;
-    min-width: 112px !important;
-    height: 44px !important;
-    border-radius: 18px !important;
-    margin: 0 !important;
-    position: static !important;
-  }
-
-  /* Wenn History vorher absolut im NowPlaying klebte */
-  .now-playing .history-btn,
-  .nowplaying .history-btn,
-  .now-card .history-btn,
-  #nowPlaying .history-btn,
-  .now-playing #historyBtn,
-  .nowplaying #historyBtn,
-  .now-card #historyBtn,
-  #nowPlaying #historyBtn {
-    position: static !important;
-    right: auto !important;
-    top: auto !important;
-    bottom: auto !important;
-  }
-
-  /* ---------- Statuskarten als Reihe unter Now Playing ---------- */
-  .status-row,
-  .stats-row,
-  .system-panels,
-  .stat-grid,
-  #statusCards {
-    order: 3 !important;
-  }
-
-  .eq-panel,
-  .equalizer-panel,
-  #equalizer {
-    order: 4 !important;
-  }
-
-  .controls,
-  .control-panel,
-  #controls {
-    order: 5 !important;
-  }
-
-  .boost-panel,
-  .boost-row,
-  .boost {
-    order: 6 !important;
-  }
-
-  /* WICHTIG:
-     Keine Seit-Levelmeter-Regeln.
-     Side-Meter-Original bleibt unberührt.
-  */
-}
-
-
-/*
-============================================================
-666SOUNDsDESIGn — v53 PC BOTTOM MOBILE LEVELMETER ADDON
-GEÄNDERT: 2026-04-30
-ZWECK:
-- Unteres iPhone-Levelmeter auch auf PC ergänzen.
-- Seitliche PC-Levelmeter bleiben original.
-- Keine Audio-/Worker-/Stream-Routen-Änderung.
-============================================================
-*/
-
-@media (min-width: 761px) {
-  .pc-bottom-mobile-levelmeter {
-    order: 7 !important;
-    width: 100% !important;
-    min-height: 82px !important;
-    margin: 0 !important;
-    padding: 18px 28px !important;
-    box-sizing: border-box !important;
-    border: 1px solid rgba(22,255,243,.42) !important;
-    border-radius: 28px !important;
-    background:
-      linear-gradient(145deg, rgba(255,61,187,.045), rgba(22,255,243,.035)),
-      rgba(7,10,29,.78) !important;
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,.025),
-      0 0 18px rgba(22,255,243,.12),
-      0 18px 54px rgba(0,0,0,.28) !important;
-    backdrop-filter: blur(14px) saturate(1.15) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
-    overflow: hidden !important;
-  }
-
-  .pc-bottom-mobile-levelmeter-inner {
-    width: 100% !important;
-    height: 42px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    overflow: hidden !important;
-  }
-
-  .pc-bottom-mobile-meter-seg {
-    width: clamp(4px, .42vw, 7px) !important;
-    height: 32px !important;
-    flex: 0 0 clamp(4px, .42vw, 7px) !important;
-    border-radius: 999px !important;
-    background: linear-gradient(to top, #22fff4 0%, #20dfff 36%, #8e58ff 66%, #ff3dbb 100%) !important;
-    box-shadow: none !important;
-    opacity: .18;
-    transform: scaleY(calc(.42 + (var(--v, .2) * .52))) !important;
-    transform-origin: 50% 50% !important;
-    transition: opacity .07s linear, filter .07s linear, transform .07s linear !important;
-    will-change: opacity, filter, transform !important;
-  }
-
-  .pc-bottom-mobile-meter-seg.is-on {
-    opacity: .92;
-    filter: brightness(1.16) saturate(1.18) !important;
-    box-shadow:
-      0 0 8px rgba(22,255,243,.30),
-      0 0 10px rgba(255,61,187,.22) !important;
-  }
-
-  /* WICHTIG:
-     Keine .side-meter / .left-meter / .right-meter / data-side-meter Regeln.
-     PC-Seiten-Levelmeter bleiben original.
-  */
-}
-
-
-/*
-============================================================
-666SOUNDsDESIGn — v54 PC VERSION BADGE BOTTOM RIGHT
-GEÄNDERT: 2026-04-30
-ZWECK:
-- Desktop/PC Versionskontrolle unten rechts.
-- Mobile/iPhone bleibt unverändert.
-============================================================
-*/
-
-@media (min-width: 761px) {
-  .pc-version-badge {
-    position: fixed !important;
-    right: max(18px, env(safe-area-inset-right, 0px)) !important;
-    bottom: max(18px, env(safe-area-inset-bottom, 0px)) !important;
-    z-index: 99999 !important;
-    min-width: 54px !important;
-    height: 34px !important;
-    padding: 0 14px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255,61,187,.72) !important;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(255,61,187,.40), rgba(255,61,187,.16) 54%, rgba(7,10,29,.78) 100%) !important;
-    color: #fff !important;
-    font-size: 14px !important;
-    font-weight: 950 !important;
-    letter-spacing: .08em !important;
-    line-height: 1 !important;
-    text-transform: lowercase !important;
-    text-shadow: 0 0 10px rgba(255,255,255,.42) !important;
-    box-shadow:
-      0 0 16px rgba(255,61,187,.52),
-      0 0 28px rgba(255,61,187,.22),
-      inset 0 0 14px rgba(255,255,255,.10) !important;
-    pointer-events: none !important;
-    user-select: none !important;
-  }
-}
-
-@media (max-width: 760px) {
-  .pc-version-badge {
-    display: none !important;
-  }
-}
-
-
-/*
-============================================================
-666SOUNDsDESIGn — v55 PC CONSOLIDATED LAYOUT + DYNAMICS FIX
-GEÄNDERT: 2026-04-30
-ZWECK:
-- Unteres PC-Levelmeter an Side-Meter-Dynamik koppeln.
-- Panel-LEDs oben wie iPhone-Systempanels.
-- History als echtes Overlay.
-- Equalizer-Mitte funktional.
-- Live Stream aus Now Playing entfernen.
-- PC-Player breiter.
-============================================================
-*/
-
-@media (min-width: 761px) {
-  /* PC-Player etwas breiter, aber Abstand zu Side-Metern behalten */
-  .player-shell {
-    width: min(72vw, 1120px) !important;
-    max-width: calc(100vw - 190px) !important;
-  }
-
-  .player-shell,
-  .radio-shell,
-  .cockpit,
-  .player-wrap,
-  .player-wrapper,
-  .main-player,
-  #mffApp {
-    max-width: min(1120px, calc(100vw - 190px)) !important;
-  }
-
-  /* Systempanels/LEDs oben als echte Reihe */
   .top-hud {
-    order: 0 !important;
-    justify-content: center !important;
-    padding: 14px 16px 0 !important;
-    margin: 0 0 10px !important;
+    order: 1 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .status-cluster,
@@ -862,10 +85,9 @@ ZWECK:
     gap: 12px !important;
     padding: 7px 12px !important;
     border-radius: 999px !important;
-    border: 1px solid rgba(22,255,243,.38) !important;
+    border: 1px solid var(--pc-border-cyan) !important;
     background: linear-gradient(145deg,rgba(22,255,243,.045),rgba(255,61,187,.035)),rgba(7,10,29,.72) !important;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.025),0 0 22px rgba(22,255,243,.10) !important;
-    box-sizing: border-box !important;
   }
 
   .status-chip {
@@ -877,45 +99,53 @@ ZWECK:
     gap: 8px !important;
     padding: 0 12px !important;
     border-radius: 999px !important;
+    border: 1px solid rgba(255,255,255,.22) !important;
     background: rgba(5,8,22,.74) !important;
     color: #dfe7ff !important;
-    border: 1px solid rgba(255,255,255,.22) !important;
     font-size: 11px !important;
     font-weight: 950 !important;
     letter-spacing: .13em !important;
     text-transform: uppercase !important;
-    box-shadow: inset 0 0 14px rgba(0,0,0,.24),0 0 13px rgba(22,255,243,.10) !important;
   }
 
   .status-dot {
     width: 9px !important;
     height: 9px !important;
     border-radius: 50% !important;
-    background: rgba(255,255,255,.16) !important;
-    box-shadow: 0 0 8px rgba(255,255,255,.22) !important;
     flex: 0 0 9px !important;
   }
 
+  .status-chip.state-ok .status-dot,
   .status-chip.state-main .status-dot,
   .status-chip.state-api .status-dot,
   .status-chip.state-external .status-dot,
   .status-chip.is-active .status-dot {
-    background: #28fff4 !important;
-    box-shadow: 0 0 10px rgba(22,255,243,.95),0 0 18px rgba(22,255,243,.34) !important;
+    background: var(--pc-cyan) !important;
+    border: 1px solid rgba(40,255,244,.95) !important;
+    box-shadow: 0 0 10px rgba(22,255,243,.95), 0 0 18px rgba(22,255,243,.36) !important;
   }
 
-  .status-chip.state-backup .status-dot {
-    background: #ff3dbb !important;
-    box-shadow: 0 0 10px rgba(255,61,187,.95),0 0 18px rgba(255,61,187,.34) !important;
-  }
-
+  .status-chip.state-warn .status-dot,
   .status-chip.state-error .status-dot,
-  .status-chip.state-off .status-dot {
-    background: #ff3dbb !important;
-    box-shadow: 0 0 10px rgba(255,61,187,.80),0 0 18px rgba(255,61,187,.30) !important;
+  .status-chip.state-backup .status-dot,
+  .status-chip.state-stopped .status-dot,
+  .status-chip.state-paused .status-dot {
+    background: var(--pc-pink) !important;
+    border: 1px solid rgba(255,61,187,.95) !important;
+    box-shadow: 0 0 10px rgba(255,61,187,.95), 0 0 18px rgba(255,61,187,.36) !important;
   }
 
-  /* LIVE / BST OK aus Now/Header-Bereich entfernen */
+  .status-chip.state-empty .status-dot,
+  .status-chip.state-off .status-dot {
+    background: transparent !important;
+    border: 1px solid rgba(255,255,255,.82) !important;
+    box-shadow: 0 0 8px rgba(255,255,255,.38) !important;
+  }
+
+  .hero {
+    order: 2 !important;
+  }
+
   .hero-label-row,
   .hero-badge,
   .hero-live,
@@ -923,28 +153,32 @@ ZWECK:
     display: none !important;
   }
 
-  /* NOW PLAYING eigene saubere Reihe ohne Livestream-Badge */
   .now-playing {
+    order: 3 !important;
     display: grid !important;
-    grid-template-columns: minmax(0,1fr) auto !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
     grid-template-rows: auto auto auto !important;
     gap: 8px 16px !important;
     min-height: 136px !important;
     padding: 18px 22px !important;
+    border: 1px solid var(--pc-border-cyan) !important;
+    border-radius: 28px !important;
+    background: linear-gradient(145deg, rgba(255,61,187,.055), rgba(22,255,243,.035)), var(--pc-panel) !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 0 18px rgba(22,255,243,.12) !important;
   }
 
   .section-topline {
     grid-column: 1 / -1 !important;
     grid-row: 1 !important;
     display: grid !important;
-    grid-template-columns: minmax(0,1fr) auto !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
     gap: 14px !important;
     align-items: start !important;
     margin: 0 !important;
   }
 
   .section-kicker {
-    color: #28fff4 !important;
+    color: var(--pc-cyan) !important;
     font-size: 12px !important;
     font-weight: 950 !important;
     letter-spacing: .22em !important;
@@ -953,7 +187,7 @@ ZWECK:
   }
 
   .meta-line {
-    color: #ff3dbb !important;
+    color: var(--pc-pink) !important;
     font-size: clamp(17px, 1.65vw, 24px) !important;
     font-weight: 950 !important;
     white-space: nowrap !important;
@@ -978,160 +212,19 @@ ZWECK:
     margin: 0 !important;
   }
 
-  /* History Overlay: kein Layout-Schieben mehr */
-  .history-panel {
-    position: fixed !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: min(560px, calc(100vw - 96px)) !important;
-    max-height: min(70vh, 620px) !important;
-    overflow: auto !important;
-    z-index: 2147483000 !important;
-    margin: 0 !important;
-    padding: 18px 20px !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(255,61,187,.62) !important;
-    background: radial-gradient(circle at 18% 0%,rgba(255,61,187,.18),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.13),transparent 38%),rgba(3,7,20,.97) !important;
-    box-shadow: 0 0 36px rgba(255,61,187,.32),0 0 28px rgba(22,255,243,.18),inset 0 0 26px rgba(255,255,255,.035) !important;
-    backdrop-filter: blur(18px) !important;
-    -webkit-backdrop-filter: blur(18px) !important;
+  .meter-card {
+    order: 4 !important;
   }
 
-  .history-panel.hidden {
+  .control-row {
+    order: 5 !important;
+  }
+
+  .now-playing + .history-panel {
     display: none !important;
   }
 
-  body.history-overlay-open::before {
-    content: '' !important;
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 2147482990 !important;
-    background: rgba(0,0,0,.58) !important;
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
-  }
-
-  .history-title {
-    color: #28fff4 !important;
-    font-size: 13px !important;
-    font-weight: 950 !important;
-    letter-spacing: .16em !important;
-    text-transform: uppercase !important;
-  }
-
-  /* Unteres Levelmeter: statisch im DOM, Dynamik aus equalizer.js = Side-Meter smoothMeter */
-  .pc-bottom-sync-meter {
-    order: 7 !important;
-    width: 100% !important;
-    min-height: 76px !important;
-    margin: 0 16px 12px !important;
-    padding: 16px 26px !important;
-    box-sizing: border-box !important;
-    border: 1px solid rgba(22,255,243,.42) !important;
-    border-radius: 26px !important;
-    background: linear-gradient(145deg,rgba(255,61,187,.045),rgba(22,255,243,.035)),rgba(7,10,29,.78) !important;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025),0 0 18px rgba(22,255,243,.12),0 18px 54px rgba(0,0,0,.28) !important;
-    overflow: hidden !important;
-  }
-
-  .pc-bottom-sync-inner {
-    width: 100% !important;
-    height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-  }
-
-  .pc-bottom-sync-seg {
-    width: clamp(4px,.42vw,7px) !important;
-    height: 32px !important;
-    flex: 0 0 clamp(4px,.42vw,7px) !important;
-    border-radius: 999px !important;
-    background: linear-gradient(to top,#22fff4 0%,#20dfff 36%,#8e58ff 66%,#ff3dbb 100%) !important;
-    opacity: .18;
-    transform-origin: 50% 50% !important;
-    transition: opacity .07s linear, filter .07s linear, transform .07s linear !important;
-  }
-
-  .pc-bottom-sync-seg.is-on {
-    filter: brightness(1.16) saturate(1.18) !important;
-    box-shadow: 0 0 8px rgba(22,255,243,.30),0 0 10px rgba(255,61,187,.22) !important;
-  }
-
-  /* Equalizer-Mitte sichtbar funktional halten */
-  .eq-bar-fill {
-    min-height: 14px !important;
-    transition: height .075s linear !important;
-  }
-
-  /* WICHTIG: keine Side-Meter-Selektoren. Seitliche PC-Levelmeter bleiben original. */
-}
-
-
-/*
-============================================================
-666SOUNDsDESIGn — v56 DIRECT REPAIR PANELS HISTORY BOTTOMMETER
-GEÄNDERT: 2026-04-30
-ZWECK:
-- Systempanel LED-Farbenlogik wie iPhone.
-- History wirkliches Overlay, kein Layout-Reflow.
-- Unteres PC-Levelmeter sichtbar und nicht verschluckt.
-============================================================
-*/
-
-@media (min-width: 761px) {
-  .status-chip {
-    min-width: 78px !important;
-    height: 31px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    border-radius: 999px !important;
-  }
-
-  .status-chip .status-dot {
-    width: 9px !important;
-    height: 9px !important;
-    border-radius: 50% !important;
-    flex: 0 0 9px !important;
-  }
-
-  /* iPhone-Farblogik:
-     Türkis = OK / aktiv
-     Pink = Warnung / Fehler / Stream gestoppt
-     Weiß leer = nicht aktiv
-  */
-  .status-chip.state-ok .status-dot,
-  .status-chip.state-main .status-dot,
-  .status-chip.state-api .status-dot,
-  .status-chip.state-external .status-dot,
-  .status-chip.is-active .status-dot {
-    background: #28fff4 !important;
-    border: 1px solid rgba(40,255,244,.95) !important;
-    box-shadow: 0 0 10px rgba(22,255,243,.95), 0 0 18px rgba(22,255,243,.36) !important;
-  }
-
-  .status-chip.state-warn .status-dot,
-  .status-chip.state-error .status-dot,
-  .status-chip.state-backup .status-dot,
-  .status-chip.state-stopped .status-dot,
-  .status-chip.state-paused .status-dot {
-    background: #ff3dbb !important;
-    border: 1px solid rgba(255,61,187,.95) !important;
-    box-shadow: 0 0 10px rgba(255,61,187,.95), 0 0 18px rgba(255,61,187,.36) !important;
-  }
-
-  .status-chip.state-empty .status-dot,
-  .status-chip.state-off .status-dot {
-    background: transparent !important;
-    border: 1px solid rgba(255,255,255,.82) !important;
-    box-shadow: 0 0 8px rgba(255,255,255,.38) !important;
-  }
-
-  /* History: Overlay gewinnt gegen alte Inline-Layout-Regeln */
+  /* History echtes Overlay: wird per JS in body portalt */
   #historyOverlayBackdrop,
   .history-overlay-backdrop {
     position: fixed !important;
@@ -1174,7 +267,7 @@ ZWECK:
     display: none !important;
   }
 
-  /* Unteres PC-Levelmeter sichtbar als fixed bottom HUD, damit es nicht durch falschen Container verschluckt wird */
+  /* Unteres PC-Levelmeter: eine feste HUD-Zeile, nicht Container-abhängig */
   #pcBottomSyncMeter.pc-bottom-sync-meter {
     position: fixed !important;
     left: 50% !important;
@@ -1188,7 +281,7 @@ ZWECK:
     padding: 13px 24px !important;
     box-sizing: border-box !important;
     display: block !important;
-    border: 1px solid rgba(22,255,243,.42) !important;
+    border: 1px solid var(--pc-border-cyan) !important;
     border-radius: 24px !important;
     background: linear-gradient(145deg,rgba(255,61,187,.045),rgba(22,255,243,.035)),rgba(7,10,29,.82) !important;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.025),0 0 18px rgba(22,255,243,.12),0 18px 54px rgba(0,0,0,.28) !important;
@@ -1222,12 +315,35 @@ ZWECK:
   }
 
   .pc-version-badge {
+    position: fixed !important;
+    right: max(18px, env(safe-area-inset-right, 0px)) !important;
     bottom: 18px !important;
+    z-index: 99999 !important;
+    min-width: 54px !important;
+    height: 34px !important;
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255,61,187,.72) !important;
+    background: radial-gradient(circle at 50% 50%, rgba(255,61,187,.40), rgba(255,61,187,.16) 54%, rgba(7,10,29,.78) 100%) !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 950 !important;
+    letter-spacing: .08em !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
+    user-select: none !important;
   }
+
+  /* WICHTIG: Keine CSS-Regeln für .side-meter / .left-meter / .right-meter.
+     PC-Seitenlevelmeter bleiben original. */
 }
 
 @media (max-width: 760px) {
-  #pcBottomSyncMeter {
+  #pcBottomSyncMeter,
+  .pc-version-badge {
     display: none !important;
   }
 }
