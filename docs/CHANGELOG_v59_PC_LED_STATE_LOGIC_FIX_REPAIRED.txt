@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — v59 PC LED STATE LOGIC FIX REPAIRED
+
+Geändert:
+- index.html: Version/Cache
+- js/shared-status.js: zentrale LED-Farblogik
+- js/player-core.js: STR/H/B Synchronisierung
+
+Nicht geändert:
+- css/desktop.css
+- js/equalizer.js
+- js/responsive-ui.js
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+LED-Regel:
+- STR/META/SRC: türkis wenn OK/aktiv
+- STR: pink wenn gestoppt/Fehler
+- H/B: aktiver Stream türkis, inaktiver Stream leer/weiß

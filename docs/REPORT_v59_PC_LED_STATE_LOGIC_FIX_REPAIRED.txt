@@ -1,0 +1,62 @@
+666SOUNDsDESIGn — v59 PC LED STATE LOGIC FIX REPAIRED
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE.zip
+
+PROBLEM:
+- STR / META / SRC blieben pink, weil applyStatusChip in js/shared-status.js ok/empty/warn nicht kannte.
+- H/B wurde bei Metadata-Poll wieder auf H zurückgesetzt.
+- Fallback-Button nutzt source='fallback', H/B-Logik erwartete teils 'backup'.
+
+FIX:
+- js/shared-status.js zentrale Farblogik ersetzt.
+- js/player-core.js: fallback/backup für B-LED gleich behandelt.
+- H/B Reset aus Metadata-Poll entfernt.
+- setStatus synchronisiert STR.
+
+LED-REGEL:
+- STR/META/SRC OK = türkis.
+- STR Fehler/Stop/Pause = pink.
+- H/B aktiver Stream = türkis.
+- H/B inaktiver Stream = weiß leer.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v59 repaired aktualisiert
+- js/shared-status.js: zentrale LED-Farblogik korrekt ersetzt
+- js/player-core.js: updateStreamPanelLeds behandelt fallback/backup korrekt
+- js/player-core.js: setStatus synchronisiert STR-LED
+- js/player-core.js: syncStreamLedFromStatus auf ok/warn/stopped normalisiert
+- js/player-core.js: H/B Reset-Zeilen aus Metadata/Global bereinigt (3)
+- js/player-core.js: initiale H/B Synchronisierung mit currentSource gesetzt
+
+NICHT GEÄNDERT:
+- css/desktop.css
+- js/equalizer.js
+- js/responsive-ui.js
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE.zip
+- before_file_count: 76
+- after_file_count_pre_report: 76
+- shared_status_has_ok_warn_empty: True
+- set_status_syncs_str: True
+- update_stream_panel_fallback_backup: True
+- metadata_no_h_b_reset_after_fetch: True
+- initial_h_b_sync_present: True
+- desktop_css_unchanged: True
+- equalizer_unchanged: True
+- responsive_unchanged: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 79
