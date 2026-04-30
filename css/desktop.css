@@ -344,3 +344,349 @@ ZWECK:
   */
 }
 
+
+/*
+============================================================
+666SOUNDsDESIGn — v52 PC PANEL LED + NOWPLAYING LAYOUT FIX
+GEÄNDERT: 2026-04-30
+ZWECK:
+- PC Kopfbereich aufräumen.
+- Panel-LEDs in die oberste Reihe bündeln.
+- LIVE/BST OK als Header-Störer ausblenden.
+- NOW PLAYING als eigene Reihe.
+- History unter Laufschrift unten rechts.
+- Seitliche PC-Levelmeter bleiben original.
+============================================================
+*/
+
+@media (min-width: 761px) {
+  /* ---------- PC Header / Shell sauber stapeln ---------- */
+  .player-shell,
+  .radio-shell,
+  .cockpit,
+  .player-wrap,
+  .player-wrapper,
+  .main-player,
+  #mffApp {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+  }
+
+  /* ---------- Oberste Reihe: nur Panel LEDs ---------- */
+  .panel-led-row,
+  .led-row,
+  .system-led-row,
+  .status-led-row,
+  .health-led-row,
+  .panel-leds,
+  .system-leds,
+  .top-leds,
+  [data-panel-led-row],
+  [data-led-row] {
+    order: 0 !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    margin: 0 0 2px 0 !important;
+    padding: 7px 12px !important;
+    border: 1px solid rgba(22,255,243,.38) !important;
+    border-radius: 999px !important;
+    background:
+      linear-gradient(145deg, rgba(22,255,243,.045), rgba(255,61,187,.035)),
+      rgba(7,10,29,.72) !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 0 22px rgba(22,255,243,.10) !important;
+    box-sizing: border-box !important;
+  }
+
+  .panel-led-row .led,
+  .led-row .led,
+  .system-led-row .led,
+  .status-led-row .led,
+  .health-led-row .led,
+  .panel-leds .led,
+  .system-leds .led,
+  .top-leds .led,
+  [data-panel-led-row] .led,
+  [data-led-row] .led,
+  .panel-led,
+  .system-led {
+    min-width: 76px !important;
+    height: 30px !important;
+    padding: 0 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255,255,255,.22) !important;
+    background: rgba(5,8,22,.72) !important;
+    color: #dfe7ff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: .14em !important;
+    text-transform: uppercase !important;
+    box-shadow: inset 0 0 14px rgba(0,0,0,.25), 0 0 13px rgba(22,255,243,.10) !important;
+  }
+
+  .panel-led-row .led::before,
+  .led-row .led::before,
+  .system-led-row .led::before,
+  .status-led-row .led::before,
+  .health-led-row .led::before,
+  .panel-leds .led::before,
+  .system-leds .led::before,
+  .top-leds .led::before,
+  .panel-led::before,
+  .system-led::before {
+    content: '' !important;
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    flex: 0 0 9px !important;
+    background: rgba(255,255,255,.14) !important;
+    box-shadow: 0 0 8px rgba(255,255,255,.24) !important;
+  }
+
+  .panel-led-row .led.ok::before,
+  .panel-led-row .led.is-ok::before,
+  .panel-led-row .led.active::before,
+  .panel-led-row .led.is-active::before,
+  .led-row .led.ok::before,
+  .led-row .led.is-ok::before,
+  .led-row .led.active::before,
+  .led-row .led.is-active::before,
+  .panel-led.ok::before,
+  .panel-led.is-ok::before,
+  .panel-led.active::before,
+  .panel-led.is-active::before {
+    background: #28fff4 !important;
+    box-shadow: 0 0 10px rgba(22,255,243,.95), 0 0 18px rgba(22,255,243,.34) !important;
+  }
+
+  .panel-led-row .led.warn::before,
+  .panel-led-row .led.error::before,
+  .panel-led-row .led.bad::before,
+  .panel-led-row .led.off::before,
+  .led-row .led.warn::before,
+  .led-row .led.error::before,
+  .led-row .led.bad::before,
+  .led-row .led.off::before,
+  .panel-led.warn::before,
+  .panel-led.error::before,
+  .panel-led.bad::before,
+  .panel-led.off::before {
+    background: #ff3dbb !important;
+    box-shadow: 0 0 10px rgba(255,61,187,.95), 0 0 18px rgba(255,61,187,.34) !important;
+  }
+
+  /* ---------- LIVE / BST OK aus oberem Kopfbereich entfernen ---------- */
+  .live-badge,
+  .live-pill,
+  .status-live,
+  .live-status,
+  .bst-ok,
+  .boost-ok,
+  .bst-status,
+  .boost-status,
+  .top-live-row,
+  .header-live-row,
+  .cockpit-badges,
+  .hero-badges {
+    display: none !important;
+  }
+
+  /* Falls LIVE/BST als einzelne Buttons im Header stehen, aber nicht die Player-Control-Buttons sind */
+  header .live,
+  header .bst,
+  .hero .live,
+  .hero .bst,
+  .cockpit-header .live,
+  .cockpit-header .bst {
+    display: none !important;
+  }
+
+  /* ---------- Titel/Hero kompakter; NOW PLAYING soll eigene Reihe bekommen ---------- */
+  .hero,
+  .cockpit-header,
+  .player-hero,
+  .intro-panel,
+  .brand-panel {
+    order: 1 !important;
+    min-height: 82px !important;
+    padding: 18px 22px !important;
+    border-radius: 24px !important;
+  }
+
+  .hero h1,
+  .cockpit-header h1,
+  .player-hero h1,
+  .intro-panel h1,
+  .brand-panel h1 {
+    margin: 0 !important;
+    font-size: clamp(22px, 2.4vw, 34px) !important;
+    line-height: 1.05 !important;
+  }
+
+  .hero p,
+  .cockpit-header p,
+  .player-hero p,
+  .intro-panel p,
+  .brand-panel p {
+    margin: 6px 0 0 !important;
+    color: #aeb6cc !important;
+  }
+
+  /* ---------- NOW PLAYING eigene Reihe ---------- */
+  .now-playing,
+  .nowplaying,
+  .now-card,
+  #nowPlaying {
+    order: 2 !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 8px 18px !important;
+    min-height: 142px !important;
+    padding: 20px 24px !important;
+    align-items: center !important;
+    position: relative !important;
+  }
+
+  .now-playing::before,
+  .nowplaying::before,
+  .now-card::before,
+  #nowPlaying::before {
+    content: 'NOW PLAYING' !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    color: #28fff4 !important;
+    font-size: 12px !important;
+    font-weight: 950 !important;
+    letter-spacing: .22em !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px rgba(22,255,243,.30) !important;
+    display: block !important;
+    margin-bottom: 4px !important;
+  }
+
+  .now-playing .title,
+  .nowplaying .title,
+  .now-card .title,
+  #nowPlaying .title,
+  .track-title,
+  #trackTitle {
+    grid-column: 1 / 2 !important;
+    grid-row: 2 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: clip !important;
+    color: #ff3dbb !important;
+    font-weight: 950 !important;
+    font-size: clamp(18px, 1.9vw, 27px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .now-playing .ticker,
+  .nowplaying .ticker,
+  .now-card .ticker,
+  #nowPlaying .ticker,
+  .marquee,
+  .track-marquee {
+    grid-column: 1 / 2 !important;
+    grid-row: 2 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  .now-playing .source,
+  .nowplaying .source,
+  .now-card .source,
+  #nowPlaying .source,
+  .meta-source,
+  .stream-source {
+    grid-column: 1 / 2 !important;
+    grid-row: 3 !important;
+    min-width: 0 !important;
+    color: #28fff4 !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* ---------- History unter die Laufschrift unten rechts ---------- */
+  .history-btn,
+  .history-button,
+  #historyBtn,
+  button[data-action="history"],
+  [data-action="history"] {
+    grid-column: 2 / 3 !important;
+    grid-row: 3 !important;
+    align-self: end !important;
+    justify-self: end !important;
+    min-width: 112px !important;
+    height: 44px !important;
+    border-radius: 18px !important;
+    margin: 0 !important;
+    position: static !important;
+  }
+
+  /* Wenn History vorher absolut im NowPlaying klebte */
+  .now-playing .history-btn,
+  .nowplaying .history-btn,
+  .now-card .history-btn,
+  #nowPlaying .history-btn,
+  .now-playing #historyBtn,
+  .nowplaying #historyBtn,
+  .now-card #historyBtn,
+  #nowPlaying #historyBtn {
+    position: static !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+  }
+
+  /* ---------- Statuskarten als Reihe unter Now Playing ---------- */
+  .status-row,
+  .stats-row,
+  .system-panels,
+  .stat-grid,
+  #statusCards {
+    order: 3 !important;
+  }
+
+  .eq-panel,
+  .equalizer-panel,
+  #equalizer {
+    order: 4 !important;
+  }
+
+  .controls,
+  .control-panel,
+  #controls {
+    order: 5 !important;
+  }
+
+  .boost-panel,
+  .boost-row,
+  .boost {
+    order: 6 !important;
+  }
+
+  /* WICHTIG:
+     Keine Seit-Levelmeter-Regeln.
+     Side-Meter-Original bleibt unberührt.
+  */
+}
+

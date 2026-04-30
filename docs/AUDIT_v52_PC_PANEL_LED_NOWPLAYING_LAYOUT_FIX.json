@@ -1,0 +1,32 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v52_PC_PANEL_LED_NOWPLAYING_LAYOUT_FIX",
+  "cache_tag": "smfp-v52-pc-panel-led-nowplaying-layout-20260430-0605",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.zip",
+  "changes": [
+    "index.html nur Version/Cache auf v52 aktualisiert",
+    "css/desktop.css: PC-Kopfbereich, LED-Reihe, NowPlaying-Reihe und History-Position korrigiert"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.zip",
+    "before_file_count": 55,
+    "after_file_count_pre_report": 55,
+    "desktop_css_changed": true,
+    "worker_unchanged": true,
+    "core_js_unchanged": true,
+    "side_meter_kept_by_design": true,
+    "inline_script_checked": true,
+    "docs_dir_present": true,
+    "final_file_count": 58
+  }
+}

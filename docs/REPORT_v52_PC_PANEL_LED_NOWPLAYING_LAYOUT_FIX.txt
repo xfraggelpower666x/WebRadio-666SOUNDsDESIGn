@@ -1,0 +1,44 @@
+666SOUNDsDESIGn — v52 PC PANEL LED + NOWPLAYING LAYOUT FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.zip
+
+ZIEL:
+- Oberste Reihe: Panel LEDs bündeln.
+- LIVE / BST 0 OK als Kopfzeilen-Störer ausblenden.
+- NOW PLAYING in eigene Reihe setzen.
+- History unter Laufschrift unten rechts positionieren.
+- Seitliche PC-Levelmeter nicht anfassen.
+
+GEÄNDERT:
+- index.html nur Version/Cache auf v52 aktualisiert
+- css/desktop.css: PC-Kopfbereich, LED-Reihe, NowPlaying-Reihe und History-Position korrigiert
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- seitliche PC-Levelmeter
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.zip
+- before_file_count: 55
+- after_file_count_pre_report: 55
+- desktop_css_changed: True
+- worker_unchanged: True
+- core_js_unchanged: True
+- side_meter_kept_by_design: True
+- inline_script_checked: True
+- docs_dir_present: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 58

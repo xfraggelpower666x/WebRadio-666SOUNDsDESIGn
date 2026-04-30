@@ -1,0 +1,24 @@
+666SOUNDsDESIGn — v52 PC PANEL LED + NOWPLAYING LAYOUT FIX
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: PC-Layout-Korrektur
+- docs/REPORT_v52_PC_PANEL_LED_NOWPLAYING_LAYOUT_FIX.txt
+- docs/CHANGELOG_v52_PC_PANEL_LED_NOWPLAYING_LAYOUT_FIX.txt
+- docs/AUDIT_v52_PC_PANEL_LED_NOWPLAYING_LAYOUT_FIX.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+
+Inhalt:
+- Panel-LEDs oben.
+- LIVE/BST OK aus Kopfbereich entfernt.
+- Now Playing eigene Reihe.
+- History unten rechts unter Laufschrift.
+- PC-Side-Levelmeter bleiben original.
