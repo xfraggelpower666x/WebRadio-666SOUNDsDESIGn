@@ -1,0 +1,51 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v50_CLEAN_REPO_ONLY_ASSET_ROUTE_FIX",
+  "cache_tag": "smfp-v50-clean-repo-only-20260430-0500",
+  "base": "WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip",
+  "changes": [
+    "Bild 2 als Header-Logo-Asset in assets/logos gesetzt",
+    "Bild 3 als PC-Hintergrund in assets/images gesetzt",
+    "Bild 4 als Browser/iPhone/Android Icons in assets/icons gesetzt",
+    "site.webmanifest aktualisiert",
+    "ungültige mff-top-logo-Section vor HTML entfernt",
+    "Icon-/Manifest-Links im Head aktualisiert",
+    "PC-Hintergrund-CSS gesetzt, ohne Mobile-Player-Layout zu ändern",
+    "Worker-Legacy-Routen /external-player* und /extern* auf Root gesetzt",
+    "worker.js Iconpfade/Route-Aliase korrigiert"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "deleted": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base_is_user_clean_repo": "WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip",
+    "before_file_count": 44,
+    "after_file_count_before_external_report": 49,
+    "main_readme_root_kept": true,
+    "docs_dir_present": true,
+    "header_logo_asset_present": true,
+    "desktop_bg_present": true,
+    "app_icon_present": true,
+    "manifest_present": true,
+    "index_has_no_v48_visualizer": true,
+    "no_new_logo_dom_inserted_by_v50": true,
+    "inline_script_checked": true,
+    "worker_checked": true,
+    "file_counts": {
+      "assets": 28,
+      "css": 7,
+      "js": 6,
+      "docs": 0,
+      "Scriptable": 1
+    },
+    "final_file_count": 52
+  }
+}

@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v50 CLEAN REPO ONLY ASSET ROUTE FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip
+WICHTIG: Keine alte Fullpack-Basis. Keine alten 188-Dateien zurückgemischt.
+
+DATEI-COUNT:
+- vorher: 44
+- nachher vor externem Download-Report: 49
+
+GEÄNDERT:
+- Bild 2 als Header-Logo-Asset in assets/logos gesetzt
+- Bild 3 als PC-Hintergrund in assets/images gesetzt
+- Bild 4 als Browser/iPhone/Android Icons in assets/icons gesetzt
+- site.webmanifest aktualisiert
+- ungültige mff-top-logo-Section vor HTML entfernt
+- Icon-/Manifest-Links im Head aktualisiert
+- PC-Hintergrund-CSS gesetzt, ohne Mobile-Player-Layout zu ändern
+- Worker-Legacy-Routen /external-player* und /extern* auf Root gesetzt
+- worker.js Iconpfade/Route-Aliase korrigiert
+
+WARNUNGEN:
+
+SANITY:
+- base_is_user_clean_repo: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip
+- before_file_count: 44
+- after_file_count_before_external_report: 49
+- main_readme_root_kept: True
+- docs_dir_present: True
+- header_logo_asset_present: True
+- desktop_bg_present: True
+- app_icon_present: True
+- manifest_present: True
+- index_has_no_v48_visualizer: True
+- no_new_logo_dom_inserted_by_v50: True
+- inline_script_checked: True
+- worker_checked: True
+- file_counts: {"assets": 28, "css": 7, "js": 6, "docs": 0, "Scriptable": 1}
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 52

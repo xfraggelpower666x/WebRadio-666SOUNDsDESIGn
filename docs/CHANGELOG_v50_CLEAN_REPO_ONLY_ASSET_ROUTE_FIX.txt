@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — v50 CLEAN REPO ONLY ASSET ROUTE FIX
+
+Basis:
+- WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip
+- Keine alte Fullpack-Basis.
+
+Geändert:
+- index.html: Iconlinks, Cache-Version, Desktop-Hintergrund-CSS
+- worker.js: Iconpfad und Legacy-Route-Aliase, falls Worker vorhanden
+- site.webmanifest
+- assets/logos/player-header-logo*.png
+- assets/images/pc-player-background.png
+- assets/images/frame-v7-clean-desktop.jpeg
+- assets/icons/*
+- docs/REPORT_v50_CLEAN_REPO_ONLY_ASSET_ROUTE_FIX.txt
+- docs/CHANGELOG_v50_CLEAN_REPO_ONLY_ASSET_ROUTE_FIX.txt
+- docs/AUDIT_v50_CLEAN_REPO_ONLY_ASSET_ROUTE_FIX.json
+
+Nicht gemacht:
+- kein alter Fullpack zurückgemischt
+- keine v48 Visualizer Runtime
+- kein neues Logo-DOM über den Player gelegt
+- keine Core-JS-Dateien geändert

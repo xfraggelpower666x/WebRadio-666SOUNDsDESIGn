@@ -369,7 +369,20 @@ export default {
   async fetch(request){
     const url=new URL(request.url);
 
-    // Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
+    
+    // v50 CLEAN ROUTE ALIAS:
+    // Alte externe Player-Aliase zeigen auf den aktuellen Root-Player.
+    if (
+      url.pathname === "/external-player" ||
+      url.pathname === "/external-player/" ||
+      url.pathname.startsWith("/external-player/") ||
+      url.pathname === "/extern" ||
+      url.pathname === "/extern/" ||
+      url.pathname.startsWith("/extern/")
+    ) {
+      url.pathname = "/";
+    }
+// Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       const externalOk = await checkExternal();
       if(externalOk){
