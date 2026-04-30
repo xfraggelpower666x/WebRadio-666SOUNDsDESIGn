@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — v51 DESKTOP MATCH MOBILE KEEP PC SIDE METERS
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: Desktop-Optik an Mobile/iPhone-Design angeglichen
+- docs/REPORT_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.txt
+- docs/CHANGELOG_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.txt
+- docs/AUDIT_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+
+Wichtig:
+- Seitliche PC-Levelmeter bleiben original.
+- Keine neuen UI-Layer.
+- Kein alter Fullpack-Ballast.

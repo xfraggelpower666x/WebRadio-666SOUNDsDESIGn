@@ -1,0 +1,42 @@
+666SOUNDsDESIGn — v51 DESKTOP MATCH MOBILE KEEP PC SIDE METERS
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v50_ASSET_ROUTE_FIX.zip
+
+ZIEL:
+- iPhone/Mobile-Design so weit wie möglich auf PC übertragen.
+- Seitliche PC-Levelmeter im Original behalten.
+- Keine Audio-/Worker-/Stream-Routen ändern.
+- Keine alten Fullpack-Dateien zurückholen.
+
+GEÄNDERT:
+- index.html nur Version/Cache auf v51 aktualisiert
+- css/desktop.css: PC-Design an iPhone-Look angeglichen, Side-Meter ausgespart
+
+BEWUSST NICHT GEÄNDERT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- seitliche PC-Levelmeter
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v50_ASSET_ROUTE_FIX.zip
+- before_file_count: 52
+- after_file_count: 52
+- desktop_css_changed: True
+- worker_unchanged: True
+- core_js_unchanged: True
+- side_meter_kept_by_design: True
+- inline_script_checked: True
+- docs_dir_present: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 55

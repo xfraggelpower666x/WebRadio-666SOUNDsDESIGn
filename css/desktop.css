@@ -20,3 +20,327 @@ ZWECK: Desktop-Feinschliff.
   }
   .status-cluster { justify-content: flex-end; }
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — v51 DESKTOP MATCH MOBILE KEEP PC SIDE METERS
+GEÄNDERT: 2026-04-30
+ZWECK:
+- Desktop optisch näher an iPhone/Mobile-Design bringen.
+- Seitliche PC-Levelmeter bleiben original: keine Side-Meter-Selektoren werden verändert.
+- Keine Audio-/Worker-/Stream-Routen-Änderung.
+============================================================
+*/
+
+@media (min-width: 761px) {
+  :root {
+    --v51-bg-panel: rgba(7, 10, 29, .78);
+    --v51-bg-panel-soft: rgba(11, 15, 40, .64);
+    --v51-border-cyan: rgba(22, 255, 243, .42);
+    --v51-border-pink: rgba(255, 61, 187, .34);
+    --v51-cyan: #28fff4;
+    --v51-pink: #ff3dbb;
+    --v51-text: #f7f8ff;
+    --v51-muted: #aeb6cc;
+    --v51-radius-xl: 28px;
+    --v51-radius-lg: 22px;
+    --v51-radius-md: 16px;
+    --v51-glow-cyan: 0 0 18px rgba(22,255,243,.18), 0 0 42px rgba(22,255,243,.08);
+    --v51-glow-pink: 0 0 18px rgba(255,61,187,.20), 0 0 42px rgba(255,61,187,.08);
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
+      radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
+      linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
+      url('/assets/images/pc-player-background.png?v=smfp-v51-desktop-match-mobile-keep-side-20260430-0535') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+  }
+
+  /* Hauptcontainer: iPhone-artige Center-Spalte, aber Desktop-breit genug */
+  #app,
+  .app,
+  .player,
+  .radio-player,
+  .desktop-player,
+  .main-player,
+  #player,
+  main {
+    box-sizing: border-box;
+  }
+
+  .player-shell,
+  .radio-shell,
+  .cockpit,
+  .player-wrap,
+  .player-wrapper,
+  .main-player,
+  #mffApp {
+    max-width: min(980px, calc(100vw - 160px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Karten/Paneele wie Mobile: Glas, Cyan-Rand, dunkle Fläche */
+  .now-playing,
+  .nowplaying,
+  .now-card,
+  .status-card,
+  .stat-card,
+  .panel,
+  .card,
+  .eq-panel,
+  .equalizer-panel,
+  .controls,
+  .control-panel,
+  .boost-panel,
+  .boost-row,
+  #nowPlaying,
+  #statusCards,
+  #equalizer,
+  #controls {
+    border: 1px solid var(--v51-border-cyan) !important;
+    border-radius: var(--v51-radius-xl) !important;
+    background:
+      linear-gradient(145deg, rgba(255,61,187,.055), rgba(22,255,243,.035)),
+      var(--v51-bg-panel) !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.025),
+      var(--v51-glow-cyan),
+      0 18px 54px rgba(0,0,0,.30) !important;
+    backdrop-filter: blur(14px) saturate(1.15) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
+  }
+
+  /* Now Playing im Mobile-Stil */
+  .now-playing,
+  .nowplaying,
+  .now-card,
+  #nowPlaying {
+    min-height: 138px !important;
+    padding: 22px 26px !important;
+    display: grid !important;
+    grid-template-columns: 112px 1fr auto !important;
+    align-items: center !important;
+    gap: 24px !important;
+  }
+
+  .now-playing img,
+  .nowplaying img,
+  .now-card img,
+  #nowPlaying img,
+  .cover,
+  .cover-art {
+    width: 96px !important;
+    height: 96px !important;
+    border-radius: 20px !important;
+    object-fit: cover !important;
+    border: 1px solid rgba(255,61,187,.48) !important;
+    box-shadow: 0 0 18px rgba(255,61,187,.24), 0 0 22px rgba(22,255,243,.12) !important;
+  }
+
+  .now-playing h1,
+  .now-playing h2,
+  .now-playing .title,
+  .nowplaying h1,
+  .nowplaying h2,
+  .nowplaying .title,
+  .track-title,
+  #trackTitle {
+    color: var(--v51-pink) !important;
+    font-weight: 900 !important;
+    letter-spacing: -.025em !important;
+    text-shadow: 0 0 12px rgba(255,61,187,.34) !important;
+  }
+
+  .now-playing small,
+  .now-playing .label,
+  .nowplaying small,
+  .nowplaying .label,
+  .source,
+  .meta-source {
+    color: var(--v51-cyan) !important;
+    font-weight: 850 !important;
+    letter-spacing: .12em !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px rgba(22,255,243,.28) !important;
+  }
+
+  /* Statusreihe: einheitlich wie iPhone-Karten */
+  .status-row,
+  .stats-row,
+  .system-panels,
+  .stat-grid,
+  #statusCards {
+    display: grid !important;
+    grid-template-columns: .9fr .9fr 1.25fr !important;
+    gap: 18px !important;
+    align-items: stretch !important;
+  }
+
+  .status-card,
+  .stat-card,
+  .system-panel,
+  .listener-card,
+  .bitrate-card,
+  .dj-card {
+    min-height: 112px !important;
+    padding: 18px 18px 16px !important;
+    text-align: center !important;
+    display: grid !important;
+    grid-template-rows: 24px 1fr 14px !important;
+    align-items: center !important;
+    justify-items: center !important;
+    border-radius: 24px !important;
+  }
+
+  .status-card .label,
+  .stat-card .label,
+  .system-panel .label,
+  .status-card small,
+  .stat-card small,
+  .system-panel small {
+    color: var(--v51-cyan) !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    letter-spacing: .16em !important;
+    text-transform: uppercase !important;
+  }
+
+  .status-card strong,
+  .stat-card strong,
+  .system-panel strong,
+  .stat-value,
+  .listener-value,
+  .bitrate-value,
+  .dj-value {
+    color: var(--v51-text) !important;
+    font-size: clamp(24px, 2.2vw, 36px) !important;
+    line-height: 1.05 !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+  }
+
+  /* EQ Panel */
+  .eq-panel,
+  .equalizer-panel,
+  #equalizer {
+    min-height: 330px !important;
+    padding: 24px 34px 26px !important;
+    border-radius: 30px !important;
+  }
+
+  .eq-title,
+  .equalizer-title,
+  #equalizer .label,
+  .bands-label {
+    color: var(--v51-cyan) !important;
+    font-weight: 950 !important;
+    letter-spacing: .18em !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px rgba(22,255,243,.32) !important;
+  }
+
+  .eq-bar,
+  .eq-band,
+  .bar,
+  [data-eq-band] {
+    border-radius: 999px !important;
+    background: linear-gradient(to top, #20fff4 0%, #2de5ff 34%, #9555ff 64%, #ff3dbb 100%) !important;
+    box-shadow: 0 0 12px rgba(22,255,243,.22), 0 0 14px rgba(255,61,187,.18) !important;
+  }
+
+  /* Controls: Mobile-Button-Look auf PC */
+  .controls,
+  .control-panel,
+  #controls {
+    min-height: 110px !important;
+    padding: 18px 22px !important;
+    border-radius: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 18px !important;
+  }
+
+  button,
+  .control-btn,
+  .btn,
+  .play-btn,
+  .pause-btn,
+  .stop-btn,
+  [data-action] {
+    border-radius: 22px !important;
+    border: 1px solid var(--v51-border-cyan) !important;
+    background: linear-gradient(145deg, rgba(8,12,34,.86), rgba(8,12,34,.62)) !important;
+    color: var(--v51-text) !important;
+    box-shadow: inset 0 0 16px rgba(22,255,243,.045), 0 0 16px rgba(22,255,243,.10) !important;
+  }
+
+  button.is-active,
+  .control-btn.is-active,
+  .btn.is-active,
+  [data-action].is-active,
+  .mff-transport-active {
+    border-color: rgba(255,61,187,1) !important;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,61,187,.36), rgba(255,61,187,.13) 48%, rgba(8,12,34,.72) 78%) !important;
+    box-shadow: 0 0 20px rgba(255,61,187,.54), inset 0 0 18px rgba(255,61,187,.16) !important;
+  }
+
+  /* Boost-Reihe im Mobile-Stil */
+  .boost-panel,
+  .boost-row,
+  .boost {
+    min-height: 58px !important;
+    border-radius: 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 18px !important;
+    color: var(--v51-cyan) !important;
+    letter-spacing: .18em !important;
+    text-transform: uppercase !important;
+  }
+
+  .boost .led,
+  .boost-led,
+  .boost-dot {
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255,255,255,.34) !important;
+    background: rgba(255,255,255,.10) !important;
+  }
+
+  .boost .led.on,
+  .boost-led.on,
+  .boost-dot.on,
+  .boost .is-on,
+  .boost-led.is-on {
+    background: var(--v51-pink) !important;
+    border-color: rgba(255,61,187,.95) !important;
+    box-shadow: 0 0 16px rgba(255,61,187,.55) !important;
+  }
+
+  /* Header-Logo Asset auf Desktop anzeigen, falls vorhandene Struktur es referenziert */
+  .header-logo,
+  .player-logo,
+  .brand-logo img,
+  .logo img {
+    filter: drop-shadow(0 0 14px rgba(22,255,243,.22)) drop-shadow(0 0 16px rgba(255,61,187,.22)) !important;
+  }
+
+  /* WICHTIG:
+     Keine Regeln für seitliche PC-Levelmeter.
+     Bewusst NICHT angefasst:
+     .side-meter, .left-meter, .right-meter, .mff-side-left, .mff-side-right,
+     .mff-level-left, .mff-level-right, [data-side-meter]
+  */
+}
+

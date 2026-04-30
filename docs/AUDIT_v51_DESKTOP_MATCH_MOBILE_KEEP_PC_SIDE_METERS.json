@@ -1,0 +1,42 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v51_DESKTOP_MATCH_MOBILE_KEEP_PC_SIDE_METERS",
+  "cache_tag": "smfp-v51-desktop-match-mobile-keep-side-20260430-0535",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v50_ASSET_ROUTE_FIX.zip",
+  "changes": [
+    "index.html nur Version/Cache auf v51 aktualisiert",
+    "css/desktop.css: PC-Design an iPhone-Look angeglichen, Side-Meter ausgespart"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "side_meter_terms_in_patch_comment_only_note": {
+    ".side-meter": 1,
+    ".left-meter": 1,
+    ".right-meter": 1,
+    ".mff-side-left": 1,
+    ".mff-side-right": 1,
+    ".mff-level-left": 1,
+    ".mff-level-right": 1,
+    "[data-side-meter]": 1
+  },
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v50_ASSET_ROUTE_FIX.zip",
+    "before_file_count": 52,
+    "after_file_count": 52,
+    "desktop_css_changed": true,
+    "worker_unchanged": true,
+    "core_js_unchanged": true,
+    "side_meter_kept_by_design": true,
+    "inline_script_checked": true,
+    "docs_dir_present": true,
+    "final_file_count": 55
+  }
+}
