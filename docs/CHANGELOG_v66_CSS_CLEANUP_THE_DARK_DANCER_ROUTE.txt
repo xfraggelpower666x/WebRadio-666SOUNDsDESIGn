@@ -1,0 +1,20 @@
+666SOUNDsDESIGn — v66 CSS CLEANUP + THE DARK DANCER ROUTE
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: finale v66-Regel für Background/Ticker/Header
+- worker.js: Route /The-Dark-Dancer + eingebettetes HTML/Bild
+- js/equalizer.js Versionsmarker
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- 666SOUNDsDESIGn/The-Dark-Dancer.html
+- 666SOUNDsDESIGn/the-dark-dancer-header-source.jpeg
+- docs/REPORT_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.txt
+- docs/CHANGELOG_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.txt
+- docs/AUDIT_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.json
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- js/responsive-ui.js
+- LED-Logik

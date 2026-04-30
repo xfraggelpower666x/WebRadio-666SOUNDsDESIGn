@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030612">
+<title>The Dark Dancer — 666SOUNDsDESIGn</title>
+<style>
+:root { --pink:#ff3dbb; --cyan:#28fff4; --violet:#7b4dff; --bg:#02030b; }
+* { box-sizing:border-box; }
+html,body { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:var(--bg); }
+body { position:fixed; inset:0; min-width:100vw; min-height:100vh; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.stage { position:fixed; inset:0; width:100vw; height:100vh; overflow:hidden; display:grid; place-items:center; background:radial-gradient(circle at 50% 50%, rgba(255,61,187,.12), transparent 38%),radial-gradient(circle at 20% 80%, rgba(40,255,244,.09), transparent 40%),#02030b; }
+.stage::before { content:""; position:absolute; inset:-8vmax; pointer-events:none; background:radial-gradient(circle at 50% 38%, rgba(255,61,187,.22), transparent 26%),radial-gradient(circle at 50% 60%, rgba(40,255,244,.18), transparent 32%); filter:blur(28px); opacity:.88; animation:colorGlow 5.8s linear infinite, glowPulse 2.4s ease-in-out infinite; z-index:0; }
+.dark-dancer-image { position:relative; z-index:1; width:100vw; height:100vh; object-fit:fill; object-position:center center; display:block; filter:drop-shadow(0 0 18px rgba(255,61,187,.42)) drop-shadow(0 0 24px rgba(40,255,244,.26)) saturate(1.14) contrast(1.04); animation:imageGlow 5.8s linear infinite,imagePulse 2.2s ease-in-out infinite; transform-origin:center center; }
+.text-pulse-overlay { position:absolute; inset:0; z-index:2; pointer-events:none; mix-blend-mode:screen; background:radial-gradient(ellipse at 50% 22%, rgba(255,61,187,.30), transparent 18%),radial-gradient(ellipse at 50% 30%, rgba(40,255,244,.20), transparent 26%); opacity:.34; filter:blur(12px); animation:textPulse 1.72s ease-in-out infinite,colorGlow 5.8s linear infinite; }
+.scanline { position:absolute; inset:0; z-index:3; pointer-events:none; background:repeating-linear-gradient(to bottom,rgba(255,255,255,.028) 0px,rgba(255,255,255,.028) 1px,transparent 2px,transparent 5px); opacity:.22; }
+@keyframes colorGlow { 0%{filter:hue-rotate(0deg) blur(28px)} 33%{filter:hue-rotate(86deg) blur(30px)} 66%{filter:hue-rotate(178deg) blur(28px)} 100%{filter:hue-rotate(360deg) blur(28px)} }
+@keyframes glowPulse { 0%,100%{opacity:.62;transform:scale(1)} 50%{opacity:1;transform:scale(1.035)} }
+@keyframes imageGlow { 0%{filter:drop-shadow(0 0 18px rgba(255,61,187,.48)) drop-shadow(0 0 24px rgba(40,255,244,.24)) saturate(1.12) contrast(1.04)} 33%{filter:drop-shadow(0 0 22px rgba(40,255,244,.50)) drop-shadow(0 0 26px rgba(123,77,255,.25)) saturate(1.22) contrast(1.06)} 66%{filter:drop-shadow(0 0 22px rgba(123,77,255,.48)) drop-shadow(0 0 26px rgba(255,61,187,.28)) saturate(1.18) contrast(1.06)} 100%{filter:drop-shadow(0 0 18px rgba(255,61,187,.48)) drop-shadow(0 0 24px rgba(40,255,244,.24)) saturate(1.12) contrast(1.04)} }
+@keyframes imagePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.012)} }
+@keyframes textPulse { 0%,100%{opacity:.18;transform:scale(1)} 50%{opacity:.54;transform:scale(1.018)} }
+@media (prefers-reduced-motion:reduce) { .stage::before,.dark-dancer-image,.text-pulse-overlay{animation:none} }
+</style>
+</head>
+<body>
+<main class="stage" aria-label="The Dark Dancer">
+<img class="dark-dancer-image" src="./the-dark-dancer-header-source.jpeg?v=smfp-v66-css-cleanup-the-dark-dancer-route-20260430-1515" alt="The Dark Dancer — 666SOUNDsDESIGn">
+<div class="text-pulse-overlay" aria-hidden="true"></div>
+<div class="scanline" aria-hidden="true"></div>
+</main>
+</body>
+</html>

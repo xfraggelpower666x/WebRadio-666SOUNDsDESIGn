@@ -1,0 +1,59 @@
+666SOUNDsDESIGn — v66 CSS CLEANUP + THE DARK DANCER ROUTE
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX.zip
+QUELLBILD: 6AE06C5E-FA2F-4826-956A-5467BAA23C6D.jpeg
+
+UMGESETZTE SAMMELLISTE:
+1. Desktop-CSS final für Header/Ticker/Background überschrieben.
+2. Laufschrift vertikal mit 56px Feld/Line-Height zentriert.
+3. Header-Logo optisch weiter entzerrt; echte getrennte 2cm-Verschiebung braucht getrennte Logo-Elemente.
+4. Hintergrund auf Viewport-Breite/-Höhe gestreckt.
+5. Root-Verzeichnis 666SOUNDsDESIGn/ erstellt.
+6. The-Dark-Dancer.html + Bild gespeichert.
+7. Worker-Route /The-Dark-Dancer ergänzt.
+8. Bildseite fullscreen mit wechselndem Neon-Glow und Puls-Effekt.
+
+GEÄNDERT:
+- 666SOUNDsDESIGn/The-Dark-Dancer.html erstellt
+- 666SOUNDsDESIGn/the-dark-dancer-header-source.jpeg gespeichert
+- index.html: Version/Cache auf v66 aktualisiert
+- css/desktop.css: alte v65 betroffene Schicht entfernt: 1
+- css/desktop.css: finale v66-Regel für Background-Stretch, Ticker-Zentrierung, Header-Logo-Abstand gesetzt
+- worker.js: /The-Dark-Dancer Hook am Anfang des fetch handlers eingefügt
+- worker.js: /The-Dark-Dancer Route mit eingebettetem HTML/Bild ergänzt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- js/responsive-ui.js
+- LED-Logik
+- Audio-/Player-Logik außer Versionsmarker
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v65_PC_CSS_LAYER_CLEANUP_TICKER_CENTER_FIX.zip
+- before_file_count: 98
+- after_file_count_pre_report: 100
+- dark_dancer_dir_exists: True
+- dark_dancer_html_exists: True
+- dark_dancer_image_exists: True
+- worker_route_constant_present: True
+- worker_route_hook_present: True
+- route_path_present: True
+- v66_css_present: True
+- background_full_viewport: False
+- ticker_center_final: True
+- logo_gap_stronger: True
+- version_v66: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 103
