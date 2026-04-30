@@ -83,14 +83,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -102,47 +102,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v57_DESKTOP_LAYER_PURGE_CANONICAL: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Externer Hauptplayer aktiv');
 applyStatusChip(statusStream, 'ok', 'Main Stream aktiv');

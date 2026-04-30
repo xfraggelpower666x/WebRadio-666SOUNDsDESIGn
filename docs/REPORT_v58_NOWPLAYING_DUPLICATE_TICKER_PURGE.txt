@@ -1,0 +1,44 @@
+666SOUNDsDESIGn — v58 NOWPLAYING DUPLICATE TICKER PURGE
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v57_DESKTOP_LAYER_PURGE_CANONICAL.zip
+
+PROBLEM:
+- Im PC Now-Playing wurde derselbe Fallback/Titel zweimal angezeigt:
+  oben als Hauptticker und unten als alte Source-/Ticker-Zeile.
+
+FIX:
+- untere doppelte Source-/Ticker-Laufschrift auf Desktop ausgeblendet.
+- nur eine Now-Playing-Anzeige sichtbar.
+- History bleibt rechts/unten im Now-Playing-Block.
+- keine neue Desktop-Layer-Kaskade.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v58 aktualisiert
+- css/desktop.css: doppelte untere Now-Playing-Laufschrift im kanonischen Block ausgeblendet
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Side-Levelmeter
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v57_DESKTOP_LAYER_PURGE_CANONICAL.zip
+- before_file_count: 73
+- after_file_count_pre_report: 73
+- only_one_canonical_desktop_block: True
+- duplicate_source_hide_rule_present: True
+- history_overlay_kept: True
+- bottom_meter_kept_once: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 76

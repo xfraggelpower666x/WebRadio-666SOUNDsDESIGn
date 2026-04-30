@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v58 NOWPLAYING DUPLICATE TICKER PURGE
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: doppelte untere NowPlaying-Source/Ticker-Zeile auf Desktop entfernt
+- js/player-core.js: Versionsmarker
+- docs/REPORT_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE.txt
+- docs/CHANGELOG_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE.txt
+- docs/AUDIT_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- Side-Levelmeter

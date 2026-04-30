@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v57 DESKTOP LAYER PURGE CANONICAL
+666SOUNDsDESIGn — v58 NOWPLAYING DUPLICATE TICKER PURGE
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v57-desktop-layer-purge-canonical-20260430-0855') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v58-nowplaying-duplicate-ticker-purge-20260430-0935') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -223,6 +223,49 @@ ZWECK:
   .now-playing + .history-panel {
     display: none !important;
   }
+
+
+  /* v58 NOWPLAYING duplicate source/ticker purge
+     Grund:
+     Die Hauptzeile zeigt bereits Titel/Fallback.
+     Die untere Ticker-/Source-Zeile hat denselben Text erneut angezeigt.
+     Daher auf Desktop: nur eine Now-Playing-Anzeige sichtbar lassen. */
+  .now-playing .ticker-window {
+    grid-column: 1 / 2 !important;
+    grid-row: 2 !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    display: block !important;
+  }
+
+  .now-playing .ticker-window .ticker {
+    color: var(--pc-pink) !important;
+    font-size: clamp(18px, 1.65vw, 25px) !important;
+    font-weight: 950 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  /* Doppelte untere Status-/Source-Laufschrift im PC-NowPlaying ausblenden */
+  .now-playing .source,
+  .now-playing .meta-source,
+  .now-playing .stream-source,
+  .now-playing .ticker-source,
+  .now-playing .ticker-window + .source,
+  .now-playing .ticker-window + .meta-source,
+  .now-playing [data-source],
+  .now-playing [data-meta-source] {
+    display: none !important;
+  }
+
+  /* History bleibt unten rechts, aber die untere Doppel-Laufschrift bekommt keinen eigenen Platz mehr */
+  #historyToggle {
+    grid-column: 2 / 3 !important;
+    grid-row: 2 !important;
+    align-self: end !important;
+    justify-self: end !important;
+  }
+
 
   /* History echtes Overlay: wird per JS in body portalt */
   #historyOverlayBackdrop,

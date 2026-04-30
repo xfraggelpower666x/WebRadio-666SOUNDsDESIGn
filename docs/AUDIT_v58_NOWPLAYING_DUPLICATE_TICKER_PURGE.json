@@ -1,0 +1,33 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v58_NOWPLAYING_DUPLICATE_TICKER_PURGE",
+  "cache_tag": "smfp-v58-nowplaying-duplicate-ticker-purge-20260430-0935",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v57_DESKTOP_LAYER_PURGE_CANONICAL.zip",
+  "changes": [
+    "index.html: Version/Cache auf v58 aktualisiert",
+    "css/desktop.css: doppelte untere Now-Playing-Laufschrift im kanonischen Block ausgeblendet"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v57_DESKTOP_LAYER_PURGE_CANONICAL.zip",
+    "before_file_count": 73,
+    "after_file_count_pre_report": 73,
+    "only_one_canonical_desktop_block": true,
+    "duplicate_source_hide_rule_present": true,
+    "history_overlay_kept": true,
+    "bottom_meter_kept_once": true,
+    "worker_unchanged": true,
+    "stream_routes_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 76
+  }
+}
