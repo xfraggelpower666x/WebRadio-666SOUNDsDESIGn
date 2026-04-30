@@ -14,16 +14,26 @@ function decodeDarkDancerBase64(value) {
 }
 
 function darkDancerResponse(pathname) {
-  if (pathname === '/The-Dark-Dancer' || pathname === '/The-Dark-Dancer/' || pathname === '/666SOUNDsDESIGn/The-Dark-Dancer.html') {
+  const path = String(pathname || '').replace(/\/+$/, '') || '/';
+  if (
+    path === '/The-Dark-Dancer' ||
+    path === '/the-dark-dancer' ||
+    path === '/666SOUNDsDESIGn/The-Dark-Dancer.html'
+  ) {
     return new Response(atob(THE_DARK_DANCER_HTML), {
       headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=300' }
     });
   }
-  if (pathname === '/666SOUNDsDESIGn/the-dark-dancer-header-source.jpeg') {
+
+  if (
+    path === '/666SOUNDsDESIGn/the-dark-dancer-header-source.jpeg' ||
+    path === '/the-dark-dancer-header-source.jpeg'
+  ) {
     return new Response(decodeDarkDancerBase64(THE_DARK_DANCER_IMAGE), {
       headers: { 'content-type': 'image/jpeg', 'cache-control': 'public, max-age=86400' }
     });
   }
+
   return null;
 }
 // ==========================================================
@@ -397,8 +407,10 @@ async function serveExternalIndex(request){
 
 export default {
   async fetch(request){
-        const darkDancer = darkDancerResponse(new URL(request.url).pathname);
-    if (darkDancer) return darkDancer;
+
+    const __darkDancerUrl = new URL(request.url);
+    const __darkDancerResponse = darkDancerResponse(__darkDancerUrl.pathname);
+    if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
 
     

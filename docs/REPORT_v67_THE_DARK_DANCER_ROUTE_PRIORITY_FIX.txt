@@ -1,0 +1,51 @@
+666SOUNDsDESIGn — v67 THE DARK DANCER ROUTE PRIORITY FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.zip
+
+UMGESETZTE SAMMELLISTE:
+1. /The-Dark-Dancer wird im Worker als erste Route im fetch handler abgefangen.
+2. Notfallplayer/Fallback kann bei diesem Endpunkt nicht mehr anspringen.
+3. /The-Dark-Dancer/ und /the-dark-dancer werden ebenfalls akzeptiert.
+4. Bildasset-Route bleibt erreichbar.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v67 aktualisiert
+- worker.js: darkDancerResponse gehärtet und Pfade normalisiert
+- worker.js: alte darkDancer-Hooks entfernt: 1
+- worker.js: /The-Dark-Dancer als erste Prioritätsroute im fetch handler eingefügt
+- worker.js: Prioritätsroute liegt vor Notfall-/Fallback-Logik
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- js/responsive-ui.js
+- LED-Logik
+- Audio-/Player-Logik
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.zip
+- before_file_count: 103
+- after_file_count_pre_report: 103
+- version_v67: True
+- dark_dancer_response_function_present: True
+- priority_hook_present: True
+- priority_hook_before_fallback_words: False
+- old_hook_removed: True
+- route_exact_path_present: True
+- route_lowercase_path_present: True
+- asset_route_present: True
+- wrangler_unchanged: True
+- stream_urls_not_changed_by_file_hash_scope: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 106

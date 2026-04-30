@@ -1,0 +1,41 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX",
+  "cache_tag": "smfp-v67-the-dark-dancer-route-priority-fix-20260430-1535",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.zip",
+  "changes": [
+    "index.html: Version/Cache auf v67 aktualisiert",
+    "worker.js: darkDancerResponse gehärtet und Pfade normalisiert",
+    "worker.js: alte darkDancer-Hooks entfernt: 1",
+    "worker.js: /The-Dark-Dancer als erste Prioritätsroute im fetch handler eingefügt",
+    "worker.js: Prioritätsroute liegt vor Notfall-/Fallback-Logik"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v66_CSS_CLEANUP_THE_DARK_DANCER_ROUTE.zip",
+    "before_file_count": 103,
+    "after_file_count_pre_report": 103,
+    "version_v67": true,
+    "dark_dancer_response_function_present": true,
+    "priority_hook_present": true,
+    "priority_hook_before_fallback_words": false,
+    "old_hook_removed": true,
+    "route_exact_path_present": true,
+    "route_lowercase_path_present": true,
+    "asset_route_present": true,
+    "wrangler_unchanged": true,
+    "stream_urls_not_changed_by_file_hash_scope": true,
+    "responsive_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 106
+  }
+}

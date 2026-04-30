@@ -1,0 +1,19 @@
+666SOUNDsDESIGn — v67 THE DARK DANCER ROUTE PRIORITY FIX
+
+Geändert:
+- worker.js: /The-Dark-Dancer Prioritätsroute direkt am Anfang des fetch handlers
+- index.html: Version/Cache
+- css/desktop.css Versionsmarker
+- js/equalizer.js Versionsmarker
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- docs/REPORT_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.txt
+- docs/CHANGELOG_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.txt
+- docs/AUDIT_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.json
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- js/responsive-ui.js
+- LED-Logik
+- Audio-/Player-Logik
