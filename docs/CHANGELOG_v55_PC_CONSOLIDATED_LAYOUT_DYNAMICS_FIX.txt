@@ -1,0 +1,24 @@
+666SOUNDsDESIGn — v55 PC CONSOLIDATED LAYOUT + DYNAMICS FIX
+
+Geändert:
+- index.html
+- css/desktop.css
+- js/player-core.js
+- js/equalizer.js
+- js/responsive-ui.js
+- docs/REPORT_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.txt
+- docs/CHANGELOG_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.txt
+- docs/AUDIT_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+Inhalt:
+- Unteres PC-Levelmeter an Side-Meter-Dynamik gekoppelt.
+- Panel LEDs STR/META/SRC/H/B oben.
+- History als Modal/Overlay mit Outside-Click.
+- Equalizer-Mitte funktional gemacht.
+- Live Stream aus Now Playing entfernt.
+- PC-Player breiter.

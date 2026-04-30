@@ -1,0 +1,52 @@
+666SOUNDsDESIGn — v55 PC CONSOLIDATED LAYOUT + DYNAMICS FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.zip
+
+UMGESETZTE SAMMELLISTE:
+1. Unteres PC-Levelmeter nutzt dieselbe Smooth-Meter-Dynamik wie die seitlichen PC-Levelmeter.
+2. Systempanels/Panel-LEDs oben mit STR / META / SRC / H / B.
+3. History ist echtes Overlay und schließt per Outside-Click / ESC.
+4. Equalizer-Mitte wird dynamisch aufgefüllt, keine tote Mitte.
+5. Live Stream Fallback aus Now Playing entfernt.
+6. PC-Player breiter.
+
+GEÄNDERT:
+- index.html: H/B Panel-LEDs in oberste Statusreihe ergänzt
+- index.html: alte v53 Bottom-Meter-Eigenruntime entfernt
+- index.html: statisches unteres PC-Levelmeter ergänzt
+- player-core.js: statusMain/statusBackup Konstanten ergänzt
+- player-core.js: bottomMeterSegments für Side-Dynamik ergänzt
+- player-core.js: initiale H/B LED-Zustände ergänzt
+- player-core.js: updateStreamPanelLeds Helper ergänzt
+- responsive-ui.js: History-Toggle zu echtem Overlay mit Outside-Click umgebaut
+- equalizer.js: Bottom-Meter-Sync und Center-Recovery Helper ergänzt
+- css/desktop.css: v55 Sammelpatch für Layout, LEDs, Overlay, Bottom-Meter, Breite ergänzt
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.zip
+- before_file_count: 64
+- after_file_count_pre_report: 64
+- h_b_leds_present: True
+- bottom_sync_meter_present: True
+- v53_runtime_removed: True
+- history_overlay_js_present: True
+- bottom_meter_passed_to_visualizer: True
+- equalizer_center_recovery_present: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- inline_script_checked: True
+- docs_dir_present: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 67

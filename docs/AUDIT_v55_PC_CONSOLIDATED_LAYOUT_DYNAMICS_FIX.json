@@ -1,0 +1,44 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX",
+  "cache_tag": "smfp-v55-pc-consolidated-layout-dynamics-20260430-0730",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.zip",
+  "changes": [
+    "index.html: H/B Panel-LEDs in oberste Statusreihe ergänzt",
+    "index.html: alte v53 Bottom-Meter-Eigenruntime entfernt",
+    "index.html: statisches unteres PC-Levelmeter ergänzt",
+    "player-core.js: statusMain/statusBackup Konstanten ergänzt",
+    "player-core.js: bottomMeterSegments für Side-Dynamik ergänzt",
+    "player-core.js: initiale H/B LED-Zustände ergänzt",
+    "player-core.js: updateStreamPanelLeds Helper ergänzt",
+    "responsive-ui.js: History-Toggle zu echtem Overlay mit Outside-Click umgebaut",
+    "equalizer.js: Bottom-Meter-Sync und Center-Recovery Helper ergänzt",
+    "css/desktop.css: v55 Sammelpatch für Layout, LEDs, Overlay, Bottom-Meter, Breite ergänzt"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.zip",
+    "before_file_count": 64,
+    "after_file_count_pre_report": 64,
+    "h_b_leds_present": true,
+    "bottom_sync_meter_present": true,
+    "v53_runtime_removed": true,
+    "history_overlay_js_present": true,
+    "bottom_meter_passed_to_visualizer": true,
+    "equalizer_center_recovery_present": true,
+    "worker_unchanged": true,
+    "stream_routes_unchanged": true,
+    "inline_script_checked": true,
+    "docs_dir_present": true,
+    "final_file_count": 67
+  }
+}

@@ -93,6 +93,42 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+
+function applyBottomMeterFromSideDynamics(segments, valuePercent) {
+  if (!Array.isArray(segments) || !segments.length) return;
+  const bounded = clamp(valuePercent, 10, 98);
+  const center = (segments.length - 1) / 2;
+  const activeWidth = (bounded / 100);
+  segments.forEach((el, index) => {
+    if (!el) return;
+    const dist = Math.abs(index - center) / Math.max(1, center);
+    const active = dist <= activeWidth;
+    el.classList.toggle('is-on', active);
+    el.style.opacity = active ? String(0.45 + (bounded / 100) * 0.55) : '0.18';
+    el.style.transform = `scaleY(${0.52 + (bounded / 100) * 0.48})`;
+    el.style.setProperty('--v', String((bounded / 100).toFixed(3)));
+  });
+}
+
+function recoverDesktopCenterBars(bars, levelPercent, playing = true) {
+  if (!Array.isArray(bars) || window.innerWidth <= 860) return;
+  const total = bars.length;
+  if (!total) return;
+  const center = (total - 1) / 2;
+  const dynamic = Math.max(18, 18 + (clamp(levelPercent, 10, 98) * 0.62));
+  bars.forEach((bar, index) => {
+    const distance = Math.abs(index - center);
+    if (distance > Math.max(3, total * 0.18)) return;
+    const current = parseFloat(String(bar.style.height || '0').replace('px', '')) || 0;
+    const localShape = 1 - (distance / Math.max(1, total * 0.20));
+    const movement = Math.abs(Math.sin((Date.now() / 180) + index * 0.27)) * 10;
+    const target = playing ? dynamic * (0.72 + localShape * 0.30) + movement : 18 + localShape * 8;
+    if (current < target) {
+      bar.style.height = `${Math.min(118, target)}px`;
+    }
+  });
+}
+
 function applyMeters(targets, valuePercent, side = 'left') {
   const bounded = clamp(valuePercent, 10, 98);
   targets.forEach((el, index) => {
@@ -108,7 +144,7 @@ function applyMeters(targets, valuePercent, side = 'left') {
   });
 }
 
-export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = [] }) {
+export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = [], bottomMeterSegments = [] }) {
   let ctx = null;
   let analyser = null;
   let source = null;
@@ -133,6 +169,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     smoothMeter = next;
     applyMeters(leftMeters, next, 'left');
     applyMeters(rightMeters, next, 'right');
+    applyBottomMeterFromSideDynamics(bottomMeterSegments, next);
   };
 
   const getFallbackBarValue = (index, total, intensity = 1) => {
@@ -153,6 +190,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       ? 26 + (Math.abs(Math.sin(Date.now() / 210)) * 62)
       : 18 + (Math.abs(Math.sin(Date.now() / 300)) * 18);
     setMeters(meter);
+    recoverDesktopCenterBars(bars, meter, audio && !audio.paused);
 
     if (!fromInterval && !fallbackTimer) {
       fallbackTimer = window.setInterval(() => renderFallback(true), 110);
@@ -226,6 +264,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       setBarHeight(bar, 12 + contour * 14);
     });
     setMeters(18);
+    recoverDesktopCenterBars(bars, 18, false);
   };
 
   try {
@@ -302,6 +341,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         : 14 + ((globalMax / 255) * 84);
 
       setMeters(meterValue);
+      recoverDesktopCenterBars(bars, meterValue, audio && !audio.paused);
       rafId = window.requestAnimationFrame(frame);
     };
 

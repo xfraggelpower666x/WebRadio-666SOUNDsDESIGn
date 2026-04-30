@@ -763,3 +763,309 @@ ZWECK:
   */
 }
 
+
+/*
+============================================================
+666SOUNDsDESIGn — v54 PC VERSION BADGE BOTTOM RIGHT
+GEÄNDERT: 2026-04-30
+ZWECK:
+- Desktop/PC Versionskontrolle unten rechts.
+- Mobile/iPhone bleibt unverändert.
+============================================================
+*/
+
+@media (min-width: 761px) {
+  .pc-version-badge {
+    position: fixed !important;
+    right: max(18px, env(safe-area-inset-right, 0px)) !important;
+    bottom: max(18px, env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 99999 !important;
+    min-width: 54px !important;
+    height: 34px !important;
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255,61,187,.72) !important;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,61,187,.40), rgba(255,61,187,.16) 54%, rgba(7,10,29,.78) 100%) !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 950 !important;
+    letter-spacing: .08em !important;
+    line-height: 1 !important;
+    text-transform: lowercase !important;
+    text-shadow: 0 0 10px rgba(255,255,255,.42) !important;
+    box-shadow:
+      0 0 16px rgba(255,61,187,.52),
+      0 0 28px rgba(255,61,187,.22),
+      inset 0 0 14px rgba(255,255,255,.10) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .pc-version-badge {
+    display: none !important;
+  }
+}
+
+
+/*
+============================================================
+666SOUNDsDESIGn — v55 PC CONSOLIDATED LAYOUT + DYNAMICS FIX
+GEÄNDERT: 2026-04-30
+ZWECK:
+- Unteres PC-Levelmeter an Side-Meter-Dynamik koppeln.
+- Panel-LEDs oben wie iPhone-Systempanels.
+- History als echtes Overlay.
+- Equalizer-Mitte funktional.
+- Live Stream aus Now Playing entfernen.
+- PC-Player breiter.
+============================================================
+*/
+
+@media (min-width: 761px) {
+  /* PC-Player etwas breiter, aber Abstand zu Side-Metern behalten */
+  .player-shell {
+    width: min(72vw, 1120px) !important;
+    max-width: calc(100vw - 190px) !important;
+  }
+
+  .player-shell,
+  .radio-shell,
+  .cockpit,
+  .player-wrap,
+  .player-wrapper,
+  .main-player,
+  #mffApp {
+    max-width: min(1120px, calc(100vw - 190px)) !important;
+  }
+
+  /* Systempanels/LEDs oben als echte Reihe */
+  .top-hud {
+    order: 0 !important;
+    justify-content: center !important;
+    padding: 14px 16px 0 !important;
+    margin: 0 0 10px !important;
+  }
+
+  .status-cluster,
+  .status-bar {
+    width: 100% !important;
+    min-height: 48px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 7px 12px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(22,255,243,.38) !important;
+    background: linear-gradient(145deg,rgba(22,255,243,.045),rgba(255,61,187,.035)),rgba(7,10,29,.72) !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025),0 0 22px rgba(22,255,243,.10) !important;
+    box-sizing: border-box !important;
+  }
+
+  .status-chip {
+    min-width: 78px !important;
+    height: 31px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 0 12px !important;
+    border-radius: 999px !important;
+    background: rgba(5,8,22,.74) !important;
+    color: #dfe7ff !important;
+    border: 1px solid rgba(255,255,255,.22) !important;
+    font-size: 11px !important;
+    font-weight: 950 !important;
+    letter-spacing: .13em !important;
+    text-transform: uppercase !important;
+    box-shadow: inset 0 0 14px rgba(0,0,0,.24),0 0 13px rgba(22,255,243,.10) !important;
+  }
+
+  .status-dot {
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,.16) !important;
+    box-shadow: 0 0 8px rgba(255,255,255,.22) !important;
+    flex: 0 0 9px !important;
+  }
+
+  .status-chip.state-main .status-dot,
+  .status-chip.state-api .status-dot,
+  .status-chip.state-external .status-dot,
+  .status-chip.is-active .status-dot {
+    background: #28fff4 !important;
+    box-shadow: 0 0 10px rgba(22,255,243,.95),0 0 18px rgba(22,255,243,.34) !important;
+  }
+
+  .status-chip.state-backup .status-dot {
+    background: #ff3dbb !important;
+    box-shadow: 0 0 10px rgba(255,61,187,.95),0 0 18px rgba(255,61,187,.34) !important;
+  }
+
+  .status-chip.state-error .status-dot,
+  .status-chip.state-off .status-dot {
+    background: #ff3dbb !important;
+    box-shadow: 0 0 10px rgba(255,61,187,.80),0 0 18px rgba(255,61,187,.30) !important;
+  }
+
+  /* LIVE / BST OK aus Now/Header-Bereich entfernen */
+  .hero-label-row,
+  .hero-badge,
+  .hero-live,
+  #streamState {
+    display: none !important;
+  }
+
+  /* NOW PLAYING eigene saubere Reihe ohne Livestream-Badge */
+  .now-playing {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 8px 16px !important;
+    min-height: 136px !important;
+    padding: 18px 22px !important;
+  }
+
+  .section-topline {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto !important;
+    gap: 14px !important;
+    align-items: start !important;
+    margin: 0 !important;
+  }
+
+  .section-kicker {
+    color: #28fff4 !important;
+    font-size: 12px !important;
+    font-weight: 950 !important;
+    letter-spacing: .22em !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px rgba(22,255,243,.30) !important;
+  }
+
+  .meta-line {
+    color: #ff3dbb !important;
+    font-size: clamp(17px, 1.65vw, 24px) !important;
+    font-weight: 950 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .ticker-window {
+    grid-column: 1 / 2 !important;
+    grid-row: 2 / 4 !important;
+    min-width: 0 !important;
+  }
+
+  #historyToggle {
+    grid-column: 2 / 3 !important;
+    grid-row: 3 !important;
+    align-self: end !important;
+    justify-self: end !important;
+    min-width: 112px !important;
+    height: 42px !important;
+    position: static !important;
+    margin: 0 !important;
+  }
+
+  /* History Overlay: kein Layout-Schieben mehr */
+  .history-panel {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(560px, calc(100vw - 96px)) !important;
+    max-height: min(70vh, 620px) !important;
+    overflow: auto !important;
+    z-index: 2147483000 !important;
+    margin: 0 !important;
+    padding: 18px 20px !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(255,61,187,.62) !important;
+    background: radial-gradient(circle at 18% 0%,rgba(255,61,187,.18),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.13),transparent 38%),rgba(3,7,20,.97) !important;
+    box-shadow: 0 0 36px rgba(255,61,187,.32),0 0 28px rgba(22,255,243,.18),inset 0 0 26px rgba(255,255,255,.035) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+  }
+
+  .history-panel.hidden {
+    display: none !important;
+  }
+
+  body.history-overlay-open::before {
+    content: '' !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147482990 !important;
+    background: rgba(0,0,0,.58) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  .history-title {
+    color: #28fff4 !important;
+    font-size: 13px !important;
+    font-weight: 950 !important;
+    letter-spacing: .16em !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Unteres Levelmeter: statisch im DOM, Dynamik aus equalizer.js = Side-Meter smoothMeter */
+  .pc-bottom-sync-meter {
+    order: 7 !important;
+    width: 100% !important;
+    min-height: 76px !important;
+    margin: 0 16px 12px !important;
+    padding: 16px 26px !important;
+    box-sizing: border-box !important;
+    border: 1px solid rgba(22,255,243,.42) !important;
+    border-radius: 26px !important;
+    background: linear-gradient(145deg,rgba(255,61,187,.045),rgba(22,255,243,.035)),rgba(7,10,29,.78) !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025),0 0 18px rgba(22,255,243,.12),0 18px 54px rgba(0,0,0,.28) !important;
+    overflow: hidden !important;
+  }
+
+  .pc-bottom-sync-inner {
+    width: 100% !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+
+  .pc-bottom-sync-seg {
+    width: clamp(4px,.42vw,7px) !important;
+    height: 32px !important;
+    flex: 0 0 clamp(4px,.42vw,7px) !important;
+    border-radius: 999px !important;
+    background: linear-gradient(to top,#22fff4 0%,#20dfff 36%,#8e58ff 66%,#ff3dbb 100%) !important;
+    opacity: .18;
+    transform-origin: 50% 50% !important;
+    transition: opacity .07s linear, filter .07s linear, transform .07s linear !important;
+  }
+
+  .pc-bottom-sync-seg.is-on {
+    filter: brightness(1.16) saturate(1.18) !important;
+    box-shadow: 0 0 8px rgba(22,255,243,.30),0 0 10px rgba(255,61,187,.22) !important;
+  }
+
+  /* Equalizer-Mitte sichtbar funktional halten */
+  .eq-bar-fill {
+    min-height: 14px !important;
+    transition: height .075s linear !important;
+  }
+
+  /* WICHTIG: keine Side-Meter-Selektoren. Seitliche PC-Levelmeter bleiben original. */
+}
+

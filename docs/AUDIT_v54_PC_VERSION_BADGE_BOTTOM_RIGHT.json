@@ -1,0 +1,34 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v54_PC_VERSION_BADGE_BOTTOM_RIGHT",
+  "cache_tag": "smfp-v54-pc-version-badge-20260430-0645",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.zip",
+  "changes": [
+    "index.html: PC-Version-Badge DOM unten rechts ergänzt",
+    "css/desktop.css: PC-Version-Badge unten rechts gestylt"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.zip",
+    "before_file_count": 61,
+    "after_file_count_pre_report": 61,
+    "pc_badge_dom_present": true,
+    "pc_badge_text": "v54",
+    "desktop_css_changed": true,
+    "worker_unchanged": true,
+    "core_js_unchanged": true,
+    "inline_script_checked": true,
+    "mobile_hidden_rule_present": true,
+    "docs_dir_present": true,
+    "final_file_count": 64
+  }
+}

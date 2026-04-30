@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — v54 PC VERSION BADGE BOTTOM RIGHT
+
+Geändert:
+- index.html: Version/Cache + pcVersionBadge
+- css/desktop.css: Badge-Styling
+- docs/REPORT_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.txt
+- docs/CHANGELOG_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.txt
+- docs/AUDIT_v54_PC_VERSION_BADGE_BOTTOM_RIGHT.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+
+Anzeige:
+- Desktop/PC: unten rechts v54
+- Mobile/iPhone: ausgeblendet

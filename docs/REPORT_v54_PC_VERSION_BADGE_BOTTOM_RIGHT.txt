@@ -1,0 +1,43 @@
+666SOUNDsDESIGn — v54 PC VERSION BADGE BOTTOM RIGHT
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.zip
+
+ZIEL:
+- PC-Version unten rechts anzeigen.
+- Mobile/iPhone unverändert.
+- Keine Worker-/Audio-/Stream-Routen ändern.
+
+GEÄNDERT:
+- index.html: PC-Version-Badge DOM unten rechts ergänzt
+- css/desktop.css: PC-Version-Badge unten rechts gestylt
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.zip
+- before_file_count: 61
+- after_file_count_pre_report: 61
+- pc_badge_dom_present: True
+- pc_badge_text: v54
+- desktop_css_changed: True
+- worker_unchanged: True
+- core_js_unchanged: True
+- inline_script_checked: True
+- mobile_hidden_rule_present: True
+- docs_dir_present: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 64
