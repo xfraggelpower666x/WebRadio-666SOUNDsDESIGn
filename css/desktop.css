@@ -690,3 +690,76 @@ ZWECK:
   */
 }
 
+
+/*
+============================================================
+666SOUNDsDESIGn — v53 PC BOTTOM MOBILE LEVELMETER ADDON
+GEÄNDERT: 2026-04-30
+ZWECK:
+- Unteres iPhone-Levelmeter auch auf PC ergänzen.
+- Seitliche PC-Levelmeter bleiben original.
+- Keine Audio-/Worker-/Stream-Routen-Änderung.
+============================================================
+*/
+
+@media (min-width: 761px) {
+  .pc-bottom-mobile-levelmeter {
+    order: 7 !important;
+    width: 100% !important;
+    min-height: 82px !important;
+    margin: 0 !important;
+    padding: 18px 28px !important;
+    box-sizing: border-box !important;
+    border: 1px solid rgba(22,255,243,.42) !important;
+    border-radius: 28px !important;
+    background:
+      linear-gradient(145deg, rgba(255,61,187,.045), rgba(22,255,243,.035)),
+      rgba(7,10,29,.78) !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.025),
+      0 0 18px rgba(22,255,243,.12),
+      0 18px 54px rgba(0,0,0,.28) !important;
+    backdrop-filter: blur(14px) saturate(1.15) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.15) !important;
+    overflow: hidden !important;
+  }
+
+  .pc-bottom-mobile-levelmeter-inner {
+    width: 100% !important;
+    height: 42px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+  }
+
+  .pc-bottom-mobile-meter-seg {
+    width: clamp(4px, .42vw, 7px) !important;
+    height: 32px !important;
+    flex: 0 0 clamp(4px, .42vw, 7px) !important;
+    border-radius: 999px !important;
+    background: linear-gradient(to top, #22fff4 0%, #20dfff 36%, #8e58ff 66%, #ff3dbb 100%) !important;
+    box-shadow: none !important;
+    opacity: .18;
+    transform: scaleY(calc(.42 + (var(--v, .2) * .52))) !important;
+    transform-origin: 50% 50% !important;
+    transition: opacity .07s linear, filter .07s linear, transform .07s linear !important;
+    will-change: opacity, filter, transform !important;
+  }
+
+  .pc-bottom-mobile-meter-seg.is-on {
+    opacity: .92;
+    filter: brightness(1.16) saturate(1.18) !important;
+    box-shadow:
+      0 0 8px rgba(22,255,243,.30),
+      0 0 10px rgba(255,61,187,.22) !important;
+  }
+
+  /* WICHTIG:
+     Keine .side-meter / .left-meter / .right-meter / data-side-meter Regeln.
+     PC-Seiten-Levelmeter bleiben original.
+  */
+}
+

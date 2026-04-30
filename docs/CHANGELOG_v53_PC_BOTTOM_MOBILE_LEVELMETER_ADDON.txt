@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — v53 PC BOTTOM MOBILE LEVELMETER ADDON
+
+Geändert:
+- index.html: Version/Cache + Desktop-Bottom-Levelmeter-Runtime
+- css/desktop.css: Bottom-Levelmeter-Optik
+- docs/REPORT_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.txt
+- docs/CHANGELOG_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.txt
+- docs/AUDIT_v53_PC_BOTTOM_MOBILE_LEVELMETER_ADDON.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+
+Wichtig:
+- PC-Seiten-Levelmeter bleiben original.
+- Unteres Levelmeter wird nur auf Desktop >=761px ergänzt.
+- Kein alter Fullpack-Ballast.

@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v53 PC BOTTOM MOBILE LEVELMETER ADDON
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v52_PC_PANEL_LED_NOWPLAYING_LAYOUT_FIX.zip
+
+ZIEL:
+- Unteres iPhone-Levelmeter auch im PC-Player ergänzen.
+- Position unter Boost/Controls-Bereich.
+- Center-Out-Bewegung wie Mobile.
+- Seitliche PC-Levelmeter bleiben original.
+- Keine Worker-/Audio-/Stream-Routen ändern.
+
+GEÄNDERT:
+- index.html: PC-Bottom-Levelmeter-Runtime ergänzt, nur Desktop >=761px
+- css/desktop.css: unteres Mobile-Levelmeter für PC ergänzt, Side-Meter ausgespart
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- seitliche PC-Levelmeter
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v52_PC_PANEL_LED_NOWPLAYING_LAYOUT_FIX.zip
+- before_file_count: 58
+- after_file_count_pre_report: 58
+- bottom_meter_script_present: True
+- bottom_meter_runtime_syntax_ok: True
+- desktop_css_changed: True
+- worker_unchanged: True
+- core_js_unchanged: True
+- side_meter_kept_by_design: True
+- inline_script_checked: True
+- docs_dir_present: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 61
