@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
+   * STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
+   * STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
+   * STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
+   * STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
+   * STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -237,6 +237,28 @@ function updateStreamPanelLeds(source) {
 }
 
 
+
+function setActivePanelLeds() {
+  applyStatusChip(statusStream, 'ok', 'Stream aktiv');
+  applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
+  applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
+  updateStreamPanelLeds(currentSource);
+}
+
+function setStoppedPanelLeds() {
+  applyStatusChip(statusStream, 'stopped', 'Stream gestoppt');
+  applyStatusChip(statusMeta, 'warn', 'Metadaten gestoppt');
+  applyStatusChip(statusSource, 'warn', 'Quelle gestoppt');
+
+  if (currentSource === 'fallback' || currentSource === 'backup') {
+    applyStatusChip(statusMain, 'empty', 'Main stream inactive');
+    applyStatusChip(statusBackup, 'stopped', 'Backup stream selected but stopped');
+  } else {
+    applyStatusChip(statusMain, 'stopped', 'Main stream selected but stopped');
+    applyStatusChip(statusBackup, 'empty', 'Backup stream inactive');
+  }
+}
+
 function syncStreamLedFromStatus(text) {
   const value = String(text || '').toLowerCase();
   if (value.includes('error') || value.includes('fehler') || value.includes('timeout')) {
@@ -288,7 +310,11 @@ function setSource(source) {
   } else {
     applyStatusChip(statusStream, 'ok', 'Backup Stream aktiv');
   }
-  updateStreamPanelLeds(source);
+  if (userStopped) {
+    setStoppedPanelLeds();
+  } else {
+    updateStreamPanelLeds(source);
+  }
 }
 
 
@@ -298,16 +324,7 @@ function isLoadingMetaText(text) {
 
 function updateNowCover(meta) {
   if (!nowCover) return;
-  const cover =
-    meta?.cover ||
-    meta?.coverUrl ||
-    meta?.artwork ||
-    meta?.artworkUrl ||
-    meta?.image ||
-    meta?.imageUrl ||
-    meta?.picture ||
-    meta?.thumbnail ||
-    '/assets/images/fallback-cover.png';
+  const cover = meta?.cover || '/assets/images/fallback-cover.png';
 
   if (nowCover.getAttribute('src') !== cover) {
     nowCover.src = cover;
@@ -352,20 +369,23 @@ function normalizeMetadataTitleV22(value) {
   let text = String(value || '').trim();
   text = text.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
   text = text.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/^\s*loading metadata\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/^\s*metadata unavailable\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/^\s*loading\s*metadata\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/^\s*metadaten\s*werden\s*geladen\s*[-:|–—]*\s*/i, '');
+  text = text.replace(/^\s*metadata\s*unavailable\s*[-:|–—]*\s*/i, '');
   text = text.replace(/\s{2,}/g, ' ').trim();
   text = text.replace(/^[-:|–—\s]+/, '').replace(/[-:|–—\s]+$/, '').trim();
-  if (!text) return 'Metadaten werden geladen …';
+  if (!text) return '';
   return text;
 }
 
 function cleanNowPlayingText(raw) {
   let value = String(raw || '').trim();
-  if (!value) return 'Metadaten werden geladen …';
+  if (!value) return '';
 
   value = value.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/^\s*loading\s*metadata\s*[-:|–—]*\s*/i, '');
+  value = value.replace(/^\s*metadaten\s*werden\s*geladen\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*666soundsdesign\s*dj\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*dj\s*[-:|–—]*\s*/i, '');
   value = value.replace(/^\s*artist\s*[-:|–—]*\s*track\s*[-:|–—]*\s*/i, '');
@@ -373,31 +393,137 @@ function cleanNowPlayingText(raw) {
   value = value.replace(/^\s*[-:|–—]+\s*/, '');
   value = value.replace(/\s{2,}/g, ' ').trim();
 
-  if (!value || /^unknown\s*title$/i.test(value)) return 'Metadaten werden geladen …';
+  if (!value || /^unknown\s*title$/i.test(value)) return '';
   return value;
 }
 
 
+
+function firstMetadataText(...values) {
+  for (const value of values) {
+    if (typeof value === 'string' || typeof value === 'number') {
+      const text = String(value).trim();
+      if (text) return text;
+    }
+
+    if (value && typeof value === 'object') {
+      const nested = value.title || value.text || value.name || value.songtitle || value.song || value.current || value.now_playing;
+      if (typeof nested === 'string' || typeof nested === 'number') {
+        const text = String(nested).trim();
+        if (text) return text;
+      }
+      if (nested && typeof nested === 'object') {
+        const deep = nested.title || nested.text || nested.name || nested.songtitle;
+        if (typeof deep === 'string' || typeof deep === 'number') {
+          const text = String(deep).trim();
+          if (text) return text;
+        }
+      }
+    }
+  }
+  return '';
+}
+
+function coverCandidateToUrl(value) {
+  if (!value) return '';
+  if (typeof value === 'string') return value.trim();
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = coverCandidateToUrl(item);
+      if (found) return found;
+    }
+  }
+  if (typeof value === 'object') {
+    return coverCandidateToUrl(value.url || value.src || value.href || value.image || value.cover || value.art || value.artwork);
+  }
+  return '';
+}
+
+function extractCoverUrl(payload) {
+  const song = payload?.now_playing?.song || payload?.song || payload?.current_song || payload?.currentSong || payload?.track || {};
+  const candidates = [
+    payload?.cover,
+    payload?.cover_url,
+    payload?.coverUrl,
+    payload?.art,
+    payload?.album_art,
+    payload?.albumArt,
+    payload?.artwork,
+    payload?.artwork_url,
+    payload?.artworkUrl,
+    payload?.image,
+    payload?.image_url,
+    payload?.imageUrl,
+    payload?.picture,
+    payload?.thumbnail,
+    payload?.station?.image,
+    payload?.station?.logo,
+    payload?.live?.art,
+    payload?.live?.image,
+    payload?.now_playing?.cover,
+    payload?.now_playing?.image,
+    payload?.now_playing?.art,
+    payload?.now_playing?.artwork,
+    song?.art,
+    song?.album_art,
+    song?.albumArt,
+    song?.cover,
+    song?.image,
+    song?.artwork,
+    song?.thumbnail
+  ];
+
+  for (const candidate of candidates) {
+    const url = coverCandidateToUrl(candidate);
+    if (url) return url;
+  }
+  return '';
+}
+
 function parseMetadata(payload) {
   if (!payload || typeof payload !== 'object') {
     return {
-      title: 'Metadaten werden geladen …',
+      title: '',
       listeners: '0 / 250',
       bitrate: 'Unknown',
-      dj: getDefaultDjName()
+      dj: getDefaultDjName(),
+      cover: ''
     };
   }
 
-  const rawTitle = payload.title || payload.now_playing || payload.song || payload.currenttrack || payload.currentSong || '';
-  const rawArtist = payload.artist || payload.dj || payload.djusername || '';
-  const listeners = payload.listeners || payload.currentlisteners || payload.listener_count || 0;
-  const bitrate = payload.bitrate || payload.stream_bitrate || 'Unknown';
-  const max = payload.maxlisteners || payload.listener_capacity || 250;
-  const dj = normalizeDjName(payload.dj || payload.djusername || rawArtist || '');
+  const song = payload?.now_playing?.song || payload?.song || payload?.current_song || payload?.currentSong || payload?.track || {};
+  const rawTitle = firstMetadataText(
+    payload.title,
+    payload.now_playing,
+    payload.currenttrack,
+    payload.currentTrack,
+    payload.currentSong,
+    payload.current_song,
+    payload.songtitle,
+    payload.song,
+    song.title,
+    song.text,
+    song.name,
+    song.songtitle
+  );
+  const rawArtist = firstMetadataText(
+    payload.artist,
+    payload.dj,
+    payload.djusername,
+    payload.presenter,
+    song.artist,
+    song.artist_name,
+    song.dj
+  );
+
+  const listeners = payload.listeners || payload.currentlisteners || payload.currentListeners || payload.listener_count || 0;
+  const bitrate = payload.bitrate || payload.stream_bitrate || payload.streamBitrate || 'Unknown';
+  const max = payload.maxlisteners || payload.maxListeners || payload.listener_capacity || 250;
+  const dj = normalizeDjName(payload.dj || payload.djusername || payload.presenter || rawArtist || '');
 
   const cleanedTitle = normalizeMetadataTitleV22(cleanNowPlayingText(rawTitle));
-  const cleanedArtist = cleanNowPlayingText(rawArtist);
-  const finalTitle = cleanedArtist && !cleanedTitle.toLowerCase().includes(cleanedArtist.toLowerCase())
+  const cleanedArtist = normalizeMetadataTitleV22(cleanNowPlayingText(rawArtist));
+  const finalTitle = cleanedArtist && cleanedTitle && !cleanedTitle.toLowerCase().includes(cleanedArtist.toLowerCase())
     ? `${cleanedArtist} - ${cleanedTitle}`
     : cleanedTitle;
 
@@ -405,7 +531,8 @@ function parseMetadata(payload) {
     title: finalTitle,
     listeners: `${listeners} / ${max}`,
     bitrate: String(bitrate),
-    dj
+    dj,
+    cover: extractCoverUrl(payload)
   };
 }
 
@@ -420,9 +547,13 @@ async function fetchMetadata() {
     if (!response.ok) throw new Error('metadata_http_error');
     const raw = await response.json();
     const data = parseMetadata(raw);
+    if (userStopped) {
+      setStoppedPanelLeds();
+      return;
+    }
     updateNowCover(data);
-    setText(metaLine, data.title);
-    setText(nowPlayingTicker, isLoadingMetaText(data.title) ? '' : data.title);
+    setText(metaLine, data.title || '');
+    setText(nowPlayingTicker, data.title || '');
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);
     setText(djText, data.dj);
@@ -451,7 +582,9 @@ function stopPlayback(status = 'STOPPED') {
   audio.src = '';
   try { audio.load(); } catch (err) {}
   visualizer.stop?.();
+  window.clearInterval(metadataTimer);
   setStatus(status);
+  setStoppedPanelLeds();
   updateTimeline();
   keepControlsUnlocked();
 }
@@ -489,6 +622,7 @@ async function playCurrent() {
   const target = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
 
   setStatus(currentSource === 'main' ? 'STARTING MAIN' : 'STARTING BACKUP');
+  setActivePanelLeds();
   audio.src = target;
   audio.load();
 
@@ -505,6 +639,7 @@ async function playCurrent() {
       }
     }, 450);
     setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+    setActivePanelLeds();
     startMetadataLoop();
   } catch (err) {
     keepControlsUnlocked();
@@ -523,6 +658,7 @@ async function playCurrent() {
         await visualizer.start?.();
         setBoostStage(currentBoostStage);
         setStatus('PLAYING BACKUP');
+        setActivePanelLeds();
         startMetadataLoop();
       } catch (err2) {
         keepControlsUnlocked();
@@ -542,6 +678,10 @@ async function playCurrent() {
   }
 }
 async function healthPing() {
+  if (userStopped) {
+    setStoppedPanelLeds();
+    return;
+  }
   try {
     const response = await fetch(`${ENDPOINTS.health}?t=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('health_http_error');
@@ -558,6 +698,7 @@ pauseBtn?.addEventListener('click', () => {
   lockVisualStage();
   visualizer.stop?.();
   setStatus('PAUSED');
+  setStoppedPanelLeds();
   keepControlsUnlocked();
 });
 stopBtn?.addEventListener('click', () => {
@@ -603,6 +744,7 @@ audio?.addEventListener('playing', async () => {
   lockVisualStage();
   await visualizer.start?.();
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+  setActivePanelLeds();
 });
 audio?.addEventListener('timeupdate', updateTimeline);
 audio?.addEventListener('loadedmetadata', updateTimeline);

@@ -1,0 +1,45 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v61_PC_META_COVER_STOP_LED_FIX",
+  "cache_tag": "smfp-v61-pc-meta-cover-stop-led-fix-20260430-1230",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.zip",
+  "changes": [
+    "index.html: statische Metadaten-Ladetexte entfernt, Version v61",
+    "player-core.js: Lade-Fallback aus Text-Cleanern entfernt",
+    "player-core.js: robuste Titel-/Cover-Extractor ergänzt",
+    "player-core.js: parseMetadata ersetzt, Cover aus echten Metadaten möglich",
+    "player-core.js: fetchMetadata setzt nur echte Titel in metaLine/ticker und ignoriert gestoppten Zustand",
+    "player-core.js: Stop-/Active-LED-Helfer ergänzt",
+    "player-core.js: Stop/Pause/Play-LED-Zustände korrigiert und Metadata-Loop bei Stop gestoppt"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.zip",
+    "before_file_count": 82,
+    "after_file_count_pre_report": 82,
+    "static_meta_line_empty": true,
+    "static_ticker_empty": true,
+    "parse_metadata_has_cover": true,
+    "no_loading_fallback_in_player_core": true,
+    "fetch_metadata_sets_ticker_real_title": true,
+    "stop_helper_present": true,
+    "stop_clears_metadata_timer": true,
+    "health_does_not_override_stop": true,
+    "cover_extractor_present": true,
+    "worker_unchanged": true,
+    "stream_routes_unchanged": true,
+    "equalizer_unchanged": true,
+    "responsive_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 85
+  }
+}

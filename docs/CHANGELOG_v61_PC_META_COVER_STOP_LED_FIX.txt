@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — v61 PC META COVER STOP LED FIX
+
+Geändert:
+- index.html
+- css/desktop.css Versionsmarker
+- js/player-core.js
+- js/shared-status.js Versionsmarker
+- docs/REPORT_v61_PC_META_COVER_STOP_LED_FIX.txt
+- docs/CHANGELOG_v61_PC_META_COVER_STOP_LED_FIX.txt
+- docs/AUDIT_v61_PC_META_COVER_STOP_LED_FIX.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+
+Inhalt:
+- Kein dauerhafter Metadaten-Ladetext mehr.
+- Ticker läuft nur mit echtem Titel.
+- Cover aus Metadaten.
+- Stop-LEDs korrekt pink/leer.

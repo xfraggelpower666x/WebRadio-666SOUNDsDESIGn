@@ -1,0 +1,55 @@
+666SOUNDsDESIGn — v61 PC META COVER STOP LED FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.zip
+
+UMGESETZTE SAMMELLISTE:
+1. 'Metadaten werden geladen' aus statischer Anzeige und Metadaten-Fallback entfernt.
+2. Laufschrift bekommt wieder echte Titel; leer, wenn kein echter Titel vorhanden ist.
+3. Cover wird aus echten Stream-Metadaten extrahiert; Fallback nur ohne Cover.
+4. Stop/Pause schaltet STR/META/SRC und gewählte Quelle pink; ungewählte Quelle leer.
+
+GEÄNDERT:
+- index.html: statische Metadaten-Ladetexte entfernt, Version v61
+- player-core.js: Lade-Fallback aus Text-Cleanern entfernt
+- player-core.js: robuste Titel-/Cover-Extractor ergänzt
+- player-core.js: parseMetadata ersetzt, Cover aus echten Metadaten möglich
+- player-core.js: fetchMetadata setzt nur echte Titel in metaLine/ticker und ignoriert gestoppten Zustand
+- player-core.js: Stop-/Active-LED-Helfer ergänzt
+- player-core.js: Stop/Pause/Play-LED-Zustände korrigiert und Metadata-Loop bei Stop gestoppt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.zip
+- before_file_count: 82
+- after_file_count_pre_report: 82
+- static_meta_line_empty: True
+- static_ticker_empty: True
+- parse_metadata_has_cover: True
+- no_loading_fallback_in_player_core: True
+- fetch_metadata_sets_ticker_real_title: True
+- stop_helper_present: True
+- stop_clears_metadata_timer: True
+- health_does_not_override_stop: True
+- cover_extractor_present: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- equalizer_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 85

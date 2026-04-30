@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v60 PC COLLECTED PATCH MB COVER VERSION META
+666SOUNDsDESIGn — v61 PC META COVER STOP LED FIX
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v60-pc-collected-mb-cover-version-meta-20260430-1145') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v61-pc-meta-cover-stop-led-fix-20260430-1230') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
