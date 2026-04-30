@@ -1,0 +1,41 @@
+666SOUNDsDESIGn — v48 MOBILE VISUALIZER PC DYNAMICS PORT
+
+BASIS: WebRadio-666SOUNDsDESIGn_FULLPACK_STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL.zip
+VERSION: STRICT_MOBILE_FRONTEND_PURGE_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT
+CACHE_TAG: smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415
+
+ZIEL:
+- PC-artige EQ/Levelmeter-Dynamik auf iPhone übertragen.
+- Kein kompletter PC-Player-Klon.
+- Keine neuen sichtbaren Layer.
+- Vorhandene Mobile-Bars werden angesteuert.
+
+UMGESETZT:
+- Realer Analyser wird genutzt, falls verfügbar.
+- Hybrid-Fallback wirkt organisierter und weniger künstlich.
+- EQ-Bänder mit Attack/Release-Inertia.
+- Unteres Levelmeter Center-Out.
+- Side-Meter mit geglättetem Energielevel.
+
+GEÄNDERT:
+- Mobile Visualizer Runtime mit PC-artiger Dynamik eingefügt
+- Visualizer-CSS für vorhandene Mobile-Bars ergänzt
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_FULLPACK_STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL.zip
+- pc_equalizer_js_present: True
+- v48_visualizer_script_present: True
+- v48_visualizer_syntax_ok: True
+- inline_mobile_script_syntax_ok: False
+- uses_real_analyser_when_available: True
+- has_hybrid_fallback: True
+- center_out_bottom_meter: True
+- no_worker_change: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js

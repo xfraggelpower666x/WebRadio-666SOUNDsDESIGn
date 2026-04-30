@@ -16,24 +16,24 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v47-user-assets-final-20260430-0330" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v47-user-assets-final-20260430-0330" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v47-user-assets-final-20260430-0330" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v47-user-assets-final-20260430-0330" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v47-user-assets-final-20260430-0330" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v47-user-assets-final-20260430-0330" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v47-user-assets-final-20260430-0330" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v47-user-assets-final-20260430-0330">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v47-user-assets-final-20260430-0330">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v47-user-assets-final-20260430-0330">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v47-user-assets-final-20260430-0330">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
@@ -173,11 +173,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v47-user-assets-final-20260430-0330"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL -->
-<style id="strictMobileFrontendPurgeV47Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT -->
+<style id="strictMobileFrontendPurgeV48Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -1011,7 +1011,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   @media(min-width:761px){
     body{
-      background-image:linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),url('/assets/images/pc-player-background.png?v=smfp-v47-user-assets-final-20260430-0330')!important;
+      background-image:linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),url('/assets/images/pc-player-background.png?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1019,14 +1019,47 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
   }
 
+
+  /* v48 MOBILE VISUALIZER PC DYNAMICS PORT */
+  #mffApp .mff-eq-band,
+  #mffApp .mff-eq-bar,
+  #mffApp [data-eq-band],
+  #mffApp .eq-band,
+  #mffApp .eq-bar{
+    transform-origin:50% 100%!important;
+    transition:height .075s linear, opacity .075s linear, filter .075s linear!important;
+    will-change:height, transform, opacity!important;
+  }
+
+  #mffApp .mff-bottom-meter-seg,
+  #mffApp .mff-bottom-meter i,
+  #mffApp .mff-horizontal-meter i,
+  #mffApp .mff-meter-bottom i,
+  #mffApp .mff-level-bottom i{
+    transition:opacity .07s linear, filter .07s linear!important;
+    will-change:opacity, filter!important;
+  }
+
+  #mffApp .mff-bottom-meter-seg.is-on,
+  #mffApp .mff-bottom-meter i.is-on,
+  #mffApp .mff-horizontal-meter i.is-on,
+  #mffApp .mff-meter-bottom i.is-on,
+  #mffApp .mff-level-bottom i.is-on,
+  #mffApp .mff-side-left i.is-on,
+  #mffApp .mff-side-right i.is-on,
+  #mffApp .mff-level-left i.is-on,
+  #mffApp .mff-level-right i.is-on{
+    box-shadow:0 0 8px rgba(22,255,243,.32),0 0 10px rgba(255,61,187,.22)!important;
+  }
+
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL -->
-<script id="strictMobileFrontendPurgeV47Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT -->
+<script id="strictMobileFrontendPurgeV48Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1347,7 +1380,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function buildBars(id,count){
     var el=q(id); if(!el||el.children.length)return;
     var mid=(count-1)/2;
-    for(var i=0;i<section class="mff-player-logo" id="mffPlayerLogo" aria-label="666SOUNDsDESIGn Player Logo"><img src="/assets/logos/player-header-logo.png?v=smfp-v47-user-assets-final-20260430-0330" alt="SOUNDs 666 DESIGn" loading="eager" decoding="async"></section>
+    for(var i=0;i<section class="mff-player-logo" id="mffPlayerLogo" aria-label="666SOUNDsDESIGn Player Logo"><img src="/assets/logos/player-header-logo.png?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415" alt="SOUNDs 666 DESIGn" loading="eager" decoding="async"></section>
 <count;i++){
       var b=document.createElement('i');
       if(id==='#mffEqBars'){
@@ -1412,7 +1445,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v47</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v48</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Loading stream metadata ...</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -2279,6 +2312,239 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',install,{passive:true});
   window.addEventListener('resize',install,{passive:true});
   window.addEventListener('orientationchange',install,{passive:true});
+})();
+</script>
+
+
+<script id="strictMobileFrontendPurgeV48VisualizerDynamics">
+(function(){
+  'use strict';
+  if(window.__mffV48VisualizerDynamicsBound) return;
+  window.__mffV48VisualizerDynamicsBound=true;
+
+  var BAND_COUNT=20;
+  var H_METER_COUNT=44;
+  var state={
+    t:0,
+    energy:0.34,
+    bass:0.36,
+    mid:0.34,
+    high:0.28,
+    peak:0,
+    last:[],
+    hLast:[],
+    sideLast:0.22,
+    frame:0
+  };
+  for(var i=0;i<BAND_COUNT;i++) state.last[i]=0.25+0.1*Math.sin(i);
+  for(var j=0;j<H_METER_COUNT;j++) state.hLast[j]=0.08;
+
+  function q(s,r){return (r||document).querySelector(s);}
+  function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+  function mix(a,b,t){return a+(b-a)*t;}
+  function now(){return performance&&performance.now?performance.now():Date.now();}
+
+  function getAudio(){
+    return q('audio') || window.audio || window.__mffAudio || null;
+  }
+
+  function isPlaying(){
+    try{
+      var a=getAudio();
+      return !!(a && !a.paused && !a.ended);
+    }catch(e){return document.documentElement.getAttribute('data-mff-playing')==='1';}
+  }
+
+  function getCtx(){
+    try{ if(window.__mffAudioCtx) return window.__mffAudioCtx; }catch(e){}
+    try{ if(typeof audioCtx!=='undefined' && audioCtx) return audioCtx; }catch(e){}
+    try{ if(typeof ctx!=='undefined' && ctx) return ctx; }catch(e){}
+    return null;
+  }
+
+  function getAnalyser(){
+    try{ if(window.__mffAnalyser) return window.__mffAnalyser; }catch(e){}
+    try{ if(typeof analyser!=='undefined' && analyser) return analyser; }catch(e){}
+    try{ if(typeof analyserNode!=='undefined' && analyserNode) return analyserNode; }catch(e){}
+    return null;
+  }
+
+  var freqArray=null;
+  function readAudioBands(){
+    var an=getAnalyser();
+    if(!an || typeof an.getByteFrequencyData!=='function') return null;
+    try{
+      if(!freqArray || freqArray.length!==an.frequencyBinCount) freqArray=new Uint8Array(an.frequencyBinCount);
+      an.getByteFrequencyData(freqArray);
+      var n=freqArray.length;
+      if(!n) return null;
+      function avg(a,b){
+        var s=0,c=0;
+        a=Math.max(0,Math.floor(a*n)); b=Math.min(n,Math.ceil(b*n));
+        for(var i=a;i<b;i++){s+=freqArray[i];c++;}
+        return c? s/(c*255):0;
+      }
+      return {
+        bass:avg(0.015,0.12),
+        mid:avg(0.12,0.44),
+        high:avg(0.44,0.92),
+        raw:freqArray
+      };
+    }catch(e){return null;}
+  }
+
+  function pseudoBands(t,playing){
+    // PC-artige, organisierte Bewegung: langsam driftender Grundkörper + kleine Transienten.
+    var base = playing ? 0.32 : 0.12;
+    var pulse = (
+      Math.sin(t*0.0021)*0.09 +
+      Math.sin(t*0.0047+1.7)*0.055 +
+      Math.sin(t*0.0083+0.4)*0.028
+    );
+    var beat = Math.pow(Math.max(0,Math.sin(t*0.0054)), 5) * 0.22;
+    return {
+      bass:clamp(base+pulse+beat,0.05,0.92),
+      mid:clamp(base*0.84+Math.sin(t*0.0031+2.1)*0.10+beat*0.38,0.05,0.82),
+      high:clamp(base*0.62+Math.sin(t*0.0073+4.2)*0.08+Math.random()*0.055,0.04,0.72),
+      raw:null
+    };
+  }
+
+  function computeBand(i,b,t,playing){
+    var x=i/(BAND_COUNT-1);
+    var wave1=Math.sin(t*0.0028 + i*0.62)*0.10;
+    var wave2=Math.sin(t*0.0061 + i*0.31 + 1.4)*0.055;
+    var shape =
+      b.bass*(1.10-Math.min(1,x*2.2))*0.55 +
+      b.mid*(1.0-Math.abs(x-0.48)*1.45)*0.66 +
+      b.high*(x*0.76)*0.42;
+    var shoulders = 0.12 + 0.13*Math.sin(i*0.83+1.2);
+    var target = shape + shoulders + wave1 + wave2;
+    if(!playing) target *= 0.42;
+    // keep not-flat, but not chaotic
+    return clamp(target,0.055,0.96);
+  }
+
+  function ensureBars(container,count,cls){
+    if(!container) return [];
+    var bars=qa('.'+cls,container);
+    if(bars.length>=count) return bars.slice(0,count);
+    for(var i=bars.length;i<count;i++){
+      var d=document.createElement('i');
+      d.className=cls;
+      container.appendChild(d);
+      bars.push(d);
+    }
+    return bars;
+  }
+
+  function findEqBars(){
+    var bars = qa('[data-eq-band], .mff-eq-band, .mff-eq-bar, .eq-band, .eq-bar');
+    if(bars.length>=8) return bars;
+    var eq = q('#mffEq, .mff-eq, .eq, [data-eq]');
+    if(eq) return ensureBars(eq,BAND_COUNT,'mff-eq-band');
+    return [];
+  }
+
+  function findBottomBars(){
+    var bars = qa('[data-bottom-meter], .mff-bottom-meter i, .mff-horizontal-meter i, .mff-meter-bottom i, .mff-level-bottom i');
+    if(bars.length>=10) return bars;
+    var box = q('#mffBottomMeter, .mff-bottom-meter, .mff-horizontal-meter, .mff-meter-bottom, .mff-level-bottom');
+    if(box) return ensureBars(box,H_METER_COUNT,'mff-bottom-meter-seg');
+    return [];
+  }
+
+  function findSideBars(side){
+    var sel = side==='left'
+      ? '[data-side-meter="left"] i, .mff-side-left i, .mff-level-left i, .left-meter i'
+      : '[data-side-meter="right"] i, .mff-side-right i, .mff-level-right i, .right-meter i';
+    return qa(sel);
+  }
+
+  function applyBarHeight(el,v){
+    v=clamp(v,0,1);
+    el.style.setProperty('--v',v.toFixed(3));
+    el.style.setProperty('--level',v.toFixed(3));
+    el.style.height=(8+v*82).toFixed(1)+'%';
+    el.style.opacity=(0.34+v*0.66).toFixed(3);
+    el.style.transform='scaleY('+(0.35+v*0.85).toFixed(3)+')';
+  }
+
+  function applySegmentActive(el,active,v){
+    el.classList.toggle('is-on',!!active);
+    el.style.opacity=active?(0.48+v*0.52).toFixed(3):'0.22';
+    el.style.filter=active?'brightness(1.16) saturate(1.25)':'brightness(.72)';
+  }
+
+  function tick(){
+    var t=now();
+    var playing=isPlaying();
+    var audio=readAudioBands();
+    var b=audio || pseudoBands(t,playing);
+
+    // Inertia like PC: faster attack, slower release.
+    function smooth(prev,next){
+      var rate = next>prev ? 0.30 : 0.105;
+      return mix(prev,next,rate);
+    }
+    state.bass=smooth(state.bass,b.bass);
+    state.mid=smooth(state.mid,b.mid);
+    state.high=smooth(state.high,b.high);
+    state.energy=clamp(state.bass*0.48+state.mid*0.34+state.high*0.18,0,1);
+
+    var eqBars=findEqBars();
+    for(var i=0;i<eqBars.length;i++){
+      var idx = Math.floor(i * BAND_COUNT / Math.max(1,eqBars.length));
+      var target=computeBand(idx,state,t,playing);
+      var prev=state.last[idx]||0;
+      var val=target>prev?mix(prev,target,0.34):mix(prev,target,0.12);
+      state.last[idx]=val;
+      applyBarHeight(eqBars[i],val);
+    }
+
+    var bottom=findBottomBars();
+    var center=(bottom.length-1)/2;
+    for(var j=0;j<bottom.length;j++){
+      var dist=Math.abs(j-center)/Math.max(1,center);
+      var sideShape=(1-dist);
+      var ripple=Math.sin(t*0.006 + j*0.42)*0.065;
+      var target=clamp((state.energy*0.85+state.bass*0.22)*sideShape + ripple + 0.04,0.02,0.95);
+      var pv=state.hLast[j]||0;
+      var hv=target>pv?mix(pv,target,0.30):mix(pv,target,0.10);
+      state.hLast[j]=hv;
+      // Center-out behavior: only segments inside active width glow
+      var active = dist < clamp(0.18 + hv*0.86,0.12,0.98);
+      bottom[j].style.setProperty('--v',hv.toFixed(3));
+      applySegmentActive(bottom[j],active,hv);
+    }
+
+    var sideLevel=clamp(state.energy*0.92 + state.bass*0.18 + Math.sin(t*0.007)*0.05,0.05,1);
+    state.sideLast = sideLevel>state.sideLast?mix(state.sideLast,sideLevel,0.28):mix(state.sideLast,sideLevel,0.085);
+    ['left','right'].forEach(function(side){
+      var bars=findSideBars(side);
+      for(var k=0;k<bars.length;k++){
+        var threshold=(k+1)/Math.max(1,bars.length);
+        var active=threshold < state.sideLast;
+        applySegmentActive(bars[k],active,state.sideLast);
+      }
+    });
+
+    document.documentElement.style.setProperty('--mff-audio-energy',state.energy.toFixed(3));
+    document.documentElement.style.setProperty('--mff-audio-bass',state.bass.toFixed(3));
+    document.documentElement.style.setProperty('--mff-audio-mid',state.mid.toFixed(3));
+    document.documentElement.style.setProperty('--mff-audio-high',state.high.toFixed(3));
+
+    requestAnimationFrame(tick);
+  }
+
+  function start(){
+    if(window.__mffV48VisualizerStarted) return;
+    window.__mffV48VisualizerStarted=true;
+    requestAnimationFrame(tick);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
+  else start();
 })();
 </script>
 

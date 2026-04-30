@@ -1,0 +1,34 @@
+{
+  "base": "WebRadio-666SOUNDsDESIGn_FULLPACK_STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL.zip",
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT",
+  "cache_tag": "smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415",
+  "findings": [
+    "PC equalizer.js terms: analyser=8, frequency=3, fft=1, getByteFrequencyData=1, requestAnimationFrame=1, smoothing=1, visualizer=3, equalizer=3",
+    "Inline-Mobile-Script gefunden."
+  ],
+  "changes": [
+    "Mobile Visualizer Runtime mit PC-artiger Dynamik eingefügt",
+    "Visualizer-CSS für vorhandene Mobile-Bars ergänzt"
+  ],
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_FULLPACK_STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL.zip",
+    "pc_equalizer_js_present": true,
+    "v48_visualizer_script_present": true,
+    "v48_visualizer_syntax_ok": true,
+    "inline_mobile_script_syntax_ok": false,
+    "uses_real_analyser_when_available": true,
+    "has_hybrid_fallback": true,
+    "center_out_bottom_meter": true,
+    "no_worker_change": true
+  },
+  "inline_error_if_any": "[stdin]:324\n    for(var i=0;i<section class=\"mff-player-logo\" id=\"mffPlayerLogo\" aria-label=\"666SOUNDsDESIGn Player Logo\"><img src=\"/assets/logos/player-header-logo.png?v=smfp-v48-mobile-visualizer-pc-dynamics-20260430-0415\" alt=\"SOUNDs 666 DESIGn\" loading=\"eager\" decoding=\"async\"></section>\n                          ^^^^^\n\nSyntaxError: Unexpected token 'class'\n\u001b[90m    at wrapSafe (node:internal/modules/cjs/loader:1662:18)\u001b[39m\n\u001b[90m    at checkSyntax (node:internal/main/check_syntax:78:3)\u001b[39m\n\u001b[90m    at node:internal/main/check_syntax:45:5\u001b[39m\n\u001b[90m    at Socket.<anonymous> (node:internal/process/execution:200:5)\u001b[39m\n\u001b[90m    at Socket.emit (node:events:530:35)\u001b[39m\n\u001b[90m    at endReadableNT (node:internal/streams/readable:1698:12)\u001b[39m\n\u001b[90m    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)\u001b[39m\n\nNode.js v22.16.0",
+  "v48_error_if_any": "",
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ]
+}

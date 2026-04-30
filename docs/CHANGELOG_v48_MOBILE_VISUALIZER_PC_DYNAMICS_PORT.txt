@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — v48 MOBILE VISUALIZER PC DYNAMICS PORT
+
+Geändert:
+- index.html
+- docs/REPORT_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT.txt
+- docs/CHANGELOG_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT.txt
+- docs/AUDIT_v48_MOBILE_VISUALIZER_PC_DYNAMICS_PORT.json
+
+Nicht geändert:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- Stream-Routen
+
+Inhalt:
+- iPhone Visualizer-Dynamik nutzt PC-artige Bewegung.
+- Echt-Audio-Analyser wird verwendet, wenn Browser/CORS/AudioContext es erlauben.
+- Hybrid-Fallback bewegt sich organisiert und nicht mehr gleichförmig statisch.
