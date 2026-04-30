@@ -1,5 +1,0 @@
-VERSION=STRICT_MOBILE_FRONTEND_PURGE_v8_CACHE_PROOF
-CACHE_TAG=smfp-v8-20260427-2035
-HINWEIS:
-Wenn die iPhone-Ansicht weiterhin 'Quelle: /streammeta' zeigt, läuft NICHT diese Version.
-In v8 ist /streammeta keine Metadatenquelle mehr.

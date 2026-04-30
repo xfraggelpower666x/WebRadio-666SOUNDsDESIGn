@@ -1,9 +1,0 @@
-VERSION=STRICT_MOBILE_FRONTEND_PURGE_v39_STATUS_CARD_ICON_LABEL_ALIGNMENT
-CACHE_TAG=smfp-v39-card-icon-label-align-20260429-1650
-
-FIX:
-- In der Statuskarten-Reihe stehen Icon und Label jetzt auf derselben Höhe.
-- Reihenfolge: Icon + Abstand + Label.
-- LSTN / BITRATE / DJ STATUS behalten Wert und Punkte zentriert darunter.
-- DJ-Symbol wird, falls im DOM fehlend, minimal vor dem Label ergänzt.
-- Keine Worker/Wrangler/Desktop-Dateien geändert.

@@ -1,9 +1,0 @@
-VERSION=STRICT_MOBILE_FRONTEND_PURGE_v12_ANALYSER_DIAGNOSTIC_FALLBACK
-CACHE_TAG=smfp-v12-analyserfallback-20260427-2138
-
-ANALYSER DIAGNOSTIC:
-- LIVE = echte Frequenzdaten vom Stream.
-- CORS/SILENT = Analyser existiert, liefert aber nur Null-/Fast-Null-Werte.
-- FALLBACK = WebAudio/Analyser nicht verfügbar.
-- In CORS/SILENT und FALLBACK bewegen sich EQ, Bottom-Meter und Side-Meter sichtbar synthetisch.
-- Boost-Ramp bleibt erhalten.
