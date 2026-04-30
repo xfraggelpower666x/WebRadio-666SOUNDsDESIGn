@@ -1,0 +1,18 @@
+666SOUNDsDESIGn — v64 PC PANEL WIDTH AUDIO LOGO EQ BOOST
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: Panelbreite, Logo-Audioaktivität, EQ-CSS
+- js/equalizer.js: EQ-Skalierung + --pc-audio-energy
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- docs/REPORT_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST.txt
+- docs/CHANGELOG_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST.txt
+- docs/AUDIT_v64_PC_PANEL_WIDTH_AUDIO_LOGO_EQ_BOOST.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/responsive-ui.js
+- LED-Logik

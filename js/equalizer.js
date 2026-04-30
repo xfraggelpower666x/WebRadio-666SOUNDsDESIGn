@@ -115,16 +115,16 @@ function recoverDesktopCenterBars(bars, levelPercent, playing = true) {
   const total = bars.length;
   if (!total) return;
   const center = (total - 1) / 2;
-  const dynamic = Math.max(18, 18 + (clamp(levelPercent, 10, 98) * 0.62));
+  const dynamic = Math.max(22, 22 + (clamp(levelPercent, 10, 98) * 0.78));
   bars.forEach((bar, index) => {
     const distance = Math.abs(index - center);
     if (distance > Math.max(3, total * 0.18)) return;
     const current = parseFloat(String(bar.style.height || '0').replace('px', '')) || 0;
     const localShape = 1 - (distance / Math.max(1, total * 0.20));
-    const movement = Math.abs(Math.sin((Date.now() / 180) + index * 0.27)) * 10;
+    const movement = Math.abs(Math.sin((Date.now() / 160) + index * 0.31)) * 15;
     const target = playing ? dynamic * (0.72 + localShape * 0.30) + movement : 18 + localShape * 8;
     if (current < target) {
-      bar.style.height = `${Math.min(118, target)}px`;
+      bar.style.height = `${Math.min(132, target)}px`;
     }
   });
 }
@@ -170,6 +170,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     applyMeters(leftMeters, next, 'left');
     applyMeters(rightMeters, next, 'right');
     applyBottomMeterFromSideDynamics(bottomMeterSegments, next);
+    document.documentElement.style.setProperty('--pc-audio-energy', String((next / 100).toFixed(3)));
   };
 
   const getFallbackBarValue = (index, total, intensity = 1) => {

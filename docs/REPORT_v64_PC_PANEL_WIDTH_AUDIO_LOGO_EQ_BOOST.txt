@@ -1,0 +1,44 @@
+666SOUNDsDESIGn — v64 PC PANEL WIDTH AUDIO LOGO EQ BOOST
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v63_PC_HEADER_LOGO_GAP_FIX.zip
+
+UMGESETZTE SAMMELLISTE:
+1. Systempanel-Bereich auf gleiche Breite wie Hauptkarten gebracht.
+2. Header-Logo musikaktiv gemacht, gekoppelt an vorhandene Meter-Dynamik.
+3. Equalizer-Ausschlag leicht verstärkt.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v64 aktualisiert
+- js/equalizer.js: Desktop-Center-EQ-Recovery etwas stärker skaliert
+- js/equalizer.js: --pc-audio-energy aus vorhandener Meter-Dynamik gesetzt
+- css/desktop.css: Systempanel-Breite angeglichen, Logo musikaktiv, EQ-CSS ergänzt
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/responsive-ui.js
+- LED-Logik
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v63_PC_HEADER_LOGO_GAP_FIX.zip
+- before_file_count: 92
+- after_file_count_pre_report: 92
+- version_v64: True
+- panel_width_css_present: True
+- audio_logo_css_present: True
+- audio_energy_var_set_in_equalizer: True
+- eq_boost_js_present: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 95
