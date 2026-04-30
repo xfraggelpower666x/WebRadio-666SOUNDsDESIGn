@@ -1,0 +1,53 @@
+666SOUNDsDESIGn — v62 PC HEADER LOGO LAYOUT COLLECTED
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v61_PC_META_COVER_STOP_LED_FIX.zip
+LOGO-QUELLE: EE27B2F5-2007-46DA-A69B-4CB86AD38C81.jpeg
+
+UMGESETZTE SAMMELLISTE:
+1. Cyberstream-Cockpit Schriftzug oben ersetzt durch geliefertes Image, mittig.
+2. Logo kleiner skaliert, Equalizer bleibt sichtbar und wird nicht verdrängt.
+3. Header/Branding ganz nach oben gesetzt.
+4. Laufschrift vertikal im Feld zentriert.
+5. Desktop-Hintergrund auf komplette Seitenbreite gestreckt.
+
+GEÄNDERT:
+- assets/logos/cyberstream-cockpit-header.png erstellt aus EE27B2F5-2007-46DA-A69B-4CB86AD38C81.jpeg mit transparenter Hintergrundbereinigung
+- index.html: Header-Logo direkt in bestehenden Hero-Bereich eingefügt
+- css/desktop.css: Header-Logo oben, kleiner skaliert; EQ sichtbar; Laufschrift vertikal zentriert; Hintergrund gestreckt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v61_PC_META_COVER_STOP_LED_FIX.zip
+- source_logo: EE27B2F5-2007-46DA-A69B-4CB86AD38C81.jpeg
+- before_file_count: 85
+- after_file_count_pre_report: 86
+- header_logo_asset_exists: True
+- header_logo_asset_size: 544178
+- header_logo_dom_present: True
+- hero_order_top: True
+- eq_visibility_preserved_css: True
+- ticker_vertical_center_css: True
+- background_full_width_css: True
+- logo_max_height_limited: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- equalizer_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 89

@@ -1,0 +1,25 @@
+666SOUNDsDESIGn — v62 PC HEADER LOGO LAYOUT COLLECTED
+
+Geändert:
+- index.html
+- css/desktop.css
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- assets/logos/cyberstream-cockpit-header.png
+- docs/REPORT_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.txt
+- docs/CHANGELOG_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.txt
+- docs/AUDIT_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+
+Inhalt:
+- Cyberstream-Cockpit Text durch geliefertes Image ersetzt.
+- Image mittig und kleiner im Header.
+- Equalizer bleibt sichtbar.
+- Laufschrift vertikal zentriert.
+- Hintergrund auf komplette Seitenbreite.

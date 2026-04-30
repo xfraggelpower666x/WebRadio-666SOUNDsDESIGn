@@ -1,0 +1,42 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v62_PC_HEADER_LOGO_LAYOUT_COLLECTED",
+  "cache_tag": "smfp-v62-pc-header-logo-layout-collected-20260430-1305",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v61_PC_META_COVER_STOP_LED_FIX.zip",
+  "source_logo": "/mnt/data/EE27B2F5-2007-46DA-A69B-4CB86AD38C81.jpeg",
+  "changes": [
+    "assets/logos/cyberstream-cockpit-header.png erstellt aus EE27B2F5-2007-46DA-A69B-4CB86AD38C81.jpeg mit transparenter Hintergrundbereinigung",
+    "index.html: Header-Logo direkt in bestehenden Hero-Bereich eingefügt",
+    "css/desktop.css: Header-Logo oben, kleiner skaliert; EQ sichtbar; Laufschrift vertikal zentriert; Hintergrund gestreckt"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v61_PC_META_COVER_STOP_LED_FIX.zip",
+    "source_logo": "EE27B2F5-2007-46DA-A69B-4CB86AD38C81.jpeg",
+    "before_file_count": 85,
+    "after_file_count_pre_report": 86,
+    "header_logo_asset_exists": true,
+    "header_logo_asset_size": 544178,
+    "header_logo_dom_present": true,
+    "hero_order_top": true,
+    "eq_visibility_preserved_css": true,
+    "ticker_vertical_center_css": true,
+    "background_full_width_css": true,
+    "logo_max_height_limited": true,
+    "worker_unchanged": true,
+    "stream_routes_unchanged": true,
+    "equalizer_unchanged": true,
+    "responsive_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 89
+  }
+}

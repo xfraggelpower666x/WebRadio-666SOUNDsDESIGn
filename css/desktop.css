@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v61 PC META COVER STOP LED FIX
+666SOUNDsDESIGn — v62 PC HEADER LOGO LAYOUT COLLECTED
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v61-pc-meta-cover-stop-led-fix-20260430-1230') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v62-pc-header-logo-layout-collected-20260430-1305') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -457,6 +457,112 @@ ZWECK:
 
 @media (max-width: 760px) {
   .now-cover-wrap {
+    display: none !important;
+  }
+}
+
+
+/* v62 header-logo collected patch */
+@media (min-width: 761px) {
+  /* Hintergrund auf komplette Seitenbreite strecken */
+  html,
+  body {
+    width: 100% !important;
+    min-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  body {
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+  }
+
+  /* Cyberstream/Branding ganz nach oben, aber kleiner, damit EQ nicht verschwindet */
+  .hero {
+    order: 0 !important;
+    width: 100% !important;
+    min-height: 118px !important;
+    max-height: 156px !important;
+    padding: 10px 18px 6px !important;
+    margin: 0 0 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  .pc-header-brand-logo {
+    display: block !important;
+    width: min(78%, 760px) !important;
+    max-width: 760px !important;
+    height: auto !important;
+    max-height: 138px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    margin: 0 auto !important;
+    filter: drop-shadow(0 0 14px rgba(255,61,187,.34)) drop-shadow(0 0 14px rgba(22,255,243,.20)) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  /* Alten Cyber Stream Cockpit Text im Hero physisch optisch neutralisieren, nicht überlagern */
+  .hero h1,
+  .hero .hero-title,
+  .hero .hero-subtitle,
+  .hero p {
+    display: none !important;
+  }
+
+  /* Reihenfolge bleibt kompakt: Logo oben, dann Panels, EQ bleibt erhalten */
+  .top-hud {
+    order: 1 !important;
+    margin-top: 0 !important;
+  }
+
+  .meter-card,
+  .eq-card,
+  .equalizer-card,
+  .visualizer-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Laufschrift vertikal mittig im vorgesehenen Feld */
+  .now-playing .ticker-window {
+    min-height: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+  }
+
+  .now-playing .ticker,
+  .now-playing .ticker-text,
+  #nowPlayingTicker {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Logo darf den EQ nicht verdrängen */
+  .player-shell {
+    gap: 12px !important;
+    margin-top: 24px !important;
+    margin-bottom: 112px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .pc-header-brand-logo {
     display: none !important;
   }
 }
