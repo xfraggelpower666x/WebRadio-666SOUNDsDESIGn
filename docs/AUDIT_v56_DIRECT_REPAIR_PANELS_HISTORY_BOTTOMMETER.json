@@ -1,0 +1,49 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER",
+  "cache_tag": "smfp-v56-direct-repair-panels-history-bottommeter-20260430-0810",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.zip",
+  "findings": [
+    "historyPanel: 1",
+    "historyToggle: 1",
+    "pcBottomSyncMeter: 1",
+    "statusMain: 1",
+    "statusBackup: 1",
+    "statusStream: 1",
+    "statusMeta: 1",
+    "statusSource: 1"
+  ],
+  "changes": [
+    "index.html: Bottom-Levelmeter neu platziert; alte Treffer entfernt: 1",
+    "player-core.js: applyStatusChip iPhone-Farblogik ersetzt (0)",
+    "player-core.js: H/B LED-Logik auf aktiv=türkis, inaktiv=leer/weiß gesetzt",
+    "responsive-ui.js: History wird in body portalt; echtes Overlay + Backdrop",
+    "equalizer.js: Bottom-Meter erneut an gleiche Side-Meter-Dynamik gekoppelt",
+    "css/desktop.css: harte Prioritätsregeln für LEDs, History Overlay, Bottom-Meter ergänzt"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.zip",
+    "before_file_count": 67,
+    "after_file_count_pre_report": 67,
+    "bottom_meter_present_once": true,
+    "bottom_meter_fixed_css": true,
+    "history_portal_to_body": true,
+    "history_backdrop_present": true,
+    "iphone_led_logic_css": true,
+    "apply_status_chip_replaced": false,
+    "bottom_meter_visualizer_sync": true,
+    "worker_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 70
+  }
+}

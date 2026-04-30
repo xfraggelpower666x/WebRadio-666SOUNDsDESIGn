@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — v56 DIRECT REPAIR PANELS HISTORY BOTTOMMETER
+
+Geändert:
+- index.html
+- css/desktop.css
+- js/player-core.js
+- js/equalizer.js
+- js/responsive-ui.js
+- docs/REPORT_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.txt
+- docs/CHANGELOG_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.txt
+- docs/AUDIT_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+Fix:
+- Panel LED Farbenlogik wie iPhone.
+- History als echtes Overlay.
+- Unteres PC-Levelmeter wieder sichtbar.

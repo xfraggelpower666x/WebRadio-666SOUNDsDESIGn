@@ -1,0 +1,45 @@
+666SOUNDsDESIGn — v56 DIRECT REPAIR PANELS HISTORY BOTTOMMETER
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.zip
+
+DIREKT REPARIERT:
+1. Systempanel LED-Farblogik wie iPhone:
+   Türkis = OK/aktiv, Pink = Warnung/Fehler/gestoppt, Weiß leer = nicht aktiv.
+2. History wird in document.body portalt und als fixed Overlay angezeigt.
+3. Unteres PC-Levelmeter wird fixed sichtbar gesetzt und an Side-Dynamik gekoppelt.
+
+GEÄNDERT:
+- index.html: Bottom-Levelmeter neu platziert; alte Treffer entfernt: 1
+- player-core.js: applyStatusChip iPhone-Farblogik ersetzt (0)
+- player-core.js: H/B LED-Logik auf aktiv=türkis, inaktiv=leer/weiß gesetzt
+- responsive-ui.js: History wird in body portalt; echtes Overlay + Backdrop
+- equalizer.js: Bottom-Meter erneut an gleiche Side-Meter-Dynamik gekoppelt
+- css/desktop.css: harte Prioritätsregeln für LEDs, History Overlay, Bottom-Meter ergänzt
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX.zip
+- before_file_count: 67
+- after_file_count_pre_report: 67
+- bottom_meter_present_once: True
+- bottom_meter_fixed_css: True
+- history_portal_to_body: True
+- history_backdrop_present: True
+- iphone_led_logic_css: True
+- apply_status_chip_replaced: False
+- bottom_meter_visualizer_sync: True
+- worker_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 70

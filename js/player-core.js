@@ -83,14 +83,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -102,51 +102,51 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v55_PC_CONSOLIDATED_LAYOUT_DYNAMICS_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v56_DIRECT_REPAIR_PANELS_HISTORY_BOTTOMMETER: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
-applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
-applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
-applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
+applyStatusChip(statusSource, 'ok', 'Externer Hauptplayer aktiv');
+applyStatusChip(statusStream, 'ok', 'Main Stream aktiv');
+applyStatusChip(statusMeta, 'ok', 'Metadaten über API aktiv');
 applyStatusChip(statusMain, 'main', 'Hauptstream aktiv');
 applyStatusChip(statusBackup, 'off', 'Backupstream nicht aktiv');
 markSourceButtons(mainBtn, fallbackBtn, currentSource);
@@ -227,11 +227,23 @@ function changeBoostStage(delta) {
 
 function updateStreamPanelLeds(source) {
   if (source === 'main') {
-    applyStatusChip(statusMain, 'main', 'Hauptstream aktiv');
-    applyStatusChip(statusBackup, 'off', 'Backupstream nicht aktiv');
+    applyStatusChip(statusMain, 'ok', 'Hauptstream aktiv');
+    applyStatusChip(statusBackup, 'empty', 'Backupstream nicht aktiv');
   } else {
-    applyStatusChip(statusMain, 'off', 'Hauptstream nicht aktiv');
-    applyStatusChip(statusBackup, 'backup', 'Backupstream aktiv');
+    applyStatusChip(statusMain, 'empty', 'Hauptstream nicht aktiv');
+    applyStatusChip(statusBackup, 'ok', 'Backupstream aktiv');
+  }
+}
+
+
+function syncStreamLedFromStatus(text) {
+  const value = String(text || '').toLowerCase();
+  if (value.includes('error') || value.includes('fehler')) {
+    applyStatusChip(statusStream, 'warn', 'Stream Fehler');
+  } else if (value.includes('stopped') || value.includes('stop') || value.includes('pause')) {
+    applyStatusChip(statusStream, 'stopped', 'Stream nicht aktiv');
+  } else if (value.includes('playing') || value.includes('verbunden') || value.includes('stream')) {
+    applyStatusChip(statusStream, 'ok', 'Stream aktiv');
   }
 }
 
@@ -270,9 +282,9 @@ function setSource(source) {
   audio.src = source === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
   markSourceButtons(mainBtn, fallbackBtn, source);
   if (source === 'main') {
-    applyStatusChip(statusStream, 'main', 'Main Stream aktiv');
+    applyStatusChip(statusStream, 'ok', 'Main Stream aktiv');
   } else {
-    applyStatusChip(statusStream, 'backup', 'Backup Stream aktiv');
+    applyStatusChip(statusStream, 'ok', 'Backup Stream aktiv');
   }
   updateStreamPanelLeds(source);
 }
@@ -381,7 +393,7 @@ async function fetchMetadata() {
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);
     setText(djText, data.dj);
-    applyStatusChip(statusMeta, 'api', 'Metadaten über API aktiv');
+    applyStatusChip(statusMeta, 'ok', 'Metadaten über API aktiv');
 applyStatusChip(statusMain, 'main', 'Hauptstream aktiv');
 applyStatusChip(statusBackup, 'off', 'Backupstream nicht aktiv');
     updateHistory(data.title);
@@ -501,7 +513,7 @@ async function healthPing() {
   try {
     const response = await fetch(`${ENDPOINTS.health}?t=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('health_http_error');
-    applyStatusChip(statusSource, 'external', 'Externer Hauptplayer aktiv');
+    applyStatusChip(statusSource, 'ok', 'Externer Hauptplayer aktiv');
   } catch (err) {
     applyStatusChip(statusSource, 'error', 'Externer Hauptplayer meldet Fehler');
   }
