@@ -1,0 +1,22 @@
+666SOUNDsDESIGn — v47 USER ASSET INTEGRATION FINAL
+
+Geändert:
+- index.html
+- site.webmanifest
+- assets/logos/player-header-logo*.png
+- assets/images/pc-player-background.png
+- assets/images/frame-v7-clean-desktop.jpeg
+- assets/icons/*
+- css/desktop.css
+- css/mobile.css
+- docs/REPORT_v47_USER_ASSET_INTEGRATION_FINAL.txt
+- docs/CHANGELOG_v47_USER_ASSET_INTEGRATION_FINAL.txt
+- docs/AUDIT_v47_USER_ASSET_INTEGRATION_FINAL.json
+
+Nicht absichtlich geändert:
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- Stream-Routen

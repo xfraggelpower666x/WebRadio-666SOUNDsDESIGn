@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v47 USER ASSET INTEGRATION FINAL
+
+BASIS: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip
+VERSION: STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL
+CACHE_TAG: smfp-v47-user-assets-final-20260430-0330
+
+EINGEBAUT:
+- Bild 2 → Logo über dem Player + assets/logos/player-header-logo.png
+- Bild 3 → PC-Player-Hintergrund + assets/images/pc-player-background.png
+- Bild 4 → Browser/iPhone/Android App-Icon + assets/icons/*
+
+GEÄNDERT:
+- Bild 2 als assets/logos/player-header-logo.png und responsive Varianten gespeichert
+- Bild 3 als assets/images/pc-player-background.png und frame-v7-clean-desktop.jpeg gesetzt
+- Bild 4 als favicon/apple-touch/android/PWA Icons gespeichert
+- site.webmanifest aktualisiert
+- ungültige Logo-Section vor <!DOCTYPE>/<html> entfernt
+- Browser/iPhone/Android Icon-Links im Head gesetzt
+- Bild 2 als Logo direkt über statischem #mffApp eingefügt
+- CSS für Logo über Player und PC-Hintergrund gesetzt
+- css/desktop.css mit PC-Hintergrund ergänzt
+- worker.js Iconpfad auf assets/icons/internal-icon.png korrigiert
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip
+- bild_2_header_logo_present: True
+- bild_3_pc_background_present: True
+- bild_3_desktop_frame_replaced: True
+- bild_4_favicon_present: True
+- bild_4_apple_icon_present: True
+- bild_4_android_192_present: True
+- bild_4_android_512_present: True
+- manifest_present: True
+- logo_dom_or_helper_present: True
+- pc_background_reference_present: True
+- index_starts_clean: False
+- inline_script_checked: False
+- main_readme_root_kept: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js

@@ -1,0 +1,50 @@
+{
+  "base": "WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip",
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v47_USER_ASSET_INTEGRATION_FINAL",
+  "cache_tag": "smfp-v47-user-assets-final-20260430-0330",
+  "input_images": {
+    "bild_2_header_logo": "/mnt/data/DA31E668-D75F-4895-AAB3-B8A857FE7891.png",
+    "bild_3_pc_background": "/mnt/data/Gaming-background-blue-and-purple-Grapthics-23272406-1.png",
+    "bild_4_app_icon": "/mnt/data/IMG_2445.PNG"
+  },
+  "changes": [
+    "Bild 2 als assets/logos/player-header-logo.png und responsive Varianten gespeichert",
+    "Bild 3 als assets/images/pc-player-background.png und frame-v7-clean-desktop.jpeg gesetzt",
+    "Bild 4 als favicon/apple-touch/android/PWA Icons gespeichert",
+    "site.webmanifest aktualisiert",
+    "ungültige Logo-Section vor <!DOCTYPE>/<html> entfernt",
+    "Browser/iPhone/Android Icon-Links im Head gesetzt",
+    "Bild 2 als Logo direkt über statischem #mffApp eingefügt",
+    "CSS für Logo über Player und PC-Hintergrund gesetzt",
+    "css/desktop.css mit PC-Hintergrund ergänzt",
+    "worker.js Iconpfad auf assets/icons/internal-icon.png korrigiert"
+  ],
+  "moved_docs": [],
+  "findings": [
+    "Inline-Script Syntax-Hinweis: [stdin]:324\n    for(var i=0;i<section class=\"mff-player-logo\" id=\"mffPlayerLogo\" aria-label=\"666SOUNDsDESIGn Player Logo\"><img src=\"/assets/logos/player-header-logo.png?v=smfp-v47-user-assets-final-20260430-0330\" alt=\"SOUNDs 666 DESIGn\" loading=\"eager\" decoding=\"async\"></section>\n                   "
+  ],
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (3).zip",
+    "bild_2_header_logo_present": true,
+    "bild_3_pc_background_present": true,
+    "bild_3_desktop_frame_replaced": true,
+    "bild_4_favicon_present": true,
+    "bild_4_apple_icon_present": true,
+    "bild_4_android_192_present": true,
+    "bild_4_android_512_present": true,
+    "manifest_present": true,
+    "logo_dom_or_helper_present": true,
+    "pc_background_reference_present": true,
+    "index_starts_clean": false,
+    "inline_script_checked": false,
+    "main_readme_root_kept": true
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ]
+}

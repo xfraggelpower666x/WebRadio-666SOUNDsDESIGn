@@ -20,3 +20,15 @@ ZWECK: Desktop-Feinschliff.
   }
   .status-cluster { justify-content: flex-end; }
 }
+
+
+/* v47 Desktop-Hintergrund User-Bild 3 */
+@media (min-width:761px){
+  body{
+    background-image:linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),url('/assets/images/pc-player-background.png?v=smfp-v47-user-assets-final-20260430-0330')!important;
+    background-size:cover!important;
+    background-position:center center!important;
+    background-attachment:fixed!important;
+    background-repeat:no-repeat!important;
+  }
+}

@@ -27,8 +27,8 @@ const HTML = `<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Internal</title>
-  <link rel="icon" type="image/png" href="/icons/internal-icon.png" />
-  <link rel="apple-touch-icon" href="/icons/internal-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/assets/icons/internal-icon.png" />
+  <link rel="apple-touch-icon" href="/assets/assets/icons/internal-icon.png" />
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
@@ -437,8 +437,8 @@ export default {
     }
 
     // Interner Notfall-Player bleibt komplett erhalten.
-    if(url.pathname==="/icons/internal-icon.png"){
-      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
+    if(url.pathname==="/assets/assets/icons/internal-icon.png"){
+      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/assets/assets/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
     }
     if(url.pathname==="/css/main.css"){
       return new Response(CSS,{headers:{"content-type":"text/css; charset=UTF-8"}});
