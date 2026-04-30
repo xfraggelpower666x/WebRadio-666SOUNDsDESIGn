@@ -1,0 +1,23 @@
+666SOUNDsDESIGn — v60 PC COLLECTED PATCH MB COVER VERSION META
+
+Geändert:
+- index.html
+- css/desktop.css
+- js/player-core.js
+- js/shared-status.js Versionsmarker
+- docs/REPORT_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.txt
+- docs/CHANGELOG_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.txt
+- docs/AUDIT_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META.json
+
+Nicht geändert:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+
+Inhalt:
+- Versionsbadge nicht mehr auf Bottom-Levelmeter.
+- H/B zu M/B mit Main/Backup-Logik.
+- Now Playing mit Cover links.
+- doppelter Metadaten-Ladetext neutralisiert.

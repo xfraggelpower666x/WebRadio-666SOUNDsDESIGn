@@ -34,6 +34,7 @@ const bitrateText = document.getElementById('bitrateText');
 const djText = document.getElementById('djText');
 const streamState = document.getElementById('streamState');
 const historyList = document.getElementById('historyList');
+const nowCover = document.getElementById('nowCover');
 const historyToggle = document.getElementById('historyToggle');
 const historyPanel = document.getElementById('historyPanel');
 const leftMeters = [document.getElementById('leftMeterA'), document.getElementById('leftMeterB')].filter(Boolean);
@@ -83,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -102,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v60_PC_COLLECTED_PATCH_MB_COVER_VERSION_META: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -227,9 +228,11 @@ function changeBoostStage(delta) {
 function updateStreamPanelLeds(source) {
   const active = source === 'fallback' || source === 'backup' ? 'backup' : 'main';
   if (active === 'main') {
-} else {
-    applyStatusChip(statusMain, 'empty', 'Hauptstream nicht aktiv');
-    applyStatusChip(statusBackup, 'ok', 'Backupstream aktiv');
+    applyStatusChip(statusMain, 'ok', 'Main stream active');
+    applyStatusChip(statusBackup, 'empty', 'Backup stream inactive');
+  } else {
+    applyStatusChip(statusMain, 'empty', 'Main stream inactive');
+    applyStatusChip(statusBackup, 'ok', 'Backup stream active');
   }
 }
 
@@ -286,6 +289,36 @@ function setSource(source) {
     applyStatusChip(statusStream, 'ok', 'Backup Stream aktiv');
   }
   updateStreamPanelLeds(source);
+}
+
+
+function isLoadingMetaText(text) {
+  return String(text || '').toLowerCase().includes('metadaten werden geladen');
+}
+
+function updateNowCover(meta) {
+  if (!nowCover) return;
+  const cover =
+    meta?.cover ||
+    meta?.coverUrl ||
+    meta?.artwork ||
+    meta?.artworkUrl ||
+    meta?.image ||
+    meta?.imageUrl ||
+    meta?.picture ||
+    meta?.thumbnail ||
+    '/assets/images/fallback-cover.png';
+
+  if (nowCover.getAttribute('src') !== cover) {
+    nowCover.src = cover;
+  }
+}
+
+function normalizeNowPlayingDuplicateFallback() {
+  if (!nowPlayingTicker || !metaLine) return;
+  if (isLoadingMetaText(nowPlayingTicker.textContent) && isLoadingMetaText(metaLine.textContent)) {
+    nowPlayingTicker.textContent = '';
+  }
 }
 
 function updateHistory(title) {
@@ -387,13 +420,15 @@ async function fetchMetadata() {
     if (!response.ok) throw new Error('metadata_http_error');
     const raw = await response.json();
     const data = parseMetadata(raw);
+    updateNowCover(data);
     setText(metaLine, data.title);
-    setText(nowPlayingTicker, data.title);
+    setText(nowPlayingTicker, isLoadingMetaText(data.title) ? '' : data.title);
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);
     setText(djText, data.dj);
     applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
 updateHistory(data.title);
+    normalizeNowPlayingDuplicateFallback();
   } catch (err) {
     setText(metaLine, 'Metadaten gerade nicht erreichbar');
     applyStatusChip(statusMeta, 'warn', 'Metadaten aktuell nicht erreichbar');

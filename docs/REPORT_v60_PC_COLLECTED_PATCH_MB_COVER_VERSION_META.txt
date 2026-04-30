@@ -1,0 +1,56 @@
+666SOUNDsDESIGn — v60 PC COLLECTED PATCH MB COVER VERSION META
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED.zip
+
+UMGESETZTE SAMMELLISTE:
+1. Versionsnummer weiter links neben das untere Levelmeter gesetzt.
+2. Doppelter 'Metadaten werden geladen'-Ticker neutralisiert.
+3. H wurde zu M; M/B Logik Main/Backup Englisch normalisiert.
+4. Now-Playing-Box bekommt links ein Cover/Streambild.
+
+GEÄNDERT:
+- index.html: Now-Playing-Cover links eingefügt
+- index.html: Version/Cache, M-LED-Label, Cover-DOM aktualisiert
+- player-core.js: defekte updateStreamPanelLeds-Funktion vollständig ersetzt
+- player-core.js: nowCover Konstante ergänzt
+- player-core.js: Cover-/Doppeltext-Helper eingefügt
+- player-core.js: Cover-Update an Metadaten gekoppelt
+- player-core.js: doppelten Metadaten-Ladetext im Ticker neutralisiert
+- player-core.js: Normalizer nach Metadaten-Update gekoppelt
+- css/desktop.css: Versionsbadge versetzt, NowPlaying-Cover-Layout ergänzt, doppelte Source-Zeile versteckt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- worker.js
+- wrangler.jsonc
+- Stream-Routen
+- js/equalizer.js
+- js/responsive-ui.js
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v59_PC_LED_STATE_LOGIC_FIX_REPAIRED.zip
+- before_file_count: 79
+- after_file_count_pre_report: 79
+- version_badge_v60: True
+- version_badge_left_css: True
+- status_main_label_m: True
+- now_cover_dom_present: True
+- now_cover_css_present: True
+- mb_logic_present: True
+- duplicate_meta_normalizer_present: True
+- ticker_loading_suppressed: True
+- worker_unchanged: True
+- stream_routes_unchanged: True
+- equalizer_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 82
