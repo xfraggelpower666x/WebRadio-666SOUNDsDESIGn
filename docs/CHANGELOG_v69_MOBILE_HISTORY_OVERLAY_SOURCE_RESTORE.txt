@@ -1,0 +1,16 @@
+666SOUNDsDESIGn — v69 MOBILE HISTORY OVERLAY + SOURCE RESTORE
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: Mobile Source-Buttons sichtbar, Mobile History Overlay CSS
+- js/responsive-ui.js: Mobile History Overlay Portal/Backdrop
+- js/equalizer.js Versionsmarker
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- Audio-/Player-Logik

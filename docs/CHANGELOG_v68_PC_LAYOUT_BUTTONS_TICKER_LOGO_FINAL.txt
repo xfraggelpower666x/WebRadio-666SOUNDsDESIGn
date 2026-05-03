@@ -1,0 +1,20 @@
+666SOUNDsDESIGn — v68 PC LAYOUT BUTTONS TICKER LOGO FINAL
+
+Geändert:
+- index.html: Header-Split-Logos, Main/Backup-Buttons in Systempanel, Version/Cache
+- css/desktop.css: v68 finale Regeln für Badge, Systempanel, Ticker, Cover, Header-Gap, violette Meter/EQ-Farben
+- assets/logos/cyberstream-left-logo.png
+- assets/logos/cyberstream-right-logo.png
+- js/equalizer.js Versionsmarker
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+- docs/REPORT_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.txt
+- docs/CHANGELOG_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.txt
+- docs/AUDIT_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.json
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- js/responsive-ui.js
+- Worker-Route /The-Dark-Dancer blieb erhalten

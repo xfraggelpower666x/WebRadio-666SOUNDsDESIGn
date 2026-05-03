@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js';
-import { createBars, startVisualizer } from './equalizer.js';
-import { installResponsiveHelpers } from './responsive-ui.js';
-import { applyStatusChip } from './shared-status.js';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v69-mobile-history-overlay-source-restore-20260430-1725';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v69-mobile-history-overlay-source-restore-20260430-1725';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v69-mobile-history-overlay-source-restore-20260430-1725';
+import { applyStatusChip } from './shared-status.js?v=smfp-v69-mobile-history-overlay-source-restore-20260430-1725';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');

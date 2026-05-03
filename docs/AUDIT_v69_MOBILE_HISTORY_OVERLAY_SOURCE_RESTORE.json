@@ -1,0 +1,36 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE",
+  "cache_tag": "smfp-v69-mobile-history-overlay-source-restore-20260430-1725",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.zip",
+  "changes": [
+    "index.html: Version/Cache auf v69 aktualisiert",
+    "js/responsive-ui.js: iPhone History als Body-Overlay mit Backdrop ergänzt",
+    "css/desktop.css: Mobile History Overlay CSS und Main/Backup-Sichtbarkeit ergänzt"
+  ],
+  "warnings": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.zip",
+    "before_file_count": 111,
+    "after_file_count_pre_report": 111,
+    "version_v69": true,
+    "main_button_present_once": true,
+    "fallback_button_present_once": true,
+    "source_actions_present": true,
+    "mobile_source_css_present": true,
+    "history_overlay_js_present": true,
+    "history_overlay_css_present": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 114
+  }
+}

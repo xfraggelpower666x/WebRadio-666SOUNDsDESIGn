@@ -1,0 +1,67 @@
+666SOUNDsDESIGn — v68 PC LAYOUT BUTTONS TICKER LOGO FINAL
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.zip
+
+PAIR-WORKFLOW INTERN:
+- Pair 1+2 version/systempanel DOM: True
+- Pair 3+4 buttons/ticker CSS: True
+- Pair 5+6 meta/cover CSS: True
+- Pair 7+8 logo split/violet CSS: True
+
+UMGESETZTE SAMMELLISTE:
+1. Versionsnummer unter dem unteren Levelmeter mittig zentriert.
+2. Systempanel-Kasten bündig auf Now-Playing/Playerbreite ausgerichtet.
+3. Systempanel-Inhalt nach links geschoben und rechts Platz geschaffen.
+4. Main-/Backup-Buttons mit LED direkt in den Systempanel-Bereich verschoben.
+5. Laufschrift wieder aktiviert und über das komplette Tickerfeld laufend.
+6. NOW-PLAYING-Schrift kleiner gesetzt.
+7. Streamcover ungefähr doppelt so groß/HD-freundlicher dargestellt.
+8. Header-Logo in zwei getrennte Logo-Elemente gesplittet mit 3cm Gap.
+9. Levelmeter und Equalizer um Lila/Violett ergänzt.
+
+GEÄNDERT:
+- assets/logos: Headerbild in zwei Elemente getrennt bei x=825px
+- index.html: einzelnes Header-Logo durch zwei getrennte Logo-Elemente ersetzt
+- index.html: Main/Backup-Buttons aus Control-Zeile in Systempanel rechts verschoben
+- css/desktop.css: alte betroffene v65/v66 Blöcke entfernt: 1
+- css/desktop.css: v68 Kanonik für Systempanel, Ticker, Cover, Version, getrennte Logos, violette EQ/Meter-Farben gesetzt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- js/responsive-ui.js
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- Audio-/Player-Logik außer Versionsmarker
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.zip
+- before_file_count: 106
+- after_file_count_pre_report: 108
+- version_v68: True
+- split_logo_assets_exist: True
+- split_logo_dom_present: True
+- single_header_logo_removed: True
+- main_backup_buttons_once: True
+- main_backup_in_systempanel: True
+- old_status_main_backup_removed: True
+- version_badge_bottom_center_css: True
+- systempanel_width_aligned_css: True
+- ticker_full_field_css: True
+- nowplaying_font_smaller_css: True
+- cover_double_size_css: True
+- purple_meter_eq_css: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- responsive_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 111

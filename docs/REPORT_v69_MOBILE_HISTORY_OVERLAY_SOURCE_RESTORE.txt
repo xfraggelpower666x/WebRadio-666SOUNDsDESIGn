@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v69 MOBILE HISTORY OVERLAY + SOURCE RESTORE
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.zip
+
+UMGESETZT:
+- iPhone/Mobile History öffnet als echtes Overlay-Fenster.
+- History wird in document.body verschoben und drückt den Player nicht nach unten.
+- Backdrop/Klick daneben schließt das Overlay.
+- Main-/Backup-Buttons bleiben auf PC und iPhone sichtbar und bedienbar.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v69 aktualisiert
+- js/responsive-ui.js: iPhone History als Body-Overlay mit Backdrop ergänzt
+- css/desktop.css: Mobile History Overlay CSS und Main/Backup-Sichtbarkeit ergänzt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- Audio-/Player-Logik außer Versionsmarker
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL.zip
+- before_file_count: 111
+- after_file_count_pre_report: 111
+- version_v69: True
+- main_button_present_once: True
+- fallback_button_present_once: True
+- source_actions_present: True
+- mobile_source_css_present: True
+- history_overlay_js_present: True
+- history_overlay_css_present: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 114

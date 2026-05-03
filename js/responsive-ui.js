@@ -66,3 +66,38 @@ export function installResponsiveHelpers(historyToggle, historyPanel) {
   setMode();
   window.addEventListener('resize', setMode);
 }
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v69 Mobile History Overlay
+// Zweck: History auf iPhone/Mobile als echtes Overlay wie am PC.
+// ==========================================================
+(function installMobileHistoryOverlayV69(){
+  function boot(){
+    const toggle=document.getElementById('historyToggle');
+    const panel=document.getElementById('historyPanel');
+    if(!toggle||!panel)return;
+    let backdrop=document.getElementById('historyOverlayBackdrop');
+    if(!backdrop){
+      backdrop=document.createElement('div');
+      backdrop.id='historyOverlayBackdrop';
+      backdrop.className='history-overlay-backdrop hidden';
+      backdrop.setAttribute('aria-hidden','true');
+      document.body.appendChild(backdrop);
+    }
+    if(panel.parentElement!==document.body)document.body.appendChild(panel);
+    panel.classList.add('history-overlay-panel','hidden');
+    const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open');};
+    const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open');};
+    const onToggle=(e)=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close();};
+    if(toggle.__historyOverlayV69)toggle.removeEventListener('click',toggle.__historyOverlayV69);
+    toggle.__historyOverlayV69=onToggle;
+    toggle.addEventListener('click',onToggle);
+    backdrop.onclick=close;
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')close();},{passive:true});
+    document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close();},true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+})();
+// END v69 Mobile History Overlay
+

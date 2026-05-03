@@ -1,0 +1,82 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v68_PC_LAYOUT_BUTTONS_TICKER_LOGO_FINAL",
+  "cache_tag": "smfp-v68-pc-layout-buttons-ticker-logo-final-20260430-1610",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.zip",
+  "changes": [
+    "assets/logos: Headerbild in zwei Elemente getrennt bei x=825px",
+    "index.html: einzelnes Header-Logo durch zwei getrennte Logo-Elemente ersetzt",
+    "index.html: Main/Backup-Buttons aus Control-Zeile in Systempanel rechts verschoben",
+    "css/desktop.css: alte betroffene v65/v66 Blöcke entfernt: 1",
+    "css/desktop.css: v68 Kanonik für Systempanel, Ticker, Cover, Version, getrennte Logos, violette EQ/Meter-Farben gesetzt"
+  ],
+  "warnings": [],
+  "moved_to_docs": [],
+  "pair_checks": [
+    [
+      "Pair 1+2 version/systempanel DOM",
+      true
+    ],
+    [
+      "Pair 3+4 buttons/ticker CSS",
+      true
+    ],
+    [
+      "Pair 5+6 meta/cover CSS",
+      true
+    ],
+    [
+      "Pair 7+8 logo split/violet CSS",
+      true
+    ]
+  ],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v67_THE_DARK_DANCER_ROUTE_PRIORITY_FIX.zip",
+    "before_file_count": 106,
+    "after_file_count_pre_report": 108,
+    "version_v68": true,
+    "split_logo_assets_exist": true,
+    "split_logo_dom_present": true,
+    "single_header_logo_removed": true,
+    "main_backup_buttons_once": true,
+    "main_backup_in_systempanel": true,
+    "old_status_main_backup_removed": true,
+    "version_badge_bottom_center_css": true,
+    "systempanel_width_aligned_css": true,
+    "ticker_full_field_css": true,
+    "nowplaying_font_smaller_css": true,
+    "cover_double_size_css": true,
+    "purple_meter_eq_css": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "responsive_unchanged": true,
+    "inline_script_checked": true,
+    "pair_checks": [
+      [
+        "Pair 1+2 version/systempanel DOM",
+        true
+      ],
+      [
+        "Pair 3+4 buttons/ticker CSS",
+        true
+      ],
+      [
+        "Pair 5+6 meta/cover CSS",
+        true
+      ],
+      [
+        "Pair 7+8 logo split/violet CSS",
+        true
+      ]
+    ],
+    "final_file_count": 111
+  }
+}
