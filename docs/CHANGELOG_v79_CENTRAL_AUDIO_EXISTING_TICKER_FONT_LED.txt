@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v79 CENTRAL AUDIO EXISTING TICKER FONT LED
+
+Geändert:
+- index.html: falsche historyTickerLane entfernt, Play-LED, Copyright, Version/Cache v79
+- css/desktop.css: vorhandene pinke Ticker-Leiste, Play/Boost LEDs, Font-Fallbacks, Copyright
+- js/player-core.js: CentralAudioCore für PC+iPhone, buffer-respektierender Watchdog, zentrale Buttonbindung
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- keine Font-Dateien weiterverteilt

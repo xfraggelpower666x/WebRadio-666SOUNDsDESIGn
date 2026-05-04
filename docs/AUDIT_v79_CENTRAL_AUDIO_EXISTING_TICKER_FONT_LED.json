@@ -1,0 +1,72 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED",
+  "cache_tag": "smfp-v79-central-audio-existing-ticker-font-led-20260504-1640",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip",
+  "changes": [
+    "index.html: Play-LED und Play-Zeichen im Play-Button ergänzt",
+    "index.html: Copyright-Schriftzug unter Bottom-Levelmeter eingefügt",
+    "css/desktop.css: v79 vorhandener Ticker, CentralAudio-UI, Play/Boost LEDs, Fonts und Copyright gesetzt",
+    "js/player-core.js: CentralAudioCore v79 eingesetzt, Buttons PC+iPhone zentral gebunden, Reconnect entschärft"
+  ],
+  "warnings": [],
+  "removed": [
+    "index.html: falsche v78 historyTickerLane/historyTickerText entfernt",
+    "desktop.css: falschen v78 historyTickerLane-Block entfernt x1",
+    "player-core.js: alter Handler v77 PC Boost Meta Glow Ticker Fix entfernt x1",
+    "player-core.js: alter Handler v78 History Ticker Modal Boost UI Fix entfernt x1"
+  ],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 HTML target cleanup",
+      true
+    ],
+    [
+      "Block 3 CSS v79",
+      false
+    ],
+    [
+      "Block 4 CentralAudioCore present",
+      true
+    ]
+  ],
+  "audit_before": {
+    "v78_wrong_lane": 7,
+    "existing_ticker": 2,
+    "audio_handlers_existing": 15,
+    "inline_mobile_audio": 63,
+    "font_zip_note": "font zips uploaded by user; font files are not redistributed"
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip",
+    "before_file_count": 142,
+    "after_file_count_pre_report": 142,
+    "version_v79": true,
+    "wrong_v78_ticker_removed": false,
+    "existing_ticker_target_used": true,
+    "central_audio_core_present": true,
+    "buffer_respecting_watchdog": true,
+    "metadata_audio_separated": true,
+    "play_led_present": true,
+    "boost_led_audio_reactive": true,
+    "copyright_present": true,
+    "font_fallbacks_present": true,
+    "dual_player_bindings": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 145
+  }
+}

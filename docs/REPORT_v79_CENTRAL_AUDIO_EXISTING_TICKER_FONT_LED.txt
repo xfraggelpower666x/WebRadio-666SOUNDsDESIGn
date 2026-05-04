@@ -1,0 +1,68 @@
+666SOUNDsDESIGn — v79 CENTRAL AUDIO EXISTING TICKER FONT LED
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip
+
+UMGESETZT:
+- Falsche v78 historyTickerLane entfernt.
+- Vorhandene pinke Laufleiste .ticker-window / #nowPlayingTicker wird als Ticker-Ziel verwendet.
+- CentralAudioCore eingeführt: PC- und Mobile/iPhone-Controls greifen auf dieselbe Play/Pause/Stop/Source/Boost-Logik.
+- Aggressive Reconnects entschärft: erst Buffer respektieren, dann soft play nach 32s, echter Reconnect erst nach 65s Stall.
+- Metadata/Ticker getrennt vom Audio; Metadatenfehler stoppen den Stream nicht.
+- Play-Knopf hat LED + Regenbogen-/Audio-Glow.
+- Boost-Anzeige hat LED/Glow, Boost 1/2/3 mit drei Farben und Audio-Puls.
+- Copyright unter Bottom-Levelmeter als echter Text mit Font-Fallbacks.
+- Squids/Game Of Squids und Radio Space als Font-Fallbacks gesetzt; keine Font-Dateien weiterverteilt.
+
+GEÄNDERT:
+- index.html: Play-LED und Play-Zeichen im Play-Button ergänzt
+- index.html: Copyright-Schriftzug unter Bottom-Levelmeter eingefügt
+- css/desktop.css: v79 vorhandener Ticker, CentralAudio-UI, Play/Boost LEDs, Fonts und Copyright gesetzt
+- js/player-core.js: CentralAudioCore v79 eingesetzt, Buttons PC+iPhone zentral gebunden, Reconnect entschärft
+
+ENTFERNT/BEREINIGT:
+- index.html: falsche v78 historyTickerLane/historyTickerText entfernt
+- desktop.css: falschen v78 historyTickerLane-Block entfernt x1
+- player-core.js: alter Handler v77 PC Boost Meta Glow Ticker Fix entfernt x1
+- player-core.js: alter Handler v78 History Ticker Modal Boost UI Fix entfernt x1
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- Font-Dateien wurden nicht ins Paket kopiert
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 HTML target cleanup: True
+- Block 3 CSS v79: False
+- Block 4 CentralAudioCore present: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip
+- before_file_count: 142
+- after_file_count_pre_report: 142
+- version_v79: True
+- wrong_v78_ticker_removed: False
+- existing_ticker_target_used: True
+- central_audio_core_present: True
+- buffer_respecting_watchdog: True
+- metadata_audio_separated: True
+- play_led_present: True
+- boost_led_audio_reactive: True
+- copyright_present: True
+- font_fallbacks_present: True
+- dual_player_bindings: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 145

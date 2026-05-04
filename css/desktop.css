@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v79-central-audio-existing-ticker-font-led-20260504-1640') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -1853,8 +1853,6 @@ ZWECK:
 }
 
 
-/* v78 history ticker modal boost ui fix */
-
 /*
   v78:
   - Ticker-Ziel ist die pinke Zeile unter History: #historyTickerLane / #historyTickerText.
@@ -2030,6 +2028,310 @@ ZWECK:
     min-width: 72px !important;
     max-width: 84px !important;
     font-size: 10.5px !important;
+  }
+}
+
+
+/* v79 central audio existing ticker font led */
+
+/*
+  v79:
+  - Vorhandene pinke Ticker-Leiste: .ticker-window / #nowPlayingTicker.
+  - Keine zusätzliche historyTickerLane.
+  - CentralAudioCore steuert PC + Mobile gleich.
+  - Font-Fallbacks: keine Font-Dateien werden ins Paket kopiert.
+*/
+
+:root {
+  --font-copyright-v79: "Game Of Squids", "Game of Squids", "Squids", "Ethnocentric", "Origin Tech", "Orbitron", "Audiowide", system-ui, sans-serif;
+  --font-radio-label-v79: "Radio Space", "Cyber Alert", "Origin Tech", "Orbitron", "Audiowide", system-ui, sans-serif;
+  --font-tech-value-v79: "Corptic", "Neotriad", "Origin Tech", "Orbitron", system-ui, sans-serif;
+  --player-state-hue-v79: 0deg;
+  --boost-color-v79: rgba(255,255,255,.45);
+}
+
+.section-kicker,
+.info-label,
+.status-code,
+.ghost-btn,
+#historyToggle,
+.systempanel-grid-v74 .status-chip {
+  font-family: var(--font-radio-label-v79) !important;
+}
+
+.info-value,
+.meta-line,
+.ticker-text {
+  font-family: var(--font-tech-value-v79) !important;
+}
+
+/* Vorhandene pinke Laufleiste unter History / im Now-Playing-Feld */
+.now-playing .ticker-window {
+  grid-column: 2 / 4 !important;
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  overflow: hidden !important;
+  display: block !important;
+  position: relative !important;
+  border: 1px solid rgba(255,61,187,.48) !important;
+  background: rgba(255,61,187,.10) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 0 20px rgba(255,61,187,.10), 0 0 16px rgba(255,61,187,.14) !important;
+}
+
+#nowPlayingTicker,
+.now-playing .ticker-text {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: max-content !important;
+  min-width: 100% !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  padding-left: 100% !important;
+  white-space: nowrap !important;
+  color: #ff4fc7 !important;
+  font-size: clamp(12px, 1.03vw, 15px) !important;
+  font-weight: 950 !important;
+  letter-spacing: .045em !important;
+  animation: v79ExistingTickerRun 22s linear infinite !important;
+  will-change: transform !important;
+}
+
+@keyframes v79ExistingTickerRun {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% - 100vw)); }
+}
+
+/* History-Fenster ohne Extra-Ticker-Zeile */
+.history-overlay-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147482990 !important;
+  display: block !important;
+  background: rgba(0,0,0,.68) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+.history-overlay-backdrop.hidden { display: none !important; }
+
+#historyPanel.history-overlay-panel,
+.history-overlay-panel {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(92vw, 560px) !important;
+  max-height: min(76vh, 660px) !important;
+  min-height: 260px !important;
+  overflow: auto !important;
+  z-index: 2147483000 !important;
+  margin: 0 !important;
+  padding: 20px 22px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255,61,187,.78) !important;
+  background: linear-gradient(180deg, rgba(10,12,34,.98), rgba(3,7,20,.98)) !important;
+  box-shadow: 0 0 42px rgba(255,61,187,.42), 0 0 34px rgba(22,255,243,.22), inset 0 0 26px rgba(255,255,255,.045) !important;
+  color: #f6f7ff !important;
+}
+#historyPanel.hidden,
+.history-overlay-panel.hidden { display: none !important; }
+
+/* Boost kompakt aber lesbar */
+.boost-compact-v79,
+.boost-compact-v78,
+.boost-compact-v77,
+.boost-compact-v76,
+#pcBoostPanel {
+  min-width: 170px !important;
+  max-width: 194px !important;
+  gap: 7px !important;
+  justify-content: center !important;
+}
+
+#pcBoostMinus,
+#pcBoostPlus {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+}
+
+#pcBoostMinus .status-dot,
+#pcBoostPlus .status-dot {
+  display: none !important;
+}
+
+#pcBoostLabel {
+  min-width: 86px !important;
+  max-width: 98px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  font-size: 11px !important;
+  letter-spacing: .07em !important;
+  position: relative !important;
+  box-shadow: 0 0 calc(10px + var(--pc-audio-energy,.1) * 24px) var(--boost-color-v79) !important;
+}
+
+#pcBoostLabel::after {
+  content: "" !important;
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 999px !important;
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: var(--boost-color-v79) !important;
+  box-shadow: 0 0 calc(8px + var(--pc-audio-energy,.1) * 18px) var(--boost-color-v79) !important;
+}
+
+body[data-boost-level="0"] { --boost-color-v79: rgba(255,255,255,.35); }
+body[data-boost-level="1"] { --boost-color-v79: rgba(22,255,243,.90); }
+body[data-boost-level="2"] { --boost-color-v79: rgba(192,71,255,.92); }
+body[data-boost-level="3"] { --boost-color-v79: rgba(255,61,187,.95); }
+
+/* Play LED + Regenbogen-Audioreaktivität */
+#playBtn {
+  position: relative !important;
+  overflow: visible !important;
+  isolation: isolate !important;
+  background:
+    linear-gradient(135deg, rgba(22,255,243,.12), rgba(255,61,187,.12), rgba(138,77,255,.12)) !important;
+  box-shadow:
+    0 0 calc(14px + var(--pc-audio-energy,.1) * 26px) hsla(var(--play-hue-v79, 180), 100%, 62%, .42),
+    inset 0 0 14px rgba(255,255,255,.05) !important;
+  filter: hue-rotate(var(--player-state-hue-v79)) saturate(calc(1.08 + var(--pc-audio-energy,.1) * .8)) !important;
+  transition: filter .08s linear, box-shadow .08s linear !important;
+}
+
+#playBtn::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -6px !important;
+  border-radius: inherit !important;
+  z-index: -1 !important;
+  background: conic-gradient(from 0deg, #28fff4, #c047ff, #ff3dbb, #ffe84a, #28fff4) !important;
+  filter: blur(calc(6px + var(--pc-audio-energy,.1) * 14px)) !important;
+  opacity: calc(.26 + var(--pc-audio-energy,.1) * .48) !important;
+  animation: v79RainbowSpin 5s linear infinite !important;
+}
+
+.play-led-v79 {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+  margin-right: 7px !important;
+  background: conic-gradient(#28fff4, #c047ff, #ff3dbb, #ffe84a, #28fff4) !important;
+  box-shadow: 0 0 calc(9px + var(--pc-audio-energy,.1) * 18px) rgba(22,255,243,.72) !important;
+  animation: v79RainbowSpin 3.2s linear infinite !important;
+}
+
+.play-icon-v79 {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+@keyframes v79RainbowSpin {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* Header-/Cover-Glow beibehalten: Logos links/rechts stabil, nur Glow; Center 666 Logo + Glow audioaktiv */
+.pc-header-logo-cell { position: relative !important; isolation: isolate !important; overflow: visible !important; }
+.pc-header-logo-cell::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 4px !important;
+  border-radius: 999px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: radial-gradient(circle, rgba(22,255,243,.30), transparent 54%), radial-gradient(circle, rgba(255,61,187,.20), transparent 68%) !important;
+  filter: blur(calc(10px + var(--pc-audio-energy,.10) * 24px)) !important;
+  opacity: calc(.34 + var(--pc-audio-energy,.10) * .58) !important;
+  transform: scale(calc(1 + var(--pc-audio-energy,.10) * .07)) !important;
+}
+.pc-header-logo-cell-center::before {
+  background: radial-gradient(circle, rgba(22,255,243,.34), transparent 50%), radial-gradient(circle, rgba(255,61,187,.28), transparent 68%), radial-gradient(circle, rgba(138,77,255,.24), transparent 76%) !important;
+}
+.pc-header-logo-left,
+.pc-header-logo-right { filter: none !important; transform: none !important; }
+.pc-header-logo-center-666 {
+  filter: brightness(calc(1.02 + var(--pc-audio-energy,.10) * .34)) saturate(calc(1.08 + var(--pc-audio-energy,.10) * .72)) !important;
+  transform: scale(calc(1 + var(--pc-audio-energy,.10) * .025)) !important;
+}
+
+/* Streambild stabil, äußerer Schein türkis audioreaktiv */
+.now-cover { filter: none !important; transform: none !important; }
+.now-cover-wrap {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: visible !important;
+  filter: none !important;
+  transform: none !important;
+  box-shadow: 0 0 calc(18px + var(--pc-audio-energy,.10) * 36px) rgba(22,255,243,.52), 0 0 calc(10px + var(--pc-audio-energy,.10) * 24px) rgba(22,255,243,.28) !important;
+}
+.now-cover-wrap::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -12px !important;
+  z-index: -1 !important;
+  border-radius: 30px !important;
+  pointer-events: none !important;
+  background: radial-gradient(circle, rgba(22,255,243,.45), transparent 58%), radial-gradient(circle, rgba(22,255,243,.18), transparent 76%) !important;
+  filter: blur(calc(8px + var(--pc-audio-energy,.10) * 22px)) !important;
+  opacity: calc(.36 + var(--pc-audio-energy,.10) * .56) !important;
+}
+
+/* Copyright unter unterstem Levelmeter */
+.copyright-v79 {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: max(2px, env(safe-area-inset-bottom)) !important;
+  transform: translateX(-50%) !important;
+  z-index: 9998 !important;
+  width: min(96vw, 1180px) !important;
+  pointer-events: none !important;
+  text-align: center !important;
+  font-family: var(--font-copyright-v79) !important;
+  font-size: clamp(9px, .95vw, 15px) !important;
+  font-weight: 950 !important;
+  letter-spacing: .08em !important;
+  white-space: nowrap !important;
+  color: #f6f7ff !important;
+  text-shadow:
+    0 0 8px rgba(22,255,243,.74),
+    0 0 14px rgba(255,61,187,.42),
+    0 0 22px rgba(138,77,255,.30) !important;
+}
+
+@media (max-width: 760px) {
+  .copyright-v79 {
+    font-size: clamp(7px, 2.2vw, 10px) !important;
+    bottom: max(3px, env(safe-area-inset-bottom)) !important;
+    width: 98vw !important;
+    letter-spacing: .045em !important;
+  }
+
+  .now-playing .ticker-window {
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+
+  #nowPlayingTicker,
+  .now-playing .ticker-text {
+    height: 38px !important;
+    line-height: 38px !important;
+    font-size: 12px !important;
+    animation: v79ExistingTickerRun 20s linear infinite !important;
   }
 }
 
