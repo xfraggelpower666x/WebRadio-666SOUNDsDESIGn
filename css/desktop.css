@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v71 PC BACKGROUND TICKER PANEL METER VERSION FIX
+666SOUNDsDESIGn — v72 BOTTOM METER PANEL TICKER COVER FIX
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v71-pc-background-ticker-panel-meter-version-fix-20260430-1915') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -1225,5 +1225,225 @@ body::before{content:""!important;position:fixed!important;inset:0!important;z-i
 .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;white-space:nowrap!important;padding-left:100%!important;animation:v71MobileTickerFullWidth 22s linear infinite!important}
 @keyframes v71MobileTickerFullWidth{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+
+
+/* v72 bottom meter panel ticker cover fix */
+
+/*
+  Ziel:
+  - Bottom-Levelmeter wieder sichtbar.
+  - Systempanel-Kasten optisch gleiche Breite wie Now-Playing.
+  - Main/Backup weiter links, Versionsbadge weiter rechts mit mehr Abstand.
+  - Ticker sichtbar, volle Breite.
+  - Streamcover audioreaktiv.
+*/
+@media (min-width: 761px) {
+  .player-shell {
+    position: relative !important;
+    width: min(80vw, 1180px) !important;
+    max-width: calc(100vw - 170px) !important;
+    min-width: 880px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .now-playing,
+  .eq-card,
+  .equalizer-card,
+  .visualizer-card,
+  .controls-card,
+  .transport-card {
+    width: calc(100% - 44px) !important;
+    max-width: calc(100% - 44px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .top-hud {
+    width: calc(100% - 44px) !important;
+    max-width: calc(100% - 44px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .status-cluster,
+  .status-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+    padding: 6px 12px !important;
+    gap: 9px !important;
+  }
+
+  .system-status-spacer {
+    flex: 1 1 auto !important;
+    min-width: 8px !important;
+  }
+
+  .system-source-actions {
+    margin-left: auto !important;
+    transform: translateX(-44px) !important;
+    gap: 10px !important;
+  }
+
+  .system-version-badge,
+  #pcVersionBadge.pc-version-badge {
+    position: static !important;
+    display: inline-flex !important;
+    margin-left: 20px !important;
+    margin-right: 2px !important;
+    transform: translateX(18px) !important;
+    height: 31px !important;
+    min-width: 54px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /*
+    Bottom-Meter zurückholen: wieder sichtbar unter Player, aber breitengleich und nicht auf Version geklebt.
+  */
+  #pcBottomSyncMeter.pc-bottom-sync-meter,
+  #pcBottomSyncMeter {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 24px !important;
+    width: min(80vw, 1180px) !important;
+    max-width: calc(100vw - 170px) !important;
+    min-width: 880px !important;
+    height: 58px !important;
+    transform: translateX(-50%) !important;
+    z-index: 9997 !important;
+    margin: 0 !important;
+    padding: 10px 18px !important;
+    box-sizing: border-box !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(22,255,243,.48) !important;
+    background: rgba(3,7,20,.62) !important;
+    box-shadow:
+      inset 0 0 22px rgba(22,255,243,.08),
+      0 0 22px rgba(255,61,187,.16),
+      0 0 18px rgba(138,77,255,.12) !important;
+    pointer-events: none !important;
+  }
+
+  .pc-bottom-sync-inner {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /*
+    Ticker: Feld sichtbar + Text sichtbar. Keine halbe Strecke.
+  */
+  .now-playing .ticker-window {
+    grid-column: 2 / 4 !important;
+    width: 100% !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    overflow: hidden !important;
+    display: block !important;
+    position: relative !important;
+    border: 1px solid rgba(255,61,187,.34) !important;
+    background: rgba(5,8,20,.54) !important;
+  }
+
+  #nowPlayingTicker,
+  .now-playing .ticker-text {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    height: 50px !important;
+    line-height: 50px !important;
+    padding-left: 100% !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    color: #ff4fc7 !important;
+    font-size: clamp(13px, 1.05vw, 16px) !important;
+    font-weight: 950 !important;
+    animation: v72TickerRunFull 23s linear infinite !important;
+    will-change: transform !important;
+  }
+
+  @keyframes v72TickerRunFull {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - 100vw)); }
+  }
+
+  /*
+    Streambild/Cover audioreaktiv.
+  */
+  .now-cover-wrap,
+  .now-cover {
+    will-change: filter, transform, box-shadow !important;
+  }
+
+  .now-cover-wrap {
+    filter:
+      brightness(calc(1.00 + var(--pc-audio-energy,.10) * .24))
+      saturate(calc(1.06 + var(--pc-audio-energy,.10) * .62)) !important;
+    transform: scale(calc(1 + var(--pc-audio-energy,.10) * .018)) !important;
+    box-shadow:
+      0 0 calc(18px + var(--pc-audio-energy,.10) * 28px) rgba(255,61,187,.30),
+      0 0 calc(14px + var(--pc-audio-energy,.10) * 24px) rgba(22,255,243,.22),
+      0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(138,77,255,.20) !important;
+    transition: filter .08s linear, transform .08s linear, box-shadow .08s linear !important;
+  }
+
+  .now-cover {
+    filter: contrast(calc(1.02 + var(--pc-audio-energy,.10) * .12)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  #pcBottomSyncMeter.pc-bottom-sync-meter {
+    display: none !important;
+  }
+
+  .now-playing .ticker-window {
+    height: 42px !important;
+    min-height: 42px !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+
+  #nowPlayingTicker,
+  .now-playing .ticker-text {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    height: 42px !important;
+    line-height: 42px !important;
+    padding-left: 100% !important;
+    white-space: nowrap !important;
+    animation: v72MobileTickerRunFull 22s linear infinite !important;
+  }
+
+  @keyframes v72MobileTickerRunFull {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - 100vw)); }
+  }
+
+  .now-cover-wrap {
+    filter:
+      brightness(calc(1.00 + var(--pc-audio-energy,.10) * .20))
+      saturate(calc(1.06 + var(--pc-audio-energy,.10) * .48)) !important;
+    box-shadow:
+      0 0 calc(14px + var(--pc-audio-energy,.10) * 22px) rgba(255,61,187,.28),
+      0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(22,255,243,.20) !important;
+  }
 }
 

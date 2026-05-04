@@ -1,0 +1,48 @@
+666SOUNDsDESIGn — v72 BOTTOM METER PANEL TICKER COVER FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX.zip
+
+UMGESETZT:
+- Unteres Levelmeter wieder sichtbar gemacht.
+- Systempanel und Now-Playing bekommen dieselbe Breitenregel calc(100% - 44px).
+- Main/Backup weiter nach links geschoben.
+- Version weiter rechts mit mehr Abstand hinter Backup gesetzt.
+- Ticker mit JS-Force-Sync und CSS-Marquee sichtbar repariert.
+- Stream-Cover audioreaktiv gemacht.
+
+GEÄNDERT:
+- index.html: Version auf v72 aktualisiert
+- js/player-core.js: v72 Force-Sync für Laufschrift ergänzt
+- css/desktop.css: Bottommeter sichtbar, Systempanelbreite korrigiert, Version/Buttons Abstand, Ticker und Cover-Audioaktivität gesetzt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX.zip
+- before_file_count: 120
+- after_file_count_pre_report: 120
+- version_v72: True
+- bottom_meter_fixed_visible: True
+- systempanel_nowplaying_width_same_rule: True
+- buttons_moved_left: True
+- version_spacing_right: True
+- ticker_force_js_present: True
+- ticker_css_present: True
+- cover_audio_reactive: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 123

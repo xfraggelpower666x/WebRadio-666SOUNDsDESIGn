@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v72 BOTTOM METER PANEL TICKER COVER FIX
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: Bottommeter sichtbar, Systempanelbreite, Button/Version-Abstand, Ticker, Cover-Audioaktivität
+- js/player-core.js: installTickerForceSyncV72
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- js/responsive-ui.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

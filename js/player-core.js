@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v71-pc-background-ticker-panel-meter-version-fix-20260430-1915';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v71-pc-background-ticker-panel-meter-version-fix-20260430-1915';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v71-pc-background-ticker-panel-meter-version-fix-20260430-1915';
-import { applyStatusChip } from './shared-status.js?v=smfp-v71-pc-background-ticker-panel-meter-version-fix-20260430-1915';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
+import { applyStatusChip } from './shared-status.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v71_PC_BACKGROUND_TICKER_PANEL_METER_VERSION_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -782,3 +782,30 @@ try {
   document.documentElement.setAttribute('data-player-core-runtime-proof','mobile-runtime-cache-bust-proof-v1-20260426');
   console.info('[666SOUNDsDESIGn] player-core runtime proof:', 'mobile-runtime-cache-bust-proof-v1-20260426');
 } catch (err) {}
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v72 Ticker Force Sync
+// Zweck: Ticker sichtbar halten, auch wenn alte Meta-/Renderpfade nur metaLine setzen.
+// ==========================================================
+(function installTickerForceSyncV72(){
+  if (window.__tickerForceSyncV72) return;
+  window.__tickerForceSyncV72 = true;
+  function syncTicker(){
+    const ticker = document.getElementById('nowPlayingTicker');
+    const meta = document.getElementById('metaLine');
+    if (!ticker) return;
+    const metaText = meta ? String(meta.textContent || '').trim() : '';
+    const current = String(ticker.textContent || '').trim();
+    if (metaText && metaText !== current) ticker.textContent = metaText;
+    if (!ticker.textContent.trim()) ticker.textContent = '666SOUNDsDESIGn WebRadio';
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncTicker, { once: true });
+  } else {
+    syncTicker();
+  }
+  setInterval(syncTicker, 900);
+})();
+// END v72 Ticker Force Sync
+
