@@ -1,0 +1,16 @@
+666SOUNDsDESIGn — v73 BOOST TICKER HISTORY HEADER CLEAN FIX
+
+Geändert:
+- index.html: drei Header-Logos + PC Boost Panel + Version/Cache
+- assets/logos/header-666-center-logo.png
+- css/desktop.css: v73 Kanonik für Header/Boost/Ticker/History/Cover
+- js/player-core.js: v73 Clean Ticker/History/Boost Handler
+- js/responsive-ui.js: alter v69 History Handler entfernt
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

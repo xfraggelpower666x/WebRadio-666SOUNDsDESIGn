@@ -16,24 +16,24 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX" />
+  <meta name="smfp-version" content="STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
@@ -64,20 +64,32 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <span class="status-dot"></span><span class="status-code">SRC</span>
           </button>
           <span class="system-status-spacer" aria-hidden="true"></span>
+          <div id="pcBoostPanel" class="system-boost-actions" aria-label="Boost Steuerung">
+            <button id="pcBoostMinus" class="system-boost-btn boost-step boost-step-down" type="button" data-boost-step="-1" title="Boost senken">−</button>
+            <span id="pcBoostLabel" class="system-boost-label">BST 0</span>
+            <button id="pcBoostPlus" class="system-boost-btn boost-step boost-step-up" type="button" data-boost-step="1" title="Boost erhöhen">+</button>
+          </div>
+
           <div class="system-source-actions" aria-label="Streamquelle wählen">
             <button id="mainBtn" class="status-source-btn source-chip is-active" type="button" title="Main Stream" aria-label="Main Stream">M</button>
             <button id="fallbackBtn" class="status-source-btn source-chip" type="button" title="Backup Stream" aria-label="Backup Stream">B</button>
-          <div id="pcVersionBadge" class="pc-version-badge system-version-badge" aria-label="Player Version">v72</div></div>
+          <div id="pcVersionBadge" class="pc-version-badge system-version-badge" aria-label="Player Version">v73</div></div>
 
 </div>
       </header>
 
       <section class="hero">
 
-      <div id="pcHeaderBrandSplit" class="pc-header-brand-split" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
-        <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
-        <span class="pc-header-logo-gap" aria-hidden="true"></span>
-        <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+      <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
+        <span class="pc-header-logo-cell pc-header-logo-cell-left">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+        </span>
+        <span class="pc-header-logo-cell pc-header-logo-cell-center">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" alt="666" loading="eager" decoding="async">
+        </span>
+        <span class="pc-header-logo-cell pc-header-logo-cell-right">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+        </span>
       </div>
 
 <div class="hero-label-row">
@@ -188,11 +200,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045"></script>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX -->
-<style id="strictMobileFrontendPurgeV72Style">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX -->
+<style id="strictMobileFrontendPurgeV73Style">
 @media(max-width:760px){
   :root{
     --mff-bg:#02040d;
@@ -1005,7 +1017,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1017,10 +1029,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX -->
-<script id="strictMobileFrontendPurgeV72Script">
+<!-- STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX -->
+<script id="strictMobileFrontendPurgeV73Script">
 (function(){
-  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX';
+  var VERSION='STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1405,7 +1417,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v72</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v73</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">History wird geladen ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Metadaten werden geladen ...</span></h1><h2>Metadaten werden geladen …</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ-666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+

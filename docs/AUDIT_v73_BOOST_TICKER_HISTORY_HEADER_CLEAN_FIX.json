@@ -1,0 +1,42 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX",
+  "cache_tag": "smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX.zip",
+  "changes": [
+    "assets/logos/header-666-center-logo.png erstellt",
+    "index.html: drei Logos + PC Boost Panel eingefügt",
+    "js/player-core.js: Ticker/History/Boost bereinigt und v73 Handler gesetzt",
+    "js/responsive-ui.js: alter History Handler entfernt",
+    "css/desktop.css: v73-Kanonik für Header/Boost/Ticker/History/Cover gesetzt"
+  ],
+  "warnings": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX.zip",
+    "before_file_count": 123,
+    "after_file_count_pre_report": 124,
+    "version_v73": true,
+    "center_logo_asset_exists": true,
+    "three_header_logos_dom": true,
+    "pc_boost_panel_dom": true,
+    "old_ticker_blocks_removed": false,
+    "v73_clean_js_present": true,
+    "old_v69_history_removed": true,
+    "ticker_css_present": true,
+    "history_overlay_css_present": true,
+    "cover_image_stable_css": true,
+    "center_logo_self_audio_css": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 127
+  }
+}

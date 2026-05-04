@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
-import { applyStatusChip } from './shared-status.js?v=smfp-v72-bottom-meter-panel-ticker-cover-fix-20260430-1945';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
+import { applyStatusChip } from './shared-status.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -536,8 +536,6 @@ function parseMetadata(payload) {
   };
 }
 
-function ensureTickerVisibleV71(text){const t=document.getElementById('nowPlayingTicker');if(!t)return;const v=String(text||'').trim();if(v&&t.textContent.trim()!==v)t.textContent=v;}
-
 async function fetchMetadata() {
   const controller = new AbortController();
   const timer = window.setTimeout(() => controller.abort(), METADATA_TIMEOUT_MS);
@@ -785,27 +783,47 @@ try {
 
 
 // ==========================================================
-// 666SOUNDsDESIGn — v72 Ticker Force Sync
-// Zweck: Ticker sichtbar halten, auch wenn alte Meta-/Renderpfade nur metaLine setzen.
+// 666SOUNDsDESIGn — v73 Clean Ticker History Boost
 // ==========================================================
-(function installTickerForceSyncV72(){
-  if (window.__tickerForceSyncV72) return;
-  window.__tickerForceSyncV72 = true;
+(function installV73CleanTickerHistoryBoost(){
+  if(window.__v73CleanTickerHistoryBoostInstalled)return;
+  window.__v73CleanTickerHistoryBoostInstalled=true;
+  const qs=(id)=>document.getElementById(id);
   function syncTicker(){
-    const ticker = document.getElementById('nowPlayingTicker');
-    const meta = document.getElementById('metaLine');
-    if (!ticker) return;
-    const metaText = meta ? String(meta.textContent || '').trim() : '';
-    const current = String(ticker.textContent || '').trim();
-    if (metaText && metaText !== current) ticker.textContent = metaText;
-    if (!ticker.textContent.trim()) ticker.textContent = '666SOUNDsDESIGn WebRadio';
+    const ticker=qs('nowPlayingTicker'), meta=qs('metaLine');
+    if(!ticker)return;
+    let text=meta&&meta.textContent.trim()?meta.textContent.trim():'';
+    if(!text&&window.__lastNowPlayingTitle)text=String(window.__lastNowPlayingTitle).trim();
+    if(!text)text='666SOUNDsDESIGn WebRadio';
+    if(ticker.textContent.trim()!==text){ticker.textContent=text;ticker.setAttribute('data-ticker-live','true');}
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', syncTicker, { once: true });
-  } else {
-    syncTicker();
+  function installHistory(){
+    const toggle=qs('historyToggle'), panel=qs('historyPanel');
+    if(!toggle||!panel)return;
+    let backdrop=qs('historyOverlayBackdrop');
+    if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop);}
+    if(panel.parentElement!==document.body)document.body.appendChild(panel);
+    panel.classList.add('history-overlay-panel','hidden');
+    const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open');};
+    const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open');};
+    const tog=(ev)=>{ev.preventDefault();ev.stopPropagation();panel.classList.contains('hidden')?open():close();};
+    if(toggle.__v73HistoryHandler)toggle.removeEventListener('click',toggle.__v73HistoryHandler);
+    toggle.__v73HistoryHandler=tog; toggle.addEventListener('click',tog);
+    backdrop.onclick=close;
+    document.addEventListener('keydown',ev=>{if(ev.key==='Escape')close();},{passive:true});
+    document.addEventListener('click',ev=>{if(panel.classList.contains('hidden'))return;if(panel.contains(ev.target)||toggle.contains(ev.target))return;close();},true);
   }
-  setInterval(syncTicker, 900);
+  function installBoostLabel(){
+    const label=qs('pcBoostLabel'); if(!label)return;
+    const update=()=>{const bst=document.body.getAttribute('data-boost-level')||document.documentElement.style.getPropertyValue('--boost-level')||''; if(bst)label.textContent='BST '+String(bst).replace(/[^\d.-]/g,'');};
+    update(); setInterval(update,700);
+  }
+  function boot(){
+    syncTicker(); setInterval(syncTicker,850);
+    const meta=qs('metaLine'); if(meta&&window.MutationObserver)new MutationObserver(syncTicker).observe(meta,{childList:true,characterData:true,subtree:true});
+    installHistory(); installBoostLabel();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })();
-// END v72 Ticker Force Sync
+// END v73 Clean Ticker History Boost
 

@@ -1,0 +1,54 @@
+666SOUNDsDESIGn — v73 BOOST TICKER HISTORY HEADER CLEAN FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX.zip
+
+UMGESETZT:
+- PC-Boost-Control im Systempanel eingefügt.
+- Ticker-Layer bereinigt: alte v71/v72 Sync-Blöcke entfernt, ein v73 Sync gesetzt.
+- History-Layer bereinigt: alter v69 Handler entfernt, ein v73 Overlay-Handler gesetzt.
+- Header oben auf drei Logos umgebaut: links / 666 Mitte / rechts.
+- Linkes/rechtes Logo: nur Hintergrundschein audioreaktiv.
+- Mittleres 666-Logo: Logo selbst audioreaktiv, Schein statischer.
+- Stream-Cover: Bild selbst stabil, nur Glow/Schein audioreaktiv.
+
+GEÄNDERT:
+- assets/logos/header-666-center-logo.png erstellt
+- index.html: drei Logos + PC Boost Panel eingefügt
+- js/player-core.js: Ticker/History/Boost bereinigt und v73 Handler gesetzt
+- js/responsive-ui.js: alter History Handler entfernt
+- css/desktop.css: v73-Kanonik für Header/Boost/Ticker/History/Cover gesetzt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v72_BOTTOM_METER_PANEL_TICKER_COVER_FIX.zip
+- before_file_count: 123
+- after_file_count_pre_report: 124
+- version_v73: True
+- center_logo_asset_exists: True
+- three_header_logos_dom: True
+- pc_boost_panel_dom: True
+- old_ticker_blocks_removed: False
+- v73_clean_js_present: True
+- old_v69_history_removed: True
+- ticker_css_present: True
+- history_overlay_css_present: True
+- cover_image_stable_css: True
+- center_logo_self_audio_css: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 127
