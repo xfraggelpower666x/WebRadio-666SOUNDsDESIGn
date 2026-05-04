@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v70 BG AUDIO TICKER MOBILE DJ FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE.zip
+
+UMGESETZT:
+- PC-Hintergrund auf Full-Cover stabilisiert.
+- Pinke/Türkise Hintergrundbereiche audioreaktiv an --pc-audio-energy gekoppelt.
+- Laufschrift auf PC und Mobile wieder sichtbar als Full-Field-Marquee.
+- PC-Playerbreite stabilisiert.
+- iPhone DJ-Status-Bereich zentriert/abgesichert.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v70 aktualisiert
+- js/equalizer.js: vorhandene Audio-Energy-Variable beibehalten
+- css/desktop.css: Full-Cover-Hintergrund, audioreaktive Pink/Türkis-Layer, Ticker-Reparatur und Mobile-DJ-Status-Fix ergänzt
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE.zip
+- before_file_count: 114
+- after_file_count_pre_report: 114
+- version_v70: True
+- background_cover_css_present: True
+- background_audio_reactive_css_present: True
+- audio_energy_available: True
+- ticker_pc_restored: True
+- ticker_mobile_restored: True
+- mobile_dj_status_fix_css: False
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 117

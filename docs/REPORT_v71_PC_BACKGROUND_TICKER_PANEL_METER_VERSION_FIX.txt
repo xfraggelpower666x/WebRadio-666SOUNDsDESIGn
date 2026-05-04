@@ -1,0 +1,46 @@
+666SOUNDsDESIGn — v71 PC BACKGROUND TICKER PANEL METER VERSION FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v70_BG_AUDIO_TICKER_MOBILE_DJ_FIX.zip
+
+UMGESETZT:
+- Hintergrund als echter Viewport-Cover-Background hinter allem, auch hinter Side-Levelmetern.
+- Ticker sichtbar repariert: CSS-Full-Width + JS-Fallback füllt nowPlayingTicker sicher.
+- Systempanel-Balken auf gleiche Breite wie Player-Karten fixiert.
+- Bottom-Levelmeter optisch in Player eingebunden.
+- Versionsbadge aus unten entfernt und rechts im Systempanel hinter Main/Backup platziert.
+
+GEÄNDERT:
+- index.html: Versionsbadge aus Bottom-Bereich entfernt und ins Systempanel verschoben
+- js/player-core.js: Ticker-Text-Fallback ergänzt
+- css/desktop.css: Hintergrund, Ticker, Systempanel-Breite, Bottommeter und Versionposition korrigiert
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v70_BG_AUDIO_TICKER_MOBILE_DJ_FIX.zip
+- before_file_count: 117
+- after_file_count_pre_report: 117
+- version_v71: True
+- version_badge_in_systempanel: True
+- background_body_before: True
+- ticker_css_present: True
+- ticker_js_fallback_present: True
+- systempanel_width_fix: True
+- bottom_meter_integrated: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 120

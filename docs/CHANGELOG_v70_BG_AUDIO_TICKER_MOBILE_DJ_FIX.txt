@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v70 BG AUDIO TICKER MOBILE DJ FIX
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: Full-Cover-Hintergrund, audioreaktive Glow-Layer, Ticker-Reparatur, Mobile-DJ-Status-Fix
+- js/equalizer.js Versionsmarker
+- js/player-core.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- js/responsive-ui.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

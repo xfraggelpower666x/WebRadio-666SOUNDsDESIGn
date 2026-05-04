@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v71 PC BACKGROUND TICKER PANEL METER VERSION FIX
+
+Geändert:
+- index.html: Version/Cache, pcVersionBadge ins Systempanel verschoben
+- css/desktop.css: Background hinter alles, Ticker, Systempanelbreite, Bottommeter-Integration
+- js/player-core.js: Ticker-Text-Fallback ensureTickerVisibleV71
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- js/responsive-ui.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

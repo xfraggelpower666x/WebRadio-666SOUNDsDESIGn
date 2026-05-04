@@ -1,0 +1,36 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v70_BG_AUDIO_TICKER_MOBILE_DJ_FIX",
+  "cache_tag": "smfp-v70-bg-audio-ticker-mobile-dj-fix-20260430-1825",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE.zip",
+  "changes": [
+    "index.html: Version/Cache auf v70 aktualisiert",
+    "js/equalizer.js: vorhandene Audio-Energy-Variable beibehalten",
+    "css/desktop.css: Full-Cover-Hintergrund, audioreaktive Pink/Türkis-Layer, Ticker-Reparatur und Mobile-DJ-Status-Fix ergänzt"
+  ],
+  "warnings": [],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v69_MOBILE_HISTORY_OVERLAY_SOURCE_RESTORE.zip",
+    "before_file_count": 114,
+    "after_file_count_pre_report": 114,
+    "version_v70": true,
+    "background_cover_css_present": true,
+    "background_audio_reactive_css_present": true,
+    "audio_energy_available": true,
+    "ticker_pc_restored": true,
+    "ticker_mobile_restored": true,
+    "mobile_dj_status_fix_css": false,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 117
+  }
+}

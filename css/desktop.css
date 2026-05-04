@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v69 MOBILE HISTORY OVERLAY SOURCE RESTORE
+666SOUNDsDESIGn — v71 PC BACKGROUND TICKER PANEL METER VERSION FIX
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v69-mobile-history-overlay-source-restore-20260430-1725') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v71-pc-background-ticker-panel-meter-version-fix-20260430-1915') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -1174,5 +1174,56 @@ ZWECK:
   #historyPanel, .history-panel, .history-overlay-panel { position:fixed !important; left:50% !important; top:50% !important; right:auto !important; bottom:auto !important; transform:translate(-50%,-50%) !important; width:min(92vw,430px) !important; max-height:min(72vh,560px) !important; overflow:auto !important; z-index:2147483000 !important; margin:0 !important; padding:16px 17px !important; border-radius:22px !important; border:1px solid rgba(255,61,187,.66) !important; background:radial-gradient(circle at 18% 0%,rgba(255,61,187,.18),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.13),transparent 38%),rgba(3,7,20,.98) !important; box-shadow:0 0 36px rgba(255,61,187,.34),0 0 28px rgba(22,255,243,.20),inset 0 0 26px rgba(255,255,255,.035) !important; }
   #historyPanel.hidden, .history-panel.hidden, .history-overlay-panel.hidden { display:none !important; }
   html.history-overlay-open, body.history-overlay-open { overflow:hidden !important; touch-action:none !important; }
+}
+
+
+/* v70 bg audio ticker mobile dj fix */
+@media (min-width:761px){
+  html,body,.frame-stage{width:100vw!important;min-width:100vw!important;height:100vh!important;min-height:100vh!important;overflow-x:hidden!important}
+  body,.frame-stage,.frame-overlay{background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;background-attachment:fixed!important}
+  .frame-stage::before{content:""!important;position:fixed!important;inset:0!important;pointer-events:none!important;z-index:0!important;background:radial-gradient(circle at 18% 72%,rgba(255,61,187,calc(.10 + var(--pc-audio-energy,.10) * .34)),transparent 34%),radial-gradient(circle at 82% 34%,rgba(22,255,243,calc(.08 + var(--pc-audio-energy,.10) * .30)),transparent 36%),linear-gradient(120deg,rgba(255,61,187,calc(.035 + var(--pc-audio-energy,.10) * .10)),transparent 42%,rgba(22,255,243,calc(.035 + var(--pc-audio-energy,.10) * .10)))!important;mix-blend-mode:screen!important;filter:blur(calc(6px + var(--pc-audio-energy,.10) * 10px)) saturate(calc(1.05 + var(--pc-audio-energy,.10) * .80))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .58)!important;transition:opacity .08s linear,filter .08s linear!important}
+  .player-shell{width:min(82vw,1180px)!important;max-width:calc(100vw - 172px)!important;min-width:880px!important;transform:none!important;scale:1!important}
+  .now-playing .ticker-window{width:100%!important;min-width:0!important;height:58px!important;min-height:58px!important;overflow:hidden!important;position:relative!important;display:block!important}
+  #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;width:max-content!important;min-width:100%!important;height:58px!important;line-height:58px!important;white-space:nowrap!important;padding-left:100%!important;padding-right:0!important;margin:0!important;transform:none!important;animation:v70TickerAcrossFullField 24s linear infinite!important;will-change:transform!important}
+  #nowPlayingTicker:empty,.now-playing .ticker-text:empty{animation:none!important}
+  @keyframes v70TickerAcrossFullField{from{transform:translateX(0)}to{transform:translateX(calc(-100% - 100vw))}}
+}
+@media (max-width:760px){
+  .info-grid{display:grid!important;grid-template-columns:1fr 1fr 1.35fr!important;gap:10px!important;align-items:stretch!important}
+  .info-card{min-width:0!important;overflow:hidden!important;display:grid!important;grid-template-rows:auto 1fr auto!important;align-items:center!important;justify-items:center!important;text-align:center!important}
+  .info-card .info-label,.info-label{width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;white-space:nowrap!important;line-height:1.05!important;min-height:22px!important}
+  .info-card .info-value,.info-value,#djText{width:100%!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:center!important;line-height:1.08!important}
+  #djText{font-size:clamp(18px,5.2vw,29px)!important}
+  .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;position:relative!important;display:block!important}
+  #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;white-space:nowrap!important;padding-left:100%!important;animation:v70MobileTickerAcrossFullField 22s linear infinite!important}
+  #nowPlayingTicker:empty{animation:none!important}
+  @keyframes v70MobileTickerAcrossFullField{from{transform:translateX(0)}to{transform:translateX(calc(-100% - 100vw))}}
+}
+
+
+/* v71 pc background ticker panel meter version fix */
+html,body{width:100vw!important;min-width:100vw!important;height:100vh!important;min-height:100vh!important;margin:0!important;overflow-x:hidden!important;background:#030714 url("/assets/images/frame-v6-desktop.jpg") center center/cover no-repeat fixed!important}
+body::before{content:""!important;position:fixed!important;inset:0!important;z-index:-3!important;pointer-events:none!important;background:#030714 url("/assets/images/frame-v6-desktop.jpg") center center/cover no-repeat fixed!important}
+.frame-stage{width:100vw!important;min-width:100vw!important;min-height:100vh!important;background:transparent!important;overflow:hidden!important}
+.frame-overlay{position:fixed!important;inset:0!important;z-index:0!important;background:transparent url("/assets/images/frame-v6-desktop.jpg") center center/cover no-repeat fixed!important;opacity:1!important}
+.frame-stage::after{content:""!important;position:fixed!important;inset:0!important;z-index:0!important;pointer-events:none!important;background:radial-gradient(circle at 15% 72%,rgba(255,61,187,calc(.10 + var(--pc-audio-energy,.10) * .34)),transparent 34%),radial-gradient(circle at 83% 36%,rgba(22,255,243,calc(.08 + var(--pc-audio-energy,.10) * .30)),transparent 36%)!important;mix-blend-mode:screen!important;filter:blur(calc(4px + var(--pc-audio-energy,.10) * 10px)) saturate(calc(1.08 + var(--pc-audio-energy,.10) * .8))!important;opacity:calc(.34 + var(--pc-audio-energy,.10) * .56)!important}
+@media (min-width:761px){
+.player-shell{width:min(80vw,1180px)!important;max-width:calc(100vw - 170px)!important;min-width:880px!important;z-index:2!important}
+.top-hud,.status-cluster,.status-bar{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+.top-hud{align-self:stretch!important;padding:0!important;margin:0 0 8px 0!important}
+.status-cluster,.status-bar{justify-content:flex-start!important;padding:6px 14px!important;overflow:hidden!important}
+.system-status-spacer{flex:1 1 auto!important;min-width:22px!important}
+.system-source-actions{margin-left:auto!important;transform:translateX(-16px)!important}
+.system-version-badge,#pcVersionBadge.pc-version-badge{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;z-index:auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;height:31px!important;min-width:52px!important;margin-left:-8px!important;padding:0 12px!important;border-radius:999px!important;font-size:11px!important;font-weight:950!important;letter-spacing:.08em!important;color:#fff!important;background:rgba(255,61,187,.18)!important;border:1px solid rgba(255,61,187,.66)!important;box-shadow:0 0 15px rgba(255,61,187,.34),inset 0 0 12px rgba(255,255,255,.04)!important}
+#pcBottomSyncMeter.pc-bottom-sync-meter{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-width:100%!important;margin:6px 0 0 0!important;transform:none!important;z-index:2!important;border-radius:22px!important;border:1px solid rgba(22,255,243,.42)!important;background:rgba(4,8,22,.52)!important;box-shadow:inset 0 0 20px rgba(22,255,243,.06),0 0 18px rgba(255,61,187,.12)!important}
+.now-playing .ticker-window{grid-column:2/4!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;overflow:hidden!important;position:relative!important;display:block!important;border:1px solid rgba(255,61,187,.28)!important;background:rgba(5,8,20,.46)!important}
+#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:48px!important;line-height:48px!important;white-space:nowrap!important;padding-left:100%!important;margin:0!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:900!important;animation:v71TickerFullWidth 24s linear infinite!important;will-change:transform!important}
+#nowPlayingTicker:empty::after{content:"666SOUNDsDESIGn WebRadio"!important}
+@keyframes v71TickerFullWidth{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+@media (max-width:760px){
+.now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}
+#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;white-space:nowrap!important;padding-left:100%!important;animation:v71MobileTickerFullWidth 22s linear infinite!important}
+@keyframes v71MobileTickerFullWidth{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
 }
 
