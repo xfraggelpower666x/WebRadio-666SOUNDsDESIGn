@@ -1,0 +1,93 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v76_HARD_PURGE_PC_BOOST_FIX",
+  "cache_tag": "smfp-v76-hard-purge-pc-boost-fix-20260430-2340",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL.zip",
+  "changes": [
+    "index.html: Boost kompakt mittig gehalten, Version v76",
+    "css/desktop.css: v76 Hard-Purge CSS + kompakter Boost gesetzt",
+    "js/player-core.js: v76 Handler mit PC-Boost-Klicklogik gesetzt",
+    "js/responsive-ui.js: alte History-Parallelhandler entfernt"
+  ],
+  "warnings": [],
+  "removed": [
+    "desktop.css: removed v75 layer clean audio meta selfheal x1",
+    "desktop.css: removed keyframes v70TickerAcrossFullField x1",
+    "desktop.css: removed keyframes v70MobileTickerAcrossFullField x1",
+    "desktop.css: removed keyframes v71TickerFullWidth x1",
+    "desktop.css: removed keyframes v71MobileTickerFullWidth x1",
+    "desktop.css: removed keyframes v72TickerRunFull x1",
+    "desktop.css: removed keyframes v72MobileTickerRunFull x1",
+    "desktop.css: removed keyframes v73TickerRun x1",
+    "desktop.css: removed keyframes v73MobileTickerRun x1",
+    "desktop.css: removed keyframes v74TickerRun x1",
+    "desktop.css: removed keyframes v74MobileTickerRun x1",
+    "desktop.css: removed keyframes v75TickerRun x1",
+    "desktop.css: removed keyframes v75MobileTickerRun x1",
+    "player-core.js: removed v75 selfheal x1"
+  ],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 CSS hard purge",
+      true
+    ],
+    [
+      "Block 3 JS hard purge + boost",
+      true
+    ]
+  ],
+  "audit_before": {
+    "old_js_markers": {
+      "statusMain": 6,
+      "statusBackup": 6,
+      "ensureTickerVisibleV71": 2,
+      "installTickerForceSyncV72": 0,
+      "installV73CleanTickerHistoryBoost": 0,
+      "installV74SystempanelBinding": 0,
+      "installV75LayerCleanAudioMetaSelfheal": 1
+    },
+    "boost_refs": {
+      "pcBoostPanel": 1,
+      "pcBoostMinus": 2,
+      "pcBoostPlus": 2,
+      "pcBoostLabel": 7,
+      "data-boost-step": 5,
+      "boostLevel": 4,
+      "__boostLevel": 1
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL.zip",
+    "before_file_count": 133,
+    "after_file_count_pre_report": 133,
+    "version_v76": true,
+    "boost_dom_present": true,
+    "boost_compact_css_present": true,
+    "v76_handler_present": true,
+    "boost_click_logic_present": true,
+    "boost_event_present": true,
+    "old_js_handlers_absent": false,
+    "statusMain_statusBackup_absent": false,
+    "old_css_markers_absent": false,
+    "single_ticker_css_v76": true,
+    "audio_watchdog_present": true,
+    "metadata_safe_ticker_present": true,
+    "history_overlay_present": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 136
+  }
+}

@@ -1,0 +1,14 @@
+666SOUNDsDESIGn — v77 PC BOOST META GLOW TICKER FIX
+
+Geändert:
+- index.html: Version/Cache v77
+- css/desktop.css: kompakter Boost, Header-Glow, türkis Cover-Glow, PC-Ticker-Hard-Fix
+- js/player-core.js: PC-Boost an setBoostStage/changeBoostStage, PC-Ticker Mobile-style Sync, Metadata-Fallback
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

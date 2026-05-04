@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v76 HARD PURGE PC BOOST FIX
+
+Geändert:
+- index.html: Boost-Panel kompakt gehalten, Version/Cache v76
+- css/desktop.css: v76 Hard-Purge CSS, kompakte Boost-Mitte
+- js/player-core.js: v76 Hard-Purge Handler mit funktionsfähigem PC-Boost
+- js/responsive-ui.js: History-Parallelhandler entfernt
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

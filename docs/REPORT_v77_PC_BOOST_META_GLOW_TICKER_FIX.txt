@@ -1,0 +1,66 @@
+666SOUNDsDESIGn — v77 PC BOOST META GLOW TICKER FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v76_HARD_PURGE_PC_BOOST_FIX.zip
+
+UMGESETZT:
+- PC-Boost ruft jetzt vorhandene setBoostStage/changeBoostStage-Logik auf.
+- Boost-Knöpfe kompakt, damit das Systempanel nicht zerbricht.
+- PC-Ticker bekommt Mobile/iPhone-artige robuste Sync-Logik über readMetaLikeMobile().
+- Ticker-Sync läuft schnell alle 900 ms und zusätzlich über MetaLine-MutationObserver.
+- Undefined ensureTickerVisibleV71-Aufrufe entfernt.
+- Metadata-Fallback hält letzte gültige Anzeige.
+- Obere drei Logos: links/rechts Logo stabil, nur Schein audioreaktiv.
+- Mittleres 666-Logo: Logo und Schein audioreaktiv.
+- Streamcover: Bild stabil, äußerer Schein türkis und audioreaktiv.
+
+GEÄNDERT:
+- index.html: Version/Cache v77 gesetzt, Boost-Klasse auf v77 aktualisiert
+- css/desktop.css: v77 Boost-Kompakt, Header-Glow, türkis Cover-Glow und PC-Ticker-Hard-Fix gesetzt
+- js/player-core.js: Metadata-Catch hält letzte Anzeige statt harten Fehlertext zu schreiben
+- js/player-core.js: v77 PC-Boost real angebunden, PC-Ticker wie Mobile robust synchronisiert, Metadata-Schutz ergänzt
+
+ENTFERNT/BEREINIGT:
+- player-core.js: undefined ensureTickerVisibleV71-Aufrufe entfernt x2
+- player-core.js: alter Handler v76 Hard Purge PC Boost Fix entfernt x1
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 ticker undefined calls removed: True
+- Block 3 PC ticker mobile-style sync: True
+- Block 4 real boost binding: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v76_HARD_PURGE_PC_BOOST_FIX.zip
+- before_file_count: 136
+- after_file_count_pre_report: 136
+- version_v77: True
+- boost_dom_present: True
+- boost_compact_css_present: True
+- real_boost_binding_present: True
+- boost_click_capture_present: True
+- pc_ticker_mobile_style_sync_present: True
+- ticker_interval_fast_present: True
+- undefined_ticker_removed: True
+- metadata_safe_ticker_present: True
+- header_logo_glow_css_present: True
+- cover_turquoise_audio_glow_present: True
+- audio_watchdog_present: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 139

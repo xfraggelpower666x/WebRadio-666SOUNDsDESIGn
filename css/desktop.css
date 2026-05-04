@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v75 LAYER CLEAN AUDIO META SELFHEAL
+666SOUNDsDESIGn — v76 HARD PURGE PC BOOST FIX
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -1182,7 +1182,7 @@ ZWECK:
   .now-playing .ticker-window{width:100%!important;min-width:0!important;height:58px!important;min-height:58px!important;overflow:hidden!important;position:relative!important;display:block!important}
   #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;width:max-content!important;min-width:100%!important;height:58px!important;line-height:58px!important;white-space:nowrap!important;padding-left:100%!important;padding-right:0!important;margin:0!important;transform:none!important;animation:v70TickerAcrossFullField 24s linear infinite!important;will-change:transform!important}
   #nowPlayingTicker:empty,.now-playing .ticker-text:empty{animation:none!important}
-  @keyframes v70TickerAcrossFullField{from{transform:translateX(0)}to{transform:translateX(calc(-100% - 100vw))}}
+  
 }
 @media (max-width:760px){
   .info-grid{display:grid!important;grid-template-columns:1fr 1fr 1.35fr!important;gap:10px!important;align-items:stretch!important}
@@ -1193,7 +1193,7 @@ ZWECK:
   .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;position:relative!important;display:block!important}
   #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;white-space:nowrap!important;padding-left:100%!important;animation:v70MobileTickerAcrossFullField 22s linear infinite!important}
   #nowPlayingTicker:empty{animation:none!important}
-  @keyframes v70MobileTickerAcrossFullField{from{transform:translateX(0)}to{transform:translateX(calc(-100% - 100vw))}}
+  
 }
 
 @media (min-width:761px){
@@ -1208,12 +1208,12 @@ ZWECK:
 .now-playing .ticker-window{grid-column:2/4!important;width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;overflow:hidden!important;position:relative!important;display:block!important;border:1px solid rgba(255,61,187,.28)!important;background:rgba(5,8,20,.46)!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:48px!important;line-height:48px!important;white-space:nowrap!important;padding-left:100%!important;margin:0!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:900!important;animation:v71TickerFullWidth 24s linear infinite!important;will-change:transform!important}
 #nowPlayingTicker:empty::after{content:"666SOUNDsDESIGn WebRadio"!important}
-@keyframes v71TickerFullWidth{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+
 }
 @media (max-width:760px){
 .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;white-space:nowrap!important;padding-left:100%!important;animation:v71MobileTickerFullWidth 22s linear infinite!important}
-@keyframes v71MobileTickerFullWidth{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+
 }
 
 
@@ -1363,10 +1363,7 @@ ZWECK:
     will-change: transform !important;
   }
 
-  @keyframes v72TickerRunFull {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% - 100vw)); }
-  }
+  
 
   /*
     Streambild/Cover audioreaktiv.
@@ -1419,10 +1416,7 @@ ZWECK:
     animation: v72MobileTickerRunFull 22s linear infinite !important;
   }
 
-  @keyframes v72MobileTickerRunFull {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% - 100vw)); }
-  }
+  
 
   .now-cover-wrap {
     filter:
@@ -1453,7 +1447,7 @@ ZWECK:
 .now-cover-wrap::before{content:""!important;position:absolute!important;inset:-10px!important;z-index:-1!important;border-radius:28px!important;background:radial-gradient(circle,rgba(255,61,187,.30),transparent 58%),radial-gradient(circle,rgba(22,255,243,.20),transparent 66%)!important;filter:blur(calc(8px + var(--pc-audio-energy,.10) * 16px))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .54)!important}
 .now-playing .ticker-window{grid-column:2/4!important;width:100%!important;height:50px!important;min-height:50px!important;overflow:hidden!important;display:block!important;position:relative!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:50px!important;line-height:50px!important;padding-left:100%!important;white-space:nowrap!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:950!important;animation:v73TickerRun 23s linear infinite!important}
-@keyframes v73TickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+
 }
 @media (max-width:760px){
 .pc-header-brand-three{display:none!important}
@@ -1464,7 +1458,7 @@ ZWECK:
 .now-cover-wrap{filter:none!important;transform:none!important;box-shadow:0 0 calc(14px + var(--pc-audio-energy,.10) * 22px) rgba(255,61,187,.28),0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(22,255,243,.20)!important}
 .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;padding-left:100%!important;white-space:nowrap!important;animation:v73MobileTickerRun 22s linear infinite!important}
-@keyframes v73MobileTickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+
 }
 
 @media (min-width:761px){
@@ -1480,18 +1474,16 @@ ZWECK:
 .now-cover-wrap::before{content:""!important;position:absolute!important;inset:-10px!important;z-index:-1!important;border-radius:28px!important;background:radial-gradient(circle,rgba(255,61,187,.30),transparent 58%),radial-gradient(circle,rgba(22,255,243,.20),transparent 66%)!important;filter:blur(calc(8px + var(--pc-audio-energy,.10) * 16px))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .54)!important}
 .now-playing .ticker-window{grid-column:2/4!important;width:100%!important;height:50px!important;min-height:50px!important;overflow:hidden!important;display:block!important;position:relative!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:50px!important;line-height:50px!important;padding-left:100%!important;white-space:nowrap!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:950!important;animation:v74TickerRun 23s linear infinite!important}
-@keyframes v74TickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+
 }
 @media (max-width:760px){
 .systempanel-v74{width:calc(100vw - 18px)!important;max-width:calc(100vw - 18px)!important;margin:6px auto 8px!important}.systempanel-grid-v74{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto auto!important;gap:6px!important;padding:7px 8px!important;overflow:visible!important}
 .systempanel-left,.systempanel-center,.systempanel-right{display:flex!important;justify-content:center!important;gap:6px!important;flex-wrap:nowrap!important;min-width:0!important}.status-chip.led-state{min-height:28px!important;font-size:10px!important;padding:0 8px!important;gap:6px!important}.status-chip.led-state .status-dot{width:8px!important;height:8px!important;flex-basis:8px!important}#pcBoostLabel{min-width:58px!important}
 .pc-header-brand-three{display:none!important}.now-cover{filter:none!important;transform:none!important}.now-cover-wrap{filter:none!important;transform:none!important;box-shadow:0 0 calc(14px + var(--pc-audio-energy,.10) * 22px) rgba(255,61,187,.28),0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(22,255,243,.20)!important}
 .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;padding-left:100%!important;white-space:nowrap!important;animation:v74MobileTickerRun 22s linear infinite!important}
-@keyframes v74MobileTickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+
 }
 
-
-/* v75 layer clean audio meta selfheal */
 
 /*
   Einziger aktiver Patchblock für:
@@ -1718,10 +1710,7 @@ ZWECK:
     animation: v75TickerRun 23s linear infinite !important;
   }
 
-  @keyframes v75TickerRun {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% - 100vw)); }
-  }
+  
 }
 
 @media (max-width: 760px) {
@@ -1788,9 +1777,78 @@ ZWECK:
     animation: v75MobileTickerRun 22s linear infinite !important;
   }
 
-  @keyframes v75MobileTickerRun {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-100% - 100vw)); }
-  }
+  
+}
+
+
+/* v76 hard purge pc boost fix */
+.status-chip.led-state{position:relative!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-height:30px!important;border-radius:999px!important;border:1px solid rgba(255,255,255,.22)!important;background:rgba(5,8,22,.74)!important;color:#dfe7ff!important;font-size:10.5px!important;font-weight:950!important;letter-spacing:.08em!important;text-transform:uppercase!important;padding:0 10px!important;box-shadow:inset 0 0 14px rgba(0,0,0,.24),0 0 13px rgba(22,255,243,.10)!important}
+.status-chip.led-state .status-dot{width:8px!important;height:8px!important;border-radius:50%!important;flex:0 0 8px!important;background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.58)!important;box-shadow:0 0 6px rgba(255,255,255,.22)!important}
+.status-chip.led-state.state-main .status-dot,.status-chip.led-state.state-api .status-dot,.status-chip.led-state.state-external .status-dot{background:#28fff4!important;border-color:rgba(40,255,244,.96)!important;box-shadow:0 0 10px rgba(22,255,243,.95),0 0 18px rgba(22,255,243,.36)!important}
+.status-chip.led-state.state-backup .status-dot,.status-chip.led-state.boost-status.state-api .status-dot{background:#c047ff!important;border-color:rgba(192,71,255,.95)!important;box-shadow:0 0 10px rgba(192,71,255,.90),0 0 18px rgba(255,61,187,.34)!important}
+.status-chip.led-state.state-error .status-dot,.status-chip.led-state.is-error .status-dot{background:#ff3dbb!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 10px rgba(255,61,187,.90),0 0 18px rgba(255,61,187,.36)!important}
+.history-overlay-backdrop{position:fixed!important;inset:0!important;z-index:2147482990!important;display:block!important;background:rgba(0,0,0,.62)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
+.history-overlay-backdrop.hidden{display:none!important}
+#historyPanel.history-overlay-panel,.history-overlay-panel{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(92vw,520px)!important;max-height:min(74vh,620px)!important;overflow:auto!important;z-index:2147483000!important;margin:0!important;padding:17px 18px!important;border-radius:22px!important;border:1px solid rgba(255,61,187,.66)!important;background:radial-gradient(circle at 18% 0%,rgba(255,61,187,.20),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.14),transparent 38%),rgba(3,7,20,.98)!important;box-shadow:0 0 38px rgba(255,61,187,.34),0 0 30px rgba(22,255,243,.20),inset 0 0 26px rgba(255,255,255,.035)!important}
+#historyPanel.hidden,.history-overlay-panel.hidden{display:none!important}
+@media (min-width:761px){
+.top-hud.systempanel-v74{width:calc(100% - 44px)!important;max-width:calc(100% - 44px)!important;margin:0 auto 8px auto!important;padding:0!important;box-sizing:border-box!important}
+.systempanel-grid-v74{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:minmax(245px,1fr) minmax(184px,auto) minmax(245px,1fr)!important;align-items:center!important;gap:10px!important;padding:6px 10px!important;box-sizing:border-box!important;overflow:hidden!important}
+.systempanel-group{display:inline-flex!important;align-items:center!important;gap:7px!important;min-width:0!important}.systempanel-left{justify-content:flex-start!important}.systempanel-center{justify-content:center!important}.systempanel-right{justify-content:flex-end!important}.systempanel-left .status-chip{min-width:66px!important}.systempanel-right .status-chip{min-width:62px!important}#pcVersionBadge{min-width:52px!important;margin-left:8px!important}
+.boost-compact-v76,#pcBoostPanel{min-width:184px!important;max-width:206px!important;justify-content:center!important;gap:6px!important}
+#pcBoostMinus,#pcBoostPlus{width:32px!important;min-width:32px!important;max-width:32px!important;padding:0!important;font-size:16px!important;line-height:1!important}
+#pcBoostLabel{min-width:72px!important;max-width:78px!important;padding:0 8px!important}
+.now-cover{filter:none!important;transform:none!important}.now-cover-wrap{position:relative!important;filter:none!important;transform:none!important;overflow:visible!important;box-shadow:0 0 calc(18px + var(--pc-audio-energy,.10) * 28px) rgba(255,61,187,.30),0 0 calc(14px + var(--pc-audio-energy,.10) * 24px) rgba(22,255,243,.22),0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(138,77,255,.20)!important}
+.now-playing .ticker-window{grid-column:2/4!important;width:100%!important;height:50px!important;min-height:50px!important;overflow:hidden!important;display:block!important;position:relative!important}
+#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:50px!important;line-height:50px!important;padding-left:100%!important;white-space:nowrap!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:950!important;animation:v76TickerRun 23s linear infinite!important}
+@keyframes v76TickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+@media (max-width:760px){
+.systempanel-v74{width:calc(100vw - 18px)!important;max-width:calc(100vw - 18px)!important;margin:6px auto 8px!important}.systempanel-grid-v74{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto auto!important;gap:6px!important;padding:7px 8px!important;overflow:visible!important}.systempanel-left,.systempanel-center,.systempanel-right{display:flex!important;justify-content:center!important;gap:6px!important;flex-wrap:nowrap!important;min-width:0!important}.status-chip.led-state{min-height:28px!important;font-size:10px!important;padding:0 8px!important;gap:6px!important}#pcBoostLabel{min-width:58px!important}
+.now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;padding-left:100%!important;white-space:nowrap!important;animation:v76MobileTickerRun 22s linear infinite!important}
+@keyframes v76MobileTickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+
+
+/* v77 pc boost meta glow ticker fix */
+
+/*
+  v77:
+  - PC Boost kompakt und funktionsfähig.
+  - PC Ticker übernimmt robuste Mobile/iPhone-Logik: Text wird direkt aus Meta/NowPlaying synchronisiert.
+  - Header-Logos: links/rechts nur Schein audioreaktiv, Center-666 Logo + Schein audioreaktiv.
+  - Streamcover: Bild stabil, türkisfarbener Schein außen audioreaktiv.
+*/
+@media (min-width:761px){
+.systempanel-grid-v74{grid-template-columns:minmax(255px,1fr) minmax(132px,150px) minmax(255px,1fr)!important;gap:8px!important;padding-left:8px!important;padding-right:8px!important}
+.boost-compact-v77,.boost-compact-v76,#pcBoostPanel{min-width:132px!important;max-width:150px!important;gap:4px!important;justify-content:center!important}
+#pcBoostMinus,#pcBoostPlus{width:24px!important;min-width:24px!important;max-width:24px!important;height:28px!important;min-height:28px!important;padding:0!important;font-size:14px!important;line-height:1!important;letter-spacing:0!important}
+#pcBoostMinus .status-dot,#pcBoostPlus .status-dot{display:none!important}
+#pcBoostLabel{min-width:64px!important;max-width:70px!important;height:28px!important;min-height:28px!important;padding:0 6px!important;font-size:10px!important;letter-spacing:.055em!important}
+.systempanel-left .status-chip{min-width:62px!important}.systempanel-right .status-chip{min-width:58px!important}#pcVersionBadge{min-width:48px!important;margin-left:6px!important}
+
+.pc-header-logo-cell{position:relative!important;isolation:isolate!important;overflow:visible!important}
+.pc-header-logo-cell::before{content:""!important;position:absolute!important;inset:4px!important;border-radius:999px!important;z-index:0!important;pointer-events:none!important;background:radial-gradient(circle,rgba(22,255,243,.30),transparent 54%),radial-gradient(circle,rgba(255,61,187,.20),transparent 68%)!important;filter:blur(calc(10px + var(--pc-audio-energy,.10) * 24px))!important;opacity:calc(.34 + var(--pc-audio-energy,.10) * .58)!important;transform:scale(calc(1 + var(--pc-audio-energy,.10) * .07))!important}
+.pc-header-logo-cell-center::before{background:radial-gradient(circle,rgba(22,255,243,.34),transparent 50%),radial-gradient(circle,rgba(255,61,187,.28),transparent 68%),radial-gradient(circle,rgba(138,77,255,.24),transparent 76%)!important;filter:blur(calc(10px + var(--pc-audio-energy,.10) * 20px))!important;opacity:calc(.42 + var(--pc-audio-energy,.10) * .50)!important;transform:scale(calc(1 + var(--pc-audio-energy,.10) * .08))!important}
+.pc-header-logo-part{position:relative!important;z-index:1!important}
+.pc-header-logo-left,.pc-header-logo-right{filter:none!important;transform:none!important}
+.pc-header-logo-center-666{filter:brightness(calc(1.02 + var(--pc-audio-energy,.10) * .34)) saturate(calc(1.08 + var(--pc-audio-energy,.10) * .72))!important;transform:scale(calc(1 + var(--pc-audio-energy,.10) * .025))!important;transition:filter .08s linear,transform .08s linear!important}
+
+.now-cover{filter:none!important;transform:none!important}
+.now-cover-wrap{position:relative!important;isolation:isolate!important;overflow:visible!important;filter:none!important;transform:none!important;box-shadow:0 0 calc(18px + var(--pc-audio-energy,.10) * 36px) rgba(22,255,243,.52),0 0 calc(10px + var(--pc-audio-energy,.10) * 24px) rgba(22,255,243,.28)!important}
+.now-cover-wrap::before{content:""!important;position:absolute!important;inset:-12px!important;z-index:-1!important;border-radius:30px!important;pointer-events:none!important;background:radial-gradient(circle,rgba(22,255,243,.45),transparent 58%),radial-gradient(circle,rgba(22,255,243,.18),transparent 76%)!important;filter:blur(calc(8px + var(--pc-audio-energy,.10) * 22px))!important;opacity:calc(.36 + var(--pc-audio-energy,.10) * .56)!important;transform:scale(calc(1 + var(--pc-audio-energy,.10) * .045))!important}
+
+/* PC-Ticker hard fix: wie Mobile, ein klares Feld + eine Animation */
+.now-playing .ticker-window{grid-column:2/4!important;width:100%!important;height:50px!important;min-height:50px!important;overflow:hidden!important;display:block!important;position:relative!important}
+#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:50px!important;line-height:50px!important;padding-left:100%!important;white-space:nowrap!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:950!important;animation:v77TickerRun 23s linear infinite!important;will-change:transform!important}
+@keyframes v77TickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+@media (max-width:760px){
+.boost-compact-v77,.boost-compact-v76,#pcBoostPanel{max-width:150px!important;gap:4px!important}
+#pcBoostMinus,#pcBoostPlus{width:24px!important;min-width:24px!important;max-width:24px!important;padding:0!important}
+#pcBoostLabel{min-width:58px!important;max-width:66px!important}
+.now-cover{filter:none!important;transform:none!important}
+.now-cover-wrap{position:relative!important;isolation:isolate!important;box-shadow:0 0 calc(14px + var(--pc-audio-energy,.10) * 26px) rgba(22,255,243,.46)!important}
+.now-cover-wrap::before{content:""!important;position:absolute!important;inset:-10px!important;z-index:-1!important;border-radius:26px!important;background:radial-gradient(circle,rgba(22,255,243,.42),transparent 62%)!important;filter:blur(calc(7px + var(--pc-audio-energy,.10) * 18px))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .52)!important}
 }
 

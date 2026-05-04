@@ -1,0 +1,76 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX",
+  "cache_tag": "smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v76_HARD_PURGE_PC_BOOST_FIX.zip",
+  "changes": [
+    "index.html: Version/Cache v77 gesetzt, Boost-Klasse auf v77 aktualisiert",
+    "css/desktop.css: v77 Boost-Kompakt, Header-Glow, türkis Cover-Glow und PC-Ticker-Hard-Fix gesetzt",
+    "js/player-core.js: Metadata-Catch hält letzte Anzeige statt harten Fehlertext zu schreiben",
+    "js/player-core.js: v77 PC-Boost real angebunden, PC-Ticker wie Mobile robust synchronisiert, Metadata-Schutz ergänzt"
+  ],
+  "warnings": [],
+  "removed": [
+    "player-core.js: undefined ensureTickerVisibleV71-Aufrufe entfernt x2",
+    "player-core.js: alter Handler v76 Hard Purge PC Boost Fix entfernt x1"
+  ],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 ticker undefined calls removed",
+      true
+    ],
+    [
+      "Block 3 PC ticker mobile-style sync",
+      true
+    ],
+    [
+      "Block 4 real boost binding",
+      true
+    ]
+  ],
+  "audit_before": {
+    "ensureTickerVisibleV71_calls": 2,
+    "metadaten_error_text": 1,
+    "v76_handler_count": 1,
+    "setBoostStage_refs": 7,
+    "ticker_ids": {
+      "nowPlayingTicker": 1,
+      "metaLine": 1,
+      "ticker-window": 1,
+      "ticker-text": 1
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v76_HARD_PURGE_PC_BOOST_FIX.zip",
+    "before_file_count": 136,
+    "after_file_count_pre_report": 136,
+    "version_v77": true,
+    "boost_dom_present": true,
+    "boost_compact_css_present": true,
+    "real_boost_binding_present": true,
+    "boost_click_capture_present": true,
+    "pc_ticker_mobile_style_sync_present": true,
+    "ticker_interval_fast_present": true,
+    "undefined_ticker_removed": true,
+    "metadata_safe_ticker_present": true,
+    "header_logo_glow_css_present": true,
+    "cover_turquoise_audio_glow_present": true,
+    "audio_watchdog_present": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 139
+  }
+}

@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
-import { applyStatusChip } from './shared-status.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
+import { applyStatusChip } from './shared-status.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -49,8 +49,8 @@ const fallbackBtn = document.getElementById('fallbackBtn');
 const statusStream = document.getElementById('statusStream');
 const statusMeta = document.getElementById('statusMeta');
 const statusSource = document.getElementById('statusSource');
-const statusMain = document.getElementById('statusMain');
-const statusBackup = document.getElementById('statusBackup');
+const statusMain = document.getElementById('mainBtn');
+const statusBackup = document.getElementById('fallbackBtn');
 const volumeSlider = document.getElementById('volumeSlider');
 const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'));
 const boostStepButtons = Array.from(document.querySelectorAll('[data-boost-step]'));
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
+   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -553,9 +553,7 @@ async function fetchMetadata() {
     }
     updateNowCover(data);
     setText(metaLine, data.title || '');
-    ensureTickerVisibleV71(data.title || '');
     setText(nowPlayingTicker, data.title || '');
-    ensureTickerVisibleV71(data.title || '');
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);
     setText(djText, data.dj);
@@ -563,7 +561,11 @@ async function fetchMetadata() {
 updateHistory(data.title);
     normalizeNowPlayingDuplicateFallback();
   } catch (err) {
-    setText(metaLine, 'Metadaten gerade nicht erreichbar');
+    const fallbackTitle = (nowPlayingTicker?.textContent || metaLine?.textContent || '').trim();
+    if (fallbackTitle && !/metadata|metadaten|loading|laden|error|fehler/i.test(fallbackTitle)) {
+      setText(metaLine, fallbackTitle);
+      setText(nowPlayingTicker, fallbackTitle);
+    }
     applyStatusChip(statusMeta, 'warn', 'Metadaten aktuell nicht erreichbar');
   } finally {
     window.clearTimeout(timer);
@@ -783,269 +785,34 @@ try {
 
 
 // ==========================================================
-// 666SOUNDsDESIGn — v75 Layer Clean Audio Meta Selfheal
+// 666SOUNDsDESIGn — v77 PC Boost Meta Glow Ticker Fix
 // Zweck:
-// - Ein Handler für LEDs / Ticker / History.
-// - Audio-Watchdog: erkennt Stalls ohne error-Event und startet sanften Reconnect.
-// - Metadata-Watchdog: letzte gültige Metadaten behalten, Fehler nicht in UI schreiben.
+// - PC-Boost ruft echte vorhandene setBoostStage/changeBoostStage Logik auf.
+// - PC-Ticker übernimmt robuste Mobile-Logik: aus metaLine/title/nowPlaying/lastGood synchronisieren.
+// - Metadata/Ticker bleiben bei Fetch-Ausfall auf letzter gültiger Anzeige.
 // ==========================================================
-(function installV75LayerCleanAudioMetaSelfheal(){
-  if (window.__v75LayerCleanAudioMetaSelfhealInstalled) return;
-  window.__v75LayerCleanAudioMetaSelfhealInstalled = true;
-
-  const qs = (id) => document.getElementById(id);
-  let lastAudioTime = 0;
-  let lastAudioMoveAt = Date.now();
-  let lastRecoverAt = 0;
-  let lastGoodMeta = '';
-  let lastMetaOkAt = 0;
-
-  function playerAudio() {
-    return document.querySelector('audio');
-  }
-
-  function shouldBePlaying() {
-    const audio = playerAudio();
-    if (!audio) return false;
-    if (audio.paused) return false;
-    if (document.body.classList.contains('is-stopped')) return false;
-    if (document.body.getAttribute('data-player-state') === 'stopped') return false;
-    return true;
-  }
-
-  function setTextSafe(el, text) {
-    if (!el) return;
-    const value = String(text || '').trim();
-    if (value && el.textContent.trim() !== value) el.textContent = value;
-  }
-
-  function setLed(el, state, active) {
-    if (!el) return;
-    el.classList.remove('state-main','state-api','state-external','state-backup','state-off','is-active','is-idle','is-error','state-error');
-    el.classList.add(state || 'state-off');
-    if (active) el.classList.add('is-active');
-  }
-
-  function boostLevel() {
-    const raw =
-      document.body.getAttribute('data-boost-level') ||
-      document.documentElement.style.getPropertyValue('--boost-level') ||
-      window.__boostLevel ||
-      window.boostLevel ||
-      0;
-    const n = Number(String(raw).replace(/[^\d.-]/g,''));
-    return Number.isFinite(n) ? n : 0;
-  }
-
-  function backupActive() {
-    const fb = qs('fallbackBtn');
-    const main = qs('mainBtn');
-    if (fb && (fb.classList.contains('is-active') || fb.getAttribute('aria-pressed') === 'true')) return true;
-    if (main && (main.classList.contains('is-active') || main.getAttribute('aria-pressed') === 'true')) return false;
-    return /back|backup|fallback/i.test(document.body.getAttribute('data-source') || document.body.getAttribute('data-stream-source') || '');
-  }
-
-  function syncPanel() {
-    const audio = playerAudio();
-    const playing = !!audio && !audio.paused && !document.body.classList.contains('is-stopped');
-    setLed(qs('statusStream'), playing ? 'state-main' : 'state-off', playing);
-    setLed(qs('statusSource'), playing ? 'state-external' : 'state-off', playing);
-
-    const metaFresh = lastMetaOkAt && (Date.now() - lastMetaOkAt < 45000);
-    setLed(qs('statusMeta'), metaFresh ? 'state-api' : (playing ? 'state-error' : 'state-off'), !!metaFresh);
-
-    const backup = backupActive();
-    setLed(qs('mainBtn'), (!backup && playing) ? 'state-main' : 'state-off', !backup && playing);
-    setLed(qs('fallbackBtn'), (backup && playing) ? 'state-backup' : 'state-off', backup && playing);
-
-    const boost = boostLevel();
-    const boostActive = boost > 0;
-    const label = qs('pcBoostLabel');
-    if (label) {
-      const code = label.querySelector('.status-code') || label;
-      code.textContent = 'BST ' + boost;
-    }
-    setLed(qs('pcBoostMinus'), boostActive ? 'state-api' : 'state-off', boostActive);
-    setLed(qs('pcBoostPlus'), boostActive ? 'state-api' : 'state-off', boostActive);
-    setLed(qs('pcBoostLabel'), boostActive ? 'state-api' : 'state-off', boostActive);
-  }
-
-  function readVisibleMeta() {
-    const meta = qs('metaLine');
-    const ticker = qs('nowPlayingTicker');
-    const txt = (meta && meta.textContent.trim()) || (ticker && ticker.textContent.trim()) || '';
-    if (txt && !/metadata|metadaten|loading|laden|error|fehler/i.test(txt)) return txt;
-    return '';
-  }
-
-  function syncTicker() {
-    const ticker = qs('nowPlayingTicker');
-    const metaLine = qs('metaLine');
-    if (!ticker) return;
-
-    const visible = readVisibleMeta();
-    if (visible) {
-      lastGoodMeta = visible;
-      lastMetaOkAt = Date.now();
-    }
-
-    const text = visible || lastGoodMeta || '666SOUNDsDESIGn WebRadio';
-    setTextSafe(ticker, text);
-
-    if (metaLine && (!metaLine.textContent.trim() || /metadata|metadaten|loading|laden|error|fehler/i.test(metaLine.textContent))) {
-      if (lastGoodMeta) metaLine.textContent = lastGoodMeta;
-    }
-  }
-
-  function installMetaObserver() {
-    const meta = qs('metaLine');
-    if (meta && window.MutationObserver) {
-      new MutationObserver(syncTicker).observe(meta, { childList:true, characterData:true, subtree:true });
-    }
-  }
-
-  function installHistory(){
-    const toggle = qs('historyToggle');
-    const panel = qs('historyPanel');
-    if (!toggle || !panel) return;
-
-    let backdrop = qs('historyOverlayBackdrop');
-    if (!backdrop) {
-      backdrop = document.createElement('div');
-      backdrop.id = 'historyOverlayBackdrop';
-      backdrop.className = 'history-overlay-backdrop hidden';
-      document.body.appendChild(backdrop);
-    }
-
-    if (panel.parentElement !== document.body) document.body.appendChild(panel);
-    panel.classList.add('history-overlay-panel','hidden');
-
-    function open(){
-      panel.classList.remove('hidden');
-      backdrop.classList.remove('hidden');
-      document.documentElement.classList.add('history-overlay-open');
-      document.body.classList.add('history-overlay-open');
-    }
-
-    function close(){
-      panel.classList.add('hidden');
-      backdrop.classList.add('hidden');
-      document.documentElement.classList.remove('history-overlay-open');
-      document.body.classList.remove('history-overlay-open');
-    }
-
-    function toggleHistory(ev){
-      ev.preventDefault();
-      ev.stopPropagation();
-      panel.classList.contains('hidden') ? open() : close();
-    }
-
-    if (toggle.__v75HistoryHandler) toggle.removeEventListener('click', toggle.__v75HistoryHandler);
-    toggle.__v75HistoryHandler = toggleHistory;
-    toggle.addEventListener('click', toggleHistory);
-
-    backdrop.onclick = close;
-    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') close(); }, { passive:true });
-    document.addEventListener('click', (ev) => {
-      if (panel.classList.contains('hidden')) return;
-      if (panel.contains(ev.target) || toggle.contains(ev.target)) return;
-      close();
-    }, true);
-  }
-
-  function markAudioMoved(audio) {
-    const current = Number(audio.currentTime || 0);
-    if (Math.abs(current - lastAudioTime) > 0.05) {
-      lastAudioTime = current;
-      lastAudioMoveAt = Date.now();
-    }
-  }
-
-  function softRecoverAudio(reason) {
-    const audio = playerAudio();
-    if (!audio) return;
-    const now = Date.now();
-    if (now - lastRecoverAt < 12000) return;
-    lastRecoverAt = now;
-
-    try {
-      const src = audio.currentSrc || audio.src;
-      if (!src) return;
-      const volume = audio.volume;
-      const muted = audio.muted;
-      audio.pause();
-      audio.src = src.includes('?') ? src + '&r=' + now : src + '?r=' + now;
-      audio.load();
-      audio.volume = volume;
-      audio.muted = muted;
-      const playPromise = audio.play();
-      if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
-      document.body.setAttribute('data-last-audio-recover', reason || 'stall');
-    } catch (err) {
-      document.body.setAttribute('data-last-audio-recover-error', String(err && err.message || err));
-    }
-  }
-
-  function audioWatchdog() {
-    const audio = playerAudio();
-    if (!audio) return;
-
-    markAudioMoved(audio);
-
-    if (!shouldBePlaying()) {
-      lastAudioTime = Number(audio.currentTime || 0);
-      lastAudioMoveAt = Date.now();
-      return;
-    }
-
-    const stalledFor = Date.now() - lastAudioMoveAt;
-    const weakState = audio.readyState < 2 || audio.networkState === 3;
-    if (stalledFor > 9000 || (weakState && stalledFor > 5500)) {
-      softRecoverAudio(weakState ? 'weak-state' : 'no-time-progress');
-    }
-  }
-
-  function metadataWatchdog() {
-    const meta = readVisibleMeta();
-    if (meta) {
-      lastGoodMeta = meta;
-      lastMetaOkAt = Date.now();
-    }
-    const metaLine = qs('metaLine');
-    if (lastGoodMeta && metaLine && /metadata|metadaten|loading|laden|error|fehler/i.test(metaLine.textContent || '')) {
-      metaLine.textContent = lastGoodMeta;
-    }
-  }
-
-  function boot() {
-    syncTicker();
-    installMetaObserver();
-    installHistory();
-
-    const audio = playerAudio();
-    if (audio) {
-      ['timeupdate','playing','canplay','loadeddata'].forEach((eventName) => {
-        audio.addEventListener(eventName, () => {
-          markAudioMoved(audio);
-          syncPanel();
-        }, { passive:true });
-      });
-      ['waiting','stalled','suspend','emptied'].forEach((eventName) => {
-        audio.addEventListener(eventName, () => setTimeout(audioWatchdog, 1800), { passive:true });
-      });
-      audio.addEventListener('error', () => setTimeout(() => softRecoverAudio('audio-error'), 1000), { passive:true });
-    }
-
-    setInterval(() => {
-      syncTicker();
-      metadataWatchdog();
-      audioWatchdog();
-      syncPanel();
-    }, 2500);
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
-  else boot();
+(function installV77PcBoostMetaGlowTickerFix(){
+  if(window.__v77PcBoostMetaGlowTickerFixInstalled)return;window.__v77PcBoostMetaGlowTickerFixInstalled=true;
+  const qs=id=>document.getElementById(id);let lastAudioTime=0,lastAudioMoveAt=Date.now(),lastRecoverAt=0,lastGoodMeta='',lastMetaOkAt=0;
+  function clamp(v){const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(3,Math.round(n))):0}
+  function level(){const raw=window.__boostLevel??document.body.getAttribute('data-boost-level')??document.documentElement.style.getPropertyValue('--boost-level')??0;return clamp(String(raw).replace(/[^\d.-]/g,''))}
+  function mirror(lv){const safe=clamp(lv);window.__boostLevel=safe;document.body.setAttribute('data-boost-level',String(safe));document.body.setAttribute('data-mobile-boost',String(safe));document.documentElement.style.setProperty('--boost-level',String(safe));document.documentElement.style.setProperty('--player-boost-level',String(safe));const gain=1+(safe*.10);document.documentElement.style.setProperty('--player-boost-gain',gain.toFixed(2));const label=qs('pcBoostLabel');if(label)(label.querySelector('.status-code')||label).textContent='BST '+safe;window.dispatchEvent(new CustomEvent('playerboostchange',{detail:{level:safe,gain}}));return safe}
+  function applyBoost(lv){const safe=clamp(lv);let applied=safe;try{if(typeof setBoostStage==='function'){const r=setBoostStage(safe);applied=clamp(typeof r==='number'?r:safe)}else if(typeof changeBoostStage==='function'){const r=changeBoostStage(safe-level());applied=clamp(typeof r==='number'?r:safe)}}catch(err){document.body.setAttribute('data-boost-error',String(err&&err.message||err))}mirror(applied);syncPanel()}
+  function boostControls(){const minus=qs('pcBoostMinus'),plus=qs('pcBoostPlus');if(minus&&!minus.__v77BoostBound){minus.__v77BoostBound=true;minus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()-1);},true)}if(plus&&!plus.__v77BoostBound){plus.__v77BoostBound=true;plus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()+1);},true)}}
+  function audioEl(){return document.querySelector('audio')}
+  function setLed(el,state,active){if(!el)return;el.classList.remove('state-main','state-api','state-external','state-backup','state-off','is-active','is-idle','is-error','state-error');el.classList.add(state||'state-off');if(active)el.classList.add('is-active')}
+  function backupActive(){const fb=qs('fallbackBtn'),mb=qs('mainBtn');if(fb&&(fb.classList.contains('is-active')||fb.getAttribute('aria-pressed')==='true'))return true;if(mb&&(mb.classList.contains('is-active')||mb.getAttribute('aria-pressed')==='true'))return false;return /back|backup|fallback/i.test(document.body.getAttribute('data-source')||document.body.getAttribute('data-stream-source')||'')}
+  function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
+  function readMetaLikeMobile(){const ids=['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle'];for(const id of ids){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}const dataTitle=document.body.getAttribute('data-current-title')||document.body.getAttribute('data-now-playing')||'';return valid(dataTitle)}
+  function syncTicker(){const ticker=qs('nowPlayingTicker');const metaLine=qs('metaLine');if(!ticker)return;const visible=readMetaLikeMobile();if(visible){lastGoodMeta=visible;lastMetaOkAt=Date.now()}const text=visible||lastGoodMeta||'666SOUNDsDESIGn WebRadio';if(ticker.textContent.trim()!==text){ticker.textContent=text;ticker.setAttribute('data-ticker-live','true')}if(metaLine&&lastGoodMeta&&!valid(metaLine.textContent))metaLine.textContent=lastGoodMeta}
+  function syncPanel(){const a=audioEl();const playing=!!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped';setLed(qs('statusStream'),playing?'state-main':'state-off',playing);setLed(qs('statusSource'),playing?'state-external':'state-off',playing);const metaFresh=lastMetaOkAt&&(Date.now()-lastMetaOkAt<45000);setLed(qs('statusMeta'),metaFresh?'state-api':(playing?'state-error':'state-off'),!!metaFresh);const b=backupActive();setLed(qs('mainBtn'),(!b&&playing)?'state-main':'state-off',!b&&playing);setLed(qs('fallbackBtn'),(b&&playing)?'state-backup':'state-off',b&&playing);const active=level()>0;setLed(qs('pcBoostMinus'),active?'state-api':'state-off',active);setLed(qs('pcBoostPlus'),active?'state-api':'state-off',active);setLed(qs('pcBoostLabel'),active?'state-api':'state-off',active)}
+  function installHistory(){const toggle=qs('historyToggle'),panel=qs('historyPanel');if(!toggle||!panel)return;let backdrop=qs('historyOverlayBackdrop');if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel','hidden');const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open')};const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open')};const click=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v77HistoryHandler)toggle.removeEventListener('click',toggle.__v77HistoryHandler);toggle.__v77HistoryHandler=click;toggle.addEventListener('click',click);backdrop.onclick=close;document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true});document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true)}
+  function mark(a){const c=Number(a.currentTime||0);if(Math.abs(c-lastAudioTime)>.05){lastAudioTime=c;lastAudioMoveAt=Date.now()}}
+  function shouldPlay(){const a=audioEl();return !!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped'}
+  function recover(reason){const a=audioEl();if(!a)return;const now=Date.now();if(now-lastRecoverAt<12000)return;lastRecoverAt=now;try{const src=a.currentSrc||a.src;if(!src)return;const vol=a.volume,muted=a.muted;a.pause();a.src=src.includes('?')?src+'&r='+now:src+'?r='+now;a.load();a.volume=vol;a.muted=muted;const p=a.play();if(p&&typeof p.catch==='function')p.catch(()=>{});document.body.setAttribute('data-last-audio-recover',reason||'stall')}catch(err){document.body.setAttribute('data-last-audio-recover-error',String(err&&err.message||err))}}
+  function audioWatchdog(){const a=audioEl();if(!a)return;mark(a);if(!shouldPlay()){lastAudioTime=Number(a.currentTime||0);lastAudioMoveAt=Date.now();return}const stalled=Date.now()-lastAudioMoveAt;const weak=a.readyState<2||a.networkState===3;if(stalled>9000||(weak&&stalled>5500))recover(weak?'weak-state':'no-time-progress')}
+  function boot(){boostControls();mirror(level());installHistory();syncTicker();const observerTarget=qs('metaLine');if(observerTarget&&window.MutationObserver)new MutationObserver(syncTicker).observe(observerTarget,{childList:true,characterData:true,subtree:true});const a=audioEl();if(a){['timeupdate','playing','canplay','loadeddata'].forEach(n=>a.addEventListener(n,()=>{mark(a);syncPanel()},{passive:true}));['waiting','stalled','suspend','emptied'].forEach(n=>a.addEventListener(n,()=>setTimeout(audioWatchdog,1800),{passive:true}));a.addEventListener('error',()=>setTimeout(()=>recover('audio-error'),1000),{passive:true})}setInterval(()=>{boostControls();syncTicker();audioWatchdog();mirror(level());syncPanel()},900)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
-// END v75 Layer Clean Audio Meta Selfheal
+// END v77 PC Boost Meta Glow Ticker Fix
 

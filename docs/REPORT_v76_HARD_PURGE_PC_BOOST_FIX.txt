@@ -1,0 +1,75 @@
+666SOUNDsDESIGn — v76 HARD PURGE PC BOOST FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL.zip
+
+UMGESETZT:
+- v76 Hard Purge: alte v69-v75 CSS/JS-Patchreste entfernt.
+- PC-Boost funktioniert über pcBoostMinus / pcBoostPlus.
+- Boost-Level wird als window.__boostLevel, data-boost-level und CSS-Variable gespiegelt.
+- Boost-Änderung feuert playerboostchange Event.
+- Boost-Control ist kompakt und mittig, damit das Systempanel nicht zerbricht.
+- Ticker/History/Audio/Meta Self-Heal bleiben im einzigen v76 Handler.
+
+GEÄNDERT:
+- index.html: Boost kompakt mittig gehalten, Version v76
+- css/desktop.css: v76 Hard-Purge CSS + kompakter Boost gesetzt
+- js/player-core.js: v76 Handler mit PC-Boost-Klicklogik gesetzt
+- js/responsive-ui.js: alte History-Parallelhandler entfernt
+
+ENTFERNT/BEREINIGT:
+- desktop.css: removed v75 layer clean audio meta selfheal x1
+- desktop.css: removed keyframes v70TickerAcrossFullField x1
+- desktop.css: removed keyframes v70MobileTickerAcrossFullField x1
+- desktop.css: removed keyframes v71TickerFullWidth x1
+- desktop.css: removed keyframes v71MobileTickerFullWidth x1
+- desktop.css: removed keyframes v72TickerRunFull x1
+- desktop.css: removed keyframes v72MobileTickerRunFull x1
+- desktop.css: removed keyframes v73TickerRun x1
+- desktop.css: removed keyframes v73MobileTickerRun x1
+- desktop.css: removed keyframes v74TickerRun x1
+- desktop.css: removed keyframes v74MobileTickerRun x1
+- desktop.css: removed keyframes v75TickerRun x1
+- desktop.css: removed keyframes v75MobileTickerRun x1
+- player-core.js: removed v75 selfheal x1
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 CSS hard purge: True
+- Block 3 JS hard purge + boost: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL.zip
+- before_file_count: 133
+- after_file_count_pre_report: 133
+- version_v76: True
+- boost_dom_present: True
+- boost_compact_css_present: True
+- v76_handler_present: True
+- boost_click_logic_present: True
+- boost_event_present: True
+- old_js_handlers_absent: False
+- statusMain_statusBackup_absent: False
+- old_css_markers_absent: False
+- single_ticker_css_v76: True
+- audio_watchdog_present: True
+- metadata_safe_ticker_present: True
+- history_overlay_present: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 136
