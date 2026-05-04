@@ -1,0 +1,114 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v74_PC_IPHONE_SYSTEMPANEL_ALIGNMENT",
+  "cache_tag": "smfp-v74-pc-iphone-systempanel-alignment-20260430-2145",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX.zip",
+  "changes": [
+    "index.html: top-hud kanonisch auf iPhone-style status-chip/led-state Struktur ersetzt",
+    "js/player-core.js: v74 Binding für LEDs/Ticker/History/Boost gesetzt",
+    "js/responsive-ui.js: alte History-Parallel-Logik entfernt",
+    "css/desktop.css: alte v69-v73 Layer entfernt (1) und v74 Kanonik gesetzt"
+  ],
+  "warnings": [],
+  "removed": [
+    "player-core.js: removed v73 ticker/history x1",
+    "desktop.css: removed v73 boost ticker history header clean fix x1"
+  ],
+  "block_checks": [
+    [
+      "Block 1 audit/find",
+      true
+    ],
+    [
+      "Block 2 canonical DOM",
+      true
+    ],
+    [
+      "Block 3 JS cleanup/binding",
+      true
+    ],
+    [
+      "Block 4 CSS canonical",
+      true
+    ]
+  ],
+  "audit_findings": {
+    "status_chip_count": 3,
+    "led_state_count": 3,
+    "status_dot_count": 3,
+    "boost_step_count": 12,
+    "old_markers": {
+      "v69": 0,
+      "v70": 4,
+      "v71": 4,
+      "v72": 4,
+      "v73": 31,
+      "ensureTickerVisibleV71": 2,
+      "Ticker Force Sync": 0,
+      "installV73CleanTickerHistoryBoost": 1,
+      "installMobileHistoryOverlayV69": 0
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX.zip",
+    "before_file_count": 127,
+    "after_file_count_pre_report": 127,
+    "version_v74": true,
+    "block_checks": [
+      [
+        "Block 1 audit/find",
+        true
+      ],
+      [
+        "Block 2 canonical DOM",
+        true
+      ],
+      [
+        "Block 3 JS cleanup/binding",
+        true
+      ],
+      [
+        "Block 4 CSS canonical",
+        true
+      ]
+    ],
+    "audit_findings": {
+      "status_chip_count": 3,
+      "led_state_count": 3,
+      "status_dot_count": 3,
+      "boost_step_count": 12,
+      "old_markers": {
+        "v69": 0,
+        "v70": 4,
+        "v71": 4,
+        "v72": 4,
+        "v73": 31,
+        "ensureTickerVisibleV71": 2,
+        "Ticker Force Sync": 0,
+        "installV73CleanTickerHistoryBoost": 1,
+        "installMobileHistoryOverlayV69": 0
+      }
+    },
+    "canonical_systempanel_present": true,
+    "boost_center_present": true,
+    "all_status_ids_once": true,
+    "iphone_led_classes_used": true,
+    "v74_binding_present": true,
+    "old_parallel_handlers_removed": false,
+    "old_css_markers_removed": true,
+    "ticker_css_present": true,
+    "history_overlay_css_present": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 130
+  }
+}

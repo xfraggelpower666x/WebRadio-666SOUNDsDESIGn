@@ -24,7 +24,7 @@ ZWECK: Desktop-Feinschliff.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v73 BOOST TICKER HISTORY HEADER CLEAN FIX
+666SOUNDsDESIGn — v75 LAYER CLEAN AUDIO META SELFHEAL
 GEÄNDERT: 2026-04-30
 ZWECK:
 - Eine einzige kanonische Desktop-Layout-Schicht.
@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -1434,13 +1434,6 @@ ZWECK:
   }
 }
 
-
-/* v73 boost ticker history header clean fix */
-.history-overlay-backdrop{position:fixed!important;inset:0!important;z-index:2147482990!important;display:block!important;background:rgba(0,0,0,.62)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
-.history-overlay-backdrop.hidden{display:none!important}
-#historyPanel.history-overlay-panel,.history-overlay-panel{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(92vw,520px)!important;max-height:min(74vh,620px)!important;overflow:auto!important;z-index:2147483000!important;margin:0!important;padding:17px 18px!important;border-radius:22px!important;border:1px solid rgba(255,61,187,.66)!important;background:radial-gradient(circle at 18% 0%,rgba(255,61,187,.20),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.14),transparent 38%),rgba(3,7,20,.98)!important;box-shadow:0 0 38px rgba(255,61,187,.34),0 0 30px rgba(22,255,243,.20),inset 0 0 26px rgba(255,255,255,.035)!important}
-#historyPanel.hidden,.history-overlay-panel.hidden{display:none!important}
-html.history-overlay-open,body.history-overlay-open{overflow:hidden!important}
 @media (min-width:761px){
 .hero{min-height:130px!important;max-height:168px!important}
 .pc-header-brand-split.pc-header-brand-three{width:min(88%,1040px)!important;max-width:1040px!important;min-height:126px!important;display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:center!important;justify-items:center!important;gap:clamp(28px,3vw,58px)!important;margin:0 auto!important;filter:none!important;transform:none!important}
@@ -1472,5 +1465,332 @@ html.history-overlay-open,body.history-overlay-open{overflow:hidden!important}
 .now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}
 #nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;padding-left:100%!important;white-space:nowrap!important;animation:v73MobileTickerRun 22s linear infinite!important}
 @keyframes v73MobileTickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+
+@media (min-width:761px){
+.top-hud.systempanel-v74{width:calc(100% - 44px)!important;max-width:calc(100% - 44px)!important;margin:0 auto 8px auto!important;padding:0!important;box-sizing:border-box!important}
+.systempanel-grid-v74{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:minmax(245px,1fr) auto minmax(245px,1fr)!important;align-items:center!important;gap:14px!important;padding:6px 12px!important;box-sizing:border-box!important;overflow:hidden!important}
+.systempanel-group{display:inline-flex!important;align-items:center!important;gap:9px!important;min-width:0!important}.systempanel-left{justify-content:flex-start!important}.systempanel-center{justify-content:center!important}.systempanel-right{justify-content:flex-end!important}
+.systempanel-left .status-chip{min-width:74px!important}.systempanel-center .status-chip{min-width:40px!important}#pcBoostLabel{min-width:76px!important}.systempanel-right .status-chip{min-width:70px!important}#pcVersionBadge{min-width:56px!important;margin-left:12px!important}
+.hero{min-height:130px!important;max-height:168px!important}.pc-header-brand-split.pc-header-brand-three{width:min(88%,1040px)!important;max-width:1040px!important;min-height:126px!important;display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:center!important;justify-items:center!important;gap:clamp(28px,3vw,58px)!important;margin:0 auto!important;filter:none!important;transform:none!important}
+.pc-header-logo-cell{position:relative!important;display:grid!important;place-items:center!important;min-height:118px!important}.pc-header-logo-cell::before{content:""!important;position:absolute!important;inset:12px!important;border-radius:999px!important;pointer-events:none!important;background:radial-gradient(circle,rgba(255,61,187,.30),transparent 58%),radial-gradient(circle,rgba(22,255,243,.22),transparent 66%)!important;filter:blur(calc(12px + var(--pc-audio-energy,.10) * 22px))!important;opacity:calc(.28 + var(--pc-audio-energy,.10) * .58)!important;z-index:0!important}
+.pc-header-logo-cell-center::before{opacity:.34!important;filter:blur(14px)!important}.pc-header-logo-part{position:relative!important;z-index:1!important;display:block!important;object-fit:contain!important;height:auto!important;filter:none!important;transform:none!important}.pc-header-logo-left,.pc-header-logo-right{max-height:92px!important;max-width:360px!important}
+.pc-header-logo-center-666{max-height:102px!important;max-width:300px!important;filter:brightness(calc(1.02 + var(--pc-audio-energy,.10) * .32)) saturate(calc(1.06 + var(--pc-audio-energy,.10) * .70))!important;transform:scale(calc(1 + var(--pc-audio-energy,.10) * .022))!important;transition:filter .08s linear,transform .08s linear!important}
+.now-cover{filter:none!important;transform:none!important}.now-cover-wrap{position:relative!important;filter:none!important;transform:none!important;overflow:visible!important;box-shadow:0 0 calc(18px + var(--pc-audio-energy,.10) * 28px) rgba(255,61,187,.30),0 0 calc(14px + var(--pc-audio-energy,.10) * 24px) rgba(22,255,243,.22),0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(138,77,255,.20)!important}
+.now-cover-wrap::before{content:""!important;position:absolute!important;inset:-10px!important;z-index:-1!important;border-radius:28px!important;background:radial-gradient(circle,rgba(255,61,187,.30),transparent 58%),radial-gradient(circle,rgba(22,255,243,.20),transparent 66%)!important;filter:blur(calc(8px + var(--pc-audio-energy,.10) * 16px))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .54)!important}
+.now-playing .ticker-window{grid-column:2/4!important;width:100%!important;height:50px!important;min-height:50px!important;overflow:hidden!important;display:block!important;position:relative!important}
+#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:50px!important;line-height:50px!important;padding-left:100%!important;white-space:nowrap!important;color:#ff4fc7!important;font-size:clamp(13px,1.05vw,16px)!important;font-weight:950!important;animation:v74TickerRun 23s linear infinite!important}
+@keyframes v74TickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+@media (max-width:760px){
+.systempanel-v74{width:calc(100vw - 18px)!important;max-width:calc(100vw - 18px)!important;margin:6px auto 8px!important}.systempanel-grid-v74{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto auto auto!important;gap:6px!important;padding:7px 8px!important;overflow:visible!important}
+.systempanel-left,.systempanel-center,.systempanel-right{display:flex!important;justify-content:center!important;gap:6px!important;flex-wrap:nowrap!important;min-width:0!important}.status-chip.led-state{min-height:28px!important;font-size:10px!important;padding:0 8px!important;gap:6px!important}.status-chip.led-state .status-dot{width:8px!important;height:8px!important;flex-basis:8px!important}#pcBoostLabel{min-width:58px!important}
+.pc-header-brand-three{display:none!important}.now-cover{filter:none!important;transform:none!important}.now-cover-wrap{filter:none!important;transform:none!important;box-shadow:0 0 calc(14px + var(--pc-audio-energy,.10) * 22px) rgba(255,61,187,.28),0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(22,255,243,.20)!important}
+.now-playing .ticker-window{height:42px!important;min-height:42px!important;overflow:hidden!important;display:block!important}#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:42px!important;line-height:42px!important;padding-left:100%!important;white-space:nowrap!important;animation:v74MobileTickerRun 22s linear infinite!important}
+@keyframes v74MobileTickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 100vw))}}
+}
+
+
+/* v75 layer clean audio meta selfheal */
+
+/*
+  Einziger aktiver Patchblock für:
+  - Systempanel LED-Technik
+  - Ticker
+  - History Overlay
+  - Header/Cover Glow
+  Alte v69-v74 Patchblöcke wurden vor diesem Block physisch entfernt.
+*/
+
+.status-chip.led-state {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 31px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  background: rgba(5,8,22,.74) !important;
+  color: #dfe7ff !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+  letter-spacing: .10em !important;
+  text-transform: uppercase !important;
+  padding: 0 12px !important;
+  box-shadow: inset 0 0 14px rgba(0,0,0,.24), 0 0 13px rgba(22,255,243,.10) !important;
+}
+
+.status-chip.led-state .status-dot {
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  flex: 0 0 9px !important;
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.58) !important;
+  box-shadow: 0 0 6px rgba(255,255,255,.22) !important;
+}
+
+.status-chip.led-state.state-main .status-dot,
+.status-chip.led-state.state-api .status-dot,
+.status-chip.led-state.state-external .status-dot {
+  background: #28fff4 !important;
+  border-color: rgba(40,255,244,.96) !important;
+  box-shadow: 0 0 10px rgba(22,255,243,.95), 0 0 18px rgba(22,255,243,.36) !important;
+}
+
+.status-chip.led-state.state-backup .status-dot,
+.status-chip.led-state.boost-status.state-api .status-dot {
+  background: #c047ff !important;
+  border-color: rgba(192,71,255,.95) !important;
+  box-shadow: 0 0 10px rgba(192,71,255,.90), 0 0 18px rgba(255,61,187,.34) !important;
+}
+
+.status-chip.led-state.state-error .status-dot,
+.status-chip.led-state.is-error .status-dot {
+  background: #ff3dbb !important;
+  border-color: rgba(255,61,187,.95) !important;
+  box-shadow: 0 0 10px rgba(255,61,187,.90), 0 0 18px rgba(255,61,187,.36) !important;
+}
+
+.history-overlay-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147482990 !important;
+  display: block !important;
+  background: rgba(0,0,0,.62) !important;
+  backdrop-filter: blur(7px) !important;
+  -webkit-backdrop-filter: blur(7px) !important;
+}
+.history-overlay-backdrop.hidden { display: none !important; }
+
+#historyPanel.history-overlay-panel,
+.history-overlay-panel {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(92vw, 520px) !important;
+  max-height: min(74vh, 620px) !important;
+  overflow: auto !important;
+  z-index: 2147483000 !important;
+  margin: 0 !important;
+  padding: 17px 18px !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255,61,187,.66) !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,61,187,.20), transparent 35%),
+    radial-gradient(circle at 84% 18%, rgba(22,255,243,.14), transparent 38%),
+    rgba(3,7,20,.98) !important;
+  box-shadow:
+    0 0 38px rgba(255,61,187,.34),
+    0 0 30px rgba(22,255,243,.20),
+    inset 0 0 26px rgba(255,255,255,.035) !important;
+}
+#historyPanel.hidden,
+.history-overlay-panel.hidden { display: none !important; }
+
+@media (min-width: 761px) {
+  .top-hud.systempanel-v74 {
+    width: calc(100% - 44px) !important;
+    max-width: calc(100% - 44px) !important;
+    margin: 0 auto 8px auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .systempanel-grid-v74 {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(245px, 1fr) auto minmax(245px, 1fr) !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 6px 12px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .systempanel-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    min-width: 0 !important;
+  }
+
+  .systempanel-left { justify-content: flex-start !important; }
+  .systempanel-center { justify-content: center !important; }
+  .systempanel-right { justify-content: flex-end !important; }
+
+  .systempanel-left .status-chip { min-width: 74px !important; }
+  .systempanel-center .status-chip { min-width: 40px !important; }
+  #pcBoostLabel { min-width: 76px !important; }
+  .systempanel-right .status-chip { min-width: 70px !important; }
+  #pcVersionBadge { min-width: 56px !important; margin-left: 12px !important; }
+
+  .pc-header-logo-cell::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 12px !important;
+    border-radius: 999px !important;
+    pointer-events: none !important;
+    background:
+      radial-gradient(circle, rgba(255,61,187,.30), transparent 58%),
+      radial-gradient(circle, rgba(22,255,243,.22), transparent 66%) !important;
+    filter: blur(calc(12px + var(--pc-audio-energy,.10) * 22px)) !important;
+    opacity: calc(.28 + var(--pc-audio-energy,.10) * .58) !important;
+    z-index: 0 !important;
+  }
+
+  .pc-header-logo-cell-center::before {
+    opacity: .34 !important;
+    filter: blur(14px) !important;
+  }
+
+  .pc-header-logo-left,
+  .pc-header-logo-right {
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .pc-header-logo-center-666 {
+    filter:
+      brightness(calc(1.02 + var(--pc-audio-energy,.10) * .32))
+      saturate(calc(1.06 + var(--pc-audio-energy,.10) * .70)) !important;
+    transform: scale(calc(1 + var(--pc-audio-energy,.10) * .022)) !important;
+  }
+
+  .now-cover {
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .now-cover-wrap {
+    position: relative !important;
+    filter: none !important;
+    transform: none !important;
+    overflow: visible !important;
+    box-shadow:
+      0 0 calc(18px + var(--pc-audio-energy,.10) * 28px) rgba(255,61,187,.30),
+      0 0 calc(14px + var(--pc-audio-energy,.10) * 24px) rgba(22,255,243,.22),
+      0 0 calc(12px + var(--pc-audio-energy,.10) * 18px) rgba(138,77,255,.20) !important;
+  }
+
+  .now-cover-wrap::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: -10px !important;
+    z-index: -1 !important;
+    border-radius: 28px !important;
+    background:
+      radial-gradient(circle, rgba(255,61,187,.30), transparent 58%),
+      radial-gradient(circle, rgba(22,255,243,.20), transparent 66%) !important;
+    filter: blur(calc(8px + var(--pc-audio-energy,.10) * 16px)) !important;
+    opacity: calc(.32 + var(--pc-audio-energy,.10) * .54) !important;
+  }
+
+  .now-playing .ticker-window {
+    grid-column: 2 / 4 !important;
+    width: 100% !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    overflow: hidden !important;
+    display: block !important;
+    position: relative !important;
+  }
+
+  #nowPlayingTicker,
+  .now-playing .ticker-text {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    height: 50px !important;
+    line-height: 50px !important;
+    padding-left: 100% !important;
+    white-space: nowrap !important;
+    color: #ff4fc7 !important;
+    font-size: clamp(13px, 1.05vw, 16px) !important;
+    font-weight: 950 !important;
+    animation: v75TickerRun 23s linear infinite !important;
+  }
+
+  @keyframes v75TickerRun {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - 100vw)); }
+  }
+}
+
+@media (max-width: 760px) {
+  .systempanel-v74 {
+    width: calc(100vw - 18px) !important;
+    max-width: calc(100vw - 18px) !important;
+    margin: 6px auto 8px !important;
+  }
+
+  .systempanel-grid-v74 {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 6px !important;
+    padding: 7px 8px !important;
+    overflow: visible !important;
+  }
+
+  .systempanel-left,
+  .systempanel-center,
+  .systempanel-right {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    min-width: 0 !important;
+  }
+
+  .status-chip.led-state {
+    min-height: 28px !important;
+    font-size: 10px !important;
+    padding: 0 8px !important;
+    gap: 6px !important;
+  }
+
+  .status-chip.led-state .status-dot {
+    width: 8px !important;
+    height: 8px !important;
+    flex-basis: 8px !important;
+  }
+
+  #pcBoostLabel { min-width: 58px !important; }
+
+  .now-cover { filter: none !important; transform: none !important; }
+
+  .now-playing .ticker-window {
+    height: 42px !important;
+    min-height: 42px !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+
+  #nowPlayingTicker,
+  .now-playing .ticker-text {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: max-content !important;
+    min-width: 100% !important;
+    height: 42px !important;
+    line-height: 42px !important;
+    padding-left: 100% !important;
+    white-space: nowrap !important;
+    animation: v75MobileTickerRun 22s linear infinite !important;
+  }
+
+  @keyframes v75MobileTickerRun {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - 100vw)); }
+  }
 }
 

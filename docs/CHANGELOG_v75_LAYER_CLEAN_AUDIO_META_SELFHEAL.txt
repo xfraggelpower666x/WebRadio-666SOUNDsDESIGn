@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v75 LAYER CLEAN AUDIO META SELFHEAL
+
+Geändert:
+- index.html: Version/Cache
+- css/desktop.css: alte v69-v74 Layer entfernt, v75 Kanonik gesetzt
+- js/player-core.js: v75 Self-Heal Handler für Audio/Meta/Ticker/History/LEDs
+- js/responsive-ui.js: alter History-Parallelhandler entfernt
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

@@ -1,0 +1,107 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL",
+  "cache_tag": "smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v74_PC_IPHONE_SYSTEMPANEL_ALIGNMENT.zip",
+  "changes": [
+    "index.html: Version/Cache auf v75 aktualisiert",
+    "css/desktop.css: alte v69-v74 Patchblöcke entfernt (1) und v75-Kanonik gesetzt",
+    "js/player-core.js: alte Parallelhandler entfernt und v75 Audio/Meta/Ticker/History/Self-Heal gesetzt",
+    "js/responsive-ui.js: alter Mobile-History-Parallelhandler entfernt"
+  ],
+  "warnings": [],
+  "removed": [
+    "desktop.css: entfernte alten Block 'v74 pc iphone systempanel alignment' x1",
+    "player-core.js: entfernte v74 binding x1"
+  ],
+  "checks": [
+    [
+      "Block 1 audit complete",
+      true
+    ],
+    [
+      "Block 2 CSS old patch blocks removed",
+      true
+    ],
+    [
+      "Block 3 JS old handlers removed + v75 installed",
+      false
+    ]
+  ],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v74_PC_IPHONE_SYSTEMPANEL_ALIGNMENT.zip",
+    "before_file_count": 130,
+    "after_file_count_pre_report": 130,
+    "version_v75": true,
+    "checks": [
+      [
+        "Block 1 audit complete",
+        true
+      ],
+      [
+        "Block 2 CSS old patch blocks removed",
+        true
+      ],
+      [
+        "Block 3 JS old handlers removed + v75 installed",
+        false
+      ]
+    ],
+    "audit_before": {
+      "css_old_markers": {
+        "v69 mobile history source restore": 0,
+        "v70 bg audio ticker mobile dj fix": 0,
+        "v71 pc background ticker panel meter version fix": 0,
+        "v72 bottom meter panel ticker cover fix": 0,
+        "v73 boost ticker history header clean fix": 0,
+        "v74 pc iphone systempanel alignment": 1,
+        "v74TickerRun": 2,
+        "v73TickerRun": 2,
+        "v72TickerRunFull": 2,
+        "v71TickerFullWidth": 2,
+        "v70TickerAcrossFullField": 2
+      },
+      "js_old_handlers": {
+        "ensureTickerVisibleV71": 2,
+        "installTickerForceSyncV72": 0,
+        "installV73CleanTickerHistoryBoost": 0,
+        "installMobileHistoryOverlayV69": 0,
+        "installV74SystempanelBinding": 1,
+        "statusMain": 6,
+        "statusBackup": 6
+      },
+      "dom_ids": {
+        "statusStream": 1,
+        "statusMeta": 1,
+        "statusSource": 1,
+        "mainBtn": 1,
+        "fallbackBtn": 1,
+        "pcBoostPanel": 1,
+        "pcVersionBadge": 1,
+        "nowPlayingTicker": 1,
+        "historyToggle": 1,
+        "historyPanel": 1
+      }
+    },
+    "old_css_markers_removed": true,
+    "old_js_handlers_removed": false,
+    "v75_binding_present": true,
+    "audio_watchdog_present": true,
+    "metadata_watchdog_present": true,
+    "ticker_single_v75_css": false,
+    "history_single_overlay": true,
+    "statusMain_statusBackup_absent_in_js": false,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 133
+  }
+}

@@ -1,0 +1,62 @@
+666SOUNDsDESIGn — v74 PC/iPHONE SYSTEMPANEL ALIGNMENT
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX.zip
+
+2ER-BLOCK-ARBEIT:
+- Block 1 audit/find: True
+- Block 2 canonical DOM: True
+- Block 3 JS cleanup/binding: True
+- Block 4 CSS canonical: True
+
+UMGESETZT:
+- Systempanel vollständig kanonisch ersetzt statt neue Fake-LED-Layer anzuhängen.
+- PC nutzt jetzt dieselben Grundklassen wie iPhone/Mobile: status-chip / led-state / status-dot / status-code.
+- Boost sitzt mittig in der Systempanel-Zeile.
+- STR / META / SRC / MAIN / BACK / BOOST / Version haben dieselbe LED-Grundtechnik.
+- Alte v69-v73 History/Ticker/CSS-Parallelblöcke wurden entfernt.
+- v74 Systempanel-Binding synchronisiert LEDs, Ticker, History und Boost-Anzeige.
+- PC/iPhone HUD-Look stärker angeglichen, ohne PC-Levelmeter/EQ/Desktop-Hintergrund zu entfernen.
+
+GEÄNDERT:
+- index.html: top-hud kanonisch auf iPhone-style status-chip/led-state Struktur ersetzt
+- js/player-core.js: v74 Binding für LEDs/Ticker/History/Boost gesetzt
+- js/responsive-ui.js: alte History-Parallel-Logik entfernt
+- css/desktop.css: alte v69-v73 Layer entfernt (1) und v74 Kanonik gesetzt
+
+ENTFERNT/BEREINIGT:
+- player-core.js: removed v73 ticker/history x1
+- desktop.css: removed v73 boost ticker history header clean fix x1
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX.zip
+- before_file_count: 127
+- after_file_count_pre_report: 127
+- version_v74: True
+- canonical_systempanel_present: True
+- boost_center_present: True
+- all_status_ids_once: True
+- iphone_led_classes_used: True
+- v74_binding_present: True
+- old_parallel_handlers_removed: False
+- old_css_markers_removed: True
+- ticker_css_present: True
+- history_overlay_css_present: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 130

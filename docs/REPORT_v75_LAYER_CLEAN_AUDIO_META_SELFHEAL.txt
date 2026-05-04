@@ -1,0 +1,60 @@
+666SOUNDsDESIGn — v75 LAYER CLEAN AUDIO META SELFHEAL
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v74_PC_IPHONE_SYSTEMPANEL_ALIGNMENT.zip
+
+UMGESETZT:
+- Alte v69-v74 CSS-Patchblöcke physisch entfernt.
+- Alte Ticker-/History-/Systempanel-Parallelhandler aus JS entfernt.
+- Genau ein v75 Handler für LEDs, Ticker, History, Audio-Watchdog und Metadata-Watchdog gesetzt.
+- Ticker bleibt bei Metadatenfehlern auf letzter gültiger Anzeige statt leer/Loading.
+- Metadatenfehler überschreiben nicht mehr sofort die laufende Anzeige.
+- Audio-Watchdog erkennt Stalls ohne error-Event und versucht sanften Reconnect.
+- Alte statusMain/statusBackup-Verweise im v75-Binding vermieden; Main/Backup läuft über mainBtn/fallbackBtn.
+
+GEÄNDERT:
+- index.html: Version/Cache auf v75 aktualisiert
+- css/desktop.css: alte v69-v74 Patchblöcke entfernt (1) und v75-Kanonik gesetzt
+- js/player-core.js: alte Parallelhandler entfernt und v75 Audio/Meta/Ticker/History/Self-Heal gesetzt
+- js/responsive-ui.js: alter Mobile-History-Parallelhandler entfernt
+
+ENTFERNT/BEREINIGT:
+- desktop.css: entfernte alten Block 'v74 pc iphone systempanel alignment' x1
+- player-core.js: entfernte v74 binding x1
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit complete: True
+- Block 2 CSS old patch blocks removed: True
+- Block 3 JS old handlers removed + v75 installed: False
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v74_PC_IPHONE_SYSTEMPANEL_ALIGNMENT.zip
+- before_file_count: 130
+- after_file_count_pre_report: 130
+- version_v75: True
+- old_css_markers_removed: True
+- old_js_handlers_removed: False
+- v75_binding_present: True
+- audio_watchdog_present: True
+- metadata_watchdog_present: True
+- ticker_single_v75_css: False
+- history_single_overlay: True
+- statusMain_statusBackup_absent_in_js: False
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 133

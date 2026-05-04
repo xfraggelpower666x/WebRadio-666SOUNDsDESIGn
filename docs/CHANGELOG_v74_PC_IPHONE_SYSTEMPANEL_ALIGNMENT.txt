@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v74 PC/iPHONE SYSTEMPANEL ALIGNMENT
+
+Geändert:
+- index.html: top-hud durch kanonisches v74-Systempanel ersetzt
+- css/desktop.css: alte v69-v73 Layer entfernt, v74 LED/Systempanel-Kanonik gesetzt
+- js/player-core.js: v74 Systempanel Binding für LEDs/Ticker/History/Boost
+- js/responsive-ui.js: alte History-Parallel-Logik entfernt
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

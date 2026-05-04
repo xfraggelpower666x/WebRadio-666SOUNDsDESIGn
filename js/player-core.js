@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
-import { applyStatusChip } from './shared-status.js?v=smfp-v73-boost-ticker-history-header-clean-fix-20260430-2045';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
+import { applyStatusChip } from './shared-status.js?v=smfp-v75-layer-clean-audio-meta-selfheal-20260430-2230';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v73_BOOST_TICKER_HISTORY_HEADER_CLEAN_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v75_LAYER_CLEAN_AUDIO_META_SELFHEAL: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -783,47 +783,269 @@ try {
 
 
 // ==========================================================
-// 666SOUNDsDESIGn — v73 Clean Ticker History Boost
+// 666SOUNDsDESIGn — v75 Layer Clean Audio Meta Selfheal
+// Zweck:
+// - Ein Handler für LEDs / Ticker / History.
+// - Audio-Watchdog: erkennt Stalls ohne error-Event und startet sanften Reconnect.
+// - Metadata-Watchdog: letzte gültige Metadaten behalten, Fehler nicht in UI schreiben.
 // ==========================================================
-(function installV73CleanTickerHistoryBoost(){
-  if(window.__v73CleanTickerHistoryBoostInstalled)return;
-  window.__v73CleanTickerHistoryBoostInstalled=true;
-  const qs=(id)=>document.getElementById(id);
-  function syncTicker(){
-    const ticker=qs('nowPlayingTicker'), meta=qs('metaLine');
-    if(!ticker)return;
-    let text=meta&&meta.textContent.trim()?meta.textContent.trim():'';
-    if(!text&&window.__lastNowPlayingTitle)text=String(window.__lastNowPlayingTitle).trim();
-    if(!text)text='666SOUNDsDESIGn WebRadio';
-    if(ticker.textContent.trim()!==text){ticker.textContent=text;ticker.setAttribute('data-ticker-live','true');}
+(function installV75LayerCleanAudioMetaSelfheal(){
+  if (window.__v75LayerCleanAudioMetaSelfhealInstalled) return;
+  window.__v75LayerCleanAudioMetaSelfhealInstalled = true;
+
+  const qs = (id) => document.getElementById(id);
+  let lastAudioTime = 0;
+  let lastAudioMoveAt = Date.now();
+  let lastRecoverAt = 0;
+  let lastGoodMeta = '';
+  let lastMetaOkAt = 0;
+
+  function playerAudio() {
+    return document.querySelector('audio');
   }
+
+  function shouldBePlaying() {
+    const audio = playerAudio();
+    if (!audio) return false;
+    if (audio.paused) return false;
+    if (document.body.classList.contains('is-stopped')) return false;
+    if (document.body.getAttribute('data-player-state') === 'stopped') return false;
+    return true;
+  }
+
+  function setTextSafe(el, text) {
+    if (!el) return;
+    const value = String(text || '').trim();
+    if (value && el.textContent.trim() !== value) el.textContent = value;
+  }
+
+  function setLed(el, state, active) {
+    if (!el) return;
+    el.classList.remove('state-main','state-api','state-external','state-backup','state-off','is-active','is-idle','is-error','state-error');
+    el.classList.add(state || 'state-off');
+    if (active) el.classList.add('is-active');
+  }
+
+  function boostLevel() {
+    const raw =
+      document.body.getAttribute('data-boost-level') ||
+      document.documentElement.style.getPropertyValue('--boost-level') ||
+      window.__boostLevel ||
+      window.boostLevel ||
+      0;
+    const n = Number(String(raw).replace(/[^\d.-]/g,''));
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function backupActive() {
+    const fb = qs('fallbackBtn');
+    const main = qs('mainBtn');
+    if (fb && (fb.classList.contains('is-active') || fb.getAttribute('aria-pressed') === 'true')) return true;
+    if (main && (main.classList.contains('is-active') || main.getAttribute('aria-pressed') === 'true')) return false;
+    return /back|backup|fallback/i.test(document.body.getAttribute('data-source') || document.body.getAttribute('data-stream-source') || '');
+  }
+
+  function syncPanel() {
+    const audio = playerAudio();
+    const playing = !!audio && !audio.paused && !document.body.classList.contains('is-stopped');
+    setLed(qs('statusStream'), playing ? 'state-main' : 'state-off', playing);
+    setLed(qs('statusSource'), playing ? 'state-external' : 'state-off', playing);
+
+    const metaFresh = lastMetaOkAt && (Date.now() - lastMetaOkAt < 45000);
+    setLed(qs('statusMeta'), metaFresh ? 'state-api' : (playing ? 'state-error' : 'state-off'), !!metaFresh);
+
+    const backup = backupActive();
+    setLed(qs('mainBtn'), (!backup && playing) ? 'state-main' : 'state-off', !backup && playing);
+    setLed(qs('fallbackBtn'), (backup && playing) ? 'state-backup' : 'state-off', backup && playing);
+
+    const boost = boostLevel();
+    const boostActive = boost > 0;
+    const label = qs('pcBoostLabel');
+    if (label) {
+      const code = label.querySelector('.status-code') || label;
+      code.textContent = 'BST ' + boost;
+    }
+    setLed(qs('pcBoostMinus'), boostActive ? 'state-api' : 'state-off', boostActive);
+    setLed(qs('pcBoostPlus'), boostActive ? 'state-api' : 'state-off', boostActive);
+    setLed(qs('pcBoostLabel'), boostActive ? 'state-api' : 'state-off', boostActive);
+  }
+
+  function readVisibleMeta() {
+    const meta = qs('metaLine');
+    const ticker = qs('nowPlayingTicker');
+    const txt = (meta && meta.textContent.trim()) || (ticker && ticker.textContent.trim()) || '';
+    if (txt && !/metadata|metadaten|loading|laden|error|fehler/i.test(txt)) return txt;
+    return '';
+  }
+
+  function syncTicker() {
+    const ticker = qs('nowPlayingTicker');
+    const metaLine = qs('metaLine');
+    if (!ticker) return;
+
+    const visible = readVisibleMeta();
+    if (visible) {
+      lastGoodMeta = visible;
+      lastMetaOkAt = Date.now();
+    }
+
+    const text = visible || lastGoodMeta || '666SOUNDsDESIGn WebRadio';
+    setTextSafe(ticker, text);
+
+    if (metaLine && (!metaLine.textContent.trim() || /metadata|metadaten|loading|laden|error|fehler/i.test(metaLine.textContent))) {
+      if (lastGoodMeta) metaLine.textContent = lastGoodMeta;
+    }
+  }
+
+  function installMetaObserver() {
+    const meta = qs('metaLine');
+    if (meta && window.MutationObserver) {
+      new MutationObserver(syncTicker).observe(meta, { childList:true, characterData:true, subtree:true });
+    }
+  }
+
   function installHistory(){
-    const toggle=qs('historyToggle'), panel=qs('historyPanel');
-    if(!toggle||!panel)return;
-    let backdrop=qs('historyOverlayBackdrop');
-    if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop);}
-    if(panel.parentElement!==document.body)document.body.appendChild(panel);
+    const toggle = qs('historyToggle');
+    const panel = qs('historyPanel');
+    if (!toggle || !panel) return;
+
+    let backdrop = qs('historyOverlayBackdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'historyOverlayBackdrop';
+      backdrop.className = 'history-overlay-backdrop hidden';
+      document.body.appendChild(backdrop);
+    }
+
+    if (panel.parentElement !== document.body) document.body.appendChild(panel);
     panel.classList.add('history-overlay-panel','hidden');
-    const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open');};
-    const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open');};
-    const tog=(ev)=>{ev.preventDefault();ev.stopPropagation();panel.classList.contains('hidden')?open():close();};
-    if(toggle.__v73HistoryHandler)toggle.removeEventListener('click',toggle.__v73HistoryHandler);
-    toggle.__v73HistoryHandler=tog; toggle.addEventListener('click',tog);
-    backdrop.onclick=close;
-    document.addEventListener('keydown',ev=>{if(ev.key==='Escape')close();},{passive:true});
-    document.addEventListener('click',ev=>{if(panel.classList.contains('hidden'))return;if(panel.contains(ev.target)||toggle.contains(ev.target))return;close();},true);
+
+    function open(){
+      panel.classList.remove('hidden');
+      backdrop.classList.remove('hidden');
+      document.documentElement.classList.add('history-overlay-open');
+      document.body.classList.add('history-overlay-open');
+    }
+
+    function close(){
+      panel.classList.add('hidden');
+      backdrop.classList.add('hidden');
+      document.documentElement.classList.remove('history-overlay-open');
+      document.body.classList.remove('history-overlay-open');
+    }
+
+    function toggleHistory(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      panel.classList.contains('hidden') ? open() : close();
+    }
+
+    if (toggle.__v75HistoryHandler) toggle.removeEventListener('click', toggle.__v75HistoryHandler);
+    toggle.__v75HistoryHandler = toggleHistory;
+    toggle.addEventListener('click', toggleHistory);
+
+    backdrop.onclick = close;
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') close(); }, { passive:true });
+    document.addEventListener('click', (ev) => {
+      if (panel.classList.contains('hidden')) return;
+      if (panel.contains(ev.target) || toggle.contains(ev.target)) return;
+      close();
+    }, true);
   }
-  function installBoostLabel(){
-    const label=qs('pcBoostLabel'); if(!label)return;
-    const update=()=>{const bst=document.body.getAttribute('data-boost-level')||document.documentElement.style.getPropertyValue('--boost-level')||''; if(bst)label.textContent='BST '+String(bst).replace(/[^\d.-]/g,'');};
-    update(); setInterval(update,700);
+
+  function markAudioMoved(audio) {
+    const current = Number(audio.currentTime || 0);
+    if (Math.abs(current - lastAudioTime) > 0.05) {
+      lastAudioTime = current;
+      lastAudioMoveAt = Date.now();
+    }
   }
-  function boot(){
-    syncTicker(); setInterval(syncTicker,850);
-    const meta=qs('metaLine'); if(meta&&window.MutationObserver)new MutationObserver(syncTicker).observe(meta,{childList:true,characterData:true,subtree:true});
-    installHistory(); installBoostLabel();
+
+  function softRecoverAudio(reason) {
+    const audio = playerAudio();
+    if (!audio) return;
+    const now = Date.now();
+    if (now - lastRecoverAt < 12000) return;
+    lastRecoverAt = now;
+
+    try {
+      const src = audio.currentSrc || audio.src;
+      if (!src) return;
+      const volume = audio.volume;
+      const muted = audio.muted;
+      audio.pause();
+      audio.src = src.includes('?') ? src + '&r=' + now : src + '?r=' + now;
+      audio.load();
+      audio.volume = volume;
+      audio.muted = muted;
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.catch === 'function') playPromise.catch(() => {});
+      document.body.setAttribute('data-last-audio-recover', reason || 'stall');
+    } catch (err) {
+      document.body.setAttribute('data-last-audio-recover-error', String(err && err.message || err));
+    }
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+
+  function audioWatchdog() {
+    const audio = playerAudio();
+    if (!audio) return;
+
+    markAudioMoved(audio);
+
+    if (!shouldBePlaying()) {
+      lastAudioTime = Number(audio.currentTime || 0);
+      lastAudioMoveAt = Date.now();
+      return;
+    }
+
+    const stalledFor = Date.now() - lastAudioMoveAt;
+    const weakState = audio.readyState < 2 || audio.networkState === 3;
+    if (stalledFor > 9000 || (weakState && stalledFor > 5500)) {
+      softRecoverAudio(weakState ? 'weak-state' : 'no-time-progress');
+    }
+  }
+
+  function metadataWatchdog() {
+    const meta = readVisibleMeta();
+    if (meta) {
+      lastGoodMeta = meta;
+      lastMetaOkAt = Date.now();
+    }
+    const metaLine = qs('metaLine');
+    if (lastGoodMeta && metaLine && /metadata|metadaten|loading|laden|error|fehler/i.test(metaLine.textContent || '')) {
+      metaLine.textContent = lastGoodMeta;
+    }
+  }
+
+  function boot() {
+    syncTicker();
+    installMetaObserver();
+    installHistory();
+
+    const audio = playerAudio();
+    if (audio) {
+      ['timeupdate','playing','canplay','loadeddata'].forEach((eventName) => {
+        audio.addEventListener(eventName, () => {
+          markAudioMoved(audio);
+          syncPanel();
+        }, { passive:true });
+      });
+      ['waiting','stalled','suspend','emptied'].forEach((eventName) => {
+        audio.addEventListener(eventName, () => setTimeout(audioWatchdog, 1800), { passive:true });
+      });
+      audio.addEventListener('error', () => setTimeout(() => softRecoverAudio('audio-error'), 1000), { passive:true });
+    }
+
+    setInterval(() => {
+      syncTicker();
+      metadataWatchdog();
+      audioWatchdog();
+      syncPanel();
+    }, 2500);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
+  else boot();
 })();
-// END v73 Clean Ticker History Boost
+// END v75 Layer Clean Audio Meta Selfheal
 
