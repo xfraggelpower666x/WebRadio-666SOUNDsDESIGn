@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
-import { applyStatusChip } from './shared-status.js?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545';
+import { applyStatusChip } from './shared-status.js?v=smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v77_PC_BOOST_META_GLOW_TICKER_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -815,4 +815,148 @@ try {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 // END v77 PC Boost Meta Glow Ticker Fix
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v78 History Ticker Modal Boost UI Fix
+// Zweck:
+// - Der Ticker läuft in der pinken Zeile unter History, nicht im falschen NowPlaying-Feld.
+// - History-Panel wird als echtes Modal-Fenster sichtbar.
+// - Boost-Anzeige bleibt lesbar und wird regelmäßig gespiegelt.
+// ==========================================================
+(function installV78HistoryTickerModalBoostUiFix(){
+  if(window.__v78HistoryTickerModalBoostUiFixInstalled)return;
+  window.__v78HistoryTickerModalBoostUiFixInstalled=true;
+  const qs=id=>document.getElementById(id);
+  let lastHistoryTickerText='';
+
+  function valid(t){
+    const v=String(t||'').trim();
+    return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:'';
+  }
+
+  function findMetaText(){
+    const ids=['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle','historyTickerText'];
+    for(const id of ids){
+      const el=qs(id);
+      const v=valid(el&&el.textContent);
+      if(v)return v;
+    }
+    return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastHistoryTickerText||'666SOUNDsDESIGn WebRadio';
+  }
+
+  function ensureHistoryTickerLane(){
+    let lane=qs('historyTickerLane');
+    let text=qs('historyTickerText');
+    if(lane&&text)return {lane,text};
+
+    const historyToggle=qs('historyToggle');
+    lane=document.createElement('div');
+    lane.id='historyTickerLane';
+    lane.className='history-ticker-lane';
+    lane.setAttribute('aria-label','Laufschrift');
+    text=document.createElement('span');
+    text.id='historyTickerText';
+    text.className='history-ticker-text';
+    text.textContent=lastHistoryTickerText||'666SOUNDsDESIGn WebRadio';
+    lane.appendChild(text);
+
+    if(historyToggle&&historyToggle.parentNode){
+      historyToggle.insertAdjacentElement('afterend',lane);
+    }else{
+      const nowPlaying=document.querySelector('.now-playing')||document.body;
+      nowPlaying.appendChild(lane);
+    }
+    return {lane,text};
+  }
+
+  function syncHistoryTicker(){
+    const target=ensureHistoryTickerLane();
+    const text=findMetaText();
+    if(valid(text))lastHistoryTickerText=text;
+    const finalText=lastHistoryTickerText||text||'666SOUNDsDESIGn WebRadio';
+    if(target.text.textContent.trim()!==finalText){
+      target.text.textContent=finalText;
+      target.text.setAttribute('data-ticker-live','true');
+    }
+  }
+
+  function installHistoryModal(){
+    const toggle=qs('historyToggle');
+    const panel=qs('historyPanel');
+    if(!toggle||!panel)return;
+
+    let backdrop=qs('historyOverlayBackdrop');
+    if(!backdrop){
+      backdrop=document.createElement('div');
+      backdrop.id='historyOverlayBackdrop';
+      backdrop.className='history-overlay-backdrop hidden';
+      document.body.appendChild(backdrop);
+    }
+
+    if(panel.parentElement!==document.body)document.body.appendChild(panel);
+    panel.classList.add('history-overlay-panel','hidden');
+
+    const open=()=>{
+      panel.classList.remove('hidden');
+      backdrop.classList.remove('hidden');
+      panel.setAttribute('role','dialog');
+      panel.setAttribute('aria-modal','true');
+      document.documentElement.classList.add('history-overlay-open');
+      document.body.classList.add('history-overlay-open');
+    };
+    const close=()=>{
+      panel.classList.add('hidden');
+      backdrop.classList.add('hidden');
+      document.documentElement.classList.remove('history-overlay-open');
+      document.body.classList.remove('history-overlay-open');
+    };
+    const click=e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      panel.classList.contains('hidden')?open():close();
+    };
+
+    if(toggle.__v78HistoryHandler)toggle.removeEventListener('click',toggle.__v78HistoryHandler);
+    toggle.__v78HistoryHandler=click;
+    toggle.addEventListener('click',click);
+    backdrop.onclick=close;
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')close();},{passive:true});
+    document.addEventListener('click',e=>{
+      if(panel.classList.contains('hidden'))return;
+      if(panel.contains(e.target)||toggle.contains(e.target))return;
+      close();
+    },true);
+  }
+
+  function syncBoostUi(){
+    const label=qs('pcBoostLabel');
+    const lvl=window.__boostLevel??document.body.getAttribute('data-boost-level')??document.documentElement.style.getPropertyValue('--boost-level')??0;
+    const clean=String(lvl).replace(/[^\d.-]/g,'')||'0';
+    if(label){
+      const code=label.querySelector('.status-code')||label;
+      const wanted='BST '+clean;
+      if(code.textContent.trim()!==wanted)code.textContent=wanted;
+    }
+  }
+
+  function boot(){
+    ensureHistoryTickerLane();
+    syncHistoryTicker();
+    installHistoryModal();
+    syncBoostUi();
+
+    const meta=qs('metaLine');
+    if(meta&&window.MutationObserver)new MutationObserver(syncHistoryTicker).observe(meta,{childList:true,characterData:true,subtree:true});
+
+    setInterval(()=>{
+      syncHistoryTicker();
+      syncBoostUi();
+    },900);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+})();
+// END v78 History Ticker Modal Boost UI Fix
 

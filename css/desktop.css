@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v77-pc-boost-meta-glow-ticker-fix-20260504-0035') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -1850,5 +1850,186 @@ ZWECK:
 .now-cover{filter:none!important;transform:none!important}
 .now-cover-wrap{position:relative!important;isolation:isolate!important;box-shadow:0 0 calc(14px + var(--pc-audio-energy,.10) * 26px) rgba(22,255,243,.46)!important}
 .now-cover-wrap::before{content:""!important;position:absolute!important;inset:-10px!important;z-index:-1!important;border-radius:26px!important;background:radial-gradient(circle,rgba(22,255,243,.42),transparent 62%)!important;filter:blur(calc(7px + var(--pc-audio-energy,.10) * 18px))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .52)!important}
+}
+
+
+/* v78 history ticker modal boost ui fix */
+
+/*
+  v78:
+  - Ticker-Ziel ist die pinke Zeile unter History: #historyTickerLane / #historyTickerText.
+  - History bekommt echtes Modal-Fenster, nicht nur Backdrop.
+  - Boost-Feld etwas größer/lesbarer, aber systempanel-stabil.
+*/
+
+.history-ticker-lane {
+  width: 100% !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  display: block !important;
+  border: 1px solid rgba(255,61,187,.42) !important;
+  background: rgba(255,61,187,.10) !important;
+  box-shadow: inset 0 0 18px rgba(255,61,187,.08), 0 0 16px rgba(255,61,187,.12) !important;
+  border-radius: 16px !important;
+  box-sizing: border-box !important;
+}
+
+.history-ticker-text {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: max-content !important;
+  min-width: 100% !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  padding-left: 100% !important;
+  white-space: nowrap !important;
+  color: #ff4fc7 !important;
+  font-size: clamp(12px, 1vw, 15px) !important;
+  font-weight: 950 !important;
+  letter-spacing: .04em !important;
+  animation: v78HistoryTickerRun 22s linear infinite !important;
+  will-change: transform !important;
+}
+
+@keyframes v78HistoryTickerRun {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-100% - 100vw)); }
+}
+
+.history-overlay-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147482990 !important;
+  display: block !important;
+  background: rgba(0,0,0,.68) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+.history-overlay-backdrop.hidden { display: none !important; }
+
+#historyPanel.history-overlay-panel,
+.history-overlay-panel {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(92vw, 560px) !important;
+  max-height: min(76vh, 660px) !important;
+  min-height: 260px !important;
+  overflow: auto !important;
+  z-index: 2147483000 !important;
+  margin: 0 !important;
+  padding: 20px 22px !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255,61,187,.78) !important;
+  background:
+    linear-gradient(180deg, rgba(10,12,34,.98), rgba(3,7,20,.98)) !important;
+  box-shadow:
+    0 0 42px rgba(255,61,187,.42),
+    0 0 34px rgba(22,255,243,.22),
+    inset 0 0 26px rgba(255,255,255,.045) !important;
+  color: #f6f7ff !important;
+}
+#historyPanel.hidden,
+.history-overlay-panel.hidden { display: none !important; }
+
+#historyPanel.history-overlay-panel::before {
+  content: "HISTORY" !important;
+  display: block !important;
+  margin: 0 0 12px 0 !important;
+  font-size: 13px !important;
+  font-weight: 950 !important;
+  letter-spacing: .18em !important;
+  color: #28fff4 !important;
+  text-shadow: 0 0 12px rgba(22,255,243,.65) !important;
+}
+
+@media (min-width:761px) {
+  .systempanel-grid-v74 {
+    grid-template-columns: minmax(250px,1fr) minmax(170px,190px) minmax(250px,1fr) !important;
+    gap: 9px !important;
+  }
+
+  .boost-compact-v78,
+  .boost-compact-v77,
+  .boost-compact-v76,
+  #pcBoostPanel {
+    min-width: 170px !important;
+    max-width: 190px !important;
+    gap: 7px !important;
+    justify-content: center !important;
+  }
+
+  #pcBoostMinus,
+  #pcBoostPlus {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+  }
+
+  #pcBoostMinus .status-dot,
+  #pcBoostPlus .status-dot {
+    display: none !important;
+  }
+
+  #pcBoostLabel {
+    min-width: 82px !important;
+    max-width: 90px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 9px !important;
+    font-size: 11px !important;
+    letter-spacing: .07em !important;
+  }
+
+  .history-ticker-lane {
+    margin-top: 8px !important;
+  }
+}
+
+@media (max-width:760px) {
+  .history-ticker-lane {
+    height: 34px !important;
+    min-height: 34px !important;
+    border-radius: 14px !important;
+  }
+
+  .history-ticker-text {
+    height: 34px !important;
+    line-height: 34px !important;
+    font-size: 12px !important;
+    animation: v78HistoryTickerRun 20s linear infinite !important;
+  }
+
+  .boost-compact-v78,
+  .boost-compact-v77,
+  .boost-compact-v76,
+  #pcBoostPanel {
+    max-width: 178px !important;
+    gap: 6px !important;
+  }
+
+  #pcBoostMinus,
+  #pcBoostPlus {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+  }
+
+  #pcBoostLabel {
+    min-width: 72px !important;
+    max-width: 84px !important;
+    font-size: 10.5px !important;
+  }
 }
 

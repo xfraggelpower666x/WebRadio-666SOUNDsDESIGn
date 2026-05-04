@@ -1,0 +1,14 @@
+666SOUNDsDESIGn — v78 HISTORY TICKER MODAL BOOST UI FIX
+
+Geändert:
+- index.html: historyTickerLane/historyTickerText ergänzt, Version/Cache v78
+- css/desktop.css: pinke History-Ticker-Zeile, echtes History-Modal, größere Boost-UI
+- js/player-core.js: History-Ticker-Ziel befüllen, History-Modal absichern, Boost-Label synchronisieren
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

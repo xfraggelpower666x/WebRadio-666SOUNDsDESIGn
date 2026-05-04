@@ -1,0 +1,79 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX",
+  "cache_tag": "smfp-v78-history-ticker-modal-boost-ui-fix-20260504-1545",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v77_PC_BOOST_META_GLOW_TICKER_FIX.zip",
+  "changes": [
+    "index.html: historyTickerLane direkt nach historyToggle eingefügt",
+    "css/desktop.css: History-Ticker-Zeile, echtes History-Modal und größere Boost-UI gesetzt",
+    "js/player-core.js: Ticker-Ziel auf pinke History-Zeile umgebogen und History-Modal abgesichert"
+  ],
+  "warnings": [],
+  "removed": [],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 history ticker DOM target",
+      true
+    ],
+    [
+      "Block 3 history modal",
+      true
+    ],
+    [
+      "Block 4 boost UI larger",
+      true
+    ]
+  ],
+  "audit_before": {
+    "history_related_ids": {
+      "historyToggle": 1,
+      "historyPanel": 1,
+      "historyOverlayBackdrop": 0,
+      "history": 46,
+      "History": 51
+    },
+    "ticker_related_ids": {
+      "nowPlayingTicker": 1,
+      "ticker-window": 1,
+      "ticker-text": 1,
+      "marquee": 0,
+      "lauf": 0
+    },
+    "boost_related": {
+      "pcBoostPanel": 4,
+      "pcBoostLabel": 11,
+      "boost-compact-v77": 3,
+      "boost-compact-v76": 3,
+      "BST": 11
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v77_PC_BOOST_META_GLOW_TICKER_FIX.zip",
+    "before_file_count": 139,
+    "after_file_count_pre_report": 139,
+    "version_v78": true,
+    "history_ticker_lane_dom": true,
+    "history_ticker_js": true,
+    "history_ticker_css": true,
+    "history_modal_window_css": true,
+    "history_modal_js": true,
+    "boost_ui_larger": true,
+    "boost_class_v78": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 142
+  }
+}

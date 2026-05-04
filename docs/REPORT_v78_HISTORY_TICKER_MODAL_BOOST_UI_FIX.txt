@@ -1,0 +1,55 @@
+666SOUNDsDESIGn — v78 HISTORY TICKER MODAL BOOST UI FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v77_PC_BOOST_META_GLOW_TICKER_FIX.zip
+
+UMGESETZT:
+- Ticker-Ziel korrigiert: pinke Zeile unter History bekommt eigenes Ziel historyTickerLane/historyTickerText.
+- Metadaten werden in diese pinke History-Ticker-Zeile gespiegelt.
+- History öffnet jetzt als echtes Modal-Fenster mit sichtbarer Box, Rahmen, Innenfläche und Scrollbereich.
+- Klick neben dem Fenster schließt weiterhin.
+- Boost-Block ist etwas größer und Beschriftung BST 0–3 besser lesbar.
+
+GEÄNDERT:
+- index.html: historyTickerLane direkt nach historyToggle eingefügt
+- css/desktop.css: History-Ticker-Zeile, echtes History-Modal und größere Boost-UI gesetzt
+- js/player-core.js: Ticker-Ziel auf pinke History-Zeile umgebogen und History-Modal abgesichert
+
+ENTFERNT/BEREINIGT:
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 history ticker DOM target: True
+- Block 3 history modal: True
+- Block 4 boost UI larger: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v77_PC_BOOST_META_GLOW_TICKER_FIX.zip
+- before_file_count: 139
+- after_file_count_pre_report: 139
+- version_v78: True
+- history_ticker_lane_dom: True
+- history_ticker_js: True
+- history_ticker_css: True
+- history_modal_window_css: True
+- history_modal_js: True
+- boost_ui_larger: True
+- boost_class_v78: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 142
