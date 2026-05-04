@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v79-central-audio-existing-ticker-font-led-20260504-1640';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v79-central-audio-existing-ticker-font-led-20260504-1640';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v79-central-audio-existing-ticker-font-led-20260504-1640';
-import { applyStatusChip } from './shared-status.js?v=smfp-v79-central-audio-existing-ticker-font-led-20260504-1640';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
+import { applyStatusChip } from './shared-status.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -1126,4 +1126,99 @@ try {
   else boot();
 })();
 // END v79 Central Audio Existing Ticker Font LED
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v80 Dual Player Parity Mobile Hard Fix
+// Zweck:
+// - Sichtbare Mobile-Controls nach Aufbau des iPhone-Players an CentralAudioCore koppeln.
+// - Mobile LEDs/Buttons/Layoutzustände mit PC-Logik synchron halten.
+// ==========================================================
+(function installV80DualPlayerParityMobileHardFix(){
+  if(window.__v80DualPlayerParityMobileHardFixInstalled)return;
+  window.__v80DualPlayerParityMobileHardFixInstalled=true;
+
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+  function core(){return window.CentralAudioCore||null;}
+
+  function setMobileSourceVisual(source){
+    const src=(source==='backup')?'backup':'main';
+    document.body.setAttribute('data-stream-source',src);
+    document.documentElement.setAttribute('data-manual-stream-target',src);
+    qa('#mffStreamSwitch .mff-stream-btn').forEach(btn=>{
+      const active=(btn.getAttribute('data-stream-target')||'main')===src;
+      btn.classList.toggle('is-active',active);
+      btn.setAttribute('aria-pressed',active?'true':'false');
+    });
+    qa('#mffPanelLedPanel [data-led="main"], #mffPanelLedPanel [data-led="backup"]').forEach(btn=>{
+      const active=(btn.getAttribute('data-led')||'main')===src;
+      btn.setAttribute('data-state',active?'ok':'off');
+      btn.classList.toggle('is-active',active);
+    });
+  }
+
+  function syncMobileBoost(){
+    const st=core()&&core().getState?core().getState():{};
+    const level=Number(st.boost||window.__boostLevel||document.body.getAttribute('data-boost-level')||0)||0;
+    const label=q('#mffBoost');
+    if(label)label.textContent='BST '+level;
+    const gain=q('#mffBoostGain');
+    if(gain)gain.textContent=(1+(level*.10)).toFixed(2)+'×';
+    qa('.mff-boost-led').forEach(led=>{
+      const n=Number(led.getAttribute('data-led')||0);
+      led.classList.toggle('is-active',n<=level&&level>0);
+    });
+  }
+
+  function bindMobileParity(){
+    const app=q('#mffApp');
+    if(!app)return;
+
+    qa('#mffStreamSwitch .mff-stream-btn, #mffPanelLedPanel [data-led="main"], #mffPanelLedPanel [data-led="backup"]',app).forEach(btn=>{
+      if(btn.__v80SourceBound)return;
+      btn.__v80SourceBound=true;
+      const fn=ev=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+        const target=btn.getAttribute('data-stream-target')||btn.getAttribute('data-led')||'main';
+        if(core()&&core().switchSource)core().switchSource(target==='backup'?'backup':'main');
+        setMobileSourceVisual(target==='backup'?'backup':'main');
+      };
+      btn.addEventListener('click',fn,true);
+      btn.addEventListener('touchend',fn,{capture:true,passive:false});
+    });
+
+    qa('[data-mff="play"],[data-mff="pause"],[data-mff="stop"],[data-mff="boost"],[data-mff="up"],[data-mff="down"]',app).forEach(btn=>{
+      if(btn.__v80MffCoreBound)return;
+      btn.__v80MffCoreBound=true;
+      const fn=ev=>{
+        const c=btn.getAttribute('data-mff');
+        if(!core())return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+        if(c==='play')core().play();
+        if(c==='pause')core().pause();
+        if(c==='stop')core().stop();
+        if(c==='boost')core().setBoost(((core().getState().boost||0)+1)%4);
+        if(c==='up')core().setBoost((core().getState().boost||0)+1);
+        if(c==='down')core().setBoost((core().getState().boost||0)-1);
+        setTimeout(syncMobileBoost,40);
+      };
+      btn.addEventListener('click',fn,true);
+      btn.addEventListener('touchend',fn,{capture:true,passive:false});
+    });
+
+    const st=core()&&core().getState?core().getState():{};
+    setMobileSourceVisual(st.source||document.body.getAttribute('data-stream-source')||'main');
+    syncMobileBoost();
+  }
+
+  setInterval(bindMobileParity,700);
+  window.addEventListener('playerboostchange',syncMobileBoost);
+})();
+// END v80 Dual Player Parity Mobile Hard Fix
 

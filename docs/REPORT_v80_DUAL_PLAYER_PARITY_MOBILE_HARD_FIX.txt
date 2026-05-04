@@ -1,0 +1,70 @@
+666SOUNDsDESIGn — v80 DUAL PLAYER PARITY MOBILE HARD FIX
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED.zip
+
+UMGESETZT:
+- iPhone/Mobile Mainstream/Backup Stream sichtbar zurückgebracht.
+- Mobile MAIN/BACK LED-Chips sind klickbar und schalten über CentralAudioCore.
+- Mobile Play/Pause/Stop/Boost delegieren an CentralAudioCore.
+- Mobile Boost sichtbar mit LED/Glow und CentralAudioCore-Sync.
+- Mobile History als echtes Modal-Fenster sichtbar abgesichert.
+- Mobile bekommt Logo-/Branding-Zeile als Verbindung zum PC-Player.
+- Mobile Player halbtransparent; gleicher PC-Hintergrund mit audioreaktivem Overlay.
+- Panel-Randlinie/Glow vereinheitlicht für PC- und Mobile-Panels.
+- DJ Status Symbol ersetzt und in gleicher Reihe gehalten.
+- Audioreaktive Play-/Boost-/LED-Technik auch für Mobile ergänzt.
+
+GEÄNDERT:
+- index.html: Mobile Logo-Parität-Zeile ergänzt
+- index.html: Mobile Mainstream/Backup-Stream-Schalter sichtbar ergänzt
+- index.html: Mobile Play/Pause/Stop/Boost an CentralAudioCore delegiert
+- index.html: Mobile Main/Backup-Umschaltung buffer-schonend an CentralAudioCore delegiert
+- index.html: Mobile LED Main/BACK Buttons als Stream-Schalter gebunden
+- css/desktop.css: Mobile-Parität, Hintergrund, Transparenz, LED-/Button-/Paneltechnik und History-Modal gesetzt
+- js/player-core.js: v80 Mobile-Parity-Bridge für CentralAudioCore, Main/BACK und Boost gesetzt
+
+ENTFERNT/BEREINIGT:
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs im Worker
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- Font-Dateien wurden nicht ins Paket kopiert
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 mobile DOM/core patch: True
+- Block 3 CSS mobile parity: True
+- Block 4 core/mobile bridge: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED.zip
+- before_file_count: 145
+- after_file_count_pre_report: 145
+- version_v80: True
+- mobile_stream_switch_visible: True
+- mobile_led_main_backup_labels: True
+- mobile_source_leds_clickable: True
+- mobile_core_delegation: True
+- mobile_history_modal_css: True
+- mobile_boost_visible: True
+- mobile_play_audio_reactive: True
+- mobile_logo_parity: True
+- mobile_background_transparent: True
+- panel_border_unified: True
+- dj_status_symbol_replaced: True
+- central_audio_core_kept: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 148

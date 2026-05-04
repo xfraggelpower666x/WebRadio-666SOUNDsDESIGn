@@ -1,0 +1,73 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX",
+  "cache_tag": "smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED.zip",
+  "changes": [
+    "index.html: Mobile Logo-Parität-Zeile ergänzt",
+    "index.html: Mobile Mainstream/Backup-Stream-Schalter sichtbar ergänzt",
+    "index.html: Mobile Play/Pause/Stop/Boost an CentralAudioCore delegiert",
+    "index.html: Mobile Main/Backup-Umschaltung buffer-schonend an CentralAudioCore delegiert",
+    "index.html: Mobile LED Main/BACK Buttons als Stream-Schalter gebunden",
+    "css/desktop.css: Mobile-Parität, Hintergrund, Transparenz, LED-/Button-/Paneltechnik und History-Modal gesetzt",
+    "js/player-core.js: v80 Mobile-Parity-Bridge für CentralAudioCore, Main/BACK und Boost gesetzt"
+  ],
+  "warnings": [],
+  "removed": [],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 mobile DOM/core patch",
+      true
+    ],
+    [
+      "Block 3 CSS mobile parity",
+      true
+    ],
+    [
+      "Block 4 core/mobile bridge",
+      true
+    ]
+  ],
+  "audit_before": {
+    "mobile_build_app": 1,
+    "mobile_stream_switch_refs": 2,
+    "mobile_panel_led_main_backup": 2,
+    "mobile_history_refs": 34,
+    "central_audio_core": 4,
+    "v79_markers": 85
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_CENTRAL_AUDIO_EXISTING_TICKER_FONT_LED.zip",
+    "before_file_count": 145,
+    "after_file_count_pre_report": 145,
+    "version_v80": true,
+    "mobile_stream_switch_visible": true,
+    "mobile_led_main_backup_labels": true,
+    "mobile_source_leds_clickable": true,
+    "mobile_core_delegation": true,
+    "mobile_history_modal_css": true,
+    "mobile_boost_visible": true,
+    "mobile_play_audio_reactive": true,
+    "mobile_logo_parity": true,
+    "mobile_background_transparent": true,
+    "panel_border_unified": true,
+    "dj_status_symbol_replaced": true,
+    "central_audio_core_kept": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 148
+  }
+}

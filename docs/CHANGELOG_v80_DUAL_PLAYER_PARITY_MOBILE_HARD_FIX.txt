@@ -1,0 +1,16 @@
+666SOUNDsDESIGn — v80 DUAL PLAYER PARITY MOBILE HARD FIX
+
+Geändert:
+- index.html: Mobile Main/BACK UI, Logozeile, History-Symbol, DJ-Symbol, Core-Delegation
+- css/desktop.css: Mobile Parität, Hintergrund/Transparenz, LED/Button/Paneltechnik, History-Modal
+- js/player-core.js: v80 Mobile-Parity-Bridge für CentralAudioCore
+- js/responsive-ui.js Versionsmarker
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs im Worker
+- Worker-Route /The-Dark-Dancer blieb erhalten
+- keine Font-Dateien weiterverteilt
