@@ -1,0 +1,81 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v79_PC_HISTORY_GLOW_BOOST_TICKER_REBUILD",
+  "cache_tag": "smfp-v79-pc-history-glow-boost-ticker-rebuild-20260505-0015",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip",
+  "changes": [
+    "index.html: neue PC-Tickerbox direkt nach historyToggle eingefügt",
+    "css/desktop.css: PC-Tickerbox neu gebaut, History-Glow audioreaktiv, Boost-LED-Abstand vergrößert",
+    "js/player-core.js: alter v78 Tickerhandler entfernt, neue PC-Tickerbox wird befüllt"
+  ],
+  "warnings": [],
+  "removed": [
+    "index.html: alte historyTickerLane entfernt",
+    "desktop.css: alter Block entfernt v78 history ticker modal boost ui fix x1",
+    "desktop.css: alte v78HistoryTickerRun Keyframes entfernt",
+    "player-core.js: alter Handler entfernt v78 History Ticker Modal Boost x1"
+  ],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 ticker old box removed",
+      true
+    ],
+    [
+      "Block 3 history glow audio reactive",
+      true
+    ],
+    [
+      "Block 4 boost spacing",
+      true
+    ]
+  ],
+  "audit_before": {
+    "history_ticker_dom": {
+      "historyTickerLane": 1,
+      "historyTickerText": 1,
+      "pcTickerRebuildLane": 0,
+      "pcTickerRebuildText": 0
+    },
+    "v78_refs": {
+      "v78HistoryTickerRun": 3,
+      "installV78HistoryTickerModalBoostUiFix": 1,
+      "history-ticker-lane": 4,
+      "historyTickerText": 4
+    },
+    "boost_refs": {
+      "pcBoostMinus": 8,
+      "pcBoostPlus": 8,
+      "pcBoostLabel": 11,
+      "boost-compact-v78": 3
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip",
+    "before_file_count": 142,
+    "after_file_count_pre_report": 142,
+    "version_v79": true,
+    "old_history_ticker_removed_from_dom": true,
+    "new_pc_ticker_dom": true,
+    "new_pc_ticker_css": true,
+    "new_pc_ticker_js": true,
+    "history_glow_audio_reactive": true,
+    "boost_leds_farther": true,
+    "boost_label_larger": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 145
+  }
+}

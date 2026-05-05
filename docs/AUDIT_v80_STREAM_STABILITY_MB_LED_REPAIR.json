@@ -1,0 +1,84 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR",
+  "cache_tag": "smfp-v80-stream-stability-mb-led-repair-20260505-0045",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_PC_HISTORY_GLOW_BOOST_TICKER_REBUILD.zip",
+  "changes": [
+    "index.html: Main/Backup-Chips auf kompakte M/B-LED-Panels gesetzt, Version v80",
+    "css/desktop.css: Monster-Umschalter neutralisiert, kompakte M/B-Chips erzwungen",
+    "js/player-core.js: resume-first Audio-Watchdog ergänzt, seltenes Reconnect ohne Cachebuster, M/B-Chips abgesichert"
+  ],
+  "warnings": [
+    "Kein eigener Monster-Button-Abschnitt im HTML per Pattern gefunden; CSS/JS neutralisiert vorhandene Großflächen"
+  ],
+  "removed": [],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 MB chip repair",
+      true
+    ],
+    [
+      "Block 3 stream stability",
+      true
+    ],
+    [
+      "Block 4 no cachebuster storm in v80",
+      true
+    ]
+  ],
+  "audit_before": {
+    "monster_switch_refs": {
+      "MAINSTREAM": 0,
+      "BACKUP STREAM": 0,
+      "mainstream": 0,
+      "backup stream": 0,
+      "source-switch": 0,
+      "source-pill": 0,
+      "stream-switch": 1
+    },
+    "audio_recover_refs": {
+      "softRecoverAudio": 0,
+      "recover(reason)": 1,
+      "audioWatchdog": 3,
+      "src.includes('?')": 1,
+      "data-last-audio-recover": 2
+    },
+    "source_buttons": {
+      "mainBtn": 1,
+      "fallbackBtn": 1,
+      "MAIN": 1,
+      "BACK": 5,
+      "M": 225,
+      "B": 216
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_PC_HISTORY_GLOW_BOOST_TICKER_REBUILD.zip",
+    "before_file_count": 145,
+    "after_file_count_pre_report": 145,
+    "version_v80": true,
+    "mb_chip_labels": true,
+    "mb_chip_css": true,
+    "monster_text_removed_from_html": true,
+    "v80_stream_handler_present": true,
+    "resume_first_present": true,
+    "rare_reconnect_present": true,
+    "no_v80_cachebuster_storm": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 148
+  }
+}

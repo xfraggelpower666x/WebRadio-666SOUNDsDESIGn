@@ -1,0 +1,60 @@
+666SOUNDsDESIGn — v79 PC HISTORY GLOW BOOST TICKER REBUILD
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip
+
+UMGESETZT:
+- PC-History bleibt funktional; Außenrand/Glow am History-Fenster ist audioreaktiv.
+- Boost-LEDs im PC-Systempanel weiter auseinandergezogen.
+- Boost-BST-Anzeige größer und lesbarer gemacht.
+- Alte pinke History-Tickerbox entfernt.
+- Neue PC-Tickerbox pcTickerRebuildLane/pcTickerRebuildText sauber aufgebaut.
+- Neuer PC-Ticker wird aus Meta-/NowPlaying-Quellen befüllt.
+
+GEÄNDERT:
+- index.html: neue PC-Tickerbox direkt nach historyToggle eingefügt
+- css/desktop.css: PC-Tickerbox neu gebaut, History-Glow audioreaktiv, Boost-LED-Abstand vergrößert
+- js/player-core.js: alter v78 Tickerhandler entfernt, neue PC-Tickerbox wird befüllt
+
+ENTFERNT/BEREINIGT:
+- index.html: alte historyTickerLane entfernt
+- desktop.css: alter Block entfernt v78 history ticker modal boost ui fix x1
+- desktop.css: alte v78HistoryTickerRun Keyframes entfernt
+- player-core.js: alter Handler entfernt v78 History Ticker Modal Boost x1
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 ticker old box removed: True
+- Block 3 history glow audio reactive: True
+- Block 4 boost spacing: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v78_HISTORY_TICKER_MODAL_BOOST_UI_FIX.zip
+- before_file_count: 142
+- after_file_count_pre_report: 142
+- version_v79: True
+- old_history_ticker_removed_from_dom: True
+- new_pc_ticker_dom: True
+- new_pc_ticker_css: True
+- new_pc_ticker_js: True
+- history_glow_audio_reactive: True
+- boost_leds_farther: True
+- boost_label_larger: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 145

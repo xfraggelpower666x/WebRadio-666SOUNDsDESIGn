@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
-import { applyStatusChip } from './shared-status.js?v=smfp-v80-dual-player-parity-mobile-hard-fix-20260504-1735';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
+import { applyStatusChip } from './shared-status.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX:
+   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v80_DUAL_PLAYER_PARITY_MOBILE_HARD_FIX: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -785,440 +785,219 @@ try {
 
 
 // ==========================================================
-// 666SOUNDsDESIGn — v79 Central Audio Existing Ticker Font LED
+// 666SOUNDsDESIGn — v77 PC Boost Meta Glow Ticker Fix
 // Zweck:
-// - CentralAudioCore für PC + Mobile: Play/Pause/Stop/Main/Backup/Boost laufen über eine Stelle.
-// - Kein aggressives src-Reset: Browser-/Safari-Buffer wird respektiert.
-// - Vorhandene pinke Ticker-Leiste #nowPlayingTicker wird befüllt, keine neue Ticker-Lane.
-// - Metadata/Ticker getrennt vom Audio.
+// - PC-Boost ruft echte vorhandene setBoostStage/changeBoostStage Logik auf.
+// - PC-Ticker übernimmt robuste Mobile-Logik: aus metaLine/title/nowPlaying/lastGood synchronisieren.
+// - Metadata/Ticker bleiben bei Fetch-Ausfall auf letzter gültiger Anzeige.
 // ==========================================================
-(function installV79CentralAudioExistingTickerFontLed(){
-  if(window.__v79CentralAudioCoreInstalled)return;
-  window.__v79CentralAudioCoreInstalled=true;
+(function installV77PcBoostMetaGlowTickerFix(){
+  if(window.__v77PcBoostMetaGlowTickerFixInstalled)return;window.__v77PcBoostMetaGlowTickerFixInstalled=true;
+  const qs=id=>document.getElementById(id);let lastAudioTime=0,lastAudioMoveAt=Date.now(),lastRecoverAt=0,lastGoodMeta='',lastMetaOkAt=0;
+  function clamp(v){const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(3,Math.round(n))):0}
+  function level(){const raw=window.__boostLevel??document.body.getAttribute('data-boost-level')??document.documentElement.style.getPropertyValue('--boost-level')??0;return clamp(String(raw).replace(/[^\d.-]/g,''))}
+  function mirror(lv){const safe=clamp(lv);window.__boostLevel=safe;document.body.setAttribute('data-boost-level',String(safe));document.body.setAttribute('data-mobile-boost',String(safe));document.documentElement.style.setProperty('--boost-level',String(safe));document.documentElement.style.setProperty('--player-boost-level',String(safe));const gain=1+(safe*.10);document.documentElement.style.setProperty('--player-boost-gain',gain.toFixed(2));const label=qs('pcBoostLabel');if(label)(label.querySelector('.status-code')||label).textContent='BST '+safe;window.dispatchEvent(new CustomEvent('playerboostchange',{detail:{level:safe,gain}}));return safe}
+  function applyBoost(lv){const safe=clamp(lv);let applied=safe;try{if(typeof setBoostStage==='function'){const r=setBoostStage(safe);applied=clamp(typeof r==='number'?r:safe)}else if(typeof changeBoostStage==='function'){const r=changeBoostStage(safe-level());applied=clamp(typeof r==='number'?r:safe)}}catch(err){document.body.setAttribute('data-boost-error',String(err&&err.message||err))}mirror(applied);syncPanel()}
+  function boostControls(){const minus=qs('pcBoostMinus'),plus=qs('pcBoostPlus');if(minus&&!minus.__v77BoostBound){minus.__v77BoostBound=true;minus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()-1);},true)}if(plus&&!plus.__v77BoostBound){plus.__v77BoostBound=true;plus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()+1);},true)}}
+  function audioEl(){return document.querySelector('audio')}
+  function setLed(el,state,active){if(!el)return;el.classList.remove('state-main','state-api','state-external','state-backup','state-off','is-active','is-idle','is-error','state-error');el.classList.add(state||'state-off');if(active)el.classList.add('is-active')}
+  function backupActive(){const fb=qs('fallbackBtn'),mb=qs('mainBtn');if(fb&&(fb.classList.contains('is-active')||fb.getAttribute('aria-pressed')==='true'))return true;if(mb&&(mb.classList.contains('is-active')||mb.getAttribute('aria-pressed')==='true'))return false;return /back|backup|fallback/i.test(document.body.getAttribute('data-source')||document.body.getAttribute('data-stream-source')||'')}
+  function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
+  function readMetaLikeMobile(){const ids=['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle'];for(const id of ids){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}const dataTitle=document.body.getAttribute('data-current-title')||document.body.getAttribute('data-now-playing')||'';return valid(dataTitle)}
+  function syncTicker(){const ticker=qs('nowPlayingTicker');const metaLine=qs('metaLine');if(!ticker)return;const visible=readMetaLikeMobile();if(visible){lastGoodMeta=visible;lastMetaOkAt=Date.now()}const text=visible||lastGoodMeta||'666SOUNDsDESIGn WebRadio';if(ticker.textContent.trim()!==text){ticker.textContent=text;ticker.setAttribute('data-ticker-live','true')}if(metaLine&&lastGoodMeta&&!valid(metaLine.textContent))metaLine.textContent=lastGoodMeta}
+  function syncPanel(){const a=audioEl();const playing=!!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped';setLed(qs('statusStream'),playing?'state-main':'state-off',playing);setLed(qs('statusSource'),playing?'state-external':'state-off',playing);const metaFresh=lastMetaOkAt&&(Date.now()-lastMetaOkAt<45000);setLed(qs('statusMeta'),metaFresh?'state-api':(playing?'state-error':'state-off'),!!metaFresh);const b=backupActive();setLed(qs('mainBtn'),(!b&&playing)?'state-main':'state-off',!b&&playing);setLed(qs('fallbackBtn'),(b&&playing)?'state-backup':'state-off',b&&playing);const active=level()>0;setLed(qs('pcBoostMinus'),active?'state-api':'state-off',active);setLed(qs('pcBoostPlus'),active?'state-api':'state-off',active);setLed(qs('pcBoostLabel'),active?'state-api':'state-off',active)}
+  function installHistory(){const toggle=qs('historyToggle'),panel=qs('historyPanel');if(!toggle||!panel)return;let backdrop=qs('historyOverlayBackdrop');if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel','hidden');const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open')};const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open')};const click=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v77HistoryHandler)toggle.removeEventListener('click',toggle.__v77HistoryHandler);toggle.__v77HistoryHandler=click;toggle.addEventListener('click',click);backdrop.onclick=close;document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true});document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true)}
+  function mark(a){const c=Number(a.currentTime||0);if(Math.abs(c-lastAudioTime)>.05){lastAudioTime=c;lastAudioMoveAt=Date.now()}}
+  function shouldPlay(){const a=audioEl();return !!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped'}
+  function recover(reason){const a=audioEl();if(!a)return;const now=Date.now();if(now-lastRecoverAt<12000)return;lastRecoverAt=now;try{const src=a.currentSrc||a.src;if(!src)return;const vol=a.volume,muted=a.muted;a.pause();a.src=src.includes('?')?src+'&r='+now:src+'?r='+now;a.load();a.volume=vol;a.muted=muted;const p=a.play();if(p&&typeof p.catch==='function')p.catch(()=>{});document.body.setAttribute('data-last-audio-recover',reason||'stall')}catch(err){document.body.setAttribute('data-last-audio-recover-error',String(err&&err.message||err))}}
+  function audioWatchdog(){const a=audioEl();if(!a)return;mark(a);if(!shouldPlay()){lastAudioTime=Number(a.currentTime||0);lastAudioMoveAt=Date.now();return}const stalled=Date.now()-lastAudioMoveAt;const weak=a.readyState<2||a.networkState===3;if(stalled>9000||(weak&&stalled>5500))recover(weak?'weak-state':'no-time-progress')}
+  function boot(){boostControls();mirror(level());installHistory();syncTicker();const observerTarget=qs('metaLine');if(observerTarget&&window.MutationObserver)new MutationObserver(syncTicker).observe(observerTarget,{childList:true,characterData:true,subtree:true});const a=audioEl();if(a){['timeupdate','playing','canplay','loadeddata'].forEach(n=>a.addEventListener(n,()=>{mark(a);syncPanel()},{passive:true}));['waiting','stalled','suspend','emptied'].forEach(n=>a.addEventListener(n,()=>setTimeout(audioWatchdog,1800),{passive:true}));a.addEventListener('error',()=>setTimeout(()=>recover('audio-error'),1000),{passive:true})}setInterval(()=>{boostControls();syncTicker();audioWatchdog();mirror(level());syncPanel()},900)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+// END v77 PC Boost Meta Glow Ticker Fix
 
-  const q=(s,r=document)=>r.querySelector(s);
-  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  const by=id=>document.getElementById(id);
 
-  const ENDPOINT_MAIN='/stream';
-  const ENDPOINT_BACKUP='/fallback-stream';
+// ==========================================================
+// 666SOUNDsDESIGn — v79 PC History Glow Boost Ticker Rebuild
+// ==========================================================
+(function installV79PcHistoryGlowBoostTickerRebuild(){
+  if(window.__v79PcHistoryGlowBoostTickerRebuildInstalled)return;window.__v79PcHistoryGlowBoostTickerRebuildInstalled=true;
+  const qs=id=>document.getElementById(id);let lastTicker='';
+  function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
+  function ensurePcTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>{el.style.display='none'});let lane=qs('pcTickerRebuildLane'),text=qs('pcTickerRebuildText');if(lane&&text)return{lane,text};lane=document.createElement('div');lane.id='pcTickerRebuildLane';lane.className='pc-ticker-rebuild-lane';lane.setAttribute('aria-label','PC Laufschrift');text=document.createElement('span');text.id='pcTickerRebuildText';text.className='pc-ticker-rebuild-text';text.textContent=lastTicker||'666SOUNDsDESIGn WebRadio';lane.appendChild(text);const h=qs('historyToggle');if(h)h.insertAdjacentElement('afterend',lane);else(document.querySelector('.now-playing')||document.body).appendChild(lane);return{lane,text}}
+  function readSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
+  function syncPcTicker(){const target=ensurePcTicker();const src=readSource();if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(target.text.textContent.trim()!==finalText){target.text.textContent=finalText;target.text.setAttribute('data-ticker-live','true')}}
+  function syncBoostLabel(){const label=qs('pcBoostLabel');if(!label)return;const raw=window.__boostLevel??document.body.getAttribute('data-boost-level')??document.documentElement.style.getPropertyValue('--boost-level')??0;const clean=String(raw).replace(/[^\d.-]/g,'')||'0';const code=label.querySelector('.status-code')||label;const wanted='BST '+clean;if(code.textContent.trim()!==wanted)code.textContent=wanted}
+  function hardenHistoryModal(){const toggle=qs('historyToggle'),panel=qs('historyPanel');if(!toggle||!panel)return;let back=qs('historyOverlayBackdrop');if(!back){back=document.createElement('div');back.id='historyOverlayBackdrop';back.className='history-overlay-backdrop hidden';document.body.appendChild(back)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel');const open=()=>{panel.classList.remove('hidden');back.classList.remove('hidden');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');document.body.classList.add('history-overlay-open');document.documentElement.classList.add('history-overlay-open')};const close=()=>{panel.classList.add('hidden');back.classList.add('hidden');document.body.classList.remove('history-overlay-open');document.documentElement.classList.remove('history-overlay-open')};const handler=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v79HistoryHandler)toggle.removeEventListener('click',toggle.__v79HistoryHandler);toggle.__v79HistoryHandler=handler;toggle.addEventListener('click',handler);back.onclick=close}
+  function boot(){ensurePcTicker();syncPcTicker();syncBoostLabel();hardenHistoryModal();const meta=qs('metaLine');if(meta&&window.MutationObserver)new MutationObserver(syncPcTicker).observe(meta,{childList:true,characterData:true,subtree:true});setInterval(()=>{syncPcTicker();syncBoostLabel()},700)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+// END v79 PC History Glow Boost Ticker Rebuild
 
-  const state={
-    source:'main',
-    wanted:false,
-    userStopped:true,
-    lastGoodMeta:'',
-    lastMetaOkAt:0,
-    lastAudioTime:0,
-    lastAudioMoveAt:Date.now(),
-    lastSoftPlayAt:0,
-    lastReconnectAt:0,
-    reconnecting:false,
-    boost:0
-  };
 
-  function audio(){
-    let a=by('radio')||by('mffAudio')||q('audio');
-    if(!a){
-      a=document.createElement('audio');
-      a.id='radio';
-      a.preload='auto';
-      a.crossOrigin='anonymous';
-      a.playsInline=true;
-      document.body.appendChild(a);
+// ==========================================================
+// 666SOUNDsDESIGn — v80 Stream Stability MB LED Repair
+// Zweck:
+// - Stream-Stopp PC/iPhone stabilisieren: resume first, reconnect nur sehr selten.
+// - Große Main/Backup-Umschalter nicht verwenden; kompakte M/B-Chips mit vorhandener Logik.
+// - Keine zweite Audioquelle, kein Dauer-Cachebuster.
+// ==========================================================
+(function installV80StreamStabilityMbLedRepair(){
+  if(window.__v80StreamStabilityMbLedRepairInstalled)return;
+  window.__v80StreamStabilityMbLedRepairInstalled=true;
+
+  const qs=id=>document.getElementById(id);
+  let lastTime=0;
+  let lastMoveAt=Date.now();
+  let lastResumeAt=0;
+  let lastReconnectAt=0;
+  let userStarted=false;
+
+  function audio(){return document.querySelector('audio');}
+
+  function setChipLabels(){
+    const main=qs('mainBtn'), back=qs('fallbackBtn');
+    if(main){
+      const code=main.querySelector('.status-code')||main;
+      if(code.textContent.trim()!=='M')code.textContent='M';
+      main.title='Mainstream';
+      main.setAttribute('aria-label','Mainstream');
+      main.classList.add('source-mini-chip-v80');
     }
-    a.preload='auto';
-    a.playsInline=true;
-    return a;
+    if(back){
+      const code=back.querySelector('.status-code')||back;
+      if(code.textContent.trim()!=='B')code.textContent='B';
+      back.title='Backup Stream';
+      back.setAttribute('aria-label','Backup Stream');
+      back.classList.add('source-mini-chip-v80');
+    }
   }
 
-  function srcFor(source){return source==='backup'?ENDPOINT_BACKUP:ENDPOINT_MAIN;}
-  function normalizeSource(source){return source==='backup'||source==='fallback'?'backup':'main';}
-
-  function setLed(el,cls,on){
-    if(!el)return;
-    el.classList.remove('state-main','state-api','state-external','state-backup','state-off','state-error','is-active','is-error');
-    el.classList.add(cls||'state-off');
-    if(on)el.classList.add('is-active');
+  function clickMain(){
+    const main=qs('mainBtn');
+    if(main&&!main.__v80MainClickBound){
+      main.__v80MainClickBound=true;
+      main.addEventListener('click',()=>{userStarted=true;},true);
+    }
+    const back=qs('fallbackBtn');
+    if(back&&!back.__v80BackClickBound){
+      back.__v80BackClickBound=true;
+      back.addEventListener('click',()=>{userStarted=true;},true);
+    }
   }
 
-  function setUiState(label){
-    document.body.setAttribute('data-player-state',label);
-    document.body.classList.toggle('is-stopped',label==='stopped');
-    document.body.classList.toggle('is-playing',label==='playing');
-    document.body.classList.toggle('is-reconnecting',label==='reconnecting');
+  function markMove(a){
+    const t=Number(a.currentTime||0);
+    if(Math.abs(t-lastTime)>0.04){
+      lastTime=t;
+      lastMoveAt=Date.now();
+    }
   }
 
-  function syncPanel(){
+  function wantsPlayback(){
     const a=audio();
-    const playing=state.wanted&&!a.paused&&!state.userStopped;
-    const metaFresh=state.lastMetaOkAt&&(Date.now()-state.lastMetaOkAt<60000);
-
-    setLed(by('statusStream'),playing?'state-main':(state.reconnecting?'state-error':'state-off'),playing);
-    setLed(by('statusSource'),playing?'state-external':'state-off',playing);
-    setLed(by('statusMeta'),metaFresh?'state-api':(playing?'state-error':'state-off'),!!metaFresh);
-    setLed(by('mainBtn'),state.source==='main'&&playing?'state-main':'state-off',state.source==='main'&&playing);
-    setLed(by('fallbackBtn'),state.source==='backup'&&playing?'state-backup':'state-off',state.source==='backup'&&playing);
-
-    const boostOn=state.boost>0;
-    setLed(by('pcBoostMinus'),boostOn?'state-api':'state-off',boostOn);
-    setLed(by('pcBoostPlus'),boostOn?'state-api':'state-off',boostOn);
-    setLed(by('pcBoostLabel'),boostOn?'state-api':'state-off',boostOn);
+    if(!a)return false;
+    if(document.body.classList.contains('is-stopped'))return false;
+    if(document.body.getAttribute('data-player-state')==='stopped')return false;
+    return userStarted || (!a.paused && !!(a.currentSrc||a.src));
   }
 
-  function validText(t){
-    const v=String(t||'').trim();
-    if(!v)return '';
-    if(/metadata|metadaten|loading|laden|error|fehler|gerade nicht erreichbar/i.test(v))return '';
-    return v;
-  }
-
-  function readMeta(){
-    const ids=['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle'];
-    for(const id of ids){
-      const v=validText(by(id)&&by(id).textContent);
-      if(v)return v;
-    }
-    return validText(document.body.getAttribute('data-current-title'))||validText(document.body.getAttribute('data-now-playing'))||'';
-  }
-
-  function syncTicker(){
-    const ticker=by('nowPlayingTicker');
-    const metaLine=by('metaLine');
-    const text=readMeta();
-    if(text){
-      state.lastGoodMeta=text;
-      state.lastMetaOkAt=Date.now();
-    }
-    const finalText=state.lastGoodMeta||text||'666SOUNDsDESIGn WebRadio';
-    if(ticker&&ticker.textContent.trim()!==finalText){
-      ticker.textContent=finalText;
-      ticker.setAttribute('data-ticker-live','true');
-    }
-    if(metaLine&&state.lastGoodMeta&&!validText(metaLine.textContent)){
-      metaLine.textContent=state.lastGoodMeta;
-    }
-    syncPanel();
-  }
-
-  function clampBoost(v){const n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(3,Math.round(n))):0;}
-
-  function setBoost(level){
-    const safe=clampBoost(level);
-    state.boost=safe;
-    try{ if(typeof window.setBoostStage==='function') window.setBoostStage(safe); }catch(e){}
-    try{ if(typeof window.changeBoostStage==='function') window.changeBoostStage(safe-state.boost); }catch(e){}
-    window.__boostLevel=safe;
-    document.body.setAttribute('data-boost-level',String(safe));
-    document.body.setAttribute('data-mobile-boost',String(safe));
-    document.documentElement.style.setProperty('--boost-level',String(safe));
-    document.documentElement.style.setProperty('--player-boost-level',String(safe));
-    document.documentElement.style.setProperty('--player-boost-gain',(1+safe*.10).toFixed(2));
-    const label=by('pcBoostLabel');
-    if(label)(label.querySelector('.status-code')||label).textContent='BST '+safe;
-    window.dispatchEvent(new CustomEvent('playerboostchange',{detail:{level:safe,gain:1+safe*.10}}));
-    syncPanel();
-  }
-
-  async function play(source){
-    if(source)state.source=normalizeSource(source);
+  function safePlay(reason){
     const a=audio();
-    const target=srcFor(state.source);
-    state.wanted=true;
-    state.userStopped=false;
-    state.reconnecting=false;
-    setUiState('playing');
-
-    if(!a.src||!(a.currentSrc||a.src).includes(target)){
-      a.src=target;
-      try{a.load();}catch(e){}
-    }
-
+    if(!a)return;
+    const now=Date.now();
+    if(now-lastResumeAt<6000)return;
+    lastResumeAt=now;
     try{
       const p=a.play();
-      if(p&&typeof p.catch==='function')await p.catch(()=>{});
-    }catch(e){}
-    markAudioProgress();
-    syncPanel();
-  }
-
-  function pause(){
-    state.wanted=false;
-    state.userStopped=false;
-    const a=audio();
-    try{a.pause();}catch(e){}
-    setUiState('paused');
-    syncPanel();
-  }
-
-  function stop(){
-    state.wanted=false;
-    state.userStopped=true;
-    const a=audio();
-    try{a.pause();}catch(e){}
-    setUiState('stopped');
-    syncPanel();
-  }
-
-  async function switchSource(source){
-    state.source=normalizeSource(source);
-    document.body.setAttribute('data-stream-source',state.source);
-    const a=audio();
-    const target=srcFor(state.source);
-    const wasWanted=state.wanted&&!state.userStopped;
-    if(!a.src||!(a.currentSrc||a.src).includes(target)){
-      a.src=target;
-      try{a.load();}catch(e){}
-    }
-    if(wasWanted)await play(state.source);
-    syncPanel();
-  }
-
-  function markAudioProgress(){
-    const a=audio();
-    const now=Number(a.currentTime||0);
-    if(Math.abs(now-state.lastAudioTime)>.05){
-      state.lastAudioTime=now;
-      state.lastAudioMoveAt=Date.now();
+      if(p&&typeof p.catch==='function')p.catch(()=>{});
+      document.body.setAttribute('data-last-safe-play',reason||'resume');
+    }catch(err){
+      document.body.setAttribute('data-last-safe-play-error',String(err&&err.message||err));
     }
   }
 
-  async function softPlay(reason){
-    const now=Date.now();
-    if(now-state.lastSoftPlayAt<12000)return;
-    state.lastSoftPlayAt=now;
+  function rareReconnect(reason){
     const a=audio();
-    try{
-      const p=a.play();
-      if(p&&typeof p.catch==='function')await p.catch(()=>{});
-      document.body.setAttribute('data-last-soft-play',reason||'buffer-wait');
-    }catch(e){}
-  }
-
-  async function gentleReconnect(reason){
+    if(!a)return;
     const now=Date.now();
-    if(now-state.lastReconnectAt<45000)return;
-    state.lastReconnectAt=now;
-    state.reconnecting=true;
-    setUiState('reconnecting');
-    syncPanel();
-
-    const a=audio();
-    const target=srcFor(state.source);
+    if(now-lastReconnectAt<90000)return;
+    lastReconnectAt=now;
     try{
+      const src=a.currentSrc||a.src;
+      if(!src)return;
       const vol=a.volume, muted=a.muted;
       a.pause();
-      a.src=target+(target.includes('?')?'&':'?')+'r='+now;
-      a.preload='auto';
+      /* Kein Cachebuster-Orkan: Original-SRC unverändert neu laden. */
+      a.src=src.replace(/[?&]r=\d+$/,'');
       a.load();
       a.volume=vol;
       a.muted=muted;
       const p=a.play();
-      if(p&&typeof p.catch==='function')await p.catch(()=>{});
-      document.body.setAttribute('data-last-reconnect',reason||'stall');
-    }catch(e){
-      document.body.setAttribute('data-last-reconnect-error',String(e&&e.message||e));
-    }finally{
-      state.reconnecting=false;
-      setUiState('playing');
-      syncPanel();
+      if(p&&typeof p.catch==='function')p.catch(()=>{});
+      document.body.setAttribute('data-last-rare-reconnect',reason||'stall');
+    }catch(err){
+      document.body.setAttribute('data-last-rare-reconnect-error',String(err&&err.message||err));
     }
   }
 
   function watchdog(){
     const a=audio();
-    markAudioProgress();
+    if(!a){setChipLabels();return;}
+    markMove(a);
 
-    if(!state.wanted||state.userStopped||a.paused){
-      state.lastAudioTime=Number(a.currentTime||0);
-      state.lastAudioMoveAt=Date.now();
+    if(!wantsPlayback()){
+      lastTime=Number(a.currentTime||0);
+      lastMoveAt=Date.now();
+      setChipLabels();
+      clickMain();
       return;
     }
 
-    const stalledFor=Date.now()-state.lastAudioMoveAt;
-    const weak=a.readyState<2||a.networkState===3;
+    const stalledFor=Date.now()-lastMoveAt;
+    const weak=a.readyState<2 || a.networkState===3;
 
-    // Safari/iPhone Buffer respektieren: erst lange warten, dann nur play() versuchen.
-    if(stalledFor>32000||weak&&stalledFor>26000){
-      softPlay(weak?'weak-buffer':'stalled-buffer');
+    /* Sanft: erst play/resume. Kein direktes src-Wechseln. */
+    if(a.paused && userStarted){
+      safePlay('paused-while-user-started');
+    }else if(stalledFor>8000 || (weak && stalledFor>5500)){
+      safePlay(weak?'weak-state-resume':'stall-resume');
     }
 
-    // Echter Reconnect erst nach längerer Stille, nicht nach 30 Sekunden.
-    if(stalledFor>65000){
-      gentleReconnect('long-stall');
+    /* Hart nur sehr selten und ohne Cachebuster. */
+    if(stalledFor>28000 && userStarted){
+      rareReconnect('long-stall');
     }
-  }
 
-  function installHistory(){
-    const toggle=by('historyToggle');
-    const panel=by('historyPanel');
-    if(!toggle||!panel)return;
-    let backdrop=by('historyOverlayBackdrop');
-    if(!backdrop){
-      backdrop=document.createElement('div');
-      backdrop.id='historyOverlayBackdrop';
-      backdrop.className='history-overlay-backdrop hidden';
-      document.body.appendChild(backdrop);
-    }
-    if(panel.parentElement!==document.body)document.body.appendChild(panel);
-    panel.classList.add('history-overlay-panel','hidden');
-
-    const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');};
-    const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');};
-    const click=e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();panel.classList.contains('hidden')?open():close();};
-
-    if(toggle.__v79History)toggle.removeEventListener('click',toggle.__v79History,true);
-    toggle.__v79History=click;
-    toggle.addEventListener('click',click,true);
-    backdrop.onclick=close;
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')close();},{passive:true});
-    document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close();},true);
-  }
-
-  function bindButton(selector,fn){
-    qa(selector).forEach(el=>{
-      if(el.__v79CoreBound)return;
-      el.__v79CoreBound=true;
-      el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();fn(e,el);},true);
-      el.addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();fn(e,el);},true);
-    });
-  }
-
-  function bindControls(){
-    bindButton('#playBtn,[data-mff="play"],.mff-play',()=>play());
-    bindButton('#pauseBtn,[data-mff="pause"]',()=>pause());
-    bindButton('#stopBtn,[data-mff="stop"],.mff-stop',()=>stop());
-    bindButton('#reconnectBtn',()=>gentleReconnect('manual'));
-    bindButton('#mainBtn,[data-led="main"]',()=>switchSource('main'));
-    bindButton('#fallbackBtn,[data-led="backup"],[data-led="back"]',()=>switchSource('backup'));
-    bindButton('#pcBoostMinus,.boost-step-down,[data-boost-step="-1"]',()=>setBoost(state.boost-1));
-    bindButton('#pcBoostPlus,.boost-step-up,[data-boost-step="1"]',()=>setBoost(state.boost+1));
-    bindButton('[data-mff="boost"],#mffBoost',()=>setBoost((state.boost+1)%4));
-  }
-
-  function installAudioEvents(){
-    const a=audio();
-    if(a.__v79AudioEvents)return;
-    a.__v79AudioEvents=true;
-    ['timeupdate','playing','canplay','loadeddata','progress'].forEach(name=>a.addEventListener(name,()=>{markAudioProgress();syncPanel();},{passive:true}));
-    ['waiting','stalled','suspend'].forEach(name=>a.addEventListener(name,()=>{setTimeout(watchdog,4500);},{passive:true}));
-    a.addEventListener('error',()=>{setTimeout(()=>softPlay('audio-error-soft'),5000);}, {passive:true});
+    setChipLabels();
+    clickMain();
   }
 
   function boot(){
-    bindControls();
-    installAudioEvents();
-    installHistory();
-    syncTicker();
-    setBoost(state.boost);
+    const a=audio();
+    if(a){
+      ['play','playing','timeupdate','canplay','loadeddata'].forEach(ev=>{
+        a.addEventListener(ev,()=>{
+          userStarted=true;
+          markMove(a);
+        },{passive:true});
+      });
+      ['pause'].forEach(ev=>{
+        a.addEventListener(ev,()=>{}, {passive:true});
+      });
+      ['waiting','stalled','suspend'].forEach(ev=>{
+        a.addEventListener(ev,()=>setTimeout(watchdog,2500),{passive:true});
+      });
+      a.addEventListener('error',()=>setTimeout(()=>rareReconnect('audio-error'),1500),{passive:true});
+    }
 
-    const meta=by('metaLine');
-    if(meta&&window.MutationObserver)new MutationObserver(syncTicker).observe(meta,{childList:true,characterData:true,subtree:true});
-
-    setInterval(()=>{bindControls();syncTicker();watchdog();syncPanel();},1200);
+    setChipLabels();
+    clickMain();
+    setInterval(watchdog,4000);
   }
-
-  window.CentralAudioCore={
-    play,pause,stop,switchSource,setBoost,getState:()=>({...state})
-  };
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 })();
-// END v79 Central Audio Existing Ticker Font LED
-
-
-// ==========================================================
-// 666SOUNDsDESIGn — v80 Dual Player Parity Mobile Hard Fix
-// Zweck:
-// - Sichtbare Mobile-Controls nach Aufbau des iPhone-Players an CentralAudioCore koppeln.
-// - Mobile LEDs/Buttons/Layoutzustände mit PC-Logik synchron halten.
-// ==========================================================
-(function installV80DualPlayerParityMobileHardFix(){
-  if(window.__v80DualPlayerParityMobileHardFixInstalled)return;
-  window.__v80DualPlayerParityMobileHardFixInstalled=true;
-
-  const q=(s,r=document)=>r.querySelector(s);
-  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-
-  function core(){return window.CentralAudioCore||null;}
-
-  function setMobileSourceVisual(source){
-    const src=(source==='backup')?'backup':'main';
-    document.body.setAttribute('data-stream-source',src);
-    document.documentElement.setAttribute('data-manual-stream-target',src);
-    qa('#mffStreamSwitch .mff-stream-btn').forEach(btn=>{
-      const active=(btn.getAttribute('data-stream-target')||'main')===src;
-      btn.classList.toggle('is-active',active);
-      btn.setAttribute('aria-pressed',active?'true':'false');
-    });
-    qa('#mffPanelLedPanel [data-led="main"], #mffPanelLedPanel [data-led="backup"]').forEach(btn=>{
-      const active=(btn.getAttribute('data-led')||'main')===src;
-      btn.setAttribute('data-state',active?'ok':'off');
-      btn.classList.toggle('is-active',active);
-    });
-  }
-
-  function syncMobileBoost(){
-    const st=core()&&core().getState?core().getState():{};
-    const level=Number(st.boost||window.__boostLevel||document.body.getAttribute('data-boost-level')||0)||0;
-    const label=q('#mffBoost');
-    if(label)label.textContent='BST '+level;
-    const gain=q('#mffBoostGain');
-    if(gain)gain.textContent=(1+(level*.10)).toFixed(2)+'×';
-    qa('.mff-boost-led').forEach(led=>{
-      const n=Number(led.getAttribute('data-led')||0);
-      led.classList.toggle('is-active',n<=level&&level>0);
-    });
-  }
-
-  function bindMobileParity(){
-    const app=q('#mffApp');
-    if(!app)return;
-
-    qa('#mffStreamSwitch .mff-stream-btn, #mffPanelLedPanel [data-led="main"], #mffPanelLedPanel [data-led="backup"]',app).forEach(btn=>{
-      if(btn.__v80SourceBound)return;
-      btn.__v80SourceBound=true;
-      const fn=ev=>{
-        ev.preventDefault();
-        ev.stopPropagation();
-        ev.stopImmediatePropagation();
-        const target=btn.getAttribute('data-stream-target')||btn.getAttribute('data-led')||'main';
-        if(core()&&core().switchSource)core().switchSource(target==='backup'?'backup':'main');
-        setMobileSourceVisual(target==='backup'?'backup':'main');
-      };
-      btn.addEventListener('click',fn,true);
-      btn.addEventListener('touchend',fn,{capture:true,passive:false});
-    });
-
-    qa('[data-mff="play"],[data-mff="pause"],[data-mff="stop"],[data-mff="boost"],[data-mff="up"],[data-mff="down"]',app).forEach(btn=>{
-      if(btn.__v80MffCoreBound)return;
-      btn.__v80MffCoreBound=true;
-      const fn=ev=>{
-        const c=btn.getAttribute('data-mff');
-        if(!core())return;
-        ev.preventDefault();
-        ev.stopPropagation();
-        ev.stopImmediatePropagation();
-        if(c==='play')core().play();
-        if(c==='pause')core().pause();
-        if(c==='stop')core().stop();
-        if(c==='boost')core().setBoost(((core().getState().boost||0)+1)%4);
-        if(c==='up')core().setBoost((core().getState().boost||0)+1);
-        if(c==='down')core().setBoost((core().getState().boost||0)-1);
-        setTimeout(syncMobileBoost,40);
-      };
-      btn.addEventListener('click',fn,true);
-      btn.addEventListener('touchend',fn,{capture:true,passive:false});
-    });
-
-    const st=core()&&core().getState?core().getState():{};
-    setMobileSourceVisual(st.source||document.body.getAttribute('data-stream-source')||'main');
-    syncMobileBoost();
-  }
-
-  setInterval(bindMobileParity,700);
-  window.addEventListener('playerboostchange',syncMobileBoost);
-})();
-// END v80 Dual Player Parity Mobile Hard Fix
+// END v80 Stream Stability MB LED Repair
 

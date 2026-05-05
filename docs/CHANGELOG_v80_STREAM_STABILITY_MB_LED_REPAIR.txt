@@ -1,0 +1,14 @@
+666SOUNDsDESIGn — v80 STREAM STABILITY MB LED REPAIR
+
+Geändert:
+- index.html: Main/Backup als kompakte M/B-Chips, Version/Cache v80
+- css/desktop.css: Monster-Umschalter neutralisiert, M/B-Chips kompakt erzwungen
+- js/player-core.js: v80 Resume-first Stream-Watchdog und M/B-Chip-Hardening
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

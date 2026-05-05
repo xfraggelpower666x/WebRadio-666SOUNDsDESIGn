@@ -1,0 +1,14 @@
+666SOUNDsDESIGn — v79 PC HISTORY GLOW BOOST TICKER REBUILD
+
+Geändert:
+- index.html: alte historyTickerLane entfernt, neue pcTickerRebuildLane eingefügt, Version/Cache v79
+- css/desktop.css: PC-Ticker neu gebaut, History-Glow audioreaktiv, Boost-LED-Abstand und Labelgröße korrigiert
+- js/player-core.js: v79 PC-Ticker-Rebuild-Handler, History-Modal-Hardening, Boost-Label-Sync
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

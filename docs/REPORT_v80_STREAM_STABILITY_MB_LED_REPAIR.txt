@@ -1,0 +1,57 @@
+666SOUNDsDESIGn — v80 STREAM STABILITY MB LED REPAIR
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_PC_HISTORY_GLOW_BOOST_TICKER_REBUILD.zip
+
+UMGESETZT:
+- Stream-Stopp priorisiert: v80 Watchdog arbeitet Resume-first.
+- Kein aggressiver Dauer-Reconnect im v80 Handler.
+- Hard-Reconnect nur selten nach langem Stall und ohne Cachebuster-Orkan.
+- Große Mainstream/Backup-Flächen neutralisiert/entfernt, soweit im HTML/CSS greifbar.
+- Kleine klickbare M/B LED-Chips wiederhergestellt.
+- Tooltip/aria-label: Mainstream / Backup Stream.
+
+GEÄNDERT:
+- index.html: Main/Backup-Chips auf kompakte M/B-LED-Panels gesetzt, Version v80
+- css/desktop.css: Monster-Umschalter neutralisiert, kompakte M/B-Chips erzwungen
+- js/player-core.js: resume-first Audio-Watchdog ergänzt, seltenes Reconnect ohne Cachebuster, M/B-Chips abgesichert
+
+ENTFERNT/BEREINIGT:
+
+WARNUNGEN:
+- Kein eigener Monster-Button-Abschnitt im HTML per Pattern gefunden; CSS/JS neutralisiert vorhandene Großflächen
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 MB chip repair: True
+- Block 3 stream stability: True
+- Block 4 no cachebuster storm in v80: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v79_PC_HISTORY_GLOW_BOOST_TICKER_REBUILD.zip
+- before_file_count: 145
+- after_file_count_pre_report: 145
+- version_v80: True
+- mb_chip_labels: True
+- mb_chip_css: True
+- monster_text_removed_from_html: True
+- v80_stream_handler_present: True
+- resume_first_present: True
+- rare_reconnect_present: True
+- no_v80_cachebuster_storm: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 148
