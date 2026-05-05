@@ -1,0 +1,30 @@
+666SOUNDsDESIGn — REPORT v84 DNS SAFE STREAM WORKER PATCH
+Erstellt: 2026-05-05
+Geändert: 2026-05-05
+
+AUFGABE:
+Die originale Repo-ZIP wurde verwendet. Der Worker liegt im Repo-Root als worker.js. Der Worker wurde nicht ersetzt, sondern gezielt erweitert.
+
+UMSETZUNG:
+Im vorhandenen worker.js wurde der alte Stream-Failover-Bereich durch eine stabilere V84-Implementierung ersetzt. Die bestehende /stream-Route bleibt erhalten, zusätzlich existiert jetzt /api/radio/stream für Radio-Core-kompatible Aufrufe. Für die Fehlersuche wurde /api/radio/debug/dns ergänzt.
+
+WARUM DAS DEN WORKER NICHT KAPUTT MACHT:
+- Bestehende Konstanten PRIMARY_STREAM_URL, FALLBACK_STREAM_URL, FALLBACK_STREAM_URL_ALT bleiben erhalten.
+- Bestehende Player-Routen bleiben erhalten.
+- Bestehende Root-Auslieferung und External-Player-Proxy bleiben erhalten.
+- Bestehende /api/nowplaying-Metadatenroute bleibt erhalten.
+- Kein Import-System wurde eingeführt; alles bleibt in einer worker.js, passend zur vorhandenen Root-Worker-Struktur.
+
+TESTS:
+- node --check worker.js erfolgreich.
+- ZIP wurde vollständig neu verpackt.
+
+TEST-URLS NACH DEPLOY:
+- /health
+- /api/radio/debug/dns
+- /api/radio/stream
+- /stream
+- /fallback-stream
+
+WICHTIG:
+Main und Backup nutzen weiterhin dieselbe Domain my.idjstream.com. Wenn diese Domain komplett DNS-seitig stirbt, kann nur eine zusätzliche direkte IP oder ein zweiter Provider als echte externe Ausweichquelle helfen.

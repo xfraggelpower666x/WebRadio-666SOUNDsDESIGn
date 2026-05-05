@@ -57,6 +57,23 @@ const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const FALLBACK_STREAM_URL_ALT = "https://my.idjstream.com/8686/stream";
 const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
+
+// ==========================================================
+// 666SOUNDsDESIGn — DNS SAFE STREAM PATCH V84
+// Erstellt: 2026-05-05
+// Geändert: 2026-05-05
+// Zweck: Original-Root-Worker nicht ersetzen, sondern Stream-/DNS-Failover
+//        direkt in die bestehenden /stream-, /fallback-stream- und
+//        /api/radio/stream-Routen integrieren. Kein KV, kein R2, keine Secrets.
+// ==========================================================
+const DNS_SAFE_STREAM_SOURCES = [
+  { id: "main-idjstream-domain", label: "Main Stream", url: PRIMARY_STREAM_URL, type: "main" },
+  { id: "backup-idjstream-port", label: "Backup Stream Port", url: FALLBACK_STREAM_URL, type: "backup" },
+  { id: "backup-idjstream-path", label: "Backup Stream Path", url: FALLBACK_STREAM_URL_ALT, type: "backup-alt" }
+];
+const DNS_SAFE_TIMEOUT_MS = 4500;
+const DNS_SAFE_STREAM_TIMEOUT_MS = 7000;
+const DNS_SAFE_USER_AGENT = "666SOUNDsDESIGn-RadioCore-DNS-Safe-V84/2026-05-05";
 const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/";
 const SWITCH_TIMEOUT_MS = 2000;
 const EXTERNAL_BUILD_ID = "root-migration-repair-v1";
@@ -247,110 +264,192 @@ async function checkExternal(){
 }
 
 function passthroughHeaders(sourceHeaders){
+  // V84: Header bewusst eng durchreichen. Keine Transcodierung, kein Body-Umbau.
   const headers=new Headers();
-  const allow=["content-type","content-length","accept-ranges","content-range","cache-control","icy-br","icy-description","icy-genre","icy-metaint","icy-name","icy-notice1","icy-notice2","icy-pub","icy-url","transfer-encoding"];
-  for(const key of allow){const value=sourceHeaders.get(key);if(value)headers.set(key,value)}
+  const allow=[
+    "content-type","content-length","accept-ranges","content-range","cache-control",
+    "icy-br","icy-description","icy-genre","icy-metaint","icy-name",
+    "icy-notice1","icy-notice2","icy-pub","icy-url"
+  ];
+  for(const key of allow){
+    const value=sourceHeaders.get(key);
+    if(value)headers.set(key,value);
+  }
+  if(!headers.get("content-type"))headers.set("content-type","audio/mpeg");
   headers.set("access-control-allow-origin","*");
+  headers.set("access-control-expose-headers","x-radio-proxy,x-active-stream-target,x-failover-state,x-666-radio-status,x-666-radio-source,x-666-radio-source-type");
+  headers.set("cache-control","no-store");
   headers.set("x-radio-proxy","666soundsdesign-worker");
+  headers.set("x-666-radio-status","stream-ok");
   return headers;
 }
-async function proxyStream(request, upstream, targetName = "unknown"){
-  // STREAM_FAILOVER_REPAIR_v1:
-  // Ein HTTP-Fehler vom Upstream zählt als echter Failover-Grund.
-  // Vorher wurde nur bei fetch-Exception umgeschaltet; ein 520 konnte direkt bis zum Player durchfallen.
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
-  const init={method:request.method,headers:new Headers(),signal:controller.signal};
+
+function dnsSafeAbortSignal(timeoutMs){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+  return {signal:controller.signal,timer};
+}
+
+function dnsSafeForwardHeaders(request){
+  // V84: Nur für Streams relevante Client-Header weiterreichen.
+  const headers=new Headers();
   const range=request.headers.get("range");
   const userAgent=request.headers.get("user-agent");
   const accept=request.headers.get("accept");
   const icyMeta=request.headers.get("icy-metadata");
-  if(range)init.headers.set("range",range);
-  if(userAgent)init.headers.set("user-agent",userAgent);
-  if(accept)init.headers.set("accept",accept);
-  if(icyMeta)init.headers.set("icy-metadata",icyMeta);
-
-  try {
-    const response=await fetch(upstream,init);
-    if(!response.ok && response.status >= 400){
-      throw new Error(`upstream_${targetName}_http_${response.status}`);
-    }
-    const headers=passthroughHeaders(response.headers);
-    headers.set("x-active-stream-target", targetName);
-    headers.set("x-failover-state", targetName === "main" ? "primary" : "fallback");
-    return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
-  } finally {
-    clearTimeout(timeout);
-  }
+  if(range)headers.set("range",range);
+  if(userAgent)headers.set("user-agent",userAgent);
+  else headers.set("user-agent",DNS_SAFE_USER_AGENT);
+  if(accept)headers.set("accept",accept);
+  else headers.set("accept","audio/mpeg,audio/*,*/*;q=0.8");
+  if(icyMeta)headers.set("icy-metadata",icyMeta);
+  headers.set("cache-control","no-store");
+  headers.set("pragma","no-cache");
+  return headers;
 }
 
-async function proxyStreamFailover(request){
-  // MAIN versuchen, bei HTTP-Fehler/Timeout direkt BACKUP versuchen.
-  try{
-    return await proxyStream(request, PRIMARY_STREAM_URL, "main");
-  }catch(primaryErr){
+async function dnsSafeProbeSource(source){
+  // Debug-Probe: HEAD zuerst, danach kurzer GET-Range-Test, weil manche Streamserver HEAD ablehnen.
+  const startedAt=Date.now();
+  const baseHeaders={
+    "user-agent":DNS_SAFE_USER_AGENT,
+    "cache-control":"no-store",
+    "pragma":"no-cache"
+  };
+
+  for(const probe of [
+    {method:"HEAD",headers:baseHeaders},
+    {method:"GET",headers:{...baseHeaders,"range":"bytes=0-1"}}
+  ]){
+    const abort=dnsSafeAbortSignal(DNS_SAFE_TIMEOUT_MS);
     try{
-      return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
-    }catch(backupErr){
-      try{
-        return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
-      }catch(backupAltErr){
-        return new Response(JSON.stringify({
-          error:"stream_proxy_failed",
-          main:String(primaryErr && primaryErr.message ? primaryErr.message : primaryErr),
-          backup:String(backupErr && backupErr.message ? backupErr.message : backupErr),
-          backup_alt:String(backupAltErr && backupAltErr.message ? backupAltErr.message : backupAltErr)
-        }),{
-          status:502,
-          headers:{
-            "content-type":"application/json; charset=UTF-8",
-            "cache-control":"no-store",
-            "access-control-allow-origin":"*",
-            "x-radio-proxy":"666soundsdesign-worker",
-            "x-failover-state":"failed"
-          }
-        });
+      const res=await fetch(source.url,{
+        method:probe.method,
+        headers:probe.headers,
+        redirect:"follow",
+        cf:{cacheTtl:0,cacheEverything:false},
+        signal:abort.signal
+      });
+      clearTimeout(abort.timer);
+      if(res.ok || res.status===200 || res.status===206 || res.status===302){
+        try{ if(res.body) await res.body.cancel(); }catch(_e){}
+        return {ok:true,source,method:probe.method,status:res.status,ms:Date.now()-startedAt};
+      }
+      try{ if(res.body) await res.body.cancel(); }catch(_e){}
+      if(probe.method==="GET"){
+        return {ok:false,source,method:"GET_RANGE",status:res.status,ms:Date.now()-startedAt,error:`bad-status-${res.status}`};
+      }
+    }catch(err){
+      clearTimeout(abort.timer);
+      if(probe.method==="GET"){
+        return {ok:false,source,method:"FETCH",status:0,ms:Date.now()-startedAt,error:String(err&&err.message?err.message:err)};
       }
     }
   }
+
+  return {ok:false,source,method:"UNKNOWN",status:0,ms:Date.now()-startedAt,error:"probe-failed"};
 }
 
-async function proxyFallbackStream(request){
-  // Direkte Backup-Route: erst alte Port-Variante, dann Pfad-Variante.
-  try{
-    return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
-  }catch(backupErr){
-    try{
-      return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
-    }catch(backupAltErr){
-      return new Response(JSON.stringify({
-        error:"fallback_stream_proxy_failed",
-        backup:String(backupErr && backupErr.message ? backupErr.message : backupErr),
-        backup_alt:String(backupAltErr && backupAltErr.message ? backupAltErr.message : backupAltErr)
-      }),{
-        status:502,
-        headers:{
-          "content-type":"application/json; charset=UTF-8",
-          "cache-control":"no-store",
-          "access-control-allow-origin":"*",
-          "x-radio-proxy":"666soundsdesign-worker",
-          "x-failover-state":"failed"
-        }
-      });
+async function dnsSafeSelectLiveSource(sources=DNS_SAFE_STREAM_SOURCES){
+  const checks=[];
+  for(const source of sources){
+    const result=await dnsSafeProbeSource(source);
+    checks.push(result);
+    if(result.ok){
+      return {ok:true,selected:source,selectedCheck:result,checks,checkedAt:new Date().toISOString()};
     }
+  }
+  return {ok:false,selected:null,selectedCheck:null,checks,checkedAt:new Date().toISOString()};
+}
+
+async function proxyStream(request, source){
+  // V84: Echte Stream-Auslieferung. Kein Vorab-Rebuild, keine Änderung am Player.
+  const abort=dnsSafeAbortSignal(DNS_SAFE_STREAM_TIMEOUT_MS);
+  try{
+    const response=await fetch(source.url,{
+      method:"GET",
+      headers:dnsSafeForwardHeaders(request),
+      redirect:"follow",
+      cf:{cacheTtl:0,cacheEverything:false},
+      signal:abort.signal
+    });
+    if(!response.ok && response.status>=400){
+      try{ if(response.body) await response.body.cancel(); }catch(_e){}
+      throw new Error(`upstream_${source.id}_http_${response.status}`);
+    }
+    const headers=passthroughHeaders(response.headers);
+    headers.set("x-active-stream-target",source.type);
+    headers.set("x-failover-state",source.type==="main"?"primary":"fallback");
+    headers.set("x-666-radio-source",source.id);
+    headers.set("x-666-radio-source-type",source.type);
+    return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+  }finally{
+    clearTimeout(abort.timer);
   }
 }
 
+async function proxyStreamFailover(request,sources=DNS_SAFE_STREAM_SOURCES){
+  // V84: Main -> Backup-Port -> Backup-Pfad. Fehler werden gesammelt statt den Worker hart sterben zu lassen.
+  const errors=[];
+  for(const source of sources){
+    try{
+      return await proxyStream(request,source);
+    }catch(err){
+      errors.push({id:source.id,type:source.type,url:source.url,error:String(err&&err.message?err.message:err)});
+    }
+  }
+  return new Response(JSON.stringify({
+    error:"stream_proxy_failed",
+    patch:"DNS_SAFE_STREAM_PATCH_V84",
+    status:"all_stream_sources_failed",
+    checkedAt:new Date().toISOString(),
+    sources:sources.map(s=>({id:s.id,label:s.label,type:s.type,url:s.url})),
+    errors
+  },null,2),{
+    status:503,
+    headers:{
+      "content-type":"application/json; charset=UTF-8",
+      "cache-control":"no-store",
+      "access-control-allow-origin":"*",
+      "x-radio-proxy":"666soundsdesign-worker",
+      "x-failover-state":"failed",
+      "x-666-radio-status":"stream-fail",
+      "x-666-radio-reason":"dns-or-provider-fail"
+    }
+  });
+}
 
-function buildExternalProxyHeaders(sourceHeaders){
-  // Relevante Header des externen Players sauber an den Browser weiterreichen.
-  const headers = new Headers(sourceHeaders);
-  headers.set("cache-control", "no-store");
-  headers.delete("content-security-policy");
-  headers.delete("x-frame-options");
-  headers.delete("content-length");
-  headers.set("x-player-mode", "external-proxy");
-  return headers;
+async function proxyFallbackStream(request){
+  // Direkte Backup-Route: Hauptstream bewusst auslassen.
+  return await proxyStreamFailover(request,DNS_SAFE_STREAM_SOURCES.filter(source=>source.type!=="main"));
+}
+
+async function handleDnsSafeDebug(){
+  const selection=await dnsSafeSelectLiveSource();
+  return new Response(JSON.stringify({
+    system:"666SOUNDsDESIGn Radio Core",
+    worker:"root-worker.js",
+    patch:"DNS_SAFE_STREAM_PATCH_V84",
+    ok:selection.ok,
+    selected:selection.selected,
+    selectedCheck:selection.selectedCheck,
+    checks:selection.checks,
+    checkedAt:selection.checkedAt,
+    routes:{
+      stream:"/stream",
+      radioStream:"/api/radio/stream",
+      fallback:"/fallback-stream",
+      debug:"/api/radio/debug/dns"
+    },
+    note:"Main und Backup liegen aktuell auf my.idjstream.com. Bei komplettem DNS-Ausfall dieser Domain hilft erst eine direkte IP oder ein zweiter Provider als zusätzliche Quelle."
+  },null,2),{
+    status:selection.ok?200:503,
+    headers:{
+      "content-type":"application/json; charset=UTF-8",
+      "cache-control":"no-store",
+      "access-control-allow-origin":"*"
+    }
+  });
 }
 
 async function fetchExternalAsset(pathname, request){
@@ -470,6 +569,15 @@ const url=new URL(request.url);
     // Gesundheitscheck unverändert lassen.
     if(url.pathname==="/health"){
       return new Response("OK",{status:200,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
+    }
+
+    // DNS_SAFE_STREAM_PATCH_V84:
+    // Neue Standard-Routen für Radio Core ergänzen, alte /stream-Route bleibt weiter aktiv.
+    if(url.pathname==="/api/radio/debug/dns" || url.pathname==="/debug/dns"){
+      return await handleDnsSafeDebug();
+    }
+    if(url.pathname==="/api/radio/stream"){
+      return await proxyStreamFailover(request);
     }
 
     // Metadaten-Proxy NICHT umbauen, damit iPhone-App und bestehende Clients stabil bleiben.

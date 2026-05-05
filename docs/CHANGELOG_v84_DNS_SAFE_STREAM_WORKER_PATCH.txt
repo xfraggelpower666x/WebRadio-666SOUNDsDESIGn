@@ -1,0 +1,25 @@
+666SOUNDsDESIGn — CHANGELOG v84 DNS SAFE STREAM WORKER PATCH
+Erstellt: 2026-05-05
+Geändert: 2026-05-05
+
+STATUS:
+- Add-only / Extend-first Patch direkt im bestehenden Root-worker.js integriert.
+- Kein Rebuild, kein KV, kein R2, keine Secrets.
+
+GEÄNDERT:
+- DNS_SAFE_STREAM_SOURCES ergänzt:
+  1. Main: https://my.idjstream.com/666soundsdesign/stream
+  2. Backup-Port: https://my.idjstream.com:8686/stream
+  3. Backup-Pfad: https://my.idjstream.com/8686/stream
+- /stream nutzt jetzt den V84 Failover-Loop.
+- /fallback-stream nutzt nur Backup-Quellen.
+- /api/radio/stream als zusätzliche Radio-Core-Route ergänzt.
+- /api/radio/debug/dns und /debug/dns als Diagnose-Routen ergänzt.
+- Diagnose-Header ergänzt: x-666-radio-status, x-666-radio-source, x-666-radio-source-type.
+
+NICHT GEÄNDERT:
+- Frontend-Dateien nicht umgebaut.
+- Interner Notfallplayer nicht entfernt.
+- Externer Player-Alias nicht entfernt.
+- Metadatenproxy /api/nowplaying nicht ersetzt.
+- wrangler.jsonc nicht geändert.

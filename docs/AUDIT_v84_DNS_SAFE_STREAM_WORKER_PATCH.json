@@ -1,0 +1,21 @@
+{
+  "project": "666SOUNDsDESIGn WebRadio",
+  "version": "v84",
+  "created": "2026-05-05",
+  "modified": "2026-05-05",
+  "mode": "ADD_ONLY_EXTEND_FIRST",
+  "worker_file": "worker.js",
+  "changes": [
+    "Integrated DNS-safe stream failover directly into root worker.js",
+    "Added /api/radio/stream compatibility route",
+    "Added /api/radio/debug/dns and /debug/dns diagnostics",
+    "Preserved /stream and /fallback-stream",
+    "Preserved /api/nowplaying metadata proxy",
+    "Preserved external and internal player routing"
+  ],
+  "no_secrets": true,
+  "no_kv": true,
+  "no_r2": true,
+  "syntax_check": "node --check worker.js passed",
+  "notes": "Main and backup still use my.idjstream.com; second provider or direct IP recommended for full DNS independence."
+}
