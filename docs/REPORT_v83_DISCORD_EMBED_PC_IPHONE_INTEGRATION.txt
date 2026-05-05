@@ -1,0 +1,70 @@
+666SOUNDsDESIGn — v83 DISCORD EMBED PC/IPHONE INTEGRATION
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION.zip
+ADDON: 666SOUNDsDESIGn_DISCORD_EMBED_ADDON_V1.zip
+
+ANALYSE:
+- Addon-Dateien: 9
+- Discord-Bezug erkannt: True
+- Iframe-Quelle erkannt: True
+- Ausgewählte Iframe-Quelle: https://webradio.666soundsdesign-broadcaster.com/assets/discord/discord-preview.svg
+
+UMGESETZT:
+- Addon-Dateien unverändert unter assets/addons/discord-embed-v1/ abgelegt.
+- Gekapseltes Addon-JS erstellt: js/addons/discord-embed-v83.js.
+- Gekapseltes Addon-CSS erstellt: css/addons/discord-embed-v83.css.
+- Discord-Button als kleiner DC LED-Chip im Systempanel.
+- PC: Discord öffnet als rechter Cockpit-Panelbereich.
+- iPhone: Discord öffnet als Bottom-Sheet, safe-area aware.
+- Klick daneben / ESC / Close schließt Panel.
+- Keine Stream-URLs, keine Worker-Routen, keine Secrets geändert.
+
+GEÄNDERT:
+- Original-Addon nach assets/addons/discord-embed-v1/ kopiert
+- Discord Addon JS/CSS gekapselt erstellt
+- index.html: Discord CSS/JS eingebunden
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 addon analysed: True
+- Block 2 addon copied: True
+- Block 3 assets created: True
+- Block 4 index integration: True
+- Block 5 no stream route in addon: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION.zip
+- addon: 666SOUNDsDESIGn_DISCORD_EMBED_ADDON_V1.zip
+- before_file_count: 154
+- after_file_count_pre_report: 165
+- version_v83: True
+- addon_file_count: 9
+- addon_contains_discord: True
+- iframe_src_detected: True
+- selected_iframe_src: https://webradio.666soundsdesign-broadcaster.com/assets/discord/discord-preview.svg
+- discord_asset_js: True
+- discord_asset_css: True
+- index_css_included: True
+- index_js_included: True
+- pc_mobile_css_present: True
+- toggle_button_code_present: True
+- panel_code_present: True
+- no_stream_url_changes_in_addon: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- js/addons/discord-embed-v83.js
+- final_file_count: 168

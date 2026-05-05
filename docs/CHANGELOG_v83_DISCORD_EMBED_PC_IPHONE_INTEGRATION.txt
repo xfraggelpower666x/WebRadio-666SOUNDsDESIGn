@@ -1,0 +1,13 @@
+666SOUNDsDESIGn — v83 DISCORD EMBED PC/IPHONE INTEGRATION
+
+Geändert:
+- index.html: Discord Addon CSS/JS eingebunden, Version/Cache v83
+- css/addons/discord-embed-v83.css
+- js/addons/discord-embed-v83.js
+- assets/addons/discord-embed-v1/: Original-Addon-Dateien kopiert
+- Versionsmarker in bestehenden JS/Worker-Dateien
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

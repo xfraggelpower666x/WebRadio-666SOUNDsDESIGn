@@ -1,0 +1,134 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION",
+  "cache_tag": "smfp-v83-discord-embed-pc-iphone-integration-20260505-0245",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION.zip",
+  "addon": "666SOUNDsDESIGn_DISCORD_EMBED_ADDON_V1.zip",
+  "addon_manifest": [
+    {
+      "path": "README.md",
+      "size": 292,
+      "contains_discord": true,
+      "contains_iframe": false,
+      "contains_widgetbot": false,
+      "first_300": "# 666SOUNDsDESIGn Discord Embed Addon V1\n\nAdd-only Paket für Discord Embed + Button zum Webradio Player.\n\nSiehe:\n\n```text\ndocs/HANDOFF_DISCORD_EMBED_PLAYER_V1.md\n```\n\nWichtig:\n\n```text\nWebhook-URL nie in öffentliches HTML/JS schreiben.\nDISCORD_WEBHOOK_URL als Cloudflare Secret setzen.\n```\n"
+    },
+    {
+      "path": "worker-addons/discord-embed-addon.js",
+      "size": 5427,
+      "contains_discord": true,
+      "contains_iframe": false,
+      "contains_widgetbot": false,
+      "first_300": "/*\n############################################################\n# 666SOUNDsDESIGn — Discord Embed Addon Worker Module\n# Created: 2026-05-05\n# Modified: 2026-05-05\n# Version: V1.0\n# Purpose: Secret-safe Discord webhook sender for Player Embed cards.\n# Change Summary:\n# - Add-only helper for Cloudflar"
+    },
+    {
+      "path": "worker-addons/WORKER_INTEGRATION_SNIPPET.txt",
+      "size": 914,
+      "contains_discord": true,
+      "contains_iframe": false,
+      "contains_widgetbot": false,
+      "first_300": "############################################################\n# 666SOUNDsDESIGn — Worker Integration Snippet\n# Created: 2026-05-05\n# Modified: 2026-05-05\n# Version: V1.0\n# Purpose: Minimal add-only patch points for existing worker.js.\n############################################################\n\nA) G"
+    },
+    {
+      "path": "docs/HANDOFF_DISCORD_EMBED_PLAYER_V1.md",
+      "size": 6545,
+      "contains_discord": true,
+      "contains_iframe": false,
+      "contains_widgetbot": false,
+      "first_300": "# 666SOUNDsDESIGn — Discord Embed + Player Button Addon V1\n\n**Created:** 2026-05-05  \n**Modified:** 2026-05-05  \n**Status:** ADD-ONLY / EXTEND-FIRST / SECRET-SAFE  \n**Purpose:** Discord-Karte mit Vorschau und Button `▶️ Player öffnen` für den bestehenden Webradio-Player.\n\n---\n\n## 1. Ergebnis\n\nDieses"
+    },
+    {
+      "path": "examples/discord-player-card-direct-payload.json",
+      "size": 928,
+      "contains_discord": true,
+      "contains_iframe": false,
+      "contains_widgetbot": false,
+      "first_300": "{\n  \"username\": \"666SOUNDsDESIGn Radio\",\n  \"avatar_url\": \"https://webradio.666soundsdesign-broadcaster.com/assets/images/logo-neon.png\",\n  \"embeds\": [\n    {\n      \"title\": \"🎧 666SOUNDsDESIGn WebRadio\",\n      \"description\": \"**Now Playing:** Live Cyber Radio Player\\n**Source:** Mainstream / Backstrea"
+    },
+    {
+      "path": "assets/discord/discord-preview.svg",
+      "size": 1581
+    },
+    {
+      "path": "tools/pc/send-discord-player-card.ps1",
+      "size": 1752
+    },
+    {
+      "path": "tools/pc/SEND_DISCORD_PLAYER_CARD_PC.bat",
+      "size": 429
+    },
+    {
+      "path": "Scriptable/Scripts/666SOUNDsDESIGn_DISCORD_PLAYER_CARD_iPHONE.js",
+      "size": 5922,
+      "contains_discord": true,
+      "contains_iframe": false,
+      "contains_widgetbot": false,
+      "first_300": "// ############################################################\n// # 666SOUNDsDESIGn — Discord Player Card Sender for iPhone\n// # Created: 2026-05-05\n// # Modified: 2026-05-05\n// # Version: V1.0\n// # Purpose: iPhone/Scriptable sender for Discord Embed + Player Button.\n// # Change Summary:\n// # - Sen"
+    }
+  ],
+  "detected_discord_urls": [
+    "https://discord.com/api/webhooks/...",
+    "https://webradio.666soundsdesign-broadcaster.com/api/discord/player-card",
+    "https://webradio.666soundsdesign-broadcaster.com/assets/discord/discord-preview.svg"
+  ],
+  "selected_iframe_src": "https://webradio.666soundsdesign-broadcaster.com/assets/discord/discord-preview.svg",
+  "changes": [
+    "Original-Addon nach assets/addons/discord-embed-v1/ kopiert",
+    "Discord Addon JS/CSS gekapselt erstellt",
+    "index.html: Discord CSS/JS eingebunden"
+  ],
+  "warnings": [],
+  "removed": [],
+  "checks": [
+    [
+      "Block 1 addon analysed",
+      true
+    ],
+    [
+      "Block 2 addon copied",
+      true
+    ],
+    [
+      "Block 3 assets created",
+      true
+    ],
+    [
+      "Block 4 index integration",
+      true
+    ],
+    [
+      "Block 5 no stream route in addon",
+      true
+    ]
+  ],
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js",
+    "js/addons/discord-embed-v83.js"
+  ],
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION.zip",
+    "addon": "666SOUNDsDESIGn_DISCORD_EMBED_ADDON_V1.zip",
+    "before_file_count": 154,
+    "after_file_count_pre_report": 165,
+    "version_v83": true,
+    "addon_file_count": 9,
+    "addon_contains_discord": true,
+    "iframe_src_detected": true,
+    "selected_iframe_src": "https://webradio.666soundsdesign-broadcaster.com/assets/discord/discord-preview.svg",
+    "discord_asset_js": true,
+    "discord_asset_css": true,
+    "index_css_included": true,
+    "index_js_included": true,
+    "pc_mobile_css_present": true,
+    "toggle_button_code_present": true,
+    "panel_code_present": true,
+    "no_stream_url_changes_in_addon": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "final_file_count": 168
+  }
+}

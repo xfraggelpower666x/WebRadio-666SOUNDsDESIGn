@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#090018"/>
+      <stop offset="0.45" stop-color="#130044"/>
+      <stop offset="1" stop-color="#001b2b"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <rect x="34" y="34" width="1132" height="562" rx="34" fill="none" stroke="#00fff7" stroke-width="4" filter="url(#glow)"/>
+  <rect x="64" y="64" width="1072" height="502" rx="24" fill="none" stroke="#ff2df7" stroke-width="2" opacity=".75"/>
+  <text x="600" y="240" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="78" fill="#00fff7" filter="url(#glow)">666SOUNDsDESIGn</text>
+  <text x="600" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="44" fill="#ff2df7">LIVE CYBER RADIO PLAYER</text>
+  <text x="600" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" fill="#c77dff">Mainstream • Backstream • Now Playing</text>
+  <circle cx="160" cy="500" r="9" fill="#00fff7" filter="url(#glow)"/>
+  <circle cx="190" cy="500" r="9" fill="#ff2df7" filter="url(#glow)"/>
+  <circle cx="220" cy="500" r="9" fill="#c77dff" filter="url(#glow)"/>
+  <text x="600" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#ffffff">▶ Player öffnen</text>
+</svg>

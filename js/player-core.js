@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
-import { applyStatusChip } from './shared-status.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
+import { applyStatusChip } from './shared-status.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
+   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
+   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
+   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
+   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
+   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
