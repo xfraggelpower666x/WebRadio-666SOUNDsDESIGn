@@ -49,7 +49,7 @@ ZWECK:
       radial-gradient(circle at 50% 12%, rgba(22,255,243,.10), transparent 38%),
       radial-gradient(circle at 22% 72%, rgba(255,61,187,.10), transparent 42%),
       linear-gradient(rgba(3,7,18,.28),rgba(3,7,18,.42)),
-      url('/assets/images/pc-player-background.png?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115') !important;
+      url('/assets/images/pc-player-background.png?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215') !important;
     background-size: cover !important;
     background-position: center center !important;
     background-attachment: fixed !important;
@@ -2151,5 +2151,109 @@ ZWECK:
 @keyframes v81PcTickerRun{0%{transform:translateX(0)}100%{transform:translateX(calc(-100% - 35vw))}}
 #playBtn,.play-btn,button[aria-label="Play"],button[title="Play"]{position:relative!important;isolation:isolate!important;overflow:visible!important}#playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before{content:""!important;position:absolute!important;inset:-10px!important;border-radius:inherit!important;z-index:-1!important;pointer-events:none!important;background:conic-gradient(from calc(var(--pc-audio-energy,.10) * 360deg),#ff3dbb,#ffb000,#39ff14,#28fff4,#8a4dff,#ff3dbb)!important;filter:blur(calc(8px + var(--pc-audio-energy,.10) * 18px))!important;opacity:calc(.32 + var(--pc-audio-energy,.10) * .58)!important;transform:scale(calc(1 + var(--pc-audio-energy,.10) * .08))!important}
 .cockpit,.player-shell,.player-frame,.root-player,main{position:relative!important}.bottom-level-meter,#bottomLevelMeter,.gesture-level-meter,.meter-bottom,.bottom-meter,.levelmeter-bottom{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;display:block!important;width:min(72%,760px)!important;margin:14px auto 8px auto!important;z-index:4!important}.copyright,.footer,.player-footer,#copyright{position:relative!important;z-index:5!important;margin-top:8px!important;clear:both!important}
+}
+
+
+/* v82 restore iphone pc only isolation */
+
+/*
+  Mobile/iPhone-Restore:
+  PC-only Patches bleiben Desktop.
+  Mobile Rows/Panels werden wieder freigegeben, falls PC-Patches sie versteckt haben.
+*/
+
+@media (min-width:761px){
+  body:not(.mobile) .systempanel-grid-v74{
+    grid-template-columns:minmax(220px,1fr) minmax(190px,212px) minmax(250px,1fr)!important;
+  }
+  body:not(.mobile) #pcTickerRebuildLane.pc-ticker-rebuild-lane,
+  body:not(.mobile) .pc-ticker-rebuild-lane{display:block!important}
+  body:not(.mobile) #historyTickerLane,
+  body:not(.mobile) .history-ticker-lane{display:none!important}
+}
+
+@media (max-width:760px){
+  #pcTickerRebuildLane,
+  .pc-ticker-rebuild-lane{
+    display:none!important;
+  }
+
+  .stream-choice-row,
+  .source-choice-row,
+  .main-back-row,
+  .mainstream-backup-row,
+  .source-switch-row,
+  .stream-source-row,
+  .mobile-stream-row,
+  .mobile-source-row,
+  .mobile-status-row,
+  .mobile-boost-row,
+  .mobile-history-row{
+    display:flex!important;
+    visibility:visible!important;
+  }
+
+  #historyToggle{
+    position:static!important;
+    top:auto!important;
+    right:auto!important;
+    z-index:auto!important;
+  }
+
+  .now-playing,
+  .now-card,
+  .now-panel{
+    max-width:100%!important;
+  }
+
+  #metaLine,
+  .now-title,
+  .track-title,
+  .current-title{
+    max-width:100%!important;
+  }
+
+  .bottom-level-meter,
+  #bottomLevelMeter,
+  .gesture-level-meter,
+  .meter-bottom,
+  .bottom-meter,
+  .levelmeter-bottom{
+    width:auto!important;
+    max-width:none!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+
+  #mainBtn,
+  #fallbackBtn,
+  #pcBoostPanel,
+  #pcBoostLabel{
+    transform:none!important;
+  }
+}
+
+body.mobile #pcTickerRebuildLane,
+body.mobile .pc-ticker-rebuild-lane{display:none!important}
+
+body.mobile .stream-choice-row,
+body.mobile .source-choice-row,
+body.mobile .main-back-row,
+body.mobile .mainstream-backup-row,
+body.mobile .source-switch-row,
+body.mobile .stream-source-row,
+body.mobile .mobile-stream-row,
+body.mobile .mobile-source-row,
+body.mobile .mobile-status-row,
+body.mobile .mobile-boost-row,
+body.mobile .mobile-history-row{
+  display:flex!important;
+  visibility:visible!important;
+}
+
+body.mobile #historyToggle{
+  position:static!important;
+  top:auto!important;
+  right:auto!important;
 }
 

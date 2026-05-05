@@ -1,0 +1,56 @@
+666SOUNDsDESIGn — v82 RESTORE IPHONE / PC-ONLY ISOLATION
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v81_PC_LAYOUT_TICKER_METER_REPAIR.zip
+
+UMGESETZT:
+- Keine neuen PC-Designänderungen.
+- PC-only Regeln zusätzlich gekapselt.
+- Mobile/iPhone Rows/Panels werden wieder freigegeben, falls PC-Patches sie versteckt haben.
+- PC-Tickerbox wird auf Mobile/iPhone deaktiviert.
+- History-Button wird auf Mobile wieder in normalen Flow gesetzt.
+- Mobile-Guard ergänzt, ohne Stream-URLs oder Worker-Routen anzufassen.
+
+GEÄNDERT:
+- index.html: nur Version/Cache v82 gesetzt
+- css/desktop.css: Mobile/iPhone Restore-Regeln und PC-only-Isolation ergänzt
+- js/player-core.js: Mobile-Isolation-Guard ergänzt
+
+ENTFERNT/BEREINIGT:
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 CSS mobile restore: True
+- Block 3 Mobile rows visible: True
+- Block 4 JS mobile guard: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v81_PC_LAYOUT_TICKER_METER_REPAIR.zip
+- before_file_count: 151
+- after_file_count_pre_report: 151
+- version_v82: True
+- mobile_restore_css_present: True
+- pc_rules_scoped_min_width: True
+- mobile_pc_ticker_disabled: True
+- mobile_rows_restored: True
+- mobile_history_static: True
+- v82_guard_present: True
+- guard_no_stream_url_changes: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 154

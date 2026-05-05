@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — v82 RESTORE IPHONE / PC-ONLY ISOLATION
+
+Geändert:
+- index.html: nur Version/Cache v82
+- css/desktop.css: Mobile/iPhone Restore-Regeln und PC-only-Isolation ergänzt
+- js/player-core.js: Mobile-Isolation-Guard ergänzt
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- js/responsive-ui.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten

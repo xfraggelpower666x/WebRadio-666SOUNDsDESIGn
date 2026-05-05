@@ -1,0 +1,69 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION",
+  "cache_tag": "smfp-v82-restore-iphone-pc-only-isolation-20260505-0215",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v81_PC_LAYOUT_TICKER_METER_REPAIR.zip",
+  "changes": [
+    "index.html: nur Version/Cache v82 gesetzt",
+    "css/desktop.css: Mobile/iPhone Restore-Regeln und PC-only-Isolation ergänzt",
+    "js/player-core.js: Mobile-Isolation-Guard ergänzt"
+  ],
+  "warnings": [],
+  "removed": [],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 CSS mobile restore",
+      true
+    ],
+    [
+      "Block 3 Mobile rows visible",
+      true
+    ],
+    [
+      "Block 4 JS mobile guard",
+      true
+    ]
+  ],
+  "audit_before": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v81_PC_LAYOUT_TICKER_METER_REPAIR.zip",
+    "v81_handlers": 1,
+    "pc_ticker_refs": 8,
+    "mobile_hide_refs": {
+      ".stream-choice-row": 1,
+      ".source-choice-row": 1,
+      ".main-back-row": 1,
+      ".mainstream-backup-row": 1,
+      ".source-switch-row": 1,
+      ".stream-source-row": 1
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v81_PC_LAYOUT_TICKER_METER_REPAIR.zip",
+    "before_file_count": 151,
+    "after_file_count_pre_report": 151,
+    "version_v82": true,
+    "mobile_restore_css_present": true,
+    "pc_rules_scoped_min_width": true,
+    "mobile_pc_ticker_disabled": true,
+    "mobile_rows_restored": true,
+    "mobile_history_static": true,
+    "v82_guard_present": true,
+    "guard_no_stream_url_changes": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 154
+  }
+}

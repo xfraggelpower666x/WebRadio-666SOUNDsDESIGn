@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
-import { applyStatusChip } from './shared-status.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
+import { applyStatusChip } from './shared-status.js?v=smfp-v82-restore-iphone-pc-only-isolation-20260505-0215';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v82_RESTORE_IPHONE_PC_ONLY_ISOLATION: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -1019,4 +1019,61 @@ try {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 // END v81 PC Layout Ticker Meter Repair
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v82 Restore iPhone PC Only Isolation
+// Zweck: PC-only Helper dürfen Mobile/iPhone nicht verbiegen.
+// ==========================================================
+(function installV82RestoreIphonePcOnlyIsolation(){
+  if(window.__v82RestoreIphonePcOnlyIsolationInstalled)return;
+  window.__v82RestoreIphonePcOnlyIsolationInstalled=true;
+  const isMobile=()=>window.matchMedia&&window.matchMedia('(max-width: 760px)').matches;
+
+  function restoreMobile(){
+    if(!isMobile())return;
+    document.documentElement.classList.add('iphone-restore-v82');
+    document.body.classList.add('iphone-restore-v82');
+
+    document.querySelectorAll('#pcTickerRebuildLane,.pc-ticker-rebuild-lane').forEach(el=>{
+      el.style.display='none';
+      el.setAttribute('aria-hidden','true');
+    });
+
+    document.querySelectorAll('.stream-choice-row,.source-choice-row,.main-back-row,.mainstream-backup-row,.source-switch-row,.stream-source-row,.mobile-stream-row,.mobile-source-row,.mobile-status-row,.mobile-boost-row,.mobile-history-row').forEach(el=>{
+      el.style.display='flex';
+      el.style.visibility='visible';
+      el.removeAttribute('hidden');
+      el.setAttribute('data-v82-mobile-restored','true');
+    });
+
+    const history=document.getElementById('historyToggle');
+    if(history){
+      history.style.position='static';
+      history.style.top='auto';
+      history.style.right='auto';
+      history.style.zIndex='auto';
+    }
+  }
+
+  function desktopGuard(){
+    if(isMobile())restoreMobile();
+    else{
+      document.documentElement.classList.remove('iphone-restore-v82');
+      document.body.classList.remove('iphone-restore-v82');
+    }
+  }
+
+  function boot(){
+    restoreMobile();
+    desktopGuard();
+    window.addEventListener('resize',desktopGuard,{passive:true});
+    window.addEventListener('orientationchange',restoreMobile,{passive:true});
+    setInterval(restoreMobile,1500);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+})();
+// END v82 Restore iPhone PC Only Isolation
 
