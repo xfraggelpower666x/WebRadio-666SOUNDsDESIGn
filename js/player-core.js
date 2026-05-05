@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
-import { applyStatusChip } from './shared-status.js?v=smfp-v80-stream-stability-mb-led-repair-20260505-0045';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
+import { applyStatusChip } from './shared-status.js?v=smfp-v81-pc-layout-ticker-meter-repair-20260505-0115';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -84,14 +84,14 @@ ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
 */
 function installMobileTouchControlsRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR: installMobileTouchControlsRepair call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR: installMobileTouchControlsRepair call removed. */
 /*
 ==========================================
 GEÄNDERT: 2026-04-25
@@ -103,47 +103,47 @@ ZWECK:
 */
 function installMobileLevelmeterGestureGuard() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR: installMobileLevelmeterGestureGuard call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR: installMobileLevelmeterGestureGuard call removed. */
 /* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
 function installMobileHudDomMeterRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
 /* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
 function installMobileTransportPinRepair() {
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
   return;
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
 /* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
 function installMobileTopControlsInBoostPanel(){
 /*
-   * STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR:
+   * STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR:
    * Alter mobiler Generator physisch deaktiviert.
    * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
    */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR');
+  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR');
   return;
 }
-/* STRICT_MOBILE_FRONTEND_PURGE_v80_STREAM_STABILITY_MB_LED_REPAIR: installMobileTopControlsInBoostPanel call removed. */
+/* STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
@@ -1000,4 +1000,23 @@ try {
   else boot();
 })();
 // END v80 Stream Stability MB LED Repair
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v81 PC Layout Ticker Meter Repair
+// ==========================================================
+(function installV81PcLayoutTickerMeterRepair(){
+  if(window.__v81PcLayoutTickerMeterRepairInstalled)return;window.__v81PcLayoutTickerMeterRepairInstalled=true;
+  const qs=id=>document.getElementById(id);let lastTicker='';
+  function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
+  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v81')code.textContent='v81'}}
+  function readTickerSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
+  function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>el.remove());let lane=qs('pcTickerRebuildLane'),text=qs('pcTickerRebuildText');if(!lane||!text){lane=document.createElement('div');lane.id='pcTickerRebuildLane';lane.className='pc-ticker-rebuild-lane';lane.setAttribute('aria-label','PC Laufschrift');text=document.createElement('span');text.id='pcTickerRebuildText';text.className='pc-ticker-rebuild-text';text.textContent=lastTicker||'666SOUNDsDESIGn WebRadio';lane.appendChild(text)}const history=qs('historyToggle');const nowBox=history?history.parentElement:(document.querySelector('.now-playing')||document.querySelector('.now-card')||document.body);if(nowBox&&lane.parentElement!==nowBox)nowBox.appendChild(lane);return{lane,text}}
+  function syncTicker(){const t=ensureSingleTicker();const src=readTickerSource();if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==finalText){t.text.textContent=finalText;t.text.setAttribute('data-ticker-live','true')}}
+  function fixNowPlayingLabel(){document.querySelectorAll('.now-label,.now-playing-label,.now-playing .label,.now-playing [class*="label"]').forEach(el=>{const txt=String(el.textContent||'').trim();if(/no\s*playing/i.test(txt)||(/now\s*playing/i.test(txt)&&txt!=='NOW PLAYING'))el.textContent='NOW PLAYING'})}
+  function hardenHistoryClose(){const toggle=qs('historyToggle'),panel=qs('historyPanel');let backdrop=qs('historyOverlayBackdrop');if(!toggle||!panel)return;if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel');function open(){panel.classList.remove('hidden');backdrop.classList.remove('hidden');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');document.body.classList.add('history-overlay-open');document.documentElement.classList.add('history-overlay-open')}function close(){panel.classList.add('hidden');backdrop.classList.add('hidden');document.body.classList.remove('history-overlay-open');document.documentElement.classList.remove('history-overlay-open');backdrop.style.pointerEvents='auto';backdrop.style.opacity=''}const handler=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v81HistoryHandler)toggle.removeEventListener('click',toggle.__v81HistoryHandler);toggle.__v81HistoryHandler=handler;toggle.addEventListener('click',handler,true);backdrop.onclick=e=>{e.preventDefault();e.stopPropagation();close()};document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true})}
+  function boot(){setMbChips();fixNowPlayingLabel();ensureSingleTicker();syncTicker();hardenHistoryClose();const meta=qs('metaLine');if(meta&&window.MutationObserver)new MutationObserver(syncTicker).observe(meta,{childList:true,characterData:true,subtree:true});setInterval(()=>{setMbChips();fixNowPlayingLabel();syncTicker()},700)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+// END v81 PC Layout Ticker Meter Repair
 

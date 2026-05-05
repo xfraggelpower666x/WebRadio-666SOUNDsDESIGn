@@ -1,0 +1,62 @@
+666SOUNDsDESIGn — v81 PC LAYOUT TICKER METER REPAIR
+
+BASIS: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v80_STREAM_STABILITY_MB_LED_REPAIR.zip
+
+UMGESETZT:
+- PC-only: obere LISTENERS/BITRATE/DJ-STATUS Panels per CSS kleiner skaliert.
+- Versionsbadge auf v81 gesetzt und oben/rechts im Systempanel priorisiert.
+- M/B-Chips kompakt rechts gesichert.
+- History-Klick daneben schließt Panel + Backdrop sofort.
+- Now Playing Label einzeilig erzwungen; Titel darunter Neonlila/ellipsis.
+- Doppelte Tickerbox entfernt; nur pcTickerRebuildLane bleibt.
+- Ticker-Zyklus verkürzt, damit weniger Leerraum nach Durchlauf entsteht.
+- Play-Button Regenbogen-Audioglow ergänzt.
+- Unteres Levelmeter relativ unter dem Player verankert, Copyright bleibt lesbar.
+
+GEÄNDERT:
+- index.html: Version v81, M/B-Chips und ein einziges PC-Tickerziel gesichert
+- css/desktop.css: PC-Layout-Reparatur, Ticker, History, Play-Glow und Bottom-Levelmeter-Verankerung gesetzt
+- js/player-core.js: History-Sofort-Schließen, einzelne PC-Tickerbox, M/B/Version-Sicherung ergänzt
+
+ENTFERNT/BEREINIGT:
+
+WARNUNGEN:
+
+NICHT GEÄNDERT:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
+
+CHECKS:
+- Block 1 audit: True
+- Block 2 top panels/version/mb css: True
+- Block 3 history close immediate: True
+- Block 4 single ticker: True
+- Block 5 rainbow play + bottom meter: True
+
+SANITY:
+- base: WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v80_STREAM_STABILITY_MB_LED_REPAIR.zip
+- before_file_count: 148
+- after_file_count_pre_report: 148
+- version_v81: True
+- pc_version_badge_updated: True
+- mb_chip_labels: True
+- single_pc_ticker_dom: True
+- single_pc_ticker_js: True
+- ticker_short_cycle: True
+- history_close_fix: False
+- now_playing_single_line_css: True
+- play_rainbow_audio_glow: True
+- bottom_meter_anchored: True
+- worker_route_kept: True
+- wrangler_unchanged: True
+- inline_script_checked: True
+
+GEPRÜFT:
+- worker.js
+- js/player-core.js
+- js/equalizer.js
+- js/controls.js
+- js/responsive-ui.js
+- js/shared-status.js
+- final_file_count: 151

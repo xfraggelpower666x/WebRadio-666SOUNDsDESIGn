@@ -1,0 +1,93 @@
+{
+  "version": "STRICT_MOBILE_FRONTEND_PURGE_v81_PC_LAYOUT_TICKER_METER_REPAIR",
+  "cache_tag": "smfp-v81-pc-layout-ticker-meter-repair-20260505-0115",
+  "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v80_STREAM_STABILITY_MB_LED_REPAIR.zip",
+  "changes": [
+    "index.html: Version v81, M/B-Chips und ein einziges PC-Tickerziel gesichert",
+    "css/desktop.css: PC-Layout-Reparatur, Ticker, History, Play-Glow und Bottom-Levelmeter-Verankerung gesetzt",
+    "js/player-core.js: History-Sofort-Schließen, einzelne PC-Tickerbox, M/B/Version-Sicherung ergänzt"
+  ],
+  "warnings": [],
+  "removed": [],
+  "checks": [
+    [
+      "Block 1 audit",
+      true
+    ],
+    [
+      "Block 2 top panels/version/mb css",
+      true
+    ],
+    [
+      "Block 3 history close immediate",
+      true
+    ],
+    [
+      "Block 4 single ticker",
+      true
+    ],
+    [
+      "Block 5 rainbow play + bottom meter",
+      true
+    ]
+  ],
+  "audit_before": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v80_STREAM_STABILITY_MB_LED_REPAIR.zip",
+    "ids": {
+      "pcVersionBadge": 1,
+      "mainBtn": 1,
+      "fallbackBtn": 1,
+      "historyToggle": 1,
+      "historyPanel": 1,
+      "pcTickerRebuildLane": 1,
+      "pcTickerRebuildText": 1,
+      "historyTickerLane": 0,
+      "nowPlayingTicker": 1,
+      "metaLine": 1
+    },
+    "text_markers": {
+      "NOW PLAYING": 2,
+      "NO PLAYING": 0,
+      "MAINSTREAM": 1,
+      "BACKUP STREAM": 1,
+      "v80": 55,
+      "v79": 12,
+      "bottom": 212
+    },
+    "css_markers": {
+      "v80 stream stability mb led repair": 1,
+      "v79 pc history glow boost ticker rebuild": 1,
+      "pc-ticker-rebuild-lane": 2,
+      "bottom-meter": 0,
+      "level": 1
+    }
+  },
+  "checked": [
+    "worker.js",
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/controls.js",
+    "js/responsive-ui.js",
+    "js/shared-status.js"
+  ],
+  "inline_error_if_any": "",
+  "sanity": {
+    "base": "WebRadio-666SOUNDsDESIGn_CLEAN_REPO_ONLY_v80_STREAM_STABILITY_MB_LED_REPAIR.zip",
+    "before_file_count": 148,
+    "after_file_count_pre_report": 148,
+    "version_v81": true,
+    "pc_version_badge_updated": true,
+    "mb_chip_labels": true,
+    "single_pc_ticker_dom": true,
+    "single_pc_ticker_js": true,
+    "ticker_short_cycle": true,
+    "history_close_fix": false,
+    "now_playing_single_line_css": true,
+    "play_rainbow_audio_glow": true,
+    "bottom_meter_anchored": true,
+    "worker_route_kept": true,
+    "wrangler_unchanged": true,
+    "inline_script_checked": true,
+    "final_file_count": 151
+  }
+}

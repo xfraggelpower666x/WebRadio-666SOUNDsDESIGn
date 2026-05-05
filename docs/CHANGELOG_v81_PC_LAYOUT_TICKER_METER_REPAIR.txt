@@ -1,0 +1,14 @@
+666SOUNDsDESIGn — v81 PC LAYOUT TICKER METER REPAIR
+
+Geändert:
+- index.html: Version v81, M/B-Chips, einzelne PC-Tickerbox abgesichert
+- css/desktop.css: PC-Info-Panels kleiner, Version/M/B rechts, Ticker, History-Close-Layout, Play-Rainbow-Glow, Bottom-Levelmeter-Verankerung
+- js/player-core.js: History-Sofort-Schließen, Single-Ticker-Sicherung, Now-Playing-Label, M/B/Version-Sicherung
+- js/equalizer.js Versionsmarker
+- js/shared-status.js Versionsmarker
+- worker.js Versionsmarker
+
+Nicht geändert:
+- wrangler.jsonc
+- Stream-Ziel-URLs
+- Worker-Route /The-Dark-Dancer blieb erhalten
