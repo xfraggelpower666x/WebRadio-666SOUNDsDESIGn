@@ -3,24 +3,26 @@
 # 666SOUNDsDESIGn — Discord Player Frontend Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.1
-# Purpose: LED + gated manual player-card post + track-change post trigger for both HTML players.
-# Notes:
-# - No webhook URL in frontend.
-# - Calls Worker routes only.
-# - Uses localStorage for browser-side dedupe; Worker also has RAM cooldown.
+# Version: V3.2
+# Purpose: Multi-slot LED + gated manual player-card post for PC and iPhone players.
+# Change Summary:
+# - Repairs PC/iPhone slot mounting: one panel per visible player slot, no moving panel between slots.
+# - Keeps gate overlay English-only.
+# - Keeps webhook URL server-side only.
+# - Uses safer status/error display without touching stream/audio/worker routes outside /api/discord/*.
 ############################################################
 */
 (function(){
   'use strict';
-  const VERSION = 'V3.1-20260507-GATED';
+  const VERSION = 'V3.2-20260507-GATE-REPAIR';
   const DEFAULTS = {
     radioName: '666SOUNDsDESIGn WebRadio',
     domain: 'webradio.666soundsdesign-broadcaster.com',
     playerUrl: 'https://webradio.666soundsdesign-broadcaster.com',
     streamUrl: 'https://webradio.666soundsdesign-broadcaster.com/api/radio/stream',
     discordInfo: 'Discord: 666SOUNDsDESIGn Cyber Radio Community',
-    embedInfo: 'Embed info: web radio stream via https://webradio.666soundsdesign-broadcaster.com/api/radio/stream',
+    embedInfo: 'Embed info: Web radio stream via https://webradio.666soundsdesign-broadcaster.com/api/radio/stream',
+    previewImage: 'https://webradio.666soundsdesign-broadcaster.com/assets/icons/icon-512x512.png',
     endpointManual: '/api/discord/manual',
     endpointNowPlaying: '/api/discord/nowplaying',
     endpointStatus: '/api/discord/status',
@@ -33,21 +35,33 @@
     accessCancelText: 'CANCEL',
     accessDeniedTitle: 'ACCESS DENIED',
     accessDeniedMessage: 'Wrong code. Discord control remains locked.',
-    autoPostTrackChanges: false
+    autoPostTrackChanges: false,
+    mount: '[data-discord-addon-slot]'
   };
   const cfg = Object.assign({}, DEFAULTS, window.S666_DISCORD_PLAYER_CONFIG || {});
-  const state = { led: null, text: null, button: null, gate: null, denied: null, input: null, lastTrackKey: localStorage.getItem('s666_discord_last_track_key_v3') || '' };
+  const state = {
+    panels: [],
+    gate: null,
+    denied: null,
+    input: null,
+    lastTrackKey: localStorage.getItem('s666_discord_last_track_key_v3') || ''
+  };
 
   function clean(v){ return String(v || '').replace(/\s+/g,' ').trim(); }
+  function allPanels(){
+    state.panels = Array.from(document.querySelectorAll('.s666-discord-panel'));
+    return state.panels;
+  }
   function setLed(mode, label){
-    if(!state.led || !state.text) return;
-    state.led.className = 's666-discord-led s666-discord-led--' + (mode || 'idle');
-    state.text.textContent = label || (mode === 'ok' ? 'Discord post OK' : mode === 'error' ? 'Discord error' : 'Discord ready');
+    const panels = allPanels();
+    panels.forEach((panel) => {
+      const led = panel.querySelector('.s666-discord-led');
+      const text = panel.querySelector('.s666-discord-text');
+      if(led) led.className = 's666-discord-led s666-discord-led--' + (mode || 'idle');
+      if(text) text.textContent = label || (mode === 'ok' ? 'Discord post OK' : mode === 'error' ? 'Discord error' : 'Discord ready');
+    });
   }
-  function endpoint(path){
-    if(/^https?:\/\//i.test(path)) return path;
-    return path;
-  }
+  function endpoint(path){ return /^https?:\/\//i.test(path) ? path : path; }
   async function post(path, payload){
     setLed('sending', 'Discord sending…');
     const headers = { 'content-type': 'application/json' };
@@ -60,6 +74,18 @@
     setLed(data.skipped ? 'cooldown' : 'ok', data.skipped ? 'Discord skipped' : 'Discord post OK');
     setTimeout(() => setLed('idle','Discord ready'), 4500);
     return data;
+  }
+  async function checkStatus(){
+    try{
+      const res = await fetch(endpoint(cfg.endpointStatus), { method:'GET', headers:{ 'accept':'application/json' }, cache:'no-store' });
+      const data = await res.json().catch(() => null);
+      if(res.ok && data && data.ok){
+        setLed(data.webhookConfigured ? 'idle' : 'error', data.webhookConfigured ? 'Discord ready' : 'Discord webhook missing');
+      }
+    }catch(e){
+      setLed('error','Discord route error');
+      console.warn('[S666 Discord V3.2] status failed:', e);
+    }
   }
   function basePayload(){
     return {
@@ -150,7 +176,7 @@
     catch(e){
       const msg = String(e && e.message || e || '');
       if(/access denied|invalid discord gate code|HTTP 401/i.test(msg)) { setLed('error', 'Access denied'); showAccessDenied(); }
-      else { setLed('error', 'Discord error'); console.warn('[S666 Discord V3] manual failed:', e); }
+      else { setLed('error', 'Discord error'); console.warn('[S666 Discord V3.2] manual failed:', e); }
     }
   }
   function submitGateOverlay(){
@@ -183,37 +209,39 @@
     state.lastTrackKey = key;
     localStorage.setItem('s666_discord_last_track_key_v3', key);
     try { await post(cfg.endpointNowPlaying, Object.assign(basePayload(), track)); }
-    catch(e){ setLed('error','Discord track error'); console.warn('[S666 Discord V3] nowplaying failed:', e); }
+    catch(e){ setLed('error','Discord track error'); console.warn('[S666 Discord V3.2] nowplaying failed:', e); }
   }
   function startTrackWatcher(){
     postTrackIfChanged(readTrackFromDom());
     setInterval(() => postTrackIfChanged(readTrackFromDom()), Math.max(8000, Number(cfg.trackPollMs) || 15000));
   }
-  function mount(container){
-    const host = typeof container === 'string' ? document.querySelector(container) : container;
+  function createPanel(host){
+    if(!host || host.querySelector('.s666-discord-panel')) return;
     const box = document.createElement('div');
     box.className = 's666-discord-panel';
+    box.setAttribute('data-s666-discord-version', VERSION);
     box.innerHTML = '<div class="s666-discord-status"><span class="s666-discord-led s666-discord-led--idle"></span><span class="s666-discord-text">Discord ready</span></div><button type="button" class="s666-discord-button"></button>';
-    state.led = box.querySelector('.s666-discord-led');
-    state.text = box.querySelector('.s666-discord-text');
-    state.button = box.querySelector('.s666-discord-button');
-    state.button.textContent = cfg.manualButtonText;
-    state.button.addEventListener('click', manualPost);
-    if(host) host.appendChild(box); else document.body.appendChild(box);
+    const btn = box.querySelector('.s666-discord-button');
+    btn.textContent = cfg.manualButtonText;
+    btn.addEventListener('click', manualPost);
+    host.appendChild(box);
+  }
+  function mountAll(){
+    const hosts = Array.from(document.querySelectorAll(cfg.mount || '[data-discord-addon-slot]'));
+    if(!hosts.length){
+      if(!document.body.querySelector('.s666-discord-panel')) createPanel(document.body);
+    } else {
+      hosts.forEach(createPanel);
+    }
+    allPanels();
     setLed('idle','Discord ready');
   }
-  window.S666DiscordPlayerAddonV3 = { version: VERSION, mount, manualPost, postTrackIfChanged, readTrackFromDom, setLed };
+  window.S666DiscordPlayerAddonV3 = { version: VERSION, mountAll, manualPost, postTrackIfChanged, readTrackFromDom, setLed, checkStatus };
   document.addEventListener('DOMContentLoaded', () => {
-    mount(cfg.mount || '[data-discord-addon-slot]');
+    mountAll();
+    checkStatus();
     startTrackWatcher();
-    // MOBILE_SAFE_REMOUNT: iPhone-Player baut #mffApp dynamisch; deshalb Slot später erneut prüfen, ohne doppelte Panels zu stapeln.
-    [300, 900, 1800, 3600].forEach((delay) => setTimeout(() => {
-      const existing = document.querySelector('.s666-discord-panel');
-      const host = document.querySelector(cfg.mount || '[data-discord-addon-slot]');
-      if(host && (!existing || !host.contains(existing))) {
-        if(existing && existing.parentNode) existing.parentNode.removeChild(existing);
-        mount(host);
-      }
-    }, delay));
+    // MOBILE_SAFE_REMOUNT: iPhone player creates #mffApp dynamically; scan all slots without moving panels between PC/mobile.
+    [300, 900, 1800, 3600, 7000].forEach((delay) => setTimeout(() => { mountAll(); checkStatus(); }, delay));
   });
 })();

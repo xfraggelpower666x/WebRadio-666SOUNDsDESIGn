@@ -3,7 +3,7 @@
 # 666SOUNDsDESIGn — Discord Webhook HTML Player Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.1
+# Version: V3.2
 # Purpose: Secret-safe Discord bridge with access-gated manual player card posts.
 # Change Summary:
 # - Add-only Worker routes; no stream/fallback/notfallplayer logic touched.
@@ -13,12 +13,12 @@
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.1-20260507-GATED';
+const ADDON_VERSION = 'V3.2-20260507-GATE-REPAIR';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_STREAM_URL = 'https://webradio.666soundsdesign-broadcaster.com/api/radio/stream';
-const DEFAULT_PREVIEW_IMAGE = 'https://webradio.666soundsdesign-broadcaster.com/assets/discord/discord-preview.svg';
+const DEFAULT_PREVIEW_IMAGE = 'https://webradio.666soundsdesign-broadcaster.com/assets/icons/icon-512x512.png';
 const DEFAULT_USERNAME = '666SOUNDsDESIGn Radio';
 const MIN_TRACK_COOLDOWN_MS = 20000;
 const MIN_MANUAL_COOLDOWN_MS = 10000;
@@ -90,6 +90,14 @@ function baseSettings(input = {}) {
   };
 }
 
+function safeImage(url) {
+  const u = clean(url, '', 400);
+  if (!u) return null;
+  // Discord embeds are more reliable with PNG/JPG/WEBP/GIF than SVG.
+  if (/\.(png|jpe?g|webp|gif)(\?|#|$)/i.test(u)) return { url: u };
+  return null;
+}
+
 function manualPayload(input = {}) {
   const s = baseSettings(input);
   const embedText = s.embedInfo || `Embed info for other websites / apps:\n${s.streamUrl}`;
@@ -99,25 +107,22 @@ function manualPayload(input = {}) {
     `**Player:** ${s.playerUrl}`,
     `**Webradio-Stream:** ${s.streamUrl}`,
     '',
-    embedText
+    embedText,
+    '',
+    `▶️ Open Player: ${s.playerUrl}`
   ];
   if (s.discordInfo) lines.push('', `**Discord:** ${s.discordInfo}`);
-  return {
-    username: s.username,
-    embeds: [{
-      title: `🚀 ${s.radioName}`,
-      description: lines.join('\n').slice(0, 4000),
-      url: s.playerUrl,
-      color: 0x00ffff,
-      image: { url: s.previewImage },
-      footer: { text: '666SOUNDsDESIGn • Cyber Radio System • Player Card' },
-      timestamp: nowIso()
-    }],
-    components: [{
-      type: 1,
-      components: [{ type: 2, style: 5, label: '▶️ Open Player', url: s.playerUrl }]
-    }]
+  const embed = {
+    title: `🚀 ${s.radioName}`,
+    description: lines.join('\n').slice(0, 4000),
+    url: s.playerUrl,
+    color: 0xff3dbb,
+    footer: { text: '666SOUNDsDESIGn • Cyber Radio System • Player Card' },
+    timestamp: nowIso()
   };
+  const image = safeImage(s.previewImage);
+  if (image) embed.image = image;
+  return { username: s.username, embeds: [embed] };
 }
 
 function nowPlayingPayload(input = {}) {
@@ -136,17 +141,17 @@ function nowPlayingPayload(input = {}) {
       footer: { text: '666SOUNDsDESIGn • Now Playing' },
       timestamp: nowIso()
     }],
-    components: [{
-      type: 1,
-      components: [{ type: 2, style: 5, label: '🎧 Listen in Player', url: s.playerUrl }]
-    }]
   };
 }
 
+function getDiscordWebhook(env) {
+  return env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
+}
+
 async function sendDiscord(env, payload) {
-  const webhook = env && env.DISCORD_WEBHOOK_URL;
-  if (!webhook) throw new Error('DISCORD_WEBHOOK_URL fehlt im Worker Secret/env.');
-  const url = String(webhook).includes('?') ? `${webhook}&with_components=true` : `${webhook}?with_components=true`;
+  const webhook = getDiscordWebhook(env);
+  if (!webhook) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
+  const url = String(webhook);
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -193,7 +198,8 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       ok: true,
       addon: ADDON_VERSION,
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
-      webhookConfigured: Boolean(env && env.DISCORD_WEBHOOK_URL),
+      webhookConfigured: Boolean(getDiscordWebhook(env)),
+      acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
       adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
       gateCodeEnabled: true,
       lastKind: runtime.lastKind,
