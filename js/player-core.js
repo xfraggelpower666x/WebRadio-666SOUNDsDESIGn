@@ -1077,3 +1077,70 @@ try {
 })();
 // END v82 Restore iPhone PC Only Isolation
 
+
+
+/*
+==========================================
+GEÄNDERT: 2026-05-07
+ÄNDERUNG: MOBILE_AUDIO_RECOVERY_PATCH_v84
+ZWECK:
+- iOS Audio-Unterbrechungen automatisch recovern.
+- Kein echter Stop bei Systemton/Benachrichtigung.
+==========================================
+*/
+let __userStopped = false;
+
+function attemptMobileRecovery(reason = 'unknown') {
+  try {
+    if (__userStopped) return;
+    if (!audio) return;
+
+    const resumePromise = window.__radioAudioContext?.resume?.();
+    if (resumePromise && typeof resumePromise.catch === 'function') {
+      resumePromise.catch(() => {});
+    }
+
+    if (audio.paused && currentSource) {
+      const playPromise = audio.play?.();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    }
+
+    document.body?.setAttribute('data-audio-recovery', reason);
+  } catch (err) {
+    console.warn('mobile recovery failed', err);
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) setTimeout(() => attemptMobileRecovery('visibility'), 180);
+});
+
+window.addEventListener('focus', () => {
+  setTimeout(() => attemptMobileRecovery('focus'), 120);
+});
+
+window.addEventListener('pageshow', () => {
+  setTimeout(() => attemptMobileRecovery('pageshow'), 120);
+});
+
+audio?.addEventListener('pause', () => {
+  if (!__userStopped) {
+    setTimeout(() => attemptMobileRecovery('pause'), 250);
+  }
+});
+
+audio?.addEventListener('stalled', () => {
+  setTimeout(() => attemptMobileRecovery('stalled'), 250);
+});
+
+audio?.addEventListener('suspend', () => {
+  setTimeout(() => attemptMobileRecovery('suspend'), 250);
+});
+
+playBtn?.addEventListener('click', () => { __userStopped = false; });
+reconnectBtn?.addEventListener('click', () => { __userStopped = false; });
+mainBtn?.addEventListener('click', () => { __userStopped = false; });
+fallbackBtn?.addEventListener('click', () => { __userStopped = false; });
+stopBtn?.addEventListener('click', () => { __userStopped = true; });

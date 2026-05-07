@@ -37,7 +37,10 @@ ZWECK: Equalizer- und Seitenmeter-Visualisierung.
 ==========================================
 */
 
-const BOOST_MULTIPLIERS = [1.0, 1.35, 1.75, 2.20];
+const IS_IPHONE = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+const BOOST_MULTIPLIERS = IS_IPHONE
+  ? [1.0, 1.40, 1.80, 1.90]
+  : [1.0, 1.35, 1.75, 2.20];
 
 /*
 ==========================================
