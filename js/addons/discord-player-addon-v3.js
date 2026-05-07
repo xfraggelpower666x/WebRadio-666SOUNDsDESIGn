@@ -3,10 +3,11 @@
 # 666SOUNDsDESIGn — Discord Player Frontend Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.2
+# Version: V3.3
 # Purpose: Multi-slot LED + gated manual player-card post for PC and iPhone players.
 # Change Summary:
 # - Repairs PC/iPhone slot mounting: one panel per visible player slot, no moving panel between slots.
+# - Adds global click/touch bridge so rebuilt/cloned Discord panels still open the access overlay.
 # - Keeps gate overlay English-only.
 # - Keeps webhook URL server-side only.
 # - Uses safer status/error display without touching stream/audio/worker routes outside /api/discord/*.
@@ -14,7 +15,7 @@
 */
 (function(){
   'use strict';
-  const VERSION = 'V3.2-20260507-GATE-REPAIR';
+  const VERSION = 'V3.3-20260507-CLICK-BRIDGE-REPAIR';
   const DEFAULTS = {
     radioName: '666SOUNDsDESIGn WebRadio',
     domain: 'webradio.666soundsdesign-broadcaster.com',
@@ -220,11 +221,32 @@
     const box = document.createElement('div');
     box.className = 's666-discord-panel';
     box.setAttribute('data-s666-discord-version', VERSION);
-    box.innerHTML = '<div class="s666-discord-status"><span class="s666-discord-led s666-discord-led--idle"></span><span class="s666-discord-text">Discord ready</span></div><button type="button" class="s666-discord-button"></button>';
+    box.setAttribute('data-s666-discord-trigger', '1');
+    box.setAttribute('role', 'button');
+    box.setAttribute('tabindex', '0');
+    box.setAttribute('aria-label', 'Open Discord access gate');
+    box.innerHTML = '<div class="s666-discord-status"><span class="s666-discord-led s666-discord-led--idle"></span><span class="s666-discord-text">Discord ready</span></div><button type="button" class="s666-discord-button" data-s666-discord-trigger="1"></button>';
     const btn = box.querySelector('.s666-discord-button');
     btn.textContent = cfg.manualButtonText;
-    btn.addEventListener('click', manualPost);
+    btn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); manualPost(); });
+    box.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); manualPost(); }
+    });
     host.appendChild(box);
+  }
+  function installClickBridge(){
+    if(window.__S666DiscordClickBridgeInstalled) return;
+    window.__S666DiscordClickBridgeInstalled = true;
+    const handle = (ev) => {
+      const target = ev.target && ev.target.closest ? ev.target.closest('.s666-discord-button,[data-s666-discord-trigger="1"]') : null;
+      if(!target) return;
+      if(target.closest && target.closest('#s666DiscordGateOverlay,#s666DiscordDeniedOverlay')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      manualPost();
+    };
+    document.addEventListener('click', handle, true);
+    document.addEventListener('touchend', handle, { capture:true, passive:false });
   }
   function mountAll(){
     const hosts = Array.from(document.querySelectorAll(cfg.mount || '[data-discord-addon-slot]'));
@@ -237,11 +259,13 @@
     setLed('idle','Discord ready');
   }
   window.S666DiscordPlayerAddonV3 = { version: VERSION, mountAll, manualPost, postTrackIfChanged, readTrackFromDom, setLed, checkStatus };
+  installClickBridge();
   document.addEventListener('DOMContentLoaded', () => {
+    installClickBridge();
     mountAll();
     checkStatus();
     startTrackWatcher();
     // MOBILE_SAFE_REMOUNT: iPhone player creates #mffApp dynamically; scan all slots without moving panels between PC/mobile.
-    [300, 900, 1800, 3600, 7000].forEach((delay) => setTimeout(() => { mountAll(); checkStatus(); }, delay));
+    [150, 300, 900, 1800, 3600, 7000, 12000, 20000].forEach((delay) => setTimeout(() => { mountAll(); checkStatus(); }, delay));
   });
 })();
