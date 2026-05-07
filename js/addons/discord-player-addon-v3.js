@@ -3,11 +3,12 @@
 # 666SOUNDsDESIGn — Discord Player Frontend Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.3
+# Version: V3.4
 # Purpose: Multi-slot LED + gated manual player-card post for PC and iPhone players.
 # Change Summary:
 # - Repairs PC/iPhone slot mounting: one panel per visible player slot, no moving panel between slots.
 # - Adds global click/touch bridge so rebuilt/cloned Discord panels still open the access overlay.
+# - Repairs mobile #mffApp body-hide rule conflict: gate/denied overlays stay visible above iPhone player.
 # - Keeps gate overlay English-only.
 # - Keeps webhook URL server-side only.
 # - Uses safer status/error display without touching stream/audio/worker routes outside /api/discord/*.
@@ -15,7 +16,7 @@
 */
 (function(){
   'use strict';
-  const VERSION = 'V3.3-20260507-CLICK-BRIDGE-REPAIR';
+  const VERSION = 'V3.4-20260507-MOBILE-OVERLAY-VISIBILITY-REPAIR';
   const DEFAULTS = {
     radioName: '666SOUNDsDESIGn WebRadio',
     domain: 'webradio.666soundsdesign-broadcaster.com',
@@ -47,6 +48,52 @@
     input: null,
     lastTrackKey: localStorage.getItem('s666_discord_last_track_key_v3') || ''
   };
+
+
+  function installMobileOverlayVisibilityPatch(){
+    if(document.getElementById('s666DiscordOverlayVisibilityPatch')) return;
+    const style = document.createElement('style');
+    style.id = 's666DiscordOverlayVisibilityPatch';
+    style.textContent = `
+      body[data-smfp-active="1"] > #s666DiscordGateOverlay,
+      body[data-smfp-active="1"] > #s666DiscordDeniedOverlay{
+        visibility:visible!important;
+        opacity:1!important;
+        pointer-events:auto!important;
+        width:auto!important;
+        height:auto!important;
+        min-width:0!important;
+        min-height:0!important;
+        max-width:none!important;
+        max-height:none!important;
+        margin:0!important;
+        padding:18px!important;
+        overflow:visible!important;
+        background:radial-gradient(circle at 50% 30%,rgba(255,61,187,.16),rgba(3,5,18,.86) 48%,rgba(0,0,0,.94) 100%)!important;
+        border:0!important;
+        box-shadow:none!important;
+        z-index:2147483600!important;
+      }
+      body[data-smfp-active="1"] > #s666DiscordGateOverlay.s666-discord-gate--hidden,
+      body[data-smfp-active="1"] > #s666DiscordDeniedOverlay.s666-discord-denied--hidden{
+        display:none!important;
+        visibility:hidden!important;
+        opacity:0!important;
+        pointer-events:none!important;
+      }
+      body[data-smfp-active="1"] > #s666DiscordGateOverlay:not(.s666-discord-gate--hidden),
+      body[data-smfp-active="1"] > #s666DiscordDeniedOverlay:not(.s666-discord-denied--hidden){
+        display:flex!important;
+      }
+      #mffApp .s666-discord-panel,
+      #mffApp .s666-discord-panel *,
+      #mffApp [data-discord-addon-slot]{
+        pointer-events:auto!important;
+        touch-action:manipulation!important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   function clean(v){ return String(v || '').replace(/\s+/g,' ').trim(); }
   function allPanels(){
@@ -260,8 +307,10 @@
   }
   window.S666DiscordPlayerAddonV3 = { version: VERSION, mountAll, manualPost, postTrackIfChanged, readTrackFromDom, setLed, checkStatus };
   installClickBridge();
+  installMobileOverlayVisibilityPatch();
   document.addEventListener('DOMContentLoaded', () => {
     installClickBridge();
+    installMobileOverlayVisibilityPatch();
     mountAll();
     checkStatus();
     startTrackWatcher();
