@@ -1,0 +1,8 @@
+{
+  "radioName": "666SOUNDsDESIGn WebRadio",
+  "domain": "webradio.666soundsdesign-broadcaster.com",
+  "playerUrl": "https://webradio.666soundsdesign-broadcaster.com",
+  "streamUrl": "https://webradio.666soundsdesign-broadcaster.com/api/radio/stream",
+  "discordInfo": "Discord: 666SOUNDsDESIGn Cyber Radio Community",
+  "embedInfo": "Einbindung für andere Player/Webseiten: https://webradio.666soundsdesign-broadcaster.com/api/radio/stream"
+}

@@ -1,3 +1,4 @@
+import { handleDiscordNotifyV3 } from './worker-addons/discord-notify-addon-v3.js';
 
 // ==========================================================
 // 666SOUNDsDESIGn — v66 The Dark Dancer Route
@@ -406,12 +407,15 @@ async function serveExternalIndex(request){
 }
 
 export default {
-  async fetch(request){
+  async fetch(request, env, ctx){
 
     const __darkDancerUrl = new URL(request.url);
     const __darkDancerResponse = darkDancerResponse(__darkDancerUrl.pathname);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
+    // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
+    const discordV3Response = await handleDiscordNotifyV3(request, env);
+    if (discordV3Response) return discordV3Response;
 
     
     // v50 CLEAN ROUTE ALIAS:

@@ -1,0 +1,44 @@
+{
+  "project": "666SOUNDsDESIGn WebRadio",
+  "addon": "Discord Webhook HTML Player Add-on",
+  "version": "V3.0",
+  "created": "2026-05-07",
+  "modified": "2026-05-07",
+  "mode": "add-only handoff package",
+  "storage_policy": {
+    "kv": false,
+    "r2": false,
+    "runtime_memory_only": true,
+    "browser_localStorage_dedupe": true
+  },
+  "routes": [
+    "/api/discord/manual",
+    "/api/discord/share",
+    "/api/discord/nowplaying",
+    "/api/discord/status",
+    "/api/discord/debug"
+  ],
+  "frontend_features": [
+    "Discord LED status",
+    "Manual player-card post button",
+    "Track-change nowplaying post trigger",
+    "Both-player integration snippet"
+  ],
+  "scriptable_features": [
+    "Manual iPhone player-card post",
+    "Editable radio/domain/player/stream info",
+    "Worker-first secret-safe send"
+  ],
+  "protected_system_parts": [
+    "/api/radio/stream",
+    "/api/radio/metadata",
+    "stream fallback",
+    "automatic switch",
+    "notfallplayer",
+    "main/backstream routing"
+  ],
+  "required_secret": "DISCORD_WEBHOOK_URL",
+  "optional_secret": "DISCORD_ADMIN_TOKEN",
+  "public_webhook": false,
+  "non_destructive": true
+}

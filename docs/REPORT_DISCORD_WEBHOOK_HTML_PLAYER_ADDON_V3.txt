@@ -1,0 +1,26 @@
+666SOUNDsDESIGn — Discord/Webhook/HTML-Player Add-on V3 Report
+Created: 2026-05-07
+Modified: 2026-05-07
+Status: COMPLETE ADD-ON HANDOFF PACKAGE
+
+User-Anforderung:
+- Keine KV, kein R2.
+- Keine Status-Spam-Posts.
+- Nur Trackwechsel automatisch posten.
+- Manueller Post mit Radio-Name, Subdomain/Domain, Player-Link, Stream-/Einbindungs-URL und Radio-/Discord-Info.
+- Kleine Discord-Post-OK Anzeige mit LED im Player.
+- LED/Manuell-Funktion in beiden Playern: Hauptplayer + iPhone/Notfallplayer UI.
+- Spezieller Worker mit Notfallplayer und Automatic Switch darf nicht zerstört werden.
+
+Umsetzung:
+- Worker Add-on V3 mit /api/discord/manual, /api/discord/share, /api/discord/nowplaying, /api/discord/status, /api/discord/debug.
+- Frontend Add-on V3 mit LED, manuellem Button, Trackwechsel-Dedupe via localStorage.
+- Worker RAM-Dedupe/Cooldown als Zusatzschutz, ohne KV/R2.
+- Scriptable V3 für iPhone manuelle Player-Karte via Worker Endpoint.
+
+Nicht verändert:
+- Kein Stream-Routing geändert.
+- Kein Notfallplayer geändert.
+- Kein Automatic Switch geändert.
+- Keine existierenden Playerdateien überschrieben.
+- Keine Secrets in öffentliche Dateien geschrieben.

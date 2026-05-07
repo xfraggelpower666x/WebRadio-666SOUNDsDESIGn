@@ -1,0 +1,34 @@
+666SOUNDsDESIGn — REPORT v85 DISCORD WEBHOOK ADDON FULL INTEGRATION
+Created: 2026-05-07
+Modified: 2026-05-07
+Purpose: Komplettes Repo-FULL-ZIP mit kontrolliert integrierter Discord Webhook Addon V3 Funktion.
+
+ÄNDERUNGEN:
+- Discord Worker Addon V3 integriert unter worker-addons/discord-notify-addon-v3.js
+- worker.js erweitert um env/ctx und isolierte /api/discord/* Routen
+- Frontend Addon V3 integriert unter js/addons/discord-player-addon-v3.js
+- CSS Addon V3 integriert unter css/addons/discord-player-addon-v3.css
+- Desktop Slot im Systempanel ergänzt
+- iPhone Slot im #mffApp ergänzt
+- Discord Preview SVG ergänzt unter assets/discord/discord-preview.svg
+- Auto-Track-Posting im öffentlichen Frontend bewusst deaktiviert, um Besucher-Spam in Discord zu verhindern
+- Manuelles Player-Posting + Discord Status LED aktiv
+
+NICHT GEÄNDERT:
+- /api/radio/stream nicht verändert
+- /stream nicht verändert
+- /fallback-stream nicht verändert
+- Notfallplayer nicht umgebaut
+- Metadata-Normalisierung nicht umgebaut
+- Kein KV, kein R2
+- Keine Secrets im Code
+
+PRÜFUNG:
+- node --check worker.js OK
+- node --check worker-addons/discord-notify-addon-v3.js OK
+- node --check js/addons/discord-player-addon-v3.js OK
+- /api/discord/status lokal via Worker fetch OK
+- /health lokal via Worker fetch OK
+
+HINWEIS:
+DISCORD_WEBHOOK_URL muss weiterhin als Cloudflare Secret gesetzt sein. Laut Nutzer ist es bereits gesetzt.

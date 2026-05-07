@@ -1,0 +1,43 @@
+666SOUNDsDESIGn — REPORT v86 DISCORD GATE ACCESS FULL
+Created: 2026-05-07
+Modified: 2026-05-07
+
+Scope:
+- Full repo build based on stable v85 Discord Webhook integration.
+- Added Discord access-code gate to both PC and iPhone player Discord controls.
+- UI language for the Discord gate is English.
+
+Changed:
+- js/addons/discord-player-addon-v3.js
+  - Discord button now opens an access-code overlay instead of posting directly.
+  - Correct code sends the manual Discord player post.
+  - Wrong/empty code triggers a pink blinking ACCESS DENIED overlay.
+  - Status labels changed to English.
+
+- css/addons/discord-player-addon-v3.css
+  - Added neon access overlay.
+  - Added pink blinking access-denied overlay.
+  - No yellow/foreign colors added.
+
+- worker-addons/discord-notify-addon-v3.js
+  - Manual Discord routes now require gate-code validation.
+  - Frontend does not contain the plaintext gate code.
+  - Fallback validation uses SHA-256 hash; optional Worker env override supported via DISCORD_GATE_CODE or DISCORD_GATE_SHA256.
+
+Not touched:
+- Stream routes
+- Metadata routes
+- Notfallplayer / fallback logic
+- Worker stream proxy logic
+- Existing webhook secret
+- PC/iPhone audio player core
+
+Validation:
+- node --check passed for js/addons/discord-player-addon-v3.js
+- node --check passed for worker-addons/discord-notify-addon-v3.js
+- node --check passed for worker.js
+- All js/*.js and worker-addons/*.js syntax checks passed
+
+Root cleanup:
+- README.md remains in root.
+- Report stored in docs/.
