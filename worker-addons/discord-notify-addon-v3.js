@@ -10,11 +10,12 @@
 # - NO_KV / NO_R2: uses only in-memory cooldown/dedupe as safety net.
 # - Adds manual radio-info/player-share post and track-change nowplaying post.
 # - V3.8: Manual big broadcast post stays manual; automatic song-change post is compact, metadata-focused and deduped.
+# - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: 666 DJ for all Discord embeds.
 # - Returns compact status JSON for frontend LED indicator.
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.8-20260508-MANUAL-BROADCAST-AUTO-NOWPLAYING';
+const ADDON_VERSION = 'V3.9-20260508-DJ-FALLBACK-666DJ';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
@@ -50,6 +51,20 @@ function json(data, status = 200) {
 
 function clean(value, fallback = '', max = 500) {
   return String(value ?? fallback).replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+}
+
+function normalizeDiscordDj(value) {
+  const fallback = '666 DJ';
+  const raw = clean(value, '', 160);
+  if (!raw) return fallback;
+  const lowered = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if (!lowered) return fallback;
+  if (lowered === 'unknown' || lowered === 'none' || lowered === 'n a' || lowered === 'na') return fallback;
+  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no dj status') return fallback;
+  if (lowered.includes('auto dj') || lowered.includes('autodj') || lowered.includes('auto-dj')) return fallback;
+  if (lowered.includes('dj 666') || lowered.includes('dj-666')) return fallback;
+  if (lowered.includes('666soundsdesign dj')) return fallback;
+  return raw;
 }
 
 async function readInput(request) {
@@ -119,7 +134,7 @@ function metadataValues(input = {}) {
   const listeners = clean(input.listeners || input.listener_count || input.currentlisteners, 'Unknown', 80);
   const bitrateRaw = clean(input.bitrate || input.kbps || input.stream_bitrate, 'Unknown', 80);
   const bitrate = bitrateRaw === 'Unknown' ? bitrateRaw : String(bitrateRaw).replace(/\s*kbps\s*$/i, '') + ' kbps';
-  const dj = clean(input.dj || input.djusername || input.djstatus || input.streamer || input.client, 'DJ-666 / AutoDJ', 160);
+  const dj = normalizeDiscordDj(input.dj || input.djusername || input.djstatus || input.streamer || input.client);
   const source = clean(input.source || input.activeSource || input.streamSource, 'Mainstream / Auto Switch', 180);
   return { artist, title, nowPlaying: np, listeners, bitrate, dj, source };
 }

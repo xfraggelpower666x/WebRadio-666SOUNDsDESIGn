@@ -14,6 +14,7 @@
 # - Uses safer status/error display without touching stream/audio/worker routes outside /api/discord/*.
 # - Adds compact DC player-post button and MSG custom-message overlay.
 # - Enriches Discord posts with current title/listeners/bitrate/DJ metadata.
+# - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: 666 DJ for Discord posts.
 # - Auto now-playing posts only after successful gate unlock in this browser session.
 # - V3.7 upgrades the Discord payload data for structured underground broadcast cards.
 # - V3.8 keeps the big broadcast post manual and arms automatic compact Now Playing posts after valid unlock; improves artwork/metadata extraction and dedupe status.
@@ -133,6 +134,19 @@
       return await res.json();
     }catch(_){ return null; }
   }
+  function normalizeDiscordDj(value){
+    const fallback = '666 DJ';
+    const raw = clean(value || '');
+    if(!raw) return fallback;
+    const lowered = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    if(!lowered) return fallback;
+    if(lowered === 'unknown' || lowered === 'none' || lowered === 'n a' || lowered === 'na') return fallback;
+    if(lowered === 'no dj' || lowered === 'nodj' || lowered === 'no dj status') return fallback;
+    if(lowered.includes('auto dj') || lowered.includes('autodj') || lowered.includes('auto-dj')) return fallback;
+    if(lowered.includes('dj 666') || lowered.includes('dj-666')) return fallback;
+    if(lowered.includes('666soundsdesign dj')) return fallback;
+    return raw;
+  }
   function normalizeMetadata(raw){
     raw = raw || {};
     const song = raw.song || raw.now_playing || raw.nowPlaying || raw.current || {};
@@ -140,7 +154,7 @@
     const artist = clean(raw.artist || raw.artist_name || song.artist || readText('#mffApp .mff-title h2'));
     const listeners = clean(raw.listeners || raw.currentlisteners || raw.currentListeners || raw.listener_count || raw.current_listeners || raw.listeners_current || (raw.stats && raw.stats.listeners) || readText('#listenersText') || readText('#mffApp .mff-card:nth-of-type(1) .mff-card-value') || readText('#mffApp .mff-cards .mff-card:nth-child(1)'));
     const bitrate = clean(raw.bitrate || raw.kbps || raw.stream_bitrate || raw.streamBitrate || (raw.stats && raw.stats.bitrate) || readText('#bitrateText') || readText('#mffApp .mff-cards .mff-card:nth-child(2)'));
-    const dj = clean(raw.dj || raw.djusername || raw.djstatus || raw.streamer || raw.client || readText('#djText') || readText('#mffApp .mff-cards .mff-card:nth-child(3)') || 'DJ-666');
+    const dj = normalizeDiscordDj(raw.dj || raw.djusername || raw.djstatus || raw.streamer || raw.client || readText('#djText') || readText('#mffApp .mff-cards .mff-card:nth-child(3)'));
     const source = clean(raw.source || raw.stream || raw.activeSource || readText('#mainBtn.is-active') || readText('#fallbackBtn.is-active') || 'Mainstream / Auto Switch');
     const station = raw.station || {};
     const np = raw.now_playing || raw.nowPlaying || {};
