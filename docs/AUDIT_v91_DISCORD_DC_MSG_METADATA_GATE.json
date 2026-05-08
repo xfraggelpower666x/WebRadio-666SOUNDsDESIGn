@@ -1,0 +1,32 @@
+{
+  "project": "666SOUNDsDESIGn WebRadio",
+  "version": "v91_DISCORD_DC_MSG_METADATA_GATE",
+  "created": "2026-05-08",
+  "type": "full repo package report",
+  "scope": "Discord frontend and Discord worker addon only",
+  "changes": [
+    "Discord Player Post button reduced to compact DC label for PC and iPhone slots.",
+    "Added second compact MSG button for custom Discord channel messages.",
+    "MSG opens English overlay with access code input and message textarea.",
+    "Wrong code still triggers pink blinking ACCESS DENIED overlay.",
+    "Manual player post and custom message posts now include current metadata fields where available: Now Playing, listeners, bitrate, DJ/status, source, artwork thumbnail.",
+    "Automatic now-playing posting enabled only after a successful access-code unlock in the current browser session, preventing public visitors from spamming Discord.",
+    "Added gated /api/discord/message route and gate protection for /api/discord/nowplaying."
+  ],
+  "untouched": [
+    "Stream routes",
+    "Core audio playback",
+    "iPhone audio recovery",
+    "Worker routing outside /api/discord/*",
+    "Webhook secret exposure",
+    "Root README policy"
+  ],
+  "validation": [
+    "node --check js/addons/discord-player-addon-v3.js",
+    "node --check worker-addons/discord-notify-addon-v3.js"
+  ],
+  "notes": [
+    "Auto now-playing cannot run as a server-side background job in this package because no KV/R2/background scheduler was requested. It runs from the player only after the Discord gate code has been accepted in that browser session.",
+    "All visible Discord overlay text is English."
+  ]
+}

@@ -39,7 +39,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v89-discord-mobile-overlay-visibility-repair-20260507">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v92-discord-broadcast-embed-20260508">
 </head>
 <body>
   <div class="frame-stage">
@@ -247,7 +247,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body[data-smfp-active="1"]{
     padding:calc(4px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom)) 0!important;
   }
-  body[data-smfp-active="1"] > *:not(#mffApp):not(script):not(style):not(link):not(#mffAudio){
+  body[data-smfp-active="1"] > *:not(#mffApp):not(script):not(style):not(link):not(#mffAudio):not(#s666DiscordGateOverlay):not(#s666DiscordDeniedOverlay){
     display:none!important;
     visibility:hidden!important;
     opacity:0!important;
@@ -1475,7 +1475,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function killOldDom(){
     if(!isMobile())return;
     qa('body > *').forEach(function(n){
-      if(n.id==='mffApp'||n.id==='mffAudio')return;
+      if(n.id==='mffApp'||n.id==='mffAudio'||n.id==='s666DiscordGateOverlay'||n.id==='s666DiscordDeniedOverlay')return;
       if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
       n.setAttribute('data-smfp-hidden','1');
       try{n.remove()}catch(e){}
@@ -2303,12 +2303,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       endpointManual: '/api/discord/manual',
       endpointStatus: '/api/discord/status',
       endpointNowPlaying: '/api/discord/nowplaying',
-      autoPostTrackChanges: false,
+      endpointMessage: '/api/discord/message',
+      autoPostTrackChanges: true,
       trackPollMs: 15000,
-      manualButtonText: 'DC PLAYER POST',
+      manualButtonText: 'DC',
+      messageButtonText: 'MSG',
       previewImage: 'https://webradio.666soundsdesign-broadcaster.com/assets/icons/icon-512x512.png'
     };
   </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=v89-discord-mobile-overlay-visibility-repair-20260507" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=v92-discord-broadcast-embed-20260508" defer></script>
 </body>
 </html>

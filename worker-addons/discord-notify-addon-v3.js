@@ -3,21 +3,22 @@
 # 666SOUNDsDESIGn — Discord Webhook HTML Player Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.2
-# Purpose: Secret-safe Discord bridge with access-gated manual player card posts.
+# Version: V3.8
+# Purpose: Secret-safe Discord bridge with structured underground broadcast embeds, metadata, artwork, socials and access-gated posts.
 # Change Summary:
 # - Add-only Worker routes; no stream/fallback/notfallplayer logic touched.
 # - NO_KV / NO_R2: uses only in-memory cooldown/dedupe as safety net.
 # - Adds manual radio-info/player-share post and track-change nowplaying post.
+# - V3.8: Manual big broadcast post stays manual; automatic song-change post is compact, metadata-focused and deduped.
 # - Returns compact status JSON for frontend LED indicator.
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.2-20260507-GATE-REPAIR';
+const ADDON_VERSION = 'V3.8-20260508-MANUAL-BROADCAST-AUTO-NOWPLAYING';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
-const DEFAULT_STREAM_URL = 'https://webradio.666soundsdesign-broadcaster.com/api/radio/stream';
+const DEFAULT_STREAM_URL = 'https://webradio.666soundsdesign-broadcaster.com/stream';
 const DEFAULT_PREVIEW_IMAGE = 'https://webradio.666soundsdesign-broadcaster.com/assets/icons/icon-512x512.png';
 const DEFAULT_USERNAME = '666SOUNDsDESIGn Radio';
 const MIN_TRACK_COOLDOWN_MS = 20000;
@@ -70,23 +71,36 @@ function nowIso() { return new Date().toISOString(); }
 function trackKey(input) {
   const artist = clean(input.artist, '', 160).toLowerCase();
   const title = clean(input.title || input.track, '', 240).toLowerCase();
-  const nowPlaying = clean(input.nowPlaying, '', 360).toLowerCase();
-  return (artist || title) ? `${artist}::${title}` : nowPlaying;
+  const nowPlaying = clean(input.nowPlaying || input.now_playing || input.songtitle, '', 360).toLowerCase();
+  const key = (artist || title) ? `${artist}::${title}` : nowPlaying;
+  return key.replace(/unknown|live stream|666soundsdesign webradio/g, '').trim() ? key : '';
 }
 
 function baseSettings(input = {}) {
   const domain = clean(input.domain || input.subdomain, DEFAULT_DOMAIN, 180).replace(/^https?:\/\//, '').replace(/\/+$/, '');
   const playerUrl = clean(input.playerUrl, `https://${domain}`, 300);
-  const streamUrl = clean(input.streamUrl, `https://${domain}/api/radio/stream`, 300);
+  const streamUrl = clean(input.streamUrl, `https://${domain}/stream`, 300);
   return {
     radioName: clean(input.radioName, DEFAULT_RADIO_NAME, 180),
     domain,
     playerUrl,
     streamUrl,
+    backupStreamUrl: clean(input.backupStreamUrl, 'https://my.idjstream.com/666soundsdesign/stream', 300),
     previewImage: clean(input.previewImage, DEFAULT_PREVIEW_IMAGE, 400),
+    artwork: clean(input.artwork || input.cover || input.coverArt || input.cover_url || input.image || input.icon || input.logo || input.albumArt || input.album_art || input.art, '', 400),
     username: clean(input.username, DEFAULT_USERNAME, 120),
     discordInfo: clean(input.discordInfo || input.discord || '', '', 400),
-    embedInfo: clean(input.embedInfo || input.embedCode || '', '', 800)
+    embedInfo: clean(input.embedInfo || input.embedCode || '', '', 800),
+    soundcloudUrl: clean(input.soundcloudUrl, 'https://soundcloud.com/fraggelpower666', 300),
+    mixcloudUrl: clean(input.mixcloudUrl, 'https://www.mixcloud.com/Fraggelpower666/', 300),
+    youtubeUrl: clean(input.youtubeUrl, 'https://music.youtube.com/@fraggelpower666', 300),
+    facebookUrl: clean(input.facebookUrl, 'https://www.facebook.com/PsyTranceFraggeL2k', 300),
+    instagramUrl: clean(input.instagramUrl, 'https://www.instagram.com/fraggelpower/', 300),
+    tiktokUrl: clean(input.tiktokUrl, 'https://www.tiktok.com/@fraggelpower666', 300),
+    discordProfileUrl: clean(input.discordProfileUrl, 'https://discord.com/users/1332026823168757776', 300),
+    distrokidUrl1: clean(input.distrokidUrl1, 'https://distrokid.com/hyperfollow/fraggelpower666/dark-techno-hyper-psy-trance-full-on', 300),
+    distrokidUrl2: clean(input.distrokidUrl2, 'https://distrokid.com/hyperfollow/fraggelpower666/the-dark-dancer-volume-i', 300),
+    distrokidUrl3: clean(input.distrokidUrl3, 'https://distrokid.com/hyperfollow/fraggelpower666/the-dark-dancer-volume-ii', 300)
   };
 }
 
@@ -98,50 +112,156 @@ function safeImage(url) {
   return null;
 }
 
+function metadataValues(input = {}) {
+  const artist = clean(input.artist, '', 180);
+  const title = clean(input.title || input.track, '', 260);
+  const np = clean(input.nowPlaying || input.now_playing || (artist || title ? `${artist}${artist && title ? ' – ' : ''}${title}` : ''), '', 360) || 'Live Stream';
+  const listeners = clean(input.listeners || input.listener_count || input.currentlisteners, 'Unknown', 80);
+  const bitrateRaw = clean(input.bitrate || input.kbps || input.stream_bitrate, 'Unknown', 80);
+  const bitrate = bitrateRaw === 'Unknown' ? bitrateRaw : String(bitrateRaw).replace(/\s*kbps\s*$/i, '') + ' kbps';
+  const dj = clean(input.dj || input.djusername || input.djstatus || input.streamer || input.client, 'DJ-666 / AutoDJ', 160);
+  const source = clean(input.source || input.activeSource || input.streamSource, 'Mainstream / Auto Switch', 180);
+  return { artist, title, nowPlaying: np, listeners, bitrate, dj, source };
+}
+
+function metadataFields(input = {}) {
+  const m = metadataValues(input);
+  return [
+    { name: '🎵 Now Playing', value: m.nowPlaying.slice(0, 1024), inline: false },
+    { name: '👥 Listeners', value: m.listeners.slice(0, 1024), inline: true },
+    { name: '📶 Bitrate', value: m.bitrate.slice(0, 1024), inline: true },
+    { name: '🎧 DJ / Status', value: m.dj.slice(0, 1024), inline: true },
+    { name: '🛰️ Source', value: m.source.slice(0, 1024), inline: true }
+  ];
+}
+
+function radioIntroText(s) {
+  return [
+    '🖤🔥 **WELCOME TO 666SOUNDsDESIGn DIGITAL UNDERGROUND** 🔥🖤',
+    '',
+    '‼️ **THIS IS NOT MAINSTREAM WEB RADIO** ‼️',
+    '24/7 PsyTrance · Techno · PsyTechno',
+    'Self-produced electronic music from the underground.',
+    '',
+    '666SOUNDsDESIGn is digital underground — driving energy without compromise.',
+    'No algorithm. No trend following. 🖤 Just honest sound. 🖤'
+  ].join('\n').slice(0, 4000);
+}
+
+function streamLinksText(s) {
+  return [
+    `🎛️ **Web Radio Tune in:** ${s.playerUrl}`,
+    '',
+    `**Main Stream:**\n${s.streamUrl}\nhttp://${s.domain}/stream`,
+    '',
+    `**Backup Stream:**\n${s.backupStreamUrl}\nhttp://my.idjstream.com/666soundsdesign/stream`
+  ].join('\n').slice(0, 4000);
+}
+
+function socialsText(s) {
+  return [
+    `🎵 **SoundCloud:** ${s.soundcloudUrl}`,
+    `🎵 **Mixcloud:** ${s.mixcloudUrl}`,
+    `🎵 **YouTube:** ${s.youtubeUrl}`,
+    `🎵 **Facebook:** ${s.facebookUrl}`,
+    `🎵 **Instagram:** ${s.instagramUrl}`,
+    `🎵 **TikTok:** ${s.tiktokUrl}`,
+    `🎵 **Discord:** ${s.discordProfileUrl}`,
+    '',
+    `💿 **DistroKid Releases:**\n${s.distrokidUrl1}\n${s.distrokidUrl2}\n${s.distrokidUrl3}`
+  ].join('\n').slice(0, 4000);
+}
+
+function copyrightText() {
+  return [
+    '🫦 **xXXx_FRAGGLE_xXXx aka FRAGGELPOWER666** 🫦',
+    'Live Music Producer · Live Act DJ · Artist Pro',
+    'My Music Label → 666SOUNDsDESIGn 2026',
+    '',
+    'All music you hear from my stream or broadcaster is © FRAGGELPOWER666.',
+    'Self-designed music, composed and produced by me.',
+    '',
+    '🔥 **HAVE FUN AND ENJOY THE UNDERGROUND** 🔥'
+  ].join('\n').slice(0, 4000);
+}
+
+function applyImages(embed, { thumbnail, image } = {}) {
+  const thumb = safeImage(thumbnail);
+  const img = safeImage(image);
+  if (thumb) embed.thumbnail = thumb;
+  if (img) embed.image = img;
+  return embed;
+}
+
 function manualPayload(input = {}) {
   const s = baseSettings(input);
-  const embedText = s.embedInfo || `Embed info for other websites / apps:\n${s.streamUrl}`;
-  const lines = [
-    `**Radio:** ${s.radioName}`,
-    `**Domain:** ${s.domain}`,
-    `**Player:** ${s.playerUrl}`,
-    `**Webradio-Stream:** ${s.streamUrl}`,
-    '',
-    embedText,
-    '',
-    `▶️ Open Player: ${s.playerUrl}`
-  ];
-  if (s.discordInfo) lines.push('', `**Discord:** ${s.discordInfo}`);
-  const embed = {
-    title: `🚀 ${s.radioName}`,
-    description: lines.join('\n').slice(0, 4000),
+  const embeds = [];
+  embeds.push(applyImages({
+    title: '🖤 666SOUNDsDESIGn Digital Underground',
+    description: radioIntroText(s),
     url: s.playerUrl,
     color: 0xff3dbb,
-    footer: { text: '666SOUNDsDESIGn • Cyber Radio System • Player Card' },
+    fields: metadataFields(input),
+    footer: { text: '666SOUNDsDESIGn • Digital Underground Broadcast' },
     timestamp: nowIso()
-  };
-  const image = safeImage(s.previewImage);
-  if (image) embed.image = image;
-  return { username: s.username, embeds: [embed] };
+  }, { thumbnail: s.previewImage, image: s.artwork }));
+  embeds.push(applyImages({
+    title: '🎛️ Web Radio Tune In',
+    description: streamLinksText(s),
+    url: s.playerUrl,
+    color: 0x16fff3,
+    footer: { text: 'Player • Main Stream • Backup Stream' }
+  }, { thumbnail: s.previewImage }));
+  embeds.push({
+    title: '🌐 Socials & Releases',
+    description: socialsText(s),
+    color: 0x7b4dff,
+    footer: { text: 'SoundCloud • Mixcloud • YouTube • Socials • Releases' }
+  });
+  embeds.push({
+    title: '© 666SOUNDsDESIGn 2026',
+    description: copyrightText(),
+    color: 0xff3dbb,
+    footer: { text: 'FRAGGELPOWER666 • Original Productions Without Compromise' }
+  });
+  return { username: s.username, content: '🖤🔥 **666SOUNDsDESIGn DIGITAL UNDERGROUND CONNECTED** 🔥🖤', embeds };
 }
 
 function nowPlayingPayload(input = {}) {
   const s = baseSettings(input);
-  const artist = clean(input.artist, '', 160);
-  const title = clean(input.title || input.track, '', 240);
-  const np = clean(input.nowPlaying, artist || title ? `${artist}${artist && title ? ' – ' : ''}${title}` : 'Live Stream', 360);
-  const source = clean(input.source, 'Mainstream / Backup Stream / Auto Switch', 180);
-  return {
-    username: s.username,
-    embeds: [{
-      title: '▶️ Now Playing',
-      description: `**${np}**\n\n**Radio:** ${s.radioName}\n**Source:** ${source}`,
-      url: s.playerUrl,
-      color: 0x7b4dff,
-      footer: { text: '666SOUNDsDESIGn • Now Playing' },
-      timestamp: nowIso()
-    }],
-  };
+  const m = metadataValues(input);
+  const embed = applyImages({
+    title: '▶️ Now Playing — 666SOUNDsDESIGn',
+    description: `**${m.nowPlaying}**\n\n‼️ This is not mainstream web radio.`,
+    url: s.playerUrl,
+    color: 0x7b4dff,
+    fields: metadataFields(input),
+    footer: { text: '666SOUNDsDESIGn • Now Playing • Digital Underground' },
+    timestamp: nowIso()
+  }, { thumbnail: s.previewImage, image: s.artwork });
+  return { username: s.username, embeds: [embed] };
+}
+
+function messagePayload(input = {}) {
+  const s = baseSettings(input);
+  const message = clean(input.message || input.text || input.content, '', 1800);
+  const embeds = [];
+  embeds.push(applyImages({
+    title: '💬 666SOUNDsDESIGn Channel Message',
+    description: message || 'Message empty.',
+    url: s.playerUrl,
+    color: 0x16fff3,
+    fields: metadataFields(input),
+    footer: { text: '666SOUNDsDESIGn • Manual Channel Message' },
+    timestamp: nowIso()
+  }, { thumbnail: s.previewImage, image: s.artwork }));
+  embeds.push({
+    title: '🌐 Radio & Social Links',
+    description: [streamLinksText(s), '', socialsText(s)].join('\n\n').slice(0, 4000),
+    color: 0xff3dbb,
+    footer: { text: '666SOUNDsDESIGn • Links' }
+  });
+  return { username: s.username, embeds };
 }
 
 function getDiscordWebhook(env) {
@@ -188,7 +308,7 @@ async function gateCodeOk(request, env) {
 export async function handleDiscordNotifyV3(request, env = {}) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '');
-  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
+  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
   if (!isRoute) return null;
 
   if (request.method === 'OPTIONS') return json({ ok: true, addon: ADDON_VERSION });
@@ -212,13 +332,20 @@ export async function handleDiscordNotifyV3(request, env = {}) {
 
   if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
   if (!tokenOk(request, env)) return json({ ok: false, error: 'invalid admin token' }, 401);
-  if ((path === '/api/discord/manual' || path === '/api/discord/share') && !(await gateCodeOk(request, env))) {
+  if ((path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying') && !(await gateCodeOk(request, env))) {
     runtime.lastKind = 'access-denied';
     return json({ ok: false, led: 'error', error: 'access denied: invalid discord gate code', addon: ADDON_VERSION }, 401);
   }
 
   try {
     const input = await readInput(request);
+    if (path === '/api/discord/message') {
+      const message = clean(input.message || input.text || input.content, '', 1800);
+      if (!message) return json({ ok: false, error: 'message text missing' }, 400);
+      runtime.lastKind = 'message';
+      const result = await sendDiscord(env, messagePayload(input));
+      return json({ ok: true, type: 'message', led: 'ok', discord: result, addon: ADDON_VERSION });
+    }
     if (path === '/api/discord/nowplaying') {
       const key = trackKey(input);
       if (!key) return json({ ok: false, error: 'track/artist/title/nowPlaying fehlt' }, 400);
