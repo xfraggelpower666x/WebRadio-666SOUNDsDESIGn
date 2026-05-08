@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
-import { applyStatusChip } from './shared-status.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v95-history-button-state-20260508';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v95-history-button-state-20260508';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v95-history-button-state-20260508';
+import { applyStatusChip } from './shared-status.js?v=smfp-v95-history-button-state-20260508';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -145,6 +145,33 @@ function installMobileTopControlsInBoostPanel(){
 }
 /* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileTopControlsInBoostPanel call removed. */
 installResponsiveHelpers(historyToggle, historyPanel);
+
+function installV95DesktopHistoryRepair() {
+  if (!historyToggle || !historyPanel) return;
+  if (!historyPanel.querySelector('[data-history-close]')) {
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'history-overlay-close';
+    close.setAttribute('data-history-close', '1');
+    close.setAttribute('aria-label', 'Close history');
+    close.textContent = '×';
+    historyPanel.insertBefore(close, historyPanel.firstChild);
+  }
+  historyPanel.setAttribute('role', 'dialog');
+  historyPanel.setAttribute('aria-modal', 'true');
+  historyPanel.setAttribute('aria-label', 'Played history');
+  historyPanel.addEventListener('click', (event) => {
+    if (event.target?.closest?.('[data-history-close]')) {
+      event.preventDefault();
+      event.stopPropagation();
+      historyPanel.classList.add('hidden');
+      document.getElementById('historyOverlayBackdrop')?.classList.add('hidden');
+      document.body.classList.remove('history-overlay-open');
+      document.documentElement.classList.remove('history-overlay-open');
+    }
+  }, true);
+}
+installV95DesktopHistoryRepair();
 applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
 applyStatusChip(statusStream, 'ok', 'Stream aktiv');
 applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
@@ -273,6 +300,22 @@ function syncStreamLedFromStatus(text) {
 function setStatus(text) {
   setText(streamState, text);
   syncStreamLedFromStatus(text);
+}
+
+function setDesktopTransportState(state) {
+  const normalized = state === 'play' || state === 'pause' || state === 'stop' ? state : 'stop';
+  [playBtn, pauseBtn, stopBtn].filter(Boolean).forEach((btn) => {
+    const id = btn.id || '';
+    const active =
+      (normalized === 'play' && id === 'playBtn') ||
+      (normalized === 'pause' && id === 'pauseBtn') ||
+      (normalized === 'stop' && id === 'stopBtn');
+    btn.classList.toggle('is-active', active);
+    btn.classList.toggle('transport-active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+  document.body?.setAttribute('data-transport-state', normalized);
+  document.documentElement?.setAttribute('data-transport-state', normalized);
 }
 
 function lockVisualStage() {
@@ -588,6 +631,7 @@ function stopPlayback(status = 'STOPPED') {
   visualizer.stop?.();
   window.clearInterval(metadataTimer);
   setStatus(status);
+  setDesktopTransportState('stop');
   setStoppedPanelLeds();
   updateTimeline();
   keepControlsUnlocked();
@@ -643,6 +687,7 @@ async function playCurrent() {
       }
     }, 450);
     setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+    setDesktopTransportState('play');
     setActivePanelLeds();
     startMetadataLoop();
   } catch (err) {
@@ -662,6 +707,7 @@ async function playCurrent() {
         await visualizer.start?.();
         setBoostStage(currentBoostStage);
         setStatus('PLAYING BACKUP');
+        setDesktopTransportState('play');
         setActivePanelLeds();
         startMetadataLoop();
       } catch (err2) {
@@ -702,6 +748,7 @@ pauseBtn?.addEventListener('click', () => {
   lockVisualStage();
   visualizer.stop?.();
   setStatus('PAUSED');
+  setDesktopTransportState('pause');
   setStoppedPanelLeds();
   keepControlsUnlocked();
 });
@@ -748,6 +795,7 @@ audio?.addEventListener('playing', async () => {
   lockVisualStage();
   await visualizer.start?.();
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
+  setDesktopTransportState('play');
   setActivePanelLeds();
 });
 audio?.addEventListener('timeupdate', updateTimeline);
@@ -758,6 +806,7 @@ healthPing();
 fetchMetadata();
 startMetadataLoop();
 updateTimeline();
+setDesktopTransportState('stop');
 
 
 audio?.addEventListener('pause', () => {
@@ -769,6 +818,7 @@ audio?.addEventListener('pause', () => {
 audio?.addEventListener('ended', () => {
   visualizer.stop?.();
   setStatus('STOPPED');
+  setDesktopTransportState('stop');
 });
 
 

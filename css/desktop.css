@@ -2257,3 +2257,56 @@ body.mobile #historyToggle{
   right:auto!important;
 }
 
+
+/*
+==========================================
+DATEI: css/desktop.css
+GEÄNDERT: 2026-05-08
+ÄNDERUNG: v95_HISTORY_OVERLAY_BUTTON_STATE_REPAIR
+ZWECK:
+- PC-History als echtes Overlay mit Close-Button absichern.
+- Play/Pause/Stop aktive Zustände pink gefüllt darstellen.
+- Kein Eingriff in Stream/Worker/Audio-Routing.
+==========================================
+*/
+.history-overlay-close {
+  position: sticky !important;
+  top: 0 !important;
+  float: right !important;
+  width: 40px !important;
+  height: 34px !important;
+  margin: -4px -3px 8px 10px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,61,187,.75) !important;
+  background: rgba(5,8,22,.92) !important;
+  color: #ff3dbb !important;
+  box-shadow: 0 0 18px rgba(255,61,187,.42), inset 0 0 12px rgba(255,61,187,.16) !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  z-index: 3 !important;
+}
+.history-overlay-close:hover,
+.history-overlay-close:focus-visible {
+  color: #fff !important;
+  background: linear-gradient(135deg, rgba(255,61,187,.72), rgba(141,69,255,.42)) !important;
+  outline: none !important;
+}
+.icon-btn.is-active,
+.icon-btn.transport-active,
+body[data-transport-state="play"] #playBtn,
+body[data-transport-state="pause"] #pauseBtn,
+body[data-transport-state="stop"] #stopBtn {
+  color: #fff !important;
+  background: linear-gradient(135deg, rgba(255,61,187,.58), rgba(141,69,255,.38)), rgba(10,6,25,.96) !important;
+  border-color: rgba(255,61,187,.95) !important;
+  box-shadow: 0 0 20px rgba(255,61,187,.62), 0 0 34px rgba(255,61,187,.24), inset 0 0 20px rgba(255,61,187,.20) !important;
+}
+body[data-transport-state="play"] #playBtn {
+  animation: s666ActivePlayPulse 1.8s ease-in-out infinite !important;
+}
+@keyframes s666ActivePlayPulse {
+  0%,100% { filter: saturate(1.05) brightness(1); }
+  50% { filter: saturate(1.35) brightness(1.22); }
+}
