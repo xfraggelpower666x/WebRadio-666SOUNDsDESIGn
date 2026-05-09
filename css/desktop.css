@@ -2310,3 +2310,124 @@ body[data-transport-state="play"] #playBtn {
   0%,100% { filter: saturate(1.05) brightness(1); }
   50% { filter: saturate(1.35) brightness(1.22); }
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — v100 SAFE CLEANUP PC WIDTH / TICKER / COPYRIGHT
+GEÄNDERT: 2026-05-09
+ZWECK:
+- Kein neuer Layer. Entfernt die alte PC-Tickerbox optisch/DOM-seitig.
+- PC-Player breiter an die Seitenmeter ziehen.
+- Copyright wieder unter das untere Levelmeter bringen.
+- Version bleibt in der Discord/System-Leiste, nicht frei in der Ecke.
+============================================================
+*/
+@media (min-width: 761px) {
+  .player-shell {
+    width: min(86vw, 1360px) !important;
+    max-width: calc(100vw - 126px) !important;
+    min-width: 900px !important;
+    margin-top: 18px !important;
+    margin-bottom: 96px !important;
+    gap: 11px !important;
+  }
+
+  .side-meter.left,
+  .side-meter.right {
+    opacity: 1 !important;
+  }
+
+  .top-hud,
+  .status-cluster,
+  .status-bar,
+  .now-playing,
+  .info-grid,
+  .visualizer,
+  .bottom-console,
+  #pcBottomSyncMeter.pc-bottom-sync-meter {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .system-source-actions {
+    margin-left: auto !important;
+    transform: none !important;
+  }
+
+  #pcVersionBadge,
+  .system-version-badge,
+  #pcVersionBadge.pc-version-badge {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: auto !important;
+    display: inline-flex !important;
+    min-width: 56px !important;
+    height: 31px !important;
+    margin-left: 0 !important;
+    pointer-events: none !important;
+  }
+
+  #historyTickerLane,
+  .history-ticker-lane,
+  #pcTickerRebuildLane,
+  .pc-ticker-rebuild-lane {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .now-playing .ticker-window {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .now-cover-wrap {
+    width: 198px !important;
+    height: 198px !important;
+  }
+
+  .now-playing {
+    grid-template-columns: 232px minmax(0, 1fr) auto !important;
+  }
+
+  #pcBottomSyncMeter.pc-bottom-sync-meter {
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pc-copyright-footer {
+    width: min(86vw, 1360px) !important;
+    max-width: calc(100vw - 126px) !important;
+    margin: -82px auto 18px auto !important;
+    padding: 0 18px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    color: rgba(247,248,255,.72) !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: .12em !important;
+    text-transform: none !important;
+    text-shadow: 0 0 10px rgba(255,61,187,.28), 0 0 9px rgba(22,255,243,.18) !important;
+    pointer-events: none !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .pc-copyright-footer { display: none !important; }
+}
