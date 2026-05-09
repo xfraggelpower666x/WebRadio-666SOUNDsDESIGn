@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v96-safe-resync-20260508';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v96-safe-resync-20260508';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v96-safe-resync-20260508';
-import { applyStatusChip } from './shared-status.js?v=smfp-v96-safe-resync-20260508';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v97-mobile-shape-fix-20260509';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v97-mobile-shape-fix-20260509';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v97-mobile-shape-fix-20260509';
+import { applyStatusChip } from './shared-status.js?v=smfp-v97-mobile-shape-fix-20260509';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -1059,7 +1059,7 @@ try {
   if(window.__v81PcLayoutTickerMeterRepairInstalled)return;window.__v81PcLayoutTickerMeterRepairInstalled=true;
   const qs=id=>document.getElementById(id);let lastTicker='';
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
-  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v96')code.textContent='v96'}}
+  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v97')code.textContent='v97'}}
   function readTickerSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
   function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>el.remove());let lane=qs('pcTickerRebuildLane'),text=qs('pcTickerRebuildText');if(!lane||!text){lane=document.createElement('div');lane.id='pcTickerRebuildLane';lane.className='pc-ticker-rebuild-lane';lane.setAttribute('aria-label','PC Laufschrift');text=document.createElement('span');text.id='pcTickerRebuildText';text.className='pc-ticker-rebuild-text';text.textContent=lastTicker||'666SOUNDsDESIGn WebRadio';lane.appendChild(text)}const history=qs('historyToggle');const nowBox=history?history.parentElement:(document.querySelector('.now-playing')||document.querySelector('.now-card')||document.body);if(nowBox&&lane.parentElement!==nowBox)nowBox.appendChild(lane);return{lane,text}}
   function syncTicker(){const t=ensureSingleTicker();const src=readTickerSource();if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==finalText){t.text.textContent=finalText;t.text.setAttribute('data-ticker-live','true')}}
