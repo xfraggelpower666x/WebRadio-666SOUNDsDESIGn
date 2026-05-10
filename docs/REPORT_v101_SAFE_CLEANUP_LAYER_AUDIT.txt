@@ -1,0 +1,24 @@
+666SOUNDsDESIGn — v101 SAFE CLEANUP LAYER AUDIT
+Created: 2026-05-09
+Modified: 2026-05-09
+Purpose: Safe cleanup build from v100. No worker/stream/Discord routing changes.
+
+CHANGES
+- Synchronized visible PC/iPhone version text to v101.
+- Moved mobile version badge into the mobile Discord/control row instead of a loose top-corner badge.
+- Added a hard mobile EQ cleanup guard: canonical EQ visualizer is #mffEqBars only.
+- Removes/hides leftover circular/morph/canvas visualizer fragments inside the mobile EQ panel if present.
+- Added single mobile EQ interval guard: old mobile EQ interval is cleared before a new one is registered.
+- Cover artwork is updated only when the actual image URL changes, preventing repeated image rebuilds on normal metadata polling.
+
+UNCHANGED / TABOO
+- No Worker/stream routing changes.
+- No Discord API/routing changes.
+- No new visualizer design added.
+- No Reactor/background redesign added.
+- No AutoChain/DSP rebuild.
+
+VALIDATION
+- JS module syntax checked with node --check.
+- Inline index scripts syntax checked with node --check extraction.
+- Root remains clean: README.md only as root markdown/text documentation.

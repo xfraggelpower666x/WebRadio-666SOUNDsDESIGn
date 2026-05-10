@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v100-safe-rollback-20260509';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v100-safe-rollback-20260509';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v100-safe-rollback-20260509';
-import { applyStatusChip } from './shared-status.js?v=smfp-v100-safe-rollback-20260509';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v102-ticker-repair-20260510';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v102-ticker-repair-20260510';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v102-ticker-repair-20260510';
+import { applyStatusChip } from './shared-status.js?v=smfp-v102-ticker-repair-20260510';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -371,7 +371,7 @@ function updateNowCover(meta) {
   const cover = String(meta?.cover || '/assets/images/fallback-cover.png').trim();
   if (!cover) return;
 
-  // v100: do not rebuild/reload the cover on every metadata poll.
+  // v101: do not rebuild/reload the cover on every metadata poll.
   // Only touch the image when the real URL changes. This prevents 15–20s flicker/repaint loops.
   if (cover === lastAppliedCoverUrlV100 && nowCover.getAttribute('src') === cover) return;
   lastAppliedCoverUrlV100 = cover;
@@ -1066,7 +1066,7 @@ try {
   if(window.__v81PcLayoutTickerMeterRepairInstalled)return;window.__v81PcLayoutTickerMeterRepairInstalled=true;
   const qs=id=>document.getElementById(id);let lastTicker='';
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
-  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v100')code.textContent='v100'}}
+  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v102')code.textContent='v102'}}
   function readTickerSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
   function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane,#pcTickerRebuildLane,.pc-ticker-rebuild-lane').forEach(el=>el.remove());return null}
   function syncTicker(){ensureSingleTicker();const src=readTickerSource();if(valid(src))lastTicker=src}
@@ -1201,3 +1201,65 @@ reconnectBtn?.addEventListener('click', () => { __userStopped = false; });
 mainBtn?.addEventListener('click', () => { __userStopped = false; });
 fallbackBtn?.addEventListener('click', () => { __userStopped = false; });
 stopBtn?.addEventListener('click', () => { __userStopped = true; });
+
+
+// ==========================================================
+// 666SOUNDsDESIGn — v102 Canonical Ticker Repair
+// GEÄNDERT: 2026-05-10
+// ZWECK:
+// - Nur ein Ticker: der ursprüngliche #nowPlayingTicker.
+// - Spätere PC-Rebuild-/History-Ticker werden physisch entfernt.
+// - Keine neue Ticker-Schicht, kein Layout-/EQ-/Audio-/Discord-Eingriff.
+// ==========================================================
+(function installV102CanonicalTickerRepair(){
+  if(window.__v102CanonicalTickerRepairInstalled)return;
+  window.__v102CanonicalTickerRepairInstalled=true;
+  const badSelector='#historyTickerLane,.history-ticker-lane,#pcTickerRebuildLane,.pc-ticker-rebuild-lane';
+  const valid=t=>{const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''};
+  function removeDuplicateTickers(){
+    document.querySelectorAll(badSelector).forEach(el=>el.remove());
+  }
+  function restoreOriginalTicker(){
+    removeDuplicateTickers();
+    const win=document.querySelector('.now-playing .ticker-window');
+    const ticker=document.getElementById('nowPlayingTicker');
+    if(!win||!ticker)return;
+    win.removeAttribute('hidden');
+    win.style.removeProperty('display');
+    win.style.removeProperty('visibility');
+    win.style.removeProperty('height');
+    win.style.removeProperty('width');
+    ticker.removeAttribute('hidden');
+    ticker.style.removeProperty('display');
+    ticker.style.removeProperty('visibility');
+    ticker.style.removeProperty('animation');
+    ticker.classList.add('ticker-text');
+    ticker.setAttribute('data-canonical-ticker','v102');
+    const current=valid(ticker.textContent);
+    if(!current){
+      const meta=valid(document.getElementById('metaLine')?.textContent)||valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'));
+      ticker.textContent=meta||'666SOUNDsDESIGn WebRadio';
+    }
+  }
+  function boot(){
+    restoreOriginalTicker();
+    const meta=document.getElementById('metaLine');
+    if(meta&&window.MutationObserver){
+      new MutationObserver(restoreOriginalTicker).observe(meta,{childList:true,characterData:true,subtree:true});
+    }
+    if(window.MutationObserver){
+      new MutationObserver(function(muts){
+        for(const m of muts){
+          for(const n of m.addedNodes||[]){
+            if(n.nodeType===1 && (n.matches?.(badSelector)||n.querySelector?.(badSelector))){
+              restoreOriginalTicker();
+              return;
+            }
+          }
+        }
+      }).observe(document.body,{childList:true,subtree:true});
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+// END v102 Canonical Ticker Repair
