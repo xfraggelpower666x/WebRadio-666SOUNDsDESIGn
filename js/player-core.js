@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v112-transport-reference-fix-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v112-transport-reference-fix-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v112-transport-reference-fix-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v112-transport-reference-fix-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v113-ticker-idle-play-state-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v113-ticker-idle-play-state-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v113-ticker-idle-play-state-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v113-ticker-idle-play-state-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -72,6 +72,8 @@ let switchingStream = false;
 const PLAY_START_TIMEOUT_MS = 6500;
 const METADATA_TIMEOUT_MS = 4500;
 const isMobileViewport = () => window.innerWidth <= 860;
+const IDLE_TICKER_TEXT_V113 = '666SOUNDsDESIGn WebRadio';
+const LIVE_TICKER_LOADING_TEXT_V113 = 'Loading live metadata ...';
 
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters, bottomMeterSegments });
@@ -524,6 +526,26 @@ function cleanNowPlayingText(raw) {
   return value;
 }
 
+function setDesktopTickerIdleV113() {
+  setText(nowPlayingTicker, IDLE_TICKER_TEXT_V113);
+  setText(metaLine, IDLE_TICKER_TEXT_V113);
+  try { document.documentElement.setAttribute('data-ticker-state', 'idle'); } catch (err) {}
+}
+
+function setDesktopTickerLoadingV113() {
+  setText(nowPlayingTicker, LIVE_TICKER_LOADING_TEXT_V113);
+  setText(metaLine, LIVE_TICKER_LOADING_TEXT_V113);
+  try { document.documentElement.setAttribute('data-ticker-state', 'live-loading'); } catch (err) {}
+}
+
+function setDesktopTickerLiveV113(title) {
+  const text = normalizeMetadataTitleV22(cleanNowPlayingText(title));
+  if (!text) return;
+  setText(nowPlayingTicker, text);
+  setText(metaLine, text);
+  try { document.documentElement.setAttribute('data-ticker-state', 'live'); } catch (err) {}
+}
+
 
 
 function firstMetadataText(...values) {
@@ -676,11 +698,11 @@ async function fetchMetadata() {
     const data = parseMetadata(raw);
     if (userStopped) {
       setStoppedPanelLeds();
+      setDesktopTickerIdleV113();
       return;
     }
     updateNowCover(data);
-    setText(metaLine, data.title || '');
-    setText(nowPlayingTicker, data.title || '');
+    setDesktopTickerLiveV113(data.title || '');
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);
     setText(djText, data.dj);
@@ -690,8 +712,7 @@ updateHistory(data.title);
   } catch (err) {
     const fallbackTitle = (nowPlayingTicker?.textContent || metaLine?.textContent || '').trim();
     if (fallbackTitle && !/metadata|metadaten|loading|laden|error|fehler/i.test(fallbackTitle)) {
-      setText(metaLine, fallbackTitle);
-      setText(nowPlayingTicker, fallbackTitle);
+      if (!userStopped) setDesktopTickerLiveV113(fallbackTitle);
     }
     applyStatusChip(statusMeta, 'warn', 'Metadaten aktuell nicht erreichbar');
   } finally {
@@ -725,6 +746,7 @@ function stopPlayback(status = 'STOPPED') {
   setStatus(status);
   setDesktopTransportState('stop');
   setStoppedPanelLeds();
+  setDesktopTickerIdleV113();
   updateTimeline();
   keepControlsUnlocked();
 }
@@ -765,6 +787,7 @@ async function playCurrent() {
     document.documentElement?.setAttribute('data-player-state','playing');
   } catch (err) {}
   const token = ++playRequestToken;
+  setDesktopTickerLoadingV113();
   const target = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
 
   setStatus(currentSource === 'main' ? 'STARTING MAIN' : 'STARTING BACKUP');
@@ -841,6 +864,7 @@ async function healthPing() {
   }
 }
 
+setDesktopTickerIdleV113();
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
   // v112: Pause is a real network break, same as Stop, but keeps PAUSED state.
@@ -863,6 +887,7 @@ pauseBtn?.addEventListener('click', () => {
   lockVisualStage();
   visualizer.stop?.();
   setStatus('PAUSED');
+  setDesktopTickerIdleV113();
   setDesktopTransportState('pause');
   setStoppedPanelLeds();
   keepControlsUnlocked();

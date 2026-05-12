@@ -16,7 +16,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="MOBILE_TICKER_DJ_FIX_v112" />
+  <meta name="smfp-version" content="TICKER_IDLE_PLAY_STATE_v113" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -39,7 +39,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v112-mobile-ticker-dj-fix-20260512">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v113-ticker-idle-play-state-20260512">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -313,7 +313,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <script type="module" src="/js/player-core.js?v=smfp-v111-pc-audio-loop-realfix-20260512"></script>
 
 
-<!-- MOBILE_TICKER_DJ_FIX_v112 -->
+<!-- TICKER_IDLE_PLAY_STATE_v113 -->
 <style id="strictMobileFrontendPurgeV83Style">
 @media(max-width:760px){
   :root{
@@ -1139,10 +1139,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- MOBILE_TICKER_DJ_FIX_v112 -->
+<!-- TICKER_IDLE_PLAY_STATE_v113 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='MOBILE_TICKER_DJ_FIX_v112';
+  var VERSION='v113';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1189,6 +1189,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var mffCleanEqPhase=0;
   var mffCleanEqLoop=0;
   var BOOST_GAINS=[1.00,1.22,1.48,1.78];
+  var MFF_IDLE_TICKER_TEXT_V113='666SOUNDsDESIGn WebRadio';
+  var MFF_LIVE_LOADING_TEXT_V113='Loading live metadata ...';
   var RAMP_UP=0.62;
   var RAMP_DOWN=0.36;
   var mffUserStopped=true;
@@ -1496,6 +1498,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   async function play(){
     mffUserStopped=false;
+    setMffTickerLoadingV113();
     prepareMffAudioForPlay(mffLastUserStopAt?'stop-to-play':'fresh-play');
     await resumeAudioGraph();
     var a=getAudio();
@@ -1506,6 +1509,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       if(r&&typeof r.catch==='function') r.catch(function(e){console.warn('[666 mobile play]',e)});
       setTransportState('play');
       setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
+      setTimeout(function(){tickMeta();},120);
     }catch(e){
       console.warn('[666 mobile play]',e);
       setTransportState('stop');
@@ -1520,6 +1524,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     try{a.pause();a.removeAttribute('src');a.load()}catch(e){}
     resetMffAudioGraph('user-pause');
     setTransportState('pause');
+    setMffTickerIdleV113();
   }
   function stop(){
     var a=getAudio();
@@ -1529,6 +1534,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     try{a.pause();a.removeAttribute('src');try{a.currentTime=0}catch(e){}a.load()}catch(e){}
     resetMffAudioGraph('user-stop');
     setTransportState('stop');
+    setMffTickerIdleV113();
   }
   function boost(d){var prev=boostStage;boostStage=Math.max(0,Math.min(3,boostStage+d));applyBoostRamp(prev)}
 
@@ -1565,6 +1571,27 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var span=document.createElement('span');
     span.textContent=clean;
     h1.appendChild(span);
+  }
+
+  function setMffTickerIdleV113(){
+    setMarqueeTitle(MFF_IDLE_TICKER_TEXT_V113);
+    var h2=q('#mffApp .mff-title h2');
+    if(h2) h2.textContent='Press Play for live metadata';
+    try{document.documentElement.setAttribute('data-mff-ticker-state','idle')}catch(e){}
+  }
+
+  function setMffTickerLoadingV113(){
+    setMarqueeTitle(MFF_LIVE_LOADING_TEXT_V113);
+    var h2=q('#mffApp .mff-title h2');
+    if(h2) h2.textContent='Updating live metadata ...';
+    try{document.documentElement.setAttribute('data-mff-ticker-state','live-loading')}catch(e){}
+  }
+
+  function setMffTickerLiveV113(title){
+    var clean=String(title||'').trim();
+    if(!clean || invalidMetaText(clean)) return;
+    setMarqueeTitle(clean);
+    try{document.documentElement.setAttribute('data-mff-ticker-state','live')}catch(e){}
   }
 
   function setArtwork(url){
@@ -1623,9 +1650,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var badge=q('.smfp-version-badge',app);
     var slot=q('.mff-discord-slot',app);
     if(!badge || !slot) return;
-    badge.textContent='v112';
+    badge.textContent='v113';
     badge.classList.add('mff-version-inline');
-    badge.setAttribute('aria-label','Player Version v112');
+    badge.setAttribute('aria-label','Player Version v113');
     if(badge.parentNode!==slot) slot.appendChild(badge);
   }
 
@@ -1650,8 +1677,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v112</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
-      '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>Loading metadata ...</span></h1><h2>Loading metadata …</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
+    app.innerHTML='<div class="smfp-version-badge">v113</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+      '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press Play for live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
       '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
@@ -1701,6 +1728,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     setTransportState('stop');
     applyBoostRamp(0);
     setPanelLedsOffline();
+    setMffTickerIdleV113();
     ensureBrandRow();
 
     setAnalyserMode('init');
@@ -2215,10 +2243,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(meta.artwork) mffLastGoodMeta.artwork=String(meta.artwork||'').trim();
     setPanelLedsFromMeta(meta);
     pushLocalHistory(meta);
-    setMarqueeTitle(meta.title||'Loading metadata ...');
+    var playing=document.documentElement.getAttribute('data-mff-playing')==='1' && !mffUserStopped;
+    if(playing){
+      setMffTickerLiveV113(meta.title||'Loading metadata ...');
+    }else{
+      setMffTickerIdleV113();
+    }
 
     var h2=q('#mffApp .mff-title h2');
-    if(h2) h2.textContent=meta.artist||'Quelle: '+(meta.source||'API');
+    if(h2 && playing) h2.textContent=meta.artist||'Quelle: '+(meta.source||'API');
 
     setArtwork(meta.artwork||'');
 
@@ -2603,15 +2636,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v112';
+  var VERSION='v113';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','MOBILE_TICKER_DJ_FIX_v112');
+    document.documentElement.setAttribute('data-smfp-version','TICKER_IDLE_PLAY_STATE_v113');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
     var app=document.getElementById('mffApp');
-    if(app) app.setAttribute('data-version','MOBILE_TICKER_DJ_FIX_v112');
+    if(app) app.setAttribute('data-version','TICKER_IDLE_PLAY_STATE_v113');
   }
   function lockMobileViewport(){
     var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -2666,11 +2699,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
-  <script src="/js/addons/discord-player-addon-v3.js?v=v112-mobile-ticker-dj-fix-20260512" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=v113-ticker-idle-play-state-20260512" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
-<style id="v112MobileTickerDjFixCss">
+<style id="v113TickerIdlePlayStateCss">
 @media (max-width:760px){
   /* Do not rebuild the mobile player grid. Keep v96 geometry intact and only move the complete HUD slightly upward. */
   #mffApp .mff-shell{
@@ -2728,7 +2761,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-/* v112 MOBILE CANONICAL TICKER REPAIR
+/* v113 TICKER IDLE/PLAY STATE
    Zweck: iPhone-Header-Ticker aus Referenz wiederherstellen: EIN Span, eine Animation, kein Ellipsis-Abbruch. */
 @media(max-width:760px){
   #mffApp .mff-title{min-width:0!important;overflow:hidden!important;}
@@ -2751,10 +2784,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     overflow:visible!important;
     text-overflow:clip!important;
     will-change:transform!important;
-    animation:mffCanonicalTickerV112 42s linear infinite!important;
+    animation:mffCanonicalTickerV113 42s linear infinite!important;
   }
 }
-@keyframes mffCanonicalTickerV112{
+@keyframes mffCanonicalTickerV113{
   0%{transform:translateX(0);}
   100%{transform:translateX(-100%);}
 }
