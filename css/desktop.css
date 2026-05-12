@@ -2465,3 +2465,120 @@ ZWECK: Laufschrift länger laufen lassen, ohne neuen Ticker/Layer zu bauen.
     box-sizing:border-box!important;
   }
 }
+
+
+/*
+============================================================
+666SOUNDsDESIGn — v117 PC BOUNDS + VERSION HARD GUARD
+GEÄNDERT: 2026-05-12
+ZWECK:
+- Unteres PC-Levelmeter hart auf Player-Breite begrenzen.
+- Rechten EQ/DJ-Status-Overflow innerhalb des Players halten.
+- Versionsbox sichtbar auf v117 halten.
+- Keine iPhone-, Ticker-, Transport-, Discord-, Worker- oder Stream-Änderung.
+============================================================
+*/
+@media (min-width: 761px) {
+  :root {
+    --pc-player-width-v117: min(82vw, 1280px);
+    --pc-player-max-v117: calc(100vw - 190px);
+  }
+
+  body .frame-stage .player-shell {
+    width: var(--pc-player-width-v117) !important;
+    max-width: var(--pc-player-max-v117) !important;
+    min-width: min(860px, var(--pc-player-max-v117)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  body .frame-stage .player-shell > .top-hud,
+  body .frame-stage .player-shell > .hero,
+  body .frame-stage .player-shell > .now-playing,
+  body .frame-stage .player-shell > .info-grid,
+  body .frame-stage .player-shell > .visualizer,
+  body .frame-stage .player-shell > .bottom-console {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  body .frame-stage .player-shell .info-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  body .frame-stage .player-shell .info-card,
+  body .frame-stage .player-shell .metric-card,
+  body .frame-stage .player-shell .stat-card,
+  body .frame-stage .player-shell .eq-card,
+  body .frame-stage .player-shell .equalizer-card,
+  body .frame-stage .player-shell .visualizer-card {
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    transform: none !important;
+  }
+
+  body .frame-stage .player-shell .info-value,
+  body .frame-stage .player-shell #djText,
+  body .frame-stage .player-shell [data-panel="dj-status"],
+  body .frame-stage .player-shell .dj-status {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+  }
+
+  body .frame-stage .player-shell .visualizer,
+  body .frame-stage .player-shell #eqBars,
+  body .frame-stage .player-shell .eq-bars {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  body #pcBottomSyncMeter.pc-bottom-sync-meter {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    width: var(--pc-player-width-v117) !important;
+    max-width: var(--pc-player-max-v117) !important;
+    min-width: min(860px, var(--pc-player-max-v117)) !important;
+    margin: 8px auto 0 auto !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  body #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  body #pcVersionBadge .status-code {
+    font-size: 0 !important;
+  }
+  body #pcVersionBadge .status-code::after {
+    content: "v117" !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+  }
+}
