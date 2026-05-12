@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v109-rollback-stable-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v109-rollback-stable-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v109-rollback-stable-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v109-rollback-stable-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -972,8 +972,8 @@ try {
   function installHistory(){const toggle=qs('historyToggle'),panel=qs('historyPanel');if(!toggle||!panel)return;let backdrop=qs('historyOverlayBackdrop');if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel','hidden');const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open')};const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open')};const click=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v77HistoryHandler)toggle.removeEventListener('click',toggle.__v77HistoryHandler);toggle.__v77HistoryHandler=click;toggle.addEventListener('click',click);backdrop.onclick=close;document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true});document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true)}
   function mark(a){const c=Number(a.currentTime||0);if(Math.abs(c-lastAudioTime)>.05){lastAudioTime=c;lastAudioMoveAt=Date.now()}}
   function shouldPlay(){const a=audioEl();return !!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped'}
-  function recover(reason){const a=audioEl();if(!a)return;const now=Date.now();if(now-lastRecoverAt<12000)return;lastRecoverAt=now;try{const src=a.currentSrc||a.src;if(!src)return;const vol=a.volume,muted=a.muted;a.pause();a.src=src.includes('?')?src+'&r='+now:src+'?r='+now;a.load();a.volume=vol;a.muted=muted;const p=a.play();if(p&&typeof p.catch==='function')p.catch(()=>{});document.body.setAttribute('data-last-audio-recover',reason||'stall')}catch(err){document.body.setAttribute('data-last-audio-recover-error',String(err&&err.message||err))}}
-  function audioWatchdog(){const a=audioEl();if(!a)return;mark(a);if(!shouldPlay()){lastAudioTime=Number(a.currentTime||0);lastAudioMoveAt=Date.now();return}const stalled=Date.now()-lastAudioMoveAt;const weak=a.readyState<2||a.networkState===3;if(stalled>9000||(weak&&stalled>5500))recover(weak?'weak-state':'no-time-progress')}
+  function recover(reason){document.body.setAttribute('data-last-audio-recover-disabled',reason||'pc-watchdog-disabled')}
+  function audioWatchdog(){const a=audioEl();if(!a)return;mark(a);if(!shouldPlay()){lastAudioTime=Number(a.currentTime||0);lastAudioMoveAt=Date.now();return}syncPanel()}
   function boot(){boostControls();mirror(level());installHistory();syncTicker();const observerTarget=qs('metaLine');if(observerTarget&&window.MutationObserver)new MutationObserver(syncTicker).observe(observerTarget,{childList:true,characterData:true,subtree:true});const a=audioEl();if(a){['timeupdate','playing','canplay','loadeddata'].forEach(n=>a.addEventListener(n,()=>{mark(a);syncPanel()},{passive:true}));['waiting','stalled','suspend','emptied'].forEach(n=>a.addEventListener(n,()=>setTimeout(audioWatchdog,1800),{passive:true}));a.addEventListener('error',()=>setTimeout(()=>recover('audio-error'),1000),{passive:true})}setInterval(()=>{boostControls();syncTicker();audioWatchdog();mirror(level());syncPanel()},900)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
@@ -1067,44 +1067,9 @@ try {
     return userStarted || (!a.paused && !!(a.currentSrc||a.src));
   }
 
-  function safePlay(reason){
-    const a=audio();
-    if(!a)return;
-    const now=Date.now();
-    if(now-lastResumeAt<6000)return;
-    lastResumeAt=now;
-    try{
-      const p=a.play();
-      if(p&&typeof p.catch==='function')p.catch(()=>{});
-      document.body.setAttribute('data-last-safe-play',reason||'resume');
-    }catch(err){
-      document.body.setAttribute('data-last-safe-play-error',String(err&&err.message||err));
-    }
-  }
+  function safePlay(reason){document.body.setAttribute('data-last-safe-play-disabled',reason||'pc-watchdog-disabled')}
 
-  function rareReconnect(reason){
-    const a=audio();
-    if(!a)return;
-    const now=Date.now();
-    if(now-lastReconnectAt<90000)return;
-    lastReconnectAt=now;
-    try{
-      const src=a.currentSrc||a.src;
-      if(!src)return;
-      const vol=a.volume, muted=a.muted;
-      a.pause();
-      /* Kein Cachebuster-Orkan: Original-SRC unverändert neu laden. */
-      a.src=src.replace(/[?&]r=\d+$/,'');
-      a.load();
-      a.volume=vol;
-      a.muted=muted;
-      const p=a.play();
-      if(p&&typeof p.catch==='function')p.catch(()=>{});
-      document.body.setAttribute('data-last-rare-reconnect',reason||'stall');
-    }catch(err){
-      document.body.setAttribute('data-last-rare-reconnect-error',String(err&&err.message||err));
-    }
-  }
+  function rareReconnect(reason){document.body.setAttribute('data-last-rare-reconnect-disabled',reason||'pc-watchdog-disabled')}
 
   function watchdog(){
     const a=audio();
@@ -1122,16 +1087,10 @@ try {
     const stalledFor=Date.now()-lastMoveAt;
     const weak=a.readyState<2 || a.networkState===3;
 
-    /* Sanft: erst play/resume. Kein direktes src-Wechseln. */
-    if(a.paused && userStarted){
-      safePlay('paused-while-user-started');
-    }else if(stalledFor>8000 || (weak && stalledFor>5500)){
-      safePlay(weak?'weak-state-resume':'stall-resume');
-    }
-
-    /* Hart nur sehr selten und ohne Cachebuster. */
-    if(stalledFor>28000 && userStarted){
-      rareReconnect('long-stall');
+    /* v110: PC watchdog darf keine Wiedergabe mehr starten/stoppen/reconnecten.
+       Der Haupt-Transport ist alleinige Audio-Steuerung. */
+    if(stalledFor>8000 || (weak && stalledFor>5500)){
+      document.body.setAttribute('data-pc-watchdog-stall-seen', weak?'weak-state':'stall');
     }
 
     setChipLabels();
