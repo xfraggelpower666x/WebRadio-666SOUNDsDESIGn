@@ -1,0 +1,22 @@
+# 666SOUNDsDESIGn v111 — Transport Reference Fix
+
+Basis: v110_PC_AUDIO_LOOP_REALFIX_FULL
+Referenz: hochgeladene funktionierende GitHub-ZIP nur zur Transport-Logik-Orientierung.
+
+Änderungen:
+- PC Pause trennt den Stream jetzt real: pause + src entfernen + load.
+- PC Stop bleibt realer Stream-Abbruch.
+- Legacy Mobile-Recovery im PC-Modul darf nicht mehr auf Desktop laufen und darf Pause/Stop nicht wieder starten.
+- iPhone Pause trennt den Stream jetzt real: pause + src entfernen + load + AudioGraph reset.
+- iPhone Stop trennt den Stream real und resetet den AudioGraph.
+- Reconnect bleibt bewusster Neuaufbau: Stop/Break -> Play.
+
+Nicht geändert:
+- kein Layout
+- kein Ticker
+- kein EQ/Visualizer
+- kein Discord
+- kein Worker/Stream-Routing
+
+Prüfung:
+- js/player-core.js: node --check bestanden.

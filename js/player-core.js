@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v110-pc-audio-loop-realfix-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v111-transport-reference-fix-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v111-transport-reference-fix-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v111-transport-reference-fix-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v111-transport-reference-fix-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -843,14 +843,23 @@ async function healthPing() {
 
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
+  // v111: Pause is a real network break, same as Stop, but keeps PAUSED state.
+  // Reason: mobile data users must not keep consuming stream data silently.
   playRequestToken += 1;
+  userStopped = true;
+  audioSelfHealStopAt = Date.now();
+  markAudioSelfHealDirty('user-pause');
   try {
     document.body?.classList.remove('is-playing','is-stopped');
     document.body?.classList.add('is-paused');
     document.body?.setAttribute('data-player-state','paused');
     document.documentElement?.setAttribute('data-player-state','paused');
   } catch (err) {}
-  audio.pause();
+  try { audio.pause(); } catch (err) {}
+  try { audio.removeAttribute('src'); } catch (err) {}
+  try { audio.src = ''; } catch (err) {}
+  try { audio.load(); } catch (err) {}
+  window.clearInterval(metadataTimer);
   lockVisualStage();
   visualizer.stop?.();
   setStatus('PAUSED');
@@ -1225,7 +1234,11 @@ let __userStopped = false;
 
 function attemptMobileRecovery(reason = 'unknown') {
   try {
-    if (__userStopped) return;
+    // v111: legacy add-on recovery must not run on desktop and must not resume after user Pause/Stop.
+    if (!isMobileViewport()) return;
+    const ps = String(document.body?.getAttribute('data-player-state') || document.documentElement?.getAttribute('data-player-state') || '').toLowerCase();
+    if (ps === 'paused' || ps === 'stopped') return;
+    if (__userStopped || userStopped) return;
     if (!audio) return;
 
     const resumePromise = window.__radioAudioContext?.resume?.();
@@ -1278,7 +1291,8 @@ audio?.addEventListener('suspend', () => {
 
 playBtn?.addEventListener('click', () => { __userStopped = false; });
 reconnectBtn?.addEventListener('click', () => { __userStopped = false; });
-mainBtn?.addEventListener('click', () => { __userStopped = false; });
-fallbackBtn?.addEventListener('click', () => { __userStopped = false; });
+mainBtn?.addEventListener('click', () => { if (String(document.body?.getAttribute('data-player-state') || '').toLowerCase() === 'playing') __userStopped = false; });
+fallbackBtn?.addEventListener('click', () => { if (String(document.body?.getAttribute('data-player-state') || '').toLowerCase() === 'playing') __userStopped = false; });
+pauseBtn?.addEventListener('click', () => { __userStopped = true; });
 stopBtn?.addEventListener('click', () => { __userStopped = true; });
 
