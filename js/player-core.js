@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v107-mobile-ticker-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v107-mobile-ticker-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v107-mobile-ticker-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v107-mobile-ticker-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v108-rollback-stable-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v108-rollback-stable-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v108-rollback-stable-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v108-rollback-stable-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -73,50 +73,13 @@ const PLAY_START_TIMEOUT_MS = 6500;
 const METADATA_TIMEOUT_MS = 4500;
 const isMobileViewport = () => window.innerWidth <= 860;
 
-
-/*
-==========================================
-GEÄNDERT: 2026-05-12
-ÄNDERUNG: v107 HARD_USER_STOP_GUARD
-ZWECK:
-- User-Stop und User-Pause sind harte Sperrzustände.
-- Recovery-/Watchdog-/Self-Heal-Pfade dürfen danach NICHT selbstständig audio.play() auslösen.
-- Erst ein echter Play-/Reconnect-/Source-Klick hebt die Sperre wieder auf.
-==========================================
-*/
-function setHardUserAudioHold(active, reason = 'stop') {
-  try {
-    window.__radioHardUserStopped = !!active;
-    document.body?.classList.toggle('is-stopped', !!active);
-    document.body?.setAttribute('data-player-state', active ? reason : 'play-intent');
-    document.documentElement?.setAttribute('data-player-state', active ? reason : 'play-intent');
-    document.documentElement?.setAttribute('data-hard-user-audio-hold', active ? reason : 'off');
-  } catch (err) {}
-}
-function isHardUserAudioHold() {
-  try {
-    if (window.__radioHardUserStopped) return true;
-    const bodyState = String(document.body?.getAttribute('data-player-state') || '').toLowerCase();
-    const htmlState = String(document.documentElement?.getAttribute('data-player-state') || '').toLowerCase();
-    return bodyState === 'stopped' || bodyState === 'stop' || bodyState === 'paused' || bodyState === 'pause' || htmlState === 'stopped' || htmlState === 'paused';
-  } catch (err) { return false; }
-}
-function clearHardUserAudioHold(reason = 'play') {
-  setHardUserAudioHold(false, reason);
-  try {
-    document.body?.classList.remove('is-stopped');
-    document.body?.setAttribute('data-player-state', 'playing-intent');
-    document.documentElement?.setAttribute('data-player-state', 'playing-intent');
-  } catch (err) {}
-}
-
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters, bottomMeterSegments });
 
 /*
 ==========================================
 GEÄNDERT: 2026-05-10
-ÄNDERUNG: v107 PLAYER_AUDIO_SELFHEAL_MINIMAL
+ÄNDERUNG: v108 PLAYER_AUDIO_SELFHEAL_MINIMAL
 ZWECK:
 - Stop→Play-Artefakte vermeiden, indem der MediaElement-Pfad vor erneutem Play sauber vorbereitet wird.
 - iPhone/Systemsound-Unterbrechungen als unterbrochenen Play-Zustand behandeln, nicht als echten User-Stop.
@@ -167,7 +130,7 @@ function prepareAudioElementForFreshPlay(target, reason = 'play') {
 }
 
 function recoverInterruptedAudio(reason = 'interrupted') {
-  if (!audio || userStopped || isHardUserAudioHold()) return;
+  if (!audio || userStopped) return;
   const state = String(document.body.getAttribute('data-player-state') || document.documentElement.getAttribute('data-mff-transport') || '').toLowerCase();
   const expectedPlay = state.includes('play') || (!audio.paused && !!(audio.currentSrc || audio.src));
   if (!expectedPlay) return;
@@ -422,8 +385,6 @@ function setDesktopTransportState(state) {
   });
   document.body?.setAttribute('data-transport-state', normalized);
   document.documentElement?.setAttribute('data-transport-state', normalized);
-  document.body?.setAttribute('data-player-state', normalized === 'play' ? 'playing' : (normalized === 'pause' ? 'paused' : 'stopped'));
-  document.documentElement?.setAttribute('data-player-state', normalized === 'play' ? 'playing' : (normalized === 'pause' ? 'paused' : 'stopped'));
 }
 
 function lockVisualStage() {
@@ -738,7 +699,6 @@ function startMetadataLoop() {
 function stopPlayback(status = 'STOPPED') {
   playRequestToken += 1;
   userStopped = true;
-  setHardUserAudioHold(true, 'stopped');
   audioSelfHealStopAt = Date.now();
   markAudioSelfHealDirty('user-stop');
   audio.pause();
@@ -782,7 +742,6 @@ function keepControlsUnlocked() {
 
 async function playCurrent() {
   keepControlsUnlocked();
-  clearHardUserAudioHold('play');
   userStopped = false;
   const token = ++playRequestToken;
   const target = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
@@ -864,8 +823,6 @@ async function healthPing() {
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
   playRequestToken += 1;
-  userStopped = true;
-  setHardUserAudioHold(true, 'paused');
   audio.pause();
   lockVisualStage();
   visualizer.stop?.();
@@ -876,14 +833,12 @@ pauseBtn?.addEventListener('click', () => {
 });
 stopBtn?.addEventListener('click', () => {
   userStopped = true;
-  setHardUserAudioHold(true, 'stopped');
   lockVisualStage();
   visualizer.stop?.();
   stopPlayback('STOPPED');
 });
 reconnectBtn?.addEventListener('click', async () => {
   stopPlayback('RECONNECT');
-  clearHardUserAudioHold('reconnect');
   userStopped = false;
   await playCurrent();
 });
@@ -989,7 +944,7 @@ try {
   function syncPanel(){const a=audioEl();const playing=!!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped';setLed(qs('statusStream'),playing?'state-main':'state-off',playing);setLed(qs('statusSource'),playing?'state-external':'state-off',playing);const metaFresh=lastMetaOkAt&&(Date.now()-lastMetaOkAt<45000);setLed(qs('statusMeta'),metaFresh?'state-api':(playing?'state-error':'state-off'),!!metaFresh);const b=backupActive();setLed(qs('mainBtn'),(!b&&playing)?'state-main':'state-off',!b&&playing);setLed(qs('fallbackBtn'),(b&&playing)?'state-backup':'state-off',b&&playing);const active=level()>0;setLed(qs('pcBoostMinus'),active?'state-api':'state-off',active);setLed(qs('pcBoostPlus'),active?'state-api':'state-off',active);setLed(qs('pcBoostLabel'),active?'state-api':'state-off',active)}
   function installHistory(){const toggle=qs('historyToggle'),panel=qs('historyPanel');if(!toggle||!panel)return;let backdrop=qs('historyOverlayBackdrop');if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel','hidden');const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open')};const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open')};const click=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v77HistoryHandler)toggle.removeEventListener('click',toggle.__v77HistoryHandler);toggle.__v77HistoryHandler=click;toggle.addEventListener('click',click);backdrop.onclick=close;document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true});document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true)}
   function mark(a){const c=Number(a.currentTime||0);if(Math.abs(c-lastAudioTime)>.05){lastAudioTime=c;lastAudioMoveAt=Date.now()}}
-  function shouldPlay(){const a=audioEl();return !!a&&!window.__radioHardUserStopped&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped'&&document.body.getAttribute('data-player-state')!=='paused'}
+  function shouldPlay(){const a=audioEl();return !!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped'}
   function recover(reason){const a=audioEl();if(!a)return;const now=Date.now();if(now-lastRecoverAt<12000)return;lastRecoverAt=now;try{const src=a.currentSrc||a.src;if(!src)return;const vol=a.volume,muted=a.muted;a.pause();a.src=src.includes('?')?src+'&r='+now:src+'?r='+now;a.load();a.volume=vol;a.muted=muted;const p=a.play();if(p&&typeof p.catch==='function')p.catch(()=>{});document.body.setAttribute('data-last-audio-recover',reason||'stall')}catch(err){document.body.setAttribute('data-last-audio-recover-error',String(err&&err.message||err))}}
   function audioWatchdog(){const a=audioEl();if(!a)return;mark(a);if(!shouldPlay()){lastAudioTime=Number(a.currentTime||0);lastAudioMoveAt=Date.now();return}const stalled=Date.now()-lastAudioMoveAt;const weak=a.readyState<2||a.networkState===3;if(stalled>9000||(weak&&stalled>5500))recover(weak?'weak-state':'no-time-progress')}
   function boot(){boostControls();mirror(level());installHistory();syncTicker();const observerTarget=qs('metaLine');if(observerTarget&&window.MutationObserver)new MutationObserver(syncTicker).observe(observerTarget,{childList:true,characterData:true,subtree:true});const a=audioEl();if(a){['timeupdate','playing','canplay','loadeddata'].forEach(n=>a.addEventListener(n,()=>{mark(a);syncPanel()},{passive:true}));['waiting','stalled','suspend','emptied'].forEach(n=>a.addEventListener(n,()=>setTimeout(audioWatchdog,1800),{passive:true}));a.addEventListener('error',()=>setTimeout(()=>recover('audio-error'),1000),{passive:true})}setInterval(()=>{boostControls();syncTicker();audioWatchdog();mirror(level());syncPanel()},900)}
@@ -1079,10 +1034,8 @@ try {
   function wantsPlayback(){
     const a=audio();
     if(!a)return false;
-    if(window.__radioHardUserStopped)return false;
     if(document.body.classList.contains('is-stopped'))return false;
-    const ps=document.body.getAttribute('data-player-state');
-    if(ps==='stopped'||ps==='paused')return false;
+    if(document.body.getAttribute('data-player-state')==='stopped')return false;
     return userStarted || (!a.paused && !!(a.currentSrc||a.src));
   }
 
@@ -1177,7 +1130,6 @@ try {
 
     setChipLabels();
     clickMain();
-    try{qs('stopBtn')?.addEventListener('click',()=>{userStarted=false;window.__radioHardUserStopped=true;},{capture:true});qs('pauseBtn')?.addEventListener('click',()=>{userStarted=false;window.__radioHardUserStopped=true;},{capture:true});qs('playBtn')?.addEventListener('click',()=>{window.__radioHardUserStopped=false;},{capture:true});}catch(e){}
     setInterval(watchdog,4000);
   }
 
@@ -1277,7 +1229,7 @@ let __userStopped = false;
 
 function attemptMobileRecovery(reason = 'unknown') {
   try {
-    if (__userStopped || isHardUserAudioHold()) return;
+    if (__userStopped) return;
     if (!audio) return;
 
     const resumePromise = window.__radioAudioContext?.resume?.();
@@ -1328,10 +1280,9 @@ audio?.addEventListener('suspend', () => {
   setTimeout(() => attemptMobileRecovery('suspend'), 250);
 });
 
-playBtn?.addEventListener('click', () => { __userStopped = false; clearHardUserAudioHold('play'); });
-reconnectBtn?.addEventListener('click', () => { __userStopped = false; clearHardUserAudioHold('reconnect'); });
-mainBtn?.addEventListener('click', () => { if (!isHardUserAudioHold()) __userStopped = false; });
-fallbackBtn?.addEventListener('click', () => { if (!isHardUserAudioHold()) __userStopped = false; });
-pauseBtn?.addEventListener('click', () => { __userStopped = true; setHardUserAudioHold(true, 'paused'); });
-stopBtn?.addEventListener('click', () => { __userStopped = true; setHardUserAudioHold(true, 'stopped'); });
+playBtn?.addEventListener('click', () => { __userStopped = false; });
+reconnectBtn?.addEventListener('click', () => { __userStopped = false; });
+mainBtn?.addEventListener('click', () => { __userStopped = false; });
+fallbackBtn?.addEventListener('click', () => { __userStopped = false; });
+stopBtn?.addEventListener('click', () => { __userStopped = true; });
 

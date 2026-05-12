@@ -1,0 +1,15 @@
+666SOUNDsDESIGn — REPORT v108 ROLLBACK FROM v107 AUDIO GUARD
+
+Basis:
+- v106 MOBILE TICKER ONLY REPAIR FULL
+
+Zweck:
+- v107 wurde verworfen, weil Hard-User-Stop-Guard Audio-Pulsing/Start-Stop-Schleifen ausgelöst hat und PC-Ticker erneut beschädigt wurde.
+
+Änderung:
+- Rückkehr auf v106-Codebasis.
+- Version/Cache-Buster auf v108 synchronisiert.
+- Keine neuen Layout-, EQ-, Discord-, Worker- oder Streamänderungen.
+
+Wichtig:
+- Dieser Build ist ein Recovery-/Rollback-Build, keine neue Feature-Version.

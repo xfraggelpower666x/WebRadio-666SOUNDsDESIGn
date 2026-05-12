@@ -1,9 +1,9 @@
-666SOUNDsDESIGn — REPORT v107 MOBILE TICKER ONLY REPAIR
+666SOUNDsDESIGn — REPORT v108 MOBILE TICKER ONLY REPAIR
 
 Scope:
 - Basis: v105_TICKER_REFERENCE_MERGE_FULL
 - Nur iPhone/Mobile-NowPlaying-Ticker repariert.
-- Version PC + iPhone auf v107 synchronisiert.
+- Version PC + iPhone auf v108 synchronisiert.
 
 Änderungen:
 1. Mobile-Metadata-Parser erweitert, damit der iPhone-Player dieselben gängigen Metadatenfelder erkennt wie der PC-Pfad:
