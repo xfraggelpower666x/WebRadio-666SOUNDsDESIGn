@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v114-initial-ticker-dj-state-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v114-initial-ticker-dj-state-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v114-initial-ticker-dj-state-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v114-initial-ticker-dj-state-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v115-pc-bottom-meter-width-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v115-pc-bottom-meter-width-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v115-pc-bottom-meter-width-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v115-pc-bottom-meter-width-20260512';
 
 const ENDPOINTS = {
   main: '/stream',

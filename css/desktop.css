@@ -2446,3 +2446,22 @@ ZWECK: Laufschrift länger laufen lassen, ohne neuen Ticker/Layer zu bauen.
 #pcTickerRebuildText.pc-ticker-rebuild-text {
   animation-duration: 42s !important;
 }
+
+
+/* v115 PC BOTTOM LEVELMETER WIDTH FIX
+   Purpose: the desktop bottom levelmeter must stay inside the main player width and must not run over the left/right side meters.
+   Scope: desktop CSS only. No layout, audio, ticker, Discord, Worker or Stream logic changed.
+*/
+@media (min-width:761px){
+  #pcBottomSyncMeter.pc-bottom-sync-meter{
+    width:min(80vw,1180px)!important;
+    max-width:calc(100vw - 170px)!important;
+    min-width:min(880px,calc(100vw - 170px))!important;
+    margin:8px auto 0 auto!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+  }
+}
