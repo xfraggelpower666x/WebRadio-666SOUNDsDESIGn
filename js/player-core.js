@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v105-audio-selfheal-20260510';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v105-audio-selfheal-20260510';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v105-audio-selfheal-20260510';
-import { applyStatusChip } from './shared-status.js?v=smfp-v105-audio-selfheal-20260510';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v103-audio-selfheal-20260510';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v103-audio-selfheal-20260510';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v103-audio-selfheal-20260510';
+import { applyStatusChip } from './shared-status.js?v=smfp-v103-audio-selfheal-20260510';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -79,7 +79,7 @@ const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters, botto
 /*
 ==========================================
 GEÄNDERT: 2026-05-10
-ÄNDERUNG: v105 PLAYER_AUDIO_SELFHEAL_MINIMAL
+ÄNDERUNG: v103 PLAYER_AUDIO_SELFHEAL_MINIMAL
 ZWECK:
 - Stop→Play-Artefakte vermeiden, indem der MediaElement-Pfad vor erneutem Play sauber vorbereitet wird.
 - iPhone/Systemsound-Unterbrechungen als unterbrochenen Play-Zustand behandeln, nicht als echten User-Stop.
@@ -434,16 +434,16 @@ function isLoadingMetaText(text) {
   return String(text || '').toLowerCase().includes('metadaten werden geladen');
 }
 
-let lastAppliedCoverUrlV105 = '';
+let lastAppliedCoverUrlV100 = '';
 function updateNowCover(meta) {
   if (!nowCover) return;
   const cover = String(meta?.cover || '/assets/images/fallback-cover.png').trim();
   if (!cover) return;
 
-  // v105: do not rebuild/reload the cover on every metadata poll.
+  // v101: do not rebuild/reload the cover on every metadata poll.
   // Only touch the image when the real URL changes. This prevents 15–20s flicker/repaint loops.
-  if (cover === lastAppliedCoverUrlV105 && nowCover.getAttribute('src') === cover) return;
-  lastAppliedCoverUrlV105 = cover;
+  if (cover === lastAppliedCoverUrlV100 && nowCover.getAttribute('src') === cover) return;
+  lastAppliedCoverUrlV100 = cover;
   if (nowCover.getAttribute('src') !== cover) {
     nowCover.src = cover;
   }
@@ -960,7 +960,7 @@ try {
   if(window.__v79PcHistoryGlowBoostTickerRebuildInstalled)return;window.__v79PcHistoryGlowBoostTickerRebuildInstalled=true;
   const qs=id=>document.getElementById(id);let lastTicker='';
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
-  function removePcTickerBoxes(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>el.remove())}
+  function removePcTickerBoxes(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane,#pcTickerRebuildLane,.pc-ticker-rebuild-lane').forEach(el=>el.remove())}
   function ensurePcTicker(){removePcTickerBoxes();return null}
   function readSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
   function syncPcTicker(){ensurePcTicker();const src=readSource();if(valid(src))lastTicker=src}
@@ -1146,10 +1146,10 @@ try {
   if(window.__v81PcLayoutTickerMeterRepairInstalled)return;window.__v81PcLayoutTickerMeterRepairInstalled=true;
   const qs=id=>document.getElementById(id);let lastTicker='';
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
-  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v81')code.textContent='v81'}}
+  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v103')code.textContent='v103'}}
   function readTickerSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
-  function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>el.remove());let lane=qs('pcTickerRebuildLane'),text=qs('pcTickerRebuildText');if(!lane||!text){lane=document.createElement('div');lane.id='pcTickerRebuildLane';lane.className='pc-ticker-rebuild-lane';lane.setAttribute('aria-label','PC Laufschrift');text=document.createElement('span');text.id='pcTickerRebuildText';text.className='pc-ticker-rebuild-text';text.textContent=lastTicker||'666SOUNDsDESIGn WebRadio';lane.appendChild(text)}const history=qs('historyToggle');const nowBox=history?history.parentElement:(document.querySelector('.now-playing')||document.querySelector('.now-card')||document.body);if(nowBox&&lane.parentElement!==nowBox)nowBox.appendChild(lane);return{lane,text}}
-  function syncTicker(){const t=ensureSingleTicker();const src=readTickerSource();if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==finalText){t.text.textContent=finalText;t.text.setAttribute('data-ticker-live','true')}}
+  function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane,#pcTickerRebuildLane,.pc-ticker-rebuild-lane').forEach(el=>el.remove());return null}
+  function syncTicker(){ensureSingleTicker();const src=readTickerSource();if(valid(src))lastTicker=src}
   function fixNowPlayingLabel(){document.querySelectorAll('.now-label,.now-playing-label,.now-playing .label,.now-playing [class*="label"]').forEach(el=>{const txt=String(el.textContent||'').trim();if(/no\s*playing/i.test(txt)||(/now\s*playing/i.test(txt)&&txt!=='NOW PLAYING'))el.textContent='NOW PLAYING'})}
   function hardenHistoryClose(){const toggle=qs('historyToggle'),panel=qs('historyPanel');let backdrop=qs('historyOverlayBackdrop');if(!toggle||!panel)return;if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel');function open(){panel.classList.remove('hidden');backdrop.classList.remove('hidden');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');document.body.classList.add('history-overlay-open');document.documentElement.classList.add('history-overlay-open')}function close(){panel.classList.add('hidden');backdrop.classList.add('hidden');document.body.classList.remove('history-overlay-open');document.documentElement.classList.remove('history-overlay-open');backdrop.style.pointerEvents='auto';backdrop.style.opacity=''}const handler=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v81HistoryHandler)toggle.removeEventListener('click',toggle.__v81HistoryHandler);toggle.__v81HistoryHandler=handler;toggle.addEventListener('click',handler,true);backdrop.onclick=e=>{e.preventDefault();e.stopPropagation();close()};document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true})}
   function boot(){setMbChips();fixNowPlayingLabel();ensureSingleTicker();syncTicker();hardenHistoryClose();const meta=qs('metaLine');if(meta&&window.MutationObserver)new MutationObserver(syncTicker).observe(meta,{childList:true,characterData:true,subtree:true});setInterval(()=>{setMbChips();fixNowPlayingLabel();syncTicker()},700)}
@@ -1286,3 +1286,64 @@ mainBtn?.addEventListener('click', () => { __userStopped = false; });
 fallbackBtn?.addEventListener('click', () => { __userStopped = false; });
 stopBtn?.addEventListener('click', () => { __userStopped = true; });
 
+
+// ==========================================================
+// 666SOUNDsDESIGn — v103 Canonical Ticker Repair
+// GEÄNDERT: 2026-05-10
+// ZWECK:
+// - Nur ein Ticker: der ursprüngliche #nowPlayingTicker.
+// - Spätere PC-Rebuild-/History-Ticker werden physisch entfernt.
+// - Keine neue Ticker-Schicht, kein Layout-/EQ-/Audio-/Discord-Eingriff.
+// ==========================================================
+(function installV103CanonicalTickerRepair(){
+  if(window.__v103CanonicalTickerRepairInstalled)return;
+  window.__v103CanonicalTickerRepairInstalled=true;
+  const badSelector='#historyTickerLane,.history-ticker-lane,#pcTickerRebuildLane,.pc-ticker-rebuild-lane';
+  const valid=t=>{const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''};
+  function removeDuplicateTickers(){
+    document.querySelectorAll(badSelector).forEach(el=>el.remove());
+  }
+  function restoreOriginalTicker(){
+    removeDuplicateTickers();
+    const win=document.querySelector('.now-playing .ticker-window');
+    const ticker=document.getElementById('nowPlayingTicker');
+    if(!win||!ticker)return;
+    win.removeAttribute('hidden');
+    win.style.removeProperty('display');
+    win.style.removeProperty('visibility');
+    win.style.removeProperty('height');
+    win.style.removeProperty('width');
+    ticker.removeAttribute('hidden');
+    ticker.style.removeProperty('display');
+    ticker.style.removeProperty('visibility');
+    ticker.style.removeProperty('animation');
+    ticker.classList.add('ticker-text');
+    ticker.setAttribute('data-canonical-ticker','v103');
+    const current=valid(ticker.textContent);
+    if(!current){
+      const meta=valid(document.getElementById('metaLine')?.textContent)||valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'));
+      ticker.textContent=meta||'666SOUNDsDESIGn WebRadio';
+    }
+  }
+  function boot(){
+    restoreOriginalTicker();
+    const meta=document.getElementById('metaLine');
+    if(meta&&window.MutationObserver){
+      new MutationObserver(restoreOriginalTicker).observe(meta,{childList:true,characterData:true,subtree:true});
+    }
+    if(window.MutationObserver){
+      new MutationObserver(function(muts){
+        for(const m of muts){
+          for(const n of m.addedNodes||[]){
+            if(n.nodeType===1 && (n.matches?.(badSelector)||n.querySelector?.(badSelector))){
+              restoreOriginalTicker();
+              return;
+            }
+          }
+        }
+      }).observe(document.body,{childList:true,subtree:true});
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+// END v103 Canonical Ticker Repair
