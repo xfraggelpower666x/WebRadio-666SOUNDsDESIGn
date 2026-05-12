@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v113-ticker-idle-play-state-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v113-ticker-idle-play-state-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v113-ticker-idle-play-state-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v113-ticker-idle-play-state-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v114-initial-ticker-dj-state-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v114-initial-ticker-dj-state-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v114-initial-ticker-dj-state-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v114-initial-ticker-dj-state-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -74,6 +74,18 @@ const METADATA_TIMEOUT_MS = 4500;
 const isMobileViewport = () => window.innerWidth <= 860;
 const IDLE_TICKER_TEXT_V113 = '666SOUNDsDESIGn WebRadio';
 const LIVE_TICKER_LOADING_TEXT_V113 = 'Loading live metadata ...';
+
+function isDesktopTransportLiveV114() {
+  try {
+    if (userStopped) return false;
+    const bodyState = document.body?.getAttribute('data-player-state') || '';
+    const rootState = document.documentElement?.getAttribute('data-player-state') || '';
+    if (bodyState === 'playing' || rootState === 'playing' || document.body?.classList.contains('is-playing')) return true;
+    return !!(audio && !audio.paused && !audio.ended && (audio.currentSrc || audio.getAttribute('src')));
+  } catch (err) {
+    return false;
+  }
+}
 
 const bars = createBars(document.getElementById('eqBars'), window.innerWidth <= 860 ? 20 : 28);
 const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters, bottomMeterSegments });
@@ -865,6 +877,11 @@ async function healthPing() {
 }
 
 setDesktopTickerIdleV113();
+try {
+  document.body?.classList.add('is-stopped');
+  document.body?.setAttribute('data-player-state','stopped');
+  document.documentElement?.setAttribute('data-player-state','stopped');
+} catch (err) {}
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
   // v112: Pause is a real network break, same as Stop, but keeps PAUSED state.
@@ -1001,7 +1018,7 @@ try {
   function backupActive(){const fb=qs('fallbackBtn'),mb=qs('mainBtn');if(fb&&(fb.classList.contains('is-active')||fb.getAttribute('aria-pressed')==='true'))return true;if(mb&&(mb.classList.contains('is-active')||mb.getAttribute('aria-pressed')==='true'))return false;return /back|backup|fallback/i.test(document.body.getAttribute('data-source')||document.body.getAttribute('data-stream-source')||'')}
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
   function readMetaLikeMobile(){const ids=['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle'];for(const id of ids){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}const dataTitle=document.body.getAttribute('data-current-title')||document.body.getAttribute('data-now-playing')||'';return valid(dataTitle)}
-  function syncTicker(){const ticker=qs('nowPlayingTicker');const metaLine=qs('metaLine');if(!ticker)return;const visible=readMetaLikeMobile();if(visible){lastGoodMeta=visible;lastMetaOkAt=Date.now()}const text=visible||lastGoodMeta||'666SOUNDsDESIGn WebRadio';if(ticker.textContent.trim()!==text){ticker.textContent=text;ticker.setAttribute('data-ticker-live','true')}if(metaLine&&lastGoodMeta&&!valid(metaLine.textContent))metaLine.textContent=lastGoodMeta}
+  function syncTicker(){const ticker=qs('nowPlayingTicker');const metaLine=qs('metaLine');if(!ticker)return;if(!isDesktopTransportLiveV114()){lastGoodMeta='';const idle='666SOUNDsDESIGn WebRadio';if(ticker.textContent.trim()!==idle){ticker.textContent=idle;ticker.setAttribute('data-ticker-live','false')}if(metaLine&&metaLine.textContent.trim()!==idle)metaLine.textContent=idle;return}const visible=readMetaLikeMobile();if(visible){lastGoodMeta=visible;lastMetaOkAt=Date.now()}const text=visible||lastGoodMeta||'666SOUNDsDESIGn WebRadio';if(ticker.textContent.trim()!==text){ticker.textContent=text;ticker.setAttribute('data-ticker-live','true')}if(metaLine&&lastGoodMeta&&!valid(metaLine.textContent))metaLine.textContent=lastGoodMeta}
   function syncPanel(){const a=audioEl();const playing=!!a&&!a.paused&&!document.body.classList.contains('is-stopped')&&document.body.getAttribute('data-player-state')!=='stopped';setLed(qs('statusStream'),playing?'state-main':'state-off',playing);setLed(qs('statusSource'),playing?'state-external':'state-off',playing);const metaFresh=lastMetaOkAt&&(Date.now()-lastMetaOkAt<45000);setLed(qs('statusMeta'),metaFresh?'state-api':(playing?'state-error':'state-off'),!!metaFresh);const b=backupActive();setLed(qs('mainBtn'),(!b&&playing)?'state-main':'state-off',!b&&playing);setLed(qs('fallbackBtn'),(b&&playing)?'state-backup':'state-off',b&&playing);const active=level()>0;setLed(qs('pcBoostMinus'),active?'state-api':'state-off',active);setLed(qs('pcBoostPlus'),active?'state-api':'state-off',active);setLed(qs('pcBoostLabel'),active?'state-api':'state-off',active)}
   function installHistory(){const toggle=qs('historyToggle'),panel=qs('historyPanel');if(!toggle||!panel)return;let backdrop=qs('historyOverlayBackdrop');if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel','hidden');const open=()=>{panel.classList.remove('hidden');backdrop.classList.remove('hidden');document.documentElement.classList.add('history-overlay-open');document.body.classList.add('history-overlay-open')};const close=()=>{panel.classList.add('hidden');backdrop.classList.add('hidden');document.documentElement.classList.remove('history-overlay-open');document.body.classList.remove('history-overlay-open')};const click=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v77HistoryHandler)toggle.removeEventListener('click',toggle.__v77HistoryHandler);toggle.__v77HistoryHandler=click;toggle.addEventListener('click',click);backdrop.onclick=close;document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true});document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true)}
   function mark(a){const c=Number(a.currentTime||0);if(Math.abs(c-lastAudioTime)>.05){lastAudioTime=c;lastAudioMoveAt=Date.now()}}
@@ -1177,9 +1194,9 @@ try {
   const qs=id=>document.getElementById(id);let lastTicker='';
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
   function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='M')code.textContent='M';main.title='Mainstream';main.setAttribute('aria-label','Mainstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v81')code.textContent='v81'}}
-  function readTickerSource(){for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
+  function readTickerSource(){if(!isDesktopTransportLiveV114())return '666SOUNDsDESIGn WebRadio';for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
   function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>el.remove());let lane=qs('pcTickerRebuildLane'),text=qs('pcTickerRebuildText');if(!lane||!text){lane=document.createElement('div');lane.id='pcTickerRebuildLane';lane.className='pc-ticker-rebuild-lane';lane.setAttribute('aria-label','PC Laufschrift');text=document.createElement('span');text.id='pcTickerRebuildText';text.className='pc-ticker-rebuild-text';text.textContent=lastTicker||'666SOUNDsDESIGn WebRadio';lane.appendChild(text)}const history=qs('historyToggle');const nowBox=history?history.parentElement:(document.querySelector('.now-playing')||document.querySelector('.now-card')||document.body);if(nowBox&&lane.parentElement!==nowBox)nowBox.appendChild(lane);return{lane,text}}
-  function syncTicker(){const t=ensureSingleTicker();const src=readTickerSource();if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==finalText){t.text.textContent=finalText;t.text.setAttribute('data-ticker-live','true')}}
+  function syncTicker(){const t=ensureSingleTicker();const src=readTickerSource();if(!isDesktopTransportLiveV114()){lastTicker='';const idle='666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==idle){t.text.textContent=idle;t.text.setAttribute('data-ticker-live','false')}return}if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==finalText){t.text.textContent=finalText;t.text.setAttribute('data-ticker-live','true')}}
   function fixNowPlayingLabel(){document.querySelectorAll('.now-label,.now-playing-label,.now-playing .label,.now-playing [class*="label"]').forEach(el=>{const txt=String(el.textContent||'').trim();if(/no\s*playing/i.test(txt)||(/now\s*playing/i.test(txt)&&txt!=='NOW PLAYING'))el.textContent='NOW PLAYING'})}
   function hardenHistoryClose(){const toggle=qs('historyToggle'),panel=qs('historyPanel');let backdrop=qs('historyOverlayBackdrop');if(!toggle||!panel)return;if(!backdrop){backdrop=document.createElement('div');backdrop.id='historyOverlayBackdrop';backdrop.className='history-overlay-backdrop hidden';document.body.appendChild(backdrop)}if(panel.parentElement!==document.body)document.body.appendChild(panel);panel.classList.add('history-overlay-panel');function open(){panel.classList.remove('hidden');backdrop.classList.remove('hidden');panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');document.body.classList.add('history-overlay-open');document.documentElement.classList.add('history-overlay-open')}function close(){panel.classList.add('hidden');backdrop.classList.add('hidden');document.body.classList.remove('history-overlay-open');document.documentElement.classList.remove('history-overlay-open');backdrop.style.pointerEvents='auto';backdrop.style.opacity=''}const handler=e=>{e.preventDefault();e.stopPropagation();panel.classList.contains('hidden')?open():close()};if(toggle.__v81HistoryHandler)toggle.removeEventListener('click',toggle.__v81HistoryHandler);toggle.__v81HistoryHandler=handler;toggle.addEventListener('click',handler,true);backdrop.onclick=e=>{e.preventDefault();e.stopPropagation();close()};document.addEventListener('click',e=>{if(panel.classList.contains('hidden'))return;if(panel.contains(e.target)||toggle.contains(e.target))return;close()},true);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()},{passive:true})}
   function boot(){setMbChips();fixNowPlayingLabel();ensureSingleTicker();syncTicker();hardenHistoryClose();const meta=qs('metaLine');if(meta&&window.MutationObserver)new MutationObserver(syncTicker).observe(meta,{childList:true,characterData:true,subtree:true});setInterval(()=>{setMbChips();fixNowPlayingLabel();syncTicker()},700)}
