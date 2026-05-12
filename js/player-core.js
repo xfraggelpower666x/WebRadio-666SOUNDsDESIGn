@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v111-transport-reference-fix-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v111-transport-reference-fix-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v111-transport-reference-fix-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v111-transport-reference-fix-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v112-transport-reference-fix-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v112-transport-reference-fix-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v112-transport-reference-fix-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v112-transport-reference-fix-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -479,15 +479,15 @@ function updateHistory(title) {
 
 
 function getDefaultDjName() {
-  return window.innerWidth <= 860 ? 'DJ666' : '666SOUNDsDESIGn';
+  return 'DJ 666';
 }
 
 function normalizeDjName(raw) {
-  const fallback = getDefaultDjName();
+  const fallback = 'DJ 666';
   const value = String(raw || '').trim();
   if (!value) return fallback;
   const lowered = value.toLowerCase();
-  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no-dj' || lowered === '-') return fallback;
+  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no-dj' || lowered === '-' || lowered.includes('auto dj') || lowered.includes('autodj') || lowered.includes('auto-dj') || lowered === 'unknown' || lowered === 'none' || lowered === 'null') return fallback;
   return value;
 }
 
@@ -843,7 +843,7 @@ async function healthPing() {
 
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
-  // v111: Pause is a real network break, same as Stop, but keeps PAUSED state.
+  // v112: Pause is a real network break, same as Stop, but keeps PAUSED state.
   // Reason: mobile data users must not keep consuming stream data silently.
   playRequestToken += 1;
   userStopped = true;
@@ -1234,7 +1234,7 @@ let __userStopped = false;
 
 function attemptMobileRecovery(reason = 'unknown') {
   try {
-    // v111: legacy add-on recovery must not run on desktop and must not resume after user Pause/Stop.
+    // v112: legacy add-on recovery must not run on desktop and must not resume after user Pause/Stop.
     if (!isMobileViewport()) return;
     const ps = String(document.body?.getAttribute('data-player-state') || document.documentElement?.getAttribute('data-player-state') || '').toLowerCase();
     if (ps === 'paused' || ps === 'stopped') return;

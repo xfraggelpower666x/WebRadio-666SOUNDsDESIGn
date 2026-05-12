@@ -93,7 +93,7 @@ async function fetchMetadata() {
 
     const listeners = Number.parseInt(pickValue(data, ["listeners"], 0), 10);
     const bitrate = pickValue(data, ["bitrate"], "--");
-    const dj = pickValue(data, ["djusername", "djstatus", "client"], "666SOUNDsDESIGn DJ");
+    const dj = pickValue(data, ["djusername", "djstatus", "client"], "DJ 666");
 
     listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${STREAMS.listenerCapacity}`;
     bitrateText.textContent = bitrate ? `${bitrate} kbps` : "--";
