@@ -1,0 +1,33 @@
+666SOUNDsDESIGn — REPORT v107 MOBILE TICKER ONLY REPAIR
+
+Scope:
+- Basis: v105_TICKER_REFERENCE_MERGE_FULL
+- Nur iPhone/Mobile-NowPlaying-Ticker repariert.
+- Version PC + iPhone auf v107 synchronisiert.
+
+Änderungen:
+1. Mobile-Metadata-Parser erweitert, damit der iPhone-Player dieselben gängigen Metadatenfelder erkennt wie der PC-Pfad:
+   - currenttrack / currentTrack
+   - current_song / currentSong
+   - songtitle / song / track
+   - nested now_playing.song Werte
+2. Mobile-Ticker-Darstellung repariert:
+   - Canonical mobile ticker span mit data-mobile-canonical-ticker=true
+   - kein neuer Ticker-Container
+   - kein zweiter Ticker
+   - kein Layout-/EQ-/Discord-/Audio-Umbau
+3. Mobile-Ticker-Animation robust gemacht:
+   - startet sichtbar, nicht leer/offscreen
+   - looped weich über duplizierten Text
+
+Tabu eingehalten:
+- Kein Worker
+- Kein Streamrouting
+- Kein Discord-Routing
+- Kein EQ/Visualizer-Umbau
+- Kein Layout-Umbau
+- Kein neuer Layer
+
+Checks:
+- Inline-JS Syntaxcheck via node --check bestanden.
+- Root bleibt sauber; Report liegt in /docs.

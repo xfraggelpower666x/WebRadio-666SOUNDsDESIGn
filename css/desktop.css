@@ -2314,7 +2314,7 @@ body[data-transport-state="play"] #playBtn {
 
 /*
 ============================================================
-666SOUNDsDESIGn — v101 SAFE CLEANUP LAYER AUDIT / SINGLE VISUALIZER
+666SOUNDsDESIGn — v107 MOBILE TICKER REPAIR BASE / SINGLE VISUALIZER
 GEÄNDERT: 2026-05-09
 ZWECK:
 - Kein neuer Layer. Entfernt die alte PC-Tickerbox optisch/DOM-seitig.
@@ -2374,9 +2374,7 @@ ZWECK:
   }
 
   #historyTickerLane,
-  .history-ticker-lane,
-  #pcTickerRebuildLane,
-  .pc-ticker-rebuild-lane {
+  .history-ticker-lane {
     display: none !important;
     visibility: hidden !important;
     width: 0 !important;
@@ -2432,89 +2430,5 @@ ZWECK:
   .pc-copyright-footer { display: none !important; }
 }
 
-
-/*
-============================================================
-666SOUNDsDESIGn — v103 CANONICAL TICKER REPAIR
-GEÄNDERT: 2026-05-10
-ZWECK:
-- Repariert den ursprünglichen NOW PLAYING Ticker (#nowPlayingTicker).
-- Der spätere zweite PC-Ticker (#pcTickerRebuildLane / historyTickerLane) bleibt aus.
-- Keine neue Ticker-Schicht, kein Layout-Umbau, kein EQ/Audio/Discord Eingriff.
-============================================================
-*/
-@media (min-width:761px){
-  #historyTickerLane,
-  .history-ticker-lane,
-  #pcTickerRebuildLane,
-  .pc-ticker-rebuild-lane{
-    display:none!important;
-    visibility:hidden!important;
-    width:0!important;
-    height:0!important;
-    min-width:0!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:0!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    overflow:hidden!important;
-  }
-
-  .now-playing .ticker-window{
-    grid-column:2/4!important;
-    width:100%!important;
-    min-width:0!important;
-    height:46px!important;
-    min-height:46px!important;
-    overflow:hidden!important;
-    display:block!important;
-    position:relative!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    padding:0!important;
-    margin:0!important;
-  }
-
-  #nowPlayingTicker,
-  .now-playing .ticker-text{
-    display:inline-block!important;
-    visibility:visible!important;
-    opacity:1!important;
-    width:max-content!important;
-    min-width:100%!important;
-    height:46px!important;
-    line-height:46px!important;
-    padding-left:100%!important;
-    padding-right:30%!important;
-    margin:0!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
-    color:#ff4fc7!important;
-    font-size:clamp(13px,1.05vw,16px)!important;
-    font-weight:950!important;
-    letter-spacing:.045em!important;
-    text-shadow:0 0 10px rgba(255,61,187,.44),0 0 8px rgba(22,255,243,.18)!important;
-    transform:none;
-    animation:v103CanonicalTickerRun 23s linear infinite!important;
-    will-change:transform!important;
-  }
-
-  #nowPlayingTicker:empty::after{
-    content:"666SOUNDsDESIGn WebRadio"!important;
-  }
-}
-
-@media (max-width:760px){
-  #pcTickerRebuildLane,
-  .pc-ticker-rebuild-lane,
-  #historyTickerLane,
-  .history-ticker-lane{display:none!important;visibility:hidden!important;}
-}
-
-@keyframes v103CanonicalTickerRun{
-  0%{transform:translateX(0)}
   100%{transform:translateX(calc(-100% - 100vw))}
 }
