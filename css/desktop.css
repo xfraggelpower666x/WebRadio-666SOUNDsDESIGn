@@ -2314,7 +2314,7 @@ body[data-transport-state="play"] #playBtn {
 
 /*
 ============================================================
-666SOUNDsDESIGn — v108 MOBILE TICKER REPAIR BASE / SINGLE VISUALIZER
+666SOUNDsDESIGn — v109 MOBILE TICKER REPAIR BASE / SINGLE VISUALIZER
 GEÄNDERT: 2026-05-09
 ZWECK:
 - Kein neuer Layer. Entfernt die alte PC-Tickerbox optisch/DOM-seitig.
@@ -2431,4 +2431,18 @@ ZWECK:
 }
 
   100%{transform:translateX(calc(-100% - 100vw))}
+}
+
+
+/*
+============================================================
+666SOUNDsDESIGn — v109 TICKER LENGTH ONLY
+GEÄNDERT: 2026-05-12
+ZWECK: Laufschrift länger laufen lassen, ohne neuen Ticker/Layer zu bauen.
+============================================================
+*/
+#nowPlayingTicker,
+.now-playing .ticker-text,
+#pcTickerRebuildText.pc-ticker-rebuild-text {
+  animation-duration: 42s !important;
 }

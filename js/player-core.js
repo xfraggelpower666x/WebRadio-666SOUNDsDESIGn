@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v108-rollback-stable-20260512';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v108-rollback-stable-20260512';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v108-rollback-stable-20260512';
-import { applyStatusChip } from './shared-status.js?v=smfp-v108-rollback-stable-20260512';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v109-rollback-stable-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v109-rollback-stable-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v109-rollback-stable-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v109-rollback-stable-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -79,7 +79,7 @@ const visualizer = startVisualizer({ audio, bars, leftMeters, rightMeters, botto
 /*
 ==========================================
 GEÄNDERT: 2026-05-10
-ÄNDERUNG: v108 PLAYER_AUDIO_SELFHEAL_MINIMAL
+ÄNDERUNG: v109 PLAYER_AUDIO_SELFHEAL_MINIMAL
 ZWECK:
 - Stop→Play-Artefakte vermeiden, indem der MediaElement-Pfad vor erneutem Play sauber vorbereitet wird.
 - iPhone/Systemsound-Unterbrechungen als unterbrochenen Play-Zustand behandeln, nicht als echten User-Stop.
@@ -130,6 +130,8 @@ function prepareAudioElementForFreshPlay(target, reason = 'play') {
 }
 
 function recoverInterruptedAudio(reason = 'interrupted') {
+  /* v109: this recovery is only allowed on mobile/iOS. On desktop it caused Play/Stop loops. */
+  if (!isMobileViewport()) return;
   if (!audio || userStopped) return;
   const state = String(document.body.getAttribute('data-player-state') || document.documentElement.getAttribute('data-mff-transport') || '').toLowerCase();
   const expectedPlay = state.includes('play') || (!audio.paused && !!(audio.currentSrc || audio.src));
@@ -385,6 +387,13 @@ function setDesktopTransportState(state) {
   });
   document.body?.setAttribute('data-transport-state', normalized);
   document.documentElement?.setAttribute('data-transport-state', normalized);
+  try {
+    document.body?.classList.toggle('is-stopped', normalized === 'stop');
+    document.body?.classList.toggle('is-paused', normalized === 'pause');
+    document.body?.classList.toggle('is-playing', normalized === 'play');
+    document.body?.setAttribute('data-player-state', normalized === 'play' ? 'playing' : (normalized === 'pause' ? 'paused' : 'stopped'));
+    document.documentElement?.setAttribute('data-player-state', normalized === 'play' ? 'playing' : (normalized === 'pause' ? 'paused' : 'stopped'));
+  } catch (err) {}
 }
 
 function lockVisualStage() {
@@ -699,6 +708,12 @@ function startMetadataLoop() {
 function stopPlayback(status = 'STOPPED') {
   playRequestToken += 1;
   userStopped = true;
+  try {
+    document.body?.classList.remove('is-playing','is-paused');
+    document.body?.classList.add('is-stopped');
+    document.body?.setAttribute('data-player-state','stopped');
+    document.documentElement?.setAttribute('data-player-state','stopped');
+  } catch (err) {}
   audioSelfHealStopAt = Date.now();
   markAudioSelfHealDirty('user-stop');
   audio.pause();
@@ -743,6 +758,12 @@ function keepControlsUnlocked() {
 async function playCurrent() {
   keepControlsUnlocked();
   userStopped = false;
+  try {
+    document.body?.classList.remove('is-stopped','is-paused');
+    document.body?.classList.add('is-playing');
+    document.body?.setAttribute('data-player-state','playing');
+    document.documentElement?.setAttribute('data-player-state','playing');
+  } catch (err) {}
   const token = ++playRequestToken;
   const target = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
 
@@ -823,6 +844,12 @@ async function healthPing() {
 playBtn?.addEventListener('click', async () => { await playCurrent(); });
 pauseBtn?.addEventListener('click', () => {
   playRequestToken += 1;
+  try {
+    document.body?.classList.remove('is-playing','is-stopped');
+    document.body?.classList.add('is-paused');
+    document.body?.setAttribute('data-player-state','paused');
+    document.documentElement?.setAttribute('data-player-state','paused');
+  } catch (err) {}
   audio.pause();
   lockVisualStage();
   visualizer.stop?.();
@@ -1035,7 +1062,8 @@ try {
     const a=audio();
     if(!a)return false;
     if(document.body.classList.contains('is-stopped'))return false;
-    if(document.body.getAttribute('data-player-state')==='stopped')return false;
+    const ps = document.body.getAttribute('data-player-state');
+    if(ps==='stopped' || ps==='paused')return false;
     return userStarted || (!a.paused && !!(a.currentSrc||a.src));
   }
 
@@ -1113,10 +1141,19 @@ try {
   function boot(){
     const a=audio();
     if(a){
-      ['play','playing','timeupdate','canplay','loadeddata'].forEach(ev=>{
+      ['play','playing'].forEach(ev=>{
         a.addEventListener(ev,()=>{
           userStarted=true;
           markMove(a);
+        },{passive:true});
+      });
+      ['timeupdate','canplay','loadeddata'].forEach(ev=>{
+        a.addEventListener(ev,()=>{ markMove(a); },{passive:true});
+      });
+      ['pause','ended'].forEach(ev=>{
+        a.addEventListener(ev,()=>{
+          const ps=document.body.getAttribute('data-player-state');
+          if(ps==='paused'||ps==='stopped') userStarted=false;
         },{passive:true});
       });
       ['pause'].forEach(ev=>{
