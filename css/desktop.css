@@ -2469,25 +2469,25 @@ ZWECK: Laufschrift länger laufen lassen, ohne neuen Ticker/Layer zu bauen.
 
 /*
 ============================================================
-666SOUNDsDESIGn — v122 PC BOUNDS + VERSION HARD GUARD
+666SOUNDsDESIGn — v123 PC BOUNDS + VERSION HARD GUARD
 GEÄNDERT: 2026-05-12
 ZWECK:
 - Unteres PC-Levelmeter hart auf Player-Breite begrenzen.
 - Rechten EQ/DJ-Status-Overflow innerhalb des Players halten.
-- Versionsbox sichtbar auf v122 halten.
+- Versionsbox sichtbar auf v123 halten.
 - Keine iPhone-, Ticker-, Transport-, Discord-, Worker- oder Stream-Änderung.
 ============================================================
 */
 @media (min-width: 761px) {
   :root {
-    --pc-player-width-v122: min(82vw, 1280px);
-    --pc-player-max-v122: calc(100vw - 190px);
+    --pc-player-width-v123: min(82vw, 1280px);
+    --pc-player-max-v123: calc(100vw - 190px);
   }
 
   body .frame-stage .player-shell {
-    width: var(--pc-player-width-v122) !important;
-    max-width: var(--pc-player-max-v122) !important;
-    min-width: min(860px, var(--pc-player-max-v122)) !important;
+    width: var(--pc-player-width-v123) !important;
+    max-width: var(--pc-player-max-v123) !important;
+    min-width: min(860px, var(--pc-player-max-v123)) !important;
     margin-left: auto !important;
     margin-right: auto !important;
     box-sizing: border-box !important;
@@ -2557,9 +2557,9 @@ ZWECK:
     top: auto !important;
     bottom: auto !important;
     transform: none !important;
-    width: var(--pc-player-width-v122) !important;
-    max-width: var(--pc-player-max-v122) !important;
-    min-width: min(860px, var(--pc-player-max-v122)) !important;
+    width: var(--pc-player-width-v123) !important;
+    max-width: var(--pc-player-max-v123) !important;
+    min-width: min(860px, var(--pc-player-max-v123)) !important;
     margin: 8px auto 0 auto !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
@@ -2577,7 +2577,7 @@ ZWECK:
     font-size: 0 !important;
   }
   body #pcVersionBadge .status-code::after {
-    content: "v122" !important;
+    content: "v123" !important;
     font-size: 11px !important;
     line-height: 1 !important;
   }
@@ -2586,7 +2586,7 @@ ZWECK:
 
 /*
 ============================================================
-666SOUNDsDESIGn — v122 PC LAYOUT CLAMP REPAIR
+666SOUNDsDESIGn — v123 PC LAYOUT CLAMP REPAIR
 GEÄNDERT: 2026-05-12
 ZWECK:
 - Play-Glow zurück auf Pink/Cyan/Lila, kein Regenbogen-Kirmes-Schein.
@@ -2710,7 +2710,7 @@ ZWECK:
     font-size: 0 !important;
   }
   body #pcVersionBadge .status-code::after {
-    content: "v122" !important;
+    content: "v123" !important;
     font-size: 11px !important;
     line-height: 1 !important;
   }
@@ -2719,7 +2719,7 @@ ZWECK:
 
 /*
 ============================================================
-666SOUNDsDESIGn — v122 PC FINAL BOUNDS CLAMP
+666SOUNDsDESIGn — v123 PC FINAL BOUNDS CLAMP
 CREATED/MODIFIED: 2026-05-13
 CHANGE SUMMARY:
 - PC-only final fine clamp for player width, EQ/DJ bounds, bottom meter position and play glow.
@@ -2751,25 +2751,26 @@ PURPOSE:
   body #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner { width:100%!important; max-width:100%!important; min-width:0!important; overflow:hidden!important; box-sizing:border-box!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v122"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v123"!important;font-size:11px!important;line-height:1!important}
 }
 
 
 /*
 ============================================================
-666SOUNDsDESIGn — v122 PC FOOTER + BOTTOM METER INTEGRATION
+666SOUNDsDESIGn — v123 PC COMPACT FOOTER + BOTTOM METER REPAIR
 CREATED/MODIFIED: 2026-05-13
 CHANGE SUMMARY:
-- PC bottom levelmeter is integrated into the player container.
-- Copyright/footer line added below the integrated levelmeter.
-- Footer glow uses existing --mff-level / --audio-level values; no new audio loop.
+- PC bottom levelmeter and copyright footer share one compact HUD slot.
+- Meter/footer no longer push the lower Now Playing area downward.
+- Footer glow remains audio-reactive via existing level variable; no new loop.
+- Ticker text color changed to neon cyan while keeping the pink frame.
 PURPOSE:
-- Keep bottom meter visually inside the player and reserve clean copyright space.
+- Restore compact cockpit proportions without adding another layer.
 ============================================================
 */
 @media (min-width: 761px) {
   body .frame-stage .player-shell{
-    padding-bottom: 18px !important;
+    padding-bottom: 8px !important;
   }
 
   body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter{
@@ -2782,37 +2783,61 @@ PURPOSE:
     width:calc(100% - 88px) !important;
     max-width:calc(100% - 88px) !important;
     min-width:0 !important;
-    margin:12px auto 8px auto !important;
+    height:26px !important;
+    min-height:26px !important;
+    max-height:26px !important;
+    margin:8px auto 3px auto !important;
+    padding:5px 18px !important;
     transform:none !important;
     box-sizing:border-box !important;
     overflow:hidden !important;
-    border-radius:18px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(22,255,243,.34) !important;
+    background:linear-gradient(90deg,rgba(255,61,187,.035),rgba(22,255,243,.035),rgba(142,69,255,.03)) !important;
+    box-shadow:inset 0 0 12px rgba(22,255,243,.045),0 0 10px rgba(255,61,187,.08) !important;
   }
 
   body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner{
     width:100% !important;
     max-width:100% !important;
     min-width:0 !important;
+    height:14px !important;
+    max-height:14px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
     overflow:hidden !important;
     box-sizing:border-box !important;
+  }
+
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg{
+    height:12px !important;
+    max-height:12px !important;
+    width:clamp(3px,.26vw,5px) !important;
+    flex:0 0 clamp(3px,.26vw,5px) !important;
+    border-radius:999px !important;
   }
 
   body .frame-stage .player-shell > .pc-copyright-footer{
     width:calc(100% - 88px) !important;
     max-width:calc(100% - 88px) !important;
-    margin:6px auto 0 auto !important;
-    padding:7px 14px !important;
+    height:18px !important;
+    min-height:18px !important;
+    max-height:18px !important;
+    margin:0 auto 8px auto !important;
+    padding:2px 10px !important;
     box-sizing:border-box !important;
-    border:1px solid rgba(22,255,243,.28) !important;
-    border-radius:16px !important;
-    background:linear-gradient(90deg,rgba(255,61,187,.035),rgba(22,255,243,.03),rgba(142,69,255,.035)) !important;
-    color:rgba(225,255,255,.86) !important;
+    border:1px solid rgba(255,61,187,.26) !important;
+    border-radius:999px !important;
+    background:linear-gradient(90deg,rgba(255,61,187,.025),rgba(22,255,243,.025),rgba(142,69,255,.025)) !important;
+    color:rgba(225,255,255,.82) !important;
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
-    gap:12px !important;
+    gap:10px !important;
     text-align:center !important;
-    font-size:11px !important;
+    font-size:8.5px !important;
     font-weight:800 !important;
     letter-spacing:.08em !important;
     white-space:nowrap !important;
@@ -2820,26 +2845,27 @@ PURPOSE:
     text-overflow:ellipsis !important;
     text-transform:none !important;
     --footer-reactive-level: var(--mff-level, var(--audio-level, .18));
-    box-shadow:
-      0 0 calc(6px + (var(--footer-reactive-level) * 18px)) rgba(22,255,243,.12),
-      0 0 calc(8px + (var(--footer-reactive-level) * 20px)) rgba(255,61,187,.10) !important;
-    text-shadow:
-      0 0 calc(4px + (var(--footer-reactive-level) * 8px)) rgba(22,255,243,.32),
-      0 0 calc(4px + (var(--footer-reactive-level) * 10px)) rgba(255,61,187,.28) !important;
+    box-shadow:0 0 calc(4px + (var(--footer-reactive-level) * 12px)) rgba(22,255,243,.10),0 0 calc(4px + (var(--footer-reactive-level) * 14px)) rgba(255,61,187,.09) !important;
+    text-shadow:0 0 calc(3px + (var(--footer-reactive-level) * 6px)) rgba(22,255,243,.30),0 0 calc(3px + (var(--footer-reactive-level) * 7px)) rgba(255,61,187,.24) !important;
   }
 
   body .frame-stage .player-shell > .pc-copyright-footer b{
     color:#16fff3 !important;
     font-weight:900 !important;
-    letter-spacing:.12em !important;
-    text-shadow:0 0 calc(5px + (var(--mff-level, .18) * 12px)) rgba(22,255,243,.42) !important;
+    letter-spacing:.10em !important;
+    text-shadow:0 0 calc(4px + (var(--mff-level, .18) * 8px)) rgba(22,255,243,.36) !important;
   }
 
   body[data-transport-state="play"] .frame-stage .player-shell > .pc-copyright-footer{
-    border-color:rgba(255,61,187,.36) !important;
-    color:rgba(255,255,255,.92) !important;
+    border-color:rgba(255,61,187,.32) !important;
+    color:rgba(255,255,255,.90) !important;
+  }
+
+  #nowPlayingTicker,.now-playing .ticker-text{
+    color:#16fff3 !important;
+    text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18) !important;
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v122"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v123"!important;font-size:11px!important;line-height:1!important}
 }
