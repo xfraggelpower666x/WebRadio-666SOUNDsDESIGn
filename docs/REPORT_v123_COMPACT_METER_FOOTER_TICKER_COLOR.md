@@ -1,10 +1,10 @@
-# v123 — Compact Meter/Footer + Ticker Color Repair
+# v124 — Compact Meter/Footer + Ticker Color Repair
 
 ## Scope
 - PC bottom levelmeter compressed into a compact HUD slot.
 - PC copyright/footer compressed directly below the meter.
 - Ticker text changed to neon cyan/turquoise while keeping the pink frame.
-- Version bumped to v123.
+- Version bumped to v124.
 
 ## Explicitly not changed
 - No Transport changes.
@@ -17,4 +17,4 @@
 ## Files changed
 - index.html
 - css/desktop.css
-- docs/REPORT_v123_COMPACT_METER_FOOTER_TICKER_COLOR.md
+- docs/REPORT_v124_COMPACT_METER_FOOTER_TICKER_COLOR.md

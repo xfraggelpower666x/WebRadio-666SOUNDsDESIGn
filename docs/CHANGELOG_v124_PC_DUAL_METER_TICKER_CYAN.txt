@@ -1,0 +1,18 @@
+666SOUNDsDESIGn v124 — PC dual meter / ticker cyan
+
+Basis: v123.
+Scope: nur PC-Feinblock.
+
+Änderungen:
+- PC-Control/Discord-Leiste vertikal kompakter gesetzt.
+- Bestehendes Bottom-Levelmeter optisch in zwei symmetrische Hälften geteilt.
+- Kein neuer Meter, kein neuer RAF-Loop, kein neuer Audio-Hook.
+- Footer kompakter darunter gehalten.
+- Ticker-Schrift hart auf Neon-Türkis/Cyan gesetzt.
+- Version auf v124 gesetzt.
+
+Tabu eingehalten:
+- kein iPhone-Umbau
+- kein Transport-Umbau
+- kein Discord-Code-Umbau
+- kein Worker/Stream-Umbau
