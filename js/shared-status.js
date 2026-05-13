@@ -35,13 +35,6 @@ const ALL_STATE_CLASSES = [
 export function applyStatusChip(el, state = 'empty', tooltip = '') {
   if (!el) return;
   const normalized = String(state || 'empty').toLowerCase();
-  const nextTooltip = String(tooltip || '');
-  if (el.getAttribute('data-status-chip-state-v120') === normalized &&
-      el.getAttribute('data-status-chip-tooltip-v120') === nextTooltip) {
-    return;
-  }
-  el.setAttribute('data-status-chip-state-v120', normalized);
-  el.setAttribute('data-status-chip-tooltip-v120', nextTooltip);
 
   ALL_STATE_CLASSES.forEach((className) => el.classList.remove(className));
 

@@ -13,10 +13,10 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v120-meta-cover-stability-merge-20260513';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v120-meta-cover-stability-merge-20260513';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v120-meta-cover-stability-merge-20260513';
-import { applyStatusChip } from './shared-status.js?v=smfp-v120-meta-cover-stability-merge-20260513';
+import { setText, markSourceButtons } from './controls.js?v=smfp-v118-pc-layout-clamp-20260512';
+import { createBars, startVisualizer } from './equalizer.js?v=smfp-v118-pc-layout-clamp-20260512';
+import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v118-pc-layout-clamp-20260512';
+import { applyStatusChip } from './shared-status.js?v=smfp-v118-pc-layout-clamp-20260512';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -457,31 +457,16 @@ function isLoadingMetaText(text) {
   return String(text || '').toLowerCase().includes('metadaten werden geladen');
 }
 
-function stableMediaUrlV120(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '';
-  try {
-    const u = new URL(raw, window.location.href);
-    ['t','ts','time','cache','cachebust','cb','r','_','v'].forEach((key) => u.searchParams.delete(key));
-    u.hash = '';
-    return u.pathname + (u.searchParams.toString() ? '?' + u.searchParams.toString() : '');
-  } catch (err) {
-    return raw.replace(/([?&])(t|ts|time|cache|cachebust|cb|r|_|v)=\d+/gi, '').replace(/[?&]$/, '');
-  }
-}
-
 let lastAppliedCoverUrlV105 = '';
 function updateNowCover(meta) {
   if (!nowCover) return;
   const cover = String(meta?.cover || '/assets/images/fallback-cover.png').trim();
   if (!cover) return;
-  const stableCover = stableMediaUrlV120(cover);
-  const currentStable = nowCover.getAttribute('data-stable-cover-url') || stableMediaUrlV120(nowCover.getAttribute('src') || '');
 
-  // v120: do not repaint/reload the cover when only cache-buster query values changed.
-  if (stableCover && stableCover === currentStable) return;
+  // v105: do not rebuild/reload the cover on every metadata poll.
+  // Only touch the image when the real URL changes. This prevents 15–20s flicker/repaint loops.
+  if (cover === lastAppliedCoverUrlV105 && nowCover.getAttribute('src') === cover) return;
   lastAppliedCoverUrlV105 = cover;
-  nowCover.setAttribute('data-stable-cover-url', stableCover || cover);
   if (nowCover.getAttribute('src') !== cover) {
     nowCover.src = cover;
   }
@@ -1029,7 +1014,7 @@ try {
   function applyBoost(lv){const safe=clamp(lv);let applied=safe;try{if(typeof setBoostStage==='function'){const r=setBoostStage(safe);applied=clamp(typeof r==='number'?r:safe)}else if(typeof changeBoostStage==='function'){const r=changeBoostStage(safe-level());applied=clamp(typeof r==='number'?r:safe)}}catch(err){document.body.setAttribute('data-boost-error',String(err&&err.message||err))}mirror(applied);syncPanel()}
   function boostControls(){const minus=qs('pcBoostMinus'),plus=qs('pcBoostPlus');if(minus&&!minus.__v77BoostBound){minus.__v77BoostBound=true;minus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()-1);},true)}if(plus&&!plus.__v77BoostBound){plus.__v77BoostBound=true;plus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()+1);},true)}}
   function audioEl(){return document.querySelector('audio')}
-  function setLed(el,state,active){if(!el)return;const next=state||'state-off';const want=active?'1':'0';if(el.getAttribute('data-led-state-v120')===next&&el.getAttribute('data-led-active-v120')===want)return;el.setAttribute('data-led-state-v120',next);el.setAttribute('data-led-active-v120',want);el.classList.remove('state-main','state-api','state-external','state-backup','state-off','is-active','is-idle','is-error','state-error');el.classList.add(next);if(active)el.classList.add('is-active')}
+  function setLed(el,state,active){if(!el)return;el.classList.remove('state-main','state-api','state-external','state-backup','state-off','is-active','is-idle','is-error','state-error');el.classList.add(state||'state-off');if(active)el.classList.add('is-active')}
   function backupActive(){const fb=qs('fallbackBtn'),mb=qs('mainBtn');if(fb&&(fb.classList.contains('is-active')||fb.getAttribute('aria-pressed')==='true'))return true;if(mb&&(mb.classList.contains('is-active')||mb.getAttribute('aria-pressed')==='true'))return false;return /back|backup|fallback/i.test(document.body.getAttribute('data-source')||document.body.getAttribute('data-stream-source')||'')}
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
   function readMetaLikeMobile(){const ids=['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle'];for(const id of ids){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}const dataTitle=document.body.getAttribute('data-current-title')||document.body.getAttribute('data-now-playing')||'';return valid(dataTitle)}

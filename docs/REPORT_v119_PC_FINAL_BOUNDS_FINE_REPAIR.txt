@@ -1,0 +1,25 @@
+666SOUNDsDESIGn — REPORT v119 PC FINAL BOUNDS FINE REPAIR
+Created/Modified: 2026-05-13
+
+Basis: v118 PC_LAYOUT_CLAMP_REPAIR_FULL
+Scope: PC-only final bounds/spacing repair.
+
+Changed:
+- PC player shell clamped further inside side-meter boundaries.
+- PC EQ/visualizer and DJ/status panels constrained inside player content width.
+- PC bottom levelmeter narrowed and raised slightly so it no longer looks cut off or wider than the player.
+- PC Play glow reduced to pink/cyan/purple only, no rainbow/orange/green effect.
+- Version strings updated to v119.
+
+Not changed:
+- iPhone layout/code.
+- Ticker logic.
+- Transport/audio logic.
+- Discord addon.
+- Worker/stream routes.
+- Govee addon.
+
+Validation:
+- File structure preserved.
+- Root kept clean: report in /docs.
+- JS syntax check executed for player-core.js and addon JS.
