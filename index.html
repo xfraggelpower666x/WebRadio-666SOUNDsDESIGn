@@ -16,30 +16,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v130" />
+  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v132" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v130-pc-addon-wide-reactive-20260514" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v130-pc-addon-wide-reactive-20260514" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v130-pc-addon-wide-reactive-20260514" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v130-pc-addon-wide-reactive-20260514" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v130-pc-addon-wide-reactive-20260514" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v130-pc-addon-wide-reactive-20260514" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v132-side-addon-width-center-20260514" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v132-side-addon-width-center-20260514" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v132-side-addon-width-center-20260514" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v132-side-addon-width-center-20260514" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v132-side-addon-width-center-20260514" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v132-side-addon-width-center-20260514" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v130-pc-addon-wide-reactive-20260514" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v130-pc-addon-wide-reactive-20260514">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v130-pc-addon-wide-reactive-20260514">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v130-pc-addon-wide-reactive-20260514">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v130-pc-addon-wide-reactive-20260514">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v132-side-addon-width-center-20260514" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v132-side-addon-width-center-20260514">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v132-side-addon-width-center-20260514">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v132-side-addon-width-center-20260514">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v132-side-addon-width-center-20260514">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v130-pc-addon-wide-reactive-20260514">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v132-side-addon-width-center-20260514">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -161,22 +161,21 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       </div>
     </aside>
 
-    <!-- v130 PC SIDE ADDON SLOTS — add-only outer modules; player core untouched -->
-    <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Left Add-on FX Panel" data-addon-side="left">
-      <section class="pc-addon-card pc-addon-reactor">
-        <header><span>AUDIO REACTOR</span><b id="pcLeftFxState">ON</b></header>
-        <div class="pc-addon-orb" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
-        <footer><span>REACTIVITY</span><strong>85%</strong></footer>
-      </section>
-      <section class="pc-addon-card pc-addon-wave">
-        <header><span>WAVE SCOPE</span></header>
-        <div class="pc-addon-waveform" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <!-- v132 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Left Add-on FX Tower" data-addon-side="left">
+      <section class="pc-addon-tower pc-addon-tower-left" aria-label="Left FX Tower">
+        <header class="pc-addon-tower-head"><span>LEFT FX</span><b id="pcLeftFxState">ON</b></header>
+        <div class="pc-addon-core" aria-hidden="true">
+          <span class="pc-addon-core-ring pc-addon-core-ring-a"></span>
+          <span class="pc-addon-core-ring pc-addon-core-ring-b"></span>
+          <span class="pc-addon-core-axis pc-addon-core-axis-h"></span>
+          <span class="pc-addon-core-axis pc-addon-core-axis-v"></span>
+          <span class="pc-addon-core-pulse"></span>
         </div>
-      </section>
-      <section class="pc-addon-card pc-addon-grid">
-        <header><span>SPECTRUM GRID</span></header>
-        <div class="pc-addon-radar" aria-hidden="true"><i></i><b></b><em></em></div>
+        <div class="pc-addon-spectrum" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <footer class="pc-addon-tower-foot"><span>AUDIO LINK</span><strong>SYNC</strong></footer>
       </section>
     </aside>
 
@@ -198,7 +197,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v130</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v132</span></div>
           </div>
         </div>
       </header>
@@ -207,13 +206,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v130-pc-addon-wide-reactive-20260514" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v132-side-addon-width-center-20260514" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v130-pc-addon-wide-reactive-20260514" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v132-side-addon-width-center-20260514" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v130-pc-addon-wide-reactive-20260514" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v132-side-addon-width-center-20260514" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -331,19 +330,21 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       </section>
 </main>
 
-    <!-- v130 PC SIDE ADDON SLOTS — add-only outer modules; player core untouched -->
-    <aside id="pcRightFxAddon" class="pc-side-addon pc-side-addon-right desktop-only" aria-label="Right Add-on FX Panel" data-addon-side="right">
-      <section class="pc-addon-card pc-addon-vu">
-        <header><span>VU MATRIX</span><b>L&nbsp;&nbsp;&nbsp;R</b></header>
-        <div class="pc-addon-vu-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      </section>
-      <section class="pc-addon-card pc-addon-phase">
-        <header><span>PHASE SCOPE</span></header>
-        <div class="pc-addon-phasebox" aria-hidden="true"><i></i><b></b></div>
-      </section>
-      <section class="pc-addon-card pc-addon-pulse">
-        <header><span>BEAT PULSE</span><b>128 BPM</b></header>
-        <div class="pc-addon-pulse-line" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <!-- v132 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <aside id="pcRightFxAddon" class="pc-side-addon pc-side-addon-right desktop-only" aria-label="Right Add-on FX Tower" data-addon-side="right">
+      <section class="pc-addon-tower pc-addon-tower-right" aria-label="Right FX Tower">
+        <header class="pc-addon-tower-head"><span>RIGHT FX</span><b id="pcRightFxState">ON</b></header>
+        <div class="pc-addon-core pc-addon-core-box" aria-hidden="true">
+          <span class="pc-addon-core-ring pc-addon-core-ring-a"></span>
+          <span class="pc-addon-core-ring pc-addon-core-ring-b"></span>
+          <span class="pc-addon-core-axis pc-addon-core-axis-h"></span>
+          <span class="pc-addon-core-axis pc-addon-core-axis-v"></span>
+          <span class="pc-addon-core-pulse"></span>
+        </div>
+        <div class="pc-addon-spectrum pc-addon-spectrum-right" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <footer class="pc-addon-tower-foot"><span>REACTOR</span><strong>LIVE</strong></footer>
       </section>
     </aside>
 
@@ -358,10 +359,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v130-pc-addon-wide-reactive-20260514"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v132-side-addon-width-center-20260514"></script>
 
 
-<!-- PC_SIDE_ADDON_FX_PANEL_v130 -->
+<!-- PC_SIDE_ADDON_FX_PANEL_v132 -->
 <style id="strictMobileFrontendPurgeV83Style">
 @media(max-width:760px){
   :root{
@@ -1175,7 +1176,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v130-pc-addon-wide-reactive-20260514')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v132-side-addon-width-center-20260514')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1187,10 +1188,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- PC_SIDE_ADDON_FX_PANEL_v130 -->
+<!-- PC_SIDE_ADDON_FX_PANEL_v132 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v130';
+  var VERSION='v132';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1698,9 +1699,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var badge=q('.smfp-version-badge',app);
     var slot=q('.mff-discord-slot',app);
     if(!badge || !slot) return;
-    badge.textContent='v130';
+    badge.textContent='v132';
     badge.classList.add('mff-version-inline');
-    badge.setAttribute('aria-label','Player Version v130');
+    badge.setAttribute('aria-label','Player Version v132');
     if(badge.parentNode!==slot) slot.appendChild(badge);
   }
 
@@ -1725,7 +1726,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v130</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v132</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -2687,15 +2688,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v130';
+  var VERSION='v132';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v130');
+    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v132');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
     var app=document.getElementById('mffApp');
-    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v130');
+    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v132');
   }
   function lockMobileViewport(){
     var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -2752,128 +2753,172 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- v130 PC SIDE ADDON FX PANELS — external add-on modules only; no player core replacement -->
-<style id="v130PcSideAddonFxPanels">
-@media (min-width: 761px){
+
+
+<!-- v132 PC SIDE ADDON HUD TOWER WIDTH CENTER — replaces old addon card stack; no player-core/ticker/transport changes -->
+<style id="v132PcSideAddonTowerRebuild">
+@media (min-width:1221px){
   body .frame-stage{
-    --pc-addon-w: clamp(140px, 12vw, 196px);
-    --pc-addon-gap: clamp(2px, .55vw, 10px);
+    --pc-addon-w:clamp(230px,17.2vw,320px);
+    --pc-addon-gap:clamp(5px,.48vw,10px);
+    --pc-addon-energy:.42;
+    --pc-addon-glow:18px;
   }
   body .pc-side-addon{
     position:absolute!important;
-    top:clamp(54px, 8vh, 92px)!important;
-    bottom:clamp(38px, 5vh, 72px)!important;
+    top:clamp(70px,9.2vh,104px)!important;
+    bottom:clamp(66px,7.2vh,98px)!important;
     width:var(--pc-addon-w)!important;
     z-index:7!important;
-    display:flex!important;
-    flex-direction:column!important;
-    gap:clamp(8px,1.15vh,14px)!important;
     pointer-events:auto!important;
+    display:flex!important;
+    align-items:stretch!important;
+    justify-content:center!important;
     opacity:1!important;
     transform:translateZ(0)!important;
     transition:opacity .22s ease, filter .22s ease!important;
   }
   body .pc-side-addon-left{
-    left:max(54px, calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap)))!important;
+    left:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;
   }
   body .pc-side-addon-right{
-    right:max(54px, calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap)))!important;
+    right:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;
   }
-  body.pc-left-addon-off .pc-side-addon-left,
-  body.pc-right-addon-off .pc-side-addon-right{
-    opacity:.08!important;
-    filter:saturate(.25) brightness(.45)!important;
-  }
-  body.pc-left-addon-off .pc-side-addon-left *,
-  body.pc-right-addon-off .pc-side-addon-right *{
-    animation-play-state:paused!important;
-  }
-  body .pc-addon-card{
+  body .pc-addon-tower{
     position:relative!important;
-    flex:1 1 0!important;
+    width:100%!important;
+    height:100%!important;
     min-height:0!important;
     overflow:hidden!important;
-    border:1px solid rgba(22,255,243,.46)!important;
-    border-radius:18px!important;
-    background:linear-gradient(145deg,rgba(5,8,28,.86),rgba(10,5,29,.70))!important;
-    box-shadow:0 0 18px rgba(22,255,243,.14), inset 0 0 24px rgba(255,61,187,.06)!important;
-    padding:10px!important;
-    box-sizing:border-box!important;
+    border:1px solid rgba(22,255,243,calc(.42 + (.28 * var(--pc-addon-energy))))!important;
+    border-radius:24px!important;
+    background:
+      radial-gradient(circle at 50% 34%,rgba(255,61,187,.18),transparent 37%),
+      linear-gradient(180deg,rgba(7,10,31,.92),rgba(8,4,25,.76))!important;
+    box-shadow:
+      0 0 var(--pc-addon-glow) rgba(22,255,243,.20),
+      0 0 calc(10px + (26px * var(--pc-addon-energy))) rgba(255,61,187,.16),
+      inset 0 0 calc(18px + (28px * var(--pc-addon-energy))) rgba(22,255,243,.055)!important;
   }
-  body .pc-addon-card::before{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(120deg,transparent 0%,rgba(255,61,187,.18) 48%,rgba(22,255,243,.16) 52%,transparent 100%);
-    transform:translateX(-125%);animation:pcAddonSoftSweep 8.5s linear infinite;opacity:.56;
+  body .pc-addon-tower::before{
+    content:"";position:absolute;inset:10px;border-radius:18px;pointer-events:none;
+    border:1px solid rgba(255,61,187,.22);
+    background:
+      linear-gradient(90deg,transparent 0 7%,rgba(22,255,243,.12) 7.5% 8%,transparent 8.5% 91%,rgba(22,255,243,.12) 92% 92.5%,transparent 93%),
+      linear-gradient(180deg,transparent 0 13%,rgba(255,61,187,.13) 13.5% 14%,transparent 14.5% 86%,rgba(255,61,187,.13) 86.5% 87%,transparent 87.5%);
+    opacity:calc(.46 + (.36 * var(--pc-addon-energy)));
   }
-  body .pc-addon-card header{
-    position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:6px;
-    color:#ff66cf;font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;
-    text-shadow:0 0 8px rgba(255,61,187,.42);
+  body .pc-addon-tower::after{
+    content:"";position:absolute;left:-35%;right:-35%;height:38%;top:-15%;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(22,255,243,.16),rgba(255,61,187,.14),transparent);
+    transform:translateY(calc(170% * var(--pc-addon-energy))) rotate(-8deg);
+    filter:blur(8px);opacity:.54;
   }
-  body .pc-addon-card header b,body .pc-addon-card footer strong{color:#16fff3;text-shadow:0 0 8px rgba(22,255,243,.55)}
-  body .pc-addon-card footer{position:absolute;left:10px;right:10px;bottom:8px;z-index:2;display:flex;justify-content:space-between;color:#dff;font-size:9px;font-weight:900;letter-spacing:.07em}
-  body .pc-addon-orb{position:absolute;inset:30px 15px 28px;z-index:1;border-radius:999px;border:1px solid rgba(22,255,243,.38);box-shadow:inset 0 0 24px rgba(22,255,243,.10),0 0 20px rgba(255,61,187,.12)}
-  body .pc-addon-orb i{position:absolute;inset:10%;border-radius:999px;border:1px solid rgba(22,255,243,.28);box-shadow:0 0 14px rgba(22,255,243,.12);animation:pcAddonSpin 11s linear infinite}
-  body .pc-addon-orb i:nth-child(2){inset:22%;border-color:rgba(255,61,187,.42);animation-duration:7s;animation-direction:reverse}
-  body .pc-addon-orb i:nth-child(3){inset:35%;border-color:rgba(139,69,255,.40);animation-duration:5s}
-  body .pc-addon-orb b{position:absolute;left:14%;right:14%;top:49%;height:3px;border-radius:999px;background:linear-gradient(90deg,transparent,#16fff3,#ff3dbb,#16fff3,transparent);filter:blur(.2px);animation:pcAddonPulse 2.8s ease-in-out infinite}
-  body .pc-addon-waveform{position:absolute;left:10px;right:10px;top:36px;bottom:18px;display:flex;align-items:center;gap:3px;z-index:1}
-  body .pc-addon-waveform i{flex:1;border-radius:999px;background:linear-gradient(180deg,#ff3dbb,#16fff3);height:20%;box-shadow:0 0 8px rgba(255,61,187,.35);animation:pcAddonWave 2.2s ease-in-out infinite}
-  body .pc-addon-waveform i:nth-child(2n){animation-delay:.13s} body .pc-addon-waveform i:nth-child(3n){animation-delay:.27s}
-  body .pc-addon-radar{position:absolute;left:18px;right:18px;top:34px;bottom:16px;border-radius:999px;border:1px solid rgba(22,255,243,.34);background:repeating-radial-gradient(circle,rgba(22,255,243,.12) 0 1px,transparent 1px 18px);z-index:1}
-  body .pc-addon-radar i,body .pc-addon-radar b{position:absolute;background:rgba(22,255,243,.55);box-shadow:0 0 9px rgba(22,255,243,.42)}
-  body .pc-addon-radar i{left:50%;top:0;bottom:0;width:1px} body .pc-addon-radar b{left:0;right:0;top:50%;height:1px}
-  body .pc-addon-radar em{position:absolute;left:50%;top:50%;width:44%;height:1px;transform-origin:left center;background:linear-gradient(90deg,#ff3dbb,transparent);animation:pcAddonSpin 5s linear infinite}
-  body .pc-addon-vu-bars{position:absolute;inset:36px 20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;z-index:1}
-  body .pc-addon-vu-bars i{align-self:end;height:74%;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,#ff3dbb 0%,#9f55ff 48%,#16fff3 100%);box-shadow:0 0 14px rgba(22,255,243,.22);animation:pcAddonVu 2.4s ease-in-out infinite}
-  body .pc-addon-vu-bars i:nth-child(2){height:58%;animation-delay:.22s} body .pc-addon-vu-bars i:nth-child(3){height:82%;animation-delay:.35s} body .pc-addon-vu-bars i:nth-child(4){height:64%;animation-delay:.52s}
-  body .pc-addon-phasebox{position:absolute;inset:34px 18px 20px;border:1px solid rgba(22,255,243,.22);background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.16),transparent 60%);z-index:1;overflow:hidden}
-  body .pc-addon-phasebox i{position:absolute;left:8%;right:8%;top:48%;height:9px;border-radius:999px;background:linear-gradient(90deg,transparent,#ff3dbb,#16fff3,transparent);filter:blur(1px);transform:rotate(27deg);animation:pcAddonPhase 4s ease-in-out infinite}
-  body .pc-addon-phasebox b{position:absolute;inset:15%;border-radius:50%;border:1px solid rgba(139,69,255,.22);animation:pcAddonSpin 9s linear infinite}
-  body .pc-addon-pulse-line{position:absolute;left:12px;right:12px;top:46px;bottom:22px;display:flex;align-items:end;gap:4px;z-index:1}
-  body .pc-addon-pulse-line i{flex:1;height:18%;border-radius:999px;background:#16fff3;box-shadow:0 0 8px rgba(22,255,243,.45);animation:pcAddonWave 2.8s ease-in-out infinite}
-  body .pc-addon-pulse-line i:nth-child(2n){background:#ff3dbb;animation-delay:.18s} body .pc-addon-pulse-line i:nth-child(3n){height:62%;animation-delay:.32s}
-  body .info-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
-  body .pc-addon-toggle-card .info-value{font-size:12px!important}
-  body .pc-addon-toggle-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
-  body .pc-addon-toggle{height:25px;min-width:54px;border-radius:999px;border:1px solid rgba(22,255,243,.46);background:rgba(5,8,24,.72);color:#dff;font-size:10px;font-weight:950;letter-spacing:.05em;display:inline-flex;align-items:center;justify-content:center;gap:5px;box-shadow:inset 0 0 10px rgba(255,255,255,.04);cursor:pointer}
-  body .pc-addon-toggle span{width:8px;height:8px;border-radius:999px;background:#2a3247;border:1px solid rgba(255,255,255,.35)}
-  body .pc-addon-toggle.is-on{border-color:rgba(255,61,187,.76);color:#fff;box-shadow:0 0 13px rgba(255,61,187,.24), inset 0 0 10px rgba(22,255,243,.05)}
-  body .pc-addon-toggle.is-on span{background:#16fff3;box-shadow:0 0 10px rgba(22,255,243,.7),0 0 16px rgba(255,61,187,.25)}
-  @keyframes pcAddonSoftSweep{0%{transform:translateX(-125%)}100%{transform:translateX(125%)}}
-  @keyframes pcAddonSpin{to{transform:rotate(360deg)}}
-  @keyframes pcAddonPulse{0%,100%{opacity:.36;transform:scaleX(.78)}50%{opacity:1;transform:scaleX(1.06)}}
-  @keyframes pcAddonWave{0%,100%{height:22%;opacity:.72}50%{height:82%;opacity:1}}
-  @keyframes pcAddonVu{0%,100%{transform:scaleY(.72);opacity:.76}50%{transform:scaleY(1.04);opacity:1}}
-  @keyframes pcAddonPhase{0%,100%{transform:rotate(22deg) scaleX(.78);opacity:.65}50%{transform:rotate(33deg) scaleX(1.12);opacity:1}}
+  body .pc-addon-tower-head{
+    position:absolute;left:14px;right:14px;top:12px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    color:#ff4fc7;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 9px rgba(255,61,187,.54);
+  }
+  body .pc-addon-tower-head b{color:#16fff3;text-shadow:0 0 10px rgba(22,255,243,.70)}
+  body .pc-addon-core{
+    position:absolute;left:20px;right:20px;top:52px;height:45%;z-index:2;border-radius:22px;
+    border:1px solid rgba(22,255,243,.30);
+    background:radial-gradient(circle at 50% 50%,rgba(22,255,243,.18),rgba(255,61,187,.10) 35%,transparent 66%);
+    box-shadow:inset 0 0 24px rgba(22,255,243,.10),0 0 calc(12px + (26px * var(--pc-addon-energy))) rgba(22,255,243,.12);
+    transform:scale(calc(.985 + (.035 * var(--pc-addon-energy))));
+  }
+  body .pc-addon-core-box{border-radius:12px;}
+  body .pc-addon-core-ring{position:absolute;border-radius:inherit;border:1px solid rgba(22,255,243,.34);box-shadow:0 0 12px rgba(22,255,243,.18);}
+  body .pc-addon-core-ring-a{inset:12%;animation:pcAddonTowerSpin 16s linear infinite;}
+  body .pc-addon-core-ring-b{inset:26%;border-color:rgba(255,61,187,.42);animation:pcAddonTowerSpin 10s linear infinite reverse;}
+  body .pc-addon-core-axis{position:absolute;background:rgba(22,255,243,.52);box-shadow:0 0 12px rgba(22,255,243,.38);opacity:calc(.35 + (.55 * var(--pc-addon-energy)));}
+  body .pc-addon-core-axis-h{left:9%;right:9%;top:50%;height:2px;}
+  body .pc-addon-core-axis-v{top:9%;bottom:9%;left:50%;width:2px;}
+  body .pc-addon-core-pulse{position:absolute;left:16%;right:16%;top:50%;height:5px;border-radius:999px;background:linear-gradient(90deg,transparent,#16fff3,#ff3dbb,#16fff3,transparent);filter:drop-shadow(0 0 calc(7px + (18px * var(--pc-addon-energy))) rgba(22,255,243,.42));opacity:calc(.38 + (.62 * var(--pc-addon-energy)));animation:pcAddonTowerPulse 3.6s ease-in-out infinite;}
+  body .pc-addon-spectrum{
+    position:absolute;left:20px;right:20px;bottom:42px;height:30%;z-index:2;display:flex;align-items:end;gap:6px;padding:0 8px 4px;box-sizing:border-box;
+    border-top:1px solid rgba(255,61,187,.20);
+  }
+  body .pc-addon-spectrum i{flex:1;min-width:0;border-radius:999px 999px 4px 4px;background:linear-gradient(180deg,#ff3dbb 0%,#8b45ff 42%,#16fff3 100%);box-shadow:0 0 calc(5px + (14px * var(--pc-addon-energy))) rgba(22,255,243,.22);height:calc(18% + (70% * var(--pc-addon-energy)));transform-origin:bottom center;animation:pcAddonTowerBars 2.8s ease-in-out infinite;}
+  body .pc-addon-spectrum i:nth-child(2n){animation-delay:.13s;height:calc(26% + (55% * var(--pc-addon-energy)));}
+  body .pc-addon-spectrum i:nth-child(3n){animation-delay:.28s;height:calc(12% + (78% * var(--pc-addon-energy)));}
+  body .pc-addon-tower-foot{position:absolute;left:14px;right:14px;bottom:12px;z-index:3;display:flex;justify-content:space-between;align-items:center;color:#dff;font-size:10px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;}
+  body .pc-addon-tower-foot strong{color:#ff4fc7;text-shadow:0 0 9px rgba(255,61,187,.55)}
+  body.pc-left-addon-off .pc-side-addon-left,
+  body.pc-right-addon-off .pc-side-addon-right{opacity:.075!important;filter:saturate(.22) brightness(.42)!important;pointer-events:none!important;}
+  body.pc-left-addon-off .pc-side-addon-left *,
+  body.pc-right-addon-off .pc-side-addon-right *{animation-play-state:paused!important;}
+  body .info-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
+  body .pc-addon-toggle-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px;}
+  body .pc-addon-toggle{height:25px;min-width:54px;border-radius:999px;border:1px solid rgba(22,255,243,.46);background:rgba(5,8,24,.72);color:#dff;font-size:10px;font-weight:950;letter-spacing:.05em;display:inline-flex;align-items:center;justify-content:center;gap:5px;box-shadow:inset 0 0 10px rgba(255,255,255,.04);cursor:pointer;}
+  body .pc-addon-toggle span{width:8px;height:8px;border-radius:999px;background:#2a3247;border:1px solid rgba(255,255,255,.35);}
+  body .pc-addon-toggle.is-on{border-color:rgba(255,61,187,.76);color:#fff;box-shadow:0 0 13px rgba(255,61,187,.24), inset 0 0 10px rgba(22,255,243,.05);}
+  body .pc-addon-toggle.is-on span{background:#16fff3;box-shadow:0 0 10px rgba(22,255,243,.7),0 0 16px rgba(255,61,187,.25);}
+  @keyframes pcAddonTowerSpin{to{transform:rotate(360deg)}}
+  @keyframes pcAddonTowerPulse{0%,100%{transform:scaleX(.70);opacity:.38}50%{transform:scaleX(1.10);opacity:1}}
+  @keyframes pcAddonTowerBars{0%,100%{transform:scaleY(.76);opacity:.76}50%{transform:scaleY(1.08);opacity:1}}
 }
-@media (max-width: 1220px) and (min-width: 761px){
-  body .pc-side-addon{display:none!important}
-}
+@media (max-width:1220px) and (min-width:761px){body .pc-side-addon{display:none!important;}}
 </style>
-<script id="v130PcSideAddonFxPanelScript">
+<script id="v132PcSideAddonTowerScript">
 (function(){
+  var timer=null;
   function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn,{once:true}); else fn(); }
-  ready(function(){
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function readMeter(el){
+    if(!el) return 0;
+    var st=getComputedStyle(el); var h=st.height || el.style.height || '0'; var n=parseFloat(h);
+    if(!Number.isFinite(n)) return 0;
+    if(h.indexOf('%')>=0) return clamp(n/100,0,1);
+    var ph=el.parentElement ? el.parentElement.getBoundingClientRect().height : 100;
+    return ph>0 ? clamp(n/ph,0,1) : 0;
+  }
+  function sampleEnergy(){
+    var vals=[];
+    document.querySelectorAll('.side-meter-fill,.eq-bar-fill,.pc-bottom-sync-seg.is-on,.pc-bottom-sync-seg.is-active,[data-bottom-meter-seg].is-on,[data-bottom-meter-seg].is-active').forEach(function(el){vals.push(readMeter(el)||.42);});
+    if(!vals.length) return .42;
+    vals=vals.map(function(v){return clamp(v,0,1);}).filter(function(v){return Number.isFinite(v);});
+    if(!vals.length) return .42;
+    vals.sort(function(a,b){return b-a;});
+    var top=vals.slice(0,Math.min(8,vals.length));
+    var avg=top.reduce(function(a,b){return a+b;},0)/top.length;
+    return clamp(avg,.14,1);
+  }
+  function syncStateLabels(side,on){
+    var label=document.getElementById(side==='left'?'pcLeftFxState':'pcRightFxState');
+    if(label) label.textContent=on?'ON':'OFF';
+  }
+  function apply(side,on){
+    var cls=side==='left'?'pc-left-addon-off':'pc-right-addon-off';
+    document.body.classList.toggle(cls,!on);
+    var btn=document.getElementById(side==='left'?'pcLeftFxToggle':'pcRightFxToggle');
+    if(btn){btn.classList.toggle('is-on',on);btn.setAttribute('aria-pressed',on?'true':'false');}
+    syncStateLabels(side,on);
+    try{localStorage.setItem('s666_'+side+'_addon_fx',on?'on':'off');}catch(e){}
+  }
+  function initial(side){try{return localStorage.getItem('s666_'+side+'_addon_fx')!=='off';}catch(e){return true;}}
+  function bind(){
     var leftBtn=document.getElementById('pcLeftFxToggle');
     var rightBtn=document.getElementById('pcRightFxToggle');
-    function apply(side,on){
-      var cls=side==='left'?'pc-left-addon-off':'pc-right-addon-off';
-      document.body.classList.toggle(cls,!on);
-      var btn=side==='left'?leftBtn:rightBtn;
-      if(btn){btn.classList.toggle('is-on',on);btn.setAttribute('aria-pressed',on?'true':'false');}
-      try{localStorage.setItem('s666_'+side+'_addon_fx',on?'on':'off');}catch(e){}
-    }
-    function initial(side){try{return localStorage.getItem('s666_'+side+'_addon_fx')!=='off';}catch(e){return true;}}
     apply('left',initial('left'));
     apply('right',initial('right'));
-    if(leftBtn) leftBtn.addEventListener('click',function(){apply('left',!leftBtn.classList.contains('is-on'));});
-    if(rightBtn) rightBtn.addEventListener('click',function(){apply('right',!rightBtn.classList.contains('is-on'));});
-  });
+    if(leftBtn && !leftBtn.dataset.v132Bound){leftBtn.dataset.v132Bound='1';leftBtn.addEventListener('click',function(){apply('left',!leftBtn.classList.contains('is-on'));});}
+    if(rightBtn && !rightBtn.dataset.v132Bound){rightBtn.dataset.v132Bound='1';rightBtn.addEventListener('click',function(){apply('right',!rightBtn.classList.contains('is-on'));});}
+  }
+  function tick(){
+    var e=sampleEnergy();
+    document.documentElement.style.setProperty('--pc-addon-energy',e.toFixed(3));
+    document.documentElement.style.setProperty('--pc-addon-glow',(9+e*28).toFixed(1)+'px');
+  }
+  function boot(){
+    bind();
+    if(window.matchMedia && !window.matchMedia('(min-width:1221px)').matches) return;
+    if(!timer){tick();timer=setInterval(tick,280);} 
+  }
+  ready(boot); window.addEventListener('load',boot,{passive:true});
 })();
 </script>
 
-  <script src="/js/addons/discord-player-addon-v3.js?v=v130-pc-addon-wide-reactive-20260514" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=v132-side-addon-width-center-20260514" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3070,8 +3115,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- v130 BASE PC LAYOUT CLAMP — compact footer/meter repair, wins after legacy styles -->
-<style id="v130FinalPcBoundsClamp">
+<!-- v132 BASE PC LAYOUT CLAMP — compact footer/meter repair, wins after legacy styles -->
+<style id="v132FinalPcBoundsClamp">
 @media (min-width: 761px) {
   body .frame-stage { overflow:hidden!important; box-sizing:border-box!important; padding-left:96px!important; padding-right:96px!important; }
   body .frame-stage .player-shell { width:min(68vw,1040px)!important; max-width:calc(100vw - 360px)!important; min-width:min(760px,calc(100vw - 360px))!important; overflow:hidden!important; box-sizing:border-box!important; margin-left:auto!important; margin-right:auto!important; padding-bottom:8px!important; }
@@ -3098,14 +3143,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v130"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v130 PC MICRO-FIX — compact Discord row, split bottom meter, true cyan ticker -->
-<style id="v130PcDualMeterTickerCyan">
+<!-- v132 PC MICRO-FIX — compact Discord row, split bottom meter, true cyan ticker -->
+<style id="v132PcDualMeterTickerCyan">
 @media (min-width: 761px) {
   /* Kompaktere obere Control/Discord-Leiste: nur Höhe/Abstände, keine Funktion. */
   body .frame-stage .player-shell > .top-hud.systempanel-v74 {
@@ -3178,15 +3223,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v130"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v130 PC DISCORD ROW + TRUE CYAN TICKER CLEANUP
+<!-- v132 PC DISCORD ROW + TRUE CYAN TICKER CLEANUP
      Scope: PC panel fitting + ticker color cleanup only. No DOM, no transport, no stream, no Discord logic. -->
-<style id="v130PcDiscordPanelTickerClean">
+<style id="v132PcDiscordPanelTickerClean">
 @media (min-width: 761px) {
   /* Keep the Discord/status/version group inside one compact HUD row. */
   body .frame-stage .player-shell .systempanel-grid-v74{
@@ -3285,16 +3330,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v130"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v130 PC BOTTOM HUD PROPORTION FIX
+<!-- v132 PC BOTTOM HUD PROPORTION FIX
      Scope: PC bottom meter + copyright/footer proportions only.
      No ticker logic, no transport, no iPhone, no Discord/Worker/Stream changes. -->
-<style id="v130PcBottomHudProportionFix">
+<style id="v132PcBottomHudProportionFix">
 @media (min-width: 761px) {
   body .frame-stage .player-shell {
     padding-bottom:10px!important;
@@ -3371,15 +3416,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v130"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v130 PC BOTTOM METER WIDTH + FOOTER COLOR CORRECTION
+<!-- v132 PC BOTTOM METER WIDTH + FOOTER COLOR CORRECTION
      Scope: PC bottom HUD only + ticker text color. No DOM, transport, iPhone, Discord logic, Worker or Stream changes. -->
-<style id="v130PcBottomMeterFooterColorCorrection">
+<style id="v132PcBottomMeterFooterColorCorrection">
 @media (min-width: 761px) {
   /* Dual middle meter: much wider on both sides, still one existing meter/one existing audio path. */
   body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter {
@@ -3447,117 +3492,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v130"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
-
-<!-- v130 PC SIDE ADDON POSITION + REACTIVITY SYNC — addon-only patch, no player core changes -->
-<style id="v130PcSideAddonPositionReactivity">
-@media (min-width: 1221px){
-  body .frame-stage{
-    /* Pull the external FX panels inward toward the player so the outer level meters stay visible. */
-    --pc-addon-w: clamp(142px, 11.6vw, 190px)!important;
-    --pc-addon-gap: clamp(-24px, -1.15vw, -10px)!important;
-  }
-  body .pc-side-addon{
-    top:clamp(58px, 8.1vh, 90px)!important;
-    bottom:clamp(46px, 5.4vh, 76px)!important;
-    gap:clamp(7px, .9vh, 11px)!important;
-  }
-  body .pc-side-addon-left{
-    left:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;
-  }
-  body .pc-side-addon-right{
-    right:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;
-  }
-  body .pc-addon-card{
-    border-color:rgba(22,255,243,calc(.34 + (.30 * var(--pc-addon-energy, .45))))!important;
-    box-shadow:
-      0 0 var(--pc-addon-glow, 18px) rgba(22,255,243,.20),
-      0 0 calc(6px + (18px * var(--pc-addon-energy, .45))) rgba(255,61,187,.18),
-      inset 0 0 calc(14px + (20px * var(--pc-addon-energy, .45))) rgba(255,61,187,.055)!important;
-  }
-  body .pc-addon-orb{
-    transform:scale(calc(.94 + (.105 * var(--pc-addon-energy, .45))))!important;
-  }
-  body .pc-addon-orb b{
-    opacity:calc(.34 + (.66 * var(--pc-addon-energy, .45)))!important;
-    filter:blur(.2px) drop-shadow(0 0 calc(6px + (14px * var(--pc-addon-energy, .45))) rgba(22,255,243,.45))!important;
-  }
-  body .pc-addon-waveform i{
-    height:calc((24% + (68% * var(--pc-addon-energy, .45))) * var(--pc-addon-wave-scale, 1))!important;
-    box-shadow:0 0 calc(5px + (14px * var(--pc-addon-energy, .45))) rgba(255,61,187,.28)!important;
-  }
-  body .pc-addon-vu-bars i{
-    transform:scaleY(calc(.48 + (.82 * var(--pc-addon-energy, .45))))!important;
-    filter:brightness(calc(.86 + (.34 * var(--pc-addon-energy, .45))))!important;
-  }
-  body .pc-addon-phasebox i,
-  body .pc-addon-pulse-line i{
-    opacity:calc(.50 + (.50 * var(--pc-addon-energy, .45)))!important;
-    box-shadow:0 0 calc(5px + (14px * var(--pc-addon-energy, .45))) rgba(22,255,243,.36)!important;
-  }
-  body.pc-left-addon-off .pc-side-addon-left,
-  body.pc-right-addon-off .pc-side-addon-right{
-    pointer-events:none!important;
-  }
-}
-</style>
-<script id="v130PcSideAddonReactivitySync">
-(function(){
-  var timer=null;
-  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-  function readPercentFromStyle(el){
-    if(!el) return 0;
-    var st=getComputedStyle(el);
-    var h=st.height || el.style.height || '0';
-    var n=parseFloat(h);
-    if(!Number.isFinite(n)) return 0;
-    var parent=el.parentElement;
-    var ph=parent ? parent.getBoundingClientRect().height : 100;
-    if(ph>0 && n>1 && h.indexOf('%')<0) return clamp(n/ph,0,1);
-    return clamp(n/100,0,1);
-  }
-  function cssVarEnergy(){
-    var cs=getComputedStyle(document.documentElement);
-    var keys=['--meter-left','--meter-right','--meter-bottom-left','--meter-bottom-right','--pc-level','--audio-level'];
-    var vals=[];
-    keys.forEach(function(k){
-      var n=parseFloat(cs.getPropertyValue(k));
-      if(Number.isFinite(n)) vals.push(n>1 ? n/100 : n);
-    });
-    return vals;
-  }
-  function sampleEnergy(){
-    var vals=cssVarEnergy();
-    document.querySelectorAll('.eq-bar-fill,.side-meter-fill,.bottom-meter-segment.is-active,.pc-mid-meter-seg.is-active').forEach(function(el){ vals.push(readPercentFromStyle(el) || .55); });
-    if(!vals.length) return .42;
-    vals=vals.map(function(v){return clamp(v,0,1);}).filter(function(v){return Number.isFinite(v);});
-    if(!vals.length) return .42;
-    vals.sort(function(a,b){return b-a;});
-    var top=vals.slice(0, Math.min(10, vals.length));
-    var avg=top.reduce(function(a,b){return a+b;},0)/top.length;
-    return clamp(avg,.16,1);
-  }
-  function tick(){
-    var e=sampleEnergy();
-    var pulse=(0.78 + e*.62);
-    document.documentElement.style.setProperty('--pc-addon-energy', e.toFixed(3));
-    document.documentElement.style.setProperty('--pc-addon-wave-scale', pulse.toFixed(3));
-    document.documentElement.style.setProperty('--pc-addon-glow', (8 + e*24).toFixed(1)+'px');
-  }
-  function boot(){
-    if(window.matchMedia && !window.matchMedia('(min-width: 1221px)').matches) return;
-    if(timer) return;
-    tick();
-    timer=setInterval(tick, 260);
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',boot,{passive:true});
-})();
-</script>
 
 </body>
 </html>
