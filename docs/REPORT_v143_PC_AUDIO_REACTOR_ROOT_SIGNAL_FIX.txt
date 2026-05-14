@@ -1,0 +1,19 @@
+666SOUNDsDESIGn WebRadio — REPORT v143
+TYPE: PC Audio Reactor Root Signal Fix
+DATE: 2026-05-14
+
+SCOPE
+- Only existing left-top PC Audio Reactor behavior changed.
+- No new layer, no new canvas, no new audio loop, no new RAF loop.
+- Position, width, ticker, transport, iPhone, Discord, Worker and Stream were not changed.
+
+CHANGES
+- Disabled the reactor's CSS-only infinite loop behavior for orbit/wave elements.
+- Existing Audio Reactor elements now use the same collected EQ/levelmeter source vector as the side add-on modules.
+- Reactor core, orbit A, orbit B, wave and dot are driven from live level/EQ-derived values instead of a visible repeating CSS loop.
+- Version/cache strings updated to v143.
+
+VALIDATION
+- ZIP was built from v142 real rebuild basis.
+- No new add-on DOM container was added.
+- No Stream/Worker files changed intentionally.
