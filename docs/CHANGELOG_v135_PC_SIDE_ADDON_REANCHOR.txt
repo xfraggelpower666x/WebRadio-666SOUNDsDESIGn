@@ -1,0 +1,15 @@
+666SOUNDsDESIGn v135 — PC Side Add-on Reanchor
+
+Scope:
+- PC only.
+- Re-anchored left/right side add-on towers to the actual player-wrapper geometry.
+- Panels are centered between player edge and triple side level meter inner edge.
+- Version display updated to v135.
+
+Not changed:
+- Player core.
+- Ticker.
+- Transport.
+- iPhone/mobile.
+- Discord/Worker/Stream routing.
+- Audio/RAF loops.
