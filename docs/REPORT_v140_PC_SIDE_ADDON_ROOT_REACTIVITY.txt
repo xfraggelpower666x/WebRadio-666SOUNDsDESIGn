@@ -1,0 +1,14 @@
+666SOUNDsDESIGn v140 PC SIDE ADDON ROOT REACTIVITY
+
+Änderungen:
+- Keine neuen Add-on-Layer, keine neuen Canvas, kein neuer Audio-/RAF-Loop.
+- Bestehende WaveScope-/BeatPulse-/VU-Matrix-Elemente werden direkt aus vorhandenen EQ-/Levelmeter-DOM-Werten gespeist.
+- Eigene CSS-Bar-Animationen in WaveScope/BeatPulse/VU deaktiviert, damit sie nicht gegen EQ/Levelmeter laufen.
+- Rechte VU-Matrix bekommt echte linke/rechte Levelmeter-Werte.
+
+Tabu eingehalten:
+- Kein Player-Core-Umbau.
+- Kein Ticker.
+- Kein Transport.
+- Kein iPhone.
+- Kein Discord/Worker/Stream.
