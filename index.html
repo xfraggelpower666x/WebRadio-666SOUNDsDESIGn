@@ -16,30 +16,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v132" />
+  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v133" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v132-side-addon-width-center-20260514" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v132-side-addon-width-center-20260514" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v132-side-addon-width-center-20260514" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v132-side-addon-width-center-20260514" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v132-side-addon-width-center-20260514" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v132-side-addon-width-center-20260514" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v133-side-addon-wide-triplemeter-20260514" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v133-side-addon-wide-triplemeter-20260514" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v133-side-addon-wide-triplemeter-20260514" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v133-side-addon-wide-triplemeter-20260514" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v133-side-addon-wide-triplemeter-20260514" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v133-side-addon-wide-triplemeter-20260514" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v132-side-addon-width-center-20260514" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v132-side-addon-width-center-20260514">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v132-side-addon-width-center-20260514">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v132-side-addon-width-center-20260514">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v132-side-addon-width-center-20260514">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v133-side-addon-wide-triplemeter-20260514" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v133-side-addon-wide-triplemeter-20260514">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v133-side-addon-wide-triplemeter-20260514">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v133-side-addon-wide-triplemeter-20260514">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v133-side-addon-wide-triplemeter-20260514">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v132-side-addon-width-center-20260514">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v133-side-addon-wide-triplemeter-20260514">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -158,10 +158,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       <div class="side-meter-stack">
         <div class="side-meter-track"><div id="leftMeterA" class="side-meter-fill"></div></div>
         <div class="side-meter-track secondary"><div id="leftMeterB" class="side-meter-fill"></div></div>
+        <div class="side-meter-track tertiary"><div id="leftMeterC" class="side-meter-fill"></div></div>
       </div>
     </aside>
 
-    <!-- v132 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <!-- v133 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
     <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Left Add-on FX Tower" data-addon-side="left">
       <section class="pc-addon-tower pc-addon-tower-left" aria-label="Left FX Tower">
         <header class="pc-addon-tower-head"><span>LEFT FX</span><b id="pcLeftFxState">ON</b></header>
@@ -197,7 +198,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v132</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v133</span></div>
           </div>
         </div>
       </header>
@@ -206,13 +207,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v132-side-addon-width-center-20260514" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v133-side-addon-wide-triplemeter-20260514" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v132-side-addon-width-center-20260514" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v133-side-addon-wide-triplemeter-20260514" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v132-side-addon-width-center-20260514" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v133-side-addon-wide-triplemeter-20260514" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -330,7 +331,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       </section>
 </main>
 
-    <!-- v132 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <!-- v133 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
     <aside id="pcRightFxAddon" class="pc-side-addon pc-side-addon-right desktop-only" aria-label="Right Add-on FX Tower" data-addon-side="right">
       <section class="pc-addon-tower pc-addon-tower-right" aria-label="Right FX Tower">
         <header class="pc-addon-tower-head"><span>RIGHT FX</span><b id="pcRightFxState">ON</b></header>
@@ -352,6 +353,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       <div class="side-meter-stack">
         <div class="side-meter-track"><div id="rightMeterA" class="side-meter-fill"></div></div>
         <div class="side-meter-track secondary"><div id="rightMeterB" class="side-meter-fill"></div></div>
+        <div class="side-meter-track tertiary"><div id="rightMeterC" class="side-meter-fill"></div></div>
       </div>
     </aside>
   </div>
@@ -359,10 +361,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v132-side-addon-width-center-20260514"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v133-side-addon-wide-triplemeter-20260514"></script>
 
 
-<!-- PC_SIDE_ADDON_FX_PANEL_v132 -->
+<!-- PC_SIDE_ADDON_FX_PANEL_v133 -->
 <style id="strictMobileFrontendPurgeV83Style">
 @media(max-width:760px){
   :root{
@@ -1176,7 +1178,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v132-side-addon-width-center-20260514')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v133-side-addon-wide-triplemeter-20260514')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1188,10 +1190,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- PC_SIDE_ADDON_FX_PANEL_v132 -->
+<!-- PC_SIDE_ADDON_FX_PANEL_v133 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v132';
+  var VERSION='v133';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1699,9 +1701,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var badge=q('.smfp-version-badge',app);
     var slot=q('.mff-discord-slot',app);
     if(!badge || !slot) return;
-    badge.textContent='v132';
+    badge.textContent='v133';
     badge.classList.add('mff-version-inline');
-    badge.setAttribute('aria-label','Player Version v132');
+    badge.setAttribute('aria-label','Player Version v133');
     if(badge.parentNode!==slot) slot.appendChild(badge);
   }
 
@@ -1726,7 +1728,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v132</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v133</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -2688,15 +2690,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v132';
+  var VERSION='v133';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v132');
+    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v133');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
     var app=document.getElementById('mffApp');
-    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v132');
+    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v133');
   }
   function lockMobileViewport(){
     var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -2755,8 +2757,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- v132 PC SIDE ADDON HUD TOWER WIDTH CENTER — replaces old addon card stack; no player-core/ticker/transport changes -->
-<style id="v132PcSideAddonTowerRebuild">
+<!-- v133 PC SIDE ADDON HUD TOWER WIDTH CENTER — replaces old addon card stack; no player-core/ticker/transport changes -->
+<style id="v133PcSideAddonTowerRebuild">
 @media (min-width:1221px){
   body .frame-stage{
     --pc-addon-w:clamp(230px,17.2vw,320px);
@@ -2859,7 +2861,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 @media (max-width:1220px) and (min-width:761px){body .pc-side-addon{display:none!important;}}
 </style>
-<script id="v132PcSideAddonTowerScript">
+<script id="v133PcSideAddonTowerScript">
 (function(){
   var timer=null;
   function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn,{once:true}); else fn(); }
@@ -2901,8 +2903,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var rightBtn=document.getElementById('pcRightFxToggle');
     apply('left',initial('left'));
     apply('right',initial('right'));
-    if(leftBtn && !leftBtn.dataset.v132Bound){leftBtn.dataset.v132Bound='1';leftBtn.addEventListener('click',function(){apply('left',!leftBtn.classList.contains('is-on'));});}
-    if(rightBtn && !rightBtn.dataset.v132Bound){rightBtn.dataset.v132Bound='1';rightBtn.addEventListener('click',function(){apply('right',!rightBtn.classList.contains('is-on'));});}
+    if(leftBtn && !leftBtn.dataset.v133Bound){leftBtn.dataset.v133Bound='1';leftBtn.addEventListener('click',function(){apply('left',!leftBtn.classList.contains('is-on'));});}
+    if(rightBtn && !rightBtn.dataset.v133Bound){rightBtn.dataset.v133Bound='1';rightBtn.addEventListener('click',function(){apply('right',!rightBtn.classList.contains('is-on'));});}
   }
   function tick(){
     var e=sampleEnergy();
@@ -2918,7 +2920,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
-  <script src="/js/addons/discord-player-addon-v3.js?v=v132-side-addon-width-center-20260514" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=v133-side-addon-wide-triplemeter-20260514" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3115,8 +3117,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- v132 BASE PC LAYOUT CLAMP — compact footer/meter repair, wins after legacy styles -->
-<style id="v132FinalPcBoundsClamp">
+<!-- v133 BASE PC LAYOUT CLAMP — compact footer/meter repair, wins after legacy styles -->
+<style id="v133FinalPcBoundsClamp">
 @media (min-width: 761px) {
   body .frame-stage { overflow:hidden!important; box-sizing:border-box!important; padding-left:96px!important; padding-right:96px!important; }
   body .frame-stage .player-shell { width:min(68vw,1040px)!important; max-width:calc(100vw - 360px)!important; min-width:min(760px,calc(100vw - 360px))!important; overflow:hidden!important; box-sizing:border-box!important; margin-left:auto!important; margin-right:auto!important; padding-bottom:8px!important; }
@@ -3143,14 +3145,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v133"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v132 PC MICRO-FIX — compact Discord row, split bottom meter, true cyan ticker -->
-<style id="v132PcDualMeterTickerCyan">
+<!-- v133 PC MICRO-FIX — compact Discord row, split bottom meter, true cyan ticker -->
+<style id="v133PcDualMeterTickerCyan">
 @media (min-width: 761px) {
   /* Kompaktere obere Control/Discord-Leiste: nur Höhe/Abstände, keine Funktion. */
   body .frame-stage .player-shell > .top-hud.systempanel-v74 {
@@ -3223,15 +3225,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v133"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v132 PC DISCORD ROW + TRUE CYAN TICKER CLEANUP
+<!-- v133 PC DISCORD ROW + TRUE CYAN TICKER CLEANUP
      Scope: PC panel fitting + ticker color cleanup only. No DOM, no transport, no stream, no Discord logic. -->
-<style id="v132PcDiscordPanelTickerClean">
+<style id="v133PcDiscordPanelTickerClean">
 @media (min-width: 761px) {
   /* Keep the Discord/status/version group inside one compact HUD row. */
   body .frame-stage .player-shell .systempanel-grid-v74{
@@ -3330,16 +3332,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v133"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v132 PC BOTTOM HUD PROPORTION FIX
+<!-- v133 PC BOTTOM HUD PROPORTION FIX
      Scope: PC bottom meter + copyright/footer proportions only.
      No ticker logic, no transport, no iPhone, no Discord/Worker/Stream changes. -->
-<style id="v132PcBottomHudProportionFix">
+<style id="v133PcBottomHudProportionFix">
 @media (min-width: 761px) {
   body .frame-stage .player-shell {
     padding-bottom:10px!important;
@@ -3416,15 +3418,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v133"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v132 PC BOTTOM METER WIDTH + FOOTER COLOR CORRECTION
+<!-- v133 PC BOTTOM METER WIDTH + FOOTER COLOR CORRECTION
      Scope: PC bottom HUD only + ticker text color. No DOM, transport, iPhone, Discord logic, Worker or Stream changes. -->
-<style id="v132PcBottomMeterFooterColorCorrection">
+<style id="v133PcBottomMeterFooterColorCorrection">
 @media (min-width: 761px) {
   /* Dual middle meter: much wider on both sides, still one existing meter/one existing audio path. */
   body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter {
@@ -3492,11 +3494,76 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v132"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v133"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
+
+
+<!-- v133 PC SIDE ADDON WIDTH/CENTER + TRIPLE SIDE METERS — surgical PC-only geometry fix -->
+<style id="v133PcAddonWideCenterTripleMeters">
+@media (min-width:1221px){
+  body .frame-stage{
+    --pc-player-w: min(82vw, 1280px);
+    --pc-side-meter-w: 92px;
+    --pc-side-meter-edge: 10px;
+    --pc-meter-inner-edge: calc(var(--pc-side-meter-edge) + var(--pc-side-meter-w));
+    --pc-side-gap-space: calc((100vw - var(--pc-player-w)) / 2 - var(--pc-meter-inner-edge));
+    --pc-addon-w: clamp(340px, calc(var(--pc-side-gap-space) - 16px), 460px);
+    --pc-addon-gap: 0px;
+  }
+
+  /* Drei Seitenmeter: kein zusätzlicher Audio-Loop, nur bestehende Meter-Ausgabe um eine dritte Spur erweitert. */
+  body .side-meter{
+    width: var(--pc-side-meter-w)!important;
+    max-width: var(--pc-side-meter-w)!important;
+  }
+  body .side-meter.left{ left: var(--pc-side-meter-edge)!important; }
+  body .side-meter.right{ right: var(--pc-side-meter-edge)!important; }
+  body .side-meter-stack{
+    width:100%!important;
+    gap:7px!important;
+    justify-content:center!important;
+  }
+  body .side-meter-track{
+    width:16px!important;
+    flex:0 0 16px!important;
+  }
+  body .side-meter-track.tertiary{
+    opacity:.76!important;
+  }
+
+  /* Add-on-Tower: breit und geometrisch mittig zwischen Playerkante und innerer Levelmeterkante. */
+  body .pc-side-addon{
+    width: var(--pc-addon-w)!important;
+    max-width: var(--pc-addon-w)!important;
+    min-width: 340px!important;
+  }
+  body .pc-side-addon-left{
+    left: calc(var(--pc-meter-inner-edge) + ((var(--pc-side-gap-space) - var(--pc-addon-w)) / 2))!important;
+    right:auto!important;
+  }
+  body .pc-side-addon-right{
+    right: calc(var(--pc-meter-inner-edge) + ((var(--pc-side-gap-space) - var(--pc-addon-w)) / 2))!important;
+    left:auto!important;
+  }
+  body .pc-addon-tower{
+    border-radius:28px!important;
+  }
+  body .pc-addon-core{
+    left:22px!important;
+    right:22px!important;
+  }
+  body .pc-addon-spectrum{
+    left:22px!important;
+    right:22px!important;
+    gap:7px!important;
+  }
+  body #pcVersionBadge .status-code{font-size:0!important}
+  body #pcVersionBadge .status-code::after{content:"v133"!important;font-size:11px!important;line-height:1!important}
+}
+</style>
 
 </body>
 </html>

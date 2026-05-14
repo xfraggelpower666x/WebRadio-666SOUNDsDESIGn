@@ -1,0 +1,14 @@
+666SOUNDsDESIGn WebRadio — v133 PC SIDE ADDON WIDE CENTER + TRIPLE SIDEMETER
+
+Changed:
+- PC side add-on towers widened again.
+- PC side add-on towers geometrically centered between player edge and outer levelmeter inner edge.
+- PC left/right side levelmeters changed from double-track to triple-track.
+- player-core meter binding extended to leftMeterC/rightMeterC.
+
+Not changed:
+- no Player-Core transport logic changes.
+- no ticker changes.
+- no Discord/Worker/Stream routing changes.
+- no iPhone layout changes.
+- no new audio loop / RAF loop.
