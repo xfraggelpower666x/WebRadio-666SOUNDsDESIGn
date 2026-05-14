@@ -1,0 +1,19 @@
+666SOUNDsDESIGn v136 PC SIDE ADDON CONTENT REBUILD
+
+Scope:
+- PC side add-on panel positions from v135 remain frozen.
+- Rebuilt only the internal content of the left/right add-on boxes.
+
+Changes:
+- Left tower split into 3 internal modules: AUDIO REACTOR, WAVE SCOPE, SPECTRUM GRID.
+- Right tower split into 3 internal modules: VU MATRIX, PHASE SCOPE, BEAT PULSE.
+- Kept L-FX/R-FX switches and default ON behavior.
+- Kept one existing add-on energy sampler; no new audio loop was added.
+
+Untouched:
+- Player core
+- Ticker
+- Transport
+- iPhone/mobile layout
+- Discord code
+- Worker/stream routing

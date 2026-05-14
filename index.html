@@ -21,25 +21,25 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v135-side-addon-reanchor-20260514" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v135-side-addon-reanchor-20260514" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v135-side-addon-reanchor-20260514" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v135-side-addon-reanchor-20260514" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v135-side-addon-reanchor-20260514" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v135-side-addon-reanchor-20260514" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v136-side-addon-content-20260514" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v136-side-addon-content-20260514" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v136-side-addon-content-20260514" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v136-side-addon-content-20260514" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v136-side-addon-content-20260514" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v136-side-addon-content-20260514" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v135-side-addon-reanchor-20260514" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v135-side-addon-reanchor-20260514">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v135-side-addon-reanchor-20260514">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v135-side-addon-reanchor-20260514">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v135-side-addon-reanchor-20260514">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v136-side-addon-content-20260514" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v136-side-addon-content-20260514">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v136-side-addon-content-20260514">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v136-side-addon-content-20260514">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v136-side-addon-content-20260514">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v135-side-addon-reanchor-20260514">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v136-side-addon-content-20260514">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -163,20 +163,35 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     </aside>
 
     <!-- v133 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <!-- v136 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
     <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Left Add-on FX Tower" data-addon-side="left">
       <section class="pc-addon-tower pc-addon-tower-left" aria-label="Left FX Tower">
         <header class="pc-addon-tower-head"><span>LEFT FX</span><b id="pcLeftFxState">ON</b></header>
-        <div class="pc-addon-core" aria-hidden="true">
-          <span class="pc-addon-core-ring pc-addon-core-ring-a"></span>
-          <span class="pc-addon-core-ring pc-addon-core-ring-b"></span>
-          <span class="pc-addon-core-axis pc-addon-core-axis-h"></span>
-          <span class="pc-addon-core-axis pc-addon-core-axis-v"></span>
-          <span class="pc-addon-core-pulse"></span>
-        </div>
-        <div class="pc-addon-spectrum" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        </div>
-        <footer class="pc-addon-tower-foot"><span>AUDIO LINK</span><strong>SYNC</strong></footer>
+        <article class="pc-addon-module pc-addon-module-reactor" aria-label="Audio Reactor">
+          <strong>AUDIO REACTOR</strong>
+          <div class="pc-addon-reactor-core" aria-hidden="true">
+            <span class="pc-addon-orbit pc-addon-orbit-a"></span>
+            <span class="pc-addon-orbit pc-addon-orbit-b"></span>
+            <span class="pc-addon-reactor-wave"></span>
+            <span class="pc-addon-reactor-dot"></span>
+          </div>
+          <footer><span>REACTIVITY</span><b>85%</b></footer>
+        </article>
+        <article class="pc-addon-module pc-addon-module-wave" aria-label="Wave Scope">
+          <strong>WAVE SCOPE</strong>
+          <div class="pc-addon-waveform" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </article>
+        <article class="pc-addon-module pc-addon-module-grid" aria-label="Spectrum Grid">
+          <strong>SPECTRUM GRID</strong>
+          <div class="pc-addon-radar" aria-hidden="true">
+            <span class="radar-ring r1"></span><span class="radar-ring r2"></span><span class="radar-ring r3"></span>
+            <span class="radar-axis radar-x"></span><span class="radar-axis radar-y"></span><span class="radar-sweep"></span>
+            <em class="pt-a"></em><em class="pt-b"></em><em class="pt-c"></em><em class="pt-d"></em>
+          </div>
+          <footer><span>AUDIO LINK</span><b>SYNC</b></footer>
+        </article>
       </section>
     </aside>
 
@@ -207,13 +222,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v135-side-addon-reanchor-20260514" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v136-side-addon-content-20260514" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v135-side-addon-reanchor-20260514" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v136-side-addon-content-20260514" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v135-side-addon-reanchor-20260514" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v136-side-addon-content-20260514" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -332,20 +347,33 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </main>
 
     <!-- v133 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <!-- v136 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
     <aside id="pcRightFxAddon" class="pc-side-addon pc-side-addon-right desktop-only" aria-label="Right Add-on FX Tower" data-addon-side="right">
       <section class="pc-addon-tower pc-addon-tower-right" aria-label="Right FX Tower">
         <header class="pc-addon-tower-head"><span>RIGHT FX</span><b id="pcRightFxState">ON</b></header>
-        <div class="pc-addon-core pc-addon-core-box" aria-hidden="true">
-          <span class="pc-addon-core-ring pc-addon-core-ring-a"></span>
-          <span class="pc-addon-core-ring pc-addon-core-ring-b"></span>
-          <span class="pc-addon-core-axis pc-addon-core-axis-h"></span>
-          <span class="pc-addon-core-axis pc-addon-core-axis-v"></span>
-          <span class="pc-addon-core-pulse"></span>
-        </div>
-        <div class="pc-addon-spectrum pc-addon-spectrum-right" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        </div>
-        <footer class="pc-addon-tower-foot"><span>REACTOR</span><strong>LIVE</strong></footer>
+        <article class="pc-addon-module pc-addon-module-vu" aria-label="VU Matrix">
+          <strong>VU MATRIX</strong>
+          <div class="pc-addon-vu-grid" aria-hidden="true">
+            <div class="pc-vu-channel"><b>L</b><span><i></i></span><span><i></i></span></div>
+            <div class="pc-vu-scale"><em>0</em><em>-6</em><em>-12</em><em>-24</em><em>-36</em><em>-48</em></div>
+            <div class="pc-vu-channel"><b>R</b><span><i></i></span><span><i></i></span></div>
+          </div>
+        </article>
+        <article class="pc-addon-module pc-addon-module-phase" aria-label="Phase Scope">
+          <strong>PHASE SCOPE</strong>
+          <div class="pc-addon-phase" aria-hidden="true">
+            <span class="phase-grid"></span><span class="phase-line"></span><span class="phase-cloud"></span>
+            <b class="phase-l">L</b><b class="phase-r">R</b>
+          </div>
+        </article>
+        <article class="pc-addon-module pc-addon-module-beat" aria-label="Beat Pulse">
+          <strong>BEAT PULSE</strong>
+          <div class="pc-addon-beat" aria-hidden="true">
+            <p><b>128.0</b> BPM</p>
+            <div class="pc-addon-beatline"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <footer><span>REACTOR</span><b>LIVE</b></footer>
+        </article>
       </section>
     </aside>
 
@@ -361,7 +389,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v135-side-addon-reanchor-20260514"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v136-side-addon-content-20260514"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v133 -->
@@ -1178,7 +1206,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v135-side-addon-reanchor-20260514')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v136-side-addon-content-20260514')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -2757,111 +2785,39 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- v135 PC SIDE ADDON HUD TOWER WIDTH TUNE — replaces old addon card stack; no player-core/ticker/transport changes -->
-<style id="v135PcSideAddonTowerRebuild">
+<!-- v136 PC SIDE ADDON HUD TOWER WIDTH TUNE — replaces old addon card stack; no player-core/ticker/transport changes -->
+<style id="v136PcSideAddonContentRebuild">
 @media (min-width:1221px){
-  body .frame-stage{
-    --pc-addon-w:clamp(220px,14.2vw,300px);
-    --pc-addon-gap:clamp(5px,.48vw,10px);
-    --pc-addon-energy:.42;
-    --pc-addon-glow:18px;
-  }
-  body .pc-side-addon{
-    position:absolute!important;
-    top:clamp(70px,9.2vh,104px)!important;
-    bottom:clamp(66px,7.2vh,98px)!important;
-    width:var(--pc-addon-w)!important;
-    z-index:7!important;
-    pointer-events:auto!important;
-    display:flex!important;
-    align-items:stretch!important;
-    justify-content:center!important;
-    opacity:1!important;
-    transform:translateZ(0)!important;
-    transition:opacity .22s ease, filter .22s ease!important;
-  }
-  body .pc-side-addon-left{
-    left:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;
-  }
-  body .pc-side-addon-right{
-    right:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;
-  }
-  body .pc-addon-tower{
-    position:relative!important;
-    width:100%!important;
-    height:100%!important;
-    min-height:0!important;
-    overflow:hidden!important;
-    border:1px solid rgba(22,255,243,calc(.42 + (.28 * var(--pc-addon-energy))))!important;
-    border-radius:24px!important;
-    background:
-      radial-gradient(circle at 50% 34%,rgba(255,61,187,.18),transparent 37%),
-      linear-gradient(180deg,rgba(7,10,31,.92),rgba(8,4,25,.76))!important;
-    box-shadow:
-      0 0 var(--pc-addon-glow) rgba(22,255,243,.20),
-      0 0 calc(10px + (26px * var(--pc-addon-energy))) rgba(255,61,187,.16),
-      inset 0 0 calc(18px + (28px * var(--pc-addon-energy))) rgba(22,255,243,.055)!important;
-  }
-  body .pc-addon-tower::before{
-    content:"";position:absolute;inset:10px;border-radius:18px;pointer-events:none;
-    border:1px solid rgba(255,61,187,.22);
-    background:
-      linear-gradient(90deg,transparent 0 7%,rgba(22,255,243,.12) 7.5% 8%,transparent 8.5% 91%,rgba(22,255,243,.12) 92% 92.5%,transparent 93%),
-      linear-gradient(180deg,transparent 0 13%,rgba(255,61,187,.13) 13.5% 14%,transparent 14.5% 86%,rgba(255,61,187,.13) 86.5% 87%,transparent 87.5%);
-    opacity:calc(.46 + (.36 * var(--pc-addon-energy)));
-  }
-  body .pc-addon-tower::after{
-    content:"";position:absolute;left:-35%;right:-35%;height:38%;top:-15%;pointer-events:none;
-    background:linear-gradient(90deg,transparent,rgba(22,255,243,.16),rgba(255,61,187,.14),transparent);
-    transform:translateY(calc(170% * var(--pc-addon-energy))) rotate(-8deg);
-    filter:blur(8px);opacity:.54;
-  }
-  body .pc-addon-tower-head{
-    position:absolute;left:14px;right:14px;top:12px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;
-    color:#ff4fc7;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 0 9px rgba(255,61,187,.54);
-  }
-  body .pc-addon-tower-head b{color:#16fff3;text-shadow:0 0 10px rgba(22,255,243,.70)}
-  body .pc-addon-core{
-    position:absolute;left:20px;right:20px;top:52px;height:45%;z-index:2;border-radius:22px;
-    border:1px solid rgba(22,255,243,.30);
-    background:radial-gradient(circle at 50% 50%,rgba(22,255,243,.18),rgba(255,61,187,.10) 35%,transparent 66%);
-    box-shadow:inset 0 0 24px rgba(22,255,243,.10),0 0 calc(12px + (26px * var(--pc-addon-energy))) rgba(22,255,243,.12);
-    transform:scale(calc(.985 + (.035 * var(--pc-addon-energy))));
-  }
-  body .pc-addon-core-box{border-radius:12px;}
-  body .pc-addon-core-ring{position:absolute;border-radius:inherit;border:1px solid rgba(22,255,243,.34);box-shadow:0 0 12px rgba(22,255,243,.18);}
-  body .pc-addon-core-ring-a{inset:12%;animation:pcAddonTowerSpin 16s linear infinite;}
-  body .pc-addon-core-ring-b{inset:26%;border-color:rgba(255,61,187,.42);animation:pcAddonTowerSpin 10s linear infinite reverse;}
-  body .pc-addon-core-axis{position:absolute;background:rgba(22,255,243,.52);box-shadow:0 0 12px rgba(22,255,243,.38);opacity:calc(.35 + (.55 * var(--pc-addon-energy)));}
-  body .pc-addon-core-axis-h{left:9%;right:9%;top:50%;height:2px;}
-  body .pc-addon-core-axis-v{top:9%;bottom:9%;left:50%;width:2px;}
-  body .pc-addon-core-pulse{position:absolute;left:16%;right:16%;top:50%;height:5px;border-radius:999px;background:linear-gradient(90deg,transparent,#16fff3,#ff3dbb,#16fff3,transparent);filter:drop-shadow(0 0 calc(7px + (18px * var(--pc-addon-energy))) rgba(22,255,243,.42));opacity:calc(.38 + (.62 * var(--pc-addon-energy)));animation:pcAddonTowerPulse 3.6s ease-in-out infinite;}
-  body .pc-addon-spectrum{
-    position:absolute;left:20px;right:20px;bottom:42px;height:30%;z-index:2;display:flex;align-items:end;gap:6px;padding:0 8px 4px;box-sizing:border-box;
-    border-top:1px solid rgba(255,61,187,.20);
-  }
-  body .pc-addon-spectrum i{flex:1;min-width:0;border-radius:999px 999px 4px 4px;background:linear-gradient(180deg,#ff3dbb 0%,#8b45ff 42%,#16fff3 100%);box-shadow:0 0 calc(5px + (14px * var(--pc-addon-energy))) rgba(22,255,243,.22);height:calc(18% + (70% * var(--pc-addon-energy)));transform-origin:bottom center;animation:pcAddonTowerBars 2.8s ease-in-out infinite;}
-  body .pc-addon-spectrum i:nth-child(2n){animation-delay:.13s;height:calc(26% + (55% * var(--pc-addon-energy)));}
-  body .pc-addon-spectrum i:nth-child(3n){animation-delay:.28s;height:calc(12% + (78% * var(--pc-addon-energy)));}
-  body .pc-addon-tower-foot{position:absolute;left:14px;right:14px;bottom:12px;z-index:3;display:flex;justify-content:space-between;align-items:center;color:#dff;font-size:10px;font-weight:900;letter-spacing:.10em;text-transform:uppercase;}
-  body .pc-addon-tower-foot strong{color:#ff4fc7;text-shadow:0 0 9px rgba(255,61,187,.55)}
-  body.pc-left-addon-off .pc-side-addon-left,
-  body.pc-right-addon-off .pc-side-addon-right{opacity:.075!important;filter:saturate(.22) brightness(.42)!important;pointer-events:none!important;}
-  body.pc-left-addon-off .pc-side-addon-left *,
-  body.pc-right-addon-off .pc-side-addon-right *{animation-play-state:paused!important;}
-  body .info-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
-  body .pc-addon-toggle-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px;}
-  body .pc-addon-toggle{height:25px;min-width:54px;border-radius:999px;border:1px solid rgba(22,255,243,.46);background:rgba(5,8,24,.72);color:#dff;font-size:10px;font-weight:950;letter-spacing:.05em;display:inline-flex;align-items:center;justify-content:center;gap:5px;box-shadow:inset 0 0 10px rgba(255,255,255,.04);cursor:pointer;}
-  body .pc-addon-toggle span{width:8px;height:8px;border-radius:999px;background:#2a3247;border:1px solid rgba(255,255,255,.35);}
-  body .pc-addon-toggle.is-on{border-color:rgba(255,61,187,.76);color:#fff;box-shadow:0 0 13px rgba(255,61,187,.24), inset 0 0 10px rgba(22,255,243,.05);}
-  body .pc-addon-toggle.is-on span{background:#16fff3;box-shadow:0 0 10px rgba(22,255,243,.7),0 0 16px rgba(255,61,187,.25);}
-  @keyframes pcAddonTowerSpin{to{transform:rotate(360deg)}}
-  @keyframes pcAddonTowerPulse{0%,100%{transform:scaleX(.70);opacity:.38}50%{transform:scaleX(1.10);opacity:1}}
-  @keyframes pcAddonTowerBars{0%,100%{transform:scaleY(.76);opacity:.76}50%{transform:scaleY(1.08);opacity:1}}
+  body .frame-stage{--pc-addon-w:clamp(210px,13.6vw,286px);--pc-addon-gap:clamp(6px,.55vw,12px);--pc-addon-energy:.42;--pc-addon-glow:18px;}
+  body .pc-side-addon{position:absolute!important;top:clamp(70px,9.2vh,104px)!important;bottom:clamp(66px,7.2vh,98px)!important;width:var(--pc-addon-w)!important;z-index:7!important;pointer-events:auto!important;display:flex!important;align-items:stretch!important;justify-content:center!important;opacity:1!important;transform:translateZ(0)!important;transition:opacity .22s ease, filter .22s ease!important;}
+  body .pc-side-addon-left{left:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;}
+  body .pc-side-addon-right{right:calc(50% - (min(82vw,1280px) / 2) - var(--pc-addon-w) - var(--pc-addon-gap))!important;}
+  body .pc-addon-tower{position:relative!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;border:1px solid rgba(22,255,243,calc(.40 + (.28 * var(--pc-addon-energy))))!important;border-radius:22px!important;background:linear-gradient(180deg,rgba(7,10,31,.94),rgba(7,5,24,.78))!important;box-shadow:0 0 var(--pc-addon-glow) rgba(22,255,243,.18),0 0 calc(10px + (24px * var(--pc-addon-energy))) rgba(255,61,187,.14),inset 0 0 calc(16px + (24px * var(--pc-addon-energy))) rgba(22,255,243,.05)!important;}
+  body .pc-addon-tower::before{content:"";position:absolute;inset:9px;border-radius:17px;pointer-events:none;border:1px solid rgba(255,61,187,.20);background:linear-gradient(90deg,transparent 0 7%,rgba(22,255,243,.12) 7.5% 8%,transparent 8.5% 91%,rgba(22,255,243,.12) 92% 92.5%,transparent 93%),linear-gradient(180deg,transparent 0 13%,rgba(255,61,187,.13) 13.5% 14%,transparent 14.5% 86%,rgba(255,61,187,.13) 86.5% 87%,transparent 87.5%);opacity:calc(.44 + (.34 * var(--pc-addon-energy)));}
+  body .pc-addon-tower::after{content:"";position:absolute;left:-40%;right:-40%;height:28%;top:-15%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(22,255,243,.13),rgba(255,61,187,.13),transparent);transform:translateY(calc(230% * var(--pc-addon-energy))) rotate(-7deg);filter:blur(8px);opacity:.46;}
+  body .pc-addon-tower-head{position:absolute;left:13px;right:13px;top:10px;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#ff4fc7;font-size:10px;font-weight:950;letter-spacing:.13em;text-transform:uppercase;text-shadow:0 0 9px rgba(255,61,187,.54);}
+  body .pc-addon-tower-head b{color:#16fff3;text-shadow:0 0 10px rgba(22,255,243,.70);}
+  body .pc-addon-module{position:absolute;left:14px;right:14px;min-height:0;border-radius:14px;border:1px solid rgba(22,255,243,.22);background:linear-gradient(180deg,rgba(4,8,24,.68),rgba(9,4,24,.48));box-shadow:inset 0 0 18px rgba(22,255,243,.055),0 0 calc(7px + (15px * var(--pc-addon-energy))) rgba(255,61,187,.09);overflow:hidden;}
+  body .pc-addon-module strong{position:absolute;left:10px;top:8px;z-index:4;color:#ff7cdf;font-size:9px;font-weight:950;letter-spacing:.10em;text-transform:uppercase;text-shadow:0 0 8px rgba(255,61,187,.45);}
+  body .pc-addon-module footer{position:absolute;left:9px;right:9px;bottom:7px;z-index:4;display:flex;align-items:center;justify-content:space-between;color:#dff;font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;}
+  body .pc-addon-module footer b{color:#16fff3;text-shadow:0 0 8px rgba(22,255,243,.52);}
+  body .pc-addon-module-reactor,body .pc-addon-module-vu{top:36px;height:31%;}
+  body .pc-addon-module-wave,body .pc-addon-module-phase{top:calc(36px + 33%);height:26%;}
+  body .pc-addon-module-grid,body .pc-addon-module-beat{bottom:14px;height:29%;}
+  body .pc-addon-reactor-core{position:absolute;left:12px;right:12px;top:28px;bottom:24px;border-radius:50%;border:1px solid rgba(22,255,243,.24);background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.24),rgba(22,255,243,.13) 34%,transparent 68%);filter:drop-shadow(0 0 calc(6px + (20px * var(--pc-addon-energy))) rgba(22,255,243,.20));transform:scale(calc(.96 + (.045 * var(--pc-addon-energy))));}
+  body .pc-addon-orbit{position:absolute;border-radius:50%;border:1px solid rgba(22,255,243,.32);inset:10%;animation:pcAddonTowerSpin 18s linear infinite;}body .pc-addon-orbit-b{inset:24%;border-color:rgba(255,61,187,.36);animation-duration:11s;animation-direction:reverse;}
+  body .pc-addon-reactor-wave{position:absolute;left:11%;right:11%;top:50%;height:5px;border-radius:999px;background:linear-gradient(90deg,transparent,#16fff3,#ff3dbb,#16fff3,transparent);opacity:calc(.46 + (.42 * var(--pc-addon-energy)));filter:drop-shadow(0 0 12px rgba(255,61,187,.32));animation:pcAddonTowerPulse 3.4s ease-in-out infinite;}body .pc-addon-reactor-dot{position:absolute;left:47%;top:47%;width:10px;height:10px;border-radius:50%;background:#16fff3;box-shadow:0 0 16px rgba(22,255,243,.8),0 0 26px rgba(255,61,187,.45);}
+  body .pc-addon-waveform{position:absolute;left:10px;right:10px;top:30px;bottom:12px;display:flex;align-items:center;gap:4px;}body .pc-addon-waveform i{flex:1;height:calc(18% + (66% * var(--pc-addon-energy)));border-radius:999px;background:linear-gradient(180deg,#ff3dbb,#8b45ff,#16fff3);box-shadow:0 0 8px rgba(22,255,243,.22);animation:pcAddonTowerBars 2.6s ease-in-out infinite;}body .pc-addon-waveform i:nth-child(2n){animation-delay:.11s;height:calc(32% + (48% * var(--pc-addon-energy)));}body .pc-addon-waveform i:nth-child(3n){animation-delay:.24s;height:calc(22% + (70% * var(--pc-addon-energy)));}
+  body .pc-addon-radar{position:absolute;left:18px;right:18px;top:30px;bottom:18px;border-radius:50%;border:1px solid rgba(22,255,243,.25);background:radial-gradient(circle,rgba(22,255,243,.14),transparent 58%);}body .radar-ring{position:absolute;border-radius:50%;border:1px solid rgba(22,255,243,.22);inset:18%;}.radar-ring.r2{inset:32%;}.radar-ring.r3{inset:46%;}body .radar-axis{position:absolute;background:rgba(22,255,243,.45);box-shadow:0 0 8px rgba(22,255,243,.35);}.radar-x{left:8%;right:8%;top:50%;height:1px}.radar-y{top:8%;bottom:8%;left:50%;width:1px}body .radar-sweep{position:absolute;left:50%;top:50%;width:44%;height:2px;background:linear-gradient(90deg,#16fff3,transparent);transform-origin:left center;animation:pcAddonTowerSpin 7s linear infinite;box-shadow:0 0 9px rgba(22,255,243,.35);}body .pc-addon-radar em{position:absolute;width:5px;height:5px;border-radius:50%;background:#16fff3;box-shadow:0 0 8px rgba(22,255,243,.7);}body .pc-addon-radar .pt-a{left:30%;top:48%}body .pc-addon-radar .pt-b{right:24%;top:35%}body .pc-addon-radar .pt-c{left:52%;bottom:22%}body .pc-addon-radar .pt-d{right:38%;bottom:46%}
+  body .pc-addon-vu-grid{position:absolute;left:9px;right:9px;top:28px;bottom:14px;display:grid;grid-template-columns:1fr 28px 1fr;gap:8px;align-items:stretch;}body .pc-vu-channel{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-items:end;position:relative;padding-top:15px;}body .pc-vu-channel b{position:absolute;top:0;left:0;right:0;text-align:center;color:#dff;font-size:8px;letter-spacing:.2em;}body .pc-vu-channel span{position:relative;border-radius:8px;background:rgba(5,8,24,.55);border:1px solid rgba(22,255,243,.18);overflow:hidden;}body .pc-vu-channel i{position:absolute;left:0;right:0;bottom:0;height:calc(35% + (55% * var(--pc-addon-energy)));background:linear-gradient(180deg,#ff3dbb,#8b45ff,#16fff3);box-shadow:0 0 12px rgba(22,255,243,.35);}body .pc-vu-scale{display:flex;flex-direction:column;justify-content:space-between;align-items:center;color:#9dd;font-size:7px;opacity:.75;}
+  body .pc-addon-phase{position:absolute;left:10px;right:10px;top:28px;bottom:12px;border:1px solid rgba(22,255,243,.22);background:radial-gradient(circle,rgba(22,255,243,.13),transparent 62%);overflow:hidden;}body .phase-grid{position:absolute;inset:8px;border:1px solid rgba(22,255,243,.14);background:linear-gradient(90deg,transparent 49%,rgba(22,255,243,.18) 50%,transparent 51%),linear-gradient(180deg,transparent 49%,rgba(255,61,187,.14) 50%,transparent 51%);}body .phase-line{position:absolute;left:8%;right:8%;top:50%;height:4px;border-radius:999px;background:linear-gradient(90deg,transparent,#16fff3,#ff3dbb,transparent);transform:rotate(calc(-24deg + (42deg * var(--pc-addon-energy))));box-shadow:0 0 18px rgba(255,61,187,.32);}body .phase-cloud{position:absolute;inset:18%;border-radius:50%;border:1px solid rgba(255,61,187,.24);filter:blur(.2px);box-shadow:0 0 calc(9px + (22px * var(--pc-addon-energy))) rgba(255,61,187,.22);}body .phase-l,body .phase-r{position:absolute;bottom:4px;font-size:8px;color:#dff;}body .phase-l{left:8px}body .phase-r{right:8px}
+  body .pc-addon-beat{position:absolute;left:10px;right:10px;top:28px;bottom:14px;}body .pc-addon-beat p{margin:0;color:#dff;font-size:9px;font-weight:900;letter-spacing:.08em;}body .pc-addon-beat p b{color:#16fff3;}body .pc-addon-beatline{position:absolute;left:0;right:0;bottom:0;top:22px;display:flex;align-items:end;gap:5px;}body .pc-addon-beatline i{flex:1;border-radius:999px 999px 3px 3px;background:linear-gradient(180deg,#ff3dbb,#16fff3);height:calc(24% + (48% * var(--pc-addon-energy)));box-shadow:0 0 10px rgba(22,255,243,.25);animation:pcAddonTowerBars 2.2s ease-in-out infinite;}body .pc-addon-beatline i:nth-child(2n){animation-delay:.12s;height:calc(42% + (40% * var(--pc-addon-energy)));}body .pc-addon-beatline i:nth-child(3n){animation-delay:.26s;height:calc(18% + (65% * var(--pc-addon-energy)));}
+  body.pc-left-addon-off .pc-side-addon-left,body.pc-right-addon-off .pc-side-addon-right{opacity:.075!important;filter:saturate(.22) brightness(.42)!important;pointer-events:none!important;}body.pc-left-addon-off .pc-side-addon-left *,body.pc-right-addon-off .pc-side-addon-right *{animation-play-state:paused!important;}body .info-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;}body .pc-addon-toggle-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px;}body .pc-addon-toggle{height:25px;min-width:54px;border-radius:999px;border:1px solid rgba(22,255,243,.46);background:rgba(5,8,24,.72);color:#dff;font-size:10px;font-weight:950;letter-spacing:.05em;display:inline-flex;align-items:center;justify-content:center;gap:5px;box-shadow:inset 0 0 10px rgba(255,255,255,.04);cursor:pointer;}body .pc-addon-toggle span{width:8px;height:8px;border-radius:999px;background:#2a3247;border:1px solid rgba(255,255,255,.35);}body .pc-addon-toggle.is-on{border-color:rgba(255,61,187,.76);color:#fff;box-shadow:0 0 13px rgba(255,61,187,.24), inset 0 0 10px rgba(22,255,243,.05);}body .pc-addon-toggle.is-on span{background:#16fff3;box-shadow:0 0 10px rgba(22,255,243,.7),0 0 16px rgba(255,61,187,.25);}
+  @keyframes pcAddonTowerSpin{to{transform:rotate(360deg)}}@keyframes pcAddonTowerPulse{0%,100%{transform:scaleX(.70);opacity:.38}50%{transform:scaleX(1.10);opacity:1}}@keyframes pcAddonTowerBars{0%,100%{transform:scaleY(.76);opacity:.76}50%{transform:scaleY(1.08);opacity:1}}
 }
 @media (max-width:1220px) and (min-width:761px){body .pc-side-addon{display:none!important;}}
 </style>
-<script id="v135PcSideAddonTowerScript">
+<script id="v136PcSideAddonContentScript">
 (function(){
   var timer=null;
   function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn,{once:true}); else fn(); }
@@ -2920,7 +2876,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
-  <script src="/js/addons/discord-player-addon-v3.js?v=v135-side-addon-reanchor-20260514" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=v136-side-addon-content-20260514" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3145,7 +3101,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3225,7 +3181,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3332,7 +3288,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3418,7 +3374,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3494,7 +3450,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3561,14 +3517,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     gap:7px!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
 
 
-<!-- v135 PC SIDE ADDON REANCHOR — player-wrapper based geometry; no player-core/ticker/transport changes -->
-<style id="v135PcSideAddonReanchor">
+<!-- v136 PC SIDE ADDON REANCHOR — player-wrapper based geometry; no player-core/ticker/transport changes -->
+<style id="v136PcSideAddonReanchor">
 @media (min-width:1221px){
   body .frame-stage{
     /* real PC player width must match the current clamped player-shell, not the older 82vw geometry */
@@ -3607,7 +3563,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body .pc-addon-core{left:18px!important;right:18px!important;}
   body .pc-addon-spectrum{left:18px!important;right:18px!important;gap:6px!important;}
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v135"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v136"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
