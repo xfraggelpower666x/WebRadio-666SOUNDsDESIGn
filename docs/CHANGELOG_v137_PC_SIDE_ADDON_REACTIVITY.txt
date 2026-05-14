@@ -1,0 +1,13 @@
+666SOUNDsDESIGn v137 - PC Side Add-on Reactivity
+
+Scope:
+- Only PC side add-on internal reactivity.
+- Add-on box position/width unchanged.
+- No player-core, ticker, transport, iPhone, Discord, Worker or Stream changes.
+
+Changes:
+- Left and right 3 add-on modules now react stronger to existing EQ/levelmeter values.
+- Reuses existing visible meter/EQ DOM values.
+- No new audio graph.
+- No new requestAnimationFrame loop.
+- Existing addon timer reused.
