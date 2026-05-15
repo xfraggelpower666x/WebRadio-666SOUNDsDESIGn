@@ -1,0 +1,18 @@
+666SOUNDsDESIGn WebRadio — CHANGELOG v154
+
+Scope:
+- PC lower now-playing area only.
+- Added a compact real WebAudio EQ panel.
+
+Changes:
+- Added REAL EQ panel with five controls: LOW, L-MID, MID, H-MID, HIGH.
+- EQ uses BiquadFilter nodes inside the existing desktop WebAudio visualizer/boost graph.
+- No new AudioContext, no new RAF loop, no new interval loop.
+- Settings persist locally in localStorage under smfp_real_eq_v154.
+
+Tabu respected:
+- No stream/Worker route change.
+- No Discord change.
+- No transport change.
+- No iPhone layout change.
+- No new visualizer layer.

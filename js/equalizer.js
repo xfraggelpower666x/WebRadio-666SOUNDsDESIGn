@@ -44,6 +44,117 @@ const BOOST_MULTIPLIERS = IS_IPHONE
 
 /*
 ==========================================
+GEÄNDERT: 2026-05-15
+ÄNDERUNG: v154 PC_REAL_EQ_BIQUAD_CHAIN
+ZWECK:
+- Echter Desktop-Equalizer über WebAudio-BiquadFilter.
+- Verwendet die bestehende Audio-/Visualizer-Kette.
+- Kein zusätzlicher AudioContext, kein zusätzlicher RAF-/Interval-Loop.
+==========================================
+*/
+const SMFP_REAL_EQ_BANDS = [
+  { key: 'low', type: 'lowshelf', freq: 90, q: 0.70 },
+  { key: 'lowMid', type: 'peaking', freq: 260, q: 0.95 },
+  { key: 'mid', type: 'peaking', freq: 1000, q: 1.05 },
+  { key: 'highMid', type: 'peaking', freq: 3400, q: 0.95 },
+  { key: 'high', type: 'highshelf', freq: 9000, q: 0.70 }
+];
+
+function clampEqDb(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(-12, Math.min(12, Math.round(n)));
+}
+
+function loadRealEqState() {
+  const state = { low: 0, lowMid: 0, mid: 0, highMid: 0, high: 0 };
+  try {
+    const raw = localStorage.getItem('smfp_real_eq_v154');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      Object.keys(state).forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(parsed, key)) state[key] = clampEqDb(parsed[key]);
+      });
+    }
+  } catch (err) {}
+  return state;
+}
+
+const smfpRealEqState = loadRealEqState();
+let smfpRealEqNodes = [];
+
+function saveRealEqState() {
+  try { localStorage.setItem('smfp_real_eq_v154', JSON.stringify(smfpRealEqState)); } catch (err) {}
+}
+
+function createRealEqNodes(ctx) {
+  smfpRealEqNodes = SMFP_REAL_EQ_BANDS.map((band) => {
+    const node = ctx.createBiquadFilter();
+    node.type = band.type;
+    node.frequency.value = band.freq;
+    if (node.Q) node.Q.value = band.q;
+    node.gain.value = clampEqDb(smfpRealEqState[band.key]);
+    return node;
+  });
+  return smfpRealEqNodes;
+}
+
+function applyRealEqToNodes() {
+  if (!smfpRealEqNodes.length) return;
+  const ctx = smfpRealEqNodes[0]?.context;
+  const now = ctx?.currentTime || 0;
+  smfpRealEqNodes.forEach((node, index) => {
+    const key = SMFP_REAL_EQ_BANDS[index]?.key;
+    const target = clampEqDb(smfpRealEqState[key]);
+    try {
+      node.gain.cancelScheduledValues(now);
+      node.gain.setTargetAtTime(target, now, 0.035);
+    } catch (err) {
+      try { node.gain.value = target; } catch (err2) {}
+    }
+  });
+  try {
+    document.documentElement.setAttribute('data-smfp-real-eq', 'active');
+    document.documentElement.setAttribute('data-smfp-real-eq-state', JSON.stringify(smfpRealEqState));
+  } catch (err) {}
+}
+
+function bindRealEqPanel() {
+  const panel = document.getElementById('pcRealEqPanel');
+  if (!panel || panel.dataset.eqBound === '1') return;
+  panel.dataset.eqBound = '1';
+  panel.querySelectorAll('[data-smfp-eq]').forEach((input) => {
+    const key = input.getAttribute('data-smfp-eq');
+    if (Object.prototype.hasOwnProperty.call(smfpRealEqState, key)) input.value = String(clampEqDb(smfpRealEqState[key]));
+    const out = document.getElementById(`${input.id}Val`);
+    const syncLabel = () => { if (out) out.textContent = String(clampEqDb(input.value)); };
+    syncLabel();
+    const update = (event) => {
+      event.stopPropagation();
+      smfpRealEqState[key] = clampEqDb(input.value);
+      syncLabel();
+      saveRealEqState();
+      applyRealEqToNodes();
+    };
+    input.addEventListener('input', update, { passive: true });
+    input.addEventListener('change', update, { passive: true });
+    input.addEventListener('pointerdown', (event) => event.stopPropagation(), { capture: true });
+    input.addEventListener('click', (event) => event.stopPropagation(), { capture: true });
+  });
+  applyRealEqToNodes();
+}
+
+window.__smfpRealEqApply = applyRealEqToNodes;
+window.__smfpRealEqBind = bindRealEqPanel;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindRealEqPanel, { passive: true });
+} else {
+  bindRealEqPanel();
+}
+window.addEventListener('load', bindRealEqPanel, { passive: true });
+
+/*
+==========================================
 GEÄNDERT: 2026-04-25
 ÄNDERUNG: MOBILE_LEVELMETER_GESTURE_GUARD_PATCH_v1
 ZWECK:
@@ -283,11 +394,21 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
     gainNode = ctx.createGain();
     gainNode.gain.value = BOOST_MULTIPLIERS[boostStage];
+    const eqNodes = createRealEqNodes(ctx);
 
     source = ctx.createMediaElementSource(audio);
     source.connect(gainNode);
-    gainNode.connect(analyser);
-    gainNode.connect(ctx.destination);
+    if (eqNodes.length) {
+      gainNode.connect(eqNodes[0]);
+      for (let eqIndex = 0; eqIndex < eqNodes.length - 1; eqIndex += 1) {
+        eqNodes[eqIndex].connect(eqNodes[eqIndex + 1]);
+      }
+      eqNodes[eqNodes.length - 1].connect(analyser);
+    } else {
+      gainNode.connect(analyser);
+    }
+    analyser.connect(ctx.destination);
+    applyRealEqToNodes();
 
     const frame = () => {
       if (!running) return;

@@ -1,0 +1,16 @@
+{
+  "version": "v154",
+  "scope": "PC lower now-playing area + real WebAudio EQ",
+  "base": "v153_ALERT_INLINE_BOTTOM_GEOMETRY_FIX_FULL",
+  "changed_files": [
+    "index.html",
+    "js/equalizer.js",
+    "js/player-core.js",
+    "docs/CHANGELOG_v154_PC_REAL_EQ_LOWER_AREA.txt",
+    "docs/AUDIT_v154_PC_REAL_EQ_LOWER_AREA.json"
+  ],
+  "no_new_audio_loop": true,
+  "no_new_raf_loop": true,
+  "no_worker_stream_change": true,
+  "mobile_layout_untouched": true
+}
