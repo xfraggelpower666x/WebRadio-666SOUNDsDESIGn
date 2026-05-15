@@ -112,6 +112,14 @@
   function mountPc(){
     var btn=qs('#playerAlertPcSend') || qs('#pcBroadcastSendBtn');
     var input=qs('#playerAlertPcText') || qs('#pcBroadcastInput');
+
+    if(window.innerWidth<=760 && btn){
+      btn.addEventListener('click',function(ev){
+        ev.preventDefault();
+        openComposer();
+      });
+      return;
+    }
     if(btn && !btn.__s666AlertBound){btn.__s666AlertBound=true;btn.addEventListener('click',function(ev){ev.preventDefault();sendFromPcInline();});}
     if(input && !input.__s666AlertBound){input.__s666AlertBound=true;input.addEventListener('keydown',function(ev){if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'){ev.preventDefault();sendFromPcInline();}});}
   }
@@ -157,6 +165,16 @@
     ensureComposer();
     poll();
     setInterval(function(){mountPc();mountMobile();poll();},POLL_MS);
+    
+    // v152 delegated click fallback: visible SEND button must always trigger, even if mounted late.
+    document.addEventListener('click',function(ev){
+      var target=ev.target && ev.target.closest ? ev.target.closest('#playerAlertPcSend,[data-player-alert-send]') : null;
+      if(!target)return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      sendFromPcInline();
+    },true);
+
     document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){closeListenerOverlay();closeComposer();}});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
