@@ -149,3 +149,71 @@
   .s666-player-alert-title{font-size:13px;}
   .s666-player-alert-text{font-size:14px;}
 }
+
+
+/* ==========================================================
+   v149 PC INLINE PLACEMENT FIX
+   Purpose: PC SEND field must sit beside History and must not create
+   a new full-width row that stretches the player.
+   Rule: same existing sender DOM, no new layer, no transport/ticker changes.
+   ========================================================== */
+@media (min-width:761px){
+  .now-playing{
+    position:relative!important;
+  }
+
+  .pc-broadcast-alert-bar{
+    position:absolute!important;
+    right:142px!important;
+    bottom:14px!important;
+    width:min(440px,calc(100% - 292px))!important;
+    max-width:440px!important;
+    min-width:260px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    margin:0!important;
+    padding:0!important;
+    display:grid!important;
+    grid-template-columns:58px minmax(150px,1fr) 58px!important;
+    gap:7px!important;
+    align-items:center!important;
+    z-index:18!important;
+    pointer-events:auto!important;
+  }
+
+  .pc-broadcast-send{
+    min-width:0!important;
+    width:58px!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    padding:0!important;
+    font-size:10px!important;
+    line-height:38px!important;
+  }
+
+  .pc-broadcast-input{
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    overflow:hidden!important;
+    resize:none!important;
+    padding:7px 10px!important;
+    font-size:10px!important;
+    line-height:12px!important;
+    box-sizing:border-box!important;
+  }
+
+  .pc-broadcast-cooldown{
+    width:58px!important;
+    min-width:58px!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    font-size:9px!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+  }
+}

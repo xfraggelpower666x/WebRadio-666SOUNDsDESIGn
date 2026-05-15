@@ -1,6 +1,6 @@
 
 /* ==========================================================
-   666SOUNDsDESIGn — v148 Player Broadcast Alert
+   666SOUNDsDESIGn — v149 Player Broadcast Inline Fix
    One-way public message sender for all open players.
    Rate limited server-side to 1 message / 180 seconds.
    Own messages are not shown again on the sender's player.
@@ -12,7 +12,7 @@
   var CURRENT_URL='/api/player-alert/current';
   var POLL_MS=10000;
   var MAX_LEN=240;
-  var SENDER_KEY='s666_player_alert_sender_v148';
+  var SENDER_KEY='s666_player_alert_sender_v149';
   var LAST_SEEN_KEY='s666_player_alert_seen_v148';
   var LAST_SENT_KEY='s666_player_alert_last_sent_v148';
   function qs(sel,root){return (root||document).querySelector(sel)}
