@@ -1,0 +1,17 @@
+666SOUNDsDESIGn WebRadio v153
+ALERT INLINE BOTTOM GEOMETRY FIX
+
+Basis: v152_ALERT_SYSTEM_CLEAN_INLINE_REAL_REBUILD_FULL
+
+Änderungen:
+- PC History wieder unten rechts im Now-Playing-Panel positioniert.
+- Bestehendes SEND/Textfeld inline links neben History gesetzt.
+- Kein neues Panel, keine neue Zeile, keine Player-Höhenänderung durch Alert-UI.
+- Ticker-Leiste wieder nach unten gezogen und von Textstart bis zur rechten Panelkante gestreckt.
+
+Tabu / nicht geändert:
+- Keine Alert-Zustelllogik.
+- Kein Worker-/Streamrouting.
+- Kein Transport.
+- Kein EQ/Add-on.
+- Kein iPhone-Layout.

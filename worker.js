@@ -270,14 +270,14 @@ async function handlePlayerAlertV152(request){
   const cache = caches.default;
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const hit = await cache.match(new Request(PLAYER_ALERT_CACHE_KEY));
-    if(!hit) return playerAlertJson({ok:true,active:false});
+    if(!hit) return playerAlertJson({active:false});
     try{ return playerAlertJson(await hit.json()); }catch(err){ return playerAlertJson({active:false}); }
   }
   if(url.pathname === '/api/player-alert/send' && request.method === 'POST'){
     let payload = {};
     try{ payload = await request.json(); }catch(err){ return playerAlertJson({ok:false,error:'invalid_json'},400); }
     const message = playerAlertCleanText(payload.message);
-    const senderId = playerAlertCleanText(payload.clientId || payload.senderId || 'anonymous').slice(0,80) || 'anonymous';
+    const senderId = playerAlertCleanText(payload.senderId || 'anonymous').slice(0,80) || 'anonymous';
     if(!message) return playerAlertJson({ok:false,error:'empty_message'},400);
     const now = Date.now();
     const rateHit = await cache.match(new Request(PLAYER_ALERT_RATE_KEY));
@@ -290,7 +290,7 @@ async function handlePlayerAlertV152(request){
         }
       }catch(err){}
     }
-    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,senderId,clientId:senderId,createdAt:new Date(now).toISOString()};
+    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,senderId,createdAt:new Date(now).toISOString()};
     await cache.put(new Request(PLAYER_ALERT_CACHE_KEY), new Response(JSON.stringify(alert), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=900'}}));
     await cache.put(new Request(PLAYER_ALERT_RATE_KEY), new Response(JSON.stringify({last:now}), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=180'}}));
     return playerAlertJson(alert);
