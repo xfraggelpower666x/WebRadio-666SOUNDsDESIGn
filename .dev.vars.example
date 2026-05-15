@@ -1,0 +1,7 @@
+# FILE: .dev.vars.example
+# CREATED: 2026-05-15
+# PURPOSE: Local-only example for Wrangler dev. Rename to .dev.vars locally only.
+# IMPORTANT: Never commit real API keys.
+
+SUNO_API_KEY=put_real_key_here_locally_only
+SUNO_API_BASE=https://example-provider.invalid
