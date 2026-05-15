@@ -7,14 +7,14 @@
    ========================================================== */
 (function(){
   'use strict';
-  var VERSION='v150';
+  var VERSION='v152-alert-fix-20260515';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var POLL_MS=10000;
   var MAX_LEN=240;
-  var SENDER_KEY='s666_player_alert_sender_v150';
-  var LAST_SEEN_KEY='s666_player_alert_seen_v148';
-  var LAST_SENT_KEY='s666_player_alert_last_sent_v148';
+  var SENDER_KEY='s666_player_alert_sender_v152';
+  var LAST_SEEN_KEY='s666_player_alert_seen_v152';
+  var LAST_SENT_KEY='s666_player_alert_last_sent_v152';
   function qs(sel,root){return (root||document).querySelector(sel)}
   function makeSenderId(){
     var id='';
@@ -76,10 +76,11 @@
   async function postMessage(text){
     var clean=safeText(text);
     if(!clean)throw new Error('Message is empty.');
-    var res=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:clean,senderId:senderId,version:VERSION})});
+    var res=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:clean,clientId:senderId,senderId:senderId,version:VERSION})});
     var data={}; try{data=await res.json()}catch(_){ }
     if(!res.ok){
-      var retry=data.retryAfter||data.retry_after||0;
+      var retry=data.retryAfter||data.retry_after||data.retryAfterMs||0;
+      if(retry>1000)retry=Math.ceil(retry/1000);
       if(res.status===429)throw new Error('Rate limit active. Try again in '+retry+' seconds.');
       throw new Error(data.error||'Send failed.');
     }
@@ -98,8 +99,8 @@
     }catch(e){setComposerMeta(e&&e.message?e.message:'Send failed.',true);}
   }
   async function sendFromPcInline(){
-    var input=qs('#pcBroadcastInput');
-    var label=qs('#pcBroadcastCooldown');
+    var input=qs('#playerAlertPcText') || qs('#pcBroadcastInput');
+    var label=qs('#playerAlertPcStatus') || qs('#pcBroadcastCooldown');
     try{
       var data=await postMessage(input?input.value:'');
       if(input)input.value='';
@@ -109,8 +110,8 @@
     }catch(e){if(label)label.textContent=(e&&e.message?e.message:'ERR').replace('Rate limit active. ','');}
   }
   function mountPc(){
-    var btn=qs('#pcBroadcastSendBtn');
-    var input=qs('#pcBroadcastInput');
+    var btn=qs('#playerAlertPcSend') || qs('#pcBroadcastSendBtn');
+    var input=qs('#playerAlertPcText') || qs('#pcBroadcastInput');
     if(btn && !btn.__s666AlertBound){btn.__s666AlertBound=true;btn.addEventListener('click',function(ev){ev.preventDefault();sendFromPcInline();});}
     if(input && !input.__s666AlertBound){input.__s666AlertBound=true;input.addEventListener('keydown',function(ev){if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'){ev.preventDefault();sendFromPcInline();}});}
   }
@@ -134,7 +135,7 @@
       var data=await res.json();
       if(!data || !data.active || !data.id || !data.message)return;
       if(String(data.id)===getLastSeen())return;
-      if(isOwn(data.id,data.senderId)){setLastSeen(data.id);return;}
+      if(isOwn(data.id,data.senderId||data.clientId)){setLastSeen(data.id);return;}
       showListenerOverlay(data.message,data.id);
     }catch(_){ }
   }

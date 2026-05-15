@@ -153,11 +153,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- SMFP_v152_PLAYER_ALERT_INLINE_SAFE -->
 <style id="smfpPlayerAlertV152Style">
   .now-playing{position:relative!important;}
-  .player-alert-pc-box{position:absolute!important;right:102px!important;bottom:16px!important;z-index:22!important;display:flex!important;align-items:center!important;gap:7px!important;max-width:360px!important;pointer-events:auto!important;}
-  .player-alert-pc-text{width:245px!important;height:38px!important;min-height:38px!important;max-height:38px!important;resize:none!important;overflow:hidden!important;border-radius:11px!important;border:1px solid rgba(255,61,187,.55)!important;background:rgba(4,8,20,.72)!important;color:#29fff4!important;font-size:11px!important;line-height:14px!important;font-weight:800!important;padding:5px 8px!important;box-shadow:inset 0 0 14px rgba(22,255,243,.06),0 0 10px rgba(255,61,187,.12)!important;outline:none!important;}
+  .player-alert-pc-box{position:absolute!important;right:118px!important;bottom:16px!important;z-index:22!important;display:flex!important;align-items:center!important;gap:7px!important;max-width:340px!important;pointer-events:auto!important;}
+  .player-alert-pc-text{width:220px!important;height:38px!important;min-height:38px!important;max-height:38px!important;resize:none!important;overflow:hidden!important;border-radius:11px!important;border:1px solid rgba(255,61,187,.55)!important;background:rgba(4,8,20,.72)!important;color:#29fff4!important;font-size:11px!important;line-height:14px!important;font-weight:800!important;padding:5px 8px!important;box-shadow:inset 0 0 14px rgba(22,255,243,.06),0 0 10px rgba(255,61,187,.12)!important;outline:none!important;}
   .player-alert-pc-text::placeholder{color:rgba(247,248,255,.46)!important;}
   .player-alert-send-btn,.mff-alert-send-btn,.mff-alert-open{height:38px!important;min-width:58px!important;border-radius:13px!important;border:1px solid rgba(22,255,243,.55)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-size:11px!important;font-weight:950!important;letter-spacing:.08em!important;box-shadow:0 0 12px rgba(22,255,243,.16),inset 0 0 12px rgba(255,61,187,.06)!important;}
   .player-alert-send-btn[disabled],.mff-alert-send-btn[disabled]{opacity:.5!important;filter:grayscale(.35)!important;}
+  .player-alert-pc-status{min-width:0!important;max-width:92px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#29fff4!important;font-size:10px!important;font-weight:900!important;text-shadow:0 0 8px rgba(22,255,243,.35)!important;}
   .player-alert-backdrop{position:fixed!important;inset:0!important;z-index:2147483400!important;background:rgba(0,0,0,.62)!important;display:none!important;align-items:center!important;justify-content:center!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;}
   .player-alert-backdrop.is-open{display:flex!important;}
   .player-alert-modal{width:min(520px,calc(100vw - 42px))!important;border-radius:22px!important;border:1px solid rgba(255,61,187,.72)!important;background:radial-gradient(circle at 20% 0%,rgba(255,61,187,.16),transparent 34%),radial-gradient(circle at 80% 10%,rgba(22,255,243,.13),transparent 36%),rgba(3,7,18,.98)!important;color:#f7f8ff!important;box-shadow:0 0 34px rgba(255,61,187,.32),0 0 28px rgba(22,255,243,.18)!important;padding:18px!important;text-align:left!important;}
@@ -288,7 +289,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           </div>
           <div id="playerAlertPcBox" class="player-alert-pc-box" aria-label="Player broadcast message">
             <textarea id="playerAlertPcText" class="player-alert-pc-text" maxlength="240" rows="2" placeholder="Write a short player message..."></textarea>
-            <button id="playerAlertPcSend" class="player-alert-send-btn" type="button">SEND</button>
+            <button id="playerAlertPcSend" class="player-alert-send-btn" type="button">SEND</button><span id="playerAlertPcStatus" class="player-alert-pc-status" aria-live="polite"></span>
           </div>
           <button id="historyToggle" class="ghost-btn" type="button">History</button>
 </div>

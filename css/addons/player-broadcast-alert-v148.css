@@ -217,3 +217,17 @@
     white-space:nowrap!important;
   }
 }
+
+
+/* v152 SEND FIX — inline status, no layout row */
+.player-alert-pc-status{
+  min-width:0!important;
+  max-width:92px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#29fff4!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  text-shadow:0 0 8px rgba(22,255,243,.35)!important;
+}
