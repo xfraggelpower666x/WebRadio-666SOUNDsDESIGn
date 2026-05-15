@@ -1,0 +1,9 @@
+666SOUNDsDESIGn v152 PLAYER BROADCAST INLINE SAFE
+
+- Basis: v151 clean rollback stable.
+- PC: SEND + Textfeld im bestehenden Now-Playing/History-Bereich, absolut positioniert ohne Layout-Höhe zu verändern.
+- iPhone: SEND-Button mit eigenem Eingabe-Overlay.
+- Empfang: Overlay mit CLOSE; Klick neben Fenster schließt.
+- Eigene Nachricht wird beim Sender nicht angezeigt.
+- Worker: /api/player-alert/send und /api/player-alert/current mit Cache API und globalem 180s Rate-Limit.
+- Kein Ticker-, Transport-, EQ/Add-on-, Discord-, Stream-Umbau.

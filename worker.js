@@ -247,6 +247,58 @@ async function checkExternal(){
   }
 }
 
+
+// ==========================================================
+// PLAYER_ALERT_V152_CACHE_BUS
+// Zweck: Kurze Player-Nachrichten zwischen offenen Playern verteilen.
+// Änderung: Shared Cache API statt isolierter Worker-Memory.
+// Schutz: globales Rate-Limit 180 Sekunden, Text-only, max. 240 Zeichen.
+// ==========================================================
+const PLAYER_ALERT_CACHE_KEY = 'https://666soundsdesign.local/player-alert/current';
+const PLAYER_ALERT_RATE_KEY = 'https://666soundsdesign.local/player-alert/rate';
+const PLAYER_ALERT_RATE_MS = 180000;
+function playerAlertJson(data, status = 200){
+  return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'}});
+}
+function playerAlertCleanText(value){
+  return String(value || '').replace(/[<>]/g, '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
+}
+async function handlePlayerAlertV152(request){
+  const url = new URL(request.url);
+  if(!url.pathname.startsWith('/api/player-alert/')) return null;
+  if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
+  const cache = caches.default;
+  if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
+    const hit = await cache.match(new Request(PLAYER_ALERT_CACHE_KEY));
+    if(!hit) return playerAlertJson({active:false});
+    try{ return playerAlertJson(await hit.json()); }catch(err){ return playerAlertJson({active:false}); }
+  }
+  if(url.pathname === '/api/player-alert/send' && request.method === 'POST'){
+    let payload = {};
+    try{ payload = await request.json(); }catch(err){ return playerAlertJson({ok:false,error:'invalid_json'},400); }
+    const message = playerAlertCleanText(payload.message);
+    const senderId = playerAlertCleanText(payload.senderId || 'anonymous').slice(0,80) || 'anonymous';
+    if(!message) return playerAlertJson({ok:false,error:'empty_message'},400);
+    const now = Date.now();
+    const rateHit = await cache.match(new Request(PLAYER_ALERT_RATE_KEY));
+    if(rateHit){
+      try{
+        const rate = await rateHit.json();
+        const last = Number(rate.last || 0);
+        if(last && (now - last) < PLAYER_ALERT_RATE_MS){
+          return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now - last)},429);
+        }
+      }catch(err){}
+    }
+    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,senderId,createdAt:new Date(now).toISOString()};
+    await cache.put(new Request(PLAYER_ALERT_CACHE_KEY), new Response(JSON.stringify(alert), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=900'}}));
+    await cache.put(new Request(PLAYER_ALERT_RATE_KEY), new Response(JSON.stringify({last:now}), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=180'}}));
+    return playerAlertJson(alert);
+  }
+  return playerAlertJson({ok:false,error:'not_found'},404);
+}
+// END PLAYER_ALERT_V152_CACHE_BUS
+
 function passthroughHeaders(sourceHeaders){
   const headers=new Headers();
   const allow=["content-type","content-length","accept-ranges","content-range","cache-control","icy-br","icy-description","icy-genre","icy-metaint","icy-name","icy-notice1","icy-notice2","icy-pub","icy-url","transfer-encoding"];
@@ -413,6 +465,8 @@ export default {
     const __darkDancerResponse = darkDancerResponse(__darkDancerUrl.pathname);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
+    const playerAlertV152Response = await handlePlayerAlertV152(request);
+    if (playerAlertV152Response) return playerAlertV152Response;
     // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;

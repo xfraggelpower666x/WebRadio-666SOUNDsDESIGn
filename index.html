@@ -16,30 +16,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v151" />
+  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v152" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v151-alert-rollback-stable-20260515" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v151-alert-rollback-stable-20260515" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v151-alert-rollback-stable-20260515" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v151-alert-rollback-stable-20260515" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v151-alert-rollback-stable-20260515" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v151-alert-rollback-stable-20260515" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v152-alert-rollback-stable-20260515" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v152-alert-rollback-stable-20260515" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v152-alert-rollback-stable-20260515" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v152-alert-rollback-stable-20260515" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v152-alert-rollback-stable-20260515" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v152-alert-rollback-stable-20260515" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v151-alert-rollback-stable-20260515" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v151-alert-rollback-stable-20260515">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v151-alert-rollback-stable-20260515">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v151-alert-rollback-stable-20260515">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v151-alert-rollback-stable-20260515">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v152-alert-rollback-stable-20260515" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v152-alert-rollback-stable-20260515">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v152-alert-rollback-stable-20260515">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v152-alert-rollback-stable-20260515">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v152-alert-rollback-stable-20260515">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v151-alert-rollback-stable-20260515">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v152-alert-rollback-stable-20260515">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -149,6 +149,31 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 </style>
 
+
+<!-- SMFP_v152_PLAYER_ALERT_INLINE_SAFE -->
+<style id="smfpPlayerAlertV152Style">
+  .now-playing{position:relative!important;}
+  .player-alert-pc-box{position:absolute!important;right:102px!important;bottom:16px!important;z-index:22!important;display:flex!important;align-items:center!important;gap:7px!important;max-width:360px!important;pointer-events:auto!important;}
+  .player-alert-pc-text{width:245px!important;height:38px!important;min-height:38px!important;max-height:38px!important;resize:none!important;overflow:hidden!important;border-radius:11px!important;border:1px solid rgba(255,61,187,.55)!important;background:rgba(4,8,20,.72)!important;color:#29fff4!important;font-size:11px!important;line-height:14px!important;font-weight:800!important;padding:5px 8px!important;box-shadow:inset 0 0 14px rgba(22,255,243,.06),0 0 10px rgba(255,61,187,.12)!important;outline:none!important;}
+  .player-alert-pc-text::placeholder{color:rgba(247,248,255,.46)!important;}
+  .player-alert-send-btn,.mff-alert-send-btn,.mff-alert-open{height:38px!important;min-width:58px!important;border-radius:13px!important;border:1px solid rgba(22,255,243,.55)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-size:11px!important;font-weight:950!important;letter-spacing:.08em!important;box-shadow:0 0 12px rgba(22,255,243,.16),inset 0 0 12px rgba(255,61,187,.06)!important;}
+  .player-alert-send-btn[disabled],.mff-alert-send-btn[disabled]{opacity:.5!important;filter:grayscale(.35)!important;}
+  .player-alert-backdrop{position:fixed!important;inset:0!important;z-index:2147483400!important;background:rgba(0,0,0,.62)!important;display:none!important;align-items:center!important;justify-content:center!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;}
+  .player-alert-backdrop.is-open{display:flex!important;}
+  .player-alert-modal{width:min(520px,calc(100vw - 42px))!important;border-radius:22px!important;border:1px solid rgba(255,61,187,.72)!important;background:radial-gradient(circle at 20% 0%,rgba(255,61,187,.16),transparent 34%),radial-gradient(circle at 80% 10%,rgba(22,255,243,.13),transparent 36%),rgba(3,7,18,.98)!important;color:#f7f8ff!important;box-shadow:0 0 34px rgba(255,61,187,.32),0 0 28px rgba(22,255,243,.18)!important;padding:18px!important;text-align:left!important;}
+  .player-alert-modal h3{margin:0 0 10px!important;color:#29fff4!important;font-size:15px!important;letter-spacing:.14em!important;font-weight:950!important;}
+  .player-alert-message{font-size:16px!important;line-height:1.35!important;color:#fff!important;white-space:pre-wrap!important;word-break:break-word!important;margin:10px 0 16px!important;}
+  .player-alert-close{height:40px!important;min-width:92px!important;border-radius:14px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-weight:950!important;letter-spacing:.1em!important;}
+  .mff-alert-open{position:absolute!important;right:78px!important;bottom:8px!important;height:30px!important;min-width:50px!important;font-size:10px!important;border-radius:12px!important;z-index:9!important;}
+  .mff-alert-editor-backdrop{position:fixed!important;inset:0!important;z-index:2147483350!important;background:rgba(0,0,0,.62)!important;display:none!important;align-items:center!important;justify-content:center!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;}
+  .mff-alert-editor-backdrop.is-open{display:flex!important;}
+  .mff-alert-editor{width:min(460px,calc(100vw - 38px))!important;border-radius:22px!important;border:1px solid rgba(255,61,187,.72)!important;background:rgba(3,7,18,.98)!important;box-shadow:0 0 34px rgba(255,61,187,.32),0 0 28px rgba(22,255,243,.18)!important;padding:16px!important;}
+  .mff-alert-editor h3{margin:0 0 10px!important;color:#29fff4!important;font-size:13px!important;letter-spacing:.14em!important;font-weight:950!important;}
+  .mff-alert-editor textarea{width:100%!important;height:110px!important;border-radius:15px!important;border:1px solid rgba(255,61,187,.55)!important;background:rgba(4,8,20,.72)!important;color:#29fff4!important;font-size:14px!important;font-weight:800!important;padding:10px!important;resize:none!important;outline:none!important;box-sizing:border-box!important;}
+  .mff-alert-editor-actions{display:flex!important;justify-content:flex-end!important;gap:8px!important;margin-top:12px!important;}
+  .mff-alert-cancel{height:38px!important;min-width:74px!important;border-radius:13px!important;border:1px solid rgba(247,248,255,.25)!important;background:rgba(4,8,20,.72)!important;color:#f7f8ff!important;font-weight:900!important;}
+  @media(max-width:760px){.player-alert-pc-box{display:none!important;}}
+</style>
 </head>
 <body>
   <div class="frame-stage">
@@ -213,7 +238,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v151</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v152</span></div>
           </div>
         </div>
       </header>
@@ -222,13 +247,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v151-alert-rollback-stable-20260515" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v152-alert-rollback-stable-20260515" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v151-alert-rollback-stable-20260515" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v152-alert-rollback-stable-20260515" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v151-alert-rollback-stable-20260515" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v152-alert-rollback-stable-20260515" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -260,6 +285,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <div>
             <div class="section-kicker">NOW PLAYING</div>
             <div id="metaLine" class="meta-line"></div>
+          </div>
+          <div id="playerAlertPcBox" class="player-alert-pc-box" aria-label="Player broadcast message">
+            <textarea id="playerAlertPcText" class="player-alert-pc-text" maxlength="240" rows="2" placeholder="Write a short player message..."></textarea>
+            <button id="playerAlertPcSend" class="player-alert-send-btn" type="button">SEND</button>
           </div>
           <button id="historyToggle" class="ghost-btn" type="button">History</button>
 </div>
@@ -389,7 +418,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v151-alert-rollback-stable-20260515"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v152-alert-rollback-stable-20260515"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -1206,7 +1235,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v151-alert-rollback-stable-20260515')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v152-alert-rollback-stable-20260515')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1221,7 +1250,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v151';
+  var VERSION='v152';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
@@ -1756,7 +1785,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v151</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v152</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -2718,15 +2747,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v151';
+  var VERSION='v152';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v151');
+    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v152');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
     var app=document.getElementById('mffApp');
-    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v151');
+    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v152');
   }
   function lockMobileViewport(){
     var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -3022,7 +3051,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       el.style.opacity=(.32+v*.48+hit*.20).toFixed(2);
       el.style.boxShadow='0 0 '+(7+v*18).toFixed(1)+'px '+color+', 0 0 '+(10+p*24).toFixed(1)+'px rgba(22,255,243,.28)';
     });
-    // v151: Phase Scope root signal motion. Existing elements only; no new layer/loop.
+    // v152: Phase Scope root signal motion. Existing elements only; no new layer/loop.
     var phaseX=50 + Math.cos(phase*Math.PI/180) * (8 + e*9);
     var phaseY=50 + Math.sin((phase*1.27)*Math.PI/180) * (6 + p*8);
     root.style.setProperty('--pc-phase-x',clamp(phaseX,28,72).toFixed(1)+'%');
@@ -3144,7 +3173,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 </style>
 <!-- v145 PC VU MATRIX ROOT REACTIVITY — existing VU Matrix only; no new layer/loop -->
-<style id="v151PcVuMatrixRootHeightFix">
+<style id="v152PcVuMatrixRootHeightFix">
 @media (min-width:1221px){
   body .pc-addon-module-vu{
     border-color:rgba(22,255,243,calc(.34 + (.44 * var(--pc-addon-energy))))!important;
@@ -3173,12 +3202,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </style>
 
 
-<!-- v151 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
-<script id="v151CacheBustVersionGuard">
+<!-- v152 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
+<script id="v152CacheBustVersionGuard">
 (function(){
-  var VERSION='v151';
-  var BUILD='smfp-v151-alert-rollback-stable-20260515';
-  try{document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v151');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
+  var VERSION='v152';
+  var BUILD='smfp-v152-alert-rollback-stable-20260515';
+  try{document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v152');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
   function apply(){
     setText(document.getElementById('pcVersionBadge'));
@@ -3188,7 +3217,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',apply,{once:true});
 })();
 </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=v151-alert-rollback-stable-20260515" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=v152-alert-rollback-stable-20260515" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3413,7 +3442,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3493,7 +3522,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3600,7 +3629,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3686,7 +3715,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3762,7 +3791,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3829,7 +3858,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     gap:7px!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -3875,9 +3904,76 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body .pc-addon-core{left:18px!important;right:18px!important;}
   body .pc-addon-spectrum{left:18px!important;right:18px!important;gap:6px!important;}
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v151"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v152"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
+
+<script id="smfpPlayerAlertV152Script">
+(function(){
+  if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
+  var VERSION='v152';
+  var SEND_URL='/api/player-alert/send';
+  var CURRENT_URL='/api/player-alert/current';
+  var RATE_MS=180000;
+  function sid(){try{var k='smfpPlayerAlertSenderId';var v=localStorage.getItem(k);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v);}return v;}catch(e){return 'smfp-session-'+Math.random().toString(36).slice(2,10);}}
+  var senderId=sid();
+  var lastSeen='';
+  function clean(text){return String(text||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
+  function ensureReceiveOverlay(){
+    var b=document.getElementById('playerAlertReceiveBackdrop'); if(b)return b;
+    b=document.createElement('div'); b.id='playerAlertReceiveBackdrop'; b.className='player-alert-backdrop';
+    b.innerHTML='<div class="player-alert-modal" role="dialog" aria-modal="true"><h3>666SOUNDsDESIGn PLAYER MESSAGE</h3><div id="playerAlertReceiveText" class="player-alert-message"></div><button id="playerAlertReceiveClose" class="player-alert-close" type="button">CLOSE</button></div>';
+    document.body.appendChild(b);
+    function close(){b.classList.remove('is-open');}
+    b.addEventListener('click',function(ev){if(ev.target===b)close();},true);
+    b.querySelector('#playerAlertReceiveClose').addEventListener('click',close,true);
+    return b;
+  }
+  function showReceived(msg){
+    var b=ensureReceiveOverlay(); var t=b.querySelector('#playerAlertReceiveText'); if(t)t.textContent=String(msg||''); b.classList.add('is-open');
+  }
+  function setDisabled(btn,ms){
+    if(!btn)return; btn.disabled=true; var sec=Math.ceil(ms/1000); btn.textContent='WAIT '+sec;
+    var iv=setInterval(function(){sec-=1;if(sec<=0){clearInterval(iv);btn.disabled=false;btn.textContent='SEND';}else btn.textContent='WAIT '+sec;},1000);
+  }
+  async function sendMessage(text, btn){
+    var msg=clean(text); if(!msg){return;}
+    try{
+      var res=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:senderId,source:'player',version:VERSION}),cache:'no-store'});
+      var data={}; try{data=await res.json();}catch(e){}
+      if(res.status===429){setDisabled(btn,Math.max(1000,Number(data.retryAfterMs||RATE_MS)));return;}
+      if(!res.ok)throw new Error(data.error||'send_failed');
+      if(data.id) lastSeen=String(data.id);
+      setDisabled(btn,RATE_MS);
+    }catch(err){console.warn('player alert send failed',err);}
+  }
+  function bindPc(){
+    var btn=document.getElementById('playerAlertPcSend'); var text=document.getElementById('playerAlertPcText');
+    if(!btn||!text||btn.__smfpAlertBound)return;
+    btn.__smfpAlertBound=true; btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=text.value; sendMessage(v,btn); text.value='';},true);
+  }
+  function ensureMobileButton(){
+    var app=document.getElementById('mffApp'); if(!app)return; var now=app.querySelector('.mff-now'); if(!now)return;
+    if(!app.querySelector('#mffAlertOpen')){var btn=document.createElement('button');btn.id='mffAlertOpen';btn.className='mff-alert-open';btn.type='button';btn.textContent='SEND';now.appendChild(btn);}
+    if(!document.getElementById('mffAlertEditorBackdrop')){
+      var b=document.createElement('div');b.id='mffAlertEditorBackdrop';b.className='mff-alert-editor-backdrop';
+      b.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
+      document.body.appendChild(b);
+    }
+    var open=app.querySelector('#mffAlertOpen'), back=document.getElementById('mffAlertEditorBackdrop'), cancel=document.getElementById('mffAlertCancel'), send=document.getElementById('mffAlertSend'), ta=document.getElementById('mffAlertText');
+    if(open&&!open.__smfpAlertBound){open.__smfpAlertBound=true;open.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();back.classList.add('is-open'); if(ta)ta.focus();},true);}
+    function close(){back.classList.remove('is-open');}
+    if(back&&!back.__smfpAlertBackBound){back.__smfpAlertBackBound=true;back.addEventListener('click',function(ev){if(ev.target===back)close();},true);}
+    if(cancel&&!cancel.__smfpAlertBound){cancel.__smfpAlertBound=true;cancel.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();close();},true);}
+    if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';sendMessage(v,send); if(ta)ta.value=''; close();},true);}
+  }
+  async function poll(){
+    try{var r=await fetch(CURRENT_URL,{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
+  }
+  function boot(){bindPc();ensureMobileButton();ensureReceiveOverlay();}
+  boot(); setInterval(boot,1200); setInterval(poll,10000); setTimeout(poll,1600);
+})();
+</script>
 </body>
 </html>
