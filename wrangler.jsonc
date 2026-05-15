@@ -1,17 +1,5 @@
-/*
-FILE: wrangler.jsonc
-MODIFIED: 2026-05-15
-PURPOSE: Cloudflare Worker configuration for GitHub/Cloudflare auto-deploy.
-CHANGE SUMMARY:
-- Keeps original Worker name/main/compatibility_date.
-- Adds keep_vars=true to preserve dashboard-managed variables during deploy.
-- Does NOT store secret values.
-- Does NOT hard-require SUNO secrets, so deploy will not fail if they are not configured yet.
-*/
 {
   "name": "webradio-666soundsdesign-worker",
   "main": "worker.js",
-  "compatibility_date": "2024-05-15",
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "keep_vars": true
+  "compatibility_date": "2024-05-15"
 }
