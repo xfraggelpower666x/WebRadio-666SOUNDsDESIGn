@@ -1,18 +1,18 @@
 
 /* ==========================================================
-   666SOUNDsDESIGn — v149 Player Broadcast Inline Fix
+   666SOUNDsDESIGn — v150 Player Broadcast CacheBus Fix
    One-way public message sender for all open players.
    Rate limited server-side to 1 message / 180 seconds.
    Own messages are not shown again on the sender's player.
    ========================================================== */
 (function(){
   'use strict';
-  var VERSION='v148';
+  var VERSION='v150';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var POLL_MS=10000;
   var MAX_LEN=240;
-  var SENDER_KEY='s666_player_alert_sender_v149';
+  var SENDER_KEY='s666_player_alert_sender_v150';
   var LAST_SEEN_KEY='s666_player_alert_seen_v148';
   var LAST_SENT_KEY='s666_player_alert_last_sent_v148';
   function qs(sel,root){return (root||document).querySelector(sel)}

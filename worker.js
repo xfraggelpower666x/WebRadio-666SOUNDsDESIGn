@@ -408,17 +408,15 @@ async function serveExternalIndex(request){
 
 
 // ==========================================================
-// v148 PLAYER BROADCAST ALERT — small public one-way message bus.
+// v150 PLAYER BROADCAST ALERT — shared message bus via Worker Cache API.
 // Scope: /api/player-alert/* only. Stream/metadata/Discord routes unchanged.
-// Runtime state is intentionally minimal; for long-term multi-region persistence
-// this can later be moved to KV/DO/back-end without changing the player UI.
+// IMPORTANT: no in-memory global state for cross-player delivery.
 // ==========================================================
 const PLAYER_ALERT_RATE_LIMIT_MS = 180000;
 const PLAYER_ALERT_MAX_LEN = 240;
-const playerAlertState = globalThis.__S666_PLAYER_ALERT_STATE__ || (globalThis.__S666_PLAYER_ALERT_STATE__ = {
-  current: null,
-  lastSendAt: 0
-});
+const PLAYER_ALERT_TTL_SECONDS = 900;
+const PLAYER_ALERT_CACHE_CURRENT = 'https://s666.local/player-alert/current';
+const PLAYER_ALERT_CACHE_RATE = 'https://s666.local/player-alert/last-send';
 function playerAlertHeaders(extra = {}) {
   return {
     "content-type": "application/json; charset=UTF-8",
@@ -432,29 +430,55 @@ function playerAlertHeaders(extra = {}) {
 function playerAlertJson(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: playerAlertHeaders() });
 }
+function playerAlertCacheResponse(body, maxAgeSeconds) {
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: {
+      "content-type": "application/json; charset=UTF-8",
+      "cache-control": `public, max-age=${Math.max(1, maxAgeSeconds || PLAYER_ALERT_TTL_SECONDS)}`
+    }
+  });
+}
+async function playerAlertReadCachedJson(cacheKey) {
+  try {
+    const cached = await caches.default.match(new Request(cacheKey, { method: 'GET' }));
+    if (!cached) return null;
+    return await cached.json();
+  } catch (_) { return null; }
+}
+async function playerAlertWriteCachedJson(cacheKey, body, maxAgeSeconds) {
+  try {
+    await caches.default.put(
+      new Request(cacheKey, { method: 'GET' }),
+      playerAlertCacheResponse(body, maxAgeSeconds)
+    );
+  } catch (_) { /* cache write failures must not kill player */ }
+}
 async function handlePlayerAlert(request) {
   const url = new URL(request.url);
   if (!url.pathname.startsWith('/api/player-alert/')) return null;
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: playerAlertHeaders() });
   if (url.pathname === '/api/player-alert/current' && request.method === 'GET') {
-    const current = playerAlertState.current;
-    return playerAlertJson(current ? { active: true, ...current, serverTime: Date.now() } : { active: false, serverTime: Date.now() });
+    const current = await playerAlertReadCachedJson(PLAYER_ALERT_CACHE_CURRENT);
+    if (!current || !current.id || !current.message) return playerAlertJson({ active: false, serverTime: Date.now() });
+    return playerAlertJson({ active: true, ...current, serverTime: Date.now() });
   }
   if (url.pathname === '/api/player-alert/send' && request.method === 'POST') {
     const now = Date.now();
-    const waitMs = Math.max(0, PLAYER_ALERT_RATE_LIMIT_MS - (now - (playerAlertState.lastSendAt || 0)));
-    if (waitMs > 0) {
-      return playerAlertJson({ error: 'rate_limited', retryAfter: Math.ceil(waitMs / 1000) }, 429);
-    }
+    const last = await playerAlertReadCachedJson(PLAYER_ALERT_CACHE_RATE);
+    const lastSendAt = Number(last && last.lastSendAt || 0);
+    const waitMs = Math.max(0, PLAYER_ALERT_RATE_LIMIT_MS - (now - lastSendAt));
+    if (waitMs > 0) return playerAlertJson({ error: 'rate_limited', retryAfter: Math.ceil(waitMs / 1000) }, 429);
     let payload = {};
     try { payload = await request.json(); } catch (_) { return playerAlertJson({ error: 'invalid_json' }, 400); }
     const message = String(payload.message || '').replace(/[<>]/g, '').trim().slice(0, PLAYER_ALERT_MAX_LEN);
     const senderId = String(payload.senderId || 'anonymous').replace(/[^a-zA-Z0-9_.:-]/g, '').slice(0, 80) || 'anonymous';
     if (!message) return playerAlertJson({ error: 'empty_message' }, 400);
     const id = `${now.toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-    playerAlertState.current = { id, message, senderId, createdAt: new Date(now).toISOString(), ttlSeconds: 900 };
-    playerAlertState.lastSendAt = now;
-    return playerAlertJson({ ok: true, id, retryAfter: 180 });
+    const current = { id, message, senderId, createdAt: new Date(now).toISOString(), ttlSeconds: PLAYER_ALERT_TTL_SECONDS };
+    await playerAlertWriteCachedJson(PLAYER_ALERT_CACHE_CURRENT, current, PLAYER_ALERT_TTL_SECONDS);
+    await playerAlertWriteCachedJson(PLAYER_ALERT_CACHE_RATE, { lastSendAt: now }, Math.ceil(PLAYER_ALERT_RATE_LIMIT_MS / 1000));
+    return playerAlertJson({ ok: true, id, retryAfter: Math.ceil(PLAYER_ALERT_RATE_LIMIT_MS / 1000) });
   }
   return playerAlertJson({ error: 'not_found' }, 404);
 }

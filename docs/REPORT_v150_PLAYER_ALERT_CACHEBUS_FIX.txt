@@ -1,0 +1,21 @@
+666SOUNDsDESIGn — v150 PLAYER ALERT CACHEBUS FIX
+
+Scope:
+- Only player broadcast alert delivery was repaired.
+- No layout, ticker, transport, EQ, Discord, stream or worker stream routing changes.
+
+Fix:
+- The previous alert bus used Worker global memory, which is not reliable across Cloudflare Worker isolates.
+- /api/player-alert/current and /api/player-alert/send now use Cloudflare caches.default as shared short-term message storage.
+- Rate-limit is stored in the same cache path: 1 message per 180 seconds.
+- Own-message suppression stays in frontend via senderId/lastSeen.
+
+Routes touched:
+- /api/player-alert/current
+- /api/player-alert/send
+
+Rules:
+- No new frontend layer.
+- No new player layout block.
+- No change to Discord routes.
+- No change to stream routes.
