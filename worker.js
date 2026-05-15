@@ -406,6 +406,59 @@ async function serveExternalIndex(request){
   });
 }
 
+
+// ==========================================================
+// v148 PLAYER BROADCAST ALERT — small public one-way message bus.
+// Scope: /api/player-alert/* only. Stream/metadata/Discord routes unchanged.
+// Runtime state is intentionally minimal; for long-term multi-region persistence
+// this can later be moved to KV/DO/back-end without changing the player UI.
+// ==========================================================
+const PLAYER_ALERT_RATE_LIMIT_MS = 180000;
+const PLAYER_ALERT_MAX_LEN = 240;
+const playerAlertState = globalThis.__S666_PLAYER_ALERT_STATE__ || (globalThis.__S666_PLAYER_ALERT_STATE__ = {
+  current: null,
+  lastSendAt: 0
+});
+function playerAlertHeaders(extra = {}) {
+  return {
+    "content-type": "application/json; charset=UTF-8",
+    "cache-control": "no-store",
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "GET,POST,OPTIONS",
+    "access-control-allow-headers": "content-type,cache-control",
+    ...extra
+  };
+}
+function playerAlertJson(body, status = 200) {
+  return new Response(JSON.stringify(body), { status, headers: playerAlertHeaders() });
+}
+async function handlePlayerAlert(request) {
+  const url = new URL(request.url);
+  if (!url.pathname.startsWith('/api/player-alert/')) return null;
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: playerAlertHeaders() });
+  if (url.pathname === '/api/player-alert/current' && request.method === 'GET') {
+    const current = playerAlertState.current;
+    return playerAlertJson(current ? { active: true, ...current, serverTime: Date.now() } : { active: false, serverTime: Date.now() });
+  }
+  if (url.pathname === '/api/player-alert/send' && request.method === 'POST') {
+    const now = Date.now();
+    const waitMs = Math.max(0, PLAYER_ALERT_RATE_LIMIT_MS - (now - (playerAlertState.lastSendAt || 0)));
+    if (waitMs > 0) {
+      return playerAlertJson({ error: 'rate_limited', retryAfter: Math.ceil(waitMs / 1000) }, 429);
+    }
+    let payload = {};
+    try { payload = await request.json(); } catch (_) { return playerAlertJson({ error: 'invalid_json' }, 400); }
+    const message = String(payload.message || '').replace(/[<>]/g, '').trim().slice(0, PLAYER_ALERT_MAX_LEN);
+    const senderId = String(payload.senderId || 'anonymous').replace(/[^a-zA-Z0-9_.:-]/g, '').slice(0, 80) || 'anonymous';
+    if (!message) return playerAlertJson({ error: 'empty_message' }, 400);
+    const id = `${now.toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    playerAlertState.current = { id, message, senderId, createdAt: new Date(now).toISOString(), ttlSeconds: 900 };
+    playerAlertState.lastSendAt = now;
+    return playerAlertJson({ ok: true, id, retryAfter: 180 });
+  }
+  return playerAlertJson({ error: 'not_found' }, 404);
+}
+
 export default {
   async fetch(request, env, ctx){
 
@@ -413,6 +466,9 @@ export default {
     const __darkDancerResponse = darkDancerResponse(__darkDancerUrl.pathname);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
+    // v148 PLAYER BROADCAST ALERT: only /api/player-alert/* is intercepted.
+    const playerAlertResponse = await handlePlayerAlert(request);
+    if (playerAlertResponse) return playerAlertResponse;
     // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;
