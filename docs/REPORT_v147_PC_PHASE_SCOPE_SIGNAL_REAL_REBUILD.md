@@ -1,4 +1,4 @@
-# v147 — PC Phase Scope Signal Real Rebuild
+# v151 — PC Phase Scope Signal Real Rebuild
 
 Basis: v146 PC VU Matrix Cachebust Fix.
 
@@ -8,7 +8,7 @@ Changes:
 - Existing Phase Scope layer enhanced; no new panel, canvas, audio loop, RAF loop, or interval.
 - Phase grid, line and cloud now use the same existing EQ/levelmeter source variables.
 - Added irregular shape motion via existing `.phase-cloud` and existing `.phase-line`.
-- Version/cacheburst updated to v147.
+- Version/cacheburst updated to v151.
 
 Tabu respected:
 - No Audio Reactor changes.
