@@ -1,0 +1,18 @@
+666SOUNDsDESIGn WebRadio — REPORT v159 MOBILE BOOST + TOPBAR FIX
+
+Basis: v158
+Scope:
+- iPhone Boost-Stufen erweitert: 1.00 / 1.30 / 1.60 / 1.90 / 2.00
+- Boost 2.0 öffnet Warn-Overlay mit OK/CANCEL.
+- Boost 2.0 nutzt als einzige Stufe rote LED.
+- Mobile Broadcast-SEND-Button aus falscher Randposition in Discord/Version-Control-Row verschoben.
+- Reihenfolge Mobile-Control-Row: Discord, Version, SEND.
+- Version/Cacheburst auf v159 gesetzt.
+
+Nicht geändert:
+- PC Layout
+- PC EQ
+- Transport
+- Ticker
+- Discord-Code
+- Worker/Stream-Routing
