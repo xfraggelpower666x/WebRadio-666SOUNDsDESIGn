@@ -1,0 +1,20 @@
+{
+  "version": "v156",
+  "created": "2026-05-16",
+  "basis": "v155_PC_10BAND_EQ_LOWER_REFLOW_FULL",
+  "changes": [
+    "Ticker lane moved upward inside existing now-playing lower geometry",
+    "SEND/Textfield/History aligned directly below ticker with spacing between SEND and History",
+    "Existing 10-band EQ retained and mirrored into two bottom EQ panels",
+    "Mirror EQ controls synchronize to primary EQ controls without new audio loop",
+    "Version/cache strings bumped to v156"
+  ],
+  "tabu_respected": [
+    "no transport changes",
+    "no ticker logic changes",
+    "no iPhone layout changes",
+    "no Discord backend changes",
+    "no Worker/stream changes",
+    "no new audio loop"
+  ]
+}
