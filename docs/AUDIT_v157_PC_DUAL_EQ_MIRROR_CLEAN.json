@@ -1,0 +1,22 @@
+{
+  "version": "v157",
+  "scope": "PC lower now-playing EQ cleanup only",
+  "basis": "v156",
+  "changes": [
+    "left EQ used as source style",
+    "right EQ mirrored with same style",
+    "EQ title columns hidden",
+    "combined EQ length clamped to ticker lane",
+    "SEND group moved left",
+    "slider thumbs visually reactive through existing --mff-level"
+  ],
+  "tabu": [
+    "iPhone",
+    "transport",
+    "worker/stream",
+    "discord",
+    "new audio loop",
+    "new RAF/interval loop"
+  ],
+  "created": "2026-05-16"
+}

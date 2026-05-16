@@ -1,0 +1,18 @@
+666SOUNDsDESIGn WebRadio — v157
+PC dual EQ mirror cleanup.
+
+Changes:
+- Kept existing left 10-band EQ as the visual source.
+- Mirrored the right EQ using the same CSS geometry/style.
+- Removed side title text columns from both EQ panels.
+- Kept combined EQ width inside ticker lane boundaries.
+- Moved SEND/text field left to avoid crowding History.
+- Made EQ slider thumbs visually audio-reactive using existing --mff-level variable.
+
+No changes:
+- no iPhone layout
+- no transport
+- no stream/worker route
+- no Discord code
+- no new audio loop
+- no new RAF/interval loop
