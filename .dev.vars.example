@@ -5,4 +5,3 @@
 
 SUNO_API_KEY=put_real_key_here_locally_only
 SUNO_API_BASE=https://example-provider.invalid
-DISCORD_WEBHOOK_URL2=

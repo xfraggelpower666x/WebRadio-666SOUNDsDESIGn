@@ -2,8 +2,8 @@
 ############################################################
 # 666SOUNDsDESIGn — Discord Webhook HTML Player Add-on
 # Created: 2026-05-07
-# Modified: 2026-05-18
-# Version: V3.10
+# Modified: 2026-05-07
+# Version: V3.8
 # Purpose: Secret-safe Discord bridge with structured underground broadcast embeds, metadata, artwork, socials and access-gated posts.
 # Change Summary:
 # - Add-only Worker routes; no stream/fallback/notfallplayer logic touched.
@@ -12,12 +12,10 @@
 # - V3.8: Manual big broadcast post stays manual; automatic song-change post is compact, metadata-focused and deduped.
 # - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: 666 DJ for all Discord embeds.
 # - Returns compact status JSON for frontend LED indicator.
-# - V3.10/v168: Dual Discord webhook support via DISCORD_WEBHOOK_URL and DISCORD_WEBHOOK_URL2.
-# - Sends each Discord payload to every configured webhook and returns sent/failed counts for UI feedback.
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.10-v168-DUAL-WEBHOOK';
+const ADDON_VERSION = 'V3.9-20260508-DJ-FALLBACK-666DJ';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
@@ -281,62 +279,24 @@ function messagePayload(input = {}) {
   return { username: s.username, embeds };
 }
 
-function getDiscordWebhooks(env) {
-  if (!env) return [];
-  const raw = [
-    env.DISCORD_WEBHOOK_URL,
-    env.DISCORD_WEBHOOK_URL2,
-    env.DISCORD_WEBHOOK_2,
-    env.DISCORD_WEBHOOK_SECONDARY,
-    env.DISCORD_WEBHOOK,
-    env.DISCORD_WEBHOOK_URI,
-    env.DISCORD_WEBHOOK_ENDPOINT,
-    env.WEBHOOK_URL
-  ].filter(Boolean).map((v) => String(v).trim()).filter(Boolean);
-  const out = [];
-  const seen = new Set();
-  for (const hook of raw) {
-    if (seen.has(hook)) continue;
-    seen.add(hook);
-    out.push(hook);
-  }
-  return out;
-}
-
 function getDiscordWebhook(env) {
-  return getDiscordWebhooks(env)[0] || '';
+  return env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
 }
 
-async function postOneDiscordWebhook(url, payload, index) {
-  const res = await fetch(String(url), {
+async function sendDiscord(env, payload) {
+  const webhook = getDiscordWebhook(env);
+  if (!webhook) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
+  const url = String(webhook);
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(payload)
   });
   const text = await res.text().catch(() => '');
-  if (!res.ok) {
-    return { ok: false, index, status: res.status, error: `Discord HTTP ${res.status}: ${text.slice(0, 220)}` };
-  }
-  return { ok: true, index, status: res.status, body: text || 'OK' };
-}
-
-async function sendDiscord(env, payload) {
-  const webhooks = getDiscordWebhooks(env);
-  if (!webhooks.length) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK_URL2, DISCORD_WEBHOOK_2, DISCORD_WEBHOOK_SECONDARY, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
-
-  const results = await Promise.all(webhooks.map((url, i) => postOneDiscordWebhook(url, payload, i + 1)));
-  const sent = results.filter((r) => r.ok).length;
-  const failed = results.length - sent;
-  const statusLabel = sent === results.length ? `SENT ${sent}/${results.length}` : sent > 0 ? `PARTIAL ${sent}/${results.length}` : `FAILED 0/${results.length}`;
-
-  if (sent > 0) {
-    runtime.lastOkAt = Date.now();
-    runtime.lastError = failed ? statusLabel : '';
-    return { ok: failed === 0, sent, failed, total: results.length, statusLabel, results: results.map((r) => ({ ok: r.ok, index: r.index, status: r.status, error: r.error || '' })) };
-  }
-
-  const errorText = results.map((r) => `#${r.index}: ${r.error || r.status || 'unknown error'}`).join(' | ');
-  throw new Error(`${statusLabel}: ${errorText}`);
+  if (!res.ok) throw new Error(`Discord HTTP ${res.status}: ${text.slice(0, 300)}`);
+  runtime.lastOkAt = Date.now();
+  runtime.lastError = '';
+  return { status: res.status, body: text || 'OK' };
 }
 
 function tokenOk(request, env) {
@@ -374,9 +334,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       addon: ADDON_VERSION,
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
       webhookConfigured: Boolean(getDiscordWebhook(env)),
-      webhookCount: getDiscordWebhooks(env).length,
-      dualWebhookConfigured: getDiscordWebhooks(env).length >= 2,
-      acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK_URL2','DISCORD_WEBHOOK_2','DISCORD_WEBHOOK_SECONDARY','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
+      acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
       adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
       gateCodeEnabled: true,
       lastKind: runtime.lastKind,
