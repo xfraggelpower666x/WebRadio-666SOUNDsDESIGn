@@ -1,19 +1,5 @@
 {
   "name": "webradio-666soundsdesign-worker",
   "main": "worker.js",
-  "compatibility_date": "2024-05-15",
-  "vars": {
-    "DISCORD_DUAL_WEBHOOK_ENABLED": "true",
-    "PLAYER_ALERT_STORAGE_MODE": "KV_WITH_CACHE_FALLBACK"
-  }
-
-  // Für echte deutschlandweite Player-zu-Player-Nachrichten muss in Cloudflare
-  // ein KV-Namespace erstellt und als Binding PLAYER_ALERT_KV verbunden werden.
-  // Ohne KV nutzt der Worker caches.default als Fallback; das kann je nach Edge/Region
-  // wieder nur lokal/regional sichtbar sein.
-  //
-  // Beispiel nach KV-Erstellung:
-  // "kv_namespaces": [
-  //   { "binding": "PLAYER_ALERT_KV", "id": "DEINE_KV_NAMESPACE_ID" }
-  // ]
+  "compatibility_date": "2024-05-15"
 }
