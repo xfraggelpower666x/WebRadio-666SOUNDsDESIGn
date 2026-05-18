@@ -1,0 +1,19 @@
+{
+  "version": "v166",
+  "created": "2026-05-18",
+  "base": "v164_RESCUE_CLEAN_SEND_METER_EQ_FULL",
+  "purpose": "Restore PC levelmeter/metadata by using v164 as base, remove only the second visible PC EQ part.",
+  "changed": [
+    "Removed PC visualizer EQ section (#eqBars section.visualizer) from index.html",
+    "Added guard CSS to keep visualizer EQ hidden if recreated",
+    "Kept real 10-band EQ (#pcRealEqPanel)",
+    "Kept side meters, bottom sync meter, metadata line, JS and desktop CSS unchanged from v164 except version labels"
+  ],
+  "not_changed": [
+    "No iPhone layout changes",
+    "No audio engine changes",
+    "No meter engine changes",
+    "No metadata polling changes",
+    "No new EQ layer"
+  ]
+}

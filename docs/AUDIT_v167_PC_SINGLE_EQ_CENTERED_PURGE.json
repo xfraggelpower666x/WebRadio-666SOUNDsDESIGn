@@ -1,0 +1,22 @@
+{
+  "version": "v167",
+  "created": "2026-05-18",
+  "modified": "2026-05-18",
+  "title": "PC Single EQ Centered Purge",
+  "scope": "PC player only: remove duplicated lower equalizer/mirror layers and center the remaining real EQ panel.",
+  "base": "v166 PC level/meta restore package",
+  "changes": [
+    "Physically removed SMFP_v159_PC_BOTTOM_GEOMETRY_DUAL_EQ_FINAL CSS/script block.",
+    "Physically removed SMFP_v159_PC_DUAL_EQ_TRUE_MIRROR_CLEAN CSS block.",
+    "Physically removed SMFP_v159_PC_TICKER_EQ_WIDTH_INNER_DOT_FIX dual/mirror CSS block.",
+    "Physically removed SMFP_v166_PC_SINGLE_EQ_GUARD hide-layer workaround.",
+    "Kept exactly one DOM element: #pcRealEqPanel.",
+    "Centered the remaining real 10-band EQ in the PC lower now-playing area.",
+    "Kept iPhone structures unchanged."
+  ],
+  "non_destructive_rules": [
+    "No new EQ layer created.",
+    "No PC levelmeter/meta logic removed.",
+    "No iPhone geometry change."
+  ]
+}

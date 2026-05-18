@@ -1,0 +1,20 @@
+{
+  "version": "v168",
+  "title": "DUAL DISCORD WEBHOOK + PC SINGLE EQ",
+  "created": "2026-05-18",
+  "basis": "v167",
+  "changes": [
+    "Added dual Discord webhook dispatch in worker-addons/discord-notify-addon-v3.js.",
+    "Primary secret: DISCORD_WEBHOOK_URL.",
+    "Secondary secret: DISCORD_WEBHOOK_URL2.",
+    "No real webhook URLs are written to the repository package.",
+    "Discord result JSON returns sent/failed/total/statusLabel for frontend feedback.",
+    "PC single-EQ state from v167 preserved."
+  ],
+  "safety": {
+    "secret_values_in_repo": false,
+    "frontend_webhook_urls": false,
+    "pc_level_meta_touched": false,
+    "iphone_layout_touched": false
+  }
+}
