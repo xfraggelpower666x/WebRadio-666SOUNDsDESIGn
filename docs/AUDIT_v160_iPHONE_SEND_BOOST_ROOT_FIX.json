@@ -1,0 +1,21 @@
+{
+  "version": "v160",
+  "created": "2026-05-18",
+  "scope": "iPhone/mobile only",
+  "base": "v159",
+  "rules": {
+    "new_topbar": false,
+    "new_buttons": false,
+    "new_boost_engine": false,
+    "pc_changes": false,
+    "full_zip_delivery": true
+  },
+  "fixes": [
+    "SEND button pointer/touch/click repair",
+    "Topbar order Discord, SEND, V160",
+    "Mobile isolation rule exception for SEND editor and Boost confirm overlay",
+    "Boost 4 confirm overlay z-index root fix",
+    "Boost 4 real gain remains 2.00",
+    "Boost 4 LED red only at stage 4"
+  ]
+}

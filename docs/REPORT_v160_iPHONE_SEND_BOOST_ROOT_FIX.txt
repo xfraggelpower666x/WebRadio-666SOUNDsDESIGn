@@ -1,0 +1,19 @@
+666SOUNDsDESIGn WebRadio — REPORT v160 iPHONE SEND + BOOST ROOT FIX
+Created: 2026-05-18
+Modified: 2026-05-18
+Purpose: Mobile-only root fix based on v159. No PC layout rebuild, no new buttons, no new Boost engine.
+
+CHANGES:
+- Updated runtime version from v159 to v160.
+- Reordered existing mobile topbar slot to: [Discord] [SEND] [V160].
+- Kept existing SEND button; repaired click/touch/pointer activation and z-index/pointer-event handling.
+- Fixed root overlay guard so mffAlertEditorBackdrop and mffExtremeBoostBackdrop are not hidden by the mobile app isolation rule.
+- Boost 4 confirmation overlay now appears above the radio app instead of behind/under it.
+- Boost stage 4 remains mapped to real gain 2.00 via existing BOOST_GAINS array and existing confirmation flow.
+- Boost LED stage 4: only LED 4 uses red extreme color; lower LEDs stay cyan/pink style.
+
+UNCHANGED:
+- PC structure and PC geometry untouched.
+- No new topbar generated.
+- No replacement Boost engine added.
+- No duplicate SEND button added.

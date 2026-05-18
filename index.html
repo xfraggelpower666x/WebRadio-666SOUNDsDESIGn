@@ -16,30 +16,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="PC_SIDE_ADDON_FX_PANEL_v159" />
+  <meta name="smfp-version" content="v160" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v159-mobile-boost-topbar-20260516" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v159-mobile-boost-topbar-20260516" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v159-mobile-boost-topbar-20260516" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v159-mobile-boost-topbar-20260516" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v159-mobile-boost-topbar-20260516" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v159-mobile-boost-topbar-20260516" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v160-iphone-send-boost-root-20260518" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v160-iphone-send-boost-root-20260518" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v160-iphone-send-boost-root-20260518" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v160-iphone-send-boost-root-20260518" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v160-iphone-send-boost-root-20260518" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v160-iphone-send-boost-root-20260518" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v159-mobile-boost-topbar-20260516" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v159-mobile-boost-topbar-20260516">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v159-mobile-boost-topbar-20260516">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v159-mobile-boost-topbar-20260516">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v159-mobile-boost-topbar-20260516">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v160-iphone-send-boost-root-20260518" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v160-iphone-send-boost-root-20260518">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v160-iphone-send-boost-root-20260518">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v160-iphone-send-boost-root-20260518">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v160-iphone-send-boost-root-20260518">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=v159-alert-rollback-stable-20260515">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v160-iphone-send-boost-root-20260518">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -622,24 +622,138 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </script>
 
 
-<style id="v159MobileBoostTopbarFix">
+<style id="v160IphoneSendBoostRootFix">
+/*
+  666SOUNDsDESIGn — v160 iPHONE SEND + BOOST ROOT FIX
+  Erstellt: 2026-05-18
+  Geändert: 2026-05-18
+  Zweck: Nur Mobile-Struktur reparieren: SEND klickbar, Topbar-Reihenfolge [Discord][SEND][V160], Boost-4-Confirm-Overlay vor die Radio-App legen.
+  Regeln: Keine neue Topbar, keine neuen Buttons, keine neue Boost-Engine, keine PC-Geometrieänderung.
+*/
 @media(max-width:760px){
-  #mffApp .mff-discord-slot{display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;flex-wrap:nowrap!important;min-height:34px!important;}
+  #mffApp .mff-discord-slot{
+    position:relative!important;
+    z-index:2147482500!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    flex-wrap:nowrap!important;
+    min-height:34px!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+    isolation:isolate!important;
+  }
   #mffApp .mff-discord-slot [data-discord-addon-panel],
-  #mffApp .mff-discord-slot .s666-discord-panel{order:1!important;max-width:132px!important;}
-  #mffApp .mff-discord-slot .smfp-version-badge.mff-version-inline{order:2!important;min-width:54px!important;padding:0 8px!important;font-size:10px!important;}
-  #mffApp #mffAlertOpen.mff-alert-open{position:static!important;inset:auto!important;right:auto!important;bottom:auto!important;order:3!important;height:30px!important;min-width:58px!important;padding:0 9px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;z-index:20!important;}
+  #mffApp .mff-discord-slot .s666-discord-panel{
+    order:1!important;
+    max-width:132px!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+    z-index:3!important;
+  }
+  #mffApp #mffAlertOpen.mff-alert-open{
+    position:static!important;
+    inset:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    order:2!important;
+    height:30px!important;
+    min-width:58px!important;
+    max-width:68px!important;
+    padding:0 9px!important;
+    margin:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+    cursor:pointer!important;
+    z-index:4!important;
+    -webkit-user-select:none!important;
+    user-select:none!important;
+  }
+  #mffApp .mff-discord-slot .smfp-version-badge.mff-version-inline{
+    order:3!important;
+    position:static!important;
+    inset:auto!important;
+    right:auto!important;
+    top:auto!important;
+    z-index:2!important;
+    min-width:54px!important;
+    min-height:30px!important;
+    padding:0 8px!important;
+    margin-left:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    font-size:10px!important;
+    pointer-events:none!important;
+    white-space:nowrap!important;
+  }
+  #mffApp .mff-history-backdrop,
+  #mffApp .mff-history-overlay,
+  #mffApp .mff-led-tip,
+  #mffApp .mff-side,
+  #mffApp .mff-bottom,
+  #mffApp .mff-eq{
+    touch-action:manipulation!important;
+  }
+  body[data-smfp-active="1"] > #mffAlertEditorBackdrop,
+  body[data-smfp-active="1"] > #mffExtremeBoostBackdrop,
+  body[data-smfp-active="1"] > #playerAlertReceiveBackdrop{
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+  body[data-smfp-active="1"] > #mffAlertEditorBackdrop.is-open{
+    display:flex!important;
+    z-index:2147483600!important;
+  }
+  body[data-smfp-active="1"] > #mffExtremeBoostBackdrop{
+    display:flex!important;
+    z-index:2147483700!important;
+  }
+  #mffExtremeBoostBackdrop,
+  #mffExtremeBoostBackdrop *,
+  #mffAlertEditorBackdrop,
+  #mffAlertEditorBackdrop *{
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
   #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="1"],
   #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="2"],
-  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="3"]{background:var(--mff-pink)!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 10px rgba(255,61,187,.75),0 0 18px rgba(255,61,187,.32)!important;}
-  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="4"]{background:#ff1744!important;border-color:rgba(255,45,72,.98)!important;box-shadow:0 0 12px rgba(255,23,68,.95),0 0 24px rgba(255,23,68,.55)!important;}
+  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="3"]{
+    background:linear-gradient(135deg,var(--mff-cyan),var(--mff-pink))!important;
+    border-color:rgba(22,255,243,.85)!important;
+    box-shadow:0 0 10px rgba(22,255,243,.58),0 0 16px rgba(255,61,187,.26)!important;
+  }
+  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="4"]{
+    background:#ff1744!important;
+    border-color:rgba(255,45,72,.98)!important;
+    box-shadow:0 0 12px rgba(255,23,68,.95),0 0 24px rgba(255,23,68,.55)!important;
+  }
+  #mffApp[data-mff-boost-stage="4"] #mffBoost{
+    border-color:rgba(255,23,68,.90)!important;
+    color:#fff!important;
+    box-shadow:0 0 16px rgba(255,23,68,.42),inset 0 0 12px rgba(255,23,68,.18)!important;
+  }
 }
-.mff-extreme-boost-backdrop{position:fixed!important;inset:0!important;z-index:2147483450!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.68)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;}
+.mff-extreme-boost-backdrop{position:fixed!important;inset:0!important;z-index:2147483700!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.68)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;}
 .mff-extreme-boost-modal{width:min(440px,calc(100vw - 42px))!important;border-radius:22px!important;border:1px solid rgba(255,23,68,.82)!important;background:radial-gradient(circle at 18% 0%,rgba(255,23,68,.22),transparent 36%),rgba(3,7,18,.98)!important;color:#f7f8ff!important;padding:18px!important;box-shadow:0 0 34px rgba(255,23,68,.34),0 0 24px rgba(22,255,243,.14)!important;}
 .mff-extreme-boost-modal h3{margin:0 0 10px!important;color:#ff3d6e!important;letter-spacing:.12em!important;font-size:15px!important;font-weight:950!important;}
 .mff-extreme-boost-modal p{margin:0 0 16px!important;line-height:1.35!important;font-size:14px!important;}
 .mff-extreme-boost-actions{display:flex!important;justify-content:flex-end!important;gap:10px!important;}
-.mff-extreme-boost-actions button{height:38px!important;min-width:84px!important;border-radius:13px!important;border:1px solid rgba(22,255,243,.55)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-weight:950!important;}
+.mff-extreme-boost-actions button{height:38px!important;min-width:84px!important;border-radius:13px!important;border:1px solid rgba(22,255,243,.55)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-weight:950!important;pointer-events:auto!important;touch-action:manipulation!important;}
 .mff-extreme-boost-actions [data-extreme="ok"]{border-color:rgba(255,23,68,.78)!important;color:#fff!important;background:rgba(255,23,68,.25)!important;}
 </style>
 </head>
@@ -706,7 +820,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v159</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v160</span></div>
           </div>
         </div>
       </header>
@@ -715,13 +829,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v159-mobile-boost-topbar-20260516" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v160-iphone-send-boost-root-20260518" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v159-mobile-boost-topbar-20260516" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v160-iphone-send-boost-root-20260518" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v159-mobile-boost-topbar-20260516" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v160-iphone-send-boost-root-20260518" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -913,7 +1027,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v159-mobile-boost-topbar-20260516"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v160-iphone-send-boost-root-20260518"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -958,7 +1072,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body[data-smfp-active="1"]{
     padding:calc(4px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom)) 0!important;
   }
-  body[data-smfp-active="1"] > *:not(#mffApp):not(script):not(style):not(link):not(#mffAudio):not(#s666DiscordGateOverlay):not(#s666DiscordDeniedOverlay){
+  body[data-smfp-active="1"] > *:not(#mffApp):not(script):not(style):not(link):not(#mffAudio):not(#s666DiscordGateOverlay):not(#s666DiscordDeniedOverlay):not(#mffAlertEditorBackdrop):not(#mffExtremeBoostBackdrop):not(#playerAlertReceiveBackdrop){
     display:none!important;
     visibility:hidden!important;
     opacity:0!important;
@@ -1730,7 +1844,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v159-mobile-boost-topbar-20260516')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v160-iphone-send-boost-root-20260518')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1745,7 +1859,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v159';
+  var VERSION='v160';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -1762,11 +1876,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   ];
   var smfpEqState=(function(){
     var base={b63:0,b125:0,b250:0,b500:0,b1k:0,b2k:0,b4k:0,b8k:0,b12k:0,b16k:0};
-    try{var raw=localStorage.getItem('smfp_real_eq_v159');if(raw){var parsed=JSON.parse(raw);Object.keys(base).forEach(function(k){var n=Number(parsed[k]);if(isFinite(n))base[k]=Math.max(-12,Math.min(12,n));});}}catch(e){}
+    try{var raw=localStorage.getItem('smfp_real_eq_v160');if(raw){var parsed=JSON.parse(raw);Object.keys(base).forEach(function(k){var n=Number(parsed[k]);if(isFinite(n))base[k]=Math.max(-12,Math.min(12,n));});}}catch(e){}
     return base;
   })();
   function clampEqDb(v){var n=Number(v); if(!isFinite(n)) n=0; return Math.max(-12,Math.min(12,Math.round(n)));}
-  function saveSmfpEqState(){try{localStorage.setItem('smfp_real_eq_v159',JSON.stringify(smfpEqState));}catch(e){}}
+  function saveSmfpEqState(){try{localStorage.setItem('smfp_real_eq_v160',JSON.stringify(smfpEqState));}catch(e){}}
   function makeSmfpEqNodes(ctx){
     return SMFP_EQ_BANDS.map(function(b){
       var node=ctx.createBiquadFilter();
@@ -2383,7 +2497,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v159</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v160</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -3346,15 +3460,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v159';
+  var VERSION='v160';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v159');
+    document.documentElement.setAttribute('data-smfp-version','v160');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
     var app=document.getElementById('mffApp');
-    if(app) app.setAttribute('data-version','PC_SIDE_ADDON_FX_PANEL_v159');
+    if(app) app.setAttribute('data-version','v160');
   }
   function lockMobileViewport(){
     var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -3804,9 +3918,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION='v159';
-  var BUILD='smfp-v159-mobile-boost-topbar-20260516';
-  try{document.documentElement.setAttribute('data-smfp-version','PC_SIDE_ADDON_FX_PANEL_v159');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
+  var VERSION='v160';
+  var BUILD='smfp-v160-iphone-send-boost-root-20260518';
+  try{document.documentElement.setAttribute('data-smfp-version','v160');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
   function apply(){
     setText(document.getElementById('pcVersionBadge'));
@@ -3816,7 +3930,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',apply,{once:true});
 })();
 </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=v159-alert-rollback-stable-20260515" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v160-iphone-send-boost-root-20260518" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -4041,7 +4155,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4121,7 +4235,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4228,7 +4342,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4314,7 +4428,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4390,7 +4504,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4457,7 +4571,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     gap:7px!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4503,7 +4617,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body .pc-addon-core{left:18px!important;right:18px!important;}
   body .pc-addon-spectrum{left:18px!important;right:18px!important;gap:6px!important;}
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4562,7 +4676,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION='v159';
+  var VERSION='v160';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4608,13 +4722,23 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(!app.querySelector('#mffAlertOpen')){var btn=document.createElement('button');btn.id='mffAlertOpen';btn.className='mff-alert-open';btn.type='button';btn.textContent='SEND';slot.appendChild(btn);}
     else { var existing=app.querySelector('#mffAlertOpen'); if(existing && existing.parentNode!==slot) slot.appendChild(existing); }
     if(!document.getElementById('mffAlertEditorBackdrop')){
-      var b=document.createElement('div');b.id='mffAlertEditorBackdrop';b.className='mff-alert-editor-backdrop';
+      var b=document.createElement('div');b.id='mffAlertEditorBackdrop';b.className='mff-alert-editor-backdrop';b.setAttribute('aria-hidden','true');
       b.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
       document.body.appendChild(b);
     }
     var open=app.querySelector('#mffAlertOpen'), back=document.getElementById('mffAlertEditorBackdrop'), cancel=document.getElementById('mffAlertCancel'), send=document.getElementById('mffAlertSend'), ta=document.getElementById('mffAlertText');
-    if(open&&!open.__smfpAlertBound){open.__smfpAlertBound=true;open.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();back.classList.add('is-open'); if(ta)ta.focus();},true);}
-    function close(){back.classList.remove('is-open');}
+    if(open&&!open.__smfpAlertBound){
+      open.__smfpAlertBound=true;
+      function openEditor(ev){
+        if(ev){ev.preventDefault();ev.stopPropagation();}
+        if(back){back.classList.add('is-open');back.setAttribute('aria-hidden','false');}
+        if(ta){setTimeout(function(){try{ta.focus();}catch(e){}},40);}
+      }
+      open.addEventListener('click',openEditor,true);
+      open.addEventListener('touchend',openEditor,{passive:false,capture:true});
+      open.addEventListener('pointerup',openEditor,{passive:false,capture:true});
+    }
+    function close(){if(back){back.classList.remove('is-open');back.setAttribute('aria-hidden','true');}}
     if(back&&!back.__smfpAlertBackBound){back.__smfpAlertBackBound=true;back.addEventListener('click',function(ev){if(ev.target===back)close();},true);}
     if(cancel&&!cancel.__smfpAlertBound){cancel.__smfpAlertBound=true;cancel.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();close();},true);}
     if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';sendMessage(v,send); if(ta)ta.value=''; close();},true);}
@@ -4780,7 +4904,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   /* sichtbare Version hart setzen */
   body #pcVersionBadge .status-code{font-size:0!important;}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important;}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important;}
 }
 @media (max-width:760px){#pcRealEqPanel,#pcRealEqPanelMirror{display:none!important;}}
 </style>
@@ -4864,7 +4988,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     box-shadow:0 0 calc(7px + (var(--mff-level,.20) * 13px)) rgba(22,255,243,.88),0 0 calc(5px + (var(--mff-level,.20) * 13px)) rgba(255,61,187,.70)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important;}
-  body #pcVersionBadge .status-code::after{content:"v159"!important;font-size:11px!important;line-height:1!important;}
+  body #pcVersionBadge .status-code::after{content:"v160"!important;font-size:11px!important;line-height:1!important;}
 }
 @media (max-width:760px){#pcRealEqPanel,#pcRealEqPanelMirror{display:none!important;}}
 </style>
