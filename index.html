@@ -16,7 +16,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="v166" />
+  <meta name="smfp-version" content="v164" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -923,6 +923,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="pcRightFxToggle" class="pc-addon-toggle is-on" type="button" aria-pressed="true" data-target="right"><span></span><b>R-FX</b></button>
           </div>
         </article>
+      </section>
+
+      <section class="visualizer">
+        <div class="section-kicker">EQ</div>
+        <div id="eqBars" class="eq-bars" aria-hidden="true"></div>
       </section>
 
       <section class="bottom-console">
@@ -1841,7 +1846,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v166';
+  var VERSION='v164';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -3442,7 +3447,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v166';
+  var VERSION='v164';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
     document.documentElement.setAttribute('data-smfp-version','v162');
@@ -3900,7 +3905,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION='v166';
+  var VERSION='v164';
   var BUILD='smfp-v164-rescue-clean-send-meter-eq-20260518';
   try{document.documentElement.setAttribute('data-smfp-version','v162');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
@@ -4658,7 +4663,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION='v166';
+  var VERSION='v164';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4980,12 +4985,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- SMFP_v166_PC_LEVEL_META_RESTORE_SINGLE_EQ
+<!-- SMFP_v164_RESCUE_CLEAN_SEND_METER_EQ
      Erstellt: 2026-05-18
      Geändert: 2026-05-18
-     Zweck: Rescue auf v164-Basis: PC-Levelmeter/Metadaten unverändert wiederherstellen und nur den zweiten sichtbaren EQ-Part entfernen.
-     Regeln: Keine neue Engine, keine neuen Layer, iPhone unverändert; PC: Levelmeter/Meta bleiben original, sichtbarer Doppel-EQ wird durch Entfernen der Visualizer-EQ-Sektion bereinigt. -->
-<style id="smfpV166PcLevelMetaRestoreCss">
+     Zweck: Rettungsfix nach v163: falsches BROADCAST READY entfernen, keine Zusatz-Overlay-Layer, Sendestatus am echten vorhandenen Dialog, iPhone-Performance entlasten, unteres Levelmeter beruhigen, PC-Doppel-EQ entfernen.
+     Regeln: Kein neuer Player, keine neue Boost-Engine, kein PC-Layout-Umbau außer Entfernen des zweiten gespiegelten EQ-Panels. -->
+<style id="smfpV164RescueCleanCss">
   #pcRealEqPanelMirror{display:none!important;visibility:hidden!important;pointer-events:none!important;}
   @media (min-width:761px){
     body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
@@ -5000,7 +5005,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       z-index:32!important;
     }
     body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{z-index:45!important;pointer-events:auto!important;}
-    body #pcVersionBadge .status-code::after{content:"v166"!important;}
+    body #pcVersionBadge .status-code::after{content:"v164"!important;}
   }
   @media (max-width:760px){
     #mffBroadcastDisplay,#mffInlineBroadcastPanel{display:none!important;visibility:hidden!important;pointer-events:none!important;}
@@ -5008,32 +5013,32 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     #mffApp .mff-alert-editor-backdrop.is-open{display:flex!important;}
     #mffApp .mff-alert-editor{pointer-events:auto!important;}
     #mffApp #mffAlertOpen,.mff-alert-open{pointer-events:auto!important;touch-action:manipulation!important;z-index:2147482000!important;}
-    #mffApp .mff-alert-editor .smfp-send-status-v166{
+    #mffApp .mff-alert-editor .smfp-send-status-v164{
       min-height:18px!important;margin:8px 0 0!important;padding:5px 8px!important;border-radius:10px!important;
       border:1px solid rgba(22,255,243,.38)!important;background:rgba(2,8,18,.74)!important;
       color:#20fff4!important;font-size:10px!important;font-weight:900!important;letter-spacing:.06em!important;text-align:center!important;
       box-shadow:inset 0 0 10px rgba(22,255,243,.06)!important;
     }
-    #mffApp .mff-alert-editor .smfp-send-status-v166.is-ok{color:#20fff4!important;border-color:rgba(22,255,243,.72)!important;box-shadow:0 0 12px rgba(22,255,243,.18)!important;}
-    #mffApp .mff-alert-editor .smfp-send-status-v166.is-error{color:#ff3d68!important;border-color:rgba(255,61,104,.78)!important;box-shadow:0 0 12px rgba(255,61,104,.18)!important;}
+    #mffApp .mff-alert-editor .smfp-send-status-v164.is-ok{color:#20fff4!important;border-color:rgba(22,255,243,.72)!important;box-shadow:0 0 12px rgba(22,255,243,.18)!important;}
+    #mffApp .mff-alert-editor .smfp-send-status-v164.is-error{color:#ff3d68!important;border-color:rgba(255,61,104,.78)!important;box-shadow:0 0 12px rgba(255,61,104,.18)!important;}
     /* Unteres Levelmeter: keine künstlichen Sinus-Ausreißer mehr; ruhiger, audioabhängiger Hub. */
     #mffApp .mff-bottom{height:52px!important;min-height:52px!important;padding:8px 10px!important;}
     #mffApp .mff-bottom-bars{height:32px!important;max-height:32px!important;gap:2px!important;align-items:center!important;overflow:hidden!important;}
     #mffApp .mff-bottom-bars i{
       height:24px!important;min-height:24px!important;max-height:24px!important;border-radius:4px!important;
-      transform:scaleY(var(--smfp-v166-bottom-scale,.62))!important;
-      opacity:var(--smfp-v166-bottom-opacity,.72)!important;
+      transform:scaleY(var(--smfp-v164-bottom-scale,.62))!important;
+      opacity:var(--smfp-v164-bottom-opacity,.72)!important;
       transition:transform 150ms ease-out,opacity 150ms ease-out,filter 150ms ease-out!important;
       animation:none!important;
     }
     #mffApp .mff-bottom-bars i.mff-seg-on{filter:brightness(1.04) saturate(1.08)!important;}
   }
 </style>
-<script id="smfpV166PcLevelMetaRestoreScript">
+<script id="smfpV164RescueCleanScript">
 (function(){
   'use strict';
-  if(window.__smfpV166PcLevelMetaRestore) return; window.__smfpV166PcLevelMetaRestore=true;
-  var VERSION='v166';
+  if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
+  var VERSION='v164';
   var SEND_URL='/api/player-alert/send';
   var SENDER_KEY='smfpPlayerAlertSenderId';
   function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
@@ -5052,8 +5057,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   function ensureStatus(back){
     var box=qs('.mff-alert-editor',back||document); if(!box) return null;
-    var s=qs('.smfp-send-status-v166',box);
-    if(!s){s=document.createElement('div');s.className='smfp-send-status-v166';s.setAttribute('aria-live','polite');s.textContent='READY';box.appendChild(s);} return s;
+    var s=qs('.smfp-send-status-v164',box);
+    if(!s){s=document.createElement('div');s.className='smfp-send-status-v164';s.setAttribute('aria-live','polite');s.textContent='READY';box.appendChild(s);} return s;
   }
   function status(text,type){
     var s=ensureStatus(qs('#mffAlertEditorBackdrop'));
@@ -5133,8 +5138,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var target=readLevel(); smooth=smooth*.82+target*.18;
     var scale=(.34+smooth*.72).toFixed(3);
     var op=(.40+smooth*.48).toFixed(3);
-    app.style.setProperty('--smfp-v166-bottom-scale',scale);
-    app.style.setProperty('--smfp-v166-bottom-opacity',op);
+    app.style.setProperty('--smfp-v164-bottom-scale',scale);
+    app.style.setProperty('--smfp-v164-bottom-opacity',op);
     var bars=qsa('#mffApp .mff-bottom-bars i');
     var mid=(bars.length-1)/2;
     bars.forEach(function(el,i){
@@ -5150,40 +5155,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('orientationchange',function(){setTimeout(boot,300);},{passive:true});
   [200,700,1500,3200].forEach(function(ms){setTimeout(boot,ms);});
   setInterval(calmBottom,180);
-})();
-</script>
-
-
-<!-- SMFP_v166_PC_SINGLE_EQ_GUARD
-     Erstellt: 2026-05-18
-     Geändert: 2026-05-18
-     Zweck: PC-Doppel-EQ entfernen ohne Levelmeter/Metadata zu beschädigen. Entfernt nur den sichtbaren Visualizer-EQ-Part; Real-10-Band-EQ bleibt. -->
-<style id="smfpV166PcSingleEqGuard">
-@media (min-width:761px){
-  body .frame-stage .player-shell section.visualizer,
-  body .frame-stage .player-shell .visualizer:has(#eqBars),
-  body .frame-stage .player-shell #eqBars{display:none!important;visibility:hidden!important;pointer-events:none!important;}
-  body .side-meter, body #pcBottomSyncMeter, body .meta-line, body #metaLine{visibility:visible!important;}
-}
-</style>
-
-
-<script id="smfpV166FinalVersionLock">
-(function(){
-  var VERSION='v166';
-  function apply(){
-    try{document.documentElement.setAttribute('data-smfp-version',VERSION);}catch(e){}
-    try{var m=document.querySelector('meta[name="smfp-version"]'); if(m)m.setAttribute('content',VERSION);}catch(e){}
-    try{document.querySelectorAll('.status-code,.smfp-version-badge,.mff-version-inline,#pcVersionBadge').forEach(function(el){
-      if(!el)return;
-      var slot=el.querySelector&&el.querySelector('.status-code');
-      if(slot) slot.textContent=VERSION;
-      else if(/^v\d+/i.test((el.textContent||'').trim())) el.textContent=VERSION;
-    });}catch(e){}
-  }
-  apply();
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});
-  setTimeout(apply,300);setTimeout(apply,1200);
 })();
 </script>
 
