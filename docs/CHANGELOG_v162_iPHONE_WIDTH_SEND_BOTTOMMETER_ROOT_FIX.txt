@@ -1,0 +1,11 @@
+666SOUNDsDESIGn WebRadio — v162 iPHONE WIDTH + SEND + BOTTOMMETER ROOT FIX
+
+BASIS: v161
+
+ÄNDERUNGEN:
+- iPhone-only: Playerbreite wieder näher an die Seiten-Levelmeter gesetzt, ohne PC-Geometrie zu verändern.
+- Seiten-Levelmeter bleiben vollständig sichtbar und werden nicht durch neue Layer ersetzt.
+- Bestehender SEND-Button bleibt erhalten; zusätzlicher Hitbox-/Capture-Guard öffnet denselben Broadcasterposter auch dann, wenn ein altes Overlay den Touch schluckt.
+- Bestehender SEND-Endpoint bleibt /api/player-alert/send, analog PC.
+- Unteres Levelmeter stärker audioreaktiv gemacht: schnellere Segmente, größere Skalierung, höhere Sättigung/Leuchtkraft.
+- Keine neue Topbar, keine neuen sichtbaren Player-Buttons, keine neue Boost-Engine.

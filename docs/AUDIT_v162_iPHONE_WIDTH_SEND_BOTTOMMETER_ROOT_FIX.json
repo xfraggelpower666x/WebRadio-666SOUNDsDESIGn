@@ -1,0 +1,16 @@
+{
+  "version":"v162",
+  "base":"v161",
+  "scope":"iPhone-only root repair",
+  "pcGeometryChanged":false,
+  "newTopbar":false,
+  "newVisiblePlayerButtons":false,
+  "newBoostEngine":false,
+  "fixes":[
+    "player shell width adjusted relative to side meters",
+    "side meters kept visible",
+    "SEND button capture/hitbox guard added",
+    "mobile broadcaster editor forced above app",
+    "bottom levelmeter reactivity strengthened"
+  ]
+}
