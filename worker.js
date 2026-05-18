@@ -377,13 +377,13 @@ async function handlePlayerAlertV170(request, env = {}){
       message,
       senderId,
       source: playerAlertCleanText(payload.source || 'player').slice(0,40),
-      version: playerAlertCleanText(payload.version || 'v171').slice(0,20),
+      version: playerAlertCleanText(payload.version || 'v172').slice(0,20),
       createdAt:new Date(now).toISOString()
     };
     const storage = await playerAlertWrite(env, PLAYER_ALERT_KV_CURRENT, alert, PLAYER_ALERT_TTL_SECONDS);
     await playerAlertWrite(env, PLAYER_ALERT_KV_RATE, {last:now}, Math.ceil(PLAYER_ALERT_RATE_MS/1000));
     const discord = await playerAlertPostDiscord(env, alert);
-    return playerAlertJson({...alert, storage, discord});
+    return playerAlertJson({...alert, storage, playerDelivery:{ok:true, storage}, discord});
   }
   return playerAlertJson({ok:false,error:'not_found'},404);
 }
