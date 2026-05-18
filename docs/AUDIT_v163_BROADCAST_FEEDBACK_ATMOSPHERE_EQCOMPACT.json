@@ -1,0 +1,19 @@
+{
+  "version": "v163",
+  "created": "2026-05-18",
+  "modified": "2026-05-18",
+  "base": "v162",
+  "scope": [
+    "broadcast_send_feedback",
+    "mobile_inline_send_panel",
+    "mobile_broadcast_marquee_display",
+    "pc_lower_meter_compact",
+    "pc_iphone_atmospheric_adaptation",
+    "mobile_bottom_meter_reactivity"
+  ],
+  "secrets_written": false,
+  "pc_layout_rebuilt": false,
+  "new_buttons_added": false,
+  "existing_send_trigger_reused": true,
+  "docs_in_docs_folder": true
+}

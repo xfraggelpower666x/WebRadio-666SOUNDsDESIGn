@@ -1,0 +1,38 @@
+666SOUNDsDESIGn WebRadio — REPORT v163
+Created: 2026-05-18
+Modified: 2026-05-18
+Purpose: Full package update after v162. Collects the requested task batch before creating the next version.
+
+Changes:
+1. Broadcaster send feedback added:
+   - SENDING...
+   - BROADCAST SENT ✓
+   - SEND FAILED ✕
+   - ENTER MESSAGE FIRST
+   - rate-limit / HTTP errors surfaced where available.
+
+2. iPhone SEND no longer depends on a large overlay for the normal message flow:
+   - Adds a compact inline player send panel.
+   - Adds a small in-player broadcast display with marquee behavior for long text.
+   - Keeps the existing SEND button as the trigger.
+
+3. Mobile bottom levelmeter reactivity strengthened:
+   - Faster update loop.
+   - Stronger transform/opacity variation.
+   - Less static full-on look.
+
+4. PC lower sync meter / mini EQ area compacted:
+   - Visible segment count reduced by CSS masking/hiding.
+   - Width clamped smaller and centered.
+   - Main PC EQ remains untouched.
+
+5. Atmospheric adaptation added for PC and iPhone:
+   - Light/day mode makes the player darker and more contrasty.
+   - Dark/night mode makes the player brighter/glowier.
+   - Implemented through central attributes and CSS variables, not layout rebuilds.
+
+Non-destructive constraints:
+- Full repo package produced.
+- Existing buttons reused.
+- No secrets added.
+- Docs stay in docs/.
