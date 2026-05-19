@@ -16,30 +16,31 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="v175" />
+  <meta name="smfp-version" content="v176" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v175-clean-version-eq-20260518" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v175-clean-version-eq-20260518" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v175-clean-version-eq-20260518" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v175-clean-version-eq-20260518" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v175-clean-version-eq-20260518" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v175-clean-version-eq-20260518" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v176-audio-core-20260518" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v176-audio-core-20260518" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v176-audio-core-20260518" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v176-audio-core-20260518" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v176-audio-core-20260518" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v176-audio-core-20260518" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v175-clean-version-eq-20260518" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v175-clean-version-eq-20260518">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v175-clean-version-eq-20260518">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v175-clean-version-eq-20260518">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v175-clean-version-eq-20260518">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v176-audio-core-20260518" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v176-audio-core-20260518">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v176-audio-core-20260518">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v176-audio-core-20260518">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v176-audio-core-20260518">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v175-clean-version-eq-20260518">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v176-audio-core-20260518">
+  <script src="/core/audio/boost-core.js?v=smfp-v176-audio-core-20260518"></script>
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -631,7 +632,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v175</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v176</span></div>
           </div>
         </div>
       </header>
@@ -640,13 +641,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v175-clean-version-eq-20260518" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v176-audio-core-20260518" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v175-clean-version-eq-20260518" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v176-audio-core-20260518" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v175-clean-version-eq-20260518" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v176-audio-core-20260518" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -663,6 +664,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <span class="boost-led" data-boost-led="2" title="Boost 2"></span>
     <span class="boost-led" data-boost-led="3" title="Boost 3"></span>
     <span class="boost-led" data-boost-led="4" title="Boost EXTREME 2.0"></span>
+    <span class="boost-led" data-boost-led="5" title="Boost EXTREME 2.2"></span>
   </div>
   <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen">+</button>
 </div>
@@ -825,7 +827,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v175-clean-version-eq-20260518"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v176-audio-core-20260518"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -1642,7 +1644,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v175-clean-version-eq-20260518')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v176-audio-core-20260518')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1657,7 +1659,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v175';
+  var VERSION='v176';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -1765,7 +1767,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var mffCleanEqValues=[];
   var mffCleanEqPhase=0;
   var mffCleanEqLoop=0;
-  var BOOST_GAINS=[1.00,1.30,1.60,1.90,2.00];
+  var BOOST_GAINS=(window.SMFPBoostCore&&window.SMFPBoostCore.stages?window.SMFPBoostCore.stages.map(function(x){return x.gain;}):[1.00,1.40,1.70,1.90,2.00,2.20]);
   var MFF_IDLE_TICKER_TEXT_V113='666SOUNDsDESIGn WebRadio';
   var MFF_LIVE_LOADING_TEXT_V113='Loading live metadata ...';
   var RAMP_UP=0.62;
@@ -1848,7 +1850,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       }
 
       var gain=ctx.createGain();
-      gain.gain.value=BOOST_GAINS[boostStage] || 1;
+      gain.gain.value=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
 
       var analyser=ctx.createAnalyser();
       analyser.fftSize=128;
@@ -1896,7 +1898,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       return audioGraph;
     }catch(e){
       console.warn('[666 boost] WebAudio fallback',e);
-      try{audio.volume=Math.min(1,BOOST_GAINS[boostStage]||1)}catch(_){}
+      try{audio.volume=Math.min(1,(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage]||1)))}catch(_){}
       audioGraph={audio:audio,ok:false,error:String(e)};
       document.documentElement.setAttribute('data-mff-boost-engine','volume-fallback');
       return audioGraph;
@@ -1904,7 +1906,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function applyBoostRamp(previousStage){
-    var target=BOOST_GAINS[boostStage] || 1;
+    var target=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
     var app=q('#mffApp');
     if(app){
       app.setAttribute('data-mff-boost-stage',String(boostStage));
@@ -1923,6 +1925,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     document.documentElement.setAttribute('data-mff-boost',String(boostStage));
     document.documentElement.setAttribute('data-mff-boost-gain',String(target));
+    try{if(window.SMFPBoostCore){boostStage=window.SMFPBoostCore.saveStage(boostStage);window.SMFPBoostCore.publish(boostStage,target,'mff-inline');}}catch(e){}
 
     var graph=ensureAudioGraph();
     if(graph && graph.ok && graph.gain && graph.ctx){
@@ -2130,7 +2133,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       var b=document.createElement('div');
       b.id='mffExtremeBoostBackdrop';
       b.className='mff-extreme-boost-backdrop';
-      b.innerHTML='<div class="mff-extreme-boost-modal" role="dialog" aria-modal="true"><h3>EXTREME BOOST MODE</h3><p>Boost 2.0 can damage speakers or headphones and may increase distortion. Use carefully.</p><div class="mff-extreme-boost-actions"><button type="button" data-extreme="cancel">CANCEL</button><button type="button" data-extreme="ok">OK</button></div></div>';
+      b.innerHTML='<div class="mff-extreme-boost-modal" role="dialog" aria-modal="true"><h3>EXTREME BOOST MODE</h3><p>Boost 2.0 / 2.2 can damage speakers or headphones and may increase distortion. Use carefully.</p><div class="mff-extreme-boost-actions"><button type="button" data-extreme="cancel">CANCEL</button><button type="button" data-extreme="ok">OK</button></div></div>';
       document.body.appendChild(b);
       function done(v){try{b.remove()}catch(e){} resolve(v);}
       b.addEventListener('click',function(ev){
@@ -2144,8 +2147,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   function boost(d){
     var prev=boostStage;
-    var next=Math.max(0,Math.min(4,boostStage+d));
-    if(next===4 && boostStage!==4){
+    var maxStage=(window.SMFPBoostCore?window.SMFPBoostCore.maxStage():BOOST_GAINS.length-1);
+    var next=Math.max(0,Math.min(maxStage,boostStage+d));
+    if((window.SMFPBoostCore?window.SMFPBoostCore.isDanger(next):next>=4) && !(window.SMFPBoostCore?window.SMFPBoostCore.isDanger(boostStage):boostStage>=4)){
       showMffExtremeBoostWarning().then(function(ok){
         if(!ok){applyBoostRamp(boostStage);return;}
         boostStage=4; applyBoostRamp(prev);
@@ -2295,7 +2299,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v175</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v176</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -3258,10 +3262,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v175';
+  var VERSION='v176';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','v175');
+    document.documentElement.setAttribute('data-smfp-version','v176');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
@@ -3716,9 +3720,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION='v175';
-  var BUILD='smfp-v175-clean-version-eq-20260518';
-  try{document.documentElement.setAttribute('data-smfp-version','v175');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
+  var VERSION='v176';
+  var BUILD='smfp-v176-audio-core-20260518';
+  try{document.documentElement.setAttribute('data-smfp-version','v176');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
   function apply(){
     setText(document.getElementById('pcVersionBadge'));
@@ -3728,7 +3732,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',apply,{once:true});
 })();
 </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v175-clean-version-eq-20260518" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v176-audio-core-20260518" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3953,7 +3957,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4033,7 +4037,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4140,7 +4144,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4226,7 +4230,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4302,7 +4306,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4369,7 +4373,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     gap:7px!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4415,7 +4419,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body .pc-addon-core{left:18px!important;right:18px!important;}
   body .pc-addon-spectrum{left:18px!important;right:18px!important;gap:6px!important;}
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4474,7 +4478,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION='v175';
+  var VERSION='v176';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4573,7 +4577,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       z-index:32!important;
     }
     body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{z-index:45!important;pointer-events:auto!important;}
-    body #pcVersionBadge .status-code::after{content:"v175"!important;}
+    body #pcVersionBadge .status-code::after{content:"v176"!important;}
   }
   @media (max-width:760px){
     #mffBroadcastDisplay,#mffInlineBroadcastPanel{display:none!important;visibility:hidden!important;pointer-events:none!important;}
@@ -4606,7 +4610,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 (function(){
   'use strict';
   if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
-  var VERSION='v175';
+  var VERSION='v176';
   var SEND_URL='/api/player-alert/send';
   var SENDER_KEY='smfpPlayerAlertSenderId';
   function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
@@ -4661,7 +4665,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(btn){btn.disabled=true;btn.textContent='SENDING';}
     status('SENDING...',null);
     try{
-      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v175',version:VERSION}),cache:'no-store'});
+      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v176',version:VERSION}),cache:'no-store'});
       var d={}; try{d=await r.json();}catch(_){ }
       if(!r.ok || d.ok===false){
         var m=d.error||d.message||('HTTP '+r.status);
