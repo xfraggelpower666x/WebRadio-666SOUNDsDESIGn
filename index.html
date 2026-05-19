@@ -16,31 +16,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="v176" />
+  <meta name="smfp-version" content="v172" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v176-audio-core-20260518" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v176-audio-core-20260518" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v176-audio-core-20260518" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v176-audio-core-20260518" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v176-audio-core-20260518" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v176-audio-core-20260518" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v172-msg-version-eq-nudge-20260518" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v172-msg-version-eq-nudge-20260518" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v172-msg-version-eq-nudge-20260518" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v172-msg-version-eq-nudge-20260518" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v172-msg-version-eq-nudge-20260518" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v172-msg-version-eq-nudge-20260518" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v176-audio-core-20260518" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v176-audio-core-20260518">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v176-audio-core-20260518">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v176-audio-core-20260518">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v176-audio-core-20260518">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v172-msg-version-eq-nudge-20260518" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v172-msg-version-eq-nudge-20260518">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v172-msg-version-eq-nudge-20260518">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v172-msg-version-eq-nudge-20260518">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v172-msg-version-eq-nudge-20260518">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v176-audio-core-20260518">
-  <script src="/core/audio/boost-core.js?v=smfp-v176-audio-core-20260518"></script>
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v172-msg-version-eq-nudge-20260518">
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -434,6 +433,195 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 <!-- SMFP_v159_PC_BOTTOM_GEOMETRY_DUAL_EQ_FINAL
      Scope: PC lower now-playing geometry only. No transport, ticker logic, discord backend, worker/stream, or mobile layout changes. -->
+<style id="smfpPcDualEqBottomLayoutV157Final">
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing{
+    position:relative!important;
+    min-height:184px!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+  /* Ticker lane back up, full usable width from now-playing text start to right panel edge. */
+  body .frame-stage .player-shell .now-playing .ticker-window{
+    position:absolute!important;
+    left:170px!important;
+    right:20px!important;
+    bottom:104px!important;
+    top:auto!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    width:auto!important;
+    max-width:none!important;
+    margin:0!important;
+    z-index:22!important;
+    overflow:hidden!important;
+  }
+  body .frame-stage .player-shell .now-playing .ticker-window #nowPlayingTicker,
+  body .frame-stage .player-shell .now-playing .ticker-window .ticker-text{
+    height:28px!important;
+    line-height:28px!important;
+    color:#29fff4!important;
+    text-shadow:0 0 9px rgba(22,255,243,.58),0 0 14px rgba(22,255,243,.22)!important;
+  }
+  /* SEND row directly below ticker; text field -> SEND -> History with breathing room. */
+  body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{
+    position:absolute!important;
+    right:128px!important;
+    bottom:66px!important;
+    top:auto!important;
+    left:auto!important;
+    z-index:34!important;
+    width:380px!important;
+    max-width:min(380px,calc(100% - 300px))!important;
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+    padding:0!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+  body .frame-stage .player-shell .now-playing #historyToggle{
+    position:absolute!important;
+    right:20px!important;
+    bottom:66px!important;
+    top:auto!important;
+    left:auto!important;
+    z-index:33!important;
+    width:96px!important;
+    min-width:96px!important;
+    max-width:96px!important;
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 10px!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+  }
+  body .frame-stage .player-shell .now-playing #playerAlertPcText.player-alert-pc-text{
+    flex:1 1 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:310px!important;
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+    line-height:12px!important;
+    font-size:10px!important;
+    padding:5px 8px!important;
+    box-sizing:border-box!important;
+  }
+  body .frame-stage .player-shell .now-playing #playerAlertPcSend.player-alert-send-btn{
+    flex:0 0 58px!important;
+    width:58px!important;
+    min-width:58px!important;
+    max-width:58px!important;
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+  }
+  /* Dual mirrored EQs in the freed lower slot. Existing EQ is left, mirror is right. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror.pc-real-eq-panel{
+    position:absolute!important;
+    bottom:10px!important;
+    top:auto!important;
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
+    z-index:31!important;
+    display:grid!important;
+    grid-template-columns:42px repeat(10,minmax(14px,1fr))!important;
+    align-items:end!important;
+    gap:4px!important;
+    padding:5px 7px 4px!important;
+    box-sizing:border-box!important;
+    border-radius:13px!important;
+    border:1px solid rgba(22,255,243,.38)!important;
+    background:linear-gradient(180deg,rgba(4,8,20,.66),rgba(7,4,24,.78))!important;
+    box-shadow:inset 0 0 14px rgba(22,255,243,.07),0 0 12px rgba(255,61,187,.10)!important;
+    overflow:hidden!important;
+    pointer-events:auto!important;
+    margin:0!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    left:170px!important;
+    right:auto!important;
+    width:calc((100% - 190px)/2 - 6px)!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror.pc-real-eq-panel{
+    left:calc(170px + ((100% - 190px)/2) + 6px)!important;
+    right:20px!important;
+    width:auto!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-title,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-title{
+    font-size:7px!important;
+    line-height:1.05!important;
+    letter-spacing:.08em!important;
+    align-self:center!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-band{
+    height:40px!important;
+    grid-template-rows:8px 24px 7px!important;
+    font-size:5.6px!important;
+    gap:0!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band b,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-band b{font-size:5.6px!important;}
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range],
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]{
+    width:25px!important;
+    height:22px!important;
+  }
+}
+@media (max-width:760px){#pcRealEqPanel,#pcRealEqPanelMirror{display:none!important;}}
+</style>
+<script id="smfpPcDualEqMirrorV157Final">
+(function(){
+  function bind(){
+    var primary=document.getElementById('pcRealEqPanel');
+    var mirror=document.getElementById('pcRealEqPanelMirror');
+    if(!primary||!mirror||mirror.__smfpMirrorBound)return;
+    mirror.__smfpMirrorBound=true;
+    function valText(input){var b=input&&input.parentElement?input.parentElement.querySelector('b'):null;if(b)b.textContent=String(input.value||0);}
+    function syncFromPrimary(){
+      mirror.querySelectorAll('input[data-smfp-eq-mirror]').forEach(function(mi){
+        var key=mi.getAttribute('data-smfp-eq-mirror');
+        var pi=primary.querySelector('input[data-smfp-eq="'+key+'"]');
+        if(pi){mi.value=pi.value;valText(mi);}
+      });
+    }
+    primary.querySelectorAll('input[data-smfp-eq]').forEach(function(pi){
+      pi.addEventListener('input',syncFromPrimary,{passive:true});
+      pi.addEventListener('change',syncFromPrimary,{passive:true});
+    });
+    mirror.querySelectorAll('input[data-smfp-eq-mirror]').forEach(function(mi){
+      mi.addEventListener('input',function(){
+        var key=mi.getAttribute('data-smfp-eq-mirror');
+        var pi=primary.querySelector('input[data-smfp-eq="'+key+'"]');
+        if(pi){pi.value=mi.value;pi.dispatchEvent(new Event('input',{bubbles:true}));pi.dispatchEvent(new Event('change',{bubbles:true}));}
+        valText(mi);
+      },{passive:true});
+      mi.addEventListener('change',function(){mi.dispatchEvent(new Event('input',{bubbles:true}));},{passive:true});
+    });
+    syncFromPrimary();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+  setTimeout(bind,600);
+})();
+</script>
+
+
 <style id="v162IphoneSendBoostRootFix">
 /*
   666SOUNDsDESIGn — v162 iPHONE SEND + BOOST ROOT FIX
@@ -632,7 +820,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v176</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">V172</span></div>
           </div>
         </div>
       </header>
@@ -641,13 +829,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v176-audio-core-20260518" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v172-msg-version-eq-nudge-20260518" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v176-audio-core-20260518" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v172-msg-version-eq-nudge-20260518" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v176-audio-core-20260518" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v172-msg-version-eq-nudge-20260518" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -664,7 +852,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <span class="boost-led" data-boost-led="2" title="Boost 2"></span>
     <span class="boost-led" data-boost-led="3" title="Boost 3"></span>
     <span class="boost-led" data-boost-led="4" title="Boost EXTREME 2.0"></span>
-    <span class="boost-led" data-boost-led="5" title="Boost EXTREME 2.2"></span>
   </div>
   <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen">+</button>
 </div>
@@ -827,7 +1014,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v176-audio-core-20260518"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v172-msg-version-eq-nudge-20260518"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -1644,7 +1831,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v176-audio-core-20260518')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v172-msg-version-eq-nudge-20260518')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1659,7 +1846,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v176';
+  var VERSION='v172';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -1767,7 +1954,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var mffCleanEqValues=[];
   var mffCleanEqPhase=0;
   var mffCleanEqLoop=0;
-  var BOOST_GAINS=(window.SMFPBoostCore&&window.SMFPBoostCore.stages?window.SMFPBoostCore.stages.map(function(x){return x.gain;}):[1.00,1.40,1.70,1.90,2.00,2.20]);
+  var BOOST_GAINS=[1.00,1.30,1.60,1.90,2.00];
   var MFF_IDLE_TICKER_TEXT_V113='666SOUNDsDESIGn WebRadio';
   var MFF_LIVE_LOADING_TEXT_V113='Loading live metadata ...';
   var RAMP_UP=0.62;
@@ -1850,7 +2037,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       }
 
       var gain=ctx.createGain();
-      gain.gain.value=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
+      gain.gain.value=BOOST_GAINS[boostStage] || 1;
 
       var analyser=ctx.createAnalyser();
       analyser.fftSize=128;
@@ -1898,7 +2085,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       return audioGraph;
     }catch(e){
       console.warn('[666 boost] WebAudio fallback',e);
-      try{audio.volume=Math.min(1,(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage]||1)))}catch(_){}
+      try{audio.volume=Math.min(1,BOOST_GAINS[boostStage]||1)}catch(_){}
       audioGraph={audio:audio,ok:false,error:String(e)};
       document.documentElement.setAttribute('data-mff-boost-engine','volume-fallback');
       return audioGraph;
@@ -1906,7 +2093,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function applyBoostRamp(previousStage){
-    var target=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
+    var target=BOOST_GAINS[boostStage] || 1;
     var app=q('#mffApp');
     if(app){
       app.setAttribute('data-mff-boost-stage',String(boostStage));
@@ -1925,7 +2112,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     document.documentElement.setAttribute('data-mff-boost',String(boostStage));
     document.documentElement.setAttribute('data-mff-boost-gain',String(target));
-    try{if(window.SMFPBoostCore){boostStage=window.SMFPBoostCore.saveStage(boostStage);window.SMFPBoostCore.publish(boostStage,target,'mff-inline');}}catch(e){}
 
     var graph=ensureAudioGraph();
     if(graph && graph.ok && graph.gain && graph.ctx){
@@ -2133,7 +2319,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       var b=document.createElement('div');
       b.id='mffExtremeBoostBackdrop';
       b.className='mff-extreme-boost-backdrop';
-      b.innerHTML='<div class="mff-extreme-boost-modal" role="dialog" aria-modal="true"><h3>EXTREME BOOST MODE</h3><p>Boost 2.0 / 2.2 can damage speakers or headphones and may increase distortion. Use carefully.</p><div class="mff-extreme-boost-actions"><button type="button" data-extreme="cancel">CANCEL</button><button type="button" data-extreme="ok">OK</button></div></div>';
+      b.innerHTML='<div class="mff-extreme-boost-modal" role="dialog" aria-modal="true"><h3>EXTREME BOOST MODE</h3><p>Boost 2.0 can damage speakers or headphones and may increase distortion. Use carefully.</p><div class="mff-extreme-boost-actions"><button type="button" data-extreme="cancel">CANCEL</button><button type="button" data-extreme="ok">OK</button></div></div>';
       document.body.appendChild(b);
       function done(v){try{b.remove()}catch(e){} resolve(v);}
       b.addEventListener('click',function(ev){
@@ -2147,9 +2333,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   function boost(d){
     var prev=boostStage;
-    var maxStage=(window.SMFPBoostCore?window.SMFPBoostCore.maxStage():BOOST_GAINS.length-1);
-    var next=Math.max(0,Math.min(maxStage,boostStage+d));
-    if((window.SMFPBoostCore?window.SMFPBoostCore.isDanger(next):next>=4) && !(window.SMFPBoostCore?window.SMFPBoostCore.isDanger(boostStage):boostStage>=4)){
+    var next=Math.max(0,Math.min(4,boostStage+d));
+    if(next===4 && boostStage!==4){
       showMffExtremeBoostWarning().then(function(ok){
         if(!ok){applyBoostRamp(boostStage);return;}
         boostStage=4; applyBoostRamp(prev);
@@ -2299,7 +2484,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v176</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">V172</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -3262,15 +3447,15 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v176';
+  var VERSION='v172';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','v176');
+    document.documentElement.setAttribute('data-smfp-version','v162');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
     var app=document.getElementById('mffApp');
-    if(app) app.setAttribute('data-version',VERSION);
+    if(app) app.setAttribute('data-version','v162');
   }
   function lockMobileViewport(){
     var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -3720,9 +3905,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION='v176';
-  var BUILD='smfp-v176-audio-core-20260518';
-  try{document.documentElement.setAttribute('data-smfp-version','v176');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
+  var VERSION='v172';
+  var BUILD='smfp-v172-msg-version-eq-nudge-20260518';
+  try{document.documentElement.setAttribute('data-smfp-version','v162');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
   function apply(){
     setText(document.getElementById('pcVersionBadge'));
@@ -3732,7 +3917,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',apply,{once:true});
 })();
 </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v176-audio-core-20260518" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v172-msg-version-eq-nudge-20260518" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3957,7 +4142,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4037,7 +4222,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4144,7 +4329,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4230,7 +4415,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4306,7 +4491,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4373,7 +4558,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     gap:7px!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4419,7 +4604,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body .pc-addon-core{left:18px!important;right:18px!important;}
   body .pc-addon-spectrum{left:18px!important;right:18px!important;gap:6px!important;}
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v176"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4478,7 +4663,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION='v176';
+  var VERSION='v172';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4556,15 +4741,258 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 <!-- SMFP_v159_PC_DUAL_EQ_TRUE_MIRROR_CLEAN
      Scope: PC lower now-playing EQ geometry only. Uses the existing left EQ style twice, mirrored right; removes side title text; moves SEND group left; makes slider thumbs visually audio-reactive via existing --mff-level. No new audio/RAF/interval loop. -->
+<style id="smfpPcDualEqTrueMirrorCleanV157">
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing{
+    position:relative!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  /* SEND/Textfeld nach links, damit History frei bleibt und nichts verdeckt. */
+  body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{
+    right:156px!important;
+    bottom:66px!important;
+    width:352px!important;
+    max-width:min(352px,calc(100% - 330px))!important;
+    gap:8px!important;
+  }
+  body .frame-stage .player-shell .now-playing #playerAlertPcText.player-alert-pc-text{
+    max-width:286px!important;
+  }
+  body .frame-stage .player-shell .now-playing #playerAlertPcSend.player-alert-send-btn{
+    flex:0 0 58px!important;
+    width:58px!important;
+    min-width:58px!important;
+    max-width:58px!important;
+  }
+
+  /* Beide EQs: gleicher Typ, gleiche Optik, kein linker/rechter Titeltext. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror.pc-real-eq-panel{
+    position:absolute!important;
+    bottom:10px!important;
+    top:auto!important;
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
+    z-index:31!important;
+    display:grid!important;
+    grid-template-columns:repeat(10,minmax(14px,1fr))!important;
+    align-items:end!important;
+    justify-items:center!important;
+    gap:4px!important;
+    padding:5px 7px 4px!important;
+    box-sizing:border-box!important;
+    border-radius:13px!important;
+    border:1px solid rgba(22,255,243,.38)!important;
+    background:linear-gradient(180deg,rgba(4,8,20,.66),rgba(7,4,24,.78))!important;
+    box-shadow:inset 0 0 14px rgba(22,255,243,.07),0 0 12px rgba(255,61,187,.10)!important;
+    overflow:hidden!important;
+    pointer-events:auto!important;
+    margin:0!important;
+  }
+
+  /* Gesamtlänge bleibt innerhalb der Tickerbreite: links 170px bis rechts 20px. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    left:170px!important;
+    right:auto!important;
+    width:calc((100% - 190px - 10px)/2)!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror.pc-real-eq-panel{
+    left:calc(170px + ((100% - 190px - 10px)/2) + 10px)!important;
+    right:20px!important;
+    width:auto!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-title,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-title{
+    display:none!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-band{
+    height:40px!important;
+    min-width:0!important;
+    display:grid!important;
+    grid-template-rows:8px 24px 7px!important;
+    align-items:center!important;
+    justify-items:center!important;
+    gap:0!important;
+    margin:0!important;
+    padding:0!important;
+    color:#f7f8ff!important;
+    font-size:5.6px!important;
+    font-weight:900!important;
+    letter-spacing:.035em!important;
+    text-transform:uppercase!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band span,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-band span{
+    color:rgba(247,248,255,.78)!important;
+    text-shadow:0 0 6px rgba(22,255,243,.24)!important;
+    white-space:nowrap!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band b,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-band b{
+    color:#16fff3!important;
+    font-size:5.6px!important;
+    font-weight:950!important;
+    text-shadow:0 0 7px rgba(22,255,243,.48)!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range],
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]{
+    -webkit-appearance:none!important;
+    appearance:none!important;
+    width:25px!important;
+    height:22px!important;
+    margin:0!important;
+    transform:rotate(-90deg)!important;
+    background:transparent!important;
+    outline:none!important;
+    cursor:pointer!important;
+    filter:brightness(calc(.86 + (var(--mff-level, .20) * .70))) saturate(calc(1 + (var(--mff-level, .20) * .75)))!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]::-webkit-slider-runnable-track,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]::-webkit-slider-runnable-track{
+    height:5px!important;
+    border-radius:99px!important;
+    background:linear-gradient(90deg,#16fff3,#7e5cff,#ff3dbb)!important;
+    box-shadow:0 0 calc(5px + (var(--mff-level, .20) * 14px)) rgba(22,255,243,.36)!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]::-webkit-slider-thumb,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none!important;
+    width:11px!important;
+    height:11px!important;
+    border-radius:50%!important;
+    background:#16fff3!important;
+    border:1px solid rgba(255,255,255,.76)!important;
+    box-shadow:0 0 calc(8px + (var(--mff-level, .20) * 14px)) rgba(22,255,243,.85),0 0 calc(6px + (var(--mff-level, .20) * 10px)) rgba(255,61,187,.44)!important;
+    margin-top:-3px!important;
+    transform:scale(calc(.92 + (var(--mff-level, .20) * .34)))!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]::-moz-range-track,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]::-moz-range-track{
+    height:5px!important;
+    border-radius:99px!important;
+    background:linear-gradient(90deg,#16fff3,#7e5cff,#ff3dbb)!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]::-moz-range-thumb,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]::-moz-range-thumb{
+    width:11px!important;
+    height:11px!important;
+    border-radius:50%!important;
+    background:#16fff3!important;
+    border:1px solid rgba(255,255,255,.76)!important;
+    box-shadow:0 0 calc(8px + (var(--mff-level, .20) * 14px)) rgba(22,255,243,.85),0 0 calc(6px + (var(--mff-level, .20) * 10px)) rgba(255,61,187,.44)!important;
+  }
+
+  /* sichtbare Version hart setzen */
+  body #pcVersionBadge .status-code{font-size:0!important;}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important;}
+}
+@media (max-width:760px){#pcRealEqPanel,#pcRealEqPanelMirror{display:none!important;}}
+</style>
+
+
+
 <!-- SMFP_v159_PC_TICKER_EQ_WIDTH_INNER_DOT_FIX
      Scope: PC bottom ticker/EQ geometry only. Extends ticker lane slightly, clamps both mirrored EQs to exactly the same total width, moves SEND group left, keeps cyan thumbs with pink audio-reactive inner dot. No transport, ticker logic, stream, worker, iPhone, or new audio loop changes. -->
+<style id="smfpPcTickerEqWidthInnerDotV159">
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing{
+    --smfp-bottom-left:150px;
+    --smfp-bottom-right:0px;
+    --smfp-eq-gap:10px;
+  }
+  /* Ticker lane: about half a centimeter more space on both sides compared to the previous 170/20 geometry. */
+  body .frame-stage .player-shell .now-playing .ticker-window{
+    left:var(--smfp-bottom-left)!important;
+    right:var(--smfp-bottom-right)!important;
+    width:auto!important;
+    max-width:none!important;
+  }
+
+  /* SEND/text field moved left so the right side has breathing room near SEND/History. */
+  body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{
+    right:188px!important;
+    width:336px!important;
+    max-width:min(336px,calc(100% - 345px))!important;
+  }
+  body .frame-stage .player-shell .now-playing #playerAlertPcText.player-alert-pc-text{
+    max-width:270px!important;
+  }
+
+  /* Both EQ panels together are exactly clamped to the ticker lane width. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror.pc-real-eq-panel{
+    bottom:10px!important;
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
+    grid-template-columns:repeat(10,minmax(12px,1fr))!important;
+    gap:3px!important;
+    padding:5px 6px 4px!important;
+    box-sizing:border-box!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    left:var(--smfp-bottom-left)!important;
+    right:auto!important;
+    width:calc((100% - var(--smfp-bottom-left) - var(--smfp-bottom-right) - var(--smfp-eq-gap)) / 2)!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror.pc-real-eq-panel{
+    left:calc(var(--smfp-bottom-left) + ((100% - var(--smfp-bottom-left) - var(--smfp-bottom-right) - var(--smfp-eq-gap)) / 2) + var(--smfp-eq-gap))!important;
+    right:var(--smfp-bottom-right)!important;
+    width:auto!important;
+  }
+
+  /* No side title text; only the actual frequency controls remain. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-title,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror .pc-real-eq-title{
+    display:none!important;
+  }
+
+  /* Keep the draggable knobs cyan, with a pink audio-reactive core inside. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]::-webkit-slider-thumb,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]::-webkit-slider-thumb{
+    width:11px!important;
+    height:11px!important;
+    border-radius:50%!important;
+    background:radial-gradient(circle at 50% 50%, rgba(255,61,187,calc(.38 + (var(--mff-level,.20) * .62))) 0 28%, #16fff3 31% 100%)!important;
+    border:1px solid rgba(255,255,255,.82)!important;
+    box-shadow:0 0 calc(7px + (var(--mff-level,.20) * 13px)) rgba(22,255,243,.88),0 0 calc(5px + (var(--mff-level,.20) * 13px)) rgba(255,61,187,.70)!important;
+    transform:scale(calc(.90 + (var(--mff-level,.20) * .32)))!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]::-moz-range-thumb,
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror input[type=range]::-moz-range-thumb{
+    width:11px!important;
+    height:11px!important;
+    border-radius:50%!important;
+    background:radial-gradient(circle at 50% 50%, rgba(255,61,187,calc(.38 + (var(--mff-level,.20) * .62))) 0 28%, #16fff3 31% 100%)!important;
+    border:1px solid rgba(255,255,255,.82)!important;
+    box-shadow:0 0 calc(7px + (var(--mff-level,.20) * 13px)) rgba(22,255,243,.88),0 0 calc(5px + (var(--mff-level,.20) * 13px)) rgba(255,61,187,.70)!important;
+  }
+  body #pcVersionBadge .status-code{font-size:0!important;}
+  body #pcVersionBadge .status-code::after{content:"V172"!important;font-size:11px!important;line-height:1!important;}
+}
+@media (max-width:760px){#pcRealEqPanel,#pcRealEqPanelMirror{display:none!important;}}
+</style>
+
+
+
+
+
+
 <!-- SMFP_v164_RESCUE_CLEAN_SEND_METER_EQ
      Erstellt: 2026-05-18
      Geändert: 2026-05-18
-     Zweck: Rettungsfix nach v163: keine Zusatz-Overlay-Layer, Sendestatus am echten vorhandenen Dialog, iPhone-Performance entlasten, unteres Levelmeter beruhigen, PC-Doppel-EQ entfernen.
+     Zweck: Rettungsfix nach v163: falsches BROADCAST READY entfernen, keine Zusatz-Overlay-Layer, Sendestatus am echten vorhandenen Dialog, iPhone-Performance entlasten, unteres Levelmeter beruhigen, PC-Doppel-EQ entfernen.
      Regeln: Kein neuer Player, keine neue Boost-Engine, kein PC-Layout-Umbau außer Entfernen des zweiten gespiegelten EQ-Panels. -->
 <style id="smfpV164RescueCleanCss">
-@media (min-width:761px){
+  #pcRealEqPanelMirror{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+  @media (min-width:761px){
     body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
       display:flex!important;
       width:min(44vw,520px)!important;
@@ -4577,7 +5005,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       z-index:32!important;
     }
     body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{z-index:45!important;pointer-events:auto!important;}
-    body #pcVersionBadge .status-code::after{content:"v176"!important;}
+    body #pcVersionBadge .status-code::after{content:"V172"!important;}
   }
   @media (max-width:760px){
     #mffBroadcastDisplay,#mffInlineBroadcastPanel{display:none!important;visibility:hidden!important;pointer-events:none!important;}
@@ -4610,7 +5038,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 (function(){
   'use strict';
   if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
-  var VERSION='v176';
+  var VERSION='v172';
   var SEND_URL='/api/player-alert/send';
   var SENDER_KEY='smfpPlayerAlertSenderId';
   function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
@@ -4624,7 +5052,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     qsa('.smfp-version-badge,.mff-version-inline,#pcVersionBadge').forEach(function(n){ if(/v\d+/i.test(n.textContent||'')) n.textContent=VERSION; });
   }
   function removeJunk(){
-    qsa('#mffBroadcastDisplay,#mffInlineBroadcastPanel').forEach(function(n){try{n.remove();}catch(e){}});
+    qsa('#pcRealEqPanelMirror,#mffBroadcastDisplay,#mffInlineBroadcastPanel').forEach(function(n){try{n.remove();}catch(e){}});
     qsa('#mffAlertEditorBackdrop').forEach(function(n,i){ if(i>0) try{n.remove();}catch(e){} });
   }
   function ensureStatus(back){
@@ -4665,7 +5093,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(btn){btn.disabled=true;btn.textContent='SENDING';}
     status('SENDING...',null);
     try{
-      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v176',version:VERSION}),cache:'no-store'});
+      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v164',version:VERSION}),cache:'no-store'});
       var d={}; try{d=await r.json();}catch(_){ }
       if(!r.ok || d.ok===false){
         var m=d.error||d.message||('HTTP '+r.status);
@@ -4727,6 +5155,332 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('orientationchange',function(){setTimeout(boot,300);},{passive:true});
   [200,700,1500,3200].forEach(function(ms){setTimeout(boot,ms);});
   setInterval(calmBottom,180);
+})();
+</script>
+
+
+<!-- SMFP_v170_GLOBAL_BROADCAST_DUAL_DISCORD_EQ_CENTER_VERSION_FIX
+     Created: 2026-05-18
+     Purpose:
+     - Remote Player Messages use Worker endpoint with global KV support and Discord dual-webhook response.
+     - PC graphical EQ/visualizer is NOT touched.
+     - Only lower real 10-band EQ is scaled/centered.
+     - Visible version is frozen to V170 to prevent mixed old style blocks showing v162/v164.
+-->
+<style id="smfpV170FinalFixCss">
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    position:absolute!important;
+    left:50%!important;
+    right:auto!important;
+    bottom:8px!important;
+    top:auto!important;
+    width:min(56vw,640px)!important;
+    max-width:640px!important;
+    min-width:430px!important;
+    height:52px!important;
+    transform:translateX(-50%)!important;
+    display:grid!important;
+    grid-template-columns:repeat(10,minmax(22px,1fr))!important;
+    align-items:end!important;
+    justify-items:center!important;
+    gap:5px!important;
+    padding:6px 10px 5px!important;
+    z-index:34!important;
+    box-sizing:border-box!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-title{
+    display:none!important;
+  }
+  body #pcVersionBadge .status-code,
+  body .smfp-version-badge,
+  body .mff-version-inline{
+    font-size:0!important;
+  }
+  body #pcVersionBadge .status-code::after,
+  body .smfp-version-badge::after,
+  body .mff-version-inline::after{
+    content:"V172"!important;
+    font-size:11px!important;
+    line-height:1!important;
+  }
+}
+@media (max-width:760px){
+  body .mff-version-inline{font-size:0!important;}
+  body .mff-version-inline::after{content:"V172"!important;font-size:10px!important;line-height:1!important;}
+}
+</style>
+<script id="smfpV170GlobalBroadcastPatch">
+(function(){
+  if(window.__smfpV170GlobalBroadcastPatch) return;
+  window.__smfpV170GlobalBroadcastPatch = true;
+  var VERSION = 'v172';
+  function qs(s,r){return (r||document).querySelector(s);}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function clean(v){return String(v||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
+  function sender(){
+    try{
+      var k='smfpPlayerAlertSenderId';
+      var v=localStorage.getItem(k);
+      if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v);}
+      return v;
+    }catch(e){return 'smfp-'+Math.random().toString(36).slice(2,10);}
+  }
+  function freezeVersion(){
+    document.documentElement.setAttribute('data-smfp-version', VERSION);
+    qsa('.smfp-version-badge,.mff-version-inline,#pcVersionBadge .status-code').forEach(function(n){
+      try{ n.textContent = 'V172'; }catch(e){}
+    });
+  }
+  function statusTextFromResponse(d){
+    // Player-Nachrichten melden nur den Player-Broadcast-Status zurück.
+    // Discord wird serverseitig mitgeschickt, darf aber im Player-Sendefeld nicht als Hauptmeldung erscheinen.
+    if(d && d.storage === 'kv') return 'SENT GLOBAL ✓';
+    if(d && d.storage === 'cache-edge-fallback') return 'SENT LOCAL EDGE ✓ / KV MISSING';
+    return 'SENT ✓';
+  }
+  async function sendGlobal(message, source){
+    var msg=clean(message);
+    if(!msg) throw new Error('ENTER MESSAGE FIRST');
+    var r = await fetch('/api/player-alert/send', {
+      method:'POST',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:source||'player',version:VERSION}),
+      cache:'no-store'
+    });
+    var d={}; try{d=await r.json();}catch(e){}
+    if(!r.ok || d.ok===false){
+      var err = d.error || d.message || ('HTTP '+r.status);
+      if(r.status===429 && (d.retryAfterMs||d.retryAfter)) err='RATE LIMIT — WAIT '+Math.ceil(Number(d.retryAfterMs||d.retryAfter)/1000)+'s';
+      throw new Error(err);
+    }
+    return d;
+  }
+  function bindPcSend(){
+    var btn=qs('#playerAlertPcSend'), text=qs('#playerAlertPcText');
+    if(!btn || !text || btn.__smfpV170Bound) return;
+    btn.__smfpV170Bound=true;
+    btn.addEventListener('click', async function(ev){
+      ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+      var old=btn.textContent;
+      btn.disabled=true; btn.textContent='SENDING';
+      try{
+        var d=await sendGlobal(text.value, 'pc-v172');
+        text.value='';
+        btn.textContent=statusTextFromResponse(d);
+      }catch(e){
+        btn.textContent='FAILED';
+        try{text.placeholder='FAILED: '+(e&&e.message?e.message:'CONNECTION ERROR');}catch(_){}
+      }finally{
+        setTimeout(function(){btn.disabled=false;btn.textContent=old||'SEND';},2200);
+      }
+    }, true);
+  }
+  function bindMobileSend(){
+    var sendBtn=qs('#mffAlertSend'), ta=qs('#mffAlertText');
+    if(!sendBtn || !ta || sendBtn.__smfpV170Bound) return;
+    sendBtn.__smfpV170Bound=true;
+    sendBtn.addEventListener('click', async function(ev){
+      ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+      var status=qs('.smfp-send-status-v164') || qs('.smfp-send-status-v170');
+      if(status) status.textContent='SENDING...';
+      sendBtn.disabled=true; sendBtn.textContent='SENDING';
+      try{
+        var d=await sendGlobal(ta.value, 'iphone-v172');
+        ta.value='';
+        var ok=statusTextFromResponse(d);
+        sendBtn.textContent='SENT';
+        if(status) status.textContent=ok;
+      }catch(e){
+        sendBtn.textContent='FAILED';
+        if(status) status.textContent='FAILED ✕ '+(e&&e.message?e.message:'CONNECTION ERROR');
+      }finally{
+        setTimeout(function(){sendBtn.disabled=false;sendBtn.textContent='SEND';},2200);
+      }
+    }, true);
+  }
+  function removeDuplicateEq(){
+    qsa('#pcRealEqPanelMirror').forEach(function(n){try{n.remove();}catch(e){}});
+  }
+  function boot(){ freezeVersion(); removeDuplicateEq(); bindPcSend(); bindMobileSend(); }
+  boot();
+  setInterval(boot, 1200);
+  window.smfpV170SendGlobalBroadcast = sendGlobal;
+})();
+</script>
+
+
+
+<!-- SMFP_v172_MINIMAL_PC_EQ_RIGHT_NUDGE_SEND_VERSION_FIX
+     Created: 2026-05-18
+     Purpose: Do NOT rescale/rebuild player. Only move the lower manual PC EQ about 3.7cm to the right, keep graphical EQ untouched, hide duplicate mirror EQ, freeze version label.
+-->
+<style id="smfpV172MinimalEqNudgeCss">
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing #pcRealEqPanelMirror{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    /* Nur der manuelle untere EQ wird verschoben. Keine Größen-/Player-Änderung. */
+    left:calc(50% + 3.7cm)!important;
+    right:auto!important;
+    transform:translateX(-50%)!important;
+  }
+  body #pcVersionBadge .status-code,
+  body .smfp-version-badge,
+  body .mff-version-inline{font-size:0!important;}
+  body #pcVersionBadge .status-code::after,
+  body .smfp-version-badge::after,
+  body .mff-version-inline::after{content:"V172"!important;font-size:11px!important;line-height:1!important;}
+}
+@media (max-width:760px){
+  body .mff-version-inline{font-size:0!important;}
+  body .mff-version-inline::after{content:"V172"!important;font-size:10px!important;line-height:1!important;}
+}
+</style>
+<script id="smfpV172NoLayerGuard">
+(function(){
+  function removeMirror(){
+    document.querySelectorAll('#pcRealEqPanelMirror').forEach(function(n){try{n.remove();}catch(e){}});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', removeMirror, {once:true});
+  else removeMirror();
+})();
+</script>
+
+
+
+<!-- SMFP_v172_SEND_VERSION_EQ_ROOT_FIX
+     Created: 2026-05-18
+     Purpose: Keine neuen sichtbaren Layer. Nur bestehende Player-Message-Rueckmeldung korrigieren, Versionsduplikate bereinigen und unteren manuellen PC-EQ weiter nach rechts setzen.
+-->
+<style id="smfpV172VersionEqRootFixCss">
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    left:calc(50% + 3.7cm)!important;
+    right:auto!important;
+    transform:translateX(-50%)!important;
+  }
+  body #pcVersionBadge .status-code,
+  body .smfp-version-badge,
+  body .mff-version-inline{font-size:0!important;}
+  body #pcVersionBadge .status-code::after,
+  body .smfp-version-badge::after,
+  body .mff-version-inline::after{content:"V172"!important;font-size:11px!important;line-height:1!important;}
+}
+@media (max-width:760px){
+  body .mff-version-inline{font-size:0!important;}
+  body .mff-version-inline::after{content:"V172"!important;font-size:10px!important;line-height:1!important;}
+}
+</style>
+<script id="smfpV172SendVersionRootFix">
+(function(){
+  if(window.__smfpV172SendVersionRootFix) return;
+  window.__smfpV172SendVersionRootFix=true;
+  var VERSION='V172';
+  function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function stabilizeVersions(){
+    document.documentElement.setAttribute('data-smfp-version','v172');
+    var pc=document.querySelector('#pcVersionBadge .status-code');
+    if(pc) pc.textContent=VERSION;
+    var app=document.getElementById('mffApp');
+    if(app){
+      var slot=app.querySelector('.mff-discord-slot');
+      var badges=qa('.smfp-version-badge',app);
+      var keep=null;
+      badges.forEach(function(b){
+        b.textContent=VERSION;
+        b.classList.add('mff-version-inline');
+        b.setAttribute('aria-label','Player Version '+VERSION);
+        if(!keep) keep=b; else { try{b.remove();}catch(e){} }
+      });
+      if(keep && slot && keep.parentNode!==slot) slot.appendChild(keep);
+    }
+  }
+  function clean(v){return String(v||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
+  function statusFromResponse(d){
+    if(d && d.storage==='kv') return 'SENT GLOBAL ✓';
+    if(d && d.storage==='cache-edge-fallback') return 'SENT LOCAL EDGE ✓ / KV MISSING';
+    return 'SENT ✓';
+  }
+  async function sendPlayerMessage(msg, source){
+    msg=clean(msg);
+    if(!msg) throw new Error('ENTER MESSAGE FIRST');
+    var sendFn=window.smfpV170SendGlobalBroadcast;
+    if(typeof sendFn==='function') return await sendFn(msg,source);
+    var r=await fetch('/api/player-alert/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,source:source||'player-v172',version:'v172'}),cache:'no-store'});
+    var d={}; try{d=await r.json();}catch(e){}
+    if(!r.ok || d.ok===false) throw new Error(d.error || d.message || ('HTTP '+r.status));
+    return d;
+  }
+  function replaceButtonClean(id){
+    var old=document.getElementById(id);
+    if(!old || old.__smfpV172Clean) return old;
+    var neu=old.cloneNode(true);
+    neu.__smfpV170Bound=true;
+    neu.__smfpV172Clean=true;
+    old.parentNode.replaceChild(neu,old);
+    return neu;
+  }
+  function bindCleanPcSend(){
+    var btn=replaceButtonClean('playerAlertPcSend');
+    var text=document.getElementById('playerAlertPcText');
+    if(!btn || !text || btn.__smfpV172Bound) return;
+    btn.__smfpV172Bound=true;
+    btn.addEventListener('click',async function(ev){
+      ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+      var original=btn.textContent || 'SEND';
+      try{
+        if(!clean(text.value)){ text.placeholder='FAILED: ENTER MESSAGE FIRST'; return; }
+        btn.disabled=true; btn.textContent='SENDING';
+        var d=await sendPlayerMessage(text.value,'pc-v172');
+        text.value='';
+        btn.textContent=statusFromResponse(d);
+      }catch(e){
+        btn.textContent='FAILED';
+        text.placeholder='FAILED: '+(e&&e.message?e.message:'CONNECTION ERROR');
+      }finally{
+        setTimeout(function(){btn.disabled=false;btn.textContent=original;},2200);
+      }
+    },true);
+  }
+  function bindCleanMobileSend(){
+    var btn=replaceButtonClean('mffAlertSend');
+    var text=document.getElementById('mffAlertText');
+    if(!btn || !text || btn.__smfpV172Bound) return;
+    btn.__smfpV172Bound=true;
+    btn.addEventListener('click',async function(ev){
+      ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+      var status=document.querySelector('.smfp-send-status-v164,.smfp-send-status-v170,.smfp-send-status-v172');
+      try{
+        if(!clean(text.value)){ if(status) status.textContent='FAILED: ENTER MESSAGE FIRST'; text.placeholder='Write a short player message...'; return; }
+        btn.disabled=true; btn.textContent='SENDING'; if(status) status.textContent='SENDING...';
+        var d=await sendPlayerMessage(text.value,'iphone-v172');
+        text.value='';
+        var ok=statusFromResponse(d);
+        btn.textContent='SENT'; if(status) status.textContent=ok;
+      }catch(e){
+        btn.textContent='FAILED'; if(status) status.textContent='FAILED ✕ '+(e&&e.message?e.message:'CONNECTION ERROR');
+      }finally{
+        setTimeout(function(){btn.disabled=false;btn.textContent='SEND';},2200);
+      }
+    },true);
+  }
+  function stabilizeSendLabels(){
+    // Keine Discord-Erfolgsmeldung im Player-Sendefeld. Discord bleibt serverseitiger Sidecar.
+    bindCleanPcSend();
+    bindCleanMobileSend();
+  }
+  function boot(){stabilizeVersions();stabilizeSendLabels();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+  setInterval(boot,1200);
 })();
 </script>
 

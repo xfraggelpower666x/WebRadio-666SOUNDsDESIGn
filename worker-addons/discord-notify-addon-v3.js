@@ -279,24 +279,40 @@ function messagePayload(input = {}) {
   return { username: s.username, embeds };
 }
 
+function getDiscordWebhooks(env) {
+  const hooks = [];
+  const primary = env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
+  const secondary = env && (env.DISCORD_WEBHOOK_URL2 || env.DISCORD_WEBHOOK_URL_2 || env.DISCORD_FORUM_WEBHOOK_URL || env.DISCORD_WEBHOOK_FORUM);
+  if (primary) hooks.push({ name: 'DISCORD_WEBHOOK_URL', url: String(primary) });
+  if (secondary && String(secondary) !== String(primary)) hooks.push({ name: 'DISCORD_WEBHOOK_URL2', url: String(secondary) });
+  return hooks;
+}
 function getDiscordWebhook(env) {
-  return env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
+  const hooks = getDiscordWebhooks(env);
+  return hooks.length ? hooks[0].url : '';
 }
 
 async function sendDiscord(env, payload) {
-  const webhook = getDiscordWebhook(env);
-  if (!webhook) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
-  const url = String(webhook);
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  const text = await res.text().catch(() => '');
-  if (!res.ok) throw new Error(`Discord HTTP ${res.status}: ${text.slice(0, 300)}`);
+  const hooks = getDiscordWebhooks(env);
+  if (!hooks.length) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL and optional DISCORD_WEBHOOK_URL2.');
+  const results = await Promise.all(hooks.map(async (hook) => {
+    try {
+      const res = await fetch(hook.url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const text = await res.text().catch(() => '');
+      return { name: hook.name, ok: res.ok, status: res.status, body: text || 'OK' };
+    } catch (err) {
+      return { name: hook.name, ok: false, status: 0, body: err && err.message ? err.message : 'fetch failed' };
+    }
+  }));
+  const failed = results.filter((r) => !r.ok);
+  if (failed.length) throw new Error(`Discord partial/failed ${results.length - failed.length}/${results.length}: ${failed.map((r) => `${r.name} HTTP ${r.status}`).join(', ')}`);
   runtime.lastOkAt = Date.now();
   runtime.lastError = '';
-  return { status: res.status, body: text || 'OK' };
+  return { status: results.map((r) => r.status).join(','), body: `OK ${results.length}/${results.length}`, total: results.length, results };
 }
 
 function tokenOk(request, env) {
@@ -334,7 +350,8 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       addon: ADDON_VERSION,
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
       webhookConfigured: Boolean(getDiscordWebhook(env)),
-      acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
+      webhookCount: getDiscordWebhooks(env).length,
+      acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK_URL2','DISCORD_WEBHOOK_URL_2','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
       adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
       gateCodeEnabled: true,
       lastKind: runtime.lastKind,
