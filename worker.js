@@ -249,145 +249,101 @@ async function checkExternal(){
 
 
 // ==========================================================
-// PLAYER_ALERT_V170_GLOBAL_BUS
-// Zweck: Kurze Player-Nachrichten zwischen offenen Playern verteilen.
-// Änderung v170:
-// - Erst PLAYER_ALERT_KV verwenden, wenn Cloudflare-KV gebunden ist.
-// - Fallback auf caches.default bleibt erhalten, ist aber nur Edge/Region-stabil.
-// - Beim Absenden zusätzlich optional an Discord Webhook 1 + 2 posten.
-// Schutz: globales Rate-Limit, Text-only, max. 240 Zeichen.
+// PLAYER_ALERT_V182_BACKEND_PRIMARY_BUS
+// Zweck: Player-Nachrichten global verteilen.
+// Reihenfolge: Render/Renda Backend -> PLAYER_ALERT_KV Fallback -> Cache Notfallback.
+// Schutz: Text-only, max. 240 Zeichen.
 // ==========================================================
 const PLAYER_ALERT_CACHE_KEY = 'https://666soundsdesign.local/player-alert/current';
 const PLAYER_ALERT_RATE_KEY = 'https://666soundsdesign.local/player-alert/rate';
 const PLAYER_ALERT_RATE_MS = 180000;
-const PLAYER_ALERT_KV_CURRENT = 'player-alert-current';
-const PLAYER_ALERT_KV_RATE = 'player-alert-rate';
-const PLAYER_ALERT_TTL_SECONDS = 900;
-
 function playerAlertJson(data, status = 200){
-  return new Response(JSON.stringify(data), {status, headers:{
-    'content-type':'application/json; charset=UTF-8',
-    'cache-control':'no-store',
-    'access-control-allow-origin':'*',
-    'access-control-allow-methods':'GET,POST,OPTIONS',
-    'access-control-allow-headers':'content-type'
-  }});
+  return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'}});
 }
 function playerAlertCleanText(value){
   return String(value || '').replace(/[<>]/g, '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
 }
-function playerAlertKv(env){
-  return env && env.PLAYER_ALERT_KV && typeof env.PLAYER_ALERT_KV.get === 'function' && typeof env.PLAYER_ALERT_KV.put === 'function'
-    ? env.PLAYER_ALERT_KV
-    : null;
+
+function playerAlertBackendUrl(env){
+  const raw = env && (env.PLAYER_ALERT_BACKEND_URL || env.RENDA_PLAYER_ALERT_URL || env.RENDER_PLAYER_ALERT_URL || env.RENDA_BACKEND_URL || env.RENDER_BACKEND_URL);
+  return raw ? String(raw).replace(/\/$/, '') : '';
 }
-async function playerAlertRead(env, key){
-  const kv = playerAlertKv(env);
-  if(kv){
-    const raw = await kv.get(key, 'json');
-    return raw || null;
-  }
-  const cacheKey = key === PLAYER_ALERT_KV_RATE ? PLAYER_ALERT_RATE_KEY : PLAYER_ALERT_CACHE_KEY;
-  const hit = await caches.default.match(new Request(cacheKey));
-  if(!hit) return null;
-  try{ return await hit.json(); }catch(err){ return null; }
+async function playerAlertBackendFetch(env, path, init = {}){
+  const base = playerAlertBackendUrl(env);
+  if(!base) return null;
+  const endpoint = base + path;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5200);
+  try{
+    const headers = new Headers(init.headers || {});
+    headers.set('content-type', headers.get('content-type') || 'application/json');
+    const res = await fetch(endpoint, {...init, headers, signal: controller.signal});
+    const data = await res.json().catch(() => ({}));
+    return {res, data, endpoint};
+  }catch(err){
+    return {error: String(err && err.message || err), endpoint};
+  }finally{ clearTimeout(timeout); }
 }
-async function playerAlertWrite(env, key, value, ttlSeconds){
-  const kv = playerAlertKv(env);
-  if(kv){
-    await kv.put(key, JSON.stringify(value), { expirationTtl: ttlSeconds || PLAYER_ALERT_TTL_SECONDS });
-    return 'kv';
-  }
-  const cacheKey = key === PLAYER_ALERT_KV_RATE ? PLAYER_ALERT_RATE_KEY : PLAYER_ALERT_CACHE_KEY;
-  await caches.default.put(
-    new Request(cacheKey),
-    new Response(JSON.stringify(value), {
-      headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=' + String(ttlSeconds || PLAYER_ALERT_TTL_SECONDS)}
-    })
-  );
-  return 'cache-edge-fallback';
+async function playerAlertKvGet(env){
+  if(!env || !env.PLAYER_ALERT_KV) return null;
+  const raw = await env.PLAYER_ALERT_KV.get('current');
+  if(!raw) return null;
+  try{return JSON.parse(raw);}catch(_){return null;}
 }
-function playerAlertDiscordWebhooks(env){
-  const hooks = [];
-  const a = env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
-  const b = env && (env.DISCORD_WEBHOOK_URL2 || env.DISCORD_WEBHOOK_URL_2 || env.DISCORD_FORUM_WEBHOOK_URL || env.DISCORD_WEBHOOK_FORUM);
-  if(a) hooks.push({name:'DISCORD_WEBHOOK_URL', url:String(a)});
-  if(b && String(b) !== String(a)) hooks.push({name:'DISCORD_WEBHOOK_URL2', url:String(b)});
-  return hooks;
+async function playerAlertKvPut(env, alert){
+  if(!env || !env.PLAYER_ALERT_KV) return false;
+  await env.PLAYER_ALERT_KV.put('current', JSON.stringify(alert), {expirationTtl: 900});
+  return true;
 }
-async function playerAlertPostDiscord(env, alert){
-  const hooks = playerAlertDiscordWebhooks(env);
-  if(!hooks.length) return {ok:true,total:0,success:0,failed:0,mode:'not_configured'};
-  const payload = {
-    username: '666SOUNDsDESIGn Radio',
-    embeds: [{
-      title: '📡 Player Broadcast Message',
-      description: String(alert.message || '').slice(0, 240),
-      color: 0x16fff3,
-      fields: [
-        { name:'Source', value:'666 Stream Player', inline:true },
-        { name:'Message ID', value:String(alert.id || '').slice(0, 80), inline:true }
-      ],
-      footer: { text:'666SOUNDsDESIGn • Player Broadcast' },
-      timestamp: alert.createdAt || new Date().toISOString()
-    }]
-  };
-  const results = await Promise.all(hooks.map(async (hook) => {
-    try{
-      const res = await fetch(hook.url, { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify(payload) });
-      const txt = await res.text().catch(()=>'');
-      return {name:hook.name, ok:res.ok, status:res.status, error:res.ok?'':txt.slice(0,160)};
-    }catch(err){
-      return {name:hook.name, ok:false, status:0, error:err && err.message ? err.message : 'fetch_failed'};
-    }
-  }));
-  const success = results.filter(r => r.ok).length;
-  return {ok:success === hooks.length,total:hooks.length,success,failed:hooks.length-success,results};
-}
-async function handlePlayerAlertV170(request, env = {}){
+async function handlePlayerAlertV152(request, env){
   const url = new URL(request.url);
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
+  const cache = caches.default;
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
-    const alert = await playerAlertRead(env, PLAYER_ALERT_KV_CURRENT);
-    if(!alert) return playerAlertJson({active:false, storage: playerAlertKv(env) ? 'kv' : 'cache-edge-fallback'});
-    alert.storage = playerAlertKv(env) ? 'kv' : 'cache-edge-fallback';
-    return playerAlertJson(alert);
+    const backend = await playerAlertBackendFetch(env, '/api/player-alert/current', {method:'GET'});
+    if(backend && backend.res && backend.res.ok) return playerAlertJson({...backend.data, source:'backend'});
+    const kv = await playerAlertKvGet(env);
+    if(kv) return playerAlertJson({...kv, source:'kv-fallback'});
+    const hit = await cache.match(new Request(PLAYER_ALERT_CACHE_KEY));
+    if(!hit) return playerAlertJson({active:false, source:'empty'});
+    try{ return playerAlertJson({...await hit.json(), source:'cache-fallback'}); }catch(err){ return playerAlertJson({active:false, source:'cache-error'}); }
   }
   if(url.pathname === '/api/player-alert/send' && request.method === 'POST'){
     let payload = {};
     try{ payload = await request.json(); }catch(err){ return playerAlertJson({ok:false,error:'invalid_json'},400); }
     const message = playerAlertCleanText(payload.message);
-    const senderId = playerAlertCleanText(payload.senderId || payload.clientId || 'anonymous').slice(0,80) || 'anonymous';
+    const senderId = playerAlertCleanText(payload.senderId || 'anonymous').slice(0,80) || 'anonymous';
     if(!message) return playerAlertJson({ok:false,error:'empty_message'},400);
-
     const now = Date.now();
-    const rate = await playerAlertRead(env, PLAYER_ALERT_KV_RATE);
-    if(rate){
-      const last = Number(rate.last || 0);
-      if(last && (now - last) < PLAYER_ALERT_RATE_MS){
-        return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now - last)},429);
-      }
+    const rateHit = await cache.match(new Request(PLAYER_ALERT_RATE_KEY));
+    if(rateHit){
+      try{
+        const rate = await rateHit.json();
+        const last = Number(rate.last || 0);
+        if(last && (now - last) < PLAYER_ALERT_RATE_MS){
+          return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now - last)},429);
+        }
+      }catch(err){}
     }
-
-    const alert = {
-      ok:true,
-      active:true,
-      id:String(now)+'-'+Math.random().toString(36).slice(2,8),
-      message,
-      senderId,
-      source: playerAlertCleanText(payload.source || 'player').slice(0,40),
-      version: playerAlertCleanText(payload.version || 'v172').slice(0,20),
-      createdAt:new Date(now).toISOString()
-    };
-    const storage = await playerAlertWrite(env, PLAYER_ALERT_KV_CURRENT, alert, PLAYER_ALERT_TTL_SECONDS);
-    await playerAlertWrite(env, PLAYER_ALERT_KV_RATE, {last:now}, Math.ceil(PLAYER_ALERT_RATE_MS/1000));
-    const discord = await playerAlertPostDiscord(env, alert);
-    return playerAlertJson({...alert, storage, playerDelivery:{ok:true, storage}, discord});
+    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,senderId,createdAt:new Date(now).toISOString()};
+    const backend = await playerAlertBackendFetch(env, '/api/player-alert/send', {method:'POST', body: JSON.stringify({message, senderId, source:'player', createdAt: alert.createdAt})});
+    if(backend && backend.res && backend.res.ok){
+      const data = backend.data && Object.keys(backend.data).length ? backend.data : alert;
+      return playerAlertJson({...data, ok:true, active:true, source:'backend'});
+    }
+    const kvOk = await playerAlertKvPut(env, alert).catch(() => false);
+    if(kvOk){
+      await cache.put(new Request(PLAYER_ALERT_RATE_KEY), new Response(JSON.stringify({last:now}), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=180'}}));
+      return playerAlertJson({...alert, source:'kv-fallback'});
+    }
+    await cache.put(new Request(PLAYER_ALERT_CACHE_KEY), new Response(JSON.stringify(alert), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=900'}}));
+    await cache.put(new Request(PLAYER_ALERT_RATE_KEY), new Response(JSON.stringify({last:now}), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age=180'}}));
+    return playerAlertJson({...alert, source:'cache-fallback'});
   }
   return playerAlertJson({ok:false,error:'not_found'},404);
 }
-// END PLAYER_ALERT_V170_GLOBAL_BUS
+// END PLAYER_ALERT_V182_BACKEND_PRIMARY_BUS
 
 function passthroughHeaders(sourceHeaders){
   const headers=new Headers();
@@ -555,8 +511,8 @@ export default {
     const __darkDancerResponse = darkDancerResponse(__darkDancerUrl.pathname);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
-    const playerAlertV170Response = await handlePlayerAlertV170(request, env);
-    if (playerAlertV170Response) return playerAlertV170Response;
+    const playerAlertV152Response = await handlePlayerAlertV152(request, env);
+    if (playerAlertV152Response) return playerAlertV152Response;
     // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;
