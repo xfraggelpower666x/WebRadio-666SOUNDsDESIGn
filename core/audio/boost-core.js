@@ -12,7 +12,7 @@ ZWECK:
 */
 (function(){
   'use strict';
-  var STORAGE_KEY = 'smfp_audio_boost_stage_v176';
+  var STORAGE_KEY = 'smfp_audio_boost_stage_v177';
   var STAGES = [
     { stage:0, gain:1.00, label:'BST 0', danger:false },
     { stage:1, gain:1.40, label:'BST 1', danger:false },
@@ -61,7 +61,7 @@ ZWECK:
     return s;
   }
   window.SMFPBoostCore = {
-    version: 'v176-audio-core',
+    version: 'v178-audio-core',
     storageKey: STORAGE_KEY,
     stages: STAGES.slice(),
     maxStage: maxStage,

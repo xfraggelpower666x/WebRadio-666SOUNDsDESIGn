@@ -16,30 +16,34 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="v182" />
+  <meta name="smfp-version" content="v181" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Root Main Player</title>
-  <link rel="stylesheet" href="/css/base.css?v=smfp-v183-emergency-click-unblock-20260520" />
-  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v183-emergency-click-unblock-20260520" />
-  <link rel="stylesheet" href="/css/layout.css?v=smfp-v183-emergency-click-unblock-20260520" />
-  <link rel="stylesheet" href="/css/effects.css?v=smfp-v183-emergency-click-unblock-20260520" />
-  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v183-emergency-click-unblock-20260520" />
-  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v183-emergency-click-unblock-20260520" />
+  <link rel="stylesheet" href="/css/base.css?v=smfp-v181-backend-kv-iphone-ui-20260519" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=smfp-v181-backend-kv-iphone-ui-20260519" />
+  <link rel="stylesheet" href="/css/layout.css?v=smfp-v181-backend-kv-iphone-ui-20260519" />
+  <link rel="stylesheet" href="/css/effects.css?v=smfp-v181-backend-kv-iphone-ui-20260519" />
+  <link rel="stylesheet" href="/css/mobile.css?v=smfp-v181-backend-kv-iphone-ui-20260519" />
+  <link rel="stylesheet" href="/css/desktop.css?v=smfp-v181-backend-kv-iphone-ui-20260519" />
 
 
-<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v183-emergency-click-unblock-20260520" sizes="any">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v183-emergency-click-unblock-20260520">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v183-emergency-click-unblock-20260520">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v183-emergency-click-unblock-20260520">
-<link rel="manifest" href="/site.webmanifest?v=smfp-v183-emergency-click-unblock-20260520">
+<link rel="icon" href="/assets/icons/favicon.ico?v=smfp-v181-backend-kv-iphone-ui-20260519" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=smfp-v181-backend-kv-iphone-ui-20260519">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=smfp-v181-backend-kv-iphone-ui-20260519">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=smfp-v181-backend-kv-iphone-ui-20260519">
+<link rel="manifest" href="/site.webmanifest?v=smfp-v181-backend-kv-iphone-ui-20260519">
 <meta name="theme-color" content="#ff3dbb">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
-  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v183-emergency-click-unblock-20260520">
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=smfp-v181-backend-kv-iphone-ui-20260519">
+  <script src="/core/version/version-core.js?v=smfp-v181-backend-kv-iphone-ui-20260519"></script>
+  <script src="/core/audio/boost-core.js?v=smfp-v181-backend-kv-iphone-ui-20260519"></script>
+  <link rel="stylesheet" href="/core/overlay/overlay-core.css?v=smfp-v181-backend-kv-iphone-ui-20260519">
+  <script src="/core/overlay/overlay-core.js?v=smfp-v181-backend-kv-iphone-ui-20260519"></script>
 
 
 <!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
@@ -510,6 +514,22 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #mffApp .mff-eq{
     touch-action:manipulation!important;
   }
+  body[data-smfp-active="1"] > #mffAlertEditorBackdrop,
+  body[data-smfp-active="1"] > #mffExtremeBoostBackdrop,
+  body[data-smfp-active="1"] > #playerAlertReceiveBackdrop{
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
   body[data-smfp-active="1"] > #mffAlertEditorBackdrop.is-open{
     display:flex!important;
     z-index:2147483600!important;
@@ -550,35 +570,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 .mff-extreme-boost-actions{display:flex!important;justify-content:flex-end!important;gap:10px!important;}
 .mff-extreme-boost-actions button{height:38px!important;min-width:84px!important;border-radius:13px!important;border:1px solid rgba(22,255,243,.55)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-weight:950!important;pointer-events:auto!important;touch-action:manipulation!important;}
 .mff-extreme-boost-actions [data-extreme="ok"]{border-color:rgba(255,23,68,.78)!important;color:#fff!important;background:rgba(255,23,68,.25)!important;}
-</style>
-
-<style id="smfpV182MobileDirectCss">
-@media(max-width:760px){
-  html,body{overflow:hidden!important;touch-action:manipulation!important;-webkit-text-size-adjust:100%!important;}
-  #mffApp .smfp-version-badge,#mffApp .mff-version-inline{display:none!important;}
-  #mffApp .mff-now{grid-template-columns:58px minmax(0,1fr)!important;}
-  #mffApp .mff-now .mff-history{display:none!important;}
-  #mffApp .mff-title h1{overflow:hidden!important;white-space:nowrap!important;}
-  #mffApp .mff-title h1 span{display:inline-block!important;white-space:nowrap!important;padding-left:100%!important;animation:mffTitleMarqueeV182 14s linear infinite!important;text-overflow:clip!important;}
-  @keyframes mffTitleMarqueeV182{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-  #mffApp .mff-discord-slot{justify-content:flex-start!important;gap:7px!important;padding-left:2px!important;overflow:visible!important;}
-  #mffApp .s666-discord-panel{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;max-width:none!important;min-height:0!important;height:auto!important;}
-  #mffApp .s666-discord-actions{gap:4px!important;}
-  #mffApp .s666-discord-button{border-radius:13px!important;}
-  #mffApp #mffAlertOpen.mff-alert-open{position:static!important;right:auto!important;bottom:auto!important;order:20!important;min-width:74px!important;height:34px!important;font-size:11px!important;}
-  #mffApp .mff-send-leds{order:21!important;display:flex!important;align-items:center!important;gap:5px!important;min-width:38px!important;height:26px!important;}
-  #mffApp .mff-send-leds i{display:block!important;width:9px!important;height:9px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.28)!important;background:rgba(247,248,255,.12)!important;}
-  #mffApp .mff-send-leds b{font-size:8px!important;color:#29fff4!important;letter-spacing:.05em!important;max-width:28px!important;overflow:hidden!important;}
-  #mffApp[data-mff-send-state="sending"] .mff-send-leds [data-send-led="request"]{background:#29fff4!important;box-shadow:0 0 11px #29fff4!important;}
-  #mffApp[data-mff-send-state="delivered"] .mff-send-leds [data-send-led="request"],#mffApp[data-mff-send-state="delivered"] .mff-send-leds [data-send-led="delivered"]{background:#29ff8a!important;box-shadow:0 0 11px #29ff8a!important;}
-  #mffApp[data-mff-send-state="failed"] .mff-send-leds [data-send-led="request"],#mffApp[data-mff-send-state="failed"] .mff-send-leds [data-send-led="delivered"]{background:#ff2d62!important;box-shadow:0 0 11px #ff2d62!important;}
-  #mffApp .mff-discord-slot .mff-history{order:22!important;position:static!important;min-width:78px!important;width:auto!important;height:34px!important;border-radius:14px!important;font-size:10px!important;padding:0 8px!important;border:1px solid rgba(255,61,187,.55)!important;background:rgba(4,8,20,.72)!important;color:#f7f8ff!important;box-shadow:0 0 12px rgba(255,61,187,.18)!important;}
-  #mffApp .mff-version-footer{height:16px!important;line-height:14px!important;margin-top:2px!important;text-align:center!important;font-size:10px!important;font-weight:950!important;letter-spacing:.08em!important;color:#29fff4!important;text-shadow:0 0 10px rgba(22,255,243,.65)!important;white-space:nowrap!important;}
-  #mffApp .mff-alert-editor textarea,#mffAlertText{font-size:16px!important;}
-  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="4"],#mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="4"]{background:#ff1744!important;border-color:#ff1744!important;box-shadow:0 0 12px rgba(255,23,68,.92)!important;}
-  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="5"]{background:#ff1744!important;border-color:#ff1744!important;box-shadow:0 0 16px rgba(255,23,68,1)!important;animation:mffRedBlinkV182 .55s steps(2,end) infinite!important;}
-  @keyframes mffRedBlinkV182{0%,100%{filter:brightness(1)}50%{filter:brightness(2)}}
-}
 </style>
 </head>
 <body>
@@ -644,7 +635,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
-            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v175</span></div>
+            <div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v181</span></div>
           </div>
         </div>
       </header>
@@ -653,13 +644,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-three" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
         <span class="pc-header-logo-cell pc-header-logo-cell-left">
-          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v183-emergency-click-unblock-20260520" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
+          <img id="pcHeaderLogoLeft" class="pc-header-logo-part pc-header-logo-left" src="/assets/logos/cyberstream-left-logo.png?v=smfp-v181-backend-kv-iphone-ui-20260519" alt="666SOUNDsDESIGn" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-center">
-          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v183-emergency-click-unblock-20260520" alt="666" loading="eager" decoding="async">
+          <img id="pcHeaderLogoCenter666" class="pc-header-logo-part pc-header-logo-center-666" src="/assets/logos/header-666-center-logo.png?v=smfp-v181-backend-kv-iphone-ui-20260519" alt="666" loading="eager" decoding="async">
         </span>
         <span class="pc-header-logo-cell pc-header-logo-cell-right">
-          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v183-emergency-click-unblock-20260520" alt="Cyberstream Cockpit" loading="eager" decoding="async">
+          <img id="pcHeaderLogoRight" class="pc-header-logo-part pc-header-logo-right" src="/assets/logos/cyberstream-right-logo.png?v=smfp-v181-backend-kv-iphone-ui-20260519" alt="Cyberstream Cockpit" loading="eager" decoding="async">
         </span>
       </div>
 
@@ -676,6 +667,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <span class="boost-led" data-boost-led="2" title="Boost 2"></span>
     <span class="boost-led" data-boost-led="3" title="Boost 3"></span>
     <span class="boost-led" data-boost-led="4" title="Boost EXTREME 2.0"></span>
+    <span class="boost-led" data-boost-led="5" title="Boost EXTREME 2.2"></span>
   </div>
   <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen">+</button>
 </div>
@@ -838,7 +830,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-  <script type="module" src="/js/player-core.js?v=smfp-v183-emergency-click-unblock-20260520"></script>
+  <script type="module" src="/js/player-core.js?v=smfp-v181-backend-kv-iphone-ui-20260519"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -1655,7 +1647,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     body{
       background-image:
         linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=smfp-v183-emergency-click-unblock-20260520')!important;
+        url('/assets/images/pc-player-background.png?v=smfp-v181-backend-kv-iphone-ui-20260519')!important;
       background-size:cover!important;
       background-position:center center!important;
       background-attachment:fixed!important;
@@ -1670,7 +1662,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION='v182';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -1778,7 +1770,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var mffCleanEqValues=[];
   var mffCleanEqPhase=0;
   var mffCleanEqLoop=0;
-  var BOOST_GAINS=[1.00,1.30,1.60,1.90,2.00,2.20];
+  var BOOST_GAINS=(window.SMFPBoostCore&&window.SMFPBoostCore.stages?window.SMFPBoostCore.stages.map(function(x){return x.gain;}):[1.00,1.40,1.70,1.90,2.00,2.20]);
   var MFF_IDLE_TICKER_TEXT_V113='666SOUNDsDESIGn WebRadio';
   var MFF_LIVE_LOADING_TEXT_V113='Loading live metadata ...';
   var RAMP_UP=0.62;
@@ -1861,7 +1853,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       }
 
       var gain=ctx.createGain();
-      gain.gain.value=BOOST_GAINS[boostStage] || 1;
+      gain.gain.value=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
 
       var analyser=ctx.createAnalyser();
       analyser.fftSize=128;
@@ -1909,7 +1901,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       return audioGraph;
     }catch(e){
       console.warn('[666 boost] WebAudio fallback',e);
-      try{audio.volume=Math.min(1,BOOST_GAINS[boostStage]||1)}catch(_){}
+      try{audio.volume=Math.min(1,(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage]||1)))}catch(_){}
       audioGraph={audio:audio,ok:false,error:String(e)};
       document.documentElement.setAttribute('data-mff-boost-engine','volume-fallback');
       return audioGraph;
@@ -1917,7 +1909,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function applyBoostRamp(previousStage){
-    var target=BOOST_GAINS[boostStage] || 1;
+    var target=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
     var app=q('#mffApp');
     if(app){
       app.setAttribute('data-mff-boost-stage',String(boostStage));
@@ -1936,6 +1928,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     document.documentElement.setAttribute('data-mff-boost',String(boostStage));
     document.documentElement.setAttribute('data-mff-boost-gain',String(target));
+    try{if(window.SMFPBoostCore){boostStage=window.SMFPBoostCore.saveStage(boostStage);window.SMFPBoostCore.publish(boostStage,target,'mff-inline');}}catch(e){}
 
     var graph=ensureAudioGraph();
     if(graph && graph.ok && graph.gain && graph.ctx){
@@ -2157,11 +2150,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   function boost(d){
     var prev=boostStage;
-    var next=Math.max(0,Math.min(5,boostStage+d));
-    if(next>=4 && boostStage!==next){
+    var maxStage=(window.SMFPBoostCore?window.SMFPBoostCore.maxStage():BOOST_GAINS.length-1);
+    var next=Math.max(0,Math.min(maxStage,boostStage+d));
+    if((window.SMFPBoostCore?window.SMFPBoostCore.isDanger(next):next>=4) && !(window.SMFPBoostCore?window.SMFPBoostCore.isDanger(boostStage):boostStage>=4)){
       showMffExtremeBoostWarning().then(function(ok){
         if(!ok){applyBoostRamp(boostStage);return;}
-        boostStage=next; applyBoostRamp(prev);
+        boostStage=4; applyBoostRamp(prev);
       });
       return;
     }
@@ -2278,21 +2272,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   function ensureMobileVersionInControlRow(app){
     if(!app) return;
-    var VERSION_TEXT='WebRadio 666 Sounds Design '+VERSION;
-    // v182: keine Versions-Badge mehr in der Discord/SEND-Leiste.
-    qa('.smfp-version-badge,.mff-version-inline',app).forEach(function(n){try{n.remove();}catch(e){}});
-    var shell=q('.mff-shell',app);
-    var footer=q('#mffVersionFooter',app);
-    if(!footer && shell){
-      footer=document.createElement('div');
-      footer.id='mffVersionFooter';
-      footer.className='mff-version-footer';
-      shell.appendChild(footer);
-    }
-    if(footer){
-      footer.textContent=VERSION_TEXT;
-      footer.setAttribute('aria-label','Player Version '+VERSION);
-    }
+    var badge=q('.smfp-version-badge',app);
+    var slot=q('.mff-discord-slot',app);
+    if(!badge || !slot) return;
+    badge.textContent=VERSION;
+    badge.classList.add('mff-version-inline');
+    badge.setAttribute('aria-label','Player Version '+VERSION);
+    if(badge.parentNode!==slot) slot.appendChild(badge);
   }
 
   function bindHistoryModalV17(app){
@@ -2316,17 +2302,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
-      '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div></section>'+
+    app.innerHTML='<div class="smfp-version-badge">v178</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+      '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
       '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
-      '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><i class="mff-boost-led" data-led="4"></i><i class="mff-boost-led" data-led="5"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section><div id="mffVersionFooter" class="mff-version-footer">WebRadio 666 Sounds Design v182</div></main>';
+      '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><i class="mff-boost-led" data-led="4"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
     document.body.insertBefore(app,document.body.firstChild);
     buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
     purgeMobileVisualizerLayers(app);
     ensureMobileVersionInControlRow(app);
-    ensureMobileUtilityButtons();
     var controls=q('.mff-controls',app);
     var handler=function(ev){
       var btn=ev.target.closest&&ev.target.closest('[data-mff]'); if(!btn)return;
@@ -3280,10 +3265,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION='v182';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
-    document.documentElement.setAttribute('data-smfp-version','v175');
+    document.documentElement.setAttribute('data-smfp-version','v181');
     var pc=document.querySelector('#pcVersionBadge .status-code');
     setText(pc,VERSION);
     document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
@@ -3738,9 +3723,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION='v182';
-  var BUILD='smfp-v183-emergency-click-unblock-20260520';
-  try{document.documentElement.setAttribute('data-smfp-version','v175');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var BUILD='smfp-v181-backend-kv-iphone-ui-20260519';
+  try{document.documentElement.setAttribute('data-smfp-version','v181');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
   function apply(){
     setText(document.getElementById('pcVersionBadge'));
@@ -3750,7 +3735,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',apply,{once:true});
 })();
 </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v183-emergency-click-unblock-20260520" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=smfp-v181-backend-kv-iphone-ui-20260519" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -3975,7 +3960,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #nowPlayingTicker,.now-playing .ticker-text{ color:#16fff3!important; text-shadow:0 0 8px rgba(22,255,243,.46),0 0 12px rgba(255,61,187,.18)!important; }
   #playBtn::before,.play-btn::before,button[aria-label="Play"]::before,button[title="Play"]::before { background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.44),rgba(142,69,255,.18) 44%,rgba(22,255,243,.10) 66%,transparent 78%)!important; filter:blur(10px) saturate(1.05)!important; opacity:.26!important; transform:scale(1.00)!important; }
   body[data-transport-state="play"] #playBtn::before { opacity:.40!important; filter:blur(11px) saturate(1.12)!important; }
-  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code{font-size:0!important} body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4055,7 +4040,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 8px rgba(22,255,243,.70),0 0 16px rgba(22,255,243,.36),0 0 12px rgba(255,61,187,.18)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4162,7 +4147,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     text-shadow:0 0 7px rgba(22,255,243,.72),0 0 14px rgba(22,255,243,.34)!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4248,7 +4233,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4324,7 +4309,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4391,7 +4376,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     gap:7px!important;
   }
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4437,7 +4422,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   body .pc-addon-core{left:18px!important;right:18px!important;}
   body .pc-addon-spectrum{left:18px!important;right:18px!important;gap:6px!important;}
   body #pcVersionBadge .status-code{font-size:0!important}
-  body #pcVersionBadge .status-code::after{content:"v175"!important;font-size:11px!important;line-height:1!important}
+  body #pcVersionBadge .status-code::after{content:"v177"!important;font-size:11px!important;line-height:1!important}
 }
 </style>
 
@@ -4496,7 +4481,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION='v182';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4521,44 +4506,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(!btn)return; btn.disabled=true; var sec=Math.ceil(ms/1000); btn.textContent='WAIT '+sec;
     var iv=setInterval(function(){sec-=1;if(sec<=0){clearInterval(iv);btn.disabled=false;btn.textContent='SEND';}else btn.textContent='WAIT '+sec;},1000);
   }
-  function setMobileSendState(state,text){
-    var app=document.getElementById('mffApp');
-    if(!app) return;
-    app.setAttribute('data-mff-send-state',state||'idle');
-    var label=app.querySelector('#mffSendStatusText');
-    if(label) label.textContent=text||'';
-  }
-  function ensureMobileUtilityButtons(){
-    var app=document.getElementById('mffApp'); if(!app) return;
-    var slot=app.querySelector('.mff-discord-slot'); if(!slot) return;
-    // äußere Panels bereinigen: nur LED/DC/MSG/SEND/HISTORY in einer Zeile.
-    slot.querySelectorAll('.smfp-version-badge,.mff-version-inline').forEach(function(n){try{n.remove();}catch(e){}});
-    var send=app.querySelector('#mffAlertOpen');
-    if(!send){send=document.createElement('button');send.id='mffAlertOpen';send.className='mff-alert-open';send.type='button';send.textContent='SEND';}
-    var leds=app.querySelector('#mffSendLeds');
-    if(!leds){leds=document.createElement('span');leds.id='mffSendLeds';leds.className='mff-send-leds';leds.innerHTML='<i data-send-led="request"></i><i data-send-led="delivered"></i><b id="mffSendStatusText"></b>'; }
-    var hist=app.querySelector('.mff-history');
-    if(!hist){hist=document.createElement('button');hist.className='mff-history';hist.type='button';hist.textContent='History';}
-    // Reihenfolge: Discord-Addon bleibt links, danach SEND, Status-LEDs, History.
-    if(send.parentNode!==slot) slot.appendChild(send);
-    if(leds.parentNode!==slot) slot.appendChild(leds);
-    if(hist.parentNode!==slot) slot.appendChild(hist);
-    bindHistoryModalV17(app);
-  }
   async function sendMessage(text, btn){
-    var msg=clean(text);
-    if(!msg){setMobileSendState('failed','EMPTY'); return {ok:false,error:'empty_message'};}
-    setMobileSendState('sending','SEND');
+    var msg=clean(text); if(!msg){return;}
     try{
       var res=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:senderId,source:'player',version:VERSION}),cache:'no-store'});
       var data={}; try{data=await res.json();}catch(e){}
-      if(res.status===429){setMobileSendState('failed','WAIT');setDisabled(btn,Math.max(1000,Number(data.retryAfterMs||RATE_MS)));return {ok:false,error:'rate_limited'};}
-      if(!res.ok || data.ok===false)throw new Error(data.error||data.message||'send_failed');
+      if(res.status===429){setDisabled(btn,Math.max(1000,Number(data.retryAfterMs||RATE_MS)));return;}
+      if(!res.ok)throw new Error(data.error||'send_failed');
       if(data.id) lastSeen=String(data.id);
-      setMobileSendState('delivered','OK');
       setDisabled(btn,RATE_MS);
-      return {ok:true,data:data};
-    }catch(err){console.warn('player alert send failed',err);setMobileSendState('failed','FAIL');return {ok:false,error:String(err&&err.message||err)};}
+    }catch(err){console.warn('player alert send failed',err);}
   }
   function bindPc(){
     var btn=document.getElementById('playerAlertPcSend'); var text=document.getElementById('playerAlertPcText');
@@ -4567,7 +4524,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   function ensureMobileButton(){
     var app=document.getElementById('mffApp'); if(!app)return; var slot=app.querySelector('.mff-discord-slot'); if(!slot)return;
-    ensureMobileUtilityButtons();
+    if(!app.querySelector('#mffAlertOpen')){var btn=document.createElement('button');btn.id='mffAlertOpen';btn.className='mff-alert-open';btn.type='button';btn.textContent='SEND';slot.appendChild(btn);}
+    else { var existing=app.querySelector('#mffAlertOpen'); if(existing && existing.parentNode!==slot) slot.appendChild(existing); }
     if(!document.getElementById('mffAlertEditorBackdrop')){
       var b=document.createElement('div');b.id='mffAlertEditorBackdrop';b.className='mff-alert-editor-backdrop';b.setAttribute('aria-hidden','true');
       b.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
@@ -4579,7 +4537,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       function openEditor(ev){
         if(ev){ev.preventDefault();ev.stopPropagation();}
         if(back){back.classList.add('is-open');back.setAttribute('aria-hidden','false');}
-        /* v182: kein Auto-Focus auf iPhone, verhindert Safari-Zoomsprung. */
+        if(ta){setTimeout(function(){try{ta.focus();}catch(e){}},40);}
       }
       open.addEventListener('click',openEditor,true);
       open.addEventListener('touchend',openEditor,{passive:false,capture:true});
@@ -4588,7 +4546,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     function close(){if(back){back.classList.remove('is-open');back.setAttribute('aria-hidden','true');}}
     if(back&&!back.__smfpAlertBackBound){back.__smfpAlertBackBound=true;back.addEventListener('click',function(ev){if(ev.target===back)close();},true);}
     if(cancel&&!cancel.__smfpAlertBound){cancel.__smfpAlertBound=true;cancel.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();close();},true);}
-    if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',async function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';var result=await sendMessage(v,send); if(result&&result.ok){ if(ta)ta.value=''; setTimeout(close,650); }},true);}
+    if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';sendMessage(v,send); if(ta)ta.value=''; close();},true);}
   }
   async function poll(){
     try{var r=await fetch(CURRENT_URL,{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
@@ -4622,7 +4580,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       z-index:32!important;
     }
     body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{z-index:45!important;pointer-events:auto!important;}
-    body #pcVersionBadge .status-code::after{content:"v175"!important;}
+    body #pcVersionBadge .status-code::after{content:"v177"!important;}
   }
   @media (max-width:760px){
     #mffBroadcastDisplay,#mffInlineBroadcastPanel{display:none!important;visibility:hidden!important;pointer-events:none!important;}
@@ -4651,85 +4609,364 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     #mffApp .mff-bottom-bars i.mff-seg-on{filter:brightness(1.04) saturate(1.08)!important;}
   }
 </style>
-
-
-
-<!-- SMFP v183 EMERGENCY CLICK UNBLOCK
-     Zweck: Nach v182 blockierende Mobile-Overlay-/Backdrop-Zustände entschärfen.
-     Kein neues UI, keine PC-Geometrie, kein EQ, kein Worker-Umbau. Bestehende Overlays dürfen nur mit .is-open Klicks abfangen. -->
-<style id="smfpV183EmergencyClickUnblockCss">
-@media (max-width:760px){
-  body:not(.smfp-overlay-open) > #mffAlertEditorBackdrop:not(.is-open),
-  body:not(.smfp-overlay-open) > #mffExtremeBoostBackdrop:not(.is-open),
-  body:not(.smfp-overlay-open) > #playerAlertReceiveBackdrop:not(.is-open),
-  body:not(.smfp-overlay-open) .mff-alert-editor-backdrop:not(.is-open),
-  body:not(.smfp-overlay-open) .player-alert-backdrop:not(.is-open),
-  #mffApp:not([data-history-open="1"]) .mff-history-backdrop,
-  #mffApp:not([data-history-open="1"]) .mff-history-overlay{
-    display:none!important;
-    visibility:hidden!important;
-    opacity:0!important;
-    pointer-events:none!important;
-  }
-  body > #mffAlertEditorBackdrop.is-open,
-  body > #mffExtremeBoostBackdrop.is-open,
-  body > #playerAlertReceiveBackdrop.is-open{
-    display:flex!important;
-    visibility:visible!important;
-    opacity:1!important;
-    pointer-events:auto!important;
-  }
-  #mffApp,
-  #mffApp .mff-shell,
-  #mffApp button,
-  #mffApp [role="button"],
-  #mffApp input,
-  #mffApp textarea{
-    pointer-events:auto!important;
-    touch-action:manipulation!important;
-  }
-}
-</style>
-<script id="smfpV183EmergencyClickUnblockScript">
+<script id="smfpV164RescueCleanScript">
 (function(){
   'use strict';
-  function qsa(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
-  function hardCloseStaleOverlays(){
-    var app=document.getElementById('mffApp');
-    if(app && app.getAttribute('data-history-open')!=='1'){
-      app.setAttribute('data-history-open','0');
-      qsa('#mffHistoryOverlay,#mffHistoryBackdrop',app).forEach(function(n){
-        if(n.id==='mffHistoryOverlay') n.setAttribute('aria-hidden','true');
-      });
+  if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var SEND_URL='/api/player-alert/send';
+  var SENDER_KEY='smfpPlayerAlertSenderId';
+  function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
+  function qs(s,r){return (r||document).querySelector(s);}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function clean(t){return String(t||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
+  function sender(){try{var v=localStorage.getItem(SENDER_KEY);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(SENDER_KEY,v);}return v;}catch(e){return 'smfp-'+Math.random().toString(36).slice(2,10);}}
+  function setVersion(){
+    document.documentElement.setAttribute('data-smfp-version',VERSION);
+    var meta=qs('meta[name="smfp-version"]'); if(meta) meta.setAttribute('content',VERSION);
+    qsa('.smfp-version-badge,.mff-version-inline,#pcVersionBadge').forEach(function(n){ if(/v\d+/i.test(n.textContent||'')) n.textContent=VERSION; });
+  }
+  function removeJunk(){
+    qsa('#mffBroadcastDisplay,#mffInlineBroadcastPanel').forEach(function(n){try{n.remove();}catch(e){}});
+    qsa('#mffAlertEditorBackdrop').forEach(function(n,i){ if(i>0) try{n.remove();}catch(e){} });
+  }
+  function ensureStatus(back){
+    var box=qs('.mff-alert-editor',back||document); if(!box) return null;
+    var s=qs('.smfp-send-status-v164',box);
+    if(!s){s=document.createElement('div');s.className='smfp-send-status-v164';s.setAttribute('aria-live','polite');s.textContent='READY';box.appendChild(s);} return s;
+  }
+  function status(text,type){
+    var s=ensureStatus(qs('#mffAlertEditorBackdrop'));
+    if(!s) return;
+    s.classList.remove('is-ok','is-error'); if(type==='ok')s.classList.add('is-ok'); if(type==='error')s.classList.add('is-error');
+    s.textContent=text;
+  }
+  function ensureEditor(){
+    var back=qs('#mffAlertEditorBackdrop');
+    if(!back){
+      back=document.createElement('div'); back.id='mffAlertEditorBackdrop'; back.className='mff-alert-editor-backdrop'; back.setAttribute('aria-hidden','true');
+      back.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
+      document.body.appendChild(back);
     }
-    ['mffAlertEditorBackdrop','mffExtremeBoostBackdrop','playerAlertReceiveBackdrop'].forEach(function(id){
-      var el=document.getElementById(id);
-      if(!el) return;
-      if(!el.classList.contains('is-open')){
-        el.setAttribute('aria-hidden','true');
-        el.style.pointerEvents='none';
-        el.style.display='none';
-        el.style.visibility='hidden';
-        el.style.opacity='0';
+    ensureStatus(back);
+    return back;
+  }
+  function openEditor(ev){
+    if(!mobile()) return;
+    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
+    var back=ensureEditor(); back.classList.add('is-open'); back.setAttribute('aria-hidden','false'); status('READY',null);
+    setTimeout(function(){try{qs('#mffAlertText',back).focus();}catch(e){}},60);
+  }
+  function closeEditor(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
+    var back=qs('#mffAlertEditorBackdrop'); if(back){back.classList.remove('is-open'); back.setAttribute('aria-hidden','true');}
+  }
+  async function sendEditor(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
+    var back=ensureEditor(), ta=qs('#mffAlertText',back), btn=qs('#mffAlertSend',back), msg=clean(ta&&ta.value);
+    if(!msg){status('ENTER MESSAGE FIRST','error');try{ta&&ta.focus();}catch(e){} return;}
+    if(btn){btn.disabled=true;btn.textContent='SENDING';}
+    status('SENDING...',null);
+    try{
+      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v177',version:VERSION}),cache:'no-store'});
+      var d={}; try{d=await r.json();}catch(_){ }
+      if(!r.ok || d.ok===false){
+        var m=d.error||d.message||('HTTP '+r.status);
+        if(r.status===429 && (d.retryAfterMs||d.retryAfter)){m='RATE LIMIT — WAIT '+Math.ceil(Number(d.retryAfterMs||d.retryAfter)/1000)+'s';}
+        throw new Error(m);
       }
+      if(ta) ta.value='';
+      if(btn){btn.textContent='SENT ✓';}
+      status('SENT ✓ MESSAGE DELIVERED','ok');
+      setTimeout(function(){closeEditor();},1300);
+    }catch(e){
+      if(btn){btn.textContent='FAILED';}
+      status('FAILED ✕ '+(e&&e.message?e.message:'CONNECTION ERROR'),'error');
+    }finally{
+      setTimeout(function(){if(btn){btn.disabled=false;btn.textContent='SEND';}},1500);
+    }
+  }
+  function bindSend(){
+    if(!mobile()) return;
+    var app=qs('#mffApp'); if(!app) return;
+    var slot=qs('.mff-discord-slot',app); if(!slot) return;
+    var open=qs('#mffAlertOpen',app);
+    if(!open){open=document.createElement('button');open.id='mffAlertOpen';open.className='mff-alert-open';open.type='button';open.textContent='SEND';slot.appendChild(open);}
+    if(open.parentNode!==slot) slot.appendChild(open);
+    ['pointerup','touchend','click'].forEach(function(t){if(!open['__v164_'+t]){open['__v164_'+t]=true;open.addEventListener(t,openEditor,{capture:true,passive:false});}});
+    var back=ensureEditor(), cancel=qs('#mffAlertCancel',back), send=qs('#mffAlertSend',back);
+    ['pointerup','touchend','click'].forEach(function(t){
+      if(cancel&&!cancel['__v164_'+t]){cancel['__v164_'+t]=true;cancel.addEventListener(t,closeEditor,{capture:true,passive:false});}
+      if(send&&!send['__v164_'+t]){send['__v164_'+t]=true;send.addEventListener(t,sendEditor,{capture:true,passive:false});}
     });
-    var anyOpen=!!document.querySelector('#mffAlertEditorBackdrop.is-open,#mffExtremeBoostBackdrop.is-open,#playerAlertReceiveBackdrop.is-open,#mffApp[data-history-open="1"]');
-    document.body.classList.toggle('smfp-overlay-open',anyOpen);
-    qsa('#mffApp button,#mffApp [role="button"],#mffApp input,#mffApp textarea').forEach(function(el){
-      if(el.disabled && !/WAIT|SENDING/i.test(String(el.textContent||''))) el.disabled=false;
-      el.style.pointerEvents='auto';
-      el.style.touchAction='manipulation';
+    if(!back.__v164Close){back.__v164Close=true;back.addEventListener('pointerup',function(ev){if(ev.target===back)closeEditor(ev);},{capture:true,passive:false});}
+  }
+  var smooth=.45;
+  function readLevel(){
+    var app=qs('#mffApp'); if(!app) return .35;
+    var raw=getComputedStyle(app).getPropertyValue('--mff-level')||getComputedStyle(document.documentElement).getPropertyValue('--mff-level');
+    var n=parseFloat(raw); if(!isFinite(n)) n=.35; return Math.max(.08,Math.min(.88,n));
+  }
+  function calmBottom(){
+    if(!mobile()) return;
+    var app=qs('#mffApp'); if(!app) return;
+    var target=readLevel(); smooth=smooth*.82+target*.18;
+    var scale=(.34+smooth*.72).toFixed(3);
+    var op=(.40+smooth*.48).toFixed(3);
+    app.style.setProperty('--smfp-v164-bottom-scale',scale);
+    app.style.setProperty('--smfp-v164-bottom-opacity',op);
+    var bars=qsa('#mffApp .mff-bottom-bars i');
+    var mid=(bars.length-1)/2;
+    bars.forEach(function(el,i){
+      var dist=Math.abs(i-mid)/(mid||1);
+      var on=smooth>(.12+dist*.38);
+      el.classList.toggle('mff-seg-on',on);
     });
   }
-  function bindOpenStateObserver(){
-    ['mffAlertEditorBackdrop','mffExtremeBoostBackdrop','playerAlertReceiveBackdrop','mffApp'].forEach(function(id){
-      var el=document.getElementById(id); if(!el || el.__smfpV183Obs) return; el.__smfpV183Obs=true;
-      new MutationObserver(hardCloseStaleOverlays).observe(el,{attributes:true,attributeFilter:['class','data-history-open','aria-hidden','style']});
-    });
-  }
-  function boot(){hardCloseStaleOverlays();bindOpenStateObserver();}
+  function boot(){setVersion();removeJunk();bindSend();calmBottom();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  setTimeout(boot,350); setTimeout(boot,1200);
+  window.addEventListener('load',boot,{passive:true});
+  window.addEventListener('resize',function(){setTimeout(boot,120);},{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(boot,300);},{passive:true});
+  [200,700,1500,3200].forEach(function(ms){setTimeout(boot,ms);});
+  setInterval(calmBottom,180);
+})();
+</script>
+
+
+
+<!-- SMFP_V181_iPHONE_UI_MESSAGE_BACKEND_SAFE
+     Zweck: iPhone-Player gezielt sortieren ohne PC-Layout/PC-EQ anzufassen.
+     - History aus Now-Playing oben in die Funktionsleiste schieben.
+     - Versionsbadge klein unter das untere Levelmeter setzen, ohne Panel.
+     - Discord-Außenpanel optisch entkernen: nur LED + DC + MSG sichtbar.
+     - SEND-Status LEDs: request/confirmed/failed.
+     - iPhone-Zoom nach Overlay/Textfeld-Fokus verhindern.
+     - Boost LEDs auf 5 Stufen sichtbar machen.
+-->
+<style id="smfpV181IphoneUiCss">
+@media (max-width:760px){
+  html,body{touch-action:manipulation!important;-webkit-text-size-adjust:100%!important;overscroll-behavior:none!important;}
+  #mffApp .mff-now{grid-template-columns:58px minmax(0,1fr)!important;}
+  #mffApp .mff-now .mff-history{display:none!important;}
+  #mffApp .mff-title h1,#mffApp .mff-title h2{min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;}
+  #mffApp .mff-title h1{display:block!important;animation:smfpV181Marquee 16s linear infinite!important;padding-left:100%!important;}
+  @keyframes smfpV181Marquee{0%{transform:translateX(0)}100%{transform:translateX(-210%)}}
+  #mffApp .mff-discord-slot{justify-content:flex-start!important;gap:5px!important;padding-left:2px!important;overflow:visible!important;}
+  #mffApp .mff-discord-slot [data-discord-addon-panel],
+  #mffApp .mff-discord-slot .s666-discord-panel{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;min-width:0!important;width:auto!important;max-width:none!important;height:26px!important;}
+  #mffApp .mff-discord-slot .s666-discord-actions{gap:4px!important;}
+  #mffApp .mff-discord-slot .s666-discord-button{height:24px!important;min-height:24px!important;min-width:43px!important;border-radius:12px!important;}
+  #mffApp .mff-discord-slot .s666-discord-text{display:none!important;}
+  #mffApp .smfp-version-badge,
+  #mffApp .mff-version-inline{position:static!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;color:#29fff4!important;font-weight:950!important;letter-spacing:.10em!important;}
+  #mffApp .smfp-v181-footer-version{display:block!important;text-align:center!important;margin:-4px 0 0!important;color:#29fff4!important;font-size:10px!important;font-weight:950!important;letter-spacing:.12em!important;text-shadow:0 0 10px rgba(22,255,243,.42)!important;}
+  #mffApp .smfp-v181-history-lane{display:flex!important;align-items:center!important;gap:6px!important;margin-left:auto!important;}
+  #mffApp .smfp-v181-history-lane .mff-history{display:flex!important;align-items:center!important;justify-content:center!important;width:62px!important;min-width:62px!important;height:28px!important;border-radius:13px!important;font-size:10px!important;padding:0 5px!important;}
+  #mffApp .smfp-v181-send-leds{display:inline-flex!important;align-items:center!important;gap:4px!important;margin-left:5px!important;vertical-align:middle!important;}
+  #mffApp .smfp-v181-send-led{width:8px!important;height:8px!important;border-radius:50%!important;border:1px solid rgba(247,248,255,.34)!important;background:rgba(247,248,255,.16)!important;box-shadow:inset 0 0 5px rgba(255,255,255,.08)!important;}
+  #mffApp[data-send-state="sending"] .smfp-v181-send-led[data-led="request"]{background:#29fff4!important;box-shadow:0 0 10px rgba(22,255,243,.9)!important;}
+  #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="request"],
+  #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="confirm"]{background:#29fff4!important;box-shadow:0 0 10px rgba(22,255,243,.9)!important;}
+  #mffApp[data-send-state="fail"] .smfp-v181-send-led[data-led="confirm"]{background:#ff315d!important;box-shadow:0 0 10px rgba(255,49,93,.9)!important;}
+  #mffApp .mff-boost-led-wrap .mff-boost-led[data-led="5"]{display:block!important;}
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="1"],
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="2"],
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="3"],
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="4"],
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="5"]{background:#ff315d!important;border-color:#ff315d!important;box-shadow:0 0 12px rgba(255,49,93,.92),0 0 20px rgba(255,49,93,.42)!important;}
+  #mffApp input,#mffApp textarea,#mffApp select{font-size:16px!important;transform:translateZ(0)!important;}
+  body.smfp-v181-overlay-lock{position:fixed!important;inset:0!important;width:100%!important;overflow:hidden!important;}
+}
+</style>
+<script id="smfpV181IphoneUiScript">
+(function(){
+  'use strict';
+  var VERSION='v181';
+  var FOOTER_TEXT='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
+  function qs(s,r){return (r||document).querySelector(s)}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+  function app(){return qs('#mffApp')}
+  function setVersion(){
+    try{document.documentElement.setAttribute('data-smfp-version',VERSION);var m=qs('meta[name="smfp-version"]'); if(m)m.setAttribute('content',VERSION);}catch(e){}
+    qsa('.status-code,.smfp-version-badge,.mff-version-inline').forEach(function(el){ if(/v\d+/i.test((el.textContent||'').trim())) el.textContent=VERSION; });
+  }
+  function installVersionFooter(a){
+    if(!a || qs('.smfp-v181-footer-version',a)) return;
+    var bottom=qs('.mff-bottom',a) || qs('.mff-bottom-bars',a);
+    if(!bottom || !bottom.parentNode) return;
+    var f=document.createElement('div'); f.className='smfp-v181-footer-version'; f.textContent=FOOTER_TEXT;
+    bottom.parentNode.insertBefore(f,bottom.nextSibling);
+  }
+  function moveHistory(a){
+    if(!a) return;
+    var h=qs('.mff-history',a); if(!h) return;
+    var slot=qs('.mff-discord-slot',a); if(!slot) return;
+    var lane=qs('.smfp-v181-history-lane',slot);
+    if(!lane){ lane=document.createElement('div'); lane.className='smfp-v181-history-lane'; slot.appendChild(lane); }
+    if(h.parentNode!==lane) lane.appendChild(h);
+    h.style.display='flex';
+  }
+  function flattenDiscord(a){
+    var slot=qs('.mff-discord-slot',a); if(!slot) return;
+    qsa('[data-discord-addon-panel],.s666-discord-panel',slot).forEach(function(p){
+      p.style.background='transparent'; p.style.border='0'; p.style.boxShadow='none'; p.style.padding='0';
+    });
+  }
+  function installSendLeds(a){
+    if(!a || qs('.smfp-v181-send-leds',a)) return;
+    var send=qs('#mffAlertOpen',a) || qs('.mff-alert-open',a) || qs('button[data-action="send"]',a);
+    if(!send || !send.parentNode) return;
+    var leds=document.createElement('span'); leds.className='smfp-v181-send-leds'; leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
+    send.parentNode.insertBefore(leds,send.nextSibling);
+  }
+  function installBoostLed5(a){
+    var wrap=qs('.mff-boost-led-wrap',a); if(!wrap || qs('.mff-boost-led[data-led="5"]',wrap)) return;
+    var led=document.createElement('span'); led.className='mff-boost-led'; led.setAttribute('data-led','5'); wrap.appendChild(led);
+  }
+  function sendState(s){ var a=app(); if(!a)return; a.setAttribute('data-send-state',s||'idle'); clearTimeout(window.__smfpV181SendStateTimer); if(s==='ok'||s==='fail') window.__smfpV181SendStateTimer=setTimeout(function(){var b=app(); if(b)b.setAttribute('data-send-state','idle')},3600); }
+  function patchFetchStatus(){
+    if(window.__smfpV181FetchPatched) return; window.__smfpV181FetchPatched=true;
+    var real=window.fetch;
+    window.fetch=function(input,init){
+      var url=String((input&&input.url)||input||'');
+      var isSend=url.indexOf('/api/player-alert/send')>=0;
+      if(isSend) sendState('sending');
+      return real.apply(this,arguments).then(function(res){ if(isSend) sendState(res && res.ok ? 'ok':'fail'); return res; }).catch(function(err){ if(isSend) sendState('fail'); throw err; });
+    };
+  }
+  function lockViewport(){
+    if(window.__smfpV181ViewportPatched) return; window.__smfpV181ViewportPatched=true;
+    var y=0;
+    document.addEventListener('focusin',function(e){ if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){ y=window.scrollY||0; document.body.classList.add('smfp-v181-overlay-lock'); document.body.style.top='-'+y+'px'; } },true);
+    document.addEventListener('focusout',function(){ if(document.body.classList.contains('smfp-v181-overlay-lock')){ document.body.classList.remove('smfp-v181-overlay-lock'); document.body.style.top=''; window.scrollTo(0,y||0); } },true);
+  }
+  function boot(){ var a=app(); if(!a)return; setVersion(); moveHistory(a); flattenDiscord(a); installSendLeds(a); installBoostLed5(a); installVersionFooter(a); patchFetchStatus(); lockViewport(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  setInterval(boot,1200);
+})();
+</script>
+
+
+
+<!-- SMFP_V181_MOBILE_VISIBLE_ROOTFIX
+     Zweck: Sichtbarer iPhone-Rootfix ohne PC-Layout/PC-EQ anzufassen.
+     - History ersetzt das obere Versionsbadge in der Mobile-Funktionszeile.
+     - Version wird nur als kleiner Text unter dem unteren Levelmeter angezeigt.
+     - SEND wird hart auf /api/player-alert/send gebunden und meldet PLAYER SENT/FAILED, nicht Discord/global.
+     - Discord-Außenpanel optisch entfernt; DC/MSG bleiben als kleine Buttons + LED.
+     - Alte Send-Handler werden im Capture-Pfad für den Player-SEND blockiert.
+-->
+<style id="smfpV181MobileVisibleRootfixCss">
+@media (max-width:760px){
+  #mffApp .mff-now .mff-history{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+  #mffApp .mff-discord-slot{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;padding-left:0!important;overflow:visible!important;}
+  #mffApp .mff-discord-slot [data-discord-addon-panel],
+  #mffApp .mff-discord-slot .s666-discord-panel{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;min-width:0!important;width:auto!important;max-width:none!important;height:28px!important;display:flex!important;align-items:center!important;gap:5px!important;}
+  #mffApp .mff-discord-slot .s666-discord-status{display:inline-flex!important;min-width:10px!important;width:10px!important;gap:0!important;overflow:visible!important;}
+  #mffApp .mff-discord-slot .s666-discord-text{display:none!important;}
+  #mffApp .mff-discord-slot .s666-discord-actions{display:inline-flex!important;align-items:center!important;gap:4px!important;}
+  #mffApp .mff-discord-slot .s666-discord-button{height:25px!important;min-height:25px!important;min-width:44px!important;border-radius:13px!important;font-size:10px!important;padding:0 8px!important;}
+  #mffApp .smfp-version-badge,
+  #mffApp .mff-version-inline,
+  #mffApp .smfp-v181-hidden-version{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+  #mffApp .smfp-v181-history-lane{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;margin-left:auto!important;}
+  #mffApp .smfp-v181-history-lane .mff-history{display:flex!important;visibility:visible!important;pointer-events:auto!important;align-items:center!important;justify-content:center!important;width:66px!important;min-width:66px!important;height:30px!important;border-radius:14px!important;font-size:10px!important;font-weight:900!important;padding:0 6px!important;background:rgba(4,8,20,.72)!important;border:1px solid rgba(255,61,187,.58)!important;box-shadow:0 0 10px rgba(255,61,187,.18),inset 0 0 10px rgba(255,255,255,.025)!important;color:#fff!important;}
+  #mffApp .smfp-v181-footer-version{display:block!important;text-align:center!important;margin:4px 0 0!important;color:#29fff4!important;font-size:10px!important;font-weight:950!important;letter-spacing:.12em!important;text-shadow:0 0 10px rgba(22,255,243,.48)!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+  #mffApp .smfp-v181-send-leds{display:inline-flex!important;align-items:center!important;gap:4px!important;margin-left:4px!important;}
+  #mffApp .smfp-v181-send-led{width:8px!important;height:8px!important;border-radius:50%!important;border:1px solid rgba(247,248,255,.38)!important;background:rgba(247,248,255,.14)!important;box-shadow:inset 0 0 5px rgba(255,255,255,.08)!important;}
+  #mffApp[data-send-state="sending"] .smfp-v181-send-led[data-led="request"]{background:#ffaa26!important;border-color:#ffaa26!important;box-shadow:0 0 11px rgba(255,170,38,.95)!important;}
+  #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="request"],
+  #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="confirm"]{background:#29fff4!important;border-color:#29fff4!important;box-shadow:0 0 11px rgba(22,255,243,.95)!important;}
+  #mffApp[data-send-state="fail"] .smfp-v181-send-led[data-led="confirm"]{background:#ff315d!important;border-color:#ff315d!important;box-shadow:0 0 11px rgba(255,49,93,.95)!important;}
+  #mffApp .mff-title h1{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;min-width:max-content!important;padding-left:100%!important;animation:smfpV181TrueMarquee 18s linear infinite!important;}
+  @keyframes smfpV181TrueMarquee{0%{transform:translateX(0)}100%{transform:translateX(-240%)}}
+  #mffApp input,#mffApp textarea,#mffApp select{font-size:16px!important;}
+  body.smfp-v181-nozoom{position:fixed!important;inset:0!important;width:100%!important;overflow:hidden!important;}
+}
+</style>
+<script id="smfpV181MobileVisibleRootfixScript">
+(function(){
+  'use strict';
+  var VERSION='v181';
+  var SEND_URL='/api/player-alert/send';
+  function qs(s,r){return (r||document).querySelector(s)}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+  function app(){return qs('#mffApp')}
+  function textClean(v){return String(v||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240)}
+  function sender(){try{var k='smfpPlayerAlertSenderId';var v=localStorage.getItem(k);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v)}return v}catch(e){return 'smfp-session'}}
+  function setVersion(){
+    try{window.SMFP_VERSION={label:VERSION,number:181,cacheBust:'smfp-v181-mobile-visible-rootfix-20260519'};document.documentElement.setAttribute('data-smfp-version',VERSION);document.documentElement.setAttribute('data-smfp-cache-bust','smfp-v181-mobile-visible-rootfix-20260519');var m=qs('meta[name="smfp-version"]');if(m)m.setAttribute('content',VERSION)}catch(e){}
+    qsa('#mffApp .smfp-version-badge,#mffApp .mff-version-inline').forEach(function(el){el.classList.add('smfp-v181-hidden-version');el.textContent='';});
+    qsa('#pcVersionBadge .status-code,.status-code').forEach(function(el){if(/v\d+/i.test(el.textContent||''))el.textContent=VERSION;});
+  }
+  function installFooter(a){
+    if(!a)return;
+    var old=qsa('.smfp-v180-footer-version,.smfp-v181-footer-version',a); old.forEach(function(n,i){if(i>0)try{n.remove()}catch(e){}});
+    var footer=qs('.smfp-v181-footer-version',a)||qs('.smfp-v180-footer-version',a);
+    if(!footer){footer=document.createElement('div');footer.className='smfp-v181-footer-version';}
+    footer.className='smfp-v181-footer-version';
+    footer.textContent='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
+    var bottom=qs('.mff-bottom',a)||qs('.mff-bottom-bars',a);
+    if(bottom&&bottom.parentNode&&footer.parentNode!==bottom.parentNode){bottom.parentNode.insertBefore(footer,bottom.nextSibling);} else if(bottom&&bottom.parentNode&&!footer.parentNode){bottom.parentNode.insertBefore(footer,bottom.nextSibling);}
+  }
+  function moveHistory(a){
+    if(!a)return;
+    var h=qs('.mff-history',a); if(!h)return;
+    var slot=qs('.mff-discord-slot',a); if(!slot)return;
+    qsa('.smfp-v181-history-lane',slot).forEach(function(n,i){if(i>0)try{n.remove()}catch(e){}});
+    var lane=qs('.smfp-v181-history-lane',slot)||document.createElement('div');
+    lane.className='smfp-v181-history-lane';
+    if(!lane.parentNode)slot.appendChild(lane);
+    if(h.parentNode!==lane)lane.appendChild(h);
+    h.style.display='flex'; h.style.visibility='visible'; h.style.pointerEvents='auto';
+  }
+  function cleanDiscordPanel(a){
+    var slot=qs('.mff-discord-slot',a); if(!slot)return;
+    qsa('[data-discord-addon-panel],.s666-discord-panel',slot).forEach(function(p){p.style.background='transparent';p.style.border='0';p.style.boxShadow='none';p.style.padding='0';p.style.margin='0';});
+    qsa('.s666-discord-text',slot).forEach(function(t){t.style.display='none'});
+  }
+  function installSendLeds(a){
+    if(!a)return;
+    qsa('.smfp-v180-send-leds',a).forEach(function(n){try{n.remove()}catch(e){}});
+    if(qs('.smfp-v181-send-leds',a))return;
+    var send=qs('#mffAlertOpen',a)||qs('.mff-alert-open',a); if(!send||!send.parentNode)return;
+    var leds=document.createElement('span');leds.className='smfp-v181-send-leds';leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
+    send.parentNode.insertBefore(leds,send.nextSibling);
+  }
+  function sendState(s){var a=app(); if(!a)return; a.setAttribute('data-send-state',s||'idle');clearTimeout(window.__smfpV181SendTimer);if(s==='ok'||s==='fail')window.__smfpV181SendTimer=setTimeout(function(){var b=app();if(b)b.setAttribute('data-send-state','idle')},3600);}
+  function status(text,cls){
+    var back=qs('#mffAlertEditorBackdrop'); if(!back)return;
+    var s=qs('.smfp-send-status-v181',back)||qs('.smfp-send-status-v164',back)||document.createElement('div');
+    s.className='smfp-send-status-v181 smfp-send-status-v164 '+(cls||''); s.textContent=text;
+    var box=qs('.mff-alert-editor',back); if(box&&!s.parentNode)box.appendChild(s);
+  }
+  async function hardSend(ev){
+    var target=ev.target&&ev.target.closest&&ev.target.closest('#mffAlertSend');
+    if(!target)return;
+    ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+    var ta=qs('#mffAlertText'); var msg=textClean(ta&&ta.value);
+    if(!msg){sendState('fail');status('FAILED: ENTER MESSAGE FIRST','is-error');return false;}
+    target.disabled=true; target.textContent='SENDING'; sendState('sending'); status('PLAYER SENDING...','');
+    try{
+      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-player',version:VERSION}),cache:'no-store'});
+      var d={};try{d=await r.json()}catch(e){}
+      if(!r.ok||d.ok===false)throw new Error(d.error||d.message||('HTTP '+r.status));
+      if(ta)ta.value=''; target.textContent='SENT'; sendState('ok'); status('PLAYER SENT ✓ '+String(d.source||'backend/cache').toUpperCase().replace('CACHE-TERTIARY','CACHE FALLBACK'),'is-ok');
+      setTimeout(function(){var b=qs('#mffAlertEditorBackdrop'); if(b){b.classList.remove('is-open');b.setAttribute('aria-hidden','true')}},1200);
+    }catch(e){target.textContent='FAILED';sendState('fail');status('PLAYER FAILED ✕ '+String(e&&e.message||'CONNECTION ERROR'),'is-error');}
+    finally{setTimeout(function(){target.disabled=false;target.textContent='SEND'},1500);}
+    return false;
+  }
+  function lockZoom(){
+    if(window.__smfpV181ZoomLock)return; window.__smfpV181ZoomLock=true; var y=0;
+    document.addEventListener('focusin',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){y=window.scrollY||0;document.body.classList.add('smfp-v181-nozoom');document.body.style.top='-'+y+'px'}},true);
+    document.addEventListener('focusout',function(){if(document.body.classList.contains('smfp-v181-nozoom')){document.body.classList.remove('smfp-v181-nozoom');document.body.style.top='';setTimeout(function(){window.scrollTo(0,y||0)},30)}},true);
+  }
+  function boot(){var a=app();setVersion();if(!a)return;moveHistory(a);installFooter(a);cleanDiscordPanel(a);installSendLeds(a);lockZoom();}
+  document.addEventListener('click',hardSend,true);document.addEventListener('touchend',hardSend,{capture:true,passive:false});document.addEventListener('pointerup',hardSend,{capture:true,passive:false});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setTimeout(boot,120);setTimeout(boot,700);setInterval(boot,1000);
 })();
 </script>
 

@@ -1,9 +1,10 @@
 {
   "name": "webradio-666soundsdesign-worker",
   "main": "worker.js",
-  "compatibility_date": "2024-05-15",
-  "vars": {
-    "PLAYER_ALERT_BACKEND_URL": "https://auto-setup-render-for-backend-mp3.onrender.com",
-    "PLAYER_ALERT_MODE": "BACKEND_PRIMARY_KV_FALLBACK_V182"
-  }
+  "compatibility_date": "2024-05-15"
 }
+
+
+// V181 PLAYER ALERT BACKEND PRIMARY:
+// Set PLAYER_ALERT_BACKEND_URL in Cloudflare Variables to the Renda/Render relay base URL.
+// Keep PLAYER_ALERT_KV binding as fallback only.

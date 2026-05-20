@@ -1,0 +1,44 @@
+/*
+==========================================
+DATEI: core/overlay/overlay-core.css
+ERSTELLT: 2026-05-19
+GEÄNDERT: 2026-05-19
+ZWECK:
+- Zentraler Overlay-Basisschutz für iPhone/PC.
+- Keine neuen sichtbaren Layer, keine Layout-Umbauten.
+- Verhindert iOS-Zoomsprünge bei Textarea/Input in bestehenden Overlays.
+==========================================
+*/
+:root{
+  --smfp-overlay-z-backdrop:2147483200;
+  --smfp-overlay-z-panel:2147483300;
+}
+html.smfp-overlay-locked,
+body.smfp-overlay-locked{
+  overscroll-behavior:none!important;
+}
+@media (max-width:760px){
+  html.smfp-overlay-locked,
+  body.smfp-overlay-locked{
+    width:100vw!important;
+    max-width:100vw!important;
+    overflow:hidden!important;
+    touch-action:none!important;
+  }
+  #mffApp.smfp-overlay-lock-host{
+    width:100vw!important;
+    max-width:100vw!important;
+    overflow:hidden!important;
+  }
+  .smfp-overlay-textfield,
+  #mffAlertText,
+  #s666DiscordCustomMessage,
+  #s666DiscordGateCode,
+  #s666DiscordGateOverlay input,
+  #s666DiscordGateOverlay textarea,
+  #mffAlertEditorBackdrop input,
+  #mffAlertEditorBackdrop textarea{
+    font-size:16px!important; /* iOS: verhindert Auto-Zoom beim Fokus */
+    touch-action:manipulation!important;
+  }
+}
