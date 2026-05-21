@@ -7,7 +7,7 @@
    ========================================================== */
 (function(){
   'use strict';
-  var VERSION='v181-broadcast-final-fix-20260521';
+  var VERSION='v152-alert-fix-20260515';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var POLL_MS=10000;
@@ -120,7 +120,7 @@
       });
       return;
     }
-    if(btn && !btn.__s666AlertBound){btn.__s666AlertBound=true;btn.addEventListener('click',function(ev){ev.preventDefault();if(window.innerWidth<=760 || (window.matchMedia && window.matchMedia('(max-width:760px)').matches)){openComposer();}else{sendFromPcInline();}});}
+    if(btn && !btn.__s666AlertBound){btn.__s666AlertBound=true;btn.addEventListener('click',function(ev){ev.preventDefault();sendFromPcInline();});}
     if(input && !input.__s666AlertBound){input.__s666AlertBound=true;input.addEventListener('keydown',function(ev){if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'){ev.preventDefault();sendFromPcInline();}});}
   }
   function mountMobile(){
@@ -175,30 +175,7 @@
       sendFromPcInline();
     },true);
 
-    // v181 broadcast final delegated SEND safety
-  document.addEventListener('click',function(ev){
-    var target=ev.target && ev.target.closest ? ev.target.closest('#playerAlertPcSend') : null;
-    if(!target)return;
-    ev.preventDefault();
-    ev.stopPropagation();
-    if(window.innerWidth<=760 || (window.matchMedia && window.matchMedia('(max-width:760px)').matches)){
-      openComposer();
-    }else if(typeof sendFromPcInline==='function'){
-      sendFromPcInline();
-    }
-  },true);
-
-  document.addEventListener('touchend',function(ev){
-    var target=ev.target && ev.target.closest ? ev.target.closest('#playerAlertPcSend') : null;
-    if(!target)return;
-    if(window.innerWidth<=760 || (window.matchMedia && window.matchMedia('(max-width:760px)').matches)){
-      ev.preventDefault();
-      ev.stopPropagation();
-      openComposer();
-    }
-  },{passive:false,capture:true});
-
-  document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){closeListenerOverlay();closeComposer();}});
+    document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){closeListenerOverlay();closeComposer();}});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })();

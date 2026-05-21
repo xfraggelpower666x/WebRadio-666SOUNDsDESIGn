@@ -262,7 +262,7 @@ const PLAYER_ALERT_KV_CURRENT_KEY = 'player-alert:current';
 const PLAYER_ALERT_KV_RATE_KEY = 'player-alert:rate';
 const PLAYER_ALERT_KV_HISTORY_KEY = 'player-alert:history';
 function playerAlertJson(data, status = 200){
-  return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store, no-cache, must-revalidate, max-age=0','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'}});
+  return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'}});
 }
 function playerAlertCleanText(value){
   return String(value || '').replace(/[<>]/g, '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
@@ -322,13 +322,13 @@ async function handlePlayerAlertV152(request, env){
     return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-kv-fallback-cache-tertiary'});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
-    const kv = await playerAlertKvGet(env, PLAYER_ALERT_KV_CURRENT_KEY);
-    if(kv && kv.active) return playerAlertJson(Object.assign({ok:true,source:'kv-fallback'}, kv));
-    const cache = await playerAlertCacheGet(PLAYER_ALERT_CACHE_KEY);
-    if(cache && cache.active) return playerAlertJson(Object.assign({ok:true,source:'cache-tertiary'}, cache));
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
-    if(backend && backend.ok && backend.data && backend.data.active) return playerAlertJson(Object.assign({ok:true,source:'backend'}, backend.data));
-    return playerAlertJson({ok:true,active:false, source:'none'});
+    if(backend && backend.ok) return playerAlertJson(Object.assign({source:'backend'}, backend.data));
+    const kv = await playerAlertKvGet(env, PLAYER_ALERT_KV_CURRENT_KEY);
+    if(kv) return playerAlertJson(Object.assign({source:'kv-fallback'}, kv));
+    const cache = await playerAlertCacheGet(PLAYER_ALERT_CACHE_KEY);
+    if(cache) return playerAlertJson(Object.assign({source:'cache-tertiary'}, cache));
+    return playerAlertJson({active:false, source:'none'});
   }
   if(url.pathname === '/api/player-alert/history' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/history', {method:'GET'});
@@ -340,7 +340,7 @@ async function handlePlayerAlertV152(request, env){
     let payload = {};
     try{ payload = await request.json(); }catch(err){ return playerAlertJson({ok:false,error:'invalid_json'},400); }
     const message = playerAlertCleanText(payload.message);
-    const senderId = playerAlertCleanText(payload.clientId || payload.senderId || 'anonymous').slice(0,80) || 'anonymous';
+    const senderId = playerAlertCleanText(payload.senderId || payload.clientId || 'anonymous').slice(0,80) || 'anonymous';
     if(!message) return playerAlertJson({ok:false,error:'empty_message'},400);
     const now = Date.now();
     const rate = (await playerAlertKvGet(env, PLAYER_ALERT_KV_RATE_KEY)) || (await playerAlertCacheGet(PLAYER_ALERT_RATE_KEY));
@@ -348,17 +348,13 @@ async function handlePlayerAlertV152(request, env){
       const last = Number(rate.last || 0);
       if(last && (now - last) < PLAYER_ALERT_RATE_MS) return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now-last)},429);
     }
-    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,senderId,clientId:senderId,timestamp:now,createdAt:new Date(now).toISOString(),version:playerAlertCleanText(payload.version||'')};
+    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,senderId,createdAt:new Date(now).toISOString(),version:playerAlertCleanText(payload.version||'')};
     const backend = await playerAlertBackendFetch(env, '/send', {method:'POST', body:JSON.stringify(alert)});
-    const localKvOkAfterBackend = await playerAlertKvPut(env, PLAYER_ALERT_KV_CURRENT_KEY, alert, 900);
-    await playerAlertCachePut(PLAYER_ALERT_CACHE_KEY, alert, 900);
     if(backend && backend.ok){
       await playerAlertKvPut(env, PLAYER_ALERT_KV_RATE_KEY, {last:now}, 180);
-      await playerAlertCachePut(PLAYER_ALERT_RATE_KEY, {last:now}, 180);
-      if(localKvOkAfterBackend) await playerAlertHistoryAppend(env, alert);
-      return playerAlertJson(Object.assign({ok:true,delivered:true,source:localKvOkAfterBackend?'backend+kv':'backend+cache',fallback:false}, alert, backend.data||{}));
+      return playerAlertJson(Object.assign({ok:true,delivered:true,source:'backend',fallback:false}, backend.data));
     }
-    const kvOk = localKvOkAfterBackend;
+    const kvOk = await playerAlertKvPut(env, PLAYER_ALERT_KV_CURRENT_KEY, alert, 900);
     if(kvOk){
       await playerAlertKvPut(env, PLAYER_ALERT_KV_RATE_KEY, {last:now}, 180);
       await playerAlertHistoryAppend(env, alert);
