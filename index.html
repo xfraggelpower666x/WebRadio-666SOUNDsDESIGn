@@ -1662,7 +1662,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION='v181-broadcast-final-fix-20260521';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -3265,7 +3265,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION='v181-broadcast-final-fix-20260521';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
     document.documentElement.setAttribute('data-smfp-version','v181');
@@ -3723,7 +3723,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION='v181-broadcast-final-fix-20260521';
   var BUILD='smfp-v181-backend-kv-iphone-ui-20260519';
   try{document.documentElement.setAttribute('data-smfp-version','v181');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
@@ -4481,7 +4481,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION='v181-broadcast-final-fix-20260521';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4549,7 +4549,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';sendMessage(v,send); if(ta)ta.value=''; close();},true);}
   }
   async function poll(){
-    try{var r=await fetch(CURRENT_URL,{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
+    try{var r=await fetch(CURRENT_URL+'?t='+Date.now(),{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
   }
   function boot(){bindPc();ensureMobileButton();ensureReceiveOverlay();}
   boot(); setInterval(boot,1200); setInterval(poll,10000); setTimeout(poll,1600);
@@ -4613,7 +4613,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 (function(){
   'use strict';
   if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION='v181-broadcast-final-fix-20260521';
   var SEND_URL='/api/player-alert/send';
   var SENDER_KEY='smfpPlayerAlertSenderId';
   function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
@@ -4782,7 +4782,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181IphoneUiScript">
 (function(){
   'use strict';
-  var VERSION='v181';
+  var VERSION='v181-broadcast-final-fix-20260521';
   var FOOTER_TEXT='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
@@ -4888,7 +4888,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181MobileVisibleRootfixScript">
 (function(){
   'use strict';
-  var VERSION='v181';
+  var VERSION='v181-broadcast-final-fix-20260521';
   var SEND_URL='/api/player-alert/send';
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
@@ -4970,5 +4970,147 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
+<link rel="stylesheet" href="/css/player-admin-overlay.css?v=admin-runtime-20260521">
+<script src="/js/player-admin-overlay.js?v=admin-runtime-20260521" defer></script>
+<style id="smfpBroadcastAlertV181FinalFixStyle">
+
+/* ==========================================================
+   v181 BROADCAST ALERT FINAL FIX — 2026-05-21
+   1) PC inline placement
+   2) iPhone SEND opens composer overlay
+   3) backend/polling source consistency
+   4) cache/stale endpoint protection
+   ========================================================== */
+
+@media (min-width:761px){
+  body .frame-stage .player-shell .now-playing .section-topline{
+    position:relative!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    gap:8px!important;
+    min-width:0!important;
+  }
+
+  body .frame-stage .player-shell .now-playing .section-topline > div:first-child{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #historyToggle{
+    order:2!important;
+    flex:0 0 auto!important;
+    position:relative!important;
+    z-index:21474820!important;
+    pointer-events:auto!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{
+    order:3!important;
+    position:relative!important;
+    right:auto!important;
+    bottom:auto!important;
+    top:auto!important;
+    left:auto!important;
+    transform:none!important;
+    z-index:21474821!important;
+    flex:0 0 auto!important;
+    width:248px!important;
+    max-width:248px!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+    display:flex!important;
+    flex-direction:row-reverse!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:6px!important;
+    margin:0!important;
+    padding:0!important;
+    pointer-events:auto!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #playerAlertPcSend.player-alert-send-btn{
+    position:relative!important;
+    z-index:21474822!important;
+    pointer-events:auto!important;
+    flex:0 0 58px!important;
+    width:58px!important;
+    min-width:58px!important;
+    max-width:58px!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #playerAlertPcText.player-alert-pc-text{
+    position:relative!important;
+    z-index:21474822!important;
+    pointer-events:auto!important;
+    flex:0 1 184px!important;
+    width:184px!important;
+    min-width:130px!important;
+    max-width:184px!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+    resize:none!important;
+    overflow:hidden!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #playerAlertPcStatus.player-alert-pc-status{
+    display:none!important;
+  }
+}
+
+@media (max-width:760px){
+  body #playerAlertPcBox.player-alert-pc-box{
+    position:absolute!important;
+    right:10px!important;
+    top:10px!important;
+    bottom:auto!important;
+    left:auto!important;
+    z-index:21474830!important;
+    width:auto!important;
+    max-width:72px!important;
+    height:34px!important;
+    min-height:34px!important;
+    display:block!important;
+    pointer-events:auto!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  body #playerAlertPcText.player-alert-pc-text,
+  body #playerAlertPcStatus.player-alert-pc-status{
+    display:none!important;
+  }
+
+  body #playerAlertPcSend.player-alert-send-btn{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:66px!important;
+    min-width:66px!important;
+    max-width:66px!important;
+    height:34px!important;
+    min-height:34px!important;
+    max-height:34px!important;
+    pointer-events:auto!important;
+    position:relative!important;
+    z-index:21474831!important;
+  }
+
+  body #s666PlayerAlertMobileSlot{
+    display:none!important;
+  }
+
+  body .s666-player-alert-composer,
+  body .s666-player-alert-overlay,
+  body #playerAlertReceiveBackdrop{
+    z-index:21474840!important;
+  }
+}
+
+</style>
 </body>
 </html>

@@ -1,0 +1,10 @@
+{
+  "primaryStream": "",
+  "backupStream": "",
+  "emergencyStream": "",
+  "version": 1,
+  "updatedAt": "2026-05-21T00:00:00.000Z",
+  "updatedBy": "initial-admin-addon",
+  "previousBackup": null,
+  "latestBackup": null
+}
