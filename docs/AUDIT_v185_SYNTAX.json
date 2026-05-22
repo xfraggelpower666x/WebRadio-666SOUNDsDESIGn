@@ -1,0 +1,34 @@
+{
+  "checks": [
+    [
+      "worker.js",
+      0,
+      ""
+    ],
+    [
+      "core/audio/boost-core.js",
+      0,
+      ""
+    ],
+    [
+      "core/version/version-core.js",
+      0,
+      ""
+    ],
+    [
+      "core/overlay/overlay-core.js",
+      0,
+      ""
+    ],
+    [
+      "js/player-core.js",
+      0,
+      ""
+    ],
+    [
+      "js/equalizer.js",
+      0,
+      ""
+    ]
+  ]
+}

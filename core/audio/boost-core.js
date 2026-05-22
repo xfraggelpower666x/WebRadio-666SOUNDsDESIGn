@@ -61,7 +61,7 @@ ZWECK:
     return s;
   }
   window.SMFPBoostCore = {
-    version: 'v178-audio-core',
+    version: 'v185-audio-core',
     storageKey: STORAGE_KEY,
     stages: STAGES.slice(),
     maxStage: maxStage,

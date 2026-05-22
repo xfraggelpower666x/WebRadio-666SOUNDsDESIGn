@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "worker.js node --check exit=0",
+    "worker-addons/radio-admin-config-addon.js node --check exit=0",
+    "wrangler has PLAYER_ALERT_BACKEND_URL: True",
+    "worker default backend route: True"
+  ]
+}

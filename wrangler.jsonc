@@ -1,10 +1,14 @@
 {
   "name": "webradio-666soundsdesign-worker",
   "main": "worker.js",
-  "compatibility_date": "2024-05-15"
+  "compatibility_date": "2024-05-15",
+  "vars": {
+    "PLAYER_ALERT_BACKEND_URL": "https://auto-setup-render-for-backend-mp3-ess8.onrender.com",
+    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_KV_FALLBACK_CACHE_LAST_V186"
+  }
 }
 
-
-// V181 PLAYER ALERT BACKEND PRIMARY:
-// Set PLAYER_ALERT_BACKEND_URL in Cloudflare Variables to the Renda/Render relay base URL.
-// Keep PLAYER_ALERT_KV binding as fallback only.
+// V186 PLAYER ALERT BACKEND ROUTING
+// Primary backend: Render Alert Service
+// PLAYER_ALERT_BACKEND_URL is public route config, not a secret.
+// KV stays optional fallback only. Cache is last emergency fallback.

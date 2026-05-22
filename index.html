@@ -16,7 +16,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="smfp-version" content="v181" />
+  <meta name="smfp-version" content="v185" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -571,6 +571,19 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 .mff-extreme-boost-actions button{height:38px!important;min-width:84px!important;border-radius:13px!important;border:1px solid rgba(22,255,243,.55)!important;background:rgba(4,8,20,.82)!important;color:#29fff4!important;font-weight:950!important;pointer-events:auto!important;touch-action:manipulation!important;}
 .mff-extreme-boost-actions [data-extreme="ok"]{border-color:rgba(255,23,68,.78)!important;color:#fff!important;background:rgba(255,23,68,.25)!important;}
 </style>
+
+<style id="smfpV185TickerMeterBoostOverlayFix">
+@media(max-width:760px){
+  #mffApp .mff-title h1{position:relative!important;display:block!important;overflow:hidden!important;white-space:nowrap!important;animation:none!important;padding-left:0!important;}
+  #mffApp .mff-title h1 span{display:inline-block!important;min-width:max-content!important;padding-left:100%!important;animation:smfpV185Marquee 22s linear infinite!important;will-change:transform!important;}
+  @keyframes smfpV185Marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+  #mffApp .mff-history-backdrop{z-index:2147483400!important;pointer-events:none!important;}
+  #mffApp[data-history-open="1"] .mff-history-backdrop{pointer-events:auto!important;display:block!important;opacity:1!important;}
+  #mffApp .mff-history-overlay{z-index:2147483500!important;}
+  #mffApp .mff-side:before{height:calc(88% * var(--mff-level))!important;transition:height 120ms linear, filter 120ms linear!important;}
+}
+</style>
+
 </head>
 <body>
   <div class="frame-stage">
@@ -1662,7 +1675,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -1857,16 +1870,16 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       var analyser=ctx.createAnalyser();
       analyser.fftSize=128;
-      analyser.smoothingTimeConstant=0.84;
+      analyser.smoothingTimeConstant=0.72;
       analyser.minDecibels=-86;
       analyser.maxDecibels=-18;
 
       var comp=ctx.createDynamicsCompressor();
-      comp.threshold.value=-3.5;
-      comp.knee.value=14;
-      comp.ratio.value=3.6;
-      comp.attack.value=0.008;
-      comp.release.value=0.30;
+      comp.threshold.value=-1.0;
+      comp.knee.value=8;
+      comp.ratio.value=1.55;
+      comp.attack.value=0.004;
+      comp.release.value=0.18;
 
       var eqNodes=makeSmfpEqNodes(ctx);
 
@@ -2155,7 +2168,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if((window.SMFPBoostCore?window.SMFPBoostCore.isDanger(next):next>=4) && !(window.SMFPBoostCore?window.SMFPBoostCore.isDanger(boostStage):boostStage>=4)){
       showMffExtremeBoostWarning().then(function(ok){
         if(!ok){applyBoostRamp(boostStage);return;}
-        boostStage=4; applyBoostRamp(prev);
+        boostStage=next; applyBoostRamp(prev);
       });
       return;
     }
@@ -2194,7 +2207,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     h1.innerHTML='';
     h1.setAttribute('data-current-title',clean);
     var span=document.createElement('span');
-    span.textContent=clean;
+    span.textContent=clean+'   •   '+clean;
     h1.appendChild(span);
   }
 
@@ -2307,7 +2320,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
       '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
-      '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><i class="mff-boost-led" data-led="4"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
+      '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><i class="mff-boost-led" data-led="4"></i><i class="mff-boost-led" data-led="5"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
     document.body.insertBefore(app,document.body.firstChild);
     buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
     purgeMobileVisualizerLayers(app);
@@ -2986,7 +2999,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function mffMeterHeadroom(v){
-    return mffClamp(v,0.08,0.84);
+    return mffClamp(v,0.10,0.96);
   }
 
 
@@ -3046,7 +3059,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       var shaped=Math.pow(avg/255,0.72);
       var contour=1.16-((i/Math.max(1,halfBars-1))*0.36);
-      var value=.14 + shaped*contour*.84 + (boost||0)*.006;
+      var value=.16 + shaped*contour*.92 + (boost||0)*.010;
       halfValues.push(mffClamp(value,.13,.86));
     }
 
@@ -3056,7 +3069,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       targets.push(halfValues[Math.min(mirroredIndex,halfValues.length-1)]||.14);
     }
 
-    return {targets:targets, level:mffClamp(globalMax/255,.10,.86), mode:'pc-code-real'};
+    return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.14,.96), mode:'pc-code-real'};
   }
 
   function mffCleanEqTargetsSynthetic(count,playing,boost){
@@ -3140,7 +3153,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
 
     // Meter folgt Peak, aber mit Headroom und ohne Boost-Sättigung.
-    var bottomLevel=mffMeterHeadroom((peak*.76)+mffBoostVisualOffset());
+    var bottomLevel=mffMeterHeadroom((peak*.90)+mffBoostVisualOffset());
     updateBottomCenterOutSegments(bottomLevel,boost);
     document.documentElement.style.setProperty('--mff-level',bottomLevel.toFixed(3));
     return bottomLevel;
@@ -3152,9 +3165,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(!bars.length) return;
     var n=bars.length;
     var half=Math.floor(n/2);
-    var active=Math.max(1,Math.min(half-2,Math.round(Math.min(level,.84)*half)));
+    var active=Math.max(1,Math.min(half-1,Math.round(Math.min(level,.96)*half)));
     var pulse=(Math.sin(Date.now()/210)+1)/2;
-    var boosted=(boost||0)*0.018;
+    var boosted=(boost||0)*0.012;
 
     for(var i=0;i<n;i++){
       var isLeft=i<half;
@@ -3265,7 +3278,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
     document.documentElement.setAttribute('data-smfp-version','v181');
@@ -3723,7 +3736,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
   var BUILD='smfp-v181-backend-kv-iphone-ui-20260519';
   try{document.documentElement.setAttribute('data-smfp-version','v181');document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
@@ -4481,7 +4494,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpPlayerAlertV152Script">
 (function(){
   if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
   var SEND_URL='/api/player-alert/send';
   var CURRENT_URL='/api/player-alert/current';
   var RATE_MS=180000;
@@ -4613,7 +4626,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 (function(){
   'use strict';
   if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v177';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
   var SEND_URL='/api/player-alert/send';
   var SENDER_KEY='smfpPlayerAlertSenderId';
   function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
@@ -4750,8 +4763,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #mffApp .mff-now{grid-template-columns:58px minmax(0,1fr)!important;}
   #mffApp .mff-now .mff-history{display:none!important;}
   #mffApp .mff-title h1,#mffApp .mff-title h2{min-width:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;}
-  #mffApp .mff-title h1{display:block!important;animation:smfpV181Marquee 16s linear infinite!important;padding-left:100%!important;}
-  @keyframes smfpV181Marquee{0%{transform:translateX(0)}100%{transform:translateX(-210%)}}
+  #mffApp .mff-title h1{display:block!important;position:relative!important;overflow:hidden!important;white-space:nowrap!important;padding-left:0!important;animation:none!important;}
+  #mffApp .mff-title h1 span{display:inline-block!important;min-width:max-content!important;padding-left:100%!important;animation:smfpV185Marquee 22s linear infinite!important;will-change:transform!important;}
+  @keyframes smfpV185Marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
   #mffApp .mff-discord-slot{justify-content:flex-start!important;gap:5px!important;padding-left:2px!important;overflow:visible!important;}
   #mffApp .mff-discord-slot [data-discord-addon-panel],
   #mffApp .mff-discord-slot .s666-discord-panel{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;min-width:0!important;width:auto!important;max-width:none!important;height:26px!important;}
@@ -4770,9 +4784,20 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="confirm"]{background:#29fff4!important;box-shadow:0 0 10px rgba(22,255,243,.9)!important;}
   #mffApp[data-send-state="fail"] .smfp-v181-send-led[data-led="confirm"]{background:#ff315d!important;box-shadow:0 0 10px rgba(255,49,93,.9)!important;}
   #mffApp .mff-boost-led-wrap .mff-boost-led[data-led="5"]{display:block!important;}
+  #mffApp .mff-boost-led{background:rgba(247,248,255,.14)!important;border-color:rgba(247,248,255,.28)!important;box-shadow:none!important;}
+  #mffApp[data-mff-boost-stage="1"] .mff-boost-led[data-led="1"],
+  #mffApp[data-mff-boost-stage="2"] .mff-boost-led[data-led="1"],
+  #mffApp[data-mff-boost-stage="2"] .mff-boost-led[data-led="2"],
+  #mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="1"],
+  #mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="2"],
+  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="1"],
+  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="2"],
   #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="1"],
-  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="2"],
-  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="3"],
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="2"]{background:#29fff4!important;border-color:#29fff4!important;box-shadow:0 0 10px rgba(41,255,244,.82)!important;}
+  #mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="3"],
+  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="3"],
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="3"]{background:#ff3dbb!important;border-color:#ff3dbb!important;box-shadow:0 0 10px rgba(255,61,187,.86)!important;}
+  #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="4"],
   #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="4"],
   #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="5"]{background:#ff315d!important;border-color:#ff315d!important;box-shadow:0 0 12px rgba(255,49,93,.92),0 0 20px rgba(255,49,93,.42)!important;}
   #mffApp input,#mffApp textarea,#mffApp select{font-size:16px!important;transform:translateZ(0)!important;}
@@ -4782,7 +4807,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181IphoneUiScript">
 (function(){
   'use strict';
-  var VERSION='v181';
+  var VERSION='v185';
   var FOOTER_TEXT='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
@@ -4879,8 +4904,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="request"],
   #mffApp[data-send-state="ok"] .smfp-v181-send-led[data-led="confirm"]{background:#29fff4!important;border-color:#29fff4!important;box-shadow:0 0 11px rgba(22,255,243,.95)!important;}
   #mffApp[data-send-state="fail"] .smfp-v181-send-led[data-led="confirm"]{background:#ff315d!important;border-color:#ff315d!important;box-shadow:0 0 11px rgba(255,49,93,.95)!important;}
-  #mffApp .mff-title h1{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;min-width:max-content!important;padding-left:100%!important;animation:smfpV181TrueMarquee 18s linear infinite!important;}
-  @keyframes smfpV181TrueMarquee{0%{transform:translateX(0)}100%{transform:translateX(-240%)}}
+  #mffApp .mff-title h1{display:block!important;position:relative!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:clip!important;min-width:0!important;padding-left:0!important;animation:none!important;}
+  #mffApp .mff-title h1 span{display:inline-block!important;min-width:max-content!important;padding-left:100%!important;animation:smfpV185Marquee 22s linear infinite!important;}
   #mffApp input,#mffApp textarea,#mffApp select{font-size:16px!important;}
   body.smfp-v181-nozoom{position:fixed!important;inset:0!important;width:100%!important;overflow:hidden!important;}
 }
@@ -4888,7 +4913,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181MobileVisibleRootfixScript">
 (function(){
   'use strict';
-  var VERSION='v181';
+  var VERSION='v185';
   var SEND_URL='/api/player-alert/send';
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
