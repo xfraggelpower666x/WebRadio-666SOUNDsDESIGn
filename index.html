@@ -2316,6 +2316,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
     app.innerHTML='<div class="smfp-version-badge">v178</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+      '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit"><img src="/assets/logos/cyberstream-cockpit-header.png" alt="Cyberstream Cockpit"></section>'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -2843,15 +2844,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function ensureBrandRow(){
-    var app=q('#mffApp');
-    if(!app) return;
-    if(q('#mffBrandRow')) return;
-    var row=document.createElement('section');
-    row.className='mff-brand-row';
-    row.id='mffBrandRow';
-    row.innerHTML='<span>666SOUNDsDESIGn WebRadio</span>';
-    var led=q('#mffPanelLedPanel');
-    if(led && led.parentNode) led.parentNode.insertBefore(row,led);
+    var old=q('#mffBrandRow');
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+    return;
   }
 
   async function fetchMeta(){
@@ -4807,7 +4802,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181IphoneUiScript">
 (function(){
   'use strict';
-  var VERSION='v185';
+  var VERSION='v187';
   var FOOTER_TEXT='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
@@ -4874,6 +4869,59 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
+
+
+<!-- SMFP_V187_MOBILE_CYBER_HEADER_BRAND_ROW_PURGE
+     Zweck: iPhone-only: WebRadio-Namenspanel unter NOW PLAYING entfernen und Cyberstream-Cockpit-Logo oberhalb NOW PLAYING platzieren.
+     SEND/Worker/Backend/Discord/PC bleiben unverändert.
+-->
+<style id="smfpV187MobileCyberHeaderCss">
+@media (max-width:760px){
+  #mffApp .mff-brand-row,
+  #mffApp #mffBrandRow{
+    display:none!important;
+    visibility:hidden!important;
+    height:0!important;
+    min-height:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+  }
+  #mffApp .mff-cyber-header{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    margin:0 0 4px 0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    pointer-events:none!important;
+    overflow:visible!important;
+  }
+  #mffApp .mff-cyber-header img{
+    display:block!important;
+    width:auto!important;
+    max-width:76%!important;
+    height:32px!important;
+    max-height:32px!important;
+    object-fit:contain!important;
+    filter:drop-shadow(0 0 10px rgba(22,255,243,.45)) drop-shadow(0 0 11px rgba(255,61,187,.34));
+    pointer-events:none!important;
+  }
+}
+@media (min-width:761px){
+  #mffApp .mff-cyber-header{display:none!important;}
+}
+</style>
+
 <!-- SMFP_V181_MOBILE_VISIBLE_ROOTFIX
      Zweck: Sichtbarer iPhone-Rootfix ohne PC-Layout/PC-EQ anzufassen.
      - History ersetzt das obere Versionsbadge in der Mobile-Funktionszeile.
@@ -4913,7 +4961,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181MobileVisibleRootfixScript">
 (function(){
   'use strict';
-  var VERSION='v185';
+  var VERSION='v187';
   var SEND_URL='/api/player-alert/send';
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
