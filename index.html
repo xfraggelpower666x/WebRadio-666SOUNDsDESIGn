@@ -1677,7 +1677,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 (function(){
   var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
   var STREAM_URL='/stream';
-  var metaTimer=null, boostStage=0, rafStarted=false, transientTimer=null;
+  var metaTimer=null, boostStage=(window.SMFPBoostCore?window.SMFPBoostCore.loadStage():0), rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
     {key:'b63',type:'lowshelf',freq:63,q:.70},
     {key:'b125',type:'peaking',freq:125,q:1.00},
@@ -1783,7 +1783,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   var mffCleanEqValues=[];
   var mffCleanEqPhase=0;
   var mffCleanEqLoop=0;
-  var BOOST_GAINS=(window.SMFPBoostCore&&window.SMFPBoostCore.stages?window.SMFPBoostCore.stages.map(function(x){return x.gain;}):[1.00,1.40,1.70,1.90,2.00,2.20]);
+  var BOOST_GAINS=(window.SMFPBoostCore&&window.SMFPBoostCore.stages?window.SMFPBoostCore.stages.map(function(x){return x.gain;}):[1.00,1.40,1.70,1.90,2.08,2.20]);
   var MFF_IDLE_TICKER_TEXT_V113='666SOUNDsDESIGn WebRadio';
   var MFF_LIVE_LOADING_TEXT_V113='Loading live metadata ...';
   var RAMP_UP=0.62;
@@ -1875,11 +1875,11 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       analyser.maxDecibels=-18;
 
       var comp=ctx.createDynamicsCompressor();
-      comp.threshold.value=-1.0;
-      comp.knee.value=8;
-      comp.ratio.value=1.55;
-      comp.attack.value=0.004;
-      comp.release.value=0.18;
+      comp.threshold.value=-0.25;
+      comp.knee.value=2;
+      comp.ratio.value=1.08;
+      comp.attack.value=0.002;
+      comp.release.value=0.12;
 
       var eqNodes=makeSmfpEqNodes(ctx);
 
@@ -1941,6 +1941,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     document.documentElement.setAttribute('data-mff-boost',String(boostStage));
     document.documentElement.setAttribute('data-mff-boost-gain',String(target));
+    try{document.documentElement.setAttribute('data-mff-boost-stage-active',String(boostStage));document.documentElement.style.setProperty('--player-boost-gain',target.toFixed(2));}catch(e){}
     try{if(window.SMFPBoostCore){boostStage=window.SMFPBoostCore.saveStage(boostStage);window.SMFPBoostCore.publish(boostStage,target,'mff-inline');}}catch(e){}
 
     var graph=ensureAudioGraph();
@@ -1956,6 +1957,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         graph.gain.gain.linearRampToValueAtTime(target,now+ramp);
         graph.gain.gain.setTargetAtTime(target,now+ramp,0.045);
         graph.lastGain=target;
+        try{graph.audio.dataset.boostStage=String(boostStage);graph.audio.dataset.boostGain=String(target);graph.audio.dataset.boostAppliedGain=String(target);graph.audio.dataset.boostGraph='MFF_GRAPH_OK';}catch(_e){}
       }catch(e){
         try{graph.gain.gain.setTargetAtTime(target,graph.ctx.currentTime,0.08)}catch(_){}
       }
@@ -5045,5 +5047,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 <link rel="stylesheet" href="/css/player-admin-overlay.css?v=admin-runtime-20260521">
 <script src="/js/player-admin-overlay.js?v=admin-runtime-20260521" defer></script>
+
+<link rel="stylesheet" href="/css/broadcast-message-history.css?v=smfp-v189-broadcast-history">
+<script src="/js/broadcast-message-history.js?v=smfp-v189-broadcast-history" defer></script>
 </body>
 </html>

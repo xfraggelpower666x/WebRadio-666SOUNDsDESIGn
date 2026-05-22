@@ -55,7 +55,7 @@ const volumeSlider = document.getElementById('volumeSlider');
 const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'));
 const boostStepButtons = Array.from(document.querySelectorAll('[data-boost-step]'));
 const boostLeds = Array.from(document.querySelectorAll('[data-boost-led]'));
-let currentBoostStage = 0;
+let currentBoostStage = window.SMFPBoostCore ? window.SMFPBoostCore.loadStage() : 0;
 const timelineProgress = document.getElementById('timelineProgress');
 const currentTimeText = document.getElementById('currentTimeText');
 const durationText = document.getElementById('durationText');
@@ -265,7 +265,7 @@ markSourceButtons(mainBtn, fallbackBtn, currentSource);
 audio.volume = Number(volumeSlider?.value || 0.75);
 
 const BASE_MOBILE_VOLUME = 0.86;
-const MOBILE_VOLUME_FALLBACK = [0.86, 0.94, 1.0, 1.0];
+const MOBILE_VOLUME_FALLBACK = [0.86, 0.94, 1.0, 1.0, 1.0, 1.0];
 const BOOST_LABELS = (window.SMFPBoostCore && window.SMFPBoostCore.stages) ? window.SMFPBoostCore.stages.map((stage) => stage.label) : ['BST 0', 'BST 1', 'BST 2', 'BST 3', 'BST 4', 'BST 5'];
 
 function applyMobileBoostFallback(stage) {
@@ -274,7 +274,7 @@ function applyMobileBoostFallback(stage) {
   // iOS/Safari kann WebAudio-Gain je nach Stream blockieren.
   // Dann bleibt wenigstens die native Lautstärke sauber auf Maximum, ohne Desktop zu stören.
   if (isMobileViewport()) {
-    audio.volume = MOBILE_VOLUME_FALLBACK[safeStage];
+    audio.volume = Number.isFinite(MOBILE_VOLUME_FALLBACK[safeStage]) ? MOBILE_VOLUME_FALLBACK[safeStage] : 1.0;
   }
 
   if (streamState && isMobileViewport()) {

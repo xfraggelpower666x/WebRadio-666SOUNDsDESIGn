@@ -1,0 +1,16 @@
+{
+  "version": "v188",
+  "base": "v187_iPHONE_CYBER_HEADER_NO_BRANDROW_FULL",
+  "scope": "Boost only, no SEND/Worker/Backend/Discord/PC-EQ layout changes",
+  "findings": [
+    "iPhone/MFF boost used central stages but compressor threshold -1.0 could flatten high stages.",
+    "player-core native mobile fallback had only 4 entries; stage 4/5 resolved to undefined if WebAudio path was not active.",
+    "Boost 4 was only 2.00 vs stage 3 1.90, barely audible; adjusted to 2.08 while keeping Boost 5 at 2.20."
+  ],
+  "changes": [
+    "core/audio/boost-core.js: stage4 gain 2.08, stage5 2.20.",
+    "js/player-core.js: currentBoostStage loads from SMFPBoostCore, mobile fallback has 6 entries.",
+    "index.html MFF inline mobile engine: boostStage loads saved core stage, compressor weakened so stages 4/5 are not flattened.",
+    "index.html MFF inline mobile engine: writes boost diagnostics to audio dataset."
+  ]
+}

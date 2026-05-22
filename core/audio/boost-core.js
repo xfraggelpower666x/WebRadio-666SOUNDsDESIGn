@@ -18,7 +18,7 @@ ZWECK:
     { stage:1, gain:1.40, label:'BST 1', danger:false },
     { stage:2, gain:1.70, label:'BST 2', danger:false },
     { stage:3, gain:1.90, label:'BST 3', danger:false },
-    { stage:4, gain:2.00, label:'BST 4', danger:true  },
+    { stage:4, gain:2.08, label:'BST 4', danger:true  },
     { stage:5, gain:2.20, label:'BST 5', danger:true  }
   ];
   function maxStage(){ return STAGES.length - 1; }
@@ -61,7 +61,7 @@ ZWECK:
     return s;
   }
   window.SMFPBoostCore = {
-    version: 'v185-audio-core',
+    version: 'v188-audio-core-boost-audible',
     storageKey: STORAGE_KEY,
     stages: STAGES.slice(),
     maxStage: maxStage,
