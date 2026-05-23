@@ -1,0 +1,35 @@
+{
+  "version": "v190",
+  "created": "2026-05-23",
+  "modified": "2026-05-23",
+  "scope": "index.html left FX tower only",
+  "user_request": [
+    "FRAGGLE DYNASTIE 666 SFX DNA header in left FX block",
+    "audio-reactive LED cycling neon purple, neon pink, neon turquoise",
+    "rename Audio Reactor to FRAGGLE AUDIO DNA REAKTOR",
+    "make reactor a story-fitting audio DNA reactor",
+    "rename Wave Scope to 666 AUDIO WAVE DNA SCOPE",
+    "add central moving oscilloscope wave inside Wave Scope",
+    "rename Spectrum Grid to 666 SPEKTRUM DNA RADAR"
+  ],
+  "files_changed": [
+    "index.html",
+    "docs/CHANGELOG_v190_FRAGGLE_DYNASTIE_LEFT_SFX_DNA.md",
+    "docs/AUDIT_v190_FRAGGLE_DYNASTIE_LEFT_SFX_DNA.json"
+  ],
+  "protected_areas": [
+    "main player",
+    "right FX tower",
+    "Now Playing panel",
+    "buttons",
+    "admin area",
+    "stream logic",
+    "layout outside left FX tower"
+  ],
+  "implementation_notes": {
+    "audio_reactivity_source": "existing pc-addon CSS variables and existing side-addon reactivity loop",
+    "new_audio_loop_added": false,
+    "new_canvas_added": false,
+    "secrets_added": false
+  }
+}
