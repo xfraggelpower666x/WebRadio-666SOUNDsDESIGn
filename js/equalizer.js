@@ -244,17 +244,35 @@ function recoverDesktopCenterBars(bars, levelPercent, playing = true) {
 }
 
 function applyMeters(targets, valuePercent, side = 'left') {
+  /*
+  ==========================================
+  GEÄNDERT: 2026-05-23
+  ÄNDERUNG: v191 CYBER_HUD_SIDE_METERS
+  ZWECK: PC-Außenlevelmeter werden nicht als Bild eingeklebt, sondern als echte,
+         variable HUD-Meter über vorhandene Audio-/Fallback-Werte gefahren.
+         Zwei sichtbare Spuren schlagen unterschiedlich aus; die rechte Seite
+         wird per CSS gespiegelt, damit links/rechts ein echtes Gegenstück bilden.
+  ==========================================
+  */
   const bounded = clamp(valuePercent, 10, 98);
+  const t = Date.now();
+  const base = bounded / 100;
+
   targets.forEach((el, index) => {
     if (!el) return;
-    let offset = 0;
-    if (side === 'left') {
-      offset = index === 0 ? 0 : -10;
-    } else {
-      // rechts intern gespiegelt: außen länger, innen kürzer
-      offset = index === 0 ? -10 : 0;
-    }
-    el.style.height = `${Math.max(10, bounded + offset)}%`;
+
+    const visibleIndex = index % 2;
+    const waveA = Math.abs(Math.sin((t / 185) + (visibleIndex * 1.37)));
+    const waveB = Math.abs(Math.sin((t / 317) + (visibleIndex * 2.11)));
+    const split = visibleIndex === 0 ? 1.04 : 0.82;
+    const motion = visibleIndex === 0 ? (waveA * 15) - (waveB * 6) : (waveB * 18) - (waveA * 5);
+    const target = clamp((bounded * split) + motion, 8, 98);
+
+    el.style.height = `${target.toFixed(1)}%`;
+    el.style.opacity = String((0.52 + (base * 0.34) + ((visibleIndex === 0 ? waveA : waveB) * 0.14)).toFixed(3));
+    el.style.filter = `brightness(${(1.05 + base * 0.42).toFixed(2)}) saturate(${(1.12 + base * 0.56).toFixed(2)})`;
+    el.dataset.level = String((target / 100).toFixed(3));
+    el.dataset.meterSide = side;
   });
 }
 

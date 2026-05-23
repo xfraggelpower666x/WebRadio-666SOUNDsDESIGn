@@ -584,6 +584,166 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 </style>
 
+
+<!-- v191 CYBER HUD LEVELMETER REBUILD — nachgebaut, nicht eingeklebt; nur PC-Meter -->
+<style id="v191CyberHudLevelmeterRebuild">
+@media (min-width:1221px){
+  /* Außenmeter: zwei sichtbare vertikale HUD-Spuren pro Seite, rechte Seite gespiegelt. */
+  body .frame-stage{
+    --pc-side-meter-w:96px!important;
+    --pc-cyber-meter-cyan:#16fff3;
+    --pc-cyber-meter-pink:#ff3dbb;
+    --pc-cyber-meter-purple:#9b4dff;
+    --pc-cyber-meter-dark:rgba(3,8,20,.74);
+  }
+  body .side-meter{
+    width:var(--pc-side-meter-w)!important;
+    max-width:var(--pc-side-meter-w)!important;
+    filter:drop-shadow(0 0 12px rgba(22,255,243,.20)) drop-shadow(0 0 16px rgba(255,61,187,.16))!important;
+  }
+  body .side-meter-stack{
+    width:100%!important;
+    height:100%!important;
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    gap:10px!important;
+    padding:10px 12px!important;
+    box-sizing:border-box!important;
+  }
+  body .side-meter.right .side-meter-stack{
+    flex-direction:row-reverse!important;
+  }
+  body .side-meter-track.tertiary{
+    display:none!important;
+  }
+  body .side-meter-track{
+    position:relative!important;
+    flex:0 0 25px!important;
+    width:25px!important;
+    height:100%!important;
+    min-height:0!important;
+    border-radius:0!important;
+    border:1px solid rgba(22,255,243,.58)!important;
+    background:
+      linear-gradient(180deg,rgba(22,255,243,.08),rgba(5,10,26,.72) 20%,rgba(5,10,26,.82)),
+      repeating-linear-gradient(180deg,rgba(22,255,243,.08) 0 1px,transparent 1px 17px)!important;
+    box-shadow:inset 0 0 15px rgba(22,255,243,.12),0 0 12px rgba(22,255,243,.18),0 0 18px rgba(255,61,187,.10)!important;
+    clip-path:polygon(28% 0,100% 0,100% 88%,72% 100%,0 100%,0 12%)!important;
+    overflow:hidden!important;
+  }
+  body .side-meter-track.secondary{
+    flex-basis:21px!important;
+    width:21px!important;
+    opacity:.94!important;
+    clip-path:polygon(0 0,72% 0,100% 12%,100% 100%,0 100%)!important;
+  }
+  body .side-meter-track::before{
+    content:""!important;
+    position:absolute!important;
+    inset:6px 5px!important;
+    border:1px solid rgba(22,255,243,.20)!important;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 2px,transparent 2px 18px)!important;
+    opacity:.72!important;
+    z-index:2!important;
+  }
+  body .side-meter-track::after{
+    content:""!important;
+    position:absolute!important;
+    inset:-20% -120%!important;
+    background:repeating-linear-gradient(122deg,transparent 0 20px,rgba(22,255,243,.24) 20px 22px,transparent 22px 42px)!important;
+    opacity:.28!important;
+    transform:translateY(calc(var(--pc-audio-energy, .22) * -24px));
+    z-index:3!important;
+    pointer-events:none!important;
+  }
+  body .side-meter-fill{
+    position:absolute!important;
+    left:4px!important;
+    right:4px!important;
+    bottom:5px!important;
+    min-height:8px!important;
+    height:18%!important;
+    border-radius:0!important;
+    background:
+      repeating-linear-gradient(180deg,
+        rgba(22,255,243,1) 0 10px,
+        rgba(22,255,243,.18) 10px 13px,
+        rgba(5,12,24,.72) 13px 17px),
+      linear-gradient(180deg,var(--pc-cyber-meter-pink),var(--pc-cyber-meter-purple) 42%,var(--pc-cyber-meter-cyan))!important;
+    background-blend-mode:screen!important;
+    box-shadow:0 0 9px rgba(22,255,243,.72),0 0 16px rgba(255,61,187,.28),inset 0 0 10px rgba(255,255,255,.18)!important;
+    clip-path:polygon(20% 0,100% 0,100% 86%,76% 100%,0 100%,0 14%)!important;
+    transition:height 90ms linear,opacity 90ms linear,filter 90ms linear!important;
+    z-index:1!important;
+  }
+
+  /* Mittleres horizontales HUD-Meter: CSS nachgebaut, bestehende Segmente bleiben echte Audioanzeige. */
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter{
+    height:32px!important;
+    min-height:32px!important;
+    max-height:32px!important;
+    padding:6px 34px!important;
+    border-radius:0!important;
+    border:1px solid rgba(22,255,243,.62)!important;
+    background:
+      linear-gradient(90deg,rgba(22,255,243,.16),rgba(5,9,24,.86) 16%,rgba(255,61,187,.10) 50%,rgba(5,9,24,.86) 84%,rgba(22,255,243,.16)),
+      repeating-linear-gradient(90deg,rgba(22,255,243,.07) 0 1px,transparent 1px 18px)!important;
+    box-shadow:inset 0 0 18px rgba(22,255,243,.11),0 0 13px rgba(22,255,243,.24),0 0 18px rgba(255,61,187,.14)!important;
+    clip-path:polygon(3% 0,97% 0,100% 50%,97% 100%,3% 100%,0 50%)!important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::before,
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::after{
+    content:""!important;
+    position:absolute!important;
+    top:4px!important;
+    bottom:4px!important;
+    width:44px!important;
+    border-top:2px solid rgba(22,255,243,.82)!important;
+    border-bottom:2px solid rgba(255,61,187,.62)!important;
+    pointer-events:none!important;
+    opacity:.88!important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::before{
+    left:8px!important;
+    transform:skewX(-32deg)!important;
+    background:linear-gradient(100deg,rgba(22,255,243,.22),transparent)!important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::after{
+    right:8px!important;
+    transform:skewX(-32deg) scaleX(-1)!important;
+    background:linear-gradient(100deg,rgba(255,61,187,.20),transparent)!important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner{
+    height:18px!important;
+    max-height:18px!important;
+    gap:4px!important;
+    justify-content:center!important;
+    align-items:center!important;
+    overflow:hidden!important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg{
+    width:clamp(5px,.40vw,8px)!important;
+    flex:0 0 clamp(5px,.40vw,8px)!important;
+    height:14px!important;
+    max-height:18px!important;
+    border-radius:0!important;
+    clip-path:polygon(22% 0,100% 0,78% 100%,0 100%)!important;
+    background:rgba(22,255,243,.16)!important;
+    box-shadow:inset 0 0 5px rgba(22,255,243,.14)!important;
+    opacity:.24!important;
+    transition:opacity 95ms linear,transform 95ms linear,filter 95ms linear,background 95ms linear!important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg.is-on,
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg.is-active{
+    background:linear-gradient(90deg,var(--pc-cyber-meter-cyan),var(--pc-cyber-meter-purple) 58%,var(--pc-cyber-meter-pink))!important;
+    opacity:calc(.46 + (var(--pc-audio-energy, .22) * .52))!important;
+    filter:brightness(calc(1.08 + (var(--pc-audio-energy, .22) * .55))) saturate(1.55)!important;
+    box-shadow:0 0 8px rgba(22,255,243,.58),0 0 12px rgba(255,61,187,.26)!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="frame-stage">

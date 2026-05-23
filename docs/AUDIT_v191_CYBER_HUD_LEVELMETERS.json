@@ -1,0 +1,21 @@
+{
+  "version": "v191",
+  "date": "2026-05-23",
+  "scope": "PC levelmeter only",
+  "changed_files": ["index.html", "js/equalizer.js"],
+  "changes": [
+    "outer PC side meters rebuilt as CSS/JS HUD meters, not pasted images",
+    "two visible variable vertical meters per side; tertiary DOM meter hidden only visually",
+    "right side mirrored through CSS row reversal",
+    "bottom sync meter restyled as horizontal cyber HUD meter",
+    "meter movement remains driven by existing visualizer/fallback meter flow"
+  ],
+  "not_changed": [
+    "stream logic",
+    "player transport",
+    "left/right FX addon panels",
+    "Now Playing panel",
+    "admin controls",
+    "mobile player"
+  ]
+}
