@@ -209,18 +209,49 @@ function clamp(value, min, max) {
 
 
 function applyBottomMeterFromSideDynamics(segments, valuePercent) {
+  /*
+  ==========================================
+  GEÄNDERT: 2026-05-23
+  ÄNDERUNG: v192 LIVE_HUD_BOTTOM_METER_MOTION
+  ZWECK: Mittleres PC-Levelmeter bekommt sichtbar lebendigere, nicht-statische
+         Bewegung. Keine neue Audioquelle, keine neue Streamlogik; bestehende
+         Analyzer-/Fallback-Werte werden in ein wanderndes HUD-Segmentfeld
+         übersetzt.
+  ==========================================
+  */
   if (!Array.isArray(segments) || !segments.length) return;
   const bounded = clamp(valuePercent, 10, 98);
+  const level = bounded / 100;
   const center = (segments.length - 1) / 2;
-  const activeWidth = (bounded / 100);
+  const t = Date.now();
+  const sweep = (t / 210) % Math.max(1, segments.length);
+  const pulseA = Math.sin(t / 145);
+  const pulseB = Math.sin(t / 265);
+  const activeHalfWidth = 4 + Math.round(level * Math.max(8, segments.length * 0.34));
+
   segments.forEach((el, index) => {
     if (!el) return;
-    const dist = Math.abs(index - center) / Math.max(1, center);
-    const active = dist <= activeWidth;
+    const distCenter = Math.abs(index - center);
+    const distNorm = distCenter / Math.max(1, center);
+    const centerEnergy = Math.max(0, 1 - distNorm);
+    const sweepDist = Math.min(
+      Math.abs(index - sweep),
+      Math.abs(index - sweep + segments.length),
+      Math.abs(index - sweep - segments.length)
+    );
+    const sweepEnergy = Math.max(0, 1 - (sweepDist / 8));
+    const localWave = (Math.sin((t / 92) + index * 0.62) + 1) / 2;
+    const altWave = (Math.sin((t / 173) + index * 1.17) + 1) / 2;
+    const dynamicLimit = activeHalfWidth + Math.round((pulseA + pulseB) * 2);
+    const active = (distCenter <= dynamicLimit) || (sweepEnergy > 0.42 && level > 0.18);
+    const energy = clamp((level * 0.58) + (centerEnergy * level * 0.24) + (sweepEnergy * 0.26) + (localWave * 0.12), 0.06, 1);
+
     el.classList.toggle('is-on', active);
-    el.style.opacity = active ? String(0.45 + (bounded / 100) * 0.55) : '0.18';
-    el.style.transform = `scaleY(${0.52 + (bounded / 100) * 0.48})`;
-    el.style.setProperty('--v', String((bounded / 100).toFixed(3)));
+    el.classList.toggle('is-active', active && (sweepEnergy > 0.28 || altWave > 0.72));
+    el.style.opacity = active ? String((0.34 + energy * 0.66).toFixed(3)) : String((0.10 + localWave * 0.10).toFixed(3));
+    el.style.transform = `scaleY(${(0.46 + energy * 0.78).toFixed(3)}) translateY(${(active ? (1 - energy) * 1.8 : 0).toFixed(2)}px)`;
+    el.style.filter = active ? `brightness(${(1.02 + energy * 0.58).toFixed(2)}) saturate(${(1.18 + energy * 0.62).toFixed(2)})` : 'brightness(.72) saturate(.86)';
+    el.style.setProperty('--v', String(energy.toFixed(3)));
   });
 }
 
@@ -247,11 +278,10 @@ function applyMeters(targets, valuePercent, side = 'left') {
   /*
   ==========================================
   GEÄNDERT: 2026-05-23
-  ÄNDERUNG: v191 CYBER_HUD_SIDE_METERS
-  ZWECK: PC-Außenlevelmeter werden nicht als Bild eingeklebt, sondern als echte,
-         variable HUD-Meter über vorhandene Audio-/Fallback-Werte gefahren.
-         Zwei sichtbare Spuren schlagen unterschiedlich aus; die rechte Seite
-         wird per CSS gespiegelt, damit links/rechts ein echtes Gegenstück bilden.
+  ÄNDERUNG: v192 WIDER_LIVE_SIDE_HUD_METERS
+  ZWECK: Zwei PC-Außenmeter pro Seite schlagen sichtbarer und unabhängiger aus,
+         ohne Bild-Einkleben und ohne neue Stream-/Audio-Engine. Rechts bleibt
+         durch CSS das gespiegelte Gegenstück.
   ==========================================
   */
   const bounded = clamp(valuePercent, 10, 98);
@@ -262,15 +292,21 @@ function applyMeters(targets, valuePercent, side = 'left') {
     if (!el) return;
 
     const visibleIndex = index % 2;
-    const waveA = Math.abs(Math.sin((t / 185) + (visibleIndex * 1.37)));
-    const waveB = Math.abs(Math.sin((t / 317) + (visibleIndex * 2.11)));
-    const split = visibleIndex === 0 ? 1.04 : 0.82;
-    const motion = visibleIndex === 0 ? (waveA * 15) - (waveB * 6) : (waveB * 18) - (waveA * 5);
-    const target = clamp((bounded * split) + motion, 8, 98);
+    const sidePhase = side === 'right' ? 0.91 : 0;
+    const waveA = Math.abs(Math.sin((t / 128) + (visibleIndex * 1.67) + sidePhase));
+    const waveB = Math.abs(Math.sin((t / 247) + (visibleIndex * 2.39) + sidePhase * 0.7));
+    const waveC = Math.abs(Math.sin((t / 410) + (visibleIndex * 3.21)));
+    const split = visibleIndex === 0 ? 1.10 : 0.78;
+    const motion = visibleIndex === 0
+      ? (waveA * 24) - (waveB * 9) + (waveC * 7)
+      : (waveB * 28) - (waveA * 8) + (waveC * 5);
+    const target = clamp((bounded * split) + motion, 6, 99);
+    const spark = visibleIndex === 0 ? waveA : waveB;
 
     el.style.height = `${target.toFixed(1)}%`;
-    el.style.opacity = String((0.52 + (base * 0.34) + ((visibleIndex === 0 ? waveA : waveB) * 0.14)).toFixed(3));
-    el.style.filter = `brightness(${(1.05 + base * 0.42).toFixed(2)}) saturate(${(1.12 + base * 0.56).toFixed(2)})`;
+    el.style.opacity = String((0.48 + (base * 0.32) + (spark * 0.20)).toFixed(3));
+    el.style.filter = `brightness(${(1.08 + base * 0.50 + spark * 0.12).toFixed(2)}) saturate(${(1.18 + base * 0.68).toFixed(2)})`;
+    el.style.transform = `scaleX(${(0.96 + spark * 0.05).toFixed(3)})`;
     el.dataset.level = String((target / 100).toFixed(3));
     el.dataset.meterSide = side;
   });

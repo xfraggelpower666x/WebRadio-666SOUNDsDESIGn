@@ -5254,5 +5254,210 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 <link rel="stylesheet" href="/css/broadcast-message-history.css?v=smfp-v189-broadcast-history">
 <script src="/js/broadcast-message-history.js?v=smfp-v189-broadcast-history" defer></script>
+
+<!-- v192 PC HUD METER WIDTH + EQ COMPACT CENTER + TICKER CONTINUITY PATCH
+     Erstellt: 2026-05-23
+     Geändert: 2026-05-23
+     Zweck: PC-Außenlevelmeter breiter, mittleres Levelmeter sichtbar lebendiger,
+            unteres echtes EQ-Panel ohne linke Beschriftung kompakter zentriert,
+            PC-Ticker mit weniger Leerphase und doppelter Durchlauf-Reserve.
+     Regeln: Keine Bildausschnitte, kein Reinkleben, keine Streamlogik, keine Buttons,
+             keine FX-Panel-Struktur und kein Mobile-Umbau. -->
+<style id="v192PcHudMeterEqTickerPatch">
+@media (min-width:1221px){
+  body .frame-stage{
+    --pc-side-meter-w:184px!important;
+    --pc-side-meter-track-w:52px!important;
+    --pc-side-meter-track-w-secondary:44px!important;
+  }
+
+  body .side-meter{
+    width:var(--pc-side-meter-w)!important;
+    max-width:var(--pc-side-meter-w)!important;
+  }
+
+  body .side-meter-stack{
+    gap:18px!important;
+    padding:10px 22px!important;
+  }
+
+  body .side-meter-track{
+    flex:0 0 var(--pc-side-meter-track-w)!important;
+    width:var(--pc-side-meter-track-w)!important;
+    border-width:2px!important;
+    box-shadow:inset 0 0 18px rgba(22,255,243,.16),0 0 16px rgba(22,255,243,.22),0 0 22px rgba(255,61,187,.13)!important;
+  }
+
+  body .side-meter-track.secondary{
+    flex-basis:var(--pc-side-meter-track-w-secondary)!important;
+    width:var(--pc-side-meter-track-w-secondary)!important;
+  }
+
+  body .side-meter-track::before{
+    inset:8px 8px!important;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.06) 0 3px,transparent 3px 20px)!important;
+  }
+
+  body .side-meter-fill{
+    left:7px!important;
+    right:7px!important;
+    bottom:8px!important;
+    min-height:12px!important;
+    transition:height 70ms linear,opacity 70ms linear,filter 70ms linear,transform 70ms linear!important;
+  }
+
+  body .side-meter-track::after{
+    opacity:.38!important;
+    transition:transform 70ms linear!important;
+  }
+
+  /* Mittleres HUD-Levelmeter: breiter, stärker sichtbar, weniger statisch. */
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter{
+    width:calc(100% - 46px)!important;
+    max-width:calc(100% - 46px)!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    margin:7px auto 4px auto!important;
+    padding:7px 34px!important;
+    border-radius:0!important;
+    border:2px solid rgba(22,255,243,.66)!important;
+    background:
+      linear-gradient(90deg,rgba(22,255,243,.20),rgba(5,9,24,.88) 15%,rgba(255,61,187,.14) 50%,rgba(5,9,24,.88) 85%,rgba(22,255,243,.20)),
+      repeating-linear-gradient(90deg,rgba(22,255,243,.10) 0 2px,transparent 2px 20px)!important;
+    box-shadow:inset 0 0 22px rgba(22,255,243,.14),0 0 16px rgba(22,255,243,.28),0 0 22px rgba(255,61,187,.18)!important;
+  }
+
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner{
+    height:22px!important;
+    max-height:22px!important;
+    gap:4px!important;
+  }
+
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg{
+    width:clamp(6px,.48vw,9px)!important;
+    flex:0 0 clamp(6px,.48vw,9px)!important;
+    height:18px!important;
+    max-height:22px!important;
+    border-radius:0!important;
+    clip-path:polygon(22% 0,100% 0,78% 100%,0 100%)!important;
+    transition:opacity 65ms linear,transform 65ms linear,filter 65ms linear,background 65ms linear!important;
+  }
+
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg.is-on,
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg.is-active{
+    background:linear-gradient(90deg,#16fff3,#9b4dff 55%,#ff3dbb)!important;
+    box-shadow:0 0 10px rgba(22,255,243,.66),0 0 16px rgba(255,61,187,.32)!important;
+  }
+
+  /* Unterer echter EQ: linke Beschriftung raus, kompakter und sauber mittig. */
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel.pc-real-eq-panel{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    left:50%!important;
+    right:auto!important;
+    bottom:12px!important;
+    width:min(37vw,430px)!important;
+    min-width:300px!important;
+    max-width:430px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    transform:translateX(-50%)!important;
+    padding:5px 9px!important;
+    gap:6px!important;
+    z-index:34!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-title{
+    display:none!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band{
+    flex:0 0 24px!important;
+    width:24px!important;
+    height:32px!important;
+    display:grid!important;
+    grid-template-rows:0 24px 8px!important;
+    gap:0!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band span{
+    display:none!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel input[type=range]{
+    width:26px!important;
+    height:22px!important;
+  }
+
+  body .frame-stage .player-shell .now-playing #pcRealEqPanel .pc-real-eq-band b{
+    font-size:6px!important;
+    opacity:.78!important;
+  }
+
+  /* PC-Ticker: weniger lange Leerphase, langsamer, doppelte Inhaltsreserve. */
+  body .frame-stage .player-shell #pcTickerRebuildLane.pc-ticker-rebuild-lane,
+  body .frame-stage .player-shell .pc-ticker-rebuild-lane{
+    height:34px!important;
+    min-height:34px!important;
+    margin-top:8px!important;
+  }
+
+  body .frame-stage .player-shell #pcTickerRebuildText.pc-ticker-rebuild-text,
+  body .frame-stage .player-shell .pc-ticker-rebuild-text{
+    height:34px!important;
+    line-height:34px!important;
+    padding-left:12%!important;
+    padding-right:38%!important;
+    animation-duration:34s!important;
+  }
+
+  body .frame-stage .player-shell .ticker-window #nowPlayingTicker,
+  body .frame-stage .player-shell .now-playing .ticker-text{
+    padding-left:12%!important;
+    padding-right:38%!important;
+    animation-duration:34s!important;
+  }
+}
+</style>
+
+<script id="v192TickerContinuityPatch">
+(function(){
+  'use strict';
+  if(window.__v192TickerContinuityPatch)return;
+  window.__v192TickerContinuityPatch=true;
+  var SEP='   ✦   ';
+  function clean(t){return String(t||'').replace(/\s+/g,' ').trim();}
+  function baseText(t){
+    var v=clean(t);
+    if(!v || /metadata|metadaten|loading|laden|error|fehler/i.test(v)) return '666SOUNDsDESIGn WebRadio';
+    if(v.indexOf(SEP)>-1) return clean(v.split(SEP)[0]);
+    return v;
+  }
+  function extend(el){
+    if(!el)return;
+    var base=baseText(el.textContent || el.getAttribute('data-v192-base') || '');
+    if(el.getAttribute('data-v192-base')!==base) el.setAttribute('data-v192-base',base);
+    var wanted=base + SEP + base;
+    if(clean(el.textContent)!==wanted) el.textContent=wanted;
+  }
+  function tick(){
+    extend(document.getElementById('pcTickerRebuildText'));
+    extend(document.getElementById('nowPlayingTicker'));
+  }
+  function boot(){
+    tick();
+    setInterval(tick,1200);
+    var targets=[document.getElementById('pcTickerRebuildText'),document.getElementById('nowPlayingTicker')].filter(Boolean);
+    targets.forEach(function(el){
+      try{new MutationObserver(function(){setTimeout(tick,0);}).observe(el,{childList:true,characterData:true,subtree:true});}catch(e){}
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+</script>
+
 </body>
 </html>

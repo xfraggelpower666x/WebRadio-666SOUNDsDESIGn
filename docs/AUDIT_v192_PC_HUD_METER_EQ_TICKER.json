@@ -1,0 +1,26 @@
+{
+  "version": "v192",
+  "date": "2026-05-23",
+  "scope": "PC-only targeted UI patch",
+  "changed_files": [
+    "index.html",
+    "js/equalizer.js",
+    "docs/AUDIT_v192_PC_HUD_METER_EQ_TICKER.json"
+  ],
+  "changes": [
+    "PC outer side level meters widened to roughly double current HUD width.",
+    "Side level meter movement made stronger and independently variable per visible lane.",
+    "Middle/bottom PC HUD level meter movement made more dynamic with sweep and local wave logic.",
+    "Real 10-band EQ title/left label hidden; panel compacted and centered lower in the Now Playing area.",
+    "PC ticker gets lower empty gap risk via shorter initial padding, slower animation duration and duplicated text pass reserve."
+  ],
+  "not_changed": [
+    "No stream routing changes",
+    "No Worker/backend changes",
+    "No transport button changes",
+    "No Discord logic changes",
+    "No right/left FX tower rebuild",
+    "No mobile/iPhone layout patch"
+  ],
+  "implementation_rule": "Nachgebaut per CSS/JS; no bitmap slicing, no pasted image fragments, no fake static meter."
+}
