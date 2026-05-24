@@ -584,166 +584,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 </style>
 
-
-<!-- v191 CYBER HUD LEVELMETER REBUILD — nachgebaut, nicht eingeklebt; nur PC-Meter -->
-<style id="v191CyberHudLevelmeterRebuild">
-@media (min-width:1221px){
-  /* Außenmeter: zwei sichtbare vertikale HUD-Spuren pro Seite, rechte Seite gespiegelt. */
-  body .frame-stage{
-    --pc-side-meter-w:96px!important;
-    --pc-cyber-meter-cyan:#16fff3;
-    --pc-cyber-meter-pink:#ff3dbb;
-    --pc-cyber-meter-purple:#9b4dff;
-    --pc-cyber-meter-dark:rgba(3,8,20,.74);
-  }
-  body .side-meter{
-    width:var(--pc-side-meter-w)!important;
-    max-width:var(--pc-side-meter-w)!important;
-    filter:drop-shadow(0 0 12px rgba(22,255,243,.20)) drop-shadow(0 0 16px rgba(255,61,187,.16))!important;
-  }
-  body .side-meter-stack{
-    width:100%!important;
-    height:100%!important;
-    display:flex!important;
-    align-items:flex-end!important;
-    justify-content:center!important;
-    gap:10px!important;
-    padding:10px 12px!important;
-    box-sizing:border-box!important;
-  }
-  body .side-meter.right .side-meter-stack{
-    flex-direction:row-reverse!important;
-  }
-  body .side-meter-track.tertiary{
-    display:none!important;
-  }
-  body .side-meter-track{
-    position:relative!important;
-    flex:0 0 25px!important;
-    width:25px!important;
-    height:100%!important;
-    min-height:0!important;
-    border-radius:0!important;
-    border:1px solid rgba(22,255,243,.58)!important;
-    background:
-      linear-gradient(180deg,rgba(22,255,243,.08),rgba(5,10,26,.72) 20%,rgba(5,10,26,.82)),
-      repeating-linear-gradient(180deg,rgba(22,255,243,.08) 0 1px,transparent 1px 17px)!important;
-    box-shadow:inset 0 0 15px rgba(22,255,243,.12),0 0 12px rgba(22,255,243,.18),0 0 18px rgba(255,61,187,.10)!important;
-    clip-path:polygon(28% 0,100% 0,100% 88%,72% 100%,0 100%,0 12%)!important;
-    overflow:hidden!important;
-  }
-  body .side-meter-track.secondary{
-    flex-basis:21px!important;
-    width:21px!important;
-    opacity:.94!important;
-    clip-path:polygon(0 0,72% 0,100% 12%,100% 100%,0 100%)!important;
-  }
-  body .side-meter-track::before{
-    content:""!important;
-    position:absolute!important;
-    inset:6px 5px!important;
-    border:1px solid rgba(22,255,243,.20)!important;
-    background:repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 2px,transparent 2px 18px)!important;
-    opacity:.72!important;
-    z-index:2!important;
-  }
-  body .side-meter-track::after{
-    content:""!important;
-    position:absolute!important;
-    inset:-20% -120%!important;
-    background:repeating-linear-gradient(122deg,transparent 0 20px,rgba(22,255,243,.24) 20px 22px,transparent 22px 42px)!important;
-    opacity:.28!important;
-    transform:translateY(calc(var(--pc-audio-energy, .22) * -24px));
-    z-index:3!important;
-    pointer-events:none!important;
-  }
-  body .side-meter-fill{
-    position:absolute!important;
-    left:4px!important;
-    right:4px!important;
-    bottom:5px!important;
-    min-height:8px!important;
-    height:18%!important;
-    border-radius:0!important;
-    background:
-      repeating-linear-gradient(180deg,
-        rgba(22,255,243,1) 0 10px,
-        rgba(22,255,243,.18) 10px 13px,
-        rgba(5,12,24,.72) 13px 17px),
-      linear-gradient(180deg,var(--pc-cyber-meter-pink),var(--pc-cyber-meter-purple) 42%,var(--pc-cyber-meter-cyan))!important;
-    background-blend-mode:screen!important;
-    box-shadow:0 0 9px rgba(22,255,243,.72),0 0 16px rgba(255,61,187,.28),inset 0 0 10px rgba(255,255,255,.18)!important;
-    clip-path:polygon(20% 0,100% 0,100% 86%,76% 100%,0 100%,0 14%)!important;
-    transition:height 90ms linear,opacity 90ms linear,filter 90ms linear!important;
-    z-index:1!important;
-  }
-
-  /* Mittleres horizontales HUD-Meter: CSS nachgebaut, bestehende Segmente bleiben echte Audioanzeige. */
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter{
-    height:32px!important;
-    min-height:32px!important;
-    max-height:32px!important;
-    padding:6px 34px!important;
-    border-radius:0!important;
-    border:1px solid rgba(22,255,243,.62)!important;
-    background:
-      linear-gradient(90deg,rgba(22,255,243,.16),rgba(5,9,24,.86) 16%,rgba(255,61,187,.10) 50%,rgba(5,9,24,.86) 84%,rgba(22,255,243,.16)),
-      repeating-linear-gradient(90deg,rgba(22,255,243,.07) 0 1px,transparent 1px 18px)!important;
-    box-shadow:inset 0 0 18px rgba(22,255,243,.11),0 0 13px rgba(22,255,243,.24),0 0 18px rgba(255,61,187,.14)!important;
-    clip-path:polygon(3% 0,97% 0,100% 50%,97% 100%,3% 100%,0 50%)!important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::before,
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::after{
-    content:""!important;
-    position:absolute!important;
-    top:4px!important;
-    bottom:4px!important;
-    width:44px!important;
-    border-top:2px solid rgba(22,255,243,.82)!important;
-    border-bottom:2px solid rgba(255,61,187,.62)!important;
-    pointer-events:none!important;
-    opacity:.88!important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::before{
-    left:8px!important;
-    transform:skewX(-32deg)!important;
-    background:linear-gradient(100deg,rgba(22,255,243,.22),transparent)!important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter::after{
-    right:8px!important;
-    transform:skewX(-32deg) scaleX(-1)!important;
-    background:linear-gradient(100deg,rgba(255,61,187,.20),transparent)!important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner{
-    height:18px!important;
-    max-height:18px!important;
-    gap:4px!important;
-    justify-content:center!important;
-    align-items:center!important;
-    overflow:hidden!important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg{
-    width:clamp(5px,.40vw,8px)!important;
-    flex:0 0 clamp(5px,.40vw,8px)!important;
-    height:14px!important;
-    max-height:18px!important;
-    border-radius:0!important;
-    clip-path:polygon(22% 0,100% 0,78% 100%,0 100%)!important;
-    background:rgba(22,255,243,.16)!important;
-    box-shadow:inset 0 0 5px rgba(22,255,243,.14)!important;
-    opacity:.24!important;
-    transition:opacity 95ms linear,transform 95ms linear,filter 95ms linear,background 95ms linear!important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg.is-on,
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg.is-active{
-    background:linear-gradient(90deg,var(--pc-cyber-meter-cyan),var(--pc-cyber-meter-purple) 58%,var(--pc-cyber-meter-pink))!important;
-    opacity:calc(.46 + (var(--pc-audio-energy, .22) * .52))!important;
-    filter:brightness(calc(1.08 + (var(--pc-audio-energy, .22) * .55))) saturate(1.55)!important;
-    box-shadow:0 0 8px rgba(22,255,243,.58),0 0 12px rgba(255,61,187,.26)!important;
-  }
-}
-</style>
-
 </head>
 <body>
   <div class="frame-stage">
@@ -761,37 +601,31 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <!-- v138 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
     <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Left Add-on FX Tower" data-addon-side="left">
       <section class="pc-addon-tower pc-addon-tower-left" aria-label="Left FX Tower">
-        <header class="pc-addon-tower-head pc-left-dna-head"><span>FRAGGLE DYNASTIE 666 SFX DNA</span><i class="pc-dna-status-led" aria-hidden="true"></i><b id="pcLeftFxState">ON</b></header>
-        <article class="pc-addon-module pc-addon-module-reactor" aria-label="Fraggle Audio DNA Reaktor">
-          <strong>FRAGGLE AUDIO DNA REAKTOR</strong>
+        <header class="pc-addon-tower-head"><span>LEFT FX</span><b id="pcLeftFxState">ON</b></header>
+        <article class="pc-addon-module pc-addon-module-reactor" aria-label="Audio Reactor">
+          <strong>AUDIO REACTOR</strong>
           <div class="pc-addon-reactor-core" aria-hidden="true">
             <span class="pc-addon-orbit pc-addon-orbit-a"></span>
             <span class="pc-addon-orbit pc-addon-orbit-b"></span>
-            <span class="pc-addon-dna-helix pc-addon-dna-helix-a"></span>
-            <span class="pc-addon-dna-helix pc-addon-dna-helix-b"></span>
-            <span class="pc-addon-dna-particle pc-addon-dna-particle-a"></span>
-            <span class="pc-addon-dna-particle pc-addon-dna-particle-b"></span>
-            <span class="pc-addon-dna-particle pc-addon-dna-particle-c"></span>
             <span class="pc-addon-reactor-wave"></span>
             <span class="pc-addon-reactor-dot"></span>
           </div>
-          <footer><span>DNA REACTIVITY</span><b>85%</b></footer>
+          <footer><span>REACTIVITY</span><b>85%</b></footer>
         </article>
-        <article class="pc-addon-module pc-addon-module-wave" aria-label="666 Audio Wave DNA Scope">
-          <strong>666 AUDIO WAVE DNA SCOPE</strong>
+        <article class="pc-addon-module pc-addon-module-wave" aria-label="Wave Scope">
+          <strong>WAVE SCOPE</strong>
           <div class="pc-addon-waveform" aria-hidden="true">
-            <span class="pc-addon-oscilloscope-wave"></span>
             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </div>
         </article>
-        <article class="pc-addon-module pc-addon-module-grid" aria-label="666 Spektrum DNA Radar">
-          <strong>666 SPEKTRUM DNA RADAR</strong>
+        <article class="pc-addon-module pc-addon-module-grid" aria-label="Spectrum Grid">
+          <strong>SPECTRUM GRID</strong>
           <div class="pc-addon-radar" aria-hidden="true">
             <span class="radar-ring r1"></span><span class="radar-ring r2"></span><span class="radar-ring r3"></span>
             <span class="radar-axis radar-x"></span><span class="radar-axis radar-y"></span><span class="radar-sweep"></span>
             <em class="pt-a"></em><em class="pt-b"></em><em class="pt-c"></em><em class="pt-d"></em>
           </div>
-          <footer><span>DNA LINK</span><b>SYNC</b></footer>
+          <footer><span>AUDIO LINK</span><b>SYNC</b></footer>
         </article>
       </section>
     </aside>
@@ -3686,7 +3520,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     document.querySelectorAll('.pc-addon-tower').forEach(function(t){
       t.style.filter='brightness('+(1+e*.22).toFixed(2)+') saturate('+(1+p*.34).toFixed(2)+')';
     });
-    // v141/v190: Fraggle Audio DNA Reaktor links oben aktiver machen, bestehende Elemente direkt steuern.
+    // v141: Audio Reactor links oben aktiver machen, bestehende Elemente direkt steuern.
     // Kein neuer Layer, kein neuer Canvas, kein neuer Audio-/RAF-Loop.
     document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-core').forEach(function(el){
       var coreScale = 0.82 + e*.30 + p*.10;
@@ -3719,7 +3553,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     document.querySelectorAll('.pc-addon-module-reactor footer b').forEach(function(el){
       el.textContent=Math.round(clamp(.22+e*.78,0,1)*100)+'%';
     });
-    // v144/v190: 666 Spektrum DNA Radar originalgetreuer machen.
+    // v144: Spectrum Grid/Radar originalgetreuer machen.
     // Bestehende Radar-Elemente werden direkt gesteuert; kein neuer Layer, kein neuer Audio-/RAF-/Interval-Loop.
     root.style.setProperty('--pc-radar-sweep-scale',(0.90+e*.20).toFixed(3));
     root.style.setProperty('--pc-radar-glow',(10+p*28).toFixed(1)+'px');
@@ -3811,8 +3645,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-<!-- v141/v190 PC FRAGGLE AUDIO DNA REAKTOR BOOST — existing left-top reactor only; no new layer/loop -->
-<!-- v144/v190 PC 666 SPEKTRUM DNA RADAR — existing left radar only; no new layer/loop -->
+<!-- v141 PC AUDIO REACTOR BOOST — existing left-top Audio Reactor only; no new layer/loop -->
+<!-- v144 PC SPECTRUM GRID SMOOTH RADAR — existing Spectrum Grid only; no new layer/loop -->
 <style id="v141PcAudioReactorBoost">
 @media (min-width:1221px){
   body .pc-addon-module-reactor{
@@ -3829,7 +3663,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 </style>
 
-<!-- v144/v190 PC 666 SPEKTRUM DNA RADAR — existing left radar only; no new layer/loop -->
+<!-- v144 PC SPECTRUM GRID SMOOTH RADAR — existing Spectrum Grid only; no new layer/loop -->
 <style id="v144PcSpectrumGridSmoothRadar">
 @media (min-width:1221px){
   body .pc-addon-module-grid{
@@ -3866,44 +3700,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 }
 </style>
-
-
-<!-- v190 FRAGGLE DYNASTIE LEFT SFX DNA — left FX tower only; no player-core/right-tower changes -->
-<style id="v190FraggleDynastieLeftSfxDna">
-@media (min-width:1221px){
-  body #pcLeftFxAddon .pc-left-dna-head{gap:6px!important;letter-spacing:.075em!important;font-size:8.5px!important;line-height:1.05!important;align-items:center!important;}
-  body #pcLeftFxAddon .pc-left-dna-head span{min-width:0!important;flex:1 1 auto!important;color:#ff4fc7!important;text-shadow:0 0 calc(7px + (16px * var(--pc-addon-peak))) rgba(255,61,187,.68),0 0 calc(5px + (12px * var(--pc-addon-energy))) rgba(22,255,243,.34)!important;}
-  body #pcLeftFxAddon .pc-left-dna-head b{flex:0 0 auto!important;}
-  body #pcLeftFxAddon .pc-dna-status-led{display:block!important;flex:0 0 auto!important;width:12px!important;height:12px!important;border-radius:999px!important;background:radial-gradient(circle at 42% 36%,#fff 0 9%,#16fff3 15%,#ff3dbb 48%,#7f5cff 76%)!important;box-shadow:0 0 calc(8px + (22px * var(--pc-addon-pulse))) rgba(22,255,243,.78),0 0 calc(9px + (24px * var(--pc-addon-peak))) rgba(255,61,187,.62)!important;opacity:calc(.62 + (.38 * var(--pc-addon-energy)))!important;transform:scale(calc(.78 + (.44 * var(--pc-addon-pulse))))!important;animation:pcDynastyLedColor 1.45s linear infinite!important;}
-
-  body #pcLeftFxAddon .pc-addon-module strong{font-size:8px!important;letter-spacing:.070em!important;line-height:1.08!important;right:8px!important;white-space:normal!important;}
-  body #pcLeftFxAddon .pc-addon-module-reactor .pc-addon-reactor-core{overflow:hidden!important;isolation:isolate!important;background:radial-gradient(circle at 50% 50%,rgba(22,255,243,calc(.20 + (.34 * var(--pc-addon-energy)))) 0 7%,rgba(255,61,187,calc(.20 + (.34 * var(--pc-addon-peak)))) 12%,rgba(127,92,255,.18) 28%,rgba(22,255,243,.10) 46%,transparent 72%),conic-gradient(from calc(var(--pc-addon-phase-angle,0deg)),rgba(22,255,243,.45),rgba(255,61,187,.36),rgba(127,92,255,.25),rgba(22,255,243,.22),rgba(255,61,187,.38),rgba(22,255,243,.45))!important;}
-  body #pcLeftFxAddon .pc-addon-dna-helix{position:absolute!important;left:15%!important;right:15%!important;top:47%!important;height:3px!important;border-radius:999px!important;background:repeating-linear-gradient(90deg,rgba(22,255,243,.92) 0 7px,rgba(255,61,187,.92) 7px 14px,rgba(127,92,255,.82) 14px 21px)!important;box-shadow:0 0 calc(8px + (24px * var(--pc-addon-peak))) rgba(255,61,187,.45),0 0 calc(6px + (20px * var(--pc-addon-energy))) rgba(22,255,243,.42)!important;opacity:calc(.42 + (.48 * var(--pc-addon-energy)))!important;transform-origin:center!important;mix-blend-mode:screen!important;}
-  body #pcLeftFxAddon .pc-addon-dna-helix-a{transform:rotate(calc(-28deg + var(--pc-addon-phase-angle,0deg))) scaleX(calc(.70 + (.48 * var(--pc-addon-pulse))))!important;}
-  body #pcLeftFxAddon .pc-addon-dna-helix-b{transform:rotate(calc(28deg - var(--pc-addon-phase-angle,0deg))) scaleX(calc(.62 + (.50 * var(--pc-addon-peak))))!important;filter:hue-rotate(36deg)!important;}
-  body #pcLeftFxAddon .pc-addon-dna-particle{position:absolute!important;width:5px!important;height:5px!important;border-radius:50%!important;background:#16fff3!important;box-shadow:0 0 calc(8px + (18px * var(--pc-addon-peak))) currentColor!important;opacity:calc(.38 + (.52 * var(--pc-addon-peak)))!important;mix-blend-mode:screen!important;}
-  body #pcLeftFxAddon .pc-addon-dna-particle-a{left:22%!important;top:30%!important;color:#16fff3!important;transform:scale(calc(.7 + (.8 * var(--pc-addon-pulse))))!important;}
-  body #pcLeftFxAddon .pc-addon-dna-particle-b{right:24%!important;top:24%!important;color:#ff3dbb!important;transform:scale(calc(.65 + (.75 * var(--pc-addon-peak))))!important;}
-  body #pcLeftFxAddon .pc-addon-dna-particle-c{right:30%!important;bottom:25%!important;color:#7f5cff!important;transform:scale(calc(.62 + (.68 * var(--pc-addon-energy))))!important;}
-  body #pcLeftFxAddon .pc-addon-module-reactor footer span{color:#dff!important;text-shadow:0 0 8px rgba(22,255,243,.28)!important;}
-
-  body #pcLeftFxAddon .pc-addon-module-wave .pc-addon-waveform{overflow:hidden!important;}
-  body #pcLeftFxAddon .pc-addon-oscilloscope-wave{position:absolute!important;left:4px!important;right:4px!important;top:50%!important;height:42%!important;z-index:5!important;pointer-events:none!important;opacity:calc(.50 + (.42 * var(--pc-addon-energy)))!important;background:linear-gradient(90deg,transparent 0 2%,rgba(22,255,243,.94) 14%,rgba(255,61,187,.82) 30%,rgba(22,255,243,.94) 47%,rgba(127,92,255,.82) 64%,rgba(22,255,243,.94) 83%,transparent 98%)!important;clip-path:polygon(0% 50%,6% 38%,12% 61%,18% 29%,24% 72%,30% 42%,36% 58%,42% 32%,48% 67%,54% 44%,60% 55%,66% 31%,72% 70%,78% 39%,84% 61%,90% 36%,96% 58%,100% 50%)!important;filter:drop-shadow(0 0 calc(7px + (23px * var(--pc-addon-peak))) rgba(22,255,243,.62)) drop-shadow(0 0 calc(5px + (19px * var(--pc-addon-pulse))) rgba(255,61,187,.54))!important;transform:translateY(-50%) translateX(calc(-9px + (18px * var(--pc-addon-pulse)))) scaleY(calc(.56 + (.78 * var(--pc-addon-peak))))!important;mix-blend-mode:screen!important;}
-  body #pcLeftFxAddon .pc-addon-module-wave .pc-addon-waveform i{z-index:2!important;opacity:calc(.42 + (.40 * var(--pc-addon-energy)))!important;}
-
-  body #pcLeftFxAddon .pc-addon-module-grid .pc-addon-radar{background:radial-gradient(circle at 50% 50%,rgba(255,61,187,calc(.10 + (.18 * var(--pc-addon-peak)))) 0 5%,rgba(22,255,243,calc(.14 + (.22 * var(--pc-addon-energy)))) 6% 10%,transparent 11%),radial-gradient(circle,rgba(22,255,243,.13),transparent 59%),conic-gradient(from calc(var(--pc-addon-phase-angle,0deg)),rgba(22,255,243,.08),rgba(255,61,187,.07),rgba(127,92,255,.06),rgba(22,255,243,.08))!important;}
-  body #pcLeftFxAddon .pc-addon-module-grid .radar-ring{border-color:rgba(22,255,243,calc(.20 + (.22 * var(--pc-addon-energy))))!important;box-shadow:0 0 calc(4px + (12px * var(--pc-addon-pulse))) rgba(22,255,243,.12)!important;}
-  body #pcLeftFxAddon .pc-addon-module-grid .radar-sweep{height:3px!important;background:linear-gradient(90deg,rgba(22,255,243,.96),rgba(255,61,187,.56),transparent 82%)!important;}
-  body #pcLeftFxAddon .pc-addon-module-grid em{width:6px!important;height:6px!important;}
-}
-@keyframes pcDynastyLedColor{
-  0%{filter:hue-rotate(0deg) brightness(1.05) saturate(1.2)}
-  34%{filter:hue-rotate(70deg) brightness(1.25) saturate(1.55)}
-  67%{filter:hue-rotate(145deg) brightness(1.18) saturate(1.45)}
-  100%{filter:hue-rotate(360deg) brightness(1.05) saturate(1.2)}
-}
-</style>
-
 <!-- v145 PC VU MATRIX ROOT REACTIVITY — existing VU Matrix only; no new layer/loop -->
 <style id="v159PcVuMatrixRootHeightFix">
 @media (min-width:1221px){
