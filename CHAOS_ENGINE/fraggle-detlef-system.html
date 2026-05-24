@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CHAOS ENGINE V3 — Fraggle Detlef System</title>
+<link rel="stylesheet" href="./assets/css/chaos-engine.css">
+<link rel="stylesheet" href="./assets/css/fraggle-detlef-system.css">
+</head>
+<body>
+<div class="ce-app fds-app">
+  <header class="ce-header fds-header">
+    <div>
+      <div class="ce-kicker">FRAGGLE DETLEF SYSTEM · MASTER HANDOFF V2.1 FULL</div>
+      <h1>DETLEF CORE</h1>
+      <p>Portable Bootloader · Fraggle DNA · Guards · 4-Codebox Production · Free Wilderness Active</p>
+    </div>
+    <div class="ce-status-stack">
+      <span id="fdsBootStatus" class="ce-pill">BOOT: loading</span>
+      <span id="fdsLimitStatus" class="ce-pill">LIMITS: unchecked</span>
+      <span id="fdsModeStatus" class="ce-pill">MODE: production</span>
+    </div>
+  </header>
+
+  <nav class="ce-tabs">
+    <a class="fds-link" href="./index.html">← Main Engine</a>
+    <a class="fds-link" href="./track-factory.html">Track Factory</a>
+    <button data-tab="boot" class="is-active">Boot</button>
+    <button data-tab="builder">4-Codebox Builder</button>
+    <button data-tab="guards">Guards</button>
+    <button data-tab="dna">DNA / Wildbahn</button>
+    <button data-tab="source">Source Text</button>
+    <button data-tab="export">Export</button>
+  </nav>
+
+  <main>
+    <section class="ce-tab is-active" data-panel="boot">
+      <div class="fds-grid">
+        <section class="ce-panel">
+          <h2>Required Boot Response</h2>
+          <pre id="fdsBootOutput">Loading...</pre>
+          <div class="ce-actions">
+            <button id="fdsCopyBoot">Copy Boot Response</button>
+            <button id="fdsSystemOnline" class="secondary">System Online</button>
+          </div>
+        </section>
+        <section class="ce-panel">
+          <h2>Core Modules</h2>
+          <div id="fdsModules" class="fds-module-grid"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="ce-tab" data-panel="builder">
+      <div class="fds-grid">
+        <section class="ce-panel">
+          <h2>Material Input</h2>
+          <label>Track Title<input id="fdsTitle" value="Living Transmission"></label>
+          <label>Production Mode<select id="fdsMode">
+            <option>Dark Techno foreground</option>
+            <option>Story Transmission</option>
+            <option>Living Memory Track</option>
+            <option>Reactor Overflow</option>
+            <option>Human Resonance Track</option>
+            <option>Free Wilderness Session</option>
+            <option>Forest Psytrance</option>
+            <option>Intro / Opener</option>
+          </select></label>
+          <label>Raw Material<textarea id="fdsMaterial" rows="13" placeholder="Lyrics, Bildbeschreibung, Story, Set-Ziel, Rohidee oder emotionale Richtung..."></textarea></label>
+          <div class="ce-actions">
+            <button id="fdsBuild">Build 4 Codeboxes</button>
+            <button id="fdsValidate" class="secondary">Validate</button>
+            <button id="fdsCopyAll" class="secondary">Copy All Four</button>
+            <button id="fdsClear" class="danger">Clear</button>
+          </div>
+        </section>
+
+        <section class="ce-panel">
+          <h2>Output</h2>
+          <label>CODEBOX 1 — TITLE<textarea id="fdsOutTitle" rows="2"></textarea></label>
+          <label>CODEBOX 2 — STYLE PROMPT<textarea id="fdsOutStyle" rows="7"></textarea></label>
+          <label>CODEBOX 3 — LYRIC PROMPT<textarea id="fdsOutLyric" rows="13"></textarea></label>
+          <label>CODEBOX 4 — EXTENDED PROMPT<textarea id="fdsOutExtended" rows="6"></textarea></label>
+        </section>
+      </div>
+    </section>
+
+    <section class="ce-tab" data-panel="guards">
+      <section class="ce-panel">
+        <h2>Guard Architecture</h2>
+        <div id="fdsGuardGrid" class="fds-guard-grid"></div>
+        <pre id="fdsGuardOutput">Ready.</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="dna">
+      <section class="ce-panel">
+        <h2>Fraggle DNA / Wildbahn / Klangliches Sehen</h2>
+        <div class="fds-dna-grid">
+          <div><strong>Fraggle DNA</strong><span>Chaos ist Rohmaterial. Musik ist Erinnerung. Atmosphäre ist Architektur.</span></div>
+          <div><strong>Detlef System</strong><span>Werkstatt, Spiegel, organisierter Chaosraum, Mustererkennung.</span></div>
+          <div><strong>Human Resonance</strong><span>Atem, Herzschlag, Nähe, emotionale Stille als lebendige Soundarchitektur.</span></div>
+          <div><strong>Source-First Sound Design</strong><span>Die Ursache des Klanges beschreiben, nicht nur das Ergebnis etikettieren.</span></div>
+          <div><strong>Anti Clone Rhythm</strong><span>Gleiche Emotion darf wiederkehren. Der Weg dorthin muss anders sein.</span></div>
+          <div><strong>Klangliches Sehen</strong><span>Track als Raum prüfen: Bewegung, Druck, Spannung, Atmosphäre, Ende.</span></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="source">
+      <section class="ce-panel">
+        <h2>PDF Source Text</h2>
+        <div class="ce-actions">
+          <button id="fdsSearchSource">Search Source</button>
+          <button id="fdsCopySource" class="secondary">Copy Full Source</button>
+        </div>
+        <input id="fdsSearch" placeholder="Suchbegriff z.B. Anti Clone, Human Resonance, Output Limit">
+        <pre id="fdsSourceOutput">Loading...</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="export">
+      <section class="ce-panel">
+        <h2>Export / Import</h2>
+        <div class="ce-actions">
+          <button id="fdsExportJson">Export JSON</button>
+          <button id="fdsImportJson" class="secondary">Import JSON</button>
+          <button id="fdsOpenSuno" class="secondary">Open Zuno/Suno</button>
+        </div>
+        <textarea id="fdsImportBox" rows="10" placeholder="JSON Import hier einfügen"></textarea>
+        <pre id="fdsDebugOutput">Ready.</pre>
+      </section>
+    </section>
+  </main>
+</div>
+<script src="./assets/js/fraggle-detlef-system.js"></script>
+</body>
+</html>

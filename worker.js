@@ -1,6 +1,7 @@
 import { handleDiscordNotifyV3 } from './worker-addons/discord-notify-addon-v3.js';
 import { handleRadioAdminConfigAddon } from './worker-addons/radio-admin-config-addon.js';
 
+import { handleChaosEngineApiAddon } from './worker-addons/chaos-engine-api-addon.js';
 // ==========================================================
 // 666SOUNDsDESIGn — v66 The Dark Dancer Route
 // Zweck: /The-Dark-Dancer direkt über die Domain ausliefern.
@@ -525,6 +526,22 @@ async function serveExternalIndex(request){
     statusText: response.statusText,
     headers
   });
+}
+
+
+// CHAOS_ENGINE_STATIC_ROUTE_V1
+async function chaosEngineStaticResponse(request, env){
+  const url = new URL(request.url);
+  let path = url.pathname;
+  if(path === "/chaos-engine" || path === "/chaos-engine/") path = "/CHAOS_ENGINE/index.html";
+  if(path === "/CHAOS_ENGINE" || path === "/CHAOS_ENGINE/") path = "/CHAOS_ENGINE/index.html";
+  if(!path.startsWith("/CHAOS_ENGINE/")) return null;
+  if(env && env.ASSETS && typeof env.ASSETS.fetch === "function"){
+    const assetUrl = new URL(request.url);
+    assetUrl.pathname = path;
+    return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
+  }
+  return null;
 }
 
 export default {
