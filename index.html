@@ -601,9 +601,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <!-- v138 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
     <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Left Add-on FX Tower" data-addon-side="left">
       <section class="pc-addon-tower pc-addon-tower-left" aria-label="Left FX Tower">
-        <header class="pc-addon-tower-head"><span>FRAGGLE DYNASTIE 666 SFX DNA</span><b id="pcLeftFxState">ON</b></header>
+        <header class="pc-addon-tower-head"><span>LEFT FX</span><b id="pcLeftFxState">ON</b></header>
         <article class="pc-addon-module pc-addon-module-reactor" aria-label="Audio Reactor">
-          <strong>FRAGGLE AUDIO DNA REAKTOR</strong>
+          <strong>AUDIO REACTOR</strong>
           <div class="pc-addon-reactor-core" aria-hidden="true">
             <span class="pc-addon-orbit pc-addon-orbit-a"></span>
             <span class="pc-addon-orbit pc-addon-orbit-b"></span>
@@ -613,13 +613,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <footer><span>REACTIVITY</span><b>85%</b></footer>
         </article>
         <article class="pc-addon-module pc-addon-module-wave" aria-label="Wave Scope">
-          <strong>666 AUDIO WAVE DNA SCOPE</strong>
+          <strong>WAVE SCOPE</strong>
           <div class="pc-addon-waveform" aria-hidden="true">
             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </div>
         </article>
         <article class="pc-addon-module pc-addon-module-grid" aria-label="Spectrum Grid">
-          <strong>666 SPEKTRUM DNA RADAR</strong>
+          <strong>SPECTRUM GRID</strong>
           <div class="pc-addon-radar" aria-hidden="true">
             <span class="radar-ring r1"></span><span class="radar-ring r2"></span><span class="radar-ring r3"></span>
             <span class="radar-axis radar-x"></span><span class="radar-axis radar-y"></span><span class="radar-sweep"></span>
@@ -5048,7 +5048,86 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <link rel="stylesheet" href="/css/player-admin-overlay.css?v=admin-runtime-20260521">
 <script src="/js/player-admin-overlay.js?v=admin-runtime-20260521" defer></script>
 
-<link rel="stylesheet" href="/css/broadcast-message-history.css?v=smfp-v189-broadcast-history">
-<script src="/js/broadcast-message-history.js?v=smfp-v189-broadcast-history" defer></script>
+<link rel="stylesheet" href="/css/broadcast-message-history.css?v=smfp-v190-broadcast-history">
+<script src="/js/broadcast-message-history.js?v=smfp-v190-broadcast-history" defer></script>
+
+<!-- SMFP_v190_MOBILE_GRAPHIC_EQ_OVERLAY -->
+<style id="smfpMobileGraphicEqOverlayV190Style">
+  #smfpMobileEqOverlay{position:fixed;inset:0;z-index:99990;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.66);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:none;}
+  #smfpMobileEqOverlay.is-open{display:flex;pointer-events:auto;}
+  #smfpMobileEqPanel{width:min(430px,94vw);max-height:88vh;overflow:auto;border-radius:22px;border:1px solid rgba(22,255,243,.64);background:radial-gradient(circle at 15% 8%,rgba(255,61,187,.22),transparent 38%),radial-gradient(circle at 85% 18%,rgba(22,255,243,.16),transparent 36%),rgba(3,6,18,.96);box-shadow:0 0 28px rgba(22,255,243,.30),0 0 34px rgba(255,61,187,.20);padding:14px 14px 16px;color:#eaffff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;}
+  #smfpMobileEqPanel h3{margin:0 0 4px;text-align:center;color:#16fff3;font-size:15px;letter-spacing:.11em;text-shadow:0 0 12px rgba(22,255,243,.65);}
+  #smfpMobileEqPanel .smfp-eq-sub{margin:0 0 12px;text-align:center;color:#ff3dbb;font-size:10px;font-weight:900;letter-spacing:.09em;}
+  #smfpMobileEqPanel .smfp-mobile-eq-row{display:grid;grid-template-columns:58px 1fr 42px;align-items:center;gap:9px;margin:9px 0;}
+  #smfpMobileEqPanel .smfp-mobile-eq-row span{font-size:11px;font-weight:950;color:#ff3dbb;letter-spacing:.07em;}
+  #smfpMobileEqPanel .smfp-mobile-eq-row output{font-size:11px;font-weight:950;color:#16fff3;text-align:right;}
+  #smfpMobileEqPanel input[type=range]{width:100%;accent-color:#16fff3;touch-action:pan-x;}
+  #smfpMobileEqPanel .smfp-eq-actions{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  #smfpMobileEqPanel button{border-radius:999px;border:1px solid rgba(22,255,243,.60);background:rgba(7,11,28,.92);color:#16fff3;font-weight:950;font-size:12px;letter-spacing:.08em;padding:9px 15px;box-shadow:0 0 12px rgba(22,255,243,.18);}
+  #smfpMobileEqPanel button.smfp-eq-reset{border-color:rgba(255,61,187,.60);color:#ff3dbb;}
+  #eqBars,#mffEqBars{cursor:pointer;}
+  @media(max-width:760px){#smfpMobileEqPanel{width:94vw;padding:13px 12px 15px;}#smfpMobileEqPanel .smfp-mobile-eq-row{grid-template-columns:54px 1fr 38px;gap:7px;margin:8px 0;}}
+</style>
+<script id="smfpMobileGraphicEqOverlayV190Script">
+(function(){
+  if(window.__smfpMobileGraphicEqOverlayV190)return; window.__smfpMobileGraphicEqOverlayV190=true;
+  var BANDS=[
+    {label:'SUB',key:'b63',id:'pcEq63'},
+    {label:'BASS',key:'b125',id:'pcEq125'},
+    {label:'LOW',key:'b250',id:'pcEq250'},
+    {label:'MID',key:'b1k',id:'pcEq1k'},
+    {label:'HIGH',key:'b4k',id:'pcEq4k'},
+    {label:'AIR',key:'b16k',id:'pcEq16k'}
+  ];
+  function clamp(v){v=Number(v); if(!isFinite(v))v=0; return Math.max(-12,Math.min(12,Math.round(v)));}
+  function getHiddenInput(b){return document.getElementById(b.id)||document.querySelector('[data-smfp-eq="'+b.key+'"]');}
+  function setBand(b,val){
+    val=clamp(val);
+    var input=getHiddenInput(b);
+    if(input){
+      input.value=String(val);
+      try{input.dispatchEvent(new Event('input',{bubbles:true})); input.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}
+    }else{
+      try{var raw=localStorage.getItem('smfp_real_eq_v162')||'{}'; var st=JSON.parse(raw); st[b.key]=val; localStorage.setItem('smfp_real_eq_v162',JSON.stringify(st));}catch(e){}
+      try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}
+    }
+  }
+  function getBand(b){
+    var input=getHiddenInput(b); if(input)return clamp(input.value);
+    try{var st=JSON.parse(localStorage.getItem('smfp_real_eq_v162')||'{}'); return clamp(st[b.key]||0);}catch(e){return 0;}
+  }
+  function ensureOverlay(){
+    var ov=document.getElementById('smfpMobileEqOverlay'); if(ov)return ov;
+    ov=document.createElement('div'); ov.id='smfpMobileEqOverlay';
+    var rows=BANDS.map(function(b){return '<label class="smfp-mobile-eq-row"><span>'+b.label+'</span><input type="range" min="-12" max="12" step="1" value="0" data-smfp-mobile-eq="'+b.key+'"><output>0</output></label>';}).join('');
+    ov.innerHTML='<div id="smfpMobileEqPanel" role="dialog" aria-modal="true" aria-label="Mobile Equalizer"><h3>POWER EQ</h3><p class="smfp-eq-sub">tap graphic EQ · adjust · OK saves</p>'+rows+'<div class="smfp-eq-actions"><button type="button" class="smfp-eq-reset">RESET</button><button type="button" class="smfp-eq-ok">OK</button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(ev){if(ev.target===ov)close();});
+    ov.querySelector('.smfp-eq-ok').addEventListener('click',close);
+    ov.querySelector('.smfp-eq-reset').addEventListener('click',function(){BANDS.forEach(function(b){setBand(b,0);}); sync();});
+    ov.querySelectorAll('[data-smfp-mobile-eq]').forEach(function(input){
+      var key=input.getAttribute('data-smfp-mobile-eq'); var b=BANDS.find(function(x){return x.key===key;}); var out=input.parentNode.querySelector('output');
+      function update(){var v=clamp(input.value); if(out)out.textContent=String(v); if(b)setBand(b,v);}
+      input.addEventListener('input',update,{passive:true}); input.addEventListener('change',update,{passive:true});
+      input.addEventListener('click',function(e){e.stopPropagation();},{capture:true}); input.addEventListener('pointerdown',function(e){e.stopPropagation();},{capture:true});
+    });
+    return ov;
+  }
+  function sync(){
+    var ov=ensureOverlay();
+    ov.querySelectorAll('[data-smfp-mobile-eq]').forEach(function(input){var key=input.getAttribute('data-smfp-mobile-eq'); var b=BANDS.find(function(x){return x.key===key;}); var v=b?getBand(b):0; input.value=String(v); var out=input.parentNode.querySelector('output'); if(out)out.textContent=String(v);});
+    try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}
+  }
+  function open(ev){if(ev){ev.preventDefault(); ev.stopPropagation();} sync(); ensureOverlay().classList.add('is-open');}
+  function close(){var ov=document.getElementById('smfpMobileEqOverlay'); if(ov)ov.classList.remove('is-open'); try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}}
+  function bind(){
+    ['mffEqBars','eqBars'].forEach(function(id){var el=document.getElementById(id); if(el && el.dataset.mobileEqOverlayBound!=='1'){el.dataset.mobileEqOverlayBound='1'; el.title='Tap for Power EQ'; el.addEventListener('click',open,{capture:false}); el.addEventListener('touchend',function(ev){ if(ev.cancelable)ev.preventDefault(); open(ev); },{passive:false});}});
+  }
+  window.SMFPMobileEqOverlay={open:open,close:close,sync:sync};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{passive:true});else bind();
+  window.addEventListener('load',bind,{passive:true}); setTimeout(bind,400); setTimeout(bind,1400);
+})();
+</script>
+
 </body>
 </html>
