@@ -1,0 +1,21 @@
+{
+  "version": "v195_SAFE_LEFT_FX_TEXT_ONLY",
+  "basis": "v194_CLEAN_REPO_EXTRACT_RESTORE_NO_PATCH_FULL",
+  "scope": "PC left FX tower text labels only",
+  "changed_files": ["index.html"],
+  "changes": [
+    "LEFT FX header text changed to FRAGGLE DYNASTIE 666 SFX DNA",
+    "AUDIO REACTOR label changed to FRAGGLE AUDIO DNA REAKTOR",
+    "WAVE SCOPE label changed to 666 AUDIO WAVE DNA SCOPE",
+    "SPECTRUM GRID label changed to 666 SPEKTRUM DNA RADAR"
+  ],
+  "not_changed": [
+    "no JavaScript changed",
+    "no CSS changed",
+    "no meter logic changed",
+    "no ticker changed",
+    "no stream logic changed",
+    "no mobile layout changed",
+    "no worker changed"
+  ]
+}
