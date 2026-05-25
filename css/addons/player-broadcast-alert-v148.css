@@ -308,3 +308,63 @@
     min-width:64px!important;
   }
 }
+
+
+/* BROADCAST_CLEANUP_V2_20260525 */
+#playerAlertPcText,
+#pcBroadcastInput{
+  min-width:min(520px,52vw)!important;
+  min-height:38px!important;
+  font-size:16px!important;
+  line-height:1.25!important;
+  letter-spacing:.02em!important;
+}
+#playerAlertPcSend,
+#pcBroadcastSendBtn{
+  min-height:38px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+#playerAlertPcStatus,
+#pcBroadcastCooldown,
+[data-broadcast-status]{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:74px!important;
+  min-height:28px!important;
+  border-radius:999px!important;
+  padding:4px 9px!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  letter-spacing:.06em!important;
+  border:1px solid rgba(32,247,255,.35)!important;
+  color:#20f7ff!important;
+  background:rgba(5,8,24,.85)!important;
+  text-shadow:0 0 8px rgba(32,247,255,.55)!important;
+}
+#playerAlertPcStatus.is-sent,
+#pcBroadcastCooldown.is-sent,
+[data-broadcast-status].is-sent{color:#60ff9b!important;border-color:rgba(96,255,155,.8)!important;box-shadow:0 0 12px rgba(96,255,155,.32)!important}
+#playerAlertPcStatus.is-failed,
+#pcBroadcastCooldown.is-failed,
+[data-broadcast-status].is-failed{color:#ff315d!important;border-color:rgba(255,49,93,.8)!important;box-shadow:0 0 12px rgba(255,49,93,.32)!important}
+.s666-player-alert-user{
+  color:#20f7ff!important;
+  font-weight:900!important;
+  font-size:15px!important;
+  margin:6px 0 4px!important;
+}
+.s666-player-alert-text{
+  font-size:18px!important;
+  line-height:1.42!important;
+}
+.s666-player-alert-name{
+  width:100%!important;
+  margin:8px 0!important;
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  border:1px solid rgba(32,247,255,.35)!important;
+  background:rgba(4,7,20,.96)!important;
+  color:#eaf4ff!important;
+}
