@@ -320,6 +320,37 @@ async function gateCodeOk(request, env) {
   return (await sha256Hex(given)) === expectedHash;
 }
 
+
+// DISCORD_ADMIN_AUTH_MERGE_V1
+function discordGetCookie(request, name) {
+  const raw = request.headers.get('cookie') || '';
+  for (const part of raw.split(';').map((v) => v.trim())) {
+    const eq = part.indexOf('=');
+    if (eq > -1 && part.slice(0, eq) === name) return decodeURIComponent(part.slice(eq + 1));
+  }
+  return '';
+}
+
+async function discordAdminAuthOk(request, env = {}) {
+  const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || 'https://666-system-auth.666soundsdesign-broadcaster.com/verify';
+  const bearer = request.headers.get('authorization') || '';
+  const cookieToken = discordGetCookie(request, 'chaos_auth') || discordGetCookie(request, 'admin_auth');
+  const headers = bearer ? { authorization: bearer } : (cookieToken ? { authorization: `Bearer ${cookieToken}` } : {});
+  if (!headers.authorization) return false;
+  try {
+    const res = await fetch(verifyUrl, { headers });
+    const data = await res.json().catch(() => ({}));
+    return res.ok && !!data.ok;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function discordAdminOrGateOk(request, env = {}) {
+  if (await discordAdminAuthOk(request, env)) return true;
+  return gateCodeOk(request, env);
+}
+
 export async function handleDiscordNotifyV3(request, env = {}) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '');
@@ -337,6 +368,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
       adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
       gateCodeEnabled: true,
+      adminAuthMergeEnabled: true,
       lastKind: runtime.lastKind,
       lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
       lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
@@ -347,9 +379,9 @@ export async function handleDiscordNotifyV3(request, env = {}) {
 
   if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
   if (!tokenOk(request, env)) return json({ ok: false, error: 'invalid admin token' }, 401);
-  if ((path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying') && !(await gateCodeOk(request, env))) {
+  if ((path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying') && !(await discordAdminOrGateOk(request, env))) {
     runtime.lastKind = 'access-denied';
-    return json({ ok: false, led: 'error', error: 'access denied: invalid discord gate code', addon: ADDON_VERSION }, 401);
+    return json({ ok: false, led: 'error', error: 'access denied: admin auth or legacy discord gate required', addon: ADDON_VERSION }, 401);
   }
 
   try {

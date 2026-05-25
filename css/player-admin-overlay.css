@@ -21,3 +21,43 @@ PURPOSE: Protected admin overlay.
 .fp-admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.fp-admin-actions.vertical{flex-direction:column;align-items:flex-start}
 .fp-admin-panel pre{white-space:pre-wrap;overflow:auto;max-height:420px;padding:12px;border-radius:12px;border:1px solid rgba(32,247,255,.22);background:#040714;color:#eaf4ff}
 @media(max-width:760px){.fp-admin-grid{grid-template-columns:1fr}.fp-admin-panel{width:96vw;max-height:92vh}.fp-admin-tabs{overflow:auto;flex-wrap:nowrap}.fp-admin-tabs button{white-space:nowrap}}
+
+
+/* DISCORD_ADMIN_MERGE_V1 */
+.fp-admin-discord-box textarea{
+  width:100%;
+  min-height:120px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(32,247,255,.32);
+  background:#040714;
+  color:#eaf4ff;
+  font-size:16px;
+  line-height:1.35;
+  resize:vertical;
+}
+.fp-admin-discord-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#ff3fd7;
+  font-weight:900;
+  letter-spacing:.08em;
+  margin-bottom:10px;
+}
+.fp-admin-led{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:70px;
+  min-height:24px;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
+  border:1px solid rgba(32,247,255,.35);
+  color:#20f7ff;
+  background:rgba(5,8,24,.9);
+}
+.fp-admin-led.is-ready{color:#20f7ff;box-shadow:0 0 9px rgba(32,247,255,.28)}
+.fp-admin-led.is-sent{color:#60ff9b;border-color:rgba(96,255,155,.8);box-shadow:0 0 11px rgba(96,255,155,.34)}
+.fp-admin-led.is-failed{color:#ff315d;border-color:rgba(255,49,93,.8);box-shadow:0 0 11px rgba(255,49,93,.34)}
