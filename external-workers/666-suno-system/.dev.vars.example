@@ -1,0 +1,6 @@
+ADMIN_AUTH_VERIFY_URL=https://666-system-auth.666soundsdesign-broadcaster.com/verify
+SUNO_API_BASE_URL=
+SUNO_API_KEY=
+SUNO_API_PROVIDER=
+SUNO_API_MODE=adapter
+SUNO_CALLBACK_SECRET=

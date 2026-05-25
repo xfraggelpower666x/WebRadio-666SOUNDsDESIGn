@@ -1,0 +1,23 @@
+{
+  "audit": [
+    "worker.js node --check exit=0",
+    "external-workers/666-chaos-ai-track-system/worker.js node --check exit=0",
+    "external-workers/666-suno-system/worker.js node --check exit=0",
+    "external-workers/666-chaos-ai-track-system/src/ai-client.js node --check exit=0",
+    "external-workers/666-chaos-ai-track-system/src/auth.js node --check exit=0",
+    "external-workers/666-chaos-ai-track-system/src/prompt-compiler.js node --check exit=0",
+    "external-workers/666-chaos-ai-track-system/src/responses.js node --check exit=0",
+    "external-workers/666-chaos-ai-track-system/src/validator.js node --check exit=0",
+    "external-workers/666-suno-system/src/auth.js node --check exit=0",
+    "external-workers/666-suno-system/src/jobs.js node --check exit=0",
+    "external-workers/666-suno-system/src/responses.js node --check exit=0",
+    "external-workers/666-suno-system/src/suno-adapter.js node --check exit=0",
+    "external-workers/666-suno-system/src/validator.js node --check exit=0",
+    "external chaos worker exists: True",
+    "external suno worker exists: True",
+    "player chaos engine exists: True",
+    "player admin overlay exists: True",
+    "player worker retained: True",
+    "secret-value grep matches: ./.dev.vars.example:6:SUNO_API_KEY=put_real_key_here_locally_only\n./config/admin-runtime.env.example:7:GITHUB_TOKEN=put_real_token_in_worker_secret_only\n./config/admin-runtime.env.example:14:OPENAI_API_KEY=put_real_key_in_worker_secret_only\n./docs/AUDIT_FINAL_INTEGRATION_2026-05-24.json:22:    \"secret-value grep matches: ./config/admin-runtime.env.example:7:GITHUB_TOKEN=put_real_token_in_worker_secret_only\\n./config/admin-runtime.env.example:14:OPENAI_API_KEY=put_real_key_in_worker_secret_only\""
+  ]
+}
