@@ -1,0 +1,14 @@
+FULL FIX PACKAGE OVERVIEW
+
+Dieses Paket wurde speziell für den Render-Fehler gebaut:
+
+- uvicorn command not found
+- gunicorn command not found
+- no open ports detected
+
+Enthaltene Gegenmaßnahmen:
+1. Root requirements.txt
+2. render.yaml mit pip upgrade
+3. startCommand über python -m gunicorn
+4. server.py mit PORT Fallback
+5. src-Struktur beibehalten
