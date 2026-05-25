@@ -568,6 +568,145 @@ async function chaosEngineStaticResponse(request, env){
   return chaosEngineEmbeddedResponseV2(path);
 }
 
+
+// ROUTE_LIVE_DEBUG_HARDENING_V1_20260525
+const ROUTE_LIVE_DEBUG_VERSION = "route-live-debug-hardening-v1-20260525";
+
+function s666Json(data, status = 200) {
+  return new Response(JSON.stringify(data, null, 2), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=UTF-8",
+      "cache-control": "no-store, no-cache, must-revalidate, max-age=0",
+      "x-666-debug-version": ROUTE_LIVE_DEBUG_VERSION
+    }
+  });
+}
+
+function s666BoolEnv(env, names) {
+  const out = {};
+  for (const name of names) out[name] = Boolean(env && env[name]);
+  return out;
+}
+
+function s666RouteTable() {
+  return [
+    { priority: 1, route: "/The-Dark-Dancer", handler: "darkDancerResponse", purpose: "The Dark Dancer story page" },
+    { priority: 2, route: "/api/admin/*", handler: "handleRadioAdminConfigAddon", purpose: "Admin auth/config/GitHub backup" },
+    { priority: 3, route: "/api/player-alert/*", handler: "handlePlayerAlertV152", purpose: "PC+iPhone broadcast relay" },
+    { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
+    { priority: 5, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
+    { priority: 6, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
+    { priority: 7, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
+    { priority: 8, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
+    { priority: 9, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
+    { priority: 10, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
+    { priority: 11, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
+    { priority: 12, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
+    { priority: 13, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
+    { priority: 14, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
+  ];
+}
+
+function s666ModuleStatus(env) {
+  return {
+    version: ROUTE_LIVE_DEBUG_VERSION,
+    generatedAt: new Date().toISOString(),
+    modules: {
+      playerRoot: { ok: true, files: ["index.html", "worker.js"] },
+      emergencyFallback: {
+        ok: true,
+        routes: ["/external-player", "/fallback-stream", "/stream"],
+        primary: "https://my.idjstream.com/666soundsdesign/stream",
+        fallback: "https://my.idjstream.com:8686/stream"
+      },
+      chaosEngine: {
+        ok: typeof chaosEngineStaticResponse === "function",
+        routes: ["/CHAOS_ENGINE/", "/CHAOS_ENGINE/track-factory.html", "/CHAOS_ENGINE/fraggle-detlef-system.html"],
+        embeddedFallback: typeof chaosEngineEmbeddedResponseV2 === "function"
+      },
+      darkDancer: {
+        ok: typeof darkDancerResponse === "function",
+        routes: ["/The-Dark-Dancer", "/The-Dark-Dancer.html"]
+      },
+      broadcast: {
+        ok: typeof handlePlayerAlertV152 === "function",
+        routes: ["/api/player-alert/send", "/api/player-alert/current", "/api/player-alert/status", "/api/player-alert/history"]
+      },
+      admin: {
+        ok: typeof handleRadioAdminConfigAddon === "function",
+        routes: ["/api/admin/auth-check", "/api/admin/config/current", "/api/admin/config/update", "/api/admin/config/rollback"],
+        env: s666BoolEnv(env, ["ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL", "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH"])
+      },
+      discord: {
+        ok: typeof handleDiscordNotifyV3 === "function",
+        routes: ["/api/discord/status", "/api/discord/manual", "/api/discord/test", "/api/discord/nowplaying"],
+        env: s666BoolEnv(env, ["DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK", "DISCORD_ADMIN_TOKEN", "DISCORD_GATE_CODE", "ADMIN_AUTH_VERIFY_URL"])
+      },
+      soundControl: {
+        ok: true,
+        files: ["js/sound-control-overlay-v1.js", "css/sound-control-overlay-v1.css"]
+      },
+      externalWorkers: {
+        ok: true,
+        folders: ["external-workers/666-chaos-ai-track-system", "external-workers/666-suno-system"]
+      },
+      rendererResource: {
+        ok: true,
+        folder: "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer"
+      }
+    }
+  };
+}
+
+async function s666LiveHealth(request, env) {
+  return s666Json({
+    ok: true,
+    service: "666SOUNDsDESIGn WebRadio",
+    version: ROUTE_LIVE_DEBUG_VERSION,
+    time: new Date().toISOString(),
+    criticalRoutes: {
+      root: "/",
+      health: "/health",
+      debug: "/debug",
+      routes: "/debug/routes",
+      modules: "/debug/modules",
+      stream: "/stream",
+      fallbackStream: "/fallback-stream",
+      chaosEngine: "/CHAOS_ENGINE/",
+      darkDancer: "/The-Dark-Dancer",
+      adminAuthCheck: "/api/admin/auth-check",
+      broadcastStatus: "/api/player-alert/status",
+      discordStatus: "/api/discord/status"
+    },
+    modules: s666ModuleStatus(env).modules
+  });
+}
+
+async function s666LiveDebug(request, env) {
+  const url = new URL(request.url);
+  return s666Json({
+    ok: true,
+    service: "666SOUNDsDESIGn WebRadio Live Debug",
+    version: ROUTE_LIVE_DEBUG_VERSION,
+    time: new Date().toISOString(),
+    request: { path: url.pathname, host: url.host, cacheBust: url.searchParams.get("t") || url.searchParams.get("v") || null },
+    safeEnvNamesOnly: Object.keys(s666BoolEnv(env, [
+      "ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL",
+      "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH",
+      "PLAYER_ALERT_BACKEND_URL", "DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK",
+      "OPENAI_API_KEY", "SUNO_API_KEY"
+    ])).filter((k) => env && env[k]),
+    routes: s666RouteTable(),
+    modules: s666ModuleStatus(env).modules,
+    warnings: [
+      "No secret values are displayed here.",
+      "If /CHAOS_ENGINE/* displays this debug object, route priority is wrong.",
+      "If Admin opens Hello World, the Admin button is navigating to Auth/PW worker instead of opening local overlay."
+    ]
+  });
+}
+
 export default {
   async fetch(request, env, ctx){
 
@@ -575,6 +714,11 @@ export default {
     const __darkDancerResponse = darkDancerResponse(__darkDancerUrl.pathname);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
+    if (url.pathname === "/health") return s666LiveHealth(request, env);
+    if (url.pathname === "/debug") return s666LiveDebug(request, env);
+    if (url.pathname === "/debug/routes") return s666Json({ ok: true, version: ROUTE_LIVE_DEBUG_VERSION, routes: s666RouteTable() });
+    if (url.pathname === "/debug/modules") return s666Json(s666ModuleStatus(env));
+
     const radioAdminConfigResponse = await handleRadioAdminConfigAddon(request, env);
     if (radioAdminConfigResponse) return radioAdminConfigResponse;
 
