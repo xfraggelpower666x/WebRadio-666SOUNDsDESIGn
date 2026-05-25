@@ -1,0 +1,200 @@
+/*
+FILE: css/sound-control-overlay-v1.css
+CREATED: 2026-05-25
+PURPOSE: Sound Control Overlay V1 styling.
+*/
+
+/* Old bottom PC EQ becomes invisible but stays in DOM as real audio bridge. */
+#pcRealEqPanel.pc-real-eq-panel{
+  opacity:0!important;
+  pointer-events:none!important;
+  transform:translateY(999px)!important;
+}
+
+.s666-sound-button{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:34px;
+  padding:7px 12px;
+  border-radius:999px;
+  border:1px solid rgba(32,247,255,.62);
+  background:linear-gradient(135deg,rgba(32,247,255,.22),rgba(255,63,215,.20));
+  color:#eaf4ff;
+  font-weight:900;
+  letter-spacing:.055em;
+  cursor:pointer;
+  box-shadow:0 0 16px rgba(32,247,255,.20);
+}
+.s666-sound-button .s666-sound-led{
+  width:10px;height:10px;border-radius:999px;
+  background:#60ff9b;
+  box-shadow:0 0 10px rgba(96,255,155,.85);
+}
+.s666-sound-button.is-dirty .s666-sound-led{
+  background:#ff3fd7;
+  box-shadow:0 0 10px rgba(255,63,215,.90);
+}
+
+.s666-sound-overlay{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  display:grid;
+  place-items:center;
+  color:#eaf4ff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+.s666-sound-overlay.is-hidden{display:none!important}
+.s666-sound-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);
+}
+.s666-sound-panel{
+  position:relative;
+  width:min(980px,94vw);
+  max-height:92vh;
+  overflow:auto;
+  border:1px solid rgba(32,247,255,.58);
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(255,63,215,.18),transparent 34%),
+    radial-gradient(circle at 90% 16%,rgba(32,247,255,.15),transparent 38%),
+    rgba(4,7,20,.97);
+  box-shadow:0 0 38px rgba(32,247,255,.22), inset 0 0 34px rgba(255,63,215,.08);
+}
+.s666-sound-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  padding:17px 20px;
+  border-bottom:1px solid rgba(32,247,255,.22);
+}
+.s666-sound-head b{
+  display:block;
+  color:#ff3fd7;
+  font-size:22px;
+  letter-spacing:.12em;
+}
+.s666-sound-head span{
+  display:block;
+  color:#8da4c2;
+  margin-top:4px;
+  font-size:12px;
+}
+.s666-sound-x{
+  width:38px;height:38px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.22);
+  background:#10182e;color:#eaf4ff;font-size:24px;cursor:pointer;
+}
+.s666-sound-body{
+  display:grid;
+  grid-template-columns:1.4fr .9fr;
+  gap:16px;
+  padding:18px 20px;
+}
+.s666-sound-eq{
+  display:grid;
+  grid-template-columns:repeat(9,1fr);
+  gap:8px;
+  min-height:310px;
+  align-items:end;
+}
+.s666-sound-band{
+  display:grid;
+  grid-template-rows:22px 230px 24px;
+  justify-items:center;
+  gap:6px;
+  padding:10px 4px;
+  border-radius:14px;
+  border:1px solid rgba(32,247,255,.22);
+  background:rgba(7,14,36,.78);
+}
+.s666-sound-band span{font-weight:900;color:#20f7ff;font-size:12px}
+.s666-sound-band b{color:#ff3fd7;font-size:12px}
+.s666-sound-band input[type=range]{
+  writing-mode:vertical-rl;
+  direction:rtl;
+  width:34px;
+  height:220px;
+  accent-color:#20f7ff;
+}
+.s666-sound-boost{
+  border:1px solid rgba(255,63,215,.24);
+  border-radius:16px;
+  padding:16px;
+  background:rgba(7,14,36,.78);
+}
+.s666-sound-boost-title{
+  font-size:18px;
+  font-weight:900;
+  color:#ff3fd7;
+  letter-spacing:.10em;
+  margin-bottom:12px;
+}
+.s666-sound-toggle{
+  display:flex;
+  gap:9px;
+  align-items:center;
+  margin:10px 0 18px;
+  color:#eaf4ff;
+  font-weight:800;
+}
+#s666SoundBoostLevel{
+  width:100%;
+  accent-color:#ff3fd7;
+}
+.s666-sound-boost-readout{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:12px;
+  font-weight:900;
+  color:#20f7ff;
+}
+.s666-sound-presets{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+}
+.s666-sound-presets button,
+.s666-sound-actions button{
+  border:1px solid rgba(32,247,255,.28);
+  border-radius:10px;
+  background:#10182e;
+  color:#eaf4ff;
+  font-weight:900;
+  padding:10px 12px;
+  cursor:pointer;
+}
+.s666-sound-presets button:hover,
+.s666-sound-actions button:hover{
+  background:linear-gradient(135deg,#20f7ff,#ff3fd7);
+  color:#02030a;
+}
+.s666-sound-actions{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:9px;
+  padding:14px 20px 18px;
+  border-top:1px solid rgba(32,247,255,.18);
+}
+.s666-sound-status{
+  margin-right:auto;
+  font-weight:900;
+  color:#60ff9b;
+}
+@media(max-width:760px){
+  .s666-sound-panel{width:96vw;max-height:94vh}
+  .s666-sound-body{grid-template-columns:1fr;padding:14px}
+  .s666-sound-eq{grid-template-columns:repeat(9,1fr);gap:4px;min-height:240px}
+  .s666-sound-band{grid-template-rows:18px 170px 20px;padding:7px 2px}
+  .s666-sound-band input[type=range]{height:165px;width:28px}
+  .s666-sound-presets{grid-template-columns:repeat(3,1fr)}
+  .s666-sound-actions{flex-wrap:wrap}
+}
