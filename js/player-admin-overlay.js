@@ -39,7 +39,7 @@ PURPOSE: Protected admin overlay.
     root.innerHTML=`
       <div class="fp-admin-backdrop" data-admin-close="1"></div>
       <section class="fp-admin-panel" role="dialog" aria-modal="true" aria-label="Radio Admin Panel">
-        <header class="fp-admin-header"><div><h2>666 RADIO ADMIN</h2><p>Auth gated · GitHub Config Backup · Chaos Engine · Broadcast Diagnostics</p></div><button class="fp-admin-close" type="button" data-admin-close="1">×</button></header>
+        <header class="fp-admin-header"><div><h2>666 RADIO ADMIN</h2><p>Auth gated · Admin Config System V1 · GitHub Backup/Rollback · Chaos/Suno/Discord Diagnostics</p></div><button class="fp-admin-close" type="button" data-admin-close="1">×</button></header>
         <nav class="fp-admin-tabs">
           <button type="button" data-admin-tab="streams" class="is-active">Streams</button>
           <button type="button" data-admin-tab="systems">Systems</button>
@@ -63,7 +63,7 @@ PURPOSE: Protected admin overlay.
               <button type="button" id="fp-admin-commit-config" class="danger">Backup + Commit</button>
               <button type="button" id="fp-admin-rollback-config">Rollback Latest</button>
             </div>
-            <pre id="fp-admin-config-preview">Ready.</pre>
+            <pre id="fp-admin-config-preview">Admin Config System V1 ready. Load current config, edit streams/endpoints, then Backup + Commit. Cloudflare auto-deploy starts after GitHub commit.</pre>
           </section>
           <section class="fp-admin-tab" data-admin-tab-panel="systems">
             <div class="fp-admin-actions vertical">
