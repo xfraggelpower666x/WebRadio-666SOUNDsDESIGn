@@ -643,6 +643,7 @@ function s666ModuleStatus(env) {
         routes: ["/api/discord/status", "/api/discord/manual", "/api/discord/test", "/api/discord/nowplaying"],
         env: s666BoolEnv(env, ["DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK", "DISCORD_ADMIN_TOKEN", "DISCORD_GATE_CODE", "ADMIN_AUTH_VERIFY_URL"])
       },
+      chaosSunoRendererIntegration: { ok: true, files: ["CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js", "CHAOS_ENGINE/assets/data/api-providers.json"] },
       soundControl: {
         ok: true,
         files: ["js/sound-control-overlay-v1.js", "css/sound-control-overlay-v1.css"]
