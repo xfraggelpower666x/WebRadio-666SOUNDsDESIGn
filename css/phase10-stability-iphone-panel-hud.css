@@ -1,0 +1,286 @@
+/*
+FILE: css/phase10-stability-iphone-panel-hud.css
+CREATED: 2026-05-25
+PURPOSE: Phase 10 Stability + iPhone/Panel/HUD rebuild.
+RULES:
+- No layer stacking.
+- Directly correct mobile panel, overlay sizing, HUD buttons, meter appearance.
+- Preserve PC/iPhone core systems.
+*/
+
+:root{
+  --s666-cyan:#20f7ff;
+  --s666-turquoise:#28fff4;
+  --s666-purple:#7b4dff;
+  --s666-violet:#b35cff;
+  --s666-pink:#ff3fd7;
+  --s666-hotpink:#ff2aa3;
+  --s666-panel-bg:rgba(3,7,20,.78);
+  --s666-panel-border:rgba(32,247,255,.36);
+  --s666-glow-cyan:0 0 12px rgba(32,247,255,.42);
+  --s666-glow-pink:0 0 12px rgba(255,63,215,.36);
+  --s666-safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* PC panelbar: compact, no huge foreign blocks */
+#s666SoundControlButton,
+.fp-admin-open,
+#fp-admin-open,
+[data-admin-open],
+button[id*="Admin"],
+button[id*="admin"]{
+  min-height:28px!important;
+  max-height:32px!important;
+  padding:4px 9px!important;
+  font-size:10px!important;
+  line-height:1!important;
+  border-radius:999px!important;
+  letter-spacing:.055em!important;
+  white-space:nowrap!important;
+}
+
+/* PC top booster must be status-only; SOUND overlay owns switching */
+#pcBoostMinus,
+#pcBoostPlus,
+.system-boost-actions .boost-step,
+#pcBoostPanel [data-boost-step]{
+  display:none!important;
+}
+#pcBoostPanel{
+  min-width:auto!important;
+  width:auto!important;
+  gap:5px!important;
+  padding:2px 6px!important;
+  pointer-events:none!important;
+}
+#pcBoostLabel{
+  pointer-events:auto!important;
+  min-width:54px!important;
+  max-width:76px!important;
+  height:26px!important;
+  min-height:26px!important;
+  padding:3px 7px!important;
+  font-size:9px!important;
+  border-color:rgba(32,247,255,.45)!important;
+  background:rgba(3,7,20,.72)!important;
+}
+#pcBoostLabel::after{
+  content:"";
+  display:inline-block;
+  width:7px;
+  height:7px;
+  margin-left:5px;
+  border-radius:999px;
+  background:var(--s666-cyan);
+  box-shadow:0 0 8px rgba(32,247,255,.82);
+}
+html[data-mff-boost="0"] #pcBoostLabel::after{background:#3b4962;box-shadow:none}
+html[data-mff-boost="4"] #pcBoostLabel::after,
+html[data-mff-boost="5"] #pcBoostLabel::after{background:var(--s666-pink);box-shadow:0 0 10px rgba(255,63,215,.9)}
+
+/* Central HUD logo zone */
+.s666-phase10-logo-zone{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:34px;
+  max-height:48px;
+  overflow:hidden;
+  pointer-events:none;
+}
+.s666-phase10-logo-zone img{
+  max-height:42px;
+  max-width:min(280px,42vw);
+  width:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(32,247,255,.45)) drop-shadow(0 0 12px rgba(255,63,215,.28));
+}
+#s666Phase10HudLogoMobile{
+  max-height:34px!important;
+  max-width:42vw!important;
+}
+
+/* Unified meter color DNA */
+.side-meter i,
+.side-meter span,
+.left-meter i,
+.right-meter i,
+.level-meter i,
+.mff-side-meter i,
+.mff-bottom-bars i,
+#mffEqBars i,
+#eqBars i,
+.equalizer-bars i{
+  background:linear-gradient(180deg,
+    var(--s666-pink) 0%,
+    var(--s666-violet) 25%,
+    var(--s666-purple) 48%,
+    var(--s666-turquoise) 74%,
+    var(--s666-cyan) 100%)!important;
+  box-shadow:0 0 8px rgba(32,247,255,.35),0 0 12px rgba(255,63,215,.18)!important;
+}
+
+/* Side meters: use whole vertical room */
+.side-meter,
+.left-meter,
+.right-meter,
+.mff-side-meter{
+  align-items:stretch!important;
+}
+.side-meter i,
+.left-meter i,
+.right-meter i,
+.mff-side-meter i{
+  min-height:3px!important;
+  flex:1 1 auto!important;
+}
+
+/* Overlay sizing: no iPhone zoom/layout growth */
+.s666-player-alert-overlay,
+.s666-player-alert-composer,
+.fp-admin-overlay,
+.fp-admin-shell,
+.s666-sound-overlay,
+.mff-history-overlay{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.s666-player-alert-box,
+.s666-player-alert-composer-box,
+.fp-admin-panel,
+.s666-sound-panel{
+  width:calc(100vw - 24px)!important;
+  max-width:min(920px,calc(100vw - 24px))!important;
+  max-height:calc(100dvh - 24px - var(--s666-safe-bottom))!important;
+  overflow:auto!important;
+  box-sizing:border-box!important;
+}
+
+/* iPhone layout lock + panel row */
+@media(max-width:760px){
+  html,body{
+    width:100vw!important;
+    max-width:100vw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+    touch-action:manipulation!important;
+    overscroll-behavior:none!important;
+    -webkit-text-size-adjust:100%!important;
+  }
+  #mffApp{
+    width:100vw!important;
+    max-width:100vw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+    padding-bottom:calc(54px + var(--s666-safe-bottom))!important;
+  }
+  .s666-mobile-extra-row{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    width:calc(100vw - 18px)!important;
+    margin:5px auto!important;
+    padding:5px 6px!important;
+    border:1px solid rgba(32,247,255,.24)!important;
+    border-radius:16px!important;
+    background:rgba(3,7,20,.54)!important;
+    box-shadow:inset 0 0 12px rgba(32,247,255,.06)!important;
+    box-sizing:border-box!important;
+  }
+  .s666-mobile-extra-row button{
+    flex:1 1 0!important;
+    min-width:0!important;
+    height:32px!important;
+    min-height:32px!important;
+    padding:3px 4px!important;
+    border-radius:11px!important;
+    border:1px solid rgba(32,247,255,.34)!important;
+    background:linear-gradient(135deg,rgba(32,247,255,.16),rgba(255,63,215,.13))!important;
+    color:#eaf4ff!important;
+    font-size:9px!important;
+    font-weight:900!important;
+    letter-spacing:.04em!important;
+    box-shadow:0 0 9px rgba(32,247,255,.12)!important;
+  }
+  .s666-mobile-extra-row button[data-state="active"]{
+    border-color:rgba(255,63,215,.75)!important;
+    box-shadow:0 0 12px rgba(255,63,215,.32)!important;
+  }
+  .s666-mobile-bottom-safe{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:var(--s666-safe-bottom)!important;
+    z-index:40!important;
+    pointer-events:none!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    gap:3px!important;
+    padding:2px 10px 4px!important;
+    box-sizing:border-box!important;
+  }
+  .s666-mobile-bottom-safe .s666-mobile-copyline{
+    max-width:calc(100vw - 20px)!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    color:rgba(234,244,255,.84)!important;
+    font-size:9px!important;
+    line-height:1.1!important;
+    text-shadow:0 0 7px rgba(32,247,255,.35)!important;
+  }
+  .s666-mobile-bottom-safe .s666-mobile-meterline{
+    width:calc(100vw - 36px)!important;
+    height:14px!important;
+    border-radius:999px!important;
+    overflow:hidden!important;
+    border:1px solid rgba(32,247,255,.25)!important;
+    background:rgba(0,0,0,.42)!important;
+  }
+  .s666-mobile-bottom-safe .s666-mobile-meterfill{
+    display:block!important;
+    width:35%;
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--s666-cyan),var(--s666-purple),var(--s666-pink))!important;
+    box-shadow:0 0 12px rgba(32,247,255,.35)!important;
+    transform-origin:left center;
+  }
+  .s666-sound-panel{
+    width:calc(100vw - 16px)!important;
+    max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 18px - var(--s666-safe-bottom))!important;
+  }
+  .s666-sound-eq{
+    min-height:220px!important;
+  }
+  .s666-sound-band{
+    grid-template-rows:16px 150px 18px!important;
+  }
+  .s666-sound-band input[type=range]{
+    height:145px!important;
+  }
+  .fp-admin-panel{
+    width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 18px - var(--s666-safe-bottom))!important;
+  }
+}
+
+
+/* AUDIO_FOCUS_GUARD_V1_20260525
+   Stream bleibt Master. Kein sichtbarer Zusatzlayer. Nur Debug-State am DOM. */
+html[data-phase10-audio-focus="tolerating-short-interruption"] audio{
+  outline:none!important;
+}
