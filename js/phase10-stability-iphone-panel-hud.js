@@ -273,7 +273,7 @@ RULES:
   }
 
   function mountHudLogo(){
-    // DIRECTFIX: 666-HUD-Logo bleibt draußen. Header nutzt phase10CleanHeaderLogo im HTML.
+    // HARDFIX_MAINONLY_LOGO_PANEL_V2_20260525: kein dynamisches 666-HUD-Logo. Header-Logo sitzt statisch im echten Header-DOM.
     qsa(".s666-phase10-logo-zone").forEach(function(el){ el.remove(); });
   }
 
@@ -449,6 +449,7 @@ RULES:
           audio.setAttribute("src","/stream?t="+Date.now());
           audio.load();
           document.documentElement.setAttribute("data-phase10-stream-target","main");
+      document.documentElement.setAttribute("data-phase10-pc-main-lock","active");
           var mainBtn = qs("#mainBtn");
           var fbBtn = qs("#fallbackBtn") || qs("#backupBtn");
           if(mainBtn) mainBtn.classList.add("is-active");
@@ -580,6 +581,11 @@ RULES:
 
   function boot(){
     mountHudLogo();
+    hardfixInstallManualBackupFlag();
+    hardfixMoveLedsBehindDj();
+    hardfixTickerNoEmptyGap();
+    hardfixMessageBox();
+    hardfixForceMainOnlyPc();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();
@@ -602,6 +608,11 @@ RULES:
       directfixRestoreStatusLeds();
       directfixPcNoAutoFallback();
       directfixTickerAndMessage();
+      hardfixInstallManualBackupFlag();
+      hardfixMoveLedsBehindDj();
+      hardfixTickerNoEmptyGap();
+      hardfixMessageBox();
+      hardfixForceMainOnlyPc();
     }, 2500);
     document.documentElement.setAttribute("data-phase10-stability", VERSION);
   }
