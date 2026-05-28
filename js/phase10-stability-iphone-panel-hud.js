@@ -1,3 +1,5 @@
+
+// PC_AUDIO_STABILITY_HOTFIX_V1_20260525
 /*
 FILE: js/phase10-stability-iphone-panel-hud.js
 CREATED: 2026-05-25
@@ -405,6 +407,7 @@ RULES:
     setInterval(function(){
       var a = getAudio();
       if(!a) return;
+      if(!phase10IsMobileAudioDevice()) return;
       if(a.paused && streamWanted() && !isUserStopRecent()){
         var pausedFor = Date.now() - audioFocusGuard.lastPauseAt;
         if(pausedFor > audioFocusGuard.longInterruptionMs){

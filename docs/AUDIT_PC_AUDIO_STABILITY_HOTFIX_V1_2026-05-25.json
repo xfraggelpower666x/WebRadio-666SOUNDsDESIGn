@@ -1,0 +1,13 @@
+{
+  "audit": [
+    "worker.js node --check exit=0",
+    "js/phase10-stability-iphone-panel-hud.js node --check exit=0",
+    "js/sound-control-overlay-v1.js node --check exit=0",
+    "js/player-admin-overlay.js node --check exit=0",
+    "Audio Focus Guard retained: True",
+    "PC audio hotfix marker present: True",
+    "PC periodic recovery disabled: True",
+    "Meter tuning absent: True",
+    "Fallback retained: True"
+  ]
+}

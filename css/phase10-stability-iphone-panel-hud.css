@@ -284,3 +284,5 @@ html[data-mff-boost="5"] #pcBoostLabel::after{background:var(--s666-pink);box-sh
 html[data-phase10-audio-focus="tolerating-short-interruption"] audio{
   outline:none!important;
 }
+
+/* PC_AUDIO_STABILITY_HOTFIX_V1_20260525: PC recovery conservative; mobile guard retained. */
