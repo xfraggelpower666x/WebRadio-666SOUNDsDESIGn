@@ -286,3 +286,98 @@ html[data-phase10-audio-focus="tolerating-short-interruption"] audio{
 }
 
 /* PC_AUDIO_STABILITY_HOTFIX_V1_20260525: PC recovery conservative; mobile guard retained. */
+
+
+/* PHASE10_MAIN_BACKUP_HEADER_PANEL_FIX_V1_20260525 */
+
+/* Logo oben in Kopf-/Brand-Zone, nicht in Panelleiste */
+.systempanel-group .s666-phase10-logo-zone{display:none!important}
+.s666-phase10-logo-zone-header{
+  width:100%!important;
+  min-height:42px!important;
+  max-height:58px!important;
+  margin:0 auto 4px!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+}
+.s666-phase10-logo-zone-header img{
+  max-height:56px!important;
+  max-width:min(360px,46vw)!important;
+}
+
+/* Info-Panelgrößen: Listeners/Bitrate kompakt, DJ größer */
+.info-grid{
+  grid-template-columns:minmax(110px,auto) minmax(104px,auto) minmax(190px,1.4fr) minmax(152px,auto) minmax(120px,auto)!important;
+  align-items:stretch!important;
+}
+.info-card:has(#listenersText){
+  min-width:112px!important;
+  max-width:140px!important;
+}
+.info-card:has(#bitrateText){
+  min-width:104px!important;
+  max-width:136px!important;
+}
+.info-card:has(#djText){
+  min-width:190px!important;
+}
+.phase10-status-led-card{
+  min-width:152px!important;
+  max-width:190px!important;
+}
+.phase10-status-led-row{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:5px!important;
+}
+.phase10-status-led-row .status-chip{
+  min-width:34px!important;
+  height:24px!important;
+  min-height:24px!important;
+  padding:2px 6px!important;
+  font-size:9px!important;
+}
+
+/* Version nach Now Playing rechts unten */
+.now-playing{
+  position:relative!important;
+}
+.phase10-now-version{
+  position:absolute!important;
+  right:8px!important;
+  bottom:6px!important;
+  z-index:8!important;
+  transform:scale(.86);
+  transform-origin:right bottom;
+  opacity:.92;
+}
+#phase10NowVersion #pcVersionBadge{
+  min-height:22px!important;
+  height:22px!important;
+  padding:2px 7px!important;
+  font-size:9px!important;
+}
+
+/* Obere Systempanel-Leiste wird entlastet */
+.systempanel-right #pcVersionBadge{display:none!important}
+.systempanel-group .discord-addon-slot-pc,
+.systempanel-group #s666SoundControlButton,
+.systempanel-group .fp-admin-open,
+.systempanel-group #fp-admin-open{
+  min-height:25px!important;
+  height:25px!important;
+  padding:2px 7px!important;
+  font-size:9px!important;
+}
+
+/* Desktop darf nicht durch mobile stream target optisch auf Backup hängen bleiben */
+html[data-phase10-stream-guard="forced-main"] #mainBtn{
+  border-color:rgba(32,247,255,.85)!important;
+  box-shadow:0 0 10px rgba(32,247,255,.36)!important;
+}
+@media(max-width:760px){
+  .info-grid{grid-template-columns:1fr!important}
+  .s666-phase10-logo-zone-header img{max-width:58vw!important;max-height:38px!important}
+}
