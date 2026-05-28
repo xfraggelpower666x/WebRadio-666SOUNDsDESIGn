@@ -1,0 +1,20 @@
+{
+  "audit": [
+    "worker.js node --check exit=0",
+    "js/phase10-stability-iphone-panel-hud.js node --check exit=0",
+    "js/version-state-guard-v1.js node --check exit=0",
+    "js/sound-control-overlay-v1.js node --check exit=0",
+    "js/player-admin-overlay.js node --check exit=0",
+    "Admin JS fix present: True",
+    "Admin Worker fix present: True",
+    "Admin route present: True",
+    "Version guard linked: True",
+    "Version guard global: True",
+    "Build current: True",
+    "Cache current: True",
+    "Version endpoint: True",
+    "Audio focus retained: True",
+    "GOVEE retained: True",
+    "Fallback retained: True"
+  ]
+}

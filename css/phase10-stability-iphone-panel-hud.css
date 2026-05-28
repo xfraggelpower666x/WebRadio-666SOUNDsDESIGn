@@ -541,3 +541,27 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
   #pcHeaderNewLogo{max-width:68vw!important;max-height:42px!important}
   .phase10-brand-line{font-size:9px!important;letter-spacing:.06em!important}
 }
+
+/* ADMIN_VERSION_GUARD_V1_20260525 */
+#pcVersionBadge,.system-version-badge,[data-version-badge]{min-width:150px!important;min-height:30px!important;height:30px!important;padding:4px 10px!important;font-size:12px!important;letter-spacing:.055em!important;}
+
+
+/* TICKER_SHORTLOOP_FIX_V1_20260525 */
+:root{
+  --s666-current-build:"v2026.05.25-ticker-shortloop-v1";
+  --s666-cache-burst:"ticker-shortloop-v1-20260525";
+  --ticker-duration:30s;
+}
+
+#nowPlayingTicker,
+.ticker-text{
+  color:#20f7ff!important;
+  text-shadow:0 0 10px rgba(32,247,255,.74),0 0 16px rgba(32,247,255,.28)!important;
+  animation-duration:var(--ticker-duration,30s)!important;
+  animation-timing-function:linear!important;
+  will-change:transform!important;
+}
+
+#nowPlayingTicker[data-ticker-shortloop="1"]{
+  min-width:max-content!important;
+}

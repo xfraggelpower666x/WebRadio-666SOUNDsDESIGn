@@ -579,8 +579,90 @@ RULES:
     }
   }
 
+
+  // ADMIN_WORKER_HELLOWORLD_FIX_V1_20260525
+  function adminFixOpenOverlay(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();}
+    if(window.S666AdminOverlay && typeof window.S666AdminOverlay.open==="function"){window.S666AdminOverlay.open();return false;}
+    var overlay=qs("#fpAdminOverlay")||qs("#playerAdminOverlay")||qs(".fp-admin-overlay")||qs("[data-admin-overlay]");
+    if(overlay){overlay.classList.remove("hidden","is-hidden");overlay.hidden=false;overlay.setAttribute("aria-hidden","false");document.documentElement.setAttribute("data-admin-overlay-open","1");return false;}
+    document.documentElement.setAttribute("data-admin-overlay-error","missing-local-overlay");
+    alert("Admin overlay local not found. Worker /admin Hello World is blocked.");
+    return false;
+  }
+  function installAdminHelloWorldFix(){
+    ["#fp-admin-open",".fp-admin-open","#adminButton","#adminBtn","[data-admin-open]","a[href='/admin']","a[href='/admin/']","a[href*='/admin']","button[aria-label*='Admin']"].forEach(function(sel){
+      qsa(sel).forEach(function(el){if(el.__adminHelloWorldFix)return;el.__adminHelloWorldFix=true;if(el.tagName==="A")el.href="#admin-overlay";el.addEventListener("click",adminFixOpenOverlay,true);el.addEventListener("touchend",adminFixOpenOverlay,{passive:false,capture:true});});
+    });
+  }
+
+
+  // TICKER_SHORTLOOP_FIX_V1_20260525
+  var tickerShortLoopLastRaw = "";
+
+  function tickerShortLoopNormalizeText(raw){
+    raw = String(raw || "").replace(/\s+/g, " ").trim();
+    if(!raw) return "";
+    var base = raw.split("   •   ")[0].trim();
+    return base || raw;
+  }
+
+  function tickerShortLoopApply(){
+    var ticker = qs("#nowPlayingTicker");
+    if(!ticker) return;
+
+    var raw = tickerShortLoopNormalizeText(ticker.textContent || "");
+    if(!raw) return;
+
+    if(raw === tickerShortLoopLastRaw && ticker.getAttribute("data-ticker-shortloop") === "1") return;
+    tickerShortLoopLastRaw = raw;
+
+    var len = raw.length;
+    var repeat = 1;
+    var duration = 44;
+
+    if(len <= 32){
+      repeat = 8;
+      duration = 24;
+    }else if(len <= 64){
+      repeat = 6;
+      duration = 30;
+    }else if(len <= 96){
+      repeat = 4;
+      duration = 36;
+    }else if(len <= 140){
+      repeat = 3;
+      duration = 42;
+    }else{
+      repeat = 2;
+      duration = 52;
+    }
+
+    var parts = [];
+    for(var i=0;i<repeat;i++) parts.push(raw);
+    ticker.textContent = parts.join("   •   ");
+    ticker.setAttribute("data-ticker-shortloop","1");
+    ticker.style.setProperty("--ticker-duration", duration + "s");
+    ticker.style.animationDuration = duration + "s";
+    ticker.style.color = "#20f7ff";
+  }
+
+  function tickerShortLoopWatch(){
+    var ticker = qs("#nowPlayingTicker");
+    if(!ticker || ticker.__tickerShortLoopObserver) return;
+    ticker.__tickerShortLoopObserver = true;
+    var obs = new MutationObserver(function(){
+      window.clearTimeout(ticker.__tickerShortLoopTimer);
+      ticker.__tickerShortLoopTimer = window.setTimeout(tickerShortLoopApply, 80);
+    });
+    obs.observe(ticker, { childList:true, characterData:true, subtree:true });
+  }
+
   function boot(){
     mountHudLogo();
+    tickerShortLoopWatch();
+    tickerShortLoopApply();
+    installAdminHelloWorldFix();
     hardfixInstallManualBackupFlag();
     hardfixMoveLedsBehindDj();
     hardfixTickerNoEmptyGap();
@@ -604,6 +686,9 @@ RULES:
       installAudioRecovery();
       installAudioFocusGuard();
       normalizeBoostStatusTooltip();
+      tickerShortLoopWatch();
+      tickerShortLoopApply();
+      installAdminHelloWorldFix();
       phase10RelocatePcPanels();
       directfixRestoreStatusLeds();
       directfixPcNoAutoFallback();
