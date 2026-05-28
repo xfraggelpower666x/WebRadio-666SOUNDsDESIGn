@@ -381,3 +381,91 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
   .info-grid{grid-template-columns:1fr!important}
   .s666-phase10-logo-zone-header img{max-width:58vw!important;max-height:38px!important}
 }
+
+
+/* DIRECTFIX_STREAM_HEADER_TICKER_MESSAGE_V1_20260525 */
+#phase10CleanHeaderLogo{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:50px;
+  margin:0 auto 6px;
+  pointer-events:none;
+}
+#phase10CleanHeaderLogo img{
+  max-height:58px;
+  max-width:min(430px,58vw);
+  object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(32,247,255,.45)) drop-shadow(0 0 12px rgba(255,63,215,.24));
+}
+.s666-phase10-logo-zone,
+.s666-phase10-logo-zone-header{display:none!important}
+
+.ticker-text,#nowPlayingTicker{
+  color:#20f7ff!important;
+  text-shadow:0 0 10px rgba(32,247,255,.7)!important;
+  animation-duration:42s!important;
+  animation-timing-function:linear!important;
+}
+
+#playerAlertPcBox{
+  width:min(720px,62vw)!important;
+  max-width:720px!important;
+  min-height:96px!important;
+  align-self:stretch!important;
+  display:grid!important;
+  grid-template-columns:1fr auto!important;
+  grid-template-rows:1fr auto!important;
+  gap:6px!important;
+}
+#playerAlertPcText{
+  min-height:74px!important;
+  height:100%!important;
+  font-size:15px!important;
+  line-height:1.28!important;
+  padding:8px 10px!important;
+  resize:none!important;
+}
+#playerAlertPcSend{
+  min-width:74px!important;
+  height:44px!important;
+  align-self:start!important;
+}
+#phase10EmojiBar{
+  grid-column:1 / -1!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:4px!important;
+}
+#phase10EmojiBar button{
+  min-width:30px!important;
+  height:24px!important;
+  border-radius:8px!important;
+  border:1px solid rgba(32,247,255,.28)!important;
+  background:rgba(3,7,20,.78)!important;
+  color:#eaf4ff!important;
+  font-size:13px!important;
+  cursor:pointer!important;
+}
+
+.info-grid{
+  grid-template-columns:118px 112px minmax(230px,1.5fr) 190px minmax(120px,auto)!important;
+}
+.info-card:has(#listenersText){max-width:118px!important;min-width:108px!important}
+.info-card:has(#bitrateText){max-width:112px!important;min-width:104px!important}
+.info-card:has(#djText){min-width:230px!important}
+.phase10-status-led-card{min-width:190px!important;max-width:210px!important}
+.phase10-status-led-row{display:flex!important;gap:5px!important;align-items:center!important;justify-content:center!important}
+.phase10-status-led-row .status-chip{
+  min-width:45px!important;
+  height:24px!important;
+  min-height:24px!important;
+  padding:2px 5px!important;
+  font-size:8px!important;
+}
+#phase10StatusLedSourcePool{display:none!important}
+@media(max-width:760px){
+  #phase10CleanHeaderLogo img{max-width:64vw;max-height:40px}
+  #playerAlertPcBox{width:calc(100vw - 20px)!important;max-width:calc(100vw - 20px)!important}
+}

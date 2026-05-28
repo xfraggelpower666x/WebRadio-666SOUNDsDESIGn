@@ -273,31 +273,8 @@ RULES:
   }
 
   function mountHudLogo(){
-    var logoSrc = "/assets/hud-logo/img/fallback-logo-static-transparent.png";
-
-    // PHASE10_HEADER_PANEL_FIX_V1: Logo gehört in Kopfzeile/Brand-Zone, niemals in die Systempanel-Leiste.
-    var wrongPanelLogo = qs("#pcBoostPanel #s666Phase10HudLogoPc") || qs(".systempanel-group #s666Phase10HudLogoPc");
-    if(wrongPanelLogo && wrongPanelLogo.closest(".s666-phase10-logo-zone")){
-      wrongPanelLogo.closest(".s666-phase10-logo-zone").remove();
-    }
-
-    var pcAnchor = qs("#pcHeaderBrandSplit") || qs(".hero-brand") || qs(".player-header") || qs(".top-panel");
-    if(pcAnchor && !qs("#s666Phase10HudLogoPc")){
-      var zone = document.createElement("div");
-      zone.className = "s666-phase10-logo-zone s666-phase10-logo-zone-header";
-      zone.innerHTML = '<img id="s666Phase10HudLogoPc" src="'+logoSrc+'" alt="666 HUD Logo">';
-      if(pcAnchor.id === "pcHeaderBrandSplit") pcAnchor.insertBefore(zone, pcAnchor.firstChild);
-      else pcAnchor.appendChild(zone);
-    }
-    var app = qs("#mffApp");
-    if(app && !qs("#s666Phase10HudLogoMobile")){
-      var mob = document.createElement("div");
-      mob.className = "s666-phase10-logo-zone";
-      mob.innerHTML = '<img id="s666Phase10HudLogoMobile" src="'+logoSrc+'" alt="666 HUD Logo">';
-      var anchor = qs(".mff-top", app) || qs(".mff-brand", app) || qs(".mff-now", app);
-      if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(mob, anchor.nextSibling);
-      else app.insertBefore(mob, app.firstChild);
-    }
+    // DIRECTFIX: 666-HUD-Logo bleibt draußen. Header nutzt phase10CleanHeaderLogo im HTML.
+    qsa(".s666-phase10-logo-zone").forEach(function(el){ el.remove(); });
   }
 
 
@@ -519,9 +496,94 @@ RULES:
     }
   }
 
+
+  // DIRECTFIX_STREAM_HEADER_TICKER_MESSAGE_V1_20260525
+  function directfixRestoreStatusLeds(){
+    if(!phase10IsDesktopPlayer || !phase10IsDesktopPlayer()) return;
+    var infoGrid = qs(".info-grid");
+    var djCard = qs("#djText") ? qs("#djText").closest(".info-card") : null;
+    if(!infoGrid || !djCard) return;
+
+    var card = qs("#phase10StatusLedCard");
+    if(!card){
+      card = document.createElement("article");
+      card.id = "phase10StatusLedCard";
+      card.className = "info-card phase10-status-led-card";
+      card.innerHTML = '<div class="info-label">Stream / Meter / Source</div><div class="phase10-status-led-row"></div>';
+      djCard.parentNode.insertBefore(card, djCard.nextSibling);
+    }
+    var row = qs(".phase10-status-led-row", card);
+    ["statusStream","statusMeter","statusSource"].forEach(function(id){
+      var el = qs("#"+id);
+      if(!el){
+        el = document.createElement("button");
+        el.id = id;
+        el.type = "button";
+        el.className = "status-chip led-state";
+        el.innerHTML = '<span class="status-dot"></span><span class="status-code">'+(id==="statusStream"?"STREAM":id==="statusMeter"?"METER":"SRC")+'</span>';
+      }
+      el.hidden = false;
+      if(el.parentNode !== row) row.appendChild(el);
+    });
+    var pool = qs("#phase10StatusLedSourcePool");
+    if(pool) pool.remove();
+  }
+
+  function directfixPcNoAutoFallback(){
+    if(!phase10IsDesktopPlayer || !phase10IsDesktopPlayer()) return;
+    var audio = getAudio();
+    if(!audio) return;
+    var src = String(audio.currentSrc || audio.getAttribute("src") || "");
+    var target = document.documentElement.getAttribute("data-phase10-stream-target");
+    var backupActive = /fallback-stream|backup/i.test(src) || target === "backup";
+    if(backupActive && !phase10ManualStreamSwitchRecent()){
+      document.documentElement.setAttribute("data-phase10-stream-target","main");
+      document.documentElement.setAttribute("data-phase10-pc-auto-fallback","blocked");
+      var wasPlaying = !audio.paused;
+      try{
+        audio.pause();
+        audio.setAttribute("src","/stream?t="+Date.now());
+        audio.load();
+        if(wasPlaying){
+          var p = audio.play();
+          if(p && p.catch) p.catch(function(){});
+        }
+      }catch(e){ console.warn("[directfix pc main lock]", e); }
+    }
+  }
+
+  function directfixTickerAndMessage(){
+    var ticker = qs("#nowPlayingTicker");
+    if(ticker){
+      ticker.style.color = "#20f7ff";
+      ticker.style.textShadow = "0 0 10px rgba(32,247,255,.65)";
+      var text = String(ticker.textContent || "").trim();
+      if(text && text.length < 90 && !ticker.__directfixRepeated){
+        ticker.__directfixRepeated = true;
+        ticker.textContent = text + "   •   " + text + "   •   " + text;
+      }
+    }
+    var box = qs("#playerAlertPcBox");
+    var txt = qs("#playerAlertPcText");
+    if(box && txt && !qs("#phase10EmojiBar")){
+      var emoji = document.createElement("div");
+      emoji.id = "phase10EmojiBar";
+      emoji.className = "phase10-emoji-bar";
+      ["😀","😎","🔥","❤️","🎧","🎵","🚀","👽","666"].forEach(function(e){
+        var b=document.createElement("button"); b.type="button"; b.textContent=e;
+        b.addEventListener("click",function(){ txt.value = (txt.value || "") + e; txt.focus(); });
+        emoji.appendChild(b);
+      });
+      box.appendChild(emoji);
+    }
+  }
+
   function boot(){
     mountHudLogo();
+    directfixRestoreStatusLeds();
+    directfixTickerAndMessage();
     installPcMainBackupGuard();
+    directfixPcNoAutoFallback();
     phase10RelocatePcPanels();
     mountMobilePanelRow();
     mountBottomSafe();
@@ -537,6 +599,9 @@ RULES:
       installAudioFocusGuard();
       normalizeBoostStatusTooltip();
       phase10RelocatePcPanels();
+      directfixRestoreStatusLeds();
+      directfixPcNoAutoFallback();
+      directfixTickerAndMessage();
     }, 2500);
     document.documentElement.setAttribute("data-phase10-stability", VERSION);
   }
