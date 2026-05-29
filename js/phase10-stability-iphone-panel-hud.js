@@ -579,12 +579,28 @@ RULES:
     }
   }
 
+
+  // PC_UI_FINETUNE_V1_20260528
+  function pcUiFinetuneRefresh(){
+    if(!hardfixIsDesktop || !hardfixIsDesktop()) return;
+    var ticker = qs("#nowPlayingTicker");
+    if(ticker){
+      ticker.style.color = "#20f7ff";
+      var raw = String(ticker.textContent || "").trim();
+      if(raw && !ticker.__pcUiFinetuneLoop && raw.length < 160){
+        ticker.__pcUiFinetuneLoop = true;
+        ticker.textContent = raw + "   •   " + raw + "   •   " + raw + "   •   " + raw + "   •   " + raw;
+      }
+    }
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
     hardfixMoveLedsBehindDj();
     hardfixTickerNoEmptyGap();
     hardfixMessageBox();
+    pcUiFinetuneRefresh();
     hardfixForceMainOnlyPc();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
