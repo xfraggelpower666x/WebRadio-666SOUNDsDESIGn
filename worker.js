@@ -317,11 +317,7 @@ async function playerAlertCachePut(key, value, maxAge=900){
 }
 async function handlePlayerAlertV152(request, env){
   const url = new URL(request.url);
-  
-    
-    if (url.pathname === "/version-state") return new Response(JSON.stringify({"ok":true,"buildVersion":"v2026.05.25-admin-version-guard-v1","cacheBurst":"admin-version-guard-v1-20260525","guard":"VERSION_STATE_GUARD_V1_20260525"}),{headers:{"content-type":"application/json","cache-control":"no-store"}});
-if (url.pathname === "/admin" || url.pathname === "/admin/") return s666AdminShellResponse();
-if(!url.pathname.startsWith('/api/player-alert/')) return null;
+  if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
     return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-kv-fallback-cache-tertiary'});
@@ -711,12 +707,6 @@ async function s666LiveDebug(request, env) {
       "If Admin opens Hello World, the Admin button is navigating to Auth/PW worker instead of opening local overlay."
     ]
   });
-}
-
-
-// ADMIN_WORKER_HELLOWORLD_FIX_V1_20260525
-function s666AdminShellResponse(){
-  return new Response("<!doctype html><html><head><meta charset=\"utf-8\"><script>location.replace(\"/#admin-overlay\")</script></head><body><a href=\"/#admin-overlay\">Open Admin Overlay</a></body></html>",{status:200,headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store, no-cache, must-revalidate, max-age=0","x-666-admin-fix":"ADMIN_WORKER_HELLOWORLD_FIX_V1_20260525","x-666-build-version":"v2026.05.25-admin-version-guard-v1","x-666-cache-burst":"admin-version-guard-v1-20260525"}});
 }
 
 export default {
