@@ -543,29 +543,29 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 }
 
 
-/* PC_UI_FINETUNE_V1_20260528 */
-:root{--s666-current-build:"v2026.05.28-ui1";--s666-cache-burst:"pc-ui-finetune-v1-20260528";}
-#pcHeaderBrandSplit.pc-header-brand-single{min-height:76px!important;margin:0 auto 6px!important;padding-top:2px!important}
-#pcHeaderNewLogo{max-height:82px!important;max-width:min(680px,72vw)!important;transform:scale(1.18)!important;transform-origin:center center!important;filter:drop-shadow(0 0 13px rgba(32,247,255,.55)) drop-shadow(0 0 18px rgba(255,63,215,.33))!important}
-#phase10BrandLine,.phase10-brand-line{margin:4px auto 10px!important;font-size:15px!important;line-height:1.15!important;letter-spacing:.13em!important;color:#20f7ff!important;text-shadow:0 0 10px rgba(32,247,255,.75),0 0 16px rgba(255,63,215,.28)!important}
-.info-grid{grid-template-columns:96px 92px minmax(330px,1.65fr) 252px minmax(116px,auto)!important;gap:8px!important}
-.info-card:has(#listenersText){width:96px!important;min-width:96px!important;max-width:96px!important;padding-left:10px!important;padding-right:10px!important}
-.info-card:has(#bitrateText){width:92px!important;min-width:92px!important;max-width:92px!important;padding-left:10px!important;padding-right:10px!important}
-.info-card:has(#djText){min-width:330px!important;padding-left:12px!important;padding-right:12px!important}
-.info-card .info-label{font-size:9px!important;letter-spacing:.09em!important;line-height:1!important}
-.info-card .info-value{font-size:13px!important;line-height:1.08!important}
-#djText{font-size:16px!important;max-width:100%!important}
-#phase10StatusLedCard{min-width:252px!important;max-width:252px!important;padding-left:10px!important;padding-right:10px!important}
-.phase10-status-led-row{gap:7px!important}
-.phase10-status-led-row .status-chip{min-width:62px!important;width:62px!important;height:30px!important;min-height:30px!important;padding:3px 7px!important;font-size:9px!important;letter-spacing:.045em!important}
-.phase10-status-led-row #statusMeter{min-width:70px!important;width:70px!important}
-.phase10-status-led-row .status-dot{width:8px!important;height:8px!important}
-.now-playing #playerAlertPcBox.player-alert-pc-box{left:156px!important;right:104px!important;bottom:10px!important;height:128px!important;min-height:128px!important;max-height:128px!important;grid-template-columns:1fr 86px!important;grid-template-rows:1fr 30px!important;gap:7px!important;z-index:24!important}
-.now-playing #playerAlertPcText.player-alert-pc-text{height:90px!important;min-height:90px!important;max-height:90px!important;font-size:17px!important;line-height:1.28!important;padding:10px 12px!important}
-.now-playing #playerAlertPcSend.player-alert-send-btn{width:86px!important;min-width:86px!important;height:46px!important;min-height:46px!important;font-size:11px!important}
-#phase10EmojiBar{min-height:28px!important;gap:5px!important}
-#phase10EmojiBar button{width:34px!important;height:26px!important;font-size:14px!important}
-#phase10NowVersion{right:12px!important;bottom:10px!important;z-index:30!important}
-#phase10NowVersion #pcVersionBadge,#pcVersionBadge{min-width:154px!important;height:34px!important;min-height:34px!important;padding:5px 12px!important;font-size:13px!important;letter-spacing:.055em!important;color:#20f7ff!important;text-shadow:0 0 8px rgba(32,247,255,.7)!important}
-#nowPlayingTicker,.ticker-text{color:#20f7ff!important;text-shadow:0 0 10px rgba(32,247,255,.8),0 0 18px rgba(32,247,255,.35)!important;animation-duration:52s!important;animation-timing-function:linear!important;will-change:transform!important}
-@media(max-width:760px){#pcHeaderNewLogo{max-width:70vw!important;max-height:44px!important;transform:none!important}}
+/* UI_FINETUNE_V1_20260528 - stabiler Feinschliff, keine Stream-/Audio-/Worker-Änderung */
+:root{--s666-current-build:"v2026.05.28-ui1";--s666-cache-burst:"ui-finetune-v1-20260528";}
+#pcHeaderBrandSplit.pc-header-brand-single{min-height:72px!important;margin:0 auto 2px!important;padding-top:2px!important;}
+#pcHeaderNewLogo{max-height:78px!important;max-width:min(620px,68vw)!important;transform:translateY(1px)!important;filter:drop-shadow(0 0 13px rgba(32,247,255,.52)) drop-shadow(0 0 18px rgba(255,63,215,.34))!important;}
+.phase10-brand-line{margin:0 auto 10px!important;font-size:14px!important;letter-spacing:.12em!important;max-width:calc(100% - 48px)!important;}
+.info-grid{grid-template-columns:104px 96px minmax(300px,1.65fr) 250px minmax(118px,auto)!important;gap:9px!important;margin-top:6px!important;}
+.info-card:has(#listenersText){width:104px!important;min-width:104px!important;max-width:104px!important;}
+.info-card:has(#bitrateText){width:96px!important;min-width:96px!important;max-width:96px!important;}
+.info-card:has(#djText){min-width:300px!important;}
+.info-card:has(#listenersText) .info-label,.info-card:has(#bitrateText) .info-label{font-size:9px!important;letter-spacing:.08em!important;}
+.info-card:has(#listenersText) .info-value,.info-card:has(#bitrateText) .info-value{font-size:13px!important;}
+#djText{font-size:16px!important;padding-top:1px!important;}
+#phase10StatusLedCard{min-width:250px!important;max-width:250px!important;}
+#phase10StatusLedCard .info-label{font-size:9px!important;letter-spacing:.08em!important;}
+.phase10-status-led-row{gap:7px!important;}
+.phase10-status-led-row .status-chip{min-width:60px!important;width:60px!important;height:29px!important;min-height:29px!important;padding:3px 7px!important;font-size:9px!important;}
+.phase10-status-led-row #statusMeter{width:70px!important;min-width:70px!important;}
+#phase10NowVersion{right:14px!important;bottom:10px!important;transform:none!important;}
+#phase10NowVersion #pcVersionBadge,#pcVersionBadge{min-width:156px!important;height:34px!important;min-height:34px!important;padding:5px 12px!important;font-size:13px!important;letter-spacing:.06em!important;background:rgba(3,7,20,.82)!important;border-color:rgba(32,247,255,.62)!important;box-shadow:0 0 12px rgba(32,247,255,.32),0 0 15px rgba(255,63,215,.16)!important;}
+.now-playing #playerAlertPcBox.player-alert-pc-box{left:18px!important;right:190px!important;bottom:12px!important;height:126px!important;min-height:126px!important;max-height:126px!important;grid-template-columns:1fr 86px!important;grid-template-rows:1fr 30px!important;gap:7px!important;}
+.now-playing #playerAlertPcText.player-alert-pc-text{height:88px!important;min-height:88px!important;max-height:88px!important;font-size:17px!important;line-height:1.32!important;padding:10px 12px!important;}
+.now-playing #playerAlertPcSend.player-alert-send-btn{width:86px!important;min-width:86px!important;height:46px!important;min-height:46px!important;font-size:12px!important;}
+#phase10EmojiBar button{width:34px!important;height:26px!important;font-size:14px!important;}
+.ticker-window{min-height:32px!important;}
+#nowPlayingTicker,.ticker-text{color:#20f7ff!important;font-size:clamp(13px,1.05vw,18px)!important;animation-duration:48s!important;animation-timing-function:linear!important;text-shadow:0 0 10px rgba(32,247,255,.82),0 0 18px rgba(32,247,255,.28)!important;will-change:transform!important;}
+@media(max-width:760px){#pcHeaderBrandSplit.pc-header-brand-single{min-height:44px!important}#pcHeaderNewLogo{max-width:70vw!important;max-height:44px!important}.phase10-brand-line{font-size:9px!important;letter-spacing:.065em!important}}

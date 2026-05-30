@@ -449,7 +449,6 @@ RULES:
           audio.setAttribute("src","/stream?t="+Date.now());
           audio.load();
           document.documentElement.setAttribute("data-phase10-stream-target","main");
-      document.documentElement.setAttribute("data-phase10-pc-main-lock","active");
           var mainBtn = qs("#mainBtn");
           var fbBtn = qs("#fallbackBtn") || qs("#backupBtn");
           if(mainBtn) mainBtn.classList.add("is-active");
@@ -580,18 +579,15 @@ RULES:
   }
 
 
-  // PC_UI_FINETUNE_V1_20260528
-  function pcUiFinetuneRefresh(){
-    if(!hardfixIsDesktop || !hardfixIsDesktop()) return;
-    var ticker = qs("#nowPlayingTicker");
-    if(ticker){
-      ticker.style.color = "#20f7ff";
-      var raw = String(ticker.textContent || "").trim();
-      if(raw && !ticker.__pcUiFinetuneLoop && raw.length < 160){
-        ticker.__pcUiFinetuneLoop = true;
-        ticker.textContent = raw + "   •   " + raw + "   •   " + raw + "   •   " + raw + "   •   " + raw;
-      }
+  // UI_FINETUNE_V1_20260528
+  function uiFinetuneV1(){
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.05.28-ui1";
+    var logo = qs("#pcHeaderNewLogo");
+    if(logo && logo.getAttribute("src") && logo.getAttribute("src").indexOf("ui-finetune-v1-20260528") === -1){
+      logo.setAttribute("src", "/assets/logos/phase10-new-header-logo.png?v=ui-finetune-v1-20260528");
     }
+    if(typeof hardfixMoveLedsBehindDj === "function") hardfixMoveLedsBehindDj();
   }
 
   function boot(){
@@ -600,8 +596,8 @@ RULES:
     hardfixMoveLedsBehindDj();
     hardfixTickerNoEmptyGap();
     hardfixMessageBox();
-    pcUiFinetuneRefresh();
     hardfixForceMainOnlyPc();
+    uiFinetuneV1();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();

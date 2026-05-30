@@ -11,11 +11,13 @@
 # - Adds manual radio-info/player-share post and track-change nowplaying post.
 # - V3.8: Manual big broadcast post stays manual; automatic song-change post is compact, metadata-focused and deduped.
 # - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: 666 DJ for all Discord embeds.
+# - V3.10: Optional private-channel track-change webhook mirrors nowplaying posts.
+# - V3.11: Accepts existing Cloudflare Secret PRIVATE_TRACK_SHOOTER.
 # - Returns compact status JSON for frontend LED indicator.
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.9-20260508-DJ-FALLBACK-666DJ';
+const ADDON_VERSION = 'V3.11-20260530-PRIVATE-TRACK-SHOOTER-SECRET';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
@@ -283,20 +285,47 @@ function getDiscordWebhook(env) {
   return env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
 }
 
-async function sendDiscord(env, payload) {
-  const webhook = getDiscordWebhook(env);
-  if (!webhook) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
-  const url = String(webhook);
-  const res = await fetch(url, {
+function getPrivateTrackWebhook(env) {
+  return env && (
+    env.DISCORD_PRIVATE_TRACK_WEBHOOK_URL ||
+    env.DISCORD_PRIVATE_WEBHOOK_URL ||
+    env.DISCORD_RUBY_TRACK_WEBHOOK_URL ||
+    env.DISCORD_TRACK_PRIVATE_WEBHOOK ||
+    env.PRIVATE_DISCORD_WEBHOOK_URL ||
+    env.PRIVATE_TRACK_SHOOTER
+  );
+}
+
+async function sendDiscordToWebhook(webhook, payload) {
+  if (!webhook) throw new Error('Discord webhook missing.');
+  const res = await fetch(String(webhook), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(payload)
   });
   const text = await res.text().catch(() => '');
   if (!res.ok) throw new Error(`Discord HTTP ${res.status}: ${text.slice(0, 300)}`);
+  return { status: res.status, body: text || 'OK' };
+}
+
+async function sendDiscord(env, payload) {
+  const webhook = getDiscordWebhook(env);
+  if (!webhook) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
+  const result = await sendDiscordToWebhook(webhook, payload);
   runtime.lastOkAt = Date.now();
   runtime.lastError = '';
-  return { status: res.status, body: text || 'OK' };
+  return result;
+}
+
+async function sendPrivateNowPlayingIfConfigured(env, payload) {
+  const privateWebhook = getPrivateTrackWebhook(env);
+  if (!privateWebhook) return { configured: false, skipped: true };
+  try {
+    const result = await sendDiscordToWebhook(privateWebhook, payload);
+    return { configured: true, ok: true, result };
+  } catch (err) {
+    return { configured: true, ok: false, error: err && err.message ? err.message : String(err) };
+  }
 }
 
 function tokenOk(request, env) {
@@ -365,7 +394,9 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       addon: ADDON_VERSION,
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
       webhookConfigured: Boolean(getDiscordWebhook(env)),
+      privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
       acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
+      acceptedPrivateTrackWebhookSecretNames: ['DISCORD_PRIVATE_TRACK_WEBHOOK_URL','DISCORD_PRIVATE_WEBHOOK_URL','DISCORD_RUBY_TRACK_WEBHOOK_URL','DISCORD_TRACK_PRIVATE_WEBHOOK','PRIVATE_DISCORD_WEBHOOK_URL','PRIVATE_TRACK_SHOOTER'],
       adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
       gateCodeEnabled: true,
       adminAuthMergeEnabled: true,
@@ -404,8 +435,10 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastTrackKey = key;
       runtime.lastTrackAt = now;
       runtime.lastKind = 'nowplaying';
-      const result = await sendDiscord(env, nowPlayingPayload(input));
-      return json({ ok: true, type: 'nowplaying', led: 'ok', discord: result, addon: ADDON_VERSION });
+      const payload = nowPlayingPayload(input);
+      const result = await sendDiscord(env, payload);
+      const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload);
+      return json({ ok: true, type: 'nowplaying', led: 'ok', discord: result, privateTrack, addon: ADDON_VERSION });
     }
 
     const now = Date.now();
