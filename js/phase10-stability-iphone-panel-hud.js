@@ -590,6 +590,90 @@ RULES:
     if(typeof hardfixMoveLedsBehindDj === "function") hardfixMoveLedsBehindDj();
   }
 
+
+  // IPHONE_PC_PARITY_V1_20260530
+  function parityIsMobile(){
+    return /iphone|ipad|ipod|android/i.test(navigator.userAgent || "") || window.innerWidth <= 760;
+  }
+  function parityOpenSound(){
+    if(typeof openSoundControl === "function") return openSoundControl();
+    if(window.S666SoundControl && typeof window.S666SoundControl.open === "function") return window.S666SoundControl.open();
+    var b = qs("#s666SoundControlButton");
+    if(b) return tap(b, "parity-sound");
+  }
+  function parityOpenAdmin(){
+    if(typeof openAdmin === "function") return openAdmin();
+    var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
+    if(b) return tap(b, "parity-admin");
+  }
+  function parityOpenChaos(){
+    if(typeof openChaos === "function") return openChaos();
+    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); } catch(e){ location.href="/CHAOS_ENGINE/?v="+Date.now(); }
+  }
+  function parityOpenStatus(){
+    if(typeof openStatus === "function") return openStatus();
+    try{ window.open("/api/discord/debug?t=" + Date.now(), "_blank"); } catch(e){ location.href="/api/discord/debug?t="+Date.now(); }
+  }
+  function parityMountMobileHub(){
+    if(!parityIsMobile()) return;
+    var app = qs("#mffApp") || qs(".player-shell") || document.body;
+    if(qs("#s666ParityMobileHub")) return;
+    var hub = document.createElement("div");
+    hub.id = "s666ParityMobileHub";
+    hub.className = "s666-parity-mobile-hub";
+    hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="sound">SOUND</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
+    var anchor = qs("#s666MobileExtraRow") || qs(".mobile-boost") || qs(".hero-label-row") || qs(".now-playing");
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(hub, anchor.nextSibling);
+    else app.insertBefore(hub, app.firstChild);
+    hub.addEventListener("click", function(ev){
+      var btn = ev.target.closest && ev.target.closest("[data-parity-action]");
+      if(!btn) return;
+      ev.preventDefault(); ev.stopPropagation();
+      parityRunMobileAction(btn.getAttribute("data-parity-action"), btn);
+    }, true);
+    hub.addEventListener("touchend", function(ev){
+      var btn = ev.target.closest && ev.target.closest("[data-parity-action]");
+      if(!btn) return;
+      ev.preventDefault(); ev.stopPropagation();
+      parityRunMobileAction(btn.getAttribute("data-parity-action"), btn);
+    }, {passive:false, capture:true});
+  }
+  function parityRunMobileAction(action, btn){
+    qsa("#s666ParityMobileHub button").forEach(function(b){ b.removeAttribute("data-active"); });
+    if(btn) btn.setAttribute("data-active","1");
+    if(action === "stream"){ if(typeof toggleMobileStream === "function") return toggleMobileStream(); return; }
+    if(action === "sound") return parityOpenSound();
+    if(action === "admin") return parityOpenAdmin();
+    if(action === "chaos") return parityOpenChaos();
+    if(action === "status") return parityOpenStatus();
+  }
+  function parityBindMobileEqTriggers(){
+    if(!parityIsMobile()) return;
+    ["#mffEqBars","#mffBottomBars",".mff-bottom-bars",".mff-eq-bars","#eqBars",".eq-bars","#pcRealEqPanel",".pc-real-eq-panel"].forEach(function(sel){
+      qsa(sel).forEach(function(el){
+        if(el.__parityEqBound) return;
+        el.__parityEqBound = true;
+        el.style.pointerEvents = "auto";
+        el.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); parityOpenSound(); }, true);
+        el.addEventListener("touchend", function(ev){ ev.preventDefault(); ev.stopPropagation(); parityOpenSound(); }, {passive:false, capture:true});
+      });
+    });
+  }
+  function parityLockViewport(){
+    if(!parityIsMobile()) return;
+    document.documentElement.setAttribute("data-s666-mobile-parity","v1");
+  }
+  function parityUpdateVersion(){
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.05.30-iphone-parity1";
+  }
+  function iphonePcParityV1(){
+    parityLockViewport();
+    parityMountMobileHub();
+    parityBindMobileEqTriggers();
+    parityUpdateVersion();
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -598,6 +682,7 @@ RULES:
     hardfixMessageBox();
     hardfixForceMainOnlyPc();
     uiFinetuneV1();
+    iphonePcParityV1();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();

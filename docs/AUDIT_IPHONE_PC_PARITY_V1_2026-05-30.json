@@ -1,0 +1,29 @@
+{
+  "audit": [
+    "worker.js node --check exit=0",
+    "js/phase10-stability-iphone-panel-hud.js node --check exit=0",
+    "js/sound-control-overlay-v1.js node --check exit=0",
+    "js/player-admin-overlay.js node --check exit=0",
+    "worker-addons/discord-notify-addon-v3.js node --check exit=0",
+    "CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js node --check exit=0",
+    "js/system-extra/govee/govee-bridge-client.js node --check exit=0",
+    "js/system-extra/govee/govee-fx-control-hooks.js node --check exit=0",
+    "js/system-extra/govee/govee-scene-sync.js node --check exit=0",
+    "js/system-extra/govee/govee-sync-config.js node --check exit=0",
+    "Parity JS present: True",
+    "Parity CSS present: True",
+    "Mobile hub present: True",
+    "Mobile EQ tap present: True",
+    "Mobile admin present: True",
+    "Mobile sound present: True",
+    "Safe area present: True",
+    "Build updated: True",
+    "Private Track Shooter retained: True",
+    "Main-only hardfix retained: True",
+    "Audio Focus retained: True",
+    "PC Audio Hotfix retained: True",
+    "GOVEE retained: True",
+    "Dark Dancer retained: True",
+    "Fallback routes retained: True"
+  ]
+}

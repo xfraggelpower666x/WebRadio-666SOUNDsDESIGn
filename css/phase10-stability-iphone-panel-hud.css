@@ -569,3 +569,48 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 .ticker-window{min-height:32px!important;}
 #nowPlayingTicker,.ticker-text{color:#20f7ff!important;font-size:clamp(13px,1.05vw,18px)!important;animation-duration:48s!important;animation-timing-function:linear!important;text-shadow:0 0 10px rgba(32,247,255,.82),0 0 18px rgba(32,247,255,.28)!important;will-change:transform!important;}
 @media(max-width:760px){#pcHeaderBrandSplit.pc-header-brand-single{min-height:44px!important}#pcHeaderNewLogo{max-width:70vw!important;max-height:44px!important}.phase10-brand-line{font-size:9px!important;letter-spacing:.065em!important}}
+
+
+/* IPHONE_PC_PARITY_V1_20260530 */
+:root{--s666-current-build:"v2026.05.30-iphone-parity1";--s666-cache-burst:"iphone-pc-parity-v1-20260530";}
+@media(max-width:760px){
+  html[data-s666-mobile-parity="v1"],html[data-s666-mobile-parity="v1"] body{
+    width:100vw!important;max-width:100vw!important;height:100dvh!important;max-height:100dvh!important;
+    overflow:hidden!important;overscroll-behavior:none!important;-webkit-text-size-adjust:100%!important;touch-action:manipulation!important;
+  }
+  #mffApp,.player-shell{
+    width:100vw!important;max-width:100vw!important;min-width:0!important;height:100dvh!important;max-height:100dvh!important;
+    overflow:hidden!important;box-sizing:border-box!important;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))!important;
+  }
+  .s666-parity-mobile-hub{
+    display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+    width:calc(100vw - 16px)!important;margin:5px auto!important;padding:5px 6px!important;
+    border:1px solid rgba(32,247,255,.28)!important;border-radius:16px!important;
+    background:rgba(3,7,20,.68)!important;box-shadow:inset 0 0 12px rgba(32,247,255,.08),0 0 10px rgba(255,63,215,.10)!important;
+    box-sizing:border-box!important;z-index:32!important;
+  }
+  .s666-parity-mobile-hub button{
+    flex:1 1 0!important;min-width:0!important;height:33px!important;min-height:33px!important;border-radius:11px!important;
+    border:1px solid rgba(32,247,255,.35)!important;background:linear-gradient(135deg,rgba(32,247,255,.16),rgba(255,63,215,.13))!important;
+    color:#eaf4ff!important;font-size:9px!important;font-weight:900!important;letter-spacing:.04em!important;
+  }
+  .s666-parity-mobile-hub button[data-active="1"]{border-color:rgba(255,63,215,.78)!important;box-shadow:0 0 12px rgba(255,63,215,.35)!important;}
+  .s666-sound-overlay,.fp-admin-overlay,.s666-player-alert-overlay,.s666-player-alert-composer,.mff-history-overlay{
+    position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;
+    overflow:hidden!important;box-sizing:border-box!important;z-index:9999!important;
+  }
+  .s666-sound-panel,.fp-admin-panel,.s666-player-alert-box,.s666-player-alert-composer-box{
+    width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 20px - env(safe-area-inset-bottom,0px))!important;overflow:auto!important;box-sizing:border-box!important;margin:8px auto!important;border-radius:18px!important;
+  }
+  .s666-sound-eq{min-height:224px!important;}
+  .s666-sound-band{grid-template-rows:16px 152px 18px!important;}
+  .s666-sound-band input[type=range]{height:148px!important;}
+  #eqBars,#mffEqBars,#mffBottomBars,.mff-bottom-bars,.eq-bars,.pc-real-eq-panel{pointer-events:auto!important;cursor:pointer!important;}
+  .now-playing #playerAlertPcBox.player-alert-pc-box{
+    width:calc(100vw - 18px)!important;max-width:calc(100vw - 18px)!important;left:9px!important;right:9px!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;height:118px!important;min-height:118px!important;max-height:118px!important;
+  }
+  .now-playing #playerAlertPcText.player-alert-pc-text{height:82px!important;min-height:82px!important;max-height:82px!important;font-size:16px!important;}
+  .s666-mobile-bottom-safe{bottom:env(safe-area-inset-bottom,0px)!important;padding-bottom:4px!important;}
+}
