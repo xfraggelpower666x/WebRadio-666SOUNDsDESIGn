@@ -674,6 +674,17 @@ RULES:
     parityUpdateVersion();
   }
 
+
+  // FORCED_UI_IMPLEMENTATION_V1_20260530
+  function forcedUiApplyV1(){
+    var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent="v2026.05.30-forced-ui1";
+    var brand=qs("#phase10BrandLine"); if(brand){brand.textContent="";brand.hidden=true;brand.style.display="none";}
+    var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530");
+    if(typeof hardfixMoveLedsBehindDj==="function") hardfixMoveLedsBehindDj();
+    var dj=qs("#djText")?qs("#djText").closest(".info-card"):null, led=qs("#phase10StatusLedCard");
+    if(dj&&led&&led.previousElementSibling!==dj) dj.parentNode.insertBefore(led,dj.nextSibling);
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -683,6 +694,7 @@ RULES:
     hardfixForceMainOnlyPc();
     uiFinetuneV1();
     iphonePcParityV1();
+    forcedUiApplyV1();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();
