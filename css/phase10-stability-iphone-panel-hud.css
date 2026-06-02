@@ -664,3 +664,8 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 .left-meter i:nth-child(3),.right-meter i:nth-child(3),.mff-left-meter i:nth-child(3),.mff-right-meter i:nth-child(3),.side-meter-left i:nth-child(3),.side-meter-right i:nth-child(3),[data-meter-side='left'] i:nth-child(3),[data-meter-side='right'] i:nth-child(3){height:60%!important;min-height:60%!important}
 .left-fx,.right-fx,.fx-side-left,.fx-side-right,.side-fx-left,.side-fx-right{min-height:100%!important}
 @media(max-width:760px){.left-meter i,.right-meter i,.mff-left-meter i,.mff-right-meter i,.side-meter-left i,.side-meter-right i{width:10px!important;min-width:10px!important;max-width:10px!important}}
+
+
+/* IPHONE_AUDIO_STABILITY_GUARD_V2_20260530 */
+:root{--s666-current-build:"v2026.05.30-iphone-audio-v2";--s666-cache-burst:"iphone-audio-stability-v2-20260530";}
+html[data-iphone-audio-stability-v2="installed"]::after{content:"";display:none;}

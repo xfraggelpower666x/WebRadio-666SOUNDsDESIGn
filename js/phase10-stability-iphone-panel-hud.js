@@ -763,6 +763,118 @@ RULES:
     setInterval(sideMeterReactV1Tick,120);
   }
 
+
+  // IPHONE_AUDIO_STABILITY_GUARD_V2_20260530
+  var iphoneAudioV2State = { started:false, wanted:false, userStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0 };
+
+  function iphoneAudioV2Mobile(){
+    return /iphone|ipad|ipod/i.test(navigator.userAgent || "") || (window.innerWidth <= 760 && /safari|applewebkit/i.test(navigator.userAgent || ""));
+  }
+  function iphoneAudioV2Audio(){
+    return (typeof getAudio === "function" && getAudio()) || document.querySelector("audio");
+  }
+  function iphoneAudioV2UserStopRecent(){
+    return Date.now() - iphoneAudioV2State.userStopAt < 14000;
+  }
+  function iphoneAudioV2Wanted(){
+    if(iphoneAudioV2State.wanted) return true;
+    try { if(typeof streamWanted === "function" && streamWanted()) return true; } catch(e) {}
+    var a = iphoneAudioV2Audio();
+    return !!(a && !a.paused && !a.ended);
+  }
+  function iphoneAudioV2MarkWanted(){
+    iphoneAudioV2State.wanted = true;
+    document.documentElement.setAttribute("data-iphone-audio-wanted","1");
+  }
+  function iphoneAudioV2MarkStop(){
+    iphoneAudioV2State.userStopAt = Date.now();
+    iphoneAudioV2State.wanted = false;
+    document.documentElement.setAttribute("data-iphone-audio-wanted","0");
+  }
+  function iphoneAudioV2TryPlay(reason){
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    iphoneAudioV2State.lastRecoverAt = Date.now();
+    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "play");
+    try {
+      var p = a.play();
+      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
+    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
+  }
+  function iphoneAudioV2LoadPlay(reason){
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    iphoneAudioV2State.lastRecoverAt = Date.now();
+    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "loadplay");
+    try {
+      a.load();
+      var p = a.play();
+      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
+    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
+  }
+  function iphoneAudioV2RebindMain(reason){
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    iphoneAudioV2State.lastRecoverAt = Date.now();
+    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "main");
+    try {
+      var src = String(a.currentSrc || a.getAttribute("src") || "");
+      if(/fallback-stream|backup/i.test(src)) {
+        a.pause();
+        a.setAttribute("src", "/stream?t=" + Date.now());
+        document.documentElement.setAttribute("data-phase10-stream-target","main");
+      }
+      a.load();
+      var p = a.play();
+      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
+    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
+  }
+  function iphoneAudioV2Recover(reason){
+    if(!iphoneAudioV2Mobile()) return;
+    if(!iphoneAudioV2Wanted()) return;
+    if(iphoneAudioV2UserStopRecent()) return;
+    if(Date.now() - iphoneAudioV2State.lastRecoverAt < 9000) return;
+    iphoneAudioV2State.step = (iphoneAudioV2State.step + 1) % 3;
+    if(iphoneAudioV2State.step === 0) return iphoneAudioV2TryPlay(reason + "-play");
+    if(iphoneAudioV2State.step === 1) return iphoneAudioV2LoadPlay(reason + "-loadplay");
+    return iphoneAudioV2RebindMain(reason + "-main");
+  }
+  function iphoneAudioV2Tick(){
+    if(!iphoneAudioV2Mobile()) return;
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    var now = Date.now();
+    var ct = Number(a.currentTime || 0);
+    var moved = Math.abs(ct - iphoneAudioV2State.lastTime) > 0.08;
+    if(!a.paused && moved) {
+      iphoneAudioV2State.lastMoveAt = now;
+      iphoneAudioV2State.step = 0;
+    }
+    iphoneAudioV2State.lastTime = ct;
+    var stalled = now - iphoneAudioV2State.lastMoveAt;
+    document.documentElement.setAttribute("data-iphone-audio-stability-v2","active");
+    document.documentElement.setAttribute("data-iphone-audio-v2-ready", String(a.readyState || 0));
+    document.documentElement.setAttribute("data-iphone-audio-v2-stall-ms", String(stalled));
+    if(!iphoneAudioV2Wanted() || iphoneAudioV2UserStopRecent()) return;
+    if(a.paused && stalled > 4200) return iphoneAudioV2Recover("paused-wanted");
+    if(!a.paused && stalled > 14500) return iphoneAudioV2Recover("time-stall");
+    if((a.readyState || 0) < 2 && stalled > 9000) return iphoneAudioV2Recover("ready-low");
+  }
+  function startIphoneAudioStabilityGuardV2(){
+    if(iphoneAudioV2State.started) return;
+    iphoneAudioV2State.started = true;
+    var a = iphoneAudioV2Audio();
+    if(a) {
+      ["play","playing","canplay","canplaythrough"].forEach(function(ev){ a.addEventListener(ev,function(){ iphoneAudioV2MarkWanted(); iphoneAudioV2State.lastMoveAt=Date.now(); },true); });
+      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){ a.addEventListener(ev,function(){ setTimeout(function(){ iphoneAudioV2Recover(ev); },6500); },true); });
+    }
+    qsa("button,.control-btn").forEach(function(btn){
+      var txt = String(btn.textContent || btn.getAttribute("aria-label") || "").toLowerCase();
+      if(/play/.test(txt)) btn.addEventListener("click", iphoneAudioV2MarkWanted, true);
+      if(/stop/.test(txt)) btn.addEventListener("click", iphoneAudioV2MarkStop, true);
+    });
+    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){ window.addEventListener(ev,function(){ setTimeout(function(){ iphoneAudioV2Recover(ev); },1200); },true); });
+    setInterval(iphoneAudioV2Tick,2500);
+    setTimeout(iphoneAudioV2Tick,1600);
+    document.documentElement.setAttribute("data-iphone-audio-stability-v2","installed");
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -774,6 +886,7 @@ RULES:
     iphonePcParityV1();
     forcedUiApplyV1();
     startSideMeterReactV1();
+    startIphoneAudioStabilityGuardV2();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();
