@@ -685,6 +685,84 @@ RULES:
     if(dj&&led&&led.previousElementSibling!==dj) dj.parentNode.insertBefore(led,dj.nextSibling);
   }
 
+
+  // SIDE_METER_REACTIVITY_V1_20260530
+  var sideMeterReactV1State = { started:false, phase:0, smooth:0, peak:0 };
+
+  function sideMeterReactV1AudioLevel(){
+    var audio = getAudio && getAudio();
+    var boost = 0;
+    try { boost = Number(activeBoost && activeBoost()) || 0; } catch(e) {}
+    var rms = 0;
+    [window.__mffLastRms,window.__mffRms,window.__smfpRms,window.__radioRms,window.__mffAudioLevel,window.__smfpAudioLevel,window.__lastAudioLevel].forEach(function(v){
+      var n = Number(v);
+      if(isFinite(n) && n > 0) rms = Math.max(rms, n > 1 ? n / 100 : n);
+    });
+    if((!rms || rms < .015) && audio && !audio.paused){
+      sideMeterReactV1State.phase += .135 + boost * .008;
+      rms = .22 + Math.abs(Math.sin(sideMeterReactV1State.phase))*.32 + Math.abs(Math.sin(sideMeterReactV1State.phase*.43+1.9))*.18 + Math.abs(Math.sin(sideMeterReactV1State.phase*1.71+.3))*.10;
+    }
+    var level = Math.max(0, Math.min(1, rms * (1 + Math.min(5,boost)*.095)));
+    sideMeterReactV1State.smooth = sideMeterReactV1State.smooth*.64 + level*.36;
+    sideMeterReactV1State.peak = Math.max(sideMeterReactV1State.smooth, sideMeterReactV1State.peak*.88);
+    return { level:sideMeterReactV1State.smooth, peak:sideMeterReactV1State.peak, boost:boost, running:!!(audio && !audio.paused) };
+  }
+
+  function sideMeterReactV1Groups(){
+    var left = qsa(".left-meter,.mff-left-meter,.side-meter-left,[data-meter-side='left'],.fx-side-left .side-meter,.left-fx .side-meter");
+    var right = qsa(".right-meter,.mff-right-meter,.side-meter-right,[data-meter-side='right'],.fx-side-right .side-meter,.right-fx .side-meter");
+    qsa(".side-meter").forEach(function(el){
+      if(left.indexOf(el)>=0 || right.indexOf(el)>=0) return;
+      var rect = el.getBoundingClientRect();
+      if(rect.left < window.innerWidth/2) left.push(el); else right.push(el);
+    });
+    return {left:left,right:right};
+  }
+
+  function sideMeterReactV1Bars(group, side){
+    group.setAttribute("data-side-meter-react-v1", side);
+    var bars = Array.prototype.slice.call(group.querySelectorAll("i,.bar,.meter-bar,.side-bar"));
+    if(bars.length < 3){
+      group.innerHTML = "<i></i><i></i><i></i>";
+      bars = Array.prototype.slice.call(group.querySelectorAll("i"));
+    }
+    return bars.slice(0,3);
+  }
+
+  function sideMeterReactV1Paint(group, side, m){
+    var bars = sideMeterReactV1Bars(group, side);
+    var base = m.running ? m.level : .08;
+    var peak = m.running ? m.peak : .10;
+    var boostPush = Math.min(.16, m.boost*.025);
+    var heights = [
+      Math.max(.20, Math.min(1.00, .38 + peak*.62 + boostPush)),
+      Math.max(.16, Math.min(.86, .26 + base*.54 + boostPush*.75)),
+      Math.max(.12, Math.min(.70, .18 + base*.42 + boostPush*.55))
+    ];
+    bars.forEach(function(bar,i){
+      var h = Math.round(heights[i]*100);
+      bar.style.height = h + "%";
+      bar.style.minHeight = Math.max(14,h) + "%";
+      bar.style.opacity = String(Math.max(.48, Math.min(1, .52 + heights[i]*.55)));
+      bar.style.filter = "saturate(" + (1.10 + m.boost*.08).toFixed(2) + ") brightness(" + (0.95 + heights[i]*.20).toFixed(2) + ")";
+    });
+  }
+
+  function sideMeterReactV1Tick(){
+    var m = sideMeterReactV1AudioLevel();
+    var g = sideMeterReactV1Groups();
+    g.left.forEach(function(el){ sideMeterReactV1Paint(el,"left",m); });
+    g.right.forEach(function(el){ sideMeterReactV1Paint(el,"right",m); });
+    document.documentElement.setAttribute("data-side-meter-react-v1","active");
+  }
+
+  function startSideMeterReactV1(){
+    if(sideMeterReactV1State.started) return;
+    sideMeterReactV1State.started = true;
+    sideMeterReactV1Tick();
+    setInterval(sideMeterReactV1Tick,120);
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -695,6 +773,7 @@ RULES:
     uiFinetuneV1();
     iphonePcParityV1();
     forcedUiApplyV1();
+    startSideMeterReactV1();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();
