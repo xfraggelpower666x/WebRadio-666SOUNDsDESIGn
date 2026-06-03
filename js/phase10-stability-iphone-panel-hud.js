@@ -875,6 +875,99 @@ RULES:
     document.documentElement.setAttribute("data-iphone-audio-stability-v2","installed");
   }
 
+
+  // CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530
+  var centralAudioGuardV2 = {
+    started:false, wanted:false, manualStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0,
+    pcProfile:{ pausedToleranceMs:8500, stallToleranceMs:21000, readyLowToleranceMs:15000, cooldownMs:14000 },
+    mobileProfile:{ pausedToleranceMs:4200, stallToleranceMs:14500, readyLowToleranceMs:9000, cooldownMs:9000 }
+  };
+  function centralAudioGuardV2IsMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || window.innerWidth <= 760; }
+  function centralAudioGuardV2Profile(){ return centralAudioGuardV2IsMobile() ? centralAudioGuardV2.mobileProfile : centralAudioGuardV2.pcProfile; }
+  function centralAudioGuardV2Audio(){ return (typeof getAudio==="function" && getAudio()) || document.querySelector("audio"); }
+  function centralAudioGuardV2ManualStopRecent(){ return Date.now() - centralAudioGuardV2.manualStopAt < 14000; }
+  function centralAudioGuardV2MarkWanted(){ centralAudioGuardV2.wanted=true; document.documentElement.setAttribute("data-central-audio-wanted","1"); }
+  function centralAudioGuardV2MarkStop(){ centralAudioGuardV2.manualStopAt=Date.now(); centralAudioGuardV2.wanted=false; document.documentElement.setAttribute("data-central-audio-wanted","0"); }
+  function centralAudioGuardV2Wanted(){
+    if(centralAudioGuardV2.wanted) return true;
+    try{ if(typeof streamWanted==="function" && streamWanted()) return true; }catch(e){}
+    var a=centralAudioGuardV2Audio();
+    return !!(a && !a.paused && !a.ended);
+  }
+  function centralAudioGuardV2Status(reason){
+    document.documentElement.setAttribute("data-central-audio-stability-v2","active");
+    document.documentElement.setAttribute("data-central-audio-device", centralAudioGuardV2IsMobile() ? "mobile" : "pc");
+    document.documentElement.setAttribute("data-central-audio-reason", reason||"");
+  }
+  function centralAudioGuardV2Play(reason){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"play");
+    try{ var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));}); }
+    catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2LoadPlay(reason){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"loadplay");
+    try{ a.load(); var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));}); }
+    catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2RebindMain(reason){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"main-rebind");
+    try{
+      var src=String(a.currentSrc||a.getAttribute("src")||"");
+      if(/fallback-stream|backup/i.test(src)){
+        a.pause(); a.setAttribute("src","/stream?t="+Date.now()); document.documentElement.setAttribute("data-phase10-stream-target","main");
+      } else { a.load(); }
+      var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));});
+    }catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2Recover(reason){
+    if(!centralAudioGuardV2Wanted()) return;
+    if(centralAudioGuardV2ManualStopRecent()) return;
+    var profile=centralAudioGuardV2Profile();
+    if(Date.now()-centralAudioGuardV2.lastRecoverAt < profile.cooldownMs) return;
+    centralAudioGuardV2.step=(centralAudioGuardV2.step+1)%3;
+    if(centralAudioGuardV2.step===0) return centralAudioGuardV2Play(reason+"-play");
+    if(centralAudioGuardV2.step===1) return centralAudioGuardV2LoadPlay(reason+"-loadplay");
+    return centralAudioGuardV2RebindMain(reason+"-main");
+  }
+  function centralAudioGuardV2Tick(){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    var now=Date.now(), ct=Number(a.currentTime||0), moved=Math.abs(ct-centralAudioGuardV2.lastTime)>0.08;
+    if(!a.paused && moved){ centralAudioGuardV2.lastMoveAt=now; centralAudioGuardV2.step=0; }
+    centralAudioGuardV2.lastTime=ct;
+    var stalled=now-centralAudioGuardV2.lastMoveAt, ready=Number(a.readyState||0), network=Number(a.networkState||0), profile=centralAudioGuardV2Profile();
+    document.documentElement.setAttribute("data-central-audio-stability-v2","active");
+    document.documentElement.setAttribute("data-central-audio-device",centralAudioGuardV2IsMobile()?"mobile":"pc");
+    document.documentElement.setAttribute("data-central-audio-ready",String(ready));
+    document.documentElement.setAttribute("data-central-audio-network",String(network));
+    document.documentElement.setAttribute("data-central-audio-stall-ms",String(Math.max(0,stalled)));
+    if(!centralAudioGuardV2Wanted() || centralAudioGuardV2ManualStopRecent()) return;
+    if(a.paused && stalled > profile.pausedToleranceMs) return centralAudioGuardV2Recover("paused-wanted");
+    if(!a.paused && stalled > profile.stallToleranceMs) return centralAudioGuardV2Recover("time-stall");
+    if(ready < 2 && stalled > profile.readyLowToleranceMs) return centralAudioGuardV2Recover("ready-low");
+  }
+  function startCentralAudioStabilityGuardV2(){
+    if(centralAudioGuardV2.started) return;
+    centralAudioGuardV2.started=true;
+    var a=centralAudioGuardV2Audio();
+    if(a){
+      ["play","playing","canplay","canplaythrough"].forEach(function(ev){a.addEventListener(ev,function(){centralAudioGuardV2MarkWanted();centralAudioGuardV2.lastMoveAt=Date.now();},true);});
+      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){a.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?6500:10500;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+    }
+    qsa("button,.control-btn").forEach(function(btn){
+      var txt=String(btn.textContent||btn.getAttribute("aria-label")||"").toLowerCase();
+      if(/play/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkWanted,true);
+      if(/stop/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkStop,true);
+    });
+    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){window.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?1200:2800;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+    setInterval(centralAudioGuardV2Tick,2500);
+    setTimeout(centralAudioGuardV2Tick,1600);
+    document.documentElement.setAttribute("data-central-audio-stability-v2","installed");
+  }
+  function startIphoneAudioStabilityGuardV2(){ startCentralAudioStabilityGuardV2(); }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();

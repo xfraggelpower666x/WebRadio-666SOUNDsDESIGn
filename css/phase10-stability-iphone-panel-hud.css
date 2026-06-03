@@ -669,3 +669,8 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 /* IPHONE_AUDIO_STABILITY_GUARD_V2_20260530 */
 :root{--s666-current-build:"v2026.05.30-iphone-audio-v2";--s666-cache-burst:"iphone-audio-stability-v2-20260530";}
 html[data-iphone-audio-stability-v2="installed"]::after{content:"";display:none;}
+
+
+/* CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530 */
+:root{--s666-current-build:"v2026.05.30-central-audio-v2";--s666-cache-burst:"central-audio-stability-v2-20260530";}
+html[data-central-audio-stability-v2="installed"]::after,html[data-central-audio-stability-v2="active"]::after{content:"";display:none;}
