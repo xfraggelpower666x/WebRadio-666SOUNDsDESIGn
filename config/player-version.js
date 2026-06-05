@@ -1,1 +1,1 @@
-window.SMFP_PLAYER_VERSION={"version": "v35.8.0", "cacheBurst": "v35.8.0-2026-06-05-task8-custom-header-livehud", "buildDate": "2026-06-05"};
+window.SMFP_PLAYER_VERSION={"version": "v35.7.0", "cacheBurst": "v35.7.0-2026-06-04-task7-stream-config-manager", "buildDate": "2026-06-04"};

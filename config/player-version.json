@@ -1,7 +1,7 @@
 {
-  "version": "v35.8.0",
-  "cacheBurst": "v35.8.0-2026-06-05-task8-custom-header-livehud",
-  "buildDate": "2026-06-05",
-  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v35.7_TASK7_STREAM_CONFIG_MANAGER_V1.zip",
-  "note": "Task 8 custom player header live HUD. User header artwork integrated, responsive PC+iPhone sizing, live display sync, header hotspot controls bound to existing player actions. Worker unchanged. DarkDancer protected."
+  "version": "v35.7.0",
+  "cacheBurst": "v35.7.0-2026-06-04-task7-stream-config-manager",
+  "buildDate": "2026-06-04",
+  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v35.6_TASK6_ADMIN_CONTROL_CENTER_STABILIZATION.zip",
+  "note": "Task 7 Stream Config Manager V1 stabilization. Player reads config/radio-runtime.json. Worker unchanged. DarkDancer protected."
 }

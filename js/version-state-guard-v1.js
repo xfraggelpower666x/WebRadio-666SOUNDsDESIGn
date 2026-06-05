@@ -1,14 +1,14 @@
 /*
-  666SOUNDsDESIGn — VERSION STATE GUARD v35.8.0
+  666SOUNDsDESIGn — VERSION STATE GUARD v35.7.0
   Zweck: Eine zentrale Versionsquelle für PC/iPhone/Worker-UI.
-  Rebased auf vollständige aktuelle Repo-ZIP vom 2026-06-05.
+  Rebased auf vollständige aktuelle Repo-ZIP vom 2026-06-04.
   Keine Secrets. Keine Worker-Änderung. DarkDancer bleibt geschützt.
 */
 (function(){
   'use strict';
-  var VERSION='v35.8.0';
-  var BUILD='v35.8.0-2026-06-05-task7-stream-config-manager';
-  var NUMBER=358;
+  var VERSION='v35.7.0';
+  var BUILD='v35.7.0-2026-06-04-task7-stream-config-manager';
+  var NUMBER=357;
   window.SMFP_VERSION={label:VERSION, build:BUILD, number:NUMBER, cacheBust:BUILD};
   window.__S666_BUILD_VERSION__=VERSION;
   window.__S666_CACHE_BURST__=BUILD;

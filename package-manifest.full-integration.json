@@ -16,7 +16,7 @@
   "rendererResourcePath": "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
   "rendererResourceZip": "666SOUNDsDESIGn_RENDERER_DEPLOY_AWARENESS_FULL_2026-05-24.zip",
   "updated": "2026-05-24",
-  "latestBuild": "v35.8.0",
-  "latestCacheBurst": "v35.8.0-2026-06-05-task8-custom-header-livehud",
-  "lastIntegratedTask": "TASK8_CUSTOM_PLAYER_HEADER_LIVEHUD"
+  "latestBuild": "v35.7.0",
+  "latestCacheBurst": "v35.7.0-2026-06-04-task7-stream-config-manager",
+  "lastIntegratedTask": "TASK7_STREAM_CONFIG_MANAGER_V1"
 }
