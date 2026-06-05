@@ -1,38 +1,44 @@
 /*
-  666SOUNDsDESIGn — VERSION CORE v178
+  666SOUNDsDESIGn — VERSION CORE v35.8.0
   Zweck: Eine zentrale Versionsquelle für PC/iPhone/Worker-UI.
-  Keine neuen sichtbaren Layer, nur Normalisierung vorhandener Versionselemente.
+  Rebased auf vollständige aktuelle Repo-ZIP vom 2026-06-05.
+  Keine Secrets. Keine Worker-Änderung. DarkDancer bleibt geschützt.
 */
 (function(){
   'use strict';
-  var VERSION='v178';
-  var BUILD='smfp-v178-overlay-core-20260519';
-  window.SMFP_VERSION={label:VERSION, build:BUILD, number:178};
-  function setText(node){
+  var VERSION='v35.8.0';
+  var BUILD='v35.8.0-2026-06-05-task7-stream-config-manager';
+  var NUMBER=358;
+  window.SMFP_VERSION={label:VERSION, build:BUILD, number:NUMBER, cacheBust:BUILD};
+  window.__S666_BUILD_VERSION__=VERSION;
+  window.__S666_CACHE_BURST__=BUILD;
+  function putVersion(node){
     if(!node) return;
-    if(node.id==='pcVersionBadge'){
-      var s=node.querySelector('.status-code');
-      if(s) s.textContent=VERSION;
-      node.setAttribute('aria-label','Player Version '+VERSION);
-      return;
-    }
-    if(node.classList && (node.classList.contains('smfp-version-badge') || node.classList.contains('status-code') || node.classList.contains('mff-version-inline'))){
-      if(/^v\d+$/i.test((node.textContent||'').trim())) node.textContent=VERSION;
-      node.setAttribute('data-smfp-version-core','1');
-    }
+    var target=node.querySelector&&node.querySelector('.status-code');
+    if(target) target.textContent=VERSION;
+    else node.textContent=VERSION;
+    node.setAttribute('data-smfp-version-core','1');
+    node.setAttribute('title','Build '+VERSION+' / Cache '+BUILD);
+    if(node.id==='pcVersionBadge') node.setAttribute('aria-label','Player Version '+VERSION);
   }
   function normalize(){
     try{
       document.documentElement.setAttribute('data-smfp-version', VERSION);
+      document.documentElement.setAttribute('data-s666-build-version', VERSION);
       document.documentElement.setAttribute('data-smfp-cache-bust', BUILD);
+      document.documentElement.setAttribute('data-s666-cache-burst', BUILD);
       var meta=document.querySelector('meta[name="smfp-version"]');
       if(meta) meta.setAttribute('content', VERSION);
-      document.querySelectorAll('#pcVersionBadge,.smfp-version-badge,.mff-version-inline,.status-code').forEach(setText);
+      var burst=document.querySelector('meta[name="s666-cache-burst"]');
+      if(burst) burst.setAttribute('content', BUILD);
+      document.querySelectorAll('#pcVersionBadge,#mffVersion,#mobileVersionBadge,[data-version-badge],.system-version-badge,.smfp-version-badge,.mff-version-inline').forEach(putVersion);
       var app=document.getElementById('mffApp');
-      if(app) app.setAttribute('data-version', VERSION);
+      if(app){ app.setAttribute('data-version', VERSION); app.setAttribute('data-cache-burst', BUILD); }
     }catch(e){}
   }
   window.SMFPApplyVersion=normalize;
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', normalize, {once:true});
   else normalize();
+  window.addEventListener('load', normalize, {once:true});
+  setInterval(normalize, 1500);
 })();

@@ -13,10 +13,11 @@ ZWECK: Hauptlogik des externen Players mit bestehenden Worker-Endpunkten.
 HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen.
 ==========================================
 */
-import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v177-version-core-20260519';
-import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
-import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
+import { setText, markSourceButtons } from './controls.js?v=v35.7.0-2026-06-04-task7-stream-config-manager';
+import { createBars, startVisualizer } from './equalizer.js?v=v35.7.0-2026-06-04-task7-stream-config-manager';
+import { installResponsiveHelpers } from './responsive-ui.js?v=v35.7.0-2026-06-04-task7-stream-config-manager';
+import { applyStatusChip } from './shared-status.js?v=v35.7.0-2026-06-04-task7-stream-config-manager';
+import { loadStreamConfig, getEndpoints } from './stream-config-manager-v1.js?v=v35.7.0-2026-06-04-task7-stream-config-manager';
 
 const ENDPOINTS = {
   main: '/stream',
@@ -24,6 +25,25 @@ const ENDPOINTS = {
   metadata: '/api/nowplaying',
   health: '/health'
 };
+
+function applyRuntimeEndpoints(source = 'runtime') {
+  try {
+    const endpoints = getEndpoints ? getEndpoints() : null;
+    if (!endpoints) return;
+    ENDPOINTS.main = endpoints.main || ENDPOINTS.main || '/stream';
+    ENDPOINTS.fallback = endpoints.fallback || ENDPOINTS.fallback || '/fallback-stream';
+    ENDPOINTS.metadata = endpoints.metadata || ENDPOINTS.metadata || '/api/nowplaying';
+    ENDPOINTS.health = endpoints.health || ENDPOINTS.health || '/health';
+    document.documentElement?.setAttribute('data-player-main-stream', ENDPOINTS.main);
+    document.documentElement?.setAttribute('data-player-backup-stream', ENDPOINTS.fallback);
+    document.documentElement?.setAttribute('data-player-metadata-url', ENDPOINTS.metadata);
+    document.documentElement?.setAttribute('data-player-health-url', ENDPOINTS.health);
+    document.documentElement?.setAttribute('data-player-stream-config-source', source);
+  } catch (err) {}
+}
+
+loadStreamConfig({ force: true }).then(() => applyRuntimeEndpoints('radio-runtime-json')).catch(() => applyRuntimeEndpoints('default'));
+window.addEventListener('smfp:stream-config-ready', () => applyRuntimeEndpoints('radio-runtime-json'));
 
 const POLL_MS = 8000;
 const audio = document.getElementById('radio');
@@ -438,6 +458,7 @@ function updateTimeline() {
 }
 
 function setSource(source) {
+  applyRuntimeEndpoints('set-source');
   currentSource = source;
   audio.src = source === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
   markSourceButtons(mainBtn, fallbackBtn, source);
@@ -791,6 +812,7 @@ function keepControlsUnlocked() {
 }
 
 async function playCurrent() {
+  applyRuntimeEndpoints('before-play');
   keepControlsUnlocked();
   userStopped = false;
   try {

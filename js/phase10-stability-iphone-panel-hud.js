@@ -585,7 +585,7 @@ RULES:
     if(v) v.textContent = "v2026.05.28-ui1";
     var logo = qs("#pcHeaderNewLogo");
     if(logo && logo.getAttribute("src") && logo.getAttribute("src").indexOf("ui-finetune-v1-20260528") === -1){
-      logo.setAttribute("src", "/assets/logos/phase10-new-header-logo.png?v=ui-finetune-v1-20260528");
+      logo.setAttribute("src", "/assets/logos/custom-header/cyber-header-user-trimmed.png?v=v35.8.0-2026-06-05-task8-custom-header-livehud");
     }
     if(typeof hardfixMoveLedsBehindDj === "function") hardfixMoveLedsBehindDj();
   }
@@ -679,7 +679,7 @@ RULES:
   function forcedUiApplyV1(){
     var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent="v2026.05.30-forced-ui1";
     var brand=qs("#phase10BrandLine"); if(brand){brand.textContent="";brand.hidden=true;brand.style.display="none";}
-    var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530");
+    var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/custom-header/cyber-header-user-trimmed.png?v=v35.8.0-2026-06-05-task8-custom-header-livehud");
     if(typeof hardfixMoveLedsBehindDj==="function") hardfixMoveLedsBehindDj();
     var dj=qs("#djText")?qs("#djText").closest(".info-card"):null, led=qs("#phase10StatusLedCard");
     if(dj&&led&&led.previousElementSibling!==dj) dj.parentNode.insertBefore(led,dj.nextSibling);

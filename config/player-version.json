@@ -1,0 +1,7 @@
+{
+  "version": "v35.8.0",
+  "cacheBurst": "v35.8.0-2026-06-05-task8-custom-header-livehud",
+  "buildDate": "2026-06-05",
+  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v35.7_TASK7_STREAM_CONFIG_MANAGER_V1.zip",
+  "note": "Task 8 custom player header live HUD. User header artwork integrated, responsive PC+iPhone sizing, live display sync, header hotspot controls bound to existing player actions. Worker unchanged. DarkDancer protected."
+}

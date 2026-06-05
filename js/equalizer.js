@@ -10,16 +10,18 @@ ZWECK: Stabiler Frequency-Mapping Fix für Desktop.
 */
 
 function v27StableMapping(dataArray, bars){
-  if (!dataArray || !bars) return;
-
-  const step = Math.floor(dataArray.length / bars.length);
-
+  // v35.5 REBASE FIX:
+  // Alte Version rief sich innerhalb der for-Schleife selbst auf und konnte bei Aktivierung
+  // in eine Endlosrekursion laufen. Diese Funktion bleibt als Kompatibilitätsanker erhalten,
+  // schreibt aber nur Werte in vorhandene Bars und startet keinen zweiten Visualizer-Layer.
+  if (!dataArray || !bars || !bars.length) return;
+  const step = Math.max(1, Math.floor(dataArray.length / bars.length));
   for (let i = 0; i < bars.length; i++) {
-    const index = i * step;
+    const index = Math.min(dataArray.length - 1, i * step);
     const value = dataArray[index] || 0;
-
-    const height = Math.max(12, value * 0.6);
-    v27StableMapping(dataArray, bars);
+    const height = Math.max(12, Math.min(100, value * 0.55));
+    const bar = bars[i];
+    if (bar && bar.style) bar.style.setProperty('--eq-level', String(height / 100));
   }
 }
 

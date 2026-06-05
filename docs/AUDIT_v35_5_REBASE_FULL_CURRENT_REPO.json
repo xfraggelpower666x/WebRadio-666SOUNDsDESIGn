@@ -1,0 +1,31 @@
+{
+  "version": "v35.5.0",
+  "cacheBurst": "v35.5.0-2026-06-04-rebased-full-current-repo",
+  "baseZip": "WebRadio-666SOUNDsDESIGn-WebRadio-666SOUNDsDESIGn (1).zip",
+  "fileCount": 481,
+  "workerShaBefore": "e74376c8c8d736981c82ad601be09b4fbb1d9fe03fa3394cb8e25477726624fd",
+  "workerShaAfter": "e74376c8c8d736981c82ad601be09b4fbb1d9fe03fa3394cb8e25477726624fd",
+  "workerUnchanged": true,
+  "darkDancerProtected": true,
+  "darkDancerAssetProtected": true,
+  "syntaxCheckFiles": [
+    "js/player-core.js",
+    "js/equalizer.js",
+    "js/stream-watchdog-v1.js",
+    "js/ticker-stability-v1.js",
+    "js/message-route-guard-v1.js",
+    "js/version-state-guard-v1.js",
+    "core/version/version-core.js",
+    "config/player-version.js",
+    "js/sound-control-overlay-v1.js",
+    "js/player-admin-overlay.js",
+    "js/addons/discord-player-addon-v3.js",
+    "js/addons/player-broadcast-alert-v148.js"
+  ],
+  "notes": [
+    "Worker unchanged by design.",
+    "Existing Discord/Message/Admin backend preserved.",
+    "DarkDancer is protected content, not an error.",
+    "v35.4 13MB line is superseded by this full repo rebase."
+  ]
+}

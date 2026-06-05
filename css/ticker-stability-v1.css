@@ -1,0 +1,5 @@
+/* 666SOUNDsDESIGn — TICKER STABILITY V1 CSS — v35.5.0 */
+.ticker-window{overflow:hidden!important;}
+#nowPlayingTicker.s666-ticker-static,.ticker-text.s666-ticker-static{animation:none!important;padding-left:0!important;transform:translateX(0)!important;width:100%!important;min-width:0!important;text-align:center!important;}
+#nowPlayingTicker.s666-ticker-scroll,.ticker-text.s666-ticker-scroll{animation:s666TickerDynamicRun var(--s666-ticker-duration,24s) linear infinite!important;padding-left:100%!important;width:max-content!important;min-width:max-content!important;will-change:transform!important;text-align:left!important;}
+@keyframes s666TickerDynamicRun{from{transform:translateX(0)}to{transform:translateX(calc(-1 * var(--s666-ticker-distance,100%)))}}

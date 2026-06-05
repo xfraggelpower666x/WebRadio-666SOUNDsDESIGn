@@ -1,0 +1,4 @@
+/* 666SOUNDsDESIGn — STREAM WATCHDOG V1 CSS — v35.5.0 */
+.stream-watchdog-badge{min-width:70px!important;white-space:nowrap!important;}
+.stream-watchdog-badge .status-code{font-size:10px!important;letter-spacing:.06em!important;}
+@media(max-width:760px){.stream-watchdog-badge{min-width:48px!important;padding:0 6px!important}.stream-watchdog-badge .status-code{font-size:8.5px!important}}
