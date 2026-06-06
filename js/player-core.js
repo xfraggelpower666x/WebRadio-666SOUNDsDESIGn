@@ -483,73 +483,17 @@ function isLoadingMetaText(text) {
 }
 
 let lastAppliedCoverUrlV105 = '';
-let lastAppliedCoverTrackKeyV363 = '';
-let pendingCoverUrlV363 = '';
-let noCoverPollCountV363 = 0;
-const FALLBACK_COVER_V363 = '/assets/images/fallback-cover.png';
-
-function isFallbackCoverV363(url) {
-  return /fallback-cover|logo-neon|favicon/i.test(String(url || ''));
-}
-
-function normalizeCoverUrlV363(url) {
-  const raw = String(url || '').trim();
-  if (!raw) return '';
-  if (/^https?:\/\//i.test(raw) || raw.startsWith('/')) return raw;
-  return '';
-}
-
-function buildCoverTrackKeyV363(meta) {
-  return String(meta?.title || meta?.dj || '').trim().toLowerCase();
-}
-
-function swapCoverWhenLoadedV363(originalUrl, trackKey) {
-  if (!nowCover || !originalUrl) return;
-  if (pendingCoverUrlV363 === originalUrl) return;
-  pendingCoverUrlV363 = originalUrl;
-  const probe = new Image();
-  probe.decoding = 'async';
-  probe.onload = () => {
-    if (!nowCover) return;
-    nowCover.src = originalUrl;
-    nowCover.setAttribute('data-cover-original-src', originalUrl);
-    nowCover.setAttribute('data-cover-track-key', trackKey || '');
-    nowCover.setAttribute('data-cover-state', 'loaded');
-    lastAppliedCoverUrlV105 = originalUrl;
-    lastAppliedCoverTrackKeyV363 = trackKey || '';
-    pendingCoverUrlV363 = '';
-    try { document.documentElement.setAttribute('data-cover-stability-state', 'desktop-loaded'); } catch (err) {}
-  };
-  probe.onerror = () => {
-    if (pendingCoverUrlV363 === originalUrl) pendingCoverUrlV363 = '';
-    nowCover?.setAttribute('data-cover-state', 'error');
-    try { document.documentElement.setAttribute('data-cover-stability-state', 'desktop-error'); } catch (err) {}
-  };
-  probe.src = originalUrl;
-}
-
 function updateNowCover(meta) {
   if (!nowCover) return;
-  const trackKey = buildCoverTrackKeyV363(meta);
-  const realCover = normalizeCoverUrlV363(meta?.cover || '');
-  const currentOriginal = nowCover.getAttribute('data-cover-original-src') || nowCover.getAttribute('src') || '';
+  const cover = String(meta?.cover || '/assets/images/fallback-cover.png').trim();
+  if (!cover) return;
 
-  // v36.3: real artwork wins, but is preloaded before swapping to prevent flicker.
-  if (realCover) {
-    noCoverPollCountV363 = 0;
-    if (realCover === lastAppliedCoverUrlV105 && trackKey === lastAppliedCoverTrackKeyV363 && currentOriginal === realCover) return;
-    swapCoverWhenLoadedV363(realCover, trackKey);
-    return;
-  }
-
-  // No real cover in this poll. Do not instantly blank the old image because metadata APIs
-  // can deliver title before artwork. After repeated no-cover polls for a new track, fall back cleanly.
-  noCoverPollCountV363 += 1;
-  const sameTrack = trackKey && trackKey === lastAppliedCoverTrackKeyV363;
-  if (sameTrack && currentOriginal && !isFallbackCoverV363(currentOriginal)) return;
-  if (noCoverPollCountV363 < 2 && currentOriginal && !isFallbackCoverV363(currentOriginal)) return;
-  if (currentOriginal !== FALLBACK_COVER_V363) {
-    swapCoverWhenLoadedV363(FALLBACK_COVER_V363, trackKey);
+  // v105: do not rebuild/reload the cover on every metadata poll.
+  // Only touch the image when the real URL changes. This prevents 15–20s flicker/repaint loops.
+  if (cover === lastAppliedCoverUrlV105 && nowCover.getAttribute('src') === cover) return;
+  lastAppliedCoverUrlV105 = cover;
+  if (nowCover.getAttribute('src') !== cover) {
+    nowCover.src = cover;
   }
 }
 
@@ -712,16 +656,7 @@ function extractCoverUrl(payload) {
     song?.cover,
     song?.image,
     song?.artwork,
-    song?.thumbnail,
-    song?.media?.image,
-    song?.media?.cover,
-    song?.media?.artwork,
-    song?.album?.image,
-    song?.album?.cover,
-    song?.album?.artwork,
-    payload?.np?.song?.image,
-    payload?.np?.song?.art,
-    payload?.np?.song?.artwork
+    song?.thumbnail
   ];
 
   for (const candidate of candidates) {

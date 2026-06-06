@@ -1,7 +1,7 @@
 {
-  "version": "v36.3.2",
-  "cacheBurst": "v36.3.2-2026-06-05-mobile-visible-state-hotfix",
+  "version": "v36.2.1",
+  "cacheBurst": "v36.2.1-2026-06-05-remove-bad-custom-header",
   "buildDate": "2026-06-05",
-  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v36.3.1_PC_VIEWPORT_HOTFIX.zip",
-  "note": "Mobile visible-state hotfix: mobile footer version corrected, EQ bars restored, now-playing clipping reduced, logo size improved. Worker unchanged."
+  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v36.2_TASK11_SPLIT_BOOSTER_PC_MOBILE.zip",
+  "note": "Hotfix: removed rejected custom player header/livehud. Kept v36.2 split booster, v36.1 layer cleanup, Codex recovery, DarkDancer. Worker unchanged."
 }

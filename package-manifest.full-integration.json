@@ -16,7 +16,7 @@
   "rendererResourcePath": "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
   "rendererResourceZip": "666SOUNDsDESIGn_RENDERER_DEPLOY_AWARENESS_FULL_2026-05-24.zip",
   "updated": "2026-05-24",
-  "latestBuild": "v36.3.2",
-  "latestCacheBurst": "v36.3.2-2026-06-05-mobile-visible-state-hotfix",
-  "lastIntegratedTask": "HOTFIX_MOBILE_VISIBLE_STATE_VERSION_EQ_TITLE"
+  "latestBuild": "v36.2.1",
+  "latestCacheBurst": "v36.2.1-2026-06-05-remove-bad-custom-header",
+  "lastIntegratedTask": "HOTFIX_REMOVE_BAD_CUSTOM_HEADER_KEEP_SPLIT_BOOSTER"
 }

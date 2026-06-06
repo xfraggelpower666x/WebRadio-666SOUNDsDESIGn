@@ -1,14 +1,14 @@
 /*
-  666SOUNDsDESIGn — VERSION CORE v36.3.2
+  666SOUNDsDESIGn — VERSION CORE v36.2.1
   Zweck: Eine zentrale Versionsquelle für PC/iPhone/Worker-UI.
   Rebased auf vollständige aktuelle Repo-ZIP vom 2026-06-05.
   Keine Secrets. Keine Worker-Änderung. DarkDancer bleibt geschützt.
 */
 (function(){
   'use strict';
-  var VERSION='v36.3.2';
-  var BUILD='v36.3.2-2026-06-05-mobile-visible-state-hotfix';
-  var NUMBER=3632;
+  var VERSION='v36.2.1';
+  var BUILD='v36.2.1-2026-06-05-remove-bad-custom-header';
+  var NUMBER=3621;
   window.SMFP_VERSION={label:VERSION, build:BUILD, number:NUMBER, cacheBust:BUILD};
   window.__S666_BUILD_VERSION__=VERSION;
   window.__S666_CACHE_BURST__=BUILD;
