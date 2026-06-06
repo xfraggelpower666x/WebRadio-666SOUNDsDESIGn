@@ -1,7 +1,7 @@
 {
-  "version": "v36.2.0",
-  "cacheBurst": "v36.2.0-2026-06-05-split-booster-pc-mobile",
+  "version": "v36.3.0",
+  "cacheBurst": "v36.3.0-2026-06-05-metadata-cover-viewport-stability",
   "buildDate": "2026-06-05",
-  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v36.1_TASK10_CANONICAL_LAYER_CLEANUP.zip",
-  "note": "Task 11 Split Booster System. PC profile capped to safe 0-1 mini boost for large speakers, iPhone/mobile profile keeps 0-5 boost stages. Worker unchanged. DarkDancer and custom header protected."
+  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v36.2.1_REMOVE_BAD_CUSTOM_HEADER_KEEP_SPLIT_BOOSTER.zip",
+  "note": "Task 12 Metadata/Cover/Viewport Stability. Cover art is preloaded before swap, fallback is debounced, mobile artwork follows same rule, viewport is bounded so player does not run below visible screen. Worker unchanged. Bad custom header remains removed."
 }

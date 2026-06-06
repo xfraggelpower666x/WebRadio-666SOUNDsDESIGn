@@ -16,7 +16,7 @@
   "rendererResourcePath": "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
   "rendererResourceZip": "666SOUNDsDESIGn_RENDERER_DEPLOY_AWARENESS_FULL_2026-05-24.zip",
   "updated": "2026-05-24",
-  "latestBuild": "v36.2.0",
-  "latestCacheBurst": "v36.2.0-2026-06-05-split-booster-pc-mobile",
-  "lastIntegratedTask": "TASK11_SPLIT_BOOSTER_PC_MOBILE"
+  "latestBuild": "v36.3.0",
+  "latestCacheBurst": "v36.3.0-2026-06-05-metadata-cover-viewport-stability",
+  "lastIntegratedTask": "TASK12_METADATA_COVER_VIEWPORT_STABILITY"
 }

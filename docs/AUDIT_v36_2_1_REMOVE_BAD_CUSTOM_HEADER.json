@@ -1,0 +1,14 @@
+{
+  "version": "v36.2.1",
+  "cacheBurst": "v36.2.1-2026-06-05-remove-bad-custom-header",
+  "status": "PASS",
+  "task": "HOTFIX_REMOVE_BAD_CUSTOM_HEADER",
+  "removedFiles": [
+    "css/custom-player-header-livehud-v1.css",
+    "js/custom-player-header-livehud-v1.js",
+    "assets/logos/custom-header/cyber-header-user-source.png",
+    "assets/logos/custom-header/cyber-header-user-transparent.png",
+    "assets/logos/custom-header/cyber-header-user-trimmed.png"
+  ],
+  "workerChanged": false
+}
