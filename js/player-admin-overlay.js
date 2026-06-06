@@ -5,7 +5,8 @@ PURPOSE: Protected admin overlay.
 */
 (function(){
   "use strict";
-  const AUTH_LOGIN_URL="https://666-system-auth.666soundsdesign-broadcaster.com/login";
+  const PW_LOGIN_URL="https://666-system-pw.666soundsdesign-broadcaster.com/login";
+  const AUTH_VERIFY_URL="https://666-system-auth.666soundsdesign-broadcaster.com/verify";
   const PW_HEALTH_URL="https://666-system-pw.666soundsdesign-broadcaster.com/health";
   const AUTH_HEALTH_URL="https://666-system-auth.666soundsdesign-broadcaster.com/health";
   const AUTH_DEBUG_URL="https://666-system-auth.666soundsdesign-broadcaster.com/debug";
@@ -20,9 +21,22 @@ PURPOSE: Protected admin overlay.
   const DISCORD_STATUS_URL="/api/discord/status";
   const $=id=>document.getElementById(id);
   let authOkCache=false,lastAuthCheck=0;
-  function loginUrl(){return `${AUTH_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;}
+  function loginUrl(){return `${PW_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;}
   function goLogin(){window.location.href=loginUrl();}
-  async function fetchJson(url,options){
+  
+  // ADMIN_AUTHORITY_CORE_FIX_V1_20260604
+  async function authorityCoreVerifyToken(token){
+    if(!token) return {ok:false,error:"token-missing"};
+    const res = await fetch(AUTH_VERIFY_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+      body:JSON.stringify({token})
+    });
+    const data = await res.json().catch(()=>({ok:false,error:"bad-json"}));
+    return data;
+  }
+
+async function fetchJson(url,options){
     const res=await fetch(url,Object.assign({credentials:"include",cache:"no-store"},options||{}));
     const text=await res.text();let data;try{data=JSON.parse(text)}catch{data={ok:false,raw:text}};
     data.__status=res.status;if(!res.ok)data.ok=false;return data;
@@ -198,3 +212,14 @@ PURPOSE: Protected admin overlay.
   window.FPAdminOverlay={mount:mountAdminButton,open:openAdminOverlay,close:closeAdminOverlay,checkAuth};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mountAdminButton);else mountAdminButton();
 })();
+
+
+  // ADMIN_AUTHORITY_CORE_OPEN_FIX_V1_20260604
+  window.S666AdminOverlay = window.S666AdminOverlay || {};
+  window.S666AdminOverlay.open = function(){
+    const b = document.querySelector("#fp-admin-open,.fp-admin-open,[data-admin-open],#adminButton,#adminBtn");
+    if(b){ b.click(); return true; }
+    const root = document.querySelector("#fp-admin-overlay,.fp-admin-overlay");
+    if(root){ root.classList.remove("fp-admin-hidden"); root.hidden = false; return true; }
+    return false;
+  };

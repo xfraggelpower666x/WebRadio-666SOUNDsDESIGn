@@ -993,6 +993,331 @@ RULES:
     }
   }
 
+
+  // MESSAGE_EMOJI_RESTORE_V1_20260604
+  function messageEmojiRestoreV1(){
+    var selectors = [
+      "#playerAlertPcBox",
+      ".player-alert-pc-box",
+      ".s666-player-alert-composer-box",
+      "#playerAlertMobileBox",
+      ".player-alert-mobile-box",
+      ".mobile-message-box"
+    ];
+
+    var textSelectors = [
+      "#playerAlertPcText",
+      ".player-alert-pc-text",
+      "#playerAlertMobileText",
+      ".player-alert-mobile-text",
+      "textarea[name='message']",
+      "textarea[data-message]",
+      ".s666-player-alert-composer textarea",
+      "textarea"
+    ];
+
+    var box = null;
+    selectors.some(function(sel){ box = qs(sel); return !!box; });
+
+    var text = null;
+    textSelectors.some(function(sel){ text = qs(sel); return !!text; });
+
+    if(!box && text) box = text.closest(".player-alert-pc-box,.s666-player-alert-composer-box,.player-alert-mobile-box,.now-playing") || text.parentNode;
+    if(!box || !text) return;
+
+    box.setAttribute("data-message-emoji-restore-v1","active");
+
+    var bar = box.querySelector("#phase10EmojiBar") || box.querySelector(".phase10-emoji-bar") || qs("#phase10EmojiBar");
+    if(!bar){
+      bar = document.createElement("div");
+      bar.id = "phase10EmojiBar";
+      bar.className = "phase10-emoji-bar s666-message-emoji-bar";
+      var emojis = ["🔥","⚡","🎧","🎶","🖤","💜","💙","💥","🚀","🌌","👽","😈","🤘","🫶","✨","🔊"];
+      bar.innerHTML = emojis.map(function(e){ return '<button type="button" data-emoji="'+e+'">'+e+'</button>'; }).join("");
+      if(text.parentNode) text.parentNode.insertBefore(bar, text.nextSibling);
+      else box.appendChild(bar);
+    }
+
+    if(!bar.__messageEmojiRestoreBound){
+      bar.__messageEmojiRestoreBound = true;
+      bar.addEventListener("click", function(ev){
+        var btn = ev.target.closest && ev.target.closest("[data-emoji]");
+        if(!btn) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        var target = null;
+        textSelectors.some(function(sel){ target = qs(sel); return !!target; });
+        if(!target) return;
+
+        var emoji = btn.getAttribute("data-emoji") || "";
+        var start = typeof target.selectionStart === "number" ? target.selectionStart : (target.value || "").length;
+        var end = typeof target.selectionEnd === "number" ? target.selectionEnd : start;
+        var before = (target.value || "").slice(0,start);
+        var after = (target.value || "").slice(end);
+        target.value = before + emoji + " " + after;
+        var pos = start + emoji.length + 1;
+        try{ target.focus(); target.setSelectionRange(pos,pos); }catch(e){}
+        target.dispatchEvent(new Event("input", {bubbles:true}));
+      }, true);
+
+      bar.addEventListener("touchend", function(ev){
+        var btn = ev.target.closest && ev.target.closest("[data-emoji]");
+        if(btn){ ev.preventDefault(); btn.click(); }
+      }, {passive:false, capture:true});
+    }
+
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.06.04-message-emoji-v1";
+  }
+
+
+  // ADMIN_AUTHORITY_CORE_MOBILE_FIX_V1_20260604
+  function adminAuthorityCoreMobileFixV1(){
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.06.04-admin-auth-fix-v1";
+
+    // PC/iPhone: wenn kein Admin-Button im sichtbaren UI vorhanden ist, kontrolliert ergänzen.
+    var existing = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
+    if(!existing){
+      var host = qs("#s666ParityMobileHub") || qs(".panel-actions") || qs(".info-grid") || qs(".now-playing") || document.body;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "fp-admin-open";
+      btn.className = "fp-admin-open s666-admin-authority-button";
+      btn.setAttribute("data-admin-open","1");
+      btn.textContent = "ADMIN";
+      if(host.id === "s666ParityMobileHub") host.appendChild(btn);
+      else if(host.parentNode && host !== document.body) host.parentNode.insertBefore(btn, host.nextSibling);
+      else document.body.appendChild(btn);
+    }
+
+    // Mobile Hub ADMIN sicher auf Overlay-Opener routen.
+    qsa("[data-phase10-mobile='admin'],[data-parity-action='admin']").forEach(function(btn){
+      if(btn.__adminAuthorityCoreBound) return;
+      btn.__adminAuthorityCoreBound = true;
+      btn.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(window.S666AdminOverlay && typeof window.S666AdminOverlay.open === "function"){
+          window.S666AdminOverlay.open();
+          return;
+        }
+        var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]");
+        if(b) b.click();
+      }, true);
+      btn.addEventListener("touchend", function(ev){
+        ev.preventDefault();
+        btn.click();
+      }, {passive:false, capture:true});
+    });
+  }
+
+
+  // ARTWORK_LED_RESTORE_V1_20260604
+  var artworkLedRestoreV1State = {
+    started:false,
+    lastTrackKey:"",
+    lastPulseAt:0,
+    showingTrack:false
+  };
+
+  function artworkLedRestoreV1FindPoster(){
+    var selectors = [
+      "#coverArt","#cover-art","#albumArt","#album-art","#trackArtwork","#track-artwork",
+      "#nowPlayingImage","#nowplayingImage","#posterImage","#posterImg",
+      ".cover-art img",".album-art img",".track-artwork img",".now-playing img",".poster img",
+      "img[id*='cover']","img[id*='art']","img[class*='cover']","img[class*='art']"
+    ];
+    for(var i=0;i<selectors.length;i++){
+      var el = qs(selectors[i]);
+      if(el && el.tagName && el.tagName.toLowerCase() === "img") return el;
+    }
+    return null;
+  }
+
+  function artworkLedRestoreV1TrackImage(){
+    var keys = [
+      "__trackArtwork","__trackArt","__currentTrackArt","__currentArtwork","__nowPlayingArtwork",
+      "__metadataArtwork","__metaArtwork","__songArtwork","__albumArtwork"
+    ];
+    for(var i=0;i<keys.length;i++){
+      var v = window[keys[i]];
+      if(typeof v === "string" && /^https?:\/\//i.test(v)) return v;
+    }
+
+    var candidates = [];
+    qsa("[data-track-art],[data-artwork],[data-cover],[data-track-image]").forEach(function(el){
+      ["data-track-art","data-artwork","data-cover","data-track-image"].forEach(function(a){
+        var v = el.getAttribute(a);
+        if(v && /^https?:\/\//i.test(v)) candidates.push(v);
+      });
+    });
+    if(candidates.length) return candidates[0];
+
+    var txt = "";
+    ["#nowPlayingText","#nowPlaying","#tickerText",".now-playing",".ticker"].forEach(function(sel){
+      var el = qs(sel);
+      if(el) txt += " " + (el.textContent || "");
+    });
+    var m = txt.match(/https?:\/\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)(?:\?[^\s"'<>]+)?/i);
+    if(m) return m[0];
+    return "";
+  }
+
+  function artworkLedRestoreV1StreamImage(){
+    var img = artworkLedRestoreV1FindPoster();
+    if(img){
+      var keep = img.getAttribute("data-stream-artwork-src") || img.getAttribute("data-default-src") || "";
+      if(keep) return keep;
+      if(img.src) {
+        img.setAttribute("data-stream-artwork-src", img.src);
+        return img.src;
+      }
+    }
+    return "";
+  }
+
+  function artworkLedRestoreV1Key(){
+    var t = "";
+    ["#nowPlayingText","#nowPlaying",".now-playing-title",".track-title",".ticker"].forEach(function(sel){
+      var el = qs(sel);
+      if(el) t += " " + (el.textContent || "");
+    });
+    return t.trim().slice(0,180);
+  }
+
+  function artworkLedRestoreV1Pulse(){
+    var img = artworkLedRestoreV1FindPoster();
+    if(!img) return;
+    var trackImg = artworkLedRestoreV1TrackImage();
+    var streamImg = artworkLedRestoreV1StreamImage();
+    if(!trackImg || !streamImg || trackImg === streamImg) return;
+
+    artworkLedRestoreV1State.showingTrack = true;
+    img.classList.add("s666-artwork-fading");
+    setTimeout(function(){
+      img.setAttribute("data-artwork-mode","track");
+      img.src = trackImg;
+      img.classList.add("s666-artwork-track-visible");
+      img.classList.remove("s666-artwork-fading");
+    }, 220);
+
+    setTimeout(function(){
+      img.classList.add("s666-artwork-fading");
+      setTimeout(function(){
+        img.setAttribute("data-artwork-mode","stream");
+        img.src = streamImg;
+        img.classList.remove("s666-artwork-track-visible");
+        img.classList.remove("s666-artwork-fading");
+        artworkLedRestoreV1State.showingTrack = false;
+      }, 260);
+    }, 4800);
+  }
+
+  function artworkLedRestoreV1Leds(){
+    var card = qs("#phase10StatusLedCard") || qs(".phase10-status-led-card") || qs(".info-grid");
+    if(!card) return;
+
+    var row = qs(".phase10-status-led-row") || qs("#phase10StatusLedRow");
+    if(!row){
+      row = document.createElement("div");
+      row.id = "phase10StatusLedRow";
+      row.className = "phase10-status-led-row";
+      card.appendChild(row);
+    }
+
+    function led(id,label,kind){
+      var el = qs("#"+id);
+      if(!el){
+        el = document.createElement("span");
+        el.id = id;
+        el.className = "status-chip s666-restored-led";
+        el.setAttribute("data-led-kind", kind);
+        el.innerHTML = '<b class="led-dot"></b><span>'+label+'</span>';
+        row.appendChild(el);
+      }
+      return el;
+    }
+
+    var source = led("statusSource","SOURCE","source");
+    var worker = led("statusWorker","WORKER","worker");
+    var watchdog = led("statusWatchdog","WATCH","watchdog");
+
+    var audio = (typeof getAudio === "function" && getAudio()) || document.querySelector("audio");
+    var srcOk = !!(audio && (audio.currentSrc || audio.getAttribute("src")));
+    var workerOk = document.documentElement.getAttribute("data-central-audio-stability-v2") || document.documentElement.getAttribute("data-iphone-audio-stability-v2");
+    var wdState = document.documentElement.getAttribute("data-stream-watchdog-state") || "ok";
+
+    source.setAttribute("data-led-state", srcOk ? "ok" : "bad");
+    worker.setAttribute("data-led-state", workerOk ? "ok" : "warn");
+    watchdog.setAttribute("data-led-state", wdState === "ok" || wdState === "" ? "ok" : (wdState === "recovering" ? "warn" : "bad"));
+    watchdog.title = "Watchdog: " + wdState;
+  }
+
+  function artworkLedRestoreV1Tick(){
+    artworkLedRestoreV1Leds();
+
+    var now = Date.now();
+    var key = artworkLedRestoreV1Key();
+    if(key && key !== artworkLedRestoreV1State.lastTrackKey){
+      artworkLedRestoreV1State.lastTrackKey = key;
+      artworkLedRestoreV1State.lastPulseAt = now;
+      setTimeout(artworkLedRestoreV1Pulse, 900);
+      return;
+    }
+
+    // Während längerer Tracks alle ~34 Sekunden kurz Track-Artwork zeigen.
+    if(now - artworkLedRestoreV1State.lastPulseAt > 34000 && !artworkLedRestoreV1State.showingTrack){
+      artworkLedRestoreV1State.lastPulseAt = now;
+      artworkLedRestoreV1Pulse();
+    }
+  }
+
+  function startArtworkLedRestoreV1(){
+    if(artworkLedRestoreV1State.started) return;
+    artworkLedRestoreV1State.started = true;
+    artworkLedRestoreV1Tick();
+    setInterval(artworkLedRestoreV1Tick, 2500);
+    document.documentElement.setAttribute("data-artwork-led-restore-v1","active");
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.06.04-artwork-led-v1";
+  }
+
+
+  // SIDE_METER_STAIR_MIRROR_V1_20260604
+  function sideMeterStairMirrorV1(){
+    var candidates = qsa(".left-meter,.right-meter,.mff-left-meter,.mff-right-meter,.side-meter-left,.side-meter-right,[data-meter-side='left'],[data-meter-side='right'],[data-side-meter-react-v1='left'],[data-side-meter-react-v1='right'],.side-meter");
+    candidates.forEach(function(group){
+      if(!group) return;
+      var r = group.getBoundingClientRect();
+      if(r.height < 70) return;
+
+      var side = group.getAttribute("data-meter-side") || group.getAttribute("data-side-meter-react-v1") || "";
+      if(!side) side = r.left < window.innerWidth / 2 ? "left" : "right";
+      group.setAttribute("data-s666-stair-side-meter", side);
+
+      var bars = Array.prototype.slice.call(group.querySelectorAll("i,.bar,.meter-bar,.side-bar"));
+      if(bars.length < 3){
+        group.innerHTML = "<i></i><i></i><i></i>";
+        bars = Array.prototype.slice.call(group.querySelectorAll("i"));
+      }
+      bars = bars.slice(0,3);
+
+      var heights = side === "right" ? [54,76,98] : [98,76,54];
+
+      bars.forEach(function(bar,i){
+        bar.setAttribute("data-s666-stair-bar", String(i+1));
+        bar.style.setProperty("--s666-stair-h", heights[i] + "%");
+        bar.style.height = heights[i] + "%";
+        bar.style.minHeight = heights[i] + "%";
+        bar.style.maxHeight = heights[i] + "%";
+      });
+    });
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.06.04-side-meter-stair-v1";
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -1005,6 +1330,10 @@ RULES:
     forcedUiApplyV1();
     startSideMeterReactV1();
     stableWatchdogMergeV1();
+    messageEmojiRestoreV1();
+    adminAuthorityCoreMobileFixV1();
+    startArtworkLedRestoreV1();
+    sideMeterStairMirrorV1();
     startIphoneAudioStabilityGuardV2();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();

@@ -61,3 +61,55 @@ PURPOSE: Protected admin overlay.
 .fp-admin-led.is-ready{color:#20f7ff;box-shadow:0 0 9px rgba(32,247,255,.28)}
 .fp-admin-led.is-sent{color:#60ff9b;border-color:rgba(96,255,155,.8);box-shadow:0 0 11px rgba(96,255,155,.34)}
 .fp-admin-led.is-failed{color:#ff315d;border-color:rgba(255,49,93,.8);box-shadow:0 0 11px rgba(255,49,93,.34)}
+
+
+/* ADMIN_AUTHORITY_CORE_MOBILE_FIX_V1_20260604
+   Admin-Menü auf PC + iPhone erreichbar. Authority Core vorbereitet. */
+:root{--s666-current-build:"v2026.06.04-admin-auth-fix-v1";--s666-cache-burst:"admin-auth-fix-v1-20260604";}
+
+.s666-admin-authority-button,
+#fp-admin-open,
+.fp-admin-open,
+[data-admin-open]{
+  border:1px solid rgba(255,63,215,.48)!important;
+  background:linear-gradient(135deg,rgba(255,63,215,.18),rgba(32,247,255,.13))!important;
+  color:#eaf4ff!important;
+  border-radius:11px!important;
+  min-height:31px!important;
+  padding:5px 10px!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.05em!important;
+  box-shadow:0 0 10px rgba(255,63,215,.18)!important;
+}
+
+@media(max-width:760px){
+  #s666ParityMobileHub .s666-admin-authority-button,
+  #s666ParityMobileHub #fp-admin-open,
+  #s666ParityMobileHub .fp-admin-open{
+    flex:1 1 0!important;
+    min-width:0!important;
+    height:33px!important;
+    min-height:33px!important;
+    font-size:9px!important;
+  }
+
+  .fp-admin-overlay{
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    z-index:9999!important;
+    overflow:hidden!important;
+  }
+
+  .fp-admin-panel{
+    width:calc(100vw - 16px)!important;
+    max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 18px - env(safe-area-inset-bottom,0px))!important;
+    margin:8px auto!important;
+    overflow:auto!important;
+    border-radius:18px!important;
+    box-sizing:border-box!important;
+  }
+}

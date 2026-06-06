@@ -1,0 +1,23 @@
+{
+  "audit": [
+    "worker.js node --check exit=0",
+    "js/phase10-stability-iphone-panel-hud.js node --check exit=0",
+    "js/player-admin-overlay.js node --check exit=0",
+    "js/stream-watchdog-v1.js node --check exit=0",
+    "worker-addons/discord-notify-addon-v3.js node --check exit=0",
+    "Artwork LED JS present: True",
+    "Artwork LED CSS present: True",
+    "Start call present: True",
+    "Source LED present: True",
+    "Worker LED present: True",
+    "Watchdog LED present: True",
+    "Artwork fade present: True",
+    "Build updated: True",
+    "Admin Auth retained: True",
+    "Message emoji retained: True",
+    "Watchdog retained: True",
+    "Central Audio retained: True",
+    "Private Track Shooter retained: True",
+    "Routes retained: True"
+  ]
+}
