@@ -526,6 +526,8 @@ RULES:
     for(const sel of targets){const t=qs(sel);if(t){t.appendChild(btn);break;}}
     setAdminState("unknown","LOCKED");
   }
+  window.openAdmin=openAdminOverlay;
+  window.S666OpenAdmin=openAdminOverlay;
   window.FPAdminOverlay={mount:mountAdminButton,open:openAdminOverlay,close:closeAdminOverlay,checkAuth,routeScan,refreshWatchdogStatus};
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",mountAdminButton); else mountAdminButton();
 })();

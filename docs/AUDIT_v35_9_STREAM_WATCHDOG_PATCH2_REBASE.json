@@ -1,0 +1,13 @@
+{
+  "version":"v35.9.0",
+  "cacheBurst":"v35.9.0-2026-06-05-task9-watchdog-patch2-rebase",
+  "task":"TASK9_STREAM_WATCHDOG_PATCH2_REBASE",
+  "sourceBase":"v35.8 custom header build",
+  "patchSources":["STREAM_WATCHDOG_V1_2026-06-04.zip","STREAM_WATCHDOG_V1_PATCH2_2026-06-04.zip"],
+  "workerChanged":false,
+  "darkDancerPreserved":true,
+  "customHeaderPreserved":true,
+  "localWatchdogRecoveryEnabled":false,
+  "updatedFiles":["js/stream-watchdog-v1.js","index.html","config/player-version.json","config/player-version.js","core/version/version-core.js","js/version-state-guard-v1.js","package-manifest.full-integration.json"],
+  "addedDocs":["docs/REPORT_v35_9_STREAM_WATCHDOG_PATCH2_REBASE.md","docs/AUDIT_v35_9_STREAM_WATCHDOG_PATCH2_REBASE.json"]
+}

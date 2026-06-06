@@ -1,0 +1,138 @@
+{
+  "version": "v36.1.0",
+  "cacheBurst": "v36.1.0-2026-06-05-canonical-layer-cleanup",
+  "task": "TASK10_CANONICAL_LAYER_CLEANUP",
+  "status": "PASS",
+  "workerChanged": false,
+  "workerSha256": "e74376c8c8d736981c82ad601be09b4fbb1d9fe03fa3394cb8e25477726624fd",
+  "riskCountsIndex": {
+    "display:none": 30,
+    "visibility:hidden": 7,
+    "pointer-events:none": 23,
+    "height:0": 16,
+    "overflow:hidden": 87,
+    "try{n.remove()}catch(e){}": 3
+  },
+  "checks": [
+    {
+      "name": "JS syntax js/phase10-stability-iphone-panel-hud.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/player-admin-overlay.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/player-core.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/equalizer.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/stream-watchdog-v1.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/ticker-stability-v1.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/message-route-guard-v1.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/custom-player-header-livehud-v1.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax core/version/version-core.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax js/version-state-guard-v1.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JS syntax config/player-version.js",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "HTML parse index.html",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JSON parse config/player-version.json",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JSON parse config/radio-runtime.json",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "JSON parse package-manifest.full-integration.json",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "killOldDom no physical remove in patched function",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "Custom header retained",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "Layer recovery retained",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "Canonical protected CSS added",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "Version in index",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "DarkDancer file",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "DarkDancer image",
+      "status": "PASS",
+      "note": ""
+    },
+    {
+      "name": "worker SHA protected",
+      "status": "PASS",
+      "note": "e74376c8c8d736981c82ad601be09b4fbb1d9fe03fa3394cb8e25477726624fd"
+    },
+    {
+      "name": "ZIP test",
+      "status": "PASS",
+      "note": ""
+    }
+  ]
+}

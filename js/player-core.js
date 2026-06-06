@@ -75,7 +75,7 @@ const volumeSlider = document.getElementById('volumeSlider');
 const boostButtons = Array.from(document.querySelectorAll('[data-boost-stage]'));
 const boostStepButtons = Array.from(document.querySelectorAll('[data-boost-step]'));
 const boostLeds = Array.from(document.querySelectorAll('[data-boost-led]'));
-let currentBoostStage = window.SMFPBoostCore ? window.SMFPBoostCore.loadStage() : 0;
+let currentBoostStage = window.SMFPBoostCore ? window.SMFPBoostCore.loadStage(window.SMFPBoostCore.getProfileName()) : 0;
 const timelineProgress = document.getElementById('timelineProgress');
 const currentTimeText = document.getElementById('currentTimeText');
 const durationText = document.getElementById('durationText');
@@ -286,10 +286,11 @@ audio.volume = Number(volumeSlider?.value || 0.75);
 
 const BASE_MOBILE_VOLUME = 0.86;
 const MOBILE_VOLUME_FALLBACK = [0.86, 0.94, 1.0, 1.0, 1.0, 1.0];
-const BOOST_LABELS = (window.SMFPBoostCore && window.SMFPBoostCore.stages) ? window.SMFPBoostCore.stages.map((stage) => stage.label) : ['BST 0', 'BST 1', 'BST 2', 'BST 3', 'BST 4', 'BST 5'];
+const BOOST_LABELS = ['BST 0', 'BST 1', 'BST 2', 'BST 3', 'BST 4', 'BST 5'];
 
 function applyMobileBoostFallback(stage) {
-  const safeStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage) : Math.max(0, Math.min(5, Number(stage) || 0));
+  const profile = window.SMFPBoostCore ? window.SMFPBoostCore.getProfileName() : 'mobile';
+  const safeStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage, profile) : Math.max(0, Math.min(5, Number(stage) || 0));
 
   // iOS/Safari kann WebAudio-Gain je nach Stream blockieren.
   // Dann bleibt wenigstens die native Lautstärke sauber auf Maximum, ohne Desktop zu stören.
@@ -298,7 +299,7 @@ function applyMobileBoostFallback(stage) {
   }
 
   if (streamState && isMobileViewport()) {
-    streamState.textContent = BOOST_LABELS[safeStage] || ('BST ' + safeStage);
+    streamState.textContent = (window.SMFPBoostCore ? window.SMFPBoostCore.getLabel(safeStage, profile) : (BOOST_LABELS[safeStage] || ('BST ' + safeStage)));
   }
 
   document.body?.setAttribute('data-mobile-boost', String(safeStage));
@@ -306,7 +307,8 @@ function applyMobileBoostFallback(stage) {
 }
 
 function updateBoostDiagnosticLabel(detail = {}) {
-  const stage = Number(detail.stage ?? audio?.dataset?.boostStage ?? currentBoostStage ?? 0);
+  const stage = Number(detail.stage ?? detail.level ?? audio?.dataset?.boostStage ?? currentBoostStage ?? 0);
+  const profile = detail.profile || (window.SMFPBoostCore ? window.SMFPBoostCore.getProfileName() : 'mobile');
   const gain = detail.gain ?? audio?.dataset?.boostGain ?? '1';
   const graph = detail.graph ?? audio?.dataset?.boostGraph ?? 'GRAPH_WAIT';
   const context = detail.context ?? audio?.dataset?.boostContext ?? 'NO_CONTEXT';
@@ -325,7 +327,7 @@ function updateBoostDiagnosticLabel(detail = {}) {
 
 
 function applyBoostButtons(stage) {
-  currentBoostStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage) : Math.max(0, Math.min(5, Number(stage) || 0));
+  currentBoostStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage, profile) : Math.max(0, Math.min(5, Number(stage) || 0));
 
   boostButtons.forEach((btn) => {
     btn.classList.toggle('is-active', Number(btn.dataset.boostStage) === currentBoostStage);
@@ -339,11 +341,12 @@ function applyBoostButtons(stage) {
 }
 
 function setBoostStage(stage) {
-  const safeStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage) : Math.max(0, Math.min(5, Number(stage) || 0));
+  const profile = window.SMFPBoostCore ? window.SMFPBoostCore.getProfileName() : 'mobile';
+  const safeStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage, profile) : Math.max(0, Math.min(5, Number(stage) || 0));
   const next = visualizer.setBoostStage ? visualizer.setBoostStage(safeStage) : safeStage;
   applyMobileBoostFallback(next);
   applyBoostButtons(next);
-  try { if (window.SMFPBoostCore) { window.SMFPBoostCore.saveStage(next); window.SMFPBoostCore.publish(next, Number(audio?.dataset?.boostGain || window.SMFPBoostCore.getGain(next)), 'player-core'); } } catch (err) {}
+  try { if (window.SMFPBoostCore) { window.SMFPBoostCore.saveStage(next, profile); window.SMFPBoostCore.publish(next, Number(audio?.dataset?.boostGain || window.SMFPBoostCore.getGain(next, profile)), 'player-core', profile); } } catch (err) {}
   updateBoostDiagnosticLabel({
     stage: next,
     gain: audio?.dataset?.boostGain || '1',
@@ -1031,9 +1034,9 @@ try {
 (function installV77PcBoostMetaGlowTickerFix(){
   if(window.__v77PcBoostMetaGlowTickerFixInstalled)return;window.__v77PcBoostMetaGlowTickerFixInstalled=true;
   const qs=id=>document.getElementById(id);let lastAudioTime=0,lastAudioMoveAt=Date.now(),lastRecoverAt=0,lastGoodMeta='',lastMetaOkAt=0;
-  function clamp(v){return window.SMFPBoostCore?window.SMFPBoostCore.clampStage(v):(Number.isFinite(Number(v))?Math.max(0,Math.min(5,Math.round(Number(v)))):0)}
+  function clamp(v){const p=window.SMFPBoostCore?window.SMFPBoostCore.getProfileName():'mobile';return window.SMFPBoostCore?window.SMFPBoostCore.clampStage(v,p):(Number.isFinite(Number(v))?Math.max(0,Math.min(5,Math.round(Number(v)))):0)}
   function level(){const raw=window.__boostLevel??document.body.getAttribute('data-boost-level')??document.documentElement.style.getPropertyValue('--boost-level')??0;return clamp(String(raw).replace(/[^\d.-]/g,''))}
-  function mirror(lv){const safe=clamp(lv);window.__boostLevel=safe;document.body.setAttribute('data-boost-level',String(safe));document.body.setAttribute('data-mobile-boost',String(safe));document.documentElement.style.setProperty('--boost-level',String(safe));document.documentElement.style.setProperty('--player-boost-level',String(safe));const gain=window.SMFPBoostCore?window.SMFPBoostCore.getGain(safe):(1+(safe*.10));document.documentElement.style.setProperty('--player-boost-gain',gain.toFixed(2));const label=qs('pcBoostLabel');if(label)(label.querySelector('.status-code')||label).textContent='BST '+safe;try{if(window.SMFPBoostCore){window.SMFPBoostCore.saveStage(safe);window.SMFPBoostCore.publish(safe,gain,'player-core-v77');}}catch(e){}window.dispatchEvent(new CustomEvent('playerboostchange',{detail:{level:safe,gain}}));return safe}
+  function mirror(lv){const safe=clamp(lv);window.__boostLevel=safe;document.body.setAttribute('data-boost-level',String(safe));document.body.setAttribute('data-mobile-boost',String(safe));document.documentElement.style.setProperty('--boost-level',String(safe));document.documentElement.style.setProperty('--player-boost-level',String(safe));const p=window.SMFPBoostCore?window.SMFPBoostCore.getProfileName():'mobile';const gain=window.SMFPBoostCore?window.SMFPBoostCore.getGain(safe,p):(1+(safe*.10));document.documentElement.style.setProperty('--player-boost-gain',gain.toFixed(2));const label=qs('pcBoostLabel');if(label)(label.querySelector('.status-code')||label).textContent='BST '+safe;try{if(window.SMFPBoostCore){window.SMFPBoostCore.saveStage(safe,p);window.SMFPBoostCore.publish(safe,gain,'player-core-v77',p);}}catch(e){}window.dispatchEvent(new CustomEvent('playerboostchange',{detail:{level:safe,gain}}));return safe}
   function applyBoost(lv){const safe=clamp(lv);let applied=safe;try{if(typeof setBoostStage==='function'){const r=setBoostStage(safe);applied=clamp(typeof r==='number'?r:safe)}else if(typeof changeBoostStage==='function'){const r=changeBoostStage(safe-level());applied=clamp(typeof r==='number'?r:safe)}}catch(err){document.body.setAttribute('data-boost-error',String(err&&err.message||err))}mirror(applied);syncPanel()}
   function boostControls(){const minus=qs('pcBoostMinus'),plus=qs('pcBoostPlus');if(minus&&!minus.__v77BoostBound){minus.__v77BoostBound=true;minus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()-1);},true)}if(plus&&!plus.__v77BoostBound){plus.__v77BoostBound=true;plus.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();applyBoost(level()+1);},true)}}
   function audioEl(){return document.querySelector('audio')}

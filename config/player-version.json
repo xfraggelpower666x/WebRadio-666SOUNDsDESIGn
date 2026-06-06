@@ -1,7 +1,7 @@
 {
-  "version": "v35.7.0",
-  "cacheBurst": "v35.7.0-2026-06-04-task7-stream-config-manager",
-  "buildDate": "2026-06-04",
-  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v35.6_TASK6_ADMIN_CONTROL_CENTER_STABILIZATION.zip",
-  "note": "Task 7 Stream Config Manager V1 stabilization. Player reads config/radio-runtime.json. Worker unchanged. DarkDancer protected."
+  "version": "v36.2.0",
+  "cacheBurst": "v36.2.0-2026-06-05-split-booster-pc-mobile",
+  "buildDate": "2026-06-05",
+  "sourceBase": "WebRadio-666SOUNDsDESIGn_FULL_REPO_v36.1_TASK10_CANONICAL_LAYER_CLEANUP.zip",
+  "note": "Task 11 Split Booster System. PC profile capped to safe 0-1 mini boost for large speakers, iPhone/mobile profile keeps 0-5 boost stages. Worker unchanged. DarkDancer and custom header protected."
 }

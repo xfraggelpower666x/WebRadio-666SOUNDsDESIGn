@@ -1,0 +1,25 @@
+{
+  "version": "v36.0.0",
+  "cacheBurst": "v36.0.0-2026-06-05-task9b-layer-recovery-codex-features",
+  "task": "TASK9B_LAYER_RECOVERY_CODEX_FEATURES",
+  "workerChanged": false,
+  "darkDancerPreserved": true,
+  "customHeaderPreserved": true,
+  "codexFeaturesRecovered": [
+    "mobile-admin-hub",
+    "mobile-eq-sound-overlay-trigger",
+    "mobile-message-emoji-bar",
+    "admin-open-fallback-selector"
+  ],
+  "updatedFiles": [
+    "js/phase10-stability-iphone-panel-hud.js",
+    "css/phase10-stability-iphone-panel-hud.css",
+    "js/player-admin-overlay.js",
+    "index.html",
+    "config/player-version.json",
+    "config/player-version.js",
+    "core/version/version-core.js",
+    "js/version-state-guard-v1.js",
+    "package-manifest.full-integration.json"
+  ]
+}
