@@ -1,0 +1,7 @@
+{
+  "version": "v36.3.1",
+  "cacheBurst": "v36.3.1-2026-06-05-pc-viewport-hotfix",
+  "status": "PASS",
+  "task": "HOTFIX_PC_VIEWPORT_RESTORE_MOBILE_ONLY_CLAMP",
+  "workerChanged": false
+}
