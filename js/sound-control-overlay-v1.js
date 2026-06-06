@@ -105,7 +105,7 @@ CHANGE SUMMARY:
       if(m) return clamp(m[1], 0, 5);
     }
     try{
-      if(window.SMFPBoostCore && typeof window.SMFPBoostCore.loadStage === "function") return clamp(window.SMFPBoostCore.loadStage(window.SMFPBoostCore.getProfileName()),0,window.SMFPBoostCore.maxStage(window.SMFPBoostCore.getProfileName()));
+      if(window.SMFPBoostCore && typeof window.SMFPBoostCore.loadStage === "function") return clamp(window.SMFPBoostCore.loadStage(),0,5);
     }catch(_){}
     return 0;
   }
@@ -121,16 +121,14 @@ CHANGE SUMMARY:
   }
 
   function setBoostStage(target){
-    var profile = window.SMFPBoostCore ? window.SMFPBoostCore.getProfileName() : 'mobile';
-    var maxStage = window.SMFPBoostCore ? window.SMFPBoostCore.maxStage(profile) : 5;
-    target = clamp(target,0,maxStage);
+    target = clamp(target,0,5);
     var guard = 0;
     var current = readBoostStage();
     while(current < target && guard++ < 8){ if(!clickBoostStep(1)) break; current += 1; }
     while(current > target && guard++ < 16){ if(!clickBoostStep(-1)) break; current -= 1; }
     document.documentElement.setAttribute("data-s666-sound-boost-target", String(target));
     try{
-      if(window.SMFPBoostCore && typeof window.SMFPBoostCore.saveStage === "function") window.SMFPBoostCore.saveStage(target, profile);
+      if(window.SMFPBoostCore && typeof window.SMFPBoostCore.saveStage === "function") window.SMFPBoostCore.saveStage(target);
     }catch(_){}
   }
 
@@ -157,7 +155,7 @@ CHANGE SUMMARY:
         '<main class="s666-sound-body">',
           '<div class="s666-sound-eq" id="s666SoundEq"></div>',
           '<section class="s666-sound-boost">',
-            '<div class="s666-sound-boost-title">BOOSTER <small id="s666SoundBoostProfile">AUTO</small></div>',
+            '<div class="s666-sound-boost-title">BOOSTER</div>',
             '<label class="s666-sound-toggle"><input id="s666SoundBoostActive" type="checkbox"> <span>Booster active</span></label>',
             '<input id="s666SoundBoostLevel" type="range" min="0" max="5" step="1">',
             '<div class="s666-sound-boost-readout"><span id="s666SoundBoostValue">0</span><span id="s666SoundBoostGain">1.00×</span></div>',
@@ -235,15 +233,10 @@ CHANGE SUMMARY:
     var value = qs("#s666SoundBoostValue", el);
     var gain = qs("#s666SoundBoostGain", el);
     if(active) active.checked = !!draft.boosterActive;
-    var profile = window.SMFPBoostCore ? window.SMFPBoostCore.getProfileName() : 'mobile';
-    var maxStage = window.SMFPBoostCore ? window.SMFPBoostCore.maxStage(profile) : 5;
-    var safeLevel = clamp(draft.boosterLevel,0,maxStage);
-    var profileNode = qs("#s666SoundBoostProfile", el);
-    if(profileNode) profileNode.textContent = profile === 'pc' ? 'PC SAFE 0–1' : 'iPHONE 0–5';
-    if(level){ level.max = String(maxStage); level.value = String(safeLevel); }
-    if(value) value.textContent = window.SMFPBoostCore ? window.SMFPBoostCore.getLabel(safeLevel, profile) : ("BST " + safeLevel);
+    if(level) level.value = String(clamp(draft.boosterLevel,0,5));
+    if(value) value.textContent = "BST " + clamp(draft.boosterLevel,0,5);
     var g = 1;
-    try{ g = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(safeLevel, profile) : [1,1.4,1.7,1.9,2,2.2][safeLevel]; }catch(_){}
+    try{ g = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(clamp(draft.boosterLevel,0,5)) : [1,1.4,1.7,1.9,2,2.2][clamp(draft.boosterLevel,0,5)]; }catch(_){}
     if(gain) gain.textContent = Number(g || 1).toFixed(2) + "×";
     var status = qs("#s666SoundDirty", el);
     if(status) status.textContent = dirty ? "UNSAVED" : "READY";

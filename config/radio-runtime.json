@@ -1,7 +1,7 @@
 {
   "schema": "radio-runtime-config-v1",
-  "primaryStream": "/stream",
-  "backupStream": "/fallback-stream",
+  "primaryStream": "",
+  "backupStream": "",
   "emergencyStream": "",
   "metadataUrl": "/api/nowplaying",
   "chaosEngineUrl": "/CHAOS_ENGINE/",
@@ -12,13 +12,9 @@
   "discordStatusUrl": "/api/discord/status",
   "sunoWorkerUrl": "https://666-suno-system.666soundsdesign-broadcaster.com",
   "chaosAiWorkerUrl": "https://666-chaos-ai-track-system.666soundsdesign-broadcaster.com",
-  "cacheBurst": "v35.7.0-2026-06-04-task7-stream-config-manager",
+  "cacheBurst": "admin-config-system-v1-20260525",
   "version": 1,
-  "updatedAt": "2026-06-04T00:00:00.000Z",
-  "updatedBy": "task7-stream-config-manager-v1",
-  "notes": "Runtime stream config is read by the Player Stream Config Manager V1. Defaults keep existing /stream and /fallback-stream worker routes. No secrets here. DarkDancer remains protected.",
-  "playerVersion": "v35.7.0",
-  "healthUrl": "/health",
-  "streamConfigManager": "STREAM_CONFIG_MANAGER_V1",
-  "streamConfigMode": "player-loads-runtime-config-with-worker-route-fallback"
+  "updatedAt": "2026-05-21T00:00:00.000Z",
+  "updatedBy": "initial-admin-addon",
+  "notes": "Runtime config editable through protected Admin Overlay. No secrets here."
 }

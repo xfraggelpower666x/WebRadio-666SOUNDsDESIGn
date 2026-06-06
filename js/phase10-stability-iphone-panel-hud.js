@@ -585,7 +585,7 @@ RULES:
     if(v) v.textContent = "v2026.05.28-ui1";
     var logo = qs("#pcHeaderNewLogo");
     if(logo && logo.getAttribute("src") && logo.getAttribute("src").indexOf("ui-finetune-v1-20260528") === -1){
-      logo.setAttribute("src", "/assets/logos/phase10-new-header-logo.png?v=v36.2.1-2026-06-05-remove-bad-custom-header");
+      logo.setAttribute("src", "/assets/logos/phase10-new-header-logo.png?v=ui-finetune-v1-20260528");
     }
     if(typeof hardfixMoveLedsBehindDj === "function") hardfixMoveLedsBehindDj();
   }
@@ -602,9 +602,8 @@ RULES:
     if(b) return tap(b, "parity-sound");
   }
   function parityOpenAdmin(){
-    if(window.FPAdminOverlay && typeof window.FPAdminOverlay.open === "function") return window.FPAdminOverlay.open();
     if(typeof openAdmin === "function") return openAdmin();
-    var b = qs("#fp-admin-button") || qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
+    var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
     if(b) return tap(b, "parity-admin");
   }
   function parityOpenChaos(){
@@ -618,20 +617,14 @@ RULES:
   function parityMountMobileHub(){
     if(!parityIsMobile()) return;
     var app = qs("#mffApp") || qs(".player-shell") || document.body;
-    var hub = qs("#s666ParityMobileHub");
-    if(!hub){
-      hub = document.createElement("div");
-      hub.id = "s666ParityMobileHub";
-      hub.className = "s666-parity-mobile-hub";
-      hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="sound">SOUND</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
-    }
-    if(app && hub.parentNode !== app){
-      var anchor = qs("#s666MobileExtraRow", app) || qs(".mff-discord-slot", app) || qs(".mobile-boost", app) || qs(".hero-label-row", app) || qs(".now-playing", app);
-      if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(hub, anchor.nextSibling);
-      else app.insertBefore(hub, app.firstChild);
-    }
-    if(hub.__parityHubBound) return;
-    hub.__parityHubBound = true;
+    if(qs("#s666ParityMobileHub")) return;
+    var hub = document.createElement("div");
+    hub.id = "s666ParityMobileHub";
+    hub.className = "s666-parity-mobile-hub";
+    hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="sound">SOUND</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
+    var anchor = qs("#s666MobileExtraRow") || qs(".mobile-boost") || qs(".hero-label-row") || qs(".now-playing");
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(hub, anchor.nextSibling);
+    else app.insertBefore(hub, app.firstChild);
     hub.addEventListener("click", function(ev){
       var btn = ev.target.closest && ev.target.closest("[data-parity-action]");
       if(!btn) return;
@@ -682,72 +675,11 @@ RULES:
   }
 
 
-
-
-  // LAYER_RECOVERY_CODEX_FEATURES_V1_20260605
-  // Purpose: restore useful Codex features that exist but can be hidden by later mobile/main layers.
-  function layerRecoveryInstallMobileMessageEmoji(){
-    var back = qs("#mffAlertEditorBackdrop");
-    if(!back) return;
-    var ta = qs("#mffAlertText", back);
-    var editor = qs(".mff-alert-editor", back);
-    if(!ta || !editor) return;
-    var bar = qs("#mffAlertEmojiBar", back);
-    if(!bar){
-      bar = document.createElement("div");
-      bar.id = "mffAlertEmojiBar";
-      bar.className = "mff-alert-emoji-bar";
-      ["😀","😎","🔥","❤️","🎧","🎵","🚀","👽","666","🖤","⚡","💜"].forEach(function(e){
-        var b=document.createElement("button"); b.type="button"; b.textContent=e; b.setAttribute("aria-label","Insert "+e);
-        b.addEventListener("click",function(ev){
-          ev.preventDefault(); ev.stopPropagation();
-          ta.value = (ta.value || "") + e;
-          try{ ta.focus(); ta.dispatchEvent(new Event("input",{bubbles:true})); }catch(_){ }
-        },true);
-        bar.appendChild(b);
-      });
-      if(ta.parentNode) ta.parentNode.insertBefore(bar, ta.nextSibling); else editor.appendChild(bar);
-    }
-    back.setAttribute("data-layer-recovery-emoji","1");
-  }
-  function layerRecoveryKeepMobileHubAlive(){
-    if(!parityIsMobile()) return;
-    parityMountMobileHub();
-    parityBindMobileEqTriggers();
-    layerRecoveryInstallMobileMessageEmoji();
-    var hub = qs("#s666ParityMobileHub");
-    if(hub){
-      hub.style.display="flex";
-      hub.style.pointerEvents="auto";
-      hub.setAttribute("data-layer-recovery-active","1");
-    }
-  }
-  function layerRecoveryBindLateEqTriggers(){
-    if(!parityIsMobile()) return;
-    ["#mffEqBars","#mffBottomBars",".mff-bottom-bars",".mff-eq-bars","#eqBars",".eq-bars","#pcRealEqPanel",".pc-real-eq-panel"].forEach(function(sel){
-      qsa(sel).forEach(function(el){
-        el.style.pointerEvents="auto";
-        el.style.cursor="pointer";
-        el.setAttribute("title", el.getAttribute("title") || "Tap for manual EQ / Sound Control");
-      });
-    });
-  }
-  function startLayerRecoveryCodexFeaturesV1(){
-    layerRecoveryKeepMobileHubAlive();
-    layerRecoveryBindLateEqTriggers();
-    document.documentElement.setAttribute("data-layer-recovery-codex-features","v1");
-    setInterval(function(){
-      layerRecoveryKeepMobileHubAlive();
-      layerRecoveryBindLateEqTriggers();
-      layerRecoveryInstallMobileMessageEmoji();
-    }, 1200);
-  }
-
   // FORCED_UI_IMPLEMENTATION_V1_20260530
   function forcedUiApplyV1(){
     var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent="v2026.05.30-forced-ui1";
     var brand=qs("#phase10BrandLine"); if(brand){brand.textContent="";brand.hidden=true;brand.style.display="none";}
-    var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=v36.2.1-2026-06-05-remove-bad-custom-header");
+    var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530");
     if(typeof hardfixMoveLedsBehindDj==="function") hardfixMoveLedsBehindDj();
     var dj=qs("#djText")?qs("#djText").closest(".info-card"):null, led=qs("#phase10StatusLedCard");
     if(dj&&led&&led.previousElementSibling!==dj) dj.parentNode.insertBefore(led,dj.nextSibling);
@@ -1036,6 +968,31 @@ RULES:
   }
   function startIphoneAudioStabilityGuardV2(){ startCentralAudioStabilityGuardV2(); }
 
+
+  // STABLE_WATCHDOG_MERGE_V1_20260604
+  function stableWatchdogMergeV1(){
+    document.documentElement.setAttribute("data-stable-watchdog-merge-v1","active");
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.06.04-stable-watchdog-merge1";
+
+    // Diagnose-HUD nur ergänzen, keine Stream-Logik ändern.
+    if(!qs("#streamWatchdogHud")){
+      var hud = document.createElement("div");
+      hud.id = "streamWatchdogHud";
+      hud.className = "stream-watchdog-hud";
+      hud.innerHTML = '<span class="stream-watchdog-chip" data-kind="audio">AUDIO</span><span class="stream-watchdog-chip" data-kind="stream">STREAM</span><span class="stream-watchdog-chip" data-kind="network">NET</span>';
+      document.body.appendChild(hud);
+    }
+
+    // Codex Watchdog starten, falls es eine globale Startfunktion bereitstellt.
+    try {
+      if(window.StreamWatchdogV1 && typeof window.StreamWatchdogV1.start === "function") window.StreamWatchdogV1.start();
+      if(typeof startStreamWatchdogV1 === "function") startStreamWatchdogV1();
+    } catch(e) {
+      document.documentElement.setAttribute("data-stream-watchdog-boot-error", String(e && e.message || e).slice(0,120));
+    }
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -1045,9 +1002,9 @@ RULES:
     hardfixForceMainOnlyPc();
     uiFinetuneV1();
     iphonePcParityV1();
-    startLayerRecoveryCodexFeaturesV1();
     forcedUiApplyV1();
     startSideMeterReactV1();
+    stableWatchdogMergeV1();
     startIphoneAudioStabilityGuardV2();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
@@ -1071,9 +1028,6 @@ RULES:
       directfixRestoreStatusLeds();
       directfixPcNoAutoFallback();
       directfixTickerAndMessage();
-      layerRecoveryKeepMobileHubAlive();
-      layerRecoveryBindLateEqTriggers();
-      layerRecoveryInstallMobileMessageEmoji();
       hardfixInstallManualBackupFlag();
       hardfixMoveLedsBehindDj();
       hardfixTickerNoEmptyGap();

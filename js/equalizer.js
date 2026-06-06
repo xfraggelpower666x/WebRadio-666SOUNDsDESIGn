@@ -10,18 +10,16 @@ ZWECK: Stabiler Frequency-Mapping Fix für Desktop.
 */
 
 function v27StableMapping(dataArray, bars){
-  // v35.5 REBASE FIX:
-  // Alte Version rief sich innerhalb der for-Schleife selbst auf und konnte bei Aktivierung
-  // in eine Endlosrekursion laufen. Diese Funktion bleibt als Kompatibilitätsanker erhalten,
-  // schreibt aber nur Werte in vorhandene Bars und startet keinen zweiten Visualizer-Layer.
-  if (!dataArray || !bars || !bars.length) return;
-  const step = Math.max(1, Math.floor(dataArray.length / bars.length));
+  if (!dataArray || !bars) return;
+
+  const step = Math.floor(dataArray.length / bars.length);
+
   for (let i = 0; i < bars.length; i++) {
-    const index = Math.min(dataArray.length - 1, i * step);
+    const index = i * step;
     const value = dataArray[index] || 0;
-    const height = Math.max(12, Math.min(100, value * 0.55));
-    const bar = bars[i];
-    if (bar && bar.style) bar.style.setProperty('--eq-level', String(height / 100));
+
+    const height = Math.max(12, value * 0.6);
+    v27StableMapping(dataArray, bars);
   }
 }
 
@@ -322,11 +320,10 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   };
 
   const setBoostStage = (stage = 0) => {
-    const profile = window.SMFPBoostCore ? window.SMFPBoostCore.getProfileName() : 'mobile';
-    const nextStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage, profile) : clamp(Number(stage) || 0, 0, BOOST_MULTIPLIERS.length - 1);
+    const nextStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(stage) : clamp(Number(stage) || 0, 0, BOOST_MULTIPLIERS.length - 1);
     boostStage = nextStage;
 
-    const targetGain = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage, profile) : BOOST_MULTIPLIERS[boostStage];
+    const targetGain = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
     let graphState = gainNode ? 'GRAPH_OK' : 'GRAPH_WAIT';
     let appliedGain = targetGain;
 
@@ -372,7 +369,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       } catch (err) {}
     }
 
-    try { if (window.SMFPBoostCore) { window.SMFPBoostCore.saveStage(boostStage, profile); window.SMFPBoostCore.publish(boostStage, targetGain, 'equalizer', profile); } } catch (err) {}
+    try { if (window.SMFPBoostCore) { window.SMFPBoostCore.saveStage(boostStage); window.SMFPBoostCore.publish(boostStage, targetGain, 'equalizer'); } } catch (err) {}
     return boostStage;
   };
 
@@ -397,7 +394,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     data = new Uint8Array(analyser.frequencyBinCount);
 
     gainNode = ctx.createGain();
-    gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage, window.SMFPBoostCore.getProfileName()) : BOOST_MULTIPLIERS[boostStage];
+    gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
     const eqNodes = createRealEqNodes(ctx);
 
     source = ctx.createMediaElementSource(audio);
@@ -506,10 +503,10 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         idleState();
       },
       setBoostStage: (stage = 0) => {
-        boostStage = window.SMFPBoostCore ? window.SMFPBoostCore.clampStage(Number(stage)||0, window.SMFPBoostCore.getProfileName()) : clamp(Number(stage) || 0, 0, BOOST_MULTIPLIERS.length - 1);
+        boostStage = clamp(Number(stage) || 0, 0, BOOST_MULTIPLIERS.length - 1);
         if (audio) {
           audio.dataset.boostStage = String(boostStage);
-          audio.dataset.boostGain = String(window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage, window.SMFPBoostCore.getProfileName()) : BOOST_MULTIPLIERS[boostStage]);
+          audio.dataset.boostGain = String(window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]);
         }
         return boostStage;
       },
