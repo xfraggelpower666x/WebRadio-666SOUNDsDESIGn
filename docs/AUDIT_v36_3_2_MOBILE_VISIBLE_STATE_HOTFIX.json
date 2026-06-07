@@ -1,7 +1,0 @@
-{
-  "version": "v36.3.2",
-  "cacheBurst": "v36.3.2-2026-06-05-mobile-visible-state-hotfix",
-  "status": "PASS",
-  "task": "HOTFIX_MOBILE_VISIBLE_STATE_VERSION_EQ_TITLE",
-  "workerChanged": false
-}

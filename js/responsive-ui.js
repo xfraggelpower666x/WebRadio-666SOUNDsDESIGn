@@ -59,37 +59,12 @@ export function installResponsiveHelpers(historyToggle, historyPanel) {
     if (event.key === 'Escape') setHistoryOpen(false);
   });
 
-  const isTouchPhone = () => {
-    const ua = navigator.userAgent || '';
-    const smallCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches && Math.min(window.innerWidth, window.innerHeight) <= 860;
-    return /iPhone|iPod|Android.*Mobile/i.test(ua) || smallCoarse;
-  };
-
   const setMode = () => {
-    const mobile = isTouchPhone();
-    document.body.dataset.device = mobile ? 'mobile' : 'desktop';
-    updatePcStageScale();
-  };
-
-  const updatePcStageScale = () => {
-    const stage = document.querySelector('.frame-stage');
-    if (!stage) return;
-    if (document.body.dataset.device === 'mobile') {
-      document.documentElement.style.setProperty('--pc-stage-scale', '1');
-      return;
-    }
-    const designW = 1440;
-    const designH = 900;
-    const margin = 16;
-    const scale = Math.min(1, Math.max(0.35, (window.innerWidth - margin) / designW, 0.35), Math.max(0.35, (window.innerHeight - margin) / designH, 0.35));
-    document.documentElement.style.setProperty('--pc-stage-scale', String(scale.toFixed(4)));
-    document.documentElement.style.setProperty('--pc-stage-width', designW + 'px');
-    document.documentElement.style.setProperty('--pc-stage-height', designH + 'px');
+    document.body.dataset.device = window.innerWidth <= 860 ? 'mobile' : 'desktop';
   };
 
   setMode();
   window.addEventListener('resize', setMode);
-  window.addEventListener('orientationchange', setMode);
 }
 
 

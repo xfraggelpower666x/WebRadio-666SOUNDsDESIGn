@@ -5,8 +5,7 @@ PURPOSE: Protected admin overlay.
 */
 (function(){
   "use strict";
-  const PW_LOGIN_URL="https://666-system-pw.666soundsdesign-broadcaster.com/login";
-  const AUTH_VERIFY_URL="https://666-system-auth.666soundsdesign-broadcaster.com/verify";
+  const AUTH_LOGIN_URL="https://666-system-auth.666soundsdesign-broadcaster.com/login";
   const PW_HEALTH_URL="https://666-system-pw.666soundsdesign-broadcaster.com/health";
   const AUTH_HEALTH_URL="https://666-system-auth.666soundsdesign-broadcaster.com/health";
   const AUTH_DEBUG_URL="https://666-system-auth.666soundsdesign-broadcaster.com/debug";
@@ -21,43 +20,9 @@ PURPOSE: Protected admin overlay.
   const DISCORD_STATUS_URL="/api/discord/status";
   const $=id=>document.getElementById(id);
   let authOkCache=false,lastAuthCheck=0;
-  function loginUrl(){return `${PW_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;}
-  function getCookie(name){const raw=document.cookie||"";for(const part of raw.split(";").map(v=>v.trim())){const eq=part.indexOf("=");if(eq>-1&&part.slice(0,eq)===name)return decodeURIComponent(part.slice(eq+1));}return""}
-  function storeAuthToken(token){if(!token)return;const secure=location.protocol==="https:"?"; Secure":"";document.cookie=`chaos_auth=${encodeURIComponent(token)}; Path=/; SameSite=Lax${secure}; Max-Age=86400`;try{sessionStorage.setItem("chaos_auth",token)}catch(_){}}
-  function readStoredToken(){try{return sessionStorage.getItem("chaos_auth")||getCookie("chaos_auth")||""}catch(_){return getCookie("chaos_auth")||""}}
-  async function localAdminLogin(){
-    const password=window.prompt("Admin Passwort eingeben");
-    if(!password)return false;
-    try{
-      const res=await fetch(PW_LOGIN_URL,{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",body:JSON.stringify({password})});
-      const data=await res.json().catch(()=>({ok:false,error:"bad-json"}));
-      const token=data.token||data.access_token||data.session||data.authToken||"";
-      if(token)storeAuthToken(token);
-      const verifyToken=token||readStoredToken();
-      const verified=verifyToken?await authorityCoreVerifyToken(verifyToken):data;
-      authOkCache=!!(verified&&verified.ok);
-      lastAuthCheck=Date.now();
-      const out=$("fp-admin-debug-output")||$("fp-admin-auth-output");
-      if(out)out.textContent=JSON.stringify({login:data,verify:verified},null,2);
-      if(!authOkCache)alert("Admin Login nicht bestätigt.");
-      return authOkCache;
-    }catch(e){alert("Admin Login Fehler: "+(e&&e.message?e.message:String(e)));return false;}
-  }
-  async function goLogin(){return await localAdminLogin();}
-  
-  // ADMIN_AUTHORITY_CORE_FIX_V1_20260604
-  async function authorityCoreVerifyToken(token){
-    if(!token) return {ok:false,error:"token-missing"};
-    const res = await fetch(AUTH_VERIFY_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
-      body:JSON.stringify({token})
-    });
-    const data = await res.json().catch(()=>({ok:false,error:"bad-json"}));
-    return data;
-  }
-
-async function fetchJson(url,options){
+  function loginUrl(){return `${AUTH_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;}
+  function goLogin(){window.location.href=loginUrl();}
+  async function fetchJson(url,options){
     const res=await fetch(url,Object.assign({credentials:"include",cache:"no-store"},options||{}));
     const text=await res.text();let data;try{data=JSON.parse(text)}catch{data={ok:false,raw:text}};
     data.__status=res.status;if(!res.ok)data.ok=false;return data;
@@ -67,7 +32,7 @@ async function fetchJson(url,options){
     try{const data=await fetchJson("/api/admin/auth-check?t="+Date.now());authOkCache=!!data.ok;lastAuthCheck=now;const out=$("fp-admin-debug-output");if(out)out.textContent=JSON.stringify(data,null,2);return authOkCache}
     catch(e){authOkCache=false;const out=$("fp-admin-debug-output");if(out)out.textContent="Auth check failed: "+(e&&e.message?e.message:String(e));return false}
   }
-  async function requireAuth(){const ok=await checkAuth(true);if(ok)return true;return await localAdminLogin()}
+  async function requireAuth(){const ok=await checkAuth(true);if(!ok){goLogin();return false}return true}
   function ensureOverlay(){
     if($("fp-admin-overlay"))return;
     const root=document.createElement("div");root.id="fp-admin-overlay";root.className="fp-admin-overlay fp-admin-hidden";
@@ -233,14 +198,3 @@ async function fetchJson(url,options){
   window.FPAdminOverlay={mount:mountAdminButton,open:openAdminOverlay,close:closeAdminOverlay,checkAuth};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mountAdminButton);else mountAdminButton();
 })();
-
-
-  // ADMIN_AUTHORITY_CORE_OPEN_FIX_V1_20260604
-  window.S666AdminOverlay = window.S666AdminOverlay || {};
-  window.S666AdminOverlay.open = function(){
-    const b = document.querySelector("#fp-admin-open,.fp-admin-open,[data-admin-open],#adminButton,#adminBtn");
-    if(b){ b.click(); return true; }
-    const root = document.querySelector("#fp-admin-overlay,.fp-admin-overlay");
-    if(root){ root.classList.remove("fp-admin-hidden"); root.hidden = false; return true; }
-    return false;
-  };
