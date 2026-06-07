@@ -14,7 +14,6 @@
     {key:'wrk', id:'statusWorker', code:'WRK', label:'Worker', tip:'Cloudflare Worker / Player Runtime erreichbar'},
     {key:'wch', id:'statusWatchdog', code:'WCH', label:'Watchdog', tip:'Stream Watchdog Diagnose aktiv'},
     {key:'str', id:'statusStream', code:'STR', label:'Stream', tip:'Audiostream läuft'},
-    {key:'main', id:'mainBtn', code:'MAIN', label:'Mainstream', tip:'Hauptstream aktiv / Main Only'},
     {key:'dsc', id:'statusDiscord', code:'DSC', label:'Discord', tip:'Discord Posting / Shooter Status'},
     {key:'gov', id:'statusGovee', code:'GOV', label:'GOVEE', tip:'GOVEE FX / Scene Sync'},
     {key:'art', id:'statusArtwork', code:'ART', label:'Artwork', tip:'Streambild / Trackbild System'}
@@ -84,7 +83,6 @@
     stateLed('met', document.getElementById('statusMeta')?.className || (document.getElementById('djText')?'ok':'warn'), 'Metadatenstatus');
     stateLed('src', document.getElementById('statusSource')?.className || 'active','Streamquelle erkannt');
     stateLed('str', /playing|live/i.test(playerState)?'ok':(document.querySelector('audio')&&!document.querySelector('audio').paused?'ok':'warn'), 'Streamstatus');
-    stateLed('main','ok','Mainstream aktiv / Backup nur manuell');
     stateLed('wch', watchdog ? (/error|stall/i.test(watchdog)?'warn':'ok') : (html.getAttribute('data-stream-watchdog-v1')?'active':'warn'), 'Stream Watchdog: '+(watchdog||'warte auf Diagnose'));
     stateLed('gov', govee ? (/error/i.test(govee)?'error':/sync|connected/i.test(govee)?'ok':'warn') : 'warn', 'GOVEE FX / Scene Sync: '+(govee||'wartet'));
     stateLed('dsc', document.querySelector('[data-discord-addon-slot]')?'active':'warn','Discord Shooter / Posting bereit');

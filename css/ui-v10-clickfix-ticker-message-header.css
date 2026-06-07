@@ -1,0 +1,85 @@
+/* ============================================================
+   666SOUNDsDESIGn — v10 Clickfix / Ticker / LED / Message / Header Repair
+   Nur aktive Layer reparieren. Keine Parallel-UI.
+   ============================================================ */
+:root{--s666-header-h-v10:clamp(82px,9.2vh,118px);--s666-chip-h-v10:26px;--s666-cyan:#28fff4;--s666-pink:#ff3dbb;--s666-green:#60ff9b;--s666-red:#ff315d;}
+
+/* CLICKFIX HARDLOCK: dekorative Flächen dürfen niemals Transport/Message blockieren. */
+.frame-overlay,.s666-player-header,.s666-player-header *,.s666-header-brandline,.s666-header-status-row,
+.pc-side-addon,.pc-side-addon::before,.pc-side-addon::after,.pc-addon-tower::before,.pc-addon-tower::after,
+.pc-addon-module::before,.pc-addon-module::after,.pc-bottom-sync-meter,.pc-bottom-sync-meter *,
+#pcCopyrightFooter,.phase10-now-version,.smfp-version-badge,.mff-side,.mff-side::before,.mff-side::after{pointer-events:none!important;}
+.player-shell,.bottom-console,.control-toolbar,.control-toolbar *,#playBtn,#pauseBtn,#stopBtn,#reconnectBtn,
+.volume-wrap,.volume-wrap *,#volumeSlider,.timeline-wrap,.top-hud,.top-hud button,.top-hud [role="button"],
+.now-playing,#historyToggle,#playerAlertPcBox,#playerAlertPcText,#playerAlertPcSend,.player-alert-pc-box *,
+#historyPanel,#historyPanel *,#mffApp .mff-controls,#mffApp .mff-controls *,#mffApp .mff-alert-row,#mffApp .mff-alert-row *,
+#smfpMobileEqOverlay.is-open,#smfpMobileEqOverlay.is-open *,#fp-admin-overlay:not(.fp-admin-hidden),#fp-admin-overlay:not(.fp-admin-hidden) *{pointer-events:auto!important;touch-action:manipulation!important;}
+.player-shell{position:relative!important;z-index:100!important;}
+.bottom-console{position:relative!important;z-index:10000!important;isolation:isolate!important;}
+.control-toolbar{position:relative!important;z-index:10020!important;}
+.control-toolbar .icon-btn{position:relative!important;z-index:10030!important;cursor:pointer!important;}
+.volume-wrap{position:relative!important;z-index:10020!important;}
+
+/* Header: breit nutzen, Höhe kontrollieren, Brandline unter dem Bild statt drübergeklatscht. */
+.s666-player-header{height:var(--s666-header-h-v10)!important;min-height:82px!important;max-height:118px!important;margin:0 auto 4px!important;border-radius:18px!important;overflow:visible!important;background:rgba(3,8,20,.62)!important;border:1px solid rgba(40,255,244,.22)!important;box-shadow:0 0 24px rgba(40,255,244,.10),0 0 28px rgba(255,61,187,.12)!important;}
+.s666-player-header-banner{width:100%!important;height:calc(100% - 19px)!important;object-fit:fill!important;object-position:center center!important;border-radius:16px 16px 9px 9px!important;display:block!important;filter:saturate(1.12) contrast(1.03) brightness(1.05)!important;}
+.s666-header-brandline{position:absolute!important;left:8px!important;right:8px!important;bottom:0!important;height:18px!important;min-height:18px!important;max-height:18px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;padding:0 9px!important;border-radius:0 0 14px 14px!important;border:1px solid rgba(255,61,187,.36)!important;background:linear-gradient(90deg,rgba(255,61,187,.24),rgba(40,255,244,.10),rgba(255,61,187,.20))!important;color:#eaffff!important;font-size:clamp(8px,.68vw,10px)!important;line-height:1!important;letter-spacing:.07em!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+.s666-header-brandline b{color:var(--s666-cyan)!important;}
+
+/* PC Topbereich: Listener/Bitrate/DJ kompakt links, System-LEDs rechts. */
+.info-grid{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;min-height:34px!important;margin:4px 0 5px!important;padding:0!important;overflow:hidden!important;}
+.info-grid .info-card{height:30px!important;min-height:30px!important;max-height:30px!important;flex:0 1 auto!important;min-width:86px!important;max-width:190px!important;padding:3px 8px!important;border-radius:13px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;}
+.info-grid .info-label{font-size:8px!important;line-height:1!important;letter-spacing:.08em!important;margin:0!important;white-space:nowrap!important;color:var(--s666-cyan)!important;}
+.info-grid .info-value{font-size:11px!important;line-height:1!important;margin:0!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+#phase10StatusLedCard,.pc-addon-toggle-card{display:none!important;visibility:hidden!important;height:0!important;width:0!important;margin:0!important;padding:0!important;overflow:hidden!important;}
+.top-hud.systempanel-v74{min-height:34px!important;max-height:40px!important;padding:3px 7px!important;overflow:hidden!important;}
+.systempanel-grid-v74{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;align-items:center!important;gap:6px!important;}
+.systempanel-left{justify-content:flex-start!important;gap:5px!important;overflow:hidden!important;}
+.systempanel-center{justify-content:center!important;gap:5px!important;}
+.systempanel-right{justify-content:flex-end!important;gap:5px!important;}
+.status-chip.s666-status-chip,.mff-panel-led.s666-status-chip,.top-hud .status-chip{height:var(--s666-chip-h-v10)!important;min-height:var(--s666-chip-h-v10)!important;max-height:var(--s666-chip-h-v10)!important;min-width:42px!important;max-width:64px!important;padding:0 6px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;line-height:1!important;}
+.s666-info-chip{height:var(--s666-chip-h-v10)!important;min-height:var(--s666-chip-h-v10)!important;max-height:var(--s666-chip-h-v10)!important;}
+[data-status="main"],#mffStatus_main{display:none!important;}
+
+/* LED-Farblogik wirklich sichtbar anwenden. */
+.s666-state-active,.state-active{color:var(--s666-cyan)!important;border-color:rgba(40,255,244,.72)!important;box-shadow:0 0 14px rgba(40,255,244,.34),inset 0 0 10px rgba(40,255,244,.08)!important;}
+.s666-state-ok,.state-ok,.state-main,.state-api{color:var(--s666-green)!important;border-color:rgba(96,255,155,.78)!important;box-shadow:0 0 14px rgba(96,255,155,.32),inset 0 0 10px rgba(96,255,155,.08)!important;}
+.s666-state-warn,.state-warning,.state-warn,.state-meter,.state-external{color:var(--s666-pink)!important;border-color:rgba(255,61,187,.78)!important;box-shadow:0 0 14px rgba(255,61,187,.34),inset 0 0 10px rgba(255,61,187,.08)!important;}
+.s666-state-error,.state-error,.state-stopped{color:var(--s666-red)!important;border-color:rgba(255,49,93,.82)!important;box-shadow:0 0 16px rgba(255,49,93,.34),inset 0 0 10px rgba(255,49,93,.08)!important;}
+.s666-state-off,.state-off{color:rgba(210,225,245,.72)!important;border-color:rgba(210,225,245,.28)!important;box-shadow:none!important;}
+.status-dot,.s666-status-chip .status-dot,.mff-panel-led.s666-status-chip i{background:currentColor!important;box-shadow:0 0 8px currentColor,0 0 14px currentColor!important;}
+
+/* Ticker zurück: sichtbare Laufschrift-Bahn im aktiven Now-Playing-Layer. */
+.now-playing .ticker-window{display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;z-index:80!important;width:100%!important;min-width:0!important;height:36px!important;min-height:36px!important;max-height:36px!important;align-items:center!important;overflow:hidden!important;border:1px solid rgba(40,255,244,.32)!important;border-radius:13px!important;background:rgba(3,8,22,.56)!important;margin:5px 0!important;padding:0!important;}
+#nowPlayingTicker,.now-playing .ticker-text{display:inline-block!important;visibility:visible!important;opacity:1!important;width:max-content!important;min-width:100%!important;height:36px!important;line-height:36px!important;white-space:nowrap!important;padding-left:100%!important;margin:0!important;color:var(--s666-cyan)!important;font-size:clamp(11px,.86vw,14px)!important;font-weight:900!important;letter-spacing:.055em!important;text-shadow:0 0 8px rgba(40,255,244,.68),0 0 12px rgba(255,61,187,.18)!important;animation:s666v10Ticker 24s linear infinite!important;}
+#nowPlayingTicker:empty::after{content:'666SOUNDsDESIGn WebRadio  •  Cyberstream Cockpit Edition  •  Alive in the frequency';}
+@keyframes s666v10Ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+
+/* Message-/History-Leiste: LOG HST MSG [breites Feld] SEND. */
+.now-playing{position:relative!important;overflow:visible!important;}
+.now-playing .section-topline{display:grid!important;grid-template-columns:minmax(150px,.75fr) auto minmax(330px,1.6fr) auto!important;grid-template-areas:'title hist msg send'!important;gap:7px!important;align-items:center!important;min-height:44px!important;}
+.now-playing .section-topline>div:first-child{grid-area:title!important;min-width:0!important;}
+#historyToggle{grid-area:hist!important;position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:58px!important;min-width:58px!important;height:34px!important;min-height:34px!important;max-height:34px!important;margin:0!important;z-index:10050!important;}
+#playerAlertPcBox{grid-area:msg!important;position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:100%!important;max-width:none!important;height:38px!important;min-height:38px!important;display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:6px!important;padding:0!important;margin:0!important;z-index:10050!important;}
+#playerAlertPcText{width:100%!important;max-width:none!important;min-width:260px!important;height:38px!important;min-height:38px!important;max-height:38px!important;padding:7px 10px!important;font-size:12px!important;line-height:15px!important;color:#fff!important;background:rgba(2,6,18,.86)!important;border:1px solid rgba(40,255,244,.44)!important;border-radius:13px!important;resize:none!important;overflow:auto!important;}
+#playerAlertPcText::placeholder{color:rgba(220,245,255,.72)!important;}
+#playerAlertPcSend{height:34px!important;min-height:34px!important;width:62px!important;min-width:62px!important;border-radius:13px!important;font-size:10px!important;}
+#playerAlertPcBox::before{content:'MSG';display:inline-flex!important;align-items:center!important;justify-content:center!important;position:absolute!important;left:-45px!important;top:2px!important;width:39px!important;height:34px!important;border:1px solid rgba(255,61,187,.55)!important;border-radius:13px!important;color:var(--s666-pink)!important;background:rgba(7,8,22,.86)!important;font-size:10px!important;font-weight:950!important;letter-spacing:.08em!important;}
+
+/* Untere Version/Symbol-Zone: kleine Tool-Icons dürfen dort sitzen, aber nicht dominieren. */
+#phase10NowVersion,.phase10-now-version{position:relative!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;min-height:22px!important;max-height:26px!important;z-index:40!important;pointer-events:none!important;}
+.pc-version-badge{height:20px!important;min-height:20px!important;max-height:20px!important;font-size:8px!important;opacity:.88!important;}
+
+/* Mobile Stage bleibt starr; Overlays scrollen intern und vergrößern nicht den Player. */
+@media(max-width:760px){
+  html,body{width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;overflow:hidden!important;position:fixed!important;inset:0!important;}
+  #mffApp{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;overflow:hidden!important;}
+  #mffApp .mff-shell{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;}
+  #mffApp .mff-cyber-header{height:clamp(50px,9dvh,76px)!important;min-height:50px!important;max-height:76px!important;overflow:visible!important;}
+  #mffApp .mff-cyber-header img{width:100%!important;height:calc(100% - 14px)!important;object-fit:fill!important;}
+  #mffApp .mff-header-brandline{bottom:0!important;height:13px!important;min-height:13px!important;max-height:13px!important;font-size:6px!important;}
+  #mffApp .mff-panel-led-panel{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;height:32px!important;min-height:32px!important;max-height:32px!important;}
+  #mffApp .mff-panel-led,#mffApp .s666-status-chip{height:28px!important;min-height:28px!important;max-height:28px!important;min-width:0!important;width:100%!important;max-width:none!important;padding:0 2px!important;}
+  #mffStatus_main,[data-status="main"]{display:none!important;}
+  #mffAlertEditor,#smfpMobileEqOverlay,.fp-admin-overlay,.s666-discord-gate,.s666-discord-denied,.smfp-msg-history-backdrop{position:fixed!important;inset:0!important;max-width:100vw!important;max-height:100dvh!important;overflow:auto!important;overscroll-behavior:contain!important;}
+}
