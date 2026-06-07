@@ -494,11 +494,11 @@ function updateHistory(title) {
 
 
 function getDefaultDjName() {
-  return '666SOUNDsDESIGn DJ';
+  return 'DJ 666';
 }
 
 function normalizeDjName(raw) {
-  const fallback = '666SOUNDsDESIGn DJ';
+  const fallback = 'DJ 666';
   const value = String(raw || '').trim();
   if (!value) return fallback;
   const lowered = value.toLowerCase();
@@ -791,28 +791,35 @@ function keepControlsUnlocked() {
 }
 
 async function playCurrent() {
+  // v12b_PLAYER_CORE_ONLY_FIX:
+  // Repariert ausschließlich den aktiven PC-Transportpfad in player-core.js.
+  // Kein neuer Layer, keine neue Datei, kein Auto-Backup bei Main-Fehler.
   keepControlsUnlocked();
   userStopped = false;
+
   try {
-    document.body?.classList.remove('is-stopped','is-paused');
+    document.body?.classList.remove('is-stopped', 'is-paused');
     document.body?.classList.add('is-playing');
-    document.body?.setAttribute('data-player-state','playing');
-    document.documentElement?.setAttribute('data-player-state','playing');
+    document.body?.setAttribute('data-player-state', 'playing');
+    document.documentElement?.setAttribute('data-player-state', 'playing');
   } catch (err) {}
+
   const token = ++playRequestToken;
-  setDesktopTickerLoadingV113();
   const target = currentSource === 'main' ? ENDPOINTS.main : ENDPOINTS.fallback;
 
+  setDesktopTickerLoadingV113();
   setStatus(currentSource === 'main' ? 'STARTING MAIN' : 'STARTING BACKUP');
   setActivePanelLeds();
-  prepareAudioElementForFreshPlay(target, audioSelfHealStopAt ? 'stop-to-play' : 'fresh-play');
-  if (audio.getAttribute('src') !== target) audio.src = target;
-  audio.load();
 
   try {
+    prepareAudioElementForFreshPlay(target, audioSelfHealStopAt ? 'stop-to-play' : 'fresh-play');
+    if (audio.getAttribute('src') !== target) audio.src = target;
+    audio.load();
+
     lockVisualStage();
     await playAudioWithTimeout(token);
     if (token !== playRequestToken || userStopped) return;
+
     await visualizer.start?.();
     setBoostStage(currentBoostStage);
     window.setTimeout(() => {
@@ -821,28 +828,29 @@ async function playCurrent() {
         setBoostStage(currentBoostStage);
       }
     }, 450);
+
     setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
     setDesktopTransportState('play');
     setActivePanelLeds();
     startMetadataLoop();
   } catch (err) {
-    keepControlsUnlocked();
     if (token !== playRequestToken || userStopped) return;
 
     if (currentSource === 'main') {
-      // V7_MAIN_ONLY_LOCK: kein automatischer Wechsel auf Backup. Backup bleibt manuell per B-Button.
+      // MAIN ONLY LOCK: Kein automatischer Wechsel auf Backup.
       applyStatusChip(statusStream, 'warn', 'Mainstream nicht erreichbar. Backup bleibt manuell.');
       setStatus('MAIN ERROR · BACKUP MANUAL');
-      visualizer.stop?.();
     } else {
       applyStatusChip(statusStream, 'warn', 'Backup Stream nicht erreichbar');
       setStatus('BACKUP ERROR');
-      visualizer.stop?.();
     }
+
+    try { visualizer.stop?.(); } catch (visualErr) {}
   } finally {
-        switchingStream = false;
-      }
-    } else {
+    switchingStream = false;
+    keepControlsUnlocked();
+  }
+} else {
       applyStatusChip(statusStream, 'warn', 'Audio-Start hängt oder Stream nicht erreichbar');
       setStatus('AUDIO TIMEOUT');
       visualizer.stop?.();
