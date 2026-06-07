@@ -1318,6 +1318,133 @@ RULES:
     if(v) v.textContent = "v2026.06.04-side-meter-stair-v1";
   }
 
+
+  // CURRENT_FULL_PATCH_CLEAN_V1_20260604
+  function currentFullPatchCleanV1(){
+    document.documentElement.setAttribute("data-current-full-patch-clean-v1","active");
+
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.06.04-current-full-patch-clean-v1";
+
+    // Admin-Button PC+iPhone defensiv ergänzen.
+    var adminBtn = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
+    if(!adminBtn){
+      var host = qs("#s666ParityMobileHub") || qs(".panel-actions") || qs(".info-grid") || qs(".now-playing") || document.body;
+      adminBtn = document.createElement("button");
+      adminBtn.type = "button";
+      adminBtn.id = "fp-admin-open";
+      adminBtn.className = "fp-admin-open s666-admin-authority-button";
+      adminBtn.setAttribute("data-admin-open","1");
+      adminBtn.textContent = "ADMIN";
+      if(host.id === "s666ParityMobileHub") host.appendChild(adminBtn);
+      else if(host.parentNode && host !== document.body) host.parentNode.insertBefore(adminBtn, host.nextSibling);
+      else document.body.appendChild(adminBtn);
+    }
+
+    qsa("[data-phase10-mobile='admin'],[data-parity-action='admin']").forEach(function(btn){
+      if(btn.__currentAdminBound) return;
+      btn.__currentAdminBound = true;
+      btn.addEventListener("click", function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        if(window.S666AdminOverlay && typeof window.S666AdminOverlay.open === "function") window.S666AdminOverlay.open();
+        else {
+          var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]");
+          if(b) b.click();
+        }
+      }, true);
+    });
+
+    // Emoji-Leiste fürs Messagefeld.
+    var text = qs("#playerAlertPcText") || qs(".player-alert-pc-text") || qs("#playerAlertMobileText") || qs(".player-alert-mobile-text") || qs("textarea[name='message']") || qs("textarea[data-message]") || qs("textarea");
+    if(text && !qs("#phase10EmojiBar")){
+      var bar = document.createElement("div");
+      bar.id = "phase10EmojiBar";
+      bar.className = "phase10-emoji-bar s666-message-emoji-bar";
+      ["🔥","⚡","🎧","🎶","🖤","💜","💙","💥","🚀","🌌","👽","😈","🤘","🫶","✨","🔊"].forEach(function(e){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("data-emoji", e);
+        b.textContent = e;
+        bar.appendChild(b);
+      });
+      text.parentNode.insertBefore(bar, text.nextSibling);
+      bar.addEventListener("click", function(ev){
+        var b = ev.target.closest && ev.target.closest("[data-emoji]");
+        if(!b) return;
+        ev.preventDefault();
+        var emoji = b.getAttribute("data-emoji") + " ";
+        var s = typeof text.selectionStart === "number" ? text.selectionStart : text.value.length;
+        var e = typeof text.selectionEnd === "number" ? text.selectionEnd : s;
+        text.value = text.value.slice(0,s) + emoji + text.value.slice(e);
+        var pos = s + emoji.length;
+        try{ text.focus(); text.setSelectionRange(pos,pos); }catch(_e){}
+        text.dispatchEvent(new Event("input", {bubbles:true}));
+      }, true);
+    }
+
+    // Source/Worker/Watchdog LEDs defensiv ergänzen.
+    var card = qs("#phase10StatusLedCard") || qs(".phase10-status-led-card") || qs(".info-grid");
+    if(card){
+      var row = qs("#phase10StatusLedRow") || qs(".phase10-status-led-row");
+      if(!row){
+        row = document.createElement("div");
+        row.id = "phase10StatusLedRow";
+        row.className = "phase10-status-led-row";
+        card.appendChild(row);
+      }
+      function led(id,label,kind){
+        var el = qs("#"+id);
+        if(!el){
+          el = document.createElement("span");
+          el.id = id;
+          el.className = "status-chip s666-restored-led";
+          el.setAttribute("data-led-kind", kind);
+          el.innerHTML = '<b class="led-dot"></b><span>'+label+'</span>';
+          row.appendChild(el);
+        }
+        return el;
+      }
+      var source = led("statusSource","SOURCE","source");
+      var worker = led("statusWorker","WORKER","worker");
+      var watchdog = led("statusWatchdog","WATCH","watchdog");
+      var a = (typeof getAudio === "function" && getAudio()) || document.querySelector("audio");
+      source.setAttribute("data-led-state", a && (a.currentSrc || a.getAttribute("src")) ? "ok" : "bad");
+      worker.setAttribute("data-led-state", document.documentElement.getAttribute("data-central-audio-stability-v2") ? "ok" : "warn");
+      var wd = document.documentElement.getAttribute("data-stream-watchdog-state") || "ok";
+      watchdog.setAttribute("data-led-state", wd === "ok" ? "ok" : (wd === "recovering" ? "warn" : "bad"));
+    }
+
+    // Watchdog Start.
+    try{
+      if(window.StreamWatchdogV1 && typeof window.StreamWatchdogV1.start === "function") window.StreamWatchdogV1.start();
+      if(typeof startStreamWatchdogV1 === "function") startStreamWatchdogV1();
+    }catch(e){
+      document.documentElement.setAttribute("data-watchdog-start-error", String(e && e.message || e).slice(0,120));
+    }
+
+    // Side-Meter Treppe erzwingen: links 98/76/54, rechts 54/76/98.
+    qsa(".left-meter,.right-meter,.mff-left-meter,.mff-right-meter,.side-meter-left,.side-meter-right,[data-meter-side='left'],[data-meter-side='right'],[data-side-meter-react-v1='left'],[data-side-meter-react-v1='right'],[data-s666-stair-side-meter],.side-meter").forEach(function(group){
+      var r = group.getBoundingClientRect();
+      if(r.height < 70) return;
+      var side = group.getAttribute("data-meter-side") || group.getAttribute("data-side-meter-react-v1") || group.getAttribute("data-s666-stair-side-meter") || (r.left < window.innerWidth / 2 ? "left" : "right");
+      group.setAttribute("data-s666-stair-side-meter", side);
+      group.setAttribute("data-s666-side-meter-force-v2","active");
+      var bars = Array.prototype.slice.call(group.querySelectorAll("i,.bar,.meter-bar,.side-bar"));
+      if(bars.length < 3){
+        group.innerHTML = "<i></i><i></i><i></i>";
+        bars = Array.prototype.slice.call(group.querySelectorAll("i"));
+      }
+      bars.slice(0,3).forEach(function(bar,i){
+        var heights = side === "right" ? [54,76,98] : [98,76,54];
+        var h = heights[i] + "%";
+        bar.style.setProperty("height", h, "important");
+        bar.style.setProperty("min-height", h, "important");
+        bar.style.setProperty("max-height", h, "important");
+        bar.style.setProperty("align-self", "flex-end", "important");
+      });
+    });
+  }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -1333,6 +1460,7 @@ RULES:
     messageEmojiRestoreV1();
     adminAuthorityCoreMobileFixV1();
     startArtworkLedRestoreV1();
+    currentFullPatchCleanV1();
     sideMeterStairMirrorV1();
     startIphoneAudioStabilityGuardV2();
     directfixRestoreStatusLeds();
