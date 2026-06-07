@@ -1,0 +1,22 @@
+{
+  "audit": [
+    "worker.js node --check exit=0",
+    "js/phase10-stability-iphone-panel-hud.js node --check exit=0",
+    "js/sound-control-overlay-v1.js node --check exit=0",
+    "js/player-admin-overlay.js node --check exit=0",
+    "worker-addons/discord-notify-addon-v3.js node --check exit=0",
+    "Forced UI JS present: True",
+    "Forced UI CSS present: True",
+    "Build updated: True",
+    "Brand line hidden: True",
+    "Header logo enlarged: True",
+    "Info grid forced: True",
+    "LEDs behind DJ forced: True",
+    "Side meters mirrored: True",
+    "iPhone parity retained: True",
+    "Private Track Shooter retained: True",
+    "Main-only retained: True",
+    "Audio focus retained: True",
+    "Stream routes retained: True"
+  ]
+}

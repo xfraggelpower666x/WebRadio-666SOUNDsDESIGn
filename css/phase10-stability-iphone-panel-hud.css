@@ -569,3 +569,108 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 .ticker-window{min-height:32px!important;}
 #nowPlayingTicker,.ticker-text{color:#20f7ff!important;font-size:clamp(13px,1.05vw,18px)!important;animation-duration:48s!important;animation-timing-function:linear!important;text-shadow:0 0 10px rgba(32,247,255,.82),0 0 18px rgba(32,247,255,.28)!important;will-change:transform!important;}
 @media(max-width:760px){#pcHeaderBrandSplit.pc-header-brand-single{min-height:44px!important}#pcHeaderNewLogo{max-width:70vw!important;max-height:44px!important}.phase10-brand-line{font-size:9px!important;letter-spacing:.065em!important}}
+
+
+/* IPHONE_PC_PARITY_V1_20260530 */
+:root{--s666-current-build:"v2026.05.30-iphone-parity1";--s666-cache-burst:"iphone-pc-parity-v1-20260530";}
+@media(max-width:760px){
+  html[data-s666-mobile-parity="v1"],html[data-s666-mobile-parity="v1"] body{
+    width:100vw!important;max-width:100vw!important;height:100dvh!important;max-height:100dvh!important;
+    overflow:hidden!important;overscroll-behavior:none!important;-webkit-text-size-adjust:100%!important;touch-action:manipulation!important;
+  }
+  #mffApp,.player-shell{
+    width:100vw!important;max-width:100vw!important;min-width:0!important;height:100dvh!important;max-height:100dvh!important;
+    overflow:hidden!important;box-sizing:border-box!important;padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))!important;
+  }
+  .s666-parity-mobile-hub{
+    display:flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+    width:calc(100vw - 16px)!important;margin:5px auto!important;padding:5px 6px!important;
+    border:1px solid rgba(32,247,255,.28)!important;border-radius:16px!important;
+    background:rgba(3,7,20,.68)!important;box-shadow:inset 0 0 12px rgba(32,247,255,.08),0 0 10px rgba(255,63,215,.10)!important;
+    box-sizing:border-box!important;z-index:32!important;
+  }
+  .s666-parity-mobile-hub button{
+    flex:1 1 0!important;min-width:0!important;height:33px!important;min-height:33px!important;border-radius:11px!important;
+    border:1px solid rgba(32,247,255,.35)!important;background:linear-gradient(135deg,rgba(32,247,255,.16),rgba(255,63,215,.13))!important;
+    color:#eaf4ff!important;font-size:9px!important;font-weight:900!important;letter-spacing:.04em!important;
+  }
+  .s666-parity-mobile-hub button[data-active="1"]{border-color:rgba(255,63,215,.78)!important;box-shadow:0 0 12px rgba(255,63,215,.35)!important;}
+  .s666-sound-overlay,.fp-admin-overlay,.s666-player-alert-overlay,.s666-player-alert-composer,.mff-history-overlay{
+    position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;
+    overflow:hidden!important;box-sizing:border-box!important;z-index:9999!important;
+  }
+  .s666-sound-panel,.fp-admin-panel,.s666-player-alert-box,.s666-player-alert-composer-box{
+    width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 20px - env(safe-area-inset-bottom,0px))!important;overflow:auto!important;box-sizing:border-box!important;margin:8px auto!important;border-radius:18px!important;
+  }
+  .s666-sound-eq{min-height:224px!important;}
+  .s666-sound-band{grid-template-rows:16px 152px 18px!important;}
+  .s666-sound-band input[type=range]{height:148px!important;}
+  #eqBars,#mffEqBars,#mffBottomBars,.mff-bottom-bars,.eq-bars,.pc-real-eq-panel{pointer-events:auto!important;cursor:pointer!important;}
+  .now-playing #playerAlertPcBox.player-alert-pc-box{
+    width:calc(100vw - 18px)!important;max-width:calc(100vw - 18px)!important;left:9px!important;right:9px!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;height:118px!important;min-height:118px!important;max-height:118px!important;
+  }
+  .now-playing #playerAlertPcText.player-alert-pc-text{height:82px!important;min-height:82px!important;max-height:82px!important;font-size:16px!important;}
+  .s666-mobile-bottom-safe{bottom:env(safe-area-inset-bottom,0px)!important;padding-bottom:4px!important;}
+}
+
+
+/* FORCED_UI_IMPLEMENTATION_V1_20260530 */
+:root{--s666-current-build:"v2026.05.30-forced-ui1";--s666-cache-burst:"forced-ui-v1-20260530";}
+#phase10BrandLine,.phase10-brand-line{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important}
+#pcHeaderBrandSplit.pc-header-brand-single{width:100%!important;height:94px!important;min-height:94px!important;display:flex!important;align-items:center!important;justify-content:center!important;margin:0 auto 8px!important;padding:0!important}
+#pcHeaderNewLogo{display:block!important;height:94px!important;max-height:94px!important;width:auto!important;max-width:min(760px,78vw)!important;margin:0 auto!important;object-fit:contain!important;transform:none!important;filter:drop-shadow(0 0 16px rgba(32,247,255,.58)) drop-shadow(0 0 20px rgba(255,63,215,.42))!important}
+#pcHeaderLogoCenter666,#pcHeaderLogoCenter666_REMOVED,.pc-header-logo-cell-center,.pc-header-logo-cell-left,.pc-header-logo-cell-right,.pc-header-logo-left,.pc-header-logo-right,.hero-title,.hero-subtitle{display:none!important}
+.info-grid{display:grid!important;grid-template-columns:96px 88px minmax(260px,1fr) 250px 120px!important;justify-content:start!important;align-items:stretch!important;gap:8px!important;margin-top:4px!important;width:100%!important}
+.info-card:has(#listenersText){width:96px!important;min-width:96px!important;max-width:96px!important}
+.info-card:has(#bitrateText){width:88px!important;min-width:88px!important;max-width:88px!important}
+.info-card:has(#djText){min-width:260px!important;max-width:none!important}
+.info-card:has(#listenersText) .info-label,.info-card:has(#bitrateText) .info-label{font-size:8px!important;letter-spacing:.07em!important}
+.info-card:has(#listenersText) .info-value,.info-card:has(#bitrateText) .info-value{font-size:12px!important;line-height:1.05!important}
+#djText{font-size:15px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#phase10StatusLedCard{min-width:250px!important;width:250px!important;max-width:250px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+#phase10StatusLedCard .info-label{font-size:8px!important;letter-spacing:.07em!important;line-height:1!important;margin-bottom:4px!important}
+.phase10-status-led-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;width:100%!important}
+.phase10-status-led-row .status-chip{width:68px!important;min-width:68px!important;max-width:68px!important;height:31px!important;min-height:31px!important;padding:3px 7px!important;font-size:9px!important}
+.phase10-status-led-row #statusMeter{width:76px!important;min-width:76px!important;max-width:76px!important}
+.systempanel-left #statusStream,.systempanel-left #statusMeter,.systempanel-left #statusSource{display:none!important}
+.left-meter,.right-meter,.mff-left-meter,.mff-right-meter,.side-meter-left,.side-meter-right,[data-meter-side='left'],[data-meter-side='right']{display:flex!important;align-items:flex-end!important;justify-content:center!important;gap:10px!important;height:100%!important;min-height:100%!important;overflow:hidden!important}
+.left-meter,.mff-left-meter,.side-meter-left,[data-meter-side='left']{flex-direction:row!important}
+.right-meter,.mff-right-meter,.side-meter-right,[data-meter-side='right']{flex-direction:row-reverse!important}
+.left-meter i,.right-meter i,.mff-left-meter i,.mff-right-meter i,.side-meter-left i,.side-meter-right i,[data-meter-side='left'] i,[data-meter-side='right'] i{display:block!important;width:18px!important;min-width:18px!important;border-radius:999px!important;align-self:flex-end!important;transform-origin:center bottom!important;background:linear-gradient(180deg,#ff3fd7 0%,#c44cff 38%,#28fff4 100%)!important;box-shadow:0 0 12px rgba(32,247,255,.36),0 0 16px rgba(255,63,215,.22)!important}
+.left-meter i:nth-child(1),.right-meter i:nth-child(1),.mff-left-meter i:nth-child(1),.mff-right-meter i:nth-child(1),.side-meter-left i:nth-child(1),.side-meter-right i:nth-child(1),[data-meter-side='left'] i:nth-child(1),[data-meter-side='right'] i:nth-child(1){height:96%!important;min-height:96%!important}
+.left-meter i:nth-child(2),.right-meter i:nth-child(2),.mff-left-meter i:nth-child(2),.mff-right-meter i:nth-child(2),.side-meter-left i:nth-child(2),.side-meter-right i:nth-child(2),[data-meter-side='left'] i:nth-child(2),[data-meter-side='right'] i:nth-child(2){height:78%!important;min-height:78%!important}
+.left-meter i:nth-child(3),.right-meter i:nth-child(3),.mff-left-meter i:nth-child(3),.mff-right-meter i:nth-child(3),.side-meter-left i:nth-child(3),.side-meter-right i:nth-child(3),[data-meter-side='left'] i:nth-child(3),[data-meter-side='right'] i:nth-child(3){height:60%!important;min-height:60%!important}
+#phase10NowVersion #pcVersionBadge,#pcVersionBadge{min-width:160px!important;height:34px!important;min-height:34px!important;font-size:13px!important}
+@media(max-width:760px){#pcHeaderBrandSplit.pc-header-brand-single{height:48px!important;min-height:48px!important;margin-bottom:4px!important}#pcHeaderNewLogo{height:48px!important;max-height:48px!important;max-width:72vw!important}}
+
+
+/* SIDE_METER_REACTIVITY_V1_20260530 */
+:root{--s666-current-build:"v2026.05.30-meter-react1";--s666-cache-burst:"side-meter-reactivity-v1-20260530";}
+.left-meter,.right-meter,.mff-left-meter,.mff-right-meter,.side-meter-left,.side-meter-right,[data-meter-side='left'],[data-meter-side='right'],[data-side-meter-react-v1='left'],[data-side-meter-react-v1='right']{
+  display:flex!important;align-items:flex-end!important;justify-content:center!important;gap:10px!important;height:100%!important;min-height:100%!important;width:100%!important;overflow:hidden!important;padding:4px 0!important;box-sizing:border-box!important;
+}
+.left-meter,.mff-left-meter,.side-meter-left,[data-meter-side='left'],[data-side-meter-react-v1='left']{flex-direction:row!important}
+.right-meter,.mff-right-meter,.side-meter-right,[data-meter-side='right'],[data-side-meter-react-v1='right']{flex-direction:row-reverse!important}
+.left-meter i,.right-meter i,.mff-left-meter i,.mff-right-meter i,.side-meter-left i,.side-meter-right i,[data-meter-side='left'] i,[data-meter-side='right'] i,[data-side-meter-react-v1='left'] i,[data-side-meter-react-v1='right'] i{
+  display:block!important;width:18px!important;min-width:18px!important;max-width:18px!important;align-self:flex-end!important;border-radius:999px!important;transform-origin:center bottom!important;
+  background:linear-gradient(180deg,#ff35da 0%,#d84cff 20%,#9a5cff 40%,#5a74ff 57%,#22f6ff 78%,#16ffe7 100%)!important;
+  box-shadow:0 0 10px rgba(32,247,255,.46),0 0 18px rgba(255,63,215,.30),inset 0 0 7px rgba(255,255,255,.16)!important;
+  transition:height 90ms linear,min-height 90ms linear,opacity 90ms linear,filter 90ms linear!important;
+}
+.left-meter i:nth-child(1),.right-meter i:nth-child(1),.mff-left-meter i:nth-child(1),.mff-right-meter i:nth-child(1),.side-meter-left i:nth-child(1),.side-meter-right i:nth-child(1),[data-meter-side='left'] i:nth-child(1),[data-meter-side='right'] i:nth-child(1){height:96%!important;min-height:96%!important}
+.left-meter i:nth-child(2),.right-meter i:nth-child(2),.mff-left-meter i:nth-child(2),.mff-right-meter i:nth-child(2),.side-meter-left i:nth-child(2),.side-meter-right i:nth-child(2),[data-meter-side='left'] i:nth-child(2),[data-meter-side='right'] i:nth-child(2){height:78%!important;min-height:78%!important}
+.left-meter i:nth-child(3),.right-meter i:nth-child(3),.mff-left-meter i:nth-child(3),.mff-right-meter i:nth-child(3),.side-meter-left i:nth-child(3),.side-meter-right i:nth-child(3),[data-meter-side='left'] i:nth-child(3),[data-meter-side='right'] i:nth-child(3){height:60%!important;min-height:60%!important}
+.left-fx,.right-fx,.fx-side-left,.fx-side-right,.side-fx-left,.side-fx-right{min-height:100%!important}
+@media(max-width:760px){.left-meter i,.right-meter i,.mff-left-meter i,.mff-right-meter i,.side-meter-left i,.side-meter-right i{width:10px!important;min-width:10px!important;max-width:10px!important}}
+
+
+/* IPHONE_AUDIO_STABILITY_GUARD_V2_20260530 */
+:root{--s666-current-build:"v2026.05.30-iphone-audio-v2";--s666-cache-burst:"iphone-audio-stability-v2-20260530";}
+html[data-iphone-audio-stability-v2="installed"]::after{content:"";display:none;}
+
+
+/* CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530 */
+:root{--s666-current-build:"v2026.05.30-central-audio-v2";--s666-cache-burst:"central-audio-stability-v2-20260530";}
+html[data-central-audio-stability-v2="installed"]::after,html[data-central-audio-stability-v2="active"]::after{content:"";display:none;}

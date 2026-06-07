@@ -590,6 +590,384 @@ RULES:
     if(typeof hardfixMoveLedsBehindDj === "function") hardfixMoveLedsBehindDj();
   }
 
+
+  // IPHONE_PC_PARITY_V1_20260530
+  function parityIsMobile(){
+    return /iphone|ipad|ipod|android/i.test(navigator.userAgent || "") || window.innerWidth <= 760;
+  }
+  function parityOpenSound(){
+    if(typeof openSoundControl === "function") return openSoundControl();
+    if(window.S666SoundControl && typeof window.S666SoundControl.open === "function") return window.S666SoundControl.open();
+    var b = qs("#s666SoundControlButton");
+    if(b) return tap(b, "parity-sound");
+  }
+  function parityOpenAdmin(){
+    if(typeof openAdmin === "function") return openAdmin();
+    var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
+    if(b) return tap(b, "parity-admin");
+  }
+  function parityOpenChaos(){
+    if(typeof openChaos === "function") return openChaos();
+    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); } catch(e){ location.href="/CHAOS_ENGINE/?v="+Date.now(); }
+  }
+  function parityOpenStatus(){
+    if(typeof openStatus === "function") return openStatus();
+    try{ window.open("/api/discord/debug?t=" + Date.now(), "_blank"); } catch(e){ location.href="/api/discord/debug?t="+Date.now(); }
+  }
+  function parityMountMobileHub(){
+    if(!parityIsMobile()) return;
+    var app = qs("#mffApp") || qs(".player-shell") || document.body;
+    if(qs("#s666ParityMobileHub")) return;
+    var hub = document.createElement("div");
+    hub.id = "s666ParityMobileHub";
+    hub.className = "s666-parity-mobile-hub";
+    hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="sound">SOUND</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
+    var anchor = qs("#s666MobileExtraRow") || qs(".mobile-boost") || qs(".hero-label-row") || qs(".now-playing");
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(hub, anchor.nextSibling);
+    else app.insertBefore(hub, app.firstChild);
+    hub.addEventListener("click", function(ev){
+      var btn = ev.target.closest && ev.target.closest("[data-parity-action]");
+      if(!btn) return;
+      ev.preventDefault(); ev.stopPropagation();
+      parityRunMobileAction(btn.getAttribute("data-parity-action"), btn);
+    }, true);
+    hub.addEventListener("touchend", function(ev){
+      var btn = ev.target.closest && ev.target.closest("[data-parity-action]");
+      if(!btn) return;
+      ev.preventDefault(); ev.stopPropagation();
+      parityRunMobileAction(btn.getAttribute("data-parity-action"), btn);
+    }, {passive:false, capture:true});
+  }
+  function parityRunMobileAction(action, btn){
+    qsa("#s666ParityMobileHub button").forEach(function(b){ b.removeAttribute("data-active"); });
+    if(btn) btn.setAttribute("data-active","1");
+    if(action === "stream"){ if(typeof toggleMobileStream === "function") return toggleMobileStream(); return; }
+    if(action === "sound") return parityOpenSound();
+    if(action === "admin") return parityOpenAdmin();
+    if(action === "chaos") return parityOpenChaos();
+    if(action === "status") return parityOpenStatus();
+  }
+  function parityBindMobileEqTriggers(){
+    if(!parityIsMobile()) return;
+    ["#mffEqBars","#mffBottomBars",".mff-bottom-bars",".mff-eq-bars","#eqBars",".eq-bars","#pcRealEqPanel",".pc-real-eq-panel"].forEach(function(sel){
+      qsa(sel).forEach(function(el){
+        if(el.__parityEqBound) return;
+        el.__parityEqBound = true;
+        el.style.pointerEvents = "auto";
+        el.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); parityOpenSound(); }, true);
+        el.addEventListener("touchend", function(ev){ ev.preventDefault(); ev.stopPropagation(); parityOpenSound(); }, {passive:false, capture:true});
+      });
+    });
+  }
+  function parityLockViewport(){
+    if(!parityIsMobile()) return;
+    document.documentElement.setAttribute("data-s666-mobile-parity","v1");
+  }
+  function parityUpdateVersion(){
+    var v = qs("#pcVersionBadge .status-code");
+    if(v) v.textContent = "v2026.05.30-iphone-parity1";
+  }
+  function iphonePcParityV1(){
+    parityLockViewport();
+    parityMountMobileHub();
+    parityBindMobileEqTriggers();
+    parityUpdateVersion();
+  }
+
+
+  // FORCED_UI_IMPLEMENTATION_V1_20260530
+  function forcedUiApplyV1(){
+    var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent="v2026.05.30-forced-ui1";
+    var brand=qs("#phase10BrandLine"); if(brand){brand.textContent="";brand.hidden=true;brand.style.display="none";}
+    var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530");
+    if(typeof hardfixMoveLedsBehindDj==="function") hardfixMoveLedsBehindDj();
+    var dj=qs("#djText")?qs("#djText").closest(".info-card"):null, led=qs("#phase10StatusLedCard");
+    if(dj&&led&&led.previousElementSibling!==dj) dj.parentNode.insertBefore(led,dj.nextSibling);
+  }
+
+
+  // SIDE_METER_REACTIVITY_V1_20260530
+  var sideMeterReactV1State = { started:false, phase:0, smooth:0, peak:0 };
+
+  function sideMeterReactV1AudioLevel(){
+    var audio = getAudio && getAudio();
+    var boost = 0;
+    try { boost = Number(activeBoost && activeBoost()) || 0; } catch(e) {}
+    var rms = 0;
+    [window.__mffLastRms,window.__mffRms,window.__smfpRms,window.__radioRms,window.__mffAudioLevel,window.__smfpAudioLevel,window.__lastAudioLevel].forEach(function(v){
+      var n = Number(v);
+      if(isFinite(n) && n > 0) rms = Math.max(rms, n > 1 ? n / 100 : n);
+    });
+    if((!rms || rms < .015) && audio && !audio.paused){
+      sideMeterReactV1State.phase += .135 + boost * .008;
+      rms = .22 + Math.abs(Math.sin(sideMeterReactV1State.phase))*.32 + Math.abs(Math.sin(sideMeterReactV1State.phase*.43+1.9))*.18 + Math.abs(Math.sin(sideMeterReactV1State.phase*1.71+.3))*.10;
+    }
+    var level = Math.max(0, Math.min(1, rms * (1 + Math.min(5,boost)*.095)));
+    sideMeterReactV1State.smooth = sideMeterReactV1State.smooth*.64 + level*.36;
+    sideMeterReactV1State.peak = Math.max(sideMeterReactV1State.smooth, sideMeterReactV1State.peak*.88);
+    return { level:sideMeterReactV1State.smooth, peak:sideMeterReactV1State.peak, boost:boost, running:!!(audio && !audio.paused) };
+  }
+
+  function sideMeterReactV1Groups(){
+    var left = qsa(".left-meter,.mff-left-meter,.side-meter-left,[data-meter-side='left'],.fx-side-left .side-meter,.left-fx .side-meter");
+    var right = qsa(".right-meter,.mff-right-meter,.side-meter-right,[data-meter-side='right'],.fx-side-right .side-meter,.right-fx .side-meter");
+    qsa(".side-meter").forEach(function(el){
+      if(left.indexOf(el)>=0 || right.indexOf(el)>=0) return;
+      var rect = el.getBoundingClientRect();
+      if(rect.left < window.innerWidth/2) left.push(el); else right.push(el);
+    });
+    return {left:left,right:right};
+  }
+
+  function sideMeterReactV1Bars(group, side){
+    group.setAttribute("data-side-meter-react-v1", side);
+    var bars = Array.prototype.slice.call(group.querySelectorAll("i,.bar,.meter-bar,.side-bar"));
+    if(bars.length < 3){
+      group.innerHTML = "<i></i><i></i><i></i>";
+      bars = Array.prototype.slice.call(group.querySelectorAll("i"));
+    }
+    return bars.slice(0,3);
+  }
+
+  function sideMeterReactV1Paint(group, side, m){
+    var bars = sideMeterReactV1Bars(group, side);
+    var base = m.running ? m.level : .08;
+    var peak = m.running ? m.peak : .10;
+    var boostPush = Math.min(.16, m.boost*.025);
+    var heights = [
+      Math.max(.20, Math.min(1.00, .38 + peak*.62 + boostPush)),
+      Math.max(.16, Math.min(.86, .26 + base*.54 + boostPush*.75)),
+      Math.max(.12, Math.min(.70, .18 + base*.42 + boostPush*.55))
+    ];
+    bars.forEach(function(bar,i){
+      var h = Math.round(heights[i]*100);
+      bar.style.height = h + "%";
+      bar.style.minHeight = Math.max(14,h) + "%";
+      bar.style.opacity = String(Math.max(.48, Math.min(1, .52 + heights[i]*.55)));
+      bar.style.filter = "saturate(" + (1.10 + m.boost*.08).toFixed(2) + ") brightness(" + (0.95 + heights[i]*.20).toFixed(2) + ")";
+    });
+  }
+
+  function sideMeterReactV1Tick(){
+    var m = sideMeterReactV1AudioLevel();
+    var g = sideMeterReactV1Groups();
+    g.left.forEach(function(el){ sideMeterReactV1Paint(el,"left",m); });
+    g.right.forEach(function(el){ sideMeterReactV1Paint(el,"right",m); });
+    document.documentElement.setAttribute("data-side-meter-react-v1","active");
+  }
+
+  function startSideMeterReactV1(){
+    if(sideMeterReactV1State.started) return;
+    sideMeterReactV1State.started = true;
+    sideMeterReactV1Tick();
+    setInterval(sideMeterReactV1Tick,120);
+  }
+
+
+  // IPHONE_AUDIO_STABILITY_GUARD_V2_20260530
+  var iphoneAudioV2State = { started:false, wanted:false, userStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0 };
+
+  function iphoneAudioV2Mobile(){
+    return /iphone|ipad|ipod/i.test(navigator.userAgent || "") || (window.innerWidth <= 760 && /safari|applewebkit/i.test(navigator.userAgent || ""));
+  }
+  function iphoneAudioV2Audio(){
+    return (typeof getAudio === "function" && getAudio()) || document.querySelector("audio");
+  }
+  function iphoneAudioV2UserStopRecent(){
+    return Date.now() - iphoneAudioV2State.userStopAt < 14000;
+  }
+  function iphoneAudioV2Wanted(){
+    if(iphoneAudioV2State.wanted) return true;
+    try { if(typeof streamWanted === "function" && streamWanted()) return true; } catch(e) {}
+    var a = iphoneAudioV2Audio();
+    return !!(a && !a.paused && !a.ended);
+  }
+  function iphoneAudioV2MarkWanted(){
+    iphoneAudioV2State.wanted = true;
+    document.documentElement.setAttribute("data-iphone-audio-wanted","1");
+  }
+  function iphoneAudioV2MarkStop(){
+    iphoneAudioV2State.userStopAt = Date.now();
+    iphoneAudioV2State.wanted = false;
+    document.documentElement.setAttribute("data-iphone-audio-wanted","0");
+  }
+  function iphoneAudioV2TryPlay(reason){
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    iphoneAudioV2State.lastRecoverAt = Date.now();
+    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "play");
+    try {
+      var p = a.play();
+      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
+    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
+  }
+  function iphoneAudioV2LoadPlay(reason){
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    iphoneAudioV2State.lastRecoverAt = Date.now();
+    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "loadplay");
+    try {
+      a.load();
+      var p = a.play();
+      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
+    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
+  }
+  function iphoneAudioV2RebindMain(reason){
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    iphoneAudioV2State.lastRecoverAt = Date.now();
+    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "main");
+    try {
+      var src = String(a.currentSrc || a.getAttribute("src") || "");
+      if(/fallback-stream|backup/i.test(src)) {
+        a.pause();
+        a.setAttribute("src", "/stream?t=" + Date.now());
+        document.documentElement.setAttribute("data-phase10-stream-target","main");
+      }
+      a.load();
+      var p = a.play();
+      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
+    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
+  }
+  function iphoneAudioV2Recover(reason){
+    if(!iphoneAudioV2Mobile()) return;
+    if(!iphoneAudioV2Wanted()) return;
+    if(iphoneAudioV2UserStopRecent()) return;
+    if(Date.now() - iphoneAudioV2State.lastRecoverAt < 9000) return;
+    iphoneAudioV2State.step = (iphoneAudioV2State.step + 1) % 3;
+    if(iphoneAudioV2State.step === 0) return iphoneAudioV2TryPlay(reason + "-play");
+    if(iphoneAudioV2State.step === 1) return iphoneAudioV2LoadPlay(reason + "-loadplay");
+    return iphoneAudioV2RebindMain(reason + "-main");
+  }
+  function iphoneAudioV2Tick(){
+    if(!iphoneAudioV2Mobile()) return;
+    var a = iphoneAudioV2Audio(); if(!a) return;
+    var now = Date.now();
+    var ct = Number(a.currentTime || 0);
+    var moved = Math.abs(ct - iphoneAudioV2State.lastTime) > 0.08;
+    if(!a.paused && moved) {
+      iphoneAudioV2State.lastMoveAt = now;
+      iphoneAudioV2State.step = 0;
+    }
+    iphoneAudioV2State.lastTime = ct;
+    var stalled = now - iphoneAudioV2State.lastMoveAt;
+    document.documentElement.setAttribute("data-iphone-audio-stability-v2","active");
+    document.documentElement.setAttribute("data-iphone-audio-v2-ready", String(a.readyState || 0));
+    document.documentElement.setAttribute("data-iphone-audio-v2-stall-ms", String(stalled));
+    if(!iphoneAudioV2Wanted() || iphoneAudioV2UserStopRecent()) return;
+    if(a.paused && stalled > 4200) return iphoneAudioV2Recover("paused-wanted");
+    if(!a.paused && stalled > 14500) return iphoneAudioV2Recover("time-stall");
+    if((a.readyState || 0) < 2 && stalled > 9000) return iphoneAudioV2Recover("ready-low");
+  }
+  function startIphoneAudioStabilityGuardV2(){
+    if(iphoneAudioV2State.started) return;
+    iphoneAudioV2State.started = true;
+    var a = iphoneAudioV2Audio();
+    if(a) {
+      ["play","playing","canplay","canplaythrough"].forEach(function(ev){ a.addEventListener(ev,function(){ iphoneAudioV2MarkWanted(); iphoneAudioV2State.lastMoveAt=Date.now(); },true); });
+      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){ a.addEventListener(ev,function(){ setTimeout(function(){ iphoneAudioV2Recover(ev); },6500); },true); });
+    }
+    qsa("button,.control-btn").forEach(function(btn){
+      var txt = String(btn.textContent || btn.getAttribute("aria-label") || "").toLowerCase();
+      if(/play/.test(txt)) btn.addEventListener("click", iphoneAudioV2MarkWanted, true);
+      if(/stop/.test(txt)) btn.addEventListener("click", iphoneAudioV2MarkStop, true);
+    });
+    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){ window.addEventListener(ev,function(){ setTimeout(function(){ iphoneAudioV2Recover(ev); },1200); },true); });
+    setInterval(iphoneAudioV2Tick,2500);
+    setTimeout(iphoneAudioV2Tick,1600);
+    document.documentElement.setAttribute("data-iphone-audio-stability-v2","installed");
+  }
+
+
+  // CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530
+  var centralAudioGuardV2 = {
+    started:false, wanted:false, manualStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0,
+    pcProfile:{ pausedToleranceMs:8500, stallToleranceMs:21000, readyLowToleranceMs:15000, cooldownMs:14000 },
+    mobileProfile:{ pausedToleranceMs:4200, stallToleranceMs:14500, readyLowToleranceMs:9000, cooldownMs:9000 }
+  };
+  function centralAudioGuardV2IsMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || window.innerWidth <= 760; }
+  function centralAudioGuardV2Profile(){ return centralAudioGuardV2IsMobile() ? centralAudioGuardV2.mobileProfile : centralAudioGuardV2.pcProfile; }
+  function centralAudioGuardV2Audio(){ return (typeof getAudio==="function" && getAudio()) || document.querySelector("audio"); }
+  function centralAudioGuardV2ManualStopRecent(){ return Date.now() - centralAudioGuardV2.manualStopAt < 14000; }
+  function centralAudioGuardV2MarkWanted(){ centralAudioGuardV2.wanted=true; document.documentElement.setAttribute("data-central-audio-wanted","1"); }
+  function centralAudioGuardV2MarkStop(){ centralAudioGuardV2.manualStopAt=Date.now(); centralAudioGuardV2.wanted=false; document.documentElement.setAttribute("data-central-audio-wanted","0"); }
+  function centralAudioGuardV2Wanted(){
+    if(centralAudioGuardV2.wanted) return true;
+    try{ if(typeof streamWanted==="function" && streamWanted()) return true; }catch(e){}
+    var a=centralAudioGuardV2Audio();
+    return !!(a && !a.paused && !a.ended);
+  }
+  function centralAudioGuardV2Status(reason){
+    document.documentElement.setAttribute("data-central-audio-stability-v2","active");
+    document.documentElement.setAttribute("data-central-audio-device", centralAudioGuardV2IsMobile() ? "mobile" : "pc");
+    document.documentElement.setAttribute("data-central-audio-reason", reason||"");
+  }
+  function centralAudioGuardV2Play(reason){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"play");
+    try{ var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));}); }
+    catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2LoadPlay(reason){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"loadplay");
+    try{ a.load(); var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));}); }
+    catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2RebindMain(reason){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"main-rebind");
+    try{
+      var src=String(a.currentSrc||a.getAttribute("src")||"");
+      if(/fallback-stream|backup/i.test(src)){
+        a.pause(); a.setAttribute("src","/stream?t="+Date.now()); document.documentElement.setAttribute("data-phase10-stream-target","main");
+      } else { a.load(); }
+      var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));});
+    }catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2Recover(reason){
+    if(!centralAudioGuardV2Wanted()) return;
+    if(centralAudioGuardV2ManualStopRecent()) return;
+    var profile=centralAudioGuardV2Profile();
+    if(Date.now()-centralAudioGuardV2.lastRecoverAt < profile.cooldownMs) return;
+    centralAudioGuardV2.step=(centralAudioGuardV2.step+1)%3;
+    if(centralAudioGuardV2.step===0) return centralAudioGuardV2Play(reason+"-play");
+    if(centralAudioGuardV2.step===1) return centralAudioGuardV2LoadPlay(reason+"-loadplay");
+    return centralAudioGuardV2RebindMain(reason+"-main");
+  }
+  function centralAudioGuardV2Tick(){
+    var a=centralAudioGuardV2Audio(); if(!a) return;
+    var now=Date.now(), ct=Number(a.currentTime||0), moved=Math.abs(ct-centralAudioGuardV2.lastTime)>0.08;
+    if(!a.paused && moved){ centralAudioGuardV2.lastMoveAt=now; centralAudioGuardV2.step=0; }
+    centralAudioGuardV2.lastTime=ct;
+    var stalled=now-centralAudioGuardV2.lastMoveAt, ready=Number(a.readyState||0), network=Number(a.networkState||0), profile=centralAudioGuardV2Profile();
+    document.documentElement.setAttribute("data-central-audio-stability-v2","active");
+    document.documentElement.setAttribute("data-central-audio-device",centralAudioGuardV2IsMobile()?"mobile":"pc");
+    document.documentElement.setAttribute("data-central-audio-ready",String(ready));
+    document.documentElement.setAttribute("data-central-audio-network",String(network));
+    document.documentElement.setAttribute("data-central-audio-stall-ms",String(Math.max(0,stalled)));
+    if(!centralAudioGuardV2Wanted() || centralAudioGuardV2ManualStopRecent()) return;
+    if(a.paused && stalled > profile.pausedToleranceMs) return centralAudioGuardV2Recover("paused-wanted");
+    if(!a.paused && stalled > profile.stallToleranceMs) return centralAudioGuardV2Recover("time-stall");
+    if(ready < 2 && stalled > profile.readyLowToleranceMs) return centralAudioGuardV2Recover("ready-low");
+  }
+  function startCentralAudioStabilityGuardV2(){
+    if(centralAudioGuardV2.started) return;
+    centralAudioGuardV2.started=true;
+    var a=centralAudioGuardV2Audio();
+    if(a){
+      ["play","playing","canplay","canplaythrough"].forEach(function(ev){a.addEventListener(ev,function(){centralAudioGuardV2MarkWanted();centralAudioGuardV2.lastMoveAt=Date.now();},true);});
+      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){a.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?6500:10500;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+    }
+    qsa("button,.control-btn").forEach(function(btn){
+      var txt=String(btn.textContent||btn.getAttribute("aria-label")||"").toLowerCase();
+      if(/play/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkWanted,true);
+      if(/stop/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkStop,true);
+    });
+    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){window.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?1200:2800;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+    setInterval(centralAudioGuardV2Tick,2500);
+    setTimeout(centralAudioGuardV2Tick,1600);
+    document.documentElement.setAttribute("data-central-audio-stability-v2","installed");
+  }
+  function startIphoneAudioStabilityGuardV2(){ startCentralAudioStabilityGuardV2(); }
+
   function boot(){
     mountHudLogo();
     hardfixInstallManualBackupFlag();
@@ -598,6 +976,10 @@ RULES:
     hardfixMessageBox();
     hardfixForceMainOnlyPc();
     uiFinetuneV1();
+    iphonePcParityV1();
+    forcedUiApplyV1();
+    startSideMeterReactV1();
+    startIphoneAudioStabilityGuardV2();
     directfixRestoreStatusLeds();
     directfixTickerAndMessage();
     installPcMainBackupGuard();
