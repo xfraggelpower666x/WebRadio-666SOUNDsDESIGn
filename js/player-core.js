@@ -829,29 +829,17 @@ async function playCurrent() {
     keepControlsUnlocked();
     if (token !== playRequestToken || userStopped) return;
 
-    if (currentSource === 'main' && !switchingStream) {
-      switchingStream = true;
-      setSource('fallback');
-      setStatus('MAIN TIMEOUT → BACKUP');
-      try {
-        const retryToken = ++playRequestToken;
-        prepareAudioElementForFreshPlay(ENDPOINTS.fallback, 'main-to-backup-retry');
-        if (audio.getAttribute('src') !== ENDPOINTS.fallback) audio.src = ENDPOINTS.fallback;
-        audio.load();
-        await playAudioWithTimeout(retryToken);
-        if (retryToken !== playRequestToken || userStopped) return;
-        await visualizer.start?.();
-        setBoostStage(currentBoostStage);
-        setStatus('PLAYING BACKUP');
-        setDesktopTransportState('play');
-        setActivePanelLeds();
-        startMetadataLoop();
-      } catch (err2) {
-        keepControlsUnlocked();
-        applyStatusChip(statusStream, 'warn', 'Audio-Start hängt oder Stream nicht erreichbar');
-        setStatus('AUDIO TIMEOUT');
-        visualizer.stop?.();
-      } finally {
+    if (currentSource === 'main') {
+      // V7_MAIN_ONLY_LOCK: kein automatischer Wechsel auf Backup. Backup bleibt manuell per B-Button.
+      applyStatusChip(statusStream, 'warn', 'Mainstream nicht erreichbar. Backup bleibt manuell.');
+      setStatus('MAIN ERROR · BACKUP MANUAL');
+      visualizer.stop?.();
+    } else {
+      applyStatusChip(statusStream, 'warn', 'Backup Stream nicht erreichbar');
+      setStatus('BACKUP ERROR');
+      visualizer.stop?.();
+    }
+  } finally {
         switchingStream = false;
       }
     } else {
@@ -942,11 +930,12 @@ volumeSlider?.addEventListener('input', () => {
 audio?.addEventListener('error', async () => {
   if (userStopped) return;
   if (currentSource === 'main') {
-    setSource('fallback');
-    await playCurrent();
+    // V7_MAIN_ONLY_LOCK: Streamfehler schaltet nicht automatisch auf Backup.
+    applyStatusChip(statusStream, 'warn', 'Mainstream Fehler. Backup manuell wählen.');
+    setStatus('MAIN ERROR · BACKUP MANUAL');
   } else {
-    applyStatusChip(statusStream, 'warn', 'Streamfehler auf Main und Backup');
-    setStatus('STREAM ERROR');
+    applyStatusChip(statusStream, 'warn', 'Backup Streamfehler');
+    setStatus('BACKUP ERROR');
   }
 });
 audio?.addEventListener('playing', async () => {

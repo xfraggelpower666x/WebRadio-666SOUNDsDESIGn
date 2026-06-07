@@ -409,33 +409,26 @@ async function proxyStream(request, upstream, targetName = "unknown"){
 }
 
 async function proxyStreamFailover(request){
-  // MAIN versuchen, bei HTTP-Fehler/Timeout direkt BACKUP versuchen.
+  // V7_MAIN_ONLY_LOCK:
+  // /stream bleibt strikt Mainstream. Kein automatischer Wechsel auf Backup wegen kurzem Stall/Timeout.
+  // Backup bleibt bewusst nur über /fallback-stream oder manuelle UI-Auswahl erreichbar.
   try{
     return await proxyStream(request, PRIMARY_STREAM_URL, "main");
   }catch(primaryErr){
-    try{
-      return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
-    }catch(backupErr){
-      try{
-        return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
-      }catch(backupAltErr){
-        return new Response(JSON.stringify({
-          error:"stream_proxy_failed",
-          main:String(primaryErr && primaryErr.message ? primaryErr.message : primaryErr),
-          backup:String(backupErr && backupErr.message ? backupErr.message : backupErr),
-          backup_alt:String(backupAltErr && backupAltErr.message ? backupAltErr.message : backupAltErr)
-        }),{
-          status:502,
-          headers:{
-            "content-type":"application/json; charset=UTF-8",
-            "cache-control":"no-store",
-            "access-control-allow-origin":"*",
-            "x-radio-proxy":"666soundsdesign-worker",
-            "x-failover-state":"failed"
-          }
-        });
+    return new Response(JSON.stringify({
+      error:"main_stream_proxy_failed",
+      main:String(primaryErr && primaryErr.message ? primaryErr.message : primaryErr),
+      backup:"manual_only"
+    }),{
+      status:502,
+      headers:{
+        "content-type":"application/json; charset=UTF-8",
+        "cache-control":"no-store",
+        "access-control-allow-origin":"*",
+        "x-radio-proxy":"666soundsdesign-worker",
+        "x-failover-state":"main-only-failed"
       }
-    }
+    });
   }
 }
 
@@ -803,9 +796,8 @@ const url=new URL(request.url);
       }
     }
 
-    // STREAM_FAILOVER_REPAIR_v1:
-    // /stream versucht MAIN und fällt bei HTTP-Fehler/Timeout automatisch auf BACKUP zurück.
-    // /fallback-stream versucht Backup-Varianten gezielt.
+    // V7_MAIN_ONLY_LOCK:
+    // /stream bleibt Main-only. /fallback-stream bleibt bewusst manuell erreichbar.
     if(url.pathname==="/stream"){
       return await proxyStreamFailover(request)
     }

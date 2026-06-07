@@ -468,6 +468,25 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
       setMeters(meterValue);
       recoverDesktopCenterBars(bars, meterValue, audio && !audio.paused);
+
+      // V7_GOVEE_ANALYZER_BRIDGE: Analyzer-Werte als nicht-blockierendes Event für GOVEE Scene Sync bereitstellen.
+      try {
+        const q = data.length || 1;
+        const bassEnd = Math.max(1, Math.floor(q * 0.18));
+        const midEnd = Math.max(bassEnd + 1, Math.floor(q * 0.55));
+        let bass = 0, mid = 0, high = 0;
+        for (let bi = 0; bi < bassEnd; bi += 1) bass += data[bi] || 0;
+        for (let mi = bassEnd; mi < midEnd; mi += 1) mid += data[mi] || 0;
+        for (let hi = midEnd; hi < q; hi += 1) high += data[hi] || 0;
+        bass = bass / Math.max(1, bassEnd) / 255;
+        mid = mid / Math.max(1, midEnd - bassEnd) / 255;
+        high = high / Math.max(1, q - midEnd) / 255;
+        const energy = clamp(meterValue / 100, 0, 1);
+        const detail = { bass, mid, high, energy, kick: bass > 0.62 && energy > 0.42, beat: bass > 0.55, source: 'equalizer-v7' };
+        window.__S666_GOVEE_ANALYZER__?.dispatchEvent(new CustomEvent('analyzer:update', { detail }));
+        window.dispatchEvent(new CustomEvent('s666:analyzer:update', { detail }));
+      } catch (err) {}
+
       rafId = window.requestAnimationFrame(frame);
     };
 

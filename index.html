@@ -16,8 +16,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="s666-cache-burst" content="current-full-patch-clean-v1-20260604" />
-  <meta name="smfp-version" content="v2026.06.04-current-full-patch-clean-v1" />
+  <meta name="s666-cache-burst" content="v7-full-repo-safe-root-replace-header-govee-20260607" />
+  <meta name="smfp-version" content="v2026.06.07-v7-full-repo-safe-root-replace" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -28,6 +28,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <link rel="stylesheet" href="/css/effects.css?v=fix2-mainonly-logo-panel-20260525" />
   <link rel="stylesheet" href="/css/mobile.css?v=fix2-mainonly-logo-panel-20260525" />
   <link rel="stylesheet" href="/css/desktop.css?v=fix2-mainonly-logo-panel-20260525" />
+  <link rel="stylesheet" href="/css/player-header-banner-v7.css?v=v7-full-repo-safe-root-replace-20260607">
 
 
 <link rel="icon" href="/assets/icons/favicon.ico?v=fix2-mainonly-logo-panel-20260525" sizes="any">
@@ -658,42 +659,29 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         </div>
       </header>
 
-<section class="hero">
-
-      
-<div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-single" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
-  <img id="pcHeaderNewLogo" class="pc-header-new-logo" src="/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530" alt="666SOUNDsDESIGn Cyberstream Cockpit" loading="eager" decoding="async">
-</div>
-<div id="phase10BrandLine" class="phase10-brand-line" hidden></div>
-
-
-<div class="hero-label-row">
-          <span class="hero-badge hero-live">LIVE</span>
-          <span id="streamState" class="hero-badge dim">READY</span>
-        </div>
-<div class="mobile-boost mobile-only" aria-label="Mobile Booster">
-  <button class="boost-step boost-step-down" type="button" data-boost-step="-1" title="Boost Stufe senken">−</button>
-  <div class="mobile-boost-core" role="group" aria-label="Booster-Stufen">
-    <span class="mobile-boost-label">BST</span>
-    <span class="boost-led" data-boost-led="0" title="Boost 0"></span>
-    <span class="boost-led" data-boost-led="1" title="Boost 1"></span>
-    <span class="boost-led" data-boost-led="2" title="Boost 2"></span>
-    <span class="boost-led" data-boost-led="3" title="Boost 3"></span>
-    <span class="boost-led" data-boost-led="4" title="Boost EXTREME 2.0"></span>
-    <span class="boost-led" data-boost-led="5" title="Boost EXTREME 2.2"></span>
+<section class="hero s666-player-header" aria-label="Cyberstream AI Cockpit Header">
+  <img id="s666PlayerHeaderBanner" class="s666-player-header-banner" src="/assets/images/player-header-banner.png?v=v7-full-repo-safe-root-replace-20260607" alt="666SOUNDsDESIGn WebRadio Cyberstream AI Cockpit Edition" loading="eager" decoding="async">
+  <div class="s666-header-status-row" aria-label="Header Status">
+    <span class="hero-badge hero-live" title="Live Stream aktiv" aria-label="Live Stream aktiv">LIVE</span>
+    <span id="streamState" class="hero-badge dim" title="Streamstatus" aria-label="Streamstatus">READY</span>
   </div>
-  <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen">+</button>
-</div>
-        
-        <div class="hero-brand" aria-label="666SOUNDsDESIGn BroadCaster v6.66">
-          <img class="hero-brand-image" src="/assets/images/logo-neon.png" alt="666SOUNDsDESIGn BroadCaster v6.66" />
-        </div>
-        <div class="hero-title">Cyber Stream Cockpit</div>
-        <div class="hero-subtitle">Kompakter Hauptplayer für iPhone und Desktop</div>
-      </section>
+  <div class="mobile-boost mobile-only" aria-label="Mobile Booster">
+    <button class="boost-step boost-step-down" type="button" data-boost-step="-1" title="Boost Stufe senken" aria-label="Boost Stufe senken">−</button>
+    <div class="mobile-boost-core" role="group" aria-label="Booster-Stufen">
+      <span class="mobile-boost-label" title="Booster" aria-label="Booster">BST</span>
+      <span class="boost-led" data-boost-led="0" title="Boost 0" aria-label="Boost 0"></span>
+      <span class="boost-led" data-boost-led="1" title="Boost 1" aria-label="Boost 1"></span>
+      <span class="boost-led" data-boost-led="2" title="Boost 2" aria-label="Boost 2"></span>
+      <span class="boost-led" data-boost-led="3" title="Boost 3" aria-label="Boost 3"></span>
+      <span class="boost-led" data-boost-led="4" title="Boost 4" aria-label="Boost 4"></span>
+      <span class="boost-led" data-boost-led="5" title="Boost 5" aria-label="Boost 5"></span>
+    </div>
+    <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen" aria-label="Boost Stufe erhöhen">+</button>
+  </div>
+</section>
 
       <section class="now-playing">
-        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.06.04-current-full-patch-clean-v1</span></div></div>
+        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.06.07-v7-full-repo-safe-root-replace</span></div></div>
         <div class="section-topline">
           <div>
             <div class="section-kicker">NOW PLAYING</div>
@@ -701,9 +689,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           </div>
           <div id="playerAlertPcBox" class="player-alert-pc-box" aria-label="Player broadcast message">
             <textarea id="playerAlertPcText" class="player-alert-pc-text" maxlength="240" rows="2" placeholder="Write a short player message..."></textarea>
-            <button id="playerAlertPcSend" class="player-alert-send-btn" type="button">SEND</button>
+            <button id="playerAlertPcSend" class="player-alert-send-btn" type="button" title="Broadcast Message senden" aria-label="Broadcast Message senden">MSG</button>
           </div>
-          <button id="historyToggle" class="ghost-btn" type="button">History</button>
+          <button id="historyToggle" class="ghost-btn" type="button" title="Message History öffnen" aria-label="Message History öffnen">HST</button>
 </div>
         
         <div class="now-cover-wrap" aria-hidden="true">
@@ -5050,8 +5038,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
-<link rel="stylesheet" href="/css/player-admin-overlay.css?v=current-full-patch-clean-v1-20260604">
-<script src="/js/player-admin-overlay.js?v=current-full-patch-clean-v1-20260604" defer></script>
+<link rel="stylesheet" href="/css/player-admin-overlay.css?v=v7-full-repo-safe-root-replace-header-govee-20260607">
+<script src="/js/player-admin-overlay.js?v=v7-full-repo-safe-root-replace-header-govee-20260607" defer></script>
 
 <link rel="stylesheet" href="/css/broadcast-message-history.css?v=fix2-mainonly-logo-panel-20260525">
 <script src="/js/broadcast-message-history.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
@@ -5138,10 +5126,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <link rel="stylesheet" href="/css/sound-control-overlay-v1.css?v=fix2-mainonly-logo-panel-20260525">
 <script src="/js/sound-control-overlay-v1.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
 <script src="/js/phase10-stability-iphone-panel-hud.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
-<script src="/js/system-extra/govee/govee-sync-config.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
-<script src="/js/system-extra/govee/govee-bridge-client.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
-<script src="/js/system-extra/govee/govee-scene-sync.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
-<script src="/js/system-extra/govee/govee-fx-control-hooks.js?v=fix2-mainonly-logo-panel-20260525" defer></script>
+<script type="module" src="/js/system-extra/govee/govee-init.js?v=v7-full-repo-safe-root-replace-20260607"></script>
   <script src="js/stream-watchdog-v1.js?v=stable-watchdog-merge1-20260604"></script>
 </body>
 </html>

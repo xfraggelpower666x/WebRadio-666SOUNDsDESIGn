@@ -22,7 +22,28 @@ PURPOSE: Protected admin overlay.
   const $=id=>document.getElementById(id);
   let authOkCache=false,lastAuthCheck=0;
   function loginUrl(){return `${PW_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;}
-  function goLogin(){window.location.href=loginUrl();}
+  function getCookie(name){const raw=document.cookie||"";for(const part of raw.split(";").map(v=>v.trim())){const eq=part.indexOf("=");if(eq>-1&&part.slice(0,eq)===name)return decodeURIComponent(part.slice(eq+1));}return""}
+  function storeAuthToken(token){if(!token)return;const secure=location.protocol==="https:"?"; Secure":"";document.cookie=`chaos_auth=${encodeURIComponent(token)}; Path=/; SameSite=Lax${secure}; Max-Age=86400`;try{sessionStorage.setItem("chaos_auth",token)}catch(_){}}
+  function readStoredToken(){try{return sessionStorage.getItem("chaos_auth")||getCookie("chaos_auth")||""}catch(_){return getCookie("chaos_auth")||""}}
+  async function localAdminLogin(){
+    const password=window.prompt("Admin Passwort eingeben");
+    if(!password)return false;
+    try{
+      const res=await fetch(PW_LOGIN_URL,{method:"POST",headers:{"Content-Type":"application/json"},credentials:"include",body:JSON.stringify({password})});
+      const data=await res.json().catch(()=>({ok:false,error:"bad-json"}));
+      const token=data.token||data.access_token||data.session||data.authToken||"";
+      if(token)storeAuthToken(token);
+      const verifyToken=token||readStoredToken();
+      const verified=verifyToken?await authorityCoreVerifyToken(verifyToken):data;
+      authOkCache=!!(verified&&verified.ok);
+      lastAuthCheck=Date.now();
+      const out=$("fp-admin-debug-output")||$("fp-admin-auth-output");
+      if(out)out.textContent=JSON.stringify({login:data,verify:verified},null,2);
+      if(!authOkCache)alert("Admin Login nicht bestätigt.");
+      return authOkCache;
+    }catch(e){alert("Admin Login Fehler: "+(e&&e.message?e.message:String(e)));return false;}
+  }
+  async function goLogin(){return await localAdminLogin();}
   
   // ADMIN_AUTHORITY_CORE_FIX_V1_20260604
   async function authorityCoreVerifyToken(token){
@@ -46,7 +67,7 @@ async function fetchJson(url,options){
     try{const data=await fetchJson("/api/admin/auth-check?t="+Date.now());authOkCache=!!data.ok;lastAuthCheck=now;const out=$("fp-admin-debug-output");if(out)out.textContent=JSON.stringify(data,null,2);return authOkCache}
     catch(e){authOkCache=false;const out=$("fp-admin-debug-output");if(out)out.textContent="Auth check failed: "+(e&&e.message?e.message:String(e));return false}
   }
-  async function requireAuth(){const ok=await checkAuth(true);if(!ok){goLogin();return false}return true}
+  async function requireAuth(){const ok=await checkAuth(true);if(ok)return true;return await localAdminLogin()}
   function ensureOverlay(){
     if($("fp-admin-overlay"))return;
     const root=document.createElement("div");root.id="fp-admin-overlay";root.className="fp-admin-overlay fp-admin-hidden";

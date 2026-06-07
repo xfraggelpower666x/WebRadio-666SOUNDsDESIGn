@@ -2869,3 +2869,21 @@ PURPOSE:
   body #pcVersionBadge .status-code{font-size:0!important}
   body #pcVersionBadge .status-code::after{content:"v126"!important;font-size:11px!important;line-height:1!important}
 }
+
+/* V7_PC_RESPONSIVE_STAGE_LOCK
+   Desktop: feste interne HUD-Fläche, proportional skaliert statt panelweise gequetscht.
+   Mobile bleibt über body[data-device="mobile"] getrennt. */
+@media (min-width:861px){
+  body[data-device="desktop"] .frame-stage{
+    width:var(--pc-stage-width,1440px)!important;
+    height:var(--pc-stage-height,900px)!important;
+    max-width:none!important;
+    max-height:none!important;
+    position:fixed!important;
+    left:50%!important;
+    top:50%!important;
+    transform:translate(-50%,-50%) scale(var(--pc-stage-scale,1))!important;
+    transform-origin:center center!important;
+    overflow:hidden!important;
+  }
+}
