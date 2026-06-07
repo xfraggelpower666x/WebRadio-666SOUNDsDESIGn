@@ -1,0 +1,6 @@
+
+/* 666SOUNDsDESIGn — v8 Broadcast Emoji Reactivation */
+.s666-emoji-bar{display:flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;flex-wrap:nowrap!important;pointer-events:auto!important;z-index:50!important;}
+.s666-emoji-btn{width:26px!important;height:26px!important;min-width:26px!important;min-height:26px!important;padding:0!important;border-radius:9px!important;border:1px solid rgba(40,255,244,.34)!important;background:rgba(3,7,18,.88)!important;color:#fff!important;font-size:14px!important;line-height:1!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 0 8px rgba(40,255,244,.12)!important;cursor:pointer!important;touch-action:manipulation!important;}
+#playerAlertPcBox .s666-emoji-bar{margin-left:2px!important;}
+@media(max-width:760px){.s666-emoji-bar{gap:3px!important;}.s666-emoji-btn{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;font-size:15px!important;}}

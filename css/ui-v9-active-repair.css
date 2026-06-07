@@ -1,0 +1,70 @@
+/* ============================================================
+   666SOUNDsDESIGn — v9 Active Clickfix + Header/Panel Repair
+   Repariert vorhandene Layer: keine Parallel-UI.
+   ============================================================ */
+:root{--s666-audio-energy:.18;--s666-header-h:112px;}
+
+/* CLICKFIX: Dekor-Layer dürfen Controls nicht blockieren. */
+.s666-player-header,.mff-cyber-header,.s666-header-brandline,#pcCopyrightFooter,
+.pc-side-addon,.pc-addon-tower,.pc-addon-module,.mff-side,.mff-symbol,.text-pulse-overlay,.scanline{box-sizing:border-box;}
+.s666-player-header::before,.s666-player-header::after,.mff-cyber-header::before,.mff-cyber-header::after,
+.pc-side-addon::before,.pc-side-addon::after,.pc-addon-module::before,.pc-addon-module::after,
+.mff-side::before,.mff-side::after{pointer-events:none!important;}
+.player-shell button,.player-shell input,.player-shell textarea,.player-shell select,
+.mff-controls,.mff-controls button,#mffApp button,#mffApp input,#mffApp textarea,
+#playerAlertPcBox,#playerAlertPcText,#playerAlertPcSend,#historyToggle,
+.fp-admin-overlay button,.fp-admin-overlay input,.fp-admin-overlay textarea,
+#smfpMobileEqOverlay button,#smfpMobileEqOverlay input,#smfpMobileEqOverlay textarea{pointer-events:auto!important;touch-action:manipulation!important;}
+
+/* Unsichtbare Backdrops blockieren keine Bedienung. Nur offene Overlays dürfen Events annehmen. */
+body:not([data-mff-alert-open="1"])>#mffAlertEditorBackdrop,
+body:not([data-mff-alert-open="1"])>#mffAlertEditor,
+body:not([data-player-alert-open="1"])>#playerAlertReceiveBackdrop,
+body:not([data-player-alert-open="1"])>#playerAlertReceiveOverlay,
+body:not([data-smfp-boost-open="1"])>#mffExtremeBoostBackdrop,
+body:not([data-smfp-boost-open="1"])>#mffExtremeBoostOverlay,
+#smfpMobileEqOverlay:not(.is-open),
+#fp-admin-overlay.fp-admin-hidden{pointer-events:none!important;visibility:hidden!important;opacity:0!important;}
+#fp-admin-overlay:not(.fp-admin-hidden),#smfpMobileEqOverlay.is-open{pointer-events:auto!important;}
+
+/* Aktive Controls liegen immer über Dekor, aber unter echten Overlays. */
+.player-shell .controls,.player-shell .transport,.player-shell .volume,.player-shell .control-row,
+.mff-controls,.mff-boost-row-panel,.mff-actions{position:relative!important;z-index:120!important;}
+.now-playing,#mffApp .mff-now,#mffApp .mff-cards,#mffApp .mff-eq{position:relative!important;z-index:30!important;}
+
+/* Header wirklich als breite Kopfzeile verwenden. */
+.s666-player-header{position:relative!important;width:100%!important;max-width:100%!important;height:clamp(92px,11vh,132px)!important;min-height:92px!important;margin:0 auto 6px!important;padding:0!important;overflow:hidden!important;border-radius:18px!important;pointer-events:none!important;}
+.s666-player-header-banner{display:block!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center center!important;border-radius:18px!important;}
+.s666-header-status-row{position:absolute!important;right:10px!important;bottom:8px!important;z-index:3!important;display:flex!important;gap:6px!important;pointer-events:none!important;}
+.s666-header-brandline{position:absolute!important;left:10px!important;right:10px!important;bottom:7px!important;z-index:4!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;min-height:18px!important;padding:2px 10px!important;border:1px solid rgba(255,61,187,.34)!important;border-radius:999px!important;background:linear-gradient(90deg,rgba(255,61,187,.20),rgba(40,255,244,.12),rgba(255,61,187,.16))!important;box-shadow:0 0 18px rgba(255,61,187,.16),inset 0 0 14px rgba(40,255,244,.06)!important;color:#dfffff!important;font-size:clamp(8px,.72vw,11px)!important;line-height:1!important;letter-spacing:.07em!important;text-transform:uppercase!important;text-shadow:0 0 8px rgba(40,255,244,.65)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;pointer-events:none!important;}
+.s666-header-brandline b{color:#2afff4!important;text-shadow:0 0 10px rgba(40,255,244,.75)!important;}
+#pcCopyrightFooter{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important;pointer-events:none!important;}
+
+/* PC Topbar kompakt halten, damit LEDs Platz haben. */
+.top-hud .status-cluster{gap:5px!important;align-items:center!important;min-height:34px!important;}
+.s666-central-status-row .s666-status-chip,.top-hud .status-chip{min-width:auto!important;width:auto!important;height:24px!important;min-height:24px!important;padding:0 6px!important;font-size:9px!important;line-height:1!important;border-radius:999px!important;}
+.s666-info-chip{height:24px!important;min-height:24px!important;padding:0 7px!important;font-size:9px!important;line-height:1!important;border-radius:999px!important;}
+.s666-info-chip span{max-width:96px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+
+/* Side Panels: vorhandene großen Panels bekommen klare Titel + audioaktive LED. */
+.pc-addon-tower-head.s666-addon-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:7px!important;padding:6px 8px!important;min-height:28px!important;border-bottom:1px solid rgba(40,255,244,.20)!important;}
+.pc-addon-tower-head.s666-addon-head span{font-size:10px!important;letter-spacing:.09em!important;color:#2afff4!important;text-shadow:0 0 10px rgba(40,255,244,.72)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+.pc-addon-tower-head.s666-addon-head b{font-size:8px!important;color:#ff3dbb!important;}
+.s666-panel-audio-led{width:11px!important;height:11px!important;min-width:11px!important;border-radius:999px!important;background:radial-gradient(circle,#8dfff8 0 35%,#20fff2 36% 58%,rgba(40,255,244,.22) 60% 100%)!important;box-shadow:0 0 calc(7px + 18px * var(--s666-audio-energy)) rgba(40,255,244,.95),0 0 calc(4px + 13px * var(--s666-audio-energy)) rgba(255,61,187,.55)!important;transform:scale(calc(.86 + var(--s666-audio-energy) * .42))!important;opacity:calc(.62 + var(--s666-audio-energy) * .38)!important;transition:transform 90ms linear,box-shadow 90ms linear,opacity 90ms linear!important;}
+.pc-addon-module-reactor strong{font-size:10px!important;letter-spacing:.08em!important;color:#ff3dbb!important;text-shadow:0 0 10px rgba(255,61,187,.72)!important;}
+
+/* Mobile: feste App-Stage, Header breit, Overlays intern begrenzt. */
+@media(max-width:760px){
+  html,body{width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;overflow:hidden!important;touch-action:manipulation!important;}
+  #mffApp{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;overflow:hidden!important;}
+  #mffApp .mff-shell{overflow:hidden!important;}
+  #mffApp .mff-cyber-header{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:clamp(58px,11dvh,88px)!important;min-height:58px!important;max-height:88px!important;margin:0 0 4px!important;padding:0!important;border-radius:16px!important;overflow:hidden!important;pointer-events:none!important;}
+  #mffApp .mff-cyber-header img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center center!important;}
+  #mffApp .mff-header-brandline{left:5px!important;right:5px!important;bottom:4px!important;gap:5px!important;min-height:14px!important;padding:1px 5px!important;font-size:6.7px!important;letter-spacing:.045em!important;}
+  #mffApp .mff-panel-led-panel{height:auto!important;min-height:30px!important;max-height:38px!important;display:flex!important;gap:4px!important;overflow:hidden!important;position:relative!important;z-index:55!important;}
+  #mffApp .mff-panel-led,#mffApp .s666-status-chip{height:28px!important;min-height:28px!important;min-width:0!important;flex:1 1 0!important;padding:0 3px!important;font-size:7px!important;line-height:1!important;}
+  #mffApp .mff-panel-led b{font-size:7px!important;letter-spacing:.02em!important;}
+  #mffApp .mff-controls{position:relative!important;z-index:160!important;pointer-events:auto!important;}
+  #mffApp .mff-controls button{pointer-events:auto!important;touch-action:manipulation!important;}
+  .fp-admin-overlay,.player-alert-receive-overlay,#mffAlertEditor,#smfpMobileEqOverlay{max-width:100vw!important;max-height:100dvh!important;overflow:auto!important;overscroll-behavior:contain!important;}
+}
