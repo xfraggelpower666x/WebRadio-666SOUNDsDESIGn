@@ -1,0 +1,129 @@
+/* ============================================================
+   666SOUNDsDESIGn — v11 Functional Recovery First
+   Ziel: letzte funktionierende Player-Bindings schützen, Header-Platz vorbereiten.
+   Keine neue Parallel-UI, kein Klick-Overlay über Controls.
+   Header-Zielbild: 1600 x 260 px, sicherer Inhalt: ca. 1500 x 210 px.
+   ============================================================ */
+:root{
+  --s666-v11-header-target-w:1600px;
+  --s666-v11-header-target-h:260px;
+  --s666-v11-header-safe-w:1500px;
+  --s666-v11-header-safe-h:210px;
+  --s666-v11-cyan:#28fff4;
+  --s666-v11-pink:#ff3dbb;
+  --s666-v11-green:#60ff9b;
+  --s666-v11-red:#ff315d;
+}
+
+/* Desktop: Player etwas nach unten setzen; Platz oben für größeren Header schaffen, ohne Controls zu überdecken. */
+@media (min-width: 761px){
+  body .frame-stage{
+    padding-top:clamp(18px,3.2vh,42px)!important;
+    padding-bottom:clamp(8px,1.8vh,22px)!important;
+    box-sizing:border-box!important;
+  }
+  body .frame-stage .player-shell{
+    margin-top:clamp(20px,3.4vh,46px)!important;
+  }
+  body .frame-stage .player-shell > .hero.s666-player-header{
+    width:calc(100% - 36px)!important;
+    max-width:100%!important;
+    height:clamp(108px,13.8vh,158px)!important;
+    min-height:108px!important;
+    max-height:158px!important;
+    margin:0 auto 8px auto!important;
+    overflow:hidden!important;
+    border-radius:18px!important;
+    pointer-events:none!important;
+  }
+  body .frame-stage .player-shell > .hero.s666-player-header .s666-player-header-banner{
+    display:block!important;
+    width:100%!important;
+    height:calc(100% - 22px)!important;
+    object-fit:fill!important;
+    object-position:center center!important;
+    border-radius:16px 16px 8px 8px!important;
+    pointer-events:none!important;
+  }
+  body .frame-stage .player-shell > .hero.s666-player-header .s666-header-brandline{
+    position:absolute!important;
+    left:10px!important;
+    right:10px!important;
+    bottom:2px!important;
+    height:19px!important;
+    min-height:19px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    font-size:clamp(8px,.68vw,10px)!important;
+    line-height:1!important;
+    color:#eaffff!important;
+    letter-spacing:.075em!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    border-radius:0 0 14px 14px!important;
+    background:linear-gradient(90deg,rgba(255,61,187,.24),rgba(40,255,244,.10),rgba(255,61,187,.18))!important;
+    border:1px solid rgba(255,61,187,.34)!important;
+    pointer-events:none!important;
+  }
+}
+
+/* Functional click recovery: nur Deko transparent machen, Controls nicht manipulativ überbinden. */
+.frame-overlay,
+.s666-player-header,
+.s666-player-header *,
+.pc-side-addon::before,
+.pc-side-addon::after,
+.pc-addon-tower::before,
+.pc-addon-tower::after,
+.pc-bottom-sync-meter,
+.pc-bottom-sync-meter *,
+#pcCopyrightFooter{
+  pointer-events:none!important;
+}
+.control-toolbar,
+.control-toolbar *,
+#playBtn,#pauseBtn,#stopBtn,#reconnectBtn,
+.volume-wrap,.volume-wrap *,#volumeSlider,
+#historyToggle,#playerAlertPcBox,#playerAlertPcText,#playerAlertPcSend,
+.top-hud button,.status-chip,
+#eqBars,.eq-bars,.visualizer{
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+
+/* Ticker nicht ausblenden. */
+.ticker-window,#nowPlayingTicker{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+
+/* LED-Chips: einheitliche Höhe ohne bestehende Logik zu ersetzen. */
+.status-chip,.led-state{
+  min-height:24px!important;
+  height:24px!important;
+  max-height:24px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+}
+.status-chip .status-dot{width:7px!important;height:7px!important;min-width:7px!important;border-radius:999px!important;}
+.state-main,.state-external,.state-api,.s666-state-active{border-color:rgba(40,255,244,.68)!important;color:var(--s666-v11-cyan)!important;}
+.state-ok,.is-ok{border-color:rgba(96,255,155,.72)!important;color:var(--s666-v11-green)!important;}
+.state-warn,.is-warn{border-color:rgba(255,61,187,.72)!important;color:var(--s666-v11-pink)!important;}
+.state-error,.is-error{border-color:rgba(255,49,93,.78)!important;color:var(--s666-v11-red)!important;}
+
+/* Mobile: feste Stage, Header nutzt dieselbe Grafik, kein Overlay vergrößert den Player. */
+@media(max-width:760px){
+  html,body{width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;}
+  body[data-smfp-active="1"],#mffApp{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:100vw!important;max-height:100dvh!important;overflow:hidden!important;}
+  #mffApp .mff-shell{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;}
+  #mffApp .mff-cyber-header{display:flex!important;position:relative!important;align-items:center!important;justify-content:center!important;width:100%!important;height:clamp(62px,10.5dvh,92px)!important;min-height:62px!important;max-height:92px!important;margin:0 0 4px 0!important;overflow:hidden!important;pointer-events:none!important;}
+  #mffApp .mff-cyber-header img{display:block!important;width:100%!important;height:calc(100% - 14px)!important;object-fit:fill!important;object-position:center center!important;pointer-events:none!important;}
+  #mffApp .mff-header-brandline{position:absolute!important;left:6px!important;right:6px!important;bottom:0!important;height:13px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:6px!important;letter-spacing:.05em!important;color:#eaffff!important;background:rgba(255,61,187,.18)!important;border:1px solid rgba(255,61,187,.22)!important;border-radius:0 0 10px 10px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  #mffAlertEditor,#smfpMobileEqOverlay,.fp-admin-overlay,.s666-discord-gate,.s666-discord-denied,.smfp-msg-history-backdrop{position:fixed!important;inset:0!important;max-width:100vw!important;max-height:100dvh!important;overflow:auto!important;overscroll-behavior:contain!important;}
+}

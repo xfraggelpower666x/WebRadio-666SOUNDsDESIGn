@@ -494,11 +494,11 @@ function updateHistory(title) {
 
 
 function getDefaultDjName() {
-  return 'DJ 666';
+  return '666SOUNDsDESIGn DJ';
 }
 
 function normalizeDjName(raw) {
-  const fallback = 'DJ 666';
+  const fallback = '666SOUNDsDESIGn DJ';
   const value = String(raw || '').trim();
   if (!value) return fallback;
   const lowered = value.toLowerCase();

@@ -1,6 +1,0 @@
-
-/* 666SOUNDsDESIGn — v8 Central Header Core */
-.s666-player-header,.mff-cyber-header{background:rgba(2,5,18,.72)!important;border:1px solid rgba(40,255,244,.20)!important;border-radius:18px!important;box-shadow:inset 0 0 18px rgba(40,255,244,.05),0 0 16px rgba(255,61,187,.08)!important;overflow:hidden!important;}
-.s666-player-header{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0 0 8px 0!important;height:clamp(74px,9.2vh,118px)!important;min-height:74px!important;max-height:118px!important;}
-.s666-player-header-banner{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center center!important;margin:0 auto!important;}
-@media(max-width:760px){.s666-player-header{display:none!important;}.mff-cyber-header{border-radius:16px!important;margin:0!important;}}
