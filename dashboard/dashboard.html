@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07000f" />
+  <title>666SOUNDsDESIGn — Radio Command Dashboard</title>
+  <link rel="stylesheet" href="./css/radio-dashboard-addon.css" />
+</head>
+<body>
+  <main class="s666-dashboard" data-dashboard="radio-core-addon-v1">
+    <section class="s666-window">
+      <header class="s666-header">
+        <div class="s666-header-art" aria-label="666SOUNDsDESIGn Dashboard Header"></div>
+        <div class="s666-title-block">
+          <span class="s666-kicker">CYBERSTREAM CONTROL INTERFACE</span>
+          <h1>666SOUNDsDESIGn Radio Dashboard</h1>
+          <p>Streamdaten · Metadaten · Discord Shooter · Player Links · Presets</p>
+        </div>
+        <div class="s666-window-controls" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </header>
+
+      <nav class="s666-sidebar" aria-label="Dashboard Navigation">
+        <button class="active" data-scroll="overview">Dashboard</button>
+        <button data-scroll="stream">Stream</button>
+        <button data-scroll="metadata">Metadata</button>
+        <button data-scroll="discord">Discord Shooter</button>
+        <button data-scroll="links">Player Links</button>
+        <button data-scroll="debug">Debug</button>
+      </nav>
+
+      <section class="s666-grid" id="overview">
+        <article class="s666-card s666-card-status" id="stream">
+          <div class="s666-card-head"><span>Stream Status</span><b id="streamLed" class="led wait"></b></div>
+          <div class="s666-big-value" id="streamState">Prüfe…</div>
+          <div class="s666-subline" id="lastUpdate">Last update: —</div>
+          <div class="s666-pill-row">
+            <span class="pill cyan" id="bitrateValue">Bitrate: —</span>
+            <span class="pill pink" id="listenersValue">Listeners: —</span>
+          </div>
+        </article>
+
+        <article class="s666-card s666-card-now" id="metadata">
+          <div class="s666-card-head"><span>Now Playing</span><button id="refreshBtn" class="mini-btn">Refresh</button></div>
+          <h2 id="nowPlaying">Loading metadata…</h2>
+          <p id="artistDj">DJ / Artist: —</p>
+          <div class="wavebar" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        </article>
+
+        <article class="s666-card s666-card-ring">
+          <div class="ring"><span id="signalPercent">66</span><small>Signal</small></div>
+          <div class="s666-subline">Human Resonance Online</div>
+          <div class="s666-dots"><span></span><span></span><span></span><span></span><span></span></div>
+        </article>
+
+        <article class="s666-card s666-card-bars">
+          <div class="s666-card-head"><span>Forward Pressure</span><b class="led ok"></b></div>
+          <div class="bars" aria-hidden="true">
+            <i style="--h:46%"></i><i style="--h:68%"></i><i style="--h:35%"></i><i style="--h:52%"></i><i style="--h:75%"></i><i style="--h:43%"></i><i style="--h:62%"></i><i style="--h:82%"></i><i style="--h:58%"></i><i style="--h:91%"></i><i style="--h:72%"></i><i style="--h:87%"></i>
+          </div>
+        </article>
+
+        <article class="s666-card s666-card-presets">
+          <div class="s666-card-head"><span>Stream Presets</span><b class="led ok"></b></div>
+          <button class="preset" data-stream="https://my.idjstream.com/666soundsdesign/stream">Preset 1 · IDJ Named</button>
+          <button class="preset" data-stream="https://my.idjstream.com:8686/stream">Preset 2 · Port 8686</button>
+          <button class="preset" data-stream="https://my.idjstream.com/8686/stream">Preset 3 · Path 8686</button>
+          <p class="hint">Klick kopiert die Adresse in die Zwischenablage.</p>
+        </article>
+
+        <article class="s666-card s666-card-links" id="links">
+          <div class="s666-card-head"><span>Player Links</span><b class="led ok"></b></div>
+          <a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener">WebRadio Player öffnen</a>
+          <a href="https://idjstream.app/cp/widgets/player/?p=8686&type=sonic" target="_blank" rel="noopener">IDJ Sonic Widget öffnen</a>
+          <a href="https://webradio.666soundsdesign-broadcaster.com/stream" target="_blank" rel="noopener">Direkten Stream öffnen</a>
+        </article>
+
+        <article class="s666-card s666-card-discord" id="discord">
+          <div class="s666-card-head"><span>Discord Shooter</span><b id="discordLed" class="led wait"></b></div>
+          <label>Gate Code / Admin Code <input id="gateCode" type="password" autocomplete="off" placeholder="optional / falls Worker verlangt" /></label>
+          <label>Nachricht <textarea id="discordMessage" rows="4" placeholder="Nachricht in den Discord-Channel senden…">📻 666SOUNDsDESIGn WebRadio ist online. Dark pressure active. Human resonance online.</textarea></label>
+          <div class="button-row">
+            <button id="sendDiscordBtn">Send to Discord</button>
+            <button id="sendNowPlayingBtn" class="secondary">Now Playing posten</button>
+          </div>
+          <pre id="discordResult">Discord status: wartet…</pre>
+        </article>
+
+        <article class="s666-card s666-card-graph">
+          <div class="s666-card-head"><span>Metadata Curve</span><b class="led ok"></b></div>
+          <svg viewBox="0 0 600 190" role="img" aria-label="Neon Metadata Curve">
+            <defs>
+              <linearGradient id="fill666" x1="0" x2="1"><stop offset="0" stop-color="#00eaff" stop-opacity=".7"/><stop offset="1" stop-color="#ff22c8" stop-opacity=".75"/></linearGradient>
+            </defs>
+            <path d="M0,130 C40,80 70,150 115,105 C160,60 195,105 235,80 C275,55 310,145 355,120 C400,90 430,40 470,75 C515,115 540,42 600,65 L600,190 L0,190 Z" fill="url(#fill666)" opacity=".72" />
+            <path d="M0,130 C40,80 70,150 115,105 C160,60 195,105 235,80 C275,55 310,145 355,120 C400,90 430,40 470,75 C515,115 540,42 600,65" fill="none" stroke="#ff38d1" stroke-width="4" />
+          </svg>
+        </article>
+
+        <article class="s666-card s666-card-debug" id="debug">
+          <div class="s666-card-head"><span>API Debug</span><button id="debugBtn" class="mini-btn">Check</button></div>
+          <pre id="debugOutput">Noch kein Debuglauf.</pre>
+        </article>
+      </section>
+    </section>
+  </main>
+  <script src="./js/radio-dashboard-addon.js"></script>
+</body>
+</html>
