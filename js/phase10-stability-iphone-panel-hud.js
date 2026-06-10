@@ -16,6 +16,23 @@ RULES:
   var lastRecoveryAt = 0;
   var meterTimer = 0;
 
+  // AUDIO_CORE_AUTHORITY_LOCK_V1_20260610
+  // Zweck: Nur ein Recovery-Chef darf automatische Audio-Recovery auslösen.
+  // Keine neue Audio-Engine. Keine neue UI. Keine Stream-URL-Änderung.
+  window.S666_AUDIO_AUTHORITY = window.S666_AUDIO_AUTHORITY || {
+    transport: "player-core-or-mff",
+    recovery: "central-audio-guard-v2",
+    legacyRecoveryMuted: true
+  };
+
+  function s666CentralAudioAuthorityActive(){
+    return !!(
+      window.S666_AUDIO_AUTHORITY &&
+      window.S666_AUDIO_AUTHORITY.recovery === "central-audio-guard-v2" &&
+      window.S666_AUDIO_AUTHORITY.legacyRecoveryMuted === true
+    );
+  }
+
   function qs(sel, root){ return (root || document).querySelector(sel); }
   function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function tap(el, label){
@@ -203,6 +220,11 @@ RULES:
   }
 
   function scheduleRecovery(reason){
+    if(s666CentralAudioAuthorityActive()){
+      document.documentElement.setAttribute("data-phase10-legacy-recovery-muted", reason || "legacy-muted");
+      return;
+    }
+
     var now = Date.now();
     if(now - lastRecoveryAt < 10000) return;
     lastRecoveryAt = now;
@@ -354,6 +376,10 @@ RULES:
 
         var age = Date.now() - audioFocusGuard.externalPauseAt;
         if(age >= audioFocusGuard.pauseToleranceMs){
+          if(s666CentralAudioAuthorityActive()){
+            document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-recovery");
+            return;
+          }
           document.documentElement.setAttribute("data-phase10-audio-focus", "recovering-after-short-interruption");
           recoverAudio("audio-focus-guard-delayed-resume");
         }
@@ -374,7 +400,13 @@ RULES:
       if(streamWanted() && a.paused && !isUserStopRecent()){
         setTimeout(function(){
           var again = getAudio();
-          if(again && again.paused && streamWanted()) recoverAudio("visibility-return-resume");
+          if(again && again.paused && streamWanted()){
+            if(s666CentralAudioAuthorityActive()){
+              document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-visibility");
+              return;
+            }
+            recoverAudio("visibility-return-resume");
+          }
         }, 650);
       }
     }, true);
@@ -382,7 +414,13 @@ RULES:
     window.addEventListener("pageshow", function(){
       var a = getAudio();
       if(a && a.paused && streamWanted() && !isUserStopRecent()){
-        setTimeout(function(){ recoverAudio("pageshow-resume"); }, 750);
+        setTimeout(function(){
+          if(s666CentralAudioAuthorityActive()){
+            document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-pageshow");
+            return;
+          }
+          recoverAudio("pageshow-resume");
+        }, 750);
       }
     }, true);
 
@@ -398,6 +436,10 @@ RULES:
       if(a.paused && streamWanted() && !isUserStopRecent()){
         var pausedFor = Date.now() - audioFocusGuard.lastPauseAt;
         if(pausedFor > audioFocusGuard.longInterruptionMs){
+          if(s666CentralAudioAuthorityActive()){
+            document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-periodic");
+            return;
+          }
           recoverAudio("audio-focus-periodic-resume");
         }
       }
@@ -827,6 +869,10 @@ RULES:
     } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
   }
   function iphoneAudioV2Recover(reason){
+    if(s666CentralAudioAuthorityActive()){
+      document.documentElement.setAttribute("data-iphone-audio-v2-muted", reason || "central-authority-active");
+      return;
+    }
     if(!iphoneAudioV2Mobile()) return;
     if(!iphoneAudioV2Wanted()) return;
     if(iphoneAudioV2UserStopRecent()) return;
@@ -923,6 +969,7 @@ RULES:
     }catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
   }
   function centralAudioGuardV2Recover(reason){
+    document.documentElement.setAttribute("data-audio-authority-chief", "central-audio-guard-v2");
     if(!centralAudioGuardV2Wanted()) return;
     if(centralAudioGuardV2ManualStopRecent()) return;
     var profile=centralAudioGuardV2Profile();
