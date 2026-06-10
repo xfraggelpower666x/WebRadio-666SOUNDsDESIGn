@@ -33,6 +33,27 @@ RULES:
     );
   }
 
+
+  // IOS_AUDIO_FOCUS_RESUME_PATCH_V1_20260610
+  // Zweck: AudioFocusGuard bleibt Sensor, CentralAudioGuardV2 bleibt Recovery-Chef.
+  // Bei iOS-Audio-Fokus-Unterbrechungen nicht stumm aussteigen, sondern an den Chef übergeben.
+  function s666AudioAuthorityHandoff(reason, state){
+    try {
+      document.documentElement.setAttribute("data-phase10-audio-focus", state || "handoff-to-central-authority");
+      document.documentElement.setAttribute("data-audio-authority-handoff", reason || "audio-focus-handoff");
+    } catch(e) {}
+
+    if (typeof centralAudioGuardV2Recover === "function") {
+      centralAudioGuardV2Recover(reason || "audio-focus-handoff");
+      return true;
+    }
+
+    try {
+      document.documentElement.setAttribute("data-audio-authority-handoff", "central-recover-function-unavailable");
+    } catch(e) {}
+    return false;
+  }
+
   function qs(sel, root){ return (root || document).querySelector(sel); }
   function qsa(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function tap(el, label){
@@ -377,7 +398,7 @@ RULES:
         var age = Date.now() - audioFocusGuard.externalPauseAt;
         if(age >= audioFocusGuard.pauseToleranceMs){
           if(s666CentralAudioAuthorityActive()){
-            document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-recovery");
+            s666AudioAuthorityHandoff("audio-focus-guard-resume", "handoff-to-central-authority");
             return;
           }
           document.documentElement.setAttribute("data-phase10-audio-focus", "recovering-after-short-interruption");
@@ -402,7 +423,7 @@ RULES:
           var again = getAudio();
           if(again && again.paused && streamWanted()){
             if(s666CentralAudioAuthorityActive()){
-              document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-visibility");
+              s666AudioAuthorityHandoff("visibility-return-resume", "handoff-to-central-authority-visibility");
               return;
             }
             recoverAudio("visibility-return-resume");
@@ -416,7 +437,7 @@ RULES:
       if(a && a.paused && streamWanted() && !isUserStopRecent()){
         setTimeout(function(){
           if(s666CentralAudioAuthorityActive()){
-            document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-pageshow");
+            s666AudioAuthorityHandoff("pageshow-resume", "handoff-to-central-authority-pageshow");
             return;
           }
           recoverAudio("pageshow-resume");
@@ -437,7 +458,7 @@ RULES:
         var pausedFor = Date.now() - audioFocusGuard.lastPauseAt;
         if(pausedFor > audioFocusGuard.longInterruptionMs){
           if(s666CentralAudioAuthorityActive()){
-            document.documentElement.setAttribute("data-phase10-audio-focus", "central-authority-handles-periodic");
+            s666AudioAuthorityHandoff("audio-focus-periodic-resume", "handoff-to-central-authority-periodic");
             return;
           }
           recoverAudio("audio-focus-periodic-resume");
