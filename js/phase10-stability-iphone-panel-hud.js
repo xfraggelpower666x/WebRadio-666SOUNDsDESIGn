@@ -945,9 +945,9 @@ RULES:
 
   // CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530
   var centralAudioGuardV2 = {
-    started:false, wanted:false, manualStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0,
-    pcProfile:{ pausedToleranceMs:8500, stallToleranceMs:21000, readyLowToleranceMs:15000, cooldownMs:14000 },
-    mobileProfile:{ pausedToleranceMs:4200, stallToleranceMs:14500, readyLowToleranceMs:9000, cooldownMs:9000 }
+    started:false, wanted:false, manualStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0, escalation:0,
+    pcProfile:{ pausedToleranceMs:12000, stallToleranceMs:36000, readyLowToleranceMs:22000, cooldownMs:18000 },
+    mobileProfile:{ pausedToleranceMs:6500, stallToleranceMs:26000, readyLowToleranceMs:14000, cooldownMs:12000 }
   };
   function centralAudioGuardV2IsMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || window.innerWidth <= 760; }
   function centralAudioGuardV2Profile(){ return centralAudioGuardV2IsMobile() ? centralAudioGuardV2.mobileProfile : centralAudioGuardV2.pcProfile; }
@@ -966,26 +966,60 @@ RULES:
     document.documentElement.setAttribute("data-central-audio-device", centralAudioGuardV2IsMobile() ? "mobile" : "pc");
     document.documentElement.setAttribute("data-central-audio-reason", reason||"");
   }
+  // IOS_PC_AUDIO_RECOVERY_ESCALATION_PATCH_A_V1_20260610
+  // Zweck: Recovery eskalieren statt sofort hart laden/rebinden.
+  // Stufe 1 = play(), Stufe 2 = AudioContext resume + play(), Stufe 3 = load()+play(), Stufe 4 = src-Rebind.
+  // currentTime allein darf keinen harten Live-Stream-Recovery-Step auslösen.
+  function centralAudioGuardV2ResumeContexts(reason){
+    var resumed=false;
+    [window.__mffAudioContext, window.__radioAudioContext, window.__smfpAudioContext].forEach(function(ctx){
+      try{
+        if(ctx && ctx.state === "suspended" && typeof ctx.resume === "function"){
+          var r=ctx.resume();
+          if(r && typeof r.catch === "function") r.catch(function(err){
+            document.documentElement.setAttribute("data-central-audio-context-error",String(err&&err.message||err).slice(0,120));
+          });
+          resumed=true;
+        }
+      }catch(e){ document.documentElement.setAttribute("data-central-audio-context-error",String(e&&e.message||e).slice(0,120)); }
+    });
+    document.documentElement.setAttribute("data-central-audio-context-resume", resumed ? (reason||"resume") : "none");
+    return resumed;
+  }
   function centralAudioGuardV2Play(reason){
     var a=centralAudioGuardV2Audio(); if(!a) return;
     centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"play");
+    document.documentElement.setAttribute("data-central-audio-recovery-action","play");
     try{ var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));}); }
     catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
+  }
+  function centralAudioGuardV2ContextPlay(reason){
+    centralAudioGuardV2ResumeContexts(reason||"context-play");
+    return centralAudioGuardV2Play(reason||"context-play");
   }
   function centralAudioGuardV2LoadPlay(reason){
     var a=centralAudioGuardV2Audio(); if(!a) return;
     centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"loadplay");
+    document.documentElement.setAttribute("data-central-audio-recovery-action","loadplay");
     try{ a.load(); var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));}); }
     catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
   }
   function centralAudioGuardV2RebindMain(reason){
     var a=centralAudioGuardV2Audio(); if(!a) return;
     centralAudioGuardV2.lastRecoverAt=Date.now(); centralAudioGuardV2Status(reason||"main-rebind");
+    document.documentElement.setAttribute("data-central-audio-recovery-action","main-rebind");
     try{
       var src=String(a.currentSrc||a.getAttribute("src")||"");
       if(/fallback-stream|backup/i.test(src)){
-        a.pause(); a.setAttribute("src","/stream?t="+Date.now()); document.documentElement.setAttribute("data-phase10-stream-target","main");
-      } else { a.load(); }
+        a.pause();
+        a.removeAttribute("src");
+        a.setAttribute("src","/stream?t="+Date.now());
+        document.documentElement.setAttribute("data-phase10-stream-target","main");
+      } else if(!src || /about:blank/i.test(src)) {
+        a.setAttribute("src","/stream?t="+Date.now());
+      } else {
+        a.load();
+      }
       var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));});
     }catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
   }
@@ -995,25 +1029,49 @@ RULES:
     if(centralAudioGuardV2ManualStopRecent()) return;
     var profile=centralAudioGuardV2Profile();
     if(Date.now()-centralAudioGuardV2.lastRecoverAt < profile.cooldownMs) return;
-    centralAudioGuardV2.step=(centralAudioGuardV2.step+1)%3;
-    if(centralAudioGuardV2.step===0) return centralAudioGuardV2Play(reason+"-play");
-    if(centralAudioGuardV2.step===1) return centralAudioGuardV2LoadPlay(reason+"-loadplay");
-    return centralAudioGuardV2RebindMain(reason+"-main");
+
+    var a=centralAudioGuardV2Audio();
+    var r=String(reason||"recovery");
+    var ready=a?Number(a.readyState||0):0;
+    var network=a?Number(a.networkState||0):0;
+    var hard=/error|abort|emptied|no-source|network-no-source|main-rebind/i.test(r) || network===3 || !a || !String(a.currentSrc||a.getAttribute("src")||"");
+
+    centralAudioGuardV2.escalation = Math.max(1, Number(centralAudioGuardV2.escalation||0) + 1);
+    if(hard) centralAudioGuardV2.escalation = Math.max(centralAudioGuardV2.escalation, 3);
+    if(a && !a.paused && ready >= 2 && /time-stall/i.test(r)) centralAudioGuardV2.escalation = Math.min(centralAudioGuardV2.escalation, 1);
+    if(centralAudioGuardV2.escalation > 5) centralAudioGuardV2.escalation = 5;
+
+    document.documentElement.setAttribute("data-central-audio-recovery-level", String(centralAudioGuardV2.escalation));
+    document.documentElement.setAttribute("data-central-audio-recovery-request", r);
+
+    if(centralAudioGuardV2.escalation <= 1) return centralAudioGuardV2Play(r+"-soft-play");
+    if(centralAudioGuardV2.escalation === 2) return centralAudioGuardV2ContextPlay(r+"-context-play");
+    if(centralAudioGuardV2.escalation === 3) return centralAudioGuardV2LoadPlay(r+"-loadplay");
+    if(centralAudioGuardV2.escalation === 4) return centralAudioGuardV2RebindMain(r+"-main-rebind");
+
+    document.documentElement.setAttribute("data-central-audio-recovery-action","fail-safe-wait");
+    centralAudioGuardV2.lastRecoverAt=Date.now();
   }
   function centralAudioGuardV2Tick(){
     var a=centralAudioGuardV2Audio(); if(!a) return;
     var now=Date.now(), ct=Number(a.currentTime||0), moved=Math.abs(ct-centralAudioGuardV2.lastTime)>0.08;
-    if(!a.paused && moved){ centralAudioGuardV2.lastMoveAt=now; centralAudioGuardV2.step=0; }
+    if(!a.paused && (moved || Number(a.readyState||0) >= 3)){ centralAudioGuardV2.lastMoveAt=now; centralAudioGuardV2.escalation=0; }
     centralAudioGuardV2.lastTime=ct;
     var stalled=now-centralAudioGuardV2.lastMoveAt, ready=Number(a.readyState||0), network=Number(a.networkState||0), profile=centralAudioGuardV2Profile();
+    var currentTimeOnlyStall=(!a.paused && stalled > profile.stallToleranceMs && ready >= 2 && network !== 3);
     document.documentElement.setAttribute("data-central-audio-stability-v2","active");
     document.documentElement.setAttribute("data-central-audio-device",centralAudioGuardV2IsMobile()?"mobile":"pc");
     document.documentElement.setAttribute("data-central-audio-ready",String(ready));
     document.documentElement.setAttribute("data-central-audio-network",String(network));
     document.documentElement.setAttribute("data-central-audio-stall-ms",String(Math.max(0,stalled)));
+    document.documentElement.setAttribute("data-central-audio-currenttime-only-stall", currentTimeOnlyStall ? "1" : "0");
     if(!centralAudioGuardV2Wanted() || centralAudioGuardV2ManualStopRecent()) return;
     if(a.paused && stalled > profile.pausedToleranceMs) return centralAudioGuardV2Recover("paused-wanted");
-    if(!a.paused && stalled > profile.stallToleranceMs) return centralAudioGuardV2Recover("time-stall");
+    if(!a.paused && stalled > profile.stallToleranceMs && (ready < 2 || network === 3)) return centralAudioGuardV2Recover("time-stall-confirmed");
+    if(currentTimeOnlyStall){
+      document.documentElement.setAttribute("data-central-audio-observe-only","currenttime-only-stall");
+      return;
+    }
     if(ready < 2 && stalled > profile.readyLowToleranceMs) return centralAudioGuardV2Recover("ready-low");
   }
   function startCentralAudioStabilityGuardV2(){
