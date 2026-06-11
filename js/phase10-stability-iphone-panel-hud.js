@@ -1023,39 +1023,162 @@ RULES:
       var p=a.play(); if(p&&p.catch) p.catch(function(err){document.documentElement.setAttribute("data-central-audio-error",String(err&&err.message||err).slice(0,120));});
     }catch(e){document.documentElement.setAttribute("data-central-audio-error",String(e&&e.message||e).slice(0,120));}
   }
-  function centralAudioGuardV2Recover(reason){
-    document.documentElement.setAttribute("data-audio-authority-chief", "central-audio-guard-v2");
-    if(!centralAudioGuardV2Wanted()) return;
-    if(centralAudioGuardV2ManualStopRecent()) return;
-    var profile=centralAudioGuardV2Profile();
-    if(Date.now()-centralAudioGuardV2.lastRecoverAt < profile.cooldownMs) return;
+  // PC_IPHONE_ANDROID_AUDIO_HEALING_ORCHESTRA_PATCH_1_V1_20260611
+  // Zweck: Ein gemeinsamer Audio-Healing-Decision-Core fuer PC, iPhone und Android.
+  // Sensoren melden nur. Diese Orchester-Funktion entscheidet zentral und gestuft.
+  window.S666_AUDIO_HEALING_ORCHESTRA = window.S666_AUDIO_HEALING_ORCHESTRA || {
+    active:true,
+    version:"PC_IPHONE_ANDROID_AUDIO_HEALING_ORCHESTRA_PATCH_1_V1_20260611",
+    recoveryChief:"audio-healing-orchestra",
+    transportChief:"player-core-or-mff",
+    legacyRecoveryMuted:true,
+    stage:0,
+    maxStage:5,
+    lastEvent:"",
+    lastDecision:"",
+    lastGuard:"",
+    lastRecoveryAt:0,
+    failSafe:0
+  };
 
+  function s666AudioOrchestra(){
+    window.S666_AUDIO_HEALING_ORCHESTRA = window.S666_AUDIO_HEALING_ORCHESTRA || {};
+    return window.S666_AUDIO_HEALING_ORCHESTRA;
+  }
+
+  function s666AudioOrchestraSet(key,val){
+    try{
+      var o=s666AudioOrchestra();
+      o[key]=val;
+      document.documentElement.setAttribute("data-audio-orchestra-"+key.replace(/[A-Z]/g,function(m){return "-"+m.toLowerCase();}), String(val));
+    }catch(e){}
+  }
+
+  function s666AudioOrchestraStatus(reason, decision, guard){
+    var o=s666AudioOrchestra();
+    var device=centralAudioGuardV2IsMobile() ? ((/android/i.test(navigator.userAgent||"")) ? "android" : "iphone") : "pc";
+    o.active=true; o.lastEvent=String(reason||""); o.lastDecision=String(decision||""); o.lastGuard=String(guard||""); o.device=device;
+    try{
+      document.documentElement.setAttribute("data-audio-orchestra","active");
+      document.documentElement.setAttribute("data-audio-orchestra-version",o.version||"PC_IPHONE_ANDROID_AUDIO_HEALING_ORCHESTRA_PATCH_1_V1_20260611");
+      document.documentElement.setAttribute("data-audio-orchestra-device",device);
+      document.documentElement.setAttribute("data-audio-orchestra-last-event",String(reason||""));
+      document.documentElement.setAttribute("data-audio-orchestra-last-decision",String(decision||""));
+      document.documentElement.setAttribute("data-audio-orchestra-last-guard",String(guard||""));
+      document.documentElement.setAttribute("data-audio-authority-chief","audio-healing-orchestra");
+    }catch(e){}
+  }
+
+  function s666AudioOrchestraManualStopRecent(){
+    if(centralAudioGuardV2ManualStopRecent()) return true;
+    try{ if(typeof isUserStopRecent==="function" && isUserStopRecent()) return true; }catch(e){}
+    return false;
+  }
+
+  function s666AudioOrchestraIsHardReason(reason, audio, ready, network){
+    var r=String(reason||"");
+    var src=audio ? String(audio.currentSrc||audio.getAttribute("src")||"") : "";
+    return /error|abort|emptied|no-source|network-no-source|decode|media-error/i.test(r) ||
+      network===3 || !audio || !src;
+  }
+
+  function s666AudioOrchestraDecide(reason){
+    var o=s666AudioOrchestra();
     var a=centralAudioGuardV2Audio();
     var r=String(reason||"recovery");
+    var now=Date.now();
+    var profile=centralAudioGuardV2Profile();
     var ready=a?Number(a.readyState||0):0;
     var network=a?Number(a.networkState||0):0;
-    var hard=/error|abort|emptied|no-source|network-no-source|main-rebind/i.test(r) || network===3 || !a || !String(a.currentSrc||a.getAttribute("src")||"");
+    var paused=!!(a && a.paused);
+    var hidden=!!document.hidden;
+    var wanted=centralAudioGuardV2Wanted();
+    var hard=s666AudioOrchestraIsHardReason(r,a,ready,network);
+    var currentTimeOnly=/time-stall/i.test(r) && a && !paused && ready>=2 && network!==3;
 
-    centralAudioGuardV2.escalation = Math.max(1, Number(centralAudioGuardV2.escalation||0) + 1);
-    if(hard) centralAudioGuardV2.escalation = Math.max(centralAudioGuardV2.escalation, 3);
-    if(a && !a.paused && ready >= 2 && /time-stall/i.test(r)) centralAudioGuardV2.escalation = Math.min(centralAudioGuardV2.escalation, 1);
-    if(centralAudioGuardV2.escalation > 5) centralAudioGuardV2.escalation = 5;
+    s666AudioOrchestraStatus(r,"inspect","decision-core");
+    document.documentElement.setAttribute("data-audio-orchestra-ready",String(ready));
+    document.documentElement.setAttribute("data-audio-orchestra-network",String(network));
+    document.documentElement.setAttribute("data-audio-orchestra-paused",paused?"1":"0");
+    document.documentElement.setAttribute("data-audio-orchestra-wanted",wanted?"1":"0");
 
-    document.documentElement.setAttribute("data-central-audio-recovery-level", String(centralAudioGuardV2.escalation));
-    document.documentElement.setAttribute("data-central-audio-recovery-request", r);
+    if(!wanted){
+      o.stage=0; o.failSafe=0;
+      s666AudioOrchestraStatus(r,"observe-no-wanted","user-intent-guard");
+      return;
+    }
 
-    if(centralAudioGuardV2.escalation <= 1) return centralAudioGuardV2Play(r+"-soft-play");
-    if(centralAudioGuardV2.escalation === 2) return centralAudioGuardV2ContextPlay(r+"-context-play");
-    if(centralAudioGuardV2.escalation === 3) return centralAudioGuardV2LoadPlay(r+"-loadplay");
-    if(centralAudioGuardV2.escalation === 4) return centralAudioGuardV2RebindMain(r+"-main-rebind");
+    if(s666AudioOrchestraManualStopRecent()){
+      o.stage=0; o.failSafe=0;
+      s666AudioOrchestraStatus(r,"blocked-manual-stop-recent","user-intent-guard");
+      return;
+    }
 
+    if(currentTimeOnly){
+      o.stage=0;
+      s666AudioOrchestraStatus(r,"observe-currenttime-only","live-stream-currenttime-guard");
+      return;
+    }
+
+    // PC-Return-Guard / iOS-Focus-Guard: Fokus- und Sichtbarkeitsereignisse starten nur soft.
+    if(/visibility|pageshow|focus|online|audio-focus/i.test(r) && !paused && ready>=2 && !hard){
+      o.stage=0;
+      s666AudioOrchestraStatus(r,"observe-focus-return-audio-ok","pc-ios-focus-guard");
+      return;
+    }
+
+    if(now-Number(o.lastRecoveryAt||0) < profile.cooldownMs){
+      s666AudioOrchestraStatus(r,"cooldown-block","no-endless-recovery-guard");
+      return;
+    }
+
+    var nextStage = Math.max(1, Number(o.stage||0) + 1);
+    if(/visibility|pageshow|focus|audio-focus|paused-wanted/i.test(r)) nextStage = Math.min(nextStage,2);
+    if(hard) nextStage = Math.max(nextStage,3);
+    if(ready < 2 && !paused) nextStage = Math.max(nextStage,2);
+    if(nextStage > 5) nextStage = 5;
+
+    o.stage=nextStage;
+    o.lastRecoveryAt=now;
+    centralAudioGuardV2.lastRecoverAt=now;
+    document.documentElement.setAttribute("data-audio-orchestra-stage",String(nextStage));
+    document.documentElement.setAttribute("data-central-audio-recovery-level",String(nextStage));
+    document.documentElement.setAttribute("data-central-audio-recovery-request",r);
+
+    if(nextStage===1){
+      s666AudioOrchestraStatus(r,"stage-1-soft-play","single-healer-guard");
+      return centralAudioGuardV2Play(r+"-orchestra-soft-play");
+    }
+    if(nextStage===2){
+      s666AudioOrchestraStatus(r,"stage-2-context-play","single-healer-guard");
+      return centralAudioGuardV2ContextPlay(r+"-orchestra-context-play");
+    }
+    if(nextStage===3){
+      s666AudioOrchestraStatus(r,"stage-3-load-play","single-healer-guard");
+      return centralAudioGuardV2LoadPlay(r+"-orchestra-loadplay");
+    }
+    if(nextStage===4){
+      if(/visibility|pageshow|focus|audio-focus/i.test(r)){
+        s666AudioOrchestraStatus(r,"stage-4-blocked-focus-no-rebind","ios-pc-return-guard");
+        return centralAudioGuardV2ContextPlay(r+"-orchestra-focus-context-play");
+      }
+      s666AudioOrchestraStatus(r,"stage-4-controlled-rebind","single-healer-guard");
+      return centralAudioGuardV2RebindMain(r+"-orchestra-main-rebind");
+    }
+
+    o.failSafe=1;
+    document.documentElement.setAttribute("data-audio-orchestra-failsafe","1");
     document.documentElement.setAttribute("data-central-audio-recovery-action","fail-safe-wait");
-    centralAudioGuardV2.lastRecoverAt=Date.now();
+    s666AudioOrchestraStatus(r,"stage-5-failsafe-wait","no-endless-recovery-guard");
+  }
+
+  function centralAudioGuardV2Recover(reason){
+    return s666AudioOrchestraDecide(reason);
   }
   function centralAudioGuardV2Tick(){
     var a=centralAudioGuardV2Audio(); if(!a) return;
     var now=Date.now(), ct=Number(a.currentTime||0), moved=Math.abs(ct-centralAudioGuardV2.lastTime)>0.08;
-    if(!a.paused && (moved || Number(a.readyState||0) >= 3)){ centralAudioGuardV2.lastMoveAt=now; centralAudioGuardV2.escalation=0; }
+    if(!a.paused && (moved || Number(a.readyState||0) >= 3)){ centralAudioGuardV2.lastMoveAt=now; centralAudioGuardV2.escalation=0; try{ var oo=s666AudioOrchestra(); oo.stage=0; oo.failSafe=0; document.documentElement.setAttribute("data-audio-orchestra-stage","0"); document.documentElement.setAttribute("data-audio-orchestra-failsafe","0"); }catch(e){} }
     centralAudioGuardV2.lastTime=ct;
     var stalled=now-centralAudioGuardV2.lastMoveAt, ready=Number(a.readyState||0), network=Number(a.networkState||0), profile=centralAudioGuardV2Profile();
     var currentTimeOnlyStall=(!a.paused && stalled > profile.stallToleranceMs && ready >= 2 && network !== 3);
@@ -1079,7 +1202,7 @@ RULES:
     centralAudioGuardV2.started=true;
     var a=centralAudioGuardV2Audio();
     if(a){
-      ["play","playing","canplay","canplaythrough"].forEach(function(ev){a.addEventListener(ev,function(){centralAudioGuardV2MarkWanted();centralAudioGuardV2.lastMoveAt=Date.now();},true);});
+      ["play","playing","canplay","canplaythrough"].forEach(function(ev){a.addEventListener(ev,function(){centralAudioGuardV2MarkWanted();centralAudioGuardV2.lastMoveAt=Date.now(); try{ var o=s666AudioOrchestra(); o.stage=0; o.failSafe=0; document.documentElement.setAttribute("data-audio-orchestra-stage","0"); document.documentElement.setAttribute("data-audio-orchestra-failsafe","0"); }catch(e){} },true);});
       ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){a.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?6500:10500;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
     }
     qsa("button,.control-btn").forEach(function(btn){
