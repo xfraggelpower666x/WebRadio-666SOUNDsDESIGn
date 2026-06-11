@@ -1842,6 +1842,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function recoverMffInterruptedAudio(reason){
+    if(
+      (window.S666_AUDIO_HEALING_ORCHESTRA && window.S666_AUDIO_HEALING_ORCHESTRA.active === true) ||
+      document.documentElement.getAttribute('data-audio-orchestra') === 'active'
+    ){
+      try{
+        document.documentElement.setAttribute('data-mff-audio-selfheal-muted', reason || 'orchestra-active');
+        document.documentElement.setAttribute('data-mff-audio-selfheal-handoff', 'audio-healing-orchestra');
+        document.documentElement.setAttribute('data-audio-sensor-event', 'mff:' + (reason || 'interrupted'));
+      }catch(e){}
+      return;
+    }
     if(mffUserStopped)return;
     var a=getAudio();
     if(!a)return;
