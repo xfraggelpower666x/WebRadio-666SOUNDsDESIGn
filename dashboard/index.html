@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+  <html lang="de">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>666SOUNDsDESIGn — Live Dashboard</title>
+  <style>
+  :root{
+    --cyan:#16fff3;--pink:#ff3dbb;--bg:#07080f;--bg2:#0a0d1a;
+    --cyan-dim:rgba(22,255,243,.18);--pink-dim:rgba(255,61,187,.14);
+    --cyan-glow:0 0 18px rgba(22,255,243,.45);
+    --pink-glow:0 0 18px rgba(255,61,187,.35);
+    --font:"Courier New",Courier,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%;background:var(--bg);color:#e0ffff;font-family:var(--font);overflow-x:hidden}
+
+  body{
+    background:
+      radial-gradient(ellipse at 10% 0%,rgba(255,61,187,.07),transparent 45%),
+      radial-gradient(ellipse at 90% 100%,rgba(22,255,243,.06),transparent 45%),
+      var(--bg);
+  }
+
+  /* ── HEADER ── */
+  .dash-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px 14px;
+    border-bottom:1px solid rgba(22,255,243,.18);
+    background:rgba(7,8,15,.85);
+  }
+  .dash-logo{
+    font-size:13px;font-weight:900;letter-spacing:.18em;
+    color:var(--cyan);text-shadow:var(--cyan-glow);
+    text-transform:uppercase;
+  }
+  .dash-logo span{color:var(--pink);text-shadow:var(--pink-glow);}
+  .dash-clock{
+    font-size:28px;font-weight:900;letter-spacing:.08em;
+    color:var(--cyan);text-shadow:var(--cyan-glow);
+    font-variant-numeric:tabular-nums;
+  }
+  .dash-date{font-size:10px;color:rgba(22,255,243,.5);letter-spacing:.12em;text-align:right;margin-top:2px;}
+
+  /* ── GRID ── */
+  .dash-grid{
+    display:grid;
+    grid-template-columns:1fr 340px;
+    grid-template-rows:auto auto;
+    gap:16px;padding:18px 22px;
+    max-width:1400px;margin:0 auto;
+  }
+  @media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+
+  /* ── CARD ── */
+  .card{
+    background:rgba(10,13,26,.92);
+    border:1px solid rgba(22,255,243,.2);
+    border-radius:16px;
+    padding:18px 20px;
+    box-shadow:0 0 24px rgba(22,255,243,.06),inset 0 1px 0 rgba(22,255,243,.08);
+  }
+  .card-label{
+    font-size:9px;letter-spacing:.22em;font-weight:900;
+    color:rgba(22,255,243,.45);text-transform:uppercase;margin-bottom:8px;
+  }
+
+  /* ── NOW PLAYING (big card) ── */
+  .card-now{grid-column:1;grid-row:1;}
+  .now-artwork{
+    width:90px;height:90px;border-radius:12px;object-fit:cover;
+    border:1px solid rgba(22,255,243,.25);
+    box-shadow:var(--cyan-glow);flex-shrink:0;
+  }
+  .now-artwork-placeholder{
+    width:90px;height:90px;border-radius:12px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--pink-dim),var(--cyan-dim));
+    border:1px solid rgba(22,255,243,.2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:32px;
+  }
+  .now-row{display:flex;gap:16px;align-items:flex-start;}
+  .now-text{flex:1;min-width:0;}
+  .now-title{
+    font-size:clamp(18px,2.8vw,32px);font-weight:900;
+    color:#fff;line-height:1.2;
+    text-shadow:0 0 30px rgba(22,255,243,.25);
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+    margin-bottom:6px;
+  }
+  .now-artist{
+    font-size:13px;color:var(--pink);letter-spacing:.08em;
+    text-shadow:var(--pink-glow);margin-bottom:10px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .now-meta-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .now-badge{
+    font-size:10px;letter-spacing:.1em;padding:3px 10px;
+    border-radius:999px;border:1px solid rgba(22,255,243,.3);
+    background:rgba(22,255,243,.06);color:var(--cyan);
+  }
+  .now-badge.pink{border-color:rgba(255,61,187,.35);background:rgba(255,61,187,.06);color:var(--pink);}
+
+  /* Equalizer bars animation */
+  .eq-bars{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:14px;}
+  .eq-bar{
+    width:5px;border-radius:3px 3px 0 0;
+    background:linear-gradient(to top,var(--cyan),var(--pink));
+    animation:eqAnim var(--d,.6s) ease-in-out infinite alternate;
+  }
+  @keyframes eqAnim{from{height:4px}to{height:var(--h,20px)}}
+  .eq-bars.paused .eq-bar{animation-play-state:paused;height:4px;}
+
+  /* ── STATUS CARD ── */
+  .card-status{grid-column:2;grid-row:1;}
+  @media(max-width:900px){.card-status{grid-column:1;}}
+  .status-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:9px 0;border-bottom:1px solid rgba(22,255,243,.08);
+    font-size:12px;letter-spacing:.06em;
+  }
+  .status-item:last-child{border-bottom:none;}
+  .status-key{color:rgba(22,255,243,.5);}
+  .status-val{font-weight:900;color:#e0ffff;text-align:right;}
+  .status-val.cyan{color:var(--cyan);text-shadow:0 0 8px rgba(22,255,243,.5);}
+  .status-val.pink{color:var(--pink);text-shadow:0 0 8px rgba(255,61,187,.4);}
+  .led{
+    display:inline-block;width:8px;height:8px;border-radius:50%;
+    margin-right:6px;vertical-align:middle;
+  }
+  .led.on{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+  .led.off{background:#333;}
+  .led.warn{background:var(--pink);box-shadow:0 0 8px var(--pink);}
+
+  /* ── HISTORY CARD ── */
+  .card-history{grid-column:1;grid-row:2;}
+  .history-list{list-style:none;}
+  .history-item{
+    display:flex;align-items:baseline;gap:10px;
+    padding:7px 0;border-bottom:1px solid rgba(22,255,243,.06);
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-num{font-size:10px;color:rgba(22,255,243,.3);width:18px;flex-shrink:0;}
+  .history-title{flex:1;font-size:12px;color:#cce8e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .history-time{font-size:10px;color:rgba(22,255,243,.35);flex-shrink:0;}
+  .history-item.fresh .history-title{color:var(--cyan);}
+
+  /* ── BROADCAST CARD ── */
+  .card-broadcast{grid-column:2;grid-row:2;}
+  @media(max-width:900px){.card-broadcast{grid-column:1;}}
+  .broadcast-msg{
+    font-size:14px;line-height:1.6;color:#e0ffff;
+    min-height:48px;word-break:break-word;
+  }
+  .broadcast-msg.empty{color:rgba(22,255,243,.25);font-style:italic;}
+  .broadcast-time{font-size:10px;color:rgba(22,255,243,.35);margin-top:6px;letter-spacing:.08em;}
+
+  /* ── FOOTER ── */
+  .dash-footer{
+    text-align:center;padding:14px;
+    font-size:10px;color:rgba(22,255,243,.25);letter-spacing:.12em;
+    border-top:1px solid rgba(22,255,243,.08);
+  }
+  #pollDot{
+    display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--cyan);margin-right:5px;vertical-align:middle;
+    animation:pollPulse 2s ease-in-out infinite;
+  }
+  @keyframes pollPulse{0%,100%{opacity:.2}50%{opacity:1}}
+  </style>
+  </head>
+  <body>
+
+  <header class="dash-header">
+    <div>
+      <div class="dash-logo">666<span>SOUNDs</span>DESIGn</div>
+      <div style="font-size:10px;color:rgba(22,255,243,.4);letter-spacing:.12em;margin-top:2px;">LIVE DASHBOARD</div>
+    </div>
+    <div style="text-align:right">
+      <div class="dash-clock" id="clock">--:--:--</div>
+      <div class="dash-date" id="dateStr">---</div>
+    </div>
+  </header>
+
+  <main class="dash-grid">
+
+    <!-- NOW PLAYING -->
+    <section class="card card-now">
+      <div class="card-label">Now Playing</div>
+      <div class="now-row">
+        <div id="artworkWrap">
+          <div class="now-artwork-placeholder">🎵</div>
+        </div>
+        <div class="now-text">
+          <div class="now-title" id="nowTitle">Verbinde…</div>
+          <div class="now-artist" id="nowArtist">&nbsp;</div>
+          <div class="now-meta-row">
+            <span class="now-badge" id="nowListeners">👤 –</span>
+            <span class="now-badge pink" id="nowBitrate">– kbps</span>
+            <span class="now-badge" id="nowDj">DJ –</span>
+          </div>
+        </div>
+      </div>
+      <div class="eq-bars paused" id="eqBars"></div>
+    </section>
+
+    <!-- STATUS -->
+    <section class="card card-status">
+      <div class="card-label">Stream Status</div>
+      <div class="status-item">
+        <span class="status-key">Stream</span>
+        <span class="status-val cyan" id="stStream"><span class="led off" id="ledStream"></span>–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">Listeners</span>
+        <span class="status-val" id="stListeners">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">Bitrate</span>
+        <span class="status-val" id="stBitrate">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">DJ / Source</span>
+        <span class="status-val pink" id="stDj">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">Letztes Update</span>
+        <span class="status-val" id="stUpdated">–</span>
+      </div>
+      <div class="status-item">
+        <span class="status-key">Tracks heute</span>
+        <span class="status-val cyan" id="stTrackCount">0</span>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="card card-history">
+      <div class="card-label">Recently Played</div>
+      <ul class="history-list" id="historyList">
+        <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
+      </ul>
+    </section>
+
+    <!-- BROADCAST -->
+    <section class="card card-broadcast">
+      <div class="card-label">📡 Aktuelle Broadcast-Nachricht</div>
+      <div class="broadcast-msg empty" id="broadcastMsg">Keine Nachricht aktiv.</div>
+      <div class="broadcast-time" id="broadcastTime"></div>
+    </section>
+
+  </main>
+
+  <footer class="dash-footer">
+    <span id="pollDot"></span>
+    LIVE — Aktualisierung alle 10s &nbsp;|&nbsp; 666SOUNDsDESIGn WebRadio Dashboard
+  </footer>
+
+  <script>
+  (function(){
+  'use strict';
+
+  /* ── State ── */
+  var history     = [];
+  var lastTitle   = '';
+  var trackCount  = 0;
+  var streamOnline= false;
+
+  /* ── Clock ── */
+  function updateClock(){
+    var now  = new Date();
+    var hh   = String(now.getHours()).padStart(2,'0');
+    var mm   = String(now.getMinutes()).padStart(2,'0');
+    var ss   = String(now.getSeconds()).padStart(2,'0');
+    var days = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    var months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    document.getElementById('clock').textContent = hh+':'+mm+':'+ss;
+    document.getElementById('dateStr').textContent =
+      days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  /* ── EQ bars (build once) ── */
+  var eqBars = document.getElementById('eqBars');
+  var heights= [14,22,30,18,26,36,20,32,16,28,24,12,34,22,18,30];
+  heights.forEach(function(h,i){
+    var b = document.createElement('div');
+    b.className = 'eq-bar';
+    b.style.setProperty('--h', h+'px');
+    b.style.setProperty('--d', (0.4 + (i%5)*0.12) + 's');
+    eqBars.appendChild(b);
+  });
+
+  /* ── Artwork ── */
+  function setArtwork(url){
+    var wrap = document.getElementById('artworkWrap');
+    if(url){
+      wrap.innerHTML = '<img class="now-artwork" src="'+url+'" onerror="this.parentNode.innerHTML='<div class=now-artwork-placeholder>🎵</div>'" alt="">';
+    } else {
+      wrap.innerHTML = '<div class="now-artwork-placeholder">🎵</div>';
+    }
+  }
+
+  /* ── History list ── */
+  function addToHistory(title, artist, time){
+    if(!title || title === lastTitle) return;
+    lastTitle = title;
+    trackCount++;
+    history.unshift({ title:title, artist:artist, time:time });
+    if(history.length > 20) history.pop();
+    renderHistory();
+    document.getElementById('stTrackCount').textContent = trackCount;
+  }
+
+  function renderHistory(){
+    var list = document.getElementById('historyList');
+    if(!history.length){
+      list.innerHTML = '<li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Noch keine Tracks gespielt.</span></li>';
+      return;
+    }
+    list.innerHTML = history.slice(0,10).map(function(item,i){
+      return '<li class="history-item'+(i===0?' fresh':'')+'">'
+        +'<span class="history-num">'+(i+1)+'</span>'
+        +'<span class="history-title">'+(item.artist?'<b style="color:var(--pink)">'+esc(item.artist)+'</b> – ':'')+esc(item.title)+'</span>'
+        +'<span class="history-time">'+esc(item.time)+'</span>'
+        +'</li>';
+    }).join('');
+  }
+
+  function esc(s){ var d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+
+  /* ── Now Playing update ── */
+  function applyMeta(meta){
+    if(!meta) return;
+    var title    = meta.title  || meta.song  || meta.current_song || meta.songtitle || '';
+    var artist   = meta.artist || meta.dj    || meta.dj_status   || '';
+    var listeners= meta.listeners || meta.currentlisteners || meta.listener_count || '–';
+    var bitrate  = meta.bitrate   || meta.kbps || '–';
+    var dj       = meta.dj        || meta.streamer || artist || '–';
+    var artwork  = meta.icon      || meta.logo || meta.artwork || meta.image || '';
+
+    // Nested formats (Shoutcast / AzuraCast / etc.)
+    if(meta.now_playing && meta.now_playing.song){
+      var np = meta.now_playing;
+      title   = title  || np.song.text  || np.song.title || '';
+      artist  = artist || np.song.artist|| '';
+      artwork = artwork|| np.song.art   || '';
+    }
+    if(meta.station){ dj = dj || meta.station.name || ''; }
+
+    title   = String(title||'').trim();
+    artist  = String(artist||'').trim();
+    listeners = String(listeners||'').trim();
+    bitrate   = String(bitrate||'').trim();
+    dj        = String(dj||'').trim();
+
+    if(!title) return;
+
+    streamOnline = true;
+
+    // Update Now Playing card
+    document.getElementById('nowTitle').textContent   = title || '–';
+    document.getElementById('nowArtist').textContent  = artist || ' ';
+    document.getElementById('nowListeners').textContent = '👤 '+(listeners||'–');
+    document.getElementById('nowBitrate').textContent  = (bitrate ? bitrate+' kbps' : '– kbps');
+    document.getElementById('nowDj').textContent       = 'DJ: '+(dj||'–');
+
+    // Update Status card
+    document.getElementById('stStream').innerHTML   = '<span class="led on" id="ledStream"></span>ONLINE';
+    document.getElementById('stListeners').textContent = listeners || '–';
+    document.getElementById('stBitrate').textContent   = bitrate ? bitrate+' kbps' : '–';
+    document.getElementById('stDj').textContent        = dj || '–';
+    document.getElementById('stUpdated').textContent   = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+    // Artwork
+    setArtwork(artwork);
+
+    // EQ animation on
+    document.getElementById('eqBars').classList.remove('paused');
+
+    // History
+    var now = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    addToHistory(title, artist, now);
+  }
+
+  function applyOffline(){
+    streamOnline = false;
+    document.getElementById('stStream').innerHTML = '<span class="led off" id="ledStream"></span>OFFLINE';
+    document.getElementById('eqBars').classList.add('paused');
+  }
+
+  /* ── Poll /api/nowplaying ── */
+  function pollMeta(){
+    fetch('/api/nowplaying?_t='+Date.now(), { cache:'no-store', headers:{ Accept:'application/json' } })
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function(data){ applyMeta(data); })
+      .catch(function(){ applyOffline(); });
+  }
+
+  /* ── Poll /api/player-alert/current ── */
+  function pollBroadcast(){
+    fetch('/api/player-alert/current?_t='+Date.now(), { cache:'no-store' })
+      .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+      .then(function(d){
+        var msg  = d.text || d.message || d.msg || '';
+        var time = d.sentAt || d.timestamp || d.created_at || '';
+        var el   = document.getElementById('broadcastMsg');
+        var tel  = document.getElementById('broadcastTime');
+        if(msg){
+          el.textContent  = msg;
+          el.className    = 'broadcast-msg';
+          tel.textContent = time ? ('Gesendet: '+new Date(time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})) : '';
+        } else {
+          el.textContent = 'Keine Nachricht aktiv.';
+          el.className   = 'broadcast-msg empty';
+          tel.textContent= '';
+        }
+      })
+      .catch(function(){});
+  }
+
+  /* ── Start ── */
+  pollMeta();
+  pollBroadcast();
+  setInterval(pollMeta,      10000);
+  setInterval(pollBroadcast, 15000);
+
+  })();
+  </script>
+  </body>
+  </html>
