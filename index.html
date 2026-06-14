@@ -2845,7 +2845,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function open(ev){if(ev){ev.preventDefault(); ev.stopPropagation();} sync(); ensureOverlay().classList.add('is-open');}
   function close(){var ov=document.getElementById('smfpMobileEqOverlay'); if(ov)ov.classList.remove('is-open'); try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}}
   function bind(){
-    ['mffEqBars','eqBars'].forEach(function(id){var el=document.getElementById(id); if(el && el.dataset.mobileEqOverlayBound!=='1'){el.dataset.mobileEqOverlayBound='1'; el.title='Tap for Power EQ'; el.addEventListener('click',open,{capture:false}); el.addEventListener('touchend',function(ev){ if(ev.cancelable)ev.preventDefault(); open(ev); },{passive:false});}});
+    /* SMFP_v190: EQ-Tap-Bindung deaktiviert - Antippen des Equalizers oeffnet jetzt ausschliesslich das Sound-Menue (S666SoundControl) ohne Konflikt; POWER EQ bleibt via window.SMFPMobileEqOverlay.open() verfuegbar. */
   }
   window.SMFPMobileEqOverlay={open:open,close:close,sync:sync};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{passive:true});else bind();
