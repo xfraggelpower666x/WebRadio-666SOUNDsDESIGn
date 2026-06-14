@@ -1216,6 +1216,8 @@ RULES:
       if(/stop/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkStop,true);
     });
     ["visibilitychange","pageshow","focus","online"].forEach(function(ev){window.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?1200:2800;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+    var s666GestureResume=function(){ try{ var aa=centralAudioGuardV2Audio(); if(!aa||!aa.paused) return; if(!centralAudioGuardV2Wanted()) return; if(centralAudioGuardV2ManualStopRecent()) return; if(typeof isUserStopRecent==="function"&&isUserStopRecent()) return; var pr=aa.play(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){} };
+    ["touchend","click"].forEach(function(ev){ document.addEventListener(ev, s666GestureResume, true); });
     setInterval(centralAudioGuardV2Tick,2500);
     setTimeout(centralAudioGuardV2Tick,1600);
     document.documentElement.setAttribute("data-central-audio-stability-v2","installed");
