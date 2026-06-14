@@ -706,8 +706,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
           <button id="historyToggle" class="ghost-btn" type="button">History</button>
 </div>
         
-        <div class="now-cover-wrap" aria-hidden="true">
-          <img id="nowCover" class="now-cover" src="/assets/images/fallback-cover.png" alt="" loading="lazy" decoding="async">
+        <div class="now-cover-wrap" aria-hidden="true" style="position:relative">
+          <img id="nowCover" class="now-cover" src="/assets/logos/radiobot-ai-badge.png" alt="" loading="lazy" decoding="async" style="transition:opacity 0.55s ease"><img aria-hidden="true" src="/assets/logos/radiobot-ai-badge.png" alt="" style="position:absolute;bottom:5px;right:5px;width:24px;height:24px;object-fit:contain;opacity:0.52;filter:drop-shadow(0 0 5px rgba(22,255,243,.88));pointer-events:none;border-radius:50%">
         </div>
         <div class="ticker-window">
           <div id="nowPlayingTicker" class="ticker-text"></div>
@@ -1660,18 +1660,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
 
-  /* v50 CLEAN REPO ONLY — DESKTOP BACKGROUND */
-  @media(min-width:761px){
-    body{
-      background-image:
-        linear-gradient(rgba(3,7,18,.30),rgba(3,7,18,.38)),
-        url('/assets/images/pc-player-background.png?v=fix2-mainonly-logo-panel-20260525')!important;
-      background-size:cover!important;
-      background-position:center center!important;
-      background-attachment:fixed!important;
-      background-repeat:no-repeat!important;
+  /* v107 CYBERPUNK BG + REACTIVE GLOW */
+  @keyframes cyberBgPulse{0%,100%{filter:brightness(1.0) saturate(1.0)}50%{filter:brightness(1.10) saturate(1.22)}}
+  @keyframes cyberGlowDrift{0%{opacity:.68}33%{opacity:.90}66%{opacity:.78}100%{opacity:.68}}
+    @media(min-width:761px){
+      body{
+        background-image:
+          linear-gradient(rgba(3,7,18,.20),rgba(3,7,18,.28)),
+          url('/assets/images/cyberpunk-bg.png')!important;
+        background-size:cover!important;
+        background-position:center center!important;
+        background-attachment:fixed!important;
+        background-repeat:no-repeat!important;
+        animation:cyberBgPulse 9s ease-in-out infinite!important;
+      }
+      body::after{
+        content:''!important;position:fixed!important;inset:0!important;
+        pointer-events:none!important;z-index:0!important;
+        background:
+          radial-gradient(ellipse 55% 38% at 12% 88%,rgba(192,71,255,.22) 0%,transparent 68%),
+          radial-gradient(ellipse 48% 32% at 88% 12%,rgba(22,255,243,.17) 0%,transparent 62%),
+          radial-gradient(ellipse 28% 18% at 50% 50%,rgba(22,255,243,.06) 0%,transparent 80%)!important;
+        animation:cyberGlowDrift 7s ease-in-out infinite!important;
+      }
     }
-  }
 
 @media(min-width:761px){#mffApp{display:none!important;}}
 </style>
@@ -2334,7 +2346,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
     app.innerHTML='<div class="smfp-version-badge">v178</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
-      '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit"><img src="/assets/logos/cyberstream-ai-cockpit-header.png" alt="CyberStream AI Cockpit Edition"></section>'+
+      '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/logos/cyberstream-ai-cockpit-header.png" alt="CyberStream AI Cockpit Edition"><img src="/assets/logos/radiobot-ai-badge.png" alt="666 RadioBotAI" style="height:28px;width:28px;object-fit:contain;opacity:0.82;filter:drop-shadow(0 0 6px rgba(22,255,243,.80))"></section>'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+

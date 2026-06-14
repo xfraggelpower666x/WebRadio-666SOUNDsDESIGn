@@ -459,19 +459,34 @@ function isLoadingMetaText(text) {
 }
 
 let lastAppliedCoverUrlV105 = '';
-function updateNowCover(meta) {
-  if (!nowCover) return;
-  const cover = String(meta?.cover || '/assets/images/fallback-cover.png').trim();
-  if (!cover) return;
+  let streamDefaultArtV106 = '';
+  let coverFadeTimerV106 = 0;
+  function updateNowCover(meta) {
+    if (!nowCover) return;
+    const FALLBACK = '/assets/logos/radiobot-ai-badge.png';
+    const raw = String(meta?.cover || '').trim();
+    const cover = raw || FALLBACK;
 
-  // v105: do not rebuild/reload the cover on every metadata poll.
-  // Only touch the image when the real URL changes. This prevents 15–20s flicker/repaint loops.
-  if (cover === lastAppliedCoverUrlV105 && nowCover.getAttribute('src') === cover) return;
-  lastAppliedCoverUrlV105 = cover;
-  if (nowCover.getAttribute('src') !== cover) {
-    nowCover.src = cover;
+    // Capture station default art once (first valid non-fallback URL)
+    if (!streamDefaultArtV106 && raw && !raw.includes('fallback')) {
+      streamDefaultArtV106 = raw;
+    }
+
+    // v106: guard — skip if cover truly unchanged
+    if (cover === lastAppliedCoverUrlV105 && nowCover.getAttribute('src') === cover) return;
+    lastAppliedCoverUrlV105 = cover;
+
+    // v106: smooth crossfade — fade out → swap src → fade in (no zapping)
+    clearTimeout(coverFadeTimerV106);
+    nowCover.style.transition = 'opacity 0.55s ease';
+    nowCover.style.opacity = '0';
+    coverFadeTimerV106 = setTimeout(() => {
+      nowCover.src = cover;
+      nowCover.onerror = () => { nowCover.src = FALLBACK; nowCover.onerror = null; nowCover.style.opacity = '1'; };
+      nowCover.onload  = () => { nowCover.style.opacity = '1'; nowCover.onload = null; };
+      setTimeout(() => { nowCover.style.opacity = '1'; }, 140); // safety for cached images
+    }, 560);
   }
-}
 
 function normalizeNowPlayingDuplicateFallback() {
   if (!nowPlayingTicker || !metaLine) return;
