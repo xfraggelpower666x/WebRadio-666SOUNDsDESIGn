@@ -17,7 +17,8 @@ PURPOSE: Protected admin overlay.
 .fp-admin-actions button.danger,#fp-admin-commit-config{background:linear-gradient(135deg,#ff315d,#ff3fd7);color:#fff}
 .fp-admin-content{padding:18px 20px}.fp-admin-tab{display:none}.fp-admin-tab.is-active{display:block}
 .fp-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fp-admin-grid label{display:block;color:#8da4c2;font-size:13px}
-.fp-admin-grid input{width:100%;margin-top:6px;padding:11px;border-radius:10px;border:1px solid rgba(32,247,255,.32);background:#060b1a;color:#eaf4ff}
+.fp-admin-grid input{width:100%;margin-top:6px;padding:11px;border-radius:10px;border:1px solid rgba(32,247,255,.32);background:#060b1a;color:#eaf4ff;font-size:16px}
+.fp-admin-panel input,.fp-admin-panel textarea,.fp-admin-panel select{font-size:16px}
 .fp-admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.fp-admin-actions.vertical{flex-direction:column;align-items:flex-start}
 .fp-admin-panel pre{white-space:pre-wrap;overflow:auto;max-height:420px;padding:12px;border-radius:12px;border:1px solid rgba(32,247,255,.22);background:#040714;color:#eaf4ff}
 @media(max-width:760px){.fp-admin-grid{grid-template-columns:1fr}.fp-admin-panel{width:96vw;max-height:92vh}.fp-admin-tabs{overflow:auto;flex-wrap:nowrap}.fp-admin-tabs button{white-space:nowrap}}
