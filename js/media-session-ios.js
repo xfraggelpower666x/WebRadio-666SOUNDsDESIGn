@@ -198,13 +198,13 @@
         document.documentElement.setAttribute('data-media-session-ended', Date.now());
         if (isUserStopped()) return;
         // Wait briefly then attempt recovery (iOS needs a tick)
-        setTimeout(function () { safePlay('audio-ended-recovery'); }, 800);
+        setMediaSessionState('paused'); /* recovery: phase10 orchestra (single authority) */
       }, true);
 
       // Also handle 'error' + 'stalled' with recovery
       audio.addEventListener('error', function () {
         if (isUserStopped()) return;
-        setTimeout(function () { safePlay('audio-error-recovery'); }, 2500);
+        setMediaSessionState('paused'); /* recovery: phase10 orchestra (single authority) */
       }, true);
     }
 
@@ -234,7 +234,7 @@
 
       // If hidden longer and audio is now paused/ended → restart
       if (audio.paused) {
-        setTimeout(function () { safePlay('visibility-return-' + Math.round(hiddenMs/1000) + 's'); }, 400);
+        /* recovery: phase10 orchestra resumes after app-return */
       }
     }, true);
 
@@ -244,7 +244,7 @@
       if (isUserStopped()) return;
       setTimeout(function () {
         var audio = getAudio();
-        if (audio && audio.paused) safePlay('pageshow-persisted');
+        /* recovery: phase10 orchestra resumes after bfcache restore */
       }, 300);
     }, { passive: true });
 
