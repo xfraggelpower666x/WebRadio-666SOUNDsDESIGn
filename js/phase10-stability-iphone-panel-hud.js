@@ -1203,7 +1203,7 @@ RULES:
     var a=centralAudioGuardV2Audio();
     if(a){
       ["play","playing","canplay","canplaythrough"].forEach(function(ev){a.addEventListener(ev,function(){centralAudioGuardV2MarkWanted();centralAudioGuardV2.lastMoveAt=Date.now(); try{ var o=s666AudioOrchestra(); o.stage=0; o.failSafe=0; document.documentElement.setAttribute("data-audio-orchestra-stage","0"); document.documentElement.setAttribute("data-audio-orchestra-failsafe","0"); }catch(e){} },true);});
-      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){a.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?6500:10500;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){a.addEventListener(ev,function(){var hard=/emptied|abort|error/.test(ev);var d=hard?(centralAudioGuardV2IsMobile()?8000:12000):(centralAudioGuardV2IsMobile()?22000:32000);setTimeout(function(){if(!hard){var aa=centralAudioGuardV2Audio();if(aa&&Number(aa.networkState||0)===2&&Number(aa.readyState||0)>=2&&!aa.paused)return;}centralAudioGuardV2Recover(ev);},d);},true);});
     }
     qsa("button,.control-btn").forEach(function(btn){
       var txt=String(btn.textContent||btn.getAttribute("aria-label")||"").toLowerCase();
