@@ -15,11 +15,11 @@ ZWECK:
   var STORAGE_KEY = 'smfp_audio_boost_stage_v177';
   var STAGES = [
     { stage:0, gain:1.00, label:'BST 0', danger:false },
-    { stage:1, gain:1.40, label:'BST 1', danger:false },
-    { stage:2, gain:1.70, label:'BST 2', danger:false },
-    { stage:3, gain:1.90, label:'BST 3', danger:false },
-    { stage:4, gain:2.08, label:'BST 4', danger:true  },
-    { stage:5, gain:2.20, label:'BST 5', danger:true  }
+    { stage:1, gain:1.26, label:'BST 1', danger:false },
+    { stage:2, gain:1.78, label:'BST 2', danger:false },
+    { stage:3, gain:2.24, label:'BST 3', danger:false },
+    { stage:4, gain:2.82, label:'BST 4', danger:true  },
+    { stage:5, gain:3.98, label:'BST 5', danger:true  }
   ];
   function maxStage(){ return STAGES.length - 1; }
   function clampStage(value){
@@ -61,7 +61,7 @@ ZWECK:
     return s;
   }
   window.SMFPBoostCore = {
-    version: 'v188-audio-core-boost-audible',
+    version: 'v192-boost-audible-stages',
     storageKey: STORAGE_KEY,
     stages: STAGES.slice(),
     maxStage: maxStage,
