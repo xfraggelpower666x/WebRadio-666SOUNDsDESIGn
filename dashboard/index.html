@@ -15,159 +15,93 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{min-height:100%;background:var(--bg);color:#e0ffff;font-family:var(--font);overflow-x:hidden}
-
   body{
     background:
       radial-gradient(ellipse at 10% 0%,rgba(255,61,187,.07),transparent 45%),
       radial-gradient(ellipse at 90% 100%,rgba(22,255,243,.06),transparent 45%),
       var(--bg);
   }
-
-  /* ── HEADER ── */
   .dash-header{
     display:flex;align-items:center;justify-content:space-between;
     padding:18px 28px 14px;
     border-bottom:1px solid rgba(22,255,243,.18);
-    background:rgba(7,8,15,.85);
+    background:rgba(7,8,15,.88);
+    position:sticky;top:0;z-index:10;
   }
-  .dash-logo{
-    font-size:13px;font-weight:900;letter-spacing:.18em;
-    color:var(--cyan);text-shadow:var(--cyan-glow);
-    text-transform:uppercase;
-  }
+  .dash-logo{font-size:13px;font-weight:900;letter-spacing:.18em;color:var(--cyan);text-shadow:var(--cyan-glow);text-transform:uppercase;}
   .dash-logo span{color:var(--pink);text-shadow:var(--pink-glow);}
-  .dash-clock{
-    font-size:28px;font-weight:900;letter-spacing:.08em;
-    color:var(--cyan);text-shadow:var(--cyan-glow);
-    font-variant-numeric:tabular-nums;
-  }
+  .dash-clock{font-size:28px;font-weight:900;letter-spacing:.08em;color:var(--cyan);text-shadow:var(--cyan-glow);font-variant-numeric:tabular-nums;}
   .dash-date{font-size:10px;color:rgba(22,255,243,.5);letter-spacing:.12em;text-align:right;margin-top:2px;}
 
-  /* ── GRID ── */
   .dash-grid{
     display:grid;
-    grid-template-columns:1fr 340px;
-    grid-template-rows:auto auto;
+    grid-template-columns:1fr 320px;
     gap:16px;padding:18px 22px;
-    max-width:1400px;margin:0 auto;
+    max-width:1300px;margin:0 auto;
   }
-  @media(max-width:900px){.dash-grid{grid-template-columns:1fr;}}
+  @media(max-width:860px){.dash-grid{grid-template-columns:1fr;}}
 
-  /* ── CARD ── */
   .card{
     background:rgba(10,13,26,.92);
     border:1px solid rgba(22,255,243,.2);
-    border-radius:16px;
-    padding:18px 20px;
+    border-radius:16px;padding:18px 20px;
     box-shadow:0 0 24px rgba(22,255,243,.06),inset 0 1px 0 rgba(22,255,243,.08);
   }
-  .card-label{
-    font-size:9px;letter-spacing:.22em;font-weight:900;
-    color:rgba(22,255,243,.45);text-transform:uppercase;margin-bottom:8px;
-  }
+  .card-label{font-size:9px;letter-spacing:.22em;font-weight:900;color:rgba(22,255,243,.45);text-transform:uppercase;margin-bottom:12px;}
 
-  /* ── NOW PLAYING (big card) ── */
-  .card-now{grid-column:1;grid-row:1;}
-  .now-artwork{
-    width:90px;height:90px;border-radius:12px;object-fit:cover;
-    border:1px solid rgba(22,255,243,.25);
-    box-shadow:var(--cyan-glow);flex-shrink:0;
-  }
-  .now-artwork-placeholder{
-    width:90px;height:90px;border-radius:12px;flex-shrink:0;
-    background:linear-gradient(135deg,var(--pink-dim),var(--cyan-dim));
-    border:1px solid rgba(22,255,243,.2);
-    display:flex;align-items:center;justify-content:center;
-    font-size:32px;
-  }
+  /* ── NOW PLAYING ── */
   .now-row{display:flex;gap:16px;align-items:flex-start;}
+  .now-artwork{width:96px;height:96px;border-radius:12px;object-fit:cover;border:1px solid rgba(22,255,243,.25);box-shadow:var(--cyan-glow);flex-shrink:0;}
+  .now-artwork-ph{width:96px;height:96px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--pink-dim),var(--cyan-dim));border:1px solid rgba(22,255,243,.2);display:flex;align-items:center;justify-content:center;font-size:36px;}
   .now-text{flex:1;min-width:0;}
-  .now-title{
-    font-size:clamp(18px,2.8vw,32px);font-weight:900;
-    color:#fff;line-height:1.2;
-    text-shadow:0 0 30px rgba(22,255,243,.25);
-    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-    margin-bottom:6px;
-  }
-  .now-artist{
-    font-size:13px;color:var(--pink);letter-spacing:.08em;
-    text-shadow:var(--pink-glow);margin-bottom:10px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .now-meta-row{display:flex;gap:16px;flex-wrap:wrap;}
-  .now-badge{
-    font-size:10px;letter-spacing:.1em;padding:3px 10px;
-    border-radius:999px;border:1px solid rgba(22,255,243,.3);
-    background:rgba(22,255,243,.06);color:var(--cyan);
-  }
-  .now-badge.pink{border-color:rgba(255,61,187,.35);background:rgba(255,61,187,.06);color:var(--pink);}
+  .now-title{font-size:clamp(16px,2.5vw,28px);font-weight:900;color:#fff;line-height:1.2;text-shadow:0 0 30px rgba(22,255,243,.2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-bottom:5px;}
+  .now-artist{font-size:12px;color:var(--pink);letter-spacing:.08em;text-shadow:var(--pink-glow);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .now-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .badge{font-size:10px;letter-spacing:.1em;padding:3px 10px;border-radius:999px;border:1px solid rgba(22,255,243,.3);background:rgba(22,255,243,.06);color:var(--cyan);}
+  .badge.pink{border-color:rgba(255,61,187,.35);background:rgba(255,61,187,.06);color:var(--pink);}
 
-  /* Equalizer bars animation */
-  .eq-bars{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:14px;}
-  .eq-bar{
-    width:5px;border-radius:3px 3px 0 0;
-    background:linear-gradient(to top,var(--cyan),var(--pink));
-    animation:eqAnim var(--d,.6s) ease-in-out infinite alternate;
-  }
-  @keyframes eqAnim{from{height:4px}to{height:var(--h,20px)}}
-  .eq-bars.paused .eq-bar{animation-play-state:paused;height:4px;}
+  /* DJ panel when live */
+  .dj-live{display:none;align-items:center;gap:10px;margin-top:10px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,61,187,.3);background:rgba(255,61,187,.06);}
+  .dj-live.visible{display:flex;}
+  .dj-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--pink);}
+  .dj-name{font-size:11px;color:var(--pink);font-weight:900;letter-spacing:.08em;}
+  .dj-dot{width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 8px var(--pink);animation:djPulse 1.2s ease-in-out infinite;}
+  @keyframes djPulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-  /* ── STATUS CARD ── */
-  .card-status{grid-column:2;grid-row:1;}
-  @media(max-width:900px){.card-status{grid-column:1;}}
-  .status-item{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:9px 0;border-bottom:1px solid rgba(22,255,243,.08);
-    font-size:12px;letter-spacing:.06em;
-  }
+  /* EQ bars */
+  .eq-bars{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:14px;}
+  .eq-bar{width:5px;border-radius:3px 3px 0 0;background:linear-gradient(to top,var(--cyan),var(--pink));animation:eqA var(--d,.6s) ease-in-out infinite alternate;}
+  @keyframes eqA{from{height:3px}to{height:var(--h,20px)}}
+  .eq-bars.paused .eq-bar{animation-play-state:paused;height:3px;}
+
+  /* ── STATUS ── */
+  .status-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(22,255,243,.08);font-size:12px;letter-spacing:.06em;}
   .status-item:last-child{border-bottom:none;}
   .status-key{color:rgba(22,255,243,.5);}
   .status-val{font-weight:900;color:#e0ffff;text-align:right;}
-  .status-val.cyan{color:var(--cyan);text-shadow:0 0 8px rgba(22,255,243,.5);}
-  .status-val.pink{color:var(--pink);text-shadow:0 0 8px rgba(255,61,187,.4);}
-  .led{
-    display:inline-block;width:8px;height:8px;border-radius:50%;
-    margin-right:6px;vertical-align:middle;
-  }
+  .status-val.cyan{color:var(--cyan);text-shadow:0 0 8px rgba(22,255,243,.4);}
+  .status-val.pink{color:var(--pink);}
+  .led{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
   .led.on{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
   .led.off{background:#333;}
-  .led.warn{background:var(--pink);box-shadow:0 0 8px var(--pink);}
 
-  /* ── HISTORY CARD ── */
-  .card-history{grid-column:1;grid-row:2;}
+  /* ── HISTORY ── */
   .history-list{list-style:none;}
-  .history-item{
-    display:flex;align-items:baseline;gap:10px;
-    padding:7px 0;border-bottom:1px solid rgba(22,255,243,.06);
-  }
+  .history-item{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid rgba(22,255,243,.06);}
   .history-item:last-child{border-bottom:none;}
-  .history-num{font-size:10px;color:rgba(22,255,243,.3);width:18px;flex-shrink:0;}
-  .history-title{flex:1;font-size:12px;color:#cce8e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .history-time{font-size:10px;color:rgba(22,255,243,.35);flex-shrink:0;}
-  .history-item.fresh .history-title{color:var(--cyan);}
+  .history-num{font-size:10px;color:rgba(22,255,243,.28);width:20px;flex-shrink:0;text-align:right;}
+  .history-title{flex:1;font-size:12px;color:#c0dede;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .history-item.fresh .history-title{color:var(--cyan);font-weight:900;}
 
-  /* ── BROADCAST CARD ── */
-  .card-broadcast{grid-column:2;grid-row:2;}
-  @media(max-width:900px){.card-broadcast{grid-column:1;}}
-  .broadcast-msg{
-    font-size:14px;line-height:1.6;color:#e0ffff;
-    min-height:48px;word-break:break-word;
-  }
+  /* ── BROADCAST ── */
+  .broadcast-msg{font-size:14px;line-height:1.65;color:#e0ffff;min-height:44px;word-break:break-word;}
   .broadcast-msg.empty{color:rgba(22,255,243,.25);font-style:italic;}
   .broadcast-time{font-size:10px;color:rgba(22,255,243,.35);margin-top:6px;letter-spacing:.08em;}
 
   /* ── FOOTER ── */
-  .dash-footer{
-    text-align:center;padding:14px;
-    font-size:10px;color:rgba(22,255,243,.25);letter-spacing:.12em;
-    border-top:1px solid rgba(22,255,243,.08);
-  }
-  #pollDot{
-    display:inline-block;width:6px;height:6px;border-radius:50%;
-    background:var(--cyan);margin-right:5px;vertical-align:middle;
-    animation:pollPulse 2s ease-in-out infinite;
-  }
-  @keyframes pollPulse{0%,100%{opacity:.2}50%{opacity:1}}
+  .dash-footer{text-align:center;padding:14px;font-size:10px;color:rgba(22,255,243,.25);letter-spacing:.12em;border-top:1px solid rgba(22,255,243,.08);margin-top:4px;}
+  #pollDot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:5px;vertical-align:middle;animation:pollP 2s ease-in-out infinite;}
+  @keyframes pollP{0%,100%{opacity:.2}50%{opacity:1}}
   </style>
   </head>
   <body>
@@ -179,81 +113,98 @@
     </div>
     <div style="text-align:right">
       <div class="dash-clock" id="clock">--:--:--</div>
-      <div class="dash-date" id="dateStr">---</div>
+      <div class="dash-date"  id="dateStr">---</div>
     </div>
   </header>
 
   <main class="dash-grid">
 
-    <!-- NOW PLAYING -->
-    <section class="card card-now">
-      <div class="card-label">Now Playing</div>
-      <div class="now-row">
-        <div id="artworkWrap">
-          <div class="now-artwork-placeholder">🎵</div>
-        </div>
-        <div class="now-text">
-          <div class="now-title" id="nowTitle">Verbinde…</div>
-          <div class="now-artist" id="nowArtist">&nbsp;</div>
-          <div class="now-meta-row">
-            <span class="now-badge" id="nowListeners">👤 –</span>
-            <span class="now-badge pink" id="nowBitrate">– kbps</span>
-            <span class="now-badge" id="nowDj">DJ –</span>
+    <!-- LEFT COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- NOW PLAYING -->
+      <section class="card">
+        <div class="card-label">Now Playing</div>
+        <div class="now-row">
+          <div id="artworkWrap"><div class="now-artwork-ph">🎵</div></div>
+          <div class="now-text">
+            <div class="now-title"  id="nowTitle">Verbinde…</div>
+            <div class="now-artist" id="nowArtist">&nbsp;</div>
+            <div class="now-badges">
+              <span class="badge"      id="nowListeners">👤 –</span>
+              <span class="badge"      id="nowUniq">✨ – unique</span>
+              <span class="badge pink" id="nowBitrate">– kbps</span>
+            </div>
+            <div class="dj-live" id="djLiveRow">
+              <div class="dj-dot"></div>
+              <img class="dj-avatar" id="djAvatar" src="" alt="">
+              <span class="dj-name" id="djName">LIVE DJ</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="eq-bars paused" id="eqBars"></div>
-    </section>
+        <div class="eq-bars paused" id="eqBars"></div>
+      </section>
 
-    <!-- STATUS -->
-    <section class="card card-status">
-      <div class="card-label">Stream Status</div>
-      <div class="status-item">
-        <span class="status-key">Stream</span>
-        <span class="status-val cyan" id="stStream"><span class="led off" id="ledStream"></span>–</span>
-      </div>
-      <div class="status-item">
-        <span class="status-key">Listeners</span>
-        <span class="status-val" id="stListeners">–</span>
-      </div>
-      <div class="status-item">
-        <span class="status-key">Bitrate</span>
-        <span class="status-val" id="stBitrate">–</span>
-      </div>
-      <div class="status-item">
-        <span class="status-key">DJ / Source</span>
-        <span class="status-val pink" id="stDj">–</span>
-      </div>
-      <div class="status-item">
-        <span class="status-key">Letztes Update</span>
-        <span class="status-val" id="stUpdated">–</span>
-      </div>
-      <div class="status-item">
-        <span class="status-key">Tracks heute</span>
-        <span class="status-val cyan" id="stTrackCount">0</span>
-      </div>
-    </section>
+      <!-- RECENTLY PLAYED -->
+      <section class="card">
+        <div class="card-label">Recently Played (letzte 20 Tracks)</div>
+        <ul class="history-list" id="historyList">
+          <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
+        </ul>
+      </section>
 
-    <!-- HISTORY -->
-    <section class="card card-history">
-      <div class="card-label">Recently Played</div>
-      <ul class="history-list" id="historyList">
-        <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
-      </ul>
-    </section>
+    </div>
 
-    <!-- BROADCAST -->
-    <section class="card card-broadcast">
-      <div class="card-label">📡 Aktuelle Broadcast-Nachricht</div>
-      <div class="broadcast-msg empty" id="broadcastMsg">Keine Nachricht aktiv.</div>
-      <div class="broadcast-time" id="broadcastTime"></div>
-    </section>
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- STATUS -->
+      <section class="card">
+        <div class="card-label">Stream Status</div>
+        <div class="status-item">
+          <span class="status-key">Stream</span>
+          <span class="status-val cyan" id="stStream"><span class="led off"></span>–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">Listeners (online)</span>
+          <span class="status-val cyan" id="stListeners">–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">Unique Listeners</span>
+          <span class="status-val" id="stUniq">–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">Bitrate</span>
+          <span class="status-val" id="stBitrate">–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">DJ Live</span>
+          <span class="status-val pink" id="stDj">–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">Letztes Update</span>
+          <span class="status-val" id="stUpdated">–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">Tracks heute</span>
+          <span class="status-val cyan" id="stTrackCount">0</span>
+        </div>
+      </section>
+
+      <!-- BROADCAST -->
+      <section class="card">
+        <div class="card-label">📡 Broadcast-Nachricht</div>
+        <div class="broadcast-msg empty" id="broadcastMsg">Keine Nachricht aktiv.</div>
+        <div class="broadcast-time" id="broadcastTime"></div>
+      </section>
+
+    </div>
 
   </main>
 
   <footer class="dash-footer">
     <span id="pollDot"></span>
-    LIVE — Aktualisierung alle 10s &nbsp;|&nbsp; 666SOUNDsDESIGn WebRadio Dashboard
+    LIVE · nowplaying alle 10s · broadcast alle 15s &nbsp;|&nbsp; 666SOUNDsDESIGn WebRadio
   </footer>
 
   <script>
@@ -261,168 +212,187 @@
   'use strict';
 
   /* ── State ── */
-  var history     = [];
-  var lastTitle   = '';
-  var trackCount  = 0;
-  var streamOnline= false;
+  var localHistory = [];
+  var lastTitle    = '';
+  var trackCount   = 0;
 
   /* ── Clock ── */
   function updateClock(){
-    var now  = new Date();
-    var hh   = String(now.getHours()).padStart(2,'0');
-    var mm   = String(now.getMinutes()).padStart(2,'0');
-    var ss   = String(now.getSeconds()).padStart(2,'0');
-    var days = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    var n=new Date();
+    var pad=function(x){return String(x).padStart(2,'0');};
+    document.getElementById('clock').textContent=pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+    var days=['So','Mo','Di','Mi','Do','Fr','Sa'];
     var months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-    document.getElementById('clock').textContent = hh+':'+mm+':'+ss;
-    document.getElementById('dateStr').textContent =
-      days[now.getDay()]+', '+now.getDate()+'. '+months[now.getMonth()]+' '+now.getFullYear();
+    document.getElementById('dateStr').textContent=days[n.getDay()]+', '+n.getDate()+'. '+months[n.getMonth()]+' '+n.getFullYear();
   }
-  setInterval(updateClock, 1000);
-  updateClock();
+  setInterval(updateClock,1000); updateClock();
 
-  /* ── EQ bars (build once) ── */
-  var eqBars = document.getElementById('eqBars');
-  var heights= [14,22,30,18,26,36,20,32,16,28,24,12,34,22,18,30];
-  heights.forEach(function(h,i){
-    var b = document.createElement('div');
-    b.className = 'eq-bar';
-    b.style.setProperty('--h', h+'px');
-    b.style.setProperty('--d', (0.4 + (i%5)*0.12) + 's');
+  /* ── EQ bars ── */
+  var eqBars=document.getElementById('eqBars');
+  [14,22,30,18,26,36,20,32,16,28,24,12,34,22,18,30].forEach(function(h,i){
+    var b=document.createElement('div'); b.className='eq-bar';
+    b.style.setProperty('--h',h+'px'); b.style.setProperty('--d',(0.38+(i%5)*0.12)+'s');
     eqBars.appendChild(b);
   });
 
+  /* ── Helpers ── */
+  function esc(s){var d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
+  function el(id){return document.getElementById(id);}
+
   /* ── Artwork ── */
   function setArtwork(url){
-    var wrap = document.getElementById('artworkWrap');
+    var w=el('artworkWrap');
     if(url){
-      wrap.innerHTML = '<img class="now-artwork" src="'+url+'" onerror="this.parentNode.innerHTML='<div class=now-artwork-placeholder>🎵</div>'" alt="">';
+      w.innerHTML='<img class="now-artwork" src="'+esc(url)+'" onerror="this.parentNode.innerHTML='<div class=now-artwork-ph>🎵</div>'" alt="">';
     } else {
-      wrap.innerHTML = '<div class="now-artwork-placeholder">🎵</div>';
+      w.innerHTML='<div class="now-artwork-ph">🎵</div>';
     }
   }
 
-  /* ── History list ── */
-  function addToHistory(title, artist, time){
-    if(!title || title === lastTitle) return;
-    lastTitle = title;
-    trackCount++;
-    history.unshift({ title:title, artist:artist, time:time });
-    if(history.length > 20) history.pop();
-    renderHistory();
-    document.getElementById('stTrackCount').textContent = trackCount;
-  }
-
-  function renderHistory(){
-    var list = document.getElementById('historyList');
-    if(!history.length){
-      list.innerHTML = '<li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Noch keine Tracks gespielt.</span></li>';
+  /* ── History ── */
+  function renderHistory(apiHistory){
+    // apiHistory: array of strings like "1.) Track Name" from SonicPanel
+    // OR locally accumulated objects {title, time}
+    var list=el('historyList');
+    var items=[];
+    if(apiHistory && apiHistory.length){
+      // SonicPanel format: ["1.) Song Title", "2.) Song Title", ...]
+      items=apiHistory.map(function(s,i){
+        var cleaned=String(s).replace(/^\d+\.\)\s*/,'').trim();
+        return {title:cleaned, num:i+1};
+      });
+    } else if(localHistory.length){
+      items=localHistory.map(function(h,i){return {title:h.title+(h.time?' · '+h.time:''), num:i+1};});
+    }
+    if(!items.length){
+      list.innerHTML='<li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Noch keine Tracks gespielt.</span></li>';
       return;
     }
-    list.innerHTML = history.slice(0,10).map(function(item,i){
-      return '<li class="history-item'+(i===0?' fresh':'')+'">'
-        +'<span class="history-num">'+(i+1)+'</span>'
-        +'<span class="history-title">'+(item.artist?'<b style="color:var(--pink)">'+esc(item.artist)+'</b> – ':'')+esc(item.title)+'</span>'
-        +'<span class="history-time">'+esc(item.time)+'</span>'
-        +'</li>';
+    list.innerHTML=items.slice(0,20).map(function(item,i){
+      return '<li class="history-item'+(i===0?' fresh':'')+'">'+
+        '<span class="history-num">'+item.num+'</span>'+
+        '<span class="history-title">'+esc(item.title)+'</span>'+
+      '</li>';
     }).join('');
   }
 
-  function esc(s){ var d=document.createElement('div'); d.textContent=String(s||''); return d.innerHTML; }
+  function addLocalHistory(title){
+    if(!title||title===lastTitle)return;
+    lastTitle=title; trackCount++;
+    localHistory.unshift({title:title,time:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});
+    if(localHistory.length>20)localHistory.pop();
+    el('stTrackCount').textContent=trackCount;
+  }
 
-  /* ── Now Playing update ── */
-  function applyMeta(meta){
-    if(!meta) return;
-    var title    = meta.title  || meta.song  || meta.current_song || meta.songtitle || '';
-    var artist   = meta.artist || meta.dj    || meta.dj_status   || '';
-    var listeners= meta.listeners || meta.currentlisteners || meta.listener_count || '–';
-    var bitrate  = meta.bitrate   || meta.kbps || '–';
-    var dj       = meta.dj        || meta.streamer || artist || '–';
-    var artwork  = meta.icon      || meta.logo || meta.artwork || meta.image || '';
+  /* ── Apply SonicPanel metadata ── */
+  function applyMeta(d){
+    if(!d)return;
 
-    // Nested formats (Shoutcast / AzuraCast / etc.)
-    if(meta.now_playing && meta.now_playing.song){
-      var np = meta.now_playing;
-      title   = title  || np.song.text  || np.song.title || '';
-      artist  = artist || np.song.artist|| '';
-      artwork = artwork|| np.song.art   || '';
+    // SonicPanel field names (from idjstream.app API):
+    // title, art, art_full, listeners, uniq, bitrate, dj, dj_profile, history[]
+    // Also support AzuraCast / generic field names as fallback
+    var title    = d.title    || d.songtitle    || d.currenttrack || d.now_playing_title || '';
+    var art      = d.art_full || d.art          || d.artwork      || d.cover             || d.icon || d.logo || '';
+    var listeners= d.listeners|| d.currentlisteners || d.listener_count || '';
+    var uniq     = d.uniq     || d.unique_listeners || '';
+    var bitrate  = d.bitrate  || d.kbps         || '';
+    var dj       = d.dj       || d.djusername   || d.streamer     || d.dj_status         || '';
+    var djpic    = d.dj_profile || d.dj_image   || '';
+    var history  = d.history  || d.song_history || d.played_history || [];
+
+    // Nested AzuraCast format fallback
+    if(!title && d.now_playing && d.now_playing.song){
+      title = d.now_playing.song.text || d.now_playing.song.title || '';
+      art   = art || d.now_playing.song.art || '';
     }
-    if(meta.station){ dj = dj || meta.station.name || ''; }
 
-    title   = String(title||'').trim();
-    artist  = String(artist||'').trim();
-    listeners = String(listeners||'').trim();
-    bitrate   = String(bitrate||'').trim();
-    dj        = String(dj||'').trim();
+    title   = String(title  ||'').trim();
+    dj      = String(dj     ||'').trim();
+    listeners=String(listeners||'').trim();
+    uniq    = String(uniq   ||'').trim();
+    bitrate = String(bitrate||'').trim();
 
-    if(!title) return;
+    // Remove "No DJ" placeholders
+    if(/nos*dj|nodj|autos*dj|autodj|auto-dj|unknown|offline/i.test(dj)) dj='';
 
-    streamOnline = true;
+    if(!title)return; // nothing useful
 
-    // Update Now Playing card
-    document.getElementById('nowTitle').textContent   = title || '–';
-    document.getElementById('nowArtist').textContent  = artist || ' ';
-    document.getElementById('nowListeners').textContent = '👤 '+(listeners||'–');
-    document.getElementById('nowBitrate').textContent  = (bitrate ? bitrate+' kbps' : '– kbps');
-    document.getElementById('nowDj').textContent       = 'DJ: '+(dj||'–');
+    // ── Now Playing card ──
+    el('nowTitle').textContent    = title;
+    el('nowArtist').textContent   = dj ? dj : ' ';
+    el('nowListeners').textContent= '👤 '+(listeners||'–');
+    el('nowUniq').textContent     = '✨ '+(uniq||'–')+' unique';
+    el('nowBitrate').textContent  = (bitrate?bitrate+' kbps':'– kbps');
 
-    // Update Status card
-    document.getElementById('stStream').innerHTML   = '<span class="led on" id="ledStream"></span>ONLINE';
-    document.getElementById('stListeners').textContent = listeners || '–';
-    document.getElementById('stBitrate').textContent   = bitrate ? bitrate+' kbps' : '–';
-    document.getElementById('stDj').textContent        = dj || '–';
-    document.getElementById('stUpdated').textContent   = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    // ── DJ Live row ──
+    var djRow=el('djLiveRow');
+    if(dj){
+      el('djName').textContent=dj;
+      var av=el('djAvatar');
+      if(djpic){ av.src=djpic; av.style.display=''; }
+      else { av.style.display='none'; }
+      djRow.classList.add('visible');
+    } else {
+      djRow.classList.remove('visible');
+    }
 
-    // Artwork
-    setArtwork(artwork);
+    // ── Status card ──
+    el('stStream').innerHTML='<span class="led on"></span>ONLINE';
+    el('stListeners').textContent=listeners||'–';
+    el('stUniq').textContent=uniq||'–';
+    el('stBitrate').textContent=bitrate?bitrate+' kbps':'–';
+    el('stDj').textContent=dj||'kein Live-DJ';
+    el('stUpdated').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
-    // EQ animation on
-    document.getElementById('eqBars').classList.remove('paused');
+    // ── Artwork ──
+    setArtwork(art);
 
-    // History
-    var now = new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-    addToHistory(title, artist, now);
+    // ── EQ on ──
+    el('eqBars').classList.remove('paused');
+
+    // ── History ──
+    if(Array.isArray(history) && history.length){
+      renderHistory(history);
+    } else {
+      addLocalHistory(title);
+      renderHistory(null);
+    }
   }
 
   function applyOffline(){
-    streamOnline = false;
-    document.getElementById('stStream').innerHTML = '<span class="led off" id="ledStream"></span>OFFLINE';
-    document.getElementById('eqBars').classList.add('paused');
+    el('stStream').innerHTML='<span class="led off"></span>OFFLINE';
+    el('eqBars').classList.add('paused');
   }
 
   /* ── Poll /api/nowplaying ── */
   function pollMeta(){
-    fetch('/api/nowplaying?_t='+Date.now(), { cache:'no-store', headers:{ Accept:'application/json' } })
-      .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
-      .then(function(data){ applyMeta(data); })
-      .catch(function(){ applyOffline(); });
+    fetch('/api/nowplaying?_t='+Date.now(),{cache:'no-store',headers:{Accept:'application/json'}})
+      .then(function(r){return r.ok?r.json():Promise.reject(r.status);})
+      .then(function(d){applyMeta(d);})
+      .catch(function(){applyOffline();});
   }
 
   /* ── Poll /api/player-alert/current ── */
   function pollBroadcast(){
-    fetch('/api/player-alert/current?_t='+Date.now(), { cache:'no-store' })
-      .then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    fetch('/api/player-alert/current?_t='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.ok?r.json():Promise.reject();})
       .then(function(d){
-        var msg  = d.text || d.message || d.msg || '';
-        var time = d.sentAt || d.timestamp || d.created_at || '';
-        var el   = document.getElementById('broadcastMsg');
-        var tel  = document.getElementById('broadcastTime');
+        var msg=d.text||d.message||d.msg||'';
+        var time=d.sentAt||d.timestamp||d.created_at||'';
+        var msgEl=el('broadcastMsg');
+        var tEl=el('broadcastTime');
         if(msg){
-          el.textContent  = msg;
-          el.className    = 'broadcast-msg';
-          tel.textContent = time ? ('Gesendet: '+new Date(time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})) : '';
+          msgEl.textContent=msg; msgEl.className='broadcast-msg';
+          tEl.textContent=time?'Gesendet: '+new Date(time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):'';
         } else {
-          el.textContent = 'Keine Nachricht aktiv.';
-          el.className   = 'broadcast-msg empty';
-          tel.textContent= '';
+          msgEl.textContent='Keine Nachricht aktiv.'; msgEl.className='broadcast-msg empty';
+          tEl.textContent='';
         }
-      })
-      .catch(function(){});
+      }).catch(function(){});
   }
 
   /* ── Start ── */
-  pollMeta();
-  pollBroadcast();
+  pollMeta(); pollBroadcast();
   setInterval(pollMeta,      10000);
   setInterval(pollBroadcast, 15000);
 
