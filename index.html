@@ -603,6 +603,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   .status-chip.led-state.state-warn .status-dot{background:#ff3dbb!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 9px rgba(255,61,187,.90)!important;}
   .status-chip.led-state.state-error .status-dot{background:#ff2244!important;border-color:rgba(255,34,68,.95)!important;box-shadow:0 0 9px rgba(255,34,68,.90)!important;}
   </style>
+  
+  <style id="meterStaircaseV108">
+  /* ── STAIRCASE LEVELMETER v108 ────────────────────────────────────────────── */
+  /* Left side: outer(A)=widest+tallest → inner(C)=narrowest+shortest */
+  .side-meter.left  .side-meter-track               { width:18px!important; max-height:100%!important; align-self:flex-end!important; }
+  .side-meter.left  .side-meter-track.secondary     { width:12px!important; max-height:76%!important;  align-self:flex-end!important; }
+  .side-meter.left  .side-meter-track.tertiary      { width: 8px!important; max-height:55%!important;  align-self:flex-end!important; }
+  /* Right side: mirror — inner(A)=narrowest+shortest, outer(C)=widest+tallest */
+  .side-meter.right .side-meter-track               { width: 8px!important; max-height:55%!important;  align-self:flex-end!important; }
+  .side-meter.right .side-meter-track.secondary     { width:12px!important; max-height:76%!important;  align-self:flex-end!important; }
+  .side-meter.right .side-meter-track.tertiary      { width:18px!important; max-height:100%!important; align-self:flex-end!important; }
+  /* Stack direction: bars side by side, growing from bottom */
+  .side-meter-stack { display:flex!important; flex-direction:row!important; align-items:flex-end!important; gap:2px!important; height:100%!important; }
+  .side-meter-track { display:flex!important; flex-direction:column!important; justify-content:flex-end!important; height:100%!important; border-radius:2px 2px 0 0!important; overflow:hidden!important; background:rgba(255,255,255,.04)!important; }
+  .side-meter-fill  { width:100%!important; border-radius:2px 2px 0 0!important; transition:height 60ms linear!important; }
+  @media(max-width:760px){
+    .side-meter.left  .side-meter-track               { width:14px!important; }
+    .side-meter.left  .side-meter-track.secondary     { width: 9px!important; }
+    .side-meter.left  .side-meter-track.tertiary      { width: 6px!important; }
+    .side-meter.right .side-meter-track               { width: 6px!important; }
+    .side-meter.right .side-meter-track.secondary     { width: 9px!important; }
+    .side-meter.right .side-meter-track.tertiary      { width:14px!important; }
+  }
+  </style>
   </head>
 <body>
   <div class="frame-stage">
