@@ -159,7 +159,12 @@ RULES:
   }
 
   function openAdmin(){
+    if(window.FPAdminOverlay && typeof window.FPAdminOverlay.open === "function"){
+      window.FPAdminOverlay.open();
+      return;
+    }
     var targets = [
+      "#fp-admin-button",
       "#fp-admin-open",
       ".fp-admin-open",
       "[data-admin-open]",
