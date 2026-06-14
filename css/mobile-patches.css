@@ -489,3 +489,132 @@
   body.smfp-v181-nozoom{position:fixed!important;inset:0!important;width:100%!important;overflow:hidden!important;}
 }
 
+
+
+/* ══ Phase 2 Migration from player-patches.css ══ */
+
+/* ── migrated: v116SafeLayoutBoundsFix (mobile) ── */
+/* ── PATCH: v116SafeLayoutBoundsFix (orig L3927–4023) ── */
+
+@media (max-width:760px){
+  /* iPhone: separate status cards, EQ and controls so panels no longer overlap. */
+  #mffApp .mff-cards{
+    min-height:78px!important;
+    height:78px!important;
+    margin-bottom:8px!important;
+    gap:8px!important;
+    overflow:visible!important;
+  }
+  #mffApp .mff-card{
+    min-height:78px!important;
+    height:78px!important;
+    padding:8px 6px!important;
+    overflow:hidden!important;
+  }
+  #mffApp .mff-eq{
+    margin-top:8px!important;
+    margin-bottom:8px!important;
+    min-height:138px!important;
+    height:138px!important;
+    overflow:hidden!important;
+    position:relative!important;
+    z-index:1!important;
+  }
+  #mffApp .mff-eq-bars{
+    height:84px!important;
+    max-height:84px!important;
+    overflow:hidden!important;
+  }
+  #mffApp .mff-controls{
+    margin-top:0!important;
+    position:relative!important;
+    z-index:2!important;
+  }
+}
+
+@media (max-width:380px) and (max-height:740px){
+  #mffApp .mff-cards{min-height:72px!important;height:72px!important;margin-bottom:6px!important;}
+  #mffApp .mff-card{min-height:72px!important;height:72px!important;}
+  #mffApp .mff-eq{min-height:126px!important;height:126px!important;margin-top:6px!important;margin-bottom:6px!important;}
+  #mffApp .mff-eq-bars{height:74px!important;max-height:74px!important;}
+}
+
+/* ── migrated: smfpRealEqPanelV154Style (mobile) ── */
+/* ── PATCH: smfpRealEqPanelV154Style (orig L4525–4553) ── */
+
+@media (max-width:760px){#pcRealEqPanel{display:none!important;}}
+
+/* ── migrated: smfpV164RescueCleanCss (mobile) ── */
+/* ── PATCH: smfpV164RescueCleanCss (orig L4661–4703) ── */
+
+  @media (max-width:760px){
+    #mffBroadcastDisplay,#mffInlineBroadcastPanel{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+    #mffApp .mff-alert-editor-backdrop{z-index:2147483500!important;pointer-events:auto!important;}
+    #mffApp .mff-alert-editor-backdrop.is-open{display:flex!important;}
+    #mffApp .mff-alert-editor{pointer-events:auto!important;}
+    #mffApp #mffAlertOpen,.mff-alert-open{pointer-events:auto!important;touch-action:manipulation!important;z-index:2147482000!important;}
+    #mffApp .mff-alert-editor .smfp-send-status-v164{
+      min-height:18px!important;margin:8px 0 0!important;padding:5px 8px!important;border-radius:10px!important;
+      border:1px solid rgba(22,255,243,.38)!important;background:rgba(2,8,18,.74)!important;
+      color:#20fff4!important;font-size:10px!important;font-weight:900!important;letter-spacing:.06em!important;text-align:center!important;
+      box-shadow:inset 0 0 10px rgba(22,255,243,.06)!important;
+    }
+    #mffApp .mff-alert-editor .smfp-send-status-v164.is-ok{color:#20fff4!important;border-color:rgba(22,255,243,.72)!important;box-shadow:0 0 12px rgba(22,255,243,.18)!important;}
+    #mffApp .mff-alert-editor .smfp-send-status-v164.is-error{color:#ff3d68!important;border-color:rgba(255,61,104,.78)!important;box-shadow:0 0 12px rgba(255,61,104,.18)!important;}
+    /* Unteres Levelmeter: keine künstlichen Sinus-Ausreißer mehr; ruhiger, audioabhängiger Hub. */
+    #mffApp .mff-bottom{height:52px!important;min-height:52px!important;padding:8px 10px!important;}
+    #mffApp .mff-bottom-bars{height:32px!important;max-height:32px!important;gap:2px!important;align-items:center!important;overflow:hidden!important;}
+    #mffApp .mff-bottom-bars i{
+      height:24px!important;min-height:24px!important;max-height:24px!important;border-radius:4px!important;
+      transform:scaleY(var(--smfp-v164-bottom-scale,.62))!important;
+      opacity:var(--smfp-v164-bottom-opacity,.72)!important;
+      transition:transform 150ms ease-out,opacity 150ms ease-out,filter 150ms ease-out!important;
+      animation:none!important;
+    }
+    #mffApp .mff-bottom-bars i.mff-seg-on{filter:brightness(1.04) saturate(1.08)!important;}
+  }
+
+/* ── migrated: smfpV187MobileCyberHeaderCss (mobile) ── */
+/* ── PATCH: smfpV187MobileCyberHeaderCss (orig L4962–5007) ── */
+
+@media (max-width:760px){
+  #mffApp .mff-brand-row,
+  #mffApp #mffBrandRow{
+    display:none!important;
+    visibility:hidden!important;
+    height:0!important;
+    min-height:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+  }
+  #mffApp .mff-cyber-header{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    margin:0 0 4px 0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    pointer-events:none!important;
+    overflow:visible!important;
+  }
+  #mffApp .mff-cyber-header img{
+    display:block!important;
+    width:auto!important;
+    max-width:76%!important;
+    height:32px!important;
+    max-height:32px!important;
+    object-fit:contain!important;
+    filter:drop-shadow(0 0 10px rgba(22,255,243,.45)) drop-shadow(0 0 11px rgba(255,61,187,.34));
+    pointer-events:none!important;
+  }
+}
