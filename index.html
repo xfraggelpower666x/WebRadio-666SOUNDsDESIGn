@@ -585,7 +585,25 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 }
 </style>
 <link rel="stylesheet" href="/css/phase10-stability-iphone-panel-hud.css?v=fix2-mainonly-logo-panel-20260525">
-</head>
+
+  <style id="ledStripV108Css">
+  /* ── LED STRIP v108 — 17-Chip Systempanel ──────────────── */
+  .led-strip-v108{display:inline-flex!important;flex-wrap:wrap!important;align-items:center!important;gap:4px!important;min-width:0!important;}
+  .led-strip-v108 .status-chip.led-state{min-height:26px!important;padding:0 7px!important;font-size:9.5px!important;gap:5px!important;min-width:auto!important;}
+  .led-strip-v108 .status-chip.led-state .status-dot{width:7px!important;height:7px!important;flex:0 0 7px!important;}
+  /* Mobile: stack strips, centered, wrap */
+  @media(max-width:760px){
+    .led-strip-v108{justify-content:center!important;gap:3px!important;}
+    .led-strip-v108 .status-chip.led-state{min-height:22px!important;padding:0 5px!important;font-size:8.5px!important;gap:4px!important;}
+    .led-strip-v108 .status-chip.led-state .status-dot{width:6px!important;height:6px!important;flex:0 0 6px!important;}
+  }
+  /* State colors for new chips */
+  .status-chip.led-state.state-empty .status-dot{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.30)!important;box-shadow:none!important;}
+  .status-chip.led-state.state-ok .status-dot,.status-chip.led-state.state-main .status-dot{background:#28fff4!important;border-color:rgba(40,255,244,.96)!important;box-shadow:0 0 9px rgba(22,255,243,.95),0 0 16px rgba(22,255,243,.35)!important;}
+  .status-chip.led-state.state-warn .status-dot{background:#ff3dbb!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 9px rgba(255,61,187,.90)!important;}
+  .status-chip.led-state.state-error .status-dot{background:#ff2244!important;border-color:rgba(255,34,68,.95)!important;box-shadow:0 0 9px rgba(255,34,68,.90)!important;}
+  </style>
+  </head>
 <body>
   <div class="frame-stage">
     <div class="frame-overlay"></div>
@@ -639,20 +657,31 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       <header class="top-hud systempanel-v74" aria-label="Systempanel">
         <div class="status-cluster status-bar systempanel-grid-v74" aria-label="Systemstatus">
-          <div class="systempanel-group systempanel-left" aria-label="Stream Status">
-            <button id="statusStream" class="status-chip led-state state-main" type="button" title="Stream aktiv"><span class="status-dot"></span><span class="status-code">STR</span></button>
-            <button id="statusMeter" class="status-chip led-state state-meter" type="button" title="Meter aktiv"><span class="status-dot"></span><span class="status-code">METER</span></button>
-            <button id="statusMeta" class="status-chip led-state state-api" type="button" title="Metadaten aktiv"><span class="status-dot"></span><span class="status-code">META</span></button>
-            <button id="statusSource" class="status-chip led-state state-external" type="button" title="Source aktiv"><span class="status-dot"></span><span class="status-code">SRC</span></button>
+          <div class="systempanel-group systempanel-left led-strip-v108" aria-label="Stream-LEDs Leiste 1">
+            <button id="statusStream" class="status-chip led-state state-main" type="button" title="Stream aktiv — türkis: läuft, pink: Fehler, leer: aus"><span class="status-dot"></span><span class="status-code">STR</span></button>
+            <button id="statusBuffer" class="status-chip led-state state-empty" type="button" title="Stream Buffering — grün: stabil, türkis: normaler Buffer, pink: Unterpufferung, rot: Stall"><span class="status-dot"></span><span class="status-code">SB</span></button>
+            <button id="statusSource" class="status-chip led-state state-external" type="button" title="Source / Quelle — Herkunft des Streams"><span class="status-dot"></span><span class="status-code">SRC</span></button>
+            <button id="statusMeta" class="status-chip led-state state-api" type="button" title="Metadaten aktiv — Titelinformationen werden empfangen"><span class="status-dot"></span><span class="status-code">MET</span></button>
+            <button id="statusWorker" class="status-chip led-state state-empty" type="button" title="Worker — Hintergrundprozess Status"><span class="status-dot"></span><span class="status-code">WRK</span></button>
+            <button id="statusAudio" class="status-chip led-state state-empty" type="button" title="Audio-Core — Selbstheilung aktiv"><span class="status-dot"></span><span class="status-code">AUD</span></button>
+            <button id="statusWatchdog" class="status-chip led-state state-empty" type="button" title="Watchdog — überwacht Stream-Stabilität"><span class="status-dot"></span><span class="status-code">WCH</span></button>
+            <button id="statusReconnect" class="status-chip led-state state-empty" type="button" title="Reconnect — Stream kontrolliert neu verbinden"><span class="status-dot"></span><span class="status-code">RCN</span></button>
+            <button id="statusMeter" class="status-chip led-state state-empty" type="button" title="Meter — Audio-Level-Anzeige aktiv"><span class="status-dot"></span><span class="status-code">MTR</span></button>
           </div>
           <div id="pcBoostPanel" class="systempanel-group systempanel-center system-boost-actions boost-compact-v79" aria-label="Boost Steuerung">
             <button id="pcBoostMinus" class="status-chip led-state boost-step boost-step-down state-off" type="button" data-boost-step="-1" title="Boost senken" aria-label="Boost senken"><span class="status-dot"></span><span class="status-code">−</span></button>
             <span id="pcBoostLabel" class="status-chip led-state boost-status state-off" role="status" aria-label="Boost Status"><span class="status-dot"></span><span class="status-code">BST 0</span></span>
             <button id="pcBoostPlus" class="status-chip led-state boost-step boost-step-up state-off" type="button" data-boost-step="1" title="Boost erhöhen" aria-label="Boost erhöhen"><span class="status-dot"></span><span class="status-code">+</span></button>
           </div>
-<div class="systempanel-group systempanel-right" aria-label="Streamquelle und Version">
-            <button id="mainBtn" class="status-chip led-state source-chip state-main is-active source-mini-chip-v80" type="button" title="Mainstream" aria-label="Mainstream"><span class="status-dot"></span><span class="status-code">M</span></button>
-            <button id="fallbackBtn" class="status-chip led-state source-chip state-off source-mini-chip-v80" type="button" title="Backup Stream" aria-label="Backup Stream"><span class="status-dot"></span><span class="status-code">B</span></button>
+<div class="systempanel-group systempanel-right led-strip-v108" aria-label="Stream-Schalter und Action-LEDs">
+            <button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Hauptstream — Klick schaltet auf Hauptstream"><span class="status-dot"></span><span class="status-code">H</span></button>
+            <button id="fallbackBtn" class="status-chip led-state state-off source-chip source-mini-chip-v80" type="button" title="Backupstream — Klick schaltet auf Backupstream"><span class="status-dot"></span><span class="status-code">B</span></button>
+            <button id="statusEq" class="status-chip led-state state-empty" type="button" title="Equalizer / Sound — EQ-Status"><span class="status-dot"></span><span class="status-code">EQ</span></button>
+            <button id="statusDiscord" class="status-chip led-state state-empty" type="button" title="Discord — verbunden: türkis, sendet: pink, Fehler: rot"><span class="status-dot"></span><span class="status-code">DSC</span></button>
+            <button id="statusMsg" class="status-chip led-state state-empty" type="button" title="Broadcast / Messenger — Nachrichtenstatus"><span class="status-dot"></span><span class="status-code">MSG</span></button>
+            <button id="statusAdmin" class="status-chip led-state state-empty" type="button" title="Admin — Admin-Zugang aktiv"><span class="status-dot"></span><span class="status-code">ADM</span></button>
+            <button id="statusGovee" class="status-chip led-state state-empty" type="button" title="GOVEE / FX — Lichtsteuerung Status"><span class="status-dot"></span><span class="status-code">GOV</span></button>
+            <button id="statusChaos" class="status-chip led-state state-empty" type="button" title="Chaos / System — Systemstatus"><span class="status-dot"></span><span class="status-code">CHA</span></button>
             <div data-discord-addon-slot class="discord-addon-slot-pc" aria-label="Discord Webhook Control"></div>
 </div>
         </div>
