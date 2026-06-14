@@ -1,0 +1,20 @@
+{
+  "playerRepo": {
+    "rootMustRemain": [
+      "worker.js",
+      "index.html",
+      "wrangler.jsonc",
+      "assets/",
+      "css/",
+      "js/",
+      "config/",
+      "worker-addons/"
+    ],
+    "adminRuntimeConfig": "config/radio-runtime.json",
+    "adminRuntimeBackups": "config/backups/",
+    "chaosEngine": "CHAOS_ENGINE/",
+    "darkDancerStory": "existing worker route /The-Dark-Dancer"
+  },
+  "rendererRole": "automation/backend helper; separate from Player repo",
+  "noSecretsInRepo": true
+}
