@@ -263,6 +263,8 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   let analyser = null;
   let source = null;
   let gainNode = null;
+  let limiterNode = null;
+    let limiterNode = null;
   let data = null;
   let rafId = 0;
   let fallbackTimer = 0;
@@ -397,6 +399,13 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
     const eqNodes = createRealEqNodes(ctx);
 
+    limiterNode = ctx.createDynamicsCompressor();
+    limiterNode.threshold.value = -1.0;
+    limiterNode.knee.value = 3.0;
+    limiterNode.ratio.value = 20.0;
+    limiterNode.attack.value = 0.001;
+    limiterNode.release.value = 0.10;
+
     source = ctx.createMediaElementSource(audio);
     source.connect(gainNode);
     if (eqNodes.length) {
@@ -404,10 +413,11 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       for (let eqIndex = 0; eqIndex < eqNodes.length - 1; eqIndex += 1) {
         eqNodes[eqIndex].connect(eqNodes[eqIndex + 1]);
       }
-      eqNodes[eqNodes.length - 1].connect(analyser);
+      eqNodes[eqNodes.length - 1].connect(limiterNode);
     } else {
-      gainNode.connect(analyser);
+      gainNode.connect(limiterNode);
     }
+    limiterNode.connect(analyser);
     analyser.connect(ctx.destination);
     applyRealEqToNodes();
 
