@@ -327,8 +327,8 @@ RULES:
     externalPauseAt: 0,
     lastPauseAt: 0,
     lastPlayWantedAt: Date.now(),
-    pauseToleranceMs: 10000,
-    longInterruptionMs: 10000,
+    pauseToleranceMs: 2500,
+    longInterruptionMs: 4000,
     recovering: false
   };
 
@@ -946,8 +946,8 @@ RULES:
   // CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530
   var centralAudioGuardV2 = {
     started:false, wanted:false, manualStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0, escalation:0,
-    pcProfile:{ pausedToleranceMs:12000, stallToleranceMs:36000, readyLowToleranceMs:22000, cooldownMs:18000 },
-    mobileProfile:{ pausedToleranceMs:6500, stallToleranceMs:26000, readyLowToleranceMs:14000, cooldownMs:12000 }
+    pcProfile:{ pausedToleranceMs:4000, stallToleranceMs:36000, readyLowToleranceMs:18000, cooldownMs:6000 },
+    mobileProfile:{ pausedToleranceMs:2000, stallToleranceMs:26000, readyLowToleranceMs:10000, cooldownMs:4500 }
   };
   function centralAudioGuardV2IsMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || window.innerWidth <= 760; }
   function centralAudioGuardV2Profile(){ return centralAudioGuardV2IsMobile() ? centralAudioGuardV2.mobileProfile : centralAudioGuardV2.pcProfile; }
@@ -1210,8 +1210,8 @@ RULES:
       if(/play/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkWanted,true);
       if(/stop/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkStop,true);
     });
-    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){window.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?1200:2800;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
-    setInterval(centralAudioGuardV2Tick,2500);
+    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){window.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?500:800;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
+    setInterval(centralAudioGuardV2Tick,1500);
     setTimeout(centralAudioGuardV2Tick,1600);
     document.documentElement.setAttribute("data-central-audio-stability-v2","installed");
   }
