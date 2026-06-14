@@ -2869,3 +2869,105 @@ PURPOSE:
   body #pcVersionBadge .status-code{font-size:0!important}
   body #pcVersionBadge .status-code::after{content:"v126"!important;font-size:11px!important;line-height:1!important}
 }
+
+  /* ════════════════════════════════════════════════════════════════════════════
+     PHASE 2 MIGRATION: fraggledna-rail-v1 + pcHeaderNewLogoFix
+     Verschoben aus player-patches.css → hier ist die Heimat (desktop only).
+     ════════════════════════════════════════════════════════════════════════════ */
+
+  /* ── PATCH: fraggledna-rail-v1 (orig L5224–5291) ── */
+  @media(min-width:761px){
+
+    /* ── DNA Rail LEDs: 4-Farb audioreaktiv ─────── */
+    .dna-rail-led{
+      display:inline-block;
+      width:9px;height:9px;
+      border-radius:50%;
+      margin-right:5px;
+      vertical-align:middle;
+      flex-shrink:0;
+      background:#16fff3;
+      box-shadow:0 0 7px #16fff3,0 0 14px rgba(22,255,243,.5);
+      transition:background .1s,box-shadow .1s;
+    }
+
+    /* ── Copyright inline unter Logo ────────────── */
+    .cockpit-copyright-inline{
+      display:block;
+      text-align:center;
+      font-size:10px;
+      font-family:'Courier New',monospace;
+      color:rgba(22,255,243,0.60);
+      letter-spacing:0.10em;
+      padding:2px 0 5px;
+      line-height:1.4;
+    }
+    .cockpit-copyright-inline b{
+      color:rgba(255,61,187,0.80);
+      font-weight:700;
+    }
+
+    /* ── frame-overlay: niemals Klicks blockieren ─ */
+    .frame-overlay{
+      pointer-events:none!important;
+      z-index:0!important;
+    }
+
+    /* ── Play/Pause/Stop/Reconnect immer klickbar ─ */
+    #playBtn,#pauseBtn,#stopBtn,#reconnectBtn,
+    .icon-btn,.icon-btn-main,
+    .control-toolbar button{
+      pointer-events:auto!important;
+      position:relative!important;
+      z-index:200!important;
+    }
+    .control-toolbar{
+      position:relative!important;
+      z-index:200!important;
+    }
+
+    /* ── Ticker immer sichtbar ───────────────────── */
+    .ticker-window{
+      display:block!important;
+      overflow:hidden!important;
+      opacity:1!important;
+      visibility:visible!important;
+    }
+
+    /* ── Panel-Header Zeile (LED + Name) als flex ─ */
+    .pc-addon-tower-head{
+      display:flex!important;
+      align-items:center!important;
+      gap:4px!important;
+      flex-wrap:nowrap!important;
+    }
+  }
+
+
+  /* ── PATCH: pcHeaderNewLogoFix (orig L5336–5362) ── */
+  @media(min-width:761px){
+    #pcHeaderNewLogo.pc-header-new-logo {
+      display: block !important;
+      width: 100% !important;
+      max-width: 860px !important;
+      height: auto !important;
+      max-height: 134px !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      margin: 0 auto !important;
+      filter:
+        drop-shadow(0 0 14px rgba(255,61,187,.45))
+        drop-shadow(0 0 10px rgba(22,255,243,.32)) !important;
+    }
+    #pcHeaderBrandSplit.pc-header-brand-split {
+      width: 100% !important;
+      max-width: 860px !important;
+      min-height: 80px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      padding: 4px 0 !important;
+    }
+  }
+  
