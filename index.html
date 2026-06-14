@@ -5331,5 +5331,35 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   })();
   </script>
   
+
+  <!-- LOGO SIZE FIX — pc-header-new-logo fills container correctly -->
+  <style id="pcHeaderNewLogoFix">
+  @media(min-width:761px){
+    #pcHeaderNewLogo.pc-header-new-logo {
+      display: block !important;
+      width: 100% !important;
+      max-width: 860px !important;
+      height: auto !important;
+      max-height: 134px !important;
+      object-fit: contain !important;
+      object-position: center center !important;
+      margin: 0 auto !important;
+      filter:
+        drop-shadow(0 0 14px rgba(255,61,187,.45))
+        drop-shadow(0 0 10px rgba(22,255,243,.32)) !important;
+    }
+    #pcHeaderBrandSplit.pc-header-brand-split {
+      width: 100% !important;
+      max-width: 860px !important;
+      min-height: 80px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin: 0 auto !important;
+      padding: 4px 0 !important;
+    }
+  }
+  </style>
+  
 </body>
 </html>
