@@ -179,7 +179,7 @@ ZWECK: Hauptlayout des externen Players.
   min-height: 12px;
   border-radius: 999px 999px 6px 6px;
   background: linear-gradient(180deg, var(--purple), var(--pink) 58%, var(--cyan));
-  box-shadow: 0 0 10px rgba(184,77,255,0.18);
+  box-shadow: 0 0 16px rgba(255,62,181,0.28), 0 0 10px rgba(22,255,243,0.18);
   transform-origin: bottom center;
   will-change: height;
 }
