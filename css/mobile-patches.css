@@ -295,7 +295,7 @@
   /* State colors for new chips */
   .status-chip.led-state.state-empty .status-dot{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.30)!important;box-shadow:none!important;}
   .status-chip.led-state.state-ok .status-dot,.status-chip.led-state.state-main .status-dot{background:#28fff4!important;border-color:rgba(40,255,244,.96)!important;box-shadow:0 0 9px rgba(22,255,243,.95),0 0 16px rgba(22,255,243,.35)!important;}
-  .status-chip.led-state.state-warn .status-dot{background:#ff3dbb!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 9px rgba(255,61,187,.90)!important;}
+  .status-chip.led-state.state-warn .status-dot{background:var(--color-pink)!important;border-color:rgba(255,61,187,.95)!important;box-shadow:0 0 9px rgba(255,61,187,.90)!important;}
   .status-chip.led-state.state-error .status-dot{background:#ff2244!important;border-color:rgba(255,34,68,.95)!important;box-shadow:0 0 9px rgba(255,34,68,.90)!important;}
 
 
@@ -452,7 +452,7 @@
   #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="2"]{background:#29fff4!important;border-color:#29fff4!important;box-shadow:0 0 10px rgba(41,255,244,.82)!important;}
   #mffApp[data-mff-boost-stage="3"] .mff-boost-led[data-led="3"],
   #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="3"],
-  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="3"]{background:#ff3dbb!important;border-color:#ff3dbb!important;box-shadow:0 0 10px rgba(255,61,187,.86)!important;}
+  #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="3"]{background:var(--color-pink)!important;border-color:var(--color-pink)!important;box-shadow:0 0 10px rgba(255,61,187,.86)!important;}
   #mffApp[data-mff-boost-stage="4"] .mff-boost-led[data-led="4"],
   #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="4"],
   #mffApp[data-mff-boost-stage="5"] .mff-boost-led[data-led="5"]{background:#ff315d!important;border-color:#ff315d!important;box-shadow:0 0 12px rgba(255,49,93,.92),0 0 20px rgba(255,49,93,.42)!important;}
