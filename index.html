@@ -69,7 +69,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <link rel="stylesheet" href="/css/phase10-stability-iphone-panel-hud.css?v=2026-06-15-fix1">
 
   
-    <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-15-fix1" />
+    <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-15-v109" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
   <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
 </head>
@@ -89,11 +89,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <!-- v138 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
     <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Fraggle DNA Links Rail" data-addon-side="left">
       <section class="pc-addon-tower pc-addon-tower-left" aria-label="Fraggle DNA Links Rail">
-        <header class="pc-addon-tower-head">
-<div id="phase10CleanHeaderLogo" class="phase10-clean-header-logo" aria-label="666SOUNDsDESIGn Header Logo">
-  <img src="/assets/images/logo-neon.png" alt="666SOUNDsDESIGn">
-</div>
-<span id="dnaRailLedLeft" class="dna-rail-led" title="Fraggle DNA Puls · audioreaktiv"></span><span>DNA · LINKS</span><b id="pcLeftFxState">ON</b></header>
+        <header class="pc-addon-tower-head"><span id="dnaRailLedLeft" class="dna-rail-led" title="Fraggle DNA Puls · audioreaktiv"></span><span>DNA · LINKS</span><b id="pcLeftFxState">ON</b></header>
         <article class="pc-addon-module pc-addon-module-reactor" aria-label="Fraggle Reaktor">
           <strong>FRAGGLE REAKTOR</strong>
           <div class="pc-addon-reactor-core" aria-hidden="true">
@@ -247,7 +243,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         </article>
         <article id="phase10StatusLedCard" class="info-card phase10-status-led-card">
           <div class="info-label">Stream / Meter / Source</div>
-          <div class="phase10-status-led-row"></div>
+          <div class="phase10-status-led-row"><span class="info-led is-off" data-info-led="stream" title="Stream"><i></i><b>STR</b></span><span class="info-led is-off" data-info-led="meter" title="Meter / Pegel"><i></i><b>MTR</b></span><span class="info-led is-off" data-info-led="source" title="Source"><i></i><b>SRC</b></span></div>
         </article>
         <article class="info-card pc-addon-toggle-card desktop-only" aria-label="Add-on FX Controls">
           <div class="info-label">ADDON FX</div>
@@ -2110,7 +2106,19 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return out;
   }
   function sampleEnergy(){
-    var data=collectLevels();
+      var bus=window.__MeterBus;
+      if(bus && typeof bus.level==='number' && (Date.now()-bus.ts)<600){
+        var be=clamp(bus.level,.04,1);
+        smoothed=(smoothed*.60)+(be*.40);
+        var bpeak=clamp((bus.peak!=null?bus.peak:bus.level),.04,1);
+        var bpulse=clamp(Math.abs(smoothed-last)*8.0 + smoothed*.72,.06,1);
+        last=smoothed;
+        var bleft=(bus.left&&bus.left.length)?bus.left:[smoothed,bpulse,bpeak];
+        var bright=(bus.right&&bus.right.length)?bus.right:[bpeak,bpulse,smoothed];
+        var beq=(bus.eq&&bus.eq.length)?bus.eq:pickVector([],28,[smoothed,bpulse,bpeak,(smoothed+bpeak)/2]);
+        return {energy:clamp(smoothed,.04,1),peak:bpeak,pulse:bpulse,eq:beq,left:bleft,right:bright,bottom:[]};
+      }
+      var data=collectLevels();
     var vals=data.all.slice();
     if(!vals.length){
       // Standby: bestehende Module bekommen nur einen sanften, einheitlichen Idle-Puls.
@@ -2161,6 +2169,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     setPctVar(root,'--pc-addon-vu-r2',.12+((e+p)/2)*.84);
     root.style.setProperty('--pc-addon-phase-angle',(-58 + 116*u).toFixed(1)+'deg');
     setPctVar(root,'--pc-addon-phase-scale',.72 + e*.48);
+      // v109 Info-Card Status-LEDs (Stream/Meter/Source) aus zentralem Pegel-Bus
+      (function(){
+        var b=window.__MeterBus; var live=!!(b && (Date.now()-b.ts)<700);
+        var ml=clamp(e,0,1);
+        var mc=ml>=.80?'is-red':ml>=.55?'is-pink':ml>=.25?'is-cyan':(live?'is-green':'is-off');
+        document.querySelectorAll('[data-info-led]').forEach(function(el){
+          var k=el.getAttribute('data-info-led');
+          el.classList.remove('is-green','is-cyan','is-pink','is-red','is-off');
+          el.classList.add(k==='meter'?mc:(live?'is-cyan':'is-off'));
+        });
+      })();
 
     // Direkt an bestehenden Elementen schreiben: gleiche Quelle wie EQ/Levelmeter, kein eigener Fake-Rhythmus.
     var eq12=pickVector(vector,12,[e,u,p,(e+p)/2]);
