@@ -13,7 +13,7 @@ ZWECK: Neon-Rahmen und subtile Glows.
     0 0 18px rgba(0,245,223,0.18),
     0 0 18px rgba(255,62,181,0.18);
 }
-.eq-bar, .side-meter-fill, .status-dot {
+.eq-bar, .eq-bar-fill, .side-meter-fill, .status-dot {
   animation: pulseGlow 1.8s ease-in-out infinite alternate;
 }
 @keyframes pulseGlow {
