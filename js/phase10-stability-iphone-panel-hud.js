@@ -1224,8 +1224,14 @@ RULES:
   }
   function startIphoneAudioStabilityGuardV2(){ startCentralAudioStabilityGuardV2(); }
 
-  function boot(){
-    mountHudLogo();
+  // no-op Stubs: diese hardfix-Funktionen wurden aufgerufen aber nie definiert -> boot() warf ReferenceError und die gesamte Stabilitaets-Schicht (Recovery-Orchester, Gesten-Resume, EQ-Trigger) startete nie
+    function hardfixInstallManualBackupFlag(){}
+    function hardfixMoveLedsBehindDj(){}
+    function hardfixTickerNoEmptyGap(){}
+    function hardfixMessageBox(){}
+    function hardfixForceMainOnlyPc(){}
+    function boot(){
+      mountHudLogo();
     hardfixInstallManualBackupFlag();
     hardfixMoveLedsBehindDj();
     hardfixTickerNoEmptyGap();
