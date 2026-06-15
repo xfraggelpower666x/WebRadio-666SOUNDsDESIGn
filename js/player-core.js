@@ -885,6 +885,7 @@ async function healthPing() {
   }
   try {
     const response = await fetch(`${ENDPOINTS.health}?t=${Date.now()}`, { cache: 'no-store' });
+    await response.text().catch(() => {}); // v107: Body auslesen, sonst hängt der Tab-Ladekreis ewig
     if (!response.ok) throw new Error('health_http_error');
     applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
   } catch (err) {
