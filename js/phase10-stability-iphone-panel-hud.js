@@ -1230,6 +1230,7 @@ RULES:
     function hardfixTickerNoEmptyGap(){}
     function hardfixMessageBox(){}
     function hardfixForceMainOnlyPc(){}
+    function phase10IsMobileAudioDevice(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || (window.innerWidth||9999) <= 860; }
     function boot(){
       mountHudLogo();
     hardfixInstallManualBackupFlag();
