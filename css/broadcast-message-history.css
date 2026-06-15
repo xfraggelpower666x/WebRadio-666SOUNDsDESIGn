@@ -30,7 +30,7 @@ NOTES: Visual-only module; hidden overlay has pointer-events:none to avoid block
   color:#eafcff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 .smfp-msg-history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid rgba(22,255,243,.20)}
-.smfp-msg-history-title{font-size:13px;font-weight:950;letter-spacing:.08em;color:#ff3dbb;text-shadow:0 0 10px rgba(255,61,187,.44)}
+.smfp-msg-history-title{font-size:13px;font-weight:950;letter-spacing:.08em;color:var(--color-pink);text-shadow:0 0 10px rgba(255,61,187,.44)}
 .smfp-msg-history-sub{font-size:10px;color:rgba(234,252,255,.62);margin-top:2px;font-weight:800;letter-spacing:.04em}
 .smfp-msg-history-close{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(4,8,20,.88);color:#28fff4;font-size:22px;line-height:1;cursor:pointer;}
 .smfp-msg-history-list{max-height:calc(min(76vh,680px) - 78px);overflow:auto;padding:10px 12px 14px;}
