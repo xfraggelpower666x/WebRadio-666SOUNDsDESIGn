@@ -3792,3 +3792,20 @@ PURPOSE:
 @media (min-width:761px){
   #mffApp .mff-cyber-header{display:none!important;}
 }
+
+/* ============================================================
+   v108 (2026-06-15) — Bottom-Meter fuellt komplette Panel-Breite
+   56 Segmente verteilen sich ueber die ganze Breite (keine Leerraeume).
+   Center-out-Helligkeitslogik bleibt unveraendert.
+   ============================================================ */
+@media (min-width: 861px) {
+  body #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-inner {
+    justify-content: space-between !important;
+    gap: 3px !important;
+  }
+  body #pcBottomSyncMeter.pc-bottom-sync-meter .pc-bottom-sync-seg {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+}
