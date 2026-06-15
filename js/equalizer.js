@@ -264,7 +264,6 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   let source = null;
   let gainNode = null;
   let limiterNode = null;
-    let limiterNode = null;
   let data = null;
   let rafId = 0;
   let fallbackTimer = 0;
