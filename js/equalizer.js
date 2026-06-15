@@ -393,6 +393,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     analyser.fftSize = mobileLike() ? 128 : 256;
     analyser.smoothingTimeConstant = mobileLike() ? 0.84 : 0.80;
     data = new Uint8Array(analyser.frequencyBinCount);
+    const timeData = new Uint8Array(analyser.fftSize); // v108: Zeitsignal fuer echtes RMS-Level
 
     gainNode = ctx.createGain();
     gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
@@ -471,9 +472,13 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         setBarHeight(bars[i], px);
       }
 
+      analyser.getByteTimeDomainData(timeData);
+      let sumSq = 0;
+      for (let k = 0; k < timeData.length; k += 1) { const dv = (timeData[k] - 128) / 128; sumSq += dv * dv; }
+      const rms = Math.sqrt(sumSq / timeData.length);
       const meterValue = useHybrid
         ? 24 + (Math.abs(Math.sin(Date.now() / 200)) * 66)
-        : 14 + ((globalMax / 255) * 84);
+        : clamp(14 + rms * 210, 12, 98); // v108: Side-Meter folgt echter Lautstaerke (RMS) statt Frequenz-Peak
 
       setMeters(meterValue);
       recoverDesktopCenterBars(bars, meterValue, audio && !audio.paused);
