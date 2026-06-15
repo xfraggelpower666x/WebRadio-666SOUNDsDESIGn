@@ -147,8 +147,8 @@
   :root{
     --mff-bg:#02040d;
     --mff-panel:rgba(5,10,28,.82);
-    --mff-cyan:#16fff3;
-    --mff-pink:#ff3dbb;
+    --mff-cyan:var(--color-cyan);
+    --mff-pink:var(--color-pink);
     --mff-purple:#8d45ff;
     --mff-text:#f7f8ff;
     --mff-level:.20;
@@ -994,7 +994,7 @@
   .info-led i{ width:9px; height:9px; border-radius:50%; background:rgba(120,140,160,.32); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); transition:background .12s ease, box-shadow .12s ease; }
   .info-led.is-off i{ background:rgba(120,140,160,.3); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
   .info-led.is-green i{ background:#27e07a; box-shadow:0 0 8px rgba(39,224,122,.85); }
-  .info-led.is-cyan i{ background:#16fff3; box-shadow:0 0 9px rgba(22,255,243,.9); }
-  .info-led.is-pink i{ background:#ff3dbb; box-shadow:0 0 9px rgba(255,61,187,.9); }
+  .info-led.is-cyan i{ background:var(--color-cyan); box-shadow:0 0 9px rgba(22,255,243,.9); }
+  .info-led.is-pink i{ background:var(--color-pink); box-shadow:0 0 9px rgba(255,61,187,.9); }
   .info-led.is-red i{ background:#ff3b4e; box-shadow:0 0 10px rgba(255,59,78,.95); }
   
