@@ -997,17 +997,4 @@
   .info-led.is-cyan i{ background:#16fff3; box-shadow:0 0 9px rgba(22,255,243,.9); }
   .info-led.is-pink i{ background:#ff3dbb; box-shadow:0 0 9px rgba(255,61,187,.9); }
   .info-led.is-red i{ background:#ff3b4e; box-shadow:0 0 10px rgba(255,59,78,.95); }
-  @media (min-width:861px){
-    body .frame-stage .player-shell > .top-hud,
-    .player-shell .top-hud{ overflow:visible !important; max-height:none !important; height:auto !important; }
-    .player-shell .status-cluster,
-    .player-shell .status-bar{
-      flex-wrap:wrap !important; overflow:visible !important;
-      max-height:none !important; min-height:0 !important; height:auto !important;
-      justify-content:center !important; align-content:center !important;
-      gap:6px 8px !important; row-gap:6px !important; padding:8px 14px !important;
-    }
-    .player-shell .systempanel-group{ flex:0 1 auto !important; overflow:visible !important; gap:6px !important; }
-    .player-shell .status-cluster .status-chip{ flex:0 0 auto !important; }
-  }
   
