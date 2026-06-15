@@ -309,9 +309,7 @@
     transition:transform 92ms linear, opacity 92ms linear, filter 92ms linear!important;
     animation:none!important;
   }
-  #mffApp .mff-bottom-bars i.mff-bottom-left{transform-origin:right center!important;}
-  #mffApp .mff-bottom-bars i.mff-bottom-right{transform-origin:left center!important;}
-
+    
 
 
   /* v23 CLEAN EQ ENGINE PURGE REPLACE */
@@ -564,10 +562,7 @@
     row-gap:4px!important;
   }
 
-  #mffApp .mff-card:nth-child(3) .mff-ico{
-    display:none!important;
-  }
-
+  
   #mffApp .mff-card:nth-child(3) small{
     width:100%!important;
     padding-left:0!important;
@@ -645,10 +640,7 @@
     line-height:1.05!important;
   }
 
-  #mffApp .mff-card:nth-child(3) .mff-ico{
-    display:none!important;
-  }
-
+  
   #mffApp .mff-card:nth-child(3) strong{
     font-size:15px!important;
   }
@@ -769,8 +761,7 @@
     font-size:11px!important;font-weight:950!important;letter-spacing:.035em!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
     text-shadow:0 0 10px rgba(22,255,243,.45)!important;pointer-events:auto!important;
   }
-  #mffApp .mff-brand-row a:active{color:var(--mff-pink)!important;}
-
+  
 
   /* v34 URL ROW ONLY — LED/META LOGIC RESTORED FROM v27 */
   #mffApp .mff-brand-row{
@@ -915,39 +906,10 @@
 
 
   /* v42 LOGO + APP ICON INTEGRATION */
-  .mff-top-logo{
-    width:min(94vw,760px)!important;
-    margin:calc(env(safe-area-inset-top,0px) + 12px) auto 10px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    pointer-events:none!important;
-    user-select:none!important;
-    position:relative!important;
-    z-index:3!important;
-  }
-
-  .mff-top-logo img{
-    display:block!important;
-    width:100%!important;
-    height:auto!important;
-    max-height:132px!important;
-    object-fit:contain!important;
-    filter:
-      drop-shadow(0 0 16px rgba(22,255,243,.24))
-      drop-shadow(0 0 18px rgba(255,61,187,.22))!important;
-  }
-
+  
+  
   @media(max-width:430px){
-    .mff-top-logo{
-      width:92vw!important;
-      margin-top:calc(env(safe-area-inset-top,0px) + 10px)!important;
-      margin-bottom:8px!important;
-    }
-    .mff-top-logo img{
-      max-height:108px!important;
-    }
-  }
+          }
 
 
   /* v107 CYBERPUNK BG + REACTIVE GLOW */
