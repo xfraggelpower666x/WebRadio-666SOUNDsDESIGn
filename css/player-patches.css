@@ -976,3 +976,38 @@
     }
 
 @media(min-width:761px){#mffApp{display:none!important;}}
+
+  /* === v109 ZENTRALES PEGEL-SYSTEM + LAYOUT-FIX (Layout/Optik; Audio & EQ-Hoehen unberuehrt) === */
+  @media (min-width:861px){
+    .player-shell .info-grid,
+    body .frame-stage .player-shell > .info-grid{
+      display:flex !important; flex-wrap:wrap !important; align-items:stretch !important;
+      gap:10px !important; grid-template-columns:none !important;
+      max-height:none !important; min-height:0 !important; height:auto !important; overflow:visible !important;
+    }
+    .player-shell .info-grid > .info-card{ flex:1 1 150px !important; }
+    .player-shell .info-grid > #phase10StatusLedCard{ flex:0 1 auto !important; margin-left:auto !important; }
+    .player-shell .info-grid > .pc-addon-toggle-card{ flex:0 1 auto !important; }
+  }
+  .phase10-status-led-row{ display:flex !important; align-items:center; gap:12px; flex-wrap:wrap; }
+  .info-led{ display:inline-flex; align-items:center; gap:5px; font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.09em; color:rgba(220,240,255,.72); }
+  .info-led i{ width:9px; height:9px; border-radius:50%; background:rgba(120,140,160,.32); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); transition:background .12s ease, box-shadow .12s ease; }
+  .info-led.is-off i{ background:rgba(120,140,160,.3); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+  .info-led.is-green i{ background:#27e07a; box-shadow:0 0 8px rgba(39,224,122,.85); }
+  .info-led.is-cyan i{ background:#16fff3; box-shadow:0 0 9px rgba(22,255,243,.9); }
+  .info-led.is-pink i{ background:#ff3dbb; box-shadow:0 0 9px rgba(255,61,187,.9); }
+  .info-led.is-red i{ background:#ff3b4e; box-shadow:0 0 10px rgba(255,59,78,.95); }
+  @media (min-width:861px){
+    body .frame-stage .player-shell > .top-hud,
+    .player-shell .top-hud{ overflow:visible !important; max-height:none !important; height:auto !important; }
+    .player-shell .status-cluster,
+    .player-shell .status-bar{
+      flex-wrap:wrap !important; overflow:visible !important;
+      max-height:none !important; min-height:0 !important; height:auto !important;
+      justify-content:center !important; align-content:center !important;
+      gap:6px 8px !important; row-gap:6px !important; padding:8px 14px !important;
+    }
+    .player-shell .systempanel-group{ flex:0 1 auto !important; overflow:visible !important; gap:6px !important; }
+    .player-shell .status-cluster .status-chip{ flex:0 0 auto !important; }
+  }
+  
