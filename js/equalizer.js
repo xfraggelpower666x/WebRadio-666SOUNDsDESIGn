@@ -476,11 +476,23 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       let sumSq = 0;
       for (let k = 0; k < timeData.length; k += 1) { const dv = (timeData[k] - 128) / 128; sumSq += dv * dv; }
       const rms = Math.sqrt(sumSq / timeData.length);
-      const meterValue = useHybrid
-        ? 24 + (Math.abs(Math.sin(Date.now() / 200)) * 66)
-        : clamp(14 + rms * 210, 12, 98); // v108: Side-Meter folgt echter Lautstaerke (RMS) statt Frequenz-Peak
+      // v109 ZENTRALES PEGEL-SYSTEM: eine kalibrierte RMS-Quelle (mit Headroom) fuer alle Anzeigen.
+        const level = useHybrid
+          ? clamp(0.20 + Math.abs(Math.sin(Date.now() / 320)) * 0.34, 0, 1)
+          : clamp(rms * 1.9, 0, 1);
+        const meterValue = clamp(12 + level * 86, 12, 98);
 
-      setMeters(meterValue);
+        setMeters(meterValue);
+
+        const __lvNorm = clamp((smoothMeter || meterValue) / 100, 0, 1);
+        window.__MeterBus = {
+          ts: Date.now(),
+          level: level,
+          peak: clamp(level * 1.12, 0, 1),
+          left: [__lvNorm, clamp(__lvNorm * 0.9, 0, 1), clamp(__lvNorm * 0.78, 0, 1)],
+          right: [clamp(__lvNorm * 0.82, 0, 1), clamp(__lvNorm * 0.95, 0, 1), __lvNorm],
+          eq: []
+        };
       recoverDesktopCenterBars(bars, meterValue, audio && !audio.paused);
       rafId = window.requestAnimationFrame(frame);
     };
