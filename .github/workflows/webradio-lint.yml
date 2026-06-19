@@ -1,0 +1,39 @@
+name: WebRadio Lint & Security Scan
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'worker.js'
+      - 'worker-addons/**'
+      - 'external-workers/**'
+      - 'js/**'
+      - 'config/**'
+      - 'CHAOS_ENGINE/**'
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install ESLint
+        run: npm install -g eslint
+      - name: Lint Worker & Addons
+        run: |
+          eslint --no-eslintrc -c '{"env":{"browser":true,"es2021":true},"rules":{"no-unused-vars":"warn","no-undef":"warn","no-console":"off","semi":"warn","eqeqeq":"warn","no-eval":"error","no-implied-eval":"error"}}' \
+            worker.js \
+            worker-addons/ \
+            external-workers/ \
+            js/ \
+            config/ \
+            CHAOS_ENGINE/ \
+            --ext .js || true
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
