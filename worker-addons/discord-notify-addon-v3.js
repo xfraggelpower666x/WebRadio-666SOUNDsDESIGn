@@ -328,25 +328,37 @@ async function sendPrivateNowPlayingIfConfigured(env, payload) {
   }
 }
 
-function tokenOk(request, env) {
-  if (!env || !env.DISCORD_ADMIN_TOKEN) return true;
-  return request.headers.get('x-admin-token') === env.DISCORD_ADMIN_TOKEN;
+async function sha256Bytes(value) {
+  const data = new TextEncoder().encode(String(value ?? ''));
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', data));
 }
 
-const FALLBACK_DISCORD_GATE_SHA256 = '911aa98122df056905093e0e83a4a0b0f304f32bcf2e69cf035347ddc8872cb0';
+// Constant-time comparison. Both inputs are hashed to a fixed 32-byte digest
+// first so that no length information leaks via the comparison itself.
+async function timingSafeEqualStr(a, b) {
+  const [ha, hb] = await Promise.all([sha256Bytes(a), sha256Bytes(b)]);
+  return crypto.subtle.timingSafeEqual(ha, hb);
+}
+
+async function tokenOk(request, env) {
+  if (!env || !env.DISCORD_ADMIN_TOKEN) return true;
+  return timingSafeEqualStr(request.headers.get('x-admin-token') || '', env.DISCORD_ADMIN_TOKEN);
+}
 
 async function sha256Hex(value) {
-  const data = new TextEncoder().encode(String(value || ''));
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  const bytes = await sha256Bytes(value);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function gateCodeOk(request, env) {
   const given = clean(request.headers.get('x-discord-gate-code') || '', '', 140);
   if (!given) return false;
-  if (env && env.DISCORD_GATE_CODE) return given === String(env.DISCORD_GATE_CODE);
-  const expectedHash = String((env && env.DISCORD_GATE_SHA256) || FALLBACK_DISCORD_GATE_SHA256).trim().toLowerCase();
-  return (await sha256Hex(given)) === expectedHash;
+  if (env && env.DISCORD_GATE_CODE) return timingSafeEqualStr(given, String(env.DISCORD_GATE_CODE));
+  // No hardcoded fallback: the legacy gate is only active when an env-configured
+  // hash is present. Without configuration the gate denies (admin auth still works).
+  if (!(env && env.DISCORD_GATE_SHA256)) return false;
+  const expectedHash = String(env.DISCORD_GATE_SHA256).trim().toLowerCase();
+  return timingSafeEqualStr(await sha256Hex(given), expectedHash);
 }
 
 
@@ -398,7 +410,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
       acceptedPrivateTrackWebhookSecretNames: ['DISCORD_PRIVATE_TRACK_WEBHOOK_URL','DISCORD_PRIVATE_WEBHOOK_URL','DISCORD_RUBY_TRACK_WEBHOOK_URL','DISCORD_TRACK_PRIVATE_WEBHOOK','PRIVATE_DISCORD_WEBHOOK_URL','PRIVATE_TRACK_SHOOTER'],
       adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
-      gateCodeEnabled: true,
+      gateCodeEnabled: Boolean(env && (env.DISCORD_GATE_CODE || env.DISCORD_GATE_SHA256)),
       adminAuthMergeEnabled: true,
       lastKind: runtime.lastKind,
       lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
@@ -409,7 +421,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
   }
 
   if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
-  if (!tokenOk(request, env)) return json({ ok: false, error: 'invalid admin token' }, 401);
+  if (!(await tokenOk(request, env))) return json({ ok: false, error: 'invalid admin token' }, 401);
   if ((path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying') && !(await discordAdminOrGateOk(request, env))) {
     runtime.lastKind = 'access-denied';
     return json({ ok: false, led: 'error', error: 'access denied: admin auth or legacy discord gate required', addon: ADDON_VERSION }, 401);
