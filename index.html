@@ -1122,7 +1122,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function normalizeDj(raw){
-    var dj=String(raw||'').trim();
+    var dj=String(raw||'').replace(/<[^>]*>/g,' ').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim();
     if(!dj)return 'DJ 666';
     if(/no\s*dj|nodj|no-dj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined/i.test(dj))return 'DJ 666';
     return dj;
@@ -1585,9 +1585,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     setArtwork(meta.artwork||'');
 
     var cards=qa('#mffApp .mff-card strong');
-    if(cards[0]) cards[0].innerHTML=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / 250'):'0 / 250';
+    if(cards[0]) cards[0].textContent=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / 250'):'0 / 250';
     if(cards[1]) cards[1].textContent=meta.bitrate||'Unknown';
-    if(cards[2]) cards[2].innerHTML=normalizeDj(meta.dj);
+    if(cards[2]) cards[2].textContent=normalizeDj(meta.dj);
     ensureBrandRow();
   }
 

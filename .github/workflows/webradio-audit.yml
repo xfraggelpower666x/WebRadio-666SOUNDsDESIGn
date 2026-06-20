@@ -1,0 +1,58 @@
+name: WebRadio Audit
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - WebRadio-666SOUNDsDESIGn
+  pull_request:
+    branches:
+      - main
+      - master
+      - WebRadio-666SOUNDsDESIGn
+
+jobs:
+  lint-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install ESLint
+        run: npm install --no-save eslint@8.57.0
+
+      - name: Lint Active JavaScript
+        run: >-
+          npx eslint
+          --no-eslintrc
+          --env browser
+          --env es2021
+          --parser-options sourceType:module
+          --rule "no-unused-vars: warn"
+          --rule "no-undef: warn"
+          --rule "no-console: off"
+          --rule "semi: warn"
+          --rule "eqeqeq: warn"
+          --rule "no-eval: error"
+          --rule "no-implied-eval: error"
+          --quiet
+          "worker.js"
+          "worker-addons/*.js"
+          "js/**/*.js"
+          "config/*.js"
+          "CHAOS_ENGINE/**/*.js"
+
+      - name: Report Wrangler Compatibility Date
+        run: >-
+          node -e "const fs=require('fs');
+          const raw=fs.readFileSync('wrangler.jsonc','utf8');
+          const match=raw.match(/\"compatibility_date\"\s*:\s*\"([^\"]+)\"/);
+          if(!match){throw new Error('compatibility_date missing in wrangler.jsonc');}
+          console.log('compatibility_date=' + match[1]);
+          if(match[1] < '2025-01-01'){console.log('warning: compatibility_date older than 2025-01-01');}"

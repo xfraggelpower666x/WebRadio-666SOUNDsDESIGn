@@ -242,11 +242,20 @@
   /* ── Artwork ── */
   function setArtwork(url){
     var w=el('artworkWrap');
-    if(url){
-      w.innerHTML='<img class="now-artwork" src="'+esc(url)+'" onerror="this.parentNode.innerHTML='<div class=now-artwork-ph>🎵</div>'" alt="">';
-    } else {
+    if(!w)return;
+    w.innerHTML='';
+    if(!url){
       w.innerHTML='<div class="now-artwork-ph">🎵</div>';
+      return;
     }
+    var img=document.createElement('img');
+    img.className='now-artwork';
+    img.src=String(url||'');
+    img.alt='';
+    img.onerror=function(){
+      w.innerHTML='<div class="now-artwork-ph">🎵</div>';
+    };
+    w.appendChild(img);
   }
 
   /* ── History ── */

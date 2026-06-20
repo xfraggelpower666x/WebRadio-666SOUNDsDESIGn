@@ -43,10 +43,7 @@ function json(data, status = 200) {
     status,
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store',
-      'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET,POST,OPTIONS',
-      'access-control-allow-headers': 'content-type,x-admin-token,x-discord-gate-code'
+      'cache-control': 'no-store'
     }
   });
 }
@@ -169,9 +166,9 @@ function streamLinksText(s) {
   return [
     `🎛️ **Web Radio Tune in:** ${s.playerUrl}`,
     '',
-    `**Main Stream:**\n${s.streamUrl}\nhttp://${s.domain}/stream`,
+    `**Main Stream:**\n${s.streamUrl}\nhttps://${s.domain}/stream`,
     '',
-    `**Backup Stream:**\n${s.backupStreamUrl}\nhttp://my.idjstream.com/666soundsdesign/stream`
+    `**Backup Stream:**\n${s.backupStreamUrl}\nhttps://my.idjstream.com/666soundsdesign/stream`
   ].join('\n').slice(0, 4000);
 }
 
@@ -328,9 +325,18 @@ async function sendPrivateNowPlayingIfConfigured(env, payload) {
   }
 }
 
+function timingSafeEqualText(a, b) {
+  const left = new TextEncoder().encode(String(a || ''));
+  const right = new TextEncoder().encode(String(b || ''));
+  let mismatch = left.length ^ right.length;
+  const max = Math.max(left.length, right.length);
+  for (let i = 0; i < max; i += 1) mismatch |= (left[i] || 0) ^ (right[i] || 0);
+  return mismatch === 0;
+}
+
 function tokenOk(request, env) {
   if (!env || !env.DISCORD_ADMIN_TOKEN) return true;
-  return request.headers.get('x-admin-token') === env.DISCORD_ADMIN_TOKEN;
+  return timingSafeEqualText(request.headers.get('x-admin-token') || '', env.DISCORD_ADMIN_TOKEN);
 }
 
 const FALLBACK_DISCORD_GATE_SHA256 = '911aa98122df056905093e0e83a4a0b0f304f32bcf2e69cf035347ddc8872cb0';
@@ -344,9 +350,9 @@ async function sha256Hex(value) {
 async function gateCodeOk(request, env) {
   const given = clean(request.headers.get('x-discord-gate-code') || '', '', 140);
   if (!given) return false;
-  if (env && env.DISCORD_GATE_CODE) return given === String(env.DISCORD_GATE_CODE);
+  if (env && env.DISCORD_GATE_CODE) return timingSafeEqualText(given, String(env.DISCORD_GATE_CODE));
   const expectedHash = String((env && env.DISCORD_GATE_SHA256) || FALLBACK_DISCORD_GATE_SHA256).trim().toLowerCase();
-  return (await sha256Hex(given)) === expectedHash;
+  return timingSafeEqualText(await sha256Hex(given), expectedHash);
 }
 
 
