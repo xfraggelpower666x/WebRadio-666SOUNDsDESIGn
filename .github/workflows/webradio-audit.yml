@@ -46,7 +46,6 @@ jobs:
           "worker-addons/*.js"
           "js/**/*.js"
           "config/*.js"
-          "CHAOS_ENGINE/**/*.js"
 
       - name: Report Wrangler Compatibility Date
         run: >-

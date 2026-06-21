@@ -639,7 +639,7 @@ function s666RouteTable() {
     { priority: 3, route: "/api/player-alert/*", handler: "handlePlayerAlertV152", purpose: "PC+iPhone broadcast relay" },
     { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
     { priority: 5, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
-    { priority: 6, route: "/api/chaos-engine/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
+    { priority: 6, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
     { priority: 7, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
     { priority: 8, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
     { priority: 9, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
@@ -772,9 +772,6 @@ const url=new URL(request.url);
     // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;
-
-    const chaosEngineApiResponse = await handleChaosEngineApiAddon(request, env);
-    if (chaosEngineApiResponse) return chaosEngineApiResponse;
 
     const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
     if (chaosEngineStatic) return chaosEngineStatic;
