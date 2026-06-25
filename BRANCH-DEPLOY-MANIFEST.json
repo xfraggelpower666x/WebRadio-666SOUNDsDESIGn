@@ -1,0 +1,12 @@
+{
+  "system": "WebRadio-666SOUNDsDESIGn",
+  "release": "FULLVERSION_BRANCH_RECOVERY_v1.0.2",
+  "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "productionBranch": "WebRadio-666SOUNDsDESIGn",
+  "workerName": "webradio-666soundsdesign-worker",
+  "preferredRootDirectory": "/",
+  "legacyRootDirectory": "workers/webradio-666soundsdesign-worker",
+  "assetsDirectory": "public",
+  "scriptableUploadMode": "atomic-single-commit",
+  "date": "2026-06-25"
+}

@@ -1,8 +1,8 @@
 {
   "name": "WebRadio-666SOUNDsDESIGn FULLVERSION REPAIRED",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "releaseDate": "2026-06-25",
-  "releaseFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1",
+  "releaseFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_BRANCH_RECOVERY_v1_0_2",
   "type": "complete-repository-release",
   "uploadMode": "scriptable-folder-upload",
   "packaging": {
@@ -34,5 +34,8 @@
     "secretsIncluded": false,
     "destructiveSimplification": false,
     "deploymentSecretsRequired": true
-  }
+  },
+  "branchRecovery": true,
+  "atomicScriptableUpload": true,
+  "assetsDirectory": "public"
 }

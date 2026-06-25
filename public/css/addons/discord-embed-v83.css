@@ -1,0 +1,15 @@
+/*
+666SOUNDsDESIGn — Discord Embed Addon v83 CSS
+Scoped PC+iPhone responsive panel.
+*/
+.discord-embed-toggle{min-width:52px!important;max-width:60px!important;height:31px!important;min-height:31px!important;cursor:pointer!important}
+.discord-embed-panel{position:fixed!important;z-index:2147482500!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;border:1px solid rgba(22,255,243,.52)!important;background:radial-gradient(circle at 18% 0%,rgba(255,61,187,.16),transparent 35%),radial-gradient(circle at 84% 18%,rgba(22,255,243,.15),transparent 38%),rgba(3,7,20,.97)!important;box-shadow:0 0 calc(22px + var(--pc-audio-energy,.10) * 26px) rgba(22,255,243,.22),0 0 calc(18px + var(--pc-audio-energy,.10) * 22px) rgba(255,61,187,.20),inset 0 0 24px rgba(255,255,255,.035)!important;color:#f6f7ff!important}
+.discord-embed-panel.hidden{display:none!important}
+.discord-embed-header{flex:0 0 auto!important;display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:42px!important;padding:0 12px!important;border-bottom:1px solid rgba(22,255,243,.28)!important;background:rgba(5,8,22,.72)!important}
+.discord-embed-title{color:#28fff4!important;font-size:12px!important;font-weight:950!important;letter-spacing:.18em!important;text-shadow:0 0 12px rgba(22,255,243,.55)!important}
+.discord-embed-close{width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(255,61,187,.50)!important;background:rgba(255,61,187,.12)!important;color:#fff!important;font-size:22px!important;line-height:1!important;cursor:pointer!important}
+.discord-embed-body{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important}
+.discord-embed-frame{width:100%!important;height:100%!important;border:0!important;display:block!important;background:transparent!important}
+.discord-embed-empty{padding:18px!important;color:#f6f7ff!important;font-size:13px!important;line-height:1.45!important}
+@media (min-width:761px){.discord-embed-panel{right:18px!important;top:132px!important;width:min(360px,31vw)!important;height:min(640px,calc(100vh - 168px))!important;border-radius:22px!important}}
+@media (max-width:760px){.discord-embed-toggle{min-width:48px!important;max-width:56px!important;height:29px!important;min-height:29px!important}.discord-embed-panel{left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;top:auto!important;width:auto!important;height:min(66vh,560px)!important;border-radius:20px!important}}

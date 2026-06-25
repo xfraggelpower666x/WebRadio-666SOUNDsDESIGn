@@ -1,0 +1,324 @@
+{
+  "release": "WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1",
+  "date": "2026-06-25",
+  "sourceAudit": "WEBRADIO_666SOUNDSDESIGN_KOMPLETTAUDIT_2026-06-25",
+  "counts": {
+    "CONFIGURATION_REQUIRED": 1,
+    "FIXED": 32,
+    "FIXED_CONFIGURATION_REQUIRED": 1,
+    "GOVERNED": 1,
+    "MITIGATED": 6,
+    "MITIGATED_CONFIGURATION_REQUIRED": 1,
+    "RESIDUAL_RISK": 1
+  },
+  "items": [
+    {
+      "id": "C-01",
+      "severity": "CRITICAL",
+      "title": "Haupt-Worker bricht wegen fehlendem handleSkipApi ab",
+      "repairStatus": "FIXED",
+      "note": "Fehlendes Skip-Add-on wiederhergestellt, importiert und per Smoke-Test geprüft."
+    },
+    {
+      "id": "C-02",
+      "severity": "CRITICAL",
+      "title": "Öffentlicher Render-Schreibendpunkt umgeht Worker-Authentifizierung",
+      "repairStatus": "FIXED",
+      "note": "Render-Schreibroute verlangt ein serverseitiges Service-Token."
+    },
+    {
+      "id": "C-03",
+      "severity": "CRITICAL",
+      "title": "ASSETS-Binding fehlt, obwohl der Worker env.ASSETS zwingend erwartet",
+      "repairStatus": "FIXED",
+      "note": "ASSETS-Binding, directory, run_worker_first und .assetsignore ergänzt."
+    },
+    {
+      "id": "C-04",
+      "severity": "CRITICAL",
+      "title": "Admin-Streamänderungen werden erfolgreich gemeldet, steuern den aktiven Worker aber nicht",
+      "repairStatus": "FIXED",
+      "note": "Worker liest Runtime-Konfiguration aus KV oder dem deployten JSON-Asset; Admin meldet ohne KV nur 202/deploymentPending."
+    },
+    {
+      "id": "H-01",
+      "severity": "HIGH",
+      "title": "Chaos-API-Add-on ist importiert und dokumentiert, wird aber nie aufgerufen",
+      "repairStatus": "FIXED",
+      "note": "Chaos-Handler im Root-Dispatcher aktiviert und getestet."
+    },
+    {
+      "id": "H-02",
+      "severity": "HIGH",
+      "title": "Unbekannte API- und Asset-Routen liefern 200-HTML statt 404/JSON",
+      "repairStatus": "FIXED",
+      "note": "API-404 und Asset-404 liefern korrekte Statuscodes und Content-Types."
+    },
+    {
+      "id": "H-03",
+      "severity": "HIGH",
+      "title": "Archiv ist kein deployfähiger Safe Root",
+      "repairStatus": "FIXED",
+      "note": "Release wird mit genau einer Top-Level-Projektmappe, ohne innere ZIPs und ohne Bytecode gebaut."
+    },
+    {
+      "id": "H-04",
+      "severity": "HIGH",
+      "title": "Player-Alert-Zustand ist nur Prozessspeicher",
+      "repairStatus": "MITIGATED_CONFIGURATION_REQUIRED",
+      "note": "Prozessspeicher durch SQLite/optional PostgreSQL ersetzt. Für geteilte, deployübergreifende Persistenz muss DATABASE_URL gesetzt werden."
+    },
+    {
+      "id": "H-05",
+      "severity": "HIGH",
+      "title": "Suno-System ist kein funktionsfähiger Provider-Adapter",
+      "repairStatus": "FIXED_CONFIGURATION_REQUIRED",
+      "note": "Generischer realer REST-Provideradapter und optionales KV-Jobstore implementiert. Ein kompatibler Providervertrag muss konfiguriert werden."
+    },
+    {
+      "id": "H-06",
+      "severity": "HIGH",
+      "title": "Keine automatisierten Tests, kein CI und keine reproduzierbare Root-Builddefinition",
+      "repairStatus": "FIXED",
+      "note": "Root package/lock, Strukturprüfung, 12 Worker-Smoke-Tests und GitHub-CI ergänzt."
+    },
+    {
+      "id": "H-07",
+      "severity": "HIGH",
+      "title": "Produktionsnahe Debug-Endpunkte sind öffentlich",
+      "repairStatus": "FIXED",
+      "note": "Debug standardmäßig verborgen; Freigabe nur kontrolliert."
+    },
+    {
+      "id": "H-08",
+      "severity": "HIGH",
+      "title": "Audio-Upload ohne Größenlimit und ffmpeg ohne Timeout",
+      "repairStatus": "FIXED",
+      "note": "Streaming-Upload, Byte-Limit, Dateitypprüfung, FFmpeg-Timeout und sanitisierte Fehler ergänzt."
+    },
+    {
+      "id": "H-09",
+      "severity": "HIGH",
+      "title": "Admin-Passwort/Token wird in Query-Parameter geschrieben",
+      "repairStatus": "FIXED",
+      "note": "Skip-Secrets standardmäßig nur im Header; Query-Transport ausschließlich über expliziten Opt-in."
+    },
+    {
+      "id": "H-10",
+      "severity": "HIGH",
+      "title": "Mehrere Transport-/Recovery-Schichten steuern dasselbe Audioelement",
+      "repairStatus": "RESIDUAL_RISK",
+      "note": "Mehrere historische Browser-Audio-Recovery-Schichten bleiben aus Kompatibilitätsgründen erhalten. Eine vollständige Konsolidierung braucht einen echten iPhone-/Browser-Paritätstest."
+    },
+    {
+      "id": "H-11",
+      "severity": "HIGH",
+      "title": "README behauptet Recovery- und Mirror-Strukturen, die fehlen",
+      "repairStatus": "FIXED",
+      "note": "README beschreibt nur tatsächlich vorhandene Repo-Strukturen."
+    },
+    {
+      "id": "M-01",
+      "severity": "MEDIUM",
+      "title": "KV-Fallback ist im Code, aber nicht in Wrangler gebunden",
+      "repairStatus": "CONFIGURATION_REQUIRED",
+      "note": "KV-Unterstützung ist implementiert und dokumentiert; konkrete Cloudflare-Namespace-IDs können nicht sicher im Quellpaket vorgegeben werden."
+    },
+    {
+      "id": "M-02",
+      "severity": "MEDIUM",
+      "title": "Cache-API wird als globale Sperre verwendet",
+      "repairStatus": "MITIGATED",
+      "note": "Cooldown ist pro IP statt global. Cache-API bleibt als Fail-safe; für atomare verteilte Sperren ist ein KV/Durable-Object-Binding erforderlich."
+    },
+    {
+      "id": "M-03",
+      "severity": "MEDIUM",
+      "title": "Ein einzelner globaler Rate-Key sperrt alle Sender drei Minuten",
+      "repairStatus": "FIXED",
+      "note": "Player-Alert-Rate-Limit ist senderbezogen."
+    },
+    {
+      "id": "M-04",
+      "severity": "MEDIUM",
+      "title": "GitHub-Aufrufe ohne Timeout und mit zu detaillierter Fehlerweitergabe",
+      "repairStatus": "FIXED",
+      "note": "GitHub-Aufrufe besitzen Timeouts und sanitisierte Fehler."
+    },
+    {
+      "id": "M-05",
+      "severity": "MEDIUM",
+      "title": "Auth-Verifikation ohne Timeout; Auth-Details werden im 401 zurückgegeben",
+      "repairStatus": "FIXED",
+      "note": "Auth-Verifikation besitzt Timeout; öffentliche Antworten geben keine internen Auth-Details aus."
+    },
+    {
+      "id": "M-06",
+      "severity": "MEDIUM",
+      "title": "Ungültiges JSON und Payloadgröße werden nicht sauber behandelt",
+      "repairStatus": "FIXED",
+      "note": "JSON-Content-Type, Größe und Parse-Fehler werden kontrolliert behandelt."
+    },
+    {
+      "id": "M-07",
+      "severity": "MEDIUM",
+      "title": "External Worker erlauben CORS für alle Origins",
+      "repairStatus": "FIXED",
+      "note": "External Worker nutzen explizite Origin-Allowlisten."
+    },
+    {
+      "id": "M-08",
+      "severity": "MEDIUM",
+      "title": "Metadata-Fetch ohne eigenen Timeout; Upstream-URL wird als Header offengelegt",
+      "repairStatus": "FIXED",
+      "note": "Metadata-Timeout ergänzt und Quell-URLs aus öffentlichen Antworten entfernt."
+    },
+    {
+      "id": "M-09",
+      "severity": "MEDIUM",
+      "title": "Kein konsistentes CSP-/Clickjacking-/Nosniff-Headerkonzept",
+      "repairStatus": "MITIGATED",
+      "note": "Nosniff, Frame-, Referrer- und Permissions-Header zentral ergänzt. Eine strikte CSP bleibt wegen historischer Inline-Skripte offen."
+    },
+    {
+      "id": "M-10",
+      "severity": "MEDIUM",
+      "title": "Renderer liegt doppelt in zwei nahezu identischen Bäumen",
+      "repairStatus": "FIXED",
+      "note": "Render/ als kanonische Quelle markiert; kritische Spiegeldateien werden bytegenau im Release-Gate geprüft."
+    },
+    {
+      "id": "M-11",
+      "severity": "MEDIUM",
+      "title": "Als JSON deklarierte Auditdatei ist leer",
+      "repairStatus": "FIXED",
+      "note": "Leere JSON-Datei transparent als Wiederherstellungs-Tombstone repariert."
+    },
+    {
+      "id": "M-12",
+      "severity": "MEDIUM",
+      "title": "Suno-ENV-Name ist widersprüchlich",
+      "repairStatus": "FIXED",
+      "note": "Einheitliches SUNO_API_BASE_URL-Schema dokumentiert und implementiert."
+    },
+    {
+      "id": "M-13",
+      "severity": "MEDIUM",
+      "title": "Eingebetteter Alt-Player und aktueller index.html sind zwei getrennte Produktstände",
+      "repairStatus": "MITIGATED",
+      "note": "ASSETS ist der Normalpfad; Legacy-Fallback wird nun ausdrücklich per Header als Emergency-Fallback markiert."
+    },
+    {
+      "id": "M-14",
+      "severity": "MEDIUM",
+      "title": "Worker sendet username, Render-Schema verwirft ihn",
+      "repairStatus": "FIXED",
+      "note": "Render-Schema übernimmt username und liefert konsistente camelCase-Felder."
+    },
+    {
+      "id": "M-15",
+      "severity": "MEDIUM",
+      "title": "Root-Compatibility-Date ist deutlich älter als Teilprojekte",
+      "repairStatus": "FIXED",
+      "note": "Root compatibility_date auf 2026-06-25 angehoben und getestet."
+    },
+    {
+      "id": "M-16",
+      "severity": "MEDIUM",
+      "title": "Generierte Python-Bytecode-Dateien sind eingecheckt",
+      "repairStatus": "FIXED",
+      "note": "PYC und __pycache__ entfernt und im Gate verboten."
+    },
+    {
+      "id": "M-17",
+      "severity": "MEDIUM",
+      "title": "Root-Abhängigkeiten und Security-Scanning sind nicht reproduzierbar",
+      "repairStatus": "MITIGATED",
+      "note": "Root-Lockfile, CI und reproduzierbare JS-Prüfung ergänzt. Vollständiges Python-Hash-Lock/SBOM bleibt offen."
+    },
+    {
+      "id": "M-18",
+      "severity": "MEDIUM",
+      "title": "Prompt-Limits werden blind abgeschnitten; Validator erzeugt mögliche False Positives",
+      "repairStatus": "FIXED",
+      "note": "Section-aware Reparaturlogik und Negationsbehandlung ergänzt."
+    },
+    {
+      "id": "M-19",
+      "severity": "MEDIUM",
+      "title": "Gerüst-Endpunkte spiegeln Payloads zurück; Story-Endpunkte sind öffentlich und leer",
+      "repairStatus": "FIXED",
+      "note": "Nicht implementierte Routen sind geschützt und antworten 501 ohne Payload-Spiegelung."
+    },
+    {
+      "id": "M-20",
+      "severity": "MEDIUM",
+      "title": "Mehrere Generationen desselben SEND-/Modal-Codes bleiben gleichzeitig aktiv",
+      "repairStatus": "MITIGATED",
+      "note": "Globales In-flight-/Zeitfenster-Gate verhindert Mehrfach-SEND durch click/touch/pointer. Historische UI-Patchschichten bleiben sichtbar."
+    },
+    {
+      "id": "L-01",
+      "severity": "LOW",
+      "title": "Zweiter /health-Zweig ist unerreichbar",
+      "repairStatus": "FIXED",
+      "note": "Doppelten Health-Zweig entfernt."
+    },
+    {
+      "id": "L-02",
+      "severity": "LOW",
+      "title": "Modul-/Routen-Diagnose enthält falsche Statusangaben",
+      "repairStatus": "FIXED",
+      "note": "Diagnosewerte an reale Module/Routen angepasst und Debug geschützt."
+    },
+    {
+      "id": "L-03",
+      "severity": "LOW",
+      "title": "Root-Alias /The-Dark-Dancer.html trifft Sonderroute nicht",
+      "repairStatus": "FIXED",
+      "note": "/The-Dark-Dancer.html-Alias ergänzt und getestet."
+    },
+    {
+      "id": "L-04",
+      "severity": "LOW",
+      "title": "Keine .gitignore vorhanden",
+      "repairStatus": "FIXED",
+      "note": ".gitignore ergänzt."
+    },
+    {
+      "id": "L-05",
+      "severity": "LOW",
+      "title": "Manifest deklariert quadratisches Icon als Wide-Screenshot; kein Service Worker vorhanden",
+      "repairStatus": "FIXED",
+      "note": "Falschen Wide-Screenshot aus dem Manifest entfernt; keine Offline-Funktion wird behauptet."
+    },
+    {
+      "id": "L-06",
+      "severity": "LOW",
+      "title": "Historische Auditdaten dominieren den Live-Baum",
+      "repairStatus": "MITIGATED",
+      "note": "Historische Dokumente bleiben in der Vollversion, werden durch .assetsignore jedoch nicht als Website-Assets veröffentlicht."
+    },
+    {
+      "id": "L-07",
+      "severity": "LOW",
+      "title": "Keine Lizenzdatei gefunden",
+      "repairStatus": "FIXED",
+      "note": "Proprietären Rechtehinweis ergänzt."
+    },
+    {
+      "id": "L-08",
+      "severity": "LOW",
+      "title": "Weitere bytegleiche Core-/Asset-Dateien vorhanden",
+      "repairStatus": "GOVERNED",
+      "note": "Kanonische Quellen dokumentiert; historische Core-Spiegel bleiben zur Funktionssicherung erhalten und werden nicht still gelöscht."
+    }
+  ],
+  "releaseGate": {
+    "repoUploadReady": true,
+    "singleTopLevelFolderRequired": true,
+    "secretsBundled": false,
+    "liveProductionDeployVerified": false,
+    "reason": "Externe DNS-, Secret-, Cloudflare-, GitHub-, Render- und Providerkonfigurationen liegen außerhalb des ZIP-Laufzeittests."
+  }
+}

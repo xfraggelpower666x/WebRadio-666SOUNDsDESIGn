@@ -1,0 +1,163 @@
+<!doctype html>
+<!--
+FILE: CHAOS_ENGINE/index.html
+CREATED: 2026-05-24
+PURPOSE: Einzel-HTML Hauptseite der Chaos Engine, modular ausgelagert.
+IMPORTANT:
+- Eine einzelne HTML-Hauptseite.
+- Kein One-HTML: CSS, JS und Systemdaten liegen extern in assets/.
+- Keine Secrets im Frontend.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CHAOS ENGINE V3 — Einzel HTML Modular</title>
+<link rel="stylesheet" href="./assets/css/chaos-engine.css">
+<link rel="stylesheet" href="./assets/css/fraggle-detlef-system.css">
+<link rel="stylesheet" href="./assets/css/track-factory.css">
+
+<link rel="stylesheet" href="/CHAOS_ENGINE/assets/css/chaos-suno-renderer-integration-v1.css?v=20260525">
+</head>
+<body>
+<div class="ce-app">
+  <header class="ce-header">
+    <div>
+      <div class="ce-kicker">666SOUNDsDESIGn · CHAOS MATRIX SAGA</div>
+      <h1>CHAOS ENGINE V3</h1>
+      <p>Einzel-HTML Modular · kein One-HTML · Suno 5.5 Pro Custom · Living Transmissions</p>
+    </div>
+    <div class="ce-status-stack">
+      <span id="bootStatus" class="ce-pill">BOOT: loading</span>
+      <span id="apiStatus" class="ce-pill">API: local</span>
+      <span id="limitStatus" class="ce-pill">LIMITS: unchecked</span>
+    </div>
+  </header>
+
+  <nav class="ce-tabs">
+    <a class="tf-link" href="./track-factory.html">Track Factory →</a>
+    <a class="fds-link" href="./fraggle-detlef-system.html">Detlef Core →</a>
+    <button data-tab="generator" class="is-active">Generator</button>
+    <button data-tab="outputs">4 Codeboxen</button>
+    <button data-tab="story">Story / Album</button>
+    <button data-tab="visual">Cover / Visual DNA</button>
+    <button data-tab="inlay">Inlay Archiv</button>
+    <button data-tab="system">Systemkern</button>
+    <button data-tab="debug">Debug / Export</button>
+  </nav>
+
+  <main>
+    <section class="ce-panel-grid ce-tab is-active" data-panel="generator">
+      <aside class="ce-panel">
+        <h2>Systemauswahl</h2>
+        <label>Track Number<input id="trackNumber" type="number" min="0" value="0"></label>
+        <label>Track Title<input id="trackTitle" value="HUMAN PULSE"></label>
+        <label>Story Phase<select id="storyPhase"></select></label>
+        <label>Character Focus<select id="characterFocus"></select></label>
+        <label>Energy Level<select id="energyLevel"></select></label>
+        <label>Atmosphere Mode<select id="atmosphereMode"></select></label>
+        <label>3C / 4C / 5C / 6C<select id="cState"></select></label>
+        <div class="ce-checks">
+          <label><input id="fakeendEnabled" type="checkbox" checked> Fakeend</label>
+          <label><input id="finalConvergenceEnabled" type="checkbox" checked> Final Convergence</label>
+          <label><input id="eetpEnabled" type="checkbox" checked> EETP</label>
+          <label><input id="teacherAllowed" type="checkbox"> Teacher Allowed</label>
+          <label><input id="apiMode" type="checkbox"> Worker AI benutzen</label>
+        </div>
+      </aside>
+
+      <section class="ce-panel ce-main-panel">
+        <h2>Wunschtext / Trackauftrag</h2>
+        <textarea id="concept" rows="12" placeholder="Hier beschreibst du Track, Story, Energie, Figuren, Druck, Drops, Atmosphäre, Cover-Idee oder Albumfunktion..."></textarea>
+        <h3>Aktive Module</h3>
+        <div id="moduleMatrix" class="ce-module-grid"></div>
+        <div class="ce-actions">
+          <button id="generateLocal">Lokal generieren</button>
+          <button id="generateApi">Über Worker AI generieren</button>
+          <button id="validateAll" class="secondary">Validieren</button>
+          <button id="copyAll" class="secondary">Alle 4 kopieren</button>
+          <button id="clearAll" class="danger">Leeren</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="outputs">
+      <div class="ce-output-grid">
+        <section class="ce-panel">
+          <h2>CODEBOX 1 — TITLE <span id="titleCount"></span></h2>
+          <textarea id="titleOutput" rows="3"></textarea>
+          <button data-copy="titleOutput">Copy Title</button>
+        </section>
+        <section class="ce-panel">
+          <h2>CODEBOX 2 — STYLE PROMPT <span id="styleCount"></span></h2>
+          <textarea id="stylePrompt" rows="9"></textarea>
+          <button data-copy="stylePrompt">Copy Style</button>
+        </section>
+        <section class="ce-panel wide">
+          <h2>CODEBOX 3 — LYRIC / STRUCTURE PROMPT <span id="lyricCount"></span></h2>
+          <textarea id="lyricPrompt" rows="18"></textarea>
+          <button data-copy="lyricPrompt">Copy Lyric</button>
+        </section>
+        <section class="ce-panel wide">
+          <h2>CODEBOX 4 — EXTENDED / FINAL CONTROL PROMPT <span id="extendedCount"></span></h2>
+          <textarea id="extendedPrompt" rows="8"></textarea>
+          <button data-copy="extendedPrompt">Copy Extended</button>
+        </section>
+      </div>
+    </section>
+
+    <section class="ce-tab" data-panel="story">
+      <section class="ce-panel">
+        <h2>Storyline / Album Package</h2>
+        <textarea id="storyInput" rows="8" placeholder="Albumidee, Trackliste, Figuren, Storyverlauf..."></textarea>
+        <div class="ce-actions"><button id="buildStory">Storyline bauen</button><button data-copy="storyOutput" class="secondary">Copy Story</button></div>
+        <pre id="storyOutput">Ready.</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="visual">
+      <section class="ce-panel">
+        <h2>Cover / Visual DNA / Artwork Prompts</h2>
+        <textarea id="visualInput" rows="8" placeholder="Cover, Farben, Symbolik, Figuren, Albumstimmung..."></textarea>
+        <div class="ce-actions"><button id="buildVisual">Visual Package bauen</button><button data-copy="visualOutput" class="secondary">Copy Visual</button></div>
+        <pre id="visualOutput">Ready.</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="inlay">
+      <section class="ce-panel">
+        <h2>Recovered Transmission Archive</h2>
+        <textarea id="inlayInput" rows="8" placeholder="Album/Trackdaten für Booklet, Warnungen, Experience Guide..."></textarea>
+        <div class="ce-actions"><button id="buildInlay">Inlay bauen</button><button data-copy="inlayOutput" class="secondary">Copy Inlay</button></div>
+        <pre id="inlayOutput">Ready.</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="system">
+      <section class="ce-panel">
+        <h2>BOOT v3 Systemkern</h2>
+        <div class="ce-actions"><button id="reloadSystem">Reload</button><button data-copy="systemOutput" class="secondary">Copy System JSON</button><button id="copyHandoff" class="secondary">Copy Handoff MD</button></div>
+        <pre id="systemOutput">Loading...</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="debug">
+      <section class="ce-panel">
+        <h2>Debug / Export / Import</h2>
+        <div class="ce-actions">
+          <button id="checkApi">Check Worker API</button>
+          <button id="exportJson" class="secondary">Export JSON</button>
+          <button id="importJson" class="secondary">Import JSON</button>
+          <button id="openSuno" class="secondary">Open Zuno/Suno</button>
+        </div>
+        <textarea id="importBox" rows="8" placeholder="JSON hier einfügen"></textarea>
+        <pre id="debugOutput">Ready.</pre>
+      </section>
+    </section>
+  </main>
+</div>
+<script src="./assets/js/chaos-engine.js"></script>
+
+<script src="/CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js?v=20260525" defer></script>
+</body>
+</html>

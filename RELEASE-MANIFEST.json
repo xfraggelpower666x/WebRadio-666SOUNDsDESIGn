@@ -1,17 +1,13 @@
 {
-  "release": "WebRadio-666SOUNDsDESIGn FULLVERSION REPAIRED",
-  "version": "1.0.1",
-  "date": "2026-06-25",
-  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1",
-  "repoRootMarkers": [
-    "worker.js",
-    "wrangler.jsonc",
-    "index.html",
-    "package.json",
-    ".assetsignore",
-    "Scriptable/Scripts/666SOUNDsDESIGn_FOLDER_UPLOADER_LIVE_UI.js"
-  ],
-  "validationCommand": "npm run verify",
-  "secretsBundled": false,
-  "nestedArchivesBundled": false
+  "system": "WebRadio-666SOUNDsDESIGn",
+  "version": "1.0.2",
+  "releaseType": "FULLVERSION_BRANCH_RECOVERY_SCRIPTABLE_ATOMIC_READY",
+  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_BRANCH_RECOVERY_v1_0_2",
+  "singleTopLevelFolder": true,
+  "nestedZipFiles": 0,
+  "atomicBranchCommit": true,
+  "dedicatedPublicAssets": true,
+  "legacyBuildRootCompatibility": true,
+  "sourcePreservation": "root source retained; public deploy mirror added",
+  "createdAt": "2026-06-25T00:00:00+02:00"
 }

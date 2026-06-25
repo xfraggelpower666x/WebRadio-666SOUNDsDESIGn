@@ -13,6 +13,7 @@
   "vars": {
     "OPENAI_MODEL": "gpt-4.1-mini",
     "SUNO_WORKER_BASE_URL": "https://666-suno-system.666soundsdesign-broadcaster.com",
-    "ADMIN_AUTH_VERIFY_URL": "https://666-system-auth.666soundsdesign-broadcaster.com/verify"
+    "ADMIN_AUTH_VERIFY_URL": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
+    "ALLOWED_ORIGINS": "https://666soundsdesign-broadcaster.com,https://www.666soundsdesign-broadcaster.com"
   }
 }

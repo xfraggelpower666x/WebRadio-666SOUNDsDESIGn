@@ -1,44 +1,25 @@
-# Scriptable Direkt-Upload – iPhone/iPad
+# Scriptable Atomic Fullversion Upload – v5.0.0
 
-## Richtige Ordnerauswahl
-
-Nach dem Entpacken wird **die Projektmappe selbst** gewählt:
+## Auszuwählende Mappe
 
 ```text
-WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1
+WebRadio-666SOUNDsDESIGn_FULLVERSION_BRANCH_RECOVERY_v1_0_2
 ```
 
-In dieser Mappe müssen direkt sichtbar sein:
+In dieser Mappe müssen `worker.js`, `wrangler.jsonc`, `public/`, `workers/`, `worker-addons/` und `Scriptable/` direkt liegen.
 
-```text
-worker.js
-wrangler.jsonc
-index.html
-package.json
-Scriptable/
-worker-addons/
-config/
-assets/
-```
+## Empfohlener Modus
 
-Nicht den übergeordneten Downloads-/iCloud-Ordner wählen. Der Uploader bricht vor dem Upload ab, wenn die Root-Marker fehlen.
+`ATOMIC FULLVERSION – EXTRAS ERHALTEN`
 
-## Scriptable-Datei
+Der Uploader erzeugt für jede Datei zunächst einen Git-Blob. Der produktive Branch bleibt währenddessen unverändert. Erst wenn alle Blobs und der vollständige Tree vorhanden sind, wird genau ein Commit erzeugt und der Branch genau einmal aktualisiert.
 
-```text
-Scriptable/Scripts/666SOUNDsDESIGn_FOLDER_UPLOADER_LIVE_UI.js
-```
+`ATOMIC EXACT MIRROR – EXTRAS LÖSCHEN` entfernt zusätzlich Dateien, die nur remote existieren. Dieser Modus ist ausdrücklich destruktiv markiert.
 
-## Verhalten
+## Pflichtwerte
 
-- erstellt neue Dateien
-- aktualisiert vorhandene Dateien
-- überspringt byteidentische Dateien
-- lädt rekursiv alle regulären Repo-Dateien hoch
-- überspringt `.git`, `.wrangler`, `node_modules`, `__pycache__`, `.DS_Store`, `.pyc` und innere ZIP-Dateien
-- hält Token ausschließlich in der Scriptable-Keychain
-- zeigt jede Datei und ihren Status live an
+- Owner: `xfraggelpower666x`
+- Repo: `WebRadio-666SOUNDsDESIGn`
+- Branch: `WebRadio-666SOUNDsDESIGn`
 
-## Wichtig
-
-Der mobile Uploader löscht absichtlich keine fremden oder alten Dateien aus dem GitHub-Repository. Er arbeitet nicht destruktiv. Für ein garantiert vollständig bereinigtes Remote-Repo muss der Zielbranch vorher kontrolliert werden.
+Token nur in der Scriptable-Keychain speichern. Nicht in Dateien oder GitHub schreiben.

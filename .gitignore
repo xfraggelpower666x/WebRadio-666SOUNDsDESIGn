@@ -1,0 +1,29 @@
+# Secrets and local Cloudflare state
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# Generated release artefacts
+release-output/
+*.tmp
+*.log

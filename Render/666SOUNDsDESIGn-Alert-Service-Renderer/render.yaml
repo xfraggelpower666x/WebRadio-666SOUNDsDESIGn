@@ -6,18 +6,23 @@ services:
     rootDir: .
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn src.server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: MASTER_ADMIN_PASSWORD
         sync: false
-      - key: ADMIN_PASSWORD
+      - key: PLAYER_ALERT_SERVICE_TOKEN
         sync: false
-      - key: OPENAI_API_KEY
+      - key: DATABASE_URL
         sync: false
-      - key: MASTERING_BACKEND_TOKEN
-        sync: false
-      - key: MASTERING_BACKEND_URL
-        value: https://auto-setup-render-for-backend-mp3.onrender.com
-      - key: MASTERING_WORKER_URL
-        value: https://666soundsdesign-mp3-mastering.fraggelpower666.workers.dev
-      - key: SYSTEM_PW_WORKER_URL
-        value: https://system-pw-worker.fraggelpower666.workers.dev
+      - key: PLAYER_ALERT_DB_PATH
+        value: ./data/player-alerts.sqlite3
+      - key: PLAYER_ALERT_TTL_SECONDS
+        value: "900"
+      - key: PLAYER_ALERT_MAX_HISTORY
+        value: "30"
+      - key: PLAYER_ALERT_RATE_SECONDS
+        value: "180"
+      - key: MAX_UPLOAD_MB
+        value: "64"
+      - key: FFMPEG_TIMEOUT_SECONDS
+        value: "180"

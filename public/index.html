@@ -1,0 +1,2923 @@
+<!--
+ÄNDERUNG: FULLPACK v17 MOBILE CLICKABILITY FIX + OVERLAY/Z-INDEX CLEANUP.
+
+==========================================
+DATEI: external-player/index.html
+ERSTELLT: 2026-04-20
+GEÄNDERT: 2026-04-21
+ZWECK: Externer Hauptplayer für 666SOUNDsDESIGn Radio unter derselben Domain.
+ÄNDERUNG: FULLPACK v34.6 MOBILE HEADER + SYSTEM PANELS. Mobile: Logo oben, System-Panels darunter, Bottom-Controls nur reine Bedienung.
+ÄNDERUNG: FULLPACK v22 METADATA REPAIR + PC LAYOUT RECOVERY. Metadaten-Bereinigung ohne 'Unknown title'; Desktop kehrt zum letzten guten Layout-Stand zurück. Mobile-v21 bleibt erhalten.
+           Clean-Frame ohne eingebauten Fake-Player, lesbares Branding oben,
+           echtes iPhone-Fullscreen ohne Scroll und finale Außenmeter-/Panel-Geometrie.
+HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Stream-Mechaniken.
+==========================================
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta name="s666-cache-burst" content="central-audio-stability-v2-20260530" />
+  <meta name="smfp-version" content="v2026.05.30-central-audio-v2" />
+  <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>666SOUNDsDESIGn Radio — Root Main Player</title>
+  <link rel="stylesheet" href="/css/design-tokens.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/base.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/shared-status.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/layout.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/effects.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/mobile.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/desktop.css?v=2026-06-15-fix1" />
+
+
+<link rel="icon" href="/assets/icons/favicon.ico?v=2026-06-15-fix1" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png?v=2026-06-15-fix1">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png?v=2026-06-15-fix1">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png?v=2026-06-15-fix1">
+<link rel="manifest" href="/site.webmanifest?v=2026-06-15-fix1">
+<meta name="theme-color" content="#ff3dbb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="666 WebRadio">
+<meta name="application-name" content="666 WebRadio">
+
+  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=2026-06-15-fix1">
+  <script src="/js/version-core.js?v=2026-06-15-fix1"></script>
+  <script src="/js/boost-core.js?v=2026-06-15-fix1"></script>
+  <link rel="stylesheet" href="/core/overlay/overlay-core.css?v=2026-06-15-fix1">
+  <script src="/js/overlay-core.js?v=2026-06-15-fix1"></script>
+
+
+<!-- V96 SAFE RESYNC — mobile viewport + version sync repair, no new design -->
+
+
+<!-- SMFP_v159_PLAYER_ALERT_INLINE_SAFE -->
+
+
+<!-- SMFP_v159_ALERT_BOTTOM_INLINE_GEOMETRY_FIX
+     Scope: PC broadcast UI placement only. No alert delivery logic, no ticker logic, no transport, no EQ/add-on, no Worker/stream.
+     Uses existing SEND/Text/History elements; no new DOM layer. -->
+
+
+<!-- SMFP_v159_PC_LOWER_AREA_10BAND_EQ_REFLOW
+     Scope: PC lower now-playing geometry only. Repositions existing SEND/History under ticker and turns existing real EQ into 10-band wide panel. -->
+
+
+<!-- SMFP_v159_PC_BOTTOM_GEOMETRY_DUAL_EQ_FINAL
+     Scope: PC lower now-playing geometry only. No transport, ticker logic, discord backend, worker/stream, or mobile layout changes. -->
+
+<link rel="stylesheet" href="/css/phase10-stability-iphone-panel-hud.css?v=2026-06-15-fix1">
+
+  
+    <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-19-repair1" />
+  <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
+  <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
+</head>
+<body>
+  <div class="frame-stage">
+    <div class="frame-overlay"></div>
+
+    <aside class="side-meter left" aria-label="Left meter">
+      <div class="side-meter-stack">
+        <div class="side-meter-track"><div id="leftMeterA" class="side-meter-fill"></div></div>
+        <div class="side-meter-track secondary"><div id="leftMeterB" class="side-meter-fill"></div></div>
+        <div class="side-meter-track tertiary"><div id="leftMeterC" class="side-meter-fill"></div></div>
+      </div>
+    </aside>
+
+    <!-- v133 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <!-- v138 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
+    <aside id="pcLeftFxAddon" class="pc-side-addon pc-side-addon-left desktop-only" aria-label="Fraggle DNA Links Rail" data-addon-side="left">
+      <section class="pc-addon-tower pc-addon-tower-left" aria-label="Fraggle DNA Links Rail">
+        <header class="pc-addon-tower-head"><span id="dnaRailLedLeft" class="dna-rail-led" title="Fraggle DNA Puls · audioreaktiv"></span><span>DNA · LINKS</span><b id="pcLeftFxState">ON</b></header>
+        <article class="pc-addon-module pc-addon-module-reactor" aria-label="Fraggle Reaktor">
+          <strong>FRAGGLE REAKTOR</strong>
+          <div class="pc-addon-reactor-core" aria-hidden="true">
+            <span class="pc-addon-orbit pc-addon-orbit-a"></span>
+            <span class="pc-addon-orbit pc-addon-orbit-b"></span>
+            <span class="pc-addon-reactor-wave"></span>
+            <span class="pc-addon-reactor-dot"></span>
+          </div>
+          <footer><span>DNA PULSE</span><b>85%</b></footer>
+        </article>
+        <article class="pc-addon-module pc-addon-module-wave" aria-label="DNA Welle">
+          <strong>DNA WELLE</strong>
+          <div class="pc-addon-waveform" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </article>
+        <article class="pc-addon-module pc-addon-module-grid" aria-label="Genom Core">
+          <strong>GENOM CORE</strong>
+          <div class="pc-addon-radar" aria-hidden="true">
+            <span class="radar-ring r1"></span><span class="radar-ring r2"></span><span class="radar-ring r3"></span>
+            <span class="radar-axis radar-x"></span><span class="radar-axis radar-y"></span><span class="radar-sweep"></span>
+            <em class="pt-a"></em><em class="pt-b"></em><em class="pt-c"></em><em class="pt-d"></em>
+          </div>
+          <footer><span>FRAGGLE SYNC</span><b>SYNC</b></footer>
+        </article>
+      </section>
+    </aside>
+
+    <main class="player-shell">
+
+      <header class="top-hud systempanel-v74" aria-label="Systempanel">
+        <div class="status-cluster status-bar systempanel-grid-v74" aria-label="Systemstatus">
+          <div class="systempanel-group systempanel-left led-strip-v108" aria-label="Stream-LEDs Leiste 1">
+            <button id="statusStream" class="status-chip led-state state-main" type="button" title="Stream aktiv — türkis: läuft, pink: Fehler, leer: aus"><span class="status-dot"></span><span class="status-code">STR</span></button>
+            <button id="statusBuffer" class="status-chip led-state state-empty" type="button" title="Stream Buffering — grün: stabil, türkis: normaler Buffer, pink: Unterpufferung, rot: Stall"><span class="status-dot"></span><span class="status-code">SB</span></button>
+            <button id="statusSource" class="status-chip led-state state-external" type="button" title="Source / Quelle — Herkunft des Streams"><span class="status-dot"></span><span class="status-code">SRC</span></button>
+            <button id="statusMeta" class="status-chip led-state state-api" type="button" title="Metadaten aktiv — Titelinformationen werden empfangen"><span class="status-dot"></span><span class="status-code">MET</span></button>
+            <button id="statusWorker" class="status-chip led-state state-empty" type="button" title="Worker — Hintergrundprozess Status"><span class="status-dot"></span><span class="status-code">WRK</span></button>
+            <button id="statusAudio" class="status-chip led-state state-empty" type="button" title="Audio-Core — Selbstheilung aktiv"><span class="status-dot"></span><span class="status-code">AUD</span></button>
+            <button id="statusWatchdog" class="status-chip led-state state-empty" type="button" title="Watchdog — überwacht Stream-Stabilität"><span class="status-dot"></span><span class="status-code">WCH</span></button>
+            <button id="statusReconnect" class="status-chip led-state state-empty" type="button" title="Reconnect — Stream kontrolliert neu verbinden"><span class="status-dot"></span><span class="status-code">RCN</span></button>
+            <button id="statusMeter" class="status-chip led-state state-empty" type="button" title="Meter — Audio-Level-Anzeige aktiv"><span class="status-dot"></span><span class="status-code">MTR</span></button>
+          </div>
+<div class="systempanel-group systempanel-right led-strip-v108" aria-label="Stream-Schalter und Action-LEDs">
+            <button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Hauptstream — Klick schaltet auf Hauptstream"><span class="status-dot"></span><span class="status-code">H</span></button>
+            <button id="fallbackBtn" class="status-chip led-state state-off source-chip source-mini-chip-v80" type="button" title="Backupstream — Klick schaltet auf Backupstream"><span class="status-dot"></span><span class="status-code">B</span></button>
+            <button id="statusDiscord" class="status-chip led-state state-empty" type="button" title="Discord — verbunden: türkis, sendet: pink, Fehler: rot"><span class="status-dot"></span><span class="status-code">DSC</span></button>
+            <button id="statusAdmin" class="status-chip led-state state-empty" type="button" title="Admin — Admin-Zugang aktiv"><span class="status-dot"></span><span class="status-code">ADM</span></button>
+            <button id="statusGovee" class="status-chip led-state state-empty" type="button" title="GOVEE / FX — Lichtsteuerung Status"><span class="status-dot"></span><span class="status-code">GOV</span></button>
+            <button id="statusChaos" class="status-chip led-state state-empty" type="button" title="Chaos / System — Systemstatus"><span class="status-dot"></span><span class="status-code">CHA</span></button>
+</div>
+        </div>
+      </header>
+
+<section class="hero">
+
+      
+<div id="pcHeaderBrandSplit" class="pc-header-brand-split pc-header-brand-single" aria-label="666SOUNDsDESIGn Cyberstream Cockpit">
+  <img id="pcHeaderNewLogo" class="pc-header-new-logo" src="/assets/logos/cyberstream-cockpit-header-2026.png?v=2026-06-15-fix1" alt="666SOUNDsDESIGn Cyberstream Cockpit" loading="eager" decoding="async">
+</div>
+  <div class="cockpit-copyright-inline desktop-only">© 666SOUNDsDESIGn WebRadio &nbsp;·&nbsp; <b>CYBERSTREAM COCKPIT EDITION</b> &nbsp;·&nbsp; Fraggelpower666 · 2026</div>
+  <div id="phase10BrandLine" class="phase10-brand-line" hidden></div>
+
+
+<div class="hero-label-row">
+          <span class="hero-badge hero-live">LIVE</span>
+          <span id="streamState" class="hero-badge dim">READY</span>
+        </div>
+<div class="mobile-boost mobile-only" aria-label="Mobile Booster">
+  <button class="boost-step boost-step-down" type="button" data-boost-step="-1" title="Boost Stufe senken">−</button>
+  <div class="mobile-boost-core" role="group" aria-label="Booster-Stufen">
+    <span class="mobile-boost-label">BST</span>
+    <span class="boost-led" data-boost-led="0" title="Boost 0"></span>
+    <span class="boost-led" data-boost-led="1" title="Boost 1"></span>
+    <span class="boost-led" data-boost-led="2" title="Boost 2"></span>
+    <span class="boost-led" data-boost-led="3" title="Boost 3"></span>
+    <span class="boost-led" data-boost-led="4" title="Boost EXTREME 2.0"></span>
+    <span class="boost-led" data-boost-led="5" title="Boost EXTREME 2.2"></span>
+  </div>
+  <button class="boost-step boost-step-up" type="button" data-boost-step="1" title="Boost Stufe erhöhen">+</button>
+</div>
+        
+        <div class="hero-brand" aria-label="666SOUNDsDESIGn BroadCaster v6.66">
+          <img class="hero-brand-image" src="/assets/logos/666soundsdesign-ai-banner.png?v=2026-06-15-fix1" alt="666SOUNDsDESIGn BroadCaster v6.66" />
+        </div>
+        <div class="hero-title">Cyber Stream Cockpit</div>
+        <div class="hero-subtitle">Kompakter Hauptplayer für iPhone und Desktop</div>
+      </section>
+
+      <section class="now-playing">
+        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.05.30-central-audio-v2</span></div></div>
+        <div class="section-topline">
+          <div>
+            <div class="section-kicker">NOW PLAYING</div>
+            <div id="metaLine" class="meta-line"></div>
+          </div>
+          <button id="historyToggle" class="ghost-btn" type="button">History</button>
+</div>
+        
+        <div class="now-cover-wrap" aria-hidden="true" style="position:relative">
+          <img id="nowCover" class="now-cover" src="/assets/logos/radiobot-ai-badge.png" alt="" loading="lazy" decoding="async" style="transition:opacity 0.55s ease"><img aria-hidden="true" src="/assets/logos/radiobot-ai-badge.png" alt="" style="position:absolute;bottom:5px;right:5px;width:24px;height:24px;object-fit:contain;opacity:0.52;filter:drop-shadow(0 0 5px rgba(22,255,243,.88));pointer-events:none;border-radius:50%">
+        </div>
+        <div class="ticker-window">
+          <div id="nowPlayingTicker" class="ticker-text"></div>
+        </div>
+        <div id="historyPanel" class="history-panel hidden">
+          <div class="history-title">Played History</div>
+          <ul id="historyList" class="history-list">
+            <li>No history loaded yet.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="info-grid">
+        <article class="info-card">
+          <div class="info-label">Listeners</div>
+          <div id="listenersText" class="info-value">0 / 250</div>
+        </article>
+        <article class="info-card">
+          <div class="info-label">Bitrate</div>
+          <div id="bitrateText" class="info-value">Unknown</div>
+        </article>
+        <article class="info-card">
+          <div class="info-label">DJ / Status</div>
+          <div id="djText" class="info-value">666SOUNDsDESIGn DJ</div>
+        </article>
+        <article class="info-card pc-addon-toggle-card desktop-only" aria-label="Add-on FX Controls">
+          <div class="info-label">ADDON FX</div>
+          <div class="pc-addon-toggle-row" role="group" aria-label="Left and Right Add-on FX">
+            <button id="pcLeftFxToggle" class="pc-addon-toggle is-on" type="button" aria-pressed="true" data-target="left"><span></span><b>L-FX</b></button>
+            <button id="pcRightFxToggle" class="pc-addon-toggle is-on" type="button" aria-pressed="true" data-target="right"><span></span><b>R-FX</b></button>
+          </div>
+        </article>
+      </section>
+
+      <section class="visualizer">
+        <div class="section-kicker">EQ</div>
+        <div id="eqBars" class="eq-bars" aria-hidden="true"></div>
+      </section>
+
+      <section id="s666PrimaryActionDock" class="s666-primary-action-dock" aria-label="Primary player actions">
+        <div id="s666SoundActionSlot" class="s666-primary-action-slot s666-primary-action-slot-left"></div>
+        <div class="s666-primary-action-line" aria-hidden="true"></div>
+        <div id="s666MessageActionSlot" class="s666-primary-action-slot s666-primary-action-slot-right"></div>
+      </section>
+
+      <section class="bottom-console">
+        <div class="control-toolbar" aria-label="Player-Steuerung">
+          <button id="playBtn" class="icon-btn icon-btn-main" type="button" title="Play" aria-label="Play">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button id="pauseBtn" class="icon-btn" type="button" title="Pause" aria-label="Pause">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+          </button>
+          <button id="stopBtn" class="icon-btn" type="button" title="Stop" aria-label="Stop">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>
+          </button>
+          <button id="reconnectBtn" class="icon-btn" type="button" title="Reconnect" aria-label="Reconnect">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-4.9 6h-2.02A7 7 0 1017.65 6.35z"/></svg>
+          </button>
+</div>
+
+        <div class="timeline-wrap desktop-only">
+          <div class="time-chip" id="currentTimeText">0:00</div>
+          <div class="timeline-bar">
+            <div id="timelineProgress" class="timeline-progress"></div>
+          </div>
+          <div class="time-chip" id="durationText">LIVE</div>
+        </div>
+
+        
+        <div class="volume-wrap desktop-only">
+          <label class="volume-label" for="volumeSlider">VOL</label>
+          <input id="volumeSlider" class="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5" />
+        </div>
+      </section>
+
+      <section id="pcBottomSyncMeter" class="pc-bottom-sync-meter desktop-only" aria-label="Bottom Level Meter">
+        <div class="pc-bottom-sync-inner"><i class="pc-bottom-sync-seg" data-bottom-meter-seg="0"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="1"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="2"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="3"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="4"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="5"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="6"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="7"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="8"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="9"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="10"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="11"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="12"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="13"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="14"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="15"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="16"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="17"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="18"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="19"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="20"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="21"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="22"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="23"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="24"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="25"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="26"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="27"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="28"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="29"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="30"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="31"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="32"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="33"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="34"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="35"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="36"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="37"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="38"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="39"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="40"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="41"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="42"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="43"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="44"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="45"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="46"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="47"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="48"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="49"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="50"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="51"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="52"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="53"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="54"></i><i class="pc-bottom-sync-seg" data-bottom-meter-seg="55"></i></div>
+      </section>
+      <section id="pcCopyrightFooter" class="pc-copyright-footer desktop-only" aria-label="Copyright">
+        <span>© 666SOUNDsDESIGn WebRadio</span>
+        <b>CYBERSTREAM COCKPIT EDITION</b>
+        <span>Fraggelpower666 • 2026</span>
+      </section>
+</main>
+
+    <!-- v133 PC SIDE ADDON HUD TOWER — old addon cards physically replaced; player core untouched -->
+    <!-- v138 PC SIDE ADDON CONTENT — position frozen; only internal modules replaced -->
+    <aside id="pcRightFxAddon" class="pc-side-addon pc-side-addon-right desktop-only" aria-label="Fraggle DNA Rechts Rail" data-addon-side="right">
+      <section class="pc-addon-tower pc-addon-tower-right" aria-label="Fraggle DNA Rechts Rail">
+        <header class="pc-addon-tower-head"><span id="dnaRailLedRight" class="dna-rail-led" title="Fraggle DNA Puls · audioreaktiv"></span><span>DNA · RECHTS</span><b id="pcRightFxState">ON</b></header>
+        <article class="pc-addon-module pc-addon-module-vu" aria-label="Fraggle VU">
+          <strong>FRAGGLE VU</strong>
+          <div class="pc-addon-vu-grid" aria-hidden="true">
+            <div class="pc-vu-channel"><b>L</b><span><i></i></span><span><i></i></span></div>
+            <div class="pc-vu-scale"><em>0</em><em>-6</em><em>-12</em><em>-24</em><em>-36</em><em>-48</em></div>
+            <div class="pc-vu-channel"><b>R</b><span><i></i></span><span><i></i></span></div>
+          </div>
+        </article>
+        <article class="pc-addon-module pc-addon-module-phase" aria-label="DNA Phase">
+          <strong>DNA PHASE</strong>
+          <div class="pc-addon-phase" aria-hidden="true">
+            <span class="phase-grid"></span><span class="phase-line"></span><span class="phase-cloud"></span>
+            <b class="phase-l">L</b><b class="phase-r">R</b>
+          </div>
+        </article>
+        <article class="pc-addon-module pc-addon-module-beat" aria-label="Fraggle Pulse">
+          <strong>FRAGGLE PULSE</strong>
+          <div class="pc-addon-beat" aria-hidden="true">
+            <p><b>128.0</b> BPM</p>
+            <div class="pc-addon-beatline"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <footer><span>DNA CORE</span><b>LIVE</b></footer>
+        </article>
+      </section>
+    </aside>
+
+    <aside class="side-meter right" aria-label="Right meter">
+      <div class="side-meter-stack">
+        <div class="side-meter-track"><div id="rightMeterA" class="side-meter-fill"></div></div>
+        <div class="side-meter-track secondary"><div id="rightMeterB" class="side-meter-fill"></div></div>
+        <div class="side-meter-track tertiary"><div id="rightMeterC" class="side-meter-fill"></div></div>
+      </div>
+    </aside>
+  </div>
+
+
+  <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
+
+<script type="module" src="/js/player-core.js?v=2026-06-19-repair3"></script>
+
+
+<!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
+
+
+<!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
+<script id="strictMobileFrontendPurgeV83Script">
+(function(){
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
+  var STREAM_URL='/stream';
+  var metaTimer=null, boostStage=(window.SMFPBoostCore?window.SMFPBoostCore.loadStage():0), rafStarted=false, transientTimer=null;
+  var SMFP_EQ_BANDS=[
+    {key:'b63',type:'lowshelf',freq:63,q:.70},
+    {key:'b125',type:'peaking',freq:125,q:1.00},
+    {key:'b250',type:'peaking',freq:250,q:1.00},
+    {key:'b500',type:'peaking',freq:500,q:1.00},
+    {key:'b1k',type:'peaking',freq:1000,q:1.00},
+    {key:'b2k',type:'peaking',freq:2000,q:1.00},
+    {key:'b4k',type:'peaking',freq:4000,q:1.00},
+    {key:'b8k',type:'peaking',freq:8000,q:1.00},
+    {key:'b12k',type:'peaking',freq:12000,q:1.00},
+    {key:'b16k',type:'highshelf',freq:16000,q:.70}
+  ];
+  var smfpEqState=(function(){
+    var base={b63:0,b125:0,b250:0,b500:0,b1k:0,b2k:0,b4k:0,b8k:0,b12k:0,b16k:0};
+    try{var raw=localStorage.getItem('smfp_real_eq_v162');if(raw){var parsed=JSON.parse(raw);Object.keys(base).forEach(function(k){var n=Number(parsed[k]);if(isFinite(n))base[k]=Math.max(-12,Math.min(12,n));});}}catch(e){}
+    return base;
+  })();
+  function clampEqDb(v){var n=Number(v); if(!isFinite(n)) n=0; return Math.max(-12,Math.min(12,Math.round(n)));}
+  function saveSmfpEqState(){try{localStorage.setItem('smfp_real_eq_v162',JSON.stringify(smfpEqState));}catch(e){}}
+  function makeSmfpEqNodes(ctx){
+    return SMFP_EQ_BANDS.map(function(b){
+      var node=ctx.createBiquadFilter();
+      node.type=b.type;
+      node.frequency.value=b.freq;
+      if('Q' in node) node.Q.value=b.q;
+      node.gain.value=clampEqDb(smfpEqState[b.key]);
+      return node;
+    });
+  }
+  function applySmfpEqToGraph(){
+    if(!audioGraph||!audioGraph.ok||!audioGraph.eqNodes||!audioGraph.ctx)return;
+    try{
+      var now=audioGraph.ctx.currentTime;
+      audioGraph.eqNodes.forEach(function(node,i){
+        var key=SMFP_EQ_BANDS[i]&&SMFP_EQ_BANDS[i].key;
+        var target=clampEqDb(smfpEqState[key]);
+        node.gain.cancelScheduledValues(now);
+        node.gain.setTargetAtTime(target,now,0.035);
+      });
+      document.documentElement.setAttribute('data-smfp-real-eq','active');
+    }catch(e){}
+  }
+  function bindSmfpRealEqPanel(){
+    var panel=document.getElementById('pcRealEqPanel'); if(!panel||panel.__smfpEqBound)return; panel.__smfpEqBound=true;
+    panel.querySelectorAll('[data-smfp-eq]').forEach(function(input){
+      var key=input.getAttribute('data-smfp-eq');
+      if(Object.prototype.hasOwnProperty.call(smfpEqState,key)) input.value=String(clampEqDb(smfpEqState[key]));
+      function label(){var out=document.getElementById(input.id+'Val'); if(out) out.textContent=String(clampEqDb(input.value));}
+      label();
+      input.addEventListener('input',function(ev){
+        ev.stopPropagation();
+        smfpEqState[key]=clampEqDb(input.value);
+        label(); saveSmfpEqState(); applySmfpEqToGraph();
+      },{passive:true});
+      input.addEventListener('change',function(ev){
+        ev.stopPropagation();
+        smfpEqState[key]=clampEqDb(input.value);
+        label(); saveSmfpEqState(); applySmfpEqToGraph();
+      },{passive:true});
+    });
+  }
+  window.__smfpRealEqApply=applySmfpEqToGraph;
+  var META_ENDPOINTS=['/api/nowplaying','/streammeta','/nowplaying','/meta','/status'];
+  var HISTORY_ENDPOINTS=['/history','/api/history','/recent','/api/recent'];
+  var localHistory=[];
+  var lastHistoryTitle='';
+  var mffLastGoodMeta={};
+  var mffPanelLedUpdateTimer=0;
+  var mffPanelLedLastRun=0;
+
+  function isMobile(){return(window.matchMedia&&window.matchMedia('(max-width: 760px)').matches)||window.innerWidth<=760}
+  function q(s,r){return(r||document).querySelector(s)}
+  function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+
+  function getAudio(){
+    var a=q('#mffAudio')||q('audio');
+    if(!a){
+      a=document.createElement('audio');
+      a.id='mffAudio'; a.preload='none'; a.crossOrigin='anonymous'; a.playsInline=true; a.style.display='none';
+      document.body.appendChild(a);
+    }
+    if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);
+      
+    return a;
+  }
+
+
+  var audioGraph=null;
+  var analyserSilentFrames=0;
+  var analyserLiveFrames=0;
+  var analyserMode='init';
+  var pcSmoothMeter=18;
+  var pcWeakFrameCounter=0;
+  var pcMobileEqTimer=0;
+  var pcMobileEqLastTick=0;
+  var pcEqSmoothBars=[];
+  var pcEqFrameTimer=0;
+  var pcEqPhase=0;
+  var pcBottomSegments=0;
+  var pcEqDirectBars=[];
+  var pcEqDirectPhase=0;
+  var pcEqDirectLastLevel=0.18;
+  var mffCleanEqValues=[];
+  var mffCleanEqPhase=0;
+  var mffCleanEqLoop=0;
+  var BOOST_GAINS=(window.SMFPBoostCore&&window.SMFPBoostCore.stages?window.SMFPBoostCore.stages.map(function(x){return x.gain;}):[1.00,1.40,1.70,1.90,2.08,2.20]);
+  var MFF_IDLE_TICKER_TEXT_V113='666SOUNDsDESIGn WebRadio';
+  var MFF_LIVE_LOADING_TEXT_V113='Loading live metadata ...';
+  var RAMP_UP=0.62;
+  var RAMP_DOWN=0.36;
+  var mffUserStopped=true;
+  var mffLastUserStopAt=0;
+  var mffAudioDirtyReason='';
+  var mffLastAudioHardResetAt=0;
+
+  /*
+  ==========================================
+  GEÄNDERT: 2026-05-10
+  ÄNDERUNG: v111 MOBILE_AUDIO_SELFHEAL_MINIMAL
+  ZWECK:
+  - Stop→Play und iOS-Systemsound-Unterbrechungen ohne Browser-Neustart erholen.
+  - Keine neue UI-Schicht, kein neuer Visualizer, kein zusätzlicher Timer.
+  ==========================================
+  */
+  function markMffAudioDirty(reason){
+    mffAudioDirtyReason=reason||'dirty';
+    try{document.documentElement.setAttribute('data-mff-audio-dirty',mffAudioDirtyReason)}catch(e){}
+  }
+
+  function resetMffAudioGraph(reason){
+    try{if(audioGraph&&audioGraph.gain)audioGraph.gain.disconnect()}catch(e){}
+    try{if(audioGraph&&audioGraph.analyser)audioGraph.analyser.disconnect()}catch(e){}
+    try{if(audioGraph&&audioGraph.compressor)audioGraph.compressor.disconnect()}catch(e){}
+    try{if(window.__mffMediaElementSource)window.__mffMediaElementSource.disconnect()}catch(e){}
+    audioGraph=null;
+    try{document.documentElement.setAttribute('data-mff-audio-graph-reset',reason||'reset')}catch(e){}
+  }
+
+  function prepareMffAudioForPlay(reason){
+    var a=getAudio();
+    if(!a)return;
+    var nextUrl=getStreamUrlForTarget(manualStreamTarget);
+    var now=Date.now();
+    var stopAge=mffLastUserStopAt?(now-mffLastUserStopAt):0;
+    var hard=!!mffAudioDirtyReason || stopAge>1500 || !a.getAttribute('src') || a.getAttribute('src')!==nextUrl;
+    if(!hard)return;
+    if(now-mffLastAudioHardResetAt<700 && a.getAttribute('src')===nextUrl)return;
+    mffLastAudioHardResetAt=now;
+    try{a.pause()}catch(e){}
+    resetMffAudioGraph(reason||mffAudioDirtyReason||'prepare-play');
+    try{a.removeAttribute('src')}catch(e){}
+    try{a.load()}catch(e){}
+    try{a.setAttribute('src',nextUrl)}catch(e){}
+    try{a.load()}catch(e){}
+    mffAudioDirtyReason='';
+    try{document.documentElement.removeAttribute('data-mff-audio-dirty');document.documentElement.setAttribute('data-mff-audio-selfheal-last',reason||'prepare-play')}catch(e){}
+  }
+
+  function recoverMffInterruptedAudio(reason){
+    if(
+      (window.S666_AUDIO_HEALING_ORCHESTRA && window.S666_AUDIO_HEALING_ORCHESTRA.active === true) ||
+      document.documentElement.getAttribute('data-audio-orchestra') === 'active'
+    ){
+      try{
+        document.documentElement.setAttribute('data-mff-audio-selfheal-muted', reason || 'orchestra-active');
+        document.documentElement.setAttribute('data-mff-audio-selfheal-handoff', 'audio-healing-orchestra');
+        document.documentElement.setAttribute('data-audio-sensor-event', 'mff:' + (reason || 'interrupted'));
+      }catch(e){}
+      return;
+    }
+    if(mffUserStopped)return;
+    var a=getAudio();
+    if(!a)return;
+    var state=document.documentElement.getAttribute('data-mff-transport')||transportState||'';
+    var shouldPlay=state==='play' || document.documentElement.getAttribute('data-mff-playing')==='1';
+    if(!shouldPlay)return;
+    markMffAudioDirty(reason||'interrupted');
+    prepareMffAudioForPlay(reason||'interrupted');
+    resumeAudioGraph();
+    try{var r=a.play();if(r&&typeof r.catch==='function')r.catch(function(){})}catch(e){}
+  }
+
+  function ensureAudioGraph(){
+    var audio=getAudio();
+    if(audioGraph && audioGraph.audio===audio) return audioGraph;
+    if(window.SMFPRealEq){
+      audioGraph={audio:audio,ok:false,external:true};
+      document.documentElement.setAttribute('data-mff-boost-engine','central-meterbus');
+      return audioGraph;
+    }
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC) throw new Error('WebAudio unavailable');
+
+      var ctx=window.__mffAudioContext || new AC();
+      window.__mffAudioContext=ctx;
+
+      var source=window.__mffMediaElementSource;
+      if(!source){
+        source=ctx.createMediaElementSource(audio);
+        window.__mffMediaElementSource=source;
+      }
+
+      var gain=ctx.createGain();
+      gain.gain.value=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
+
+      var analyser=ctx.createAnalyser();
+      analyser.fftSize=128;
+      analyser.smoothingTimeConstant=0.72;
+      analyser.minDecibels=-86;
+      analyser.maxDecibels=-18;
+
+      var comp=ctx.createDynamicsCompressor();
+      comp.threshold.value=-0.25;
+      comp.knee.value=2;
+      comp.ratio.value=1.08;
+      comp.attack.value=0.002;
+      comp.release.value=0.12;
+
+      var eqNodes=makeSmfpEqNodes(ctx);
+
+      try{source.disconnect()}catch(e){}
+      source.connect(gain);
+      if(eqNodes.length){
+        gain.connect(eqNodes[0]);
+        for(var ei=0; ei<eqNodes.length-1; ei++) eqNodes[ei].connect(eqNodes[ei+1]);
+        eqNodes[eqNodes.length-1].connect(analyser);
+      }else{
+        gain.connect(analyser);
+      }
+      analyser.connect(comp);
+      comp.connect(ctx.destination);
+
+      audio.volume=1;
+      audioGraph={
+        audio:audio,
+        ctx:ctx,
+        source:source,
+        gain:gain,
+        eqNodes:eqNodes,
+        analyser:analyser,
+        compressor:comp,
+        ok:true,
+        lastGain:gain.gain.value,
+        freqData:new Uint8Array(analyser.frequencyBinCount),
+        timeData:new Uint8Array(analyser.fftSize)
+      };
+      document.documentElement.setAttribute('data-mff-boost-engine','webaudio-ramp-analyser');
+      applySmfpEqToGraph();
+      return audioGraph;
+    }catch(e){
+      console.warn('[666 boost] WebAudio fallback',e);
+      try{audio.volume=Math.min(1,(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage]||1)))}catch(_){}
+      audioGraph={audio:audio,ok:false,error:String(e)};
+      document.documentElement.setAttribute('data-mff-boost-engine','volume-fallback');
+      return audioGraph;
+    }
+  }
+
+  function applyBoostRamp(previousStage){
+    var target=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
+    var app=q('#mffApp');
+    if(app){
+      app.setAttribute('data-mff-boost-stage',String(boostStage));
+      app.setAttribute('data-mff-boost-ramping','1');
+      clearTimeout(window.__mffBoostRampVisualTimer);
+      window.__mffBoostRampVisualTimer=setTimeout(function(){
+        var a=q('#mffApp');
+        if(a) a.setAttribute('data-mff-boost-ramping','0');
+      },520);
+    }
+
+    var b=q('#mffBoost');
+    if(b) b.textContent='BST '+boostStage;
+    var bg=q('#mffBoostGain');
+    if(bg) bg.textContent=target.toFixed(2)+'×';
+
+    document.documentElement.setAttribute('data-mff-boost',String(boostStage));
+    document.documentElement.setAttribute('data-mff-boost-gain',String(target));
+    try{document.documentElement.setAttribute('data-mff-boost-stage-active',String(boostStage));document.documentElement.style.setProperty('--player-boost-gain',target.toFixed(2));}catch(e){}
+    try{if(window.SMFPBoostCore){boostStage=window.SMFPBoostCore.saveStage(boostStage);window.SMFPBoostCore.publish(boostStage,target,'mff-inline');}}catch(e){}
+
+    var graph=ensureAudioGraph();
+    if(graph && graph.ok && graph.gain && graph.ctx){
+      try{
+        if(graph.ctx.state==='suspended') graph.ctx.resume();
+        var now=graph.ctx.currentTime;
+        var current=graph.gain.gain.value || graph.lastGain || 1;
+        var ramp=(target>current)?RAMP_UP:RAMP_DOWN;
+
+        graph.gain.gain.cancelScheduledValues(now);
+        graph.gain.gain.setValueAtTime(current,now);
+        graph.gain.gain.linearRampToValueAtTime(target,now+ramp);
+        graph.gain.gain.setTargetAtTime(target,now+ramp,0.045);
+        graph.lastGain=target;
+        try{graph.audio.dataset.boostStage=String(boostStage);graph.audio.dataset.boostGain=String(target);graph.audio.dataset.boostAppliedGain=String(target);graph.audio.dataset.boostGraph='MFF_GRAPH_OK';}catch(_e){}
+      }catch(e){
+        try{graph.gain.gain.setTargetAtTime(target,graph.ctx.currentTime,0.08)}catch(_){}
+      }
+    }else{
+      try{getAudio().volume=Math.min(1,target)}catch(e){}
+    }
+  }
+
+  async function resumeAudioGraph(){
+    var graph=ensureAudioGraph();
+    if(graph && graph.ok && graph.ctx && graph.ctx.state==='suspended'){
+      try{await graph.ctx.resume()}catch(e){}
+    }
+    applyBoostRamp(boostStage);
+  }
+
+
+  function flashControl(btn,ms){
+    if(!btn) return;
+    btn.classList.add('is-burst');
+    clearTimeout(btn.__mffBurstTimer);
+    btn.__mffBurstTimer=setTimeout(function(){
+      btn.classList.remove('is-burst');
+    },ms||520);
+  }
+
+  function flashAction(action,ms){
+    var btn=q('#mffApp .mff-control[data-action="'+action+'"]') || q('#mffApp [data-action="'+action+'"]');
+    flashControl(btn,ms||520);
+  }
+
+
+
+  function getTransportButtonsByRole(role){
+    var aliases={
+      play:['play','start','stream-play','transport-play'],
+      pause:['pause','stream-pause','transport-pause'],
+      stop:['stop','stream-stop','transport-stop']
+    };
+    var list=[];
+    (aliases[role]||[]).forEach(function(a){
+      qa('#mffApp [data-action="'+a+'"], #mffApp [data-mff-action="'+a+'"]').forEach(function(btn){
+        if(list.indexOf(btn)<0) list.push(btn);
+      });
+    });
+
+    // Fallback: vorhandene Button-Icons/Texte erkennen, falls data-action anders ist.
+    qa('#mffApp button, #mffApp .mff-control').forEach(function(btn){
+      var t=String(btn.textContent||btn.getAttribute('aria-label')||btn.title||'').trim().toLowerCase();
+      if(role==='play' && (/▶|►|play/.test(t)) && list.indexOf(btn)<0) list.push(btn);
+      if(role==='pause' && (/pause|⏸|Ⅱ|\|\|/.test(t)) && list.indexOf(btn)<0) list.push(btn);
+      if(role==='stop' && (/stop|■|▪|square/.test(t)) && list.indexOf(btn)<0) list.push(btn);
+    });
+    return list;
+  }
+
+  function setTransportButtonRoleState(role,active){
+    getTransportButtonsByRole(role).forEach(function(btn){
+      btn.classList.toggle('is-active',!!active);
+      btn.classList.toggle('mff-transport-active',!!active);
+      btn.setAttribute('aria-pressed',active?'true':'false');
+    });
+  }
+
+  function flashTransportRole(role,ms){
+    getTransportButtonsByRole(role).forEach(function(btn){
+      flashControl(btn,ms||720);
+      btn.classList.add('mff-transport-active');
+      clearTimeout(btn.__mffTransportFlashTimer);
+      btn.__mffTransportFlashTimer=setTimeout(function(){
+        btn.classList.remove('mff-transport-active');
+        btn.classList.remove('is-active');
+      },ms||720);
+    });
+  }
+
+  function applyTransportVisualState(state){
+    // v95: persistent transport state. Stop/Pause bleiben sichtbar aktiv,
+    // statt nur kurz aufzublitzen. Play bleibt später für Audio-Reactive offen.
+    setTransportButtonRoleState('play',state==='play');
+    setTransportButtonRoleState('pause',state==='pause');
+    setTransportButtonRoleState('stop',state==='stop');
+    document.documentElement.setAttribute('data-mff-transport',state||'stop');
+    var app=q('#mffApp'); if(app) app.setAttribute('data-transport',state||'stop');
+  }
+
+
+
+  function setTransportState(state){
+    transportState=state;
+
+    // Erst normale data-action-Logik erhalten.
+    qa('.mff-control,[data-action],[data-mff-action]').forEach(function(btn){
+      var a=btn.getAttribute('data-action')||btn.getAttribute('data-mff-action')||'';
+      var active =
+        (state==='play' && /^(play|start|stream-play|transport-play)$/.test(a)) ||
+        (state==='pause' && /^(pause|stream-pause|transport-pause)$/.test(a)) ||
+        (state==='stop' && /^(stop|stream-stop|transport-stop)$/.test(a));
+      if(/play|pause|stop|stream-play|stream-pause|stream-stop|transport-play|transport-pause|transport-stop/.test(a)){
+        btn.classList.toggle('is-active',active);
+        btn.classList.toggle('mff-transport-active',active);
+        btn.setAttribute('aria-pressed',active?'true':'false');
+      }
+    });
+
+    // Dann hart anhand Rolle/Icon absichern.
+    applyTransportVisualState(state);
+
+    document.documentElement.setAttribute('data-mff-playing',state==='play'?'1':'0');
+
+    if(state==='stop'){
+      setTimeout(setPanelLedsOffline,60);
+    }else if(state==='pause'){
+      setTimeout(setPanelLedsOffline,60);
+    }
+  }
+
+  function flash(cmd){
+    var btn=q('#mffApp .mff-controls [data-mff="'+cmd+'"]');
+    if(!btn)return;
+    btn.classList.add('mff-transient');
+    clearTimeout(transientTimer);
+    transientTimer=setTimeout(function(){qa('#mffApp .mff-controls .mff-transient').forEach(function(n){n.classList.remove('mff-transient')})},1200);
+  }
+
+  function updateBoostVisualState(action){
+    if(action==='boostUp' || action==='plus' || action==='boost-plus' || action==='+'){
+      flashAction('boostUp',620);
+      flashAction('plus',620);
+      flashAction('+',620);
+    }
+    if(action==='boostDown' || action==='minus' || action==='boost-minus' || action==='-'){
+      flashAction('boostDown',620);
+      flashAction('minus',620);
+      flashAction('-',620);
+    }
+    var bst=q('#mffApp [data-action="boost"], #mffApp .mff-bst, #mffApp .mff-boost');
+    if(bst){
+      bst.classList.add('is-burst');
+      clearTimeout(bst.__mffBurstTimer);
+      bst.__mffBurstTimer=setTimeout(function(){bst.classList.remove('is-burst');},620);
+    }
+  }
+
+
+
+  async function play(){
+    mffUserStopped=false;
+    setMffTickerLoadingV113();
+    prepareMffAudioForPlay(mffLastUserStopAt?'stop-to-play':'fresh-play');
+    await resumeAudioGraph();
+    var a=getAudio();
+    try{
+      var nextUrl=getStreamUrlForTarget(manualStreamTarget);
+      if(!a.getAttribute('src') || a.getAttribute('src')!==nextUrl) a.setAttribute('src',nextUrl);
+      var r=a.play();
+      if(r&&typeof r.catch==='function') r.catch(function(e){console.warn('[666 mobile play]',e)});
+      setTransportState('play');
+      setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
+      setTimeout(function(){tickMeta();},120);
+    }catch(e){
+      console.warn('[666 mobile play]',e);
+      setTransportState('stop');
+      setPanelLedsOffline();
+    }
+  }
+  function pause(){
+    var a=getAudio();
+    mffUserStopped=true;
+    mffLastUserStopAt=Date.now();
+    markMffAudioDirty('user-pause');
+    try{a.pause();a.removeAttribute('src');a.load()}catch(e){}
+    resetMffAudioGraph('user-pause');
+    setTransportState('pause');
+    setMffTickerIdleV113();
+  }
+  function stop(){
+    var a=getAudio();
+    mffUserStopped=true;
+    mffLastUserStopAt=Date.now();
+    markMffAudioDirty('user-stop');
+    try{a.pause();a.removeAttribute('src');try{a.currentTime=0}catch(e){}a.load()}catch(e){}
+    resetMffAudioGraph('user-stop');
+    setTransportState('stop');
+    setMffTickerIdleV113();
+  }
+  function showMffExtremeBoostWarning(){
+    return new Promise(function(resolve){
+      var old=document.getElementById('mffExtremeBoostBackdrop');
+      if(old) old.remove();
+      var b=document.createElement('div');
+      b.id='mffExtremeBoostBackdrop';
+      b.className='mff-extreme-boost-backdrop';
+      b.innerHTML='<div class="mff-extreme-boost-modal" role="dialog" aria-modal="true"><h3>EXTREME BOOST MODE</h3><p>Boost 2.0 / 2.2 can damage speakers or headphones and may increase distortion. Use carefully.</p><div class="mff-extreme-boost-actions"><button type="button" data-extreme="cancel">CANCEL</button><button type="button" data-extreme="ok">OK</button></div></div>';
+      document.body.appendChild(b);
+      function done(v){try{b.remove()}catch(e){} resolve(v);}
+      b.addEventListener('click',function(ev){
+        if(ev.target===b) return done(false);
+        var btn=ev.target.closest&&ev.target.closest('[data-extreme]');
+        if(!btn) return;
+        ev.preventDefault(); ev.stopPropagation();
+        done(btn.getAttribute('data-extreme')==='ok');
+      },true);
+    });
+  }
+  function boost(d){
+    var prev=boostStage;
+    var maxStage=(window.SMFPBoostCore?window.SMFPBoostCore.maxStage():BOOST_GAINS.length-1);
+    var next=Math.max(0,Math.min(maxStage,boostStage+d));
+    if((window.SMFPBoostCore?window.SMFPBoostCore.isDanger(next):next>=4) && !(window.SMFPBoostCore?window.SMFPBoostCore.isDanger(boostStage):boostStage>=4)){
+      showMffExtremeBoostWarning().then(function(ok){
+        if(!ok){applyBoostRamp(boostStage);return;}
+        boostStage=next; applyBoostRamp(prev);
+      });
+      return;
+    }
+    boostStage=next;
+    applyBoostRamp(prev);
+  }
+
+  function card(t,v,i){return'<section class="mff-card"><div><span class="mff-ico">'+i+'</span><small>'+t+'</small></div><strong>'+v+'</strong><p><i></i><i></i><i></i></p></section>'}
+
+  function buildBars(id,count){
+    var el=q(id); if(!el||el.children.length)return;
+    var mid=(count-1)/2;
+    for(var i=0;i<count;i++){
+      var b=document.createElement('i');
+      if(id==='#mffEqBars'){
+        b.style.setProperty('--h',(30+((i*37)%48))+'%');
+        b.style.height=(24+((i*29)%72))+'px';
+      }
+      if(id==='#mffBottomBars'){
+        b.className=i<count/2?'mff-bottom-left':'mff-bottom-right';
+        b.dataset.seg=String(i);
+        b.style.setProperty('--mff-center-distance',Math.abs(i-mid).toFixed(2));
+        b.style.setProperty('--mff-bar-on','0');
+        b.style.setProperty('--mff-bar-opacity','.28');
+      }
+      b.style.setProperty('--d',(i*13)+'ms');
+      el.appendChild(b);
+    }
+  }
+
+  function setMarqueeTitle(text){
+    var h1=q('#mffApp .mff-title h1');
+    if(!h1)return;
+    var clean=String(text||'').trim();
+    if(!clean || invalidMetaText(clean)) clean=(mffLastGoodMeta&&mffLastGoodMeta.title)||'Loading metadata ...';
+    h1.innerHTML='';
+    h1.setAttribute('data-current-title',clean);
+    var span=document.createElement('span');
+    span.textContent=clean+'   •   '+clean;
+    h1.appendChild(span);
+  }
+
+  function setMffTickerIdleV113(){
+    setMarqueeTitle(MFF_IDLE_TICKER_TEXT_V113);
+    var h2=q('#mffApp .mff-title h2');
+    if(h2) h2.textContent='Press PLAY for playback and live metadata';
+    try{document.documentElement.setAttribute('data-mff-ticker-state','idle')}catch(e){}
+  }
+
+  function setMffTickerLoadingV113(){
+    setMarqueeTitle(MFF_LIVE_LOADING_TEXT_V113);
+    var h2=q('#mffApp .mff-title h2');
+    if(h2) h2.textContent='Updating live metadata ...';
+    try{document.documentElement.setAttribute('data-mff-ticker-state','live-loading')}catch(e){}
+  }
+
+  function setMffTickerLiveV113(title){
+    var clean=String(title||'').trim();
+    if(!clean || invalidMetaText(clean)) return;
+    setMarqueeTitle(clean);
+    try{document.documentElement.setAttribute('data-mff-ticker-state','live')}catch(e){}
+  }
+
+  function setArtwork(url){
+    var box=q('#mffApp .mff-symbol');
+    if(!box)return;
+    var next=String(url||'').trim();
+    var old=q('img',box);
+
+    // v111 cleanup: cover art is NOT rebuilt on every metadata poll.
+    // It is replaced only if the actual image URL changes.
+    if(!next){
+      if(old) old.remove();
+      lastArtworkUrl='';
+      box.removeAttribute('data-has-artwork');
+      return;
+    }
+    if(old && lastArtworkUrl===next && old.getAttribute('src')===next){
+      box.setAttribute('data-has-artwork','1');
+      return;
+    }
+    if(old)old.remove();
+    var img=document.createElement('img');
+    img.alt='Stream Icon';
+    img.src=next;
+    img.loading='lazy';
+    img.decoding='async';
+    img.onerror=function(){
+      if(lastArtworkUrl===next) lastArtworkUrl='';
+      img.remove();
+      box.removeAttribute('data-has-artwork');
+    };
+    box.appendChild(img);
+    lastArtworkUrl=next;
+    box.setAttribute('data-has-artwork','1');
+  }
+
+
+
+  function purgeMobileVisualizerLayers(app){
+    if(!app) return;
+    // v111 cleanup: never stack new visualizers over the canonical EQ block.
+    // Canonical mobile visualizer = #mffEqBars only. Anything morph/canvas/reactor left inside the EQ area is removed.
+    qa('.mff-eq canvas,.mff-eq .mff-morph,.mff-eq .mff-circular,.mff-eq .circular-morph,.mff-eq .morph-reactor,.mff-eq [data-morph],.mff-eq [data-visualizer-extra]',app).forEach(function(n){
+      if(n.id==='mffEqBars') return;
+      try{n.remove();}catch(e){}
+    });
+    var eq=q('#mffEqBars',app);
+    if(eq){
+      eq.setAttribute('data-canonical-visualizer','eq-bars-single-loop');
+      eq.setAttribute('aria-label','Single active EQ visualizer');
+    }
+  }
+
+  function ensureMobileVersionInControlRow(app){
+    if(!app) return;
+    var badge=q('.smfp-version-badge',app);
+    var slot=q('.mff-discord-slot',app);
+    if(!badge || !slot) return;
+    badge.textContent=VERSION;
+    badge.classList.add('mff-version-inline');
+    badge.setAttribute('aria-label','Player Version '+VERSION);
+    if(badge.parentNode!==slot) slot.appendChild(badge);
+  }
+
+  function bindHistoryModalV17(app){
+    var hbtn=q('.mff-history',app);
+    if(hbtn && !hbtn.__mffHistoryBound){
+      hbtn.__mffHistoryBound=true;
+      hbtn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{capture:true});
+      hbtn.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{passive:false,capture:true});
+    }
+    qa('[data-mff-history-close]',app).forEach(function(el){
+      if(el.__mffHistoryCloseBound)return;
+      el.__mffHistoryCloseBound=true;
+      el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
+      el.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
+    });
+  }
+
+  function buildApp(){
+    var app=q('#mffApp');
+    if(app)return app;
+    app=document.createElement('div');
+    app.id='mffApp';
+    app.setAttribute('data-version',VERSION);
+    app.innerHTML='<div class="smfp-version-badge">v178</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+      '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/logos/cyberstream-ai-cockpit-header.png?v=2026-06-15-fix1" alt="CyberStream AI Cockpit Edition"><img src="/assets/logos/radiobot-ai-badge.png" alt="666 RadioBotAI" style="height:28px;width:28px;object-fit:contain;opacity:0.82;filter:drop-shadow(0 0 6px rgba(22,255,243,.80))"></section>'+
+      '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
+      '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
+      '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
+      '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
+      '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><i class="mff-boost-led" data-led="4"></i><i class="mff-boost-led" data-led="5"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
+    document.body.insertBefore(app,document.body.firstChild);
+    buildBars('#mffEqBars',20); buildBars('#mffBottomBars',60);
+    purgeMobileVisualizerLayers(app);
+    ensureMobileVersionInControlRow(app);
+    var controls=q('.mff-controls',app);
+    var handler=function(ev){
+      var btn=ev.target.closest&&ev.target.closest('[data-mff]'); if(!btn)return;
+      ev.preventDefault(); ev.stopPropagation();
+      var c=btn.getAttribute('data-mff');
+      if(c==='play')play(); if(c==='pause')pause(); if(c==='stop')stop();
+      if(c==='reset'){flash('reset');stop();setTimeout(play,120)}
+      if(c==='down'){flash('down');boost(-1)}
+      if(c==='up'){flash('up');boost(1)}
+      if(c==='boost'){flash('boost');boost(1)}
+    };
+    controls.addEventListener('click',handler,{capture:true});
+    controls.addEventListener('touchend',handler,{passive:false,capture:true});
+
+    var hbtn=q('.mff-history',app);
+    if(hbtn){
+      hbtn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{capture:true});
+      hbtn.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{passive:false,capture:true});
+    }
+    var hback=q('#mffHistoryBackdrop',app);
+    if(hback){
+      hback.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
+      hback.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
+    }
+
+    var hclose=q('[data-mff-history-close]',app);
+    if(hclose){
+      hclose.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
+      hclose.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
+    }
+
+    bindHistoryModalV17(app);
+    purgeMobileVisualizerLayers(app);
+    ensureMobileVersionInControlRow(app);
+    bindPanelLedTips(app);
+    bindStreamSwitch(app);
+    bindControlActiveFeedback(app);
+    bindTransportHardFeedback(app);
+    setTransportState('stop');
+    applyBoostRamp(0);
+    bindSmfpRealEqPanel();
+    setPanelLedsOffline();
+    setMffTickerIdleV113();
+    ensureBrandRow();
+
+    setAnalyserMode('init');
+    return app;
+  }
+
+  function installMffAudioSelfHealEvents(){
+    if(window.__mffAudioSelfHealV105Installed)return;
+    window.__mffAudioSelfHealV105Installed=true;
+    var a=getAudio();
+    if(a){
+      a.addEventListener('pause',function(){if(!mffUserStopped){markMffAudioDirty('unexpected-pause');setTimeout(function(){recoverMffInterruptedAudio('unexpected-pause')},260)}},{passive:true});
+      a.addEventListener('stalled',function(){markMffAudioDirty('stalled');setTimeout(function(){recoverMffInterruptedAudio('stalled')},360)},{passive:true});
+      a.addEventListener('suspend',function(){markMffAudioDirty('suspend');setTimeout(function(){recoverMffInterruptedAudio('suspend')},360)},{passive:true});
+      a.addEventListener('error',function(){markMffAudioDirty('audio-error');setTimeout(function(){recoverMffInterruptedAudio('audio-error')},500)},{passive:true});
+    }
+    window.addEventListener('focus',function(){setTimeout(function(){recoverMffInterruptedAudio('focus')},220)},{passive:true});
+    window.addEventListener('pageshow',function(){setTimeout(function(){recoverMffInterruptedAudio('pageshow')},220)},{passive:true});
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(function(){recoverMffInterruptedAudio('visibility')},220)});
+  }
+
+  function killOldDom(){
+    if(!isMobile())return;
+    qa('body > *').forEach(function(n){
+      if(n.id==='mffApp'||n.id==='mffAudio'||n.id==='s666DiscordGateOverlay'||n.id==='s666DiscordDeniedOverlay'||n.id==='s666SoundControlOverlay'||n.id==='s666MsgOverlay'||n.id==='fp-admin-overlay')return;
+      if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
+      n.setAttribute('data-smfp-hidden','1');
+      try{n.remove()}catch(e){}
+    });
+    qa('header,main:not(.mff-shell),.hero,.hero-image,.site-header,.main-header,.mobile-shell,.player-shell,.hud-panel,.panel:not(.mff-now):not(.mff-card):not(.mff-eq):not(.mff-controls):not(.mff-bottom),#mfmApp,#mobileHudDomMeterRepair,#mobileControlsLayerReset,#mobileInlineTopControlsForce,#mobileTopControlsInBoostPanel,#mobileTransportRepair,.mobile-hud-dom-meter-repair,.mobile-transport-repair,.mobile-top-controls-in-boost,.mobile-dom-side-meter,.mobile-dom-bottom-guard,.mobile-dom-bottom-track,.mobile-dom-bottom-left,.mobile-dom-bottom-right,.bottom-meter,.bottom-levelmeter,.gesture-guard,.mobile-bottom-meter,[class*="bottom"][class*="meter"],[class*="bottom"][class*="guard"],[class*="gesture"][class*="guard"]').forEach(function(n){
+      if(n.closest&&n.closest('#mffApp,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
+      n.setAttribute('data-smfp-hidden','1');
+      try{n.remove()}catch(e){}
+    });
+    qa('body *').forEach(function(n){
+      if(n.closest&&n.closest('#mffApp,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
+      if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
+      var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
+      if(!r)return;
+      var cs=window.getComputedStyle?window.getComputedStyle(n):null;
+      var bg=cs?((cs.background||'')+' '+(cs.backgroundImage||'')+' '+(cs.boxShadow||'')):'';
+      var bottomish=r.top>window.innerHeight*.72;
+      var wide=r.width>window.innerWidth*.55;
+      var flat=r.height>6&&r.height<95;
+      var lowText=((n.textContent||'').trim().length<24);
+      var colored=/linear-gradient|cyan|magenta|pink|rgba|rgb|255,\s*0|0,\s*255/i.test(bg);
+      if(bottomish&&wide&&flat&&(lowText||colored)){
+        n.setAttribute('data-v8-old-bottom','1');
+        try{n.remove()}catch(e){}
+      }
+    });
+  }
+
+  function invalidMetaText(x){
+    if(!x)return true;
+    var s=String(x).trim();
+    if(!s)return true;
+    if(s.indexOf('<!DOCTYPE')>=0||s.indexOf('<!doctype')>=0||s.indexOf('<html')>=0||s.indexOf('<body')>=0||s.indexOf('<script')>=0)return true;
+    if(s.length>260&&/<\/?[a-z][\s\S]*>/i.test(s))return true;
+    return false;
+  }
+
+  function normalizeDj(raw){
+    var dj=String(raw||'').trim();
+    if(!dj)return 'DJ 666';
+    if(/no\s*dj|nodj|no-dj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined/i.test(dj))return 'DJ 666';
+    return dj;
+  }
+
+  function mobileMetaText(){
+    for(var i=0;i<arguments.length;i++){
+      var value=arguments[i];
+      if(value===undefined||value===null) continue;
+      if(typeof value==='string'||typeof value==='number'){
+        var text=String(value).trim();
+        if(text&&!invalidMetaText(text)) return text;
+      }
+      if(value&&typeof value==='object'){
+        var nested=value.title||value.text||value.name||value.songtitle||value.song||value.current||value.now_playing||value.nowPlaying;
+        if(typeof nested==='string'||typeof nested==='number'){
+          var nestedText=String(nested).trim();
+          if(nestedText&&!invalidMetaText(nestedText)) return nestedText;
+        }
+        if(nested&&typeof nested==='object'){
+          var deep=nested.title||nested.text||nested.name||nested.songtitle||nested.current||nested.now_playing||nested.nowPlaying;
+          if(typeof deep==='string'||typeof deep==='number'){
+            var deepText=String(deep).trim();
+            if(deepText&&!invalidMetaText(deepText)) return deepText;
+          }
+        }
+      }
+    }
+    return '';
+  }
+
+  function normalizeMeta(data){
+    if(!data)return null;
+    if(typeof data==='string'){if(invalidMetaText(data))return null;return{title:data,dj:'DJ 666'};}
+    var np=data.now_playing||data.nowPlaying||{};
+    var song=np.song||data.song||data.current_song||data.currentSong||data.track||{};
+    var station=data.station||{};
+    var title=mobileMetaText(data.title,data.current_title,data.currentTitle,data.nowplaying,data.nowPlaying,data.currenttrack,data.currentTrack,data.current_song,data.currentSong,data.songtitle,data.song,data.track,data.stream_title,data.streamTitle,song.title,song.text,song.name,song.songtitle);
+    var artist=mobileMetaText(data.artist,data.dj,data.djusername,data.presenter,song.artist,song.artist_name,song.dj);
+    var listeners=data.listeners||data.listener_count||data.currentlisteners||data.current_listeners||data.listeners_current||(data.stats&&data.stats.listeners)||'';
+    var bitrate=data.bitrate||data.kbps||data.stream_bitrate||(data.stats&&data.stats.bitrate)||'';
+    var dj=data.dj||data.dj_status||data.live_dj||data.streamer||data.server_name||station.name||data.station_name||data.stream_name||data.name||'';
+    var artwork=data.icon||data.logo||data.artwork||data.image||data.cover||data.cover_url||data.art||station.icon||station.logo||station.image||song.art||'';
+    title=String(title||'').trim();
+    if(invalidMetaText(title))title='';
+    if(!title && mffLastGoodMeta && mffLastGoodMeta.title) title=mffLastGoodMeta.title;
+    var cleanArtist=String(artist||'').trim();
+    if(/no\s*dj|nodj|no-dj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined/i.test(cleanArtist)) cleanArtist='';
+    return{title:title,artist:cleanArtist,listeners:String(listeners||'').trim(),bitrate:String(bitrate||'').trim(),dj:normalizeDj(dj||cleanArtist),artwork:String(artwork||'').trim()};
+  }
+
+  async function fetchOne(url){
+    var res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json,*/*'}});
+    if(!res.ok)throw new Error(url+' '+res.status);
+    var ct=(res.headers.get('content-type')||'').toLowerCase();
+    var text=await res.text();
+    if(invalidMetaText(text)&&ct.indexOf('json')<0)throw new Error('HTML response '+url);
+    try{return JSON.parse(text)}catch(e){}
+    if(invalidMetaText(text))throw new Error('invalid meta text '+url);
+    return text;
+  }
+
+
+  function normalizeHistoryItems(raw){
+    var arr=[];
+    if(!raw) return arr;
+    if(Array.isArray(raw)) arr=raw;
+    else if(Array.isArray(raw.history)) arr=raw.history;
+    else if(Array.isArray(raw.recent)) arr=raw.recent;
+    else if(Array.isArray(raw.songs)) arr=raw.songs;
+    else if(Array.isArray(raw.tracks)) arr=raw.tracks;
+    else if(raw.items && Array.isArray(raw.items)) arr=raw.items;
+    return arr.map(function(item){
+      if(typeof item==='string') return {title:item,artist:''};
+      var song=item.song||item.track||item.now_playing&&item.now_playing.song||{};
+      var title=item.title||item.name||item.text||item.current_song||song.text||song.title||'';
+      var artist=item.artist||song.artist||item.dj||item.streamer||'';
+      var time=item.time||item.played_at||item.timestamp||item.date||'';
+      return {title:String(title||'').trim(),artist:String(artist||'').trim(),time:String(time||'').trim()};
+    }).filter(function(x){return x.title;}).slice(0,18);
+  }
+
+  function pushLocalHistory(meta){
+    if(!meta || !meta.title) return;
+    var title=String(meta.title||'').trim();
+    if(!title || title===lastHistoryTitle) return;
+    lastHistoryTitle=title;
+    localHistory.unshift({
+      title:title,
+      artist:String(meta.artist||'').trim(),
+      time:new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    });
+    localHistory=localHistory.slice(0,18);
+  }
+
+  function renderHistory(items,source){
+    var box=q('#mffHistoryList');
+    if(!box) return;
+    var list=(items&&items.length)?items:localHistory;
+    if(!list || !list.length){
+      box.innerHTML='<div class="mff-history-empty">No history data available yet.</div>';
+      return;
+    }
+    box.innerHTML=list.slice(0,18).map(function(item,idx){
+      var sub=(item.artist||item.time||source||'');
+      return '<div class="mff-history-item">'+
+        '<div class="mff-history-num">'+String(idx+1).padStart(2,'0')+'</div>'+
+        '<div><div class="mff-history-title">'+escapeHtml(item.title||'Unknown title')+'</div>'+
+        '<div class="mff-history-sub">'+escapeHtml(sub||'played')+'</div></div></div>';
+    }).join('');
+  }
+
+  function escapeHtml(str){
+    return String(str||'').replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  async function fetchHistory(){
+    for(var i=0;i<HISTORY_ENDPOINTS.length;i++){
+      try{
+        var raw=await fetchOne(HISTORY_ENDPOINTS[i]+'?ts='+Date.now());
+        var items=normalizeHistoryItems(raw);
+        if(items.length) return {items:items,source:HISTORY_ENDPOINTS[i]};
+      }catch(e){}
+    }
+    return {items:localHistory,source:'local'};
+  }
+
+  async function toggleHistory(force){
+    var app=q('#mffApp');
+    if(!app) return;
+    var open=app.getAttribute('data-history-open')==='1';
+    var next=(typeof force==='boolean')?force:!open;
+    app.setAttribute('data-history-open',next?'1':'0');
+    var overlay=q('#mffHistoryOverlay');
+    if(overlay) overlay.setAttribute('aria-hidden',next?'false':'true');
+    if(next){
+      renderHistory(localHistory,'local');
+      try{
+        var h=await fetchHistory();
+        renderHistory(h.items,h.source);
+      }catch(e){
+        renderHistory(localHistory,'local');
+      }
+    }
+  }
+
+
+
+
+  /* v34 removed conflicting helper from later builds: mffTextOf */
+
+
+  /* v34 removed conflicting helper from later builds: normalizePanelMeta */
+
+
+  /* v34 removed conflicting helper from later builds: schedulePanelLedUpdate */
+
+
+
+  var manualStreamTarget='main';
+
+  function getStreamUrlForTarget(target){
+    if(target==='backup'){
+      return (typeof BACKUP_STREAM_URL!=='undefined' && BACKUP_STREAM_URL) ? BACKUP_STREAM_URL : STREAM_URL;
+    }
+    return (typeof PRIMARY_STREAM_URL!=='undefined' && PRIMARY_STREAM_URL) ? PRIMARY_STREAM_URL : STREAM_URL;
+  }
+
+  function setManualStreamTarget(target){
+    manualStreamTarget=(target==='backup')?'backup':'main';
+    document.documentElement.setAttribute('data-manual-stream-target',manualStreamTarget);
+    updateStreamSwitchButtons();
+
+    var a=getAudio();
+    var wasPlaying=false;
+    try{wasPlaying=!!(a && !a.paused && !a.ended);}catch(e){}
+
+    try{
+      if(a){
+        a.pause();
+        a.removeAttribute('src');
+        a.load();
+        a.setAttribute('src',getStreamUrlForTarget(manualStreamTarget));
+      }
+    }catch(e){}
+
+    setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});
+    if(wasPlaying){setTimeout(play,120);}
+  }
+
+  function updateStreamSwitchButtons(){
+    qa('#mffStreamSwitch .mff-stream-btn').forEach(function(btn){
+      var target=btn.getAttribute('data-stream-target')||'main';
+      btn.classList.toggle('is-active',target===manualStreamTarget);
+      btn.setAttribute('aria-pressed',target===manualStreamTarget?'true':'false');
+    });
+  }
+
+  function bindTransportHardFeedback(app){
+    if(app.__mffTransportHardFeedbackBound) return;
+    app.__mffTransportHardFeedbackBound=true;
+
+    function detectRole(btn){
+      if(!btn) return '';
+      var a=btn.getAttribute('data-action')||btn.getAttribute('data-mff-action')||'';
+      if(/^(play|start|stream-play|transport-play)$/.test(a)) return 'play';
+      if(/^(pause|stream-pause|transport-pause)$/.test(a)) return 'pause';
+      if(/^(stop|stream-stop|transport-stop)$/.test(a)) return 'stop';
+      var t=String(btn.textContent||btn.getAttribute('aria-label')||btn.title||'').trim().toLowerCase();
+      if(/▶|►|play/.test(t)) return 'play';
+      if(/pause|⏸|Ⅱ|\|\|/.test(t)) return 'pause';
+      if(/stop|■|▪|square/.test(t)) return 'stop';
+      return '';
+    }
+
+    function onTransportTap(ev){
+      var btn=ev.target&&ev.target.closest?ev.target.closest('button,.mff-control,[data-action],[data-mff-action]'):null;
+      if(!btn || !app.contains(btn)) return;
+      var role=detectRole(btn);
+      if(!role) return;
+
+      // Nur visuelles Feedback hart setzen. Audio-Logik bleibt bei bestehenden Handlern.
+      if(role==='play'){
+        applyTransportVisualState('play');
+      }else if(role==='pause'){
+        applyTransportVisualState('pause');
+      }else if(role==='stop'){
+        applyTransportVisualState('stop');
+      }
+    }
+
+    app.addEventListener('click',onTransportTap,true);
+    app.addEventListener('touchend',onTransportTap,{capture:true,passive:true});
+  }
+
+
+
+  function bindControlActiveFeedback(app){
+    if(app.__mffControlFeedbackBound) return;
+    app.__mffControlFeedbackBound=true;
+    app.addEventListener('click',function(ev){
+      var btn=ev.target&&ev.target.closest?ev.target.closest('.mff-control,[data-action]'):null;
+      if(!btn || !app.contains(btn)) return;
+      var action=btn.getAttribute('data-action')||'';
+      if(action==='plus' || action==='boostUp' || action==='boost-plus' || action==='+' ||
+         action==='minus' || action==='boostDown' || action==='boost-minus' || action==='-'){
+        flashControl(btn,620);
+        updateBoostVisualState(action);
+      }
+    },true);
+    app.addEventListener('touchend',function(ev){
+      var btn=ev.target&&ev.target.closest?ev.target.closest('.mff-control,[data-action]'):null;
+      if(!btn || !app.contains(btn)) return;
+      var action=btn.getAttribute('data-action')||'';
+      if(action==='plus' || action==='boostUp' || action==='boost-plus' || action==='+' ||
+         action==='minus' || action==='boostDown' || action==='boost-minus' || action==='-'){
+        flashControl(btn,620);
+        updateBoostVisualState(action);
+      }
+    },{capture:true,passive:true});
+  }
+
+
+
+  function bindStreamSwitch(app){
+    qa('#mffStreamSwitch .mff-stream-btn',app).forEach(function(btn){
+      if(btn.__mffStreamBound)return;
+      btn.__mffStreamBound=true;
+      var fn=function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        setManualStreamTarget(btn.getAttribute('data-stream-target')||'main');
+      };
+      btn.addEventListener('click',fn,{capture:true});
+      btn.addEventListener('touchend',fn,{passive:false,capture:true});
+    });
+    updateStreamSwitchButtons();
+  }
+
+
+  function setPanelLed(name,state,info){
+    var el=q('#mffPanelLedPanel [data-led="'+name+'"]');
+    if(!el) return;
+    el.setAttribute('data-state',state||'off');
+    if(info) el.setAttribute('data-info',info);
+  }
+
+  function setPanelLedTip(text,anchor){
+    var tip=q('#mffLedTip');
+    if(!tip) return;
+    if(!text){
+      tip.setAttribute('aria-hidden','true');
+      tip.textContent='';
+      tip.style.display='none';
+      return;
+    }
+    tip.textContent=text;
+    tip.style.display='block';
+    tip.setAttribute('aria-hidden','false');
+    try{
+      var r=anchor.getBoundingClientRect();
+      tip.style.left=Math.max(12,Math.min(window.innerWidth-220,r.left-72))+'px';
+      tip.style.top=Math.max(64,r.top-42)+'px';
+    }catch(e){}
+    clearTimeout(window.__mffLedTipTimer);
+    window.__mffLedTipTimer=setTimeout(function(){setPanelLedTip('',null)},2600);
+  }
+
+  function bindPanelLedTips(app){
+    qa('#mffPanelLedPanel .mff-panel-led',app).forEach(function(btn){
+      if(btn.__mffLedBound) return;
+      btn.__mffLedBound=true;
+      var handler=function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        var label=btn.getAttribute('data-label')||'LED';
+        var state=btn.getAttribute('data-state')||'off';
+        var info=btn.getAttribute('data-info')||'Status';
+        setPanelLedTip(label+': '+state.toUpperCase()+' — '+info,btn);
+      };
+      btn.addEventListener('click',handler,{capture:true});
+      btn.addEventListener('touchend',handler,{passive:false,capture:true});
+    });
+  }
+
+
+  /* v34 removed conflicting helper from later builds: mffIsPlayingRuntime */
+
+
+  /* v34 removed conflicting helper from later builds: mffHasVisibleNowPlaying */
+
+
+  /* v34 removed conflicting helper from later builds: mffHasRuntimeSource */
+
+
+  /* v34 removed conflicting helper from later builds: mffIsBackupRuntime */
+
+
+
+  function inferActiveStream(meta){
+    if(manualStreamTarget==='backup') return 'backup';
+    var text='';
+    try{
+      text=[
+        document.documentElement.getAttribute('data-active-stream')||'',
+        document.documentElement.getAttribute('data-stream-target')||'',
+        document.documentElement.getAttribute('data-active-stream-target')||'',
+        meta&&meta.source||'',
+        meta&&meta.stream||'',
+        meta&&meta.stream_url||'',
+        meta&&meta.url||'',
+        meta&&meta.server||'',
+        meta&&meta.name||''
+      ].join(' ').toLowerCase();
+    }catch(e){}
+    if(/backup|8686|fallback|secondary/.test(text)) return 'backup';
+    return 'main';
+  }
+
+  function setPanelLedsFromMeta(meta){
+    setPanelLed('worker','ok','Mobile UI Runtime läuft');
+
+    var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
+    var sourceOk=false;
+    try{
+      var a=getAudio();
+      sourceOk=!!(a && (a.getAttribute('src') || a.src || a.currentSrc));
+    }catch(e){}
+
+    setPanelLed('source',(playing && sourceOk)?'ok':'warn',(playing && sourceOk)?'Audioquelle läuft':'Streamquelle nicht aktiv');
+
+    var metaOk=!!(meta && (meta.title || meta.artist || meta.dj || meta.bitrate || meta.listeners || meta.artwork));
+    setPanelLed('meta',metaOk?'ok':(playing?'warn':'off'),metaOk?'Metadaten empfangen':(playing?'Metadaten fehlen/leer':'noch keine Metadaten'));
+
+    var active=inferActiveStream(meta);
+    if(playing && sourceOk){
+      if(manualStreamTarget==='backup' || active==='backup'){
+        setPanelLed('main','off','Hauptstream nicht aktiv');
+        setPanelLed('backup','ok','Backupstream aktiv');
+      }else{
+        setPanelLed('main','ok','Hauptstream aktiv');
+        setPanelLed('backup','off','Backupstream nicht aktiv');
+      }
+    }else{
+      setPanelLed('main','off','Hauptstream nicht aktiv');
+      setPanelLed('backup','off','Backupstream nicht aktiv');
+    }
+  }
+
+
+  /* v34 removed conflicting helper from later builds: updatePanelLedsFromRuntime */
+
+
+
+  function setPanelLedsOffline(){
+    setPanelLed('worker','ok','Mobile UI Runtime läuft');
+    setPanelLed('source','warn','Streamquelle nicht aktiv');
+    setPanelLed('meta','off','noch keine Metadaten');
+    setPanelLed('main','off','Hauptstream nicht aktiv');
+    setPanelLed('backup','off','Backupstream nicht aktiv');
+  }
+
+
+  function setPlayerAddressLine(){
+    // v35: sicherer No-Op. Die Playeradresse wird NICHT in die Meta-/Quelle-Zeile geschrieben.
+    ensureBrandRow();
+  }
+
+  function ensureBrandRow(){
+    var old=q('#mffBrandRow');
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+    return;
+  }
+
+  async function fetchMeta(){
+    for(var i=0;i<META_ENDPOINTS.length;i++){
+      var endpoint=META_ENDPOINTS[i];
+      try{
+        var raw=await fetchOne(endpoint+'?ts='+Date.now());
+        var meta=normalizeMeta(raw);
+        if(meta&&(meta.title||meta.listeners||meta.bitrate||meta.dj||meta.artwork)){
+          meta.source=endpoint;
+          return meta;
+        }
+      }catch(e){}
+    }
+    return null;
+  }
+
+
+  /* v34 removed conflicting helper from later builds: setPlayerAddressLine */
+
+
+
+  function applyMeta(meta){
+    if(!meta){
+      setPanelLedsOffline();
+      return;
+    }
+    if(!meta.title && mffLastGoodMeta && mffLastGoodMeta.title) meta.title=mffLastGoodMeta.title;
+    if(meta.title) mffLastGoodMeta.title=String(meta.title||'').trim();
+    if(meta.artwork) mffLastGoodMeta.artwork=String(meta.artwork||'').trim();
+    setPanelLedsFromMeta(meta);
+    pushLocalHistory(meta);
+    var playing=document.documentElement.getAttribute('data-mff-playing')==='1' && !mffUserStopped;
+    if(playing){
+      setMffTickerLiveV113(meta.title||'Loading metadata ...');
+    }else{
+      setMffTickerIdleV113();
+    }
+
+    var h2=q('#mffApp .mff-title h2');
+    if(h2 && playing){
+      var liveDj=normalizeDj(meta.dj||meta.artist||'');
+      h2.textContent=liveDj||'DJ 666';
+    }
+
+    setArtwork(meta.artwork||'');
+
+    var cards=qa('#mffApp .mff-card strong');
+    if(cards[0]) cards[0].innerHTML=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / 250'):'0 / 250';
+    if(cards[1]) cards[1].textContent=meta.bitrate||'Unknown';
+    if(cards[2]) cards[2].innerHTML=normalizeDj(meta.dj);
+    ensureBrandRow();
+  }
+
+  async function tickMeta(){try{var meta=await fetchMeta();if(meta)applyMeta(meta)}catch(e){}}
+  function startMeta(){if(metaTimer)return;tickMeta();metaTimer=setInterval(tickMeta,12000)}
+
+
+  function setAnalyserMode(mode){
+    analyserMode=mode;
+    document.documentElement.setAttribute('data-mff-analyser',mode);
+    var label=q('#mffAnalyserMode');
+    if(label){
+      label.textContent='';
+      label.setAttribute('data-mode',mode);
+    }
+  }
+
+
+  function pseudoNoise(seed){
+    var x=Math.sin(seed*12.9898+78.233)*43758.5453;
+    return x-Math.floor(x);
+  }
+
+  function smoothPulse(t, speed, phase){
+    var v=(Math.sin(t*speed+phase)+1)/2;
+    return v*v*(3-2*v);
+  }
+
+
+
+  function pcClamp(value,min,max){
+    return Math.max(min,Math.min(max,value));
+  }
+
+  function pcFallbackBarValue(index,total,intensity){
+    var t=Date.now()/155;
+    var mirrored=index<(total/2)?index:(total-1-index);
+    var waveA=Math.abs(Math.sin(t+mirrored*.30));
+    var waveB=Math.abs(Math.sin((t*.66)+mirrored*.17));
+    var contour=1.16-((mirrored/Math.max(1,total/2))*.38);
+    return 14+((waveA*68)+(waveB*18))*contour*intensity;
+  }
+
+  /* v23 removed old mobile EQ helper: pcPxToPercent */
+
+
+  function pcSetSideMeterFromPercent(valuePercent){
+    var next=(pcSmoothMeter*.58)+(pcClamp(valuePercent,12,98)*.42);
+    pcSmoothMeter=next;
+    return next/100;
+  }
+
+  function pcApplyBottomCenterOut(bottomBars,meterPercent){
+    if(!bottomBars||!bottomBars.length)return;
+    var mid=(bottomBars.length-1)/2;
+    var level=pcClamp(meterPercent,12,98)/100;
+    for(var i=0;i<bottomBars.length;i++){
+      var dist=Math.abs(i-mid)/mid;
+      var center=1-dist;
+      var pulse=Math.abs(Math.sin(Date.now()/210+i*.13));
+      var shaped=pcClamp((level*.70)+(center*.18)+(pulse*.12),.16,1);
+      bottomBars[i].style.setProperty('--mff-bar-x',shaped.toFixed(3));
+      bottomBars[i].style.setProperty('--mff-bar-opacity',(.44+shaped*.54).toFixed(2));
+    }
+  }
+
+
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectClamp */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectEnsure */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectFallbackValue */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectWriteBars */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectFallback */
+
+
+  /* v23 removed old mobile EQ helper: pcEqDirectFromAnalyser */
+
+
+
+
+  function mffClamp(v,min,max){return Math.max(min,Math.min(max,v));}
+
+  function mffBoostVisualOffset(){
+    return (boostStage||0)*0.006;
+  }
+
+  function mffMeterHeadroom(v){
+    return mffClamp(v,0.10,0.96);
+  }
+
+
+  function mffCleanEqBars(){
+    return qa('#mffEqBars i');
+  }
+
+  function mffCleanEqEnsure(bars){
+    if(!mffCleanEqValues.length || mffCleanEqValues.length!==bars.length){
+      mffCleanEqValues=new Array(bars.length).fill(.28);
+    }
+  }
+
+  function mffCleanEqReadAnalyser(){
+    try{
+      if(audioGraph && audioGraph.ok && audioGraph.analyser && audioGraph.freqData){
+        audioGraph.analyser.getByteFrequencyData(audioGraph.freqData);
+        var peak=0;
+        for(var i=0;i<audioGraph.freqData.length;i++){
+          if((audioGraph.freqData[i]||0)>peak) peak=audioGraph.freqData[i]||0;
+        }
+        if(peak>8) return audioGraph.freqData;
+      }
+    }catch(e){}
+    return null;
+  }
+
+  function mffCleanEqTargetsFromAnalyser(data,count,boost){
+    var halfBars=Math.max(1,Math.floor(count/2));
+    var analysisWindow=Math.max(8,Math.floor(data.length*0.72));
+    var slice=Math.max(1,Math.floor(analysisWindow/halfBars));
+    var halfValues=[];
+    var globalMax=0;
+
+    /*
+      Direkt am PC-Equalizer-Verhalten orientiert:
+      - halfBars
+      - analysisWindow 72%
+      - pow(i, 1.65) Frequenzbandverteilung
+      - pow(avg / 255, 0.72) Bar-Shaping
+      - contour-Absenkung in höheren Bändern
+    */
+    for(var i=0;i<halfBars;i++){
+      var total=0;
+      var countBins=0;
+      var start=Math.floor(Math.pow(i/Math.max(1,halfBars-1),1.65)*Math.max(1,analysisWindow-slice));
+      var end=Math.min(analysisWindow,start+slice);
+
+      for(var j=start;j<end;j++){
+        var v=data[j]||0;
+        total+=v;
+        countBins++;
+      }
+
+      var avg=countBins?(total/countBins):0;
+      globalMax=Math.max(globalMax,avg);
+
+      var shaped=Math.pow(avg/255,0.72);
+      var contour=1.16-((i/Math.max(1,halfBars-1))*0.36);
+      var value=.16 + shaped*contour*.92 + (boost||0)*.010;
+      halfValues.push(mffClamp(value,.13,.86));
+    }
+
+    var targets=[];
+    for(var b=0;b<count;b++){
+      var mirroredIndex=b<halfBars?b:(count-1-b);
+      targets.push(halfValues[Math.min(mirroredIndex,halfValues.length-1)]||.14);
+    }
+
+    return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.14,.96), mode:'pc-code-real'};
+  }
+
+  function mffCleanEqTargetsSynthetic(count,playing,boost){
+    var half=Math.max(1,Math.floor(count/2));
+    var targets=[];
+    var intensity=(playing?1.0:0.36)+(boost||0)*0.018;
+
+    /*
+      v26:
+      An PC js/equalizer.js ausgerichtet.
+      Kein "organic random", sondern organisierte PC-Fallback-Welle:
+      mirroredIndex, waveA, waveB, contour.
+      Das wirkt strukturierter wie PC, statt wie künstliches Algorithmus-Flackern.
+    */
+    mffCleanEqPhase += playing ? 0.092 : 0.038;
+
+    var t=mffCleanEqPhase;
+    var peak=.14;
+
+    for(var i=0;i<count;i++){
+      var mirroredIndex=i<half?i:(count-1-i);
+      var pos=mirroredIndex/Math.max(1,half-1);
+
+      var waveA=Math.abs(Math.sin(t + mirroredIndex*0.30));
+      var waveB=Math.abs(Math.sin((t*0.66) + mirroredIndex*0.17));
+      var waveC=Math.abs(Math.sin((t*0.31) + mirroredIndex*0.39));
+
+      var contour=1.16-(pos*0.38);
+      var value=.14 + ((waveA*.52)+(waveB*.18)+(waveC*.07))*contour*intensity;
+
+      // PC-artige ruhige Begrenzung, kein Vollanschlag.
+      value=mffClamp(value,.13,.82);
+      targets.push(value);
+      peak=Math.max(peak,value);
+    }
+
+    return {targets:targets, level:peak, mode:'pc-code-fallback'};
+  }
+
+  function mffCleanEqRender(playing){
+    var bars=mffCleanEqBars();
+    if(!bars.length) return .14;
+
+    mffCleanEqEnsure(bars);
+    var boost=boostStage||0;
+    var data=mffCleanEqReadAnalyser();
+    var pack=data
+      ? mffCleanEqTargetsFromAnalyser(data,bars.length,boost)
+      : mffCleanEqTargetsSynthetic(bars.length,playing,boost);
+
+    /*
+      PC-Look: bars sind organisiert, aber nicht permanent gleich schnell.
+      Wichtig: eine einzige Stelle schreibt transform/opacity.
+    */
+    var peak=.14;
+    var inertia=pack.mode==='pc-code-real'?0.58:0.64;
+
+    for(var i=0;i<bars.length;i++){
+      var prev=mffCleanEqValues[i]||.22;
+      var target=pack.targets[i]||.14;
+
+      // leicht unterschiedliche Inertia nach Frequenzzone,
+      // aber konstant/deterministisch, kein Layer, kein Random.
+      var zone=i/Math.max(1,bars.length-1);
+      var localInertia=mffClamp(inertia + (zone*.035),0.58,0.70);
+      var next=(prev*localInertia)+(target*(1-localInertia));
+
+      mffCleanEqValues[i]=next;
+      peak=Math.max(peak,next);
+
+      bars[i].style.setProperty('--mff-eq-scale',next.toFixed(3));
+      bars[i].style.setProperty('--mff-eq-opacity',(0.48+next*.50).toFixed(3));
+      bars[i].style.transform='scaleY('+next.toFixed(3)+')';
+      bars[i].style.opacity=(0.48+next*.50).toFixed(3);
+    }
+
+    var app=q('#mffApp');
+    if(app){
+      app.setAttribute('data-mff-eq-engine','pc-match-v26');
+      app.setAttribute('data-mff-meter-mode',pack.mode);
+    }
+
+    // Meter folgt Peak, aber mit Headroom und ohne Boost-Sättigung.
+    var bottomLevel=mffMeterHeadroom((peak*.90)+mffBoostVisualOffset());
+    updateBottomCenterOutSegments(bottomLevel,boost);
+    document.documentElement.style.setProperty('--mff-level',bottomLevel.toFixed(3));
+    return bottomLevel;
+  }
+
+
+  function updateBottomCenterOutSegments(level, boost){
+    var bars=qa('#mffBottomBars i');
+    if(!bars.length) return;
+    var n=bars.length;
+    var half=Math.floor(n/2);
+    var active=Math.max(1,Math.min(half-1,Math.round(Math.min(level,.96)*half)));
+    var pulse=(Math.sin(Date.now()/210)+1)/2;
+    var boosted=(boost||0)*0.012;
+
+    for(var i=0;i<n;i++){
+      var isLeft=i<half;
+      var distFromCenter=isLeft?(half-1-i):(i-half);
+      var on=distFromCenter<active;
+      var falloff=1-(distFromCenter/Math.max(1,half));
+      var glow=Math.max(0.22,Math.min(1,falloff*level + pulse*0.10 + boosted));
+
+      bars[i].classList.toggle('mff-seg-on',on);
+      bars[i].style.setProperty('--mff-bar-on',on?'1':'0');
+      bars[i].style.setProperty('--mff-bar-opacity',on?(0.55+glow*0.45).toFixed(2):'0.24');
+      bars[i].style.setProperty('--mff-bar-scale',on?(0.72+glow*0.28).toFixed(3):'0.55');
+    }
+  }
+
+  /* v23 removed old mobile EQ helper: forceEqVisibleMotion */
+
+
+
+  function syntheticMeterMotion(playing,reason){
+    return mffCleanEqRender(!!playing);
+  }
+
+
+
+  function pcMobileEqTimerTick(){
+    if(!isMobile()) return;
+    var audio=null;
+    try{audio=getAudio();}catch(e){}
+    var attrPlaying=document.documentElement.getAttribute('data-mff-playing')==='1';
+    var audioPlaying=!!(audio && !audio.paused && !audio.ended);
+    var playing=attrPlaying || audioPlaying;
+    mffCleanEqRender(playing);
+    pcMobileEqLastTick=Date.now();
+  }
+
+  function startPcMobileEqTimer(){
+    if(pcMobileEqTimer) return;
+    if(window.__s666MobileEqTimer){
+      try{window.clearInterval(window.__s666MobileEqTimer);}catch(e){}
+      window.__s666MobileEqTimer=null;
+    }
+    pcMobileEqTimer=window.setInterval(pcMobileEqTimerTick,110);
+    window.__s666MobileEqTimer=pcMobileEqTimer;
+    pcMobileEqTimerTick();
+    document.documentElement.setAttribute('data-mff-mobile-eq-engine','pc-eq-match-v111-single-loop');
+  }
+
+
+  function averageRange(arr,start,end){
+    var sum=0,count=0;
+    for(var i=start;i<end&&i<arr.length;i++){sum+=arr[i];count++;}
+    return count?sum/count:0;
+  }
+
+  function updateEqFromAnalyser(graph,playing){
+    return mffCleanEqRender(!!playing);
+  }
+
+  function animate(){
+    // v20: Keine separate RAF-Meterengine mehr.
+    // Die einzige aktive Meter-Schleife ist startPcMobileEqTimer() im 110ms-PC-Takt.
+    rafStarted=false;
+  }
+
+  function install(){
+    if(!document.body)return;
+    document.documentElement.setAttribute('data-smfp-version',VERSION);
+    document.body.setAttribute('data-smfp-active',isMobile()?'1':'0');
+    if(!isMobile())return;
+    var app=buildApp();
+    purgeMobileVisualizerLayers(app);
+    ensureMobileVersionInControlRow(app);
+    killOldDom();
+    startMeta();
+    startPcMobileEqTimer();
+    installMffAudioSelfHealEvents();
+  }
+
+  document.addEventListener('DOMContentLoaded',function(){install();setTimeout(install,150);setTimeout(install,650);setTimeout(install,1500);setTimeout(install,3200);setTimeout(install,6000)});
+  window.addEventListener('load',install,{passive:true});
+  window.addEventListener('resize',install,{passive:true});
+  window.addEventListener('orientationchange',install,{passive:true});
+})();
+</script>
+
+
+  <script>
+    window.S666_DISCORD_PLAYER_CONFIG = {
+      radioName: '666SOUNDsDESIGn WebRadio',
+      domain: 'webradio.666soundsdesign-broadcaster.com',
+      playerUrl: 'https://webradio.666soundsdesign-broadcaster.com',
+      streamUrl: 'https://webradio.666soundsdesign-broadcaster.com/api/radio/stream',
+      discordInfo: 'Discord: 666SOUNDsDESIGn Cyber Radio Community',
+      embedInfo: 'Embed info: Web radio stream via https://webradio.666soundsdesign-broadcaster.com/api/radio/stream',
+      endpointManual: '/api/discord/manual',
+      endpointStatus: '/api/discord/status',
+      endpointNowPlaying: '/api/discord/nowplaying',
+      endpointMessage: '/api/discord/message',
+      autoPostTrackChanges: true,
+      trackPollMs: 15000,
+      manualButtonText: 'DC',
+      messageButtonText: 'MSG',
+      previewImage: 'https://webradio.666soundsdesign-broadcaster.com/assets/icons/icon-512x512.png'
+    };
+  </script>
+  
+<script id="v98SafeResyncJs">
+(function(){
+  'use strict';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
+  function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
+  function syncVersion(){
+    document.documentElement.setAttribute('data-smfp-version',VERSION);
+    var pc=document.querySelector('#pcVersionBadge .status-code');
+    setText(pc,VERSION);
+    document.querySelectorAll('.smfp-version-badge').forEach(function(n){ setText(n,VERSION); });
+    var app=document.getElementById('mffApp');
+    if(app) app.setAttribute('data-version',VERSION);
+  }
+  function lockMobileViewport(){
+    var isMobile=window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+    if(!isMobile) return;
+    document.body.setAttribute('data-smfp-active','1');
+    var app=document.getElementById('mffApp');
+    if(app){
+      app.style.position='fixed';
+      app.style.inset='0';
+      app.style.width='100vw';
+      app.style.height='100dvh';
+      app.style.overflow='hidden';
+    }
+  }
+  function repairHistoryButton(){
+    var app=document.getElementById('mffApp');
+    if(!app) return;
+    var btn=app.querySelector('.mff-history');
+    var overlay=app.querySelector('#mffHistoryOverlay');
+    var backdrop=app.querySelector('#mffHistoryBackdrop');
+    if(!btn || !overlay) return;
+    function setOpen(open){
+      app.setAttribute('data-history-open',open?'1':'0');
+      overlay.setAttribute('aria-hidden',open?'false':'true');
+    }
+    if(!btn.__v98HistoryBound){
+      btn.__v98HistoryBound=true;
+      ['click','touchend'].forEach(function(type){
+        btn.addEventListener(type,function(ev){ev.preventDefault();ev.stopPropagation();setOpen(app.getAttribute('data-history-open')!=='1');},{capture:true,passive:false});
+      });
+    }
+    app.querySelectorAll('[data-mff-history-close],.mff-history-close').forEach(function(close){
+      if(close.__v98HistoryCloseBound) return;
+      close.__v98HistoryCloseBound=true;
+      ['click','touchend'].forEach(function(type){
+        close.addEventListener(type,function(ev){ev.preventDefault();ev.stopPropagation();setOpen(false);},{capture:true,passive:false});
+      });
+    });
+    if(backdrop && !backdrop.__v98HistoryCloseBound){
+      backdrop.__v98HistoryCloseBound=true;
+      ['click','touchend'].forEach(function(type){
+        backdrop.addEventListener(type,function(ev){ev.preventDefault();ev.stopPropagation();setOpen(false);},{capture:true,passive:false});
+      });
+    }
+  }
+  function boot(){syncVersion();lockMobileViewport();repairHistoryButton();}
+  document.addEventListener('DOMContentLoaded',boot,{passive:true});
+  window.addEventListener('load',boot,{passive:true});
+  window.addEventListener('resize',function(){setTimeout(boot,40);},{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(boot,180);},{passive:true});
+  [120,500,1300,2600,5200].forEach(function(ms){setTimeout(boot,ms);});
+})();
+</script>
+
+
+
+
+
+<!-- v140 PC SIDE ADDON ROOT REACTIVITY — replaces old addon card stack; no player-core/ticker/transport changes -->
+<script id="v140PcSideAddonContentScript">
+(function(){
+  'use strict';
+  /*
+    v140 PC SIDE ADDON ROOT REACTIVITY FIX
+    Zweck: bestehende sechs Add-on-Module an dieselbe vorhandene EQ-/Levelmeter-Reaktionsquelle koppeln.
+    Kein neuer Layer, kein neuer Canvas, kein neuer Audio-Graph. Der vorhandene v138-Intervall wird ersetzt.
+  */
+  var timer=null;
+  var smoothed=.36, last=.36, phase=0;
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn,{once:true}); else fn(); }
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function readVisualLevel(el){
+    if(!el) return 0;
+    var ds = el.dataset || {};
+    if(ds.level){ var dl=parseFloat(ds.level); if(Number.isFinite(dl)) return clamp(dl,0,1); }
+    var st = getComputedStyle(el);
+    var h = st.height || el.style.height || '';
+    var n = parseFloat(h);
+    if(Number.isFinite(n)){
+      if(String(h).indexOf('%')>=0) return clamp(n/100,0,1);
+      var ph = el.parentElement ? el.parentElement.getBoundingClientRect().height : 0;
+      if(ph>0) return clamp(n/ph,0,1);
+    }
+    var scale = (st.transform || '').match(/matrix\(([^)]+)\)/);
+    if(scale){
+      var parts=scale[1].split(',').map(function(x){return parseFloat(x.trim());});
+      if(parts.length>=6 && Number.isFinite(parts[3])) return clamp(Math.abs(parts[3]),0,1);
+    }
+    var r=el.getBoundingClientRect();
+    var pr=el.parentElement ? el.parentElement.getBoundingClientRect() : null;
+    if(pr && pr.height>0 && r.height>0) return clamp(r.height/pr.height,0,1);
+    return 0;
+  }
+  function collectLevels(){
+    var vals=[];
+    var eq=[];
+    var left=[];
+    var right=[];
+    var bottom=[];
+
+    function pushTo(bucket, el){
+      var v=readVisualLevel(el);
+      if(Number.isFinite(v) && v>0.012){
+        v=clamp(v,0,1);
+        vals.push(v);
+        bucket.push(v);
+      }
+    }
+
+    document.querySelectorAll('#eqBars .eq-bar-fill, .visualizer .eq-bars .eq-bar-fill').forEach(function(el){ pushTo(eq, el); });
+    document.querySelectorAll('#leftMeterA,#leftMeterB,#leftMeterC,.side-meter.left .side-meter-fill').forEach(function(el){ pushTo(left, el); });
+    document.querySelectorAll('#rightMeterA,#rightMeterB,#rightMeterC,.side-meter.right .side-meter-fill').forEach(function(el){ pushTo(right, el); });
+    document.querySelectorAll('#pcBottomSyncMeter .pc-bottom-sync-seg.is-on,#pcBottomSyncMeter .pc-bottom-sync-seg.is-active,[data-bottom-meter-seg].is-on,[data-bottom-meter-seg].is-active').forEach(function(el){ pushTo(bottom, el); });
+
+    if(!eq.length){
+      document.querySelectorAll('.eq-bar-fill,.eq-bar,.pc-eq-bar').forEach(function(el){ pushTo(eq, el); });
+    }
+    return {all:vals, eq:eq, left:left, right:right, bottom:bottom};
+  }
+  function avg(list, fallback){
+    if(!list || !list.length) return fallback;
+    return list.reduce(function(a,b){return a+b;},0)/list.length;
+  }
+  function pickVector(list, count, fallback){
+    var src=(list && list.length) ? list : fallback;
+    if(!src || !src.length) src=[.18,.22,.25,.21,.28,.24,.20,.18];
+    var out=[];
+    for(var i=0;i<count;i++){
+      var idx=Math.round((i/Math.max(1,count-1))*(src.length-1));
+      out.push(clamp(src[idx] || .12,.05,1));
+    }
+    return out;
+  }
+  function sampleEnergy(){
+      var bus=window.__MeterBus;
+      if(bus && typeof bus.level==='number' && (Date.now()-bus.ts)<600){
+        var be=clamp(bus.level,.04,1);
+        smoothed=(smoothed*.60)+(be*.40);
+        var bpeak=clamp((bus.peak!=null?bus.peak:bus.level),.04,1);
+        var bpulse=clamp(Math.abs(smoothed-last)*8.0 + smoothed*.72,.06,1);
+        last=smoothed;
+        var bleft=(bus.left&&bus.left.length)?bus.left:[smoothed,bpulse,bpeak];
+        var bright=(bus.right&&bus.right.length)?bus.right:[bpeak,bpulse,smoothed];
+        var beq=(bus.eq&&bus.eq.length)?bus.eq:pickVector([],28,[smoothed,bpulse,bpeak,(smoothed+bpeak)/2]);
+        return {energy:clamp(smoothed,.04,1),peak:bpeak,pulse:bpulse,eq:beq,left:bleft,right:bright,bottom:[]};
+      }
+      var data=collectLevels();
+    var vals=data.all.slice();
+    if(!vals.length){
+      // Standby: bestehende Module bekommen nur einen sanften, einheitlichen Idle-Puls.
+      var t=Date.now()/1000;
+      var idle=.18 + .07*Math.sin(t*1.7);
+      smoothed=(smoothed*.86)+(idle*.14);
+      return {energy:clamp(smoothed,.10,.34), peak:clamp(idle,.10,.36), pulse:clamp(.18 + Math.abs(Math.sin(t*1.7))*.16,.12,.40), eq:pickVector([],12,[]), left:[idle,idle*.86,idle*.72], right:[idle*.75,idle*.92,idle], bottom:[]};
+    }
+    vals.sort(function(a,b){return b-a;});
+    var top=vals.slice(0, Math.min(12, vals.length));
+    var levelAvg=top.reduce(function(a,b){return a+b;},0)/top.length;
+    var peak=vals[0] || levelAvg;
+    smoothed=(smoothed*.58)+(levelAvg*.42);
+    var pulse=clamp(Math.abs(smoothed-last)*8.2 + smoothed*.88,.10,1);
+    last=smoothed;
+    return {
+      energy:clamp(smoothed,.10,1),
+      peak:clamp(peak,.10,1),
+      pulse:pulse,
+      eq:pickVector(data.eq, 28, vals),
+      left:data.left.length?data.left:[levelAvg,pulse,peak],
+      right:data.right.length?data.right:[peak,pulse,levelAvg],
+      bottom:data.bottom
+    };
+  }
+  function setPxVar(root,name,val){ root.style.setProperty(name, val.toFixed(1)+'px'); }
+  function setPctVar(root,name,val){ root.style.setProperty(name, clamp(val,0,1).toFixed(3)); }
+  function setBars(nodes, values){
+    nodes.forEach(function(el,i){
+      var v=values[i % values.length];
+      el.style.height=(clamp(v,.06,.98)*100).toFixed(1)+'%';
+      el.style.transform='scaleY('+(0.94 + clamp(v,.06,.98)*0.12).toFixed(3)+')';
+      el.style.filter='brightness('+(1+v*.62).toFixed(2)+') saturate('+(1+v*.82).toFixed(2)+')';
+      el.style.opacity=(.54+v*.46).toFixed(2);
+      el.style.animation='none';
+    });
+  }
+  function driveExistingModules(e,p,u,vector,leftVec,rightVec){
+    var root=document.documentElement;
+    phase=(phase + 3 + (u*5)) % 360;
+    setPctVar(root,'--pc-addon-energy',e);
+    setPctVar(root,'--pc-addon-peak',p);
+    setPctVar(root,'--pc-addon-pulse',u);
+    setPxVar(root,'--pc-addon-glow',8+p*38);
+    setPctVar(root,'--pc-addon-vu-l1',.10+e*.88);
+    setPctVar(root,'--pc-addon-vu-l2',.12+u*.84);
+    setPctVar(root,'--pc-addon-vu-r1',.10+p*.88);
+    setPctVar(root,'--pc-addon-vu-r2',.12+((e+p)/2)*.84);
+    root.style.setProperty('--pc-addon-phase-angle',(-58 + 116*u).toFixed(1)+'deg');
+    setPctVar(root,'--pc-addon-phase-scale',.72 + e*.48);
+      // v109 Info-Card Status-LEDs (Stream/Meter/Source) aus zentralem Pegel-Bus
+      (function(){
+        var b=window.__MeterBus; var live=!!(b && (Date.now()-b.ts)<700 && b.source!=='synthetic');
+        var ml=clamp(e,0,1);
+        var mc=ml>=.80?'is-red':ml>=.55?'is-pink':ml>=.25?'is-cyan':(live?'is-green':'is-off');
+        document.querySelectorAll('[data-info-led]').forEach(function(el){
+          var k=el.getAttribute('data-info-led');
+          el.classList.remove('is-green','is-cyan','is-pink','is-red','is-off');
+          el.classList.add(k==='meter'?mc:(live?'is-cyan':'is-off'));
+        });
+      })();
+
+    // Direkt an bestehenden Elementen schreiben: gleiche Quelle wie EQ/Levelmeter, kein eigener Fake-Rhythmus.
+    var eq12=pickVector(vector,12,[e,u,p,(e+p)/2]);
+    var eq8=pickVector(vector,8,[u,p,e,(e+p)/2]);
+    var lvu=pickVector(leftVec,2,[e,u]);
+    var rvu=pickVector(rightVec,2,[p,(e+p)/2]);
+    setBars(Array.from(document.querySelectorAll('.pc-addon-waveform i')), eq12);
+    setBars(Array.from(document.querySelectorAll('.pc-addon-beatline i')), eq8);
+    setBars(Array.from(document.querySelectorAll('.pc-addon-vu-grid .pc-vu-channel:first-child i')), lvu);
+    setBars(Array.from(document.querySelectorAll('.pc-addon-vu-grid .pc-vu-channel:last-child i')), rvu);
+
+    document.querySelectorAll('.pc-addon-module').forEach(function(m,idx){
+      var local = clamp((e*.58)+(p*.26)+(u*.16)+((idx%3)*.025),.10,1);
+      m.style.boxShadow='inset 0 0 '+(10+local*24).toFixed(1)+'px rgba(22,255,243,.075), 0 0 '+(7+local*20).toFixed(1)+'px rgba(255,61,187,.14)';
+      m.style.borderColor='rgba(22,255,243,'+(.22+local*.48).toFixed(3)+')';
+    });
+    document.querySelectorAll('.pc-addon-tower').forEach(function(t){
+      t.style.filter='brightness('+(1+e*.22).toFixed(2)+') saturate('+(1+p*.34).toFixed(2)+')';
+    });
+    // v141: Audio Reactor links oben aktiver machen, bestehende Elemente direkt steuern.
+    // Kein neuer Layer, kein neuer Canvas, kein neuer Audio-/RAF-Loop.
+    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-core').forEach(function(el){
+      var coreScale = 0.82 + e*.30 + p*.10;
+      el.style.transform='scale('+coreScale.toFixed(3)+') rotate('+(phase*.42).toFixed(1)+'deg)';
+      el.style.opacity=(.62+e*.36).toFixed(2);
+      el.style.filter='brightness('+(1+e*.42).toFixed(2)+') saturate('+(1+p*.56).toFixed(2)+') drop-shadow(0 0 '+(8+p*32).toFixed(1)+'px rgba(22,255,243,.30)) drop-shadow(0 0 '+(6+u*26).toFixed(1)+'px rgba(255,61,187,.26))';
+      el.style.boxShadow='inset 0 0 '+(10+e*38).toFixed(1)+'px rgba(22,255,243,.15), inset 0 0 '+(8+p*30).toFixed(1)+'px rgba(255,61,187,.12), 0 0 '+(10+p*36).toFixed(1)+'px rgba(22,255,243,.18)';
+    });
+    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-orbit-a').forEach(function(el){
+      el.style.transform='rotate('+(phase*1.15).toFixed(1)+'deg) scale('+(0.94+p*.12).toFixed(3)+')';
+      el.style.borderColor='rgba(22,255,243,'+(.30+e*.45).toFixed(3)+')';
+      el.style.boxShadow='0 0 '+(5+p*18).toFixed(1)+'px rgba(22,255,243,.28)';
+    });
+    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-orbit-b').forEach(function(el){
+      el.style.transform='rotate('+(-phase*.86).toFixed(1)+'deg) scale('+(0.90+u*.16).toFixed(3)+')';
+      el.style.borderColor='rgba(255,61,187,'+(.30+p*.46).toFixed(3)+')';
+      el.style.boxShadow='0 0 '+(5+u*18).toFixed(1)+'px rgba(255,61,187,.28)';
+    });
+    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-wave').forEach(function(el){
+      el.style.transform='scaleX('+(0.48+u*.92).toFixed(3)+') scaleY('+(0.86+p*.42).toFixed(3)+')';
+      el.style.opacity=(.40+p*.58).toFixed(2);
+      el.style.filter='drop-shadow(0 0 '+(8+p*26).toFixed(1)+'px rgba(255,61,187,.44)) drop-shadow(0 0 '+(6+e*20).toFixed(1)+'px rgba(22,255,243,.30))';
+    });
+    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-dot').forEach(function(el){
+      var dot = 0.86 + p*.70;
+      el.style.transform='scale('+dot.toFixed(3)+')';
+      el.style.opacity=(.62+p*.38).toFixed(2);
+      el.style.boxShadow='0 0 '+(12+p*30).toFixed(1)+'px rgba(22,255,243,.90), 0 0 '+(16+u*38).toFixed(1)+'px rgba(255,61,187,.52)';
+    });
+    document.querySelectorAll('.pc-addon-module-reactor footer b').forEach(function(el){
+      el.textContent=Math.round(clamp(.22+e*.78,0,1)*100)+'%';
+    });
+    // v144: Spectrum Grid/Radar originalgetreuer machen.
+    // Bestehende Radar-Elemente werden direkt gesteuert; kein neuer Layer, kein neuer Audio-/RAF-/Interval-Loop.
+    root.style.setProperty('--pc-radar-sweep-scale',(0.90+e*.20).toFixed(3));
+    root.style.setProperty('--pc-radar-glow',(10+p*28).toFixed(1)+'px');
+    document.querySelectorAll('.pc-addon-radar .radar-sweep').forEach(function(el){
+      // Rotation kommt absichtlich aus der CSS-Keyframe-Animation, damit der Zeiger komplett rund und ohne Tick-Reset läuft.
+      el.style.transform='';
+      el.style.opacity=(.48+e*.46).toFixed(2);
+      el.style.filter='drop-shadow(0 0 '+(8+p*24).toFixed(1)+'px rgba(22,255,243,.50)) drop-shadow(0 0 '+(4+u*18).toFixed(1)+'px rgba(255,61,187,.32))';
+    });
+    document.querySelectorAll('.pc-addon-radar em').forEach(function(el,i){
+      var v=[e,u,p,(e+p)/2][i%4];
+      var a=(phase*(.55+(i*.08)) + (i*83) + (u*46)) * Math.PI/180;
+      var r=[25,34,42,19][i%4] + (p*5) - (i%2?u*3:e*2);
+      var x=50 + Math.cos(a)*r;
+      var y=50 + Math.sin(a)*r;
+      var colors=['#16fff3','#ff3dbb','#7f5cff','#ff225d'];
+      var color=colors[(i + Math.floor(phase/90)) % colors.length];
+      var hit=(Math.sin((phase+i*74)*Math.PI/180)+1)/2;
+      el.style.left=clamp(x,10,90).toFixed(1)+'%';
+      el.style.top=clamp(y,10,90).toFixed(1)+'%';
+      el.style.background=color;
+      el.style.transform='scale('+(0.64+v*.92+hit*.18).toFixed(3)+')';
+      el.style.opacity=(.32+v*.48+hit*.20).toFixed(2);
+      el.style.boxShadow='0 0 '+(7+v*18).toFixed(1)+'px '+color+', 0 0 '+(10+p*24).toFixed(1)+'px rgba(22,255,243,.28)';
+    });
+    // v159: Phase Scope root signal motion. Existing elements only; no new layer/loop.
+    var phaseX=50 + Math.cos(phase*Math.PI/180) * (8 + e*9);
+    var phaseY=50 + Math.sin((phase*1.27)*Math.PI/180) * (6 + p*8);
+    root.style.setProperty('--pc-phase-x',clamp(phaseX,28,72).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-y',clamp(phaseY,30,70).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-grid-angle',(70 + Math.sin(phase*Math.PI/180)*18).toFixed(1)+'deg');
+    root.style.setProperty('--pc-phase-skew',(-10 + (u*20)).toFixed(1)+'deg');
+    root.style.setProperty('--pc-phase-grid-scale',(0.94 + e*.10).toFixed(3));
+    root.style.setProperty('--pc-phase-line-y',((-5 + p*10)).toFixed(1)+'px');
+    root.style.setProperty('--pc-phase-cloud-x',((-7 + e*14)).toFixed(1)+'px');
+    root.style.setProperty('--pc-phase-cloud-y',((-5 + u*10)).toFixed(1)+'px');
+    root.style.setProperty('--pc-phase-cloud-rot',(phase*(0.38+p*.42)).toFixed(1)+'deg');
+    root.style.setProperty('--pc-phase-radius',(38 + u*24).toFixed(1)+'% '+(62 - p*20).toFixed(1)+'% '+(48 + e*18).toFixed(1)+'% '+(52 - u*16).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-poly-a',(48 + Math.sin(phase*.017)*10).toFixed(1)+'% '+(2 + u*8).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-poly-b',(96 - e*8).toFixed(1)+'% '+(35 + p*16).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-poly-c',(70 + u*12).toFixed(1)+'% '+(98 - e*7).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-poly-d',(24 - p*8).toFixed(1)+'% '+(88 - u*10).toFixed(1)+'%');
+    root.style.setProperty('--pc-phase-poly-e',(4 + e*8).toFixed(1)+'% '+(36 + p*15).toFixed(1)+'%');
+    document.querySelectorAll('.phase-line').forEach(function(el){
+      el.style.transform='translateY('+((-5+p*10)).toFixed(1)+'px) rotate('+(-70+140*u).toFixed(1)+'deg) scaleX('+(0.58+e*.74).toFixed(3)+')';
+      el.style.opacity=(.42+p*.56).toFixed(2);
+      el.style.filter='brightness('+(1+e*.45).toFixed(2)+') saturate('+(1+p*.62).toFixed(2)+')';
+    });
+    document.querySelectorAll('.phase-cloud').forEach(function(el){
+      el.style.transform='translate('+((-7+e*14)).toFixed(1)+'px,'+((-5+u*10)).toFixed(1)+'px) scale('+(0.74+u*.42).toFixed(3)+') rotate('+(phase*(0.38+p*.42)).toFixed(1)+'deg)';
+      el.style.opacity=(.32+e*.62).toFixed(2);
+      el.style.filter='blur(.2px) brightness('+(1+p*.36).toFixed(2)+') saturate('+(1+u*.58).toFixed(2)+')';
+    });
+  }
+  function syncStateLabels(side,on){
+    var label=document.getElementById(side==='left'?'pcLeftFxState':'pcRightFxState');
+    if(label) label.textContent=on?'ON':'OFF';
+  }
+  function apply(side,on){
+    var cls=side==='left'?'pc-left-addon-off':'pc-right-addon-off';
+    document.body.classList.toggle(cls,!on);
+    var btn=document.getElementById(side==='left'?'pcLeftFxToggle':'pcRightFxToggle');
+    if(btn){btn.classList.toggle('is-on',on);btn.setAttribute('aria-pressed',on?'true':'false');}
+    syncStateLabels(side,on);
+    try{localStorage.setItem('s666_'+side+'_addon_fx',on?'on':'off');}catch(e){}
+  }
+  function initial(side){try{return localStorage.getItem('s666_'+side+'_addon_fx')!=='off';}catch(e){return true;}}
+  function bind(){
+    var leftBtn=document.getElementById('pcLeftFxToggle');
+    var rightBtn=document.getElementById('pcRightFxToggle');
+    apply('left',initial('left'));
+    apply('right',initial('right'));
+    if(leftBtn && !leftBtn.dataset.v140Bound){leftBtn.dataset.v140Bound='1';leftBtn.addEventListener('click',function(){apply('left',!leftBtn.classList.contains('is-on'));});}
+    if(rightBtn && !rightBtn.dataset.v140Bound){rightBtn.dataset.v140Bound='1';rightBtn.addEventListener('click',function(){apply('right',!rightBtn.classList.contains('is-on'));});}
+  }
+  function tick(){
+    var s=sampleEnergy();
+    driveExistingModules(s.energy,s.peak,s.pulse,s.eq,s.left,s.right);
+  }
+  function boot(){
+    bind();
+    if(window.matchMedia && !window.matchMedia('(min-width:1221px)').matches) return;
+    if(!timer){ tick(); timer=setInterval(tick,160); }
+  }
+  ready(boot);
+  window.addEventListener('load',boot,{passive:true});
+})();
+</script>
+
+
+
+<!-- v141 PC AUDIO REACTOR BOOST — existing left-top Audio Reactor only; no new layer/loop -->
+<!-- v144 PC SPECTRUM GRID SMOOTH RADAR — existing Spectrum Grid only; no new layer/loop -->
+
+<!-- v144 PC SPECTRUM GRID SMOOTH RADAR — existing Spectrum Grid only; no new layer/loop -->
+<!-- v145 PC VU MATRIX ROOT REACTIVITY — existing VU Matrix only; no new layer/loop -->
+
+
+<!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
+<script id="v159CacheBustVersionGuard">
+(function(){
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
+  var BUILD='smfp-v181-backend-kv-iphone-ui-20260519';
+  try{document.documentElement.setAttribute('data-smfp-version',VERSION);document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
+  function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
+  function apply(){
+    setText(document.getElementById('pcVersionBadge'));
+    document.querySelectorAll('.status-code,.smfp-version-badge').forEach(function(el){ if((el.textContent||'').match(/^v\d+$/)) el.textContent=VERSION; });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true}); else apply();
+  window.addEventListener('load',apply,{once:true});
+})();
+</script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-06-19-repair1" defer></script>
+
+
+<!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
+
+
+<!-- V116 SAFE LAYOUT BOUNDS FIX
+     Scope: only spacing/bounds for existing PC/iPhone containers. No DOM, ticker, EQ engine, Discord, Worker, Stream or transport changes. -->
+
+
+
+<!-- v133 BASE PC LAYOUT CLAMP — compact footer/meter repair, wins after legacy styles -->
+
+
+
+<!-- v133 PC MICRO-FIX — compact Discord row, split bottom meter, true cyan ticker -->
+
+
+
+<!-- v133 PC DISCORD ROW + TRUE CYAN TICKER CLEANUP
+     Scope: PC panel fitting + ticker color cleanup only. No DOM, no transport, no stream, no Discord logic. -->
+
+
+
+<!-- v133 PC BOTTOM HUD PROPORTION FIX
+     Scope: PC bottom meter + copyright/footer proportions only.
+     No ticker logic, no transport, no iPhone, no Discord/Worker/Stream changes. -->
+
+
+
+<!-- v133 PC BOTTOM METER WIDTH + FOOTER COLOR CORRECTION
+     Scope: PC bottom HUD only + ticker text color. No DOM, transport, iPhone, Discord logic, Worker or Stream changes. -->
+
+
+
+
+<!-- v133 PC SIDE ADDON WIDTH/CENTER + TRIPLE SIDE METERS — surgical PC-only geometry fix -->
+
+
+
+<!-- v138 PC SIDE ADDON REANCHOR — player-wrapper based geometry; no player-core/ticker/transport changes -->
+
+
+
+
+<!-- SMFP_v159_PC_REAL_EQ_PANEL_STYLE -->
+
+<script id="smfpRealEqPanelV154Boot">
+(function(){
+  function bind(){
+    var panel=document.getElementById('pcRealEqPanel');
+    if(!panel || panel.__smfpEqStandaloneBound)return;
+    panel.__smfpEqStandaloneBound=true;
+    panel.querySelectorAll('[data-smfp-eq]').forEach(function(input){
+      input.addEventListener('pointerdown',function(ev){ev.stopPropagation();},{capture:true});
+      input.addEventListener('click',function(ev){ev.stopPropagation();},{capture:true});
+    });
+    try{ if(typeof window.__smfpRealEqApply==='function') window.__smfpRealEqApply(); }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded',bind,{passive:true});
+  window.addEventListener('load',bind,{passive:true});
+  setTimeout(bind,300); setTimeout(bind,1400);
+})();
+</script>
+
+<script id="smfpPlayerAlertV152Script">
+(function(){
+  if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
+  var SEND_URL='/api/player-alert/send';
+  var CURRENT_URL='/api/player-alert/current';
+  var RATE_MS=180000;
+  function sid(){try{var k='smfpPlayerAlertSenderId';var v=localStorage.getItem(k);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v);}return v;}catch(e){return 'smfp-session-'+Math.random().toString(36).slice(2,10);}}
+  var senderId=sid();
+  var lastSeen='';
+  function clean(text){return String(text||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
+  function ensureReceiveOverlay(){
+    var b=document.getElementById('playerAlertReceiveBackdrop'); if(b)return b;
+    b=document.createElement('div'); b.id='playerAlertReceiveBackdrop'; b.className='player-alert-backdrop';
+    b.innerHTML='<div class="player-alert-modal" role="dialog" aria-modal="true"><h3>666SOUNDsDESIGn PLAYER MESSAGE</h3><div id="playerAlertReceiveText" class="player-alert-message"></div><button id="playerAlertReceiveClose" class="player-alert-close" type="button">CLOSE</button></div>';
+    document.body.appendChild(b);
+    function close(){b.classList.remove('is-open');}
+    b.addEventListener('click',function(ev){if(ev.target===b)close();},true);
+    b.querySelector('#playerAlertReceiveClose').addEventListener('click',close,true);
+    return b;
+  }
+  function showReceived(msg){
+    var b=ensureReceiveOverlay(); var t=b.querySelector('#playerAlertReceiveText'); if(t)t.textContent=String(msg||''); b.classList.add('is-open');
+  }
+  function setDisabled(btn,ms){
+    if(!btn)return; btn.disabled=true; var sec=Math.ceil(ms/1000); btn.textContent='WAIT '+sec;
+    var iv=setInterval(function(){sec-=1;if(sec<=0){clearInterval(iv);btn.disabled=false;btn.textContent='SEND';}else btn.textContent='WAIT '+sec;},1000);
+  }
+  async function sendMessage(text, btn){
+    var msg=clean(text); if(!msg){return;}
+    try{
+      var res=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:senderId,source:'player',version:VERSION}),cache:'no-store'});
+      var data={}; try{data=await res.json();}catch(e){}
+      if(res.status===429){setDisabled(btn,Math.max(1000,Number(data.retryAfterMs||RATE_MS)));return;}
+      if(!res.ok)throw new Error(data.error||'send_failed');
+      if(data.id) lastSeen=String(data.id);
+      setDisabled(btn,RATE_MS);
+    }catch(err){console.warn('player alert send failed',err);}
+  }
+  function bindPc(){
+    var btn=document.getElementById('playerAlertPcSend'); var text=document.getElementById('playerAlertPcText');
+    if(!btn||!text||btn.__smfpAlertBound)return;
+    btn.__smfpAlertBound=true; btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=text.value; sendMessage(v,btn); text.value='';},true);
+  }
+  function ensureMobileButton(){
+    var app=document.getElementById('mffApp'); if(!app)return; var slot=app.querySelector('.mff-discord-slot'); if(!slot)return;
+    if(!app.querySelector('#mffAlertOpen')){var btn=document.createElement('button');btn.id='mffAlertOpen';btn.className='mff-alert-open';btn.type='button';btn.textContent='SEND';slot.appendChild(btn);}
+    else { var existing=app.querySelector('#mffAlertOpen'); if(existing && existing.parentNode!==slot) slot.appendChild(existing); }
+    if(!document.getElementById('mffAlertEditorBackdrop')){
+      var b=document.createElement('div');b.id='mffAlertEditorBackdrop';b.className='mff-alert-editor-backdrop';b.setAttribute('aria-hidden','true');
+      b.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
+      document.body.appendChild(b);
+    }
+    var open=app.querySelector('#mffAlertOpen'), back=document.getElementById('mffAlertEditorBackdrop'), cancel=document.getElementById('mffAlertCancel'), send=document.getElementById('mffAlertSend'), ta=document.getElementById('mffAlertText');
+    if(open&&!open.__smfpAlertBound){
+      open.__smfpAlertBound=true;
+      function openEditor(ev){
+        if(ev){ev.preventDefault();ev.stopPropagation();}
+        if(back){back.classList.add('is-open');back.setAttribute('aria-hidden','false');}
+        if(ta){setTimeout(function(){try{ta.focus();}catch(e){}},40);}
+      }
+      open.addEventListener('click',openEditor,true);
+      open.addEventListener('touchend',openEditor,{passive:false,capture:true});
+      open.addEventListener('pointerup',openEditor,{passive:false,capture:true});
+    }
+    function close(){if(back){back.classList.remove('is-open');back.setAttribute('aria-hidden','true');}}
+    if(back&&!back.__smfpAlertBackBound){back.__smfpAlertBackBound=true;back.addEventListener('click',function(ev){if(ev.target===back)close();},true);}
+    if(cancel&&!cancel.__smfpAlertBound){cancel.__smfpAlertBound=true;cancel.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();close();},true);}
+    if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';sendMessage(v,send); if(ta)ta.value=''; close();},true);}
+  }
+  async function poll(){
+    try{var r=await fetch(CURRENT_URL,{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
+  }
+  function boot(){bindPc();ensureMobileButton();ensureReceiveOverlay();}
+  boot(); setInterval(boot,1200); setInterval(poll,10000); setTimeout(poll,1600);
+})();
+</script>
+
+
+<!-- SMFP_v159_PC_DUAL_EQ_TRUE_MIRROR_CLEAN
+     Scope: PC lower now-playing EQ geometry only. Uses the existing left EQ style twice, mirrored right; removes side title text; moves SEND group left; makes slider thumbs visually audio-reactive via existing --mff-level. No new audio/RAF/interval loop. -->
+<!-- SMFP_v159_PC_TICKER_EQ_WIDTH_INNER_DOT_FIX
+     Scope: PC bottom ticker/EQ geometry only. Extends ticker lane slightly, clamps both mirrored EQs to exactly the same total width, moves SEND group left, keeps cyan thumbs with pink audio-reactive inner dot. No transport, ticker logic, stream, worker, iPhone, or new audio loop changes. -->
+<!-- SMFP_v164_RESCUE_CLEAN_SEND_METER_EQ
+     Erstellt: 2026-05-18
+     Geändert: 2026-05-18
+     Zweck: Rettungsfix nach v163: keine Zusatz-Overlay-Layer, Sendestatus am echten vorhandenen Dialog, iPhone-Performance entlasten, unteres Levelmeter beruhigen, PC-Doppel-EQ entfernen.
+     Regeln: Kein neuer Player, keine neue Boost-Engine, kein PC-Layout-Umbau außer Entfernen des zweiten gespiegelten EQ-Panels. -->
+<script id="smfpV164RescueCleanScript">
+(function(){
+  'use strict';
+  if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
+  var SEND_URL='/api/player-alert/send';
+  var SENDER_KEY='smfpPlayerAlertSenderId';
+  function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
+  function qs(s,r){return (r||document).querySelector(s);}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+  function clean(t){return String(t||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
+  function sender(){try{var v=localStorage.getItem(SENDER_KEY);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(SENDER_KEY,v);}return v;}catch(e){return 'smfp-'+Math.random().toString(36).slice(2,10);}}
+  function setVersion(){
+    document.documentElement.setAttribute('data-smfp-version',VERSION);
+    var meta=qs('meta[name="smfp-version"]'); if(meta) meta.setAttribute('content',VERSION);
+    qsa('.smfp-version-badge,.mff-version-inline,#pcVersionBadge').forEach(function(n){ if(/v\d+/i.test(n.textContent||'')) n.textContent=VERSION; });
+  }
+  function removeJunk(){
+    qsa('#mffBroadcastDisplay,#mffInlineBroadcastPanel').forEach(function(n){try{n.remove();}catch(e){}});
+    qsa('#mffAlertEditorBackdrop').forEach(function(n,i){ if(i>0) try{n.remove();}catch(e){} });
+  }
+  function ensureStatus(back){
+    var box=qs('.mff-alert-editor',back||document); if(!box) return null;
+    var s=qs('.smfp-send-status-v164',box);
+    if(!s){s=document.createElement('div');s.className='smfp-send-status-v164';s.setAttribute('aria-live','polite');s.textContent='READY';box.appendChild(s);} return s;
+  }
+  function status(text,type){
+    var s=ensureStatus(qs('#mffAlertEditorBackdrop'));
+    if(!s) return;
+    s.classList.remove('is-ok','is-error'); if(type==='ok')s.classList.add('is-ok'); if(type==='error')s.classList.add('is-error');
+    s.textContent=text;
+  }
+  function ensureEditor(){
+    var back=qs('#mffAlertEditorBackdrop');
+    if(!back){
+      back=document.createElement('div'); back.id='mffAlertEditorBackdrop'; back.className='mff-alert-editor-backdrop'; back.setAttribute('aria-hidden','true');
+      back.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
+      document.body.appendChild(back);
+    }
+    ensureStatus(back);
+    return back;
+  }
+  function openEditor(ev){
+    if(!mobile()) return;
+    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
+    var back=ensureEditor(); back.classList.add('is-open'); back.setAttribute('aria-hidden','false'); status('READY',null);
+    setTimeout(function(){try{qs('#mffAlertText',back).focus();}catch(e){}},60);
+  }
+  function closeEditor(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
+    var back=qs('#mffAlertEditorBackdrop'); if(back){back.classList.remove('is-open'); back.setAttribute('aria-hidden','true');}
+  }
+  async function sendEditor(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
+    var back=ensureEditor(), ta=qs('#mffAlertText',back), btn=qs('#mffAlertSend',back), msg=clean(ta&&ta.value);
+    if(!msg){status('ENTER MESSAGE FIRST','error');try{ta&&ta.focus();}catch(e){} return;}
+    if(btn){btn.disabled=true;btn.textContent='SENDING';}
+    status('SENDING...',null);
+    try{
+      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v177',version:VERSION}),cache:'no-store'});
+      var d={}; try{d=await r.json();}catch(_){ }
+      if(!r.ok || d.ok===false){
+        var m=d.error||d.message||('HTTP '+r.status);
+        if(r.status===429 && (d.retryAfterMs||d.retryAfter)){m='RATE LIMIT — WAIT '+Math.ceil(Number(d.retryAfterMs||d.retryAfter)/1000)+'s';}
+        throw new Error(m);
+      }
+      if(ta) ta.value='';
+      if(btn){btn.textContent='SENT ✓';}
+      status('SENT ✓ MESSAGE DELIVERED','ok');
+      setTimeout(function(){closeEditor();},1300);
+    }catch(e){
+      if(btn){btn.textContent='FAILED';}
+      status('FAILED ✕ '+(e&&e.message?e.message:'CONNECTION ERROR'),'error');
+    }finally{
+      setTimeout(function(){if(btn){btn.disabled=false;btn.textContent='SEND';}},1500);
+    }
+  }
+  function bindSend(){
+    if(!mobile()) return;
+    var app=qs('#mffApp'); if(!app) return;
+    var slot=qs('.mff-discord-slot',app); if(!slot) return;
+    var open=qs('#mffAlertOpen',app);
+    if(!open){open=document.createElement('button');open.id='mffAlertOpen';open.className='mff-alert-open';open.type='button';open.textContent='SEND';slot.appendChild(open);}
+    if(open.parentNode!==slot) slot.appendChild(open);
+    ['pointerup','touchend','click'].forEach(function(t){if(!open['__v164_'+t]){open['__v164_'+t]=true;open.addEventListener(t,openEditor,{capture:true,passive:false});}});
+    var back=ensureEditor(), cancel=qs('#mffAlertCancel',back), send=qs('#mffAlertSend',back);
+    ['pointerup','touchend','click'].forEach(function(t){
+      if(cancel&&!cancel['__v164_'+t]){cancel['__v164_'+t]=true;cancel.addEventListener(t,closeEditor,{capture:true,passive:false});}
+      if(send&&!send['__v164_'+t]){send['__v164_'+t]=true;send.addEventListener(t,sendEditor,{capture:true,passive:false});}
+    });
+    if(!back.__v164Close){back.__v164Close=true;back.addEventListener('pointerup',function(ev){if(ev.target===back)closeEditor(ev);},{capture:true,passive:false});}
+  }
+  var smooth=.45;
+  function readLevel(){
+    var app=qs('#mffApp'); if(!app) return .35;
+    var raw=getComputedStyle(app).getPropertyValue('--mff-level')||getComputedStyle(document.documentElement).getPropertyValue('--mff-level');
+    var n=parseFloat(raw); if(!isFinite(n)) n=.35; return Math.max(.08,Math.min(.88,n));
+  }
+  function calmBottom(){
+    if(!mobile()) return;
+    var app=qs('#mffApp'); if(!app) return;
+    var target=readLevel(); smooth=smooth*.82+target*.18;
+    var scale=(.34+smooth*.72).toFixed(3);
+    var op=(.40+smooth*.48).toFixed(3);
+    app.style.setProperty('--smfp-v164-bottom-scale',scale);
+    app.style.setProperty('--smfp-v164-bottom-opacity',op);
+    var bars=qsa('#mffApp .mff-bottom-bars i');
+    var mid=(bars.length-1)/2;
+    bars.forEach(function(el,i){
+      var dist=Math.abs(i-mid)/(mid||1);
+      var on=smooth>(.12+dist*.38);
+      el.classList.toggle('mff-seg-on',on);
+    });
+  }
+  function boot(){setVersion();removeJunk();bindSend();calmBottom();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
+  window.addEventListener('load',boot,{passive:true});
+  window.addEventListener('resize',function(){setTimeout(boot,120);},{passive:true});
+  window.addEventListener('orientationchange',function(){setTimeout(boot,300);},{passive:true});
+  [200,700,1500,3200].forEach(function(ms){setTimeout(boot,ms);});
+  setInterval(calmBottom,180);
+})();
+</script>
+
+
+
+<!-- SMFP_V181_iPHONE_UI_MESSAGE_BACKEND_SAFE
+     Zweck: iPhone-Player gezielt sortieren ohne PC-Layout/PC-EQ anzufassen.
+     - History aus Now-Playing oben in die Funktionsleiste schieben.
+     - Versionsbadge klein unter das untere Levelmeter setzen, ohne Panel.
+     - Discord-Außenpanel optisch entkernen: nur LED + DC + MSG sichtbar.
+     - SEND-Status LEDs: request/confirmed/failed.
+     - iPhone-Zoom nach Overlay/Textfeld-Fokus verhindern.
+     - Boost LEDs auf 5 Stufen sichtbar machen.
+-->
+<script id="smfpV181IphoneUiScript">
+(function(){
+  'use strict';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.06.17-gui-audit1';
+  var FOOTER_TEXT='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
+  function qs(s,r){return (r||document).querySelector(s)}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+  function app(){return qs('#mffApp')}
+  function setVersion(){
+    try{document.documentElement.setAttribute('data-smfp-version',VERSION);var m=qs('meta[name="smfp-version"]'); if(m)m.setAttribute('content',VERSION);}catch(e){}
+    qsa('.status-code,.smfp-version-badge,.mff-version-inline').forEach(function(el){ if(/v\d+/i.test((el.textContent||'').trim())) el.textContent=VERSION; });
+  }
+  function installVersionFooter(a){
+    if(!a || qs('.smfp-v181-footer-version',a)) return;
+    var bottom=qs('.mff-bottom',a) || qs('.mff-bottom-bars',a);
+    if(!bottom || !bottom.parentNode) return;
+    var f=document.createElement('div'); f.className='smfp-v181-footer-version'; f.textContent=FOOTER_TEXT;
+    bottom.parentNode.insertBefore(f,bottom.nextSibling);
+  }
+  function moveHistory(a){
+    if(!a) return;
+    var h=qs('.mff-history',a); if(!h) return;
+    var slot=qs('.mff-discord-slot',a); if(!slot) return;
+    var lane=qs('.smfp-v181-history-lane',slot);
+    if(!lane){ lane=document.createElement('div'); lane.className='smfp-v181-history-lane'; slot.appendChild(lane); }
+    if(h.parentNode!==lane) lane.appendChild(h);
+    h.style.display='flex';
+  }
+  function flattenDiscord(a){
+    var slot=qs('.mff-discord-slot',a); if(!slot) return;
+    qsa('[data-discord-addon-panel],.s666-discord-panel',slot).forEach(function(p){
+      p.style.background='transparent'; p.style.border='0'; p.style.boxShadow='none'; p.style.padding='0';
+    });
+  }
+  function installSendLeds(a){
+    if(!a || qs('.smfp-v181-send-leds',a)) return;
+    var send=qs('#mffAlertOpen',a) || qs('.mff-alert-open',a) || qs('button[data-action="send"]',a);
+    if(!send || !send.parentNode) return;
+    var leds=document.createElement('span'); leds.className='smfp-v181-send-leds'; leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
+    send.parentNode.insertBefore(leds,send.nextSibling);
+  }
+  function installBoostLed5(a){
+    var wrap=qs('.mff-boost-led-wrap',a); if(!wrap || qs('.mff-boost-led[data-led="5"]',wrap)) return;
+    var led=document.createElement('span'); led.className='mff-boost-led'; led.setAttribute('data-led','5'); wrap.appendChild(led);
+  }
+  function sendState(s){ var a=app(); if(!a)return; a.setAttribute('data-send-state',s||'idle'); clearTimeout(window.__smfpV181SendStateTimer); if(s==='ok'||s==='fail') window.__smfpV181SendStateTimer=setTimeout(function(){var b=app(); if(b)b.setAttribute('data-send-state','idle')},3600); }
+  function patchFetchStatus(){
+    if(window.__smfpV181FetchPatched) return; window.__smfpV181FetchPatched=true;
+    var real=window.fetch;
+    window.fetch=function(input,init){
+      var url=String((input&&input.url)||input||'');
+      var isSend=url.indexOf('/api/player-alert/send')>=0;
+      if(isSend) sendState('sending');
+      return real.apply(this,arguments).then(function(res){ if(isSend) sendState(res && res.ok ? 'ok':'fail'); return res; }).catch(function(err){ if(isSend) sendState('fail'); throw err; });
+    };
+  }
+  function lockViewport(){
+    if(window.__smfpV181ViewportPatched) return; window.__smfpV181ViewportPatched=true;
+    var y=0;
+    document.addEventListener('focusin',function(e){ if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){ y=window.scrollY||0; document.body.classList.add('smfp-v181-overlay-lock'); document.body.style.top='-'+y+'px'; } },true);
+    document.addEventListener('focusout',function(){ if(document.body.classList.contains('smfp-v181-overlay-lock')){ document.body.classList.remove('smfp-v181-overlay-lock'); document.body.style.top=''; window.scrollTo(0,y||0); } },true);
+  }
+  function boot(){ var a=app(); if(!a)return; setVersion(); moveHistory(a); flattenDiscord(a); installSendLeds(a); installBoostLed5(a); installVersionFooter(a); patchFetchStatus(); lockViewport(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  setInterval(boot,1200);
+})();
+</script>
+
+
+
+
+
+<!-- SMFP_V187_MOBILE_CYBER_HEADER_BRAND_ROW_PURGE
+     Zweck: iPhone-only: WebRadio-Namenspanel unter NOW PLAYING entfernen und Cyberstream-Cockpit-Logo oberhalb NOW PLAYING platzieren.
+     SEND/Worker/Backend/Discord/PC bleiben unverändert.
+-->
+
+<!-- SMFP_V181_MOBILE_VISIBLE_ROOTFIX
+     Zweck: Sichtbarer iPhone-Rootfix ohne PC-Layout/PC-EQ anzufassen.
+     - History ersetzt das obere Versionsbadge in der Mobile-Funktionszeile.
+     - Version wird nur als kleiner Text unter dem unteren Levelmeter angezeigt.
+     - SEND wird hart auf /api/player-alert/send gebunden und meldet PLAYER SENT/FAILED, nicht Discord/global.
+     - Discord-Außenpanel optisch entfernt; DC/MSG bleiben als kleine Buttons + LED.
+     - Alte Send-Handler werden im Capture-Pfad für den Player-SEND blockiert.
+-->
+<script id="smfpV181MobileVisibleRootfixScript">
+(function(){
+  'use strict';
+  var VERSION='v187';
+  var SEND_URL='/api/player-alert/send';
+  function qs(s,r){return (r||document).querySelector(s)}
+  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+  function app(){return qs('#mffApp')}
+  function textClean(v){return String(v||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240)}
+  function sender(){try{var k='smfpPlayerAlertSenderId';var v=localStorage.getItem(k);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v)}return v}catch(e){return 'smfp-session'}}
+  function setVersion(){
+    try{window.SMFP_VERSION=window.SMFP_VERSION||{};window.SMFP_VERSION.label=VERSION;window.SMFP_VERSION.number=window.SMFP_VERSION.number||20260617;window.SMFP_VERSION.cacheBust=(window.SMFP_VERSION.cacheBust||window.SMFP_VERSION.build||'smfp-v2026-06-17-gui-audit1');document.documentElement.setAttribute('data-smfp-version',VERSION);document.documentElement.setAttribute('data-smfp-cache-bust',window.SMFP_VERSION.cacheBust);var m=qs('meta[name="smfp-version"]');if(m)m.setAttribute('content',VERSION)}catch(e){}
+    qsa('#mffApp .smfp-version-badge,#mffApp .mff-version-inline').forEach(function(el){el.classList.add('smfp-v181-hidden-version');el.textContent='';});
+    qsa('#pcVersionBadge .status-code,.status-code').forEach(function(el){if(/v\d+/i.test(el.textContent||''))el.textContent=VERSION;});
+  }
+  function installFooter(a){
+    if(!a)return;
+    var old=qsa('.smfp-v180-footer-version,.smfp-v181-footer-version',a); old.forEach(function(n,i){if(i>0)try{n.remove()}catch(e){}});
+    var footer=qs('.smfp-v181-footer-version',a)||qs('.smfp-v180-footer-version',a);
+    if(!footer){footer=document.createElement('div');footer.className='smfp-v181-footer-version';}
+    footer.className='smfp-v181-footer-version';
+    footer.textContent='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
+    var bottom=qs('.mff-bottom',a)||qs('.mff-bottom-bars',a);
+    if(bottom&&bottom.parentNode&&footer.parentNode!==bottom.parentNode){bottom.parentNode.insertBefore(footer,bottom.nextSibling);} else if(bottom&&bottom.parentNode&&!footer.parentNode){bottom.parentNode.insertBefore(footer,bottom.nextSibling);}
+  }
+  function moveHistory(a){
+    if(!a)return;
+    var h=qs('.mff-history',a); if(!h)return;
+    var slot=qs('.mff-discord-slot',a); if(!slot)return;
+    qsa('.smfp-v181-history-lane',slot).forEach(function(n,i){if(i>0)try{n.remove()}catch(e){}});
+    var lane=qs('.smfp-v181-history-lane',slot)||document.createElement('div');
+    lane.className='smfp-v181-history-lane';
+    if(!lane.parentNode)slot.appendChild(lane);
+    if(h.parentNode!==lane)lane.appendChild(h);
+    h.style.display='flex'; h.style.visibility='visible'; h.style.pointerEvents='auto';
+  }
+  function cleanDiscordPanel(a){
+    var slot=qs('.mff-discord-slot',a); if(!slot)return;
+    qsa('[data-discord-addon-panel],.s666-discord-panel',slot).forEach(function(p){p.style.background='transparent';p.style.border='0';p.style.boxShadow='none';p.style.padding='0';p.style.margin='0';});
+    qsa('.s666-discord-text',slot).forEach(function(t){t.style.display='none'});
+  }
+  function installSendLeds(a){
+    if(!a)return;
+    qsa('.smfp-v180-send-leds',a).forEach(function(n){try{n.remove()}catch(e){}});
+    if(qs('.smfp-v181-send-leds',a))return;
+    var send=qs('#mffAlertOpen',a)||qs('.mff-alert-open',a); if(!send||!send.parentNode)return;
+    var leds=document.createElement('span');leds.className='smfp-v181-send-leds';leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
+    send.parentNode.insertBefore(leds,send.nextSibling);
+  }
+  function sendState(s){var a=app(); if(!a)return; a.setAttribute('data-send-state',s||'idle');clearTimeout(window.__smfpV181SendTimer);if(s==='ok'||s==='fail')window.__smfpV181SendTimer=setTimeout(function(){var b=app();if(b)b.setAttribute('data-send-state','idle')},3600);}
+  function status(text,cls){
+    var back=qs('#mffAlertEditorBackdrop'); if(!back)return;
+    var s=qs('.smfp-send-status-v181',back)||qs('.smfp-send-status-v164',back)||document.createElement('div');
+    s.className='smfp-send-status-v181 smfp-send-status-v164 '+(cls||''); s.textContent=text;
+    var box=qs('.mff-alert-editor',back); if(box&&!s.parentNode)box.appendChild(s);
+  }
+  async function hardSend(ev){
+    var target=ev.target&&ev.target.closest&&ev.target.closest('#mffAlertSend');
+    if(!target)return;
+    ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+    var now=Date.now();
+    if(window.__smfpPlayerAlertSendInFlight || (now-Number(window.__smfpPlayerAlertLastSendEvent||0))<1200)return false;
+    window.__smfpPlayerAlertSendInFlight=true;
+    window.__smfpPlayerAlertLastSendEvent=now;
+    var ta=qs('#mffAlertText'); var msg=textClean(ta&&ta.value);
+    if(!msg){sendState('fail');status('FAILED: ENTER MESSAGE FIRST','is-error');return false;}
+    target.disabled=true; target.textContent='SENDING'; sendState('sending'); status('PLAYER SENDING...','');
+    try{
+      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-player',version:VERSION}),cache:'no-store'});
+      var d={};try{d=await r.json()}catch(e){}
+      if(!r.ok||d.ok===false)throw new Error(d.error||d.message||('HTTP '+r.status));
+      if(ta)ta.value=''; target.textContent='SENT'; sendState('ok'); status('PLAYER SENT ✓ '+String(d.source||'backend/cache').toUpperCase().replace('CACHE-TERTIARY','CACHE FALLBACK'),'is-ok');
+      setTimeout(function(){var b=qs('#mffAlertEditorBackdrop'); if(b){b.classList.remove('is-open');b.setAttribute('aria-hidden','true')}},1200);
+    }catch(e){target.textContent='FAILED';sendState('fail');status('PLAYER FAILED ✕ '+String(e&&e.message||'CONNECTION ERROR'),'is-error');}
+    finally{window.__smfpPlayerAlertSendInFlight=false;setTimeout(function(){target.disabled=false;target.textContent='SEND'},1500);}
+    return false;
+  }
+  function lockZoom(){
+    if(window.__smfpV181ZoomLock)return; window.__smfpV181ZoomLock=true; var y=0;
+    document.addEventListener('focusin',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){y=window.scrollY||0;document.body.classList.add('smfp-v181-nozoom');document.body.style.top='-'+y+'px'}},true);
+    document.addEventListener('focusout',function(){if(document.body.classList.contains('smfp-v181-nozoom')){document.body.classList.remove('smfp-v181-nozoom');document.body.style.top='';setTimeout(function(){window.scrollTo(0,y||0)},30)}},true);
+  }
+  function boot(){var a=app();setVersion();if(!a)return;moveHistory(a);installFooter(a);cleanDiscordPanel(a);installSendLeds(a);lockZoom();}
+  document.addEventListener('click',hardSend,true);document.addEventListener('touchend',hardSend,{capture:true,passive:false});document.addEventListener('pointerup',hardSend,{capture:true,passive:false});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  setTimeout(boot,120);setTimeout(boot,700);setInterval(boot,1000);
+})();
+</script>
+
+<link rel="stylesheet" href="/css/player-admin-overlay.css?v=2026-06-15-fix1">
+<script src="/js/player-admin-overlay.js?v=2026-06-19-repair1" defer></script>
+
+<link rel="stylesheet" href="/css/broadcast-message-history.css?v=2026-06-15-fix1">
+<script src="/js/broadcast-message-history.js?v=2026-06-15-fix1" defer></script>
+
+<!-- SMFP_v190_MOBILE_GRAPHIC_EQ_OVERLAY -->
+<script id="smfpMobileGraphicEqOverlayV190Script">
+(function(){
+  if(window.__smfpMobileGraphicEqOverlayV190)return; window.__smfpMobileGraphicEqOverlayV190=true;
+  var BANDS=[
+    {label:'SUB',key:'b63',id:'pcEq63'},
+    {label:'BASS',key:'b125',id:'pcEq125'},
+    {label:'LOW',key:'b250',id:'pcEq250'},
+    {label:'MID',key:'b1k',id:'pcEq1k'},
+    {label:'HIGH',key:'b4k',id:'pcEq4k'},
+    {label:'AIR',key:'b16k',id:'pcEq16k'}
+  ];
+  function clamp(v){v=Number(v); if(!isFinite(v))v=0; return Math.max(-12,Math.min(12,Math.round(v)));}
+  function getHiddenInput(b){return document.getElementById(b.id)||document.querySelector('[data-smfp-eq="'+b.key+'"]');}
+  function setBand(b,val){
+    val=clamp(val);
+    var input=getHiddenInput(b);
+    if(input){
+      input.value=String(val);
+      try{input.dispatchEvent(new Event('input',{bubbles:true})); input.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}
+    }else{
+      try{var raw=localStorage.getItem('smfp_real_eq_v162')||'{}'; var st=JSON.parse(raw); st[b.key]=val; localStorage.setItem('smfp_real_eq_v162',JSON.stringify(st));}catch(e){}
+      try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}
+    }
+  }
+  function getBand(b){
+    var input=getHiddenInput(b); if(input)return clamp(input.value);
+    try{var st=JSON.parse(localStorage.getItem('smfp_real_eq_v162')||'{}'); return clamp(st[b.key]||0);}catch(e){return 0;}
+  }
+  function ensureOverlay(){
+    var ov=document.getElementById('smfpMobileEqOverlay'); if(ov)return ov;
+    ov=document.createElement('div'); ov.id='smfpMobileEqOverlay';
+    var rows=BANDS.map(function(b){return '<label class="smfp-mobile-eq-row"><span>'+b.label+'</span><input type="range" min="-12" max="12" step="1" value="0" data-smfp-mobile-eq="'+b.key+'"><output>0</output></label>';}).join('');
+    ov.innerHTML='<div id="smfpMobileEqPanel" role="dialog" aria-modal="true" aria-label="Mobile Equalizer"><h3>POWER EQ</h3><p class="smfp-eq-sub">tap graphic EQ · adjust · OK saves</p>'+rows+'<div class="smfp-eq-actions"><button type="button" class="smfp-eq-reset">RESET</button><button type="button" class="smfp-eq-ok">OK</button></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(ev){if(ev.target===ov)close();});
+    ov.querySelector('.smfp-eq-ok').addEventListener('click',close);
+    ov.querySelector('.smfp-eq-reset').addEventListener('click',function(){BANDS.forEach(function(b){setBand(b,0);}); sync();});
+    ov.querySelectorAll('[data-smfp-mobile-eq]').forEach(function(input){
+      var key=input.getAttribute('data-smfp-mobile-eq'); var b=BANDS.find(function(x){return x.key===key;}); var out=input.parentNode.querySelector('output');
+      function update(){var v=clamp(input.value); if(out)out.textContent=String(v); if(b)setBand(b,v);}
+      input.addEventListener('input',update,{passive:true}); input.addEventListener('change',update,{passive:true});
+      input.addEventListener('click',function(e){e.stopPropagation();},{capture:true}); input.addEventListener('pointerdown',function(e){e.stopPropagation();},{capture:true});
+    });
+    return ov;
+  }
+  function sync(){
+    var ov=ensureOverlay();
+    ov.querySelectorAll('[data-smfp-mobile-eq]').forEach(function(input){var key=input.getAttribute('data-smfp-mobile-eq'); var b=BANDS.find(function(x){return x.key===key;}); var v=b?getBand(b):0; input.value=String(v); var out=input.parentNode.querySelector('output'); if(out)out.textContent=String(v);});
+    try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}
+  }
+  function open(ev){if(ev){ev.preventDefault(); ev.stopPropagation();} sync(); ensureOverlay().classList.add('is-open');}
+  function close(){var ov=document.getElementById('smfpMobileEqOverlay'); if(ov)ov.classList.remove('is-open'); try{if(typeof window.__smfpRealEqApply==='function')window.__smfpRealEqApply();}catch(e){}}
+  function bind(){
+    ['mffEqBars','eqBars'].forEach(function(id){var el=document.getElementById(id); if(el && el.dataset.mobileEqOverlayBound!=='1'){el.dataset.mobileEqOverlayBound='1'; el.title='Tap for Sound Control'; var openSnd=function(ev){ if(ev){ if(ev.cancelable)ev.preventDefault(); try{ev.stopPropagation();}catch(_e){} } if(window.S666SoundControl && typeof window.S666SoundControl.open==='function'){ window.S666SoundControl.open(); return; } open(ev); }; el.addEventListener('click',openSnd,{capture:true}); el.addEventListener('touchend',openSnd,{passive:false,capture:true});}});
+  }
+  window.SMFPMobileEqOverlay={open:open,close:close,sync:sync};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{passive:true});else bind();
+  window.addEventListener('load',bind,{passive:true}); setTimeout(bind,400); setTimeout(bind,1400);
+})();
+</script>
+
+
+<link rel="stylesheet" href="/css/sound-control-overlay-v1.css?v=2026-06-15-fix1">
+<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-06-19-repair6">
+<script src="/js/sound-control-overlay-v1.js?v=2026-06-19-repair4" defer></script>
+<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-06-19-repair2" defer></script>
+<script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=2026-06-15-fix1"></script>
+<script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=2026-06-15-fix1"></script>
+<script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=2026-06-15-fix1"></script>
+<script type="module" src="/js/system-extra/govee/govee-fx-control-hooks.js?v=2026-06-15-fix1"></script>
+
+  <!-- FRAGGLE DNA RAIL v1 — LEDs + Fixes + Umbenennung -->
+
+  <script id="fraggledna-rail-led-js">
+  /* Fraggle DNA Rail — audioreaktive 4-Farb-LED */
+  (function(){
+    var COLORS = [
+      {pct:80, c:'#ff4444', s:'0 0 10px #ff4444, 0 0 18px rgba(255,68,68,.6)'},
+      {pct:55, c:'#ff3dbb', s:'0 0 10px #ff3dbb, 0 0 18px rgba(255,61,187,.6)'},
+      {pct:25, c:'#16fff3', s:'0 0 8px  #16fff3, 0 0 14px rgba(22,255,243,.5)'},
+      {pct: 0, c:'#00cc66', s:'0 0 6px  #00cc66, 0 0 10px rgba(0,204,102,.4)'}
+    ];
+    function setLed(ledId, meterIds){
+      var led = document.getElementById(ledId);
+      if(!led) return;
+      var maxPct = 0;
+      meterIds.forEach(function(mid){
+        var el = document.getElementById(mid);
+        if(!el) return;
+        var h = parseFloat(el.style.height) || 0;
+        if(h > maxPct) maxPct = h;
+      });
+      for(var i=0;i<COLORS.length;i++){
+        if(maxPct >= COLORS[i].pct){
+          led.style.background = COLORS[i].c;
+          led.style.boxShadow = COLORS[i].s;
+          return;
+        }
+      }
+      led.style.background = COLORS[COLORS.length-1].c;
+      led.style.boxShadow  = COLORS[COLORS.length-1].s;
+    }
+    function tick(){
+      setLed('dnaRailLedLeft',  ['leftMeterA','leftMeterB','leftMeterC']);
+      setLed('dnaRailLedRight', ['rightMeterA','rightMeterB','rightMeterC']);
+    }
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded',function(){ setInterval(tick,100); });
+    } else {
+      setInterval(tick,100);
+    }
+  })();
+  </script>
+  
+
+  <!-- LOGO SIZE FIX — pc-header-new-logo fills container correctly -->
+  
+  <!-- Skip-Button: Vote-Skip + Admin-Skip fuer alle Hoerer -->
+    <script src="/js/skip-control.js?v=2026-06-19-repair1" defer></script>
+  <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
+    <script src="/js/media-session-ios.js?v=2026-06-19-repair1" defer></script>
+    <script src="/js/messenger-overlay.js?v=2026-06-19-repair2" defer></script>
+</body>
+</html>

@@ -12,6 +12,11 @@
   ],
   "vars": {
     "ADMIN_AUTH_VERIFY_URL": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
-    "SUNO_API_MODE": "adapter"
+    "SUNO_API_MODE": "generic-rest",
+    "SUNO_API_PROVIDER": "generic-rest",
+    "SUNO_CREATE_PATH": "/api/generate",
+    "SUNO_STATUS_PATH_TEMPLATE": "/api/status/{id}",
+    "SUNO_RESULT_PATH_TEMPLATE": "/api/result/{id}",
+    "ALLOWED_ORIGINS": "https://666soundsdesign-broadcaster.com,https://www.666soundsdesign-broadcaster.com"
   }
 }

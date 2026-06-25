@@ -4,7 +4,7 @@
   "main": "worker.js",
   "compatibility_date": "2026-06-25",
   "assets": {
-    "directory": "./",
+    "directory": "./public",
     "binding": "ASSETS",
     "run_worker_first": true
   },
@@ -13,6 +13,7 @@
     "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_KV_FALLBACK_CACHE_LAST_V101",
     "GITHUB_CONFIG_PATH": "config/radio-runtime.json",
     "GITHUB_BACKUP_DIR": "config/backups",
-    "ENABLE_PUBLIC_DEBUG": "false"
+    "ENABLE_PUBLIC_DEBUG": "false",
+    "RELEASE_VERSION": "FULLVERSION_BRANCH_RECOVERY_v1.0.2"
   }
 }

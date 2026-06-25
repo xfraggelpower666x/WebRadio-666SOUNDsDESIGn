@@ -1,0 +1,370 @@
+
+/* ==========================================================
+   666SOUNDsDESIGn — v148 Player Broadcast Alert
+   Purpose: one-way listener message overlay + sender UI.
+   Scope: PC sender row + iPhone composer overlay + listener overlay.
+   No player-core, transport, ticker, EQ, Discord or stream routing changes.
+   ========================================================== */
+:root{
+  --s666-alert-pink:#ff3dbb;
+  --s666-alert-cyan:#20fff4;
+  --s666-alert-purple:#8b45ff;
+  --s666-alert-bg:rgba(3,7,20,.94);
+}
+.pc-broadcast-alert-bar{
+  display:grid;
+  grid-template-columns:auto minmax(180px,1fr) auto;
+  gap:8px;
+  align-items:stretch;
+  margin:8px 0 6px;
+  width:100%;
+}
+.pc-broadcast-send{
+  min-width:66px;
+  border-color:rgba(32,255,244,.55)!important;
+  color:var(--s666-alert-cyan)!important;
+  box-shadow:0 0 12px rgba(32,255,244,.18), inset 0 0 13px rgba(255,61,187,.08)!important;
+}
+.pc-broadcast-input{
+  resize:none;
+  min-height:38px;
+  max-height:56px;
+  border-radius:13px;
+  border:1px solid rgba(255,61,187,.42);
+  background:linear-gradient(90deg,rgba(255,61,187,.065),rgba(32,255,244,.035)),rgba(2,5,16,.78);
+  color:#eaffff;
+  outline:none;
+  padding:8px 10px;
+  font-weight:800;
+  letter-spacing:.03em;
+  box-shadow:inset 0 0 17px rgba(32,255,244,.055),0 0 12px rgba(255,61,187,.08);
+}
+.pc-broadcast-input::placeholder{color:rgba(234,255,255,.52)}
+.pc-broadcast-input:focus{border-color:rgba(32,255,244,.7);box-shadow:0 0 17px rgba(32,255,244,.16),inset 0 0 18px rgba(32,255,244,.08)}
+.pc-broadcast-cooldown{
+  min-width:70px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:13px;
+  border:1px solid rgba(32,255,244,.28);
+  color:rgba(234,255,255,.78);
+  font-size:11px;
+  font-weight:900;
+  background:rgba(2,5,16,.58);
+}
+.s666-player-alert-overlay,
+.s666-player-alert-composer{
+  position:fixed;
+  inset:0;
+  z-index:2147483600;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:radial-gradient(circle at 50% 40%,rgba(255,61,187,.18),transparent 36%),rgba(0,0,0,.58);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+.s666-player-alert-overlay.is-hidden,
+.s666-player-alert-composer.is-hidden{display:none!important;}
+.s666-player-alert-box,
+.s666-player-alert-composer-box{
+  width:min(520px,calc(100vw - 34px));
+  border:1px solid rgba(32,255,244,.52);
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(255,61,187,.10),rgba(32,255,244,.055)),var(--s666-alert-bg);
+  box-shadow:0 0 28px rgba(32,255,244,.18),0 0 32px rgba(255,61,187,.14),inset 0 0 28px rgba(255,255,255,.035);
+  color:#f8ffff;
+  padding:18px;
+}
+.s666-player-alert-title{
+  color:var(--s666-alert-cyan);
+  font-size:15px;
+  font-weight:1000;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  text-shadow:0 0 12px rgba(32,255,244,.6);
+  margin-bottom:10px;
+}
+.s666-player-alert-text{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:15px;
+  line-height:1.42;
+  color:#fff;
+  margin:10px 0 16px;
+}
+.s666-player-alert-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;}
+.s666-player-alert-button{
+  appearance:none;
+  border:1px solid rgba(255,61,187,.50);
+  border-radius:999px;
+  background:rgba(3,8,22,.72);
+  color:var(--s666-alert-cyan);
+  min-height:34px;
+  padding:0 18px;
+  font-weight:1000;
+  letter-spacing:.08em;
+  box-shadow:0 0 13px rgba(255,61,187,.14), inset 0 0 14px rgba(32,255,244,.05);
+}
+.s666-player-alert-composer textarea{
+  width:100%;
+  min-height:112px;
+  resize:vertical;
+  border-radius:16px;
+  border:1px solid rgba(32,255,244,.45);
+  background:rgba(0,0,0,.35);
+  color:#f8ffff;
+  padding:12px;
+  margin:8px 0 10px;
+  font-size:15px;
+  font-weight:750;
+  outline:none;
+}
+.s666-player-alert-meta{
+  min-height:18px;
+  color:rgba(248,255,255,.72);
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+.s666-player-alert-meta.is-error{color:#ff73d0;text-shadow:0 0 10px rgba(255,61,187,.65)}
+.s666-player-alert-mobile-button{
+  width:100%;
+  min-height:34px;
+  border-radius:15px;
+  border:1px solid rgba(32,255,244,.50);
+  background:linear-gradient(90deg,rgba(255,61,187,.12),rgba(32,255,244,.08)),rgba(3,8,22,.72);
+  color:var(--s666-alert-cyan);
+  font-weight:1000;
+  letter-spacing:.08em;
+  box-shadow:0 0 14px rgba(32,255,244,.14), inset 0 0 15px rgba(255,61,187,.05);
+  pointer-events:auto;
+}
+#s666PlayerAlertMobileSlot{width:100%;display:flex;gap:8px;align-items:center;justify-content:center;margin:6px 0 0;pointer-events:auto;}
+@media (max-width:760px){
+  .pc-broadcast-alert-bar{display:none!important;}
+  .s666-player-alert-box,.s666-player-alert-composer-box{padding:16px;border-radius:20px;}
+  .s666-player-alert-title{font-size:13px;}
+  .s666-player-alert-text{font-size:14px;}
+}
+
+
+/* ==========================================================
+   v150 PC INLINE PLACEMENT FIX
+   Purpose: PC SEND field must sit beside History and must not create
+   a new full-width row that stretches the player.
+   Rule: same existing sender DOM, no new layer, no transport/ticker changes.
+   ========================================================== */
+@media (min-width:761px){
+  .now-playing{
+    position:relative!important;
+  }
+
+  .pc-broadcast-alert-bar{
+    position:absolute!important;
+    right:142px!important;
+    bottom:14px!important;
+    width:min(440px,calc(100% - 292px))!important;
+    max-width:440px!important;
+    min-width:260px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    margin:0!important;
+    padding:0!important;
+    display:grid!important;
+    grid-template-columns:58px minmax(150px,1fr) 58px!important;
+    gap:7px!important;
+    align-items:center!important;
+    z-index:18!important;
+    pointer-events:auto!important;
+  }
+
+  .pc-broadcast-send{
+    min-width:0!important;
+    width:58px!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    padding:0!important;
+    font-size:10px!important;
+    line-height:38px!important;
+  }
+
+  .pc-broadcast-input{
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    overflow:hidden!important;
+    resize:none!important;
+    padding:7px 10px!important;
+    font-size:10px!important;
+    line-height:12px!important;
+    box-sizing:border-box!important;
+  }
+
+  .pc-broadcast-cooldown{
+    width:58px!important;
+    min-width:58px!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    font-size:9px!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+  }
+}
+
+
+/* v152 SEND FIX — inline status, no layout row */
+.player-alert-pc-status{
+  min-width:0!important;
+  max-width:92px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#29fff4!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  text-shadow:0 0 8px rgba(22,255,243,.35)!important;
+}
+
+
+/* v152 CLICK FIX — inline real flex placement, no overlay over player */
+@media (min-width:761px){
+  .section-topline{
+    position:relative!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+  }
+  .section-topline>div:first-child{
+    min-width:0!important;
+    flex:1 1 auto!important;
+  }
+  .player-alert-pc-box{
+    position:relative!important;
+    right:auto!important;
+    bottom:auto!important;
+    z-index:21474830!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    max-width:330px!important;
+    pointer-events:auto!important;
+    flex:0 0 auto!important;
+    margin-left:auto!important;
+    margin-right:4px!important;
+  }
+  .player-alert-pc-text{
+    width:190px!important;
+    pointer-events:auto!important;
+  }
+  .player-alert-send-btn{
+    position:relative!important;
+    z-index:21474831!important;
+    pointer-events:auto!important;
+  }
+  .player-alert-pc-status{
+    max-width:74px!important;
+  }
+}
+
+
+/* v152 final placement fix */
+@media (min-width:761px){
+  .player-alert-pc-box{
+    margin-left:12px!important;
+    margin-right:0!important;
+    transform:translateY(2px)!important;
+  }
+  .player-alert-pc-text{
+    width:170px!important;
+  }
+}
+
+@media (max-width:760px){
+  .player-alert-pc-box{
+    position:absolute!important;
+    right:92px!important;
+    top:10px!important;
+    z-index:99999!important;
+    max-width:70px!important;
+  }
+
+  .player-alert-pc-text{
+    display:none!important;
+  }
+
+  #playerAlertPcStatus{
+    display:none!important;
+  }
+
+  .player-alert-send-btn{
+    width:64px!important;
+    min-width:64px!important;
+  }
+}
+
+
+/* BROADCAST_CLEANUP_V2_20260525 */
+#playerAlertPcText,
+#pcBroadcastInput{
+  min-width:min(520px,52vw)!important;
+  min-height:38px!important;
+  font-size:16px!important;
+  line-height:1.25!important;
+  letter-spacing:.02em!important;
+}
+#playerAlertPcSend,
+#pcBroadcastSendBtn{
+  min-height:38px!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+#playerAlertPcStatus,
+#pcBroadcastCooldown,
+[data-broadcast-status]{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:74px!important;
+  min-height:28px!important;
+  border-radius:999px!important;
+  padding:4px 9px!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  letter-spacing:.06em!important;
+  border:1px solid rgba(32,247,255,.35)!important;
+  color:#20f7ff!important;
+  background:rgba(5,8,24,.85)!important;
+  text-shadow:0 0 8px rgba(32,247,255,.55)!important;
+}
+#playerAlertPcStatus.is-sent,
+#pcBroadcastCooldown.is-sent,
+[data-broadcast-status].is-sent{color:#60ff9b!important;border-color:rgba(96,255,155,.8)!important;box-shadow:0 0 12px rgba(96,255,155,.32)!important}
+#playerAlertPcStatus.is-failed,
+#pcBroadcastCooldown.is-failed,
+[data-broadcast-status].is-failed{color:#ff315d!important;border-color:rgba(255,49,93,.8)!important;box-shadow:0 0 12px rgba(255,49,93,.32)!important}
+.s666-player-alert-user{
+  color:#20f7ff!important;
+  font-weight:900!important;
+  font-size:15px!important;
+  margin:6px 0 4px!important;
+}
+.s666-player-alert-text{
+  font-size:18px!important;
+  line-height:1.42!important;
+}
+.s666-player-alert-name{
+  width:100%!important;
+  margin:8px 0!important;
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  border:1px solid rgba(32,247,255,.35)!important;
+  background:rgba(4,7,20,.96)!important;
+  color:#eaf4ff!important;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "webradio-666soundsdesign-worker-legacy-build-root",
+  "version": "1.0.2",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "npx wrangler deploy"
+  }
+}

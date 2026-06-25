@@ -1,19 +1,37 @@
-# FILE: .dev.vars.example
-# CREATED: 2026-05-15
-# PURPOSE: Local-only example for Wrangler dev. Rename to .dev.vars locally only.
-# IMPORTANT: Never commit real API keys.
+# Local-only example for Wrangler development.
+# Copy to .dev.vars locally. Never commit real values.
 
-SUNO_API_KEY=put_real_key_here_locally_only
-SUNO_API_BASE=https://example-provider.invalid
+# Admin authentication services
+ADMIN_AUTH_VERIFY_URL=https://666-system-auth.666soundsdesign-broadcaster.com/verify
+PW_VERIFY_URL=https://666-system-pw.666soundsdesign-broadcaster.com/verify
 
-# Skip / Next Track bridge. Real values stay local or in Cloudflare Worker Secrets.
+# GitHub-backed runtime configuration
+GITHUB_TOKEN=
+GITHUB_OWNER=xfraggelpower666x
+GITHUB_REPO=WebRadio-666SOUNDsDESIGn
+GITHUB_BRANCH=WebRadio-666SOUNDsDESIGn
+GITHUB_CONFIG_PATH=config/radio-runtime.json
+GITHUB_BACKUP_DIR=config/backups
+
+# Player Alert Worker -> Render service authentication
+PLAYER_ALERT_BACKEND_URL=https://auto-setup-render-for-backend-mp3-ess8.onrender.com
+PLAYER_ALERT_SERVICE_TOKEN=
+PLAYER_ALERT_WRITE_TOKEN=
+# Optional for trusted non-browser writers. Browser SEND may use the same-origin admin session.
+
+# Debug endpoints remain hidden unless a token is configured.
+DEBUG_TOKEN=
+ENABLE_PUBLIC_DEBUG=false
+
+# Skip / Next Track bridge. Use headers by default.
 SHOUTCAST_ADMIN_URL=https://my.idjstream.com:8686/admin.cgi
 SHOUTCAST_ADMIN_USER=admin
-SHOUTCAST_ADMIN_PASSWORD=put_real_shoutcast_admin_password_in_secret_only
-PW_VERIFY_URL=https://666-system-pw.666soundsdesign-broadcaster.com/verify
+SHOUTCAST_ADMIN_PASSWORD=
 SHOUTCAST_SID=1
 SHOUTCAST_SKIP_MODE=nextsong
-MYIDJ_ADMIN_USER=admin
-MYIDJ_ADMIN_PASSWORD=put_real_myidj_admin_password_in_secret_only
-SKIP_ADMIN_TOKEN=put_worker_skip_admin_token_in_secret_only
-SKIP_VOTE_THRESHOLD=3
+SKIP_ALLOW_QUERY_SECRET=false
+ADMIN_SKIP_COOLDOWN_MS=12000
+
+# Alternative provider bridge
+SONICPANEL_SKIP_URL=
+SONICPANEL_SKIP_TOKEN=

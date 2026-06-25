@@ -1,0 +1,89 @@
+/*
+FILE: CHAOS_ENGINE/assets/css/chaos-suno-renderer-integration-v1.css
+CREATED: 2026-05-25
+PURPOSE: Chaos/Suno/Renderer integration panel styles.
+*/
+.chaos-integration-panel{
+  margin:18px auto;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(32,247,255,.38);
+  background:linear-gradient(135deg,rgba(6,10,28,.94),rgba(18,6,32,.88));
+  box-shadow:0 0 24px rgba(32,247,255,.16), inset 0 0 24px rgba(255,63,215,.08);
+  color:#eaf4ff;
+}
+.chaos-integration-panel header{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+}
+.chaos-integration-panel header b{
+  color:#ff3fd7;
+  letter-spacing:.08em;
+}
+.chaos-integration-panel header span{
+  color:#20f7ff;
+  font-size:12px;
+}
+.chaos-api-leds{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0;
+}
+.chaos-api-leds span{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:rgba(3,7,20,.75);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:12px;
+  font-weight:800;
+}
+.chaos-api-leds i{
+  min-width:42px;
+  text-align:center;
+  font-style:normal;
+  border-radius:999px;
+  padding:2px 7px;
+  background:#1a2034;
+  color:#90a0bb;
+}
+.chaos-api-leds i.ok{color:#60ff9b;box-shadow:0 0 10px rgba(96,255,155,.35)}
+.chaos-api-leds i.warn{color:#ffd166;box-shadow:0 0 10px rgba(255,209,102,.28)}
+.chaos-api-leds i.fail{color:#ff315d;box-shadow:0 0 10px rgba(255,49,93,.35)}
+.chaos-api-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0;
+}
+.chaos-api-actions button{
+  border:1px solid rgba(32,247,255,.35);
+  background:#10182e;
+  color:#eaf4ff;
+  border-radius:10px;
+  padding:9px 12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.chaos-api-actions button:hover{
+  background:linear-gradient(135deg,#20f7ff,#ff3fd7);
+  color:#02030a;
+}
+#chaosApiLog{
+  min-height:130px;
+  max-height:280px;
+  overflow:auto;
+  white-space:pre-wrap;
+  border-radius:12px;
+  padding:12px;
+  background:rgba(0,0,0,.45);
+  border:1px solid rgba(32,247,255,.18);
+  color:#bdefff;
+  font-size:12px;
+}

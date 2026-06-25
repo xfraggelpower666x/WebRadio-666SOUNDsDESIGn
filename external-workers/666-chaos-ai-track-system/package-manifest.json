@@ -1,20 +1,31 @@
 {
   "name": "666-chaos-ai-track-system",
   "type": "cloudflare-worker",
-  "version": "1.0.0",
-  "created": "2026-05-24",
+  "version": "1.0.1",
+  "updated": "2026-06-25",
   "secrets": [
+    "ADMIN_AUTH_URL",
     "OPENAI_API_KEY"
   ],
-  "routes": [
-    "GET /health",
-    "GET /debug",
-    "POST /api/chaos/generate-track",
-    "POST /api/chaos/generate-album",
-    "POST /api/chaos/generate-cover",
-    "POST /api/chaos/generate-description",
-    "POST /api/chaos/validate",
-    "GET /api/story/export",
-    "GET /api/story/archive"
-  ]
+  "optionalSecrets": [
+    "DEBUG_TOKEN"
+  ],
+  "variables": [
+    "ALLOWED_ORIGINS"
+  ],
+  "routes": {
+    "implemented": [
+      "GET /health",
+      "GET /debug (protected)",
+      "POST /api/chaos/generate-track",
+      "POST /api/chaos/generate-album",
+      "POST /api/chaos/generate-cover",
+      "POST /api/chaos/generate-description",
+      "POST /api/chaos/validate"
+    ],
+    "explicitNotImplemented": [
+      "GET /api/story/export",
+      "GET /api/story/archive"
+    ]
+  }
 }

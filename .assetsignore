@@ -1,0 +1,5 @@
+# DEFENCE IN DEPTH ONLY.
+# Produktive Assets liegen ausschließlich unter ./public.
+# Selbst wenn diese Datei bei einem manuellen Browser-Upload fehlt, bleibt der Deploy sicher begrenzt.
+.DS_Store
+Thumbs.db

@@ -1,0 +1,111 @@
+/*
+   * FILE: css/design-tokens.css
+   * 666SOUNDsDESIGn WebRadio — Zentrale Design-Tokens
+   * Einbinden als ERSTES <link> vor allen anderen CSS-Dateien.
+   *
+   * Alle Farbwerte, Schriften, Schatten und Radien zentral definiert.
+   * Kein Styling hier — nur var()-Definitionen.
+   *
+   * Kanonische Werte:
+   *   Cyan  → #16fff3  (rgb 22 255 243)   — Legacy-Abweichungen: #29fff4, #28fff4
+   *   Pink  → #ff3dbb  (rgb 255 61 187)   — Legacy-Abweichungen: #ff4fc7
+   *   Bg    → #07080f
+   *   Bg2   → #0a0d1a
+   */
+
+  :root {
+
+    /* ── Kernfarben ─────────────────────────────────────────────────────── */
+    --color-cyan:       #16fff3;
+    --color-pink:       #ff3dbb;
+    --color-white:      #ffffff;
+    --color-text:       #e0ffff;
+    --color-text-dim:   #a0c0c0;
+
+    /* ── Hintergründe ───────────────────────────────────────────────────── */
+    --color-bg:         #07080f;
+    --color-bg2:        #0a0d1a;
+    --color-bg3:        #0d1020;
+    --color-surface:    rgba(10, 13, 26, 0.92);
+
+    /* ── Cyan-Transparenzstufen ─────────────────────────────────────────── */
+    --cyan-03:   rgba(22, 255, 243, 0.03);
+    --cyan-06:   rgba(22, 255, 243, 0.06);
+    --cyan-08:   rgba(22, 255, 243, 0.08);
+    --cyan-10:   rgba(22, 255, 243, 0.10);
+    --cyan-12:   rgba(22, 255, 243, 0.12);
+    --cyan-14:   rgba(22, 255, 243, 0.14);
+    --cyan-18:   rgba(22, 255, 243, 0.18);
+    --cyan-20:   rgba(22, 255, 243, 0.20);
+    --cyan-22:   rgba(22, 255, 243, 0.22);
+    --cyan-28:   rgba(22, 255, 243, 0.28);
+    --cyan-30:   rgba(22, 255, 243, 0.30);
+    --cyan-35:   rgba(22, 255, 243, 0.35);
+    --cyan-42:   rgba(22, 255, 243, 0.42);
+    --cyan-45:   rgba(22, 255, 243, 0.45);
+    --cyan-55:   rgba(22, 255, 243, 0.55);
+    --cyan-75:   rgba(22, 255, 243, 0.75);
+    --cyan-95:   rgba(22, 255, 243, 0.95);
+
+    /* ── Pink-Transparenzstufen ─────────────────────────────────────────── */
+    --pink-06:   rgba(255, 61, 187, 0.06);
+    --pink-08:   rgba(255, 61, 187, 0.08);
+    --pink-10:   rgba(255, 61, 187, 0.10);
+    --pink-13:   rgba(255, 61, 187, 0.13);
+    --pink-14:   rgba(255, 61, 187, 0.14);
+    --pink-16:   rgba(255, 61, 187, 0.16);
+    --pink-18:   rgba(255, 61, 187, 0.18);
+    --pink-20:   rgba(255, 61, 187, 0.20);
+    --pink-22:   rgba(255, 61, 187, 0.22);
+    --pink-28:   rgba(255, 61, 187, 0.28);
+    --pink-30:   rgba(255, 61, 187, 0.30);
+    --pink-32:   rgba(255, 61, 187, 0.32);
+    --pink-34:   rgba(255, 61, 187, 0.34);
+    --pink-38:   rgba(255, 61, 187, 0.38);
+    --pink-42:   rgba(255, 61, 187, 0.42);
+    --pink-55:   rgba(255, 61, 187, 0.55);
+    --pink-95:   rgba(255, 61, 187, 0.95);
+
+    /* ── Schatten / Glows ───────────────────────────────────────────────── */
+    --glow-cyan:        0 0 18px rgba(22, 255, 243, 0.45);
+    --glow-cyan-soft:   0 0 10px rgba(22, 255, 243, 0.25);
+    --glow-cyan-hard:   0 0 28px rgba(22, 255, 243, 0.65);
+    --glow-pink:        0 0 18px rgba(255, 61, 187, 0.35);
+    --glow-pink-soft:   0 0 10px rgba(255, 61, 187, 0.20);
+    --glow-pink-hard:   0 0 28px rgba(255, 61, 187, 0.55);
+
+    /* ── Schriften ──────────────────────────────────────────────────────── */
+    --font-mono:  "Courier New", Courier, monospace;
+    --font-ui:    system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* ── Radien ─────────────────────────────────────────────────────────── */
+    --radius-sm:   6px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --radius-xl:   20px;
+    --radius-pill: 999px;
+
+    /* ── Z-Index-Staffel ────────────────────────────────────────────────── */
+    --z-base:      1;
+    --z-overlay:   9000;
+    --z-modal:     9500;
+    --z-top:       99990;
+
+    /* ── Breakpoints (als Referenz — in @media direkt nutzen) ───────────── */
+    /* Mobile:   max-width: 760px  */
+    /* Desktop:  min-width: 761px  */
+
+    /* ── Timing ─────────────────────────────────────────────────────────── */
+    --transition-fast:   0.12s ease;
+    --transition-mid:    0.22s ease;
+    --transition-slow:   0.45s ease;
+  }
+
+  /*
+   * HINWEIS: Legacy-Farbwerte in bestehenden CSS-Dateien:
+   *   #29fff4  →  var(--color-cyan)   [identisch mit #16fff3 für das Auge]
+   *   #28fff4  →  var(--color-cyan)
+   *   #ff4fc7  →  var(--color-pink)   [identisch mit #ff3dbb für das Auge]
+   * Diese werden schrittweise bei jeder Dateiüberarbeitung ersetzt.
+   */
+  

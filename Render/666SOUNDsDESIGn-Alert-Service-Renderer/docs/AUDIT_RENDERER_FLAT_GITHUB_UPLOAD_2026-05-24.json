@@ -1,0 +1,7 @@
+{
+  "audit": "AUDIT_RENDERER_FLAT_GITHUB_UPLOAD_2026-05-24",
+  "status": "recovered_from_empty_file",
+  "recoveredAt": "2026-06-25",
+  "note": "Die ursprüngliche Datei war leer. Der leere JSON-Container wurde durch einen gültigen, transparent gekennzeichneten Wiederherstellungsdatensatz ersetzt. Es wurden keine historischen Prüfergebnisse erfunden.",
+  "historicalFindingsAvailable": false
+}

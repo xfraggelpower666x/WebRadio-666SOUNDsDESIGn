@@ -1,13 +1,15 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source, Cloudflare Worker, Scriptable uploader and separated backend resources.",
+  "description": "666SOUNDsDESIGn WebRadio full source with atomic Scriptable branch upload and Cloudflare branch recovery compatibility.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",
-    "verify": "npm run check && npm test"
+    "verify": "npm run check && npm test",
+    "deploy": "npx wrangler deploy",
+    "deploy:legacy-root": "cd workers/webradio-666soundsdesign-worker && npx wrangler deploy"
   },
   "engines": {
     "node": ">=20"

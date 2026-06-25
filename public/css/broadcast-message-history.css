@@ -1,0 +1,46 @@
+/*
+FILE: css/broadcast-message-history.css
+CREATED: 2026-05-22
+PURPOSE: Broadcast message history overlay for PC + iPhone player.
+NOTES: Visual-only module; hidden overlay has pointer-events:none to avoid blocking player controls.
+*/
+.smfp-msg-history-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:42px;height:30px;padding:0 9px;border-radius:11px;
+  border:1px solid rgba(22,255,243,.62);
+  background:linear-gradient(135deg,rgba(4,8,20,.92),rgba(28,10,44,.82));
+  color:#28fff4;font-weight:950;font-size:10px;letter-spacing:.06em;
+  box-shadow:0 0 12px rgba(22,255,243,.18), inset 0 0 10px rgba(255,61,187,.07);
+  cursor:pointer;touch-action:manipulation;pointer-events:auto;white-space:nowrap;
+}
+.smfp-msg-history-btn:hover{filter:brightness(1.12);box-shadow:0 0 16px rgba(255,61,187,.24),0 0 14px rgba(22,255,243,.2)}
+#playerAlertPcBox .smfp-msg-history-btn{height:36px;min-width:46px;flex:0 0 auto;margin-left:2px;}
+#mffApp .smfp-msg-history-btn{height:30px;min-width:42px;font-size:9px;border-radius:10px;margin-left:4px;z-index:20;}
+.smfp-msg-history-backdrop{
+  position:fixed;inset:0;z-index:2147482100;display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.66);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+  pointer-events:none;
+}
+.smfp-msg-history-backdrop.is-open{display:flex;pointer-events:auto;}
+.smfp-msg-history-modal{
+  width:min(520px,92vw);max-height:min(76vh,680px);overflow:hidden;
+  border-radius:20px;border:1px solid rgba(22,255,243,.58);
+  background:radial-gradient(circle at 10% 0%,rgba(255,61,187,.18),transparent 36%),radial-gradient(circle at 90% 18%,rgba(22,255,243,.13),transparent 34%),rgba(3,7,21,.96);
+  box-shadow:0 0 34px rgba(22,255,243,.22),0 0 28px rgba(255,61,187,.15);
+  color:#eafcff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.smfp-msg-history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid rgba(22,255,243,.20)}
+.smfp-msg-history-title{font-size:13px;font-weight:950;letter-spacing:.08em;color:var(--color-pink);text-shadow:0 0 10px rgba(255,61,187,.44)}
+.smfp-msg-history-sub{font-size:10px;color:rgba(234,252,255,.62);margin-top:2px;font-weight:800;letter-spacing:.04em}
+.smfp-msg-history-close{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(4,8,20,.88);color:#28fff4;font-size:22px;line-height:1;cursor:pointer;}
+.smfp-msg-history-list{max-height:calc(min(76vh,680px) - 78px);overflow:auto;padding:10px 12px 14px;}
+.smfp-msg-history-empty,.smfp-msg-history-error{padding:18px 10px;text-align:center;color:rgba(234,252,255,.64);font-weight:850;}
+.smfp-msg-history-error{color:#ff5570;}
+.smfp-msg-history-item{display:grid;gap:4px;margin:0 0 9px;padding:9px 10px;border-radius:13px;border:1px solid rgba(22,255,243,.18);background:rgba(5,10,28,.68);box-shadow:inset 0 0 12px rgba(22,255,243,.035)}
+.smfp-msg-history-item.is-self{border-color:rgba(255,61,187,.25);background:rgba(24,8,30,.64)}
+.smfp-msg-history-meta{display:flex;justify-content:space-between;gap:10px;font-size:9px;font-weight:900;letter-spacing:.05em;color:#28fff4;text-transform:uppercase;opacity:.85;}
+.smfp-msg-history-message{font-size:12px;line-height:1.32;color:#f3fbff;font-weight:750;overflow-wrap:anywhere;}
+@media(max-width:760px){
+  .smfp-msg-history-modal{width:94vw;max-height:74vh;border-radius:18px;}
+  .smfp-msg-history-title{font-size:12px}.smfp-msg-history-message{font-size:12px;}
+}

@@ -1,34 +1,23 @@
-const memoryJobs = new Map();
+const PREFIX = "suno-job:";
 
-export function createLocalJob(payload) {
-  const id = "suno-local-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
-  const job = {
-    id,
-    status: "queued",
-    provider: "local-adapter-placeholder",
-    payload,
-    createdAt: new Date().toISOString(),
-    result: null
-  };
-  memoryJobs.set(id, job);
-  return job;
+export async function saveJob(env, job) {
+  if (!(env.SUNO_JOBS_KV && typeof env.SUNO_JOBS_KV.put === "function")) return false;
+  await env.SUNO_JOBS_KV.put(`${PREFIX}${job.id}`, JSON.stringify(job), { expirationTtl: 60 * 60 * 24 * 7 });
+  return true;
 }
 
-export function getJob(id) {
-  return memoryJobs.get(id) || null;
+export async function getJob(env, id) {
+  if (!(env.SUNO_JOBS_KV && typeof env.SUNO_JOBS_KV.get === "function")) return null;
+  return env.SUNO_JOBS_KV.get(`${PREFIX}${id}`, { type: "json" });
 }
 
-export function listJobs() {
-  return Array.from(memoryJobs.values()).slice(-50);
-}
-
-export function completePlaceholder(id) {
-  const job = memoryJobs.get(id);
-  if (!job) return null;
-  job.status = "done";
-  job.result = {
-    tracks: [],
-    note: "Placeholder mode. Connect real Suno/Zuno provider in src/suno-adapter.js."
-  };
-  return job;
+export async function listJobs(env, limit = 50) {
+  if (!(env.SUNO_JOBS_KV && typeof env.SUNO_JOBS_KV.list === "function")) return null;
+  const result = await env.SUNO_JOBS_KV.list({ prefix: PREFIX, limit: Math.max(1, Math.min(100, limit)) });
+  const jobs = [];
+  for (const key of result.keys || []) {
+    const job = await env.SUNO_JOBS_KV.get(key.name, { type: "json" });
+    if (job) jobs.push(job);
+  }
+  return jobs.sort((a, b) => String(b.updatedAt || b.createdAt || "").localeCompare(String(a.updatedAt || a.createdAt || "")));
 }

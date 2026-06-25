@@ -1,0 +1,37 @@
+name: Release Integrity
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm run verify
+      - name: Python syntax audit without bytecode
+        shell: python
+        run: |
+          from pathlib import Path
+          import ast
+          failures = []
+          for path in Path('.').rglob('*.py'):
+              try:
+                  ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+              except Exception as exc:
+                  failures.append(f"{path}: {exc}")
+          if failures:
+              raise SystemExit("\n".join(failures))
+          print("Python files valid")
