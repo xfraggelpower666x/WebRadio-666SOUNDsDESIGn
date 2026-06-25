@@ -1,19 +1,38 @@
 {
-  "name": "WebRadio-666SOUNDsDESIGn fullversion with Suno/Chaos workers",
-  "created": "2026-05-24",
-  "baseZip": "WebRadio-666SOUNDsDESIGn_FINAL_ADMIN_AUTH_CHAOS_ENGINE_INTEGRATION_2026-05-24.zip",
-  "integratedResourceZip": "SUNO_CHAOS_WORKER_GITHUB_FULL_VERSION_2026-05-24.zip",
+  "name": "WebRadio-666SOUNDsDESIGn FULLVERSION REPAIRED",
+  "version": "1.0.1",
+  "releaseDate": "2026-06-25",
+  "releaseFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1",
+  "type": "complete-repository-release",
+  "uploadMode": "scriptable-folder-upload",
+  "packaging": {
+    "singleTopLevelDirectory": true,
+    "repoRootDirectlyInsideTopLevelDirectory": true,
+    "nestedZipFiles": false,
+    "generatedPythonBytecode": false
+  },
   "integratedPaths": [
     "external-workers/666-chaos-ai-track-system/",
-    "external-workers/666-suno-system/"
+    "external-workers/666-suno-system/",
+    "Render/666SOUNDsDESIGn-Alert-Service-Renderer/",
+    "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
+    "Scriptable/Scripts/"
   ],
-  "safety": {
-    "audioWorkerRootPreserved": true,
-    "externalWorkersSeparate": true,
-    "secretsIncluded": false
+  "repairState": {
+    "runtimeBlockersRepaired": true,
+    "skipApiRestored": true,
+    "chaosDispatcherConnected": true,
+    "staticAssetsBindingConfigured": true,
+    "runtimeRadioConfigConnected": true,
+    "playerAlertWriteAuthenticationAdded": true,
+    "api404ContractRepaired": true,
+    "debugExposureReduced": true,
+    "testsIncluded": true
   },
-  "rendererResourceIntegrated": true,
-  "rendererResourcePath": "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
-  "rendererResourceZip": "666SOUNDsDESIGn_RENDERER_DEPLOY_AWARENESS_FULL_2026-05-24.zip",
-  "updated": "2026-05-24"
+  "safety": {
+    "sourceSystemsPreserved": true,
+    "secretsIncluded": false,
+    "destructiveSimplification": false,
+    "deploymentSecretsRequired": true
+  }
 }

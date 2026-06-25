@@ -1,0 +1,17 @@
+{
+  "release": "WebRadio-666SOUNDsDESIGn FULLVERSION REPAIRED",
+  "version": "1.0.1",
+  "date": "2026-06-25",
+  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1",
+  "repoRootMarkers": [
+    "worker.js",
+    "wrangler.jsonc",
+    "index.html",
+    "package.json",
+    ".assetsignore",
+    "Scriptable/Scripts/666SOUNDsDESIGn_FOLDER_UPLOADER_LIVE_UI.js"
+  ],
+  "validationCommand": "npm run verify",
+  "secretsBundled": false,
+  "nestedArchivesBundled": false
+}

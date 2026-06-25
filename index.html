@@ -2761,6 +2761,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var target=ev.target&&ev.target.closest&&ev.target.closest('#mffAlertSend');
     if(!target)return;
     ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
+    var now=Date.now();
+    if(window.__smfpPlayerAlertSendInFlight || (now-Number(window.__smfpPlayerAlertLastSendEvent||0))<1200)return false;
+    window.__smfpPlayerAlertSendInFlight=true;
+    window.__smfpPlayerAlertLastSendEvent=now;
     var ta=qs('#mffAlertText'); var msg=textClean(ta&&ta.value);
     if(!msg){sendState('fail');status('FAILED: ENTER MESSAGE FIRST','is-error');return false;}
     target.disabled=true; target.textContent='SENDING'; sendState('sending'); status('PLAYER SENDING...','');
@@ -2771,7 +2775,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       if(ta)ta.value=''; target.textContent='SENT'; sendState('ok'); status('PLAYER SENT ✓ '+String(d.source||'backend/cache').toUpperCase().replace('CACHE-TERTIARY','CACHE FALLBACK'),'is-ok');
       setTimeout(function(){var b=qs('#mffAlertEditorBackdrop'); if(b){b.classList.remove('is-open');b.setAttribute('aria-hidden','true')}},1200);
     }catch(e){target.textContent='FAILED';sendState('fail');status('PLAYER FAILED ✕ '+String(e&&e.message||'CONNECTION ERROR'),'is-error');}
-    finally{setTimeout(function(){target.disabled=false;target.textContent='SEND'},1500);}
+    finally{window.__smfpPlayerAlertSendInFlight=false;setTimeout(function(){target.disabled=false;target.textContent='SEND'},1500);}
     return false;
   }
   function lockZoom(){

@@ -1,0 +1,43 @@
+{
+  "release": "WebRadio-666SOUNDsDESIGn_FULLVERSION_REPAIRED_v1_0_1",
+  "verifiedAt": "2026-06-25",
+  "packagingTarget": "iPhone Files extraction plus Scriptable folder upload",
+  "checks": {
+    "singleTopLevelProjectFolder": true,
+    "repoRootFilesDirectlyInsideProjectFolder": true,
+    "nestedZipFiles": 0,
+    "pythonBytecodeFiles": 0,
+    "javascriptSyntax": {
+      "checked": 57,
+      "passed": 57
+    },
+    "pythonAst": {
+      "checked": 16,
+      "passed": 16
+    },
+    "jsonParse": {
+      "checked": 116,
+      "passed": 116
+    },
+    "nodeRuntimeSmokeTests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "renderServiceSmoke": {
+      "health": "PASS",
+      "unauthenticatedWriteBlocked": "PASS",
+      "authenticatedWrite": "PASS",
+      "currentSchema": "PASS",
+      "historySchema": "PASS"
+    },
+    "obviousSecretPatternScan": {
+      "hits": 0
+    }
+  },
+  "scopeBoundary": {
+    "liveProductionDeployVerified": false,
+    "externalSecretsBundled": false,
+    "externalProviderCredentialsBundled": false,
+    "note": "Live-DNS, Cloudflare-Namespace-IDs, GitHub-Zielbranch, Render-Umgebung und Suno-Provider liegen außerhalb des lokalen Release-Tests."
+  }
+}

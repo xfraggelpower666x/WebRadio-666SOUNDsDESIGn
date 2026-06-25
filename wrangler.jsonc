@@ -1,14 +1,18 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "webradio-666soundsdesign-worker",
   "main": "worker.js",
-  "compatibility_date": "2024-05-15",
+  "compatibility_date": "2026-06-25",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
   "vars": {
     "PLAYER_ALERT_BACKEND_URL": "https://auto-setup-render-for-backend-mp3-ess8.onrender.com",
-    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_KV_FALLBACK_CACHE_LAST_V186"
+    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_KV_FALLBACK_CACHE_LAST_V101",
+    "GITHUB_CONFIG_PATH": "config/radio-runtime.json",
+    "GITHUB_BACKUP_DIR": "config/backups",
+    "ENABLE_PUBLIC_DEBUG": "false"
   }
 }
-
-// V186 PLAYER ALERT BACKEND ROUTING
-// Primary backend: Render Alert Service
-// PLAYER_ALERT_BACKEND_URL is public route config, not a secret.
-// KV stays optional fallback only. Cache is last emergency fallback.

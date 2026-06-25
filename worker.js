@@ -1,6 +1,6 @@
 import { handleDiscordNotifyV3 } from './worker-addons/discord-notify-addon-v3.js';
 import { handleRadioAdminConfigAddon } from './worker-addons/radio-admin-config-addon.js';
-
+import { handleSkipApi } from './worker-addons/skip-api-addon.js';
 import { handleChaosEngineApiAddon } from './worker-addons/chaos-engine-api-addon.js';
 // ==========================================================
 // 666SOUNDsDESIGn — v66 The Dark Dancer Route
@@ -20,6 +20,7 @@ function darkDancerResponse(pathname) {
   const path = String(pathname || '').replace(/\/+$/, '') || '/';
   if (
     path === '/The-Dark-Dancer' ||
+    path === '/The-Dark-Dancer.html' ||
     path === '/the-dark-dancer' ||
     path === '/666SOUNDsDESIGn/The-Dark-Dancer.html'
   ) {
@@ -78,6 +79,85 @@ const METADATA_URLS = [
   "https://idjstream.app/cp/get_info.php?p=8686"
 ];
 const STATIC_ROOT_INDEX_PATH = "/index.html";
+const RADIO_RUNTIME_KV_KEY = "radio-runtime:current";
+const RADIO_RUNTIME_CACHE_MS = 15000;
+let radioRuntimeCache = { expiresAt: 0, value: null, source: "none" };
+
+const DEFAULT_RADIO_RUNTIME_CONFIG = Object.freeze({
+  schema: "radio-runtime-config-v2",
+  version: 2,
+  primaryStream: PRIMARY_STREAM_URLS[0],
+  backupStream: FALLBACK_STREAM_URLS[0],
+  emergencyStream: FALLBACK_STREAM_URLS_ALT[0],
+  primaryStreams: PRIMARY_STREAM_URLS,
+  backupStreams: FALLBACK_STREAM_URLS,
+  emergencyStreams: FALLBACK_STREAM_URLS_ALT,
+  metadataUpstreams: METADATA_URLS
+});
+
+function normalizedHttpUrls(value, fallback = []) {
+  const candidates = Array.isArray(value) ? value : (value ? [value] : []);
+  const unique = [];
+  for (const entry of candidates) {
+    try {
+      const url = new URL(String(entry).trim());
+      if (!/^https?:$/.test(url.protocol)) continue;
+      const normalized = url.toString();
+      if (!unique.includes(normalized)) unique.push(normalized);
+    } catch {}
+  }
+  return unique.length ? unique : [...fallback];
+}
+
+function normalizeRadioRuntimeConfig(raw = {}) {
+  const primary = normalizedHttpUrls(raw.primaryStreams || raw.primaryStream, PRIMARY_STREAM_URLS);
+  const backup = normalizedHttpUrls(raw.backupStreams || raw.backupStream, FALLBACK_STREAM_URLS);
+  const emergency = normalizedHttpUrls(raw.emergencyStreams || raw.emergencyStream, FALLBACK_STREAM_URLS_ALT);
+  const metadata = normalizedHttpUrls(raw.metadataUpstreams, METADATA_URLS);
+  return {
+    ...DEFAULT_RADIO_RUNTIME_CONFIG,
+    ...raw,
+    primaryStream: primary[0],
+    backupStream: backup[0],
+    emergencyStream: emergency[0],
+    primaryStreams: primary,
+    backupStreams: backup,
+    emergencyStreams: emergency,
+    metadataUpstreams: metadata
+  };
+}
+
+async function loadRadioRuntimeConfig(request, env, force = false) {
+  const now = Date.now();
+  if (!force && radioRuntimeCache.value && radioRuntimeCache.expiresAt > now) return radioRuntimeCache;
+
+  if (env?.RADIO_CONFIG_KV && typeof env.RADIO_CONFIG_KV.get === "function") {
+    try {
+      const kvValue = await env.RADIO_CONFIG_KV.get(RADIO_RUNTIME_KV_KEY, { type: "json" });
+      if (kvValue && typeof kvValue === "object") {
+        radioRuntimeCache = { value: normalizeRadioRuntimeConfig(kvValue), source: "kv", expiresAt: now + RADIO_RUNTIME_CACHE_MS };
+        return radioRuntimeCache;
+      }
+    } catch {}
+  }
+
+  if (env?.ASSETS && typeof env.ASSETS.fetch === "function") {
+    try {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = "/config/radio-runtime.json";
+      assetUrl.search = `?runtime=${now}`;
+      const response = await env.ASSETS.fetch(new Request(assetUrl.toString(), { headers: { "cache-control": "no-store" } }));
+      if (response?.ok) {
+        const assetValue = await response.json();
+        radioRuntimeCache = { value: normalizeRadioRuntimeConfig(assetValue), source: "asset", expiresAt: now + RADIO_RUNTIME_CACHE_MS };
+        return radioRuntimeCache;
+      }
+    } catch {}
+  }
+
+  radioRuntimeCache = { value: normalizeRadioRuntimeConfig(DEFAULT_RADIO_RUNTIME_CONFIG), source: "defaults", expiresAt: now + RADIO_RUNTIME_CACHE_MS };
+  return radioRuntimeCache;
+}
 
 const HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -289,12 +369,15 @@ function playerAlertSameOriginRequest(request){
 async function verifyPlayerAlertWrite(request, env){
   const configuredToken = String((env && (env.PLAYER_ALERT_WRITE_TOKEN || env.PLAYER_ALERT_BACKEND_TOKEN || env.PLAYER_ALERT_TOKEN)) || '').trim();
   const providedToken = String(request.headers.get('x-player-alert-token') || playerAlertBearerToken(request) || '').trim();
-  if(configuredToken){
-    if(providedToken && timingSafeEqualText(providedToken, configuredToken)) return { ok: true, mode: 'token' };
-    return { ok: false, error: providedToken ? 'invalid_token' : 'missing_token' };
+  if(configuredToken && providedToken && timingSafeEqualText(providedToken, configuredToken)){
+    return { ok: true, mode: 'token' };
   }
 
-  if(!playerAlertSameOriginRequest(request)) return { ok: false, error: 'origin_mismatch' };
+  // Browser-SEND bleibt über die bestehende Admin-Sitzung nutzbar. Ein gesetztes
+  // Maschinen-Token darf den Same-Origin-/Admin-Cookie-Weg nicht unbeabsichtigt blockieren.
+  if(!playerAlertSameOriginRequest(request)){
+    return { ok: false, error: configuredToken && providedToken ? 'invalid_token' : 'origin_mismatch' };
+  }
 
   const verifyUrl = String((env && env.ADMIN_AUTH_VERIFY_URL) || 'https://666-system-auth.666soundsdesign-broadcaster.com/verify').trim();
   const cookieToken = playerAlertCookie(request, 'chaos_auth') || playerAlertCookie(request, 'admin_auth');
@@ -304,13 +387,17 @@ async function verifyPlayerAlertWrite(request, env){
     : (cookieToken ? { authorization: `Bearer ${cookieToken}` } : null);
   if(!headers) return { ok: false, error: 'missing_auth' };
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
   try{
-    const response = await fetch(verifyUrl, { headers });
+    const response = await fetch(verifyUrl, { headers, signal: controller.signal, redirect: 'error' });
     const data = await response.json().catch(() => ({}));
     if(response.ok && data && data.ok) return { ok: true, mode: 'admin-auth' };
     return { ok: false, error: 'unauthorized', status: response.status };
   }catch(err){
-    return { ok: false, error: 'auth_verify_failed', detail: String(err && err.message || err) };
+    return { ok: false, error: err?.name === 'AbortError' ? 'auth_verify_timeout' : 'auth_verify_failed' };
+  }finally{
+    clearTimeout(timer);
   }
 }
 
@@ -336,11 +423,15 @@ function sanitizeMetadataValue(value, depth = 0){
   return null;
 }
 
-async function fetchMetadataProxyPayload(){
+async function fetchMetadataProxyPayload(request, env){
+  const runtime = await loadRadioRuntimeConfig(request, env);
   let lastError = null;
-  for(const upstreamUrl of METADATA_URLS){
+  for(let index = 0; index < runtime.value.metadataUpstreams.length; index += 1){
+    const upstreamUrl = runtime.value.metadataUpstreams[index];
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
     try{
-      const upstream = await fetch(upstreamUrl,{headers:{"cache-control":"no-store"}});
+      const upstream = await fetch(upstreamUrl,{headers:{"cache-control":"no-store"},signal:controller.signal});
       if(!upstream.ok) throw new Error(`metadata_http_${upstream.status}`);
       const body = await upstream.text();
       let payload = body;
@@ -349,12 +440,14 @@ async function fetchMetadataProxyPayload(){
       }catch(err){
         payload = JSON.stringify({ raw: metadataSafeText(body, 1024) });
       }
-      return { ok: true, status: upstream.status, payload, source: upstreamUrl };
+      return { ok: true, status: upstream.status, payload, source: `upstream-${index + 1}`, configSource: runtime.source };
     }catch(err){
-      lastError = { source: upstreamUrl, error: String(err && err.message || err) };
+      lastError = { source: `upstream-${index + 1}`, error: err?.name === "AbortError" ? "metadata_timeout" : String(err && err.message || err) };
+    }finally{
+      clearTimeout(timer);
     }
   }
-  return { ok: false, error: lastError || { error: "metadata_proxy_failed" } };
+  return { ok: false, error: lastError || { error: "metadata_proxy_failed" }, configSource: runtime.source };
 }
 
 
@@ -393,7 +486,11 @@ async function playerAlertBackendFetch(env, path, init){
   const controller = new AbortController();
   const timer = setTimeout(()=>controller.abort(), 6500);
   try{
-    const res = await fetch(url.toString(), Object.assign({signal:controller.signal, headers:{'content-type':'application/json'}}, init || {}));
+    const headers = new Headers((init && init.headers) || {});
+    if(!headers.has('content-type')) headers.set('content-type','application/json');
+    const serviceToken = String((env && (env.PLAYER_ALERT_SERVICE_TOKEN || env.PLAYER_ALERT_BACKEND_TOKEN)) || '').trim();
+    if(serviceToken) headers.set('x-player-alert-service-token', serviceToken);
+    const res = await fetch(url.toString(), Object.assign({}, init || {}, {signal:controller.signal, headers}));
     clearTimeout(timer);
     let data = null; try{ data = await res.json(); }catch(e){ data = {ok:res.ok,status:res.status}; }
     return {ok:res.ok, status:res.status, data};
@@ -422,6 +519,12 @@ async function playerAlertCacheGet(key){
 }
 async function playerAlertCachePut(key, value, maxAge=900){
   try{ await caches.default.put(new Request(key), new Response(JSON.stringify(value), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age='+String(maxAge)}})); return true; }catch(e){ return false; }
+}
+function playerAlertRateKvKey(senderId){
+  return `${PLAYER_ALERT_KV_RATE_KEY}:${encodeURIComponent(String(senderId || 'anonymous').slice(0,80))}`;
+}
+function playerAlertRateCacheKey(senderId){
+  return `${PLAYER_ALERT_RATE_KEY}/${encodeURIComponent(String(senderId || 'anonymous').slice(0,80))}`;
 }
 async function handlePlayerAlertV152(request, env){
   const url = new URL(request.url);
@@ -455,7 +558,9 @@ async function handlePlayerAlertV152(request, env){
     const username = playerAlertCleanText(payload.username || payload.name || 'Broadcast').slice(0,28) || 'Broadcast';
     if(!message) return playerAlertJson({ok:false,error:'empty_message'},400);
     const now = Date.now();
-    const rate = (await playerAlertKvGet(env, PLAYER_ALERT_KV_RATE_KEY)) || (await playerAlertCacheGet(PLAYER_ALERT_RATE_KEY));
+    const rateKvKey = playerAlertRateKvKey(senderId);
+    const rateCacheKey = playerAlertRateCacheKey(senderId);
+    const rate = (await playerAlertKvGet(env, rateKvKey)) || (await playerAlertCacheGet(rateCacheKey));
     if(rate){
       const last = Number(rate.last || 0);
       if(last && (now - last) < PLAYER_ALERT_RATE_MS) return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now-last)},429);
@@ -463,17 +568,17 @@ async function handlePlayerAlertV152(request, env){
     const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,username,senderId,clientId:senderId,createdAt:new Date(now).toISOString(),timestamp:now,version:playerAlertCleanText(payload.version||'')};
     const backend = await playerAlertBackendFetch(env, '/send', {method:'POST', body:JSON.stringify(alert)});
     if(backend && backend.ok){
-      await playerAlertKvPut(env, PLAYER_ALERT_KV_RATE_KEY, {last:now}, 180);
+      await playerAlertKvPut(env, rateKvKey, {last:now}, 180);
       return playerAlertJson(Object.assign({ok:true,delivered:true,source:'backend',fallback:false}, backend.data));
     }
     const kvOk = await playerAlertKvPut(env, PLAYER_ALERT_KV_CURRENT_KEY, alert, 900);
     if(kvOk){
-      await playerAlertKvPut(env, PLAYER_ALERT_KV_RATE_KEY, {last:now}, 180);
+      await playerAlertKvPut(env, rateKvKey, {last:now}, 180);
       await playerAlertHistoryAppend(env, alert);
       return playerAlertJson(Object.assign({source:'kv-fallback',backend:backend?backend.data:null}, alert));
     }
     await playerAlertCachePut(PLAYER_ALERT_CACHE_KEY, alert, 900);
-    await playerAlertCachePut(PLAYER_ALERT_RATE_KEY, {last:now}, 180);
+    await playerAlertCachePut(rateCacheKey, {last:now}, 180);
     return playerAlertJson(Object.assign({source:'cache-tertiary',backend:backend?backend.data:null}, alert));
   }
   return playerAlertJson({ok:false,error:'not_found'},404);
@@ -512,7 +617,6 @@ async function proxyStream(request, upstream, targetName = "unknown"){
     const headers=passthroughHeaders(response.headers);
     headers.set("x-active-stream-target", targetName);
     headers.set("x-failover-state", targetName === "main" ? "primary" : "fallback");
-    headers.set("x-upstream-url", upstream);
     headers.set("x-upstream-protocol", upstream.startsWith("https://") ? "https" : "http");
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   } finally {
@@ -533,22 +637,23 @@ async function proxyStreamCandidates(request, upstreams, targetName){
   throw lastError || new Error(`upstream_${targetName}_unavailable`);
 }
 
-async function proxyStreamFailover(request){
+async function proxyStreamFailover(request, env){
+  const runtime = await loadRadioRuntimeConfig(request, env);
   // MAIN versuchen, bei HTTP-Fehler/Timeout direkt BACKUP versuchen.
   try{
-    return await proxyStreamCandidates(request, PRIMARY_STREAM_URLS, "main");
+    return await proxyStreamCandidates(request, runtime.value.primaryStreams, "main");
   }catch(primaryErr){
     try{
-      return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS, "backup");
+      return await proxyStreamCandidates(request, runtime.value.backupStreams, "backup");
     }catch(backupErr){
       try{
-        return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS_ALT, "backup-alt");
+        return await proxyStreamCandidates(request, runtime.value.emergencyStreams, "backup-alt");
       }catch(backupAltErr){
         return new Response(JSON.stringify({
           error:"stream_proxy_failed",
-          main:String(primaryErr && primaryErr.message ? primaryErr.message : primaryErr),
-          backup:String(backupErr && backupErr.message ? backupErr.message : backupErr),
-          backup_alt:String(backupAltErr && backupAltErr.message ? backupAltErr.message : backupAltErr)
+          main:streamFailureCode(primaryErr),
+          backup:streamFailureCode(backupErr),
+          backup_alt:streamFailureCode(backupAltErr)
         }),{
           status:502,
           headers:{
@@ -564,13 +669,22 @@ async function proxyStreamFailover(request){
   }
 }
 
-async function proxyFallbackStream(request){
-  // Direkte Backup-Route: erst alte Port-Variante, dann Pfad-Variante.
+function streamFailureCode(error){
+  const message = String(error && error.message || error || 'stream_failed');
+  if(error && error.name === 'AbortError') return 'stream_timeout';
+  const http = message.match(/http_(\d{3})/i);
+  if(http) return `stream_http_${http[1]}`;
+  return 'stream_unreachable';
+}
+
+async function proxyFallbackStream(request, env){
+  const runtime = await loadRadioRuntimeConfig(request, env);
+  // Direkte Backup-Route: erst Backup, dann Emergency.
   try{
-    return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS, "backup");
+    return await proxyStreamCandidates(request, runtime.value.backupStreams, "backup");
   }catch(backupErr){
     try{
-      return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS_ALT, "backup-alt");
+      return await proxyStreamCandidates(request, runtime.value.emergencyStreams, "backup-alt");
     }catch(backupAltErr){
       return new Response(JSON.stringify({
         error:"fallback_stream_proxy_failed",
@@ -596,6 +710,10 @@ function buildExternalProxyHeaders(sourceHeaders){
   headers.delete("content-length");
   if(!headers.get("cache-control")) headers.set("cache-control", "no-store");
   headers.set("x-player-mode", "local-project-asset");
+  headers.set("x-content-type-options", "nosniff");
+  headers.set("x-frame-options", "SAMEORIGIN");
+  headers.set("referrer-policy", "strict-origin-when-cross-origin");
+  headers.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
   return headers;
 }
 
@@ -622,7 +740,7 @@ async function fetchExternalAsset(pathname, request, env){
 
 async function serveExternalIndex(request, env){
   const response = await serveProjectAsset(request, env, STATIC_ROOT_INDEX_PATH);
-  return response || new Response(HTML, {status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
+  return response || new Response(HTML, {status:200,headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store","x-player-mode":"embedded-emergency-fallback","x-player-version":"legacy-embedded"}});
 }
 
 
@@ -691,16 +809,18 @@ function s666RouteTable() {
     { priority: 2, route: "/api/admin/*", handler: "handleRadioAdminConfigAddon", purpose: "Admin auth/config/GitHub backup" },
     { priority: 3, route: "/api/player-alert/*", handler: "handlePlayerAlertV152", purpose: "PC+iPhone broadcast relay" },
     { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
-    { priority: 5, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
-    { priority: 6, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
-    { priority: 7, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
-    { priority: 8, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
-    { priority: 9, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
-    { priority: 10, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
-    { priority: 11, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
-    { priority: 12, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
-    { priority: 13, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
-    { priority: 14, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
+    { priority: 5, route: "/api/skip/status", handler: "handleSkipApi", purpose: "skip status / diagnostics" },
+    { priority: 6, route: "/api/admin/skip + /skip", handler: "handleSkipApi", purpose: "protected shoutcast autodj skip" },
+    { priority: 7, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
+    { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
+    { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
+    { priority: 10, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
+    { priority: 11, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
+    { priority: 12, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
+    { priority: 13, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
+    { priority: 14, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
+    { priority: 15, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
+    { priority: 16, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
   ];
 }
 
@@ -729,6 +849,11 @@ function s666ModuleStatus(env) {
         ok: typeof handlePlayerAlertV152 === "function",
         routes: ["/api/player-alert/send", "/api/player-alert/current", "/api/player-alert/status", "/api/player-alert/history"]
       },
+      skip: {
+        ok: typeof handleSkipApi === "function",
+        routes: ["/api/skip/status", "/api/admin/skip", "/skip"],
+        env: s666BoolEnv(env, ["SHOUTCAST_ADMIN_URL","SHOUTCAST_ADMIN_USER","SHOUTCAST_ADMIN_PASSWORD","SHOUTCAST_SID","SONICPANEL_SKIP_URL","SONICPANEL_SKIP_TOKEN","ADMIN_AUTH_VERIFY_URL","PW_VERIFY_URL","PW_AUTH_SECRET"])
+      },
       admin: {
         ok: typeof handleRadioAdminConfigAddon === "function",
         routes: ["/api/admin/auth-check", "/api/admin/config/current", "/api/admin/config/update", "/api/admin/config/rollback"],
@@ -746,8 +871,9 @@ function s666ModuleStatus(env) {
         files: ["js/sound-control-overlay-v1.js", "css/sound-control-overlay-v1.css"]
       },
       externalWorkers: {
-        ok: false,
-        folders: []
+        ok: true,
+        folders: ["external-workers/666-chaos-ai-track-system", "external-workers/666-suno-system"],
+        deployment: "separate-workers"
       },
       rendererResource: {
         ok: true,
@@ -758,26 +884,14 @@ function s666ModuleStatus(env) {
 }
 
 async function s666LiveHealth(request, env) {
+  const runtime = await loadRadioRuntimeConfig(request, env);
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: ROUTE_LIVE_DEBUG_VERSION,
+    version: "FULLVERSION_REPAIRED_v1.0.1",
     time: new Date().toISOString(),
-    criticalRoutes: {
-      root: "/",
-      health: "/health",
-      debug: "/debug",
-      routes: "/debug/routes",
-      modules: "/debug/modules",
-      stream: "/stream",
-      fallbackStream: "/fallback-stream",
-      chaosEngine: "/CHAOS_ENGINE/",
-      darkDancer: "/The-Dark-Dancer",
-      adminAuthCheck: "/api/admin/auth-check",
-      broadcastStatus: "/api/player-alert/status",
-      discordStatus: "/api/discord/status"
-    },
-    modules: s666ModuleStatus(env).modules
+    runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
+    routes: { root: "/", stream: "/stream", metadata: "/api/nowplaying" }
   });
 }
 
@@ -805,6 +919,25 @@ async function s666LiveDebug(request, env) {
   });
 }
 
+function diagnosticAccessAllowed(request, env){
+  if(String(env?.ENABLE_PUBLIC_DEBUG || "").toLowerCase() === "true") return true;
+  const expected = String(env?.DEBUG_TOKEN || "").trim();
+  if(!expected) return false;
+  const auth = String(request.headers.get("authorization") || "").trim();
+  const bearer = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
+  const provided = String(request.headers.get("x-debug-token") || bearer || "").trim();
+  return provided && timingSafeEqualText(provided, expected);
+}
+
+function apiNotFound(pathname){
+  return s666Json({ok:false,error:"not_found",path:pathname},404);
+}
+
+function requestAcceptsHtml(request){
+  const accept = String(request.headers.get("accept") || "").toLowerCase();
+  return accept.includes("text/html") || accept === "" || accept.includes("*/*");
+}
+
 export default {
   async fetch(request, env, ctx){
 
@@ -813,12 +946,33 @@ export default {
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
     if (url.pathname === "/health") return s666LiveHealth(request, env);
+    if (url.pathname === "/api/runtime-config/status" && (request.method === "GET" || request.method === "HEAD")) {
+      const runtime = await loadRadioRuntimeConfig(request, env, true);
+      return s666Json({
+        ok: true,
+        source: runtime.source,
+        schema: runtime.value.schema || null,
+        version: runtime.value.version || null,
+        updatedAt: runtime.value.updatedAt || null,
+        primaryStream: runtime.value.primaryStreams[0] || null,
+        backupStream: runtime.value.backupStreams[0] || null,
+        emergencyStream: runtime.value.emergencyStreams[0] || null,
+        metadataUpstreamCount: runtime.value.metadataUpstreams.length
+      });
+    }
+    if (["/debug", "/debug/routes", "/debug/modules"].includes(url.pathname) && !diagnosticAccessAllowed(request, env)) return apiNotFound(url.pathname);
     if (url.pathname === "/debug") return s666LiveDebug(request, env);
     if (url.pathname === "/debug/routes") return s666Json({ ok: true, version: ROUTE_LIVE_DEBUG_VERSION, routes: s666RouteTable() });
     if (url.pathname === "/debug/modules") return s666Json(s666ModuleStatus(env));
 
     const radioAdminConfigResponse = await handleRadioAdminConfigAddon(request, env);
     if (radioAdminConfigResponse) return radioAdminConfigResponse;
+
+    const skipResponse = await handleSkipApi(request, env);
+    if (skipResponse) return skipResponse;
+
+    const chaosApiResponse = await handleChaosEngineApiAddon(request, env);
+    if (chaosApiResponse) return chaosApiResponse;
 
     const playerAlertV152Response = await handlePlayerAlertV152(request, env);
     if (playerAlertV152Response) return playerAlertV152Response;
@@ -851,16 +1005,11 @@ const url=new URL(request.url);
       return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
     }
 
-    // Gesundheitscheck unverändert lassen.
-    if(url.pathname==="/health"){
-      return new Response("OK",{status:200,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
-    }
-
     // Metadaten-Proxy NICHT umbauen, damit iPhone-App und bestehende Clients stabil bleiben.
     if(url.pathname==="/api/nowplaying"){
-      const metadata = await fetchMetadataProxyPayload();
+      const metadata = await fetchMetadataProxyPayload(request, env);
       if(metadata.ok){
-        return new Response(metadata.payload,{status:metadata.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker","x-radio-meta-source":metadata.source}});
+        return new Response(metadata.payload,{status:metadata.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker","x-radio-meta-source":metadata.source,"x-radio-config-source":metadata.configSource}});
       }
       return new Response(JSON.stringify({error:"metadata_proxy_failed",detail:metadata.error}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
     }
@@ -869,10 +1018,10 @@ const url=new URL(request.url);
     // /stream versucht MAIN und fällt bei HTTP-Fehler/Timeout automatisch auf BACKUP zurück.
     // /fallback-stream versucht Backup-Varianten gezielt.
     if(url.pathname==="/stream"){
-      return await proxyStreamFailover(request)
+      return await proxyStreamFailover(request, env)
     }
     if(url.pathname==="/fallback-stream"){
-      return await proxyFallbackStream(request)
+      return await proxyFallbackStream(request, env)
     }
 
     // Interner Notfall-Player bleibt komplett erhalten.
@@ -900,6 +1049,14 @@ const url=new URL(request.url);
       if(localAsset) return localAsset;
     }
 
-    return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
+    if(url.pathname.startsWith("/api/")) return apiNotFound(url.pathname);
+    if(request.method !== "GET" && request.method !== "HEAD") {
+      return s666Json({ok:false,error:"method_not_allowed",allowed:["GET","HEAD"]},405);
+    }
+    const lastSegment = url.pathname.split("/").pop() || "";
+    if(lastSegment.includes(".") || !requestAcceptsHtml(request)) {
+      return new Response("Not found", {status:404,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","x-content-type-options":"nosniff"}});
+    }
+    return await serveExternalIndex(request, env);
   }
 };
