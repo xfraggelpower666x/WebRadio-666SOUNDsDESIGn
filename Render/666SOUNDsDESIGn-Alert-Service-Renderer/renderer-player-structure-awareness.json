@@ -1,6 +1,6 @@
 {
   "version": "2026-05-24",
-  "purpose": "Renderer deploy-awareness for WebRadio fullversion with Chaos Engine and external workers.",
+  "purpose": "Renderer deploy-awareness for WebRadio fullversion with Chaos Engine.",
   "player_paths_to_preserve": [
     "worker.js",
     "index.html",
@@ -10,8 +10,7 @@
     "js/",
     "config/",
     "worker-addons/",
-    "CHAOS_ENGINE/",
-    "external-workers/"
+    "CHAOS_ENGINE/"
   ],
   "new_important_paths": {
     "chaos_engine": [
@@ -21,10 +20,6 @@
       "CHAOS_ENGINE/assets/css/",
       "CHAOS_ENGINE/assets/js/",
       "CHAOS_ENGINE/assets/data/"
-    ],
-    "external_workers": [
-      "external-workers/666-chaos-ai-track-system/",
-      "external-workers/666-suno-system/"
     ],
     "admin_runtime": [
       "config/radio-runtime.json",
@@ -38,8 +33,6 @@
   },
   "rules": [
     "Do not flatten nested directories.",
-    "Do not discard external-workers.",
-    "Do not merge external-workers into the audio worker root.",
     "Do not delete worker.js, index.html, config, worker-addons or CHAOS_ENGINE.",
     "Do not write secrets into repo files.",
     "Preserve file names and casing exactly."

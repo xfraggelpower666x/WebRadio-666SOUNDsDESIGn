@@ -1,15 +1,12 @@
 {
-  "name": "WebRadio-666SOUNDsDESIGn fullversion with Suno/Chaos workers",
+  "name": "WebRadio-666SOUNDsDESIGn fullversion",
   "created": "2026-05-24",
   "baseZip": "WebRadio-666SOUNDsDESIGn_FINAL_ADMIN_AUTH_CHAOS_ENGINE_INTEGRATION_2026-05-24.zip",
   "integratedResourceZip": "SUNO_CHAOS_WORKER_GITHUB_FULL_VERSION_2026-05-24.zip",
-  "integratedPaths": [
-    "external-workers/666-chaos-ai-track-system/",
-    "external-workers/666-suno-system/"
-  ],
+  "integratedPaths": [],
   "safety": {
     "audioWorkerRootPreserved": true,
-    "externalWorkersSeparate": true,
+    "externalWorkersSeparate": false,
     "secretsIncluded": false
   },
   "rendererResourceIntegrated": true,

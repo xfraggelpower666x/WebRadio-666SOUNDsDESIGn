@@ -59,7 +59,10 @@ function darkDancerResponse(pathname) {
 const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
 const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
 const FALLBACK_STREAM_URL_ALT = "https://my.idjstream.com/8686/stream";
-const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
+const METADATA_URLS = [
+  "https://my.idjstream.com/cp/get_info.php?p=8686",
+  "https://idjstream.app/cp/get_info.php?p=8686"
+];
 const STATIC_ROOT_INDEX_PATH = "/index.html";
 
 const HTML = `<!DOCTYPE html>
@@ -317,6 +320,27 @@ function sanitizeMetadataValue(value, depth = 0){
     return out;
   }
   return null;
+}
+
+async function fetchMetadataProxyPayload(){
+  let lastError = null;
+  for(const upstreamUrl of METADATA_URLS){
+    try{
+      const upstream = await fetch(upstreamUrl,{headers:{"cache-control":"no-store"}});
+      if(!upstream.ok) throw new Error(`metadata_http_${upstream.status}`);
+      const body = await upstream.text();
+      let payload = body;
+      try{
+        payload = JSON.stringify(sanitizeMetadataValue(JSON.parse(body)));
+      }catch(err){
+        payload = JSON.stringify({ raw: metadataSafeText(body, 1024) });
+      }
+      return { ok: true, status: upstream.status, payload, source: upstreamUrl };
+    }catch(err){
+      lastError = { source: upstreamUrl, error: String(err && err.message || err) };
+    }
+  }
+  return { ok: false, error: lastError || { error: "metadata_proxy_failed" } };
 }
 
 
@@ -805,19 +829,11 @@ const url=new URL(request.url);
 
     // Metadaten-Proxy NICHT umbauen, damit iPhone-App und bestehende Clients stabil bleiben.
     if(url.pathname==="/api/nowplaying"){
-      try{
-        const upstream=await fetch(METADATA_URL,{headers:{"cache-control":"no-store"}});
-        const body=await upstream.text();
-        let payload = body;
-        try{
-          payload = JSON.stringify(sanitizeMetadataValue(JSON.parse(body)));
-        }catch(err){
-          payload = JSON.stringify({ raw: metadataSafeText(body, 1024) });
-        }
-        return new Response(payload,{status:upstream.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker"}});
-      }catch(err){
-        return new Response(JSON.stringify({error:"metadata_proxy_failed"}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
+      const metadata = await fetchMetadataProxyPayload();
+      if(metadata.ok){
+        return new Response(metadata.payload,{status:metadata.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker","x-radio-meta-source":metadata.source}});
       }
+      return new Response(JSON.stringify({error:"metadata_proxy_failed",detail:metadata.error}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
     }
 
     // STREAM_FAILOVER_REPAIR_v1:
