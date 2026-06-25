@@ -56,13 +56,24 @@ function darkDancerResponse(pathname) {
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
-const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
-const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
-const FALLBACK_STREAM_URL_ALT = "https://my.idjstream.com/8686/stream";
-const METADATA_URL = "https://my.idjstream.com/cp/get_info.php?p=8686";
-const EXTERNAL_PLAYER_URL = "https://xfraggelpower666x.github.io/WebRadio-666SOUNDsDESIGn/";
-const SWITCH_TIMEOUT_MS = 2000;
-const EXTERNAL_BUILD_ID = "root-migration-repair-v1";
+const PRIMARY_STREAM_URLS = [
+  "https://my.idjstream.com/666soundsdesign/stream",
+  "http://my.idjstream.com/666soundsdesign/stream"
+];
+const FALLBACK_STREAM_URLS = [
+  "https://my.idjstream.com:8686/stream",
+  "http://my.idjstream.com:8686/stream"
+];
+const FALLBACK_STREAM_URLS_ALT = [
+  "https://my.idjstream.com/8686/stream",
+  "http://my.idjstream.com/8686/stream"
+];
+const METADATA_URLS = [
+  "https://my.idjstream.com/cp/get_info.php?p=8686",
+  "http://my.idjstream.com/cp/get_info.php?p=8686",
+  "https://idjstream.app/cp/get_info.php?p=8686"
+];
+const STATIC_ROOT_INDEX_PATH = "/index.html";
 
 const HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -230,23 +241,116 @@ const CONFIG_JS = `export const STREAM_CONFIG = {
 };`;
 
 
-async function checkExternal(){
-  try{
-    const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(), SWITCH_TIMEOUT_MS);
-    const indexUrl = new URL(EXTERNAL_PLAYER_URL);
-  indexUrl.searchParams.set("v", EXTERNAL_BUILD_ID);
-  const response = await fetch(indexUrl.toString(), {
-      method: "HEAD",
-      redirect: "follow",
-      signal: controller.signal,
-      headers: { "cache-control": "no-store" }
-    });
-    clearTimeout(timer);
-    return response.ok;
-  }catch(err){
-    return false;
+function timingSafeEqualText(a, b){
+  const left = new TextEncoder().encode(String(a || ''));
+  const right = new TextEncoder().encode(String(b || ''));
+  let mismatch = left.length ^ right.length;
+  const max = Math.max(left.length, right.length);
+  for(let i = 0; i < max; i += 1){
+    mismatch |= (left[i] || 0) ^ (right[i] || 0);
   }
+  return mismatch === 0;
+}
+
+function playerAlertCookie(request, name){
+  const raw = request.headers.get('cookie') || '';
+  for(const part of raw.split(';').map(v => v.trim())){
+    const eq = part.indexOf('=');
+    if(eq > -1 && part.slice(0, eq) === name) return decodeURIComponent(part.slice(eq + 1));
+  }
+  return '';
+}
+
+function playerAlertBearerToken(request){
+  const auth = String(request.headers.get('authorization') || '').trim();
+  if(auth.toLowerCase().startsWith('bearer ')) return auth.slice(7).trim();
+  return '';
+}
+
+function playerAlertSameOriginRequest(request){
+  const requestOrigin = new URL(request.url).origin;
+  const origin = String(request.headers.get('origin') || '').trim();
+  const referer = String(request.headers.get('referer') || '').trim();
+  if(origin && origin !== requestOrigin) return false;
+  if(referer){
+    try{
+      if(new URL(referer).origin !== requestOrigin) return false;
+    }catch(err){
+      return false;
+    }
+  }
+  return true;
+}
+
+async function verifyPlayerAlertWrite(request, env){
+  const configuredToken = String((env && (env.PLAYER_ALERT_WRITE_TOKEN || env.PLAYER_ALERT_BACKEND_TOKEN || env.PLAYER_ALERT_TOKEN)) || '').trim();
+  const providedToken = String(request.headers.get('x-player-alert-token') || playerAlertBearerToken(request) || '').trim();
+  if(configuredToken){
+    if(providedToken && timingSafeEqualText(providedToken, configuredToken)) return { ok: true, mode: 'token' };
+    return { ok: false, error: providedToken ? 'invalid_token' : 'missing_token' };
+  }
+
+  if(!playerAlertSameOriginRequest(request)) return { ok: false, error: 'origin_mismatch' };
+
+  const verifyUrl = String((env && env.ADMIN_AUTH_VERIFY_URL) || 'https://666-system-auth.666soundsdesign-broadcaster.com/verify').trim();
+  const cookieToken = playerAlertCookie(request, 'chaos_auth') || playerAlertCookie(request, 'admin_auth');
+  const authHeader = playerAlertBearerToken(request);
+  const headers = authHeader
+    ? { authorization: `Bearer ${authHeader}` }
+    : (cookieToken ? { authorization: `Bearer ${cookieToken}` } : null);
+  if(!headers) return { ok: false, error: 'missing_auth' };
+
+  try{
+    const response = await fetch(verifyUrl, { headers });
+    const data = await response.json().catch(() => ({}));
+    if(response.ok && data && data.ok) return { ok: true, mode: 'admin-auth' };
+    return { ok: false, error: 'unauthorized', status: response.status };
+  }catch(err){
+    return { ok: false, error: 'auth_verify_failed', detail: String(err && err.message || err) };
+  }
+}
+
+function metadataSafeText(value, max = 512){
+  return String(value ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
+function sanitizeMetadataValue(value, depth = 0){
+  if(depth > 6) return null;
+  if(typeof value === 'string') return metadataSafeText(value);
+  if(typeof value === 'number' || typeof value === 'boolean' || value === null) return value;
+  if(Array.isArray(value)) return value.slice(0, 60).map((entry) => sanitizeMetadataValue(entry, depth + 1));
+  if(value && typeof value === 'object'){
+    const out = {};
+    for(const [key, entry] of Object.entries(value).slice(0, 80)) out[key] = sanitizeMetadataValue(entry, depth + 1);
+    return out;
+  }
+  return null;
+}
+
+async function fetchMetadataProxyPayload(){
+  let lastError = null;
+  for(const upstreamUrl of METADATA_URLS){
+    try{
+      const upstream = await fetch(upstreamUrl,{headers:{"cache-control":"no-store"}});
+      if(!upstream.ok) throw new Error(`metadata_http_${upstream.status}`);
+      const body = await upstream.text();
+      let payload = body;
+      try{
+        payload = JSON.stringify(sanitizeMetadataValue(JSON.parse(body)));
+      }catch(err){
+        payload = JSON.stringify({ raw: metadataSafeText(body, 1024) });
+      }
+      return { ok: true, status: upstream.status, payload, source: upstreamUrl };
+    }catch(err){
+      lastError = { source: upstreamUrl, error: String(err && err.message || err) };
+    }
+  }
+  return { ok: false, error: lastError || { error: "metadata_proxy_failed" } };
 }
 
 
@@ -263,7 +367,7 @@ const PLAYER_ALERT_KV_CURRENT_KEY = 'player-alert:current';
 const PLAYER_ALERT_KV_RATE_KEY = 'player-alert:rate';
 const PLAYER_ALERT_KV_HISTORY_KEY = 'player-alert:history';
 function playerAlertJson(data, status = 200){
-  return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'}});
+  return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store'}});
 }
 function playerAlertCleanText(value){
   return String(value || '').replace(/[<>]/g, '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
@@ -338,6 +442,8 @@ async function handlePlayerAlertV152(request, env){
     return playerAlertJson({ok:true, source:kv.length?'kv-fallback':'none', items:kv});
   }
   if(url.pathname === '/api/player-alert/send' && request.method === 'POST'){
+    const writeAccess = await verifyPlayerAlertWrite(request, env);
+    if(!writeAccess.ok) return playerAlertJson({ok:false,error:writeAccess.error},401);
     let payload = {};
     try{ payload = await request.json(); }catch(err){ return playerAlertJson({ok:false,error:'invalid_json'},400); }
     const message = playerAlertCleanText(payload.message);
@@ -402,22 +508,37 @@ async function proxyStream(request, upstream, targetName = "unknown"){
     const headers=passthroughHeaders(response.headers);
     headers.set("x-active-stream-target", targetName);
     headers.set("x-failover-state", targetName === "main" ? "primary" : "fallback");
+    headers.set("x-upstream-url", upstream);
+    headers.set("x-upstream-protocol", upstream.startsWith("https://") ? "https" : "http");
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   } finally {
     clearTimeout(timeout);
   }
 }
 
+async function proxyStreamCandidates(request, upstreams, targetName){
+  let lastError = null;
+  for(const upstream of upstreams){
+    try{
+      return await proxyStream(request, upstream, targetName);
+    }catch(err){
+      const detail = String(err && err.message ? err.message : err);
+      lastError = new Error(`${targetName}_${upstream.startsWith("https://") ? "https" : "http"}_${detail}`);
+    }
+  }
+  throw lastError || new Error(`upstream_${targetName}_unavailable`);
+}
+
 async function proxyStreamFailover(request){
   // MAIN versuchen, bei HTTP-Fehler/Timeout direkt BACKUP versuchen.
   try{
-    return await proxyStream(request, PRIMARY_STREAM_URL, "main");
+    return await proxyStreamCandidates(request, PRIMARY_STREAM_URLS, "main");
   }catch(primaryErr){
     try{
-      return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
+      return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS, "backup");
     }catch(backupErr){
       try{
-        return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
+        return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS_ALT, "backup-alt");
       }catch(backupAltErr){
         return new Response(JSON.stringify({
           error:"stream_proxy_failed",
@@ -442,10 +563,10 @@ async function proxyStreamFailover(request){
 async function proxyFallbackStream(request){
   // Direkte Backup-Route: erst alte Port-Variante, dann Pfad-Variante.
   try{
-    return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
+    return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS, "backup");
   }catch(backupErr){
     try{
-      return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
+      return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS_ALT, "backup-alt");
     }catch(backupAltErr){
       return new Response(JSON.stringify({
         error:"fallback_stream_proxy_failed",
@@ -467,34 +588,19 @@ async function proxyFallbackStream(request){
 
 
 function buildExternalProxyHeaders(sourceHeaders){
-  // Relevante Header des externen Players sauber an den Browser weiterreichen.
   const headers = new Headers(sourceHeaders);
-  headers.set("cache-control", "no-store");
-  headers.delete("content-security-policy");
-  headers.delete("x-frame-options");
   headers.delete("content-length");
-  headers.set("x-player-mode", "external-proxy");
+  if(!headers.get("cache-control")) headers.set("cache-control", "no-store");
+  headers.set("x-player-mode", "local-project-asset");
   return headers;
 }
 
-async function fetchExternalAsset(pathname, request){
-  // ROOT_MIGRATION_REPAIR_v1:
-  // Hauptplayer-Assets werden unter derselben Domain ausgeliefert.
-  // /extern/... und /external-player/... bleiben Legacy-Aliase auf Root.
-  let suffix = pathname.replace(/^\/(?:extern|external-player)\/?/, "");
-  suffix = suffix.replace(/^\//, "");
-  const upstreamObject = new URL(suffix || "", EXTERNAL_PLAYER_URL);
-  upstreamObject.searchParams.set("v", EXTERNAL_BUILD_ID);
-  const upstreamUrl = upstreamObject.toString();
-  const init = {
-    method: request.method,
-    headers: {
-      "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",
-      "cache-control": "no-store"
-    },
-    redirect: "follow"
-  };
-  const response = await fetch(upstreamUrl, init);
+async function serveProjectAsset(request, env, pathname){
+  if(!(env && env.ASSETS && typeof env.ASSETS.fetch === 'function')) return null;
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = pathname;
+  const response = await env.ASSETS.fetch(new Request(assetUrl.toString(), request));
+  if(!response || response.status === 404) return null;
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -502,31 +608,17 @@ async function fetchExternalAsset(pathname, request){
   });
 }
 
-async function serveExternalIndex(request){
-  // ROOT_MIGRATION_REPAIR_v1:
-  // Root-Hauptplayer laden und unter der eigenen Domain ausliefern.
-  // Kein sichtbarer Redirect zu github.io.
-  const indexUrl = new URL(EXTERNAL_PLAYER_URL);
-  indexUrl.searchParams.set("v", EXTERNAL_BUILD_ID);
-  const response = await fetch(indexUrl.toString(), {
-    method: "GET",
-    headers: {
-      "user-agent": request.headers.get("user-agent") || "Cloudflare-Worker",
-      "cache-control": "no-store"
-    },
-    redirect: "follow"
-  });
-  let html = await response.text();
-  if (!html.includes('<base href="/">')) {
-    html = html.replace("<head>", '<head>\n  <base href="/">');
-  }
-  const headers = buildExternalProxyHeaders(response.headers);
-  headers.set("content-type", "text/html; charset=UTF-8");
-  return new Response(html, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
+async function fetchExternalAsset(pathname, request, env){
+  let suffix = pathname.replace(/^\/(?:extern|external-player)\/?/, "");
+  suffix = suffix.replace(/^\//, "");
+  const localPath = suffix ? `/${suffix}` : STATIC_ROOT_INDEX_PATH;
+  const response = await serveProjectAsset(request, env, localPath);
+  return response || new Response("Not found", { status: 404, headers: { "cache-control": "no-store" } });
+}
+
+async function serveExternalIndex(request, env){
+  const response = await serveProjectAsset(request, env, STATIC_ROOT_INDEX_PATH);
+  return response || new Response(HTML, {status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
 }
 
 
@@ -617,8 +709,8 @@ function s666ModuleStatus(env) {
       emergencyFallback: {
         ok: true,
         routes: ["/external-player", "/fallback-stream", "/stream"],
-        primary: "https://my.idjstream.com/666soundsdesign/stream",
-        fallback: "https://my.idjstream.com:8686/stream"
+        primary: PRIMARY_STREAM_URLS[0],
+        fallback: FALLBACK_STREAM_URLS[0]
       },
       chaosEngine: {
         ok: typeof chaosEngineStaticResponse === "function",
@@ -650,8 +742,8 @@ function s666ModuleStatus(env) {
         files: ["js/sound-control-overlay-v1.js", "css/sound-control-overlay-v1.css"]
       },
       externalWorkers: {
-        ok: true,
-        folders: ["external-workers/666-chaos-ai-track-system", "external-workers/666-suno-system"]
+        ok: false,
+        folders: []
       },
       rendererResource: {
         ok: true,
@@ -733,58 +825,26 @@ const url=new URL(request.url);
     const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
     if (chaosEngineStatic) return chaosEngineStatic;
 
-    
-    // v50 CLEAN ROUTE ALIAS:
-    // Alte externe Player-Aliase zeigen auf den aktuellen Root-Player.
-    if (
-      url.pathname === "/external-player" ||
-      url.pathname === "/external-player/" ||
-      url.pathname.startsWith("/external-player/") ||
-      url.pathname === "/extern" ||
-      url.pathname === "/extern/" ||
-      url.pathname.startsWith("/extern/")
-    ) {
-      url.pathname = "/";
-    }
-// Standardmodus: externer Player zuerst. Nur bei Fehler auf internen Worker-Player wechseln.
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
-      const externalOk = await checkExternal();
-      if(externalOk){
-        return await serveExternalIndex(request);
-      }
+      return await serveExternalIndex(request, env);
     }
 
-    // Direkte Proxy-Auslieferung für den externen Player unter derselben Domain.
     if(url.pathname==="/extern" || url.pathname==="/extern/"){
-      return await serveExternalIndex(request);
+      return await serveExternalIndex(request, env);
     }
     if(url.pathname.startsWith("/extern/")){
-      return await fetchExternalAsset(url.pathname, request);
+      return await fetchExternalAsset(url.pathname, request, env);
     }
-    // Alte Route als Alias bewusst erhalten, damit bestehende Links nicht brechen.
     if(url.pathname==="/external-player" || url.pathname==="/external-player/"){
-      return await serveExternalIndex(request);
+      return await serveExternalIndex(request, env);
     }
     if(url.pathname.startsWith("/external-player/")){
-      return await fetchExternalAsset(url.pathname, request);
+      return await fetchExternalAsset(url.pathname, request, env);
     }
 
     // Interner Player explizit direkt erreichbar halten.
     if(url.pathname==="/internal" || url.pathname==="/internal/"){
       return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
-    }
-
-    // ROOT_MIGRATION_REPAIR_v1:
-    // Root-Assets des Hauptplayers unter eigener Domain ausliefern.
-    // Interne Notfallplayer-Dateien /css/main.css, /js/app.js und /config/stream.config.js bleiben weiter unten reserviert.
-    if(url.pathname.startsWith("/css/") && url.pathname!=="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
-      return await fetchExternalAsset(url.pathname, request);
-    }
-    if(url.pathname.startsWith("/js/") && url.pathname!=="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
-      return await fetchExternalAsset(url.pathname, request);
-    }
-    if(url.pathname.startsWith("/assets/")){
-      return await fetchExternalAsset(url.pathname, request);
     }
 
     // Gesundheitscheck unverändert lassen.
@@ -794,13 +854,11 @@ const url=new URL(request.url);
 
     // Metadaten-Proxy NICHT umbauen, damit iPhone-App und bestehende Clients stabil bleiben.
     if(url.pathname==="/api/nowplaying"){
-      try{
-        const upstream=await fetch(METADATA_URL,{headers:{"cache-control":"no-store"}});
-        const body=await upstream.text();
-        return new Response(body,{status:upstream.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker"}});
-      }catch(err){
-        return new Response(JSON.stringify({error:"metadata_proxy_failed"}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
+      const metadata = await fetchMetadataProxyPayload();
+      if(metadata.ok){
+        return new Response(metadata.payload,{status:metadata.status,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*","x-radio-proxy":"666soundsdesign-worker","x-radio-meta-source":metadata.source}});
       }
+      return new Response(JSON.stringify({error:"metadata_proxy_failed",detail:metadata.error}),{status:502,headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}});
     }
 
     // STREAM_FAILOVER_REPAIR_v1:
@@ -815,17 +873,29 @@ const url=new URL(request.url);
 
     // Interner Notfall-Player bleibt komplett erhalten.
     if(url.pathname==="/assets/assets/icons/internal-icon.png"){
-      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/assets/assets/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
+      const internalIcon = await serveProjectAsset(request, env, "/assets/icons/internal-icon.png");
+      if(internalIcon) return internalIcon;
     }
-    if(url.pathname==="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname==="/css/main.css"){
       return new Response(CSS,{headers:{"content-type":"text/css; charset=UTF-8"}});
     }
-    if(url.pathname==="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname==="/js/app.js"){
       return new Response(APP_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
-    if(url.pathname==="/config/stream.config.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname==="/config/stream.config.js"){
       return new Response(CONFIG_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
+
+    if(url.pathname==="/dashboard" || url.pathname==="/dashboard/"){
+      const dashboard = await serveProjectAsset(request, env, "/dashboard/index.html");
+      if(dashboard) return dashboard;
+    }
+
+    if(request.method === "GET" || request.method === "HEAD"){
+      const localAsset = await serveProjectAsset(request, env, url.pathname);
+      if(localAsset) return localAsset;
+    }
+
     return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});
   }
 };
