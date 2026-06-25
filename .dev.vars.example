@@ -5,3 +5,15 @@
 
 SUNO_API_KEY=put_real_key_here_locally_only
 SUNO_API_BASE=https://example-provider.invalid
+
+# Skip / Next Track bridge. Real values stay local or in Cloudflare Worker Secrets.
+SHOUTCAST_ADMIN_URL=https://my.idjstream.com:8686/admin.cgi
+SHOUTCAST_ADMIN_USER=admin
+SHOUTCAST_ADMIN_PASSWORD=put_real_shoutcast_admin_password_in_secret_only
+PW_VERIFY_URL=https://666-system-pw.666soundsdesign-broadcaster.com/verify
+SHOUTCAST_SID=1
+SHOUTCAST_SKIP_MODE=nextsong
+MYIDJ_ADMIN_USER=admin
+MYIDJ_ADMIN_PASSWORD=put_real_myidj_admin_password_in_secret_only
+SKIP_ADMIN_TOKEN=put_worker_skip_admin_token_in_secret_only
+SKIP_VOTE_THRESHOLD=3

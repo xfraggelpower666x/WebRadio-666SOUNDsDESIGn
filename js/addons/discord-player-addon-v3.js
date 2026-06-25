@@ -411,13 +411,10 @@
     box.setAttribute('role', 'button');
     box.setAttribute('tabindex', '0');
     box.setAttribute('aria-label', 'Open Discord access gate');
-    box.innerHTML = '<div class="s666-discord-status"><span class="s666-discord-led s666-discord-led--idle"></span><span class="s666-discord-text">Discord ready</span></div><div class="s666-discord-actions"><button type="button" class="s666-discord-button s666-discord-button--dc" data-s666-discord-action="manual"></button><button type="button" class="s666-discord-button s666-discord-button--msg" data-s666-discord-action="message"></button></div>';
+    box.innerHTML = '<div class="s666-discord-status"><span class="s666-discord-led s666-discord-led--idle"></span><span class="s666-discord-text">Discord ready</span></div><div class="s666-discord-actions"><button type="button" class="s666-discord-button s666-discord-button--dc" data-s666-discord-action="manual"></button></div>';
     const btn = box.querySelector('.s666-discord-button--dc');
-    const msgBtn = box.querySelector('.s666-discord-button--msg');
     btn.textContent = cfg.manualButtonText;
-    msgBtn.textContent = cfg.messageButtonText;
     btn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); manualPost(); });
-    msgBtn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); messagePost(); });
     box.addEventListener('keydown', (ev) => {
       if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); manualPost(); }
     });

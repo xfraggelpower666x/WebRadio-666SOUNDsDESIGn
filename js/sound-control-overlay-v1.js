@@ -15,15 +15,11 @@ CHANGE SUMMARY:
   var PRESET_PREFIX = "s666_sound_control_preset_v1_";
   var VERSION = "sound-control-overlay-v1-20260525";
   var BANDS = [
-    { key:"b63", label:"63", selector:"#pcEq63,[data-smfp-eq='b63']" },
-    { key:"b125", label:"125", selector:"#pcEq125,[data-smfp-eq='b125']" },
-    { key:"b250", label:"250", selector:"#pcEq250,[data-smfp-eq='b250']" },
-    { key:"b500", label:"500", selector:"#pcEq500,[data-smfp-eq='b500']" },
-    { key:"b1k", label:"1K", selector:"#pcEq1k,[data-smfp-eq='b1k']" },
-    { key:"b2k", label:"2K", selector:"#pcEq2k,[data-smfp-eq='b2k']" },
-    { key:"b4k", label:"4K", selector:"#pcEq4k,[data-smfp-eq='b4k']" },
-    { key:"b8k", label:"8K", selector:"#pcEq8k,[data-smfp-eq='b8k']" },
-    { key:"b12k", label:"12K", selector:"#pcEq12k,[data-smfp-eq='b12k']" }
+    { key:"low", label:"LOW" },
+    { key:"lowMid", label:"260" },
+    { key:"mid", label:"1K" },
+    { key:"highMid", label:"3.4K" },
+    { key:"high", label:"HIGH" }
   ];
 
   var state = loadState();
@@ -65,8 +61,12 @@ CHANGE SUMMARY:
   }
 
   function readEqFromDom(){
+    if(window.SMFPRealEq && typeof window.SMFPRealEq.getState === "function"){
+      draft.eq = Object.assign(draft.eq || {}, window.SMFPRealEq.getState());
+      return;
+    }
     BANDS.forEach(function(b){
-      var input = qs(b.selector);
+      var input = b.selector ? qs(b.selector) : null;
       if(input) draft.eq[b.key] = clamp(input.value, -12, 12);
     });
   }
@@ -78,21 +78,18 @@ CHANGE SUMMARY:
   }
 
   function applyEqToDom(next){
+    var values = {};
     BANDS.forEach(function(b){
-      var input = qs(b.selector);
       var value = clamp((next.eq || {})[b.key], -12, 12);
+      values[b.key] = value;
+      var input = b.selector ? qs(b.selector) : null;
       if(input){
         input.value = String(value);
         dispatchInput(input);
       }
     });
-    // Existing real EQ uses smfp_real_eq_v162, keep it synchronized.
-    try{
-      var existing = {};
-      BANDS.forEach(function(b){ existing[b.key] = clamp((next.eq || {})[b.key], -12, 12); });
-      existing.b16k = 0;
-      localStorage.setItem("smfp_real_eq_v162", JSON.stringify(existing));
-    }catch(_){}
+    if(window.SMFPRealEq && typeof window.SMFPRealEq.setState === "function") window.SMFPRealEq.setState(values);
+    document.dispatchEvent(new CustomEvent("s666:sound-eq", { detail:{ values:values } }));
   }
 
   function readBoostStage(){
@@ -122,6 +119,11 @@ CHANGE SUMMARY:
 
   function setBoostStage(target){
     target = clamp(target,0,5);
+    document.dispatchEvent(new CustomEvent("s666:sound-boost", { detail:{ stage:target } }));
+    if(window.SMFPPlayerBoost && typeof window.SMFPPlayerBoost.setStage === "function"){
+      window.SMFPPlayerBoost.setStage(target);
+      return;
+    }
     var guard = 0;
     var current = readBoostStage();
     while(current < target && guard++ < 8){ if(!clickBoostStep(1)) break; current += 1; }
@@ -149,7 +151,7 @@ CHANGE SUMMARY:
       '<div class="s666-sound-backdrop" data-sound-close="1"></div>',
       '<section class="s666-sound-panel" role="dialog" aria-modal="true" aria-label="Sound Control">',
         '<header class="s666-sound-head">',
-          '<div><b>SOUND CONTROL</b><span>EQ9 · BOOSTER · LOCAL PRESETS</span></div>',
+          '<div><b>SOUND CONTROL</b><span>5-BAND EQ · BOOSTER · LOCAL PRESETS</span></div>',
           '<button type="button" class="s666-sound-x" data-sound-close="1">×</button>',
         '</header>',
         '<main class="s666-sound-body">',
@@ -249,7 +251,7 @@ CHANGE SUMMARY:
     draft = clone(state);
     // If user changed old EQ panel before opening, reflect existing DOM once.
     BANDS.forEach(function(b){
-      var input = qs(b.selector);
+      var input = b.selector ? qs(b.selector) : null;
       if(input) draft.eq[b.key] = clamp(input.value,-12,12);
     });
     draft.boosterLevel = readBoostStage();
@@ -302,42 +304,36 @@ CHANGE SUMMARY:
   }
 
   function mountButton(){
-    if(qs("#s666SoundControlButton")) return;
-    var btn = document.createElement("button");
-    btn.id = "s666SoundControlButton";
-    btn.type = "button";
-    btn.className = "s666-sound-button is-active";
-    btn.innerHTML = '<span class="s666-sound-led"></span><span>SOUND</span>';
-    btn.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); open(); }, true);
-
-    var target = qs(".systempanel-right") || qs(".systempanel-center") || qs(".player-actions") || qs(".controls") || qs(".now-playing") || document.body;
-    target.appendChild(btn);
+    var btn = qs("#s666SoundControlButton");
+    if(!btn){
+      btn = document.createElement("button");
+      btn.id = "s666SoundControlButton";
+      btn.type = "button";
+      btn.className = "s666-sound-button is-active";
+      btn.innerHTML = '<span class="s666-sound-led"></span><span>SOUND</span>';
+      btn.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); open(); }, true);
+    }
+    var mobileTarget = window.innerWidth <= 760 ? qs("#s666MobileExtraRow") : null;
+    var target = mobileTarget || qs("#s666SoundActionSlot") || qs("#s666MobileExtraRow") || document.body;
+    if(btn.parentNode !== target){
+      if(mobileTarget && target.firstChild) target.insertBefore(btn, target.firstChild);
+      else target.appendChild(btn);
+    }
   }
 
   function mountTriggers(){
-    // iPhone/mobile: tap existing 3D EQ / bottom visualizer zones.
-    var selectors = [
-      "#mffEqBars",
-      "#mffBottomBars",
-      ".mff-bottom-bars",
-      ".mff-eq",
-      "#pcRealEqPanel",
-      ".pc-real-eq-panel"
-    ];
-    selectors.forEach(function(sel){
-      qsa(sel).forEach(function(el){
-        if(el.__s666SoundTrigger) return;
-        el.__s666SoundTrigger = true;
-        el.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); open(); }, true);
-        el.addEventListener("touchend", function(ev){ ev.preventDefault(); ev.stopPropagation(); open(); }, { passive:false, capture:true });
-      });
-    });
+    mountButton();
   }
 
   function boot(){
     mountButton();
     mountTriggers();
     applyDraft();
+    var observer = new MutationObserver(function(){
+      if(window.innerWidth <= 760 && qs("#s666MobileExtraRow")) mountButton();
+    });
+    observer.observe(document.body, { childList:true, subtree:true });
+    setTimeout(function(){ observer.disconnect(); }, 10000);
     setInterval(mountTriggers, 2500);
   }
 

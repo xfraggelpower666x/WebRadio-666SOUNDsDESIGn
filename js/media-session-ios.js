@@ -137,10 +137,10 @@
         });
       } catch (e) {}
 
-      // Next track = Vote Skip (ruft DJ Panel API)
+      // Next track uses the same protected admin skip gate as the player.
       try {
         navigator.mediaSession.setActionHandler('nexttrack', function () {
-          submitSkipVote('mediasession-nexttrack');
+          submitAdminSkip('mediasession-nexttrack');
         });
       } catch (e) {}
 
@@ -150,27 +150,14 @@
       try { navigator.mediaSession.setActionHandler('seekto', null); } catch (e) {}
     }
 
-    // ─── Skip Vote integration ────────────────────────────────────────────────
-    function submitSkipVote(reason) {
-      var apiBase = window.S666_DJ_PANEL_API || '';
-      if (!apiBase) return; // Only works when DJ Panel API URL is configured
-      var voterId = getOrCreateVoterId();
-      fetch(apiBase + '/skip/vote', {
+    function submitAdminSkip(reason) {
+      fetch('/api/admin/skip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ voterId: voterId }),
+        credentials: 'include',
+        body: JSON.stringify({ source: reason || 'mediasession-nexttrack' }),
         cache: 'no-store'
       }).catch(function () {});
-    }
-
-    function getOrCreateVoterId() {
-      var key = 's666_voter_id';
-      var id = localStorage.getItem(key);
-      if (!id) {
-        id = 'v_' + Math.random().toString(36).slice(2) + '_' + Date.now().toString(36);
-        localStorage.setItem(key, id);
-      }
-      return id;
     }
 
     // ─── Sync MediaSession with audio element state ───────────────────────────
@@ -296,9 +283,7 @@
     // Expose for other scripts
     window.S666MediaSession = {
       update: updateMediaSession,
-      safePlay: safePlay,
-      setDJPanelApi: function (url) { window.S666_DJ_PANEL_API = url; }
+      safePlay: safePlay
     };
 
   })();
-  

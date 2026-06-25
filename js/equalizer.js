@@ -10,17 +10,15 @@ ZWECK: Stabiler Frequency-Mapping Fix für Desktop.
 */
 
 function v27StableMapping(dataArray, bars){
-  if (!dataArray || !bars) return;
-
-  const step = Math.floor(dataArray.length / bars.length);
-
-  for (let i = 0; i < bars.length; i++) {
-    const index = i * step;
+  if (!dataArray || !bars || !bars.length) return [];
+  const step = Math.max(1, Math.floor(dataArray.length / bars.length));
+  return bars.map((bar, i) => {
+    const index = Math.min(dataArray.length - 1, i * step);
     const value = dataArray[index] || 0;
-
     const height = Math.max(12, value * 0.6);
-    v27StableMapping(dataArray, bars);
-  }
+    if (bar) bar.style.height = `${height}px`;
+    return height;
+  });
 }
 
 /*
@@ -144,8 +142,26 @@ function bindRealEqPanel() {
   applyRealEqToNodes();
 }
 
+function setRealEqState(next = {}) {
+  Object.keys(smfpRealEqState).forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(next, key)) smfpRealEqState[key] = clampEqDb(next[key]);
+  });
+  saveRealEqState();
+  applyRealEqToNodes();
+  return { ...smfpRealEqState };
+}
+
 window.__smfpRealEqApply = applyRealEqToNodes;
 window.__smfpRealEqBind = bindRealEqPanel;
+window.SMFPRealEq = {
+  bands: SMFP_REAL_EQ_BANDS.map((band) => ({ key: band.key, freq: band.freq, type: band.type })),
+  getState: () => ({ ...smfpRealEqState }),
+  setState: setRealEqState,
+  setBand: (key, value) => setRealEqState({ [key]: value })
+};
+document.addEventListener('s666:sound-eq', (event) => {
+  setRealEqState(event.detail?.values || {});
+});
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', bindRealEqPanel, { passive: true });
 } else {
@@ -288,6 +304,26 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     document.documentElement.style.setProperty('--pc-audio-energy', String((next / 100).toFixed(3)));
   };
 
+  const publishMeterBus = (level = 0, peak = level, sourceType = 'synthetic', eqValues = []) => {
+    const safeLevel = clamp(Number(level) || 0, 0, 1);
+    const safePeak = clamp(Number(peak) || safeLevel, 0, 1);
+    const lvNorm = clamp((smoothMeter || (safeLevel * 100)) / 100, 0, 1);
+    const normalizedEq = Array.isArray(eqValues)
+      ? eqValues.map((value) => clamp(Number(value) || 0, 0, 1))
+      : [];
+    window.__MeterBus = {
+      ts: Date.now(),
+      level: safeLevel,
+      peak: safePeak,
+      source: sourceType,
+      synthetic: sourceType === 'synthetic',
+      hybrid: sourceType === 'hybrid',
+      left: [lvNorm, clamp(lvNorm * 0.9, 0, 1), clamp(lvNorm * 0.78, 0, 1)],
+      right: [clamp(lvNorm * 0.82, 0, 1), clamp(lvNorm * 0.95, 0, 1), lvNorm],
+      eq: normalizedEq
+    };
+  };
+
   const getFallbackBarValue = (index, total, intensity = 1) => {
     const t = Date.now() / 155;
     const mirroredIndex = index < (total / 2) ? index : (total - 1 - index);
@@ -306,6 +342,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       ? 26 + (Math.abs(Math.sin(Date.now() / 210)) * 62)
       : 18 + (Math.abs(Math.sin(Date.now() / 300)) * 18);
     setMeters(meter);
+    publishMeterBus(meter / 100, Math.min(1, (meter / 100) * 1.12), 'synthetic');
     recoverDesktopCenterBars(bars, meter, audio && !audio.paused);
 
     if (!fromInterval && !fallbackTimer) {
@@ -460,6 +497,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
       const useHybrid = weakFrameCounter > 3;
 
+      const eqVector = [];
       for (let i = 0; i < bars.length; i += 1) {
         const mirroredIndex = i < halfBars ? i : (bars.length - 1 - i);
         let px = shapedValues[Math.min(mirroredIndex, shapedValues.length - 1)] || 14;
@@ -470,6 +508,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         }
 
         setBarHeight(bars[i], px);
+        eqVector.push(clamp((px - 12) / (mobileLike() ? 84 : 98), 0, 1));
       }
 
       analyser.getByteTimeDomainData(timeData);
@@ -484,15 +523,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
         setMeters(meterValue);
 
-        const __lvNorm = clamp((smoothMeter || meterValue) / 100, 0, 1);
-        window.__MeterBus = {
-          ts: Date.now(),
-          level: level,
-          peak: clamp(level * 1.12, 0, 1),
-          left: [__lvNorm, clamp(__lvNorm * 0.9, 0, 1), clamp(__lvNorm * 0.78, 0, 1)],
-          right: [clamp(__lvNorm * 0.82, 0, 1), clamp(__lvNorm * 0.95, 0, 1), __lvNorm],
-          eq: []
-        };
+        publishMeterBus(level, clamp(level * 1.12, 0, 1), useHybrid ? 'hybrid' : 'real', eqVector);
       recoverDesktopCenterBars(bars, meterValue, audio && !audio.paused);
       rafId = window.requestAnimationFrame(frame);
     };

@@ -5,9 +5,9 @@
 */
 (function(){
   'use strict';
-  var VERSION='v178';
-  var BUILD='smfp-v178-overlay-core-20260519';
-  window.SMFP_VERSION={label:VERSION, build:BUILD, number:178};
+  var VERSION='v2026.06.17-gui-audit1';
+  var BUILD='smfp-v2026-06-17-gui-audit1';
+  window.SMFP_VERSION={label:VERSION, build:BUILD, cacheBust:BUILD, number:20260617};
   function setText(node){
     if(!node) return;
     if(node.id==='pcVersionBadge'){

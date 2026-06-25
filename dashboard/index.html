@@ -243,7 +243,7 @@
   function setArtwork(url){
     var w=el('artworkWrap');
     if(url){
-      w.innerHTML='<img class="now-artwork" src="'+esc(url)+'" onerror="this.parentNode.innerHTML='<div class=now-artwork-ph>🎵</div>'" alt="">';
+      w.innerHTML="<img class=\"now-artwork\" src=\"" + esc(url) + "\" onerror=\"this.parentNode.innerHTML='&lt;div class=&quot;now-artwork-ph&quot;&gt;🎵&lt;/div&gt;'\" alt=\"\">";
     } else {
       w.innerHTML='<div class="now-artwork-ph">🎵</div>';
     }

@@ -363,44 +363,29 @@
       document.body.style.overflow = '';
     }
 
-    // ── Trigger Button: inject into Desktop + iPhone ───────────────────────────
+    // One authoritative MESSAGE trigger for desktop and mobile.
     function mountMsgTriggers() {
-      // ── Desktop: add MSG button next to the ticker-window ─────────────────
-      var tickerWindow = document.querySelector('.ticker-window');
-      if (tickerWindow && !document.getElementById('s666MsgDesktopTrigger')) {
-        var wrap = document.createElement('div');
-        wrap.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;padding:4px 0;';
-        var btn  = document.createElement('button');
-        btn.id   = 's666MsgDesktopTrigger';
+      var mobileTarget = window.innerWidth <= 760 ? document.getElementById('s666MobileExtraRow') : null;
+      var target = mobileTarget || document.getElementById('s666MessageActionSlot') ||
+        document.getElementById('s666MobileExtraRow');
+      if (!target) return;
+
+      var btn = document.getElementById('s666MessageControlButton');
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 's666MessageControlButton';
         btn.type = 'button';
         btn.className = 's666msg-trigger';
-        btn.innerHTML = '📡 MSG';
+        btn.textContent = 'MESSAGE';
         btn.setAttribute('title', 'Broadcast-Nachricht senden');
-        btn.addEventListener('click', function () { openMessenger(); });
-        wrap.appendChild(btn);
-        tickerWindow.parentNode.insertBefore(wrap, tickerWindow.nextSibling);
-      }
-
-      // ── iPhone: add MSG button to mobile row (s666MobileExtraRow) ─────────
-      var mobileRow = document.getElementById('s666MobileExtraRow');
-      if (mobileRow && !document.getElementById('s666MsgMobileBtn')) {
-        var mBtn  = document.createElement('button');
-        mBtn.id   = 's666MsgMobileBtn';
-        mBtn.type = 'button';
-        mBtn.setAttribute('data-phase10-mobile', 'msg');
-        mBtn.textContent = 'MSG';
-        mobileRow.appendChild(mBtn);
-
-        // Bind click + touchend like the existing buttons
-        mBtn.addEventListener('click', function (e) {
-          e.preventDefault(); e.stopPropagation();
+        btn.setAttribute('aria-label', 'Broadcast-Nachricht senden');
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
           openMessenger();
         });
-        mBtn.addEventListener('touchend', function (e) {
-          e.preventDefault(); e.stopPropagation();
-          openMessenger();
-        }, { passive: false, capture: true });
       }
+      if (btn.parentNode !== target) target.appendChild(btn);
     }
 
     // ── Boot ─────────────────────────────────────────────────────────────────
@@ -410,16 +395,8 @@
       var attempts = 0;
       var t = setInterval(function () {
         mountMsgTriggers();
-        if (document.getElementById('s666MsgDesktopTrigger') || ++attempts > 20) {
+        if (document.getElementById('s666MessageControlButton') || ++attempts > 20) {
           clearInterval(t);
-          // Also mount iPhone if mobile row appears later
-          if (!document.getElementById('s666MsgMobileBtn')) {
-            var mobileAttempts = 0;
-            var mt = setInterval(function () {
-              mountMsgTriggers();
-              if (document.getElementById('s666MsgMobileBtn') || ++mobileAttempts > 30) clearInterval(mt);
-            }, 700);
-          }
         }
       }, 500);
     }
@@ -438,4 +415,3 @@
     };
 
   })();
-  

@@ -14,7 +14,7 @@ HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=smfp-v109-meterbus-20260615';
+import { createBars, startVisualizer } from './equalizer.js?v=2026-06-19-repair2';
 import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
 import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
 
@@ -158,7 +158,6 @@ function recoverInterruptedAudio(reason = 'interrupted') {
 }
 
 audio?.addEventListener('boost-diagnostic', (event) => updateBoostDiagnosticLabel(event.detail || {}));
-setBoostStage(0);
 
 /*
 ==========================================
@@ -262,7 +261,7 @@ applyStatusChip(statusStream, 'ok', 'Stream aktiv');
 applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
 updateStreamPanelLeds(currentSource);
 markSourceButtons(mainBtn, fallbackBtn, currentSource);
-audio.volume = Number(volumeSlider?.value || 0.75);
+if (audio) audio.volume = Number(volumeSlider?.value || 0.75);
 
 const BASE_MOBILE_VOLUME = 0.86;
 const MOBILE_VOLUME_FALLBACK = [0.86, 0.94, 1.0, 1.0, 1.0, 1.0];
@@ -274,7 +273,7 @@ function applyMobileBoostFallback(stage) {
   // iOS/Safari kann WebAudio-Gain je nach Stream blockieren.
   // Dann bleibt wenigstens die native Lautstärke sauber auf Maximum, ohne Desktop zu stören.
   if (isMobileViewport()) {
-    audio.volume = Number.isFinite(MOBILE_VOLUME_FALLBACK[safeStage]) ? MOBILE_VOLUME_FALLBACK[safeStage] : 1.0;
+    if (audio) audio.volume = Number.isFinite(MOBILE_VOLUME_FALLBACK[safeStage]) ? MOBILE_VOLUME_FALLBACK[safeStage] : 1.0;
   }
 
   if (streamState && isMobileViewport()) {
@@ -336,6 +335,16 @@ function setBoostStage(stage) {
 function changeBoostStage(delta) {
   return setBoostStage(currentBoostStage + Number(delta || 0));
 }
+
+window.SMFPPlayerBoost = {
+  getStage: () => currentBoostStage,
+  setStage: (stage) => setBoostStage(stage),
+  changeStage: (delta) => changeBoostStage(delta)
+};
+document.addEventListener('s666:sound-boost', (event) => {
+  setBoostStage(event.detail?.stage || 0);
+});
+setBoostStage(0);
 
 
 function updateStreamPanelLeds(source) {
@@ -953,7 +962,7 @@ boostStepButtons.forEach((btn) => {
 });
 
 volumeSlider?.addEventListener('input', () => {
-  audio.volume = Number(volumeSlider.value);
+  if (audio) audio.volume = Number(volumeSlider.value);
 });
 audio?.addEventListener('error', async () => {
   if (userStopped) return;

@@ -79,7 +79,6 @@ RULES:
     row.className = "s666-mobile-extra-row";
     row.innerHTML = [
       '<button type="button" data-phase10-mobile="stream">STREAM</button>',
-      '<button type="button" data-phase10-mobile="sound">SOUND</button>',
       '<button type="button" data-phase10-mobile="admin">ADMIN</button>',
       '<button type="button" data-phase10-mobile="chaos">CHAOS</button>',
       '<button type="button" data-phase10-mobile="status">STATUS</button>'
@@ -89,7 +88,13 @@ RULES:
     if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(row, anchor.nextSibling);
     else app.appendChild(row);
 
+    qsa('[data-mff="down"],[data-mff="boost"],[data-mff="up"],.mff-boost-row-panel', app).forEach(function(el){ el.remove(); });
+
     row.addEventListener("click", function(ev){
+      var sound = ev.target.closest && ev.target.closest("#s666SoundControlButton");
+      if(sound){ ev.preventDefault(); ev.stopPropagation(); openSoundControl(); return; }
+      var message = ev.target.closest && ev.target.closest("#s666MessageControlButton");
+      if(message && window.S666Messenger){ ev.preventDefault(); ev.stopPropagation(); window.S666Messenger.open(); return; }
       var btn = ev.target.closest && ev.target.closest("[data-phase10-mobile]");
       if(!btn) return;
       ev.preventDefault();
@@ -98,6 +103,10 @@ RULES:
     }, true);
 
     row.addEventListener("touchend", function(ev){
+      var sound = ev.target.closest && ev.target.closest("#s666SoundControlButton");
+      if(sound){ ev.preventDefault(); ev.stopPropagation(); openSoundControl(); return; }
+      var message = ev.target.closest && ev.target.closest("#s666MessageControlButton");
+      if(message && window.S666Messenger){ ev.preventDefault(); ev.stopPropagation(); window.S666Messenger.open(); return; }
       var btn = ev.target.closest && ev.target.closest("[data-phase10-mobile]");
       if(!btn) return;
       ev.preventDefault();
@@ -204,25 +213,7 @@ RULES:
   }
 
   function bindEqTriggers(){
-    var selectors = [
-      "#mffEqBars",
-      "#mffBottomBars",
-      ".mff-bottom-bars",
-      ".mff-eq",
-      ".mff-eq-bars",
-      "#pcRealEqPanel",
-      ".pc-real-eq-panel"
-    ];
-    selectors.forEach(function(sel){
-      qsa(sel).forEach(function(el){
-        if(el.__phase10SoundBound) return;
-        el.__phase10SoundBound = true;
-        el.style.pointerEvents = "auto";
-        el.addEventListener("pointerup", function(ev){ ev.preventDefault(); ev.stopPropagation(); openSoundControl(); }, true);
-        el.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); openSoundControl(); }, true);
-        el.addEventListener("touchend", function(ev){ ev.preventDefault(); ev.stopPropagation(); openSoundControl(); }, { passive:false, capture:true });
-      });
-    });
+    // SOUND is opened only by the primary action button.
   }
 
   function installAudioRecovery(){
@@ -307,15 +298,10 @@ RULES:
         el.style.width = Math.max(18, Math.min(96, w * scale)) + "%";
       });
 
-      qsa(".side-meter i,.left-meter i,.right-meter i,.mff-side-meter i,#mffEqBars i,#mffBottomBars i,.mff-bottom-bars i,.equalizer-bars i").forEach(function(el, idx){
+      qsa("#mffEqBars i,#mffBottomBars i,.mff-bottom-bars i,.equalizer-bars i").forEach(function(el, idx){
         var base = 18 + ((Date.now()/95 + idx*17) % 78);
         var val = Math.max(8, Math.min(100, base * scale));
-        if(el.closest && (el.closest(".side-meter") || el.closest(".left-meter") || el.closest(".right-meter") || el.closest(".mff-side-meter"))){
-          el.style.opacity = String(Math.max(.25, Math.min(1, val/100)));
-          el.style.transform = "scaleY(" + (0.45 + val/180).toFixed(2) + ")";
-        }else{
-          el.style.height = val.toFixed(0) + "%";
-        }
+        el.style.height = val.toFixed(0) + "%";
       });
     }, 220);
   }
@@ -532,24 +518,8 @@ RULES:
 
   function phase10RelocatePcPanels(){
     if(!phase10IsDesktopPlayer()) return;
-
-    var infoGrid = qs(".info-grid");
-    var djCard = qs("#djText") ? qs("#djText").closest(".info-card") : null;
-    if(infoGrid && djCard && !qs("#phase10StatusLedCard")){
-      var card = document.createElement("article");
-      card.id = "phase10StatusLedCard";
-      card.className = "info-card phase10-status-led-card";
-      card.innerHTML = '<div class="info-label">Stream</div><div class="phase10-status-led-row"></div>';
-      djCard.parentNode.insertBefore(card, djCard.nextSibling);
-    }
-
-    var row = qs("#phase10StatusLedCard .phase10-status-led-row");
-    if(row){
-      ["#statusStream","#statusMeter","#statusSource"].forEach(function(sel){
-        var el = qs(sel);
-        if(el && el.parentNode !== row) row.appendChild(el);
-      });
-    }
+    var legacyCard = qs("#phase10StatusLedCard");
+    if(legacyCard) legacyCard.remove();
 
     var version = qs("#pcVersionBadge");
     var now = qs(".now-playing");
@@ -568,31 +538,8 @@ RULES:
   // DIRECTFIX_STREAM_HEADER_TICKER_MESSAGE_V1_20260525
   function directfixRestoreStatusLeds(){
     if(!phase10IsDesktopPlayer || !phase10IsDesktopPlayer()) return;
-    var infoGrid = qs(".info-grid");
-    var djCard = qs("#djText") ? qs("#djText").closest(".info-card") : null;
-    if(!infoGrid || !djCard) return;
-
     var card = qs("#phase10StatusLedCard");
-    if(!card){
-      card = document.createElement("article");
-      card.id = "phase10StatusLedCard";
-      card.className = "info-card phase10-status-led-card";
-      card.innerHTML = '<div class="info-label">Stream / Meter / Source</div><div class="phase10-status-led-row"></div>';
-      djCard.parentNode.insertBefore(card, djCard.nextSibling);
-    }
-    var row = qs(".phase10-status-led-row", card);
-    ["statusStream","statusMeter","statusSource"].forEach(function(id){
-      var el = qs("#"+id);
-      if(!el){
-        el = document.createElement("button");
-        el.id = id;
-        el.type = "button";
-        el.className = "status-chip led-state";
-        el.innerHTML = '<span class="status-dot"></span><span class="status-code">'+(id==="statusStream"?"STREAM":id==="statusMeter"?"METER":"SRC")+'</span>';
-      }
-      el.hidden = false;
-      if(el.parentNode !== row) row.appendChild(el);
-    });
+    if(card) card.remove();
     var pool = qs("#phase10StatusLedSourcePool");
     if(pool) pool.remove();
   }
@@ -689,7 +636,7 @@ RULES:
     var hub = document.createElement("div");
     hub.id = "s666ParityMobileHub";
     hub.className = "s666-parity-mobile-hub";
-    hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="sound">SOUND</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
+    hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
     var anchor = qs("#s666MobileExtraRow") || qs(".mobile-boost") || qs(".hero-label-row") || qs(".now-playing");
     if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(hub, anchor.nextSibling);
     else app.insertBefore(hub, app.firstChild);
@@ -716,16 +663,7 @@ RULES:
     if(action === "status") return parityOpenStatus();
   }
   function parityBindMobileEqTriggers(){
-    if(!parityIsMobile()) return;
-    ["#mffEqBars","#mffBottomBars",".mff-bottom-bars",".mff-eq-bars","#eqBars",".eq-bars","#pcRealEqPanel",".pc-real-eq-panel"].forEach(function(sel){
-      qsa(sel).forEach(function(el){
-        if(el.__parityEqBound) return;
-        el.__parityEqBound = true;
-        el.style.pointerEvents = "auto";
-        el.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); parityOpenSound(); }, true);
-        el.addEventListener("touchend", function(ev){ ev.preventDefault(); ev.stopPropagation(); parityOpenSound(); }, {passive:false, capture:true});
-      });
-    });
+    // SOUND is opened only by the primary action button.
   }
   function parityLockViewport(){
     if(!parityIsMobile()) return;
@@ -762,10 +700,16 @@ RULES:
     var boost = 0;
     try { boost = Number(activeBoost && activeBoost()) || 0; } catch(e) {}
     var rms = 0;
-    [window.__mffLastRms,window.__mffRms,window.__smfpRms,window.__radioRms,window.__mffAudioLevel,window.__smfpAudioLevel,window.__lastAudioLevel].forEach(function(v){
-      var n = Number(v);
-      if(isFinite(n) && n > 0) rms = Math.max(rms, n > 1 ? n / 100 : n);
-    });
+    var bus = window.__MeterBus;
+    var busFresh = !!(bus && typeof bus.level === "number" && Date.now() - Number(bus.ts || 0) < 700);
+    if(busFresh){
+      rms = Math.max(0, Math.min(1, Number(bus.level) || 0));
+    }else{
+      [window.__mffLastRms,window.__mffRms,window.__smfpRms,window.__radioRms,window.__mffAudioLevel,window.__smfpAudioLevel,window.__lastAudioLevel].forEach(function(v){
+        var n = Number(v);
+        if(isFinite(n) && n > 0) rms = Math.max(rms, n > 1 ? n / 100 : n);
+      });
+    }
     if((!rms || rms < .015) && audio && !audio.paused){
       sideMeterReactV1State.phase += .135 + boost * .008;
       rms = .22 + Math.abs(Math.sin(sideMeterReactV1State.phase))*.32 + Math.abs(Math.sin(sideMeterReactV1State.phase*.43+1.9))*.18 + Math.abs(Math.sin(sideMeterReactV1State.phase*1.71+.3))*.10;
@@ -811,6 +755,7 @@ RULES:
       var h = Math.round(heights[i]*100);
       bar.style.height = h + "%";
       bar.style.minHeight = Math.max(14,h) + "%";
+      bar.style.transform = "scaleY(1)";
       bar.style.opacity = String(Math.max(.48, Math.min(1, .52 + heights[i]*.55)));
       bar.style.filter = "saturate(" + (1.10 + m.boost*.08).toFixed(2) + ") brightness(" + (0.95 + heights[i]*.20).toFixed(2) + ")";
     });

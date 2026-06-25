@@ -218,8 +218,7 @@ async function upload(path, data, branch) {
     sha = res.sha || null;
 
     if (res.content) {
-      remoteContent = res.content.replace(/
-/g, "");
+      remoteContent = res.content.replace(/[\r\n]/g, "");
     }
   } catch (e) {
     // Datei existiert nicht -> CREATE
@@ -370,9 +369,7 @@ ${String(e)}`);
       msg += `
 
 Fehler:
-` + failList.join("
-
-").slice(0, 2500);
+` + failList.join("\n\n").slice(0, 2500);
     }
 
     await showMessage("UPLOAD DONE", msg);

@@ -70,8 +70,8 @@ const HTML = `<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Internal</title>
-  <link rel="icon" type="image/png" href="/assets/assets/icons/internal-icon.png" />
-  <link rel="apple-touch-icon" href="/assets/assets/icons/internal-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/icons/internal-icon.png" />
+  <link rel="apple-touch-icon" href="/assets/icons/internal-icon.png" />
   <link rel="stylesheet" href="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245" />
 </head>
 <body>
@@ -378,6 +378,110 @@ function passthroughHeaders(sourceHeaders){
   headers.set("x-radio-proxy","666soundsdesign-worker");
   return headers;
 }
+
+function skipCorsHeaders(){
+  return {
+    "content-type":"application/json; charset=UTF-8",
+    "cache-control":"no-store",
+    "access-control-allow-origin":"*",
+    "access-control-allow-methods":"GET,POST,OPTIONS",
+    "access-control-allow-headers":"content-type,x-admin-password,x-admin-token,authorization"
+  };
+}
+
+function skipJson(data,status=200){
+  return new Response(JSON.stringify(data),{status,headers:skipCorsHeaders()});
+}
+
+async function skipReadJson(request){
+  try{return await request.json()}catch(e){return {}}
+}
+
+function skipAdminAuthorized(request,env){
+  const provided = String(
+    request.headers.get("x-admin-token") ||
+    request.headers.get("x-admin-password") ||
+    (request.headers.get("authorization") || "").replace(/^Bearer\s+/i,"")
+  ).trim();
+  const allowed = [
+    env && env.SKIP_ADMIN_TOKEN,
+    env && env.SKIP_ADMIN_PASSWORD,
+    env && env.DISCORD_ADMIN_TOKEN
+  ].filter(Boolean).map((value)=>String(value).trim());
+  return !!provided && allowed.includes(provided);
+}
+
+function skipConfig(env){
+  const adminUrl = env && (env.SHOUTCAST_ADMIN_URL || env.SONICPANEL_SKIP_URL || env.MYIDJ_SKIP_URL || env.MYIDJ_ADMIN_URL);
+  return {
+    configured: Boolean(adminUrl && (env.SHOUTCAST_ADMIN_PASSWORD || env.SONICPANEL_SKIP_TOKEN || env.MYIDJ_ADMIN_PASSWORD)),
+    adminUrl: adminUrl || "",
+    sid: env && (env.SHOUTCAST_SID || env.MYIDJ_STREAM_PORT || "1"),
+    mode: env && (env.SHOUTCAST_SKIP_MODE || "nextsong"),
+    threshold: Math.max(1, Number(env && env.SKIP_VOTE_THRESHOLD) || 3)
+  };
+}
+
+async function performShoutcastSkip(env,source="unknown"){
+  const cfg = skipConfig(env);
+  if(!cfg.adminUrl) return {ok:false,success:false,message:"SHOUTCAST_ADMIN_URL or SONICPANEL_SKIP_URL missing",configured:false};
+
+  const url = new URL(cfg.adminUrl);
+  if(!url.searchParams.has("mode")) url.searchParams.set("mode", cfg.mode);
+  if(cfg.sid && !url.searchParams.has("sid")) url.searchParams.set("sid", String(cfg.sid));
+  if(env.SHOUTCAST_ADMIN_PASSWORD && !url.searchParams.has("pass")) url.searchParams.set("pass", String(env.SHOUTCAST_ADMIN_PASSWORD));
+  if(env.MYIDJ_ADMIN_PASSWORD && !url.searchParams.has("pass")) url.searchParams.set("pass", String(env.MYIDJ_ADMIN_PASSWORD));
+  if(env.SONICPANEL_SKIP_TOKEN && !url.searchParams.has("token")) url.searchParams.set("token", String(env.SONICPANEL_SKIP_TOKEN));
+
+  const headers = new Headers({"cache-control":"no-store","user-agent":"666soundsdesign-worker-skip"});
+  if(env.SHOUTCAST_ADMIN_USER && env.SHOUTCAST_ADMIN_PASSWORD){
+    headers.set("authorization","Basic "+btoa(String(env.SHOUTCAST_ADMIN_USER)+":"+String(env.SHOUTCAST_ADMIN_PASSWORD)));
+  } else if(env.MYIDJ_ADMIN_USER && env.MYIDJ_ADMIN_PASSWORD){
+    headers.set("authorization","Basic "+btoa(String(env.MYIDJ_ADMIN_USER)+":"+String(env.MYIDJ_ADMIN_PASSWORD)));
+  }
+
+  const res = await fetch(url.toString(),{method:"GET",headers});
+  await res.arrayBuffer().catch(()=>null);
+  return {
+    ok: res.ok,
+    success: res.ok,
+    status: res.status,
+    source,
+    message: res.ok ? "skip sent" : "skip upstream failed"
+  };
+}
+
+async function skipVoteState(songId){
+  const key = new Request("https://skip.local/v1/"+encodeURIComponent(songId || "current"));
+  try{
+    const cached = await caches.default.match(key);
+    if(cached) return {key,data:await cached.json()};
+  }catch(e){}
+  return {key,data:{songId:songId || "current",voters:[],updatedAt:0}};
+}
+
+async function skipSaveVoteState(key,data){
+  try{
+    await caches.default.put(key,new Response(JSON.stringify(data),{headers:{"content-type":"application/json","cache-control":"public, max-age=600"}}));
+  }catch(e){}
+}
+
+async function handleSkipApi(request,env){
+  const url = new URL(request.url);
+  if(!url.pathname.startsWith("/api/skip")) return null;
+  if(request.method==="OPTIONS") return new Response(null,{status:204,headers:skipCorsHeaders()});
+
+  const cfg = skipConfig(env);
+  if(url.pathname==="/api/skip/status" && request.method==="GET"){
+    return skipJson({ok:true,configured:cfg.configured,adminProtected:true,route:"/api/admin/skip"});
+  }
+
+  if(url.pathname==="/api/skip/votes" || url.pathname==="/api/skip/vote" || url.pathname==="/api/skip"){
+    return skipJson({ok:false,error:"protected_admin_route_required",route:"/api/admin/skip"},403);
+  }
+
+  return skipJson({ok:false,error:"not_found"},404);
+}
 async function proxyStream(request, upstream, targetName = "unknown"){
   // STREAM_FAILOVER_REPAIR_v1:
   // Ein HTTP-Fehler vom Upstream zählt als echter Failover-Grund.
@@ -595,16 +699,17 @@ function s666RouteTable() {
     { priority: 2, route: "/api/admin/*", handler: "handleRadioAdminConfigAddon", purpose: "Admin auth/config/GitHub backup" },
     { priority: 3, route: "/api/player-alert/*", handler: "handlePlayerAlertV152", purpose: "PC+iPhone broadcast relay" },
     { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
-    { priority: 5, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
-    { priority: 6, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
-    { priority: 7, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
-    { priority: 8, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
-    { priority: 9, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
-    { priority: 10, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
-    { priority: 11, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
-    { priority: 12, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
-    { priority: 13, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
-    { priority: 14, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
+    { priority: 5, route: "/api/skip/status", handler: "handleSkipApi", purpose: "Read-only skip configuration status" },
+    { priority: 6, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
+    { priority: 7, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
+    { priority: 8, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
+    { priority: 9, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
+    { priority: 10, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
+    { priority: 11, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
+    { priority: 12, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
+    { priority: 13, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
+    { priority: 14, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
+    { priority: 15, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
   ];
 }
 
@@ -643,6 +748,11 @@ function s666ModuleStatus(env) {
         routes: ["/api/discord/status", "/api/discord/manual", "/api/discord/test", "/api/discord/nowplaying"],
         env: s666BoolEnv(env, ["DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK", "DISCORD_ADMIN_TOKEN", "DISCORD_GATE_CODE", "ADMIN_AUTH_VERIFY_URL"])
       },
+      skip: {
+        ok: typeof handleSkipApi === "function",
+        routes: ["/api/skip/status", "/api/admin/skip"],
+        env: s666BoolEnv(env, ["SHOUTCAST_ADMIN_URL", "SHOUTCAST_ADMIN_PASSWORD", "SHOUTCAST_ADMIN_USER", "SHOUTCAST_SID", "SONICPANEL_SKIP_URL", "SONICPANEL_SKIP_TOKEN", "ADMIN_AUTH_VERIFY_URL", "PW_VERIFY_URL"])
+      },
       chaosSunoRendererIntegration: { ok: true, files: ["CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js", "CHAOS_ENGINE/assets/data/api-providers.json"] },
       goveeFxSceneSync: { ok: true, files: ["js/system-extra/govee/govee-sync-config.js","js/system-extra/govee/govee-bridge-client.js","js/system-extra/govee/govee-scene-sync.js","js/system-extra/govee/govee-fx-control-hooks.js"], secretPolicy: "no frontend secrets" },
       soundControl: {
@@ -679,7 +789,8 @@ async function s666LiveHealth(request, env) {
       darkDancer: "/The-Dark-Dancer",
       adminAuthCheck: "/api/admin/auth-check",
       broadcastStatus: "/api/player-alert/status",
-      discordStatus: "/api/discord/status"
+      discordStatus: "/api/discord/status",
+      skipStatus: "/api/skip/status"
     },
     modules: s666ModuleStatus(env).modules
   });
@@ -730,6 +841,9 @@ const url=new URL(request.url);
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;
 
+    const skipApiResponse = await handleSkipApi(request, env);
+    if (skipApiResponse) return skipApiResponse;
+
     const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
     if (chaosEngineStatic) return chaosEngineStatic;
 
@@ -777,13 +891,13 @@ const url=new URL(request.url);
     // ROOT_MIGRATION_REPAIR_v1:
     // Root-Assets des Hauptplayers unter eigener Domain ausliefern.
     // Interne Notfallplayer-Dateien /css/main.css, /js/app.js und /config/stream.config.js bleiben weiter unten reserviert.
-    if(url.pathname.startsWith("/css/") && url.pathname!=="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname.startsWith("/css/") && url.pathname!=="/css/main.css"){
       return await fetchExternalAsset(url.pathname, request);
     }
-    if(url.pathname.startsWith("/js/") && url.pathname!=="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname.startsWith("/js/") && url.pathname!=="/js/app.js"){
       return await fetchExternalAsset(url.pathname, request);
     }
-    if(url.pathname.startsWith("/assets/")){
+    if(url.pathname.startsWith("/assets/") && url.pathname!=="/assets/icons/internal-icon.png"){
       return await fetchExternalAsset(url.pathname, request);
     }
 
@@ -814,16 +928,16 @@ const url=new URL(request.url);
     }
 
     // Interner Notfall-Player bleibt komplett erhalten.
-    if(url.pathname==="/assets/assets/icons/internal-icon.png"){
-      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/assets/assets/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
+    if(url.pathname==="/assets/icons/internal-icon.png"){
+      return fetch("https://raw.githubusercontent.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/assets/icons/internal-icon.png", {headers: {"cache-control":"no-store"}});
     }
-    if(url.pathname==="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname==="/css/main.css"){
       return new Response(CSS,{headers:{"content-type":"text/css; charset=UTF-8"}});
     }
-    if(url.pathname==="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname==="/js/app.js"){
       return new Response(APP_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
-    if(url.pathname==="/config/stream.config.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"){
+    if(url.pathname==="/config/stream.config.js"){
       return new Response(CONFIG_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
     return new Response(HTML,{status:200,headers:{"content-type":"text/html; charset=UTF-8"}});

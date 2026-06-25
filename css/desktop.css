@@ -3786,6 +3786,55 @@ PURPOSE:
     body #pcVersionBadge .status-code::after{content:"v177"!important;}
   }
 
+@media (min-width:761px){
+  body .frame-stage .player-shell .systempanel-grid-v74{
+    grid-template-columns:minmax(0,1fr) minmax(132px,168px) minmax(0,1fr)!important;
+    gap:10px!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  body .frame-stage .player-shell .systempanel-left,
+  body .frame-stage .player-shell .systempanel-right{
+    justify-content:center!important;
+  }
+  body .frame-stage .player-shell .systempanel-right{
+    gap:6px!important;
+    flex-wrap:wrap!important;
+  }
+  body .frame-stage .player-shell .discord-addon-slot-pc,
+  body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{
+    display:none!important;
+  }
+  body .frame-stage .player-shell #pcVersionBadge .status-code{
+    font-size:11px!important;
+  }
+  body .frame-stage .player-shell #pcVersionBadge .status-code::after{
+    content:none!important;
+    display:none!important;
+  }
+  body .frame-stage .player-shell .phase10-status-led-card{
+    display:none!important;
+  }
+  body .frame-stage .player-shell .bottom-console{
+    margin-top:14px!important;
+    padding-top:8px!important;
+    align-items:center!important;
+  }
+  body .frame-stage .player-shell .control-toolbar,
+  body .frame-stage .player-shell .timeline-wrap,
+  body .frame-stage .player-shell .volume-wrap{
+    transform:translateY(6px)!important;
+  }
+  body .frame-stage .player-shell .control-toolbar{
+    justify-content:center!important;
+    gap:10px!important;
+  }
+  body .frame-stage .player-shell #s666SkipBar{
+    display:flex!important;
+    align-items:center!important;
+  }
+}
+
 /* ── migrated: smfpV187MobileCyberHeaderCss (desktop) ── */
 /* ── PATCH: smfpV187MobileCyberHeaderCss (orig L4962–5007) ── */
 

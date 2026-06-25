@@ -98,7 +98,7 @@ PURPOSE: Sound Control Overlay V1 styling.
 }
 .s666-sound-eq{
   display:grid;
-  grid-template-columns:repeat(9,1fr);
+  grid-template-columns:repeat(5,1fr);
   gap:8px;
   min-height:310px;
   align-items:end;
@@ -192,7 +192,7 @@ PURPOSE: Sound Control Overlay V1 styling.
 @media(max-width:760px){
   .s666-sound-panel{width:96vw;max-height:94vh}
   .s666-sound-body{grid-template-columns:1fr;padding:14px}
-  .s666-sound-eq{grid-template-columns:repeat(9,1fr);gap:4px;min-height:240px}
+  .s666-sound-eq{grid-template-columns:repeat(5,1fr);gap:6px;min-height:240px}
   .s666-sound-band{grid-template-rows:18px 170px 20px;padding:7px 2px}
   .s666-sound-band input[type=range]{height:165px;width:28px}
   .s666-sound-presets{grid-template-columns:repeat(3,1fr)}

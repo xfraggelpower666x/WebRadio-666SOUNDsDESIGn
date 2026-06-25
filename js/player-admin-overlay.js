@@ -19,7 +19,7 @@ PURPOSE: Protected admin overlay.
   const DISCORD_TEST_URL="/api/discord/test";
   const DISCORD_STATUS_URL="/api/discord/status";
   const $=id=>document.getElementById(id);
-  let authOkCache=false,lastAuthCheck=0;
+  let authOkCache=false,lastAuthCheck=0,pwOkCache=false,lastPwCheck=0;
   function loginUrl(){return `${AUTH_LOGIN_URL}?next=${encodeURIComponent(window.location.href)}`;}
   function goLogin(){window.location.href=loginUrl();}
   async function fetchJson(url,options){
@@ -32,7 +32,19 @@ PURPOSE: Protected admin overlay.
     try{const data=await fetchJson("/api/admin/auth-check?t="+Date.now());authOkCache=!!data.ok;lastAuthCheck=now;const out=$("fp-admin-debug-output");if(out)out.textContent=JSON.stringify(data,null,2);return authOkCache}
     catch(e){authOkCache=false;const out=$("fp-admin-debug-output");if(out)out.textContent="Auth check failed: "+(e&&e.message?e.message:String(e));return false}
   }
-  async function requireAuth(){const ok=await checkAuth(true);if(!ok){goLogin();return false}return true}
+  async function checkPw(force){
+    const now=Date.now();if(!force&&pwOkCache&&now-lastPwCheck<30000)return true;
+    try{const data=await safeCheck("PW Worker",PW_HEALTH_URL);pwOkCache=!!data.ok;lastPwCheck=now;const out=$("fp-admin-auth-output");if(out)out.textContent=JSON.stringify(data,null,2);return pwOkCache}
+    catch(e){pwOkCache=false;const out=$("fp-admin-auth-output");if(out)out.textContent="PW worker check failed: "+(e&&e.message?e.message:String(e));return false}
+  }
+  async function checkAdminGate(force){
+    const authOk=await checkAuth(force);
+    if(!authOk){goLogin();return false}
+    const pwOk=await checkPw(force);
+    if(!pwOk)return false;
+    return true;
+  }
+  async function requireAuth(){return checkAdminGate(true)}
   function ensureOverlay(){
     if($("fp-admin-overlay"))return;
     const root=document.createElement("div");root.id="fp-admin-overlay";root.className="fp-admin-overlay fp-admin-hidden";
@@ -193,8 +205,8 @@ PURPOSE: Protected admin overlay.
     }catch(e){ setDiscordLed("failed","FAILED"); if(out) out.textContent = e && e.message ? e.message : String(e); }
   }
 
-  async function checkAllLayers(){const localAuth=await fetchJson("/api/admin/auth-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const adminApi=await fetchJson("/api/admin/debug?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const pw=await safeCheck("PW Worker",PW_HEALTH_URL);const auth=await safeCheck("Auth Worker",AUTH_HEALTH_URL);const suno=await safeCheck("Zuno/Suno Worker",SUNO_HEALTH_URL);const chaosAI=await safeCheck("Chaos AI Worker",CHAOS_AI_HEALTH_URL);const chaosLocal=await fetch(CHAOS_ENGINE_URL+"?t="+Date.now(),{cache:"no-store"}).then(r=>({ok:r.ok,status:r.status,url:CHAOS_ENGINE_URL})).catch(e=>({ok:false,error:e.message,url:CHAOS_ENGINE_URL}));const broadcast=await fetchJson("/api/player-alert/status?t="+Date.now()).catch(e=>({ok:false,error:e.message}));$("fp-admin-auth-output").textContent=JSON.stringify({localAuth,adminApi,pw,auth,suno,chaosAI,chaosLocal,broadcast},null,2)}
-  function mountAdminButton(){if($("fp-admin-button"))return;const btn=document.createElement("button");btn.id="fp-admin-button";btn.type="button";btn.className="fp-admin-button";btn.textContent="ADMIN";btn.title="Protected radio admin menu";btn.onclick=openAdminOverlay;const targets=[".systempanel-right",".player-actions",".controls",".radio-controls","#player","main","body"];for(const sel of targets){const t=document.querySelector(sel);if(t){t.appendChild(btn);return}}document.body.appendChild(btn)}
-  window.FPAdminOverlay={mount:mountAdminButton,open:openAdminOverlay,close:closeAdminOverlay,checkAuth};
+  async function checkAllLayers(){const localAuth=await fetchJson("/api/admin/auth-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const gate=await fetchJson("/api/admin/gate-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const adminApi=await fetchJson("/api/admin/debug?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const pw=await safeCheck("PW Worker",PW_HEALTH_URL);const auth=await safeCheck("Auth Worker",AUTH_HEALTH_URL);const suno=await safeCheck("Zuno/Suno Worker",SUNO_HEALTH_URL);const chaosAI=await safeCheck("Chaos AI Worker",CHAOS_AI_HEALTH_URL);const chaosLocal=await fetch(CHAOS_ENGINE_URL+"?t="+Date.now(),{cache:"no-store"}).then(r=>({ok:r.ok,status:r.status,url:CHAOS_ENGINE_URL})).catch(e=>({ok:false,error:e.message,url:CHAOS_ENGINE_URL}));const broadcast=await fetchJson("/api/player-alert/status?t="+Date.now()).catch(e=>({ok:false,error:e.message}));$("fp-admin-auth-output").textContent=JSON.stringify({localAuth,gate,adminApi,pw,auth,suno,chaosAI,chaosLocal,broadcast},null,2)}
+  function mountAdminButton(){const old=$("fp-admin-button");if(old)old.remove();const chip=$("statusAdmin");if(chip&&!chip.__adminBound){chip.__adminBound=true;chip.title="Protected radio admin menu";chip.addEventListener("click",openAdminOverlay)}}
+  window.FPAdminOverlay={mount:mountAdminButton,open:openAdminOverlay,close:closeAdminOverlay,checkAuth,checkGate:checkAdminGate};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mountAdminButton);else mountAdminButton();
 })();
