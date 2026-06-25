@@ -130,21 +130,3 @@
   window.S666SkipControl = { refreshGate: function () { return syncAdminButton(true); } };
 })();
 
-/* Player Stage V2 loader: reuses this already-loaded frontend entry without changing index.html. */
-(function(){
-  'use strict';
-  if(window.__S666_PLAYER_STAGE_V2_LOADER__) return;
-  window.__S666_PLAYER_STAGE_V2_LOADER__=true;
-  if(!document.getElementById('s666PlayerStageV2Css')){
-    var link=document.createElement('link');
-    link.id='s666PlayerStageV2Css';link.rel='stylesheet';
-    link.href='/css/player-stage-v2.css?v=2026-06-25-v2';
-    document.head.appendChild(link);
-  }
-  if(!document.getElementById('s666PlayerStageV2Script')){
-    var script=document.createElement('script');
-    script.id='s666PlayerStageV2Script';script.defer=true;
-    script.src='/js/player-stage-v2.js?v=2026-06-25-v2';
-    document.head.appendChild(script);
-  }
-})();

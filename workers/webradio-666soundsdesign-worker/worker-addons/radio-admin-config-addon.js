@@ -80,24 +80,33 @@ function verificationHeaders(request, token) {
   return headers;
 }
 
-async function fetchVerification(url, headers, label) {
+async function fetchVerification(url, token, label) {
   try {
+    const headers = new Headers({
+      accept: "application/json",
+      "content-type": "application/json",
+      "cache-control": "no-store",
+      authorization: `Bearer ${token}`
+    });
     const response = await fetchWithTimeout(url, {
-      method: "GET",
+      method: "POST",
       headers,
+      body: JSON.stringify({ token }),
       redirect: "error"
     }, 5000);
     const data = await response.json().catch(() => ({}));
     return {
-      ok: response.ok && data && data.ok === true,
+      ok: response.ok && data && data.ok === true && data.valid === true,
       status: response.status,
       service: label,
+      payload: data?.payload || null,
       error: response.ok ? null : cleanText(data?.error || "verification_rejected", 80)
     };
   } catch (error) {
     return {
       ok: false,
       service: label,
+      payload: null,
       error: error?.name === "AbortError" ? "verification_timeout" : "verification_unreachable"
     };
   }
@@ -106,16 +115,66 @@ async function fetchVerification(url, headers, label) {
 async function verifyAdminAuth(request, env) {
   const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
   const token = getCookie(request, "chaos_auth") || getCookie(request, "admin_auth") || bearerToken(request);
-  if (!token && !request.headers.get("authorization")) return { ok: false, service: "auth", error: "auth_token_missing" };
-  return fetchVerification(verifyUrl, verificationHeaders(request, token), "auth");
+  if (!token) return { ok: false, service: "auth", payload: null, error: "auth_token_missing" };
+  return fetchVerification(verifyUrl, token, "auth");
 }
 
-async function verifyPwWorker(request, env) {
-  const verifyUrl = env.PW_VERIFY_URL;
-  if (!verifyUrl) return { ok: false, service: "password", error: "pw_verify_not_configured" };
-  const token = getCookie(request, "pw_auth") || getCookie(request, "admin_auth") || getCookie(request, "chaos_auth") || bearerToken(request);
-  if (!token && !request.headers.get("authorization")) return { ok: false, service: "password", error: "pw_token_missing" };
-  return fetchVerification(verifyUrl, verificationHeaders(request, token), "password");
+function verifyPwIssuedToken(auth) {
+  return {
+    ok: Boolean(auth?.ok && auth?.payload?.iss === "666-system-pw" && auth?.payload?.scope === "admin"),
+    service: "password",
+    payload: auth?.payload || null,
+    error: auth?.ok ? "pw_issuer_invalid" : "auth_invalid"
+  };
+}
+
+
+async function loginAdmin(request, env) {
+  if (!isSameOrigin(request)) return adminJson({ ok: false, error: "origin_rejected" }, 403);
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return adminJson({ ok: false, error: "invalid_json" }, 400);
+  }
+  const password = String(body?.password || "");
+  if (!password) return adminJson({ ok: false, error: "password_missing" }, 400);
+
+  const loginUrl = env.PW_LOGIN_URL || "https://666-system-pw.666soundsdesign-broadcaster.com/login";
+  try {
+    const response = await fetchWithTimeout(loginUrl, {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "cache-control": "no-store"
+      },
+      body: JSON.stringify({ password }),
+      redirect: "error"
+    }, 7000);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data?.ok !== true || !data?.token) {
+      return adminJson({ ok: false, error: cleanText(data?.error || "login_rejected", 80) }, response.status || 401);
+    }
+
+    const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
+    const verified = await fetchVerification(verifyUrl, data.token, "auth");
+    const pw = verifyPwIssuedToken(verified);
+    if (!pw.ok) return adminJson({ ok: false, error: "token_verification_failed" }, 401);
+
+    return adminJson({
+      ok: true,
+      token: data.token,
+      expiresAt: data.expiresAt || verified?.payload?.exp || null,
+      scope: verified?.payload?.scope || "admin",
+      issuer: verified?.payload?.iss || "666-system-pw"
+    });
+  } catch (error) {
+    return adminJson({
+      ok: false,
+      error: error?.name === "AbortError" ? "pw_login_timeout" : "pw_login_unreachable"
+    }, 502);
+  }
 }
 
 function requiredEnv(env) {
@@ -251,7 +310,7 @@ async function requireAdminGate(request, env) {
   if (!isSameOrigin(request)) return { response: adminJson({ ok: false, error: "origin_rejected" }, 403) };
   const auth = await verifyAdminAuth(request, env);
   if (!auth.ok) return { response: adminJson({ ok: false, error: "unauthorized" }, 401) };
-  const pw = await verifyPwWorker(request, env);
+  const pw = verifyPwIssuedToken(auth);
   if (!pw.ok) return { response: adminJson({ ok: false, error: "password_verification_failed" }, 403) };
   return { auth, pw };
 }
@@ -513,7 +572,7 @@ async function debugStatus(request, env) {
     configPath: env.GITHUB_CONFIG_PATH || DEFAULT_CONFIG_PATH,
     backupDir: env.GITHUB_BACKUP_DIR || DEFAULT_BACKUP_DIR,
     authVerifyConfigured: Boolean(env.ADMIN_AUTH_VERIFY_URL),
-    pwVerifyConfigured: Boolean(env.PW_VERIFY_URL),
+    pwLoginConfigured: Boolean(env.PW_LOGIN_URL || "https://666-system-pw.666soundsdesign-broadcaster.com/login"),
     runtimeKvConfigured: Boolean(env.RADIO_CONFIG_KV),
     skipConfigured: skipConfig(env).configured
   });
@@ -530,6 +589,10 @@ export async function handleRadioAdminConfigAddon(request, env) {
     if (request.method !== "GET") return methodNotAllowed(["GET"]);
     return debugStatus(request, env);
   }
+  if (url.pathname === "/api/admin/login") {
+    if (request.method !== "POST") return methodNotAllowed(["POST"]);
+    return loginAdmin(request, env);
+  }
   if (url.pathname === "/api/admin/auth-check") {
     if (request.method !== "GET") return methodNotAllowed(["GET"]);
     const auth = await verifyAdminAuth(request, env);
@@ -538,8 +601,11 @@ export async function handleRadioAdminConfigAddon(request, env) {
   if (url.pathname === "/api/admin/gate-check") {
     if (request.method !== "GET") return methodNotAllowed(["GET"]);
     const auth = await verifyAdminAuth(request, env);
-    const pw = auth.ok ? await verifyPwWorker(request, env) : { ok: false };
-    return adminJson({ ok: Boolean(auth.ok && pw.ok), authOk: Boolean(auth.ok), pwOk: Boolean(pw.ok) }, auth.ok && pw.ok ? 200 : 403);
+    const pw = verifyPwIssuedToken(auth);
+    return adminJson(
+      { ok: Boolean(auth.ok && pw.ok), authOk: Boolean(auth.ok), pwOk: Boolean(pw.ok) },
+      auth.ok && pw.ok ? 200 : 403
+    );
   }
   if (url.pathname === "/api/admin/skip") {
     if (request.method !== "POST") return methodNotAllowed(["POST"]);
