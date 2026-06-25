@@ -56,10 +56,20 @@ function darkDancerResponse(pathname) {
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
-const PRIMARY_STREAM_URL = "http://my.idjstream.com/666soundsdesign/stream";
-const FALLBACK_STREAM_URL = "http://my.idjstream.com:8686/stream";
-const FALLBACK_STREAM_URL_ALT = "http://my.idjstream.com/8686/stream";
+const PRIMARY_STREAM_URLS = [
+  "https://my.idjstream.com/666soundsdesign/stream",
+  "http://my.idjstream.com/666soundsdesign/stream"
+];
+const FALLBACK_STREAM_URLS = [
+  "https://my.idjstream.com:8686/stream",
+  "http://my.idjstream.com:8686/stream"
+];
+const FALLBACK_STREAM_URLS_ALT = [
+  "https://my.idjstream.com/8686/stream",
+  "http://my.idjstream.com/8686/stream"
+];
 const METADATA_URLS = [
+  "https://my.idjstream.com/cp/get_info.php?p=8686",
   "http://my.idjstream.com/cp/get_info.php?p=8686",
   "https://idjstream.app/cp/get_info.php?p=8686"
 ];
@@ -498,22 +508,37 @@ async function proxyStream(request, upstream, targetName = "unknown"){
     const headers=passthroughHeaders(response.headers);
     headers.set("x-active-stream-target", targetName);
     headers.set("x-failover-state", targetName === "main" ? "primary" : "fallback");
+    headers.set("x-upstream-url", upstream);
+    headers.set("x-upstream-protocol", upstream.startsWith("https://") ? "https" : "http");
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   } finally {
     clearTimeout(timeout);
   }
 }
 
+async function proxyStreamCandidates(request, upstreams, targetName){
+  let lastError = null;
+  for(const upstream of upstreams){
+    try{
+      return await proxyStream(request, upstream, targetName);
+    }catch(err){
+      const detail = String(err && err.message ? err.message : err);
+      lastError = new Error(`${targetName}_${upstream.startsWith("https://") ? "https" : "http"}_${detail}`);
+    }
+  }
+  throw lastError || new Error(`upstream_${targetName}_unavailable`);
+}
+
 async function proxyStreamFailover(request){
   // MAIN versuchen, bei HTTP-Fehler/Timeout direkt BACKUP versuchen.
   try{
-    return await proxyStream(request, PRIMARY_STREAM_URL, "main");
+    return await proxyStreamCandidates(request, PRIMARY_STREAM_URLS, "main");
   }catch(primaryErr){
     try{
-      return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
+      return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS, "backup");
     }catch(backupErr){
       try{
-        return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
+        return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS_ALT, "backup-alt");
       }catch(backupAltErr){
         return new Response(JSON.stringify({
           error:"stream_proxy_failed",
@@ -538,10 +563,10 @@ async function proxyStreamFailover(request){
 async function proxyFallbackStream(request){
   // Direkte Backup-Route: erst alte Port-Variante, dann Pfad-Variante.
   try{
-    return await proxyStream(request, FALLBACK_STREAM_URL, "backup");
+    return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS, "backup");
   }catch(backupErr){
     try{
-      return await proxyStream(request, FALLBACK_STREAM_URL_ALT, "backup-alt");
+      return await proxyStreamCandidates(request, FALLBACK_STREAM_URLS_ALT, "backup-alt");
     }catch(backupAltErr){
       return new Response(JSON.stringify({
         error:"fallback_stream_proxy_failed",
@@ -684,8 +709,8 @@ function s666ModuleStatus(env) {
       emergencyFallback: {
         ok: true,
         routes: ["/external-player", "/fallback-stream", "/stream"],
-        primary: "https://my.idjstream.com/666soundsdesign/stream",
-        fallback: "https://my.idjstream.com:8686/stream"
+        primary: PRIMARY_STREAM_URLS[0],
+        fallback: FALLBACK_STREAM_URLS[0]
       },
       chaosEngine: {
         ok: typeof chaosEngineStaticResponse === "function",
