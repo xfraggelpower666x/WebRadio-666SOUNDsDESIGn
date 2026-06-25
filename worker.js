@@ -691,16 +691,18 @@ function s666RouteTable() {
     { priority: 2, route: "/api/admin/*", handler: "handleRadioAdminConfigAddon", purpose: "Admin auth/config/GitHub backup" },
     { priority: 3, route: "/api/player-alert/*", handler: "handlePlayerAlertV152", purpose: "PC+iPhone broadcast relay" },
     { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
-    { priority: 5, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
-    { priority: 6, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
-    { priority: 7, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
-    { priority: 8, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
-    { priority: 9, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
-    { priority: 10, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
-    { priority: 11, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
-    { priority: 12, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
-    { priority: 13, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
-    { priority: 14, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
+    { priority: 5, route: "/api/skip/status", handler: "handleSkipApi", purpose: "skip status / diagnostics" },
+    { priority: 6, route: "/api/admin/skip + /skip", handler: "handleSkipApi", purpose: "protected shoutcast autodj skip" },
+    { priority: 7, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
+    { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
+    { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
+    { priority: 10, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
+    { priority: 11, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
+    { priority: 12, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
+    { priority: 13, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
+    { priority: 14, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
+    { priority: 15, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
+    { priority: 16, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
   ];
 }
 
@@ -728,6 +730,11 @@ function s666ModuleStatus(env) {
       broadcast: {
         ok: typeof handlePlayerAlertV152 === "function",
         routes: ["/api/player-alert/send", "/api/player-alert/current", "/api/player-alert/status", "/api/player-alert/history"]
+      },
+      skip: {
+        ok: typeof handleSkipApi === "function",
+        routes: ["/api/skip/status", "/api/admin/skip", "/skip"],
+        env: s666BoolEnv(env, ["SHOUTCAST_ADMIN_URL","SHOUTCAST_ADMIN_USER","SHOUTCAST_ADMIN_PASSWORD","SHOUTCAST_SID","SONICPANEL_SKIP_URL","SONICPANEL_SKIP_TOKEN","ADMIN_AUTH_VERIFY_URL","PW_VERIFY_URL","PW_AUTH_SECRET"])
       },
       admin: {
         ok: typeof handleRadioAdminConfigAddon === "function",
@@ -773,6 +780,8 @@ async function s666LiveHealth(request, env) {
       fallbackStream: "/fallback-stream",
       chaosEngine: "/CHAOS_ENGINE/",
       darkDancer: "/The-Dark-Dancer",
+      skipStatus: "/api/skip/status",
+      adminSkip: "/api/admin/skip",
       adminAuthCheck: "/api/admin/auth-check",
       broadcastStatus: "/api/player-alert/status",
       discordStatus: "/api/discord/status"
@@ -819,6 +828,9 @@ const url=new URL(request.url);
 
     const radioAdminConfigResponse = await handleRadioAdminConfigAddon(request, env);
     if (radioAdminConfigResponse) return radioAdminConfigResponse;
+
+    const skipResponse = await handleSkipApi(request, env);
+    if (skipResponse) return skipResponse;
 
     const playerAlertV152Response = await handlePlayerAlertV152(request, env);
     if (playerAlertV152Response) return playerAlertV152Response;
