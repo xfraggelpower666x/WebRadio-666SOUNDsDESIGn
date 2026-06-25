@@ -77,112 +77,154 @@
     display: flex !important;
     flex-direction: column !important;
     gap: 4px !important;
-    padding-bottom: 4px !important;
+    height: calc(100dvh - 12px) !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 12px) !important;
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+    padding: 4px 0 2px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
   }
+
+  /* Current logo and current LED panel stay at the top. */
   body .frame-stage .player-shell > .hero { order: 1 !important; }
   body .frame-stage .player-shell > .top-hud { order: 2 !important; }
-  body .frame-stage .player-shell > .now-playing { order: 3 !important; }
-  body .frame-stage .player-shell > .info-grid { order: 4 !important; }
-  body .frame-stage .player-shell > .visualizer { order: 5 !important; }
-  body .frame-stage .player-shell > .s666-primary-action-dock { order: 6 !important; }
-  body .frame-stage .player-shell > .bottom-console { order: 7 !important; }
-  body .frame-stage .player-shell > #pcBottomSyncMeter { order: 8 !important; }
+
+  /* Current functional panels stay in the middle. */
+  body .frame-stage .player-shell > .info-grid { order: 3 !important; }
+  body .frame-stage .player-shell > .visualizer { order: 4 !important; }
+  body .frame-stage .player-shell > .s666-primary-action-dock { order: 5 !important; }
+  body .frame-stage .player-shell > .bottom-console { order: 6 !important; }
+
+  /* Bottom stack: level meter -> NOW PLAYING -> copyright. */
+  body .frame-stage .player-shell > #pcBottomSyncMeter { order: 7 !important; }
+  body .frame-stage .player-shell > .now-playing { order: 8 !important; }
   body .frame-stage .player-shell > .pc-copyright-footer { order: 9 !important; }
 
   body .frame-stage .player-shell > .hero {
-    height: 90px !important;
-    min-height: 90px !important;
-    max-height: 90px !important;
+    height: clamp(68px, 9.2vh, 90px) !important;
+    min-height: clamp(68px, 9.2vh, 90px) !important;
+    max-height: clamp(68px, 9.2vh, 90px) !important;
     margin: 0 22px !important;
     padding: 6px 18px !important;
   }
   body .frame-stage .player-shell > .top-hud {
     margin: 0 22px !important;
+    flex: 0 0 auto !important;
+  }
+  body .frame-stage .player-shell > .info-grid {
+    height: clamp(58px, 8.2vh, 78px) !important;
+    min-height: clamp(58px, 8.2vh, 78px) !important;
+    max-height: clamp(58px, 8.2vh, 78px) !important;
+    margin: 0 22px !important;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,.70fr) minmax(0,1.08fr) !important;
+    gap: 8px !important;
+  }
+  body .frame-stage .player-shell > .info-grid .info-card {
+    min-height: 0 !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+  body .frame-stage .player-shell > .info-grid .info-card:nth-child(3) {
+    font-size: .88em !important;
+  }
+  body .frame-stage .player-shell > .visualizer {
+    height: clamp(58px, 8.5vh, 82px) !important;
+    min-height: clamp(58px, 8.5vh, 82px) !important;
+    max-height: clamp(58px, 8.5vh, 82px) !important;
+    margin: 0 22px !important;
+    padding: 7px 14px 9px !important;
+  }
+  body .frame-stage .player-shell > .visualizer .eq-bars {
+    height: clamp(38px, 5.8vh, 54px) !important;
+    min-height: clamp(38px, 5.8vh, 54px) !important;
+  }
+  body .frame-stage .player-shell > .s666-primary-action-dock {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    margin: 0 22px !important;
+    flex: 0 0 44px !important;
+  }
+  body .frame-stage .player-shell > .bottom-console {
+    height: clamp(52px, 7.2vh, 62px) !important;
+    min-height: clamp(52px, 7.2vh, 62px) !important;
+    max-height: clamp(52px, 7.2vh, 62px) !important;
+    margin: 0 22px !important;
+    padding: 7px 16px !important;
+  }
+  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter {
+    order: 7 !important;
+    flex: 0 0 24px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    width: calc(100% - 44px) !important;
+    max-width: calc(100% - 44px) !important;
+    margin: auto auto 0 !important;
+    padding: 4px 14px !important;
   }
   body .frame-stage .player-shell > .now-playing {
-    height: 140px !important;
-    min-height: 140px !important;
-    max-height: 140px !important;
+    height: clamp(76px, 10vh, 94px) !important;
+    min-height: clamp(76px, 10vh, 94px) !important;
+    max-height: clamp(76px, 10vh, 94px) !important;
     margin: 0 22px !important;
-    padding: 10px 14px !important;
-    grid-template-columns: 110px minmax(0, 1fr) !important;
-    column-gap: 14px !important;
+    padding: 8px 14px !important;
+    grid-template-columns: 70px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+    flex: 0 0 auto !important;
   }
   body .frame-stage .player-shell .now-cover-wrap {
-    width: 110px !important;
-    min-width: 110px !important;
-    height: 110px !important;
-    min-height: 110px !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    height: 64px !important;
+    min-height: 64px !important;
   }
   body .frame-stage .player-shell #nowCover.now-cover {
-    width: 108px !important;
-    height: 108px !important;
+    width: 62px !important;
+    height: 62px !important;
   }
   body .frame-stage .player-shell .now-playing .section-topline {
     width: auto !important;
     min-width: 0 !important;
-    height: 54px !important;
-    min-height: 54px !important;
+    height: 34px !important;
+    min-height: 34px !important;
   }
   body .frame-stage .player-shell .now-playing .ticker-window {
-    left: 138px !important;
+    left: 92px !important;
     right: 84px !important;
     top: auto !important;
-    bottom: 12px !important;
+    bottom: 8px !important;
     width: auto !important;
-    height: 32px !important;
+    height: 28px !important;
+    min-height: 28px !important;
   }
   body .frame-stage .player-shell .now-playing #historyToggle {
     right: 14px !important;
-    bottom: 12px !important;
+    bottom: 8px !important;
     width: 62px !important;
     min-width: 62px !important;
-    height: 32px !important;
+    height: 28px !important;
+    min-height: 28px !important;
   }
   body .frame-stage .player-shell #pcTickerRebuildLane,
   body .frame-stage .player-shell #phase10NowVersion {
     display: none !important;
   }
-  body .frame-stage .player-shell > .info-grid {
-    margin: 0 22px !important;
-  }
-  body .frame-stage .player-shell > .visualizer {
-    height: 84px !important;
-    min-height: 84px !important;
-    max-height: 84px !important;
-    margin: 0 22px !important;
-    padding: 7px 14px 9px !important;
-  }
-  body .frame-stage .player-shell > .visualizer .eq-bars {
-    height: 54px !important;
-    min-height: 54px !important;
-  }
-  body .frame-stage .player-shell > .s666-primary-action-dock {
-    min-height: 44px !important;
-    height: 44px !important;
-    margin: 0 22px !important;
-  }
-  body .frame-stage .player-shell > .bottom-console {
-    height: 62px !important;
-    min-height: 62px !important;
-    margin: 0 22px !important;
-    padding: 7px 16px !important;
-  }
-  body .frame-stage .player-shell > #pcBottomSyncMeter.pc-bottom-sync-meter {
-    height: 24px !important;
-    min-height: 24px !important;
-    max-height: 24px !important;
-    margin: 0 auto !important;
-    padding: 4px 14px !important;
-  }
   body .frame-stage .player-shell > .pc-copyright-footer {
+    order: 9 !important;
+    flex: 0 0 18px !important;
     height: 18px !important;
     min-height: 18px !important;
     max-height: 18px !important;
+    width: calc(100% - 44px) !important;
+    max-width: calc(100% - 44px) !important;
     margin: 0 auto !important;
     padding: 2px 10px !important;
   }
 
+  /* Existing LED strip position stays fixed and may not stretch the shell. */
   body .frame-stage .player-shell .systempanel-grid-v74 {
     grid-template-columns: minmax(0, 1.45fr) minmax(250px, .75fr) !important;
     min-height: 38px !important;
@@ -202,6 +244,12 @@
     min-width: 30px !important;
     max-width: 48px !important;
     padding: 0 6px !important;
+  }
+
+  /* Side panels and player use the same upper and lower edge. */
+  body .frame-stage .pc-side-addon {
+    top: 6px !important;
+    bottom: 6px !important;
   }
 }
 
@@ -243,6 +291,46 @@
     max-width: none !important;
     padding: 0 4px !important;
     font-size: 8px !important;
+  }
+}
+
+
+  #s666MobileStatusPanel { display: none; }
+
+@media (max-width: 760px) {
+  #s666MobileStatusPanel {
+    width: calc(100vw - 48px);
+    max-width: calc(100vw - 48px);
+    margin: 6px auto;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid rgba(22,255,243,.42);
+    border-radius: 14px;
+    background: linear-gradient(180deg,rgba(4,10,26,.96),rgba(13,4,28,.94));
+    box-shadow: inset 0 0 18px rgba(22,255,243,.06),0 0 18px rgba(255,61,187,.12);
+  }
+  #s666MobileStatusPanel:not([hidden]) { display: block; }
+  #s666MobileStatusPanel .s666-mobile-status-title {
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    color:#16fff3;font:900 11px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+    letter-spacing:.08em;margin-bottom:8px;
+  }
+  #s666MobileStatusPanel .s666-mobile-status-grid {
+    display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  }
+  #s666MobileStatusPanel .s666-mobile-status-item {
+    min-width:0;padding:7px 8px;border-radius:9px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(4,8,22,.72);display:flex;align-items:center;justify-content:space-between;gap:8px;
+    color:#dfe7ff;font:800 9px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  #s666MobileStatusPanel .s666-mobile-status-item i {
+    width:8px;height:8px;border-radius:50%;background:#6b7280;box-shadow:0 0 6px rgba(255,255,255,.18);flex:0 0 8px;
+  }
+  #s666MobileStatusPanel .s666-mobile-status-item.is-ok i { background:#16fff3;box-shadow:0 0 10px rgba(22,255,243,.9); }
+  #s666MobileStatusPanel .s666-mobile-status-item.is-warn i { background:#ff3dbb;box-shadow:0 0 10px rgba(255,61,187,.85); }
+  #s666MobileStatusPanel .s666-mobile-status-back {
+    min-height:30px;padding:0 10px;border-radius:8px;border:1px solid rgba(255,61,187,.55);
+    background:rgba(255,61,187,.08);color:#ff71cc;font-weight:900;
   }
 }
 

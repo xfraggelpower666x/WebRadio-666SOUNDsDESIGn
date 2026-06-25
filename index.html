@@ -2467,7 +2467,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     try{var r=await fetch(CURRENT_URL,{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
   }
   function boot(){bindPc();ensureMobileButton();ensureReceiveOverlay();}
-  boot(); setInterval(boot,1200); setInterval(poll,10000); setTimeout(poll,1600);
+  boot(); setTimeout(boot,1200); setInterval(poll,10000); setTimeout(poll,1600);
 })();
 </script>
 
@@ -2680,7 +2680,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
   function boot(){ var a=app(); if(!a)return; setVersion(); moveHistory(a); flattenDiscord(a); installSendLeds(a); installBoostLed5(a); installVersionFooter(a); patchFetchStatus(); lockViewport(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
-  setInterval(boot,1200);
+  setTimeout(boot,1200);
 })();
 </script>
 
@@ -2786,7 +2786,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function boot(){var a=app();setVersion();if(!a)return;moveHistory(a);installFooter(a);cleanDiscordPanel(a);installSendLeds(a);lockZoom();}
   document.addEventListener('click',hardSend,true);document.addEventListener('touchend',hardSend,{capture:true,passive:false});document.addEventListener('pointerup',hardSend,{capture:true,passive:false});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-  setTimeout(boot,120);setTimeout(boot,700);setInterval(boot,1000);
+  setTimeout(boot,120);setTimeout(boot,700);setTimeout(boot,1000);
 })();
 </script>
 
@@ -2860,9 +2860,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 <link rel="stylesheet" href="/css/sound-control-overlay-v1.css?v=2026-06-15-fix1">
-<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-06-19-repair6">
+<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-06-25-geometry1">
 <script src="/js/sound-control-overlay-v1.js?v=2026-06-19-repair4" defer></script>
-<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-06-19-repair2" defer></script>
+<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-06-25-geometry1" defer></script>
 <script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=2026-06-15-fix1"></script>
 <script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=2026-06-15-fix1"></script>
 <script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=2026-06-15-fix1"></script>

@@ -73,14 +73,15 @@ RULES:
   function mountMobilePanelRow(){
     var app = qs("#mffApp");
     if(!app || qs("#s666MobileExtraRow", app)) return;
+    qsa("#s666ParityMobileHub").forEach(function(el){ try{ el.remove(); }catch(e){} });
 
     var row = document.createElement("div");
     row.id = "s666MobileExtraRow";
     row.className = "s666-mobile-extra-row";
     row.innerHTML = [
+      '<button type="button" data-phase10-mobile="player">PLAYER</button>',
       '<button type="button" data-phase10-mobile="stream">STREAM</button>',
       '<button type="button" data-phase10-mobile="admin">ADMIN</button>',
-      '<button type="button" data-phase10-mobile="chaos">CHAOS</button>',
       '<button type="button" data-phase10-mobile="status">STATUS</button>'
     ].join("");
 
@@ -119,6 +120,7 @@ RULES:
     qsa("#s666MobileExtraRow button").forEach(function(b){ b.removeAttribute("data-state"); });
     if(btn) btn.setAttribute("data-state", "active");
 
+    if(action === "player") return returnToPlayer();
     if(action === "stream") return toggleMobileStream();
     if(action === "sound") return openSoundControl();
     if(action === "admin") return openAdmin();
@@ -197,9 +199,63 @@ RULES:
     catch(e){ location.href = "/CHAOS_ENGINE/?v=" + Date.now(); }
   }
 
-  function openStatus(){
-    try{ window.open("/debug/modules?t=" + Date.now(), "_blank"); }
-    catch(e){ location.href = "/debug/modules?t=" + Date.now(); }
+  function returnToPlayer(){
+    var app = qs("#mffApp");
+    if(app) app.removeAttribute("data-s666-mobile-view");
+    var panel = qs("#s666MobileStatusPanel");
+    if(panel) panel.hidden = true;
+    qsa("#s666MobileExtraRow button,#s666ParityMobileHub button").forEach(function(b){ b.removeAttribute("data-state"); b.removeAttribute("data-active"); });
+    try{ window.scrollTo(0,0); }catch(e){}
+  }
+
+  function ensureMobileStatusPanel(){
+    var app = qs("#mffApp");
+    if(!app) return null;
+    var panel = qs("#s666MobileStatusPanel", app);
+    if(panel) return panel;
+    panel = document.createElement("section");
+    panel.id = "s666MobileStatusPanel";
+    panel.hidden = true;
+    panel.innerHTML = '<div class="s666-mobile-status-title"><span>PLAYER STATUS</span><button type="button" class="s666-mobile-status-back">← PLAYER</button></div><div class="s666-mobile-status-grid"><div class="s666-mobile-status-item" data-status-key="stream"><span>STREAM</span><i></i><b>CHECK</b></div><div class="s666-mobile-status-item" data-status-key="source"><span>SOURCE</span><i></i><b>MAIN</b></div><div class="s666-mobile-status-item" data-status-key="metadata"><span>METADATA</span><i></i><b>CHECK</b></div><div class="s666-mobile-status-item" data-status-key="worker"><span>WORKER</span><i></i><b>CHECK</b></div><div class="s666-mobile-status-item" data-status-key="audio"><span>AUDIO</span><i></i><b>CHECK</b></div><div class="s666-mobile-status-item" data-status-key="message"><span>MESSAGE</span><i></i><b>CHECK</b></div></div>';
+    var anchor = qs("#s666MobileExtraRow", app) || qs(".mff-controls", app) || qs(".mff-now", app);
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(panel, anchor.nextSibling);
+    else app.appendChild(panel);
+    var back = qs(".s666-mobile-status-back", panel);
+    if(back) back.addEventListener("click", returnToPlayer, true);
+    return panel;
+  }
+
+  function setMobileStatus(panel, key, ok, text){
+    var item = qs('[data-status-key="'+key+'"]', panel);
+    if(!item) return;
+    item.classList.remove("is-ok","is-warn");
+    item.classList.add(ok ? "is-ok" : "is-warn");
+    var value = qs("b", item); if(value) value.textContent = text;
+  }
+
+  async function openStatus(){
+    var app = qs("#mffApp");
+    var panel = ensureMobileStatusPanel();
+    if(!app || !panel) return;
+    app.setAttribute("data-s666-mobile-view","status");
+    panel.hidden = false;
+    var audio = getAudio();
+    var src = String((audio && (audio.currentSrc || audio.getAttribute("src"))) || "");
+    setMobileStatus(panel,"stream",!!(audio && !audio.paused),audio && !audio.paused ? "PLAY" : "READY");
+    setMobileStatus(panel,"source",true,/fallback|backup/i.test(src) ? "BACK" : "MAIN");
+    setMobileStatus(panel,"audio",!!audio,audio ? (audio.paused ? "READY" : "ACTIVE") : "ERROR");
+    try{
+      var health = await fetch("/health?t="+Date.now(),{cache:"no-store"});
+      setMobileStatus(panel,"worker",health.ok,health.ok ? "ONLINE" : "ERROR");
+    }catch(e){ setMobileStatus(panel,"worker",false,"ERROR"); }
+    try{
+      var meta = await fetch("/api/nowplaying?t="+Date.now(),{cache:"no-store"});
+      setMobileStatus(panel,"metadata",meta.ok,meta.ok ? "ACTIVE" : "ERROR");
+    }catch(e){ setMobileStatus(panel,"metadata",false,"ERROR"); }
+    try{
+      var msg = await fetch("/api/player-alert/status?t="+Date.now(),{cache:"no-store"});
+      setMobileStatus(panel,"message",msg.ok,msg.ok ? "READY" : "ERROR");
+    }catch(e){ setMobileStatus(panel,"message",false,"ERROR"); }
   }
 
   function mountBottomSafe(){
@@ -632,11 +688,11 @@ RULES:
   function parityMountMobileHub(){
     if(!parityIsMobile()) return;
     var app = qs("#mffApp") || qs(".player-shell") || document.body;
-    if(qs("#s666ParityMobileHub")) return;
+    if(qs("#s666MobileExtraRow") || qs("#s666ParityMobileHub")) return;
     var hub = document.createElement("div");
     hub.id = "s666ParityMobileHub";
     hub.className = "s666-parity-mobile-hub";
-    hub.innerHTML = '<button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="chaos">CHAOS</button><button type="button" data-parity-action="status">STATUS</button>';
+    hub.innerHTML = '<button type="button" data-parity-action="player">PLAYER</button><button type="button" data-parity-action="stream">STREAM</button><button type="button" data-parity-action="admin">ADMIN</button><button type="button" data-parity-action="status">STATUS</button>';
     var anchor = qs("#s666MobileExtraRow") || qs(".mobile-boost") || qs(".hero-label-row") || qs(".now-playing");
     if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(hub, anchor.nextSibling);
     else app.insertBefore(hub, app.firstChild);
@@ -656,11 +712,11 @@ RULES:
   function parityRunMobileAction(action, btn){
     qsa("#s666ParityMobileHub button").forEach(function(b){ b.removeAttribute("data-active"); });
     if(btn) btn.setAttribute("data-active","1");
+    if(action === "player") return returnToPlayer();
     if(action === "stream"){ if(typeof toggleMobileStream === "function") return toggleMobileStream(); return; }
     if(action === "sound") return parityOpenSound();
     if(action === "admin") return parityOpenAdmin();
-    if(action === "chaos") return parityOpenChaos();
-    if(action === "status") return parityOpenStatus();
+    if(action === "status") return openStatus();
   }
   function parityBindMobileEqTriggers(){
     // SOUND is opened only by the primary action button.
@@ -1200,22 +1256,15 @@ RULES:
     installAudioFocusGuard();
     normalizeBoostStatusTooltip();
     improveMeterScaling();
+    // Stable maintenance only: do not relocate or delete layout nodes after first render.
     setInterval(function(){
       mountMobilePanelRow();
       bindEqTriggers();
       installAudioRecovery();
       installAudioFocusGuard();
       normalizeBoostStatusTooltip();
-      phase10RelocatePcPanels();
-      directfixRestoreStatusLeds();
-      directfixPcNoAutoFallback();
-      directfixTickerAndMessage();
       hardfixInstallManualBackupFlag();
-      hardfixMoveLedsBehindDj();
-      hardfixTickerNoEmptyGap();
-      hardfixMessageBox();
-      hardfixForceMainOnlyPc();
-    }, 2500);
+    }, 5000);
     document.documentElement.setAttribute("data-phase10-stability", VERSION);
   }
 
