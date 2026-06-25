@@ -370,35 +370,16 @@ async function verifyPlayerAlertWrite(request, env){
   const configuredToken = String((env && (env.PLAYER_ALERT_WRITE_TOKEN || env.PLAYER_ALERT_BACKEND_TOKEN || env.PLAYER_ALERT_TOKEN)) || '').trim();
   const providedToken = String(request.headers.get('x-player-alert-token') || playerAlertBearerToken(request) || '').trim();
   if(configuredToken && providedToken && timingSafeEqualText(providedToken, configuredToken)){
-    return { ok: true, mode: 'token' };
+    return { ok: true, mode: 'service-token' };
   }
 
-  // Browser-SEND bleibt über die bestehende Admin-Sitzung nutzbar. Ein gesetztes
-  // Maschinen-Token darf den Same-Origin-/Admin-Cookie-Weg nicht unbeabsichtigt blockieren.
+  // Public player message route: every listener may send from the WebRadio player.
+  // No admin session and no password worker are required here.
+  // Cross-origin browser calls remain rejected; text cleanup and rate limiting stay active.
   if(!playerAlertSameOriginRequest(request)){
     return { ok: false, error: configuredToken && providedToken ? 'invalid_token' : 'origin_mismatch' };
   }
-
-  const verifyUrl = String((env && env.ADMIN_AUTH_VERIFY_URL) || 'https://666-system-auth.666soundsdesign-broadcaster.com/verify').trim();
-  const cookieToken = playerAlertCookie(request, 'chaos_auth') || playerAlertCookie(request, 'admin_auth');
-  const authHeader = playerAlertBearerToken(request);
-  const headers = authHeader
-    ? { authorization: `Bearer ${authHeader}` }
-    : (cookieToken ? { authorization: `Bearer ${cookieToken}` } : null);
-  if(!headers) return { ok: false, error: 'missing_auth' };
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 5000);
-  try{
-    const response = await fetch(verifyUrl, { headers, signal: controller.signal, redirect: 'error' });
-    const data = await response.json().catch(() => ({}));
-    if(response.ok && data && data.ok) return { ok: true, mode: 'admin-auth' };
-    return { ok: false, error: 'unauthorized', status: response.status };
-  }catch(err){
-    return { ok: false, error: err?.name === 'AbortError' ? 'auth_verify_timeout' : 'auth_verify_failed' };
-  }finally{
-    clearTimeout(timer);
-  }
+  return { ok: true, mode: 'public-player-same-origin' };
 }
 
 function metadataSafeText(value, max = 512){
@@ -470,7 +451,7 @@ function playerAlertCleanText(value){
   return String(value || '').replace(/[<>]/g, '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
 }
 function playerAlertBackendUrl(env){
-  const raw = (env && (env.PLAYER_ALERT_BACKEND_URL || env.RENDA_PLAYER_ALERT_URL || env.RENDER_PLAYER_ALERT_URL || env.RENDA_BACKEND_URL || env.RENDER_BACKEND_URL)) || 'https://auto-setup-render-for-backend-mp3-ess8.onrender.com';
+  const raw = (env && (env.PLAYER_ALERT_BACKEND_URL || env.RENDA_PLAYER_ALERT_URL || env.RENDER_PLAYER_ALERT_URL || env.RENDA_BACKEND_URL || env.RENDER_BACKEND_URL)) || 'https://666soundsdesign-alert-service.onrender.com';
   if(!raw) return '';
   try{
     const url = new URL(String(raw));
@@ -531,7 +512,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-kv-fallback-cache-tertiary'});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback'});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});

@@ -10,11 +10,11 @@
     "html_handling": "none"
   },
   "vars": {
-    "PLAYER_ALERT_BACKEND_URL": "https://auto-setup-render-for-backend-mp3-ess8.onrender.com",
-    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_KV_FALLBACK_CACHE_LAST_V101",
+    "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
+    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V102",
     "GITHUB_CONFIG_PATH": "config/radio-runtime.json",
     "GITHUB_BACKUP_DIR": "config/backups",
     "ENABLE_PUBLIC_DEBUG": "false",
-    "RELEASE_VERSION": "FULLVERSION_BRANCH_RECOVERY_v1.0.2"
+    "RELEASE_VERSION": "FULLVERSION_MESSAGE_BACKEND_REPAIR_v1.0.3"
   }
 }
