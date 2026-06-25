@@ -58,11 +58,15 @@ function darkDancerResponse(pathname) {
 
 const PRIMARY_STREAM_URLS = [
   "https://my.idjstream.com/666soundsdesign/stream",
-  "http://my.idjstream.com/666soundsdesign/stream"
+  "https://my.idjstream.com/666soundsdesign",
+  "http://my.idjstream.com/666soundsdesign/stream",
+  "http://my.idjstream.com/666soundsdesign"
 ];
 const FALLBACK_STREAM_URLS = [
   "https://my.idjstream.com:8686/stream",
-  "http://my.idjstream.com:8686/stream"
+  "https://my.idjstream.com:8686",
+  "http://my.idjstream.com:8686/stream",
+  "http://my.idjstream.com:8686"
 ];
 const FALLBACK_STREAM_URLS_ALT = [
   "https://my.idjstream.com/8686/stream",
