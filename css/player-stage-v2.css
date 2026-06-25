@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn Player Geometry V4 - Side Rails + Expanded EQ
+ * 666SOUNDsDESIGn Interior Layout V5 - EQ + NOW PLAYING + Ticker
  * No scroll, no DOM reparenting, no delayed geometry takeover.
  * Existing player structure remains the source of truth.
  */
@@ -604,4 +604,145 @@
     color:#ff83d7!important;
     border-color:rgba(255,61,187,.54)!important;
   }
+}
+
+
+/* ==========================================================
+   INTERIOR_LAYOUT_V5 — EQ / NOW PLAYING / TICKER / SIDE CONTENT
+   Existing elements only. No new visual layer.
+   ========================================================== */
+@media (min-width:761px){
+  body .frame-stage .player-shell>.visualizer{
+    flex:1 1 320px!important;
+    min-height:220px!important;
+    max-height:none!important;
+    height:auto!important;
+    padding:8px 15px 10px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+  }
+  body .frame-stage .player-shell>.visualizer .eq-bars{
+    flex:1 1 auto!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:198px!important;
+    max-height:none!important;
+    margin-top:5px!important;
+    align-items:stretch!important;
+    overflow:hidden!important;
+  }
+  body .frame-stage .player-shell>.visualizer .eq-bar-slot{
+    height:100%!important;
+    min-height:100%!important;
+    align-self:stretch!important;
+  }
+  body .frame-stage .player-shell>.visualizer .eq-bar-fill{
+    min-height:22px!important;
+  }
+
+  body .frame-stage .player-shell>.now-playing{
+    flex:0 0 clamp(208px,22.5vh,242px)!important;
+    height:clamp(208px,22.5vh,242px)!important;
+    min-height:clamp(208px,22.5vh,242px)!important;
+    max-height:clamp(208px,22.5vh,242px)!important;
+    grid-template-columns:clamp(148px,12vw,182px) minmax(0,1fr) auto!important;
+    grid-template-rows:auto 54px 38px!important;
+    padding:12px 15px!important;
+    column-gap:15px!important;
+    row-gap:8px!important;
+    overflow:hidden!important;
+  }
+  body .frame-stage .player-shell .now-cover-wrap{
+    width:clamp(146px,11.6vw,178px)!important;
+    min-width:clamp(146px,11.6vw,178px)!important;
+    max-width:clamp(146px,11.6vw,178px)!important;
+    height:clamp(146px,11.6vw,178px)!important;
+    min-height:clamp(146px,11.6vw,178px)!important;
+    max-height:clamp(146px,11.6vw,178px)!important;
+    overflow:hidden!important;
+  }
+  body .frame-stage .player-shell .now-playing .ticker-window{
+    grid-column:2/4!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:54px!important;
+    min-height:54px!important;
+    max-height:54px!important;
+    display:block!important;
+    padding:0 12px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    border-radius:14px!important;
+  }
+  body .frame-stage .player-shell .now-playing #nowPlayingTicker,
+  body .frame-stage .player-shell .now-playing .ticker-text{
+    position:relative!important;
+    display:inline-block!important;
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:52px!important;
+    line-height:52px!important;
+    margin:0!important;
+    padding:0!important;
+    white-space:nowrap!important;
+    animation:none!important;
+    transform:translateX(0)!important;
+    will-change:transform!important;
+    font-size:clamp(16px,1.28vw,21px)!important;
+    color:#16fff3!important;
+    text-shadow:0 0 10px rgba(22,255,243,.56)!important;
+  }
+
+  body .frame-stage .pc-side-addon .pc-addon-module{
+    display:grid!important;
+    grid-template-rows:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+    justify-items:stretch!important;
+    row-gap:7px!important;
+    padding:12px 13px!important;
+  }
+  body .frame-stage .pc-addon-reactor-core,
+  body .frame-stage .pc-addon-radar,
+  body .frame-stage .pc-addon-phase{
+    width:min(94%,196px)!important;
+    height:auto!important;
+    max-height:100%!important;
+    aspect-ratio:1/1!important;
+    margin:auto!important;
+    align-self:center!important;
+    justify-self:center!important;
+  }
+  body .frame-stage .pc-addon-waveform,
+  body .frame-stage .pc-addon-beatline,
+  body .frame-stage .pc-addon-vu-grid{
+    width:100%!important;
+    min-height:128px!important;
+    height:100%!important;
+    max-height:none!important;
+    margin:auto 0!important;
+    align-self:stretch!important;
+  }
+  body .frame-stage .pc-addon-beat{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+}
+@media (min-width:761px) and (max-height:820px){
+  body .frame-stage .player-shell>.now-playing{
+    flex-basis:188px!important;height:188px!important;min-height:188px!important;max-height:188px!important;
+  }
+  body .frame-stage .player-shell .now-cover-wrap{
+    width:136px!important;min-width:136px!important;max-width:136px!important;
+    height:136px!important;min-height:136px!important;max-height:136px!important;
+  }
+  body .frame-stage .player-shell>.visualizer{min-height:190px!important;}
+  body .frame-stage .player-shell>.visualizer .eq-bars{min-height:170px!important;}
 }
