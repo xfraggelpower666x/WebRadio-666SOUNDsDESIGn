@@ -56,11 +56,11 @@ function darkDancerResponse(pathname) {
 // HINWEIS: Nicht eigenmächtig kürzen. Root-Worker und Worker-Unterordner müssen identisch sein.
 // ==========================================
 
-const PRIMARY_STREAM_URL = "https://my.idjstream.com/666soundsdesign/stream";
-const FALLBACK_STREAM_URL = "https://my.idjstream.com:8686/stream";
-const FALLBACK_STREAM_URL_ALT = "https://my.idjstream.com/8686/stream";
+const PRIMARY_STREAM_URL = "http://my.idjstream.com/666soundsdesign/stream";
+const FALLBACK_STREAM_URL = "http://my.idjstream.com:8686/stream";
+const FALLBACK_STREAM_URL_ALT = "http://my.idjstream.com/8686/stream";
 const METADATA_URLS = [
-  "https://my.idjstream.com/cp/get_info.php?p=8686",
+  "http://my.idjstream.com/cp/get_info.php?p=8686",
   "https://idjstream.app/cp/get_info.php?p=8686"
 ];
 const STATIC_ROOT_INDEX_PATH = "/index.html";
