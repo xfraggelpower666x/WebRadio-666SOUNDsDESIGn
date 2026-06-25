@@ -1,18 +1,21 @@
 /*
- * 666SOUNDsDESIGn Player Stage V2 Correction
+ * 666SOUNDsDESIGn Player Geometry V4 - Side Rails + Expanded EQ
  * No scroll, no DOM reparenting, no delayed geometry takeover.
  * Existing player structure remains the source of truth.
  */
 
 @media (min-width:761px){
   :root{
-    --s666-side-panel-width:clamp(170px,13vw,220px);
+    --s666-main-player-width:min(56vw,1080px);
+    --s666-main-player-half:min(28vw,540px);
+    --s666-side-panel-width:clamp(200px,calc(19vw - 20px),270px);
+    --s666-side-panel-gap:clamp(6px,.55vw,10px);
   }
 
   body .frame-stage .player-shell{
-    width:min(62vw,1120px)!important;
-    max-width:calc(100vw - 500px)!important;
-    min-width:760px!important;
+    width:var(--s666-main-player-width)!important;
+    max-width:var(--s666-main-player-width)!important;
+    min-width:min(760px,var(--s666-main-player-width))!important;
     height:calc(100dvh - 12px)!important;
     min-height:0!important;
     max-height:calc(100dvh - 12px)!important;
@@ -54,19 +57,25 @@
 
   body .frame-stage .player-shell > .visualizer{
     order:4!important;
-    flex:1 1 138px!important;
-    min-height:122px!important;
-    max-height:250px!important;
+    flex:1 1 230px!important;
+    min-height:180px!important;
+    max-height:none!important;
     height:auto!important;
     margin:0 22px!important;
     padding:9px 15px 11px!important;
     overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
   }
 
   body .frame-stage .player-shell > .visualizer .eq-bars{
-    height:calc(100% - 20px)!important;
-    min-height:96px!important;
+    flex:1 1 auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:158px!important;
+    max-height:none!important;
     align-items:end!important;
+    margin-top:8px!important;
   }
 
   body .frame-stage .player-shell > .visualizer .eq-bar-fill{
@@ -77,20 +86,23 @@
 
   body .frame-stage .player-shell > .s666-primary-action-dock{
     order:5!important;
-    flex:0 0 42px!important;
-    height:42px!important;
-    min-height:42px!important;
-    max-height:42px!important;
+    flex:0 0 40px!important;
+    height:40px!important;
+    min-height:40px!important;
+    max-height:40px!important;
     margin:0 22px!important;
+    margin-top:0!important;
   }
 
   body .frame-stage .player-shell > .bottom-console{
     order:6!important;
-    flex:0 0 clamp(74px,8.2vh,88px)!important;
-    height:clamp(74px,8.2vh,88px)!important;
-    min-height:clamp(74px,8.2vh,88px)!important;
-    max-height:clamp(74px,8.2vh,88px)!important;
+    flex:0 0 clamp(72px,7.8vh,84px)!important;
+    height:clamp(72px,7.8vh,84px)!important;
+    min-height:clamp(72px,7.8vh,84px)!important;
+    max-height:clamp(72px,7.8vh,84px)!important;
     margin:0 22px!important;
+    margin-top:0!important;
+    margin-bottom:0!important;
     padding:8px 12px!important;
     border:1px solid rgba(22,255,243,.34)!important;
     border-radius:18px!important;
@@ -323,23 +335,40 @@
   }
 
   body .frame-stage .pc-side-addon-left{
-    left:clamp(42px,3.6vw,66px)!important;
+    left:calc(50% - var(--s666-main-player-half) - var(--s666-side-panel-gap) - var(--s666-side-panel-width))!important;
+    right:auto!important;
   }
 
   body .frame-stage .pc-side-addon-right{
-    right:clamp(42px,3.6vw,66px)!important;
+    right:calc(50% - var(--s666-main-player-half) - var(--s666-side-panel-gap) - var(--s666-side-panel-width))!important;
+    left:auto!important;
+  }
+
+  body .frame-stage .side-meter.left{
+    left:clamp(6px,.7vw,14px)!important;
+    right:auto!important;
+    z-index:9!important;
+  }
+
+  body .frame-stage .side-meter.right{
+    right:clamp(6px,.7vw,14px)!important;
+    left:auto!important;
+    z-index:9!important;
+  }
+
+  body .frame-stage .pc-side-addon{
+    z-index:7!important;
   }
 
   body .frame-stage .pc-side-addon .pc-addon-tower{
     height:100%!important;
     min-height:0!important;
     max-height:100%!important;
-    display:flex!important;
-    flex-direction:column!important;
+    display:grid!important;
+    grid-template-rows:34px repeat(3,minmax(0,1fr)) 76px!important;
     align-items:stretch!important;
-    justify-content:space-between!important;
-    gap:10px!important;
-    padding:10px!important;
+    gap:8px!important;
+    padding:9px!important;
     box-sizing:border-box!important;
   }
 
@@ -351,49 +380,60 @@
   }
 
   body .frame-stage .pc-side-addon .pc-addon-module{
-    flex:0 0 clamp(148px,16.2vh,184px)!important;
-    height:clamp(148px,16.2vh,184px)!important;
-    min-height:clamp(148px,16.2vh,184px)!important;
-    max-height:clamp(148px,16.2vh,184px)!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    max-height:none!important;
     margin:0!important;
-    padding:11px!important;
+    padding:12px 13px!important;
     box-sizing:border-box!important;
     overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+    align-items:stretch!important;
   }
 
   body .frame-stage .pc-side-addon .pc-addon-module > strong{
-    font-size:clamp(10px,.72vw,12px)!important;
+    font-size:clamp(11px,.80vw,14px)!important;
     line-height:1.1!important;
+    letter-spacing:.04em!important;
   }
 
   body .frame-stage .pc-side-addon .pc-addon-module footer{
-    margin-top:6px!important;
-    font-size:9px!important;
+    margin-top:7px!important;
+    font-size:clamp(9px,.62vw,11px)!important;
   }
 
   body .frame-stage .pc-addon-reactor-core{
-    width:clamp(92px,8vw,118px)!important;
-    height:clamp(92px,8vw,118px)!important;
+    width:min(88%,180px)!important;
+    height:auto!important;
+    aspect-ratio:1/1!important;
+    margin:auto!important;
   }
 
   body .frame-stage .pc-addon-waveform,
   body .frame-stage .pc-addon-beatline,
   body .frame-stage .pc-addon-vu-grid{
-    min-height:86px!important;
-    height:86px!important;
+    width:100%!important;
+    min-height:112px!important;
+    height:clamp(112px,14.5vh,170px)!important;
+    max-height:170px!important;
+    margin:auto 0!important;
   }
 
   body .frame-stage .pc-addon-radar,
   body .frame-stage .pc-addon-phase{
-    width:clamp(100px,8.3vw,126px)!important;
-    height:clamp(100px,8.3vw,126px)!important;
+    width:min(90%,180px)!important;
+    height:auto!important;
+    aspect-ratio:1/1!important;
     margin:auto!important;
   }
 
   .s666-side-status-panel{
-    flex:0 0 88px!important;
-    min-height:88px!important;
-    max-height:88px!important;
+    min-height:76px!important;
+    height:76px!important;
+    max-height:76px!important;
     padding:9px!important;
     border:1px solid rgba(22,255,243,.34)!important;
     border-radius:15px!important;
@@ -464,12 +504,6 @@
     max-height:98px!important;
   }
 
-  body .frame-stage .pc-side-addon .pc-addon-module{
-    flex-basis:132px!important;
-    height:132px!important;
-    min-height:132px!important;
-    max-height:132px!important;
-  }
 }
 
 /* In-player protected control dialog. */
