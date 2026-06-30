@@ -1,12 +1,11 @@
-import { requireStrictAdmin } from './radio-admin-config-addon.js';
-
+import { verifyAdminAuth, verifyPwIssuedToken } from './radio-admin-config-addon.js';
 /*
 ############################################################
 # 666SOUNDsDESIGn — Discord Webhook HTML Player Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.12
-# Purpose: Secret-safe Discord bridge with structured underground broadcast embeds, metadata, artwork, socials and canonical strict-admin Bearer authorization.
+# Version: V3.8
+# Purpose: Secret-safe Discord bridge with structured underground broadcast embeds, metadata, artwork, socials and access-gated posts.
 # Change Summary:
 # - Add-only Worker routes; no stream/fallback/notfallplayer logic touched.
 # - NO_KV / NO_R2: uses only in-memory cooldown/dedupe as safety net.
@@ -19,7 +18,7 @@ import { requireStrictAdmin } from './radio-admin-config-addon.js';
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.12-20260630-STRICT-ADMIN-AUTH';
+const ADDON_VERSION = 'V4.0-20260625-SHARED-ADMIN-AUTH';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
@@ -46,8 +45,9 @@ function json(data, status = 200) {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'cache-control': 'no-store',
-      'x-content-type-options': 'nosniff',
-      'referrer-policy': 'no-referrer'
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET,POST,OPTIONS',
+      'access-control-allow-headers': 'content-type,authorization,x-admin-token'
     }
   });
 }
@@ -329,45 +329,62 @@ async function sendPrivateNowPlayingIfConfigured(env, payload) {
   }
 }
 
-async function requireDiscordAdmin(request, env, source) {
-  return requireStrictAdmin(request, env, source || 'webradio-discord-write');
+function timingSafeEqualText(a, b) {
+  const left = new TextEncoder().encode(String(a || ''));
+  const right = new TextEncoder().encode(String(b || ''));
+  if (left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < left.length; i += 1) mismatch |= left[i] ^ right[i];
+  return mismatch === 0;
 }
 
+function serviceTokenOk(request, env = {}) {
+  const expected = String(env.DISCORD_ADMIN_TOKEN || '').trim();
+  if (!expected) return false;
+  const headerToken = String(request.headers.get('x-admin-token') || '').trim();
+  const auth = String(request.headers.get('authorization') || '').trim();
+  const bearer = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
+  return timingSafeEqualText(headerToken || bearer, expected);
+}
+
+async function sharedAdminOk(request, env = {}) {
+  const auth = await verifyAdminAuth(request, env);
+  const pw = verifyPwIssuedToken(auth);
+  return Boolean(auth && auth.ok && pw && pw.ok);
+}
+
+async function discordAccessOk(request, env = {}) {
+  if (serviceTokenOk(request, env)) return true;
+  return sharedAdminOk(request, env);
+}
 
 export async function handleDiscordNotifyV3(request, env = {}) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '');
-  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/test' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
+  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
   if (!isRoute) return null;
 
-  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { allow: 'GET, POST, OPTIONS' } });
+  if (request.method === 'OPTIONS') return json({ ok: true, addon: ADDON_VERSION });
 
   if (path === '/api/discord/status') {
-    if (request.method !== 'GET') return json({ ok: false, error: 'method_not_allowed' }, 405);
     return json({
       ok: true,
       addon: ADDON_VERSION,
-      mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
-      authMode: 'strict_admin_bearer',
-      webhookConfigured: Boolean(getDiscordWebhook(env)),
-      privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
-      lastKind: runtime.lastKind,
-      lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
-      lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
-      lastTrackKey: runtime.lastTrackKey ? '[set]' : ''
+      ready: Boolean(getDiscordWebhook(env)),
+      authMode: 'shared-admin-bearer'
     });
   }
 
   if (path === '/api/discord/debug') {
-    if (request.method !== 'GET') return json({ ok: false, error: 'method_not_allowed' }, 405);
-    const gate = await requireDiscordAdmin(request, env, 'webradio-discord-debug');
-    if (gate.response) return gate.response;
+    if (!(await discordAccessOk(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
     return json({
       ok: true,
       addon: ADDON_VERSION,
-      authMode: 'strict_admin_bearer',
+      mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
       webhookConfigured: Boolean(getDiscordWebhook(env)),
       privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
+      serviceTokenConfigured: Boolean(env && env.DISCORD_ADMIN_TOKEN),
+      sharedAdminAuth: true,
       lastKind: runtime.lastKind,
       lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
       lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
@@ -376,11 +393,10 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     });
   }
 
-  if (request.method !== 'POST') return json({ ok: false, error: 'method_not_allowed' }, 405);
-  const gate = await requireDiscordAdmin(request, env, `webradio-discord-${path.split('/').pop() || 'write'}`);
-  if (gate.response) {
+  if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
+  if (!(await discordAccessOk(request, env))) {
     runtime.lastKind = 'access-denied';
-    return gate.response;
+    return json({ ok: false, led: 'error', error: 'shared admin session required', addon: ADDON_VERSION }, 401);
   }
 
   try {
@@ -391,13 +407,6 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastKind = 'message';
       const result = await sendDiscord(env, messagePayload(input));
       return json({ ok: true, type: 'message', led: 'ok', discord: result, addon: ADDON_VERSION });
-    }
-    if (path === '/api/discord/test') {
-      runtime.lastKind = 'test';
-      const result = await sendDiscord(env, messagePayload(Object.assign({}, input, {
-        message: input.message || 'Admin Discord test ' + new Date().toISOString()
-      })));
-      return json({ ok: true, type: 'test', led: 'ok', discord: result, addon: ADDON_VERSION });
     }
     if (path === '/api/discord/nowplaying') {
       const key = trackKey(input);

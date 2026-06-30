@@ -1,7 +1,4 @@
 # 666SOUNDsDESIGn - MASTER HANDOFF
-
-> **AUTH-HARDLOCK-HINWEIS (2026-06-30):** Alle Auth-Angaben dieses historischen Handoffs werden durch `docs/AUTH_ARCHITECTURE_CANONICAL_v1_0_0.md` ersetzt. Login ausschließlich über den Passwort-Worker `/login`, Verifikation ausschließlich über den Auth-Worker `/verify`; kein Healthcheck als Authentifizierung.
-
 ## WebRadio Repo / Codebau / Discord-Shooter / 666 RadioBotAI / Dashboard
 
 Version: v1.0.0
@@ -585,7 +582,7 @@ Wichtige Werte:
   "broadcastStatusUrl": "/api/player-alert/status",
   "discordStatusUrl": "/api/discord/status",
   "adminAuthVerifyUrl": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
-  "adminAuthLoginUrl": "https://666-system-pw.666soundsdesign-broadcaster.com/login",
+  "adminAuthLoginUrl": "https://666-system-auth.666soundsdesign-broadcaster.com/login",
   "sunoWorkerUrl": "https://666-suno-system.666soundsdesign-broadcaster.com",
   "chaosAiWorkerUrl": "https://666-chaos-ai-track-system.666soundsdesign-broadcaster.com"
 }

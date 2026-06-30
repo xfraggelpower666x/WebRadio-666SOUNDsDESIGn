@@ -1,0 +1,4 @@
+ALLOWED_ORIGIN=https://webradio.666soundsdesign-broadcaster.com
+ADMIN_SERVICE_TOKEN=
+DEBUG_TOKEN=
+AUTH_SECRET=

@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn Interior Layout V5 - Ticker + EQ calibration
+ * 666SOUNDsDESIGn Interior Layout V6 - shared auth + responsive calibration
  * No element reparenting. Existing layout stays intact.
  * Adds only protected action buttons, side LEDs and MeterBus visual calibration.
  */
@@ -21,7 +21,7 @@
     state.levels[key]=next;
     return next;
   }
-  function adminAuth(){return window.S666AdminAuth||null;}
+  function adminAuth(){ return window.S666AdminAuth || null; }
   function toast(text,mode){
     var el=q('#s666StageToast');
     if(!el){
@@ -44,12 +44,8 @@
     gate.id='s666StageGate';
     gate.innerHTML='<section class="s666-stage-gate-box" role="dialog" aria-modal="true"><h3>PROTECTED PLAYER CONTROL</h3><p id="s666StageGateText">Admin password required.</p><input id="s666StageGatePassword" type="password" autocomplete="current-password" placeholder="Admin password"><div class="s666-stage-gate-actions"><button type="button" data-stage-close>CANCEL</button><button type="button" id="s666StageGateLogin" class="danger">LOGIN & CONTINUE</button></div></section>';
     document.body.appendChild(gate);
-    gate.addEventListener('click',function(ev){
-      if(ev.target===gate||ev.target.closest('[data-stage-close]')) closeGate();
-    });
-    q('#s666StageGatePassword',gate).addEventListener('keydown',function(ev){
-      if(ev.key==='Enter') loginAndContinue();
-    });
+    gate.addEventListener('click',function(ev){ if(ev.target===gate||ev.target.closest('[data-stage-close]'))closeGate(); });
+    q('#s666StageGatePassword',gate).addEventListener('keydown',function(ev){ if(ev.key==='Enter')loginAndContinue(); });
     q('#s666StageGateLogin',gate).onclick=loginAndContinue;
     return gate;
   }
@@ -71,23 +67,27 @@
   }
 
   async function loginAndContinue(){
+    var auth=adminAuth();
     var gate=ensureGate(),input=q('#s666StageGatePassword',gate),password=String(input.value||'');
+    if(!auth){toast('Admin-Auth-Client fehlt.','error');return;}
     if(!password){toast('Admin-Passwort fehlt.','error');return;}
-    var btn=q('#s666StageGateLogin',gate),auth=adminAuth();
-    if(!auth){toast('Zentraler Auth-Client fehlt.','error');return;}
+    var btn=q('#s666StageGateLogin',gate);
     btn.disabled=true;
     btn.textContent='LOGIN...';
     try{
-      var d=await auth.login(password);
-      password='';
-      input.value='';
-      if(!d||d.ok!==true)throw new Error((d&&d.error)||'login_failed');
+      var result=await auth.login(password);
+      if(!result||result.ok!==true)throw new Error(result&&result.error||'login_failed');
       var pending=state.pending;
       closeGate();
       toast('Admin-Zugang aktiv.');
       if(typeof pending==='function')await pending();
     }catch(e){
-      toast('Login abgelehnt.','error');
+      auth.clear();
+      var code=auth.errorCode?auth.errorCode(e,'login_failed'):(e&&e.message?e.message:'login_failed');
+      var message=auth.errorMessage?auth.errorMessage(code):('Login abgelehnt: '+code);
+      var text=q('#s666StageGateText',gate);
+      if(text)text.textContent=message;
+      toast(message,'error');
     }finally{
       btn.disabled=false;
       btn.textContent='LOGIN & CONTINUE';
@@ -96,29 +96,27 @@
 
   async function gateCheck(){
     var auth=adminAuth();
-    if(!auth)return {ok:false,authOk:false,pwOk:false,error:'auth_client_missing'};
-    try{
-      var ok=await auth.check(true);
-      return {ok:ok,authOk:ok,pwOk:ok};
-    }catch(e){
-      return {ok:false,authOk:false,pwOk:false,error:e};
-    }
+    if(!auth)return {ok:false,error:'admin_auth_client_missing'};
+    return auth.check(false);
   }
 
   async function withGate(action,message){
     var gate=await gateCheck();
-    if(gate.ok)return action();
+    if(gate&&gate.ok)return action();
     openGate(message||'Admin password required.',action);
+    return false;
   }
 
   async function protectedDiscord(){
-    return withGate(function(){
-      if(window.S666DiscordPlayerAddonV3&&typeof window.S666DiscordPlayerAddonV3.messagePost==='function'){
-        window.S666DiscordPlayerAddonV3.messagePost();
-      }else if(window.FPAdminOverlay&&typeof window.FPAdminOverlay.open==='function'){
-        window.FPAdminOverlay.open();
-      }else{
-        toast('Discord Shooter ist nicht bereit.','error');
+    return withGate(async function(){
+      try{
+        if(window.S666DiscordPlayerAddonV3&&typeof window.S666DiscordPlayerAddonV3.messagePost==='function'){
+          await window.S666DiscordPlayerAddonV3.messagePost();
+        }else{
+          throw new Error('discord_addon_not_ready');
+        }
+      }catch(e){
+        toast(e&&e.message==='admin_session_required'?'Admin-Sitzung abgelaufen.':'Discord Shooter ist nicht bereit.','error');
       }
     },'Admin-Passwort für den Discord Shooter eingeben.');
   }
@@ -126,22 +124,13 @@
   async function protectedSkip(){
     return withGate(async function(){
       if(!confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?'))return;
-      try{
-        var auth=adminAuth();
-        if(!auth)throw new Error('auth_client_missing');
-        var r=await auth.fetch('/api/admin/skip',{
-          method:'POST',
-          headers:{'content-type':'application/json'},
-          credentials:'same-origin',
-          body:JSON.stringify({source:'player-stage-v2-correction'}),
-          cache:'no-store'
-        });
-        var d=await r.json().catch(function(){return{};});
-        if(!r.ok||d.ok!==true)throw new Error(d.error||'skip_failed');
-        toast('AUTO-DJ SKIP ausgeführt.');
-      }catch(e){
-        toast(e.message==='cooldown_active'?'Skip-Cooldown aktiv.':'Auto-DJ Skip abgelehnt.','error');
+      if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function'){
+        toast('Auto-DJ Skip ist nicht bereit.','error');
+        return;
       }
+      var result=await window.S666SkipControl.skip({source:'player-stage-v2'});
+      if(result&&result.ok)toast('AUTO-DJ SKIP ausgeführt.');
+      else toast(result&&result.error?result.error:'Auto-DJ Skip abgelehnt.','error');
     },'Admin-Passwort für Auto-DJ Skip eingeben.');
   }
 

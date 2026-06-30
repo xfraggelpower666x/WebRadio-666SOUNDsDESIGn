@@ -1,28 +1,5 @@
-# V186 Worker Backend Route Fix
+# Player Alert backend route — audit repair v1.1.0
 
-Purpose: connect Player Alert Worker to deployed Render Alert Backend.
+Canonical configured candidate: `https://666soundsdesign-alert-service.onrender.com`.
 
-Changed:
-- `wrangler.jsonc` now contains public `vars.PLAYER_ALERT_BACKEND_URL`.
-- `worker.js` has the same Render URL as safe default if env vars are missing.
-- KV remains fallback only.
-- Cache remains last emergency fallback.
-
-Backend URL:
-`https://auto-setup-render-for-backend-mp3-ess8.onrender.com`
-
-Expected worker flow:
-1. `POST /api/player-alert/send`
-2. Worker forwards to Render: `/api/player-alert/send`
-3. Player reads `GET /api/player-alert/current`
-4. Worker forwards to Render: `/api/player-alert/current`
-5. KV only used if Render is unreachable.
-
-Not touched:
-- iPhone UI
-- PC UI
-- SEND frontend handler
-- Ticker
-- Meter
-- Boost
-- Discord addon
+This repository value is a configuration candidate, not proof of a live deployment. Before release verify `/health`, `/api/player-alert/status`, matching `PLAYER_ALERT_SERVICE_TOKEN`, PostgreSQL `shared_persistence=true`, and `release_ready=true`. Do not substitute another Render hostname without a live contract test.

@@ -16,8 +16,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta name="s666-cache-burst" content="central-audio-stability-v2-20260530" />
-  <meta name="smfp-version" content="v2026.06.30-auth-hardlock1" />
+  <meta name="s666-cache-burst" content="audit-repair-v1-1-0-20260625" />
+  <meta name="smfp-version" content="v2026.06.25-hardlock1" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -42,8 +42,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <meta name="application-name" content="666 WebRadio">
 
   <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=2026-06-15-fix1">
-  <script src="/js/version-core.js?v=2026-06-30-auth-hardlock1"></script>
-  <script src="/js/admin-auth.js?v=2026-06-30-auth-hardlock1"></script>
+  <script src="/js/version-core.js?v=2026-06-15-fix1"></script>
   <script src="/js/boost-core.js?v=2026-06-15-fix1"></script>
   <link rel="stylesheet" href="/core/overlay/overlay-core.css?v=2026-06-15-fix1">
   <script src="/js/overlay-core.js?v=2026-06-15-fix1"></script>
@@ -70,8 +69,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <link rel="stylesheet" href="/css/phase10-stability-iphone-panel-hud.css?v=2026-06-15-fix1">
 
   
-    <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-19-repair1" />
-  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-06-25-interior-v5" />
+    <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-25-hardlock1" />
+  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-06-25-hardlock1" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
   <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
 </head>
@@ -182,7 +181,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       </section>
 
       <section class="now-playing">
-        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.06.30-auth-hardlock1</span></div></div>
+        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.06.25-hardlock1</span></div></div>
         <div class="section-topline">
           <div>
             <div class="section-kicker">NOW PLAYING</div>
@@ -989,7 +988,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v2026.06.30-auth-hardlock1</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v178</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/logos/cyberstream-ai-cockpit-header.png?v=2026-06-15-fix1" alt="CyberStream AI Cockpit Edition"><img src="/assets/logos/radiobot-ai-badge.png" alt="666 RadioBotAI" style="height:28px;width:28px;object-fit:contain;opacity:0.82;filter:drop-shadow(0 0 6px rgba(22,255,243,.80))"></section>'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','DJ 666','◖')+'</section>'+
@@ -1417,17 +1416,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     window.__mffLedTipTimer=setTimeout(function(){setPanelLedTip('',null)},2600);
   }
 
-  function panelLedLevelState(){
-    var bus=window.__MeterBus;
-    var live=!!(bus && (Date.now()-Number(bus.ts||0))<700 && bus.source!=='synthetic');
-    var level=Math.max(0,Math.min(1,Number(bus&&bus.level)||0));
-    if(!live) return 'off';
-    if(level>=.80) return 'red';
-    if(level>=.55) return 'pink';
-    if(level>=.25) return 'cyan';
-    return 'green';
-  }
-
   function bindPanelLedTips(app){
     qa('#mffPanelLedPanel .mff-panel-led',app).forEach(function(btn){
       if(btn.__mffLedBound) return;
@@ -1480,7 +1468,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function setPanelLedsFromMeta(meta){
-    setPanelLed('worker','green','Mobile UI Runtime läuft');
+    setPanelLed('worker','ok','Mobile UI Runtime läuft');
 
     var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
     var sourceOk=false;
@@ -1489,19 +1477,18 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       sourceOk=!!(a && (a.getAttribute('src') || a.src || a.currentSrc));
     }catch(e){}
 
-    var signalState=panelLedLevelState();
-    setPanelLed('source',(playing && sourceOk)?signalState:(playing?'red':'off'),(playing && sourceOk)?'Audioquelle läuft':'Streamquelle nicht aktiv');
+    setPanelLed('source',(playing && sourceOk)?'ok':'warn',(playing && sourceOk)?'Audioquelle läuft':'Streamquelle nicht aktiv');
 
     var metaOk=!!(meta && (meta.title || meta.artist || meta.dj || meta.bitrate || meta.listeners || meta.artwork));
-    setPanelLed('meta',metaOk?'green':(playing?'pink':'off'),metaOk?'Metadaten empfangen':(playing?'Metadaten fehlen/leer':'noch keine Metadaten'));
+    setPanelLed('meta',metaOk?'ok':(playing?'warn':'off'),metaOk?'Metadaten empfangen':(playing?'Metadaten fehlen/leer':'noch keine Metadaten'));
 
     var active=inferActiveStream(meta);
     if(playing && sourceOk){
       if(manualStreamTarget==='backup' || active==='backup'){
         setPanelLed('main','off','Hauptstream nicht aktiv');
-        setPanelLed('backup',signalState,'Backupstream aktiv');
+        setPanelLed('backup','ok','Backupstream aktiv');
       }else{
-        setPanelLed('main',signalState,'Hauptstream aktiv');
+        setPanelLed('main','ok','Hauptstream aktiv');
         setPanelLed('backup','off','Backupstream nicht aktiv');
       }
     }else{
@@ -1516,8 +1503,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
   function setPanelLedsOffline(){
-    setPanelLed('worker','green','Mobile UI Runtime läuft');
-    setPanelLed('source','off','Streamquelle nicht aktiv');
+    setPanelLed('worker','ok','Mobile UI Runtime läuft');
+    setPanelLed('source','warn','Streamquelle nicht aktiv');
     setPanelLed('meta','off','noch keine Metadaten');
     setPanelLed('main','off','Hauptstream nicht aktiv');
     setPanelLed('backup','off','Backupstream nicht aktiv');
@@ -2035,7 +2022,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     Zweck: bestehende sechs Add-on-Module an dieselbe vorhandene EQ-/Levelmeter-Reaktionsquelle koppeln.
     Kein neuer Layer, kein neuer Canvas, kein neuer Audio-Graph. Der vorhandene v138-Intervall wird ersetzt.
   */
-  var timer=null;
+  var timer=null,lastVisualTick=0;
   var smoothed=.36, last=.36, phase=0;
   function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn,{once:true}); else fn(); }
   function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
@@ -2308,10 +2295,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var s=sampleEnergy();
     driveExistingModules(s.energy,s.peak,s.pulse,s.eq,s.left,s.right);
   }
+  function visualFrame(now){
+    if(!timer)return;
+    if(!document.hidden && (!window.matchMedia || window.matchMedia('(min-width:1221px)').matches) && now-lastVisualTick>=160){
+      lastVisualTick=now;tick();
+    }
+    timer=requestAnimationFrame(visualFrame);
+  }
   function boot(){
     bind();
     if(window.matchMedia && !window.matchMedia('(min-width:1221px)').matches) return;
-    if(!timer){ tick(); timer=setInterval(tick,160); }
+    if(!timer){tick();timer=requestAnimationFrame(visualFrame);}
   }
   ready(boot);
   window.addEventListener('load',boot,{passive:true});
@@ -2342,7 +2336,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   window.addEventListener('load',apply,{once:true});
 })();
 </script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=2026-06-19-repair1" defer></script>
+  <script src="/js/admin-auth-client.js?v=2026-06-25-hardlock1" defer></script>
+  <script src="/js/player-alert-client.js?v=2026-06-25-hardlock1" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-06-25-hardlock1" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -2407,83 +2403,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 })();
 </script>
 
-<script id="smfpPlayerAlertV152Script">
-(function(){
-  if(window.__smfpPlayerAlertV152)return; window.__smfpPlayerAlertV152=true;
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
-  var SEND_URL='/api/player-alert/send';
-  var CURRENT_URL='/api/player-alert/current';
-  var RATE_MS=180000;
-  function sid(){try{var k='smfpPlayerAlertSenderId';var v=localStorage.getItem(k);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v);}return v;}catch(e){return 'smfp-session-'+Math.random().toString(36).slice(2,10);}}
-  var senderId=sid();
-  var lastSeen='';
-  function clean(text){return String(text||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
-  function ensureReceiveOverlay(){
-    var b=document.getElementById('playerAlertReceiveBackdrop'); if(b)return b;
-    b=document.createElement('div'); b.id='playerAlertReceiveBackdrop'; b.className='player-alert-backdrop';
-    b.innerHTML='<div class="player-alert-modal" role="dialog" aria-modal="true"><h3>666SOUNDsDESIGn PLAYER MESSAGE</h3><div id="playerAlertReceiveText" class="player-alert-message"></div><button id="playerAlertReceiveClose" class="player-alert-close" type="button">CLOSE</button></div>';
-    document.body.appendChild(b);
-    function close(){b.classList.remove('is-open');}
-    b.addEventListener('click',function(ev){if(ev.target===b)close();},true);
-    b.querySelector('#playerAlertReceiveClose').addEventListener('click',close,true);
-    return b;
-  }
-  function showReceived(msg){
-    var b=ensureReceiveOverlay(); var t=b.querySelector('#playerAlertReceiveText'); if(t)t.textContent=String(msg||''); b.classList.add('is-open');
-  }
-  function setDisabled(btn,ms){
-    if(!btn)return; btn.disabled=true; var sec=Math.ceil(ms/1000); btn.textContent='WAIT '+sec;
-    var iv=setInterval(function(){sec-=1;if(sec<=0){clearInterval(iv);btn.disabled=false;btn.textContent='SEND';}else btn.textContent='WAIT '+sec;},1000);
-  }
-  async function sendMessage(text, btn){
-    var msg=clean(text); if(!msg){return;}
-    try{
-      var res=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:senderId,source:'player',version:VERSION}),cache:'no-store'});
-      var data={}; try{data=await res.json();}catch(e){}
-      if(res.status===429){setDisabled(btn,Math.max(1000,Number(data.retryAfterMs||RATE_MS)));return;}
-      if(!res.ok)throw new Error(data.error||'send_failed');
-      if(data.id) lastSeen=String(data.id);
-      setDisabled(btn,RATE_MS);
-    }catch(err){console.warn('player alert send failed',err);}
-  }
-  function bindPc(){
-    var btn=document.getElementById('playerAlertPcSend'); var text=document.getElementById('playerAlertPcText');
-    if(!btn||!text||btn.__smfpAlertBound)return;
-    btn.__smfpAlertBound=true; btn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=text.value; sendMessage(v,btn); text.value='';},true);
-  }
-  function ensureMobileButton(){
-    var app=document.getElementById('mffApp'); if(!app)return; var slot=app.querySelector('.mff-discord-slot'); if(!slot)return;
-    if(!app.querySelector('#mffAlertOpen')){var btn=document.createElement('button');btn.id='mffAlertOpen';btn.className='mff-alert-open';btn.type='button';btn.textContent='SEND';slot.appendChild(btn);}
-    else { var existing=app.querySelector('#mffAlertOpen'); if(existing && existing.parentNode!==slot) slot.appendChild(existing); }
-    if(!document.getElementById('mffAlertEditorBackdrop')){
-      var b=document.createElement('div');b.id='mffAlertEditorBackdrop';b.className='mff-alert-editor-backdrop';b.setAttribute('aria-hidden','true');
-      b.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
-      document.body.appendChild(b);
-    }
-    var open=app.querySelector('#mffAlertOpen'), back=document.getElementById('mffAlertEditorBackdrop'), cancel=document.getElementById('mffAlertCancel'), send=document.getElementById('mffAlertSend'), ta=document.getElementById('mffAlertText');
-    if(open&&!open.__smfpAlertBound){
-      open.__smfpAlertBound=true;
-      function openEditor(ev){
-        if(ev){ev.preventDefault();ev.stopPropagation();}
-        if(back){back.classList.add('is-open');back.setAttribute('aria-hidden','false');}
-        if(ta){setTimeout(function(){try{ta.focus();}catch(e){}},40);}
-      }
-      open.addEventListener('click',openEditor,true);
-      open.addEventListener('touchend',openEditor,{passive:false,capture:true});
-      open.addEventListener('pointerup',openEditor,{passive:false,capture:true});
-    }
-    function close(){if(back){back.classList.remove('is-open');back.setAttribute('aria-hidden','true');}}
-    if(back&&!back.__smfpAlertBackBound){back.__smfpAlertBackBound=true;back.addEventListener('click',function(ev){if(ev.target===back)close();},true);}
-    if(cancel&&!cancel.__smfpAlertBound){cancel.__smfpAlertBound=true;cancel.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();close();},true);}
-    if(send&&!send.__smfpAlertBound){send.__smfpAlertBound=true;send.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();var v=ta?ta.value:'';sendMessage(v,send); if(ta)ta.value=''; close();},true);}
-  }
-  async function poll(){
-    try{var r=await fetch(CURRENT_URL,{cache:'no-store'}); if(!r.ok)return; var d=await r.json(); if(!d||!d.active||!d.id)return; var id=String(d.id); if(id===lastSeen)return; lastSeen=id; if(String(d.senderId||'')===senderId)return; showReceived(d.message||'');}catch(e){}
-  }
-  function boot(){bindPc();ensureMobileButton();ensureReceiveOverlay();}
-  boot(); setTimeout(boot,1200); setInterval(poll,10000); setTimeout(poll,1600);
-})();
-</script>
+<script id="smfpPlayerAlertV152Script" type="application/json" data-disabled="audit-repair-v1">{"disabled":true,"reason":"legacy player-alert sender disabled; S666PlayerAlertClient is authoritative"}</script>
 
 
 <!-- SMFP_v159_PC_DUAL_EQ_TRUE_MIRROR_CLEAN
@@ -2495,129 +2415,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
      Geändert: 2026-05-18
      Zweck: Rettungsfix nach v163: keine Zusatz-Overlay-Layer, Sendestatus am echten vorhandenen Dialog, iPhone-Performance entlasten, unteres Levelmeter beruhigen, PC-Doppel-EQ entfernen.
      Regeln: Kein neuer Player, keine neue Boost-Engine, kein PC-Layout-Umbau außer Entfernen des zweiten gespiegelten EQ-Panels. -->
-<script id="smfpV164RescueCleanScript">
-(function(){
-  'use strict';
-  if(window.__smfpV164RescueClean) return; window.__smfpV164RescueClean=true;
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v185';
-  var SEND_URL='/api/player-alert/send';
-  var SENDER_KEY='smfpPlayerAlertSenderId';
-  function mobile(){return (window.matchMedia&&window.matchMedia('(max-width:760px)').matches)||innerWidth<=760;}
-  function qs(s,r){return (r||document).querySelector(s);}
-  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
-  function clean(t){return String(t||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240);}
-  function sender(){try{var v=localStorage.getItem(SENDER_KEY);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(SENDER_KEY,v);}return v;}catch(e){return 'smfp-'+Math.random().toString(36).slice(2,10);}}
-  function setVersion(){
-    document.documentElement.setAttribute('data-smfp-version',VERSION);
-    var meta=qs('meta[name="smfp-version"]'); if(meta) meta.setAttribute('content',VERSION);
-    qsa('.smfp-version-badge,.mff-version-inline,#pcVersionBadge').forEach(function(n){ if(/v\d+/i.test(n.textContent||'')) n.textContent=VERSION; });
-  }
-  function removeJunk(){
-    qsa('#mffBroadcastDisplay,#mffInlineBroadcastPanel').forEach(function(n){try{n.remove();}catch(e){}});
-    qsa('#mffAlertEditorBackdrop').forEach(function(n,i){ if(i>0) try{n.remove();}catch(e){} });
-  }
-  function ensureStatus(back){
-    var box=qs('.mff-alert-editor',back||document); if(!box) return null;
-    var s=qs('.smfp-send-status-v164',box);
-    if(!s){s=document.createElement('div');s.className='smfp-send-status-v164';s.setAttribute('aria-live','polite');s.textContent='READY';box.appendChild(s);} return s;
-  }
-  function status(text,type){
-    var s=ensureStatus(qs('#mffAlertEditorBackdrop'));
-    if(!s) return;
-    s.classList.remove('is-ok','is-error'); if(type==='ok')s.classList.add('is-ok'); if(type==='error')s.classList.add('is-error');
-    s.textContent=text;
-  }
-  function ensureEditor(){
-    var back=qs('#mffAlertEditorBackdrop');
-    if(!back){
-      back=document.createElement('div'); back.id='mffAlertEditorBackdrop'; back.className='mff-alert-editor-backdrop'; back.setAttribute('aria-hidden','true');
-      back.innerHTML='<div class="mff-alert-editor" role="dialog" aria-modal="true"><h3>SEND PLAYER MESSAGE</h3><textarea id="mffAlertText" maxlength="240" placeholder="Write a short player message..."></textarea><div class="mff-alert-editor-actions"><button id="mffAlertCancel" class="mff-alert-cancel" type="button">CLOSE</button><button id="mffAlertSend" class="mff-alert-send-btn" type="button">SEND</button></div></div>';
-      document.body.appendChild(back);
-    }
-    ensureStatus(back);
-    return back;
-  }
-  function openEditor(ev){
-    if(!mobile()) return;
-    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
-    var back=ensureEditor(); back.classList.add('is-open'); back.setAttribute('aria-hidden','false'); status('READY',null);
-    setTimeout(function(){try{qs('#mffAlertText',back).focus();}catch(e){}},60);
-  }
-  function closeEditor(ev){
-    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
-    var back=qs('#mffAlertEditorBackdrop'); if(back){back.classList.remove('is-open'); back.setAttribute('aria-hidden','true');}
-  }
-  async function sendEditor(ev){
-    if(ev){ev.preventDefault();ev.stopPropagation();if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();}
-    var back=ensureEditor(), ta=qs('#mffAlertText',back), btn=qs('#mffAlertSend',back), msg=clean(ta&&ta.value);
-    if(!msg){status('ENTER MESSAGE FIRST','error');try{ta&&ta.focus();}catch(e){} return;}
-    if(btn){btn.disabled=true;btn.textContent='SENDING';}
-    status('SENDING...',null);
-    try{
-      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-v177',version:VERSION}),cache:'no-store'});
-      var d={}; try{d=await r.json();}catch(_){ }
-      if(!r.ok || d.ok===false){
-        var m=d.error||d.message||('HTTP '+r.status);
-        if(r.status===429 && (d.retryAfterMs||d.retryAfter)){m='RATE LIMIT — WAIT '+Math.ceil(Number(d.retryAfterMs||d.retryAfter)/1000)+'s';}
-        throw new Error(m);
-      }
-      if(ta) ta.value='';
-      if(btn){btn.textContent='SENT ✓';}
-      status('SENT ✓ MESSAGE DELIVERED','ok');
-      setTimeout(function(){closeEditor();},1300);
-    }catch(e){
-      if(btn){btn.textContent='FAILED';}
-      status('FAILED ✕ '+(e&&e.message?e.message:'CONNECTION ERROR'),'error');
-    }finally{
-      setTimeout(function(){if(btn){btn.disabled=false;btn.textContent='SEND';}},1500);
-    }
-  }
-  function bindSend(){
-    if(!mobile()) return;
-    var app=qs('#mffApp'); if(!app) return;
-    var slot=qs('.mff-discord-slot',app); if(!slot) return;
-    var open=qs('#mffAlertOpen',app);
-    if(!open){open=document.createElement('button');open.id='mffAlertOpen';open.className='mff-alert-open';open.type='button';open.textContent='SEND';slot.appendChild(open);}
-    if(open.parentNode!==slot) slot.appendChild(open);
-    ['pointerup','touchend','click'].forEach(function(t){if(!open['__v164_'+t]){open['__v164_'+t]=true;open.addEventListener(t,openEditor,{capture:true,passive:false});}});
-    var back=ensureEditor(), cancel=qs('#mffAlertCancel',back), send=qs('#mffAlertSend',back);
-    ['pointerup','touchend','click'].forEach(function(t){
-      if(cancel&&!cancel['__v164_'+t]){cancel['__v164_'+t]=true;cancel.addEventListener(t,closeEditor,{capture:true,passive:false});}
-      if(send&&!send['__v164_'+t]){send['__v164_'+t]=true;send.addEventListener(t,sendEditor,{capture:true,passive:false});}
-    });
-    if(!back.__v164Close){back.__v164Close=true;back.addEventListener('pointerup',function(ev){if(ev.target===back)closeEditor(ev);},{capture:true,passive:false});}
-  }
-  var smooth=.45;
-  function readLevel(){
-    var app=qs('#mffApp'); if(!app) return .35;
-    var raw=getComputedStyle(app).getPropertyValue('--mff-level')||getComputedStyle(document.documentElement).getPropertyValue('--mff-level');
-    var n=parseFloat(raw); if(!isFinite(n)) n=.35; return Math.max(.08,Math.min(.88,n));
-  }
-  function calmBottom(){
-    if(!mobile()) return;
-    var app=qs('#mffApp'); if(!app) return;
-    var target=readLevel(); smooth=smooth*.82+target*.18;
-    var scale=(.34+smooth*.72).toFixed(3);
-    var op=(.40+smooth*.48).toFixed(3);
-    app.style.setProperty('--smfp-v164-bottom-scale',scale);
-    app.style.setProperty('--smfp-v164-bottom-opacity',op);
-    var bars=qsa('#mffApp .mff-bottom-bars i');
-    var mid=(bars.length-1)/2;
-    bars.forEach(function(el,i){
-      var dist=Math.abs(i-mid)/(mid||1);
-      var on=smooth>(.12+dist*.38);
-      el.classList.toggle('mff-seg-on',on);
-    });
-  }
-  function boot(){setVersion();removeJunk();bindSend();calmBottom();}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',boot,{passive:true});
-  window.addEventListener('resize',function(){setTimeout(boot,120);},{passive:true});
-  window.addEventListener('orientationchange',function(){setTimeout(boot,300);},{passive:true});
-  [200,700,1500,3200].forEach(function(ms){setTimeout(boot,ms);});
-  setInterval(calmBottom,180);
-})();
-</script>
+<script id="smfpV164RescueCleanScript" type="application/json" data-disabled="audit-repair-v1">{"disabled":true,"reason":"legacy rescue sender/interval disabled; responsive CSS and central client are authoritative"}</script>
 
 
 
@@ -2633,68 +2431,37 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="smfpV181IphoneUiScript">
 (function(){
   'use strict';
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.06.17-gui-audit1';
-  var FOOTER_TEXT='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
+  if(window.__S666_MOBILE_UI_BRIDGE_V110__)return;
+  window.__S666_MOBILE_UI_BRIDGE_V110__=true;
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
   function app(){return qs('#mffApp')}
-  function setVersion(){
-    try{document.documentElement.setAttribute('data-smfp-version',VERSION);var m=qs('meta[name="smfp-version"]'); if(m)m.setAttribute('content',VERSION);}catch(e){}
-    qsa('.status-code,.smfp-version-badge,.mff-version-inline').forEach(function(el){ if(/v\d+/i.test((el.textContent||'').trim())) el.textContent=VERSION; });
-  }
-  function installVersionFooter(a){
-    if(!a || qs('.smfp-v181-footer-version',a)) return;
-    var bottom=qs('.mff-bottom',a) || qs('.mff-bottom-bars',a);
-    if(!bottom || !bottom.parentNode) return;
-    var f=document.createElement('div'); f.className='smfp-v181-footer-version'; f.textContent=FOOTER_TEXT;
-    bottom.parentNode.insertBefore(f,bottom.nextSibling);
-  }
-  function moveHistory(a){
-    if(!a) return;
-    var h=qs('.mff-history',a); if(!h) return;
-    var slot=qs('.mff-discord-slot',a); if(!slot) return;
-    var lane=qs('.smfp-v181-history-lane',slot);
-    if(!lane){ lane=document.createElement('div'); lane.className='smfp-v181-history-lane'; slot.appendChild(lane); }
-    if(h.parentNode!==lane) lane.appendChild(h);
-    h.style.display='flex';
-  }
-  function flattenDiscord(a){
-    var slot=qs('.mff-discord-slot',a); if(!slot) return;
-    qsa('[data-discord-addon-panel],.s666-discord-panel',slot).forEach(function(p){
-      p.style.background='transparent'; p.style.border='0'; p.style.boxShadow='none'; p.style.padding='0';
-    });
+  function version(){return (window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.06.25-hardlock1'}
+  function installFooter(a){
+    if(!a)return;
+    var footer=qs('.smfp-v181-footer-version',a);
+    if(!footer){footer=document.createElement('div');footer.className='smfp-v181-footer-version';}
+    footer.textContent='WebRadio 666SOUNDsDESIGn '+version().toUpperCase();
+    var bottom=qs('.mff-bottom',a)||qs('.mff-bottom-bars',a);
+    if(bottom&&bottom.parentNode&&footer.parentNode!==bottom.parentNode)bottom.parentNode.insertBefore(footer,bottom.nextSibling);
   }
   function installSendLeds(a){
-    if(!a || qs('.smfp-v181-send-leds',a)) return;
-    var send=qs('#mffAlertOpen',a) || qs('.mff-alert-open',a) || qs('button[data-action="send"]',a);
-    if(!send || !send.parentNode) return;
-    var leds=document.createElement('span'); leds.className='smfp-v181-send-leds'; leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
-    send.parentNode.insertBefore(leds,send.nextSibling);
+    if(!a||qs('.smfp-v181-send-leds',a))return;
+    var anchor=qs('#s666MessageControlButton',a)||qs('#s666StageMobileActions',a);
+    if(!anchor||!anchor.parentNode)return;
+    var leds=document.createElement('span');leds.className='smfp-v181-send-leds';leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
+    anchor.parentNode.insertBefore(leds,anchor.nextSibling);
   }
-  function installBoostLed5(a){
-    var wrap=qs('.mff-boost-led-wrap',a); if(!wrap || qs('.mff-boost-led[data-led="5"]',wrap)) return;
-    var led=document.createElement('span'); led.className='mff-boost-led'; led.setAttribute('data-led','5'); wrap.appendChild(led);
-  }
-  function sendState(s){ var a=app(); if(!a)return; a.setAttribute('data-send-state',s||'idle'); clearTimeout(window.__smfpV181SendStateTimer); if(s==='ok'||s==='fail') window.__smfpV181SendStateTimer=setTimeout(function(){var b=app(); if(b)b.setAttribute('data-send-state','idle')},3600); }
-  function patchFetchStatus(){
-    if(window.__smfpV181FetchPatched) return; window.__smfpV181FetchPatched=true;
-    var real=window.fetch;
-    window.fetch=function(input,init){
-      var url=String((input&&input.url)||input||'');
-      var isSend=url.indexOf('/api/player-alert/send')>=0;
-      if(isSend) sendState('sending');
-      return real.apply(this,arguments).then(function(res){ if(isSend) sendState(res && res.ok ? 'ok':'fail'); return res; }).catch(function(err){ if(isSend) sendState('fail'); throw err; });
-    };
-  }
+  function sendState(state){var a=app();if(!a)return;a.setAttribute('data-send-state',state||'idle');clearTimeout(sendState.t);if(state==='ok'||state==='fail')sendState.t=setTimeout(function(){var b=app();if(b)b.setAttribute('data-send-state','idle')},3600)}
   function lockViewport(){
-    if(window.__smfpV181ViewportPatched) return; window.__smfpV181ViewportPatched=true;
-    var y=0;
-    document.addEventListener('focusin',function(e){ if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){ y=window.scrollY||0; document.body.classList.add('smfp-v181-overlay-lock'); document.body.style.top='-'+y+'px'; } },true);
-    document.addEventListener('focusout',function(){ if(document.body.classList.contains('smfp-v181-overlay-lock')){ document.body.classList.remove('smfp-v181-overlay-lock'); document.body.style.top=''; window.scrollTo(0,y||0); } },true);
+    if(window.__S666_MOBILE_VIEWPORT_LOCK__)return;window.__S666_MOBILE_VIEWPORT_LOCK__=true;var y=0;
+    document.addEventListener('focusin',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){y=window.scrollY||0;document.body.classList.add('smfp-v181-overlay-lock');document.body.style.top='-'+y+'px'}},true);
+    document.addEventListener('focusout',function(){if(document.body.classList.contains('smfp-v181-overlay-lock')){document.body.classList.remove('smfp-v181-overlay-lock');document.body.style.top='';window.scrollTo(0,y||0)}},true);
   }
-  function boot(){ var a=app(); if(!a)return; setVersion(); moveHistory(a); flattenDiscord(a); installSendLeds(a); installBoostLed5(a); installVersionFooter(a); patchFetchStatus(); lockViewport(); }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
-  setTimeout(boot,1200);
+  function boot(){var a=app();if(!a)return;installFooter(a);installSendLeds(a);lockViewport()}
+  window.addEventListener('s666:player-alert-state',function(e){var p=e&&e.detail&&e.detail.phase;sendState(p==='sending'?'sending':p==='success'?'ok':p==='error'?'fail':'idle')});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  [300,1000,2500].forEach(function(ms){setTimeout(boot,ms)});
 })();
 </script>
 
@@ -2715,100 +2482,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
      - Discord-Außenpanel optisch entfernt; DC/MSG bleiben als kleine Buttons + LED.
      - Alte Send-Handler werden im Capture-Pfad für den Player-SEND blockiert.
 -->
-<script id="smfpV181MobileVisibleRootfixScript">
-(function(){
-  'use strict';
-  var VERSION='v187';
-  var SEND_URL='/api/player-alert/send';
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
-  function app(){return qs('#mffApp')}
-  function textClean(v){return String(v||'').replace(/[<>]/g,'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,240)}
-  function sender(){try{var k='smfpPlayerAlertSenderId';var v=localStorage.getItem(k);if(!v){v='smfp-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);localStorage.setItem(k,v)}return v}catch(e){return 'smfp-session'}}
-  function setVersion(){
-    try{window.SMFP_VERSION=window.SMFP_VERSION||{};window.SMFP_VERSION.label=VERSION;window.SMFP_VERSION.number=window.SMFP_VERSION.number||20260617;window.SMFP_VERSION.cacheBust=(window.SMFP_VERSION.cacheBust||window.SMFP_VERSION.build||'smfp-v2026-06-17-gui-audit1');document.documentElement.setAttribute('data-smfp-version',VERSION);document.documentElement.setAttribute('data-smfp-cache-bust',window.SMFP_VERSION.cacheBust);var m=qs('meta[name="smfp-version"]');if(m)m.setAttribute('content',VERSION)}catch(e){}
-    qsa('#mffApp .smfp-version-badge,#mffApp .mff-version-inline').forEach(function(el){el.classList.add('smfp-v181-hidden-version');el.textContent='';});
-    qsa('#pcVersionBadge .status-code,.status-code').forEach(function(el){if(/v\d+/i.test(el.textContent||''))el.textContent=VERSION;});
-  }
-  function installFooter(a){
-    if(!a)return;
-    var old=qsa('.smfp-v180-footer-version,.smfp-v181-footer-version',a); old.forEach(function(n,i){if(i>0)try{n.remove()}catch(e){}});
-    var footer=qs('.smfp-v181-footer-version',a)||qs('.smfp-v180-footer-version',a);
-    if(!footer){footer=document.createElement('div');footer.className='smfp-v181-footer-version';}
-    footer.className='smfp-v181-footer-version';
-    footer.textContent='WebRadio 666SOUNDsDESIGn '+VERSION.toUpperCase();
-    var bottom=qs('.mff-bottom',a)||qs('.mff-bottom-bars',a);
-    if(bottom&&bottom.parentNode&&footer.parentNode!==bottom.parentNode){bottom.parentNode.insertBefore(footer,bottom.nextSibling);} else if(bottom&&bottom.parentNode&&!footer.parentNode){bottom.parentNode.insertBefore(footer,bottom.nextSibling);}
-  }
-  function moveHistory(a){
-    if(!a)return;
-    var h=qs('.mff-history',a); if(!h)return;
-    var slot=qs('.mff-discord-slot',a); if(!slot)return;
-    qsa('.smfp-v181-history-lane',slot).forEach(function(n,i){if(i>0)try{n.remove()}catch(e){}});
-    var lane=qs('.smfp-v181-history-lane',slot)||document.createElement('div');
-    lane.className='smfp-v181-history-lane';
-    if(!lane.parentNode)slot.appendChild(lane);
-    if(h.parentNode!==lane)lane.appendChild(h);
-    h.style.display='flex'; h.style.visibility='visible'; h.style.pointerEvents='auto';
-  }
-  function cleanDiscordPanel(a){
-    var slot=qs('.mff-discord-slot',a); if(!slot)return;
-    qsa('[data-discord-addon-panel],.s666-discord-panel',slot).forEach(function(p){p.style.background='transparent';p.style.border='0';p.style.boxShadow='none';p.style.padding='0';p.style.margin='0';});
-    qsa('.s666-discord-text',slot).forEach(function(t){t.style.display='none'});
-  }
-  function installSendLeds(a){
-    if(!a)return;
-    qsa('.smfp-v180-send-leds',a).forEach(function(n){try{n.remove()}catch(e){}});
-    if(qs('.smfp-v181-send-leds',a))return;
-    var send=qs('#mffAlertOpen',a)||qs('.mff-alert-open',a); if(!send||!send.parentNode)return;
-    var leds=document.createElement('span');leds.className='smfp-v181-send-leds';leds.innerHTML='<i class="smfp-v181-send-led" data-led="request"></i><i class="smfp-v181-send-led" data-led="confirm"></i>';
-    send.parentNode.insertBefore(leds,send.nextSibling);
-  }
-  function sendState(s){var a=app(); if(!a)return; a.setAttribute('data-send-state',s||'idle');clearTimeout(window.__smfpV181SendTimer);if(s==='ok'||s==='fail')window.__smfpV181SendTimer=setTimeout(function(){var b=app();if(b)b.setAttribute('data-send-state','idle')},3600);}
-  function status(text,cls){
-    var back=qs('#mffAlertEditorBackdrop'); if(!back)return;
-    var s=qs('.smfp-send-status-v181',back)||qs('.smfp-send-status-v164',back)||document.createElement('div');
-    s.className='smfp-send-status-v181 smfp-send-status-v164 '+(cls||''); s.textContent=text;
-    var box=qs('.mff-alert-editor',back); if(box&&!s.parentNode)box.appendChild(s);
-  }
-  async function hardSend(ev){
-    var target=ev.target&&ev.target.closest&&ev.target.closest('#mffAlertSend');
-    if(!target)return;
-    ev.preventDefault(); ev.stopPropagation(); if(ev.stopImmediatePropagation)ev.stopImmediatePropagation();
-    var now=Date.now();
-    if(window.__smfpPlayerAlertSendInFlight || (now-Number(window.__smfpPlayerAlertLastSendEvent||0))<1200)return false;
-    window.__smfpPlayerAlertSendInFlight=true;
-    window.__smfpPlayerAlertLastSendEvent=now;
-    var ta=qs('#mffAlertText'); var msg=textClean(ta&&ta.value);
-    if(!msg){sendState('fail');status('FAILED: ENTER MESSAGE FIRST','is-error');return false;}
-    target.disabled=true; target.textContent='SENDING'; sendState('sending'); status('PLAYER SENDING...','');
-    try{
-      var r=await fetch(SEND_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({message:msg,senderId:sender(),clientId:sender(),source:'iphone-player',version:VERSION}),cache:'no-store'});
-      var d={};try{d=await r.json()}catch(e){}
-      if(!r.ok||d.ok===false)throw new Error(d.error||d.message||('HTTP '+r.status));
-      if(ta)ta.value=''; target.textContent='SENT'; sendState('ok'); status('PLAYER SENT ✓ '+String(d.source||'backend/cache').toUpperCase().replace('CACHE-TERTIARY','CACHE FALLBACK'),'is-ok');
-      setTimeout(function(){var b=qs('#mffAlertEditorBackdrop'); if(b){b.classList.remove('is-open');b.setAttribute('aria-hidden','true')}},1200);
-    }catch(e){target.textContent='FAILED';sendState('fail');status('PLAYER FAILED ✕ '+String(e&&e.message||'CONNECTION ERROR'),'is-error');}
-    finally{window.__smfpPlayerAlertSendInFlight=false;setTimeout(function(){target.disabled=false;target.textContent='SEND'},1500);}
-    return false;
-  }
-  function lockZoom(){
-    if(window.__smfpV181ZoomLock)return; window.__smfpV181ZoomLock=true; var y=0;
-    document.addEventListener('focusin',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName||'')){y=window.scrollY||0;document.body.classList.add('smfp-v181-nozoom');document.body.style.top='-'+y+'px'}},true);
-    document.addEventListener('focusout',function(){if(document.body.classList.contains('smfp-v181-nozoom')){document.body.classList.remove('smfp-v181-nozoom');document.body.style.top='';setTimeout(function(){window.scrollTo(0,y||0)},30)}},true);
-  }
-  function boot(){var a=app();setVersion();if(!a)return;moveHistory(a);installFooter(a);cleanDiscordPanel(a);installSendLeds(a);lockZoom();}
-  document.addEventListener('click',hardSend,true);document.addEventListener('touchend',hardSend,{capture:true,passive:false});document.addEventListener('pointerup',hardSend,{capture:true,passive:false});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-  setTimeout(boot,120);setTimeout(boot,700);setTimeout(boot,1000);
-})();
-</script>
+<script id="smfpV181MobileVisibleRootfixScript" type="application/json" data-disabled="audit-repair-v1">{"disabled":true,"reason":"legacy hard-send capture handlers disabled; shared controls are authoritative"}</script>
 
 <link rel="stylesheet" href="/css/player-admin-overlay.css?v=2026-06-15-fix1">
-<script src="/js/player-admin-overlay.js?v=2026-06-19-repair1" defer></script>
+<script src="/js/player-admin-overlay.js?v=2026-06-25-hardlock1" defer></script>
 
 <link rel="stylesheet" href="/css/broadcast-message-history.css?v=2026-06-15-fix1">
-<script src="/js/broadcast-message-history.js?v=2026-06-15-fix1" defer></script>
+<script src="/js/broadcast-message-history.js?v=2026-06-25-hardlock1" defer></script>
 
 <!-- SMFP_v190_MOBILE_GRAPHIC_EQ_OVERLAY -->
 <script id="smfpMobileGraphicEqOverlayV190Script">
@@ -2874,9 +2554,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 <link rel="stylesheet" href="/css/sound-control-overlay-v1.css?v=2026-06-15-fix1">
-<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-06-25-geometry1">
+<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-06-25-hardlock1">
 <script src="/js/sound-control-overlay-v1.js?v=2026-06-19-repair4" defer></script>
-<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-06-25-geometry1" defer></script>
+<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-06-25-hardlock1" defer></script>
 <script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=2026-06-15-fix1"></script>
 <script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=2026-06-15-fix1"></script>
 <script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=2026-06-15-fix1"></script>
@@ -2917,11 +2597,13 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       setLed('dnaRailLedLeft',  ['leftMeterA','leftMeterB','leftMeterC']);
       setLed('dnaRailLedRight', ['rightMeterA','rightMeterB','rightMeterC']);
     }
-    if(document.readyState==='loading'){
-      document.addEventListener('DOMContentLoaded',function(){ setInterval(tick,100); });
-    } else {
-      setInterval(tick,100);
+    var railFrame=0,railLast=0;
+    function railLoop(now){
+      if(!document.hidden && now-railLast>=120){railLast=now;tick();}
+      railFrame=requestAnimationFrame(railLoop);
     }
+    function start(){if(!railFrame){tick();railFrame=requestAnimationFrame(railLoop);}}
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   })();
   </script>
   
@@ -2929,10 +2611,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <!-- LOGO SIZE FIX — pc-header-new-logo fills container correctly -->
   
   <!-- Skip-Button: Vote-Skip + Admin-Skip fuer alle Hoerer -->
-    <script src="/js/skip-control.js?v=2026-06-19-repair1" defer></script>
-    <script src="/js/player-stage-v2.js?v=2026-06-25-interior-v5" defer></script>
+    <script src="/js/skip-control.js?v=2026-06-25-hardlock1" defer></script>
+    <script src="/js/player-stage-v2.js?v=2026-06-25-hardlock1" defer></script>
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
-    <script src="/js/media-session-ios.js?v=2026-06-19-repair1" defer></script>
-    <script src="/js/messenger-overlay.js?v=2026-06-19-repair2" defer></script>
+    <script src="/js/media-session-ios.js?v=2026-06-25-hardlock1" defer></script>
+    <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>
 </body>
 </html>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CHAOS ENGINE V3 — Track Factory</title>
+<link rel="stylesheet" href="./assets/css/chaos-engine.css">
+<link rel="stylesheet" href="./assets/css/fraggle-detlef-system.css">
+<link rel="stylesheet" href="./assets/css/track-factory.css">
+
+<link rel="stylesheet" href="/CHAOS_ENGINE/assets/css/chaos-suno-renderer-integration-v1.css?v=20260525">
+</head>
+<body>
+<div class="ce-app tf-app">
+  <header class="ce-header tf-header">
+    <div>
+      <div class="ce-kicker">CHAOS MATRIX SAGA · TRACK FACTORY</div>
+      <h1>TRACK FACTORY</h1>
+      <p>Second full HTML page · Single Track Compression · 4-Codebox Output · Guard Matrix</p>
+    </div>
+    <div class="ce-status-stack">
+      <span id="tfBootStatus" class="ce-pill">BOOT: loading</span>
+      <span id="tfGuardStatus" class="ce-pill">GUARDS: standby</span>
+      <span id="tfLimitStatus" class="ce-pill">LIMITS: unchecked</span>
+    </div>
+  </header>
+
+  <nav class="ce-tabs">
+    <a class="tf-link" href="./index.html">← Main Engine</a>
+    <a class="fds-link" href="./fraggle-detlef-system.html">Detlef Core →</a>
+    <button data-tab="factory" class="is-active">Factory</button>
+    <button data-tab="guards">Guards</button>
+    <button data-tab="arrangement">Arrangement</button>
+    <button data-tab="finalizer">Finalizer</button>
+    <button data-tab="export">Export</button>
+  </nav>
+
+  <main>
+    <section class="ce-tab is-active" data-panel="factory">
+      <div class="tf-grid">
+        <section class="ce-panel">
+          <h2>Track Input</h2>
+          <label>Reiner Tracktitel<input id="tfTitle" value="Human Pulse"></label>
+          <label>Track-Funktion<select id="tfFunction">
+            <option>Club Transmission</option>
+            <option>Album Opener</option>
+            <option>Story Chapter</option>
+            <option>Peak-Time Warehouse Tool</option>
+            <option>Emotional Reactor Track</option>
+            <option>Final Transmission</option>
+          </select></label>
+          <label>Sprachmodus<select id="tfLanguage">
+            <option>English lyrics</option>
+            <option>German lyrics</option>
+            <option>Hybrid English/German</option>
+          </select></label>
+          <label>BPM<select id="tfBpm">
+            <option>142 BPM</option>
+            <option>143 BPM</option>
+            <option>144 BPM</option>
+            <option>145 BPM</option>
+          </select></label>
+          <label>Beschreibung / Rohlyrics / Idee<textarea id="tfInput" rows="12" placeholder="Lyrics, Story, Druck, Energie, Figuren, Drops, Stimmung..."></textarea></label>
+        </section>
+
+        <section class="ce-panel">
+          <h2>Pressure / Sound DNA</h2>
+          <div class="tf-switches">
+            <label><input type="checkbox" id="tfDarkTechno" checked> Deep Dark Techno</label>
+            <label><input type="checkbox" id="tfBunker" checked> Bunker / Warehouse Pressure</label>
+            <label><input type="checkbox" id="tfPsy" checked> Psy-Techno / Psytrance Motion</label>
+            <label><input type="checkbox" id="tfIndustrial" checked> Industrial Cyberpunk</label>
+            <label><input type="checkbox" id="tfErotic"> Deep Dark Erotical Tension</label>
+            <label><input type="checkbox" id="tfGuitar" checked> Emotional Electric Guitar Humanity Layer</label>
+            <label><input type="checkbox" id="tfHumanFx" checked> Human Resonance FX</label>
+            <label><input type="checkbox" id="tfNoScream" checked> No Screaming Vocals</label>
+          </div>
+
+          <h2>Drop Logic</h2>
+          <div class="tf-switches">
+            <label><input type="checkbox" id="tfFakeDrop" checked> Fake Drop</label>
+            <label><input type="checkbox" id="tfDoubleDrop" checked> Double Drop</label>
+            <label><input type="checkbox" id="tfMegaDrop"> Mega Drop</label>
+            <label><input type="checkbox" id="tfSilenceImpact" checked> Silence Impact</label>
+          </div>
+
+          <div class="ce-actions">
+            <button id="tfBuild">Build Track</button>
+            <button id="tfValidate" class="secondary">Validate</button>
+            <button id="tfCopyAll" class="secondary">Copy All Four</button>
+            <button id="tfClear" class="danger">Clear</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="ce-tab" data-panel="guards">
+      <section class="ce-panel">
+        <h2>Guard Matrix</h2>
+        <div id="tfGuardMatrix" class="tf-guard-grid"></div>
+        <pre id="tfGuardOutput">Ready.</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="arrangement">
+      <section class="ce-panel">
+        <h2>Arrangement Blueprint</h2>
+        <div class="tf-arrangement">
+          <div><strong>0:00–0:32</strong><span>DJ Mix Intro / atmosphere seed</span></div>
+          <div><strong>0:32–1:30</strong><span>Groove entry / first pressure layer</span></div>
+          <div><strong>1:30–2:30</strong><span>Story vocal / controlled clarity</span></div>
+          <div><strong>2:30–3:30</strong><span>Build-up / fake drop / impact</span></div>
+          <div><strong>3:30–4:40</strong><span>Main drop / bunker pressure</span></div>
+          <div><strong>4:40–5:40</strong><span>Expansion / double drop / memory echo</span></div>
+          <div><strong>5:40–6:00</strong><span>Fakeend window</span></div>
+          <div><strong>6:00–6:45</strong><span>Reactivation / final convergence / hard cut</span></div>
+        </div>
+        <pre id="tfArrangementOutput">Blueprint active.</pre>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="finalizer">
+      <section class="ce-panel">
+        <h2>4 Codebox Output</h2>
+        <label>CODEBOX 1 — TITLE<textarea id="tfOutTitle" rows="2"></textarea></label>
+        <label>CODEBOX 2 — STYLE PROMPT<textarea id="tfOutStyle" rows="8"></textarea></label>
+        <label>CODEBOX 3 — LYRIC / STRUCTURE PROMPT<textarea id="tfOutLyric" rows="18"></textarea></label>
+        <label>CODEBOX 4 — EXTENDED / FINAL CONTROL PROMPT<textarea id="tfOutExtended" rows="7"></textarea></label>
+      </section>
+    </section>
+
+    <section class="ce-tab" data-panel="export">
+      <section class="ce-panel">
+        <h2>Export / Import</h2>
+        <div class="ce-actions">
+          <button id="tfExportJson">Export JSON</button>
+          <button id="tfImportJson" class="secondary">Import JSON</button>
+          <button id="tfOpenSuno" class="secondary">Open Zuno/Suno</button>
+        </div>
+        <textarea id="tfImportBox" rows="10" placeholder="JSON Import hier einfügen"></textarea>
+        <pre id="tfDebugOutput">Ready.</pre>
+      </section>
+    </section>
+  </main>
+</div>
+<script src="./assets/js/track-factory.js"></script>
+
+<script src="/CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js?v=20260525" defer></script>
+</body>
+</html>

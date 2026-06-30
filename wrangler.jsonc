@@ -11,15 +11,14 @@
   },
   "vars": {
     "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
-    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V102",
+    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V120",
     "GITHUB_CONFIG_PATH": "config/radio-runtime.json",
     "GITHUB_BACKUP_DIR": "config/backups",
     "ENABLE_PUBLIC_DEBUG": "false",
-    "RELEASE_VERSION": "FULLVERSION_AUTH_HARDLOCK_REPAIR_v1.1.0",
-    "ADMIN_AUTH_LOGIN_URL": "https://666-system-pw.666soundsdesign-broadcaster.com/login",
-    "ADMIN_AUTH_VERIFY_URL": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
+    "RELEASE_VERSION": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
+    "STREAM_ATTEMPT_TIMEOUT_MS": "2500",
+    "STREAM_FAILOVER_BUDGET_MS": "12000",
     "ADMIN_SERVICE_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com",
-    "AUTH_AUDIENCE": "666SOUNDsDESIGn-WebRadio-Admin",
-    "AUTH_MODE": "external_auth_worker"
+    "PUBLIC_PLAYER_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com"
   }
 }

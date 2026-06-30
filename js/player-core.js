@@ -159,75 +159,10 @@ function recoverInterruptedAudio(reason = 'interrupted') {
 
 audio?.addEventListener('boost-diagnostic', (event) => updateBoostDiagnosticLabel(event.detail || {}));
 
-/*
-==========================================
-GEÄNDERT: 2026-04-25
-ÄNDERUNG: MOBILE_TOUCH_CONTROLS_REPAIR_v1
-ZWECK: Zusätzliche Touch-Delegation für Play/Pause/Stop/Boost.
-==========================================
-*/
-function installMobileTouchControlsRepair() {
-/*
-   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
-   * Alter mobiler Generator physisch deaktiviert.
-   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
-   */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
-  return;
-}
-/* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileTouchControlsRepair call removed. */
-/*
-==========================================
-GEÄNDERT: 2026-04-25
-ÄNDERUNG: MOBILE_LEVELMETER_GESTURE_GUARD_PATCH_v1
-ZWECK:
-- Mobile-Gesten-Schutzstatus setzen.
-- Unterer Center-Out-Levelmeter bleibt unter Player und nicht im iPhone-Gestenbereich.
-==========================================
-*/
-function installMobileLevelmeterGestureGuard() {
-/*
-   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
-   * Alter mobiler Generator physisch deaktiviert.
-   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
-   */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
-  return;
-}
-/* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileLevelmeterGestureGuard call removed. */
-/* MOBILE_HUD_DOM_METER_REPAIR_v1: echte DOM-Meter + Mobile-Transportleiste. */
-function installMobileHudDomMeterRepair() {
-/*
-   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
-   * Alter mobiler Generator physisch deaktiviert.
-   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
-   */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
-  return;
-}
-/* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileHudDomMeterRepair disabled. */
-/* MOBILE_TRANSPORT_PIN_REPAIR_v1: Mobile Play/Pause/Stop/Boost-Leiste sichtbar pinnen. */
-function installMobileTransportPinRepair() {
-/*
-   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
-   * Alter mobiler Generator physisch deaktiviert.
-   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
-   */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
-  return;
-}
-/* STRICT_MOBILE_FRONTEND_PURGE_v6: installMobileTransportPinRepair disabled. */
-/* MOBILE_TOP_CONTROLS_IN_BOOST_PANEL_v1 */
-function installMobileTopControlsInBoostPanel(){
-/*
-   * STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION:
-   * Alter mobiler Generator physisch deaktiviert.
-   * Keine DOM-Erzeugung, keine alten Bottom-/Transport-/Boost-Layer.
-   */
-  document.documentElement.setAttribute('data-old-mobile-generator-disabled', 'STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION');
-  return;
-}
-/* STRICT_MOBILE_FRONTEND_PURGE_v83_DISCORD_EMBED_PC_IPHONE_INTEGRATION: installMobileTopControlsInBoostPanel call removed. */
+/* AUDIT_REPAIR_v1.1.0:
+ * Five unreferenced, immediate-return legacy mobile generator stubs were removed here.
+ * The active mobile player is provided by the existing mff/phase10 systems; no call sites existed.
+ */
 installResponsiveHelpers(historyToggle, historyPanel);
 
 function installV95DesktopHistoryRepair() {
@@ -1219,7 +1154,7 @@ try {
   if(window.__v81PcLayoutTickerMeterRepairInstalled)return;window.__v81PcLayoutTickerMeterRepairInstalled=true;
   const qs=id=>document.getElementById(id);let lastTicker='';
   function valid(t){const v=String(t||'').trim();return v&&!/metadata|metadaten|loading|laden|error|fehler/i.test(v)?v:''}
-  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='H')code.textContent='H';main.title='Hauptstream';main.setAttribute('aria-label','Hauptstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;code.textContent=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.06.30-auth-hardlock1'}}
+  function setMbChips(){const main=qs('mainBtn'),back=qs('fallbackBtn'),ver=qs('pcVersionBadge');if(main){const code=main.querySelector('.status-code')||main;if(code.textContent.trim()!=='H')code.textContent='H';main.title='Hauptstream';main.setAttribute('aria-label','Hauptstream');main.classList.add('source-mini-chip-v80')}if(back){const code=back.querySelector('.status-code')||back;if(code.textContent.trim()!=='B')code.textContent='B';back.title='Backup Stream';back.setAttribute('aria-label','Backup Stream');back.classList.add('source-mini-chip-v80')}if(ver){const code=ver.querySelector('.status-code')||ver;if(code.textContent.trim()!=='v81')code.textContent='v81'}}
   function readTickerSource(){if(!isDesktopTransportLiveV114())return '666SOUNDsDESIGn WebRadio';for(const id of ['metaLine','nowPlayingTicker','nowTitle','trackTitle','currentTitle','songTitle']){const el=qs(id);const v=valid(el&&el.textContent);if(v)return v}return valid(document.body.getAttribute('data-current-title'))||valid(document.body.getAttribute('data-now-playing'))||lastTicker||'666SOUNDsDESIGn WebRadio'}
   function ensureSingleTicker(){document.querySelectorAll('#historyTickerLane,.history-ticker-lane').forEach(el=>el.remove());let lane=qs('pcTickerRebuildLane'),text=qs('pcTickerRebuildText');if(!lane||!text){lane=document.createElement('div');lane.id='pcTickerRebuildLane';lane.className='pc-ticker-rebuild-lane';lane.setAttribute('aria-label','PC Laufschrift');text=document.createElement('span');text.id='pcTickerRebuildText';text.className='pc-ticker-rebuild-text';text.textContent=lastTicker||'666SOUNDsDESIGn WebRadio';lane.appendChild(text)}const history=qs('historyToggle');const nowBox=history?history.parentElement:(document.querySelector('.now-playing')||document.querySelector('.now-card')||document.body);if(nowBox&&lane.parentElement!==nowBox)nowBox.appendChild(lane);return{lane,text}}
   function syncTicker(){const t=ensureSingleTicker();const src=readTickerSource();if(!isDesktopTransportLiveV114()){lastTicker='';const idle='666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==idle){t.text.textContent=idle;t.text.setAttribute('data-ticker-live','false')}return}if(valid(src))lastTicker=src;const finalText=lastTicker||src||'666SOUNDsDESIGn WebRadio';if(t.text.textContent.trim()!==finalText){t.text.textContent=finalText;t.text.setAttribute('data-ticker-live','true')}}

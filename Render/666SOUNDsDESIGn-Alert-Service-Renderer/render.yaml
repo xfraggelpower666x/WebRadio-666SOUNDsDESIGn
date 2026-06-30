@@ -8,10 +8,14 @@ services:
     startCommand: uvicorn src.server:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
+      - key: MASTER_ADMIN_PASSWORD
+        sync: false
       - key: PLAYER_ALERT_SERVICE_TOKEN
         sync: false
       - key: DATABASE_URL
         sync: false
+      - key: REQUIRE_SHARED_PERSISTENCE
+        value: "true"
       - key: PLAYER_ALERT_DB_PATH
         value: ./data/player-alerts.sqlite3
       - key: PLAYER_ALERT_TTL_SECONDS

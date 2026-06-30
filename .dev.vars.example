@@ -1,12 +1,12 @@
 # Local-only example for Wrangler development.
 # Copy to .dev.vars locally. Never commit real values.
 
-# Canonical admin authentication broker
-ADMIN_AUTH_LOGIN_URL=https://666-system-pw.666soundsdesign-broadcaster.com/login
+# Admin authentication services
 ADMIN_AUTH_VERIFY_URL=https://666-system-auth.666soundsdesign-broadcaster.com/verify
+PW_LOGIN_URL=https://666-system-pw.666soundsdesign-broadcaster.com/login
+PW_VERIFY_URL=https://666-system-pw.666soundsdesign-broadcaster.com/verify
 ADMIN_SERVICE_ORIGIN=https://webradio.666soundsdesign-broadcaster.com
-AUTH_AUDIENCE=666SOUNDsDESIGn-WebRadio-Admin
-AUTH_MODE=external_auth_worker
+# Optional hardlock: set the same secret on WebRadio, PW Worker and Auth Worker.
 ADMIN_SERVICE_TOKEN=
 
 # GitHub-backed runtime configuration
@@ -18,9 +18,12 @@ GITHUB_CONFIG_PATH=config/radio-runtime.json
 GITHUB_BACKUP_DIR=config/backups
 
 # Player Alert Worker -> Render service authentication
-PLAYER_ALERT_BACKEND_URL=https://auto-setup-render-for-backend-mp3-ess8.onrender.com
+PLAYER_ALERT_BACKEND_URL=https://666soundsdesign-alert-service.onrender.com
 PLAYER_ALERT_SERVICE_TOKEN=
+PLAYER_ALERT_RATE_SALT=
+# Required in production for privacy-preserving rate-key hardening.
 PLAYER_ALERT_WRITE_TOKEN=
+# Optional for trusted non-browser writers. Browser SEND may use the same-origin admin session.
 
 # Debug endpoints remain hidden unless a token is configured.
 DEBUG_TOKEN=
@@ -38,3 +41,7 @@ ADMIN_SKIP_COOLDOWN_MS=12000
 # Alternative provider bridge
 SONICPANEL_SKIP_URL=
 SONICPANEL_SKIP_TOKEN=
+
+# Stream failover time budget
+STREAM_ATTEMPT_TIMEOUT_MS=2500
+STREAM_FAILOVER_BUDGET_MS=12000

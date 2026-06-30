@@ -1,22 +1,23 @@
-# 666SOUNDsDESIGn Alert Service Renderer
+# Audio-Only MP3 Mastering System
 
-FastAPI-Service für Player-Alerts und den optionalen Audio-Prozess-Endpunkt.
+This package is stripped down to audio pipeline parts only.
 
-## Authentifizierung
+## Included
+- Render Flask backend
+- `/master` audio mastering
+- `/analyze` audio analysis via `ffprobe`, `loudnorm`, `volumedetect`
+- `/situate` mastering recommendation endpoint
+- Cloudflare Worker bridge for `/master`, `/analyze`, `/situate`, `/transcribe`
 
-- Browser-Adminlogin findet nicht in diesem Service statt.
-- `POST /process` ist ausschließlich Service-zu-Service und benötigt `x-player-alert-service-token`.
-- Das Secret wird als `PLAYER_ALERT_SERVICE_TOKEN` in Render und im aufrufenden WebRadio-Worker identisch gesetzt.
-- Es gibt keinen direkten Passwortheader und keinen lokalen Admin-Passwortcache.
-- `GET /health` meldet nur Erreichbarkeit.
+## Not included
+- lyrics frameworks
+- UI dashboard
+- job/session orchestration
+- backup/web3/radio workers
 
-## Start
+## Render
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn src.server:app`
 
-```text
-pip install -r requirements.txt
-uvicorn src.server:app --host 0.0.0.0 --port $PORT
-```
-
-## Runtime
-
-`ffmpeg` und `ffprobe` müssen verfügbar sein. Ohne `DATABASE_URL` wird SQLite verwendet.
+## Important
+Runtime needs both `ffmpeg` and `ffprobe` available.

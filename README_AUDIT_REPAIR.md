@@ -1,0 +1,25 @@
+# WebRadio-666SOUNDsDESIGn — Hardlock Repair v1.2.0
+
+Dieses Paket ist die vollständige lokale Hardlock-Reparatur auf Basis von `FULLVERSION_AUDIT_REPAIR_v1.1.0`.
+
+## Einstieg
+
+1. `HARD_AUDIT_POLICY.md` lesen.
+2. `HARDLOCK_REPAIR_REPORT.md` lesen.
+3. `HARDLOCK_VALIDATION.json` prüfen.
+4. Lokal `npm ci` und `npm run verify` ausführen.
+5. `DEPLOYMENT_REQUIRED_CHECKS.md` vollständig abarbeiten.
+6. Änderungen atomar auf `repair-v1` übernehmen.
+7. Erst nach Live- und Geräteprüfung in `WebRadio-666SOUNDsDESIGn` mergen.
+
+## Status
+
+- Lokale Hard-Audit-Prüfung: **PASS**
+- Live-Deploymentprüfung: **BLOCKED / PENDING**
+- Produktionsbranch verändert: **NEIN**
+- Live-Deployment ausgeführt: **NEIN**
+- Secrets enthalten: **NEIN**
+
+## Harte Freigaberegel
+
+Ein Live-Deploy ist gesperrt, solange Cloudflare-Secrets, Worker-zu-Worker-Vertrag, Render-Persistenz und physische Geräteprüfungen nicht vollständig PASS sind.

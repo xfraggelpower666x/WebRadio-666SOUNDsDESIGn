@@ -13,8 +13,6 @@ RULES:
   "use strict";
   var VERSION = "phase10-stability-iphone-panel-hud-20260525";
   var lastAudibleAt = Date.now();
-  var lastRecoveryAt = 0;
-  var meterTimer = 0;
 
   // AUDIO_CORE_AUTHORITY_LOCK_V1_20260610
   // Zweck: Nur ein Recovery-Chef darf automatische Audio-Recovery auslösen.
@@ -124,6 +122,7 @@ RULES:
     if(action === "stream") return toggleMobileStream();
     if(action === "sound") return openSoundControl();
     if(action === "admin") return openAdmin();
+    if(action === "chaos") return openChaos();
     if(action === "status") return openStatus();
   }
 
@@ -193,9 +192,9 @@ RULES:
     alert("Admin overlay trigger not found.");
   }
 
-  function openDarkDancer(){
-    try{ window.open("/The-Dark-Dancer?v=" + Date.now(), "_blank"); }
-    catch(e){ location.href = "/The-Dark-Dancer?v=" + Date.now(); }
+  function openChaos(){
+    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); }
+    catch(e){ location.href = "/CHAOS_ENGINE/?v=" + Date.now(); }
   }
 
   function returnToPlayer(){
@@ -271,39 +270,10 @@ RULES:
     // SOUND is opened only by the primary action button.
   }
 
-  function installAudioRecovery(){
-    var audio = getAudio();
-    if(!audio || audio.__phase10Recovery) return;
-    audio.__phase10Recovery = true;
-
-    ["playing","timeupdate","canplay"].forEach(function(evt){
-      audio.addEventListener(evt, function(){ lastAudibleAt = Date.now(); }, true);
-    });
-
-    ["stalled","suspend","waiting","emptied"].forEach(function(evt){
-      audio.addEventListener(evt, function(){ scheduleRecovery("event:"+evt); }, true);
-    });
-
-    setInterval(function(){
-      if(!audio || audio.paused) return;
-      var silentAge = Date.now() - lastAudibleAt;
-      if(silentAge > 18000) scheduleRecovery("silent-age-"+silentAge);
-    }, 6000);
-  }
-
-  function scheduleRecovery(reason){
-    if(s666CentralAudioAuthorityActive()){
-      document.documentElement.setAttribute("data-phase10-legacy-recovery-muted", reason || "legacy-muted");
-      return;
-    }
-
-    var now = Date.now();
-    if(now - lastRecoveryAt < 10000) return;
-    lastRecoveryAt = now;
-    setTimeout(function(){ recoverAudio(reason); }, 350);
-  }
-
   async function recoverAudio(reason){
+    if(s666CentralAudioAuthorityActive() && typeof centralAudioGuardV2Recover === "function"){
+      return centralAudioGuardV2Recover(reason || "manual-recovery-handoff");
+    }
     var audio = getAudio();
     if(!audio) return;
     try{
@@ -341,25 +311,6 @@ RULES:
     }, 700);
   }
 
-  function improveMeterScaling(){
-    if(meterTimer) return;
-    meterTimer = setInterval(function(){
-      var boost = activeBoost();
-      var scale = 1 + boost * 0.13;
-      document.documentElement.style.setProperty("--phase10-meter-boost-scale", scale.toFixed(2));
-
-      qsa(".s666-mobile-meterfill").forEach(function(el){
-        var w = 28 + ((Date.now()/140 + boost*13) % 62);
-        el.style.width = Math.max(18, Math.min(96, w * scale)) + "%";
-      });
-
-      qsa("#mffEqBars i,#mffBottomBars i,.mff-bottom-bars i,.equalizer-bars i").forEach(function(el, idx){
-        var base = 18 + ((Date.now()/95 + idx*17) % 78);
-        var val = Math.max(8, Math.min(100, base * scale));
-        el.style.height = val.toFixed(0) + "%";
-      });
-    }, 220);
-  }
 
   function mountHudLogo(){
     // HARDFIX_MAINONLY_LOGO_PANEL_V2_20260525: kein dynamisches 666-HUD-Logo. Header-Logo sitzt statisch im echten Header-DOM.
@@ -652,7 +603,7 @@ RULES:
   // UI_FINETUNE_V1_20260528
   function uiFinetuneV1(){
     var v = qs("#pcVersionBadge .status-code");
-    if(v) v.textContent = (window.SMFP_VERSION&&window.SMFP_VERSION.label)||"v2026.06.30-auth-hardlock1";
+    if(v) v.textContent = "v2026.05.28-ui1";
     var logo = qs("#pcHeaderNewLogo");
     if(logo && logo.getAttribute("src") && logo.getAttribute("src").indexOf("ui-finetune-v1-20260528") === -1){
       logo.setAttribute("src", "/assets/logos/phase10-new-header-logo.png?v=ui-finetune-v1-20260528");
@@ -676,9 +627,9 @@ RULES:
     var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
     if(b) return tap(b, "parity-admin");
   }
-  function parityOpenDarkDancer(){
-    if(typeof openDarkDancer === "function") return openDarkDancer();
-    try{ window.open("/The-Dark-Dancer?v=" + Date.now(), "_blank"); } catch(e){ location.href="/The-Dark-Dancer?v="+Date.now(); }
+  function parityOpenChaos(){
+    if(typeof openChaos === "function") return openChaos();
+    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); } catch(e){ location.href="/CHAOS_ENGINE/?v="+Date.now(); }
   }
   function parityOpenStatus(){
     if(typeof openStatus === "function") return openStatus();
@@ -726,7 +677,7 @@ RULES:
   }
   function parityUpdateVersion(){
     var v = qs("#pcVersionBadge .status-code");
-    if(v) v.textContent = (window.SMFP_VERSION&&window.SMFP_VERSION.label)||"v2026.06.30-auth-hardlock1";
+    if(v) v.textContent = "v2026.05.30-iphone-parity1";
   }
   function iphonePcParityV1(){
     parityLockViewport();
@@ -738,7 +689,7 @@ RULES:
 
   // FORCED_UI_IMPLEMENTATION_V1_20260530
   function forcedUiApplyV1(){
-    var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||"v2026.06.30-auth-hardlock1";
+    var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent="v2026.05.30-forced-ui1";
     var brand=qs("#phase10BrandLine"); if(brand){brand.textContent="";brand.hidden=true;brand.style.display="none";}
     var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530");
     if(typeof hardfixMoveLedsBehindDj==="function") hardfixMoveLedsBehindDj();
@@ -752,8 +703,6 @@ RULES:
 
   function sideMeterReactV1AudioLevel(){
     var audio = getAudio && getAudio();
-    var boost = 0;
-    try { boost = Number(activeBoost && activeBoost()) || 0; } catch(e) {}
     var rms = 0;
     var bus = window.__MeterBus;
     var busFresh = !!(bus && typeof bus.level === "number" && Date.now() - Number(bus.ts || 0) < 700);
@@ -766,13 +715,13 @@ RULES:
       });
     }
     if((!rms || rms < .015) && audio && !audio.paused){
-      sideMeterReactV1State.phase += .135 + boost * .008;
+      sideMeterReactV1State.phase += .135;
       rms = .22 + Math.abs(Math.sin(sideMeterReactV1State.phase))*.32 + Math.abs(Math.sin(sideMeterReactV1State.phase*.43+1.9))*.18 + Math.abs(Math.sin(sideMeterReactV1State.phase*1.71+.3))*.10;
     }
-    var level = Math.max(0, Math.min(1, rms * (1 + Math.min(5,boost)*.095)));
+    var level = Math.max(0, Math.min(1, rms));
     sideMeterReactV1State.smooth = sideMeterReactV1State.smooth*.64 + level*.36;
     sideMeterReactV1State.peak = Math.max(sideMeterReactV1State.smooth, sideMeterReactV1State.peak*.88);
-    return { level:sideMeterReactV1State.smooth, peak:sideMeterReactV1State.peak, boost:boost, running:!!(audio && !audio.paused) };
+    return { level:sideMeterReactV1State.smooth, peak:sideMeterReactV1State.peak, running:!!(audio && !audio.paused) };
   }
 
   function sideMeterReactV1Groups(){
@@ -800,11 +749,10 @@ RULES:
     var bars = sideMeterReactV1Bars(group, side);
     var base = m.running ? m.level : .08;
     var peak = m.running ? m.peak : .10;
-    var boostPush = Math.min(.16, m.boost*.025);
     var heights = [
-      Math.max(.20, Math.min(1.00, .38 + peak*.62 + boostPush)),
-      Math.max(.16, Math.min(.86, .26 + base*.54 + boostPush*.75)),
-      Math.max(.12, Math.min(.70, .18 + base*.42 + boostPush*.55))
+      Math.max(.20, Math.min(1.00, .38 + peak*.62)),
+      Math.max(.16, Math.min(.86, .26 + base*.54)),
+      Math.max(.12, Math.min(.70, .18 + base*.42))
     ];
     bars.forEach(function(bar,i){
       var h = Math.round(heights[i]*100);
@@ -812,7 +760,7 @@ RULES:
       bar.style.minHeight = Math.max(14,h) + "%";
       bar.style.transform = "scaleY(1)";
       bar.style.opacity = String(Math.max(.48, Math.min(1, .52 + heights[i]*.55)));
-      bar.style.filter = "saturate(" + (1.10 + m.boost*.08).toFixed(2) + ") brightness(" + (0.95 + heights[i]*.20).toFixed(2) + ")";
+      bar.style.filter = "saturate(1.10) brightness(" + (0.95 + heights[i]*.20).toFixed(2) + ")";
     });
   }
 
@@ -832,121 +780,8 @@ RULES:
   }
 
 
-  // IPHONE_AUDIO_STABILITY_GUARD_V2_20260530
-  var iphoneAudioV2State = { started:false, wanted:false, userStopAt:0, lastTime:0, lastMoveAt:Date.now(), lastRecoverAt:0, step:0 };
-
-  function iphoneAudioV2Mobile(){
-    return /iphone|ipad|ipod/i.test(navigator.userAgent || "") || (window.innerWidth <= 760 && /safari|applewebkit/i.test(navigator.userAgent || ""));
-  }
-  function iphoneAudioV2Audio(){
-    return (typeof getAudio === "function" && getAudio()) || document.querySelector("audio");
-  }
-  function iphoneAudioV2UserStopRecent(){
-    return Date.now() - iphoneAudioV2State.userStopAt < 14000;
-  }
-  function iphoneAudioV2Wanted(){
-    if(iphoneAudioV2State.wanted) return true;
-    try { if(typeof streamWanted === "function" && streamWanted()) return true; } catch(e) {}
-    var a = iphoneAudioV2Audio();
-    return !!(a && !a.paused && !a.ended);
-  }
-  function iphoneAudioV2MarkWanted(){
-    iphoneAudioV2State.wanted = true;
-    document.documentElement.setAttribute("data-iphone-audio-wanted","1");
-  }
-  function iphoneAudioV2MarkStop(){
-    iphoneAudioV2State.userStopAt = Date.now();
-    iphoneAudioV2State.wanted = false;
-    document.documentElement.setAttribute("data-iphone-audio-wanted","0");
-  }
-  function iphoneAudioV2TryPlay(reason){
-    var a = iphoneAudioV2Audio(); if(!a) return;
-    iphoneAudioV2State.lastRecoverAt = Date.now();
-    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "play");
-    try {
-      var p = a.play();
-      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
-    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
-  }
-  function iphoneAudioV2LoadPlay(reason){
-    var a = iphoneAudioV2Audio(); if(!a) return;
-    iphoneAudioV2State.lastRecoverAt = Date.now();
-    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "loadplay");
-    try {
-      a.load();
-      var p = a.play();
-      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
-    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
-  }
-  function iphoneAudioV2RebindMain(reason){
-    var a = iphoneAudioV2Audio(); if(!a) return;
-    iphoneAudioV2State.lastRecoverAt = Date.now();
-    document.documentElement.setAttribute("data-iphone-audio-v2-recover", reason || "main");
-    try {
-      var src = String(a.currentSrc || a.getAttribute("src") || "");
-      if(/fallback-stream|backup/i.test(src)) {
-        a.pause();
-        a.setAttribute("src", "/stream?t=" + Date.now());
-        document.documentElement.setAttribute("data-phase10-stream-target","main");
-      }
-      a.load();
-      var p = a.play();
-      if(p && p.catch) p.catch(function(err){ document.documentElement.setAttribute("data-iphone-audio-v2-error", String(err && err.message || err).slice(0,120)); });
-    } catch(e) { document.documentElement.setAttribute("data-iphone-audio-v2-error", String(e && e.message || e).slice(0,120)); }
-  }
-  function iphoneAudioV2Recover(reason){
-    if(s666CentralAudioAuthorityActive()){
-      document.documentElement.setAttribute("data-iphone-audio-v2-muted", reason || "central-authority-active");
-      return;
-    }
-    if(!iphoneAudioV2Mobile()) return;
-    if(!iphoneAudioV2Wanted()) return;
-    if(iphoneAudioV2UserStopRecent()) return;
-    if(Date.now() - iphoneAudioV2State.lastRecoverAt < 9000) return;
-    iphoneAudioV2State.step = (iphoneAudioV2State.step + 1) % 3;
-    if(iphoneAudioV2State.step === 0) return iphoneAudioV2TryPlay(reason + "-play");
-    if(iphoneAudioV2State.step === 1) return iphoneAudioV2LoadPlay(reason + "-loadplay");
-    return iphoneAudioV2RebindMain(reason + "-main");
-  }
-  function iphoneAudioV2Tick(){
-    if(!iphoneAudioV2Mobile()) return;
-    var a = iphoneAudioV2Audio(); if(!a) return;
-    var now = Date.now();
-    var ct = Number(a.currentTime || 0);
-    var moved = Math.abs(ct - iphoneAudioV2State.lastTime) > 0.08;
-    if(!a.paused && moved) {
-      iphoneAudioV2State.lastMoveAt = now;
-      iphoneAudioV2State.step = 0;
-    }
-    iphoneAudioV2State.lastTime = ct;
-    var stalled = now - iphoneAudioV2State.lastMoveAt;
-    document.documentElement.setAttribute("data-iphone-audio-stability-v2","active");
-    document.documentElement.setAttribute("data-iphone-audio-v2-ready", String(a.readyState || 0));
-    document.documentElement.setAttribute("data-iphone-audio-v2-stall-ms", String(stalled));
-    if(!iphoneAudioV2Wanted() || iphoneAudioV2UserStopRecent()) return;
-    if(a.paused && stalled > 4200) return iphoneAudioV2Recover("paused-wanted");
-    if(!a.paused && stalled > 14500) return iphoneAudioV2Recover("time-stall");
-    if((a.readyState || 0) < 2 && stalled > 9000) return iphoneAudioV2Recover("ready-low");
-  }
-  function startIphoneAudioStabilityGuardV2(){
-    if(iphoneAudioV2State.started) return;
-    iphoneAudioV2State.started = true;
-    var a = iphoneAudioV2Audio();
-    if(a) {
-      ["play","playing","canplay","canplaythrough"].forEach(function(ev){ a.addEventListener(ev,function(){ iphoneAudioV2MarkWanted(); iphoneAudioV2State.lastMoveAt=Date.now(); },true); });
-      ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){ a.addEventListener(ev,function(){ setTimeout(function(){ iphoneAudioV2Recover(ev); },6500); },true); });
-    }
-    qsa("button,.control-btn").forEach(function(btn){
-      var txt = String(btn.textContent || btn.getAttribute("aria-label") || "").toLowerCase();
-      if(/play/.test(txt)) btn.addEventListener("click", iphoneAudioV2MarkWanted, true);
-      if(/stop/.test(txt)) btn.addEventListener("click", iphoneAudioV2MarkStop, true);
-    });
-    ["visibilitychange","pageshow","focus","online"].forEach(function(ev){ window.addEventListener(ev,function(){ setTimeout(function(){ iphoneAudioV2Recover(ev); },1200); },true); });
-    setInterval(iphoneAudioV2Tick,2500);
-    setTimeout(iphoneAudioV2Tick,1600);
-    document.documentElement.setAttribute("data-iphone-audio-stability-v2","installed");
-  }
-
+  // Legacy iPhone recovery guard removed by HARDLOCK v1.2.0.
+  // CentralAudioStabilityGuardV2 is the single automatic recovery authority.
 
   // CENTRAL_AUDIO_STABILITY_GUARD_V2_20260530
   var centralAudioGuardV2 = {
@@ -1251,16 +1086,13 @@ RULES:
     mountMobilePanelRow();
     mountBottomSafe();
     bindEqTriggers();
-    installAudioRecovery();
     installAudioFocusGuard();
     normalizeBoostStatusTooltip();
-    improveMeterScaling();
     // Stable maintenance only: do not relocate or delete layout nodes after first render.
     setInterval(function(){
       mountMobilePanelRow();
       bindEqTriggers();
-      installAudioRecovery();
-      installAudioFocusGuard();
+        installAudioFocusGuard();
       normalizeBoostStatusTooltip();
       hardfixInstallManualBackupFlag();
     }, 5000);

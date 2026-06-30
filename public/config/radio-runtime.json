@@ -25,17 +25,17 @@
     "https://idjstream.app/cp/get_info.php?p=8686"
   ],
   "metadataUrl": "/api/nowplaying",
+  "chaosEngineUrl": "/CHAOS_ENGINE/",
   "darkDancerUrl": "/The-Dark-Dancer",
-  "adminAuthVerifyUrl": "/api/admin/auth-check",
-  "adminAuthLoginUrl": "/api/admin/login",
+  "adminAuthVerifyUrl": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
+  "adminAuthLoginUrl": "https://666-system-pw.666soundsdesign-broadcaster.com/login",
   "broadcastStatusUrl": "/api/player-alert/status",
   "discordStatusUrl": "/api/discord/status",
   "sunoWorkerUrl": "https://666-suno-system.666soundsdesign-broadcaster.com",
   "chaosAiWorkerUrl": "https://666-chaos-ai-track-system.666soundsdesign-broadcaster.com",
-  "cacheBurst": "auth-hardlock-repair-v1-1-0-20260630",
+  "cacheBurst": "hardlock-repair-v1-2-0-20260625",
   "version": 3,
-  "updatedAt": "2026-06-30T04:14:02.000Z",
-  "updatedBy": "auth-hardlock-repair-v1.1.0",
-  "notes": "Canonical runtime config. Browser authentication is same-origin through /api/admin/login and /api/admin/auth-check. Password/Auth Worker URLs and secrets remain Worker-side only.",
-  "adminServiceHealthUrl": "/api/admin/services/health"
+  "updatedAt": "2026-06-25T00:00:00.000Z",
+  "updatedBy": "hardlock-repair-v1.2.0",
+  "notes": "Canonical non-secret runtime config. Protected browser actions use /api/admin/login and the shared Bearer client. Secrets and shared AUTH_SECRET values remain Worker environment configuration."
 }

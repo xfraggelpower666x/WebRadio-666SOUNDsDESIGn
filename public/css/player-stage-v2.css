@@ -88,7 +88,7 @@
     order:5!important;
     flex:0 0 40px!important;
     height:40px!important;
-    min-height:40px!important;
+    min-height:44px!important;
     max-height:40px!important;
     margin:0 22px!important;
     margin-top:0!important;
@@ -453,7 +453,7 @@
 
   .s666-side-status-grid{
     display:grid!important;
-    grid-template-columns:1fr 1fr!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:7px!important;
   }
 
@@ -585,7 +585,7 @@
   #s666StageMobileActions{
     width:100%!important;
     display:grid!important;
-    grid-template-columns:1fr 1fr!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:7px!important;
     margin-top:7px!important;
     pointer-events:auto!important;
@@ -608,16 +608,16 @@
 
 
 /* ==========================================================
-   INTERIOR_LAYOUT_V5 — EQ / NOW PLAYING / TICKER / SIDE CONTENT
-   Existing elements only. No new visual layer.
+   INTERIOR_LAYOUT_V6 — RESPONSIVE EQ / NOW PLAYING / TICKER
+   Final override only; no DOM reparenting and no fixed-height takeover.
    ========================================================== */
 @media (min-width:761px){
   body .frame-stage .player-shell>.visualizer{
-    flex:1 1 320px!important;
-    min-height:220px!important;
+    flex:1 1 clamp(150px,31vh,330px)!important;
+    min-height:clamp(140px,24vh,220px)!important;
     max-height:none!important;
     height:auto!important;
-    padding:8px 15px 10px!important;
+    padding:clamp(5px,.8vh,8px) 15px clamp(6px,1vh,10px)!important;
     display:flex!important;
     flex-direction:column!important;
     overflow:hidden!important;
@@ -625,8 +625,8 @@
   body .frame-stage .player-shell>.visualizer .eq-bars{
     flex:1 1 auto!important;
     width:100%!important;
-    height:100%!important;
-    min-height:198px!important;
+    height:auto!important;
+    min-height:clamp(118px,20vh,198px)!important;
     max-height:none!important;
     margin-top:5px!important;
     align-items:stretch!important;
@@ -634,32 +634,31 @@
   }
   body .frame-stage .player-shell>.visualizer .eq-bar-slot{
     height:100%!important;
-    min-height:100%!important;
+    min-height:0!important;
     align-self:stretch!important;
   }
-  body .frame-stage .player-shell>.visualizer .eq-bar-fill{
-    min-height:22px!important;
-  }
+  body .frame-stage .player-shell>.visualizer .eq-bar-fill{min-height:18px!important;}
 
   body .frame-stage .player-shell>.now-playing{
-    flex:0 0 clamp(208px,22.5vh,242px)!important;
-    height:clamp(208px,22.5vh,242px)!important;
-    min-height:clamp(208px,22.5vh,242px)!important;
-    max-height:clamp(208px,22.5vh,242px)!important;
-    grid-template-columns:clamp(148px,12vw,182px) minmax(0,1fr) auto!important;
-    grid-template-rows:auto 54px 38px!important;
-    padding:12px 15px!important;
-    column-gap:15px!important;
-    row-gap:8px!important;
+    flex:0 1 clamp(156px,20vh,220px)!important;
+    height:clamp(156px,20vh,220px)!important;
+    min-height:clamp(156px,20vh,220px)!important;
+    max-height:clamp(156px,20vh,220px)!important;
+    grid-template-columns:clamp(112px,11vw,168px) minmax(0,1fr) auto!important;
+    grid-template-rows:minmax(0,1fr) clamp(44px,5.4vh,52px) clamp(34px,4.2vh,40px)!important;
+    padding:clamp(8px,1.2vh,12px) 15px!important;
+    column-gap:clamp(9px,1.2vw,15px)!important;
+    row-gap:clamp(5px,.8vh,8px)!important;
     overflow:hidden!important;
+    box-sizing:border-box!important;
   }
   body .frame-stage .player-shell .now-cover-wrap{
-    width:clamp(146px,11.6vw,178px)!important;
-    min-width:clamp(146px,11.6vw,178px)!important;
-    max-width:clamp(146px,11.6vw,178px)!important;
-    height:clamp(146px,11.6vw,178px)!important;
-    min-height:clamp(146px,11.6vw,178px)!important;
-    max-height:clamp(146px,11.6vw,178px)!important;
+    width:clamp(110px,10.8vw,166px)!important;
+    min-width:clamp(110px,10.8vw,166px)!important;
+    max-width:clamp(110px,10.8vw,166px)!important;
+    height:clamp(110px,10.8vw,166px)!important;
+    min-height:clamp(110px,10.8vw,166px)!important;
+    max-height:clamp(110px,10.8vw,166px)!important;
     overflow:hidden!important;
   }
   body .frame-stage .player-shell .now-playing .ticker-window{
@@ -668,9 +667,9 @@
     width:100%!important;
     max-width:100%!important;
     min-width:0!important;
-    height:54px!important;
-    min-height:54px!important;
-    max-height:54px!important;
+    height:clamp(44px,5.4vh,52px)!important;
+    min-height:clamp(44px,5.4vh,52px)!important;
+    max-height:clamp(44px,5.4vh,52px)!important;
     display:block!important;
     padding:0 12px!important;
     box-sizing:border-box!important;
@@ -684,15 +683,15 @@
     width:max-content!important;
     min-width:0!important;
     max-width:none!important;
-    height:52px!important;
-    line-height:52px!important;
+    height:100%!important;
+    line-height:clamp(44px,5.4vh,52px)!important;
     margin:0!important;
     padding:0!important;
     white-space:nowrap!important;
     animation:none!important;
     transform:translateX(0)!important;
     will-change:transform!important;
-    font-size:clamp(16px,1.28vw,21px)!important;
+    font-size:clamp(15px,1.2vw,20px)!important;
     color:#16fff3!important;
     text-shadow:0 0 10px rgba(22,255,243,.56)!important;
   }
@@ -702,47 +701,69 @@
     grid-template-rows:auto minmax(0,1fr) auto!important;
     align-items:center!important;
     justify-items:stretch!important;
-    row-gap:7px!important;
-    padding:12px 13px!important;
+    row-gap:clamp(4px,.7vh,7px)!important;
+    padding:clamp(7px,1vh,12px) 13px!important;
+    min-height:0!important;
   }
   body .frame-stage .pc-addon-reactor-core,
   body .frame-stage .pc-addon-radar,
   body .frame-stage .pc-addon-phase{
-    width:min(94%,196px)!important;
+    width:min(88%,clamp(106px,15vh,180px))!important;
     height:auto!important;
     max-height:100%!important;
     aspect-ratio:1/1!important;
     margin:auto!important;
-    align-self:center!important;
-    justify-self:center!important;
   }
   body .frame-stage .pc-addon-waveform,
   body .frame-stage .pc-addon-beatline,
   body .frame-stage .pc-addon-vu-grid{
     width:100%!important;
-    min-height:128px!important;
+    min-height:clamp(72px,13vh,128px)!important;
     height:100%!important;
     max-height:none!important;
     margin:auto 0!important;
-    align-self:stretch!important;
   }
   body .frame-stage .pc-addon-beat{
-    width:100%!important;
-    height:100%!important;
-    min-height:0!important;
-    display:flex!important;
-    flex-direction:column!important;
-    justify-content:space-between!important;
+    width:100%!important;height:100%!important;min-height:0!important;
+    display:flex!important;flex-direction:column!important;justify-content:space-between!important;
   }
 }
+
 @media (min-width:761px) and (max-height:820px){
   body .frame-stage .player-shell>.now-playing{
-    flex-basis:188px!important;height:188px!important;min-height:188px!important;max-height:188px!important;
+    flex-basis:clamp(148px,21vh,176px)!important;
+    height:clamp(148px,21vh,176px)!important;
+    min-height:clamp(148px,21vh,176px)!important;
+    max-height:clamp(148px,21vh,176px)!important;
   }
   body .frame-stage .player-shell .now-cover-wrap{
-    width:136px!important;min-width:136px!important;max-width:136px!important;
-    height:136px!important;min-height:136px!important;max-height:136px!important;
+    width:clamp(108px,16vh,132px)!important;min-width:clamp(108px,16vh,132px)!important;max-width:clamp(108px,16vh,132px)!important;
+    height:clamp(108px,16vh,132px)!important;min-height:clamp(108px,16vh,132px)!important;max-height:clamp(108px,16vh,132px)!important;
   }
-  body .frame-stage .player-shell>.visualizer{min-height:190px!important;}
-  body .frame-stage .player-shell>.visualizer .eq-bars{min-height:170px!important;}
+  body .frame-stage .player-shell>.visualizer{min-height:clamp(128px,22vh,176px)!important;}
+  body .frame-stage .player-shell>.visualizer .eq-bars{min-height:clamp(106px,18vh,154px)!important;}
+}
+
+@media (min-width:761px) and (max-height:720px){
+  body .frame-stage .player-shell{gap:3px!important;}
+  body .frame-stage .player-shell>.now-playing{
+    flex-basis:142px!important;height:142px!important;min-height:142px!important;max-height:142px!important;
+    padding:7px 12px!important;row-gap:4px!important;
+  }
+  body .frame-stage .player-shell .now-cover-wrap{
+    width:104px!important;min-width:104px!important;max-width:104px!important;
+    height:104px!important;min-height:104px!important;max-height:104px!important;
+  }
+  body .frame-stage .player-shell>.visualizer{min-height:118px!important;padding-top:4px!important;padding-bottom:4px!important;}
+  body .frame-stage .player-shell>.visualizer .eq-bars{min-height:96px!important;}
+  body .frame-stage .pc-side-addon .pc-addon-module{padding:6px 10px!important;row-gap:3px!important;}
+  body .frame-stage .pc-addon-waveform,
+  body .frame-stage .pc-addon-beatline,
+  body .frame-stage .pc-addon-vu-grid{min-height:62px!important;}
+}
+
+@media (max-width:760px){
+  #s666StageMobileActions{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  #s666MessageActionSlot,#s666MobileExtraRow{display:flex!important;flex-wrap:wrap!important;gap:7px!important;align-items:stretch!important;}
+  #s666MessageControlButton,#s666HistoryControlButton{min-height:44px!important;flex:1 1 calc(50% - 4px)!important;justify-content:center!important;}
 }

@@ -1,51 +1,60 @@
 {
-  "name": "WebRadio-666SOUNDsDESIGn FULLVERSION AUTH HARDLOCK REPAIR",
-  "version": "1.1.0",
-  "releaseDate": "2026-06-30",
-  "releaseFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_AUTH_HARDLOCK_REPAIR_v1_1_0",
+  "name": "WebRadio-666SOUNDsDESIGn FULLVERSION HARDLOCK REPAIR",
+  "version": "1.2.0",
+  "releaseDate": "2026-06-25",
+  "releaseFolder": "WebRadio-666SOUNDsDESIGn_HARDLOCK_REPAIR_v1_2_0",
   "type": "complete-repository-release",
   "uploadMode": "scriptable-folder-upload",
   "packaging": {
-    "repoRootAtArchiveRoot": true,
+    "singleTopLevelDirectory": true,
+    "repoRootDirectlyInsideTopLevelDirectory": true,
     "nestedZipFiles": false,
-    "generatedPythonBytecode": false,
-    "gitMetadataIncluded": false,
-    "wranglerLocalStateIncluded": false
+    "generatedPythonBytecode": false
   },
+  "integratedPaths": [
+    "external-workers/666-chaos-ai-track-system/",
+    "external-workers/666-suno-system/",
+    "Render/666SOUNDsDESIGn-Alert-Service-Renderer/",
+    "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
+    "Scriptable/Scripts/"
+  ],
   "repairState": {
-    "canonicalPasswordWorkerLogin": true,
-    "canonicalAuthWorkerVerify": true,
-    "sameOriginBrowserBroker": true,
-    "singleBrowserAuthClient": true,
-    "sessionOnlyBearerToken": true,
-    "strictAdminFailClosed": true,
-    "legacyPasswordHeadersRemoved": true,
-    "discordWriteStrictAdmin": true,
-    "skipStrictAdmin": true,
-    "configStrictAdmin": true,
-    "versionAuthorityRepaired": true,
-    "testsIncluded": true
+    "runtimeBlockersRepaired": true,
+    "skipApiRestored": true,
+    "chaosDispatcherConnected": true,
+    "staticAssetsBindingConfigured": true,
+    "runtimeRadioConfigConnected": true,
+    "playerAlertWriteAuthenticationAdded": true,
+    "api404ContractRepaired": true,
+    "debugExposureReduced": true,
+    "testsIncluded": true,
+    "messengerSingleEngine": true,
+    "sharedAdminAuth": true,
+    "discordSecondGateRemoved": true,
+    "skipControllerConsolidated": true,
+    "responsiveGeometryV6": true,
+    "streamFailoverBudgetAdded": true,
+    "renderPersistenceGateAdded": true,
+    "versionConsistencyRepaired": true,
+    "hardAuditPolicyActive": true,
+    "strictAdminAuthorization": true,
+    "singleAuthAuthority": true,
+    "legacyAdminAuthRemoved": true,
+    "preBoostMeterAuthority": true,
+    "syntheticMeterRemoved": true,
+    "privateRateIdentity": true,
+    "senderIdRateBypassBlocked": true,
+    "hardlockTestsIncluded": true
   },
   "safety": {
     "sourceSystemsPreserved": true,
     "secretsIncluded": false,
     "destructiveSimplification": false,
-    "deploymentSecretsRequired": true
+    "deploymentSecretsRequired": true,
+    "paidTestPreflightGate": true,
+    "liveDeploymentPerformed": false
   },
   "branchRecovery": true,
   "atomicScriptableUpload": true,
-  "assetsDirectory": "public",
-  "sourceArchive": {
-    "name": "666WebRadio-666SOUNDsDESIGn.zip",
-    "sha256": "0bbcbb292738361162f5e6b945640af5d8a03eb5539fd96182b43a7ef9893271"
-  },
-  "verification": {
-    "releaseCheck": "PASS",
-    "tests": "27/27 PASS",
-    "javascriptSyntax": "80/80 PASS",
-    "pythonSyntax": "16/16 PASS",
-    "npmVulnerabilities": 0,
-    "liveE2ERequired": true
-  },
-  "finalRepoFiles": 651
+  "assetsDirectory": "public"
 }

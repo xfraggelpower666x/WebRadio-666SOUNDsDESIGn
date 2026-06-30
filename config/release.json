@@ -1,0 +1,9 @@
+{
+  "version": "1.2.0",
+  "release": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
+  "frontendVersion": "v2026.06.25-hardlock1",
+  "build": "smfp-v2026-06-25-hardlock1",
+  "date": "2026-06-25",
+  "baselineRelease": "FULLVERSION_AUDIT_REPAIR_v1.1.0",
+  "baselineCommit": "e6aa911e71d6b28c616fed44683e93ea6d5a2a9a"
+}

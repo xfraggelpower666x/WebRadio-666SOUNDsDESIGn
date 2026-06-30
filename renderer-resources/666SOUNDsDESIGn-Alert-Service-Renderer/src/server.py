@@ -18,6 +18,7 @@ from starlette.background import BackgroundTask
 
 
 APP_NAME = "666soundsdesign-audio-player-alert-backend"
+MASTER_ADMIN_PASSWORD = os.getenv("MASTER_ADMIN_PASSWORD", "").strip()
 PLAYER_ALERT_SERVICE_TOKEN = os.getenv("PLAYER_ALERT_SERVICE_TOKEN", "").strip()
 PLAYER_ALERT_TTL_SECONDS = max(30, int(os.getenv("PLAYER_ALERT_TTL_SECONDS", "900")))
 PLAYER_ALERT_MAX_HISTORY = max(1, min(200, int(os.getenv("PLAYER_ALERT_MAX_HISTORY", "30"))))
@@ -25,6 +26,7 @@ PLAYER_ALERT_RATE_SECONDS = max(1, int(os.getenv("PLAYER_ALERT_RATE_SECONDS", "1
 MAX_UPLOAD_BYTES = max(1, int(os.getenv("MAX_UPLOAD_MB", "64"))) * 1024 * 1024
 FFMPEG_TIMEOUT_SECONDS = max(10, int(os.getenv("FFMPEG_TIMEOUT_SECONDS", "180")))
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+REQUIRE_SHARED_PERSISTENCE = os.getenv("REQUIRE_SHARED_PERSISTENCE", "true").strip().lower() in {"1", "true", "yes", "on"}
 SQLITE_PATH = Path(os.getenv("PLAYER_ALERT_DB_PATH", "./data/player-alerts.sqlite3"))
 
 app = FastAPI(title=APP_NAME)
@@ -53,6 +55,14 @@ def safe_filename(name: str) -> str:
     stem = Path(name or "upload.mp3").stem
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "_", stem).strip("._")
     return (cleaned or "upload")[:120]
+
+
+def check_admin(request: Request) -> None:
+    if not MASTER_ADMIN_PASSWORD:
+        raise HTTPException(status_code=503, detail="admin_auth_not_configured")
+    provided = request.headers.get("x-admin-password", "").strip()
+    if not secrets.compare_digest(provided, MASTER_ADMIN_PASSWORD):
+        raise HTTPException(status_code=401, detail="unauthorized")
 
 
 def check_player_alert_service(request: Request) -> None:
@@ -117,11 +127,18 @@ def init_database() -> None:
     """
     index_statement = "CREATE INDEX IF NOT EXISTS idx_player_alerts_timestamp ON player_alerts(timestamp DESC)"
     sender_index = "CREATE INDEX IF NOT EXISTS idx_player_alerts_sender_timestamp ON player_alerts(sender_id, timestamp DESC)"
+    rate_statement = """
+        CREATE TABLE IF NOT EXISTS player_alert_rate_limits (
+            rate_key TEXT PRIMARY KEY,
+            timestamp BIGINT NOT NULL
+        )
+    """
     with _db_lock, db_connection() as connection:
         cursor = connection.cursor()
         cursor.execute(statement)
         cursor.execute(index_statement)
         cursor.execute(sender_index)
+        cursor.execute(rate_statement)
 
 
 def clean_alert_text(value: str | None, limit: int = 240) -> str:
@@ -165,17 +182,26 @@ def alert_history(limit: int) -> list[dict]:
         return [row_to_dict(cursor, row) for row in cursor.fetchall()]
 
 
-def latest_sender_timestamp(sender_id: str) -> int:
-    query = sql_placeholders("SELECT timestamp FROM player_alerts WHERE sender_id = ? ORDER BY timestamp DESC LIMIT 1")
+def latest_rate_timestamp(rate_key: str) -> int:
+    query = sql_placeholders("SELECT timestamp FROM player_alert_rate_limits WHERE rate_key = ? LIMIT 1")
     with _db_lock, db_connection() as connection:
         cursor = connection.cursor()
-        cursor.execute(query, (sender_id,))
+        cursor.execute(query, (rate_key,))
         row = cursor.fetchone()
         if not row:
             return 0
         if isinstance(row, sqlite3.Row):
             return int(row["timestamp"] or 0)
         return int(row[0] or 0)
+
+
+def record_rate_timestamp(rate_key: str, timestamp: int) -> None:
+    delete_query = sql_placeholders("DELETE FROM player_alert_rate_limits WHERE rate_key = ?")
+    insert_query = sql_placeholders("INSERT INTO player_alert_rate_limits (rate_key, timestamp) VALUES (?, ?)")
+    with _db_lock, db_connection() as connection:
+        cursor = connection.cursor()
+        cursor.execute(delete_query, (rate_key,))
+        cursor.execute(insert_query, (rate_key, timestamp))
 
 
 def public_alert(alert: dict | None) -> dict | None:
@@ -213,14 +239,20 @@ def health():
         init_database()
     except Exception:
         database_ok = False
+    shared_persistence = database_backend() == "postgres"
+    release_ready = bool(database_ok and PLAYER_ALERT_SERVICE_TOKEN and (shared_persistence or not REQUIRE_SHARED_PERSISTENCE))
     return {
         "ok": database_ok,
         "service": APP_NAME,
+        "version": "1.2.0-hardlock-repair",
         "ffmpeg_found": bool(which("ffmpeg")),
         "ffprobe_found": bool(which("ffprobe")),
         "database_backend": database_backend(),
         "database_ok": database_ok,
+        "shared_persistence": shared_persistence,
+        "shared_persistence_required": REQUIRE_SHARED_PERSISTENCE,
         "player_alert_write_auth_configured": bool(PLAYER_ALERT_SERVICE_TOKEN),
+        "release_ready": release_ready,
     }
 
 
@@ -230,7 +262,7 @@ async def process_audio(
     file: UploadFile = File(...),
     mode: str = Form(default="process"),
 ):
-    check_player_alert_service(request)
+    check_admin(request)
     ffmpeg_bin = which("ffmpeg")
     if not ffmpeg_bin:
         raise HTTPException(status_code=503, detail="ffmpeg_not_available")
@@ -304,11 +336,13 @@ class PlayerAlertPayload(BaseModel):
     id: str | None = None
     clientId: str | None = None
     senderId: str | None = None
+    rateKey: str | None = None
     username: str | None = None
     message: str
     timestamp: int | None = None
     createdAt: str | None = None
     version: str | None = None
+    source: str | None = None
 
 
 @app.get("/api/player-alert/status")
@@ -320,6 +354,9 @@ def player_alert_status():
         "backend": database_backend(),
         "storage_scope": "shared-postgres" if database_backend() == "postgres" else "local-sqlite",
         "shared_persistence": database_backend() == "postgres",
+        "shared_persistence_required": REQUIRE_SHARED_PERSISTENCE,
+        "release_ready": bool(PLAYER_ALERT_SERVICE_TOKEN and (database_backend() == "postgres" or not REQUIRE_SHARED_PERSISTENCE)),
+        "rate_identity": "worker-provided-sha256",
         "ttl_seconds": PLAYER_ALERT_TTL_SECONDS,
         "history_size": len(alert_history(PLAYER_ALERT_MAX_HISTORY)),
         "current_active": alert_active(current),
@@ -332,12 +369,15 @@ async def player_alert_send(request: Request, payload: PlayerAlertPayload):
     check_player_alert_service(request)
     message = clean_alert_text(payload.message)
     sender = clean_alert_text(payload.senderId or payload.clientId or "anonymous", 80) or "anonymous"
+    rate_key = clean_alert_text(payload.rateKey, 96)
     username = clean_alert_text(payload.username or "Broadcast", 28) or "Broadcast"
     if not message:
         raise HTTPException(status_code=400, detail="empty_message")
+    if not rate_key or not re.fullmatch(r"[a-f0-9]{64}", rate_key):
+        raise HTTPException(status_code=400, detail="rate_key_invalid")
 
     now_ms = int(time.time() * 1000)
-    last_ms = latest_sender_timestamp(sender)
+    last_ms = latest_rate_timestamp(rate_key)
     retry_ms = (PLAYER_ALERT_RATE_SECONDS * 1000) - (now_ms - last_ms)
     if last_ms and retry_ms > 0:
         raise HTTPException(status_code=429, detail={"error": "rate_limited", "retryAfterMs": retry_ms})
@@ -352,10 +392,11 @@ async def player_alert_send(request: Request, payload: PlayerAlertPayload):
         "clientId": sender,
         "timestamp": now_ms,
         "createdAt": payload.createdAt or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "version": clean_alert_text(payload.version, 40),
-        "source": "render-backend",
+        "version": clean_alert_text(payload.version, 80),
+        "source": clean_alert_text(payload.source, 80) or "render-backend",
     }
     insert_alert(alert)
+    record_rate_timestamp(rate_key, now_ms)
     return {
         "ok": True,
         "delivered": True,

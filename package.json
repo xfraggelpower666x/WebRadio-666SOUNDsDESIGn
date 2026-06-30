@@ -1,15 +1,16 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with canonical Password-Worker/Auth-Worker admin authentication, atomic Scriptable upload and Cloudflare branch recovery compatibility.",
+  "description": "666SOUNDsDESIGn WebRadio hardlocked full source with strict admin authorization, unified auth, privacy-safe rate limiting and pre-Boost meter authority.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",
     "verify": "npm run check && npm test",
     "deploy": "npx wrangler deploy",
-    "deploy:legacy-root": "cd workers/webradio-666soundsdesign-worker && npx wrangler deploy"
+    "deploy:legacy-root": "cd workers/webradio-666soundsdesign-worker && npx wrangler deploy",
+    "verify:deployment": "node scripts/verify-deployment.mjs"
   },
   "engines": {
     "node": ">=20"

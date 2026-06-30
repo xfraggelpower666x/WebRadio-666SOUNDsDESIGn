@@ -1,0 +1,151 @@
+{
+  "release": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
+  "version": "1.2.0",
+  "baselineRelease": "FULLVERSION_AUDIT_REPAIR_v1.1.0",
+  "baselineCommit": "e6aa911e71d6b28c616fed44683e93ea6d5a2a9a",
+  "generatedAt": "2026-06-25T00:00:00+02:00",
+  "status": "LOCAL_HARD_AUDIT_PASS_DEPLOYMENT_GATE_LOCKED",
+  "hardAuditPolicy": true,
+  "paidTestPreflightGate": "LOCKED_UNTIL_LIVE_CHECKS_PASS",
+  "localChecks": {
+    "npmRunVerify": "PASS",
+    "nodeTests": {
+      "passed": 34,
+      "failed": 0
+    },
+    "javascriptSyntaxFiles": 111,
+    "pythonAstFiles": 16,
+    "pythonAstErrors": 0,
+    "rootPublicMirrorPairs": 54,
+    "nestedZipFiles": 0,
+    "pythonBytecodeFiles": 0,
+    "workerBytes": 60183,
+    "embeddedBase64Assets": false,
+    "npmKnownVulnerabilities": 0,
+    "confirmedSecretSignatures": 0,
+    "repositoryFiles": 729,
+    "inventoryEntries": 727,
+    "checksumEntries": 728
+  },
+  "hardlockFlags": {
+    "strictAdminAuthorization": true,
+    "singleAuthAuthority": true,
+    "pwAuthContractValidated": true,
+    "preBoostMeterAuthority": true,
+    "singleAutomaticAudioRecoveryOwner": true,
+    "privateRateIdentity": true,
+    "senderIdRateBypassBlocked": true,
+    "publicRateKeyRemoved": true,
+    "messengerSingleEngine": true,
+    "rootPublicParity": true
+  },
+  "checks": [
+    {
+      "id": "BASELINE_VERIFY",
+      "status": "PASS",
+      "detail": "Baseline archive verified before hardlock work."
+    },
+    {
+      "id": "RELEASE_CHECK",
+      "status": "PASS",
+      "detail": "scripts/check-release.mjs completed."
+    },
+    {
+      "id": "NODE_TESTS",
+      "status": "PASS",
+      "detail": "34 passed, 0 failed."
+    },
+    {
+      "id": "JAVASCRIPT_SYNTAX",
+      "status": "PASS",
+      "detail": "111 JavaScript/MJS files parsed by node --check."
+    },
+    {
+      "id": "PYTHON_AST",
+      "status": "PASS",
+      "detail": "16 Python files parsed, 0 errors."
+    },
+    {
+      "id": "ROOT_PUBLIC_MIRRORS",
+      "status": "PASS",
+      "detail": "54 mirror pairs verified byte-identical."
+    },
+    {
+      "id": "WORKER_MIRROR",
+      "status": "PASS",
+      "detail": "Root and legacy Cloudflare Worker mirrors verified."
+    },
+    {
+      "id": "STRICT_ADMIN_AUTHORIZATION",
+      "status": "PASS",
+      "detail": "Issuer, scope, expiry and write-origin hardlock active."
+    },
+    {
+      "id": "SINGLE_AUTH_AUTHORITY",
+      "status": "PASS",
+      "detail": "Legacy redirect/header/password-cache paths removed."
+    },
+    {
+      "id": "PW_AUTH_CONTRACT_TESTS",
+      "status": "PASS",
+      "detail": "Password/Auth worker contract tests pass and fail closed."
+    },
+    {
+      "id": "PRE_BOOST_METER_AUTHORITY",
+      "status": "PASS",
+      "detail": "Synthetic and Boost-driven meter logic removed."
+    },
+    {
+      "id": "SINGLE_AUDIO_RECOVERY_OWNER",
+      "status": "PASS",
+      "detail": "CentralAudioStabilityGuardV2 remains the automatic authority."
+    },
+    {
+      "id": "PLAYER_ALERT_RATE_PRIVACY",
+      "status": "PASS",
+      "detail": "senderId rotation cannot bypass rate limit; public rateKey removed."
+    },
+    {
+      "id": "MESSENGER_CONTRACT",
+      "status": "PASS",
+      "detail": "Authoritative message payload and real response handling retained."
+    },
+    {
+      "id": "NPM_AUDIT",
+      "status": "PASS",
+      "detail": "0 known vulnerabilities."
+    },
+    {
+      "id": "SECRET_SIGNATURE_SCAN",
+      "status": "PASS",
+      "detail": "0 private-key, GitHub-token, OpenAI-key, Discord-webhook or JWT signatures."
+    },
+    {
+      "id": "NESTED_ZIP",
+      "status": "PASS",
+      "detail": "0 nested ZIP files."
+    },
+    {
+      "id": "PYTHON_BYTECODE",
+      "status": "PASS",
+      "detail": "0 .pyc or __pycache__ artifacts."
+    }
+  ],
+  "deployment": {
+    "performed": false,
+    "permittedNow": false,
+    "reason": "Live Cloudflare secrets, PW/Auth integration, Render/PostgreSQL, public streams and physical devices are not locally verifiable."
+  },
+  "requiredLiveChecks": [
+    "AUTH_SECRET equality on PW/Auth workers",
+    "ADMIN_SERVICE_TOKEN equality on WebRadio/PW/Auth workers when enabled",
+    "ADMIN_SERVICE_ORIGIN and ALLOWED_ORIGIN exact production origin",
+    "production PLAYER_ALERT_RATE_SALT",
+    "Render PostgreSQL release_ready=true",
+    "live password login on PC and iPhone",
+    "Discord and Auto-DJ Skip live test",
+    "physical PC/iPhone/Android UI acceptance",
+    "public-network stream failover test"
+  ],
+  "generatedAtUtc": "2026-06-25T19:33:06.945219+00:00"
+}
