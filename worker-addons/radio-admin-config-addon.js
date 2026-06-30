@@ -1,14 +1,18 @@
 /*
 FILE: worker-addons/radio-admin-config-addon.js
-VERSION: 1.0.1
-PURPOSE: Protected GitHub-backed radio runtime config and admin skip API.
-SECURITY: No secrets in URLs unless SKIP_ALLOW_QUERY_SECRET=true is explicitly set.
+VERSION: 1.1.0
+PURPOSE: Canonical external-auth Worker broker, protected GitHub-backed radio runtime config and admin skip API.
+SECURITY: Password only reaches the Password Worker through the same-origin login proxy. Runtime routes accept Bearer tokens only and fail closed.
 */
 
 const DEFAULT_CONFIG_PATH = "config/radio-runtime.json";
 const DEFAULT_BACKUP_DIR = "config/backups";
 const RADIO_CONFIG_KV_KEY = "radio-runtime:current";
 const DEFAULT_TIMEOUT_MS = 8000;
+const DEFAULT_AUTH_LOGIN_URL = "https://666-system-pw.666soundsdesign-broadcaster.com/login";
+const DEFAULT_AUTH_VERIFY_URL = "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
+const EXPECTED_ISSUER = "666-system-pw";
+const EXPECTED_SCOPE = "admin";
 
 function adminJson(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -31,33 +35,47 @@ function cleanText(value, max = 240) {
     .slice(0, max);
 }
 
-function getCookie(request, name) {
-  const raw = request.headers.get("cookie") || "";
-  for (const part of raw.split(";").map(value => value.trim())) {
-    const eq = part.indexOf("=");
-    if (eq > -1 && part.slice(0, eq) === name) return decodeURIComponent(part.slice(eq + 1));
-  }
-  return "";
-}
-
 function bearerToken(request) {
   const value = String(request.headers.get("authorization") || "").trim();
   return value.toLowerCase().startsWith("bearer ") ? value.slice(7).trim() : "";
 }
 
-function isSameOrigin(request) {
-  const requestOrigin = new URL(request.url).origin;
-  const origin = String(request.headers.get("origin") || "").trim();
+function constantTimeEqual(left, right) {
+  const a = new TextEncoder().encode(String(left || ""));
+  const b = new TextEncoder().encode(String(right || ""));
+  const length = Math.max(a.length, b.length);
+  let diff = a.length ^ b.length;
+  for (let index = 0; index < length; index += 1) diff |= (a[index] || 0) ^ (b[index] || 0);
+  return diff === 0;
+}
+
+function expectedBrowserOrigin(request, env) {
+  return String(env.ADMIN_SERVICE_ORIGIN || new URL(request.url).origin).replace(/\/$/, "");
+}
+
+function requestOriginEvidence(request) {
+  const origin = String(request.headers.get("origin") || "").trim().replace(/\/$/, "");
   const referer = String(request.headers.get("referer") || "").trim();
-  if (origin && origin !== requestOrigin) return false;
+  let refererOrigin = "";
   if (referer) {
-    try {
-      if (new URL(referer).origin !== requestOrigin) return false;
-    } catch {
-      return false;
-    }
+    try { refererOrigin = new URL(referer).origin.replace(/\/$/, ""); } catch { return { origin, refererOrigin: "!invalid" }; }
   }
+  return { origin, refererOrigin };
+}
+
+function browserOriginAllowed(request, env, requireEvidence = false) {
+  const expected = expectedBrowserOrigin(request, env);
+  const evidence = requestOriginEvidence(request);
+  if (evidence.origin && evidence.origin !== expected) return false;
+  if (evidence.refererOrigin && evidence.refererOrigin !== expected) return false;
+  if (requireEvidence && !evidence.origin && !evidence.refererOrigin) return false;
   return true;
+}
+
+function serviceTokenValid(request, env) {
+  const expected = String(env.ADMIN_SERVICE_TOKEN || "");
+  const supplied = String(request.headers.get("x-service-token") || "");
+  return Boolean(expected && supplied && constantTimeEqual(expected, supplied));
 }
 
 async function fetchWithTimeout(url, init = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
@@ -70,110 +88,143 @@ async function fetchWithTimeout(url, init = {}, timeoutMs = DEFAULT_TIMEOUT_MS) 
   }
 }
 
-function verificationHeaders(request, token) {
-  const headers = new Headers({ accept: "application/json", "cache-control": "no-store" });
-  const incoming = request.headers.get("authorization");
-  if (incoming) headers.set("authorization", incoming);
-  else if (token) headers.set("authorization", `Bearer ${token}`);
-  const cookie = request.headers.get("cookie");
-  if (cookie) headers.set("cookie", cookie);
+function authServiceHeaders(env, token = "") {
+  const headers = new Headers({
+    accept: "application/json",
+    "content-type": "application/json",
+    "cache-control": "no-store",
+    origin: String(env.ADMIN_SERVICE_ORIGIN || "https://webradio.666soundsdesign-broadcaster.com"),
+    "x-service-token": String(env.ADMIN_SERVICE_TOKEN || ""),
+    "x-auth-audience": String(env.AUTH_AUDIENCE || "")
+  });
+  if (token) headers.set("authorization", `Bearer ${token}`);
   return headers;
 }
 
-async function fetchVerification(url, token, label) {
+function claimAudience(payload) {
+  if (Array.isArray(payload?.aud)) return payload.aud;
+  if (payload?.aud !== undefined) return [payload.aud];
+  if (payload?.audience !== undefined) return Array.isArray(payload.audience) ? payload.audience : [payload.audience];
+  return [];
+}
+
+function validateVerifiedPayload(payload, env) {
+  if (!payload || typeof payload !== "object") return { ok: false, error: "token_invalid" };
+  if (payload.iss !== EXPECTED_ISSUER) return { ok: false, error: "issuer_rejected" };
+  if (payload.scope !== EXPECTED_SCOPE) return { ok: false, error: "scope_rejected" };
+  const exp = Number(payload.exp);
+  if (!Number.isFinite(exp) || exp <= 0) return { ok: false, error: "token_invalid" };
+  if (exp <= Math.floor(Date.now() / 1000)) return { ok: false, error: "token_expired" };
+  const audience = String(env.AUTH_AUDIENCE || "");
+  if (!audience || !claimAudience(payload).map(String).includes(audience)) return { ok: false, error: "audience_rejected" };
+  return { ok: true, payload };
+}
+
+async function verifyTokenWithAuthWorker(token, env, source = "webradio-auth-check") {
+  const verifyUrl = String(env.ADMIN_AUTH_VERIFY_URL || DEFAULT_AUTH_VERIFY_URL);
+  if (!token) return { ok: false, error: "token_invalid" };
+  if (!env.ADMIN_SERVICE_TOKEN || !env.AUTH_AUDIENCE || !env.ADMIN_SERVICE_ORIGIN) {
+    return { ok: false, error: "service_auth_rejected" };
+  }
   try {
-    const headers = new Headers({
-      accept: "application/json",
-      "content-type": "application/json",
-      "cache-control": "no-store",
-      authorization: `Bearer ${token}`
-    });
-    const response = await fetchWithTimeout(url, {
+    const response = await fetchWithTimeout(verifyUrl, {
       method: "POST",
-      headers,
-      body: JSON.stringify({ token }),
+      headers: authServiceHeaders(env, token),
+      body: JSON.stringify({ audience: env.AUTH_AUDIENCE, source }),
       redirect: "error"
-    }, 5000);
+    }, 6000);
     const data = await response.json().catch(() => ({}));
-    return {
-      ok: response.ok && data && data.ok === true && data.valid === true,
-      status: response.status,
-      service: label,
-      payload: data?.payload || null,
-      error: response.ok ? null : cleanText(data?.error || "verification_rejected", 80)
-    };
+    if (!response.ok || data?.ok !== true || data?.valid !== true) {
+      return { ok: false, error: cleanText(data?.error || "token_invalid", 80), status: response.status };
+    }
+    return validateVerifiedPayload(data.payload, env);
   } catch (error) {
     return {
       ok: false,
-      service: label,
-      payload: null,
-      error: error?.name === "AbortError" ? "verification_timeout" : "verification_unreachable"
+      error: error?.name === "AbortError" ? "auth_verify_unreachable" : "auth_verify_unreachable"
     };
   }
 }
 
-async function verifyAdminAuth(request, env) {
-  const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
-  const token = getCookie(request, "chaos_auth") || getCookie(request, "admin_auth") || bearerToken(request);
-  if (!token) return { ok: false, service: "auth", payload: null, error: "auth_token_missing" };
-  return fetchVerification(verifyUrl, token, "auth");
+export async function verifyStrictAdminRequest(request, env, source = "webradio-strict-admin") {
+  const writeRequest = !["GET", "HEAD", "OPTIONS"].includes(request.method.toUpperCase());
+  const hasOriginEvidence = Boolean(request.headers.get("origin") || request.headers.get("referer"));
+  const serviceRequest = serviceTokenValid(request, env);
+
+  if (hasOriginEvidence && !browserOriginAllowed(request, env, true)) {
+    return { ok: false, error: "origin_rejected", status: 403 };
+  }
+  if (writeRequest && !hasOriginEvidence && !serviceRequest) {
+    return { ok: false, error: request.headers.get("x-service-token") ? "service_auth_rejected" : "origin_rejected", status: 403 };
+  }
+  if (!hasOriginEvidence && request.headers.get("x-service-token") && !serviceRequest) {
+    return { ok: false, error: "service_auth_rejected", status: 403 };
+  }
+
+  const token = bearerToken(request);
+  if (!token) return { ok: false, error: "token_invalid", status: 401 };
+  const verified = await verifyTokenWithAuthWorker(token, env, source);
+  if (!verified.ok) {
+    const status = ["issuer_rejected", "scope_rejected", "audience_rejected"].includes(verified.error) ? 403 : 401;
+    return { ...verified, status };
+  }
+  return { ok: true, payload: verified.payload, serviceRequest };
 }
 
-function verifyPwIssuedToken(auth) {
-  return {
-    ok: Boolean(auth?.ok && auth?.payload?.iss === "666-system-pw" && auth?.payload?.scope === "admin"),
-    service: "password",
-    payload: auth?.payload || null,
-    error: auth?.ok ? "pw_issuer_invalid" : "auth_invalid"
-  };
+export async function requireStrictAdmin(request, env, source = "webradio-strict-admin") {
+  const auth = await verifyStrictAdminRequest(request, env, source);
+  if (auth.ok) return { ok: true, auth };
+  return { ok: false, auth, response: adminJson({ ok: false, error: auth.error }, auth.status || 401) };
 }
-
 
 async function loginAdmin(request, env) {
-  if (!isSameOrigin(request)) return adminJson({ ok: false, error: "origin_rejected" }, 403);
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return adminJson({ ok: false, error: "invalid_json" }, 400);
+  if (!browserOriginAllowed(request, env, true)) return adminJson({ ok: false, error: "origin_rejected" }, 403);
+  if (!env.ADMIN_SERVICE_TOKEN || !env.AUTH_AUDIENCE || !env.ADMIN_SERVICE_ORIGIN) {
+    return adminJson({ ok: false, error: "service_auth_rejected" }, 503);
   }
-  const password = String(body?.password || "");
-  if (!password) return adminJson({ ok: false, error: "password_missing" }, 400);
 
-  const loginUrl = env.PW_LOGIN_URL || "https://666-system-pw.666soundsdesign-broadcaster.com/login";
+  let body;
+  try { body = await request.json(); }
+  catch { return adminJson({ ok: false, error: "invalid_json" }, 400); }
+  const password = String(body?.password || "");
+  if (!password) return adminJson({ ok: false, error: "password_rejected" }, 401);
+
+  const loginUrl = String(env.ADMIN_AUTH_LOGIN_URL || DEFAULT_AUTH_LOGIN_URL);
   try {
     const response = await fetchWithTimeout(loginUrl, {
       method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "cache-control": "no-store"
-      },
-      body: JSON.stringify({ password }),
+      headers: authServiceHeaders(env),
+      body: JSON.stringify({
+        password,
+        audience: env.AUTH_AUDIENCE,
+        source: "webradio-admin-login"
+      }),
       redirect: "error"
     }, 7000);
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data?.ok !== true || !data?.token) {
-      return adminJson({ ok: false, error: cleanText(data?.error || "login_rejected", 80) }, response.status || 401);
+      const error = cleanText(data?.error || "password_rejected", 80);
+      return adminJson({ ok: false, error: error === "password_rejected" ? error : "password_rejected" }, 401);
     }
 
-    const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
-    const verified = await fetchVerification(verifyUrl, data.token, "auth");
-    const pw = verifyPwIssuedToken(verified);
-    if (!pw.ok) return adminJson({ ok: false, error: "token_verification_failed" }, 401);
+    const verified = await verifyTokenWithAuthWorker(data.token, env, "webradio-login-token-check");
+    if (!verified.ok) return adminJson({ ok: false, error: verified.error || "token_verification_failed" }, verified.status || 401);
+
+    const expiresAt = Number(data.expiresAt ?? verified.payload.exp);
+    if (!Number.isFinite(expiresAt) || expiresAt !== Number(verified.payload.exp)) {
+      return adminJson({ ok: false, error: "token_verification_failed" }, 401);
+    }
 
     return adminJson({
       ok: true,
       token: data.token,
-      expiresAt: data.expiresAt || verified?.payload?.exp || null,
-      scope: verified?.payload?.scope || "admin",
-      issuer: verified?.payload?.iss || "666-system-pw"
+      expiresAt,
+      scope: verified.payload.scope,
+      issuer: verified.payload.iss,
+      audience: claimAudience(verified.payload)[0] || env.AUTH_AUDIENCE
     });
   } catch (error) {
-    return adminJson({
-      ok: false,
-      error: error?.name === "AbortError" ? "pw_login_timeout" : "pw_login_unreachable"
-    }, 502);
+    return adminJson({ ok: false, error: "pw_login_unreachable" }, 502);
   }
 }
 
@@ -298,21 +349,16 @@ function validatePayload(body) {
   return errors;
 }
 
-async function requireAdmin(request, env) {
-  const auth = await verifyAdminAuth(request, env);
-  if (!auth.ok) return { response: adminJson({ ok: false, error: "unauthorized" }, 401) };
+async function requireAdmin(request, env, source = "webradio-admin-config") {
+  const gate = await requireStrictAdmin(request, env, source);
+  if (gate.response) return gate;
   const missing = requiredEnv(env);
   if (missing.length) return { response: adminJson({ ok: false, error: "missing_env", missing }, 503) };
-  return { auth };
+  return gate;
 }
 
-async function requireAdminGate(request, env) {
-  if (!isSameOrigin(request)) return { response: adminJson({ ok: false, error: "origin_rejected" }, 403) };
-  const auth = await verifyAdminAuth(request, env);
-  if (!auth.ok) return { response: adminJson({ ok: false, error: "unauthorized" }, 401) };
-  const pw = verifyPwIssuedToken(auth);
-  if (!pw.ok) return { response: adminJson({ ok: false, error: "password_verification_failed" }, 403) };
-  return { auth, pw };
+async function requireAdminGate(request, env, source = "webradio-admin-action") {
+  return requireStrictAdmin(request, env, source);
 }
 
 async function writeRuntimeKv(env, config) {
@@ -451,7 +497,6 @@ function mergeConfig(oldConfig, body, backupPath, latestPath) {
 async function update(request, env) {
   const gate = await requireAdmin(request, env);
   if (gate.response) return gate.response;
-  if (!isSameOrigin(request)) return adminJson({ ok: false, error: "origin_rejected" }, 403);
 
   let body;
   try {
@@ -510,7 +555,6 @@ async function update(request, env) {
 async function rollback(request, env) {
   const gate = await requireAdmin(request, env);
   if (gate.response) return gate.response;
-  if (!isSameOrigin(request)) return adminJson({ ok: false, error: "origin_rejected" }, 403);
 
   const configPath = env.GITHUB_CONFIG_PATH || DEFAULT_CONFIG_PATH;
   const backupDir = env.GITHUB_BACKUP_DIR || DEFAULT_BACKUP_DIR;
@@ -548,7 +592,7 @@ async function rollback(request, env) {
 }
 
 async function adminSkip(request, env) {
-  const gate = await requireAdminGate(request, env);
+  const gate = await requireAdminGate(request, env, "webradio-admin-skip");
   if (gate.response) return gate.response;
   const cooldownMs = Math.max(3000, Number(env.ADMIN_SKIP_COOLDOWN_MS) || 12000);
   const cooldown = await readSkipCooldown(request);
@@ -562,17 +606,46 @@ async function adminSkip(request, env) {
   return adminJson({ ...result, cooldownMs, cooldownUntil: new Date(until).toISOString() });
 }
 
+async function adminServicesHealth(request, env) {
+  const gate = await requireStrictAdmin(request, env, "webradio-admin-services-health");
+  if (gate.response) return gate.response;
+  const serviceHeaders = authServiceHeaders(env);
+  serviceHeaders.delete("authorization");
+  async function check(label, endpoint) {
+    try {
+      const url = new URL(endpoint);
+      url.pathname = "/health";
+      url.search = "";
+      const response = await fetchWithTimeout(url.toString(), { method: "GET", headers: serviceHeaders, redirect: "error" }, 5000);
+      return { label, reachable: response.ok, status: response.status, authorization: false };
+    } catch {
+      return { label, reachable: false, status: 0, authorization: false };
+    }
+  }
+  return adminJson({
+    ok: true,
+    note: "Health proves reachability only; it is never an authorization result.",
+    passwordWorker: await check("password-worker", env.ADMIN_AUTH_LOGIN_URL || DEFAULT_AUTH_LOGIN_URL),
+    authWorker: await check("auth-worker", env.ADMIN_AUTH_VERIFY_URL || DEFAULT_AUTH_VERIFY_URL)
+  });
+}
+
 async function debugStatus(request, env) {
-  const auth = await verifyAdminAuth(request, env);
-  if (!auth.ok) return adminJson({ ok: false, error: "not_found" }, 404);
+  const gate = await requireStrictAdmin(request, env, "webradio-admin-debug");
+  if (gate.response) return adminJson({ ok: false, error: "not_found" }, 404);
   return adminJson({
     ok: true,
     service: "radio-admin-config-addon",
+    authMode: env.AUTH_MODE || "external_auth_worker",
+    issuer: EXPECTED_ISSUER,
+    audienceConfigured: Boolean(env.AUTH_AUDIENCE),
+    serviceOriginConfigured: Boolean(env.ADMIN_SERVICE_ORIGIN),
+    serviceTokenConfigured: Boolean(env.ADMIN_SERVICE_TOKEN),
     githubConfigured: requiredEnv(env).length === 0,
     configPath: env.GITHUB_CONFIG_PATH || DEFAULT_CONFIG_PATH,
     backupDir: env.GITHUB_BACKUP_DIR || DEFAULT_BACKUP_DIR,
     authVerifyConfigured: Boolean(env.ADMIN_AUTH_VERIFY_URL),
-    pwLoginConfigured: Boolean(env.PW_LOGIN_URL || "https://666-system-pw.666soundsdesign-broadcaster.com/login"),
+    pwLoginConfigured: Boolean(env.ADMIN_AUTH_LOGIN_URL),
     runtimeKvConfigured: Boolean(env.RADIO_CONFIG_KV),
     skipConfigured: skipConfig(env).configured
   });
@@ -593,19 +666,23 @@ export async function handleRadioAdminConfigAddon(request, env) {
     if (request.method !== "POST") return methodNotAllowed(["POST"]);
     return loginAdmin(request, env);
   }
-  if (url.pathname === "/api/admin/auth-check") {
+  if (url.pathname === "/api/admin/auth-check" || url.pathname === "/api/admin/gate-check") {
     if (request.method !== "GET") return methodNotAllowed(["GET"]);
-    const auth = await verifyAdminAuth(request, env);
-    return adminJson({ ok: Boolean(auth.ok) }, auth.ok ? 200 : 401);
+    const gate = await requireStrictAdmin(request, env, "webradio-admin-auth-check");
+    if (gate.response) return gate.response;
+    return adminJson({
+      ok: true,
+      valid: true,
+      authOk: true,
+      pwOk: true,
+      issuer: gate.auth.payload.iss,
+      scope: gate.auth.payload.scope,
+      exp: gate.auth.payload.exp
+    });
   }
-  if (url.pathname === "/api/admin/gate-check") {
+  if (url.pathname === "/api/admin/services/health") {
     if (request.method !== "GET") return methodNotAllowed(["GET"]);
-    const auth = await verifyAdminAuth(request, env);
-    const pw = verifyPwIssuedToken(auth);
-    return adminJson(
-      { ok: Boolean(auth.ok && pw.ok), authOk: Boolean(auth.ok), pwOk: Boolean(pw.ok) },
-      auth.ok && pw.ok ? 200 : 403
-    );
+    return adminServicesHealth(request, env);
   }
   if (url.pathname === "/api/admin/skip") {
     if (request.method !== "POST") return methodNotAllowed(["POST"]);

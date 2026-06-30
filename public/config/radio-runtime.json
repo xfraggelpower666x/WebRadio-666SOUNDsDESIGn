@@ -25,17 +25,17 @@
     "https://idjstream.app/cp/get_info.php?p=8686"
   ],
   "metadataUrl": "/api/nowplaying",
-  "chaosEngineUrl": "/CHAOS_ENGINE/",
   "darkDancerUrl": "/The-Dark-Dancer",
-  "adminAuthVerifyUrl": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
-  "adminAuthLoginUrl": "https://666-system-auth.666soundsdesign-broadcaster.com/login",
+  "adminAuthVerifyUrl": "/api/admin/auth-check",
+  "adminAuthLoginUrl": "/api/admin/login",
   "broadcastStatusUrl": "/api/player-alert/status",
   "discordStatusUrl": "/api/discord/status",
   "sunoWorkerUrl": "https://666-suno-system.666soundsdesign-broadcaster.com",
   "chaosAiWorkerUrl": "https://666-chaos-ai-track-system.666soundsdesign-broadcaster.com",
-  "cacheBurst": "fullversion-repaired-v1-0-1-20260625",
-  "version": 2,
-  "updatedAt": "2026-06-25T00:00:00.000Z",
-  "updatedBy": "complete-repair-v1.0.1",
-  "notes": "Canonical runtime config. Worker reads this asset on stream/metadata requests; optional RADIO_CONFIG_KV can activate admin changes immediately. No secrets here."
+  "cacheBurst": "auth-hardlock-repair-v1-1-0-20260630",
+  "version": 3,
+  "updatedAt": "2026-06-30T04:14:02.000Z",
+  "updatedBy": "auth-hardlock-repair-v1.1.0",
+  "notes": "Canonical runtime config. Browser authentication is same-origin through /api/admin/login and /api/admin/auth-check. Password/Auth Worker URLs and secrets remain Worker-side only.",
+  "adminServiceHealthUrl": "/api/admin/services/health"
 }

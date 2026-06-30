@@ -65,11 +65,30 @@
 /* The direct EQ/boost surfaces were replaced by the SOUND overlay. */
 #pcRealEqPanel,
 #pcBoostPanel,
+#smfpMobileEqOverlay,
+#smfpMobileEqPanel,
 #statusMsg,
 #fp-admin-button,
 #s666MsgMobileBtn,
-.s666-discord-button--msg {
+.s666-discord-button--msg,
+#playerAlertPcBox,
+#mffAlertOpen,
+#mffAlertEditorBackdrop,
+#s666PlayerAlertComposer,
+#s666PlayerAlertMobileSlot {
   display: none !important;
+}
+
+body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box,
+#mffApp #mffAlertOpen.mff-alert-open,
+#smfpMobileEqOverlay.is-open,
+#smfpMobileEqOverlay #smfpMobileEqPanel,
+body #mffAlertEditorBackdrop.mff-alert-editor-backdrop,
+body #s666PlayerAlertComposer.s666-player-alert-composer,
+#mffApp #s666PlayerAlertMobileSlot {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 @media (min-width: 761px) {
@@ -162,7 +181,7 @@
     max-height: 24px !important;
     width: calc(100% - 44px) !important;
     max-width: calc(100% - 44px) !important;
-    margin: auto auto 0 !important;
+    margin: 6px auto 0 !important;
     padding: 4px 14px !important;
   }
   body .frame-stage .player-shell > .now-playing {

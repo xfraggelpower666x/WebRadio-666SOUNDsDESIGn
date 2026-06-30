@@ -8,7 +8,6 @@
   if(window.__S666_PLAYER_STAGE_V2_CORRECTION__) return;
   window.__S666_PLAYER_STAGE_V2_CORRECTION__ = true;
 
-  var TOKEN_KEY='s666_admin_session_token_v1';
   var state={levels:{},lastLevel:0,lastPeak:0,bus:null,pending:null};
 
   function q(s,r){return (r||document).querySelector(s);}
@@ -22,13 +21,7 @@
     state.levels[key]=next;
     return next;
   }
-  function getToken(){try{return sessionStorage.getItem(TOKEN_KEY)||'';}catch(e){return '';}}
-  function setToken(v){try{if(v)sessionStorage.setItem(TOKEN_KEY,v);else sessionStorage.removeItem(TOKEN_KEY);}catch(e){}}
-  function authHeaders(extra){
-    var h=Object.assign({},extra||{}),t=getToken();
-    if(t)h.Authorization='Bearer '+t;
-    return h;
-  }
+  function adminAuth(){return window.S666AdminAuth||null;}
   function toast(text,mode){
     var el=q('#s666StageToast');
     if(!el){
@@ -80,26 +73,20 @@
   async function loginAndContinue(){
     var gate=ensureGate(),input=q('#s666StageGatePassword',gate),password=String(input.value||'');
     if(!password){toast('Admin-Passwort fehlt.','error');return;}
-    var btn=q('#s666StageGateLogin',gate);
+    var btn=q('#s666StageGateLogin',gate),auth=adminAuth();
+    if(!auth){toast('Zentraler Auth-Client fehlt.','error');return;}
     btn.disabled=true;
     btn.textContent='LOGIN...';
     try{
-      var r=await fetch('/api/admin/login',{
-        method:'POST',
-        headers:{'content-type':'application/json'},
-        credentials:'include',
-        cache:'no-store',
-        body:JSON.stringify({password:password})
-      });
-      var d=await r.json().catch(function(){return{};});
-      if(!r.ok||d.ok!==true||!d.token)throw new Error(d.error||'login_failed');
-      setToken(d.token);
+      var d=await auth.login(password);
+      password='';
+      input.value='';
+      if(!d||d.ok!==true)throw new Error((d&&d.error)||'login_failed');
       var pending=state.pending;
       closeGate();
       toast('Admin-Zugang aktiv.');
       if(typeof pending==='function')await pending();
     }catch(e){
-      setToken('');
       toast('Login abgelehnt.','error');
     }finally{
       btn.disabled=false;
@@ -108,20 +95,11 @@
   }
 
   async function gateCheck(){
-    var token=getToken();
-    if(!token)return {ok:false,authOk:false,pwOk:false};
+    var auth=adminAuth();
+    if(!auth)return {ok:false,authOk:false,pwOk:false,error:'auth_client_missing'};
     try{
-      var r=await fetch('/api/admin/gate-check?t='+Date.now(),{
-        credentials:'include',
-        cache:'no-store',
-        headers:authHeaders({'accept':'application/json'})
-      });
-      var d=await r.json().catch(function(){return{};});
-      if(!r.ok||d.ok!==true){
-        if(r.status===401||r.status===403)setToken('');
-        return {ok:false,authOk:d.authOk===true,pwOk:d.pwOk===true,data:d};
-      }
-      return {ok:true,authOk:true,pwOk:true,data:d};
+      var ok=await auth.check(true);
+      return {ok:ok,authOk:ok,pwOk:ok};
     }catch(e){
       return {ok:false,authOk:false,pwOk:false,error:e};
     }
@@ -149,10 +127,12 @@
     return withGate(async function(){
       if(!confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?'))return;
       try{
-        var r=await fetch('/api/admin/skip',{
+        var auth=adminAuth();
+        if(!auth)throw new Error('auth_client_missing');
+        var r=await auth.fetch('/api/admin/skip',{
           method:'POST',
-          headers:authHeaders({'content-type':'application/json'}),
-          credentials:'include',
+          headers:{'content-type':'application/json'},
+          credentials:'same-origin',
           body:JSON.stringify({source:'player-stage-v2-correction'}),
           cache:'no-store'
         });

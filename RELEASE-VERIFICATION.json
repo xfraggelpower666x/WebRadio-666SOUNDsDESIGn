@@ -1,9 +1,36 @@
 {
-  "release": "WebRadio-666SOUNDsDESIGn_FULLVERSION_BRANCH_RECOVERY_v1_0_2",
-  "status": "BUILT_AWAITING_TEST_EXECUTION",
-  "singleTopLevelFolder": true,
+  "release": "WebRadio-666SOUNDsDESIGn_FULLVERSION_AUTH_HARDLOCK_REPAIR_v1_1_0",
+  "version": "1.1.0",
+  "status": "LOCAL_REPAIR_AND_PACKAGE_TESTS_PASS_LIVE_E2E_REQUIRED",
+  "sourceArchiveSha256": "0bbcbb292738361162f5e6b945640af5d8a03eb5539fd96182b43a7ef9893271",
+  "finalRepoFiles": 651,
+  "deployArchiveRoot": "repo-root-direct",
   "nestedZipFiles": 0,
+  "localGitStateFiles": 0,
+  "wranglerLocalStateFiles": 0,
+  "pythonBytecodeFiles": 0,
   "publicAssetsDirectory": "public",
   "atomicScriptableUploaderVersion": "5.0.0",
-  "legacyCloudflareRoot": "workers/webradio-666soundsdesign-worker"
+  "legacyCloudflareRoot": "workers/webradio-666soundsdesign-worker",
+  "authContract": "CANONICAL_AUTH_ARCHITECTURE_v1.0.0",
+  "releaseCheck": {
+    "status": "PASS",
+    "javascriptSyntax": "80/80",
+    "pythonSyntax": "16/16",
+    "publicMirrors": "13/13",
+    "legacyWorkerMirrors": "4/4",
+    "rendererMirrors": "5/5"
+  },
+  "tests": {
+    "status": "PASS",
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "npmAudit": {
+    "status": "PASS",
+    "vulnerabilities": 0
+  },
+  "liveDeployPerformed": false,
+  "liveExternalAuthWorkersVerified": false
 }

@@ -1,9 +1,13 @@
 # Local-only example for Wrangler development.
 # Copy to .dev.vars locally. Never commit real values.
 
-# Admin authentication services
+# Canonical admin authentication broker
+ADMIN_AUTH_LOGIN_URL=https://666-system-pw.666soundsdesign-broadcaster.com/login
 ADMIN_AUTH_VERIFY_URL=https://666-system-auth.666soundsdesign-broadcaster.com/verify
-PW_VERIFY_URL=https://666-system-pw.666soundsdesign-broadcaster.com/verify
+ADMIN_SERVICE_ORIGIN=https://webradio.666soundsdesign-broadcaster.com
+AUTH_AUDIENCE=666SOUNDsDESIGn-WebRadio-Admin
+AUTH_MODE=external_auth_worker
+ADMIN_SERVICE_TOKEN=
 
 # GitHub-backed runtime configuration
 GITHUB_TOKEN=
@@ -17,7 +21,6 @@ GITHUB_BACKUP_DIR=config/backups
 PLAYER_ALERT_BACKEND_URL=https://auto-setup-render-for-backend-mp3-ess8.onrender.com
 PLAYER_ALERT_SERVICE_TOKEN=
 PLAYER_ALERT_WRITE_TOKEN=
-# Optional for trusted non-browser writers. Browser SEND may use the same-origin admin session.
 
 # Debug endpoints remain hidden unless a token is configured.
 DEBUG_TOKEN=

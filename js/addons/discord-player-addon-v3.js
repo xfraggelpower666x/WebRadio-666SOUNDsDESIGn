@@ -3,7 +3,7 @@
 # 666SOUNDsDESIGn — Discord Player Frontend Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.8
+# Version: V3.12
 # Purpose: Compact DC/MSG gate with structured Discord broadcast embed posts, metadata, artwork, branding and socials.
 # Change Summary:
 # - Repairs PC/iPhone slot mounting: one panel per visible player slot, no moving panel between slots.
@@ -15,14 +15,14 @@
 # - Adds compact DC player-post button and MSG custom-message overlay.
 # - Enriches Discord posts with current title/listeners/bitrate/DJ metadata.
 # - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: 666 DJ for Discord posts.
-# - Auto now-playing posts only after successful gate unlock in this browser session.
+# - Auto now-playing posts only while the canonical admin session is valid.
 # - V3.7 upgrades the Discord payload data for structured underground broadcast cards.
 # - V3.8 keeps the big broadcast post manual and arms automatic compact Now Playing posts after valid unlock; improves artwork/metadata extraction and dedupe status.
 ############################################################
 */
 (function(){
   'use strict';
-  const VERSION = 'V3.8-20260508-MANUAL-BROADCAST-AUTO-NOWPLAYING';
+  const VERSION = 'V3.12-20260630-CANONICAL-ADMIN-AUTH';
   const DEFAULTS = {
     radioName: '666SOUNDsDESIGn WebRadio',
     domain: 'webradio.666soundsdesign-broadcaster.com',
@@ -49,17 +49,17 @@
     trackPollMs: 12000,
     manualButtonText: 'DC',
     messageButtonText: 'MSG',
-    accessTitle: 'DISCORD ACCESS',
-    accessMessage: 'Enter access code to unlock the Discord player post.',
-    accessPlaceholder: 'ACCESS CODE',
-    accessSubmitText: 'UNLOCK + POST',
+    accessTitle: 'ADMIN AUTHENTICATION',
+    accessMessage: 'Enter the WebRadio admin password. It is sent only to the same-origin login proxy.',
+    accessPlaceholder: 'ADMIN PASSWORD',
+    accessSubmitText: 'LOGIN + POST',
     messageTitle: 'DISCORD MESSAGE',
-    messageText: 'Enter access code and message text for the Discord channel.',
+    messageText: 'Enter a Discord message. Admin authentication is reused for this browser session.',
     messagePlaceholder: 'MESSAGE TEXT',
-    messageSubmitText: 'UNLOCK + SEND',
+    messageSubmitText: 'LOGIN + SEND',
     accessCancelText: 'CANCEL',
     accessDeniedTitle: 'ACCESS DENIED',
-    accessDeniedMessage: 'Wrong code. Discord control remains locked.',
+    accessDeniedMessage: 'Admin login rejected. Discord control remains locked.',
     autoPostTrackChanges: true,
     autoPostRequiresUnlock: true,
     mount: '[data-discord-addon-slot]'
@@ -71,7 +71,7 @@
     denied: null,
     input: null,
     lastTrackKey: localStorage.getItem('s666_discord_last_track_key_v3') || '',
-    accessCode: sessionStorage.getItem('s666_discord_gate_code_v3') || '',
+    authArmed: false,
     activeMode: 'manual',
     msg: null
   };
@@ -194,13 +194,17 @@
       if(text) text.textContent = label || (mode === 'ok' ? 'Discord post OK' : mode === 'error' ? 'Discord error' : 'Discord ready');
     });
   }
-  function endpoint(path){ return /^https?:\/\//i.test(path) ? path : path; }
+  function endpoint(path){
+    const url = new URL(String(path || ''), window.location.href);
+    if(url.origin !== window.location.origin) throw new Error('cross_origin_discord_request_blocked');
+    return url.toString();
+  }
+  function adminAuth(){ return window.S666AdminAuth || null; }
   async function post(path, payload){
     setLed('sending', 'Discord sending…');
-    const headers = { 'content-type': 'application/json' };
-    if(cfg.adminToken) headers['x-admin-token'] = cfg.adminToken;
-    if(payload && payload.__accessCode){ headers['x-discord-gate-code'] = String(payload.__accessCode); delete payload.__accessCode; }
-    const res = await fetch(endpoint(path), { method:'POST', headers, body: JSON.stringify(payload || {}) });
+    const auth = adminAuth();
+    if(!auth) throw new Error('admin_auth_client_missing');
+    const res = await auth.fetch(endpoint(path), { method:'POST', headers:{ 'content-type':'application/json' }, body: JSON.stringify(payload || {}) });
     let data = null;
     try { data = await res.json(); } catch { data = { ok: res.ok }; }
     if(!res.ok || !data.ok){ throw new Error((data && data.error) || ('HTTP ' + res.status)); }
@@ -296,7 +300,7 @@
     state.msg = gate.querySelector('.s666-discord-msg-input');
     return gate;
   }
-  function openGateOverlay(mode){
+  async function openGateOverlay(mode){
     state.activeMode = mode === 'message' ? 'message' : 'manual';
     const gate = ensureGateOverlay();
     const title = gate.querySelector('.s666-discord-gate-title');
@@ -306,11 +310,21 @@
     if(msg) msg.textContent = state.activeMode === 'message' ? cfg.messageText : cfg.accessMessage;
     if(submit) submit.textContent = state.activeMode === 'message' ? cfg.messageSubmitText : cfg.accessSubmitText;
     gate.classList.toggle('s666-discord-gate--message', state.activeMode === 'message');
+    const auth = adminAuth();
+    const alreadyAuthorized = Boolean(auth && await auth.check(false));
+    if(state.input){
+      state.input.style.display = alreadyAuthorized ? 'none' : '';
+      state.input.required = !alreadyAuthorized;
+    }
+    if(submit) submit.textContent = alreadyAuthorized ? (state.activeMode === 'message' ? 'SEND' : 'POST') : (state.activeMode === 'message' ? cfg.messageSubmitText : cfg.accessSubmitText);
     gate.classList.remove('s666-discord-gate--hidden');
     gate.classList.add('s666-discord-gate--open');
     setTimeout(() => {
-      if(state.input){ state.input.value = ''; state.input.focus(); }
-      if(state.msg && state.activeMode === 'message') state.msg.value = '';
+      if(state.input) state.input.value = '';
+      if(state.msg && state.activeMode === 'message'){
+        state.msg.value = '';
+        if(alreadyAuthorized) state.msg.focus();
+      } else if(state.input && !alreadyAuthorized) state.input.focus();
     }, 30);
   }
   function closeGateOverlay(){
@@ -339,10 +353,18 @@
     denied.classList.remove('s666-discord-denied--hidden');
     setTimeout(() => denied.classList.add('s666-discord-denied--hidden'), 2600);
   }
-  async function gatedPost(accessCode){
+  async function gatedPost(password){
     try {
+      const auth = adminAuth();
+      if(!auth) throw new Error('admin_auth_client_missing');
+      let authorized = await auth.check(false);
+      if(!authorized){
+        const result = await auth.login(String(password || ''));
+        password = '';
+        if(!result || result.ok !== true) throw new Error((result && result.error) || 'password_rejected');
+        authorized = true;
+      }
       const payload = await basePayload();
-      payload.__accessCode = accessCode;
       if(state.activeMode === 'message'){
         const customMessage = clean(state.msg && state.msg.value, '', 1800);
         if(!customMessage){ setLed('error', 'Message missing'); return; }
@@ -351,10 +373,8 @@
       } else {
         await post(cfg.endpointManual, payload);
       }
-      state.accessCode = accessCode;
-      try { sessionStorage.setItem('s666_discord_gate_code_v3', accessCode); } catch(_){}
-      setLed('ok', 'Discord auto armed');
-      // AUTO_NOWPLAYING_ARM: The large broadcast post remains manual, but a valid unlock arms compact song-change posts in this browser session.
+      state.authArmed = authorized;
+      setLed('ok', 'Discord admin active');
       setTimeout(async () => {
         try { await postTrackIfChanged(await readTrackFromDom()); }
         catch(_){}
@@ -363,17 +383,27 @@
     }
     catch(e){
       const msg = String(e && e.message || e || '');
-      if(/access denied|invalid discord gate code|HTTP 401/i.test(msg)) { setLed('error', 'Access denied'); showAccessDenied(); }
-      else { setLed('error', 'Discord error'); console.warn('[S666 Discord V3.7] gated post failed:', e); }
+      if(/password_rejected|token_invalid|HTTP 401|HTTP 403/i.test(msg)) { setLed('error', 'Access denied'); showAccessDenied(); }
+      else { setLed('error', 'Discord error'); console.warn('[S666 Discord V3.12] protected post failed:', e); }
     }
   }
-  function submitGateOverlay(){
-    const code = clean(state.input && state.input.value);
-    if(!code){ showAccessDenied(); setLed('error', 'Access denied'); return; }
-    gatedPost(code);
+  async function submitGateOverlay(){
+    const auth = adminAuth();
+    const alreadyAuthorized = Boolean(auth && await auth.check(false));
+    const password = alreadyAuthorized ? '' : clean(state.input && state.input.value);
+    if(!alreadyAuthorized && !password){ showAccessDenied(); setLed('error', 'Access denied'); return; }
+    await gatedPost(password);
+    if(state.input) state.input.value='';
   }
-  function manualPost(){ openGateOverlay('manual'); }
-  function messagePost(){ openGateOverlay('message'); }
+  async function manualPost(){
+    const auth = adminAuth();
+    if(auth && await auth.check(false)){
+      state.activeMode='manual';
+      return gatedPost('');
+    }
+    return openGateOverlay('manual');
+  }
+  async function messagePost(){ return openGateOverlay('message'); }
   async function readTrackFromDom(){
     const meta = await currentMetadataPayload();
     if(meta && (meta.title || meta.nowPlaying || meta.artist)) return meta;
@@ -387,13 +417,13 @@
   }
   async function postTrackIfChanged(track){
     if(!cfg.autoPostTrackChanges || !track) return;
-    if(cfg.autoPostRequiresUnlock !== false && !state.accessCode) return;
+    if(cfg.autoPostRequiresUnlock !== false){ const auth=adminAuth(); if(!auth || !(await auth.check(false))) return; }
     const key = clean((track.artist || '') + '::' + (track.title || '') + '::' + (track.nowPlaying || '')).toLowerCase();
     if(!key || key === state.lastTrackKey) return;
     state.lastTrackKey = key;
     localStorage.setItem('s666_discord_last_track_key_v3', key);
     try {
-      const payload = Object.assign(await basePayload(), track, { __accessCode: state.accessCode, autoPost: true });
+      const payload = Object.assign(await basePayload(), track, { autoPost: true });
       await post(cfg.endpointNowPlaying, payload);
     }
     catch(e){ setLed('error','Discord track error'); console.warn('[S666 Discord V3.8] nowplaying failed:', e); }

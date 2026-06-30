@@ -321,11 +321,20 @@ CHANGE SUMMARY:
     }
   }
 
+  function cleanupLegacySoundMenus(){
+    qsa('#smfpMobileEqOverlay,#smfpMobileEqPanel').forEach(function(el){
+      try{ el.remove(); }catch(_){ if(el.style) el.style.display = 'none'; }
+    });
+    window.SMFPMobileEqOverlay = { open:open, close:requestClose, sync:function(){ readEqFromDom(); renderValues(); } };
+  }
+
   function mountTriggers(){
+    cleanupLegacySoundMenus();
     mountButton();
   }
 
   function boot(){
+    cleanupLegacySoundMenus();
     mountButton();
     mountTriggers();
     applyDraft();

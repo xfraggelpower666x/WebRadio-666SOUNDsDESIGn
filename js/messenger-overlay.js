@@ -363,8 +363,24 @@
       document.body.style.overflow = '';
     }
 
+    function cleanupLegacyMessengerMenus() {
+      [
+        '#playerAlertPcBox',
+        '#mffAlertOpen',
+        '#mffAlertEditorBackdrop',
+        '#s666PlayerAlertComposer',
+        '#s666PlayerAlertMobileSlot'
+      ].forEach(function (sel) {
+        Array.prototype.slice.call(document.querySelectorAll(sel)).forEach(function (el) {
+          try { el.remove(); }
+          catch (_) { if (el.style) el.style.display = 'none'; }
+        });
+      });
+    }
+
     // One authoritative MESSAGE trigger for desktop and mobile.
     function mountMsgTriggers() {
+      cleanupLegacyMessengerMenus();
       var mobileTarget = window.innerWidth <= 760 ? document.getElementById('s666MobileExtraRow') : null;
       var target = mobileTarget || document.getElementById('s666MessageActionSlot') ||
         document.getElementById('s666MobileExtraRow');
@@ -391,6 +407,7 @@
     // ── Boot ─────────────────────────────────────────────────────────────────
     function init() {
       injectCss();
+      cleanupLegacyMessengerMenus();
       // Mount trigger buttons — retry until DOM is ready
       var attempts = 0;
       var t = setInterval(function () {
@@ -399,6 +416,10 @@
           clearInterval(t);
         }
       }, 500);
+      setInterval(function () {
+        cleanupLegacyMessengerMenus();
+        mountMsgTriggers();
+      }, 2500);
     }
 
     if (document.readyState === 'loading') {

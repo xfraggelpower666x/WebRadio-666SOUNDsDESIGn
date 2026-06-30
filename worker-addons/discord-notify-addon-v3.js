@@ -1,10 +1,12 @@
+import { requireStrictAdmin } from './radio-admin-config-addon.js';
+
 /*
 ############################################################
 # 666SOUNDsDESIGn — Discord Webhook HTML Player Add-on
 # Created: 2026-05-07
 # Modified: 2026-05-07
-# Version: V3.8
-# Purpose: Secret-safe Discord bridge with structured underground broadcast embeds, metadata, artwork, socials and access-gated posts.
+# Version: V3.12
+# Purpose: Secret-safe Discord bridge with structured underground broadcast embeds, metadata, artwork, socials and canonical strict-admin Bearer authorization.
 # Change Summary:
 # - Add-only Worker routes; no stream/fallback/notfallplayer logic touched.
 # - NO_KV / NO_R2: uses only in-memory cooldown/dedupe as safety net.
@@ -17,7 +19,7 @@
 ############################################################
 */
 
-const ADDON_VERSION = 'V3.11-20260530-PRIVATE-TRACK-SHOOTER-SECRET';
+const ADDON_VERSION = 'V3.12-20260630-STRICT-ADMIN-AUTH';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
@@ -44,9 +46,8 @@ function json(data, status = 200) {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'cache-control': 'no-store',
-      'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET,POST,OPTIONS',
-      'access-control-allow-headers': 'content-type,x-admin-token,x-discord-gate-code'
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'no-referrer'
     }
   });
 }
@@ -328,78 +329,45 @@ async function sendPrivateNowPlayingIfConfigured(env, payload) {
   }
 }
 
-function tokenOk(request, env) {
-  if (!env || !env.DISCORD_ADMIN_TOKEN) return true;
-  return request.headers.get('x-admin-token') === env.DISCORD_ADMIN_TOKEN;
+async function requireDiscordAdmin(request, env, source) {
+  return requireStrictAdmin(request, env, source || 'webradio-discord-write');
 }
 
-const FALLBACK_DISCORD_GATE_SHA256 = '911aa98122df056905093e0e83a4a0b0f304f32bcf2e69cf035347ddc8872cb0';
-
-async function sha256Hex(value) {
-  const data = new TextEncoder().encode(String(value || ''));
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function gateCodeOk(request, env) {
-  const given = clean(request.headers.get('x-discord-gate-code') || '', '', 140);
-  if (!given) return false;
-  if (env && env.DISCORD_GATE_CODE) return given === String(env.DISCORD_GATE_CODE);
-  const expectedHash = String((env && env.DISCORD_GATE_SHA256) || FALLBACK_DISCORD_GATE_SHA256).trim().toLowerCase();
-  return (await sha256Hex(given)) === expectedHash;
-}
-
-
-// DISCORD_ADMIN_AUTH_MERGE_V1
-function discordGetCookie(request, name) {
-  const raw = request.headers.get('cookie') || '';
-  for (const part of raw.split(';').map((v) => v.trim())) {
-    const eq = part.indexOf('=');
-    if (eq > -1 && part.slice(0, eq) === name) return decodeURIComponent(part.slice(eq + 1));
-  }
-  return '';
-}
-
-async function discordAdminAuthOk(request, env = {}) {
-  const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || 'https://666-system-auth.666soundsdesign-broadcaster.com/verify';
-  const bearer = request.headers.get('authorization') || '';
-  const cookieToken = discordGetCookie(request, 'chaos_auth') || discordGetCookie(request, 'admin_auth');
-  const headers = bearer ? { authorization: bearer } : (cookieToken ? { authorization: `Bearer ${cookieToken}` } : {});
-  if (!headers.authorization) return false;
-  try {
-    const res = await fetch(verifyUrl, { headers });
-    const data = await res.json().catch(() => ({}));
-    return res.ok && !!data.ok;
-  } catch (err) {
-    return false;
-  }
-}
-
-async function discordAdminOrGateOk(request, env = {}) {
-  if (await discordAdminAuthOk(request, env)) return true;
-  return gateCodeOk(request, env);
-}
 
 export async function handleDiscordNotifyV3(request, env = {}) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '');
-  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
+  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/test' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
   if (!isRoute) return null;
 
-  if (request.method === 'OPTIONS') return json({ ok: true, addon: ADDON_VERSION });
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { allow: 'GET, POST, OPTIONS' } });
 
-  if (path === '/api/discord/status' || path === '/api/discord/debug') {
+  if (path === '/api/discord/status') {
+    if (request.method !== 'GET') return json({ ok: false, error: 'method_not_allowed' }, 405);
     return json({
       ok: true,
       addon: ADDON_VERSION,
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
+      authMode: 'strict_admin_bearer',
       webhookConfigured: Boolean(getDiscordWebhook(env)),
       privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
-      acceptedWebhookSecretNames: ['DISCORD_WEBHOOK_URL','DISCORD_WEBHOOK','DISCORD_WEBHOOK_URI','DISCORD_WEBHOOK_ENDPOINT','WEBHOOK_URL'],
-      acceptedPrivateTrackWebhookSecretNames: ['DISCORD_PRIVATE_TRACK_WEBHOOK_URL','DISCORD_PRIVATE_WEBHOOK_URL','DISCORD_RUBY_TRACK_WEBHOOK_URL','DISCORD_TRACK_PRIVATE_WEBHOOK','PRIVATE_DISCORD_WEBHOOK_URL','PRIVATE_TRACK_SHOOTER'],
-      adminTokenEnabled: Boolean(env && env.DISCORD_ADMIN_TOKEN),
-      gateCodeEnabled: true,
-      adminAuthMergeEnabled: true,
+      lastKind: runtime.lastKind,
+      lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
+      lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
+      lastTrackKey: runtime.lastTrackKey ? '[set]' : ''
+    });
+  }
+
+  if (path === '/api/discord/debug') {
+    if (request.method !== 'GET') return json({ ok: false, error: 'method_not_allowed' }, 405);
+    const gate = await requireDiscordAdmin(request, env, 'webradio-discord-debug');
+    if (gate.response) return gate.response;
+    return json({
+      ok: true,
+      addon: ADDON_VERSION,
+      authMode: 'strict_admin_bearer',
+      webhookConfigured: Boolean(getDiscordWebhook(env)),
+      privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
       lastKind: runtime.lastKind,
       lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
       lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
@@ -408,11 +376,11 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     });
   }
 
-  if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
-  if (!tokenOk(request, env)) return json({ ok: false, error: 'invalid admin token' }, 401);
-  if ((path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying') && !(await discordAdminOrGateOk(request, env))) {
+  if (request.method !== 'POST') return json({ ok: false, error: 'method_not_allowed' }, 405);
+  const gate = await requireDiscordAdmin(request, env, `webradio-discord-${path.split('/').pop() || 'write'}`);
+  if (gate.response) {
     runtime.lastKind = 'access-denied';
-    return json({ ok: false, led: 'error', error: 'access denied: admin auth or legacy discord gate required', addon: ADDON_VERSION }, 401);
+    return gate.response;
   }
 
   try {
@@ -423,6 +391,13 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastKind = 'message';
       const result = await sendDiscord(env, messagePayload(input));
       return json({ ok: true, type: 'message', led: 'ok', discord: result, addon: ADDON_VERSION });
+    }
+    if (path === '/api/discord/test') {
+      runtime.lastKind = 'test';
+      const result = await sendDiscord(env, messagePayload(Object.assign({}, input, {
+        message: input.message || 'Admin Discord test ' + new Date().toISOString()
+      })));
+      return json({ ok: true, type: 'test', led: 'ok', discord: result, addon: ADDON_VERSION });
     }
     if (path === '/api/discord/nowplaying') {
       const key = trackKey(input);

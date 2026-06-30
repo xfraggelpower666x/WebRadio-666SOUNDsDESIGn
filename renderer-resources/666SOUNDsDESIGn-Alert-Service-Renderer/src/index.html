@@ -1,91 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>666 Upload</title>
-
-  <style>
-    body {
-      background: #0a0a0a;
-      color: #00ffcc;
-      font-family: Arial;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .box {
-      border: 2px solid #00ffcc;
-      padding: 30px;
-      border-radius: 10px;
-      width: 400px;
-      text-align: center;
-    }
-
-    input, button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-      background: black;
-      color: #00ffcc;
-      border: 1px solid #00ffcc;
-    }
-
-    button:hover {
-      background: #00ffcc;
-      color: black;
-      cursor: pointer;
-    }
-
-    #result {
-      margin-top: 20px;
-      font-size: 12px;
-      color: white;
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>666SOUNDsDESIGn Alert Service</title>
+  <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#05030a;color:#e8fbff;font-family:system-ui,sans-serif}.box{max-width:760px;margin:24px;padding:28px;border:1px solid #24f1ff66;border-radius:18px;background:#0b0714;box-shadow:0 0 36px #8b2cff33}code{color:#73fff2}h1{margin-top:0;color:#ff4fd8}</style>
 </head>
-
 <body>
-
-<div class="box">
-  <h2>🎧 MP3 Upload</h2>
-
-  <input type="file" id="file" />
-  <input type="password" id="password" placeholder="Admin Passwort" />
-
-  <button onclick="upload()">UPLOAD</button>
-
-  <div id="result"></div>
-</div>
-
-<script>
-async function upload() {
-  const file = document.getElementById("file").files[0];
-  const password = document.getElementById("password").value;
-
-  if (!file) {
-    alert("Datei fehlt");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const res = await fetch("/transcribe", {
-    method: "POST",
-    headers: {
-      "x-admin-password": password
-    },
-    body: formData
-  });
-
-  const data = await res.json();
-
-  document.getElementById("result").innerText =
-    JSON.stringify(data, null, 2);
-}
-</script>
-
+  <main class="box">
+    <h1>666SOUNDsDESIGn Alert Service</h1>
+    <p>Der direkte Browser-Adminupload ist deaktiviert.</p>
+    <p>Administrative Benutzeraktionen laufen ausschließlich über den zentralen Same-Origin-WebRadio-Login. Der Audio-Prozess-Endpunkt <code>POST /process</code> akzeptiert nur vertrauenswürdige Service-zu-Service-Aufrufe mit <code>x-player-alert-service-token</code>.</p>
+    <p><code>GET /health</code> bestätigt ausschließlich die Erreichbarkeit und ist kein Authentifizierungsnachweis.</p>
+  </main>
 </body>
 </html>

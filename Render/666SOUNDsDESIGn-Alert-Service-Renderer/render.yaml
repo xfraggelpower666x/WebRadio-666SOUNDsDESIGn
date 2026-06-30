@@ -8,8 +8,6 @@ services:
     startCommand: uvicorn src.server:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
-      - key: MASTER_ADMIN_PASSWORD
-        sync: false
       - key: PLAYER_ALERT_SERVICE_TOKEN
         sync: false
       - key: DATABASE_URL

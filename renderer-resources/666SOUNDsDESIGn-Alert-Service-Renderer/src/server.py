@@ -18,7 +18,6 @@ from starlette.background import BackgroundTask
 
 
 APP_NAME = "666soundsdesign-audio-player-alert-backend"
-MASTER_ADMIN_PASSWORD = os.getenv("MASTER_ADMIN_PASSWORD", "").strip()
 PLAYER_ALERT_SERVICE_TOKEN = os.getenv("PLAYER_ALERT_SERVICE_TOKEN", "").strip()
 PLAYER_ALERT_TTL_SECONDS = max(30, int(os.getenv("PLAYER_ALERT_TTL_SECONDS", "900")))
 PLAYER_ALERT_MAX_HISTORY = max(1, min(200, int(os.getenv("PLAYER_ALERT_MAX_HISTORY", "30"))))
@@ -54,14 +53,6 @@ def safe_filename(name: str) -> str:
     stem = Path(name or "upload.mp3").stem
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "_", stem).strip("._")
     return (cleaned or "upload")[:120]
-
-
-def check_admin(request: Request) -> None:
-    if not MASTER_ADMIN_PASSWORD:
-        raise HTTPException(status_code=503, detail="admin_auth_not_configured")
-    provided = request.headers.get("x-admin-password", "").strip()
-    if not secrets.compare_digest(provided, MASTER_ADMIN_PASSWORD):
-        raise HTTPException(status_code=401, detail="unauthorized")
 
 
 def check_player_alert_service(request: Request) -> None:
@@ -239,7 +230,7 @@ async def process_audio(
     file: UploadFile = File(...),
     mode: str = Form(default="process"),
 ):
-    check_admin(request)
+    check_player_alert_service(request)
     ffmpeg_bin = which("ffmpeg")
     if not ffmpeg_bin:
         raise HTTPException(status_code=503, detail="ffmpeg_not_available")

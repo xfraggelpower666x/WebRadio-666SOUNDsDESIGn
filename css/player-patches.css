@@ -469,10 +469,34 @@
     box-shadow:0 0 8px rgba(22,255,243,.85),0 0 15px rgba(22,255,243,.35)!important;
   }
 
+  #mffApp .mff-panel-led[data-state="green"] i{
+    background:#27e07a!important;
+    border-color:rgba(39,224,122,.95)!important;
+    box-shadow:0 0 8px rgba(39,224,122,.85),0 0 15px rgba(39,224,122,.35)!important;
+  }
+
+  #mffApp .mff-panel-led[data-state="cyan"] i{
+    background:var(--mff-cyan)!important;
+    border-color:rgba(22,255,243,.95)!important;
+    box-shadow:0 0 8px rgba(22,255,243,.85),0 0 15px rgba(22,255,243,.35)!important;
+  }
+
   #mffApp .mff-panel-led[data-state="warn"] i{
     background:var(--mff-pink)!important;
     border-color:rgba(255,61,187,.95)!important;
     box-shadow:0 0 8px rgba(255,61,187,.82),0 0 15px rgba(255,61,187,.35)!important;
+  }
+
+  #mffApp .mff-panel-led[data-state="pink"] i{
+    background:var(--mff-pink)!important;
+    border-color:rgba(255,61,187,.95)!important;
+    box-shadow:0 0 8px rgba(255,61,187,.82),0 0 15px rgba(255,61,187,.35)!important;
+  }
+
+  #mffApp .mff-panel-led[data-state="red"] i{
+    background:#ff3b4e!important;
+    border-color:rgba(255,59,78,.95)!important;
+    box-shadow:0 0 8px rgba(255,59,78,.88),0 0 15px rgba(255,59,78,.42)!important;
   }
 
   #mffApp .mff-panel-led[data-state="off"] i{

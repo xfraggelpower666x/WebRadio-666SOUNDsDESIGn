@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with atomic Scriptable branch upload and Cloudflare branch recovery compatibility.",
+  "description": "666SOUNDsDESIGn WebRadio full source with canonical Password-Worker/Auth-Worker admin authentication, atomic Scriptable upload and Cloudflare branch recovery compatibility.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",

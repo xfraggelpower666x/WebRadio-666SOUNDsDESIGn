@@ -1,7 +1,6 @@
 import { handleDiscordNotifyV3 } from './worker-addons/discord-notify-addon-v3.js';
 import { handleRadioAdminConfigAddon } from './worker-addons/radio-admin-config-addon.js';
 import { handleSkipApi } from './worker-addons/skip-api-addon.js';
-import { handleChaosEngineApiAddon } from './worker-addons/chaos-engine-api-addon.js';
 // ==========================================================
 // 666SOUNDsDESIGn — v66 The Dark Dancer Route
 // Zweck: /The-Dark-Dancer direkt über die Domain ausliefern.
@@ -433,17 +432,11 @@ async function fetchMetadataProxyPayload(request, env){
 
 
 // ==========================================================
-// PLAYER_ALERT_V180_BACKEND_PRIMARY_KV_FALLBACK
-// Zweck: Player-Nachrichten zuerst an Renda/Render Backend senden.
-// Fallback-Reihenfolge: Backend -> PLAYER_ALERT_KV -> Cloudflare Cache.
+// PLAYER_ALERT_V181_BACKEND_ONLY
+// Zweck: Player-Nachrichten ausschliesslich ueber das Renda/Render Backend senden.
+// Kein Worker-KV/Cache-Fallback, damit der Backend-Status die einzige Quelle bleibt.
 // Discord ist hier NICHT das primäre Player-Nachrichtensystem.
 // ==========================================================
-const PLAYER_ALERT_CACHE_KEY = 'https://666soundsdesign.local/player-alert/current';
-const PLAYER_ALERT_RATE_KEY = 'https://666soundsdesign.local/player-alert/rate';
-const PLAYER_ALERT_RATE_MS = 180000;
-const PLAYER_ALERT_KV_CURRENT_KEY = 'player-alert:current';
-const PLAYER_ALERT_KV_RATE_KEY = 'player-alert:rate';
-const PLAYER_ALERT_KV_HISTORY_KEY = 'player-alert:history';
 function playerAlertJson(data, status = 200){
   return new Response(JSON.stringify(data), {status, headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store'}});
 }
@@ -480,91 +473,44 @@ async function playerAlertBackendFetch(env, path, init){
     return {ok:false, status:0, data:{ok:false,error:'backend_unreachable', detail:String(err && err.message || err)}};
   }
 }
-async function playerAlertKvGet(env, key){
-  try{ if(env && env.PLAYER_ALERT_KV) return await env.PLAYER_ALERT_KV.get(key, {type:'json'}); }catch(e){}
-  return null;
-}
-async function playerAlertKvPut(env, key, value, ttl=900){
-  try{ if(env && env.PLAYER_ALERT_KV) { await env.PLAYER_ALERT_KV.put(key, JSON.stringify(value), {expirationTtl:ttl}); return true; } }catch(e){}
-  return false;
-}
-async function playerAlertHistoryAppend(env, alert){
-  const current = await playerAlertKvGet(env, PLAYER_ALERT_KV_HISTORY_KEY) || [];
-  const next = Array.isArray(current) ? current.slice(0,19) : [];
-  next.unshift(alert);
-  await playerAlertKvPut(env, PLAYER_ALERT_KV_HISTORY_KEY, next, 86400);
-}
-async function playerAlertCacheGet(key){
-  try{ const hit = await caches.default.match(new Request(key)); if(hit) return await hit.json(); }catch(e){}
-  return null;
-}
-async function playerAlertCachePut(key, value, maxAge=900){
-  try{ await caches.default.put(new Request(key), new Response(JSON.stringify(value), {headers:{'content-type':'application/json; charset=UTF-8','cache-control':'public, max-age='+String(maxAge)}})); return true; }catch(e){ return false; }
-}
-function playerAlertRateKvKey(senderId){
-  return `${PLAYER_ALERT_KV_RATE_KEY}:${encodeURIComponent(String(senderId || 'anonymous').slice(0,80))}`;
-}
-function playerAlertRateCacheKey(senderId){
-  return `${PLAYER_ALERT_RATE_KEY}/${encodeURIComponent(String(senderId || 'anonymous').slice(0,80))}`;
+function playerAlertBackendUnavailable(backend){
+  return playerAlertJson({ok:false,error:'backend_unavailable',backend:backend ? backend.data : null}, 502);
 }
 async function handlePlayerAlertV152(request, env){
   const url = new URL(request.url);
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback'});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvFallbackEnabled:false, cacheFallbackEnabled:false, mode:'backend-only'});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
     if(backend && backend.ok) return playerAlertJson(Object.assign({source:'backend'}, backend.data));
-    const kv = await playerAlertKvGet(env, PLAYER_ALERT_KV_CURRENT_KEY);
-    if(kv) return playerAlertJson(Object.assign({source:'kv-fallback'}, kv));
-    const cache = await playerAlertCacheGet(PLAYER_ALERT_CACHE_KEY);
-    if(cache) return playerAlertJson(Object.assign({source:'cache-tertiary'}, cache));
-    return playerAlertJson({active:false, source:'none'});
+    return playerAlertBackendUnavailable(backend);
   }
   if(url.pathname === '/api/player-alert/history' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/history', {method:'GET'});
     if(backend && backend.ok) return playerAlertJson(Object.assign({source:'backend'}, backend.data));
-    const kv = await playerAlertKvGet(env, PLAYER_ALERT_KV_HISTORY_KEY) || [];
-    return playerAlertJson({ok:true, source:kv.length?'kv-fallback':'none', items:kv});
+    return playerAlertBackendUnavailable(backend);
   }
   if(url.pathname === '/api/player-alert/send' && request.method === 'POST'){
     const writeAccess = await verifyPlayerAlertWrite(request, env);
     if(!writeAccess.ok) return playerAlertJson({ok:false,error:writeAccess.error},401);
     let payload = {};
     try{ payload = await request.json(); }catch(err){ return playerAlertJson({ok:false,error:'invalid_json'},400); }
-    const message = playerAlertCleanText(payload.message);
+    const message = playerAlertCleanText(payload.message || payload.text);
     const senderId = playerAlertCleanText(payload.senderId || payload.clientId || 'anonymous').slice(0,80) || 'anonymous';
     const username = playerAlertCleanText(payload.username || payload.name || 'Broadcast').slice(0,28) || 'Broadcast';
     if(!message) return playerAlertJson({ok:false,error:'empty_message'},400);
     const now = Date.now();
-    const rateKvKey = playerAlertRateKvKey(senderId);
-    const rateCacheKey = playerAlertRateCacheKey(senderId);
-    const rate = (await playerAlertKvGet(env, rateKvKey)) || (await playerAlertCacheGet(rateCacheKey));
-    if(rate){
-      const last = Number(rate.last || 0);
-      if(last && (now - last) < PLAYER_ALERT_RATE_MS) return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now-last)},429);
-    }
     const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,username,senderId,clientId:senderId,createdAt:new Date(now).toISOString(),timestamp:now,version:playerAlertCleanText(payload.version||'')};
     const backend = await playerAlertBackendFetch(env, '/send', {method:'POST', body:JSON.stringify(alert)});
-    if(backend && backend.ok){
-      await playerAlertKvPut(env, rateKvKey, {last:now}, 180);
-      return playerAlertJson(Object.assign({ok:true,delivered:true,source:'backend',fallback:false}, backend.data));
-    }
-    const kvOk = await playerAlertKvPut(env, PLAYER_ALERT_KV_CURRENT_KEY, alert, 900);
-    if(kvOk){
-      await playerAlertKvPut(env, rateKvKey, {last:now}, 180);
-      await playerAlertHistoryAppend(env, alert);
-      return playerAlertJson(Object.assign({source:'kv-fallback',backend:backend?backend.data:null}, alert));
-    }
-    await playerAlertCachePut(PLAYER_ALERT_CACHE_KEY, alert, 900);
-    await playerAlertCachePut(rateCacheKey, {last:now}, 180);
-    return playerAlertJson(Object.assign({source:'cache-tertiary',backend:backend?backend.data:null}, alert));
+    if(backend && backend.ok) return playerAlertJson(Object.assign({ok:true,delivered:true,source:'backend',fallback:false}, backend.data));
+    return playerAlertBackendUnavailable(backend);
   }
   return playerAlertJson({ok:false,error:'not_found'},404);
 }
-// END PLAYER_ALERT_V180_BACKEND_PRIMARY_KV_FALLBACK
+// END PLAYER_ALERT_V181_BACKEND_ONLY
 
 function passthroughHeaders(sourceHeaders){
   const headers=new Headers();
@@ -765,7 +711,7 @@ async function chaosEngineStaticResponse(request, env){
 
 
 // ROUTE_LIVE_DEBUG_HARDENING_V1_20260525
-const ROUTE_LIVE_DEBUG_VERSION = "route-live-debug-hardening-v1-20260525";
+const ROUTE_LIVE_DEBUG_VERSION = "route-live-debug-auth-hardlock-v1-20260630";
 
 function s666Json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -787,21 +733,19 @@ function s666BoolEnv(env, names) {
 function s666RouteTable() {
   return [
     { priority: 1, route: "/The-Dark-Dancer", handler: "darkDancerResponse", purpose: "The Dark Dancer story page" },
-    { priority: 2, route: "/api/admin/*", handler: "handleRadioAdminConfigAddon", purpose: "Admin auth/config/GitHub backup" },
+    { priority: 2, route: "/api/admin/*", handler: "handleRadioAdminConfigAddon", purpose: "Same-origin login broker + strict Bearer auth/config/GitHub backup" },
     { priority: 3, route: "/api/player-alert/*", handler: "handlePlayerAlertV152", purpose: "PC+iPhone broadcast relay" },
     { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
     { priority: 5, route: "/api/skip/status", handler: "handleSkipApi", purpose: "skip status / diagnostics" },
     { priority: 6, route: "/api/admin/skip + /skip", handler: "handleSkipApi", purpose: "protected shoutcast autodj skip" },
-    { priority: 7, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
-    { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
-    { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
-    { priority: 10, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
-    { priority: 11, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
-    { priority: 12, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
-    { priority: 13, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
-    { priority: 14, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
-    { priority: 15, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
-    { priority: 16, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
+    { priority: 7, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
+    { priority: 8, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
+    { priority: 9, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
+    { priority: 10, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
+    { priority: 11, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
+    { priority: 12, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
+    { priority: 13, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
+    { priority: 14, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
   ];
 }
 
@@ -817,11 +761,6 @@ function s666ModuleStatus(env) {
         primary: PRIMARY_STREAM_URLS[0],
         fallback: FALLBACK_STREAM_URLS[0]
       },
-      chaosEngine: {
-        ok: typeof chaosEngineStaticResponse === "function",
-        routes: ["/CHAOS_ENGINE/", "/CHAOS_ENGINE/track-factory.html", "/CHAOS_ENGINE/fraggle-detlef-system.html"],
-        embeddedFallback: typeof chaosEngineEmbeddedResponseV2 === "function"
-      },
       darkDancer: {
         ok: typeof darkDancerResponse === "function",
         routes: ["/The-Dark-Dancer", "/The-Dark-Dancer.html"]
@@ -833,28 +772,22 @@ function s666ModuleStatus(env) {
       skip: {
         ok: typeof handleSkipApi === "function",
         routes: ["/api/skip/status", "/api/admin/skip", "/skip"],
-        env: s666BoolEnv(env, ["SHOUTCAST_ADMIN_URL","SHOUTCAST_ADMIN_USER","SHOUTCAST_ADMIN_PASSWORD","SHOUTCAST_SID","SONICPANEL_SKIP_URL","SONICPANEL_SKIP_TOKEN","ADMIN_AUTH_VERIFY_URL","PW_VERIFY_URL","PW_AUTH_SECRET"])
+        env: s666BoolEnv(env, ["SHOUTCAST_ADMIN_URL","SHOUTCAST_ADMIN_USER","SHOUTCAST_ADMIN_PASSWORD","SHOUTCAST_SID","SONICPANEL_SKIP_URL","SONICPANEL_SKIP_TOKEN","ADMIN_AUTH_VERIFY_URL","ADMIN_AUTH_LOGIN_URL","ADMIN_SERVICE_TOKEN","AUTH_AUDIENCE"])
       },
       admin: {
         ok: typeof handleRadioAdminConfigAddon === "function",
-        routes: ["/api/admin/auth-check", "/api/admin/config/current", "/api/admin/config/update", "/api/admin/config/rollback"],
-        env: s666BoolEnv(env, ["ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL", "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH"])
+        routes: ["/api/admin/login", "/api/admin/auth-check", "/api/admin/services/health", "/api/admin/config/current", "/api/admin/config/update", "/api/admin/config/rollback"],
+        env: s666BoolEnv(env, ["ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL", "ADMIN_SERVICE_TOKEN", "ADMIN_SERVICE_ORIGIN", "AUTH_AUDIENCE", "AUTH_MODE", "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH"])
       },
       discord: {
         ok: typeof handleDiscordNotifyV3 === "function",
         routes: ["/api/discord/status", "/api/discord/manual", "/api/discord/test", "/api/discord/nowplaying"],
-        env: s666BoolEnv(env, ["DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK", "DISCORD_ADMIN_TOKEN", "DISCORD_GATE_CODE", "ADMIN_AUTH_VERIFY_URL"])
+        env: s666BoolEnv(env, ["DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK", "ADMIN_AUTH_VERIFY_URL", "ADMIN_SERVICE_TOKEN", "AUTH_AUDIENCE"])
       },
-      chaosSunoRendererIntegration: { ok: true, files: ["CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js", "CHAOS_ENGINE/assets/data/api-providers.json"] },
       goveeFxSceneSync: { ok: true, files: ["js/system-extra/govee/govee-sync-config.js","js/system-extra/govee/govee-bridge-client.js","js/system-extra/govee/govee-scene-sync.js","js/system-extra/govee/govee-fx-control-hooks.js"], secretPolicy: "no frontend secrets" },
       soundControl: {
         ok: true,
         files: ["js/sound-control-overlay-v1.js", "css/sound-control-overlay-v1.css"]
-      },
-      externalWorkers: {
-        ok: true,
-        folders: ["external-workers/666-chaos-ai-track-system", "external-workers/666-suno-system"],
-        deployment: "separate-workers"
       },
       rendererResource: {
         ok: true,
@@ -869,7 +802,7 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_BRANCH_RECOVERY_v1.0.2",
+    version: env.RELEASE_VERSION || "FULLVERSION_AUTH_HARDLOCK_REPAIR_v1.1.0",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
     routes: { root: "/", stream: "/stream", metadata: "/api/nowplaying" }
@@ -885,17 +818,16 @@ async function s666LiveDebug(request, env) {
     time: new Date().toISOString(),
     request: { path: url.pathname, host: url.host, cacheBust: url.searchParams.get("t") || url.searchParams.get("v") || null },
     safeEnvNamesOnly: Object.keys(s666BoolEnv(env, [
-      "ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL",
+      "ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL", "ADMIN_SERVICE_ORIGIN", "AUTH_AUDIENCE", "AUTH_MODE",
       "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH",
-      "PLAYER_ALERT_BACKEND_URL", "DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK",
-      "OPENAI_API_KEY", "SUNO_API_KEY"
+      "PLAYER_ALERT_BACKEND_URL", "DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK"
     ])).filter((k) => env && env[k]),
     routes: s666RouteTable(),
     modules: s666ModuleStatus(env).modules,
     warnings: [
-      "No secret values are displayed here.",
+      "No secret values, passwords or Bearer tokens are displayed here.",
       "If /CHAOS_ENGINE/* displays this debug object, route priority is wrong.",
-      "If Admin opens Hello World, the Admin button is navigating to Auth/PW worker instead of opening local overlay."
+      "Browser admin login is same-origin only; Password Worker and Auth Worker are contacted server-side."
     ]
   });
 }
@@ -952,17 +884,15 @@ const url=new URL(request.url);
     const skipResponse = await handleSkipApi(request, env);
     if (skipResponse) return skipResponse;
 
-    const chaosApiResponse = await handleChaosEngineApiAddon(request, env);
-    if (chaosApiResponse) return chaosApiResponse;
-
     const playerAlertV152Response = await handlePlayerAlertV152(request, env);
     if (playerAlertV152Response) return playerAlertV152Response;
     // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;
 
-    const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
-    if (chaosEngineStatic) return chaosEngineStatic;
+    if(url.pathname === "/chaos-engine" || url.pathname === "/chaos-engine/" || url.pathname.startsWith("/CHAOS_ENGINE")){
+      return apiNotFound(url.pathname);
+    }
 
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       return await serveExternalIndex(request, env);

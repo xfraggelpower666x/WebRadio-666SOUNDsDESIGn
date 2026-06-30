@@ -124,7 +124,6 @@ RULES:
     if(action === "stream") return toggleMobileStream();
     if(action === "sound") return openSoundControl();
     if(action === "admin") return openAdmin();
-    if(action === "chaos") return openChaos();
     if(action === "status") return openStatus();
   }
 
@@ -194,9 +193,9 @@ RULES:
     alert("Admin overlay trigger not found.");
   }
 
-  function openChaos(){
-    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); }
-    catch(e){ location.href = "/CHAOS_ENGINE/?v=" + Date.now(); }
+  function openDarkDancer(){
+    try{ window.open("/The-Dark-Dancer?v=" + Date.now(), "_blank"); }
+    catch(e){ location.href = "/The-Dark-Dancer?v=" + Date.now(); }
   }
 
   function returnToPlayer(){
@@ -653,7 +652,7 @@ RULES:
   // UI_FINETUNE_V1_20260528
   function uiFinetuneV1(){
     var v = qs("#pcVersionBadge .status-code");
-    if(v) v.textContent = "v2026.05.28-ui1";
+    if(v) v.textContent = (window.SMFP_VERSION&&window.SMFP_VERSION.label)||"v2026.06.30-auth-hardlock1";
     var logo = qs("#pcHeaderNewLogo");
     if(logo && logo.getAttribute("src") && logo.getAttribute("src").indexOf("ui-finetune-v1-20260528") === -1){
       logo.setAttribute("src", "/assets/logos/phase10-new-header-logo.png?v=ui-finetune-v1-20260528");
@@ -677,9 +676,9 @@ RULES:
     var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
     if(b) return tap(b, "parity-admin");
   }
-  function parityOpenChaos(){
-    if(typeof openChaos === "function") return openChaos();
-    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); } catch(e){ location.href="/CHAOS_ENGINE/?v="+Date.now(); }
+  function parityOpenDarkDancer(){
+    if(typeof openDarkDancer === "function") return openDarkDancer();
+    try{ window.open("/The-Dark-Dancer?v=" + Date.now(), "_blank"); } catch(e){ location.href="/The-Dark-Dancer?v="+Date.now(); }
   }
   function parityOpenStatus(){
     if(typeof openStatus === "function") return openStatus();
@@ -727,7 +726,7 @@ RULES:
   }
   function parityUpdateVersion(){
     var v = qs("#pcVersionBadge .status-code");
-    if(v) v.textContent = "v2026.05.30-iphone-parity1";
+    if(v) v.textContent = (window.SMFP_VERSION&&window.SMFP_VERSION.label)||"v2026.06.30-auth-hardlock1";
   }
   function iphonePcParityV1(){
     parityLockViewport();
@@ -739,7 +738,7 @@ RULES:
 
   // FORCED_UI_IMPLEMENTATION_V1_20260530
   function forcedUiApplyV1(){
-    var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent="v2026.05.30-forced-ui1";
+    var v=qs("#pcVersionBadge .status-code"); if(v) v.textContent=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||"v2026.06.30-auth-hardlock1";
     var brand=qs("#phase10BrandLine"); if(brand){brand.textContent="";brand.hidden=true;brand.style.display="none";}
     var logo=qs("#pcHeaderNewLogo"); if(logo) logo.setAttribute("src","/assets/logos/phase10-new-header-logo.png?v=forced-ui-v1-20260530");
     if(typeof hardfixMoveLedsBehindDj==="function") hardfixMoveLedsBehindDj();

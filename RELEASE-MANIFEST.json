@@ -1,13 +1,17 @@
 {
   "system": "WebRadio-666SOUNDsDESIGn",
-  "version": "1.0.2",
-  "releaseType": "FULLVERSION_BRANCH_RECOVERY_SCRIPTABLE_ATOMIC_READY",
-  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_BRANCH_RECOVERY_v1_0_2",
-  "singleTopLevelFolder": true,
+  "version": "1.1.0",
+  "releaseType": "FULLVERSION_AUTH_HARDLOCK_REPAIR_SCRIPTABLE_ATOMIC_READY",
+  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_FULLVERSION_AUTH_HARDLOCK_REPAIR_v1_1_0",
+  "deployArchiveRoot": "repo-root-direct",
+  "sourceArchive": "666WebRadio-666SOUNDsDESIGn.zip",
+  "sourceArchiveSha256": "0bbcbb292738361162f5e6b945640af5d8a03eb5539fd96182b43a7ef9893271",
+  "finalRepoFiles": 651,
   "nestedZipFiles": 0,
   "atomicBranchCommit": true,
   "dedicatedPublicAssets": true,
   "legacyBuildRootCompatibility": true,
-  "sourcePreservation": "root source retained; public deploy mirror added",
-  "createdAt": "2026-06-25T00:00:00+02:00"
+  "canonicalAuthArchitecture": "Password Worker /login -> Auth Worker /verify -> WebRadio same-origin broker",
+  "sourcePreservation": "original archive retained separately in full backup; repaired deploy excludes local .git/.wrangler state",
+  "createdAt": "2026-06-30T06:30:00+02:00"
 }
