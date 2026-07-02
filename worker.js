@@ -519,7 +519,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_HARDLOCK_REPAIR_v1.2.0')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -708,6 +708,18 @@ async function serveExternalIndex(request, env){
   return response || new Response(HTML, {status:200,headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store","x-player-mode":"embedded-emergency-fallback","x-player-version":"legacy-embedded"}});
 }
 
+async function serveAmarisPlayer(request, env){
+  const response = await serveProjectAsset(request, env, "/AMARIS/index.html");
+  if(!response){
+    return new Response("AMARIS player asset unavailable",{status:503,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store"}});
+  }
+  const headers = new Headers(response.headers);
+  headers.set("cache-control","no-store, no-cache, must-revalidate, max-age=0");
+  headers.set("x-player-mode","amaris-lyvra-minimal");
+  headers.set("x-player-version","v1.2.1");
+  return new Response(request.method === "HEAD" ? null : response.body,{status:response.status,statusText:response.statusText,headers});
+}
+
 
 
 // AUDIT_REPAIR_v1.1.0: CHAOS_ENGINE files are served from the required ASSETS binding.
@@ -767,13 +779,15 @@ function s666RouteTable() {
     { priority: 7, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
     { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
     { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
-    { priority: 10, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
-    { priority: 11, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
-    { priority: 12, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
-    { priority: 13, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
-    { priority: 14, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
-    { priority: 15, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
-    { priority: 16, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
+    { priority: 10, route: "/amaris", handler: "serveAmarisPlayer", purpose: "AMARIS LYVRA minimal recovery player" },
+    { priority: 11, route: "/internal", handler: "embedded internal player", purpose: "existing internal emergency player" },
+    { priority: 12, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
+    { priority: 13, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
+    { priority: 14, route: "/api/nowplaying", handler: "metadata proxy", purpose: "metadata / now playing" },
+    { priority: 15, route: "/health", handler: "s666LiveHealth", purpose: "live module health" },
+    { priority: 16, route: "/debug", handler: "s666LiveDebug", purpose: "safe debug overview" },
+    { priority: 17, route: "/debug/routes", handler: "s666RouteTable", purpose: "route priority table" },
+    { priority: 18, route: "/debug/modules", handler: "s666ModuleStatus", purpose: "module status table" }
   ];
 }
 
@@ -788,6 +802,14 @@ function s666ModuleStatus(env) {
         routes: ["/external-player", "/fallback-stream", "/stream"],
         primary: PRIMARY_STREAM_URLS[0],
         fallback: FALLBACK_STREAM_URLS[0]
+      },
+      amarisMinimalPlayer: {
+        ok: true,
+        routes: ["/amaris", "/amaris/", "/AMARIS/index.html"],
+        primary: "https://my.idjstream.com:8686",
+        fallback: "https://my.idjstream.com:8686/stream",
+        emergencyChain: ["/stream", "/fallback-stream"],
+        internalPlayerPreserved: true
       },
       chaosEngine: {
         ok: typeof chaosEngineStaticResponse === "function",
@@ -841,10 +863,10 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
+    version: "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
-    routes: { root: "/", stream: "/stream", metadata: "/api/nowplaying" }
+    routes: { root: "/", amaris: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
   });
 }
 
@@ -934,6 +956,10 @@ const url=new URL(request.url);
 
     const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
     if (chaosEngineStatic) return chaosEngineStatic;
+
+    if(url.pathname==="/amaris" || url.pathname==="/amaris/" || url.pathname==="/AMARIS" || url.pathname==="/AMARIS/"){
+      return await serveAmarisPlayer(request, env);
+    }
 
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       return await serveExternalIndex(request, env);

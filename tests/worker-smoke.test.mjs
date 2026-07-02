@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_HARDLOCK_REPAIR_v1.2.0");
+  assert.equal(data.version, "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1");
 });
 
 test("runtime configuration is read from static assets", async () => {
@@ -109,4 +109,25 @@ test("root and CSS are served from ASSETS", async () => {
   const cssResponse = await request("/css/base.css", { headers: { accept: "text/css" } });
   assert.equal(cssResponse.status, 200);
   assert.match(cssResponse.headers.get("content-type") || "", /text\/css/);
+});
+
+
+test("AMARIS endpoint serves the standalone minimal player and keeps the internal player", async () => {
+  const amaris = await request("/amaris", { headers: { accept: "text/html" } });
+  assert.equal(amaris.status, 200);
+  assert.match(amaris.headers.get("content-type") || "", /text\/html/);
+  assert.equal(amaris.headers.get("x-player-mode"), "amaris-lyvra-minimal");
+  const amarisHtml = await amaris.text();
+  assert.match(amarisHtml, /A M A R I S - L Y V R A\s+MINIMAL WEBRADIO/);
+  assert.match(amarisHtml, /https:\/\/my\.idjstream\.com:8686/);
+  assert.match(amarisHtml, /\/stream/);
+  assert.match(amarisHtml, /\/fallback-stream/);
+
+  const internal = await request("/internal", { headers: { accept: "text/html" } });
+  assert.equal(internal.status, 200);
+  const internalHtml = await internal.text();
+  assert.match(internalHtml, /666SOUNDsDESIGn DJ/);
+  assert.match(internalHtml, /id="reconnectBtn"/);
+  assert.match(internalHtml, /id="primaryBtn"/);
+  assert.match(internalHtml, /id="backupBtn"/);
 });

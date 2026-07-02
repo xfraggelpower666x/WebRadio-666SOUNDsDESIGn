@@ -9,7 +9,7 @@ const release = JSON.parse(await readFile(new URL("config/release.json", rootUrl
 const packageJson = JSON.parse(await readFile(new URL("package.json", rootUrl), "utf8"));
 
 const releaseManifest = JSON.parse(await readFile(new URL("RELEASE-MANIFEST.json", rootUrl), "utf8"));
-if (releaseManifest.expectedTopLevelFolder && basename(rootPath) !== releaseManifest.expectedTopLevelFolder) {
+if (process.env.S666_ENFORCE_RELEASE_FOLDER === "1" && releaseManifest.expectedTopLevelFolder && basename(rootPath) !== releaseManifest.expectedTopLevelFolder) {
   throw new Error(`top-level folder mismatch: expected ${releaseManifest.expectedTopLevelFolder}, got ${basename(rootPath)}`);
 }
 if (releaseManifest.hardAuditPolicy !== true) throw new Error("HARD AUDIT policy flag missing");
@@ -27,7 +27,8 @@ const required = [
   "workers/webradio-666soundsdesign-worker/wrangler.jsonc",
   "HARD_AUDIT_POLICY.md", "HARDLOCK_REPAIR_REPORT.md", "HARDLOCK_VALIDATION.json",
   "external-workers/666-system-pw-worker/worker.js",
-  "external-workers/666-system-auth-worker/worker.js"
+  "external-workers/666-system-auth-worker/worker.js",
+  "AMARIS/index.html", "public/AMARIS/index.html"
 ];
 for (const path of required) {
   const info = await stat(new URL(path, rootUrl));
@@ -63,7 +64,7 @@ for (const file of files.filter(file => /\.(?:js|mjs)$/i.test(file))) {
 }
 
 const worker = await readFile(new URL("worker.js", rootUrl), "utf8");
-for (const marker of ["playerAlertRateIdentity", "STREAM_FAILOVER_BUDGET_MS", "handleDiscordNotifyV3", "apiNotFound", release.release]) {
+for (const marker of ["playerAlertRateIdentity", "STREAM_FAILOVER_BUDGET_MS", "handleDiscordNotifyV3", "serveAmarisPlayer", "apiNotFound", release.release]) {
   if (!worker.includes(marker)) throw new Error(`worker integration missing: ${marker}`);
 }
 for (const forbidden of [
@@ -145,7 +146,7 @@ for (const item of rendererPairs) {
 }
 
 const productiveRoots = ["js", "css", "config"];
-const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html"];
+const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html", "AMARIS/index.html"];
 for (const directory of productiveRoots) {
   const sourceFiles = files.filter(file => relative(rootPath, file).split(sep)[0] === directory);
   for (const source of sourceFiles) {
@@ -159,7 +160,7 @@ for (const directory of productiveRoots) {
     publicPairs.push(item);
   }
 }
-for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html"]) {
+for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html", "AMARIS/index.html"]) {
   const source = await readFile(new URL(item, rootUrl));
   const mirror = await readFile(new URL(`public/${item}`, rootUrl));
   if (!source.equals(mirror)) throw new Error(`public deploy mirror drift: ${item}`);

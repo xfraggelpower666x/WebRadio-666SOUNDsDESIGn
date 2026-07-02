@@ -1,17 +1,19 @@
 {
-  "name": "WebRadio-666SOUNDsDESIGn FULLVERSION HARDLOCK REPAIR",
-  "version": "1.2.0",
-  "releaseDate": "2026-06-25",
-  "releaseFolder": "WebRadio-666SOUNDsDESIGn_HARDLOCK_REPAIR_v1_2_0",
-  "type": "complete-repository-release",
+  "name": "WebRadio-666SOUNDsDESIGn AMARIS MINIMAL PLAYER REPAIR",
+  "version": "1.2.1",
+  "releaseDate": "2026-07-02",
+  "releaseFolder": null,
+  "type": "safe-root-complete-repository-release",
   "uploadMode": "scriptable-folder-upload",
   "packaging": {
-    "singleTopLevelDirectory": true,
-    "repoRootDirectlyInsideTopLevelDirectory": true,
+    "singleTopLevelDirectory": false,
+    "repoRootDirectlyInsideTopLevelDirectory": false,
     "nestedZipFiles": false,
-    "generatedPythonBytecode": false
+    "generatedPythonBytecode": false,
+    "safeRootDeploy": true
   },
   "integratedPaths": [
+    "AMARIS/",
     "external-workers/666-chaos-ai-track-system/",
     "external-workers/666-suno-system/",
     "Render/666SOUNDsDESIGn-Alert-Service-Renderer/",
@@ -44,7 +46,12 @@
     "syntheticMeterRemoved": true,
     "privateRateIdentity": true,
     "senderIdRateBypassBlocked": true,
-    "hardlockTestsIncluded": true
+    "hardlockTestsIncluded": true,
+    "amarisMinimalPlayerAdded": true,
+    "amarisEndpointAdded": true,
+    "internalEmergencyPlayerPreserved": true,
+    "blackScreenComparisonAuditIncluded": true,
+    "safeRootReleaseCheckRepaired": true
   },
   "safety": {
     "sourceSystemsPreserved": true,

@@ -1,9 +1,16 @@
 {
-  "version": "1.2.0",
-  "release": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
-  "frontendVersion": "v2026.06.25-hardlock1",
-  "build": "smfp-v2026-06-25-hardlock1",
-  "date": "2026-06-25",
-  "baselineRelease": "FULLVERSION_AUDIT_REPAIR_v1.1.0",
-  "baselineCommit": "e6aa911e71d6b28c616fed44683e93ea6d5a2a9a"
+  "version": "1.2.1",
+  "release": "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
+  "frontendVersion": "v2026.07.02-amaris1",
+  "build": "smfp-v2026-07-02-amaris1",
+  "date": "2026-07-02",
+  "baselineRelease": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
+  "baselineCommit": "CURRENT_REPO_UPLOAD_2026-07-02",
+  "features": [
+    "AMARIS_MINIMAL_PLAYER",
+    "AMARIS_ENDPOINT",
+    "INTERNAL_PLAYER_PRESERVED",
+    "SAFE_ROOT_DEPLOY",
+    "BLACK_SCREEN_COMPARISON_AUDIT"
+  ]
 }

@@ -80,3 +80,13 @@ Abnahme:
 ## 7. Merge-Gate
 
 Erst mergen, wenn alle Punkte vollständig PASS sind. Ein lokaler PASS ersetzt keinen Live-PASS.
+
+
+## v1.2.1 AMARIS endpoint checks
+
+- [ ] `/` returns the normal main player.
+- [ ] `/amaris` returns `A M A R I S - L Y V R A   MINIMAL WEBRADIO`.
+- [ ] `/internal` still returns the existing internal emergency player.
+- [ ] `/stream` and `/fallback-stream` remain available.
+- [ ] `AMARIS/index.html` and `public/AMARIS/index.html` are byte-identical.
+- [ ] Deploy ZIP has no wrapper folder.

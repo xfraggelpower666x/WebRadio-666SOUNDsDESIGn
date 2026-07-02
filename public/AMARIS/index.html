@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <meta name="robots" content="noindex,nofollow">
+  <title>AMARIS LYVRA Minimal WebRadio</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#05070d;--panel:#0b1018;--panel2:#111822;--cyan:#16fff3;--pink:#ff3dbb;
+      --green:#52ff9a;--red:#ff5570;--text:#eefcff;--muted:#91a7b5;--line:rgba(22,255,243,.28)
+    }
+    html,body{margin:0;min-height:100%;background:
+      radial-gradient(circle at 18% 0%,rgba(255,61,187,.11),transparent 34%),
+      radial-gradient(circle at 82% 100%,rgba(22,255,243,.12),transparent 36%),
+      linear-gradient(180deg,#03050a,#080c13 48%,#04060b);color:var(--text);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+    body{min-height:100vh;display:grid;place-items:center;padding:16px}
+    .shell{width:min(680px,100%);border:1px solid var(--line);border-radius:24px;padding:18px;
+      background:linear-gradient(180deg,rgba(14,20,29,.97),rgba(7,11,17,.98));
+      box-shadow:0 0 34px rgba(22,255,243,.12),0 0 26px rgba(255,61,187,.09)}
+    h1{margin:2px 0 16px;text-align:center;white-space:pre-wrap;font-size:clamp(1.05rem,3.4vw,1.65rem);
+      line-height:1.35;letter-spacing:.13em;color:var(--cyan);
+      text-shadow:0 0 8px rgba(22,255,243,.95),0 0 18px rgba(22,255,243,.48),1px 1px 8px rgba(255,61,187,.38)}
+    .sub{text-align:center;color:var(--muted);font-size:.78rem;letter-spacing:.08em;margin:-8px 0 16px}
+    .status-grid,.stats,.controls,.tools{display:grid;gap:10px}
+    .status-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:10px}
+    .stats{grid-template-columns:repeat(3,minmax(0,1fr));margin:10px 0}
+    .controls{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}
+    .tools{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}
+    .box,.pill,.display,.btn{border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.035)}
+    .box{padding:10px 12px;min-height:58px}.label{font-size:.72rem;color:var(--muted);letter-spacing:.08em}.value{margin-top:5px;font-weight:800;overflow-wrap:anywhere}
+    .lamp-row{display:flex;align-items:center;gap:8px}.lamp{width:12px;height:12px;border-radius:50%;background:#384550;box-shadow:0 0 8px #384550}
+    .lamp.ok{background:var(--green);box-shadow:0 0 12px var(--green)}.lamp.work{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+    .lamp.warn{background:var(--pink);box-shadow:0 0 12px var(--pink)}.lamp.error{background:var(--red);box-shadow:0 0 12px var(--red)}
+    .pills{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}.pill{padding:7px 10px;color:var(--muted);font-size:.78rem}
+    .pill.active{color:var(--cyan);border-color:rgba(22,255,243,.4)}
+    .display-wrap{position:relative}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .display{min-height:62px;padding:12px;display:flex;align-items:center;overflow:hidden;border-color:rgba(22,255,243,.22)}
+    #nowPlaying{font-weight:800;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+    .history{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:20;padding:12px;border-radius:14px;background:#0b1119;border:1px solid rgba(255,61,187,.32);box-shadow:0 0 22px rgba(255,61,187,.16)}
+    .history.hidden{display:none}.history ul{margin:8px 0 0;padding-left:20px;max-height:210px;overflow:auto}
+    .btn{appearance:none;color:var(--text);padding:11px 10px;font-weight:800;cursor:pointer;min-height:44px;
+      background:linear-gradient(180deg,rgba(22,255,243,.07),rgba(255,61,187,.035));box-shadow:0 0 10px rgba(22,255,243,.08)}
+    .btn:hover,.btn:focus-visible{border-color:rgba(22,255,243,.55);outline:none;box-shadow:0 0 16px rgba(22,255,243,.18)}
+    .btn.primary{border-color:rgba(255,61,187,.36);box-shadow:0 0 14px rgba(255,61,187,.12)}
+    .btn.active{border-color:rgba(22,255,243,.7);color:var(--cyan);box-shadow:0 0 18px rgba(22,255,243,.2)}
+    .tiny{min-height:32px;padding:6px 9px;font-size:.75rem}
+    .boot{position:fixed;inset:0;display:grid;place-items:center;padding:20px;background:rgba(2,4,8,.92);z-index:50}
+    .boot.hidden{display:none}.boot-card{width:min(440px,100%);padding:22px;border-radius:20px;background:#0b1119;border:1px solid var(--line);text-align:center;box-shadow:0 0 28px rgba(22,255,243,.16)}
+    .boot-title{color:var(--cyan);font-weight:900;letter-spacing:.18em;text-shadow:0 0 14px rgba(22,255,243,.55);margin-bottom:8px}
+    .boot-note{color:var(--muted);font-size:.8rem;line-height:1.45;margin:0 0 16px}
+    .footer{margin-top:14px;text-align:center;color:#6f8592;font-size:.68rem;line-height:1.45}
+    @media(max-width:560px){body{padding:8px}.shell{padding:13px;border-radius:18px}.status-grid,.stats{grid-template-columns:1fr 1fr}.status-grid .box:last-child,.stats .box:last-child{grid-column:1/-1}.tools{grid-template-columns:1fr 1fr}h1{letter-spacing:.09em}.sub{font-size:.7rem}}
+  </style>
+</head>
+<body>
+  <div id="boot" class="boot">
+    <div class="boot-card">
+      <div class="boot-title">AMARIS · LYVRA</div>
+      <p class="boot-note">Startet den Minimalplayer und initialisiert Audio auf Desktop, iPhone und Android.</p>
+      <button id="bootButton" class="btn primary" type="button">START AUDIO</button>
+    </div>
+  </div>
+
+  <main class="shell" aria-label="AMARIS LYVRA Minimal WebRadio">
+    <h1>A M A R I S - L Y V R A   MINIMAL WEBRADIO</h1>
+    <div class="sub">DIRECT STREAM · FALLBACK STREAM · INTERNAL EMERGENCY CHAIN</div>
+
+    <section class="status-grid" aria-label="Player status">
+      <div class="box"><div class="lamp-row"><span id="metaLamp" class="lamp"></span><strong>METADATA</strong></div><div id="metaState" class="label">Loading</div></div>
+      <div class="box"><div class="lamp-row"><span id="audioLamp" class="lamp"></span><strong>AUDIO</strong></div><div id="audioState" class="label">Ready</div></div>
+      <div class="box"><div class="lamp-row"><span id="sourceLamp" class="lamp work"></span><strong>SOURCE</strong></div><div id="sourceState" class="label">MAIN DIRECT</div></div>
+    </section>
+
+    <div class="pills">
+      <span id="statusPill" class="pill active">READY</span>
+      <span id="modePill" class="pill">MAIN</span>
+      <span id="candidatePill" class="pill">DIRECT PRIMARY</span>
+    </div>
+
+    <section class="display-wrap">
+      <div class="display-head"><span class="label">NOW PLAYING</span><button id="historyButton" class="btn tiny" type="button">HISTORY</button></div>
+      <div class="display"><div id="nowPlaying">Metadata loading …</div></div>
+      <div id="historyPanel" class="history hidden"><strong>LAST TRACKS</strong><ul id="historyList"><li>No history loaded</li></ul></div>
+    </section>
+
+    <section class="stats">
+      <div class="box"><div class="label">LISTENERS</div><div id="listeners" class="value">0 / 250</div></div>
+      <div class="box"><div class="label">BITRATE</div><div id="bitrate" class="value">Unknown</div></div>
+      <div class="box"><div class="label">DJ / STATUS</div><div id="dj" class="value">666SOUNDsDESIGn DJ</div></div>
+    </section>
+
+    <section class="controls" aria-label="Transport controls">
+      <button id="playButton" class="btn primary" type="button">PLAY</button>
+      <button id="pauseButton" class="btn" type="button">PAUSE</button>
+      <button id="stopButton" class="btn" type="button">STOP</button>
+    </section>
+
+    <section class="tools" aria-label="Source and recovery controls">
+      <button id="reconnectButton" class="btn" type="button">RECONNECT</button>
+      <button id="muteButton" class="btn" type="button">MUTE</button>
+      <button id="mainButton" class="btn active" type="button">MAIN</button>
+      <button id="backButton" class="btn" type="button">BACK</button>
+    </section>
+
+    <audio id="radio" preload="none" playsinline></audio>
+    <div class="footer">AMARIS · LYVRA minimal recovery player · existing /internal emergency player remains unchanged</div>
+  </main>
+
+  <script>
+  (()=>{
+    'use strict';
+    const DIRECT_PRIMARY='https://my.idjstream.com:8686';
+    const DIRECT_FALLBACK='https://my.idjstream.com:8686/stream';
+    const WORKER_PRIMARY='/stream';
+    const WORKER_FALLBACK='/fallback-stream';
+    const METADATA_URL='/api/nowplaying';
+    const CAPACITY=250;
+    const CHAINS={
+      main:[
+        {url:DIRECT_PRIMARY,label:'DIRECT PRIMARY',mode:'MAIN'},
+        {url:DIRECT_FALLBACK,label:'DIRECT FALLBACK',mode:'BACK'},
+        {url:WORKER_PRIMARY,label:'WORKER EMERGENCY MAIN',mode:'MAIN'},
+        {url:WORKER_FALLBACK,label:'WORKER EMERGENCY BACK',mode:'BACK'}
+      ],
+      back:[
+        {url:DIRECT_FALLBACK,label:'DIRECT FALLBACK',mode:'BACK'},
+        {url:WORKER_FALLBACK,label:'WORKER EMERGENCY BACK',mode:'BACK'},
+        {url:WORKER_PRIMARY,label:'WORKER EMERGENCY MAIN',mode:'MAIN'},
+        {url:DIRECT_PRIMARY,label:'DIRECT PRIMARY',mode:'MAIN'}
+      ]
+    };
+    const q=id=>document.getElementById(id);
+    const audio=q('radio'),boot=q('boot'),bootButton=q('bootButton');
+    const statusPill=q('statusPill'),modePill=q('modePill'),candidatePill=q('candidatePill');
+    const metaLamp=q('metaLamp'),audioLamp=q('audioLamp'),sourceLamp=q('sourceLamp');
+    const metaState=q('metaState'),audioState=q('audioState'),sourceState=q('sourceState');
+    const nowPlaying=q('nowPlaying'),listeners=q('listeners'),bitrate=q('bitrate'),dj=q('dj');
+    const historyButton=q('historyButton'),historyPanel=q('historyPanel'),historyList=q('historyList');
+    const playButton=q('playButton'),pauseButton=q('pauseButton'),stopButton=q('stopButton');
+    const reconnectButton=q('reconnectButton'),muteButton=q('muteButton'),mainButton=q('mainButton'),backButton=q('backButton');
+    let selected='main',candidateIndex=0,userStopped=false,switching=false,muted=false,metadataTimer=0,stallTimer=0,lastTitle='';
+    const localHistory=[];
+    function lamp(node,state){node.className='lamp'+(state?' '+state:'')}
+    function status(text,state='active'){statusPill.textContent=text;statusPill.className='pill '+state}
+    function updateButtons(){mainButton.classList.toggle('active',selected==='main');backButton.classList.toggle('active',selected==='back');modePill.textContent=selected.toUpperCase()}
+    function currentCandidate(){return CHAINS[selected][candidateIndex]||CHAINS[selected][0]}
+    function updateSource(){const item=currentCandidate();candidatePill.textContent=item.label;sourceState.textContent=item.label;lamp(sourceLamp,item.url.startsWith('/')?'warn':'work')}
+    function resetAudio(){clearTimeout(stallTimer);audio.pause();audio.removeAttribute('src');audio.load()}
+    async function playCandidate(index,reason='Play'){
+      if(switching)return false;
+      switching=true;userStopped=false;candidateIndex=Math.max(0,Math.min(index,CHAINS[selected].length-1));updateButtons();updateSource();
+      const item=currentCandidate();status(reason+' · '+item.label);audioState.textContent='Connecting';lamp(audioLamp,'work');
+      try{
+        resetAudio();audio.src=item.url;audio.muted=muted;audio.load();
+        await audio.play();status('PLAYING');audioState.textContent='Playing';lamp(audioLamp,'ok');startMetadata();return true;
+      }catch(err){audioState.textContent='Failed: '+item.label;lamp(audioLamp,'error');switching=false;return advanceFallback('Play failed')}
+      finally{switching=false}
+    }
+    async function advanceFallback(reason){
+      if(userStopped)return false;
+      const next=candidateIndex+1;
+      if(next>=CHAINS[selected].length){status('ALL SOURCES FAILED');audioState.textContent='No source available';lamp(audioLamp,'error');return false}
+      candidateIndex=next;updateSource();
+      await new Promise(r=>setTimeout(r,220));
+      return playCandidate(candidateIndex,reason);
+    }
+    function stopMetadata(){clearInterval(metadataTimer);metadataTimer=0}
+    function startMetadata(){if(metadataTimer)return;fetchMetadata();metadataTimer=setInterval(fetchMetadata,8000)}
+    function normalizeTitle(data){return String(data?.song||data?.title||data?.track||data?.nowplaying||data?.currentSong||'Metadata unavailable')}
+    function renderHistory(items){
+      const list=Array.isArray(items)&&items.length?items:localHistory;
+      historyList.textContent='';
+      if(!list.length){const li=document.createElement('li');li.textContent='No history loaded';historyList.appendChild(li);return}
+      list.slice(0,12).forEach(item=>{const li=document.createElement('li');li.textContent=typeof item==='string'?item:String(item?.song||item?.title||item?.track||item?.name||'Unknown track');historyList.appendChild(li)})
+    }
+    async function fetchMetadata(){
+      try{
+        const response=await fetch(METADATA_URL,{cache:'no-store'});if(!response.ok)throw new Error('metadata_http_'+response.status);
+        const data=await response.json();const title=normalizeTitle(data);nowPlaying.textContent=title;
+        if(title&&title!==lastTitle&&title!=='Metadata unavailable'){lastTitle=title;localHistory.unshift(title);if(localHistory.length>12)localHistory.length=12}
+        const count=Number.parseInt(data?.listeners??data?.currentListeners??0,10);listeners.textContent=(Number.isFinite(count)?count:0)+' / '+CAPACITY;
+        const br=data?.bitrate??data?.stream?.bitrate??'Unknown';bitrate.textContent=br==='Unknown'?'Unknown':String(br).replace(/\s*kbps$/i,'')+' kbps';
+        dj.textContent=String(data?.djusername||data?.djstatus||data?.dj||data?.client||'666SOUNDsDESIGn DJ');
+        renderHistory(data?.history);metaState.textContent='Online';lamp(metaLamp,'ok');
+      }catch(err){metaState.textContent='Offline';lamp(metaLamp,'error');if(!lastTitle)nowPlaying.textContent='Metadata unavailable';renderHistory([])}
+    }
+    bootButton.addEventListener('click',async()=>{bootButton.disabled=true;boot.classList.add('hidden');await playCandidate(0,'Start')});
+    playButton.addEventListener('click',()=>playCandidate(candidateIndex,'Play'));
+    pauseButton.addEventListener('click',()=>{audio.pause();stopMetadata();status('PAUSED','');audioState.textContent='Paused';lamp(audioLamp,'warn')});
+    stopButton.addEventListener('click',()=>{userStopped=true;switching=false;stopMetadata();resetAudio();status('STOPPED','');audioState.textContent='Stopped';lamp(audioLamp,'')});
+    reconnectButton.addEventListener('click',()=>{userStopped=false;playCandidate(candidateIndex,'Reconnect')});
+    muteButton.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteButton.textContent=muted?'UNMUTE':'MUTE'});
+    mainButton.addEventListener('click',()=>{selected='main';candidateIndex=0;updateButtons();playCandidate(0,'Switch MAIN')});
+    backButton.addEventListener('click',()=>{selected='back';candidateIndex=0;updateButtons();playCandidate(0,'Switch BACK')});
+    historyButton.addEventListener('click',()=>historyPanel.classList.toggle('hidden'));
+    audio.addEventListener('playing',()=>{if(userStopped)return;status('PLAYING');audioState.textContent='Playing';lamp(audioLamp,'ok')});
+    audio.addEventListener('waiting',()=>{if(userStopped)return;status('BUFFERING');audioState.textContent='Buffering';lamp(audioLamp,'warn')});
+    audio.addEventListener('stalled',()=>{if(userStopped)return;clearTimeout(stallTimer);stallTimer=setTimeout(()=>advanceFallback('Stalled fallback'),4000)});
+    audio.addEventListener('error',()=>{if(userStopped||switching)return;advanceFallback('Audio error fallback')});
+    audio.addEventListener('ended',()=>{if(userStopped)return;advanceFallback('Stream ended fallback')});
+    updateButtons();updateSource();renderHistory([]);fetchMetadata();
+  })();
+  </script>
+</body>
+</html>

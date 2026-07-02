@@ -61,3 +61,15 @@ npm ci
 npm run verify
 npm run deploy
 ```
+
+
+## Release v1.2.1 — AMARIS minimal recovery player
+
+- New standalone page: `AMARIS/index.html`
+- Public endpoint: `/amaris`
+- Direct primary: `https://my.idjstream.com:8686`
+- Direct fallback: `https://my.idjstream.com:8686/stream`
+- Additional emergency chain: `/stream` then `/fallback-stream`
+- Existing internal emergency player remains available at `/internal` and was preserved byte-for-byte.
+- Root/public mirrors and the legacy Worker mirror are synchronized.
+- Safe-root deploy packaging is required; the source download ZIP contains a wrapper folder and must not be uploaded as-is.

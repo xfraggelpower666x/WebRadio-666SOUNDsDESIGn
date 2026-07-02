@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio hardlocked full source with strict admin authorization, unified auth, privacy-safe rate limiting and pre-Boost meter authority.",
+  "description": "666SOUNDsDESIGn WebRadio full source with strict admin hardlock, black-screen regression protection and AMARIS LYVRA minimal recovery player.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",
