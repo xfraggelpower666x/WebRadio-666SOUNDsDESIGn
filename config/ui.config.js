@@ -60,7 +60,7 @@ export const UI_CONFIG = {
     audioError: 'Audio konnte nicht abgespielt werden.'
   },
   defaults: {
-    djName: '666SOUNDsDESIGn DJ',
+    djName: 'LYVRA DJ',
     stationName: '666SOUNDsDESIGn Radio'
   }
 };

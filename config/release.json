@@ -1,16 +1,20 @@
 {
-  "version": "1.2.1",
-  "release": "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
-  "frontendVersion": "v2026.07.02-amaris1",
-  "build": "smfp-v2026-07-02-amaris1",
+  "version": "1.2.2",
+  "release": "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2",
+  "frontendVersion": "v2026.07.02-amaris2",
+  "build": "smfp-v2026-07-02-amaris2",
   "date": "2026-07-02",
-  "baselineRelease": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
-  "baselineCommit": "CURRENT_REPO_UPLOAD_2026-07-02",
+  "baselineRelease": "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
+  "baselineCommit": "LOCAL_PACKAGE_v1.2.1",
   "features": [
-    "AMARIS_MINIMAL_PLAYER",
-    "AMARIS_ENDPOINT",
+    "AMARIS_STANDALONE_HARD_ROUTE",
+    "AMARIS_LOWERCASE_STATIC_ROUTE",
+    "AMARIS_IOS_AUDIO_START_REPAIR",
+    "WORKER_RUNTIME_SWITCH_FIRST",
+    "LYVRA_DJ_CANONICAL_AUTODJ_NAME",
+    "LIVE_DJ_DYNAMIC_OVERRIDE",
     "INTERNAL_PLAYER_PRESERVED",
-    "SAFE_ROOT_DEPLOY",
-    "BLACK_SCREEN_COMPARISON_AUDIT"
+    "MAIN_PLAYER_PRESERVED",
+    "SAFE_ROOT_DEPLOY"
   ]
 }

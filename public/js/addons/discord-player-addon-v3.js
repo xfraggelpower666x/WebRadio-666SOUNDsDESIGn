@@ -37,7 +37,7 @@
   function readTrackFromDom() {
     var title = readText(['#trackTitle', '#mffTrackTitle', '#nowPlayingTitle', '[data-now-playing-title]']);
     var artist = readText(['#trackArtist', '#mffTrackArtist', '#nowPlayingArtist', '[data-now-playing-artist]']);
-    var dj = readText(['#statusDj', '#mffDj', '[data-dj-name]']) || '666 DJ';
+    var dj = readText(['#statusDj', '#mffDj', '[data-dj-name]']) || 'LYVRA DJ';
     var listeners = readText(['#statusListeners', '#mffListeners', '[data-listeners]']);
     var bitrate = readText(['#statusBitrate', '#mffBitrate', '[data-bitrate]']);
     var artwork = readImage(['#coverImage', '#mffCoverImage', '#nowPlayingCover', '[data-now-playing-cover] img']);

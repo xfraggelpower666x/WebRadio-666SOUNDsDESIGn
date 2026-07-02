@@ -1,7 +1,7 @@
 {
   "system": "WebRadio-666SOUNDsDESIGn",
-  "version": "1.2.1",
-  "releaseType": "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_VALIDATED",
+  "version": "1.2.2",
+  "releaseType": "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_VALIDATED",
   "expectedTopLevelFolder": null,
   "singleTopLevelFolder": false,
   "nestedZipFiles": 0,
@@ -9,9 +9,9 @@
   "dedicatedPublicAssets": true,
   "legacyBuildRootCompatibility": true,
   "sourcePreservation": "root source retained; public and legacy Worker mirrors synchronized",
-  "baselineCommit": "e6aa911e71d6b28c616fed44683e93ea6d5a2a9a",
-  "createdAt": "2026-07-02T15:14:27Z",
-  "baselineRelease": "FULLVERSION_HARDLOCK_REPAIR_v1.2.0",
+  "baselineCommit": "LOCAL_PACKAGE_v1.2.1",
+  "createdAt": "2026-07-02T17:30:00Z",
+  "baselineRelease": "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
   "hardAuditPolicy": true,
   "strictAdminAuthorization": true,
   "singleAuthClient": true,
@@ -19,5 +19,12 @@
   "privateRateIdentity": true,
   "safeRootDeploy": true,
   "amarisMinimalPlayer": true,
-  "internalEmergencyPlayerPreserved": true
+  "internalEmergencyPlayerPreserved": true,
+  "amarisStandaloneHardRoute": true,
+  "amarisLowercaseStaticMirror": true,
+  "amarisIosStartRepair": true,
+  "workerRuntimeSwitchFirst": true,
+  "lyvraDjCanonical": true,
+  "liveDjDynamicOverride": true,
+  "mainPlayerPreserved": true
 }

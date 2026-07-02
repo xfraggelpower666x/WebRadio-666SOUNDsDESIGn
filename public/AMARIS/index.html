@@ -5,204 +5,219 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#05070d">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>AMARIS LYVRA Minimal WebRadio</title>
   <style>
     *{box-sizing:border-box}
-    :root{
-      --bg:#05070d;--panel:#0b1018;--panel2:#111822;--cyan:#16fff3;--pink:#ff3dbb;
-      --green:#52ff9a;--red:#ff5570;--text:#eefcff;--muted:#91a7b5;--line:rgba(22,255,243,.28)
-    }
-    html,body{margin:0;min-height:100%;background:
-      radial-gradient(circle at 18% 0%,rgba(255,61,187,.11),transparent 34%),
-      radial-gradient(circle at 82% 100%,rgba(22,255,243,.12),transparent 36%),
-      linear-gradient(180deg,#03050a,#080c13 48%,#04060b);color:var(--text);
-      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
-    body{min-height:100vh;display:grid;place-items:center;padding:16px}
-    .shell{width:min(680px,100%);border:1px solid var(--line);border-radius:24px;padding:18px;
-      background:linear-gradient(180deg,rgba(14,20,29,.97),rgba(7,11,17,.98));
-      box-shadow:0 0 34px rgba(22,255,243,.12),0 0 26px rgba(255,61,187,.09)}
-    h1{margin:2px 0 16px;text-align:center;white-space:pre-wrap;font-size:clamp(1.05rem,3.4vw,1.65rem);
-      line-height:1.35;letter-spacing:.13em;color:var(--cyan);
-      text-shadow:0 0 8px rgba(22,255,243,.95),0 0 18px rgba(22,255,243,.48),1px 1px 8px rgba(255,61,187,.38)}
-    .sub{text-align:center;color:var(--muted);font-size:.78rem;letter-spacing:.08em;margin:-8px 0 16px}
-    .status-grid,.stats,.controls,.tools{display:grid;gap:10px}
-    .status-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:10px}
-    .stats{grid-template-columns:repeat(3,minmax(0,1fr));margin:10px 0}
-    .controls{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}
-    .tools{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:10px}
-    .box,.pill,.display,.btn{border:1px solid rgba(255,255,255,.09);border-radius:15px;background:rgba(255,255,255,.035)}
-    .box{padding:10px 12px;min-height:58px}.label{font-size:.72rem;color:var(--muted);letter-spacing:.08em}.value{margin-top:5px;font-weight:800;overflow-wrap:anywhere}
-    .lamp-row{display:flex;align-items:center;gap:8px}.lamp{width:12px;height:12px;border-radius:50%;background:#384550;box-shadow:0 0 8px #384550}
-    .lamp.ok{background:var(--green);box-shadow:0 0 12px var(--green)}.lamp.work{background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
-    .lamp.warn{background:var(--pink);box-shadow:0 0 12px var(--pink)}.lamp.error{background:var(--red);box-shadow:0 0 12px var(--red)}
-    .pills{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}.pill{padding:7px 10px;color:var(--muted);font-size:.78rem}
-    .pill.active{color:var(--cyan);border-color:rgba(22,255,243,.4)}
-    .display-wrap{position:relative}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-    .display{min-height:62px;padding:12px;display:flex;align-items:center;overflow:hidden;border-color:rgba(22,255,243,.22)}
-    #nowPlaying{font-weight:800;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-    .history{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:20;padding:12px;border-radius:14px;background:#0b1119;border:1px solid rgba(255,61,187,.32);box-shadow:0 0 22px rgba(255,61,187,.16)}
-    .history.hidden{display:none}.history ul{margin:8px 0 0;padding-left:20px;max-height:210px;overflow:auto}
-    .btn{appearance:none;color:var(--text);padding:11px 10px;font-weight:800;cursor:pointer;min-height:44px;
-      background:linear-gradient(180deg,rgba(22,255,243,.07),rgba(255,61,187,.035));box-shadow:0 0 10px rgba(22,255,243,.08)}
-    .btn:hover,.btn:focus-visible{border-color:rgba(22,255,243,.55);outline:none;box-shadow:0 0 16px rgba(22,255,243,.18)}
-    .btn.primary{border-color:rgba(255,61,187,.36);box-shadow:0 0 14px rgba(255,61,187,.12)}
-    .btn.active{border-color:rgba(22,255,243,.7);color:var(--cyan);box-shadow:0 0 18px rgba(22,255,243,.2)}
-    .tiny{min-height:32px;padding:6px 9px;font-size:.75rem}
-    .boot{position:fixed;inset:0;display:grid;place-items:center;padding:20px;background:rgba(2,4,8,.92);z-index:50}
-    .boot.hidden{display:none}.boot-card{width:min(440px,100%);padding:22px;border-radius:20px;background:#0b1119;border:1px solid var(--line);text-align:center;box-shadow:0 0 28px rgba(22,255,243,.16)}
-    .boot-title{color:var(--cyan);font-weight:900;letter-spacing:.18em;text-shadow:0 0 14px rgba(22,255,243,.55);margin-bottom:8px}
-    .boot-note{color:var(--muted);font-size:.8rem;line-height:1.45;margin:0 0 16px}
-    .footer{margin-top:14px;text-align:center;color:#6f8592;font-size:.68rem;line-height:1.45}
-    @media(max-width:560px){body{padding:8px}.shell{padding:13px;border-radius:18px}.status-grid,.stats{grid-template-columns:1fr 1fr}.status-grid .box:last-child,.stats .box:last-child{grid-column:1/-1}.tools{grid-template-columns:1fr 1fr}h1{letter-spacing:.09em}.sub{font-size:.7rem}}
+    :root{--bg:#07080f;--bg2:#0a0d1a;--cyan:#16fff3;--pink:#ff3dbb;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(22,255,243,.28);--shadow-cyan:0 0 18px rgba(22,255,243,.22);--shadow-pink:0 0 18px rgba(255,61,187,.18)}
+    html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,61,187,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(22,255,243,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:'Courier New',Courier,monospace}
+    body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+    .player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}
+    .player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(22,255,243,.25)}
+    .brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(22,255,243,.34)}.brand{font-size:clamp(1rem,3.8vw,1.42rem);line-height:1.35}.boot-title{font-size:1.5rem;margin-bottom:8px}
+    .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}
+    .lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp-box-source{justify-content:flex-start}.lamp-side-label{margin-left:auto;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.28)}
+    .lamp{width:12px;height:12px;border-radius:999px;display:inline-block;border:1px solid rgba(255,255,255,.20);box-shadow:0 0 10px currentColor}.lamp-purple{color:#b14dff;background:#b14dff}.lamp-red{color:var(--pink);background:var(--pink)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-green{color:var(--green);background:var(--green)}
+    .lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.pill{padding:8px 12px;font-size:.86rem}.pill-dim{color:var(--muted)}
+    .display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(22,255,243,.22)}
+    .marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+    .tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,61,187,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}
+    .mini-grid{display:grid;gap:10px;margin-bottom:12px}.mini-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.mini-box{padding:10px 12px}.mini-value{font-weight:700;margin-top:4px;overflow-wrap:anywhere}.control-strip,.audio-tools{display:grid;gap:10px;align-items:stretch}.control-strip-3{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:10px}.audio-tools-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .control-btn,.small-btn{padding:12px;color:var(--text);font-weight:700;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:var(--shadow-cyan)}.control-btn.main{border-color:rgba(255,61,187,.35);box-shadow:var(--shadow-pink)}.small-btn{border-color:rgba(255,61,187,.28);box-shadow:var(--shadow-pink)}.source-btn.is-active{border-color:rgba(22,255,243,.45);box-shadow:0 0 14px rgba(22,255,243,.28)}
+    .overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.90)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(22,255,243,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(22,255,243,.16),rgba(255,61,187,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.neon-button:disabled{opacity:.65;cursor:wait}.boot-state{min-height:1.4em;margin-top:12px;color:var(--pink);font-size:.82rem}.footer{margin-top:12px;text-align:center;color:#6f8592;font-size:.68rem;line-height:1.45}
+    @media(max-width:560px){.mini-grid-3{grid-template-columns:1fr}.audio-tools-4{grid-template-columns:repeat(2,minmax(0,1fr))}.status-grid{grid-template-columns:1fr}.app-shell{padding:8px}.player-card{padding:13px;border-radius:18px}}
   </style>
 </head>
 <body>
-  <div id="boot" class="boot">
-    <div class="boot-card">
+  <div id="bootOverlay" class="overlay">
+    <div class="boot-panel">
       <div class="boot-title">AMARIS · LYVRA</div>
-      <p class="boot-note">Startet den Minimalplayer und initialisiert Audio auf Desktop, iPhone und Android.</p>
-      <button id="bootButton" class="btn primary" type="button">START AUDIO</button>
+      <div class="boot-subtitle">MINIMAL WEBRADIO · WORKER EMERGENCY CHAIN</div>
+      <p class="boot-note">Ein Tipp startet Audio direkt über die Worker-Switch-Logik. Der Dialog schließt erst, wenn die Wiedergabe wirklich läuft.</p>
+      <button id="bootButton" class="neon-button" type="button">START AUDIO</button>
+      <div id="bootState" class="boot-state" role="status" aria-live="polite">Bereit</div>
     </div>
   </div>
 
-  <main class="shell" aria-label="AMARIS LYVRA Minimal WebRadio">
-    <h1>A M A R I S - L Y V R A   MINIMAL WEBRADIO</h1>
-    <div class="sub">DIRECT STREAM · FALLBACK STREAM · INTERNAL EMERGENCY CHAIN</div>
+  <main class="app-shell" aria-label="AMARIS LYVRA Minimal WebRadio">
+    <section class="player-card">
+      <header class="topbar">
+        <div class="topbar-line"></div>
+        <div class="brand">A M A R I S - L Y V R A<br>MINIMAL WEBRADIO</div>
+        <div class="topbar-line"></div>
+      </header>
 
-    <section class="status-grid" aria-label="Player status">
-      <div class="box"><div class="lamp-row"><span id="metaLamp" class="lamp"></span><strong>METADATA</strong></div><div id="metaState" class="label">Loading</div></div>
-      <div class="box"><div class="lamp-row"><span id="audioLamp" class="lamp"></span><strong>AUDIO</strong></div><div id="audioState" class="label">Ready</div></div>
-      <div class="box"><div class="lamp-row"><span id="sourceLamp" class="lamp work"></span><strong>SOURCE</strong></div><div id="sourceState" class="label">MAIN DIRECT</div></div>
+      <div class="status-grid">
+        <div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">Meta</span></div>
+        <div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">Audio</span></div>
+        <div class="lamp-box lamp-box-source"><span id="sourceLamp" class="lamp lamp-cyan"></span><span class="lamp-label">Source</span><span id="playerTypeLabel" class="lamp-side-label">AMARIS</span></div>
+      </div>
+
+      <div class="pill-row">
+        <span id="streamStatus" class="pill">Ready</span>
+        <span id="sourceLabel" class="pill pill-dim">MAIN</span>
+        <span id="fallbackText" class="pill pill-dim">WORKER MAIN SWITCH</span>
+      </div>
+
+      <div class="display-block">
+        <div class="display-head"><div class="display-label">Now Playing</div><button id="historyToggle" class="tiny-btn" type="button">History</button></div>
+        <div id="metaText" class="display-label" style="margin-bottom:6px;">Loading...</div>
+        <div class="display-window"><div id="nowPlaying" class="marquee-track">Loading metadata...</div></div>
+        <div id="historyOverlay" class="history-overlay hidden"><div class="history-title">Last Tracks</div><ul id="historyList" class="history-list"><li>No history loaded</li></ul></div>
+      </div>
+
+      <div class="mini-grid mini-grid-3">
+        <div class="mini-box"><div class="mini-label">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
+        <div class="mini-box"><div class="mini-label">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
+        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">LYVRA DJ</div></div>
+      </div>
+
+      <div class="control-strip control-strip-3">
+        <button id="playBtn" class="control-btn main" type="button">Play</button>
+        <button id="pauseBtn" class="control-btn" type="button">Pause</button>
+        <button id="stopBtn" class="control-btn" type="button">Stop</button>
+      </div>
+
+      <div class="audio-tools audio-tools-4">
+        <button id="reconnectBtn" class="small-btn" type="button">Reconnect</button>
+        <button id="muteBtn" class="small-btn" type="button">Mute</button>
+        <button id="primaryBtn" class="small-btn source-btn is-active" type="button">MAIN</button>
+        <button id="backupBtn" class="small-btn source-btn" type="button">BACK</button>
+      </div>
+
+      <audio id="radio" preload="none" playsinline webkit-playsinline></audio>
+      <div class="footer">AMARIS · LYVRA minimal recovery player · `/internal` remains a separate preserved emergency player</div>
     </section>
-
-    <div class="pills">
-      <span id="statusPill" class="pill active">READY</span>
-      <span id="modePill" class="pill">MAIN</span>
-      <span id="candidatePill" class="pill">DIRECT PRIMARY</span>
-    </div>
-
-    <section class="display-wrap">
-      <div class="display-head"><span class="label">NOW PLAYING</span><button id="historyButton" class="btn tiny" type="button">HISTORY</button></div>
-      <div class="display"><div id="nowPlaying">Metadata loading …</div></div>
-      <div id="historyPanel" class="history hidden"><strong>LAST TRACKS</strong><ul id="historyList"><li>No history loaded</li></ul></div>
-    </section>
-
-    <section class="stats">
-      <div class="box"><div class="label">LISTENERS</div><div id="listeners" class="value">0 / 250</div></div>
-      <div class="box"><div class="label">BITRATE</div><div id="bitrate" class="value">Unknown</div></div>
-      <div class="box"><div class="label">DJ / STATUS</div><div id="dj" class="value">666SOUNDsDESIGn DJ</div></div>
-    </section>
-
-    <section class="controls" aria-label="Transport controls">
-      <button id="playButton" class="btn primary" type="button">PLAY</button>
-      <button id="pauseButton" class="btn" type="button">PAUSE</button>
-      <button id="stopButton" class="btn" type="button">STOP</button>
-    </section>
-
-    <section class="tools" aria-label="Source and recovery controls">
-      <button id="reconnectButton" class="btn" type="button">RECONNECT</button>
-      <button id="muteButton" class="btn" type="button">MUTE</button>
-      <button id="mainButton" class="btn active" type="button">MAIN</button>
-      <button id="backButton" class="btn" type="button">BACK</button>
-    </section>
-
-    <audio id="radio" preload="none" playsinline></audio>
-    <div class="footer">AMARIS · LYVRA minimal recovery player · existing /internal emergency player remains unchanged</div>
   </main>
 
   <script>
   (()=>{
     'use strict';
-    const DIRECT_PRIMARY='https://my.idjstream.com:8686';
-    const DIRECT_FALLBACK='https://my.idjstream.com:8686/stream';
-    const WORKER_PRIMARY='/stream';
-    const WORKER_FALLBACK='/fallback-stream';
-    const METADATA_URL='/api/nowplaying';
+    const AUTO_DJ_NAME='LYVRA DJ';
+    const ENDPOINTS={main:'/stream',back:'/fallback-stream',metadata:'/api/nowplaying',runtime:'/api/runtime-config/status'};
+    const DEFAULT_DIRECT={primary:'https://my.idjstream.com/666soundsdesign/stream',backup:'https://my.idjstream.com:8686/stream'};
     const CAPACITY=250;
-    const CHAINS={
-      main:[
-        {url:DIRECT_PRIMARY,label:'DIRECT PRIMARY',mode:'MAIN'},
-        {url:DIRECT_FALLBACK,label:'DIRECT FALLBACK',mode:'BACK'},
-        {url:WORKER_PRIMARY,label:'WORKER EMERGENCY MAIN',mode:'MAIN'},
-        {url:WORKER_FALLBACK,label:'WORKER EMERGENCY BACK',mode:'BACK'}
-      ],
-      back:[
-        {url:DIRECT_FALLBACK,label:'DIRECT FALLBACK',mode:'BACK'},
-        {url:WORKER_FALLBACK,label:'WORKER EMERGENCY BACK',mode:'BACK'},
-        {url:WORKER_PRIMARY,label:'WORKER EMERGENCY MAIN',mode:'MAIN'},
-        {url:DIRECT_PRIMARY,label:'DIRECT PRIMARY',mode:'MAIN'}
-      ]
-    };
     const q=id=>document.getElementById(id);
-    const audio=q('radio'),boot=q('boot'),bootButton=q('bootButton');
-    const statusPill=q('statusPill'),modePill=q('modePill'),candidatePill=q('candidatePill');
+    const audio=q('radio'),overlay=q('bootOverlay'),bootButton=q('bootButton'),bootState=q('bootState');
     const metaLamp=q('metaLamp'),audioLamp=q('audioLamp'),sourceLamp=q('sourceLamp');
-    const metaState=q('metaState'),audioState=q('audioState'),sourceState=q('sourceState');
-    const nowPlaying=q('nowPlaying'),listeners=q('listeners'),bitrate=q('bitrate'),dj=q('dj');
-    const historyButton=q('historyButton'),historyPanel=q('historyPanel'),historyList=q('historyList');
-    const playButton=q('playButton'),pauseButton=q('pauseButton'),stopButton=q('stopButton');
-    const reconnectButton=q('reconnectButton'),muteButton=q('muteButton'),mainButton=q('mainButton'),backButton=q('backButton');
-    let selected='main',candidateIndex=0,userStopped=false,switching=false,muted=false,metadataTimer=0,stallTimer=0,lastTitle='';
-    const localHistory=[];
-    function lamp(node,state){node.className='lamp'+(state?' '+state:'')}
-    function status(text,state='active'){statusPill.textContent=text;statusPill.className='pill '+state}
-    function updateButtons(){mainButton.classList.toggle('active',selected==='main');backButton.classList.toggle('active',selected==='back');modePill.textContent=selected.toUpperCase()}
-    function currentCandidate(){return CHAINS[selected][candidateIndex]||CHAINS[selected][0]}
-    function updateSource(){const item=currentCandidate();candidatePill.textContent=item.label;sourceState.textContent=item.label;lamp(sourceLamp,item.url.startsWith('/')?'warn':'work')}
-    function resetAudio(){clearTimeout(stallTimer);audio.pause();audio.removeAttribute('src');audio.load()}
-    async function playCandidate(index,reason='Play'){
-      if(switching)return false;
-      switching=true;userStopped=false;candidateIndex=Math.max(0,Math.min(index,CHAINS[selected].length-1));updateButtons();updateSource();
-      const item=currentCandidate();status(reason+' · '+item.label);audioState.textContent='Connecting';lamp(audioLamp,'work');
-      try{
-        resetAudio();audio.src=item.url;audio.muted=muted;audio.load();
-        await audio.play();status('PLAYING');audioState.textContent='Playing';lamp(audioLamp,'ok');startMetadata();return true;
-      }catch(err){audioState.textContent='Failed: '+item.label;lamp(audioLamp,'error');switching=false;return advanceFallback('Play failed')}
-      finally{switching=false}
+    const streamStatus=q('streamStatus'),sourceLabel=q('sourceLabel'),fallbackText=q('fallbackText');
+    const metaText=q('metaText'),nowPlaying=q('nowPlaying'),listenersText=q('listenersText'),bitrateText=q('bitrateText'),djText=q('djText');
+    const historyToggle=q('historyToggle'),historyOverlay=q('historyOverlay'),historyList=q('historyList');
+    const playBtn=q('playBtn'),pauseBtn=q('pauseBtn'),stopBtn=q('stopBtn'),reconnectBtn=q('reconnectBtn'),muteBtn=q('muteBtn'),primaryBtn=q('primaryBtn'),backupBtn=q('backupBtn');
+    let runtime={...DEFAULT_DIRECT};
+    let selected='main',candidateIndex=0,muted=false,userStopped=false,switching=false,metadataTimer=0,stallTimer=0,lastTitle='',historyOpen=false,hasPlayed=false;
+    let chains=buildChains();
+
+    function buildChains(){
+      return {
+        main:[
+          {url:ENDPOINTS.main,label:'WORKER MAIN SWITCH',mode:'MAIN',worker:true},
+          {url:ENDPOINTS.back,label:'WORKER BACK SWITCH',mode:'BACK',worker:true},
+          {url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT PRIMARY RESERVE',mode:'MAIN'},
+          {url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK'}
+        ],
+        back:[
+          {url:ENDPOINTS.back,label:'WORKER BACK SWITCH',mode:'BACK',worker:true},
+          {url:ENDPOINTS.main,label:'WORKER MAIN SWITCH',mode:'MAIN',worker:true},
+          {url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK'},
+          {url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT PRIMARY RESERVE',mode:'MAIN'}
+        ]
+      };
     }
-    async function advanceFallback(reason){
-      if(userStopped)return false;
-      const next=candidateIndex+1;
-      if(next>=CHAINS[selected].length){status('ALL SOURCES FAILED');audioState.textContent='No source available';lamp(audioLamp,'error');return false}
-      candidateIndex=next;updateSource();
-      await new Promise(r=>setTimeout(r,220));
-      return playCandidate(candidateIndex,reason);
+    function clean(value){return String(value??'').replace(/\s+/g,' ').trim()}
+    function normalizeDj(value){
+      const raw=clean(value);if(!raw)return AUTO_DJ_NAME;
+      const lowered=raw.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+      if(!lowered||['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','lyvra dj'].includes(lowered))return AUTO_DJ_NAME;
+      if(lowered.includes('auto dj')||lowered.includes('autodj'))return AUTO_DJ_NAME;
+      return raw;
     }
+    function setLamp(node,state){if(!node)return;node.classList.remove('lamp-purple','lamp-red','lamp-cyan','lamp-green');node.classList.add(state)}
+    function setStatus(text){streamStatus.textContent=text}
+    function currentCandidate(){return chains[selected][candidateIndex]||chains[selected][0]}
+    function updateSourceUi(){
+      const item=currentCandidate();
+      sourceLabel.textContent=item.mode;
+      fallbackText.textContent=item.label;
+      setLamp(sourceLamp,item.worker?'lamp-cyan':'lamp-purple');
+      primaryBtn.classList.toggle('is-active',selected==='main');
+      backupBtn.classList.toggle('is-active',selected==='back');
+    }
+    function clearStall(){clearTimeout(stallTimer);stallTimer=0}
+    function resetAudio(){clearStall();audio.pause();audio.removeAttribute('src');audio.load()}
     function stopMetadata(){clearInterval(metadataTimer);metadataTimer=0}
     function startMetadata(){if(metadataTimer)return;fetchMetadata();metadataTimer=setInterval(fetchMetadata,8000)}
-    function normalizeTitle(data){return String(data?.song||data?.title||data?.track||data?.nowplaying||data?.currentSong||'Metadata unavailable')}
     function renderHistory(items){
-      const list=Array.isArray(items)&&items.length?items:localHistory;
-      historyList.textContent='';
+      historyList.textContent='';const list=Array.isArray(items)?items:[];
       if(!list.length){const li=document.createElement('li');li.textContent='No history loaded';historyList.appendChild(li);return}
-      list.slice(0,12).forEach(item=>{const li=document.createElement('li');li.textContent=typeof item==='string'?item:String(item?.song||item?.title||item?.track||item?.name||'Unknown track');historyList.appendChild(li)})
+      list.slice(0,12).forEach(item=>{const li=document.createElement('li');li.textContent=typeof item==='string'?item:clean(item?.song||item?.title||item?.track||item?.name||'Unknown track');historyList.appendChild(li)});
+    }
+    async function loadRuntime(){
+      try{
+        const response=await fetch(ENDPOINTS.runtime,{cache:'no-store'});if(!response.ok)throw new Error('runtime_http_'+response.status);
+        const data=await response.json();
+        runtime={primary:clean(data.primaryStream)||DEFAULT_DIRECT.primary,backup:clean(data.backupStream||data.emergencyStream)||DEFAULT_DIRECT.backup};
+        chains=buildChains();updateSourceUi();
+      }catch(_){runtime={...DEFAULT_DIRECT};chains=buildChains();updateSourceUi()}
     }
     async function fetchMetadata(){
       try{
-        const response=await fetch(METADATA_URL,{cache:'no-store'});if(!response.ok)throw new Error('metadata_http_'+response.status);
-        const data=await response.json();const title=normalizeTitle(data);nowPlaying.textContent=title;
-        if(title&&title!==lastTitle&&title!=='Metadata unavailable'){lastTitle=title;localHistory.unshift(title);if(localHistory.length>12)localHistory.length=12}
-        const count=Number.parseInt(data?.listeners??data?.currentListeners??0,10);listeners.textContent=(Number.isFinite(count)?count:0)+' / '+CAPACITY;
-        const br=data?.bitrate??data?.stream?.bitrate??'Unknown';bitrate.textContent=br==='Unknown'?'Unknown':String(br).replace(/\s*kbps$/i,'')+' kbps';
-        dj.textContent=String(data?.djusername||data?.djstatus||data?.dj||data?.client||'666SOUNDsDESIGn DJ');
-        renderHistory(data?.history);metaState.textContent='Online';lamp(metaLamp,'ok');
-      }catch(err){metaState.textContent='Offline';lamp(metaLamp,'error');if(!lastTitle)nowPlaying.textContent='Metadata unavailable';renderHistory([])}
+        const response=await fetch(ENDPOINTS.metadata+'?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw new Error('metadata_http_'+response.status);
+        const data=await response.json();
+        const title=clean(data?.song||data?.title||data?.songtitle||data?.track||data?.currentSong||data?.nowplaying||'Metadata unavailable');
+        nowPlaying.textContent=title||'Metadata unavailable';lastTitle=title||lastTitle;
+        const count=Number.parseInt(data?.listeners??data?.currentListeners??0,10);listenersText.textContent=String(Number.isFinite(count)?count:0)+' / '+String(data?.maxlisteners||data?.maxListeners||CAPACITY);
+        const br=data?.bitrate??data?.stream?.bitrate??'Unknown';bitrateText.textContent=br==='Unknown'?'Unknown':String(br).replace(/\s*kbps$/i,'')+' kbps';
+        djText.textContent=normalizeDj(data?.dj??data?.djusername??data?.djstatus??data?.live_dj??data?.streamer??data?.presenter??data?.client);
+        renderHistory(data?.history||data?.song_history||data?.played_history||[]);metaText.textContent='Online';setLamp(metaLamp,'lamp-cyan');
+      }catch(_){metaText.textContent='Offline';setLamp(metaLamp,'lamp-red');if(!lastTitle)nowPlaying.textContent='Metadata unavailable'}
     }
-    bootButton.addEventListener('click',async()=>{bootButton.disabled=true;boot.classList.add('hidden');await playCandidate(0,'Start')});
-    playButton.addEventListener('click',()=>playCandidate(candidateIndex,'Play'));
-    pauseButton.addEventListener('click',()=>{audio.pause();stopMetadata();status('PAUSED','');audioState.textContent='Paused';lamp(audioLamp,'warn')});
-    stopButton.addEventListener('click',()=>{userStopped=true;switching=false;stopMetadata();resetAudio();status('STOPPED','');audioState.textContent='Stopped';lamp(audioLamp,'')});
-    reconnectButton.addEventListener('click',()=>{userStopped=false;playCandidate(candidateIndex,'Reconnect')});
-    muteButton.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteButton.textContent=muted?'UNMUTE':'MUTE'});
-    mainButton.addEventListener('click',()=>{selected='main';candidateIndex=0;updateButtons();playCandidate(0,'Switch MAIN')});
-    backButton.addEventListener('click',()=>{selected='back';candidateIndex=0;updateButtons();playCandidate(0,'Switch BACK')});
-    historyButton.addEventListener('click',()=>historyPanel.classList.toggle('hidden'));
-    audio.addEventListener('playing',()=>{if(userStopped)return;status('PLAYING');audioState.textContent='Playing';lamp(audioLamp,'ok')});
-    audio.addEventListener('waiting',()=>{if(userStopped)return;status('BUFFERING');audioState.textContent='Buffering';lamp(audioLamp,'warn')});
-    audio.addEventListener('stalled',()=>{if(userStopped)return;clearTimeout(stallTimer);stallTimer=setTimeout(()=>advanceFallback('Stalled fallback'),4000)});
-    audio.addEventListener('error',()=>{if(userStopped||switching)return;advanceFallback('Audio error fallback')});
-    audio.addEventListener('ended',()=>{if(userStopped)return;advanceFallback('Stream ended fallback')});
-    updateButtons();updateSource();renderHistory([]);fetchMetadata();
+    function preparePlayback(){
+      const item=currentCandidate();userStopped=false;updateSourceUi();setStatus('Connecting');setLamp(audioLamp,'lamp-cyan');
+      resetAudio();audio.src=item.url;audio.muted=muted;audio.load();
+      return {item,promise:audio.play()};
+    }
+    async function playCurrent(reason='Play',fromBoot=false){
+      if(switching)return false;switching=true;
+      try{
+        const started=preparePlayback();setStatus(reason+' · '+started.item.label);
+        await started.promise;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-purple');startMetadata();
+        if(fromBoot){overlay.classList.add('hidden');bootState.textContent='Audio läuft'}
+        return true;
+      }catch(error){
+        setStatus('Audio Error');setLamp(audioLamp,'lamp-red');
+        if(fromBoot){bootState.textContent='Start fehlgeschlagen. Erneut tippen für die nächste Worker-/Fallback-Stufe.';bootButton.textContent='ERNEUT VERSUCHEN';bootButton.disabled=false;candidateIndex=Math.min(candidateIndex+1,chains[selected].length-1);updateSourceUi()}
+        return false;
+      }finally{switching=false}
+    }
+    async function advanceFallback(reason){
+      if(userStopped||switching)return false;
+      if(candidateIndex+1>=chains[selected].length){setStatus('All Sources Failed');setLamp(audioLamp,'lamp-red');return false}
+      candidateIndex+=1;updateSourceUi();return playCurrent(reason,false);
+    }
+    async function selectSource(next){
+      if(switching)return;selected=next;candidateIndex=0;updateSourceUi();await playCurrent(next==='main'?'Switch MAIN':'Switch BACK',false)
+    }
+
+    bootButton.addEventListener('click',()=>{
+      if(switching)return;bootButton.disabled=true;bootState.textContent='Worker-Switch wird gestartet …';
+      void playCurrent('Start',true).then(ok=>{if(!ok)bootButton.disabled=false});
+    });
+    playBtn.addEventListener('click',()=>void playCurrent('Play',false));
+    pauseBtn.addEventListener('click',()=>{audio.pause();stopMetadata();setStatus('Paused');setLamp(audioLamp,'lamp-red')});
+    stopBtn.addEventListener('click',()=>{userStopped=true;switching=false;stopMetadata();resetAudio();setStatus('Stopped');setLamp(audioLamp,'lamp-red')});
+    reconnectBtn.addEventListener('click',()=>{userStopped=false;void playCurrent('Reconnect',false)});
+    muteBtn.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteBtn.textContent=muted?'Unmute':'Mute'});
+    primaryBtn.addEventListener('click',()=>void selectSource('main'));
+    backupBtn.addEventListener('click',()=>void selectSource('back'));
+    historyToggle.addEventListener('click',()=>{historyOpen=!historyOpen;historyOverlay.classList.toggle('hidden',!historyOpen)});
+    audio.addEventListener('playing',()=>{if(userStopped)return;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-purple');if(!overlay.classList.contains('hidden'))overlay.classList.add('hidden')});
+    audio.addEventListener('waiting',()=>{if(userStopped)return;setStatus('Buffering');setLamp(audioLamp,'lamp-red')});
+    audio.addEventListener('stalled',()=>{if(userStopped)return;clearStall();stallTimer=setTimeout(()=>void advanceFallback('Stalled Fallback'),4000)});
+    audio.addEventListener('error',()=>{if(userStopped||switching||!hasPlayed)return;void advanceFallback('Audio Error Fallback')});
+    audio.addEventListener('ended',()=>{if(userStopped)return;void advanceFallback('Stream Ended Fallback')});
+
+    updateSourceUi();renderHistory([]);void loadRuntime();void fetchMetadata();
   })();
   </script>
 </body>

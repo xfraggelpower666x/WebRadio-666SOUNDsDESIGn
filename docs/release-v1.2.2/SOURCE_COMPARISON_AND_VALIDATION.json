@@ -1,0 +1,70 @@
+{
+  "release": "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2",
+  "version": "1.2.2",
+  "baseline": "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
+  "status": "LOCAL_REPAIR_PASS_LIVE_DEVICE_VALIDATION_REQUIRED",
+  "scope": {
+    "mainPlayerPreserved": true,
+    "internalPlayerPreserved": true,
+    "amarisStandalone": true,
+    "mainAudioEqBoostUntouched": true,
+    "workerRuntimeSwitchFirst": true,
+    "lyvraDjCanonical": true,
+    "liveDjDynamicOverride": true
+  },
+  "rootCauses": [
+    {
+      "id": "F1",
+      "severity": "blocker",
+      "finding": "Observed OK button belongs to /internal, not AMARIS START AUDIO page."
+    },
+    {
+      "id": "F2",
+      "severity": "blocker",
+      "finding": "No physical lowercase amaris directory existed for static hosting fallback."
+    },
+    {
+      "id": "F3",
+      "severity": "blocker",
+      "finding": "AMARIS tried hard-coded direct streams before Worker runtime/failover."
+    },
+    {
+      "id": "F4",
+      "severity": "blocker",
+      "finding": "iOS boot overlay could close and button remain disabled after failed play()."
+    },
+    {
+      "id": "F5",
+      "severity": "warning",
+      "finding": "Auto-DJ fallback names were inconsistent across player systems."
+    },
+    {
+      "id": "F6",
+      "severity": "warning",
+      "finding": "Tests did not cover aliases, static route, iOS retry, or AutoDJ/live-DJ switching."
+    }
+  ],
+  "repairs": [
+    "early hard AMARIS route lock",
+    "six route aliases",
+    "lowercase physical static mirrors",
+    "worker-first stream chain",
+    "runtime-configured direct reserves",
+    "iOS retry-safe boot overlay",
+    "central LYVRA DJ metadata normalization",
+    "live DJ name preservation",
+    "expanded automated tests"
+  ],
+  "tests": {
+    "node": "37/37 PASS",
+    "javascriptSyntax": "111 PASS",
+    "amarisInlineJavaScript": "PASS",
+    "publicMirrorPairs": "56 PASS",
+    "amarisAliases": "6/6 PASS",
+    "methodGate": "POST 405 PASS",
+    "autoDjNormalization": "PASS",
+    "liveDjPreservation": "PASS"
+  },
+  "liveDeploymentPerformed": false,
+  "physicalIphoneValidation": "REQUIRED_AFTER_DEPLOYMENT"
+}

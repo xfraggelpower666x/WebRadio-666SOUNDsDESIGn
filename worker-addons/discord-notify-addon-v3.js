@@ -11,7 +11,7 @@ import { verifyAdminAuth, verifyPwIssuedToken } from './radio-admin-config-addon
 # - NO_KV / NO_R2: uses only in-memory cooldown/dedupe as safety net.
 # - Adds manual radio-info/player-share post and track-change nowplaying post.
 # - V3.8: Manual big broadcast post stays manual; automatic song-change post is compact, metadata-focused and deduped.
-# - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: 666 DJ for all Discord embeds.
+# - V3.9: Empty/AutoDJ/no-DJ metadata is normalized to DJ: LYVRA DJ for all Discord embeds.
 # - V3.10: Optional private-channel track-change webhook mirrors nowplaying posts.
 # - V3.11: Accepts existing Cloudflare Secret PRIVATE_TRACK_SHOOTER.
 # - Returns compact status JSON for frontend LED indicator.
@@ -57,7 +57,7 @@ function clean(value, fallback = '', max = 500) {
 }
 
 function normalizeDiscordDj(value) {
-  const fallback = '666 DJ';
+  const fallback = 'LYVRA DJ';
   const raw = clean(value, '', 160);
   if (!raw) return fallback;
   const lowered = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();

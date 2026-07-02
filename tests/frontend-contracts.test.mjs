@@ -59,8 +59,23 @@ test("all repaired root/public files are byte-identical", async () => {
     "index.html", "js/admin-auth-client.js", "js/player-alert-client.js",
     "js/messenger-overlay.js", "js/broadcast-message-history.js", "js/skip-control.js",
     "js/player-stage-v2.js", "js/addons/discord-player-addon-v3.js", "js/version-core.js",
-    "css/player-stage-v2.css", "config/radio-runtime.json", "config/release.json", "AMARIS/index.html"
+    "css/player-stage-v2.css", "config/radio-runtime.json", "config/release.json", "AMARIS/index.html", "amaris/index.html"
   ]) {
     assert.equal(await read(path), await read(`public/${path}`), `mirror drift: ${path}`);
   }
+});
+
+
+test("LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic", async () => {
+  for (const path of [
+    "index.html", "AMARIS/index.html", "amaris/index.html", "js/player-core.js", "js/extern.js",
+    "dashboard/index.html", "config/ui.config.js", "worker-addons/discord-notify-addon-v3.js"
+  ]) {
+    const source = await read(path);
+    assert.match(source, /LYVRA DJ/, path);
+    assert.doesNotMatch(source, /['\"](?:DJ 666|666 DJ|666SOUNDsDESIGn DJ)['\"]/, path);
+  }
+  const worker = await read("worker.js");
+  assert.match(worker, /normalizeMetadataDjPayload/);
+  assert.match(worker, /dj_mode: dj === AUTO_DJ_DISPLAY_NAME \? 'autodj' : 'live'/);
 });

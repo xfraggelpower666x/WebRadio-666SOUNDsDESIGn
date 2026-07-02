@@ -296,7 +296,7 @@
     var listeners= d.listeners|| d.currentlisteners || d.listener_count || '';
     var uniq     = d.uniq     || d.unique_listeners || '';
     var bitrate  = d.bitrate  || d.kbps         || '';
-    var dj       = d.dj       || d.djusername   || d.streamer     || d.dj_status         || '';
+    var dj       = d.dj_display || d.dj || d.djusername || d.streamer || d.presenter || d.live_dj || d.dj_status || '';
     var djpic    = d.dj_profile || d.dj_image   || '';
     var history  = d.history  || d.song_history || d.played_history || [];
 
@@ -312,36 +312,32 @@
     uniq    = String(uniq   ||'').trim();
     bitrate = String(bitrate||'').trim();
 
-    // Remove "No DJ" placeholders
-    if(/nos*dj|nodj|autos*dj|autodj|auto-dj|unknown|offline/i.test(dj)) dj='';
+    // Canonical Auto-DJ display; real live-DJ names remain unchanged.
+    if(!dj || /no\s*dj|nodj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined|dj\s*666|666\s*dj|666soundsdesign\s*dj/i.test(dj)) dj='LYVRA DJ';
 
     if(!title)return; // nothing useful
 
     // ── Now Playing card ──
     el('nowTitle').textContent    = title;
-    el('nowArtist').textContent   = dj ? dj : ' ';
+    el('nowArtist').textContent   = dj;
     el('nowListeners').textContent= '👤 '+(listeners||'–');
     el('nowUniq').textContent     = '✨ '+(uniq||'–')+' unique';
     el('nowBitrate').textContent  = (bitrate?bitrate+' kbps':'– kbps');
 
     // ── DJ Live row ──
     var djRow=el('djLiveRow');
-    if(dj){
-      el('djName').textContent=dj;
-      var av=el('djAvatar');
-      if(djpic){ av.src=djpic; av.style.display=''; }
-      else { av.style.display='none'; }
-      djRow.classList.add('visible');
-    } else {
-      djRow.classList.remove('visible');
-    }
+    el('djName').textContent=dj;
+    var av=el('djAvatar');
+    if(djpic && dj !== 'LYVRA DJ'){ av.src=djpic; av.style.display=''; }
+    else { av.style.display='none'; }
+    djRow.classList.add('visible');
 
     // ── Status card ──
     el('stStream').innerHTML='<span class="led on"></span>ONLINE';
     el('stListeners').textContent=listeners||'–';
     el('stUniq').textContent=uniq||'–';
     el('stBitrate').textContent=bitrate?bitrate+' kbps':'–';
-    el('stDj').textContent=dj||'kein Live-DJ';
+    el('stDj').textContent=dj;
     el('stUpdated').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
     // ── Artwork ──

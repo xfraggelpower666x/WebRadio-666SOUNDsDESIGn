@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1");
+  assert.equal(data.version, "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2");
 });
 
 test("runtime configuration is read from static assets", async () => {
@@ -65,6 +65,35 @@ test("runtime configuration is read from static assets", async () => {
   assert.equal(data.ok, true);
   assert.equal(data.source, "asset");
   assert.equal(data.version, 3);
+});
+
+
+
+test("metadata proxy maps AutoDJ to LYVRA DJ and preserves a real live DJ", async () => {
+  const originalFetch = globalThis.fetch;
+  let upstreamPayload = { title: "Test Track", dj: "AutoDJ", listeners: 3, bitrate: 320 };
+  globalThis.fetch = async () => new Response(JSON.stringify(upstreamPayload), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
+  try {
+    const autoResponse = await request("/api/nowplaying");
+    assert.equal(autoResponse.status, 200);
+    const autoData = await autoResponse.json();
+    assert.equal(autoData.dj, "LYVRA DJ");
+    assert.equal(autoData.dj_display, "LYVRA DJ");
+    assert.equal(autoData.dj_mode, "autodj");
+
+    upstreamPayload = { title: "Live Track", dj: "FragglePower666", listeners: 5, bitrate: 320 };
+    const liveResponse = await request("/api/nowplaying");
+    assert.equal(liveResponse.status, 200);
+    const liveData = await liveResponse.json();
+    assert.equal(liveData.dj, "FragglePower666");
+    assert.equal(liveData.dj_display, "FragglePower666");
+    assert.equal(liveData.dj_mode, "live");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("debug endpoints are hidden without debug token", async () => {
@@ -112,22 +141,35 @@ test("root and CSS are served from ASSETS", async () => {
 });
 
 
-test("AMARIS endpoint serves the standalone minimal player and keeps the internal player", async () => {
-  const amaris = await request("/amaris", { headers: { accept: "text/html" } });
-  assert.equal(amaris.status, 200);
-  assert.match(amaris.headers.get("content-type") || "", /text\/html/);
-  assert.equal(amaris.headers.get("x-player-mode"), "amaris-lyvra-minimal");
-  const amarisHtml = await amaris.text();
-  assert.match(amarisHtml, /A M A R I S - L Y V R A\s+MINIMAL WEBRADIO/);
-  assert.match(amarisHtml, /https:\/\/my\.idjstream\.com:8686/);
-  assert.match(amarisHtml, /\/stream/);
-  assert.match(amarisHtml, /\/fallback-stream/);
+test("AMARIS aliases are hard-routed to the standalone worker-first player and keep all other players", async () => {
+  for (const path of ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/", "/amaris/index.html", "/AMARIS/index.html"]) {
+    const amaris = await request(path, { headers: { accept: "text/html" } });
+    assert.equal(amaris.status, 200, path);
+    assert.match(amaris.headers.get("content-type") || "", /text\/html/, path);
+    assert.equal(amaris.headers.get("x-player-mode"), "amaris-lyvra-minimal", path);
+    assert.equal(amaris.headers.get("x-amaris-route-lock"), "standalone-only", path);
+    const amarisHtml = await amaris.text();
+    assert.match(amarisHtml, /A M A R I S - L Y V R A[\s\S]*MINIMAL WEBRADIO/, path);
+    assert.match(amarisHtml, /WORKER MAIN SWITCH/, path);
+    assert.match(amarisHtml, /\/api\/runtime-config\/status/, path);
+    assert.match(amarisHtml, /LYVRA DJ/, path);
+    assert.doesNotMatch(amarisHtml, /id="mffApp"|Starting Audio Systems/, path);
+  }
+
+  const amarisPost = await request("/amaris", { method: "POST", headers: { accept: "application/json" } });
+  assert.equal(amarisPost.status, 405);
 
   const internal = await request("/internal", { headers: { accept: "text/html" } });
   assert.equal(internal.status, 200);
   const internalHtml = await internal.text();
-  assert.match(internalHtml, /666SOUNDsDESIGn DJ/);
+  assert.match(internalHtml, /666SOUNDsDESIGn RADIO/);
+  assert.match(internalHtml, /LYVRA DJ/);
   assert.match(internalHtml, /id="reconnectBtn"/);
   assert.match(internalHtml, /id="primaryBtn"/);
   assert.match(internalHtml, /id="backupBtn"/);
+
+  const rootPlayer = await request("/", { headers: { accept: "text/html" } });
+  const rootHtml = await rootPlayer.text();
+  assert.match(rootHtml, /Root Main Player/);
+  assert.doesNotMatch(rootHtml, /A M A R I S - L Y V R A[\s\S]*MINIMAL WEBRADIO/);
 });

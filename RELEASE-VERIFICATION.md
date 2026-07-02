@@ -1,13 +1,20 @@
-# Release Verification — v1.2.1
+# Release Verification — v1.2.2
 
-- Status: LOCAL PASS / LIVE DEPLOY REQUIRED
+- Status: **LOCAL REPAIR PASS / LIVE DEPLOY + DEVICE VALIDATION REQUIRED**
+- Release: `FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2`
 - Safe-root deploy: YES
-- Wrapper folder: NO in deploy package
+- Wrapper folder in deploy ZIP: NO
 - Nested ZIP files in repo: 0
-- Node tests: 35/35 PASS
+- Node tests: 37/37 PASS
 - JavaScript/MJS syntax: 111 PASS
-- Root/Public mirror validation: PASS
+- AMARIS inline JavaScript: PASS
+- Root/Public mirror validation: 56 pairs PASS
+- AMARIS aliases: 6/6 PASS
 - AMARIS endpoint: `/amaris`
-- Existing internal player: `/internal` preserved
-- Internal embedded player blocks: byte-identical to current uploaded repo
+- Existing full main player: `/` preserved
+- Existing internal player: `/internal` preserved as separate player
+- Main player Audio/EQ/Boost architecture: unchanged
+- Auto-DJ display: `LYVRA DJ`
+- Real live-DJ metadata: dynamically preserved
 - Live Cloudflare deployment: not performed
+- Physical iPhone validation: required after deployment

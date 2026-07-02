@@ -1,9 +1,9 @@
-/* 666SOUNDsDESIGn canonical version core — AMARIS repair v1.2.1. */
+/* 666SOUNDsDESIGn canonical version core — AMARIS route/iOS/LYVRA DJ repair v1.2.2. */
 (function(){
   'use strict';
-  var VERSION='v2026.07.02-amaris1';
-  var BUILD='smfp-v2026-07-02-amaris1';
-  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260702,release:'FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1'};
+  var VERSION='v2026.07.02-amaris2';
+  var BUILD='smfp-v2026-07-02-amaris2';
+  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260702,release:'FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2'};
   function setText(node){
     if(!node)return;
     if(node.id==='pcVersionBadge'){var status=node.querySelector('.status-code');if(status)status.textContent=VERSION;node.setAttribute('aria-label','Player Version '+VERSION);return;}

@@ -82,11 +82,18 @@ Abnahme:
 Erst mergen, wenn alle Punkte vollständig PASS sind. Ein lokaler PASS ersetzt keinen Live-PASS.
 
 
-## v1.2.1 AMARIS endpoint checks
+## v1.2.2 AMARIS endpoint checks
 
-- [ ] `/` returns the normal main player.
-- [ ] `/amaris` returns `A M A R I S - L Y V R A   MINIMAL WEBRADIO`.
-- [ ] `/internal` still returns the existing internal emergency player.
-- [ ] `/stream` and `/fallback-stream` remain available.
-- [ ] `AMARIS/index.html` and `public/AMARIS/index.html` are byte-identical.
-- [ ] Deploy ZIP has no wrapper folder.
+- [ ] `/` returns the normal full main player.
+- [ ] `/amaris`, `/amaris/`, `/AMARIS`, `/AMARIS/` return the AMARIS-LYVRA Mini-Player.
+- [ ] `/amaris/index.html` and `/AMARIS/index.html` return the same AMARIS-LYVRA Mini-Player.
+- [ ] Every AMARIS response includes `x-player-mode: amaris-lyvra-minimal`.
+- [ ] Every AMARIS response includes `x-amaris-route-lock: standalone-only`.
+- [ ] iPhone button reads `START AUDIO`, not `OK`.
+- [ ] Failed iPhone start keeps the overlay open and enables `ERNEUT VERSUCHEN`.
+- [ ] MAIN starts through `/stream`; BACK starts through `/fallback-stream`.
+- [ ] `/internal` still returns the separate internal emergency player with `OK` boot button.
+- [ ] Auto-DJ metadata displays `LYVRA DJ`.
+- [ ] A real live-DJ login replaces `LYVRA DJ` with the real DJ name.
+- [ ] `AMARIS/index.html`, `amaris/index.html`, `public/AMARIS/index.html`, and `public/amaris/index.html` are byte-identical.
+- [ ] Deploy ZIP has no wrapper folder and no nested ZIP.

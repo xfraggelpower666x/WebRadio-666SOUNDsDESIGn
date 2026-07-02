@@ -1,0 +1,268 @@
+
+> webradio-666soundsdesign-fullversion@1.2.2 verify
+> npm run check && npm test
+
+
+> webradio-666soundsdesign-fullversion@1.2.2 check
+> node scripts/check-release.mjs
+
+{
+  "ok": true,
+  "rootName": "amaris_audit",
+  "release": "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2",
+  "version": "1.2.2",
+  "files": 743,
+  "nestedZips": 0,
+  "bytecode": 0,
+  "required": 34,
+  "rendererMirrorPairs": 4,
+  "javascriptSyntaxChecked": 111,
+  "publicMirrorPairs": 56,
+  "sharedAdminAuth": true,
+  "singleMessengerEngine": true,
+  "streamFailoverBudget": true,
+  "workerBytes": 64134,
+  "embeddedBase64Assets": false,
+  "legacyBuildRoot": true,
+  "hardAuditPolicy": true,
+  "strictAdminAuthorization": true,
+  "singleAuthAuthority": true,
+  "preBoostMeterAuthority": true,
+  "privateRateIdentity": true
+}
+
+> webradio-666soundsdesign-fullversion@1.2.2 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: password-issued token hardlock validates issuer, scope and expiry separately
+ok 1 - password-issued token hardlock validates issuer, scope and expiry separately
+  ---
+  duration_ms: 0.883882
+  type: 'test'
+  ...
+# Subtest: admin config rejects a valid auth token with the wrong issuer before GitHub access
+ok 2 - admin config rejects a valid auth token with the wrong issuer before GitHub access
+  ---
+  duration_ms: 25.481416
+  type: 'test'
+  ...
+# Subtest: state-changing admin routes require explicit same-origin evidence
+ok 3 - state-changing admin routes require explicit same-origin evidence
+  ---
+  duration_ms: 0.817786
+  type: 'test'
+  ...
+# Subtest: login follows the PW/Auth contract and forwards hardlock service headers
+ok 4 - login follows the PW/Auth contract and forwards hardlock service headers
+  ---
+  duration_ms: 50.615312
+  type: 'test'
+  ...
+# Subtest: PW/Auth workers implement one deployable contract
+ok 5 - PW/Auth workers implement one deployable contract
+  ---
+  duration_ms: 10.337235
+  type: 'test'
+  ...
+# Subtest: PW/Auth workers fail closed when the service token is configured but missing
+ok 6 - PW/Auth workers fail closed when the service token is configured but missing
+  ---
+  duration_ms: 0.639032
+  type: 'test'
+  ...
+# Subtest: Chaos worker health and hidden debug contract
+ok 7 - Chaos worker health and hidden debug contract
+  ---
+  duration_ms: 72.462006
+  type: 'test'
+  ...
+# Subtest: Chaos worker uses an explicit CORS allowlist
+ok 8 - Chaos worker uses an explicit CORS allowlist
+  ---
+  duration_ms: 0.72504
+  type: 'test'
+  ...
+# Subtest: Suno worker reports provider state honestly
+ok 9 - Suno worker reports provider state honestly
+  ---
+  duration_ms: 1.042325
+  type: 'test'
+  ...
+# Subtest: Suno create route is protected and no placeholder job is created
+ok 10 - Suno create route is protected and no placeholder job is created
+  ---
+  duration_ms: 0.729836
+  type: 'test'
+  ...
+# Subtest: messenger uses one authoritative Player Alert client
+ok 11 - messenger uses one authoritative Player Alert client
+  ---
+  duration_ms: 7.294735
+  type: 'test'
+  ...
+# Subtest: legacy inline senders are disabled and fetch is not monkey-patched
+ok 12 - legacy inline senders are disabled and fetch is not monkey-patched
+  ---
+  duration_ms: 2.159435
+  type: 'test'
+  ...
+# Subtest: Admin, Discord and Skip share one Bearer client
+ok 13 - Admin, Discord and Skip share one Bearer client
+  ---
+  duration_ms: 4.599324
+  type: 'test'
+  ...
+# Subtest: Discord worker has no public fallback code and debug is protected
+ok 14 - Discord worker has no public fallback code and debug is protected
+  ---
+  duration_ms: 49.545463
+  type: 'test'
+  ...
+# Subtest: responsive V6 layout removes fixed V5 takeover
+ok 15 - responsive V6 layout removes fixed V5 takeover
+  ---
+  duration_ms: 1.103171
+  type: 'test'
+  ...
+# Subtest: all repaired root/public files are byte-identical
+ok 16 - all repaired root/public files are byte-identical
+  ---
+  duration_ms: 20.602968
+  type: 'test'
+  ...
+# Subtest: LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic
+ok 17 - LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic
+  ---
+  duration_ms: 9.360577
+  type: 'test'
+  ...
+# Subtest: legacy admin login paths and password headers are hardlocked out
+ok 18 - legacy admin login paths and password headers are hardlocked out
+  ---
+  duration_ms: 6.099372
+  type: 'test'
+  ...
+# Subtest: all protected config routes use strict password-issued admin gate
+ok 19 - all protected config routes use strict password-issued admin gate
+  ---
+  duration_ms: 1.426889
+  type: 'test'
+  ...
+# Subtest: meter hardlock removes synthetic and Boost-driven level animation
+ok 20 - meter hardlock removes synthetic and Boost-driven level animation
+  ---
+  duration_ms: 2.597048
+  type: 'test'
+  ...
+# Subtest: Player Alert hardlock does not bind rate limits to client senderId or expose rateKey
+ok 21 - Player Alert hardlock does not bind rate limits to client senderId or expose rateKey
+  ---
+  duration_ms: 1.196266
+  type: 'test'
+  ...
+# Subtest: authorized admin fetch is restricted to the WebRadio origin
+ok 22 - authorized admin fetch is restricted to the WebRadio origin
+  ---
+  duration_ms: 1.061666
+  type: 'test'
+  ...
+# Subtest: Player Alert rejects the old text-only request contract
+ok 23 - Player Alert rejects the old text-only request contract
+  ---
+  duration_ms: 24.455677
+  type: 'test'
+  ...
+# Subtest: Player Alert accepts message contract and returns a real storage source
+ok 24 - Player Alert accepts message contract and returns a real storage source
+  ---
+  duration_ms: 6.93355
+  type: 'test'
+  ...
+# Subtest: Player Alert rate limit uses server-assisted identity
+ok 25 - Player Alert rate limit uses server-assisted identity
+  ---
+  duration_ms: 0.729202
+  type: 'test'
+  ...
+# Subtest: cross-origin Player Alert writes are rejected
+ok 26 - cross-origin Player Alert writes are rejected
+  ---
+  duration_ms: 0.94345
+  type: 'test'
+  ...
+# Subtest: Player Alert changing senderId cannot bypass the server-controlled rate bucket
+ok 27 - Player Alert changing senderId cannot bypass the server-controlled rate bucket
+  ---
+  duration_ms: 7.144949
+  type: 'test'
+  ...
+# Subtest: health is operational and does not crash
+ok 28 - health is operational and does not crash
+  ---
+  duration_ms: 29.943858
+  type: 'test'
+  ...
+# Subtest: runtime configuration is read from static assets
+ok 29 - runtime configuration is read from static assets
+  ---
+  duration_ms: 2.828967
+  type: 'test'
+  ...
+# Subtest: metadata proxy maps AutoDJ to LYVRA DJ and preserves a real live DJ
+ok 30 - metadata proxy maps AutoDJ to LYVRA DJ and preserves a real live DJ
+  ---
+  duration_ms: 3.204271
+  type: 'test'
+  ...
+# Subtest: debug endpoints are hidden without debug token
+ok 31 - debug endpoints are hidden without debug token
+  ---
+  duration_ms: 0.927715
+  type: 'test'
+  ...
+# Subtest: skip compatibility handler exists
+ok 32 - skip compatibility handler exists
+  ---
+  duration_ms: 0.585211
+  type: 'test'
+  ...
+# Subtest: chaos API reaches the addon instead of HTML fallback
+ok 33 - chaos API reaches the addon instead of HTML fallback
+  ---
+  duration_ms: 0.695151
+  type: 'test'
+  ...
+# Subtest: unknown API and missing assets return real 404 responses
+ok 34 - unknown API and missing assets return real 404 responses
+  ---
+  duration_ms: 5.080939
+  type: 'test'
+  ...
+# Subtest: dark dancer html alias is available
+ok 35 - dark dancer html alias is available
+  ---
+  duration_ms: 1.208524
+  type: 'test'
+  ...
+# Subtest: root and CSS are served from ASSETS
+ok 36 - root and CSS are served from ASSETS
+  ---
+  duration_ms: 3.139291
+  type: 'test'
+  ...
+# Subtest: AMARIS aliases are hard-routed to the standalone worker-first player and keep all other players
+ok 37 - AMARIS aliases are hard-routed to the standalone worker-first player and keep all other players
+  ---
+  duration_ms: 49.64129
+  type: 'test'
+  ...
+1..37
+# tests 37
+# suites 0
+# pass 37
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 308.202364

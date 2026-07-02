@@ -172,7 +172,7 @@ const HTML = `<!DOCTYPE html>
     <section class="player-card">
       <header class="topbar">
         <div class="topbar-line"></div>
-        <div class="brand">666SOUNDsDESIGn DJ</div>
+        <div class="brand">666SOUNDsDESIGn RADIO</div>
         <div class="topbar-line"></div>
       </header>
 
@@ -212,7 +212,7 @@ const HTML = `<!DOCTYPE html>
       <div class="mini-grid mini-grid-3">
         <div class="mini-box"><div class="mini-label">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
         <div class="mini-box"><div class="mini-label">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
-        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">666SOUNDsDESIGn DJ</div></div>
+        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">LYVRA DJ</div></div>
       </div>
 
       <div class="control-strip control-strip-3">
@@ -275,8 +275,9 @@ function setSource(isFallback){usingFallback=isFallback;if(sourceLabel)sourceLab
 function setMetadataStatus(text){if(metaText)metaText.textContent=text}
 function pickValue(obj,keys,fallback=""){for(const key of keys){const value=obj?.[key];if(value!==undefined&&value!==null&&String(value).trim()!=="")return value}return fallback}
 function normalizeTitle(data){return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"],lastTitle||"Live Stream"))}
+function normalizeDjDisplay(value){const raw=String(value||"").trim();if(!raw)return "LYVRA DJ";const lowered=raw.toLowerCase().replace(/[^a-z0-9]+/g," ").trim();if(!lowered||["unknown","none","null","undefined","offline","n a","na","no dj","nodj","no dj status","dj 666","666 dj","666soundsdesign dj","lyvra dj"].includes(lowered)||lowered.includes("auto dj")||lowered.includes("autodj"))return "LYVRA DJ";return raw}
 function renderHistory(items){if(!historyList)return;historyList.innerHTML="";if(!Array.isArray(items)||!items.length){const li=document.createElement("li");li.textContent="No history loaded";historyList.appendChild(li);return}items.slice(0,12).forEach((item)=>{const li=document.createElement("li");li.textContent=typeof item==="string"?item:String(pickValue(item,["song","title","track","name"],"Unknown track"));historyList.appendChild(li)})}
-async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=pickValue(data,["djusername","djstatus","client"],"666SOUNDsDESIGn DJ");if(listenersText)listenersText.textContent=String(Number.isFinite(listeners)?listeners:0)+" / "+String(STREAM_CONFIG.listener_capacity);if(bitrateText)bitrateText.textContent=bitrate?(String(bitrate)+" kbps"):"Unknown";if(djText)djText.textContent=String(djStatus||"666SOUNDsDESIGn DJ");renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-cyan")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
+async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=normalizeDjDisplay(pickValue(data,["dj","djusername","djstatus","live_dj","streamer","presenter","client"],"LYVRA DJ"));if(listenersText)listenersText.textContent=String(Number.isFinite(listeners)?listeners:0)+" / "+String(STREAM_CONFIG.listener_capacity);if(bitrateText)bitrateText.textContent=bitrate?(String(bitrate)+" kbps"):"Unknown";if(djText)djText.textContent=String(djStatus||"LYVRA DJ");renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-cyan")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
 function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetchMetadata();metadataTimer=setInterval(fetchMetadata,STREAM_CONFIG.poll_interval_ms)}
 function stopMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);metadataTimer=null}
 function hardDisconnect(stateText="Stopped"){stopMetadataLoop();if(audio){audio.pause();audio.removeAttribute("src");audio.src="";audio.load()}setStatus(stateText);setLamp(audioLamp,"lamp-red")}
@@ -378,6 +379,27 @@ function metadataSafeText(value, max = 512){
     .slice(0, max);
 }
 
+const AUTO_DJ_DISPLAY_NAME = 'LYVRA DJ';
+function normalizeBroadcastDjName(value){
+  const raw = metadataSafeText(value, 160);
+  if(!raw) return AUTO_DJ_DISPLAY_NAME;
+  const lowered = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if(!lowered) return AUTO_DJ_DISPLAY_NAME;
+  if(['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','lyvra dj'].includes(lowered)) return AUTO_DJ_DISPLAY_NAME;
+  if(lowered.includes('auto dj') || lowered.includes('autodj')) return AUTO_DJ_DISPLAY_NAME;
+  return raw;
+}
+function normalizeMetadataDjPayload(payload){
+  if(!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload;
+  const rawDj = payload.dj ?? payload.djusername ?? payload.djstatus ?? payload.live_dj ?? payload.streamer ?? payload.presenter ?? payload.client ?? '';
+  const dj = normalizeBroadcastDjName(rawDj);
+  return Object.assign({}, payload, {
+    dj,
+    dj_display: dj,
+    dj_mode: dj === AUTO_DJ_DISPLAY_NAME ? 'autodj' : 'live'
+  });
+}
+
 function sanitizeMetadataValue(value, depth = 0){
   if(depth > 6) return null;
   if(typeof value === 'string') return metadataSafeText(value);
@@ -404,7 +426,7 @@ async function fetchMetadataProxyPayload(request, env){
       const body = await upstream.text();
       let payload = body;
       try{
-        payload = JSON.stringify(sanitizeMetadataValue(JSON.parse(body)));
+        payload = JSON.stringify(normalizeMetadataDjPayload(sanitizeMetadataValue(JSON.parse(body))));
       }catch(err){
         payload = JSON.stringify({ raw: metadataSafeText(body, 1024) });
       }
@@ -519,7 +541,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -708,15 +730,34 @@ async function serveExternalIndex(request, env){
   return response || new Response(HTML, {status:200,headers:{"content-type":"text/html; charset=UTF-8","cache-control":"no-store","x-player-mode":"embedded-emergency-fallback","x-player-version":"legacy-embedded"}});
 }
 
+function normalizedRoutePath(pathname){
+  let value = String(pathname || '/');
+  try{ value = decodeURIComponent(value); }catch(err){}
+  value = value.replace(/\/{2,}/g, '/');
+  if(value.length > 1) value = value.replace(/\/+$/, '');
+  return value.toLowerCase();
+}
+function isAmarisPlayerPath(pathname){
+  const path = normalizedRoutePath(pathname);
+  return path === '/amaris' || path === '/amaris/index.html';
+}
+
 async function serveAmarisPlayer(request, env){
-  const response = await serveProjectAsset(request, env, "/AMARIS/index.html");
+  if(request.method !== 'GET' && request.method !== 'HEAD'){
+    return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
+  }
+  const response = await serveProjectAsset(request, env, "/amaris/index.html") || await serveProjectAsset(request, env, "/AMARIS/index.html");
   if(!response){
-    return new Response("AMARIS player asset unavailable",{status:503,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store"}});
+    return new Response("AMARIS player asset unavailable",{status:503,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","x-player-mode":"amaris-asset-missing"}});
   }
   const headers = new Headers(response.headers);
   headers.set("cache-control","no-store, no-cache, must-revalidate, max-age=0");
+  headers.set("pragma","no-cache");
+  headers.set("expires","0");
+  headers.set("content-location","/amaris/");
   headers.set("x-player-mode","amaris-lyvra-minimal");
-  headers.set("x-player-version","v1.2.1");
+  headers.set("x-player-version","v1.2.2");
+  headers.set("x-amaris-route-lock","standalone-only");
   return new Response(request.method === "HEAD" ? null : response.body,{status:response.status,statusText:response.statusText,headers});
 }
 
@@ -805,7 +846,7 @@ function s666ModuleStatus(env) {
       },
       amarisMinimalPlayer: {
         ok: true,
-        routes: ["/amaris", "/amaris/", "/AMARIS/index.html"],
+        routes: ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/", "/amaris/index.html", "/AMARIS/index.html"],
         primary: "https://my.idjstream.com:8686",
         fallback: "https://my.idjstream.com:8686/stream",
         emergencyChain: ["/stream", "/fallback-stream"],
@@ -863,7 +904,7 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_AMARIS_MINIMAL_PLAYER_REPAIR_v1.2.1",
+    version: "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
     routes: { root: "/", amaris: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
@@ -919,6 +960,7 @@ export default {
     const __darkDancerResponse = await darkDancerResponse(request, env);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
+    if(isAmarisPlayerPath(url.pathname)) return await serveAmarisPlayer(request, env);
     if (url.pathname === "/health") return s666LiveHealth(request, env);
     if (url.pathname === "/api/runtime-config/status" && (request.method === "GET" || request.method === "HEAD")) {
       const runtime = await loadRadioRuntimeConfig(request, env, true);
@@ -956,10 +998,6 @@ const url=new URL(request.url);
 
     const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
     if (chaosEngineStatic) return chaosEngineStatic;
-
-    if(url.pathname==="/amaris" || url.pathname==="/amaris/" || url.pathname==="/AMARIS" || url.pathname==="/AMARIS/"){
-      return await serveAmarisPlayer(request, env);
-    }
 
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       return await serveExternalIndex(request, env);

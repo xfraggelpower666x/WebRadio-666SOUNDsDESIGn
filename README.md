@@ -63,13 +63,11 @@ npm run deploy
 ```
 
 
-## Release v1.2.1 — AMARIS minimal recovery player
+## Release v1.2.2 — AMARIS hard route, iOS start and LYVRA DJ
 
-- New standalone page: `AMARIS/index.html`
-- Public endpoint: `/amaris`
-- Direct primary: `https://my.idjstream.com:8686`
-- Direct fallback: `https://my.idjstream.com:8686/stream`
-- Additional emergency chain: `/stream` then `/fallback-stream`
-- Existing internal emergency player remains available at `/internal` and was preserved byte-for-byte.
-- Root/public mirrors and the legacy Worker mirror are synchronized.
-- Safe-root deploy packaging is required; the source download ZIP contains a wrapper folder and must not be uploaded as-is.
+- `/amaris`, `/AMARIS` and both `index.html` aliases are hard-routed to one standalone Mini-Player.
+- Physical lowercase `amaris/index.html` mirrors prevent static hosting from falling back to the normal main player.
+- Audio starts worker-first through `/stream`; `/fallback-stream` and runtime-configured direct sources remain recovery stages.
+- The iPhone start overlay closes only after confirmed playback and re-enables retry after failure.
+- Auto-DJ is displayed canonically as `LYVRA DJ`; real live-DJ metadata overrides it automatically.
+- Main player and `/internal` emergency player remain separate and preserved.

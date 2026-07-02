@@ -453,11 +453,11 @@ function updateHistory(title) {
 
 
 function getDefaultDjName() {
-  return 'DJ 666';
+  return 'LYVRA DJ';
 }
 
 function normalizeDjName(raw) {
-  const fallback = 'DJ 666';
+  const fallback = 'LYVRA DJ';
   const value = String(raw || '').trim();
   if (!value) return fallback;
   const lowered = value.toLowerCase();
