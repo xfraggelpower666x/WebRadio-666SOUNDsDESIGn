@@ -54,6 +54,34 @@ test("responsive V6 layout removes fixed V5 takeover", async () => {
   assert.doesNotMatch(css, /INTERIOR_LAYOUT_V5/);
 });
 
+
+test("AMARIS is a no-scroll iPhone viewport and a compact black-background PC mini-player", async () => {
+  const amaris = await read("AMARIS/index.html");
+  assert.match(amaris, /height:100dvh/);
+  assert.match(amaris, /overflow:hidden;overscroll-behavior:none/);
+  assert.match(amaris, /@media \(min-width:769px\)/);
+  assert.match(amaris, /width:min\(520px,calc\(100vw - 48px\)\)/);
+  assert.match(amaris, /background:#000/);
+  assert.match(amaris, /id="nowPlayingClone"/);
+  assert.match(amaris, /@keyframes amarisTicker/);
+  assert.match(amaris, /WORKER AUTO SWITCH/);
+  assert.match(amaris, /L\.Y\.V\.R\.A\. – Living Yielding Vibration and Resonance Architecture/);
+  assert.doesNotMatch(amaris, /\.status-grid\{grid-template-columns:1fr\}/);
+});
+
+test("all player frontends consume the central de-duplicated title and LYVRA prefix contract", async () => {
+  for (const path of ["AMARIS/index.html", "amaris/index.html", "index.html", "js/player-core.js", "js/extern.js", "dashboard/index.html"]) {
+    const source = await read(path);
+    assert.match(source, /LYVRA is alive · 666SOUNDsDESIGn · /, path);
+    assert.match(source, /display_title/, path);
+    assert.match(source, /Fraggle|fraggle/, path);
+  }
+  const worker = await read("worker.js");
+  assert.match(worker, /normalizeMetadataBroadcastPayload/);
+  assert.match(worker, /display_title: displayTitle/);
+  assert.match(worker, /BROADCAST_TITLE_PREFIX/);
+});
+
 test("all repaired root/public files are byte-identical", async () => {
   for (const path of [
     "index.html", "js/admin-auth-client.js", "js/player-alert-client.js",

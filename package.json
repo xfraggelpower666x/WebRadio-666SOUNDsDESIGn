@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with strict admin hardlock, black-screen regression protection and AMARIS LYVRA hard-routed iOS-safe recovery player with canonical LYVRA DJ switching.",
+  "description": "666SOUNDsDESIGn WebRadio full source with preserved player architecture, hard-routed AMARIS LYVRA recovery player, iPhone no-scroll viewport layout, compact PC mini-card, centralized title de-duplication and canonical LYVRA DJ/live-DJ switching.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",

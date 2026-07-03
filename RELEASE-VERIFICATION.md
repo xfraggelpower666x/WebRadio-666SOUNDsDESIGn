@@ -1,20 +1,30 @@
-# Release Verification — v1.2.2
+# Release Verification — v1.2.3
 
-- Status: **LOCAL REPAIR PASS / LIVE DEPLOY + DEVICE VALIDATION REQUIRED**
-- Release: `FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2`
+- Status: **LOCAL REPAIR PASS / LIVE DEPLOY + PHYSICAL IPHONE AUDIO VALIDATION REQUIRED**
+- Release: `FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3`
 - Safe-root deploy: YES
 - Wrapper folder in deploy ZIP: NO
 - Nested ZIP files in repo: 0
-- Node tests: 37/37 PASS
+- Files in release tree: 747
+- Hashed inventory entries: 743
+- Node tests: 40/40 PASS
 - JavaScript/MJS syntax: 111 PASS
 - AMARIS inline JavaScript: PASS
 - Root/Public mirror validation: 56 pairs PASS
 - AMARIS aliases: 6/6 PASS
-- AMARIS endpoint: `/amaris`
+- iPhone viewport: 390×844 client dimensions equal scroll dimensions
+- iPhone page scrolling: NONE
+- Desktop card: centered 520 px on black background
+- Now Playing: continuous marquee for long titles; static centered text for short titles
+- Title de-duplication: central Worker + all updated player frontends
+- Screenshot title result: `666SOUNDsDESIGn - FRAGGELPOWER666 - Ghost Inside The Line_1`
+- Bare-title prefix: `LYVRA is alive · 666SOUNDsDESIGn ·`
+- Source colors: Main green / Fallback cyan / Direct reserve amber
+- Auto-DJ display: `LYVRA DJ`
+- Real live-DJ metadata: dynamically preserved
+- Footer: `L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture`
 - Existing full main player: `/` preserved
 - Existing internal player: `/internal` preserved as separate player
 - Main player Audio/EQ/Boost architecture: unchanged
-- Auto-DJ display: `LYVRA DJ`
-- Real live-DJ metadata: dynamically preserved
 - Live Cloudflare deployment: not performed
-- Physical iPhone validation: required after deployment
+- Physical iPhone audio validation: required after deployment

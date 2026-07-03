@@ -3,37 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#05070d">
+  <meta name="theme-color" content="#000000">
   <meta name="robots" content="noindex,nofollow">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>AMARIS LYVRA Minimal WebRadio</title>
   <style>
     *{box-sizing:border-box}
-    :root{--bg:#07080f;--bg2:#0a0d1a;--cyan:#16fff3;--pink:#ff3dbb;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(22,255,243,.28);--shadow-cyan:0 0 18px rgba(22,255,243,.22);--shadow-pink:0 0 18px rgba(255,61,187,.18)}
-    html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,61,187,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(22,255,243,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:'Courier New',Courier,monospace}
-    body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-    .player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}
-    .player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(22,255,243,.25)}
-    .brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(22,255,243,.34)}.brand{font-size:clamp(1rem,3.8vw,1.42rem);line-height:1.35}.boot-title{font-size:1.5rem;margin-bottom:8px}
-    .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}
-    .lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp-box-source{justify-content:flex-start}.lamp-side-label{margin-left:auto;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.28)}
-    .lamp{width:12px;height:12px;border-radius:999px;display:inline-block;border:1px solid rgba(255,255,255,.20);box-shadow:0 0 10px currentColor}.lamp-purple{color:#b14dff;background:#b14dff}.lamp-red{color:var(--pink);background:var(--pink)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-green{color:var(--green);background:var(--green)}
-    .lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.pill{padding:8px 12px;font-size:.86rem}.pill-dim{color:var(--muted)}
-    .display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(22,255,243,.22)}
-    .marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
-    .tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,61,187,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}
-    .mini-grid{display:grid;gap:10px;margin-bottom:12px}.mini-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.mini-box{padding:10px 12px}.mini-value{font-weight:700;margin-top:4px;overflow-wrap:anywhere}.control-strip,.audio-tools{display:grid;gap:10px;align-items:stretch}.control-strip-3{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:10px}.audio-tools-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .control-btn,.small-btn{padding:12px;color:var(--text);font-weight:700;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:var(--shadow-cyan)}.control-btn.main{border-color:rgba(255,61,187,.35);box-shadow:var(--shadow-pink)}.small-btn{border-color:rgba(255,61,187,.28);box-shadow:var(--shadow-pink)}.source-btn.is-active{border-color:rgba(22,255,243,.45);box-shadow:0 0 14px rgba(22,255,243,.28)}
-    .overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.90)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(22,255,243,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(22,255,243,.16),rgba(255,61,187,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.neon-button:disabled{opacity:.65;cursor:wait}.boot-state{min-height:1.4em;margin-top:12px;color:var(--pink);font-size:.82rem}.footer{margin-top:12px;text-align:center;color:#6f8592;font-size:.68rem;line-height:1.45}
-    @media(max-width:560px){.mini-grid-3{grid-template-columns:1fr}.audio-tools-4{grid-template-columns:repeat(2,minmax(0,1fr))}.status-grid{grid-template-columns:1fr}.app-shell{padding:8px}.player-card{padding:13px;border-radius:18px}}
+    :root{
+      --bg:#000;
+      --panel:#090d14;
+      --panel-2:#111721;
+      --cyan:#16fff3;
+      --pink:#ff3dbb;
+      --green:#47ff8a;
+      --amber:#ffc857;
+      --red:#ff5570;
+      --text:#eef7ff;
+      --muted:#9db0be;
+      --border:rgba(22,255,243,.28);
+      --shadow-cyan:0 0 18px rgba(22,255,243,.20);
+      --shadow-pink:0 0 15px rgba(255,61,187,.18);
+      --safe-top:max(4px,env(safe-area-inset-top));
+      --safe-right:max(4px,env(safe-area-inset-right));
+      --safe-bottom:max(4px,env(safe-area-inset-bottom));
+      --safe-left:max(4px,env(safe-area-inset-left));
+    }
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:#000;color:var(--text);font-family:"Courier New",Courier,monospace}
+    body{min-height:100svh;min-height:100dvh}
+    button{font:inherit}
+    .app-shell{
+      width:100vw;height:100svh;height:100dvh;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+      padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      background:#000;
+    }
+    .player-card,.boot-panel{
+      min-width:0;
+      background:linear-gradient(180deg,rgba(17,23,33,.99),rgba(5,8,14,.99));
+      border:1px solid var(--border);
+      box-shadow:var(--shadow-cyan),var(--shadow-pink);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+    }
+    .player-card{
+      width:100%;height:100%;min-height:0;overflow:hidden;
+      display:grid;
+      grid-template-rows:auto auto auto minmax(104px,18dvh) auto auto auto minmax(0,1fr) auto;
+      gap:7px;padding:9px;border-radius:16px;
+    }
+    .topbar{min-width:0;display:grid;grid-template-columns:minmax(18px,1fr) auto minmax(18px,1fr);align-items:center;gap:7px}
+    .topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 10px rgba(22,255,243,.35)}
+    .brand{text-align:center;font-weight:900;letter-spacing:.11em;color:var(--cyan);text-shadow:0 0 8px rgba(22,255,243,.85),0 0 18px rgba(255,61,187,.22);font-size:clamp(.77rem,3.4vw,1.12rem);line-height:1.12;white-space:nowrap}
+    .brand small{display:block;margin-top:3px;font-size:.72em;letter-spacing:.18em;color:var(--muted);text-shadow:none}
+
+    .status-grid{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+    .lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn{min-width:0;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:12px}
+    .lamp-box{display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 7px;min-height:40px}
+    .lamp{flex:0 0 auto;width:10px;height:10px;border-radius:999px;border:1px solid rgba(255,255,255,.24);box-shadow:0 0 10px currentColor}
+    .lamp-red{color:var(--red);background:var(--red)}
+    .lamp-cyan{color:var(--cyan);background:var(--cyan)}
+    .lamp-green{color:var(--green);background:var(--green)}
+    .lamp-amber{color:var(--amber);background:var(--amber)}
+    .lamp-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:clamp(.66rem,2.6vw,.82rem);font-weight:800;letter-spacing:.04em}
+    .lamp-side-label{display:none}
+
+    .pill-row{min-width:0;display:grid;grid-template-columns:.78fr .55fr 1.67fr;gap:6px}
+    .pill{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 8px;text-align:center;color:var(--text);font-size:clamp(.58rem,2.25vw,.76rem);font-weight:800;letter-spacing:.035em}
+    .pill-dim{color:var(--muted)}
+
+    .display-block{min-width:0;min-height:0;position:relative;display:grid;grid-template-rows:auto auto minmax(46px,1fr);gap:4px}
+    .display-head{min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .display-label,.mini-label{color:var(--muted);font-size:clamp(.62rem,2.35vw,.78rem);letter-spacing:.08em;text-transform:uppercase}
+    #metaText{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(.56rem,2.05vw,.7rem)}
+    .display-window{min-height:46px;height:100%;overflow:hidden;display:flex;align-items:center;border-color:rgba(22,255,243,.28);background:linear-gradient(90deg,rgba(22,255,243,.035),rgba(255,61,187,.035));mask-image:linear-gradient(90deg,transparent 0,#000 4%,#000 96%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 4%,#000 96%,transparent 100%)}
+    .marquee-track{display:flex;align-items:center;width:max-content;min-width:100%;white-space:nowrap;transform:translate3d(0,0,0);will-change:transform}
+    .marquee-track.is-running{animation:amarisTicker var(--ticker-duration,18s) linear infinite}
+    .marquee-track.is-static{justify-content:center}
+    .marquee-track.is-static .marquee-clone,.marquee-track.is-static .marquee-gap{display:none}
+    .marquee-item{display:inline-block;padding:0 14px;font-size:clamp(.82rem,3.45vw,1.03rem);font-weight:900;color:var(--pink);text-shadow:0 0 9px rgba(255,61,187,.58);letter-spacing:.015em}
+    .marquee-gap{display:inline-block;padding:0 20px;color:var(--cyan);text-shadow:0 0 8px rgba(22,255,243,.70)}
+    @keyframes amarisTicker{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--ticker-shift,500px)),0,0)}}
+    .tiny-btn{appearance:none;border:1px solid rgba(22,255,243,.22);border-radius:10px;background:rgba(255,255,255,.045);color:var(--text);padding:5px 9px;font-size:clamp(.58rem,2.15vw,.73rem);font-weight:800;cursor:pointer}
+    .history-overlay{position:absolute;left:0;right:0;top:26px;z-index:10;border-radius:12px;padding:10px;background:rgba(5,8,14,.99);border:1px solid rgba(255,61,187,.34);box-shadow:var(--shadow-pink)}
+    .history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:800;margin-bottom:7px}.history-list{margin:0;padding-left:18px;max-height:38dvh;overflow:auto;font-size:.75rem}
+
+    .mini-grid{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+    .mini-box{padding:7px 8px;min-height:50px;display:flex;flex-direction:column;justify-content:center}
+    .mini-value{min-width:0;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-size:clamp(.69rem,2.7vw,.9rem)}
+    #djText{color:var(--cyan);text-shadow:0 0 7px rgba(22,255,243,.35)}
+
+    .control-strip,.audio-tools{min-width:0;display:grid;gap:6px}
+    .control-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .audio-tools{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .control-btn,.small-btn{appearance:none;min-height:40px;padding:7px 5px;color:var(--text);font-weight:900;font-size:clamp(.64rem,2.45vw,.8rem);letter-spacing:.035em;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 0 10px rgba(22,255,243,.08)}
+    .control-btn.main{border-color:rgba(255,61,187,.42);box-shadow:var(--shadow-pink)}
+    .source-btn.is-active{border-color:rgba(22,255,243,.58);box-shadow:0 0 12px rgba(22,255,243,.28);color:var(--cyan)}
+    .viewport-spacer{min-height:0}
+    audio{display:none}
+    .footer{min-width:0;overflow:hidden;text-align:center;white-space:nowrap;color:var(--cyan);font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;font-size:clamp(.58rem,2.32vw,.78rem);font-weight:800;line-height:1.15;letter-spacing:.005em;text-shadow:0 0 7px rgba(22,255,243,.68),0 0 12px rgba(255,61,187,.62)}
+
+    .overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 12px) calc(var(--safe-left) + 12px);background:rgba(0,0,0,.94)}
+    .overlay.hidden{display:none}.boot-panel{width:min(92vw,430px);padding:22px;text-align:center;border-radius:18px}.boot-title{font-size:clamp(1.15rem,5vw,1.55rem);font-weight:900;letter-spacing:.12em;color:var(--cyan);text-shadow:0 0 12px rgba(22,255,243,.58)}.boot-subtitle,.boot-note{color:var(--muted)}.boot-subtitle{font-size:.76rem;letter-spacing:.08em}.boot-note{font-size:.76rem;line-height:1.45}.neon-button{appearance:none;border:1px solid rgba(22,255,243,.55);border-radius:13px;padding:12px 17px;background:linear-gradient(180deg,rgba(22,255,243,.16),rgba(255,61,187,.08));color:var(--text);font-weight:900;cursor:pointer;box-shadow:var(--shadow-cyan)}.neon-button:disabled{opacity:.65;cursor:wait}.boot-state{min-height:1.4em;margin-top:10px;color:var(--pink);font-size:.76rem}
+
+    @media (min-width:769px){
+      .app-shell{padding:24px;background:#000}
+      .player-card{width:min(520px,calc(100vw - 48px));height:auto;max-height:calc(100dvh - 48px);grid-template-rows:repeat(8,auto);padding:14px;gap:9px;border-radius:20px}
+      .viewport-spacer{display:none}
+      .brand{font-size:1.02rem}.lamp-box{min-height:46px}.display-block{grid-template-rows:auto auto 58px}.display-window{height:58px}.mini-box{min-height:58px}.control-btn,.small-btn{min-height:44px}.footer{font-size:.76rem}
+    }
+    @media (max-height:680px) and (max-width:768px){
+      .player-card{grid-template-rows:auto auto auto 82px auto auto auto minmax(0,1fr) auto;gap:4px;padding:6px;border-radius:11px}.brand{font-size:.72rem}.brand small{margin-top:1px}.lamp-box{min-height:34px;padding:4px}.pill{padding:4px 5px}.display-block{grid-template-rows:auto auto minmax(38px,1fr);gap:2px}.display-window{min-height:38px}.mini-box{min-height:42px;padding:4px 6px}.control-btn,.small-btn{min-height:34px;padding:4px}.footer{font-size:.54rem}.tiny-btn{padding:3px 7px}
+    }
+    @media (prefers-reduced-motion:reduce){.marquee-track.is-running{animation-duration:36s}}
   </style>
 </head>
 <body>
   <div id="bootOverlay" class="overlay">
     <div class="boot-panel">
       <div class="boot-title">AMARIS · LYVRA</div>
-      <div class="boot-subtitle">MINIMAL WEBRADIO · WORKER EMERGENCY CHAIN</div>
-      <p class="boot-note">Ein Tipp startet Audio direkt über die Worker-Switch-Logik. Der Dialog schließt erst, wenn die Wiedergabe wirklich läuft.</p>
+      <div class="boot-subtitle">MINIMAL WEBRADIO · WORKER SWITCH CHAIN</div>
+      <p class="boot-note">Ein Tipp startet Audio über die Worker-Haupt-, Fallback- und Reservekette. Der Dialog schließt erst bei bestätigter Wiedergabe.</p>
       <button id="bootButton" class="neon-button" type="button">START AUDIO</button>
       <div id="bootState" class="boot-state" role="status" aria-live="polite">Bereit</div>
     </div>
@@ -43,50 +133,58 @@
     <section class="player-card">
       <header class="topbar">
         <div class="topbar-line"></div>
-        <div class="brand">A M A R I S - L Y V R A<br>MINIMAL WEBRADIO</div>
+        <div class="brand">AMARIS · LYVRA<small>MINIMAL WEBRADIO</small></div>
         <div class="topbar-line"></div>
       </header>
 
       <div class="status-grid">
-        <div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">Meta</span></div>
-        <div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">Audio</span></div>
-        <div class="lamp-box lamp-box-source"><span id="sourceLamp" class="lamp lamp-cyan"></span><span class="lamp-label">Source</span><span id="playerTypeLabel" class="lamp-side-label">AMARIS</span></div>
+        <div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">METADATA</span></div>
+        <div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">AUDIO</span></div>
+        <div class="lamp-box"><span id="sourceLamp" class="lamp lamp-cyan"></span><span class="lamp-label">SOURCE</span><span id="playerTypeLabel" class="lamp-side-label">AMARIS</span></div>
       </div>
 
       <div class="pill-row">
-        <span id="streamStatus" class="pill">Ready</span>
+        <span id="streamStatus" class="pill">READY</span>
         <span id="sourceLabel" class="pill pill-dim">MAIN</span>
-        <span id="fallbackText" class="pill pill-dim">WORKER MAIN SWITCH</span>
+        <span id="fallbackText" class="pill pill-dim">WORKER AUTO SWITCH</span>
       </div>
 
       <div class="display-block">
-        <div class="display-head"><div class="display-label">Now Playing</div><button id="historyToggle" class="tiny-btn" type="button">History</button></div>
-        <div id="metaText" class="display-label" style="margin-bottom:6px;">Loading...</div>
-        <div class="display-window"><div id="nowPlaying" class="marquee-track">Loading metadata...</div></div>
-        <div id="historyOverlay" class="history-overlay hidden"><div class="history-title">Last Tracks</div><ul id="historyList" class="history-list"><li>No history loaded</li></ul></div>
+        <div class="display-head"><div class="display-label">NOW PLAYING</div><button id="historyToggle" class="tiny-btn" type="button">HISTORY</button></div>
+        <div id="metaText" class="display-label">METADATA LOADING</div>
+        <div id="displayWindow" class="display-window">
+          <div id="tickerTrack" class="marquee-track is-static">
+            <span id="nowPlaying" class="marquee-item">Loading metadata...</span>
+            <span class="marquee-gap" aria-hidden="true">◆</span>
+            <span id="nowPlayingClone" class="marquee-item marquee-clone" aria-hidden="true">Loading metadata...</span>
+            <span class="marquee-gap" aria-hidden="true">◆</span>
+          </div>
+        </div>
+        <div id="historyOverlay" class="history-overlay hidden"><div class="history-title">LAST TRACKS</div><ul id="historyList" class="history-list"><li>No history loaded</li></ul></div>
       </div>
 
-      <div class="mini-grid mini-grid-3">
-        <div class="mini-box"><div class="mini-label">Listeners</div><div id="listenersText" class="mini-value">0 / 250</div></div>
-        <div class="mini-box"><div class="mini-label">Bitrate</div><div id="bitrateText" class="mini-value">Unknown</div></div>
-        <div class="mini-box"><div class="mini-label">DJ / Status</div><div id="djText" class="mini-value">LYVRA DJ</div></div>
+      <div class="mini-grid">
+        <div class="mini-box"><div class="mini-label">LISTENERS</div><div id="listenersText" class="mini-value">0 / 250</div></div>
+        <div class="mini-box"><div class="mini-label">BITRATE</div><div id="bitrateText" class="mini-value">UNKNOWN</div></div>
+        <div class="mini-box"><div class="mini-label">DJ / STATUS</div><div id="djText" class="mini-value">LYVRA DJ</div></div>
       </div>
 
-      <div class="control-strip control-strip-3">
-        <button id="playBtn" class="control-btn main" type="button">Play</button>
-        <button id="pauseBtn" class="control-btn" type="button">Pause</button>
-        <button id="stopBtn" class="control-btn" type="button">Stop</button>
+      <div class="control-strip">
+        <button id="playBtn" class="control-btn main" type="button">PLAY</button>
+        <button id="pauseBtn" class="control-btn" type="button">PAUSE</button>
+        <button id="stopBtn" class="control-btn" type="button">STOP</button>
       </div>
 
-      <div class="audio-tools audio-tools-4">
-        <button id="reconnectBtn" class="small-btn" type="button">Reconnect</button>
-        <button id="muteBtn" class="small-btn" type="button">Mute</button>
+      <div class="audio-tools">
+        <button id="reconnectBtn" class="small-btn" type="button">RECONNECT</button>
+        <button id="muteBtn" class="small-btn" type="button">MUTE</button>
         <button id="primaryBtn" class="small-btn source-btn is-active" type="button">MAIN</button>
         <button id="backupBtn" class="small-btn source-btn" type="button">BACK</button>
       </div>
 
+      <div class="viewport-spacer" aria-hidden="true"></div>
       <audio id="radio" preload="none" playsinline webkit-playsinline></audio>
-      <div class="footer">AMARIS · LYVRA minimal recovery player · `/internal` remains a separate preserved emergency player</div>
+      <div class="footer">L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture</div>
     </section>
   </main>
 
@@ -94,6 +192,7 @@
   (()=>{
     'use strict';
     const AUTO_DJ_NAME='LYVRA DJ';
+    const TITLE_PREFIX='LYVRA is alive · 666SOUNDsDESIGn · ';
     const ENDPOINTS={main:'/stream',back:'/fallback-stream',metadata:'/api/nowplaying',runtime:'/api/runtime-config/status'};
     const DEFAULT_DIRECT={primary:'https://my.idjstream.com/666soundsdesign/stream',backup:'https://my.idjstream.com:8686/stream'};
     const CAPACITY=250;
@@ -101,7 +200,8 @@
     const audio=q('radio'),overlay=q('bootOverlay'),bootButton=q('bootButton'),bootState=q('bootState');
     const metaLamp=q('metaLamp'),audioLamp=q('audioLamp'),sourceLamp=q('sourceLamp');
     const streamStatus=q('streamStatus'),sourceLabel=q('sourceLabel'),fallbackText=q('fallbackText');
-    const metaText=q('metaText'),nowPlaying=q('nowPlaying'),listenersText=q('listenersText'),bitrateText=q('bitrateText'),djText=q('djText');
+    const metaText=q('metaText'),nowPlaying=q('nowPlaying'),nowPlayingClone=q('nowPlayingClone'),tickerTrack=q('tickerTrack'),displayWindow=q('displayWindow');
+    const listenersText=q('listenersText'),bitrateText=q('bitrateText'),djText=q('djText');
     const historyToggle=q('historyToggle'),historyOverlay=q('historyOverlay'),historyList=q('historyList');
     const playBtn=q('playBtn'),pauseBtn=q('pauseBtn'),stopBtn=q('stopBtn'),reconnectBtn=q('reconnectBtn'),muteBtn=q('muteBtn'),primaryBtn=q('primaryBtn'),backupBtn=q('backupBtn');
     let runtime={...DEFAULT_DIRECT};
@@ -111,37 +211,96 @@
     function buildChains(){
       return {
         main:[
-          {url:ENDPOINTS.main,label:'WORKER MAIN SWITCH',mode:'MAIN',worker:true},
-          {url:ENDPOINTS.back,label:'WORKER BACK SWITCH',mode:'BACK',worker:true},
-          {url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT PRIMARY RESERVE',mode:'MAIN'},
-          {url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK'}
+          {url:ENDPOINTS.main,label:'WORKER AUTO SWITCH',mode:'MAIN',worker:true},
+          {url:ENDPOINTS.back,label:'WORKER FALLBACK SWITCH',mode:'BACK',worker:true},
+          {url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT MAIN RESERVE',mode:'MAIN',reserve:true},
+          {url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK',reserve:true}
         ],
         back:[
-          {url:ENDPOINTS.back,label:'WORKER BACK SWITCH',mode:'BACK',worker:true},
-          {url:ENDPOINTS.main,label:'WORKER MAIN SWITCH',mode:'MAIN',worker:true},
-          {url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK'},
-          {url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT PRIMARY RESERVE',mode:'MAIN'}
+          {url:ENDPOINTS.back,label:'WORKER FALLBACK SWITCH',mode:'BACK',worker:true},
+          {url:ENDPOINTS.main,label:'WORKER AUTO SWITCH',mode:'MAIN',worker:true},
+          {url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK',reserve:true},
+          {url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT MAIN RESERVE',mode:'MAIN',reserve:true}
         ]
       };
     }
-    function clean(value){return String(value??'').replace(/\s+/g,' ').trim()}
-    function normalizeDj(value){
-      const raw=clean(value);if(!raw)return AUTO_DJ_NAME;
-      const lowered=raw.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-      if(!lowered||['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','lyvra dj'].includes(lowered))return AUTO_DJ_NAME;
-      if(lowered.includes('auto dj')||lowered.includes('autodj'))return AUTO_DJ_NAME;
-      return raw;
+    function clean(value){return String(value??'').replace(/<[^>]*>/g,' ').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim()}
+    function firstText(...values){
+      for(const value of values){
+        if(value===undefined||value===null)continue;
+        if(typeof value==='string'||typeof value==='number'){const text=clean(value);if(text)return text;continue}
+        if(value&&typeof value==='object'){
+          const nested=value.display_title??value.normalized_title??value.text??value.title??value.name??value.songtitle??value.song??value.current??value.now_playing??value.nowPlaying;
+          if(nested!==value){const text=firstText(nested);if(text)return text}
+        }
+      }
+      return '';
     }
-    function setLamp(node,state){if(!node)return;node.classList.remove('lamp-purple','lamp-red','lamp-cyan','lamp-green');node.classList.add(state)}
-    function setStatus(text){streamStatus.textContent=text}
+    function isAutoDjValue(value){
+      const lowered=clean(value).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+      return !lowered||['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','666 sounds design dj','lyvra dj'].includes(lowered)||lowered.includes('auto dj')||lowered.includes('autodj');
+    }
+    function normalizeDj(value){const raw=clean(value);return isAutoDjValue(raw)?AUTO_DJ_NAME:raw}
+    function hasBrandIdentity(value){
+      return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(clean(value));
+    }
+    function cleanTitle(value){
+      let text=clean(value)
+        .replace(/^\s*(?:unknown title|loading metadata|metadata unavailable|metadaten werden geladen|no dj)\s*(?:[-:|–—·•]+\s*)*/i,'')
+        .replace(/(?:\s*[-–—|·•]\s*){2,}/g,' - ')
+        .replace(/\s{2,}/g,' ')
+        .replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g,'')
+        .trim();
+      text=text.replace(/666\s*sounds?\s*design/ig,'666SOUNDsDESIGn').replace(/\blyvra\b/ig,'LYVRA');
+      const segments=text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(part=>part.trim()).filter(Boolean);
+      const seen=new Set();
+      const unique=[];
+      for(const segment of segments){const key=segment.toLowerCase().replace(/[^a-z0-9]+/g,'');if(!key||seen.has(key))continue;seen.add(key);unique.push(segment)}
+      return unique.length?unique.join(' - '):text;
+    }
+    function normalizeDisplayTitle(rawTitle,rawArtist=''){
+      const title=cleanTitle(rawTitle);if(!title)return '';
+      const artist=cleanTitle(rawArtist);
+      let candidate=title;
+      if(artist&&hasBrandIdentity(artist)&&!title.toLowerCase().includes(artist.toLowerCase()))candidate=cleanTitle(artist+' - '+title);
+      if(hasBrandIdentity(candidate))return candidate;
+      return TITLE_PREFIX+candidate;
+    }
+    function setLamp(node,state){if(!node)return;node.classList.remove('lamp-red','lamp-cyan','lamp-green','lamp-amber');node.classList.add(state)}
+    function setStatus(text){streamStatus.textContent=String(text||'').toUpperCase()}
     function currentCandidate(){return chains[selected][candidateIndex]||chains[selected][0]}
     function updateSourceUi(){
       const item=currentCandidate();
       sourceLabel.textContent=item.mode;
       fallbackText.textContent=item.label;
-      setLamp(sourceLamp,item.worker?'lamp-cyan':'lamp-purple');
+      setLamp(sourceLamp,item.reserve?'lamp-amber':(item.mode==='MAIN'?'lamp-green':'lamp-cyan'));
       primaryBtn.classList.toggle('is-active',selected==='main');
       backupBtn.classList.toggle('is-active',selected==='back');
+    }
+    function syncTickerMotion(){
+      if(!displayWindow||!tickerTrack||!nowPlaying)return;
+      tickerTrack.classList.remove('is-running','is-static');
+      tickerTrack.style.removeProperty('--ticker-shift');
+      tickerTrack.style.removeProperty('--ticker-duration');
+      const itemWidth=Math.ceil(nowPlaying.getBoundingClientRect().width);
+      const viewportWidth=Math.floor(displayWindow.clientWidth);
+      if(itemWidth<=Math.max(0,viewportWidth-24)){
+        tickerTrack.classList.add('is-static');
+        return;
+      }
+      const gapNode=tickerTrack.querySelector('.marquee-gap');
+      const gapWidth=gapNode?Math.ceil(gapNode.getBoundingClientRect().width):48;
+      const shift=itemWidth+gapWidth;
+      const duration=Math.max(14,Math.min(42,shift/34));
+      tickerTrack.style.setProperty('--ticker-shift',shift+'px');
+      tickerTrack.style.setProperty('--ticker-duration',duration.toFixed(2)+'s');
+      void tickerTrack.offsetWidth;
+      tickerTrack.classList.add('is-running');
+    }
+    function setTicker(text){
+      const finalText=clean(text)||'Metadata unavailable';
+      nowPlaying.textContent=finalText;nowPlayingClone.textContent=finalText;lastTitle=finalText;
+      requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion));
     }
     function clearStall(){clearTimeout(stallTimer);stallTimer=0}
     function resetAudio(){clearStall();audio.pause();audio.removeAttribute('src');audio.load()}
@@ -150,7 +309,7 @@
     function renderHistory(items){
       historyList.textContent='';const list=Array.isArray(items)?items:[];
       if(!list.length){const li=document.createElement('li');li.textContent='No history loaded';historyList.appendChild(li);return}
-      list.slice(0,12).forEach(item=>{const li=document.createElement('li');li.textContent=typeof item==='string'?item:clean(item?.song||item?.title||item?.track||item?.name||'Unknown track');historyList.appendChild(li)});
+      list.slice(0,12).forEach(item=>{const li=document.createElement('li');const raw=firstText(item?.display_title,item?.normalized_title,item?.song,item?.title,item?.track,item?.name,item);li.textContent=cleanTitle(raw)||'Unknown track';historyList.appendChild(li)});
     }
     async function loadRuntime(){
       try{
@@ -164,13 +323,18 @@
       try{
         const response=await fetch(ENDPOINTS.metadata+'?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw new Error('metadata_http_'+response.status);
         const data=await response.json();
-        const title=clean(data?.song||data?.title||data?.songtitle||data?.track||data?.currentSong||data?.nowplaying||'Metadata unavailable');
-        nowPlaying.textContent=title||'Metadata unavailable';lastTitle=title||lastTitle;
-        const count=Number.parseInt(data?.listeners??data?.currentListeners??0,10);listenersText.textContent=String(Number.isFinite(count)?count:0)+' / '+String(data?.maxlisteners||data?.maxListeners||CAPACITY);
-        const br=data?.bitrate??data?.stream?.bitrate??'Unknown';bitrateText.textContent=br==='Unknown'?'Unknown':String(br).replace(/\s*kbps$/i,'')+' kbps';
-        djText.textContent=normalizeDj(data?.dj??data?.djusername??data?.djstatus??data?.live_dj??data?.streamer??data?.presenter??data?.client);
-        renderHistory(data?.history||data?.song_history||data?.played_history||[]);metaText.textContent='Online';setLamp(metaLamp,'lamp-cyan');
-      }catch(_){metaText.textContent='Offline';setLamp(metaLamp,'lamp-red');if(!lastTitle)nowPlaying.textContent='Metadata unavailable'}
+        const rawTitle=firstText(data?.display_title,data?.normalized_title,data?.title_display,data?.song,data?.title,data?.songtitle,data?.track,data?.currentSong,data?.current_song,data?.nowplaying,data?.nowPlaying);
+        const rawArtist=firstText(data?.artist,data?.song?.artist,data?.now_playing?.song?.artist);
+        const title=firstText(data?.display_title,data?.normalized_title,data?.title_display)||normalizeDisplayTitle(rawTitle,rawArtist)||'Metadata unavailable';
+        setTicker(title);
+        const count=Number.parseInt(data?.listeners??data?.currentListeners??data?.currentlisteners??0,10);
+        listenersText.textContent=String(Number.isFinite(count)?count:0)+' / '+String(data?.maxlisteners||data?.maxListeners||CAPACITY);
+        const br=data?.bitrate??data?.stream?.bitrate??'Unknown';bitrateText.textContent=br==='Unknown'?'UNKNOWN':String(br).replace(/\s*kbps$/i,'')+' kbps';
+        const liveName=firstText(data?.dj_display,data?.dj,data?.djusername,data?.djstatus,data?.live_dj,data?.streamer,data?.presenter,data?.client,data?.live?.streamer_name,data?.live?.streamer,data?.live?.name);
+        djText.textContent=normalizeDj(liveName);
+        renderHistory(data?.history||data?.song_history||data?.played_history||[]);
+        metaText.textContent='METADATA ONLINE';setLamp(metaLamp,'lamp-green');
+      }catch(_){metaText.textContent='METADATA OFFLINE';setLamp(metaLamp,'lamp-red');if(!lastTitle)setTicker('Metadata unavailable')}
     }
     function preparePlayback(){
       const item=currentCandidate();userStopped=false;updateSourceUi();setStatus('Connecting');setLamp(audioLamp,'lamp-cyan');
@@ -181,10 +345,10 @@
       if(switching)return false;switching=true;
       try{
         const started=preparePlayback();setStatus(reason+' · '+started.item.label);
-        await started.promise;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-purple');startMetadata();
+        await started.promise;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-green');startMetadata();
         if(fromBoot){overlay.classList.add('hidden');bootState.textContent='Audio läuft'}
         return true;
-      }catch(error){
+      }catch(_){
         setStatus('Audio Error');setLamp(audioLamp,'lamp-red');
         if(fromBoot){bootState.textContent='Start fehlgeschlagen. Erneut tippen für die nächste Worker-/Fallback-Stufe.';bootButton.textContent='ERNEUT VERSUCHEN';bootButton.disabled=false;candidateIndex=Math.min(candidateIndex+1,chains[selected].length-1);updateSourceUi()}
         return false;
@@ -195,29 +359,26 @@
       if(candidateIndex+1>=chains[selected].length){setStatus('All Sources Failed');setLamp(audioLamp,'lamp-red');return false}
       candidateIndex+=1;updateSourceUi();return playCurrent(reason,false);
     }
-    async function selectSource(next){
-      if(switching)return;selected=next;candidateIndex=0;updateSourceUi();await playCurrent(next==='main'?'Switch MAIN':'Switch BACK',false)
-    }
+    async function selectSource(next){if(switching)return;selected=next;candidateIndex=0;updateSourceUi();await playCurrent(next==='main'?'Switch Main':'Switch Back',false)}
 
-    bootButton.addEventListener('click',()=>{
-      if(switching)return;bootButton.disabled=true;bootState.textContent='Worker-Switch wird gestartet …';
-      void playCurrent('Start',true).then(ok=>{if(!ok)bootButton.disabled=false});
-    });
+    bootButton.addEventListener('click',()=>{if(switching)return;bootButton.disabled=true;bootState.textContent='Worker-Switch wird gestartet …';void playCurrent('Start',true).then(ok=>{if(!ok)bootButton.disabled=false})});
     playBtn.addEventListener('click',()=>void playCurrent('Play',false));
-    pauseBtn.addEventListener('click',()=>{audio.pause();stopMetadata();setStatus('Paused');setLamp(audioLamp,'lamp-red')});
+    pauseBtn.addEventListener('click',()=>{audio.pause();stopMetadata();setStatus('Paused');setLamp(audioLamp,'lamp-amber')});
     stopBtn.addEventListener('click',()=>{userStopped=true;switching=false;stopMetadata();resetAudio();setStatus('Stopped');setLamp(audioLamp,'lamp-red')});
     reconnectBtn.addEventListener('click',()=>{userStopped=false;void playCurrent('Reconnect',false)});
-    muteBtn.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteBtn.textContent=muted?'Unmute':'Mute'});
+    muteBtn.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteBtn.textContent=muted?'UNMUTE':'MUTE'});
     primaryBtn.addEventListener('click',()=>void selectSource('main'));
     backupBtn.addEventListener('click',()=>void selectSource('back'));
     historyToggle.addEventListener('click',()=>{historyOpen=!historyOpen;historyOverlay.classList.toggle('hidden',!historyOpen)});
-    audio.addEventListener('playing',()=>{if(userStopped)return;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-purple');if(!overlay.classList.contains('hidden'))overlay.classList.add('hidden')});
-    audio.addEventListener('waiting',()=>{if(userStopped)return;setStatus('Buffering');setLamp(audioLamp,'lamp-red')});
+    audio.addEventListener('playing',()=>{if(userStopped)return;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-green');if(!overlay.classList.contains('hidden'))overlay.classList.add('hidden')});
+    audio.addEventListener('waiting',()=>{if(userStopped)return;setStatus('Buffering');setLamp(audioLamp,'lamp-cyan')});
     audio.addEventListener('stalled',()=>{if(userStopped)return;clearStall();stallTimer=setTimeout(()=>void advanceFallback('Stalled Fallback'),4000)});
     audio.addEventListener('error',()=>{if(userStopped||switching||!hasPlayed)return;void advanceFallback('Audio Error Fallback')});
     audio.addEventListener('ended',()=>{if(userStopped)return;void advanceFallback('Stream Ended Fallback')});
+    window.addEventListener('resize',()=>requestAnimationFrame(syncTickerMotion),{passive:true});
+    window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(syncTickerMotion),{passive:true});
 
-    updateSourceUi();renderHistory([]);void loadRuntime();void fetchMetadata();
+    updateSourceUi();renderHistory([]);setTicker('Loading metadata...');void loadRuntime();void fetchMetadata();
   })();
   </script>
 </body>

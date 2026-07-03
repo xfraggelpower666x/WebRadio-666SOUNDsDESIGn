@@ -78,8 +78,68 @@ function pickValue(data, keys, fallback = "") {
   return fallback;
 }
 
+function cleanMetaText(value) {
+  return String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function firstMetaText(...values) {
+  for (const value of values) {
+    if (value === undefined || value === null) continue;
+    if (typeof value === 'string' || typeof value === 'number') {
+      const text = cleanMetaText(value);
+      if (text) return text;
+      continue;
+    }
+    if (value && typeof value === 'object') {
+      const nested = value.display_title ?? value.normalized_title ?? value.text ?? value.title ?? value.name ?? value.songtitle ?? value.song ?? value.current ?? value.now_playing ?? value.nowPlaying;
+      if (nested !== value) {
+        const text = firstMetaText(nested);
+        if (text) return text;
+      }
+    }
+  }
+  return '';
+}
+
+function cleanBroadcastTitle(value) {
+  let text = cleanMetaText(value)
+    .replace(/^\s*(?:unknown title|no dj|loading metadata|metadata unavailable|metadaten werden geladen)\s*(?:[-:|–—·•]+\s*)*/i, '')
+    .replace(/(?:\s*[-–—|·•]\s*){2,}/g, ' - ')
+    .replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g, '')
+    .trim();
+  text = text.replace(/666\s*sounds?\s*design/ig, '666SOUNDsDESIGn').replace(/\blyvra\b/ig, 'LYVRA');
+  const parts = text.split(/\s+(?:-|–|—|\||·|•)\s+/).map((part) => part.trim()).filter(Boolean);
+  const seen = new Set();
+  return parts.filter((part) => {
+    const key = part.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).join(' - ') || text;
+}
+
+function hasBroadcastIdentity(value) {
+  return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(String(value || ''));
+}
+
 function normalizeTitle(data) {
-  return String(pickValue(data, ["song", "title", "songtitle", "currentSong", "track", "now_playing"], lastTitle || "Live Stream"));
+  const served = firstMetaText(data?.display_title, data?.normalized_title, data?.title_display);
+  if (served) return cleanBroadcastTitle(served);
+  const raw = firstMetaText(data?.song, data?.title, data?.songtitle, data?.currentSong, data?.current_song, data?.track, data?.now_playing, data?.nowPlaying);
+  const artist = firstMetaText(data?.artist, data?.song?.artist, data?.now_playing?.song?.artist);
+  const title = cleanBroadcastTitle(raw);
+  if (!title) return lastTitle || 'Live Stream';
+  let candidate = title;
+  const cleanArtist = cleanBroadcastTitle(artist);
+  if (cleanArtist && hasBroadcastIdentity(cleanArtist) && !title.toLowerCase().includes(cleanArtist.toLowerCase())) candidate = cleanBroadcastTitle(`${cleanArtist} - ${title}`);
+  return hasBroadcastIdentity(candidate) ? candidate : `LYVRA is alive · 666SOUNDsDESIGn · ${candidate}`;
+}
+
+function normalizeDj(value) {
+  const raw = cleanMetaText(value);
+  const lowered = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if (!lowered || ['no dj', 'nodj', 'no dj status', 'unknown', 'offline', 'none', 'null', 'undefined', 'n a', 'na', 'dj 666', '666 dj', '666soundsdesign dj', '666 sounds design dj', 'lyvra dj'].includes(lowered) || lowered.includes('auto dj') || lowered.includes('autodj')) return 'LYVRA DJ';
+  return raw;
 }
 
 async function fetchMetadata() {
@@ -93,7 +153,7 @@ async function fetchMetadata() {
 
     const listeners = Number.parseInt(pickValue(data, ["listeners"], 0), 10);
     const bitrate = pickValue(data, ["bitrate"], "--");
-    const dj = pickValue(data, ["dj", "djusername", "djstatus", "live_dj", "streamer", "presenter", "client"], "LYVRA DJ");
+    const dj = normalizeDj(firstMetaText(data?.dj_display, data?.dj, data?.djusername, data?.djstatus, data?.live_dj, data?.streamer, data?.presenter, data?.client, data?.live?.streamer_name, data?.live?.streamer, data?.live?.name));
 
     listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${STREAMS.listenerCapacity}`;
     bitrateText.textContent = bitrate ? `${bitrate} kbps` : "--";

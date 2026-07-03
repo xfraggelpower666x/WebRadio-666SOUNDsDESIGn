@@ -274,10 +274,14 @@ function updateSourceButtons(){if(primaryBtn)primaryBtn.classList.toggle("is-act
 function setSource(isFallback){usingFallback=isFallback;if(sourceLabel)sourceLabel.textContent=isFallback?"BACK":"MAIN";if(fallbackText)fallbackText.textContent=isFallback?"Manual":"Manual";setLamp(sourceLamp,isFallback?"lamp-purple":"lamp-cyan");updateSourceButtons()}
 function setMetadataStatus(text){if(metaText)metaText.textContent=text}
 function pickValue(obj,keys,fallback=""){for(const key of keys){const value=obj?.[key];if(value!==undefined&&value!==null&&String(value).trim()!=="")return value}return fallback}
-function normalizeTitle(data){return String(pickValue(data,["song","title","songtitle","currentSong","track","now_playing"],lastTitle||"Live Stream"))}
-function normalizeDjDisplay(value){const raw=String(value||"").trim();if(!raw)return "LYVRA DJ";const lowered=raw.toLowerCase().replace(/[^a-z0-9]+/g," ").trim();if(!lowered||["unknown","none","null","undefined","offline","n a","na","no dj","nodj","no dj status","dj 666","666 dj","666soundsdesign dj","lyvra dj"].includes(lowered)||lowered.includes("auto dj")||lowered.includes("autodj"))return "LYVRA DJ";return raw}
+function cleanMetaText(value){return String(value??"").replace(/<[^>]*>/g," ").replace(/[\u0000-\u001f\u007f]/g," ").replace(/\s+/g," ").trim()}
+function firstMetaText(...values){for(const value of values){if(value===undefined||value===null)continue;if(typeof value==="string"||typeof value==="number"){const text=cleanMetaText(value);if(text)return text;continue}if(value&&typeof value==="object"){const nested=value.display_title??value.normalized_title??value.text??value.title??value.name??value.songtitle??value.song??value.current??value.now_playing??value.nowPlaying;if(nested!==value){const text=firstMetaText(nested);if(text)return text}}}return ""}
+function metaHasIdentity(value){return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|lyvra)/i.test(cleanMetaText(value))}
+function cleanMetaTitle(value){let text=cleanMetaText(value).replace(/^\s*(?:unknown title|loading metadata|metadata unavailable|metadaten werden geladen|no dj)\s*(?:[-:|–—·•]+\s*)*/i,"").replace(/(?:\s*[-–—|·•]\s*){2,}/g," - ").replace(/\s{2,}/g," ").replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g,"").trim();text=text.replace(/666\s*sounds?\s*design/ig,"666SOUNDsDESIGn").replace(/lyvra/ig,"LYVRA");const parts=text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(v=>v.trim()).filter(Boolean);const seen=new Set(),out=[];for(const part of parts){const key=part.toLowerCase().replace(/[^a-z0-9]+/g,"");if(!key||seen.has(key))continue;seen.add(key);out.push(part)}return out.length?out.join(" - "):text}
+function normalizeTitle(data){const served=firstMetaText(data?.display_title,data?.normalized_title,data?.title_display);if(served)return cleanMetaTitle(served);const raw=firstMetaText(data?.song,data?.title,data?.songtitle,data?.currentSong,data?.current_song,data?.track,data?.now_playing,data?.nowPlaying);const artist=firstMetaText(data?.artist,data?.song?.artist,data?.now_playing?.song?.artist);const title=cleanMetaTitle(raw);if(!title)return lastTitle||"Live Stream";let candidate=title;if(artist&&metaHasIdentity(artist)&&!title.toLowerCase().includes(cleanMetaTitle(artist).toLowerCase()))candidate=cleanMetaTitle(artist+" - "+title);return metaHasIdentity(candidate)?candidate:"LYVRA is alive · 666SOUNDsDESIGn · "+candidate}
+function normalizeDjDisplay(value){const raw=cleanMetaText(value);if(!raw)return "LYVRA DJ";const lowered=raw.toLowerCase().replace(/[^a-z0-9]+/g," ").trim();if(!lowered||["unknown","none","null","undefined","offline","n a","na","no dj","nodj","no dj status","dj 666","666 dj","666soundsdesign dj","666 sounds design dj","lyvra dj"].includes(lowered)||lowered.includes("auto dj")||lowered.includes("autodj"))return "LYVRA DJ";return raw}
 function renderHistory(items){if(!historyList)return;historyList.innerHTML="";if(!Array.isArray(items)||!items.length){const li=document.createElement("li");li.textContent="No history loaded";historyList.appendChild(li);return}items.slice(0,12).forEach((item)=>{const li=document.createElement("li");li.textContent=typeof item==="string"?item:String(pickValue(item,["song","title","track","name"],"Unknown track"));historyList.appendChild(li)})}
-async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=normalizeDjDisplay(pickValue(data,["dj","djusername","djstatus","live_dj","streamer","presenter","client"],"LYVRA DJ"));if(listenersText)listenersText.textContent=String(Number.isFinite(listeners)?listeners:0)+" / "+String(STREAM_CONFIG.listener_capacity);if(bitrateText)bitrateText.textContent=bitrate?(String(bitrate)+" kbps"):"Unknown";if(djText)djText.textContent=String(djStatus||"LYVRA DJ");renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-cyan")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
+async function fetchMetadata(){try{const res=await fetch(STREAM_CONFIG.metadata_url,{cache:"no-store"});if(!res.ok)throw new Error("metadata fetch failed");const data=await res.json();const title=normalizeTitle(data);lastTitle=title;if(nowPlaying)nowPlaying.textContent=title;const listeners=Number.parseInt(pickValue(data,["listeners"],0),10);const bitrate=pickValue(data,["bitrate"],"Unknown");const djStatus=normalizeDjDisplay(firstMetaText(data?.dj_display,data?.dj,data?.djusername,data?.djstatus,data?.live_dj,data?.streamer,data?.presenter,data?.client,data?.live?.streamer_name,data?.live?.streamer,data?.live?.name));if(listenersText)listenersText.textContent=String(Number.isFinite(listeners)?listeners:0)+" / "+String(STREAM_CONFIG.listener_capacity);if(bitrateText)bitrateText.textContent=bitrate?(String(bitrate).replace(/\s*kbps$/i,"")+" kbps"):"Unknown";if(djText)djText.textContent=String(djStatus||"LYVRA DJ");renderHistory(pickValue(data,["history"],[]));setMetadataStatus("Online");setLamp(metaLamp,"lamp-cyan")}catch(err){if(nowPlaying)nowPlaying.textContent=lastTitle||"Metadata unavailable";setMetadataStatus("Offline");setLamp(metaLamp,"lamp-red")}}
 function startMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);fetchMetadata();metadataTimer=setInterval(fetchMetadata,STREAM_CONFIG.poll_interval_ms)}
 function stopMetadataLoop(){if(metadataTimer)clearInterval(metadataTimer);metadataTimer=null}
 function hardDisconnect(stateText="Stopped"){stopMetadataLoop();if(audio){audio.pause();audio.removeAttribute("src");audio.src="";audio.load()}setStatus(stateText);setLamp(audioLamp,"lamp-red")}
@@ -380,24 +384,104 @@ function metadataSafeText(value, max = 512){
 }
 
 const AUTO_DJ_DISPLAY_NAME = 'LYVRA DJ';
+const BROADCAST_TITLE_PREFIX = 'LYVRA is alive · 666SOUNDsDESIGn · ';
+
+function metadataFirstText(...values){
+  for(const value of values){
+    if(value === undefined || value === null) continue;
+    if(typeof value === 'string' || typeof value === 'number'){
+      const text = metadataSafeText(value, 512);
+      if(text) return text;
+      continue;
+    }
+    if(value && typeof value === 'object'){
+      const nested = value.display_title ?? value.normalized_title ?? value.text ?? value.title ?? value.name ?? value.songtitle ?? value.song ?? value.current ?? value.now_playing ?? value.nowPlaying;
+      if(nested !== value){
+        const text = metadataFirstText(nested);
+        if(text) return text;
+      }
+    }
+  }
+  return '';
+}
+
+function metadataAutoDjValue(value){
+  const lowered = metadataSafeText(value, 160).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if(!lowered) return true;
+  if(['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','666 sounds design dj','lyvra dj'].includes(lowered)) return true;
+  return lowered.includes('auto dj') || lowered.includes('autodj');
+}
+
 function normalizeBroadcastDjName(value){
   const raw = metadataSafeText(value, 160);
-  if(!raw) return AUTO_DJ_DISPLAY_NAME;
-  const lowered = raw.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  if(!lowered) return AUTO_DJ_DISPLAY_NAME;
-  if(['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','lyvra dj'].includes(lowered)) return AUTO_DJ_DISPLAY_NAME;
-  if(lowered.includes('auto dj') || lowered.includes('autodj')) return AUTO_DJ_DISPLAY_NAME;
-  return raw;
+  return metadataAutoDjValue(raw) ? AUTO_DJ_DISPLAY_NAME : raw;
 }
-function normalizeMetadataDjPayload(payload){
+
+function metadataHasBrandIdentity(value){
+  return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(metadataSafeText(value, 512));
+}
+
+function normalizeBroadcastTitleText(value){
+  let text = metadataSafeText(value, 512)
+    .replace(/^\s*(?:unknown title|loading metadata|metadata unavailable|metadaten werden geladen|no dj)\s*(?:[-:|–—·•]+\s*)*/i, '')
+    .replace(/(?:\s*[-–—|·•]\s*){2,}/g, ' - ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g, '')
+    .trim();
+  text = text.replace(/666\s*sounds?\s*design/ig, '666SOUNDsDESIGn').replace(/\blyvra\b/ig, 'LYVRA');
+  const segments = text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(part => part.trim()).filter(Boolean);
+  const seen = new Set();
+  const unique = [];
+  for(const segment of segments){
+    const key = segment.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if(!key || seen.has(key)) continue;
+    seen.add(key);
+    unique.push(segment);
+  }
+  return unique.length ? unique.join(' - ') : text;
+}
+
+function normalizeBroadcastDisplayTitle(rawTitle, rawArtist = ''){
+  const title = normalizeBroadcastTitleText(rawTitle);
+  if(!title) return '';
+  const artist = normalizeBroadcastTitleText(rawArtist);
+  let candidate = title;
+  if(artist && metadataHasBrandIdentity(artist) && !title.toLowerCase().includes(artist.toLowerCase())){
+    candidate = normalizeBroadcastTitleText(`${artist} - ${title}`);
+  }
+  if(metadataHasBrandIdentity(candidate)) return candidate;
+  return `${BROADCAST_TITLE_PREFIX}${candidate}`;
+}
+
+function normalizeMetadataBroadcastPayload(payload){
   if(!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload;
-  const rawDj = payload.dj ?? payload.djusername ?? payload.djstatus ?? payload.live_dj ?? payload.streamer ?? payload.presenter ?? payload.client ?? '';
+  const rawDj = metadataFirstText(
+    payload.dj_display, payload.dj, payload.djusername, payload.djstatus, payload.live_dj,
+    payload.streamer, payload.presenter, payload.client,
+    payload.live?.streamer_name, payload.live?.streamer, payload.live?.name
+  );
   const dj = normalizeBroadcastDjName(rawDj);
+  const rawTitle = metadataFirstText(
+    payload.display_title, payload.normalized_title, payload.title_display,
+    payload.title, payload.current_title, payload.currentTitle, payload.nowplaying, payload.nowPlaying,
+    payload.currenttrack, payload.currentTrack, payload.current_song, payload.currentSong,
+    payload.songtitle, payload.song, payload.track, payload.stream_title, payload.streamTitle,
+    payload.now_playing?.song?.text, payload.now_playing?.song?.title
+  );
+  const rawArtist = metadataFirstText(payload.artist, payload.song?.artist, payload.now_playing?.song?.artist);
+  const displayTitle = normalizeBroadcastDisplayTitle(rawTitle, rawArtist);
   return Object.assign({}, payload, {
+    raw_title: normalizeBroadcastTitleText(rawTitle),
+    display_title: displayTitle,
+    normalized_title: displayTitle,
     dj,
     dj_display: dj,
     dj_mode: dj === AUTO_DJ_DISPLAY_NAME ? 'autodj' : 'live'
   });
+}
+
+function normalizeMetadataDjPayload(payload){
+  return normalizeMetadataBroadcastPayload(payload);
 }
 
 function sanitizeMetadataValue(value, depth = 0){
@@ -426,7 +510,7 @@ async function fetchMetadataProxyPayload(request, env){
       const body = await upstream.text();
       let payload = body;
       try{
-        payload = JSON.stringify(normalizeMetadataDjPayload(sanitizeMetadataValue(JSON.parse(body))));
+        payload = JSON.stringify(normalizeMetadataBroadcastPayload(sanitizeMetadataValue(JSON.parse(body))));
       }catch(err){
         payload = JSON.stringify({ raw: metadataSafeText(body, 1024) });
       }
@@ -541,7 +625,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -904,7 +988,7 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2",
+    version: "FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
     routes: { root: "/", amaris: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }

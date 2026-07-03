@@ -97,3 +97,17 @@ Erst mergen, wenn alle Punkte vollständig PASS sind. Ein lokaler PASS ersetzt k
 - [ ] A real live-DJ login replaces `LYVRA DJ` with the real DJ name.
 - [ ] `AMARIS/index.html`, `amaris/index.html`, `public/AMARIS/index.html`, and `public/amaris/index.html` are byte-identical.
 - [ ] Deploy ZIP has no wrapper folder and no nested ZIP.
+
+## v1.2.3 AMARIS Responsive- und Metadaten-Checks
+
+- [ ] iPhone Portrait: keine horizontale oder vertikale Seitenscrollbar.
+- [ ] iPhone Portrait: alle AMARIS-Statusfelder, Bedienelemente und der Footer sind sichtbar.
+- [ ] iPhone Portrait: Footer zeigt vollständig `L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture`.
+- [ ] Desktop: schwarzer Hintergrund und kompakte zentrierte Miniplayer-Karte.
+- [ ] langer Now-Playing-Titel läuft kontinuierlich; kurzer Titel bleibt zentriert.
+- [ ] gebrandeter Titel erzeugt keine doppelte Fraggle-/666SOUNDsDESIGn-Angabe.
+- [ ] nackter Titel erhält `LYVRA is alive · 666SOUNDsDESIGn ·`.
+- [ ] Auto-DJ zeigt auf Hauptplayer, AMARIS, `/internal`, Dashboard und externer Ansicht `LYVRA DJ`.
+- [ ] realer Live-DJ-Name ersetzt `LYVRA DJ` überall dynamisch.
+- [ ] Main-Source wird grün, Fallback cyan, direkte Reserve amber angezeigt.
+- [ ] Hauptplayer-Audio, EQ und Boost funktionieren unverändert.

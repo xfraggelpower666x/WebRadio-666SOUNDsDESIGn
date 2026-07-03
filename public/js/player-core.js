@@ -458,44 +458,56 @@ function getDefaultDjName() {
 
 function normalizeDjName(raw) {
   const fallback = 'LYVRA DJ';
-  const value = String(raw || '').trim();
+  const value = String(raw || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
   if (!value) return fallback;
-  const lowered = value.toLowerCase();
-  if (lowered === 'no dj' || lowered === 'nodj' || lowered === 'no-dj' || lowered === '-' || lowered.includes('auto dj') || lowered.includes('autodj') || lowered.includes('auto-dj') || lowered === 'unknown' || lowered === 'none' || lowered === 'null') return fallback;
+  const lowered = value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if (!lowered || [
+    'no dj', 'nodj', 'no dj status', 'unknown', 'offline', 'none', 'null', 'undefined',
+    'n a', 'na', 'dj 666', '666 dj', '666soundsdesign dj', '666 sounds design dj', 'lyvra dj'
+  ].includes(lowered) || lowered.includes('auto dj') || lowered.includes('autodj')) return fallback;
   return value;
 }
 
-
 function normalizeMetadataTitleV22(value) {
-  let text = String(value || '').trim();
-  text = text.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/^\s*loading\s*metadata\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/^\s*metadaten\s*werden\s*geladen\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/^\s*metadata\s*unavailable\s*[-:|–—]*\s*/i, '');
-  text = text.replace(/\s{2,}/g, ' ').trim();
-  text = text.replace(/^[-:|–—\s]+/, '').replace(/[-:|–—\s]+$/, '').trim();
-  if (!text) return '';
-  return text;
+  let text = String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/^\s*(?:unknown title|no dj|loading metadata|metadaten werden geladen|metadata unavailable)\s*(?:[-:|–—·•]+\s*)*/i, '')
+    .replace(/(?:\s*[-–—|·•]\s*){2,}/g, ' - ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g, '')
+    .trim();
+  text = text.replace(/666\s*sounds?\s*design/ig, '666SOUNDsDESIGn').replace(/\blyvra\b/ig, 'LYVRA');
+  const segments = text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(part => part.trim()).filter(Boolean);
+  const seen = new Set();
+  const unique = [];
+  for (const segment of segments) {
+    const key = segment.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    unique.push(segment);
+  }
+  return unique.length ? unique.join(' - ') : text;
 }
 
 function cleanNowPlayingText(raw) {
-  let value = String(raw || '').trim();
-  if (!value) return '';
+  return normalizeMetadataTitleV22(raw);
+}
 
-  value = value.replace(/^\s*unknown\s*title\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/^\s*no\s*dj\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/^\s*loading\s*metadata\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/^\s*metadaten\s*werden\s*geladen\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/^\s*666soundsdesign\s*dj\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/^\s*dj\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/^\s*artist\s*[-:|–—]*\s*track\s*[-:|–—]*\s*/i, '');
-  value = value.replace(/\s+[-:|–—]\s+[-:|–—]\s+/g, ' - ');
-  value = value.replace(/^\s*[-:|–—]+\s*/, '');
-  value = value.replace(/\s{2,}/g, ' ').trim();
+function hasBroadcastIdentityV123(value) {
+  return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(String(value || ''));
+}
 
-  if (!value || /^unknown\s*title$/i.test(value)) return '';
-  return value;
+function normalizeBroadcastDisplayTitleV123(rawTitle, rawArtist = '') {
+  const prefix = 'LYVRA is alive · 666SOUNDsDESIGn · ';
+  const title = normalizeMetadataTitleV22(rawTitle);
+  if (!title) return '';
+  const artist = normalizeMetadataTitleV22(rawArtist);
+  let candidate = title;
+  if (artist && hasBroadcastIdentityV123(artist) && !title.toLowerCase().includes(artist.toLowerCase())) {
+    candidate = normalizeMetadataTitleV22(`${artist} - ${title}`);
+  }
+  return hasBroadcastIdentityV123(candidate) ? candidate : `${prefix}${candidate}`;
 }
 
 function setDesktopTickerIdleV113() {
@@ -511,14 +523,12 @@ function setDesktopTickerLoadingV113() {
 }
 
 function setDesktopTickerLiveV113(title) {
-  const text = normalizeMetadataTitleV22(cleanNowPlayingText(title));
+  const text = normalizeMetadataTitleV22(title);
   if (!text) return;
   setText(nowPlayingTicker, text);
   setText(metaLine, text);
   try { document.documentElement.setAttribute('data-ticker-state', 'live'); } catch (err) {}
 }
-
-
 
 function firstMetadataText(...values) {
   for (const value of values) {
@@ -526,19 +536,11 @@ function firstMetadataText(...values) {
       const text = String(value).trim();
       if (text) return text;
     }
-
     if (value && typeof value === 'object') {
-      const nested = value.title || value.text || value.name || value.songtitle || value.song || value.current || value.now_playing;
-      if (typeof nested === 'string' || typeof nested === 'number') {
-        const text = String(nested).trim();
+      const nested = value.display_title ?? value.normalized_title ?? value.text ?? value.title ?? value.name ?? value.songtitle ?? value.song ?? value.current ?? value.now_playing ?? value.nowPlaying;
+      if (nested !== value) {
+        const text = firstMetadataText(nested);
         if (text) return text;
-      }
-      if (nested && typeof nested === 'object') {
-        const deep = nested.title || nested.text || nested.name || nested.songtitle;
-        if (typeof deep === 'string' || typeof deep === 'number') {
-          const text = String(deep).trim();
-          if (text) return text;
-        }
       }
     }
   }
@@ -613,40 +615,41 @@ function parseMetadata(payload) {
   }
 
   const song = payload?.now_playing?.song || payload?.song || payload?.current_song || payload?.currentSong || payload?.track || {};
+  const servedTitle = firstMetadataText(payload.display_title, payload.normalized_title, payload.title_display);
   const rawTitle = firstMetadataText(
     payload.title,
-    payload.now_playing,
+    payload.current_title,
+    payload.currentTitle,
+    payload.nowplaying,
+    payload.nowPlaying,
     payload.currenttrack,
     payload.currentTrack,
     payload.currentSong,
     payload.current_song,
     payload.songtitle,
     payload.song,
+    payload.track,
+    payload.stream_title,
+    payload.streamTitle,
     song.title,
     song.text,
     song.name,
     song.songtitle
   );
-  const rawArtist = firstMetadataText(
-    payload.artist,
-    payload.dj,
-    payload.djusername,
-    payload.presenter,
-    song.artist,
-    song.artist_name,
-    song.dj
-  );
+  const rawArtist = firstMetadataText(payload.artist, song.artist, song.artist_name);
 
   const listeners = payload.listeners || payload.currentlisteners || payload.currentListeners || payload.listener_count || 0;
   const bitrate = payload.bitrate || payload.stream_bitrate || payload.streamBitrate || 'Unknown';
   const max = payload.maxlisteners || payload.maxListeners || payload.listener_capacity || 250;
-  const dj = normalizeDjName(payload.dj || payload.djusername || payload.presenter || rawArtist || '');
-
-  const cleanedTitle = normalizeMetadataTitleV22(cleanNowPlayingText(rawTitle));
-  const cleanedArtist = normalizeMetadataTitleV22(cleanNowPlayingText(rawArtist));
-  const finalTitle = cleanedArtist && cleanedTitle && !cleanedTitle.toLowerCase().includes(cleanedArtist.toLowerCase())
-    ? `${cleanedArtist} - ${cleanedTitle}`
-    : cleanedTitle;
+  const rawDj = firstMetadataText(
+    payload.dj_display, payload.dj, payload.djusername, payload.djstatus, payload.presenter,
+    payload.live_dj, payload.streamer, payload.client,
+    payload.live?.streamer_name, payload.live?.streamer, payload.live?.name
+  );
+  const dj = normalizeDjName(rawDj);
+  const finalTitle = servedTitle
+    ? normalizeMetadataTitleV22(servedTitle)
+    : normalizeBroadcastDisplayTitleV123(rawTitle, rawArtist);
 
   return {
     title: finalTitle,

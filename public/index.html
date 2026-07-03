@@ -1105,9 +1105,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function normalizeDj(raw){
-    var dj=String(raw||'').trim();
+    var dj=String(raw||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
     if(!dj)return 'LYVRA DJ';
-    if(/no\s*dj|nodj|no-dj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined/i.test(dj))return 'LYVRA DJ';
+    var lowered=dj.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+    if(!lowered||/^(?:no dj|nodj|no dj status|unknown|offline|none|null|undefined|n a|na|dj 666|666 dj|666soundsdesign dj|666 sounds design dj|lyvra dj)$/.test(lowered)||lowered.indexOf('auto dj')>=0||lowered.indexOf('autodj')>=0)return 'LYVRA DJ';
     return dj;
   }
 
@@ -1120,41 +1121,53 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         if(text&&!invalidMetaText(text)) return text;
       }
       if(value&&typeof value==='object'){
-        var nested=value.title||value.text||value.name||value.songtitle||value.song||value.current||value.now_playing||value.nowPlaying;
-        if(typeof nested==='string'||typeof nested==='number'){
-          var nestedText=String(nested).trim();
-          if(nestedText&&!invalidMetaText(nestedText)) return nestedText;
-        }
-        if(nested&&typeof nested==='object'){
-          var deep=nested.title||nested.text||nested.name||nested.songtitle||nested.current||nested.now_playing||nested.nowPlaying;
-          if(typeof deep==='string'||typeof deep==='number'){
-            var deepText=String(deep).trim();
-            if(deepText&&!invalidMetaText(deepText)) return deepText;
-          }
+        var nested=value.display_title||value.normalized_title||value.text||value.title||value.name||value.songtitle||value.song||value.current||value.now_playing||value.nowPlaying;
+        if(nested!==value){
+          var nestedText=mobileMetaText(nested);
+          if(nestedText)return nestedText;
         }
       }
     }
     return '';
   }
 
+  function cleanBroadcastTitleV123(value){
+    var text=String(value||'').replace(/<[^>]*>/g,' ').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/^\s*(?:unknown title|no dj|loading metadata|metadaten werden geladen|metadata unavailable)\s*(?:[-:|–—·•]+\s*)*/i,'').replace(/(?:\s*[-–—|·•]\s*){2,}/g,' - ').replace(/\s{2,}/g,' ').replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g,'').trim();
+    text=text.replace(/666\s*sounds?\s*design/ig,'666SOUNDsDESIGn').replace(/\blyvra\b/ig,'LYVRA');
+    var parts=text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(function(part){return part.trim();}).filter(Boolean);
+    var seen={},out=[];
+    parts.forEach(function(part){var key=part.toLowerCase().replace(/[^a-z0-9]+/g,'');if(!key||seen[key])return;seen[key]=true;out.push(part);});
+    return out.length?out.join(' - '):text;
+  }
+
+  function hasBroadcastIdentityV123(value){
+    return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(String(value||''));
+  }
+
+  function normalizeBroadcastDisplayTitleV123(rawTitle,rawArtist){
+    var title=cleanBroadcastTitleV123(rawTitle);if(!title)return '';
+    var artist=cleanBroadcastTitleV123(rawArtist);var candidate=title;
+    if(artist&&hasBroadcastIdentityV123(artist)&&title.toLowerCase().indexOf(artist.toLowerCase())<0)candidate=cleanBroadcastTitleV123(artist+' - '+title);
+    return hasBroadcastIdentityV123(candidate)?candidate:'LYVRA is alive · 666SOUNDsDESIGn · '+candidate;
+  }
+
   function normalizeMeta(data){
     if(!data)return null;
-    if(typeof data==='string'){if(invalidMetaText(data))return null;return{title:data,dj:'LYVRA DJ'};}
+    if(typeof data==='string'){if(invalidMetaText(data))return null;return{title:normalizeBroadcastDisplayTitleV123(data,''),dj:'LYVRA DJ'};}
     var np=data.now_playing||data.nowPlaying||{};
     var song=np.song||data.song||data.current_song||data.currentSong||data.track||{};
     var station=data.station||{};
-    var title=mobileMetaText(data.title,data.current_title,data.currentTitle,data.nowplaying,data.nowPlaying,data.currenttrack,data.currentTrack,data.current_song,data.currentSong,data.songtitle,data.song,data.track,data.stream_title,data.streamTitle,song.title,song.text,song.name,song.songtitle);
-    var artist=mobileMetaText(data.artist,data.dj,data.djusername,data.presenter,song.artist,song.artist_name,song.dj);
+    var servedTitle=mobileMetaText(data.display_title,data.normalized_title,data.title_display);
+    var rawTitle=mobileMetaText(data.title,data.current_title,data.currentTitle,data.nowplaying,data.nowPlaying,data.currenttrack,data.currentTrack,data.current_song,data.currentSong,data.songtitle,data.song,data.track,data.stream_title,data.streamTitle,song.title,song.text,song.name,song.songtitle);
+    var artist=mobileMetaText(data.artist,song.artist,song.artist_name);
+    var title=servedTitle?cleanBroadcastTitleV123(servedTitle):normalizeBroadcastDisplayTitleV123(rawTitle,artist);
     var listeners=data.listeners||data.listener_count||data.currentlisteners||data.current_listeners||data.listeners_current||(data.stats&&data.stats.listeners)||'';
     var bitrate=data.bitrate||data.kbps||data.stream_bitrate||(data.stats&&data.stats.bitrate)||'';
-    var dj=data.dj||data.dj_status||data.live_dj||data.streamer||data.server_name||station.name||data.station_name||data.stream_name||data.name||'';
+    var dj=mobileMetaText(data.dj_display,data.dj,data.dj_status,data.live_dj,data.streamer,data.presenter,data.client,data.live&&data.live.streamer_name,data.live&&data.live.streamer,data.live&&data.live.name);
     var artwork=data.icon||data.logo||data.artwork||data.image||data.cover||data.cover_url||data.art||station.icon||station.logo||station.image||song.art||'';
-    title=String(title||'').trim();
     if(invalidMetaText(title))title='';
     if(!title && mffLastGoodMeta && mffLastGoodMeta.title) title=mffLastGoodMeta.title;
-    var cleanArtist=String(artist||'').trim();
-    if(/no\s*dj|nodj|no-dj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined/i.test(cleanArtist)) cleanArtist='';
-    return{title:title,artist:cleanArtist,listeners:String(listeners||'').trim(),bitrate:String(bitrate||'').trim(),dj:normalizeDj(dj||cleanArtist),artwork:String(artwork||'').trim()};
+    return{title:title,artist:cleanBroadcastTitleV123(artist),listeners:String(listeners||'').trim(),bitrate:String(bitrate||'').trim(),dj:normalizeDj(dj),artwork:String(artwork||'').trim()};
   }
 
   async function fetchOne(url){

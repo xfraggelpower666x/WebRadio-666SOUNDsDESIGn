@@ -71,3 +71,16 @@ npm run deploy
 - The iPhone start overlay closes only after confirmed playback and re-enables retry after failure.
 - Auto-DJ is displayed canonically as `LYVRA DJ`; real live-DJ metadata overrides it automatically.
 - Main player and `/internal` emergency player remain separate and preserved.
+
+## Release v1.2.3 — Responsive AMARIS, zentraler Ticker und systemweite DJ-Normalisierung
+
+- AMARIS nutzt auf iPhone/iOS exakt `100dvh` mit Safe-Area-Unterstützung und gesperrtem horizontalem sowie vertikalem Seiten-Overflow.
+- Auf Desktop/PC steht AMARIS als kompakte, zentrierte 520-px-Miniplayer-Karte auf schwarzem Hintergrund.
+- Now Playing ist auf AMARIS als echte, duplizierte Endlos-Laufschrift umgesetzt; kurze Titel bleiben statisch zentriert.
+- Die Worker-Metadaten liefern zentral `raw_title`, `display_title`, `normalized_title`, `dj_display` und `dj_mode`.
+- Bereits im Streamtitel vorhandene Identitäten wie Fraggle/Fraggel, FragglePower666, 666SOUNDsDESIGn oder LYVRA werden nicht erneut vorangestellt.
+- Nackte Tracktitel erhalten zentral den Prefix `LYVRA is alive · 666SOUNDsDESIGn ·`.
+- Auto-DJ-/Leer-/Legacy-Werte werden systemweit zu `LYVRA DJ`; echte Live-DJ-Namen bleiben dynamisch erhalten.
+- Source-Main wird grün, Fallback cyan und direkte Reserve amber dargestellt; die alte irreführende pinke Source-Anzeige ist entfernt.
+- Der Footer lautet vollständig: `L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture`.
+- Hauptplayer, `/internal`, Audioquelle, Equalizer und Booster bleiben erhalten; geändert wurden nur AMARIS-UI, Metadatenaufbereitung und DJ-/Ticker-Anzeigewege.

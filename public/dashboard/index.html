@@ -284,6 +284,38 @@
     el('stTrackCount').textContent=trackCount;
   }
 
+  function dashCleanText(value){return String(value??'').replace(/<[^>]*>/g,' ').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim();}
+  function dashFirstText(){
+    for(var i=0;i<arguments.length;i++){
+      var value=arguments[i];if(value===undefined||value===null)continue;
+      if(typeof value==='string'||typeof value==='number'){var text=dashCleanText(value);if(text)return text;continue;}
+      if(value&&typeof value==='object'){
+        var nested=value.display_title||value.normalized_title||value.text||value.title||value.name||value.songtitle||value.song||value.current||value.now_playing||value.nowPlaying;
+        if(nested!==value){var deep=dashFirstText(nested);if(deep)return deep;}
+      }
+    }
+    return '';
+  }
+  function dashCleanTitle(value){
+    var text=dashCleanText(value).replace(/^\s*(?:unknown title|no dj|loading metadata|metadata unavailable|metadaten werden geladen)\s*(?:[-:|–—·•]+\s*)*/i,'').replace(/(?:\s*[-–—|·•]\s*){2,}/g,' - ').replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g,'').trim();
+    text=text.replace(/666\s*sounds?\s*design/ig,'666SOUNDsDESIGn').replace(/\blyvra\b/ig,'LYVRA');
+    var parts=text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(function(v){return v.trim();}).filter(Boolean),seen={},out=[];
+    parts.forEach(function(part){var key=part.toLowerCase().replace(/[^a-z0-9]+/g,'');if(!key||seen[key])return;seen[key]=1;out.push(part);});
+    return out.length?out.join(' - '):text;
+  }
+  function dashHasIdentity(value){return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(String(value||''));}
+  function dashNormalizeTitle(raw,artist){
+    var title=dashCleanTitle(raw);if(!title)return '';
+    var cleanArtist=dashCleanTitle(artist),candidate=title;
+    if(cleanArtist&&dashHasIdentity(cleanArtist)&&title.toLowerCase().indexOf(cleanArtist.toLowerCase())<0)candidate=dashCleanTitle(cleanArtist+' - '+title);
+    return dashHasIdentity(candidate)?candidate:'LYVRA is alive · 666SOUNDsDESIGn · '+candidate;
+  }
+  function dashNormalizeDj(value){
+    var raw=dashCleanText(value),lowered=raw.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+    if(!lowered||/^(?:no dj|nodj|no dj status|unknown|offline|none|null|undefined|n a|na|dj 666|666 dj|666soundsdesign dj|666 sounds design dj|lyvra dj)$/.test(lowered)||lowered.indexOf('auto dj')>=0||lowered.indexOf('autodj')>=0)return 'LYVRA DJ';
+    return raw;
+  }
+
   /* ── Apply SonicPanel metadata ── */
   function applyMeta(d){
     if(!d)return;
@@ -291,12 +323,15 @@
     // SonicPanel field names (from idjstream.app API):
     // title, art, art_full, listeners, uniq, bitrate, dj, dj_profile, history[]
     // Also support AzuraCast / generic field names as fallback
-    var title    = d.title    || d.songtitle    || d.currenttrack || d.now_playing_title || '';
+    var servedTitle = dashFirstText(d.display_title,d.normalized_title,d.title_display);
+    var rawTitle = dashFirstText(d.title,d.songtitle,d.currenttrack,d.now_playing_title,d.now_playing,d.song,d.track);
+    var rawArtist = dashFirstText(d.artist,d.song&&d.song.artist,d.now_playing&&d.now_playing.song&&d.now_playing.song.artist);
+    var title    = servedTitle ? dashCleanTitle(servedTitle) : dashNormalizeTitle(rawTitle,rawArtist);
     var art      = d.art_full || d.art          || d.artwork      || d.cover             || d.icon || d.logo || '';
     var listeners= d.listeners|| d.currentlisteners || d.listener_count || '';
     var uniq     = d.uniq     || d.unique_listeners || '';
     var bitrate  = d.bitrate  || d.kbps         || '';
-    var dj       = d.dj_display || d.dj || d.djusername || d.streamer || d.presenter || d.live_dj || d.dj_status || '';
+    var dj       = dashFirstText(d.dj_display,d.dj,d.djusername,d.streamer,d.presenter,d.live_dj,d.dj_status,d.client,d.live&&d.live.streamer_name,d.live&&d.live.streamer,d.live&&d.live.name);
     var djpic    = d.dj_profile || d.dj_image   || '';
     var history  = d.history  || d.song_history || d.played_history || [];
 
@@ -313,7 +348,7 @@
     bitrate = String(bitrate||'').trim();
 
     // Canonical Auto-DJ display; real live-DJ names remain unchanged.
-    if(!dj || /no\s*dj|nodj|auto\s*dj|autodj|auto-dj|unknown|offline|none|null|undefined|dj\s*666|666\s*dj|666soundsdesign\s*dj/i.test(dj)) dj='LYVRA DJ';
+    dj=dashNormalizeDj(dj);
 
     if(!title)return; // nothing useful
 

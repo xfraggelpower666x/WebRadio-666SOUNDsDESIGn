@@ -1,0 +1,45 @@
+666SOUNDsDESIGn WebRadio v1.2.3 — ACTUAL LOCAL VERIFY OUTPUT
+Release: FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3
+Date: 2026-07-02
+
+npm run check:
+{
+  "ok": true,
+  "files": 747,
+  "nestedZips": 0,
+  "bytecode": 0,
+  "required": 34,
+  "rendererMirrorPairs": 4,
+  "javascriptSyntaxChecked": 111,
+  "publicMirrorPairs": 56,
+  "workerBytes": 70026,
+  "legacyBuildRoot": true,
+  "hardAuditPolicy": true,
+  "strictAdminAuthorization": true,
+  "singleAuthAuthority": true,
+  "preBoostMeterAuthority": true,
+  "privateRateIdentity": true
+}
+
+npm test:
+- tests: 40
+- pass: 40
+- fail: 0
+- cancelled: 0
+- skipped: 0
+- todo: 0
+
+Visual viewport validation:
+- iPhone viewport: 390 x 844
+- document/body client size equals scroll size
+- overflow-x: hidden
+- overflow-y: hidden
+- player card: 382 x 836 at x=4, y=4
+- footer clientWidth/scrollWidth: 362/362
+- desktop viewport: 1440 x 900
+- desktop player card: 520 x 465.4, centered
+- desktop background: black
+
+Deployment state:
+- Cloudflare live deployment not performed in this environment
+- physical iPhone live audio test required after deployment

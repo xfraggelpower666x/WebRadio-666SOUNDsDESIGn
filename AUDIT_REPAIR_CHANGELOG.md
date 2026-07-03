@@ -48,3 +48,21 @@
 - öffentlicher Stream-Failover unter realen Netzbedingungen
 
 Diese Punkte bleiben bis zum Live-Test gesperrt.
+
+---
+
+## Addendum v1.2.3 — AMARIS Responsive / Ticker / Metadata / LYVRA DJ
+
+**Release:** `FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3`  
+**Baseline:** v1.2.2  
+**Modus:** lokal, nicht destruktiv, kein Live-Deployment
+
+- AMARIS auf iPhone auf `100dvh` ohne horizontalen oder vertikalen Seiten-Overflow begrenzt.
+- Desktop-AMARIS als kleine zentrierte 520-px-Karte auf schwarzem Hintergrund umgesetzt.
+- kontinuierliche Now-Playing-Laufschrift ergänzt.
+- zentrale Titelbereinigung und Marken-Deduplizierung im Worker ergänzt.
+- nackte Titel erhalten `LYVRA is alive · 666SOUNDsDESIGn ·`.
+- Auto-/Legacy-/Leer-DJ-Werte werden systemweit zu `LYVRA DJ`; echte Live-DJ-Namen bleiben erhalten.
+- Source-Farbe von irreführendem Pink auf Main=Grün, Fallback=Cyan, Direktreserve=Amber umgestellt.
+- kanonischen LYVRA-Footer ergänzt.
+- Hauptplayer, `/internal`, Audio, EQ und Boost nicht verändert.

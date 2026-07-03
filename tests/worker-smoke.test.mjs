@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2");
+  assert.equal(data.version, "FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3");
 });
 
 test("runtime configuration is read from static assets", async () => {
@@ -91,6 +91,43 @@ test("metadata proxy maps AutoDJ to LYVRA DJ and preserves a real live DJ", asyn
     assert.equal(liveData.dj, "FragglePower666");
     assert.equal(liveData.dj_display, "FragglePower666");
     assert.equal(liveData.dj_mode, "live");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
+test("metadata proxy de-duplicates branded titles and prefixes bare titles consistently", async () => {
+  const originalFetch = globalThis.fetch;
+  let upstreamPayload = {
+    title: "666SOUNDSDESIGN - FRAGGELPOWER666 - - Ghost Inside The Line_1",
+    dj: "No DJ",
+    listeners: 34,
+    bitrate: 320
+  };
+  globalThis.fetch = async () => new Response(JSON.stringify(upstreamPayload), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
+  try {
+    const brandedResponse = await request("/api/nowplaying");
+    const branded = await brandedResponse.json();
+    assert.equal(branded.display_title, "666SOUNDsDESIGn - FRAGGELPOWER666 - Ghost Inside The Line_1");
+    assert.equal(branded.normalized_title, branded.display_title);
+    assert.equal(branded.dj, "LYVRA DJ");
+    assert.doesNotMatch(branded.display_title, /666SOUNDsDESIGn.*666SOUNDsDESIGn/i);
+
+    upstreamPayload = { title: "Signal Through The Dark", dj: "AutoDJ", listeners: 5, bitrate: 320 };
+    const bareResponse = await request("/api/nowplaying");
+    const bare = await bareResponse.json();
+    assert.equal(bare.display_title, "LYVRA is alive · 666SOUNDsDESIGn · Signal Through The Dark");
+
+    upstreamPayload = { title: "Neon Memory", artist: "FragglePower666", dj: "Live Ruby", listeners: 5, bitrate: 320 };
+    const liveResponse = await request("/api/nowplaying");
+    const live = await liveResponse.json();
+    assert.equal(live.display_title, "FragglePower666 - Neon Memory");
+    assert.equal(live.dj, "Live Ruby");
+    assert.equal(live.dj_mode, "live");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -149,8 +186,8 @@ test("AMARIS aliases are hard-routed to the standalone worker-first player and k
     assert.equal(amaris.headers.get("x-player-mode"), "amaris-lyvra-minimal", path);
     assert.equal(amaris.headers.get("x-amaris-route-lock"), "standalone-only", path);
     const amarisHtml = await amaris.text();
-    assert.match(amarisHtml, /A M A R I S - L Y V R A[\s\S]*MINIMAL WEBRADIO/, path);
-    assert.match(amarisHtml, /WORKER MAIN SWITCH/, path);
+    assert.match(amarisHtml, /AMARIS · LYVRA[\s\S]*MINIMAL WEBRADIO/, path);
+    assert.match(amarisHtml, /WORKER AUTO SWITCH/, path);
     assert.match(amarisHtml, /\/api\/runtime-config\/status/, path);
     assert.match(amarisHtml, /LYVRA DJ/, path);
     assert.doesNotMatch(amarisHtml, /id="mffApp"|Starting Audio Systems/, path);
@@ -171,5 +208,5 @@ test("AMARIS aliases are hard-routed to the standalone worker-first player and k
   const rootPlayer = await request("/", { headers: { accept: "text/html" } });
   const rootHtml = await rootPlayer.text();
   assert.match(rootHtml, /Root Main Player/);
-  assert.doesNotMatch(rootHtml, /A M A R I S - L Y V R A[\s\S]*MINIMAL WEBRADIO/);
+  assert.doesNotMatch(rootHtml, /AMARIS · LYVRA[\s\S]*MINIMAL WEBRADIO/);
 });

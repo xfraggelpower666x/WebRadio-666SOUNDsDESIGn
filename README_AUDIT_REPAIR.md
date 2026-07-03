@@ -23,3 +23,7 @@ Dieses Paket ist die vollständige lokale Hardlock-Reparatur auf Basis von `FULL
 ## Harte Freigaberegel
 
 Ein Live-Deploy ist gesperrt, solange Cloudflare-Secrets, Worker-zu-Worker-Vertrag, Render-Persistenz und physische Geräteprüfungen nicht vollständig PASS sind.
+
+## Aktuelles UI-/Metadaten-Addendum v1.2.3
+
+Die Hardlock-Basis bleibt erhalten. Der aktuelle Zusatzrelease repariert ausschließlich den eigenständigen AMARIS-Miniplayer sowie die gemeinsame sichtbare Titel-/DJ-Normalisierung. Vollständiger Befund: `AMARIS_COMPLETE_ANALYSIS_AUDIT_v1_2_3.md`. Release-Dokumente: `docs/release-v1.2.3/`.
