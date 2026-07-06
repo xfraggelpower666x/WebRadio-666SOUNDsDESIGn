@@ -1,7 +1,7 @@
 {
   "system": "WebRadio-666SOUNDsDESIGn",
-  "release": "FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3",
-  "baselineRelease": "FULLVERSION_AMARIS_ROUTE_IOS_LYVRA_DJ_REPAIR_v1.2.2",
+  "release": "FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4",
+  "baselineRelease": "FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "repairBranch": "repair-v1",
   "productionBranch": "WebRadio-666SOUNDsDESIGn",
@@ -22,5 +22,6 @@
     "/AMARIS/",
     "/amaris/index.html",
     "/AMARIS/index.html"
-  ]
+  ],
+  "createdAt": "2026-07-06T15:58:00Z"
 }

@@ -1,30 +1,39 @@
-# Release Verification — v1.2.3
+# Release Verification — v1.2.4
 
-- Status: **LOCAL REPAIR PASS / LIVE DEPLOY + PHYSICAL IPHONE AUDIO VALIDATION REQUIRED**
-- Release: `FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3`
-- Safe-root deploy: YES
-- Wrapper folder in deploy ZIP: NO
-- Nested ZIP files in repo: 0
-- Files in release tree: 747
-- Hashed inventory entries: 743
-- Node tests: 40/40 PASS
-- JavaScript/MJS syntax: 111 PASS
-- AMARIS inline JavaScript: PASS
-- Root/Public mirror validation: 56 pairs PASS
-- AMARIS aliases: 6/6 PASS
-- iPhone viewport: 390×844 client dimensions equal scroll dimensions
-- iPhone page scrolling: NONE
-- Desktop card: centered 520 px on black background
-- Now Playing: continuous marquee for long titles; static centered text for short titles
-- Title de-duplication: central Worker + all updated player frontends
-- Screenshot title result: `666SOUNDsDESIGn - FRAGGELPOWER666 - Ghost Inside The Line_1`
-- Bare-title prefix: `LYVRA is alive · 666SOUNDsDESIGn ·`
-- Source colors: Main green / Fallback cyan / Direct reserve amber
-- Auto-DJ display: `LYVRA DJ`
-- Real live-DJ metadata: dynamically preserved
-- Footer: `L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture`
-- Existing full main player: `/` preserved
-- Existing internal player: `/internal` preserved as separate player
-- Main player Audio/EQ/Boost architecture: unchanged
-- Live Cloudflare deployment: not performed
-- Physical iPhone audio validation: required after deployment
+- Release: `FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4`
+- Status: `LOCAL_REPAIR_PASS_LIVE_DEPLOYMENT_AND_DEVICE_AUDIO_VALIDATION_REQUIRED`
+- Main player preserved: yes
+- Internal emergency player preserved: yes
+- AMARIS endpoint preserved and expanded: yes
+- Secrets embedded in frontend: no
+
+## Local verification
+
+```text
+npm run verify: PASS
+check-release: PASS
+node --test tests/*.test.mjs: 41 / 41 PASS
+JavaScript-/MJS-Syntax: 111 PASS
+Nested ZIP files: 0
+Public mirror pairs: 56 PASS
+```
+
+## AMARIS v1.2.4 verified markers
+
+- iPhone fullscreen viewport with no document scroll
+- PC compact black-background mini-card
+- protected Auto-DJ Skip button
+- Discord Shooter button
+- mobile-only Sound panel
+- Boost `0–5`
+- 5-band EQ `SUB / LOW / MID / HIGH / AIR`
+- Audio-Stability handlers for visibility/page/focus return
+- Bottom Levelmeter
+- Main/Backup LED switch
+
+## Required live validation after deployment
+
+- Physical iPhone audio start and app-switch recovery
+- Real Auto-DJ Skip through deployed PW/Auth/Admin worker chain
+- Real Discord Shooter through deployed worker secrets
+- Real stream fallback switching with production sources

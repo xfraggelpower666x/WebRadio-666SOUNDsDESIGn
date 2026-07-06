@@ -51,9 +51,9 @@ Diese Punkte bleiben bis zum Live-Test gesperrt.
 
 ---
 
-## Addendum v1.2.3 — AMARIS Responsive / Ticker / Metadata / LYVRA DJ
+## Addendum v1.2.4 — AMARIS Responsive / Ticker / Metadata / LYVRA DJ
 
-**Release:** `FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3`  
+**Release:** `FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4`  
 **Baseline:** v1.2.2  
 **Modus:** lokal, nicht destruktiv, kein Live-Deployment
 
@@ -66,3 +66,16 @@ Diese Punkte bleiben bis zum Live-Test gesperrt.
 - Source-Farbe von irreführendem Pink auf Main=Grün, Fallback=Cyan, Direktreserve=Amber umgestellt.
 - kanonischen LYVRA-Footer ergänzt.
 - Hauptplayer, `/internal`, Audio, EQ und Boost nicht verändert.
+
+## Addendum v1.2.4 — AMARIS Fullscreen / Auth Skip / 5-Band EQ / Discord / Audio Stability / Levelmeter
+
+**Release:** `FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4`
+
+- AMARIS-iPhone-Layout als echtes Ganzdisplay-Grid neu verteilt.
+- PC-Miniplayer bleibt kompakt auf schwarzem Hintergrund.
+- Auto-DJ Skip über gemeinsame Admin-/Auth-Worker-Kette ergänzt.
+- Discord-Shooter über gemeinsame Admin-Session ergänzt.
+- Mobile Boost-Stufen `0–5` und 5-Band-EQ `SUB / LOW / MID / HIGH / AIR` ergänzt.
+- Audio-Stability-Guard für App-/Tab-Wechsel ergänzt.
+- Bottom-Levelmeter und Main/Backup-LED-Schalter ergänzt.
+- Bestehende Player, `/internal`, Stream-/Workerkette und Auth-Hardlock bleiben erhalten.

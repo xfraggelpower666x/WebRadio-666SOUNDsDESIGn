@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with preserved player architecture, hard-routed AMARIS LYVRA recovery player, iPhone no-scroll viewport layout, compact PC mini-card, centralized title de-duplication and canonical LYVRA DJ/live-DJ switching.",
+  "description": "666SOUNDsDESIGn WebRadio full source with preserved player architecture, AMARIS fullscreen iPhone layout, protected Auto-DJ skip, 5-band mobile EQ, mobile booster, Discord shooter, audio stability recovery and compact levelmeter.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",

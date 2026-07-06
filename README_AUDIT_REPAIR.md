@@ -24,6 +24,10 @@ Dieses Paket ist die vollständige lokale Hardlock-Reparatur auf Basis von `FULL
 
 Ein Live-Deploy ist gesperrt, solange Cloudflare-Secrets, Worker-zu-Worker-Vertrag, Render-Persistenz und physische Geräteprüfungen nicht vollständig PASS sind.
 
-## Aktuelles UI-/Metadaten-Addendum v1.2.3
+## Aktuelles UI-/Metadaten-Addendum v1.2.4
 
-Die Hardlock-Basis bleibt erhalten. Der aktuelle Zusatzrelease repariert ausschließlich den eigenständigen AMARIS-Miniplayer sowie die gemeinsame sichtbare Titel-/DJ-Normalisierung. Vollständiger Befund: `AMARIS_COMPLETE_ANALYSIS_AUDIT_v1_2_3.md`. Release-Dokumente: `docs/release-v1.2.3/`.
+Die Hardlock-Basis bleibt erhalten. Der aktuelle Zusatzrelease repariert ausschließlich den eigenständigen AMARIS-Miniplayer sowie die gemeinsame sichtbare Titel-/DJ-Normalisierung. Vollständiger Befund: `AMARIS_COMPLETE_ANALYSIS_AUDIT_v1_2_3.md`. Release-Dokumente: `docs/release-v1.2.4/`.
+
+## Aktuelles AMARIS-Addendum v1.2.4
+
+Der Hardlock- und v1.2.3-Stand bleibt erhalten. v1.2.4 erweitert ausschließlich den eigenständigen AMARIS-Miniplayer: Fullscreen-iPhone-Verteilung, PC-Minicard-Erhalt, geschützter Auto-DJ-Skip, Discord-Shooter, mobiles Boost-/5-Band-EQ-Soundpanel, Audio-Stability-Guard, Bottom-Levelmeter und Main/Backup-LED-Schalter. Vollständiger Befund: `AMARIS_COMPLETE_ANALYSIS_AUDIT_v1_2_4.md`. Release-Dokumente: `docs/release-v1.2.4/`.

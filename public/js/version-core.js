@@ -1,9 +1,9 @@
-/* 666SOUNDsDESIGn canonical version core — AMARIS responsive/ticker/metadata/LYVRA DJ repair v1.2.3. */
+/* 666SOUNDsDESIGn canonical version core — AMARIS fullscreen/Auth Skip/5-band EQ/Discord/audio-stability/levelmeter repair v1.2.4. */
 (function(){
   'use strict';
-  var VERSION='v2026.07.02-amaris3';
-  var BUILD='smfp-v2026-07-02-amaris3';
-  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260702,release:'FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3'};
+  var VERSION='v2026.07.06-amaris4';
+  var BUILD='2026-07-06-amaris-v124';
+  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260706,release:'FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4'};
   function setText(node){
     if(!node)return;
     if(node.id==='pcVersionBadge'){var status=node.querySelector('.status-code');if(status)status.textContent=VERSION;node.setAttribute('aria-label','Player Version '+VERSION);return;}

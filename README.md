@@ -72,7 +72,7 @@ npm run deploy
 - Auto-DJ is displayed canonically as `LYVRA DJ`; real live-DJ metadata overrides it automatically.
 - Main player and `/internal` emergency player remain separate and preserved.
 
-## Release v1.2.3 — Responsive AMARIS, zentraler Ticker und systemweite DJ-Normalisierung
+## Release v1.2.4 — Responsive AMARIS, zentraler Ticker und systemweite DJ-Normalisierung
 
 - AMARIS nutzt auf iPhone/iOS exakt `100dvh` mit Safe-Area-Unterstützung und gesperrtem horizontalem sowie vertikalem Seiten-Overflow.
 - Auf Desktop/PC steht AMARIS als kompakte, zentrierte 520-px-Miniplayer-Karte auf schwarzem Hintergrund.
@@ -84,3 +84,7 @@ npm run deploy
 - Source-Main wird grün, Fallback cyan und direkte Reserve amber dargestellt; die alte irreführende pinke Source-Anzeige ist entfernt.
 - Der Footer lautet vollständig: `L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture`.
 - Hauptplayer, `/internal`, Audioquelle, Equalizer und Booster bleiben erhalten; geändert wurden nur AMARIS-UI, Metadatenaufbereitung und DJ-/Ticker-Anzeigewege.
+
+## Release v1.2.4 — AMARIS Fullscreen, Auth Skip, 5-Band EQ, Discord, Audio Stability, Levelmeter
+
+AMARIS wurde als eigenständiger Mini-Player-Endpunkt weiter ausgebaut. iPhone nutzt jetzt ein Ganzdisplay-Grid mit besserer vertikaler Verteilung. PC bleibt ein kompakter Miniplayer auf schwarzem Hintergrund. Neu sind geschützter Auto-DJ-Skip über die bestehende Admin-/Auth-Worker-Kette, Discord-Shooter, mobiles Soundpanel mit Boost `0–5`, mobiler 5-Band-EQ `SUB / LOW / MID / HIGH / AIR`, Audio-Recovery nach App-/Tab-Wechsel und ein kleines Bottom-Levelmeter. Bestehende Player, `/internal`, Worker-Switch-Kette, Auth-Hardlock und Hauptplayer-Audio bleiben erhalten.

@@ -1,0 +1,14 @@
+666SOUNDsDESIGn WebRadio v1.2.4 — ACTUAL LOCAL VERIFY OUTPUT
+Release: FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4
+
+check-release: PASS
+files: 752
+nestedZips: 0
+javascriptSyntaxChecked: 111
+publicMirrorPairs: 56
+workerBytes: 70068
+
+node --test tests/*.test.mjs: PASS
+Node tests: 41 / 41 PASS
+
+Live Cloudflare and physical iPhone audio validation: REQUIRED AFTER DEPLOYMENT
