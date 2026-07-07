@@ -1,10 +1,10 @@
 {
-  "version": "1.2.4",
-  "release": "FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4",
-  "frontendVersion": "v2026.07.06-amaris4",
-  "build": "2026-07-06-amaris-v124",
-  "date": "2026-07-06",
-  "baselineRelease": "FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3",
+  "version": "1.2.7",
+  "release": "FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7",
+  "frontendVersion": "v2026.07.07-amaris7",
+  "build": "2026-07-07-amaris-v127",
+  "date": "2026-07-07",
+  "baselineRelease": "FULLVERSION_AMARIS_CANONICAL_WEBRADIO_AUTH_SKIP_DISCORD_AUDIO_BOOST_COVER_v1.2.6",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
   "features": [
     "AMARIS_STANDALONE_HARD_ROUTE",
@@ -29,7 +29,25 @@
     "AMARIS_IPHONE_5_BAND_EQ_SUB_LOW_MID_HIGH_AIR",
     "AMARIS_AUDIO_STABILITY_VISIBILITY_RECOVERY",
     "AMARIS_BOTTOM_LEVELMETER",
-    "AMARIS_MAIN_BACKUP_LED_SWITCH"
+    "AMARIS_MAIN_BACKUP_LED_SWITCH",
+    "AMARIS_ACTION_FEEDBACK_LED",
+    "AMARIS_PASSWORD_MANAGER_AUTH_MODAL",
+    "AMARIS_DISCORD_MESSAGE_SHOOTER_BINDING",
+    "AMARIS_COVER_BACKED_TICKER",
+    "AMARIS_TRACK_COVER_10_SECOND_FLASH",
+    "AMARIS_BOOST_GAIN_STATUS",
+    "DISCORD_TEST_ROUTE_COMPAT",
+    "AMARIS_CANONICAL_WEBRADIO_AUTH_ROUTES",
+    "AMARIS_SKIP_DIRECT_API_ADMIN_SKIP",
+    "AMARIS_DISCORD_DIRECT_API_DISCORD_ROUTES",
+    "AMARIS_AUTH_MODAL_AUDIO_KEEPALIVE",
+    "AMARIS_DISCORD_OVERLAY_CSS_FALLBACK",
+    "AMARIS_STREAM_COVER_BASE_PLUS_TRACK_FLASH",
+    "AMARIS_DESKTOP_BACKGROUND_ORIGINAL_IMAGE",
+    "AMARIS_DEFAULT_STREAM_FALLBACK_IMAGE",
+    "AMARIS_APP_BROWSER_HOME_ICONS",
+    "AMARIS_PWA_MANIFEST",
+    "AMARIS_MEDIASESSION_ARTWORK_METADATA"
   ],
-  "notes": "AMARIS fullscreen/Auth Skip/5-band EQ/Discord/audio stability/levelmeter patch. Existing players preserved."
+  "notes": "AMARIS branding background/icon/media-session patch. Original image 1 is desktop background; original image 2 is fallback cover, app/browser/home icon and Media Session artwork. Existing player/audio/auth functionality preserved."
 }

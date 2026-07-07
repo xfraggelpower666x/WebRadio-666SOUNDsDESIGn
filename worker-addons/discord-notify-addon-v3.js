@@ -361,7 +361,7 @@ async function discordAccessOk(request, env = {}) {
 export async function handleDiscordNotifyV3(request, env = {}) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '');
-  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying' || path === '/api/discord/status' || path === '/api/discord/debug';
+  const isRoute = path === '/api/discord/manual' || path === '/api/discord/share' || path === '/api/discord/message' || path === '/api/discord/nowplaying' || path === '/api/discord/test' || path === '/api/discord/status' || path === '/api/discord/debug';
   if (!isRoute) return null;
 
   if (request.method === 'OPTIONS') return json({ ok: true, addon: ADDON_VERSION });
@@ -401,6 +401,12 @@ export async function handleDiscordNotifyV3(request, env = {}) {
 
   try {
     const input = await readInput(request);
+    if (path === '/api/discord/test') {
+      const message = clean(input.message || input.text || input.content, 'AMARIS Discord test ' + new Date().toISOString(), 1800);
+      runtime.lastKind = 'test';
+      const result = await sendDiscord(env, messagePayload({ ...input, message }));
+      return json({ ok: true, type: 'test', led: 'ok', discord: result, addon: ADDON_VERSION });
+    }
     if (path === '/api/discord/message') {
       const message = clean(input.message || input.text || input.content, '', 1800);
       if (!message) return json({ ok: false, error: 'message text missing' }, 400);

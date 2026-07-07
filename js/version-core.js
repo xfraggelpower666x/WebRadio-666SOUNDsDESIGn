@@ -1,9 +1,9 @@
-/* 666SOUNDsDESIGn canonical version core — AMARIS fullscreen/Auth Skip/5-band EQ/Discord/audio-stability/levelmeter repair v1.2.4. */
+/* 666SOUNDsDESIGn canonical version core — AMARIS branding/background/icons/media-session patch v1.2.7. */
 (function(){
   'use strict';
-  var VERSION='v2026.07.06-amaris4';
-  var BUILD='2026-07-06-amaris-v124';
-  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260706,release:'FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4'};
+  var VERSION='v2026.07.07-amaris7';
+  var BUILD='2026-07-07-amaris-v127';
+  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260706,release:'FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7'};
   function setText(node){
     if(!node)return;
     if(node.id==='pcVersionBadge'){var status=node.querySelector('.status-code');if(status)status.textContent=VERSION;node.setAttribute('aria-label','Player Version '+VERSION);return;}

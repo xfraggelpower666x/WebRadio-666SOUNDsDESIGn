@@ -6,7 +6,7 @@
   'use strict';
   if (window.S666DiscordPlayerAddonV3 && window.S666DiscordPlayerAddonV3.auditRepair) return;
 
-  var VERSION = 'V4.0-20260625-SHARED-ADMIN-AUTH';
+  var VERSION = 'V4.1-20260706-AMARIS-CANONICAL-WEBRADIO';
   var inFlight = false;
   var watcherTimer = 0;
   var lastTrackKey = '';
@@ -35,7 +35,7 @@
   }
 
   function readTrackFromDom() {
-    var title = readText(['#trackTitle', '#mffTrackTitle', '#nowPlayingTitle', '[data-now-playing-title]']);
+    var title = readText(['#trackTitle', '#mffTrackTitle', '#nowPlayingTitle', '#nowPlaying', '[data-now-playing-title]']);
     var artist = readText(['#trackArtist', '#mffTrackArtist', '#nowPlayingArtist', '[data-now-playing-artist]']);
     var dj = readText(['#statusDj', '#mffDj', '[data-dj-name]']) || 'LYVRA DJ';
     var listeners = readText(['#statusListeners', '#mffListeners', '[data-listeners]']);
@@ -89,7 +89,16 @@
     }
   }
 
+  function ensureAddonStyle(){
+    if(document.getElementById('s666DiscordAddonInlineStyle'))return;
+    var style=document.createElement('style');
+    style.id='s666DiscordAddonInlineStyle';
+    style.textContent='.s666-discord-gate--hidden{display:none!important}.s666-discord-gate{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}.s666-discord-gate-box{position:relative!important;width:min(470px,94vw)!important;border:1px solid rgba(255,61,187,.72)!important;border-radius:22px!important;background:linear-gradient(135deg,rgba(255,61,187,.13),rgba(22,255,243,.07)),rgba(4,8,24,.96)!important;box-shadow:0 0 24px rgba(255,61,187,.32),0 0 22px rgba(22,255,243,.18)!important;color:#fff!important;text-align:center!important;padding:22px 18px 18px!important}.s666-discord-gate-title{font-size:15px!important;font-weight:950!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:#ff3dbb!important;text-shadow:0 0 14px rgba(255,61,187,.78)!important}.s666-discord-msg-input{display:block!important;width:min(340px,82vw)!important;min-height:118px!important;margin:12px auto 0!important;padding:12px 13px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(0,0,0,.5)!important;color:#fff!important;font-size:13px!important;font-weight:750!important;line-height:1.35!important;resize:vertical!important}.s666-discord-gate-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin-top:15px!important}.s666-discord-gate-x{position:absolute!important;right:10px!important;top:8px!important;width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.44)!important;background:rgba(22,255,243,.08)!important;color:#fff!important;font-size:21px!important;line-height:1!important;cursor:pointer!important}.s666-discord-gate-submit,.s666-discord-gate-cancel{min-height:34px!important;border-radius:999px!important;padding:0 14px!important;text-transform:uppercase!important;font-size:11px!important;font-weight:950!important;letter-spacing:.09em!important;cursor:pointer!important}.s666-discord-gate-submit{border:1px solid rgba(255,61,187,.76)!important;background:linear-gradient(90deg,rgba(255,61,187,.32),rgba(22,255,243,.12))!important;color:#fff!important}.s666-discord-gate-cancel{border:1px solid rgba(22,255,243,.42)!important;background:rgba(22,255,243,.065)!important;color:#dff!important}';
+    document.head.appendChild(style);
+  }
+
   function ensureMessageOverlay() {
+    ensureAddonStyle();
     var overlay = document.getElementById('s666DiscordMessageOverlay');
     if (overlay) return overlay;
     overlay = document.createElement('div');

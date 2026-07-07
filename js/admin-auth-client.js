@@ -1,6 +1,6 @@
 /*
  * 666SOUNDsDESIGn shared admin authentication client.
- * HARDLOCK v1.2.0: one token store, one same-origin Bearer contract,
+ * HARDLOCK v1.2.6: one token store, one same-origin Bearer contract,
  * one interactive login path for Admin, Discord and Auto-DJ Skip.
  */
 (function () {
@@ -49,6 +49,10 @@
     return headers;
   }
 
+  function overlayEvent(state, detail) {
+    try { window.dispatchEvent(new CustomEvent('s666:admin-auth-overlay', { detail: Object.assign({ state: state }, detail || {}) })); } catch (_) {}
+  }
+
   function emit(state, detail) {
     try {
       document.dispatchEvent(new CustomEvent('s666:admin-auth-state', {
@@ -84,6 +88,90 @@
       session_storage_unavailable: 'Die Admin-Sitzung kann in diesem Browser nicht gespeichert werden.'
     };
     return messages[code] || ('Admin-Anmeldung fehlgeschlagen: ' + code);
+  }
+
+
+  // v1.2.5: password-manager friendly modal. Replaces window.prompt for iPhone autofill,
+  // without pausing/restarting the player audio element.
+  function ensureLoginOverlay() {
+    var overlay = document.getElementById('s666AdminAuthOverlay');
+    if (overlay) return overlay;
+    var style = document.getElementById('s666AdminAuthOverlayStyle');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 's666AdminAuthOverlayStyle';
+      style.textContent = '' +
+        '#s666AdminAuthOverlay{position:fixed;inset:0;z-index:2147483645;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}' +
+        '#s666AdminAuthOverlay.is-open{display:flex}' +
+        '#s666AdminAuthOverlay .s666-auth-box{width:min(92vw,420px);border:1px solid rgba(22,255,243,.42);border-radius:18px;background:linear-gradient(180deg,rgba(9,15,25,.98),rgba(2,5,12,.99));box-shadow:0 0 28px rgba(22,255,243,.24),0 0 22px rgba(255,61,187,.18);padding:16px;color:#eef7ff;font:700 13px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}' +
+        '#s666AdminAuthOverlay .s666-auth-title{color:#16fff3;font-size:16px;font-weight:900;letter-spacing:.08em;text-shadow:0 0 12px rgba(22,255,243,.55);margin-bottom:8px}' +
+        '#s666AdminAuthOverlay .s666-auth-message{color:#9db0be;margin-bottom:12px}' +
+        '#s666AdminAuthOverlay input{width:100%;border:1px solid rgba(22,255,243,.34);border-radius:13px;background:rgba(255,255,255,.055);color:#fff;padding:13px 12px;font:900 16px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;outline:none}' +
+        '#s666AdminAuthOverlay input:focus{border-color:#ff3dbb;box-shadow:0 0 0 2px rgba(255,61,187,.18),0 0 18px rgba(22,255,243,.18)}' +
+        '#s666AdminAuthOverlay .s666-auth-actions{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;margin-top:12px}' +
+        '#s666AdminAuthOverlay button{appearance:none;border:1px solid rgba(22,255,243,.30);border-radius:12px;background:rgba(255,255,255,.055);color:#eef7ff;padding:11px 10px;font:900 12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;cursor:pointer}' +
+        '#s666AdminAuthOverlay button.s666-auth-submit{border-color:rgba(255,61,187,.45);box-shadow:0 0 14px rgba(255,61,187,.18)}' +
+        '#s666AdminAuthOverlay .s666-auth-state{min-height:16px;margin-top:10px;color:#16fff3;font-size:11px;letter-spacing:.04em}';
+      document.head.appendChild(style);
+    }
+    overlay = document.createElement('div');
+    overlay.id = 's666AdminAuthOverlay';
+    overlay.innerHTML = '<form class="s666-auth-box" id="s666AdminAuthForm" autocomplete="on">' +
+      '<div class="s666-auth-title">ADMIN AUTH</div>' +
+      '<div class="s666-auth-message" id="s666AdminAuthMessage">Admin-Passwort eingeben.</div>' +
+      '<input id="s666AdminAuthPassword" name="password" type="password" autocomplete="current-password" inputmode="text" enterkeyhint="go" placeholder="Admin-Passwort" />' +
+      '<div class="s666-auth-actions"><button type="button" id="s666AdminAuthCancel">CANCEL</button><button type="submit" class="s666-auth-submit" id="s666AdminAuthSubmit">LOGIN & CONTINUE</button></div>' +
+      '<div class="s666-auth-state" id="s666AdminAuthState">Bereit</div>' +
+      '</form>';
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function promptPasswordWithOverlay(message) {
+    return new Promise(function (resolve, reject) {
+      var overlay = ensureLoginOverlay();
+      var form = document.getElementById('s666AdminAuthForm');
+      var input = document.getElementById('s666AdminAuthPassword');
+      var msg = document.getElementById('s666AdminAuthMessage');
+      var state = document.getElementById('s666AdminAuthState');
+      var cancel = document.getElementById('s666AdminAuthCancel');
+      var done = false;
+      function cleanup() {
+        form.removeEventListener('submit', onSubmit);
+        cancel.removeEventListener('click', onCancel);
+        overlay.removeEventListener('click', onOverlay);
+        document.removeEventListener('keydown', onKey);
+      }
+      function finish(fn, value) {
+        if (done) return;
+        done = true;
+        cleanup();
+        overlay.classList.remove('is-open');
+        overlayEvent('close', { message: msg.textContent || '' });
+        setTimeout(function () { try { input.value = ''; } catch (_) {} }, 120);
+        fn(value);
+      }
+      function onSubmit(ev) {
+        ev.preventDefault();
+        var value = String(input.value || '');
+        if (!value) { state.textContent = 'Passwort fehlt.'; input.focus(); return; }
+        state.textContent = 'Authentifiziere …';
+        finish(resolve, value);
+      }
+      function onCancel() { finish(reject, new Error('login_cancelled')); }
+      function onOverlay(ev) { if (ev.target === overlay) onCancel(); }
+      function onKey(ev) { if (ev.key === 'Escape') onCancel(); }
+      msg.textContent = message || 'Admin-Passwort eingeben.';
+      state.textContent = 'Bereit';
+      input.value = '';
+      form.addEventListener('submit', onSubmit);
+      cancel.addEventListener('click', onCancel);
+      overlay.addEventListener('click', onOverlay);
+      document.addEventListener('keydown', onKey);
+      overlay.classList.add('is-open');
+      overlayEvent('open', { message: msg.textContent || '' });
+      setTimeout(function () { try { input.focus(); input.select(); } catch (_) {} }, 80);
+    });
   }
 
   function requestJson(url, init, timeoutMs) {
@@ -165,12 +253,14 @@
     interactiveLoginPromise = (opts.forceLogin ? Promise.resolve({ ok: false }) : check(true))
       .then(function (status) {
         if (status && status.ok) return status;
-        var promptFn = typeof opts.prompt === 'function'
-          ? opts.prompt
-          : function () { return window.prompt(opts.message || 'Admin-Passwort eingeben:', ''); };
-        var password = promptFn();
-        if (password === null) throw new Error('login_cancelled');
-        return login(password).then(function () { return check(true); });
+        if (typeof opts.prompt === 'function') {
+          var password = opts.prompt();
+          if (password === null) throw new Error('login_cancelled');
+          return login(password).then(function () { return check(true); });
+        }
+        return promptPasswordWithOverlay(opts.message || 'Admin-Passwort eingeben:')
+          .then(function (password) { return login(password); })
+          .then(function () { return check(true); });
       })
       .then(function (status) {
         if (!status || !status.ok) throw new Error(status && status.error || 'gate_check_failed');
@@ -194,7 +284,7 @@
   }
 
   window.S666AdminAuth = {
-    version: '1.2.0-hardlock',
+    version: '1.2.5-hardlock-modal',
     tokenKey: TOKEN_KEY,
     getToken: getToken,
     setToken: setToken,

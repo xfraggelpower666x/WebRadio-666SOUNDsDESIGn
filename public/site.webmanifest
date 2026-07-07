@@ -1,11 +1,12 @@
 {
   "name": "666SOUNDsDESIGn WebRadio",
   "short_name": "666RADIO",
-  "description": "666SOUNDsDESIGn WebRadio — RadioBotAI DJ",
+  "description": "666SOUNDsDESIGn WebRadio — AMARIS / LYVRA compatible app icons and media artwork.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#07080f",
-  "theme_color": "#16fff3",
+  "background_color": "#05030a",
+  "theme_color": "#12061f",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -48,7 +49,7 @@
       "src": "/assets/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/assets/icons/android-chrome-192x192.png",
@@ -72,13 +73,13 @@
       "src": "/assets/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/assets/icons/android-chrome-512x512.png",
+      "src": "/assets/icons/maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     },
     {
       "src": "/assets/icons/icon-1024x1024.png",
@@ -89,9 +90,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Radio starten",
-      "short_name": "Play",
-      "url": "/?autoplay=1",
+      "name": "AMARIS Minimal Player",
+      "short_name": "AMARIS",
+      "url": "/amaris/",
       "icons": [
         {
           "src": "/assets/icons/icon-192x192.png",
@@ -100,6 +101,5 @@
         }
       ]
     }
-  ],
-  "scope": "/"
+  ]
 }

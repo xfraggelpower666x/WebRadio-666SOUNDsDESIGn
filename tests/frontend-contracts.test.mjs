@@ -108,14 +108,17 @@ test("LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic
   assert.match(worker, /dj_mode: dj === AUTO_DJ_DISPLAY_NAME \? 'autodj' : 'live'/);
 });
 
-test("AMARIS v1.2.4 adds protected Skip, Discord Shooter, mobile 5-band sound panel, stability recovery and levelmeter", async () => {
+test("AMARIS v1.2.6 uses canonical WebRadio Skip/Discord routes, protected modals, mobile sound panel, stability recovery and levelmeter", async () => {
   const amaris = await read("AMARIS/index.html");
   assert.match(amaris, /id="skipBtn"/);
   assert.match(amaris, /S666AdminAuth\.ensure/);
-  assert.match(amaris, /S666SkipControl\.skip/);
+  assert.match(amaris, /ENDPOINTS\.skip/);
   assert.match(amaris, /\/api\/admin\/skip/);
+  assert.match(amaris, /canonical:'webradio-worker'/);
   assert.match(amaris, /id="discordBtn"/);
   assert.match(amaris, /\/api\/discord\/manual/);
+  assert.match(amaris, /activeSecureAction='discord'/);
+  assert.match(amaris, /s666:admin-auth-overlay/);
   assert.match(amaris, /id="soundPanel"/);
   assert.match(amaris, /SUB[\s\S]*LOW[\s\S]*MID[\s\S]*HIGH[\s\S]*AIR/);
   assert.match(amaris, /BOOST 0–5/);

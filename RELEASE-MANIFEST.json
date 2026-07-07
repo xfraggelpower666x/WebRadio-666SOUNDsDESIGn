@@ -1,7 +1,7 @@
 {
   "system": "WebRadio-666SOUNDsDESIGn",
-  "version": "1.2.4",
-  "releaseType": "FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_VALIDATED",
+  "version": "1.2.6",
+  "releaseType": "FULLVERSION_AMARIS_CANONICAL_WEBRADIO_AUTH_SKIP_DISCORD_AUDIO_BOOST_COVER_VALIDATED",
   "expectedTopLevelFolder": null,
   "singleTopLevelFolder": false,
   "nestedZipFiles": 0,
@@ -10,8 +10,8 @@
   "legacyBuildRootCompatibility": true,
   "sourcePreservation": "root source retained; public and legacy Worker mirrors synchronized",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
-  "createdAt": "2026-07-06T15:58:00Z",
-  "baselineRelease": "FULLVERSION_AMARIS_RESPONSIVE_TICKER_METADATA_LYVRA_DJ_REPAIR_v1.2.3",
+  "createdAt": "2026-07-06T19:10:00Z",
+  "baselineRelease": "FULLVERSION_AMARIS_FEEDBACK_AUTH_MODAL_BOOST_COVER_TICKER_v1.2.5",
   "hardAuditPolicy": true,
   "strictAdminAuthorization": true,
   "singleAuthClient": true,
@@ -41,5 +41,9 @@
   "amarisIphoneFiveBandEq": true,
   "amarisAudioStabilityRecovery": true,
   "amarisBottomLevelmeter": true,
-  "amarisMainBackupLedSwitch": true
+  "amarisMainBackupLedSwitch": true,
+  "amarisCanonicalWebradioRoutes": true,
+  "amarisSeparatedSkipDiscordHandlers": true,
+  "amarisAuthModalAudioKeepalive": true,
+  "amarisCoverTickerBaseAndTrackFlash": true
 }

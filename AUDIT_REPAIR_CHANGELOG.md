@@ -51,9 +51,9 @@ Diese Punkte bleiben bis zum Live-Test gesperrt.
 
 ---
 
-## Addendum v1.2.4 — AMARIS Responsive / Ticker / Metadata / LYVRA DJ
+## Addendum v1.2.5 — AMARIS Responsive / Ticker / Metadata / LYVRA DJ
 
-**Release:** `FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4`  
+**Release:** `FULLVERSION_AMARIS_FEEDBACK_AUTH_MODAL_BOOST_COVER_TICKER_v1.2.5`  
 **Baseline:** v1.2.2  
 **Modus:** lokal, nicht destruktiv, kein Live-Deployment
 
@@ -67,9 +67,9 @@ Diese Punkte bleiben bis zum Live-Test gesperrt.
 - kanonischen LYVRA-Footer ergänzt.
 - Hauptplayer, `/internal`, Audio, EQ und Boost nicht verändert.
 
-## Addendum v1.2.4 — AMARIS Fullscreen / Auth Skip / 5-Band EQ / Discord / Audio Stability / Levelmeter
+## Addendum v1.2.5 — AMARIS Fullscreen / Auth Skip / 5-Band EQ / Discord / Audio Stability / Levelmeter
 
-**Release:** `FULLVERSION_AMARIS_FULLSCREEN_AUTH_SKIP_5BAND_EQ_DISCORD_AUDIOSTABILITY_LEVELMETER_v1.2.4`
+**Release:** `FULLVERSION_AMARIS_FEEDBACK_AUTH_MODAL_BOOST_COVER_TICKER_v1.2.5`
 
 - AMARIS-iPhone-Layout als echtes Ganzdisplay-Grid neu verteilt.
 - PC-Miniplayer bleibt kompakt auf schwarzem Hintergrund.
