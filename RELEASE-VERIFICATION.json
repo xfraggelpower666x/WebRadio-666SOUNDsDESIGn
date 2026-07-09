@@ -1,13 +1,13 @@
 {
   "ok": true,
-  "version": "1.2.7",
-  "release": "FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7",
-  "build": "2026-07-07-amaris-v127",
+  "version": "1.2.8",
+  "release": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
+  "build": "2026-07-08-veluna-v128",
   "verify": "npm run verify PASS",
-  "nodeTests": "41 / 41 PASS",
-  "javascriptSyntaxChecked": 111,
-  "publicMirrorPairs": 56,
+  "nodeTests": "43 / 43 PASS",
+  "javascriptSyntaxChecked": 115,
+  "publicMirrorPairs": 61,
   "nestedZipFiles": 0,
   "liveCloudflareTestRequired": true,
-  "notes": "Local package verification only; PC background, app icons and Media Session artwork require deployed browser/iPhone/Android validation."
+  "notes": "Local package verification only; endpoint routing, animated splash, real iPhone/Android PWA behavior and productive Stream/Auth/Discord integrations require deployed validation."
 }

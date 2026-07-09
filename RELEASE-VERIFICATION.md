@@ -1,27 +1,26 @@
-# RELEASE VERIFICATION v1.2.7
+# RELEASE VERIFICATION VELUNA v1.2.8
 
-Status: PASS
+**Status:** LOCAL PASS  
+**Release:** `FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8`
 
-## Release
-`FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7`
-
-## Local Verification
+## Automatisierte Prüfung
 - `npm run verify`: PASS
-- Node tests: 41 / 41 PASS
-- JavaScript/MJS syntax: 111 PASS
-- Public mirror pairs: 56 PASS
-- Nested ZIP files: 0
+- Node-Tests: 43 / 43 PASS
+- JavaScript-/MJS-Syntax: 115 PASS
+- Root-/Public-Spiegel: 61 PASS
+- Nested ZIP-Dateien: 0
 
-## Branding Checks
-- Original image 1 exists locally as AMARIS desktop background asset.
-- Original image 2 exists locally as AMARIS fallback/stream cover asset.
-- Icon set generated from image 2.
-- `/amaris.webmanifest` created and linked from AMARIS.
-- `site.webmanifest` updated with new icon set.
-- Media Session metadata/artwork logic added to AMARIS.
+## Paketinhalt
+- Kanonischer VELUNA-Endpunkt und Legacy-Redirects
+- zentrale VELUNA-Assetregistry
+- gemeinsamer Hintergrund und Header
+- neues Stream-Fallbackbild
+- einheitliches Browser-/PWA-/iPhone-/Android-Icon-Pack
+- interner animierter Splash aus dem Originalvideo bei jedem Player-Aufruf
+- responsives Bottom-Banner
+- festes iPhone-Viewportlayout
+- begrenztes responsives PC-Layout
+- gemeinsames Neon-Laserfarbsystem
 
-## Live checks still required
-- Real PC browser background rendering after Cloudflare upload.
-- iPhone Add-to-Home icon cache behavior.
-- iPhone Lock Screen / Control Center Media Session artwork.
-- Android PWA icon and media notification.
+## Live-Prüfung erforderlich
+Cloudflare, reale Stream-/Auth-/Discord-Secrets, iPhone Add-to-Home/Lockscreen und Android-PWA können lokal nicht abschließend bestätigt werden.

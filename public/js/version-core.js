@@ -1,9 +1,9 @@
-/* 666SOUNDsDESIGn canonical version core — AMARIS branding/background/icons/media-session patch v1.2.7. */
+/* 666SOUNDsDESIGn canonical version core — VELUNA centralized branding/responsive players patch v1.2.8. */
 (function(){
   'use strict';
-  var VERSION='v2026.07.07-amaris7';
-  var BUILD='2026-07-07-amaris-v127';
-  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260706,release:'FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7'};
+  var VERSION='v2026.07.08-veluna8';
+  var BUILD='2026-07-08-veluna-v128';
+  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260708,release:'FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8'};
   function setText(node){
     if(!node)return;
     if(node.id==='pcVersionBadge'){var status=node.querySelector('.status-code');if(status)status.textContent=VERSION;node.setAttribute('aria-label','Player Version '+VERSION);return;}

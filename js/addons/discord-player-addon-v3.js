@@ -6,7 +6,7 @@
   'use strict';
   if (window.S666DiscordPlayerAddonV3 && window.S666DiscordPlayerAddonV3.auditRepair) return;
 
-  var VERSION = 'V4.1-20260706-AMARIS-CANONICAL-WEBRADIO';
+  var VERSION = 'V4.2-20260708-VELUNA-CANONICAL-WEBRADIO';
   var inFlight = false;
   var watcherTimer = 0;
   var lastTrackKey = '';

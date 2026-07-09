@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with AMARIS v1.2.7 branding assets, desktop background, fallback cover icons, PWA metadata and Media Session artwork.",
+  "description": "666SOUNDsDESIGn WebRadio full source with canonical VELUNA endpoint, centralized branding assets, responsive player geometry, laser-neon theme and internal animated splash.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",

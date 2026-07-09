@@ -919,7 +919,7 @@
       body{
         background-image:
           linear-gradient(rgba(3,7,18,.20),rgba(3,7,18,.28)),
-          url('/assets/images/cyberpunk-bg.png')!important;
+          url('/assets/veluna/background/veluna-player-background.webp?v=veluna-v128')!important;
         background-size:cover!important;
         background-position:center center!important;
         background-attachment:fixed!important;

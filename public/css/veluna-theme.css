@@ -1,0 +1,231 @@
+/*
+ * VELUNA Central Player Theme v1.2.8
+ * Eine zentrale Grafik-/Farblogik für Hauptplayer, VELUNA-Miniplayer und Internal-Player.
+ * Bilder werden proportional eingepasst; Overlays verändern niemals die Playergeometrie.
+ */
+:root{
+  --veluna-laser-blue:#36a8ff;
+  --veluna-laser-blue-hot:#78d8ff;
+  --veluna-laser-violet:#9b4dff;
+  --veluna-laser-pink:#ff39c7;
+  --veluna-panel:#17181d;
+  --veluna-panel-2:#202127;
+  --veluna-panel-deep:#0b0c10;
+  --veluna-text:#f4f7ff;
+  --veluna-muted:#b8c2d4;
+  --veluna-border:rgba(54,168,255,.72);
+  --veluna-blue-glow:0 0 4px rgba(120,216,255,.95),0 0 14px rgba(54,168,255,.58),inset 0 0 12px rgba(54,168,255,.10);
+  --veluna-violet-glow:0 0 4px rgba(192,132,255,.95),0 0 14px rgba(155,77,255,.58);
+  --veluna-pink-glow:0 0 4px rgba(255,130,224,.95),0 0 14px rgba(255,57,199,.58);
+  --color-cyan:var(--veluna-laser-blue);
+  --color-pink:var(--veluna-laser-pink);
+  --color-bg:var(--veluna-panel-deep);
+  --color-bg2:#111217;
+  --color-bg3:var(--veluna-panel);
+  --color-surface:rgba(23,24,29,.96);
+  --cyan-03:rgba(54,168,255,.03);--cyan-06:rgba(54,168,255,.06);--cyan-08:rgba(54,168,255,.08);
+  --cyan-10:rgba(54,168,255,.10);--cyan-12:rgba(54,168,255,.12);--cyan-14:rgba(54,168,255,.14);
+  --cyan-18:rgba(54,168,255,.18);--cyan-20:rgba(54,168,255,.20);--cyan-22:rgba(54,168,255,.22);
+  --cyan-28:rgba(54,168,255,.28);--cyan-30:rgba(54,168,255,.30);--cyan-35:rgba(54,168,255,.35);
+  --cyan-42:rgba(54,168,255,.42);--cyan-45:rgba(54,168,255,.45);--cyan-55:rgba(54,168,255,.55);
+  --cyan-75:rgba(54,168,255,.75);--cyan-95:rgba(54,168,255,.95);
+  --pink-06:rgba(255,57,199,.06);--pink-08:rgba(255,57,199,.08);--pink-10:rgba(255,57,199,.10);
+  --pink-13:rgba(255,57,199,.13);--pink-14:rgba(255,57,199,.14);--pink-16:rgba(255,57,199,.16);
+  --pink-18:rgba(255,57,199,.18);--pink-20:rgba(255,57,199,.20);--pink-22:rgba(255,57,199,.22);
+  --pink-28:rgba(255,57,199,.28);--pink-30:rgba(255,57,199,.30);--pink-32:rgba(255,57,199,.32);
+  --pink-34:rgba(255,57,199,.34);--pink-38:rgba(255,57,199,.38);--pink-42:rgba(255,57,199,.42);
+  --pink-55:rgba(255,57,199,.55);--pink-95:rgba(255,57,199,.95);
+  --glow-cyan:var(--veluna-blue-glow);--glow-cyan-soft:0 0 10px rgba(54,168,255,.32);--glow-cyan-hard:0 0 28px rgba(54,168,255,.72);
+  --glow-pink:var(--veluna-pink-glow);--glow-pink-soft:0 0 10px rgba(255,57,199,.28);--glow-pink-hard:0 0 28px rgba(255,57,199,.68);
+}
+
+html,body{background-color:#050508!important;color:var(--veluna-text)}
+body[data-veluna-ui]{
+  background-image:linear-gradient(rgba(2,2,7,.32),rgba(2,2,7,.42)),var(--veluna-background-image)!important;
+  background-position:center center!important;background-size:cover!important;background-repeat:no-repeat!important;background-attachment:fixed!important;
+}
+body[data-veluna-ui]::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 72%,rgba(54,168,255,calc(.03 + var(--veluna-bass,0) * .16)),transparent 36%),
+    radial-gradient(circle at 27% 36%,rgba(255,57,199,calc(.02 + var(--veluna-mid,0) * .11)),transparent 25%),
+    radial-gradient(circle at 74% 30%,rgba(155,77,255,calc(.02 + var(--veluna-high,0) * .13)),transparent 28%);
+  mix-blend-mode:screen;transition:opacity .12s linear;opacity:.92;
+}
+body[data-veluna-ui] > *{position:relative;z-index:1}
+
+/* Neutral-dunkle Panels ohne Grün-/Türkisstich. */
+body[data-veluna-ui] :is(.player-card,.player-shell,.now-playing,.info-card,.lamp-box,.mini-box,.display-block,.display-window,.history-panel,.history-overlay,.panel-overlay,.sound-panel,.admin-panel,.pc-addon-module,.top-hud,.systempanel-v74){
+  background-color:rgba(23,24,29,.94)!important;
+  background-image:linear-gradient(180deg,rgba(32,33,39,.95),rgba(17,18,23,.97))!important;
+  border-color:var(--veluna-border)!important;
+  box-shadow:var(--veluna-blue-glow)!important;
+}
+body[data-veluna-ui] :is(.topbar-line,.phase10-brand-line,.section-topline,.display-head){border-color:rgba(54,168,255,.55)!important}
+body[data-veluna-ui] :is(.topbar-line,.status-dot,.meter-bar,.level-segment){filter:none}
+body[data-veluna-ui] :is(.brand,.section-kicker,.display-label,.mini-label,.info-label,.status-code,.hero-title,.history-title,.footer){color:var(--veluna-laser-blue-hot)!important;text-shadow:0 0 4px #000,var(--veluna-blue-glow)!important}
+body[data-veluna-ui] :is(.marquee-item,.ticker-text,.now-title,.action-status,.hero-live){color:var(--veluna-laser-pink)!important;text-shadow:0 2px 3px #000,var(--veluna-pink-glow)!important}
+body[data-veluna-ui] :is(.lamp-green,.lamp-cyan,.state-main,.state-api,.state-external,.is-active){--lamp-color:var(--veluna-laser-blue)!important;color:var(--veluna-laser-blue)!important}
+body[data-veluna-ui] :is(.lamp-purple,.state-fallback,.state-backup){--lamp-color:var(--veluna-laser-violet)!important;color:var(--veluna-laser-violet)!important}
+body[data-veluna-ui] :is(button,.control-btn,.small-btn,.ghost-btn,.tiny-btn,.source-led-btn,.status-chip){border-color:rgba(54,168,255,.62)!important;background:linear-gradient(180deg,rgba(34,35,42,.97),rgba(16,17,22,.98))!important;box-shadow:0 0 4px rgba(120,216,255,.72),0 0 12px rgba(54,168,255,.30)!important}
+body[data-veluna-ui] :is(button,.control-btn,.small-btn,.ghost-btn,.tiny-btn,.source-led-btn,.status-chip):is(:hover,:focus-visible,.is-active){border-color:rgba(255,57,199,.86)!important;box-shadow:var(--veluna-pink-glow)!important}
+
+/* Zentraler, panelbreiter Header. Nie breiter als sein Playerpanel. */
+.veluna-global-header{width:100%;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:clamp(8px,1.2vw,16px);margin:0 auto clamp(7px,1vw,12px);background:#05050a;border:1px solid rgba(54,168,255,.58);box-shadow:var(--veluna-blue-glow)}
+.veluna-global-header img{display:block;width:100%;height:auto;max-height:clamp(66px,15vw,176px);object-fit:contain;object-position:center;background:#05050a}
+body[data-veluna-page="main"] :is(#pcHeaderBrandSplit,.hero-brand,.hero-title,.hero-subtitle){display:none!important}
+body[data-veluna-page="veluna"] .topbar,body[data-veluna-page="internal"] .topbar{display:none!important}
+
+/* Gemeinsames Banner: Desktop unter Player; mobil nur im VELUNA-Panel. */
+.veluna-bottom-brand{display:block;width:min(94%,980px);height:auto;max-height:clamp(72px,14vw,190px);object-fit:contain;object-position:center;margin:clamp(8px,1.2vw,16px) auto 0;border-radius:12px;filter:drop-shadow(0 0 8px rgba(155,77,255,.48));pointer-events:none}
+body[data-veluna-page="veluna"] .veluna-bottom-brand{width:100%;max-height:136px}
+
+/* Interner bewegter Ladebildschirm; kein externer Landing-Screen. */
+.veluna-splash{position:absolute;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:#040408;overflow:hidden;border-radius:inherit;opacity:1;transition:opacity .42s ease;pointer-events:none}
+.veluna-splash.is-leaving{opacity:0}
+.veluna-splash video{width:100%;height:100%;object-fit:contain;background:#040408}
+.veluna-splash-host{position:relative!important;isolation:isolate}
+
+/* Intelligente Desktopbegrenzung: nicht zerquetschen, nicht endlos auseinanderziehen. */
+@media (min-width:769px){
+  body[data-veluna-page="main"] .player-shell{width:min(1180px,calc(100vw - 310px))!important;max-width:1180px!important;min-width:720px!important;margin-inline:auto!important}
+  body[data-veluna-page="veluna"] .player-card,body[data-veluna-page="internal"] .player-card{width:clamp(430px,42vw,590px)!important;max-width:min(590px,calc(100vw - 48px))!important;height:auto!important;max-height:calc(100dvh - 48px)!important;overflow:hidden!important}
+  body[data-veluna-page="veluna"] .app-shell,body[data-veluna-page="internal"] .app-shell{padding:24px!important;align-items:center!important;justify-content:center!important}
+}
+@media (min-width:769px) and (max-width:1100px){
+  body[data-veluna-page="main"] :is(.pc-side-addon,.side-meter){display:none!important}
+  body[data-veluna-page="main"] .frame-stage{display:flex!important;justify-content:center!important;padding:12px!important}
+  body[data-veluna-page="main"] .player-shell{width:min(960px,calc(100vw - 24px))!important;max-width:960px!important;min-width:0!important}
+}
+@media (min-width:1400px){body[data-veluna-page="main"] .player-shell{width:1120px!important}}
+
+/* iPhone/kleine Touchgeräte: feste Viewportgeometrie, Overlays ohne Reflow oder Zoom. */
+@media (max-width:768px){
+  html,body{width:100%!important;height:100%!important;min-height:100%!important;max-height:100%!important;overflow:hidden!important;overscroll-behavior:none!important}
+  body[data-veluna-ui]{position:fixed!important;inset:0!important;width:100dvw!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;touch-action:manipulation!important;background-attachment:scroll!important}
+  body[data-veluna-ui] :is(.frame-stage,.app-shell){width:100dvw!important;height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
+  body[data-veluna-page="veluna"] .player-card,body[data-veluna-page="internal"] .player-card{height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 8px)!important;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 8px)!important;width:calc(100dvw - 8px)!important;max-width:calc(100dvw - 8px)!important;margin:calc(env(safe-area-inset-top) + 4px) 4px calc(env(safe-area-inset-bottom) + 4px)!important;overflow:hidden!important}
+  body[data-veluna-ui] :is(.overlay,.panel-overlay,.history-overlay,.admin-overlay,[role="dialog"]){position:fixed!important;inset:0!important;max-width:100dvw!important;max-height:100dvh!important;margin:0!important;transform:none!important;overflow:auto!important;overscroll-behavior:contain!important}
+  body[data-veluna-ui] input,body[data-veluna-ui] textarea,body[data-veluna-ui] select{font-size:16px!important}
+  .veluna-global-header img{max-height:clamp(58px,14dvh,112px)}
+  .veluna-bottom-brand{display:none}
+  body[data-veluna-page="veluna"] .veluna-bottom-brand{display:block;width:100%;max-height:clamp(48px,9dvh,78px);margin-top:5px}
+}
+
+/* Landscape auf iPhone/Touch: nur zentrales Hintergrundbild sichtbar. */
+@media (orientation:landscape) and (pointer:coarse) and (max-height:540px){
+  body[data-veluna-ui] :is(.frame-stage,.app-shell,.player-shell,.player-card){visibility:hidden!important;pointer-events:none!important}
+  body[data-veluna-ui]::after{display:none!important}
+}
+
+@media (prefers-reduced-motion:reduce){body[data-veluna-ui]::after{display:none}.veluna-splash{transition:none}}
+
+/* Playerflächen lassen das gemeinsame Hintergrundbild sichtbar; nur Karten bleiben dunkelgrau. */
+body[data-veluna-page="veluna"] .app-shell,
+body[data-veluna-page="internal"] .app-shell,
+body[data-veluna-page="main"] .frame-stage{background:transparent!important;background-image:none!important}
+
+/* Aktive Legacy-Variablen werden zentral auf das neue Laserdesign umgebogen. */
+:root{
+  --cyan:var(--veluna-laser-blue)!important;
+  --blue:var(--veluna-laser-blue)!important;
+  --green:var(--veluna-laser-blue)!important;
+  --pink:var(--veluna-laser-pink)!important;
+  --panel:var(--veluna-panel)!important;
+  --panel-2:var(--veluna-panel-2)!important;
+  --bg:#050508!important;
+  --bg2:#0c0d11!important;
+  --border:var(--veluna-border)!important;
+  --shadow-cyan:var(--veluna-blue-glow)!important;
+  --shadow-pink:var(--veluna-pink-glow)!important;
+}
+body[data-veluna-ui] .frame-overlay{background:transparent!important;background-image:none!important}
+
+@media (max-width:768px){
+  body[data-veluna-page="veluna"] .player-card{
+    grid-template-rows:auto auto auto minmax(78px,1fr) auto auto auto auto auto auto auto auto!important;
+    gap:4px!important;padding:6px!important;
+  }
+  body[data-veluna-page="veluna"] .veluna-global-header{margin-bottom:0}
+  body[data-veluna-page="veluna"] .veluna-global-header img{max-height:clamp(54px,10dvh,80px)}
+  body[data-veluna-page="veluna"] .veluna-bottom-brand{max-height:clamp(42px,7.5dvh,62px);margin-top:0}
+  body[data-veluna-page="veluna"] :is(.status-grid,.pill-row,.mini-grid,.source-switch,.control-strip,.tool-strip){gap:4px!important}
+  body[data-veluna-page="veluna"] :is(.lamp-box,.mini-box,.source-led-btn,.control-btn,.small-btn){min-height:32px!important;padding-block:4px!important}
+  body[data-veluna-page="veluna"] .levelmeter{height:24px!important}
+  body[data-veluna-page="veluna"] .footer{font-size:clamp(.55rem,2vw,.72rem)!important;line-height:1.05!important}
+}
+
+/* Cover bleibt lesbar unter der Laufschrift; nur ein leichter dunkler Leseschleier. */
+body[data-veluna-page="veluna"] .display-window::before{
+  background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,.08),rgba(0,0,0,.34)),linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.03),rgba(0,0,0,.22))!important;
+}
+body[data-veluna-page="veluna"] .cover-image{z-index:0!important;opacity:.92!important;filter:saturate(1.12) contrast(1.06) brightness(.88)!important}
+
+@media (min-width:769px){
+  body[data-veluna-page="veluna"] .app-shell,
+  body[data-veluna-page="internal"] .app-shell{flex-direction:column!important;gap:10px!important}
+  body[data-veluna-page="veluna"] .player-card,
+  body[data-veluna-page="internal"] .player-card{width:clamp(430px,40vw,540px)!important;max-width:min(540px,calc(100vw - 48px))!important}
+  .veluna-bottom-brand.veluna-desktop-outside{width:min(88vw,520px)!important;max-height:none!important;margin:0 auto!important}
+}
+body[data-veluna-page="main"] :is(.mff-cyber-header,.pc-header-brand-split,.hero-brand,.hero-title,.hero-subtitle){display:none!important}
+
+/* Kurze PC-Fenster werden nicht zerquetscht: Breite bleibt kompakt, vertikal darf sauber gescrollt werden. */
+@media (min-width:769px){
+  body[data-veluna-page="veluna"] .player-card,
+  body[data-veluna-page="internal"] .player-card,
+  .veluna-bottom-brand.veluna-desktop-outside{flex:0 0 auto!important}
+}
+@media (min-width:769px) and (max-height:760px){
+  html,body[data-veluna-ui]{height:auto!important;min-height:100vh!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important}
+  body[data-veluna-page="veluna"] .app-shell,
+  body[data-veluna-page="internal"] .app-shell,
+  body[data-veluna-page="main"] .frame-stage{height:auto!important;min-height:100vh!important;max-height:none!important;overflow:visible!important;align-items:flex-start!important;justify-content:flex-start!important;padding-top:18px!important;padding-bottom:18px!important}
+  body[data-veluna-page="veluna"] .player-card,
+  body[data-veluna-page="internal"] .player-card{height:auto!important;max-height:none!important;overflow:visible!important}
+  body[data-veluna-page="main"] .player-shell{height:auto!important;max-height:none!important;overflow:visible!important}
+}
+
+/* Final responsive fit corrections. */
+body[data-veluna-page="veluna"] .cover-image{z-index:2!important}
+body[data-veluna-page="veluna"] .display-window::before{z-index:3!important}
+body[data-veluna-page="veluna"] .marquee-track{z-index:4!important}
+@media (min-width:769px){
+  body[data-veluna-page="veluna"] .player-card,
+  body[data-veluna-page="internal"] .player-card{width:clamp(430px,39vw,520px)!important;max-width:min(520px,calc(100vw - 48px))!important}
+  .veluna-bottom-brand.veluna-desktop-outside{width:min(86vw,480px)!important}
+}
+@media (min-width:769px) and (max-height:760px){
+  body[data-veluna-page="veluna"] .app-shell,
+  body[data-veluna-page="internal"] .app-shell,
+  body[data-veluna-page="main"] .frame-stage{align-items:center!important;justify-content:flex-start!important}
+}
+
+/* Release-Fit v1.2.8: Cover klar sichtbar, Desktop ohne Rand-Clipping. */
+body[data-veluna-page="veluna"] .display-window::before{
+  background:rgba(0,0,0,.14)!important;
+}
+body[data-veluna-page="veluna"] .cover-image{
+  opacity:1!important;
+  filter:saturate(1.10) contrast(1.04) brightness(.96)!important;
+}
+@media (min-width:769px){
+  body[data-veluna-page="veluna"] .player-card,
+  body[data-veluna-page="internal"] .player-card{
+    width:clamp(430px,37vw,500px)!important;
+    max-width:min(500px,calc(100vw - 48px))!important;
+  }
+  .veluna-bottom-brand.veluna-desktop-outside{
+    width:min(84vw,460px)!important;
+  }
+}
+@media (min-width:769px) and (max-height:920px){
+  body[data-veluna-page="veluna"] .app-shell,
+  body[data-veluna-page="internal"] .app-shell{
+    justify-content:flex-start!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding-top:8px!important;
+    padding-bottom:8px!important;
+  }
+}

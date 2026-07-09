@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7");
+  assert.equal(data.version, "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8");
 });
 
 test("runtime configuration is read from static assets", async () => {
@@ -178,35 +178,42 @@ test("root and CSS are served from ASSETS", async () => {
 });
 
 
-test("AMARIS aliases are hard-routed to the standalone worker-first player and keep all other players", async () => {
-  for (const path of ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/", "/amaris/index.html", "/AMARIS/index.html"]) {
-    const amaris = await request(path, { headers: { accept: "text/html" } });
-    assert.equal(amaris.status, 200, path);
-    assert.match(amaris.headers.get("content-type") || "", /text\/html/, path);
-    assert.equal(amaris.headers.get("x-player-mode"), "amaris-lyvra-minimal", path);
-    assert.equal(amaris.headers.get("x-amaris-route-lock"), "standalone-only", path);
-    const amarisHtml = await amaris.text();
-    assert.match(amarisHtml, /AMARIS · LYVRA[\s\S]*MINIMAL WEBRADIO/, path);
-    assert.match(amarisHtml, /WORKER AUTO SWITCH/, path);
-    assert.match(amarisHtml, /\/api\/runtime-config\/status/, path);
-    assert.match(amarisHtml, /LYVRA DJ/, path);
-    assert.doesNotMatch(amarisHtml, /id="mffApp"|Starting Audio Systems/, path);
+test("VELUNA is the canonical standalone endpoint and legacy AMARIS aliases redirect without affecting other players", async () => {
+  for (const path of ["/veluna", "/veluna/", "/VELUNA", "/VELUNA/", "/veluna/index.html", "/VELUNA/index.html"]) {
+    const veluna = await request(path, { headers: { accept: "text/html" } });
+    assert.equal(veluna.status, 200, path);
+    assert.match(veluna.headers.get("content-type") || "", /text\/html/, path);
+    assert.equal(veluna.headers.get("x-player-mode"), "veluna-lyvra-minimal", path);
+    assert.equal(veluna.headers.get("x-veluna-route-lock"), "standalone-only", path);
+    const html = await veluna.text();
+    assert.match(html, /VELUNA · LYVRA[\s\S]*MINIMAL WEBRADIO/, path);
+    assert.match(html, /WORKER AUTO SWITCH/, path);
+    assert.match(html, /\/api\/runtime-config\/status/, path);
+    assert.match(html, /LYVRA DJ/, path);
+    assert.match(html, /veluna-theme\.css/, path);
+    assert.doesNotMatch(html, /id="mffApp"|Starting Audio Systems/, path);
   }
 
-  const amarisPost = await request("/amaris", { method: "POST", headers: { accept: "application/json" } });
-  assert.equal(amarisPost.status, 405);
+  for (const path of ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/"]) {
+    const legacy = await request(path, { headers: { accept: "text/html" }, redirect: "manual" });
+    assert.equal(legacy.status, 308, path);
+    assert.equal(new URL(legacy.headers.get("location")).pathname, "/veluna/", path);
+  }
+
+  const velunaPost = await request("/veluna", { method: "POST", headers: { accept: "application/json" } });
+  assert.equal(velunaPost.status, 405);
 
   const internal = await request("/internal", { headers: { accept: "text/html" } });
   assert.equal(internal.status, 200);
   const internalHtml = await internal.text();
   assert.match(internalHtml, /666SOUNDsDESIGn RADIO/);
   assert.match(internalHtml, /LYVRA DJ/);
+  assert.match(internalHtml, /veluna-ui\.js/);
   assert.match(internalHtml, /id="reconnectBtn"/);
-  assert.match(internalHtml, /id="primaryBtn"/);
-  assert.match(internalHtml, /id="backupBtn"/);
 
   const rootPlayer = await request("/", { headers: { accept: "text/html" } });
   const rootHtml = await rootPlayer.text();
   assert.match(rootHtml, /Root Main Player/);
-  assert.doesNotMatch(rootHtml, /AMARIS · LYVRA[\s\S]*MINIMAL WEBRADIO/);
+  assert.match(rootHtml, /veluna-theme\.css/);
+  assert.doesNotMatch(rootHtml, /VELUNA · LYVRA[\s\S]*MINIMAL WEBRADIO/);
 });

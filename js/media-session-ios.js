@@ -74,7 +74,7 @@
       title: '666SOUNDsDESIGn WebRadio',
       artist: 'RadioBotAI DJ',
       album: '666SOUNDsDESIGn',
-      artwork: '/assets/icons/radiobot-ai-dj-icon.png'
+      artwork: '/assets/veluna/icons/icon-512x512.png'
     };
 
     function updateMediaSession(meta) {
@@ -92,7 +92,7 @@
           album:   currentMeta.album,
           artwork: [
             { src: currentMeta.artwork, sizes: '512x512', type: 'image/png' },
-            { src: '/assets/icons/radiobot-ai-badge.png', sizes: '256x256', type: 'image/png' }
+            { src: '/assets/veluna/icons/icon-512x512.png', sizes: '256x256', type: 'image/png' }
           ]
         });
       } catch (e) {}

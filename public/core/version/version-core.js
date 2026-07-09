@@ -5,9 +5,9 @@
 */
 (function(){
   'use strict';
-  var VERSION='v178';
-  var BUILD='smfp-v178-overlay-core-20260519';
-  window.SMFP_VERSION={label:VERSION, build:BUILD, number:178};
+  var VERSION='v2026.07.08-veluna8';
+  var BUILD='2026-07-08-veluna-v128';
+  window.SMFP_VERSION={label:VERSION, build:BUILD, number:20260708};
   function setText(node){
     if(!node) return;
     if(node.id==='pcVersionBadge'){

@@ -407,7 +407,7 @@ let lastAppliedCoverUrlV105 = '';
   let coverFadeTimerV106 = 0;
   function updateNowCover(meta) {
     if (!nowCover) return;
-    const FALLBACK = '/assets/logos/radiobot-ai-badge.png';
+    const FALLBACK = '/assets/veluna/covers/veluna-stream-fallback.webp';
     const raw = String(meta?.cover || '').trim();
     const cover = raw || FALLBACK;
 

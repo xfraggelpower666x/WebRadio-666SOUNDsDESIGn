@@ -1,101 +1,41 @@
 {
   "name": "666SOUNDsDESIGn WebRadio",
   "short_name": "666RADIO",
-  "description": "666SOUNDsDESIGn WebRadio — AMARIS / LYVRA compatible app icons and media artwork.",
+  "description": "666SOUNDsDESIGn WebRadio — VELUNA / LYVRA compatible app icons and media artwork.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#05030a",
-  "theme_color": "#12061f",
+  "background_color": "#08080d",
+  "theme_color": "#17181d",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/assets/icons/favicon-16x16.png",
-      "sizes": "16x16",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-48x48.png",
-      "sizes": "48x48",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-64x64.png",
-      "sizes": "64x64",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-192x192.png",
+      "src": "/assets/veluna/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/android-chrome-192x192.png",
-      "sizes": "192x192",
+      "src": "/assets/veluna/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/veluna/icons/maskable-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/assets/icons/icon-256x256.png",
-      "sizes": "256x256",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/assets/icons/icon-1024x1024.png",
-      "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
-      "name": "AMARIS Minimal Player",
-      "short_name": "AMARIS",
-      "url": "/amaris/",
+      "name": "VELUNA Minimal Player",
+      "short_name": "VELUNA",
+      "url": "/veluna/",
       "icons": [
         {
-          "src": "/assets/icons/icon-192x192.png",
+          "src": "/assets/veluna/icons/icon-192x192.png",
           "sizes": "192x192",
           "type": "image/png"
         }

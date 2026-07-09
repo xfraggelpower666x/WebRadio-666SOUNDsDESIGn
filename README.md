@@ -98,3 +98,13 @@ AMARIS wurde als eigenständiger Mini-Player-Endpunkt weiter ausgebaut. iPhone n
 - Separate Skip/Discord feedback states.
 - Audio-safe password modal handling.
 - Cover-backed ticker with stream-cover fallback.
+
+
+## VELUNA v1.2.8
+
+`FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8`
+
+- Kanonischer Endpunkt `/veluna`; alte AMARIS-Routen redirecten kompatibel.
+- Zentrale VELUNA-Assets, responsiver Header/Hintergrund, Fallback-Cover, App-Icon-Pack und interner animierter Splash.
+- Festes iPhone-Viewportlayout, begrenztes PC-Layout und gemeinsames Neon-Laserfarbsystem.
+- Hauptplayer, Internal-Player, Auth, Skip, Discord, Audio, Booster und EQ bleiben erhalten.

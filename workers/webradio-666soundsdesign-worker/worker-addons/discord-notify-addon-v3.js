@@ -23,7 +23,7 @@ const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_STREAM_URL = 'https://webradio.666soundsdesign-broadcaster.com/stream';
-const DEFAULT_PREVIEW_IMAGE = 'https://webradio.666soundsdesign-broadcaster.com/assets/icons/icon-512x512.png';
+const DEFAULT_PREVIEW_IMAGE = 'https://webradio.666soundsdesign-broadcaster.com/assets/veluna/icons/icon-512x512.png';
 const DEFAULT_USERNAME = '666SOUNDsDESIGn Radio';
 const MIN_TRACK_COOLDOWN_MS = 20000;
 const MIN_MANUAL_COOLDOWN_MS = 10000;
@@ -402,7 +402,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
   try {
     const input = await readInput(request);
     if (path === '/api/discord/test') {
-      const message = clean(input.message || input.text || input.content, 'AMARIS Discord test ' + new Date().toISOString(), 1800);
+      const message = clean(input.message || input.text || input.content, 'VELUNA Discord test ' + new Date().toISOString(), 1800);
       runtime.lastKind = 'test';
       const result = await sendDiscord(env, messagePayload({ ...input, message }));
       return json({ ok: true, type: 'test', led: 'ok', discord: result, addon: ADDON_VERSION });

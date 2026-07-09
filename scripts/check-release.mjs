@@ -28,7 +28,16 @@ const required = [
   "HARD_AUDIT_POLICY.md", "HARDLOCK_REPAIR_REPORT.md", "HARDLOCK_VALIDATION.json",
   "external-workers/666-system-pw-worker/worker.js",
   "external-workers/666-system-auth-worker/worker.js",
-  "AMARIS/index.html", "amaris/index.html", "public/AMARIS/index.html", "public/amaris/index.html"
+  "VELUNA/index.html", "veluna/index.html", "public/VELUNA/index.html", "public/veluna/index.html",
+  "AMARIS/index.html", "amaris/index.html", "public/AMARIS/index.html", "public/amaris/index.html",
+  "config/veluna-assets.js", "css/veluna-theme.css", "js/veluna-ui.js", "veluna.webmanifest",
+  "assets/veluna/icons/favicon-16x16.png", "assets/veluna/icons/favicon-32x32.png",
+  "assets/veluna/background/veluna-player-background.webp",
+  "assets/veluna/header/veluna-player-header.webp",
+  "assets/veluna/covers/veluna-stream-fallback.webp",
+  "assets/veluna/banner/veluna-bottom-banner.webp",
+  "assets/veluna/splash/veluna-loading-splash.webm",
+  "assets/veluna/splash/veluna-loading-splash.mp4"
 ];
 for (const path of required) {
   const info = await stat(new URL(path, rootUrl));
@@ -64,7 +73,7 @@ for (const file of files.filter(file => /\.(?:js|mjs)$/i.test(file))) {
 }
 
 const worker = await readFile(new URL("worker.js", rootUrl), "utf8");
-for (const marker of ["playerAlertRateIdentity", "STREAM_FAILOVER_BUDGET_MS", "handleDiscordNotifyV3", "serveAmarisPlayer", "isAmarisPlayerPath", "normalizeMetadataDjPayload", "apiNotFound", release.release]) {
+for (const marker of ["playerAlertRateIdentity", "STREAM_FAILOVER_BUDGET_MS", "handleDiscordNotifyV3", "serveVelunaPlayer", "isVelunaPlayerPath", "normalizeMetadataDjPayload", "apiNotFound", release.release]) {
   if (!worker.includes(marker)) throw new Error(`worker integration missing: ${marker}`);
 }
 for (const forbidden of [
@@ -146,7 +155,7 @@ for (const item of rendererPairs) {
 }
 
 const productiveRoots = ["js", "css", "config"];
-const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html", "AMARIS/index.html", "amaris/index.html"];
+const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html", "AMARIS/index.html", "amaris/index.html"];
 for (const directory of productiveRoots) {
   const sourceFiles = files.filter(file => relative(rootPath, file).split(sep)[0] === directory);
   for (const source of sourceFiles) {
@@ -160,7 +169,7 @@ for (const directory of productiveRoots) {
     publicPairs.push(item);
   }
 }
-for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html", "AMARIS/index.html", "amaris/index.html"]) {
+for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html", "AMARIS/index.html", "amaris/index.html"]) {
   const source = await readFile(new URL(item, rootUrl));
   const mirror = await readFile(new URL(`public/${item}`, rootUrl));
   if (!source.equals(mirror)) throw new Error(`public deploy mirror drift: ${item}`);

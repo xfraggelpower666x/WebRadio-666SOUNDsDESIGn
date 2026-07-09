@@ -23,8 +23,8 @@ ZWECK: Basisfarben, Reset und globales Cockpit-Fundament des externen Players.
   --radius-xl: 28px;
   --radius-lg: 22px;
   --radius-md: 16px;
-  --desktop-frame: url("../assets/images/frame-v7-clean-desktop.jpeg");
-  --mobile-frame: url("../assets/images/frame-v7-clean-mobile.jpeg");
+  --desktop-frame: url("../assets/veluna/background/veluna-player-background.webp");
+  --mobile-frame: url("../assets/veluna/background/veluna-player-background.webp");
 }
 * { box-sizing: border-box; }
 html, body {

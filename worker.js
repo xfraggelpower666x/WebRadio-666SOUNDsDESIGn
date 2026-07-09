@@ -152,9 +152,10 @@ const HTML = `<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Internal</title>
-  <link rel="icon" type="image/png" href="/assets/assets/icons/internal-icon.png" />
-  <link rel="apple-touch-icon" href="/assets/assets/icons/internal-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/veluna/icons/icon-32x32.png?v=veluna-v128" />
+  <link rel="apple-touch-icon" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v128" />
   <link rel="stylesheet" href="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245" />
+  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-08-veluna-v128" />
 </head>
 <body>
   <div id="bootOverlay" class="overlay">
@@ -233,6 +234,8 @@ const HTML = `<!DOCTYPE html>
   </main>
 
   <script type="module" src="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"></script>
+  <script src="/config/veluna-assets.js?v=2026-07-08-veluna-v128"></script>
+  <script defer src="/js/veluna-ui.js?v=2026-07-08-veluna-v128"></script>
 </body>
 </html>`;
 
@@ -625,7 +628,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -821,27 +824,41 @@ function normalizedRoutePath(pathname){
   if(value.length > 1) value = value.replace(/\/+$/, '');
   return value.toLowerCase();
 }
-function isAmarisPlayerPath(pathname){
+function isVelunaPlayerPath(pathname){
+  const path = normalizedRoutePath(pathname);
+  return path === '/veluna' || path === '/veluna/index.html';
+}
+function isLegacyAmarisPlayerPath(pathname){
   const path = normalizedRoutePath(pathname);
   return path === '/amaris' || path === '/amaris/index.html';
 }
 
-async function serveAmarisPlayer(request, env){
+function redirectLegacyAmarisToVeluna(request){
   if(request.method !== 'GET' && request.method !== 'HEAD'){
     return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
   }
-  const response = await serveProjectAsset(request, env, "/amaris/index.html") || await serveProjectAsset(request, env, "/AMARIS/index.html");
+  const source = new URL(request.url);
+  const target = new URL('/veluna/', source.origin);
+  target.search = source.search;
+  return Response.redirect(target.toString(), 308);
+}
+
+async function serveVelunaPlayer(request, env){
+  if(request.method !== 'GET' && request.method !== 'HEAD'){
+    return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
+  }
+  const response = await serveProjectAsset(request, env, "/veluna/index.html") || await serveProjectAsset(request, env, "/VELUNA/index.html");
   if(!response){
-    return new Response("AMARIS player asset unavailable",{status:503,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","x-player-mode":"amaris-asset-missing"}});
+    return new Response("VELUNA player asset unavailable",{status:503,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","x-player-mode":"veluna-asset-missing"}});
   }
   const headers = new Headers(response.headers);
   headers.set("cache-control","no-store, no-cache, must-revalidate, max-age=0");
   headers.set("pragma","no-cache");
   headers.set("expires","0");
-  headers.set("content-location","/amaris/");
-  headers.set("x-player-mode","amaris-lyvra-minimal");
-  headers.set("x-player-version","v1.2.2");
-  headers.set("x-amaris-route-lock","standalone-only");
+  headers.set("content-location","/veluna/");
+  headers.set("x-player-mode","veluna-lyvra-minimal");
+  headers.set("x-player-version","v1.2.8");
+  headers.set("x-veluna-route-lock","standalone-only");
   return new Response(request.method === "HEAD" ? null : response.body,{status:response.status,statusText:response.statusText,headers});
 }
 
@@ -904,7 +921,8 @@ function s666RouteTable() {
     { priority: 7, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
     { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
     { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
-    { priority: 10, route: "/amaris", handler: "serveAmarisPlayer", purpose: "AMARIS LYVRA minimal recovery player" },
+    { priority: 10, route: "/veluna", handler: "serveVelunaPlayer", purpose: "VELUNA LYVRA minimal recovery player" },
+    { priority: 10.1, route: "/amaris", handler: "redirectLegacyAmarisToVeluna", purpose: "legacy compatibility redirect" },
     { priority: 11, route: "/internal", handler: "embedded internal player", purpose: "existing internal emergency player" },
     { priority: 12, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
     { priority: 13, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
@@ -928,9 +946,10 @@ function s666ModuleStatus(env) {
         primary: PRIMARY_STREAM_URLS[0],
         fallback: FALLBACK_STREAM_URLS[0]
       },
-      amarisMinimalPlayer: {
+      velunaMinimalPlayer: {
         ok: true,
-        routes: ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/", "/amaris/index.html", "/AMARIS/index.html"],
+        routes: ["/veluna", "/veluna/", "/VELUNA", "/VELUNA/", "/veluna/index.html", "/VELUNA/index.html"],
+        legacyRedirects: ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/"],
         primary: "https://my.idjstream.com:8686",
         fallback: "https://my.idjstream.com:8686/stream",
         emergencyChain: ["/stream", "/fallback-stream"],
@@ -988,10 +1007,10 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7",
+    version: "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
-    routes: { root: "/", amaris: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
+    routes: { root: "/", veluna: "/veluna", legacyAmarisRedirect: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
   });
 }
 
@@ -1044,7 +1063,8 @@ export default {
     const __darkDancerResponse = await darkDancerResponse(request, env);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
-    if(isAmarisPlayerPath(url.pathname)) return await serveAmarisPlayer(request, env);
+    if(isLegacyAmarisPlayerPath(url.pathname)) return redirectLegacyAmarisToVeluna(request);
+    if(isVelunaPlayerPath(url.pathname)) return await serveVelunaPlayer(request, env);
     if (url.pathname === "/health") return s666LiveHealth(request, env);
     if (url.pathname === "/api/runtime-config/status" && (request.method === "GET" || request.method === "HEAD")) {
       const runtime = await loadRadioRuntimeConfig(request, env, true);
@@ -1126,7 +1146,7 @@ const url=new URL(request.url);
 
     // Interner Notfall-Player bleibt komplett erhalten.
     if(url.pathname==="/assets/assets/icons/internal-icon.png"){
-      const internalIcon = await serveProjectAsset(request, env, "/assets/icons/internal-icon.png");
+      const internalIcon = await serveProjectAsset(request, env, "/assets/veluna/icons/icon-512x512.png");
       if(internalIcon) return internalIcon;
     }
     if(url.pathname==="/css/main.css"){

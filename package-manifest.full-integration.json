@@ -1,7 +1,7 @@
 {
-  "name": "WebRadio-666SOUNDsDESIGn AMARIS MINIMAL PLAYER REPAIR",
-  "version": "1.2.1",
-  "releaseDate": "2026-07-02",
+  "name": "WebRadio-666SOUNDsDESIGn VELUNA CENTRAL BRANDING",
+  "version": "1.2.8",
+  "releaseDate": "2026-07-08",
   "releaseFolder": null,
   "type": "safe-root-complete-repository-release",
   "uploadMode": "scriptable-folder-upload",
@@ -13,7 +13,12 @@
     "safeRootDeploy": true
   },
   "integratedPaths": [
-    "AMARIS/",
+    "VELUNA/",
+    "veluna/",
+    "assets/veluna/",
+    "config/veluna-assets.js",
+    "css/veluna-theme.css",
+    "js/veluna-ui.js",
     "external-workers/666-chaos-ai-track-system/",
     "external-workers/666-suno-system/",
     "Render/666SOUNDsDESIGn-Alert-Service-Renderer/",
@@ -47,11 +52,21 @@
     "privateRateIdentity": true,
     "senderIdRateBypassBlocked": true,
     "hardlockTestsIncluded": true,
-    "amarisMinimalPlayerAdded": true,
-    "amarisEndpointAdded": true,
+    "velunaMinimalPlayerAdded": true,
+    "velunaEndpointAdded": true,
     "internalEmergencyPlayerPreserved": true,
     "blackScreenComparisonAuditIncluded": true,
-    "safeRootReleaseCheckRepaired": true
+    "safeRootReleaseCheckRepaired": true,
+    "legacyAmarisRedirects": true,
+    "centralVelunaAssetRegistry": true,
+    "sharedResponsiveHeader": true,
+    "sharedPlayerBackground": true,
+    "sharedFallbackCover": true,
+    "unifiedAppIconPack": true,
+    "internalAnimatedSplash": true,
+    "fixedIphoneViewport": true,
+    "boundedDesktopGeometry": true,
+    "laserNeonSharedTheme": true
   },
   "safety": {
     "sourceSystemsPreserved": true,
@@ -63,5 +78,6 @@
   },
   "branchRecovery": true,
   "atomicScriptableUpload": true,
-  "assetsDirectory": "public"
+  "assetsDirectory": "public",
+  "release": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8"
 }
