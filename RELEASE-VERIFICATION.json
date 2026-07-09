@@ -1,13 +1,20 @@
 {
   "ok": true,
-  "version": "1.2.8",
-  "release": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
-  "build": "2026-07-08-veluna-v128",
+  "version": "1.2.10",
+  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10",
+  "build": "2026-07-09-veluna-v1210",
   "verify": "npm run verify PASS",
   "nodeTests": "43 / 43 PASS",
-  "javascriptSyntaxChecked": 115,
-  "publicMirrorPairs": 61,
+  "javascriptSyntaxChecked": 117,
+  "publicMirrorPairs": 62,
   "nestedZipFiles": 0,
+  "desktopBottomBannerRemoved": true,
+  "mobileVelunaBannerPreserved": true,
   "liveCloudflareTestRequired": true,
-  "notes": "Local package verification only; endpoint routing, animated splash, real iPhone/Android PWA behavior and productive Stream/Auth/Discord integrations require deployed validation."
+  "notes": "Local package verification only. The iPhone player is locked to its captured full-display geometry; overlays, auth dialogs and keyboard activity do not resize or reflow the player. Desktop bottom-banner removal remains preserved. Final live iPhone/Safari confirmation requires deployment.",
+  "requiredFiles": 51,
+  "iphoneFixedFullscreenGeometry": true,
+  "overlayNoReflow": true,
+  "keyboardNoResize": true,
+  "orientationOnlyRecapture": true
 }

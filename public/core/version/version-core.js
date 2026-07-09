@@ -5,9 +5,9 @@
 */
 (function(){
   'use strict';
-  var VERSION='v2026.07.08-veluna8';
-  var BUILD='2026-07-08-veluna-v128';
-  window.SMFP_VERSION={label:VERSION, build:BUILD, number:20260708};
+  var VERSION='v2026.07.09-veluna9';
+  var BUILD='2026-07-09-veluna-v129';
+  window.SMFP_VERSION={label:VERSION, build:BUILD, number:20260709};
   function setText(node){
     if(!node) return;
     if(node.id==='pcVersionBadge'){

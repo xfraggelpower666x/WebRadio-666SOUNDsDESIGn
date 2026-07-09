@@ -1,10 +1,10 @@
 {
-  "version": "1.2.8",
-  "release": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
-  "frontendVersion": "v2026.07.08-veluna8",
-  "build": "2026-07-08-veluna-v128",
-  "date": "2026-07-08",
-  "baselineRelease": "FULLVERSION_AMARIS_BRANDING_BACKGROUND_ICONS_MEDIASESSION_v1.2.7",
+  "version": "1.2.10",
+  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10",
+  "frontendVersion": "v2026.07.09-veluna10",
+  "build": "2026-07-09-veluna-v1210",
+  "date": "2026-07-09",
+  "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
   "features": [
     "CENTRAL_METADATA_TITLE_DEDUP",
@@ -26,11 +26,16 @@
     "VELUNA_STREAM_FALLBACK_COVER",
     "VELUNA_COMMON_APP_ICON_PACK",
     "VELUNA_INTERNAL_ANIMATED_SPLASH",
-    "VELUNA_RESPONSIVE_BOTTOM_BANNER",
     "VELUNA_FIXED_IPHONE_VIEWPORT",
     "VELUNA_BOUNDED_PC_LAYOUT",
     "VELUNA_LASER_NEON_SHARED_THEME",
-    "VELUNA_BACKGROUND_AUDIO_GLOW_LAYER"
+    "VELUNA_BACKGROUND_AUDIO_GLOW_LAYER",
+    "VELUNA_MOBILE_ONLY_BOTTOM_BANNER",
+    "VELUNA_DESKTOP_BOTTOM_BANNER_REMOVED",
+    "VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY",
+    "VELUNA_OVERLAY_NO_REFLOW",
+    "VELUNA_KEYBOARD_NO_RESIZE",
+    "VELUNA_ORIENTATION_ONLY_GEOMETRY_RECAPTURE"
   ],
-  "notes": "Canonical AMARIS-to-VELUNA migration with new /veluna endpoint and legacy redirects; centralized background/header/fallback/app icon/banner/splash assets; responsive fixed iPhone geometry, bounded PC layouts and shared laser-neon color theme."
+  "notes": "Targeted iPhone fullscreen geometry lock: the player remains a fixed full-display panel, overlay and keyboard activity no longer resize/reflow the player, orientation changes are the only mobile geometry recapture. Desktop bottom-banner removal from v1.2.9 remains preserved."
 }

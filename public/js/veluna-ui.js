@@ -1,4 +1,4 @@
-/* VELUNA Central UI Runtime v1.2.8 */
+/* VELUNA Central UI Runtime v1.2.10 */
 (() => {
   'use strict';
   const A = window.VELUNA_ASSETS || {};
@@ -35,23 +35,21 @@
   }
 
   function injectBottomBanner(){
-    if (q('.veluna-bottom-brand')) return;
-    const isDesktop = matchMedia('(min-width:769px)').matches;
-    const allowed = isDesktop ? (page === 'main' || page === 'veluna') : page === 'veluna';
-    if (!allowed) return;
+    const existing = q('.veluna-bottom-brand');
+    const mobileContext = matchMedia('(pointer:coarse)').matches && matchMedia('(max-width:1024px)').matches;
+    const allowed = page === 'veluna' && mobileContext;
+    if (!allowed) {
+      if (existing) existing.remove();
+      return;
+    }
+    if (existing) return;
     const img = new Image();
     img.className = 'veluna-bottom-brand';
     img.src = A.bottomBanner || '/assets/veluna/banner/veluna-bottom-banner.webp';
     img.alt = 'VELUNA LYVRA Minimal WebRadio 666';
     img.loading = 'eager';
     img.decoding = 'async';
-    const desktopOutside = isDesktop;
-    if (desktopOutside && host.parentElement) {
-      img.classList.add('veluna-desktop-outside');
-      host.insertAdjacentElement('afterend', img);
-    } else {
-      host.appendChild(img);
-    }
+    host.appendChild(img);
   }
 
   function replaceFallbackArtwork(){

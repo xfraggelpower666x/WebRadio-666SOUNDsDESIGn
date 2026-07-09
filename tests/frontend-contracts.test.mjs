@@ -70,6 +70,13 @@ test("VELUNA uses a fixed no-scroll iPhone viewport, bounded PC layout and centr
   assert.match(theme, /width:min\(1180px,calc\(100vw - 310px\)\)/);
   assert.match(theme, /position:fixed!important;inset:0!important/);
   assert.match(theme, /orientation:landscape/);
+  assert.match(theme, /--veluna-fixed-vw/);
+  assert.match(theme, /contain:strict!important/);
+  const viewportLock = await read("js/veluna-viewport-lock.js");
+  assert.match(viewportLock, /orientationchange/);
+  assert.match(viewportLock, /data-veluna-keyboard-open/);
+  assert.match(veluna, /maximum-scale=1/);
+  assert.match(veluna, /veluna-viewport-lock\.js/);
   assert.match(ui, /injectHeader/);
   assert.match(ui, /injectBottomBanner/);
   assert.match(ui, /injectSplash/);
@@ -93,7 +100,7 @@ test("all repaired root/public files are byte-identical", async () => {
     "index.html", "js/admin-auth-client.js", "js/player-alert-client.js",
     "js/messenger-overlay.js", "js/broadcast-message-history.js", "js/skip-control.js",
     "js/player-stage-v2.js", "js/addons/discord-player-addon-v3.js", "js/version-core.js",
-    "css/player-stage-v2.css", "config/radio-runtime.json", "config/release.json", "VELUNA/index.html", "veluna/index.html", "css/veluna-theme.css", "js/veluna-ui.js", "config/veluna-assets.js"
+    "css/player-stage-v2.css", "config/radio-runtime.json", "config/release.json", "VELUNA/index.html", "veluna/index.html", "css/veluna-theme.css", "js/veluna-ui.js", "js/veluna-viewport-lock.js", "config/veluna-assets.js"
   ]) {
     assert.equal(await read(path), await read(`public/${path}`), `mirror drift: ${path}`);
   }
@@ -160,7 +167,8 @@ test("VELUNA app icon pack, internal splash and requested banner placement are w
   assert.match(assets, /veluna-loading-splash\.webm/);
   assert.match(assets, /veluna-bottom-banner\.webp/);
   assert.doesNotMatch(ui, /veluna_splash_seen_v128/);
-  assert.match(ui, /const allowed = isDesktop \? \(page === 'main' \|\| page === 'veluna'\) : page === 'veluna'/);
+  assert.match(ui, /const allowed = page === 'veluna' && mobileContext/);
+  assert.doesNotMatch(ui, /veluna-desktop-outside/);
   assert.match(main, /assets\/veluna\/icons\/favicon-16x16\.png/);
   assert.match(main, /assets\/veluna\/icons\/favicon-32x32\.png/);
   assert.match(veluna, /assets\/veluna\/icons\/favicon-32x32\.png/);

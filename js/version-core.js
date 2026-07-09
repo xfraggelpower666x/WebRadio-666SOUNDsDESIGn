@@ -1,9 +1,9 @@
-/* 666SOUNDsDESIGn canonical version core — VELUNA centralized branding/responsive players patch v1.2.8. */
+/* 666SOUNDsDESIGn canonical version core — VELUNA iPhone fixed fullscreen geometry patch v1.2.10. */
 (function(){
   'use strict';
-  var VERSION='v2026.07.08-veluna8';
-  var BUILD='2026-07-08-veluna-v128';
-  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260708,release:'FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8'};
+  var VERSION='v2026.07.09-veluna10';
+  var BUILD='2026-07-09-veluna-v1210';
+  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260709,release:'FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10'};
   function setText(node){
     if(!node)return;
     if(node.id==='pcVersionBadge'){var status=node.querySelector('.status-code');if(status)status.textContent=VERSION;node.setAttribute('aria-label','Player Version '+VERSION);return;}

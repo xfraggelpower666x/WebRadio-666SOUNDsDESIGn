@@ -1,6 +1,6 @@
 {
   "name": "WebRadio-666SOUNDsDESIGn VELUNA CENTRAL BRANDING",
-  "version": "1.2.8",
+  "version": "1.2.10",
   "releaseDate": "2026-07-08",
   "releaseFolder": null,
   "type": "safe-root-complete-repository-release",
@@ -19,6 +19,7 @@
     "config/veluna-assets.js",
     "css/veluna-theme.css",
     "js/veluna-ui.js",
+    "js/veluna-viewport-lock.js",
     "external-workers/666-chaos-ai-track-system/",
     "external-workers/666-suno-system/",
     "Render/666SOUNDsDESIGn-Alert-Service-Renderer/",
@@ -66,7 +67,10 @@
     "internalAnimatedSplash": true,
     "fixedIphoneViewport": true,
     "boundedDesktopGeometry": true,
-    "laserNeonSharedTheme": true
+    "laserNeonSharedTheme": true,
+    "iphoneFixedFullscreenGeometry": true,
+    "iphoneOverlayGeometryLocked": true,
+    "iphoneKeyboardResizeBlocked": true
   },
   "safety": {
     "sourceSystemsPreserved": true,
@@ -79,5 +83,5 @@
   "branchRecovery": true,
   "atomicScriptableUpload": true,
   "assetsDirectory": "public",
-  "release": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8"
+  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10"
 }

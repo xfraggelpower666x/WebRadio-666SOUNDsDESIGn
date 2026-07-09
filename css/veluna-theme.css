@@ -1,5 +1,5 @@
 /*
- * VELUNA Central Player Theme v1.2.8
+ * VELUNA Central Player Theme v1.2.10
  * Eine zentrale Grafik-/Farblogik für Hauptplayer, VELUNA-Miniplayer und Internal-Player.
  * Bilder werden proportional eingepasst; Overlays verändern niemals die Playergeometrie.
  */
@@ -76,7 +76,7 @@ body[data-veluna-ui] :is(button,.control-btn,.small-btn,.ghost-btn,.tiny-btn,.so
 body[data-veluna-page="main"] :is(#pcHeaderBrandSplit,.hero-brand,.hero-title,.hero-subtitle){display:none!important}
 body[data-veluna-page="veluna"] .topbar,body[data-veluna-page="internal"] .topbar{display:none!important}
 
-/* Gemeinsames Banner: Desktop unter Player; mobil nur im VELUNA-Panel. */
+/* VELUNA-Banner: ausschließlich im mobilen/touchbasierten VELUNA-Panel. Desktop bleibt frei. */
 .veluna-bottom-brand{display:block;width:min(94%,980px);height:auto;max-height:clamp(72px,14vw,190px);object-fit:contain;object-position:center;margin:clamp(8px,1.2vw,16px) auto 0;border-radius:12px;filter:drop-shadow(0 0 8px rgba(155,77,255,.48));pointer-events:none}
 body[data-veluna-page="veluna"] .veluna-bottom-brand{width:100%;max-height:136px}
 
@@ -166,15 +166,13 @@ body[data-veluna-page="veluna"] .cover-image{z-index:0!important;opacity:.92!imp
   body[data-veluna-page="internal"] .app-shell{flex-direction:column!important;gap:10px!important}
   body[data-veluna-page="veluna"] .player-card,
   body[data-veluna-page="internal"] .player-card{width:clamp(430px,40vw,540px)!important;max-width:min(540px,calc(100vw - 48px))!important}
-  .veluna-bottom-brand.veluna-desktop-outside{width:min(88vw,520px)!important;max-height:none!important;margin:0 auto!important}
 }
 body[data-veluna-page="main"] :is(.mff-cyber-header,.pc-header-brand-split,.hero-brand,.hero-title,.hero-subtitle){display:none!important}
 
 /* Kurze PC-Fenster werden nicht zerquetscht: Breite bleibt kompakt, vertikal darf sauber gescrollt werden. */
 @media (min-width:769px){
   body[data-veluna-page="veluna"] .player-card,
-  body[data-veluna-page="internal"] .player-card,
-  .veluna-bottom-brand.veluna-desktop-outside{flex:0 0 auto!important}
+  body[data-veluna-page="internal"] .player-card{flex:0 0 auto!important}
 }
 @media (min-width:769px) and (max-height:760px){
   html,body[data-veluna-ui]{height:auto!important;min-height:100vh!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important}
@@ -193,7 +191,6 @@ body[data-veluna-page="veluna"] .marquee-track{z-index:4!important}
 @media (min-width:769px){
   body[data-veluna-page="veluna"] .player-card,
   body[data-veluna-page="internal"] .player-card{width:clamp(430px,39vw,520px)!important;max-width:min(520px,calc(100vw - 48px))!important}
-  .veluna-bottom-brand.veluna-desktop-outside{width:min(86vw,480px)!important}
 }
 @media (min-width:769px) and (max-height:760px){
   body[data-veluna-page="veluna"] .app-shell,
@@ -201,7 +198,7 @@ body[data-veluna-page="veluna"] .marquee-track{z-index:4!important}
   body[data-veluna-page="main"] .frame-stage{align-items:center!important;justify-content:flex-start!important}
 }
 
-/* Release-Fit v1.2.8: Cover klar sichtbar, Desktop ohne Rand-Clipping. */
+/* Release-Fit v1.2.10: Cover klar sichtbar; Desktop-Banner entfernt. */
 body[data-veluna-page="veluna"] .display-window::before{
   background:rgba(0,0,0,.14)!important;
 }
@@ -215,9 +212,6 @@ body[data-veluna-page="veluna"] .cover-image{
     width:clamp(430px,37vw,500px)!important;
     max-width:min(500px,calc(100vw - 48px))!important;
   }
-  .veluna-bottom-brand.veluna-desktop-outside{
-    width:min(84vw,460px)!important;
-  }
 }
 @media (min-width:769px) and (max-height:920px){
   body[data-veluna-page="veluna"] .app-shell,
@@ -228,4 +222,120 @@ body[data-veluna-page="veluna"] .cover-image{
     padding-top:8px!important;
     padding-bottom:8px!important;
   }
+}
+
+
+/* ========================================================================
+   VELUNA v1.2.10 — IPHONE FIXED FULLSCREEN GEOMETRY LOCK
+   Der Player ist die komplette Seite. Browserleisten, Overlays, Passwortfelder
+   und die Bildschirmtastatur dürfen die gespeicherte Playergeometrie nicht
+   verkleinern oder neu umbrechen. Nur ein echter Orientierungswechsel setzt
+   die feste Geometrie neu.
+   ======================================================================== */
+@media (max-width:768px){
+  html[data-veluna-fixed-viewport],
+  html[data-veluna-fixed-viewport] body{
+    position:fixed!important;
+    left:var(--veluna-fixed-left,0px)!important;
+    top:var(--veluna-fixed-top,0px)!important;
+    width:var(--veluna-fixed-vw,100vw)!important;
+    min-width:var(--veluna-fixed-vw,100vw)!important;
+    max-width:var(--veluna-fixed-vw,100vw)!important;
+    height:var(--veluna-fixed-vh,100vh)!important;
+    min-height:var(--veluna-fixed-vh,100vh)!important;
+    max-height:var(--veluna-fixed-vh,100vh)!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    overscroll-behavior:none!important;
+    -webkit-overflow-scrolling:auto!important;
+    -webkit-text-size-adjust:100%!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-ui]{
+    inset:auto!important;
+    contain:strict!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-ui] :is(.frame-stage,.app-shell){
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    min-width:100%!important;
+    max-width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    max-height:100%!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    align-items:stretch!important;
+    justify-content:stretch!important;
+    contain:strict!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-page="veluna"] .player-card,
+  html[data-veluna-fixed-viewport] body[data-veluna-page="internal"] .player-card{
+    position:absolute!important;
+    top:max(4px,env(safe-area-inset-top))!important;
+    right:max(4px,env(safe-area-inset-right))!important;
+    bottom:max(4px,env(safe-area-inset-bottom))!important;
+    left:max(4px,env(safe-area-inset-left))!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    overflow:hidden!important;
+    contain:layout paint size style!important;
+    transform:none!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-page="main"] .player-shell{
+    position:absolute!important;
+    top:max(4px,env(safe-area-inset-top))!important;
+    right:max(4px,env(safe-area-inset-right))!important;
+    bottom:max(4px,env(safe-area-inset-bottom))!important;
+    left:max(4px,env(safe-area-inset-left))!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    overflow:hidden!important;
+    contain:layout paint size style!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-ui] :is(.panel-overlay,.history-overlay){
+    position:absolute!important;
+    max-width:calc(100% - 12px)!important;
+    max-height:calc(100% - 12px)!important;
+    overflow:auto!important;
+    overscroll-behavior:contain!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-ui] :is(.overlay,.admin-overlay,[role="dialog"]){
+    position:fixed!important;
+    left:0!important;
+    top:0!important;
+    right:auto!important;
+    bottom:auto!important;
+    width:var(--veluna-fixed-vw,100vw)!important;
+    min-width:var(--veluna-fixed-vw,100vw)!important;
+    max-width:var(--veluna-fixed-vw,100vw)!important;
+    height:var(--veluna-fixed-vh,100vh)!important;
+    min-height:var(--veluna-fixed-vh,100vh)!important;
+    max-height:var(--veluna-fixed-vh,100vh)!important;
+    margin:0!important;
+    transform:none!important;
+    overflow:auto!important;
+    overscroll-behavior:contain!important;
+    contain:layout paint size style!important;
+  }
+  html[data-veluna-fixed-viewport][data-veluna-keyboard-open] body[data-veluna-ui],
+  html[data-veluna-fixed-viewport][data-veluna-keyboard-open] body[data-veluna-ui] :is(.frame-stage,.app-shell,.player-card,.player-shell){
+    width:var(--veluna-fixed-vw,100vw)!important;
+    height:var(--veluna-fixed-vh,100vh)!important;
+    max-width:var(--veluna-fixed-vw,100vw)!important;
+    max-height:var(--veluna-fixed-vh,100vh)!important;
+  }
+  html[data-veluna-fixed-viewport] body[data-veluna-ui] :is(input,textarea,select,button){font-size:max(16px,1em)!important}
 }

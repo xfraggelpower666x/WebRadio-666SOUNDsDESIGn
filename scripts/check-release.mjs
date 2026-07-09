@@ -30,7 +30,7 @@ const required = [
   "external-workers/666-system-auth-worker/worker.js",
   "VELUNA/index.html", "veluna/index.html", "public/VELUNA/index.html", "public/veluna/index.html",
   "AMARIS/index.html", "amaris/index.html", "public/AMARIS/index.html", "public/amaris/index.html",
-  "config/veluna-assets.js", "css/veluna-theme.css", "js/veluna-ui.js", "veluna.webmanifest",
+  "config/veluna-assets.js", "css/veluna-theme.css", "js/veluna-ui.js", "js/veluna-viewport-lock.js", "veluna.webmanifest",
   "assets/veluna/icons/favicon-16x16.png", "assets/veluna/icons/favicon-32x32.png",
   "assets/veluna/background/veluna-player-background.webp",
   "assets/veluna/header/veluna-player-header.webp",

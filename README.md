@@ -108,3 +108,19 @@ AMARIS wurde als eigenständiger Mini-Player-Endpunkt weiter ausgebaut. iPhone n
 - Zentrale VELUNA-Assets, responsiver Header/Hintergrund, Fallback-Cover, App-Icon-Pack und interner animierter Splash.
 - Festes iPhone-Viewportlayout, begrenztes PC-Layout und gemeinsames Neon-Laserfarbsystem.
 - Hauptplayer, Internal-Player, Auth, Skip, Discord, Audio, Booster und EQ bleiben erhalten.
+
+
+## VELUNA v1.2.9
+
+`FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10`
+
+Gezielter Desktop-Layout-Patch: Das zusätzliche VELUNA-Banner unterhalb der PC-Player wurde entfernt. Mobil bleibt das Banner ausschließlich im VELUNA-Panel erhalten.
+
+
+## VELUNA v1.2.10
+
+- iPhone-Player als unveränderlicher Ganzseiten-Player.
+- Feste Viewport-Geometrie über `js/veluna-viewport-lock.js`.
+- Overlays, Passwortdialoge und Bildschirmtastatur ohne Player-Reflow.
+- Geometrie-Refresh nur bei echtem Orientierungswechsel.
+- Desktop-Bottom-Banner bleibt entfernt.

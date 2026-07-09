@@ -6,7 +6,7 @@
   'use strict';
   if (window.S666PlayerAlertClient) return;
 
-  var VERSION = (window.SMFP_VERSION && window.SMFP_VERSION.label) || 'v2026.07.08-veluna8';
+  var VERSION = (window.SMFP_VERSION && window.SMFP_VERSION.label) || 'v2026.07.09-veluna9';
   var MAX_CHARS = 240;
   var REQUEST_TIMEOUT_MS = 15000;
   var POLL_VISIBLE_MS = 10000;
