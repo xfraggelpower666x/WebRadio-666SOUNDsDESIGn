@@ -1,4 +1,4 @@
-/* VELUNA iPhone fixed fullscreen geometry lock v1.2.10 */
+/* VELUNA iPhone fixed fullscreen geometry lock v1.2.11 */
 (() => {
   'use strict';
   const root = document.documentElement;

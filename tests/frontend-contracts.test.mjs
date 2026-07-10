@@ -168,9 +168,34 @@ test("VELUNA app icon pack, internal splash and requested banner placement are w
   assert.match(assets, /veluna-bottom-banner\.webp/);
   assert.doesNotMatch(ui, /veluna_splash_seen_v128/);
   assert.match(ui, /const allowed = page === 'veluna' && mobileContext/);
+  assert.match(ui, /data-veluna-central-splash/);
+  assert.match(ui, /body\.appendChild\(splash\)/);
+  assert.match(ui, /VELUNA_CENTRAL_SPLASH_READY/);
   assert.doesNotMatch(ui, /veluna-desktop-outside/);
   assert.match(main, /assets\/veluna\/icons\/favicon-16x16\.png/);
   assert.match(main, /assets\/veluna\/icons\/favicon-32x32\.png/);
   assert.match(veluna, /assets\/veluna\/icons\/favicon-32x32\.png/);
   assert.equal(siteManifest.orientation, "any");
+});
+
+
+test("VELUNA EQ shapes first, Booster amplifies second, and limiter protects the combined output", async () => {
+  const veluna = await read("VELUNA/index.html");
+  assert.match(veluna, /let node=source;eqNodes\.forEach\(filter=>\{node\.connect\(filter\);node=filter\}\);node\.connect\(gainNode\)/);
+  assert.match(veluna, /gainNode\.connect\(limiterNode\);limiterNode\.connect\(analyser\)/);
+  assert.match(veluna, /createDynamicsCompressor/);
+  assert.match(veluna, /audio\.dataset\.audioChain='eq-boost-limiter-active'/);
+  assert.match(veluna, /EQ bleibt aktiv · Boost/);
+  assert.doesNotMatch(veluna, /source\.connect\(gainNode\);let node=gainNode/);
+});
+
+
+test("VELUNA iPhone footer uses the available lower panel space without changing fullscreen geometry", async () => {
+  const theme = await read("css/veluna-theme.css");
+  assert.match(theme, /SMART IPHONE FOOTER FIT/);
+  assert.match(theme, /clamp\(88px,16dvh,136px\)/);
+  assert.match(theme, /\.veluna-bottom-brand[\s\S]*height:100%!important/);
+  assert.match(theme, /max-width:96%!important/);
+  assert.match(theme, /object-fit:contain!important/);
+  assert.match(theme, /data-veluna-fixed-viewport/);
 });

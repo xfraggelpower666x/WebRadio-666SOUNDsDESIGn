@@ -1,3 +1,13 @@
+# VELUNA v1.2.12 — Global Splash + Smart iPhone Footer
+
+Aktueller Release: `FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12`
+
+- zentraler animierter Startbildschirm für Haupt-, VELUNA- und Internal-Player
+- größeres, proportionales VELUNA-Footerbanner auf dem iPhone
+- feste Ganzseiten-Geometrie, EQ → Boost → Limiter und bestehende Funktionen bleiben erhalten
+
+---
+
 # 666SOUNDsDESIGn WebRadio – FULLVERSION BRANCH RECOVERY v1.0.2
 
 **Release:** 25. Juni 2026  
@@ -124,3 +134,13 @@ Gezielter Desktop-Layout-Patch: Das zusätzliche VELUNA-Banner unterhalb der PC-
 - Overlays, Passwortdialoge und Bildschirmtastatur ohne Player-Reflow.
 - Geometrie-Refresh nur bei echtem Orientierungswechsel.
 - Desktop-Bottom-Banner bleibt entfernt.
+
+## VELUNA v1.2.11
+
+`FULLVERSION_VELUNA_EQ_THEN_BOOST_LIMITER_AUDIO_CHAIN_v1.2.11`
+
+- Der 5-Band-EQ formt das Audiosignal zuerst.
+- Der Booster verstärkt danach das bereits equalizte Signal unabhängig in Stufe 0–5.
+- Ein nachgeschalteter Limiter schützt die kombinierte EQ-/Boost-Ausgabe vor hartem Clipping.
+- EQ- und Boost-Zustände bleiben getrennt gespeichert und getrennt bedienbar.
+- iPhone-Fullscreen-Geometrie, Overlays, Worker, Skip, Discord, Metadaten und Player-Routing bleiben unverändert erhalten.

@@ -152,10 +152,10 @@ const HTML = `<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>666SOUNDsDESIGn Radio — Internal</title>
-  <link rel="icon" type="image/png" href="/assets/veluna/icons/icon-32x32.png?v=veluna-v1210" />
-  <link rel="apple-touch-icon" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v1210" />
+  <link rel="icon" type="image/png" href="/assets/veluna/icons/icon-32x32.png?v=veluna-v1212" />
+  <link rel="apple-touch-icon" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v1212" />
   <link rel="stylesheet" href="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245" />
-  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-09-veluna-v1210" />
+  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-09-veluna-v1212" />
 </head>
 <body>
   <div id="bootOverlay" class="overlay">
@@ -234,8 +234,8 @@ const HTML = `<!DOCTYPE html>
   </main>
 
   <script type="module" src="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"></script>
-  <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1210"></script>
-  <script defer src="/js/veluna-ui.js?v=2026-07-09-veluna-v1210"></script>
+  <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
+  <script defer src="/js/veluna-ui.js?v=2026-07-09-veluna-v1212"></script>
 </body>
 </html>`;
 
@@ -628,7 +628,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -857,7 +857,7 @@ async function serveVelunaPlayer(request, env){
   headers.set("expires","0");
   headers.set("content-location","/veluna/");
   headers.set("x-player-mode","veluna-lyvra-minimal");
-  headers.set("x-player-version","v1.2.10");
+  headers.set("x-player-version","v1.2.12");
   headers.set("x-veluna-route-lock","standalone-only");
   return new Response(request.method === "HEAD" ? null : response.body,{status:response.status,statusText:response.statusText,headers});
 }
@@ -1007,7 +1007,7 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10",
+    version: "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
     routes: { root: "/", veluna: "/veluna", legacyAmarisRedirect: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }

@@ -1,29 +1,15 @@
-# RELEASE VERIFICATION VELUNA v1.2.10
+# RELEASE VERIFICATION — VELUNA v1.2.12
 
-**Release:** `FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10`  
-**Build:** `2026-07-09-veluna-v1210`
+- Release check: **PASS**
+- Node tests: **45 / 45 PASS**
+- JavaScript/MJS syntax: **117 PASS**
+- Root/Public mirror pairs: **62 PASS**
+- Required files: **51 PASS**
+- Nested ZIP files: **0**
+- Central splash: **Main + VELUNA + Internal**
+- iPhone footer row: **clamp(88px, 16dvh, 136px)**
+- Fixed iPhone fullscreen geometry: **preserved**
+- Desktop bottom banner: **removed / remains absent**
+- Audio chain: **EQ → Boost → Limiter preserved**
 
-## Lokale Verifikation
-
-- `npm run verify`: **PASS**
-- Node-Tests: **43 / 43 PASS**
-- JavaScript-/MJS-Syntax: **117 PASS**
-- Root-/Public-Spiegel: **62 PASS**
-- Pflichtdateien: **51 PASS**
-- Nested ZIP-Dateien: **0**
-
-## Reparatur bestätigt
-
-- iPhone-Player ist eine feste Ganzseiten-Geometrie.
-- Breite und Höhe werden beim Start gespeichert.
-- Overlays, Auth-Dialoge und Bildschirmtastatur verändern die Playergröße nicht.
-- Nur ein echter Orientierungswechsel berechnet die Geometrie neu.
-- Desktop-Bottom-Banner bleibt entfernt.
-- Audio, Worker, Skip, Discord, Booster, EQ, Levelmeter und Metadaten bleiben erhalten.
-
-## Noch live zu prüfen
-
-- echtes iPhone Safari / Home-Screen-PWA
-- native Passwortmanager- und Tastaturdarstellung
-- Hoch-/Querformatwechsel
-- Cloudflare-Routing und Cache
+A live visual test on the deployed iPhone route is still required because Safari chrome and safe-area behavior cannot be fully proven by static package tests.

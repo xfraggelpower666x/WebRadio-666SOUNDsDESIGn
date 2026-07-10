@@ -1,20 +1,21 @@
 {
   "ok": true,
-  "version": "1.2.10",
-  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10",
-  "build": "2026-07-09-veluna-v1210",
-  "verify": "npm run verify PASS",
-  "nodeTests": "43 / 43 PASS",
+  "release": "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12",
+  "version": "1.2.12",
+  "npm_verify": "PASS",
+  "tests": "45/45 PASS",
   "javascriptSyntaxChecked": 117,
   "publicMirrorPairs": 62,
-  "nestedZipFiles": 0,
-  "desktopBottomBannerRemoved": true,
-  "mobileVelunaBannerPreserved": true,
-  "liveCloudflareTestRequired": true,
-  "notes": "Local package verification only. The iPhone player is locked to its captured full-display geometry; overlays, auth dialogs and keyboard activity do not resize or reflow the player. Desktop bottom-banner removal remains preserved. Final live iPhone/Safari confirmation requires deployment.",
   "requiredFiles": 51,
+  "nestedZipFiles": 0,
+  "centralSplashPlayers": [
+    "main",
+    "veluna",
+    "internal"
+  ],
+  "iphoneFooterGrid": "clamp(88px,16dvh,136px)",
   "iphoneFixedFullscreenGeometry": true,
-  "overlayNoReflow": true,
-  "keyboardNoResize": true,
-  "orientationOnlyRecapture": true
+  "desktopBottomBannerRemoved": true,
+  "audioChain": "EQ -> Boost -> Limiter",
+  "liveDeviceTest": "required after deployment"
 }

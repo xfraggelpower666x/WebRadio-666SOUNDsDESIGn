@@ -1,6 +1,6 @@
 {
   "name": "WebRadio-666SOUNDsDESIGn VELUNA CENTRAL BRANDING",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "releaseDate": "2026-07-08",
   "releaseFolder": null,
   "type": "safe-root-complete-repository-release",
@@ -83,5 +83,5 @@
   "branchRecovery": true,
   "atomicScriptableUpload": true,
   "assetsDirectory": "public",
-  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10"
+  "release": "FULLVERSION_VELUNA_EQ_THEN_BOOST_LIMITER_AUDIO_CHAIN_v1.2.11"
 }

@@ -1,6 +1,6 @@
 {
   "system": "WebRadio-666SOUNDsDESIGn",
-  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10",
+  "release": "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "repairBranch": "repair-v1",
@@ -14,7 +14,7 @@
   "hardAuditPolicy": true,
   "deploymentState": "LOCAL_BUILD_VALIDATED_NOT_DEPLOYED",
   "date": "2026-07-09",
-  "createdAt": "2026-07-09T15:20:00Z",
+  "createdAt": "2026-07-09T21:30:00Z",
   "velunaEndpoint": "/veluna",
   "velunaAliases": [
     "/veluna",

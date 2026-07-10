@@ -1,17 +1,18 @@
-/* VELUNA Central UI Runtime v1.2.10 */
+/* VELUNA Central UI Runtime v1.2.12 */
 (() => {
   'use strict';
   const A = window.VELUNA_ASSETS || {};
   const path = location.pathname.toLowerCase();
-  const page = path.startsWith('/veluna') ? 'veluna' : path.startsWith('/internal') ? 'internal' : 'main';
   const body = document.body;
+  const declaredPage = body?.dataset?.velunaPage;
+  const page = declaredPage || (path.startsWith('/veluna') ? 'veluna' : path.startsWith('/internal') ? 'internal' : 'main');
   if (!body) return;
   body.dataset.velunaUi = '1';
   body.dataset.velunaPage = page;
   body.style.setProperty('--veluna-background-image', `url("${A.background || '/assets/veluna/background/veluna-player-background.webp'}")`);
 
   const q = (sel, root = document) => root.querySelector(sel);
-  const host = page === 'main' ? q('.player-shell') : q('.player-card');
+  const host = (page === 'main' ? q('.player-shell') : q('.player-card')) || q('[data-player-root]') || q('.player-card') || q('.player-shell') || q('main');
   if (!host) return;
   host.classList.add('veluna-splash-host');
 
@@ -61,24 +62,33 @@
   }
 
   function injectSplash(){
+    if (q('[data-veluna-central-splash="1"]')) return;
     const splash = document.createElement('div');
-    splash.className = 'veluna-splash';
+    splash.className = 'veluna-splash veluna-splash-global';
+    splash.dataset.velunaCentralSplash = '1';
+    splash.dataset.player = page;
     splash.setAttribute('aria-hidden','true');
     const video = document.createElement('video');
     video.autoplay = true; video.muted = true; video.playsInline = true; video.preload = 'auto';
     video.setAttribute('webkit-playsinline','');
+    video.setAttribute('disablepictureinpicture','');
     const webm = document.createElement('source'); webm.src = A.splashWebm || '/assets/veluna/splash/veluna-loading-splash.webm'; webm.type='video/webm';
     const mp4 = document.createElement('source'); mp4.src = A.splashMp4 || '/assets/veluna/splash/veluna-loading-splash.mp4'; mp4.type='video/mp4';
-    video.append(webm,mp4); splash.appendChild(video); host.appendChild(splash);
+    video.append(webm,mp4); splash.appendChild(video); body.appendChild(splash);
+    body.dataset.velunaSplash = 'active';
+    window.VELUNA_CENTRAL_SPLASH_READY = true;
+    let finished = false;
     const finish = () => {
-      if (!splash.isConnected) return;
+      if (finished || !splash.isConnected) return;
+      finished = true;
       splash.classList.add('is-leaving');
+      body.dataset.velunaSplash = 'complete';
       setTimeout(() => splash.remove(), 480);
     };
     video.addEventListener('ended',finish,{once:true});
     video.addEventListener('error',finish,{once:true});
-    setTimeout(finish,5400);
-    video.play().catch(() => setTimeout(finish,1200));
+    setTimeout(finish,7200);
+    video.play().catch(() => setTimeout(finish,1600));
   }
 
   function mediaSessionFallback(){

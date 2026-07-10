@@ -1,8 +1,8 @@
 {
   "system": "WebRadio-666SOUNDsDESIGn",
-  "version": "1.2.10",
-  "releaseType": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_VALIDATED",
-  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_DEPLOY_ROOT_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1_2_10",
+  "version": "1.2.12",
+  "releaseType": "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_VALIDATED",
+  "expectedTopLevelFolder": "WebRadio-666SOUNDsDESIGn_DEPLOY_ROOT_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1_2_12",
   "singleTopLevelFolder": false,
   "nestedZipFiles": 0,
   "atomicBranchCommit": true,
@@ -10,7 +10,7 @@
   "legacyBuildRootCompatibility": true,
   "sourcePreservation": "root source retained; public and legacy Worker mirrors synchronized",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.8",
-  "createdAt": "2026-07-09T15:20:00Z",
+  "createdAt": "2026-07-09T21:30:00Z",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "hardAuditPolicy": true,
   "strictAdminAuthorization": true,
@@ -32,7 +32,7 @@
   "fixedIphoneViewport": true,
   "iphoneOverlayGeometryLocked": true,
   "boundedDesktopGeometry": true,
-  "responsiveBottomBanner": false,
+  "responsiveBottomBanner": true,
   "laserNeonSharedTheme": true,
   "backgroundAudioGlowLayer": true,
   "canonicalWebradioRoutes": true,
@@ -42,5 +42,11 @@
   "desktopBottomBannerRemoved": true,
   "iphoneFixedFullscreenGeometry": true,
   "keyboardViewportResizeBlocked": true,
-  "orientationOnlyGeometryRecapture": true
+  "orientationOnlyGeometryRecapture": true,
+  "eqBeforeBoost": true,
+  "independentEqBoostState": true,
+  "postBoostLimiter": true,
+  "audioClipProtection": true,
+  "globalAnimatedSplashAllPlayers": true,
+  "smartIphoneFooterFit": true
 }

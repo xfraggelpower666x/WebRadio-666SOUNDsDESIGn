@@ -1,8 +1,8 @@
 {
-  "version": "1.2.10",
-  "release": "FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10",
-  "frontendVersion": "v2026.07.09-veluna10",
-  "build": "2026-07-09-veluna-v1210",
+  "version": "1.2.12",
+  "release": "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12",
+  "frontendVersion": "v2026.07.09-veluna12",
+  "build": "2026-07-09-veluna-v1212",
   "date": "2026-07-09",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
@@ -35,7 +35,14 @@
     "VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY",
     "VELUNA_OVERLAY_NO_REFLOW",
     "VELUNA_KEYBOARD_NO_RESIZE",
-    "VELUNA_ORIENTATION_ONLY_GEOMETRY_RECAPTURE"
+    "VELUNA_ORIENTATION_ONLY_GEOMETRY_RECAPTURE",
+    "VELUNA_EQ_BEFORE_BOOST_CHAIN",
+    "VELUNA_EQ_BOOST_STATE_SEPARATION",
+    "VELUNA_POST_BOOST_LIMITER",
+    "VELUNA_AUDIO_CHAIN_CLIP_PROTECTION",
+    "VELUNA_GLOBAL_SPLASH_ALL_PLAYERS",
+    "VELUNA_SMART_IPHONE_FOOTER_FIT",
+    "VELUNA_PROPORTIONAL_MOBILE_BOTTOM_BANNER"
   ],
-  "notes": "Targeted iPhone fullscreen geometry lock: the player remains a fixed full-display panel, overlay and keyboard activity no longer resize/reflow the player, orientation changes are the only mobile geometry recapture. Desktop bottom-banner removal from v1.2.9 remains preserved."
+  "notes": "Central splash runtime now covers root/main, VELUNA and internal emergency players from one shared asset registry. The iPhone-only VELUNA footer banner uses a larger proportional grid row and available vertical space without changing the locked fullscreen geometry. EQ-before-Boost, limiter, routing, overlays, Skip, Discord and metadata remain preserved."
 }

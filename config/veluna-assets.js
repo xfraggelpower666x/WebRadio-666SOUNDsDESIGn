@@ -1,7 +1,7 @@
 /* Zentrale VELUNA-Asset- und Branding-Quelle. Keine Playerdatei pflegt eigene Bildpfade. */
 window.VELUNA_ASSETS = Object.freeze({
-  release: 'FULLVERSION_VELUNA_IPHONE_FIXED_FULLSCREEN_GEOMETRY_v1.2.10',
-  version: '1.2.10',
+  release: 'FULLVERSION_VELUNA_EQ_THEN_BOOST_LIMITER_AUDIO_CHAIN_v1.2.11',
+  version: '1.2.11',
   endpoint: '/veluna',
   legacyEndpoints: ['/amaris', '/AMARIS'],
   background: '/assets/veluna/background/veluna-player-background.webp',
