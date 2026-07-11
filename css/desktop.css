@@ -3858,3 +3858,146 @@ PURPOSE:
     min-width: 0 !important;
   }
 }
+
+/* ============================================================
+   VELUNA v1.2.15 — PC FIXED COCKPIT CANVAS
+   The complete desktop cockpit keeps one fixed internal geometry.
+   Window resizing scales the whole cockpit as a unit instead of
+   reflowing, overlapping or stretching individual modules.
+   Order: left meter | left tower | player | right tower | right meter.
+   Mobile is intentionally untouched.
+   ============================================================ */
+@media (min-width: 761px) {
+  :root {
+    --pc-canvas-w: 1720;
+    --pc-canvas-h: 980;
+    --pc-canvas-scale: 1;
+  }
+
+  html.pc-fixed-canvas,
+  html.pc-fixed-canvas body {
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  html.pc-fixed-canvas body {
+    min-height: calc(980px * var(--pc-canvas-scale)) !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: 64px 230px 1040px 230px 64px !important;
+    column-gap: 23px !important;
+    align-items: center !important;
+    justify-items: stretch !important;
+    width: 1720px !important;
+    min-width: 1720px !important;
+    max-width: 1720px !important;
+    height: 980px !important;
+    min-height: 980px !important;
+    max-height: 980px !important;
+    margin: 12px auto 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    transform: scale(var(--pc-canvas-scale)) !important;
+    transform-origin: top center !important;
+    overflow: visible !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .frame-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .side-meter,
+  html.pc-fixed-canvas body > .frame-stage > .pc-side-addon,
+  html.pc-fixed-canvas body > .frame-stage > .player-shell {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .side-meter.left  { grid-column: 1 !important; }
+  html.pc-fixed-canvas body > .frame-stage > .pc-side-addon-left  { grid-column: 2 !important; }
+  html.pc-fixed-canvas body > .frame-stage > .player-shell { grid-column: 3 !important; }
+  html.pc-fixed-canvas body > .frame-stage > .pc-side-addon-right { grid-column: 4 !important; }
+  html.pc-fixed-canvas body > .frame-stage > .side-meter.right { grid-column: 5 !important; }
+
+  html.pc-fixed-canvas body > .frame-stage > .side-meter {
+    display: flex !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    height: 900px !important;
+    min-height: 900px !important;
+    max-height: 900px !important;
+    align-self: center !important;
+    justify-self: center !important;
+    z-index: 8 !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .side-meter .side-meter-stack {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .pc-side-addon {
+    display: block !important;
+    width: 230px !important;
+    min-width: 230px !important;
+    max-width: 230px !important;
+    height: 900px !important;
+    min-height: 900px !important;
+    max-height: 900px !important;
+    align-self: center !important;
+    z-index: 7 !important;
+    overflow: hidden !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .pc-side-addon .pc-addon-tower {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    box-sizing: border-box !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .player-shell {
+    display: flex !important;
+    width: 1040px !important;
+    min-width: 1040px !important;
+    max-width: 1040px !important;
+    height: 940px !important;
+    min-height: 940px !important;
+    max-height: 940px !important;
+    align-self: center !important;
+    overflow: hidden !important;
+    z-index: 6 !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage > .player-shell > * {
+    flex-shrink: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  html.pc-fixed-canvas body > .frame-stage .pc-bottom-sync-meter,
+  html.pc-fixed-canvas body > .frame-stage .pc-copyright-footer {
+    width: calc(100% - 44px) !important;
+    max-width: calc(100% - 44px) !important;
+    margin-left: 22px !important;
+    margin-right: 22px !important;
+    box-sizing: border-box !important;
+  }
+}

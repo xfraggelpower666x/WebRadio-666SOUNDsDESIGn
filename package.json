@@ -1,6 +1,6 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.12",
+  "version": "1.2.14",
   "private": true,
   "type": "module",
   "description": "666SOUNDsDESIGn WebRadio full source with central animated splash across all players, fixed iPhone geometry, smart proportional iPhone footer banner, and preserved EQ-then-Boost limiter audio chain.",

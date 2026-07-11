@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
-  <script src="/js/veluna-viewport-lock.js?v=2026-07-09-veluna-v1212"></script>
+  <script src="/js/veluna-viewport-lock.js?v=2026-07-11-veluna-v1214"></script>
   <meta name="theme-color" content="#12061f">
   <meta name="robots" content="noindex,nofollow">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -57,7 +57,7 @@
     @media (max-height:700px) and (max-width:768px){.player-card{grid-template-rows:auto auto auto minmax(74px,1fr) auto auto auto auto auto;gap:4px;padding:6px;border-radius:11px}.brand{font-size:clamp(.98rem,4.4vw,1.28rem)}.brand small{margin-top:1px}.lamp-box{min-height:32px;padding:4px}.pill{padding:4px 5px}.display-block{grid-template-rows:auto auto minmax(38px,1fr);gap:2px}.display-window{min-height:38px}.mini-box{min-height:39px;padding:4px 6px}.source-led-btn,.control-btn,.small-btn{min-height:31px;padding:3px}.levelmeter{height:21px;padding:3px 8px}.footer{font-size:clamp(.64rem,2.2vw,.84rem)}.tiny-btn{padding:3px 6px}.eq-band input{height:58px}.panel-overlay{bottom:38px;padding:8px}.boost-row{margin-top:6px}.eq-grid{margin-top:6px}.action-status{display:none}}
     @media (prefers-reduced-motion:reduce){.marquee-track.is-running{animation-duration:36s}.meter-bar{transition:none}}
   </style>
-  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-09-veluna-v1212">
+  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-11-veluna-v1214">
 </head>
 <body data-veluna-ui="1" data-veluna-page="veluna">
   <div id="bootOverlay" class="overlay hidden" hidden aria-hidden="true">
@@ -170,7 +170,33 @@
     document.querySelectorAll('[data-veluna-eq]').forEach(input=>input.addEventListener('input',()=>soundEngine.setEq(input.dataset.velunaEq,input.value),{passive:true}));
 
     async function preparePlayback(){const item=currentCandidate();userStopped=false;updateSourceUi();setStatus('Connecting');setLamp(audioLamp,'lamp-cyan');resetAudio();audio.src=item.url;audio.muted=muted;audio.load();await soundEngine.start();return {item,promise:audio.play()}}
-    async function playCurrent(reason='Play',fromBoot=false){if(switching)return false;switching=true;try{const started=await preparePlayback();setStatus(reason+' · '+started.item.label);await started.promise;await soundEngine.resume();hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-green');updateMediaSession(lastTitle||'VELUNA LYVRA WebRadio',djText.textContent||AUTO_DJ_NAME,lastCoverUrl||baseCoverUrl||STREAM_COVER);startMetadata();if(fromBoot){overlay.classList.add('hidden');bootState.textContent='Audio läuft'}return true}catch(_){setStatus('Audio Error');setLamp(audioLamp,'lamp-red');if(fromBoot){bootState.textContent='Start fehlgeschlagen. Erneut tippen für die nächste Worker-/Fallback-Stufe.';bootButton.textContent='ERNEUT VERSUCHEN';bootButton.disabled=false;candidateIndex=Math.min(candidateIndex+1,chains[selected].length-1);updateSourceUi()}return false}finally{switching=false}}
+    async function playCurrent(reason='Play',fromBoot=false){
+      if(switching)return false;
+      switching=true; userStopped=false;
+      const startIndex=candidateIndex;
+      try{
+        for(let attempt=0;attempt<chains[selected].length;attempt++){
+          candidateIndex=(startIndex+attempt)%chains[selected].length;
+          updateSourceUi();
+          try{
+            const started=await preparePlayback();
+            setStatus(reason+' · '+started.item.label);
+            await started.promise;
+            await soundEngine.resume();
+            hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-green');
+            updateMediaSession(lastTitle||'VELUNA LYVRA WebRadio',djText.textContent||AUTO_DJ_NAME,lastCoverUrl||baseCoverUrl||STREAM_COVER);
+            startMetadata();overlay.classList.add('hidden');
+            if(fromBoot)bootState.textContent='Audio läuft';
+            return true;
+          }catch(err){
+            resetAudio();setStatus('Fallback '+(attempt+1));setLamp(audioLamp,'lamp-amber');
+          }
+        }
+        setStatus('All Sources Failed');setLamp(audioLamp,'lamp-red');
+        if(fromBoot){bootState.textContent='Keine Streamquelle erreichbar.';bootButton.disabled=false;}
+        return false;
+      }finally{switching=false}
+    }
     async function advanceFallback(reason){if(userStopped||switching)return false;if(candidateIndex+1>=chains[selected].length){setStatus('All Sources Failed');setLamp(audioLamp,'lamp-red');return false}candidateIndex+=1;updateSourceUi();return playCurrent(reason,false)}
     async function selectSource(next){if(switching)return;selected=next;candidateIndex=0;updateSourceUi();await playCurrent(next==='main'?'Switch Main':'Switch Back',false)}
     async function ensureAdmin(message='Admin-Passwort eingeben:'){if(!window.S666AdminAuth||typeof window.S666AdminAuth.ensure!=='function')throw new Error('admin_auth_client_missing');return window.S666AdminAuth.ensure({message})}
@@ -187,21 +213,17 @@
     window.addEventListener('s666:skip-state',ev=>{const d=ev.detail||{};if(d.phase==='sending')setAction('SKIP: sendet …','is-busy',skipBtn);else if(d.phase==='success')setAction('SKIP: gesendet','is-ok',skipBtn);else if(d.phase==='error')setAction('SKIP FEHLER: '+describeError(d.error),'is-error',skipBtn)});
     document.addEventListener('s666:admin-auth-state',ev=>{const d=ev.detail||{};if(d.state==='authenticated')setAction('AUTH: aktiv','is-ok');else if(d.state==='rejected'||d.state==='unreachable')setAction('AUTH FEHLER: '+describeError(d.message||d.error),'is-error')});
     bootButton.addEventListener('click',()=>{if(switching)return;bootButton.disabled=true;bootState.textContent='Worker-Switch wird gestartet …';void playCurrent('Start',true).then(ok=>{if(!ok)bootButton.disabled=false})});
-    playBtn.addEventListener('click',()=>void playCurrent('Play',false));pauseBtn.addEventListener('click',()=>{audio.pause();stopMetadata();soundEngine.stop();setStatus('Paused');setLamp(audioLamp,'lamp-amber')});stopBtn.addEventListener('click',()=>{userStopped=true;switching=false;stopMetadata();soundEngine.stop();resetAudio();setStatus('Stopped');setLamp(audioLamp,'lamp-red')});reconnectBtn.addEventListener('click',()=>{userStopped=false;void playCurrent('Reconnect',false)});muteBtn.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteBtn.textContent=muted?'UNMUTE':'MUTE'});primaryBtn.addEventListener('click',()=>void selectSource('main'));backupBtn.addEventListener('click',()=>void selectSource('back'));historyToggle.addEventListener('click',()=>{historyOpen=!historyOpen;historyOverlay.classList.toggle('hidden',!historyOpen)});skipBtn.addEventListener('click',()=>void doSkip());discordBtn.addEventListener('click',()=>void doDiscord());soundBtn.addEventListener('click',()=>openPanel(soundPanel));metaBtn.addEventListener('click',()=>{renderMetaDetail();openPanel(metaPanel)});soundClose.addEventListener('click',closePanels);metaClose.addEventListener('click',closePanels);soundReset.addEventListener('click',()=>{soundEngine.reset();soundStatus.textContent='Sound neutral zurückgesetzt'});soundApply.addEventListener('click',()=>{void soundEngine.start().then(()=>{soundStatus.textContent='EQ separat aktiv · danach Boost · Gain '+(audio.dataset.boostGain||'1')+' · Limiter';})});
+    playBtn.addEventListener('click',async()=>{userStopped=false;await soundEngine.resume();void playCurrent('Play',false)});pauseBtn.addEventListener('click',()=>{audio.pause();stopMetadata();soundEngine.stop();setStatus('Paused');setLamp(audioLamp,'lamp-amber')});stopBtn.addEventListener('click',()=>{userStopped=true;switching=false;stopMetadata();soundEngine.stop();resetAudio();setStatus('Stopped');setLamp(audioLamp,'lamp-red')});reconnectBtn.addEventListener('click',()=>{userStopped=false;void playCurrent('Reconnect',false)});muteBtn.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteBtn.textContent=muted?'UNMUTE':'MUTE'});primaryBtn.addEventListener('click',()=>void selectSource('main'));backupBtn.addEventListener('click',()=>void selectSource('back'));historyToggle.addEventListener('click',()=>{historyOpen=!historyOpen;historyOverlay.classList.toggle('hidden',!historyOpen)});skipBtn.addEventListener('click',()=>void doSkip());discordBtn.addEventListener('click',()=>void doDiscord());soundBtn.addEventListener('click',()=>openPanel(soundPanel));metaBtn.addEventListener('click',()=>{renderMetaDetail();openPanel(metaPanel)});soundClose.addEventListener('click',closePanels);metaClose.addEventListener('click',closePanels);soundReset.addEventListener('click',()=>{soundEngine.reset();soundStatus.textContent='Sound neutral zurückgesetzt'});soundApply.addEventListener('click',()=>{void soundEngine.start().then(()=>{soundStatus.textContent='EQ separat aktiv · danach Boost · Gain '+(audio.dataset.boostGain||'1')+' · Limiter';})});
     audio.addEventListener('playing',()=>{if(userStopped)return;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-green');if(!overlay.classList.contains('hidden'))overlay.classList.add('hidden')});audio.addEventListener('waiting',()=>{if(userStopped)return;setStatus('Buffering');setLamp(audioLamp,'lamp-cyan')});audio.addEventListener('stalled',()=>{if(userStopped)return;clearStall();stallTimer=setTimeout(()=>void advanceFallback('Stalled Fallback'),4000)});audio.addEventListener('error',()=>{if(userStopped||switching||!hasPlayed)return;void advanceFallback('Audio Error Fallback')});audio.addEventListener('ended',()=>{if(userStopped)return;void advanceFallback('Stream Ended Fallback')});
     document.addEventListener('visibilitychange',()=>{if(document.hidden){lastHiddenAt=Date.now()}else void recoverAfterReturn('visibilitychange')});window.addEventListener('pagehide',()=>{lastHiddenAt=Date.now()},{passive:true});window.addEventListener('pageshow',()=>void recoverAfterReturn('pageshow'),{passive:true});window.addEventListener('focus',()=>void recoverAfterReturn('focus'),{passive:true});window.addEventListener('resize',()=>requestAnimationFrame(()=>{syncTickerMotion();fitFooterLine()}),{passive:true});window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(()=>{syncTickerMotion();fitFooterLine()}),{passive:true});window.addEventListener('orientationchange',()=>setTimeout(()=>{syncTickerMotion();fitFooterLine()},250),{passive:true});
     buildMeter();buildBoostUi();syncEqUi();updateSourceUi();renderHistory([]);setTicker('Loading metadata...');fitFooterLine();void loadRuntime();void fetchMetadata();soundEngine.stop();
-    // Audio starts directly without a blocking START AUDIO window. Desktop gets an immediate attempt;
-    // iPhone retries on the first normal touch/click anywhere in the player if Safari blocked autoplay.
-    const startWithoutGate=()=>void playCurrent('Automatic Start',false);
-    setTimeout(startWithoutGate,120);
-    let unlockPending=true;
-    const unlockOnNormalInteraction=()=>{if(!unlockPending)return;unlockPending=false;void soundEngine.resume();if(audio.paused&&!userStopped)void playCurrent('iPhone Audio Unlock',false)};
-    document.addEventListener('pointerdown',unlockOnNormalInteraction,{once:true,capture:true,passive:true});
-    document.addEventListener('touchend',unlockOnNormalInteraction,{once:true,capture:true,passive:true});
+    // Desktop may autoplay. iPhone starts only from the real PLAY button so no capture listener
+    // can swallow or race the user's first interaction. No blocking audio gate is shown.
+    if(!isMobileLike()) setTimeout(()=>void playCurrent('Automatic Start',false),180);
+    overlay.classList.add('hidden');
   })();
   </script>
-  <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
-  <script defer src="/js/veluna-ui.js?v=2026-07-09-veluna-v1212"></script>
+  <script src="/config/veluna-assets.js?v=2026-07-11-veluna-v1214"></script>
+  <script defer src="/js/veluna-ui.js?v=2026-07-11-veluna-v1214"></script>
 </body>
 </html>
