@@ -1,6 +1,6 @@
 {
-  "version": "1.2.12",
-  "release": "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12",
+  "version": "1.2.13",
+  "release": "FULLVERSION_VELUNA_NO_AUDIO_GATE_AUTOSTART_REPAIR_v1.2.13",
   "frontendVersion": "v2026.07.09-veluna12",
   "build": "2026-07-09-veluna-v1212",
   "date": "2026-07-09",
@@ -42,7 +42,10 @@
     "VELUNA_AUDIO_CHAIN_CLIP_PROTECTION",
     "VELUNA_GLOBAL_SPLASH_ALL_PLAYERS",
     "VELUNA_SMART_IPHONE_FOOTER_FIT",
-    "VELUNA_PROPORTIONAL_MOBILE_BOTTOM_BANNER"
+    "VELUNA_PROPORTIONAL_MOBILE_BOTTOM_BANNER",
+    "VELUNA_AUDIO_GATE_REMOVED",
+    "VELUNA_AUTOSTART_REPAIR",
+    "VELUNA_INLINE_JS_SYNTAX_REPAIR"
   ],
-  "notes": "Central splash runtime now covers root/main, VELUNA and internal emergency players from one shared asset registry. The iPhone-only VELUNA footer banner uses a larger proportional grid row and available vertical space without changing the locked fullscreen geometry. EQ-before-Boost, limiter, routing, overlays, Skip, Discord and metadata remain preserved."
+  "notes": "Critical repair: fixed VELUNA inline JavaScript syntax failure, removed the blocking START AUDIO gate, added immediate desktop autoplay attempt and silent first-interaction iPhone unlock fallback. Central splash remains non-interactive and all existing EQ→Boost→Limiter and responsive geometry are preserved."
 }

@@ -1,9 +1,9 @@
-/* 666SOUNDsDESIGn canonical version core — VELUNA global splash and smart iPhone footer patch v1.2.12. */
+/* 666SOUNDsDESIGn canonical version core — VELUNA no-audio-gate autostart repair v1.2.13. */
 (function(){
   'use strict';
   var VERSION='v2026.07.09-veluna12';
   var BUILD='2026-07-09-veluna-v1212';
-  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260709,release:'FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12'};
+  window.SMFP_VERSION={label:VERSION,build:BUILD,cacheBust:BUILD,number:20260710,release:'FULLVERSION_VELUNA_NO_AUDIO_GATE_AUTOSTART_REPAIR_v1.2.13'};
   function setText(node){
     if(!node)return;
     if(node.id==='pcVersionBadge'){var status=node.querySelector('.status-code');if(status)status.textContent=VERSION;node.setAttribute('aria-label','Player Version '+VERSION);return;}
