@@ -199,3 +199,16 @@ test("VELUNA iPhone footer uses the available lower panel space without changing
   assert.match(theme, /object-fit:contain!important/);
   assert.match(theme, /data-veluna-fixed-viewport/);
 });
+
+
+test('all player actions use one interactive admin auth owner', async () => {
+  const stage = await read('js/player-stage-v2.js');
+  const stageCss = await read('css/player-stage-v2.css');
+  const discord = await read('js/addons/discord-player-addon-v3.js');
+  assert.match(stage, /auth\.ensure\(\{message:/);
+  assert.doesNotMatch(stage, /s666StageGatePassword|function ensureGate\(/);
+  assert.doesNotMatch(stageCss, /#s666StageGate/);
+  assert.match(discord, /function ensureInteractiveAuth\(/);
+  assert.match(discord, /S666AdminAuth\.ensure/);
+  assert.doesNotMatch(discord, /throw new Error\('admin_session_required'\)/);
+});

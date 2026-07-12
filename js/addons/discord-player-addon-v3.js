@@ -6,7 +6,7 @@
   'use strict';
   if (window.S666DiscordPlayerAddonV3 && window.S666DiscordPlayerAddonV3.auditRepair) return;
 
-  var VERSION = 'V4.2-20260708-VELUNA-CANONICAL-WEBRADIO';
+  var VERSION = 'V4.3-20260712-SHARED-AUTH-INTERACTIVE';
   var inFlight = false;
   var watcherTimer = 0;
   var lastTrackKey = '';
@@ -127,10 +127,15 @@
     if (overlay) overlay.classList.add('s666-discord-gate--hidden');
   }
 
+  async function ensureInteractiveAuth(message) {
+    if (!window.S666AdminAuth || typeof window.S666AdminAuth.ensure !== 'function') {
+      throw new Error('admin_auth_client_missing');
+    }
+    return window.S666AdminAuth.ensure({ message: message || 'Admin-Passwort für Discord eingeben:' });
+  }
+
   async function openMessageOverlay() {
-    if (!window.S666AdminAuth) throw new Error('admin_auth_client_missing');
-    var check = await window.S666AdminAuth.check(true);
-    if (!check.ok) throw new Error('admin_session_required');
+    await ensureInteractiveAuth('Admin-Passwort für den Discord Shooter eingeben:');
     var overlay = ensureMessageOverlay();
     overlay.classList.remove('s666-discord-gate--hidden');
     setTimeout(function () { var input = document.getElementById('s666DiscordMessageText'); if (input) input.focus(); }, 40);
@@ -154,12 +159,14 @@
 
   async function messagePost(message) {
     if (typeof message === 'string' && clean(message, 1800)) {
+      await ensureInteractiveAuth('Admin-Passwort für Discord Messaging eingeben:');
       return authorizedPost('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800) }));
     }
     return openMessageOverlay();
   }
 
   async function manualPost() {
+    await ensureInteractiveAuth('Admin-Passwort für Discord senden eingeben:');
     return authorizedPost('/api/discord/manual', readTrackFromDom());
   }
 

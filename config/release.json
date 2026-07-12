@@ -1,6 +1,6 @@
 {
-  "version": "1.2.18",
-  "release": "FULLVERSION_SESSION_SPLASH_ONCE_v1.2.18",
+  "version": "1.2.19",
+  "release": "FULLVERSION_SHARED_AUTH_MESSAGING_REPAIR_v1.2.19",
   "frontendVersion": "v2026.07.09-veluna12",
   "build": "2026-07-09-veluna-v1212",
   "date": "2026-07-12",
@@ -56,7 +56,12 @@
     "SESSION_SPLASH_ONCE",
     "SHARED_SPLASH_SESSION_STATE",
     "RELOAD_SPLASH_BYPASS",
-    "PLAYER_SWITCH_SPLASH_BYPASS"
+    "PLAYER_SWITCH_SPLASH_BYPASS",
+    "SHARED_INTERACTIVE_ADMIN_AUTH",
+    "DUPLICATE_PLAYER_AUTH_GATE_REMOVED",
+    "DISCORD_AUTH_ENSURE_REPAIR",
+    "PASSWORD_AUTH_WORKER_CHAIN_SINGLE_OWNER",
+    "MESSAGING_OVERLAY_AUTH_RECOVERY"
   ],
-  "notes": "The existing central animated splash now runs only once per browser tab session across 666 PLAYER and VELUNA. Reloads and design switches bypass the animation; audio start behavior remains unchanged."
+  "notes": "All player variants now use the existing shared admin-auth client as the single interactive owner. The duplicate main-player password gate was removed; Discord messaging invokes the shared Password Worker -> Auth Worker session flow directly before opening or sending."
 }

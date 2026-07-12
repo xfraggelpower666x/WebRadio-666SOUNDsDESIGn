@@ -8,7 +8,7 @@
   if(window.__S666_PLAYER_STAGE_V2_CORRECTION__) return;
   window.__S666_PLAYER_STAGE_V2_CORRECTION__ = true;
 
-  var state={levels:{},lastLevel:0,lastPeak:0,bus:null,pending:null};
+  var state={levels:{},lastLevel:0,lastPeak:0,bus:null};
 
   function q(s,r){return (r||document).querySelector(s);}
   function qa(s,r){return Array.from((r||document).querySelectorAll(s));}
@@ -37,63 +37,6 @@
     el.__t=setTimeout(function(){el.style.opacity='0';},3000);
   }
 
-  function ensureGate(){
-    var gate=q('#s666StageGate');
-    if(gate)return gate;
-    gate=document.createElement('div');
-    gate.id='s666StageGate';
-    gate.innerHTML='<section class="s666-stage-gate-box" role="dialog" aria-modal="true"><h3>PROTECTED PLAYER CONTROL</h3><p id="s666StageGateText">Admin password required.</p><input id="s666StageGatePassword" type="password" autocomplete="current-password" placeholder="Admin password"><div class="s666-stage-gate-actions"><button type="button" data-stage-close>CANCEL</button><button type="button" id="s666StageGateLogin" class="danger">LOGIN & CONTINUE</button></div></section>';
-    document.body.appendChild(gate);
-    gate.addEventListener('click',function(ev){ if(ev.target===gate||ev.target.closest('[data-stage-close]'))closeGate(); });
-    q('#s666StageGatePassword',gate).addEventListener('keydown',function(ev){ if(ev.key==='Enter')loginAndContinue(); });
-    q('#s666StageGateLogin',gate).onclick=loginAndContinue;
-    return gate;
-  }
-
-  function openGate(message,pending){
-    state.pending=pending||null;
-    var gate=ensureGate();
-    q('#s666StageGateText',gate).textContent=message||'Admin password required.';
-    var input=q('#s666StageGatePassword',gate);
-    input.value='';
-    gate.classList.add('is-open');
-    setTimeout(function(){try{input.focus();}catch(e){}},40);
-  }
-
-  function closeGate(){
-    var gate=q('#s666StageGate');
-    if(gate)gate.classList.remove('is-open');
-    state.pending=null;
-  }
-
-  async function loginAndContinue(){
-    var auth=adminAuth();
-    var gate=ensureGate(),input=q('#s666StageGatePassword',gate),password=String(input.value||'');
-    if(!auth){toast('Admin-Auth-Client fehlt.','error');return;}
-    if(!password){toast('Admin-Passwort fehlt.','error');return;}
-    var btn=q('#s666StageGateLogin',gate);
-    btn.disabled=true;
-    btn.textContent='LOGIN...';
-    try{
-      var result=await auth.login(password);
-      if(!result||result.ok!==true)throw new Error(result&&result.error||'login_failed');
-      var pending=state.pending;
-      closeGate();
-      toast('Admin-Zugang aktiv.');
-      if(typeof pending==='function')await pending();
-    }catch(e){
-      auth.clear();
-      var code=auth.errorCode?auth.errorCode(e,'login_failed'):(e&&e.message?e.message:'login_failed');
-      var message=auth.errorMessage?auth.errorMessage(code):('Login abgelehnt: '+code);
-      var text=q('#s666StageGateText',gate);
-      if(text)text.textContent=message;
-      toast(message,'error');
-    }finally{
-      btn.disabled=false;
-      btn.textContent='LOGIN & CONTINUE';
-    }
-  }
-
   async function gateCheck(){
     var auth=adminAuth();
     if(!auth)return {ok:false,error:'admin_auth_client_missing'};
@@ -101,10 +44,20 @@
   }
 
   async function withGate(action,message){
-    var gate=await gateCheck();
-    if(gate&&gate.ok)return action();
-    openGate(message||'Admin password required.',action);
-    return false;
+    var auth=adminAuth();
+    if(!auth||typeof auth.ensure!=='function'){
+      toast('Admin-Auth-Client fehlt.','error');
+      return false;
+    }
+    try{
+      await auth.ensure({message:message||'Admin-Passwort eingeben:'});
+      return await action();
+    }catch(e){
+      var code=auth.errorCode?auth.errorCode(e,'auth_failed'):(e&&e.message?e.message:'auth_failed');
+      var text=auth.errorMessage?auth.errorMessage(code):('Admin-Anmeldung fehlgeschlagen: '+code);
+      toast(text,'error');
+      return false;
+    }
   }
 
   async function protectedDiscord(){

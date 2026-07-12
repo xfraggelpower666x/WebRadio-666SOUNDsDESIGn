@@ -85,7 +85,10 @@
       pw_login_unreachable: 'Passwort-Worker ist nicht erreichbar.',
       auth_token_missing: 'Keine aktive Admin-Sitzung.',
       cross_origin_authorized_fetch_rejected: 'Geschützte Anfrage an fremde Domain blockiert.',
-      session_storage_unavailable: 'Die Admin-Sitzung kann in diesem Browser nicht gespeichert werden.'
+      session_storage_unavailable: 'Die Admin-Sitzung kann in diesem Browser nicht gespeichert werden.',
+      login_cancelled: 'Admin-Anmeldung wurde abgebrochen.',
+      gate_check_failed: 'Passwort- und Auth-Worker konnten die Sitzung nicht gemeinsam bestätigen.',
+      request_timeout: 'Die geschützte Player-Anfrage hat das Zeitlimit überschritten.'
     };
     return messages[code] || ('Admin-Anmeldung fehlgeschlagen: ' + code);
   }
@@ -284,7 +287,7 @@
   }
 
   window.S666AdminAuth = {
-    version: '1.2.5-hardlock-modal',
+    version: '1.2.19-shared-interactive-auth',
     tokenKey: TOKEN_KEY,
     getToken: getToken,
     setToken: setToken,
