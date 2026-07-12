@@ -29,7 +29,6 @@ const required = [
   "external-workers/666-system-pw-worker/worker.js",
   "external-workers/666-system-auth-worker/worker.js",
   "VELUNA/index.html", "veluna/index.html", "public/VELUNA/index.html", "public/veluna/index.html",
-  "AMARIS/index.html", "amaris/index.html", "public/AMARIS/index.html", "public/amaris/index.html",
   "config/veluna-assets.js", "css/veluna-theme.css", "js/veluna-ui.js", "js/veluna-viewport-lock.js", "veluna.webmanifest",
   "assets/veluna/icons/favicon-16x16.png", "assets/veluna/icons/favicon-32x32.png",
   "assets/veluna/background/veluna-player-background.webp",
@@ -155,7 +154,7 @@ for (const item of rendererPairs) {
 }
 
 const productiveRoots = ["js", "css", "config"];
-const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html", "AMARIS/index.html", "amaris/index.html"];
+const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html"];
 for (const directory of productiveRoots) {
   const sourceFiles = files.filter(file => relative(rootPath, file).split(sep)[0] === directory);
   for (const source of sourceFiles) {
@@ -169,7 +168,7 @@ for (const directory of productiveRoots) {
     publicPairs.push(item);
   }
 }
-for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html", "AMARIS/index.html", "amaris/index.html"]) {
+for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html"]) {
   const source = await readFile(new URL(item, rootUrl));
   const mirror = await readFile(new URL(`public/${item}`, rootUrl));
   if (!source.equals(mirror)) throw new Error(`public deploy mirror drift: ${item}`);

@@ -628,7 +628,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -828,21 +828,6 @@ function isVelunaPlayerPath(pathname){
   const path = normalizedRoutePath(pathname);
   return path === '/veluna' || path === '/veluna/index.html';
 }
-function isLegacyAmarisPlayerPath(pathname){
-  const path = normalizedRoutePath(pathname);
-  return path === '/amaris' || path === '/amaris/index.html';
-}
-
-function redirectLegacyAmarisToVeluna(request){
-  if(request.method !== 'GET' && request.method !== 'HEAD'){
-    return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
-  }
-  const source = new URL(request.url);
-  const target = new URL('/veluna/', source.origin);
-  target.search = source.search;
-  return Response.redirect(target.toString(), 308);
-}
-
 async function serveVelunaPlayer(request, env){
   if(request.method !== 'GET' && request.method !== 'HEAD'){
     return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
@@ -922,7 +907,6 @@ function s666RouteTable() {
     { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
     { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
     { priority: 10, route: "/veluna", handler: "serveVelunaPlayer", purpose: "VELUNA LYVRA minimal recovery player" },
-    { priority: 10.1, route: "/amaris", handler: "redirectLegacyAmarisToVeluna", purpose: "legacy compatibility redirect" },
     { priority: 11, route: "/internal", handler: "embedded internal player", purpose: "existing internal emergency player" },
     { priority: 12, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
     { priority: 13, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
@@ -949,7 +933,6 @@ function s666ModuleStatus(env) {
       velunaMinimalPlayer: {
         ok: true,
         routes: ["/veluna", "/veluna/", "/VELUNA", "/VELUNA/", "/veluna/index.html", "/VELUNA/index.html"],
-        legacyRedirects: ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/"],
         primary: "https://my.idjstream.com:8686",
         fallback: "https://my.idjstream.com:8686/stream",
         emergencyChain: ["/stream", "/fallback-stream"],
@@ -1007,10 +990,10 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12",
+    version: "FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
-    routes: { root: "/", veluna: "/veluna", legacyAmarisRedirect: "/amaris", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
+    routes: { root: "/", veluna: "/veluna", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
   });
 }
 
@@ -1063,7 +1046,6 @@ export default {
     const __darkDancerResponse = await darkDancerResponse(request, env);
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
-    if(isLegacyAmarisPlayerPath(url.pathname)) return redirectLegacyAmarisToVeluna(request);
     if(isVelunaPlayerPath(url.pathname)) return await serveVelunaPlayer(request, env);
     if (url.pathname === "/health") return s666LiveHealth(request, env);
     if (url.pathname === "/api/runtime-config/status" && (request.method === "GET" || request.method === "HEAD")) {

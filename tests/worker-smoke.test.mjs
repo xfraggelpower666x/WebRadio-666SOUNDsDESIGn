@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12");
+  assert.equal(data.version, "FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16");
 });
 
 test("runtime configuration is read from static assets", async () => {
@@ -178,7 +178,7 @@ test("root and CSS are served from ASSETS", async () => {
 });
 
 
-test("VELUNA is the canonical standalone endpoint and legacy AMARIS aliases redirect without affecting other players", async () => {
+test("VELUNA is canonical and AMARIS player routes are removed", async () => {
   for (const path of ["/veluna", "/veluna/", "/VELUNA", "/VELUNA/", "/veluna/index.html", "/VELUNA/index.html"]) {
     const veluna = await request(path, { headers: { accept: "text/html" } });
     assert.equal(veluna.status, 200, path);
@@ -195,9 +195,8 @@ test("VELUNA is the canonical standalone endpoint and legacy AMARIS aliases redi
   }
 
   for (const path of ["/amaris", "/amaris/", "/AMARIS", "/AMARIS/"]) {
-    const legacy = await request(path, { headers: { accept: "text/html" }, redirect: "manual" });
-    assert.equal(legacy.status, 308, path);
-    assert.equal(new URL(legacy.headers.get("location")).pathname, "/veluna/", path);
+    const removed = await request(path, { headers: { accept: "text/html" }, redirect: "manual" });
+    assert.notEqual(removed.status, 308, path);
   }
 
   const velunaPost = await request("/veluna", { method: "POST", headers: { accept: "application/json" } });
@@ -214,6 +213,6 @@ test("VELUNA is the canonical standalone endpoint and legacy AMARIS aliases redi
   const rootPlayer = await request("/", { headers: { accept: "text/html" } });
   const rootHtml = await rootPlayer.text();
   assert.match(rootHtml, /Root Main Player/);
-  assert.match(rootHtml, /veluna-theme\.css/);
+  assert.match(rootHtml, /VELUNA PLAYER/);
   assert.doesNotMatch(rootHtml, /VELUNA · LYVRA[\s\S]*MINIMAL WEBRADIO/);
 });

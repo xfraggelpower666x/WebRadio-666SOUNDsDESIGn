@@ -1,9 +1,9 @@
 {
-  "version": "1.2.15",
-  "release": "1.2.15",
+  "version": "1.2.16",
+  "release": "FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16",
   "frontendVersion": "v2026.07.09-veluna12",
   "build": "2026-07-09-veluna-v1212",
-  "date": "2026-07-09",
+  "date": "2026-07-12",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
   "features": [
@@ -19,7 +19,6 @@
     "SAFE_ROOT_DEPLOY",
     "DISCORD_TEST_ROUTE_COMPAT",
     "VELUNA_CANONICAL_ENDPOINT",
-    "VELUNA_LEGACY_AMARIS_REDIRECTS",
     "VELUNA_CENTRAL_ASSET_REGISTRY",
     "VELUNA_COMMON_PLAYER_BACKGROUND",
     "VELUNA_COMMON_RESPONSIVE_HEADER",
@@ -45,7 +44,11 @@
     "VELUNA_PROPORTIONAL_MOBILE_BOTTOM_BANNER",
     "VELUNA_AUDIO_GATE_REMOVED",
     "VELUNA_AUTOSTART_REPAIR",
-    "VELUNA_INLINE_JS_SYNTAX_REPAIR"
+    "VELUNA_INLINE_JS_SYNTAX_REPAIR",
+    "VELUNA_DESIGN_SWITCH",
+    "DIRECT_LAYER_BUTTON_OWNERSHIP",
+    "AMARIS_PLAYER_REMOVED",
+    "PHASE10_OBSERVE_ONLY_CONTROLS"
   ],
-  "notes": "Critical repair: fixed VELUNA inline JavaScript syntax failure, removed the blocking START AUDIO gate, added immediate desktop autoplay attempt and silent first-interaction iPhone unlock fallback. Central splash remains non-interactive and all existing EQ→Boost→Limiter and responsive geometry are preserved."
+  "notes": "Direct repair in existing responsible layers: 666/VĖLUNA design switch, AMARIS player removal, and one authoritative transport/source owner without new override layers."
 }

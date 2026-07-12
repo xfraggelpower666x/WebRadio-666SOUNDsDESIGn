@@ -17,7 +17,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <html lang="de">
 <head>
   <meta name="s666-cache-burst" content="audit-repair-v1-1-0-20260625" />
-  <meta name="smfp-version" content="v2026.07.11-veluna15" />
+  <meta name="smfp-version" content="v2026.07.12-veluna16" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -184,7 +184,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       </section>
 
       <section class="now-playing">
-        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.07.11-veluna15</span></div></div>
+        <div id="phase10NowVersion" class="phase10-now-version"><div id="pcVersionBadge" class="status-chip led-state state-api pc-version-badge system-version-badge" aria-label="Player Version"><span class="status-dot"></span><span class="status-code">v2026.07.12-veluna16</span></div></div>
         <div class="section-topline">
           <div>
             <div class="section-kicker">NOW PLAYING</div>
@@ -255,6 +255,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0012 4V1L7 6l5 5V7a5 5 0 11-4.9 6h-2.02A7 7 0 1017.65 6.35z"/></svg>
           </button>
 </div>
+        <a id="playerDesignSwitch" class="player-design-switch" href="/veluna" aria-label="Zum VELUNA Player wechseln">VELUNA PLAYER</a>
 
         <div class="timeline-wrap desktop-only">
           <div class="time-chip" id="currentTimeText">0:00</div>
@@ -333,7 +334,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
 <script id="strictMobileFrontendPurgeV83Script">
 (function(){
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.11-veluna15';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.12-veluna16';
   var STREAM_URL='/stream';
   var metaTimer=null, boostStage=(window.SMFPBoostCore?window.SMFPBoostCore.loadStage():0), rafStarted=false, transientTimer=null;
   var SMFP_EQ_BANDS=[
@@ -991,7 +992,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app=document.createElement('div');
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
-    app.innerHTML='<div class="smfp-version-badge">v2026.07.11-veluna15</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
+    app.innerHTML='<div class="smfp-version-badge">v2026.07.12-veluna16</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/veluna/header/veluna-player-header.webp?v=veluna-v1212" alt="CyberStream AI Cockpit Edition"><img src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="666 RadioBotAI" style="height:28px;width:28px;object-fit:contain;opacity:0.82;filter:drop-shadow(0 0 6px rgba(22,255,243,.80))"></section>'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','LYVRA DJ','◖')+'</section>'+
@@ -1962,7 +1963,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script id="v98SafeResyncJs">
 (function(){
   'use strict';
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.11-veluna15';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.12-veluna16';
   function setText(el,txt){ if(el && el.textContent !== txt) el.textContent=txt; }
   function syncVersion(){
     document.documentElement.setAttribute('data-smfp-version',VERSION);
@@ -2340,7 +2341,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!-- v159 CACHEBUST VERSION GUARD — visible version/cache marker only; no player logic -->
 <script id="v159CacheBustVersionGuard">
 (function(){
-  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.11-veluna15';
+  var VERSION=(window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.12-veluna16';
   var BUILD='smfp-v181-backend-kv-iphone-ui-20260519';
   try{document.documentElement.setAttribute('data-smfp-version',VERSION);document.documentElement.setAttribute('data-smfp-cache-bust',BUILD);}catch(e){}
   function setText(el){ if(!el) return; if(el.classList && el.classList.contains('status-code')) el.textContent=VERSION; else if(el.id==='pcVersionBadge') { var s=el.querySelector('.status-code'); if(s) s.textContent=VERSION; } else if(el.classList && el.classList.contains('smfp-version-badge')) el.textContent=VERSION; }
@@ -2452,7 +2453,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function qs(s,r){return (r||document).querySelector(s)}
   function qsa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
   function app(){return qs('#mffApp')}
-  function version(){return (window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.11-veluna15'}
+  function version(){return (window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.12-veluna16'}
   function installFooter(a){
     if(!a)return;
     var footer=qs('.smfp-v181-footer-version',a);
@@ -2570,9 +2571,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 <link rel="stylesheet" href="/css/sound-control-overlay-v1.css?v=2026-06-15-fix1">
-<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-06-25-hardlock1">
+<link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-07-12-veluna16">
 <script src="/js/sound-control-overlay-v1.js?v=2026-06-19-repair4" defer></script>
-<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-06-25-hardlock1" defer></script>
+<script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-07-12-veluna16" defer></script>
 <script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=2026-06-15-fix1"></script>
 <script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=2026-06-15-fix1"></script>
 <script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=2026-06-15-fix1"></script>

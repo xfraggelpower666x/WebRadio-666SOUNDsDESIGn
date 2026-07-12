@@ -1045,14 +1045,9 @@ RULES:
       ["play","playing","canplay","canplaythrough"].forEach(function(ev){a.addEventListener(ev,function(){centralAudioGuardV2MarkWanted();centralAudioGuardV2.lastMoveAt=Date.now(); try{ var o=s666AudioOrchestra(); o.stage=0; o.failSafe=0; document.documentElement.setAttribute("data-audio-orchestra-stage","0"); document.documentElement.setAttribute("data-audio-orchestra-failsafe","0"); }catch(e){} },true);});
       ["waiting","stalled","suspend","emptied","abort","error"].forEach(function(ev){a.addEventListener(ev,function(){var hard=/emptied|abort|error/.test(ev);var d=hard?(centralAudioGuardV2IsMobile()?8000:12000):(centralAudioGuardV2IsMobile()?22000:32000);setTimeout(function(){if(!hard){var aa=centralAudioGuardV2Audio();if(aa&&Number(aa.networkState||0)===2&&Number(aa.readyState||0)>=2&&!aa.paused)return;}centralAudioGuardV2Recover(ev);},d);},true);});
     }
-    qsa("button,.control-btn").forEach(function(btn){
-      var txt=String(btn.textContent||btn.getAttribute("aria-label")||"").toLowerCase();
-      if(/play/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkWanted,true);
-      if(/stop/.test(txt)) btn.addEventListener("click",centralAudioGuardV2MarkStop,true);
-    });
+    // v1.2.16: transport buttons are bound only in player-core.js; no capture listeners here.
     ["visibilitychange","pageshow","focus","online"].forEach(function(ev){window.addEventListener(ev,function(){var d=centralAudioGuardV2IsMobile()?1200:2800;setTimeout(function(){centralAudioGuardV2Recover(ev);},d);},true);});
-    var s666GestureResume=function(){ try{ var aa=centralAudioGuardV2Audio(); if(!aa||!aa.paused) return; if(!centralAudioGuardV2Wanted()) return; if(centralAudioGuardV2ManualStopRecent()) return; if(typeof isUserStopRecent==="function"&&isUserStopRecent()) return; var pr=aa.play(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){} };
-    ["touchend","click"].forEach(function(ev){ document.addEventListener(ev, s666GestureResume, true); });
+    // v1.2.16: no document-wide click/touch resume. The real PLAY action owns iOS unlock.
     setInterval(centralAudioGuardV2Tick,2500);
     setTimeout(centralAudioGuardV2Tick,1600);
     document.documentElement.setAttribute("data-central-audio-stability-v2","installed");

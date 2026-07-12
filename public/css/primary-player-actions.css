@@ -346,3 +346,9 @@
 #fp-admin-overlay {
   z-index: 2147483600 !important;
 }
+
+
+/* v1.2.16: direct design switch, maintained in the existing primary action layer. */
+.player-design-switch{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 14px;border:1px solid rgba(77,190,255,.72);border-radius:10px;background:rgba(7,12,22,.9);color:#8fd8ff;font:700 11px/1.1 "Courier New",monospace;letter-spacing:.08em;text-decoration:none;white-space:nowrap;box-shadow:0 0 10px rgba(38,141,255,.32),inset 0 0 10px rgba(89,50,255,.12)}
+.player-design-switch:hover,.player-design-switch:focus-visible{color:#fff;border-color:#b56cff;box-shadow:0 0 14px rgba(77,190,255,.5),0 0 10px rgba(255,58,196,.25);outline:none}
+@media(max-width:760px){.player-design-switch{min-height:30px;padding:6px 10px;font-size:9px;letter-spacing:.05em;max-width:100%}}
