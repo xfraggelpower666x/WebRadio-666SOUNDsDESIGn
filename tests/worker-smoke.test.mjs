@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16");
+  assert.equal(data.version, "FULLVERSION_SESSION_SPLASH_ONCE_v1.2.18");
 });
 
 test("runtime configuration is read from static assets", async () => {

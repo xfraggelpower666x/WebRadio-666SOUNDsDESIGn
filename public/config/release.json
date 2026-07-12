@@ -1,6 +1,6 @@
 {
-  "version": "1.2.16",
-  "release": "FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16",
+  "version": "1.2.18",
+  "release": "FULLVERSION_SESSION_SPLASH_ONCE_v1.2.18",
   "frontendVersion": "v2026.07.09-veluna12",
   "build": "2026-07-09-veluna-v1212",
   "date": "2026-07-12",
@@ -48,7 +48,15 @@
     "VELUNA_DESIGN_SWITCH",
     "DIRECT_LAYER_BUTTON_OWNERSHIP",
     "AMARIS_PLAYER_REMOVED",
-    "PHASE10_OBSERVE_ONLY_CONTROLS"
+    "PHASE10_OBSERVE_ONLY_CONTROLS",
+    "SHARED_IPHONE_AUDIO_START_CORE",
+    "NATIVE_PLAY_BEFORE_WEBAUDIO",
+    "VELUNA_STANDALONE_AUDIO_START",
+    "VELUNA_CASE_VARIANTS_SYNCHRONIZED",
+    "SESSION_SPLASH_ONCE",
+    "SHARED_SPLASH_SESSION_STATE",
+    "RELOAD_SPLASH_BYPASS",
+    "PLAYER_SWITCH_SPLASH_BYPASS"
   ],
-  "notes": "Direct repair in existing responsible layers: 666/VĖLUNA design switch, AMARIS player removal, and one authoritative transport/source owner without new override layers."
+  "notes": "The existing central animated splash now runs only once per browser tab session across 666 PLAYER and VELUNA. Reloads and design switches bypass the animation; audio start behavior remains unchanged."
 }

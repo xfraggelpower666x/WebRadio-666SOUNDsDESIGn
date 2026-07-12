@@ -1,7 +1,7 @@
 /* Zentrale VELUNA-Asset- und Branding-Quelle. Keine Playerdatei pflegt eigene Bildpfade. */
 window.VELUNA_ASSETS = Object.freeze({
-  release: 'FULLVERSION_VELUNA_DIRECT_LAYER_CLEANUP_v1.2.16',
-  version: '1.2.16',
+  release: 'FULLVERSION_SHARED_IPHONE_AUDIO_START_v1.2.17',
+  version: '1.2.17',
   endpoint: '/veluna',
   background: '/assets/veluna/background/veluna-player-background.webp',
   header: '/assets/veluna/header/veluna-player-header.webp',

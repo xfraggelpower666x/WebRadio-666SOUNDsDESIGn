@@ -1,5 +1,10 @@
-/* VELUNA central splash only v1.2.14 — no player layout mutation */
+/* VELUNA central splash once per browser session v1.2.18 — no player layout mutation */
 (()=>{'use strict';
+ const SESSION_KEY='s666_player_intro_seen_v1';
+ try{
+   if(sessionStorage.getItem(SESSION_KEY)==='1')return;
+   sessionStorage.setItem(SESSION_KEY,'1');
+ }catch(_){}
  const A=window.VELUNA_ASSETS||{};
  if(document.querySelector('[data-veluna-central-splash="1"]'))return;
  const splash=document.createElement('div');

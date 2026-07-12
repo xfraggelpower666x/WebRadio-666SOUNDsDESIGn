@@ -27,6 +27,7 @@ const ENDPOINTS = {
 
 const POLL_MS = 8000;
 const audio = document.getElementById('radio');
+const audioStartController = window.S666AudioStartCore?.create({ audio, timeoutMs: 6500 });
 const nowPlayingTicker = document.getElementById('nowPlayingTicker');
 const metaLine = document.getElementById('metaLine');
 const listenersText = document.getElementById('listenersText');
@@ -129,12 +130,16 @@ function prepareAudioElementForFreshPlay(target, reason = 'play') {
   if (now - audioSelfHealLastResetAt < 700 && audio.getAttribute('src') === target) return;
   audioSelfHealLastResetAt = now;
 
-  try { visualizer.stop?.(); } catch (err) {}
-  try { audio.pause(); } catch (err) {}
-  try { audio.removeAttribute('src'); } catch (err) {}
-  try { audio.load(); } catch (err) {}
-  try { audio.src = target; } catch (err) {}
-  try { audio.load(); } catch (err) {}
+  if (audioStartController) {
+    audioStartController.reset(target, reason, () => visualizer.stop?.());
+  } else {
+    try { visualizer.stop?.(); } catch (err) {}
+    try { audio.pause(); } catch (err) {}
+    try { audio.removeAttribute('src'); } catch (err) {}
+    try { audio.load(); } catch (err) {}
+    try { audio.src = target; } catch (err) {}
+    try { audio.load(); } catch (err) {}
+  }
 
   audioSelfHealDirtyReason = '';
   try {
@@ -703,6 +708,7 @@ function startMetadataLoop() {
 
 function stopPlayback(status = 'STOPPED') {
   playRequestToken += 1;
+  audioStartController?.cancel();
   userStopped = true;
   try {
     document.body?.classList.remove('is-playing','is-paused');
@@ -727,17 +733,18 @@ function stopPlayback(status = 'STOPPED') {
 }
 
 
-function withTimeout(promise, timeoutMs, label = 'timeout') {
-  let timer = 0;
-  const timeout = new Promise((_, reject) => {
-    timer = window.setTimeout(() => reject(new Error(label)), timeoutMs);
-  });
-  return Promise.race([promise, timeout]).finally(() => window.clearTimeout(timer));
-}
-
 async function playAudioWithTimeout(token) {
-  const playPromise = audio.play();
-  await withTimeout(playPromise, PLAY_START_TIMEOUT_MS, 'audio_play_timeout');
+  if (!audioStartController) {
+    const playPromise = audio.play();
+    await Promise.resolve(playPromise);
+  } else {
+    await audioStartController.start({
+      target: audio.getAttribute('src') || audio.src,
+      reason: '666-player-play',
+      reset: false,
+      isStopped: () => userStopped || token !== playRequestToken
+    });
+  }
   if (token !== playRequestToken || userStopped) {
     audio.pause();
     throw new Error('stale_play_request');
@@ -851,6 +858,7 @@ pauseBtn?.addEventListener('click', () => {
   // v112: Pause is a real network break, same as Stop, but keeps PAUSED state.
   // Reason: mobile data users must not keep consuming stream data silently.
   playRequestToken += 1;
+  audioStartController?.cancel();
   userStopped = true;
   audioSelfHealStopAt = Date.now();
   markAudioSelfHealDirty('user-pause');
