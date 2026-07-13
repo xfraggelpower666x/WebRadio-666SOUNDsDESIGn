@@ -628,7 +628,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_SHARED_AUTH_MESSAGING_REPAIR_v1.2.19')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -990,7 +990,7 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_SHARED_AUTH_MESSAGING_REPAIR_v1.2.19",
+    version: "FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
     routes: { root: "/", veluna: "/veluna", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }

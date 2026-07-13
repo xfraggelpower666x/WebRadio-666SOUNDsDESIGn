@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.19",
+  "version": "1.2.20",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with central animated splash across all players, fixed iPhone geometry, smart proportional iPhone footer banner, and preserved EQ-then-Boost limiter audio chain.",
+  "description": "666SOUNDsDESIGn WebRadio full source with shared auth/messaging, session-once splash, shared native iPhone audio start, and adaptive iPhone fullscreen viewport geometry.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",

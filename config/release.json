@@ -1,9 +1,9 @@
 {
-  "version": "1.2.19",
-  "release": "FULLVERSION_SHARED_AUTH_MESSAGING_REPAIR_v1.2.19",
+  "version": "1.2.20",
+  "release": "FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20",
   "frontendVersion": "v2026.07.09-veluna12",
   "build": "2026-07-09-veluna-v1212",
-  "date": "2026-07-12",
+  "date": "2026-07-13",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
   "features": [
@@ -61,7 +61,11 @@
     "DUPLICATE_PLAYER_AUTH_GATE_REMOVED",
     "DISCORD_AUTH_ENSURE_REPAIR",
     "PASSWORD_AUTH_WORKER_CHAIN_SINGLE_OWNER",
-    "MESSAGING_OVERLAY_AUTH_RECOVERY"
+    "MESSAGING_OVERLAY_AUTH_RECOVERY",
+    "IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY",
+    "SAFARI_TOOLBAR_HEIGHT_GROW_RECOVERY",
+    "VISUAL_VIEWPORT_GEOMETRY_REFRESH",
+    "KEYBOARD_SHRINK_GUARD"
   ],
-  "notes": "All player variants now use the existing shared admin-auth client as the single interactive owner. The duplicate main-player password gate was removed; Discord messaging invokes the shared Password Worker -> Auth Worker session flow directly before opening or sending."
+  "notes": "The existing iPhone viewport owner now expands the fixed player geometry when Safari exposes more usable height after toolbar changes. Keyboard-induced shrink remains blocked; no new CSS or geometry layer was added."
 }

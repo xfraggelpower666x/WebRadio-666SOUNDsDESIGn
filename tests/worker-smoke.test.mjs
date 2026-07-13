@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_SHARED_AUTH_MESSAGING_REPAIR_v1.2.19");
+  assert.equal(data.version, "FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20");
 });
 
 test("runtime configuration is read from static assets", async () => {
