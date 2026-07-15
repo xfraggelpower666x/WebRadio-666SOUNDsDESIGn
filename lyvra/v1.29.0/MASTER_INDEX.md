@@ -18,6 +18,8 @@ Global status: NOT PROMOTED
 8. PART_008_MOMENTUM_AND_CAUSAL_MEGAEVENT_AUDIT.md
 9. PART_009_INTEGRATION_REGISTRY_AND_LATEST_STATE_GATE.md
 10. PART_010_AUDIT_FREEZE_AND_THREE_TARGET_BACKUP.md
+11. PART_011_PHOTOREALISMUS_FRAMEWORK_REPLACEMENT_v1_9_0.md
+12. PART_012_PHOTOREALISMUS_CAUSAL_INTEGRATION_MAP.md
 
 ## Core development statement
 
@@ -31,22 +33,28 @@ Complexity is a causal relationship network. Controlled chaos becomes musically 
 
 The LYVRA ⇄ SUNO Production Dictionary converts internal musical meaning into concise production language. Philosophical or architectural explanation remains internal and is not passed to the renderer.
 
+## Photorealism statement
+
+The v1.9.0 Lean Photoreal Reconstruction framework is the sole valid photorealism engine. It inherits all valid causal, routing, audit, recovery and latest-state connections previously required by the image framework, while the faulty former render logic is removed.
+
 ## Experimental statement
 
 Emoji production emphasis remains optional and unpromoted until repeated A/B testing demonstrates a reliable benefit without vocalization or drift. Candidate rule: Emoji+Word=ProdOnly.
 
 ## Current gate
 
-- Ten-part package: PASS
+- Twelve-part package: PASS
 - Numerical load order: PASS
 - Separate development branch: PASS
 - Active predecessor v1.28.0 recorded: PASS
 - Non-destructive integration contract: PASS
 - Latest-state gate: PASS
+- Photorealism v1.9.0 replacement: PASS
+- Photorealism causal rewiring: PASS
 - GitHub candidate construction: PASS
-- Canonical candidate backup: PENDING
-- PC-Recovery candidate backup: PENDING
-- Physical hash manifest: PENDING
+- Canonical candidate backup: PENDING REFRESH
+- PC-Recovery candidate backup: PENDING REFRESH
+- Physical hash manifest: PENDING REFRESH
 - Emoji A/B validation: PENDING
 - Global promotion: BLOCKED
 
