@@ -10,9 +10,9 @@ Integration class: EXPLICIT REPLACEMENT
 
 ## Replacement decision
 
-The previous LYVRA photorealism framework logic is classified as faulty and must no longer be the active default. The v1.9.0 Lean Photoreal Reconstruction logic replaces it as the authoritative photorealism path.
+The previous LYVRA photorealism framework logic is faulty and is removed from the valid execution architecture. It is not retained as a fallback, compatibility layer or optional mode.
 
-The previous implementation remains isolated as LEGACY/FALLBACK only. It must never auto-activate and must not be layered underneath or above v1.9.0.
+The v1.9.0 Lean Photoreal Reconstruction logic is the sole authoritative photorealism path.
 
 ## Active reconstruction logic
 
@@ -23,14 +23,15 @@ The previous implementation remains isolated as LEGACY/FALLBACK only. It must ne
 5. Apply identity-drift control after generation through result validation instead of overblocking the generation prompt before execution.
 6. Include only environment, material, text and anatomy constraints that are directly relevant to the current edit.
 
-## Removed mandatory prompt behavior
+## Deleted prompt behavior
 
 - duplicated IDENTITY_CORE_LOCK block,
 - unconditional FRAMELESS_STAGE1 block,
 - unconditional NO_UNAUTHORIZED_TEXT block,
 - oversized anatomy wording,
 - redundant environment and material blocks,
-- stacked legacy photorealism guards that duplicate the same restriction.
+- stacked photorealism guards that duplicate the same restriction,
+- any loader, resolver or fallback path capable of reactivating the former logic.
 
 ## Runtime authority
 
@@ -56,4 +57,4 @@ The following v1.9.0 components define the authoritative execution behavior:
 
 ## Integration guard
 
-This is a replacement at the responsible framework layer, not an additive parallel layer. Existing valid LYVRA identity, storage, recovery and latest-state gates remain active. Any older photorealism logic conflicting with this part is subordinate and inactive.
+This replacement occurs at the responsible framework layer. No parallel photorealism layer may coexist with it. Existing valid LYVRA identity, storage, recovery and latest-state gates remain active. Any older conflicting photorealism rule is invalid and must fail closed rather than load.
