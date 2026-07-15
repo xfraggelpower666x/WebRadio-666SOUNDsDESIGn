@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V4.6-20260715-SHARED-VISUAL-COVER-COLOR-BRIDGE';
+  var VERSION = 'V4.7-20260715-VELUNA-DISCORD-NO-AUTH';
   var inFlight = false;
   var watcherTimer = 0;
   var visualTimer = 0;
@@ -65,7 +65,7 @@
       bitrate: bitrate,
       artwork: artwork,
       playerUrl: location.origin + (location.pathname.toLowerCase().indexOf('/veluna') === 0 ? '/veluna' : '/'),
-      source: 'webradio-player'
+      source: location.pathname.toLowerCase().indexOf('/veluna') === 0 ? 'veluna-player' : 'webradio-player'
     };
   }
 
@@ -73,18 +73,14 @@
     return clean([data.artist, data.title, data.track, data.nowPlaying].filter(Boolean).join('|').toLowerCase(), 800);
   }
 
-  function dispatch(detail) {
-    try { window.dispatchEvent(new CustomEvent('s666:discord-state', { detail: detail || {} })); } catch (_) {}
-  }
-
-  function dispatchMessenger(detail) {
-    try { window.dispatchEvent(new CustomEvent('s666:veluna-messenger-state', { detail: detail || {} })); } catch (_) {}
+  function dispatch(name, detail) {
+    try { window.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (_) {}
   }
 
   async function postJson(path, payload) {
     if (inFlight) throw new Error('discord_request_in_flight');
     inFlight = true;
-    dispatch({ phase: 'sending', path: path });
+    dispatch('s666:discord-state', { phase: 'sending', path: path });
     try {
       var response = await fetch(path, {
         method: 'POST',
@@ -95,10 +91,10 @@
       });
       var data = await response.json().catch(function () { return {}; });
       if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
-      dispatch({ phase: 'success', path: path, data: data });
+      dispatch('s666:discord-state', { phase: 'success', path: path, data: data });
       return data;
     } catch (error) {
-      dispatch({ phase: 'error', path: path, error: error && error.message ? error.message : String(error) });
+      dispatch('s666:discord-state', { phase: 'error', path: path, error: error && error.message ? error.message : String(error) });
       throw error;
     } finally {
       inFlight = false;
@@ -114,9 +110,9 @@
   }
 
   function installSharedVisualStyle() {
-    if (document.getElementById('s666SharedVisualStyleV46')) return;
+    if (document.getElementById('s666SharedVisualStyleV47')) return;
     var style = document.createElement('style');
-    style.id = 's666SharedVisualStyleV46';
+    style.id = 's666SharedVisualStyleV47';
     style.textContent = [
       '@media(min-width:761px){',
       ':root{--s666-live:#47ff8a;--s666-cyan:#16fff3;--s666-blue:#35b7ff;--s666-pink:#ff3dbb;--s666-warn:#ffc857;--s666-red:#ff5570}',
@@ -159,8 +155,8 @@
     if (state.indexOf('play') !== -1) setSharedColorState('transport', 'playing');
     else if (state.indexOf('pause') !== -1) setSharedColorState('transport', 'paused');
     else if (state.indexOf('stop') !== -1) setSharedColorState('transport', 'stopped');
-    var source = clean((document.getElementById('fallbackBtn') && document.getElementById('fallbackBtn').classList.contains('is-active')) || (document.getElementById('backupBtn') && document.getElementById('backupBtn').classList.contains('is-active')) ? 'backup' : 'main', 40);
-    setSharedColorState('source', source);
+    var backupActive = (document.getElementById('fallbackBtn') && document.getElementById('fallbackBtn').classList.contains('is-active')) || (document.getElementById('backupBtn') && document.getElementById('backupBtn').classList.contains('is-active'));
+    setSharedColorState('source', backupActive ? 'backup' : 'main');
   }
 
   function closeMessageOverlay() {
@@ -183,13 +179,9 @@
       '<div class="s666-discord-gate-actions"><button type="button" class="s666-discord-gate-cancel" data-discord-close>CANCEL</button><button type="button" id="s666DiscordMessageSend" class="s666-discord-gate-submit">SEND</button></div>' +
       '</div>';
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', function (event) {
-      if (event.target === overlay || event.target.closest('[data-discord-close]')) closeMessageOverlay();
-    });
+    overlay.addEventListener('click', function (event) { if (event.target === overlay || event.target.closest('[data-discord-close]')) closeMessageOverlay(); });
     document.getElementById('s666DiscordMessageSend').addEventListener('click', sendMessageFromOverlay);
-    document.getElementById('s666DiscordMessageText').addEventListener('keydown', function (event) {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); sendMessageFromOverlay(); }
-    });
+    document.getElementById('s666DiscordMessageText').addEventListener('keydown', function (event) { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); sendMessageFromOverlay(); } });
     return overlay;
   }
 
@@ -216,9 +208,7 @@
   }
 
   async function messagePost(message) {
-    if (typeof message === 'string' && clean(message, 1800)) {
-      return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800) }));
-    }
+    if (typeof message === 'string' && clean(message, 1800)) return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800) }));
     return openMessageOverlay();
   }
 
@@ -239,10 +229,10 @@
     try {
       var response = await fetch('/api/discord/status?t=' + Date.now(), { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' } });
       var data = await response.json().catch(function () { return {}; });
-      dispatch({ phase: 'status', ok: response.ok && data.ok === true, data: data });
+      dispatch('s666:discord-state', { phase: 'status', ok: response.ok && data.ok === true, data: data });
       return data;
     } catch (error) {
-      dispatch({ phase: 'status', ok: false, error: error && error.message ? error.message : String(error) });
+      dispatch('s666:discord-state', { phase: 'status', ok: false, error: error && error.message ? error.message : String(error) });
       return { ok: false };
     }
   }
@@ -312,7 +302,7 @@
     var message = clean(input && input.value, MSG_MAX);
     if (!message) return;
     if (button) button.disabled = true;
-    dispatchMessenger({ phase: 'sending' });
+    dispatch('s666:veluna-messenger-state', { phase: 'sending' });
     try {
       var client = await ensurePlayerAlertClient();
       var result = await client.send(message, { username: 'Veluna Broadcast', source: 'veluna-messenger' });
@@ -320,9 +310,9 @@
       if (input) input.value = '';
       var overlay = document.getElementById('s666VelunaMessengerOverlay');
       if (overlay) overlay.classList.add('s666-discord-gate--hidden');
-      dispatchMessenger({ phase: 'success', data: result });
+      dispatch('s666:veluna-messenger-state', { phase: 'success', data: result });
     } catch (error) {
-      dispatchMessenger({ phase: 'error', error: error && error.message ? error.message : String(error) });
+      dispatch('s666:veluna-messenger-state', { phase: 'error', error: error && error.message ? error.message : String(error) });
     } finally {
       if (button) button.disabled = false;
     }
@@ -350,10 +340,28 @@
     return true;
   }
 
+  function installVelunaDiscordNoAuthBypass() {
+    var button = document.getElementById('discordBtn');
+    if (!button || button.dataset.s666NoAuthDiscord === '1') return false;
+    button.dataset.s666NoAuthDiscord = '1';
+    button.addEventListener('click', function (event) {
+      if (location.pathname.toLowerCase().indexOf('/veluna') !== 0) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      event.stopPropagation();
+      dispatch('s666:discord-state', { phase: 'veluna-no-auth-click' });
+      messagePost().catch(function (error) {
+        dispatch('s666:discord-state', { phase: 'error', error: error && error.message ? error.message : String(error) });
+      });
+    }, true);
+    return true;
+  }
+
   function initVelunaMessengerBridge() {
     if (!document.querySelector('.tool-strip')) return;
     mountVelunaMessengerButton();
-    ensurePlayerAlertClient().catch(function (error) { dispatchMessenger({ phase: 'error', error: error.message || String(error) }); });
+    installVelunaDiscordNoAuthBypass();
+    ensurePlayerAlertClient().catch(function (error) { dispatch('s666:veluna-messenger-state', { phase: 'error', error: error.message || String(error) }); });
     window.addEventListener('s666:veluna-messenger-state', function (event) {
       var detail = event.detail || {};
       var btn = document.getElementById('s666VelunaMessageButton');
@@ -445,6 +453,7 @@
     visualTimer = setInterval(function () {
       syncSharedColorState();
       syncSharedCoverLogic();
+      installVelunaDiscordNoAuthBypass();
     }, 3500);
   }
 
@@ -456,13 +465,14 @@
     version: VERSION,
     auditRepair: true,
     velunaMessengerBridge: true,
+    velunaDiscordNoAuth: true,
     sharedVisualBridge: true,
-    mountAll: function () { mountVelunaMessengerButton(); initSharedVisualBridge(); return true; },
+    mountAll: function () { mountVelunaMessengerButton(); installVelunaDiscordNoAuthBypass(); initSharedVisualBridge(); return true; },
     manualPost: manualPost,
     messagePost: messagePost,
     postTrackIfChanged: postTrackIfChanged,
     readTrackFromDom: readTrackFromDom,
     checkStatus: checkStatus,
-    setLed: function (mode, text) { dispatch({ phase: mode || 'idle', text: text || '' }); }
+    setLed: function (mode, text) { dispatch('s666:discord-state', { phase: mode || 'idle', text: text || '' }); }
   };
 })();
