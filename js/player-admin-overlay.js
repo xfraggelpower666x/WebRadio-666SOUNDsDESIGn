@@ -8,10 +8,6 @@ PURPOSE: Protected admin overlay.
   const PW_HEALTH_URL="https://666-system-pw.666soundsdesign-broadcaster.com/health";
   const AUTH_HEALTH_URL="https://666-system-auth.666soundsdesign-broadcaster.com/health";
   const AUTH_DEBUG_URL="https://666-system-auth.666soundsdesign-broadcaster.com/debug";
-  const SUNO_URL="https://666-suno-system.666soundsdesign-broadcaster.com";
-  const SUNO_HEALTH_URL="https://666-suno-system.666soundsdesign-broadcaster.com/health";
-  const CHAOS_AI_HEALTH_URL="https://666-chaos-ai-track-system.666soundsdesign-broadcaster.com/health";
-  const CHAOS_ENGINE_URL="/CHAOS_ENGINE/index.html";
   const DARK_DANCER_URL="/The-Dark-Dancer";
   // DISCORD_ADMIN_MERGE_V1
   const DISCORD_SEND_URL="/api/discord/manual";
@@ -69,7 +65,7 @@ PURPOSE: Protected admin overlay.
     root.innerHTML=`
       <div class="fp-admin-backdrop" data-admin-close="1"></div>
       <section class="fp-admin-panel" role="dialog" aria-modal="true" aria-label="Radio Admin Panel">
-        <header class="fp-admin-header"><div><h2>666 RADIO ADMIN</h2><p>Auth gated · Admin Config System V1 · GitHub Backup/Rollback · Chaos/Suno/Discord Diagnostics</p></div><button class="fp-admin-close" type="button" data-admin-close="1">×</button></header>
+        <header class="fp-admin-header"><div><h2>666 RADIO ADMIN</h2><p>Auth gated · Admin Config System V1 · GitHub Backup/Rollback · Discord Diagnostics</p></div><button class="fp-admin-close" type="button" data-admin-close="1">×</button></header>
         <nav class="fp-admin-tabs">
           <button type="button" data-admin-tab="streams" class="is-active">Streams</button>
           <button type="button" data-admin-tab="systems">Systems</button>
@@ -97,10 +93,6 @@ PURPOSE: Protected admin overlay.
           </section>
           <section class="fp-admin-tab" data-admin-tab-panel="systems">
             <div class="fp-admin-actions vertical">
-              <button type="button" data-admin-protected-open="${CHAOS_ENGINE_URL}">Open Chaos Engine</button>
-              <button type="button" data-admin-protected-open="/CHAOS_ENGINE/track-factory.html">Open Track Factory</button>
-              <button type="button" data-admin-protected-open="/CHAOS_ENGINE/fraggle-detlef-system.html">Open Detlef Core</button>
-              <button type="button" data-admin-protected-open="${SUNO_URL}">Open Zuno/Suno System</button>
               <button type="button" data-admin-protected-open="${DARK_DANCER_URL}">Open Dark Dancer Story</button>
               <button type="button" data-admin-protected-open="/debug">Open Radio Debug</button>
               <button type="button" data-admin-protected-open="/health">Open Radio Health</button>
@@ -113,7 +105,6 @@ PURPOSE: Protected admin overlay.
               <button type="button" id="fp-admin-trigger-skip" class="danger">AutoDJ Skip Now</button>
               <button type="button" id="fp-admin-check-pw">Check PW Worker</button>
               <button type="button" id="fp-admin-check-auth-worker">Check Auth Worker</button>
-              <button type="button" id="fp-admin-check-suno">Check Zuno/Suno</button>
               <button type="button" id="fp-admin-login" class="danger">Force Login</button>
             </div><pre id="fp-admin-auth-output">Ready.</pre>
           </section>
@@ -142,7 +133,6 @@ PURPOSE: Protected admin overlay.
             <div class="fp-admin-actions">
               <button type="button" id="fp-admin-check-auth">Check Local Auth</button>
               <button type="button" id="fp-admin-check-api">Check Admin API</button>
-              <button type="button" id="fp-admin-check-chaos-local">Check Local Chaos Engine</button>
             </div><pre id="fp-admin-debug-output">Ready.</pre>
           </section>
         </main>
@@ -154,7 +144,7 @@ PURPOSE: Protected admin overlay.
       if(openUrl){ev.preventDefault();if(await requireAuth())window.open(openUrl,"_blank","noopener,noreferrer")}
       const tab=ev.target&&ev.target.getAttribute("data-admin-tab");if(tab)switchTab(tab);
     });
-    $("fp-admin-load-config").onclick=loadConfig;$("fp-admin-list-backups").onclick=listBackups;$("fp-admin-preview-config").onclick=previewConfig;$("fp-admin-commit-config").onclick=commitConfig;$("fp-admin-rollback-config").onclick=rollbackLatest;$("fp-admin-check-auth").onclick=()=>checkAuth(true);$("fp-admin-check-api").onclick=checkApi;$("fp-admin-check-all").onclick=checkAllLayers;$("fp-admin-skip-status").onclick=checkSkipStatus;$("fp-admin-trigger-skip").onclick=triggerSkipNow;$("fp-admin-check-pw").onclick=checkPwWorker;$("fp-admin-check-auth-worker").onclick=checkAuthWorker;$("fp-admin-check-suno").onclick=checkSunoWorker;$("fp-admin-login").onclick=()=>goLogin();$("fp-admin-check-chaos-local").onclick=checkLocalChaos;$("fp-admin-check-broadcast-status").onclick=checkBroadcastStatus;$("fp-admin-check-broadcast-current").onclick=checkBroadcastCurrent;$("fp-admin-test-broadcast").onclick=testBroadcast;$("fp-admin-discord-send").onclick=sendDiscordAdmin;$("fp-admin-discord-clear").onclick=clearDiscordAdmin;$("fp-admin-discord-test").onclick=testDiscordAdmin;$("fp-admin-discord-status").onclick=statusDiscordAdmin;
+    $("fp-admin-load-config").onclick=loadConfig;$("fp-admin-list-backups").onclick=listBackups;$("fp-admin-preview-config").onclick=previewConfig;$("fp-admin-commit-config").onclick=commitConfig;$("fp-admin-rollback-config").onclick=rollbackLatest;$("fp-admin-check-auth").onclick=()=>checkAuth(true);$("fp-admin-check-api").onclick=checkApi;$("fp-admin-check-all").onclick=checkAllLayers;$("fp-admin-skip-status").onclick=checkSkipStatus;$("fp-admin-trigger-skip").onclick=triggerSkipNow;$("fp-admin-check-pw").onclick=checkPwWorker;$("fp-admin-check-auth-worker").onclick=checkAuthWorker;$("fp-admin-login").onclick=()=>goLogin();$("fp-admin-check-broadcast-status").onclick=checkBroadcastStatus;$("fp-admin-check-broadcast-current").onclick=checkBroadcastCurrent;$("fp-admin-test-broadcast").onclick=testBroadcast;$("fp-admin-discord-send").onclick=sendDiscordAdmin;$("fp-admin-discord-clear").onclick=clearDiscordAdmin;$("fp-admin-discord-test").onclick=testDiscordAdmin;$("fp-admin-discord-status").onclick=statusDiscordAdmin;
   }
   function switchTab(name){document.querySelectorAll("[data-admin-tab]").forEach(b=>b.classList.toggle("is-active",b.getAttribute("data-admin-tab")===name));document.querySelectorAll("[data-admin-tab-panel]").forEach(p=>p.classList.toggle("is-active",p.getAttribute("data-admin-tab-panel")===name))}
   async function openAdminOverlay(){if(!await requireAuth())return;ensureOverlay();$("fp-admin-overlay").classList.remove("fp-admin-hidden")}
@@ -172,8 +162,6 @@ PURPOSE: Protected admin overlay.
   async function checkAuthWorker(){const health=await safeCheck("Auth Worker Health",AUTH_HEALTH_URL);const debug=await safeCheck("Auth Worker Debug",AUTH_DEBUG_URL);$("fp-admin-auth-output").textContent=JSON.stringify({health,debug},null,2)}
   async function checkSkipStatus(){if(!await requireAuth())return;$("fp-admin-auth-output").textContent=JSON.stringify(await fetchJson("/api/skip/status?t="+Date.now()),null,2)}
   async function triggerSkipNow(){if(!await requireAuth())return;$("fp-admin-auth-output").textContent=JSON.stringify(await fetchJson("/api/admin/skip",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({source:"admin-overlay-skip"})}),null,2)}
-  async function checkSunoWorker(){const suno=await safeCheck("Zuno/Suno Worker",SUNO_HEALTH_URL);const chaosAI=await safeCheck("Chaos AI Worker",CHAOS_AI_HEALTH_URL);$("fp-admin-auth-output").textContent=JSON.stringify({suno,chaosAI},null,2)}
-  async function checkLocalChaos(){try{const res=await fetch(CHAOS_ENGINE_URL+"?t="+Date.now(),{cache:"no-store"});$("fp-admin-debug-output").textContent=JSON.stringify({ok:res.ok,status:res.status,url:CHAOS_ENGINE_URL},null,2)}catch(e){$("fp-admin-debug-output").textContent="Chaos check failed: "+e.message}}
   async function checkBroadcastStatus(){if(!await requireAuth())return;$("fp-admin-broadcast-output").textContent=JSON.stringify(await fetchJson("/api/player-alert/status?t="+Date.now()),null,2)}
   async function checkBroadcastCurrent(){if(!await requireAuth())return;$("fp-admin-broadcast-output").textContent=JSON.stringify(await fetchJson("/api/player-alert/current?t="+Date.now()),null,2)}
   async function testBroadcast(){if(!await requireAuth())return;const id="admin-overlay-"+Date.now();$("fp-admin-broadcast-output").textContent=JSON.stringify(await fetchJson("/api/player-alert/send",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({message:"Admin broadcast test "+new Date().toLocaleTimeString(),clientId:id,senderId:id,version:"admin-final-integration"})}),null,2)}
@@ -227,7 +215,7 @@ PURPOSE: Protected admin overlay.
     }catch(e){ setDiscordLed("failed","FAILED"); if(out) out.textContent = e && e.message ? e.message : String(e); }
   }
 
-  async function checkAllLayers(){const localAuth=await fetchJson("/api/admin/auth-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const gate=await fetchJson("/api/admin/gate-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const adminApi=await fetchJson("/api/admin/debug?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const pw=await safeCheck("PW Worker",PW_HEALTH_URL);const auth=await safeCheck("Auth Worker",AUTH_HEALTH_URL);const suno=await safeCheck("Zuno/Suno Worker",SUNO_HEALTH_URL);const chaosAI=await safeCheck("Chaos AI Worker",CHAOS_AI_HEALTH_URL);const chaosLocal=await fetch(CHAOS_ENGINE_URL+"?t="+Date.now(),{cache:"no-store"}).then(r=>({ok:r.ok,status:r.status,url:CHAOS_ENGINE_URL})).catch(e=>({ok:false,error:e.message,url:CHAOS_ENGINE_URL}));const broadcast=await fetchJson("/api/player-alert/status?t="+Date.now()).catch(e=>({ok:false,error:e.message}));$("fp-admin-auth-output").textContent=JSON.stringify({localAuth,gate,adminApi,pw,auth,suno,chaosAI,chaosLocal,broadcast},null,2)}
+  async function checkAllLayers(){const localAuth=await fetchJson("/api/admin/auth-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const gate=await fetchJson("/api/admin/gate-check?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const adminApi=await fetchJson("/api/admin/debug?t="+Date.now()).catch(e=>({ok:false,error:e.message}));const pw=await safeCheck("PW Worker",PW_HEALTH_URL);const auth=await safeCheck("Auth Worker",AUTH_HEALTH_URL);const broadcast=await fetchJson("/api/player-alert/status?t="+Date.now()).catch(e=>({ok:false,error:e.message}));$("fp-admin-auth-output").textContent=JSON.stringify({localAuth,gate,adminApi,pw,auth,broadcast},null,2)}
   function mountAdminButton(){const old=$("fp-admin-button");if(old)old.remove();const chip=$("statusAdmin");if(chip&&!chip.__adminBound){chip.__adminBound=true;chip.title="Protected radio admin menu";chip.addEventListener("click",openAdminOverlay)}}
   window.FPAdminOverlay={mount:mountAdminButton,open:openAdminOverlay,close:closeAdminOverlay,checkAuth,checkGate:checkAdminGate,version:"1.2.0-hardlock"};
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mountAdminButton);else mountAdminButton();

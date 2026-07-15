@@ -20,8 +20,6 @@
     "css/veluna-theme.css",
     "js/veluna-ui.js",
     "js/veluna-viewport-lock.js",
-    "external-workers/666-chaos-ai-track-system/",
-    "external-workers/666-suno-system/",
     "Render/666SOUNDsDESIGn-Alert-Service-Renderer/",
     "renderer-resources/666SOUNDsDESIGn-Alert-Service-Renderer/",
     "Scriptable/Scripts/"
@@ -29,7 +27,6 @@
   "repairState": {
     "runtimeBlockersRepaired": true,
     "skipApiRestored": true,
-    "chaosDispatcherConnected": true,
     "staticAssetsBindingConfigured": true,
     "runtimeRadioConfigConnected": true,
     "playerAlertWriteAuthenticationAdded": true,

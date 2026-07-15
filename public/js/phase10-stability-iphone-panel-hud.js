@@ -122,7 +122,6 @@ RULES:
     if(action === "stream") return toggleMobileStream();
     if(action === "sound") return openSoundControl();
     if(action === "admin") return openAdmin();
-    if(action === "chaos") return openChaos();
     if(action === "status") return openStatus();
   }
 
@@ -192,10 +191,6 @@ RULES:
     alert("Admin overlay trigger not found.");
   }
 
-  function openChaos(){
-    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); }
-    catch(e){ location.href = "/CHAOS_ENGINE/?v=" + Date.now(); }
-  }
 
   function returnToPlayer(){
     var app = qs("#mffApp");
@@ -626,10 +621,6 @@ RULES:
     if(typeof openAdmin === "function") return openAdmin();
     var b = qs("#fp-admin-open") || qs(".fp-admin-open") || qs("[data-admin-open]") || qs("#adminButton") || qs("#adminBtn");
     if(b) return tap(b, "parity-admin");
-  }
-  function parityOpenChaos(){
-    if(typeof openChaos === "function") return openChaos();
-    try{ window.open("/CHAOS_ENGINE/?v=" + Date.now(), "_blank"); } catch(e){ location.href="/CHAOS_ENGINE/?v="+Date.now(); }
   }
   function parityOpenStatus(){
     if(typeof openStatus === "function") return openStatus();

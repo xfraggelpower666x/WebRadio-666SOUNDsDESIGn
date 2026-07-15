@@ -5,6 +5,7 @@ import passwordWorker from "../external-workers/666-system-pw-worker/worker.js";
 import authWorker from "../external-workers/666-system-auth-worker/worker.js";
 
 const FUTURE = Math.floor(Date.now() / 1000) + 3600;
+const AUDIENCE = "666SOUNDsDESIGn-WebRadio-Admin";
 
 function request(path, init = {}) {
   return new Request(`https://radio.test${path}`, init);
@@ -18,10 +19,11 @@ async function withMockFetch(mock, fn) {
 }
 
 test("password-issued token hardlock validates issuer, scope and expiry separately", () => {
-  assert.equal(verifyPwIssuedToken({ ok: true, payload: { iss: "other", scope: "admin", exp: FUTURE } }).error, "issuer_invalid");
-  assert.equal(verifyPwIssuedToken({ ok: true, payload: { iss: "666-system-pw", scope: "reader", exp: FUTURE } }).error, "scope_invalid");
-  assert.equal(verifyPwIssuedToken({ ok: true, payload: { iss: "666-system-pw", scope: "admin", exp: 1 } }).error, "token_expired");
-  assert.equal(verifyPwIssuedToken({ ok: true, payload: { iss: "666-system-pw", scope: "admin", exp: FUTURE } }).ok, true);
+  assert.equal(verifyPwIssuedToken({ ok: true, expectedAudience: AUDIENCE, payload: { iss: "other", aud: AUDIENCE, scope: "admin", exp: FUTURE } }).error, "issuer_invalid");
+  assert.equal(verifyPwIssuedToken({ ok: true, expectedAudience: AUDIENCE, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "reader", exp: FUTURE } }).error, "scope_invalid");
+  assert.equal(verifyPwIssuedToken({ ok: true, expectedAudience: AUDIENCE, payload: { iss: "666-system-pw", aud: "wrong", scope: "admin", exp: FUTURE } }).error, "audience_invalid");
+  assert.equal(verifyPwIssuedToken({ ok: true, expectedAudience: AUDIENCE, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: 1 } }).error, "token_expired");
+  assert.equal(verifyPwIssuedToken({ ok: true, expectedAudience: AUDIENCE, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: FUTURE } }).ok, true);
 });
 
 test("admin config rejects a valid auth token with the wrong issuer before GitHub access", async () => {
@@ -55,7 +57,7 @@ test("login follows the PW/Auth contract and forwards hardlock service headers",
     const headers = new Headers(init.headers || {});
     seen.push({ url: String(url), origin: headers.get("origin"), serviceToken: headers.get("x-admin-service-token") });
     if (String(url).includes("666-system-pw")) return Response.json({ ok: true, token: "abc.def", expiresAt: FUTURE });
-    if (String(url).includes("666-system-auth")) return Response.json({ ok: true, valid: true, payload: { iss: "666-system-pw", scope: "admin", exp: FUTURE } });
+    if (String(url).includes("666-system-auth")) return Response.json({ ok: true, valid: true, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: FUTURE } });
     throw new Error("unexpected_fetch");
   }, async () => {
     const response = await handleRadioAdminConfigAddon(request("/api/admin/login", {
@@ -64,7 +66,8 @@ test("login follows the PW/Auth contract and forwards hardlock service headers",
       body: JSON.stringify({ password: "correct" })
     }), {
       ADMIN_SERVICE_ORIGIN: "https://radio.test/",
-      ADMIN_SERVICE_TOKEN: "service-secret"
+      ADMIN_SERVICE_TOKEN: "service-secret",
+      AUTH_AUDIENCE: AUDIENCE
     });
     assert.equal(response.status, 200);
     const data = await response.json();
@@ -80,7 +83,8 @@ test("PW/Auth workers implement one deployable contract", async () => {
   const common = {
     ALLOWED_ORIGIN: "https://radio.test",
     ADMIN_SERVICE_TOKEN: "service-secret",
-    AUTH_SECRET: "shared-auth-secret"
+    AUTH_SECRET: "shared-auth-secret",
+    AUTH_AUDIENCE: AUDIENCE
   };
   const login = await passwordWorker.fetch(request("/login", {
     method: "POST",
@@ -112,6 +116,7 @@ test("PW/Auth workers implement one deployable contract", async () => {
   assert.equal(verifyData.valid, true);
   assert.equal(verifyData.payload.iss, "666-system-pw");
   assert.equal(verifyData.payload.scope, "admin");
+  assert.equal(verifyData.payload.aud, AUDIENCE);
 });
 
 test("PW/Auth workers fail closed when the service token is configured but missing", async () => {
@@ -123,8 +128,22 @@ test("PW/Auth workers fail closed when the service token is configured but missi
     ALLOWED_ORIGIN: "https://radio.test",
     ADMIN_SERVICE_TOKEN: "service-secret",
     AUTH_SECRET: "shared-auth-secret",
-    ADMIN_PASSWORD: "correct-password"
+    ADMIN_PASSWORD: "correct-password",
+    AUTH_AUDIENCE: AUDIENCE
   });
   assert.equal(response.status, 403);
-  assert.equal((await response.json()).error, "origin_rejected");
+  assert.equal((await response.json()).error, "service_auth_rejected");
+});
+
+
+test("PW/Auth hardening requires audience, service token and rate limiting source", () => {
+  const pwSource = new URL("../external-workers/666-system-pw-worker/worker.js", import.meta.url);
+  const authSource = new URL("../external-workers/666-system-auth-worker/worker.js", import.meta.url);
+  return Promise.all([import("node:fs/promises").then(fs => fs.readFile(pwSource, "utf8")), import("node:fs/promises").then(fs => fs.readFile(authSource, "utf8"))]).then(([pw, auth]) => {
+    assert.match(pw, /AUTH_AUDIENCE/);
+    assert.match(pw, /login_rate_limited/);
+    assert.match(pw, /ADMIN_SERVICE_TOKEN/);
+    assert.match(auth, /audience_invalid/);
+    assert.match(auth, /service_token_missing/);
+  });
 });

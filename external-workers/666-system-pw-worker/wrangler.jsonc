@@ -10,6 +10,7 @@
     }
   ],
   "vars": {
-    "ALLOWED_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com"
+    "ALLOWED_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com",
+    "AUTH_AUDIENCE": "666SOUNDsDESIGn-WebRadio-Admin"
   }
 }

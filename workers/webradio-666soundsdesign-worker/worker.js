@@ -1,7 +1,6 @@
 import { handleDiscordNotifyV3 } from './worker-addons/discord-notify-addon-v3.js';
 import { handleRadioAdminConfigAddon } from './worker-addons/radio-admin-config-addon.js';
 import { handleSkipApi } from './worker-addons/skip-api-addon.js';
-import { handleChaosEngineApiAddon } from './worker-addons/chaos-engine-api-addon.js';
 // ==========================================================
 // 666SOUNDsDESIGn — v66 The Dark Dancer Route
 // Zweck: /The-Dark-Dancer direkt über die Domain ausliefern.
@@ -628,7 +627,7 @@ async function handlePlayerAlertV152(request, env){
   if(!url.pathname.startsWith('/api/player-alert/')) return null;
   if(request.method === 'OPTIONS') return playerAlertJson({ok:true});
   if(url.pathname === '/api/player-alert/status' && request.method === 'GET'){
-    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20')});
+    return playerAlertJson({ok:true, backendConfigured:!!playerAlertBackendUrl(env), kvConfigured:!!(env && env.PLAYER_ALERT_KV), mode:'backend-primary-optional-kv-cache-fallback', rateIdentity:'server-controlled-ip-ua-sha256', rateSaltConfigured:!!(env && (env.PLAYER_ALERT_RATE_SALT || env.PLAYER_ALERT_SERVICE_TOKEN)), releaseVersion:String((env&&env.RELEASE_VERSION)||'FULLVERSION_RADIO_ONLY_CLEANUP_v1.2.22')});
   }
   if(url.pathname === '/api/player-alert/current' && request.method === 'GET'){
     const backend = await playerAlertBackendFetch(env, '/current', {method:'GET'});
@@ -849,31 +848,6 @@ async function serveVelunaPlayer(request, env){
 
 
 
-// AUDIT_REPAIR_v1.1.0: CHAOS_ENGINE files are served from the required ASSETS binding.
-// The previous duplicate base64 bundle was removed to avoid Worker-size and maintenance drift.
-
-// CHAOS_ENGINE_STATIC_ROUTE_V1
-async function chaosEngineStaticResponse(request, env){
-  const url = new URL(request.url);
-  let path = url.pathname;
-  if(path === "/chaos-engine" || path === "/chaos-engine/") path = "/CHAOS_ENGINE/index.html";
-  if(path === "/CHAOS_ENGINE" || path === "/CHAOS_ENGINE/") path = "/CHAOS_ENGINE/index.html";
-  if(!path.startsWith("/CHAOS_ENGINE/")) return null;
-
-  // First try Worker asset binding when available.
-  if(env && env.ASSETS && typeof env.ASSETS.fetch === "function"){
-    const assetUrl = new URL(request.url);
-    assetUrl.pathname = path;
-    const assetResponse = await env.ASSETS.fetch(new Request(assetUrl.toString(), request));
-    if(assetResponse && assetResponse.status !== 404) return assetResponse;
-  }
-
-  return new Response(JSON.stringify({ok:false,error:"chaos_engine_assets_unavailable",path}),{
-    status:503,
-    headers:{"content-type":"application/json; charset=UTF-8","cache-control":"no-store","x-666-route":"chaos-engine-assets-required"}
-  });
-}
-
 
 // ROUTE_LIVE_DEBUG_HARDENING_V1_20260525
 const ROUTE_LIVE_DEBUG_VERSION = "route-live-debug-hardening-v1-20260525";
@@ -903,8 +877,6 @@ function s666RouteTable() {
     { priority: 4, route: "/api/discord/*", handler: "handleDiscordNotifyV3", purpose: "Discord shooter / webhook bridge" },
     { priority: 5, route: "/api/skip/status", handler: "handleSkipApi", purpose: "skip status / diagnostics" },
     { priority: 6, route: "/api/admin/skip + /skip", handler: "handleSkipApi", purpose: "protected shoutcast autodj skip" },
-    { priority: 7, route: "/CHAOS_ENGINE/*", handler: "chaosEngineStaticResponse", purpose: "Chaos Engine static UI with embedded fallback" },
-    { priority: 8, route: "/api/chaos/*", handler: "handleChaosEngineApiAddon", purpose: "Chaos API addon" },
     { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
     { priority: 10, route: "/veluna", handler: "serveVelunaPlayer", purpose: "VELUNA LYVRA minimal recovery player" },
     { priority: 11, route: "/internal", handler: "embedded internal player", purpose: "existing internal emergency player" },
@@ -938,11 +910,6 @@ function s666ModuleStatus(env) {
         emergencyChain: ["/stream", "/fallback-stream"],
         internalPlayerPreserved: true
       },
-      chaosEngine: {
-        ok: typeof chaosEngineStaticResponse === "function",
-        routes: ["/CHAOS_ENGINE/", "/CHAOS_ENGINE/track-factory.html", "/CHAOS_ENGINE/fraggle-detlef-system.html"],
-        embeddedFallback: false, assetBindingRequired: true
-      },
       darkDancer: {
         ok: typeof darkDancerResponse === "function",
         routes: ["/The-Dark-Dancer", "/The-Dark-Dancer.html"]
@@ -966,16 +933,10 @@ function s666ModuleStatus(env) {
         routes: ["/api/discord/status", "/api/discord/manual", "/api/discord/test", "/api/discord/nowplaying"],
         env: s666BoolEnv(env, ["DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK", "DISCORD_ADMIN_TOKEN", "DISCORD_GATE_CODE", "ADMIN_AUTH_VERIFY_URL"])
       },
-      chaosSunoRendererIntegration: { ok: true, files: ["CHAOS_ENGINE/assets/js/chaos-suno-renderer-integration-v1.js", "CHAOS_ENGINE/assets/data/api-providers.json"] },
       goveeFxSceneSync: { ok: true, files: ["js/system-extra/govee/govee-sync-config.js","js/system-extra/govee/govee-bridge-client.js","js/system-extra/govee/govee-scene-sync.js","js/system-extra/govee/govee-fx-control-hooks.js"], secretPolicy: "no frontend secrets" },
       soundControl: {
         ok: true,
         files: ["js/sound-control-overlay-v1.js", "css/sound-control-overlay-v1.css"]
-      },
-      externalWorkers: {
-        ok: true,
-        folders: ["external-workers/666-chaos-ai-track-system", "external-workers/666-suno-system"],
-        deployment: "separate-workers"
       },
       rendererResource: {
         ok: true,
@@ -990,7 +951,7 @@ async function s666LiveHealth(request, env) {
   return s666Json({
     ok: true,
     service: "666SOUNDsDESIGn WebRadio",
-    version: "FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20",
+    version: "FULLVERSION_RADIO_ONLY_CLEANUP_v1.2.22",
     time: new Date().toISOString(),
     runtimeConfig: { source: runtime.source, version: runtime.value.version || null },
     routes: { root: "/", veluna: "/veluna", internal: "/internal", stream: "/stream", metadata: "/api/nowplaying" }
@@ -1009,13 +970,11 @@ async function s666LiveDebug(request, env) {
       "ADMIN_AUTH_VERIFY_URL", "ADMIN_AUTH_LOGIN_URL",
       "GITHUB_TOKEN", "GITHUB_OWNER", "GITHUB_REPO", "GITHUB_BRANCH",
       "PLAYER_ALERT_BACKEND_URL", "DISCORD_WEBHOOK_URL", "DISCORD_WEBHOOK",
-      "OPENAI_API_KEY", "SUNO_API_KEY"
     ])).filter((k) => env && env[k]),
     routes: s666RouteTable(),
     modules: s666ModuleStatus(env).modules,
     warnings: [
       "No secret values are displayed here.",
-      "If /CHAOS_ENGINE/* displays this debug object, route priority is wrong.",
       "If Admin opens Hello World, the Admin button is navigating to Auth/PW worker instead of opening local overlay."
     ]
   });
@@ -1073,17 +1032,11 @@ const url=new URL(request.url);
     const skipResponse = await handleSkipApi(request, env);
     if (skipResponse) return skipResponse;
 
-    const chaosApiResponse = await handleChaosEngineApiAddon(request, env);
-    if (chaosApiResponse) return chaosApiResponse;
-
     const playerAlertV152Response = await handlePlayerAlertV152(request, env);
     if (playerAlertV152Response) return playerAlertV152Response;
     // DISCORD_ADDON_V3_SAFE_ROUTE: nur /api/discord/* wird abgefangen. Stream/Player/Notfallplayer bleiben unberührt.
     const discordV3Response = await handleDiscordNotifyV3(request, env);
     if (discordV3Response) return discordV3Response;
-
-    const chaosEngineStatic = await chaosEngineStaticResponse(request, env);
-    if (chaosEngineStatic) return chaosEngineStatic;
 
     if((url.pathname==="/" || url.pathname==="/index.html") && url.searchParams.get("player")!=="internal"){
       return await serveExternalIndex(request, env);

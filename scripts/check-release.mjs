@@ -21,7 +21,7 @@ const required = [
   "js/messenger-overlay.js", "js/broadcast-message-history.js", "js/skip-control.js",
   "js/player-stage-v2.js", "js/addons/discord-player-addon-v3.js",
   "worker-addons/skip-api-addon.js", "worker-addons/radio-admin-config-addon.js",
-  "worker-addons/discord-notify-addon-v3.js", "worker-addons/chaos-engine-api-addon.js",
+  "worker-addons/discord-notify-addon-v3.js",
   "Scriptable/Scripts/666SOUNDsDESIGn_FOLDER_UPLOADER_LIVE_UI.js",
   "public/index.html", "workers/webradio-666soundsdesign-worker/worker.js",
   "workers/webradio-666soundsdesign-worker/wrangler.jsonc",
@@ -154,7 +154,7 @@ for (const item of rendererPairs) {
 }
 
 const productiveRoots = ["js", "css", "config"];
-const publicPairs = ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html"];
+const publicPairs = ["index.html", "site.webmanifest", "VELUNA/index.html", "veluna/index.html"];
 for (const directory of productiveRoots) {
   const sourceFiles = files.filter(file => relative(rootPath, file).split(sep)[0] === directory);
   for (const source of sourceFiles) {
@@ -168,7 +168,7 @@ for (const directory of productiveRoots) {
     publicPairs.push(item);
   }
 }
-for (const item of ["index.html", "site.webmanifest", "chaos-matrix-control.html", "VELUNA/index.html", "veluna/index.html"]) {
+for (const item of ["index.html", "site.webmanifest", "VELUNA/index.html", "veluna/index.html"]) {
   const source = await readFile(new URL(item, rootUrl));
   const mirror = await readFile(new URL(`public/${item}`, rootUrl));
   if (!source.equals(mirror)) throw new Error(`public deploy mirror drift: ${item}`);

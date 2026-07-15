@@ -1,6 +1,6 @@
 /*
- * 666-system-auth-worker HARDLOCK v1.2.0
- * Verifies HMAC, expiry, issuer and admin scope.
+ * 666-system-auth-worker HARDLOCK v1.2.1
+ * Verifies HMAC, expiry, issuer, audience and admin scope. Requires service authentication.
  */
 function normalizeOrigin(value) {
   return String(value || "").trim().replace(/\/$/, "");
@@ -47,11 +47,9 @@ function serviceRequestAllowed(request, env) {
   const allowedOrigin = normalizeOrigin(env.ALLOWED_ORIGIN || "https://webradio.666soundsdesign-broadcaster.com");
   const requestOrigin = normalizeOrigin(request.headers.get("origin"));
 
-  if (expectedToken) {
-    if (!timingSafeEqualText(provided, expectedToken)) return false;
-    return !requestOrigin || requestOrigin === allowedOrigin;
-  }
-  return Boolean(requestOrigin && requestOrigin === allowedOrigin);
+  if (!expectedToken) return false;
+  if (!timingSafeEqualText(provided, expectedToken)) return false;
+  return !requestOrigin || requestOrigin === allowedOrigin;
 }
 
 function decodeBase64url(value) {
@@ -78,7 +76,7 @@ async function signRaw(payloadPart, secret) {
   return base64urlBytes(sig);
 }
 
-async function verifyToken(token, secret) {
+async function verifyToken(token, secret, audience) {
   if (!token || !token.includes(".")) return { ok: false, error: "token_missing" };
   const parts = token.split(".");
   if (parts.length !== 2 || !parts[0] || !parts[1]) return { ok: false, error: "token_malformed" };
@@ -93,6 +91,7 @@ async function verifyToken(token, secret) {
   const now = Math.floor(Date.now() / 1000);
   if (!Number(payload.exp) || Number(payload.exp) <= now) return { ok: false, error: "token_expired" };
   if (payload.iss !== "666-system-pw") return { ok: false, error: "issuer_invalid" };
+  if (!audience || payload.aud !== audience) return { ok: false, error: "audience_invalid" };
   if (payload.scope !== "admin") return { ok: false, error: "scope_invalid" };
   return { ok: true, payload };
 }
@@ -103,7 +102,7 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(request, env) });
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return json(request, env, { ok: true, worker: "666-system-auth-worker", version: "1.2.0", role: "auth", status: "active" });
+      return json(request, env, { ok: true, worker: "666-system-auth-worker", version: "1.2.1", role: "auth", status: "active" });
     }
 
     if (url.pathname === "/debug" && request.method === "GET") {
@@ -120,15 +119,16 @@ export default {
     }
 
     if (url.pathname === "/verify" && request.method === "POST") {
-      if (!serviceRequestAllowed(request, env)) return json(request, env, { ok: false, valid: false, error: "origin_rejected" }, 403);
-      if (!env.AUTH_SECRET) return json(request, env, { ok: false, valid: false, error: "worker_secrets_missing" }, 500);
+      if (!String(env.ADMIN_SERVICE_TOKEN || "").trim()) return json(request, env, { ok: false, valid: false, error: "service_token_missing" }, 500);
+      if (!serviceRequestAllowed(request, env)) return json(request, env, { ok: false, valid: false, error: "service_auth_rejected" }, 403);
+      if (!env.AUTH_SECRET || !env.AUTH_AUDIENCE) return json(request, env, { ok: false, valid: false, error: "worker_secrets_missing" }, 500);
 
       const body = await request.json().catch(() => ({}));
       let token = String(body.token || "");
       const bearer = String(request.headers.get("authorization") || "");
       if (!token && bearer.toLowerCase().startsWith("bearer ")) token = bearer.slice(7).trim();
 
-      const result = await verifyToken(token, env.AUTH_SECRET);
+      const result = await verifyToken(token, env.AUTH_SECRET, String(env.AUTH_AUDIENCE));
       if (!result.ok) return json(request, env, { ok: false, valid: false, error: result.error }, 401);
       return json(request, env, { ok: true, valid: true, payload: result.payload });
     }

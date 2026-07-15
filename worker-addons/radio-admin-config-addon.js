@@ -156,9 +156,11 @@ export async function fetchVerification(url, token, label, env = {}) {
 
 export async function verifyAdminAuth(request, env) {
   const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
-  const token = getCookie(request, "chaos_auth") || getCookie(request, "admin_auth") || bearerToken(request);
+  const token = getCookie(request, "admin_auth") || bearerToken(request);
   if (!token) return { ok: false, service: "auth", payload: null, error: "auth_token_missing" };
-  return fetchVerification(verifyUrl, token, "auth", env);
+  const result = await fetchVerification(verifyUrl, token, "auth", env);
+  result.expectedAudience = String(env.AUTH_AUDIENCE || "");
+  return result;
 }
 
 export function verifyPwIssuedToken(auth) {
@@ -171,6 +173,10 @@ export function verifyPwIssuedToken(auth) {
   }
   if (payload.iss !== "666-system-pw") {
     return { ok: false, service: "password", payload, error: "issuer_invalid" };
+  }
+  const expectedAudience = String(auth?.expectedAudience || "");
+  if (!expectedAudience || payload.aud !== expectedAudience) {
+    return { ok: false, service: "password", payload, error: "audience_invalid" };
   }
   if (payload.scope !== "admin") {
     return { ok: false, service: "password", payload, error: "scope_invalid" };
@@ -213,6 +219,7 @@ async function loginAdmin(request, env) {
 
     const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
     const verified = await fetchVerification(verifyUrl, data.token, "auth", env);
+    verified.expectedAudience = String(env.AUTH_AUDIENCE || "");
     const pw = verifyPwIssuedToken(verified);
     if (!pw.ok) return adminJson({ ok: false, error: pw.error || verified.error || "token_verification_failed" }, 401);
 

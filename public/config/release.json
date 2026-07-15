@@ -1,9 +1,9 @@
 {
-  "version": "1.2.20",
-  "release": "FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20",
+  "version": "1.2.22",
+  "release": "FULLVERSION_RADIO_ONLY_CLEANUP_v1.2.22",
   "frontendVersion": "v2026.07.09-veluna12",
   "build": "2026-07-09-veluna-v1212",
-  "date": "2026-07-13",
+  "date": "2026-07-15",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
   "features": [
@@ -65,7 +65,11 @@
     "IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY",
     "SAFARI_TOOLBAR_HEIGHT_GROW_RECOVERY",
     "VISUAL_VIEWPORT_GEOMETRY_REFRESH",
-    "KEYBOARD_SHRINK_GUARD"
+    "KEYBOARD_SHRINK_GUARD",
+    "RADIO_ONLY_REPOSITORY",
+    "CHAOS_SUNO_REMOVED",
+    "UNREFERENCED_ASSET_PURGE",
+    "THREE_WORKER_CLOUDFLARE_DEPLOY"
   ],
-  "notes": "The existing iPhone viewport owner now expands the fixed player geometry when Safari exposes more usable height after toolbar changes. Keyboard-induced shrink remains blocked; no new CSS or geometry layer was added."
+  "notes": "Radio-only cleanup removes Chaos/Suno systems and unreferenced assets while preserving the v1.2.21 password/auth hardening. GitHub Actions deploys only password, authentication and WebRadio workers."
 }

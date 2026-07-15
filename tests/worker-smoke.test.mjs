@@ -55,7 +55,7 @@ test("health is operational and does not crash", async () => {
   assert.equal(response.status, 200);
   const data = await response.json();
   assert.equal(data.ok, true);
-  assert.equal(data.version, "FULLVERSION_IPHONE_ADAPTIVE_FULLSCREEN_GEOMETRY_v1.2.20");
+  assert.equal(data.version, "FULLVERSION_RADIO_ONLY_CLEANUP_v1.2.22");
 });
 
 test("runtime configuration is read from static assets", async () => {
@@ -147,11 +147,6 @@ test("skip compatibility handler exists", async () => {
   assert.equal(data.protectedWriteRoute, "/api/admin/skip");
 });
 
-test("chaos API reaches the addon instead of HTML fallback", async () => {
-  const response = await request("/api/chaos-engine/auth-status");
-  assert.equal(response.status, 401);
-  assert.match(response.headers.get("content-type") || "", /application\/json/);
-});
 
 test("unknown API and missing assets return real 404 responses", async () => {
   const api = await request("/api/does-not-exist");

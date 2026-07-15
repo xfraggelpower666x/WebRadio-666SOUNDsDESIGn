@@ -1,9 +1,9 @@
 {
   "name": "webradio-666soundsdesign-fullversion",
-  "version": "1.2.20",
+  "version": "1.2.22",
   "private": true,
   "type": "module",
-  "description": "666SOUNDsDESIGn WebRadio full source with shared auth/messaging, session-once splash, shared native iPhone audio start, and adaptive iPhone fullscreen viewport geometry.",
+  "description": "666SOUNDsDESIGn WebRadio radio-only production source with hardened password/auth workers, shared player services and cleaned referenced assets.",
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",
