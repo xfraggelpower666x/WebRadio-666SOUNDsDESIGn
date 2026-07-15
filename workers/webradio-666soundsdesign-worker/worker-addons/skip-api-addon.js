@@ -1,7 +1,7 @@
 /*
 FILE: worker-addons/skip-api-addon.js
-VERSION: 1.0.1
-PURPOSE: Safe compatibility routes for the historic skip API.
+VERSION: 1.0.2
+PURPOSE: Safe compatibility routes for the historic skip API and MyIDJ route names.
 NOTE: The protected implementation remains in radio-admin-config-addon.js.
 */
 
@@ -42,12 +42,12 @@ export async function handleSkipApi(request, env) {
       service: "666soundsdesign-skip-compatibility",
       configured: skipConfigured(env),
       protectedWriteRoute: "/api/admin/skip",
-      compatibilityRoutes: ["/api/skip", "/skip"],
+      compatibilityRoutes: ["/api/skip", "/api/radio/skip", "/radio/autodj/skip", "/admin/autodj/skip", "/skip"],
       secretTransport: "authorization-header-preferred"
     });
   }
 
-  if (url.pathname === "/api/skip" || url.pathname === "/skip") {
+  if (url.pathname === "/api/skip" || url.pathname === "/api/radio/skip" || url.pathname === "/radio/autodj/skip" || url.pathname === "/admin/autodj/skip" || url.pathname === "/skip") {
     if (request.method === "POST") return redirectPreservingMethod(request, "/api/admin/skip");
     return json({
       ok: false,
