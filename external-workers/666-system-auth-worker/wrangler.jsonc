@@ -5,7 +5,7 @@
   "compatibility_date": "2026-06-25",
   "routes": [
     {
-      "pattern": "666-system-auth.666soundsdesign-broadcaster.com/*",
+      "pattern": "666-system-auth.666soundsdesign-broadcaster.com",
       "custom_domain": true
     }
   ],
