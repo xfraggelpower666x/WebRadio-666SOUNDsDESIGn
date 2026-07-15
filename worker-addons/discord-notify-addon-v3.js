@@ -18,7 +18,7 @@ import { verifyAdminAuth, verifyPwIssuedToken } from './radio-admin-config-addon
 ############################################################
 */
 
-const ADDON_VERSION = 'V4.0-20260625-SHARED-ADMIN-AUTH';
+const ADDON_VERSION = 'V4.4-20260715-DUAL-WEBHOOK-NO-PASSWORD-GATE';
 const DEFAULT_RADIO_NAME = '666SOUNDsDESIGn WebRadio';
 const DEFAULT_DOMAIN = 'webradio.666soundsdesign-broadcaster.com';
 const DEFAULT_PLAYER_URL = 'https://webradio.666soundsdesign-broadcaster.com';
@@ -32,6 +32,7 @@ const runtime = globalThis.__S666_DISCORD_V3_RUNTIME__ || {
   lastTrackKey: '',
   lastTrackAt: 0,
   lastManualAt: 0,
+  lastMessageAt: 0,
   lastOkAt: 0,
   lastErrorAt: 0,
   lastError: '',
@@ -254,7 +255,7 @@ function nowPlayingPayload(input = {}) {
     url: s.playerUrl,
     color: 0x7b4dff,
     fields: metadataFields(input),
-    footer: { text: '666SOUNDsDESIGn • Now Playing • Digital Underground' },
+    footer: { text: 'Auto Now Playing • 666SOUNDsDESIGn' },
     timestamp: nowIso()
   }, { thumbnail: s.previewImage, image: s.artwork });
   return { username: s.username, embeds: [embed] };
@@ -282,8 +283,31 @@ function messagePayload(input = {}) {
   return { username: s.username, embeds };
 }
 
+function getDiscordWebhooks(env) {
+  const raw = env ? [
+    env.DISCORD_WEBHOOK_URL,
+    env.DISCORD_WEBHOOK,
+    env.DISCORD_WEBHOOK_URI,
+    env.DISCORD_WEBHOOK_ENDPOINT,
+    env.WEBHOOK_URL,
+    env.DISCORD_WEBHOOK_URL2,
+    env.DISCORD_WEBHOOK_2,
+    env.DISCORD_SECONDARY_WEBHOOK_URL,
+    env.DISCORD_BROADCAST_WEBHOOK_URL2
+  ] : [];
+  const out = [];
+  const seen = new Set();
+  for (const value of raw) {
+    const cleanValue = clean(value, '', 1000);
+    if (!cleanValue || seen.has(cleanValue)) continue;
+    seen.add(cleanValue);
+    out.push(cleanValue);
+  }
+  return out;
+}
+
 function getDiscordWebhook(env) {
-  return env && (env.DISCORD_WEBHOOK_URL || env.DISCORD_WEBHOOK || env.DISCORD_WEBHOOK_URI || env.DISCORD_WEBHOOK_ENDPOINT || env.WEBHOOK_URL);
+  return getDiscordWebhooks(env)[0] || '';
 }
 
 function getPrivateTrackWebhook(env) {
@@ -310,12 +334,22 @@ async function sendDiscordToWebhook(webhook, payload) {
 }
 
 async function sendDiscord(env, payload) {
-  const webhook = getDiscordWebhook(env);
-  if (!webhook) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
-  const result = await sendDiscordToWebhook(webhook, payload);
+  const webhooks = getDiscordWebhooks(env);
+  if (!webhooks.length) throw new Error('Discord webhook secret missing. Accepted names: DISCORD_WEBHOOK_URL, DISCORD_WEBHOOK_URL2, DISCORD_WEBHOOK, DISCORD_WEBHOOK_URI, DISCORD_WEBHOOK_ENDPOINT, WEBHOOK_URL.');
+  const results = [];
+  for (let i = 0; i < webhooks.length; i += 1) {
+    try {
+      const result = await sendDiscordToWebhook(webhooks[i], payload);
+      results.push({ index: i + 1, ok: true, status: result.status, body: result.body });
+    } catch (err) {
+      results.push({ index: i + 1, ok: false, error: err && err.message ? err.message : String(err) });
+    }
+  }
+  const failed = results.filter(item => !item.ok);
+  if (failed.length === results.length) throw new Error(failed.map(item => item.error).join(' | ') || 'all_discord_webhooks_failed');
   runtime.lastOkAt = Date.now();
   runtime.lastError = '';
-  return result;
+  return { ok: true, count: results.length, results };
 }
 
 async function sendPrivateNowPlayingIfConfigured(env, payload) {
@@ -355,6 +389,8 @@ async function sharedAdminOk(request, env = {}) {
 
 async function discordAccessOk(request, env = {}) {
   if (serviceTokenOk(request, env)) return true;
+  const requireAdmin = String(env.DISCORD_REQUIRE_ADMIN || '').toLowerCase() === 'true';
+  if (!requireAdmin) return true;
   return sharedAdminOk(request, env);
 }
 
@@ -370,8 +406,11 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     return json({
       ok: true,
       addon: ADDON_VERSION,
-      ready: Boolean(getDiscordWebhook(env)),
-      authMode: 'shared-admin-bearer'
+      ready: Boolean(getDiscordWebhooks(env).length),
+      webhookCount: getDiscordWebhooks(env).length,
+      webhook2Configured: Boolean(env && (env.DISCORD_WEBHOOK_URL2 || env.DISCORD_WEBHOOK_2 || env.DISCORD_SECONDARY_WEBHOOK_URL)),
+      privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
+      authMode: String(env.DISCORD_REQUIRE_ADMIN || '').toLowerCase() === 'true' ? 'shared-admin-bearer-required' : 'public-secret-server-side'
     });
   }
 
@@ -381,9 +420,12 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       ok: true,
       addon: ADDON_VERSION,
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
-      webhookConfigured: Boolean(getDiscordWebhook(env)),
+      webhookConfigured: Boolean(getDiscordWebhooks(env).length),
+      webhookCount: getDiscordWebhooks(env).length,
+      webhook2Configured: Boolean(env && (env.DISCORD_WEBHOOK_URL2 || env.DISCORD_WEBHOOK_2 || env.DISCORD_SECONDARY_WEBHOOK_URL)),
       privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
       serviceTokenConfigured: Boolean(env && env.DISCORD_ADMIN_TOKEN),
+      requireAdmin: String(env.DISCORD_REQUIRE_ADMIN || '').toLowerCase() === 'true',
       sharedAdminAuth: true,
       lastKind: runtime.lastKind,
       lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
@@ -410,6 +452,12 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     if (path === '/api/discord/message') {
       const message = clean(input.message || input.text || input.content, '', 1800);
       if (!message) return json({ ok: false, error: 'message text missing' }, 400);
+      const now = Date.now();
+      if (now - runtime.lastMessageAt < MIN_MANUAL_COOLDOWN_MS) {
+        runtime.lastKind = 'message-cooldown';
+        return json({ ok: true, skipped: true, reason: 'message cooldown', led: 'cooldown', addon: ADDON_VERSION });
+      }
+      runtime.lastMessageAt = now;
       runtime.lastKind = 'message';
       const result = await sendDiscord(env, messagePayload(input));
       return json({ ok: true, type: 'message', led: 'ok', discord: result, addon: ADDON_VERSION });
