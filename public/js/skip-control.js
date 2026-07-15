@@ -1,6 +1,6 @@
 /*
  * 666SOUNDsDESIGn authoritative Auto-DJ skip controller.
- * UI is owned by player-stage-v2; this module owns the protected API request only.
+ * UI is owned by player-stage-v2; this module owns the protected API request.
  */
 (function () {
   'use strict';
@@ -22,6 +22,18 @@
     return window.S666AdminAuth.check(Boolean(force));
   }
 
+  async function postViaAdminAuth(path, payload) {
+    var response = await window.S666AdminAuth.fetch(path, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      credentials: 'same-origin',
+      cache: 'no-store',
+      body: JSON.stringify(payload || {})
+    });
+    var data = await response.json().catch(function () { return {}; });
+    return { response: response, data: data };
+  }
+
   async function skip(options) {
     options = options || {};
     if (inFlight) return { ok: false, error: 'skip_in_flight' };
@@ -30,14 +42,17 @@
     inFlight = true;
     dispatch({ phase: 'sending' });
     try {
-      var response = await window.S666AdminAuth.fetch('/api/admin/skip', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', accept: 'application/json' },
-        credentials: 'same-origin',
-        cache: 'no-store',
-        body: JSON.stringify({ source: options.source || 'player-stage-v2' })
-      });
-      var data = await response.json().catch(function () { return {}; });
+      var payload = { source: options.source || 'player-stage-v2' };
+      var result = await postViaAdminAuth('/api/admin/skip', payload);
+      var response = result.response;
+      var data = result.data;
+
+      if ((!response.ok || data.ok !== true) && (data.error === 'skip_not_configured' || data.error === 'skip_upstream_unreachable' || data.error === 'skip_timeout')) {
+        result = await postViaAdminAuth('/api/radio/skip', Object.assign({}, payload, { fallback: 'myidj-compat' }));
+        response = result.response;
+        data = result.data;
+      }
+
       if (!response.ok || data.ok !== true) {
         var error = normalizeError(response, data);
         dispatch({ phase: 'error', error: error, status: response.status });
