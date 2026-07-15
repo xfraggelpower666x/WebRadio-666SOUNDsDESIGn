@@ -37,6 +37,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: external-workers/666-system-pw-worker
+          wranglerVersion: "4.111.0"
           command: deploy
 
   deploy-auth-worker:
@@ -50,6 +51,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: external-workers/666-system-auth-worker
+          wranglerVersion: "4.111.0"
           command: deploy
 
   deploy-webradio-worker:
@@ -62,4 +64,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.111.0"
           command: deploy
