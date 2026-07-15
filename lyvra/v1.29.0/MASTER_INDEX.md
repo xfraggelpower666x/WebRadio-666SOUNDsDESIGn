@@ -1,10 +1,12 @@
 # LYVRA v1.29.0 — MASTER INDEX
 
-Package ID: LYVRA_v1.29.0_DEVELOPMENT_PACKAGE_CHAIN_001
-Branch: lyvra-development-v1.29.0
-Active predecessor: LYVRA v1.28.0
-Classification: DEVELOPMENT CANDIDATE
-Global status: NOT PROMOTED
+Package ID: LYVRA_v1.29.0_ACTIVE_HEAD_CHAIN_001
+Branch: WebRadio-666SOUNDsDESIGn
+Previous active release: LYVRA v1.28.0
+Classification: ACTIVE HEAD
+Global status: PROMOTED / ACTIVE
+Promotion date: 2026-07-15
+Promotion merge commit: 4029b31bd756b70164db233ff417dce870f8ad78
 
 ## Authoritative load order
 
@@ -21,43 +23,32 @@ Global status: NOT PROMOTED
 11. PART_011_PHOTOREALISMUS_FRAMEWORK_REPLACEMENT_v1_9_0.md
 12. PART_012_PHOTOREALISMUS_CAUSAL_INTEGRATION_MAP.md
 
-## Core development statement
+## Active authority
 
-LYVRA generates project-specific knowledge from State Zero through observation, experimentation, audit and validation. Reference knowledge is used afterward for comparison, correction and expansion. Negative experiences remain usable measurements and are transformed into improved hypotheses and decisions.
+LYVRA v1.29.0 is the latest verified active system state. Historical versions remain recovery references only and must never auto-activate over this release.
 
-## Core musical statement
+## Photorealism authority
 
-Complexity is a causal relationship network. Controlled chaos becomes musically coherent when its micro-decisions converge into a self-propelling causal mega-event.
+666 Photorealismus Generator v1.9.0 Lean Photoreal Reconstruction Stable is the sole valid photorealism engine. The former faulty render logic is removed from runtime, fallback, recovery and self-healing paths.
 
-## Translation statement
+## Experimental module state
 
-The LYVRA ⇄ SUNO Production Dictionary converts internal musical meaning into concise production language. Philosophical or architectural explanation remains internal and is not passed to the renderer.
+The Emoji Production Boost A/B Layer is included in the active package but remains disabled by default pending practical A/B validation. Its presence does not block the rest of v1.29.0 from being active.
 
-## Photorealism statement
-
-The v1.9.0 Lean Photoreal Reconstruction framework is the sole valid photorealism engine. It inherits all valid causal, routing, audit, recovery and latest-state connections previously required by the image framework, while the faulty former render logic is removed.
-
-## Experimental statement
-
-Emoji production emphasis remains optional and unpromoted until repeated A/B testing demonstrates a reliable benefit without vocalization or drift. Candidate rule: Emoji+Word=ProdOnly.
-
-## Current gate
+## Promotion gate result
 
 - Twelve-part package: PASS
 - Numerical load order: PASS
-- Separate development branch: PASS
-- Active predecessor v1.28.0 recorded: PASS
-- Non-destructive integration contract: PASS
-- Latest-state gate: PASS
+- Main-branch merge: PASS
+- Branch drift: PASS
+- Causal integration: PASS
 - Photorealism v1.9.0 replacement: PASS
-- Photorealism causal rewiring: PASS
-- GitHub candidate construction: PASS
-- Canonical candidate backup: PENDING REFRESH
-- PC-Recovery candidate backup: PENDING REFRESH
-- Physical hash manifest: PENDING REFRESH
-- Emoji A/B validation: PENDING
-- Global promotion: BLOCKED
+- Old photorealism runtime removal: PASS
+- Canonical freeze backup: PASS
+- PC-Recovery freeze backup: PASS
+- Physical hash seal: PASS
+- Global promotion: PASS
 
 ## Recovery rule
 
-Load this index first. Verify every listed file and its hash when available. If any required component is missing, inconsistent or based on an older active predecessor, do not activate v1.29.0. Keep the last verified active release authoritative.
+Load this index first. Verify all twelve parts and package hashes. Restore v1.29.0 as one connected system. Never restore the removed photorealism engine. The Emoji A/B layer may be disabled independently without rolling back the active release.
