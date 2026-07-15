@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/deploy-cloudflare-workers.yml"
+      - "external-workers/**"
+      - "public/**"
+      - "worker.js"
+      - "wrangler.jsonc"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
+      - "tests/**"
+      - "worker-addons/**"
   workflow_dispatch:
 
 permissions:
