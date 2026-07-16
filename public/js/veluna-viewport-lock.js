@@ -1,4 +1,4 @@
-/* VELUNA iPhone fullscreen geometry lock v1.2.20 */
+/* VELUNA iPhone fullscreen geometry lock v1.2.23 */
 (() => {
   'use strict';
 
@@ -26,18 +26,18 @@
     const width = Math.max(
       1,
       Math.round(
+        visual?.width ||
         document.documentElement.clientWidth ||
         window.innerWidth ||
-        visual?.width ||
         screen.width
       )
     );
     const height = Math.max(
       1,
       Math.round(
-        window.innerHeight ||
-        document.documentElement.clientHeight ||
         visual?.height ||
+        document.documentElement.clientHeight ||
+        window.innerHeight ||
         screen.height
       )
     );
@@ -92,8 +92,8 @@
      * übernehmen wir deshalb jede echte Vergrößerung, schrumpfen aber nicht bei
      * Tastatur oder wieder eingeblendeten Browserleisten.
      */
-    const nextWidth = Math.max(state.width, viewport.width);
-    const nextHeight = allowGrow ? Math.max(state.height, viewport.height) : viewport.height;
+    const nextWidth = viewport.width;
+    const nextHeight = viewport.height;
     if (Math.abs(nextWidth - state.width) >= 2 || Math.abs(nextHeight - state.height) >= 2) {
       writeGeometry(nextWidth, nextHeight, orientation);
     }

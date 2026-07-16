@@ -18,28 +18,28 @@ PURPOSE: Sound Control Overlay V1 styling.
   min-height:34px;
   padding:7px 12px;
   border-radius:999px;
-  border:1px solid rgba(32,247,255,.62);
-  background:linear-gradient(135deg,rgba(32,247,255,.22),rgba(255,63,215,.20));
+  border:1px solid rgba(22,139,255,.62);
+  background:linear-gradient(135deg,rgba(22,139,255,.22),rgba(180,92,255,.20));
   color:#eaf4ff;
   font-weight:900;
   letter-spacing:.055em;
   cursor:pointer;
-  box-shadow:0 0 16px rgba(32,247,255,.20);
+  box-shadow:0 0 16px rgba(22,139,255,.20);
 }
 .s666-sound-button .s666-sound-led{
   width:10px;height:10px;border-radius:999px;
-  background:#60ff9b;
-  box-shadow:0 0 10px rgba(96,255,155,.85);
+  background:#7edcff;
+  box-shadow:0 0 10px rgba(126,220,255,.85);
 }
 .s666-sound-button.is-dirty .s666-sound-led{
-  background:#ff3fd7;
-  box-shadow:0 0 10px rgba(255,63,215,.90);
+  background:#b45cff;
+  box-shadow:0 0 10px rgba(180,92,255,.90);
 }
 
 .s666-sound-overlay{
   position:fixed;
   inset:0;
-  z-index:999999;
+  z-index:2147483600;
   display:grid;
   place-items:center;
   color:#eaf4ff;
@@ -57,13 +57,13 @@ PURPOSE: Sound Control Overlay V1 styling.
   width:min(980px,94vw);
   max-height:92vh;
   overflow:auto;
-  border:1px solid rgba(32,247,255,.58);
+  border:1px solid rgba(22,139,255,.58);
   border-radius:22px;
   background:
-    radial-gradient(circle at 10% 0%,rgba(255,63,215,.18),transparent 34%),
-    radial-gradient(circle at 90% 16%,rgba(32,247,255,.15),transparent 38%),
+    radial-gradient(circle at 10% 0%,rgba(180,92,255,.18),transparent 34%),
+    radial-gradient(circle at 90% 16%,rgba(22,139,255,.15),transparent 38%),
     rgba(4,7,20,.97);
-  box-shadow:0 0 38px rgba(32,247,255,.22), inset 0 0 34px rgba(255,63,215,.08);
+  box-shadow:0 0 38px rgba(22,139,255,.22), inset 0 0 34px rgba(180,92,255,.08);
 }
 .s666-sound-head{
   display:flex;
@@ -71,11 +71,11 @@ PURPOSE: Sound Control Overlay V1 styling.
   align-items:center;
   gap:16px;
   padding:17px 20px;
-  border-bottom:1px solid rgba(32,247,255,.22);
+  border-bottom:1px solid rgba(22,139,255,.22);
 }
 .s666-sound-head b{
   display:block;
-  color:#ff3fd7;
+  color:#b45cff;
   font-size:22px;
   letter-spacing:.12em;
 }
@@ -110,20 +110,20 @@ PURPOSE: Sound Control Overlay V1 styling.
   gap:6px;
   padding:10px 4px;
   border-radius:14px;
-  border:1px solid rgba(32,247,255,.22);
+  border:1px solid rgba(22,139,255,.22);
   background:rgba(7,14,36,.78);
 }
-.s666-sound-band span{font-weight:900;color:#20f7ff;font-size:12px}
-.s666-sound-band b{color:#ff3fd7;font-size:12px}
+.s666-sound-band span{font-weight:900;color:#168bff;font-size:12px}
+.s666-sound-band b{color:#b45cff;font-size:12px}
 .s666-sound-band input[type=range]{
   writing-mode:vertical-rl;
   direction:rtl;
   width:34px;
   height:220px;
-  accent-color:#20f7ff;
+  accent-color:#168bff;
 }
 .s666-sound-boost{
-  border:1px solid rgba(255,63,215,.24);
+  border:1px solid rgba(180,92,255,.24);
   border-radius:16px;
   padding:16px;
   background:rgba(7,14,36,.78);
@@ -131,7 +131,7 @@ PURPOSE: Sound Control Overlay V1 styling.
 .s666-sound-boost-title{
   font-size:18px;
   font-weight:900;
-  color:#ff3fd7;
+  color:#b45cff;
   letter-spacing:.10em;
   margin-bottom:12px;
 }
@@ -145,7 +145,7 @@ PURPOSE: Sound Control Overlay V1 styling.
 }
 #s666SoundBoostLevel{
   width:100%;
-  accent-color:#ff3fd7;
+  accent-color:#b45cff;
 }
 .s666-sound-boost-readout{
   display:flex;
@@ -153,7 +153,7 @@ PURPOSE: Sound Control Overlay V1 styling.
   gap:10px;
   margin-top:12px;
   font-weight:900;
-  color:#20f7ff;
+  color:#168bff;
 }
 .s666-sound-presets{
   grid-column:1/-1;
@@ -163,7 +163,7 @@ PURPOSE: Sound Control Overlay V1 styling.
 }
 .s666-sound-presets button,
 .s666-sound-actions button{
-  border:1px solid rgba(32,247,255,.28);
+  border:1px solid rgba(22,139,255,.28);
   border-radius:10px;
   background:#10182e;
   color:#eaf4ff;
@@ -173,7 +173,7 @@ PURPOSE: Sound Control Overlay V1 styling.
 }
 .s666-sound-presets button:hover,
 .s666-sound-actions button:hover{
-  background:linear-gradient(135deg,#20f7ff,#ff3fd7);
+  background:linear-gradient(135deg,#168bff,#b45cff);
   color:#02030a;
 }
 .s666-sound-actions{
@@ -182,12 +182,12 @@ PURPOSE: Sound Control Overlay V1 styling.
   align-items:center;
   gap:9px;
   padding:14px 20px 18px;
-  border-top:1px solid rgba(32,247,255,.18);
+  border-top:1px solid rgba(22,139,255,.18);
 }
 .s666-sound-status{
   margin-right:auto;
   font-weight:900;
-  color:#60ff9b;
+  color:#7edcff;
 }
 @media(max-width:760px){
   .s666-sound-panel{width:96vw;max-height:94vh}

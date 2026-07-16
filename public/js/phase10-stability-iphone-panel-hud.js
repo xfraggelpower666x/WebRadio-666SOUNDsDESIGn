@@ -11,7 +11,7 @@ RULES:
 */
 (function(){
   "use strict";
-  var VERSION = "phase10-stability-iphone-panel-hud-20260525";
+  var VERSION = "phase10-stability-iphone-panel-hud-20260716-single-tap";
   var lastAudibleAt = Date.now();
 
   // AUDIO_CORE_AUTHORITY_LOCK_V1_20260610
@@ -100,18 +100,6 @@ RULES:
       ev.stopPropagation();
       runMobileAction(btn.getAttribute("data-phase10-mobile"), btn);
     }, true);
-
-    row.addEventListener("touchend", function(ev){
-      var sound = ev.target.closest && ev.target.closest("#s666SoundControlButton");
-      if(sound){ ev.preventDefault(); ev.stopPropagation(); openSoundControl(); return; }
-      var message = ev.target.closest && ev.target.closest("#s666MessageControlButton");
-      if(message && window.S666Messenger){ ev.preventDefault(); ev.stopPropagation(); window.S666Messenger.open(); return; }
-      var btn = ev.target.closest && ev.target.closest("[data-phase10-mobile]");
-      if(!btn) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      runMobileAction(btn.getAttribute("data-phase10-mobile"), btn);
-    }, { passive:false, capture:true });
   }
 
   function runMobileAction(action, btn){
@@ -643,12 +631,6 @@ RULES:
       ev.preventDefault(); ev.stopPropagation();
       parityRunMobileAction(btn.getAttribute("data-parity-action"), btn);
     }, true);
-    hub.addEventListener("touchend", function(ev){
-      var btn = ev.target.closest && ev.target.closest("[data-parity-action]");
-      if(!btn) return;
-      ev.preventDefault(); ev.stopPropagation();
-      parityRunMobileAction(btn.getAttribute("data-parity-action"), btn);
-    }, {passive:false, capture:true});
   }
   function parityRunMobileAction(action, btn){
     qsa("#s666ParityMobileHub button").forEach(function(b){ b.removeAttribute("data-active"); });

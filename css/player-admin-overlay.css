@@ -3,24 +3,24 @@ FILE: css/player-admin-overlay.css
 CREATED: 2026-05-24
 PURPOSE: Protected admin overlay.
 */
-.fp-admin-button{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:8px 13px;border-radius:999px;border:1px solid rgba(32,247,255,.68);background:linear-gradient(135deg,#20f7ff,#ff3fd7);color:#02030a;font-weight:900;letter-spacing:.05em;cursor:pointer;box-shadow:0 0 18px rgba(32,247,255,.28);z-index:50}
+.fp-admin-button{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:8px 13px;border-radius:999px;border:1px solid rgba(22,139,255,.68);background:linear-gradient(135deg,#168bff,#b45cff);color:#02030a;font-weight:900;letter-spacing:.05em;cursor:pointer;box-shadow:0 0 18px rgba(22,139,255,.28);z-index:50}
 .fp-admin-button::after{content:"🔒";margin-left:6px}
-.fp-admin-overlay{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;color:#eaf4ff;font-family:Arial,Helvetica,sans-serif}
+.fp-admin-overlay{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;color:#eaf4ff;font-family:Arial,Helvetica,sans-serif}
 .fp-admin-hidden{display:none!important}.fp-admin-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(10px)}
-.fp-admin-panel{position:relative;width:min(1180px,94vw);max-height:90vh;overflow:auto;border:1px solid rgba(32,247,255,.55);border-radius:22px;background:radial-gradient(circle at 12% 6%,rgba(255,63,215,.18),transparent 34%),radial-gradient(circle at 82% 18%,rgba(32,247,255,.13),transparent 34%),rgba(5,8,24,.96);box-shadow:0 0 38px rgba(32,247,255,.22)}
-.fp-admin-header{display:flex;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(32,247,255,.18)}
-.fp-admin-header h2{margin:0;color:#ff3fd7;letter-spacing:.08em}.fp-admin-header p{margin:4px 0 0;color:#8da4c2}
+.fp-admin-panel{position:relative;width:min(1180px,94vw);max-height:90vh;overflow:auto;border:1px solid rgba(22,139,255,.55);border-radius:22px;background:radial-gradient(circle at 12% 6%,rgba(180,92,255,.18),transparent 34%),radial-gradient(circle at 82% 18%,rgba(22,139,255,.13),transparent 34%),rgba(5,8,24,.96);box-shadow:0 0 38px rgba(22,139,255,.22)}
+.fp-admin-header{display:flex;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(22,139,255,.18)}
+.fp-admin-header h2{margin:0;color:#b45cff;letter-spacing:.08em}.fp-admin-header p{margin:4px 0 0;color:#8da4c2}
 .fp-admin-close{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:#10182e;color:#eaf4ff;font-size:24px;cursor:pointer}
-.fp-admin-tabs{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid rgba(32,247,255,.18);flex-wrap:wrap}
+.fp-admin-tabs{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid rgba(22,139,255,.18);flex-wrap:wrap}
 .fp-admin-tabs button,.fp-admin-actions button{padding:10px 14px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#10182e;color:#eaf4ff;font-weight:800;cursor:pointer}
-.fp-admin-tabs button.is-active,.fp-admin-actions button:hover{background:linear-gradient(135deg,#20f7ff,#9b5cff);color:#02030a}
-.fp-admin-actions button.danger,#fp-admin-commit-config{background:linear-gradient(135deg,#ff315d,#ff3fd7);color:#fff}
+.fp-admin-tabs button.is-active,.fp-admin-actions button:hover{background:linear-gradient(135deg,#168bff,#b45cff);color:#02030a}
+.fp-admin-actions button.danger,#fp-admin-commit-config{background:linear-gradient(135deg,#ff315d,#b45cff);color:#fff}
 .fp-admin-content{padding:18px 20px}.fp-admin-tab{display:none}.fp-admin-tab.is-active{display:block}
 .fp-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fp-admin-grid label{display:block;color:#8da4c2;font-size:13px}
-.fp-admin-grid input{width:100%;margin-top:6px;padding:11px;border-radius:10px;border:1px solid rgba(32,247,255,.32);background:#060b1a;color:#eaf4ff;font-size:16px}
+.fp-admin-grid input{width:100%;margin-top:6px;padding:11px;border-radius:10px;border:1px solid rgba(22,139,255,.32);background:#060b1a;color:#eaf4ff;font-size:16px}
 .fp-admin-panel input,.fp-admin-panel textarea,.fp-admin-panel select{font-size:16px}
 .fp-admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.fp-admin-actions.vertical{flex-direction:column;align-items:flex-start}
-.fp-admin-panel pre{white-space:pre-wrap;overflow:auto;max-height:420px;padding:12px;border-radius:12px;border:1px solid rgba(32,247,255,.22);background:#040714;color:#eaf4ff}
+.fp-admin-panel pre{white-space:pre-wrap;overflow:auto;max-height:420px;padding:12px;border-radius:12px;border:1px solid rgba(22,139,255,.22);background:#040714;color:#eaf4ff}
 @media(max-width:760px){.fp-admin-grid{grid-template-columns:1fr}.fp-admin-panel{width:96vw;max-height:92vh}.fp-admin-tabs{overflow:auto;flex-wrap:nowrap}.fp-admin-tabs button{white-space:nowrap}}
 
 
@@ -30,7 +30,7 @@ PURPOSE: Protected admin overlay.
   min-height:120px;
   padding:12px;
   border-radius:12px;
-  border:1px solid rgba(32,247,255,.32);
+  border:1px solid rgba(22,139,255,.32);
   background:#040714;
   color:#eaf4ff;
   font-size:16px;
@@ -41,7 +41,7 @@ PURPOSE: Protected admin overlay.
   display:flex;
   align-items:center;
   gap:10px;
-  color:#ff3fd7;
+  color:#b45cff;
   font-weight:900;
   letter-spacing:.08em;
   margin-bottom:10px;
@@ -55,10 +55,10 @@ PURPOSE: Protected admin overlay.
   border-radius:999px;
   padding:3px 8px;
   font-size:11px;
-  border:1px solid rgba(32,247,255,.35);
-  color:#20f7ff;
+  border:1px solid rgba(22,139,255,.35);
+  color:#168bff;
   background:rgba(5,8,24,.9);
 }
-.fp-admin-led.is-ready{color:#20f7ff;box-shadow:0 0 9px rgba(32,247,255,.28)}
-.fp-admin-led.is-sent{color:#60ff9b;border-color:rgba(96,255,155,.8);box-shadow:0 0 11px rgba(96,255,155,.34)}
+.fp-admin-led.is-ready{color:#168bff;box-shadow:0 0 9px rgba(22,139,255,.28)}
+.fp-admin-led.is-sent{color:#7edcff;border-color:rgba(126,220,255,.8);box-shadow:0 0 11px rgba(126,220,255,.34)}
 .fp-admin-led.is-failed{color:#ff315d;border-color:rgba(255,49,93,.8);box-shadow:0 0 11px rgba(255,49,93,.34)}

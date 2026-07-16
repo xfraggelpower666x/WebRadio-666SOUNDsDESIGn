@@ -9,13 +9,15 @@ const viewportMirror = await readFile(new URL('../public/js/veluna-viewport-lock
 for (const htmlPath of ['../veluna/index.html','../VELUNA/index.html','../public/veluna/index.html','../public/VELUNA/index.html']) {
   test(`VELUNA viewport cache bust active: ${htmlPath}`, async () => {
     const html = await readFile(new URL(htmlPath, import.meta.url), 'utf8');
-    assert.match(html, /veluna-viewport-lock\.js\?v=2026-07-13-veluna-v1220/);
+    assert.match(html, /veluna-viewport-lock\.js\?v=2026-07-16-iphone-action-v1223/);
   });
 }
 
-test('viewport lock grows with Safari usable height', () => {
+test('viewport lock follows Safari visible viewport', () => {
   assert.match(viewportLock, /visualViewport\.addEventListener\('resize'/);
-  assert.match(viewportLock, /Math\.max\(state\.height, viewport\.height\)/);
+  assert.match(viewportLock, /const nextWidth = viewport\.width/);
+  assert.match(viewportLock, /const nextHeight = viewport\.height/);
+  assert.doesNotMatch(viewportLock, /Math\.max\(state\.height, viewport\.height\)/);
   assert.match(viewportLock, /keyboardOpen\(\)/);
   assert.doesNotMatch(viewportLock, /if \(!force && state\.width && state\.orientation === orientation\) return/);
 });
