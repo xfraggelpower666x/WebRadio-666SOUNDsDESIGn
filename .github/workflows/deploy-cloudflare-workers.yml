@@ -97,3 +97,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.111.0"
           command: deploy
+
+# PR merge trigger: audited iPhone action repair 2026-07-16
