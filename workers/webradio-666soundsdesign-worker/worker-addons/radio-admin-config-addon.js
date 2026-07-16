@@ -639,6 +639,89 @@ async function debugStatus(request, env) {
   });
 }
 
+function diagnosticTokenAllowed(request, env) {
+  if (String(env?.ENABLE_PUBLIC_DEBUG || "").toLowerCase() === "true") return true;
+  const expected = String(env?.DEBUG_TOKEN || "").trim();
+  if (!expected) return false;
+  const auth = String(request.headers.get("authorization") || "").trim();
+  const bearer = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
+  const provided = String(request.headers.get("x-debug-token") || bearer || "").trim();
+  if (!provided || provided.length !== expected.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < expected.length; i += 1) mismatch |= expected.charCodeAt(i) ^ provided.charCodeAt(i);
+  return mismatch === 0;
+}
+
+function healthUrlFrom(baseUrl, fallback) {
+  const raw = String(baseUrl || fallback || "").trim();
+  try {
+    const url = new URL(raw);
+    url.pathname = "/health";
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+async function probeWorkerHealth(url) {
+  if (!url) return { reachable: false, version: null, status: 0, error: "url_missing" };
+  try {
+    const response = await fetchWithTimeout(url, {
+      method: "GET",
+      headers: { accept: "application/json", "cache-control": "no-store" },
+      redirect: "error"
+    }, 5000);
+    const data = await response.json().catch(() => ({}));
+    return {
+      reachable: response.ok && data?.ok === true,
+      version: data?.version ? String(data.version) : null,
+      status: response.status,
+      worker: data?.worker ? String(data.worker) : null,
+      error: response.ok ? null : cleanText(data?.error || `http_${response.status}`, 120)
+    };
+  } catch (error) {
+    return {
+      reachable: false,
+      version: null,
+      status: 0,
+      worker: null,
+      error: error?.name === "AbortError" ? "health_timeout" : "health_unreachable"
+    };
+  }
+}
+
+async function authLiveState(request, env) {
+  if (!diagnosticTokenAllowed(request, env)) return adminJson({ ok: false, error: "not_found" }, 404);
+
+  const pwHealthUrl = healthUrlFrom(env.PW_LOGIN_URL || env.ADMIN_AUTH_LOGIN_URL, "https://666-system-pw.666soundsdesign-broadcaster.com/login");
+  const authHealthUrl = healthUrlFrom(env.ADMIN_AUTH_VERIFY_URL, "https://666-system-auth.666soundsdesign-broadcaster.com/verify");
+  const [pw, auth] = await Promise.all([
+    probeWorkerHealth(pwHealthUrl),
+    probeWorkerHealth(authHealthUrl)
+  ]);
+
+  return adminJson({
+    ok: true,
+    diagnostic: "auth-live-state",
+    mainWorkerCanReachPwLogin: Boolean(pw.reachable),
+    mainWorkerCanReachAuthVerify: Boolean(auth.reachable),
+    audienceConfigured: Boolean(env.AUTH_AUDIENCE),
+    serviceTokenConfigured: Boolean(env.ADMIN_SERVICE_TOKEN),
+    pwWorkerVersion: pw.version,
+    authWorkerVersion: auth.version,
+    details: {
+      pw: { reachable: Boolean(pw.reachable), status: pw.status, worker: pw.worker, error: pw.error },
+      auth: { reachable: Boolean(auth.reachable), status: auth.status, worker: auth.worker, error: auth.error }
+    },
+    notes: [
+      "No secret values are returned.",
+      "Reachability uses /health on the configured PW/Auth worker origins."
+    ]
+  });
+}
+
 function methodNotAllowed(allowed) {
   return adminJson({ ok: false, error: "method_not_allowed", allowed }, 405, { allow: allowed.join(", ") });
 }
@@ -649,6 +732,10 @@ export async function handleRadioAdminConfigAddon(request, env) {
   if (url.pathname === "/api/admin/debug") {
     if (request.method !== "GET") return methodNotAllowed(["GET"]);
     return debugStatus(request, env);
+  }
+  if (url.pathname === "/api/admin/auth-live-state") {
+    if (request.method !== "GET") return methodNotAllowed(["GET"]);
+    return authLiveState(request, env);
   }
   if (url.pathname === "/api/admin/login") {
     if (request.method !== "POST") return methodNotAllowed(["POST"]);
