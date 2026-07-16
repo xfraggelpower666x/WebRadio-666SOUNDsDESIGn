@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: webradio-cloudflare-production
@@ -30,30 +30,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - name: Apply pending iPhone action repair
-        shell: bash
-        run: |
-          if grep -q "2026-07-13-veluna-v1220" veluna/index.html; then
-            python .github/one-time/apply_iphone_action_repair.py
-            echo "REPAIR_APPLIED=1" >> "$GITHUB_ENV"
-          else
-            echo "REPAIR_APPLIED=0" >> "$GITHUB_ENV"
-          fi
-      - name: Commit staged repair before verification
-        if: env.REPAIR_APPLIED == '1'
-        shell: bash
-        run: |
-          git config user.name "666SOUNDsDESIGn Repair Bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html css/veluna-theme.css public/css/veluna-theme.css js/veluna-viewport-lock.js public/js/veluna-viewport-lock.js js/phase10-stability-iphone-panel-hud.js public/js/phase10-stability-iphone-panel-hud.js css/phase10-stability-iphone-panel-hud.css public/css/phase10-stability-iphone-panel-hud.css css/player-admin-overlay.css public/css/player-admin-overlay.css css/sound-control-overlay-v1.css public/css/sound-control-overlay-v1.css js/messenger-overlay.js public/js/messenger-overlay.js tests/viewport-fullscreen.test.mjs
-          git commit -m "repair: restore iPhone player actions and laser theme"
-          git push origin HEAD:WebRadio-666SOUNDsDESIGn
       - run: npm ci
       - run: npm run verify
 
