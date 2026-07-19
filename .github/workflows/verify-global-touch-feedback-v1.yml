@@ -1,0 +1,70 @@
+name: Verify Global Touch Feedback v1
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/one-time/apply_global_touch_feedback_v1.py"
+      - ".github/workflows/verify-global-touch-feedback-v1.yml"
+      - "js/veluna-ui.js"
+      - "public/js/veluna-ui.js"
+      - "css/veluna-theme.css"
+      - "public/css/veluna-theme.css"
+      - "js/player-stage-v2.js"
+      - "public/js/player-stage-v2.js"
+      - "css/player-stage-v2.css"
+      - "public/css/player-stage-v2.css"
+      - "veluna/index.html"
+      - "VELUNA/index.html"
+      - "public/veluna/index.html"
+      - "public/VELUNA/index.html"
+      - "index.html"
+      - "public/index.html"
+      - "worker.js"
+      - "workers/webradio-666soundsdesign-worker/worker.js"
+      - "tests/frontend-contracts.test.mjs"
+      - "tests/worker-smoke.test.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply global touch repair
+        run: python .github/one-time/apply_global_touch_feedback_v1.py
+      - name: Verify complete release
+        run: |
+          npm ci
+          npm run verify
+      - name: Stage verified files
+        shell: bash
+        run: |
+          mkdir -p /tmp/global-touch-feedback
+          cp --parents \
+            js/veluna-ui.js public/js/veluna-ui.js \
+            css/veluna-theme.css public/css/veluna-theme.css \
+            js/player-stage-v2.js public/js/player-stage-v2.js \
+            css/player-stage-v2.css public/css/player-stage-v2.css \
+            veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html \
+            index.html public/index.html \
+            worker.js workers/webradio-666soundsdesign-worker/worker.js \
+            tests/frontend-contracts.test.mjs tests/worker-smoke.test.mjs \
+            /tmp/global-touch-feedback/
+          cd /tmp/global-touch-feedback
+          sha256sum $(find . -type f -print | sort) > VERIFIED-SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: global-touch-feedback-v1-verified
+          path: /tmp/global-touch-feedback
+          if-no-files-found: error
+          retention-days: 7
