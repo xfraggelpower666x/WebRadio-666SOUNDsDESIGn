@@ -14,28 +14,31 @@ permissions:
 jobs:
   live-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - name: Wait for Cloudflare propagation
-        run: sleep 30
+        run: sleep 45
       - name: Fetch live assets
         shell: bash
         run: |
           set -euo pipefail
           base="https://webradio.666soundsdesign-broadcaster.com"
-          curl --fail --silent --show-error --location --retry 6 --retry-delay 10 --retry-all-errors "$base/veluna?t=$(date +%s)" -o /tmp/veluna.html
-          curl --fail --silent --show-error --location --retry 6 --retry-delay 10 --retry-all-errors "$base/js/addons/discord-player-addon-v3.js?t=$(date +%s)" -o /tmp/discord.js
-          curl --fail --silent --show-error --location --retry 6 --retry-delay 10 --retry-all-errors "$base/js/admin-auth-client.js?t=$(date +%s)" -o /tmp/auth.js
-          curl --fail --silent --show-error --location --retry 6 --retry-delay 10 --retry-all-errors "$base/css/veluna-theme.css?t=$(date +%s)" -o /tmp/theme.css
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 10 --retry-all-errors "$base/veluna?t=$(date +%s)" -o /tmp/veluna.html
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 10 --retry-all-errors "$base/js/addons/discord-player-addon-v3.js?t=$(date +%s)" -o /tmp/discord.js
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 10 --retry-all-errors "$base/js/admin-auth-client.js?t=$(date +%s)" -o /tmp/auth.js
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 10 --retry-all-errors "$base/css/veluna-theme.css?t=$(date +%s)" -o /tmp/theme.css
       - name: Verify live repair markers
         shell: bash
         run: |
           set -euo pipefail
-          grep -F '2026-07-19-overlay-status-v49' /tmp/veluna.html
-          grep -F 'V4.9-20260719-OVERLAY-STATUS-MANUAL-NOWPLAYING' /tmp/discord.js
+          grep -F '2026-07-19-overlay-status-v50' /tmp/veluna.html
+          grep -F 'V4.10-20260719-MESSENGER-STATUS-EMOJI-CLOSE' /tmp/discord.js
           grep -F '✓ Erfolgreich an Discord gesendet' /tmp/discord.js
           grep -F '✓ Now Playing erfolgreich gesendet' /tmp/discord.js
-          grep -F '✓ Erfolgreich an Hörer gesendet' /tmp/discord.js
+          grep -F 'data-veluna-msg-emoji' /tmp/discord.js
+          grep -F 'closeVelunaMessengerOverlay' /tmp/discord.js
+          grep -F '✓ Erfolgreich an die Hörer gesendet' /tmp/discord.js
+          grep -F '✗ Versand fehlgeschlagen:' /tmp/discord.js
           grep -F "version: '1.2.20-exact-auth-errors'" /tmp/auth.js
           grep -F 'VELUNA Central Player Theme v1.2.24' /tmp/theme.css
           grep -F 'margin-top:clamp(32px,4vh,40px)!important' /tmp/theme.css
