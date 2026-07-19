@@ -1,6 +1,6 @@
 /*
 FILE: worker-addons/radio-admin-config-addon.js
-VERSION: 1.0.1
+VERSION: 1.0.2
 PURPOSE: Protected GitHub-backed radio runtime config and admin skip API.
 SECURITY: No secrets in URLs unless SKIP_ALLOW_QUERY_SECRET=true is explicitly set.
 */
@@ -9,6 +9,8 @@ const DEFAULT_CONFIG_PATH = "config/radio-runtime.json";
 const DEFAULT_BACKUP_DIR = "config/backups";
 const RADIO_CONFIG_KV_KEY = "radio-runtime:current";
 const DEFAULT_TIMEOUT_MS = 8000;
+const CANONICAL_PW_LOGIN_URL = "https://666-system-pw.666soundsdesign-broadcaster.com/login";
+const CANONICAL_AUTH_VERIFY_URL = "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
 
 function adminJson(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -100,6 +102,22 @@ function adminServiceHeaders(env, base = {}) {
   return headers;
 }
 
+// MAIN_WORKER_CANONICAL_AUTH_FALLBACK_V1
+function uniqueUpstreamUrls(...values) {
+  const urls = [];
+  for (const value of values) {
+    const raw = String(value || "").trim();
+    if (!raw) continue;
+    try {
+      const url = new URL(raw);
+      if (!/^https?:$/.test(url.protocol)) continue;
+      const normalized = url.toString();
+      if (!urls.includes(normalized)) urls.push(normalized);
+    } catch {}
+  }
+  return urls;
+}
+
 async function fetchWithTimeout(url, init = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -154,11 +172,21 @@ export async function fetchVerification(url, token, label, env = {}) {
   }
 }
 
+async function fetchVerificationWithFallback(configuredUrl, token, label, env = {}) {
+  const urls = uniqueUpstreamUrls(configuredUrl, CANONICAL_AUTH_VERIFY_URL);
+  let last = { ok: false, service: label, payload: null, error: "verification_unreachable", upstream: null };
+  for (const url of urls) {
+    const result = await fetchVerification(url, token, label, env);
+    last = { ...result, upstream: url };
+    if (result.ok) return last;
+  }
+  return last;
+}
+
 export async function verifyAdminAuth(request, env) {
-  const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
   const token = getCookie(request, "admin_auth") || bearerToken(request);
   if (!token) return { ok: false, service: "auth", payload: null, error: "auth_token_missing" };
-  const result = await fetchVerification(verifyUrl, token, "auth", env);
+  const result = await fetchVerificationWithFallback(env.ADMIN_AUTH_VERIFY_URL, token, "auth", env);
   result.expectedAudience = String(env.AUTH_AUDIENCE || "");
   return result;
 }
@@ -200,42 +228,54 @@ async function loginAdmin(request, env) {
   const password = String(body?.password || "");
   if (!password) return adminJson({ ok: false, error: "password_missing" }, 400);
 
-  const loginUrl = env.PW_LOGIN_URL || env.ADMIN_AUTH_LOGIN_URL || "https://666-system-pw.666soundsdesign-broadcaster.com/login";
-  try {
-    const response = await fetchWithTimeout(loginUrl, {
-      method: "POST",
-      headers: adminServiceHeaders(env, {
-        accept: "application/json",
-        "content-type": "application/json",
-        "cache-control": "no-store"
-      }),
-      body: JSON.stringify({ password }),
-      redirect: "error"
-    }, 7000);
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || data?.ok !== true || !data?.token) {
-      return adminJson({ ok: false, error: normalizeAdminError(data?.error, "login_rejected") }, response.status || 401);
+  const loginUrls = uniqueUpstreamUrls(env.PW_LOGIN_URL, env.ADMIN_AUTH_LOGIN_URL, CANONICAL_PW_LOGIN_URL);
+  let lastFailure = { status: 502, error: "pw_login_unreachable" };
+
+  for (const loginUrl of loginUrls) {
+    try {
+      const response = await fetchWithTimeout(loginUrl, {
+        method: "POST",
+        headers: adminServiceHeaders(env, {
+          accept: "application/json",
+          "content-type": "application/json",
+          "cache-control": "no-store"
+        }),
+        body: JSON.stringify({ password }),
+        redirect: "error"
+      }, 7000);
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data?.ok !== true || !data?.token) {
+        const error = normalizeAdminError(data?.error, "login_rejected");
+        lastFailure = { status: response.status || 502, error };
+        if (error === "password_rejected" || error === "login_rate_limited") break;
+        continue;
+      }
+
+      const verified = await fetchVerificationWithFallback(env.ADMIN_AUTH_VERIFY_URL, data.token, "auth", env);
+      verified.expectedAudience = String(env.AUTH_AUDIENCE || "");
+      const pw = verifyPwIssuedToken(verified);
+      if (!pw.ok) {
+        lastFailure = { status: 401, error: pw.error || verified.error || "token_verification_failed" };
+        continue;
+      }
+
+      return adminJson({
+        ok: true,
+        token: data.token,
+        expiresAt: data.expiresAt || verified?.payload?.exp || null,
+        scope: verified?.payload?.scope || "admin",
+        issuer: verified?.payload?.iss || "666-system-pw"
+      });
+    } catch (error) {
+      lastFailure = {
+        status: 502,
+        error: error?.name === "AbortError" ? "pw_login_timeout" : "pw_login_unreachable"
+      };
     }
-
-    const verifyUrl = env.ADMIN_AUTH_VERIFY_URL || "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
-    const verified = await fetchVerification(verifyUrl, data.token, "auth", env);
-    verified.expectedAudience = String(env.AUTH_AUDIENCE || "");
-    const pw = verifyPwIssuedToken(verified);
-    if (!pw.ok) return adminJson({ ok: false, error: pw.error || verified.error || "token_verification_failed" }, 401);
-
-    return adminJson({
-      ok: true,
-      token: data.token,
-      expiresAt: data.expiresAt || verified?.payload?.exp || null,
-      scope: verified?.payload?.scope || "admin",
-      issuer: verified?.payload?.iss || "666-system-pw"
-    });
-  } catch (error) {
-    return adminJson({
-      ok: false,
-      error: error?.name === "AbortError" ? "pw_login_timeout" : "pw_login_unreachable"
-    }, 502);
   }
+
+  return adminJson({ ok: false, error: lastFailure.error }, lastFailure.status || 502);
 }
 
 function requiredEnv(env) {
@@ -692,14 +732,23 @@ async function probeWorkerHealth(url) {
   }
 }
 
+async function probeWorkerHealthCandidates(...urls) {
+  const candidates = uniqueUpstreamUrls(...urls);
+  let last = { reachable: false, version: null, status: 0, worker: null, error: "url_missing", upstream: null };
+  for (const raw of candidates) {
+    const result = await probeWorkerHealth(healthUrlFrom(raw, ""));
+    last = { ...result, upstream: raw };
+    if (result.reachable) return last;
+  }
+  return last;
+}
+
 async function authLiveState(request, env) {
   if (!diagnosticTokenAllowed(request, env)) return adminJson({ ok: false, error: "not_found" }, 404);
 
-  const pwHealthUrl = healthUrlFrom(env.PW_LOGIN_URL || env.ADMIN_AUTH_LOGIN_URL, "https://666-system-pw.666soundsdesign-broadcaster.com/login");
-  const authHealthUrl = healthUrlFrom(env.ADMIN_AUTH_VERIFY_URL, "https://666-system-auth.666soundsdesign-broadcaster.com/verify");
   const [pw, auth] = await Promise.all([
-    probeWorkerHealth(pwHealthUrl),
-    probeWorkerHealth(authHealthUrl)
+    probeWorkerHealthCandidates(env.PW_LOGIN_URL, env.ADMIN_AUTH_LOGIN_URL, CANONICAL_PW_LOGIN_URL),
+    probeWorkerHealthCandidates(env.ADMIN_AUTH_VERIFY_URL, CANONICAL_AUTH_VERIFY_URL)
   ]);
 
   return adminJson({
@@ -712,8 +761,8 @@ async function authLiveState(request, env) {
     pwWorkerVersion: pw.version,
     authWorkerVersion: auth.version,
     details: {
-      pw: { reachable: Boolean(pw.reachable), status: pw.status, worker: pw.worker, error: pw.error },
-      auth: { reachable: Boolean(auth.reachable), status: auth.status, worker: auth.worker, error: auth.error }
+      pw: { reachable: Boolean(pw.reachable), status: pw.status, worker: pw.worker, error: pw.error, upstream: pw.upstream },
+      auth: { reachable: Boolean(auth.reachable), status: auth.status, worker: auth.worker, error: auth.error, upstream: auth.upstream }
     },
     notes: [
       "No secret values are returned.",
