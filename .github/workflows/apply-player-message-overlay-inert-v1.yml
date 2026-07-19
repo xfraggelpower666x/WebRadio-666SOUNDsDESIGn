@@ -47,13 +47,26 @@ jobs:
           python .github/one-time/apply_player_message_overlay_inert_v1.py
           python - <<'PY'
           from pathlib import Path
-          path = Path('tests/frontend-contracts.test.mjs')
-          text = path.read_text(encoding='utf-8')
-          old = '2026-07-19-touch-feedback-v1225'
-          new = '2026-07-19-overlay-inert-v1226'
+
+          front = Path('tests/frontend-contracts.test.mjs')
+          text = front.read_text(encoding='utf-8')
+          old = r'veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225'
+          new = r'veluna-theme\.css\?v=2026-07-19-overlay-inert-v1226'
           if old not in text:
-              raise SystemExit('touch cache contract anchor missing')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+              raise SystemExit('frontend theme cache contract anchor missing')
+          front.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          smoke = Path('tests/worker-smoke.test.mjs')
+          text = smoke.read_text(encoding='utf-8')
+          replacements = {
+              r'discord-player-addon-v3\.js\?v=2026-07-19-overlay-status-v51': r'discord-player-addon-v3\.js\?v=2026-07-19-overlay-inert-v52',
+              r'veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225': r'veluna-theme\.css\?v=2026-07-19-overlay-inert-v1226',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'worker cache contract anchor missing: {old}')
+              text = text.replace(old, new, 1)
+          smoke.write_text(text, encoding='utf-8')
           PY
       - name: Verify complete release
         id: verify
