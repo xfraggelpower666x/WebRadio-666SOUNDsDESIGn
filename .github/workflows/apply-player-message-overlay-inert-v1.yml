@@ -32,7 +32,19 @@ jobs:
           node-version: 22
           cache: npm
       - name: Apply overlay repair
-        run: python .github/one-time/apply_player_message_overlay_inert_v1.py
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('.github/one-time/apply_player_message_overlay_inert_v1.py')
+          text = path.read_text(encoding='utf-8')
+          old = "assert.match(client, /pointer-events[^\\n]*none/);"
+          new = "assert.match(client, /pointer-events.*none/);"
+          if old not in text:
+              raise SystemExit('overlay test regex anchor missing')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          PY
+          python .github/one-time/apply_player_message_overlay_inert_v1.py
       - name: Verify complete release
         id: verify
         continue-on-error: true
