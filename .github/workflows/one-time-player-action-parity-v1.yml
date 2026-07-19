@@ -1,25 +1,36 @@
-name: One-time Player Action Parity v1
+name: Verify Player Action Parity v1
 
 on:
-  push:
+  pull_request:
     branches:
-      - repair-player-action-parity-v1-20260719
+      - WebRadio-666SOUNDsDESIGn
     paths:
       - ".github/one-time/apply_player_action_parity_v1.py"
       - ".github/workflows/one-time-player-action-parity-v1.yml"
+      - "js/skip-control.js"
+      - "public/js/skip-control.js"
+      - "js/player-stage-v2.js"
+      - "public/js/player-stage-v2.js"
+      - "js/addons/discord-player-addon-v3.js"
+      - "public/js/addons/discord-player-addon-v3.js"
+      - "veluna/index.html"
+      - "VELUNA/index.html"
+      - "public/veluna/index.html"
+      - "public/VELUNA/index.html"
+      - "index.html"
+      - "public/index.html"
+      - "tests/frontend-contracts.test.mjs"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  repair:
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -30,16 +41,22 @@ jobs:
         run: |
           npm ci
           npm run verify
-      - name: Commit verified repair
+      - name: Stage verified files
         shell: bash
         run: |
-          git config user.name "666SOUNDsDESIGn Repair Bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- \
+          mkdir -p /tmp/player-action-parity
+          cp --parents \
             js/skip-control.js public/js/skip-control.js \
             js/player-stage-v2.js public/js/player-stage-v2.js \
             js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js \
             veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html \
-            index.html public/index.html tests/frontend-contracts.test.mjs
-          git commit -m "repair: centralize Skip auth and remove Discord password gates"
-          git push origin HEAD:repair-player-action-parity-v1-20260719
+            index.html public/index.html tests/frontend-contracts.test.mjs \
+            /tmp/player-action-parity/
+          cd /tmp/player-action-parity
+          sha256sum $(find . -type f -print | sort) > VERIFIED-SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: player-action-parity-v1-verified
+          path: /tmp/player-action-parity
+          if-no-files-found: error
+          retention-days: 7
