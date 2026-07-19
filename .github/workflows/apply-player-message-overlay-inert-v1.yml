@@ -45,6 +45,16 @@ jobs:
           path.write_text(text.replace(old, new), encoding='utf-8')
           PY
           python .github/one-time/apply_player_message_overlay_inert_v1.py
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/frontend-contracts.test.mjs')
+          text = path.read_text(encoding='utf-8')
+          old = '2026-07-19-touch-feedback-v1225'
+          new = '2026-07-19-overlay-inert-v1226'
+          if old not in text:
+              raise SystemExit('touch cache contract anchor missing')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
       - name: Verify complete release
         id: verify
         continue-on-error: true
