@@ -1,8 +1,33 @@
 /*
- * 666SOUNDsDESIGn Interior Layout V5 - EQ + NOW PLAYING + Ticker
+ * 666SOUNDsDESIGn Interior Layout V6 - EQ + NOW PLAYING + Touch Feedback
  * No scroll, no DOM reparenting, no delayed geometry takeover.
  * Existing player structure remains the source of truth.
  */
+
+/* Shared Main-player touch authority: instant, visible and identical on mouse, keyboard and iPhone. */
+body[data-veluna-page="main"] :is(button,a[href],[role="button"],.icon-btn){
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:rgba(180,92,255,.32)!important;
+  transform-origin:center!important;
+  transition:transform .08s ease,filter .08s ease,color .08s ease,background .08s ease,border-color .08s ease,box-shadow .08s ease!important;
+  -webkit-user-select:none!important;user-select:none!important;
+}
+body[data-veluna-page="main"] :is(button,a[href],[role="button"],.icon-btn):is(:active,.is-pressed,[data-s666-press="1"]){
+  transform:translateY(2px) scale(.955)!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,rgba(180,92,255,.58),rgba(22,139,255,.42)),rgba(5,8,20,.98)!important;
+  border-color:rgba(216,170,255,.98)!important;
+  box-shadow:0 0 7px rgba(255,255,255,.78),0 0 22px rgba(180,92,255,.88),0 0 24px rgba(22,139,255,.62),inset 0 0 18px rgba(255,255,255,.12)!important;
+  filter:brightness(1.34) saturate(1.24)!important;
+}
+body[data-veluna-page="main"] :is(button,a[href],[role="button"],.icon-btn):is(.is-active,.transport-active,[aria-pressed="true"],[data-state="active"]):not(.is-pressed){
+  color:#7edcff!important;
+  border-color:rgba(180,92,255,.86)!important;
+  background:linear-gradient(135deg,rgba(180,92,255,.26),rgba(22,139,255,.22)),rgba(5,8,20,.98)!important;
+  box-shadow:0 0 5px rgba(126,220,255,.82),0 0 16px rgba(180,92,255,.58)!important;
+}
+body[data-veluna-page="main"] :is(button,a[href],[role="button"]):disabled{transform:none!important;filter:none!important;opacity:.48!important;pointer-events:none!important}
+
 
 @media (min-width:761px){
   :root{
