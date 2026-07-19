@@ -24,4 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run concise live auth and skip audit
-        run: bash .github/one-time/audit-live-auth-skip-chain.sh
+        run: bash .github/one-time/audit-live-auth-skip-chain.sh | tee /tmp/auth-skip-result.txt
+      - name: Upload concise audit result
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-auth-skip-result
+          path: /tmp/auth-skip-result.txt
+          if-no-files-found: error
+          retention-days: 1
