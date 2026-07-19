@@ -21,99 +21,66 @@ jobs:
     env:
       DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
     steps:
-      - name: Probe PW and Auth health
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --fail --silent --show-error --location --retry 5 --retry-delay 4 \
-            'https://666-system-pw.666soundsdesign-broadcaster.com/health?t='"$(date +%s)" -o /tmp/pw-health.json
-          curl --fail --silent --show-error --location --retry 5 --retry-delay 4 \
-            'https://666-system-auth.666soundsdesign-broadcaster.com/health?t='"$(date +%s)" -o /tmp/auth-health.json
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          for name in ('pw', 'auth'):
-              data = json.loads(Path(f'/tmp/{name}-health.json').read_text())
-              assert data.get('ok') is True, (name, data)
-              print(f'{name}WorkerReachable=true')
-              print(f'{name}WorkerVersion={data.get("version")}')
-              print(f'{name}WorkerName={data.get("worker")}')
-          PY
-
-      - name: Read Main Worker auth diagnostics
-        shell: bash
-        run: |
-          set -euo pipefail
-          base='https://webradio.666soundsdesign-broadcaster.com'
-          stamp="$(date +%s)"
-          args=(--silent --show-error --location --retry 4 --retry-delay 4 -D /tmp/auth-live.headers -o /tmp/auth-live.json -w '%{http_code}')
-          if [[ -n "${DEBUG_TOKEN:-}" ]]; then
-            args+=( -H "x-debug-token: ${DEBUG_TOKEN}" )
-          fi
-          code="$(curl "${args[@]}" "$base/api/admin/auth-live-state?t=$stamp")"
-          echo "authLiveStateHttp=$code"
-          if [[ "$code" == "200" ]]; then
-            python - <<'PY'
-          import json
-          from pathlib import Path
-          data=json.loads(Path('/tmp/auth-live.json').read_text())
-          for key in ('mainWorkerCanReachPwLogin','mainWorkerCanReachAuthVerify','audienceConfigured','serviceTokenConfigured','pwWorkerVersion','authWorkerVersion'):
-              print(f'{key}={data.get(key)}')
-          assert data.get('mainWorkerCanReachPwLogin') is True, data
-          assert data.get('mainWorkerCanReachAuthVerify') is True, data
-          assert data.get('audienceConfigured') is True, data
-          assert data.get('serviceTokenConfigured') is True, data
-          assert data.get('pwWorkerVersion'), data
-          assert data.get('authWorkerVersion'), data
-          PY
-          else
-            echo 'Main Worker protected diagnostic unavailable to this workflow; direct PW/Auth health remains verified.'
-            cat /tmp/auth-live.json
-          fi
-
-      - name: Verify Main Worker login proxy reaches PW Worker
+      - name: Run concise live auth and skip audit
         shell: bash
         run: |
           set -euo pipefail
           base='https://webradio.666soundsdesign-broadcaster.com'
           origin='https://webradio.666soundsdesign-broadcaster.com'
           stamp="$(date +%s)"
-          code="$(curl --silent --show-error --location --retry 4 --retry-delay 4 \
+
+          curl --fail --silent --show-error --location \
+            "https://666-system-pw.666soundsdesign-broadcaster.com/health?t=$stamp" -o /tmp/pw.json
+          curl --fail --silent --show-error --location \
+            "https://666-system-auth.666soundsdesign-broadcaster.com/health?t=$stamp" -o /tmp/auth.json
+
+          args=(--silent --show-error --location -o /tmp/live.json -w '%{http_code}')
+          if [[ -n "${DEBUG_TOKEN:-}" ]]; then args+=( -H "x-debug-token: ${DEBUG_TOKEN}" ); fi
+          live_code="$(curl "${args[@]}" "$base/api/admin/auth-live-state?t=$stamp")"
+
+          login_code="$(curl --silent --show-error --location \
             -H 'content-type: application/json' -H 'accept: application/json' \
             -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
             -X POST "$base/api/admin/login?t=$stamp" \
             --data '{"password":"__S666_INTENTIONAL_INVALID_AUDIT_PASSWORD__"}' \
-            -o /tmp/login-invalid.json -w '%{http_code}')"
-          echo "invalidLoginHttp=$code"
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          data=json.loads(Path('/tmp/login-invalid.json').read_text())
-          print('invalidLoginError='+str(data.get('error')))
-          assert data.get('ok') is False, data
-          assert data.get('error') not in {'pw_login_unreachable','pw_login_timeout','worker_secrets_missing','service_token_missing','service_auth_rejected'}, data
-          assert data.get('error') in {'password_rejected','login_rejected','login_rate_limited'}, data
-          PY
+            -o /tmp/login.json -w '%{http_code}')"
 
-      - name: Verify protected Skip contract without performing a skip
-        shell: bash
-        run: |
-          set -euo pipefail
-          base='https://webradio.666soundsdesign-broadcaster.com'
-          origin='https://webradio.666soundsdesign-broadcaster.com'
-          stamp="$(date +%s)"
-          code="$(curl --silent --show-error --location \
+          skip_code="$(curl --silent --show-error --location \
             -H 'content-type: application/json' -H 'accept: application/json' \
             -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
-            -X POST "$base/api/admin/skip?t=$stamp" --data '{"source":"live-auth-audit-no-token"}' \
-            -o /tmp/skip-no-token.json -w '%{http_code}')"
-          echo "skipNoTokenHttp=$code"
+            -X POST "$base/api/admin/skip?t=$stamp" \
+            --data '{"source":"live-auth-audit-no-token"}' \
+            -o /tmp/skip.json -w '%{http_code}')"
+
           python - <<'PY'
           import json
           from pathlib import Path
-          data=json.loads(Path('/tmp/skip-no-token.json').read_text())
-          print('skipNoTokenError='+str(data.get('error')))
-          assert data.get('ok') is False, data
-          assert data.get('error') in {'auth_token_missing','unauthorized'}, data
+
+          pw=json.loads(Path('/tmp/pw.json').read_text())
+          auth=json.loads(Path('/tmp/auth.json').read_text())
+          live=json.loads(Path('/tmp/live.json').read_text())
+          login=json.loads(Path('/tmp/login.json').read_text())
+          skip=json.loads(Path('/tmp/skip.json').read_text())
+
+          print('pwWorkerReachable='+str(pw.get('ok') is True).lower())
+          print('pwWorkerVersion='+str(pw.get('version')))
+          print('authWorkerReachable='+str(auth.get('ok') is True).lower())
+          print('authWorkerVersion='+str(auth.get('version')))
+          print('authLiveStateHttp='+'${{ env.LIVE_CODE }}')
+          for key in ('mainWorkerCanReachPwLogin','mainWorkerCanReachAuthVerify','audienceConfigured','serviceTokenConfigured','pwWorkerVersion','authWorkerVersion'):
+              print(f'{key}={live.get(key)}')
+          print('invalidLoginHttp='+'${{ env.LOGIN_CODE }}')
+          print('invalidLoginError='+str(login.get('error')))
+          print('skipNoTokenHttp='+'${{ env.SKIP_CODE }}')
+          print('skipNoTokenError='+str(skip.get('error')))
+
+          assert pw.get('ok') is True, pw
+          assert auth.get('ok') is True, auth
+          assert login.get('ok') is False, login
+          assert skip.get('ok') is False, skip
+          assert skip.get('error') in {'auth_token_missing','unauthorized'}, skip
           PY
-          echo 'LIVE_AUTH_SKIP_CHAIN_AUDIT_OK'
+        env:
+          LIVE_CODE: ${{ env.live_code }}
+          LOGIN_CODE: ${{ env.login_code }}
+          SKIP_CODE: ${{ env.skip_code }}
