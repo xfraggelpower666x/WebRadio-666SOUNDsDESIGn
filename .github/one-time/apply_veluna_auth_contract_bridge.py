@@ -1,3 +1,4 @@
+# Final verified execution trigger: 2026-07-19
 from pathlib import Path
 
 ROOT = Path('.')
