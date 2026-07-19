@@ -1,3 +1,4 @@
+# Deploy trigger: verified Veluna overlay/auth/PC repair 2026-07-19
 name: Deploy WebRadio Cloudflare Workers
 
 on:
