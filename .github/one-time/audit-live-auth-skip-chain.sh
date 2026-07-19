@@ -3,10 +3,7 @@ set -euo pipefail
 base='https://webradio.666soundsdesign-broadcaster.com'
 origin='https://webradio.666soundsdesign-broadcaster.com'
 
-# Give the production Worker deployment and edge cache time to converge.
-sleep 75
 stamp="$(date +%s)"
-
 curl --fail --silent --show-error --location "https://666-system-pw.666soundsdesign-broadcaster.com/health?t=$stamp" -o /tmp/pw.json
 curl --fail --silent --show-error --location "https://666-system-auth.666soundsdesign-broadcaster.com/health?t=$stamp" -o /tmp/auth.json
 
@@ -14,24 +11,50 @@ args=(--silent --show-error --location -o /tmp/live.json -w '%{http_code}')
 if [[ -n "${DEBUG_TOKEN:-}" ]]; then args+=( -H "x-debug-token: ${DEBUG_TOKEN}" ); fi
 curl "${args[@]}" "$base/api/admin/auth-live-state?t=$stamp" > /tmp/live-code.txt
 
-# An intentional invalid password must reach a real PW worker. A definitive rejection
-# or throttling response proves the proxy path; transport/config failures do not.
-curl --silent --show-error --location \
-  -H 'content-type: application/json' -H 'accept: application/json' \
-  -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
-  -X POST "$base/api/admin/login?t=$stamp" \
-  --data '{"password":"__S666_INTENTIONAL_INVALID_AUDIT_PASSWORD__"}' \
-  -o /tmp/login.json -w '%{http_code}' > /tmp/login-code.txt
+login_ready=false
+auth_ready=false
+for attempt in $(seq 1 24); do
+  stamp="$(date +%s)"
+  curl --silent --show-error --location \
+    -H 'content-type: application/json' -H 'accept: application/json' \
+    -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
+    -X POST "$base/api/admin/login?t=$stamp" \
+    --data '{"password":"__S666_INTENTIONAL_INVALID_AUDIT_PASSWORD__"}' \
+    -o /tmp/login.json -w '%{http_code}' > /tmp/login-code.txt
 
-# A deliberately malformed bearer token must reach a real Auth worker and be rejected
-# as malformed/signature-invalid, never as unreachable or service-auth broken.
-curl --silent --show-error --location \
-  -H 'accept: application/json' -H 'authorization: Bearer invalid.audit.token' \
-  -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
-  "$base/api/admin/auth-check?t=$stamp" \
-  -o /tmp/auth-check.json -w '%{http_code}' > /tmp/auth-check-code.txt
+  curl --silent --show-error --location \
+    -H 'accept: application/json' -H 'authorization: Bearer invalid.audit.token' \
+    -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
+    "$base/api/admin/auth-check?t=$stamp" \
+    -o /tmp/auth-check.json -w '%{http_code}' > /tmp/auth-check-code.txt
+
+  read -r login_error auth_error < <(python - <<'PY'
+import json
+from pathlib import Path
+login=json.loads(Path('/tmp/login.json').read_text())
+auth=json.loads(Path('/tmp/auth-check.json').read_text())
+print(str(login.get('error')), str(auth.get('error')))
+PY
+  )
+
+  case "$login_error" in
+    password_rejected|login_rate_limited) login_ready=true ;;
+    *) login_ready=false ;;
+  esac
+  case "$auth_error" in
+    token_malformed|token_signature_invalid|token_payload_invalid|token_missing) auth_ready=true ;;
+    *) auth_ready=false ;;
+  esac
+
+  echo "edgeAttempt=$attempt login=$login_error auth=$auth_error"
+  if [[ "$login_ready" == true && "$auth_ready" == true ]]; then
+    break
+  fi
+  sleep 20
+done
 
 # No-token Skip request must remain blocked and must not perform a skip.
+stamp="$(date +%s)"
 curl --silent --show-error --location \
   -H 'content-type: application/json' -H 'accept: application/json' \
   -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
