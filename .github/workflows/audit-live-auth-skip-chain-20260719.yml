@@ -9,6 +9,7 @@ on:
       - WebRadio-666SOUNDsDESIGn
     paths:
       - ".github/workflows/audit-live-auth-skip-chain-20260719.yml"
+      - ".github/one-time/audit-live-auth-skip-chain.sh"
   workflow_dispatch:
 
 permissions:
@@ -21,66 +22,6 @@ jobs:
     env:
       DEBUG_TOKEN: ${{ secrets.DEBUG_TOKEN }}
     steps:
+      - uses: actions/checkout@v4
       - name: Run concise live auth and skip audit
-        shell: bash
-        run: |
-          set -euo pipefail
-          base='https://webradio.666soundsdesign-broadcaster.com'
-          origin='https://webradio.666soundsdesign-broadcaster.com'
-          stamp="$(date +%s)"
-
-          curl --fail --silent --show-error --location \
-            "https://666-system-pw.666soundsdesign-broadcaster.com/health?t=$stamp" -o /tmp/pw.json
-          curl --fail --silent --show-error --location \
-            "https://666-system-auth.666soundsdesign-broadcaster.com/health?t=$stamp" -o /tmp/auth.json
-
-          args=(--silent --show-error --location -o /tmp/live.json -w '%{http_code}')
-          if [[ -n "${DEBUG_TOKEN:-}" ]]; then args+=( -H "x-debug-token: ${DEBUG_TOKEN}" ); fi
-          curl "${args[@]}" "$base/api/admin/auth-live-state?t=$stamp" > /tmp/live-code.txt
-
-          curl --silent --show-error --location \
-            -H 'content-type: application/json' -H 'accept: application/json' \
-            -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
-            -X POST "$base/api/admin/login?t=$stamp" \
-            --data '{"password":"__S666_INTENTIONAL_INVALID_AUDIT_PASSWORD__"}' \
-            -o /tmp/login.json -w '%{http_code}' > /tmp/login-code.txt
-
-          curl --silent --show-error --location \
-            -H 'content-type: application/json' -H 'accept: application/json' \
-            -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
-            -X POST "$base/api/admin/skip?t=$stamp" \
-            --data '{"source":"live-auth-audit-no-token"}' \
-            -o /tmp/skip.json -w '%{http_code}' > /tmp/skip-code.txt
-
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          pw=json.loads(Path('/tmp/pw.json').read_text())
-          auth=json.loads(Path('/tmp/auth.json').read_text())
-          live=json.loads(Path('/tmp/live.json').read_text())
-          login=json.loads(Path('/tmp/login.json').read_text())
-          skip=json.loads(Path('/tmp/skip.json').read_text())
-          live_code=Path('/tmp/live-code.txt').read_text().strip()
-          login_code=Path('/tmp/login-code.txt').read_text().strip()
-          skip_code=Path('/tmp/skip-code.txt').read_text().strip()
-
-          print('pwWorkerReachable='+str(pw.get('ok') is True).lower())
-          print('pwWorkerVersion='+str(pw.get('version')))
-          print('authWorkerReachable='+str(auth.get('ok') is True).lower())
-          print('authWorkerVersion='+str(auth.get('version')))
-          print('authLiveStateHttp='+live_code)
-          for key in ('mainWorkerCanReachPwLogin','mainWorkerCanReachAuthVerify','audienceConfigured','serviceTokenConfigured','pwWorkerVersion','authWorkerVersion'):
-              print(f'{key}={live.get(key)}')
-          print('invalidLoginHttp='+login_code)
-          print('invalidLoginError='+str(login.get('error')))
-          print('skipNoTokenHttp='+skip_code)
-          print('skipNoTokenError='+str(skip.get('error')))
-
-          assert pw.get('ok') is True, pw
-          assert auth.get('ok') is True, auth
-          assert login.get('ok') is False, login
-          assert skip.get('ok') is False, skip
-          assert skip.get('error') in {'auth_token_missing','unauthorized'}, skip
-          print('LIVE_AUTH_SKIP_CHAIN_DIAGNOSTICS_COMPLETE')
-          PY
+        run: bash .github/one-time/audit-live-auth-skip-chain.sh
