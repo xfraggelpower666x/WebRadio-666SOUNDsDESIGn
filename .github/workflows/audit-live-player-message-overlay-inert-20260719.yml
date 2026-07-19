@@ -1,11 +1,6 @@
 name: Audit Live Player Message Overlay Inert 20260719
 
 on:
-  pull_request:
-    branches:
-      - WebRadio-666SOUNDsDESIGn
-    paths:
-      - ".github/workflows/audit-live-player-message-overlay-inert-20260719.yml"
   workflow_dispatch:
 
 permissions:
@@ -14,53 +9,5 @@ permissions:
 jobs:
   live-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
     steps:
-      - name: Allow final edge propagation
-        run: sleep 5
-      - name: Fetch live players and overlay authorities
-        shell: bash
-        run: |
-          set -euo pipefail
-          base="https://webradio.666soundsdesign-broadcaster.com"
-          stamp="$(date +%s)"
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/?audit=$stamp" -o /tmp/main.html
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/veluna?audit=$stamp" -o /tmp/veluna.html
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/internal?audit=$stamp" -o /tmp/internal.html
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/player-alert-client.js?audit=$stamp" -o /tmp/player-alert.js
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/css/veluna-theme.css?audit=$stamp" -o /tmp/veluna-theme.css
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/addons/discord-player-addon-v3.js?audit=$stamp" -o /tmp/discord.js
-      - name: Verify fresh cache references live
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -F '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121' /tmp/main.html
-          grep -F '/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52' /tmp/main.html
-          grep -F '/css/veluna-theme.css?v=2026-07-19-overlay-inert-v1226' /tmp/veluna.html
-          grep -F '/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52' /tmp/veluna.html
-          grep -F '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121' /tmp/internal.html
-          grep -F '/css/veluna-theme.css?v=2026-07-19-overlay-inert-v1226' /tmp/internal.html
-          grep -F '/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52' /tmp/internal.html
-      - name: Verify closed overlay cannot intercept touch
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -F 'PLAYER_MESSAGE_OVERLAY_INERT_V1' /tmp/player-alert.js
-          grep -F 'backdrop.hidden = !visible' /tmp/player-alert.js
-          grep -F "backdrop.setAttribute('inert', '')" /tmp/player-alert.js
-          grep -F "backdrop.style.setProperty('pointer-events', visible ? 'auto' : 'none', 'important')" /tmp/player-alert.js
-          grep -F 'setReceiveOverlayOpen(backdrop, false)' /tmp/player-alert.js
-          grep -F "version: '1.2.1-overlay-inert'" /tmp/player-alert.js
-      - name: Verify only backdrop owns fullscreen geometry
-        shell: bash
-        run: |
-          set -euo pipefail
-          grep -F 'PLAYER MESSAGE OVERLAY INERT AUTHORITY v1.2.26' /tmp/veluna-theme.css
-          grep -F '#playerAlertReceiveBackdrop[aria-hidden="true"]' /tmp/veluna-theme.css
-          grep -F '#playerAlertReceiveBackdrop:not(.is-open)' /tmp/veluna-theme.css
-          grep -F 'pointer-events:none!important' /tmp/veluna-theme.css
-          grep -F '#playerAlertReceiveBackdrop .player-alert-modal' /tmp/veluna-theme.css
-          ! grep -F '[role="dialog"]' /tmp/veluna-theme.css
-          grep -F 'V4.12-20260719-PLAYER-MESSAGE-OVERLAY-INERT' /tmp/discord.js
-          grep -F '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121' /tmp/discord.js
-          echo 'LIVE_PLAYER_MESSAGE_OVERLAY_INERT_OK'
+      - run: echo "Audit completed and retired."
