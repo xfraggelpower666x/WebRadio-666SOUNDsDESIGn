@@ -147,3 +147,59 @@ test("PW/Auth hardening requires audience, service token and rate limiting sourc
     assert.match(auth, /service_token_missing/);
   });
 });
+
+
+test("login falls back from stale configured PW/Auth URLs to canonical workers", async () => {
+  const seen = [];
+  await withMockFetch(async (url, init = {}) => {
+    const value = String(url);
+    seen.push(value);
+    if (value.includes("stale-pw.invalid")) throw new Error("configured_pw_unreachable");
+    if (value.includes("666-system-pw")) return Response.json({ ok: true, token: "abc.def", expiresAt: FUTURE });
+    if (value.includes("stale-auth.invalid")) throw new Error("configured_auth_unreachable");
+    if (value.includes("666-system-auth")) return Response.json({ ok: true, valid: true, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: FUTURE } });
+    throw new Error("unexpected_fetch:" + value);
+  }, async () => {
+    const response = await handleRadioAdminConfigAddon(request("/api/admin/login", {
+      method: "POST",
+      headers: { origin: "https://radio.test", "content-type": "application/json" },
+      body: JSON.stringify({ password: "correct" })
+    }), {
+      PW_LOGIN_URL: "https://stale-pw.invalid/login",
+      ADMIN_AUTH_VERIFY_URL: "https://stale-auth.invalid/verify",
+      ADMIN_SERVICE_ORIGIN: "https://radio.test",
+      ADMIN_SERVICE_TOKEN: "service-secret",
+      AUTH_AUDIENCE: AUDIENCE
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).ok, true);
+    assert.deepEqual(seen, [
+      "https://stale-pw.invalid/login",
+      "https://666-system-pw.666soundsdesign-broadcaster.com/login",
+      "https://stale-auth.invalid/verify",
+      "https://666-system-auth.666soundsdesign-broadcaster.com/verify"
+    ]);
+  });
+});
+
+test("a definitive password rejection does not fan out to another password worker", async () => {
+  const seen = [];
+  await withMockFetch(async (url) => {
+    seen.push(String(url));
+    return Response.json({ ok: false, error: "password_rejected" }, { status: 401 });
+  }, async () => {
+    const response = await handleRadioAdminConfigAddon(request("/api/admin/login", {
+      method: "POST",
+      headers: { origin: "https://radio.test", "content-type": "application/json" },
+      body: JSON.stringify({ password: "wrong" })
+    }), {
+      PW_LOGIN_URL: "https://configured-pw.example/login",
+      ADMIN_SERVICE_ORIGIN: "https://radio.test",
+      ADMIN_SERVICE_TOKEN: "service-secret",
+      AUTH_AUDIENCE: AUDIENCE
+    });
+    assert.equal(response.status, 401);
+    assert.equal((await response.json()).error, "password_rejected");
+    assert.deepEqual(seen, ["https://configured-pw.example/login"]);
+  });
+});
