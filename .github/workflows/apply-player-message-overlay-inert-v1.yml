@@ -34,9 +34,12 @@ jobs:
       - name: Apply overlay repair
         run: python .github/one-time/apply_player_message_overlay_inert_v1.py
       - name: Verify complete release
+        shell: bash
         run: |
-          npm ci
-          npm run verify
+          set -o pipefail
+          npm ci >/tmp/npm-ci.log 2>&1 || { cat /tmp/npm-ci.log; exit 1; }
+          npm run verify >/tmp/verify.log 2>&1 || { tail -n 180 /tmp/verify.log; exit 1; }
+          tail -n 80 /tmp/verify.log
       - name: Commit verified product files
         shell: bash
         run: |
