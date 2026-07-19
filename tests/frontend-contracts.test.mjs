@@ -23,18 +23,22 @@ test("legacy inline senders are disabled and fetch is not monkey-patched", async
   assert.match(index, /\/js\/player-alert-client\.js/);
 });
 
-test("Admin, Discord and Skip share one Bearer client", async () => {
+test("Skip owns interactive Bearer auth while Discord stays public", async () => {
   const auth = await read("js/admin-auth-client.js");
   const stage = await read("js/player-stage-v2.js");
   const skip = await read("js/skip-control.js");
   const discord = await read("js/addons/discord-player-addon-v3.js");
+  const veluna = await read("veluna/index.html");
   assert.match(auth, /s666_admin_session_token_v1/);
   assert.match(auth, /authorization/);
-  assert.match(stage, /S666AdminAuth/);
-  assert.match(stage, /S666SkipControl/);
-  assert.doesNotMatch(stage, /sessionStorage|\/api\/admin\/login|fetch\('\/api\/admin\/skip/);
+  assert.match(skip, /S666AdminAuth\.ensure/);
   assert.match(skip, /S666AdminAuth\.fetch/);
-  assert.match(discord, /S666AdminAuth\.fetch/);
+  assert.match(stage, /S666SkipControl\.skip/);
+  assert.match(veluna, /S666SkipControl\.skip/);
+  assert.doesNotMatch(stage, /S666AdminAuth|withGate\(/);
+  assert.doesNotMatch(stage, /Admin-Passwort für den Discord Shooter/);
+  assert.doesNotMatch(veluna, /S666AdminAuth\.fetch\(ENDPOINTS\.skip|async function ensureAdmin/);
+  assert.doesNotMatch(discord, /S666AdminAuth\.ensure|ensureInteractiveAuth|authorizedAdminFetch/);
   assert.doesNotMatch(discord, /x-discord-gate-code|DISCORD_GATE_CODE|gateCode/);
 });
 
@@ -121,16 +125,17 @@ test("LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic
   assert.match(worker, /dj_mode: dj === AUTO_DJ_DISPLAY_NAME \? 'autodj' : 'live'/);
 });
 
-test("VELUNA preserves canonical WebRadio Skip/Discord routes, protected modals, mobile sound panel, stability recovery and levelmeter", async () => {
+test("VELUNA delegates Skip centrally, keeps Discord public, and preserves sound/stability controls", async () => {
   const veluna = await read("VELUNA/index.html");
+  const skip = await read("js/skip-control.js");
   assert.match(veluna, /id="skipBtn"/);
-  assert.match(veluna, /S666AdminAuth\.ensure/);
-  assert.match(veluna, /ENDPOINTS\.skip/);
-  assert.match(veluna, /\/api\/admin\/skip/);
-  assert.match(veluna, /canonical:'webradio-worker'/);
+  assert.match(veluna, /S666SkipControl\.skip/);
+  assert.match(skip, /\/api\/admin\/skip/);
+  assert.match(skip, /\/api\/radio\/skip/);
+  assert.doesNotMatch(veluna, /S666AdminAuth\.fetch\(ENDPOINTS\.skip|async function ensureAdmin/);
   assert.match(veluna, /id="discordBtn"/);
-  assert.match(veluna, /\/api\/discord\/manual/);
-  assert.match(veluna, /activeSecureAction='discord'/);
+  assert.match(veluna, /S666DiscordPlayerAddonV3\?\.messagePost/);
+  assert.doesNotMatch(veluna, /Admin-Passwort für VELUNA Discord Shooter/);
   assert.match(veluna, /s666:admin-auth-overlay/);
   assert.match(veluna, /id="soundPanel"/);
   assert.match(veluna, /SUB[\s\S]*LOW[\s\S]*MID[\s\S]*HIGH[\s\S]*AIR/);
@@ -201,14 +206,16 @@ test("VELUNA iPhone footer uses the available lower panel space without changing
 });
 
 
-test('all player actions use one interactive admin auth owner', async () => {
+test('all player variants use one Skip auth owner and a public Discord owner', async () => {
   const stage = await read('js/player-stage-v2.js');
-  const stageCss = await read('css/player-stage-v2.css');
+  const skip = await read('js/skip-control.js');
   const discord = await read('js/addons/discord-player-addon-v3.js');
-  assert.match(stage, /auth\.ensure\(\{message:/);
-  assert.doesNotMatch(stage, /s666StageGatePassword|function ensureGate\(/);
-  assert.doesNotMatch(stageCss, /#s666StageGate/);
-  assert.match(discord, /function ensureInteractiveAuth\(/);
-  assert.match(discord, /S666AdminAuth\.ensure/);
-  assert.doesNotMatch(discord, /throw new Error\('admin_session_required'\)/);
+  const veluna = await read('veluna/index.html');
+  assert.match(skip, /function ensureInteractiveAuth\(options\)/);
+  assert.match(skip, /S666AdminAuth\.ensure/);
+  assert.match(skip, /S666AdminAuth\.fetch/);
+  assert.match(stage, /S666SkipControl\.skip/);
+  assert.match(veluna, /S666SkipControl\.skip/);
+  assert.doesNotMatch(stage, /function withGate\(|S666AdminAuth/);
+  assert.doesNotMatch(discord, /ensureInteractiveAuth|S666AdminAuth\.ensure|admin_session_required/);
 });

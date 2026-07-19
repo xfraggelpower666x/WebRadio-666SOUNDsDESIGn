@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V4.10-20260719-MESSENGER-STATUS-EMOJI-CLOSE';
+  var VERSION = 'V4.11-20260719-PUBLIC-DISCORD-CENTRAL-SKIP';
   var inFlight = false;
   var watcherTimer = 0;
   var visualTimer = 0;
@@ -75,25 +75,6 @@
 
   function dispatch(name, detail) {
     try { window.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (_) {}
-  }
-
-  /*
-   * Shared protected-action contract.
-   * Discord webhook sends intentionally remain public same-origin requests;
-   * these helpers are reserved for protected admin actions only.
-   */
-  function ensureInteractiveAuth(message) {
-    if (!window.S666AdminAuth || typeof window.S666AdminAuth.ensure !== 'function') {
-      return Promise.reject(new Error('admin_auth_client_missing'));
-    }
-    return window.S666AdminAuth.ensure({ message: message || 'Admin-Passwort eingeben:' });
-  }
-
-  function authorizedAdminFetch(path, init) {
-    if (!window.S666AdminAuth || typeof window.S666AdminAuth.fetch !== 'function') {
-      return Promise.reject(new Error('admin_auth_client_missing'));
-    }
-    return window.S666AdminAuth.fetch(path, init);
   }
 
   async function postJson(path, payload) {
