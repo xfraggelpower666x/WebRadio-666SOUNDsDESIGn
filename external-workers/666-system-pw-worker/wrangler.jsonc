@@ -3,12 +3,7 @@
   "name": "666-system-pw-worker",
   "main": "worker.js",
   "compatibility_date": "2026-06-25",
-  "routes": [
-    {
-      "pattern": "666-system-pw.666soundsdesign-broadcaster.com",
-      "custom_domain": true
-    }
-  ],
+  "workers_dev": false,
   "vars": {
     "ALLOWED_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com",
     "AUTH_AUDIENCE": "666SOUNDsDESIGn-WebRadio-Admin"
