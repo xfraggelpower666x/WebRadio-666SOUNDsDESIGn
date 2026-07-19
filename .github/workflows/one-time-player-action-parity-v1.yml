@@ -40,6 +40,7 @@ jobs:
         shell: bash
         run: |
           set +e
+          sed -i "s/re.subn(pattern, replacement, text/re.subn(pattern, lambda _match: replacement, text/" .github/one-time/apply_player_action_parity_v1.py
           python .github/one-time/apply_player_action_parity_v1.py > /tmp/player-action-parity-transform.log 2>&1
           status=$?
           cat /tmp/player-action-parity-transform.log
