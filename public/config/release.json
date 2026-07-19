@@ -1,11 +1,12 @@
 {
   "version": "1.2.22",
   "release": "FULLVERSION_RADIO_ONLY_CLEANUP_v1.2.22",
-  "frontendVersion": "v2026.07.09-veluna12",
-  "build": "2026-07-09-veluna-v1212",
-  "date": "2026-07-15",
+  "frontendVersion": "v2026.07.19-veluna-overlay49",
+  "build": "2026-07-19-overlay-status-pc-fit",
+  "date": "2026-07-19",
   "baselineRelease": "FULLVERSION_VELUNA_CENTRAL_BRANDING_RESPONSIVE_PLAYERS_v1.2.8",
   "baselineCommit": "LOCAL_PACKAGE_v1.2.2",
+  "verifiedRepairCommit": "2c731608273836a939bbcefe4c53812bb267fc75",
   "features": [
     "CENTRAL_METADATA_TITLE_DEDUP",
     "BARE_TITLE_LYVRA_IDENTITY_PREFIX",
@@ -66,10 +67,18 @@
     "SAFARI_TOOLBAR_HEIGHT_GROW_RECOVERY",
     "VISUAL_VIEWPORT_GEOMETRY_REFRESH",
     "KEYBOARD_SHRINK_GUARD",
+    "VELUNA_DISCORD_OVERLAY_CLOSE_REPAIR",
+    "VELUNA_DISCORD_EMOJI_SHOOTER",
+    "VELUNA_DISCORD_MANUAL_NOW_PLAYING",
+    "VELUNA_DISCORD_SEND_STATUS",
+    "VELUNA_MESSENGER_EMOJI_AND_CLOSE_REPAIR",
+    "VELUNA_MESSENGER_SEND_STATUS",
+    "VELUNA_ADMIN_AUTH_ERROR_DETAIL",
+    "VELUNA_PC_NOW_PLAYING_FIT",
     "RADIO_ONLY_REPOSITORY",
     "CHAOS_SUNO_REMOVED",
     "UNREFERENCED_ASSET_PURGE",
     "THREE_WORKER_CLOUDFLARE_DEPLOY"
   ],
-  "notes": "Radio-only cleanup removes Chaos/Suno systems and unreferenced assets while preserving the v1.2.21 password/auth hardening. GitHub Actions deploys only password, authentication and WebRadio workers."
+  "notes": "Radio-only cleanup remains the release baseline. The 2026-07-19 verified repair restores closeable Discord and Messenger overlays, emoji input, manual Now Playing posting, visible send results, detailed admin authentication errors and the compact PC layout with a larger Now Playing area. Full release verification passed before production commit."
 }
