@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V4.11-20260719-PUBLIC-DISCORD-CENTRAL-SKIP';
+  var VERSION = 'V4.12-20260719-PLAYER-MESSAGE-OVERLAY-INERT';
   var inFlight = false;
   var watcherTimer = 0;
   var visualTimer = 0;
@@ -360,7 +360,7 @@
 
   async function ensurePlayerAlertClient() {
     if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
-    await loadScriptOnce('s666PlayerAlertClientVelunaBridge', '/js/player-alert-client.js?v=2026-07-15-veluna-msg');
+    await loadScriptOnce('s666PlayerAlertClientVelunaBridge', '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121');
     if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
     throw new Error('player_alert_client_missing');
   }

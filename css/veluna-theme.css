@@ -1,5 +1,5 @@
 /*
- * VELUNA Central Player Theme v1.2.25
+ * VELUNA Central Player Theme v1.2.26
  * Eine zentrale Grafik-/Farblogik für Hauptplayer, VELUNA-Miniplayer und Internal-Player.
  * Bilder werden proportional eingepasst; Overlays verändern niemals die Playergeometrie.
  */
@@ -91,7 +91,7 @@ body[data-veluna-ui] :is(button,a[href],[role="button"]):disabled{transform:none
 
 /* iPhone action/modal/laser authority v1.2.23 */
 body[data-veluna-ui] :is(button,a,[role="button"],.control-btn,.small-btn,.source-led-btn,.tiny-btn,.status-chip){position:relative;z-index:8;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:rgba(180,92,255,.28)}
-body[data-veluna-ui] :is(.overlay,.panel-overlay,.history-overlay,.admin-overlay,.fp-admin-overlay,.s666-sound-overlay,.s666msg-overlay,.s666-discord-gate,.s666-discord-denied,.s666-player-alert-overlay,#s666AdminAuthOverlay,[role="dialog"]){z-index:2147483600!important;pointer-events:auto!important;isolation:isolate!important}
+body[data-veluna-ui] :is(.overlay,.panel-overlay,.history-overlay,.admin-overlay,.fp-admin-overlay,.s666-sound-overlay,.s666msg-overlay,.s666-discord-gate,.s666-discord-denied,.s666-player-alert-overlay,#s666AdminAuthOverlay){z-index:2147483600!important;pointer-events:auto!important;isolation:isolate!important}
 body[data-veluna-ui] :is(.fp-admin-hidden,.is-hidden,.s666-discord-gate--hidden,.s666-discord-denied--hidden){pointer-events:none!important}
 body[data-veluna-ui] :is(.s666msg-panel,.s666-discord-gate-box,.s666-discord-denied-box,.s666-player-alert-panel,#s666AdminAuthOverlay .s666-auth-box){border-color:rgba(22,139,255,.72)!important;background:linear-gradient(135deg,rgba(180,92,255,.16),rgba(22,139,255,.10)),rgba(4,8,24,.97)!important;box-shadow:0 0 8px rgba(126,220,255,.88),0 0 26px rgba(22,139,255,.44),0 0 24px rgba(180,92,255,.26)!important}
 
@@ -130,7 +130,7 @@ body[data-veluna-page="veluna"] .veluna-bottom-brand{width:100%;max-height:136px
   body[data-veluna-ui]{position:fixed!important;inset:0!important;width:var(--veluna-fixed-vw,100dvw)!important;height:var(--veluna-fixed-vh,100dvh)!important;min-height:var(--veluna-fixed-vh,100dvh)!important;max-height:var(--veluna-fixed-vh,100dvh)!important;touch-action:manipulation!important;background-attachment:scroll!important}
   body[data-veluna-ui] :is(.frame-stage,.app-shell){width:100%!important;height:100%!important;min-height:100%!important;max-height:100%!important;padding:0!important;overflow:hidden!important}
   body[data-veluna-page="veluna"] .player-card,body[data-veluna-page="internal"] .player-card{height:calc(100% - 8px)!important;max-height:calc(100% - 8px)!important;width:calc(100% - 8px)!important;max-width:calc(100% - 8px)!important;margin:4px!important;padding-bottom:max(6px,env(safe-area-inset-bottom))!important;overflow:hidden!important}
-  body[data-veluna-ui] :is(.overlay,.panel-overlay,.history-overlay,.admin-overlay,[role="dialog"]){position:fixed!important;inset:0!important;max-width:100dvw!important;max-height:100dvh!important;margin:0!important;transform:none!important;overflow:auto!important;overscroll-behavior:contain!important}
+  body[data-veluna-ui] :is(.overlay,.panel-overlay,.history-overlay,.admin-overlay){position:fixed!important;inset:0!important;max-width:100dvw!important;max-height:100dvh!important;margin:0!important;transform:none!important;overflow:auto!important;overscroll-behavior:contain!important}
   body[data-veluna-ui] input,body[data-veluna-ui] textarea,body[data-veluna-ui] select{font-size:16px!important}
   .veluna-global-header img{max-height:clamp(58px,14dvh,112px)}
   .veluna-bottom-brand{display:none}
@@ -376,7 +376,7 @@ body[data-veluna-page="veluna"] .cover-image{
     overflow:auto!important;
     overscroll-behavior:contain!important;
   }
-  html[data-veluna-fixed-viewport] body[data-veluna-ui] :is(.overlay,.admin-overlay,[role="dialog"]){
+  html[data-veluna-fixed-viewport] body[data-veluna-ui] :is(.overlay,.admin-overlay){
     position:fixed!important;
     left:0!important;
     top:0!important;
@@ -458,4 +458,56 @@ body[data-veluna-page="veluna"] .cover-image{
   body[data-veluna-page="veluna"] .player-card{
     grid-template-rows:auto auto auto minmax(56px,1fr) auto auto auto auto auto auto auto clamp(76px,14dvh,104px)!important;
   }
+}
+
+
+/* ========================================================================
+   PLAYER MESSAGE OVERLAY INERT AUTHORITY v1.2.26
+   Only the backdrop owns fullscreen geometry. The inner role=dialog box is
+   never promoted to a viewport layer. A closed message cannot capture touch.
+   ======================================================================== */
+#playerAlertReceiveBackdrop,
+body[data-veluna-ui] #playerAlertReceiveBackdrop{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483600!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))!important;
+  background:rgba(0,0,0,.72)!important;
+  backdrop-filter:blur(8px)!important;
+  -webkit-backdrop-filter:blur(8px)!important;
+}
+#playerAlertReceiveBackdrop[hidden],
+#playerAlertReceiveBackdrop[aria-hidden="true"],
+#playerAlertReceiveBackdrop:not(.is-open){
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+#playerAlertReceiveBackdrop.is-open[aria-hidden="false"]{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+#playerAlertReceiveBackdrop .player-alert-modal{
+  position:relative!important;
+  inset:auto!important;
+  width:min(520px,calc(100vw - 32px))!important;
+  min-width:0!important;
+  max-width:520px!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:min(82dvh,620px)!important;
+  margin:0!important;
+  padding:18px!important;
+  overflow:auto!important;
+  border:1px solid rgba(22,139,255,.72)!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,rgba(180,92,255,.16),rgba(22,139,255,.10)),rgba(4,8,24,.98)!important;
+  box-shadow:0 0 8px rgba(126,220,255,.88),0 0 26px rgba(22,139,255,.44),0 0 24px rgba(180,92,255,.26)!important;
+  pointer-events:auto!important;
+  transform:none!important;
 }

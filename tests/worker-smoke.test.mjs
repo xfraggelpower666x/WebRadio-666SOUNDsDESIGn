@@ -212,7 +212,7 @@ test("VELUNA is canonical and AMARIS player routes are removed", async () => {
   assert.match(internalHtml, /skip-control\.js\?v=2026-07-19-action-parity-v1/);
   assert.match(internalHtml, /player-alert-client\.js/);
   assert.match(internalHtml, /messenger-overlay\.js/);
-  assert.match(internalHtml, /discord-player-addon-v3\.js\?v=2026-07-19-overlay-status-v51/);
+  assert.match(internalHtml, /discord-player-addon-v3\.js\?v=2026-07-19-overlay-inert-v52/);
   assert.match(internalHtml, /S666SkipControl\.skip/);
   assert.match(internalHtml, /S666DiscordPlayerAddonV3\.messagePost/);
   assert.match(internalHtml, /S666Messenger\.open/);
@@ -230,6 +230,17 @@ test("Internal player loads the shared touch feedback authority", async () => {
   const internal = await request("/internal", { headers: { accept: "text/html" } });
   assert.equal(internal.status, 200);
   const html = await internal.text();
-  assert.match(html, /veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225/);
+  assert.match(html, /veluna-theme\.css\?v=2026-07-19-overlay-inert-v1226/);
   assert.match(html, /veluna-ui\.js\?v=2026-07-19-touch-feedback-v1225/);
+});
+
+
+
+test("internal player serves the inert Player Message overlay authorities", async () => {
+  const response = await request("/internal", { headers: { accept: "text/html" } });
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /player-alert-client\.js\?v=2026-07-19-overlay-inert-v121/);
+  assert.match(html, /discord-player-addon-v3\.js\?v=2026-07-19-overlay-inert-v52/);
+  assert.match(html, /veluna-theme\.css\?v=2026-07-19-overlay-inert-v1226/);
 });
