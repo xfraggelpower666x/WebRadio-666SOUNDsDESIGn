@@ -1,0 +1,52 @@
+name: Audit Production Deploy Status 20260719
+
+on:
+  push:
+    branches:
+      - audit-live-auth-skip-chain-20260719
+    paths:
+      - ".github/workflows/audit-production-deploy-status-20260719.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  deploy-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read latest production deploy runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            -H "authorization: Bearer $GH_TOKEN" \
+            -H 'accept: application/vnd.github+json' \
+            -H 'x-github-api-version: 2022-11-28' \
+            "https://api.github.com/repos/$REPO/actions/workflows/deploy-cloudflare-workers.yml/runs?branch=WebRadio-666SOUNDsDESIGn&event=push&per_page=5" \
+            -o /tmp/runs.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/runs.json').read_text())
+          runs=data.get('workflow_runs') or []
+          assert runs, data
+          for run in runs:
+              print('deployRun=' + ' '.join([
+                  'id='+str(run.get('id')),
+                  'sha='+str(run.get('head_sha')),
+                  'status='+str(run.get('status')),
+                  'conclusion='+str(run.get('conclusion')),
+                  'created='+str(run.get('created_at')),
+                  'updated='+str(run.get('updated_at')),
+              ]))
+          latest=runs[0]
+          print('latestDeployRunId='+str(latest.get('id')))
+          print('latestDeployHeadSha='+str(latest.get('head_sha')))
+          print('latestDeployStatus='+str(latest.get('status')))
+          print('latestDeployConclusion='+str(latest.get('conclusion')))
+          PY
