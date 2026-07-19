@@ -1,0 +1,1 @@
+Trigger the verified one-time Veluna overlay/auth/PC repair through a real merge event.
