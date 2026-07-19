@@ -34,13 +34,27 @@ jobs:
       - name: Apply overlay repair
         run: python .github/one-time/apply_player_message_overlay_inert_v1.py
       - name: Verify complete release
+        id: verify
+        continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
-          npm ci >/tmp/npm-ci.log 2>&1 || { cat /tmp/npm-ci.log; exit 1; }
-          npm run verify >/tmp/verify.log 2>&1 || { tail -n 180 /tmp/verify.log; exit 1; }
-          tail -n 80 /tmp/verify.log
+          npm ci >/tmp/npm-ci.log 2>&1 || { cp /tmp/npm-ci.log /tmp/verify.log; exit 1; }
+          npm run verify >/tmp/verify.log 2>&1
+      - name: Persist verification diagnostics
+        if: steps.verify.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/verify.log .github/one-time/verify-failure.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/one-time/verify-failure.txt
+          git commit -m "ci: capture overlay repair verification failure"
+          git push origin HEAD:repair-player-message-overlay-inert-v1-20260719
+          exit 1
       - name: Commit verified product files
+        if: steps.verify.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
