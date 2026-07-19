@@ -21,7 +21,7 @@ jobs:
   deploy-status:
     runs-on: ubuntu-latest
     steps:
-      - name: Read latest production deploy and failed job log
+      - name: Export latest failed production deploy log
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -39,26 +39,17 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          data=json.loads(Path('/tmp/runs.json').read_text())
-          runs=data.get('workflow_runs') or []
-          assert runs, data
-          for run in runs:
-              print('deployRun=' + ' '.join([
-                  'id='+str(run.get('id')),
-                  'sha='+str(run.get('head_sha')),
-                  'status='+str(run.get('status')),
-                  'conclusion='+str(run.get('conclusion')),
-                  'created='+str(run.get('created_at')),
-                  'updated='+str(run.get('updated_at')),
-              ]))
+          runs=json.loads(Path('/tmp/runs.json').read_text()).get('workflow_runs') or []
+          assert runs
           latest=runs[0]
-          Path('/tmp/latest-run-id').write_text(str(latest.get('id')))
-          print('latestDeployRunId='+str(latest.get('id')))
-          print('latestDeployHeadSha='+str(latest.get('head_sha')))
-          print('latestDeployStatus='+str(latest.get('status')))
-          print('latestDeployConclusion='+str(latest.get('conclusion')))
+          Path('/tmp/latest-run-id').write_text(str(latest['id']))
+          Path('/tmp/deploy-summary.txt').write_text(
+              'latestDeployRunId='+str(latest.get('id'))+'\n'+
+              'latestDeployHeadSha='+str(latest.get('head_sha'))+'\n'+
+              'latestDeployStatus='+str(latest.get('status'))+'\n'+
+              'latestDeployConclusion='+str(latest.get('conclusion'))+'\n'
+          )
           PY
-
           run_id="$(cat /tmp/latest-run-id)"
           curl --fail --silent --show-error "${api_headers[@]}" \
             "https://api.github.com/repos/$REPO/actions/runs/$run_id/jobs?per_page=100" \
@@ -67,29 +58,34 @@ jobs:
           import json
           from pathlib import Path
           jobs=json.loads(Path('/tmp/jobs.json').read_text()).get('jobs') or []
-          assert jobs
           failed=[job for job in jobs if job.get('conclusion') == 'failure']
-          for job in jobs:
-              print('deployJob=' + ' '.join([
-                  'id='+str(job.get('id')),
-                  'name='+str(job.get('name')).replace(' ','_'),
-                  'status='+str(job.get('status')),
-                  'conclusion='+str(job.get('conclusion')),
-              ]))
-          assert failed, jobs
-          Path('/tmp/failed-job-id').write_text(str(failed[0].get('id')))
-          print('failedDeployJobId='+str(failed[0].get('id')))
-          print('failedDeployJobName='+str(failed[0].get('name')))
+          assert failed
+          job=failed[0]
+          Path('/tmp/failed-job-id').write_text(str(job['id']))
+          with Path('/tmp/deploy-summary.txt').open('a') as out:
+              out.write('failedDeployJobId='+str(job.get('id'))+'\n')
+              out.write('failedDeployJobName='+str(job.get('name'))+'\n')
           PY
-
           job_id="$(cat /tmp/failed-job-id)"
           curl --fail --silent --show-error --location "${api_headers[@]}" \
             "https://api.github.com/repos/$REPO/actions/jobs/$job_id/logs" \
-            -o /tmp/failed-job-logs
-          echo '--- FAILED DEPLOY LOG TAIL ---'
-          if unzip -t /tmp/failed-job-logs >/dev/null 2>&1; then
-            unzip -p /tmp/failed-job-logs | tail -n 140
+            -o /tmp/raw-job-logs
+          if unzip -t /tmp/raw-job-logs >/dev/null 2>&1; then
+            unzip -p /tmp/raw-job-logs > /tmp/job.log
           else
-            tail -n 140 /tmp/failed-job-logs
+            cp /tmp/raw-job-logs /tmp/job.log
           fi
-          echo '--- END FAILED DEPLOY LOG TAIL ---'
+          {
+            cat /tmp/deploy-summary.txt
+            echo '--- FAILED WRANGLER LOG TAIL ---'
+            tail -n 160 /tmp/job.log
+            echo '--- END FAILED WRANGLER LOG TAIL ---'
+          } > /tmp/failed-deploy-result.txt
+          cat /tmp/deploy-summary.txt
+      - name: Upload exact failed deploy result
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-production-deploy-result
+          path: /tmp/failed-deploy-result.txt
+          if-no-files-found: error
+          retention-days: 1
