@@ -36,21 +36,21 @@ jobs:
 
           args=(--silent --show-error --location -o /tmp/live.json -w '%{http_code}')
           if [[ -n "${DEBUG_TOKEN:-}" ]]; then args+=( -H "x-debug-token: ${DEBUG_TOKEN}" ); fi
-          live_code="$(curl "${args[@]}" "$base/api/admin/auth-live-state?t=$stamp")"
+          curl "${args[@]}" "$base/api/admin/auth-live-state?t=$stamp" > /tmp/live-code.txt
 
-          login_code="$(curl --silent --show-error --location \
+          curl --silent --show-error --location \
             -H 'content-type: application/json' -H 'accept: application/json' \
             -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
             -X POST "$base/api/admin/login?t=$stamp" \
             --data '{"password":"__S666_INTENTIONAL_INVALID_AUDIT_PASSWORD__"}' \
-            -o /tmp/login.json -w '%{http_code}')"
+            -o /tmp/login.json -w '%{http_code}' > /tmp/login-code.txt
 
-          skip_code="$(curl --silent --show-error --location \
+          curl --silent --show-error --location \
             -H 'content-type: application/json' -H 'accept: application/json' \
             -H "origin: $origin" -H "referer: $origin/veluna" -H 'sec-fetch-site: same-origin' \
             -X POST "$base/api/admin/skip?t=$stamp" \
             --data '{"source":"live-auth-audit-no-token"}' \
-            -o /tmp/skip.json -w '%{http_code}')"
+            -o /tmp/skip.json -w '%{http_code}' > /tmp/skip-code.txt
 
           python - <<'PY'
           import json
@@ -61,17 +61,20 @@ jobs:
           live=json.loads(Path('/tmp/live.json').read_text())
           login=json.loads(Path('/tmp/login.json').read_text())
           skip=json.loads(Path('/tmp/skip.json').read_text())
+          live_code=Path('/tmp/live-code.txt').read_text().strip()
+          login_code=Path('/tmp/login-code.txt').read_text().strip()
+          skip_code=Path('/tmp/skip-code.txt').read_text().strip()
 
           print('pwWorkerReachable='+str(pw.get('ok') is True).lower())
           print('pwWorkerVersion='+str(pw.get('version')))
           print('authWorkerReachable='+str(auth.get('ok') is True).lower())
           print('authWorkerVersion='+str(auth.get('version')))
-          print('authLiveStateHttp='+'${{ env.LIVE_CODE }}')
+          print('authLiveStateHttp='+live_code)
           for key in ('mainWorkerCanReachPwLogin','mainWorkerCanReachAuthVerify','audienceConfigured','serviceTokenConfigured','pwWorkerVersion','authWorkerVersion'):
               print(f'{key}={live.get(key)}')
-          print('invalidLoginHttp='+'${{ env.LOGIN_CODE }}')
+          print('invalidLoginHttp='+login_code)
           print('invalidLoginError='+str(login.get('error')))
-          print('skipNoTokenHttp='+'${{ env.SKIP_CODE }}')
+          print('skipNoTokenHttp='+skip_code)
           print('skipNoTokenError='+str(skip.get('error')))
 
           assert pw.get('ok') is True, pw
@@ -79,8 +82,5 @@ jobs:
           assert login.get('ok') is False, login
           assert skip.get('ok') is False, skip
           assert skip.get('error') in {'auth_token_missing','unauthorized'}, skip
+          print('LIVE_AUTH_SKIP_CHAIN_DIAGNOSTICS_COMPLETE')
           PY
-        env:
-          LIVE_CODE: ${{ env.live_code }}
-          LOGIN_CODE: ${{ env.login_code }}
-          SKIP_CODE: ${{ env.skip_code }}
