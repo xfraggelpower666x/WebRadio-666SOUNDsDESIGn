@@ -1,56 +1,46 @@
 /*
- * 666SOUNDsDESIGn Interior Layout V7 - shared auth + global touch feedback
- * No element reparenting. Existing layout stays intact.
- * Adds only protected action buttons, side LEDs and MeterBus visual calibration.
+ * 666SOUNDsDESIGn Player Stage V8
+ * Zuständigkeit: Touchfeedback, geschützte Aktionsbuttons, Ticker und Status-LEDs.
+ * Der Audio-Visualizer bleibt alleiniger Writer für EQ, Seitenmeter und Bottom-Meter.
  */
 (function(){
   'use strict';
   if(window.__S666_PLAYER_STAGE_V2_CORRECTION__) return;
   window.__S666_PLAYER_STAGE_V2_CORRECTION__ = true;
 
-  var state={levels:{},lastLevel:0,lastPeak:0,bus:null};
+  var state={bus:null,lastDrive:0};
+  function q(selector,root){return (root||document).querySelector(selector);}
+  function qa(selector,root){return Array.from((root||document).querySelectorAll(selector));}
+  function clamp(value,min,max){value=Number(value)||0;return Math.max(min,Math.min(max,value));}
 
-  function q(s,r){return (r||document).querySelector(s);}
-  function qa(s,r){return Array.from((r||document).querySelectorAll(s));}
-  function clamp(v,a,b){v=Number(v)||0;return Math.max(a,Math.min(b,v));}
-  function avg(a,f){if(!a||!a.length)return f||0;return a.reduce(function(x,y){return x+(Number(y)||0);},0)/a.length;}
-  function smooth(key,target,attack,release){
-    var prev=Number(state.levels[key]||0);
-    var speed=target>prev?(attack||.72):(release||.18);
-    var next=prev+(target-prev)*speed;
-    state.levels[key]=next;
-    return next;
+  function toast(message,type){
+    var host=q('#actionText')||q('#actionStatus')||q('[role="status"]');
+    if(host) host.textContent=String(message||'');
+    try{window.dispatchEvent(new CustomEvent('s666:player-toast',{detail:{message:String(message||''),type:type||'info'}}));}catch(_){ }
   }
+
   async function openDiscordShooter(){
     try{
-      if(window.S666DiscordPlayerAddonV3&&typeof window.S666DiscordPlayerAddonV3.messagePost==='function'){
-        await window.S666DiscordPlayerAddonV3.messagePost();
-        toast('Discord Shooter geöffnet.');
-      }else{
-        throw new Error('discord_addon_not_ready');
-      }
-    }catch(e){
-      toast(e&&e.message?e.message:'Discord Shooter ist nicht bereit.','error');
-    }
+      if(!window.S666DiscordPlayerAddonV3||typeof window.S666DiscordPlayerAddonV3.messagePost!=='function') throw new Error('Discord Shooter ist nicht bereit.');
+      await window.S666DiscordPlayerAddonV3.messagePost();
+      toast('Discord Shooter geöffnet.');
+    }catch(error){toast(error&&error.message?error.message:'Discord Shooter ist nicht bereit.','error');}
   }
 
   async function requestSkip(){
-    if(!confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?'))return false;
+    if(!confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?')) return false;
     if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function'){
       toast('Auto-DJ Skip ist nicht bereit.','error');
       return false;
     }
-    var result=await window.S666SkipControl.skip({
-      source:'player-stage-v2',
-      prompt:'Admin-Passwort für Auto-DJ Skip eingeben:'
-    });
-    if(result&&result.ok)toast('AUTO-DJ SKIP ausgeführt.');
+    var result=await window.S666SkipControl.skip({source:'player-stage-v2',prompt:'Admin-Passwort für Auto-DJ Skip eingeben:'});
+    if(result&&result.ok) toast('AUTO-DJ SKIP ausgeführt.');
     else toast(result&&result.error?result.error:'Auto-DJ Skip abgelehnt.','error');
     return !!(result&&result.ok);
   }
 
   function installTouchFeedback(){
-    if(document.documentElement.dataset.s666StageTouchFeedback==='1')return;
+    if(document.documentElement.dataset.s666StageTouchFeedback==='1') return;
     document.documentElement.dataset.s666StageTouchFeedback='1';
     var selector='#mffApp button,#mffApp a[href],.player-shell button,.player-shell a[href],.player-shell [role="button"]';
     var pressed=null,releaseTimer=0;
@@ -58,16 +48,16 @@
       clearTimeout(releaseTimer);
       var current=pressed;
       releaseTimer=setTimeout(function(){
-        if(!current)return;
+        if(!current) return;
         current.classList.remove('is-pressed');
         current.removeAttribute('data-s666-press');
-        if(pressed===current)pressed=null;
+        if(pressed===current) pressed=null;
       },delay||0);
     }
     function press(target,input){
       var control=target&&target.closest?target.closest(selector):null;
-      if(!control||control.disabled||control.getAttribute('aria-disabled')==='true')return;
-      if(pressed&&pressed!==control)release(0);
+      if(!control||control.disabled||control.getAttribute('aria-disabled')==='true') return;
+      if(pressed&&pressed!==control) release(0);
       pressed=control;
       clearTimeout(releaseTimer);
       control.classList.add('is-pressed');
@@ -79,214 +69,95 @@
     document.addEventListener('pointercancel',function(){release(0);},{capture:true,passive:true});
     document.addEventListener('touchend',function(){release(170);},{capture:true,passive:true});
     document.addEventListener('touchcancel',function(){release(0);},{capture:true,passive:true});
-    document.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' ')press(event.target,'keyboard');},true);
-    document.addEventListener('keyup',function(event){if(event.key==='Enter'||event.key===' ')release(120);},true);
+    document.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' ') press(event.target,'keyboard');},true);
+    document.addEventListener('keyup',function(event){if(event.key==='Enter'||event.key===' ') release(120);},true);
     window.addEventListener('blur',function(){release(0);},{passive:true});
   }
 
   function makeButton(id,label,action){
-    var b=document.createElement('button');
-    b.id=id;
-    b.type='button';
-    b.textContent=label;
-    b.setAttribute('data-action',action);
-    return b;
+    var button=document.createElement('button');
+    button.id=id;
+    button.type='button';
+    button.textContent=label;
+    button.setAttribute('data-action',action);
+    return button;
   }
 
   function ensureActionButtons(){
     var toolbar=q('.player-shell .bottom-console .control-toolbar');
     if(toolbar){
-      var d=q('#s666StageDiscord',toolbar);
-      if(!d){d=makeButton('s666StageDiscord','DISCORD SHOOTER','discord');toolbar.appendChild(d);}
-      if(!d.__bound){d.__bound=true;d.onclick=openDiscordShooter;}
-      var s=q('#s666StageSkip',toolbar);
-      if(!s){s=makeButton('s666StageSkip','AUTO-DJ SKIP','skip');toolbar.appendChild(s);}
-      if(!s.__bound){s.__bound=true;s.onclick=requestSkip;}
+      var discord=q('#s666StageDiscord',toolbar);
+      if(!discord){discord=makeButton('s666StageDiscord','DISCORD SHOOTER','discord');toolbar.appendChild(discord);}
+      if(!discord.__bound){discord.__bound=true;discord.onclick=openDiscordShooter;}
+      var skip=q('#s666StageSkip',toolbar);
+      if(!skip){skip=makeButton('s666StageSkip','AUTO-DJ SKIP','skip');toolbar.appendChild(skip);}
+      if(!skip.__bound){skip.__bound=true;skip.onclick=requestSkip;}
     }
 
     var mobileSlot=q('#mffApp .mff-discord-slot');
     if(mobileSlot&&!q('#s666StageMobileActions',mobileSlot)){
       var row=document.createElement('div');
       row.id='s666StageMobileActions';
-      var md=makeButton('s666StageMobileDiscord','DISCORD','discord');
-      var ms=makeButton('s666StageMobileSkip','AUTO-DJ SKIP','skip');
-      md.onclick=openDiscordShooter;
-      ms.onclick=requestSkip;
-      row.appendChild(md);
-      row.appendChild(ms);
+      var mobileDiscord=makeButton('s666StageMobileDiscord','DISCORD','discord');
+      var mobileSkip=makeButton('s666StageMobileSkip','AUTO-DJ SKIP','skip');
+      mobileDiscord.onclick=openDiscordShooter;
+      mobileSkip.onclick=requestSkip;
+      row.appendChild(mobileDiscord);
+      row.appendChild(mobileSkip);
       mobileSlot.appendChild(row);
     }
   }
 
-  function sidePanel(side){
+  function ensureSidePanel(side){
     var tower=q(side==='left'?'#pcLeftFxAddon .pc-addon-tower':'#pcRightFxAddon .pc-addon-tower');
-    if(!tower)return false;
+    if(!tower) return false;
     var id=side==='left'?'s666LeftStatusPanel':'s666RightStatusPanel';
-    if(q('#'+id,tower))return true;
+    if(q('#'+id,tower)) return true;
+    var labels=side==='left'?['INPUT','RMS','PEAK','BUS']:['MAIN','BACK','META','SYNC'];
     var panel=document.createElement('section');
     panel.id=id;
     panel.className='s666-side-status-panel';
     panel.setAttribute('data-side',side);
-    var labels=side==='left'?['INPUT','RMS','PEAK','BUS']:['MAIN','BACK','META','SYNC'];
-    panel.innerHTML='<div class="s666-side-status-title"><span>'+(side==='left'?'SIGNAL CORE':'ROUTE CORE')+'</span><b>LIVE</b></div><div class="s666-side-status-grid">'+labels.map(function(x){return'<span class="s666-side-led" data-led="'+x.toLowerCase()+'"><i></i><b>'+x+'</b></span>';}).join('')+'</div>';
+    panel.innerHTML='<div class="s666-side-status-title"><span>'+(side==='left'?'SIGNAL CORE':'ROUTE CORE')+'</span><b>LIVE</b></div><div class="s666-side-status-grid">'+labels.map(function(label){return '<span class="s666-side-led" data-led="'+label.toLowerCase()+'"><i></i><b>'+label+'</b></span>';}).join('')+'</div>';
     tower.appendChild(panel);
     return true;
   }
 
-  function ensureSmallAdditions(){
-    installTouchFeedback();
-    ensureActionButtons();
-    sidePanel('left');
-    sidePanel('right');
+  function setLed(panel,key,on,className){
+    var element=q('#'+panel+' [data-led="'+key+'"]');
+    if(!element) return;
+    element.classList.remove('is-on','is-peak','is-back','is-warn');
+    if(on) element.classList.add(className||'is-on');
   }
 
-  function driveSideLeds(bus,level,peak){
-    var age=bus&&bus.ts?Date.now()-bus.ts:99999;
-    var live=age<900&&bus&&bus.source!=='synthetic';
-    function led(panel,key,on,cls){
-      var el=q('#'+panel+' [data-led="'+key+'"]');
-      if(!el)return;
-      el.classList.remove('is-on','is-peak','is-back','is-warn');
-      if(on)el.classList.add(cls||'is-on');
-    }
-    led('s666LeftStatusPanel','input',!!bus&&age<900);
-    led('s666LeftStatusPanel','rms',level>.07);
-    led('s666LeftStatusPanel','peak',peak>.58,'is-peak');
-    led('s666LeftStatusPanel','bus',live);
-    var src=q('#statusSource');
-    var back=!!(src&&(src.classList.contains('state-backup')||src.classList.contains('state-fallback')));
-    led('s666RightStatusPanel','main',!back&&live);
-    led('s666RightStatusPanel','back',back,'is-back');
+  function driveSideLeds(bus){
+    if(!bus||typeof bus!=='object') return;
+    var age=bus.ts?Date.now()-bus.ts:99999;
+    var level=clamp(bus.level,0,1);
+    var peak=clamp(bus.peak==null?level:bus.peak,0,1);
+    var live=age<900&&bus.source!=='synthetic';
+    setLed('s666LeftStatusPanel','input',age<900);
+    setLed('s666LeftStatusPanel','rms',level>.06);
+    setLed('s666LeftStatusPanel','peak',peak>.56,'is-peak');
+    setLed('s666LeftStatusPanel','bus',live);
+    var source=q('#statusSource');
+    var backup=!!(source&&(source.classList.contains('state-backup')||source.classList.contains('state-fallback')));
+    setLed('s666RightStatusPanel','main',!backup&&live);
+    setLed('s666RightStatusPanel','back',backup,'is-back');
     var meta=q('#statusMeta');
-    led('s666RightStatusPanel','meta',!!(meta&&(meta.classList.contains('state-api')||meta.classList.contains('is-active'))));
-    led('s666RightStatusPanel','sync',live&&level>.035);
-  }
-
-  function setSideMeters(values,selector,prefix){
-    qa(selector).forEach(function(el,i){
-      var target=clamp(values[i%values.length],.02,1);
-      var v=smooth(prefix+i,target,.80,.16);
-      el.style.height=(7+v*92).toFixed(1)+'%';
-      el.style.opacity=(.32+v*.68).toFixed(2);
-      el.style.filter='brightness('+(1+v*.78).toFixed(2)+') saturate('+(1+v*.92).toFixed(2)+')';
-    });
-  }
-
-  function setBottom(level,peak,pulse){
-    var bars=qa('#pcBottomSyncMeter .pc-bottom-sync-seg');
-    if(!bars.length)return;
-    var active=clamp(level*.66+peak*.34,0,1);
-    var center=(bars.length-1)/2;
-    var width=Math.max(2,active*center);
-    bars.forEach(function(el,i){
-      var dist=Math.abs(i-center);
-      var local=clamp(1-dist/Math.max(1,width),0,1);
-      var target=dist<=width?clamp(.22+local*.56+pulse*.28,0,1):.04;
-      var v=smooth('bottom'+i,target,.88,.20);
-      el.classList.toggle('is-on',dist<=width);
-      el.style.opacity=(.10+v*.90).toFixed(2);
-      el.style.transform='scaleY('+(0.30+v*.82).toFixed(3)+')';
-      el.style.filter='brightness('+(1+v*.94).toFixed(2)+') saturate('+(1+v*.78).toFixed(2)+')';
-    });
-  }
-
-  function setEq(bus,level,peak){
-    var eq=(bus&&Array.isArray(bus.eq)&&bus.eq.length)?bus.eq:[level,peak,level*.8,peak*.7];
-    var pc=qa('#eqBars .eq-bar-fill,.visualizer .eq-bars .eq-bar-fill');
-    pc.forEach(function(el,i){
-      var sourceValue=clamp(eq[Math.round(i/Math.max(1,pc.length-1)*(eq.length-1))]||0,0,1);
-      var raw=clamp(Math.pow(sourceValue,.58)*1.28+level*.16+peak*.10,0,1);
-      var v=smooth('eqpc'+i,raw,.90,.13);
-      el.style.height=(18+v*82).toFixed(1)+'%';
-      el.style.opacity=(.36+v*.64).toFixed(2);
-      el.style.filter='brightness('+(1+v*.90).toFixed(2)+') saturate('+(1+v*1.05).toFixed(2)+')';
-    });
-    var mob=qa('#mffEqBars i');
-    mob.forEach(function(el,i){
-      var raw=clamp(eq[Math.round(i/Math.max(1,mob.length-1)*(eq.length-1))]||0,0,1);
-      var v=smooth('eqmob'+i,raw,.86,.16);
-      el.style.height=(12+v*150).toFixed(1)+'px';
-      el.style.opacity=(.32+v*.68).toFixed(2);
-      el.style.filter='brightness('+(1+v*.84).toFixed(2)+') saturate('+(1+v*.95).toFixed(2)+')';
-    });
-  }
-
-  function setPanelModules(bus,level,peak,pulse){
-    var eq=(bus&&bus.eq)||[];
-    var low=avg(eq.slice(0,Math.max(1,Math.floor(eq.length*.34))),level);
-    var mid=avg(eq.slice(Math.floor(eq.length*.28),Math.max(2,Math.floor(eq.length*.70))),level);
-    var high=avg(eq.slice(Math.floor(eq.length*.62)),level);
+    setLed('s666RightStatusPanel','meta',!!(meta&&(meta.classList.contains('state-api')||meta.classList.contains('is-active'))));
+    setLed('s666RightStatusPanel','sync',live&&level>.03);
     document.documentElement.style.setProperty('--s666-stage-level',level.toFixed(3));
     document.documentElement.style.setProperty('--s666-stage-peak',peak.toFixed(3));
-
-    qa('.pc-addon-waveform i').forEach(function(el,i){
-      var source=i%3===0?low:i%3===1?mid:high;
-      var v=smooth('wave'+i,clamp(source*.72+pulse*.28,0,1),.88,.18);
-      el.style.height=(10+v*88).toFixed(1)+'%';
-      el.style.opacity=(.30+v*.70).toFixed(2);
-      el.style.filter='brightness('+(1+v*.82).toFixed(2)+')';
-    });
-
-    qa('.pc-addon-beatline i').forEach(function(el,i){
-      var v=smooth('beat'+i,clamp(pulse*(.68+(i%2)*.32)+peak*.20,0,1),.94,.10);
-      el.style.height=(8+v*90).toFixed(1)+'%';
-      el.style.opacity=(.24+v*.76).toFixed(2);
-    });
-
-    qa('.pc-addon-vu-grid .pc-vu-channel:first-child i').forEach(function(el,i){
-      var v=smooth('vuL'+i,clamp((i?mid:low)*.60+level*.40,0,1),.88,.15);
-      el.style.height=(7+v*92).toFixed(1)+'%';
-      el.style.opacity=(.26+v*.74).toFixed(2);
-    });
-
-    qa('.pc-addon-vu-grid .pc-vu-channel:last-child i').forEach(function(el,i){
-      var v=smooth('vuR'+i,clamp((i?high:mid)*.60+peak*.40,0,1),.88,.15);
-      el.style.height=(7+v*92).toFixed(1)+'%';
-      el.style.opacity=(.26+v*.74).toFixed(2);
-    });
-
-    qa('.pc-addon-reactor-core').forEach(function(el){
-      var s=smooth('reactor',clamp(low*.54+level*.24+peak*.22,0,1),.84,.14);
-      el.style.transform='scale('+(0.88+s*.24).toFixed(3)+')';
-      el.style.filter='brightness('+(1+s*.62).toFixed(2)+') saturate('+(1+s*.86).toFixed(2)+') drop-shadow(0 0 '+(8+s*28).toFixed(1)+'px rgba(22,255,243,.35))';
-    });
-
-    qa('.phase-line').forEach(function(el){
-      var s=smooth('phaseLine',clamp(mid*.55+high*.25+pulse*.20,0,1),.86,.16);
-      el.style.transform='rotate('+(-55+s*110).toFixed(1)+'deg) scaleX('+(0.56+s*.72).toFixed(3)+')';
-      el.style.opacity=(.30+s*.68).toFixed(2);
-    });
   }
 
   function drive(bus){
-    if(!bus||typeof bus!=='object')return;
+    if(!bus||typeof bus!=='object') return;
     state.bus=bus;
-    var level=smooth('masterLevel',clamp(bus.level,0,1),.84,.14);
-    var peak=smooth('masterPeak',clamp(bus.peak==null?bus.level:bus.peak,0,1),.94,.10);
-    var pulse=clamp(Math.max(0,peak-state.lastPeak)*2.8+Math.abs(level-state.lastLevel)*4.8,0,1);
-    state.lastLevel=level;
-    state.lastPeak=peak;
-    var eq=Array.isArray(bus.eq)?bus.eq:[];
-    var low=avg(eq.slice(0,Math.max(1,Math.floor(eq.length*.35))),level);
-    var mid=avg(eq.slice(Math.floor(eq.length*.28),Math.max(2,Math.floor(eq.length*.72))),level);
-    var high=avg(eq.slice(Math.floor(eq.length*.62)),level);
-
-    setSideMeters([
-      clamp(level*.52+low*.48,0,1),
-      clamp(level*.48+mid*.52,0,1),
-      clamp(level*.38+pulse*.62,0,1)
-    ],'#leftMeterA,#leftMeterB,#leftMeterC','left');
-
-    setSideMeters([
-      clamp(level*.50+high*.50,0,1),
-      clamp(level*.46+mid*.54,0,1),
-      clamp(level*.36+peak*.64,0,1)
-    ],'#rightMeterA,#rightMeterB,#rightMeterC','right');
-
-    setBottom(level,peak,pulse);
-    setEq(bus,level,peak);
-    setPanelModules(bus,level,peak,pulse);
-    driveSideLeds(bus,level,peak);
+    var now=Date.now();
+    if(now-state.lastDrive<28) return;
+    state.lastDrive=now;
+    driveSideLeds(bus);
   }
 
   function installMeterBusHook(){
@@ -296,76 +167,82 @@
         configurable:true,
         enumerable:true,
         get:function(){return state.bus;},
-        set:function(v){state.bus=v;drive(v);}
+        set:function(value){state.bus=value;drive(value);}
       });
       if(initial){state.bus=initial;drive(initial);}
-    }catch(e){
-      state.bus=initial;
-    }
+    }catch(_){state.bus=initial;}
   }
 
-
-  var tickerV5={observer:null,timer:0,animation:null};
-  function tickerV5Text(){
-    var ticker=q('#nowPlayingTicker'),meta=q('#metaLine');
-    if(!ticker)return '';
-    var text=String(ticker.textContent||'').replace(/\s+/g,' ').trim();
+  var ticker={observer:null,timer:0,animation:null};
+  function tickerText(){
+    var element=q('#nowPlayingTicker');
+    var meta=q('#metaLine');
+    if(!element) return '';
+    var text=String(element.textContent||'').replace(/\s+/g,' ').trim();
     var metaText=String(meta&&meta.textContent||'').replace(/\s+/g,' ').trim();
-    if((!text||text==='—'||text==='-')&&metaText){text=metaText;ticker.textContent=text;}
-    if(!text){text='666SOUNDsDESIGn WebRadio • LIVE';ticker.textContent=text;}
+    if((!text||text==='—'||text==='-')&&metaText){text=metaText;element.textContent=text;}
+    if(!text){text='666SOUNDsDESIGn WebRadio • LIVE';element.textContent=text;}
     return text;
   }
-  function restartTickerV5(){
-    var ticker=q('#nowPlayingTicker'),box=ticker&&ticker.closest('.ticker-window');
-    if(!ticker||!box)return;
-    tickerV5Text();
-    if(tickerV5.animation){try{tickerV5.animation.cancel();}catch(e){}tickerV5.animation=null;}
-    ticker.style.animation='none';ticker.style.transform='translateX(0px)';
+
+  function restartTicker(){
+    var element=q('#nowPlayingTicker');
+    var box=element&&element.closest('.ticker-window');
+    if(!element||!box) return;
+    tickerText();
+    if(ticker.animation){try{ticker.animation.cancel();}catch(_){ }ticker.animation=null;}
+    element.style.animation='none';
+    element.style.transform='translateX(0px)';
     requestAnimationFrame(function(){
-      var bw=Math.max(1,box.clientWidth),tw=Math.max(1,ticker.scrollWidth);
-      var duration=Math.max(12000,Math.min(30000,(bw+tw)*27));
-      if(typeof ticker.animate==='function'){
-        tickerV5.animation=ticker.animate(
-          [{transform:'translateX('+bw+'px)'},{transform:'translateX(-'+tw+'px)'}],
+      var boxWidth=Math.max(1,box.clientWidth);
+      var textWidth=Math.max(1,element.scrollWidth);
+      var duration=Math.max(12000,Math.min(32000,(boxWidth+textWidth)*27));
+      if(typeof element.animate==='function'){
+        ticker.animation=element.animate(
+          [{transform:'translateX('+boxWidth+'px)'},{transform:'translateX(-'+textWidth+'px)'}],
           {duration:duration,iterations:Infinity,easing:'linear'}
         );
       }
     });
   }
-  function installTickerV5(){
-    var ticker=q('#nowPlayingTicker'),meta=q('#metaLine');
-    if(!ticker)return;
-    tickerV5Text();restartTickerV5();
-    if(!tickerV5.observer&&typeof MutationObserver!=='undefined'){
-      tickerV5.observer=new MutationObserver(function(){
-        clearTimeout(tickerV5.timer);tickerV5.timer=setTimeout(restartTickerV5,40);
-      });
-      tickerV5.observer.observe(ticker,{childList:true,characterData:true,subtree:true});
-      if(meta)tickerV5.observer.observe(meta,{childList:true,characterData:true,subtree:true});
+
+  function installTicker(){
+    var element=q('#nowPlayingTicker');
+    var meta=q('#metaLine');
+    if(!element) return;
+    tickerText();
+    restartTicker();
+    if(!ticker.observer&&typeof MutationObserver!=='undefined'){
+      ticker.observer=new MutationObserver(function(){clearTimeout(ticker.timer);ticker.timer=setTimeout(restartTicker,40);});
+      ticker.observer.observe(element,{childList:true,characterData:true,subtree:true});
+      if(meta) ticker.observer.observe(meta,{childList:true,characterData:true,subtree:true});
     }
-    if(!window.__S666_TICKER_V5_RESIZE__){
-      window.__S666_TICKER_V5_RESIZE__=true;
-      window.addEventListener('resize',function(){
-        clearTimeout(tickerV5.timer);tickerV5.timer=setTimeout(restartTickerV5,120);
-      },{passive:true});
+    if(!window.__S666_TICKER_V8_RESIZE__){
+      window.__S666_TICKER_V8_RESIZE__=true;
+      window.addEventListener('resize',function(){clearTimeout(ticker.timer);ticker.timer=setTimeout(restartTicker,120);},{passive:true});
     }
+  }
+
+  function ensure(){
+    installTouchFeedback();
+    ensureActionButtons();
+    ensureSidePanel('left');
+    ensureSidePanel('right');
   }
 
   function boot(){
-    ensureSmallAdditions();
-    installTickerV5();
+    ensure();
+    installTicker();
     installMeterBusHook();
     var attempts=0;
     var timer=setInterval(function(){
-      ensureSmallAdditions();
-      if(attempts===1||attempts===5)restartTickerV5();
-      if(++attempts>12)clearInterval(timer);
+      ensure();
+      if(attempts===1||attempts===5) restartTicker();
+      attempts+=1;
+      if(attempts>12) clearInterval(timer);
     },500);
   }
 
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',boot,{once:true});
-  }else{
-    boot();
-  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
