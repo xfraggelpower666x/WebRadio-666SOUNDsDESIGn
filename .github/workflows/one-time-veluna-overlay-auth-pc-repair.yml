@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/one-time-veluna-overlay-auth-pc-repair.yml"
       - ".github/one-time/apply_veluna_overlay_auth_pc_repair.py"
+      - ".github/one-time/apply_veluna_auth_contract_bridge.py"
   workflow_dispatch:
 
 permissions:
@@ -15,7 +16,7 @@ permissions:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,6 +27,8 @@ jobs:
           cache: npm
       - name: Apply repair
         run: python .github/one-time/apply_veluna_overlay_auth_pc_repair.py
+      - name: Apply protected auth contract bridge
+        run: python .github/one-time/apply_veluna_auth_contract_bridge.py
       - name: Verify
         run: |
           npm ci
@@ -36,5 +39,6 @@ jobs:
           git config user.name "666SOUNDsDESIGn Repair Bot"
           git config user.email "actions@users.noreply.github.com"
           git add -- css/veluna-theme.css public/css/veluna-theme.css js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js js/admin-auth-client.js public/js/admin-auth-client.js veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html index.html public/index.html worker.js workers/webradio-666soundsdesign-worker/worker.js
+          git diff --cached --quiet && { echo "No repair changes produced"; exit 1; }
           git commit -m "repair: restore Veluna overlays auth feedback and PC fit"
           git push origin HEAD:WebRadio-666SOUNDsDESIGn
