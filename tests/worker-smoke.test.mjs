@@ -202,8 +202,21 @@ test("VELUNA is canonical and AMARIS player routes are removed", async () => {
   const internalHtml = await internal.text();
   assert.match(internalHtml, /666SOUNDsDESIGn RADIO/);
   assert.match(internalHtml, /LYVRA DJ/);
+  assert.match(internalHtml, /data-veluna-page="internal"/);
   assert.match(internalHtml, /veluna-ui\.js/);
   assert.match(internalHtml, /id="reconnectBtn"/);
+  assert.match(internalHtml, /id="skipBtn"/);
+  assert.match(internalHtml, /id="discordBtn"/);
+  assert.match(internalHtml, /id="internalMessageBtn"/);
+  assert.match(internalHtml, /admin-auth-client\.js/);
+  assert.match(internalHtml, /skip-control\.js\?v=2026-07-19-action-parity-v1/);
+  assert.match(internalHtml, /player-alert-client\.js/);
+  assert.match(internalHtml, /messenger-overlay\.js/);
+  assert.match(internalHtml, /discord-player-addon-v3\.js\?v=2026-07-19-overlay-status-v51/);
+  assert.match(internalHtml, /S666SkipControl\.skip/);
+  assert.match(internalHtml, /S666DiscordPlayerAddonV3\.messagePost/);
+  assert.match(internalHtml, /S666Messenger\.open/);
+  assert.doesNotMatch(internalHtml, /Admin-Passwort für den Discord Shooter/);
 
   const rootPlayer = await request("/", { headers: { accept: "text/html" } });
   const rootHtml = await rootPlayer.text();

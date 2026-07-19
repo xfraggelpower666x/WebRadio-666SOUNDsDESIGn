@@ -156,7 +156,7 @@ const HTML = `<!DOCTYPE html>
   <link rel="stylesheet" href="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245" />
   <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-19-pc-fit-v1224" />
 </head>
-<body>
+<body data-veluna-ui="1" data-veluna-page="internal">
   <div id="bootOverlay" class="overlay">
     <div class="boot-panel">
       <div class="boot-title">666SOUNDsDESIGn</div>
@@ -228,17 +228,113 @@ const HTML = `<!DOCTYPE html>
         <button id="backupBtn" class="small-btn source-btn" type="button">BACK</button>
       </div>
 
+      <div class="internal-action-grid" role="group" aria-label="Internal Player Actions">
+        <button id="skipBtn" class="small-btn internal-action-btn" type="button" data-action="skip">SKIP</button>
+        <button id="discordBtn" class="small-btn internal-action-btn" type="button" data-action="discord">DISC</button>
+        <button id="internalMessageBtn" class="small-btn internal-action-btn" type="button" data-action="message">MSG</button>
+      </div>
+      <div id="internalActionStatus" class="internal-action-status" role="status" aria-live="polite">Aktionen bereit</div>
+
       <audio id="radio" preload="none" playsinline></audio>
     </section>
   </main>
 
   <script type="module" src="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"></script>
   <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
+  <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220"></script>
+  <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1"></script>
+  <script src="/js/player-alert-client.js?v=2026-06-25-hardlock1"></script>
+  <script src="/js/messenger-overlay.js?v=2026-07-19-overlay-status-v2"></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v51"></script>
   <script defer src="/js/veluna-ui.js?v=2026-07-09-veluna-v1212"></script>
+  <script>
+  (function () {
+    'use strict';
+    var skipButton = document.getElementById('skipBtn');
+    var discordButton = document.getElementById('discordBtn');
+    var messageButton = document.getElementById('internalMessageBtn');
+    var actionStatus = document.getElementById('internalActionStatus');
+
+    function clean(value) {
+      return String(value == null ? '' : value).replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 220);
+    }
+
+    function setButtonState(button, mode) {
+      if (!button) return;
+      button.classList.remove('is-busy', 'is-ok', 'is-error');
+      if (mode) button.classList.add('is-' + mode);
+    }
+
+    function setAction(text, mode, button) {
+      if (actionStatus) {
+        actionStatus.textContent = clean(text) || 'Aktionen bereit';
+        actionStatus.style.color = mode === 'error' ? '#ff5570' : mode === 'busy' ? '#ffc857' : mode === 'ok' ? '#16fff3' : '';
+      }
+      setButtonState(button, mode);
+    }
+
+    async function runSkip() {
+      if (!window.confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?')) return;
+      setAction('SKIP: Admin-Freigabe wird geprüft …', 'busy', skipButton);
+      try {
+        if (!window.S666SkipControl || typeof window.S666SkipControl.skip !== 'function') throw new Error('skip_controller_missing');
+        var result = await window.S666SkipControl.skip({
+          source: 'internal-player',
+          prompt: 'Admin-Passwort für Internal Auto-DJ Skip eingeben:'
+        });
+        if (!result || result.ok !== true) throw new Error(result && result.error ? result.error : 'skip_failed');
+        setAction('SKIP OK: zentraler Controller bestätigt', 'ok', skipButton);
+      } catch (error) {
+        setAction('SKIP FEHLER: ' + clean(error && error.message ? error.message : error), 'error', skipButton);
+      }
+    }
+
+    async function openDiscord() {
+      setAction('DISCORD SHOOTER wird geöffnet …', 'busy', discordButton);
+      try {
+        if (!window.S666DiscordPlayerAddonV3 || typeof window.S666DiscordPlayerAddonV3.messagePost !== 'function') throw new Error('discord_addon_not_ready');
+        await window.S666DiscordPlayerAddonV3.messagePost();
+        setAction('DISCORD SHOOTER geöffnet', 'ok', discordButton);
+      } catch (error) {
+        setAction('DISCORD FEHLER: ' + clean(error && error.message ? error.message : error), 'error', discordButton);
+      }
+    }
+
+    function openMessenger() {
+      setAction('MESSENGER wird geöffnet …', 'busy', messageButton);
+      try {
+        if (!window.S666Messenger || typeof window.S666Messenger.open !== 'function') throw new Error('messenger_overlay_missing');
+        window.S666Messenger.open();
+        setAction('MESSENGER geöffnet', 'ok', messageButton);
+      } catch (error) {
+        setAction('MESSENGER FEHLER: ' + clean(error && error.message ? error.message : error), 'error', messageButton);
+      }
+    }
+
+    if (skipButton) skipButton.addEventListener('click', runSkip);
+    if (discordButton) discordButton.addEventListener('click', openDiscord);
+    if (messageButton) messageButton.addEventListener('click', openMessenger);
+
+    window.addEventListener('s666:skip-state', function (event) {
+      var detail = event.detail || {};
+      if (detail.phase === 'auth') setAction('SKIP: Admin-Freigabe erforderlich', 'busy', skipButton);
+      else if (detail.phase === 'sending') setAction('SKIP: wird ausgeführt …', 'busy', skipButton);
+      else if (detail.phase === 'success') setAction('SKIP OK', 'ok', skipButton);
+      else if (detail.phase === 'error') setAction('SKIP FEHLER: ' + clean(detail.error), 'error', skipButton);
+    });
+
+    window.addEventListener('s666:discord-state', function (event) {
+      var detail = event.detail || {};
+      if (detail.phase === 'sending') setButtonState(discordButton, 'busy');
+      else if (detail.phase === 'success') setButtonState(discordButton, 'ok');
+      else if (detail.phase === 'error') setButtonState(discordButton, 'error');
+    });
+  })();
+  </script>
 </body>
 </html>`;
 
-const CSS = `*{box-sizing:border-box}:root{--bg:#07080f;--bg2:#0a0d1a;--cyan:#16fff3;--pink:#ff3dbb;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(22,255,243,.28);--shadow-cyan:0 0 18px rgba(22,255,243,.22);--shadow-pink:0 0 18px rgba(255,61,187,.18)}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,61,187,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(22,255,243,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:'Courier New',Courier,monospace}body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}.player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(22,255,243,.25)}.brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(22,255,243,.34)}.brand{font-size:1.55rem}.boot-title{font-size:1.5rem;margin-bottom:8px}.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}.lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp-box-source{justify-content:flex-start}.lamp-side-label{margin-left:auto;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.28)}.lamp{width:12px;height:12px;border-radius:999px;display:inline-block;border:1px solid rgba(255,255,255,.20);box-shadow:0 0 10px currentColor}.lamp-purple{color:#b14dff;background:#b14dff}.lamp-red{color:var(--pink);background:var(--pink)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.pill{padding:8px 12px;font-size:.92rem}.pill-dim{color:var(--muted)}.display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(22,255,243,.22)}.marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}.tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,61,187,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}.mini-grid{display:grid;gap:10px;margin-bottom:12px}.mini-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.mini-box{padding:10px 12px}.mini-value{font-weight:700;margin-top:4px}.control-strip,.audio-tools{display:grid;gap:10px;align-items:stretch}.control-strip-3{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:10px}.audio-tools-4{grid-template-columns:repeat(4,minmax(0,1fr))}.control-btn,.small-btn{padding:12px 12px;color:var(--text);font-weight:700;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:var(--shadow-cyan)}.control-btn.main{border-color:rgba(255,61,187,.35);box-shadow:var(--shadow-pink)}.small-btn{border-color:rgba(255,61,187,.28);box-shadow:var(--shadow-pink)}.source-btn.is-active{border-color:rgba(22,255,243,.45);box-shadow:0 0 14px rgba(22,255,243,.28)}.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.86)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(22,255,243,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(22,255,243,.16),rgba(255,61,187,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.progress-wrap{width:100%;height:12px;margin-top:18px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}.progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .12s linear}.progress-text{margin-top:10px;font-weight:700}@media (max-width:560px){.mini-grid-3{grid-template-columns:1fr}.audio-tools-4{grid-template-columns:repeat(2,minmax(0,1fr))}}`;
+const CSS = `*{box-sizing:border-box}:root{--bg:#07080f;--bg2:#0a0d1a;--cyan:#16fff3;--pink:#ff3dbb;--green:#47ff8a;--red:#ff5570;--text:#eef7ff;--muted:#afbfcc;--border:rgba(22,255,243,.28);--shadow-cyan:0 0 18px rgba(22,255,243,.22);--shadow-pink:0 0 18px rgba(255,61,187,.18)}html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(255,61,187,.10),transparent 28%),radial-gradient(circle at bottom right,rgba(22,255,243,.11),transparent 30%),linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:'Courier New',Courier,monospace}body{min-height:100vh}.app-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}.player-card,.boot-panel{width:min(94vw,560px);background:linear-gradient(180deg,rgba(21,25,32,.98),rgba(18,21,27,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px)}.player-card{padding:16px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:14px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(22,255,243,.25)}.brand,.boot-title{text-align:center;font-weight:700;letter-spacing:.05em;color:var(--cyan);text-shadow:0 0 12px rgba(22,255,243,.34)}.brand{font-size:1.55rem}.boot-title{font-size:1.5rem;margin-bottom:8px}.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}.lamp-box{display:flex;align-items:center;gap:8px;padding:10px 12px;min-height:50px}.lamp-box-source{justify-content:flex-start}.lamp-side-label{margin-left:auto;font-size:.82rem;font-weight:700;letter-spacing:.05em;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.28)}.lamp{width:12px;height:12px;border-radius:999px;display:inline-block;border:1px solid rgba(255,255,255,.20);box-shadow:0 0 10px currentColor}.lamp-purple{color:#b14dff;background:#b14dff}.lamp-red{color:var(--pink);background:var(--pink)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-label,.display-label,.boot-subtitle,.boot-note,.mini-label{color:var(--muted)}.pill-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}.pill{padding:8px 12px;font-size:.92rem}.pill-dim{color:var(--muted)}.display-block{position:relative;margin-bottom:12px}.display-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.display-window{height:54px;overflow:hidden;display:flex;align-items:center;border-color:rgba(22,255,243,.22)}.marquee-track{white-space:nowrap;display:inline-block;padding-left:100%;font-size:1.08rem;font-weight:700;color:var(--pink);text-shadow:0 0 10px rgba(255,61,187,.3);animation:marquee 12s linear infinite}@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}.tiny-btn{appearance:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.05);color:var(--text);padding:6px 10px;font-size:.85rem;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:10;border-radius:16px;padding:12px;background:rgba(13,16,22,.98);border:1px solid rgba(255,61,187,.25);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:700;margin-bottom:8px}.history-list{margin:0;padding-left:18px;max-height:200px;overflow:auto}.mini-grid{display:grid;gap:10px;margin-bottom:12px}.mini-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.mini-box{padding:10px 12px}.mini-value{font-weight:700;margin-top:4px}.control-strip,.audio-tools{display:grid;gap:10px;align-items:stretch}.control-strip-3{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:10px}.audio-tools-4{grid-template-columns:repeat(4,minmax(0,1fr))}.internal-action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.internal-action-status{min-height:26px;margin-top:8px;padding:6px 10px;border:1px solid rgba(22,255,243,.18);border-radius:12px;background:rgba(0,0,0,.22);color:var(--muted);font-size:.78rem;font-weight:700;letter-spacing:.03em;text-align:center}.internal-action-btn.is-busy{border-color:rgba(255,200,87,.72);color:#ffc857;box-shadow:0 0 16px rgba(255,200,87,.24)}.internal-action-btn.is-ok{border-color:rgba(22,255,243,.72);color:var(--cyan);box-shadow:0 0 18px rgba(22,255,243,.28)}.internal-action-btn.is-error{border-color:rgba(255,85,112,.78);color:var(--red);box-shadow:0 0 18px rgba(255,85,112,.24)}.control-btn,.small-btn{padding:12px 12px;color:var(--text);font-weight:700;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));box-shadow:var(--shadow-cyan)}.control-btn.main{border-color:rgba(255,61,187,.35);box-shadow:var(--shadow-pink)}.small-btn{border-color:rgba(255,61,187,.28);box-shadow:var(--shadow-pink)}.source-btn.is-active{border-color:rgba(22,255,243,.45);box-shadow:0 0 14px rgba(22,255,243,.28)}.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(7,10,14,.86)}.overlay.hidden{display:none}.boot-panel{padding:22px;text-align:center}.neon-button{appearance:none;border:1px solid rgba(22,255,243,.45);border-radius:16px;padding:14px 18px;background:linear-gradient(180deg,rgba(22,255,243,.16),rgba(255,61,187,.08));color:var(--text);font-size:1rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-cyan)}.progress-wrap{width:100%;height:12px;margin-top:18px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}.progress-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));transition:width .12s linear}.progress-text{margin-top:10px;font-weight:700}@media (max-width:560px){.mini-grid-3{grid-template-columns:1fr}.audio-tools-4{grid-template-columns:repeat(2,minmax(0,1fr))}}`;
 
 const APP_JS = `import { STREAM_CONFIG } from "../config/stream.config.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245";
 const overlay=document.getElementById("bootOverlay");
