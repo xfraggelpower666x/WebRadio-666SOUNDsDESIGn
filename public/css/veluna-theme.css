@@ -1,5 +1,5 @@
 /*
- * VELUNA Central Player Theme v1.2.23
+ * VELUNA Central Player Theme v1.2.24
  * Eine zentrale Grafik-/Farblogik für Hauptplayer, VELUNA-Miniplayer und Internal-Player.
  * Bilder werden proportional eingepasst; Overlays verändern niemals die Playergeometrie.
  */
@@ -214,11 +214,48 @@ body[data-veluna-page="veluna"] .cover-image{
   filter:saturate(1.10) contrast(1.04) brightness(.96)!important;
 }
 @media (min-width:769px){
+  body[data-veluna-page="veluna"] .app-shell,
+  body[data-veluna-page="internal"] .app-shell{
+    align-items:flex-start!important;
+    justify-content:center!important;
+    padding:0 24px 18px!important;
+    overflow:hidden!important;
+  }
   body[data-veluna-page="veluna"] .player-card,
   body[data-veluna-page="internal"] .player-card{
     width:clamp(430px,37vw,500px)!important;
     max-width:min(500px,calc(100vw - 48px))!important;
+    height:min(760px,calc(100dvh - 82px))!important;
+    max-height:calc(100dvh - 82px)!important;
+    margin-top:clamp(32px,4vh,40px)!important;
+    grid-template-rows:auto auto auto minmax(154px,1fr) auto auto auto auto auto!important;
+    gap:5px!important;
+    padding:8px!important;
+    overflow:hidden!important;
   }
+  body[data-veluna-page="veluna"] .display-block,
+  body[data-veluna-page="internal"] .display-block{
+    min-height:154px!important;
+    grid-template-rows:auto auto minmax(120px,1fr)!important;
+  }
+  body[data-veluna-page="veluna"] .display-window,
+  body[data-veluna-page="internal"] .display-window{min-height:120px!important}
+  body[data-veluna-page="veluna"] :is(.status-grid,.pill-row,.mini-grid,.source-switch,.control-strip,.tool-strip),
+  body[data-veluna-page="internal"] :is(.status-grid,.pill-row,.mini-grid,.source-switch,.control-strip,.tool-strip){gap:4px!important}
+  body[data-veluna-page="veluna"] .lamp-box,
+  body[data-veluna-page="internal"] .lamp-box{min-height:32px!important;padding:4px 6px!important}
+  body[data-veluna-page="veluna"] .pill,
+  body[data-veluna-page="internal"] .pill{padding:4px 6px!important}
+  body[data-veluna-page="veluna"] .mini-box,
+  body[data-veluna-page="internal"] .mini-box{min-height:38px!important;padding:4px 6px!important}
+  body[data-veluna-page="veluna"] :is(.source-led-btn,.control-btn),
+  body[data-veluna-page="internal"] :is(.source-led-btn,.control-btn){min-height:30px!important;padding:3px 4px!important}
+  body[data-veluna-page="veluna"] .small-btn,
+  body[data-veluna-page="internal"] .small-btn{min-height:28px!important;padding:3px 4px!important}
+  body[data-veluna-page="veluna"] .action-bar,
+  body[data-veluna-page="internal"] .action-bar{height:22px!important;padding-block:2px!important}
+  body[data-veluna-page="veluna"] .levelmeter,
+  body[data-veluna-page="internal"] .levelmeter{height:22px!important;padding-block:3px!important}
 }
 @media (min-width:769px) and (max-height:920px){
   body[data-veluna-page="veluna"] .app-shell,

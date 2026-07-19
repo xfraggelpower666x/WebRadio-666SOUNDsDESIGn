@@ -69,7 +69,10 @@
   function errorMessage(code) {
     var messages = {
       password_missing: 'Admin-Passwort fehlt.',
-      password_rejected: 'Das Admin-Passwort wurde abgelehnt.',
+      password_rejected: 'Das eingegebene Admin-Passwort stimmt nicht mit dem aktuell im Passwort-Worker gespeicherten Wert überein.',
+      login_rejected: 'Der Passwort-Worker hat die Anmeldung abgelehnt. Worker-Version und Secrets prüfen.',
+      login_failed: 'Die Anmeldung konnte nicht abgeschlossen werden.',
+      auth_unreachable: 'Die Auth-Prüfung ist nicht erreichbar.',
       origin_rejected: 'Die Anmeldequelle wurde abgelehnt.',
       worker_secrets_missing: 'Passwort- oder Auth-Worker ist nicht vollständig konfiguriert.',
       service_token_missing: 'Service-Token fehlt im Worker.',
@@ -291,7 +294,7 @@
   }
 
   window.S666AdminAuth = {
-    version: '1.2.19-shared-interactive-auth',
+    version: '1.2.20-exact-auth-errors',
     tokenKey: TOKEN_KEY,
     getToken: getToken,
     setToken: setToken,

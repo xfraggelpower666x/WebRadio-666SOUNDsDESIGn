@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'V4.7-20260715-VELUNA-DISCORD-NO-AUTH';
+  var VERSION = 'V4.9-20260719-OVERLAY-STATUS-MANUAL-NOWPLAYING';
   var inFlight = false;
   var watcherTimer = 0;
   var visualTimer = 0;
@@ -77,6 +77,25 @@
     try { window.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (_) {}
   }
 
+  /*
+   * Shared protected-action contract.
+   * Discord webhook sends intentionally remain public same-origin requests;
+   * these helpers are reserved for protected admin actions only.
+   */
+  function ensureInteractiveAuth(message) {
+    if (!window.S666AdminAuth || typeof window.S666AdminAuth.ensure !== 'function') {
+      return Promise.reject(new Error('admin_auth_client_missing'));
+    }
+    return window.S666AdminAuth.ensure({ message: message || 'Admin-Passwort eingeben:' });
+  }
+
+  function authorizedAdminFetch(path, init) {
+    if (!window.S666AdminAuth || typeof window.S666AdminAuth.fetch !== 'function') {
+      return Promise.reject(new Error('admin_auth_client_missing'));
+    }
+    return window.S666AdminAuth.fetch(path, init);
+  }
+
   async function postJson(path, payload) {
     if (inFlight) throw new Error('discord_request_in_flight');
     inFlight = true;
@@ -105,7 +124,7 @@
     if (document.getElementById('s666DiscordShooterStyle')) return;
     var style = document.createElement('style');
     style.id = 's666DiscordShooterStyle';
-    style.textContent = '.s666-discord-gate--hidden{display:none!important}.s666-discord-gate{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}.s666-discord-gate-box{position:relative!important;width:min(470px,94vw)!important;border:1px solid rgba(255,61,187,.72)!important;border-radius:22px!important;background:linear-gradient(135deg,rgba(255,61,187,.13),rgba(22,255,243,.07)),rgba(4,8,24,.96)!important;box-shadow:0 0 24px rgba(255,61,187,.32),0 0 22px rgba(22,255,243,.18)!important;color:#fff!important;text-align:center!important;padding:22px 18px 18px!important}.s666-discord-gate-title{font-size:15px!important;font-weight:950!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:#ff3dbb!important;text-shadow:0 0 14px rgba(255,61,187,.78)!important}.s666-discord-msg-input{display:block!important;width:min(340px,82vw)!important;min-height:118px!important;margin:12px auto 0!important;padding:12px 13px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(0,0,0,.5)!important;color:#fff!important;font-size:13px!important;font-weight:750!important;line-height:1.35!important;resize:vertical!important}.s666-discord-gate-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin-top:15px!important}.s666-discord-gate-x{position:absolute!important;right:10px!important;top:8px!important;width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.44)!important;background:rgba(22,255,243,.08)!important;color:#fff!important;font-size:21px!important;line-height:1!important;cursor:pointer!important}.s666-discord-gate-submit,.s666-discord-gate-cancel{min-height:34px!important;border-radius:999px!important;padding:0 14px!important;text-transform:uppercase!important;font-size:11px!important;font-weight:950!important;letter-spacing:.09em!important;cursor:pointer!important}.s666-discord-gate-submit{border:1px solid rgba(255,61,187,.76)!important;background:linear-gradient(90deg,rgba(255,61,187,.32),rgba(22,255,243,.12))!important;color:#fff!important}.s666-discord-gate-cancel{border:1px solid rgba(22,255,243,.42)!important;background:rgba(22,255,243,.065)!important;color:#dff!important}.s666-veluna-msg-btn{border-color:rgba(22,255,243,.48)!important;color:#16fff3!important}.s666msg-count-veluna{display:block;margin:7px 0 0;color:rgba(22,255,243,.72);font-size:11px;font-weight:900;letter-spacing:.06em}';
+    style.textContent = '.s666-discord-gate.s666-discord-gate--hidden{display:none!important}.s666-discord-gate{position:fixed!important;inset:0!important;z-index:2147483646!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}.s666-discord-gate-box{position:relative!important;width:min(470px,94vw)!important;border:1px solid rgba(255,61,187,.72)!important;border-radius:22px!important;background:linear-gradient(135deg,rgba(255,61,187,.13),rgba(22,255,243,.07)),rgba(4,8,24,.96)!important;box-shadow:0 0 24px rgba(255,61,187,.32),0 0 22px rgba(22,255,243,.18)!important;color:#fff!important;text-align:center!important;padding:22px 18px 18px!important}.s666-discord-gate-title{font-size:15px!important;font-weight:950!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:#ff3dbb!important;text-shadow:0 0 14px rgba(255,61,187,.78)!important}.s666-discord-msg-input{display:block!important;width:min(340px,82vw)!important;min-height:118px!important;margin:12px auto 0!important;padding:12px 13px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(0,0,0,.5)!important;color:#fff!important;font-size:13px!important;font-weight:750!important;line-height:1.35!important;resize:vertical!important}.s666-discord-gate-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin-top:15px!important}.s666-discord-gate-x{position:absolute!important;right:10px!important;top:8px!important;width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.44)!important;background:rgba(22,255,243,.08)!important;color:#fff!important;font-size:21px!important;line-height:1!important;cursor:pointer!important}.s666-discord-gate-submit,.s666-discord-gate-cancel{min-height:34px!important;border-radius:999px!important;padding:0 14px!important;text-transform:uppercase!important;font-size:11px!important;font-weight:950!important;letter-spacing:.09em!important;cursor:pointer!important}.s666-discord-gate-submit{border:1px solid rgba(255,61,187,.76)!important;background:linear-gradient(90deg,rgba(255,61,187,.32),rgba(22,255,243,.12))!important;color:#fff!important}.s666-discord-gate-cancel{border:1px solid rgba(22,255,243,.42)!important;background:rgba(22,255,243,.065)!important;color:#dff!important}.s666-veluna-msg-btn{border-color:rgba(22,255,243,.48)!important;color:#16fff3!important}.s666msg-count-veluna{display:block;margin:7px 0 0;color:rgba(22,255,243,.72);font-size:11px;font-weight:900;letter-spacing:.06em}.s666-discord-status{min-height:18px;margin-top:9px;font-size:11px;font-weight:900;letter-spacing:.05em}.s666-discord-status.is-sending{color:#ffc857}.s666-discord-status.is-ok{color:#7edcff}.s666-discord-status.is-error{color:#ff5570}.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}';
     document.head.appendChild(style);
   }
 
@@ -159,6 +178,25 @@
     setSharedColorState('source', backupActive ? 'backup' : 'main');
   }
 
+  var DISCORD_EMOJIS = ['🎵','🎶','🎧','🎤','🔥','⚡','💜','💙','🤘','😎','👽','💀','🎉','🚀','✨','⭐','666'];
+
+  function setDiscordOverlayStatus(text, mode) {
+    var status = document.getElementById('s666DiscordMessageStatus');
+    if (!status) return;
+    status.textContent = text || '';
+    status.className = 's666-discord-status' + (mode ? ' is-' + mode : '');
+  }
+
+  function insertAtCursor(input, value, max) {
+    if (!input || !value) return;
+    var start = typeof input.selectionStart === 'number' ? input.selectionStart : input.value.length;
+    var end = typeof input.selectionEnd === 'number' ? input.selectionEnd : start;
+    var next = input.value.slice(0, start) + value + input.value.slice(end);
+    input.value = next.slice(0, max || 1800);
+    var pos = Math.min(input.value.length, start + value.length);
+    try { input.setSelectionRange(pos, pos); input.focus(); } catch (_) {}
+  }
+
   function closeMessageOverlay() {
     var overlay = document.getElementById('s666DiscordMessageOverlay');
     if (overlay) overlay.classList.add('s666-discord-gate--hidden');
@@ -171,23 +209,33 @@
     overlay = document.createElement('div');
     overlay.id = 's666DiscordMessageOverlay';
     overlay.className = 's666-discord-gate s666-discord-gate--hidden s666-discord-gate--message';
+    var emojiHtml = '<div class="s666-discord-emojis">' + DISCORD_EMOJIS.map(function (emoji) { return '<button type="button" class="s666-discord-emoji" data-discord-emoji="' + emoji + '">' + emoji + '</button>'; }).join('') + '</div>';
     overlay.innerHTML = '<div class="s666-discord-gate-box" role="dialog" aria-modal="true" aria-label="Discord Message">' +
       '<button type="button" class="s666-discord-gate-x" data-discord-close aria-label="Close">×</button>' +
       '<div class="s666-discord-gate-title">DISCORD SHOOTER</div>' +
       '<div class="s666-discord-gate-message">Message to Discord:</div>' +
       '<textarea id="s666DiscordMessageText" class="s666-discord-msg-input" maxlength="1800" rows="7" placeholder="Message"></textarea>' +
-      '<div class="s666-discord-gate-actions"><button type="button" class="s666-discord-gate-cancel" data-discord-close>CANCEL</button><button type="button" id="s666DiscordMessageSend" class="s666-discord-gate-submit">SEND</button></div>' +
+      emojiHtml +
+      '<div id="s666DiscordMessageStatus" class="s666-discord-status" role="status" aria-live="polite">Bereit</div>' +
+      '<div class="s666-discord-gate-actions"><button type="button" class="s666-discord-gate-cancel" data-discord-close>CLOSE</button><button type="button" id="s666DiscordNowPlayingSend" class="s666-discord-gate-submit s666-discord-nowplaying">NOW PLAYING</button><button type="button" id="s666DiscordMessageSend" class="s666-discord-gate-submit">SEND</button></div>' +
       '</div>';
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', function (event) { if (event.target === overlay || event.target.closest('[data-discord-close]')) closeMessageOverlay(); });
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay || event.target.closest('[data-discord-close]')) { closeMessageOverlay(); return; }
+      var emojiButton = event.target.closest && event.target.closest('[data-discord-emoji]');
+      if (emojiButton) insertAtCursor(document.getElementById('s666DiscordMessageText'), emojiButton.getAttribute('data-discord-emoji') || '', 1800);
+    });
     document.getElementById('s666DiscordMessageSend').addEventListener('click', sendMessageFromOverlay);
+    document.getElementById('s666DiscordNowPlayingSend').addEventListener('click', sendNowPlayingFromOverlay);
     document.getElementById('s666DiscordMessageText').addEventListener('keydown', function (event) { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); sendMessageFromOverlay(); } });
+    document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !overlay.classList.contains('s666-discord-gate--hidden')) closeMessageOverlay(); });
     return overlay;
   }
 
   async function openMessageOverlay() {
     var overlay = ensureMessageOverlay();
     overlay.classList.remove('s666-discord-gate--hidden');
+    setDiscordOverlayStatus('Bereit', '');
     setTimeout(function () { var input = document.getElementById('s666DiscordMessageText'); if (input) input.focus(); }, 40);
     return true;
   }
@@ -196,12 +244,29 @@
     var input = document.getElementById('s666DiscordMessageText');
     var button = document.getElementById('s666DiscordMessageSend');
     var message = clean(input && input.value, 1800);
-    if (!message) return;
+    if (!message) { setDiscordOverlayStatus('Nachricht fehlt', 'error'); return; }
     if (button) button.disabled = true;
+    setDiscordOverlayStatus('Wird gesendet …', 'sending');
     try {
       await postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: message }));
       if (input) input.value = '';
-      closeMessageOverlay();
+      setDiscordOverlayStatus('✓ Erfolgreich an Discord gesendet', 'ok');
+    } catch (error) {
+      setDiscordOverlayStatus('✗ Versand fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  async function sendNowPlayingFromOverlay() {
+    var button = document.getElementById('s666DiscordNowPlayingSend');
+    if (button) button.disabled = true;
+    setDiscordOverlayStatus('Now Playing wird gesendet …', 'sending');
+    try {
+      await postTrackIfChanged(true);
+      setDiscordOverlayStatus('✓ Now Playing erfolgreich gesendet', 'ok');
+    } catch (error) {
+      setDiscordOverlayStatus('✗ Now Playing fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
     } finally {
       if (button) button.disabled = false;
     }
@@ -329,10 +394,16 @@
     button.title = 'VELUNA Broadcast Messenger';
     button.setAttribute('aria-label', 'VELUNA Broadcast Messenger');
     button.addEventListener('click', function () {
-      var overlay = ensureVelunaMessengerOverlay();
-      overlay.classList.remove('s666-discord-gate--hidden');
-      document.body.style.overflow = 'hidden';
-      setTimeout(function () { var input = document.getElementById('s666VelunaMessengerText'); if (input) input.focus(); }, 60);
+      Promise.resolve()
+        .then(function () {
+          if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return true;
+          return loadScriptOnce('s666MessengerOverlayVelunaBridge', '/js/messenger-overlay.js?v=2026-07-19-overlay-status-v2');
+        })
+        .then(function () {
+          if (!window.S666Messenger || typeof window.S666Messenger.open !== 'function') throw new Error('messenger_overlay_missing');
+          window.S666Messenger.open();
+        })
+        .catch(function (error) { dispatch('s666:veluna-messenger-state', { phase: 'error', error: error && error.message ? error.message : String(error) }); });
     });
     var discordButton = document.getElementById('discordBtn');
     if (discordButton && discordButton.parentNode === toolStrip) toolStrip.insertBefore(button, discordButton.nextSibling);

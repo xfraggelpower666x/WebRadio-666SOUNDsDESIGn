@@ -154,7 +154,7 @@ const HTML = `<!DOCTYPE html>
   <link rel="icon" type="image/png" href="/assets/veluna/icons/icon-32x32.png?v=veluna-v1212" />
   <link rel="apple-touch-icon" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v1212" />
   <link rel="stylesheet" href="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245" />
-  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-09-veluna-v1212" />
+  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-19-pc-fit-v1224" />
 </head>
 <body>
   <div id="bootOverlay" class="overlay">
