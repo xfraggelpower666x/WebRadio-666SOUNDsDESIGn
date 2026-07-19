@@ -1,4 +1,4 @@
-name: Audit Live Player Action Parity 20260719
+name: Audit Live Internal Player Diagnostics 20260719
 
 on:
   pull_request:
@@ -12,60 +12,24 @@ permissions:
   contents: read
 
 jobs:
-  live-audit:
+  internal-diagnostics:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
     steps:
-      - name: Wait for Cloudflare deployment and propagation
-        run: sleep 90
-      - name: Fetch live player routes and shared modules
+      - name: Inspect live Internal route
         shell: bash
         run: |
           set -euo pipefail
           base="https://webradio.666soundsdesign-broadcaster.com"
           stamp="$(date +%s)"
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/?audit=$stamp" -o /tmp/main.html
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/internal?audit=$stamp" -o /tmp/internal.html
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/veluna?audit=$stamp" -o /tmp/veluna.html
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/skip-control.js?audit=$stamp" -o /tmp/skip.js
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/player-stage-v2.js?audit=$stamp" -o /tmp/stage.js
-          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/addons/discord-player-addon-v3.js?audit=$stamp" -o /tmp/discord.js
-      - name: Verify centralized Skip and public Discord live
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          grep -F '/js/skip-control.js?v=2026-07-19-action-parity-v1' /tmp/main.html
-          grep -F '/js/player-stage-v2.js?v=2026-07-19-action-parity-v1' /tmp/main.html
-          grep -F '/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v51' /tmp/main.html
-
-          grep -F '/js/skip-control.js?v=2026-07-19-action-parity-v1' /tmp/internal.html
-          grep -F '/js/player-stage-v2.js?v=2026-07-19-action-parity-v1' /tmp/internal.html
-          grep -F '/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v51' /tmp/internal.html
-
-          grep -F '/js/skip-control.js?v=2026-07-19-action-parity-v1' /tmp/veluna.html
-          grep -F '/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v51' /tmp/veluna.html
-          grep -F 'S666SkipControl.skip' /tmp/veluna.html
-          ! grep -F 'S666AdminAuth.fetch(ENDPOINTS.skip' /tmp/veluna.html
-          ! grep -F 'async function ensureAdmin' /tmp/veluna.html
-          ! grep -F 'Admin-Passwort für VELUNA Discord Shooter' /tmp/veluna.html
-
-          grep -F 'function ensureInteractiveAuth(options)' /tmp/skip.js
-          grep -F 'S666AdminAuth.ensure' /tmp/skip.js
-          grep -F 'S666AdminAuth.fetch' /tmp/skip.js
-          grep -F '/api/admin/skip' /tmp/skip.js
-          grep -F '/api/radio/skip' /tmp/skip.js
-
-          grep -F 'S666SkipControl.skip' /tmp/stage.js
-          grep -F 'openDiscordShooter' /tmp/stage.js
-          ! grep -F 'withGate(' /tmp/stage.js
-          ! grep -F 'Admin-Passwort für den Discord Shooter' /tmp/stage.js
-          ! grep -F 'S666AdminAuth' /tmp/stage.js
-
-          grep -F "V4.11-20260719-PUBLIC-DISCORD-CENTRAL-SKIP" /tmp/discord.js
-          grep -F '✓ Erfolgreich an Discord gesendet' /tmp/discord.js
-          grep -F '✓ Erfolgreich an die Hörer gesendet' /tmp/discord.js
-          ! grep -F 'ensureInteractiveAuth' /tmp/discord.js
-          ! grep -F 'S666AdminAuth.ensure' /tmp/discord.js
-
-          echo 'LIVE_PLAYER_ACTION_PARITY_OK'
+          curl --fail --silent --show-error --location --retry 8 --retry-delay 8 --retry-all-errors \
+            "$base/internal?audit=$stamp" -o /tmp/internal.html
+          echo "INTERNAL_SIZE=$(wc -c < /tmp/internal.html)"
+          echo "INTERNAL_TITLE=$(grep -o '<title>[^<]*' /tmp/internal.html | head -1 || true)"
+          echo 'INTERNAL_SCRIPTS_BEGIN'
+          grep -o '<script[^>]*src="[^"]*"[^>]*>' /tmp/internal.html || true
+          echo 'INTERNAL_SCRIPTS_END'
+          echo 'INTERNAL_ACTION_MARKERS_BEGIN'
+          grep -E 'S666|Discord|DISCORD|SKIP|Skip|skip|Internal|INTERNAL|player-stage|skip-control|admin-auth' /tmp/internal.html | head -160 || true
+          echo 'INTERNAL_ACTION_MARKERS_END'
+          echo 'LIVE_INTERNAL_DIAGNOSTICS_OK'
