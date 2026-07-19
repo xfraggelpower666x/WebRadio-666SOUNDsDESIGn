@@ -36,7 +36,25 @@ jobs:
           node-version: 22
           cache: npm
       - name: Apply parity repair
-        run: python .github/one-time/apply_player_action_parity_v1.py
+        id: apply
+        shell: bash
+        run: |
+          set +e
+          python .github/one-time/apply_player_action_parity_v1.py > /tmp/player-action-parity-transform.log 2>&1
+          status=$?
+          cat /tmp/player-action-parity-transform.log
+          echo "$status" > /tmp/player-action-parity-transform.status
+          exit "$status"
+      - name: Upload transform diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: player-action-parity-v1-transform-diagnostics
+          path: |
+            /tmp/player-action-parity-transform.log
+            /tmp/player-action-parity-transform.status
+          if-no-files-found: error
+          retention-days: 7
       - name: Verify complete release
         run: |
           npm ci
