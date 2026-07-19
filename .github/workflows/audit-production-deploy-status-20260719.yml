@@ -21,17 +21,19 @@ jobs:
   deploy-status:
     runs-on: ubuntu-latest
     steps:
-      - name: Read latest production deploy runs
+      - name: Read latest production deploy and failed job log
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error \
-            -H "authorization: Bearer $GH_TOKEN" \
-            -H 'accept: application/vnd.github+json' \
-            -H 'x-github-api-version: 2022-11-28' \
+          api_headers=(
+            -H "authorization: Bearer $GH_TOKEN"
+            -H 'accept: application/vnd.github+json'
+            -H 'x-github-api-version: 2022-11-28'
+          )
+          curl --fail --silent --show-error "${api_headers[@]}" \
             "https://api.github.com/repos/$REPO/actions/workflows/deploy-cloudflare-workers.yml/runs?branch=WebRadio-666SOUNDsDESIGn&event=push&per_page=5" \
             -o /tmp/runs.json
           python - <<'PY'
@@ -50,8 +52,44 @@ jobs:
                   'updated='+str(run.get('updated_at')),
               ]))
           latest=runs[0]
+          Path('/tmp/latest-run-id').write_text(str(latest.get('id')))
           print('latestDeployRunId='+str(latest.get('id')))
           print('latestDeployHeadSha='+str(latest.get('head_sha')))
           print('latestDeployStatus='+str(latest.get('status')))
           print('latestDeployConclusion='+str(latest.get('conclusion')))
           PY
+
+          run_id="$(cat /tmp/latest-run-id)"
+          curl --fail --silent --show-error "${api_headers[@]}" \
+            "https://api.github.com/repos/$REPO/actions/runs/$run_id/jobs?per_page=100" \
+            -o /tmp/jobs.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          jobs=json.loads(Path('/tmp/jobs.json').read_text()).get('jobs') or []
+          assert jobs
+          failed=[job for job in jobs if job.get('conclusion') == 'failure']
+          for job in jobs:
+              print('deployJob=' + ' '.join([
+                  'id='+str(job.get('id')),
+                  'name='+str(job.get('name')).replace(' ','_'),
+                  'status='+str(job.get('status')),
+                  'conclusion='+str(job.get('conclusion')),
+              ]))
+          assert failed, jobs
+          Path('/tmp/failed-job-id').write_text(str(failed[0].get('id')))
+          print('failedDeployJobId='+str(failed[0].get('id')))
+          print('failedDeployJobName='+str(failed[0].get('name')))
+          PY
+
+          job_id="$(cat /tmp/failed-job-id)"
+          curl --fail --silent --show-error --location "${api_headers[@]}" \
+            "https://api.github.com/repos/$REPO/actions/jobs/$job_id/logs" \
+            -o /tmp/failed-job-logs
+          echo '--- FAILED DEPLOY LOG TAIL ---'
+          if unzip -t /tmp/failed-job-logs >/dev/null 2>&1; then
+            unzip -p /tmp/failed-job-logs | tail -n 140
+          else
+            tail -n 140 /tmp/failed-job-logs
+          fi
+          echo '--- END FAILED DEPLOY LOG TAIL ---'
