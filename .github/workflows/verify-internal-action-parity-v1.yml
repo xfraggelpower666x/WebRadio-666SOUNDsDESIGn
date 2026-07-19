@@ -1,0 +1,50 @@
+name: Verify Internal Action Parity v1
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/one-time/apply_internal_action_parity_v1.py"
+      - ".github/workflows/verify-internal-action-parity-v1.yml"
+      - "worker.js"
+      - "workers/webradio-666soundsdesign-worker/worker.js"
+      - "tests/worker-smoke.test.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply Internal parity repair
+        run: python .github/one-time/apply_internal_action_parity_v1.py
+      - name: Verify complete release
+        run: |
+          npm ci
+          npm run verify
+      - name: Stage verified files
+        shell: bash
+        run: |
+          mkdir -p /tmp/internal-action-parity
+          cp --parents \
+            worker.js \
+            workers/webradio-666soundsdesign-worker/worker.js \
+            tests/worker-smoke.test.mjs \
+            /tmp/internal-action-parity/
+          cd /tmp/internal-action-parity
+          sha256sum $(find . -type f -print | sort) > VERIFIED-SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: internal-action-parity-v1-verified
+          path: /tmp/internal-action-parity
+          if-no-files-found: error
+          retention-days: 7
