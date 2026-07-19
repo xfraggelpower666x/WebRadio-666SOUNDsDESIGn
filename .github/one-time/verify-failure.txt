@@ -1,0 +1,25 @@
+
+> webradio-666soundsdesign-fullversion@1.2.22 verify
+> npm run check && npm test
+
+
+> webradio-666soundsdesign-fullversion@1.2.22 check
+> node scripts/check-release.mjs
+
+file:///home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/scripts/check-release.mjs:70
+  if (result.status !== 0) throw new Error(`JavaScript syntax error: ${relative(rootPath, file)}\n${result.stderr || result.stdout}`);
+                                 ^
+
+Error: JavaScript syntax error: tests/frontend-contracts.test.mjs
+/home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/tests/frontend-contracts.test.mjs:256
+  assert.match(client, /pointer-events[^
+                       ^
+
+SyntaxError: Invalid regular expression: missing /
+    at checkSyntax (node:internal/main/check_syntax:74:5)
+
+Node.js v22.23.1
+
+    at file:///home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/scripts/check-release.mjs:70:34
+
+Node.js v22.23.1
