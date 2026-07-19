@@ -1,0 +1,45 @@
+name: One-time Player Action Parity v1
+
+on:
+  push:
+    branches:
+      - repair-player-action-parity-v1-20260719
+    paths:
+      - ".github/one-time/apply_player_action_parity_v1.py"
+      - ".github/workflows/one-time-player-action-parity-v1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply parity repair
+        run: python .github/one-time/apply_player_action_parity_v1.py
+      - name: Verify complete release
+        run: |
+          npm ci
+          npm run verify
+      - name: Commit verified repair
+        shell: bash
+        run: |
+          git config user.name "666SOUNDsDESIGn Repair Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- \
+            js/skip-control.js public/js/skip-control.js \
+            js/player-stage-v2.js public/js/player-stage-v2.js \
+            js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js \
+            veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html \
+            index.html public/index.html tests/frontend-contracts.test.mjs
+          git commit -m "repair: centralize Skip auth and remove Discord password gates"
+          git push origin HEAD:repair-player-action-parity-v1-20260719
