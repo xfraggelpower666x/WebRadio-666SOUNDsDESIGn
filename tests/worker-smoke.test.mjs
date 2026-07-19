@@ -224,3 +224,12 @@ test("VELUNA is canonical and AMARIS player routes are removed", async () => {
   assert.match(rootHtml, /VELUNA PLAYER/);
   assert.doesNotMatch(rootHtml, /VELUNA · LYVRA[\s\S]*MINIMAL WEBRADIO/);
 });
+
+
+test("Internal player loads the shared touch feedback authority", async () => {
+  const internal = await request("/internal", { headers: { accept: "text/html" } });
+  assert.equal(internal.status, 200);
+  const html = await internal.text();
+  assert.match(html, /veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225/);
+  assert.match(html, /veluna-ui\.js\?v=2026-07-19-touch-feedback-v1225/);
+});

@@ -219,3 +219,27 @@ test('all player variants use one Skip auth owner and a public Discord owner', a
   assert.doesNotMatch(stage, /function withGate\(|S666AdminAuth/);
   assert.doesNotMatch(discord, /ensureInteractiveAuth|S666AdminAuth\.ensure|admin_session_required/);
 });
+
+
+test("all player variants expose immediate touch feedback without overlay interception", async () => {
+  const velunaUi = await read("js/veluna-ui.js");
+  const velunaTheme = await read("css/veluna-theme.css");
+  const stage = await read("js/player-stage-v2.js");
+  const stageCss = await read("css/player-stage-v2.css");
+  const veluna = await read("veluna/index.html");
+  const main = await read("index.html");
+  assert.match(velunaUi, /function installTouchFeedback\(\)/);
+  assert.match(velunaUi, /pointerdown/);
+  assert.match(velunaUi, /pointercancel/);
+  assert.match(velunaUi, /data-veluna-press/);
+  assert.match(velunaTheme, /translateY\(2px\) scale\(\.955\)/);
+  assert.match(velunaTheme, /tool-strip\{grid-template-columns:repeat\(4/);
+  assert.match(stage, /function installTouchFeedback\(\)/);
+  assert.match(stage, /data-s666-press/);
+  assert.match(stageCss, /Shared Main-player touch authority/);
+  assert.match(stageCss, /translateY\(2px\) scale\(\.955\)/);
+  assert.match(veluna, /veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225/);
+  assert.match(veluna, /veluna-ui\.js\?v=2026-07-19-touch-feedback-v1225/);
+  assert.match(main, /player-stage-v2\.css\?v=2026-07-19-touch-feedback-v1/);
+  assert.match(main, /player-stage-v2\.js\?v=2026-07-19-touch-feedback-v1/);
+});

@@ -1,4 +1,4 @@
-/* VELUNA Central UI Runtime v1.2.12 */
+/* VELUNA Central UI Runtime v1.2.25 */
 (() => {
   'use strict';
   const A = window.VELUNA_ASSETS || {};
@@ -15,6 +15,56 @@
   const host = (page === 'main' ? q('.player-shell') : q('.player-card')) || q('[data-player-root]') || q('.player-card') || q('.player-shell') || q('main');
   if (!host) return;
   host.classList.add('veluna-splash-host');
+
+  function installTouchFeedback(){
+    if (document.documentElement.dataset.velunaTouchFeedback === '1') return;
+    document.documentElement.dataset.velunaTouchFeedback = '1';
+    const selector = 'button,a[href],[role="button"],input[type="button"],input[type="submit"],.control-btn,.small-btn,.source-led-btn,.tiny-btn';
+    let pressed = null;
+    let releaseTimer = 0;
+
+    const release = (delay = 0) => {
+      clearTimeout(releaseTimer);
+      const current = pressed;
+      releaseTimer = window.setTimeout(() => {
+        if (!current) return;
+        current.classList.remove('is-pressed');
+        current.removeAttribute('data-veluna-press');
+        if (pressed === current) pressed = null;
+      }, delay);
+    };
+
+    const press = (target, inputType) => {
+      const control = target?.closest?.(selector);
+      if (!control || !body.contains(control) || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+      if (pressed && pressed !== control) release(0);
+      pressed = control;
+      clearTimeout(releaseTimer);
+      control.classList.add('is-pressed');
+      control.setAttribute('data-veluna-press','1');
+      try {
+        window.dispatchEvent(new CustomEvent('veluna:button-feedback', { detail: {
+          page,
+          id: control.id || '',
+          action: control.getAttribute('data-action') || control.textContent?.trim().slice(0,40) || '',
+          input: inputType || 'pointer'
+        }}));
+      } catch (_) {}
+    };
+
+    document.addEventListener('pointerdown', event => press(event.target, event.pointerType || 'pointer'), { capture:true, passive:true });
+    document.addEventListener('pointerup', () => release(150), { capture:true, passive:true });
+    document.addEventListener('pointercancel', () => release(0), { capture:true, passive:true });
+    document.addEventListener('touchend', () => release(170), { capture:true, passive:true });
+    document.addEventListener('touchcancel', () => release(0), { capture:true, passive:true });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') press(event.target, 'keyboard');
+    }, true);
+    document.addEventListener('keyup', event => {
+      if (event.key === 'Enter' || event.key === ' ') release(120);
+    }, true);
+    window.addEventListener('blur', () => release(0), { passive:true });
+  }
 
   function injectHeader(){
     if (q('.veluna-global-header', host)) return;
@@ -122,6 +172,7 @@
     requestAnimationFrame(tick);
   }
 
+  installTouchFeedback();
   injectHeader();
   injectBottomBanner();
   replaceFallbackArtwork();

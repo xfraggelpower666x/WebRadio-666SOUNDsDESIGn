@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn Interior Layout V6 - shared auth + responsive calibration
+ * 666SOUNDsDESIGn Interior Layout V7 - shared auth + global touch feedback
  * No element reparenting. Existing layout stays intact.
  * Adds only protected action buttons, side LEDs and MeterBus visual calibration.
  */
@@ -47,6 +47,41 @@
     if(result&&result.ok)toast('AUTO-DJ SKIP ausgeführt.');
     else toast(result&&result.error?result.error:'Auto-DJ Skip abgelehnt.','error');
     return !!(result&&result.ok);
+  }
+
+  function installTouchFeedback(){
+    if(document.documentElement.dataset.s666StageTouchFeedback==='1')return;
+    document.documentElement.dataset.s666StageTouchFeedback='1';
+    var selector='#mffApp button,#mffApp a[href],.player-shell button,.player-shell a[href],.player-shell [role="button"]';
+    var pressed=null,releaseTimer=0;
+    function release(delay){
+      clearTimeout(releaseTimer);
+      var current=pressed;
+      releaseTimer=setTimeout(function(){
+        if(!current)return;
+        current.classList.remove('is-pressed');
+        current.removeAttribute('data-s666-press');
+        if(pressed===current)pressed=null;
+      },delay||0);
+    }
+    function press(target,input){
+      var control=target&&target.closest?target.closest(selector):null;
+      if(!control||control.disabled||control.getAttribute('aria-disabled')==='true')return;
+      if(pressed&&pressed!==control)release(0);
+      pressed=control;
+      clearTimeout(releaseTimer);
+      control.classList.add('is-pressed');
+      control.setAttribute('data-s666-press','1');
+      try{window.dispatchEvent(new CustomEvent('s666:button-feedback',{detail:{id:control.id||'',action:control.getAttribute('data-action')||String(control.textContent||'').trim().slice(0,40),input:input||'pointer'}}));}catch(_){ }
+    }
+    document.addEventListener('pointerdown',function(event){press(event.target,event.pointerType||'pointer');},{capture:true,passive:true});
+    document.addEventListener('pointerup',function(){release(150);},{capture:true,passive:true});
+    document.addEventListener('pointercancel',function(){release(0);},{capture:true,passive:true});
+    document.addEventListener('touchend',function(){release(170);},{capture:true,passive:true});
+    document.addEventListener('touchcancel',function(){release(0);},{capture:true,passive:true});
+    document.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' ')press(event.target,'keyboard');},true);
+    document.addEventListener('keyup',function(event){if(event.key==='Enter'||event.key===' ')release(120);},true);
+    window.addEventListener('blur',function(){release(0);},{passive:true});
   }
 
   function makeButton(id,label,action){
@@ -99,6 +134,7 @@
   }
 
   function ensureSmallAdditions(){
+    installTouchFeedback();
     ensureActionButtons();
     sidePanel('left');
     sidePanel('right');
