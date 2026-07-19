@@ -7,6 +7,12 @@ on:
     paths:
       - ".github/one-time/apply_player_message_overlay_inert_v1.py"
       - ".github/workflows/apply-player-message-overlay-inert-v1.yml"
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/one-time/apply_player_message_overlay_inert_v1.py"
+      - ".github/workflows/apply-player-message-overlay-inert-v1.yml"
   workflow_dispatch:
 
 permissions:
