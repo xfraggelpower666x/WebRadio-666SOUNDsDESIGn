@@ -1,0 +1,66 @@
+name: Audit Live Global Touch Feedback 20260719
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/audit-live-global-touch-feedback-20260719.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for Cloudflare deployment and propagation
+        run: sleep 90
+      - name: Fetch live players and touch authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://webradio.666soundsdesign-broadcaster.com"
+          stamp="$(date +%s)"
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/?audit=$stamp" -o /tmp/main.html
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/veluna?audit=$stamp" -o /tmp/veluna.html
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/internal?audit=$stamp" -o /tmp/internal.html
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/player-stage-v2.js?audit=$stamp" -o /tmp/stage.js
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/css/player-stage-v2.css?audit=$stamp" -o /tmp/stage.css
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/js/veluna-ui.js?audit=$stamp" -o /tmp/veluna-ui.js
+          curl --fail --silent --show-error --location --retry 10 --retry-delay 10 --retry-all-errors "$base/css/veluna-theme.css?audit=$stamp" -o /tmp/veluna-theme.css
+      - name: Verify Main touch authority live
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F '/css/player-stage-v2.css?v=2026-07-19-touch-feedback-v1' /tmp/main.html
+          grep -F '/js/player-stage-v2.js?v=2026-07-19-touch-feedback-v1' /tmp/main.html
+          grep -F 'Interior Layout V7 - shared auth + global touch feedback' /tmp/stage.js
+          grep -F 'function installTouchFeedback()' /tmp/stage.js
+          grep -F 'data-s666-press' /tmp/stage.js
+          grep -F 'Shared Main-player touch authority' /tmp/stage.css
+          grep -F 'translateY(2px) scale(.955)' /tmp/stage.css
+      - name: Verify VELUNA touch authority live
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F '/css/veluna-theme.css?v=2026-07-19-touch-feedback-v1225' /tmp/veluna.html
+          grep -F '/js/veluna-ui.js?v=2026-07-19-touch-feedback-v1225' /tmp/veluna.html
+          grep -F 'VELUNA Central UI Runtime v1.2.25' /tmp/veluna-ui.js
+          grep -F 'function installTouchFeedback()' /tmp/veluna-ui.js
+          grep -F 'data-veluna-press' /tmp/veluna-ui.js
+          grep -F 'VELUNA Central Player Theme v1.2.25' /tmp/veluna-theme.css
+          grep -F 'translateY(2px) scale(.955)' /tmp/veluna-theme.css
+          grep -F 'tool-strip{grid-template-columns:repeat(4' /tmp/veluna-theme.css
+      - name: Verify Internal touch authority live
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F '/css/veluna-theme.css?v=2026-07-19-touch-feedback-v1225' /tmp/internal.html
+          grep -F '/js/veluna-ui.js?v=2026-07-19-touch-feedback-v1225' /tmp/internal.html
+          grep -F 'id="skipBtn"' /tmp/internal.html
+          grep -F 'id="discordBtn"' /tmp/internal.html
+          grep -F 'id="internalMessageBtn"' /tmp/internal.html
+          echo 'LIVE_GLOBAL_TOUCH_FEEDBACK_OK'
