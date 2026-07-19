@@ -154,7 +154,7 @@ const HTML = `<!DOCTYPE html>
   <link rel="icon" type="image/png" href="/assets/veluna/icons/icon-32x32.png?v=veluna-v1212" />
   <link rel="apple-touch-icon" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v1212" />
   <link rel="stylesheet" href="/css/main.css?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245" />
-  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-19-touch-feedback-v1225" />
+  <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-19-overlay-inert-v1226" />
 </head>
 <body data-veluna-ui="1" data-veluna-page="internal">
   <div id="bootOverlay" class="overlay">
@@ -243,9 +243,9 @@ const HTML = `<!DOCTYPE html>
   <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
   <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220"></script>
   <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1"></script>
-  <script src="/js/player-alert-client.js?v=2026-06-25-hardlock1"></script>
+  <script src="/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121"></script>
   <script src="/js/messenger-overlay.js?v=2026-07-19-overlay-status-v2"></script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v51"></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52"></script>
   <script defer src="/js/veluna-ui.js?v=2026-07-19-touch-feedback-v1225"></script>
   <script>
   (function () {

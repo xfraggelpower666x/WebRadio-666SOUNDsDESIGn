@@ -15,6 +15,19 @@
   var LEGACY_SENDER_KEY = 'smfpPlayerAlertSenderId';
   var state = { inFlight: false, lastSeen: '', timer: 0, stopped: false };
 
+  // PLAYER_MESSAGE_OVERLAY_INERT_V1 — closed means visually hidden and unable to capture touch.
+  function setReceiveOverlayOpen(backdrop, open) {
+    if (!backdrop) return;
+    var visible = open === true;
+    backdrop.classList.toggle('is-open', visible);
+    backdrop.hidden = !visible;
+    backdrop.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    if (visible) backdrop.removeAttribute('inert'); else backdrop.setAttribute('inert', '');
+    backdrop.style.setProperty('display', visible ? 'flex' : 'none', 'important');
+    backdrop.style.setProperty('visibility', visible ? 'visible' : 'hidden', 'important');
+    backdrop.style.setProperty('pointer-events', visible ? 'auto' : 'none', 'important');
+  }
+
   function clean(value, max) {
     return String(value == null ? '' : value)
       .replace(/[<>]/g, '')
@@ -143,16 +156,19 @@
 
   function ensureReceiveOverlay() {
     var backdrop = document.getElementById('playerAlertReceiveBackdrop');
-    if (backdrop) return backdrop;
+    if (backdrop) {
+      if (!backdrop.classList.contains('is-open')) setReceiveOverlayOpen(backdrop, false);
+      return backdrop;
+    }
     backdrop = document.createElement('div');
     backdrop.id = 'playerAlertReceiveBackdrop';
     backdrop.className = 'player-alert-backdrop';
     backdrop.setAttribute('aria-hidden', 'true');
     backdrop.innerHTML = '<div class="player-alert-modal" role="dialog" aria-modal="true" aria-label="Player message"><h3>666SOUNDsDESIGn PLAYER MESSAGE</h3><div id="playerAlertReceiveText" class="player-alert-message"></div><button id="playerAlertReceiveClose" class="player-alert-close" type="button">CLOSE</button></div>';
     document.body.appendChild(backdrop);
+    setReceiveOverlayOpen(backdrop, false);
     function close() {
-      backdrop.classList.remove('is-open');
-      backdrop.setAttribute('aria-hidden', 'true');
+      setReceiveOverlayOpen(backdrop, false);
     }
     backdrop.addEventListener('click', function (event) { if (event.target === backdrop) close(); }, true);
     var closeButton = backdrop.querySelector('#playerAlertReceiveClose');
@@ -164,8 +180,7 @@
     var backdrop = ensureReceiveOverlay();
     var text = backdrop.querySelector('#playerAlertReceiveText');
     if (text) text.textContent = clean(alert && alert.message || '', MAX_CHARS);
-    backdrop.classList.add('is-open');
-    backdrop.setAttribute('aria-hidden', 'false');
+    setReceiveOverlayOpen(backdrop, true);
     emit('s666:player-alert-received', { alert: alert });
   }
 
@@ -210,7 +225,7 @@
   else startPolling();
 
   window.S666PlayerAlertClient = {
-    version: '1.2.0',
+    version: '1.2.1-overlay-inert',
     maxChars: MAX_CHARS,
     senderId: senderId,
     send: send,

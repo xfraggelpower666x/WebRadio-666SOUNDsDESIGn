@@ -238,8 +238,24 @@ test("all player variants expose immediate touch feedback without overlay interc
   assert.match(stage, /data-s666-press/);
   assert.match(stageCss, /Shared Main-player touch authority/);
   assert.match(stageCss, /translateY\(2px\) scale\(\.955\)/);
-  assert.match(veluna, /veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225/);
+  assert.match(veluna, /veluna-theme\.css\?v=2026-07-19-overlay-inert-v1226/);
   assert.match(veluna, /veluna-ui\.js\?v=2026-07-19-touch-feedback-v1225/);
   assert.match(main, /player-stage-v2\.css\?v=2026-07-19-touch-feedback-v1/);
   assert.match(main, /player-stage-v2\.js\?v=2026-07-19-touch-feedback-v1/);
+});
+
+
+
+test("player message overlay is inert when closed and inner dialogs never own viewport geometry", async () => {
+  const client = await read("js/player-alert-client.js");
+  const theme = await read("css/veluna-theme.css");
+  const discord = await read("js/addons/discord-player-addon-v3.js");
+  assert.match(client, /PLAYER_MESSAGE_OVERLAY_INERT_V1/);
+  assert.match(client, /backdrop\.hidden = !visible/);
+  assert.match(client, /setReceiveOverlayOpen\(backdrop, false\)/);
+  assert.match(client, /pointer-events.*none/);
+  assert.doesNotMatch(theme, /\[role=["']dialog["']\]/);
+  assert.match(theme, /#playerAlertReceiveBackdrop\[aria-hidden="true"\]/);
+  assert.match(theme, /#playerAlertReceiveBackdrop \.player-alert-modal/);
+  assert.match(discord, /overlay-inert-v121/);
 });
