@@ -38,644 +38,313 @@ TAP version 13
 # Subtest: password-issued token hardlock validates issuer, scope and expiry separately
 ok 1 - password-issued token hardlock validates issuer, scope and expiry separately
   ---
-  duration_ms: 2.790987
+  duration_ms: 2.567077
   type: 'test'
   ...
 # Subtest: admin config rejects a valid auth token with the wrong issuer before GitHub access
 ok 2 - admin config rejects a valid auth token with the wrong issuer before GitHub access
   ---
-  duration_ms: 39.191634
+  duration_ms: 74.358558
   type: 'test'
   ...
 # Subtest: state-changing admin routes require explicit same-origin evidence
 ok 3 - state-changing admin routes require explicit same-origin evidence
   ---
-  duration_ms: 1.278335
+  duration_ms: 1.319061
   type: 'test'
   ...
 # Subtest: login follows the PW/Auth contract and forwards hardlock service headers
 ok 4 - login follows the PW/Auth contract and forwards hardlock service headers
   ---
-  duration_ms: 4.061705
+  duration_ms: 5.816182
   type: 'test'
   ...
 # Subtest: PW/Auth workers implement one deployable contract
 ok 5 - PW/Auth workers implement one deployable contract
   ---
-  duration_ms: 14.119459
+  duration_ms: 27.284034
   type: 'test'
   ...
 # Subtest: PW/Auth workers fail closed when the service token is configured but missing
 ok 6 - PW/Auth workers fail closed when the service token is configured but missing
   ---
-  duration_ms: 1.011644
+  duration_ms: 2.165386
   type: 'test'
   ...
 # Subtest: PW/Auth hardening requires audience, service token and rate limiting source
 ok 7 - PW/Auth hardening requires audience, service token and rate limiting source
   ---
-  duration_ms: 11.559355
+  duration_ms: 6.53097
   type: 'test'
   ...
 # Subtest: messenger uses one authoritative Player Alert client
 ok 8 - messenger uses one authoritative Player Alert client
   ---
-  duration_ms: 10.598152
+  duration_ms: 10.537797
   type: 'test'
   ...
 # Subtest: legacy inline senders are disabled and fetch is not monkey-patched
 ok 9 - legacy inline senders are disabled and fetch is not monkey-patched
   ---
-  duration_ms: 3.372974
+  duration_ms: 2.519014
   type: 'test'
   ...
 # Subtest: Skip owns interactive Bearer auth while Discord stays public
 ok 10 - Skip owns interactive Bearer auth while Discord stays public
   ---
-  duration_ms: 3.986244
+  duration_ms: 2.548178
   type: 'test'
   ...
 # Subtest: Discord worker has no public fallback code and debug is protected
 ok 11 - Discord worker has no public fallback code and debug is protected
   ---
-  duration_ms: 2.15808
+  duration_ms: 3.732698
   type: 'test'
   ...
 # Subtest: responsive V6 layout removes fixed V5 takeover
 ok 12 - responsive V6 layout removes fixed V5 takeover
   ---
-  duration_ms: 2.13544
+  duration_ms: 2.828517
   type: 'test'
   ...
 # Subtest: VELUNA uses a fixed no-scroll iPhone viewport, bounded PC layout and central responsive artwork
 ok 13 - VELUNA uses a fixed no-scroll iPhone viewport, bounded PC layout and central responsive artwork
   ---
-  duration_ms: 3.822326
+  duration_ms: 1.884967
   type: 'test'
   ...
 # Subtest: all player frontends consume the central de-duplicated title and LYVRA prefix contract
 ok 14 - all player frontends consume the central de-duplicated title and LYVRA prefix contract
   ---
-  duration_ms: 4.611158
+  duration_ms: 7.683172
   type: 'test'
   ...
 # Subtest: all repaired root/public files are byte-identical
 ok 15 - all repaired root/public files are byte-identical
   ---
-  duration_ms: 18.366326
+  duration_ms: 28.026734
   type: 'test'
   ...
 # Subtest: LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic
 ok 16 - LYVRA DJ is the canonical Auto-DJ name while live-DJ values remain dynamic
   ---
-  duration_ms: 8.07468
+  duration_ms: 5.263856
   type: 'test'
   ...
 # Subtest: VELUNA delegates Skip centrally, keeps Discord public, and preserves sound/stability controls
 ok 17 - VELUNA delegates Skip centrally, keeps Discord public, and preserves sound/stability controls
   ---
-  duration_ms: 2.638847
+  duration_ms: 2.781266
   type: 'test'
   ...
 # Subtest: VELUNA central asset registry is the single runtime source for shared player visuals
 ok 18 - VELUNA central asset registry is the single runtime source for shared player visuals
   ---
-  duration_ms: 1.779449
+  duration_ms: 1.696515
   type: 'test'
   ...
 # Subtest: VELUNA app icon pack, internal splash and requested banner placement are wired centrally
 ok 19 - VELUNA app icon pack, internal splash and requested banner placement are wired centrally
   ---
-  duration_ms: 13.485668
+  duration_ms: 9.022734
   type: 'test'
   ...
 # Subtest: VELUNA EQ shapes first, Booster amplifies second, and limiter protects the combined output
 ok 20 - VELUNA EQ shapes first, Booster amplifies second, and limiter protects the combined output
   ---
-  duration_ms: 1.093102
+  duration_ms: 2.594538
   type: 'test'
   ...
 # Subtest: VELUNA iPhone footer uses the available lower panel space without changing fullscreen geometry
 ok 21 - VELUNA iPhone footer uses the available lower panel space without changing fullscreen geometry
   ---
-  duration_ms: 1.098954
+  duration_ms: 1.000375
   type: 'test'
   ...
 # Subtest: all player variants use one Skip auth owner and a public Discord owner
 ok 22 - all player variants use one Skip auth owner and a public Discord owner
   ---
-  duration_ms: 1.859697
+  duration_ms: 2.119267
   type: 'test'
   ...
 # Subtest: all player variants expose immediate touch feedback without overlay interception
-not ok 23 - all player variants expose immediate touch feedback without overlay interception
+ok 23 - all player variants expose immediate touch feedback without overlay interception
   ---
-  duration_ms: 4.750651
+  duration_ms: 2.472715
   type: 'test'
-  location: '/home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/tests/frontend-contracts.test.mjs:224:1'
-  failureType: 'testCodeFailure'
-  error: |-
-    The input did not match the regular expression /veluna-theme\.css\?v=2026-07-19-touch-feedback-v1225/. Input:
-    
-    '<!DOCTYPE html>\n' +
-      '<html lang="de">\n' +
-      '<head>\n' +
-      '  <meta charset="UTF-8">\n' +
-      '  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">\n' +
-      '  <script src="/js/veluna-viewport-lock.js?v=2026-07-16-iphone-action-v1223"></script>\n' +
-      '  <meta name="theme-color" content="#12061f">\n' +
-      '  <meta name="robots" content="noindex,nofollow">\n' +
-      '  <meta name="apple-mobile-web-app-capable" content="yes">\n' +
-      '  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n' +
-      '  <title>VELUNA LYVRA Minimal WebRadio</title>\n' +
-      '  <link rel="icon" href="/assets/veluna/icons/favicon.ico?v=veluna-v1212">\n' +
-      '  <link rel="icon" type="image/png" sizes="32x32" href="/assets/veluna/icons/favicon-32x32.png?v=veluna-v1212">\n' +
-      '  <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">\n' +
-      '  <link rel="apple-touch-icon" sizes="180x180" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v1212">\n' +
-      '  <link rel="manifest" href="/veluna.webmanifest?v=veluna-v1212">\n' +
-      '  <meta name="mobile-web-app-capable" content="yes">\n' +
-      '  <meta name="apple-mobile-web-app-title" content="VELUNA LYVRA">\n' +
-      '  <meta name="application-name" content="VELUNA LYVRA">\n' +
-      '  <meta name="msapplication-TileColor" content="#12061f">\n' +
-      '  <meta name="msapplication-TileImage" content="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">\n' +
-      '  <meta property="og:title" content="VELUNA LYVRA Minimal Web Player">\n' +
-      '  <meta property="og:image" content="/assets/veluna/icons/icon-512x512.png?v=veluna-v1212">\n' +
-      '  <meta name="twitter:image" content="/assets/veluna/icons/icon-512x512.png?v=veluna-v1212">\n' +
-      '  <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=2026-07-16-iphone-action-v1223">\n' +
-      '  <style>\n' +
-      '    *{box-sizing:border-box}\n' +
-      '    :root{\n' +
-      '      --bg:#000;--panel:#070b12;--panel-2:#101720;--cyan:#168bff;--pink:#b45cff;--green:#7edcff;--amber:#ffc857;--red:#ff5570;--blue:#35b7ff;--text:#eef7ff;--muted:#9db0be;\n' +
-      '      --border:rgba(22,139,255,.30);--shadow-cyan:0 0 22px rgba(22,139,255,.22);--shadow-pink:0 0 18px rgba(180,92,255,.20);\n' +
-      '      --safe-top:max(4px,env(safe-area-inset-top));--safe-right:max(4px,env(safe-area-inset-right));--safe-bottom:max(4px,env(safe-area-inset-bottom));--safe-left:max(4px,env(safe-area-inset-left));\n' +
-      '    }\n' +
-      '    html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:#000;color:var(--text);font-family:"Courier New",Courier,monospace;-webkit-text-size-adjust:100%;touch-action:manipulation}\n' +
-      '    body{min-height:100svh;min-height:100dvh}\n' +
-      '    button,input,textarea{font:inherit}button{touch-action:manipulation}\n' +
-      '    .app-shell{width:100vw;height:100svh;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);background:#000}\n' +
-      '    .player-card,.boot-panel{min-width:0;background:linear-gradient(180deg,rgba(17,23,33,.99),rgba(5,8,14,.995));border:1px solid var(--border);box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}\n' +
-      '    .player-card{position:relative;width:100%;height:100%;min-height:0;overflow:hidden;display:grid;grid-template-rows:auto auto auto minmax(108px,1fr) auto auto auto auto auto;gap:7px;padding:10px;border-radius:16px}\n' +
-      '    .topbar{min-width:0;display:grid;grid-template-columns:minmax(14px,1fr) auto minmax(14px,1fr);align-items:center;gap:7px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(22,139,255,.42)}\n' +
-      '    .brand{text-align:center;font-weight:900;letter-spacing:.08em;color:var(--cyan);text-shadow:0 0 10px rgba(22,139,255,.92),0 0 22px rgba(180,92,255,.27);font-size:clamp(1.18rem,5.6vw,1.74rem);line-height:1.02;white-space:nowrap}.brand small{display:block;margin-top:3px;font-size:.50em;letter-spacing:.18em;color:var(--muted);text-shadow:none}\n' +
-      '    .status-grid{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn,.source-led-btn{min-width:0;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:12px}.lamp-box{display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 7px;min-height:39px}.lamp{flex:0 0 auto;width:10px;height:10px;border-radius:999px;border:1px solid rgba(255,255,255,.24);box-shadow:0 0 10px currentColor}.lamp-red{color:var(--red);background:var(--red)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-green{color:var(--green);background:var(--green)}.lamp-amber{color:var(--amber);background:var(--amber)}.lamp-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:clamp(.62rem,2.45vw,.80rem);font-weight:800;letter-spacing:.04em}.lamp-side-label{display:none}\n' +
-      '    .pill-row{min-width:0;display:grid;grid-template-columns:.78fr .58fr 1.64fr;gap:6px}.pill{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 8px;text-align:center;color:var(--text);font-size:clamp(.56rem,2.2vw,.74rem);font-weight:800;letter-spacing:.035em}.pill-dim{color:var(--muted)}\n' +
-      '    .display-block{min-width:0;min-height:0;position:relative;display:grid;grid-template-rows:auto auto minmax(52px,1fr);gap:4px}.display-head{min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px}.display-label,.mini-label{color:var(--muted);font-size:clamp(.60rem,2.25vw,.76rem);letter-spacing:.08em;text-transform:uppercase}#metaText{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(.54rem,2.0vw,.68rem)}\n' +
-      '    .display-window{min-height:88px;height:100%;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border-color:rgba(22,139,255,.28);background:#02050a;box-shadow:inset 0 0 44px rgba(0,0,0,.72)}\n' +
-      '    .display-window:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(0,0,0,.74),rgba(0,0,0,.28),rgba(0,0,0,.74)),linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.18),rgba(0,0,0,.52));pointer-events:none}\n' +
-      '    .cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.88;filter:saturate(1.18) contrast(1.08) brightness(.74);transform:scale(1.02);transition:opacity .35s ease,filter .35s ease}\n' +
-      '    .marquee-track{position:relative;z-index:2;display:flex;align-items:center;width:max-content;min-width:100%;white-space:nowrap;transform:translate3d(0,0,0);will-change:transform}.marquee-track.is-running{animation:velunaTicker var(--ticker-duration,18s) linear infinite}.marquee-track.is-static{justify-content:center}.marquee-track.is-static .marquee-clone,.marquee-track.is-static .marquee-gap{display:none}.marquee-item{display:inline-block;padding:0 14px;font-size:clamp(.92rem,3.95vw,1.18rem);font-weight:900;color:var(--pink);text-shadow:0 2px 3px #000,0 0 7px #000,0 0 11px rgba(180,92,255,.88),0 0 18px rgba(22,139,255,.34);letter-spacing:.015em}.marquee-gap{display:inline-block;padding:0 20px;color:var(--cyan);text-shadow:0 0 8px rgba(22,139,255,.70)}@keyframes velunaTicker{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--ticker-shift,500px)),0,0)}}\n' +
-      '    .tiny-btn{appearance:none;border:1px solid rgba(22,139,255,.22);border-radius:10px;background:rgba(255,255,255,.045);color:var(--text);padding:5px 8px;font-size:clamp(.56rem,2.05vw,.71rem);font-weight:800;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:26px;z-index:10;border-radius:12px;padding:10px;background:rgba(5,8,14,.99);border:1px solid rgba(180,92,255,.34);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:800;margin-bottom:7px}.history-list{margin:0;padding-left:18px;max-height:35dvh;overflow:auto;font-size:.75rem}\n' +
-      '    .mini-grid{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.mini-box{padding:7px 8px;min-height:48px;display:flex;flex-direction:column;justify-content:center}.mini-value{min-width:0;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-size:clamp(.68rem,2.62vw,.88rem)}#djText{color:var(--cyan);text-shadow:0 0 7px rgba(22,139,255,.35)}\n' +
-      '    .source-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px}.source-led-btn{appearance:none;min-height:38px;padding:5px 6px;color:var(--text);font-weight:900;font-size:clamp(.62rem,2.35vw,.78rem);letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.014))}.source-led-btn .source-led{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);box-shadow:0 0 8px rgba(255,255,255,.10)}.source-led-btn.is-active{border-color:rgba(22,139,255,.58);box-shadow:0 0 12px rgba(22,139,255,.25)}#primaryBtn.is-active{color:var(--green)}#primaryBtn.is-active .source-led{background:var(--green);box-shadow:0 0 13px rgba(126,220,255,.75)}#backupBtn.is-active{color:var(--cyan)}#backupBtn.is-active .source-led{background:var(--cyan);box-shadow:0 0 13px rgba(22,139,255,.75)}\n' +
-      '    .control-strip,.tool-strip{min-width:0;display:grid;gap:6px}.control-strip{grid-template-columns:repeat(3,minmax(0,1fr))}.tool-strip{grid-template-columns:repeat(6,minmax(0,1fr))}.control-btn,.small-btn{appearance:none;min-height:38px;padding:6px 4px;color:var(--text);font-weight:900;font-size:clamp(.58rem,2.20vw,.76rem);letter-spacing:.025em;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 0 10px rgba(22,139,255,.08)}.control-btn.main{border-color:rgba(180,92,255,.42);box-shadow:var(--shadow-pink)}.small-btn.is-busy{border-color:rgba(255,200,87,.45);color:var(--amber)}.small-btn.is-ok{border-color:rgba(126,220,255,.48);color:var(--green)}.small-btn.is-error{border-col'... 50047 more characters
-    
-  code: 'ERR_ASSERTION'
-  name: 'AssertionError'
-  expected:
-  actual: |-
-    <!DOCTYPE html>
-    <html lang="de">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
-      <script src="/js/veluna-viewport-lock.js?v=2026-07-16-iphone-action-v1223"></script>
-      <meta name="theme-color" content="#12061f">
-      <meta name="robots" content="noindex,nofollow">
-      <meta name="apple-mobile-web-app-capable" content="yes">
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-      <title>VELUNA LYVRA Minimal WebRadio</title>
-      <link rel="icon" href="/assets/veluna/icons/favicon.ico?v=veluna-v1212">
-      <link rel="icon" type="image/png" sizes="32x32" href="/assets/veluna/icons/favicon-32x32.png?v=veluna-v1212">
-      <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
-      <link rel="apple-touch-icon" sizes="180x180" href="/assets/veluna/icons/apple-touch-icon.png?v=veluna-v1212">
-      <link rel="manifest" href="/veluna.webmanifest?v=veluna-v1212">
-      <meta name="mobile-web-app-capable" content="yes">
-      <meta name="apple-mobile-web-app-title" content="VELUNA LYVRA">
-      <meta name="application-name" content="VELUNA LYVRA">
-      <meta name="msapplication-TileColor" content="#12061f">
-      <meta name="msapplication-TileImage" content="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
-      <meta property="og:title" content="VELUNA LYVRA Minimal Web Player">
-      <meta property="og:image" content="/assets/veluna/icons/icon-512x512.png?v=veluna-v1212">
-      <meta name="twitter:image" content="/assets/veluna/icons/icon-512x512.png?v=veluna-v1212">
-      <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=2026-07-16-iphone-action-v1223">
-      <style>
-        *{box-sizing:border-box}
-        :root{
-          --bg:#000;--panel:#070b12;--panel-2:#101720;--cyan:#168bff;--pink:#b45cff;--green:#7edcff;--amber:#ffc857;--red:#ff5570;--blue:#35b7ff;--text:#eef7ff;--muted:#9db0be;
-          --border:rgba(22,139,255,.30);--shadow-cyan:0 0 22px rgba(22,139,255,.22);--shadow-pink:0 0 18px rgba(180,92,255,.20);
-          --safe-top:max(4px,env(safe-area-inset-top));--safe-right:max(4px,env(safe-area-inset-right));--safe-bottom:max(4px,env(safe-area-inset-bottom));--safe-left:max(4px,env(safe-area-inset-left));
-        }
-        html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:#000;color:var(--text);font-family:"Courier New",Courier,monospace;-webkit-text-size-adjust:100%;touch-action:manipulation}
-        body{min-height:100svh;min-height:100dvh}
-        button,input,textarea{font:inherit}button{touch-action:manipulation}
-        .app-shell{width:100vw;height:100svh;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);background:#000}
-        .player-card,.boot-panel{min-width:0;background:linear-gradient(180deg,rgba(17,23,33,.99),rgba(5,8,14,.995));border:1px solid var(--border);box-shadow:var(--shadow-cyan),var(--shadow-pink);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-        .player-card{position:relative;width:100%;height:100%;min-height:0;overflow:hidden;display:grid;grid-template-rows:auto auto auto minmax(108px,1fr) auto auto auto auto auto;gap:7px;padding:10px;border-radius:16px}
-        .topbar{min-width:0;display:grid;grid-template-columns:minmax(14px,1fr) auto minmax(14px,1fr);align-items:center;gap:7px}.topbar-line{height:2px;border-radius:999px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 12px rgba(22,139,255,.42)}
-        .brand{text-align:center;font-weight:900;letter-spacing:.08em;color:var(--cyan);text-shadow:0 0 10px rgba(22,139,255,.92),0 0 22px rgba(180,92,255,.27);font-size:clamp(1.18rem,5.6vw,1.74rem);line-height:1.02;white-space:nowrap}.brand small{display:block;margin-top:3px;font-size:.50em;letter-spacing:.18em;color:var(--muted);text-shadow:none}
-        .status-grid{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.lamp-box,.pill,.mini-box,.display-window,.control-btn,.small-btn,.source-led-btn{min-width:0;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09);border-radius:12px}.lamp-box{display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 7px;min-height:39px}.lamp{flex:0 0 auto;width:10px;height:10px;border-radius:999px;border:1px solid rgba(255,255,255,.24);box-shadow:0 0 10px currentColor}.lamp-red{color:var(--red);background:var(--red)}.lamp-cyan{color:var(--cyan);background:var(--cyan)}.lamp-green{color:var(--green);background:var(--green)}.lamp-amber{color:var(--amber);background:var(--amber)}.lamp-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:clamp(.62rem,2.45vw,.80rem);font-weight:800;letter-spacing:.04em}.lamp-side-label{display:none}
-        .pill-row{min-width:0;display:grid;grid-template-columns:.78fr .58fr 1.64fr;gap:6px}.pill{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 8px;text-align:center;color:var(--text);font-size:clamp(.56rem,2.2vw,.74rem);font-weight:800;letter-spacing:.035em}.pill-dim{color:var(--muted)}
-        .display-block{min-width:0;min-height:0;position:relative;display:grid;grid-template-rows:auto auto minmax(52px,1fr);gap:4px}.display-head{min-width:0;display:flex;justify-content:space-between;align-items:center;gap:8px}.display-label,.mini-label{color:var(--muted);font-size:clamp(.60rem,2.25vw,.76rem);letter-spacing:.08em;text-transform:uppercase}#metaText{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(.54rem,2.0vw,.68rem)}
-        .display-window{min-height:88px;height:100%;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border-color:rgba(22,139,255,.28);background:#02050a;box-shadow:inset 0 0 44px rgba(0,0,0,.72)}
-        .display-window:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(0,0,0,.74),rgba(0,0,0,.28),rgba(0,0,0,.74)),linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.18),rgba(0,0,0,.52));pointer-events:none}
-        .cover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.88;filter:saturate(1.18) contrast(1.08) brightness(.74);transform:scale(1.02);transition:opacity .35s ease,filter .35s ease}
-        .marquee-track{position:relative;z-index:2;display:flex;align-items:center;width:max-content;min-width:100%;white-space:nowrap;transform:translate3d(0,0,0);will-change:transform}.marquee-track.is-running{animation:velunaTicker var(--ticker-duration,18s) linear infinite}.marquee-track.is-static{justify-content:center}.marquee-track.is-static .marquee-clone,.marquee-track.is-static .marquee-gap{display:none}.marquee-item{display:inline-block;padding:0 14px;font-size:clamp(.92rem,3.95vw,1.18rem);font-weight:900;color:var(--pink);text-shadow:0 2px 3px #000,0 0 7px #000,0 0 11px rgba(180,92,255,.88),0 0 18px rgba(22,139,255,.34);letter-spacing:.015em}.marquee-gap{display:inline-block;padding:0 20px;color:var(--cyan);text-shadow:0 0 8px rgba(22,139,255,.70)}@keyframes velunaTicker{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--ticker-shift,500px)),0,0)}}
-        .tiny-btn{appearance:none;border:1px solid rgba(22,139,255,.22);border-radius:10px;background:rgba(255,255,255,.045);color:var(--text);padding:5px 8px;font-size:clamp(.56rem,2.05vw,.71rem);font-weight:800;cursor:pointer}.history-overlay{position:absolute;left:0;right:0;top:26px;z-index:10;border-radius:12px;padding:10px;background:rgba(5,8,14,.99);border:1px solid rgba(180,92,255,.34);box-shadow:var(--shadow-pink)}.history-overlay.hidden{display:none}.history-title{color:var(--cyan);font-weight:800;margin-bottom:7px}.history-list{margin:0;padding-left:18px;max-height:35dvh;overflow:auto;font-size:.75rem}
-        .mini-grid{min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.mini-box{padding:7px 8px;min-height:48px;display:flex;flex-direction:column;justify-content:center}.mini-value{min-width:0;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-size:clamp(.68rem,2.62vw,.88rem)}#djText{color:var(--cyan);text-shadow:0 0 7px rgba(22,139,255,.35)}
-        .source-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px}.source-led-btn{appearance:none;min-height:38px;padding:5px 6px;color:var(--text);font-weight:900;font-size:clamp(.62rem,2.35vw,.78rem);letter-spacing:.04em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.014))}.source-led-btn .source-led{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);box-shadow:0 0 8px rgba(255,255,255,.10)}.source-led-btn.is-active{border-color:rgba(22,139,255,.58);box-shadow:0 0 12px rgba(22,139,255,.25)}#primaryBtn.is-active{color:var(--green)}#primaryBtn.is-active .source-led{background:var(--green);box-shadow:0 0 13px rgba(126,220,255,.75)}#backupBtn.is-active{color:var(--cyan)}#backupBtn.is-active .source-led{background:var(--cyan);box-shadow:0 0 13px rgba(22,139,255,.75)}
-        .control-strip,.tool-strip{min-width:0;display:grid;gap:6px}.control-strip{grid-template-columns:repeat(3,minmax(0,1fr))}.tool-strip{grid-template-columns:repeat(6,minmax(0,1fr))}.control-btn,.small-btn{appearance:none;min-height:38px;padding:6px 4px;color:var(--text);font-weight:900;font-size:clamp(.58rem,2.20vw,.76rem);letter-spacing:.025em;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 0 10px rgba(22,139,255,.08)}.control-btn.main{border-color:rgba(180,92,255,.42);box-shadow:var(--shadow-pink)}.small-btn.is-busy{border-color:rgba(255,200,87,.45);color:var(--amber)}.small-btn.is-ok{border-color:rgba(126,220,255,.48);color:var(--green)}.small-btn.is-error{border-color:rgba(255,85,112,.60);color:var(--red)}
-        .action-bar{min-width:0;height:25px;border:1px solid rgba(22,139,255,.22);border-radius:13px;background:rgba(255,255,255,.028);display:flex;align-items:center;justify-content:center;gap:7px;padding:3px 10px;color:var(--muted);font-size:clamp(.52rem,2.0vw,.68rem);font-weight:900;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.action-led{width:9px;height:9px;border-radius:999px;background:rgba(255,255,255,.18);box-shadow:0 0 8px rgba(255,255,255,.10);flex:0 0 auto}.action-led.is-idle{background:var(--cyan);box-shadow:0 0 10px rgba(22,139,255,.62)}.action-led.is-busy{background:var(--amber);box-shadow:0 0 10px rgba(255,200,87,.70)}.action-led.is-ok{background:var(--green);box-shadow:0 0 10px rgba(126,220,255,.72)}.action-led.is-error{background:var(--red);box-shadow:0 0 10px rgba(255,85,112,.72)}
-        .levelmeter{min-width:0;height:26px;border:1px solid rgba(22,139,255,.24);border-radius:13px;background:rgba(255,255,255,.028);display:flex;align-items:end;justify-content:center;gap:3px;padding:4px 8px;overflow:hidden;box-shadow:inset 0 0 18px rgba(22,139,255,.04),0 0 10px rgba(180,92,255,.06)}.meter-bar{width:4px;height:18%;min-height:3px;border-radius:999px;background:linear-gradient(180deg,var(--cyan),var(--pink));opacity:.42;box-shadow:0 0 7px rgba(22,139,255,.25);transform-origin:bottom;transition:height .07s linear,opacity .07s linear}.levelmeter[data-live="1"] .meter-bar{opacity:.88}
-        audio{display:none}.footer{min-width:0;overflow:hidden;text-align:center;white-space:nowrap;color:var(--cyan);font-family:"Arial Narrow","Helvetica Neue",Arial,sans-serif;font-size:clamp(.78rem,2.65vw,1.08rem);font-weight:900;line-height:1.08;letter-spacing:-.025em;text-shadow:0 0 8px rgba(22,139,255,.72),0 0 14px rgba(180,92,255,.68)}
-        .panel-overlay{position:absolute;left:8px;right:8px;bottom:48px;z-index:12;border-radius:15px;border:1px solid rgba(22,139,255,.32);background:rgba(5,8,14,.985);box-shadow:var(--shadow-cyan),var(--shadow-pink);padding:10px;max-height:calc(100% - 90px);overflow:hidden}.panel-overlay.hidden{display:none}.panel-title{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--cyan);font-weight:900;letter-spacing:.08em;text-shadow:0 0 8px rgba(22,139,255,.45)}.panel-close{appearance:none;border:1px solid rgba(180,92,255,.28);background:rgba(255,255,255,.04);color:var(--text);border-radius:10px;padding:4px 8px;font-weight:900;cursor:pointer}.boost-row{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:9px}.boost-chip{appearance:none;border:1px solid rgba(22,139,255,.18);border-radius:10px;background:rgba(255,255,255,.035);color:var(--text);padding:7px 0;font-weight:900}.boost-chip.is-active{border-color:rgba(180,92,255,.55);color:var(--pink);box-shadow:0 0 12px rgba(180,92,255,.25)}.eq-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:10px}.eq-band{min-width:0;text-align:center}.eq-band label{display:block;color:var(--muted);font-size:.62rem;font-weight:900;margin-bottom:5px}.eq-band input{width:100%;height:86px;writing-mode:vertical-rl;direction:rtl;accent-color:#168bff}.eq-value{font-size:.60rem;color:var(--cyan)}.panel-actions{display:flex;gap:7px;justify-content:center;margin-top:8px}.panel-actions button{appearance:none;border:1px solid rgba(22,139,255,.22);background:rgba(255,255,255,.035);border-radius:10px;color:var(--text);padding:6px 9px;font-size:.68rem;font-weight:900}.meta-panel pre{white-space:pre-wrap;word-break:break-word;margin:8px 0 0;color:var(--text);font-size:.66rem;line-height:1.35;max-height:42dvh;overflow:auto}.action-status{margin-top:7px;text-align:center;color:var(--muted);font-size:.66rem;min-height:1em}.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 12px) calc(var(--safe-left) + 12px);background:rgba(0,0,0,.94)}.overlay.hidden{display:none}.boot-panel{width:min(92vw,430px);padding:22px;text-align:center;border-radius:18px}.boot-title{font-size:clamp(1.15rem,5vw,1.55rem);font-weight:900;letter-spacing:.12em;color:var(--cyan);text-shadow:0 0 12px rgba(22,139,255,.58)}.boot-subtitle,.boot-note{color:var(--muted)}.boot-subtitle{font-size:.76rem;letter-spacing:.08em}.boot-note{font-size:.76rem;line-height:1.45}.neon-button{appearance:none;border:1px solid rgba(22,139,255,.55);border-radius:13px;padding:12px 17px;background:linear-gradient(180deg,rgba(22,139,255,.16),rgba(180,92,255,.08));color:var(--text);font-weight:900;cursor:pointer;box-shadow:var(--shadow-cyan)}.neon-button:disabled{opacity:.65;cursor:wait}.boot-state{min-height:1.4em;margin-top:10px;color:var(--pink);font-size:.76rem}
-        @media (min-width:769px){body{background:#000}.app-shell{padding:24px;background:linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.44),rgba(0,0,0,.82)),linear-gradient(180deg,rgba(0,0,0,.54),rgba(0,0,0,.34)),url('/assets/veluna/background/veluna-player-background.webp?v=veluna-v1212') center center/cover no-repeat #000}.player-card{width:min(520px,calc(100vw - 48px));height:auto;max-height:calc(100dvh - 48px);grid-template-rows:repeat(9,auto);padding:14px;gap:9px;border-radius:20px}.brand{font-size:1.48rem}.brand small{font-size:.48em}.lamp-box{min-height:44px}.display-block{grid-template-rows:auto auto 68px}.display-window{height:68px}.mini-box{min-height:56px}.source-led-btn,.control-btn,.small-btn{min-height:42px}.tool-strip{grid-template-columns:repeat(5,minmax(0,1fr))}#soundBtn{display:none}.levelmeter{height:30px}.footer{font-size:.98rem}.panel-overlay{bottom:54px}.mobile-only{display:none!important}}
-        @media (max-height:700px) and (max-width:768px){.player-card{grid-template-rows:auto auto auto minmax(74px,1fr) auto auto auto auto auto;gap:4px;padding:6px;border-radius:11px}.brand{font-size:clamp(.98rem,4.4vw,1.28rem)}.brand small{margin-top:1px}.lamp-box{min-height:32px;padding:4px}.pill{padding:4px 5px}.display-block{grid-template-rows:auto auto minmax(38px,1fr);gap:2px}.display-window{min-height:38px}.mini-box{min-height:39px;padding:4px 6px}.source-led-btn,.control-btn,.small-btn{min-height:31px;padding:3px}.levelmeter{height:21px;padding:3px 8px}.footer{font-size:clamp(.64rem,2.2vw,.84rem)}.tiny-btn{padding:3px 6px}.eq-band input{height:58px}.panel-overlay{bottom:38px;padding:8px}.boost-row{margin-top:6px}.eq-grid{margin-top:6px}.action-status{display:none}}
-        @media (prefers-reduced-motion:reduce){.marquee-track.is-running{animation-duration:36s}.meter-bar{transition:none}}
-      .design-switch{display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--laser-blue);font-weight:800;letter-spacing:.04em;white-space:nowrap}.design-switch:hover,.design-switch:focus-visible{color:#fff;border-color:var(--laser-pink);outline:none}
-    </style>
-      <link rel="stylesheet" href="/css/veluna-theme.css?v=2026-07-19-overlay-inert-v1226">
-    </head>
-    <body data-veluna-ui="1" data-veluna-page="veluna">
-      <div id="bootOverlay" class="overlay hidden" hidden aria-hidden="true">
-        <div class="boot-panel">
-          <div class="boot-title">VELUNA · LYVRA</div>
-          <div class="boot-subtitle">MINIMAL WEBRADIO · WORKER SWITCH CHAIN</div>
-          <p class="boot-note">Ein Tipp startet Audio über die Worker-Haupt-, Fallback- und Reservekette. Der Dialog schließt erst bei bestätigter Wiedergabe.</p>
-          <button id="bootButton" class="neon-button" type="button">START AUDIO</button>
-          <div id="bootState" class="boot-state" role="status" aria-live="polite">Bereit</div>
-        </div>
-      </div>
-      <main class="app-shell" aria-label="VELUNA LYVRA Minimal WebRadio">
-        <section class="player-card">
-          <header class="topbar"><div class="topbar-line"></div><div class="brand">VELUNA · LYVRA<small>MINIMAL WEBRADIO</small></div><div class="topbar-line"></div></header>
-          <div class="status-grid"><div class="lamp-box"><span id="metaLamp" class="lamp lamp-red"></span><span class="lamp-label">METADATA</span></div><div class="lamp-box"><span id="audioLamp" class="lamp lamp-red"></span><span class="lamp-label">AUDIO</span></div><div class="lamp-box"><span id="sourceLamp" class="lamp lamp-green"></span><span class="lamp-label">SOURCE</span><span id="playerTypeLabel" class="lamp-side-label">VELUNA</span></div></div>
-          <div class="pill-row"><span id="streamStatus" class="pill">READY</span><span id="sourceLabel" class="pill pill-dim">MAIN</span><span id="fallbackText" class="pill pill-dim">WORKER AUTO SWITCH</span></div>
-          <div class="display-block">
-            <div class="display-head"><div class="display-label">NOW PLAYING</div><button id="historyToggle" class="tiny-btn" type="button">HISTORY</button></div>
-            <div id="metaText" class="display-label">METADATA LOADING</div>
-            <div id="displayWindow" class="display-window"><img id="coverImage" class="cover-image" src="/assets/veluna/covers/veluna-stream-fallback.webp?v=veluna-v1212" alt="Stream Cover" decoding="async"><div id="tickerTrack" class="marquee-track is-static"><span id="nowPlaying" class="marquee-item" data-now-playing-title>Loading metadata...</span><span class="marquee-gap" aria-hidden="true">◆</span><span id="nowPlayingClone" class="marquee-item marquee-clone" aria-hidden="true">Loading metadata...</span><span class="marquee-gap" aria-hidden="true">◆</span></div></div>
-            <div id="historyOverlay" class="history-overlay hidden"><div class="history-title">LAST TRACKS</div><ul id="historyList" class="history-list"><li>No history loaded</li></ul></div>
-          </div>
-          <div class="mini-grid"><div class="mini-box"><div class="mini-label">LISTENERS</div><div id="listenersText" class="mini-value" data-listeners>0 / 250</div></div><div class="mini-box"><div class="mini-label">BITRATE</div><div id="bitrateText" class="mini-value" data-bitrate>UNKNOWN</div></div><div class="mini-box"><div class="mini-label">DJ / STATUS</div><div id="djText" class="mini-value" data-dj-name>LYVRA DJ</div></div></div>
-          <div class="source-switch" aria-label="Streamquelle umschalten"><button id="primaryBtn" class="source-led-btn is-active" type="button" title="Hauptstream aktivieren" aria-pressed="true"><span class="source-led"></span><span>MAIN</span></button><button id="backupBtn" class="source-led-btn" type="button" title="Backupstream aktivieren" aria-pressed="false"><span class="source-led"></span><span>BACKUP</span></button></div>
-          <div class="control-strip"><button id="playBtn" class="control-btn main" type="button">PLAY</button><button id="pauseBtn" class="control-btn" type="button">PAUSE</button><button id="stopBtn" class="control-btn" type="button">STOP</button></div>
-          <div class="tool-strip"><button id="reconnectBtn" class="small-btn" type="button">RECON</button><button id="muteBtn" class="small-btn" type="button">MUTE</button><button id="skipBtn" class="small-btn" type="button">SKIP</button><button id="discordBtn" class="small-btn" type="button">DISC</button><button id="soundBtn" class="small-btn mobile-only" type="button">SOUND</button><button id="metaBtn" class="small-btn" type="button">META</button><a class="small-btn design-switch" href="/" aria-label="Zum 666 Player wechseln">666 PLAYER</a></div><div id="actionBar" class="action-bar"><span id="actionLed" class="action-led is-idle"></span><span id="actionText">Bereit</span></div>
-          <div id="levelMeter" class="levelmeter" data-live="0" aria-label="Audio-Levelmeter"></div>
-          <audio id="radio" preload="none" playsinline webkit-playsinline crossorigin="anonymous"></audio>
-          <div class="footer">L.Y.V.R.A. – Living Yielding Vibration and Resonance Architecture</div>
-          <div id="soundPanel" class="panel-overlay hidden mobile-only" aria-hidden="true"><div class="panel-title"><span>SOUND · BOOST 0–5 · 5-BAND EQ</span><button id="soundClose" class="panel-close" type="button">×</button></div><div id="boostRow" class="boost-row" aria-label="Booster-Stufen"></div><div class="eq-grid"><div class="eq-band"><label for="eqSub">SUB</label><input id="eqSub" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="sub"><div id="eqSubVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqLow">LOW</label><input id="eqLow" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="low"><div id="eqLowVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqMid">MID</label><input id="eqMid" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="mid"><div id="eqMidVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqHigh">HIGH</label><input id="eqHigh" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="high"><div id="eqHighVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqAir">AIR</label><input id="eqAir" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="air"><div id="eqAirVal" class="eq-value">0</div></div></div><div class="panel-actions"><button id="soundReset" type="button">RESET</button><button id="soundApply" type="button">APPLY</button></div><div id="soundStatus" class="action-status">iPhone-Soundpanel: neutral bis Boost 5, EQ -12 bis +12 dB.</div></div>
-          <div id="metaPanel" class="panel-overlay meta-panel hidden" aria-hidden="true"><div class="panel-title"><span>METADATA DETAIL</span><button id="metaClose" class="panel-close" type="button">×</button></div><pre id="metaDetailText">Noch keine Metadaten geladen.</pre><div id="actionStatus" class="action-status">Bereit</div></div>
-        </section>
-      </main>
-      <script src="/js/boost-core.js?v=2026-07-06-veluna-v126"></script>
-      <script src="/js/audio-start-core.js?v=2026-07-12-v1217"></script>
-      <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220"></script>
-      <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1"></script>
-      <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52"></script>
-      <script>
-      (()=>{
-        'use strict';
-        const AUTO_DJ_NAME='LYVRA DJ';
-        const TITLE_PREFIX='LYVRA is alive · 666SOUNDsDESIGn · ';
-        const ENDPOINTS={main:'/stream',back:'/fallback-stream',metadata:'/api/nowplaying',runtime:'/api/runtime-config/status',discordManual:'/api/discord/manual',discordMessage:'/api/discord/message'};
-        const STREAM_COVER='/assets/veluna/covers/veluna-stream-fallback.webp?v=veluna-v1212';
-        const DEFAULT_DIRECT={primary:'https://my.idjstream.com/666soundsdesign/stream',backup:'https://my.idjstream.com:8686/stream'};
-        const CAPACITY=250;
-        const BOOST_KEY='veluna_mobile_boost_v126';
-        const EQ_KEY='veluna_mobile_eq_v126';
-        const EQ_DEFAULT={sub:0,low:0,mid:0,high:0,air:0};
-        const EQ_BANDS=[{key:'sub',type:'lowshelf',freq:55,q:.70},{key:'low',type:'peaking',freq:160,q:.95},{key:'mid',type:'peaking',freq:1000,q:1.0},{key:'high',type:'peaking',freq:3600,q:.90},{key:'air',type:'highshelf',freq:10500,q:.70}];
-        const BOOST_GAINS=()=>window.SMFPBoostCore?window.SMFPBoostCore.stages.map(stage=>stage.gain):[1,1.45,2.10,2.85,3.60,4.80];
-        const q=id=>document.getElementById(id);
-        const audio=q('radio'),overlay=q('bootOverlay'),bootButton=q('bootButton'),bootState=q('bootState');
-        const metaLamp=q('metaLamp'),audioLamp=q('audioLamp'),sourceLamp=q('sourceLamp'),streamStatus=q('streamStatus'),sourceLabel=q('sourceLabel'),fallbackText=q('fallbackText');
-        const metaText=q('metaText'),nowPlaying=q('nowPlaying'),nowPlayingClone=q('nowPlayingClone'),tickerTrack=q('tickerTrack'),displayWindow=q('displayWindow'),coverImage=q('coverImage');
-        const listenersText=q('listenersText'),bitrateText=q('bitrateText'),djText=q('djText'),historyToggle=q('historyToggle'),historyOverlay=q('historyOverlay'),historyList=q('historyList');
-        const playBtn=q('playBtn'),pauseBtn=q('pauseBtn'),stopBtn=q('stopBtn'),reconnectBtn=q('reconnectBtn'),muteBtn=q('muteBtn'),primaryBtn=q('primaryBtn'),backupBtn=q('backupBtn');
-        const skipBtn=q('skipBtn'),discordBtn=q('discordBtn'),soundBtn=q('soundBtn'),metaBtn=q('metaBtn'),soundPanel=q('soundPanel'),metaPanel=q('metaPanel'),levelMeter=q('levelMeter');
-        const soundClose=q('soundClose'),metaClose=q('metaClose'),boostRow=q('boostRow'),soundReset=q('soundReset'),soundApply=q('soundApply'),soundStatus=q('soundStatus'),metaDetailText=q('metaDetailText'),actionStatus=q('actionStatus'),actionText=q('actionText'),actionLed=q('actionLed');
-        let runtime={...DEFAULT_DIRECT},selected='main',candidateIndex=0,muted=false,userStopped=false,switching=false,metadataTimer=0,stallTimer=0,lastTitle='',historyOpen=false,hasPlayed=false,lastMetadata=null,lastHiddenAt=0,lastRecoveryAt=0,lastCoverUrl='',baseCoverUrl=STREAM_COVER,coverTimer=0,activeSecureAction='idle',authKeepAliveTimer=0;
-        let chains=buildChains();
-    
-        function isMobileLike(){return window.matchMedia('(max-width: 768px)').matches||/iPhone|iPad|iPod/i.test(navigator.userAgent||'')}
-        function clamp(n,min,max){n=Number(n);return Math.max(min,Math.min(max,Number.isFinite(n)?n:min))}
-        function clean(value){return String(value??'').replace(/<[^>]*>/g,' ').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim()}
-        function firstText(...values){for(const value of values){if(value===undefined||value===null)continue;if(typeof value==='string'||typeof value==='number'){const text=clean(value);if(text)return text;continue}if(value&&typeof value==='object'){const nested=value.display_title??value.normalized_title??value.text??value.title??value.name??value.songtitle??value.song??value.current??value.now_playing??value.nowPlaying;if(nested!==value){const text=firstText(nested);if(text)return text}}}return ''}
-        function isAutoDjValue(value){const lowered=clean(value).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();return !lowered||['unknown','none','null','undefined','offline','n a','na','no dj','nodj','no dj status','dj 666','666 dj','666soundsdesign dj','666 sounds design dj','lyvra dj'].includes(lowered)||lowered.includes('auto dj')||lowered.includes('autodj')}
-        function normalizeDj(value){const raw=clean(value);return isAutoDjValue(raw)?AUTO_DJ_NAME:raw}
-        function hasBrandIdentity(value){return /(?:fraggle(?:\s*power)?(?:\s*666)?|fraggel(?:\s*power)?(?:\s*666)?|666\s*sounds?\s*design|666soundsdesign|666\s*sound\s*system|666soundsystem|l\.?\s*y\.?\s*v\.?\s*r\.?\s*a\.?|\blyvra\b)/i.test(clean(value))}
-        function cleanTitle(value){let text=clean(value).replace(/^\s*(?:unknown title|loading metadata|metadata unavailable|metadaten werden geladen|no dj)\s*(?:[-:|–—·•]+\s*)*/i,'').replace(/(?:\s*[-–—|·•]\s*){2,}/g,' - ').replace(/\s{2,}/g,' ').replace(/^\s*[-:|–—·•]+\s*|\s*[-:|–—·•]+\s*$/g,'').trim();text=text.replace(/666\s*sounds?\s*design/ig,'666SOUNDsDESIGn').replace(/\blyvra\b/ig,'LYVRA');const segments=text.split(/\s+(?:-|–|—|\||·|•)\s+/).map(part=>part.trim()).filter(Boolean);const seen=new Set(),unique=[];for(const segment of segments){const key=segment.toLowerCase().replace(/[^a-z0-9]+/g,'');if(!key||seen.has(key))continue;seen.add(key);unique.push(segment)}return unique.length?unique.join(' - '):text}
-        function normalizeDisplayTitle(rawTitle,rawArtist=''){const title=cleanTitle(rawTitle);if(!title)return '';const artist=cleanTitle(rawArtist);let candidate=title;if(artist&&hasBrandIdentity(artist)&&!title.toLowerCase().includes(artist.toLowerCase()))candidate=cleanTitle(artist+' - '+title);if(hasBrandIdentity(candidate))return candidate;return TITLE_PREFIX+candidate}
-        function setLamp(node,state){if(!node)return;node.classList.remove('lamp-red','lamp-cyan','lamp-green','lamp-amber');node.classList.add(state)}
-        function setStatus(text){streamStatus.textContent=String(text||'').toUpperCase()}
-        function setAction(text,mode='is-idle',targetBtn=null){const msg=text||'Bereit';if(actionStatus)actionStatus.textContent=msg;if(actionText)actionText.textContent=String(msg).slice(0,96);if(actionLed){actionLed.classList.remove('is-idle','is-busy','is-ok','is-error');actionLed.classList.add(mode||'is-idle')}[skipBtn,discordBtn,reconnectBtn].forEach(btn=>btn&&btn.classList.remove('is-busy','is-ok','is-error'));if(targetBtn&&mode&&targetBtn.classList&&mode!=='is-idle')targetBtn.classList.add(mode);try{document.documentElement.setAttribute('data-veluna-action',String(activeSecureAction||'idle'));document.documentElement.setAttribute('data-veluna-action-state',String(mode||'is-idle'))}catch(_){}}
-        function setTransportUi(state='stop'){const map={play:playBtn,pause:pauseBtn,stop:stopBtn,reconnect:reconnectBtn};[playBtn,pauseBtn,stopBtn,reconnectBtn].forEach(btn=>{if(!btn)return;btn.classList.remove('is-active','transport-active');btn.setAttribute('aria-pressed','false')});const active=map[state];if(active){active.classList.add('is-active','transport-active');active.setAttribute('aria-pressed','true')}document.documentElement.setAttribute('data-player-state',state==='play'?'playing':state==='pause'?'paused':'stopped');document.body.setAttribute('data-player-state',state==='play'?'playing':state==='pause'?'paused':'stopped')}
-        function flashButton(btn){if(!btn)return;btn.classList.add('is-pressed');clearTimeout(btn.__pressTimer);btn.__pressTimer=setTimeout(()=>btn.classList.remove('is-pressed'),360)}
-        function describeError(err){return clean(err?.message||err?.error||err||'unknown_error').replace(/^error\s*:?\s*/i,'')||'unknown_error'}
-        function protectAudioDuringDialog(){const wasPlaying=audio&&!audio.paused&&!userStopped;let closed=false;function keepAlive(){if(!wasPlaying||userStopped||closed)return;try{void soundEngine.resume()}catch(_){}try{if(audio.paused&&audio.src)void audio.play()}catch(_){}}keepAlive();authKeepAliveTimer=setInterval(keepAlive,1400);return ()=>{closed=true;clearInterval(authKeepAliveTimer);authKeepAliveTimer=0;if(wasPlaying&&!userStopped)setTimeout(()=>void recoverAfterReturn('auth-dialog-return'),120)}}
-        function buildChains(){return {main:[{url:ENDPOINTS.main,label:'WORKER AUTO SWITCH',mode:'MAIN',worker:true},{url:ENDPOINTS.back,label:'WORKER FALLBACK SWITCH',mode:'BACK',worker:true},{url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT MAIN RESERVE',mode:'MAIN',reserve:true},{url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK',reserve:true}],back:[{url:ENDPOINTS.back,label:'WORKER FALLBACK SWITCH',mode:'BACK',worker:true},{url:ENDPOINTS.main,label:'WORKER AUTO SWITCH',mode:'MAIN',worker:true},{url:runtime.backup||DEFAULT_DIRECT.backup,label:'DIRECT BACK RESERVE',mode:'BACK',reserve:true},{url:runtime.primary||DEFAULT_DIRECT.primary,label:'DIRECT MAIN RESERVE',mode:'MAIN',reserve:true}]}}
-        function currentCandidate(){return chains[selected][candidateIndex]||chains[selected][0]}
-        function updateSourceUi(){const item=currentCandidate();sourceLabel.textContent=item.mode;fallbackText.textContent=item.label;setLamp(sourceLamp,item.reserve?'lamp-amber':(item.mode==='MAIN'?'lamp-green':'lamp-cyan'));primaryBtn.classList.toggle('is-active',selected==='main');backupBtn.classList.toggle('is-active',selected==='back');primaryBtn.setAttribute('aria-pressed',selected==='main'?'true':'false');backupBtn.setAttribute('aria-pressed',selected==='back'?'true':'false')}
-        function syncTickerMotion(){if(!displayWindow||!tickerTrack||!nowPlaying)return;tickerTrack.classList.remove('is-running','is-static');tickerTrack.style.removeProperty('--ticker-shift');tickerTrack.style.removeProperty('--ticker-duration');const itemWidth=Math.ceil(nowPlaying.getBoundingClientRect().width);const viewportWidth=Math.floor(displayWindow.clientWidth);if(itemWidth<=Math.max(0,viewportWidth-24)){tickerTrack.classList.add('is-static');return}const gapNode=tickerTrack.querySelector('.marquee-gap');const gapWidth=gapNode?Math.ceil(gapNode.getBoundingClientRect().width):48;const shift=itemWidth+gapWidth;const duration=Math.max(14,Math.min(42,shift/34));tickerTrack.style.setProperty('--ticker-shift',shift+'px');tickerTrack.style.setProperty('--ticker-duration',duration.toFixed(2)+'s');void tickerTrack.offsetWidth;tickerTrack.classList.add('is-running')}
-        function setTicker(text){const finalText=clean(text)||'Metadata unavailable';nowPlaying.textContent=finalText;nowPlayingClone.textContent=finalText;lastTitle=finalText;requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion))}
-        function coverCandidateToUrl(value){if(!value)return '';if(typeof value==='string'){const raw=clean(value);if(!raw||/^data:/i.test(raw))return '';try{return new URL(raw,location.origin).toString()}catch(_){return ''}}if(Array.isArray(value)){for(const item of value){const found=coverCandidateToUrl(item);if(found)return found}return ''}if(typeof value==='object'){return coverCandidateToUrl(value.url||value.src||value.href||value.image||value.cover||value.art||value.artwork||value.thumbnail||value.picture||value.large)}return ''}
-        function streamCoverCandidate(data){return coverCandidateToUrl(data?.station?.image||data?.station?.cover||data?.station?.artwork||data?.stream?.image||data?.stream?.cover||data?.radio?.image||data?.radio?.cover||data?.server?.image||data?.server?.cover||data?.logo||data?.stationLogo||data?.station_logo)||STREAM_COVER}
-        function trackCoverCandidate(data){return coverCandidateToUrl(data?.now_playing?.song?.art||data?.now_playing?.song?.artwork||data?.now_playing?.song?.image||data?.now_playing?.cover||data?.now_playing?.image||data?.song?.art||data?.song?.artwork||data?.song?.image||data?.track?.art||data?.track?.artwork||data?.track?.image||data?.cover||data?.cover_url||data?.coverUrl||data?.album_art||data?.albumArt||data?.artwork||data?.artwork_url||data?.artworkUrl||data?.image||data?.image_url||data?.imageUrl||data?.thumbnail||data?.picture)}
-        function setCover(url,temporary=false){const next=url||STREAM_COVER;if(!coverImage||next===lastCoverUrl)return;lastCoverUrl=next;coverImage.style.opacity='.18';setTimeout(()=>{coverImage.src=next;coverImage.style.opacity=temporary?'.96':'.84'},120)}
-        function updateCoverFromMetadata(data){baseCoverUrl=streamCoverCandidate(data)||STREAM_COVER;const trackCover=trackCoverCandidate(data);clearTimeout(coverTimer);if(trackCover&&trackCover!==baseCoverUrl){setCover(trackCover,true);coverTimer=setTimeout(()=>setCover(baseCoverUrl,false),10000)}else setCover(baseCoverUrl,false)}
-    
-        function mediaArtworkFor(url){const src=url||lastCoverUrl||baseCoverUrl||STREAM_COVER;return [{src:src,sizes:'192x192',type:src.includes('.jpeg')||src.includes('.jpg')?'image/jpeg':'image/png'},{src:src,sizes:'512x512',type:src.includes('.jpeg')||src.includes('.jpg')?'image/jpeg':'image/png'},{src:'/assets/veluna/icons/icon-512x512.png?v=veluna-v1212',sizes:'512x512',type:'image/png'}]}
-        function updateMediaSession(title,dj,artwork){try{if(!('mediaSession' in navigator)||typeof MediaMetadata==='undefined')return;const cleanTitle=clean(title)||'VELUNA LYVRA WebRadio';const cleanDj=normalizeDj(dj||djText?.textContent||AUTO_DJ_NAME);navigator.mediaSession.metadata=new MediaMetadata({title:cleanTitle,artist:cleanDj,album:'VELUNA / LYVRA / 666SOUNDsDESIGn',artwork:mediaArtworkFor(artwork)});try{navigator.mediaSession.playbackState=(audio&&!audio.paused)?'playing':'paused'}catch(_){}}catch(_){}}
-        function fitFooterLine(){const footer=document.querySelector('.footer');if(!footer)return;footer.style.removeProperty('font-size');let size=parseFloat(getComputedStyle(footer).fontSize)||11;let guard=0;while(footer.scrollWidth>footer.clientWidth&&size>8.5&&guard<12){size-=.5;footer.style.fontSize=size+'px';guard++}}
-        function renderHistory(items){historyList.textContent='';const list=Array.isArray(items)?items:[];if(!list.length){const li=document.createElement('li');li.textContent='No history loaded';historyList.appendChild(li);return}list.slice(0,12).forEach(item=>{const li=document.createElement('li');const raw=firstText(item?.display_title,item?.normalized_title,item?.song,item?.title,item?.track,item?.name,item);li.textContent=cleanTitle(raw)||'Unknown track';historyList.appendChild(li)})}
-        function renderMetaDetail(){if(!metaDetailText)return;const item=currentCandidate();const detail={player:'VELUNA LYVRA Minimal WebRadio',release:'FULLVERSION_VELUNA_GLOBAL_SPLASH_SMART_IPHONE_FOOTER_v1.2.12',track_display:lastTitle,track_raw:firstText(lastMetadata?.raw_title,lastMetadata?.title,lastMetadata?.song,lastMetadata?.songtitle),track_normalized:firstText(lastMetadata?.normalized_title,lastMetadata?.display_title)||lastTitle,dj:djText.textContent,source:selected,candidate:item?.label,bitrate:bitrateText.textContent,listeners:listenersText.textContent,status:streamStatus.textContent,last_update:lastMetadata?new Date(lastMetadata.__veluna_ts).toLocaleString():'none',worker_route:ENDPOINTS.metadata,cover:lastCoverUrl||STREAM_COVER};metaDetailText.textContent=JSON.stringify(detail,null,2)}
-        async function loadRuntime(){try{const response=await fetch(ENDPOINTS.runtime,{cache:'no-store'});if(!response.ok)throw new Error('runtime_http_'+response.status);const data=await response.json();runtime={primary:clean(data.primaryStream)||DEFAULT_DIRECT.primary,backup:clean(data.backupStream||data.emergencyStream)||DEFAULT_DIRECT.backup};chains=buildChains();updateSourceUi()}catch(_){runtime={...DEFAULT_DIRECT};chains=buildChains();updateSourceUi()}}
-        async function fetchMetadata(){try{const response=await fetch(ENDPOINTS.metadata+'?t='+Date.now(),{cache:'no-store'});if(!response.ok)throw new Error('metadata_http_'+response.status);const data=await response.json();lastMetadata=Object.assign({__veluna_ts:Date.now()},data);updateCoverFromMetadata(data);const rawTitle=firstText(data?.display_title,data?.normalized_title,data?.title_display,data?.song,data?.title,data?.songtitle,data?.track,data?.currentSong,data?.current_song,data?.nowplaying,data?.nowPlaying);const rawArtist=firstText(data?.artist,data?.song?.artist,data?.now_playing?.song?.artist);const title=firstText(data?.display_title,data?.normalized_title,data?.title_display)||normalizeDisplayTitle(rawTitle,rawArtist)||'Metadata unavailable';setTicker(title);const count=Number.parseInt(data?.listeners??data?.currentListeners??data?.currentlisteners??0,10);listenersText.textContent=String(Number.isFinite(count)?count:0)+' / '+String(data?.maxlisteners||data?.maxListeners||CAPACITY);const br=data?.bitrate??data?.stream?.bitrate??'Unknown';bitrateText.textContent=br==='Unknown'?'UNKNOWN':String(br).replace(/\s*kbps$/i,'')+' kbps';const liveName=firstText(data?.dj_display,data?.dj,data?.djusername,data?.djstatus,data?.live_dj,data?.streamer,data?.presenter,data?.client,data?.live?.streamer_name,data?.live?.streamer,data?.live?.name);djText.textContent=normalizeDj(liveName);updateMediaSession(title,djText.textContent,lastCoverUrl||baseCoverUrl||STREAM_COVER);renderHistory(data?.history||data?.song_history||data?.played_history||[]);renderMetaDetail();metaText.textContent='METADATA ONLINE';setLamp(metaLamp,'lamp-green')}catch(_){metaText.textContent='METADATA OFFLINE';setLamp(metaLamp,'lamp-red');if(!lastTitle)setTicker('Metadata unavailable');updateMediaSession(lastTitle||'Metadata unavailable',AUTO_DJ_NAME,STREAM_COVER)}}
-        function stopMetadata(){clearInterval(metadataTimer);metadataTimer=0}function startMetadata(){if(metadataTimer)return;fetchMetadata();metadataTimer=setInterval(fetchMetadata,8000)}function clearStall(){clearTimeout(stallTimer);stallTimer=0}function resetAudio(){clearStall();audio.pause();audio.removeAttribute('src');audio.load()}
-    
-        const soundEngine=(()=>{let ctx=null,source=null,gainNode=null,limiterNode=null,analyser=null,data=null,raf=0,syntheticTimer=0,eqNodes=[];let boostStage=loadBoost(),eqState=loadEq();function loadBoost(){try{return clamp(localStorage.getItem(BOOST_KEY)||0,0,5)}catch(_){return 0}}function saveBoost(v){const n=clamp(v,0,5);try{localStorage.setItem(BOOST_KEY,String(n))}catch(_){}return n}function loadEq(){try{return Object.assign({},EQ_DEFAULT,JSON.parse(localStorage.getItem(EQ_KEY)||'{}'))}catch(_){return {...EQ_DEFAULT}}}function saveEq(){try{localStorage.setItem(EQ_KEY,JSON.stringify(eqState))}catch(_){}}
-          function setBars(level,peak=level,sourceType='synthetic'){const bars=[...levelMeter.querySelectorAll('.meter-bar')];levelMeter.dataset.live=level>.035?'1':'0';bars.forEach((bar,i)=>{const center=(bars.length-1)/2;const dist=Math.abs(i-center)/Math.max(1,center);const wave=.52+(1-dist)*.48;const wobble=Math.abs(Math.sin(Date.now()/155+i*.55))*.18;const h=clamp((peak*wave+wobble*(audio.paused ? .18 : .75))*100,10,100);bar.style.height=h.toFixed(1)+'%';bar.style.opacity=audio.paused ? .35 : .58+clamp(level,0,1)*.42});try{window.__MeterBus={ts:Date.now(),level,peak,source:sourceType,veluna:true,eq:Object.values(eqState).map(v=>(Number(v)+12)/24)}}catch(_){}}
-          function renderSynthetic(){const live=audio&&!audio.paused&&audio.readyState>1;const base=live ? .14 : .02;const stage=isMobileLike()?boostStage:0;const lv=live?clamp(base+Math.abs(Math.sin(Date.now()/210))*.42+stage*.025,0,1):.02;setBars(lv,clamp(lv*1.14,0,1),'synthetic')}
-          function frame(){if(!raf)return;if(analyser&&data&&audio&&!audio.paused){try{analyser.getByteTimeDomainData(data);let sum=0;for(let i=0;i<data.length;i++){const x=(data[i]-128)/128;sum+=x*x}const rms=Math.sqrt(sum/data.length);const lv=clamp(rms*2.25,0,1);if(lv>.015)setBars(lv,clamp(lv*1.18,0,1),'real');else renderSynthetic()}catch(_){renderSynthetic()}}else renderSynthetic();raf=requestAnimationFrame(frame)}
-          async function ensure(){if(ctx||!audio)return true;try{const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)throw new Error('no_audio_context');ctx=new AudioCtx();source=ctx.createMediaElementSource(audio);gainNode=ctx.createGain();limiterNode=ctx.createDynamicsCompressor();limiterNode.threshold.value=-2.5;limiterNode.knee.value=1.5;limiterNode.ratio.value=20;limiterNode.attack.value=.003;limiterNode.release.value=.14;analyser=ctx.createAnalyser();analyser.fftSize=128;analyser.smoothingTimeConstant=.82;data=new Uint8Array(analyser.fftSize);eqNodes=EQ_BANDS.map(b=>{const n=ctx.createBiquadFilter();n.type=b.type;n.frequency.value=b.freq;if(n.Q)n.Q.value=b.q;n.gain.value=0;return n});let node=source;eqNodes.forEach(filter=>{node.connect(filter);node=filter});node.connect(gainNode);gainNode.connect(limiterNode);limiterNode.connect(analyser);analyser.connect(ctx.destination);apply();audio.dataset.audioChain='eq-boost-limiter-active';return true}catch(err){ctx=null;source=null;gainNode=null;limiterNode=null;eqNodes=[];audio.dataset.audioChain='webaudio-unavailable';return false}}
-          function apply(){const gains=BOOST_GAINS();const mobile=isMobileLike();const targetGain=mobile?Number(gains[boostStage]||1):1;if(gainNode){try{const now=ctx?.currentTime||0;gainNode.gain.cancelScheduledValues(now);gainNode.gain.setTargetAtTime(targetGain,now,.035)}catch(_){try{gainNode.gain.value=targetGain}catch(__){}}}eqNodes.forEach((node,index)=>{const key=EQ_BANDS[index].key;const value=mobile?clamp(eqState[key]||0,-12,12):0;try{const now=ctx?.currentTime||0;node.gain.cancelScheduledValues(now);node.gain.setTargetAtTime(value,now,.035)}catch(_){try{node.gain.value=value}catch(__){}}});audio.dataset.boostStage=String(mobile?boostStage:0);audio.dataset.boostGain=String(targetGain);try{if(window.SMFPBoostCore&&mobile){window.SMFPBoostCore.saveStage(boostStage);window.SMFPBoostCore.publish(boostStage,targetGain,'veluna-mobile')}}catch(_){};if(mobile&&soundStatus)soundStatus.textContent='EQ → Boost '+boostStage+' · Gain '+targetGain.toFixed(2)+' · Limiter · '+(audio.dataset.audioChain||'chain')}
-          async function resumeCtx(){try{if(ctx&&ctx.state==='suspended')await ctx.resume()}catch(_){}}return {ensure,resume:resumeCtx,start:async()=>{await ensure();await resumeCtx();if(!raf){raf=requestAnimationFrame(frame)}if(!syntheticTimer)syntheticTimer=setInterval(renderSynthetic,220);apply()},stop:()=>{if(raf)cancelAnimationFrame(raf);raf=0;if(syntheticTimer)clearInterval(syntheticTimer);syntheticTimer=0;renderSynthetic()},setBoost:(v)=>{boostStage=saveBoost(v);apply();syncBoostUi();return boostStage},getBoost:()=>boostStage,setEq:(key,val)=>{if(Object.prototype.hasOwnProperty.call(EQ_DEFAULT,key)){eqState[key]=clamp(val,-12,12);saveEq();apply();syncEqUi()}},reset:()=>{boostStage=saveBoost(0);eqState={...EQ_DEFAULT};saveEq();apply();syncBoostUi();syncEqUi()},getEq:()=>({...eqState})};
-        })();
-    
-        function buildMeter(){levelMeter.textContent='';for(let i=0;i<24;i++){const b=document.createElement('span');b.className='meter-bar';levelMeter.appendChild(b)}}
-        function buildBoostUi(){boostRow.textContent='';for(let i=0;i<=5;i++){const btn=document.createElement('button');btn.type='button';btn.className='boost-chip';btn.dataset.boost=String(i);btn.textContent=String(i);btn.addEventListener('click',()=>{void soundEngine.start().then(()=>{soundEngine.setBoost(i);soundStatus.textContent='EQ bleibt aktiv · Boost '+i+' · Gain '+(audio.dataset.boostGain||'1')+' · Limiter';})});boostRow.appendChild(btn)}syncBoostUi()}
-        function syncBoostUi(){const stage=soundEngine.getBoost?Number(soundEngine.getBoost()):0;boostRow.querySelectorAll('.boost-chip').forEach(btn=>btn.classList.toggle('is-active',Number(btn.dataset.boost)===stage))}
-        function syncEqUi(){const eq=soundEngine.getEq?soundEngine.getEq():EQ_DEFAULT;document.querySelectorAll('[data-veluna-eq]').forEach(input=>{const key=input.dataset.velunaEq;input.value=String(clamp(eq[key]||0,-12,12));const out=q(input.id+'Val');if(out)out.textContent=String(input.value)})}
-        document.querySelectorAll('[data-veluna-eq]').forEach(input=>input.addEventListener('input',()=>soundEngine.setEq(input.dataset.velunaEq,input.value),{passive:true}));
-    
-        const audioStartController=window.S666AudioStartCore.create({audio,timeoutMs:6500});
-        async function preparePlayback(reason='Play'){
-          const item=currentCandidate();
-          userStopped=false;
-          updateSourceUi();
-          setStatus('Connecting');
-          setLamp(audioLamp,'lamp-cyan');
-          const nativeStart=audioStartController.start({target:item.url,reason:'veluna-'+reason,muted,isStopped:()=>userStopped});
-          return {item,nativeStart};
-        }
-        async function playCurrent(reason='Play',fromBoot=false){
-          if(switching)return false;
-          switching=true;
-          try{
-            const started=await preparePlayback(reason);
-            setStatus(reason+' · '+started.item.label);
-            await started.nativeStart;
-            await soundEngine.start();
-            hasPlayed=true;
-            setStatus('Playing');
-            setLamp(audioLamp,'lamp-green');
-            setTransportUi('play');
-            updateMediaSession(lastTitle||'VELUNA LYVRA WebRadio',djText.textContent||AUTO_DJ_NAME,lastCoverUrl||baseCoverUrl||STREAM_COVER);
-            startMetadata();
-            if(fromBoot){overlay.classList.add('hidden');bootState.textContent='Audio läuft'}
-            return true;
-          }catch(error){
-            try{audio.dataset.audioStartError=clean(error?.message||error||'audio_error')}catch(_){}
-            setStatus('Audio Error');
-            setLamp(audioLamp,'lamp-red');
-            setTransportUi('stop');
-            if(fromBoot){bootState.textContent='Start fehlgeschlagen. Erneut tippen für die nächste Worker-/Fallback-Stufe.';bootButton.textContent='ERNEUT VERSUCHEN';bootButton.disabled=false;candidateIndex=Math.min(candidateIndex+1,chains[selected].length-1);updateSourceUi()}
-            return false;
-          }finally{switching=false}
-        }
-        async function advanceFallback(reason){if(userStopped||switching)return false;if(candidateIndex+1>=chains[selected].length){setStatus('All Sources Failed');setLamp(audioLamp,'lamp-red');return false}candidateIndex+=1;updateSourceUi();return playCurrent(reason,false)}
-        async function selectSource(next){if(switching)return;selected=next;candidateIndex=0;updateSourceUi();await playCurrent(next==='main'?'Switch Main':'Switch Back',false)}
-        async function getJson(url,init){const r=await fetch(url,Object.assign({cache:'no-store',credentials:'same-origin',headers:{accept:'application/json'}},init||{}));const data=await r.json().catch(()=>({}));return {response:r,data}}
-        async function doSkip(){
-          activeSecureAction='skip';
-          const restoreAudio=protectAudioDuringDialog();
-          skipBtn.classList.add('is-busy');
-          setAction('SKIP: zentraler WebRadio-Controller startet …','is-busy',skipBtn);
-          try{
-            if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function')throw new Error('skip_controller_missing');
-            const result=await window.S666SkipControl.skip({
-              source:'veluna-lyvra-v1211',
-              prompt:'Admin-Passwort für VELUNA Auto-DJ Skip eingeben:'
-            });
-            if(!result||result.ok!==true)throw new Error(result?.error||'skip_failed');
-            setAction('SKIP OK: zentraler Controller bestätigt','is-ok',skipBtn);
-            setTimeout(fetchMetadata,1500);
-          }catch(err){
-            setAction('SKIP FEHLER: '+describeError(err),'is-error',skipBtn);
-          }finally{
-            skipBtn.classList.remove('is-busy');
-            restoreAudio();
-            activeSecureAction='idle';
-          }
-        }
-        function discordPayload(){return {title:lastTitle,track:lastTitle,nowPlaying:lastTitle,dj:djText.textContent||AUTO_DJ_NAME,listeners:listenersText.textContent,bitrate:bitrateText.textContent,playerUrl:location.origin+'/veluna',streamUrl:location.origin+'/stream',artwork:lastCoverUrl||baseCoverUrl||STREAM_COVER,source:'veluna-lyvra-miniplayer-v1211',metadata:lastMetadata||{}}}
-        async function doDiscord(){activeSecureAction='discord';const restoreAudio=protectAudioDuringDialog();discordBtn.classList.add('is-busy');setAction('DISCORD: Shooter-Fenster öffnen …','is-busy',discordBtn);try{if(window.S666DiscordPlayerAddonV3?.messagePost){await window.S666DiscordPlayerAddonV3.messagePost();setAction('DISCORD: Nachricht bereit','is-ok',discordBtn);return}const response=await fetch(ENDPOINTS.discordMessage,{method:'POST',headers:{'content-type':'application/json',accept:'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify(Object.assign(discordPayload(),{message:lastTitle||'VELUNA WebRadio'}))});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok!==true)throw new Error(data.error||data.message||('HTTP '+response.status));setAction('DISCORD: gesendet','is-ok',discordBtn)}catch(err){setAction('DISCORD FEHLER: '+describeError(err),'is-error',discordBtn)}finally{discordBtn.classList.remove('is-busy');restoreAudio();activeSecureAction='idle'}}
-        function openPanel(panel){soundPanel.classList.add('hidden');metaPanel.classList.add('hidden');soundPanel.setAttribute('aria-hidden','true');metaPanel.setAttribute('aria-hidden','true');panel.classList.remove('hidden');panel.setAttribute('aria-hidden','false')}function closePanels(){soundPanel.classList.add('hidden');metaPanel.classList.add('hidden');soundPanel.setAttribute('aria-hidden','true');metaPanel.setAttribute('aria-hidden','true')}
-        async function recoverAfterReturn(source='return'){if(userStopped||!hasPlayed)return;const now=Date.now();if(now-lastRecoveryAt<2400)return;lastRecoveryAt=now;setStatus('Resume');setLamp(audioLamp,'lamp-cyan');await soundEngine.resume();try{if(audio.paused)await audio.play()}catch(_){setStatus('Tap Required');setLamp(audioLamp,'lamp-amber');return}setTimeout(()=>{if(userStopped||!hasPlayed)return;if(audio.readyState<2||audio.networkState===HTMLMediaElement.NETWORK_NO_SOURCE){void playCurrent('Return Reconnect',false)}else{setStatus('Playing');setLamp(audioLamp,'lamp-green')}},1400)}
-    
-        
-        window.addEventListener('s666:admin-auth-overlay',ev=>{const d=ev.detail||{};if(d.state==='open'){try{void soundEngine.resume()}catch(_){}try{if(audio&&!audio.paused)void audio.play()}catch(_){}setAction((activeSecureAction==='discord'?'DISCORD':'SKIP')+': Passwortfenster offen · Audio bleibt aktiv','is-busy',activeSecureAction==='discord'?discordBtn:skipBtn)}else if(d.state==='close'){setTimeout(()=>void recoverAfterReturn('auth-overlay-close'),120)}});
-        window.addEventListener('s666:discord-state',ev=>{const d=ev.detail||{};if(d.phase==='sending')setAction('DISCORD: sendet …','is-busy',discordBtn);else if(d.phase==='success')setAction('DISCORD: gesendet','is-ok',discordBtn);else if(d.phase==='error')setAction('DISCORD FEHLER: '+describeError(d.error),'is-error',discordBtn);else if(d.phase==='status'&&d.ok===false)setAction('DISCORD STATUS: nicht bereit','is-error',discordBtn)});
-        window.addEventListener('s666:skip-state',ev=>{const d=ev.detail||{};if(d.phase==='sending')setAction('SKIP: sendet …','is-busy',skipBtn);else if(d.phase==='success')setAction('SKIP: gesendet','is-ok',skipBtn);else if(d.phase==='error')setAction('SKIP FEHLER: '+describeError(d.error),'is-error',skipBtn)});
-        document.addEventListener('s666:admin-auth-state',ev=>{const d=ev.detail||{};if(d.state==='authenticated')setAction('AUTH: aktiv','is-ok');else if(d.state==='rejected'||d.state==='unreachable')setAction('AUTH FEHLER: '+describeError(d.message||d.error),'is-error')});
-        bootButton.addEventListener('click',()=>{if(switching)return;bootButton.disabled=true;bootState.textContent='Worker-Switch wird gestartet …';void playCurrent('Start',true).then(ok=>{if(!ok)bootButton.disabled=false})});
-        playBtn.addEventListener('click',()=>{setTransportUi('play');void playCurrent('Play',false)});pauseBtn.addEventListener('click',()=>{audioStartController.cancel();audio.pause();stopMetadata();soundEngine.stop();setStatus('Paused');setLamp(audioLamp,'lamp-amber');setTransportUi('pause')});stopBtn.addEventListener('click',()=>{audioStartController.cancel();userStopped=true;switching=false;stopMetadata();soundEngine.stop();resetAudio();setStatus('Stopped');setLamp(audioLamp,'lamp-red');setTransportUi('stop')});reconnectBtn.addEventListener('click',()=>{userStopped=false;setTransportUi('reconnect');void playCurrent('Reconnect',false)});muteBtn.addEventListener('click',()=>{muted=!muted;audio.muted=muted;muteBtn.textContent=muted?'UNMUTE':'MUTE';muteBtn.classList.toggle('is-active',muted);muteBtn.setAttribute('aria-pressed',muted?'true':'false')});primaryBtn.addEventListener('click',()=>void selectSource('main'));backupBtn.addEventListener('click',()=>void selectSource('back'));historyToggle.addEventListener('click',()=>{historyOpen=!historyOpen;historyOverlay.classList.toggle('hidden',!historyOpen);historyToggle.classList.toggle('is-active',historyOpen)});skipBtn.addEventListener('click',()=>void doSkip());discordBtn.addEventListener('click',()=>void doDiscord());soundBtn.addEventListener('click',()=>{openPanel(soundPanel);soundBtn.classList.add('is-active')});metaBtn.addEventListener('click',()=>{renderMetaDetail();openPanel(metaPanel);metaBtn.classList.add('is-active')});soundClose.addEventListener('click',()=>{closePanels();soundBtn.classList.remove('is-active')});metaClose.addEventListener('click',()=>{closePanels();metaBtn.classList.remove('is-active')});soundReset.addEventListener('click',()=>{soundEngine.reset();soundStatus.textContent='Sound neutral zurückgesetzt'});soundApply.addEventListener('click',()=>void soundEngine.start());document.addEventListener('click',ev=>{const b=ev.target?.closest?.('button,.small-btn,.control-btn,.source-led-btn,.tiny-btn');if(b)flashButton(b)},true);
-        audio.addEventListener('playing',()=>{if(userStopped)return;hasPlayed=true;setStatus('Playing');setLamp(audioLamp,'lamp-green');setTransportUi('play');if(!overlay.classList.contains('hidden'))overlay.classList.add('hidden')});audio.addEventListener('waiting',()=>{if(userStopped)return;setStatus('Buffering');setLamp(audioLamp,'lamp-cyan')});audio.addEventListener('stalled',()=>{if(userStopped)return;clearStall();stallTimer=setTimeout(()=>void advanceFallback('Stalled Fallback'),4000)});audio.addEventListener('error',()=>{if(userStopped||switching||!hasPlayed)return;void advanceFallback('Audio Error Fallback')});audio.addEventListener('ended',()=>{if(userStopped)return;void advanceFallback('Stream Ended Fallback')});
-        document.addEventListener('visibilitychange',()=>{if(document.hidden){lastHiddenAt=Date.now()}else void recoverAfterReturn('visibilitychange')});window.addEventListener('pagehide',()=>{lastHiddenAt=Date.now()},{passive:true});window.addEventListener('pageshow',()=>void recoverAfterReturn('pageshow'),{passive:true});window.addEventListener('focus',()=>void recoverAfterReturn('focus'),{passive:true});window.addEventListener('resize',()=>requestAnimationFrame(()=>{syncTickerMotion();fitFooterLine()}),{passive:true});window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(()=>{syncTickerMotion();fitFooterLine()}),{passive:true});window.addEventListener('orientationchange',()=>setTimeout(()=>{syncTickerMotion();fitFooterLine()},250),{passive:true});
-        buildMeter();buildBoostUi();syncEqUi();updateSourceUi();setTransportUi('stop');renderHistory([]);setTicker('Loading metadata...');fitFooterLine();void loadRuntime();void fetchMetadata();soundEngine.stop();
-        // Audio starts directly without a blocking START AUDIO window. Desktop gets an immediate attempt;
-        // iPhone retries on the first normal touch/click anywhere in the player if Safari blocked autoplay.
-        const startWithoutGate=()=>void playCurrent('Automatic Start',false);
-        setTimeout(startWithoutGate,120);
-        let unlockPending=true;
-        const unlockOnNormalInteraction=()=>{if(!unlockPending)return;unlockPending=false;void soundEngine.resume();if(audio.paused&&!userStopped)void playCurrent('iPhone Audio Unlock',false)};
-        document.addEventListener('pointerdown',unlockOnNormalInteraction,{once:true,capture:true,passive:true});
-        document.addEventListener('touchend',unlockOnNormalInteraction,{once:true,capture:true,passive:true});
-      })();
-      </script>
-      <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
-      <script defer src="/js/veluna-ui.js?v=2026-07-19-touch-feedback-v1225"></script>
-    </body>
-    </html>
-    
-  operator: 'match'
-  stack: |-
-    TestContext.<anonymous> (file:///home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/tests/frontend-contracts.test.mjs:241:10)
-    async Test.run (node:internal/test_runner/test:1054:7)
-    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
   ...
 # Subtest: player message overlay is inert when closed and inner dialogs never own viewport geometry
 ok 24 - player message overlay is inert when closed and inner dialogs never own viewport geometry
   ---
-  duration_ms: 10.56492
+  duration_ms: 4.718702
   type: 'test'
   ...
 # Subtest: legacy admin login paths and password headers are hardlocked out
 ok 25 - legacy admin login paths and password headers are hardlocked out
   ---
-  duration_ms: 6.293974
+  duration_ms: 6.975845
   type: 'test'
   ...
 # Subtest: all protected config routes use strict password-issued admin gate
 ok 26 - all protected config routes use strict password-issued admin gate
   ---
-  duration_ms: 1.473168
+  duration_ms: 1.71917
   type: 'test'
   ...
 # Subtest: meter hardlock removes synthetic and Boost-driven level animation
 ok 27 - meter hardlock removes synthetic and Boost-driven level animation
   ---
-  duration_ms: 2.371422
+  duration_ms: 2.494017
   type: 'test'
   ...
 # Subtest: Player Alert hardlock does not bind rate limits to client senderId or expose rateKey
 ok 28 - Player Alert hardlock does not bind rate limits to client senderId or expose rateKey
   ---
-  duration_ms: 1.542425
+  duration_ms: 1.657517
   type: 'test'
   ...
 # Subtest: authorized admin fetch is restricted to the WebRadio origin
 ok 29 - authorized admin fetch is restricted to the WebRadio origin
   ---
-  duration_ms: 0.935957
+  duration_ms: 1.262126
   type: 'test'
   ...
 # Subtest: Player Alert rejects the old text-only request contract
 ok 30 - Player Alert rejects the old text-only request contract
   ---
-  duration_ms: 33.10636
+  duration_ms: 35.051282
   type: 'test'
   ...
 # Subtest: Player Alert accepts message contract and returns a real storage source
 ok 31 - Player Alert accepts message contract and returns a real storage source
   ---
-  duration_ms: 12.857491
+  duration_ms: 10.416917
   type: 'test'
   ...
 # Subtest: Player Alert rate limit uses server-assisted identity
 ok 32 - Player Alert rate limit uses server-assisted identity
   ---
-  duration_ms: 1.010442
+  duration_ms: 1.381385
   type: 'test'
   ...
 # Subtest: cross-origin Player Alert writes are rejected
 ok 33 - cross-origin Player Alert writes are rejected
   ---
-  duration_ms: 7.16441
+  duration_ms: 1.061316
   type: 'test'
   ...
 # Subtest: Player Alert changing senderId cannot bypass the server-controlled rate bucket
 ok 34 - Player Alert changing senderId cannot bypass the server-controlled rate bucket
   ---
-  duration_ms: 10.588296
+  duration_ms: 6.938899
   type: 'test'
   ...
 # Subtest: radio-only release contains no Chaos or Suno worker payloads
 ok 35 - radio-only release contains no Chaos or Suno worker payloads
   ---
-  duration_ms: 113.041208
+  duration_ms: 133.692534
   type: 'test'
   ...
 # Subtest: asset mirrors contain only the referenced production set
 ok 36 - asset mirrors contain only the referenced production set
   ---
-  duration_ms: 3.706612
+  duration_ms: 5.656493
   type: 'test'
   ...
 # Subtest: VELUNA viewport cache bust active: ../veluna/index.html
 ok 37 - VELUNA viewport cache bust active: ../veluna/index.html
   ---
-  duration_ms: 8.593436
+  duration_ms: 10.824396
   type: 'test'
   ...
 # Subtest: VELUNA viewport cache bust active: ../VELUNA/index.html
 ok 38 - VELUNA viewport cache bust active: ../VELUNA/index.html
   ---
-  duration_ms: 2.245123
+  duration_ms: 4.100628
   type: 'test'
   ...
 # Subtest: VELUNA viewport cache bust active: ../public/veluna/index.html
 ok 39 - VELUNA viewport cache bust active: ../public/veluna/index.html
   ---
-  duration_ms: 1.044198
+  duration_ms: 1.984336
   type: 'test'
   ...
 # Subtest: VELUNA viewport cache bust active: ../public/VELUNA/index.html
 ok 40 - VELUNA viewport cache bust active: ../public/VELUNA/index.html
   ---
-  duration_ms: 0.944878
+  duration_ms: 1.512831
   type: 'test'
   ...
 # Subtest: viewport lock follows Safari visible viewport
 ok 41 - viewport lock follows Safari visible viewport
   ---
-  duration_ms: 0.256226
+  duration_ms: 0.354931
   type: 'test'
   ...
 # Subtest: viewport lock root/public mirrors are identical
 ok 42 - viewport lock root/public mirrors are identical
   ---
-  duration_ms: 0.182329
+  duration_ms: 0.223864
   type: 'test'
   ...
 # Subtest: health is operational and does not crash
 ok 43 - health is operational and does not crash
   ---
-  duration_ms: 36.173987
+  duration_ms: 39.932326
   type: 'test'
   ...
 # Subtest: runtime configuration is read from static assets
 ok 44 - runtime configuration is read from static assets
   ---
-  duration_ms: 2.299043
+  duration_ms: 2.336722
   type: 'test'
   ...
 # Subtest: metadata proxy maps AutoDJ to LYVRA DJ and preserves a real live DJ
 ok 45 - metadata proxy maps AutoDJ to LYVRA DJ and preserves a real live DJ
   ---
-  duration_ms: 4.70006
+  duration_ms: 4.931039
   type: 'test'
   ...
 # Subtest: metadata proxy de-duplicates branded titles and prefixes bare titles consistently
 ok 46 - metadata proxy de-duplicates branded titles and prefixes bare titles consistently
   ---
-  duration_ms: 4.556806
+  duration_ms: 5.042196
   type: 'test'
   ...
 # Subtest: debug endpoints are hidden without debug token
 ok 47 - debug endpoints are hidden without debug token
   ---
-  duration_ms: 0.838818
+  duration_ms: 0.781778
   type: 'test'
   ...
 # Subtest: skip compatibility handler exists
 ok 48 - skip compatibility handler exists
   ---
-  duration_ms: 2.105937
+  duration_ms: 1.123349
   type: 'test'
   ...
 # Subtest: unknown API and missing assets return real 404 responses
 ok 49 - unknown API and missing assets return real 404 responses
   ---
-  duration_ms: 7.09132
+  duration_ms: 5.651686
   type: 'test'
   ...
 # Subtest: dark dancer html alias is available
 ok 50 - dark dancer html alias is available
   ---
-  duration_ms: 2.982776
+  duration_ms: 1.582415
   type: 'test'
   ...
 # Subtest: root and CSS are served from ASSETS
 ok 51 - root and CSS are served from ASSETS
   ---
-  duration_ms: 3.11419
+  duration_ms: 2.787255
   type: 'test'
   ...
 # Subtest: VELUNA is canonical and AMARIS player routes are removed
 not ok 52 - VELUNA is canonical and AMARIS player routes are removed
   ---
-  duration_ms: 22.585887
+  duration_ms: 19.749654
   type: 'test'
   location: '/home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/tests/worker-smoke.test.mjs:176:1'
   failureType: 'testCodeFailure'
@@ -1072,7 +741,7 @@ not ok 52 - VELUNA is canonical and AMARIS player routes are removed
 # Subtest: Internal player loads the shared touch feedback authority
 not ok 53 - Internal player loads the shared touch feedback authority
   ---
-  duration_ms: 1.954952
+  duration_ms: 2.770611
   type: 'test'
   location: '/home/runner/work/WebRadio-666SOUNDsDESIGn/WebRadio-666SOUNDsDESIGn/tests/worker-smoke.test.mjs:229:1'
   failureType: 'testCodeFailure'
@@ -1469,15 +1138,15 @@ not ok 53 - Internal player loads the shared touch feedback authority
 # Subtest: internal player serves the inert Player Message overlay authorities
 ok 54 - internal player serves the inert Player Message overlay authorities
   ---
-  duration_ms: 0.406248
+  duration_ms: 0.598705
   type: 'test'
   ...
 1..54
 # tests 54
 # suites 0
-# pass 51
-# fail 3
+# pass 52
+# fail 2
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 364.846795
+# duration_ms 418.791625
