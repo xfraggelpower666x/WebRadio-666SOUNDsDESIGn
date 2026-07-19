@@ -6,6 +6,11 @@ on:
       - audit-live-auth-skip-chain-20260719
     paths:
       - ".github/workflows/audit-production-deploy-status-20260719.yml"
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/audit-production-deploy-status-20260719.yml"
   workflow_dispatch:
 
 permissions:
