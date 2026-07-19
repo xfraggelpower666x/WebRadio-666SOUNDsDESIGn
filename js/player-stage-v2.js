@@ -21,70 +21,32 @@
     state.levels[key]=next;
     return next;
   }
-  function adminAuth(){ return window.S666AdminAuth || null; }
-  function toast(text,mode){
-    var el=q('#s666StageToast');
-    if(!el){
-      el=document.createElement('div');
-      el.id='s666StageToast';
-      el.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2147483640;padding:10px 16px;border-radius:12px;border:1px solid rgba(22,255,243,.5);background:rgba(3,7,20,.97);color:#16fff3;font:900 11px/1.3 ui-monospace,monospace;box-shadow:0 0 22px rgba(22,255,243,.18);opacity:0;transition:opacity .18s';
-      document.body.appendChild(el);
-    }
-    el.textContent=text;
-    el.style.color=mode==='error'?'#ff78cf':'#16fff3';
-    el.style.opacity='1';
-    clearTimeout(el.__t);
-    el.__t=setTimeout(function(){el.style.opacity='0';},3000);
-  }
-
-  async function gateCheck(){
-    var auth=adminAuth();
-    if(!auth)return {ok:false,error:'admin_auth_client_missing'};
-    return auth.check(false);
-  }
-
-  async function withGate(action,message){
-    var auth=adminAuth();
-    if(!auth||typeof auth.ensure!=='function'){
-      toast('Admin-Auth-Client fehlt.','error');
-      return false;
-    }
+  async function openDiscordShooter(){
     try{
-      await auth.ensure({message:message||'Admin-Passwort eingeben:'});
-      return await action();
+      if(window.S666DiscordPlayerAddonV3&&typeof window.S666DiscordPlayerAddonV3.messagePost==='function'){
+        await window.S666DiscordPlayerAddonV3.messagePost();
+        toast('Discord Shooter geöffnet.');
+      }else{
+        throw new Error('discord_addon_not_ready');
+      }
     }catch(e){
-      var code=auth.errorCode?auth.errorCode(e,'auth_failed'):(e&&e.message?e.message:'auth_failed');
-      var text=auth.errorMessage?auth.errorMessage(code):('Admin-Anmeldung fehlgeschlagen: '+code);
-      toast(text,'error');
-      return false;
+      toast(e&&e.message?e.message:'Discord Shooter ist nicht bereit.','error');
     }
   }
 
-  async function protectedDiscord(){
-    return withGate(async function(){
-      try{
-        if(window.S666DiscordPlayerAddonV3&&typeof window.S666DiscordPlayerAddonV3.messagePost==='function'){
-          await window.S666DiscordPlayerAddonV3.messagePost();
-        }else{
-          throw new Error('discord_addon_not_ready');
-        }
-      }catch(e){
-        toast(e&&e.message==='admin_session_required'?'Admin-Sitzung abgelaufen.':'Discord Shooter ist nicht bereit.','error');
-      }
-    },'Admin-Passwort für den Discord Shooter eingeben.');
-  }
-
-  async function protectedSkip(){
-    return withGate(async function(){
-      if(!confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?'))return;
-      if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function'){
-        toast('Auto-DJ Skip ist nicht bereit.','error');
-        return;
-      }
-      var result=await window.S666SkipControl.skip({source:'player-stage-v2'});
-      if(result&&result.ok)toast('AUTO-DJ SKIP ausgeführt.');
-      else toast(result&&result.error?result.error:'Auto-DJ Skip abgelehnt.','error');
-    },'Admin-Passwort für Auto-DJ Skip eingeben.');
+  async function requestSkip(){
+    if(!confirm('Aktuellen Auto-DJ-Titel wirklich überspringen?'))return false;
+    if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function'){
+      toast('Auto-DJ Skip ist nicht bereit.','error');
+      return false;
+    }
+    var result=await window.S666SkipControl.skip({
+      source:'player-stage-v2',
+      prompt:'Admin-Passwort für Auto-DJ Skip eingeben:'
+    });
+    if(result&&result.ok)toast('AUTO-DJ SKIP ausgeführt.');
+    else toast(result&&result.error?result.error:'Auto-DJ Skip abgelehnt.','error');
+    return !!(result&&result.ok);
   }
 
   function makeButton(id,label,action){
@@ -101,10 +63,10 @@
     if(toolbar){
       var d=q('#s666StageDiscord',toolbar);
       if(!d){d=makeButton('s666StageDiscord','DISCORD SHOOTER','discord');toolbar.appendChild(d);}
-      if(!d.__bound){d.__bound=true;d.onclick=protectedDiscord;}
+      if(!d.__bound){d.__bound=true;d.onclick=openDiscordShooter;}
       var s=q('#s666StageSkip',toolbar);
       if(!s){s=makeButton('s666StageSkip','AUTO-DJ SKIP','skip');toolbar.appendChild(s);}
-      if(!s.__bound){s.__bound=true;s.onclick=protectedSkip;}
+      if(!s.__bound){s.__bound=true;s.onclick=requestSkip;}
     }
 
     var mobileSlot=q('#mffApp .mff-discord-slot');
@@ -113,8 +75,8 @@
       row.id='s666StageMobileActions';
       var md=makeButton('s666StageMobileDiscord','DISCORD','discord');
       var ms=makeButton('s666StageMobileSkip','AUTO-DJ SKIP','skip');
-      md.onclick=protectedDiscord;
-      ms.onclick=protectedSkip;
+      md.onclick=openDiscordShooter;
+      ms.onclick=requestSkip;
       row.appendChild(md);
       row.appendChild(ms);
       mobileSlot.appendChild(row);

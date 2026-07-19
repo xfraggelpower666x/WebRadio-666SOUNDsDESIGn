@@ -1,6 +1,6 @@
 /*
  * 666SOUNDsDESIGn authoritative Auto-DJ skip controller.
- * UI is owned by player-stage-v2; this module owns the protected API request.
+ * All players delegate interactive auth and the protected API request to this module.
  */
 (function () {
   'use strict';
@@ -15,6 +15,16 @@
   function normalizeError(response, data) {
     if (data && data.retryAfterMs) return 'Skip-Cooldown: ' + Math.max(1, Math.ceil(Number(data.retryAfterMs) / 1000)) + ' s';
     return String((data && (data.error || data.message)) || (response ? 'HTTP ' + response.status : 'skip_failed'));
+  }
+
+  async function ensureInteractiveAuth(options) {
+    options = options || {};
+    if (!window.S666AdminAuth || typeof window.S666AdminAuth.ensure !== 'function') {
+      throw new Error('admin_auth_client_missing');
+    }
+    return window.S666AdminAuth.ensure({
+      message: options.prompt || 'Admin-Passwort für Auto-DJ Skip eingeben:'
+    });
   }
 
   async function check(force) {
@@ -40,8 +50,10 @@
     if (!window.S666AdminAuth) return { ok: false, error: 'admin_auth_client_missing' };
 
     inFlight = true;
-    dispatch({ phase: 'sending' });
+    dispatch({ phase: 'auth' });
     try {
+      if (options.ensureAuth !== false) await ensureInteractiveAuth(options);
+      dispatch({ phase: 'sending' });
       var payload = { source: options.source || 'player-stage-v2' };
       var result = await postViaAdminAuth('/api/admin/skip', payload);
       var response = result.response;
@@ -71,6 +83,7 @@
 
   window.S666SkipControl = {
     check: check,
+    ensure: ensureInteractiveAuth,
     skip: skip,
     isBusy: function () { return inFlight; }
   };

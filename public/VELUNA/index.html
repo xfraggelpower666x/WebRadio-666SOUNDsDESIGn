@@ -95,14 +95,14 @@
   <script src="/js/boost-core.js?v=2026-07-06-veluna-v126"></script>
   <script src="/js/audio-start-core.js?v=2026-07-12-v1217"></script>
   <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220"></script>
-  <script src="/js/skip-control.js?v=2026-07-06-veluna-v126"></script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v50"></script>
+  <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1"></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-status-v51"></script>
   <script>
   (()=>{
     'use strict';
     const AUTO_DJ_NAME='LYVRA DJ';
     const TITLE_PREFIX='LYVRA is alive · 666SOUNDsDESIGn · ';
-    const ENDPOINTS={main:'/stream',back:'/fallback-stream',metadata:'/api/nowplaying',runtime:'/api/runtime-config/status',skipStatus:'/api/skip/status',skip:'/api/admin/skip',discordManual:'/api/discord/manual',discordMessage:'/api/discord/message'};
+    const ENDPOINTS={main:'/stream',back:'/fallback-stream',metadata:'/api/nowplaying',runtime:'/api/runtime-config/status',discordManual:'/api/discord/manual',discordMessage:'/api/discord/message'};
     const STREAM_COVER='/assets/veluna/covers/veluna-stream-fallback.webp?v=veluna-v1212';
     const DEFAULT_DIRECT={primary:'https://my.idjstream.com/666soundsdesign/stream',backup:'https://my.idjstream.com:8686/stream'};
     const CAPACITY=250;
@@ -210,9 +210,29 @@
     }
     async function advanceFallback(reason){if(userStopped||switching)return false;if(candidateIndex+1>=chains[selected].length){setStatus('All Sources Failed');setLamp(audioLamp,'lamp-red');return false}candidateIndex+=1;updateSourceUi();return playCurrent(reason,false)}
     async function selectSource(next){if(switching)return;selected=next;candidateIndex=0;updateSourceUi();await playCurrent(next==='main'?'Switch Main':'Switch Back',false)}
-    async function ensureAdmin(message='Admin-Passwort eingeben:'){if(!window.S666AdminAuth||typeof window.S666AdminAuth.ensure!=='function')throw new Error('admin_auth_client_missing');return window.S666AdminAuth.ensure({message})}
     async function getJson(url,init){const r=await fetch(url,Object.assign({cache:'no-store',credentials:'same-origin',headers:{accept:'application/json'}},init||{}));const data=await r.json().catch(()=>({}));return {response:r,data}}
-    async function doSkip(){activeSecureAction='skip';const restoreAudio=protectAudioDuringDialog();skipBtn.classList.add('is-busy');setAction('SKIP: WebRadio-Auth läuft …','is-busy',skipBtn);try{await ensureAdmin('Admin-Passwort für VELUNA Auto-DJ Skip eingeben:');let status=null;try{status=await getJson(ENDPOINTS.skipStatus+'?t='+Date.now())}catch(_){}if(status&&status.data&&status.data.configured===false)setAction('SKIP: Worker erreichbar, Skip-Upstream nicht konfiguriert','is-error',skipBtn);setAction('SKIP: sende an /api/admin/skip …','is-busy',skipBtn);const r=await window.S666AdminAuth.fetch(ENDPOINTS.skip,{method:'POST',headers:{'content-type':'application/json',accept:'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify({source:'veluna-lyvra-v1211',route:ENDPOINTS.skip,canonical:'webradio-worker'})});const data=await r.json().catch(()=>({}));const ok=r.ok&&(data.ok===true||data.success===true||data.status==='ok');if(!ok)throw new Error(data.error||data.message||('HTTP '+r.status));setAction('SKIP OK: /api/admin/skip bestätigt','is-ok',skipBtn);setTimeout(fetchMetadata,1500)}catch(err){setAction('SKIP FEHLER: '+describeError(err),'is-error',skipBtn)}finally{skipBtn.classList.remove('is-busy');restoreAudio();activeSecureAction='idle'}}
+    async function doSkip(){
+      activeSecureAction='skip';
+      const restoreAudio=protectAudioDuringDialog();
+      skipBtn.classList.add('is-busy');
+      setAction('SKIP: zentraler WebRadio-Controller startet …','is-busy',skipBtn);
+      try{
+        if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function')throw new Error('skip_controller_missing');
+        const result=await window.S666SkipControl.skip({
+          source:'veluna-lyvra-v1211',
+          prompt:'Admin-Passwort für VELUNA Auto-DJ Skip eingeben:'
+        });
+        if(!result||result.ok!==true)throw new Error(result?.error||'skip_failed');
+        setAction('SKIP OK: zentraler Controller bestätigt','is-ok',skipBtn);
+        setTimeout(fetchMetadata,1500);
+      }catch(err){
+        setAction('SKIP FEHLER: '+describeError(err),'is-error',skipBtn);
+      }finally{
+        skipBtn.classList.remove('is-busy');
+        restoreAudio();
+        activeSecureAction='idle';
+      }
+    }
     function discordPayload(){return {title:lastTitle,track:lastTitle,nowPlaying:lastTitle,dj:djText.textContent||AUTO_DJ_NAME,listeners:listenersText.textContent,bitrate:bitrateText.textContent,playerUrl:location.origin+'/veluna',streamUrl:location.origin+'/stream',artwork:lastCoverUrl||baseCoverUrl||STREAM_COVER,source:'veluna-lyvra-miniplayer-v1211',metadata:lastMetadata||{}}}
     async function doDiscord(){activeSecureAction='discord';const restoreAudio=protectAudioDuringDialog();discordBtn.classList.add('is-busy');setAction('DISCORD: Shooter-Fenster öffnen …','is-busy',discordBtn);try{if(window.S666DiscordPlayerAddonV3?.messagePost){await window.S666DiscordPlayerAddonV3.messagePost();setAction('DISCORD: Nachricht bereit','is-ok',discordBtn);return}const response=await fetch(ENDPOINTS.discordMessage,{method:'POST',headers:{'content-type':'application/json',accept:'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify(Object.assign(discordPayload(),{message:lastTitle||'VELUNA WebRadio'}))});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok!==true)throw new Error(data.error||data.message||('HTTP '+response.status));setAction('DISCORD: gesendet','is-ok',discordBtn)}catch(err){setAction('DISCORD FEHLER: '+describeError(err),'is-error',discordBtn)}finally{discordBtn.classList.remove('is-busy');restoreAudio();activeSecureAction='idle'}}
     function openPanel(panel){soundPanel.classList.add('hidden');metaPanel.classList.add('hidden');soundPanel.setAttribute('aria-hidden','true');metaPanel.setAttribute('aria-hidden','true');panel.classList.remove('hidden');panel.setAttribute('aria-hidden','false')}function closePanels(){soundPanel.classList.add('hidden');metaPanel.classList.add('hidden');soundPanel.setAttribute('aria-hidden','true');metaPanel.setAttribute('aria-hidden','true')}
