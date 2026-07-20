@@ -1,6 +1,25 @@
 name: Live Player Smoke
 
 on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/live-player-smoke.yml"
+      - "index.html"
+      - "public/index.html"
+      - "VELUNA/index.html"
+      - "veluna/index.html"
+      - "public/VELUNA/index.html"
+      - "public/veluna/index.html"
+      - "js/equalizer.js"
+      - "public/js/equalizer.js"
+      - "js/player-stage-v2.js"
+      - "public/js/player-stage-v2.js"
+      - "css/player-stage-v2.css"
+      - "public/css/player-stage-v2.css"
+      - "css/veluna-theme.css"
+      - "public/css/veluna-theme.css"
   pull_request:
     paths:
       - ".github/workflows/live-player-smoke.yml"
