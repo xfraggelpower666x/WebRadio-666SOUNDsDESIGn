@@ -1,0 +1,87 @@
+name: Live Player Smoke
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/live-player-smoke.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-player-smoke
+  cancel-in-progress: false
+
+jobs:
+  production-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BASE_URL: https://webradio.666soundsdesign-broadcaster.com
+    steps:
+      - name: Check live routes and repaired assets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+
+          fetch_live() {
+            local path="$1"
+            local output="$2"
+            local attempt code url
+
+            for attempt in $(seq 1 18); do
+              url="${BASE_URL}${path}"
+              if [[ "$url" == *\?* ]]; then
+                url="${url}&smoke=${GITHUB_SHA}-${attempt}"
+              else
+                url="${url}?smoke=${GITHUB_SHA}-${attempt}"
+              fi
+
+              code="$(curl \
+                --silent \
+                --show-error \
+                --location \
+                --connect-timeout 10 \
+                --max-time 35 \
+                --header 'Cache-Control: no-cache' \
+                --header 'Pragma: no-cache' \
+                --output "$output" \
+                --write-out '%{http_code}' \
+                "$url" || true)"
+
+              if [[ "$code" == "200" && -s "$output" ]]; then
+                echo "PASS ${path} (${code}, $(wc -c < "$output") bytes)"
+                return 0
+              fi
+
+              echo "WAIT ${path}: attempt ${attempt}/18 returned ${code:-curl_error}"
+              sleep 10
+            done
+
+            echo "FAIL ${path}: production did not return a usable HTTP 200 response" >&2
+            return 1
+          }
+
+          fetch_live "/" "$workdir/root.html"
+          fetch_live "/veluna/" "$workdir/veluna.html"
+          fetch_live "/js/equalizer.js" "$workdir/equalizer.js"
+          fetch_live "/js/player-stage-v2.js" "$workdir/player-stage-v2.js"
+          fetch_live "/css/player-stage-v2.css" "$workdir/player-stage-v2.css"
+          fetch_live "/css/veluna-theme.css" "$workdir/veluna-theme.css"
+
+          grep -Fq "Root Main Player" "$workdir/root.html"
+          grep -Fq 'data-veluna-page="veluna"' "$workdir/veluna.html"
+          grep -Fq "canonical audio visualizer authority" "$workdir/equalizer.js"
+          grep -Fq "__S666_PLAYER_STAGE_V2_CORRECTION__" "$workdir/player-stage-v2.js"
+          grep -Fq -- "--s666-side-panel-width:clamp(220px" "$workdir/player-stage-v2.css"
+          grep -Fq "margin:6px auto!important" "$workdir/player-stage-v2.css"
+          grep -Fq "align-items:center!important;justify-content:center!important" "$workdir/veluna-theme.css"
+          grep -Fq "height:clamp(76px,10vh,96px)!important" "$workdir/veluna-theme.css"
+
+          echo "LIVE PLAYER SMOKE PASS"
