@@ -13,7 +13,7 @@ test('shared asset config bootstraps the design-neutral overlay core once', asyn
   assert.match(config, /\/core\/overlay\/overlay-core\.js/);
   assert.match(config, /window\.SMFPOverlayCore\?\.scanOverlays/);
   assert.match(config, /document\.querySelector\('script\[src\*=/);
-  assert.doesNotMatch(config, /style\.setProperty|background:|border-color:|box-shadow:/);
+  assert.doesNotMatch(config, /style\.setProperty|style\.cssText|border-color:|box-shadow:/);
 });
 
 test('main, VELUNA and internal player all load the shared asset config', async () => {
