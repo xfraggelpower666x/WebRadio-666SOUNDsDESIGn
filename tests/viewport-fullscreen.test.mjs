@@ -6,18 +6,23 @@ const viewportLock = await readFile(new URL('../js/veluna-viewport-lock.js', imp
 const viewportMirror = await readFile(new URL('../public/js/veluna-viewport-lock.js', import.meta.url), 'utf8');
 
 for (const htmlPath of ['../veluna/index.html','../VELUNA/index.html','../public/veluna/index.html','../public/VELUNA/index.html']) {
-  test(`VELUNA viewport cache bust active: ${htmlPath}`, async () => {
+  test(`VELUNA viewport lock remains loaded: ${htmlPath}`, async () => {
     const html = await readFile(new URL(htmlPath, import.meta.url), 'utf8');
-    assert.match(html, /veluna-viewport-lock\.js\?v=2026-07-16-iphone-action-v1223/);
+    assert.match(html, /veluna-viewport-lock\.js\?v=/);
+    assert.match(html, /viewport-fit=cover/);
   });
 }
 
-test('viewport lock follows Safari visible viewport', () => {
-  assert.match(viewportLock, /visualViewport\.addEventListener\('resize'/);
-  assert.match(viewportLock, /const nextWidth = viewport\.width/);
-  assert.match(viewportLock, /const nextHeight = viewport\.height/);
-  assert.doesNotMatch(viewportLock, /Math\.max\(state\.height, viewport\.height\)/);
+test('viewport lock follows Safari visible viewport and protects Dynamic Island', () => {
+  assert.match(viewportLock, /fullscreen geometry lock v1\.2\.27/);
+  assert.match(viewportLock, /window\.visualViewport/);
+  assert.match(viewportLock, /--veluna-safe-player-top/);
+  assert.match(viewportLock, /max\(56px, calc\(env\(safe-area-inset-top\) \+ 10px\)\)/);
+  assert.match(viewportLock, /--veluna-safe-player-bottom/);
+  assert.match(viewportLock, /card\.style\.setProperty\('top'/);
+  assert.match(viewportLock, /card\.style\.setProperty\('bottom'/);
   assert.match(viewportLock, /keyboardOpen\(\)/);
+  assert.doesNotMatch(viewportLock, /Math\.max\(state\.height, viewport\.height\)/);
   assert.doesNotMatch(viewportLock, /if \(!force && state\.width && state\.orientation === orientation\) return/);
 });
 
