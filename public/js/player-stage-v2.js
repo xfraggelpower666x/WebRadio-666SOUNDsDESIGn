@@ -1,17 +1,25 @@
 /*
- * 666SOUNDsDESIGn Player Stage V8
- * Zuständigkeit: Touchfeedback, geschützte Aktionsbuttons, Ticker und Status-LEDs.
- * Der Audio-Visualizer bleibt alleiniger Writer für EQ, Seitenmeter und Bottom-Meter.
+ * 666SOUNDsDESIGn Player Stage V9
+ * Touchfeedback, protected actions, ticker, status LEDs and side-module consumption.
+ * The audio visualizer remains the only writer for EQ, side meters and bottom meter.
  */
 (function(){
   'use strict';
   if(window.__S666_PLAYER_STAGE_V2_CORRECTION__) return;
-  window.__S666_PLAYER_STAGE_V2_CORRECTION__ = true;
+  window.__S666_PLAYER_STAGE_V2_CORRECTION__=true;
 
-  var state={bus:null,lastDrive:0};
+  var state={bus:null,lastDrive:0,energy:.08,peak:.10,pulse:.06};
   function q(selector,root){return (root||document).querySelector(selector);}
   function qa(selector,root){return Array.from((root||document).querySelectorAll(selector));}
   function clamp(value,min,max){value=Number(value)||0;return Math.max(min,Math.min(max,value));}
+  function average(values,start,end,fallback){
+    if(!Array.isArray(values)||!values.length) return fallback;
+    var from=Math.max(0,Math.min(values.length-1,Math.floor(start)));
+    var to=Math.max(from+1,Math.min(values.length,Math.ceil(end)));
+    var total=0,count=0;
+    for(var index=from;index<to;index+=1){total+=clamp(values[index],0,1);count+=1;}
+    return count?total/count:fallback;
+  }
 
   function toast(message,type){
     var host=q('#actionText')||q('#actionStatus')||q('[role="status"]');
@@ -151,6 +159,52 @@
     document.documentElement.style.setProperty('--s666-stage-peak',peak.toFixed(3));
   }
 
+  function driveSideModules(bus){
+    if(!bus||typeof bus!=='object') return;
+    var root=document.documentElement;
+    var rawLevel=clamp(bus.level,0,1);
+    var rawPeak=clamp(bus.peak==null?rawLevel:bus.peak,0,1);
+    var rawPulse=clamp(bus.pulse==null?Math.max(0,rawPeak-rawLevel):bus.pulse,0,1);
+    state.energy+=(rawLevel-state.energy)*(rawLevel>state.energy ? .62 : .20);
+    state.peak=Math.max(rawPeak,state.peak*.88);
+    state.pulse+=(rawPulse-state.pulse)*(rawPulse>state.pulse ? .72 : .24);
+
+    var eq=Array.isArray(bus.eq)?bus.eq:[];
+    var low=average(eq,0,eq.length*.34,state.energy);
+    var mid=average(eq,eq.length*.25,eq.length*.72,state.energy);
+    var high=average(eq,eq.length*.62,eq.length,state.peak);
+    var left=Array.isArray(bus.left)?bus.left:[];
+    var right=Array.isArray(bus.right)?bus.right:[];
+    var l1=clamp(left[0]==null?low:left[0],.03,1);
+    var l2=clamp(left[1]==null?mid:left[1],.03,1);
+    var r1=clamp(right[0]==null?high:right[0],.03,1);
+    var r2=clamp(right[1]==null?state.peak:right[1],.03,1);
+    var stamp=Number(bus.ts)||Date.now();
+    var angle=-28+state.energy*48+Math.sin(stamp/620)*12;
+    var phaseX=50+Math.sin(stamp/710)*18*state.energy;
+    var phaseY=50+Math.cos(stamp/590)*16*state.peak;
+
+    root.style.setProperty('--pc-addon-energy',state.energy.toFixed(3));
+    root.style.setProperty('--pc-addon-peak',state.peak.toFixed(3));
+    root.style.setProperty('--pc-addon-pulse',state.pulse.toFixed(3));
+    root.style.setProperty('--pc-addon-glow',(12+state.peak*34).toFixed(1)+'px');
+    root.style.setProperty('--pc-addon-vu-l1',l1.toFixed(3));
+    root.style.setProperty('--pc-addon-vu-l2',l2.toFixed(3));
+    root.style.setProperty('--pc-addon-vu-r1',r1.toFixed(3));
+    root.style.setProperty('--pc-addon-vu-r2',r2.toFixed(3));
+    root.style.setProperty('--pc-addon-phase-angle',angle.toFixed(2)+'deg');
+    root.style.setProperty('--pc-addon-phase-scale',(0.78+mid*.42).toFixed(3));
+    root.style.setProperty('--pc-phase-x',phaseX.toFixed(2)+'%');
+    root.style.setProperty('--pc-phase-y',phaseY.toFixed(2)+'%');
+    root.style.setProperty('--pc-phase-line-y',((mid-.5)*18).toFixed(2)+'px');
+    root.style.setProperty('--pc-phase-grid-angle',(70+high*55).toFixed(2)+'deg');
+    root.style.setProperty('--pc-phase-grid-scale',(0.86+state.energy*.30).toFixed(3));
+
+    var percent=Math.round(clamp(state.energy*.74+state.peak*.26,0,1)*100);
+    var reactor=q('#pcLeftFxAddon .pc-addon-module-reactor footer b');
+    if(reactor) reactor.textContent=String(percent)+'%';
+  }
+
   function drive(bus){
     if(!bus||typeof bus!=='object') return;
     state.bus=bus;
@@ -158,6 +212,7 @@
     if(now-state.lastDrive<28) return;
     state.lastDrive=now;
     driveSideLeds(bus);
+    driveSideModules(bus);
   }
 
   function installMeterBusHook(){
@@ -196,6 +251,10 @@
     requestAnimationFrame(function(){
       var boxWidth=Math.max(1,box.clientWidth);
       var textWidth=Math.max(1,element.scrollWidth);
+      if(textWidth<=boxWidth-18){
+        element.style.transform='translateX(0px)';
+        return;
+      }
       var duration=Math.max(12000,Math.min(32000,(boxWidth+textWidth)*27));
       if(typeof element.animate==='function'){
         ticker.animation=element.animate(
@@ -217,8 +276,8 @@
       ticker.observer.observe(element,{childList:true,characterData:true,subtree:true});
       if(meta) ticker.observer.observe(meta,{childList:true,characterData:true,subtree:true});
     }
-    if(!window.__S666_TICKER_V8_RESIZE__){
-      window.__S666_TICKER_V8_RESIZE__=true;
+    if(!window.__S666_TICKER_V9_RESIZE__){
+      window.__S666_TICKER_V9_RESIZE__=true;
       window.addEventListener('resize',function(){clearTimeout(ticker.timer);ticker.timer=setTimeout(restartTicker,120);},{passive:true});
     }
   }

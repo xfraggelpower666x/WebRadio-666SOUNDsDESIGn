@@ -1,7 +1,7 @@
 /*
  * 666SOUNDsDESIGn canonical audio visualizer authority.
- * One WebAudio graph, one RAF writer for EQ, side meters and bottom meter.
- * Desktop reactivity repair: continuous center, faster attack, controlled release.
+ * One WebAudio graph and one RAF writer for EQ, side meters and bottom meter.
+ * V9 performance repair: transform-only EQ, no per-bar layout reads and RAF fallback.
  */
 
 const BOOST_MULTIPLIERS = (window.SMFPBoostCore && window.SMFPBoostCore.stages)
@@ -144,13 +144,17 @@ export function createBars(container, count = 24) {
     slot.style.overflow = 'hidden';
     const fill = document.createElement('div');
     fill.className = 'eq-bar-fill';
-    fill.style.height = '18px';
+    fill.style.height = '100%';
+    fill.style.setProperty('--eq-scale', '0.08');
     slot.appendChild(fill);
     container.appendChild(slot);
     bars.push(fill);
   }
   return bars;
 }
+
+const meterRenderCache = new WeakMap();
+const bottomRenderCache = new WeakMap();
 
 function applyMeters(targets, values, side) {
   targets.forEach((element, index) => {
@@ -160,9 +164,11 @@ function applyMeters(targets, values, side) {
       ? (index === 0 ? 0 : index === 1 ? -5 : -10)
       : (index === 2 ? 0 : index === 1 ? -5 : -10);
     const value = clamp((Number(source) || 0) * 100 + offset, 6, 100);
-    element.style.height = `${value.toFixed(1)}%`;
-    element.style.opacity = (0.30 + value / 142).toFixed(2);
-    element.style.filter = `brightness(${(1 + value / 128).toFixed(2)}) saturate(${(1 + value / 115).toFixed(2)})`;
+    const quantized = Math.round(value * 2) / 2;
+    if (meterRenderCache.get(element) === quantized) return;
+    meterRenderCache.set(element, quantized);
+    element.style.height = `${quantized.toFixed(1)}%`;
+    element.style.opacity = (0.30 + quantized / 142).toFixed(2);
   });
 }
 
@@ -177,11 +183,14 @@ function applyBottomMeter(segments, level, peak, pulse) {
     const active = distance <= width;
     const local = active ? clamp(1 - distance / Math.max(1, width), 0, 1) : 0;
     const value = active ? clamp(0.22 + local * 0.58 + pulse * 0.20, 0, 1) : 0.04;
+    const quantized = Math.round(value * 25) / 25;
+    const cacheKey = `${active ? 1 : 0}:${quantized.toFixed(2)}`;
+    if (bottomRenderCache.get(element) === cacheKey) return;
+    bottomRenderCache.set(element, cacheKey);
     element.classList.toggle('is-on', active);
-    element.style.opacity = (0.12 + value * 0.88).toFixed(2);
-    element.style.transform = `scaleY(${(0.34 + value * 0.74).toFixed(3)})`;
-    element.style.filter = `brightness(${(1 + value * 0.94).toFixed(2)}) saturate(${(1 + value * 0.82).toFixed(2)})`;
-    element.style.setProperty('--v', value.toFixed(3));
+    element.style.opacity = (0.12 + quantized * 0.88).toFixed(2);
+    element.style.transform = `scaleY(${(0.34 + quantized * 0.74).toFixed(3)})`;
+    element.style.setProperty('--v', quantized.toFixed(3));
   });
 }
 
@@ -193,7 +202,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   let data = null;
   let timeData = null;
   let rafId = 0;
-  let fallbackTimer = 0;
+  let fallbackRafId = 0;
   let running = false;
   let boostStage = 0;
   let weakFrames = 0;
@@ -203,17 +212,15 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   let bandEnvelope = [];
 
   const mobileLike = () => window.innerWidth <= 860;
-  const slotHeight = (bar) => {
-    const measured = bar?.parentElement?.clientHeight || bar?.parentElement?.getBoundingClientRect?.().height || 0;
-    return Math.max(mobileLike() ? 96 : 150, measured || (mobileLike() ? 112 : 190));
-  };
   const setBar = (bar, normalized) => {
     if (!bar) return;
-    const maxHeight = Math.max(26, slotHeight(bar) - 4);
     const value = clamp(normalized, 0, 1);
-    bar.style.height = `${(16 + value * (maxHeight - 16)).toFixed(1)}px`;
-    bar.style.opacity = (0.38 + value * 0.62).toFixed(2);
-    bar.style.filter = `brightness(${(1 + value * 0.88).toFixed(2)}) saturate(${(1 + value * 0.96).toFixed(2)})`;
+    const scale = clamp(0.075 + value * 0.925, 0.075, 1);
+    const quantized = Math.round(scale * 1000) / 1000;
+    if (bar.__s666EqScale === quantized) return;
+    bar.__s666EqScale = quantized;
+    bar.style.setProperty('--eq-scale', quantized.toFixed(3));
+    bar.style.opacity = (0.42 + value * 0.58).toFixed(2);
   };
 
   const setMeters = (level, peak, low, mid, high) => {
@@ -256,38 +263,46 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     };
   };
 
-  const fallbackValue = (index, total, intensity) => {
+  const fallbackValue = (index, total, intensity, timestamp = performance.now()) => {
     const half = Math.max(1, Math.floor(total / 2));
     const mirrored = index < half ? index : total - 1 - index;
-    const t = Date.now() / 155;
+    const t = timestamp / 155;
     const a = Math.abs(Math.sin(t + mirrored * 0.31));
     const b = Math.abs(Math.sin(t * 0.63 + mirrored * 0.18));
     const broad = Math.abs(Math.sin(t * 0.41 + mirrored * 0.08));
     return clamp((0.10 + a * 0.53 + b * 0.19 + broad * 0.12) * intensity, 0.04, 1);
   };
 
-  const renderFallback = (fromInterval = false) => {
+  const renderFallbackFrame = (timestamp = performance.now()) => {
+    if (!running) return;
     const live = !!(audio && !audio.paused && !audio.ended);
     const intensity = live ? 1 : 0.28;
     const eq = bars.map((bar, index) => {
-      const value = fallbackValue(index, bars.length, intensity);
+      const value = fallbackValue(index, bars.length, intensity, timestamp);
       setBar(bar, value);
       return value;
     });
-    const level = live ? 0.28 + Math.abs(Math.sin(Date.now() / 225)) * 0.58 : 0.10 + Math.abs(Math.sin(Date.now() / 340)) * 0.12;
+    const level = live ? 0.28 + Math.abs(Math.sin(timestamp / 225)) * 0.58 : 0.10 + Math.abs(Math.sin(timestamp / 340)) * 0.12;
     const peak = clamp(level * 1.15, 0, 1);
-    const low = eq.length ? eq.slice(0, Math.ceil(eq.length * 0.35)).reduce((a, b) => a + b, 0) / Math.ceil(eq.length * 0.35) : level;
+    const lowCount = Math.max(1, Math.ceil(eq.length * 0.35));
+    const highStart = Math.floor(eq.length * 0.65);
+    const low = eq.length ? eq.slice(0, lowCount).reduce((a, b) => a + b, 0) / lowCount : level;
     const mid = level;
-    const high = eq.length ? eq.slice(Math.floor(eq.length * 0.65)).reduce((a, b) => a + b, 0) / Math.max(1, eq.length - Math.floor(eq.length * 0.65)) : level;
+    const high = eq.length ? eq.slice(highStart).reduce((a, b) => a + b, 0) / Math.max(1, eq.length - highStart) : level;
     const meters = setMeters(level, peak, low, mid, high);
     publish(level, peak, 'synthetic', eq, meters);
-    if (!fromInterval && !fallbackTimer) fallbackTimer = window.setInterval(() => renderFallback(true), 90);
+    fallbackRafId = window.requestAnimationFrame(renderFallbackFrame);
+  };
+
+  const startFallback = () => {
+    if (fallbackRafId) return;
+    fallbackRafId = window.requestAnimationFrame(renderFallbackFrame);
   };
 
   const stopFallback = () => {
-    if (!fallbackTimer) return;
-    window.clearInterval(fallbackTimer);
-    fallbackTimer = 0;
+    if (!fallbackRafId) return;
+    window.cancelAnimationFrame(fallbackRafId);
+    fallbackRafId = 0;
   };
 
   const setBoostStage = (stage = 0) => {
@@ -330,7 +345,8 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   };
 
   const idleState = () => {
-    bars.forEach((bar, index) => setBar(bar, 0.07 + fallbackValue(index, bars.length, 0.12)));
+    const timestamp = performance.now();
+    bars.forEach((bar, index) => setBar(bar, 0.07 + fallbackValue(index, bars.length, 0.12, timestamp)));
     const meters = setMeters(0.08, 0.10, 0.08, 0.08, 0.08);
     publish(0.08, 0.10, 'synthetic', bars.map(() => 0.08), meters);
   };
@@ -341,7 +357,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     ctx = new AudioCtx();
     analyser = ctx.createAnalyser();
     analyser.fftSize = mobileLike() ? 128 : 512;
-    analyser.smoothingTimeConstant = mobileLike() ? 0.82 : 0.62;
+    analyser.smoothingTimeConstant = mobileLike() ? 0.82 : 0.58;
     analyser.minDecibels = -92;
     analyser.maxDecibels = -18;
     data = new Uint8Array(analyser.frequencyBinCount);
@@ -366,7 +382,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     analyser.connect(ctx.destination);
     applyRealEqToNodes();
 
-    const frame = () => {
+    const frame = (timestamp = performance.now()) => {
       if (!running) return;
       analyser.getByteFrequencyData(data);
       analyser.getByteTimeDomainData(timeData);
@@ -401,9 +417,9 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         const spectral = Math.pow(clamp(value / 255, 0, 1), 0.62);
         const centerSupport = 0.07 + Math.pow(globalMean / 255, 0.72) * (0.18 + index / Math.max(1, halfBars - 1) * 0.12);
         let target = clamp(spectral * 1.20 + centerSupport, 0.04, 1);
-        if (useHybrid) target = Math.max(target, fallbackValue(index, halfBars * 2, audio.paused ? 0.25 : 0.66));
+        if (useHybrid) target = Math.max(target, fallbackValue(index, halfBars * 2, audio.paused ? 0.25 : 0.66, timestamp));
         const previous = bandEnvelope[index] || 0;
-        bandEnvelope[index] = previous + (target - previous) * (target > previous ? 0.76 : 0.23);
+        bandEnvelope[index] = previous + (target - previous) * (target > previous ? 0.68 : 0.18);
         return bandEnvelope[index];
       });
       const eq = [];
@@ -415,14 +431,14 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       });
       let sumSq = 0;
       let samplePeak = 0;
-      timeData.forEach((sample) => {
-        const value = (sample - 128) / 128;
+      for (let index = 0; index < timeData.length; index += 1) {
+        const value = (timeData[index] - 128) / 128;
         sumSq += value * value;
         samplePeak = Math.max(samplePeak, Math.abs(value));
-      });
+      }
       const rms = Math.sqrt(sumSq / Math.max(1, timeData.length));
       const level = useHybrid
-        ? clamp(0.22 + Math.abs(Math.sin(Date.now() / 310)) * 0.34, 0, 1)
+        ? clamp(0.22 + Math.abs(Math.sin(timestamp / 310)) * 0.34, 0, 1)
         : clamp(rms * 2.25, 0, 1);
       const peak = useHybrid ? clamp(level * 1.16, 0, 1) : clamp(Math.max(samplePeak * 1.08, level), 0, 1);
       const sliceAverage = (start, end, fallback) => {
@@ -443,7 +459,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
         stopFallback();
         if (ctx?.state === 'suspended') await ctx.resume();
         setBoostStage(boostStage);
-        if (!rafId) frame();
+        if (!rafId) rafId = window.requestAnimationFrame(frame);
       },
       stop: () => {
         running = false;
@@ -460,8 +476,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     return {
       start: async () => {
         running = true;
-        stopFallback();
-        renderFallback(false);
+        startFallback();
       },
       stop: () => {
         running = false;
