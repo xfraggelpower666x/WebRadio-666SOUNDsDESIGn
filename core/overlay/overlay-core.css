@@ -2,33 +2,101 @@
 ==========================================
 DATEI: core/overlay/overlay-core.css
 ERSTELLT: 2026-05-19
-GEÄNDERT: 2026-05-19
+GEÄNDERT: 2026-07-20
 ZWECK:
-- Zentraler Overlay-Basisschutz für iPhone/PC.
-- Keine neuen sichtbaren Layer, keine Layout-Umbauten.
-- Verhindert iOS-Zoomsprünge bei Textarea/Input in bestehenden Overlays.
+- Zentraler Overlay-Safe-Area-Vertrag für alle Player.
+- Nur Geometrie, Zentrierung, Scrollbarkeit und Close-Sichtbarkeit.
+- Kein Überschreiben von Farben, Hintergründen, Rahmen oder Typografie.
 ==========================================
 */
 :root{
   --smfp-overlay-z-backdrop:2147483200;
   --smfp-overlay-z-panel:2147483300;
+  --smfp-overlay-safe-top:max(12px,env(safe-area-inset-top));
+  --smfp-overlay-safe-right:max(12px,env(safe-area-inset-right));
+  --smfp-overlay-safe-bottom:max(12px,env(safe-area-inset-bottom));
+  --smfp-overlay-safe-left:max(12px,env(safe-area-inset-left));
+  --smfp-overlay-vv-height:100dvh;
+  --smfp-overlay-vv-width:100dvw;
+  --smfp-overlay-vv-top:0px;
+  --smfp-overlay-vv-left:0px;
 }
 html.smfp-overlay-locked,
 body.smfp-overlay-locked{
   overscroll-behavior:none!important;
+  overflow:hidden!important;
 }
-@media (max-width:760px){
+.smfp-overlay-managed{
+  position:fixed!important;
+  left:var(--smfp-overlay-vv-left,0px)!important;
+  top:var(--smfp-overlay-vv-top,0px)!important;
+  width:var(--smfp-overlay-vv-width,100dvw)!important;
+  height:var(--smfp-overlay-vv-height,100dvh)!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:
+    calc(var(--smfp-overlay-safe-top) + 8px)
+    calc(var(--smfp-overlay-safe-right) + 8px)
+    calc(var(--smfp-overlay-safe-bottom) + 8px)
+    calc(var(--smfp-overlay-safe-left) + 8px)!important;
+  box-sizing:border-box!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+  overscroll-behavior:contain!important;
+  z-index:var(--smfp-overlay-z-backdrop)!important;
+}
+.smfp-overlay-panel-managed{
+  position:relative!important;
+  inset:auto!important;
+  transform:none!important;
+  width:min(100%,960px)!important;
+  max-width:min(100%,960px)!important;
+  max-height:100%!important;
+  margin:auto!important;
+  box-sizing:border-box!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  z-index:var(--smfp-overlay-z-panel)!important;
+}
+.smfp-overlay-close-managed{
+  z-index:calc(var(--smfp-overlay-z-panel) + 10)!important;
+  flex:0 0 auto!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+@media(max-width:760px){
   html.smfp-overlay-locked,
   body.smfp-overlay-locked{
     width:100vw!important;
     max-width:100vw!important;
-    overflow:hidden!important;
     touch-action:none!important;
   }
   #mffApp.smfp-overlay-lock-host{
     width:100vw!important;
     max-width:100vw!important;
     overflow:hidden!important;
+  }
+  .smfp-overlay-managed{
+    padding:
+      calc(var(--smfp-overlay-safe-top) + 10px)
+      calc(var(--smfp-overlay-safe-right) + 6px)
+      calc(var(--smfp-overlay-safe-bottom) + 10px)
+      calc(var(--smfp-overlay-safe-left) + 6px)!important;
+  }
+  .smfp-overlay-panel-managed{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    min-height:0!important;
+  }
+  .smfp-overlay-close-managed{
+    position:sticky!important;
+    top:0!important;
+    margin-left:auto!important;
   }
   .smfp-overlay-textfield,
   #mffAlertText,
@@ -38,7 +106,7 @@ body.smfp-overlay-locked{
   #s666DiscordGateOverlay textarea,
   #mffAlertEditorBackdrop input,
   #mffAlertEditorBackdrop textarea{
-    font-size:16px!important; /* iOS: verhindert Auto-Zoom beim Fokus */
+    font-size:16px!important;
     touch-action:manipulation!important;
   }
 }
