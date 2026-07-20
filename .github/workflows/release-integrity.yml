@@ -24,7 +24,10 @@ jobs:
         run: node --check js/veluna-viewport-lock.js
       - name: VELUNA viewport contract
         run: node --test tests/viewport-fullscreen.test.mjs
-      - run: npm run verify
+      - name: Release structure check
+        run: npm run check
+      - name: Full Node test suite
+        run: npm test
       - name: Python syntax audit without bytecode
         shell: python
         run: |
