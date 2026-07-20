@@ -70,6 +70,16 @@ test("main PC layout is centered, compact below and keeps large square side modu
   assert.match(css, /\.volume-wrap\{display:flex!important/);
 });
 
+test("legacy primary action stylesheet never owns main-player geometry", async () => {
+  const actions = await read("css/primary-player-actions.css");
+  assert.match(actions, /Main-player geometry belongs to player-stage-v2\.css/);
+  assert.match(actions, /\.s666-primary-action-dock/);
+  assert.doesNotMatch(actions, /player-shell\s*>\s*\.visualizer/);
+  assert.doesNotMatch(actions, /player-shell\s*>\s*\.now-playing/);
+  assert.doesNotMatch(actions, /player-shell\s*>\s*\.bottom-console/);
+  assert.doesNotMatch(actions, /\.visualizer\s*\{[\s\S]*height:/);
+});
+
 test("VELUNA desktop player is centered and its Now Playing area is compact", async () => {
   const theme = await read("css/veluna-theme.css");
   assert.match(theme, /data-veluna-page="veluna"\] \.app-shell[\s\S]*align-items:center!important;justify-content:center!important/);
@@ -79,6 +89,19 @@ test("VELUNA desktop player is centered and its Now Playing area is compact", as
   assert.match(theme, /grid-template-rows:auto auto minmax\(76px,96px\)/);
   assert.match(theme, /height:clamp\(76px,10vh,96px\)/);
   assert.doesNotMatch(theme, /data-veluna-page="veluna"\] \.app-shell[^}]*align-items:flex-start/);
+});
+
+test("VELUNA central UI restores persistent purple active states and volume", async () => {
+  const ui = await read("js/veluna-ui.js");
+  assert.match(ui, /VELUNA Central UI Runtime v1\.2\.26/);
+  assert.match(ui, /function installPersistentActiveState\(\)/);
+  assert.match(ui, /transport-active/);
+  assert.match(ui, /rgba\(180,92,255,\.78\)/);
+  assert.match(ui, /function injectVolumeControl\(\)/);
+  assert.match(ui, /velunaVolumeSlider/);
+  assert.match(ui, /veluna_volume_v1/);
+  assert.match(ui, /VELUNA_VOLUME_CONTROL/);
+  assert.match(ui, /sourceSwitch\.appendChild\(row\)/);
 });
 
 test("VELUNA keeps fixed iPhone geometry and central responsive artwork", async () => {
@@ -102,12 +125,19 @@ test("VELUNA keeps fixed iPhone geometry and central responsive artwork", async 
 
 test("all repaired runtime mirrors are byte-identical", async () => {
   for (const path of [
-    "index.html", "js/admin-auth-client.js", "js/player-alert-client.js", "js/messenger-overlay.js",
+    "_headers", "index.html", "js/admin-auth-client.js", "js/player-alert-client.js", "js/messenger-overlay.js",
     "js/broadcast-message-history.js", "js/skip-control.js", "js/equalizer.js", "js/player-stage-v2.js",
     "js/addons/discord-player-addon-v3.js", "js/version-core.js", "css/player-stage-v2.css",
-    "css/veluna-theme.css", "config/radio-runtime.json", "config/release.json", "VELUNA/index.html",
+    "css/primary-player-actions.css", "css/veluna-theme.css", "config/radio-runtime.json", "config/release.json", "VELUNA/index.html",
     "veluna/index.html", "js/veluna-ui.js", "js/veluna-viewport-lock.js", "config/veluna-assets.js"
   ]) await assertMirror(path);
+});
+
+test("UI assets are revalidated instead of being frozen behind stale cache", async () => {
+  const headers = await read("_headers");
+  assert.match(headers, /\/js\/\*/);
+  assert.match(headers, /\/css\/\*/);
+  assert.match(headers, /Cache-Control: no-cache, must-revalidate/);
 });
 
 test("all player frontends use the canonical title and LYVRA DJ identity", async () => {

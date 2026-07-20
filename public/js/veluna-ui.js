@@ -1,4 +1,4 @@
-/* VELUNA Central UI Runtime v1.2.25 */
+/* VELUNA Central UI Runtime v1.2.26 */
 (() => {
   'use strict';
   const A = window.VELUNA_ASSETS || {};
@@ -64,6 +64,143 @@
       if (event.key === 'Enter' || event.key === ' ') release(120);
     }, true);
     window.addEventListener('blur', () => release(0), { passive:true });
+  }
+
+  const ACTIVE_STYLE_PROPERTIES = ['color','border-color','background','box-shadow','text-shadow','filter'];
+
+  function isPersistentActive(control){
+    return control.classList.contains('is-active') ||
+      control.classList.contains('transport-active') ||
+      control.getAttribute('aria-pressed') === 'true' ||
+      control.getAttribute('data-state') === 'active';
+  }
+
+  function syncPersistentControlState(control){
+    if (!control || control.disabled || control.getAttribute('aria-disabled') === 'true') return;
+    if (isPersistentActive(control)) {
+      control.dataset.velunaActivePaint = '1';
+      control.style.setProperty('color','#fff','important');
+      control.style.setProperty('border-color','rgba(222,176,255,.98)','important');
+      control.style.setProperty('background','linear-gradient(135deg,rgba(180,92,255,.78),rgba(86,27,145,.88)),rgba(10,5,20,.98)','important');
+      control.style.setProperty('box-shadow','0 0 7px rgba(255,255,255,.78),0 0 20px rgba(180,92,255,.92),0 0 28px rgba(115,63,255,.52),inset 0 0 16px rgba(255,255,255,.12)','important');
+      control.style.setProperty('text-shadow','0 0 8px rgba(255,255,255,.72)','important');
+      control.style.setProperty('filter','brightness(1.12) saturate(1.2)','important');
+      return;
+    }
+    if (control.dataset.velunaActivePaint !== '1') return;
+    for (const property of ACTIVE_STYLE_PROPERTIES) control.style.removeProperty(property);
+    delete control.dataset.velunaActivePaint;
+  }
+
+  function installPersistentActiveState(){
+    if (page !== 'veluna' || host.dataset.velunaPersistentActive === '1') return;
+    host.dataset.velunaPersistentActive = '1';
+    const selector = 'button,.control-btn,.small-btn,.source-led-btn,.tiny-btn';
+    const syncAll = () => host.querySelectorAll(selector).forEach(syncPersistentControlState);
+    const observer = new MutationObserver(records => {
+      for (const record of records) {
+        if (record.type === 'attributes') syncPersistentControlState(record.target);
+        for (const node of record.addedNodes || []) {
+          if (!(node instanceof Element)) continue;
+          if (node.matches?.(selector)) syncPersistentControlState(node);
+          node.querySelectorAll?.(selector).forEach(syncPersistentControlState);
+        }
+      }
+    });
+    observer.observe(host, { subtree:true, childList:true, attributes:true, attributeFilter:['class','aria-pressed','disabled','data-state'] });
+    document.addEventListener('click', event => {
+      const control = event.target?.closest?.(selector);
+      if (control && host.contains(control)) requestAnimationFrame(() => syncPersistentControlState(control));
+    }, true);
+    requestAnimationFrame(syncAll);
+  }
+
+  function injectVolumeControl(){
+    if (page !== 'veluna' || q('#velunaVolumeSlider', host)) return;
+    const sourceSwitch = q('.source-switch', host);
+    const audio = q('#radio', host) || q('audio', host) || q('audio');
+    if (!sourceSwitch || !audio) return;
+
+    const row = document.createElement('div');
+    row.className = 'veluna-volume-row';
+    row.dataset.velunaVolume = '1';
+    row.setAttribute('role','group');
+    row.setAttribute('aria-label','Lautstärke');
+    row.style.cssText = 'grid-column:1/-1;min-width:0;min-height:28px;display:grid;grid-template-columns:auto minmax(0,1fr) 42px;align-items:center;gap:7px;padding:3px 8px;border:1px solid rgba(22,139,255,.46);border-radius:11px;background:linear-gradient(90deg,rgba(180,92,255,.10),rgba(22,139,255,.08));box-shadow:inset 0 0 12px rgba(180,92,255,.08),0 0 10px rgba(22,139,255,.16);';
+
+    const label = document.createElement('label');
+    label.htmlFor = 'velunaVolumeSlider';
+    label.textContent = 'VOL';
+    label.style.cssText = 'color:#dcb0ff;font-weight:900;font-size:.68rem;letter-spacing:.06em;text-shadow:0 0 8px rgba(180,92,255,.56);';
+
+    const slider = document.createElement('input');
+    slider.id = 'velunaVolumeSlider';
+    slider.type = 'range';
+    slider.min = '0';
+    slider.max = '1';
+    slider.step = '0.01';
+    slider.value = '1';
+    slider.setAttribute('aria-label','Lautstärke');
+    slider.style.cssText = 'width:100%;min-width:0;accent-color:#b45cff;cursor:pointer;pointer-events:auto;';
+
+    const output = document.createElement('output');
+    output.id = 'velunaVolumeValue';
+    output.htmlFor = 'velunaVolumeSlider';
+    output.textContent = '100%';
+    output.style.cssText = 'color:#dcb0ff;font-weight:900;font-size:.68rem;letter-spacing:.03em;text-align:right;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(180,92,255,.56);';
+
+    row.append(label, slider, output);
+    sourceSwitch.appendChild(row);
+
+    const key = 'veluna_volume_v1';
+    const clamp = value => Math.max(0, Math.min(1, Number.isFinite(Number(value)) ? Number(value) : 1));
+    const load = () => {
+      try {
+        const saved = localStorage.getItem(key);
+        return saved === null ? 1 : clamp(saved);
+      } catch (_) {
+        return 1;
+      }
+    };
+    const render = value => {
+      const next = clamp(value);
+      slider.value = String(next);
+      slider.setAttribute('aria-valuetext', `${Math.round(next * 100)} Prozent`);
+      output.value = `${Math.round(next * 100)}%`;
+      output.textContent = output.value;
+      return next;
+    };
+    const apply = (value, persist = true) => {
+      const next = render(value);
+      try { audio.volume = next; } catch (_) {}
+      if (persist) {
+        try { localStorage.setItem(key, String(next)); } catch (_) {}
+      }
+      return next;
+    };
+    const unmuteForManualVolume = () => {
+      if (!audio.muted) return;
+      audio.muted = false;
+      const mute = q('#muteBtn', host);
+      if (mute) {
+        mute.textContent = 'MUTE';
+        mute.classList.remove('is-active');
+        mute.setAttribute('aria-pressed','false');
+        syncPersistentControlState(mute);
+      }
+    };
+
+    slider.addEventListener('input', () => {
+      unmuteForManualVolume();
+      apply(slider.value, true);
+    });
+    slider.addEventListener('change', () => apply(slider.value, true));
+    audio.addEventListener('volumechange', () => {
+      if (!audio.muted) render(audio.volume);
+    });
+
+    apply(load(), false);
+    window.VELUNA_VOLUME_CONTROL = Object.freeze({ apply, slider, output });
   }
 
   function injectHeader(){
@@ -173,6 +310,8 @@
   }
 
   installTouchFeedback();
+  installPersistentActiveState();
+  injectVolumeControl();
   injectHeader();
   injectBottomBanner();
   replaceFallbackArtwork();
