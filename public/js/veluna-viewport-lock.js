@@ -1,10 +1,11 @@
-/* VELUNA iPhone fullscreen geometry lock v1.2.27 */
+/* VELUNA iPhone fullscreen geometry lock v1.2.28 */
 (() => {
   'use strict';
 
   const root = document.documentElement;
   const state = { width: 0, height: 0, orientation: '' };
   let resizeTimer = 0;
+  let layoutObserver = null;
 
   const isMobileViewport = () =>
     matchMedia('(max-width: 768px)').matches ||
@@ -31,18 +32,70 @@
     };
   };
 
+  const clearStyles = (node, properties) => {
+    if (!node) return;
+    properties.forEach(property => node.style.removeProperty(property));
+  };
+
+  const placeInRow = (node, row) => {
+    if (!node) return;
+    node.style.setProperty('grid-row', String(row), 'important');
+    node.style.setProperty('min-width', '0', 'important');
+    node.style.setProperty('position', 'relative', 'important');
+    node.style.setProperty('inset', 'auto', 'important');
+    node.style.setProperty('margin', '0', 'important');
+  };
+
   function clearSafeLayout() {
     const app = document.querySelector('.app-shell');
     const card = document.querySelector('.player-card');
     root.removeAttribute('data-veluna-iphone-safe');
-    if (app) ['position','inset','width','height','padding','overflow'].forEach(property => app.style.removeProperty(property));
-    if (card) ['position','top','right','bottom','left','width','height','min-height','max-height','margin','transform'].forEach(property => card.style.removeProperty(property));
+    if (layoutObserver) {
+      layoutObserver.disconnect();
+      layoutObserver = null;
+    }
+    clearStyles(app, ['position','inset','width','height','padding','overflow']);
+    clearStyles(card, [
+      'position','top','right','bottom','left','width','height','min-height','max-height','margin','transform',
+      'display','grid-template-columns','grid-template-rows','align-content','gap','padding','overflow'
+    ]);
+    for (const selector of [
+      '.veluna-global-header','.status-grid','.pill-row','.display-block','.mini-grid','.source-switch',
+      '.control-strip','.tool-strip','.action-bar','.levelmeter','.footer'
+    ]) {
+      clearStyles(card?.querySelector(selector), [
+        'grid-row','min-width','position','inset','margin','height','min-height','max-height','display',
+        'visibility','opacity','z-index','align-self','overflow'
+      ]);
+    }
+    card?.querySelectorAll('.mini-box').forEach(node => clearStyles(node, ['min-height','display','visibility','opacity']));
+    clearStyles(card?.querySelector('.display-window'), ['height','min-height','max-height','overflow']);
+    clearStyles(card?.querySelector('.veluna-global-header img'), ['width','height','max-height','object-fit','object-position']);
+  }
+
+  function observeInjectedLayout(card) {
+    if (!card || layoutObserver) return;
+    layoutObserver = new MutationObserver(records => {
+      if (!isMobileViewport()) return;
+      const relevant = records.some(record => [...record.addedNodes].some(node =>
+        node instanceof Element && (
+          node.matches?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand') ||
+          node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand')
+        )
+      ));
+      if (relevant) scheduleApply(0, { force: true });
+    });
+    layoutObserver.observe(card, { childList: true, subtree: true });
   }
 
   function applySafeLayout(viewport) {
     const app = document.querySelector('.app-shell');
     const card = document.querySelector('.player-card');
     if (!app || !card || !isMobileViewport()) return;
+
+    const compact = viewport.height < 720;
+    const displayMinimum = compact ? 118 : 140;
+    const spacerMinimum = compact ? 4 : 8;
 
     root.setAttribute('data-veluna-iphone-safe','1');
     root.style.setProperty('--veluna-safe-player-top','max(56px, calc(env(safe-area-inset-top) + 10px))');
@@ -66,14 +119,26 @@
     card.style.setProperty('max-height','none','important');
     card.style.setProperty('margin','0','important');
     card.style.setProperty('transform','none','important');
+    card.style.setProperty('display','grid','important');
+    card.style.setProperty('grid-template-columns','minmax(0,1fr)','important');
+    card.style.setProperty(
+      'grid-template-rows',
+      `auto auto auto minmax(${displayMinimum}px,1.15fr) auto minmax(${spacerMinimum}px,.38fr) auto auto auto auto auto auto`,
+      'important'
+    );
+    card.style.setProperty('align-content','stretch','important');
+    card.style.setProperty('gap',compact ? '3px' : '4px','important');
+    card.style.setProperty('padding','6px','important');
+    card.style.setProperty('overflow','hidden','important');
 
     const header = card.querySelector('.veluna-global-header');
     const headerImage = header?.querySelector('img');
+    placeInRow(header, 1);
     if (header) {
-      header.style.setProperty('height','clamp(108px, 18dvh, 188px)','important');
-      header.style.setProperty('min-height','108px','important');
-      header.style.setProperty('max-height','188px','important');
-      header.style.setProperty('margin','0 auto 5px','important');
+      header.style.setProperty('height', compact ? 'clamp(94px,13dvh,124px)' : 'clamp(112px,15dvh,158px)', 'important');
+      header.style.setProperty('min-height', compact ? '94px' : '112px', 'important');
+      header.style.setProperty('max-height', compact ? '124px' : '158px', 'important');
+      header.style.setProperty('overflow','hidden','important');
     }
     if (headerImage) {
       headerImage.style.setProperty('width','100%','important');
@@ -83,17 +148,67 @@
       headerImage.style.setProperty('object-position','center','important');
     }
 
+    const statusGrid = card.querySelector('.status-grid');
+    const pillRow = card.querySelector('.pill-row');
     const displayBlock = card.querySelector('.display-block');
     const displayWindow = card.querySelector('.display-window');
+    const miniGrid = card.querySelector('.mini-grid');
+    const sourceSwitch = card.querySelector('.source-switch');
+    const controlStrip = card.querySelector('.control-strip');
+    const toolStrip = card.querySelector('.tool-strip');
+    const actionBar = card.querySelector('.action-bar');
+    const levelMeter = card.querySelector('.levelmeter');
+    const footer = card.querySelector('.footer');
+
+    placeInRow(statusGrid, 2);
+    placeInRow(pillRow, 3);
+    placeInRow(displayBlock, 4);
+    placeInRow(miniGrid, 5);
+    placeInRow(sourceSwitch, 7);
+    placeInRow(controlStrip, 8);
+    placeInRow(toolStrip, 9);
+    placeInRow(actionBar, 10);
+    placeInRow(levelMeter, 11);
+    placeInRow(footer, 12);
+
     if (displayBlock) {
-      displayBlock.style.setProperty('min-height','clamp(170px, 27dvh, 280px)','important');
-      displayBlock.style.setProperty('height','auto','important');
+      displayBlock.style.setProperty('height','100%','important');
+      displayBlock.style.setProperty('min-height',`${displayMinimum}px`,'important');
+      displayBlock.style.setProperty('max-height','none','important');
+      displayBlock.style.setProperty('overflow','hidden','important');
     }
     if (displayWindow) {
-      displayWindow.style.setProperty('min-height','clamp(138px, 23dvh, 238px)','important');
       displayWindow.style.setProperty('height','100%','important');
+      displayWindow.style.setProperty('min-height',compact ? '92px' : '112px','important');
       displayWindow.style.setProperty('max-height','none','important');
+      displayWindow.style.setProperty('overflow','hidden','important');
     }
+
+    if (miniGrid) {
+      miniGrid.style.setProperty('display','grid','important');
+      miniGrid.style.setProperty('visibility','visible','important');
+      miniGrid.style.setProperty('opacity','1','important');
+      miniGrid.style.setProperty('min-height',compact ? '38px' : '44px','important');
+      miniGrid.style.setProperty('z-index','4','important');
+    }
+    miniGrid?.querySelectorAll('.mini-box').forEach(node => {
+      node.style.setProperty('display','flex','important');
+      node.style.setProperty('visibility','visible','important');
+      node.style.setProperty('opacity','1','important');
+      node.style.setProperty('min-height',compact ? '36px' : '42px','important');
+    });
+
+    if (sourceSwitch) {
+      sourceSwitch.style.setProperty('display','grid','important');
+      sourceSwitch.style.setProperty('visibility','visible','important');
+      sourceSwitch.style.setProperty('opacity','1','important');
+      sourceSwitch.style.setProperty('z-index','4','important');
+      sourceSwitch.style.setProperty('align-self','end','important');
+    }
+
+    const bottomBanner = card.querySelector('.veluna-bottom-brand');
+    if (bottomBanner) bottomBanner.remove();
+    observeInjectedLayout(card);
   }
 
   function clearDesktopLock() {
