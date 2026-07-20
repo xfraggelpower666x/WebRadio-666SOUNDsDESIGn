@@ -1,0 +1,291 @@
+from pathlib import Path
+from textwrap import dedent
+import re
+
+BRANCH_WORKFLOW = Path('.github/workflows/one-shot-ui-repair-v2.yml')
+TRIGGER_FILE = Path('.repair-trigger-v2')
+SELF = Path('.github/scripts/ui-repair-v2.py')
+
+
+def read(path: str) -> str:
+    return Path(path).read_text(encoding='utf-8')
+
+
+def write(path: str, content: str) -> None:
+    Path(path).write_text(content, encoding='utf-8')
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise SystemExit(message)
+
+
+actions_css = dedent(r'''
+    /* Canonical primary player actions only. Main-player geometry belongs to player-stage-v2.css. */
+    .s666-primary-action-dock {
+      width: calc(100% - 44px) !important;
+      max-width: calc(100% - 44px) !important;
+      min-height: 44px;
+      margin: 8px 22px 0 !important;
+      padding: 5px 8px;
+      display: grid !important;
+      grid-template-columns: minmax(112px, 1fr) minmax(64px, 3fr) minmax(112px, 1fr);
+      align-items: center;
+      gap: 14px;
+      box-sizing: border-box;
+      border-top: 1px solid rgba(22, 255, 243, .24);
+      border-bottom: 1px solid rgba(255, 61, 187, .24);
+      background: rgba(4, 8, 24, .62);
+      overflow: hidden;
+    }
+    .s666-primary-action-slot {
+      min-width: 0;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+    }
+    .s666-primary-action-slot-left { justify-content: flex-start; }
+    .s666-primary-action-slot-right { justify-content: flex-end; }
+    .s666-primary-action-line {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(22,255,243,.12), rgba(22,255,243,.58), rgba(255,61,187,.58), rgba(255,61,187,.12));
+    }
+    #s666SoundControlButton,
+    #s666MessageControlButton {
+      width: 112px !important;
+      min-width: 112px !important;
+      max-width: 112px !important;
+      height: 34px !important;
+      min-height: 34px !important;
+      max-height: 34px !important;
+      margin: 0 !important;
+      padding: 0 10px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
+      border-radius: 6px !important;
+      font: 900 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace !important;
+      letter-spacing: 0 !important;
+      cursor: pointer;
+    }
+    #s666SoundControlButton {
+      color: #16fff3 !important;
+      border: 1px solid rgba(22,255,243,.62) !important;
+      background: rgba(4,14,27,.92) !important;
+    }
+    #s666MessageControlButton {
+      color: #ff71cc !important;
+      border: 1px solid rgba(255,61,187,.62) !important;
+      background: rgba(23,5,27,.92) !important;
+    }
+    #pcRealEqPanel,
+    #pcBoostPanel,
+    #statusMsg,
+    #fp-admin-button,
+    #s666MsgMobileBtn,
+    .s666-discord-button--msg {
+      display: none !important;
+    }
+    @media (min-width: 761px) {
+      body .frame-stage .player-shell > .s666-primary-action-dock {
+        order: 5 !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        max-height: 44px !important;
+        margin: 0 22px !important;
+        flex: 0 0 44px !important;
+        position: relative !important;
+        inset: auto !important;
+        transform: none !important;
+      }
+    }
+    @media (max-width: 760px) {
+      .s666-primary-action-dock {
+        width: calc(100% - 24px) !important;
+        max-width: calc(100% - 24px) !important;
+        margin: 6px 12px !important;
+        grid-template-columns: minmax(96px, 1fr) minmax(24px, 1fr) minmax(96px, 1fr);
+        gap: 8px;
+      }
+      #s666SoundControlButton,
+      #s666MessageControlButton {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+      }
+    }
+''').strip() + '\n'
+
+for path in ['css/primary-player-actions.css', 'public/css/primary-player-actions.css']:
+    write(path, actions_css)
+
+for path in ['css/player-stage-v2.css', 'public/css/player-stage-v2.css']:
+    text = read(path)
+    replacements = {
+        'flex:1 1 clamp(210px,30vh,360px)!important;min-height:clamp(190px,24vh,250px)!important;':
+            'flex:1 1 clamp(240px,34vh,410px)!important;min-height:clamp(220px,28vh,300px)!important;',
+        'min-height:clamp(168px,22vh,230px)!important;':
+            'min-height:clamp(198px,26vh,280px)!important;',
+        'clamp(126px,13.5vh,146px)':
+            'clamp(146px,16vh,176px)',
+        'clamp(104px,8.4vw,124px)':
+            'clamp(120px,9.4vw,146px)',
+    }
+    for old, new in replacements.items():
+        require(old in text, f'missing main layout marker in {path}: {old}')
+        text = text.replace(old, new)
+
+    marker = '/* MAIN_PC_LAYOUT_V2_POSITION_AUTHORITY */'
+    if marker not in text:
+        text += marker + dedent('''
+            @media (min-width:761px){
+            body[data-veluna-page="main"] .player-shell>:is(.hero,.top-hud,.info-grid,.visualizer,.s666-primary-action-dock,.bottom-console,.now-playing,.pc-copyright-footer),
+            body[data-veluna-page="main"] .player-shell>#pcBottomSyncMeter{
+            position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;float:none!important
+            }
+            body[data-veluna-page="main"] .player-shell>.visualizer{overflow:hidden!important}
+            body[data-veluna-page="main"] .player-shell>.visualizer .eq-bars{height:100%!important;max-height:none!important}
+            }
+        ''')
+    write(path, text)
+
+for path in ['index.html', 'public/index.html']:
+    text = read(path)
+    text = re.sub(r'player-stage-v2\.css\?v=[^"\']+', 'player-stage-v2.css?v=2026-07-20-main-layout-v2', text)
+    text = re.sub(r'player-stage-v2\.js\?v=[^"\']+', 'player-stage-v2.js?v=2026-07-20-main-layout-v2', text)
+    text = re.sub(r'player-core\.js\?v=[^"\']+', 'player-core.js?v=2026-07-20-main-layout-v2', text)
+    text = re.sub(r'primary-player-actions\.css\?v=[^"\']+', 'primary-player-actions.css?v=2026-07-20-actions-only-v2', text)
+    write(path, text)
+
+for path in ['js/player-core.js', 'public/js/player-core.js']:
+    text = read(path)
+    require("./equalizer.js?v=2026-06-19-repair2" in text, f'equalizer import marker missing in {path}')
+    text = text.replace('./equalizer.js?v=2026-06-19-repair2', './equalizer.js?v=2026-07-20-reactivity-v2')
+    write(path, text)
+
+volume_markup = dedent('''
+      <div class="veluna-volume-row" role="group" aria-label="Lautstärke">
+        <label for="volumeSlider">VOL</label>
+        <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="1" aria-label="Lautstärke">
+        <output id="volumeValue" for="volumeSlider">100%</output>
+      </div>''')
+
+veluna_paths = ['VELUNA/index.html', 'veluna/index.html', 'public/VELUNA/index.html', 'public/veluna/index.html']
+for path in veluna_paths:
+    text = read(path)
+    text = re.sub(r'/css/veluna-theme\.css\?v=[^"\']+', '/css/veluna-theme.css?v=2026-07-20-active-volume-v1', text)
+
+    if 'id="volumeSlider"' not in text:
+        pattern = r'(\s*<div class="source-switch"[^>]*>.*?</div>)(\s*<div class="control-strip">)'
+        text, count = re.subn(pattern, lambda match: match.group(1) + '\n' + volume_markup + match.group(2), text, count=1, flags=re.S)
+        require(count == 1, f'could not insert VELUNA volume row in {path}')
+
+    if "const VOLUME_KEY='veluna_volume_v1';" not in text:
+        require("const EQ_KEY='veluna_mobile_eq_v126';" in text, f'EQ key marker missing in {path}')
+        text = text.replace(
+            "const EQ_KEY='veluna_mobile_eq_v126';",
+            "const EQ_KEY='veluna_mobile_eq_v126';\n    const VOLUME_KEY='veluna_volume_v1';",
+        )
+
+    if "const volumeSlider=q('volumeSlider'),volumeValue=q('volumeValue');" not in text:
+        anchor = "const soundClose=q('soundClose'),metaClose=q('metaClose'),boostRow=q('boostRow'),soundReset=q('soundReset'),soundApply=q('soundApply'),soundStatus=q('soundStatus'),metaDetailText=q('metaDetailText'),actionStatus=q('actionStatus'),actionText=q('actionText'),actionLed=q('actionLed');"
+        require(anchor in text, f'VELUNA control anchor missing in {path}')
+        text = text.replace(anchor, anchor + "\n    const volumeSlider=q('volumeSlider'),volumeValue=q('volumeValue');")
+
+    if 'function loadVolume()' not in text:
+        anchor = "function clamp(n,min,max){n=Number(n);return Math.max(min,Math.min(max,Number.isFinite(n)?n:min))}"
+        require(anchor in text, f'clamp anchor missing in {path}')
+        volume_logic = dedent('''
+            function loadVolume(){try{const raw=localStorage.getItem(VOLUME_KEY);return raw===null?1:clamp(Number(raw),0,1)}catch(_){return 1}}
+            function applyVolume(value,persist=true){const next=clamp(value,0,1);audio.volume=next;if(volumeSlider){volumeSlider.value=String(next);volumeSlider.setAttribute('aria-valuetext',Math.round(next*100)+' Prozent')}if(volumeValue)volumeValue.textContent=Math.round(next*100)+'%';if(persist){try{localStorage.setItem(VOLUME_KEY,String(next))}catch(_){}}return next}
+        ''').strip()
+        text = text.replace(anchor, anchor + '\n    ' + volume_logic.replace('\n', '\n    '))
+
+    if "volumeSlider.addEventListener('input'" not in text:
+        anchor = "bootButton.addEventListener('click',()=>{if(switching)return;"
+        require(anchor in text, f'boot listener anchor missing in {path}')
+        listener = "if(volumeSlider){volumeSlider.addEventListener('input',()=>{muted=false;audio.muted=false;muteBtn.textContent='MUTE';muteBtn.classList.remove('is-active');muteBtn.setAttribute('aria-pressed','false');applyVolume(volumeSlider.value,true)});volumeSlider.addEventListener('change',()=>applyVolume(volumeSlider.value,true));}\n    "
+        text = text.replace(anchor, listener + anchor)
+
+    if 'applyVolume(loadVolume(),false);buildMeter();' not in text:
+        require('buildMeter();buildBoostUi();' in text, f'initialization anchor missing in {path}')
+        text = text.replace('buildMeter();buildBoostUi();', 'applyVolume(loadVolume(),false);buildMeter();buildBoostUi();')
+
+    write(path, text)
+
+for path in ['css/veluna-theme.css', 'public/css/veluna-theme.css']:
+    text = read(path)
+    text = text.replace('grid-template-rows:repeat(9,auto)!important', 'grid-template-rows:repeat(10,auto)!important')
+    marker = '/* VELUNA_PERSISTENT_PURPLE_ACTIVE_AND_VOLUME_V1 */'
+    if marker not in text:
+        text += marker + dedent('''
+            body[data-veluna-page="veluna"] :is(button,.control-btn,.small-btn,.source-led-btn,.tiny-btn):is(.is-active,.transport-active,[aria-pressed="true"]):not(:disabled){
+            color:#fff!important;border-color:rgba(222,176,255,.98)!important;background:linear-gradient(135deg,rgba(180,92,255,.78),rgba(86,27,145,.88)),rgba(10,5,20,.98)!important;box-shadow:0 0 7px rgba(255,255,255,.78),0 0 20px rgba(180,92,255,.92),0 0 28px rgba(115,63,255,.52),inset 0 0 16px rgba(255,255,255,.12)!important;text-shadow:0 0 8px rgba(255,255,255,.72)!important;filter:brightness(1.12) saturate(1.2)!important
+            }
+            body[data-veluna-page="veluna"] .veluna-volume-row{min-width:0;min-height:30px;display:grid;grid-template-columns:auto minmax(0,1fr) 44px;align-items:center;gap:8px;padding:4px 9px;border:1px solid rgba(22,139,255,.46);border-radius:12px;background:linear-gradient(90deg,rgba(180,92,255,.10),rgba(22,139,255,.08));box-shadow:inset 0 0 12px rgba(180,92,255,.08),0 0 10px rgba(22,139,255,.16)}
+            body[data-veluna-page="veluna"] .veluna-volume-row label,body[data-veluna-page="veluna"] .veluna-volume-row output{color:#dcb0ff;font-weight:900;font-size:clamp(.58rem,2vw,.72rem);letter-spacing:.06em;text-shadow:0 0 8px rgba(180,92,255,.56)}
+            body[data-veluna-page="veluna"] .veluna-volume-row output{text-align:right;font-variant-numeric:tabular-nums}
+            body[data-veluna-page="veluna"] #volumeSlider{width:100%;min-width:0;accent-color:#b45cff;cursor:pointer;pointer-events:auto!important}
+            @media(max-width:768px){body[data-veluna-page="veluna"] .veluna-volume-row{min-height:27px;padding:2px 7px;gap:6px;grid-template-columns:auto minmax(0,1fr) 38px}}
+        ''')
+    write(path, text)
+
+test_path = Path('tests/frontend-contracts.test.mjs')
+tests = test_path.read_text(encoding='utf-8')
+tests = tests.replace('clamp\\(126px,13\\.5vh,146px\\)', 'clamp\\(146px,16vh,176px\\)')
+tests = tests.replace('grid-template-rows:repeat\\(9,auto\\)', 'grid-template-rows:repeat\\(10,auto\\)')
+tests = tests.replace(
+    '"css/veluna-theme.css", "config/radio-runtime.json"',
+    '"css/veluna-theme.css", "css/primary-player-actions.css", "config/radio-runtime.json"',
+)
+extra_tests = dedent(r'''
+
+    test("legacy primary action CSS never owns main-player geometry", async () => {
+      const actions = await read("css/primary-player-actions.css");
+      const stage = await read("css/player-stage-v2.css");
+      const index = await read("index.html");
+      assert.doesNotMatch(actions, /player-shell > \.visualizer|player-shell > \.now-playing|player-shell > \.bottom-console/);
+      assert.match(actions, /Main-player geometry belongs to player-stage-v2\.css/);
+      assert.match(stage, /MAIN_PC_LAYOUT_V2_POSITION_AUTHORITY/);
+      assert.match(index, /player-stage-v2\.css\?v=2026-07-20-main-layout-v2/);
+      assert.match(index, /player-core\.js\?v=2026-07-20-main-layout-v2/);
+    });
+
+    test("VELUNA keeps purple active buttons and a persistent volume control", async () => {
+      const veluna = await read("VELUNA/index.html");
+      const theme = await read("css/veluna-theme.css");
+      assert.match(veluna, /id="volumeSlider"/);
+      assert.match(veluna, /VOLUME_KEY='veluna_volume_v1'/);
+      assert.match(veluna, /applyVolume\(loadVolume\(\),false\)/);
+      assert.match(veluna, /volumeSlider\.addEventListener\('input'/);
+      assert.match(veluna, /veluna-theme\.css\?v=2026-07-20-active-volume-v1/);
+      assert.match(theme, /VELUNA_PERSISTENT_PURPLE_ACTIVE_AND_VOLUME_V1/);
+      assert.match(theme, /transport-active/);
+      assert.match(theme, /\.veluna-volume-row/);
+    });
+''')
+if 'legacy primary action CSS never owns main-player geometry' not in tests:
+    tests += extra_tests
+test_path.write_text(tests, encoding='utf-8')
+
+smoke_path = Path('.github/workflows/live-player-smoke.yml')
+smoke = smoke_path.read_text(encoding='utf-8')
+if 'primary-player-actions.css" "$workdir/primary-player-actions.css' not in smoke:
+    smoke = smoke.replace(
+        '          fetch_live "/css/player-stage-v2.css" "$workdir/player-stage-v2.css"\n',
+        '          fetch_live "/css/player-stage-v2.css" "$workdir/player-stage-v2.css"\n          fetch_live "/css/primary-player-actions.css" "$workdir/primary-player-actions.css"\n',
+    )
+    smoke = smoke.replace(
+        '          grep -Fq "margin:6px auto!important" "$workdir/player-stage-v2.css"\n',
+        '          grep -Fq "margin:6px auto!important" "$workdir/player-stage-v2.css"\n          grep -Fq "MAIN_PC_LAYOUT_V2_POSITION_AUTHORITY" "$workdir/player-stage-v2.css"\n          grep -Fq "Main-player geometry belongs to player-stage-v2.css" "$workdir/primary-player-actions.css"\n',
+    )
+    smoke = smoke.replace(
+        '          grep -Fq "height:clamp(76px,10vh,96px)!important" "$workdir/veluna-theme.css"\n',
+        '          grep -Fq "height:clamp(76px,10vh,96px)!important" "$workdir/veluna-theme.css"\n          grep -Fq "VELUNA_PERSISTENT_PURPLE_ACTIVE_AND_VOLUME_V1" "$workdir/veluna-theme.css"\n          grep -Fq "id=\\"volumeSlider\\"" "$workdir/veluna.html"\n          grep -Fq "player-stage-v2.css?v=2026-07-20-main-layout-v2" "$workdir/root.html"\n          grep -Fq "veluna-theme.css?v=2026-07-20-active-volume-v1" "$workdir/veluna.html"\n',
+    )
+smoke_path.write_text(smoke, encoding='utf-8')
+
+for temporary in [BRANCH_WORKFLOW, TRIGGER_FILE, SELF]:
+    if temporary.exists():
+        temporary.unlink()
