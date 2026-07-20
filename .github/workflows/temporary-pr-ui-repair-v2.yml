@@ -1,0 +1,54 @@
+name: Temporary PR UI Repair V2
+
+on:
+  pull_request_target:
+    types:
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  patch:
+    if: github.event.pull_request.head.ref == 'repair/veluna-active-volume-main-layout-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Apply controlled repair
+        run: |
+          test -f .github/scripts/ui-repair-v2.py
+          python .github/scripts/ui-repair-v2.py
+
+      - name: Verify repaired source
+        run: |
+          npm ci
+          npm run verify
+          git diff --check
+          node --check js/player-core.js
+          node --check js/player-stage-v2.js
+          cmp css/player-stage-v2.css public/css/player-stage-v2.css
+          cmp css/primary-player-actions.css public/css/primary-player-actions.css
+          cmp css/veluna-theme.css public/css/veluna-theme.css
+          cmp VELUNA/index.html public/VELUNA/index.html
+          cmp veluna/index.html public/veluna/index.html
+
+      - name: Commit repaired branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Repair main layout authority and VELUNA active volume UI"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
