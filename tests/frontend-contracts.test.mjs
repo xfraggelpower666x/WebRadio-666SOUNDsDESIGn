@@ -43,7 +43,7 @@ test("Skip owns interactive Bearer auth while Discord remains public", async () 
   assert.doesNotMatch(discord, /ensureInteractiveAuth|S666AdminAuth\.ensure|admin_session_required|x-discord-gate-code/);
 });
 
-test("main player has one canonical EQ and meter writer", async () => {
+test("main player has one smooth canonical EQ and meter writer", async () => {
   const equalizer = await read("js/equalizer.js");
   const stage = await read("js/player-stage-v2.js");
   assert.match(equalizer, /analyser\.fftSize = mobileLike\(\) \? 128 : 512/);
@@ -51,22 +51,27 @@ test("main player has one canonical EQ and meter writer", async () => {
   assert.match(equalizer, /applyBottomMeter/);
   assert.match(equalizer, /window\.__MeterBus/);
   assert.match(equalizer, /target > meterEnvelope \? 0\.72 : 0\.20/);
+  assert.match(equalizer, /--eq-scale/);
+  assert.match(equalizer, /requestAnimationFrame\(renderFallbackFrame\)/);
+  assert.doesNotMatch(equalizer, /slotHeight\(|clientHeight.*eq-bar|getBoundingClientRect.*eq-bar/);
   assert.match(stage, /installMeterBusHook/);
   assert.match(stage, /driveSideLeds/);
+  assert.match(stage, /driveSideModules/);
   assert.doesNotMatch(stage, /function setEq\(|function setSideMeters\(|function setBottom\(|function setPanelModules\(/);
-  assert.doesNotMatch(stage, /\.eq-bar-fill[\s\S]*style\.height/);
 });
 
-test("main PC layout is centered, compact below and keeps large square side modules", async () => {
+test("main PC layout resets legacy absolute modules and uses one clean Now Playing grid", async () => {
   const css = await read("css/player-stage-v2.css");
   assert.match(css, /\.frame-stage \.player-shell\{position:relative!important/);
   assert.match(css, /transform:none!important/);
   assert.match(css, /margin:6px auto!important/);
   assert.match(css, /--s666-side-panel-width:clamp\(220px/);
-  assert.match(css, /aspect-ratio:1\/1!important/);
-  assert.match(css, /\.visualizer \.(?:eq-bars|eq-bar-slot)/);
-  assert.match(css, /grid-template-columns:auto auto minmax\(90px,1fr\) minmax\(142px,174px\)/);
-  assert.match(css, /\.now-playing\{order:8!important[\s\S]*clamp\(126px,13\.5vh,146px\)/);
+  assert.match(css, /grid-template-rows:36px repeat\(3,minmax\(0,1fr\)\) 64px/);
+  assert.match(css, /\.pc-addon-module\{position:relative!important;inset:auto!important/);
+  assert.match(css, /\.eq-bar-fill[\s\S]*scaleY\(var\(--eq-scale/);
+  assert.match(css, /#phase10NowVersion[\s\S]*#pcTickerRebuildLane/);
+  assert.match(css, /\.section-topline[\s\S]*grid-template-columns:minmax\(0,1fr\) auto/);
+  assert.match(css, /\.now-playing #historyToggle\{position:relative!important;inset:auto!important/);
   assert.match(css, /\.volume-wrap\{display:flex!important/);
 });
 
