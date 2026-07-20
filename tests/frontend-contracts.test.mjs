@@ -43,36 +43,45 @@ test("Skip owns interactive Bearer auth while Discord remains public", async () 
   assert.doesNotMatch(discord, /ensureInteractiveAuth|S666AdminAuth\.ensure|admin_session_required|x-discord-gate-code/);
 });
 
-test("main player has one smooth canonical EQ and meter writer", async () => {
+test("main player has one canonical EQ and meter writer", async () => {
   const equalizer = await read("js/equalizer.js");
   const stage = await read("js/player-stage-v2.js");
+  assert.match(equalizer, /canonical audio visualizer authority V10/);
   assert.match(equalizer, /analyser\.fftSize = mobileLike\(\) \? 128 : 512/);
-  assert.match(equalizer, /centerSupport/);
+  assert.match(equalizer, /signalBridge/);
+  assert.match(equalizer, /centerBridge/);
   assert.match(equalizer, /applyBottomMeter/);
   assert.match(equalizer, /window\.__MeterBus/);
-  assert.match(equalizer, /target > meterEnvelope \? 0\.72 : 0\.20/);
+  assert.match(equalizer, /target > meterEnvelope \? 0\.70 : 0\.20/);
   assert.match(equalizer, /--eq-scale/);
   assert.match(equalizer, /requestAnimationFrame\(renderFallbackFrame\)/);
+  assert.doesNotMatch(equalizer, /const offset = side|index === 1 \? -5|index === 1 \? -10/);
   assert.doesNotMatch(equalizer, /slotHeight\(|clientHeight.*eq-bar|getBoundingClientRect.*eq-bar/);
-  assert.match(stage, /installMeterBusHook/);
+  assert.match(stage, /Reiner MeterBus-Konsument/);
+  assert.match(stage, /consumeMeterBus/);
   assert.match(stage, /driveSideLeds/);
-  assert.match(stage, /driveSideModules/);
-  assert.doesNotMatch(stage, /function setEq\(|function setSideMeters\(|function setBottom\(|function setPanelModules\(/);
+  assert.match(stage, /drivePanelModules/);
+  assert.doesNotMatch(stage, /function setEq\(|function setSideMeters\(|function setBottom\(|\.side-meter-fill|#pcBottomSyncMeter|\.eq-bar-fill/);
 });
 
-test("main PC layout resets legacy absolute modules and uses one clean Now Playing grid", async () => {
+test("main player restores responsive header, cockpit buttons and clean Now Playing", async () => {
   const css = await read("css/player-stage-v2.css");
-  assert.match(css, /\.frame-stage \.player-shell\{position:relative!important/);
-  assert.match(css, /transform:none!important/);
-  assert.match(css, /margin:6px auto!important/);
-  assert.match(css, /--s666-side-panel-width:clamp\(220px/);
-  assert.match(css, /grid-template-rows:36px repeat\(3,minmax\(0,1fr\)\) 64px/);
-  assert.match(css, /\.pc-addon-module\{position:relative!important;inset:auto!important/);
-  assert.match(css, /\.eq-bar-fill[\s\S]*scaleY\(var\(--eq-scale/);
+  const stage = await read("js/player-stage-v2.js");
+  assert.match(css, /Player Stage V10: canonical responsive geometry/);
+  assert.match(css, /\.s666-main-header-image/);
+  assert.match(css, /\.s666-main-header-line/);
+  assert.match(css, /grid-template-columns:minmax\(0,1fr\) auto/);
+  assert.match(css, /nth-child\(13\)[\s\S]*nth-child\(16\)/);
+  assert.match(css, /\.now-playing \.now-cover-wrap[\s\S]*grid-column:1/);
+  assert.match(css, /\.now-playing \.section-kicker/);
+  assert.match(css, /animation:s666TitleMarquee 16s linear infinite/);
   assert.match(css, /#phase10NowVersion[\s\S]*#pcTickerRebuildLane/);
-  assert.match(css, /\.section-topline[\s\S]*grid-template-columns:minmax\(0,1fr\) auto/);
-  assert.match(css, /\.now-playing #historyToggle\{position:relative!important;inset:auto!important/);
-  assert.match(css, /\.volume-wrap\{display:flex!important/);
+  assert.match(css, /\.side-meter-stack\{display:grid!important;grid-template-columns:repeat\(3/);
+  assert.match(stage, /veluna-player-header\.webp/);
+  assert.match(stage, /NOW PLAYING/);
+  assert.match(stage, /s666-now-static-title/);
+  assert.match(stage, /s666-title-marquee/);
+  assert.match(stage, /normalizeQueued/);
 });
 
 test("legacy primary action stylesheet never owns main-player geometry", async () => {
@@ -85,7 +94,7 @@ test("legacy primary action stylesheet never owns main-player geometry", async (
   assert.doesNotMatch(actions, /\.visualizer\s*\{[\s\S]*height:/);
 });
 
-test("VELUNA desktop player is centered and its Now Playing area is compact", async () => {
+test("VELUNA desktop player remains centered and compact", async () => {
   const theme = await read("css/veluna-theme.css");
   assert.match(theme, /data-veluna-page="veluna"\] \.app-shell[\s\S]*align-items:center!important;justify-content:center!important/);
   assert.match(theme, /width:clamp\(430px,37vw,500px\)/);
@@ -96,7 +105,7 @@ test("VELUNA desktop player is centered and its Now Playing area is compact", as
   assert.doesNotMatch(theme, /data-veluna-page="veluna"\] \.app-shell[^}]*align-items:flex-start/);
 });
 
-test("VELUNA central UI restores persistent purple active states and volume", async () => {
+test("VELUNA keeps persistent purple active states and volume", async () => {
   const ui = await read("js/veluna-ui.js");
   assert.match(ui, /VELUNA Central UI Runtime v1\.2\.26/);
   assert.match(ui, /function installPersistentActiveState\(\)/);
@@ -109,29 +118,42 @@ test("VELUNA central UI restores persistent purple active states and volume", as
   assert.match(ui, /sourceSwitch\.appendChild\(row\)/);
 });
 
-test("VELUNA keeps fixed iPhone geometry and central responsive artwork", async () => {
+test("VELUNA iPhone geometry clears Dynamic Island and uses lower free space", async () => {
+  const lock = await read("js/veluna-viewport-lock.js");
   const veluna = await read("VELUNA/index.html");
-  const theme = await read("css/veluna-theme.css");
-  const ui = await read("js/veluna-ui.js");
-  assert.match(veluna, /height:100dvh/);
-  assert.match(veluna, /overflow:hidden;overscroll-behavior:none/);
-  assert.match(veluna, /id="nowPlayingClone"/);
-  assert.match(veluna, /@keyframes velunaTicker/);
-  assert.match(theme, /position:fixed!important/);
-  assert.match(theme, /orientation:landscape/);
-  assert.match(theme, /--veluna-fixed-vw/);
-  assert.match(theme, /contain:strict!important/);
-  assert.match(theme, /\.veluna-bottom-brand[\s\S]*height:100%!important/);
-  assert.match(theme, /max-width:96%!important/);
-  assert.match(ui, /injectHeader/);
-  assert.match(ui, /injectBottomBanner/);
-  assert.match(ui, /injectSplash/);
+  assert.match(veluna, /viewport-fit=cover/);
+  assert.match(lock, /fullscreen geometry lock v1\.2\.27/);
+  assert.match(lock, /--veluna-safe-player-top/);
+  assert.match(lock, /max\(56px, calc\(env\(safe-area-inset-top\) \+ 10px\)\)/);
+  assert.match(lock, /--veluna-safe-player-bottom/);
+  assert.match(lock, /card\.style\.setProperty\('bottom'/);
+  assert.match(lock, /clamp\(108px, 18dvh, 188px\)/);
+  assert.match(lock, /clamp\(170px, 27dvh, 280px\)/);
+  assert.match(lock, /visualViewport/);
+});
+
+test("all player overlays use one design-neutral safe-area core", async () => {
+  const core = await read("core/overlay/overlay-core.js");
+  const css = await read("core/overlay/overlay-core.css");
+  assert.match(core, /v179-overlay-safe-area-core/);
+  assert.match(core, /visualViewport/);
+  assert.match(core, /scanOverlays/);
+  assert.match(core, /s666SoundControlOverlay/);
+  assert.match(core, /s666MsgOverlay/);
+  assert.match(core, /smfp-overlay-close-managed/);
+  assert.match(css, /--smfp-overlay-safe-top/);
+  assert.match(css, /\.smfp-overlay-managed/);
+  assert.match(css, /\.smfp-overlay-panel-managed/);
+  assert.match(css, /overflow-y:auto!important/);
+  assert.match(css, /position:sticky!important/);
+  assert.doesNotMatch(css, /background:|border-color:|color:/);
 });
 
 test("all repaired runtime mirrors are byte-identical", async () => {
   for (const path of [
     "_headers", "index.html", "js/admin-auth-client.js", "js/player-alert-client.js", "js/messenger-overlay.js",
     "js/broadcast-message-history.js", "js/skip-control.js", "js/equalizer.js", "js/player-stage-v2.js",
+    "js/overlay-core.js", "core/overlay/overlay-core.js", "core/overlay/overlay-core.css",
     "js/addons/discord-player-addon-v3.js", "js/version-core.js", "css/player-stage-v2.css",
     "css/primary-player-actions.css", "css/veluna-theme.css", "config/radio-runtime.json", "config/release.json", "VELUNA/index.html",
     "veluna/index.html", "js/veluna-ui.js", "js/veluna-viewport-lock.js", "config/veluna-assets.js"
