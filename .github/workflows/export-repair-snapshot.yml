@@ -1,0 +1,28 @@
+name: Export Repair Snapshot
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - .github/workflows/export-repair-snapshot.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repair branch
+        uses: actions/checkout@v4
+      - name: Create repository snapshot
+        run: |
+          zip -qr repo-repair-snapshot.zip . -x '.git/*' 'repo-repair-snapshot.zip'
+      - name: Upload repository snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-repair-snapshot
+          path: repo-repair-snapshot.zip
+          if-no-files-found: error
+          retention-days: 1
