@@ -20,14 +20,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: npm ci
-      - name: VELUNA viewport JavaScript syntax
-        run: node --check js/veluna-viewport-lock.js
-      - name: VELUNA viewport contract
-        run: node --test tests/viewport-fullscreen.test.mjs
-      - name: Release structure check
-        run: npm run check
-      - name: Full Node test suite
-        run: npm test
+      - run: npm run verify
       - name: Python syntax audit without bytecode
         shell: python
         run: |
