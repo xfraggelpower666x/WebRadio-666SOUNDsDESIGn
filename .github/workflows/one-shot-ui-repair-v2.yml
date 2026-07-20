@@ -6,6 +6,11 @@ on:
       - repair/veluna-active-volume-main-layout-v2
     paths:
       - ".github/workflows/one-shot-ui-repair-v2.yml"
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/one-shot-ui-repair-v2.yml"
 
 permissions:
   contents: write
