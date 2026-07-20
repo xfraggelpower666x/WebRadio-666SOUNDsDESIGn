@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn Player Stage V10.
+ * 666SOUNDsDESIGn Player Stage V10.1.
  * Reiner MeterBus-Konsument: Header, Now Playing, Buttons, Status-LEDs und Panelmodule.
  * EQ, Außenmeter und Bottom-Meter werden ausschließlich von equalizer.js geschrieben.
  */
@@ -8,7 +8,7 @@
   if(window.__S666_PLAYER_STAGE_V2_CORRECTION__) return;
   window.__S666_PLAYER_STAGE_V2_CORRECTION__ = true;
 
-  var state={smooth:Object.create(null),lastTitle:'',lastFrame:0};
+  var state={smooth:Object.create(null),lastTitle:'',lastFrame:0,normalizeQueued:false};
   function q(s,r){return (r||document).querySelector(s);}
   function qa(s,r){return Array.from((r||document).querySelectorAll(s));}
   function clamp(v,a,b){v=Number(v)||0;return Math.max(a,Math.min(b,v));}
@@ -80,7 +80,9 @@
     if(mobile){
       mobile.classList.add('s666-mobile-header');
       var images=qa('img',mobile);images.slice(1).forEach(function(item){item.remove();});
-      var first=images[0];if(!first){first=new Image();mobile.prepend(first);}first.src='/assets/veluna/header/veluna-player-header.webp';first.alt='LYVRA · 666 PLAYER';first.className='s666-mobile-header-image';
+      var first=images[0];if(!first){first=new Image();mobile.prepend(first);}
+      if(first.getAttribute('src')!=='/assets/veluna/header/veluna-player-header.webp')first.src='/assets/veluna/header/veluna-player-header.webp';
+      first.alt='LYVRA · 666 PLAYER';first.className='s666-mobile-header-image';
     }
   }
 
@@ -95,15 +97,15 @@
     panel.classList.add('s666-now-playing-canonical');
     var topline=q('.section-topline',panel);if(!topline)return;
     var textBox=topline.firstElementChild||topline;
-    var kicker=q('.section-kicker',textBox);if(!kicker){kicker=document.createElement('div');kicker.className='section-kicker';textBox.prepend(kicker);}kicker.textContent='NOW PLAYING';
+    var kicker=q('.section-kicker',textBox);if(!kicker){kicker=document.createElement('div');kicker.className='section-kicker';textBox.prepend(kicker);}if(kicker.textContent!=='NOW PLAYING')kicker.textContent='NOW PLAYING';
     var staticTitle=q('.meta-line',textBox);if(!staticTitle){staticTitle=document.createElement('div');staticTitle.className='meta-line';textBox.appendChild(staticTitle);}staticTitle.classList.add('s666-now-static-title');
-    var title=titleFromDesktop()||state.lastTitle||'666SOUNDsDESIGn WebRadio';state.lastTitle=title;staticTitle.textContent=title;
-    var ticker=q('#nowPlayingTicker',panel)||q('.ticker-text',panel);if(ticker){ticker.classList.add('s666-title-marquee');if(cleanTitle(ticker.textContent)!==title)ticker.textContent=title;ticker.setAttribute('aria-label','Aktueller Titel: '+title);}
+    var title=titleFromDesktop()||state.lastTitle||'666SOUNDsDESIGn WebRadio';state.lastTitle=title;if(cleanTitle(staticTitle.textContent)!==title)staticTitle.textContent=title;
+    var ticker=q('#nowPlayingTicker',panel)||q('.ticker-text',panel);if(ticker){ticker.classList.add('s666-title-marquee');if(cleanTitle(ticker.textContent)!==title)ticker.textContent=title;var label='Aktueller Titel: '+title;if(ticker.getAttribute('aria-label')!==label)ticker.setAttribute('aria-label',label);}
   }
 
   function normalizeMobileNowPlaying(){
     var app=q('#mffApp');if(!app)return;
-    var small=q('.mff-title small',app);if(small)small.textContent='NOW PLAYING';
+    var small=q('.mff-title small',app);if(small&&small.textContent!=='NOW PLAYING')small.textContent='NOW PLAYING';
     var mobileTitle=q('.mff-title h1 span',app)||q('.mff-title h1',app);if(mobileTitle){var value=cleanTitle(mobileTitle.textContent);if(value)state.lastTitle=value;mobileTitle.classList.add('s666-title-marquee');}
     ensureMainHeader();
   }
@@ -142,12 +144,14 @@
     driveSideLeds(bus,level,peak);drivePanelModules(bus,level,peak,pulse);requestAnimationFrame(consumeMeterBus);
   }
 
+  function normalizeUi(){ensureActionButtons();ensureMainHeader();normalizeDesktopNowPlaying();normalizeMobileNowPlaying();}
+  function scheduleNormalize(){if(state.normalizeQueued)return;state.normalizeQueued=true;requestAnimationFrame(function(){state.normalizeQueued=false;normalizeUi();});}
   function boot(){
-    installTouchFeedback();ensureActionButtons();ensureMainHeader();normalizeDesktopNowPlaying();normalizeMobileNowPlaying();sidePanel('left');sidePanel('right');
+    installTouchFeedback();normalizeUi();sidePanel('left');sidePanel('right');
     if(!window.__S666_STAGE_BUS_LOOP__){window.__S666_STAGE_BUS_LOOP__=true;requestAnimationFrame(consumeMeterBus);}
   }
 
-  var observer=new MutationObserver(function(){ensureActionButtons();ensureMainHeader();normalizeDesktopNowPlaying();normalizeMobileNowPlaying();});
+  var observer=new MutationObserver(scheduleNormalize);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){boot();observer.observe(document.body,{childList:true,subtree:true,characterData:true});},{once:true});
   else{boot();observer.observe(document.body,{childList:true,subtree:true,characterData:true});}
   window.addEventListener('load',boot,{passive:true});
