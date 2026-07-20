@@ -6,6 +6,8 @@ on:
       - WebRadio-666SOUNDsDESIGn
     paths:
       - ".github/workflows/live-player-smoke.yml"
+      - "_headers"
+      - "public/_headers"
       - "index.html"
       - "public/index.html"
       - "VELUNA/index.html"
@@ -16,8 +18,12 @@ on:
       - "public/js/equalizer.js"
       - "js/player-stage-v2.js"
       - "public/js/player-stage-v2.js"
+      - "js/veluna-ui.js"
+      - "public/js/veluna-ui.js"
       - "css/player-stage-v2.css"
       - "public/css/player-stage-v2.css"
+      - "css/primary-player-actions.css"
+      - "public/css/primary-player-actions.css"
       - "css/veluna-theme.css"
       - "public/css/veluna-theme.css"
   pull_request:
@@ -91,7 +97,9 @@ jobs:
           fetch_live "/veluna/" "$workdir/veluna.html"
           fetch_live "/js/equalizer.js" "$workdir/equalizer.js"
           fetch_live "/js/player-stage-v2.js" "$workdir/player-stage-v2.js"
+          fetch_live "/js/veluna-ui.js" "$workdir/veluna-ui.js"
           fetch_live "/css/player-stage-v2.css" "$workdir/player-stage-v2.css"
+          fetch_live "/css/primary-player-actions.css" "$workdir/primary-player-actions.css"
           fetch_live "/css/veluna-theme.css" "$workdir/veluna-theme.css"
 
           grep -Fq "Root Main Player" "$workdir/root.html"
@@ -102,5 +110,17 @@ jobs:
           grep -Fq "margin:6px auto!important" "$workdir/player-stage-v2.css"
           grep -Fq "align-items:center!important;justify-content:center!important" "$workdir/veluna-theme.css"
           grep -Fq "height:clamp(76px,10vh,96px)!important" "$workdir/veluna-theme.css"
+
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            grep -Fq "Main-player geometry belongs to player-stage-v2.css" "$workdir/primary-player-actions.css"
+            if grep -Fq "player-shell > .visualizer" "$workdir/primary-player-actions.css"; then
+              echo "FAIL primary-player-actions.css still owns visualizer geometry" >&2
+              exit 1
+            fi
+            grep -Fq "VELUNA Central UI Runtime v1.2.26" "$workdir/veluna-ui.js"
+            grep -Fq "installPersistentActiveState" "$workdir/veluna-ui.js"
+            grep -Fq "velunaVolumeSlider" "$workdir/veluna-ui.js"
+            grep -Fq "veluna_volume_v1" "$workdir/veluna-ui.js"
+          fi
 
           echo "LIVE PLAYER SMOKE PASS"
