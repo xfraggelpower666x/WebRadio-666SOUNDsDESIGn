@@ -43,9 +43,10 @@ jobs:
               ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
           print('Python syntax PASS')
           PY
-      - name: Remove temporary workflow and publish revert
+      - name: Remove temporary files and publish revert
         run: |
           rm -f .github/workflows/revert-pr44-mobile-regression.yml
+          rm -f docs/ROLLBACK_PR44_MOBILE_REGRESSION.md
           git add -A
           git commit --amend --no-edit
           git push --force-with-lease origin HEAD:rollback-pr44-mobile-regression-20260722
