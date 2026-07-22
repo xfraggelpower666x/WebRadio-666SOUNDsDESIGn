@@ -20,7 +20,18 @@ jobs:
         with:
           python-version: "3.12"
       - run: npm ci
-      - run: npm run verify
+      - name: Central policy JavaScript syntax
+        run: |
+          node --check js/boost-core.js
+          node --check js/audio-policy-core.js
+          node --check js/artwork-core.js
+          node --check config/veluna-assets.js
+      - name: Central policy contract
+        run: node --test tests/central-audio-artwork-policy.test.mjs
+      - name: Release structure check
+        run: npm run check
+      - name: Full Node test suite
+        run: npm test
       - name: Python syntax audit without bytecode
         shell: python
         run: |
