@@ -123,13 +123,15 @@ test("VELUNA iPhone geometry clears Dynamic Island and uses lower free space", a
   const veluna = await read("VELUNA/index.html");
   assert.match(veluna, /viewport-fit=cover/);
   assert.match(veluna, /id="listenersText"[\s\S]*id="bitrateText"[\s\S]*id="djText"/);
-  assert.match(lock, /fullscreen geometry lock v1\.2\.28/);
+  assert.match(lock, /fullscreen geometry lock v1\.2\.30/);
   assert.match(lock, /--veluna-safe-player-top/);
   assert.match(lock, /max\(56px, calc\(env\(safe-area-inset-top\) \+ 10px\)\)/);
   assert.match(lock, /--veluna-safe-player-bottom/);
   assert.match(lock, /card\.style\.setProperty\('bottom'/);
   assert.match(lock, /grid-template-rows/);
-  assert.match(lock, /minmax\(\$\{spacerMinimum\}px,\.38fr\)/);
+  assert.match(lock, /displayMinimum = compact \? 150 : 188/);
+  assert.match(lock, /spacerMinimum = 0/);
+  assert.match(lock, /minmax\(\$\{displayMinimum\}px,1fr\) auto \$\{spacerMinimum\}px/);
   assert.match(lock, /placeInRow\(miniGrid, 5\)/);
   assert.match(lock, /placeInRow\(sourceSwitch, 7\)/);
   assert.match(lock, /placeInRow\(footer, 12\)/);
