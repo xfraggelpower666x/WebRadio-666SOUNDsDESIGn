@@ -40,7 +40,7 @@ jobs:
               code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
               exec(compile(code, 'stored-single-writer-repair.py', 'exec'), {'__name__':'__main__'})
               error_path.unlink(missing_ok=True)
-          except Exception:
+          except BaseException:
               error_path.write_text(traceback.format_exc(), encoding='utf-8')
               raise
       - name: Upload exact transform exception
