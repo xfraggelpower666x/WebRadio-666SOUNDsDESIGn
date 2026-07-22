@@ -1,7 +1,7 @@
 /* Zentrale VELUNA-Asset-, Branding- und Shared-Infrastructure-Quelle. */
 window.VELUNA_ASSETS = Object.freeze({
-  release: 'FULLVERSION_SHARED_IPHONE_AUDIO_START_v1.2.17',
-  version: '1.2.17',
+  release: 'FULLVERSION_CENTRAL_AUDIO_ARTWORK_POLICY_v1.2.29',
+  version: '1.2.29',
   endpoint: '/veluna',
   background: '/assets/veluna/background/veluna-player-background.webp',
   header: '/assets/veluna/header/veluna-player-header.webp',
@@ -14,41 +14,75 @@ window.VELUNA_ASSETS = Object.freeze({
 });
 
 /*
- * Shared overlay bootstrap v179.
+ * Shared infrastructure bootstrap v180.
  * Wird von 666 PLAYER, VELUNA und internem Notfallplayer geladen.
- * Lädt nur den bestehenden designneutralen Overlay-Core; erzeugt kein eigenes Menü oder Theme.
+ * Lädt designneutral: Overlay-Safe-Area, zentrale Audio-/Gerätepolicy und Artwork-Priorität.
  */
 (() => {
   'use strict';
-  const version = '2026-07-20-safe-area-v179';
+  const version = '2026-07-22-central-audio-artwork-v180';
   const head = document.head || document.documentElement;
   if (!head) return;
 
-  if (!document.querySelector('link[href*="/core/overlay/overlay-core.css"]')) {
+  const loadStyle = (href, marker) => {
+    if (document.querySelector(`link[href*="${href.split('?')[0]}"]`)) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = `/core/overlay/overlay-core.css?v=${version}`;
-    link.dataset.smfpOverlayCore = 'css';
+    link.href = href;
+    link.dataset[marker] = 'css';
     head.appendChild(link);
-  }
+  };
 
-  const activate = () => {
+  const loadScript = (src, marker, ready) => new Promise((resolve, reject) => {
+    if (typeof ready === 'function' && ready()) { resolve(); return; }
+    const base = src.split('?')[0];
+    const existing = Array.from(document.scripts).find(script => script.src && script.src.includes(base));
+    if (existing) {
+      if (typeof ready === 'function' && ready()) { resolve(); return; }
+      existing.addEventListener('load', () => resolve(), { once:true });
+      existing.addEventListener('error', reject, { once:true });
+      setTimeout(resolve, 1200);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = true;
+    script.dataset[marker] = 'js';
+    script.addEventListener('load', () => resolve(), { once:true });
+    script.addEventListener('error', reject, { once:true });
+    head.appendChild(script);
+  });
+
+  loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
+  loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
+
+  const activateOverlay = () => {
     try {
       window.SMFPOverlayCore?.updateViewport?.();
       window.SMFPOverlayCore?.scanOverlays?.(document);
     } catch (_) {}
   };
 
-  if (window.SMFPOverlayCore) {
-    activate();
-    return;
-  }
-  if (document.querySelector('script[src*="/core/overlay/overlay-core.js"],script[src*="/js/overlay-core.js"]')) return;
+  void loadScript(
+    `/core/overlay/overlay-core.js?v=${version}`,
+    'smfpOverlayCore',
+    () => !!window.SMFPOverlayCore
+  ).then(activateOverlay).catch(() => {});
 
-  const script = document.createElement('script');
-  script.src = `/core/overlay/overlay-core.js?v=${version}`;
-  script.defer = true;
-  script.dataset.smfpOverlayCore = 'js';
-  script.addEventListener('load', activate, { once:true });
-  head.appendChild(script);
+  const audioReady = () => !!window.SMFPBoostCore?.centralPolicyVersion;
+  const policyReady = () => !!window.SMFPAudioPolicyUI;
+  const artworkReady = () => !!window.SMFPArtworkCore;
+
+  void loadScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
+    .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
+    .then(() => {
+      try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {}
+    })
+    .catch(() => {});
+
+  void loadScript(`/js/artwork-core.js?v=${version}`, 'smfpArtworkCore', artworkReady)
+    .then(() => {
+      try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {}
+    })
+    .catch(() => {});
 })();

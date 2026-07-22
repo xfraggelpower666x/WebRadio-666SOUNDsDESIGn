@@ -1,0 +1,76 @@
+/* Central audio/device policy v2.0.0. No player theme takeover. */
+@media (max-width:860px), (pointer:coarse) {
+  #volumeSlider,
+  #velunaVolumeSlider,
+  #smfpDesktopVolumeSlider,
+  .volume-wrap,
+  .veluna-volume-row,
+  .smfp-desktop-volume-row,
+  [data-player-volume],
+  [data-veluna-volume] {
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+}
+
+.smfp-desktop-volume-row {
+  min-width:0;
+  min-height:30px;
+  display:grid;
+  grid-template-columns:auto minmax(100px,1fr) 48px;
+  align-items:center;
+  gap:8px;
+  padding:4px 9px;
+  border:1px solid rgba(22,139,255,.52);
+  border-radius:11px;
+  background:linear-gradient(90deg,rgba(180,92,255,.10),rgba(22,139,255,.08));
+  box-shadow:inset 0 0 12px rgba(180,92,255,.08),0 0 10px rgba(22,139,255,.16);
+}
+.smfp-desktop-volume-row label,
+.smfp-desktop-volume-row output {
+  color:#dcb0ff;
+  font-weight:900;
+  font-size:.68rem;
+  letter-spacing:.05em;
+  text-shadow:0 0 8px rgba(180,92,255,.56);
+}
+.smfp-desktop-volume-row output { text-align:right; font-variant-numeric:tabular-nums; }
+.smfp-desktop-volume-row input { width:100%; min-width:0; accent-color:#b45cff; }
+
+.smfp-central-sound-panel {
+  position:fixed!important;
+  inset:auto!important;
+  top:50%!important;
+  left:50%!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(560px,calc(100vw - 48px))!important;
+  max-height:min(720px,calc(100dvh - 48px))!important;
+  overflow:auto!important;
+  z-index:2147483600!important;
+  padding:14px!important;
+  border-radius:16px!important;
+}
+.smfp-central-sound-panel.hidden,
+.smfp-central-sound-panel[hidden] { display:none!important; }
+.smfp-central-sound-head {
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:10px;
+}
+.smfp-central-boost-row,
+.smfp-central-sound-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.smfp-central-eq-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin:12px 0; }
+.smfp-central-eq-grid label { display:grid; grid-template-rows:auto 150px auto; justify-items:center; gap:6px; min-width:0; }
+.smfp-central-eq-grid input { writing-mode:vertical-lr; direction:rtl; width:28px; height:150px; accent-color:#b45cff; }
+.smfp-central-eq-grid output { font-variant-numeric:tabular-nums; }
+.smfp-central-sound-status { margin-top:10px; text-align:center; font-size:.72rem; letter-spacing:.04em; }
+@media (max-width:860px), (pointer:coarse) {
+  .smfp-central-sound-button,
+  .smfp-central-sound-panel { display:none!important; }
+}
