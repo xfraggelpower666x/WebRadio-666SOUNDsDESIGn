@@ -1,0 +1,224 @@
+name: Finalize Main Now Playing Single Writer
+
+on:
+  push:
+    branches:
+      - repair-main-now-playing-single-writer-20260722
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-main-now-playing-single-writer-20260722
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Apply single-writer repair
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, got {count}')
+              return text.replace(old, new, 1)
+
+          def regex_once(text, pattern, replacement, label, flags=0):
+              next_text, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 regex match, got {count}')
+              return next_text
+
+          # 1) Discord/Messenger add-on: keep messaging and shared status only.
+          addon_path = Path('js/addons/discord-player-addon-v3.js')
+          addon = addon_path.read_text(encoding='utf-8')
+          addon = addon.replace('Shared visual bridge applies Veluna color logic, larger PC Now Playing/cover/EQ and 15s track-cover display.',
+                                'Shared status bridge applies transport/source color state only; player layout and artwork stay central.')
+          addon = addon.replace("var VERSION = 'V4.12-20260719-PLAYER-MESSAGE-OVERLAY-INERT';",
+                                "var VERSION = 'V4.13-20260722-NOW-PLAYING-SINGLE-WRITER';")
+          for line in [
+              "  var lastVisualTrackKey = '';\n",
+              "  var lastStreamCover = '';\n",
+              "  var trackCoverUntil = 0;\n",
+              "  var TRACK_COVER_MS = 15000;\n",
+              "  var STREAM_FALLBACK_COVER = '/assets/veluna/covers/veluna-stream-fallback.webp?v=veluna-v1212';\n",
+          ]:
+              addon = addon.replace(line, '')
+          addon = regex_once(
+              addon,
+              r"\n  function installSharedVisualStyle\(\) \{.*?\n  \}\n\n  function setSharedColorState",
+              "\n  function setSharedColorState",
+              'remove Discord visual CSS writer',
+              re.S,
+          )
+          addon = regex_once(
+              addon,
+              r"\n  function coverCandidate\(value\) \{.*?\n  function initSharedVisualBridge\(\) \{.*?\n  \}\n",
+              "\n  function initSharedVisualBridge() {\n    setSharedColorState('transport', 'idle');\n    syncSharedColorState();\n    clearInterval(visualTimer);\n    visualTimer = setInterval(function () {\n      syncSharedColorState();\n      installVelunaDiscordNoAuthBypass();\n    }, 3500);\n  }\n",
+              'remove Discord cover writer',
+              re.S,
+          )
+          addon = replace_once(addon, '    sharedVisualBridge: true,', "    sharedVisualBridge: false,\n    sharedStatusBridge: true,", 'Discord bridge capability')
+          addon_path.write_text(addon, encoding='utf-8')
+          Path('public/js/addons/discord-player-addon-v3.js').write_text(addon, encoding='utf-8')
+
+          # 2) Main player: central artwork core receives the original metadata payload.
+          player_path = Path('js/player-core.js')
+          player = player_path.read_text(encoding='utf-8')
+          player = replace_once(
+              player,
+              '    updateNowCover(data);',
+              "    if (window.SMFPArtworkCore?.update) window.SMFPArtworkCore.update(raw);\n    else updateNowCover(data);",
+              'player-core artwork delegation',
+          )
+          player_path.write_text(player, encoding='utf-8')
+          Path('public/js/player-core.js').write_text(player, encoding='utf-8')
+
+          # 3) VELUNA UI no longer resets central artwork or creates a second splash.
+          veluna_ui_path = Path('js/veluna-ui.js')
+          veluna_ui = veluna_ui_path.read_text(encoding='utf-8')
+          veluna_ui = regex_once(
+              veluna_ui,
+              r"  function replaceFallbackArtwork\(\) \{.*?\n  \}\n\n  function injectSplash",
+              "  function replaceFallbackArtwork(){\n    const fallback = A.fallbackCover || '/assets/veluna/covers/veluna-stream-fallback.webp';\n    if (window.SMFPArtworkCore?.enforce) { window.SMFPArtworkCore.enforce(); return; }\n    for (const img of document.querySelectorAll('#nowCover,.now-cover,[data-stream-cover]')) {\n      if (!img.getAttribute('src')) img.src = fallback;\n    }\n  }\n\n  function injectSplash",
+              'VELUNA fallback ownership',
+              re.S,
+          )
+          veluna_ui = replace_once(veluna_ui, '  requestAnimationFrame(injectSplash);', '  // Splash wird ausschließlich von veluna-splash.js verwaltet.', 'disable duplicate VELUNA splash')
+          veluna_ui_path.write_text(veluna_ui, encoding='utf-8')
+          Path('public/js/veluna-ui.js').write_text(veluna_ui, encoding='utf-8')
+
+          # 4) One central pre-paint splash implementation.
+          splash = """/* Central player splash pre-paint gate v1.2.19 — no player layout mutation */
+          (()=>{'use strict';
+           const ROOT=document.documentElement;
+           const SESSION_KEY='s666_player_intro_seen_v1';
+           const reveal=()=>{ROOT.removeAttribute('data-s666-splash-pending');ROOT.removeAttribute('data-s666-splash-active');};
+           try{if(sessionStorage.getItem(SESSION_KEY)==='1'){reveal();return;}sessionStorage.setItem(SESSION_KEY,'1');}catch(_){}
+           const A=window.VELUNA_ASSETS||{};
+           if(document.querySelector('[data-veluna-central-splash="1"]'))return;
+           const splash=document.createElement('div');
+           splash.dataset.velunaCentralSplash='1';splash.setAttribute('aria-hidden','true');
+           Object.assign(splash.style,{position:'fixed',inset:'0',zIndex:'2147483000',display:'flex',alignItems:'center',justifyContent:'center',background:'#040408',overflow:'hidden',pointerEvents:'none',opacity:'1',transition:'opacity .42s ease'});
+           const video=document.createElement('video');video.autoplay=true;video.muted=true;video.playsInline=true;video.preload='auto';video.setAttribute('webkit-playsinline','');video.setAttribute('disablepictureinpicture','');
+           Object.assign(video.style,{width:'100%',height:'100%',objectFit:'contain',background:'#040408'});
+           const webm=document.createElement('source');webm.src=A.splashWebm||'/assets/veluna/splash/veluna-loading-splash.webm';webm.type='video/webm';
+           const mp4=document.createElement('source');mp4.src=A.splashMp4||'/assets/veluna/splash/veluna-loading-splash.mp4';mp4.type='video/mp4';
+           video.append(webm,mp4);splash.append(video);document.body.append(splash);ROOT.setAttribute('data-s666-splash-active','1');window.VELUNA_CENTRAL_SPLASH_READY=true;
+           let done=false;const finish=()=>{if(done)return;done=true;splash.style.opacity='0';setTimeout(()=>{splash.remove();reveal();},480)};
+           video.addEventListener('ended',finish,{once:true});video.addEventListener('error',finish,{once:true});setTimeout(finish,7200);video.play().catch(()=>setTimeout(finish,1200));setTimeout(reveal,8200);
+          })();
+          """
+          Path('js/veluna-splash.js').write_text(splash, encoding='utf-8')
+          Path('public/js/veluna-splash.js').write_text(splash, encoding='utf-8')
+
+          # 5) HTML mirrors: pre-paint gate, one cover element and current cache-busts.
+          html_paths = [
+              Path('index.html'), Path('public/index.html'),
+              Path('VELUNA/index.html'), Path('public/VELUNA/index.html'),
+              Path('veluna/index.html'), Path('public/veluna/index.html'),
+          ]
+          preflight = """  <script id="s666SplashPreflight">(()=>{try{if(sessionStorage.getItem('s666_player_intro_seen_v1')!=='1')document.documentElement.setAttribute('data-s666-splash-pending','1')}catch(_){}})();</script>
+            <style id="s666SplashPrepaintGate">html[data-s666-splash-pending="1"] body .frame-stage,html[data-s666-splash-pending="1"] body .app-shell{visibility:hidden!important}</style>
+          """
+          for path in html_paths:
+              if not path.exists():
+                  continue
+              html = path.read_text(encoding='utf-8')
+              if 's666SplashPreflight' not in html:
+                  html = replace_once(html, '</head>', preflight + '</head>', f'{path} splash preflight')
+              html = re.sub(r'(/js/addons/discord-player-addon-v3\.js\?v=)[^"\']+', r'\g<1>2026-07-22-single-writer-v53', html)
+              html = re.sub(r'(/js/player-core\.js\?v=)[^"\']+', r'\g<1>2026-07-22-single-writer-v4', html)
+              html = re.sub(r'(/js/veluna-ui\.js\?v=)[^"\']+', r'\g<1>2026-07-22-single-writer-v1229', html)
+              html = re.sub(r'(/js/veluna-splash\.js\?v=)[^"\']+', r'\g<1>2026-07-22-prepaint-v1219', html)
+              html = re.sub(r'(/config/veluna-assets\.js\?v=)[^"\']+', r'\g<1>2026-07-22-central-v181', html)
+              html = re.sub(
+                  r'(<img id="nowCover"[^>]*>)[ \t]*<img aria-hidden="true" src="/assets/veluna/covers/veluna-stream-fallback\.webp"[^>]*>',
+                  r'\1',
+                  html,
+                  count=1,
+              )
+              path.write_text(html, encoding='utf-8')
+
+          # 6) Regression contract.
+          test = r"""import test from 'node:test';
+          import assert from 'node:assert/strict';
+          import { readFile } from 'node:fs/promises';
+          const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+
+          test('main Now Playing has exactly one active artwork writer', async () => {
+            const addon = await read('js/addons/discord-player-addon-v3.js');
+            const player = await read('js/player-core.js');
+            const artwork = await read('js/artwork-core.js');
+            const velunaUi = await read('js/veluna-ui.js');
+            assert.doesNotMatch(addon, /installSharedVisualStyle|applyCoverToPlayers|syncSharedCoverLogic|TRACK_COVER_MS/);
+            assert.match(addon, /sharedVisualBridge:\s*false/);
+            assert.match(addon, /sharedStatusBridge:\s*true/);
+            assert.match(player, /SMFPArtworkCore\?\.update\) window\.SMFPArtworkCore\.update\(raw\)/);
+            assert.match(artwork, /TRACK_MS\s*=\s*18000/);
+            assert.match(artwork, /track-18s-complete/);
+            assert.match(velunaUi, /SMFPArtworkCore\?\.enforce/);
+            assert.doesNotMatch(velunaUi, /requestAnimationFrame\(injectSplash\)/);
+          });
+
+          test('main HTML has pre-paint splash gate and no decorative fallback image duplicate', async () => {
+            const root = await read('index.html');
+            const mirror = await read('public/index.html');
+            assert.equal(mirror, root);
+            assert.match(root, /s666SplashPreflight/);
+            assert.match(root, /data-s666-splash-pending/);
+            assert.match(root, /discord-player-addon-v3\.js\?v=2026-07-22-single-writer-v53/);
+            assert.match(root, /veluna-splash\.js\?v=2026-07-22-prepaint-v1219/);
+            assert.equal((root.match(/id="nowCover"/g) || []).length, 1);
+            assert.doesNotMatch(root, /<img aria-hidden="true" src="\/assets\/veluna\/covers\/veluna-stream-fallback\.webp"/);
+          });
+
+          test('single splash runtime reveals only after splash completion or session skip', async () => {
+            const splash = await read('js/veluna-splash.js');
+            assert.equal(await read('public/js/veluna-splash.js'), splash);
+            assert.match(splash, /SESSION_KEY='s666_player_intro_seen_v1'/);
+            assert.match(splash, /data-s666-splash-pending/);
+            assert.match(splash, /splash\.remove\(\);reveal\(\)/);
+            assert.match(splash, /VELUNA_CENTRAL_SPLASH_READY=true/);
+          });
+
+          test('all changed runtime mirrors are byte-identical', async () => {
+            for (const path of [
+              'js/addons/discord-player-addon-v3.js',
+              'js/player-core.js',
+              'js/veluna-ui.js',
+              'js/veluna-splash.js'
+            ]) assert.equal(await read(path), await read(`public/${path}`), path);
+          });
+          """
+          Path('tests/main-now-playing-single-writer.test.mjs').write_text(test, encoding='utf-8')
+
+      - name: JavaScript syntax
+        run: |
+          node --check js/addons/discord-player-addon-v3.js
+          node --check js/player-core.js
+          node --check js/veluna-ui.js
+          node --check js/veluna-splash.js
+      - name: Single-writer contract
+        run: node --test tests/main-now-playing-single-writer.test.mjs
+      - name: Full repository verification
+        run: npm run verify
+      - name: Commit repaired files and remove finalizer
+        run: |
+          rm -f .github/workflows/finalize-main-now-playing-single-writer.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Repair main Now Playing single-writer ownership"
+          git push origin HEAD:repair-main-now-playing-single-writer-20260722
