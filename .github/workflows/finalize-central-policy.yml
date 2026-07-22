@@ -1,0 +1,335 @@
+name: Finalize Central Audio Policy
+
+on:
+  push:
+    branches:
+      - repair-central-audio-artwork-policy-20260722
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-central-audio-artwork-policy-20260722
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Apply final central-policy repairs
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, got {count}")
+              return text.replace(old, new, 1)
+
+          config_path = Path('config/veluna-assets.js')
+          config = config_path.read_text(encoding='utf-8')
+          config = config.replace('Shared infrastructure bootstrap v180.', 'Shared infrastructure bootstrap v181.')
+          config = config.replace("const version = '2026-07-22-central-audio-artwork-v180';", "const version = '2026-07-22-central-audio-artwork-v181';")
+          bridge_anchor = "  const head = document.head || document.documentElement;\n  if (!head) return;\n"
+          bridge = r'''
+
+  /*
+   * Synchronous graph bridge: captures an already scheduled player graph even when an old
+   * boost-core file was restored from browser cache. The current central core adopts this
+   * bridge and remains the single policy authority.
+   */
+  const installAudioGraphBridge = () => {
+    if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
+    const graphs = new WeakMap();
+    const graphFor = audio => {
+      if (!audio) return null;
+      let graph = graphs.get(audio);
+      if (!graph) {
+        graph = { audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null };
+        graphs.set(audio, graph);
+      }
+      return graph;
+    };
+    const nodeType = node => {
+      const name = String(node?.constructor?.name || '');
+      if (/BiquadFilter/i.test(name) || (node?.frequency && node?.gain && typeof node.type === 'string')) return 'filter';
+      if (/DynamicsCompressor/i.test(name) || (node?.threshold && node?.ratio && node?.attack)) return 'limiter';
+      if (/Analyser/i.test(name) || (typeof node?.fftSize === 'number' && typeof node?.getByteFrequencyData === 'function')) return 'analyser';
+      if (/GainNode/i.test(name) || (node?.gain && !node?.frequency && !node?.threshold)) return 'gain';
+      return 'other';
+    };
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const AudioNodeCtor = window.AudioNode;
+      if (Ctx?.prototype && AudioNodeCtor?.prototype) {
+        const nativeCreateSource = Ctx.prototype.createMediaElementSource;
+        if (nativeCreateSource && !nativeCreateSource.__smfpWrapped) {
+          const wrappedCreateSource = function(media) {
+            const source = nativeCreateSource.call(this, media);
+            source.__smfpBridgeAudio = media;
+            const graph = graphFor(media);
+            graph.context = this;
+            graph.source = source;
+            return source;
+          };
+          wrappedCreateSource.__smfpWrapped = true;
+          wrappedCreateSource.__smfpBridgeWrapped = true;
+          Ctx.prototype.createMediaElementSource = wrappedCreateSource;
+        }
+        const nativeConnect = AudioNodeCtor.prototype.connect;
+        if (nativeConnect && !nativeConnect.__smfpWrapped) {
+          const wrappedConnect = function(destination) {
+            const result = nativeConnect.apply(this, arguments);
+            try {
+              const audio = this.__smfpBridgeAudio;
+              if (audio && destination) {
+                destination.__smfpBridgeAudio = audio;
+                const graph = graphFor(audio);
+                graph.context = this.context || destination.context || graph.context;
+                const type = nodeType(destination);
+                if (type === 'gain' && !graph.gains.includes(destination)) graph.gains.push(destination);
+                if (type === 'filter' && !graph.filters.includes(destination)) graph.filters.push(destination);
+                if (type === 'limiter') graph.limiter = destination;
+                if (type === 'analyser') graph.analyser = destination;
+              }
+            } catch (_) {}
+            return result;
+          };
+          wrappedConnect.__smfpWrapped = true;
+          wrappedConnect.__smfpBridgeWrapped = true;
+          AudioNodeCtor.prototype.connect = wrappedConnect;
+        }
+      }
+    } catch (_) {}
+    window.__SMFPAudioGraphBridge = Object.freeze({ version:'1.0.0', graphFor });
+    return window.__SMFPAudioGraphBridge;
+  };
+  installAudioGraphBridge();
+'''
+          config = replace_once(config, bridge_anchor, bridge_anchor + bridge, 'config bridge insertion')
+          load_anchor = "  const loadScript = (src, marker, ready) => new Promise((resolve, reject) => {"
+          current_loader = r'''
+
+  const loadCurrentScript = (src, marker, ready) => new Promise((resolve, reject) => {
+    if (typeof ready === 'function' && ready()) { resolve(); return; }
+    const pending = Array.from(document.scripts).find(script => script.dataset.smfpCurrentRuntime === marker);
+    if (pending) {
+      pending.addEventListener('load', () => resolve(), { once:true });
+      pending.addEventListener('error', reject, { once:true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = false;
+    script.async = false;
+    script.dataset[marker] = 'js';
+    script.dataset.smfpCurrentRuntime = marker;
+    script.addEventListener('load', () => resolve(), { once:true });
+    script.addEventListener('error', reject, { once:true });
+    head.appendChild(script);
+  });
+'''
+          config = replace_once(config, load_anchor, current_loader + "\n" + load_anchor, 'current loader insertion')
+          config = replace_once(
+              config,
+              "  void loadScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)",
+              "  void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)",
+              'force current boost core'
+          )
+          config_path.write_text(config, encoding='utf-8')
+          Path('public/config/veluna-assets.js').write_text(config, encoding='utf-8')
+
+          boost_path = Path('js/boost-core.js')
+          boost = boost_path.read_text(encoding='utf-8')
+          old_graph = '''  function graphFor(audio){
+    if (!audio) return null;
+    var graph = graphs.get(audio);
+    if (!graph) {
+      graph = { audio:audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null, createdByCore:false };
+      graphs.set(audio, graph);
+    }
+    return graph;
+  }
+'''
+          new_graph = '''  function graphFor(audio){
+    if (!audio) return null;
+    var graph = graphs.get(audio);
+    if (!graph) {
+      graph = { audio:audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null, createdByCore:false };
+      graphs.set(audio, graph);
+    }
+    try {
+      var bridged = window.__SMFPAudioGraphBridge?.graphFor?.(audio);
+      if (bridged) {
+        graph.context = bridged.context || graph.context;
+        graph.source = bridged.source || graph.source;
+        graph.gains = bridged.gains?.length ? bridged.gains : graph.gains;
+        graph.filters = bridged.filters?.length ? bridged.filters : graph.filters;
+        graph.limiter = bridged.limiter || graph.limiter;
+        graph.analyser = bridged.analyser || graph.analyser;
+        graph.gains.forEach(function(node){ attachParamContext(node, graph.context); });
+        graph.filters.forEach(function(node){ attachParamContext(node, graph.context); });
+      }
+    } catch (_) {}
+    return graph;
+  }
+'''
+          boost = replace_once(boost, old_graph, new_graph, 'boost graph bridge adoption')
+          boost_path.write_text(boost, encoding='utf-8')
+          for path in ['public/js/boost-core.js', 'core/audio/boost-core.js', 'public/core/audio/boost-core.js']:
+              Path(path).write_text(boost, encoding='utf-8')
+
+          policy_path = Path('js/audio-policy-core.js')
+          policy = policy_path.read_text(encoding='utf-8')
+          configure = r'''
+  function configureExistingSoundPanel() {
+    const panel = q('#soundPanel');
+    const engine = core();
+    if (!panel || !engine) return false;
+    const max = Number(engine.maxStage?.() ?? (isMobile() ? 5 : 1));
+    qa('.boost-chip[data-boost]', panel).forEach(button => {
+      const allowed = Number(button.dataset.boost) <= max;
+      button.hidden = !allowed;
+      button.setAttribute('aria-hidden', allowed ? 'false' : 'true');
+      if ('inert' in button) button.inert = !allowed;
+      if (!allowed) {
+        button.classList.remove('is-active');
+        button.setAttribute('aria-pressed', 'false');
+      }
+    });
+    panel.dataset.smfpCentralAudio = '1';
+    panel.dataset.smfpMaxBoost = String(max);
+    const status = q('#soundStatus', panel);
+    if (status && !status.textContent.includes('CENTRAL SOUND')) {
+      status.textContent = `CENTRAL SOUND · ${isMobile() ? 'MOBILE' : 'DESKTOP'} · BOOST 0/${max} · GRAPH WAIT · RAMP 160ms`;
+    }
+    return true;
+  }
+
+'''
+          policy = replace_once(policy, '  function ensureDesktopSoundPanel() {\n', configure + '  function ensureDesktopSoundPanel() {\n', 'existing panel configurator')
+          policy = replace_once(
+              policy,
+              "    if (isMobile() || currentPage === 'main' || q('#smfpCentralSoundPanel')) return;",
+              "    if (isMobile() || currentPage === 'main' || q('#smfpCentralSoundPanel')) return;\n    if (currentPage === 'veluna' && configureExistingSoundPanel()) return;",
+              'avoid duplicate VELUNA sound panel'
+          )
+          policy = replace_once(
+              policy,
+              "  function bindMobileSoundRecovery() {\n    if (!isMobile()) return;\n    const playerAudio = audio();\n    const engine = core();\n    if (!playerAudio || !engine) return;",
+              "  function bindSharedSoundRecovery() {\n    const marker = document.documentElement;\n    if (marker.dataset.smfpSharedSoundRecovery === '1') return;\n    const playerAudio = audio();\n    const engine = core();\n    if (!playerAudio || !engine) return;\n    marker.dataset.smfpSharedSoundRecovery = '1';",
+              'shared sound binding'
+          )
+          policy = replace_once(
+              policy,
+              "    ensureDesktopVolume();\n    ensureDesktopSoundPanel();\n    bindMobileSoundRecovery();\n    core()?.applyVolumePolicy?.(document);",
+              "    ensureDesktopVolume();\n    configureExistingSoundPanel();\n    ensureDesktopSoundPanel();\n    bindSharedSoundRecovery();\n    core()?.applyVolumePolicy?.(document);",
+              'activate shared panel binding'
+          )
+          policy_path.write_text(policy, encoding='utf-8')
+          Path('public/js/audio-policy-core.js').write_text(policy, encoding='utf-8')
+
+          overlay_test = '''import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+
+const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+
+test('shared asset config bootstraps design-neutral overlay, audio policy and artwork once', async () => {
+  const config = await read('config/veluna-assets.js');
+  const mirror = await read('public/config/veluna-assets.js');
+  assert.equal(mirror, config);
+  assert.match(config, /Shared infrastructure bootstrap v181/);
+  assert.match(config, /\/core\/overlay\/overlay-core\.css/);
+  assert.match(config, /\/core\/overlay\/overlay-core\.js/);
+  assert.match(config, /\/css\/audio-policy-core\.css/);
+  assert.match(config, /\/js\/boost-core\.js/);
+  assert.match(config, /\/js\/audio-policy-core\.js/);
+  assert.match(config, /\/js\/artwork-core\.js/);
+  assert.match(config, /window\.SMFPOverlayCore\?\.scanOverlays/);
+  assert.match(config, /__SMFPAudioGraphBridge/);
+  assert.match(config, /loadCurrentScript/);
+  assert.doesNotMatch(config, /border-color:|box-shadow:|background:\s*(?:linear-gradient|#[0-9a-f])/i);
+});
+
+test('main, VELUNA and internal player all load the shared asset config', async () => {
+  for (const path of [
+    'index.html',
+    'veluna/index.html',
+    'VELUNA/index.html',
+    'public/index.html',
+    'public/veluna/index.html',
+    'public/VELUNA/index.html',
+    'worker.js',
+    'workers/webradio-666soundsdesign-worker/worker.js'
+  ]) {
+    const source = await read(path);
+    assert.match(source, /\/config\/veluna-assets\.js\?v=/, path);
+  }
+});
+'''
+          Path('tests/overlay-bootstrap-all-players.test.mjs').write_text(overlay_test, encoding='utf-8')
+
+          central_test = Path('tests/central-audio-artwork-policy.test.mjs').read_text(encoding='utf-8')
+          additions = '''\n\ntest('existing VELUNA sound panel is reused and desktop stages above one are hidden', async () => {\n  const policy = await read('js/audio-policy-core.js');\n  assert.match(policy, /configureExistingSoundPanel/);\n  assert.match(policy, /currentPage === 'veluna' && configureExistingSoundPanel\(\)/);\n  assert.match(policy, /Number\(button\.dataset\.boost\) <= max/);\n  assert.match(policy, /bindSharedSoundRecovery/);\n  assert.doesNotMatch(policy, /function bindMobileSoundRecovery/);\n});\n\ntest('cache-safe graph bridge captures player nodes before central core reload', async () => {\n  const config = await read('config/veluna-assets.js');\n  const core = await read('js/boost-core.js');\n  assert.match(config, /__SMFPAudioGraphBridge/);\n  assert.match(config, /__smfpBridgeAudio/);\n  assert.match(config, /loadCurrentScript/);\n  assert.match(core, /var bridged = window\.__SMFPAudioGraphBridge/);\n});\n'''
+          if 'existing VELUNA sound panel is reused' not in central_test:
+              central_test += additions
+          Path('tests/central-audio-artwork-policy.test.mjs').write_text(central_test, encoding='utf-8')
+
+          release_workflow = '''name: Release Integrity
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: npm run verify
+      - name: Python syntax audit without bytecode
+        shell: python
+        run: |
+          from pathlib import Path
+          import ast
+          failures = []
+          for path in Path('.').rglob('*.py'):
+              try:
+                  ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+              except Exception as exc:
+                  failures.append(f"{path}: {exc}")
+          if failures:
+              raise SystemExit("\\n".join(failures))
+          print("Python files valid")
+'''
+          Path('.github/workflows/release-integrity.yml').write_text(release_workflow, encoding='utf-8')
+          Path('.github/workflows/finalize-central-policy.yml').unlink()
+      - name: Verify finalized repository
+        run: npm run verify
+      - name: Commit finalized policy
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Finalize central audio, artwork and device policy"
+          git push origin HEAD:repair-central-audio-artwork-policy-20260722
