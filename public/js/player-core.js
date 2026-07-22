@@ -681,7 +681,8 @@ async function fetchMetadata() {
       setDesktopTickerIdleV113();
       return;
     }
-    updateNowCover(data);
+    if (window.SMFPArtworkCore?.update) window.SMFPArtworkCore.update(raw);
+    else updateNowCover(data);
     setDesktopTickerLiveV113(data.title || '');
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);

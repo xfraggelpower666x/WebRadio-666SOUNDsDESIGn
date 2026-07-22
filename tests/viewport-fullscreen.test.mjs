@@ -18,7 +18,7 @@ for (const htmlPath of ['../veluna/index.html','../VELUNA/index.html','../public
 }
 
 test('viewport lock follows Safari viewport and protects Dynamic Island', () => {
-  assert.match(viewportLock, /fullscreen geometry lock v1\.2\.28/);
+  assert.match(viewportLock, /fullscreen geometry lock v1\.2\.30/);
   assert.match(viewportLock, /window\.visualViewport/);
   assert.match(viewportLock, /--veluna-safe-player-top/);
   assert.match(viewportLock, /max\(56px, calc\(env\(safe-area-inset-top\) \+ 10px\)\)/);
@@ -30,9 +30,12 @@ test('viewport lock follows Safari viewport and protects Dynamic Island', () => 
   assert.doesNotMatch(viewportLock, /if \(!force && state\.width && state\.orientation === orientation\) return/);
 });
 
-test('iPhone layout keeps status row visible and pushes MAIN controls downward', () => {
+test('iPhone layout keeps status row visible and gives free space to Now Playing', () => {
   assert.match(viewportLock, /grid-template-rows/);
-  assert.match(viewportLock, /minmax\(\$\{spacerMinimum\}px,\.38fr\)/);
+  assert.match(viewportLock, /displayMinimum = compact \? 150 : 188/);
+  assert.match(viewportLock, /spacerMinimum = 0/);
+  assert.match(viewportLock, /minmax\(\$\{displayMinimum\}px,1fr\) auto \$\{spacerMinimum\}px/);
+  assert.match(viewportLock, /compact \? '124px' : '158px'/);
   assert.match(viewportLock, /placeInRow\(miniGrid, 5\)/);
   assert.match(viewportLock, /placeInRow\(sourceSwitch, 7\)/);
   assert.match(viewportLock, /placeInRow\(footer, 12\)/);
