@@ -242,10 +242,10 @@
 
   function replaceFallbackArtwork(){
     const fallback = A.fallbackCover || '/assets/veluna/covers/veluna-stream-fallback.webp';
+    if (window.SMFPArtworkCore?.enforce) { window.SMFPArtworkCore.enforce(); return; }
     for (const img of document.querySelectorAll('#nowCover,.now-cover,[data-stream-cover]')) {
-      if (!img.dataset.trackArtworkActive) img.src = fallback;
+      if (!img.getAttribute('src')) img.src = fallback;
     }
-    window.dispatchEvent(new CustomEvent('veluna:fallback-ready',{detail:{src:fallback}}));
   }
 
   function injectSplash(){
@@ -317,5 +317,5 @@
   replaceFallbackArtwork();
   mediaSessionFallback();
   animateBackground();
-  requestAnimationFrame(injectSplash);
+  // Splash wird ausschließlich von veluna-splash.js verwaltet.
 })();

@@ -77,6 +77,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
   <meta name="msapplication-TileColor" content="#12061f">
   <meta name="msapplication-TileImage" content="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
+  <script id="s666SplashPreflight">(()=>{try{if(sessionStorage.getItem('s666_player_intro_seen_v1')!=='1')document.documentElement.setAttribute('data-s666-splash-pending','1')}catch(_){}})();</script>
+  <style id="s666SplashPrepaintGate">html[data-s666-splash-pending="1"] body .frame-stage,html[data-s666-splash-pending="1"] body .app-shell{visibility:hidden!important}</style>
 </head>
 <body data-veluna-ui="1" data-veluna-page="main">
   <div class="frame-stage">
@@ -194,7 +196,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </div>
         
         <div class="now-cover-wrap" aria-hidden="true" style="position:relative">
-          <img id="nowCover" class="now-cover" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="" loading="lazy" decoding="async" style="transition:opacity 0.55s ease"><img aria-hidden="true" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="" style="position:absolute;bottom:5px;right:5px;width:24px;height:24px;object-fit:contain;opacity:0.52;filter:drop-shadow(0 0 5px rgba(22,255,243,.88));pointer-events:none;border-radius:50%">
+          <img id="nowCover" class="now-cover" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="" loading="lazy" decoding="async" style="transition:opacity 0.55s ease">
         </div>
         <div class="ticker-window">
           <div id="nowPlayingTicker" class="ticker-text"></div>
@@ -325,7 +327,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-06-19-repair3"></script>
+<script type="module" src="/js/player-core.js?v=2026-07-22-single-writer-v4"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -2355,7 +2357,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </script>
   <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220" defer></script>
   <script src="/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121" defer></script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-22-single-writer-v53" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
@@ -2633,8 +2635,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
     <script src="/js/media-session-ios.js?v=2026-06-25-hardlock1" defer></script>
     <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>
-  <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
-  <script defer src="/js/veluna-splash.js?v=2026-07-11-veluna-v1214"></script>
+  <script src="/config/veluna-assets.js?v=2026-07-22-central-v181"></script>
+  <script defer src="/js/veluna-splash.js?v=2026-07-22-prepaint-v1219"></script>
   <script src="/js/pc-fixed-canvas.js?v=2026-07-11-veluna15" defer></script>
 </body>
 </html>
