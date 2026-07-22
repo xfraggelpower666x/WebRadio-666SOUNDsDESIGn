@@ -2,18 +2,23 @@
  * 666SOUNDsDESIGn Discord Shooter + Veluna Messenger + shared visual bridge.
  * Discord webhook URLs stay server-side in Worker secrets. No Discord password gate.
  * Veluna messenger uses the authoritative /api/player-alert/* backend.
- * Shared status bridge applies transport/source color state only; player layout and artwork stay central.
+ * Shared visual bridge applies Veluna color logic, larger PC Now Playing/cover/EQ and 15s track-cover display.
  */
 (function () {
   'use strict';
 
-  var VERSION = 'V4.13-20260722-NOW-PLAYING-SINGLE-WRITER';
+  var VERSION = 'V4.12-20260719-PLAYER-MESSAGE-OVERLAY-INERT';
   var inFlight = false;
   var watcherTimer = 0;
   var visualTimer = 0;
   var lastTrackKey = '';
   var lastPostedKey = '';
+  var lastVisualTrackKey = '';
+  var lastStreamCover = '';
+  var trackCoverUntil = 0;
   var MSG_MAX = 240;
+  var TRACK_COVER_MS = 15000;
+  var STREAM_FALLBACK_COVER = '/assets/veluna/covers/veluna-stream-fallback.webp?v=veluna-v1212';
 
   function clean(value, max) {
     return String(value == null ? '' : value)
@@ -101,6 +106,36 @@
     var style = document.createElement('style');
     style.id = 's666DiscordShooterStyle';
     style.textContent = '.s666-discord-gate.s666-discord-gate--hidden{display:none!important}.s666-discord-gate{position:fixed!important;inset:0!important;z-index:2147483646!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}.s666-discord-gate-box{position:relative!important;width:min(470px,94vw)!important;border:1px solid rgba(255,61,187,.72)!important;border-radius:22px!important;background:linear-gradient(135deg,rgba(255,61,187,.13),rgba(22,255,243,.07)),rgba(4,8,24,.96)!important;box-shadow:0 0 24px rgba(255,61,187,.32),0 0 22px rgba(22,255,243,.18)!important;color:#fff!important;text-align:center!important;padding:22px 18px 18px!important}.s666-discord-gate-title{font-size:15px!important;font-weight:950!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:#ff3dbb!important;text-shadow:0 0 14px rgba(255,61,187,.78)!important}.s666-discord-msg-input{display:block!important;width:min(340px,82vw)!important;min-height:118px!important;margin:12px auto 0!important;padding:12px 13px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(0,0,0,.5)!important;color:#fff!important;font-size:13px!important;font-weight:750!important;line-height:1.35!important;resize:vertical!important}.s666-discord-gate-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin-top:15px!important}.s666-discord-gate-x{position:absolute!important;right:10px!important;top:8px!important;width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.44)!important;background:rgba(22,255,243,.08)!important;color:#fff!important;font-size:21px!important;line-height:1!important;cursor:pointer!important}.s666-discord-gate-submit,.s666-discord-gate-cancel{min-height:34px!important;border-radius:999px!important;padding:0 14px!important;text-transform:uppercase!important;font-size:11px!important;font-weight:950!important;letter-spacing:.09em!important;cursor:pointer!important}.s666-discord-gate-submit{border:1px solid rgba(255,61,187,.76)!important;background:linear-gradient(90deg,rgba(255,61,187,.32),rgba(22,255,243,.12))!important;color:#fff!important}.s666-discord-gate-cancel{border:1px solid rgba(22,255,243,.42)!important;background:rgba(22,255,243,.065)!important;color:#dff!important}.s666-veluna-msg-btn{border-color:rgba(22,255,243,.48)!important;color:#16fff3!important}.s666msg-count-veluna{display:block;margin:7px 0 0;color:rgba(22,255,243,.72);font-size:11px;font-weight:900;letter-spacing:.06em}.s666-discord-status{min-height:18px;margin-top:9px;font-size:11px;font-weight:900;letter-spacing:.05em}.s666-discord-status.is-sending{color:#ffc857}.s666-discord-status.is-ok{color:#7edcff}.s666-discord-status.is-error{color:#ff5570}.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}';
+    document.head.appendChild(style);
+  }
+
+  function installSharedVisualStyle() {
+    if (document.getElementById('s666SharedVisualStyleV47')) return;
+    var style = document.createElement('style');
+    style.id = 's666SharedVisualStyleV47';
+    style.textContent = [
+      '@media(min-width:761px){',
+      ':root{--s666-live:#47ff8a;--s666-cyan:#16fff3;--s666-blue:#35b7ff;--s666-pink:#ff3dbb;--s666-warn:#ffc857;--s666-red:#ff5570}',
+      'body{--s666-cover-size:clamp(176px,18vw,252px);--s666-now-font:clamp(24px,2.35vw,36px);--s666-eq-height:clamp(108px,14vh,168px)}',
+      'body .frame-stage .player-shell .hero{min-height:clamp(138px,16vh,180px)!important;max-height:clamp(150px,17vh,190px)!important}',
+      '#pcHeaderBrandSplit,.pc-header-brand-split{width:min(92%,1120px)!important;min-height:clamp(104px,12vh,154px)!important;max-height:clamp(124px,15vh,174px)!important;margin:0 auto!important;display:grid!important;align-items:center!important;justify-items:center!important}',
+      '#pcHeaderNewLogo,.pc-header-new-logo,.pc-header-brand-logo{width:min(88%,860px)!important;max-width:min(860px,88vw)!important;max-height:clamp(108px,13vh,164px)!important;object-fit:contain!important}',
+      'body .frame-stage .player-shell .now-playing{min-height:clamp(204px,24vh,286px)!important;grid-template-columns:minmax(0,1fr) var(--s666-cover-size)!important;grid-template-rows:auto minmax(72px,1fr) auto!important;gap:12px 24px!important;padding:clamp(20px,2.1vh,26px) clamp(24px,2vw,32px)!important;border-radius:30px!important}',
+      'body .frame-stage .player-shell .now-cover-wrap{grid-column:2/3!important;grid-row:1/4!important;width:var(--s666-cover-size)!important;height:var(--s666-cover-size)!important;align-self:center!important;justify-self:end!important;border-radius:30px!important;overflow:hidden!important;background:rgba(0,0,0,.52)!important}',
+      'body .frame-stage .player-shell .now-cover{width:100%!important;height:100%!important;object-fit:cover!important;image-rendering:auto!important}',
+      'body[data-now-cover-mode="track"] .now-cover-wrap,body[data-now-cover-mode="track"] #coverImage{box-shadow:0 0 38px rgba(255,61,187,.52),0 0 28px rgba(22,255,243,.34)!important}',
+      'body .frame-stage .player-shell .meta-line,body .frame-stage .player-shell .now-playing .ticker-window .ticker,body .frame-stage .player-shell #nowPlayingTicker{font-size:var(--s666-now-font)!important;line-height:1.08!important}',
+      'body .frame-stage .player-shell .now-playing .ticker-window{min-height:clamp(70px,9vh,104px)!important;align-self:center!important}',
+      'body .frame-stage .player-shell .meter-card,body .frame-stage .player-shell .eq-card,body .frame-stage .player-shell .equalizer-card,body .frame-stage .player-shell .visualizer-card{min-height:clamp(118px,15vh,176px)!important}',
+      'body .frame-stage .player-shell #eqBars{height:var(--s666-eq-height)!important;min-height:var(--s666-eq-height)!important;max-height:none!important;gap:clamp(5px,.55vw,10px)!important;align-items:end!important}',
+      'body .frame-stage .player-shell #eqBars .eq-bar,body .frame-stage .player-shell #eqBars [data-eq-bar],body .frame-stage .player-shell #eqBars span,body .frame-stage .player-shell #eqBars i{width:clamp(7px,.65vw,13px)!important;min-height:12px!important;border-radius:999px 999px 5px 5px!important}',
+      'body[data-s666-transport="playing"] .status-chip.state-ok .status-dot,body[data-s666-source="main"] #mainBtn .status-dot{background:var(--s666-live)!important;border-color:rgba(71,255,138,.95)!important;box-shadow:0 0 10px rgba(71,255,138,.95),0 0 24px rgba(71,255,138,.35)!important}',
+      'body[data-s666-source="backup"] #fallbackBtn .status-dot,body[data-s666-source="back"] #fallbackBtn .status-dot{background:var(--s666-blue)!important;border-color:rgba(53,183,255,.95)!important;box-shadow:0 0 10px rgba(53,183,255,.9),0 0 24px rgba(22,255,243,.30)!important}',
+      'body[data-s666-transport="paused"] #statusStream .status-dot,body[data-s666-transport="stopped"] #statusStream .status-dot{background:var(--s666-warn)!important;border-color:rgba(255,200,87,.95)!important;box-shadow:0 0 10px rgba(255,200,87,.9),0 0 22px rgba(255,200,87,.30)!important}',
+      'body[data-s666-transport="error"] #statusStream .status-dot,body[data-s666-transport="error"] #statusMeta .status-dot{background:var(--s666-red)!important;border-color:rgba(255,85,112,.95)!important;box-shadow:0 0 12px rgba(255,85,112,.9),0 0 24px rgba(255,85,112,.32)!important}',
+      '}',
+      '@media(min-width:761px) and (max-height:860px){body{--s666-cover-size:180px;--s666-eq-height:112px}.frame-stage .player-shell .now-playing{min-height:196px!important}}'
+    ].join('');
     document.head.appendChild(style);
   }
 
@@ -417,12 +452,86 @@
     });
   }
 
+  function coverCandidate(value) {
+    if (!value) return '';
+    if (typeof value === 'string') {
+      var raw = clean(value, 1200);
+      if (!raw || /^data:/i.test(raw)) return '';
+      try { return new URL(raw, location.origin).toString(); } catch (_) { return ''; }
+    }
+    if (Array.isArray(value)) {
+      for (var i = 0; i < value.length; i += 1) {
+        var found = coverCandidate(value[i]);
+        if (found) return found;
+      }
+    }
+    if (typeof value === 'object') return coverCandidate(value.url || value.src || value.href || value.image || value.cover || value.art || value.artwork || value.thumbnail || value.picture || value.logo || value.large);
+    return '';
+  }
+
+  function streamCoverFrom(data) {
+    return coverCandidate(data && (data.station && (data.station.image || data.station.cover || data.station.artwork || data.station.logo) || data.stream && (data.stream.image || data.stream.cover) || data.radio && (data.radio.image || data.radio.cover) || data.server && (data.server.image || data.server.cover) || data.logo || data.stationLogo || data.station_logo)) || STREAM_FALLBACK_COVER;
+  }
+
+  function trackCoverFrom(data) {
+    var song = data && (data.now_playing && data.now_playing.song || data.song || data.current_song || data.currentSong || data.track) || {};
+    return coverCandidate(data && (data.now_playing && data.now_playing.song && (data.now_playing.song.art || data.now_playing.song.artwork || data.now_playing.song.image) || data.now_playing && (data.now_playing.cover || data.now_playing.image || data.now_playing.art || data.now_playing.artwork) || song.art || song.album_art || song.albumArt || song.cover || song.image || song.artwork || song.thumbnail || data.track && (data.track.art || data.track.artwork || data.track.image) || data.cover_url || data.coverUrl || data.album_art || data.albumArt || data.artwork_url || data.artworkUrl || data.image_url || data.imageUrl || data.thumbnail || data.picture));
+  }
+
+  function visualTrackKeyFrom(data) {
+    var song = data && (data.now_playing && data.now_playing.song || data.song || data.current_song || data.currentSong || data.track) || {};
+    return clean([data && (data.title || data.nowPlaying || data.nowplaying || data.songtitle), song.title, song.text, song.artist, data && data.artist].filter(Boolean).join('|').toLowerCase(), 1000);
+  }
+
+  function applyCoverToPlayers(url, mode) {
+    var targets = [document.getElementById('nowCover'), document.getElementById('coverImage'), document.getElementById('mffCoverImage')].filter(Boolean);
+    targets.forEach(function (img) {
+      if (!url || img.getAttribute('src') === url) return;
+      img.style.transition = 'opacity .55s ease';
+      img.style.opacity = '0';
+      setTimeout(function () {
+        img.src = url;
+        img.onerror = function () { img.src = STREAM_FALLBACK_COVER; img.onerror = null; img.style.opacity = '1'; };
+        img.onload = function () { img.style.opacity = '1'; img.onload = null; };
+        setTimeout(function () { img.style.opacity = '1'; }, 160);
+      }, 220);
+    });
+    try {
+      document.documentElement.setAttribute('data-now-cover-mode', mode || 'stream');
+      document.body.setAttribute('data-now-cover-mode', mode || 'stream');
+    } catch (_) {}
+  }
+
+  async function syncSharedCoverLogic() {
+    try {
+      var response = await fetch('/api/nowplaying?t=' + Date.now(), { cache: 'no-store', headers: { accept: 'application/json' } });
+      if (!response.ok) throw new Error('metadata_http_' + response.status);
+      var data = await response.json();
+      var streamCover = streamCoverFrom(data) || lastStreamCover || STREAM_FALLBACK_COVER;
+      var tCover = trackCoverFrom(data);
+      var tKey = visualTrackKeyFrom(data) || tCover;
+      if (streamCover && streamCover.indexOf('fallback') === -1) lastStreamCover = streamCover;
+      var now = Date.now();
+      if (tCover && tCover !== streamCover && tKey && tKey !== lastVisualTrackKey) {
+        lastVisualTrackKey = tKey;
+        trackCoverUntil = now + TRACK_COVER_MS;
+        applyCoverToPlayers(tCover, 'track');
+        return;
+      }
+      if (trackCoverUntil && now < trackCoverUntil) return;
+      applyCoverToPlayers(lastStreamCover || streamCover || STREAM_FALLBACK_COVER, 'stream');
+    } catch (_) {}
+  }
+
   function initSharedVisualBridge() {
+    installSharedVisualStyle();
     setSharedColorState('transport', 'idle');
     syncSharedColorState();
+    syncSharedCoverLogic();
     clearInterval(visualTimer);
     visualTimer = setInterval(function () {
       syncSharedColorState();
+      syncSharedCoverLogic();
       installVelunaDiscordNoAuthBypass();
     }, 3500);
   }
@@ -436,8 +545,7 @@
     auditRepair: true,
     velunaMessengerBridge: true,
     velunaDiscordNoAuth: true,
-    sharedVisualBridge: false,
-    sharedStatusBridge: true,
+    sharedVisualBridge: true,
     mountAll: function () { mountVelunaMessengerButton(); installVelunaDiscordNoAuthBypass(); initSharedVisualBridge(); return true; },
     manualPost: manualPost,
     messagePost: messagePost,
