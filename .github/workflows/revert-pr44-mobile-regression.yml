@@ -47,6 +47,8 @@ jobs:
         run: |
           rm -f .github/workflows/revert-pr44-mobile-regression.yml
           rm -f docs/ROLLBACK_PR44_MOBILE_REGRESSION.md
+          rm -f ROLLBACK_TRIGGER_PR44.txt
+          rm -f docs/ROLLBACK_TRIGGER_PR44_REMOVE_ME.txt
           git add -A
           git commit --amend --no-edit
           git push --force-with-lease origin HEAD:rollback-pr44-mobile-regression-20260722
