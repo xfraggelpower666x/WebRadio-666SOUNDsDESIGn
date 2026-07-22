@@ -43,7 +43,7 @@ test('central sound UI reuses VELUNA panel and keeps PC boost at one stage', asy
   assert.match(ui, /shared-sound-panel-confirm/);
   assert.match(ui, /bindSharedSoundRecovery/);
   assert.doesNotMatch(ui, /function bindMobileSoundRecovery/);
-  assert.match(css, /@media \(max-width:860px\), \(pointer:coarse\)/);
+  assert.match(css, /@media \(max-width:860px\), \(max-width:1024px\) and \(pointer:coarse\)/);
   assert.match(css, /#velunaVolumeSlider/);
   assert.match(css, /#volumeSlider/);
   assert.match(css, /display:none!important/);

@@ -1,5 +1,5 @@
-/* Central audio/device policy v2.0.0. No player theme takeover. */
-@media (max-width:860px), (pointer:coarse) {
+/* Central audio/device policy v2.0.2. No player theme takeover. */
+@media (max-width:860px), (max-width:1024px) and (pointer:coarse) {
   #volumeSlider,
   #velunaVolumeSlider,
   #smfpDesktopVolumeSlider,
@@ -70,7 +70,7 @@
 .smfp-central-eq-grid input { writing-mode:vertical-lr; direction:rtl; width:28px; height:150px; accent-color:#b45cff; }
 .smfp-central-eq-grid output { font-variant-numeric:tabular-nums; }
 .smfp-central-sound-status { margin-top:10px; text-align:center; font-size:.72rem; letter-spacing:.04em; }
-@media (max-width:860px), (pointer:coarse) {
+@media (max-width:860px), (max-width:1024px) and (pointer:coarse) {
   .smfp-central-sound-button,
   .smfp-central-sound-panel { display:none!important; }
 }
