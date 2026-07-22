@@ -1,4 +1,4 @@
-/* VELUNA iPhone fullscreen geometry lock v1.2.28 */
+/* VELUNA iPhone fullscreen geometry lock v1.2.30 */
 (() => {
   'use strict';
 
@@ -94,12 +94,12 @@
     if (!app || !card || !isMobileViewport()) return;
 
     const compact = viewport.height < 720;
-    const displayMinimum = compact ? 118 : 140;
-    const spacerMinimum = compact ? 4 : 8;
+    const displayMinimum = compact ? 150 : 188;
+    const spacerMinimum = 0;
 
     root.setAttribute('data-veluna-iphone-safe','1');
     root.style.setProperty('--veluna-safe-player-top','max(56px, calc(env(safe-area-inset-top) + 10px))');
-    root.style.setProperty('--veluna-safe-player-bottom','max(7px, env(safe-area-inset-bottom))');
+    root.style.setProperty('--veluna-safe-player-bottom','max(1px, calc(env(safe-area-inset-bottom) - 12px))');
 
     app.style.setProperty('position','fixed','important');
     app.style.setProperty('inset','0','important');
@@ -123,7 +123,7 @@
     card.style.setProperty('grid-template-columns','minmax(0,1fr)','important');
     card.style.setProperty(
       'grid-template-rows',
-      `auto auto auto minmax(${displayMinimum}px,1.15fr) auto minmax(${spacerMinimum}px,.38fr) auto auto auto auto auto auto`,
+      `auto auto auto minmax(${displayMinimum}px,1fr) auto ${spacerMinimum}px auto auto auto auto auto auto`,
       'important'
     );
     card.style.setProperty('align-content','stretch','important');
@@ -179,7 +179,7 @@
     }
     if (displayWindow) {
       displayWindow.style.setProperty('height','100%','important');
-      displayWindow.style.setProperty('min-height',compact ? '92px' : '112px','important');
+      displayWindow.style.setProperty('min-height',compact ? '124px' : '158px','important');
       displayWindow.style.setProperty('max-height','none','important');
       displayWindow.style.setProperty('overflow','hidden','important');
     }
