@@ -32,11 +32,29 @@ jobs:
         run: npm run check
       - name: Frontend contracts
         run: node --test tests/frontend-contracts.test.mjs
-      - name: Remaining Node test files
+      - name: Admin hardlock contracts
+        run: node --test tests/admin-hardlock.test.mjs
+      - name: Hardlock source contracts
+        run: node --test tests/hardlock-source.test.mjs
+      - name: Player alert contracts
+        run: node --test tests/player-alert-contract.test.mjs
+      - name: Radio-only cleanup contracts
+        run: node --test tests/radio-only-cleanup.test.mjs
+      - name: Viewport contracts
+        run: node --test tests/viewport-fullscreen.test.mjs
+      - name: Worker smoke contracts
+        run: node --test tests/worker-smoke.test.mjs
+      - name: Overlay bootstrap contracts
+        run: |
+          if [ -f tests/overlay-bootstrap-all-players.test.mjs ]; then node --test tests/overlay-bootstrap-all-players.test.mjs; fi
+      - name: Wrangler deployment contracts
+        run: |
+          if [ -f tests/deploy-wrangler-contract.test.mjs ]; then node --test tests/deploy-wrangler-contract.test.mjs; fi
+      - name: Any additional Node contracts
         run: |
           for file in tests/*.test.mjs; do
             case "$file" in
-              tests/central-audio-artwork-policy.test.mjs|tests/frontend-contracts.test.mjs) continue ;;
+              tests/central-audio-artwork-policy.test.mjs|tests/frontend-contracts.test.mjs|tests/admin-hardlock.test.mjs|tests/hardlock-source.test.mjs|tests/player-alert-contract.test.mjs|tests/radio-only-cleanup.test.mjs|tests/viewport-fullscreen.test.mjs|tests/worker-smoke.test.mjs|tests/overlay-bootstrap-all-players.test.mjs|tests/deploy-wrangler-contract.test.mjs) continue ;;
             esac
             echo "RUNNING $file"
             node --test "$file"
