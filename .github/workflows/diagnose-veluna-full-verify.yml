@@ -1,0 +1,51 @@
+name: Diagnose VELUNA Full Verify
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-veluna-mobile-layout-central-runtime-20260722
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Apply the same targeted repair
+        shell: python
+        run: |
+          from pathlib import Path
+          source = Path('.github/workflows/finalize-veluna-targeted-repair.yml').read_text(encoding='utf-8')
+          start_marker = '      - name: Apply targeted repair in existing layers\n        shell: python\n        run: |\n'
+          end_marker = '      - name: JavaScript syntax\n'
+          start = source.index(start_marker) + len(start_marker)
+          end = source.index(end_marker, start)
+          lines = source[start:end].splitlines()
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+          exec(compile(code, 'targeted-veluna-repair.py', 'exec'), {'__name__':'__main__'})
+      - name: Capture full verify output
+        id: verify
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run verify 2>&1 | tee full-verify.log
+      - name: Upload full verify log
+        uses: actions/upload-artifact@v4
+        with:
+          name: veluna-full-verify-log
+          path: full-verify.log
+          if-no-files-found: error
+      - name: Preserve failure result
+        if: steps.verify.outcome == 'failure'
+        run: exit 1
