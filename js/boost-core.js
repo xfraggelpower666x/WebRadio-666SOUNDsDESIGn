@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/boost-core.js
-VERSION: CENTRAL_AUDIO_POLICY_v2.0.0
+VERSION: CENTRAL_AUDIO_POLICY_v2.0.1
 ZWECK:
 - Eine zentrale Boost-, EQ-, AudioContext- und Gerätepolicy für alle Player.
 - Mobile Geräte: Boost 0–5, Hardware-Lautstärke, kein Player-Volume-Regler.
@@ -13,7 +13,7 @@ ZWECK:
 (function(){
   'use strict';
 
-  if (window.SMFPBoostCore?.centralPolicyVersion === '2.0.0') return;
+  if (window.SMFPBoostCore?.centralPolicyVersion === '2.0.1') return;
 
   var STORAGE_KEY = 'smfp_audio_boost_stage_v177';
   var EQ_STORAGE_KEY = 'smfp_audio_eq_v2';
@@ -41,11 +41,12 @@ ZWECK:
 
   function isMobileDevice(){
     try {
-      return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') ||
-        window.matchMedia('(pointer: coarse)').matches ||
-        window.matchMedia('(max-width: 860px)').matches;
+      var mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+      var coarse = window.matchMedia('(pointer: coarse)').matches;
+      var screenWidth = Math.min(Number(screen.width) || window.innerWidth, Number(screen.height) || window.innerHeight);
+      return mobileUa || (coarse && screenWidth <= 1024);
     } catch (_) {
-      return window.innerWidth <= 860;
+      return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
     }
   }
 
@@ -162,11 +163,16 @@ ZWECK:
     return 'other';
   }
 
+  function attachParamContext(node, context){
+    try { if (node?.gain) node.gain.__smfpContext = context || node.context || null; } catch (_) {}
+  }
+
   function registerNode(audio, node, context){
     if (!audio || !node) return;
     try { node.__smfpAudioElement = audio; } catch (_) {}
     var graph = graphFor(audio);
     graph.context = context || node.context || graph.context;
+    attachParamContext(node, graph.context);
     var type = nodeType(node);
     if (type === 'gain' && graph.gains.indexOf(node) < 0) graph.gains.push(node);
     if (type === 'filter' && graph.filters.indexOf(node) < 0) graph.filters.push(node);
@@ -215,7 +221,7 @@ ZWECK:
 
   function rampParam(param, target, seconds){
     if (!param) return false;
-    var context = param.context || null;
+    var context = param.__smfpContext || param.context || null;
     var now = context?.currentTime || 0;
     var duration = Math.max(0.01, Number(seconds) || RAMP_SECONDS);
     try {
@@ -255,7 +261,10 @@ ZWECK:
     var graph = graphFor(audio);
     var gainNode = graph?.gains?.[0] || null;
     var graphState = gainNode ? 'GRAPH_OK' : (audio.dataset?.audioChain === 'webaudio-unavailable' ? 'GRAPH_FAIL' : 'GRAPH_WAIT');
-    if (gainNode) rampParam(gainNode.gain, targetGain, RAMP_SECONDS);
+    if (gainNode) {
+      attachParamContext(gainNode, graph.context);
+      rampParam(gainNode.gain, targetGain, RAMP_SECONDS);
+    }
     try {
       audio.dataset.boostStage = String(safeStage);
       audio.dataset.boostGain = String(targetGain);
@@ -289,6 +298,7 @@ ZWECK:
     var graph = graphFor(audio);
     var ordered = valuesToArray(normalized);
     (graph?.filters || []).slice(0, 5).forEach(function(node, index){
+      attachParamContext(node, graph.context);
       rampParam(node.gain, ordered[index] || 0, EQ_RAMP_SECONDS);
     });
     try {
@@ -366,9 +376,11 @@ ZWECK:
         node.frequency.value = band.freq;
         if (node.Q) node.Q.value = band.q;
         node.gain.value = 0;
+        attachParamContext(node, context);
         return node;
       });
       var gain = context.createGain();
+      attachParamContext(gain, context);
       var limiter = context.createDynamicsCompressor();
       limiter.threshold.value = -2.5;
       limiter.knee.value = 1.5;
@@ -498,8 +510,8 @@ ZWECK:
   installGraphInstrumentation();
 
   window.SMFPBoostCore = {
-    version: 'v192-boost-audible-stages + central-audio-policy-v2',
-    centralPolicyVersion: '2.0.0',
+    version: 'v192-boost-audible-stages + central-audio-policy-v2.0.1',
+    centralPolicyVersion: '2.0.1',
     storageKey: STORAGE_KEY,
     eqStorageKey: EQ_STORAGE_KEY,
     stages: STAGES.slice(),
@@ -536,6 +548,8 @@ ZWECK:
       graph.filters = engine.eqNodes || engine.filters || graph.filters;
       graph.limiter = engine.limiterNode || engine.limiter || graph.limiter;
       graph.analyser = engine.analyser || graph.analyser;
+      graph.gains.forEach(function(node){ attachParamContext(node, graph.context); });
+      graph.filters.forEach(function(node){ attachParamContext(node, graph.context); });
       scheduleApply(audio, 'manual-register');
       return graph;
     }

@@ -10,13 +10,15 @@ async function assertMirror(path) {
 
 test('central audio policy owns device boost, ramp, EQ and volume rules', async () => {
   const core = await read('js/boost-core.js');
-  assert.match(core, /CENTRAL_AUDIO_POLICY_v2\.0\.0/);
-  assert.match(core, /centralPolicyVersion:\s*'2\.0\.0'/);
+  assert.match(core, /CENTRAL_AUDIO_POLICY_v2\.0\.1/);
+  assert.match(core, /centralPolicyVersion:\s*'2\.0\.1'/);
   assert.match(core, /maxBoostStage:\s*mobile\s*\?\s*5\s*:\s*1/);
   assert.match(core, /playerVolume:\s*!mobile/);
   assert.match(core, /hardwareVolume:\s*mobile/);
+  assert.match(core, /coarse\s*&&\s*screenWidth\s*<=\s*1024/);
   assert.match(core, /RAMP_SECONDS\s*=\s*0\.16/);
   assert.match(core, /linearRampToValueAtTime/);
+  assert.match(core, /__smfpContext/);
   assert.match(core, /EQ_BANDS/);
   assert.match(core, /applyEq/);
   assert.match(core, /ensureGraph/);
