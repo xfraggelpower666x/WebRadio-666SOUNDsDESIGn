@@ -23,17 +23,38 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Execute stored single-writer repair
+        id: repair
+        continue-on-error: true
         shell: python
         run: |
           from pathlib import Path
-          source = Path('.github/workflows/finalize-main-now-playing-single-writer.yml').read_text(encoding='utf-8')
-          start_marker = '      - name: Apply single-writer repair\n        shell: python\n        run: |\n'
-          end_marker = '      - name: JavaScript syntax\n'
-          start = source.index(start_marker) + len(start_marker)
-          end = source.index(end_marker, start)
-          lines = source[start:end].splitlines()
-          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
-          exec(compile(code, 'stored-single-writer-repair.py', 'exec'), {'__name__':'__main__'})
+          import traceback
+          error_path = Path('docs/NOWPLAYING_REPAIR_ERROR.txt')
+          try:
+              source = Path('.github/workflows/finalize-main-now-playing-single-writer.yml').read_text(encoding='utf-8')
+              start_marker = '      - name: Apply single-writer repair\n        shell: python\n        run: |\n'
+              end_marker = '      - name: JavaScript syntax\n'
+              start = source.index(start_marker) + len(start_marker)
+              end = source.index(end_marker, start)
+              lines = source[start:end].splitlines()
+              code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+              exec(compile(code, 'stored-single-writer-repair.py', 'exec'), {'__name__':'__main__'})
+              error_path.unlink(missing_ok=True)
+          except Exception:
+              error_path.parent.mkdir(parents=True, exist_ok=True)
+              error_path.write_text(traceback.format_exc(), encoding='utf-8')
+              raise
+      - name: Persist transform exception
+        if: steps.repair.outcome == 'failure'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -f docs/NOWPLAYING_REPAIR_ERROR.txt
+          git commit -m "Record exact Now Playing transform exception"
+          git push origin HEAD:repair-main-now-playing-single-writer-20260722
+      - name: Stop after transform error
+        if: steps.repair.outcome == 'failure'
+        run: exit 1
       - name: JavaScript syntax
         run: |
           node --check js/addons/discord-player-addon-v3.js
@@ -48,7 +69,7 @@ jobs:
         run: |
           rm -f .github/workflows/finalize-main-now-playing-single-writer.yml
           rm -f .github/workflows/finalize-main-now-playing-pr.yml
-          rm -f .nowplaying-repair-error.txt
+          rm -f docs/NOWPLAYING_REPAIR_ERROR.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
