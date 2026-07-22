@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
 
 jobs:
   finalize:
@@ -45,12 +43,13 @@ jobs:
           except Exception:
               error_path.write_text(traceback.format_exc(), encoding='utf-8')
               raise
-      - name: Report transform exception to PR
+      - name: Upload exact transform exception
         if: steps.repair.outcome == 'failure'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr comment 44 --body-file NOWPLAYING_REPAIR_ERROR.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: nowplaying-transform-error
+          path: NOWPLAYING_REPAIR_ERROR.txt
+          if-no-files-found: error
       - name: Stop after transform error
         if: steps.repair.outcome == 'failure'
         run: exit 1
