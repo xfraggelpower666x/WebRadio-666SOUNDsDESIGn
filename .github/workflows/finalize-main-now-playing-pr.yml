@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
+  issues: write
 
 jobs:
   finalize:
@@ -29,7 +31,7 @@ jobs:
         run: |
           from pathlib import Path
           import traceback
-          error_path = Path('docs/NOWPLAYING_REPAIR_ERROR.txt')
+          error_path = Path('NOWPLAYING_REPAIR_ERROR.txt')
           try:
               source = Path('.github/workflows/finalize-main-now-playing-single-writer.yml').read_text(encoding='utf-8')
               start_marker = '      - name: Apply single-writer repair\n        shell: python\n        run: |\n'
@@ -41,17 +43,14 @@ jobs:
               exec(compile(code, 'stored-single-writer-repair.py', 'exec'), {'__name__':'__main__'})
               error_path.unlink(missing_ok=True)
           except Exception:
-              error_path.parent.mkdir(parents=True, exist_ok=True)
               error_path.write_text(traceback.format_exc(), encoding='utf-8')
               raise
-      - name: Persist transform exception
+      - name: Report transform exception to PR
         if: steps.repair.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -f docs/NOWPLAYING_REPAIR_ERROR.txt
-          git commit -m "Record exact Now Playing transform exception"
-          git push origin HEAD:repair-main-now-playing-single-writer-20260722
+          gh pr comment 44 --body-file NOWPLAYING_REPAIR_ERROR.txt
       - name: Stop after transform error
         if: steps.repair.outcome == 'failure'
         run: exit 1
@@ -69,7 +68,7 @@ jobs:
         run: |
           rm -f .github/workflows/finalize-main-now-playing-single-writer.yml
           rm -f .github/workflows/finalize-main-now-playing-pr.yml
-          rm -f docs/NOWPLAYING_REPAIR_ERROR.txt
+          rm -f NOWPLAYING_REPAIR_ERROR.txt docs/NOWPLAYING_REPAIR_ERROR.txt .nowplaying-repair-error.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
