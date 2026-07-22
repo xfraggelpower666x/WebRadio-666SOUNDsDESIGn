@@ -1,28 +1,28 @@
 /*
- * 666SOUNDsDESIGn central audio control UI v2.0.0.
- * Uses SMFPBoostCore for device policy, graph, 160 ms boost ramp and 5-band EQ.
+ * 666SOUNDsDESIGn central audio control UI v2.0.2.
+ * Reuses the existing VELUNA sound panel, injects only missing desktop controls,
+ * and delegates every audible change to SMFPBoostCore.
  */
 (() => {
   'use strict';
-  if (window.SMFPAudioPolicyUI?.version === '2.0.0') return;
+  if (window.SMFPAudioPolicyUI?.version === '2.0.2') return;
 
   const q = (selector, root = document) => root.querySelector(selector);
   const qa = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const core = () => window.SMFPBoostCore;
   const page = () => document.body?.dataset?.velunaPage || (location.pathname.toLowerCase().startsWith('/veluna') ? 'veluna' : location.pathname.toLowerCase().startsWith('/internal') ? 'internal' : 'main');
   const audio = () => q('audio#radio') || q('audio');
-  const isMobile = () => core()?.isMobileDevice?.() ?? (matchMedia('(pointer: coarse)').matches || innerWidth <= 860);
+  const isMobile = () => core()?.isMobileDevice?.() ?? (/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') || (matchMedia('(pointer:coarse)').matches && Math.min(screen.width || innerWidth, screen.height || innerHeight) <= 1024));
   const volumeKey = 'smfp_desktop_volume_v2';
 
-  function clamp(value, min, max) {
+  const clamp = (value, min, max) => {
     const number = Number(value);
     return Math.max(min, Math.min(max, Number.isFinite(number) ? number : min));
-  }
+  };
 
   function restoreVolume() {
     try { return clamp(localStorage.getItem(volumeKey) ?? 0.75, 0, 1); } catch (_) { return 0.75; }
   }
-
   function saveVolume(value) {
     try { localStorage.setItem(volumeKey, String(value)); } catch (_) {}
   }
@@ -83,7 +83,6 @@
       slider.setAttribute('aria-valuetext', `${Math.round(value * 100)} Prozent`);
       return value;
     };
-
     const apply = () => {
       const value = render();
       try { playerAudio.volume = value; } catch (_) {}
@@ -104,6 +103,30 @@
     apply();
   }
 
+  function configureExistingSoundPanel() {
+    const panel = q('#soundPanel');
+    const engine = core();
+    if (!panel || !engine) return false;
+    const max = Number(engine.maxStage?.() ?? (isMobile() ? 5 : 1));
+    qa('.boost-chip[data-boost]', panel).forEach(button => {
+      const allowed = Number(button.dataset.boost) <= max;
+      button.hidden = !allowed;
+      button.setAttribute('aria-hidden', allowed ? 'false' : 'true');
+      if ('inert' in button) button.inert = !allowed;
+      if (!allowed) {
+        button.classList.remove('is-active');
+        button.setAttribute('aria-pressed', 'false');
+      }
+    });
+    panel.dataset.smfpCentralAudio = '1';
+    panel.dataset.smfpMaxBoost = String(max);
+    const status = q('#soundStatus', panel);
+    if (status && !status.textContent.includes('CENTRAL SOUND')) {
+      status.textContent = `CENTRAL SOUND · ${isMobile() ? 'MOBILE' : 'DESKTOP'} · BOOST 0/${max} · GRAPH WAIT · RAMP 160ms`;
+    }
+    return true;
+  }
+
   function centralPanelHost() {
     return q('.player-card') || q('.player-shell') || q('main') || document.body;
   }
@@ -114,6 +137,7 @@
     panel.setAttribute('aria-hidden', open ? 'false' : 'true');
     button?.classList.toggle('is-active', open);
     button?.setAttribute('aria-pressed', open ? 'true' : 'false');
+    button?.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) {
       core()?.ensureGraph?.(audio());
       void core()?.resume?.(audio());
@@ -127,7 +151,7 @@
     return values;
   }
 
-  function syncPanel(panel) {
+  function syncInjectedPanel(panel) {
     const engine = core();
     if (!engine) return;
     const values = engine.loadEq?.() || { sub:0, low:0, mid:0, high:0, air:0 };
@@ -152,6 +176,8 @@
   function ensureDesktopSoundPanel() {
     const currentPage = page();
     if (isMobile() || currentPage === 'main' || q('#smfpCentralSoundPanel')) return;
+    if (currentPage === 'veluna' && configureExistingSoundPanel()) return;
+
     const playerAudio = audio();
     const engine = core();
     const host = centralPanelHost();
@@ -160,14 +186,12 @@
     const button = document.createElement('button');
     button.id = 'smfpCentralSoundButton';
     button.type = 'button';
-    button.className = currentPage === 'veluna' ? 'small-btn smfp-central-sound-button' : 'small-btn internal-action-btn smfp-central-sound-button';
+    button.className = 'small-btn internal-action-btn smfp-central-sound-button';
     button.textContent = 'SOUND';
     button.setAttribute('aria-controls', 'smfpCentralSoundPanel');
     button.setAttribute('aria-expanded', 'false');
     button.setAttribute('aria-pressed', 'false');
-
-    const buttonHost = currentPage === 'veluna' ? q('.tool-strip') : q('.internal-action-grid');
-    buttonHost?.appendChild(button);
+    q('.internal-action-grid')?.appendChild(button);
 
     const panel = document.createElement('section');
     panel.id = 'smfpCentralSoundPanel';
@@ -199,18 +223,10 @@
     button.addEventListener('click', () => {
       const open = panel.hidden || panel.classList.contains('hidden');
       setPanelOpen(panel, button, open);
-      button.setAttribute('aria-expanded', open ? 'true' : 'false');
-      syncPanel(panel);
+      syncInjectedPanel(panel);
     });
-    q('[data-central-sound-close]', panel)?.addEventListener('click', () => {
-      setPanelOpen(panel, button, false);
-      button.setAttribute('aria-expanded', 'false');
-    });
-    panel.addEventListener('click', event => {
-      if (event.target !== panel) return;
-      setPanelOpen(panel, button, false);
-      button.setAttribute('aria-expanded', 'false');
-    });
+    q('[data-central-sound-close]', panel)?.addEventListener('click', () => setPanelOpen(panel, button, false));
+    panel.addEventListener('click', event => { if (event.target === panel) setPanelOpen(panel, button, false); });
 
     qa('[data-central-boost]', panel).forEach(boost => boost.addEventListener('click', () => {
       const stage = engine.clampStage?.(boost.dataset.centralBoost) || 0;
@@ -219,7 +235,7 @@
       engine.applyBoost?.(playerAudio, stage, 'central-desktop-ui');
       engine.saveStage?.(stage);
       engine.publish?.(stage, engine.getGain?.(stage), 'central-desktop-ui');
-      syncPanel(panel);
+      syncInjectedPanel(panel);
     }));
 
     qa('[data-central-eq]', panel).forEach(input => input.addEventListener('input', () => {
@@ -228,7 +244,7 @@
       engine.ensureGraph?.(playerAudio);
       void engine.resume?.(playerAudio);
       engine.applyEq?.(playerAudio, readPanelEq(panel), 'central-desktop-ui');
-      syncPanel(panel);
+      syncInjectedPanel(panel);
     }));
 
     q('[data-central-sound-reset]', panel)?.addEventListener('click', () => {
@@ -236,62 +252,74 @@
       engine.applyBoost?.(playerAudio, 0, 'central-reset');
       engine.saveStage?.(0);
       engine.applyEq?.(playerAudio, flat, 'central-reset');
-      syncPanel(panel);
+      syncInjectedPanel(panel);
     });
     q('[data-central-sound-apply]', panel)?.addEventListener('click', () => {
       engine.ensureGraph?.(playerAudio);
       void engine.resume?.(playerAudio);
       engine.applyBoost?.(playerAudio, engine.loadStage?.() || 0, 'central-apply');
       engine.applyEq?.(playerAudio, readPanelEq(panel), 'central-apply');
-      syncPanel(panel);
+      syncInjectedPanel(panel);
     });
 
-    syncPanel(panel);
+    syncInjectedPanel(panel);
   }
 
-  function bindMobileSoundRecovery() {
-    if (!isMobile()) return;
+  function bindSharedSoundRecovery() {
+    const marker = document.documentElement;
+    if (marker.dataset.smfpSharedSoundRecovery === '1') return;
     const playerAudio = audio();
     const engine = core();
     if (!playerAudio || !engine) return;
+    marker.dataset.smfpSharedSoundRecovery = '1';
 
-    const activate = () => {
+    const activateGraph = () => {
       engine.ensureGraph?.(playerAudio);
       void engine.resume?.(playerAudio);
     };
+
     document.addEventListener('pointerdown', event => {
-      if (event.target?.closest?.('#soundPanel,[data-veluna-eq],.boost-chip,#soundBtn')) activate();
+      if (event.target?.closest?.('#soundPanel,#smfpCentralSoundPanel,[data-veluna-eq],[data-smfp-eq],.boost-chip,[data-boost-stage],#soundBtn,#smfpCentralSoundButton')) activateGraph();
     }, true);
+
     document.addEventListener('input', event => {
-      if (!event.target?.matches?.('[data-veluna-eq]')) return;
-      activate();
+      if (!event.target?.matches?.('[data-veluna-eq],[data-smfp-eq]')) return;
+      activateGraph();
       const values = {};
-      qa('[data-veluna-eq]').forEach(input => { values[input.dataset.velunaEq] = input.value; });
-      setTimeout(() => engine.applyEq?.(playerAudio, values, 'mobile-sound-panel'), 0);
-      setTimeout(() => engine.applyEq?.(playerAudio, values, 'mobile-sound-panel-confirm'), 190);
+      qa('[data-veluna-eq],[data-smfp-eq]').forEach(input => {
+        const key = input.dataset.velunaEq || input.dataset.smfpEq;
+        if (key) values[key] = input.value;
+      });
+      setTimeout(() => engine.applyEq?.(playerAudio, values, 'shared-sound-panel'), 0);
+      setTimeout(() => engine.applyEq?.(playerAudio, values, 'shared-sound-panel-confirm'), 190);
     }, true);
+
     document.addEventListener('click', event => {
-      const boost = event.target?.closest?.('.boost-chip[data-boost]');
-      if (!boost) return;
-      activate();
-      const stage = engine.clampStage?.(boost.dataset.boost) || 0;
-      setTimeout(() => engine.applyBoost?.(playerAudio, stage, 'mobile-sound-panel'), 0);
-      setTimeout(() => engine.applyBoost?.(playerAudio, stage, 'mobile-sound-panel-confirm'), 190);
+      const button = event.target?.closest?.('.boost-chip[data-boost],[data-boost-stage]');
+      if (!button) return;
+      activateGraph();
+      const raw = button.dataset.boost ?? button.dataset.boostStage ?? 0;
+      const stage = engine.clampStage?.(raw) || 0;
+      setTimeout(() => engine.applyBoost?.(playerAudio, stage, 'shared-sound-panel'), 0);
+      setTimeout(() => engine.applyBoost?.(playerAudio, stage, 'shared-sound-panel-confirm'), 190);
+      setTimeout(configureExistingSoundPanel, 210);
     }, true);
   }
 
   function activate() {
     ensureDesktopVolume();
+    configureExistingSoundPanel();
     ensureDesktopSoundPanel();
-    bindMobileSoundRecovery();
+    bindSharedSoundRecovery();
     core()?.applyVolumePolicy?.(document);
   }
 
   window.SMFPAudioPolicyUI = Object.freeze({
-    version:'2.0.0',
+    version:'2.0.2',
     activate,
     ensureDesktopVolume,
-    ensureDesktopSoundPanel
+    ensureDesktopSoundPanel,
+    configureExistingSoundPanel
   });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', activate, { once:true });

@@ -14,15 +14,87 @@ window.VELUNA_ASSETS = Object.freeze({
 });
 
 /*
- * Shared infrastructure bootstrap v180.
+ * Shared infrastructure bootstrap v181.
  * Wird von 666 PLAYER, VELUNA und internem Notfallplayer geladen.
  * Lädt designneutral: Overlay-Safe-Area, zentrale Audio-/Gerätepolicy und Artwork-Priorität.
  */
 (() => {
   'use strict';
-  const version = '2026-07-22-central-audio-artwork-v180';
+  const version = '2026-07-22-central-audio-artwork-v181';
   const head = document.head || document.documentElement;
   if (!head) return;
+
+  /*
+   * Synchronous graph bridge: captures the player graph before a potentially cached old
+   * boost-core can be replaced by the current central runtime.
+   */
+  const installAudioGraphBridge = () => {
+    if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
+    const graphs = new WeakMap();
+    const graphFor = audio => {
+      if (!audio) return null;
+      let graph = graphs.get(audio);
+      if (!graph) {
+        graph = { audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null };
+        graphs.set(audio, graph);
+      }
+      return graph;
+    };
+    const nodeType = node => {
+      const name = String(node?.constructor?.name || '');
+      if (/BiquadFilter/i.test(name) || (node?.frequency && node?.gain && typeof node.type === 'string')) return 'filter';
+      if (/DynamicsCompressor/i.test(name) || (node?.threshold && node?.ratio && node?.attack)) return 'limiter';
+      if (/Analyser/i.test(name) || (typeof node?.fftSize === 'number' && typeof node?.getByteFrequencyData === 'function')) return 'analyser';
+      if (/GainNode/i.test(name) || (node?.gain && !node?.frequency && !node?.threshold)) return 'gain';
+      return 'other';
+    };
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const AudioNodeCtor = window.AudioNode;
+      if (Ctx?.prototype && AudioNodeCtor?.prototype) {
+        const nativeCreateSource = Ctx.prototype.createMediaElementSource;
+        if (nativeCreateSource && !nativeCreateSource.__smfpWrapped) {
+          const wrappedCreateSource = function(media) {
+            const source = nativeCreateSource.call(this, media);
+            source.__smfpBridgeAudio = media;
+            const graph = graphFor(media);
+            graph.context = this;
+            graph.source = source;
+            return source;
+          };
+          wrappedCreateSource.__smfpWrapped = true;
+          wrappedCreateSource.__smfpBridgeWrapped = true;
+          Ctx.prototype.createMediaElementSource = wrappedCreateSource;
+        }
+        const nativeConnect = AudioNodeCtor.prototype.connect;
+        if (nativeConnect && !nativeConnect.__smfpWrapped) {
+          const wrappedConnect = function(destination) {
+            const result = nativeConnect.apply(this, arguments);
+            try {
+              const audio = this.__smfpBridgeAudio;
+              if (audio && destination) {
+                destination.__smfpBridgeAudio = audio;
+                const graph = graphFor(audio);
+                graph.context = this.context || destination.context || graph.context;
+                const type = nodeType(destination);
+                if (type === 'gain' && !graph.gains.includes(destination)) graph.gains.push(destination);
+                if (type === 'filter' && !graph.filters.includes(destination)) graph.filters.push(destination);
+                if (type === 'limiter') graph.limiter = destination;
+                if (type === 'analyser') graph.analyser = destination;
+              }
+            } catch (_) {}
+            return result;
+          };
+          wrappedConnect.__smfpWrapped = true;
+          wrappedConnect.__smfpBridgeWrapped = true;
+          AudioNodeCtor.prototype.connect = wrappedConnect;
+        }
+      }
+    } catch (_) {}
+    window.__SMFPAudioGraphBridge = Object.freeze({ version:'1.0.0', graphFor });
+    return window.__SMFPAudioGraphBridge;
+  };
+  installAudioGraphBridge();
 
   const loadStyle = (href, marker) => {
     if (document.querySelector(`link[href*="${href.split('?')[0]}"]`)) return;
@@ -53,6 +125,25 @@ window.VELUNA_ASSETS = Object.freeze({
     head.appendChild(script);
   });
 
+  const loadCurrentScript = (src, marker, ready) => new Promise((resolve, reject) => {
+    if (typeof ready === 'function' && ready()) { resolve(); return; }
+    const pending = Array.from(document.scripts).find(script => script.dataset.smfpCurrentRuntime === marker);
+    if (pending) {
+      pending.addEventListener('load', () => resolve(), { once:true });
+      pending.addEventListener('error', reject, { once:true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = false;
+    script.async = false;
+    script.dataset[marker] = 'js';
+    script.dataset.smfpCurrentRuntime = marker;
+    script.addEventListener('load', () => resolve(), { once:true });
+    script.addEventListener('error', reject, { once:true });
+    head.appendChild(script);
+  });
+
   loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
 
@@ -73,7 +164,7 @@ window.VELUNA_ASSETS = Object.freeze({
   const policyReady = () => !!window.SMFPAudioPolicyUI;
   const artworkReady = () => !!window.SMFPArtworkCore;
 
-  void loadScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
+  void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
     .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
     .then(() => {
       try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {}

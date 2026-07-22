@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/boost-core.js
-VERSION: CENTRAL_AUDIO_POLICY_v2.0.1
+VERSION: CENTRAL_AUDIO_POLICY_v2.0.2
 ZWECK:
 - Eine zentrale Boost-, EQ-, AudioContext- und Gerätepolicy für alle Player.
 - Mobile Geräte: Boost 0–5, Hardware-Lautstärke, kein Player-Volume-Regler.
@@ -13,7 +13,7 @@ ZWECK:
 (function(){
   'use strict';
 
-  if (window.SMFPBoostCore?.centralPolicyVersion === '2.0.1') return;
+  if (window.SMFPBoostCore?.centralPolicyVersion === '2.0.2') return;
 
   var STORAGE_KEY = 'smfp_audio_boost_stage_v177';
   var EQ_STORAGE_KEY = 'smfp_audio_eq_v2';
@@ -28,23 +28,23 @@ ZWECK:
     { stage:5, gain:3.98, label:'BST 5', danger:true  }
   ];
   var EQ_BANDS = [
-    { key:'sub', aliases:['sub','low'], type:'lowshelf', freq:55, q:0.70 },
-    { key:'low', aliases:['low','lowMid'], type:'peaking', freq:160, q:0.95 },
-    { key:'mid', aliases:['mid'], type:'peaking', freq:1000, q:1.00 },
-    { key:'high', aliases:['high','highMid'], type:'peaking', freq:3600, q:0.90 },
-    { key:'air', aliases:['air','high'], type:'highshelf', freq:10500, q:0.70 }
+    { key:'sub', type:'lowshelf', freq:55, q:0.70 },
+    { key:'low', type:'peaking', freq:160, q:0.95 },
+    { key:'mid', type:'peaking', freq:1000, q:1.00 },
+    { key:'high', type:'peaking', freq:3600, q:0.90 },
+    { key:'air', type:'highshelf', freq:10500, q:0.70 }
   ];
 
   var graphs = new WeakMap();
   var desired = new WeakMap();
-  var patched = false;
+  var instrumentationInstalled = false;
 
   function isMobileDevice(){
     try {
       var mobileUa = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
       var coarse = window.matchMedia('(pointer: coarse)').matches;
-      var screenWidth = Math.min(Number(screen.width) || window.innerWidth, Number(screen.height) || window.innerHeight);
-      return mobileUa || (coarse && screenWidth <= 1024);
+      var width = Math.min(Number(screen.width) || window.innerWidth, Number(screen.height) || window.innerHeight);
+      return mobileUa || (coarse && width <= 1024);
     } catch (_) {
       return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
     }
@@ -64,84 +64,87 @@ ZWECK:
   }
 
   function maxStage(){ return deviceProfile().maxBoostStage; }
-
   function clampStage(value){
-    var n = Number(value);
-    if(!isFinite(n)) n = 0;
-    return Math.max(0, Math.min(maxStage(), Math.round(n)));
+    var number = Number(value);
+    if (!isFinite(number)) number = 0;
+    return Math.max(0, Math.min(maxStage(), Math.round(number)));
   }
-
-  function getStageInfo(value){
-    var s = clampStage(value);
-    return STAGES[s] || STAGES[0];
-  }
-
+  function getStageInfo(value){ return STAGES[clampStage(value)] || STAGES[0]; }
   function getGain(value){ return getStageInfo(value).gain; }
   function getLabel(value){ return getStageInfo(value).label; }
   function isDanger(value){ return !!getStageInfo(value).danger; }
-
   function loadStage(){
-    try { return clampStage(localStorage.getItem(STORAGE_KEY)); } catch(e) { return 0; }
+    try { return clampStage(localStorage.getItem(STORAGE_KEY)); } catch (_) { return 0; }
   }
-
   function saveStage(value){
-    var s = clampStage(value);
-    try { localStorage.setItem(STORAGE_KEY, String(s)); } catch(e) {}
-    return s;
+    var stage = clampStage(value);
+    try { localStorage.setItem(STORAGE_KEY, String(stage)); } catch (_) {}
+    return stage;
   }
 
   function clampDb(value){
-    var n = Number(value);
-    if (!isFinite(n)) n = 0;
-    return Math.max(-12, Math.min(12, Math.round(n)));
+    var number = Number(value);
+    if (!isFinite(number)) number = 0;
+    return Math.max(-12, Math.min(12, Math.round(number)));
   }
-
+  function normalizeEq(values){
+    values = values || {};
+    var velunaShape = Object.prototype.hasOwnProperty.call(values, 'sub') || Object.prototype.hasOwnProperty.call(values, 'air');
+    if (velunaShape) {
+      return {
+        sub:clampDb(values.sub), low:clampDb(values.low), mid:clampDb(values.mid),
+        high:clampDb(values.high), air:clampDb(values.air)
+      };
+    }
+    return {
+      sub:clampDb(values.low), low:clampDb(values.lowMid), mid:clampDb(values.mid),
+      high:clampDb(values.highMid), air:clampDb(values.high)
+    };
+  }
   function loadEq(){
-    var fallback = { sub:0, low:0, mid:0, high:0, air:0 };
+    var flat = { sub:0, low:0, mid:0, high:0, air:0 };
     try {
       var parsed = JSON.parse(localStorage.getItem(EQ_STORAGE_KEY) || '{}');
-      Object.keys(fallback).forEach(function(key){
-        if (Object.prototype.hasOwnProperty.call(parsed, key)) fallback[key] = clampDb(parsed[key]);
+      Object.keys(flat).forEach(function(key){
+        if (Object.prototype.hasOwnProperty.call(parsed, key)) flat[key] = clampDb(parsed[key]);
       });
     } catch (_) {}
-    return fallback;
+    return flat;
   }
-
   function saveEq(values){
     var normalized = normalizeEq(values);
     try { localStorage.setItem(EQ_STORAGE_KEY, JSON.stringify(normalized)); } catch (_) {}
     return normalized;
   }
 
-  function normalizeEq(values){
-    values = values || {};
-    var velunaShape = Object.prototype.hasOwnProperty.call(values, 'sub') || Object.prototype.hasOwnProperty.call(values, 'air');
-    if (velunaShape) {
-      return {
-        sub: clampDb(values.sub),
-        low: clampDb(values.low),
-        mid: clampDb(values.mid),
-        high: clampDb(values.high),
-        air: clampDb(values.air)
-      };
-    }
-    return {
-      sub: clampDb(values.low),
-      low: clampDb(values.lowMid),
-      mid: clampDb(values.mid),
-      high: clampDb(values.highMid),
-      air: clampDb(values.high)
-    };
-  }
-
   function stateFor(audio){
-    if (!audio) return { stage:0, eq:loadEq() };
+    if (!audio) return { stage:loadStage(), eq:loadEq() };
     var state = desired.get(audio);
     if (!state) {
       state = { stage:loadStage(), eq:loadEq() };
       desired.set(audio, state);
     }
     return state;
+  }
+
+  function attachParamContext(node, context){
+    try { if (node?.gain) node.gain.__smfpContext = context || node.context || null; } catch (_) {}
+  }
+
+  function adoptBridge(audio, graph){
+    try {
+      var bridged = window.__SMFPAudioGraphBridge?.graphFor?.(audio);
+      if (!bridged) return graph;
+      graph.context = bridged.context || graph.context;
+      graph.source = bridged.source || graph.source;
+      graph.gains = bridged.gains?.length ? bridged.gains : graph.gains;
+      graph.filters = bridged.filters?.length ? bridged.filters : graph.filters;
+      graph.limiter = bridged.limiter || graph.limiter;
+      graph.analyser = bridged.analyser || graph.analyser;
+      graph.gains.forEach(function(node){ attachParamContext(node, graph.context); });
+      graph.filters.forEach(function(node){ attachParamContext(node, graph.context); });
+    } catch (_) {}
+    return graph;
   }
 
   function graphFor(audio){
@@ -151,7 +154,7 @@ ZWECK:
       graph = { audio:audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null, createdByCore:false };
       graphs.set(audio, graph);
     }
-    return graph;
+    return adoptBridge(audio, graph);
   }
 
   function nodeType(node){
@@ -161,10 +164,6 @@ ZWECK:
     if (/Analyser/i.test(name) || (typeof node?.fftSize === 'number' && typeof node?.getByteFrequencyData === 'function')) return 'analyser';
     if (/GainNode/i.test(name) || (node?.gain && !node?.frequency && !node?.threshold)) return 'gain';
     return 'other';
-  }
-
-  function attachParamContext(node, context){
-    try { if (node?.gain) node.gain.__smfpContext = context || node.context || null; } catch (_) {}
   }
 
   function registerNode(audio, node, context){
@@ -182,13 +181,12 @@ ZWECK:
   }
 
   function installGraphInstrumentation(){
-    if (patched) return;
-    patched = true;
+    if (instrumentationInstalled) return;
+    instrumentationInstalled = true;
     try {
       var Ctx = window.AudioContext || window.webkitAudioContext;
       var AudioNodeCtor = window.AudioNode;
       if (!Ctx?.prototype || !AudioNodeCtor?.prototype) return;
-
       var nativeCreateSource = Ctx.prototype.createMediaElementSource;
       if (nativeCreateSource && !nativeCreateSource.__smfpWrapped) {
         var wrappedCreateSource = function(media){
@@ -202,7 +200,6 @@ ZWECK:
         wrappedCreateSource.__smfpWrapped = true;
         Ctx.prototype.createMediaElementSource = wrappedCreateSource;
       }
-
       var nativeConnect = AudioNodeCtor.prototype.connect;
       if (nativeConnect && !nativeConnect.__smfpWrapped) {
         var wrappedConnect = function(destination){
@@ -230,12 +227,8 @@ ZWECK:
       param.linearRampToValueAtTime(Number(target), now + duration);
       return true;
     } catch (_) {
-      try {
-        param.setTargetAtTime(Number(target), now, Math.max(0.01, duration / 3));
-        return true;
-      } catch (__) {
-        try { param.value = Number(target); return true; } catch (___) { return false; }
-      }
+      try { param.setTargetAtTime(Number(target), now, Math.max(0.01, duration / 3)); return true; }
+      catch (__) { try { param.value = Number(target); return true; } catch (___) { return false; } }
     }
   }
 
@@ -246,125 +239,13 @@ ZWECK:
     try {
       if (context.state === 'suspended' || context.state === 'interrupted') await context.resume();
       return context.state === 'running';
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function applyBoost(audio, stage, source){
-    if (!audio) return 0;
-    var safeStage = clampStage(stage);
-    var targetGain = getGain(safeStage);
-    var state = stateFor(audio);
-    state.stage = safeStage;
-    saveStage(safeStage);
-    var graph = graphFor(audio);
-    var gainNode = graph?.gains?.[0] || null;
-    var graphState = gainNode ? 'GRAPH_OK' : (audio.dataset?.audioChain === 'webaudio-unavailable' ? 'GRAPH_FAIL' : 'GRAPH_WAIT');
-    if (gainNode) {
-      attachParamContext(gainNode, graph.context);
-      rampParam(gainNode.gain, targetGain, RAMP_SECONDS);
-    }
-    try {
-      audio.dataset.boostStage = String(safeStage);
-      audio.dataset.boostGain = String(targetGain);
-      audio.dataset.boostGraph = graphState;
-      audio.dataset.boostContext = graph?.context?.state || 'NO_CONTEXT';
-      audio.dispatchEvent(new CustomEvent('boost-diagnostic', { detail:{
-        stage:safeStage,
-        gain:targetGain,
-        graph:graphState,
-        context:graph?.context?.state || 'NO_CONTEXT',
-        profile:deviceProfile().id,
-        maxStage:maxStage(),
-        rampMs:Math.round(RAMP_SECONDS * 1000),
-        source:source || 'central-core'
-      }}));
-    } catch (_) {}
-    updateSoundStatus(audio, graphState, state.eq);
-    return safeStage;
-  }
-
-  function valuesToArray(values){
-    var normalized = normalizeEq(values);
-    return [normalized.sub, normalized.low, normalized.mid, normalized.high, normalized.air];
-  }
-
-  function applyEq(audio, values, source){
-    if (!audio) return normalizeEq(values);
-    var normalized = saveEq(values);
-    var state = stateFor(audio);
-    state.eq = normalized;
-    var graph = graphFor(audio);
-    var ordered = valuesToArray(normalized);
-    (graph?.filters || []).slice(0, 5).forEach(function(node, index){
-      attachParamContext(node, graph.context);
-      rampParam(node.gain, ordered[index] || 0, EQ_RAMP_SECONDS);
-    });
-    try {
-      audio.dataset.eqGraph = graph?.filters?.length ? 'GRAPH_OK' : 'GRAPH_WAIT';
-      audio.dataset.eqContext = graph?.context?.state || 'NO_CONTEXT';
-      audio.dataset.eqState = JSON.stringify(normalized);
-      window.dispatchEvent(new CustomEvent('smfpeqchange', { detail:{
-        values:normalized,
-        graph:audio.dataset.eqGraph,
-        context:audio.dataset.eqContext,
-        source:source || 'central-core'
-      }}));
-    } catch (_) {}
-    updateSoundStatus(audio, audio.dataset?.eqGraph || 'GRAPH_WAIT', normalized);
-    return normalized;
-  }
-
-  function updateSoundStatus(audio, graphState, eq){
-    var status = document.getElementById('soundStatus');
-    if (!status) return;
-    var state = stateFor(audio);
-    var profile = deviceProfile();
-    var values = eq || state.eq || loadEq();
-    var changed = Object.keys(values).some(function(key){ return Number(values[key]) !== 0; });
-    status.textContent = 'CENTRAL SOUND · ' + profile.id.toUpperCase() +
-      ' · BOOST ' + state.stage + '/' + profile.maxBoostStage +
-      ' · EQ ' + (changed ? 'ACTIVE' : 'FLAT') +
-      ' · ' + String(graphState || 'GRAPH_WAIT') +
-      ' · RAMP 160ms';
-  }
-
-  function publish(stage, gain, source){
-    var s = clampStage(stage);
-    var g = getGain(s);
-    try {
-      document.documentElement.setAttribute('data-smfp-boost-stage', String(s));
-      document.documentElement.setAttribute('data-smfp-boost-gain', String(g));
-      document.documentElement.setAttribute('data-smfp-boost-danger', isDanger(s) ? '1' : '0');
-      document.documentElement.setAttribute('data-smfp-audio-profile', deviceProfile().id);
-      document.body && document.body.setAttribute('data-boost-level', String(s));
-      document.body && document.body.setAttribute('data-mobile-boost', String(s));
-      document.documentElement.style.setProperty('--boost-level', String(s));
-      document.documentElement.style.setProperty('--player-boost-level', String(s));
-      document.documentElement.style.setProperty('--player-boost-gain', g.toFixed(2));
-      window.__boostLevel = s;
-      window.dispatchEvent(new CustomEvent('smfpboostchange', { detail:{ stage:s, gain:g, label:getLabel(s), danger:isDanger(s), source:source||'core', profile:deviceProfile().id, maxStage:maxStage() } }));
-      window.dispatchEvent(new CustomEvent('playerboostchange', { detail:{ level:s, gain:g, label:getLabel(s), danger:isDanger(s), source:source||'core', profile:deviceProfile().id, maxStage:maxStage() } }));
-    } catch(e) {}
-    return s;
-  }
-
-  function scheduleApply(audio, source){
-    if (!audio) return;
-    clearTimeout(audio.__smfpCentralApplyTimer);
-    audio.__smfpCentralApplyTimer = setTimeout(function(){
-      var state = stateFor(audio);
-      void resume(audio);
-      applyBoost(audio, state.stage, source || 'scheduled');
-      applyEq(audio, state.eq, source || 'scheduled');
-    }, 0);
+    } catch (_) { return false; }
   }
 
   function ensureGraph(audio){
     if (!audio) return null;
     var graph = graphFor(audio);
-    if (graph.source || audio.dataset?.audioChain === 'eq-boost-limiter-active') return graph;
+    if (graph.source) return graph;
     try {
       var AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) throw new Error('no_audio_context');
@@ -405,12 +286,123 @@ ZWECK:
       graph.createdByCore = true;
       audio.dataset.audioChain = 'central-eq-boost-limiter-active';
       scheduleApply(audio, 'ensure-graph');
-      return graph;
     } catch (error) {
       audio.dataset.audioChain = audio.dataset.audioChain || 'webaudio-unavailable';
       audio.dataset.centralAudioError = String(error?.message || error || 'graph_error');
-      return graph;
     }
+    return graphFor(audio);
+  }
+
+  function graphStatus(audio){
+    var graph = graphFor(audio);
+    if (graph?.gains?.length && graph?.filters?.length) return 'GRAPH_OK';
+    if (audio?.dataset?.audioChain === 'webaudio-unavailable') return 'GRAPH_FAIL';
+    return 'GRAPH_WAIT';
+  }
+
+  function updateSoundStatus(audio, stateLabel, eq){
+    var status = document.getElementById('soundStatus');
+    if (!status) return;
+    var state = stateFor(audio);
+    var profile = deviceProfile();
+    var values = eq || state.eq || loadEq();
+    var changed = Object.keys(values).some(function(key){ return Number(values[key]) !== 0; });
+    status.textContent = 'CENTRAL SOUND · ' + profile.id.toUpperCase() +
+      ' · BOOST ' + state.stage + '/' + profile.maxBoostStage +
+      ' · EQ ' + (changed ? 'ACTIVE' : 'FLAT') +
+      ' · ' + String(stateLabel || graphStatus(audio)) +
+      ' · RAMP 160ms';
+  }
+
+  function applyBoost(audio, stage, source){
+    if (!audio) return 0;
+    var safeStage = clampStage(stage);
+    var targetGain = getGain(safeStage);
+    var state = stateFor(audio);
+    state.stage = safeStage;
+    saveStage(safeStage);
+    var graph = ensureGraph(audio);
+    var gainNode = graph?.gains?.[0] || null;
+    var status = graphStatus(audio);
+    if (gainNode) {
+      attachParamContext(gainNode, graph.context);
+      rampParam(gainNode.gain, targetGain, RAMP_SECONDS);
+    }
+    try {
+      audio.dataset.boostStage = String(safeStage);
+      audio.dataset.boostGain = String(targetGain);
+      audio.dataset.boostGraph = status;
+      audio.dataset.boostContext = graph?.context?.state || 'NO_CONTEXT';
+      audio.dispatchEvent(new CustomEvent('boost-diagnostic', { detail:{
+        stage:safeStage, gain:targetGain, graph:status,
+        context:graph?.context?.state || 'NO_CONTEXT', profile:deviceProfile().id,
+        maxStage:maxStage(), rampMs:160, source:source || 'central-core'
+      }}));
+    } catch (_) {}
+    updateSoundStatus(audio, status, state.eq);
+    return safeStage;
+  }
+
+  function applyEq(audio, values, source){
+    if (!audio) return normalizeEq(values);
+    var normalized = saveEq(values);
+    var state = stateFor(audio);
+    state.eq = normalized;
+    var graph = ensureGraph(audio);
+    var ordered = [normalized.sub, normalized.low, normalized.mid, normalized.high, normalized.air];
+    (graph?.filters || []).slice(0, 5).forEach(function(node, index){
+      attachParamContext(node, graph.context);
+      rampParam(node.gain, ordered[index] || 0, EQ_RAMP_SECONDS);
+    });
+    var status = graph?.filters?.length >= 5 ? 'GRAPH_OK' : graphStatus(audio);
+    try {
+      audio.dataset.eqGraph = status;
+      audio.dataset.eqContext = graph?.context?.state || 'NO_CONTEXT';
+      audio.dataset.eqState = JSON.stringify(normalized);
+      window.dispatchEvent(new CustomEvent('smfpeqchange', { detail:{
+        values:normalized, graph:status, context:audio.dataset.eqContext,
+        source:source || 'central-core'
+      }}));
+    } catch (_) {}
+    updateSoundStatus(audio, status, normalized);
+    return normalized;
+  }
+
+  function publish(stage, gain, source){
+    var safeStage = clampStage(stage);
+    var actualGain = getGain(safeStage);
+    try {
+      document.documentElement.setAttribute('data-smfp-boost-stage', String(safeStage));
+      document.documentElement.setAttribute('data-smfp-boost-gain', String(actualGain));
+      document.documentElement.setAttribute('data-smfp-boost-danger', isDanger(safeStage) ? '1' : '0');
+      document.documentElement.setAttribute('data-smfp-audio-profile', deviceProfile().id);
+      document.body?.setAttribute('data-boost-level', String(safeStage));
+      document.body?.setAttribute('data-mobile-boost', String(safeStage));
+      document.documentElement.style.setProperty('--boost-level', String(safeStage));
+      document.documentElement.style.setProperty('--player-boost-level', String(safeStage));
+      document.documentElement.style.setProperty('--player-boost-gain', actualGain.toFixed(2));
+      window.__boostLevel = safeStage;
+      window.dispatchEvent(new CustomEvent('smfpboostchange', { detail:{
+        stage:safeStage, gain:actualGain, label:getLabel(safeStage), danger:isDanger(safeStage),
+        source:source || 'core', profile:deviceProfile().id, maxStage:maxStage()
+      }}));
+      window.dispatchEvent(new CustomEvent('playerboostchange', { detail:{
+        level:safeStage, gain:actualGain, label:getLabel(safeStage), danger:isDanger(safeStage),
+        source:source || 'core', profile:deviceProfile().id, maxStage:maxStage()
+      }}));
+    } catch (_) {}
+    return safeStage;
+  }
+
+  function scheduleApply(audio, source){
+    if (!audio) return;
+    clearTimeout(audio.__smfpCentralApplyTimer);
+    audio.__smfpCentralApplyTimer = setTimeout(function(){
+      var state = stateFor(audio);
+      void resume(audio);
+      applyBoost(audio, state.stage, source || 'scheduled');
+      applyEq(audio, state.eq, source || 'scheduled');
+    }, 0);
   }
 
   function collectEqControls(){
@@ -440,17 +432,18 @@ ZWECK:
       }
     });
     root.querySelectorAll('audio').forEach(function(audio){
-      if (profile.hardwareVolume) {
-        try { audio.volume = 1; } catch (_) {}
-      }
+      if (profile.hardwareVolume) { try { audio.volume = 1; } catch (_) {} }
     });
     document.documentElement.setAttribute('data-smfp-volume-policy', profile.hardwareVolume ? 'hardware' : 'player');
     return profile;
   }
 
   function bindUi(){
+    if (document.documentElement.dataset.smfpCentralAudioBound === '1') return;
+    document.documentElement.dataset.smfpCentralAudioBound = '1';
+
     document.addEventListener('pointerdown', function(event){
-      var control = event.target?.closest?.('[data-veluna-eq],[data-smfp-eq],[data-boost],[data-boost-stage],[data-boost-step]');
+      var control = event.target?.closest?.('[data-veluna-eq],[data-smfp-eq],[data-boost],[data-boost-stage],[data-boost-step],.boost-chip');
       if (!control) return;
       var audio = document.querySelector('audio');
       if (!audio) return;
@@ -463,18 +456,19 @@ ZWECK:
       var audio = document.querySelector('audio');
       if (!audio) return;
       ensureGraph(audio);
+      void resume(audio);
       setTimeout(function(){ applyEq(audio, collectEqControls(), 'ui-input'); }, 0);
-      setTimeout(function(){ applyEq(audio, collectEqControls(), 'ui-input-confirm'); }, 180);
+      setTimeout(function(){ applyEq(audio, collectEqControls(), 'ui-input-confirm'); }, 190);
     }, true);
 
     window.addEventListener('smfpboostchange', function(event){
-      if (event.detail?.source === 'central-enforce') return;
+      if (String(event.detail?.source || '').startsWith('central-')) return;
       var audio = document.querySelector('audio');
       if (!audio) return;
-      ensureGraph(audio);
       var stage = clampStage(event.detail?.stage ?? event.detail?.level ?? 0);
-      var state = stateFor(audio);
-      state.stage = stage;
+      stateFor(audio).stage = stage;
+      ensureGraph(audio);
+      void resume(audio);
       setTimeout(function(){ applyBoost(audio, stage, 'central-enforce'); }, 0);
       setTimeout(function(){ applyBoost(audio, stage, 'central-confirm'); }, 190);
     });
@@ -482,17 +476,19 @@ ZWECK:
     document.addEventListener('s666:sound-boost', function(event){
       var audio = document.querySelector('audio');
       if (!audio) return;
-      ensureGraph(audio);
       var stage = clampStage(event.detail?.stage || 0);
       stateFor(audio).stage = stage;
-      applyBoost(audio, stage, 'sound-event');
+      ensureGraph(audio);
+      void resume(audio);
+      applyBoost(audio, stage, 'central-sound-event');
     });
 
     document.addEventListener('s666:sound-eq', function(event){
       var audio = document.querySelector('audio');
       if (!audio) return;
       ensureGraph(audio);
-      applyEq(audio, event.detail?.values || {}, 'sound-event');
+      void resume(audio);
+      applyEq(audio, event.detail?.values || {}, 'central-sound-event');
     });
 
     ['resize','orientationchange'].forEach(function(name){
@@ -502,44 +498,44 @@ ZWECK:
       }, { passive:true });
     });
 
-    var observer = new MutationObserver(function(){ applyVolumePolicy(document); });
-    observer.observe(document.documentElement, { childList:true, subtree:true });
+    var volumeObserver = new MutationObserver(function(){ applyVolumePolicy(document); });
+    volumeObserver.observe(document.documentElement, { childList:true, subtree:true });
     applyVolumePolicy(document);
   }
 
   installGraphInstrumentation();
 
   window.SMFPBoostCore = {
-    version: 'v192-boost-audible-stages + central-audio-policy-v2.0.1',
-    centralPolicyVersion: '2.0.1',
-    storageKey: STORAGE_KEY,
-    eqStorageKey: EQ_STORAGE_KEY,
-    stages: STAGES.slice(),
-    eqBands: EQ_BANDS.map(function(band){ return Object.assign({}, band); }),
-    rampSeconds: RAMP_SECONDS,
-    eqRampSeconds: EQ_RAMP_SECONDS,
-    isMobileDevice: isMobileDevice,
-    deviceProfile: deviceProfile,
-    maxStage: maxStage,
-    clampStage: clampStage,
-    getStageInfo: getStageInfo,
-    getGain: getGain,
-    getLabel: getLabel,
-    isDanger: isDanger,
-    loadStage: loadStage,
-    saveStage: saveStage,
-    loadEq: loadEq,
-    saveEq: saveEq,
-    normalizeEq: normalizeEq,
-    publish: publish,
-    rampAudioParam: rampParam,
-    graphFor: graphFor,
-    ensureGraph: ensureGraph,
-    resume: resume,
-    applyBoost: applyBoost,
-    applyEq: applyEq,
-    applyVolumePolicy: applyVolumePolicy,
-    registerEngine: function(audio, engine){
+    version:'v192-boost-audible-stages + central-audio-policy-v2.0.2',
+    centralPolicyVersion:'2.0.2',
+    storageKey:STORAGE_KEY,
+    eqStorageKey:EQ_STORAGE_KEY,
+    stages:STAGES.slice(),
+    eqBands:EQ_BANDS.map(function(band){ return Object.assign({}, band); }),
+    rampSeconds:RAMP_SECONDS,
+    eqRampSeconds:EQ_RAMP_SECONDS,
+    isMobileDevice:isMobileDevice,
+    deviceProfile:deviceProfile,
+    maxStage:maxStage,
+    clampStage:clampStage,
+    getStageInfo:getStageInfo,
+    getGain:getGain,
+    getLabel:getLabel,
+    isDanger:isDanger,
+    loadStage:loadStage,
+    saveStage:saveStage,
+    loadEq:loadEq,
+    saveEq:saveEq,
+    normalizeEq:normalizeEq,
+    publish:publish,
+    rampAudioParam:rampParam,
+    graphFor:graphFor,
+    ensureGraph:ensureGraph,
+    resume:resume,
+    applyBoost:applyBoost,
+    applyEq:applyEq,
+    applyVolumePolicy:applyVolumePolicy,
+    registerEngine:function(audio, engine){
       var graph = graphFor(audio);
       engine = engine || {};
       graph.context = engine.context || engine.ctx || graph.context;
