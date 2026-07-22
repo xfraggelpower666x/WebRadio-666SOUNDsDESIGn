@@ -30,8 +30,17 @@ jobs:
         run: node --test tests/central-audio-artwork-policy.test.mjs
       - name: Release structure check
         run: npm run check
-      - name: Full Node test suite
-        run: npm test
+      - name: Frontend contracts
+        run: node --test tests/frontend-contracts.test.mjs
+      - name: Remaining Node test files
+        run: |
+          for file in tests/*.test.mjs; do
+            case "$file" in
+              tests/central-audio-artwork-policy.test.mjs|tests/frontend-contracts.test.mjs) continue ;;
+            esac
+            echo "RUNNING $file"
+            node --test "$file"
+          done
       - name: Python syntax audit without bytecode
         shell: python
         run: |
