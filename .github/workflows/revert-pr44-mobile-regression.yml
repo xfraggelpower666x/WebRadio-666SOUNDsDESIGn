@@ -46,10 +46,8 @@ jobs:
       - name: Remove temporary files and publish revert
         run: |
           rm -f .github/workflows/revert-pr44-mobile-regression.yml
-          rm -f docs/ROLLBACK_PR44_MOBILE_REGRESSION.md
           rm -f ROLLBACK_TRIGGER_PR44.txt
-          rm -f docs/ROLLBACK_TRIGGER_PR44_REMOVE_ME.txt
-          rm -f docs/ROLLBACK_READY_PR44.txt
+          rm -f docs/ROLLBACK_PR44_*.md docs/ROLLBACK_PR44_*.txt docs/ROLLBACK_TRIGGER_PR44_*.txt
           git add -A
           git commit --amend --no-edit
           git push --force-with-lease origin HEAD:rollback-pr44-mobile-regression-20260722
