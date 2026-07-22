@@ -1,7 +1,7 @@
 /* Zentrale VELUNA-Asset-, Branding- und Shared-Infrastructure-Quelle. */
 window.VELUNA_ASSETS = Object.freeze({
-  release: 'FULLVERSION_SHARED_IPHONE_AUDIO_START_v1.2.17',
-  version: '1.2.17',
+  release: 'FULLVERSION_CENTRAL_AUDIO_ARTWORK_POLICY_v1.2.29',
+  version: '1.2.29',
   endpoint: '/veluna',
   background: '/assets/veluna/background/veluna-player-background.webp',
   header: '/assets/veluna/header/veluna-player-header.webp',
@@ -14,41 +14,166 @@ window.VELUNA_ASSETS = Object.freeze({
 });
 
 /*
- * Shared overlay bootstrap v179.
+ * Shared infrastructure bootstrap v181.
  * Wird von 666 PLAYER, VELUNA und internem Notfallplayer geladen.
- * Lädt nur den bestehenden designneutralen Overlay-Core; erzeugt kein eigenes Menü oder Theme.
+ * Lädt designneutral: Overlay-Safe-Area, zentrale Audio-/Gerätepolicy und Artwork-Priorität.
  */
 (() => {
   'use strict';
-  const version = '2026-07-20-safe-area-v179';
+  const version = '2026-07-22-central-audio-artwork-v181';
   const head = document.head || document.documentElement;
   if (!head) return;
 
-  if (!document.querySelector('link[href*="/core/overlay/overlay-core.css"]')) {
+  /*
+   * Synchronous graph bridge: captures the player graph before a potentially cached old
+   * boost-core can be replaced by the current central runtime.
+   */
+  const installAudioGraphBridge = () => {
+    if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
+    const graphs = new WeakMap();
+    const graphFor = audio => {
+      if (!audio) return null;
+      let graph = graphs.get(audio);
+      if (!graph) {
+        graph = { audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null };
+        graphs.set(audio, graph);
+      }
+      return graph;
+    };
+    const nodeType = node => {
+      const name = String(node?.constructor?.name || '');
+      if (/BiquadFilter/i.test(name) || (node?.frequency && node?.gain && typeof node.type === 'string')) return 'filter';
+      if (/DynamicsCompressor/i.test(name) || (node?.threshold && node?.ratio && node?.attack)) return 'limiter';
+      if (/Analyser/i.test(name) || (typeof node?.fftSize === 'number' && typeof node?.getByteFrequencyData === 'function')) return 'analyser';
+      if (/GainNode/i.test(name) || (node?.gain && !node?.frequency && !node?.threshold)) return 'gain';
+      return 'other';
+    };
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const AudioNodeCtor = window.AudioNode;
+      if (Ctx?.prototype && AudioNodeCtor?.prototype) {
+        const nativeCreateSource = Ctx.prototype.createMediaElementSource;
+        if (nativeCreateSource && !nativeCreateSource.__smfpWrapped) {
+          const wrappedCreateSource = function(media) {
+            const source = nativeCreateSource.call(this, media);
+            source.__smfpBridgeAudio = media;
+            const graph = graphFor(media);
+            graph.context = this;
+            graph.source = source;
+            return source;
+          };
+          wrappedCreateSource.__smfpWrapped = true;
+          wrappedCreateSource.__smfpBridgeWrapped = true;
+          Ctx.prototype.createMediaElementSource = wrappedCreateSource;
+        }
+        const nativeConnect = AudioNodeCtor.prototype.connect;
+        if (nativeConnect && !nativeConnect.__smfpWrapped) {
+          const wrappedConnect = function(destination) {
+            const result = nativeConnect.apply(this, arguments);
+            try {
+              const audio = this.__smfpBridgeAudio;
+              if (audio && destination) {
+                destination.__smfpBridgeAudio = audio;
+                const graph = graphFor(audio);
+                graph.context = this.context || destination.context || graph.context;
+                const type = nodeType(destination);
+                if (type === 'gain' && !graph.gains.includes(destination)) graph.gains.push(destination);
+                if (type === 'filter' && !graph.filters.includes(destination)) graph.filters.push(destination);
+                if (type === 'limiter') graph.limiter = destination;
+                if (type === 'analyser') graph.analyser = destination;
+              }
+            } catch (_) {}
+            return result;
+          };
+          wrappedConnect.__smfpWrapped = true;
+          wrappedConnect.__smfpBridgeWrapped = true;
+          AudioNodeCtor.prototype.connect = wrappedConnect;
+        }
+      }
+    } catch (_) {}
+    window.__SMFPAudioGraphBridge = Object.freeze({ version:'1.0.0', graphFor });
+    return window.__SMFPAudioGraphBridge;
+  };
+  installAudioGraphBridge();
+
+  const loadStyle = (href, marker) => {
+    if (document.querySelector(`link[href*="${href.split('?')[0]}"]`)) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = `/core/overlay/overlay-core.css?v=${version}`;
-    link.dataset.smfpOverlayCore = 'css';
+    link.href = href;
+    link.dataset[marker] = 'css';
     head.appendChild(link);
-  }
+  };
 
-  const activate = () => {
+  const loadScript = (src, marker, ready) => new Promise((resolve, reject) => {
+    if (typeof ready === 'function' && ready()) { resolve(); return; }
+    const base = src.split('?')[0];
+    const existing = Array.from(document.scripts).find(script => script.src && script.src.includes(base));
+    if (existing) {
+      if (typeof ready === 'function' && ready()) { resolve(); return; }
+      existing.addEventListener('load', () => resolve(), { once:true });
+      existing.addEventListener('error', reject, { once:true });
+      setTimeout(resolve, 1200);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = true;
+    script.dataset[marker] = 'js';
+    script.addEventListener('load', () => resolve(), { once:true });
+    script.addEventListener('error', reject, { once:true });
+    head.appendChild(script);
+  });
+
+  const loadCurrentScript = (src, marker, ready) => new Promise((resolve, reject) => {
+    if (typeof ready === 'function' && ready()) { resolve(); return; }
+    const pending = Array.from(document.scripts).find(script => script.dataset.smfpCurrentRuntime === marker);
+    if (pending) {
+      pending.addEventListener('load', () => resolve(), { once:true });
+      pending.addEventListener('error', reject, { once:true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = false;
+    script.async = false;
+    script.dataset[marker] = 'js';
+    script.dataset.smfpCurrentRuntime = marker;
+    script.addEventListener('load', () => resolve(), { once:true });
+    script.addEventListener('error', reject, { once:true });
+    head.appendChild(script);
+  });
+
+  loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
+  loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
+
+  const activateOverlay = () => {
     try {
       window.SMFPOverlayCore?.updateViewport?.();
       window.SMFPOverlayCore?.scanOverlays?.(document);
     } catch (_) {}
   };
 
-  if (window.SMFPOverlayCore) {
-    activate();
-    return;
-  }
-  if (document.querySelector('script[src*="/core/overlay/overlay-core.js"],script[src*="/js/overlay-core.js"]')) return;
+  void loadScript(
+    `/core/overlay/overlay-core.js?v=${version}`,
+    'smfpOverlayCore',
+    () => !!window.SMFPOverlayCore
+  ).then(activateOverlay).catch(() => {});
 
-  const script = document.createElement('script');
-  script.src = `/core/overlay/overlay-core.js?v=${version}`;
-  script.defer = true;
-  script.dataset.smfpOverlayCore = 'js';
-  script.addEventListener('load', activate, { once:true });
-  head.appendChild(script);
+  const audioReady = () => !!window.SMFPBoostCore?.centralPolicyVersion;
+  const policyReady = () => !!window.SMFPAudioPolicyUI;
+  const artworkReady = () => !!window.SMFPArtworkCore;
+
+  void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
+    .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
+    .then(() => {
+      try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {}
+    })
+    .catch(() => {});
+
+  void loadScript(`/js/artwork-core.js?v=${version}`, 'smfpArtworkCore', artworkReady)
+    .then(() => {
+      try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {}
+    })
+    .catch(() => {});
 })();
