@@ -38,6 +38,7 @@ jobs:
               end = source.index(end_marker, start)
               lines = source[start:end].splitlines()
               code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+              code = code.replace('replaceFallbackArtwork\\(\\) \\{', 'replaceFallbackArtwork\\(\\)\\s*\\{')
               exec(compile(code, 'stored-single-writer-repair.py', 'exec'), {'__name__':'__main__'})
               error_path.unlink(missing_ok=True)
           except BaseException:
