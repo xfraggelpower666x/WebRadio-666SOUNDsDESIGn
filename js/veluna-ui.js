@@ -1,4 +1,4 @@
-/* VELUNA Central UI Runtime v1.2.26 */
+/* VELUNA Central UI Runtime v1.2.31 — no delayed splash ownership */
 (() => {
   'use strict';
   const A = window.VELUNA_ASSETS || {};
@@ -248,36 +248,6 @@
     }
   }
 
-  function injectSplash(){
-    if (q('[data-veluna-central-splash="1"]')) return;
-    const splash = document.createElement('div');
-    splash.className = 'veluna-splash veluna-splash-global';
-    splash.dataset.velunaCentralSplash = '1';
-    splash.dataset.player = page;
-    splash.setAttribute('aria-hidden','true');
-    const video = document.createElement('video');
-    video.autoplay = true; video.muted = true; video.playsInline = true; video.preload = 'auto';
-    video.setAttribute('webkit-playsinline','');
-    video.setAttribute('disablepictureinpicture','');
-    const webm = document.createElement('source'); webm.src = A.splashWebm || '/assets/veluna/splash/veluna-loading-splash.webm'; webm.type='video/webm';
-    const mp4 = document.createElement('source'); mp4.src = A.splashMp4 || '/assets/veluna/splash/veluna-loading-splash.mp4'; mp4.type='video/mp4';
-    video.append(webm,mp4); splash.appendChild(video); body.appendChild(splash);
-    body.dataset.velunaSplash = 'active';
-    window.VELUNA_CENTRAL_SPLASH_READY = true;
-    let finished = false;
-    const finish = () => {
-      if (finished || !splash.isConnected) return;
-      finished = true;
-      splash.classList.add('is-leaving');
-      body.dataset.velunaSplash = 'complete';
-      setTimeout(() => splash.remove(), 480);
-    };
-    video.addEventListener('ended',finish,{once:true});
-    video.addEventListener('error',finish,{once:true});
-    setTimeout(finish,7200);
-    video.play().catch(() => setTimeout(finish,1600));
-  }
-
   function mediaSessionFallback(){
     if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
     const fallback = A.fallbackCover || '/assets/veluna/covers/veluna-stream-fallback.webp';
@@ -317,5 +287,4 @@
   replaceFallbackArtwork();
   mediaSessionFallback();
   animateBackground();
-  requestAnimationFrame(injectSplash);
 })();

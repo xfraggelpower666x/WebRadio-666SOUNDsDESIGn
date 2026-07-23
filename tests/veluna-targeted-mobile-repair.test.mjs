@@ -7,10 +7,9 @@ const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 test('VELUNA iPhone uses free space for a larger Now Playing image', async () => {
   const root = await read('js/veluna-viewport-lock.js');
   assert.equal(await read('public/js/veluna-viewport-lock.js'), root);
-  assert.match(root, /geometry lock v1\.2\.30/);
+  assert.match(root, /stable iPhone fullscreen geometry lock v1\.3\.0/);
   assert.match(root, /displayMinimum = compact \? 150 : 188/);
-  assert.match(root, /spacerMinimum = 0/);
-  assert.match(root, /minmax\(\$\{displayMinimum\}px,1fr\) auto \$\{spacerMinimum\}px/);
+  assert.match(root, /minmax\(\$\{displayMinimum\}px,1fr\) auto 0px/);
   assert.match(root, /compact \? '124px' : '158px'/);
 });
 
@@ -21,7 +20,7 @@ test('VELUNA keeps original DOM and loads current central audio/artwork runtimes
   assert.match(canonical, /central-audio-v202/);
   assert.match(canonical, /single-writer-v54/);
   assert.match(canonical, /central-audio-artwork-v182/);
-  assert.match(canonical, /central-artwork-v1230/);
+  assert.match(canonical, /no-delayed-splash-v1231/);
   assert.doesNotMatch(canonical, /s666SplashPreflight|s666SplashPrepaintGate/);
   assert.match(canonical, /id="coverImage"/);
   assert.match(canonical, /id="listenersText"/);

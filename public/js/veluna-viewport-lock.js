@@ -1,10 +1,10 @@
-/* VELUNA iPhone fullscreen geometry lock v1.2.30 */
+/* VELUNA stable iPhone fullscreen geometry lock v1.3.0 */
 (() => {
   'use strict';
 
   const root = document.documentElement;
-  const state = { width: 0, height: 0, orientation: '' };
-  let resizeTimer = 0;
+  const state = { width: 0, height: 0, cssHeight: '', orientation: '', locked: false };
+  let orientationTimer = 0;
   let layoutObserver = null;
 
   const isMobileViewport = () =>
@@ -17,18 +17,13 @@
     return innerWidth > innerHeight ? 'landscape' : 'portrait';
   };
 
-  const keyboardOpen = () => {
-    const active = document.activeElement;
-    return Boolean(active && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
-  };
-
-  const readViewport = () => {
-    const visual = window.visualViewport;
+  const readStableScreen = () => {
+    const width = Math.max(1, Math.round(root.clientWidth || innerWidth || screen.width));
+    const height = Math.max(1, Math.round(innerHeight || root.clientHeight || screen.height));
     return {
-      width: Math.max(1, Math.round(visual?.width || root.clientWidth || innerWidth || screen.width)),
-      height: Math.max(1, Math.round(visual?.height || root.clientHeight || innerHeight || screen.height)),
-      left: Math.max(0, Math.round(visual?.offsetLeft || 0)),
-      top: Math.max(0, Math.round(visual?.offsetTop || 0))
+      width,
+      height,
+      cssHeight: CSS.supports?.('height', '100lvh') ? '100lvh' : `${height}px`
     };
   };
 
@@ -54,7 +49,7 @@
       layoutObserver.disconnect();
       layoutObserver = null;
     }
-    clearStyles(app, ['position','inset','width','height','padding','overflow']);
+    clearStyles(app, ['position','inset','width','height','min-height','max-height','padding','overflow']);
     clearStyles(card, [
       'position','top','right','bottom','left','width','height','min-height','max-height','margin','transform',
       'display','grid-template-columns','grid-template-rows','align-content','gap','padding','overflow'
@@ -79,32 +74,36 @@
       if (!isMobileViewport()) return;
       const relevant = records.some(record => [...record.addedNodes].some(node =>
         node instanceof Element && (
-          node.matches?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand') ||
-          node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand')
+node.matches?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand') ||
+node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand')
         )
       ));
-      if (relevant) scheduleApply(0, { force: true });
+      if (relevant) requestAnimationFrame(() => applyStableLayout());
     });
     layoutObserver.observe(card, { childList: true, subtree: true });
   }
 
-  function applySafeLayout(viewport) {
+  function applyStableLayout() {
     const app = document.querySelector('.app-shell');
     const card = document.querySelector('.player-card');
-    if (!app || !card || !isMobileViewport()) return;
+    if (!app || !card || !isMobileViewport() || !state.locked) return;
 
-    const compact = viewport.height < 720;
+    const compact = state.height < 720;
     const displayMinimum = compact ? 150 : 188;
-    const spacerMinimum = 0;
 
     root.setAttribute('data-veluna-iphone-safe','1');
+    root.setAttribute('data-veluna-stable-fullscreen','1');
     root.style.setProperty('--veluna-safe-player-top','max(56px, calc(env(safe-area-inset-top) + 10px))');
     root.style.setProperty('--veluna-safe-player-bottom','max(1px, calc(env(safe-area-inset-bottom) - 12px))');
+    root.style.setProperty('--veluna-stable-screen-width', `${state.width}px`);
+    root.style.setProperty('--veluna-stable-screen-height', `${state.height}px`);
 
     app.style.setProperty('position','fixed','important');
     app.style.setProperty('inset','0','important');
-    app.style.setProperty('width',`${viewport.width}px`,'important');
-    app.style.setProperty('height',`${viewport.height}px`,'important');
+    app.style.setProperty('width','100vw','important');
+    app.style.setProperty('height',state.cssHeight,'important');
+    app.style.setProperty('min-height',state.cssHeight,'important');
+    app.style.setProperty('max-height',state.cssHeight,'important');
     app.style.setProperty('padding','0','important');
     app.style.setProperty('overflow','hidden','important');
 
@@ -123,7 +122,7 @@
     card.style.setProperty('grid-template-columns','minmax(0,1fr)','important');
     card.style.setProperty(
       'grid-template-rows',
-      `auto auto auto minmax(${displayMinimum}px,1fr) auto ${spacerMinimum}px auto auto auto auto auto auto`,
+      `auto auto auto minmax(${displayMinimum}px,1fr) auto 0px auto auto auto auto auto auto`,
       'important'
     );
     card.style.setProperty('align-content','stretch','important');
@@ -135,7 +134,7 @@
     const headerImage = header?.querySelector('img');
     placeInRow(header, 1);
     if (header) {
-      header.style.setProperty('height', compact ? 'clamp(94px,13dvh,124px)' : 'clamp(112px,15dvh,158px)', 'important');
+      header.style.setProperty('height', compact ? 'clamp(94px,13svh,124px)' : 'clamp(112px,15svh,158px)', 'important');
       header.style.setProperty('min-height', compact ? '94px' : '112px', 'important');
       header.style.setProperty('max-height', compact ? '124px' : '158px', 'important');
       header.style.setProperty('overflow','hidden','important');
@@ -183,7 +182,6 @@
       displayWindow.style.setProperty('max-height','none','important');
       displayWindow.style.setProperty('overflow','hidden','important');
     }
-
     if (miniGrid) {
       miniGrid.style.setProperty('display','grid','important');
       miniGrid.style.setProperty('visibility','visible','important');
@@ -197,7 +195,6 @@
       node.style.setProperty('opacity','1','important');
       node.style.setProperty('min-height',compact ? '36px' : '42px','important');
     });
-
     if (sourceSwitch) {
       sourceSwitch.style.setProperty('display','grid','important');
       sourceSwitch.style.setProperty('visibility','visible','important');
@@ -205,86 +202,64 @@
       sourceSwitch.style.setProperty('z-index','4','important');
       sourceSwitch.style.setProperty('align-self','end','important');
     }
-
-    const bottomBanner = card.querySelector('.veluna-bottom-brand');
-    if (bottomBanner) bottomBanner.remove();
+    card.querySelector('.veluna-bottom-brand')?.remove();
     observeInjectedLayout(card);
   }
 
-  function clearDesktopLock() {
-    state.width = 0;
-    state.height = 0;
-    state.orientation = '';
-    root.removeAttribute('data-veluna-fixed-viewport');
-    root.removeAttribute('data-veluna-keyboard-open');
-    root.style.removeProperty('--veluna-fixed-vw');
-    root.style.removeProperty('--veluna-fixed-vh');
-    root.style.removeProperty('--veluna-fixed-left');
-    root.style.removeProperty('--veluna-fixed-top');
-    root.style.removeProperty('--veluna-safe-player-top');
-    root.style.removeProperty('--veluna-safe-player-bottom');
-    clearSafeLayout();
-  }
-
-  function writeGeometry(viewport, orientation) {
-    state.width = viewport.width;
-    state.height = viewport.height;
+  function lockGeometry({ reset = false } = {}) {
+    if (!isMobileViewport()) {
+      state.width = 0;
+      state.height = 0;
+      state.cssHeight = '';
+      state.orientation = '';
+      state.locked = false;
+      root.removeAttribute('data-veluna-fixed-viewport');
+      root.removeAttribute('data-veluna-stable-fullscreen');
+      root.removeAttribute('data-veluna-keyboard-open');
+      root.style.removeProperty('--veluna-safe-player-top');
+      root.style.removeProperty('--veluna-safe-player-bottom');
+      root.style.removeProperty('--veluna-stable-screen-width');
+      root.style.removeProperty('--veluna-stable-screen-height');
+      clearSafeLayout();
+      return;
+    }
+    const orientation = orientationKey();
+    if (!reset && state.locked && state.orientation === orientation) {
+      applyStableLayout();
+      return;
+    }
+    const screenBox = readStableScreen();
+    state.width = screenBox.width;
+    state.height = screenBox.height;
+    state.cssHeight = screenBox.cssHeight;
     state.orientation = orientation;
-    root.style.setProperty('--veluna-fixed-vw', `${viewport.width}px`);
-    root.style.setProperty('--veluna-fixed-vh', `${viewport.height}px`);
-    root.style.setProperty('--veluna-fixed-left', `${viewport.left}px`);
-    root.style.setProperty('--veluna-fixed-top', `${viewport.top}px`);
+    state.locked = true;
     root.setAttribute('data-veluna-fixed-viewport', orientation);
-    applySafeLayout(viewport);
+    applyStableLayout();
     requestAnimationFrame(() => window.scrollTo(0, 0));
   }
 
-  function apply({ force = false } = {}) {
-    if (!isMobileViewport()) {
-      clearDesktopLock();
-      return;
-    }
-
-    const orientation = orientationKey();
-    const viewport = readViewport();
-    const orientationChanged = state.orientation && state.orientation !== orientation;
-    if (keyboardOpen() && !orientationChanged && !force) return;
-
-    if (!state.width || !state.height || orientationChanged || force) {
-      writeGeometry(viewport, orientation);
-      return;
-    }
-
-    if (Math.abs(viewport.width - state.width) >= 2 || Math.abs(viewport.height - state.height) >= 2) {
-      writeGeometry(viewport, orientation);
-    } else {
-      applySafeLayout(viewport);
-    }
+  function scheduleOrientationLock(delay = 420) {
+    clearTimeout(orientationTimer);
+    orientationTimer = setTimeout(() => lockGeometry({ reset: true }), delay);
   }
 
-  function scheduleApply(delay = 80, options = {}) {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => apply(options), delay);
-  }
-
-  apply({ force: true });
-  document.addEventListener('DOMContentLoaded', () => apply({ force:true }), { once: true });
-  addEventListener('pageshow', event => apply({ force: Boolean(event.persisted) }), { passive: true });
-  addEventListener('orientationchange', () => scheduleApply(420, { force: true }), { passive: true });
-  screen.orientation?.addEventListener?.('change', () => scheduleApply(420, { force: true }));
-  addEventListener('resize', () => scheduleApply(80), { passive: true });
-  window.visualViewport?.addEventListener('resize', () => scheduleApply(80), { passive: true });
-  window.visualViewport?.addEventListener('scroll', () => scheduleApply(120), { passive: true });
+  lockGeometry({ reset: true });
+  document.addEventListener('DOMContentLoaded', () => lockGeometry(), { once: true });
+  addEventListener('pageshow', () => lockGeometry(), { passive: true });
+  addEventListener('orientationchange', () => scheduleOrientationLock(), { passive: true });
+  screen.orientation?.addEventListener?.('change', () => scheduleOrientationLock());
 
   document.addEventListener('focusin', () => root.setAttribute('data-veluna-keyboard-open', '1'), true);
   document.addEventListener('focusout', () => {
     root.removeAttribute('data-veluna-keyboard-open');
     requestAnimationFrame(() => window.scrollTo(0, 0));
-    scheduleApply(260, { force:true });
+    lockGeometry();
   }, true);
 
   window.VELUNA_FIXED_VIEWPORT = Object.freeze({
-    refresh: () => apply({ force: true }),
+    refresh: () => lockGeometry(),
+    resetForOrientation: () => lockGeometry({ reset: true }),
     current: () => ({ ...state })
   });
 })();

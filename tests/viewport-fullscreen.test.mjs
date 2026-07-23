@@ -18,14 +18,14 @@ for (const htmlPath of ['../veluna/index.html','../VELUNA/index.html','../public
 }
 
 test('viewport lock follows Safari viewport and protects Dynamic Island', () => {
-  assert.match(viewportLock, /fullscreen geometry lock v1\.2\.30/);
-  assert.match(viewportLock, /window\.visualViewport/);
+  assert.match(viewportLock, /stable iPhone fullscreen geometry lock v1\.3\.0/);
+  assert.doesNotMatch(viewportLock, /visualViewport\?\.addEventListener|addEventListener\('resize'/);
   assert.match(viewportLock, /--veluna-safe-player-top/);
   assert.match(viewportLock, /max\(56px, calc\(env\(safe-area-inset-top\) \+ 10px\)\)/);
   assert.match(viewportLock, /--veluna-safe-player-bottom/);
   assert.match(viewportLock, /card\.style\.setProperty\('top'/);
   assert.match(viewportLock, /card\.style\.setProperty\('bottom'/);
-  assert.match(viewportLock, /keyboardOpen\(\)/);
+  assert.match(viewportLock, /data-veluna-keyboard-open/);
   assert.doesNotMatch(viewportLock, /Math\.max\(state\.height, viewport\.height\)/);
   assert.doesNotMatch(viewportLock, /if \(!force && state\.width && state\.orientation === orientation\) return/);
 });
@@ -33,15 +33,14 @@ test('viewport lock follows Safari viewport and protects Dynamic Island', () => 
 test('iPhone layout keeps status row visible and gives free space to Now Playing', () => {
   assert.match(viewportLock, /grid-template-rows/);
   assert.match(viewportLock, /displayMinimum = compact \? 150 : 188/);
-  assert.match(viewportLock, /spacerMinimum = 0/);
-  assert.match(viewportLock, /minmax\(\$\{displayMinimum\}px,1fr\) auto \$\{spacerMinimum\}px/);
+  assert.match(viewportLock, /minmax\(\$\{displayMinimum\}px,1fr\) auto 0px/);
   assert.match(viewportLock, /compact \? '124px' : '158px'/);
   assert.match(viewportLock, /placeInRow\(miniGrid, 5\)/);
   assert.match(viewportLock, /placeInRow\(sourceSwitch, 7\)/);
   assert.match(viewportLock, /placeInRow\(footer, 12\)/);
   assert.match(viewportLock, /miniGrid\.style\.setProperty\('visibility','visible','important'\)/);
   assert.match(viewportLock, /sourceSwitch\.style\.setProperty\('align-self','end','important'\)/);
-  assert.match(viewportLock, /bottomBanner\.remove\(\)/);
+  assert.match(viewportLock, /veluna-bottom-brand/);
 });
 
 test('viewport lock root/public mirrors are identical', () => {
