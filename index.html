@@ -26,7 +26,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <link rel="stylesheet" href="/css/base.css?v=2026-06-15-fix1" />
   <link rel="stylesheet" href="/css/shared-status.css?v=2026-06-15-fix1" />
   <link rel="stylesheet" href="/css/layout.css?v=2026-06-15-fix1" />
-  <link rel="stylesheet" href="/css/effects.css?v=2026-06-15-fix1" />
+  <link rel="stylesheet" href="/css/effects.css?v=2026-07-23-main-reactive-v11" />
   <link rel="stylesheet" href="/css/mobile.css?v=2026-06-15-fix1" />
   <link rel="stylesheet" href="/css/desktop.css?v=2026-06-15-fix1" />
 
@@ -71,7 +71,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   
     <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-25-hardlock1" />
-  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-07-19-touch-feedback-v1" />
+  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-07-23-main-reactive-v11" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
   <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
@@ -194,7 +194,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </div>
         
         <div class="now-cover-wrap" aria-hidden="true" style="position:relative">
-          <img id="nowCover" class="now-cover" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="" loading="lazy" decoding="async" style="transition:opacity 0.55s ease"><img aria-hidden="true" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="" style="position:absolute;bottom:5px;right:5px;width:24px;height:24px;object-fit:contain;opacity:0.52;filter:drop-shadow(0 0 5px rgba(22,255,243,.88));pointer-events:none;border-radius:50%">
+          <img id="nowCover" class="now-cover" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="" loading="lazy" decoding="async" style="transition:opacity 0.55s ease">
         </div>
         <div class="ticker-window">
           <div id="nowPlayingTicker" class="ticker-text"></div>
@@ -325,7 +325,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-06-19-repair3"></script>
+<script type="module" src="/js/player-core.js?v=2026-07-23-main-reactive-v11"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -993,7 +993,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app.id='mffApp';
     app.setAttribute('data-version',VERSION);
     app.innerHTML='<div class="smfp-version-badge">v2026.07.12-veluna16</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
-      '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/veluna/header/veluna-player-header.webp?v=veluna-v1212" alt="CyberStream AI Cockpit Edition"><img src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="666 RadioBotAI" style="height:28px;width:28px;object-fit:contain;opacity:0.82;filter:drop-shadow(0 0 6px rgba(22,255,243,.80))"></section>'+
+      '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/veluna/header/veluna-player-header.webp?v=veluna-v1212" alt="CyberStream AI Cockpit Edition"></section>'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
       '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','LYVRA DJ','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
@@ -2031,303 +2031,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 <!-- v140 PC SIDE ADDON ROOT REACTIVITY — replaces old addon card stack; no player-core/ticker/transport changes -->
-<script id="v140PcSideAddonContentScript">
-(function(){
-  'use strict';
-  /*
-    v140 PC SIDE ADDON ROOT REACTIVITY FIX
-    Zweck: bestehende sechs Add-on-Module an dieselbe vorhandene EQ-/Levelmeter-Reaktionsquelle koppeln.
-    Kein neuer Layer, kein neuer Canvas, kein neuer Audio-Graph. Der vorhandene v138-Intervall wird ersetzt.
-  */
-  var timer=null,lastVisualTick=0;
-  var smoothed=.36, last=.36, phase=0;
-  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn,{once:true}); else fn(); }
-  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-  function readVisualLevel(el){
-    if(!el) return 0;
-    var ds = el.dataset || {};
-    if(ds.level){ var dl=parseFloat(ds.level); if(Number.isFinite(dl)) return clamp(dl,0,1); }
-    var st = getComputedStyle(el);
-    var h = st.height || el.style.height || '';
-    var n = parseFloat(h);
-    if(Number.isFinite(n)){
-      if(String(h).indexOf('%')>=0) return clamp(n/100,0,1);
-      var ph = el.parentElement ? el.parentElement.getBoundingClientRect().height : 0;
-      if(ph>0) return clamp(n/ph,0,1);
-    }
-    var scale = (st.transform || '').match(/matrix\(([^)]+)\)/);
-    if(scale){
-      var parts=scale[1].split(',').map(function(x){return parseFloat(x.trim());});
-      if(parts.length>=6 && Number.isFinite(parts[3])) return clamp(Math.abs(parts[3]),0,1);
-    }
-    var r=el.getBoundingClientRect();
-    var pr=el.parentElement ? el.parentElement.getBoundingClientRect() : null;
-    if(pr && pr.height>0 && r.height>0) return clamp(r.height/pr.height,0,1);
-    return 0;
-  }
-  function collectLevels(){
-    var vals=[];
-    var eq=[];
-    var left=[];
-    var right=[];
-    var bottom=[];
-
-    function pushTo(bucket, el){
-      var v=readVisualLevel(el);
-      if(Number.isFinite(v) && v>0.012){
-        v=clamp(v,0,1);
-        vals.push(v);
-        bucket.push(v);
-      }
-    }
-
-    document.querySelectorAll('#eqBars .eq-bar-fill, .visualizer .eq-bars .eq-bar-fill').forEach(function(el){ pushTo(eq, el); });
-    document.querySelectorAll('#leftMeterA,#leftMeterB,#leftMeterC,.side-meter.left .side-meter-fill').forEach(function(el){ pushTo(left, el); });
-    document.querySelectorAll('#rightMeterA,#rightMeterB,#rightMeterC,.side-meter.right .side-meter-fill').forEach(function(el){ pushTo(right, el); });
-    document.querySelectorAll('#pcBottomSyncMeter .pc-bottom-sync-seg.is-on,#pcBottomSyncMeter .pc-bottom-sync-seg.is-active,[data-bottom-meter-seg].is-on,[data-bottom-meter-seg].is-active').forEach(function(el){ pushTo(bottom, el); });
-
-    if(!eq.length){
-      document.querySelectorAll('.eq-bar-fill,.eq-bar,.pc-eq-bar').forEach(function(el){ pushTo(eq, el); });
-    }
-    return {all:vals, eq:eq, left:left, right:right, bottom:bottom};
-  }
-  function avg(list, fallback){
-    if(!list || !list.length) return fallback;
-    return list.reduce(function(a,b){return a+b;},0)/list.length;
-  }
-  function pickVector(list, count, fallback){
-    var src=(list && list.length) ? list : fallback;
-    if(!src || !src.length) src=[.18,.22,.25,.21,.28,.24,.20,.18];
-    var out=[];
-    for(var i=0;i<count;i++){
-      var idx=Math.round((i/Math.max(1,count-1))*(src.length-1));
-      out.push(clamp(src[idx] || .12,.05,1));
-    }
-    return out;
-  }
-  function sampleEnergy(){
-      var bus=window.__MeterBus;
-      if(bus && typeof bus.level==='number' && (Date.now()-bus.ts)<600){
-        var be=clamp(bus.level,.04,1);
-        smoothed=(smoothed*.60)+(be*.40);
-        var bpeak=clamp((bus.peak!=null?bus.peak:bus.level),.04,1);
-        var bpulse=clamp(Math.abs(smoothed-last)*8.0 + smoothed*.72,.06,1);
-        last=smoothed;
-        var bleft=(bus.left&&bus.left.length)?bus.left:[smoothed,bpulse,bpeak];
-        var bright=(bus.right&&bus.right.length)?bus.right:[bpeak,bpulse,smoothed];
-        var beq=(bus.eq&&bus.eq.length)?bus.eq:pickVector([],28,[smoothed,bpulse,bpeak,(smoothed+bpeak)/2]);
-        return {energy:clamp(smoothed,.04,1),peak:bpeak,pulse:bpulse,eq:beq,left:bleft,right:bright,bottom:[]};
-      }
-      var data=collectLevels();
-    var vals=data.all.slice();
-    if(!vals.length){
-      // Standby: bestehende Module bekommen nur einen sanften, einheitlichen Idle-Puls.
-      var t=Date.now()/1000;
-      var idle=.18 + .07*Math.sin(t*1.7);
-      smoothed=(smoothed*.86)+(idle*.14);
-      return {energy:clamp(smoothed,.10,.34), peak:clamp(idle,.10,.36), pulse:clamp(.18 + Math.abs(Math.sin(t*1.7))*.16,.12,.40), eq:pickVector([],12,[]), left:[idle,idle*.86,idle*.72], right:[idle*.75,idle*.92,idle], bottom:[]};
-    }
-    vals.sort(function(a,b){return b-a;});
-    var top=vals.slice(0, Math.min(12, vals.length));
-    var levelAvg=top.reduce(function(a,b){return a+b;},0)/top.length;
-    var peak=vals[0] || levelAvg;
-    smoothed=(smoothed*.58)+(levelAvg*.42);
-    var pulse=clamp(Math.abs(smoothed-last)*8.2 + smoothed*.88,.10,1);
-    last=smoothed;
-    return {
-      energy:clamp(smoothed,.10,1),
-      peak:clamp(peak,.10,1),
-      pulse:pulse,
-      eq:pickVector(data.eq, 28, vals),
-      left:data.left.length?data.left:[levelAvg,pulse,peak],
-      right:data.right.length?data.right:[peak,pulse,levelAvg],
-      bottom:data.bottom
-    };
-  }
-  function setPxVar(root,name,val){ root.style.setProperty(name, val.toFixed(1)+'px'); }
-  function setPctVar(root,name,val){ root.style.setProperty(name, clamp(val,0,1).toFixed(3)); }
-  function setBars(nodes, values){
-    nodes.forEach(function(el,i){
-      var v=values[i % values.length];
-      el.style.height=(clamp(v,.06,.98)*100).toFixed(1)+'%';
-      el.style.transform='scaleY('+(0.94 + clamp(v,.06,.98)*0.12).toFixed(3)+')';
-      el.style.filter='brightness('+(1+v*.62).toFixed(2)+') saturate('+(1+v*.82).toFixed(2)+')';
-      el.style.opacity=(.54+v*.46).toFixed(2);
-      el.style.animation='none';
-    });
-  }
-  function driveExistingModules(e,p,u,vector,leftVec,rightVec){
-    var root=document.documentElement;
-    phase=(phase + 3 + (u*5)) % 360;
-    setPctVar(root,'--pc-addon-energy',e);
-    setPctVar(root,'--pc-addon-peak',p);
-    setPctVar(root,'--pc-addon-pulse',u);
-    setPxVar(root,'--pc-addon-glow',8+p*38);
-    setPctVar(root,'--pc-addon-vu-l1',.10+e*.88);
-    setPctVar(root,'--pc-addon-vu-l2',.12+u*.84);
-    setPctVar(root,'--pc-addon-vu-r1',.10+p*.88);
-    setPctVar(root,'--pc-addon-vu-r2',.12+((e+p)/2)*.84);
-    root.style.setProperty('--pc-addon-phase-angle',(-58 + 116*u).toFixed(1)+'deg');
-    setPctVar(root,'--pc-addon-phase-scale',.72 + e*.48);
-      // v109 Info-Card Status-LEDs (Stream/Meter/Source) aus zentralem Pegel-Bus
-      (function(){
-        var b=window.__MeterBus; var live=!!(b && (Date.now()-b.ts)<700 && b.source!=='synthetic');
-        var ml=clamp(e,0,1);
-        var mc=ml>=.80?'is-red':ml>=.55?'is-pink':ml>=.25?'is-cyan':(live?'is-green':'is-off');
-        document.querySelectorAll('[data-info-led]').forEach(function(el){
-          var k=el.getAttribute('data-info-led');
-          el.classList.remove('is-green','is-cyan','is-pink','is-red','is-off');
-          el.classList.add(k==='meter'?mc:(live?'is-cyan':'is-off'));
-        });
-      })();
-
-    // Direkt an bestehenden Elementen schreiben: gleiche Quelle wie EQ/Levelmeter, kein eigener Fake-Rhythmus.
-    var eq12=pickVector(vector,12,[e,u,p,(e+p)/2]);
-    var eq8=pickVector(vector,8,[u,p,e,(e+p)/2]);
-    var lvu=pickVector(leftVec,2,[e,u]);
-    var rvu=pickVector(rightVec,2,[p,(e+p)/2]);
-    setBars(Array.from(document.querySelectorAll('.pc-addon-waveform i')), eq12);
-    setBars(Array.from(document.querySelectorAll('.pc-addon-beatline i')), eq8);
-    setBars(Array.from(document.querySelectorAll('.pc-addon-vu-grid .pc-vu-channel:first-child i')), lvu);
-    setBars(Array.from(document.querySelectorAll('.pc-addon-vu-grid .pc-vu-channel:last-child i')), rvu);
-
-    document.querySelectorAll('.pc-addon-module').forEach(function(m,idx){
-      var local = clamp((e*.58)+(p*.26)+(u*.16)+((idx%3)*.025),.10,1);
-      m.style.boxShadow='inset 0 0 '+(10+local*24).toFixed(1)+'px rgba(22,255,243,.075), 0 0 '+(7+local*20).toFixed(1)+'px rgba(255,61,187,.14)';
-      m.style.borderColor='rgba(22,255,243,'+(.22+local*.48).toFixed(3)+')';
-    });
-    document.querySelectorAll('.pc-addon-tower').forEach(function(t){
-      t.style.filter='brightness('+(1+e*.22).toFixed(2)+') saturate('+(1+p*.34).toFixed(2)+')';
-    });
-    // v141: Audio Reactor links oben aktiver machen, bestehende Elemente direkt steuern.
-    // Kein neuer Layer, kein neuer Canvas, kein neuer Audio-/RAF-Loop.
-    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-core').forEach(function(el){
-      var coreScale = 0.82 + e*.30 + p*.10;
-      el.style.transform='scale('+coreScale.toFixed(3)+') rotate('+(phase*.42).toFixed(1)+'deg)';
-      el.style.opacity=(.62+e*.36).toFixed(2);
-      el.style.filter='brightness('+(1+e*.42).toFixed(2)+') saturate('+(1+p*.56).toFixed(2)+') drop-shadow(0 0 '+(8+p*32).toFixed(1)+'px rgba(22,255,243,.30)) drop-shadow(0 0 '+(6+u*26).toFixed(1)+'px rgba(255,61,187,.26))';
-      el.style.boxShadow='inset 0 0 '+(10+e*38).toFixed(1)+'px rgba(22,255,243,.15), inset 0 0 '+(8+p*30).toFixed(1)+'px rgba(255,61,187,.12), 0 0 '+(10+p*36).toFixed(1)+'px rgba(22,255,243,.18)';
-    });
-    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-orbit-a').forEach(function(el){
-      el.style.transform='rotate('+(phase*1.15).toFixed(1)+'deg) scale('+(0.94+p*.12).toFixed(3)+')';
-      el.style.borderColor='rgba(22,255,243,'+(.30+e*.45).toFixed(3)+')';
-      el.style.boxShadow='0 0 '+(5+p*18).toFixed(1)+'px rgba(22,255,243,.28)';
-    });
-    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-orbit-b').forEach(function(el){
-      el.style.transform='rotate('+(-phase*.86).toFixed(1)+'deg) scale('+(0.90+u*.16).toFixed(3)+')';
-      el.style.borderColor='rgba(255,61,187,'+(.30+p*.46).toFixed(3)+')';
-      el.style.boxShadow='0 0 '+(5+u*18).toFixed(1)+'px rgba(255,61,187,.28)';
-    });
-    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-wave').forEach(function(el){
-      el.style.transform='scaleX('+(0.48+u*.92).toFixed(3)+') scaleY('+(0.86+p*.42).toFixed(3)+')';
-      el.style.opacity=(.40+p*.58).toFixed(2);
-      el.style.filter='drop-shadow(0 0 '+(8+p*26).toFixed(1)+'px rgba(255,61,187,.44)) drop-shadow(0 0 '+(6+e*20).toFixed(1)+'px rgba(22,255,243,.30))';
-    });
-    document.querySelectorAll('.pc-addon-module-reactor .pc-addon-reactor-dot').forEach(function(el){
-      var dot = 0.86 + p*.70;
-      el.style.transform='scale('+dot.toFixed(3)+')';
-      el.style.opacity=(.62+p*.38).toFixed(2);
-      el.style.boxShadow='0 0 '+(12+p*30).toFixed(1)+'px rgba(22,255,243,.90), 0 0 '+(16+u*38).toFixed(1)+'px rgba(255,61,187,.52)';
-    });
-    document.querySelectorAll('.pc-addon-module-reactor footer b').forEach(function(el){
-      el.textContent=Math.round(clamp(.22+e*.78,0,1)*100)+'%';
-    });
-    // v144: Spectrum Grid/Radar originalgetreuer machen.
-    // Bestehende Radar-Elemente werden direkt gesteuert; kein neuer Layer, kein neuer Audio-/RAF-/Interval-Loop.
-    root.style.setProperty('--pc-radar-sweep-scale',(0.90+e*.20).toFixed(3));
-    root.style.setProperty('--pc-radar-glow',(10+p*28).toFixed(1)+'px');
-    document.querySelectorAll('.pc-addon-radar .radar-sweep').forEach(function(el){
-      // Rotation kommt absichtlich aus der CSS-Keyframe-Animation, damit der Zeiger komplett rund und ohne Tick-Reset läuft.
-      el.style.transform='';
-      el.style.opacity=(.48+e*.46).toFixed(2);
-      el.style.filter='drop-shadow(0 0 '+(8+p*24).toFixed(1)+'px rgba(22,255,243,.50)) drop-shadow(0 0 '+(4+u*18).toFixed(1)+'px rgba(255,61,187,.32))';
-    });
-    document.querySelectorAll('.pc-addon-radar em').forEach(function(el,i){
-      var v=[e,u,p,(e+p)/2][i%4];
-      var a=(phase*(.55+(i*.08)) + (i*83) + (u*46)) * Math.PI/180;
-      var r=[25,34,42,19][i%4] + (p*5) - (i%2?u*3:e*2);
-      var x=50 + Math.cos(a)*r;
-      var y=50 + Math.sin(a)*r;
-      var colors=['#16fff3','#ff3dbb','#7f5cff','#ff225d'];
-      var color=colors[(i + Math.floor(phase/90)) % colors.length];
-      var hit=(Math.sin((phase+i*74)*Math.PI/180)+1)/2;
-      el.style.left=clamp(x,10,90).toFixed(1)+'%';
-      el.style.top=clamp(y,10,90).toFixed(1)+'%';
-      el.style.background=color;
-      el.style.transform='scale('+(0.64+v*.92+hit*.18).toFixed(3)+')';
-      el.style.opacity=(.32+v*.48+hit*.20).toFixed(2);
-      el.style.boxShadow='0 0 '+(7+v*18).toFixed(1)+'px '+color+', 0 0 '+(10+p*24).toFixed(1)+'px rgba(22,255,243,.28)';
-    });
-    // v159: Phase Scope root signal motion. Existing elements only; no new layer/loop.
-    var phaseX=50 + Math.cos(phase*Math.PI/180) * (8 + e*9);
-    var phaseY=50 + Math.sin((phase*1.27)*Math.PI/180) * (6 + p*8);
-    root.style.setProperty('--pc-phase-x',clamp(phaseX,28,72).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-y',clamp(phaseY,30,70).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-grid-angle',(70 + Math.sin(phase*Math.PI/180)*18).toFixed(1)+'deg');
-    root.style.setProperty('--pc-phase-skew',(-10 + (u*20)).toFixed(1)+'deg');
-    root.style.setProperty('--pc-phase-grid-scale',(0.94 + e*.10).toFixed(3));
-    root.style.setProperty('--pc-phase-line-y',((-5 + p*10)).toFixed(1)+'px');
-    root.style.setProperty('--pc-phase-cloud-x',((-7 + e*14)).toFixed(1)+'px');
-    root.style.setProperty('--pc-phase-cloud-y',((-5 + u*10)).toFixed(1)+'px');
-    root.style.setProperty('--pc-phase-cloud-rot',(phase*(0.38+p*.42)).toFixed(1)+'deg');
-    root.style.setProperty('--pc-phase-radius',(38 + u*24).toFixed(1)+'% '+(62 - p*20).toFixed(1)+'% '+(48 + e*18).toFixed(1)+'% '+(52 - u*16).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-poly-a',(48 + Math.sin(phase*.017)*10).toFixed(1)+'% '+(2 + u*8).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-poly-b',(96 - e*8).toFixed(1)+'% '+(35 + p*16).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-poly-c',(70 + u*12).toFixed(1)+'% '+(98 - e*7).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-poly-d',(24 - p*8).toFixed(1)+'% '+(88 - u*10).toFixed(1)+'%');
-    root.style.setProperty('--pc-phase-poly-e',(4 + e*8).toFixed(1)+'% '+(36 + p*15).toFixed(1)+'%');
-    document.querySelectorAll('.phase-line').forEach(function(el){
-      el.style.transform='translateY('+((-5+p*10)).toFixed(1)+'px) rotate('+(-70+140*u).toFixed(1)+'deg) scaleX('+(0.58+e*.74).toFixed(3)+')';
-      el.style.opacity=(.42+p*.56).toFixed(2);
-      el.style.filter='brightness('+(1+e*.45).toFixed(2)+') saturate('+(1+p*.62).toFixed(2)+')';
-    });
-    document.querySelectorAll('.phase-cloud').forEach(function(el){
-      el.style.transform='translate('+((-7+e*14)).toFixed(1)+'px,'+((-5+u*10)).toFixed(1)+'px) scale('+(0.74+u*.42).toFixed(3)+') rotate('+(phase*(0.38+p*.42)).toFixed(1)+'deg)';
-      el.style.opacity=(.32+e*.62).toFixed(2);
-      el.style.filter='blur(.2px) brightness('+(1+p*.36).toFixed(2)+') saturate('+(1+u*.58).toFixed(2)+')';
-    });
-  }
-  function syncStateLabels(side,on){
-    var label=document.getElementById(side==='left'?'pcLeftFxState':'pcRightFxState');
-    if(label) label.textContent=on?'ON':'OFF';
-  }
-  function apply(side,on){
-    var cls=side==='left'?'pc-left-addon-off':'pc-right-addon-off';
-    document.body.classList.toggle(cls,!on);
-    var btn=document.getElementById(side==='left'?'pcLeftFxToggle':'pcRightFxToggle');
-    if(btn){btn.classList.toggle('is-on',on);btn.setAttribute('aria-pressed',on?'true':'false');}
-    syncStateLabels(side,on);
-    try{localStorage.setItem('s666_'+side+'_addon_fx',on?'on':'off');}catch(e){}
-  }
-  function initial(side){try{return localStorage.getItem('s666_'+side+'_addon_fx')!=='off';}catch(e){return true;}}
-  function bind(){
-    var leftBtn=document.getElementById('pcLeftFxToggle');
-    var rightBtn=document.getElementById('pcRightFxToggle');
-    apply('left',initial('left'));
-    apply('right',initial('right'));
-    if(leftBtn && !leftBtn.dataset.v140Bound){leftBtn.dataset.v140Bound='1';leftBtn.addEventListener('click',function(){apply('left',!leftBtn.classList.contains('is-on'));});}
-    if(rightBtn && !rightBtn.dataset.v140Bound){rightBtn.dataset.v140Bound='1';rightBtn.addEventListener('click',function(){apply('right',!rightBtn.classList.contains('is-on'));});}
-  }
-  function tick(){
-    var s=sampleEnergy();
-    driveExistingModules(s.energy,s.peak,s.pulse,s.eq,s.left,s.right);
-  }
-  function visualFrame(now){
-    if(!timer)return;
-    if(!document.hidden && (!window.matchMedia || window.matchMedia('(min-width:1221px)').matches) && now-lastVisualTick>=160){
-      lastVisualTick=now;tick();
-    }
-    timer=requestAnimationFrame(visualFrame);
-  }
-  function boot(){
-    bind();
-    if(window.matchMedia && !window.matchMedia('(min-width:1221px)').matches) return;
-    if(!timer){tick();timer=requestAnimationFrame(visualFrame);}
-  }
-  ready(boot);
-  window.addEventListener('load',boot,{passive:true});
-})();
-</script>
 
 
 
@@ -2580,60 +2283,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script type="module" src="/js/system-extra/govee/govee-fx-control-hooks.js?v=2026-06-15-fix1"></script>
 
   <!-- FRAGGLE DNA RAIL v1 — LEDs + Fixes + Umbenennung -->
-
-  <script id="fraggledna-rail-led-js">
-  /* Fraggle DNA Rail — audioreaktive 4-Farb-LED */
-  (function(){
-    var COLORS = [
-      {pct:80, c:'#ff4444', s:'0 0 10px #ff4444, 0 0 18px rgba(255,68,68,.6)'},
-      {pct:55, c:'#ff3dbb', s:'0 0 10px #ff3dbb, 0 0 18px rgba(255,61,187,.6)'},
-      {pct:25, c:'#16fff3', s:'0 0 8px  #16fff3, 0 0 14px rgba(22,255,243,.5)'},
-      {pct: 0, c:'#00cc66', s:'0 0 6px  #00cc66, 0 0 10px rgba(0,204,102,.4)'}
-    ];
-    function setLed(ledId, meterIds){
-      var led = document.getElementById(ledId);
-      if(!led) return;
-      var maxPct = 0;
-      meterIds.forEach(function(mid){
-        var el = document.getElementById(mid);
-        if(!el) return;
-        var h = parseFloat(el.style.height) || 0;
-        if(h > maxPct) maxPct = h;
-      });
-      for(var i=0;i<COLORS.length;i++){
-        if(maxPct >= COLORS[i].pct){
-          led.style.background = COLORS[i].c;
-          led.style.boxShadow = COLORS[i].s;
-          return;
-        }
-      }
-      led.style.background = COLORS[COLORS.length-1].c;
-      led.style.boxShadow  = COLORS[COLORS.length-1].s;
-    }
-    function tick(){
-      setLed('dnaRailLedLeft',  ['leftMeterA','leftMeterB','leftMeterC']);
-      setLed('dnaRailLedRight', ['rightMeterA','rightMeterB','rightMeterC']);
-    }
-    var railFrame=0,railLast=0;
-    function railLoop(now){
-      if(!document.hidden && now-railLast>=120){railLast=now;tick();}
-      railFrame=requestAnimationFrame(railLoop);
-    }
-    function start(){if(!railFrame){tick();railFrame=requestAnimationFrame(railLoop);}}
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
-  })();
-  </script>
   
 
   <!-- LOGO SIZE FIX — pc-header-new-logo fills container correctly -->
   
   <!-- Skip-Button: Vote-Skip + Admin-Skip fuer alle Hoerer -->
     <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1" defer></script>
-    <script src="/js/player-stage-v2.js?v=2026-07-19-touch-feedback-v1" defer></script>
+    <script src="/js/player-stage-v2.js?v=2026-07-23-main-reactive-v11" defer></script>
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
     <script src="/js/media-session-ios.js?v=2026-06-25-hardlock1" defer></script>
     <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>
-  <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
+  <script src="/config/veluna-assets.js?v=2026-07-23-reactive-visual-v183"></script>
   <script defer src="/js/veluna-splash.js?v=2026-07-11-veluna-v1214"></script>
   <script src="/js/pc-fixed-canvas.js?v=2026-07-11-veluna15" defer></script>
 </body>

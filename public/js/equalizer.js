@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn canonical audio visualizer authority V10.
+ * 666SOUNDsDESIGn canonical audio visualizer authority V11.
  * One WebAudio graph and one RAF writer for EQ, side meters and bottom meter.
  * Signal-derived center bridge, balanced side channels and transform-only EQ rendering.
  */
@@ -167,6 +167,7 @@ function applyMeters(targets, values) {
     element.style.height = `${quantized.toFixed(1)}%`;
     element.style.opacity = (0.34 + quantized / 152).toFixed(2);
     element.style.filter = `brightness(${(1 + quantized / 170).toFixed(2)}) saturate(${(1 + quantized / 145).toFixed(2)})`;
+    element.dataset.level = (quantized / 100).toFixed(3);
   });
 }
 
@@ -224,8 +225,8 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
   const setMeters = (level, peak, low, mid, high) => {
     const target = clamp(level, 0, 1);
-    meterEnvelope += (target - meterEnvelope) * (target > meterEnvelope ? 0.70 : 0.20);
-    peakEnvelope = Math.max(clamp(peak, 0, 1), peakEnvelope * 0.91);
+    meterEnvelope += (target - meterEnvelope) * (target > meterEnvelope ? 0.82 : 0.13);
+    peakEnvelope = Math.max(clamp(peak, 0, 1), peakEnvelope * 0.86);
     const pulse = clamp(Math.max(0, meterEnvelope - previousEnvelope) * 5.4 + Math.abs(target - previousEnvelope) * 2.0, 0, 1);
     previousEnvelope = meterEnvelope;
 
@@ -249,7 +250,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     return { pulse, left, right };
   };
 
-  const publish = (level, peak, sourceType, eq, meterState) => {
+  const publish = (level, peak, sourceType, eq, meterState, bands = {}) => {
     window.__MeterBus = {
       ts: Date.now(),
       level: clamp(level, 0, 1),
@@ -260,6 +261,9 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       left: meterState.left,
       right: meterState.right,
       pulse: meterState.pulse,
+      low: clamp(bands.low ?? level, 0, 1),
+      mid: clamp(bands.mid ?? level, 0, 1),
+      high: clamp(bands.high ?? level, 0, 1),
       eq: eq.map((value) => clamp(value, 0, 1))
     };
   };
@@ -292,7 +296,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     const mid = level;
     const high = eq.length ? eq.slice(highStart).reduce((a, b) => a + b, 0) / Math.max(1, eq.length - highStart) : level;
     const meters = setMeters(level, peak, low, mid, high);
-    publish(level, peak, 'synthetic', eq, meters);
+    publish(level, peak, 'synthetic', eq, meters, { low, mid, high });
     fallbackRafId = window.requestAnimationFrame(renderFallbackFrame);
   };
 
@@ -318,7 +322,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       try {
         gainNode.gain.cancelScheduledValues(now);
         gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-        gainNode.gain.linearRampToValueAtTime(targetGain, now + 0.08);
+        gainNode.gain.linearRampToValueAtTime(targetGain, now + 0.16);
       } catch (_) {
         try { gainNode.gain.value = targetGain; } catch (_) { graphState = 'GRAPH_FAIL'; }
       }
@@ -349,7 +353,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
     const timestamp = performance.now();
     bars.forEach((bar, index) => setBar(bar, 0.07 + fallbackValue(index, bars.length, 0.12, timestamp)));
     const meters = setMeters(0.08, 0.10, 0.08, 0.08, 0.08);
-    publish(0.08, 0.10, 'synthetic', bars.map(() => 0.08), meters);
+    publish(0.08, 0.10, 'synthetic', bars.map(() => 0.08), meters, { low:0.08, mid:0.08, high:0.08 });
   };
 
   try {
@@ -470,7 +474,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       const mid = sliceAverage(Math.floor(halfValues.length * 0.25), Math.max(2, Math.ceil(halfValues.length * 0.72)), level);
       const high = sliceAverage(Math.floor(halfValues.length * 0.62), halfValues.length, level);
       const meters = setMeters(level, peak, low, mid, high);
-      publish(level, peak, useHybrid ? 'hybrid' : 'real', eq, meters);
+      publish(level, peak, useHybrid ? 'hybrid' : 'real', eq, meters, { low, mid, high });
       rafId = window.requestAnimationFrame(frame);
     };
 

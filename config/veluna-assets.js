@@ -1,7 +1,7 @@
 /* Zentrale VELUNA-Asset-, Branding- und Shared-Infrastructure-Quelle. */
 window.VELUNA_ASSETS = Object.freeze({
-  release: 'FULLVERSION_CENTRAL_AUDIO_ARTWORK_POLICY_v1.2.29',
-  version: '1.2.29',
+  release: 'FULLVERSION_CENTRAL_REACTIVE_VISUAL_POLICY_v1.2.30',
+  version: '1.2.30',
   endpoint: '/veluna',
   background: '/assets/veluna/background/veluna-player-background.webp',
   header: '/assets/veluna/header/veluna-player-header.webp',
@@ -20,7 +20,7 @@ window.VELUNA_ASSETS = Object.freeze({
  */
 (() => {
   'use strict';
-  const version = '2026-07-22-central-audio-artwork-v181';
+  const version = '2026-07-23-reactive-visual-v183';
   const head = document.head || document.documentElement;
   if (!head) return;
 

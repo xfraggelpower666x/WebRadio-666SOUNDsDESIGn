@@ -1,4 +1,4 @@
-/* VELUNA Central UI Runtime v1.2.31 — no delayed splash ownership */
+/* VELUNA Central UI Runtime v1.2.32 — no delayed splash ownership + shared live audio-reactive graphics */
 (() => {
   'use strict';
   const A = window.VELUNA_ASSETS || {};
@@ -214,6 +214,10 @@
     img.alt = 'LYVRA VELUNA';
     img.decoding = 'async';
     img.fetchPriority = 'high';
+    img.width = 1536;
+    img.height = 509;
+    img.classList.add('s666-canonical-header-image');
+    img.style.aspectRatio = '1536 / 509';
     header.appendChild(img);
     if (page === 'main') host.prepend(header);
     else {
@@ -262,18 +266,38 @@
 
   function animateBackground(){
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let smooth=.04, phase=0;
-    const tick=()=>{
-      const bus=window.__MeterBus;
-      let level=Number(bus?.level||0), peak=Number(bus?.peak||level);
-      const audio=q('audio');
-      if ((!Number.isFinite(level)||level<=0) && audio && !audio.paused) level=.14+Math.abs(Math.sin(phase))*.08;
-      phase+=.035;
-      smooth += (Math.min(1,Math.max(0,level)) - smooth) * .09;
-      const high=Math.min(1,Math.max(0,peak||smooth*.8));
-      body.style.setProperty('--veluna-bass',smooth.toFixed(3));
-      body.style.setProperty('--veluna-mid',(smooth*.72).toFixed(3));
-      body.style.setProperty('--veluna-high',(high*.58).toFixed(3));
+    let lastFrame = 0;
+    const envelope = { bass:.02, mid:.02, high:.02, pulse:0, stereo:0 };
+    const clamp01 = value => Math.max(0, Math.min(1, Number(value) || 0));
+    const average = (values, fallback = 0) => values?.length ? values.reduce((sum,value)=>sum+(Number(value)||0),0)/values.length : fallback;
+    const follow = (key,target,attack=.70,release=.10) => {
+      const previous = envelope[key] || 0;
+      envelope[key] = previous + (target - previous) * (target > previous ? attack : release);
+      return envelope[key];
+    };
+    const tick = timestamp => {
+      if (timestamp - lastFrame < 33) { requestAnimationFrame(tick); return; }
+      lastFrame = timestamp;
+      const bus = window.__MeterBus || {};
+      const fresh = Boolean(bus.ts && Date.now() - bus.ts < 1000);
+      const eq = fresh && Array.isArray(bus.eq) ? bus.eq : [];
+      const half = eq.slice(0, Math.max(1, Math.ceil(eq.length / 2)));
+      const level = fresh ? clamp01(bus.level) : 0;
+      const targetBass = fresh ? clamp01(Number.isFinite(Number(bus.low)) ? bus.low : average(half.slice(0,Math.max(1,Math.ceil(half.length*.34))),level)) : 0;
+      const targetMid = fresh ? clamp01(Number.isFinite(Number(bus.mid)) ? bus.mid : average(half.slice(Math.floor(half.length*.25),Math.max(2,Math.ceil(half.length*.72))),level)) : 0;
+      const targetHigh = fresh ? clamp01(Number.isFinite(Number(bus.high)) ? bus.high : average(half.slice(Math.floor(half.length*.62)),level)) : 0;
+      const targetPulse = fresh ? clamp01(bus.pulse || Math.max(0,(Number(bus.peak)||level)-level)) : 0;
+      const targetStereo = fresh ? clamp01(Math.abs(average(bus.left,level)-average(bus.right,level))*2.5) : 0;
+      const bass = follow('bass',targetBass,.72,.08);
+      const mid = follow('mid',targetMid,.66,.09);
+      const high = follow('high',targetHigh,.74,.12);
+      const pulse = follow('pulse',targetPulse,.84,.07);
+      const stereo = follow('stereo',targetStereo,.70,.10);
+      body.style.setProperty('--veluna-bass',bass.toFixed(3));
+      body.style.setProperty('--veluna-mid',mid.toFixed(3));
+      body.style.setProperty('--veluna-high',high.toFixed(3));
+      body.style.setProperty('--veluna-pulse',pulse.toFixed(3));
+      body.style.setProperty('--veluna-stereo',stereo.toFixed(3));
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
