@@ -27,7 +27,7 @@ test('all VELUNA mirrors load current stable runtimes', async () => {
   const values = await Promise.all(files.map(read));
   for (const html of values) {
     assert.match(html, /stable-fullscreen-v130/);
-    assert.match(html, /no-delayed-splash-v1231/);
+    assert.match(html, /reactive-visual-v1232/);
   }
   assert.equal(values[0], values[1]);
   assert.equal(values[0], values[2]);

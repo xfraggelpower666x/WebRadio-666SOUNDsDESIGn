@@ -46,28 +46,28 @@ test("Skip owns interactive Bearer auth while Discord remains public", async () 
 test("main player has one canonical EQ and meter writer", async () => {
   const equalizer = await read("js/equalizer.js");
   const stage = await read("js/player-stage-v2.js");
-  assert.match(equalizer, /canonical audio visualizer authority V10/);
+  assert.match(equalizer, /canonical audio visualizer authority V11/);
   assert.match(equalizer, /analyser\.fftSize = mobileLike\(\) \? 128 : 512/);
   assert.match(equalizer, /signalBridge/);
   assert.match(equalizer, /centerBridge/);
   assert.match(equalizer, /applyBottomMeter/);
   assert.match(equalizer, /window\.__MeterBus/);
-  assert.match(equalizer, /target > meterEnvelope \? 0\.70 : 0\.20/);
+  assert.match(equalizer, /target > meterEnvelope \? 0\.82 : 0\.13/);
   assert.match(equalizer, /--eq-scale/);
   assert.match(equalizer, /requestAnimationFrame\(renderFallbackFrame\)/);
   assert.doesNotMatch(equalizer, /const offset = side|index === 1 \? -5|index === 1 \? -10/);
   assert.doesNotMatch(equalizer, /slotHeight\(|clientHeight.*eq-bar|getBoundingClientRect.*eq-bar/);
-  assert.match(stage, /Reiner MeterBus-Konsument/);
+  assert.match(stage, /Single MeterBus consumer/);
   assert.match(stage, /consumeMeterBus/);
-  assert.match(stage, /driveSideLeds/);
-  assert.match(stage, /drivePanelModules/);
+  assert.match(stage, /driveStatus/);
+  assert.match(stage, /driveReactiveVisuals/);
   assert.doesNotMatch(stage, /function setEq\(|function setSideMeters\(|function setBottom\(|\.side-meter-fill|#pcBottomSyncMeter|\.eq-bar-fill/);
 });
 
 test("main player restores responsive header, cockpit buttons and clean Now Playing", async () => {
   const css = await read("css/player-stage-v2.css");
   const stage = await read("js/player-stage-v2.js");
-  assert.match(css, /Player Stage V10: canonical responsive geometry/);
+  assert.match(css, /Player Stage V11: canonical responsive geometry/);
   assert.match(css, /\.s666-main-header-image/);
   assert.match(css, /\.s666-main-header-line/);
   assert.match(css, /grid-template-columns:minmax\(0,1fr\) auto/);
@@ -107,7 +107,7 @@ test("VELUNA desktop player remains centered and compact", async () => {
 
 test("VELUNA keeps persistent purple active states and volume", async () => {
   const ui = await read("js/veluna-ui.js");
-  assert.match(ui, /VELUNA Central UI Runtime v1\.2\.31/);
+  assert.match(ui, /VELUNA Central UI Runtime v1\.2\.32/);
   assert.match(ui, /function installPersistentActiveState\(\)/);
   assert.match(ui, /transport-active/);
   assert.match(ui, /rgba\(180,92,255,\.78\)/);

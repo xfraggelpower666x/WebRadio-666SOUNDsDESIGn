@@ -14,7 +14,7 @@ HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=2026-06-19-repair2';
+import { createBars, startVisualizer } from './equalizer.js?v=2026-07-23-main-reactive-v11';
 import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
 import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
 
@@ -652,6 +652,12 @@ function parseMetadata(payload) {
     payload.live?.streamer_name, payload.live?.streamer, payload.live?.name
   );
   const dj = normalizeDjName(rawDj);
+  const liveSet = firstMetadataText(
+    payload.set_display, payload.setDisplay, payload.set_name, payload.setName, payload.set,
+    payload.show_display, payload.showDisplay, payload.show_name, payload.showName, payload.show,
+    payload.program, payload.programme, payload.broadcast, payload.session,
+    payload.live?.title, payload.live?.show, payload.live?.program
+  );
   const finalTitle = servedTitle
     ? normalizeMetadataTitleV22(servedTitle)
     : normalizeBroadcastDisplayTitleV123(rawTitle, rawArtist);
@@ -661,6 +667,7 @@ function parseMetadata(payload) {
     listeners: `${listeners} / ${max}`,
     bitrate: String(bitrate),
     dj,
+    set: normalizeMetadataTitleV22(liveSet),
     cover: extractCoverUrl(payload)
   };
 }
@@ -687,6 +694,11 @@ async function fetchMetadata() {
     setText(listenersText, data.listeners);
     setText(bitrateText, data.bitrate);
     setText(djText, data.dj);
+    try {
+      window.dispatchEvent(new CustomEvent('s666:metadata-live', { detail:{
+        title:data.title, dj:data.dj, set:data.set, bitrate:data.bitrate, listeners:data.listeners, source:currentSource, raw
+      } }));
+    } catch (eventError) {}
     applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
 updateHistory(data.title);
     normalizeNowPlayingDuplicateFallback();
