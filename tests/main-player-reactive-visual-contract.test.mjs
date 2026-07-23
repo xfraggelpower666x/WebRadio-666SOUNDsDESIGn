@@ -1,4 +1,4 @@
-// Main/all-player live audio-reactive visual and metadata contract v1.0.0.
+// Main/all-player live audio-reactive visual and metadata contract v1.0.1.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
