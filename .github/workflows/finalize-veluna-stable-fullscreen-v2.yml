@@ -1,0 +1,95 @@
+name: Finalize VELUNA Stable Fullscreen V2
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-veluna-stable-fullscreen-no-reboot-20260723
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Apply verified repair and reconcile legacy contracts
+        shell: python
+        run: |
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/finalize-veluna-stable-fullscreen.yml').read_text(encoding='utf-8')
+          start_marker = '      - name: Repair VELUNA in existing canonical files\n        shell: python\n        run: |\n'
+          end_marker = '      - name: JavaScript syntax\n'
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          lines = workflow[start:end].splitlines()
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+          exec(compile(code, 'veluna-stable-fullscreen-repair.py', 'exec'), {'__name__':'__main__'})
+
+          frontend_path = Path('tests/frontend-contracts.test.mjs')
+          frontend = frontend_path.read_text(encoding='utf-8')
+          frontend = frontend.replace(r'VELUNA Central UI Runtime v1\.2\.26', r'VELUNA Central UI Runtime v1\.2\.31')
+          frontend = frontend.replace("  assert.match(lock, /spacerMinimum = 0/);\n", '')
+          frontend = frontend.replace(
+              r"  assert.match(lock, /minmax\(\$\{displayMinimum\}px,1fr\) auto \$\{spacerMinimum\}px/);",
+              r"  assert.match(lock, /minmax\(\$\{displayMinimum\}px,1fr\) auto 0px/);"
+          )
+          frontend = frontend.replace(r"  assert.match(lock, /bottomBanner\.remove\(\)/);", r"  assert.match(lock, /veluna-bottom-brand/);")
+          frontend = frontend.replace(r"  assert.match(lock, /visualViewport/);", r"  assert.doesNotMatch(lock, /visualViewport\?\.addEventListener|addEventListener\('resize'/);")
+          frontend_path.write_text(frontend, encoding='utf-8')
+
+          viewport_path = Path('tests/viewport-fullscreen.test.mjs')
+          viewport = viewport_path.read_text(encoding='utf-8')
+          viewport = viewport.replace(r"  assert.match(viewportLock, /window\.visualViewport/);", r"  assert.doesNotMatch(viewportLock, /visualViewport\?\.addEventListener|addEventListener\('resize'/);")
+          viewport = viewport.replace(r"  assert.match(viewportLock, /keyboardOpen\(\)/);", r"  assert.match(viewportLock, /data-veluna-keyboard-open/);")
+          viewport = viewport.replace("  assert.match(viewportLock, /spacerMinimum = 0/);\n", '')
+          viewport = viewport.replace(
+              r"  assert.match(viewportLock, /minmax\(\$\{displayMinimum\}px,1fr\) auto \$\{spacerMinimum\}px/);",
+              r"  assert.match(viewportLock, /minmax\(\$\{displayMinimum\}px,1fr\) auto 0px/);"
+          )
+          viewport = viewport.replace(r"  assert.match(viewportLock, /bottomBanner\.remove\(\)/);", r"  assert.match(viewportLock, /veluna-bottom-brand/);")
+          viewport_path.write_text(viewport, encoding='utf-8')
+      - name: JavaScript syntax
+        run: |
+          node --check js/veluna-ui.js
+          node --check js/veluna-viewport-lock.js
+      - name: Targeted stable-fullscreen tests
+        run: |
+          node --test tests/veluna-stable-fullscreen-no-reboot.test.mjs
+          node --test tests/frontend-contracts.test.mjs
+          node --test tests/viewport-fullscreen.test.mjs
+      - name: Full repository verification
+        run: npm run verify
+      - name: Python syntax audit without bytecode
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          for path in Path('.').rglob('*.py'):
+              if any(part in {'.git','node_modules','.venv','venv'} for part in path.parts):
+                  continue
+              ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+          print('Python syntax PASS')
+          PY
+      - name: Remove temporary workflows and publish repaired state
+        run: |
+          rm -f .github/workflows/finalize-veluna-stable-fullscreen.yml
+          rm -f .github/workflows/finalize-veluna-stable-fullscreen-v2.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Stop VELUNA delayed reboot and lock stable iPhone fullscreen"
+          git push origin HEAD:repair-veluna-stable-fullscreen-no-reboot-20260723
