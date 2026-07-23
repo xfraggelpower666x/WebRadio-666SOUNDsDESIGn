@@ -1,0 +1,394 @@
+name: Finalize VELUNA Stable Fullscreen
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-veluna-stable-fullscreen-no-reboot-20260723
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Repair VELUNA in existing canonical files
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          viewport = r'''/* VELUNA stable iPhone fullscreen geometry lock v1.3.0 */
+          (() => {
+            'use strict';
+
+            const root = document.documentElement;
+            const state = { width: 0, height: 0, cssHeight: '', orientation: '', locked: false };
+            let orientationTimer = 0;
+            let layoutObserver = null;
+
+            const isMobileViewport = () =>
+              matchMedia('(max-width: 768px)').matches ||
+              (matchMedia('(pointer: coarse)').matches && Math.min(screen.width || 0, screen.height || 0) <= 768);
+
+            const orientationKey = () => {
+              const type = screen.orientation && screen.orientation.type;
+              if (type) return type.startsWith('landscape') ? 'landscape' : 'portrait';
+              return innerWidth > innerHeight ? 'landscape' : 'portrait';
+            };
+
+            const readStableScreen = () => {
+              const width = Math.max(1, Math.round(root.clientWidth || innerWidth || screen.width));
+              const height = Math.max(1, Math.round(innerHeight || root.clientHeight || screen.height));
+              return {
+                width,
+                height,
+                cssHeight: CSS.supports?.('height', '100lvh') ? '100lvh' : `${height}px`
+              };
+            };
+
+            const clearStyles = (node, properties) => {
+              if (!node) return;
+              properties.forEach(property => node.style.removeProperty(property));
+            };
+
+            const placeInRow = (node, row) => {
+              if (!node) return;
+              node.style.setProperty('grid-row', String(row), 'important');
+              node.style.setProperty('min-width', '0', 'important');
+              node.style.setProperty('position', 'relative', 'important');
+              node.style.setProperty('inset', 'auto', 'important');
+              node.style.setProperty('margin', '0', 'important');
+            };
+
+            function clearSafeLayout() {
+              const app = document.querySelector('.app-shell');
+              const card = document.querySelector('.player-card');
+              root.removeAttribute('data-veluna-iphone-safe');
+              if (layoutObserver) {
+                layoutObserver.disconnect();
+                layoutObserver = null;
+              }
+              clearStyles(app, ['position','inset','width','height','min-height','max-height','padding','overflow']);
+              clearStyles(card, [
+                'position','top','right','bottom','left','width','height','min-height','max-height','margin','transform',
+                'display','grid-template-columns','grid-template-rows','align-content','gap','padding','overflow'
+              ]);
+              for (const selector of [
+                '.veluna-global-header','.status-grid','.pill-row','.display-block','.mini-grid','.source-switch',
+                '.control-strip','.tool-strip','.action-bar','.levelmeter','.footer'
+              ]) {
+                clearStyles(card?.querySelector(selector), [
+                  'grid-row','min-width','position','inset','margin','height','min-height','max-height','display',
+                  'visibility','opacity','z-index','align-self','overflow'
+                ]);
+              }
+              card?.querySelectorAll('.mini-box').forEach(node => clearStyles(node, ['min-height','display','visibility','opacity']));
+              clearStyles(card?.querySelector('.display-window'), ['height','min-height','max-height','overflow']);
+              clearStyles(card?.querySelector('.veluna-global-header img'), ['width','height','max-height','object-fit','object-position']);
+            }
+
+            function observeInjectedLayout(card) {
+              if (!card || layoutObserver) return;
+              layoutObserver = new MutationObserver(records => {
+                if (!isMobileViewport()) return;
+                const relevant = records.some(record => [...record.addedNodes].some(node =>
+                  node instanceof Element && (
+                    node.matches?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand') ||
+                    node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-brand')
+                  )
+                ));
+                if (relevant) requestAnimationFrame(() => applyStableLayout());
+              });
+              layoutObserver.observe(card, { childList: true, subtree: true });
+            }
+
+            function applyStableLayout() {
+              const app = document.querySelector('.app-shell');
+              const card = document.querySelector('.player-card');
+              if (!app || !card || !isMobileViewport() || !state.locked) return;
+
+              const compact = state.height < 720;
+              const displayMinimum = compact ? 150 : 188;
+
+              root.setAttribute('data-veluna-iphone-safe','1');
+              root.setAttribute('data-veluna-stable-fullscreen','1');
+              root.style.setProperty('--veluna-safe-player-top','max(56px, calc(env(safe-area-inset-top) + 10px))');
+              root.style.setProperty('--veluna-safe-player-bottom','max(1px, calc(env(safe-area-inset-bottom) - 12px))');
+              root.style.setProperty('--veluna-stable-screen-width', `${state.width}px`);
+              root.style.setProperty('--veluna-stable-screen-height', `${state.height}px`);
+
+              app.style.setProperty('position','fixed','important');
+              app.style.setProperty('inset','0','important');
+              app.style.setProperty('width','100vw','important');
+              app.style.setProperty('height',state.cssHeight,'important');
+              app.style.setProperty('min-height',state.cssHeight,'important');
+              app.style.setProperty('max-height',state.cssHeight,'important');
+              app.style.setProperty('padding','0','important');
+              app.style.setProperty('overflow','hidden','important');
+
+              card.style.setProperty('position','absolute','important');
+              card.style.setProperty('top','var(--veluna-safe-player-top)','important');
+              card.style.setProperty('right','max(5px, env(safe-area-inset-right))','important');
+              card.style.setProperty('bottom','var(--veluna-safe-player-bottom)','important');
+              card.style.setProperty('left','max(5px, env(safe-area-inset-left))','important');
+              card.style.setProperty('width','auto','important');
+              card.style.setProperty('height','auto','important');
+              card.style.setProperty('min-height','0','important');
+              card.style.setProperty('max-height','none','important');
+              card.style.setProperty('margin','0','important');
+              card.style.setProperty('transform','none','important');
+              card.style.setProperty('display','grid','important');
+              card.style.setProperty('grid-template-columns','minmax(0,1fr)','important');
+              card.style.setProperty(
+                'grid-template-rows',
+                `auto auto auto minmax(${displayMinimum}px,1fr) auto 0px auto auto auto auto auto auto`,
+                'important'
+              );
+              card.style.setProperty('align-content','stretch','important');
+              card.style.setProperty('gap',compact ? '3px' : '4px','important');
+              card.style.setProperty('padding','6px','important');
+              card.style.setProperty('overflow','hidden','important');
+
+              const header = card.querySelector('.veluna-global-header');
+              const headerImage = header?.querySelector('img');
+              placeInRow(header, 1);
+              if (header) {
+                header.style.setProperty('height', compact ? 'clamp(94px,13svh,124px)' : 'clamp(112px,15svh,158px)', 'important');
+                header.style.setProperty('min-height', compact ? '94px' : '112px', 'important');
+                header.style.setProperty('max-height', compact ? '124px' : '158px', 'important');
+                header.style.setProperty('overflow','hidden','important');
+              }
+              if (headerImage) {
+                headerImage.style.setProperty('width','100%','important');
+                headerImage.style.setProperty('height','100%','important');
+                headerImage.style.setProperty('max-height','none','important');
+                headerImage.style.setProperty('object-fit','contain','important');
+                headerImage.style.setProperty('object-position','center','important');
+              }
+
+              const statusGrid = card.querySelector('.status-grid');
+              const pillRow = card.querySelector('.pill-row');
+              const displayBlock = card.querySelector('.display-block');
+              const displayWindow = card.querySelector('.display-window');
+              const miniGrid = card.querySelector('.mini-grid');
+              const sourceSwitch = card.querySelector('.source-switch');
+              const controlStrip = card.querySelector('.control-strip');
+              const toolStrip = card.querySelector('.tool-strip');
+              const actionBar = card.querySelector('.action-bar');
+              const levelMeter = card.querySelector('.levelmeter');
+              const footer = card.querySelector('.footer');
+
+              placeInRow(statusGrid, 2);
+              placeInRow(pillRow, 3);
+              placeInRow(displayBlock, 4);
+              placeInRow(miniGrid, 5);
+              placeInRow(sourceSwitch, 7);
+              placeInRow(controlStrip, 8);
+              placeInRow(toolStrip, 9);
+              placeInRow(actionBar, 10);
+              placeInRow(levelMeter, 11);
+              placeInRow(footer, 12);
+
+              if (displayBlock) {
+                displayBlock.style.setProperty('height','100%','important');
+                displayBlock.style.setProperty('min-height',`${displayMinimum}px`,'important');
+                displayBlock.style.setProperty('max-height','none','important');
+                displayBlock.style.setProperty('overflow','hidden','important');
+              }
+              if (displayWindow) {
+                displayWindow.style.setProperty('height','100%','important');
+                displayWindow.style.setProperty('min-height',compact ? '124px' : '158px','important');
+                displayWindow.style.setProperty('max-height','none','important');
+                displayWindow.style.setProperty('overflow','hidden','important');
+              }
+              if (miniGrid) {
+                miniGrid.style.setProperty('display','grid','important');
+                miniGrid.style.setProperty('visibility','visible','important');
+                miniGrid.style.setProperty('opacity','1','important');
+                miniGrid.style.setProperty('min-height',compact ? '38px' : '44px','important');
+                miniGrid.style.setProperty('z-index','4','important');
+              }
+              miniGrid?.querySelectorAll('.mini-box').forEach(node => {
+                node.style.setProperty('display','flex','important');
+                node.style.setProperty('visibility','visible','important');
+                node.style.setProperty('opacity','1','important');
+                node.style.setProperty('min-height',compact ? '36px' : '42px','important');
+              });
+              if (sourceSwitch) {
+                sourceSwitch.style.setProperty('display','grid','important');
+                sourceSwitch.style.setProperty('visibility','visible','important');
+                sourceSwitch.style.setProperty('opacity','1','important');
+                sourceSwitch.style.setProperty('z-index','4','important');
+                sourceSwitch.style.setProperty('align-self','end','important');
+              }
+              card.querySelector('.veluna-bottom-brand')?.remove();
+              observeInjectedLayout(card);
+            }
+
+            function lockGeometry({ reset = false } = {}) {
+              if (!isMobileViewport()) {
+                state.width = 0;
+                state.height = 0;
+                state.cssHeight = '';
+                state.orientation = '';
+                state.locked = false;
+                root.removeAttribute('data-veluna-fixed-viewport');
+                root.removeAttribute('data-veluna-stable-fullscreen');
+                root.removeAttribute('data-veluna-keyboard-open');
+                root.style.removeProperty('--veluna-safe-player-top');
+                root.style.removeProperty('--veluna-safe-player-bottom');
+                root.style.removeProperty('--veluna-stable-screen-width');
+                root.style.removeProperty('--veluna-stable-screen-height');
+                clearSafeLayout();
+                return;
+              }
+              const orientation = orientationKey();
+              if (!reset && state.locked && state.orientation === orientation) {
+                applyStableLayout();
+                return;
+              }
+              const screenBox = readStableScreen();
+              state.width = screenBox.width;
+              state.height = screenBox.height;
+              state.cssHeight = screenBox.cssHeight;
+              state.orientation = orientation;
+              state.locked = true;
+              root.setAttribute('data-veluna-fixed-viewport', orientation);
+              applyStableLayout();
+              requestAnimationFrame(() => window.scrollTo(0, 0));
+            }
+
+            function scheduleOrientationLock(delay = 420) {
+              clearTimeout(orientationTimer);
+              orientationTimer = setTimeout(() => lockGeometry({ reset: true }), delay);
+            }
+
+            lockGeometry({ reset: true });
+            document.addEventListener('DOMContentLoaded', () => lockGeometry(), { once: true });
+            addEventListener('pageshow', () => lockGeometry(), { passive: true });
+            addEventListener('orientationchange', () => scheduleOrientationLock(), { passive: true });
+            screen.orientation?.addEventListener?.('change', () => scheduleOrientationLock());
+
+            document.addEventListener('focusin', () => root.setAttribute('data-veluna-keyboard-open', '1'), true);
+            document.addEventListener('focusout', () => {
+              root.removeAttribute('data-veluna-keyboard-open');
+              requestAnimationFrame(() => window.scrollTo(0, 0));
+              lockGeometry();
+            }, true);
+
+            window.VELUNA_FIXED_VIEWPORT = Object.freeze({
+              refresh: () => lockGeometry(),
+              resetForOrientation: () => lockGeometry({ reset: true }),
+              current: () => ({ ...state })
+            });
+          })();
+          '''
+          viewport = '\n'.join(line[10:] if line.startswith('          ') else line for line in viewport.splitlines()) + '\n'
+          for path in [Path('js/veluna-viewport-lock.js'), Path('public/js/veluna-viewport-lock.js')]:
+              path.write_text(viewport, encoding='utf-8')
+
+          for path in [Path('js/veluna-ui.js'), Path('public/js/veluna-ui.js')]:
+              source = path.read_text(encoding='utf-8')
+              source, count = re.subn(
+                  r'\n  function injectSplash\(\)\{[\s\S]*?\n  \}\n\n  function mediaSessionFallback\(\)',
+                  '\n  function mediaSessionFallback()',
+                  source,
+                  count=1
+              )
+              if count != 1:
+                  raise SystemExit(f'{path}: injectSplash block match count {count}')
+              source = source.replace('  requestAnimationFrame(injectSplash);\n', '')
+              source = source.replace('/* VELUNA Central UI Runtime v1.2.26 */', '/* VELUNA Central UI Runtime v1.2.31 — no delayed splash ownership */')
+              path.write_text(source, encoding='utf-8')
+
+          for path in [Path('VELUNA/index.html'), Path('veluna/index.html'), Path('public/VELUNA/index.html'), Path('public/veluna/index.html')]:
+              source = path.read_text(encoding='utf-8')
+              source = re.sub(r'/js/veluna-viewport-lock\.js\?v=[^"\']+', '/js/veluna-viewport-lock.js?v=2026-07-23-stable-fullscreen-v130', source)
+              source = re.sub(r'/js/veluna-ui\.js\?v=[^"\']+', '/js/veluna-ui.js?v=2026-07-23-no-delayed-splash-v1231', source)
+              path.write_text(source, encoding='utf-8')
+
+          test = r'''import test from 'node:test';
+          import assert from 'node:assert/strict';
+          import { readFile } from 'node:fs/promises';
+          const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+
+          test('VELUNA has one boot owner and no delayed UI splash', async () => {
+            const ui = await read('js/veluna-ui.js');
+            assert.match(ui, /no delayed splash ownership/);
+            assert.doesNotMatch(ui, /function injectSplash\(|requestAnimationFrame\(injectSplash\)|data-veluna-central-splash/);
+            assert.equal(await read('public/js/veluna-ui.js'), ui);
+          });
+
+          test('VELUNA iPhone uses one stable full-screen size per orientation', async () => {
+            const lock = await read('js/veluna-viewport-lock.js');
+            assert.match(lock, /stable iPhone fullscreen geometry lock v1\.3\.0/);
+            assert.match(lock, /100lvh/);
+            assert.match(lock, /data-veluna-stable-fullscreen/);
+            assert.match(lock, /state\.locked && state\.orientation === orientation/);
+            assert.match(lock, /resetForOrientation/);
+            assert.doesNotMatch(lock, /visualViewport\?\.addEventListener|addEventListener\('resize'/);
+            assert.equal(await read('public/js/veluna-viewport-lock.js'), lock);
+          });
+
+          test('all VELUNA mirrors load current stable runtimes', async () => {
+            const files = ['VELUNA/index.html','veluna/index.html','public/VELUNA/index.html','public/veluna/index.html'];
+            const values = await Promise.all(files.map(read));
+            for (const html of values) {
+              assert.match(html, /stable-fullscreen-v130/);
+              assert.match(html, /no-delayed-splash-v1231/);
+            }
+            assert.equal(values[0], values[1]);
+            assert.equal(values[0], values[2]);
+            assert.equal(values[0], values[3]);
+          });
+          '''
+          test = '\n'.join(line[10:] if line.startswith('          ') else line for line in test.splitlines()) + '\n'
+          Path('tests/veluna-stable-fullscreen-no-reboot.test.mjs').write_text(test, encoding='utf-8')
+
+          for path in [Path('tests/frontend-contracts.test.mjs'), Path('tests/viewport-fullscreen.test.mjs')]:
+              source = path.read_text(encoding='utf-8')
+              source = source.replace('fullscreen geometry lock v1\\.2\\.30', 'stable iPhone fullscreen geometry lock v1\\.3\\.0')
+              source = source.replace('fullscreen geometry lock v1\\.2\\.28', 'stable iPhone fullscreen geometry lock v1\\.3\\.0')
+              source = source.replace("assert.match(lock, /visualViewport/);", "assert.doesNotMatch(lock, /visualViewport\\?\\.addEventListener|addEventListener\\('resize'/);")
+              path.write_text(source, encoding='utf-8')
+      - name: JavaScript syntax
+        run: |
+          node --check js/veluna-ui.js
+          node --check js/veluna-viewport-lock.js
+      - name: Targeted no-reboot/fullscreen contract
+        run: node --test tests/veluna-stable-fullscreen-no-reboot.test.mjs
+      - name: Full repository verification
+        run: npm run verify
+      - name: Python syntax audit without bytecode
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          for path in Path('.').rglob('*.py'):
+              if any(part in {'.git','node_modules','.venv','venv'} for part in path.parts):
+                  continue
+              ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+          print('Python syntax PASS')
+          PY
+      - name: Remove temporary workflow and publish repaired state
+        run: |
+          rm -f .github/workflows/finalize-veluna-stable-fullscreen.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Stop VELUNA delayed reboot and lock stable iPhone fullscreen"
+          git push origin HEAD:repair-veluna-stable-fullscreen-no-reboot-20260723
