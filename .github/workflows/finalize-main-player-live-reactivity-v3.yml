@@ -1,0 +1,132 @@
+name: Finalize Main Player Live Reactivity V3
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-main-player-reactivity-metadata-20260723
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Apply verified repair and exact contract reconciliation
+        shell: python
+        run: |
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/finalize-main-player-live-reactivity.yml').read_text(encoding='utf-8')
+          start_marker = '      - name: Prepare canonical repair payload\n        shell: python\n        run: |\n'
+          end_marker = '      - name: Repair canonical visual and metadata ownership\n'
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          lines = workflow[start:end].splitlines()
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+          exec(compile(code, 'prepare-main-reactive.py', 'exec'), {'__name__':'__main__'})
+          exec(compile(Path('/tmp/transform-main-reactive.py').read_text(encoding='utf-8'), 'transform-main-reactive.py', 'exec'), {'__name__':'__main__'})
+
+          def replace_once(path, old, new, label):
+              source = path.read_text(encoding='utf-8')
+              if old not in source:
+                  raise SystemExit(f'{label}: anchor missing in {path}')
+              path.write_text(source.replace(old, new, 1), encoding='utf-8')
+
+          for path in [Path('css/audio-policy-core.css'), Path('public/css/audio-policy-core.css')]:
+              replace_once(
+                  path,
+                  ':is(.veluna-global-header img,.mff-cyber-header img,.s666-main-header img)',
+                  ':is(.veluna-global-header img,.mff-cyber-header img,.s666-main-header img,.s666-canonical-header-image)',
+                  'canonical header selector'
+              )
+
+          for path in [Path('js/veluna-ui.js'), Path('public/js/veluna-ui.js')]:
+              replace_once(
+                  path,
+                  '/* VELUNA Central UI Runtime v1.2.32 — shared live audio-reactive graphics */',
+                  '/* VELUNA Central UI Runtime v1.2.32 — no delayed splash ownership + shared live audio-reactive graphics */',
+                  'VELUNA single-boot marker'
+              )
+
+          frontend = Path('tests/frontend-contracts.test.mjs')
+          replacements = [
+              ('canonical audio visualizer authority V10', 'canonical audio visualizer authority V11'),
+              ('target > meterEnvelope \\? 0\\.70 : 0\\.20', 'target > meterEnvelope \\? 0\\.82 : 0\\.13'),
+              ('assert.match(stage, /Reiner MeterBus-Konsument/);', 'assert.match(stage, /Single MeterBus consumer/);'),
+              ('assert.match(stage, /driveSideLeds/);', 'assert.match(stage, /driveStatus/);'),
+              ('assert.match(stage, /drivePanelModules/);', 'assert.match(stage, /driveReactiveVisuals/);'),
+              ('Player Stage V10: canonical responsive geometry', 'Player Stage V11: canonical responsive geometry'),
+              ('VELUNA Central UI Runtime v1\\.2\\.31', 'VELUNA Central UI Runtime v1\\.2\\.32')
+          ]
+          source = frontend.read_text(encoding='utf-8')
+          for old, new in replacements:
+              if old not in source:
+                  raise SystemExit(f'frontend contract anchor missing: {old}')
+              source = source.replace(old, new, 1)
+          frontend.write_text(source, encoding='utf-8')
+
+          stable = Path('tests/veluna-stable-fullscreen-no-reboot.test.mjs')
+          replace_once(stable, 'no-delayed-splash-v1231', 'reactive-visual-v1232', 'stable runtime cache contract')
+
+          targeted = Path('tests/veluna-targeted-mobile-repair.test.mjs')
+          source = targeted.read_text(encoding='utf-8')
+          for old, new in [
+              ('central-audio-artwork-v182', 'reactive-visual-v183'),
+              ('no-delayed-splash-v1231', 'reactive-visual-v1232')
+          ]:
+              if old not in source:
+                  raise SystemExit(f'targeted contract anchor missing: {old}')
+              source = source.replace(old, new, 1)
+          targeted.write_text(source, encoding='utf-8')
+      - name: JavaScript syntax
+        run: |
+          node --check js/player-stage-v2.js
+          node --check js/equalizer.js
+          node --check js/player-core.js
+          node --check js/veluna-ui.js
+      - name: Directly affected contracts
+        run: |
+          node --test tests/main-player-reactive-visual-contract.test.mjs
+          node --test tests/frontend-contracts.test.mjs
+          node --test tests/veluna-stable-fullscreen-no-reboot.test.mjs
+          node --test tests/veluna-targeted-mobile-repair.test.mjs
+      - name: Full repository verification
+        run: npm run verify
+      - name: Python syntax audit without bytecode
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          for path in Path('.').rglob('*.py'):
+              if any(part in {'.git','node_modules','.venv','venv'} for part in path.parts):
+                  continue
+              ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+          print('Python syntax PASS')
+          PY
+      - name: Remove temporary workflows and publish repaired state
+        run: |
+          rm -f .github/workflows/finalize-main-player-live-reactivity.yml
+          rm -f .github/workflows/diagnose-main-player-live-reactivity.yml
+          rm -f .github/workflows/finalize-main-player-live-reactivity-v2.yml
+          rm -f .github/workflows/diagnose-main-player-full-verify.yml
+          rm -f .github/workflows/diagnose-main-player-transformed-files.yml
+          rm -f .github/workflows/finalize-main-player-live-reactivity-v3.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Repair main player live audio reactivity and metadata presentation"
+          git push origin HEAD:repair-main-player-reactivity-metadata-20260723
