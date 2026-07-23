@@ -1,3 +1,4 @@
+// VELUNA stable fullscreen and single-boot regression contract v1.0.0.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
