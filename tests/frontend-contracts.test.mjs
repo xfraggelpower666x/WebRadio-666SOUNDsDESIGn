@@ -46,15 +46,15 @@ test("Skip owns interactive Bearer auth while Discord remains public", async () 
 test("main player has one canonical EQ and meter writer", async () => {
   const equalizer = await read("js/equalizer.js");
   const stage = await read("js/player-stage-v2.js");
-  assert.match(equalizer, /canonical audio visualizer authority V11/);
+  assert.match(equalizer, /canonical audio visualizer authority V12/);
   assert.match(equalizer, /analyser\.fftSize = mobileLike\(\) \? 128 : 512/);
-  assert.match(equalizer, /signalBridge/);
-  assert.match(equalizer, /centerBridge/);
+  assert.match(equalizer, /const bandCount = Math.max\(1, bars.length\)/);
+  assert.match(equalizer, /const signalPresent = globalMax >= 4/);
   assert.match(equalizer, /applyBottomMeter/);
   assert.match(equalizer, /window\.__MeterBus/);
   assert.match(equalizer, /target > meterEnvelope \? 0\.82 : 0\.13/);
   assert.match(equalizer, /--eq-scale/);
-  assert.match(equalizer, /requestAnimationFrame\(renderFallbackFrame\)/);
+  assert.doesNotMatch(equalizer, /const halfBars|const mirrored|useHybrid|fallbackValue/);
   assert.doesNotMatch(equalizer, /const offset = side|index === 1 \? -5|index === 1 \? -10/);
   assert.doesNotMatch(equalizer, /slotHeight\(|clientHeight.*eq-bar|getBoundingClientRect.*eq-bar/);
   assert.match(stage, /Single MeterBus consumer/);
@@ -67,7 +67,7 @@ test("main player has one canonical EQ and meter writer", async () => {
 test("main player restores responsive header, cockpit buttons and clean Now Playing", async () => {
   const css = await read("css/player-stage-v2.css");
   const stage = await read("js/player-stage-v2.js");
-  assert.match(css, /Player Stage V11: canonical responsive geometry/);
+  assert.match(css, /Player Stage V12: real-spectrum geometry/);
   assert.match(css, /\.s666-main-header-image/);
   assert.match(css, /\.s666-main-header-line/);
   assert.match(css, /grid-template-columns:minmax\(0,1fr\) auto/);
