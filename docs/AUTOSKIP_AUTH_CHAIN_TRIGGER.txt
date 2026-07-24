@@ -1,0 +1,1 @@
+Temporary trigger for the verified PR #52 AutoSkip authentication-chain repair. Removed before merge.
