@@ -63,6 +63,10 @@ jobs:
           end = source.index(end_marker, start)
           lines = source[start:end].splitlines()
           code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+          code = code.replace(
+              "real = replace_once(real, '2026-07-23-real-spectrum-v12', '2026-07-24-high-response-v13', 'real spectrum cache')",
+              "if real.count('2026-07-23-real-spectrum-v12') < 1:\n    raise SystemExit('real spectrum cache marker missing')\nreal = real.replace('2026-07-23-real-spectrum-v12', '2026-07-24-high-response-v13')"
+          )
           exec(compile(code, 'pc-high-frequency-response.py', 'exec'), {'__name__':'__main__'})
       - run: node --check js/equalizer.js
       - run: node --check js/player-core.js
