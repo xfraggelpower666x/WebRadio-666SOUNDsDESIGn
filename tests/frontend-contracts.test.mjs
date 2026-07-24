@@ -46,7 +46,7 @@ test("Skip owns interactive Bearer auth while Discord remains public", async () 
 test("main player has one canonical EQ and meter writer", async () => {
   const equalizer = await read("js/equalizer.js");
   const stage = await read("js/player-stage-v2.js");
-  assert.match(equalizer, /canonical audio visualizer authority V13/);
+  assert.match(equalizer, /canonical audio visualizer authority V14/);
   assert.match(equalizer, /analyser\.fftSize = mobileLike\(\) \? 128 : 1024/);
   assert.match(equalizer, /const bandCount = Math.max\(1, bars.length\)/);
   assert.match(equalizer, /const signalPresent = globalMax >= 3/);

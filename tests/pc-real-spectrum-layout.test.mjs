@@ -7,7 +7,7 @@ const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 test('PC EQ renders every bar from its own real frequency range', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
-  assert.match(eq, /canonical audio visualizer authority V13/);
+  assert.match(eq, /canonical audio visualizer authority V14/);
   assert.match(eq, /const bandCount = Math.max\(1, bars.length\)/);
   assert.match(eq, /for \(let index = 0; index < bandCount; index \+= 1\)/);
   assert.match(eq, /const value = values\[index\]/);
@@ -37,6 +37,6 @@ test('cache markers load the exact repaired runtime', async () => {
   const core = await read('js/player-core.js');
   assert.equal(await read('public/index.html'), html);
   assert.equal(await read('public/js/player-core.js'), core);
-  assert.match(html, /2026-07-24-high-response-v13/);
-  assert.match(core, /equalizer\.js\?v=2026-07-24-high-response-v13/);
+  assert.match(html, /2026-07-24-balanced-headroom-v14/);
+  assert.match(core, /equalizer\.js\?v=2026-07-24-balanced-headroom-v14/);
 });
