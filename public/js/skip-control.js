@@ -13,8 +13,17 @@
   }
 
   function normalizeError(response, data) {
-    if (data && data.retryAfterMs) return 'Skip-Cooldown: ' + Math.max(1, Math.ceil(Number(data.retryAfterMs) / 1000)) + ' s';
-    return String((data && (data.error || data.message)) || (response ? 'HTTP ' + response.status : 'skip_failed'));
+    if (data && (data.retryAfterMs || data.remainingMs)) return 'Skip-Cooldown: ' + Math.max(1, Math.ceil(Number(data.retryAfterMs || data.remainingMs) / 1000)) + ' s';
+    var code = String((data && (data.error || data.message)) || (response ? 'HTTP ' + response.status : 'skip_failed'));
+    var messages = {
+      myidj_admin_token_missing: 'MyIDJ-Worker-Token fehlt im Haupt-Worker. Das Player-Passwort ist nicht die Ursache.',
+      myidj_admin_token_rejected: 'MyIDJ-Worker-Token wurde abgelehnt. ADMIN_TOKEN und MYIDJ_WORKER_ADMIN_TOKEN müssen übereinstimmen.',
+      skip_target_not_configured: 'Der MyIDJ-Worker hat kein gültiges Shoutcast-Skip-Ziel konfiguriert.',
+      myidj_skip_unreachable: 'Der zentrale MyIDJ-Skip-Worker ist nicht erreichbar.',
+      myidj_skip_timeout: 'Der zentrale MyIDJ-Skip-Worker antwortet nicht rechtzeitig.',
+      myidj_worker_exception: 'Der zentrale MyIDJ-Skip-Worker meldet einen internen Fehler.'
+    };
+    return messages[code] || code;
   }
 
   async function ensureInteractiveAuth(options) {
@@ -23,7 +32,7 @@
       throw new Error('admin_auth_client_missing');
     }
     return window.S666AdminAuth.ensure({
-      message: options.prompt || 'Admin-Passwort für Auto-DJ Skip eingeben:'
+      message: options.prompt || 'Player-Admin-Passwort für Auto-DJ Skip eingeben (nicht Shoutcast-Login):'
     });
   }
 

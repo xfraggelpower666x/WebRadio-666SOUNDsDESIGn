@@ -203,3 +203,34 @@ test("a definitive password rejection does not fan out to another password worke
     assert.deepEqual(seen, ["https://configured-pw.example/login"]);
   });
 });
+
+
+test("generic login_rejected from a stale configured route falls back and is not called password_rejected", async () => {
+  const seen = [];
+  await withMockFetch(async (url) => {
+    const value = String(url);
+    seen.push(value);
+    if (value.includes("configured-pw.example")) return Response.json({ ok: false, error: "login_rejected" }, { status: 403 });
+    if (value.includes("666-system-pw")) return Response.json({ ok: true, token: "abc.def", expiresAt: FUTURE });
+    if (value.includes("666-system-auth")) return Response.json({ ok: true, valid: true, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: FUTURE } });
+    throw new Error("unexpected_fetch:" + value);
+  }, async () => {
+    const response = await handleRadioAdminConfigAddon(request("/api/admin/login", {
+      method: "POST",
+      headers: { origin: "https://radio.test", "content-type": "application/json" },
+      body: JSON.stringify({ password: "correct" })
+    }), {
+      PW_LOGIN_URL: "https://configured-pw.example/login",
+      ADMIN_SERVICE_ORIGIN: "https://radio.test",
+      ADMIN_SERVICE_TOKEN: "service-secret",
+      AUTH_AUDIENCE: AUDIENCE
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).ok, true);
+    assert.deepEqual(seen, [
+      "https://configured-pw.example/login",
+      "https://666-system-pw.666soundsdesign-broadcaster.com/login",
+      "https://666-system-auth.666soundsdesign-broadcaster.com/verify"
+    ]);
+  });
+});

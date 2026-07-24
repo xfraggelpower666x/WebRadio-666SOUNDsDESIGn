@@ -1,9 +1,11 @@
 /*
 FILE: worker-addons/radio-admin-config-addon.js
-VERSION: 1.0.2
+VERSION: 1.1.0
 PURPOSE: Protected GitHub-backed radio runtime config and admin skip API.
 SECURITY: No secrets in URLs unless SKIP_ALLOW_QUERY_SECRET=true is explicitly set.
 */
+
+import { callMyIdjSkip } from "./skip-api-addon.js";
 
 const DEFAULT_CONFIG_PATH = "config/radio-runtime.json";
 const DEFAULT_BACKUP_DIR = "config/backups";
@@ -76,7 +78,11 @@ function isSameOrigin(request, options = {}) {
 function normalizeAdminError(value, fallback = "request_rejected") {
   const raw = cleanText(value || fallback, 120).toLowerCase();
   const map = [
-    [/invalid password|password rejected|login rejected/, "password_rejected"],
+    [/invalid password|password rejected/, "password_rejected"],
+    [/service auth rejected|service_auth_rejected/, "service_auth_rejected"],
+    [/login rate limited|login_rate_limited/, "login_rate_limited"],
+    [/login rejected|login_rejected/, "login_rejected"],
+    [/invalid json|non[- ]?json|protocol error|protocol_error/, "pw_login_protocol_error"],
     [/worker secrets missing|secret.*missing/, "worker_secrets_missing"],
     [/invalid signature|signature invalid/, "token_signature_invalid"],
     [/token expired|expired token/, "token_expired"],
@@ -243,12 +249,22 @@ async function loginAdmin(request, env) {
         body: JSON.stringify({ password }),
         redirect: "error"
       }, 7000);
-      const data = await response.json().catch(() => ({}));
+      const raw = await response.text().catch(() => "");
+      let data = {};
+      let jsonOk = false;
+      try { data = raw ? JSON.parse(raw) : {}; jsonOk = true; } catch {}
 
       if (!response.ok || data?.ok !== true || !data?.token) {
-        const error = normalizeAdminError(data?.error, "login_rejected");
-        lastFailure = { status: response.status || 502, error };
-        if (error === "password_rejected" || error === "login_rate_limited") break;
+        const fallback = response.status >= 500 ? `pw_login_http_${response.status}` : "login_rejected";
+        const error = jsonOk ? normalizeAdminError(data?.error, fallback) : "pw_login_protocol_error";
+        lastFailure = {
+status: response.status || 502,
+error,
+stage: "player-admin-login",
+upstream: loginUrl === CANONICAL_PW_LOGIN_URL ? "canonical" : "configured"
+        };
+        const definitivePasswordFailure = response.status === 401 && error === "password_rejected";
+        if (definitivePasswordFailure || error === "login_rate_limited") break;
         continue;
       }
 
@@ -275,7 +291,7 @@ async function loginAdmin(request, env) {
     }
   }
 
-  return adminJson({ ok: false, error: lastFailure.error }, lastFailure.status || 502);
+  return adminJson({ ok: false, error: lastFailure.error, stage: lastFailure.stage || "player-admin-login", credentialType: "player-admin-password", upstream: lastFailure.upstream || null }, lastFailure.status || 502);
 }
 
 function requiredEnv(env) {
@@ -656,11 +672,11 @@ async function adminSkip(request, env) {
   const remainingMs = Math.max(0, Number(cooldown.data.until || 0) - Date.now());
   if (remainingMs > 0) return adminJson({ ok: false, error: "cooldown_active", remainingMs, cooldownMs }, 429);
 
-  const result = await performShoutcastSkip(env, "admin-player");
-  if (!result.ok) return adminJson(result, 502);
+  const result = await callMyIdjSkip({ source: "admin-player" }, env);
+  if (!result.ok) return adminJson(result, result.status || 502);
   const until = Date.now() + cooldownMs;
   await writeSkipCooldown(cooldown.key, until);
-  return adminJson({ ...result, cooldownMs, cooldownUntil: new Date(until).toISOString() });
+  return adminJson({ ...result, skipAuthority: "666myidjstreamadmin", cooldownMs, cooldownUntil: new Date(until).toISOString() });
 }
 
 async function debugStatus(request, env) {
@@ -675,7 +691,10 @@ async function debugStatus(request, env) {
     authVerifyConfigured: Boolean(env.ADMIN_AUTH_VERIFY_URL),
     pwLoginConfigured: Boolean(env.PW_LOGIN_URL || env.ADMIN_AUTH_LOGIN_URL || "https://666-system-pw.666soundsdesign-broadcaster.com/login"),
     runtimeKvConfigured: Boolean(env.RADIO_CONFIG_KV),
-    skipConfigured: skipConfig(env).configured
+    skipConfigured: Boolean(env.MYIDJ_WORKER_ADMIN_TOKEN || env.MYIDJ_ADMIN_TOKEN || env.ADMIN_TOKEN),
+    skipAuthority: "666myidjstreamadmin",
+    myIdjWorkerAdminTokenConfigured: Boolean(env.MYIDJ_WORKER_ADMIN_TOKEN || env.MYIDJ_ADMIN_TOKEN || env.ADMIN_TOKEN),
+    legacyDirectSkipConfigured: skipConfig(env).configured
   });
 }
 

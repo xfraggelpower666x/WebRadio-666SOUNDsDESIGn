@@ -209,7 +209,7 @@ test("VELUNA is canonical and AMARIS player routes are removed", async () => {
   assert.match(internalHtml, /id="discordBtn"/);
   assert.match(internalHtml, /id="internalMessageBtn"/);
   assert.match(internalHtml, /admin-auth-client\.js/);
-  assert.match(internalHtml, /skip-control\.js\?v=2026-07-19-action-parity-v1/);
+  assert.match(internalHtml, /skip-control\.js\?v=2026-07-24-autoskip-authority-v2/);
   assert.match(internalHtml, /player-alert-client\.js/);
   assert.match(internalHtml, /messenger-overlay\.js/);
   assert.match(internalHtml, /discord-player-addon-v3\.js\?v=2026-07-19-overlay-inert-v52/);
