@@ -1,0 +1,285 @@
+name: Finalize PC Real Spectrum Layout
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-pc-eq-real-spectrum-layout-20260723
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Repair real spectrum, meters and PC proportions
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, got {count}')
+              return text.replace(old, new, 1)
+
+          def regex_once(text, pattern, replacement, label):
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 regex match, got {count}')
+              return updated
+
+          eq_path = Path('js/equalizer.js')
+          eq = eq_path.read_text(encoding='utf-8')
+          eq = replace_once(eq, 'canonical audio visualizer authority V11', 'canonical audio visualizer authority V12', 'equalizer version')
+          eq = replace_once(eq, 'Signal-derived center bridge, balanced side channels and transform-only EQ rendering.', 'Twenty-four independent real-frequency bands, balanced meters and transform-only rendering.', 'equalizer header')
+          eq = replace_once(eq, "  let weakFrames = 0;\n", '', 'remove weak frame counter')
+          eq = replace_once(eq, 'const value = clamp((Number(source) || 0) * 100, 6, 100);', 'const value = clamp((Number(source) || 0) * 100, 1.5, 100);', 'meter floor')
+          eq = replace_once(eq, 'const quantized = Math.round(value * 2) / 2;', 'const quantized = Math.round(value * 10) / 10;', 'meter quantization')
+          eq = replace_once(eq, "element.style.opacity = (0.34 + quantized / 152).toFixed(2);", "element.style.opacity = (0.18 + quantized / 122).toFixed(2);", 'meter opacity')
+
+          fallback = """  const renderFallbackFrame = () => {
+            if (!running) return;
+            const eq = bars.map((bar) => {
+              const value = 0.025;
+              setBar(bar, value);
+              return value;
+            });
+            const meters = setMeters(0.015, 0.02, 0.015, 0.015, 0.015);
+            publish(0.015, 0.02, 'unavailable', eq, meters, { low:0.015, mid:0.015, high:0.015 });
+          };
+
+          const startFallback = () => {
+            renderFallbackFrame();
+          };
+
+          const stopFallback = () => {
+            if (fallbackRafId) window.cancelAnimationFrame(fallbackRafId);
+            fallbackRafId = 0;
+          };
+"""
+          eq = regex_once(eq, r"  const fallbackValue = .*?\n  const stopFallback = \(\) => \{.*?\n  \};\n", fallback, 'static honest fallback')
+
+          idle = """  const idleState = () => {
+            const eq = bars.map((bar) => {
+              const value = 0.025;
+              setBar(bar, value);
+              return value;
+            });
+            const meters = setMeters(0.015, 0.02, 0.015, 0.015, 0.015);
+            publish(0.015, 0.02, 'idle', eq, meters, { low:0.015, mid:0.015, high:0.015 });
+          };
+"""
+          eq = regex_once(eq, r"  const idleState = \(\) => \{.*?\n  \};\n", idle, 'static idle state')
+
+          spectrum = """      const bandCount = Math.max(1, bars.length);
+            const analysisWindow = Math.max(bandCount * 2, Math.floor(data.length * 0.90));
+            const rawBands = [];
+            let globalMax = 0;
+            let globalTotal = 0;
+            for (let index = 0; index < analysisWindow; index += 1) globalTotal += data[index] || 0;
+            const globalMean = globalTotal / analysisWindow;
+
+            for (let index = 0; index < bandCount; index += 1) {
+              const normalizedStart = index / bandCount;
+              const normalizedEnd = (index + 1) / bandCount;
+              const start = Math.floor(Math.pow(normalizedStart, 1.72) * Math.max(1, analysisWindow - 2));
+              const end = Math.max(start + 2, Math.floor(Math.pow(normalizedEnd, 1.72) * analysisWindow));
+              let total = 0;
+              let count = 0;
+              let localPeak = 0;
+              for (let bin = start; bin < Math.min(analysisWindow, end + 2); bin += 1) {
+                const sample = data[bin] || 0;
+                total += sample;
+                localPeak = Math.max(localPeak, sample);
+                count += 1;
+              }
+              const average = count ? total / count : 0;
+              const local = average * 0.78 + localPeak * 0.16 + globalMean * 0.06;
+              globalMax = Math.max(globalMax, localPeak, local);
+              rawBands.push(local);
+            }
+
+            const signalPresent = globalMax >= 4 || rms > 0.005;
+            if (bandEnvelope.length !== bandCount) bandEnvelope = new Array(bandCount).fill(0.025);
+
+            const values = rawBands.map((value, index) => {
+              const before = rawBands[Math.max(0, index - 1)] ?? value;
+              const after = rawBands[Math.min(rawBands.length - 1, index + 1)] ?? value;
+              const local = value * 0.78 + before * 0.11 + after * 0.11;
+              const spectral = Math.pow(clamp(local / 255, 0, 1), 0.58);
+              const broadbandSupport = signalPresent ? Math.pow(globalMean / 255, 0.78) * 0.075 : 0;
+              const target = signalPresent ? clamp(spectral * 1.22 + broadbandSupport, 0.012, 1) : 0.012;
+              const previous = bandEnvelope[index] || 0.025;
+              bandEnvelope[index] = previous + (target - previous) * (target > previous ? 0.78 : 0.16);
+              return bandEnvelope[index];
+            });
+
+            const eq = [];
+            bars.forEach((bar, index) => {
+              const value = values[index] || 0.012;
+              setBar(bar, value);
+              eq.push(value);
+            });
+
+            const level = clamp(rms * 2.40, 0, 1);
+            const peak = clamp(Math.max(samplePeak * 1.08, level), 0, 1);
+            const sliceAverage = (start, end, fallback) => {
+              const slice = values.slice(start, end);
+              return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : fallback;
+            };
+            const low = sliceAverage(0, Math.max(1, Math.ceil(values.length * 0.34)), level);
+            const mid = sliceAverage(Math.floor(values.length * 0.25), Math.max(2, Math.ceil(values.length * 0.72)), level);
+            const high = sliceAverage(Math.floor(values.length * 0.62), values.length, level);
+            const meters = setMeters(level, peak, low, mid, high);
+            publish(level, peak, 'real', eq, meters, { low, mid, high });
+"""
+          eq = regex_once(eq, r"      const halfBars = .*?      publish\(level, peak, useHybrid \? 'hybrid' : 'real', eq, meters, \{ low, mid, high \}\);\n", spectrum, 'full independent spectrum')
+          eq_path.write_text(eq, encoding='utf-8')
+          Path('public/js/equalizer.js').write_text(eq, encoding='utf-8')
+
+          css_path = Path('css/player-stage-v2.css')
+          css = css_path.read_text(encoding='utf-8')
+          css = replace_once(css, 'Player Stage V11: canonical responsive geometry + single-bus reactivity.', 'Player Stage V12: real-spectrum geometry + single-bus reactivity.', 'stage css version')
+          css = replace_once(css,
+            'body[data-veluna-page="main"] .player-shell>.hero{order:1!important;flex:0 0 clamp(94px,12.5vh,154px)!important;height:clamp(94px,12.5vh,154px)!important;min-height:94px!important;max-height:154px!important;margin:0 22px!important;overflow:hidden!important}',
+            'body[data-veluna-page="main"] .player-shell>.hero{order:1!important;position:relative!important;flex:0 0 clamp(142px,18vh,224px)!important;height:clamp(142px,18vh,224px)!important;min-height:142px!important;max-height:224px!important;margin:0 22px!important;overflow:hidden!important}',
+            'header height')
+          css = replace_once(css,
+            '.s666-main-header :is(#pcHeaderBrandSplit,.pc-header-brand-split){width:100%!important;height:calc(100% - 18px)!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}',
+            '.s666-main-header :is(#pcHeaderBrandSplit,.pc-header-brand-split){width:100%!important;height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}',
+            'header image box')
+          css = replace_once(css,
+            '.s666-main-header-image{display:block!important;width:auto!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-height:0!important}',
+            '.s666-main-header-image{display:block!important;width:100%!important;height:auto!important;max-width:100%!important;max-height:100%!important;min-height:0!important;object-fit:contain!important;object-position:center!important}',
+            'header scaling')
+          css = replace_once(css,
+            '.s666-main-header-line{flex:0 0 18px;display:flex!important;',
+            '.s666-main-header-line{position:absolute!important;left:0!important;right:0!important;bottom:0!important;height:18px!important;display:flex!important;',
+            'header line overlay')
+          css = replace_once(css,
+            'body[data-veluna-page="main"] .player-shell>.visualizer{order:4!important;flex:1 1 auto!important;min-height:clamp(170px,19vh,226px)!important;height:auto!important;',
+            'body[data-veluna-page="main"] .player-shell>.visualizer{order:4!important;flex:0 1 clamp(154px,19vh,206px)!important;min-height:154px!important;height:clamp(154px,19vh,206px)!important;',
+            'visualizer height')
+          css = replace_once(css,
+            'body[data-veluna-page="main"] .visualizer .eq-bars{flex:1 1 auto!important;width:100%!important;height:auto!important;min-height:clamp(144px,17vh,200px)!important;',
+            'body[data-veluna-page="main"] .visualizer .eq-bars{flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:128px!important;',
+            'eq use full panel')
+          css = replace_once(css,
+            'body[data-veluna-page="main"] .player-shell>.now-playing{order:8!important;position:relative!important;inset:auto!important;flex:0 0 clamp(164px,18vh,194px)!important;height:clamp(164px,18vh,194px)!important;min-height:164px!important;max-height:194px!important;',
+            'body[data-veluna-page="main"] .player-shell>.now-playing{order:8!important;position:relative!important;inset:auto!important;flex:0 0 clamp(204px,23vh,252px)!important;height:clamp(204px,23vh,252px)!important;min-height:204px!important;max-height:252px!important;',
+            'now playing height')
+          css = replace_once(css,
+            'grid-template-columns:clamp(126px,10vw,154px) minmax(0,1fr)!important;',
+            'grid-template-columns:clamp(164px,12vw,198px) minmax(0,1fr)!important;',
+            'now playing columns')
+          css = replace_once(css,
+            'width:clamp(126px,10vw,154px)!important;height:clamp(126px,10vw,154px)!important;',
+            'width:clamp(164px,12vw,198px)!important;height:clamp(164px,12vw,198px)!important;',
+            'cover size')
+          css_path.write_text(css, encoding='utf-8')
+          Path('public/css/player-stage-v2.css').write_text(css, encoding='utf-8')
+
+          for path in ['js/player-core.js','public/js/player-core.js']:
+              text = Path(path).read_text(encoding='utf-8')
+              text = text.replace("./equalizer.js?v=2026-07-23-main-reactive-v11", "./equalizer.js?v=2026-07-23-real-spectrum-v12")
+              Path(path).write_text(text, encoding='utf-8')
+
+          root_html = Path('index.html').read_text(encoding='utf-8')
+          root_html = root_html.replace('2026-07-23-main-reactive-v11', '2026-07-23-real-spectrum-v12')
+          Path('index.html').write_text(root_html, encoding='utf-8')
+          Path('public/index.html').write_text(root_html, encoding='utf-8')
+
+          test_path = Path('tests/frontend-contracts.test.mjs')
+          tests = test_path.read_text(encoding='utf-8')
+          tests = tests.replace('/canonical audio visualizer authority V11/', '/canonical audio visualizer authority V12/')
+          tests = tests.replace('  assert.match(equalizer, /signalBridge/);\n  assert.match(equalizer, /centerBridge/);\n', "  assert.match(equalizer, /const bandCount = Math.max\\(1, bars.length\\)/);\n  assert.match(equalizer, /const signalPresent = globalMax >= 4/);\n")
+          tests = tests.replace("  assert.match(equalizer, /requestAnimationFrame\\(renderFallbackFrame\\)/);\n", "  assert.doesNotMatch(equalizer, /const halfBars|const mirrored|useHybrid|fallbackValue/);\n")
+          tests = tests.replace('/Player Stage V11: canonical responsive geometry/', '/Player Stage V12: real-spectrum geometry/')
+          test_path.write_text(tests, encoding='utf-8')
+
+          contract = """// PC real-spectrum and proportion regression contract v1.0.0.
+          import test from 'node:test';
+          import assert from 'node:assert/strict';
+          import { readFile } from 'node:fs/promises';
+          const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+
+          test('PC EQ renders every bar from its own real frequency range', async () => {
+            const eq = await read('js/equalizer.js');
+            assert.equal(await read('public/js/equalizer.js'), eq);
+            assert.match(eq, /canonical audio visualizer authority V12/);
+            assert.match(eq, /const bandCount = Math.max\(1, bars.length\)/);
+            assert.match(eq, /for \(let index = 0; index < bandCount; index \+= 1\)/);
+            assert.match(eq, /const value = values\[index\]/);
+            assert.match(eq, /publish\(level, peak, 'real'/);
+            assert.doesNotMatch(eq, /const halfBars|const mirrored|useHybrid|fallbackValue|Math\.sin\(timestamp \/ 310\)/);
+          });
+
+          test('PC meters can fall near zero and retain fine resolution', async () => {
+            const eq = await read('js/equalizer.js');
+            assert.match(eq, /\* 100, 1\.5, 100/);
+            assert.match(eq, /Math\.round\(value \* 10\) \/ 10/);
+            assert.doesNotMatch(eq, /\* 100, 6, 100/);
+          });
+
+          test('PC header and Now Playing receive the recovered vertical space', async () => {
+            const css = await read('css/player-stage-v2.css');
+            assert.equal(await read('public/css/player-stage-v2.css'), css);
+            assert.match(css, /Player Stage V12: real-spectrum geometry/);
+            assert.match(css, /clamp\(142px,18vh,224px\)/);
+            assert.match(css, /width:100%!important;height:auto!important/);
+            assert.match(css, /clamp\(204px,23vh,252px\)/);
+            assert.match(css, /clamp\(164px,12vw,198px\)/);
+          });
+
+          test('cache markers load the exact repaired runtime', async () => {
+            const html = await read('index.html');
+            const core = await read('js/player-core.js');
+            assert.equal(await read('public/index.html'), html);
+            assert.equal(await read('public/js/player-core.js'), core);
+            assert.match(html, /2026-07-23-real-spectrum-v12/);
+            assert.match(core, /equalizer\.js\?v=2026-07-23-real-spectrum-v12/);
+          });
+          """
+          Path('tests/pc-real-spectrum-layout.test.mjs').write_text(contract, encoding='utf-8')
+      - name: JavaScript syntax
+        run: |
+          node --check js/equalizer.js
+          node --check js/player-core.js
+      - name: Targeted real-spectrum contract
+        run: node --test tests/pc-real-spectrum-layout.test.mjs tests/frontend-contracts.test.mjs
+      - name: Full repository verification
+        run: npm run verify
+      - name: Python syntax audit without bytecode
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          for path in Path('.').rglob('*.py'):
+              if any(part in {'.git','node_modules','.venv','venv'} for part in path.parts):
+                  continue
+              ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+          print('Python syntax PASS')
+          PY
+      - name: Remove temporary workflow and publish repaired state
+        run: |
+          rm -f .github/workflows/finalize-pc-real-spectrum-layout.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Repair PC real spectrum and player proportions"
+          git push origin HEAD:repair-pc-eq-real-spectrum-layout-20260723
