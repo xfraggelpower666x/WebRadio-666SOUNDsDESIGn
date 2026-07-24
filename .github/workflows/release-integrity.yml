@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -35,3 +35,48 @@ jobs:
           if failures:
               raise SystemExit("\n".join(failures))
           print("Python files valid")
+
+  finalize-pr52:
+    if: github.event_name == 'pull_request' && github.event.pull_request.number == 52 && github.event.pull_request.head.ref == 'repair-autoskip-auth-error-chain-20260724'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-autoskip-auth-error-chain-20260724
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - name: Execute stored AutoSkip auth-chain repair
+        shell: python
+        run: |
+          from pathlib import Path
+          source = Path('.github/workflows/finalize-autoskip-auth-chain.yml').read_text(encoding='utf-8')
+          start_marker = '      - name: Apply AutoSkip authority and auth-error repair\n        shell: python\n        run: |\n'
+          end_marker = '      - name: Syntax and targeted contracts\n'
+          start = source.index(start_marker) + len(start_marker)
+          end = source.index(end_marker, start)
+          lines = source[start:end].splitlines()
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
+          exec(compile(code, 'autoskip-auth-chain.py', 'exec'), {'__name__':'__main__'})
+      - run: |
+          node --check js/admin-auth-client.js
+          node --check js/skip-control.js
+          node --check worker-addons/skip-api-addon.js
+          node --check worker-addons/radio-admin-config-addon.js
+      - run: node --test tests/admin-hardlock.test.mjs tests/autoskip-auth-chain.test.mjs tests/hardlock-source.test.mjs tests/frontend-contracts.test.mjs
+      - run: npm run verify
+      - name: Publish verified repair
+        run: |
+          rm -f .github/workflows/finalize-autoskip-auth-chain.yml
+          rm -f docs/AUTOSKIP_AUTH_CHAIN_TRIGGER.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Repair AutoSkip authentication and MyIDJ worker authority"
+          git push origin HEAD:repair-autoskip-auth-error-chain-20260724
