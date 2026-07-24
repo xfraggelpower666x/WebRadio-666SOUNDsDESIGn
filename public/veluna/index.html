@@ -94,8 +94,8 @@
   </main>
   <script src="/js/boost-core.js?v=2026-07-22-central-audio-v202"></script>
   <script src="/js/audio-start-core.js?v=2026-07-12-v1217"></script>
-  <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220"></script>
-  <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1"></script>
+  <script src="/js/admin-auth-client.js?v=2026-07-24-autoskip-auth-v1222"></script>
+  <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2"></script>
   <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-22-single-writer-v54"></script>
   <script>
   (()=>{
@@ -220,7 +220,7 @@
         if(!window.S666SkipControl||typeof window.S666SkipControl.skip!=='function')throw new Error('skip_controller_missing');
         const result=await window.S666SkipControl.skip({
           source:'veluna-lyvra-v1211',
-          prompt:'Admin-Passwort für VELUNA Auto-DJ Skip eingeben:'
+          prompt:'Player-Admin-Passwort für VELUNA Auto-DJ Skip eingeben (nicht Shoutcast-Login):'
         });
         if(!result||result.ok!==true)throw new Error(result?.error||'skip_failed');
         setAction('SKIP OK: zentraler Controller bestätigt','is-ok',skipBtn);

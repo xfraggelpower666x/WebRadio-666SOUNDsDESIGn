@@ -241,8 +241,8 @@ const HTML = `<!DOCTYPE html>
 
   <script type="module" src="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"></script>
   <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
-  <script src="/js/admin-auth-client.js?v=2026-07-19-auth-errors-v1220"></script>
-  <script src="/js/skip-control.js?v=2026-07-19-action-parity-v1"></script>
+  <script src="/js/admin-auth-client.js?v=2026-07-24-autoskip-auth-v1222"></script>
+  <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2"></script>
   <script src="/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121"></script>
   <script src="/js/messenger-overlay.js?v=2026-07-19-overlay-status-v2"></script>
   <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52"></script>
@@ -280,7 +280,7 @@ const HTML = `<!DOCTYPE html>
         if (!window.S666SkipControl || typeof window.S666SkipControl.skip !== 'function') throw new Error('skip_controller_missing');
         var result = await window.S666SkipControl.skip({
           source: 'internal-player',
-          prompt: 'Admin-Passwort für Internal Auto-DJ Skip eingeben:'
+          prompt: 'Player-Admin-Passwort für Internal Auto-DJ Skip eingeben (nicht Shoutcast-Login):'
         });
         if (!result || result.ok !== true) throw new Error(result && result.error ? result.error : 'skip_failed');
         setAction('SKIP OK: zentraler Controller bestätigt', 'ok', skipButton);

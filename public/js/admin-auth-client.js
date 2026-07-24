@@ -1,6 +1,6 @@
 /*
  * 666SOUNDsDESIGn shared admin authentication client.
- * HARDLOCK v1.2.6: one token store, one same-origin Bearer contract,
+ * HARDLOCK v1.2.22: one token store, one same-origin Bearer contract,
  * one interactive login path for Admin, Discord and Auto-DJ Skip.
  */
 (function () {
@@ -69,8 +69,8 @@
   function errorMessage(code) {
     var messages = {
       password_missing: 'Admin-Passwort fehlt.',
-      password_rejected: 'Das eingegebene Admin-Passwort stimmt nicht mit dem aktuell im Passwort-Worker gespeicherten Wert überein.',
-      login_rejected: 'Der Passwort-Worker hat die Anmeldung abgelehnt. Worker-Version und Secrets prüfen.',
+      password_rejected: 'Das Player-Admin-Passwort wurde vom Passwort-Worker ausdrücklich abgelehnt. Der Shoutcast-Benutzername wird hier nicht geprüft.',
+      login_rejected: 'Der Passwort-Worker hat die Anmeldung abgelehnt. Das ist kein bestätigter Passwortfehler; Worker-Route und Service-Token prüfen.',
       login_failed: 'Die Anmeldung konnte nicht abgeschlossen werden.',
       auth_unreachable: 'Die Auth-Prüfung ist nicht erreichbar.',
       origin_rejected: 'Die Anmeldequelle wurde abgelehnt.',
@@ -90,6 +90,7 @@
       verification_unreachable: 'Auth-Worker ist nicht erreichbar.',
       pw_login_timeout: 'Passwort-Worker antwortet nicht rechtzeitig.',
       pw_login_unreachable: 'Passwort-Worker ist nicht erreichbar.',
+      pw_login_protocol_error: 'Die Passwort-Worker-Route lieferte keine gültige Login-Antwort. Wahrscheinlich falsche Route, alter Deploy-Stand oder HTML/Proxy-Fehler.',
       auth_token_missing: 'Keine aktive Admin-Sitzung.',
       cross_origin_authorized_fetch_rejected: 'Geschützte Anfrage an fremde Domain blockiert.',
       session_storage_unavailable: 'Die Admin-Sitzung kann in diesem Browser nicht gespeichert werden.',
@@ -127,8 +128,8 @@
     overlay = document.createElement('div');
     overlay.id = 's666AdminAuthOverlay';
     overlay.innerHTML = '<form class="s666-auth-box" id="s666AdminAuthForm" autocomplete="on">' +
-      '<div class="s666-auth-title">ADMIN AUTH</div>' +
-      '<div class="s666-auth-message" id="s666AdminAuthMessage">Admin-Passwort eingeben.</div>' +
+      '<div class="s666-auth-title">PLAYER ADMIN AUTH</div>' +
+      '<div class="s666-auth-message" id="s666AdminAuthMessage">Player-Admin-Passwort eingeben. Shoutcast-Benutzername und Stream-Passwort bleiben im Worker.</div>' +
       '<input id="s666AdminAuthPassword" name="password" type="password" autocomplete="current-password" inputmode="text" enterkeyhint="go" placeholder="Admin-Passwort" />' +
       '<div class="s666-auth-actions"><button type="button" id="s666AdminAuthCancel">CANCEL</button><button type="submit" class="s666-auth-submit" id="s666AdminAuthSubmit">LOGIN & CONTINUE</button></div>' +
       '<div class="s666-auth-state" id="s666AdminAuthState">Bereit</div>' +
@@ -171,7 +172,7 @@
       function onCancel() { finish(reject, new Error('login_cancelled')); }
       function onOverlay(ev) { if (ev.target === overlay) onCancel(); }
       function onKey(ev) { if (ev.key === 'Escape') onCancel(); }
-      msg.textContent = message || 'Admin-Passwort eingeben.';
+      msg.textContent = message || 'Player-Admin-Passwort eingeben (nicht Shoutcast-Login).';
       state.textContent = 'Bereit';
       input.value = '';
       form.addEventListener('submit', onSubmit);
@@ -294,7 +295,7 @@
   }
 
   window.S666AdminAuth = {
-    version: '1.2.20-exact-auth-errors',
+    version: '1.2.22-autoskip-auth-chain',
     tokenKey: TOKEN_KEY,
     getToken: getToken,
     setToken: setToken,
