@@ -1,4 +1,4 @@
-// PC high-frequency response regression contract v1.0.0.
+// PC high-frequency response regression contract v1.0.1.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
