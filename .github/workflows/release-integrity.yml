@@ -64,13 +64,32 @@ jobs:
           lines = source[start:end].splitlines()
           code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
           exec(compile(code, 'autoskip-auth-chain.py', 'exec'), {'__name__':'__main__'})
-      - run: |
-          node --check js/admin-auth-client.js
-          node --check js/skip-control.js
-          node --check worker-addons/skip-api-addon.js
-          node --check worker-addons/radio-admin-config-addon.js
-      - run: node --test tests/admin-hardlock.test.mjs tests/autoskip-auth-chain.test.mjs tests/hardlock-source.test.mjs tests/frontend-contracts.test.mjs
-      - run: npm run verify
+      - name: Release structure diagnostic
+        id: check
+        continue-on-error: true
+        run: npm run check > release-check.log 2>&1
+      - name: Per-file Node test diagnostic
+        id: tests
+        continue-on-error: true
+        run: |
+          : > failed-tests.txt
+          for file in tests/*.test.mjs; do
+            echo "===== $file =====" >> all-tests.log
+            node --test "$file" >> all-tests.log 2>&1 || echo "$file" >> failed-tests.txt
+          done
+          test ! -s failed-tests.txt
+      - name: Upload PR52 diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr52-autoskip-diagnostics
+          path: |
+            release-check.log
+            failed-tests.txt
+            all-tests.log
+          if-no-files-found: error
+      - name: Stop on diagnostic failure
+        if: steps.check.outcome == 'failure' || steps.tests.outcome == 'failure'
+        run: exit 1
       - name: Publish verified repair
         run: |
           rm -f .github/workflows/finalize-autoskip-auth-chain.yml
