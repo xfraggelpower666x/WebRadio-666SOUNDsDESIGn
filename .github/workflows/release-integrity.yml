@@ -64,32 +64,37 @@ jobs:
           lines = source[start:end].splitlines()
           code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
           exec(compile(code, 'autoskip-auth-chain.py', 'exec'), {'__name__':'__main__'})
-      - name: Release structure diagnostic
-        id: check
-        continue-on-error: true
-        run: npm run check > release-check.log 2>&1
-      - name: Per-file Node test diagnostic
-        id: tests
-        continue-on-error: true
+      - name: Normalize final cache markers and legacy worker contract
+        shell: python
         run: |
-          : > failed-tests.txt
-          for file in tests/*.test.mjs; do
-            echo "===== $file =====" >> all-tests.log
-            node --test "$file" >> all-tests.log 2>&1 || echo "$file" >> failed-tests.txt
-          done
-          test ! -s failed-tests.txt
-      - name: Upload PR52 diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr52-autoskip-diagnostics
-          path: |
-            release-check.log
-            failed-tests.txt
-            all-tests.log
-          if-no-files-found: error
-      - name: Stop on diagnostic failure
-        if: steps.check.outcome == 'failure' || steps.tests.outcome == 'failure'
-        run: exit 1
+          from pathlib import Path
+          import re
+          cache_files = [
+            'index.html','public/index.html','VELUNA/index.html','public/VELUNA/index.html',
+            'veluna/index.html','public/veluna/index.html','worker.js',
+            'workers/webradio-666soundsdesign-worker/worker.js'
+          ]
+          for name in cache_files:
+              path = Path(name)
+              text = path.read_text(encoding='utf-8')
+              text = re.sub(r'admin-auth-client\.js\?v=[^"\'<>\s]+', 'admin-auth-client.js?v=2026-07-24-autoskip-auth-v1222', text)
+              text = re.sub(r'skip-control\.js\?v=[^"\'<>\s]+', 'skip-control.js?v=2026-07-24-autoskip-authority-v2', text)
+              text = text.replace('Admin-Passwort für Internal Auto-DJ Skip eingeben:', 'Player-Admin-Passwort für Internal Auto-DJ Skip eingeben (nicht Shoutcast-Login):')
+              text = text.replace('Admin-Passwort für Auto-DJ Skip eingeben:', 'Player-Admin-Passwort für Auto-DJ Skip eingeben (nicht Shoutcast-Login):')
+              path.write_text(text, encoding='utf-8')
+          test = Path('tests/worker-smoke.test.mjs')
+          text = test.read_text(encoding='utf-8')
+          text = text.replace('skip-control\\.js\\?v=2026-07-19-action-parity-v1', 'skip-control\\.js\\?v=2026-07-24-autoskip-authority-v2')
+          test.write_text(text, encoding='utf-8')
+      - name: Syntax and targeted contracts
+        run: |
+          node --check js/admin-auth-client.js
+          node --check js/skip-control.js
+          node --check worker-addons/skip-api-addon.js
+          node --check worker-addons/radio-admin-config-addon.js
+          node --test tests/admin-hardlock.test.mjs tests/autoskip-auth-chain.test.mjs tests/hardlock-source.test.mjs tests/frontend-contracts.test.mjs tests/worker-smoke.test.mjs
+      - name: Full repository verification
+        run: npm run verify
       - name: Publish verified repair
         run: |
           rm -f .github/workflows/finalize-autoskip-auth-chain.yml
