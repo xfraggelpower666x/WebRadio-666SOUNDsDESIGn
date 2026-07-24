@@ -1,4 +1,4 @@
-// AutoSkip authority and authentication-chain regression contract v1.0.0.
+// AutoSkip authority and authentication-chain regression contract v1.0.1.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { handleRadioAdminConfigAddon } from "../worker-addons/radio-admin-config-addon.js";
