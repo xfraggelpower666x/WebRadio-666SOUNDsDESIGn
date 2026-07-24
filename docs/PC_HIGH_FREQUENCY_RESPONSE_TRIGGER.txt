@@ -1,1 +1,1 @@
-Temporary trigger for the verified PR #50 high-frequency response repair. Removed before merge.
+Temporary trigger for the Release-Integrity-backed PR #50 finalizer. Removed before merge.
