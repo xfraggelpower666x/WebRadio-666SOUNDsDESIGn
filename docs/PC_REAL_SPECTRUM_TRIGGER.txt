@@ -1,1 +1,1 @@
-Temporary trigger for the PR #49 real-spectrum verification workflow. Remove before merge.
+Temporary trigger for the PR #49 real-spectrum verification workflow. Execute now and remove before merge.
