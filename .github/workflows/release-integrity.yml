@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -35,45 +35,3 @@ jobs:
           if failures:
               raise SystemExit("\n".join(failures))
           print("Python files valid")
-
-  finalize-pr51:
-    if: github.event_name == 'pull_request' && github.event.pull_request.number == 51 && github.event.pull_request.head.ref == 'repair-pc-eq-balanced-headroom-20260724'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: repair-pc-eq-balanced-headroom-20260724
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: npm ci
-      - name: Execute stored balanced-headroom repair
-        shell: python
-        run: |
-          from pathlib import Path
-          source = Path('.github/workflows/finalize-pc-eq-balanced-headroom.yml').read_text(encoding='utf-8')
-          start_marker = '      - name: Apply balanced visual headroom repair\n        shell: python\n        run: |\n'
-          end_marker = '      - name: JavaScript syntax\n'
-          start = source.index(start_marker) + len(start_marker)
-          end = source.index(end_marker, start)
-          lines = source[start:end].splitlines()
-          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
-          exec(compile(code, 'pc-eq-balanced-headroom.py', 'exec'), {'__name__':'__main__'})
-      - run: node --check js/equalizer.js
-      - run: node --check js/player-core.js
-      - run: node --test tests/pc-eq-balanced-headroom.test.mjs tests/pc-high-frequency-response.test.mjs tests/pc-real-spectrum-layout.test.mjs tests/frontend-contracts.test.mjs
-      - run: npm run verify
-      - name: Publish verified repair
-        run: |
-          rm -f .github/workflows/finalize-pc-eq-balanced-headroom.yml
-          rm -f docs/PC_EQ_BALANCED_HEADROOM_TRIGGER.txt
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -A
-          git commit -m "Balance PC equalizer visual headroom"
-          git push origin HEAD:repair-pc-eq-balanced-headroom-20260724
