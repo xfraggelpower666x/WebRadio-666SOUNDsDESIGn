@@ -1,7 +1,7 @@
 /*
- * 666SOUNDsDESIGn canonical audio visualizer authority V13.
+ * 666SOUNDsDESIGn canonical audio visualizer authority V14.
  * One WebAudio graph and one RAF writer for EQ, side meters and bottom meter.
- * Twenty-four independent logarithmic real-frequency bands with perceptual high-frequency compensation.
+ * Twenty-four independent logarithmic real-frequency bands with balanced perceptual compensation and peak headroom.
  */
 
 const BOOST_MULTIPLIERS = (window.SMFPBoostCore && window.SMFPBoostCore.stages)
@@ -260,6 +260,8 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       hybrid: false,
       frequencyScale: 'logarithmic',
       highFrequencyCompensation: true,
+      visualHeadroom: 'balanced',
+      visualCeiling: 'peak-dependent',
       left: meterState.left,
       right: meterState.right,
       pulse: meterState.pulse,
@@ -417,7 +419,7 @@ count += 1;
 
       const signalPresent = globalMax >= 3 || rms > 0.004;
       if (bandEnvelope.length !== bandCount) bandEnvelope = new Array(bandCount).fill(0.012);
-      if (bandReference.length !== bandCount) bandReference = new Array(bandCount).fill(18);
+      if (bandReference.length !== bandCount) bandReference = new Array(bandCount).fill(24);
 
       const values = rawBands.map((value, index) => {
         const before = rawBands[Math.max(0, index - 1)] ?? value;
@@ -425,23 +427,27 @@ count += 1;
         const local = value * 0.86 + before * 0.07 + after * 0.07;
         const position = index / Math.max(1, bandCount - 1);
         const absolute = clamp(local / 255, 0, 1);
-        const localGate = clamp((local - 2) / 14, 0, 1);
-        const currentReference = bandReference[index] || 18;
-        const desiredReference = Math.max(8, local);
+        const localGate = clamp((local - 6) / 26, 0, 1);
+        const currentReference = bandReference[index] || 24;
+        const desiredReference = Math.max(14, local);
         bandReference[index] = desiredReference > currentReference
-? currentReference + (desiredReference - currentReference) * 0.08
-: Math.max(8, currentReference * 0.9985);
-        const relative = clamp(local / Math.max(8, bandReference[index]), 0, 1);
-        const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;
-        const spectral = Math.pow(absolute, 0.52) * visualTilt;
-        const spectralResponse = spectral * (0.35 + localGate * 0.65);
-        const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;
+? currentReference + (desiredReference - currentReference) * 0.025
+: Math.max(14, currentReference * 0.9994);
+        const relative = clamp(local / Math.max(14, bandReference[index]), 0, 1);
+        const visualTilt = 1 + Math.pow(position, 1.24) * 0.34;
+        const spectral = Math.pow(absolute, 0.74) * visualTilt;
+        const spectralResponse = spectral * (0.20 + localGate * 0.80);
+        const adaptiveResponse = Math.pow(relative, 0.82) * 0.065 * localGate;
+        const transient = clamp((localPeak - average) / 255, 0, 1);
+        const transientResponse = Math.pow(transient, 0.72) * 0.14 * localGate;
+        const energy = spectralResponse * 0.68 + adaptiveResponse + transientResponse;
+        const peakHeadroom = 0.78 + clamp(localPeak / 255, 0, 1) * 0.22;
         const target = signalPresent && localGate > 0
-? clamp(spectralResponse * 0.92 + adaptiveResponse, 0.012, 1)
+? clamp(energy, 0.012, peakHeadroom)
 : 0.012;
         const previous = bandEnvelope[index] || 0.012;
-        const attack = 0.76 + position * 0.12;
-        const release = 0.15 + position * 0.03;
+        const attack = 0.62 + position * 0.08;
+        const release = 0.13 + position * 0.02;
         bandEnvelope[index] = previous + (target - previous) * (target > previous ? attack : release);
         return bandEnvelope[index];
       });
