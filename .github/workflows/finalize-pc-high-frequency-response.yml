@@ -1,0 +1,248 @@
+name: Finalize PC High Frequency Response
+
+on:
+  push:
+    branches:
+      - repair-pc-high-frequency-response-20260724
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair-pc-high-frequency-response-20260724
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Apply logarithmic frequency response repair
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, content):
+              Path(path).write_text(content, encoding='utf-8')
+
+          def replace_once(content, old, new, label):
+              count = content.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, got {count}')
+              return content.replace(old, new, 1)
+
+          eq = read('js/equalizer.js')
+          eq = replace_once(eq, 'canonical audio visualizer authority V12', 'canonical audio visualizer authority V13', 'visualizer version')
+          eq = replace_once(
+              eq,
+              'Twenty-four independent real-frequency bands, balanced meters and transform-only rendering.',
+              'Twenty-four independent logarithmic real-frequency bands with perceptual high-frequency compensation.',
+              'visualizer description'
+          )
+          eq = replace_once(eq, '  let bandEnvelope = [];\n', '  let bandEnvelope = [];\n  let bandReference = [];\n', 'band reference state')
+          eq = replace_once(eq, 'analyser.fftSize = mobileLike() ? 128 : 512;', 'analyser.fftSize = mobileLike() ? 128 : 1024;', 'desktop fft')
+          eq = replace_once(eq, 'analyser.smoothingTimeConstant = mobileLike() ? 0.80 : 0.56;', 'analyser.smoothingTimeConstant = mobileLike() ? 0.78 : 0.48;', 'analyser smoothing')
+          eq = replace_once(
+              eq,
+              "      hybrid: sourceType === 'hybrid',\n",
+              "      hybrid: false,\n      frequencyScale: 'logarithmic',\n      highFrequencyCompensation: true,\n",
+              'meterbus diagnostics'
+          )
+
+          spectrum_pattern = re.compile(
+              r"      const bandCount = Math\.max\(1, bars\.length\);[\s\S]*?  publish\(level, peak, 'real', eq, meters, \{ low, mid, high \}\);"
+          )
+          spectrum_block = """      const bandCount = Math.max(1, bars.length);
+      const nyquist = Math.max(1, ctx.sampleRate / 2);
+      const minFrequency = mobileLike() ? 70 : 45;
+      const maxFrequency = Math.min(mobileLike() ? 15000 : 17000, nyquist * 0.92);
+      const frequencyRatio = Math.max(1.01, maxFrequency / minFrequency);
+      const rawBands = [];
+      let globalMax = 0;
+
+      for (let index = 0; index < bandCount; index += 1) {
+        const startFrequency = minFrequency * Math.pow(frequencyRatio, index / bandCount);
+        const endFrequency = minFrequency * Math.pow(frequencyRatio, (index + 1) / bandCount);
+        const start = Math.floor(clamp((startFrequency / nyquist) * data.length, 0, data.length - 1));
+        const end = Math.max(start + 1, Math.min(data.length, Math.ceil((endFrequency / nyquist) * data.length)));
+        let total = 0;
+        let count = 0;
+        let localPeak = 0;
+        for (let bin = start; bin < end; bin += 1) {
+          const sample = data[bin] || 0;
+          total += sample;
+          localPeak = Math.max(localPeak, sample);
+          count += 1;
+        }
+        const average = count ? total / count : 0;
+        const local = average * 0.72 + localPeak * 0.28;
+        globalMax = Math.max(globalMax, localPeak, local);
+        rawBands.push(local);
+      }
+
+      const signalPresent = globalMax >= 3 || rms > 0.004;
+      if (bandEnvelope.length !== bandCount) bandEnvelope = new Array(bandCount).fill(0.012);
+      if (bandReference.length !== bandCount) bandReference = new Array(bandCount).fill(18);
+
+      const values = rawBands.map((value, index) => {
+        const before = rawBands[Math.max(0, index - 1)] ?? value;
+        const after = rawBands[Math.min(rawBands.length - 1, index + 1)] ?? value;
+        const local = value * 0.86 + before * 0.07 + after * 0.07;
+        const position = index / Math.max(1, bandCount - 1);
+        const absolute = clamp(local / 255, 0, 1);
+        const localGate = clamp((local - 2) / 14, 0, 1);
+        const currentReference = bandReference[index] || 18;
+        const desiredReference = Math.max(8, local);
+        bandReference[index] = desiredReference > currentReference
+          ? currentReference + (desiredReference - currentReference) * 0.08
+          : Math.max(8, currentReference * 0.9985);
+        const relative = clamp(local / Math.max(8, bandReference[index]), 0, 1);
+        const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;
+        const spectral = Math.pow(absolute, 0.52) * visualTilt;
+        const spectralResponse = spectral * (0.35 + localGate * 0.65);
+        const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;
+        const target = signalPresent && localGate > 0
+          ? clamp(spectralResponse * 0.92 + adaptiveResponse, 0.012, 1)
+          : 0.012;
+        const previous = bandEnvelope[index] || 0.012;
+        const attack = 0.76 + position * 0.12;
+        const release = 0.15 + position * 0.03;
+        bandEnvelope[index] = previous + (target - previous) * (target > previous ? attack : release);
+        return bandEnvelope[index];
+      });
+
+      const eq = [];
+      bars.forEach((bar, index) => {
+        const value = values[index] || 0.012;
+        setBar(bar, value);
+        eq.push(value);
+      });
+
+      const level = clamp(rms * 2.40, 0, 1);
+      const peak = clamp(Math.max(samplePeak * 1.08, level), 0, 1);
+      const sliceAverage = (start, end, fallback) => {
+        const slice = values.slice(start, end);
+        return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : fallback;
+      };
+      const low = sliceAverage(0, Math.max(1, Math.ceil(values.length * 0.34)), level);
+      const mid = sliceAverage(Math.floor(values.length * 0.25), Math.max(2, Math.ceil(values.length * 0.72)), level);
+      const high = sliceAverage(Math.floor(values.length * 0.62), values.length, level);
+      const meters = setMeters(level, peak, low, mid, high);
+      publish(level, peak, 'real', eq, meters, { low, mid, high });"""
+          eq, count = spectrum_pattern.subn(spectrum_block, eq, count=1)
+          if count != 1:
+              raise SystemExit(f'real spectrum block: expected 1 match, got {count}')
+
+          write('js/equalizer.js', eq)
+          write('public/js/equalizer.js', eq)
+
+          for path in ('js/player-core.js', 'public/js/player-core.js'):
+              content = read(path)
+              content = replace_once(
+                  content,
+                  'equalizer.js?v=2026-07-23-real-spectrum-v12',
+                  'equalizer.js?v=2026-07-24-high-response-v13',
+                  f'{path} equalizer cache'
+              )
+              write(path, content)
+
+          for path in ('index.html', 'public/index.html'):
+              content = read(path)
+              count = content.count('2026-07-23-real-spectrum-v12')
+              if count < 1:
+                  raise SystemExit(f'{path} cache markers missing')
+              content = content.replace('2026-07-23-real-spectrum-v12', '2026-07-24-high-response-v13')
+              write(path, content)
+
+          frontend_path = Path('tests/frontend-contracts.test.mjs')
+          frontend = frontend_path.read_text(encoding='utf-8')
+          frontend = replace_once(frontend, 'authority V12', 'authority V13', 'frontend visualizer version')
+          frontend = replace_once(frontend, r'128 : 512', r'128 : 1024', 'frontend fft contract')
+          frontend = replace_once(frontend, r'const signalPresent = globalMax >= 4', r'const signalPresent = globalMax >= 3', 'frontend signal contract')
+          frontend_path.write_text(frontend, encoding='utf-8')
+
+          real_path = Path('tests/pc-real-spectrum-layout.test.mjs')
+          real = real_path.read_text(encoding='utf-8')
+          real = replace_once(real, 'authority V12', 'authority V13', 'real spectrum version')
+          real = replace_once(real, '2026-07-23-real-spectrum-v12', '2026-07-24-high-response-v13', 'real spectrum cache')
+          real_path.write_text(real, encoding='utf-8')
+
+          Path('tests/pc-high-frequency-response.test.mjs').write_text("""// PC high-frequency response regression contract v1.0.0.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+
+test('PC spectrum maps all bars logarithmically through the audible range', async () => {
+  const eq = await read('js/equalizer.js');
+  assert.equal(await read('public/js/equalizer.js'), eq);
+  assert.match(eq, /canonical audio visualizer authority V13/);
+  assert.match(eq, /analyser\.fftSize = mobileLike\(\) \? 128 : 1024/);
+  assert.match(eq, /const minFrequency = mobileLike\(\) \? 70 : 45/);
+  assert.match(eq, /const maxFrequency = Math\.min\(mobileLike\(\) \? 15000 : 17000/);
+  assert.match(eq, /Math\.pow\(frequencyRatio, index \/ bandCount\)/);
+  assert.match(eq, /Math\.pow\(frequencyRatio, \(index \+ 1\) \/ bandCount\)/);
+  assert.doesNotMatch(eq, /analysisWindow|normalizedStart|normalizedEnd/);
+});
+
+test('right-side bands use real perceptual compensation without synthetic motion', async () => {
+  const eq = await read('js/equalizer.js');
+  assert.match(eq, /let bandReference = \[\]/);
+  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
+  assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
+  assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.70\) \* 0\.22 \* localGate/);
+  assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
+  assert.match(eq, /frequencyScale: 'logarithmic'/);
+  assert.match(eq, /highFrequencyCompensation: true/);
+  assert.doesNotMatch(eq, /Math\.sin|useHybrid|fallbackValue|const mirrored/);
+});
+
+test('cache markers deliver the compensated analyzer', async () => {
+  const html = await read('index.html');
+  const core = await read('js/player-core.js');
+  assert.equal(await read('public/index.html'), html);
+  assert.equal(await read('public/js/player-core.js'), core);
+  assert.match(html, /2026-07-24-high-response-v13/);
+  assert.match(core, /equalizer\.js\?v=2026-07-24-high-response-v13/);
+});
+""", encoding='utf-8')
+      - name: JavaScript syntax
+        run: |
+          node --check js/equalizer.js
+          node --check js/player-core.js
+      - name: High-frequency response contract
+        run: node --test tests/pc-high-frequency-response.test.mjs tests/pc-real-spectrum-layout.test.mjs tests/frontend-contracts.test.mjs
+      - name: Full repository verification
+        run: npm run verify
+      - name: Python syntax audit
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          for path in Path('.').rglob('*.py'):
+              if any(part in {'.git','node_modules','.venv','venv'} for part in path.parts):
+                  continue
+              ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+          print('Python syntax PASS')
+          PY
+      - name: Publish verified repair
+        run: |
+          rm -f .github/workflows/finalize-pc-high-frequency-response.yml
+          rm -f docs/PC_HIGH_FREQUENCY_RESPONSE_TRIGGER.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Repair PC high-frequency visual response"
+          git push origin HEAD:repair-pc-high-frequency-response-20260724
