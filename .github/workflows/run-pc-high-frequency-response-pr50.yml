@@ -2,7 +2,7 @@ name: Run PR50 PC High Frequency Response
 
 on:
   pull_request_target:
-    types: [synchronize]
+    types: [synchronize, edited, reopened]
     branches:
       - WebRadio-666SOUNDsDESIGn
 
