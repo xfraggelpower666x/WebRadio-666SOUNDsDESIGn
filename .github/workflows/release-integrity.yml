@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -35,49 +35,3 @@ jobs:
           if failures:
               raise SystemExit("\n".join(failures))
           print("Python files valid")
-
-  finalize-pr50:
-    if: github.event_name == 'pull_request' && github.event.pull_request.number == 50 && github.event.pull_request.head.ref == 'repair-pc-high-frequency-response-20260724'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: repair-pc-high-frequency-response-20260724
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: npm ci
-      - name: Execute stored high-frequency repair
-        shell: python
-        run: |
-          from pathlib import Path
-          source = Path('.github/workflows/finalize-pc-high-frequency-response.yml').read_text(encoding='utf-8')
-          start_marker = '      - name: Apply logarithmic frequency response repair\n        shell: python\n        run: |\n'
-          end_marker = '      - name: JavaScript syntax\n'
-          start = source.index(start_marker) + len(start_marker)
-          end = source.index(end_marker, start)
-          lines = source[start:end].splitlines()
-          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines)
-          code = code.replace(
-              "real = replace_once(real, '2026-07-23-real-spectrum-v12', '2026-07-24-high-response-v13', 'real spectrum cache')",
-              "if real.count('2026-07-23-real-spectrum-v12') < 1:\n    raise SystemExit('real spectrum cache marker missing')\nreal = real.replace('2026-07-23-real-spectrum-v12', '2026-07-24-high-response-v13')"
-          )
-          exec(compile(code, 'pc-high-frequency-response.py', 'exec'), {'__name__':'__main__'})
-      - run: node --check js/equalizer.js
-      - run: node --check js/player-core.js
-      - run: node --test tests/pc-high-frequency-response.test.mjs tests/pc-real-spectrum-layout.test.mjs tests/frontend-contracts.test.mjs
-      - run: npm run verify
-      - name: Publish verified repair
-        run: |
-          rm -f .github/workflows/finalize-pc-high-frequency-response.yml
-          rm -f docs/PC_HIGH_FREQUENCY_RESPONSE_TRIGGER.txt
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -A
-          git commit -m "Repair PC high-frequency visual response"
-          git push origin HEAD:repair-pc-high-frequency-response-20260724
