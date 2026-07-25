@@ -1,0 +1,56 @@
+name: One-shot Player Admin chain metadata audit
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - .github/workflows/ops-audit-player-admin-chain-20260725.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit-player-admin-chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read secret metadata without values
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+          main_json="$(npx --yes wrangler@4.111.0 secret list --name webradio-666soundsdesign-worker --format json)"
+          pw_json="$(npx --yes wrangler@4.111.0 secret list --name 666-system-pw-worker --format json)"
+          auth_json="$(npx --yes wrangler@4.111.0 secret list --name 666-system-auth-worker --format json)"
+
+          present() {
+            local payload="$1"
+            local secret_name="$2"
+            if jq -e --arg name "$secret_name" 'any(.[]; .name == $name and .type == "secret_text")' <<< "$payload" >/dev/null; then
+              printf 'true'
+            else
+              printf 'false'
+            fi
+          }
+
+          echo "MAIN_ADMIN_SERVICE_TOKEN=$(present "$main_json" ADMIN_SERVICE_TOKEN)"
+          echo "MAIN_MYIDJ_WORKER_ADMIN_TOKEN=$(present "$main_json" MYIDJ_WORKER_ADMIN_TOKEN)"
+          echo "PW_ADMIN_PASSWORD=$(present "$pw_json" ADMIN_PASSWORD)"
+          echo "PW_AUTH_SECRET=$(present "$pw_json" AUTH_SECRET)"
+          echo "PW_ADMIN_SERVICE_TOKEN=$(present "$pw_json" ADMIN_SERVICE_TOKEN)"
+          echo "AUTH_AUTH_SECRET=$(present "$auth_json" AUTH_SECRET)"
+          echo "AUTH_ADMIN_SERVICE_TOKEN=$(present "$auth_json" ADMIN_SERVICE_TOKEN)"
+
+          npx --yes wrangler@4.111.0 deployments status --name webradio-666soundsdesign-worker --json >/dev/null
+          npx --yes wrangler@4.111.0 deployments status --name 666-system-pw-worker --json >/dev/null
+          npx --yes wrangler@4.111.0 deployments status --name 666-system-auth-worker --json >/dev/null
+          echo "ACTIVE_DEPLOYMENTS=READABLE"
+          echo "NO_SECRET_VALUES_READ_OR_PRINTED=true"
