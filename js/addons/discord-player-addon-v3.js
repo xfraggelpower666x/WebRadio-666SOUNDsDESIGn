@@ -2,18 +2,24 @@
  * 666SOUNDsDESIGn Discord Shooter + Veluna Messenger + shared visual bridge.
  * Discord webhook URLs stay server-side in Worker secrets. No Discord password gate.
  * Veluna messenger uses the authoritative /api/player-alert/* backend.
- * Shared status bridge applies transport/source color state only; player layout and artwork stay central.
+ * Repair v4.14: restore one startup Now Playing post and stop reporting skipped/dedupe as sent.
  */
 (function () {
   'use strict';
+  if (window.S666DiscordPlayerAddonV3 && window.S666DiscordPlayerAddonV3.version) return;
 
-  var VERSION = 'V4.13-20260722-NOW-PLAYING-SINGLE-WRITER';
+  var VERSION = 'V4.14-20260725-DISCORD-START-AUTOPOST-REPAIR';
   var inFlight = false;
   var watcherTimer = 0;
   var visualTimer = 0;
+  var startupTimer = 0;
   var lastTrackKey = '';
   var lastPostedKey = '';
+  var startupAutoPostDone = false;
+  var startupAutoPostStartedAt = 0;
   var MSG_MAX = 240;
+  var STARTUP_RETRY_MS = 1500;
+  var STARTUP_MAX_WAIT_MS = 24000;
 
   function clean(value, max) {
     return String(value == null ? '' : value)
@@ -72,6 +78,81 @@
     try { window.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (_) {}
   }
 
+  function hasOwn(obj, key) {
+    return Object.prototype.hasOwnProperty.call(Object(obj || {}), key);
+  }
+
+  function deliveryArray(data) {
+    if (!data || typeof data !== 'object') return [];
+    var candidates = [data.results, data.deliveries, data.deliveryResults, data.webhooks, data.targets, data.discordResults];
+    if (data.discord && typeof data.discord === 'object') {
+      candidates.push(data.discord.results, data.discord.deliveries, data.discord.webhooks, data.discord.targets);
+    }
+    for (var i = 0; i < candidates.length; i += 1) {
+      if (Array.isArray(candidates[i])) return candidates[i];
+    }
+    return [];
+  }
+
+  function deliveryOk(entry) {
+    if (!entry || typeof entry !== 'object') return false;
+    if (entry.ok === true || entry.success === true || entry.sent === true || entry.delivered === true) return true;
+    var status = Number(entry.status || entry.statusCode || entry.httpStatus || 0);
+    return status === 200 || status === 204;
+  }
+
+  function deliveryStatus(entry) {
+    if (!entry || typeof entry !== 'object') return '';
+    return clean(entry.status || entry.statusCode || entry.httpStatus || entry.error || entry.message || '', 80);
+  }
+
+  function deliverySummary(data, fallback) {
+    var summary = {
+      sent: false,
+      skipped: false,
+      mode: 'unknown',
+      text: fallback || 'Discord-Antwort empfangen'
+    };
+    if (!data || typeof data !== 'object') return summary;
+
+    if (data.skipped === true || data.deduped === true || data.duplicate === true || data.unchanged === true || data.reason === 'unchanged') {
+      summary.skipped = true;
+      summary.mode = clean(data.reason || data.error || data.message || 'unchanged', 80);
+      summary.text = '⚠ Nicht neu gesendet: ' + summary.mode;
+      return summary;
+    }
+
+    var deliveries = deliveryArray(data);
+    if (deliveries.length) {
+      var okCount = 0;
+      var failed = [];
+      for (var i = 0; i < deliveries.length; i += 1) {
+        if (deliveryOk(deliveries[i])) okCount += 1;
+        else failed.push(String(i + 1) + ':' + (deliveryStatus(deliveries[i]) || 'failed'));
+      }
+      summary.sent = okCount > 0;
+      summary.mode = okCount + '/' + deliveries.length;
+      summary.text = okCount === deliveries.length
+        ? '✓ Discord angenommen: ' + okCount + '/' + deliveries.length
+        : (okCount > 0 ? '⚠ Discord Teil-Erfolg: ' + okCount + '/' + deliveries.length + ' · ' + failed.join(', ') : '✗ Discord nicht angenommen: ' + failed.join(', '));
+      return summary;
+    }
+
+    if (hasOwn(data, 'accepted') || hasOwn(data, 'sent') || hasOwn(data, 'delivered')) {
+      summary.sent = data.accepted === true || data.sent === true || data.delivered === true;
+      summary.mode = summary.sent ? 'accepted' : 'not_accepted';
+      summary.text = summary.sent ? '✓ Discord angenommen' : '⚠ Discord nicht bestätigt';
+      return summary;
+    }
+
+    if (data.ok === true) {
+      summary.sent = true;
+      summary.mode = 'ok';
+      summary.text = fallback || '✓ Discord angenommen';
+    }
+    return summary;
+  }
+
   async function postJson(path, payload) {
     if (inFlight) throw new Error('discord_request_in_flight');
     inFlight = true;
@@ -85,8 +166,9 @@
         body: JSON.stringify(payload || {})
       });
       var data = await response.json().catch(function () { return {}; });
+      data.__httpStatus = response.status;
       if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
-      dispatch('s666:discord-state', { phase: 'success', path: path, data: data });
+      dispatch('s666:discord-state', { phase: 'success', path: path, data: data, summary: deliverySummary(data) });
       return data;
     } catch (error) {
       dispatch('s666:discord-state', { phase: 'error', path: path, error: error && error.message ? error.message : String(error) });
@@ -100,7 +182,24 @@
     if (document.getElementById('s666DiscordShooterStyle')) return;
     var style = document.createElement('style');
     style.id = 's666DiscordShooterStyle';
-    style.textContent = '.s666-discord-gate.s666-discord-gate--hidden{display:none!important}.s666-discord-gate{position:fixed!important;inset:0!important;z-index:2147483646!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}.s666-discord-gate-box{position:relative!important;width:min(470px,94vw)!important;border:1px solid rgba(255,61,187,.72)!important;border-radius:22px!important;background:linear-gradient(135deg,rgba(255,61,187,.13),rgba(22,255,243,.07)),rgba(4,8,24,.96)!important;box-shadow:0 0 24px rgba(255,61,187,.32),0 0 22px rgba(22,255,243,.18)!important;color:#fff!important;text-align:center!important;padding:22px 18px 18px!important}.s666-discord-gate-title{font-size:15px!important;font-weight:950!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:#ff3dbb!important;text-shadow:0 0 14px rgba(255,61,187,.78)!important}.s666-discord-msg-input{display:block!important;width:min(340px,82vw)!important;min-height:118px!important;margin:12px auto 0!important;padding:12px 13px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(0,0,0,.5)!important;color:#fff!important;font-size:13px!important;font-weight:750!important;line-height:1.35!important;resize:vertical!important}.s666-discord-gate-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin-top:15px!important}.s666-discord-gate-x{position:absolute!important;right:10px!important;top:8px!important;width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.44)!important;background:rgba(22,255,243,.08)!important;color:#fff!important;font-size:21px!important;line-height:1!important;cursor:pointer!important}.s666-discord-gate-submit,.s666-discord-gate-cancel{min-height:34px!important;border-radius:999px!important;padding:0 14px!important;text-transform:uppercase!important;font-size:11px!important;font-weight:950!important;letter-spacing:.09em!important;cursor:pointer!important}.s666-discord-gate-submit{border:1px solid rgba(255,61,187,.76)!important;background:linear-gradient(90deg,rgba(255,61,187,.32),rgba(22,255,243,.12))!important;color:#fff!important}.s666-discord-gate-cancel{border:1px solid rgba(22,255,243,.42)!important;background:rgba(22,255,243,.065)!important;color:#dff!important}.s666-veluna-msg-btn{border-color:rgba(22,255,243,.48)!important;color:#16fff3!important}.s666msg-count-veluna{display:block;margin:7px 0 0;color:rgba(22,255,243,.72);font-size:11px;font-weight:900;letter-spacing:.06em}.s666-discord-status{min-height:18px;margin-top:9px;font-size:11px;font-weight:900;letter-spacing:.05em}.s666-discord-status.is-sending{color:#ffc857}.s666-discord-status.is-ok{color:#7edcff}.s666-discord-status.is-error{color:#ff5570}.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}';
+    style.textContent = [
+      '.s666-discord-gate.s666-discord-gate--hidden{display:none!important}',
+      '.s666-discord-gate{position:fixed!important;inset:0!important;z-index:2147483646!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}',
+      '.s666-discord-gate-box{position:relative!important;width:min(470px,94vw)!important;border:1px solid rgba(255,61,187,.72)!important;border-radius:22px!important;background:linear-gradient(135deg,rgba(255,61,187,.13),rgba(22,255,243,.07)),rgba(4,8,24,.96)!important;box-shadow:0 0 24px rgba(255,61,187,.32),0 0 22px rgba(22,255,243,.18)!important;color:#fff!important;text-align:center!important;padding:22px 18px 18px!important}',
+      '.s666-discord-gate-title{font-size:15px!important;font-weight:950!important;letter-spacing:.22em!important;text-transform:uppercase!important;color:#ff3dbb!important;text-shadow:0 0 14px rgba(255,61,187,.78)!important}',
+      '.s666-discord-gate-message{margin-top:8px!important;color:#dff!important;font-size:12px!important;font-weight:800!important}',
+      '.s666-discord-msg-input{display:block!important;width:min(340px,82vw)!important;min-height:118px!important;margin:12px auto 0!important;padding:12px 13px!important;border-radius:16px!important;border:1px solid rgba(22,255,243,.56)!important;background:rgba(0,0,0,.5)!important;color:#fff!important;font-size:13px!important;font-weight:750!important;line-height:1.35!important;resize:vertical!important}',
+      '.s666-discord-gate-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;margin-top:15px!important;flex-wrap:wrap!important}',
+      '.s666-discord-gate-x{position:absolute!important;right:10px!important;top:8px!important;width:30px!important;height:30px!important;border-radius:999px!important;border:1px solid rgba(22,255,243,.44)!important;background:rgba(22,255,243,.08)!important;color:#fff!important;font-size:21px!important;line-height:1!important;cursor:pointer!important}',
+      '.s666-discord-gate-submit,.s666-discord-gate-cancel{min-height:34px!important;border-radius:999px!important;padding:0 14px!important;text-transform:uppercase!important;font-size:11px!important;font-weight:950!important;letter-spacing:.09em!important;cursor:pointer!important}',
+      '.s666-discord-gate-submit{border:1px solid rgba(255,61,187,.76)!important;background:linear-gradient(90deg,rgba(255,61,187,.32),rgba(22,255,243,.12))!important;color:#fff!important}',
+      '.s666-discord-gate-cancel{border:1px solid rgba(22,255,243,.42)!important;background:rgba(22,255,243,.065)!important;color:#dff!important}',
+      '.s666-veluna-msg-btn{border-color:rgba(22,255,243,.48)!important;color:#16fff3!important}',
+      '.s666msg-count-veluna{display:block;margin:7px 0 0;color:rgba(22,255,243,.72);font-size:11px;font-weight:900;letter-spacing:.06em}',
+      '.s666-discord-status{min-height:18px;margin-top:9px;font-size:11px;font-weight:900;letter-spacing:.05em}',
+      '.s666-discord-status.is-sending{color:#ffc857}.s666-discord-status.is-ok{color:#7edcff}.s666-discord-status.is-error{color:#ff5570}.s666-discord-status.is-warn{color:#ffc857}',
+      '.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}'
+    ].join('');
     document.head.appendChild(style);
   }
 
@@ -194,9 +293,14 @@
     if (button) button.disabled = true;
     setDiscordOverlayStatus('Wird gesendet …', 'sending');
     try {
-      await postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: message }));
-      if (input) input.value = '';
-      setDiscordOverlayStatus('✓ Erfolgreich an Discord gesendet', 'ok');
+      var result = await postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: message, manual: true }));
+      var summary = deliverySummary(result, '✓ Discord-Nachricht angenommen');
+      if (summary.skipped || !summary.sent) {
+        setDiscordOverlayStatus(summary.text, summary.skipped ? 'warn' : 'error');
+      } else {
+        if (input) input.value = '';
+        setDiscordOverlayStatus(summary.text, 'ok');
+      }
     } catch (error) {
       setDiscordOverlayStatus('✗ Versand fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
     } finally {
@@ -209,8 +313,9 @@
     if (button) button.disabled = true;
     setDiscordOverlayStatus('Now Playing wird gesendet …', 'sending');
     try {
-      await postTrackIfChanged(true);
-      setDiscordOverlayStatus('✓ Now Playing erfolgreich gesendet', 'ok');
+      var result = await postTrackIfChanged(true, 'manual-now-playing');
+      var summary = deliverySummary(result, '✓ Now Playing von Discord angenommen');
+      setDiscordOverlayStatus(summary.text, summary.skipped ? 'warn' : (summary.sent ? 'ok' : 'error'));
     } catch (error) {
       setDiscordOverlayStatus('✗ Now Playing fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
     } finally {
@@ -219,21 +324,57 @@
   }
 
   async function messagePost(message) {
-    if (typeof message === 'string' && clean(message, 1800)) return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800) }));
+    if (typeof message === 'string' && clean(message, 1800)) {
+      return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800), manual: true }));
+    }
     return openMessageOverlay();
   }
 
   async function manualPost() {
-    return postJson('/api/discord/manual', readTrackFromDom());
+    return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true }));
   }
 
-  async function postTrackIfChanged(force) {
+  async function postTrackIfChanged(force, reason) {
     var data = readTrackFromDom();
     var key = trackKey(data);
-    if (!key || (key === lastPostedKey && !force)) return { ok: true, skipped: true, reason: 'unchanged' };
-    var result = await postJson('/api/discord/nowplaying', data);
-    lastPostedKey = key;
+    if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
+    if (key === lastPostedKey && !force) return { ok: true, skipped: true, reason: 'unchanged' };
+    var result = await postJson('/api/discord/nowplaying', Object.assign({}, data, {
+      force: Boolean(force),
+      reason: reason || (force ? 'manual' : 'watcher'),
+      clientVersion: VERSION
+    }));
+    if (!result || result.skipped !== true) lastPostedKey = key;
     return result;
+  }
+
+  function tryStartupAutoPost() {
+    clearTimeout(startupTimer);
+    if (startupAutoPostDone) return;
+    var data = readTrackFromDom();
+    var key = trackKey(data);
+    if (!startupAutoPostStartedAt) startupAutoPostStartedAt = Date.now();
+
+    if (!key) {
+      if (Date.now() - startupAutoPostStartedAt < STARTUP_MAX_WAIT_MS) {
+        startupTimer = setTimeout(tryStartupAutoPost, STARTUP_RETRY_MS);
+      } else {
+        dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'no_track_key' });
+      }
+      return;
+    }
+
+    startupAutoPostDone = true;
+    lastTrackKey = key;
+    dispatch('s666:discord-state', { phase: 'startup-autopost', key: key });
+    postTrackIfChanged(true, 'startup-first-now-playing')
+      .then(function (result) {
+        dispatch('s666:discord-state', { phase: result && result.skipped ? 'startup-autopost-skipped' : 'startup-autopost-success', data: result, summary: deliverySummary(result) });
+      })
+      .catch(function (error) {
+        startupAutoPostDone = false;
+        dispatch('s666:discord-state', { phase: 'startup-autopost-error', error: error && error.message ? error.message : String(error) });
+      });
   }
 
   async function checkStatus() {
@@ -254,7 +395,7 @@
       var current = trackKey(readTrackFromDom());
       if (current && current !== lastTrackKey) {
         lastTrackKey = current;
-        try { await postTrackIfChanged(false); } catch (_) {}
+        try { await postTrackIfChanged(false, 'watcher-track-change'); } catch (_) {}
       }
       scheduleWatcher(document.hidden ? 30000 : 8000);
     }, delay);
@@ -427,9 +568,17 @@
     }, 3500);
   }
 
+  function initAll() {
+    checkStatus();
+    tryStartupAutoPost();
+    scheduleWatcher(4000);
+    initVelunaMessengerBridge();
+    initSharedVisualBridge();
+  }
+
   document.addEventListener('visibilitychange', function () { scheduleWatcher(document.hidden ? 30000 : 1500); });
-  document.addEventListener('DOMContentLoaded', function () { checkStatus(); scheduleWatcher(4000); initVelunaMessengerBridge(); initSharedVisualBridge(); });
-  if (document.readyState !== 'loading') setTimeout(function () { initVelunaMessengerBridge(); initSharedVisualBridge(); }, 0);
+  document.addEventListener('DOMContentLoaded', initAll);
+  if (document.readyState !== 'loading') setTimeout(initAll, 0);
 
   window.S666DiscordPlayerAddonV3 = {
     version: VERSION,
@@ -438,12 +587,15 @@
     velunaDiscordNoAuth: true,
     sharedVisualBridge: false,
     sharedStatusBridge: true,
+    startupNowPlayingAutopost: true,
+    skippedIsNotSent: true,
     mountAll: function () { mountVelunaMessengerButton(); installVelunaDiscordNoAuthBypass(); initSharedVisualBridge(); return true; },
     manualPost: manualPost,
     messagePost: messagePost,
     postTrackIfChanged: postTrackIfChanged,
     readTrackFromDom: readTrackFromDom,
     checkStatus: checkStatus,
+    deliverySummary: deliverySummary,
     setLed: function (mode, text) { dispatch('s666:discord-state', { phase: mode || 'idle', text: text || '' }); }
   };
 })();
