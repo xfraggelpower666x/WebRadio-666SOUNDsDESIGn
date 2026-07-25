@@ -1,0 +1,66 @@
+name: Read-only post-PR59 live contract check
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - .github/workflows/ops-read-only-post-pr59-live-contract-20260725.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-post-pr59-live-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify production without writes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_url='https://webradio.666soundsdesign-broadcaster.com'
+          veluna_body_file="$RUNNER_TEMP/veluna.html"
+          login_body_file="$RUNNER_TEMP/login-negative.json"
+          skip_body_file="$RUNNER_TEMP/skip-status.json"
+          discord_body_file="$RUNNER_TEMP/discord-status.json"
+          player_alert_body_file="$RUNNER_TEMP/player-alert-status.json"
+          myidj_body_file="$RUNNER_TEMP/myidj-negative.json"
+          trap 'rm -f "$veluna_body_file" "$login_body_file" "$skip_body_file" "$discord_body_file" "$player_alert_body_file" "$myidj_body_file"' EXIT
+
+          curl -fsS --max-time 20 "$base_url/health" | jq -e '.ok == true' >/dev/null
+          curl -fsS --max-time 20 "$base_url/veluna/" > "$veluna_body_file"
+          grep -Fq 'Automatische Now-Playing-Posts dürfen den manuellen DISC-Status nicht als „gesendet“ überschreiben' "$veluna_body_file"
+
+          curl -fsS --max-time 20 'https://666-system-pw.666soundsdesign-broadcaster.com/health' | jq -e '.ok == true and .worker == "666-system-pw-worker"' >/dev/null
+          curl -fsS --max-time 20 'https://666-system-auth.666soundsdesign-broadcaster.com/health' | jq -e '.ok == true and .worker == "666-system-auth-worker"' >/dev/null
+
+          curl -fsS --max-time 20 -H 'accept: application/json' "$base_url/api/skip/status" > "$skip_body_file"
+          jq -e '.configured == true and .myIdjAdminTokenConfigured == true and .compatibilityProtection == "player-admin-gate"' "$skip_body_file" >/dev/null
+
+          curl -fsS --max-time 20 -H 'accept: application/json' "$base_url/api/discord/status" > "$discord_body_file"
+          jq -e '.ready == true and .authMode == "public-secret-server-side"' "$discord_body_file" >/dev/null
+
+          curl -fsS --max-time 20 -H 'accept: application/json' "$base_url/api/player-alert/status" > "$player_alert_body_file"
+          jq -e '.ok == true and .backendConfigured == true' "$player_alert_body_file" >/dev/null
+
+          invalid_password="contract-invalid-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          login_code="$(curl -sS --max-time 25 -o "$login_body_file" -w '%{http_code}' -X POST -H "origin: $base_url" -H 'content-type: application/json' --data "{\"password\":\"$invalid_password\"}" "$base_url/api/admin/login")"
+          case "$login_code" in
+            401) jq -e '.ok == false and .error == "password_rejected"' "$login_body_file" >/dev/null ;;
+            429) jq -e '.ok == false and .error == "login_rate_limited"' "$login_body_file" >/dev/null ;;
+            *) echo "UNEXPECTED_LOGIN_STATUS=$login_code"; jq -c '{ok,error,stage,credentialType,upstream,diagnostic}' "$login_body_file"; exit 1 ;;
+          esac
+
+          myidj_code="$(curl -sS --max-time 20 -o "$myidj_body_file" -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' 'https://666myidjstreamadmin.666soundsdesign-broadcaster.com/api/radio/skip')"
+          test "$myidj_code" = "401"
+          jq -e '.ok == false and .error == "UNAUTHORIZED"' "$myidj_body_file" >/dev/null
+
+          echo "POST_PR59_LIVE_CONTRACT=PASS"
+          echo "PLAYER_ADMIN_NEGATIVE_LOGIN_CONTRACT=$login_code"
+          echo "PLAYER_ADMIN_HUMAN_PASSWORD=UNCHANGED_NOT_READ"
+          echo "DISCORD_SEND_PERFORMED=false"
+          echo "VALID_SKIP_PERFORMED=false"
+          echo "NO_SECRETS_PRINTED=true"
