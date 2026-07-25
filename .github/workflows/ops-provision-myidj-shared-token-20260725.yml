@@ -1,0 +1,63 @@
+name: One-shot provision shared MyIDJ Worker token
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - .github/workflows/ops-provision-myidj-shared-token-20260725.yml
+
+permissions:
+  contents: read
+
+jobs:
+  provision-shared-worker-token:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate, install, and verify shared Worker token
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+          token_file="$RUNNER_TEMP/myidj-shared-token"
+          main_status_file="$RUNNER_TEMP/main-skip-status.json"
+          route_body_file="$RUNNER_TEMP/main-route-negative.json"
+          myidj_body_file="$RUNNER_TEMP/myidj-negative.json"
+          trap 'rm -f "$token_file" "$main_status_file" "$route_body_file" "$myidj_body_file"' EXIT
+
+          umask 077
+          openssl rand -hex 32 > "$token_file"
+
+          npx --yes wrangler@4.111.0 secret put MYIDJ_WORKER_ADMIN_TOKEN --name webradio-666soundsdesign-worker < "$token_file"
+          npx --yes wrangler@4.111.0 secret put ADMIN_TOKEN --name 666myidjstreamadmin < "$token_file"
+
+          main_secret_json="$(npx --yes wrangler@4.111.0 secret list --name webradio-666soundsdesign-worker --format json)"
+          myidj_secret_json="$(npx --yes wrangler@4.111.0 secret list --name 666myidjstreamadmin --format json)"
+          jq -e 'any(.[]; .name == "MYIDJ_WORKER_ADMIN_TOKEN" and .type == "secret_text")' <<< "$main_secret_json" >/dev/null
+          jq -e 'any(.[]; .name == "ADMIN_TOKEN" and .type == "secret_text")' <<< "$myidj_secret_json" >/dev/null
+
+          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/skip/status' > "$main_status_file"
+          jq -e '.configured == true and .myIdjAdminTokenConfigured == true and .compatibilityProtection == "player-admin-gate"' "$main_status_file" >/dev/null
+
+          for route in /api/admin/skip /api/radio/skip /api/skip /radio/autodj/skip /admin/autodj/skip /skip; do
+            code="$(curl -sS --max-time 20 -o "$route_body_file" -w '%{http_code}' -X POST -H 'origin: https://webradio.666soundsdesign-broadcaster.com' -H 'content-type: application/json' --data '{}' "https://webradio.666soundsdesign-broadcaster.com$route")"
+            test "$code" = "401"
+            jq -e '.ok == false and .error == "auth_token_missing"' "$route_body_file" >/dev/null
+          done
+
+          myidj_code="$(curl -sS --max-time 20 -o "$myidj_body_file" -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' 'https://666myidjstreamadmin.666soundsdesign-broadcaster.com/api/radio/skip')"
+          test "$myidj_code" = "401"
+          jq -e '.ok == false and .error == "UNAUTHORIZED"' "$myidj_body_file" >/dev/null
+
+          echo "SHARED_TOKEN_WRITES=VERIFIED"
+          echo "MAIN_SKIP_STATUS=CONFIGURED"
+          echo "ALL_MAIN_SKIP_WRITES=PLAYER_ADMIN_GATED"
+          echo "MYIDJ_DIRECT_UNAUTHENTICATED_POST=REJECTED_401"
