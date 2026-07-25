@@ -79,6 +79,46 @@ test("login follows the PW/Auth contract and forwards hardlock service headers",
   });
 });
 
+test("login prefers native PW/Auth service bindings over public fetch", async () => {
+  const seen = [];
+  let publicFetchCalls = 0;
+  const service = (expectedPath, response) => ({
+    async fetch(serviceRequest) {
+      seen.push({
+        path: new URL(serviceRequest.url).pathname,
+        origin: serviceRequest.headers.get("origin"),
+        serviceToken: serviceRequest.headers.get("x-admin-service-token")
+      });
+      assert.equal(new URL(serviceRequest.url).pathname, expectedPath);
+      return response();
+    }
+  });
+
+  await withMockFetch(async () => {
+    publicFetchCalls += 1;
+    throw new Error("public_fetch_must_not_run");
+  }, async () => {
+    const response = await handleRadioAdminConfigAddon(request("/api/admin/login", {
+      method: "POST",
+      headers: { origin: "https://radio.test", "content-type": "application/json" },
+      body: JSON.stringify({ password: "correct" })
+    }), {
+      PW_ADMIN_WORKER: service("/login", () => Response.json({ ok: true, token: "abc.def", expiresAt: FUTURE })),
+      AUTH_ADMIN_WORKER: service("/verify", () => Response.json({ ok: true, valid: true, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: FUTURE } })),
+      ADMIN_SERVICE_ORIGIN: "https://radio.test",
+      ADMIN_SERVICE_TOKEN: "service-secret",
+      AUTH_AUDIENCE: AUDIENCE
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).ok, true);
+    assert.equal(publicFetchCalls, 0);
+    assert.deepEqual(seen.map(item => item.path), ["/login", "/verify"]);
+    assert.deepEqual(seen.map(item => item.origin), ["https://radio.test", "https://radio.test"]);
+    assert.deepEqual(seen.map(item => item.serviceToken), ["service-secret", "service-secret"]);
+  });
+});
+
 test("PW/Auth workers implement one deployable contract", async () => {
   const common = {
     ALLOWED_ORIGIN: "https://radio.test",
@@ -146,6 +186,15 @@ test("PW/Auth hardening requires audience, service token and rate limiting sourc
     assert.match(auth, /audience_invalid/);
     assert.match(auth, /service_token_missing/);
   });
+});
+
+test("Player Admin upstream requests use Cloudflare-supported redirect handling", async () => {
+  const source = await import("node:fs/promises").then(fs => fs.readFile(
+    new URL("../worker-addons/radio-admin-config-addon.js", import.meta.url),
+    "utf8"
+  ));
+  assert.doesNotMatch(source, /redirect:\s*"error"/);
+  assert.equal([...source.matchAll(/redirect:\s*"manual"/g)].length, 3);
 });
 
 

@@ -25,5 +25,10 @@ test("main deploy pins the canonical Player Admin Worker contract without commit
   assert.equal(config.vars.PW_LOGIN_URL, "https://666-system-pw.666soundsdesign-broadcaster.com/login");
   assert.equal(config.vars.ADMIN_AUTH_VERIFY_URL, "https://666-system-auth.666soundsdesign-broadcaster.com/verify");
   assert.equal(config.vars.AUTH_AUDIENCE, "666SOUNDsDESIGn-WebRadio-Admin");
+  assert.deepEqual(Object.fromEntries(config.services.map(item => [item.binding, item.service])), {
+    PW_ADMIN_WORKER: "666-system-pw-worker",
+    AUTH_ADMIN_WORKER: "666-system-auth-worker"
+  });
+  assert.equal(Object.hasOwn(config, "compatibility_flags"), false);
   assert.equal(Object.hasOwn(config.vars, "ADMIN_SERVICE_TOKEN"), false);
 });
