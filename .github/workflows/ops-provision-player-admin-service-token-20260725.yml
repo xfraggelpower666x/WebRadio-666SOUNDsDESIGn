@@ -1,4 +1,4 @@
-name: Read-only verify Worker-to-Worker fetch preview
+name: Read-only verify Player Admin production
 
 on:
   pull_request:
@@ -11,16 +11,16 @@ permissions:
   contents: read
 
 jobs:
-  verify-worker-fetch-preview:
+  verify-player-admin-production:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Verify preview without writes
+      - name: Verify production without writes
         shell: bash
         run: |
           set -euo pipefail
 
-          base_url='https://fd5392fc-webradio-666soundsdesign-worker.digital-underground-connected.workers.dev'
+          base_url='https://webradio.666soundsdesign-broadcaster.com'
           veluna_body_file="$RUNNER_TEMP/veluna.html"
           login_body_file="$RUNNER_TEMP/login-negative.json"
           skip_body_file="$RUNNER_TEMP/skip-status.json"
