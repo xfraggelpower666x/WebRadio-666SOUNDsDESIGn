@@ -20,7 +20,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          base_url='https://544b7743-webradio-666soundsdesign-worker.digital-underground-connected.workers.dev'
+          base_url='https://df0da7ab-webradio-666soundsdesign-worker.digital-underground-connected.workers.dev'
           veluna_body_file="$RUNNER_TEMP/veluna.html"
           login_body_file="$RUNNER_TEMP/login-negative.json"
           skip_body_file="$RUNNER_TEMP/skip-status.json"
@@ -44,7 +44,7 @@ jobs:
           case "$login_code" in
             401) jq -e '.ok == false and .error == "password_rejected"' "$login_body_file" >/dev/null ;;
             429) jq -e '.ok == false and .error == "login_rate_limited"' "$login_body_file" >/dev/null ;;
-            *) echo "UNEXPECTED_LOGIN_STATUS=$login_code"; jq -c '{ok,error,stage,credentialType,upstream}' "$login_body_file"; exit 1 ;;
+            *) echo "UNEXPECTED_LOGIN_STATUS=$login_code"; jq -c '{ok,error,stage,credentialType,upstream,diagnostic}' "$login_body_file"; exit 1 ;;
           esac
 
           myidj_code="$(curl -sS --max-time 20 -o "$myidj_body_file" -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' 'https://666myidjstreamadmin.666soundsdesign-broadcaster.com/api/radio/skip')"
