@@ -33,19 +33,40 @@ jobs:
           myidj_body_file="$RUNNER_TEMP/myidj-negative.json"
           trap 'rm -f "$token_file" "$main_status_file" "$route_body_file" "$myidj_body_file"' EXIT
 
+          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/skip/status' > "$main_status_file"
+          jq -e '.compatibilityProtection == "player-admin-gate"' "$main_status_file" >/dev/null
+
           umask 077
           openssl rand -hex 32 > "$token_file"
+          main_tag="myidj-shared-main-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          myidj_tag="myidj-shared-admin-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
-          npx --yes wrangler@4.111.0 secret put MYIDJ_WORKER_ADMIN_TOKEN --name webradio-666soundsdesign-worker < "$token_file"
-          npx --yes wrangler@4.111.0 secret put ADMIN_TOKEN --name 666myidjstreamadmin < "$token_file"
+          npx --yes wrangler@4.111.0 versions secret put MYIDJ_WORKER_ADMIN_TOKEN --name webradio-666soundsdesign-worker --tag "$main_tag" --message 'Provision protected MyIDJ bridge token' < "$token_file"
+          npx --yes wrangler@4.111.0 versions deploy --name webradio-666soundsdesign-worker --version-tag "$main_tag" --percentage 100 --yes --message 'Deploy protected MyIDJ bridge token'
 
-          main_secret_json="$(npx --yes wrangler@4.111.0 secret list --name webradio-666soundsdesign-worker --format json)"
-          myidj_secret_json="$(npx --yes wrangler@4.111.0 secret list --name 666myidjstreamadmin --format json)"
-          jq -e 'any(.[]; .name == "MYIDJ_WORKER_ADMIN_TOKEN" and .type == "secret_text")' <<< "$main_secret_json" >/dev/null
-          jq -e 'any(.[]; .name == "ADMIN_TOKEN" and .type == "secret_text")' <<< "$myidj_secret_json" >/dev/null
+          npx --yes wrangler@4.111.0 versions secret put ADMIN_TOKEN --name 666myidjstreamadmin --tag "$myidj_tag" --message 'Rotate protected MyIDJ admin token' < "$token_file"
+          npx --yes wrangler@4.111.0 versions deploy --name 666myidjstreamadmin --version-tag "$myidj_tag" --percentage 100 --yes --message 'Deploy protected MyIDJ admin token'
 
-          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/skip/status' > "$main_status_file"
-          jq -e '.configured == true and .myIdjAdminTokenConfigured == true and .compatibilityProtection == "player-admin-gate"' "$main_status_file" >/dev/null
+          main_metadata_ok=false
+          myidj_metadata_ok=false
+          for attempt in 1 2 3 4 5 6; do
+            main_secret_json="$(npx --yes wrangler@4.111.0 secret list --name webradio-666soundsdesign-worker --format json)"
+            myidj_secret_json="$(npx --yes wrangler@4.111.0 secret list --name 666myidjstreamadmin --format json)"
+            if jq -e 'any(.[]; .name == "MYIDJ_WORKER_ADMIN_TOKEN" and .type == "secret_text")' <<< "$main_secret_json" >/dev/null; then main_metadata_ok=true; fi
+            if jq -e 'any(.[]; .name == "ADMIN_TOKEN" and .type == "secret_text")' <<< "$myidj_secret_json" >/dev/null; then myidj_metadata_ok=true; fi
+            if [ "$main_metadata_ok" = true ] && [ "$myidj_metadata_ok" = true ]; then break; fi
+            sleep 3
+          done
+          test "$main_metadata_ok" = true
+          test "$myidj_metadata_ok" = true
+
+          main_status_ok=false
+          for attempt in 1 2 3 4 5 6; do
+            curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/skip/status' > "$main_status_file"
+            if jq -e '.configured == true and .myIdjAdminTokenConfigured == true and .compatibilityProtection == "player-admin-gate"' "$main_status_file" >/dev/null; then main_status_ok=true; break; fi
+            sleep 3
+          done
+          test "$main_status_ok" = true
 
           for route in /api/admin/skip /api/radio/skip /api/skip /radio/autodj/skip /admin/autodj/skip /skip; do
             code="$(curl -sS --max-time 20 -o "$route_body_file" -w '%{http_code}' -X POST -H 'origin: https://webradio.666soundsdesign-broadcaster.com' -H 'content-type: application/json' --data '{}' "https://webradio.666soundsdesign-broadcaster.com$route")"
