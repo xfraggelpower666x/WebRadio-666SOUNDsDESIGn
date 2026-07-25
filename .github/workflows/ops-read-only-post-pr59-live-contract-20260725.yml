@@ -74,3 +74,59 @@ jobs:
           echo "DISCORD_SEND_PERFORMED=false"
           echo "VALID_SKIP_PERFORMED=false"
           echo "NO_SECRETS_PRINTED=true"
+
+  wrangler-discord-secret-metadata-readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Discord Worker secret names without values
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+          secret_json="$(npx --yes wrangler@4.111.0 secret list --name webradio-666soundsdesign-worker --format json)"
+
+          jq -e 'all(.[]; .type == "secret_text")' <<< "$secret_json" >/dev/null
+
+          jq -n --argjson secrets "$secret_json" '
+            def has($name): any($secrets[]; .name == $name and .type == "secret_text");
+            {
+              worker: "webradio-666soundsdesign-worker",
+              checkedBy: "wrangler secret list",
+              valuesExposed: false,
+              discordWebhookUrl: has("DISCORD_WEBHOOK_URL"),
+              discordWebhook: has("DISCORD_WEBHOOK"),
+              discordWebhookUri: has("DISCORD_WEBHOOK_URI"),
+              discordWebhookEndpoint: has("DISCORD_WEBHOOK_ENDPOINT"),
+              webhookUrl: has("WEBHOOK_URL"),
+              discordWebhookUrl2: has("DISCORD_WEBHOOK_URL2"),
+              discordWebhook2: has("DISCORD_WEBHOOK_2"),
+              discordSecondaryWebhookUrl: has("DISCORD_SECONDARY_WEBHOOK_URL"),
+              discordBroadcastWebhookUrl2: has("DISCORD_BROADCAST_WEBHOOK_URL2"),
+              privateTrackShooter: has("PRIVATE_TRACK_SHOOTER"),
+              discordAdminToken: has("DISCORD_ADMIN_TOKEN"),
+              anyAcceptedDiscordWebhookSecret: (
+                has("DISCORD_WEBHOOK_URL") or
+                has("DISCORD_WEBHOOK") or
+                has("DISCORD_WEBHOOK_URI") or
+                has("DISCORD_WEBHOOK_ENDPOINT") or
+                has("WEBHOOK_URL")
+              ),
+              anySecondaryDiscordWebhookSecret: (
+                has("DISCORD_WEBHOOK_URL2") or
+                has("DISCORD_WEBHOOK_2") or
+                has("DISCORD_SECONDARY_WEBHOOK_URL") or
+                has("DISCORD_BROADCAST_WEBHOOK_URL2")
+              )
+            }
+          ' | tee "$RUNNER_TEMP/discord-secret-metadata.safe.json"
+
+          jq -e '.anyAcceptedDiscordWebhookSecret == true' "$RUNNER_TEMP/discord-secret-metadata.safe.json" >/dev/null
+          echo "WRANGLER_DISCORD_SECRET_METADATA=VERIFIED_NO_VALUES_EXPOSED"
