@@ -26,9 +26,10 @@ jobs:
           login_body_file="$RUNNER_TEMP/login-negative.json"
           skip_body_file="$RUNNER_TEMP/skip-status.json"
           discord_body_file="$RUNNER_TEMP/discord-status.json"
+          discord_debug_body_file="$RUNNER_TEMP/discord-debug.json"
           player_alert_body_file="$RUNNER_TEMP/player-alert-status.json"
           myidj_body_file="$RUNNER_TEMP/myidj-negative.json"
-          trap 'rm -f "$veluna_body_file" "$login_body_file" "$skip_body_file" "$discord_body_file" "$player_alert_body_file" "$myidj_body_file"' EXIT
+          trap 'rm -f "$veluna_body_file" "$login_body_file" "$skip_body_file" "$discord_body_file" "$discord_debug_body_file" "$player_alert_body_file" "$myidj_body_file"' EXIT
 
           curl -fsS --max-time 20 "$base_url/health" | jq -e '.ok == true' >/dev/null
           curl -fsS --max-time 20 "$base_url/veluna/" > "$veluna_body_file"
@@ -42,6 +43,15 @@ jobs:
 
           curl -fsS --max-time 20 -H 'accept: application/json' "$base_url/api/discord/status" > "$discord_body_file"
           jq -e '.ready == true and .authMode == "public-secret-server-side"' "$discord_body_file" >/dev/null
+          echo "DISCORD_STATUS_SAFE=$(jq -c '{ok,ready,webhookCount,webhook2Configured,privateTrackWebhookConfigured,authMode,addon}' "$discord_body_file")"
+
+          discord_debug_code="$(curl -sS --max-time 20 -o "$discord_debug_body_file" -w '%{http_code}' -H 'accept: application/json' "$base_url/api/discord/debug")"
+          if [ "$discord_debug_code" = "200" ]; then
+            echo "DISCORD_DEBUG_SAFE=$(jq -c '{ok,mode,webhookConfigured,webhookCount,webhook2Configured,privateTrackWebhookConfigured,serviceTokenConfigured,requireAdmin,sharedAdminAuth,lastKind,lastOkAt,lastErrorAt,lastError,lastTrackKey,addon}' "$discord_debug_body_file")"
+          else
+            echo "DISCORD_DEBUG_STATUS=$discord_debug_code"
+            jq -c '{ok,error,addon}' "$discord_debug_body_file" || true
+          fi
 
           curl -fsS --max-time 20 -H 'accept: application/json' "$base_url/api/player-alert/status" > "$player_alert_body_file"
           jq -e '.ok == true and .backendConfigured == true' "$player_alert_body_file" >/dev/null
