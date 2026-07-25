@@ -1,8 +1,8 @@
 /*
 FILE: worker-addons/skip-api-addon.js
-VERSION: 1.1.1
+VERSION: 1.2.0
 PURPOSE: Safe compatibility routes for the historic skip API and MyIDJ route names.
-NOTE: /api/admin/skip remains protected. Compatibility routes proxy to the existing MyIDJ worker.
+NOTE: /api/admin/skip and its compatibility aliases are owned by the protected Player Admin gate.
 */
 
 const DEFAULT_MYIDJ_SKIP_URL = "https://666myidjstreamadmin.666soundsdesign-broadcaster.com/api/radio/skip";
@@ -50,19 +50,6 @@ function normalizeMyIdjWorkerError(data = {}, status = 0) {
 function publicMyIdjWorkerStatus(error, upstreamStatus = 0) {
   if (error === "myidj_admin_token_rejected") return 502;
   return upstreamStatus || 502;
-}
-
-function sameOriginEvidenceOk(request) {
-  const requestOrigin = new URL(request.url).origin;
-  const origin = String(request.headers.get("origin") || "").trim();
-  const referer = String(request.headers.get("referer") || "").trim();
-  const fetchSite = String(request.headers.get("sec-fetch-site") || "").trim().toLowerCase();
-  if (origin) return origin === requestOrigin;
-  if (referer) {
-    try { return new URL(referer).origin === requestOrigin; } catch { return false; }
-  }
-  if (fetchSite) return fetchSite === "same-origin";
-  return true;
 }
 
 export async function callMyIdjSkip(payload = {}, env = {}) {
@@ -125,14 +112,6 @@ export async function callMyIdjSkip(payload = {}, env = {}) {
   }
 }
 
-async function proxyMyIdjSkip(request, env = {}) {
-  if (!sameOriginEvidenceOk(request)) return json({ ok: false, error: "origin_rejected" }, 403);
-  let payload = {};
-  try { payload = await request.json(); } catch {}
-  const result = await callMyIdjSkip(payload, env);
-  return json(result, result.ok ? 200 : (result.status || 502));
-}
-
 export async function handleSkipApi(request, env) {
   const url = new URL(request.url);
 
@@ -149,12 +128,19 @@ export async function handleSkipApi(request, env) {
       protectedWriteRoute: "/api/admin/skip",
       myIdjWorkerFallback: myIdjWorkerUrl(env).replace(/^https?:\/\//, ""),
       compatibilityRoutes: ["/api/skip", "/api/radio/skip", "/radio/autodj/skip", "/admin/autodj/skip", "/skip"],
+      compatibilityProtection: "player-admin-gate",
       secretTransport: "server-side-worker-proxy"
     });
   }
 
   if (url.pathname === "/api/skip" || url.pathname === "/api/radio/skip" || url.pathname === "/radio/autodj/skip" || url.pathname === "/admin/autodj/skip" || url.pathname === "/skip") {
-    if (request.method === "POST") return proxyMyIdjSkip(request, env);
+    if (request.method === "POST") {
+      return json({
+        ok: false,
+        error: "protected_route_required",
+        protectedWriteRoute: "/api/admin/skip"
+      }, 404);
+    }
     return json({
       ok: false,
       error: "method_not_allowed",

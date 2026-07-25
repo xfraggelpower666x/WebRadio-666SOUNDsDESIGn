@@ -1,6 +1,6 @@
 /*
 FILE: worker-addons/radio-admin-config-addon.js
-VERSION: 1.1.0
+VERSION: 1.2.0
 PURPOSE: Protected GitHub-backed radio runtime config and admin skip API.
 SECURITY: No secrets in URLs unless SKIP_ALLOW_QUERY_SECRET=true is explicitly set.
 */
@@ -13,6 +13,14 @@ const RADIO_CONFIG_KV_KEY = "radio-runtime:current";
 const DEFAULT_TIMEOUT_MS = 8000;
 const CANONICAL_PW_LOGIN_URL = "https://666-system-pw.666soundsdesign-broadcaster.com/login";
 const CANONICAL_AUTH_VERIFY_URL = "https://666-system-auth.666soundsdesign-broadcaster.com/verify";
+const PROTECTED_SKIP_PATHS = new Set([
+  "/api/admin/skip",
+  "/api/skip",
+  "/api/radio/skip",
+  "/radio/autodj/skip",
+  "/admin/autodj/skip",
+  "/skip"
+]);
 
 function adminJson(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -827,7 +835,7 @@ export async function handleRadioAdminConfigAddon(request, env) {
       auth.ok && pw.ok ? 200 : 403
     );
   }
-  if (url.pathname === "/api/admin/skip") {
+  if (PROTECTED_SKIP_PATHS.has(url.pathname)) {
     if (request.method !== "POST") return methodNotAllowed(["POST"]);
     return adminSkip(request, env);
   }

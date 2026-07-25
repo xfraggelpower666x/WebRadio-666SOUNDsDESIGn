@@ -145,6 +145,15 @@ test("skip compatibility handler exists", async () => {
   const data = await response.json();
   assert.equal(data.ok, true);
   assert.equal(data.protectedWriteRoute, "/api/admin/skip");
+  assert.equal(data.compatibilityProtection, "player-admin-gate");
+
+  const unauthenticatedWrite = await request("/api/radio/skip", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "{}"
+  });
+  assert.equal(unauthenticatedWrite.status, 401);
+  assert.equal((await unauthenticatedWrite.json()).error, "auth_token_missing");
 });
 
 
