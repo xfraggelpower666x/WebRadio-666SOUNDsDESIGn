@@ -130,3 +130,10 @@ jobs:
 
           jq -e '.anyAcceptedDiscordWebhookSecret == true' "$RUNNER_TEMP/discord-secret-metadata.safe.json" >/dev/null
           echo "WRANGLER_DISCORD_SECRET_METADATA=VERIFIED_NO_VALUES_EXPOSED"
+
+      - name: Upload safe Discord secret metadata artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: discord-secret-metadata-safe
+          path: ${{ runner.temp }}/discord-secret-metadata.safe.json
+          if-no-files-found: error
