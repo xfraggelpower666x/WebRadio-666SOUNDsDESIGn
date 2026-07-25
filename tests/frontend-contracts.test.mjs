@@ -41,6 +41,7 @@ test("Skip owns interactive Bearer auth while Discord remains public", async () 
   assert.match(veluna, /S666SkipControl\.skip/);
   assert.doesNotMatch(stage, /function withGate\(|S666AdminAuth/);
   assert.doesNotMatch(discord, /ensureInteractiveAuth|S666AdminAuth\.ensure|admin_session_required|x-discord-gate-code/);
+  assert.match(veluna, /d\.path==='\/api\/discord\/nowplaying'&&activeSecureAction!=='discord'/);
 });
 
 test("main player has one canonical EQ and meter writer", async () => {

@@ -19,6 +19,9 @@
     "STREAM_ATTEMPT_TIMEOUT_MS": "2500",
     "STREAM_FAILOVER_BUDGET_MS": "12000",
     "ADMIN_SERVICE_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com",
-    "PUBLIC_PLAYER_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com"
+    "PUBLIC_PLAYER_ORIGIN": "https://webradio.666soundsdesign-broadcaster.com",
+    "PW_LOGIN_URL": "https://666-system-pw.666soundsdesign-broadcaster.com/login",
+    "ADMIN_AUTH_VERIFY_URL": "https://666-system-auth.666soundsdesign-broadcaster.com/verify",
+    "AUTH_AUDIENCE": "666SOUNDsDESIGn-WebRadio-Admin"
   }
 }

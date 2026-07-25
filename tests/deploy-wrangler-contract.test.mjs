@@ -19,3 +19,11 @@ test("PW and Auth deploys update scripts without mutating dashboard-managed doma
     assert.equal(config.main, "worker.js", path);
   }
 });
+
+test("main deploy pins the canonical Player Admin Worker contract without committing secrets", async () => {
+  const config = await readJson("wrangler.jsonc");
+  assert.equal(config.vars.PW_LOGIN_URL, "https://666-system-pw.666soundsdesign-broadcaster.com/login");
+  assert.equal(config.vars.ADMIN_AUTH_VERIFY_URL, "https://666-system-auth.666soundsdesign-broadcaster.com/verify");
+  assert.equal(config.vars.AUTH_AUDIENCE, "666SOUNDsDESIGn-WebRadio-Admin");
+  assert.equal(Object.hasOwn(config.vars, "ADMIN_SERVICE_TOKEN"), false);
+});
