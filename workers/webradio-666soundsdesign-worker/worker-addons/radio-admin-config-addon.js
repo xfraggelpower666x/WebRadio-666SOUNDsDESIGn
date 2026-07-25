@@ -116,6 +116,11 @@ function adminServiceHeaders(env, base = {}) {
   return headers;
 }
 
+function adminServiceBinding(env, service) {
+  const binding = service === "pw" ? env?.PW_ADMIN_WORKER : service === "auth" ? env?.AUTH_ADMIN_WORKER : null;
+  return binding && typeof binding.fetch === "function" ? binding : null;
+}
+
 // MAIN_WORKER_CANONICAL_AUTH_FALLBACK_V1
 function uniqueUpstreamUrls(...values) {
   const urls = [];
@@ -132,10 +137,11 @@ function uniqueUpstreamUrls(...values) {
   return urls;
 }
 
-async function fetchWithTimeout(url, init = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
+async function fetchWithTimeout(url, init = {}, timeoutMs = DEFAULT_TIMEOUT_MS, binding = null) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
+    if (binding) return await binding.fetch(new Request(url, { ...init, signal: controller.signal }));
     return await fetch(url, { ...init, signal: controller.signal });
   } finally {
     clearTimeout(timer);
@@ -164,8 +170,8 @@ export async function fetchVerification(url, token, label, env = {}) {
       method: "POST",
       headers,
       body: JSON.stringify({ token }),
-      redirect: "error"
-    }, 5000);
+      redirect: "manual"
+    }, 5000, adminServiceBinding(env, "auth"));
     const data = await response.json().catch(() => ({}));
     const payload = data && typeof data.payload === "object" ? data.payload : null;
     const valid = response.ok && data?.ok === true && data?.valid === true && Boolean(payload);
@@ -255,8 +261,8 @@ async function loginAdmin(request, env) {
           "cache-control": "no-store"
         }),
         body: JSON.stringify({ password }),
-        redirect: "error"
-      }, 7000);
+        redirect: "manual"
+      }, 7000, adminServiceBinding(env, "pw"));
       const raw = await response.text().catch(() => "");
       let data = {};
       let jsonOk = false;
@@ -732,14 +738,14 @@ function healthUrlFrom(baseUrl, fallback) {
   }
 }
 
-async function probeWorkerHealth(url) {
+async function probeWorkerHealth(url, binding = null) {
   if (!url) return { reachable: false, version: null, status: 0, error: "url_missing" };
   try {
     const response = await fetchWithTimeout(url, {
       method: "GET",
       headers: { accept: "application/json", "cache-control": "no-store" },
-      redirect: "error"
-    }, 5000);
+      redirect: "manual"
+    }, 5000, binding);
     const data = await response.json().catch(() => ({}));
     return {
       reachable: response.ok && data?.ok === true,
@@ -759,11 +765,11 @@ async function probeWorkerHealth(url) {
   }
 }
 
-async function probeWorkerHealthCandidates(...urls) {
+async function probeWorkerHealthCandidates(binding, ...urls) {
   const candidates = uniqueUpstreamUrls(...urls);
   let last = { reachable: false, version: null, status: 0, worker: null, error: "url_missing", upstream: null };
   for (const raw of candidates) {
-    const result = await probeWorkerHealth(healthUrlFrom(raw, ""));
+    const result = await probeWorkerHealth(healthUrlFrom(raw, ""), binding);
     last = { ...result, upstream: raw };
     if (result.reachable) return last;
   }
@@ -774,8 +780,8 @@ async function authLiveState(request, env) {
   if (!diagnosticTokenAllowed(request, env)) return adminJson({ ok: false, error: "not_found" }, 404);
 
   const [pw, auth] = await Promise.all([
-    probeWorkerHealthCandidates(env.PW_LOGIN_URL, env.ADMIN_AUTH_LOGIN_URL, CANONICAL_PW_LOGIN_URL),
-    probeWorkerHealthCandidates(env.ADMIN_AUTH_VERIFY_URL, CANONICAL_AUTH_VERIFY_URL)
+    probeWorkerHealthCandidates(adminServiceBinding(env, "pw"), env.PW_LOGIN_URL, env.ADMIN_AUTH_LOGIN_URL, CANONICAL_PW_LOGIN_URL),
+    probeWorkerHealthCandidates(adminServiceBinding(env, "auth"), env.ADMIN_AUTH_VERIFY_URL, CANONICAL_AUTH_VERIFY_URL)
   ]);
 
   return adminJson({

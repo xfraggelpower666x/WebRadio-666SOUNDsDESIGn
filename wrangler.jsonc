@@ -9,6 +9,16 @@
     "run_worker_first": true,
     "html_handling": "none"
   },
+  "services": [
+    {
+      "binding": "PW_ADMIN_WORKER",
+      "service": "666-system-pw-worker"
+    },
+    {
+      "binding": "AUTH_ADMIN_WORKER",
+      "service": "666-system-auth-worker"
+    }
+  ],
   "vars": {
     "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
     "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V120",
