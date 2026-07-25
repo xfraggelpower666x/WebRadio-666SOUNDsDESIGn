@@ -1,0 +1,109 @@
+name: One-shot provision Player Admin service token
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - .github/workflows/ops-provision-player-admin-service-token-20260725.yml
+
+permissions:
+  contents: read
+
+jobs:
+  provision-player-admin-service-token:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate, install, and verify shared service token
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+          token_file="$RUNNER_TEMP/player-admin-service-token"
+          auth_body_file="$RUNNER_TEMP/auth-negative.json"
+          login_body_file="$RUNNER_TEMP/login-negative.json"
+          skip_body_file="$RUNNER_TEMP/skip-status.json"
+          discord_body_file="$RUNNER_TEMP/discord-status.json"
+          myidj_body_file="$RUNNER_TEMP/myidj-negative.json"
+          trap 'rm -f "$token_file" "$auth_body_file" "$login_body_file" "$skip_body_file" "$discord_body_file" "$myidj_body_file"' EXIT
+
+          curl -fsS --max-time 20 'https://webradio.666soundsdesign-broadcaster.com/veluna/' | grep -Fq 'Automatische Now-Playing-Posts dürfen den manuellen DISC-Status nicht als „gesendet“ überschreiben'
+          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/skip/status' > "$skip_body_file"
+          jq -e '.configured == true and .myIdjAdminTokenConfigured == true and .compatibilityProtection == "player-admin-gate"' "$skip_body_file" >/dev/null
+          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/discord/status' > "$discord_body_file"
+          jq -e '.ready == true and .authMode == "public-secret-server-side"' "$discord_body_file" >/dev/null
+
+          umask 077
+          openssl rand -hex 32 > "$token_file"
+          pw_tag="player-admin-service-pw-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          auth_tag="player-admin-service-auth-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          main_tag="player-admin-service-main-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          npx --yes wrangler@4.111.0 versions secret put ADMIN_SERVICE_TOKEN --name 666-system-pw-worker --tag "$pw_tag" --message 'Provision Player Admin service trust token' < "$token_file"
+          npx --yes wrangler@4.111.0 versions deploy --name 666-system-pw-worker --version-tag "$pw_tag" --percentage 100 --yes --message 'Deploy Player Admin service trust token'
+
+          npx --yes wrangler@4.111.0 versions secret put ADMIN_SERVICE_TOKEN --name 666-system-auth-worker --tag "$auth_tag" --message 'Provision Player Admin service trust token' < "$token_file"
+          npx --yes wrangler@4.111.0 versions deploy --name 666-system-auth-worker --version-tag "$auth_tag" --percentage 100 --yes --message 'Deploy Player Admin service trust token'
+
+          npx --yes wrangler@4.111.0 versions secret put ADMIN_SERVICE_TOKEN --name webradio-666soundsdesign-worker --tag "$main_tag" --message 'Provision Player Admin service trust token' < "$token_file"
+          npx --yes wrangler@4.111.0 versions deploy --name webradio-666soundsdesign-worker --version-tag "$main_tag" --percentage 100 --yes --message 'Deploy Player Admin service trust token'
+
+          main_json="$(npx --yes wrangler@4.111.0 secret list --name webradio-666soundsdesign-worker --format json)"
+          pw_json="$(npx --yes wrangler@4.111.0 secret list --name 666-system-pw-worker --format json)"
+          auth_json="$(npx --yes wrangler@4.111.0 secret list --name 666-system-auth-worker --format json)"
+
+          has_secret() {
+            local payload="$1"
+            local secret_name="$2"
+            jq -e --arg name "$secret_name" 'any(.[]; .name == $name and .type == "secret_text")' <<< "$payload" >/dev/null
+          }
+
+          has_secret "$main_json" ADMIN_SERVICE_TOKEN
+          has_secret "$main_json" MYIDJ_WORKER_ADMIN_TOKEN
+          has_secret "$pw_json" ADMIN_SERVICE_TOKEN
+          has_secret "$pw_json" ADMIN_PASSWORD
+          has_secret "$pw_json" AUTH_SECRET
+          has_secret "$auth_json" ADMIN_SERVICE_TOKEN
+          has_secret "$auth_json" AUTH_SECRET
+
+          curl -fsS --max-time 20 'https://666-system-pw.666soundsdesign-broadcaster.com/health' | jq -e '.ok == true and .worker == "666-system-pw-worker"' >/dev/null
+          curl -fsS --max-time 20 'https://666-system-auth.666soundsdesign-broadcaster.com/health' | jq -e '.ok == true and .worker == "666-system-auth-worker"' >/dev/null
+
+          service_token="$(cat "$token_file")"
+          auth_code="$(curl -sS --max-time 20 -o "$auth_body_file" -w '%{http_code}' -X POST -H 'origin: https://webradio.666soundsdesign-broadcaster.com' -H 'content-type: application/json' -H "x-admin-service-token: $service_token" --data '{"token":"invalid"}' 'https://666-system-auth.666soundsdesign-broadcaster.com/verify')"
+          test "$auth_code" = "401"
+          jq -e '.ok == false and .valid == false and .error == "token_missing"' "$auth_body_file" >/dev/null
+
+          invalid_password="contract-invalid-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          login_code="$(curl -sS --max-time 25 -o "$login_body_file" -w '%{http_code}' -X POST -H 'origin: https://webradio.666soundsdesign-broadcaster.com' -H 'content-type: application/json' --data "{\"password\":\"$invalid_password\"}" 'https://webradio.666soundsdesign-broadcaster.com/api/admin/login')"
+          case "$login_code" in
+            401) jq -e '.ok == false and .error == "password_rejected"' "$login_body_file" >/dev/null ;;
+            429) jq -e '.ok == false and .error == "login_rate_limited"' "$login_body_file" >/dev/null ;;
+            *) echo "UNEXPECTED_LOGIN_STATUS=$login_code"; jq -c '{ok,error,stage,credentialType,upstream}' "$login_body_file"; exit 1 ;;
+          esac
+
+          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/skip/status' > "$skip_body_file"
+          jq -e '.configured == true and .myIdjAdminTokenConfigured == true and .compatibilityProtection == "player-admin-gate"' "$skip_body_file" >/dev/null
+          curl -fsS --max-time 20 -H 'accept: application/json' 'https://webradio.666soundsdesign-broadcaster.com/api/discord/status' > "$discord_body_file"
+          jq -e '.ready == true and .authMode == "public-secret-server-side"' "$discord_body_file" >/dev/null
+
+          myidj_code="$(curl -sS --max-time 20 -o "$myidj_body_file" -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' 'https://666myidjstreamadmin.666soundsdesign-broadcaster.com/api/radio/skip')"
+          test "$myidj_code" = "401"
+          jq -e '.ok == false and .error == "UNAUTHORIZED"' "$myidj_body_file" >/dev/null
+
+          echo "PLAYER_ADMIN_SERVICE_TOKEN_WRITES=VERIFIED"
+          echo "PLAYER_ADMIN_HUMAN_PASSWORD=UNCHANGED"
+          echo "PW_AUTH_EXISTING_SECRETS=PRESERVED"
+          echo "MAIN_MYIDJ_SECRET=PRESERVED"
+          echo "AUTH_SERVICE_CONTRACT=REJECTED_INVALID_TOKEN_401"
+          echo "MAIN_LOGIN_REACHABILITY_CONTRACT=$login_code"
+          echo "SKIP_AND_DISCORD_CONTRACTS=PRESERVED"
+          echo "NO_SECRET_VALUES_PRINTED=true"
