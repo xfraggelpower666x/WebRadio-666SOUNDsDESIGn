@@ -21,14 +21,16 @@ jobs:
           set -euo pipefail
 
           base_url='https://8bf3b956-webradio-666soundsdesign-worker.digital-underground-connected.workers.dev'
+          veluna_body_file="$RUNNER_TEMP/veluna.html"
           login_body_file="$RUNNER_TEMP/login-negative.json"
           skip_body_file="$RUNNER_TEMP/skip-status.json"
           discord_body_file="$RUNNER_TEMP/discord-status.json"
           myidj_body_file="$RUNNER_TEMP/myidj-negative.json"
-          trap 'rm -f "$login_body_file" "$skip_body_file" "$discord_body_file" "$myidj_body_file"' EXIT
+          trap 'rm -f "$veluna_body_file" "$login_body_file" "$skip_body_file" "$discord_body_file" "$myidj_body_file"' EXIT
 
           curl -fsS --max-time 20 "$base_url/health" | jq -e '.ok == true' >/dev/null
-          curl -fsS --max-time 20 "$base_url/veluna/" | grep -Fq 'Automatische Now-Playing-Posts dürfen den manuellen DISC-Status nicht als „gesendet“ überschreiben'
+          curl -fsS --max-time 20 "$base_url/veluna/" > "$veluna_body_file"
+          grep -Fq 'Automatische Now-Playing-Posts dürfen den manuellen DISC-Status nicht als „gesendet“ überschreiben' "$veluna_body_file"
           curl -fsS --max-time 20 'https://666-system-pw.666soundsdesign-broadcaster.com/health' | jq -e '.ok == true and .worker == "666-system-pw-worker"' >/dev/null
           curl -fsS --max-time 20 'https://666-system-auth.666soundsdesign-broadcaster.com/health' | jq -e '.ok == true and .worker == "666-system-auth-worker"' >/dev/null
 
