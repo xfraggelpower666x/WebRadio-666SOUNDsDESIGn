@@ -1,6 +1,7 @@
-// AutoSkip authority and authentication-chain regression contract v1.0.1.
+// AutoSkip authority and authentication-chain regression contract v1.0.2.
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { handleRadioAdminConfigAddon } from "../worker-addons/radio-admin-config-addon.js";
 
 const FUTURE = Math.floor(Date.now() / 1000) + 3600;
@@ -49,6 +50,13 @@ test("MyIDJ token rejection remains distinct from Player Admin password rejectio
       MYIDJ_WORKER_SKIP_URL: "https://myidj.test/api/radio/skip", MYIDJ_WORKER_ADMIN_TOKEN: "wrong-token"
     });
     const data = await response.json();
-    assert.equal(response.status, 401); assert.equal(data.error, "myidj_admin_token_rejected"); assert.notEqual(data.error, "password_rejected");
+    assert.equal(response.status, 502); assert.equal(data.upstreamStatus, 401);
+    assert.equal(data.error, "myidj_admin_token_rejected"); assert.notEqual(data.error, "password_rejected");
   });
+});
+
+test("documented runtime config includes the canonical MyIDJ worker route and secret name", async () => {
+  const envExample = await readFile(new URL("../config/admin-runtime.env.example", import.meta.url), "utf8");
+  assert.match(envExample, /^MYIDJ_WORKER_SKIP_URL=https:\/\/666myidjstreamadmin\.666soundsdesign-broadcaster\.com\/api\/radio\/skip$/m);
+  assert.match(envExample, /^MYIDJ_WORKER_ADMIN_TOKEN=put_matching_myidj_worker_admin_token_in_worker_secret_only$/m);
 });

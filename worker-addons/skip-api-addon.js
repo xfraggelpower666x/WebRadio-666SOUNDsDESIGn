@@ -1,6 +1,6 @@
 /*
 FILE: worker-addons/skip-api-addon.js
-VERSION: 1.1.0
+VERSION: 1.1.1
 PURPOSE: Safe compatibility routes for the historic skip API and MyIDJ route names.
 NOTE: /api/admin/skip remains protected. Compatibility routes proxy to the existing MyIDJ worker.
 */
@@ -47,6 +47,11 @@ function normalizeMyIdjWorkerError(data = {}, status = 0) {
   return normalized || `myidj_skip_http_${status || 502}`;
 }
 
+function publicMyIdjWorkerStatus(error, upstreamStatus = 0) {
+  if (error === "myidj_admin_token_rejected") return 502;
+  return upstreamStatus || 502;
+}
+
 function sameOriginEvidenceOk(request) {
   const requestOrigin = new URL(request.url).origin;
   const origin = String(request.headers.get("origin") || "").trim();
@@ -73,7 +78,7 @@ export async function callMyIdjSkip(payload = {}, env = {}) {
       accept: "application/json",
       "content-type": "application/json",
       "cache-control": "no-store",
-      "user-agent": "666soundsdesign-main-worker-myidj-skip-proxy-v1.1.0",
+      "user-agent": "666soundsdesign-main-worker-myidj-skip-proxy-v1.1.1",
       authorization: `Bearer ${token}`,
       "x-admin-token": token
     });
@@ -88,11 +93,13 @@ export async function callMyIdjSkip(payload = {}, env = {}) {
     let data = {};
     try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text.slice(0, 500) }; }
     if (!response.ok || data.ok === false) {
+      const error = normalizeMyIdjWorkerError(data, response.status);
       return {
         ok: false,
         success: false,
-        status: response.status || 502,
-        error: normalizeMyIdjWorkerError(data, response.status),
+        status: publicMyIdjWorkerStatus(error, response.status),
+        upstreamStatus: response.status || 0,
+        error,
         upstream: "myidj-worker",
         data
       };
