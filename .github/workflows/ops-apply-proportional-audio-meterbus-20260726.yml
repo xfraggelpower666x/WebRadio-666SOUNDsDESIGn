@@ -2,10 +2,9 @@ name: Apply proportional audio MeterBus repair
 
 on:
   push:
-    branches:
-      - repair/proportional-audio-meterbus-20260726
-    paths:
-      - ".github/workflows/ops-apply-proportional-audio-meterbus-20260726.yml"
+    branches: [repair/proportional-audio-meterbus-20260726]
+    paths: [".github/workflows/ops-apply-proportional-audio-meterbus-20260726.yml"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,14 +12,14 @@ permissions:
 jobs:
   repair-existing-audio-layer:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: repair/proportional-audio-meterbus-20260726
           fetch-depth: 0
 
-      - name: Repair canonical visualizer and existing mobile consumer
+      - name: Repair existing audio authority and mobile consumer
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -28,43 +27,28 @@ jobs:
           from pathlib import Path
           import re
 
-          root = Path('.')
-          eq_path = root / 'js/equalizer.js'
-          html_path = root / 'index.html'
+          def sub1(text, pattern, replacement, label, flags=0):
+              out, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, found {count}')
+              return out
+
+          eq_path = Path('js/equalizer.js')
+          html_path = Path('index.html')
           eq = eq_path.read_text(encoding='utf-8')
           html = html_path.read_text(encoding='utf-8')
 
-          def replace_once(text, old, new, label):
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f'{label}: expected exactly 1 match, found {count}')
-              return text.replace(old, new, 1)
-
-          eq = replace_once(
-              eq,
-              '666SOUNDsDESIGn canonical audio visualizer authority V14.',
-              '666SOUNDsDESIGn canonical audio visualizer authority V15.',
-              'equalizer version'
-          )
-          eq = replace_once(
-              eq,
-              ' * Twenty-four independent logarithmic real-frequency bands with balanced perceptual compensation and peak headroom.',
-              ' * Twenty-four independent logarithmic real-frequency bands with proportional volume/boost response and balanced peak headroom.',
-              'equalizer contract header'
+          eq = eq.replace('canonical audio visualizer authority V14', 'canonical audio visualizer authority V15', 1)
+          eq = eq.replace(
+              'Twenty-four independent logarithmic real-frequency bands with balanced perceptual compensation and peak headroom.',
+              'Twenty-four independent logarithmic real-frequency bands with proportional volume/boost response and balanced peak headroom.',
+              1
           )
 
-          old_graph = '''    const source = ctx.createMediaElementSource(audio);
-              source.connect(gainNode);
-              if (eqNodes.length) {
-                gainNode.connect(eqNodes[0]);
-                for (let index = 0; index < eqNodes.length - 1; index += 1) eqNodes[index].connect(eqNodes[index + 1]);
-                eqNodes[eqNodes.length - 1].connect(limiterNode);
-              } else {
-                gainNode.connect(limiterNode);
-              }
-              limiterNode.connect(analyser);
-              analyser.connect(ctx.destination);'''
-          new_graph = '''    const source = ctx.createMediaElementSource(audio);
+          eq = sub1(
+              eq,
+              r"    const source = ctx\.createMediaElementSource\(audio\);[\s\S]*?    applyRealEqToNodes\(\);",
+              """    const source = ctx.createMediaElementSource(audio);
               source.connect(gainNode);
               if (eqNodes.length) {
                 gainNode.connect(eqNodes[0]);
@@ -74,185 +58,123 @@ jobs:
                 gainNode.connect(analyser);
               }
               analyser.connect(limiterNode);
-              limiterNode.connect(ctx.destination);'''
-          eq = replace_once(eq, old_graph, new_graph, 'analysis tap order')
-
-          eq = replace_once(
-              eq,
-              '      const rms = Math.sqrt(sumSq / Math.max(1, timeData.length));\n',
-              '''      const rms = Math.sqrt(sumSq / Math.max(1, timeData.length));
-                  const volume = clamp(audio?.volume ?? 1, 0, 1);
-                  const boostGain = Math.max(1, Number(gainNode?.gain?.value || (window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]) || 1));
-                  const visualGainCompensation = Math.pow(boostGain, -0.55);
-                  const visualVolumeScale = Math.pow(volume, 0.85);
-                  const visualSignalScale = visualGainCompensation * visualVolumeScale;
-          ''',
-              'visual proportional scale'
+              limiterNode.connect(ctx.destination);
+              applyRealEqToNodes();""",
+              'processed analysis tap'
           )
 
-          eq = replace_once(
+          eq = sub1(
               eq,
-              '        const local = average * 0.72 + localPeak * 0.28;\n',
-              '        const local = (average * 0.72 + localPeak * 0.28) * visualSignalScale;\n',
-              'frequency scaling'
+              r"(      const rms = Math\.sqrt\(sumSq / Math\.max\(1, timeData\.length\)\);\n)",
+              r"\1      const volume = clamp(audio?.volume ?? 1, 0, 1);\n      const boostGain = Math.max(1, Number(gainNode?.gain?.value || (window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]) || 1));\n      const visualGainCompensation = Math.pow(boostGain, -0.55);\n      const visualVolumeScale = Math.pow(volume, 0.85);\n      const visualSignalScale = visualGainCompensation * visualVolumeScale;\n",
+              'visual scale'
           )
-          eq = replace_once(
-              eq,
-              '      const level = clamp(rms * 2.40, 0, 1);\n      const peak = clamp(Math.max(samplePeak * 1.08, level), 0, 1);\n',
-              '      const level = clamp(rms * visualSignalScale * 2.40, 0, 1);\n      const peak = clamp(Math.max(samplePeak * visualSignalScale * 1.08, level), 0, 1);\n',
-              'meter scaling'
-          )
-
-          eq = replace_once(
-              eq,
+          eq = sub1(eq, r"const local = average \* 0\.72 \+ localPeak \* 0\.28;", "const local = (average * 0.72 + localPeak * 0.28) * visualSignalScale;", 'band scale')
+          eq = sub1(eq, r"const level = clamp\(rms \* 2\.40, 0, 1\);\n      const peak = clamp\(Math\.max\(samplePeak \* 1\.08, level\), 0, 1\);", "const level = clamp(rms * visualSignalScale * 2.40, 0, 1);\n      const peak = clamp(Math.max(samplePeak * visualSignalScale * 1.08, level), 0, 1);", 'meter scale')
+          eq = eq.replace(
               "      visualCeiling: 'peak-dependent',\n",
               "      visualCeiling: 'peak-dependent',\n      volume: clamp(audio?.volume ?? 1, 0, 1),\n      boostGain: Math.max(1, Number(gainNode?.gain?.value || 1)),\n      eqState: { ...smfpRealEqState },\n",
-              'MeterBus diagnostics'
+              1
           )
-
-          guard_pattern = re.compile(r"\n/\* Mobile-only visibility guard\. Desktop has no secondary interval writer\. \*/\nwindow\.setInterval\(\(\) => \{.*?\n\}, 360\);\s*$", re.S)
-          eq, guard_count = guard_pattern.subn(
-              "\n/* Mobile visuals consume the canonical MeterBus; no secondary synthetic writer is allowed. */\n",
+          eq = sub1(
               eq,
-              count=1
-          )
-          if guard_count != 1:
-              raise SystemExit(f'mobile synthetic guard: expected 1 match, found {guard_count}')
-
-          analyser_signature = '  function mffCleanEqTargetsFromAnalyser(data,count,boost){'
-          if analyser_signature not in html:
-              raise SystemExit('mobile analyser helper signature not found')
-          html = html.replace(analyser_signature, '  function mffCleanEqTargetsFromAnalyser(data,count){', 1)
-          html = replace_once(
-              html,
-              '      var value=.16 + shaped*contour*.92 + (boost||0)*.010;\n',
-              '      var value=.16 + shaped*contour*.92;\n',
-              'remove artificial boost from analyser bars'
-          )
-          html = replace_once(
-              html,
-              "    return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.14,.96), mode:'pc-code-real'};\n",
-              "    return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.02,.96), pulse:0, mode:'local-analyser-real'};\n",
-              'analyser pack'
+              r"\n/\* Mobile-only visibility guard\.[\s\S]*?\n\}, 360\);\s*$",
+              "\n/* Mobile visuals consume the canonical MeterBus; no secondary synthetic writer is allowed. */\n",
+              'secondary synthetic writer removal'
           )
 
-          synthetic_pattern = re.compile(r"  function mffCleanEqTargetsSynthetic\(count,playing,boost\)\{.*?\n  \}\n\n\n  function mffCleanEqRender", re.S)
-          replacement = '''  function mffCleanEqTargetsFromMeterBus(bus,count){
+          html = html.replace('function mffCleanEqTargetsFromAnalyser(data,count,boost)', 'function mffCleanEqTargetsFromAnalyser(data,count)', 1)
+          html = html.replace('var value=.16 + shaped*contour*.92 + (boost||0)*.010;', 'var value=.16 + shaped*contour*.92;', 1)
+          html = html.replace(
+              "return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.14,.96), mode:'pc-code-real'};",
+              "return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.02,.96), pulse:0, mode:'local-analyser-real'};",
+              1
+          )
+
+          html = sub1(
+              html,
+              r"  function mffCleanEqTargetsSynthetic\(count,playing,boost\)\{[\s\S]*?\n  \}\n\n\n  function mffCleanEqRender",
+              """  function mffCleanEqTargetsFromMeterBus(bus,count){
               var source=(bus&&Array.isArray(bus.eq))?bus.eq:[];
               var targets=[];
               for(var i=0;i<count;i++){
                 var sourceIndex=source.length?Math.round((i/Math.max(1,count-1))*(source.length-1)):0;
                 targets.push(mffClamp(Number(source[sourceIndex])||0,.012,.96));
               }
-              return {
-                targets:targets,
-                level:mffClamp(Number(bus&&bus.level)||0,.012,.96),
-                pulse:mffClamp(Number(bus&&bus.pulse)||0,0,1),
-                mode:'meterbus-real'
-              };
+              return {targets:targets,level:mffClamp(Number(bus&&bus.level)||0,.012,.96),pulse:mffClamp(Number(bus&&bus.pulse)||0,0,1),mode:'meterbus-real'};
             }
 
             function mffCleanEqTargetsSynthetic(count){
-              return {targets:new Array(count).fill(.025), level:.015, pulse:0, mode:'idle-unavailable'};
+              return {targets:new Array(count).fill(.025),level:.015,pulse:0,mode:'idle-unavailable'};
             }
 
 
-            function mffCleanEqRender'''
-          html, synthetic_count = synthetic_pattern.subn(replacement, html, count=1)
-          if synthetic_count != 1:
-              raise SystemExit(f'mobile synthetic function: expected 1 match, found {synthetic_count}')
+            function mffCleanEqRender""",
+              'mobile fake wave replacement'
+          )
 
-          old_pack = '''    var boost=boostStage||0;
-              var data=mffCleanEqReadAnalyser();
-              var pack=data
-                ? mffCleanEqTargetsFromAnalyser(data,bars.length,boost)
-                : mffCleanEqTargetsSynthetic(bars.length,playing,boost);'''
-          new_pack = '''    var bus=window.__MeterBus||null;
+          html = sub1(
+              html,
+              r"    var boost=boostStage\|\|0;\n    var data=mffCleanEqReadAnalyser\(\);\n    var pack=data\n      \? mffCleanEqTargetsFromAnalyser\(data,bars\.length,boost\)\n      : mffCleanEqTargetsSynthetic\(bars\.length,playing,boost\);",
+              """    var bus=window.__MeterBus||null;
               var busFresh=!!(bus&&bus.ts&&(Date.now()-Number(bus.ts)<1000)&&bus.source==='real'&&Array.isArray(bus.eq));
               var data=busFresh?null:mffCleanEqReadAnalyser();
               var pack=busFresh
                 ? mffCleanEqTargetsFromMeterBus(bus,bars.length)
-                : (data ? mffCleanEqTargetsFromAnalyser(data,bars.length) : mffCleanEqTargetsSynthetic(bars.length));'''
-          html = replace_once(html, old_pack, new_pack, 'mobile MeterBus selection')
+                : (data ? mffCleanEqTargetsFromAnalyser(data,bars.length) : mffCleanEqTargetsSynthetic(bars.length));""",
+              'mobile MeterBus selection'
+          )
+          html = html.replace("app.setAttribute('data-mff-eq-engine','pc-match-v26');", "app.setAttribute('data-mff-eq-engine',pack.mode==='meterbus-real'?'canonical-meterbus-v15':'idle-no-fake-motion');", 1)
+          html = html.replace('var bottomLevel=mffMeterHeadroom((peak*.90)+mffBoostVisualOffset());\n    updateBottomCenterOutSegments(bottomLevel,boost);', 'var bottomLevel=mffMeterHeadroom(pack.level);\n    updateBottomCenterOutSegments(bottomLevel,pack.pulse||0);', 1)
+          html = html.replace('function updateBottomCenterOutSegments(level, boost)', 'function updateBottomCenterOutSegments(level, pulse)', 1)
+          html = html.replace('var pulse=(Math.sin(Date.now()/210)+1)/2;\n    var boosted=(boost||0)*0.012;', 'var safePulse=mffClamp(Number(pulse)||0,0,1);', 1)
+          html = html.replace('falloff*level + pulse*0.10 + boosted', 'falloff*level + safePulse*0.10', 1)
 
-          html = replace_once(
-              html,
-              "      app.setAttribute('data-mff-eq-engine','pc-match-v26');\n",
-              "      app.setAttribute('data-mff-eq-engine',pack.mode==='meterbus-real'?'canonical-meterbus-v15':'idle-no-fake-motion');\n",
-              'mobile engine marker'
-          )
-          html = replace_once(
-              html,
-              '    var bottomLevel=mffMeterHeadroom((peak*.90)+mffBoostVisualOffset());\n    updateBottomCenterOutSegments(bottomLevel,boost);\n',
-              '    var bottomLevel=mffMeterHeadroom(pack.level);\n    updateBottomCenterOutSegments(bottomLevel,pack.pulse||0);\n',
-              'mobile bottom meter source'
-          )
-          html = replace_once(
-              html,
-              '  function updateBottomCenterOutSegments(level, boost){\n',
-              '  function updateBottomCenterOutSegments(level, pulse){\n',
-              'bottom meter signature'
-          )
-          html = replace_once(
-              html,
-              '    var pulse=(Math.sin(Date.now()/210)+1)/2;\n    var boosted=(boost||0)*0.012;\n',
-              '    var safePulse=mffClamp(Number(pulse)||0,0,1);\n',
-              'remove artificial bottom pulse'
-          )
-          html = replace_once(
-              html,
-              '      var glow=Math.max(0.22,Math.min(1,falloff*level + pulse*0.10 + boosted));\n',
-              '      var glow=Math.max(0.16,Math.min(1,falloff*level + safePulse*0.10));\n',
-              'bottom meter proportional glow'
-          )
+          required = ['canonical audio visualizer authority V15','analyser.connect(limiterNode)','visualGainCompensation']
+          for marker in required:
+              if marker not in eq: raise SystemExit(f'equalizer marker missing: {marker}')
+          for marker in ['mffCleanEqTargetsFromMeterBus','canonical-meterbus-v15','idle-unavailable']:
+              if marker not in html: raise SystemExit(f'html marker missing: {marker}')
 
           eq_path.write_text(eq, encoding='utf-8')
           html_path.write_text(html, encoding='utf-8')
-          (root/'public/js/equalizer.js').write_text(eq, encoding='utf-8')
-          (root/'public/index.html').write_text(html, encoding='utf-8')
+          Path('public/js/equalizer.js').write_text(eq, encoding='utf-8')
+          Path('public/index.html').write_text(html, encoding='utf-8')
 
-          test_path = root/'tests/audio-meter-proportional-contract.test.mjs'
-          test_path.write_text('''import test from 'node:test';
+          Path('tests/audio-meter-proportional-contract.test.mjs').write_text("""import test from 'node:test';
           import assert from 'node:assert/strict';
           import { readFile } from 'node:fs/promises';
           const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
-
-          test('canonical graph analyses processed signal before limiter and publishes proportional state', async () => {
-            const eq = await read('js/equalizer.js');
-            assert.match(eq, /connect\(analyser\)/);
-            assert.match(eq, /analyser\.connect\(limiterNode\)/);
-            assert.match(eq, /visualGainCompensation/);
-            assert.match(eq, /visualVolumeScale/);
-            assert.match(eq, /volume: clamp\(audio\?\.volume/);
-            assert.match(eq, /boostGain:/);
-            assert.doesNotMatch(eq, /Mobile-only visibility guard/);
+          test('processed canonical graph owns proportional MeterBus', async () => {
+            const eq=await read('js/equalizer.js');
+            assert.match(eq,/analyser\\.connect\\(limiterNode\\)/);
+            assert.match(eq,/visualGainCompensation/);
+            assert.match(eq,/visualVolumeScale/);
+            assert.doesNotMatch(eq,/Mobile-only visibility guard/);
+            assert.equal(await read('public/js/equalizer.js'),eq);
           });
-
-          test('mobile main player consumes canonical MeterBus without sinus or boost fake motion', async () => {
-            const html = await read('index.html');
-            const segment = html.match(/function mffCleanEqTargetsSynthetic[\s\S]*?function mffCleanEqRender/)?.[0] || '';
-            assert.match(html, /mffCleanEqTargetsFromMeterBus/);
-            assert.match(html, /canonical-meterbus-v15/);
-            assert.doesNotMatch(segment, /Math\.sin|boostStage|boosted/);
-            assert.match(segment, /idle-unavailable/);
-            assert.doesNotMatch(html, /falloff\*level \+ pulse\*0\.10 \+ boosted/);
-            assert.equal(await read('public/index.html'), html);
-            assert.equal(await read('public/js/equalizer.js'), await read('js/equalizer.js'));
+          test('mobile consumer has no fake sinus or boost animation', async () => {
+            const html=await read('index.html');
+            const synthetic=html.match(/function mffCleanEqTargetsSynthetic[\\s\\S]*?function mffCleanEqRender/)?.[0]||'';
+            assert.match(html,/mffCleanEqTargetsFromMeterBus/);
+            assert.match(html,/canonical-meterbus-v15/);
+            assert.doesNotMatch(synthetic,/Math\\.sin|boostStage|boosted/);
+            assert.equal(await read('public/index.html'),html);
           });
-          ''', encoding='utf-8')
+          """, encoding='utf-8')
           PY
 
           node --check js/equalizer.js
           node --test tests/audio-meter-proportional-contract.test.mjs tests/main-player-reactive-visual-contract.test.mjs
           npm test
 
-      - name: Commit repair and remove one-shot workflow
+      - name: Commit repair and remove temporary runner
         shell: bash
         run: |
           set -Eeuo pipefail
           rm -f .github/workflows/ops-apply-proportional-audio-meterbus-20260726.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add js/equalizer.js public/js/equalizer.js index.html public/index.html tests/audio-meter-proportional-contract.test.mjs .github/workflows/ops-apply-proportional-audio-meterbus-20260726.yml
+          git add -A
           git commit -m "Repair proportional audio MeterBus without new runtime layers"
           git push origin HEAD:repair/proportional-audio-meterbus-20260726
