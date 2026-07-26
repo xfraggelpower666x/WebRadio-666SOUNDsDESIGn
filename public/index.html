@@ -1854,32 +1854,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return mffCleanEqRender(!!playing);
   }
 
-
-
-  function pcMobileEqTimerTick(){
-    if(!isMobile()) return;
-    var audio=null;
-    try{audio=getAudio();}catch(e){}
-    var attrPlaying=document.documentElement.getAttribute('data-mff-playing')==='1';
-    var audioPlaying=!!(audio && !audio.paused && !audio.ended);
-    var playing=attrPlaying || audioPlaying;
-    mffCleanEqRender(playing);
-    pcMobileEqLastTick=Date.now();
-  }
-
-  function startPcMobileEqTimer(){
-    if(pcMobileEqTimer) return;
-    if(window.__s666MobileEqTimer){
-      try{window.clearInterval(window.__s666MobileEqTimer);}catch(e){}
-      window.__s666MobileEqTimer=null;
-    }
-    pcMobileEqTimer=window.setInterval(pcMobileEqTimerTick,110);
-    window.__s666MobileEqTimer=pcMobileEqTimer;
-    pcMobileEqTimerTick();
-    document.documentElement.setAttribute('data-mff-mobile-eq-engine','pc-eq-match-v111-single-loop');
-  }
-
-
+  /* Mobile EQ writing is owned exclusively by js/equalizer.js. */
   function averageRange(arr,start,end){
     var sum=0,count=0;
     for(var i=start;i<end&&i<arr.length;i++){sum+=arr[i];count++;}
@@ -1906,13 +1881,20 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     ensureMobileVersionInControlRow(app);
     killOldDom();
     startMeta();
-    startPcMobileEqTimer();
+    if(window.__S666VisualizerRefreshTargets){window.__S666VisualizerRefreshTargets();}
     installMffAudioSelfHealEvents();
   }
-
-  document.addEventListener('DOMContentLoaded',function(){install();setTimeout(install,150);setTimeout(install,650);setTimeout(install,1500);setTimeout(install,3200);setTimeout(install,6000)});
-  window.addEventListener('load',install,{passive:true});
-  window.addEventListener('resize',install,{passive:true});
+  var mffInstalledOnce=false;
+  function installOnce(){
+    if(mffInstalledOnce)return;
+    mffInstalledOnce=true;
+    install();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',installOnce,{once:true});
+  }else{
+    installOnce();
+  }
   window.addEventListener('orientationchange',install,{passive:true});
 })();
 </script>

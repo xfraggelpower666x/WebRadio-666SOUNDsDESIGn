@@ -212,6 +212,22 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
   const mobileLike = () => window.innerWidth <= 860;
 
+  const refreshVisualizerTargets = () => {
+    if (!mobileLike()) return;
+    const mobileBars = Array.from(document.querySelectorAll('#mffEqBars i'));
+    if (mobileBars.length && (bars.length !== mobileBars.length || bars[0] !== mobileBars[0])) {
+      bars.splice(0, bars.length, ...mobileBars);
+      bandEnvelope = new Array(mobileBars.length).fill(0.012);
+      bandReference = new Array(mobileBars.length).fill(24);
+    }
+    const mobileBottom = Array.from(document.querySelectorAll('#mffBottomBars i'));
+    if (mobileBottom.length && (bottomMeterSegments.length !== mobileBottom.length || bottomMeterSegments[0] !== mobileBottom[0])) {
+      bottomMeterSegments.splice(0, bottomMeterSegments.length, ...mobileBottom);
+    }
+  };
+
+  window.__S666VisualizerRefreshTargets = refreshVisualizerTargets;
+
   const setBar = (bar, normalized) => {
     if (!bar) return;
     const value = clamp(normalized, 0, 1);
@@ -277,6 +293,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
   const renderFallbackFrame = () => {
   if (!running) return;
+  refreshVisualizerTargets();
   const eq = bars.map((bar) => {
     const value = 0.025;
     setBar(bar, value);
@@ -335,6 +352,7 @@ const stopFallback = () => {
   };
 
   const idleState = () => {
+  refreshVisualizerTargets();
   const eq = bars.map((bar) => {
     const value = 0.025;
     setBar(bar, value);
@@ -380,6 +398,7 @@ const stopFallback = () => {
 
     const frame = (timestamp = performance.now()) => {
       if (!running) return;
+      refreshVisualizerTargets();
       analyser.getByteFrequencyData(data);
       analyser.getByteTimeDomainData(timeData);
 
