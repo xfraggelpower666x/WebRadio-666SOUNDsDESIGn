@@ -1,0 +1,45 @@
+name: Verify production single-writer deployment
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-production-single-writer:
+    if: github.head_ref == 'ops/verify-production-single-writer-20260726'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify live main player markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://webradio.666soundsdesign-broadcaster.com'
+          html="$(mktemp)"
+          eq="$(mktemp)"
+          trap 'rm -f "$html" "$eq"' EXIT
+
+          curl --fail --silent --show-error --location --max-time 25 \
+            -H 'cache-control: no-cache' \
+            "$base/?ops_verify=$(date +%s)" -o "$html"
+
+          curl --fail --silent --show-error --location --max-time 25 \
+            -H 'cache-control: no-cache' \
+            "$base/js/equalizer.js?ops_verify=$(date +%s)" -o "$eq"
+
+          grep -Fq 'mffInstalledOnce=false' "$html"
+          grep -Fq '__S666VisualizerRefreshTargets' "$html"
+          ! grep -Fq 'setTimeout(install,150)' "$html"
+          ! grep -Fq 'setInterval(pcMobileEqTimerTick,110)' "$html"
+          ! grep -Fq "addEventListener('resize',install" "$html"
+          ! grep -Fq "addEventListener('orientationchange',install" "$html"
+
+          grep -Fq 'window.__S666VisualizerRefreshTargets = refreshVisualizerTargets' "$eq"
+          grep -Fq "querySelectorAll('#mffEqBars i')" "$eq"
+          grep -Fq "querySelectorAll('#mffBottomBars i')" "$eq"
+
+          echo 'PRODUCTION_SINGLE_WRITER_CONTRACT=PASS'
+          echo 'No mutating request, no Discord send, no skip, no secrets.'
