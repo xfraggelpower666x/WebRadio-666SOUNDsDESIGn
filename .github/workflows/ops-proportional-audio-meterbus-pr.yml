@@ -36,20 +36,30 @@ jobs:
           rm -f tests/audio-meter-proportional-contract.test.mjs
 
       - name: Run full existing release test suite
+        id: full_suite
         shell: bash
         run: |
           set +e
           npm test > /tmp/npm-test.log 2>&1
           code=$?
+          tail -n 220 /tmp/npm-test.log > /tmp/npm-test-tail.log
           if [ "$code" -ne 0 ]; then
-            echo "FULL_SUITE_FAILURE_TAIL"
-            tail -n 180 /tmp/npm-test.log
+            echo "FULL_SUITE_FAILURE"
             exit "$code"
           fi
           echo "FULL_SUITE_PASS"
-          tail -n 30 /tmp/npm-test.log
+
+      - name: Upload full-suite failure tail
+        if: failure() && steps.full_suite.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: proportional-meterbus-full-suite-failure
+          path: /tmp/npm-test-tail.log
+          if-no-files-found: error
+          retention-days: 2
 
       - name: Commit repaired existing layers
+        if: success()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
