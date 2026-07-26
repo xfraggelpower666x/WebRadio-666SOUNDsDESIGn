@@ -46,10 +46,10 @@
     height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 8px)!important;
     max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 8px)!important;
     margin:0 auto!important;
-    padding:39px 0 5px 0!important;
-    gap:6px!important;
+    padding:27px 0 5px 0!important;
+    gap:5px!important;
     overflow:hidden!important;
-    justify-content:center!important;
+    justify-content:flex-start!important;
     transform:none!important;
   }
   #mffApp .mff-side,
@@ -61,8 +61,8 @@
   }
   #mffApp .mff-left,.mff-left{left:5px!important;}
   #mffApp .mff-right,.mff-right{right:5px!important;}
-  #mffApp .mff-now{min-height:96px!important;height:96px!important;padding:9px!important;border-radius:20px!important;grid-template-columns:58px minmax(0,1fr) 60px!important;gap:7px!important;}
-  #mffApp .mff-symbol{width:56px!important;height:56px!important;border-radius:15px!important;}
+  #mffApp .mff-now{min-height:92px!important;height:92px!important;padding:8px!important;border-radius:20px!important;grid-template-columns:62px minmax(0,1fr) 58px!important;gap:7px!important;}
+  #mffApp .mff-symbol{width:62px!important;height:62px!important;border-radius:15px!important;overflow:hidden!important;}
   #mffApp .mff-title small{font-size:10px!important;margin-bottom:5px!important;}
   #mffApp .mff-title h1{font-size:15px!important;margin-bottom:5px!important;}
   #mffApp .mff-title h2{font-size:11px!important;}
@@ -79,11 +79,11 @@
   #mffApp .mff-card small{font-size:8.5px!important;letter-spacing:.08em!important;}
   #mffApp .mff-card strong{font-size:14px!important;margin-top:4px!important;}
   #mffApp .mff-card:nth-child(3) strong{font-size:12px!important;}
-  #mffApp .mff-eq{height:144px!important;min-height:144px!important;padding:10px!important;border-radius:18px!important;}
+  #mffApp .mff-eq{height:138px!important;min-height:138px!important;padding:9px!important;border-radius:18px!important;}
   #mffApp .mff-eq header{margin-bottom:6px!important;}
   #mffApp .mff-eq header span{font-size:12px!important;}
   #mffApp .mff-eq header b{font-size:9px!important;}
-  #mffApp .mff-eq-bars{height:92px!important;gap:4px!important;padding:8px 6px!important;border-radius:14px!important;}
+  #mffApp .mff-eq-bars{height:88px!important;gap:4px!important;padding:7px 6px!important;border-radius:14px!important;}
   #mffApp .mff-eq footer{margin-top:5px!important;font-size:9px!important;}
   #mffApp .mff-controls{height:58px!important;min-height:58px!important;padding:6px!important;border-radius:18px!important;gap:4px!important;}
   #mffApp .mff-controls button{height:42px!important;min-height:42px!important;border-radius:13px!important;font-size:15px!important;}
