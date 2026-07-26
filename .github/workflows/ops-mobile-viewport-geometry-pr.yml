@@ -1,0 +1,37 @@
+name: PR mobile viewport geometry repair
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+
+jobs:
+  repair-existing-mobile-layout:
+    if: github.head_ref == 'repair/mobile-viewport-geometry-20260726'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/mobile-viewport-geometry-20260726
+          fetch-depth: 0
+      - name: Repair existing mobile layout owners
+        run: python3 scripts/ops_apply_mobile_viewport_geometry_20260726.py
+      - name: Verify targeted mobile contracts
+        run: node --test tests/mobile-viewport-geometry-contract.test.mjs
+      - name: Remove temporary automation before release audit
+        run: |
+          rm -f .github/workflows/ops-mobile-viewport-geometry-pr.yml
+          rm -f scripts/ops_apply_mobile_viewport_geometry_20260726.py
+      - name: Run full existing test suite
+        run: npm test
+      - name: Commit repaired existing mobile layers
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Repair iPhone viewport geometry in existing layout owners"
+          git push origin HEAD:repair/mobile-viewport-geometry-20260726
