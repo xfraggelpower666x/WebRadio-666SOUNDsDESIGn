@@ -42,19 +42,26 @@ jobs:
           set +e
           npm test > /tmp/npm-test.log 2>&1
           code=$?
-          tail -n 220 /tmp/npm-test.log > /tmp/npm-test-tail.log
+          : > /tmp/npm-test-failures.log
           if [ "$code" -ne 0 ]; then
+            grep -n '^not ok ' /tmp/npm-test.log | while IFS=: read -r line rest; do
+              start=$((line>6 ? line-6 : 1))
+              end=$((line+34))
+              sed -n "${start},${end}p" /tmp/npm-test.log >> /tmp/npm-test-failures.log
+              printf '\n-----\n' >> /tmp/npm-test-failures.log
+            done
+            tail -n 12 /tmp/npm-test.log >> /tmp/npm-test-failures.log
             echo "FULL_SUITE_FAILURE"
             exit "$code"
           fi
           echo "FULL_SUITE_PASS"
 
-      - name: Upload full-suite failure tail
+      - name: Upload failing assertions
         if: failure() && steps.full_suite.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: proportional-meterbus-full-suite-failure
-          path: /tmp/npm-test-tail.log
+          name: proportional-meterbus-failing-assertions
+          path: /tmp/npm-test-failures.log
           if-no-files-found: error
           retention-days: 2
 
