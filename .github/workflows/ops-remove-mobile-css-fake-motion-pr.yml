@@ -1,0 +1,39 @@
+name: PR remove mobile CSS fake motion
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+
+jobs:
+  repair-mobile-css-audio-authority:
+    if: github.head_ref == 'repair/remove-mobile-css-fake-motion-20260726'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/remove-mobile-css-fake-motion-20260726
+          fetch-depth: 0
+      - name: Repair existing CSS and equalizer owners
+        run: python3 scripts/ops_remove_mobile_css_fake_motion_20260726.py
+      - name: Verify targeted audio authority contract
+        run: node --test tests/mobile-css-audio-authority-contract.test.mjs tests/single-mobile-visual-writer-contract.test.mjs
+      - name: Verify JavaScript syntax
+        run: node --check js/equalizer.js
+      - name: Remove temporary automation before release audit
+        run: |
+          rm -f .github/workflows/ops-remove-mobile-css-fake-motion-pr.yml
+          rm -f scripts/ops_remove_mobile_css_fake_motion_20260726.py
+      - name: Run full existing test suite
+        run: npm test
+      - name: Commit repaired existing owners
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Remove autonomous mobile CSS meter animations"
+          git push origin HEAD:repair/remove-mobile-css-fake-motion-20260726
