@@ -1,0 +1,37 @@
+name: PR proportional audio MeterBus repair
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+
+jobs:
+  repair-existing-layer:
+    if: github.head_ref == 'repair/proportional-audio-meterbus-20260726'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/proportional-audio-meterbus-20260726
+          fetch-depth: 0
+      - name: Apply repair in existing owners
+        run: python3 scripts/ops_apply_proportional_audio_meterbus_20260726.py
+      - name: Verify syntax and contracts
+        run: |
+          node --check js/equalizer.js
+          node --test tests/audio-meter-proportional-contract.test.mjs tests/main-player-reactive-visual-contract.test.mjs
+          npm test
+      - name: Commit repair and remove temporary automation
+        run: |
+          rm -f .github/workflows/ops-apply-proportional-audio-meterbus-20260726.yml
+          rm -f .github/workflows/ops-proportional-audio-meterbus-pr.yml
+          rm -f scripts/ops_apply_proportional_audio_meterbus_20260726.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Repair proportional audio MeterBus without new runtime layers"
+          git push origin HEAD:repair/proportional-audio-meterbus-20260726
