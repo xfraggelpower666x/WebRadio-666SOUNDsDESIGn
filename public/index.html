@@ -1895,7 +1895,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }else{
     installOnce();
   }
-  window.addEventListener('orientationchange',install,{passive:true});
+  window.addEventListener('orientationchange',function(){if(window.__S666VisualizerRefreshTargets){window.__S666VisualizerRefreshTargets();}},{passive:true});
 })();
 </script>
 

@@ -9,6 +9,7 @@ test('mobile player has one visual writer and one installation', async () => {
   assert.doesNotMatch(html, /setInterval\(pcMobileEqTimerTick,110\)/);
   assert.doesNotMatch(html, /setTimeout\(install,150\)/);
   assert.doesNotMatch(html, /addEventListener\('resize',install/);
+  assert.doesNotMatch(html, /addEventListener\('orientationchange',install/);
   assert.match(html, /__S666VisualizerRefreshTargets/);
   assert.match(html, /mffInstalledOnce=false/);
   assert.equal(await read('public/index.html'), html);
