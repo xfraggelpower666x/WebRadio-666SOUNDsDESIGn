@@ -1,0 +1,39 @@
+name: PR finish single mobile visual writer
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    types: [synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+
+jobs:
+  finish-single-mobile-writer:
+    if: github.head_ref == 'repair/remove-competing-mobile-writer-20260726'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/remove-competing-mobile-writer-20260726
+          fetch-depth: 0
+      - name: Remove final orientation rebuild
+        run: python3 scripts/ops_finish_single_mobile_writer_20260726.py
+      - name: Verify ownership contract
+        run: node --test tests/single-mobile-visual-writer-contract.test.mjs
+      - name: Verify JavaScript syntax
+        run: node --check js/equalizer.js
+      - name: Remove temporary automation
+        run: |
+          rm -f .github/workflows/ops-finish-single-mobile-writer-pr.yml
+          rm -f scripts/ops_finish_single_mobile_writer_20260726.py
+      - name: Run full suite
+        run: npm test
+      - name: Commit final single-install cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Prevent orientation from rebuilding the mobile player"
+          git push origin HEAD:repair/remove-competing-mobile-writer-20260726
