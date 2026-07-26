@@ -1,7 +1,7 @@
 /*
- * 666SOUNDsDESIGn canonical audio visualizer authority V14.
+ * 666SOUNDsDESIGn canonical audio visualizer authority V14 · proportional repair V15.
  * One WebAudio graph and one RAF writer for EQ, side meters and bottom meter.
- * Twenty-four independent logarithmic real-frequency bands with balanced perceptual compensation and peak headroom.
+ * Twenty-four independent logarithmic real-frequency bands with proportional volume/boost response and balanced peak headroom.
  */
 
 const BOOST_MULTIPLIERS = (window.SMFPBoostCore && window.SMFPBoostCore.stages)
@@ -262,6 +262,9 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       highFrequencyCompensation: true,
       visualHeadroom: 'balanced',
       visualCeiling: 'peak-dependent',
+      volume: clamp(audio?.volume ?? 1, 0, 1),
+      boostGain: Math.max(1, Number(gainNode?.gain?.value || 1)),
+      eqState: { ...smfpRealEqState },
       left: meterState.left,
       right: meterState.right,
       pulse: meterState.pulse,
@@ -367,12 +370,12 @@ const stopFallback = () => {
     if (eqNodes.length) {
       gainNode.connect(eqNodes[0]);
       for (let index = 0; index < eqNodes.length - 1; index += 1) eqNodes[index].connect(eqNodes[index + 1]);
-      eqNodes[eqNodes.length - 1].connect(limiterNode);
+      eqNodes[eqNodes.length - 1].connect(analyser);
     } else {
-      gainNode.connect(limiterNode);
+      gainNode.connect(analyser);
     }
-    limiterNode.connect(analyser);
-    analyser.connect(ctx.destination);
+    analyser.connect(limiterNode);
+    limiterNode.connect(ctx.destination);
     applyRealEqToNodes();
 
     const frame = (timestamp = performance.now()) => {
@@ -388,6 +391,11 @@ const stopFallback = () => {
         samplePeak = Math.max(samplePeak, Math.abs(sample));
       }
       const rms = Math.sqrt(sumSq / Math.max(1, timeData.length));
+      const volume = clamp(audio?.volume ?? 1, 0, 1);
+      const boostGain = Math.max(1, Number(gainNode?.gain?.value || (window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]) || 1));
+      const visualGainCompensation = Math.pow(boostGain, -0.55);
+      const visualVolumeScale = Math.pow(volume, 0.85);
+      const visualSignalScale = visualGainCompensation * visualVolumeScale;
 
       const bandCount = Math.max(1, bars.length);
       const nyquist = Math.max(1, ctx.sampleRate / 2);
@@ -412,7 +420,7 @@ localPeak = Math.max(localPeak, sample);
 count += 1;
         }
         const average = count ? total / count : 0;
-        const local = average * 0.72 + localPeak * 0.28;
+        const local = (average * 0.72 + localPeak * 0.28) * visualSignalScale;
         globalMax = Math.max(globalMax, localPeak, local);
         rawBands.push(local);
       }
@@ -459,8 +467,8 @@ count += 1;
         eq.push(value);
       });
 
-      const level = clamp(rms * 2.40, 0, 1);
-      const peak = clamp(Math.max(samplePeak * 1.08, level), 0, 1);
+      const level = clamp(rms * visualSignalScale * 2.40, 0, 1);
+      const peak = clamp(Math.max(samplePeak * visualSignalScale * 1.08, level), 0, 1);
       const sliceAverage = (start, end, fallback) => {
         const slice = values.slice(start, end);
         return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : fallback;
@@ -516,17 +524,4 @@ count += 1;
   }
 }
 
-/* Mobile-only visibility guard. Desktop has no secondary interval writer. */
-window.setInterval(() => {
-  if (window.innerWidth > 860) return;
-  try {
-    const audio = document.querySelector('audio');
-    if (!audio || audio.paused || audio.readyState <= 1) return;
-    const current = Number(getComputedStyle(document.documentElement).getPropertyValue('--audio-level')) || 0;
-    if (current < 0.035) {
-      const stage = Number(audio.dataset?.boostStage || 0);
-      const safe = 0.10 + stage * 0.02;
-      writeMobileHudLevelVars(safe, safe);
-    }
-  } catch (_) {}
-}, 360);
+/* Mobile visuals consume the canonical MeterBus; no secondary synthetic writer is allowed. */

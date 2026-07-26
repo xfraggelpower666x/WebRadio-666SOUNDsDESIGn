@@ -1712,7 +1712,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return null;
   }
 
-  function mffCleanEqTargetsFromAnalyser(data,count,boost){
+  function mffCleanEqTargetsFromAnalyser(data,count){
     var halfBars=Math.max(1,Math.floor(count/2));
     var analysisWindow=Math.max(8,Math.floor(data.length*0.72));
     var slice=Math.max(1,Math.floor(analysisWindow/halfBars));
@@ -1744,7 +1744,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
       var shaped=Math.pow(avg/255,0.72);
       var contour=1.16-((i/Math.max(1,halfBars-1))*0.36);
-      var value=.16 + shaped*contour*.92 + (boost||0)*.010;
+      var value=.16 + shaped*contour*.92;
       halfValues.push(mffClamp(value,.13,.86));
     }
 
@@ -1754,56 +1754,35 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       targets.push(halfValues[Math.min(mirroredIndex,halfValues.length-1)]||.14);
     }
 
-    return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.14,.96), mode:'pc-code-real'};
+    return {targets:targets, level:mffClamp(Math.pow(globalMax/255,.62),.02,.96), pulse:0, mode:'local-analyser-real'};
   }
 
-  function mffCleanEqTargetsSynthetic(count,playing,boost){
-    var half=Math.max(1,Math.floor(count/2));
+  function mffCleanEqTargetsFromMeterBus(bus,count){
+    var source=(bus&&Array.isArray(bus.eq))?bus.eq:[];
     var targets=[];
-    var intensity=(playing?1.0:0.36)+(boost||0)*0.018;
-
-    /*
-      v26:
-      An PC js/equalizer.js ausgerichtet.
-      Kein "organic random", sondern organisierte PC-Fallback-Welle:
-      mirroredIndex, waveA, waveB, contour.
-      Das wirkt strukturierter wie PC, statt wie künstliches Algorithmus-Flackern.
-    */
-    mffCleanEqPhase += playing ? 0.092 : 0.038;
-
-    var t=mffCleanEqPhase;
-    var peak=.14;
-
     for(var i=0;i<count;i++){
-      var mirroredIndex=i<half?i:(count-1-i);
-      var pos=mirroredIndex/Math.max(1,half-1);
-
-      var waveA=Math.abs(Math.sin(t + mirroredIndex*0.30));
-      var waveB=Math.abs(Math.sin((t*0.66) + mirroredIndex*0.17));
-      var waveC=Math.abs(Math.sin((t*0.31) + mirroredIndex*0.39));
-
-      var contour=1.16-(pos*0.38);
-      var value=.14 + ((waveA*.52)+(waveB*.18)+(waveC*.07))*contour*intensity;
-
-      // PC-artige ruhige Begrenzung, kein Vollanschlag.
-      value=mffClamp(value,.13,.82);
-      targets.push(value);
-      peak=Math.max(peak,value);
+      var sourceIndex=source.length?Math.round((i/Math.max(1,count-1))*(source.length-1)):0;
+      targets.push(mffClamp(Number(source[sourceIndex])||0,.012,.96));
     }
-
-    return {targets:targets, level:peak, mode:'pc-code-fallback'};
+    return {targets:targets,level:mffClamp(Number(bus&&bus.level)||0,.012,.96),pulse:mffClamp(Number(bus&&bus.pulse)||0,0,1),mode:'meterbus-real'};
   }
+
+  function mffCleanEqTargetsSynthetic(count){
+    return {targets:new Array(count).fill(.025),level:.015,pulse:0,mode:'idle-unavailable'};
+  }
+
 
   function mffCleanEqRender(playing){
     var bars=mffCleanEqBars();
     if(!bars.length) return .14;
 
     mffCleanEqEnsure(bars);
-    var boost=boostStage||0;
-    var data=mffCleanEqReadAnalyser();
-    var pack=data
-      ? mffCleanEqTargetsFromAnalyser(data,bars.length,boost)
-      : mffCleanEqTargetsSynthetic(bars.length,playing,boost);
+    var bus=window.__MeterBus||null;
+    var busFresh=!!(bus&&bus.ts&&(Date.now()-Number(bus.ts)<1000)&&bus.source==='real'&&Array.isArray(bus.eq));
+    var data=busFresh?null:mffCleanEqReadAnalyser();
+    var pack=busFresh
+      ? mffCleanEqTargetsFromMeterBus(bus,bars.length)
+      : (data ? mffCleanEqTargetsFromAnalyser(data,bars.length) : mffCleanEqTargetsSynthetic(bars.length));
 
     /*
       PC-Look: bars sind organisiert, aber nicht permanent gleich schnell.
@@ -1833,33 +1812,32 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     var app=q('#mffApp');
     if(app){
-      app.setAttribute('data-mff-eq-engine','pc-match-v26');
+      app.setAttribute('data-mff-eq-engine',pack.mode==='meterbus-real'?'canonical-meterbus-v15':'idle-no-fake-motion');
       app.setAttribute('data-mff-meter-mode',pack.mode);
     }
 
     // Meter folgt Peak, aber mit Headroom und ohne Boost-Sättigung.
-    var bottomLevel=mffMeterHeadroom((peak*.90)+mffBoostVisualOffset());
-    updateBottomCenterOutSegments(bottomLevel,boost);
+    var bottomLevel=mffMeterHeadroom(pack.level);
+    updateBottomCenterOutSegments(bottomLevel,pack.pulse||0);
     document.documentElement.style.setProperty('--mff-level',bottomLevel.toFixed(3));
     return bottomLevel;
   }
 
 
-  function updateBottomCenterOutSegments(level, boost){
+  function updateBottomCenterOutSegments(level, pulse){
     var bars=qa('#mffBottomBars i');
     if(!bars.length) return;
     var n=bars.length;
     var half=Math.floor(n/2);
     var active=Math.max(1,Math.min(half-1,Math.round(Math.min(level,.96)*half)));
-    var pulse=(Math.sin(Date.now()/210)+1)/2;
-    var boosted=(boost||0)*0.012;
+    var safePulse=mffClamp(Number(pulse)||0,0,1);
 
     for(var i=0;i<n;i++){
       var isLeft=i<half;
       var distFromCenter=isLeft?(half-1-i):(i-half);
       var on=distFromCenter<active;
       var falloff=1-(distFromCenter/Math.max(1,half));
-      var glow=Math.max(0.22,Math.min(1,falloff*level + pulse*0.10 + boosted));
+      var glow=Math.max(0.22,Math.min(1,falloff*level + safePulse*0.10));
 
       bars[i].classList.toggle('mff-seg-on',on);
       bars[i].style.setProperty('--mff-bar-on',on?'1':'0');
