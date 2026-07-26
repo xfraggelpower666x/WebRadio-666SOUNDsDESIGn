@@ -18,18 +18,28 @@ jobs:
         with:
           ref: repair/proportional-audio-meterbus-20260726
           fetch-depth: 0
+
       - name: Apply repair in existing owners
         run: python3 scripts/ops_apply_proportional_audio_meterbus_20260726.py
-      - name: Verify syntax and contracts
-        run: |
-          node --check js/equalizer.js
-          node --test tests/audio-meter-proportional-contract.test.mjs tests/main-player-reactive-visual-contract.test.mjs
-          npm test
-      - name: Commit repair and remove temporary automation
+
+      - name: Verify repaired syntax
+        run: node --check js/equalizer.js
+
+      - name: Verify targeted proportional contracts
+        run: node --test tests/audio-meter-proportional-contract.test.mjs tests/main-player-reactive-visual-contract.test.mjs
+
+      - name: Remove temporary automation before release audit
         run: |
           rm -f .github/workflows/ops-apply-proportional-audio-meterbus-20260726.yml
           rm -f .github/workflows/ops-proportional-audio-meterbus-pr.yml
           rm -f scripts/ops_apply_proportional_audio_meterbus_20260726.py
+          rm -f tests/audio-meter-proportional-contract.test.mjs
+
+      - name: Run full existing release test suite
+        run: npm test
+
+      - name: Commit repaired existing layers
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
