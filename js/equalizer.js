@@ -125,6 +125,7 @@ const writeMobileHudLevelVars = (level = 0, peak = level) => {
   const safePeak = clamp(peak, 0, 1);
   const root = document.documentElement;
   root.style.setProperty('--audio-level', safeLevel.toFixed(3));
+  root.style.setProperty('--mff-level', safeLevel.toFixed(3));
   root.style.setProperty('--audio-peak', safePeak.toFixed(3));
   root.style.setProperty('--meter-left', safeLevel.toFixed(3));
   root.style.setProperty('--meter-right', safeLevel.toFixed(3));
