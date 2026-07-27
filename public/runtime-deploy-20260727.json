@@ -1,0 +1,8 @@
+{
+  "deployment": "runtime-owner-repair-production",
+  "expectedMainCommit": "101457b46d1f6ece036f26070bb723115d105253",
+  "triggeredAt": "2026-07-27T12:40:13Z",
+  "publishedRoot": "public",
+  "workerAssetsDirectory": "./public",
+  "reason": "Force production autodeploy after runtime owner repair; not a preview deployment."
+}
