@@ -6,25 +6,50 @@ on:
       - WebRadio-666SOUNDsDESIGn
     paths:
       - ".github/workflows/666pfs-child-freeze.yml"
-      - "public/666pfs-child-release.json"
+      - ".github/workflows/deploy-cloudflare-workers.yml"
       - "docs/666PFS_CHILD_666STREAM_DEPLOYMENT_CONTRACT_v1.0.0.md"
+      - "external-workers/**"
+      - "public/**"
+      - "worker.js"
+      - "wrangler.jsonc"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
+      - "tests/**"
+      - "worker-addons/**"
+  workflow_run:
+    workflows:
+      - Deploy WebRadio Cloudflare Workers
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
+  pull-requests: write
+  issues: write
 
 concurrency:
-  group: 666pfs-666stream-child-freeze-${{ github.ref }}
+  group: 666pfs-666stream-child-freeze-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: false
 
 jobs:
-  verify-and-freeze:
+  verify-readback-and-freeze:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    env:
+      FREEZE_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      BACKUP_CLASS: ${{ github.event_name == 'workflow_run' && 'POST_DEPLOY_VERIFIED_TREE' || 'PR_TREE_CANDIDATE' }}
+      PRODUCTION_ORIGIN: https://webradio.666soundsdesign-broadcaster.com
     steps:
       - name: Checkout exact repository tree
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.FREEZE_SHA }}
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -39,33 +64,163 @@ jobs:
       - name: Run repository verification
         run: npm run verify
 
-      - name: Build immutable repository tree archive
+      - name: Read back deployed production
+        if: github.event_name == 'workflow_run'
         shell: bash
         run: |
           set -euo pipefail
-          ARCHIVE="666PFS_666STREAM_REPOSITORY_TREE_${GITHUB_SHA}.zip"
-          git archive --format=zip --output="$ARCHIVE" HEAD
+          CACHE_BUST="${FREEZE_SHA}-$(date +%s)"
+          MARKER="PRODUCTION_READBACK_${FREEZE_SHA}.json"
+          INDEX="PRODUCTION_INDEX_${FREEZE_SHA}.html"
+
+          curl --fail --silent --show-error --location \
+            --retry 12 --retry-delay 5 --retry-all-errors \
+            --max-time 30 \
+            "${PRODUCTION_ORIGIN}/666pfs-child-release.json?verify=${CACHE_BUST}" \
+            --output "$MARKER"
+
+          curl --fail --silent --show-error --location \
+            --retry 12 --retry-delay 5 --retry-all-errors \
+            --max-time 30 \
+            "${PRODUCTION_ORIGIN}/?verify=${CACHE_BUST}" \
+            --output "$INDEX"
+
+          node - "$MARKER" <<'NODE'
+          const fs = require('node:fs');
+          const markerPath = process.argv[2];
+          const data = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+          const expected = {
+            systemId: '666PFS-666STREAM-DEPLOYMENT-001',
+            parentSystem: '666PFS',
+            version: '1.0.1',
+            backupAllowedAfter: 'DEPLOYMENT_READBACK_PASS',
+            childAutoload: false,
+            secondBootstrap: false,
+            secondUpdateRoute: false,
+            lyvra: 'EXTERNAL_UNCHANGED'
+          };
+          for (const [key, value] of Object.entries(expected)) {
+            if (data[key] !== value) {
+              throw new Error(`Production marker mismatch for ${key}: ${JSON.stringify(data[key])}`);
+            }
+          }
+          NODE
+
+          grep -Eiq '<!doctype html|<html' "$INDEX"
+
+          {
+            echo "DEPLOYMENT_WORKFLOW_RUN_ID=${{ github.event.workflow_run.id }}"
+            echo "DEPLOYMENT_HEAD_SHA=${FREEZE_SHA}"
+            echo "PRODUCTION_ORIGIN=${PRODUCTION_ORIGIN}"
+            echo "MARKER_PATH=/666pfs-child-release.json"
+            echo "MARKER_SCHEMA=666pfs-666stream-child-release-v1"
+            echo "DEPLOYMENT_READBACK=PASS"
+            echo "FUNCTIONAL_HTTP_READBACK=PASS"
+          } > "PRODUCTION_READBACK_RECEIPT_${FREEZE_SHA}.txt"
+
+      - name: Build immutable repository tree archive
+        id: freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARCHIVE="666PFS_666STREAM_REPOSITORY_TREE_${FREEZE_SHA}.zip"
+          TREE="REPOSITORY_TREE_${FREEZE_SHA}.txt"
+          METADATA="666PFS_666STREAM_FREEZE_METADATA_${FREEZE_SHA}.txt"
+
+          git archive --format=zip --output="$ARCHIVE" "$FREEZE_SHA"
           sha256sum "$ARCHIVE" > "${ARCHIVE}.sha256"
-          git ls-tree -r --long HEAD > "REPOSITORY_TREE_${GITHUB_SHA}.txt"
+          git ls-tree -r --long "$FREEZE_SHA" > "$TREE"
+
+          HASH="$(sha256sum "$ARCHIVE" | awk '{print $1}')"
+          SIZE="$(stat -c%s "$ARCHIVE")"
+          ENTRIES="$(unzip -Z1 "$ARCHIVE" | wc -l | tr -d ' ')"
+          unzip -t "$ARCHIVE" > "ZIP_CRC_${FREEZE_SHA}.txt"
+
           {
             echo "SYSTEM_ID=666PFS-666STREAM-DEPLOYMENT-001"
             echo "PARENT_SYSTEM=666PFS"
             echo "SOURCE_REPOSITORY=${GITHUB_REPOSITORY}"
-            echo "SOURCE_COMMIT=${GITHUB_SHA}"
+            echo "SOURCE_COMMIT=${FREEZE_SHA}"
+            echo "SOURCE_EVENT=${GITHUB_EVENT_NAME}"
             echo "SOURCE_REF=${GITHUB_REF}"
             echo "ARCHIVE=${ARCHIVE}"
+            echo "ARCHIVE_SHA256=${HASH}"
+            echo "ARCHIVE_SIZE=${SIZE}"
+            echo "ARCHIVE_ENTRIES=${ENTRIES}"
+            echo "ZIP_CRC=PASS"
             echo "VERIFY_COMMAND=npm run verify"
-            echo "BACKUP_CLASS=PR_TREE_CANDIDATE"
-          } > "666PFS_666STREAM_FREEZE_METADATA_${GITHUB_SHA}.txt"
+            echo "BACKUP_CLASS=${BACKUP_CLASS}"
+            echo "DEPLOYMENT_READBACK=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
+          } > "$METADATA"
+
+          echo "archive=${ARCHIVE}" >> "$GITHUB_OUTPUT"
+          echo "hash=${HASH}" >> "$GITHUB_OUTPUT"
+          echo "size=${SIZE}" >> "$GITHUB_OUTPUT"
+          echo "entries=${ENTRIES}" >> "$GITHUB_OUTPUT"
+          echo "source_commit=${FREEZE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "metadata=${METADATA}" >> "$GITHUB_OUTPUT"
+          echo "tree=${TREE}" >> "$GITHUB_OUTPUT"
 
       - name: Upload 666PFS child freeze artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 666pfs-666stream-repository-tree-${{ github.sha }}
+          name: 666pfs-666stream-repository-tree-${{ steps.freeze.outputs.source_commit }}
           path: |
-            666PFS_666STREAM_REPOSITORY_TREE_${{ github.sha }}.zip
-            666PFS_666STREAM_REPOSITORY_TREE_${{ github.sha }}.zip.sha256
-            REPOSITORY_TREE_${{ github.sha }}.txt
-            666PFS_666STREAM_FREEZE_METADATA_${{ github.sha }}.txt
-          if-no-files-found: error
+            ${{ steps.freeze.outputs.archive }}
+            ${{ steps.freeze.outputs.archive }}.sha256
+            ${{ steps.freeze.outputs.tree }}
+            ${{ steps.freeze.outputs.metadata }}
+            ZIP_CRC_${{ steps.freeze.outputs.source_commit }}.txt
+            PRODUCTION_READBACK_${{ steps.freeze.outputs.source_commit }}.json
+            PRODUCTION_READBACK_RECEIPT_${{ steps.freeze.outputs.source_commit }}.txt
+          if-no-files-found: warn
           retention-days: 30
+
+      - name: Publish post-deploy receipt to associated pull request
+        if: github.event_name == 'workflow_run'
+        uses: actions/github-script@v7
+        env:
+          SOURCE_COMMIT: ${{ steps.freeze.outputs.source_commit }}
+          ARCHIVE_SHA256: ${{ steps.freeze.outputs.hash }}
+          ARCHIVE_SIZE: ${{ steps.freeze.outputs.size }}
+          ARCHIVE_ENTRIES: ${{ steps.freeze.outputs.entries }}
+          ARTIFACT_NAME: 666pfs-666stream-repository-tree-${{ steps.freeze.outputs.source_commit }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const commit_sha = process.env.SOURCE_COMMIT;
+            const { data: pulls } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha
+            });
+            const body = [
+              '## 666PFS 666STREAM Post-Deploy Freeze Receipt',
+              '',
+              `- SOURCE_COMMIT=${commit_sha}`,
+              `- DEPLOYMENT_WORKFLOW_RUN_ID=${context.payload.workflow_run.id}`,
+              `- FREEZE_WORKFLOW_RUN_ID=${context.runId}`,
+              '- DEPLOYMENT_READBACK=PASS',
+              '- FUNCTIONAL_HTTP_READBACK=PASS',
+              '- REPOSITORY_VERIFY=PASS',
+              '- ZIP_CRC=PASS',
+              `- ZIP_SHA256=${process.env.ARCHIVE_SHA256}`,
+              `- ZIP_SIZE=${process.env.ARCHIVE_SIZE}`,
+              `- ZIP_ENTRIES=${process.env.ARCHIVE_ENTRIES}`,
+              `- ARTIFACT_NAME=${process.env.ARTIFACT_NAME}`,
+              '- BACKUP_CLASS=POST_DEPLOY_VERIFIED_TREE',
+              '- CHILD_BACKUP_REGISTRATION=READY',
+              '- LYVRA=EXTERNAL_UNCHANGED'
+            ].join('\n');
+            if (pulls.length === 0) {
+              core.warning(`No pull request associated with ${commit_sha}; receipt remains in the workflow artifact.`);
+              return;
+            }
+            for (const pull of pulls) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pull.number,
+                body
+              });
+            }
