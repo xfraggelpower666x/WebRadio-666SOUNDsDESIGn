@@ -64,13 +64,14 @@ jobs:
       - name: Run repository verification
         run: npm run verify
 
-      - name: Read back deployed production
+      - name: Read back exact deployed production commit
         if: github.event_name == 'workflow_run'
         shell: bash
         run: |
           set -euo pipefail
-          CACHE_BUST="${FREEZE_SHA}-$(date +%s)"
+          CACHE_BUST="${FREEZE_SHA}-${{ github.event.workflow_run.id }}-$(date +%s)"
           MARKER="PRODUCTION_READBACK_${FREEZE_SHA}.json"
+          IDENTITY="PRODUCTION_DEPLOYMENT_IDENTITY_${FREEZE_SHA}.json"
           INDEX="PRODUCTION_INDEX_${FREEZE_SHA}.html"
 
           curl --fail --silent --show-error --location \
@@ -82,17 +83,27 @@ jobs:
           curl --fail --silent --show-error --location \
             --retry 12 --retry-delay 5 --retry-all-errors \
             --max-time 30 \
+            "${PRODUCTION_ORIGIN}/666pfs-deployed-commit.json?verify=${CACHE_BUST}" \
+            --output "$IDENTITY"
+
+          curl --fail --silent --show-error --location \
+            --retry 12 --retry-delay 5 --retry-all-errors \
+            --max-time 30 \
             "${PRODUCTION_ORIGIN}/?verify=${CACHE_BUST}" \
             --output "$INDEX"
 
-          node - "$MARKER" <<'NODE'
+          node - "$MARKER" "$IDENTITY" "$FREEZE_SHA" "${{ github.event.workflow_run.id }}" <<'NODE'
           const fs = require('node:fs');
           const markerPath = process.argv[2];
+          const identityPath = process.argv[3];
+          const expectedCommit = process.argv[4];
+          const expectedWorkflowRunId = process.argv[5];
           const data = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+          const identity = JSON.parse(fs.readFileSync(identityPath, 'utf8'));
           const expected = {
             systemId: '666PFS-666STREAM-DEPLOYMENT-001',
             parentSystem: '666PFS',
-            version: '1.0.1',
+            version: '1.0.2',
             backupAllowedAfter: 'DEPLOYMENT_READBACK_PASS',
             childAutoload: false,
             secondBootstrap: false,
@@ -104,6 +115,18 @@ jobs:
               throw new Error(`Production marker mismatch for ${key}: ${JSON.stringify(data[key])}`);
             }
           }
+          if (identity.schema !== '666pfs-666stream-deployed-commit-v1') {
+            throw new Error(`Deployment identity schema mismatch: ${JSON.stringify(identity.schema)}`);
+          }
+          if (identity.systemId !== expected.systemId) {
+            throw new Error(`Deployment identity system mismatch: ${JSON.stringify(identity.systemId)}`);
+          }
+          if (identity.sourceCommit !== expectedCommit) {
+            throw new Error(`DEPLOYED_COMMIT_MISMATCH expected=${expectedCommit} actual=${identity.sourceCommit}`);
+          }
+          if (String(identity.workflowRunId) !== String(expectedWorkflowRunId)) {
+            throw new Error(`DEPLOYMENT_RUN_MISMATCH expected=${expectedWorkflowRunId} actual=${identity.workflowRunId}`);
+          }
           NODE
 
           grep -Eiq '<!doctype html|<html' "$INDEX"
@@ -113,7 +136,11 @@ jobs:
             echo "DEPLOYMENT_HEAD_SHA=${FREEZE_SHA}"
             echo "PRODUCTION_ORIGIN=${PRODUCTION_ORIGIN}"
             echo "MARKER_PATH=/666pfs-child-release.json"
+            echo "IDENTITY_PATH=/666pfs-deployed-commit.json"
             echo "MARKER_SCHEMA=666pfs-666stream-child-release-v1"
+            echo "IDENTITY_SCHEMA=666pfs-666stream-deployed-commit-v1"
+            echo "IDENTITY_SOURCE_COMMIT=${FREEZE_SHA}"
+            echo "DEPLOYMENT_IDENTITY_MATCH=PASS"
             echo "DEPLOYMENT_READBACK=PASS"
             echo "FUNCTIONAL_HTTP_READBACK=PASS"
           } > "PRODUCTION_READBACK_RECEIPT_${FREEZE_SHA}.txt"
@@ -150,6 +177,7 @@ jobs:
             echo "ZIP_CRC=PASS"
             echo "VERIFY_COMMAND=npm run verify"
             echo "BACKUP_CLASS=${BACKUP_CLASS}"
+            echo "DEPLOYMENT_IDENTITY_MATCH=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
             echo "DEPLOYMENT_READBACK=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
           } > "$METADATA"
 
@@ -172,6 +200,7 @@ jobs:
             ${{ steps.freeze.outputs.metadata }}
             ZIP_CRC_${{ steps.freeze.outputs.source_commit }}.txt
             PRODUCTION_READBACK_${{ steps.freeze.outputs.source_commit }}.json
+            PRODUCTION_DEPLOYMENT_IDENTITY_${{ steps.freeze.outputs.source_commit }}.json
             PRODUCTION_READBACK_RECEIPT_${{ steps.freeze.outputs.source_commit }}.txt
           if-no-files-found: warn
           retention-days: 30
@@ -195,11 +224,12 @@ jobs:
               commit_sha
             });
             const body = [
-              '## 666PFS 666STREAM Post-Deploy Freeze Receipt',
+              '## 666PFS 666STREAM Commit-Bound Post-Deploy Freeze Receipt',
               '',
               `- SOURCE_COMMIT=${commit_sha}`,
               `- DEPLOYMENT_WORKFLOW_RUN_ID=${context.payload.workflow_run.id}`,
               `- FREEZE_WORKFLOW_RUN_ID=${context.runId}`,
+              '- DEPLOYMENT_IDENTITY_MATCH=PASS',
               '- DEPLOYMENT_READBACK=PASS',
               '- FUNCTIONAL_HTTP_READBACK=PASS',
               '- REPOSITORY_VERIFY=PASS',
