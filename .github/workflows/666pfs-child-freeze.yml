@@ -1,0 +1,71 @@
+name: 666PFS 666STREAM Child Freeze
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/666pfs-child-freeze.yml"
+      - "public/666pfs-child-release.json"
+      - "docs/666PFS_CHILD_666STREAM_DEPLOYMENT_CONTRACT_v1.0.0.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 666pfs-666stream-child-freeze-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact repository tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run repository verification
+        run: npm run verify
+
+      - name: Build immutable repository tree archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARCHIVE="666PFS_666STREAM_REPOSITORY_TREE_${GITHUB_SHA}.zip"
+          git archive --format=zip --output="$ARCHIVE" HEAD
+          sha256sum "$ARCHIVE" > "${ARCHIVE}.sha256"
+          git ls-tree -r --long HEAD > "REPOSITORY_TREE_${GITHUB_SHA}.txt"
+          {
+            echo "SYSTEM_ID=666PFS-666STREAM-DEPLOYMENT-001"
+            echo "PARENT_SYSTEM=666PFS"
+            echo "SOURCE_REPOSITORY=${GITHUB_REPOSITORY}"
+            echo "SOURCE_COMMIT=${GITHUB_SHA}"
+            echo "SOURCE_REF=${GITHUB_REF}"
+            echo "ARCHIVE=${ARCHIVE}"
+            echo "VERIFY_COMMAND=npm run verify"
+            echo "BACKUP_CLASS=PR_TREE_CANDIDATE"
+          } > "666PFS_666STREAM_FREEZE_METADATA_${GITHUB_SHA}.txt"
+
+      - name: Upload 666PFS child freeze artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 666pfs-666stream-repository-tree-${{ github.sha }}
+          path: |
+            666PFS_666STREAM_REPOSITORY_TREE_${{ github.sha }}.zip
+            666PFS_666STREAM_REPOSITORY_TREE_${{ github.sha }}.zip.sha256
+            REPOSITORY_TREE_${{ github.sha }}.txt
+            666PFS_666STREAM_FREEZE_METADATA_${{ github.sha }}.txt
+          if-no-files-found: error
+          retention-days: 30
