@@ -412,15 +412,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
 
   function getAudio(){
-    var a=q('#mffAudio')||q('audio');
-    if(!a){
-      a=document.createElement('audio');
-      a.id='mffAudio'; a.preload='none'; a.crossOrigin='anonymous'; a.playsInline=true; a.style.display='none';
-      document.body.appendChild(a);
-    }
-    if(!a.getAttribute('src'))a.setAttribute('src',STREAM_URL);
-      
-    return a;
+    return q('#radio')||q('audio')||null;
   }
 
 
@@ -466,13 +458,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     try{document.documentElement.setAttribute('data-mff-audio-dirty',mffAudioDirtyReason)}catch(e){}
   }
 
-  function resetMffAudioGraph(reason){
-    try{if(audioGraph&&audioGraph.gain)audioGraph.gain.disconnect()}catch(e){}
-    try{if(audioGraph&&audioGraph.analyser)audioGraph.analyser.disconnect()}catch(e){}
-    try{if(audioGraph&&audioGraph.compressor)audioGraph.compressor.disconnect()}catch(e){}
-    try{if(window.__mffMediaElementSource)window.__mffMediaElementSource.disconnect()}catch(e){}
+  function resetMffAudioGraph(){
     audioGraph=null;
-    try{document.documentElement.setAttribute('data-mff-audio-graph-reset',reason||'reset')}catch(e){}
   }
 
   function prepareMffAudioForPlay(reason){
@@ -520,80 +507,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   }
 
   function ensureAudioGraph(){
-    var audio=getAudio();
-    if(audioGraph && audioGraph.audio===audio) return audioGraph;
-    if(window.SMFPRealEq){
-      audioGraph={audio:audio,ok:false,external:true};
-      document.documentElement.setAttribute('data-mff-boost-engine','central-meterbus');
-      return audioGraph;
-    }
-    try{
-      var AC=window.AudioContext||window.webkitAudioContext;
-      if(!AC) throw new Error('WebAudio unavailable');
-
-      var ctx=window.__mffAudioContext || new AC();
-      window.__mffAudioContext=ctx;
-
-      var source=window.__mffMediaElementSource;
-      if(!source){
-        source=ctx.createMediaElementSource(audio);
-        window.__mffMediaElementSource=source;
-      }
-
-      var gain=ctx.createGain();
-      gain.gain.value=(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage] || 1));
-
-      var analyser=ctx.createAnalyser();
-      analyser.fftSize=128;
-      analyser.smoothingTimeConstant=0.72;
-      analyser.minDecibels=-86;
-      analyser.maxDecibels=-18;
-
-      var comp=ctx.createDynamicsCompressor();
-      comp.threshold.value=-0.25;
-      comp.knee.value=2;
-      comp.ratio.value=1.08;
-      comp.attack.value=0.002;
-      comp.release.value=0.12;
-
-      var eqNodes=makeSmfpEqNodes(ctx);
-
-      try{source.disconnect()}catch(e){}
-      source.connect(gain);
-      if(eqNodes.length){
-        gain.connect(eqNodes[0]);
-        for(var ei=0; ei<eqNodes.length-1; ei++) eqNodes[ei].connect(eqNodes[ei+1]);
-        eqNodes[eqNodes.length-1].connect(analyser);
-      }else{
-        gain.connect(analyser);
-      }
-      analyser.connect(comp);
-      comp.connect(ctx.destination);
-
-      audio.volume=1;
-      audioGraph={
-        audio:audio,
-        ctx:ctx,
-        source:source,
-        gain:gain,
-        eqNodes:eqNodes,
-        analyser:analyser,
-        compressor:comp,
-        ok:true,
-        lastGain:gain.gain.value,
-        freqData:new Uint8Array(analyser.frequencyBinCount),
-        timeData:new Uint8Array(analyser.fftSize)
-      };
-      document.documentElement.setAttribute('data-mff-boost-engine','webaudio-ramp-analyser');
-      applySmfpEqToGraph();
-      return audioGraph;
-    }catch(e){
-      console.warn('[666 boost] WebAudio fallback',e);
-      try{audio.volume=Math.min(1,(window.SMFPBoostCore?window.SMFPBoostCore.getGain(boostStage):(BOOST_GAINS[boostStage]||1)))}catch(_){}
-      audioGraph={audio:audio,ok:false,error:String(e)};
-      document.documentElement.setAttribute('data-mff-boost-engine','volume-fallback');
-      return audioGraph;
-    }
+    return null;
   }
 
   function applyBoostRamp(previousStage){
@@ -641,12 +555,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
   }
 
-  async function resumeAudioGraph(){
-    var graph=ensureAudioGraph();
-    if(graph && graph.ok && graph.ctx && graph.ctx.state==='suspended'){
-      try{await graph.ctx.resume()}catch(e){}
-    }
-    applyBoostRamp(boostStage);
+  async async function resumeAudioGraph(){
+    try{
+      var ctx=window.__radioAudioContext;
+      if(ctx && ctx.state==='suspended') await ctx.resume();
+    }catch(e){}
+    return true;
   }
 
 
@@ -779,43 +693,28 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-  async function play(){
+  async async function play(){
     mffUserStopped=false;
     setMffTickerLoadingV113();
-    prepareMffAudioForPlay(mffLastUserStopAt?'stop-to-play':'fresh-play');
-    await resumeAudioGraph();
-    var a=getAudio();
-    try{
-      var nextUrl=getStreamUrlForTarget(manualStreamTarget);
-      if(!a.getAttribute('src') || a.getAttribute('src')!==nextUrl) a.setAttribute('src',nextUrl);
-      var r=a.play();
-      if(r&&typeof r.catch==='function') r.catch(function(e){console.warn('[666 mobile play]',e)});
-      setTransportState('play');
-      setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
-      setTimeout(function(){tickMeta();},120);
-    }catch(e){
-      console.warn('[666 mobile play]',e);
-      setTransportState('stop');
-      setPanelLedsOffline();
-    }
+    var canonical=document.getElementById('playBtn');
+    if(canonical && typeof canonical.click==='function') canonical.click();
+    setTransportState('play');
+    setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
+    setTimeout(function(){tickMeta();},120);
   }
   function pause(){
-    var a=getAudio();
     mffUserStopped=true;
     mffLastUserStopAt=Date.now();
-    markMffAudioDirty('user-pause');
-    try{a.pause();a.removeAttribute('src');a.load()}catch(e){}
-    resetMffAudioGraph('user-pause');
+    var canonical=document.getElementById('pauseBtn');
+    if(canonical && typeof canonical.click==='function') canonical.click();
     setTransportState('pause');
     setMffTickerIdleV113();
   }
   function stop(){
-    var a=getAudio();
     mffUserStopped=true;
     mffLastUserStopAt=Date.now();
-    markMffAudioDirty('user-stop');
-    try{a.pause();a.removeAttribute('src');try{a.currentTime=0}catch(e){}a.load()}catch(e){}
-    resetMffAudioGraph('user-stop');
+    var canonical=document.getElementById('stopBtn');
+    if(canonical && typeof canonical.click==='function') canonical.click();
     setTransportState('stop');
     setMffTickerIdleV113();
   }
@@ -1297,22 +1196,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     manualStreamTarget=(target==='backup')?'backup':'main';
     document.documentElement.setAttribute('data-manual-stream-target',manualStreamTarget);
     updateStreamSwitchButtons();
-
-    var a=getAudio();
-    var wasPlaying=false;
-    try{wasPlaying=!!(a && !a.paused && !a.ended);}catch(e){}
-
-    try{
-      if(a){
-        a.pause();
-        a.removeAttribute('src');
-        a.load();
-        a.setAttribute('src',getStreamUrlForTarget(manualStreamTarget));
-      }
-    }catch(e){}
-
+    var canonical=document.getElementById(manualStreamTarget==='backup'?'fallbackBtn':'mainBtn');
+    if(canonical && typeof canonical.click==='function') canonical.click();
     setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});
-    if(wasPlaying){setTimeout(play,120);}
   }
 
   function updateStreamSwitchButtons(){
