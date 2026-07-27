@@ -1,0 +1,47 @@
+name: Audit Freeze Runtime Owner Repair
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    paths:
+      - 'scripts/audit-freeze-runtime-owner-repair-20260727.mjs'
+      - '.github/workflows/audit-freeze-runtime-owner-repair-20260727.yml'
+      - 'index.html'
+      - 'public/index.html'
+      - 'tests/player-runtime-single-audio-owner-contract.test.mjs'
+
+permissions:
+  contents: write
+
+jobs:
+  repair-runtime-owner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Repair active runtime owners
+        run: node scripts/audit-freeze-runtime-owner-repair-20260727.mjs
+      - name: Verify focused runtime ownership
+        run: node --test tests/player-runtime-single-audio-owner-contract.test.mjs
+      - name: Verify JavaScript syntax
+        run: |
+          node --check js/player-core.js
+          node --check js/equalizer.js
+      - name: Remove temporary repair automation
+        run: |
+          rm -f scripts/audit-freeze-runtime-owner-repair-20260727.mjs
+          rm -f .github/workflows/audit-freeze-runtime-owner-repair-20260727.yml
+      - name: Run complete existing tests
+        run: npm test
+      - name: Commit practical repair
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html public/index.html tests/player-runtime-single-audio-owner-contract.test.mjs scripts/audit-freeze-runtime-owner-repair-20260727.mjs .github/workflows/audit-freeze-runtime-owner-repair-20260727.yml
+          git commit -m 'Repair main player to one canonical audio owner'
+          git push
