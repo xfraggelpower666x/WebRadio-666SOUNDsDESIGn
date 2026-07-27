@@ -555,7 +555,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     }
   }
 
-  async async function resumeAudioGraph(){
+  async function resumeAudioGraph(){
     try{
       var ctx=window.__radioAudioContext;
       if(ctx && ctx.state==='suspended') await ctx.resume();
@@ -693,7 +693,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
 
 
-  async async function play(){
+  async function play(){
     mffUserStopped=false;
     setMffTickerLoadingV113();
     var canonical=document.getElementById('playBtn');
