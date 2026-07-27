@@ -72,6 +72,29 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+
+      - name: Generate commit-bound production identity marker
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const marker = {
+            schema: '666pfs-666stream-deployed-commit-v1',
+            systemId: '666PFS-666STREAM-DEPLOYMENT-001',
+            sourceCommit: process.env.GITHUB_SHA,
+            workflowRunId: process.env.GITHUB_RUN_ID,
+            repository: process.env.GITHUB_REPOSITORY,
+            productionBranch: process.env.GITHUB_REF_NAME,
+            generatedAt: new Date().toISOString()
+          };
+          fs.writeFileSync(
+            'public/666pfs-deployed-commit.json',
+            `${JSON.stringify(marker, null, 2)}\n`,
+            'utf8'
+          );
+          NODE
+
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
