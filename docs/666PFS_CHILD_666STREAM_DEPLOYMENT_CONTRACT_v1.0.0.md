@@ -1,5 +1,7 @@
 # 666PFS Child 666STREAM Deployment Contract
-## Version 1.0.0
+## Version 1.0.1
+
+> Compatibility note: the established repository path retains `v1.0.0` in its filename to avoid a duplicate documentation route. This document content is authoritative for v1.0.1.
 
 SYSTEM_ID=666PFS-666STREAM-DEPLOYMENT-001
 PARENT_SYSTEM=666PFS
@@ -8,6 +10,7 @@ CHILD_NAMESPACE=666PFS/Child_Systems/666STREAM_DEPLOYMENT
 CHILD_AUTOLOAD=FORBIDDEN
 SECOND_BOOTSTRAP=FORBIDDEN
 SECOND_UPDATE_ROUTE=FORBIDDEN
+POST_DEPLOY_FREEZE_REQUIRED=true
 LYVRA=EXTERNAL_UNCHANGED
 
 ## Activation
@@ -28,21 +31,42 @@ When 666CSM has unambiguously selected this child, the parent lifecycle is exten
 3. Repair in place only when a verified change is required.
 4. Run syntax, runtime, asset and repository verification.
 5. Upload the verified change to GitHub.
-6. Allow the configured production deployment to complete.
-7. Read back the live deployment marker and critical runtime assets.
-8. Require `DEPLOYMENT_READBACK=PASS` and `FUNCTIONAL_VERIFICATION=PASS`.
-9. Freeze the exact deployed repository tree.
-10. Store MD + ZIP + SHA-256 as this 666PFS child release.
-11. Read back the child backup and verify size, entries, CRC and SHA-256.
-12. Update Registry and Menu.
-13. Update the CURRENT Pointer last.
+6. Complete the configured `Deploy WebRadio Cloudflare Workers` workflow.
+7. Start the child freeze only from a successful production deployment workflow run.
+8. Check out the exact deployed production commit.
+9. Read back the live child marker and production HTML from the configured production origin.
+10. Require `DEPLOYMENT_READBACK=PASS` and `FUNCTIONAL_HTTP_READBACK=PASS`.
+11. Freeze the exact deployed repository tree.
+12. Generate ZIP, SHA-256, repository-tree inventory, CRC receipt and deployment receipt.
+13. Store the verified package as this 666PFS child release.
+14. Read back the canonical and backup copies and verify size, entries, CRC and SHA-256.
+15. Update Registry and Menu.
+16. Update the CURRENT Pointer last.
 
-A repository archive created before production readback is only a candidate and must not be registered as a verified release.
+A repository archive created during pull-request validation is classified only as `PR_TREE_CANDIDATE`. It must not be registered as a verified release. Only an archive generated after a successful production deployment and successful production readback may use `BACKUP_CLASS=POST_DEPLOY_VERIFIED_TREE`.
+
+## Deployable-path coverage
+
+The candidate verification path covers the same production-relevant paths as the existing deployment workflow, including:
+
+- `.github/workflows/deploy-cloudflare-workers.yml`
+- `.github/workflows/666pfs-child-freeze.yml`
+- `external-workers/**`
+- `public/**`
+- `worker.js`
+- `wrangler.jsonc`
+- `package.json`
+- `package-lock.json`
+- `scripts/**`
+- `tests/**`
+- `worker-addons/**`
+
+The authoritative post-deploy freeze is triggered by the completed production deployment workflow and therefore freezes every successfully deployed production commit regardless of which allowed deployable path changed.
 
 ## Authority split
 
 - GitHub repository: technical code source of truth.
-- Production readback: deployment success authority.
+- Successful production deployment workflow plus live production readback: deployment success authority.
 - 666PFS and 666CSM: child lifecycle, registry and backup authority.
 - LYVRA: external and unchanged.
 
@@ -60,8 +84,9 @@ REPOSITORY_VERIFIED=PASS
 GITHUB_UPLOAD=PASS
 DEPLOYMENT=SUCCESS
 DEPLOYMENT_READBACK=PASS
-FUNCTIONAL_VERIFICATION=PASS
+FUNCTIONAL_HTTP_READBACK=PASS
 REPOSITORY_TREE_FREEZE=PASS
+ZIP_CRC=PASS
 CHILD_BACKUP_WRITE=PASS
 CHILD_BACKUP_READBACK=PASS
 SHA256_VERIFIED=PASS
