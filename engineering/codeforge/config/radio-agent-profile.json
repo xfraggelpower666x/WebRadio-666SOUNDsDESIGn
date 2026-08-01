@@ -1,0 +1,21 @@
+{
+  "continuation": "CHECKPOINT_CLASSIFY_INTEGRATE_KNOWLEDGE_ARCHITECTURE_REAUDIT_RESUME",
+  "integration_root": "engineering/codeforge",
+  "mode": "READ_ONLY_AUDIT_AND_PROPOSAL",
+  "production_branch": "WebRadio-666SOUNDsDESIGn",
+  "protected_paths": [
+    "worker.js",
+    "public/**",
+    "workers/**",
+    "js/**",
+    "css/**",
+    ".github/workflows/**",
+    "wrangler.jsonc",
+    "package.json",
+    "index.html"
+  ],
+  "real_write_enabled": false,
+  "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "schema": "codeforge-radio-agent-profile-v1",
+  "version": "1.6.0-radio.1"
+}

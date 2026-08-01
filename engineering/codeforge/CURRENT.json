@@ -1,0 +1,10 @@
+{
+  "agent": "engineering/codeforge/codeforge_radio_agent.py",
+  "checkpoint": "IMPLEMENTATION_PHASE7_9100",
+  "continuation_state_digest": "2d10b8c8bc90984a2720a5e1c0dfb276e4b1b259aec366b1601be306901b72db",
+  "digest": "e4c1f80d96a7d82ae56aea249b4572d9a69e6f6cb6185228b423daae7c72b9b3",
+  "manifest_digest": "6c6b062487dad5b393b597655114b50df75405ab41af2b03cfd123b1f7fedd2b",
+  "schema": "codeforge-radio-current-v3",
+  "status": "CANDIDATE_BRANCH_ONLY",
+  "version": "1.6.0-radio.1"
+}
