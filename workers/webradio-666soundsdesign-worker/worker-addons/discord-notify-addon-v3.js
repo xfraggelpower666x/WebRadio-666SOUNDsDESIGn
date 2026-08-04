@@ -352,9 +352,13 @@ async function sendDiscord(env, payload) {
   return { ok: true, count: results.length, results };
 }
 
-async function sendPrivateNowPlayingIfConfigured(env, payload) {
-  const privateWebhook = getPrivateTrackWebhook(env);
+async function sendPrivateNowPlayingIfConfigured(env, payload, alreadyUsedWebhooks = []) {
+  const privateWebhook = clean(getPrivateTrackWebhook(env), '', 1000);
   if (!privateWebhook) return { configured: false, skipped: true };
+  const used = new Set((alreadyUsedWebhooks || []).map(value => clean(value, '', 1000)).filter(Boolean));
+  if (used.has(privateWebhook)) {
+    return { configured: true, skipped: true, reason: 'private webhook duplicates main delivery target' };
+  }
   try {
     const result = await sendDiscordToWebhook(privateWebhook, payload);
     return { configured: true, ok: true, result };
@@ -470,12 +474,13 @@ export async function handleDiscordNotifyV3(request, env = {}) {
         runtime.lastKind = 'nowplaying-dedupe';
         return json({ ok: true, skipped: true, reason: 'duplicate track cooldown', led: 'dedupe', addon: ADDON_VERSION });
       }
-      runtime.lastTrackKey = key;
-      runtime.lastTrackAt = now;
       runtime.lastKind = 'nowplaying';
       const payload = nowPlayingPayload(input);
+      const mainWebhooks = getDiscordWebhooks(env);
       const result = await sendDiscord(env, payload);
-      const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload);
+      runtime.lastTrackKey = key;
+      runtime.lastTrackAt = Date.now();
+      const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload, mainWebhooks);
       return json({ ok: true, type: 'nowplaying', led: 'ok', discord: result, privateTrack, addon: ADDON_VERSION });
     }
 
