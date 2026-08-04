@@ -1,0 +1,34 @@
+name: Repair canonical mobile EQ sync
+
+on:
+  push:
+    branches:
+      - repair/canonical-mobile-eq-sync-20260804
+    paths:
+      - scripts/repair-canonical-mobile-eq-sync.mjs
+      - .github/workflows/repair-canonical-mobile-eq-sync.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/canonical-mobile-eq-sync-20260804
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/repair-canonical-mobile-eq-sync.mjs
+      - run: node --test tests/canonical-mobile-eq-sync.test.mjs
+      - run: node --check js/sound-control-overlay-v1.js
+      - run: |
+          rm scripts/repair-canonical-mobile-eq-sync.mjs
+          rm .github/workflows/repair-canonical-mobile-eq-sync.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html public/index.html js/sound-control-overlay-v1.js public/js/sound-control-overlay-v1.js tests/canonical-mobile-eq-sync.test.mjs scripts/repair-canonical-mobile-eq-sync.mjs .github/workflows/repair-canonical-mobile-eq-sync.yml
+          git commit -m "Synchronize mobile sound controls with canonical EQ"
+          git push
