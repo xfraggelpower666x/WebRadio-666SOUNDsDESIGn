@@ -1,4 +1,4 @@
-// CI retrigger after one-shot cleanup; runtime files unchanged.
+// CI retrigger after private-delivery status extension; runtime files unchanged.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -16,9 +16,11 @@ test('partial main or mirror failure remains visible',()=>{
   assert.ok(root.includes("runtime.lastError = partial ? failed.map(item => item.error).join(' | ').slice(0, 1200) : ''"));
 });
 
-test('all successful response routes expose partial and delivery LED',()=>{
-  for(const type of ['test','message','nowplaying','manual']) assert.ok(root.includes("type: '"+type+"', led: discordDeliveryLed(result)"),type);
-  assert.equal((root.match(/partial: Boolean\(result\.partial\)/g)||[]).length,4);
+test('all successful response routes expose truthful partial and delivery LED state',()=>{
+  for(const type of ['test','message','manual']) assert.ok(root.includes("type: '"+type+"', led: discordDeliveryLed(result)"),type);
+  assert.ok(root.includes("type: 'nowplaying', led: partial ? 'warning' : discordDeliveryLed(result)"),'nowplaying');
+  assert.ok((root.match(/partial: Boolean\(result\.partial\)/g)||[]).length>=3);
+  assert.ok(root.includes('const partial = Boolean(result.partial || privatePartial)'));
 });
 
 test('delivery and endpoint contracts remain intact',()=>{
