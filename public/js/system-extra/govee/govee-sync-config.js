@@ -4,8 +4,10 @@ export const GOVEE_SYNC_CONFIG = {
   // local bridge endpoint
   baseUrl: "http://localhost:3000",
 
-  // how often audio packets are sent to the bridge
+  // runtime pacing and bridge recovery
   sendIntervalMs: 90,
+  requestTimeoutMs: 1800,
+  reconnectDelayMs: 5000,
 
   // scene coupling
   sceneCoupling: true,
