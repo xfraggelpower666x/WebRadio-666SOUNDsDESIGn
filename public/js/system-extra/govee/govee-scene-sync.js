@@ -10,10 +10,25 @@ function sceneToMode(scene) {
   return GOVEE_SYNC_CONFIG.sceneModeMap?.[scene] || "cyber";
 }
 
-function readFxContext() {
+function inferSignalScene(detail = {}) {
+  const energy = clamp(detail.energy ?? detail.level, 0, 1);
+  const pulse = clamp(detail.pulse || 0, 0, 1);
+  const playing = document.documentElement.getAttribute("data-mff-playing") === "1";
+  const realSignal = detail.source === "real" || energy > 0.025;
+
+  if ((!playing && !realSignal) || energy < 0.025) return "idle";
+  if (pulse > 0.42 || energy > 0.78) return "drop";
+  if (energy > 0.32) return "build";
+  if (energy < 0.12) return "break";
+  return "build";
+}
+
+function readFxContext(detail = {}) {
   const body = document.body;
+  const explicitScene = String(body?.dataset.fxSceneMode || "").trim();
   return {
-    scene: body?.dataset.fxSceneMode || "idle",
+    scene: explicitScene || inferSignalScene(detail),
+    sceneSource: explicitScene ? "dataset" : "meterbus",
     theme: body?.dataset.fxTheme || "pink-cyan",
     tunnel: body?.dataset.fxTunnel || "off",
     lightning: body?.dataset.fxLightning || "off",
@@ -71,6 +86,8 @@ export function initGoveeSceneSync(ctx) {
 
   let lastSend = 0;
   let lastScene = null;
+  let pendingScene = null;
+  let pendingSceneSince = 0;
   let connected = false;
   let retryAt = 0;
   let inFlight = false;
@@ -104,10 +121,20 @@ export function initGoveeSceneSync(ctx) {
         connected = true;
       }
 
-      const fx = readFxContext();
-      const payload = mapAnalyzer(event.detail || {}, fx);
+      const detail = event.detail || {};
+      const fx = readFxContext(detail);
+      const payload = mapAnalyzer(detail, fx);
+      document.documentElement.setAttribute("data-govee-scene", fx.scene);
+      document.documentElement.setAttribute("data-govee-scene-source", fx.sceneSource);
 
-      if (GOVEE_SYNC_CONFIG.sceneCoupling && fx.scene !== lastScene) {
+      if (fx.scene !== pendingScene) {
+        pendingScene = fx.scene;
+        pendingSceneSince = now;
+      }
+
+      const immediateScene = fx.sceneSource === "dataset" || fx.scene === "drop" || fx.scene === "storm";
+      const stableScene = now - pendingSceneSince >= 1200;
+      if (GOVEE_SYNC_CONFIG.sceneCoupling && fx.scene !== lastScene && (lastScene === null || immediateScene || stableScene)) {
         await goveeSetMode(sceneToMode(fx.scene));
         lastScene = fx.scene;
       }
@@ -137,13 +164,15 @@ export function initGoveeSceneSync(ctx) {
     },
     setMode(mode) {
       lastScene = null;
+      pendingScene = null;
+      pendingSceneSince = 0;
       return goveeSetMode(mode);
     },
     sendPreview(payload) {
       return goveeSendAudio(payload);
     },
     getState() {
-      return { enabled: GOVEE_SYNC_CONFIG.enabled, connected, retryAt, lastScene };
+      return { enabled: GOVEE_SYNC_CONFIG.enabled, connected, retryAt, lastScene, pendingScene };
     },
     destroy() {
       destroyed = true;
