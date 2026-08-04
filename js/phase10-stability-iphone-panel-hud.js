@@ -239,14 +239,49 @@ RULES:
     }catch(e){ setMobileStatus(panel,"message",false,"ERROR"); }
   }
 
+  var mobileBottomMeterState = { started:false, smooth:0 };
+
+  function mobileBottomMeterTick(){
+    var box = qs("#s666MobileBottomSafe");
+    var fill = box && qs(".s666-mobile-meterfill", box);
+    if(!fill) return;
+    var audio = getAudio();
+    var bus = window.__MeterBus;
+    var fresh = !!(bus && bus.source === "real" && typeof bus.level === "number" && Date.now() - Number(bus.ts || 0) < 700);
+    var level = fresh && audio && !audio.paused ? Math.max(0, Math.min(1, Number(bus.level) || 0)) : 0;
+    mobileBottomMeterState.smooth = mobileBottomMeterState.smooth*.72 + level*.28;
+    if(level === 0 && mobileBottomMeterState.smooth < .01) mobileBottomMeterState.smooth = 0;
+    fill.style.setProperty("width", "100%", "important");
+    fill.style.setProperty("transform", "scaleX(" + mobileBottomMeterState.smooth.toFixed(4) + ")", "important");
+    fill.style.setProperty("opacity", fresh ? "1" : ".32", "important");
+    document.documentElement.setAttribute("data-mobile-bottom-meter-source", fresh ? "meterbus-real" : "real-unavailable");
+  }
+
+  function startMobileBottomMeter(){
+    if(mobileBottomMeterState.started) return;
+    mobileBottomMeterState.started = true;
+    mobileBottomMeterTick();
+    setInterval(mobileBottomMeterTick, 120);
+  }
+
   function mountBottomSafe(){
     var app = qs("#mffApp");
-    if(!app || qs("#s666MobileBottomSafe")) return;
-    var box = document.createElement("div");
-    box.id = "s666MobileBottomSafe";
-    box.className = "s666-mobile-bottom-safe";
-    box.innerHTML = '<div class="s666-mobile-copyline">666SOUNDsDESIGn WebRadio</div><div class="s666-mobile-meterline"><i class="s666-mobile-meterfill"></i></div>';
-    document.body.appendChild(box);
+    if(!app) return;
+    var box = qs("#s666MobileBottomSafe");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "s666MobileBottomSafe";
+      box.className = "s666-mobile-bottom-safe";
+      box.innerHTML = '<div class="s666-mobile-copyline">666SOUNDsDESIGn WebRadio</div><div class="s666-mobile-meterline"><i class="s666-mobile-meterfill"></i></div>';
+      document.body.appendChild(box);
+    }
+    box.style.setProperty("bottom", "max(var(--s666-safe-bottom), 6px)", "important");
+    var fill = qs(".s666-mobile-meterfill", box);
+    if(fill){
+      fill.style.setProperty("width", "100%", "important");
+      fill.style.setProperty("transform", "scaleX(0)", "important");
+    }
+    startMobileBottomMeter();
   }
 
   function bindEqTriggers(){
