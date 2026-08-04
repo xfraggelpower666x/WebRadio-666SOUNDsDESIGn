@@ -1281,7 +1281,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     qa('#mffStreamSwitch .mff-stream-btn',app).forEach(function(btn){
       if(btn.__mffStreamBound)return;
       btn.__mffStreamBound=true;
+      var lastStreamSwitchTouchAt=0;
       var fn=function(ev){
+        if(ev.type==='touchend') lastStreamSwitchTouchAt=Date.now();
+        else if(ev.type==='click' && Date.now()-lastStreamSwitchTouchAt<700){ev.preventDefault();ev.stopPropagation();return;}
         ev.preventDefault();
         ev.stopPropagation();
         setManualStreamTarget(btn.getAttribute('data-stream-target')||'main');
