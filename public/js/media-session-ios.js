@@ -151,13 +151,15 @@
     }
 
     function submitAdminSkip(reason) {
-      fetch('/api/admin/skip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ source: reason || 'mediasession-nexttrack' }),
-        cache: 'no-store'
-      }).catch(function () {});
+      var source = reason || 'mediasession-nexttrack';
+      if (window.S666SkipControl && typeof window.S666SkipControl.skip === 'function') {
+        return window.S666SkipControl.skip({ source: source, ensureAuth: true });
+      }
+      document.documentElement.setAttribute('data-media-session-skip-error', 'skip-control-missing');
+      try {
+        window.dispatchEvent(new CustomEvent('s666:skip-state', { detail: { phase: 'error', error: 'skip_control_missing', source: source } }));
+      } catch (e) {}
+      return Promise.resolve({ ok: false, error: 'skip_control_missing' });
     }
 
     // ─── Sync MediaSession with audio element state ───────────────────────────
