@@ -36,8 +36,10 @@ const runtime = globalThis.__S666_DISCORD_V3_RUNTIME__ || {
   lastOkAt: 0,
   lastErrorAt: 0,
   lastError: '',
-  lastKind: 'idle'
+  lastKind: 'idle',
+  pendingPrivateTrackKey: ''
 };
+if (typeof runtime.pendingPrivateTrackKey !== 'string') runtime.pendingPrivateTrackKey = '';
 globalThis.__S666_DISCORD_V3_RUNTIME__ = runtime;
 
 function json(data, status = 200) {
@@ -477,6 +479,22 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       if (!key) return json({ ok: false, error: 'track/artist/title/nowPlaying fehlt' }, 400);
       const now = Date.now();
       if (key === runtime.lastTrackKey && now - runtime.lastTrackAt < MIN_TRACK_COOLDOWN_MS) {
+        if (runtime.pendingPrivateTrackKey === key) {
+          const payload = nowPlayingPayload(input);
+          const mainWebhooks = getDiscordWebhooks(env);
+          const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload, mainWebhooks);
+          const privateFailed = privateTrack.configured === true && privateTrack.ok === false;
+          if (privateFailed) {
+            runtime.lastErrorAt = Date.now();
+            runtime.lastError = clean(privateTrack.error, 'private_track_delivery_failed', 1200);
+            runtime.lastKind = 'nowplaying-private-retry-failed';
+            return json({ ok: true, partial: true, privateRetry: true, skippedMain: true, led: 'warning', privateTrack, addon: ADDON_VERSION });
+          }
+          runtime.pendingPrivateTrackKey = '';
+          runtime.lastError = '';
+          runtime.lastKind = 'nowplaying-private-retry-ok';
+          return json({ ok: true, partial: false, privateRetry: true, skippedMain: true, led: 'ok', privateTrack, addon: ADDON_VERSION });
+        }
         runtime.lastKind = 'nowplaying-dedupe';
         return json({ ok: true, skipped: true, reason: 'duplicate track cooldown', led: 'dedupe', addon: ADDON_VERSION });
       }
@@ -490,8 +508,11 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       const privatePartial = privateTrack.configured === true && privateTrack.ok === false;
       const partial = Boolean(result.partial || privatePartial);
       if (privatePartial) {
+        runtime.pendingPrivateTrackKey = key;
         runtime.lastErrorAt = Date.now();
         runtime.lastError = clean(privateTrack.error, 'private_track_delivery_failed', 1200);
+      } else if (runtime.pendingPrivateTrackKey === key) {
+        runtime.pendingPrivateTrackKey = '';
       }
       return json({ ok: true, partial, type: 'nowplaying', led: partial ? 'warning' : discordDeliveryLed(result), discord: result, privateTrack, addon: ADDON_VERSION });
     }
