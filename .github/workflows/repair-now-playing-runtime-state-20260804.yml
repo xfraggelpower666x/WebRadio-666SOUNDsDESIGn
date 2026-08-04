@@ -1,0 +1,43 @@
+name: Repair Now Playing runtime state
+
+on:
+  push:
+    branches: [repair/now-playing-runtime-state-20260804]
+    paths:
+      - 'scripts/repair-now-playing-runtime-state-20260804.mjs'
+      - '.github/workflows/repair-now-playing-runtime-state-20260804.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/now-playing-runtime-state-20260804
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply targeted runtime-state repair
+        run: node scripts/repair-now-playing-runtime-state-20260804.mjs
+      - name: Verify targeted contract
+        run: node --test tests/now-playing-runtime-state.test.mjs
+      - name: Verify inline scripts and full suite
+        run: |
+          node --check js/player-core.js
+          node --check js/equalizer.js
+          npm test
+      - name: Remove temporary automation and commit repair
+        run: |
+          rm -f scripts/repair-now-playing-runtime-state-20260804.mjs
+          rm -f .github/workflows/repair-now-playing-runtime-state-20260804.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Repair Now Playing runtime-state detection'
+          git push origin HEAD:repair/now-playing-runtime-state-20260804
