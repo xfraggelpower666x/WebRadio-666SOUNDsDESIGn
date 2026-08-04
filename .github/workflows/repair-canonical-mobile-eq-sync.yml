@@ -21,14 +21,30 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node scripts/repair-canonical-mobile-eq-sync.mjs
+      - name: Apply repair with failure receipt
+        run: |
+          set +e
+          node scripts/repair-canonical-mobile-eq-sync.mjs > /tmp/canonical-eq-repair.log 2>&1
+          code=$?
+          cat /tmp/canonical-eq-repair.log
+          if [ "$code" -ne 0 ]; then
+            mkdir -p diagnostics
+            cp /tmp/canonical-eq-repair.log diagnostics/canonical-mobile-eq-repair-failure.log
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add diagnostics/canonical-mobile-eq-repair-failure.log
+            git commit -m "Record canonical mobile EQ repair failure"
+            git push
+            exit "$code"
+          fi
       - run: node --test tests/canonical-mobile-eq-sync.test.mjs
       - run: node --check js/sound-control-overlay-v1.js
       - run: |
           rm scripts/repair-canonical-mobile-eq-sync.mjs
           rm .github/workflows/repair-canonical-mobile-eq-sync.yml
+          rm -f diagnostics/canonical-mobile-eq-repair-failure.log
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html public/index.html js/sound-control-overlay-v1.js public/js/sound-control-overlay-v1.js tests/canonical-mobile-eq-sync.test.mjs scripts/repair-canonical-mobile-eq-sync.mjs .github/workflows/repair-canonical-mobile-eq-sync.yml
+          git add index.html public/index.html js/sound-control-overlay-v1.js public/js/sound-control-overlay-v1.js tests/canonical-mobile-eq-sync.test.mjs scripts/repair-canonical-mobile-eq-sync.mjs .github/workflows/repair-canonical-mobile-eq-sync.yml diagnostics/canonical-mobile-eq-repair-failure.log
           git commit -m "Synchronize mobile sound controls with canonical EQ"
           git push
