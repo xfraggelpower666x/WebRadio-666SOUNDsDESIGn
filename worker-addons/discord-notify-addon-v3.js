@@ -347,9 +347,15 @@ async function sendDiscord(env, payload) {
   }
   const failed = results.filter(item => !item.ok);
   if (failed.length === results.length) throw new Error(failed.map(item => item.error).join(' | ') || 'all_discord_webhooks_failed');
+  const partial = failed.length > 0;
   runtime.lastOkAt = Date.now();
-  runtime.lastError = '';
-  return { ok: true, count: results.length, results };
+  runtime.lastErrorAt = partial ? Date.now() : runtime.lastErrorAt;
+  runtime.lastError = partial ? failed.map(item => item.error).join(' | ').slice(0, 1200) : '';
+  return { ok: true, partial, delivered: results.length - failed.length, failed: failed.length, count: results.length, results };
+}
+
+function discordDeliveryLed(result) {
+  return result && result.partial ? 'warning' : 'ok';
 }
 
 async function sendPrivateNowPlayingIfConfigured(env, payload, alreadyUsedWebhooks = []) {
@@ -451,7 +457,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       const message = clean(input.message || input.text || input.content, 'VELUNA Discord test ' + new Date().toISOString(), 1800);
       runtime.lastKind = 'test';
       const result = await sendDiscord(env, messagePayload({ ...input, message }));
-      return json({ ok: true, type: 'test', led: 'ok', discord: result, addon: ADDON_VERSION });
+      return json({ ok: true, partial: Boolean(result.partial), type: 'test', led: discordDeliveryLed(result), discord: result, addon: ADDON_VERSION });
     }
     if (path === '/api/discord/message') {
       const message = clean(input.message || input.text || input.content, '', 1800);
@@ -464,7 +470,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastMessageAt = now;
       runtime.lastKind = 'message';
       const result = await sendDiscord(env, messagePayload(input));
-      return json({ ok: true, type: 'message', led: 'ok', discord: result, addon: ADDON_VERSION });
+      return json({ ok: true, partial: Boolean(result.partial), type: 'message', led: discordDeliveryLed(result), discord: result, addon: ADDON_VERSION });
     }
     if (path === '/api/discord/nowplaying') {
       const key = trackKey(input);
@@ -481,7 +487,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastTrackKey = key;
       runtime.lastTrackAt = Date.now();
       const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload, mainWebhooks);
-      return json({ ok: true, type: 'nowplaying', led: 'ok', discord: result, privateTrack, addon: ADDON_VERSION });
+      return json({ ok: true, partial: Boolean(result.partial), type: 'nowplaying', led: discordDeliveryLed(result), discord: result, privateTrack, addon: ADDON_VERSION });
     }
 
     const now = Date.now();
@@ -492,7 +498,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     runtime.lastManualAt = now;
     runtime.lastKind = 'manual';
     const result = await sendDiscord(env, manualPayload(input));
-    return json({ ok: true, type: 'manual', led: 'ok', discord: result, addon: ADDON_VERSION });
+    return json({ ok: true, partial: Boolean(result.partial), type: 'manual', led: discordDeliveryLed(result), discord: result, addon: ADDON_VERSION });
   } catch (err) {
     runtime.lastErrorAt = Date.now();
     runtime.lastError = err && err.message ? err.message : String(err);
