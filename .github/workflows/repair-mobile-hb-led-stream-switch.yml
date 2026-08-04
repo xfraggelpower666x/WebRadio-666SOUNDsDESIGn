@@ -1,0 +1,34 @@
+name: Repair mobile H/B LED stream switch
+
+on:
+  push:
+    branches:
+      - repair/mobile-hb-led-stream-switch-20260804
+    paths:
+      - scripts/repair-mobile-hb-led-stream-switch.mjs
+      - .github/workflows/repair-mobile-hb-led-stream-switch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/mobile-hb-led-stream-switch-20260804
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/repair-mobile-hb-led-stream-switch.mjs
+      - run: node --test tests/mobile-hb-led-stream-switch.test.mjs
+      - run: node --check js/phase10-stability-iphone-panel-hud.js
+      - run: |
+          rm scripts/repair-mobile-hb-led-stream-switch.mjs
+          rm .github/workflows/repair-mobile-hb-led-stream-switch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/phase10-stability-iphone-panel-hud.js public/js/phase10-stability-iphone-panel-hud.js tests/mobile-hb-led-stream-switch.test.mjs scripts/repair-mobile-hb-led-stream-switch.mjs .github/workflows/repair-mobile-hb-led-stream-switch.yml
+          git commit -m "Bind mobile H/B LEDs to canonical stream controls"
+          git push
