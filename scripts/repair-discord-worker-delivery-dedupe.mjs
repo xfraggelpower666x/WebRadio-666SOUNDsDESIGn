@@ -72,7 +72,7 @@ test('nowplaying dedupe commits only after a successful main delivery',()=>{
   const sendAt=root.indexOf('const result = await sendDiscord(env, payload)',start);
   const keyAt=root.indexOf('runtime.lastTrackKey = key',start);
   const timeAt=root.indexOf('runtime.lastTrackAt = Date.now()',start);
-  const nextManualAt=root.indexOf('runtime.lastKind = \'manual\'',start);
+  const nextManualAt=root.indexOf("runtime.lastKind = 'manual'",start);
   assert.ok(start>=0&&sendAt>start&&keyAt>sendAt&&timeAt>sendAt&&nextManualAt>timeAt);
   const block=root.slice(start,nextManualAt);
   assert.ok(!block.includes('runtime.lastTrackAt = now'));
