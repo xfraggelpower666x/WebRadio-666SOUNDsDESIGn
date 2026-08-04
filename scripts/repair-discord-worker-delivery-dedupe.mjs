@@ -69,7 +69,7 @@ test('Discord worker addon mirrors remain byte-identical',()=>assert.equal(root,
 
 test('nowplaying dedupe commits only after a successful main delivery',()=>{
   const start=root.indexOf("    if (path === '/api/discord/nowplaying')");
-  const end=root.indexOf('    const now = Date.now();',start+20);
+  const end=root.indexOf("\n\n    const now = Date.now();",start+20);
   assert.ok(start>=0&&end>start);
   const block=root.slice(start,end);
   const sendAt=block.indexOf('const result = await sendDiscord(env, payload)');
