@@ -1,0 +1,37 @@
+name: Repair Discord partial delivery status
+
+on:
+  push:
+    branches:
+      - repair/discord-partial-delivery-status-20260804
+    paths:
+      - scripts/repair-discord-partial-delivery-status.mjs
+      - .github/workflows/repair-discord-partial-delivery-status.yml
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-partial-delivery-status-20260804
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/repair-discord-partial-delivery-status.mjs
+      - run: node --test tests/discord-partial-delivery-status.test.mjs
+      - run: node --check worker-addons/discord-notify-addon-v3.js
+      - run: |
+          rm scripts/repair-discord-partial-delivery-status.mjs
+          rm .github/workflows/repair-discord-partial-delivery-status.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add worker-addons/discord-notify-addon-v3.js workers/webradio-666soundsdesign-worker/worker-addons/discord-notify-addon-v3.js tests/discord-partial-delivery-status.test.mjs scripts/repair-discord-partial-delivery-status.mjs .github/workflows/repair-discord-partial-delivery-status.yml
+          git commit -m "Report Discord partial delivery truthfully"
+          git push
