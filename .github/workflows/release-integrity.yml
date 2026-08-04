@@ -35,3 +35,4 @@ jobs:
           git add index.html public/index.html js/sound-control-overlay-v1.js public/js/sound-control-overlay-v1.js tests/canonical-mobile-eq-sync.test.mjs scripts/repair-canonical-mobile-eq-sync.mjs .github/workflows/repair-canonical-mobile-eq-sync.yml .github/workflows/release-integrity.yml diagnostics/canonical-mobile-eq-repair-failure.log
           git commit -m "Synchronize mobile sound controls with canonical EQ"
           git push
+# trigger-after-registration
