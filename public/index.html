@@ -903,7 +903,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     purgeMobileVisualizerLayers(app);
     ensureMobileVersionInControlRow(app);
     var controls=q('.mff-controls',app);
+    var mffLastControlTouchAt=0;
     var handler=function(ev){
+      if(ev.type==='touchend') mffLastControlTouchAt=Date.now();
+      else if(ev.type==='click' && Date.now()-mffLastControlTouchAt<700) return;
       var btn=ev.target.closest&&ev.target.closest('[data-mff]'); if(!btn)return;
       ev.preventDefault(); ev.stopPropagation();
       var c=btn.getAttribute('data-mff');
