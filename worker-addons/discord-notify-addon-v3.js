@@ -487,7 +487,13 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastTrackKey = key;
       runtime.lastTrackAt = Date.now();
       const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload, mainWebhooks);
-      return json({ ok: true, partial: Boolean(result.partial), type: 'nowplaying', led: discordDeliveryLed(result), discord: result, privateTrack, addon: ADDON_VERSION });
+      const privatePartial = privateTrack.configured === true && privateTrack.ok === false;
+      const partial = Boolean(result.partial || privatePartial);
+      if (privatePartial) {
+        runtime.lastErrorAt = Date.now();
+        runtime.lastError = clean(privateTrack.error, 'private_track_delivery_failed', 1200);
+      }
+      return json({ ok: true, partial, type: 'nowplaying', led: partial ? 'warning' : discordDeliveryLed(result), discord: result, privateTrack, addon: ADDON_VERSION });
     }
 
     const now = Date.now();
