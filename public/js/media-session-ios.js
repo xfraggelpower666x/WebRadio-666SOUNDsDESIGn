@@ -241,12 +241,16 @@
     function watchNowPlaying() {
       var lastTitle = '';
       setInterval(function () {
+        var mobileTicker = document.querySelector('#mffApp .mff-title h1');
+        var mobileTitle = mobileTicker && mobileTicker.getAttribute('data-current-title');
         var ticker = document.getElementById('nowPlayingTicker');
         var metaLine = document.getElementById('metaLine');
-        var title = (ticker && ticker.textContent.trim()) ||
-                    (metaLine && metaLine.textContent.trim()) || '';
-        if (title && title !== lastTitle && !title.match(/loading|connecting|starting/i)) {
+        var title = String(mobileTitle ||
+                    (ticker && ticker.textContent.trim()) ||
+                    (metaLine && metaLine.textContent.trim()) || '').trim();
+        if (title && title !== lastTitle && !title.match(/loading|connecting|starting|press play/i)) {
           lastTitle = title;
+          document.documentElement.setAttribute('data-media-session-title-source', mobileTitle ? 'mobile-current-title' : (ticker ? 'desktop-ticker' : 'desktop-meta'));
           // Try to split "Artist - Title" format
           var parts = title.split(' - ');
           if (parts.length >= 2) {
