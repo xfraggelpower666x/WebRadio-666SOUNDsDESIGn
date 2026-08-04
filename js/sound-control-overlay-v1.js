@@ -247,14 +247,11 @@ CHANGE SUMMARY:
   function markDirty(){ dirty = true; renderValues(); updateLed(); }
 
   function open(){
-    readEqFromDom();
+    // Clone persisted overlay state first, then let the canonical five-band EQ overwrite it.
     draft = clone(state);
-    // If user changed old EQ panel before opening, reflect existing DOM once.
-    BANDS.forEach(function(b){
-      var input = b.selector ? qs(b.selector) : null;
-      if(input) draft.eq[b.key] = clamp(input.value,-12,12);
-    });
+    readEqFromDom();
     draft.boosterLevel = readBoostStage();
+    dirty = false;
     getOverlay().classList.remove("is-hidden");
     renderValues();
     updateLed();
