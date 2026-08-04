@@ -1,5 +1,6 @@
 import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js";
 import { goveeSendAudio, goveeSetMode, goveeSetEnabled } from "/js/system-extra/govee/govee-bridge-client.js";
+import { applyStatusChip } from "/js/shared-status.js";
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, Number(n) || 0));
@@ -47,6 +48,21 @@ function publishState(state, error = "") {
   root?.setAttribute("data-govee-sync", state);
   if (error) root?.setAttribute("data-govee-error", String(error).slice(0, 160));
   else root?.removeAttribute("data-govee-error");
+
+  const chip = document.getElementById("statusGovee");
+  const ledState = state === "connecting" ? "warn" : state === "disabled" ? "off" : state;
+  const labels = {
+    online: "GOVEE / FX - lokale Bridge online",
+    connecting: "GOVEE / FX - lokale Bridge wird verbunden",
+    offline: "GOVEE / FX - lokale Bridge offline",
+    disabled: "GOVEE / FX - Synchronisation deaktiviert",
+    stopped: "GOVEE / FX - Synchronisation gestoppt"
+  };
+  const tooltip = error
+    ? `${labels[state] || "GOVEE / FX"}: ${String(error).slice(0, 100)}`
+    : (labels[state] || "GOVEE / FX");
+  applyStatusChip(chip, ledState, tooltip);
+
   try { window.dispatchEvent(new CustomEvent("s666:govee-state", { detail: { state, error } })); } catch (_) {}
 }
 
