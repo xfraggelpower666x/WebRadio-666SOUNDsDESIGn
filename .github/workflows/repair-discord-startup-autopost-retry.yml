@@ -35,3 +35,4 @@ jobs:
           git add js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js tests/discord-startup-autopost-retry.test.mjs scripts/repair-discord-startup-autopost-retry.mjs .github/workflows/repair-discord-startup-autopost-retry.yml
           git commit -m "Retry Discord startup autopost safely"
           git push
+# trigger-after-registration
