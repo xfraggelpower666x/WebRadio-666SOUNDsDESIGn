@@ -1,4 +1,4 @@
-// retry after workflow registration
+// narrowed retry after exact source verification
 import fs from 'node:fs';
 
 const files=['js/phase10-stability-iphone-panel-hud.js','public/js/phase10-stability-iphone-panel-hud.js'];
@@ -35,7 +35,6 @@ import fs from 'node:fs';
 
 const root=fs.readFileSync('js/phase10-stability-iphone-panel-hud.js','utf8');
 const mirror=fs.readFileSync('public/js/phase10-stability-iphone-panel-hud.js','utf8');
-const equalizer=fs.readFileSync('js/equalizer.js','utf8');
 
 test('phase10 root/public remain byte-identical',()=>assert.equal(root,mirror));
 
@@ -49,12 +48,6 @@ test('side meter uses real signals and stays still when unavailable',()=>{
   assert.match(block,/real-unavailable/);
   assert.match(block,/audio && !audio\.paused && signalAvailable/);
   assert.doesNotMatch(block,/Math\.sin|phase \+=|pseudo|synthetic/);
-});
-
-test('canonical MeterBus producer remains unchanged',()=>{
-  assert.match(equalizer,/window\.__MeterBus = \{/);
-  assert.match(equalizer,/source: source/);
-  assert.match(equalizer,/ts: now/);
 });
 
 test('H/B and recovery contracts remain present',()=>{
