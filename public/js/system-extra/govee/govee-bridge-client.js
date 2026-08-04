@@ -2,16 +2,31 @@ import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js";
 
 async function post(path, payload) {
   const url = `${GOVEE_SYNC_CONFIG.baseUrl}${path}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload || {})
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Bridge error ${res.status}: ${text}`);
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutMs = Math.max(250, Number(GOVEE_SYNC_CONFIG.requestTimeoutMs) || 1800);
+  const timeout = controller ? setTimeout(() => controller.abort(), timeoutMs) : 0;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-store",
+      credentials: "omit",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload || {}),
+      ...(controller ? { signal: controller.signal } : {})
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Bridge error ${res.status}: ${text}`);
+    }
+    return res.json().catch(() => ({}));
+  } catch (error) {
+    if (error?.name === "AbortError") throw new Error(`Bridge timeout after ${timeoutMs}ms`);
+    throw error;
+  } finally {
+    if (timeout) clearTimeout(timeout);
   }
-  return res.json().catch(() => ({}));
 }
 
 export async function goveeSetEnabled(enabled) {
