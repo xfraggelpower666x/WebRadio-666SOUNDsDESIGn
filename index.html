@@ -874,14 +874,30 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var hbtn=q('.mff-history',app);
     if(hbtn && !hbtn.__mffHistoryBound){
       hbtn.__mffHistoryBound=true;
-      hbtn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{capture:true});
-      hbtn.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{passive:false,capture:true});
+      var lastHistoryTouchAt=0;
+      var toggleHistoryHandler=function(ev){
+        if(ev.type==='touchend') lastHistoryTouchAt=Date.now();
+        else if(ev.type==='click' && Date.now()-lastHistoryTouchAt<700){ev.preventDefault();ev.stopPropagation();return;}
+        ev.preventDefault();
+        ev.stopPropagation();
+        toggleHistory();
+      };
+      hbtn.addEventListener('click',toggleHistoryHandler,{capture:true});
+      hbtn.addEventListener('touchend',toggleHistoryHandler,{passive:false,capture:true});
     }
     qa('[data-mff-history-close]',app).forEach(function(el){
       if(el.__mffHistoryCloseBound)return;
       el.__mffHistoryCloseBound=true;
-      el.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
-      el.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
+      var lastHistoryCloseTouchAt=0;
+      var closeHistoryHandler=function(ev){
+        if(ev.type==='touchend') lastHistoryCloseTouchAt=Date.now();
+        else if(ev.type==='click' && Date.now()-lastHistoryCloseTouchAt<700){ev.preventDefault();ev.stopPropagation();return;}
+        ev.preventDefault();
+        ev.stopPropagation();
+        toggleHistory(false);
+      };
+      el.addEventListener('click',closeHistoryHandler,{capture:true});
+      el.addEventListener('touchend',closeHistoryHandler,{passive:false,capture:true});
     });
   }
 
@@ -918,23 +934,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     };
     controls.addEventListener('click',handler,{capture:true});
     controls.addEventListener('touchend',handler,{passive:false,capture:true});
-
-    var hbtn=q('.mff-history',app);
-    if(hbtn){
-      hbtn.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{capture:true});
-      hbtn.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory();},{passive:false,capture:true});
-    }
-    var hback=q('#mffHistoryBackdrop',app);
-    if(hback){
-      hback.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
-      hback.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
-    }
-
-    var hclose=q('[data-mff-history-close]',app);
-    if(hclose){
-      hclose.addEventListener('click',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{capture:true});
-      hclose.addEventListener('touchend',function(ev){ev.preventDefault();ev.stopPropagation();toggleHistory(false);},{passive:false,capture:true});
-    }
 
     bindHistoryModalV17(app);
     purgeMobileVisualizerLayers(app);
@@ -1854,6 +1853,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var overlay=app.querySelector('#mffHistoryOverlay');
     var backdrop=app.querySelector('#mffHistoryBackdrop');
     if(!btn || !overlay) return;
+    if(btn.__mffHistoryBound) return;
     function setOpen(open){
       app.setAttribute('data-history-open',open?'1':'0');
       overlay.setAttribute('aria-hidden',open?'false':'true');
