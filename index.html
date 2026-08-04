@@ -2020,11 +2020,9 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function version(){return (window.SMFP_VERSION&&window.SMFP_VERSION.label)||'v2026.07.12-veluna16'}
   function installFooter(a){
     if(!a)return;
-    var footer=qs('.smfp-v181-footer-version',a);
-    if(!footer){footer=document.createElement('div');footer.className='smfp-v181-footer-version';}
-    footer.textContent='WebRadio 666SOUNDsDESIGn '+version().toUpperCase();
-    var bottom=qs('.mff-bottom',a)||qs('.mff-bottom-bars',a);
-    if(bottom&&bottom.parentNode&&footer.parentNode!==bottom.parentNode)bottom.parentNode.insertBefore(footer,bottom.nextSibling);
+    qsa('.smfp-v181-footer-version',a).forEach(function(footer){
+      try{footer.remove();}catch(e){if(footer.parentNode)footer.parentNode.removeChild(footer);}
+    });
   }
   function installSendLeds(a){
     if(!a||qs('.smfp-v181-send-leds',a))return;
