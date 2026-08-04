@@ -31,8 +31,8 @@ export function initGoveeFxControlHooks() {
 
   if (bindControl(test, "click", () => {
     const payload = { r: 0, g: 220, b: 255, brightness: 70 };
-    const action = runtime()?.sendPreview?.({ previewColor: payload }) || goveeTestColor(payload);
-    Promise.resolve(action).catch((e) => console.warn(e.message));
+    // Test color has a dedicated bridge route; do not send it as an audio payload.
+    Promise.resolve(goveeTestColor(payload)).catch((e) => console.warn(e.message));
   })) bound += 1;
 
   return bound;
