@@ -7,6 +7,9 @@ on:
     paths:
       - scripts/repair-mobile-bottom-meter-real-safe.mjs
       - .github/workflows/repair-mobile-bottom-meter-real-safe.yml
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
 
 permissions:
   contents: write
@@ -32,4 +35,3 @@ jobs:
           git add js/phase10-stability-iphone-panel-hud.js public/js/phase10-stability-iphone-panel-hud.js css/phase10-stability-iphone-panel-hud.css public/css/phase10-stability-iphone-panel-hud.css tests/mobile-bottom-meter-real-safe.test.mjs scripts/repair-mobile-bottom-meter-real-safe.mjs .github/workflows/repair-mobile-bottom-meter-real-safe.yml
           git commit -m "Drive mobile bottom meter from real signal"
           git push
-# trigger-after-registration
