@@ -1,0 +1,33 @@
+name: Repair mobile interaction dedupe batch
+
+on:
+  push:
+    branches:
+      - repair/mobile-interaction-dedupe-batch-20260804
+    paths:
+      - scripts/repair-mobile-interaction-dedupe-batch.mjs
+      - .github/workflows/repair-mobile-interaction-dedupe-batch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/mobile-interaction-dedupe-batch-20260804
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/repair-mobile-interaction-dedupe-batch.mjs
+      - run: node --test tests/mobile-interaction-dedupe-batch.test.mjs
+      - run: |
+          rm scripts/repair-mobile-interaction-dedupe-batch.mjs
+          rm .github/workflows/repair-mobile-interaction-dedupe-batch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html public/index.html tests/mobile-interaction-dedupe-batch.test.mjs scripts/repair-mobile-interaction-dedupe-batch.mjs .github/workflows/repair-mobile-interaction-dedupe-batch.yml
+          git commit -m "Repair batched mobile interaction double triggers"
+          git push
