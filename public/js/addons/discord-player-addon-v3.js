@@ -364,6 +364,13 @@
       return;
     }
 
+    if (key === lastPostedKey) {
+      startupAutoPostDone = true;
+      lastTrackKey = key;
+      dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'already-posted-by-watcher', key: key });
+      return;
+    }
+
     startupAutoPostDone = true;
     lastTrackKey = key;
     dispatch('s666:discord-state', { phase: 'startup-autopost', key: key });
@@ -374,6 +381,11 @@
       .catch(function (error) {
         startupAutoPostDone = false;
         dispatch('s666:discord-state', { phase: 'startup-autopost-error', error: error && error.message ? error.message : String(error) });
+        if (Date.now() - startupAutoPostStartedAt < STARTUP_MAX_WAIT_MS) {
+          startupTimer = setTimeout(tryStartupAutoPost, STARTUP_RETRY_MS);
+        } else {
+          dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'retry-window-exhausted', key: key });
+        }
       });
   }
 
