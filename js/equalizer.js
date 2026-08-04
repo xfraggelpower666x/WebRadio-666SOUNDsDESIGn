@@ -1,7 +1,7 @@
 /*
- * 666SOUNDsDESIGn canonical audio visualizer authority V14 · proportional repair V15.
+ * 666SOUNDsDESIGn canonical audio visualizer authority V12.
  * One WebAudio graph and one RAF writer for EQ, side meters and bottom meter.
- * Twenty-four independent logarithmic real-frequency bands with proportional volume/boost response and balanced peak headroom.
+ * Twenty-four independent real-frequency bands, balanced meters and transform-only rendering.
  */
 
 const BOOST_MULTIPLIERS = (window.SMFPBoostCore && window.SMFPBoostCore.stages)
@@ -125,7 +125,6 @@ const writeMobileHudLevelVars = (level = 0, peak = level) => {
   const safePeak = clamp(peak, 0, 1);
   const root = document.documentElement;
   root.style.setProperty('--audio-level', safeLevel.toFixed(3));
-  root.style.setProperty('--mff-level', safeLevel.toFixed(3));
   root.style.setProperty('--audio-peak', safePeak.toFixed(3));
   root.style.setProperty('--meter-left', safeLevel.toFixed(3));
   root.style.setProperty('--meter-right', safeLevel.toFixed(3));
@@ -209,25 +208,8 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   let peakEnvelope = 0.16;
   let previousEnvelope = 0.14;
   let bandEnvelope = [];
-  let bandReference = [];
 
   const mobileLike = () => window.innerWidth <= 860;
-
-  const refreshVisualizerTargets = () => {
-    if (!mobileLike()) return;
-    const mobileBars = Array.from(document.querySelectorAll('#mffEqBars i'));
-    if (mobileBars.length && (bars.length !== mobileBars.length || bars[0] !== mobileBars[0])) {
-      bars.splice(0, bars.length, ...mobileBars);
-      bandEnvelope = new Array(mobileBars.length).fill(0.012);
-      bandReference = new Array(mobileBars.length).fill(24);
-    }
-    const mobileBottom = Array.from(document.querySelectorAll('#mffBottomBars i'));
-    if (mobileBottom.length && (bottomMeterSegments.length !== mobileBottom.length || bottomMeterSegments[0] !== mobileBottom[0])) {
-      bottomMeterSegments.splice(0, bottomMeterSegments.length, ...mobileBottom);
-    }
-  };
-
-  window.__S666VisualizerRefreshTargets = refreshVisualizerTargets;
 
   const setBar = (bar, normalized) => {
     if (!bar) return;
@@ -274,14 +256,7 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
       peak: clamp(peak, 0, 1),
       source: sourceType,
       synthetic: sourceType === 'synthetic',
-      hybrid: false,
-      frequencyScale: 'logarithmic',
-      highFrequencyCompensation: true,
-      visualHeadroom: 'balanced',
-      visualCeiling: 'peak-dependent',
-      volume: clamp(audio?.volume ?? 1, 0, 1),
-      boostGain: Math.max(1, Number(gainNode?.gain?.value || 1)),
-      eqState: { ...smfpRealEqState },
+      hybrid: sourceType === 'hybrid',
       left: meterState.left,
       right: meterState.right,
       pulse: meterState.pulse,
@@ -294,7 +269,6 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
 
   const renderFallbackFrame = () => {
   if (!running) return;
-  refreshVisualizerTargets();
   const eq = bars.map((bar) => {
     const value = 0.025;
     setBar(bar, value);
@@ -353,7 +327,6 @@ const stopFallback = () => {
   };
 
   const idleState = () => {
-  refreshVisualizerTargets();
   const eq = bars.map((bar) => {
     const value = 0.025;
     setBar(bar, value);
@@ -368,8 +341,8 @@ const stopFallback = () => {
     if (!AudioCtx || !audio) throw new Error('no_audio_context');
     ctx = new AudioCtx();
     analyser = ctx.createAnalyser();
-    analyser.fftSize = mobileLike() ? 128 : 1024;
-    analyser.smoothingTimeConstant = mobileLike() ? 0.78 : 0.48;
+    analyser.fftSize = mobileLike() ? 128 : 512;
+    analyser.smoothingTimeConstant = mobileLike() ? 0.80 : 0.56;
     analyser.minDecibels = -92;
     analyser.maxDecibels = -18;
     data = new Uint8Array(analyser.frequencyBinCount);
@@ -389,17 +362,16 @@ const stopFallback = () => {
     if (eqNodes.length) {
       gainNode.connect(eqNodes[0]);
       for (let index = 0; index < eqNodes.length - 1; index += 1) eqNodes[index].connect(eqNodes[index + 1]);
-      eqNodes[eqNodes.length - 1].connect(analyser);
+      eqNodes[eqNodes.length - 1].connect(limiterNode);
     } else {
-      gainNode.connect(analyser);
+      gainNode.connect(limiterNode);
     }
-    analyser.connect(limiterNode);
-    limiterNode.connect(ctx.destination);
+    limiterNode.connect(analyser);
+    analyser.connect(ctx.destination);
     applyRealEqToNodes();
 
     const frame = (timestamp = performance.now()) => {
       if (!running) return;
-      refreshVisualizerTargets();
       analyser.getByteFrequencyData(data);
       analyser.getByteTimeDomainData(timeData);
 
@@ -411,93 +383,68 @@ const stopFallback = () => {
         samplePeak = Math.max(samplePeak, Math.abs(sample));
       }
       const rms = Math.sqrt(sumSq / Math.max(1, timeData.length));
-      const volume = clamp(audio?.volume ?? 1, 0, 1);
-      const boostGain = Math.max(1, Number(gainNode?.gain?.value || (window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]) || 1));
-      const visualGainCompensation = Math.pow(boostGain, -0.55);
-      const visualVolumeScale = Math.pow(volume, 0.85);
-      const visualSignalScale = visualGainCompensation * visualVolumeScale;
 
       const bandCount = Math.max(1, bars.length);
-      const nyquist = Math.max(1, ctx.sampleRate / 2);
-      const minFrequency = mobileLike() ? 70 : 45;
-      const maxFrequency = Math.min(mobileLike() ? 15000 : 17000, nyquist * 0.92);
-      const frequencyRatio = Math.max(1.01, maxFrequency / minFrequency);
-      const rawBands = [];
-      let globalMax = 0;
+  const analysisWindow = Math.max(bandCount * 2, Math.floor(data.length * 0.90));
+  const rawBands = [];
+  let globalMax = 0;
+  let globalTotal = 0;
+  for (let index = 0; index < analysisWindow; index += 1) globalTotal += data[index] || 0;
+  const globalMean = globalTotal / analysisWindow;
 
-      for (let index = 0; index < bandCount; index += 1) {
-        const startFrequency = minFrequency * Math.pow(frequencyRatio, index / bandCount);
-        const endFrequency = minFrequency * Math.pow(frequencyRatio, (index + 1) / bandCount);
-        const start = Math.floor(clamp((startFrequency / nyquist) * data.length, 0, data.length - 1));
-        const end = Math.max(start + 1, Math.min(data.length, Math.ceil((endFrequency / nyquist) * data.length)));
-        let total = 0;
-        let count = 0;
-        let localPeak = 0;
-        for (let bin = start; bin < end; bin += 1) {
-const sample = data[bin] || 0;
-total += sample;
-localPeak = Math.max(localPeak, sample);
-count += 1;
-        }
-        const average = count ? total / count : 0;
-        const local = (average * 0.72 + localPeak * 0.28) * visualSignalScale;
-        globalMax = Math.max(globalMax, localPeak, local);
-        rawBands.push(local);
-      }
+  for (let index = 0; index < bandCount; index += 1) {
+    const normalizedStart = index / bandCount;
+    const normalizedEnd = (index + 1) / bandCount;
+    const start = Math.floor(Math.pow(normalizedStart, 1.72) * Math.max(1, analysisWindow - 2));
+    const end = Math.max(start + 2, Math.floor(Math.pow(normalizedEnd, 1.72) * analysisWindow));
+    let total = 0;
+    let count = 0;
+    let localPeak = 0;
+    for (let bin = start; bin < Math.min(analysisWindow, end + 2); bin += 1) {
+      const sample = data[bin] || 0;
+      total += sample;
+      localPeak = Math.max(localPeak, sample);
+      count += 1;
+    }
+    const average = count ? total / count : 0;
+    const local = average * 0.78 + localPeak * 0.16 + globalMean * 0.06;
+    globalMax = Math.max(globalMax, localPeak, local);
+    rawBands.push(local);
+  }
 
-      const signalPresent = globalMax >= 3 || rms > 0.004;
-      if (bandEnvelope.length !== bandCount) bandEnvelope = new Array(bandCount).fill(0.012);
-      if (bandReference.length !== bandCount) bandReference = new Array(bandCount).fill(24);
+  const signalPresent = globalMax >= 4 || rms > 0.005;
+  if (bandEnvelope.length !== bandCount) bandEnvelope = new Array(bandCount).fill(0.025);
 
-      const values = rawBands.map((value, index) => {
-        const before = rawBands[Math.max(0, index - 1)] ?? value;
-        const after = rawBands[Math.min(rawBands.length - 1, index + 1)] ?? value;
-        const local = value * 0.86 + before * 0.07 + after * 0.07;
-        const position = index / Math.max(1, bandCount - 1);
-        const absolute = clamp(local / 255, 0, 1);
-        const localGate = clamp((local - 6) / 26, 0, 1);
-        const currentReference = bandReference[index] || 24;
-        const desiredReference = Math.max(14, local);
-        bandReference[index] = desiredReference > currentReference
-? currentReference + (desiredReference - currentReference) * 0.025
-: Math.max(14, currentReference * 0.9994);
-        const relative = clamp(local / Math.max(14, bandReference[index]), 0, 1);
-        const visualTilt = 1 + Math.pow(position, 1.24) * 0.34;
-        const spectral = Math.pow(absolute, 0.74) * visualTilt;
-        const spectralResponse = spectral * (0.20 + localGate * 0.80);
-        const adaptiveResponse = Math.pow(relative, 0.82) * 0.065 * localGate;
-        const transient = clamp((localPeak - average) / 255, 0, 1);
-        const transientResponse = Math.pow(transient, 0.72) * 0.14 * localGate;
-        const energy = spectralResponse * 0.68 + adaptiveResponse + transientResponse;
-        const peakHeadroom = 0.78 + clamp(localPeak / 255, 0, 1) * 0.22;
-        const target = signalPresent && localGate > 0
-? clamp(energy, 0.012, peakHeadroom)
-: 0.012;
-        const previous = bandEnvelope[index] || 0.012;
-        const attack = 0.62 + position * 0.08;
-        const release = 0.13 + position * 0.02;
-        bandEnvelope[index] = previous + (target - previous) * (target > previous ? attack : release);
-        return bandEnvelope[index];
-      });
+  const values = rawBands.map((value, index) => {
+    const before = rawBands[Math.max(0, index - 1)] ?? value;
+    const after = rawBands[Math.min(rawBands.length - 1, index + 1)] ?? value;
+    const local = value * 0.78 + before * 0.11 + after * 0.11;
+    const spectral = Math.pow(clamp(local / 255, 0, 1), 0.58);
+    const broadbandSupport = signalPresent ? Math.pow(globalMean / 255, 0.78) * 0.075 : 0;
+    const target = signalPresent ? clamp(spectral * 1.22 + broadbandSupport, 0.012, 1) : 0.012;
+    const previous = bandEnvelope[index] || 0.025;
+    bandEnvelope[index] = previous + (target - previous) * (target > previous ? 0.78 : 0.16);
+    return bandEnvelope[index];
+  });
 
-      const eq = [];
-      bars.forEach((bar, index) => {
-        const value = values[index] || 0.012;
-        setBar(bar, value);
-        eq.push(value);
-      });
+  const eq = [];
+  bars.forEach((bar, index) => {
+    const value = values[index] || 0.012;
+    setBar(bar, value);
+    eq.push(value);
+  });
 
-      const level = clamp(rms * visualSignalScale * 2.40, 0, 1);
-      const peak = clamp(Math.max(samplePeak * visualSignalScale * 1.08, level), 0, 1);
-      const sliceAverage = (start, end, fallback) => {
-        const slice = values.slice(start, end);
-        return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : fallback;
-      };
-      const low = sliceAverage(0, Math.max(1, Math.ceil(values.length * 0.34)), level);
-      const mid = sliceAverage(Math.floor(values.length * 0.25), Math.max(2, Math.ceil(values.length * 0.72)), level);
-      const high = sliceAverage(Math.floor(values.length * 0.62), values.length, level);
-      const meters = setMeters(level, peak, low, mid, high);
-      publish(level, peak, 'real', eq, meters, { low, mid, high });
+  const level = clamp(rms * 2.40, 0, 1);
+  const peak = clamp(Math.max(samplePeak * 1.08, level), 0, 1);
+  const sliceAverage = (start, end, fallback) => {
+    const slice = values.slice(start, end);
+    return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : fallback;
+  };
+  const low = sliceAverage(0, Math.max(1, Math.ceil(values.length * 0.34)), level);
+  const mid = sliceAverage(Math.floor(values.length * 0.25), Math.max(2, Math.ceil(values.length * 0.72)), level);
+  const high = sliceAverage(Math.floor(values.length * 0.62), values.length, level);
+  const meters = setMeters(level, peak, low, mid, high);
+  publish(level, peak, 'real', eq, meters, { low, mid, high });
       rafId = window.requestAnimationFrame(frame);
     };
 
@@ -544,4 +491,17 @@ count += 1;
   }
 }
 
-/* Mobile visuals consume the canonical MeterBus; no secondary synthetic writer is allowed. */
+/* Mobile-only visibility guard. Desktop has no secondary interval writer. */
+window.setInterval(() => {
+  if (window.innerWidth > 860) return;
+  try {
+    const audio = document.querySelector('audio');
+    if (!audio || audio.paused || audio.readyState <= 1) return;
+    const current = Number(getComputedStyle(document.documentElement).getPropertyValue('--audio-level')) || 0;
+    if (current < 0.035) {
+      const stage = Number(audio.dataset?.boostStage || 0);
+      const safe = 0.10 + stage * 0.02;
+      writeMobileHudLevelVars(safe, safe);
+    }
+  } catch (_) {}
+}, 360);
