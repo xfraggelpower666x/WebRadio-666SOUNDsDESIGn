@@ -1,3 +1,4 @@
+// retry after workflow registration
 import fs from 'node:fs';
 
 const files=['js/phase10-stability-iphone-panel-hud.js','public/js/phase10-stability-iphone-panel-hud.js'];
