@@ -1,0 +1,45 @@
+name: Apply PC meter reactivity repair
+
+on:
+  push:
+    branches:
+      - repair/pc-meter-reactivity-20260804
+    paths:
+      - "scripts/ops_repair_pc_meter_reactivity_20260804.py"
+      - ".github/workflows/ops-apply-pc-meter-reactivity-20260804.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/pc-meter-reactivity-20260804
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply visual-only meter repair
+        run: python3 scripts/ops_repair_pc_meter_reactivity_20260804.py
+      - name: Verify JavaScript and focused contracts
+        run: |
+          node --check js/equalizer.js
+          node --test tests/pc-meter-reactivity-floor.test.mjs tests/pc-real-spectrum-layout.test.mjs tests/main-player-reactive-visual-contract.test.mjs
+      - name: Run complete verification
+        run: npm run verify
+      - name: Remove temporary repair automation
+        run: |
+          rm -f scripts/ops_repair_pc_meter_reactivity_20260804.py
+          rm -f .github/workflows/ops-apply-pc-meter-reactivity-20260804.yml
+      - name: Commit verified repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Repair PC real-meter visual response floor"
+          git push origin HEAD:repair/pc-meter-reactivity-20260804
