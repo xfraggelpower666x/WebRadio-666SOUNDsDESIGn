@@ -57,26 +57,26 @@ test('startup autopost retries temporary failures within the bounded window',()=
   const end=root.indexOf('  async function checkStatus()',start);
   assert.ok(start>=0&&end>start);
   const block=root.slice(start,end);
-  assert.match(block,/startupAutoPostDone = false/);
-  assert.match(block,/Date\.now\(\) - startupAutoPostStartedAt < STARTUP_MAX_WAIT_MS/);
-  assert.match(block,/startupTimer = setTimeout\(tryStartupAutoPost, STARTUP_RETRY_MS\)/);
-  assert.match(block,/retry-window-exhausted/);
+  assert.ok(block.includes('startupAutoPostDone = false'));
+  assert.ok(block.includes('Date.now() - startupAutoPostStartedAt < STARTUP_MAX_WAIT_MS'));
+  assert.ok(block.includes('startupTimer = setTimeout(tryStartupAutoPost, STARTUP_RETRY_MS)'));
+  assert.ok(block.includes('retry-window-exhausted'));
 });
 
 test('startup autopost does not duplicate a watcher post',()=>{
   const start=root.indexOf('  function tryStartupAutoPost()');
   const end=root.indexOf('  async function checkStatus()',start);
   const block=root.slice(start,end);
-  assert.match(block,/key === lastPostedKey/);
-  assert.match(block,/already-posted-by-watcher/);
+  assert.ok(block.includes('key === lastPostedKey'));
+  assert.ok(block.includes('already-posted-by-watcher'));
   assert.ok(block.indexOf('key === lastPostedKey') < block.indexOf("postTrackIfChanged(true, 'startup-first-now-playing')"));
 });
 
 test('Discord endpoint and delivery contract remain unchanged',()=>{
-  assert.match(root,/postJson\('\/api\/discord\/nowplaying'/);
-  assert.match(root,/postJson\('\/api\/discord\/manual'/);
-  assert.match(root,/credentials: 'same-origin'/);
-  assert.match(root,/if \(!result \|\| result\.skipped !== true\) lastPostedKey = key/);
+  assert.ok(root.includes("postJson('/api/discord/nowplaying'"));
+  assert.ok(root.includes("postJson('/api/discord/manual'"));
+  assert.ok(root.includes("credentials: 'same-origin'"));
+  assert.ok(root.includes('if (!result || result.skipped !== true) lastPostedKey = key'));
 });
 `;
 fs.writeFileSync('tests/discord-startup-autopost-retry.test.mjs',test);
