@@ -687,14 +687,17 @@ RULES:
         if(isFinite(n) && n > 0) rms = Math.max(rms, n > 1 ? n / 100 : n);
       });
     }
-    if((!rms || rms < .015) && audio && !audio.paused){
-      sideMeterReactV1State.phase += .135;
-      rms = .22 + Math.abs(Math.sin(sideMeterReactV1State.phase))*.32 + Math.abs(Math.sin(sideMeterReactV1State.phase*.43+1.9))*.18 + Math.abs(Math.sin(sideMeterReactV1State.phase*1.71+.3))*.10;
+    var signalAvailable = !!(rms && rms >= .015);
+    if(!signalAvailable){
+      rms = 0;
+      document.documentElement.setAttribute("data-side-meter-signal","real-unavailable");
+    }else{
+      document.documentElement.setAttribute("data-side-meter-signal", busFresh ? "meterbus-real" : "legacy-real-level");
     }
     var level = Math.max(0, Math.min(1, rms));
     sideMeterReactV1State.smooth = sideMeterReactV1State.smooth*.64 + level*.36;
     sideMeterReactV1State.peak = Math.max(sideMeterReactV1State.smooth, sideMeterReactV1State.peak*.88);
-    return { level:sideMeterReactV1State.smooth, peak:sideMeterReactV1State.peak, running:!!(audio && !audio.paused) };
+    return { level:sideMeterReactV1State.smooth, peak:sideMeterReactV1State.peak, running:!!(audio && !audio.paused && signalAvailable) };
   }
 
   function sideMeterReactV1Groups(){
