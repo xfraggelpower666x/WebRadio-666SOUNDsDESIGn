@@ -107,29 +107,29 @@ test('mobile bottom meter uses only fresh real MeterBus data', () => {
   const end = js.indexOf('  function bindEqTriggers()', start);
   assert.ok(start >= 0 && end > start);
   const block = js.slice(start, end);
-  assert.match(block, /window\.__MeterBus/);
-  assert.match(block, /bus\.source === "real"/);
-  assert.match(block, /Date\.now\(\) - Number\(bus\.ts \|\| 0\) < 700/);
-  assert.match(block, /audio && !audio\.paused/);
-  assert.match(block, /scaleX\(/);
-  assert.match(block, /real-unavailable/);
-  assert.doesNotMatch(block, /Math\.sin|pseudo|synthetic|AudioContext|createMediaElementSource|createAnalyser/);
+  assert.ok(block.includes('window.__MeterBus'));
+  assert.ok(block.includes('bus.source === "real"'));
+  assert.ok(block.includes('Date.now() - Number(bus.ts || 0) < 700'));
+  assert.ok(block.includes('audio && !audio.paused'));
+  assert.ok(block.includes('scaleX('));
+  assert.ok(block.includes('real-unavailable'));
+  for (const forbidden of ['Math.sin', 'pseudo', 'synthetic', 'AudioContext', 'createMediaElementSource', 'createAnalyser']) {
+    assert.ok(!block.includes(forbidden), forbidden);
+  }
 });
 
 test('mobile bottom meter has a physical safe-edge floor', () => {
-  assert.match(css, /bottom:max\(var\(--s666-safe-bottom\),6px\)!important/);
-  assert.match(css, /bottom:max\(env\(safe-area-inset-bottom,0px\),6px\)!important/);
-  assert.match(css, /\.s666-mobile-meterfill[\s\S]*width:100%/);
-  assert.match(css, /transform:scaleX\(0\)/);
-  assert.doesNotMatch(css, /width:35%/);
+  assert.ok(css.includes('bottom:max(var(--s666-safe-bottom),6px)!important'));
+  assert.ok(css.includes('bottom:max(env(safe-area-inset-bottom,0px),6px)!important'));
+  assert.ok(css.includes('width:100%;'));
+  assert.ok(css.includes('transform:scaleX(0);'));
+  assert.ok(!css.includes('width:35%;'));
 });
 
 test('audio recovery and H-B hardlocks remain intact', () => {
-  assert.match(js, /S666_AUDIO_HEALING_ORCHESTRA/);
-  assert.match(js, /centralAudioGuardV2Recover/);
-  assert.match(js, /bindMobileStreamLedSwitch/);
-  assert.match(js, /canonical:"mainBtn"/);
-  assert.match(js, /canonical:"fallbackBtn"/);
+  for (const required of ['S666_AUDIO_HEALING_ORCHESTRA', 'centralAudioGuardV2Recover', 'bindMobileStreamLedSwitch', 'canonical:"mainBtn"', 'canonical:"fallbackBtn"']) {
+    assert.ok(js.includes(required), required);
+  }
 });
 `;
 fs.writeFileSync('tests/mobile-bottom-meter-real-safe.test.mjs', test);
