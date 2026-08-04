@@ -1,0 +1,37 @@
+name: Apply Mobile Touch Dedupe
+
+on:
+  push:
+    branches:
+      - repair/mobile-touch-dedupe-20260804
+    paths:
+      - tools/apply_mobile_touch_dedupe.py
+      - .github/workflows/apply-mobile-touch-dedupe.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/mobile-touch-dedupe-20260804
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Apply targeted repair
+        run: python tools/apply_mobile_touch_dedupe.py
+      - name: Remove temporary repair files
+        run: |
+          rm -f tools/apply_mobile_touch_dedupe.py
+          rm -f .github/workflows/apply-mobile-touch-dedupe.yml
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html public/index.html tests/mobile-touch-dedupe.test.mjs tools/apply_mobile_touch_dedupe.py .github/workflows/apply-mobile-touch-dedupe.yml
+          git commit -m "fix: dedupe mobile transport touch and click events"
+          git push origin HEAD:repair/mobile-touch-dedupe-20260804
