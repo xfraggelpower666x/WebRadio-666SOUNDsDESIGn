@@ -233,11 +233,6 @@
     mountPc(); mountMobile(); ensureListenerOverlay(); ensureComposer(); setLed('ready','READY'); poll();
     setInterval(function(){mountPc();mountMobile();poll();},POLL_MS);
     document.addEventListener('visibilitychange',function(){ if(!document.hidden) setTimeout(poll,350); });
-    document.addEventListener('click',function(ev){
-      var target=ev.target && ev.target.closest ? ev.target.closest('#playerAlertPcSend,[data-player-alert-send]') : null;
-      if(!target)return;
-      ev.preventDefault(); ev.stopPropagation(); sendFromPcInline();
-    },true);
     document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){closeListenerOverlay();closeComposer();}});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
