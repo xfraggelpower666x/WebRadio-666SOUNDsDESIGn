@@ -1370,10 +1370,22 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     return 'main';
   }
 
+  function mffRuntimeIsPlaying(){
+    try{
+      var a=getAudio();
+      var hasSource=!!(a&&(a.currentSrc||a.getAttribute('src')||a.src));
+      var audioPlaying=!!(a&&hasSource&&!a.paused&&!a.ended);
+      var uiPlaying=document.documentElement.getAttribute('data-mff-playing')==='1';
+      return !mffUserStopped&&(audioPlaying||uiPlaying);
+    }catch(e){
+      return !mffUserStopped&&document.documentElement.getAttribute('data-mff-playing')==='1';
+    }
+  }
+
   function setPanelLedsFromMeta(meta){
     setPanelLed('worker','ok','Mobile UI Runtime läuft');
 
-    var playing=document.documentElement.getAttribute('data-mff-playing')==='1';
+    var playing=mffRuntimeIsPlaying();
     var sourceOk=false;
     try{
       var a=getAudio();
@@ -1455,7 +1467,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(meta.artwork) mffLastGoodMeta.artwork=String(meta.artwork||'').trim();
     setPanelLedsFromMeta(meta);
     pushLocalHistory(meta);
-    var playing=document.documentElement.getAttribute('data-mff-playing')==='1' && !mffUserStopped;
+    var playing=mffRuntimeIsPlaying();
     if(playing){
       setMffTickerLiveV113(meta.title||'Loading metadata ...');
     }else{
