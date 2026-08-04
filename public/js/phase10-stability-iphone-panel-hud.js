@@ -1033,6 +1033,47 @@ RULES:
     function hardfixTickerNoEmptyGap(){}
     function hardfixMessageBox(){}
     function hardfixForceMainOnlyPc(){}
+
+    var phase10StreamSwitchLastTouchAt=0;
+    function bindMobileStreamLedSwitch(){
+      var app=qs("#mffApp");
+      if(!app) return;
+      var entries=[
+        {led:"main",target:"main",canonical:"mainBtn"},
+        {led:"backup",target:"backup",canonical:"fallbackBtn"}
+      ];
+      entries.forEach(function(entry){
+        var btn=qs('#mffPanelLedPanel [data-led="'+entry.led+'"]',app);
+        if(!btn) return;
+        btn.classList.add("mff-stream-btn");
+        btn.setAttribute("data-stream-target",entry.target);
+        if(btn.__phase10StreamSwitchBound) return;
+        btn.__phase10StreamSwitchBound=true;
+        var handler=function(ev){
+          if(ev.type==="touchend") phase10StreamSwitchLastTouchAt=Date.now();
+          else if(ev.type==="click" && Date.now()-phase10StreamSwitchLastTouchAt<700){ev.preventDefault();ev.stopPropagation();return;}
+          ev.preventDefault();
+          ev.stopPropagation();
+          var canonical=document.getElementById(entry.canonical);
+          if(canonical) tap(canonical,"mobile-"+entry.target+"-stream");
+          document.documentElement.setAttribute("data-manual-stream-target",entry.target);
+          qsa('#mffPanelLedPanel [data-stream-target]',app).forEach(function(other){
+            var active=other.getAttribute("data-stream-target")===entry.target;
+            other.classList.toggle("is-active",active);
+            other.setAttribute("aria-pressed",active?"true":"false");
+          });
+        };
+        btn.addEventListener("click",handler,{capture:true});
+        btn.addEventListener("touchend",handler,{capture:true,passive:false});
+      });
+      var current=document.documentElement.getAttribute("data-manual-stream-target")||"main";
+      qsa('#mffPanelLedPanel [data-stream-target]',app).forEach(function(btn){
+        var active=btn.getAttribute("data-stream-target")===current;
+        btn.classList.toggle("is-active",active);
+        btn.setAttribute("aria-pressed",active?"true":"false");
+      });
+    }
+
     function phase10IsMobileAudioDevice(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || (window.innerWidth||9999) <= 860; }
     function boot(){
       mountHudLogo();
@@ -1052,6 +1093,7 @@ RULES:
     directfixPcNoAutoFallback();
     phase10RelocatePcPanels();
     mountMobilePanelRow();
+    bindMobileStreamLedSwitch();
     mountBottomSafe();
     bindEqTriggers();
     installAudioFocusGuard();
@@ -1059,6 +1101,7 @@ RULES:
     // Stable maintenance only: do not relocate or delete layout nodes after first render.
     setInterval(function(){
       mountMobilePanelRow();
+      bindMobileStreamLedSwitch();
       bindEqTriggers();
         installAudioFocusGuard();
       normalizeBoostStatusTooltip();
