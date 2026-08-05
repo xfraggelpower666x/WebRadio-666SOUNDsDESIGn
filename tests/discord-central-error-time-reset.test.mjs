@@ -15,3 +15,4 @@ test('partial delivery still records a current error timestamp',()=>{
   assert.ok(block.includes('partial ? Date.now() : 0'));
   assert.ok(block.includes('runtime.lastOkAt = Date.now();'));
 });
+// gate retrigger: runtime contracts unchanged
