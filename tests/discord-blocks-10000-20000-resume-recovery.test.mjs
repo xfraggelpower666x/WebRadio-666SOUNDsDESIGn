@@ -15,7 +15,8 @@ test('suspend clears stale button reset timers',()=>{
 test('player alert recovery is single-flight across parallel callers',()=>{
   assert.ok(root.includes('var playerAlertClientLoad = null;'));
   assert.ok(root.includes('if (playerAlertClientLoad) return playerAlertClientLoad;'));
-  assert.ok(root.includes('playerAlertClientLoad = (async function ()'));
-  assert.ok(root.includes('playerAlertClientLoad = null;'));
+  assert.ok(root.includes('var loadPromise = (async function ()'));
+  assert.ok(root.includes('playerAlertClientLoad = loadPromise;'));
+  assert.ok(root.includes('if (playerAlertClientLoad === loadPromise) playerAlertClientLoad = null;'));
 });
 // final required-gate retrigger after self-clean
