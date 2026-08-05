@@ -15,7 +15,11 @@
   var statusSequence = 0;
   var velunaSendSequence = 0;
   var activeVelunaSendId = 0;
+  var discordOverlaySendSequence = 0;
+  var activeDiscordOverlaySendId = 0;
   var messengerOpenSequence = 0;
+  var discordOverlayFocusTimer = 0;
+  var discordOverlayReturnFocus = null;
   var watcherTimer = 0;
   var visualTimer = 0;
   var startupTimer = 0;
@@ -316,9 +320,40 @@
     try { input.setSelectionRange(pos, pos); input.focus(); } catch (_) {}
   }
 
+  function setDiscordOverlayButtonsDisabled(disabled) {
+    ['s666DiscordMessageSend', 's666DiscordNowPlayingSend'].forEach(function (id) {
+      var currentButton = document.getElementById(id);
+      if (currentButton) currentButton.disabled = Boolean(disabled);
+    });
+  }
+
+  function scheduleDiscordOverlayFocus(delay) {
+    clearTimeout(discordOverlayFocusTimer);
+    var focusLifecycle = lifecycleGeneration;
+    discordOverlayFocusTimer = setTimeout(function () {
+      discordOverlayFocusTimer = 0;
+      var currentOverlay = document.getElementById('s666DiscordMessageOverlay');
+      if (!lifecycleIsCurrent(focusLifecycle) || !currentOverlay || currentOverlay.classList.contains('s666-discord-gate--hidden')) return;
+      var currentInput = document.getElementById('s666DiscordMessageText');
+      if (currentInput && currentOverlay.contains(currentInput)) {
+        try { currentInput.focus(); } catch (_) {}
+      }
+    }, typeof delay === 'number' ? delay : 40);
+  }
+
+  function restoreDiscordOverlayFocus() {
+    var previous = discordOverlayReturnFocus;
+    discordOverlayReturnFocus = null;
+    if (lifecycleSuspended || !previous || previous.isConnected === false || typeof previous.focus !== 'function') return;
+    try { previous.focus(); } catch (_) {}
+  }
+
   function closeMessageOverlay() {
+    clearTimeout(discordOverlayFocusTimer);
+    discordOverlayFocusTimer = 0;
     var overlay = document.getElementById('s666DiscordMessageOverlay');
     if (overlay) overlay.classList.add('s666-discord-gate--hidden');
+    restoreDiscordOverlayFocus();
   }
 
   function installEscapeBridge() {
@@ -365,23 +400,31 @@
 
   async function openMessageOverlay() {
     var overlay = ensureMessageOverlay();
+    var activeElement = document.activeElement;
+    if (activeElement && activeElement !== document.body && !overlay.contains(activeElement)) discordOverlayReturnFocus = activeElement;
     overlay.classList.remove('s666-discord-gate--hidden');
     setDiscordOverlayStatus('Bereit', '');
-    setTimeout(function () { var input = document.getElementById('s666DiscordMessageText'); if (input) input.focus(); }, 40);
+    scheduleDiscordOverlayFocus(40);
     return true;
   }
 
   async function sendMessageFromOverlay() {
     var input = document.getElementById('s666DiscordMessageText');
-    var button = document.getElementById('s666DiscordMessageSend');
     var message = clean(input && input.value, 1800);
     var sendLifecycle = lifecycleGeneration;
     if (!message) { setDiscordOverlayStatus('Nachricht fehlt', 'error'); return; }
-    if (button) button.disabled = true;
+    if (activeDiscordOverlaySendId) return;
+    if (activeRequestId) {
+      setDiscordOverlayStatus('Discord verarbeitet bereits einen Versand …', 'warn');
+      return;
+    }
+    var sendId = ++discordOverlaySendSequence;
+    activeDiscordOverlaySendId = sendId;
+    setDiscordOverlayButtonsDisabled(true);
     setDiscordOverlayStatus('Wird gesendet …', 'sending');
     try {
       var result = await postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: message, manual: true }));
-      if (!lifecycleIsCurrent(sendLifecycle)) return;
+      if (!lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
       var summary = deliverySummary(result, '✓ Discord-Nachricht angenommen');
       if (summary.skipped || !summary.sent) {
         setDiscordOverlayStatus(summary.text, summary.skipped ? 'warn' : 'error');
@@ -390,34 +433,36 @@
         setDiscordOverlayStatus(summary.text, summary.warning ? 'warn' : 'ok');
       }
     } catch (error) {
-      if (isStaleLifecycleError(error) || !lifecycleIsCurrent(sendLifecycle)) return;
+      if (isStaleLifecycleError(error) || !lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
       setDiscordOverlayStatus('✗ Versand fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
     } finally {
-      if (lifecycleIsCurrent(sendLifecycle)) {
-        var currentButton = document.getElementById('s666DiscordMessageSend');
-        if (currentButton) currentButton.disabled = false;
-      }
+      if (activeDiscordOverlaySendId === sendId) activeDiscordOverlaySendId = 0;
+      if (lifecycleIsCurrent(sendLifecycle)) setDiscordOverlayButtonsDisabled(false);
     }
   }
 
   async function sendNowPlayingFromOverlay() {
-    var button = document.getElementById('s666DiscordNowPlayingSend');
     var sendLifecycle = lifecycleGeneration;
-    if (button) button.disabled = true;
+    if (activeDiscordOverlaySendId) return;
+    if (activeRequestId) {
+      setDiscordOverlayStatus('Discord verarbeitet bereits einen Versand …', 'warn');
+      return;
+    }
+    var sendId = ++discordOverlaySendSequence;
+    activeDiscordOverlaySendId = sendId;
+    setDiscordOverlayButtonsDisabled(true);
     setDiscordOverlayStatus('Now Playing wird gesendet …', 'sending');
     try {
       var result = await postTrackIfChanged(true, 'manual-now-playing');
-      if (!lifecycleIsCurrent(sendLifecycle)) return;
+      if (!lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
       var summary = deliverySummary(result, '✓ Now Playing von Discord angenommen');
       setDiscordOverlayStatus(summary.text, summary.skipped || summary.warning ? 'warn' : (summary.sent ? 'ok' : 'error'));
     } catch (error) {
-      if (isStaleLifecycleError(error) || !lifecycleIsCurrent(sendLifecycle)) return;
+      if (isStaleLifecycleError(error) || !lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
       setDiscordOverlayStatus('✗ Now Playing fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
     } finally {
-      if (lifecycleIsCurrent(sendLifecycle)) {
-        var currentButton = document.getElementById('s666DiscordNowPlayingSend');
-        if (currentButton) currentButton.disabled = false;
-      }
+      if (activeDiscordOverlaySendId === sendId) activeDiscordOverlaySendId = 0;
+      if (lifecycleIsCurrent(sendLifecycle)) setDiscordOverlayButtonsDisabled(false);
     }
   }
 
@@ -791,6 +836,7 @@
       var detail = event.detail || {};
       var phase = detail.phase;
       if (phase === 'status') {
+        if (activeRequestId) return;
         if (detail.ok !== false) return;
         phase = 'error';
       }
@@ -834,11 +880,15 @@
     lifecycleSuspended = true;
     activeRequestId = 0;
     activeVelunaSendId = 0;
+    activeDiscordOverlaySendId = 0;
+    discordOverlaySendSequence += 1;
+    clearTimeout(discordOverlayFocusTimer);
     clearTimeout(watcherTimer);
     clearTimeout(startupTimer);
     clearTimeout(statusResetTimer);
     clearTimeout(velunaStatusResetTimer);
     clearInterval(visualTimer);
+    discordOverlayFocusTimer = 0;
     watcherTimer = 0;
     startupTimer = 0;
     statusResetTimer = 0;
@@ -854,6 +904,8 @@
     syncSharedColorState();
     initSharedVisualBridge();
     scheduleWatcher(1200);
+    var discordOverlay = document.getElementById('s666DiscordMessageOverlay');
+    if (discordOverlay && !discordOverlay.classList.contains('s666-discord-gate--hidden')) scheduleDiscordOverlayFocus(0);
     if (!startupAutoPostDone) tryStartupAutoPost();
     checkStatus();
   }
