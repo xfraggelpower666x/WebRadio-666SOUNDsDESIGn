@@ -491,6 +491,7 @@ export async function handleDiscordNotifyV3(request, env = {}) {
             return json({ ok: true, partial: true, privateRetry: true, skippedMain: true, led: 'warning', privateTrack, addon: ADDON_VERSION });
           }
           runtime.pendingPrivateTrackKey = '';
+          runtime.lastOkAt = Date.now();
           runtime.lastError = '';
           runtime.lastKind = 'nowplaying-private-retry-ok';
           return json({ ok: true, partial: false, privateRetry: true, skippedMain: true, led: 'ok', privateTrack, addon: ADDON_VERSION });
