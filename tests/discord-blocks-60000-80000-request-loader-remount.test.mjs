@@ -67,3 +67,4 @@ test('network, endpoint and protected audio contracts remain unchanged',()=>{
   assert.ok(root.includes("credentials: 'same-origin'"));
   assert.equal(/AudioContext|webkitAudioContext|createMediaElementSource/.test(root),false);
 });
+// final required-gate retrigger after self-clean
