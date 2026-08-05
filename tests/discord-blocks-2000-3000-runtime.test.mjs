@@ -8,7 +8,7 @@ test('Discord requests and status checks have bounded timeouts',()=>{
   assert.ok(root.includes('function fetchWithTimeout('));
   assert.ok(root.includes('REQUEST_TIMEOUT_MS = 15000'));
   assert.ok(root.includes('STATUS_TIMEOUT_MS = 10000'));
-  assert.ok(root.includes("throw new Error('discord_request_timeout')"));
+  assert.ok(root.includes("new Error('discord_request_timeout')"));
 });
 test('watcher is single-flight across visibility reschedules',()=>{
   assert.ok(root.includes('var watcherRunning = false;'));
@@ -22,4 +22,4 @@ test('script loads share one pending promise and wait for real load',()=>{
   assert.ok(root.includes("script.addEventListener('load', done, { once: true })"));
   assert.ok(root.includes("script_load_timeout:"));
 });
-// final gate retrigger after self-clean
+// updated for promise-based timeout fallback

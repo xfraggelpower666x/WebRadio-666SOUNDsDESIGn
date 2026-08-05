@@ -167,17 +167,32 @@
   }
 
   function fetchWithTimeout(url, options, timeoutMs) {
+    var limit = timeoutMs || REQUEST_TIMEOUT_MS;
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
-    var timer = 0;
     var requestOptions = Object.assign({}, options || {});
-    if (controller) {
-      requestOptions.signal = controller.signal;
-      timer = setTimeout(function () { controller.abort(); }, timeoutMs || REQUEST_TIMEOUT_MS);
-    }
-    return fetch(url, requestOptions).catch(function (error) {
-      if (error && error.name === 'AbortError') throw new Error('discord_request_timeout');
-      throw error;
-    }).finally(function () { if (timer) clearTimeout(timer); });
+    var timer = 0;
+    var settled = false;
+    if (controller) requestOptions.signal = controller.signal;
+    return new Promise(function (resolve, reject) {
+      timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        if (controller) controller.abort();
+        reject(new Error('discord_request_timeout'));
+      }, limit);
+      fetch(url, requestOptions).then(function (response) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(response);
+      }).catch(function (error) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (error && error.name === 'AbortError') reject(new Error('discord_request_timeout'));
+        else reject(error);
+      });
+    });
   }
 
   async function postJson(path, payload) {
@@ -459,33 +474,51 @@
     if (scriptLoads[id]) return scriptLoads[id];
     scriptLoads[id] = new Promise(function (resolve, reject) {
       var script = document.getElementById(id);
-      var timeout = setTimeout(function () {
-        delete scriptLoads[id];
-        reject(new Error('script_load_timeout:' + src));
-      }, REQUEST_TIMEOUT_MS);
-      function done() {
+      var settled = false;
+      var timeout = 0;
+      function cleanup() {
         clearTimeout(timeout);
+        if (!script) return;
+        script.removeEventListener('load', done);
+        script.removeEventListener('error', failed);
+      }
+      function removeBrokenScript() {
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+      }
+      function done() {
+        if (settled) return;
+        settled = true;
+        cleanup();
         if (script) script.dataset.s666Loaded = '1';
         resolve();
       }
       function failed() {
-        clearTimeout(timeout);
+        if (settled) return;
+        settled = true;
+        cleanup();
+        removeBrokenScript();
         delete scriptLoads[id];
         reject(new Error('script_load_failed:' + src));
       }
-      if (script) {
-        if (script.dataset.s666Loaded === '1' || script.readyState === 'loaded' || script.readyState === 'complete') return done();
-        script.addEventListener('load', done, { once: true });
-        script.addEventListener('error', failed, { once: true });
-        return;
+      function timedOut() {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        removeBrokenScript();
+        delete scriptLoads[id];
+        reject(new Error('script_load_timeout:' + src));
       }
-      script = document.createElement('script');
-      script.id = id;
-      script.src = src;
-      script.async = false;
+      if (script && (script.dataset.s666Loaded === '1' || script.readyState === 'loaded' || script.readyState === 'complete')) return done();
+      if (!script) {
+        script = document.createElement('script');
+        script.id = id;
+        script.src = src;
+        script.async = false;
+        document.head.appendChild(script);
+      }
       script.addEventListener('load', done, { once: true });
       script.addEventListener('error', failed, { once: true });
-      document.head.appendChild(script);
+      timeout = setTimeout(timedOut, REQUEST_TIMEOUT_MS);
     });
     return scriptLoads[id];
   }
