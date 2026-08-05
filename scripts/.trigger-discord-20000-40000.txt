@@ -1,1 +1,1 @@
-Trigger registered one-shot workflow after workflow file became available.
+Trigger PR-synchronize one-shot after the workflow file became available.
