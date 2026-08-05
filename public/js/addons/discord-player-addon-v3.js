@@ -18,6 +18,10 @@
   var startupAutoPostDone = false;
   var startupAutoPostStartedAt = 0;
   var initialized = false;
+  var watcherRunning = false;
+  var scriptLoads = Object.create(null);
+  var REQUEST_TIMEOUT_MS = 15000;
+  var STATUS_TIMEOUT_MS = 10000;
   var MSG_MAX = 240;
   var STARTUP_RETRY_MS = 1500;
   var STARTUP_MAX_WAIT_MS = 24000;
@@ -162,18 +166,32 @@
     return summary;
   }
 
+  function fetchWithTimeout(url, options, timeoutMs) {
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = 0;
+    var requestOptions = Object.assign({}, options || {});
+    if (controller) {
+      requestOptions.signal = controller.signal;
+      timer = setTimeout(function () { controller.abort(); }, timeoutMs || REQUEST_TIMEOUT_MS);
+    }
+    return fetch(url, requestOptions).catch(function (error) {
+      if (error && error.name === 'AbortError') throw new Error('discord_request_timeout');
+      throw error;
+    }).finally(function () { if (timer) clearTimeout(timer); });
+  }
+
   async function postJson(path, payload) {
     if (inFlight) throw new Error('discord_request_in_flight');
     inFlight = true;
     dispatch('s666:discord-state', { phase: 'sending', path: path });
     try {
-      var response = await fetch(path, {
+      var response = await fetchWithTimeout(path, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
         credentials: 'same-origin',
         cache: 'no-store',
         body: JSON.stringify(payload || {})
-      });
+      }, REQUEST_TIMEOUT_MS);
       var data = await response.json().catch(function () { return {}; });
       data.__httpStatus = response.status;
       if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
@@ -404,7 +422,7 @@
 
   async function checkStatus() {
     try {
-      var response = await fetch('/api/discord/status?t=' + Date.now(), { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' } });
+      var response = await fetchWithTimeout('/api/discord/status?t=' + Date.now(), { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' } }, STATUS_TIMEOUT_MS);
       var data = await response.json().catch(function () { return {}; });
       dispatch('s666:discord-state', { phase: 'status', ok: response.ok && data.ok === true, data: data });
       return data;
@@ -417,28 +435,59 @@
   function scheduleWatcher(delay) {
     clearTimeout(watcherTimer);
     watcherTimer = setTimeout(async function () {
-      var current = trackKey(readTrackFromDom());
-      if (current && current !== lastTrackKey) {
-        try {
-          var result = await postTrackIfChanged(false, 'watcher-track-change');
-          if (result && result.ok === true) lastTrackKey = current;
-        } catch (_) {}
+      if (watcherRunning) {
+        scheduleWatcher(document.hidden ? 30000 : 1500);
+        return;
       }
-      scheduleWatcher(document.hidden ? 30000 : 8000);
+      watcherRunning = true;
+      try {
+        var current = trackKey(readTrackFromDom());
+        if (current && current !== lastTrackKey) {
+          try {
+            var result = await postTrackIfChanged(false, 'watcher-track-change');
+            if (result && result.ok === true) lastTrackKey = current;
+          } catch (_) {}
+        }
+      } finally {
+        watcherRunning = false;
+        scheduleWatcher(document.hidden ? 30000 : 8000);
+      }
     }, delay);
   }
 
   function loadScriptOnce(id, src) {
-    return new Promise(function (resolve, reject) {
-      if (document.getElementById(id)) return resolve();
-      var script = document.createElement('script');
+    if (scriptLoads[id]) return scriptLoads[id];
+    scriptLoads[id] = new Promise(function (resolve, reject) {
+      var script = document.getElementById(id);
+      var timeout = setTimeout(function () {
+        delete scriptLoads[id];
+        reject(new Error('script_load_timeout:' + src));
+      }, REQUEST_TIMEOUT_MS);
+      function done() {
+        clearTimeout(timeout);
+        if (script) script.dataset.s666Loaded = '1';
+        resolve();
+      }
+      function failed() {
+        clearTimeout(timeout);
+        delete scriptLoads[id];
+        reject(new Error('script_load_failed:' + src));
+      }
+      if (script) {
+        if (script.dataset.s666Loaded === '1' || script.readyState === 'loaded' || script.readyState === 'complete') return done();
+        script.addEventListener('load', done, { once: true });
+        script.addEventListener('error', failed, { once: true });
+        return;
+      }
+      script = document.createElement('script');
       script.id = id;
       script.src = src;
       script.async = false;
-      script.onload = function () { resolve(); };
-      script.onerror = function () { reject(new Error('script_load_failed:' + src)); };
+      script.addEventListener('load', done, { once: true });
+      script.addEventListener('error', failed, { once: true });
       document.head.appendChild(script);
     });
+    return scriptLoads[id];
   }
 
   function setVelunaMessengerStatus(text, mode) {
