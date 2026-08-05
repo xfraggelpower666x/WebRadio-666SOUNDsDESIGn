@@ -24,6 +24,8 @@
   var discordOverlayReturnFocus = null;
   var watcherTimer = 0;
   var visualTimer = 0;
+  var controlObserver = null;
+  var controlReconcileTimer = 0;
   var startupTimer = 0;
   var lastTrackKey = '';
   var lastPostedKey = '';
@@ -35,7 +37,15 @@
   var statusResetTimer = 0;
   var velunaStatusResetTimer = 0;
   var escapeBridgeInstalled = false;
+  var discordOverlayStatusState = { text: 'Bereit', mode: '' };
+  var discordDraftState = '';
+  var discordDraftRevision = 0;
+  var discordButtonPhase = 'idle';
+  var discordButtonStateSequence = 0;
+  var velunaButtonPhase = 'idle';
+  var velunaButtonStateSequence = 0;
   var playerAlertClientLoad = null;
+  var messengerOverlayClientLoad = null;
   var scriptLoads = Object.create(null);
   var REQUEST_TIMEOUT_MS = 15000;
   var STATUS_TIMEOUT_MS = 10000;
@@ -183,15 +193,17 @@
     return summary;
   }
 
-  function releaseFetchController(controllerId, controller) {
-    if (controllerId && activeFetchControllers[controllerId] === controller) delete activeFetchControllers[controllerId];
+  function releaseFetchController(controllerId, entry) {
+    if (controllerId && activeFetchControllers[controllerId] === entry) delete activeFetchControllers[controllerId];
   }
 
   function abortActiveFetches() {
     Object.keys(activeFetchControllers).forEach(function (controllerId) {
-      var controller = activeFetchControllers[controllerId];
+      var entry = activeFetchControllers[controllerId];
       delete activeFetchControllers[controllerId];
-      try { controller.abort(); } catch (_) {}
+      if (!entry || !entry.controller) return;
+      entry.abortReason = 'lifecycle';
+      try { entry.controller.abort(); } catch (_) {}
     });
   }
 
@@ -199,34 +211,45 @@
     var limit = timeoutMs || REQUEST_TIMEOUT_MS;
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
     var controllerId = controller ? ++fetchControllerSequence : 0;
+    var entry = controller ? { controller: controller, abortReason: '' } : null;
     var requestOptions = Object.assign({}, options || {});
     var timer = 0;
     var settled = false;
-    if (controller) {
-      activeFetchControllers[controllerId] = controller;
+    if (entry) {
+      activeFetchControllers[controllerId] = entry;
       requestOptions.signal = controller.signal;
     }
     return new Promise(function (resolve, reject) {
+      function rejectAbort(error) {
+        if (entry && entry.abortReason === 'lifecycle') reject(staleLifecycleError());
+        else if (error && error.name === 'AbortError') reject(new Error('discord_request_timeout'));
+        else reject(error);
+      }
       timer = setTimeout(function () {
         if (settled) return;
         settled = true;
-        releaseFetchController(controllerId, controller);
+        if (entry) entry.abortReason = 'timeout';
+        releaseFetchController(controllerId, entry);
         if (controller) controller.abort();
         reject(new Error('discord_request_timeout'));
       }, limit);
       fetch(url, requestOptions).then(function (response) {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        releaseFetchController(controllerId, controller);
-        resolve(response);
+        return response.json().catch(function (error) {
+          if (error && error.name === 'AbortError') throw error;
+          return {};
+        }).then(function (data) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          releaseFetchController(controllerId, entry);
+          resolve({ response: response, data: data });
+        });
       }).catch(function (error) {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        releaseFetchController(controllerId, controller);
-        if (error && error.name === 'AbortError') reject(new Error('discord_request_timeout'));
-        else reject(error);
+        releaseFetchController(controllerId, entry);
+        rejectAbort(error);
       });
     });
   }
@@ -252,7 +275,7 @@
     activeRequestId = requestId;
     dispatch('s666:discord-state', { phase: 'sending', path: path, requestId: requestId });
     try {
-      var response = await fetchWithTimeout(path, {
+      var packet = await fetchWithTimeout(path, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
         credentials: 'same-origin',
@@ -260,8 +283,8 @@
         body: JSON.stringify(payload || {})
       }, REQUEST_TIMEOUT_MS);
       if (!lifecycleIsCurrent(requestLifecycle) || activeRequestId !== requestId) throw staleLifecycleError();
-      var data = await response.json().catch(function () { return {}; });
-      if (!lifecycleIsCurrent(requestLifecycle) || activeRequestId !== requestId) throw staleLifecycleError();
+      var response = packet.response;
+      var data = packet.data && typeof packet.data === 'object' ? packet.data : {};
       data.__httpStatus = response.status;
       if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
       var summary = deliverySummary(data);
@@ -324,11 +347,26 @@
 
   var DISCORD_EMOJIS = ['🎵','🎶','🎧','🎤','🔥','⚡','💜','💙','🤘','😎','👽','💀','🎉','🚀','✨','⭐','666'];
 
-  function setDiscordOverlayStatus(text, mode) {
+  function renderDiscordOverlayStatus(text, mode) {
     var status = document.getElementById('s666DiscordMessageStatus');
     if (!status) return;
     status.textContent = text || '';
     status.className = 's666-discord-status' + (mode ? ' is-' + mode : '');
+  }
+
+  function applyDiscordOverlayStatusState() {
+    renderDiscordOverlayStatus(discordOverlayStatusState.text, discordOverlayStatusState.mode);
+  }
+
+  function setDiscordOverlayStatus(text, mode) {
+    discordOverlayStatusState = { text: text || '', mode: mode || '' };
+    applyDiscordOverlayStatusState();
+  }
+
+  function syncDiscordDraftToOverlay() {
+    var input = document.getElementById('s666DiscordMessageText');
+    if (!input) return;
+    if (!input.value && discordDraftState) input.value = discordDraftState;
   }
 
   function insertAtCursor(input, value, max) {
@@ -389,10 +427,62 @@
     });
   }
 
+  function bindDiscordMessageOverlay(overlay) {
+    if (!overlay || overlay.__s666DiscordOverlayBound === true) return;
+    overlay.__s666DiscordOverlayBound = true;
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay || (event.target.closest && event.target.closest('[data-discord-close]'))) { closeMessageOverlay(); return; }
+      var emojiButton = event.target.closest && event.target.closest('[data-discord-emoji]');
+      if (emojiButton) {
+        insertAtCursor(document.getElementById('s666DiscordMessageText'), emojiButton.getAttribute('data-discord-emoji') || '', 1800);
+        var emojiInput = document.getElementById('s666DiscordMessageText');
+        if (emojiInput) {
+          discordDraftState = String(emojiInput.value || '');
+          discordDraftRevision += 1;
+        }
+        return;
+      }
+      var action = event.target.closest && event.target.closest('#s666DiscordMessageSend,#s666DiscordNowPlayingSend');
+      if (!action) return;
+      if (action.id === 's666DiscordMessageSend') sendMessageFromOverlay();
+      else sendNowPlayingFromOverlay();
+    });
+    overlay.addEventListener('input', function (event) {
+      if (event.target && event.target.id === 's666DiscordMessageText') {
+        discordDraftState = String(event.target.value || '');
+        discordDraftRevision += 1;
+      }
+    });
+    overlay.addEventListener('keydown', function (event) {
+      if (!event.target || event.target.id !== 's666DiscordMessageText') return;
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault();
+        sendMessageFromOverlay();
+      }
+    });
+  }
+
+  function reconcileDiscordMessageOverlay() {
+    var overlay = document.getElementById('s666DiscordMessageOverlay');
+    if (!overlay) return false;
+    bindDiscordMessageOverlay(overlay);
+    syncDiscordDraftToOverlay();
+    applyDiscordOverlayStatusState();
+    setDiscordOverlayButtonsDisabled(Boolean(activeDiscordOverlaySendId || activeRequestId));
+    if (!overlay.classList.contains('s666-discord-gate--hidden')) {
+      var activeElement = document.activeElement;
+      if (!activeElement || activeElement === document.body || !overlay.contains(activeElement)) scheduleDiscordOverlayFocus(0);
+    }
+    return true;
+  }
+
   function ensureMessageOverlay() {
     ensureStyle();
     var overlay = document.getElementById('s666DiscordMessageOverlay');
-    if (overlay) return overlay;
+    if (overlay) {
+      reconcileDiscordMessageOverlay();
+      return overlay;
+    }
     overlay = document.createElement('div');
     overlay.id = 's666DiscordMessageOverlay';
     overlay.className = 's666-discord-gate s666-discord-gate--hidden s666-discord-gate--message';
@@ -407,14 +497,9 @@
       '<div class="s666-discord-gate-actions"><button type="button" class="s666-discord-gate-cancel" data-discord-close>CLOSE</button><button type="button" id="s666DiscordNowPlayingSend" class="s666-discord-gate-submit s666-discord-nowplaying">NOW PLAYING</button><button type="button" id="s666DiscordMessageSend" class="s666-discord-gate-submit">SEND</button></div>' +
       '</div>';
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', function (event) {
-      if (event.target === overlay || event.target.closest('[data-discord-close]')) { closeMessageOverlay(); return; }
-      var emojiButton = event.target.closest && event.target.closest('[data-discord-emoji]');
-      if (emojiButton) insertAtCursor(document.getElementById('s666DiscordMessageText'), emojiButton.getAttribute('data-discord-emoji') || '', 1800);
-    });
-    document.getElementById('s666DiscordMessageSend').addEventListener('click', sendMessageFromOverlay);
-    document.getElementById('s666DiscordNowPlayingSend').addEventListener('click', sendNowPlayingFromOverlay);
-    document.getElementById('s666DiscordMessageText').addEventListener('keydown', function (event) { if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); sendMessageFromOverlay(); } });
+    bindDiscordMessageOverlay(overlay);
+    syncDiscordDraftToOverlay();
+    applyDiscordOverlayStatusState();
     installEscapeBridge();
     return overlay;
   }
@@ -431,9 +516,21 @@
     return true;
   }
 
+  function requestBusyResult(source) {
+    return {
+      ok: false,
+      skipped: true,
+      busy: true,
+      reason: 'request_in_flight',
+      source: source || 'discord'
+    };
+  }
+
   async function sendMessageFromOverlay() {
     var input = document.getElementById('s666DiscordMessageText');
     var inputSnapshot = String(input && input.value || '');
+    var inputRevision = discordDraftRevision;
+    discordDraftState = inputSnapshot;
     var message = clean(inputSnapshot, 1800);
     var sendLifecycle = lifecycleGeneration;
     if (!message) { setDiscordOverlayStatus('Nachricht fehlt', 'error'); return; }
@@ -454,7 +551,11 @@
         setDiscordOverlayStatus(summary.text, summary.skipped ? 'warn' : 'error');
       } else {
         var currentInput = document.getElementById('s666DiscordMessageText');
-        if (currentInput && currentInput.value === inputSnapshot) currentInput.value = '';
+        if (discordDraftRevision === inputRevision && discordDraftState === inputSnapshot) {
+          discordDraftState = '';
+          discordDraftRevision += 1;
+          if (currentInput && currentInput.value === inputSnapshot) currentInput.value = '';
+        }
         setDiscordOverlayStatus(summary.text, summary.warning ? 'warn' : 'ok');
       }
     } catch (error) {
@@ -493,16 +594,19 @@
 
   async function messagePost(message) {
     if (typeof message === 'string' && clean(message, 1800)) {
+      if (activeRequestId) return requestBusyResult('message');
       return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800), manual: true }));
     }
     return openMessageOverlay();
   }
 
   async function manualPost() {
+    if (activeRequestId) return requestBusyResult('manual');
     return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true }));
   }
 
   async function postTrackIfChanged(force, reason) {
+    if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
     var data = readTrackFromDom();
     var key = trackKey(data);
     var postLifecycle = lifecycleGeneration;
@@ -547,6 +651,13 @@
     postTrackIfChanged(true, 'startup-first-now-playing')
       .then(function (result) {
         if (!lifecycleIsCurrent(startupLifecycle)) return;
+        if (result && result.busy) {
+          startupAutoPostDone = false;
+          dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'request_in_flight', key: key });
+          if (Date.now() - startupAutoPostStartedAt < STARTUP_MAX_WAIT_MS) startupTimer = setTimeout(tryStartupAutoPost, STARTUP_RETRY_MS);
+          else lastTrackKey = '';
+          return;
+        }
         var summary = deliverySummary(result);
         dispatch('s666:discord-state', { phase: result && result.skipped ? 'startup-autopost-skipped' : (summary.warning ? 'startup-autopost-warning' : 'startup-autopost-success'), data: result, summary: summary });
       })
@@ -566,14 +677,24 @@
   async function checkStatus() {
     var statusId = ++statusSequence;
     var statusLifecycle = lifecycleGeneration;
+    var statusRequestSequence = requestSequence;
+    var statusStartedDuringRequest = Boolean(activeRequestId);
+    function statusIsStale() {
+      return !lifecycleIsCurrent(statusLifecycle) ||
+        statusId !== statusSequence ||
+        statusStartedDuringRequest ||
+        Boolean(activeRequestId) ||
+        requestSequence !== statusRequestSequence;
+    }
     try {
-      var response = await fetchWithTimeout('/api/discord/status?t=' + Date.now(), { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' } }, STATUS_TIMEOUT_MS);
-      var data = await response.json().catch(function () { return {}; });
-      if (!lifecycleIsCurrent(statusLifecycle) || statusId !== statusSequence) return { ok: false, stale: true };
+      var packet = await fetchWithTimeout('/api/discord/status?t=' + Date.now(), { cache: 'no-store', credentials: 'same-origin', headers: { accept: 'application/json' } }, STATUS_TIMEOUT_MS);
+      if (statusIsStale()) return { ok: false, stale: true };
+      var response = packet.response;
+      var data = packet.data && typeof packet.data === 'object' ? packet.data : {};
       dispatch('s666:discord-state', { phase: 'status', ok: response.ok && data.ok === true, data: data, statusId: statusId });
       return data;
     } catch (error) {
-      if (!lifecycleIsCurrent(statusLifecycle) || statusId !== statusSequence) return { ok: false, stale: true };
+      if (isStaleLifecycleError(error) || statusIsStale()) return { ok: false, stale: true };
       dispatch('s666:discord-state', { phase: 'status', ok: false, error: error && error.message ? error.message : String(error), statusId: statusId });
       return { ok: false };
     }
@@ -617,16 +738,59 @@
     });
   }
 
+  function normalizedScriptSource(src) {
+    try { return new URL(src, document.baseURI || location.href).href; } catch (_) { return String(src || ''); }
+  }
+
+  function scriptSourceMatches(script, src) {
+    if (!script) return false;
+    return normalizedScriptSource(script.getAttribute('src') || script.src || '') === normalizedScriptSource(src);
+  }
+
+  function scriptIsLoaderOwned(script) {
+    return Boolean(script && script.dataset && script.dataset.s666LoaderOwned === '1');
+  }
+
+  function findScriptSlot(id, src) {
+    var elementId = id;
+    var script = document.getElementById(elementId);
+    var recoveryIndex = 0;
+    while (script && !scriptSourceMatches(script, src)) {
+      if (scriptIsLoaderOwned(script)) {
+        if (script.parentNode) script.parentNode.removeChild(script);
+        script = null;
+        break;
+      }
+      recoveryIndex += 1;
+      elementId = id + 'S666Recovery' + (recoveryIndex > 1 ? String(recoveryIndex) : '');
+      script = document.getElementById(elementId);
+    }
+    return { elementId: elementId, script: script };
+  }
+
+  function removeOwnedScriptSlots(id) {
+    var ids = [id];
+    for (var i = 1; i <= 8; i += 1) ids.push(id + 'S666Recovery' + (i > 1 ? String(i) : ''));
+    ids.forEach(function (elementId) {
+      var script = document.getElementById(elementId);
+      if (scriptIsLoaderOwned(script) && script.parentNode) script.parentNode.removeChild(script);
+    });
+  }
+
   function loadScriptOnce(id, src) {
     var pending = scriptLoads[id];
     if (pending) return pending.promise;
     var entry = { promise: null, cancel: null, script: null, createdByAddon: false };
     scriptLoads[id] = entry;
     entry.promise = new Promise(function (resolve, reject) {
-      var script = document.getElementById(id);
+      var slot = findScriptSlot(id, src);
+      var elementId = slot.elementId;
+      var script = slot.script;
       var settled = false;
       var timeout = 0;
+      var appendAfterBinding = false;
       entry.script = script;
+      entry.createdByAddon = scriptIsLoaderOwned(script);
       function cleanup() {
         clearTimeout(timeout);
         if (!script) return;
@@ -634,7 +798,7 @@
         script.removeEventListener('error', failed);
       }
       function removeBrokenScript() {
-        if (script && script.parentNode) script.parentNode.removeChild(script);
+        if (entry.createdByAddon && script && script.parentNode) script.parentNode.removeChild(script);
       }
       function finish(error) {
         if (settled) return;
@@ -658,7 +822,7 @@
       }
       entry.cancel = function (error) {
         if (settled) return;
-        if (entry.createdByAddon) removeBrokenScript();
+        removeBrokenScript();
         finish(error || staleLifecycleError());
       };
       if (script && (script.dataset.s666Loaded === '1' || script.readyState === 'loaded' || script.readyState === 'complete')) return done();
@@ -666,14 +830,16 @@
         script = document.createElement('script');
         entry.script = script;
         entry.createdByAddon = true;
-        script.id = id;
+        appendAfterBinding = true;
+        script.id = elementId;
         script.src = src;
         script.async = false;
-        document.head.appendChild(script);
+        script.dataset.s666LoaderOwned = '1';
       }
       script.addEventListener('load', done, { once: true });
       script.addEventListener('error', failed, { once: true });
       timeout = setTimeout(timedOut, REQUEST_TIMEOUT_MS);
+      if (appendAfterBinding) document.head.appendChild(script);
     });
     return entry.promise;
   }
@@ -736,8 +902,7 @@
       var src = '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121';
       await loadScriptOnce(id, src);
       if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
-      var stale = document.getElementById(id);
-      if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+      removeOwnedScriptSlots(id);
       delete scriptLoads[id];
       await loadScriptOnce(id, src);
       if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
@@ -748,6 +913,29 @@
       if (playerAlertClientLoad === loadPromise) playerAlertClientLoad = null;
     }, function () {
       if (playerAlertClientLoad === loadPromise) playerAlertClientLoad = null;
+    });
+    return loadPromise;
+  }
+
+  function ensureMessengerOverlayClient() {
+    if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return Promise.resolve(window.S666Messenger);
+    if (messengerOverlayClientLoad) return messengerOverlayClientLoad;
+    var loadPromise = (async function () {
+      var id = 's666MessengerOverlayVelunaBridge';
+      var src = '/js/messenger-overlay.js?v=2026-07-19-overlay-status-v2';
+      await loadScriptOnce(id, src);
+      if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return window.S666Messenger;
+      removeOwnedScriptSlots(id);
+      delete scriptLoads[id];
+      await loadScriptOnce(id, src);
+      if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return window.S666Messenger;
+      throw new Error('messenger_overlay_missing');
+    })();
+    messengerOverlayClientLoad = loadPromise;
+    loadPromise.then(function () {
+      if (messengerOverlayClientLoad === loadPromise) messengerOverlayClientLoad = null;
+    }, function () {
+      if (messengerOverlayClientLoad === loadPromise) messengerOverlayClientLoad = null;
     });
     return loadPromise;
   }
@@ -794,15 +982,10 @@
   function openVelunaMessengerFromButton() {
     var openId = ++messengerOpenSequence;
     var openLifecycle = lifecycleGeneration;
-    Promise.resolve()
-      .then(function () {
-        if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return true;
-        return loadScriptOnce('s666MessengerOverlayVelunaBridge', '/js/messenger-overlay.js?v=2026-07-19-overlay-status-v2');
-      })
-      .then(function () {
+    ensureMessengerOverlayClient()
+      .then(function (messenger) {
         if (!lifecycleIsCurrent(openLifecycle) || openId !== messengerOpenSequence) return;
-        if (!window.S666Messenger || typeof window.S666Messenger.open !== 'function') throw new Error('messenger_overlay_missing');
-        window.S666Messenger.open();
+        messenger.open();
       })
       .catch(function (error) {
         if (isStaleLifecycleError(error) || !lifecycleIsCurrent(openLifecycle) || openId !== messengerOpenSequence) return;
@@ -857,18 +1040,84 @@
     return true;
   }
 
+  function applyDiscordButtonPhase(button, phase) {
+    if (!button) return;
+    var effectivePhase = phase || discordButtonPhase;
+    button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
+    if (effectivePhase === 'sending') button.classList.add('is-busy');
+    else if (effectivePhase === 'success') button.classList.add('is-ok');
+    else if (effectivePhase === 'warning') button.classList.add('is-warn');
+    else if (effectivePhase === 'error') button.classList.add('is-error');
+  }
+
+  function applyVelunaButtonPhase(button, phase) {
+    if (!button) return;
+    var effectivePhase = phase || velunaButtonPhase;
+    button.classList.remove('is-busy', 'is-ok', 'is-error');
+    if (effectivePhase === 'sending') button.classList.add('is-busy');
+    else if (effectivePhase === 'success') button.classList.add('is-ok');
+    else if (effectivePhase === 'error') button.classList.add('is-error');
+  }
+
   function syncMountedBusyState() {
     var discordButton = document.getElementById('discordBtn');
-    if (discordButton && activeRequestId) {
-      discordButton.classList.remove('is-ok', 'is-warn', 'is-error');
-      discordButton.classList.add('is-busy');
-    }
+    applyDiscordButtonPhase(discordButton, activeRequestId ? 'sending' : discordButtonPhase);
     var velunaButton = document.getElementById('s666VelunaMessageButton');
-    if (velunaButton && activeVelunaSendId) {
-      velunaButton.classList.remove('is-ok', 'is-error');
-      velunaButton.classList.add('is-busy');
-    }
-    if (activeDiscordOverlaySendId || activeRequestId) setDiscordOverlayButtonsDisabled(true);
+    applyVelunaButtonPhase(velunaButton, activeVelunaSendId ? 'sending' : velunaButtonPhase);
+    var discordBusy = Boolean(activeDiscordOverlaySendId || activeRequestId);
+    setDiscordOverlayButtonsDisabled(discordBusy);
+    if (discordBusy) renderDiscordOverlayStatus('Discord verarbeitet bereits einen Versand …', 'sending');
+    else applyDiscordOverlayStatusState();
+    var velunaSendButton = document.getElementById('s666VelunaMessengerSend');
+    if (velunaSendButton) velunaSendButton.disabled = Boolean(activeVelunaSendId);
+    if (activeVelunaSendId) setVelunaMessengerStatus('Wird an die Hörer gesendet …', 'sending');
+  }
+
+  function reconcileMountedControls() {
+    mountVelunaMessengerButton();
+    installVelunaDiscordNoAuthBypass();
+    reconcileDiscordMessageOverlay();
+    syncMountedBusyState();
+  }
+
+  function nodeTouchesMountedControls(node) {
+    if (!node || node.nodeType !== 1) return false;
+    var selector = '#discordBtn,#s666VelunaMessageButton,#s666DiscordMessageOverlay,#s666DiscordMessageSend,#s666DiscordNowPlayingSend,#s666VelunaMessengerSend,.tool-strip';
+    if (node.matches && node.matches(selector)) return true;
+    return Boolean(node.querySelector && node.querySelector(selector));
+  }
+
+  function scheduleControlReconciliation() {
+    if (lifecycleSuspended || controlReconcileTimer) return;
+    controlReconcileTimer = setTimeout(function () {
+      controlReconcileTimer = 0;
+      if (!lifecycleSuspended) reconcileMountedControls();
+    }, 0);
+  }
+
+  function startControlObserver() {
+    if (controlObserver || typeof MutationObserver !== 'function') return;
+    var root = document.documentElement || document.body;
+    if (!root) return;
+    controlObserver = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i += 1) {
+        var mutation = mutations[i];
+        for (var a = 0; a < mutation.addedNodes.length; a += 1) {
+          if (nodeTouchesMountedControls(mutation.addedNodes[a])) return scheduleControlReconciliation();
+        }
+        for (var r = 0; r < mutation.removedNodes.length; r += 1) {
+          if (nodeTouchesMountedControls(mutation.removedNodes[r])) return scheduleControlReconciliation();
+        }
+      }
+    });
+    controlObserver.observe(root, { childList: true, subtree: true });
+  }
+
+  function stopControlObserver() {
+    clearTimeout(controlReconcileTimer);
+    controlReconcileTimer = 0;
+    if (controlObserver) controlObserver.disconnect();
+    controlObserver = null;
   }
 
   function initVelunaMessengerBridge() {
@@ -876,26 +1125,23 @@
       window.__S666_VELUNA_MESSENGER_STATUS_BRIDGE__ = true;
       window.addEventListener('s666:veluna-messenger-state', function (event) {
         var detail = event.detail || {};
-        var btn = document.getElementById('s666VelunaMessageButton');
-        if (!btn) return;
+        if (detail.phase !== 'sending' && detail.phase !== 'success' && detail.phase !== 'error') return;
         clearTimeout(velunaStatusResetTimer);
-        btn.classList.remove('is-busy', 'is-ok', 'is-error');
-        if (detail.phase === 'sending') btn.classList.add('is-busy');
-        else if (detail.phase === 'success') btn.classList.add('is-ok');
-        else if (detail.phase === 'error') btn.classList.add('is-error');
+        var stateSequence = ++velunaButtonStateSequence;
+        velunaButtonPhase = detail.phase;
+        applyVelunaButtonPhase(document.getElementById('s666VelunaMessageButton'));
         if (detail.phase === 'success' || detail.phase === 'error') {
           velunaStatusResetTimer = setTimeout(function () {
-            var currentBtn = document.getElementById('s666VelunaMessageButton');
-            if (currentBtn) currentBtn.classList.remove('is-busy', 'is-ok', 'is-error');
+            if (velunaButtonStateSequence !== stateSequence) return;
+            velunaButtonPhase = 'idle';
+            applyVelunaButtonPhase(document.getElementById('s666VelunaMessageButton'));
             velunaStatusResetTimer = 0;
           }, detail.phase === 'success' ? 5000 : 8000);
         }
       });
     }
     if (!document.querySelector('.tool-strip')) return;
-    mountVelunaMessengerButton();
-    installVelunaDiscordNoAuthBypass();
-    syncMountedBusyState();
+    reconcileMountedControls();
     ensurePlayerAlertClient().catch(function (error) {
       if (isStaleLifecycleError(error) || lifecycleSuspended) return;
       dispatch('s666:veluna-messenger-state', { phase: 'error', error: error.message || String(error) });
@@ -905,17 +1151,14 @@
   function initSharedVisualBridge() {
     setSharedColorState('transport', 'idle');
     syncSharedColorState();
-    mountVelunaMessengerButton();
-    installVelunaDiscordNoAuthBypass();
-    syncMountedBusyState();
+    reconcileMountedControls();
     clearInterval(visualTimer);
     visualTimer = 0;
     if (lifecycleSuspended) return;
+    startControlObserver();
     visualTimer = setInterval(function () {
       syncSharedColorState();
-      mountVelunaMessengerButton();
-      installVelunaDiscordNoAuthBypass();
-      syncMountedBusyState();
+      reconcileMountedControls();
     }, 3500);
   }
 
@@ -931,19 +1174,15 @@
         phase = 'error';
       }
       if (phase !== 'sending' && phase !== 'success' && phase !== 'warning' && phase !== 'error') return;
-      var button = document.getElementById('discordBtn');
-      if (!button) return;
       clearTimeout(statusResetTimer);
-      button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
-      if (phase === 'sending') button.classList.add('is-busy');
-      else if (phase === 'success') button.classList.add('is-ok');
-      else if (phase === 'warning') button.classList.add('is-warn');
-      else if (phase === 'error') button.classList.add('is-error');
+      var stateSequence = ++discordButtonStateSequence;
+      discordButtonPhase = phase;
+      applyDiscordButtonPhase(document.getElementById('discordBtn'));
       if (phase !== 'sending') {
         statusResetTimer = setTimeout(function () {
-          var currentButton = document.getElementById('discordBtn');
-          if (currentButton) currentButton.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
-          if (button !== currentButton) button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
+          if (discordButtonStateSequence !== stateSequence) return;
+          discordButtonPhase = 'idle';
+          applyDiscordButtonPhase(document.getElementById('discordBtn'));
           statusResetTimer = 0;
         }, phase === 'success' ? 5000 : 8000);
       }
@@ -951,10 +1190,14 @@
   }
 
   function resetTransientRuntimeState() {
+    discordButtonStateSequence += 1;
+    velunaButtonStateSequence += 1;
+    discordButtonPhase = 'idle';
+    velunaButtonPhase = 'idle';
     var discordButton = document.getElementById('discordBtn');
-    if (discordButton) discordButton.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
+    applyDiscordButtonPhase(discordButton);
     var velunaButton = document.getElementById('s666VelunaMessageButton');
-    if (velunaButton) velunaButton.classList.remove('is-busy', 'is-ok', 'is-error');
+    applyVelunaButtonPhase(velunaButton);
     ['s666DiscordMessageSend', 's666DiscordNowPlayingSend', 's666VelunaMessengerSend'].forEach(function (id) {
       var button = document.getElementById(id);
       if (button) button.disabled = false;
@@ -970,7 +1213,9 @@
     lifecycleSuspended = true;
     abortActiveFetches();
     cancelPendingScriptLoads();
+    stopControlObserver();
     playerAlertClientLoad = null;
+    messengerOverlayClientLoad = null;
     activeRequestId = 0;
     activeVelunaSendId = 0;
     activeDiscordOverlaySendId = 0;
@@ -1031,7 +1276,7 @@
     sharedStatusBridge: true,
     startupNowPlayingAutopost: true,
     skippedIsNotSent: true,
-    mountAll: function () { initVelunaMessengerBridge(); initSharedVisualBridge(); syncMountedBusyState(); return true; },
+    mountAll: function () { initVelunaMessengerBridge(); initSharedVisualBridge(); reconcileMountedControls(); return true; },
     manualPost: manualPost,
     messagePost: messagePost,
     postTrackIfChanged: postTrackIfChanged,

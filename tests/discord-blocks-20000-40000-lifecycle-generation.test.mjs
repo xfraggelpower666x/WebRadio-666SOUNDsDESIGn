@@ -26,9 +26,12 @@ test('messenger open and send paths reject stale BFCache completions',()=>{
   assert.ok(root.includes('activeVelunaSendId !== sendId'));
 });
 test('button status timers survive DOM remounts and reset both bridges',()=>{
-  assert.ok(root.includes("var currentButton = document.getElementById('discordBtn');"));
-  assert.ok(root.includes('var velunaStatusResetTimer = 0;'));
-  assert.ok(root.includes("var currentBtn = document.getElementById('s666VelunaMessageButton');"));
+  assert.ok(root.includes('var discordButtonPhase = \'idle\';'));
+  assert.ok(root.includes('var discordButtonStateSequence = 0;'));
+  assert.ok(root.includes('var velunaButtonPhase = \'idle\';'));
+  assert.ok(root.includes('var velunaButtonStateSequence = 0;'));
+  assert.ok(root.includes('applyDiscordButtonPhase(document.getElementById(\'discordBtn\'))'));
+  assert.ok(root.includes('applyVelunaButtonPhase(document.getElementById(\'s666VelunaMessageButton\'))'));
 });
 test('suspend clears transient controls and invalidates async work',()=>{
   assert.ok(root.includes('lifecycleGeneration += 1;'));

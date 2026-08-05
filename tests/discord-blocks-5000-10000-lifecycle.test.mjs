@@ -19,9 +19,9 @@ test('watcher and visual bridge honor lifecycle suspension',()=>{
   assert.ok(root.includes('if (lifecycleSuspended) return;'));
   assert.ok(root.includes('if (!lifecycleSuspended) scheduleWatcher'));
 });
-test('script success cache clears and missing client gets one fresh retry',()=>{
+test('script success cache clears and missing client gets one owner-safe retry',()=>{
   assert.ok(root.includes('delete scriptLoads[id];'));
-  assert.ok(root.includes('var stale = document.getElementById(id);'));
+  assert.ok(root.includes('removeOwnedScriptSlots(id);'));
   assert.ok(root.includes('await loadScriptOnce(id, src);'));
 });
 // final gate retrigger after one-shot cleanup
