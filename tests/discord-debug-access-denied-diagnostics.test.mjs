@@ -13,3 +13,4 @@ test('debug access denied records diagnostic truth',()=>{
  assert.ok(block.includes("runtime.lastKind = 'debug-access-denied';"));
  assert.ok(block.includes('401'));
 });
+// gate retrigger: runtime contract unchanged
