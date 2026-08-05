@@ -8,7 +8,8 @@ test('central Discord button bridge consumes warning exactly once',()=>{
   assert.ok(root.includes('function initDiscordButtonStatusBridge()'));
   assert.ok(root.includes('window.__S666_DISCORD_BUTTON_STATUS_BRIDGE__'));
   assert.ok(root.includes("button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');"));
-  assert.ok(root.includes("else if (phase === 'warning') button.classList.add('is-warn');"));
+  assert.ok(root.includes("else if (effectivePhase === 'warning') button.classList.add('is-warn');"));
+  assert.ok(root.includes('discordButtonPhase = phase;'));
   assert.ok(root.includes('initDiscordButtonStatusBridge();'));
 });
 test('warning class has a distinct visual state',()=>{
