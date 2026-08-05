@@ -427,7 +427,12 @@ export async function handleDiscordNotifyV3(request, env = {}) {
   }
 
   if (path === '/api/discord/debug') {
-    if (!(await discordAccessOk(request, env))) return json({ ok: false, error: 'unauthorized' }, 401);
+    if (!(await discordAccessOk(request, env))) {
+      runtime.lastErrorAt = Date.now();
+      runtime.lastError = 'unauthorized';
+      runtime.lastKind = 'debug-access-denied';
+      return json({ ok: false, error: runtime.lastError }, 401);
+    }
     return json({
       ok: true,
       addon: ADDON_VERSION,
