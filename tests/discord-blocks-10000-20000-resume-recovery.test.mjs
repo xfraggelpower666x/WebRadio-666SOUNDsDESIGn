@@ -18,3 +18,4 @@ test('player alert recovery is single-flight across parallel callers',()=>{
   assert.ok(root.includes('playerAlertClientLoad = (async function ()'));
   assert.ok(root.includes('playerAlertClientLoad = null;'));
 });
+// final required-gate retrigger after self-clean
