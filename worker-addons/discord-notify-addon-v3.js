@@ -448,11 +448,17 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       lastOkAt: runtime.lastOkAt ? new Date(runtime.lastOkAt).toISOString() : null,
       lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
       lastError: runtime.lastError || '',
-      lastTrackKey: runtime.lastTrackKey ? '[set]' : ''
+      lastTrackKey: runtime.lastTrackKey ? '[set]' : '',
+      pendingPrivateTrack: runtime.pendingPrivateTrackKey ? '[set]' : ''
     });
   }
 
-  if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
+  if (request.method !== 'POST') {
+    runtime.lastErrorAt = Date.now();
+    runtime.lastError = 'POST required';
+    runtime.lastKind = 'method-not-allowed';
+    return json({ ok: false, error: runtime.lastError }, 405);
+  }
   if (!(await discordAccessOk(request, env))) {
     runtime.lastErrorAt = Date.now();
     runtime.lastError = 'shared admin session required';
@@ -470,7 +476,12 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     }
     if (path === '/api/discord/message') {
       const message = clean(input.message || input.text || input.content, '', 1800);
-      if (!message) return json({ ok: false, error: 'message text missing' }, 400);
+      if (!message) {
+        runtime.lastErrorAt = Date.now();
+        runtime.lastError = 'message text missing';
+        runtime.lastKind = 'message-validation-error';
+        return json({ ok: false, error: runtime.lastError }, 400);
+      }
       const now = Date.now();
       if (now - runtime.lastMessageAt < MIN_MANUAL_COOLDOWN_MS) {
         runtime.lastKind = 'message-cooldown';
@@ -483,7 +494,12 @@ export async function handleDiscordNotifyV3(request, env = {}) {
     }
     if (path === '/api/discord/nowplaying') {
       const key = trackKey(input);
-      if (!key) return json({ ok: false, error: 'track/artist/title/nowPlaying fehlt' }, 400);
+      if (!key) {
+        runtime.lastErrorAt = Date.now();
+        runtime.lastError = 'track/artist/title/nowPlaying fehlt';
+        runtime.lastKind = 'nowplaying-validation-error';
+        return json({ ok: false, error: runtime.lastError }, 400);
+      }
       const now = Date.now();
       if (key === runtime.lastTrackKey && now - runtime.lastTrackAt < MIN_TRACK_COOLDOWN_MS) {
         if (runtime.pendingPrivateTrackKey === key) {
@@ -522,7 +538,8 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       if (privatePartial) {
         runtime.pendingPrivateTrackKey = key;
         runtime.lastErrorAt = Date.now();
-        runtime.lastError = clean(privateTrack.error, 'private_track_delivery_failed', 1200);
+        const privateError = clean(privateTrack.error, 'private_track_delivery_failed', 1200);
+        runtime.lastError = [result.partial ? runtime.lastError : '', privateError].filter(Boolean).join(' | ').slice(0, 1200);
       } else if (runtime.pendingPrivateTrackKey === key) {
         runtime.pendingPrivateTrackKey = '';
       }
