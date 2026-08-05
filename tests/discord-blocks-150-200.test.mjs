@@ -17,3 +17,4 @@ test('private retry cannot erase an unresolved main partial failure',()=>{
   assert.ok(root.includes("'nowplaying-private-retry-ok-main-partial'"));
   assert.ok(root.includes("pendingMainPartialTrack: runtime.pendingMainPartialTrackKey ? '[set]' : ''"));
 });
+// final gate trigger
