@@ -19,6 +19,8 @@
   var startupAutoPostStartedAt = 0;
   var initialized = false;
   var watcherRunning = false;
+  var lifecycleSuspended = false;
+  var statusResetTimer = 0;
   var scriptLoads = Object.create(null);
   var REQUEST_TIMEOUT_MS = 15000;
   var STATUS_TIMEOUT_MS = 10000;
@@ -449,7 +451,10 @@
 
   function scheduleWatcher(delay) {
     clearTimeout(watcherTimer);
+    watcherTimer = 0;
+    if (lifecycleSuspended) return;
     watcherTimer = setTimeout(async function () {
+      if (lifecycleSuspended) return;
       if (watcherRunning) {
         scheduleWatcher(document.hidden ? 30000 : 1500);
         return;
@@ -465,7 +470,7 @@
         }
       } finally {
         watcherRunning = false;
-        scheduleWatcher(document.hidden ? 30000 : 8000);
+        if (!lifecycleSuspended) scheduleWatcher(document.hidden ? 30000 : 8000);
       }
     }, delay);
   }
@@ -490,6 +495,7 @@
         settled = true;
         cleanup();
         if (script) script.dataset.s666Loaded = '1';
+        delete scriptLoads[id];
         resolve();
       }
       function failed() {
@@ -574,8 +580,15 @@
   }
 
   async function ensurePlayerAlertClient() {
+    var id = 's666PlayerAlertClientVelunaBridge';
+    var src = '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121';
     if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
-    await loadScriptOnce('s666PlayerAlertClientVelunaBridge', '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121');
+    await loadScriptOnce(id, src);
+    if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
+    var stale = document.getElementById(id);
+    if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+    delete scriptLoads[id];
+    await loadScriptOnce(id, src);
     if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
     throw new Error('player_alert_client_missing');
   }
@@ -671,6 +684,8 @@
     setSharedColorState('transport', 'idle');
     syncSharedColorState();
     clearInterval(visualTimer);
+    visualTimer = 0;
+    if (lifecycleSuspended) return;
     visualTimer = setInterval(function () {
       syncSharedColorState();
       installVelunaDiscordNoAuthBypass();
@@ -690,12 +705,38 @@
       if (phase !== 'sending' && phase !== 'success' && phase !== 'warning' && phase !== 'error') return;
       var button = document.getElementById('discordBtn');
       if (!button) return;
+      clearTimeout(statusResetTimer);
       button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
       if (phase === 'sending') button.classList.add('is-busy');
       else if (phase === 'success') button.classList.add('is-ok');
       else if (phase === 'warning') button.classList.add('is-warn');
       else if (phase === 'error') button.classList.add('is-error');
+      if (phase !== 'sending') {
+        statusResetTimer = setTimeout(function () {
+          button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
+        }, phase === 'success' ? 5000 : 8000);
+      }
     });
+  }
+
+  function suspendRuntime() {
+    lifecycleSuspended = true;
+    clearTimeout(watcherTimer);
+    clearTimeout(startupTimer);
+    clearInterval(visualTimer);
+    watcherTimer = 0;
+    startupTimer = 0;
+    visualTimer = 0;
+  }
+
+  function resumeRuntime() {
+    if (!initialized) return;
+    lifecycleSuspended = false;
+    syncSharedColorState();
+    initSharedVisualBridge();
+    scheduleWatcher(1200);
+    if (!startupAutoPostDone) tryStartupAutoPost();
+    checkStatus();
   }
 
   function initAll() {
@@ -709,7 +750,11 @@
     initSharedVisualBridge();
   }
 
-  document.addEventListener('visibilitychange', function () { scheduleWatcher(document.hidden ? 30000 : 1500); });
+  document.addEventListener('visibilitychange', function () {
+    if (!lifecycleSuspended) scheduleWatcher(document.hidden ? 30000 : 1500);
+  });
+  window.addEventListener('pagehide', suspendRuntime);
+  window.addEventListener('pageshow', function () { resumeRuntime(); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll, { once: true });
   else setTimeout(initAll, 0);
 
