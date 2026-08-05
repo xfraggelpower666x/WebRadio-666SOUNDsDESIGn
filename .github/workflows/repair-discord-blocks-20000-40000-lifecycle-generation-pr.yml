@@ -32,6 +32,16 @@ jobs:
           base64 -d /tmp/repair-discord-20000-40000.b64 | gzip -dc > /tmp/repair-discord-20000-40000.mjs
           node --check /tmp/repair-discord-20000-40000.mjs
           node /tmp/repair-discord-20000-40000.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs')
+          text = path.read_text(encoding='utf-8')
+          bad = "  assert.equal((root.match(/document.addEventListener('keydown', function (event) {/g)||[]).length >= 1, true);"
+          good = "  assert.ok(root.includes(\"document.addEventListener('keydown', function (event) {\"));"
+          if bad not in text:
+              raise SystemExit('expected malformed keydown assertion not found')
+          path.write_text(text.replace(bad, good), encoding='utf-8')
+          PY
       - name: Verify addon syntax and mirror integrity
         run: |
           node --check js/addons/discord-player-addon-v3.js
