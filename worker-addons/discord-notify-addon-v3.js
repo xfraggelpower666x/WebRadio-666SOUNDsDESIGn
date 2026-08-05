@@ -37,9 +37,13 @@ const runtime = globalThis.__S666_DISCORD_V3_RUNTIME__ || {
   lastErrorAt: 0,
   lastError: '',
   lastKind: 'idle',
-  pendingPrivateTrackKey: ''
+  pendingPrivateTrackKey: '',
+  pendingMainPartialTrackKey: '',
+  pendingMainPartialError: ''
 };
 if (typeof runtime.pendingPrivateTrackKey !== 'string') runtime.pendingPrivateTrackKey = '';
+if (typeof runtime.pendingMainPartialTrackKey !== 'string') runtime.pendingMainPartialTrackKey = '';
+if (typeof runtime.pendingMainPartialError !== 'string') runtime.pendingMainPartialError = '';
 globalThis.__S666_DISCORD_V3_RUNTIME__ = runtime;
 
 function json(data, status = 200) {
@@ -420,8 +424,8 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       addon: ADDON_VERSION,
       ready: Boolean(getDiscordWebhooks(env).length),
       webhookCount: getDiscordWebhooks(env).length,
-      webhook2Configured: Boolean(env && (env.DISCORD_WEBHOOK_URL2 || env.DISCORD_WEBHOOK_2 || env.DISCORD_SECONDARY_WEBHOOK_URL)),
-      privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
+      webhook2Configured: getDiscordWebhooks(env).length > 1,
+      privateTrackWebhookConfigured: Boolean(clean(getPrivateTrackWebhook(env), '', 1000)),
       authMode: String(env.DISCORD_REQUIRE_ADMIN || '').toLowerCase() === 'true' ? 'shared-admin-bearer-required' : 'public-secret-server-side'
     });
   }
@@ -439,8 +443,8 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       mode: 'NO_KV_NO_R2_PLAYER_EVENT_DRIVEN',
       webhookConfigured: Boolean(getDiscordWebhooks(env).length),
       webhookCount: getDiscordWebhooks(env).length,
-      webhook2Configured: Boolean(env && (env.DISCORD_WEBHOOK_URL2 || env.DISCORD_WEBHOOK_2 || env.DISCORD_SECONDARY_WEBHOOK_URL)),
-      privateTrackWebhookConfigured: Boolean(getPrivateTrackWebhook(env)),
+      webhook2Configured: getDiscordWebhooks(env).length > 1,
+      privateTrackWebhookConfigured: Boolean(clean(getPrivateTrackWebhook(env), '', 1000)),
       serviceTokenConfigured: Boolean(env && env.DISCORD_ADMIN_TOKEN),
       requireAdmin: String(env.DISCORD_REQUIRE_ADMIN || '').toLowerCase() === 'true',
       sharedAdminAuth: true,
@@ -449,7 +453,8 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       lastErrorAt: runtime.lastErrorAt ? new Date(runtime.lastErrorAt).toISOString() : null,
       lastError: runtime.lastError || '',
       lastTrackKey: runtime.lastTrackKey ? '[set]' : '',
-      pendingPrivateTrack: runtime.pendingPrivateTrackKey ? '[set]' : ''
+      pendingPrivateTrack: runtime.pendingPrivateTrackKey ? '[set]' : '',
+      pendingMainPartialTrack: runtime.pendingMainPartialTrackKey ? '[set]' : ''
     });
   }
 
@@ -487,9 +492,9 @@ export async function handleDiscordNotifyV3(request, env = {}) {
         runtime.lastKind = 'message-cooldown';
         return json({ ok: true, skipped: true, reason: 'message cooldown', led: 'cooldown', addon: ADDON_VERSION });
       }
-      runtime.lastMessageAt = now;
       runtime.lastKind = 'message';
       const result = await sendDiscord(env, messagePayload(input));
+      runtime.lastMessageAt = Date.now();
       return json({ ok: true, partial: Boolean(result.partial), type: 'message', led: discordDeliveryLed(result), discord: result, addon: ADDON_VERSION });
     }
     if (path === '/api/discord/nowplaying') {
@@ -515,10 +520,11 @@ export async function handleDiscordNotifyV3(request, env = {}) {
           }
           runtime.pendingPrivateTrackKey = '';
           runtime.lastOkAt = Date.now();
-          runtime.lastErrorAt = 0;
-          runtime.lastError = '';
-          runtime.lastKind = 'nowplaying-private-retry-ok';
-          return json({ ok: true, partial: false, privateRetry: true, skippedMain: true, led: 'ok', privateTrack, addon: ADDON_VERSION });
+          const mainStillPartial = runtime.pendingMainPartialTrackKey === key;
+          runtime.lastErrorAt = mainStillPartial ? Date.now() : 0;
+          runtime.lastError = mainStillPartial ? runtime.pendingMainPartialError : '';
+          runtime.lastKind = mainStillPartial ? 'nowplaying-private-retry-ok-main-partial' : 'nowplaying-private-retry-ok';
+          return json({ ok: true, partial: mainStillPartial, privateRetry: true, skippedMain: true, led: mainStillPartial ? 'warning' : 'ok', privateTrack, addon: ADDON_VERSION });
         }
         runtime.lastKind = 'nowplaying-dedupe';
         return json({ ok: true, skipped: true, reason: 'duplicate track cooldown', led: 'dedupe', addon: ADDON_VERSION });
@@ -526,12 +532,23 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       if (runtime.pendingPrivateTrackKey && runtime.pendingPrivateTrackKey !== key) {
         runtime.pendingPrivateTrackKey = '';
       }
+      if (runtime.pendingMainPartialTrackKey && runtime.pendingMainPartialTrackKey !== key) {
+        runtime.pendingMainPartialTrackKey = '';
+        runtime.pendingMainPartialError = '';
+      }
       runtime.lastKind = 'nowplaying';
       const payload = nowPlayingPayload(input);
       const mainWebhooks = getDiscordWebhooks(env);
       const result = await sendDiscord(env, payload);
       runtime.lastTrackKey = key;
       runtime.lastTrackAt = Date.now();
+      if (result.partial) {
+        runtime.pendingMainPartialTrackKey = key;
+        runtime.pendingMainPartialError = runtime.lastError;
+      } else {
+        runtime.pendingMainPartialTrackKey = '';
+        runtime.pendingMainPartialError = '';
+      }
       const privateTrack = await sendPrivateNowPlayingIfConfigured(env, payload, mainWebhooks);
       const privatePartial = privateTrack.configured === true && privateTrack.ok === false;
       const partial = Boolean(result.partial || privatePartial);
@@ -551,9 +568,9 @@ export async function handleDiscordNotifyV3(request, env = {}) {
       runtime.lastKind = 'manual-cooldown';
       return json({ ok: true, skipped: true, reason: 'manual cooldown', led: 'cooldown', addon: ADDON_VERSION });
     }
-    runtime.lastManualAt = now;
     runtime.lastKind = 'manual';
     const result = await sendDiscord(env, manualPayload(input));
+    runtime.lastManualAt = Date.now();
     return json({ ok: true, partial: Boolean(result.partial), type: 'manual', led: discordDeliveryLed(result), discord: result, addon: ADDON_VERSION });
   } catch (err) {
     runtime.lastErrorAt = Date.now();
