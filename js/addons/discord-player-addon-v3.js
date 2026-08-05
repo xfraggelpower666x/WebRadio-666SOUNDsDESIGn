@@ -25,6 +25,7 @@
   var watcherTimer = 0;
   var visualTimer = 0;
   var controlObserver = null;
+  var controlObserverRoot = null;
   var controlReconcileTimer = 0;
   var startupTimer = 0;
   var lastTrackKey = '';
@@ -200,6 +201,10 @@
   function abortActiveFetches() {
     Object.keys(activeFetchControllers).forEach(function (controllerId) {
       var entry = activeFetchControllers[controllerId];
+      if (entry && typeof entry.cancel === 'function') {
+        entry.cancel('lifecycle');
+        return;
+      }
       delete activeFetchControllers[controllerId];
       if (!entry || !entry.controller) return;
       entry.abortReason = 'lifecycle';
@@ -211,7 +216,7 @@
     var limit = timeoutMs || REQUEST_TIMEOUT_MS;
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
     var controllerId = controller ? ++fetchControllerSequence : 0;
-    var entry = controller ? { controller: controller, abortReason: '' } : null;
+    var entry = controller ? { controller: controller, abortReason: '', cancel: null } : null;
     var requestOptions = Object.assign({}, options || {});
     var timer = 0;
     var settled = false;
@@ -225,14 +230,20 @@
         else if (error && error.name === 'AbortError') reject(new Error('discord_request_timeout'));
         else reject(error);
       }
-      timer = setTimeout(function () {
+      function cancelRequest(reason) {
         if (settled) return;
         settled = true;
-        if (entry) entry.abortReason = 'timeout';
+        clearTimeout(timer);
+        if (entry) entry.abortReason = reason || 'lifecycle';
         releaseFetchController(controllerId, entry);
-        if (controller) controller.abort();
-        reject(new Error('discord_request_timeout'));
-      }, limit);
+        if (controller) {
+          try { controller.abort(); } catch (_) {}
+        }
+        if (reason === 'timeout') reject(new Error('discord_request_timeout'));
+        else reject(staleLifecycleError());
+      }
+      if (entry) entry.cancel = cancelRequest;
+      timer = setTimeout(function () { cancelRequest('timeout'); }, limit);
       fetch(url, requestOptions).then(function (response) {
         return response.json().catch(function (error) {
           if (error && error.name === 'AbortError') throw error;
@@ -739,7 +750,11 @@
   }
 
   function normalizedScriptSource(src) {
-    try { return new URL(src, document.baseURI || location.href).href; } catch (_) { return String(src || ''); }
+    try {
+      var url = new URL(src, document.baseURI || location.href);
+      url.hash = '';
+      return url.href;
+    } catch (_) { return String(src || '').split('#')[0]; }
   }
 
   function scriptSourceMatches(script, src) {
@@ -1097,7 +1112,7 @@
 
   function startControlObserver() {
     if (controlObserver || typeof MutationObserver !== 'function') return;
-    var root = document.documentElement || document.body;
+    var root = document && typeof document.nodeType === 'number' ? document : (document.documentElement || document.body);
     if (!root) return;
     controlObserver = new MutationObserver(function (mutations) {
       for (var i = 0; i < mutations.length; i += 1) {
@@ -1110,7 +1125,14 @@
         }
       }
     });
-    controlObserver.observe(root, { childList: true, subtree: true });
+    controlObserverRoot = root;
+    try {
+      controlObserver.observe(root, { childList: true, subtree: true });
+    } catch (_) {
+      controlObserver.disconnect();
+      controlObserver = null;
+      controlObserverRoot = null;
+    }
   }
 
   function stopControlObserver() {
@@ -1118,6 +1140,7 @@
     controlReconcileTimer = 0;
     if (controlObserver) controlObserver.disconnect();
     controlObserver = null;
+    controlObserverRoot = null;
   }
 
   function initVelunaMessengerBridge() {

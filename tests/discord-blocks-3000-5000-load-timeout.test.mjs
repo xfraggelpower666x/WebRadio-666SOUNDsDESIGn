@@ -7,7 +7,10 @@ test('Discord addon mirrors remain byte-identical',()=>assert.equal(root,mirror)
 test('fetch timeout works even without AbortController',()=>{
   assert.ok(root.includes("reject(new Error('discord_request_timeout'))"));
   assert.ok(root.includes('return new Promise(function (resolve, reject)'));
-  assert.ok(root.includes('if (controller) controller.abort();'));
+  assert.ok(root.includes("if (reason === 'timeout') reject(new Error('discord_request_timeout'));"));
+  assert.ok(root.includes('if (controller) {'));
+  assert.ok(root.includes('controller.abort();'));
+  assert.ok(root.includes('else reject(staleLifecycleError());'));
 });
 test('failed scripts are removed and retry registry is cleared',()=>{
   assert.ok(root.includes('function removeBrokenScript()'));
