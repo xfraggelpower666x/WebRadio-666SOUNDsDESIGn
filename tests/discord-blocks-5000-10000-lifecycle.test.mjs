@@ -24,3 +24,4 @@ test('script success cache clears and missing client gets one fresh retry',()=>{
   assert.ok(root.includes('var stale = document.getElementById(id);'));
   assert.ok(root.includes('await loadScriptOnce(id, src);'));
 });
+// final gate retrigger after one-shot cleanup
