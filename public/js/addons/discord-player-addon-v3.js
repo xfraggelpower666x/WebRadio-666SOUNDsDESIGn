@@ -207,6 +207,7 @@
       '.s666msg-count-veluna{display:block;margin:7px 0 0;color:rgba(22,255,243,.72);font-size:11px;font-weight:900;letter-spacing:.06em}',
       '.s666-discord-status{min-height:18px;margin-top:9px;font-size:11px;font-weight:900;letter-spacing:.05em}',
       '.s666-discord-status.is-sending{color:#ffc857}.s666-discord-status.is-ok{color:#7edcff}.s666-discord-status.is-error{color:#ff5570}.s666-discord-status.is-warn{color:#ffc857}',
+      '#discordBtn.is-warn{border-color:rgba(255,200,87,.82)!important;color:#ffc857!important;box-shadow:0 0 14px rgba(255,200,87,.3)!important}',
       '.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}'
     ].join('');
     document.head.appendChild(style);
@@ -592,7 +593,23 @@
     }, 3500);
   }
 
+  function initDiscordButtonStatusBridge() {
+    if (window.__S666_DISCORD_BUTTON_STATUS_BRIDGE__) return;
+    window.__S666_DISCORD_BUTTON_STATUS_BRIDGE__ = true;
+    window.addEventListener('s666:discord-state', function (event) {
+      var detail = event.detail || {};
+      var button = document.getElementById('discordBtn');
+      if (!button) return;
+      button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
+      if (detail.phase === 'sending') button.classList.add('is-busy');
+      else if (detail.phase === 'success') button.classList.add('is-ok');
+      else if (detail.phase === 'warning') button.classList.add('is-warn');
+      else if (detail.phase === 'error') button.classList.add('is-error');
+    });
+  }
+
   function initAll() {
+    initDiscordButtonStatusBridge();
     checkStatus();
     tryStartupAutoPost();
     scheduleWatcher(4000);
