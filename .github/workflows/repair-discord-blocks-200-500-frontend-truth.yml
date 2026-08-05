@@ -1,4 +1,5 @@
 name: Repair Discord Blocks 200-500 Frontend Truth
+# trigger registration
 on:
   pull_request:
     branches: [WebRadio-666SOUNDsDESIGn]
