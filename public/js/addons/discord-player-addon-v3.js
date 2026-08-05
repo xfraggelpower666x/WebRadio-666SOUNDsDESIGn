@@ -21,6 +21,7 @@
   var watcherRunning = false;
   var lifecycleSuspended = false;
   var statusResetTimer = 0;
+  var playerAlertClientLoad = null;
   var scriptLoads = Object.create(null);
   var REQUEST_TIMEOUT_MS = 15000;
   var STATUS_TIMEOUT_MS = 10000;
@@ -579,18 +580,22 @@
     return overlay;
   }
 
-  async function ensurePlayerAlertClient() {
-    var id = 's666PlayerAlertClientVelunaBridge';
-    var src = '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121';
-    if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
-    await loadScriptOnce(id, src);
-    if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
-    var stale = document.getElementById(id);
-    if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
-    delete scriptLoads[id];
-    await loadScriptOnce(id, src);
-    if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
-    throw new Error('player_alert_client_missing');
+  function ensurePlayerAlertClient() {
+    if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return Promise.resolve(window.S666PlayerAlertClient);
+    if (playerAlertClientLoad) return playerAlertClientLoad;
+    playerAlertClientLoad = (async function () {
+      var id = 's666PlayerAlertClientVelunaBridge';
+      var src = '/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121';
+      await loadScriptOnce(id, src);
+      if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
+      var stale = document.getElementById(id);
+      if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+      delete scriptLoads[id];
+      await loadScriptOnce(id, src);
+      if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
+      throw new Error('player_alert_client_missing');
+    })().finally(function () { playerAlertClientLoad = null; });
+    return playerAlertClientLoad;
   }
 
   async function sendVelunaMessenger() {
@@ -723,14 +728,16 @@
     lifecycleSuspended = true;
     clearTimeout(watcherTimer);
     clearTimeout(startupTimer);
+    clearTimeout(statusResetTimer);
     clearInterval(visualTimer);
     watcherTimer = 0;
     startupTimer = 0;
+    statusResetTimer = 0;
     visualTimer = 0;
   }
 
   function resumeRuntime() {
-    if (!initialized) return;
+    if (!initialized || !lifecycleSuspended) return;
     lifecycleSuspended = false;
     syncSharedColorState();
     initSharedVisualBridge();
