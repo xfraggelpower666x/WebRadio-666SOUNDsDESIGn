@@ -1,0 +1,54 @@
+name: Repair Discord Blocks 60000-80000 Request Loader Remount
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-blocks-60000-80000-request-loader-remount-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rehydrate hash-locked repair
+        shell: bash
+        run: |
+          base64 -d .github/repair-payloads/discord-60000-80000-request-loader-remount.b64 | gzip -dc > /tmp/repair-discord-60000-80000.py
+          python -m py_compile /tmp/repair-discord-60000-80000.py
+          python /tmp/repair-discord-60000-80000.py
+      - name: Verify exact addon and mirrors
+        shell: bash
+        run: |
+          test "$(sha256sum js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "386a7364d5945aa9706107ab50532ace0145399b652d9ce7107ef4fdf82e8a57"
+          node --check js/addons/discord-player-addon-v3.js
+          node --check public/js/addons/discord-player-addon-v3.js
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+          node --check tests/discord-blocks-60000-80000-request-loader-remount.test.mjs
+      - name: Run full repository verification
+        run: |
+          npm ci
+          npm run verify
+      - name: Self-clean and commit repair
+        shell: bash
+        run: |
+          rm -f .github/repair-payloads/discord-60000-80000-request-loader-remount.b64
+          rm -f .github/workflows/repair-discord-blocks-60000-80000-request-loader-remount-pr.yml
+          rmdir .github/repair-payloads 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js tests/discord-blocks-10000-20000-resume-recovery.test.mjs tests/discord-blocks-2000-3000-runtime.test.mjs tests/discord-blocks-60000-80000-request-loader-remount.test.mjs .github/repair-payloads/discord-60000-80000-request-loader-remount.b64 .github/workflows/repair-discord-blocks-60000-80000-request-loader-remount-pr.yml
+          git commit -m "Repair Discord request loader remount blocks 60000-80000"
+          git push origin HEAD:repair/discord-blocks-60000-80000-request-loader-remount-20260805
