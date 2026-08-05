@@ -28,9 +28,10 @@ test('startup autopost does not duplicate a watcher post',()=>{
   assert.ok(block.indexOf('key === lastPostedKey') < block.indexOf("postTrackIfChanged(true, 'startup-first-now-playing')"));
 });
 
-test('Discord endpoint and delivery contract remain unchanged',()=>{
+test('Discord endpoints remain unchanged and dedupe commits only for the current live track',()=>{
   assert.ok(root.includes("postJson('/api/discord/nowplaying'"));
   assert.ok(root.includes("postJson('/api/discord/manual'"));
   assert.ok(root.includes("credentials: 'same-origin'"));
-  assert.ok(root.includes('if (!result || result.skipped !== true) lastPostedKey = key'));
+  assert.ok(root.includes('if (lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key'));
+  assert.equal(root.includes('if (!result || result.skipped !== true) lastPostedKey = key'), false);
 });
