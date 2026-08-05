@@ -8,11 +8,11 @@ test('central Discord button bridge consumes warning exactly once',()=>{
   assert.ok(root.includes('function initDiscordButtonStatusBridge()'));
   assert.ok(root.includes('window.__S666_DISCORD_BUTTON_STATUS_BRIDGE__'));
   assert.ok(root.includes("button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');"));
-  assert.ok(root.includes("else if (detail.phase === 'warning') button.classList.add('is-warn');"));
+  assert.ok(root.includes("else if (phase === 'warning') button.classList.add('is-warn');"));
   assert.ok(root.includes('initDiscordButtonStatusBridge();'));
 });
 test('warning class has a distinct visual state',()=>{
   assert.ok(root.includes('#discordBtn.is-warn'));
   assert.ok(root.includes('color:#ffc857!important'));
 });
-// final gate retrigger after temporary workflow cleanup
+// block 1000-2000 normalized phase contract
