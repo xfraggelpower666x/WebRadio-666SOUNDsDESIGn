@@ -498,6 +498,9 @@ export async function handleDiscordNotifyV3(request, env = {}) {
         runtime.lastKind = 'nowplaying-dedupe';
         return json({ ok: true, skipped: true, reason: 'duplicate track cooldown', led: 'dedupe', addon: ADDON_VERSION });
       }
+      if (runtime.pendingPrivateTrackKey && runtime.pendingPrivateTrackKey !== key) {
+        runtime.pendingPrivateTrackKey = '';
+      }
       runtime.lastKind = 'nowplaying';
       const payload = nowPlayingPayload(input);
       const mainWebhooks = getDiscordWebhooks(env);
