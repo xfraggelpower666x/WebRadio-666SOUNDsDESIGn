@@ -1,0 +1,51 @@
+name: Repair Discord Blocks 20000-40000 Lifecycle Generation PR
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-blocks-20000-40000-lifecycle-generation-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Rehydrate repair from quarantined payload
+        shell: bash
+        run: |
+          awk '
+            /<<'"'"'B64'"'"'/ { capture=1; next }
+            capture && $0 ~ /^[[:space:]]*B64[[:space:]]*$/ { exit }
+            capture { sub(/^[[:space:]]+/, ""); print }
+          ' .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation.yml > /tmp/repair-discord-20000-40000.b64
+          test -s /tmp/repair-discord-20000-40000.b64
+          base64 -d /tmp/repair-discord-20000-40000.b64 | gzip -dc > /tmp/repair-discord-20000-40000.mjs
+          node --check /tmp/repair-discord-20000-40000.mjs
+          node /tmp/repair-discord-20000-40000.mjs
+      - name: Verify addon syntax and mirror integrity
+        run: |
+          node --check js/addons/discord-player-addon-v3.js
+          node --check public/js/addons/discord-player-addon-v3.js
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+      - name: Run focused regression chain
+        run: node --test tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs tests/discord-blocks-10000-20000-resume-recovery.test.mjs tests/discord-blocks-5000-10000-lifecycle.test.mjs tests/discord-blocks-3000-5000-load-timeout.test.mjs tests/discord-blocks-2000-3000-runtime.test.mjs tests/discord-blocks-1000-2000-init-state.test.mjs
+      - name: Self-clean and commit repair
+        run: |
+          rm -f .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation.yml
+          rm -f .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation-pr.yml
+          rm -f scripts/.trigger-discord-20000-40000.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation.yml .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation-pr.yml scripts/.trigger-discord-20000-40000.txt
+          git commit -m "Repair Discord lifecycle generations blocks 20000-40000"
+          git push origin HEAD:repair/discord-blocks-20000-40000-lifecycle-generation-20260805
