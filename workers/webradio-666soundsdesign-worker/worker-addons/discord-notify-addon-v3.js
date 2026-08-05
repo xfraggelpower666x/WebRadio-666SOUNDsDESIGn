@@ -351,7 +351,7 @@ async function sendDiscord(env, payload) {
   if (failed.length === results.length) throw new Error(failed.map(item => item.error).join(' | ') || 'all_discord_webhooks_failed');
   const partial = failed.length > 0;
   runtime.lastOkAt = Date.now();
-  runtime.lastErrorAt = partial ? Date.now() : runtime.lastErrorAt;
+  runtime.lastErrorAt = partial ? Date.now() : 0;
   runtime.lastError = partial ? failed.map(item => item.error).join(' | ').slice(0, 1200) : '';
   return { ok: true, partial, delivered: results.length - failed.length, failed: failed.length, count: results.length, results };
 }
