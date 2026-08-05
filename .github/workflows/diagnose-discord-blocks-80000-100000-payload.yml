@@ -1,0 +1,43 @@
+name: Diagnose Discord Blocks 80000-100000 Payload
+
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    paths:
+      - '.github/workflows/diagnose-discord-blocks-80000-100000-payload.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    if: github.event.pull_request.head.ref == 'repair/discord-blocks-80000-100000-abort-loader-status-20260805'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Print every payload segment hash
+        shell: python
+        run: |
+          from pathlib import Path
+          import hashlib
+          files = [
+            '.repair/discord-blocks-80000-100000.v3.payload.part1a.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part1b.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part2a.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part2b.txt',
+            '.repair/discord-blocks-80000-100000.v4.payload.part2b1.txt',
+            '.repair/discord-blocks-80000-100000.v4.payload.part2b2.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part3a.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part3b.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part4a.txt',
+            '.repair/discord-blocks-80000-100000.v3.payload.part4b.txt',
+          ]
+          for rel in files:
+              p=Path(rel)
+              if not p.exists():
+                  print(f'MISSING {rel}')
+                  continue
+              data=p.read_bytes()
+              print(f'{rel} length={len(data)} sha256={hashlib.sha256(data).hexdigest()}')
