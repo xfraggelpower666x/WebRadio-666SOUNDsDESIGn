@@ -1,0 +1,166 @@
+name: Repair Discord Blocks 80000-100000 Abort Loader Status
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - '.repair/discord-blocks-80000-100000.v2.payload.part1.txt'
+      - '.repair/discord-blocks-80000-100000.v2.payload.part2.txt'
+      - '.repair/discord-blocks-80000-100000.v2.payload.part3.txt'
+      - '.repair/discord-blocks-80000-100000.v2.payload.part4.txt'
+      - '.github/workflows/repair-discord-blocks-80000-100000-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.event.pull_request.head.ref == 'repair/discord-blocks-80000-100000-abort-loader-status-20260805'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify exact base
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin WebRadio-666SOUNDsDESIGn
+          test "$(git merge-base HEAD origin/WebRadio-666SOUNDsDESIGn)" = "ad449a8d1754adacc06899783a36a3dbdf662278"
+
+      - name: Rehydrate hash-locked repair
+        shell: python
+        run: |
+          from pathlib import Path
+          import base64, hashlib, io, tarfile
+
+          part_paths = ['.repair/discord-blocks-80000-100000.v2.payload.part1.txt', '.repair/discord-blocks-80000-100000.v2.payload.part2.txt', '.repair/discord-blocks-80000-100000.v2.payload.part3.txt', '.repair/discord-blocks-80000-100000.v2.payload.part4.txt']
+          targets = ['js/addons/discord-player-addon-v3.js', 'public/js/addons/discord-player-addon-v3.js', 'tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs', 'tests/discord-blocks-500-1000-status-bridge.test.mjs', 'tests/discord-blocks-5000-10000-lifecycle.test.mjs', 'tests/discord-blocks-60000-80000-request-loader-remount.test.mjs', 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs']
+          old_hashes = {'js/addons/discord-player-addon-v3.js': '386a7364d5945aa9706107ab50532ace0145399b652d9ce7107ef4fdf82e8a57', 'public/js/addons/discord-player-addon-v3.js': '386a7364d5945aa9706107ab50532ace0145399b652d9ce7107ef4fdf82e8a57', 'tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs': '66c13b170b1943628933a8ba321b2c2d69da768a4082c6fd5992aaa9ab0f586f', 'tests/discord-blocks-500-1000-status-bridge.test.mjs': '3385a695437fa4c0c599f72d7b33695b8a5dc04a3f10e98215198e4fe2b7c850', 'tests/discord-blocks-5000-10000-lifecycle.test.mjs': '34b261ae2702751fd17ccb54837e946b1cc7b5b997f7d900c8a504727e386d72', 'tests/discord-blocks-60000-80000-request-loader-remount.test.mjs': 'd6043ae3a4aa14ff1e9b867a27eed4a44fb844bac3148b566169ae98f26aa9b9', 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs': None}
+          new_hashes = {'js/addons/discord-player-addon-v3.js': 'c13deecd2a48c97c6daac41184203c5a45df0d808cfb726afb9da7e12947a362', 'public/js/addons/discord-player-addon-v3.js': 'c13deecd2a48c97c6daac41184203c5a45df0d808cfb726afb9da7e12947a362', 'tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs': '338d95c067456ca33bd40c704210980ef4431f760ffd4daa24dacfe48360e968', 'tests/discord-blocks-500-1000-status-bridge.test.mjs': '2c10a1cbbc256c8b324f21caeba73ca621ed401cffcde608a3844d010fddce94', 'tests/discord-blocks-5000-10000-lifecycle.test.mjs': 'b1ee38a94b735778a99f884ea03e981b8b0875a42e28565f25c817e7b4be1c19', 'tests/discord-blocks-60000-80000-request-loader-remount.test.mjs': '8e28be368751172e4d7d6fbf31e28eeda46dbcffddee6871ec8a83f21ba2f4af', 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs': '73b9160ac240cc51e34c44fab610177f28949b87095d078656a824fe5bf8faec'}
+
+          def sha256(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+          for rel in targets:
+              path = Path(rel)
+              expected = old_hashes[rel]
+              if expected is None:
+                  if path.exists():
+                      raise SystemExit(f"hash gate failed: expected absent {rel}")
+              else:
+                  if not path.exists():
+                      raise SystemExit(f"hash gate failed: missing {rel}")
+                  actual = sha256(path)
+                  if actual != expected:
+                      raise SystemExit(f"hash gate failed: {rel} {actual} != {expected}")
+
+          encoded = ''.join(Path(path).read_text(encoding='ascii') for path in part_paths)
+          raw = base64.b64decode(encoded)
+          with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as tf:
+              members = tf.getmembers()
+              names = [m.name for m in members]
+              if sorted(names) != sorted(targets):
+                  raise SystemExit(f"payload scope mismatch: {names}")
+              for member in members:
+                  if not member.isfile() or member.name.startswith('/') or '..' in Path(member.name).parts:
+                      raise SystemExit(f"unsafe payload member: {member.name}")
+                  data = tf.extractfile(member).read()
+                  destination = Path(member.name)
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  destination.write_bytes(data)
+
+          for rel in targets:
+              actual = sha256(rel)
+              expected = new_hashes[rel]
+              if actual != expected:
+                  raise SystemExit(f"rehydrated hash mismatch: {rel} {actual} != {expected}")
+
+          if Path('js/addons/discord-player-addon-v3.js').read_bytes() != Path('public/js/addons/discord-player-addon-v3.js').read_bytes():
+              raise SystemExit('Discord addon mirrors differ after rehydrate')
+          print('HASH_GATES_PASS')
+
+
+      - name: Verify exact addon and mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/addons/discord-player-addon-v3.js
+          cmp js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+          test "$(sha256sum js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "c13deecd2a48c97c6daac41184203c5a45df0d808cfb726afb9da7e12947a362"
+
+      - name: Run full repository verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run verify
+          python - <<'PY'
+          from pathlib import Path
+          import ast
+          failures=[]
+          for path in Path('.').rglob('*.py'):
+              try:
+                  ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
+              except Exception as exc:
+                  failures.append(f"{path}: {exc}")
+          if failures:
+              raise SystemExit("\n".join(failures))
+          print("Python files valid")
+          PY
+
+      - name: Self-clean and commit repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f '.repair/discord-blocks-80000-100000.v2.payload.part1.txt' '.repair/discord-blocks-80000-100000.v2.payload.part2.txt' '.repair/discord-blocks-80000-100000.v2.payload.part3.txt' '.repair/discord-blocks-80000-100000.v2.payload.part4.txt' '.github/workflows/repair-discord-blocks-80000-100000-v2.yml' '.repair/discord-blocks-80000-100000.payload.part1.txt' '.repair/discord-blocks-80000-100000.payload.part2.txt' '.repair/discord-blocks-80000-100000.payload.part3.txt' '.repair/discord-blocks-80000-100000.payload.part4.txt' '.github/workflows/repair-discord-blocks-80000-100000.yml'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- \
+            js/addons/discord-player-addon-v3.js \
+            public/js/addons/discord-player-addon-v3.js \
+            tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs \
+            tests/discord-blocks-500-1000-status-bridge.test.mjs \
+            tests/discord-blocks-5000-10000-lifecycle.test.mjs \
+            tests/discord-blocks-60000-80000-request-loader-remount.test.mjs \
+            tests/discord-blocks-80000-100000-abort-loader-status.test.mjs \
+            .repair/discord-blocks-80000-100000.v2.payload.part1.txt \
+            .repair/discord-blocks-80000-100000.v2.payload.part2.txt \
+            .repair/discord-blocks-80000-100000.v2.payload.part3.txt \
+            .repair/discord-blocks-80000-100000.v2.payload.part4.txt \
+            .github/workflows/repair-discord-blocks-80000-100000-v2.yml \
+            .repair/discord-blocks-80000-100000.payload.part1.txt \
+            .repair/discord-blocks-80000-100000.payload.part2.txt \
+            .repair/discord-blocks-80000-100000.payload.part3.txt \
+            .repair/discord-blocks-80000-100000.payload.part4.txt \
+            .github/workflows/repair-discord-blocks-80000-100000.yml
+          git commit -m "Repair Discord abort loader status blocks 80000-100000"
+          mapfile -t changed < <(git diff --name-only origin/WebRadio-666SOUNDsDESIGn...HEAD | sort)
+          expected=(
+            "js/addons/discord-player-addon-v3.js"
+            "public/js/addons/discord-player-addon-v3.js"
+            "tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs"
+            "tests/discord-blocks-500-1000-status-bridge.test.mjs"
+            "tests/discord-blocks-5000-10000-lifecycle.test.mjs"
+            "tests/discord-blocks-60000-80000-request-loader-remount.test.mjs"
+            "tests/discord-blocks-80000-100000-abort-loader-status.test.mjs"
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          test "${#changed[@]}" -eq "${#expected_sorted[@]}"
+          for i in "${!expected_sorted[@]}"; do
+            test "${changed[$i]}" = "${expected_sorted[$i]}"
+          done
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
