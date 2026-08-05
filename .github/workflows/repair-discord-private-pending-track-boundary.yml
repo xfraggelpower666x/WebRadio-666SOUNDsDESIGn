@@ -1,0 +1,38 @@
+name: Repair Discord Private Pending Track Boundary
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    paths:
+      - 'scripts/repair-discord-private-pending-track-boundary.mjs'
+      - '.github/workflows/repair-discord-private-pending-track-boundary.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.head_ref == 'repair/discord-private-pending-track-boundary-20260805' || github.ref_name == 'repair/discord-private-pending-track-boundary-20260805'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-private-pending-track-boundary-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/repair-discord-private-pending-track-boundary.mjs
+      - run: node --test tests/discord-private-pending-track-boundary.test.mjs tests/discord-private-retry.test.mjs tests/discord-private-partial-status.test.mjs tests/discord-partial-delivery-status.test.mjs
+      - name: Self-clean one-shot files
+        run: |
+          rm scripts/repair-discord-private-pending-track-boundary.mjs
+          rm .github/workflows/repair-discord-private-pending-track-boundary.yml
+      - name: Commit repaired result
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add worker-addons/discord-notify-addon-v3.js workers/webradio-666soundsdesign-worker/worker-addons/discord-notify-addon-v3.js tests/discord-private-pending-track-boundary.test.mjs scripts/repair-discord-private-pending-track-boundary.mjs .github/workflows/repair-discord-private-pending-track-boundary.yml
+          git commit -m "Repair stale private pending state at track boundary"
+          git push origin HEAD:repair/discord-private-pending-track-boundary-20260805
