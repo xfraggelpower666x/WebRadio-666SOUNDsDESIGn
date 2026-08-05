@@ -1,0 +1,46 @@
+name: Repair Discord Blocks 20000-40000 Lifecycle Generation
+
+on:
+  push:
+    branches:
+      - repair/discord-blocks-20000-40000-lifecycle-generation-20260805
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-blocks-20000-40000-lifecycle-generation-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Rehydrate and apply lifecycle generation repair
+        shell: bash
+        run: |
+          cat > /tmp/repair-discord-20000-40000.b64 <<'B64'
+          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
+          B64
+          base64 -d /tmp/repair-discord-20000-40000.b64 | gzip -dc > /tmp/repair-discord-20000-40000.mjs
+          node --check /tmp/repair-discord-20000-40000.mjs
+          node /tmp/repair-discord-20000-40000.mjs
+      - name: Verify addon syntax and mirror integrity
+        run: |
+          node --check js/addons/discord-player-addon-v3.js
+          node --check public/js/addons/discord-player-addon-v3.js
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+      - name: Run focused regression chain
+        run: node --test tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs tests/discord-blocks-10000-20000-resume-recovery.test.mjs tests/discord-blocks-5000-10000-lifecycle.test.mjs tests/discord-blocks-3000-5000-load-timeout.test.mjs tests/discord-blocks-2000-3000-runtime.test.mjs tests/discord-blocks-1000-2000-init-state.test.mjs
+      - name: Self-clean and commit repair
+        run: |
+          rm -f .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs .github/workflows/repair-discord-blocks-20000-40000-lifecycle-generation.yml
+          git commit -m "Repair Discord lifecycle generations blocks 20000-40000"
+          git push origin HEAD:repair/discord-blocks-20000-40000-lifecycle-generation-20260805
