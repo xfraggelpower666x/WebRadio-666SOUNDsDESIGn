@@ -1,22 +1,4 @@
-import fs from 'node:fs';
-
-const files = [
-  'worker-addons/discord-notify-addon-v3.js',
-  'workers/webradio-666soundsdesign-worker/worker-addons/discord-notify-addon-v3.js'
-];
-
-const anchor = "      runtime.lastKind = 'nowplaying';\n      const payload = nowPlayingPayload(input);";
-const replacement = "      if (runtime.pendingPrivateTrackKey && runtime.pendingPrivateTrackKey !== key) {\n        runtime.pendingPrivateTrackKey = '';\n      }\n      runtime.lastKind = 'nowplaying';\n      const payload = nowPlayingPayload(input);";
-
-for (const file of files) {
-  const source = fs.readFileSync(file, 'utf8');
-  if (!source.includes(anchor)) throw new Error(`anchor missing: ${file}`);
-  const next = source.replace(anchor, replacement);
-  if (next === source) throw new Error(`no change: ${file}`);
-  fs.writeFileSync(file, next);
-}
-
-const test = `import test from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const root = fs.readFileSync('worker-addons/discord-notify-addon-v3.js','utf8');
@@ -39,5 +21,3 @@ test('same-track private-only retry remains before the track-boundary clear',()=
 test('main Discord contracts remain intact',()=>{
   for (const marker of ['sendDiscord(env, payload)','sendPrivateNowPlayingIfConfigured(env, payload, mainWebhooks)','MIN_TRACK_COOLDOWN_MS','PRIVATE_TRACK_SHOOTER']) assert.ok(root.includes(marker), marker);
 });
-`;
-fs.writeFileSync('tests/discord-private-pending-track-boundary.test.mjs', test);
