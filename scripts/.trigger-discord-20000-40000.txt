@@ -1,1 +1,0 @@
-Trigger PR-synchronize one-shot after the workflow file became available.
