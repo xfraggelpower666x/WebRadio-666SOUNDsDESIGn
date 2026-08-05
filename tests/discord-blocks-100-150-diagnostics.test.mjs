@@ -15,3 +15,4 @@ test('debug exposes pending private retry without leaking its key',()=>{
 test('simultaneous main and private partial errors are combined',()=>{
  assert.ok(root.includes("[result.partial ? runtime.lastError : '', privateError].filter(Boolean).join(' | ').slice(0, 1200)"));
 });
+// Gate retrigger after consolidated cleanup commit.
