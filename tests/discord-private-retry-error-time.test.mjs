@@ -13,3 +13,4 @@ test('successful private retry clears stale error timestamp',()=>{
  assert.ok(block.includes("runtime.lastError = '';"));
  assert.ok(!block.includes('sendDiscord(env'));
 });
+// final gate retrigger
