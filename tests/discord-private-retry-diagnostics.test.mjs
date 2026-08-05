@@ -5,12 +5,13 @@ import fs from 'node:fs';
 const root=fs.readFileSync('worker-addons/discord-notify-addon-v3.js','utf8');
 const mirror=fs.readFileSync('workers/webradio-666soundsdesign-worker/worker-addons/discord-notify-addon-v3.js','utf8');
 test('mirrors remain byte-identical',()=>assert.equal(root,mirror));
-test('successful private-only retry refreshes diagnostics',()=>{
+test('successful private-only retry refreshes diagnostics without erasing a main partial',()=>{
   const start=root.indexOf("runtime.pendingPrivateTrackKey = ''", root.indexOf('nowplaying-private-retry-failed'));
-  const end=root.indexOf("runtime.lastKind = 'nowplaying-private-retry-ok'", start);
+  const end=root.indexOf("return json({ ok: true, partial: mainStillPartial", start);
   const block=root.slice(start,end);
   assert.ok(block.includes('runtime.lastOkAt = Date.now();'));
-  assert.ok(block.includes("runtime.lastError = '';"));
+  assert.ok(block.includes('const mainStillPartial = runtime.pendingMainPartialTrackKey === key;'));
+  assert.ok(block.includes("runtime.lastError = mainStillPartial ? runtime.pendingMainPartialError : '';"));
   assert.ok(!block.includes('sendDiscord(env'));
 });
 test('private retry contracts remain intact',()=>{
