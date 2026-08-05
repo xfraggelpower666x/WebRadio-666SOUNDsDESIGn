@@ -449,8 +449,10 @@ export async function handleDiscordNotifyV3(request, env = {}) {
 
   if (request.method !== 'POST') return json({ ok: false, error: 'POST required' }, 405);
   if (!(await discordAccessOk(request, env))) {
+    runtime.lastErrorAt = Date.now();
+    runtime.lastError = 'shared admin session required';
     runtime.lastKind = 'access-denied';
-    return json({ ok: false, led: 'error', error: 'shared admin session required', addon: ADDON_VERSION }, 401);
+    return json({ ok: false, led: 'error', error: runtime.lastError, addon: ADDON_VERSION }, 401);
   }
 
   try {
