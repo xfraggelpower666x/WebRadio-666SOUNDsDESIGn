@@ -1,0 +1,31 @@
+name: Repair Discord Blocks 1000-2000 Init State
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: github.head_ref == 'repair/discord-blocks-1000-2000-init-state-20260805'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-blocks-1000-2000-init-state-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply initialization and status repair
+        run: node scripts/repair-discord-blocks-1000-2000-init-state.mjs
+      - name: Run focused tests
+        run: node --test tests/discord-blocks-1000-2000-init-state.test.mjs tests/discord-blocks-500-1000-status-bridge.test.mjs tests/discord-blocks-200-500-frontend-truth.test.mjs tests/discord-startup-autopost-retry.test.mjs
+      - name: Self-clean and commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm scripts/repair-discord-blocks-1000-2000-init-state.mjs .github/workflows/repair-discord-blocks-1000-2000-init-state.yml
+          git add js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js tests/discord-blocks-1000-2000-init-state.test.mjs
+          git commit -m "Repair Discord initialization state blocks 1000-2000"
+          git push
