@@ -17,6 +17,7 @@
   var lastPostedKey = '';
   var startupAutoPostDone = false;
   var startupAutoPostStartedAt = 0;
+  var initialized = false;
   var MSG_MAX = 240;
   var STARTUP_RETRY_MS = 1500;
   var STARTUP_MAX_WAIT_MS = 24000;
@@ -395,6 +396,7 @@
         if (Date.now() - startupAutoPostStartedAt < STARTUP_MAX_WAIT_MS) {
           startupTimer = setTimeout(tryStartupAutoPost, STARTUP_RETRY_MS);
         } else {
+          lastTrackKey = '';
           dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'retry-window-exhausted', key: key });
         }
       });
@@ -598,17 +600,25 @@
     window.__S666_DISCORD_BUTTON_STATUS_BRIDGE__ = true;
     window.addEventListener('s666:discord-state', function (event) {
       var detail = event.detail || {};
+      var phase = detail.phase;
+      if (phase === 'status') {
+        if (detail.ok !== false) return;
+        phase = 'error';
+      }
+      if (phase !== 'sending' && phase !== 'success' && phase !== 'warning' && phase !== 'error') return;
       var button = document.getElementById('discordBtn');
       if (!button) return;
       button.classList.remove('is-busy', 'is-ok', 'is-warn', 'is-error');
-      if (detail.phase === 'sending') button.classList.add('is-busy');
-      else if (detail.phase === 'success') button.classList.add('is-ok');
-      else if (detail.phase === 'warning') button.classList.add('is-warn');
-      else if (detail.phase === 'error') button.classList.add('is-error');
+      if (phase === 'sending') button.classList.add('is-busy');
+      else if (phase === 'success') button.classList.add('is-ok');
+      else if (phase === 'warning') button.classList.add('is-warn');
+      else if (phase === 'error') button.classList.add('is-error');
     });
   }
 
   function initAll() {
+    if (initialized) return;
+    initialized = true;
     initDiscordButtonStatusBridge();
     checkStatus();
     tryStartupAutoPost();
@@ -618,8 +628,8 @@
   }
 
   document.addEventListener('visibilitychange', function () { scheduleWatcher(document.hidden ? 30000 : 1500); });
-  document.addEventListener('DOMContentLoaded', initAll);
-  if (document.readyState !== 'loading') setTimeout(initAll, 0);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAll, { once: true });
+  else setTimeout(initAll, 0);
 
   window.S666DiscordPlayerAddonV3 = {
     version: VERSION,
