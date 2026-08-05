@@ -15,3 +15,4 @@ test('warning class has a distinct visual state',()=>{
   assert.ok(root.includes('#discordBtn.is-warn'));
   assert.ok(root.includes('color:#ffc857!important'));
 });
+// final gate retrigger after temporary workflow cleanup
