@@ -48,6 +48,14 @@ jobs:
           import base64, hashlib, io, tarfile
 
           part_paths = ['.repair/discord-blocks-80000-100000.v2.payload.part1.txt', '.repair/discord-blocks-80000-100000.v2.payload.part2.txt', '.repair/discord-blocks-80000-100000.v2.payload.part3.txt', '.repair/discord-blocks-80000-100000.v2.payload.part4.txt']
+          part_lengths = [10000, 10000, 10000, 7180]
+          part_hashes = ['cb02ab26663fea07a9e63cf219031f4aa0cb2b885d450626ab4157bbe459cfca', '4a3fdf7753618da52ad1581fd07482af01e7c46f31ac7180a0d4ccd372431741', 'f1d22e8394bed0983df822593dc6c2e7148053b5f20e420e58e428a74c7ac225', '1d73eda7093233052b278df924702746facc934d6e5ba278f4b51ff31915d2b4']
+          for index, rel in enumerate(part_paths):
+              data = Path(rel).read_bytes()
+              actual_hash = hashlib.sha256(data).hexdigest()
+              print(f'PAYLOAD_PART_{index + 1} length={len(data)} sha256={actual_hash}')
+              if len(data) != part_lengths[index] or actual_hash != part_hashes[index]:
+                  raise SystemExit(f'payload part {index + 1} mismatch')
           targets = ['js/addons/discord-player-addon-v3.js', 'public/js/addons/discord-player-addon-v3.js', 'tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs', 'tests/discord-blocks-500-1000-status-bridge.test.mjs', 'tests/discord-blocks-5000-10000-lifecycle.test.mjs', 'tests/discord-blocks-60000-80000-request-loader-remount.test.mjs', 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs']
           old_hashes = {'js/addons/discord-player-addon-v3.js': '386a7364d5945aa9706107ab50532ace0145399b652d9ce7107ef4fdf82e8a57', 'public/js/addons/discord-player-addon-v3.js': '386a7364d5945aa9706107ab50532ace0145399b652d9ce7107ef4fdf82e8a57', 'tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs': '66c13b170b1943628933a8ba321b2c2d69da768a4082c6fd5992aaa9ab0f586f', 'tests/discord-blocks-500-1000-status-bridge.test.mjs': '3385a695437fa4c0c599f72d7b33695b8a5dc04a3f10e98215198e4fe2b7c850', 'tests/discord-blocks-5000-10000-lifecycle.test.mjs': '34b261ae2702751fd17ccb54837e946b1cc7b5b997f7d900c8a504727e386d72', 'tests/discord-blocks-60000-80000-request-loader-remount.test.mjs': 'd6043ae3a4aa14ff1e9b867a27eed4a44fb844bac3148b566169ae98f26aa9b9', 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs': None}
           new_hashes = {'js/addons/discord-player-addon-v3.js': 'c13deecd2a48c97c6daac41184203c5a45df0d808cfb726afb9da7e12947a362', 'public/js/addons/discord-player-addon-v3.js': 'c13deecd2a48c97c6daac41184203c5a45df0d808cfb726afb9da7e12947a362', 'tests/discord-blocks-20000-40000-lifecycle-generation.test.mjs': '338d95c067456ca33bd40c704210980ef4431f760ffd4daa24dacfe48360e968', 'tests/discord-blocks-500-1000-status-bridge.test.mjs': '2c10a1cbbc256c8b324f21caeba73ca621ed401cffcde608a3844d010fddce94', 'tests/discord-blocks-5000-10000-lifecycle.test.mjs': 'b1ee38a94b735778a99f884ea03e981b8b0875a42e28565f25c817e7b4be1c19', 'tests/discord-blocks-60000-80000-request-loader-remount.test.mjs': '8e28be368751172e4d7d6fbf31e28eeda46dbcffddee6871ec8a83f21ba2f4af', 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs': '73b9160ac240cc51e34c44fab610177f28949b87095d078656a824fe5bf8faec'}
@@ -69,7 +77,11 @@ jobs:
                       raise SystemExit(f"hash gate failed: {rel} {actual} != {expected}")
 
           encoded = ''.join(Path(path).read_text(encoding='ascii') for path in part_paths)
-          raw = base64.b64decode(encoded)
+          encoded_hash = hashlib.sha256(encoded.encode('ascii')).hexdigest()
+          print(f'PAYLOAD_COMBINED length={len(encoded)} sha256={encoded_hash}')
+          if len(encoded) != 37180 or encoded_hash != '49ce0e7f697f039cc79e06845378f51d1ca7908b5ebf9b4580e6672ecd78f96c':
+              raise SystemExit('combined payload mismatch')
+          raw = base64.b64decode(encoded, validate=True)
           with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as tf:
               members = tf.getmembers()
               names = [m.name for m in members]
