@@ -19,3 +19,4 @@ test('startup retry exhaustion releases the track to the watcher',()=>{
   const block=root.slice(root.indexOf("reason: 'retry-window-exhausted'")-120,root.indexOf("reason: 'retry-window-exhausted'")+180);
   assert.ok(block.includes("lastTrackKey = '';"));
 });
+// final gate retrigger after self-cleaned repair
