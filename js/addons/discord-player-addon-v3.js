@@ -110,6 +110,7 @@
     var summary = {
       sent: false,
       skipped: false,
+      warning: false,
       mode: 'unknown',
       text: fallback || 'Discord-Antwort empfangen'
     };
@@ -131,10 +132,16 @@
         else failed.push(String(i + 1) + ':' + (deliveryStatus(deliveries[i]) || 'failed'));
       }
       summary.sent = okCount > 0;
-      summary.mode = okCount + '/' + deliveries.length;
-      summary.text = okCount === deliveries.length
-        ? '✓ Discord angenommen: ' + okCount + '/' + deliveries.length
-        : (okCount > 0 ? '⚠ Discord Teil-Erfolg: ' + okCount + '/' + deliveries.length + ' · ' + failed.join(', ') : '✗ Discord nicht angenommen: ' + failed.join(', '));
+      summary.warning = data.partial === true || data.led === 'warning' || okCount !== deliveries.length;
+      summary.mode = summary.warning ? 'partial' : (okCount + '/' + deliveries.length);
+      if (summary.warning && okCount === deliveries.length) {
+        var privateError = clean(data.privateTrack && (data.privateTrack.error || data.privateTrack.message) || '', 120);
+        summary.text = '⚠ Discord Teil-Erfolg: Hauptziele ' + okCount + '/' + deliveries.length + (privateError ? ' · Private: ' + privateError : ' · mindestens ein weiteres Ziel fehlgeschlagen');
+      } else {
+        summary.text = okCount === deliveries.length
+          ? '✓ Discord angenommen: ' + okCount + '/' + deliveries.length
+          : (okCount > 0 ? '⚠ Discord Teil-Erfolg: ' + okCount + '/' + deliveries.length + ' · ' + failed.join(', ') : '✗ Discord nicht angenommen: ' + failed.join(', '));
+      }
       return summary;
     }
 
@@ -147,8 +154,9 @@
 
     if (data.ok === true) {
       summary.sent = true;
-      summary.mode = 'ok';
-      summary.text = fallback || '✓ Discord angenommen';
+      summary.warning = data.partial === true || data.led === 'warning';
+      summary.mode = summary.warning ? 'partial' : 'ok';
+      summary.text = summary.warning ? '⚠ Discord Teil-Erfolg' : (fallback || '✓ Discord angenommen');
     }
     return summary;
   }
@@ -168,7 +176,8 @@
       var data = await response.json().catch(function () { return {}; });
       data.__httpStatus = response.status;
       if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
-      dispatch('s666:discord-state', { phase: 'success', path: path, data: data, summary: deliverySummary(data) });
+      var summary = deliverySummary(data);
+      dispatch('s666:discord-state', { phase: summary.warning ? 'warning' : 'success', path: path, data: data, summary: summary });
       return data;
     } catch (error) {
       dispatch('s666:discord-state', { phase: 'error', path: path, error: error && error.message ? error.message : String(error) });
@@ -299,7 +308,7 @@
         setDiscordOverlayStatus(summary.text, summary.skipped ? 'warn' : 'error');
       } else {
         if (input) input.value = '';
-        setDiscordOverlayStatus(summary.text, 'ok');
+        setDiscordOverlayStatus(summary.text, summary.warning ? 'warn' : 'ok');
       }
     } catch (error) {
       setDiscordOverlayStatus('✗ Versand fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
@@ -315,7 +324,7 @@
     try {
       var result = await postTrackIfChanged(true, 'manual-now-playing');
       var summary = deliverySummary(result, '✓ Now Playing von Discord angenommen');
-      setDiscordOverlayStatus(summary.text, summary.skipped ? 'warn' : (summary.sent ? 'ok' : 'error'));
+      setDiscordOverlayStatus(summary.text, summary.skipped || summary.warning ? 'warn' : (summary.sent ? 'ok' : 'error'));
     } catch (error) {
       setDiscordOverlayStatus('✗ Now Playing fehlgeschlagen: ' + clean(error && error.message, 180), 'error');
     } finally {
@@ -376,7 +385,8 @@
     dispatch('s666:discord-state', { phase: 'startup-autopost', key: key });
     postTrackIfChanged(true, 'startup-first-now-playing')
       .then(function (result) {
-        dispatch('s666:discord-state', { phase: result && result.skipped ? 'startup-autopost-skipped' : 'startup-autopost-success', data: result, summary: deliverySummary(result) });
+        var summary = deliverySummary(result);
+        dispatch('s666:discord-state', { phase: result && result.skipped ? 'startup-autopost-skipped' : (summary.warning ? 'startup-autopost-warning' : 'startup-autopost-success'), data: result, summary: summary });
       })
       .catch(function (error) {
         startupAutoPostDone = false;
@@ -406,8 +416,10 @@
     watcherTimer = setTimeout(async function () {
       var current = trackKey(readTrackFromDom());
       if (current && current !== lastTrackKey) {
-        lastTrackKey = current;
-        try { await postTrackIfChanged(false, 'watcher-track-change'); } catch (_) {}
+        try {
+          var result = await postTrackIfChanged(false, 'watcher-track-change');
+          if (result && result.ok === true) lastTrackKey = current;
+        } catch (_) {}
       }
       scheduleWatcher(document.hidden ? 30000 : 8000);
     }, delay);
