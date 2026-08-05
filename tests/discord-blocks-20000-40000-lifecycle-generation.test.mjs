@@ -41,3 +41,4 @@ test('overlay Escape handling is single and DOM-remount safe',()=>{
   assert.ok(root.includes('function installEscapeBridge()'));
   assert.ok(root.includes("document.addEventListener('keydown', function (event) {"));
 });
+// Required-gate retrigger after one-shot self-clean.
