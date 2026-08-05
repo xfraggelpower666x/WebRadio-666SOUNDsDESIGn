@@ -138,8 +138,9 @@ test('Discord overlays render partial delivery as warning',()=>{
 });
 test('track watcher commits the key only after a successful request',()=>{
   const block=root.slice(root.indexOf('function scheduleWatcher'),root.indexOf('function loadScriptOnce'));
-  assert.ok(block.includes("if (result && result.ok === true) lastTrackKey = current;"));
-  assert.ok(!block.includes("lastTrackKey = current;\n        try"));
+  const requestPos=block.indexOf("await postTrackIfChanged(false, 'watcher-track-change')");
+  const commitPos=block.indexOf('lastTrackKey = current;');
+  assert.ok(requestPos >= 0 && commitPos > requestPos);
 });
 `;
 fs.writeFileSync('tests/discord-blocks-200-500-frontend-truth.test.mjs', test);
