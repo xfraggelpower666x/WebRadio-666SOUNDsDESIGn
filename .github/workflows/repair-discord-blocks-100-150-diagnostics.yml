@@ -1,0 +1,32 @@
+name: Repair Discord Blocks 100-150 Diagnostics
+# trigger registration
+on:
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: github.head_ref == 'repair/discord-blocks-100-150-diagnostics-20260805'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-blocks-100-150-diagnostics-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply consolidated repair
+        run: node scripts/repair-discord-blocks-100-150-diagnostics.mjs
+      - name: Run focused regression tests
+        run: node --test tests/discord-blocks-100-150-diagnostics.test.mjs tests/discord-access-denied-diagnostics.test.mjs tests/discord-debug-access-denied-diagnostics.test.mjs tests/discord-central-error-time-reset.test.mjs tests/discord-private-retry.test.mjs tests/discord-worker-delivery-dedupe.test.mjs
+      - name: Self-clean and commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm scripts/repair-discord-blocks-100-150-diagnostics.mjs .github/workflows/repair-discord-blocks-100-150-diagnostics.yml
+          git add worker-addons/discord-notify-addon-v3.js workers/webradio-666soundsdesign-worker/worker-addons/discord-notify-addon-v3.js tests/discord-blocks-100-150-diagnostics.test.mjs
+          git commit -m "Repair Discord diagnostics blocks 100-150"
+          git push
