@@ -19,3 +19,4 @@ test('script listeners are cleaned on success failure and timeout',()=>{
   assert.ok(root.includes("script.removeEventListener('error', failed)"));
   assert.ok(root.includes('timeout = setTimeout(timedOut, REQUEST_TIMEOUT_MS);'));
 });
+// final gate retrigger after self-clean
