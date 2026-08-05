@@ -22,3 +22,4 @@ test('script loads share one pending promise and wait for real load',()=>{
   assert.ok(root.includes("script.addEventListener('load', done, { once: true })"));
   assert.ok(root.includes("script_load_timeout:"));
 });
+// final gate retrigger after self-clean
