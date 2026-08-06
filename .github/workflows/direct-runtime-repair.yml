@@ -1,0 +1,124 @@
+name: Apply Direct Discord Runtime Owner Repair
+
+"on":
+  push:
+    branches:
+      - repair/direct-discord-runtime-owner-20260806
+    paths:
+      - .github/workflows/direct-runtime-repair.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: direct-runtime-repair-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply-verify-clean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_SHA: 4a58fa28ac188c534b7f615307b1d0330f9124a1
+      B64_SHA: 86ae6f1f762f720bedfdbb66cbddb245716335f5207093023a1fe8ff596b820e
+      GZIP_SHA: d8c5477b2261b9068e6f4e5fb5efc23f074ffe6856423ccf2da3eb87f4d01f45
+      PATCH_SHA: 1c61e5ac8de7e6e2f1edb7126d494a69674af612a4e6f783aef75e23e40dce90
+    steps:
+      - name: Checkout repair branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify repair patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .github/direct-runtime-repair-payload/part*.b64 > /tmp/direct-runtime-repair.b64
+          echo "${B64_SHA}  /tmp/direct-runtime-repair.b64" | sha256sum --check --strict
+          base64 --decode /tmp/direct-runtime-repair.b64 > /tmp/direct-runtime-repair.patch.gz
+          echo "${GZIP_SHA}  /tmp/direct-runtime-repair.patch.gz" | sha256sum --check --strict
+          gzip --decompress --stdout /tmp/direct-runtime-repair.patch.gz > /tmp/direct-runtime-repair.patch
+          echo "${PATCH_SHA}  /tmp/direct-runtime-repair.patch" | sha256sum --check --strict
+          git apply --check /tmp/direct-runtime-repair.patch
+          git apply /tmp/direct-runtime-repair.patch
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run complete repository verification
+        run: npm run verify
+
+      - name: Verify repair contracts and hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "5c51635e223fb8cd0b2d738f0541b4ab1d901a10cac5338ebd2b0e6e78772ec1"
+          test "$(sha256sum public/js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "5c51635e223fb8cd0b2d738f0541b4ab1d901a10cac5338ebd2b0e6e78772ec1"
+          test "$(sha256sum js/equalizer.js | cut -d' ' -f1)" = "d0e278f1bd84ce319c92d95a3a8f3ff92aa3bae2d3e400b4ed7566b0fdd16028"
+          test "$(sha256sum public/js/equalizer.js | cut -d' ' -f1)" = "d0e278f1bd84ce319c92d95a3a8f3ff92aa3bae2d3e400b4ed7566b0fdd16028"
+          test "$(sha256sum js/player-core.js | cut -d' ' -f1)" = "f6e56dcff8220f217ed161291942a7749db31ecf5ed37391ee70324bad1b63c7"
+          test "$(sha256sum public/js/player-core.js | cut -d' ' -f1)" = "f6e56dcff8220f217ed161291942a7749db31ecf5ed37391ee70324bad1b63c7"
+          test "$(sha256sum index.html | cut -d' ' -f1)" = "21b0048354007be9af74a192c2d0fd19364cfddf3d24e7201a53271e0779f6f5"
+          test "$(sha256sum public/index.html | cut -d' ' -f1)" = "21b0048354007be9af74a192c2d0fd19364cfddf3d24e7201a53271e0779f6f5"
+          for file in veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html; do
+            test "$(sha256sum "$file" | cut -d' ' -f1)" = "69240bfc01a0e06d38411dcc4dfba60ed794a76b53d22a40598e5e8e2cd6abb9"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pattern = re.compile(rb'https://(?:canary\.|ptb\.)?(?:discord(?:app)?\.com)/api/webhooks/[0-9]+/[A-Za-z0-9._-]{20,}')
+          hits = []
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or '.git' in path.parts or 'node_modules' in path.parts:
+                  continue
+              try:
+                  data = path.read_bytes()
+              except OSError:
+                  continue
+              if pattern.search(data):
+                  hits.append(str(path))
+          if hits:
+              raise SystemExit('Actual Discord webhook literal found: ' + ', '.join(hits))
+          PY
+
+      - name: Remove transport files and verify exact final scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .github/direct-runtime-repair-payload
+          rm -f .github/workflows/direct-runtime-repair.yml
+          git add -A
+          cat > /tmp/expected-files.txt <<'EOF'
+          VELUNA/index.html
+          index.html
+          js/addons/discord-player-addon-v3.js
+          js/equalizer.js
+          js/player-core.js
+          public/VELUNA/index.html
+          public/index.html
+          public/js/addons/discord-player-addon-v3.js
+          public/js/equalizer.js
+          public/js/player-core.js
+          public/veluna/index.html
+          tests/direct-discord-runtime-owner-repair.test.mjs
+          tests/pc-eq-balanced-headroom.test.mjs
+          tests/pc-high-frequency-response.test.mjs
+          tests/pc-real-spectrum-layout.test.mjs
+          tests/player-runtime-single-audio-owner-contract.test.mjs
+          tests/veluna-targeted-mobile-repair.test.mjs
+          veluna/index.html
+          EOF
+          git diff --cached --name-only "${BASE_SHA}" | LC_ALL=C sort > /tmp/actual-files.txt
+          LC_ALL=C sort -o /tmp/expected-files.txt /tmp/expected-files.txt
+          diff -u /tmp/expected-files.txt /tmp/actual-files.txt
+          test "$(wc -l < /tmp/actual-files.txt)" -eq 18
+          test -z "$(git diff --cached --name-only "${BASE_SHA}" | grep -E '^\.github/' || true)"
+
+      - name: Commit clean verified repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Restore direct Discord shooters and player runtime owners"
+          git push origin HEAD:${GITHUB_REF_NAME}
