@@ -935,6 +935,8 @@
     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
     var data = readTrackFromDom();
     if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
+    var commitsAutomaticKey = true;
+    if (transportMode() === 'direct' && data.directTarget) commitsAutomaticKey = data.directTarget === loadDirectSettings().autoTarget;
     var key = trackKey(data);
     var postLifecycle = lifecycleGeneration;
     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
@@ -946,7 +948,7 @@
       reason: reason || (force ? 'manual' : 'watcher'),
       clientVersion: VERSION
     }));
-    if (lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key;
+    if (commitsAutomaticKey && lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key;
     return result;
   }
 

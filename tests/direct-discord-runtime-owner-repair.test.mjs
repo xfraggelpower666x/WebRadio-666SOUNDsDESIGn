@@ -40,6 +40,17 @@ test('Manual Now Playing uses the selected category while startup and watcher us
   assert.match(addon, /postTrackIfChanged\(false, 'watcher-track-change'\)/);
 });
 
+
+test('Manual posts to another category do not consume automatic Now Playing deduplication', async () => {
+  const addon = await read('js/addons/discord-player-addon-v3.js');
+  assert.match(addon, /var commitsAutomaticKey = true;/);
+  assert.match(addon, /if \(transportMode\(\) === 'direct' && data\.directTarget\) commitsAutomaticKey = data\.directTarget === loadDirectSettings\(\)\.autoTarget;/);
+  assert.match(addon, /if \(commitsAutomaticKey && lifecycleIsCurrent\(postLifecycle\)/);
+  assert.match(addon, /postTrackIfChanged\(true, 'manual-now-playing', selectedTarget && selectedTarget\.value\)/);
+  assert.match(addon, /postTrackIfChanged\(true, 'startup-first-now-playing'\)/);
+  assert.match(addon, /postTrackIfChanged\(false, 'watcher-track-change'\)/);
+});
+
 test('Canonical visualizer adopts or registers one central graph and reports failures', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
