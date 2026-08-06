@@ -32,6 +32,9 @@ test('Discord endpoints remain unchanged and dedupe commits only for the current
   assert.ok(root.includes("postJson('/api/discord/nowplaying'"));
   assert.ok(root.includes("postJson('/api/discord/manual'"));
   assert.ok(root.includes("credentials: 'same-origin'"));
-  assert.ok(root.includes('if (lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key'));
+  assert.ok(root.includes('if (commitsAutomaticKey && lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key'));
+  assert.ok(root.includes("var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result && result.target || '')) >= 0 ? String(result.target) : data.directTarget"));
+  assert.ok(root.includes('commitsAutomaticKey = deliveredTarget === loadDirectSettings().autoTarget'));
+  assert.ok(root.indexOf('var deliveredTarget =') > root.indexOf("await postJson('/api/discord/nowplaying'"));
   assert.equal(root.includes('if (!result || result.skipped !== true) lastPostedKey = key'), false);
 });

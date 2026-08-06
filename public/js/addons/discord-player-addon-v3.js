@@ -946,7 +946,12 @@
       reason: reason || (force ? 'manual' : 'watcher'),
       clientVersion: VERSION
     }));
-    if (lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key;
+    var commitsAutomaticKey = true;
+    if (transportMode() === 'direct' && data.directTarget) {
+      var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result && result.target || '')) >= 0 ? String(result.target) : data.directTarget;
+      commitsAutomaticKey = deliveredTarget === loadDirectSettings().autoTarget;
+    }
+    if (commitsAutomaticKey && lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key;
     return result;
   }
 
