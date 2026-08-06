@@ -8,7 +8,9 @@ const mirror=fs.readFileSync('public/js/addons/discord-player-addon-v3.js','utf8
 test('Discord addon mirrors remain byte-identical',()=>assert.equal(root,mirror));
 
 test('lifecycle cancellation owns the fetch timer even when fetch ignores abort',()=>{
-  assert.ok(root.includes("var entry = controller ? { controller: controller, abortReason: '', cancel: null } : null;"));
+  assert.ok(root.includes("var entry = { controller: controller, abortReason: '', cancel: null };"));
+  assert.ok(root.includes('activeFetchControllers[controllerId] = entry;'));
+  assert.ok(root.includes('if (controller) requestOptions.signal = controller.signal;'));
   assert.ok(root.includes("if (entry && typeof entry.cancel === 'function')"));
   assert.ok(root.includes("entry.cancel('lifecycle');"));
   assert.ok(root.includes('function cancelRequest(reason)'));
@@ -28,7 +30,10 @@ test('fetch cleanup remains owner-safe after timeout response and lifecycle canc
   assert.ok(block.includes('releaseFetchController(controllerId, entry);'));
   assert.ok(block.includes("if (reason === 'timeout') reject(new Error('discord_request_timeout'));"));
   assert.ok(block.includes('else reject(staleLifecycleError());'));
-  assert.ok(block.includes('if (settled) return;\n          settled = true;\n          clearTimeout(timer);'));
+  assert.ok(block.includes('function cleanup() {'));
+  assert.ok(block.includes('clearTimeout(timer);'));
+  assert.ok(block.includes('settled = true;\n          cleanup();'));
+  assert.ok(block.includes('try {\n        fetchPromise = fetch(url, requestOptions);'));
 });
 
 test('control observer survives documentElement and body replacement with one document owner',()=>{

@@ -9,13 +9,14 @@ test('Discord addon mirrors remain byte-identical',()=>assert.equal(root,mirror)
 
 test('lifecycle aborts remain distinct and controllers own JSON body parsing',()=>{
   assert.ok(root.includes("entry.abortReason = 'lifecycle';"));
-  assert.ok(root.includes("if (entry && entry.abortReason === 'lifecycle') reject(staleLifecycleError());"));
+  assert.ok(root.includes("if (entry.abortReason === 'lifecycle') reject(staleLifecycleError());"));
   assert.ok(root.includes('return response.json().catch(function (error)'));
   assert.ok(root.includes('resolve({ response: response, data: data });'));
   const fetchStart=root.indexOf('  function fetchWithTimeout(');
   const fetchEnd=root.indexOf('  function lifecycleIsCurrent',fetchStart);
   const block=root.slice(fetchStart,fetchEnd);
-  assert.ok(block.indexOf('response.json()') < block.indexOf('releaseFetchController(controllerId, entry);\n          resolve'));
+  assert.ok(block.indexOf('response.json()') < block.indexOf('cleanup();\n          resolve'));
+  assert.ok(block.includes('releaseFetchController(controllerId, entry);'));
 });
 
 test('status checks cannot overwrite newer or overlapping request truth',()=>{
@@ -32,12 +33,13 @@ test('script loader validates source and never removes foreign script nodes',()=
   assert.ok(root.includes('function scriptSourceMatches(script, src)'));
   assert.ok(root.includes('function scriptIsLoaderOwned(script)'));
   assert.ok(root.includes("script.dataset.s666LoaderOwned = '1';"));
-  assert.ok(root.includes("elementId = id + 'S666Recovery'"));
+  assert.ok(root.includes('function recoveryScriptId(id, recoveryIndex)'));
+  assert.ok(root.includes("id + 'S666Recovery'"));
   const loadStart=root.indexOf('  function loadScriptOnce(');
   const loadEnd=root.indexOf('  function setVelunaMessengerStatus',loadStart);
   const block=root.slice(loadStart,loadEnd);
   assert.ok(block.includes('if (entry.createdByAddon && script && script.parentNode) script.parentNode.removeChild(script);'));
-  assert.ok(block.indexOf("script.addEventListener('load', done") < block.indexOf('document.head.appendChild(script)'));
+  assert.ok(block.indexOf("script.addEventListener('load', done") < block.indexOf('host.appendChild(script)'));
 });
 
 test('player alert and messenger overlay retries are owner-safe and single-flight',()=>{
@@ -46,7 +48,7 @@ test('player alert and messenger overlay retries are owner-safe and single-fligh
   assert.ok(root.includes('function ensureMessengerOverlayClient()'));
   assert.ok(root.includes('if (messengerOverlayClientLoad) return messengerOverlayClientLoad;'));
   assert.ok(root.includes('if (messengerOverlayClientLoad === loadPromise) messengerOverlayClientLoad = null;'));
-  assert.ok(root.includes('removeOwnedScriptSlots(id);\n      delete scriptLoads[id];\n      await loadScriptOnce(id, src);'));
+  assert.ok(root.includes('removeOwnedScriptSlots(id);\n      delete scriptLoads[id];\n      await loadScriptOnce(id, src, true);'));
 });
 
 test('targeted MutationObserver closes the 3.5 second remount gap and suspends cleanly',()=>{
