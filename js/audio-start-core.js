@@ -105,3 +105,174 @@ ZWECK:
 
   global.S666AudioStartCore = Object.freeze({ create });
 })(window);
+
+/*
+==========================================
+S666 Discord Direct Settings Race Guard v1
+- Separate from audio start logic.
+- Locks local Discord destination controls during a direct webhook request.
+- Detects same-tab and cross-tab settings changes while delivery is in flight.
+- Forces one current-track retry when the delivered webhook no longer matches
+  the then-current AUTO NOW PLAYING webhook.
+- Webhook values remain lexical and are never logged, dispatched or exported.
+==========================================
+*/
+(function installS666DiscordDirectSettingsRaceGuard(global) {
+  'use strict';
+
+  if (global.S666DiscordDirectSettingsRaceGuard) return;
+  if (typeof global.fetch !== 'function') return;
+
+  const STORAGE_KEY = 's666_discord_direct_v1';
+  const CONTROL_SELECTOR = [
+    '#s666DiscordTargetSelect',
+    '#s666DiscordAutoTarget',
+    '[data-direct-label]',
+    '[data-direct-webhook]',
+    '[data-discord-settings-save]',
+    '[data-discord-settings-clear]',
+    '[data-discord-settings-toggle]'
+  ].join(',');
+  const originalFetch = global.fetch.bind(global);
+  const storagePrototype = global.Storage && global.Storage.prototype;
+  const originalSetItem = storagePrototype && storagePrototype.setItem;
+  let directRequestCount = 0;
+  let settingsChangedDuringDelivery = false;
+  let controlObserver = null;
+  let retryTimer = 0;
+
+  function normalizeWebhook(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      const url = new URL(raw, global.location && global.location.href || undefined);
+      const host = String(url.hostname || '').toLowerCase();
+      if (url.protocol !== 'https:' || !/(^|\.)discord(?:app)?\.com$/.test(host)) return '';
+      if (!/^\/api\/webhooks\/\d+\/[A-Za-z0-9._-]+\/?$/.test(url.pathname)) return '';
+      return `${url.origin}${url.pathname.replace(/\/$/, '')}`;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function requestWebhook(input) {
+    try {
+      const raw = typeof input === 'string' || input instanceof URL
+        ? String(input)
+        : String(input && input.url || '');
+      return normalizeWebhook(raw);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function currentAutoWebhook() {
+    try {
+      const parsed = JSON.parse(global.localStorage.getItem(STORAGE_KEY) || 'null');
+      if (!parsed || !Array.isArray(parsed.categories)) return '';
+      const autoTarget = String(parsed.autoTarget || 'main');
+      const category = parsed.categories.find((item) => item && String(item.id || '') === autoTarget);
+      return normalizeWebhook(category && category.webhook || '');
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function markControls(disabled) {
+    if (!global.document || typeof global.document.querySelectorAll !== 'function') return;
+    global.document.querySelectorAll(CONTROL_SELECTOR).forEach((control) => {
+      if (!control || !('disabled' in control)) return;
+      if (disabled) {
+        if (!control.hasAttribute('data-s666-race-guard-disabled')) {
+          control.setAttribute('data-s666-race-guard-disabled', control.disabled ? '1' : '0');
+        }
+        control.disabled = true;
+      } else if (control.hasAttribute('data-s666-race-guard-disabled')) {
+        control.disabled = control.getAttribute('data-s666-race-guard-disabled') === '1';
+        control.removeAttribute('data-s666-race-guard-disabled');
+      }
+    });
+  }
+
+  function startControlGuard() {
+    markControls(true);
+    if (controlObserver || typeof global.MutationObserver !== 'function' || !global.document) return;
+    controlObserver = new global.MutationObserver(() => {
+      if (directRequestCount > 0) markControls(true);
+    });
+    const root = global.document.documentElement || global.document;
+    controlObserver.observe(root, { childList: true, subtree: true });
+  }
+
+  function stopControlGuard() {
+    if (controlObserver) controlObserver.disconnect();
+    controlObserver = null;
+    markControls(false);
+  }
+
+  function retryCurrentAutomaticTarget(attempt) {
+    const api = global.S666DiscordPlayerAddonV3;
+    if (!api || typeof api.postTrackIfChanged !== 'function') return;
+    Promise.resolve(api.postTrackIfChanged(true, 'settings-race-retry')).then((result) => {
+      if (result && result.busy && attempt < 4) {
+        retryTimer = global.setTimeout(() => retryCurrentAutomaticTarget(attempt + 1), 180);
+      }
+    }).catch(() => {});
+  }
+
+  function settleDirectRequest(deliveredWebhook, accepted) {
+    directRequestCount = Math.max(0, directRequestCount - 1);
+    if (directRequestCount === 0) stopControlGuard();
+    global.setTimeout(() => {
+      const currentWebhook = currentAutoWebhook();
+      const mustRetry = Boolean(
+        accepted &&
+        settingsChangedDuringDelivery &&
+        currentWebhook &&
+        deliveredWebhook &&
+        currentWebhook !== deliveredWebhook
+      );
+      if (directRequestCount === 0) settingsChangedDuringDelivery = false;
+      if (!mustRetry) return;
+      global.clearTimeout(retryTimer);
+      retryTimer = global.setTimeout(() => retryCurrentAutomaticTarget(0), 40);
+    }, 0);
+  }
+
+  global.fetch = function s666DiscordRaceGuardedFetch(input, init) {
+    const deliveredWebhook = requestWebhook(input);
+    if (!deliveredWebhook) return originalFetch(input, init);
+    directRequestCount += 1;
+    startControlGuard();
+    let request;
+    try {
+      request = originalFetch(input, init);
+    } catch (error) {
+      settleDirectRequest(deliveredWebhook, false);
+      throw error;
+    }
+    return Promise.resolve(request).then((response) => {
+      settleDirectRequest(deliveredWebhook, Boolean(response && response.ok));
+      return response;
+    }, (error) => {
+      settleDirectRequest(deliveredWebhook, false);
+      throw error;
+    });
+  };
+
+  if (originalSetItem) {
+    storagePrototype.setItem = function s666DiscordRaceGuardedSetItem(key, value) {
+      if (directRequestCount > 0 && String(key) === STORAGE_KEY) settingsChangedDuringDelivery = true;
+      return originalSetItem.call(this, key, value);
+    };
+  }
+
+  global.addEventListener('storage', (event) => {
+    if (directRequestCount > 0 && event && event.key === STORAGE_KEY) settingsChangedDuringDelivery = true;
+  });
+
+  global.S666DiscordDirectSettingsRaceGuard = Object.freeze({
+    version: '1.0.0',
+    active: () => directRequestCount > 0
+  });
+})(window);
