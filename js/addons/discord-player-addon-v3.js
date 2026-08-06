@@ -1,14 +1,15 @@
 /*
  * 666SOUNDsDESIGn Discord Shooter + Veluna Messenger + shared visual bridge.
- * Discord webhook URLs stay server-side in Worker secrets. No Discord password gate.
- * Veluna messenger uses the authoritative /api/player-alert/* backend.
- * Repair v4.14: restore one startup Now Playing post and stop reporting skipped/dedupe as sent.
+ * Discord transport defaults to direct browser-to-webhook delivery with three locally stored categories.
+ * Webhook URLs never enter the repository, events, logs or payload diagnostics. Worker transport remains explicit legacy fallback only.
+ * Veluna messenger continues to use the authoritative /api/player-alert/* backend.
+ * Repair v5.0: restore direct startup Now Playing, three-category shooter and local target migration.
  */
 (function () {
   'use strict';
   if (window.S666DiscordPlayerAddonV3 && window.S666DiscordPlayerAddonV3.version) return;
 
-  var VERSION = 'V4.14-20260725-DISCORD-START-AUTOPOST-REPAIR';
+  var VERSION = 'V5.0-20260806-DIRECT-LOCAL-THREE-CATEGORY';
   var lifecycleGeneration = 0;
   var requestSequence = 0;
   var activeRequestId = 0;
@@ -53,6 +54,253 @@
   var MSG_MAX = 240;
   var STARTUP_RETRY_MS = 1500;
   var STARTUP_MAX_WAIT_MS = 24000;
+  var DIRECT_STORAGE_KEY = 's666_discord_direct_v1';
+  var DIRECT_CATEGORY_IDS = ['main', 'community', 'labor'];
+  var directPlaybackStarted = false;
+  var directPlayingBridgeInstalled = false;
+
+  function runtimeConfig() {
+    return window.S666_DISCORD_PLAYER_CONFIG && typeof window.S666_DISCORD_PLAYER_CONFIG === 'object'
+      ? window.S666_DISCORD_PLAYER_CONFIG : {};
+  }
+
+  function transportMode() {
+    return clean(runtimeConfig().transport || 'direct', 24).toLowerCase() === 'worker' ? 'worker' : 'direct';
+  }
+
+  function defaultDirectSettings() {
+    return {
+      version: 1,
+      selectedTarget: 'main',
+      autoTarget: 'main',
+      categories: [
+        { id: 'main', label: 'MAIN', webhook: '' },
+        { id: 'community', label: 'COMMUNITY', webhook: '' },
+        { id: 'labor', label: 'AI / PSYCHOACTIV / DESIGN LABOR', webhook: '' }
+      ],
+      migrated: false
+    };
+  }
+
+  function normalizeDiscordWebhook(value) {
+    var raw = String(value || '').trim();
+    if (!raw) return '';
+    try {
+      var url = new URL(raw);
+      var host = String(url.hostname || '').toLowerCase();
+      if (url.protocol !== 'https:' || !/(^|\.)discord(?:app)?\.com$/.test(host)) return '';
+      if (!/^\/api\/webhooks\/\d+\/[A-Za-z0-9._-]+\/?$/.test(url.pathname)) return '';
+      return url.origin + url.pathname.replace(/\/$/, '');
+    } catch (_) { return ''; }
+  }
+
+  function webhookCandidatesFromText(value) {
+    var matches = String(value || '').match(/https:\/\/(?:canary\.|ptb\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9._-]+/gi) || [];
+    var result = [];
+    matches.forEach(function (candidate) {
+      var normalized = normalizeDiscordWebhook(candidate);
+      if (normalized && result.indexOf(normalized) < 0) result.push(normalized);
+    });
+    return result;
+  }
+
+  function migrateLegacyDirectTargets(settings) {
+    if (settings.migrated) return settings;
+    var discovered = [];
+    try {
+      for (var i = 0; i < localStorage.length; i += 1) {
+        var key = localStorage.key(i) || '';
+        if (key === DIRECT_STORAGE_KEY || !/(discord|webhook|shooter|private.?track)/i.test(key)) continue;
+        webhookCandidatesFromText(localStorage.getItem(key) || '').forEach(function (url) {
+          if (discovered.indexOf(url) < 0) discovered.push(url);
+        });
+      }
+    } catch (_) {}
+    settings.categories.forEach(function (category, index) {
+      if (!category.webhook && discovered[index]) category.webhook = discovered[index];
+    });
+    settings.migrated = true;
+    return settings;
+  }
+
+  function normalizeDirectSettings(raw) {
+    var defaults = defaultDirectSettings();
+    raw = raw && typeof raw === 'object' ? raw : {};
+    var byId = Object.create(null);
+    if (Array.isArray(raw.categories)) raw.categories.forEach(function (item) {
+      if (item && DIRECT_CATEGORY_IDS.indexOf(String(item.id || '')) >= 0) byId[String(item.id)] = item;
+    });
+    defaults.categories = defaults.categories.map(function (fallback) {
+      var item = byId[fallback.id] || {};
+      return {
+        id: fallback.id,
+        label: clean(item.label || fallback.label, 52) || fallback.label,
+        webhook: normalizeDiscordWebhook(item.webhook || '')
+      };
+    });
+    defaults.selectedTarget = DIRECT_CATEGORY_IDS.indexOf(String(raw.selectedTarget || '')) >= 0 ? String(raw.selectedTarget) : 'main';
+    defaults.autoTarget = DIRECT_CATEGORY_IDS.indexOf(String(raw.autoTarget || '')) >= 0 ? String(raw.autoTarget) : 'main';
+    defaults.migrated = raw.migrated === true;
+    return migrateLegacyDirectTargets(defaults);
+  }
+
+  function loadDirectSettings() {
+    var parsed = null;
+    try { parsed = JSON.parse(localStorage.getItem(DIRECT_STORAGE_KEY) || 'null'); } catch (_) {}
+    var settings = normalizeDirectSettings(parsed);
+    if (!parsed || settings.migrated !== Boolean(parsed && parsed.migrated)) saveDirectSettings(settings);
+    return settings;
+  }
+
+  function saveDirectSettings(settings) {
+    var normalized = normalizeDirectSettings(Object.assign({}, settings || {}, { migrated: true }));
+    try { localStorage.setItem(DIRECT_STORAGE_KEY, JSON.stringify(normalized)); } catch (_) {}
+    return normalized;
+  }
+
+  function directCategory(settings, id) {
+    settings = settings || loadDirectSettings();
+    var targetId = DIRECT_CATEGORY_IDS.indexOf(String(id || '')) >= 0 ? String(id) : settings.selectedTarget;
+    for (var i = 0; i < settings.categories.length; i += 1) if (settings.categories[i].id === targetId) return settings.categories[i];
+    return settings.categories[0];
+  }
+
+  function directTargetId(path, payload, settings) {
+    settings = settings || loadDirectSettings();
+    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
+    var requested = payload && payload.directTarget;
+    return DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0 ? String(requested) : settings.selectedTarget;
+  }
+
+  function directTargetReady(path, payload) {
+    if (transportMode() !== 'direct') return true;
+    var settings = loadDirectSettings();
+    return Boolean(directCategory(settings, directTargetId(path, payload, settings)).webhook);
+  }
+
+  function directDiscordPayload(path, payload, category) {
+    payload = payload || {};
+    var username = '666SOUNDsDESIGn WebRadio';
+    if (String(path).indexOf('/message') >= 0 || String(path).indexOf('/manual') >= 0) {
+      var message = clean(payload.message || payload.track || payload.nowPlaying || '', 1800);
+      return { username: username, content: message, allowed_mentions: { parse: [] } };
+    }
+    var title = clean(payload.track || payload.nowPlaying || [payload.artist, payload.title].filter(Boolean).join(' - ') || 'Live Stream', 240);
+    var fields = [];
+    if (clean(payload.dj, 120)) fields.push({ name: 'DJ', value: clean(payload.dj, 120), inline: true });
+    if (clean(payload.bitrate, 80)) fields.push({ name: 'Bitrate', value: clean(payload.bitrate, 80), inline: true });
+    if (clean(payload.listeners, 80)) fields.push({ name: 'Listeners', value: clean(payload.listeners, 80), inline: true });
+    var embed = {
+      title: 'NOW PLAYING',
+      description: title,
+      color: 16727483,
+      fields: fields,
+      footer: { text: '666SOUNDsDESIGn · ' + clean(category && category.label || 'DIRECT', 80) },
+      timestamp: new Date().toISOString()
+    };
+    if (payload.playerUrl) embed.url = clean(payload.playerUrl, 1000);
+    if (payload.artwork) embed.thumbnail = { url: clean(payload.artwork, 1000) };
+    return { username: username, embeds: [embed], allowed_mentions: { parse: [] } };
+  }
+
+  function directErrorMessage(response, data) {
+    var status = Number(response && response.status || 0);
+    var code = Number(data && data.code || 0);
+    if (status === 404 || code === 10015) return 'Webhook gelöscht oder ungültig';
+    if (status === 401 || status === 403) return 'Webhook nicht autorisiert';
+    if (status === 429) return 'Discord Rate-Limit aktiv';
+    return clean(data && (data.message || data.error) || ('Discord HTTP ' + status), 180);
+  }
+
+  function directConfiguredCount(settings) {
+    return (settings || loadDirectSettings()).categories.filter(function (category) { return Boolean(category.webhook); }).length;
+  }
+
+  function directCategoryOptions(settings, selected) {
+    return settings.categories.map(function (category) {
+      return '<option value="' + category.id + '"' + (category.id === selected ? ' selected' : '') + '>' + clean(category.label, 52) + (category.webhook ? ' ✓' : ' — FEHLT') + '</option>';
+    }).join('');
+  }
+
+  function syncDirectSettingsUi() {
+    if (transportMode() !== 'direct') return;
+    var settings = loadDirectSettings();
+    var targetSelect = document.getElementById('s666DiscordTargetSelect');
+    var autoSelect = document.getElementById('s666DiscordAutoTarget');
+    if (targetSelect) targetSelect.innerHTML = directCategoryOptions(settings, settings.selectedTarget);
+    if (autoSelect) autoSelect.innerHTML = directCategoryOptions(settings, settings.autoTarget);
+    settings.categories.forEach(function (category) {
+      var label = document.querySelector('[data-direct-label="' + category.id + '"]');
+      var webhook = document.querySelector('[data-direct-webhook="' + category.id + '"]');
+      if (label && document.activeElement !== label) label.value = category.label;
+      if (webhook && document.activeElement !== webhook) webhook.value = category.webhook;
+    });
+    var summary = document.getElementById('s666DiscordDirectSummary');
+    if (summary) summary.textContent = directConfiguredCount(settings) + '/3 Ziele lokal eingerichtet · Auto: ' + directCategory(settings, settings.autoTarget).label;
+  }
+
+  function toggleDirectSettings(open) {
+    var panel = document.getElementById('s666DiscordDirectSettings');
+    if (!panel) return;
+    var next = typeof open === 'boolean' ? open : panel.classList.contains('s666-discord-settings--hidden');
+    panel.classList.toggle('s666-discord-settings--hidden', !next);
+    if (next) syncDirectSettingsUi();
+  }
+
+  function saveDirectSettingsFromOverlay() {
+    var current = loadDirectSettings();
+    var invalid = false;
+    current.categories = current.categories.map(function (category) {
+      var labelInput = document.querySelector('[data-direct-label="' + category.id + '"]');
+      var webhookInput = document.querySelector('[data-direct-webhook="' + category.id + '"]');
+      var rawWebhook = String(webhookInput && webhookInput.value || '').trim();
+      var normalized = normalizeDiscordWebhook(rawWebhook);
+      if (rawWebhook && !normalized) invalid = true;
+      return {
+        id: category.id,
+        label: clean(labelInput && labelInput.value || category.label, 52) || category.label,
+        webhook: normalized
+      };
+    });
+    var selected = document.getElementById('s666DiscordTargetSelect');
+    var auto = document.getElementById('s666DiscordAutoTarget');
+    if (selected && DIRECT_CATEGORY_IDS.indexOf(selected.value) >= 0) current.selectedTarget = selected.value;
+    if (auto && DIRECT_CATEGORY_IDS.indexOf(auto.value) >= 0) current.autoTarget = auto.value;
+    if (invalid) { setDiscordOverlayStatus('Mindestens eine Webhook-Adresse ist ungültig', 'error'); return false; }
+    saveDirectSettings(current);
+    syncDirectSettingsUi();
+    setDiscordOverlayStatus('Direkte Discord-Ziele lokal gespeichert', 'ok');
+    startupAutoPostDone = false;
+    startupAutoPostStartedAt = 0;
+    if (directPlaybackStarted) tryStartupAutoPost();
+    checkStatus();
+    return true;
+  }
+
+  function clearDirectSettingsFromOverlay() {
+    saveDirectSettings(defaultDirectSettings());
+    syncDirectSettingsUi();
+    startupAutoPostDone = false;
+    lastPostedKey = '';
+    setDiscordOverlayStatus('Lokale Discord-Ziele entfernt', 'warn');
+    checkStatus();
+  }
+
+  function bindDirectPlaybackAutopost() {
+    if (directPlayingBridgeInstalled) return;
+    directPlayingBridgeInstalled = true;
+    function onPlaying(event) {
+      if (transportMode() !== 'direct') return;
+      if (event && event.target && String(event.target.tagName || '').toLowerCase() !== 'audio') return;
+      directPlaybackStarted = true;
+      if (!startupAutoPostDone) setTimeout(tryStartupAutoPost, 250);
+    }
+    document.addEventListener('playing', onPlaying, true);
+    Array.prototype.slice.call(document.querySelectorAll('audio')).forEach(function (audio) {
+      audio.addEventListener('playing', onPlaying, { passive: true });
+      if (!audio.paused && audio.readyState >= 2) directPlaybackStarted = true;
+    });
+  }
 
   function clean(value, max) {
     return String(value == null ? '' : value)
@@ -294,27 +542,54 @@
     if (activeRequestId) throw new Error('discord_request_in_flight');
     var requestId = ++requestSequence;
     var requestLifecycle = lifecycleGeneration;
+    var direct = transportMode() === 'direct' && /^\/api\/discord\/(message|manual|nowplaying)$/.test(String(path || ''));
     activeRequestId = requestId;
-    dispatch('s666:discord-state', { phase: 'sending', path: path, requestId: requestId });
+    dispatch('s666:discord-state', { phase: 'sending', path: path, transport: direct ? 'direct-local' : 'worker', requestId: requestId });
     try {
-      var packet = await fetchWithTimeout(path, {
+      var requestUrl = path;
+      var requestOptions = {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
         credentials: 'same-origin',
         cache: 'no-store',
         body: JSON.stringify(payload || {})
-      }, REQUEST_TIMEOUT_MS);
+      };
+      var directCategoryState = null;
+      if (direct) {
+        var settings = loadDirectSettings();
+        var targetId = directTargetId(path, payload, settings);
+        directCategoryState = directCategory(settings, targetId);
+        if (!directCategoryState.webhook) throw new Error('Discord-Ziel fehlt – ZIELE öffnen');
+        requestUrl = directCategoryState.webhook + (directCategoryState.webhook.indexOf('?') >= 0 ? '&' : '?') + 'wait=true';
+        requestOptions.credentials = 'omit';
+        requestOptions.body = JSON.stringify(directDiscordPayload(path, payload, directCategoryState));
+      }
+      var packet = await fetchWithTimeout(requestUrl, requestOptions, REQUEST_TIMEOUT_MS);
       if (!lifecycleIsCurrent(requestLifecycle) || activeRequestId !== requestId) throw staleLifecycleError();
       var response = packet.response;
-      var data = packet.data && typeof packet.data === 'object' ? packet.data : {};
-      data.__httpStatus = response.status;
-      if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
+      var responseData = packet.data && typeof packet.data === 'object' ? packet.data : {};
+      var data = responseData;
+      if (direct) {
+        if (!response.ok) throw new Error(directErrorMessage(response, responseData));
+        data = {
+          ok: true,
+          sent: true,
+          accepted: true,
+          direct: true,
+          target: directCategoryState.id,
+          targetLabel: directCategoryState.label,
+          __httpStatus: response.status
+        };
+      } else {
+        data.__httpStatus = response.status;
+        if (!response.ok || data.ok !== true) throw new Error(clean(data.error || data.message || ('HTTP ' + response.status), 300));
+      }
       var summary = deliverySummary(data);
-      dispatch('s666:discord-state', { phase: summary.warning ? 'warning' : 'success', path: path, data: data, summary: summary, requestId: requestId });
+      dispatch('s666:discord-state', { phase: summary.warning ? 'warning' : 'success', path: path, transport: direct ? 'direct-local' : 'worker', data: data, summary: summary, requestId: requestId });
       return data;
     } catch (error) {
       if (!lifecycleIsCurrent(requestLifecycle) || activeRequestId !== requestId || isStaleLifecycleError(error)) throw staleLifecycleError();
-      dispatch('s666:discord-state', { phase: 'error', path: path, error: error && error.message ? error.message : String(error), requestId: requestId });
+      dispatch('s666:discord-state', { phase: 'error', path: path, transport: direct ? 'direct-local' : 'worker', error: error && error.message ? error.message : String(error), requestId: requestId });
       throw error;
     } finally {
       if (activeRequestId === requestId) activeRequestId = 0;
@@ -342,7 +617,9 @@
       '.s666-discord-status{min-height:18px;margin-top:9px;font-size:11px;font-weight:900;letter-spacing:.05em}',
       '.s666-discord-status.is-sending{color:#ffc857}.s666-discord-status.is-ok{color:#7edcff}.s666-discord-status.is-error{color:#ff5570}.s666-discord-status.is-warn{color:#ffc857}',
       '#discordBtn.is-warn{border-color:rgba(255,200,87,.82)!important;color:#ffc857!important;box-shadow:0 0 14px rgba(255,200,87,.3)!important}',
-      '.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}'
+      '.s666-discord-emojis{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px}.s666-discord-emoji{min-width:32px;min-height:30px;border-radius:8px!important;padding:4px 6px!important;font-size:18px!important}.s666-discord-nowplaying{border-color:rgba(126,220,255,.68)!important;color:#7edcff!important}',
+      '.s666-discord-target-row{display:grid!important;grid-template-columns:1fr auto!important;gap:8px!important;align-items:center!important;margin:10px auto 0!important;width:min(340px,82vw)!important}.s666-discord-target-select,.s666-discord-direct-input{min-height:34px!important;border-radius:10px!important;border:1px solid rgba(22,255,243,.48)!important;background:rgba(0,0,0,.55)!important;color:#eaffff!important;padding:6px 9px!important;font-weight:800!important}.s666-discord-settings-toggle{min-height:34px!important;border-radius:10px!important;border:1px solid rgba(255,61,187,.58)!important;background:rgba(255,61,187,.10)!important;color:#ff8ddb!important;font-weight:950!important;cursor:pointer!important}',
+      '.s666-discord-settings{width:min(400px,86vw)!important;margin:10px auto 0!important;padding:10px!important;border:1px solid rgba(22,255,243,.26)!important;border-radius:14px!important;background:rgba(0,0,0,.30)!important;text-align:left!important}.s666-discord-settings--hidden{display:none!important}.s666-discord-direct-row{display:grid!important;grid-template-columns:minmax(90px,.8fr) minmax(150px,1.6fr)!important;gap:7px!important;margin:6px 0!important}.s666-discord-direct-input{width:100%!important;box-sizing:border-box!important}.s666-discord-direct-summary{font-size:10px!important;color:#9eefff!important;text-align:center!important;margin:4px 0 8px!important}.s666-discord-settings-actions{display:flex!important;justify-content:center!important;gap:8px!important;margin-top:8px!important}.s666-discord-settings-note{font-size:9px!important;line-height:1.3!important;color:rgba(220,250,255,.68)!important;text-align:center!important}'
     ].join('');
     document.head.appendChild(style);
   }
@@ -454,6 +731,9 @@
     overlay.__s666DiscordOverlayBound = true;
     overlay.addEventListener('click', function (event) {
       if (event.target === overlay || (event.target.closest && event.target.closest('[data-discord-close]'))) { closeMessageOverlay(); return; }
+      if (event.target.closest && event.target.closest('[data-discord-settings-toggle]')) { toggleDirectSettings(); return; }
+      if (event.target.closest && event.target.closest('[data-discord-settings-save]')) { saveDirectSettingsFromOverlay(); return; }
+      if (event.target.closest && event.target.closest('[data-discord-settings-clear]')) { clearDirectSettingsFromOverlay(); return; }
       var emojiButton = event.target.closest && event.target.closest('[data-discord-emoji]');
       if (emojiButton) {
         insertAtCursor(document.getElementById('s666DiscordMessageText'), emojiButton.getAttribute('data-discord-emoji') || '', 1800);
@@ -475,6 +755,15 @@
         discordDraftRevision += 1;
       }
     });
+    overlay.addEventListener('change', function (event) {
+      if (!event.target) return;
+      if (event.target.id === 's666DiscordTargetSelect') {
+        var settings = loadDirectSettings();
+        if (DIRECT_CATEGORY_IDS.indexOf(event.target.value) >= 0) settings.selectedTarget = event.target.value;
+        saveDirectSettings(settings);
+        syncDirectSettingsUi();
+      }
+    });
     overlay.addEventListener('keydown', function (event) {
       if (!event.target || event.target.id !== 's666DiscordMessageText') return;
       if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
@@ -489,6 +778,7 @@
     if (!overlay) return false;
     bindDiscordMessageOverlay(overlay);
     syncDiscordDraftToOverlay();
+    syncDirectSettingsUi();
     applyDiscordOverlayStatusState();
     setDiscordOverlayButtonsDisabled(Boolean(activeDiscordOverlaySendId || activeRequestId));
     if (!overlay.classList.contains('s666-discord-gate--hidden')) {
@@ -513,6 +803,13 @@
       '<button type="button" class="s666-discord-gate-x" data-discord-close aria-label="Close">×</button>' +
       '<div class="s666-discord-gate-title">DISCORD SHOOTER</div>' +
       '<div class="s666-discord-gate-message">Message to Discord:</div>' +
+      '<div class="s666-discord-target-row"><select id="s666DiscordTargetSelect" class="s666-discord-target-select" aria-label="Discord Posting Kategorie"></select><button type="button" class="s666-discord-settings-toggle" data-discord-settings-toggle>ZIELE</button></div>' +
+      '<div id="s666DiscordDirectSettings" class="s666-discord-settings s666-discord-settings--hidden"><div id="s666DiscordDirectSummary" class="s666-discord-direct-summary"></div>' +
+      '<div class="s666-discord-direct-row"><input class="s666-discord-direct-input" data-direct-label="main" maxlength="52" aria-label="Kategorie 1 Name"><input type="password" autocomplete="off" class="s666-discord-direct-input" data-direct-webhook="main" placeholder="Webhook Kategorie 1" aria-label="Webhook Kategorie 1"></div>' +
+      '<div class="s666-discord-direct-row"><input class="s666-discord-direct-input" data-direct-label="community" maxlength="52" aria-label="Kategorie 2 Name"><input type="password" autocomplete="off" class="s666-discord-direct-input" data-direct-webhook="community" placeholder="Webhook Kategorie 2" aria-label="Webhook Kategorie 2"></div>' +
+      '<div class="s666-discord-direct-row"><input class="s666-discord-direct-input" data-direct-label="labor" maxlength="52" aria-label="Kategorie 3 Name"><input type="password" autocomplete="off" class="s666-discord-direct-input" data-direct-webhook="labor" placeholder="Webhook Kategorie 3" aria-label="Webhook Kategorie 3"></div>' +
+      '<div class="s666-discord-direct-row"><span class="s666-discord-settings-note">AUTO NOW PLAYING</span><select id="s666DiscordAutoTarget" class="s666-discord-target-select" aria-label="Auto Now Playing Ziel"></select></div>' +
+      '<div class="s666-discord-settings-actions"><button type="button" class="s666-discord-gate-cancel" data-discord-settings-clear>CLEAR</button><button type="button" class="s666-discord-gate-submit" data-discord-settings-save>SAVE LOCAL</button></div><div class="s666-discord-settings-note">Nur in diesem Browser gespeichert · keine Worker · keine Repo-Secrets</div></div>' +
       '<textarea id="s666DiscordMessageText" class="s666-discord-msg-input" maxlength="1800" rows="7" placeholder="Message"></textarea>' +
       emojiHtml +
       '<div id="s666DiscordMessageStatus" class="s666-discord-status" role="status" aria-live="polite">Bereit</div>' +
@@ -521,6 +818,7 @@
     document.body.appendChild(overlay);
     bindDiscordMessageOverlay(overlay);
     syncDiscordDraftToOverlay();
+    syncDirectSettingsUi();
     applyDiscordOverlayStatusState();
     installEscapeBridge();
     return overlay;
@@ -532,6 +830,7 @@
     var overlayBusy = Boolean(activeDiscordOverlaySendId || activeRequestId);
     if (activeElement && activeElement !== document.body && !overlay.contains(activeElement)) discordOverlayReturnFocus = activeElement;
     overlay.classList.remove('s666-discord-gate--hidden');
+    syncDirectSettingsUi();
     setDiscordOverlayButtonsDisabled(overlayBusy);
     setDiscordOverlayStatus(overlayBusy ? 'Discord verarbeitet bereits einen Versand …' : 'Bereit', overlayBusy ? 'sending' : '');
     scheduleDiscordOverlayFocus(40);
@@ -566,7 +865,8 @@
     setDiscordOverlayButtonsDisabled(true);
     setDiscordOverlayStatus('Wird gesendet …', 'sending');
     try {
-      var result = await postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: message, manual: true }));
+      var selectedTarget = document.getElementById('s666DiscordTargetSelect');
+      var result = await postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: message, manual: true, directTarget: selectedTarget && selectedTarget.value }));
       if (!lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
       var summary = deliverySummary(result, '✓ Discord-Nachricht angenommen');
       if (summary.skipped || !summary.sent) {
@@ -617,14 +917,16 @@
   async function messagePost(message) {
     if (typeof message === 'string' && clean(message, 1800)) {
       if (activeRequestId) return requestBusyResult('message');
-      return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800), manual: true }));
+      var settings = loadDirectSettings();
+      return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800), manual: true, directTarget: settings.selectedTarget }));
     }
     return openMessageOverlay();
   }
 
   async function manualPost() {
     if (activeRequestId) return requestBusyResult('manual');
-    return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true }));
+    var settings = loadDirectSettings();
+    return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true, directTarget: settings.selectedTarget }));
   }
 
   async function postTrackIfChanged(force, reason) {
@@ -633,6 +935,8 @@
     var key = trackKey(data);
     var postLifecycle = lifecycleGeneration;
     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
+    if (transportMode() === 'direct' && !directTargetReady('/api/discord/nowplaying', data)) return { ok: true, skipped: true, configured: false, reason: 'direct_target_missing' };
+    if (transportMode() === 'direct' && !force && !directPlaybackStarted) return { ok: true, skipped: true, reason: 'audio_not_playing' };
     if (key === lastPostedKey && !force) return { ok: true, skipped: true, reason: 'unchanged' };
     var result = await postJson('/api/discord/nowplaying', Object.assign({}, data, {
       force: Boolean(force),
@@ -646,6 +950,12 @@
   function tryStartupAutoPost() {
     clearTimeout(startupTimer);
     if (startupAutoPostDone) return;
+    if (transportMode() === 'direct' && !directPlaybackStarted) return;
+    if (transportMode() === 'direct' && !directTargetReady('/api/discord/nowplaying', readTrackFromDom())) {
+      startupAutoPostDone = true;
+      dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'direct_target_missing', transport: 'direct-local' });
+      return;
+    }
     var data = readTrackFromDom();
     var key = trackKey(data);
     if (!startupAutoPostStartedAt) startupAutoPostStartedAt = Date.now();
@@ -698,6 +1008,22 @@
 
   async function checkStatus() {
     var statusId = ++statusSequence;
+    if (transportMode() === 'direct') {
+      var settings = loadDirectSettings();
+      var configured = directConfiguredCount(settings);
+      var autoReady = Boolean(directCategory(settings, settings.autoTarget).webhook);
+      var localData = {
+        ok: configured > 0,
+        direct: true,
+        transport: 'direct-local',
+        configuredTargets: configured,
+        targetCount: 3,
+        autoReady: autoReady,
+        autoTarget: settings.autoTarget
+      };
+      dispatch('s666:discord-state', { phase: 'status', ok: localData.ok, data: localData, statusId: statusId });
+      return localData;
+    }
     var statusLifecycle = lifecycleGeneration;
     var statusRequestSequence = requestSequence;
     var statusStartedDuringRequest = Boolean(activeRequestId);
@@ -1306,6 +1632,7 @@
     if (initialized) return;
     initialized = true;
     initDiscordButtonStatusBridge();
+    bindDirectPlaybackAutopost();
     checkStatus();
     tryStartupAutoPost();
     scheduleWatcher(4000);
@@ -1329,7 +1656,11 @@
     sharedVisualBridge: false,
     sharedStatusBridge: true,
     startupNowPlayingAutopost: true,
+    directLocalTransport: true,
+    threePostingCategories: true,
     skippedIsNotSent: true,
+    transportMode: transportMode,
+    directStatus: function () { var settings = loadDirectSettings(); return { configuredTargets: directConfiguredCount(settings), autoReady: Boolean(directCategory(settings, settings.autoTarget).webhook), selectedTarget: settings.selectedTarget, autoTarget: settings.autoTarget }; },
     mountAll: function () { initVelunaMessengerBridge(); initSharedVisualBridge(); reconcileMountedControls(); return true; },
     manualPost: manualPost,
     messagePost: messagePost,

@@ -38,6 +38,6 @@ test('cache markers deliver the compensated analyzer', async () => {
   const core = await read('js/player-core.js');
   assert.equal(await read('public/index.html'), html);
   assert.equal(await read('public/js/player-core.js'), core);
-  assert.match(html, /2026-07-24-balanced-headroom-v14/);
-  assert.match(core, /equalizer\.js\?v=2026-07-24-balanced-headroom-v14/);
+  assert.match(html, /2026-08-06-runtime-owner-v1/);
+  assert.match(core, /equalizer\.js\?v=2026-08-06-runtime-owner-v1/);
 });

@@ -366,36 +366,70 @@ const stopFallback = () => {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx || !audio) throw new Error('no_audio_context');
-    ctx = new AudioCtx();
-    analyser = ctx.createAnalyser();
-    analyser.fftSize = mobileLike() ? 128 : 1024;
-    analyser.smoothingTimeConstant = mobileLike() ? 0.78 : 0.48;
-    analyser.minDecibels = -92;
-    analyser.maxDecibels = -18;
+    const centralGraph = window.SMFPBoostCore?.graphFor?.(audio) || null;
+    let source = null;
+    let graphOwner = 'equalizer';
+
+    if (centralGraph?.source) {
+      if (!centralGraph.context || !centralGraph.analyser) throw new Error('existing_audio_source_without_analyser');
+      ctx = centralGraph.context;
+      source = centralGraph.source;
+      analyser = centralGraph.analyser;
+      gainNode = centralGraph.gains?.[0] || null;
+      limiterNode = centralGraph.limiter || null;
+      smfpRealEqNodes = (centralGraph.filters || []).slice(0, SMFP_REAL_EQ_BANDS.length);
+      graphOwner = centralGraph.createdByCore ? 'central-boost-core' : 'registered-existing';
+    } else {
+      ctx = new AudioCtx();
+      analyser = ctx.createAnalyser();
+      analyser.fftSize = mobileLike() ? 128 : 1024;
+      analyser.smoothingTimeConstant = mobileLike() ? 0.78 : 0.48;
+      analyser.minDecibels = -92;
+      analyser.maxDecibels = -18;
+      gainNode = ctx.createGain();
+      gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
+      const eqNodes = createRealEqNodes(ctx);
+      limiterNode = ctx.createDynamicsCompressor();
+      limiterNode.threshold.value = -1;
+      limiterNode.knee.value = 3;
+      limiterNode.ratio.value = 20;
+      limiterNode.attack.value = 0.001;
+      limiterNode.release.value = 0.10;
+
+      source = ctx.createMediaElementSource(audio);
+      source.connect(gainNode);
+      if (eqNodes.length) {
+        gainNode.connect(eqNodes[0]);
+        for (let index = 0; index < eqNodes.length - 1; index += 1) eqNodes[index].connect(eqNodes[index + 1]);
+        eqNodes[eqNodes.length - 1].connect(analyser);
+      } else {
+        gainNode.connect(analyser);
+      }
+      analyser.connect(limiterNode);
+      limiterNode.connect(ctx.destination);
+      try {
+        window.SMFPBoostCore?.registerEngine?.(audio, {
+          context: ctx,
+          source,
+          gainNode,
+          eqNodes,
+          limiterNode,
+          analyser
+        });
+      } catch (_) {}
+    }
+
+    if (!analyser || !ctx) throw new Error('visualizer_graph_incomplete');
+    if (!analyser.fftSize || analyser.frequencyBinCount < 16) analyser.fftSize = mobileLike() ? 128 : 1024;
     data = new Uint8Array(analyser.frequencyBinCount);
     timeData = new Uint8Array(analyser.fftSize);
-    gainNode = ctx.createGain();
-    gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
-    const eqNodes = createRealEqNodes(ctx);
-    limiterNode = ctx.createDynamicsCompressor();
-    limiterNode.threshold.value = -1;
-    limiterNode.knee.value = 3;
-    limiterNode.ratio.value = 20;
-    limiterNode.attack.value = 0.001;
-    limiterNode.release.value = 0.10;
-
-    const source = ctx.createMediaElementSource(audio);
-    source.connect(gainNode);
-    if (eqNodes.length) {
-      gainNode.connect(eqNodes[0]);
-      for (let index = 0; index < eqNodes.length - 1; index += 1) eqNodes[index].connect(eqNodes[index + 1]);
-      eqNodes[eqNodes.length - 1].connect(analyser);
-    } else {
-      gainNode.connect(analyser);
-    }
-    analyser.connect(limiterNode);
-    limiterNode.connect(ctx.destination);
     applyRealEqToNodes();
+    audio.dataset.visualizerGraph = 'GRAPH_OK';
+    audio.dataset.visualizerGraphOwner = graphOwner;
+    audio.dataset.visualizerError = '';
+    document.documentElement.setAttribute('data-visualizer-graph', 'ok');
+    document.documentElement.setAttribute('data-visualizer-owner', graphOwner);
+    try { window.dispatchEvent(new CustomEvent('s666:visualizer-graph', { detail: { ok: true, owner: graphOwner } })); } catch (_) {}
 
     const frame = (timestamp = performance.now()) => {
       if (!running) return;
@@ -521,7 +555,15 @@ count += 1;
       setBoostStage,
       getBoostStage: () => boostStage
     };
-  } catch (_) {
+  } catch (error) {
+    var visualizerError = String(error?.message || error || 'visualizer_graph_error').slice(0, 160);
+    if (audio) {
+      audio.dataset.visualizerGraph = 'GRAPH_FAIL';
+      audio.dataset.visualizerError = visualizerError;
+    }
+    document.documentElement.setAttribute('data-visualizer-graph', 'fail');
+    document.documentElement.setAttribute('data-visualizer-error', visualizerError);
+    try { window.dispatchEvent(new CustomEvent('s666:visualizer-graph', { detail: { ok: false, error: visualizerError } })); } catch (_) {}
     idleState();
     return {
       start: async () => {
