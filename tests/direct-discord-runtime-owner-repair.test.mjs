@@ -44,7 +44,9 @@ test('Manual Now Playing uses the selected category while startup and watcher us
 test('Manual posts to another category do not consume automatic Now Playing deduplication', async () => {
   const addon = await read('js/addons/discord-player-addon-v3.js');
   assert.match(addon, /var commitsAutomaticKey = true;/);
-  assert.match(addon, /if \(transportMode\(\) === 'direct' && data\.directTarget\) commitsAutomaticKey = data\.directTarget === loadDirectSettings\(\)\.autoTarget;/);
+  assert.match(addon, /var deliveredTarget = DIRECT_CATEGORY_IDS\.indexOf\(String\(result && result\.target \|\| ''\)\) >= 0 \? String\(result\.target\) : data\.directTarget;/);
+  assert.match(addon, /commitsAutomaticKey = deliveredTarget === loadDirectSettings\(\)\.autoTarget;/);
+  assert.ok(addon.indexOf('var deliveredTarget =') > addon.indexOf("await postJson('/api/discord/nowplaying'"));
   assert.match(addon, /if \(commitsAutomaticKey && lifecycleIsCurrent\(postLifecycle\)/);
   assert.match(addon, /postTrackIfChanged\(true, 'manual-now-playing', selectedTarget && selectedTarget\.value\)/);
   assert.match(addon, /postTrackIfChanged\(true, 'startup-first-now-playing'\)/);
