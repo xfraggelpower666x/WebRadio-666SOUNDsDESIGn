@@ -325,7 +325,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-07-24-balanced-headroom-v14"></script>
+<script type="module" src="/js/player-core.js?v=2026-08-06-runtime-owner-v1"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -411,8 +411,34 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function q(s,r){return(r||document).querySelector(s)}
   function qa(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
 
+  var mffCanonicalRuntimeOwners={
+    radio:q('#radio'),playBtn:q('#playBtn'),pauseBtn:q('#pauseBtn'),stopBtn:q('#stopBtn'),
+    reconnectBtn:q('#reconnectBtn'),mainBtn:q('#mainBtn'),fallbackBtn:q('#fallbackBtn'),backupBtn:q('#backupBtn')
+  };
+  function canonicalRuntimeOwner(id){
+    return document.getElementById(id)||mffCanonicalRuntimeOwners[id]||null;
+  }
+  function ensureCanonicalRuntimeOwnerHost(){
+    if(!isMobile())return null;
+    var host=document.getElementById('s666CanonicalRuntimeOwners');
+    if(!host){
+      host=document.createElement('div');
+      host.id='s666CanonicalRuntimeOwners';
+      host.hidden=true;
+      host.setAttribute('aria-hidden','true');
+      host.style.display='none';
+      document.body.appendChild(host);
+    }
+    Object.keys(mffCanonicalRuntimeOwners).forEach(function(id){
+      var owner=canonicalRuntimeOwner(id);
+      if(owner&&owner.parentNode!==host){mffCanonicalRuntimeOwners[id]=owner;host.appendChild(owner);}
+    });
+    document.documentElement.setAttribute('data-mff-canonical-runtime-owners','preserved');
+    return host;
+  }
+
   function getAudio(){
-    return q('#radio')||q('audio')||null;
+    return canonicalRuntimeOwner('radio')||q('audio')||null;
   }
 
 
@@ -696,7 +722,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   async function play(){
     mffUserStopped=false;
     setMffTickerLoadingV113();
-    var canonical=document.getElementById('playBtn');
+    var canonical=canonicalRuntimeOwner('playBtn');
     if(canonical && typeof canonical.click==='function') canonical.click();
     setTransportState('play');
     setTimeout(function(){setPanelLedsFromMeta({source:manualStreamTarget,dj:'DJ-666'});},80);
@@ -705,7 +731,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function pause(){
     mffUserStopped=true;
     mffLastUserStopAt=Date.now();
-    var canonical=document.getElementById('pauseBtn');
+    var canonical=canonicalRuntimeOwner('pauseBtn');
     if(canonical && typeof canonical.click==='function') canonical.click();
     setTransportState('pause');
     setMffTickerIdleV113();
@@ -713,7 +739,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   function stop(){
     mffUserStopped=true;
     mffLastUserStopAt=Date.now();
-    var canonical=document.getElementById('stopBtn');
+    var canonical=canonicalRuntimeOwner('stopBtn');
     if(canonical && typeof canonical.click==='function') canonical.click();
     setTransportState('stop');
     setMffTickerIdleV113();
@@ -970,19 +996,20 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   function killOldDom(){
     if(!isMobile())return;
+    ensureCanonicalRuntimeOwnerHost();
     qa('body > *').forEach(function(n){
-      if(n.id==='mffApp'||n.id==='mffAudio'||n.id==='s666DiscordGateOverlay'||n.id==='s666DiscordDeniedOverlay'||n.id==='s666SoundControlOverlay'||n.id==='s666MsgOverlay'||n.id==='fp-admin-overlay')return;
+      if(n.id==='mffApp'||n.id==='mffAudio'||n.id==='s666CanonicalRuntimeOwners'||n.id==='s666DiscordGateOverlay'||n.id==='s666DiscordDeniedOverlay'||n.id==='s666SoundControlOverlay'||n.id==='s666MsgOverlay'||n.id==='fp-admin-overlay')return;
       if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
       n.setAttribute('data-smfp-hidden','1');
       try{n.remove()}catch(e){}
     });
     qa('header,main:not(.mff-shell),.hero,.hero-image,.site-header,.main-header,.mobile-shell,.player-shell,.hud-panel,.panel:not(.mff-now):not(.mff-card):not(.mff-eq):not(.mff-controls):not(.mff-bottom),#mfmApp,#mobileHudDomMeterRepair,#mobileControlsLayerReset,#mobileInlineTopControlsForce,#mobileTopControlsInBoostPanel,#mobileTransportRepair,.mobile-hud-dom-meter-repair,.mobile-transport-repair,.mobile-top-controls-in-boost,.mobile-dom-side-meter,.mobile-dom-bottom-guard,.mobile-dom-bottom-track,.mobile-dom-bottom-left,.mobile-dom-bottom-right,.bottom-meter,.bottom-levelmeter,.gesture-guard,.mobile-bottom-meter,[class*="bottom"][class*="meter"],[class*="bottom"][class*="guard"],[class*="gesture"][class*="guard"]').forEach(function(n){
-      if(n.closest&&n.closest('#mffApp,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
+      if(n.closest&&n.closest('#mffApp,#s666CanonicalRuntimeOwners,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
       n.setAttribute('data-smfp-hidden','1');
       try{n.remove()}catch(e){}
     });
     qa('body *').forEach(function(n){
-      if(n.closest&&n.closest('#mffApp,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
+      if(n.closest&&n.closest('#mffApp,#s666CanonicalRuntimeOwners,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
       if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
       var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
       if(!r)return;
@@ -1806,6 +1833,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <script>
     window.S666_DISCORD_PLAYER_CONFIG = {
+      transport: 'direct',
       radioName: '666SOUNDsDESIGn WebRadio',
       domain: 'webradio.666soundsdesign-broadcaster.com',
       playerUrl: 'https://webradio.666soundsdesign-broadcaster.com',
@@ -1923,7 +1951,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 </script>
   <script src="/js/admin-auth-client.js?v=2026-07-24-autoskip-auth-v1222" defer></script>
   <script src="/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121" defer></script>
-  <script src="/js/addons/discord-player-addon-v3.js?v=2026-07-19-overlay-inert-v52" defer></script>
+  <script src="/js/addons/discord-player-addon-v3.js?v=2026-08-06-direct-local-v1" defer></script>
 
 
 <!-- V105 SAFE CLEANUP LAYER AUDIT — mobile layout guard + single visualizer enforcement -->
