@@ -1,0 +1,87 @@
+name: Apply Post-Success Automatic Target Ownership Fix
+
+"on":
+  push:
+    branches:
+      - repair/automatic-now-playing-dedupe-20260806
+    paths:
+      - .github/workflows/p2-settings-race-fix.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p2-settings-race-fix-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply-verify-clean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_SHA: ecf91ffc33a2ca55577c7e4c800132b655fb97dc
+      PATCH_SHA: 227ccc63d4a0ee5ebf17b60e8437f97834fa3123e6733aecc159b42834dc58f9
+    steps:
+      - name: Checkout current PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify and apply review fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${PATCH_SHA}  .github/p2-settings-race-fix.patch" | sha256sum --check --strict
+          git apply --check .github/p2-settings-race-fix.patch
+          git apply .github/p2-settings-race-fix.patch
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run complete verification
+        run: npm run verify
+
+      - name: Verify post-success ownership and mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "4f3d9ab9ee552b06ad9f8ad9e470fbe8b0848c223900bc8fe046acafdf6a6306"
+          test "$(sha256sum public/js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "4f3d9ab9ee552b06ad9f8ad9e470fbe8b0848c223900bc8fe046acafdf6a6306"
+          test "$(sha256sum tests/direct-discord-runtime-owner-repair.test.mjs | cut -d' ' -f1)" = "a9e02f5e742e90958100925c2f0f729b5027138e91d9ad43b1ec9cbb8e28ebd6"
+          test "$(sha256sum tests/discord-startup-autopost-retry.test.mjs | cut -d' ' -f1)" = "5cd14b934a4c254f242a266e8c7bfceb3da1dd57819a5b704e4c7dba093fef37"
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+          grep -F "var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result && result.target || '')) >= 0 ? String(result.target) : data.directTarget" js/addons/discord-player-addon-v3.js
+          grep -F "commitsAutomaticKey = deliveredTarget === loadDirectSettings().autoTarget" js/addons/discord-player-addon-v3.js
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('js/addons/discord-player-addon-v3.js').read_text()
+          assert s.index('var deliveredTarget =') > s.index("await postJson('/api/discord/nowplaying'")
+          PY
+
+      - name: Remove transport files and verify exact update scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/p2-settings-race-fix.patch
+          rm -f .github/workflows/p2-settings-race-fix.yml
+          git add -A
+          cat > /tmp/expected-files.txt <<'EOF'
+          js/addons/discord-player-addon-v3.js
+          public/js/addons/discord-player-addon-v3.js
+          tests/direct-discord-runtime-owner-repair.test.mjs
+          tests/discord-startup-autopost-retry.test.mjs
+          EOF
+          git diff --cached --name-only "${BASE_SHA}" | LC_ALL=C sort > /tmp/actual-files.txt
+          LC_ALL=C sort -o /tmp/expected-files.txt /tmp/expected-files.txt
+          diff -u /tmp/expected-files.txt /tmp/actual-files.txt
+          test "$(wc -l < /tmp/actual-files.txt)" -eq 4
+          test -z "$(git diff --cached --name-only "${BASE_SHA}" | grep -E '^\.github/' || true)"
+
+      - name: Commit clean reviewed fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Evaluate automatic target ownership after successful delivery"
+          git push origin HEAD:${GITHUB_REF_NAME}
