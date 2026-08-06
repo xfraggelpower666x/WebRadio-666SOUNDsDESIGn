@@ -1,0 +1,100 @@
+diff --git a/js/addons/discord-player-addon-v3.js b/js/addons/discord-player-addon-v3.js
+index 56edca4..c4c2f4f 100644
+--- a/js/addons/discord-player-addon-v3.js
++++ b/js/addons/discord-player-addon-v3.js
+@@ -167,9 +167,10 @@
+ 
+   function directTargetId(path, payload, settings) {
+     settings = settings || loadDirectSettings();
+-    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
+     var requested = payload && payload.directTarget;
+-    return DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0 ? String(requested) : settings.selectedTarget;
++    if (DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0) return String(requested);
++    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
++    return settings.selectedTarget;
+   }
+ 
+   function directTargetReady(path, payload) {
+@@ -901,7 +902,8 @@
+     setDiscordOverlayButtonsDisabled(true);
+     setDiscordOverlayStatus('Now Playing wird gesendet …', 'sending');
+     try {
+-      var result = await postTrackIfChanged(true, 'manual-now-playing');
++      var selectedTarget = document.getElementById('s666DiscordTargetSelect');
++      var result = await postTrackIfChanged(true, 'manual-now-playing', selectedTarget && selectedTarget.value);
+       if (!lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
+       var summary = deliverySummary(result, '✓ Now Playing von Discord angenommen');
+       setDiscordOverlayStatus(summary.text, summary.skipped || summary.warning ? 'warn' : (summary.sent ? 'ok' : 'error'));
+@@ -929,9 +931,10 @@
+     return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true, directTarget: settings.selectedTarget }));
+   }
+ 
+-  async function postTrackIfChanged(force, reason) {
++  async function postTrackIfChanged(force, reason, directTarget) {
+     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
+     var data = readTrackFromDom();
++    if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
+     var key = trackKey(data);
+     var postLifecycle = lifecycleGeneration;
+     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
+diff --git a/public/js/addons/discord-player-addon-v3.js b/public/js/addons/discord-player-addon-v3.js
+index 56edca4..c4c2f4f 100644
+--- a/public/js/addons/discord-player-addon-v3.js
++++ b/public/js/addons/discord-player-addon-v3.js
+@@ -167,9 +167,10 @@
+ 
+   function directTargetId(path, payload, settings) {
+     settings = settings || loadDirectSettings();
+-    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
+     var requested = payload && payload.directTarget;
+-    return DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0 ? String(requested) : settings.selectedTarget;
++    if (DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0) return String(requested);
++    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
++    return settings.selectedTarget;
+   }
+ 
+   function directTargetReady(path, payload) {
+@@ -901,7 +902,8 @@
+     setDiscordOverlayButtonsDisabled(true);
+     setDiscordOverlayStatus('Now Playing wird gesendet …', 'sending');
+     try {
+-      var result = await postTrackIfChanged(true, 'manual-now-playing');
++      var selectedTarget = document.getElementById('s666DiscordTargetSelect');
++      var result = await postTrackIfChanged(true, 'manual-now-playing', selectedTarget && selectedTarget.value);
+       if (!lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
+       var summary = deliverySummary(result, '✓ Now Playing von Discord angenommen');
+       setDiscordOverlayStatus(summary.text, summary.skipped || summary.warning ? 'warn' : (summary.sent ? 'ok' : 'error'));
+@@ -929,9 +931,10 @@
+     return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true, directTarget: settings.selectedTarget }));
+   }
+ 
+-  async function postTrackIfChanged(force, reason) {
++  async function postTrackIfChanged(force, reason, directTarget) {
+     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
+     var data = readTrackFromDom();
++    if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
+     var key = trackKey(data);
+     var postLifecycle = lifecycleGeneration;
+     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
+diff --git a/tests/direct-discord-runtime-owner-repair.test.mjs b/tests/direct-discord-runtime-owner-repair.test.mjs
+index 4fcdd2e..3ca9b9e 100644
+--- a/tests/direct-discord-runtime-owner-repair.test.mjs
++++ b/tests/direct-discord-runtime-owner-repair.test.mjs
+@@ -29,6 +29,17 @@ test('Direct Now Playing waits for the real audio playing event and worker mode
+   assert.match(addon, /Webhook gelöscht oder ungültig/);
+ });
+ 
++
++test('Manual Now Playing uses the selected category while startup and watcher use Auto Now Playing', async () => {
++  const addon = await read('js/addons/discord-player-addon-v3.js');
++  assert.match(addon, /if \(DIRECT_CATEGORY_IDS\.indexOf\(String\(requested \|\| ''\)\) >= 0\) return String\(requested\);[\s\S]*if \(String\(path\)\.indexOf\('\/nowplaying'\) >= 0\) return settings\.autoTarget;/);
++  assert.match(addon, /postTrackIfChanged\(true, 'manual-now-playing', selectedTarget && selectedTarget\.value\)/);
++  assert.match(addon, /async function postTrackIfChanged\(force, reason, directTarget\)/);
++  assert.match(addon, /data\.directTarget = String\(directTarget\)/);
++  assert.match(addon, /postTrackIfChanged\(true, 'startup-first-now-playing'\)/);
++  assert.match(addon, /postTrackIfChanged\(false, 'watcher-track-change'\)/);
++});
++
+ test('Canonical visualizer adopts or registers one central graph and reports failures', async () => {
+   const eq = await read('js/equalizer.js');
+   assert.equal(await read('public/js/equalizer.js'), eq);
