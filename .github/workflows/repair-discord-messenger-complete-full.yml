@@ -56,7 +56,10 @@ jobs:
             '0be552f1216a7906d61fe3ada315e55835baa6e2ab67467838d23a734f59f319' '.repair/complete-full-repair.patch.b64.part01' \
             '92f90c2e90b4e5c3a1c4009f86c42c1625fb566f85faac9c3cf9482e9a2dcf79' '.repair/complete-full-repair.patch.b64.part02' \
             '9544b5bdde7cebc6e203100af1c01553d0c9bea4e7bb65c99fa646a46fed6a58' '.repair/complete-full-repair.patch.b64.part03' \
-            '8de93d8158f7eb8c1d8402baa219f558df632ece95ecd2ac9de425f4febc5833' '.repair/complete-full-repair.patch.b64.part04' \
+            'b46b9a0b51bc195160f29d318a8d697bb5baa64a711055fc435b83ef203dd434' '.repair/complete-full-repair.patch.b64.part041' \
+            '3e389b5370b6fe2da4abdffb3909e45d91a594a3150048853d970813a93d2b62' '.repair/complete-full-repair.patch.b64.part042' \
+            '9a80449ebbe3a2766928ac017d4ed6d8d47f5a49c809d771baa9cb1c06f1b5c6' '.repair/complete-full-repair.patch.b64.part043' \
+            '05a4af45ab0802ebf73b06b843ac9cfe33efc5ad33de4990c2da4758d3cece21' '.repair/complete-full-repair.patch.b64.part044' \
             '0b30277570d6bc71d39e841ccc1b10cb99521e8b941a74f2c73fa65fb788d94c' '.repair/complete-full-repair.patch.b64.part05' \
             '8331d996ad3b2ba1a4819228b63ec76cbb8d861fae47280d915f3d31e7bc7c78' '.repair/complete-full-repair.patch.b64.part06' \
             '61cc4dad3f5979bc0fc6f096a14f6074edb1a1de642601bac2a13ca17be38ab4' '.repair/complete-full-repair.patch.b64.part07' \
@@ -67,7 +70,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .repair/complete-full-repair.patch.b64.part{01..08} > /tmp/complete-full-repair.patch.b64
+          cat .repair/complete-full-repair.patch.b64.part01 .repair/complete-full-repair.patch.b64.part02 .repair/complete-full-repair.patch.b64.part03 .repair/complete-full-repair.patch.b64.part041 .repair/complete-full-repair.patch.b64.part042 .repair/complete-full-repair.patch.b64.part043 .repair/complete-full-repair.patch.b64.part044 .repair/complete-full-repair.patch.b64.part05 .repair/complete-full-repair.patch.b64.part06 .repair/complete-full-repair.patch.b64.part07 .repair/complete-full-repair.patch.b64.part08 > /tmp/complete-full-repair.patch.b64
           test "$(sha256sum /tmp/complete-full-repair.patch.b64 | cut -d' ' -f1)" = 'e5d70593520b9d12a7372dc2c685dd76f99a8d7dfe448e26f615910e05c11c58'
           base64 --decode /tmp/complete-full-repair.patch.b64 > /tmp/complete-full-repair.patch.gz
           test "$(sha256sum /tmp/complete-full-repair.patch.gz | cut -d' ' -f1)" = '86ed859d5ccee0a01c3655bd4351f3c5c59d6542729e6349b375c8bc35103f6c'
@@ -112,7 +115,7 @@ jobs:
         run: |
           set -euo pipefail
           WORKFLOW='.github/workflows/repair-discord-messenger-complete-full.yml'
-          PAYLOAD_PARTS=(.repair/complete-full-repair.patch.b64.part{01..08})
+          PAYLOAD_PARTS=(.repair/complete-full-repair.patch.b64.part01 .repair/complete-full-repair.patch.b64.part02 .repair/complete-full-repair.patch.b64.part03 .repair/complete-full-repair.patch.b64.part041 .repair/complete-full-repair.patch.b64.part042 .repair/complete-full-repair.patch.b64.part043 .repair/complete-full-repair.patch.b64.part044 .repair/complete-full-repair.patch.b64.part05 .repair/complete-full-repair.patch.b64.part06 .repair/complete-full-repair.patch.b64.part07 .repair/complete-full-repair.patch.b64.part08)
           TARGETS=(
             'js/addons/discord-player-addon-v3.js'
             'public/js/addons/discord-player-addon-v3.js'
