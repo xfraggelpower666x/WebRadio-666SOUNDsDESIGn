@@ -167,9 +167,10 @@
 
   function directTargetId(path, payload, settings) {
     settings = settings || loadDirectSettings();
-    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
     var requested = payload && payload.directTarget;
-    return DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0 ? String(requested) : settings.selectedTarget;
+    if (DIRECT_CATEGORY_IDS.indexOf(String(requested || '')) >= 0) return String(requested);
+    if (String(path).indexOf('/nowplaying') >= 0) return settings.autoTarget;
+    return settings.selectedTarget;
   }
 
   function directTargetReady(path, payload) {
@@ -901,7 +902,8 @@
     setDiscordOverlayButtonsDisabled(true);
     setDiscordOverlayStatus('Now Playing wird gesendet …', 'sending');
     try {
-      var result = await postTrackIfChanged(true, 'manual-now-playing');
+      var selectedTarget = document.getElementById('s666DiscordTargetSelect');
+      var result = await postTrackIfChanged(true, 'manual-now-playing', selectedTarget && selectedTarget.value);
       if (!lifecycleIsCurrent(sendLifecycle) || activeDiscordOverlaySendId !== sendId) return;
       var summary = deliverySummary(result, '✓ Now Playing von Discord angenommen');
       setDiscordOverlayStatus(summary.text, summary.skipped || summary.warning ? 'warn' : (summary.sent ? 'ok' : 'error'));
@@ -929,9 +931,10 @@
     return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true, directTarget: settings.selectedTarget }));
   }
 
-  async function postTrackIfChanged(force, reason) {
+  async function postTrackIfChanged(force, reason, directTarget) {
     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
     var data = readTrackFromDom();
+    if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
     var key = trackKey(data);
     var postLifecycle = lifecycleGeneration;
     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
