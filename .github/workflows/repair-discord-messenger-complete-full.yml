@@ -1,3 +1,4 @@
+# armed retry after workflow registration
 name: Complete Discord Messenger Player Alert Full Repair
 
 on:
