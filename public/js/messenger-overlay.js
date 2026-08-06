@@ -12,6 +12,14 @@
   var statusTimer = 0;
   var mountTimer = 0;
   var observer = null;
+  var observerRoot = null;
+  var sendSequence = 0;
+  var activeSendId = 0;
+  var statusSequence = 0;
+  var statusState = { text: '', kind: '' };
+  var draftState = '';
+  var draftRevision = 0;
+  var focusTimer = 0;
   var EMOJIS = [
     '🎵','🎶','🎧','🎤','🎸','🎹','🥁','🎺','🔥','⚡',
     '❤️','💜','💙','🖤','🤘','😎','👽','💀','🎉','🥂',
@@ -71,13 +79,25 @@
     document.head.appendChild(style);
   }
 
-  function setStatus(text, kind, clearAfter) {
+  function renderStatus() {
     var status = document.getElementById('s666MsgStatus');
     if (!status) return;
+    status.textContent = statusState.text;
+    status.className = 's666msg-status' + (statusState.kind ? ' ' + statusState.kind : '');
+  }
+
+  function setStatus(text, kind, clearAfter) {
     clearTimeout(statusTimer);
-    status.textContent = text || '';
-    status.className = 's666msg-status' + (kind ? ' ' + kind : '');
-    if (clearAfter) statusTimer = setTimeout(function () { setStatus('', ''); }, clearAfter);
+    statusTimer = 0;
+    var owner = ++statusSequence;
+    statusState = { text: text || '', kind: kind || '' };
+    renderStatus();
+    if (clearAfter) statusTimer = setTimeout(function () {
+      if (statusSequence !== owner) return;
+      statusTimer = 0;
+      statusState = { text: '', kind: '' };
+      renderStatus();
+    }, clearAfter);
   }
 
   function updateCount(textarea) {
@@ -86,6 +106,20 @@
     var length = textarea.value.length;
     counter.textContent = length + ' / ' + MAX_CHARS;
     counter.classList.toggle('near-limit', length > MAX_CHARS * .85);
+  }
+
+  function syncDraft(textarea) {
+    if (!textarea) return;
+    if (String(textarea.value || '') !== draftState) textarea.value = draftState;
+    updateCount(textarea);
+  }
+
+  function syncMessengerRuntime() {
+    var textarea = document.getElementById('s666MsgText');
+    var button = document.getElementById('s666MsgSend');
+    syncDraft(textarea);
+    renderStatus();
+    if (button) button.disabled = Boolean(activeSendId);
   }
 
   function closeMessenger() {
@@ -102,85 +136,139 @@
       setStatus('✗ Messenger nicht bereit', 'err', 4000);
       return Promise.resolve(false);
     }
-    var message = textarea.value.trim();
+    var inputSnapshot = String(textarea.value || '');
+    var inputRevision = draftRevision;
+    draftState = inputSnapshot;
+    var message = inputSnapshot.trim();
     if (!message) {
       setStatus('✗ Nachricht fehlt', 'err', 3000);
       textarea.focus();
       return Promise.resolve(false);
     }
+    if (activeSendId) return Promise.resolve(false);
+    var sendId = ++sendSequence;
+    activeSendId = sendId;
     if (button) button.disabled = true;
     setStatus('⏳ SENDE...', 'sending');
-    return client.send(message, { username: 'Broadcast', source: 'messenger-overlay' }).then(function (result) {
-      if (result.ok) {
-        textarea.value = '';
-        updateCount(textarea);
+    return Promise.resolve().then(function () {
+      return client.send(message, { username: 'Broadcast', source: 'messenger-overlay' });
+    }).then(function (result) {
+      if (activeSendId !== sendId) return false;
+      if (result && result.ok) {
+        var currentTextarea = document.getElementById('s666MsgText');
+        if (draftRevision === inputRevision && draftState === inputSnapshot) {
+          draftState = '';
+          draftRevision += 1;
+          if (currentTextarea && currentTextarea.value === inputSnapshot) currentTextarea.value = '';
+        }
+        updateCount(currentTextarea);
         setStatus('✓ GESENDET', 'ok', 3500);
         return true;
       }
-      var label = result.retryAfterMs
+      var label = result && result.retryAfterMs
         ? 'Bitte ' + Math.max(1, Math.ceil(result.retryAfterMs / 1000)) + ' s warten'
-        : (result.error || 'Fehler');
+        : (result && result.error || 'Fehler');
       setStatus('✗ ' + label, 'err', 5000);
       return false;
+    }).catch(function (error) {
+      if (activeSendId !== sendId) return false;
+      setStatus('✗ ' + (error && error.message ? error.message : 'Verbindungsfehler'), 'err', 5000);
+      return false;
     }).finally(function () {
-      if (button) button.disabled = false;
+      if (activeSendId === sendId) activeSendId = 0;
+      var currentButton = document.getElementById('s666MsgSend');
+      if (currentButton) currentButton.disabled = Boolean(activeSendId);
     });
   }
 
   function bindOverlayEvents() {
     var overlay = document.getElementById(OVERLAY_ID);
     var textarea = document.getElementById('s666MsgText');
-    if (!overlay || !textarea || overlay.dataset.bound === '1') return;
-    overlay.dataset.bound = '1';
-    textarea.addEventListener('input', function () { updateCount(textarea); });
-    overlay.addEventListener('click', function (event) {
-      var emojiButton = event.target.closest && event.target.closest('.s666msg-emoji');
-      if (!emojiButton) return;
-      var emoji = emojiButton.getAttribute('data-emoji') || '';
-      if (textarea.value.length + emoji.length > MAX_CHARS) return;
-      var start = textarea.selectionStart || textarea.value.length;
-      textarea.value = textarea.value.slice(0, start) + emoji + textarea.value.slice(start);
-      textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-      updateCount(textarea);
-      textarea.focus();
-    });
-    document.getElementById('s666MsgClose').addEventListener('click', closeMessenger);
-    document.getElementById('s666MsgBackdrop').addEventListener('click', closeMessenger);
-    document.getElementById('s666MsgClear').addEventListener('click', function () {
-      textarea.value = '';
-      updateCount(textarea);
-      setStatus('', '');
-      textarea.focus();
-    });
-    document.getElementById('s666MsgSend').addEventListener('click', sendMessage);
-    textarea.addEventListener('keydown', function (event) {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-        event.preventDefault();
-        sendMessage();
-      }
-    });
+    if (!overlay || !textarea) return false;
+    if (overlay.__s666MessengerOverlayBound !== true) {
+      overlay.__s666MessengerOverlayBound = true;
+      overlay.addEventListener('input', function (event) {
+        if (!event.target || event.target.id !== 's666MsgText') return;
+        draftState = String(event.target.value || '');
+        draftRevision += 1;
+        updateCount(event.target);
+      });
+      overlay.addEventListener('click', function (event) {
+        var target = event.target;
+        if (!target) return;
+        if (target === overlay || target.id === 's666MsgBackdrop' || (target.closest && target.closest('#s666MsgClose'))) {
+          closeMessenger();
+          return;
+        }
+        var emojiButton = target.closest && target.closest('.s666msg-emoji');
+        if (emojiButton) {
+          var currentTextarea = document.getElementById('s666MsgText');
+          if (!currentTextarea) return;
+          var emoji = emojiButton.getAttribute('data-emoji') || '';
+          if (currentTextarea.value.length + emoji.length > MAX_CHARS) return;
+          var start = typeof currentTextarea.selectionStart === 'number' ? currentTextarea.selectionStart : currentTextarea.value.length;
+          currentTextarea.value = currentTextarea.value.slice(0, start) + emoji + currentTextarea.value.slice(start);
+          currentTextarea.selectionStart = currentTextarea.selectionEnd = start + emoji.length;
+          draftState = String(currentTextarea.value || '');
+          draftRevision += 1;
+          updateCount(currentTextarea);
+          currentTextarea.focus();
+          return;
+        }
+        if (target.closest && target.closest('#s666MsgClear')) {
+          var clearTextarea = document.getElementById('s666MsgText');
+          draftState = '';
+          draftRevision += 1;
+          if (clearTextarea) clearTextarea.value = '';
+          updateCount(clearTextarea);
+          setStatus('', '');
+          if (clearTextarea) clearTextarea.focus();
+          return;
+        }
+        if (target.closest && target.closest('#s666MsgSend')) sendMessage();
+      });
+      overlay.addEventListener('keydown', function (event) {
+        if (!event.target || event.target.id !== 's666MsgText') return;
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+    }
+    syncMessengerRuntime();
+    return true;
   }
 
   function ensureOverlay() {
+    if (!document.body) return false;
     if (!document.getElementById(OVERLAY_ID)) {
       var wrapper = document.createElement('div');
       wrapper.innerHTML = buildOverlayHtml();
       document.body.appendChild(wrapper.firstElementChild);
     }
-    bindOverlayEvents();
+    return bindOverlayEvents();
   }
 
   function openMessenger(prefill) {
-    ensureOverlay();
+    if (!ensureOverlay()) return false;
     var overlay = document.getElementById(OVERLAY_ID);
     var textarea = document.getElementById('s666MsgText');
+    if (!overlay || !textarea) return false;
     overlay.hidden = false;
-    document.body.style.overflow = 'hidden';
+    if (document.body) document.body.style.overflow = 'hidden';
     if (typeof prefill === 'string') {
-      textarea.value = prefill.slice(0, MAX_CHARS);
-      updateCount(textarea);
+      draftState = prefill.slice(0, MAX_CHARS);
+      draftRevision += 1;
     }
-    setTimeout(function () { textarea.focus(); }, 80);
+    syncDraft(textarea);
+    clearTimeout(focusTimer);
+    focusTimer = setTimeout(function () {
+      focusTimer = 0;
+      var currentOverlay = document.getElementById(OVERLAY_ID);
+      var currentTextarea = document.getElementById('s666MsgText');
+      if (currentOverlay && !currentOverlay.hidden && currentTextarea && currentOverlay.contains(currentTextarea)) currentTextarea.focus();
+    }, 80);
+    return true;
   }
 
   function desiredTarget() {
@@ -202,6 +290,9 @@
       button.textContent = 'MESSAGE';
       button.title = 'Broadcast-Nachricht senden';
       button.setAttribute('aria-label', 'Broadcast-Nachricht senden');
+    }
+    if (button.__s666MessengerTriggerBound !== true) {
+      button.__s666MessengerTriggerBound = true;
       button.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -212,21 +303,51 @@
     return true;
   }
 
+  function reconcileMessengerRuntime() {
+    ensureOverlay();
+    mountTrigger();
+    syncMessengerRuntime();
+  }
+
   function scheduleMount() {
+    if (mountTimer) return;
+    mountTimer = setTimeout(function () {
+      mountTimer = 0;
+      reconcileMessengerRuntime();
+    }, 60);
+  }
+
+  function startObserver() {
+    if (observer || typeof MutationObserver !== 'function') return;
+    var root = document && typeof document.nodeType === 'number' ? document : document.body;
+    if (!root) return;
+    observer = new MutationObserver(scheduleMount);
+    observerRoot = root;
+    try {
+      observer.observe(root, { childList: true, subtree: true });
+    } catch (_) {
+      observer.disconnect();
+      observer = null;
+      observerRoot = null;
+    }
+  }
+
+  function stopObserver() {
     clearTimeout(mountTimer);
-    mountTimer = setTimeout(mountTrigger, 60);
+    mountTimer = 0;
+    if (observer) observer.disconnect();
+    observer = null;
+    observerRoot = null;
   }
 
   function init() {
     injectCss();
-    ensureOverlay();
-    mountTrigger();
-    [250, 800, 1800, 4000].forEach(function (delay) { setTimeout(mountTrigger, delay); });
-    if (!observer && typeof MutationObserver === 'function') {
-      observer = new MutationObserver(scheduleMount);
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
+    reconcileMessengerRuntime();
+    [250, 800, 1800, 4000].forEach(function (delay) { setTimeout(reconcileMessengerRuntime, delay); });
+    startObserver();
     window.addEventListener('resize', scheduleMount, { passive: true });
+    window.addEventListener('pagehide', stopObserver);
+    window.addEventListener('pageshow', function () { reconcileMessengerRuntime(); startObserver(); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

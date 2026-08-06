@@ -18,8 +18,11 @@ test('watcher is single-flight across visibility reschedules',()=>{
 });
 test('script loads share one pending promise and wait for real load',()=>{
   assert.ok(root.includes('var scriptLoads = Object.create(null);'));
-  assert.ok(root.includes('if (pending) return pending.promise;'));
-  assert.ok(root.includes('var entry = { promise: null, cancel: null, script: null, createdByAddon: false };'));
+  assert.ok(root.includes('if (pending) {'));
+  assert.ok(root.includes('pending.source === requestedSource'));
+  assert.ok(root.includes("pending.cancel(new Error('script_source_changed:' + id))"));
+  assert.ok(root.includes('source: requestedSource'));
+  assert.ok(root.includes('forceRecovery: Boolean(forceRecovery)'));
   assert.ok(root.includes("script.addEventListener('load', done, { once: true })"));
   assert.ok(root.includes("script_load_timeout:"));
 });

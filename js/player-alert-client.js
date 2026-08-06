@@ -13,7 +13,7 @@
   var POLL_HIDDEN_MS = 30000;
   var SENDER_KEY = 's666_player_alert_sender_id_v1';
   var LEGACY_SENDER_KEY = 'smfpPlayerAlertSenderId';
-  var state = { inFlight: false, lastSeen: '', timer: 0, stopped: false };
+  var state = { inFlight: false, lastSeen: '', timer: 0, stopped: false, pollInFlight: false, pollSequence: 0 };
 
   // PLAYER_MESSAGE_OVERLAY_INERT_V1 — closed means visually hidden and unable to capture touch.
   function setReceiveOverlayOpen(backdrop, open) {
@@ -77,16 +77,51 @@
 
   function requestJson(url, init, timeoutMs) {
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
-    var timer = setTimeout(function () { if (controller) controller.abort(); }, timeoutMs || REQUEST_TIMEOUT_MS);
     var options = Object.assign({ cache: 'no-store', credentials: 'same-origin' }, init || {});
     if (controller) options.signal = controller.signal;
-    return fetch(url, options).then(function (response) {
-      return response.text().then(function (raw) {
-        var data = {};
-        try { data = raw ? JSON.parse(raw) : {}; } catch (_) { data = { raw: raw }; }
-        return { response: response, data: data };
-      });
-    }).finally(function () { clearTimeout(timer); });
+    return new Promise(function (resolve, reject) {
+      var settled = false;
+      var timer = 0;
+      function cleanup() { clearTimeout(timer); }
+      function timeoutError() {
+        var error = new Error('request_timeout');
+        error.name = 'AbortError';
+        return error;
+      }
+      function fail(error) {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(error);
+      }
+      function succeed(value) {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(value);
+      }
+      timer = setTimeout(function () {
+        if (settled) return;
+        if (controller) {
+          try { controller.abort(); } catch (_) {}
+        }
+        fail(timeoutError());
+      }, timeoutMs || REQUEST_TIMEOUT_MS);
+      var fetchPromise;
+      try {
+        fetchPromise = fetch(url, options);
+      } catch (error) {
+        fail(error);
+        return;
+      }
+      Promise.resolve(fetchPromise).then(function (response) {
+        return response.text().then(function (raw) {
+          var data = {};
+          try { data = raw ? JSON.parse(raw) : {}; } catch (_) { data = { raw: raw }; }
+          succeed({ response: response, data: data });
+        });
+      }).catch(fail);
+    });
   }
 
   function send(message, options) {
@@ -154,30 +189,34 @@
     });
   }
 
+  function bindReceiveOverlay(backdrop) {
+    if (!backdrop || backdrop.__s666PlayerAlertReceiveBound === true) return;
+    backdrop.__s666PlayerAlertReceiveBound = true;
+    backdrop.addEventListener('click', function (event) {
+      var target = event.target;
+      if (target === backdrop || (target && target.id === 'playerAlertReceiveClose')) setReceiveOverlayOpen(backdrop, false);
+    }, true);
+  }
+
   function ensureReceiveOverlay() {
     var backdrop = document.getElementById('playerAlertReceiveBackdrop');
-    if (backdrop) {
-      if (!backdrop.classList.contains('is-open')) setReceiveOverlayOpen(backdrop, false);
-      return backdrop;
+    if (!backdrop) {
+      if (!document.body) return null;
+      backdrop = document.createElement('div');
+      backdrop.id = 'playerAlertReceiveBackdrop';
+      backdrop.className = 'player-alert-backdrop';
+      backdrop.setAttribute('aria-hidden', 'true');
+      backdrop.innerHTML = '<div class="player-alert-modal" role="dialog" aria-modal="true" aria-label="Player message"><h3>666SOUNDsDESIGn PLAYER MESSAGE</h3><div id="playerAlertReceiveText" class="player-alert-message"></div><button id="playerAlertReceiveClose" class="player-alert-close" type="button">CLOSE</button></div>';
+      document.body.appendChild(backdrop);
     }
-    backdrop = document.createElement('div');
-    backdrop.id = 'playerAlertReceiveBackdrop';
-    backdrop.className = 'player-alert-backdrop';
-    backdrop.setAttribute('aria-hidden', 'true');
-    backdrop.innerHTML = '<div class="player-alert-modal" role="dialog" aria-modal="true" aria-label="Player message"><h3>666SOUNDsDESIGn PLAYER MESSAGE</h3><div id="playerAlertReceiveText" class="player-alert-message"></div><button id="playerAlertReceiveClose" class="player-alert-close" type="button">CLOSE</button></div>';
-    document.body.appendChild(backdrop);
-    setReceiveOverlayOpen(backdrop, false);
-    function close() {
-      setReceiveOverlayOpen(backdrop, false);
-    }
-    backdrop.addEventListener('click', function (event) { if (event.target === backdrop) close(); }, true);
-    var closeButton = backdrop.querySelector('#playerAlertReceiveClose');
-    if (closeButton) closeButton.addEventListener('click', close, true);
+    if (!backdrop.classList.contains('is-open')) setReceiveOverlayOpen(backdrop, false);
+    bindReceiveOverlay(backdrop);
     return backdrop;
   }
 
   function showReceived(alert) {
     var backdrop = ensureReceiveOverlay();
+    if (!backdrop) return;
     var text = backdrop.querySelector('#playerAlertReceiveText');
     if (text) text.textContent = clean(alert && alert.message || '', MAX_CHARS);
     setReceiveOverlayOpen(backdrop, true);
@@ -186,12 +225,20 @@
 
   function schedulePoll(delay) {
     clearTimeout(state.timer);
+    state.timer = 0;
     if (state.stopped) return;
-    state.timer = setTimeout(poll, delay);
+    state.timer = setTimeout(function () {
+      state.timer = 0;
+      poll();
+    }, delay);
   }
 
   function poll() {
+    if (state.stopped || state.pollInFlight) return;
+    state.pollInFlight = true;
+    var pollId = ++state.pollSequence;
     get('current').then(function (data) {
+      if (state.stopped || pollId !== state.pollSequence) return;
       if (data.ok && data.active && data.id) {
         var id = String(data.id);
         if (id !== state.lastSeen) {
@@ -200,12 +247,14 @@
         }
       }
     }).finally(function () {
+      if (pollId !== state.pollSequence) return;
+      state.pollInFlight = false;
       schedulePoll(document.hidden ? POLL_HIDDEN_MS : POLL_VISIBLE_MS);
     });
   }
 
   function startPolling() {
-    if (!state.stopped && state.timer) return;
+    if (!state.stopped && (state.timer || state.pollInFlight)) return;
     state.stopped = false;
     ensureReceiveOverlay();
     schedulePoll(1200);
@@ -213,6 +262,8 @@
 
   function stopPolling() {
     state.stopped = true;
+    state.pollSequence += 1;
+    state.pollInFlight = false;
     clearTimeout(state.timer);
     state.timer = 0;
   }
@@ -220,6 +271,8 @@
   document.addEventListener('visibilitychange', function () {
     if (!state.stopped) schedulePoll(document.hidden ? POLL_HIDDEN_MS : 400);
   });
+  window.addEventListener('pagehide', stopPolling);
+  window.addEventListener('pageshow', startPolling);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startPolling, { once: true });
   else startPolling();

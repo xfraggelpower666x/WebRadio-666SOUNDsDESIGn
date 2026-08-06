@@ -215,51 +215,62 @@
   function fetchWithTimeout(url, options, timeoutMs) {
     var limit = timeoutMs || REQUEST_TIMEOUT_MS;
     var controller = typeof AbortController === 'function' ? new AbortController() : null;
-    var controllerId = controller ? ++fetchControllerSequence : 0;
-    var entry = controller ? { controller: controller, abortReason: '', cancel: null } : null;
+    var controllerId = ++fetchControllerSequence;
+    var entry = { controller: controller, abortReason: '', cancel: null };
     var requestOptions = Object.assign({}, options || {});
     var timer = 0;
     var settled = false;
-    if (entry) {
-      activeFetchControllers[controllerId] = entry;
-      requestOptions.signal = controller.signal;
-    }
+    activeFetchControllers[controllerId] = entry;
+    if (controller) requestOptions.signal = controller.signal;
     return new Promise(function (resolve, reject) {
+      function cleanup() {
+        clearTimeout(timer);
+        releaseFetchController(controllerId, entry);
+      }
       function rejectAbort(error) {
-        if (entry && entry.abortReason === 'lifecycle') reject(staleLifecycleError());
+        if (entry.abortReason === 'lifecycle') reject(staleLifecycleError());
         else if (error && error.name === 'AbortError') reject(new Error('discord_request_timeout'));
         else reject(error);
       }
       function cancelRequest(reason) {
-        if (settled) return;
+        if (settled) return false;
         settled = true;
-        clearTimeout(timer);
-        if (entry) entry.abortReason = reason || 'lifecycle';
-        releaseFetchController(controllerId, entry);
+        entry.abortReason = reason || 'lifecycle';
+        cleanup();
         if (controller) {
           try { controller.abort(); } catch (_) {}
         }
         if (reason === 'timeout') reject(new Error('discord_request_timeout'));
         else reject(staleLifecycleError());
+        return true;
       }
-      if (entry) entry.cancel = cancelRequest;
+      entry.cancel = cancelRequest;
       timer = setTimeout(function () { cancelRequest('timeout'); }, limit);
-      fetch(url, requestOptions).then(function (response) {
+      var fetchPromise;
+      try {
+        fetchPromise = fetch(url, requestOptions);
+      } catch (error) {
+        if (!settled) {
+          settled = true;
+          cleanup();
+          rejectAbort(error);
+        }
+        return;
+      }
+      Promise.resolve(fetchPromise).then(function (response) {
         return response.json().catch(function (error) {
           if (error && error.name === 'AbortError') throw error;
           return {};
         }).then(function (data) {
           if (settled) return;
           settled = true;
-          clearTimeout(timer);
-          releaseFetchController(controllerId, entry);
+          cleanup();
           resolve({ response: response, data: data });
         });
       }).catch(function (error) {
         if (settled) return;
         settled = true;
-        clearTimeout(timer);
-        releaseFetchController(controllerId, entry);
+        cleanup();
         rejectAbort(error);
       });
     });
@@ -759,46 +770,62 @@
 
   function scriptSourceMatches(script, src) {
     if (!script) return false;
-    return normalizedScriptSource(script.getAttribute('src') || script.src || '') === normalizedScriptSource(src);
+    var currentSource = script.src || script.getAttribute('src') || '';
+    return normalizedScriptSource(currentSource) === normalizedScriptSource(src);
   }
 
   function scriptIsLoaderOwned(script) {
     return Boolean(script && script.dataset && script.dataset.s666LoaderOwned === '1');
   }
 
-  function findScriptSlot(id, src) {
-    var elementId = id;
+  function recoveryScriptId(id, recoveryIndex) {
+    return recoveryIndex > 0 ? id + 'S666Recovery' + (recoveryIndex > 1 ? String(recoveryIndex) : '') : id;
+  }
+
+  function findScriptSlot(id, src, forceRecovery) {
+    var recoveryIndex = forceRecovery ? 1 : 0;
+    var elementId = recoveryScriptId(id, recoveryIndex);
     var script = document.getElementById(elementId);
-    var recoveryIndex = 0;
-    while (script && !scriptSourceMatches(script, src)) {
+    while (script && (!scriptSourceMatches(script, src) || (forceRecovery && !scriptIsLoaderOwned(script)))) {
       if (scriptIsLoaderOwned(script)) {
         if (script.parentNode) script.parentNode.removeChild(script);
         script = null;
         break;
       }
       recoveryIndex += 1;
-      elementId = id + 'S666Recovery' + (recoveryIndex > 1 ? String(recoveryIndex) : '');
+      elementId = recoveryScriptId(id, recoveryIndex);
       script = document.getElementById(elementId);
     }
     return { elementId: elementId, script: script };
   }
 
   function removeOwnedScriptSlots(id) {
-    var ids = [id];
-    for (var i = 1; i <= 8; i += 1) ids.push(id + 'S666Recovery' + (i > 1 ? String(i) : ''));
-    ids.forEach(function (elementId) {
-      var script = document.getElementById(elementId);
+    var scripts = document.getElementsByTagName ? Array.prototype.slice.call(document.getElementsByTagName('script')) : [];
+    scripts.forEach(function (script) {
+      var elementId = String(script && script.id || '');
+      if (elementId !== id && elementId.indexOf(id + 'S666Recovery') !== 0) return;
       if (scriptIsLoaderOwned(script) && script.parentNode) script.parentNode.removeChild(script);
     });
   }
 
-  function loadScriptOnce(id, src) {
+  function loadScriptOnce(id, src, forceRecovery) {
+    var requestedSource = normalizedScriptSource(src);
     var pending = scriptLoads[id];
-    if (pending) return pending.promise;
-    var entry = { promise: null, cancel: null, script: null, createdByAddon: false };
+    if (pending) {
+      if (pending.source === requestedSource && pending.forceRecovery === Boolean(forceRecovery)) return pending.promise;
+      if (typeof pending.cancel === 'function') pending.cancel(new Error('script_source_changed:' + id));
+    }
+    var entry = {
+      promise: null,
+      cancel: null,
+      script: null,
+      createdByAddon: false,
+      source: requestedSource,
+      forceRecovery: Boolean(forceRecovery)
+    };
     scriptLoads[id] = entry;
     entry.promise = new Promise(function (resolve, reject) {
-      var slot = findScriptSlot(id, src);
+      var slot = findScriptSlot(id, requestedSource, entry.forceRecovery);
       var elementId = slot.elementId;
       var script = slot.script;
       var settled = false;
@@ -847,14 +874,18 @@
         entry.createdByAddon = true;
         appendAfterBinding = true;
         script.id = elementId;
-        script.src = src;
+        script.src = requestedSource;
         script.async = false;
         script.dataset.s666LoaderOwned = '1';
       }
       script.addEventListener('load', done, { once: true });
       script.addEventListener('error', failed, { once: true });
       timeout = setTimeout(timedOut, REQUEST_TIMEOUT_MS);
-      if (appendAfterBinding) document.head.appendChild(script);
+      if (appendAfterBinding) {
+        var host = document.head || document.documentElement;
+        if (!host) return finish(new Error('script_host_missing:' + src));
+        host.appendChild(script);
+      }
     });
     return entry.promise;
   }
@@ -919,7 +950,7 @@
       if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
       removeOwnedScriptSlots(id);
       delete scriptLoads[id];
-      await loadScriptOnce(id, src);
+      await loadScriptOnce(id, src, true);
       if (window.S666PlayerAlertClient && typeof window.S666PlayerAlertClient.send === 'function') return window.S666PlayerAlertClient;
       throw new Error('player_alert_client_missing');
     })();
@@ -942,7 +973,7 @@
       if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return window.S666Messenger;
       removeOwnedScriptSlots(id);
       delete scriptLoads[id];
-      await loadScriptOnce(id, src);
+      await loadScriptOnce(id, src, true);
       if (window.S666Messenger && typeof window.S666Messenger.open === 'function') return window.S666Messenger;
       throw new Error('messenger_overlay_missing');
     })();
