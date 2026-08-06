@@ -1,0 +1,84 @@
+name: Apply Final Direct Discord Race Repair
+
+"on":
+  push:
+    branches:
+      - repair/direct-discord-final-stage-20260806
+    paths:
+      - .github/workflows/direct-discord-final-race-fix.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: direct-discord-final-race-fix-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply-verify-clean:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_SHA: 23ec84940049358b92f2988b9dd081f9a3e21832
+      PATCH_SHA: 42a619fc46c1aea71c3f337953bc54c5b6d7d57ee761af0a3c32a37441d1b532
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify and apply final race repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${PATCH_SHA}  .github/direct-discord-final-race-fix.patch" | sha256sum --check --strict
+          git apply --check .github/direct-discord-final-race-fix.patch
+          git apply .github/direct-discord-final-race-fix.patch
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run complete repository verification
+        run: npm run verify
+
+      - name: Verify final ownership contract and mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "d6dfb6052ffc96dad488900111aa299c3337ef9f7a3d5175dcfcda362aaaf96d"
+          test "$(sha256sum public/js/addons/discord-player-addon-v3.js | cut -d' ' -f1)" = "d6dfb6052ffc96dad488900111aa299c3337ef9f7a3d5175dcfcda362aaaf96d"
+          test "$(sha256sum tests/direct-discord-runtime-owner-repair.test.mjs | cut -d' ' -f1)" = "35e912ae6c6b2648d4812c23efc019ce503bffcedf2ff828e3c861eca8b4ba08"
+          test "$(sha256sum tests/discord-startup-autopost-retry.test.mjs | cut -d' ' -f1)" = "d1c8ae91707173959fbb1854bfb9b9b70e95f9cabfb57a32fd98cc8e8333a18b"
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+          grep -F "var directDeliverySnapshot = null" js/addons/discord-player-addon-v3.js
+          grep -F "if (result && result.direct === true)" js/addons/discord-player-addon-v3.js
+          grep -F "deliveredTarget === currentSettings.autoTarget" js/addons/discord-player-addon-v3.js
+          grep -F "directDeliverySnapshot.webhook === currentAutoCategory.webhook" js/addons/discord-player-addon-v3.js
+
+      - name: Remove staging files and verify exact final scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/direct-discord-final-race-fix.patch
+          rm -f .github/workflows/direct-discord-final-race-fix.yml
+          git add -A
+          cat > /tmp/expected-files.txt <<'EOF'
+          js/addons/discord-player-addon-v3.js
+          public/js/addons/discord-player-addon-v3.js
+          tests/direct-discord-runtime-owner-repair.test.mjs
+          tests/discord-startup-autopost-retry.test.mjs
+          EOF
+          git diff --cached --name-only "${BASE_SHA}" | LC_ALL=C sort > /tmp/actual-files.txt
+          LC_ALL=C sort -o /tmp/expected-files.txt /tmp/expected-files.txt
+          diff -u /tmp/expected-files.txt /tmp/actual-files.txt
+          test "$(wc -l < /tmp/actual-files.txt)" -eq 4
+          test -z "$(git diff --cached --name-only "${BASE_SHA}" | grep -E '^\.github/' || true)"
+
+      - name: Commit clean verified final repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Revalidate all direct automatic destinations after delivery"
+          git push origin HEAD:${GITHUB_REF_NAME}
