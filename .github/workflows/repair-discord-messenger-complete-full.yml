@@ -1,10 +1,17 @@
-# armed retry after workflow registration
+# armed for pull-request quarantine execution
 name: Complete Discord Messenger Player Alert Full Repair
 
 on:
   push:
     branches:
       - repair/discord-messenger-complete-full-20260806
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
@@ -23,6 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: repair/discord-messenger-complete-full-20260806
 
       - name: Verify exact production base and source hashes
         shell: bash
