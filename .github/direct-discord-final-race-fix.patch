@@ -1,0 +1,130 @@
+--- a/js/addons/discord-player-addon-v3.js
++++ b/js/addons/discord-player-addon-v3.js
+@@ -935,6 +935,13 @@
+     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
+     var data = readTrackFromDom();
+     if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
++    var directDeliverySnapshot = null;
++    if (transportMode() === 'direct') {
++      var deliverySettings = loadDirectSettings();
++      var deliveryTarget = directTargetId('/api/discord/nowplaying', data, deliverySettings);
++      var deliveryCategory = directCategory(deliverySettings, deliveryTarget);
++      directDeliverySnapshot = { target: deliveryCategory.id, webhook: deliveryCategory.webhook };
++    }
+     var key = trackKey(data);
+     var postLifecycle = lifecycleGeneration;
+     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
+@@ -947,9 +954,14 @@
+       clientVersion: VERSION
+     }));
+     var commitsAutomaticKey = true;
+-    if (transportMode() === 'direct' && data.directTarget) {
+-      var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result && result.target || '')) >= 0 ? String(result.target) : data.directTarget;
+-      commitsAutomaticKey = deliveredTarget === loadDirectSettings().autoTarget;
++    if (result && result.direct === true) {
++      var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result.target || '')) >= 0 ? String(result.target) : (directDeliverySnapshot && directDeliverySnapshot.target || '');
++      var currentSettings = loadDirectSettings();
++      var currentAutoCategory = directCategory(currentSettings, currentSettings.autoTarget);
++      commitsAutomaticKey = Boolean(directDeliverySnapshot) &&
++        deliveredTarget === currentSettings.autoTarget &&
++        directDeliverySnapshot.target === deliveredTarget &&
++        directDeliverySnapshot.webhook === currentAutoCategory.webhook;
+     }
+     if (commitsAutomaticKey && lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key;
+     return result;
+--- a/public/js/addons/discord-player-addon-v3.js
++++ b/public/js/addons/discord-player-addon-v3.js
+@@ -935,6 +935,13 @@
+     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
+     var data = readTrackFromDom();
+     if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
++    var directDeliverySnapshot = null;
++    if (transportMode() === 'direct') {
++      var deliverySettings = loadDirectSettings();
++      var deliveryTarget = directTargetId('/api/discord/nowplaying', data, deliverySettings);
++      var deliveryCategory = directCategory(deliverySettings, deliveryTarget);
++      directDeliverySnapshot = { target: deliveryCategory.id, webhook: deliveryCategory.webhook };
++    }
+     var key = trackKey(data);
+     var postLifecycle = lifecycleGeneration;
+     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
+@@ -947,9 +954,14 @@
+       clientVersion: VERSION
+     }));
+     var commitsAutomaticKey = true;
+-    if (transportMode() === 'direct' && data.directTarget) {
+-      var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result && result.target || '')) >= 0 ? String(result.target) : data.directTarget;
+-      commitsAutomaticKey = deliveredTarget === loadDirectSettings().autoTarget;
++    if (result && result.direct === true) {
++      var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result.target || '')) >= 0 ? String(result.target) : (directDeliverySnapshot && directDeliverySnapshot.target || '');
++      var currentSettings = loadDirectSettings();
++      var currentAutoCategory = directCategory(currentSettings, currentSettings.autoTarget);
++      commitsAutomaticKey = Boolean(directDeliverySnapshot) &&
++        deliveredTarget === currentSettings.autoTarget &&
++        directDeliverySnapshot.target === deliveredTarget &&
++        directDeliverySnapshot.webhook === currentAutoCategory.webhook;
+     }
+     if (commitsAutomaticKey && lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key;
+     return result;
+--- a/tests/direct-discord-runtime-owner-repair.test.mjs
++++ b/tests/direct-discord-runtime-owner-repair.test.mjs
+@@ -41,18 +41,36 @@
+ });
+ 
+ 
+-test('Manual posts to another category do not consume automatic Now Playing deduplication', async () => {
++test('Every direct Now Playing delivery revalidates the current automatic destination after success', async () => {
+   const addon = await read('js/addons/discord-player-addon-v3.js');
+-  assert.match(addon, /var commitsAutomaticKey = true;/);
+-  assert.match(addon, /var deliveredTarget = DIRECT_CATEGORY_IDS\.indexOf\(String\(result && result\.target \|\| ''\)\) >= 0 \? String\(result\.target\) : data\.directTarget;/);
+-  assert.match(addon, /commitsAutomaticKey = deliveredTarget === loadDirectSettings\(\)\.autoTarget;/);
+-  assert.ok(addon.indexOf('var deliveredTarget =') > addon.indexOf("await postJson('/api/discord/nowplaying'"));
++  assert.match(addon, /var directDeliverySnapshot = null;/);
++  assert.match(addon, /var deliveryTarget = directTargetId\('\/api\/discord\/nowplaying', data, deliverySettings\);/);
++  assert.match(addon, /directDeliverySnapshot = \{ target: deliveryCategory\.id, webhook: deliveryCategory\.webhook \};/);
++  assert.match(addon, /if \(result && result\.direct === true\)/);
++  assert.match(addon, /var deliveredTarget = DIRECT_CATEGORY_IDS\.indexOf\(String\(result\.target \|\| ''\)\) >= 0/);
++  assert.match(addon, /deliveredTarget === currentSettings\.autoTarget/);
++  assert.match(addon, /directDeliverySnapshot\.target === deliveredTarget/);
++  assert.match(addon, /directDeliverySnapshot\.webhook === currentAutoCategory\.webhook/);
++  assert.ok(addon.indexOf('var directDeliverySnapshot =') < addon.indexOf("await postJson('/api/discord/nowplaying'"));
++  assert.ok(addon.indexOf('var currentSettings = loadDirectSettings()') > addon.indexOf("await postJson('/api/discord/nowplaying'"));
+   assert.match(addon, /if \(commitsAutomaticKey && lifecycleIsCurrent\(postLifecycle\)/);
+   assert.match(addon, /postTrackIfChanged\(true, 'manual-now-playing', selectedTarget && selectedTarget\.value\)/);
+   assert.match(addon, /postTrackIfChanged\(true, 'startup-first-now-playing'\)/);
+   assert.match(addon, /postTrackIfChanged\(false, 'watcher-track-change'\)/);
+ });
+ 
++test('Automatic destination ownership truth table covers target and webhook changes in flight', () => {
++  const owns = (snapshot, deliveredTarget, currentAutoTarget, currentAutoWebhook) => Boolean(snapshot) &&
++    deliveredTarget === currentAutoTarget &&
++    snapshot.target === deliveredTarget &&
++    snapshot.webhook === currentAutoWebhook;
++  assert.equal(owns({target:'main',webhook:'A'}, 'main', 'main', 'A'), true);
++  assert.equal(owns({target:'main',webhook:'A'}, 'main', 'community', 'B'), false);
++  assert.equal(owns({target:'community',webhook:'B'}, 'community', 'community', 'B'), true);
++  assert.equal(owns({target:'main',webhook:'A'}, 'main', 'main', 'A2'), false);
++  assert.equal(owns(null, 'main', 'main', 'A'), false);
++});
++
+ test('Canonical visualizer adopts or registers one central graph and reports failures', async () => {
+   const eq = await read('js/equalizer.js');
+   assert.equal(await read('public/js/equalizer.js'), eq);
+--- a/tests/discord-startup-autopost-retry.test.mjs
++++ b/tests/discord-startup-autopost-retry.test.mjs
+@@ -33,8 +33,12 @@
+   assert.ok(root.includes("postJson('/api/discord/manual'"));
+   assert.ok(root.includes("credentials: 'same-origin'"));
+   assert.ok(root.includes('if (commitsAutomaticKey && lifecycleIsCurrent(postLifecycle) && trackKey(readTrackFromDom()) === key && (!result || result.skipped !== true)) lastPostedKey = key'));
+-  assert.ok(root.includes("var deliveredTarget = DIRECT_CATEGORY_IDS.indexOf(String(result && result.target || '')) >= 0 ? String(result.target) : data.directTarget"));
+-  assert.ok(root.includes('commitsAutomaticKey = deliveredTarget === loadDirectSettings().autoTarget'));
+-  assert.ok(root.indexOf('var deliveredTarget =') > root.indexOf("await postJson('/api/discord/nowplaying'"));
++  assert.ok(root.includes("var deliveryTarget = directTargetId('/api/discord/nowplaying', data, deliverySettings)"));
++  assert.ok(root.includes('if (result && result.direct === true)'));
++  assert.ok(root.includes('deliveredTarget === currentSettings.autoTarget'));
++  assert.ok(root.includes('directDeliverySnapshot.target === deliveredTarget'));
++  assert.ok(root.includes('directDeliverySnapshot.webhook === currentAutoCategory.webhook'));
++  assert.ok(root.indexOf('var directDeliverySnapshot =') < root.indexOf("await postJson('/api/discord/nowplaying'"));
++  assert.ok(root.indexOf('var currentSettings = loadDirectSettings()') > root.indexOf("await postJson('/api/discord/nowplaying'"));
+   assert.equal(root.includes('if (!result || result.skipped !== true) lastPostedKey = key'), false);
+ });
