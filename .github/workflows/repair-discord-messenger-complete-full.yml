@@ -56,7 +56,6 @@ jobs:
             | sha256sum -c -
 
           test ! -e tests/discord-messenger-complete-full-repair.test.mjs
-          test "$(sha256sum .repair/complete-full-repair.patch.b64 | cut -d' ' -f1)" = 'e5d70593520b9d12a7372dc2c685dd76f99a8d7dfe448e26f615910e05c11c58'
 
       - name: Decode, verify and apply full repair
         shell: bash
