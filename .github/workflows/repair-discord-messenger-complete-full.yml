@@ -1,17 +1,8 @@
-# armed for pull-request quarantine execution
+# segmented transport staging
 name: Complete Discord Messenger Player Alert Full Repair
 
 on:
-  push:
-    branches:
-      - repair/discord-messenger-complete-full-20260806
-  pull_request:
-    branches:
-      - WebRadio-666SOUNDsDESIGn
-    types:
-      - opened
-      - synchronize
-      - reopened
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -56,12 +47,24 @@ jobs:
             | sha256sum -c -
 
           test ! -e tests/discord-messenger-complete-full-repair.test.mjs
+          printf '%s  %s\n' \
+            '0be552f1216a7906d61fe3ada315e55835baa6e2ab67467838d23a734f59f319' '.repair/complete-full-repair.patch.b64.part01' \
+            '92f90c2e90b4e5c3a1c4009f86c42c1625fb566f85faac9c3cf9482e9a2dcf79' '.repair/complete-full-repair.patch.b64.part02' \
+            '9544b5bdde7cebc6e203100af1c01553d0c9bea4e7bb65c99fa646a46fed6a58' '.repair/complete-full-repair.patch.b64.part03' \
+            '8de93d8158f7eb8c1d8402baa219f558df632ece95ecd2ac9de425f4febc5833' '.repair/complete-full-repair.patch.b64.part04' \
+            '0b30277570d6bc71d39e841ccc1b10cb99521e8b941a74f2c73fa65fb788d94c' '.repair/complete-full-repair.patch.b64.part05' \
+            '8331d996ad3b2ba1a4819228b63ec76cbb8d861fae47280d915f3d31e7bc7c78' '.repair/complete-full-repair.patch.b64.part06' \
+            '61cc4dad3f5979bc0fc6f096a14f6074edb1a1de642601bac2a13ca17be38ab4' '.repair/complete-full-repair.patch.b64.part07' \
+            'dd58165505bceea4db8f3520647590cf34f94052973bd78dad7c487904ba4bb1' '.repair/complete-full-repair.patch.b64.part08' \
+            | sha256sum -c -
 
       - name: Decode, verify and apply full repair
         shell: bash
         run: |
           set -euo pipefail
-          base64 --decode .repair/complete-full-repair.patch.b64 > /tmp/complete-full-repair.patch.gz
+          cat .repair/complete-full-repair.patch.b64.part{01..08} > /tmp/complete-full-repair.patch.b64
+          test "$(sha256sum /tmp/complete-full-repair.patch.b64 | cut -d' ' -f1)" = 'e5d70593520b9d12a7372dc2c685dd76f99a8d7dfe448e26f615910e05c11c58'
+          base64 --decode /tmp/complete-full-repair.patch.b64 > /tmp/complete-full-repair.patch.gz
           test "$(sha256sum /tmp/complete-full-repair.patch.gz | cut -d' ' -f1)" = '86ed859d5ccee0a01c3655bd4351f3c5c59d6542729e6349b375c8bc35103f6c'
           gzip --decompress --stdout /tmp/complete-full-repair.patch.gz > /tmp/complete-full-repair.patch
           test "$(sha256sum /tmp/complete-full-repair.patch | cut -d' ' -f1)" = 'c9ef9589f34627f2669803f1914c1b49639a136677108455122d1f12bbc0e484'
@@ -104,7 +107,7 @@ jobs:
         run: |
           set -euo pipefail
           WORKFLOW='.github/workflows/repair-discord-messenger-complete-full.yml'
-          PAYLOAD='.repair/complete-full-repair.patch.b64'
+          PAYLOAD_PARTS=(.repair/complete-full-repair.patch.b64.part{01..08})
           TARGETS=(
             'js/addons/discord-player-addon-v3.js'
             'public/js/addons/discord-player-addon-v3.js'
@@ -119,7 +122,7 @@ jobs:
           )
 
           git add -- "${TARGETS[@]}"
-          git rm -- "$WORKFLOW" "$PAYLOAD"
+          git rm -- "$WORKFLOW" "${PAYLOAD_PARTS[@]}"
 
           printf '%s\n' "${TARGETS[@]}" | sort > /tmp/expected-scope.txt
           git diff --cached --name-only '6619973e54f35f56d9691b45678f83f5f192d6c5' | sort > /tmp/actual-scope.txt
