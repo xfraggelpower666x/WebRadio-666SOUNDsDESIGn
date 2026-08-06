@@ -29,6 +29,17 @@ test('Direct Now Playing waits for the real audio playing event and worker mode 
   assert.match(addon, /Webhook gelöscht oder ungültig/);
 });
 
+
+test('Manual Now Playing uses the selected category while startup and watcher use Auto Now Playing', async () => {
+  const addon = await read('js/addons/discord-player-addon-v3.js');
+  assert.match(addon, /if \(DIRECT_CATEGORY_IDS\.indexOf\(String\(requested \|\| ''\)\) >= 0\) return String\(requested\);[\s\S]*if \(String\(path\)\.indexOf\('\/nowplaying'\) >= 0\) return settings\.autoTarget;/);
+  assert.match(addon, /postTrackIfChanged\(true, 'manual-now-playing', selectedTarget && selectedTarget\.value\)/);
+  assert.match(addon, /async function postTrackIfChanged\(force, reason, directTarget\)/);
+  assert.match(addon, /data\.directTarget = String\(directTarget\)/);
+  assert.match(addon, /postTrackIfChanged\(true, 'startup-first-now-playing'\)/);
+  assert.match(addon, /postTrackIfChanged\(false, 'watcher-track-change'\)/);
+});
+
 test('Canonical visualizer adopts or registers one central graph and reports failures', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
