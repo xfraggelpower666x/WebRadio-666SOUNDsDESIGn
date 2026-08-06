@@ -2,7 +2,12 @@
 name: Complete Discord Messenger Player Alert Full Repair
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    types:
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
