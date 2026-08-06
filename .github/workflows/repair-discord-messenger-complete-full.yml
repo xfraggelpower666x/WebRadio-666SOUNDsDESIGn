@@ -1,0 +1,130 @@
+name: Complete Discord Messenger Player Alert Full Repair
+
+on:
+  push:
+    branches:
+      - repair/discord-messenger-complete-full-20260806
+
+permissions:
+  contents: write
+
+concurrency:
+  group: complete-discord-messenger-player-alert-full-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout quarantine branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact production base and source hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_SHA='6619973e54f35f56d9691b45678f83f5f192d6c5'
+          PROD_BRANCH='WebRadio-666SOUNDsDESIGn'
+          git fetch origin "$PROD_BRANCH" --depth=1
+          ACTUAL_PROD="$(git rev-parse "origin/$PROD_BRANCH")"
+          test "$ACTUAL_PROD" = "$BASE_SHA"
+          git merge-base --is-ancestor "$BASE_SHA" HEAD
+
+          printf '%s  %s\n' \
+            '9c3a8caf12fc0a3f67cc1073202026cf332b9b09d624ca3025780fc79bff4286' 'js/addons/discord-player-addon-v3.js' \
+            '9c3a8caf12fc0a3f67cc1073202026cf332b9b09d624ca3025780fc79bff4286' 'public/js/addons/discord-player-addon-v3.js' \
+            '2f535496b2f3a4d69a7a8959728d4b465240c6b33a1bfeaa91f386ad9c0aeb8a' 'js/messenger-overlay.js' \
+            '2f535496b2f3a4d69a7a8959728d4b465240c6b33a1bfeaa91f386ad9c0aeb8a' 'public/js/messenger-overlay.js' \
+            '7283b2d81e90b90a35dbdf4ee3d449142c74bf3677f009f5dd520bccc1548435' 'js/player-alert-client.js' \
+            '7283b2d81e90b90a35dbdf4ee3d449142c74bf3677f009f5dd520bccc1548435' 'public/js/player-alert-client.js' \
+            '6b99b6ba48fe79b255612512574617085581027aead3dfecd3730f8e91215eeb' 'tests/discord-blocks-100000-120000-observer-request-authority.test.mjs' \
+            '1eef5b6e797d12fb319e40d7337a3381cd638c58220e9bf6de8a1092d48b19f2' 'tests/discord-blocks-2000-3000-runtime.test.mjs' \
+            '8b72f1327fe9798d7cd6538eda0c3a6daf190647f4bb6aba75400668e7ba8f9c' 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs' \
+            | sha256sum -c -
+
+          test ! -e tests/discord-messenger-complete-full-repair.test.mjs
+          test "$(sha256sum .repair/complete-full-repair.patch.b64 | cut -d' ' -f1)" = 'e5d70593520b9d12a7372dc2c685dd76f99a8d7dfe448e26f615910e05c11c58'
+
+      - name: Decode, verify and apply full repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode .repair/complete-full-repair.patch.b64 > /tmp/complete-full-repair.patch.gz
+          test "$(sha256sum /tmp/complete-full-repair.patch.gz | cut -d' ' -f1)" = '86ed859d5ccee0a01c3655bd4351f3c5c59d6542729e6349b375c8bc35103f6c'
+          gzip --decompress --stdout /tmp/complete-full-repair.patch.gz > /tmp/complete-full-repair.patch
+          test "$(sha256sum /tmp/complete-full-repair.patch | cut -d' ' -f1)" = 'c9ef9589f34627f2669803f1914c1b49639a136677108455122d1f12bbc0e484'
+          git apply --check /tmp/complete-full-repair.patch
+          git apply /tmp/complete-full-repair.patch
+
+      - name: Verify target hashes and runtime mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' \
+            '9dfcc33a7e7ba4e35c0e962a65137ab35b462cee86c81cdb42d317512862d85a' 'js/addons/discord-player-addon-v3.js' \
+            '9dfcc33a7e7ba4e35c0e962a65137ab35b462cee86c81cdb42d317512862d85a' 'public/js/addons/discord-player-addon-v3.js' \
+            'ef39772c611a7ca989b894ff8a1d6849f3ada9d6ee0a6fb77969b2683d9f6cfa' 'js/messenger-overlay.js' \
+            'ef39772c611a7ca989b894ff8a1d6849f3ada9d6ee0a6fb77969b2683d9f6cfa' 'public/js/messenger-overlay.js' \
+            'd15ffd1b1040ddbe6aa1381301a350e89743303dee8346b403c2e27cac9a32ee' 'js/player-alert-client.js' \
+            'd15ffd1b1040ddbe6aa1381301a350e89743303dee8346b403c2e27cac9a32ee' 'public/js/player-alert-client.js' \
+            '70f09dbbb268d031e87b62fcb58886741ab5b244cd284ffe1cbe6906c1f17230' 'tests/discord-blocks-100000-120000-observer-request-authority.test.mjs' \
+            '09f69a741cfb147d496b34c001cf7b01ba92f34d156576407278b89f6394444b' 'tests/discord-blocks-2000-3000-runtime.test.mjs' \
+            '178241c5b93a75b3215cf1c4533a2a776e0f5371ccbd73140ecb23e560ce1f4e' 'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs' \
+            '1d0f2e1b0f26b845c391b873e5d9ff0455cf04008915f0057cedd58659027865' 'tests/discord-messenger-complete-full-repair.test.mjs' \
+            | sha256sum -c -
+
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+          cmp -s js/messenger-overlay.js public/js/messenger-overlay.js
+          cmp -s js/player-alert-client.js public/js/player-alert-client.js
+
+      - name: Install and run complete repository verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run verify | tee /tmp/full-verify.log
+          grep -Eq '^# tests 292$' /tmp/full-verify.log
+          grep -Eq '^# pass 292$' /tmp/full-verify.log
+          grep -Eq '^# fail 0$' /tmp/full-verify.log
+
+      - name: Self-clean transport and verify exact final scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKFLOW='.github/workflows/repair-discord-messenger-complete-full.yml'
+          PAYLOAD='.repair/complete-full-repair.patch.b64'
+          TARGETS=(
+            'js/addons/discord-player-addon-v3.js'
+            'public/js/addons/discord-player-addon-v3.js'
+            'js/messenger-overlay.js'
+            'public/js/messenger-overlay.js'
+            'js/player-alert-client.js'
+            'public/js/player-alert-client.js'
+            'tests/discord-blocks-100000-120000-observer-request-authority.test.mjs'
+            'tests/discord-blocks-2000-3000-runtime.test.mjs'
+            'tests/discord-blocks-80000-100000-abort-loader-status.test.mjs'
+            'tests/discord-messenger-complete-full-repair.test.mjs'
+          )
+
+          git add -- "${TARGETS[@]}"
+          git rm -- "$WORKFLOW" "$PAYLOAD"
+
+          printf '%s\n' "${TARGETS[@]}" | sort > /tmp/expected-scope.txt
+          git diff --cached --name-only '6619973e54f35f56d9691b45678f83f5f192d6c5' | sort > /tmp/actual-scope.txt
+          diff -u /tmp/expected-scope.txt /tmp/actual-scope.txt
+          test "$(wc -l < /tmp/actual-scope.txt)" -eq 10
+
+      - name: Commit complete full repair
+        shell: bash
+        env:
+          BRANCH: repair/discord-messenger-complete-full-20260806
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Complete Discord Messenger Player Alert full repair'
+          git push origin "HEAD:$BRANCH"
