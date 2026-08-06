@@ -50,6 +50,15 @@ test('A changed automatic target or webhook is force-delivered after the old req
   assert.ok(root.indexOf("postTrackIfChanged(true, 'settings-race-retry')") < root.indexOf('function settleDirectRequest'));
 });
 
+test('The guard ignores normal Discord text messages and owns only Now Playing embeds', async () => {
+  const { root } = await sources();
+  assert.match(root, /function isNowPlayingPayload\(init\)/);
+  assert.match(root, /Array\.isArray\(body\.embeds\)/);
+  assert.match(root, /toUpperCase\(\) === 'NOW PLAYING'/);
+  assert.match(root, /if \(!isNowPlayingPayload\(init\)\) return ''/);
+  assert.match(root, /requestWebhook\(input, init\)/);
+});
+
 test('Webhook comparison truth table retries only when the current automatic destination differs', () => {
   const mustRetry = ({ accepted, changed, current, delivered }) => Boolean(
     accepted && changed && current && delivered && current !== delivered

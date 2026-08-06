@@ -155,7 +155,19 @@ S666 Discord Direct Settings Race Guard v1
     }
   }
 
-  function requestWebhook(input) {
+  function isNowPlayingPayload(init) {
+    try {
+      const body = init && typeof init.body === 'string' ? JSON.parse(init.body) : null;
+      return Boolean(body && Array.isArray(body.embeds) && body.embeds.some((embed) =>
+        embed && String(embed.title || '').trim().toUpperCase() === 'NOW PLAYING'
+      ));
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function requestWebhook(input, init) {
+    if (!isNowPlayingPayload(init)) return '';
     try {
       const raw = typeof input === 'string' || input instanceof URL
         ? String(input)
@@ -240,7 +252,7 @@ S666 Discord Direct Settings Race Guard v1
   }
 
   global.fetch = function s666DiscordRaceGuardedFetch(input, init) {
-    const deliveredWebhook = requestWebhook(input);
+    const deliveredWebhook = requestWebhook(input, init);
     if (!deliveredWebhook) return originalFetch(input, init);
     directRequestCount += 1;
     startControlGuard();
