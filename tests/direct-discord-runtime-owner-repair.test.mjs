@@ -30,6 +30,19 @@ test('Worker Now Playing waits for real audio playing while direct remains expli
   assert.match(addon, /directTarget: transportMode\(\) === 'direct' \? settings\.selectedTarget : undefined/);
 });
 
+test('all production player mirrors explicitly select Worker transport', async () => {
+  const files = ['index.html','public/index.html','VELUNA/index.html','veluna/index.html','public/VELUNA/index.html','public/veluna/index.html'];
+  for (const path of files) {
+    const html = await read(path);
+    assert.match(html, /transport:\s*'worker'/, path);
+    assert.doesNotMatch(html, /transport:\s*'direct'/, path);
+    assert.match(html, /discord-player-addon-v3\.js\?v=2026-08-07-worker-restore-v1/, path);
+  }
+  assert.equal(await read('public/index.html'), await read('index.html'));
+  const veluna = await read('VELUNA/index.html');
+  for (const path of ['veluna/index.html','public/VELUNA/index.html','public/veluna/index.html']) assert.equal(await read(path), veluna, path);
+});
+
 test('Canonical visualizer adopts or registers one central graph and reports failures', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
