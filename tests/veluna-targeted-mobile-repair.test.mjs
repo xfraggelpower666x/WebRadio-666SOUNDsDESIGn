@@ -18,7 +18,7 @@ test('VELUNA keeps original DOM and loads current central audio/artwork runtimes
   const canonical = await read(files[0]);
   for (const path of files.slice(1)) assert.equal(await read(path), canonical, path);
   assert.match(canonical, /central-audio-v202/);
-  assert.match(canonical, /2026-08-06-direct-local-v1/);
+  assert.match(canonical, /2026-08-07-worker-restore-v1/);
   assert.match(canonical, /reactive-visual-v183/);
   assert.match(canonical, /reactive-visual-v1232/);
   assert.doesNotMatch(canonical, /s666SplashPreflight|s666SplashPrepaintGate/);

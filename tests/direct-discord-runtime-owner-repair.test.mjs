@@ -3,41 +3,44 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('Discord shooter defaults to direct local transport with exactly three categories', async () => {
+test('Discord shooter restores verified Worker transport as default', async () => {
   const addon = await read('js/addons/discord-player-addon-v3.js');
   assert.equal(await read('public/js/addons/discord-player-addon-v3.js'), addon);
-  assert.match(addon, /DIRECT_STORAGE_KEY = 's666_discord_direct_v1'/);
-  assert.match(addon, /DIRECT_CATEGORY_IDS = \['main', 'community', 'labor'\]/);
-  assert.match(addon, /runtimeConfig\(\)\.transport \|\| 'direct'/);
-  assert.match(addon, /transportMode\(\) === 'direct'/);
-  assert.match(addon, /credentials = 'omit'/);
-  assert.match(addon, /wait=true/);
-  assert.match(addon, /threePostingCategories: true/);
-  assert.match(addon, /data-discord-settings-save/);
-  assert.match(addon, /s666DiscordAutoTarget/);
+  assert.match(addon, /V5\.1-20260807-WORKER-RESTORE-LIVE-JULY/);
+  assert.match(addon, /runtimeConfig\(\)\.transport \|\| 'worker'/);
+  assert.match(addon, /=== 'direct' \? 'direct' : 'worker'/);
+  assert.match(addon, /\/api\/discord\/message/);
+  assert.match(addon, /\/api\/discord\/manual/);
+  assert.match(addon, /\/api\/discord\/nowplaying/);
+  assert.match(addon, /\/api\/discord\/status/);
+  assert.match(addon, /Serverseitiger Discord Shooter/);
+  assert.match(addon, /workerTransportDefault: true/);
+  assert.match(addon, /directLocalTransport: false/);
+  assert.match(addon, /threePostingCategories: false/);
   assert.doesNotMatch(addon, /https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[A-Za-z0-9._-]{10,}/);
 });
 
-test('Direct Now Playing waits for the real audio playing event and worker mode is only legacy explicit', async () => {
+test('Worker Now Playing waits for real audio playing while direct remains explicit fallback', async () => {
   const addon = await read('js/addons/discord-player-addon-v3.js');
   assert.match(addon, /document\.addEventListener\('playing', onPlaying, true\)/);
-  assert.match(addon, /if \(transportMode\(\) === 'direct' && !directPlaybackStarted\) return/);
-  assert.match(addon, /startup-first-now-playing/);
-  assert.match(addon, /clean\(runtimeConfig\(\)\.transport \|\| 'direct'/);
-  assert.match(addon, /\/api\/discord\/status\?t=/);
-  assert.match(addon, /transport: 'direct-local'/);
-  assert.match(addon, /Webhook gelöscht oder ungültig/);
+  assert.match(addon, /if \(!force && !directPlaybackStarted\) return \{ ok: true, skipped: true, reason: 'audio_not_playing' \}/);
+  assert.match(addon, /if \(!directPlaybackStarted\) return;/);
+  assert.match(addon, /credentials: 'same-origin'/);
+  assert.match(addon, /transportMode\(\) === 'direct'/);
+  assert.match(addon, /directTarget: transportMode\(\) === 'direct' \? settings\.selectedTarget : undefined/);
 });
 
-
-test('Manual Now Playing uses the selected category while startup and watcher use Auto Now Playing', async () => {
-  const addon = await read('js/addons/discord-player-addon-v3.js');
-  assert.match(addon, /if \(DIRECT_CATEGORY_IDS\.indexOf\(String\(requested \|\| ''\)\) >= 0\) return String\(requested\);[\s\S]*if \(String\(path\)\.indexOf\('\/nowplaying'\) >= 0\) return settings\.autoTarget;/);
-  assert.match(addon, /postTrackIfChanged\(true, 'manual-now-playing', selectedTarget && selectedTarget\.value\)/);
-  assert.match(addon, /async function postTrackIfChanged\(force, reason, directTarget\)/);
-  assert.match(addon, /data\.directTarget = String\(directTarget\)/);
-  assert.match(addon, /postTrackIfChanged\(true, 'startup-first-now-playing'\)/);
-  assert.match(addon, /postTrackIfChanged\(false, 'watcher-track-change'\)/);
+test('all production player mirrors explicitly select Worker transport', async () => {
+  const files = ['index.html','public/index.html','VELUNA/index.html','veluna/index.html','public/VELUNA/index.html','public/veluna/index.html'];
+  for (const path of files) {
+    const html = await read(path);
+    assert.match(html, /transport:\s*'worker'/, path);
+    assert.doesNotMatch(html, /transport:\s*'direct'/, path);
+    assert.match(html, /discord-player-addon-v3\.js\?v=2026-08-07-worker-restore-v1/, path);
+  }
+  assert.equal(await read('public/index.html'), await read('index.html'));
+  const veluna = await read('VELUNA/index.html');
+  for (const path of ['veluna/index.html','public/VELUNA/index.html','public/veluna/index.html']) assert.equal(await read(path), veluna, path);
 });
 
 test('Canonical visualizer adopts or registers one central graph and reports failures', async () => {
