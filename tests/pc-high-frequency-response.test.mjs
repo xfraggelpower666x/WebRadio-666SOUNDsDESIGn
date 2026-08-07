@@ -1,4 +1,4 @@
-// PC high-frequency response regression contract v1.1.0.
+// PC high-frequency response regression contract v1.2.0.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -16,21 +16,19 @@ test('PC spectrum maps all bars logarithmically through the audible range', asyn
   assert.doesNotMatch(eq, /analysisWindow|normalizedStart|normalizedEnd/);
 });
 
-test('right-side bands use real perceptual compensation without synthetic motion', async () => {
+test('right-side bands use real high-response compensation without synthetic motion', async () => {
   const eq = await read('js/equalizer.js');
   assert.match(eq, /let bandReference = \[\]/);
-  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.24\) \* 0\.34/);
-  assert.match(eq, /const localGate = clamp\(\(local - 6\) \/ 26/);
-  assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.82\) \* 0\.065 \* localGate/);
-  assert.match(eq, /const transientResponse = Math\.pow\(transient, 0\.72\) \* 0\.14 \* localGate/);
-  assert.match(eq, /const energy = spectralResponse \* 0\.68 \+ adaptiveResponse \+ transientResponse/);
-  assert.match(eq, /const peakHeadroom = 0\.78 \+ clamp\(localPeak \/ 255, 0, 1\) \* 0\.22/);
-  assert.match(eq, /const attack = 0\.62 \+ position \* 0\.08/);
+  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
+  assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
+  assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.70\) \* 0\.22 \* localGate/);
+  assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
+  assert.match(eq, /const release = 0\.15 \+ position \* 0\.03/);
+  assert.match(eq, /clamp\(spectralResponse \* 0\.92 \+ adaptiveResponse, 0\.012, 1\)/);
   assert.match(eq, /visualHeadroom: 'balanced'/);
-  assert.doesNotMatch(eq, /position, 1\.18\) \* 1\.10|spectralResponse \* 0\.92|0\.22 \* localGate/);
   assert.match(eq, /frequencyScale: 'logarithmic'/);
   assert.match(eq, /highFrequencyCompensation: true/);
-  assert.doesNotMatch(eq, /Math\.sin|useHybrid|fallbackValue|const mirrored/);
+  assert.doesNotMatch(eq, /Math\.sin|useHybrid|fallbackValue|const mirrored|localPeak - average/);
 });
 
 test('cache markers deliver the compensated analyzer', async () => {
