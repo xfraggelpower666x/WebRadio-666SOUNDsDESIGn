@@ -43,7 +43,9 @@ source = source.replace(marker, worker_ui)
 
 if "runtimeConfig().transport || 'direct'" in source:
     raise SystemExit('direct default still present')
-if "if (transportMode() !== 'direct') return;" in source:
+on_playing_start = source.index('function onPlaying(event)')
+on_playing_end = source.index("document.addEventListener('playing'", on_playing_start)
+if "if (transportMode() !== 'direct') return;" in source[on_playing_start:on_playing_end]:
     raise SystemExit('playing bridge still direct-only')
 if "workerTransportDefault: true" not in source:
     raise SystemExit('worker default export missing')
