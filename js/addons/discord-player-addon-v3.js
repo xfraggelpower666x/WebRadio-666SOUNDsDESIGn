@@ -1,15 +1,15 @@
 /*
  * 666SOUNDsDESIGn Discord Shooter + Veluna Messenger + shared visual bridge.
- * Discord transport defaults to direct browser-to-webhook delivery with three locally stored categories.
- * Webhook URLs never enter the repository, events, logs or payload diagnostics. Worker transport remains explicit legacy fallback only.
+ * Discord transport defaults to the verified same-origin Worker routes with server-side webhook secrets.
+ * Webhook URLs remain server-side in Worker secrets. Direct local transport is retained only as an explicit emergency fallback.
  * Veluna messenger continues to use the authoritative /api/player-alert/* backend.
- * Repair v5.0: restore direct startup Now Playing, three-category shooter and local target migration.
+ * Repair v5.1: restore verified July Worker transport while preserving modern lifecycle, timeout and remount repairs.
  */
 (function () {
   'use strict';
   if (window.S666DiscordPlayerAddonV3 && window.S666DiscordPlayerAddonV3.version) return;
 
-  var VERSION = 'V5.0-20260806-DIRECT-LOCAL-THREE-CATEGORY';
+  var VERSION = 'V5.1-20260807-WORKER-RESTORE-LIVE-JULY';
   var lifecycleGeneration = 0;
   var requestSequence = 0;
   var activeRequestId = 0;
@@ -65,7 +65,7 @@
   }
 
   function transportMode() {
-    return clean(runtimeConfig().transport || 'direct', 24).toLowerCase() === 'worker' ? 'worker' : 'direct';
+    return clean(runtimeConfig().transport || 'worker', 24).toLowerCase() === 'direct' ? 'direct' : 'worker';
   }
 
   function defaultDirectSettings() {
@@ -291,7 +291,6 @@
     if (directPlayingBridgeInstalled) return;
     directPlayingBridgeInstalled = true;
     function onPlaying(event) {
-      if (transportMode() !== 'direct') return;
       if (event && event.target && String(event.target.tagName || '').toLowerCase() !== 'audio') return;
       directPlaybackStarted = true;
       if (!startupAutoPostDone) setTimeout(tryStartupAutoPost, 250);
@@ -817,6 +816,17 @@
       '<div class="s666-discord-gate-actions"><button type="button" class="s666-discord-gate-cancel" data-discord-close>CLOSE</button><button type="button" id="s666DiscordNowPlayingSend" class="s666-discord-gate-submit s666-discord-nowplaying">NOW PLAYING</button><button type="button" id="s666DiscordMessageSend" class="s666-discord-gate-submit">SEND</button></div>' +
       '</div>';
     document.body.appendChild(overlay);
+    if (transportMode() !== 'direct') {
+      var directTargetRow = overlay.querySelector('.s666-discord-target-row');
+      var directSettingsPanel = document.getElementById('s666DiscordDirectSettings');
+      if (directTargetRow && directTargetRow.parentNode) directTargetRow.parentNode.removeChild(directTargetRow);
+      if (directSettingsPanel && directSettingsPanel.parentNode) directSettingsPanel.parentNode.removeChild(directSettingsPanel);
+      var workerNote = document.createElement('div');
+      workerNote.className = 's666-discord-settings-note';
+      workerNote.textContent = 'Serverseitiger Discord Shooter · Ziele bleiben geschützt im Worker';
+      var workerTextArea = document.getElementById('s666DiscordMessageText');
+      if (workerTextArea && workerTextArea.parentNode) workerTextArea.parentNode.insertBefore(workerNote, workerTextArea);
+    }
     bindDiscordMessageOverlay(overlay);
     syncDiscordDraftToOverlay();
     syncDirectSettingsUi();
@@ -920,7 +930,7 @@
     if (typeof message === 'string' && clean(message, 1800)) {
       if (activeRequestId) return requestBusyResult('message');
       var settings = loadDirectSettings();
-      return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800), manual: true, directTarget: settings.selectedTarget }));
+      return postJson('/api/discord/message', Object.assign(readTrackFromDom(), { message: clean(message, 1800), manual: true, directTarget: transportMode() === 'direct' ? settings.selectedTarget : undefined }));
     }
     return openMessageOverlay();
   }
@@ -928,18 +938,18 @@
   async function manualPost() {
     if (activeRequestId) return requestBusyResult('manual');
     var settings = loadDirectSettings();
-    return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true, directTarget: settings.selectedTarget }));
+    return postJson('/api/discord/manual', Object.assign(readTrackFromDom(), { manual: true, directTarget: transportMode() === 'direct' ? settings.selectedTarget : undefined }));
   }
 
   async function postTrackIfChanged(force, reason, directTarget) {
     if (activeRequestId) return requestBusyResult(reason || 'nowplaying');
     var data = readTrackFromDom();
-    if (DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
+    if (transportMode() === 'direct' && DIRECT_CATEGORY_IDS.indexOf(String(directTarget || '')) >= 0) data.directTarget = String(directTarget);
     var key = trackKey(data);
     var postLifecycle = lifecycleGeneration;
     if (!key) return { ok: true, skipped: true, reason: 'no_track_key' };
     if (transportMode() === 'direct' && !directTargetReady('/api/discord/nowplaying', data)) return { ok: true, skipped: true, configured: false, reason: 'direct_target_missing' };
-    if (transportMode() === 'direct' && !force && !directPlaybackStarted) return { ok: true, skipped: true, reason: 'audio_not_playing' };
+    if (!force && !directPlaybackStarted) return { ok: true, skipped: true, reason: 'audio_not_playing' };
     if (key === lastPostedKey && !force) return { ok: true, skipped: true, reason: 'unchanged' };
     var result = await postJson('/api/discord/nowplaying', Object.assign({}, data, {
       force: Boolean(force),
@@ -953,7 +963,7 @@
   function tryStartupAutoPost() {
     clearTimeout(startupTimer);
     if (startupAutoPostDone) return;
-    if (transportMode() === 'direct' && !directPlaybackStarted) return;
+    if (!directPlaybackStarted) return;
     if (transportMode() === 'direct' && !directTargetReady('/api/discord/nowplaying', readTrackFromDom())) {
       startupAutoPostDone = true;
       dispatch('s666:discord-state', { phase: 'startup-autopost-skipped', reason: 'direct_target_missing', transport: 'direct-local' });
@@ -1659,8 +1669,9 @@
     sharedVisualBridge: false,
     sharedStatusBridge: true,
     startupNowPlayingAutopost: true,
-    directLocalTransport: true,
-    threePostingCategories: true,
+    workerTransportDefault: true,
+    directLocalTransport: false,
+    threePostingCategories: false,
     skippedIsNotSent: true,
     transportMode: transportMode,
     directStatus: function () { var settings = loadDirectSettings(); return { configuredTargets: directConfiguredCount(settings), autoReady: Boolean(directCategory(settings, settings.autoTarget).webhook), selectedTarget: settings.selectedTarget, autoTarget: settings.autoTarget }; },
