@@ -1,0 +1,52 @@
+name: Restore Discord Worker PR 20260807
+
+on:
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    if: github.head_ref == 'repair/discord-worker-restore-20260807-final'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/discord-worker-restore-20260807-final
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply verified Worker restore
+        run: python .github/restore-discord-worker-20260807.py
+      - name: Verify mirrors and syntax
+        run: |
+          node --check js/addons/discord-player-addon-v3.js
+          cmp -s js/addons/discord-player-addon-v3.js public/js/addons/discord-player-addon-v3.js
+          cmp -s index.html public/index.html
+          cmp -s VELUNA/index.html veluna/index.html
+          cmp -s VELUNA/index.html public/VELUNA/index.html
+          cmp -s VELUNA/index.html public/veluna/index.html
+          ! grep -E 'https://discord(app)?\.com/api/webhooks/[0-9]+/[A-Za-z0-9._-]{10,}' js/addons/discord-player-addon-v3.js
+      - name: Complete repository gates
+        run: |
+          npm ci
+          npm test
+          npm run verify
+      - name: Commit clean restore
+        run: |
+          rm -f .github/workflows/restore-discord-worker-20260807.yml
+          rm -f .github/workflows/restore-discord-worker-pr-20260807.yml
+          rm -f .github/restore-discord-worker-20260807.py
+          rm -f .github/discord-worker-restore-trigger-20260807
+          rm -f .github/discord-worker-restore-trigger-20260807-b
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Restore verified July Discord Worker transport"
+          git push origin HEAD:repair/discord-worker-restore-20260807-final
