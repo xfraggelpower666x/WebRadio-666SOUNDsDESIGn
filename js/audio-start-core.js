@@ -1,30 +1,18 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.18
+VERSION: v1.2.17
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
 - WebAudio/DSP wird erst nach erfolgreichem Play durch den jeweiligen Player aktiviert.
 - Keine EQ-, Booster-, Limiter- oder Visualizer-Logik in dieser Datei.
-- Lädt den zentralen Radio-Bootscreen für alle Player, die diesen bestehenden Core verwenden.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
   'use strict';
 
   if (global.S666AudioStartCore) return;
-
-  // CENTRAL_RADIO_BOOT_OWNER_v1
-  // Bestehenden gemeinsamen Player-Startpunkt verwenden statt Bootscreen-Kopien pro Player.
-  (function ensureCentralRadioBootScreen() {
-    if (global.S666CentralBootScreen || document.querySelector('script[data-s666-central-boot-loader]')) return;
-    const script = document.createElement('script');
-    script.src = '/js/central-boot-screen.js?v=20260809-radio-v1';
-    script.async = false;
-    script.dataset.s666CentralBootLoader = '1';
-    (document.head || document.documentElement).appendChild(script);
-  })();
 
   function withTimeout(promise, timeoutMs, label) {
     let timer = 0;
