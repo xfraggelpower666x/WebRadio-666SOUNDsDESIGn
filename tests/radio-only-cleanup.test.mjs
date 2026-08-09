@@ -41,9 +41,10 @@ test('radio-only release contains no Chaos or Suno worker payloads', async () =>
 test('asset mirrors contain only the referenced production set', async () => {
   const rootAssets = (await walk(join(rootPath, 'assets'))).sort();
   const publicAssets = (await walk(join(rootPath, 'public', 'assets'))).sort();
-  assert.equal(rootAssets.length, 17);
-  assert.equal(publicAssets.length, 17);
+  assert.equal(rootAssets.length, 18);
+  assert.equal(publicAssets.length, 18);
   const normalizedRoot = rootAssets.map(path => path.split('/assets/')[1]);
   const normalizedPublic = publicAssets.map(path => path.split('/public/assets/')[1]);
   assert.deepEqual(normalizedPublic, normalizedRoot);
+  assert.ok(normalizedRoot.includes('boot-screen/lyvra-radio-boot.jpg'), 'central LYVRA radio boot image must be part of the mirrored production asset set');
 });
