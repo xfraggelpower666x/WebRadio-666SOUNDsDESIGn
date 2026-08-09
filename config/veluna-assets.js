@@ -10,17 +10,20 @@ window.VELUNA_ASSETS = Object.freeze({
   bottomBanner: '/assets/veluna/banner/veluna-bottom-banner.webp',
   splashWebm: '/assets/veluna/splash/veluna-loading-splash.webm',
   splashMp4: '/assets/veluna/splash/veluna-loading-splash.mp4',
+  bootBackground: '/assets/boot-screen/lyvra-radio-boot.jpg',
+  bootTemplate: '/components/boot-screen/boot-screen.html',
   manifest: '/veluna.webmanifest'
 });
 
 /*
- * Shared infrastructure bootstrap v181.
+ * Shared infrastructure bootstrap v184.
  * Wird von 666 PLAYER, VELUNA und internem Notfallplayer geladen.
- * Lädt designneutral: Overlay-Safe-Area, zentrale Audio-/Gerätepolicy und Artwork-Priorität.
+ * Lädt designneutral: zentralen Radio-Bootscreen, Overlay-Safe-Area,
+ * zentrale Audio-/Gerätepolicy und Artwork-Priorität.
  */
 (() => {
   'use strict';
-  const version = '2026-07-23-reactive-visual-v183';
+  const version = '2026-08-09-central-radio-boot-v184';
   const head = document.head || document.documentElement;
   if (!head) return;
 
@@ -143,6 +146,19 @@ window.VELUNA_ASSETS = Object.freeze({
     script.addEventListener('error', reject, { once:true });
     head.appendChild(script);
   });
+
+  /*
+   * CENTRAL_RADIO_BOOT_OWNER_v1
+   * Ein Owner für Main, VELUNA und internen Notfallplayer.
+   * Die Boot-Optik stammt aus dem vorhandenen NEOCITIES-LYVRA-Bootscreen;
+   * Redirect-/Navigationsteile sind nicht Bestandteil des Radio-Runtimes.
+   */
+  loadStyle(`/css/central-boot-screen.css?v=${version}`, 'smfpCentralRadioBoot');
+  void loadScript(
+    `/js/central-boot-screen.js?v=${version}`,
+    'smfpCentralRadioBoot',
+    () => !!window.S666CentralBootScreen
+  ).catch(() => {});
 
   loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
