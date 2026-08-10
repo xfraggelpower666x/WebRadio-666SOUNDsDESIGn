@@ -3,6 +3,7 @@
   "name": "webradio-666soundsdesign-worker",
   "main": "worker-entry.js",
   "compatibility_date": "2026-06-25",
+  "preview_urls": false,
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
@@ -17,12 +18,14 @@
       }
     ]
   },
-  "exports": {
-    "DiscordNowPlayingGate": {
-      "type": "durable-object",
-      "storage": "sqlite"
+  "migrations": [
+    {
+      "tag": "v2026-08-10-discord-nowplaying-gate",
+      "new_sqlite_classes": [
+        "DiscordNowPlayingGate"
+      ]
     }
-  },
+  ],
   "vars": {
     "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
     "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V120",
