@@ -43,6 +43,8 @@
     const page=String(document.body?.dataset?.velunaPage||'').toLowerCase();
     let handoff=false;
 
+    // INTERNAL besitzt historisch Audio-Startlogik am alten bootButton.
+    // Handler nach DOMContentLoaded automatisch auslösen, dann den alten DOM wirklich entfernen.
     if(page==='internal'){
       const legacyButton=document.getElementById('bootButton');
       if(legacyButton&&typeof legacyButton.click==='function'){
@@ -58,7 +60,10 @@
     if(root&&root.isConnected) return root;
     await domReady();
     ensureStyle();
+
+    // Kein Layer-Hide: vorhandener alter Boot-DOM wird nach initialisierten Handlern physisch entfernt.
     detachLegacyBootDom();
+
     const response=await fetch(TEMPLATE_URL,{cache:'no-store',credentials:'same-origin'});
     if(!response.ok) throw new Error('central_boot_template_http_'+response.status);
     const holder=document.createElement('div');
@@ -144,6 +149,7 @@
     global.setTimeout(()=>{
       if(root){root.remove();root=null;}
       document.documentElement.classList.remove('s666-central-boot-active');
+      // Guard: auch verspätet erzeugte historische Boot-DOMs nicht verstecken, sondern entfernen.
       detachLegacyBootDom();
     },300);
   }
