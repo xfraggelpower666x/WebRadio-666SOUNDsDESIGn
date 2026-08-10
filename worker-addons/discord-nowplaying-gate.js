@@ -1,7 +1,9 @@
 /*
- * 666SOUNDsDESIGn — Discord Now Playing Global Gate
- * Version: V1.0-20260810
- * Scope: central dedupe/serialization for automatic Now Playing only.
+ * 666SOUNDsDESIGn — Discord Now Playing Global Gate Core
+ * Version: V1.1-20260810
+ * Scope: central dedupe/serialization logic for automatic Now Playing only.
+ * The Cloudflare DurableObject wrapper lives in worker-entry.js so this core
+ * remains directly testable under Node without Cloudflare runtime imports.
  * No webhook URLs, no secrets, no audio/stream/EQ/boost changes.
  */
 
@@ -32,7 +34,7 @@ function newToken() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
 }
 
-export class DiscordNowPlayingGate {
+export class DiscordNowPlayingGateCore {
   constructor(state, env) {
     this.state = state;
     this.env = env;
