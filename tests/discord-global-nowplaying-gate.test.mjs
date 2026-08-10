@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { DiscordNowPlayingGate } from '../worker-addons/discord-nowplaying-gate.js';
+import { DiscordNowPlayingGateCore } from '../worker-addons/discord-nowplaying-gate.js';
 import { handleDiscordNotifyWithGlobalTrackGate } from '../worker-addons/discord-global-gate-router.js';
 
 class MemoryStorage {
@@ -12,7 +12,7 @@ class MemoryStorage {
 }
 
 function createGateEnvironment() {
-  const gate = new DiscordNowPlayingGate({ storage: new MemoryStorage() }, {});
+  const gate = new DiscordNowPlayingGateCore({ storage: new MemoryStorage() }, {});
   const stub = { fetch: (request) => gate.fetch(request) };
   return {
     DISCORD_NOWPLAYING_GATE: {
