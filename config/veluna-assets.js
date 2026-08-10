@@ -24,7 +24,7 @@ window.VELUNA_ASSETS = Object.freeze({
 (() => {
   'use strict';
   const version = '2026-07-23-reactive-visual-v183';
-  const bootVersion = '2026-08-09-central-radio-boot-v1';
+  const bootVersion = '2026-08-10-central-radio-boot-v2';
   const head = document.head || document.documentElement;
   if (!head) return;
 
