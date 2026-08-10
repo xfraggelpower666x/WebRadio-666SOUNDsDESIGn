@@ -1,13 +1,27 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "webradio-666soundsdesign-worker",
-  "main": "worker.js",
+  "main": "worker-entry.js",
   "compatibility_date": "2026-06-25",
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
     "run_worker_first": true,
     "html_handling": "none"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "DISCORD_NOWPLAYING_GATE",
+        "class_name": "DiscordNowPlayingGate"
+      }
+    ]
+  },
+  "exports": {
+    "DiscordNowPlayingGate": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
   },
   "vars": {
     "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
