@@ -32,3 +32,23 @@ test("main deploy pins the canonical Player Admin Worker contract without commit
   assert.equal(Object.hasOwn(config, "compatibility_flags"), false);
   assert.equal(Object.hasOwn(config.vars, "ADMIN_SERVICE_TOKEN"), false);
 });
+
+test("WebRadio Durable Object stays on Cloudflare declarative exports lifecycle", async () => {
+  for (const path of [
+    "wrangler.jsonc",
+    "workers/webradio-666soundsdesign-worker/wrangler.jsonc"
+  ]) {
+    const config = await readJson(path);
+    assert.equal(Object.hasOwn(config, "migrations"), false, `${path}: legacy migrations must not be restored`);
+    assert.deepEqual(config.exports?.DiscordNowPlayingGate, {
+      type: "durable-object",
+      storage: "sqlite"
+    }, path);
+    assert.ok(
+      config.durable_objects?.bindings?.some(item =>
+        item.name === "DISCORD_NOWPLAYING_GATE" && item.class_name === "DiscordNowPlayingGate"
+      ),
+      `${path}: Discord gate binding missing`
+    );
+  }
+});
