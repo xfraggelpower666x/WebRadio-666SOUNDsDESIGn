@@ -1,6 +1,6 @@
 /*
  * 666SOUNDsDESIGn — Discord Now Playing Global Gate Core
- * Version: V1.2-20260811
+ * Version: V1.3-20260811
  * Scope: existing global Discord dedupe plus isolated Player Alert fallback
  * storage inside separately named Durable Object instances.
  * The Cloudflare DurableObject wrapper lives in worker-entry.js so this core
@@ -60,9 +60,40 @@ function publicAlert(input = {}) {
   };
 }
 
+function alertTimestamp(alert) {
+  return Number(alert && alert.timestamp || 0) || 0;
+}
+
+function alertHistoryKey(alert) {
+  const id = cleanAlertText(alert && alert.id, 80);
+  if (id) return `id:${id}`;
+  return [
+    alertTimestamp(alert),
+    cleanAlertText(alert && (alert.senderId || alert.clientId), 80),
+    cleanAlertText(alert && alert.message, 240)
+  ].join('|');
+}
+
+function orderedPlayerAlertHistory(items) {
+  const seen = new Set();
+  const sorted = (Array.isArray(items) ? items : [])
+    .filter((item) => item && item.message)
+    .slice()
+    .sort((a, b) => alertTimestamp(b) - alertTimestamp(a));
+  const ordered = [];
+  for (const item of sorted) {
+    const key = alertHistoryKey(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    ordered.push(item);
+    if (ordered.length >= PLAYER_ALERT_MAX_HISTORY) break;
+  }
+  return ordered;
+}
+
 function alertActive(alert) {
   if (!alert || !alert.message) return false;
-  const timestamp = Number(alert.timestamp || 0);
+  const timestamp = alertTimestamp(alert);
   return Boolean(timestamp && (Date.now() - timestamp) < PLAYER_ALERT_TTL_MS);
 }
 
@@ -111,23 +142,30 @@ export class DiscordNowPlayingGateCore {
 
     if (path === '/player-alert/history' && requestMethod === 'GET') {
       const history = await this.state.storage.get('playerAlertHistory');
-      const items = Array.isArray(history) ? history.slice(0, PLAYER_ALERT_MAX_HISTORY) : [];
+      const items = orderedPlayerAlertHistory(history);
       return gateJson({ ok: true, source: 'durable-object-fallback', items });
     }
 
     if (path === '/player-alert/store' && requestMethod === 'POST') {
       const alert = publicAlert(input);
       if (!alert) return gateJson({ ok: false, error: 'empty_message' }, 400);
+
+      const storedCurrent = await this.state.storage.get('playerAlertCurrent');
       const storedHistory = await this.state.storage.get('playerAlertHistory');
       const history = Array.isArray(storedHistory) ? storedHistory : [];
-      const deduped = history.filter((item) => item && item.id !== alert.id);
-      deduped.unshift(alert);
-      const bounded = deduped.slice(0, PLAYER_ALERT_MAX_HISTORY);
-      await this.state.storage.put('playerAlertCurrent', alert);
+      const withoutSameId = history.filter((item) => item && item.id !== alert.id);
+      const bounded = orderedPlayerAlertHistory([...withoutSameId, alert]);
+
+      const currentTimestamp = alertTimestamp(storedCurrent);
+      const incomingTimestamp = alertTimestamp(alert);
+      const currentUpdated = !storedCurrent || !currentTimestamp || incomingTimestamp >= currentTimestamp;
+      if (currentUpdated) await this.state.storage.put('playerAlertCurrent', alert);
       await this.state.storage.put('playerAlertHistory', bounded);
+
       return gateJson({
         ok: true,
         stored: true,
+        current_updated: currentUpdated,
         storage_scope: 'global-durable-object',
         alert,
         history_size: bounded.length
