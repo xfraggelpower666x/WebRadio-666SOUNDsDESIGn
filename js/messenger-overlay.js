@@ -74,6 +74,7 @@
       '.s666msg-btn-send{background:linear-gradient(135deg,rgba(22,139,255,.18),rgba(180,92,255,.14));color:#168bff;flex:1;box-shadow:0 0 14px rgba(22,139,255,.18)}',
       '.s666msg-btn-send:disabled{opacity:.45;cursor:default}',
       '.s666msg-trigger{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:34px;padding:5px 12px;border-radius:8px;border:1px solid rgba(22,139,255,.5);background:rgba(7,11,28,.85);color:#168bff;font:900 10px/1 "Courier New",monospace;letter-spacing:.04em;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}',
+      'body[data-veluna-page="veluna"] #actionBar #s666MessageControlButton{min-height:20px;padding:2px 7px;margin-left:auto;flex:0 0 auto;border-radius:8px;font-size:9px;line-height:1}',
       '@media(max-width:760px){.s666msg-panel{width:100%;max-height:88dvh;border-radius:20px 20px 0 0}.s666msg-overlay{align-items:flex-end;padding:0}.s666msg-textarea{font-size:16px!important}.s666msg-emoji{font-size:21px;padding:8px}.s666msg-btn-send,.s666msg-btn-secondary{min-height:44px;font-size:13px}}'
     ].join('');
     document.head.appendChild(style);
@@ -272,10 +273,12 @@
   }
 
   function desiredTarget() {
+    var velunaActionBar = document.body && document.body.getAttribute('data-veluna-page') === 'veluna' ? document.getElementById('actionBar') : null;
+    if (velunaActionBar) return velunaActionBar;
     if (window.innerWidth <= 760) {
-      return document.getElementById('s666StageMobileActions') || document.getElementById('s666MobileExtraRow') || document.querySelector('#mffApp .mff-discord-slot') || document.querySelector('.tool-strip');
+      return document.getElementById('s666StageMobileActions') || document.getElementById('s666MobileExtraRow') || document.querySelector('#mffApp .mff-discord-slot');
     }
-    return document.querySelector('.player-shell .bottom-console .control-toolbar') || document.getElementById('s666MessageActionSlot') || document.querySelector('.tool-strip');
+    return document.querySelector('.player-shell .bottom-console .control-toolbar') || document.getElementById('s666MessageActionSlot');
   }
 
   function mountTrigger() {
@@ -287,7 +290,7 @@
       button.id = 's666MessageControlButton';
       button.type = 'button';
       button.className = 's666msg-trigger';
-      button.textContent = 'MESSAGE';
+      button.textContent = document.body && document.body.getAttribute('data-veluna-page') === 'veluna' ? 'MSG' : 'MESSAGE';
       button.title = 'Broadcast-Nachricht senden';
       button.setAttribute('aria-label', 'Broadcast-Nachricht senden');
     }
