@@ -28,10 +28,10 @@ test('Player Alert worker mirror remains byte-identical', () => {
   assert.equal(workerMirror, worker);
 });
 
-test('shared Messenger mounts in the existing VELUNA action bar without adding a player-control row', () => {
+test('shared Messenger adopts the existing VELUNA MSG trigger instead of creating a duplicate control', () => {
   assert.match(messenger, /data-veluna-page/);
-  assert.match(messenger, /document\.getElementById\('actionBar'\)/);
-  assert.match(messenger, /\? 'MSG' : 'MESSAGE'/);
+  assert.match(messenger, /document\.getElementById\('s666VelunaMessageButton'\)/);
+  assert.doesNotMatch(messenger, /document\.getElementById\('actionBar'\)/);
   assert.doesNotMatch(messenger, /document\.querySelector\('\.tool-strip'\)/);
   assert.equal(messengerMirror, messenger);
 });
