@@ -18,14 +18,12 @@
       }
     ]
   },
-  "migrations": [
-    {
-      "tag": "v2026-08-10-discord-nowplaying-gate",
-      "new_sqlite_classes": [
-        "DiscordNowPlayingGate"
-      ]
+  "exports": {
+    "DiscordNowPlayingGate": {
+      "type": "durable-object",
+      "storage": "sqlite"
     }
-  ],
+  },
   "services": [
     {
       "binding": "PW_ADMIN_WORKER",
