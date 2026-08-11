@@ -19,7 +19,8 @@ const velunaPaths = [
 
 test('Player Alert worker forwards the server-controlled SHA-256 rate identity to the Render backend', () => {
   assert.match(worker, /const rateKey = await playerAlertRateIdentity\(request, env\)/);
-  assert.match(worker, /source:playerAlertCleanText\(payload\.source\|\|'web-player'\),rateKey\};\s*const backend = await playerAlertBackendFetch\(env, '\/send'/);
+  assert.match(worker, /const backendAlert = Object\.assign\(\{\}, alert, \{rateKey\}\);\s*const backend = await playerAlertBackendFetch\(env, '\/send', \{method:'POST', body:JSON\.stringify\(backendAlert\)\}\)/);
+  assert.doesNotMatch(worker, /const alert = \{[^\n]*rateKey[^\n]*\};/);
   assert.match(renderer, /if not rate_key or not re\.fullmatch\(r"\[a-f0-9\]\{64\}", rate_key\)/);
 });
 
