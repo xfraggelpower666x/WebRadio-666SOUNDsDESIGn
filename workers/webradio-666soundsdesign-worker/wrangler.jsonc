@@ -18,14 +18,12 @@
       }
     ]
   },
-  "migrations": [
-    {
-      "tag": "v2026-08-10-discord-nowplaying-gate",
-      "new_sqlite_classes": [
-        "DiscordNowPlayingGate"
-      ]
+  "exports": {
+    "DiscordNowPlayingGate": {
+      "type": "durable-object",
+      "storage": "sqlite"
     }
-  ],
+  },
   "vars": {
     "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
     "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V120",
