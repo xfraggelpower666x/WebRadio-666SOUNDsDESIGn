@@ -13,11 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Compare configured and render.yaml service-name candidates
+      - name: Compare Render candidates and RadioBotAI bridge status
         shell: bash
         env:
           CONFIGURED_URL: https://666soundsdesign-alert-service.onrender.com
           SERVICE_NAME_URL: https://auto-setup-render-for-backend-mp3.onrender.com
+          RADIOBOTAI_URL: https://666radiobotai.666soundsdesign-broadcaster.com
         run: |
           set -Eeuo pipefail
           workdir="$(mktemp -d)"
@@ -35,7 +36,7 @@ jobs:
               "${base}${path}?probe=${GITHUB_SHA}-$(date +%s)" || true)"
             echo "${name} ${path} HTTP=${code:-curl_error} BYTES=$(wc -c < "$out" 2>/dev/null || echo 0)"
             if [[ -s "$out" ]]; then
-              head -c 2400 "$out" || true
+              head -c 3200 "$out" || true
               echo
             fi
           }
@@ -45,4 +46,7 @@ jobs:
           done
           for path in /health /openapi.json /api/player-alert/status; do
             probe service-name "$SERVICE_NAME_URL" "$path"
+          done
+          for path in /health /api/player-alert/status /render/status; do
+            probe radiobotai "$RADIOBOTAI_URL" "$path"
           done
