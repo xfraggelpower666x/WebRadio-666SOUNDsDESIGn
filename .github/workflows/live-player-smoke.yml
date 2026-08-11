@@ -14,6 +14,8 @@ on:
       - "veluna/index.html"
       - "public/VELUNA/index.html"
       - "public/veluna/index.html"
+      - "worker.js"
+      - "workers/webradio-666soundsdesign-worker/worker.js"
       - "js/player-alert-client.js"
       - "public/js/player-alert-client.js"
       - "js/messenger-overlay.js"
@@ -107,11 +109,27 @@ jobs:
 
           fetch_live "/" "$workdir/root.html"
           fetch_live "/veluna/" "$workdir/veluna.html"
+          fetch_live "/internal/" "$workdir/internal.html"
           fetch_live "/js/player-alert-client.js" "$workdir/player-alert-client.js"
           fetch_live "/js/messenger-overlay.js" "$workdir/messenger-overlay.js"
           fetch_live "/api/player-alert/status" "$workdir/player-alert-status.json"
           fetch_live "/api/player-alert/current" "$workdir/player-alert-current.json"
-          fetch_url "${PLAYER_ALERT_BACKEND_URL}/api/player-alert/status" "$workdir/render-player-alert-status.json" "Render Player Alert status"
+
+          # Wake and identify the existing Render service before asserting Player Alert routes.
+          fetch_url "${PLAYER_ALERT_BACKEND_URL}/health" "$workdir/render-health.json" "Render health"
+          fetch_url "${PLAYER_ALERT_BACKEND_URL}/openapi.json" "$workdir/render-openapi.json" "Render OpenAPI"
+
+          render_status_code="$(curl \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 10 \
+            --max-time 35 \
+            --header 'Cache-Control: no-cache' \
+            --output "$workdir/render-player-alert-status.json" \
+            --write-out '%{http_code}' \
+            "${PLAYER_ALERT_BACKEND_URL}/api/player-alert/status?smoke=${GITHUB_SHA}" || true)"
+
           fetch_live "/js/equalizer.js" "$workdir/equalizer.js"
           fetch_live "/js/player-stage-v2.js" "$workdir/player-stage-v2.js"
           fetch_live "/js/veluna-ui.js" "$workdir/veluna-ui.js"
@@ -120,25 +138,53 @@ jobs:
           fetch_live "/css/veluna-theme.css" "$workdir/veluna-theme.css"
 
           grep -Fq "Root Main Player" "$workdir/root.html"
-          grep -Fq "id='mffApp'" "$workdir/root.html" || grep -Fq 'app.id='"'"'mffApp'"'"'' "$workdir/root.html"
+          grep -Fq "app.id='mffApp'" "$workdir/root.html"
           grep -Fq "/js/player-alert-client.js" "$workdir/root.html"
           grep -Fq "/js/messenger-overlay.js" "$workdir/root.html"
+
           grep -Fq 'data-veluna-page="veluna"' "$workdir/veluna.html"
           grep -Fq "/js/player-alert-client.js" "$workdir/veluna.html"
           grep -Fq "/js/messenger-overlay.js" "$workdir/veluna.html"
+
+          grep -Fq 'data-veluna-page="internal"' "$workdir/internal.html"
+          grep -Fq 'id="internalMessageBtn"' "$workdir/internal.html"
+          grep -Fq "/js/player-alert-client.js" "$workdir/internal.html"
+          grep -Fq "/js/messenger-overlay.js" "$workdir/internal.html"
+
           grep -Fq "/api/player-alert/send" "$workdir/player-alert-client.js"
           grep -Fq "/api/player-alert/current" "$workdir/player-alert-client.js"
           grep -Fq "Broadcast-Nachricht senden" "$workdir/messenger-overlay.js"
 
-          node - "$workdir/player-alert-status.json" "$workdir/player-alert-current.json" "$workdir/render-player-alert-status.json" <<'NODE'
+          node - "$workdir/player-alert-status.json" "$workdir/player-alert-current.json" "$workdir/render-health.json" "$workdir/render-openapi.json" "$workdir/render-player-alert-status.json" "$render_status_code" <<'NODE'
           const fs = require('node:fs');
-          const [workerPath, currentPath, renderPath] = process.argv.slice(2);
+          const [workerPath, currentPath, healthPath, openapiPath, renderStatusPath, renderStatusCode] = process.argv.slice(2);
           const worker = JSON.parse(fs.readFileSync(workerPath, 'utf8'));
           const current = JSON.parse(fs.readFileSync(currentPath, 'utf8'));
-          const render = JSON.parse(fs.readFileSync(renderPath, 'utf8'));
+          const health = JSON.parse(fs.readFileSync(healthPath, 'utf8'));
+          const openapi = JSON.parse(fs.readFileSync(openapiPath, 'utf8'));
+          const paths = Object.keys(openapi.paths || {});
 
           if (worker.ok !== true) throw new Error(`Worker Player Alert status not ok: ${JSON.stringify(worker)}`);
-          if (current.ok !== true) throw new Error(`Worker Player Alert current not ok: ${JSON.stringify(current)}`);
+          if (typeof current.active !== 'boolean') throw new Error(`Worker Player Alert current contract invalid: ${JSON.stringify(current)}`);
+          if (health.ok !== true) throw new Error(`Render health not ok: ${JSON.stringify(health)}`);
+
+          const requiredPaths = [
+            '/api/player-alert/status',
+            '/api/player-alert/send',
+            '/api/player-alert/current',
+            '/api/player-alert/history'
+          ];
+          const missingPaths = requiredPaths.filter(path => !paths.includes(path));
+          if (missingPaths.length) {
+            console.error(`RENDER_HEALTH=${JSON.stringify(health)}`);
+            console.error(`RENDER_OPENAPI_PATHS=${JSON.stringify(paths)}`);
+            throw new Error(`Render deployment is missing Player Alert routes: ${missingPaths.join(', ')}`);
+          }
+
+          if (String(renderStatusCode) !== '200') {
+            throw new Error(`Render Player Alert status returned HTTP ${renderStatusCode}`);
+          }
+          const render = JSON.parse(fs.readFileSync(renderStatusPath, 'utf8'));
           if (render.ok !== true) throw new Error(`Render Player Alert status not ok: ${JSON.stringify(render)}`);
           if (render.release_ready !== true) throw new Error(`Render Player Alert backend not release-ready: ${JSON.stringify(render)}`);
           if (render.shared_persistence !== true) throw new Error(`Render Player Alert backend has no shared persistence: ${JSON.stringify(render)}`);
@@ -146,7 +192,8 @@ jobs:
 
           console.log('PLAYER ALERT LIVE BUS PASS');
           console.log(`WORKER_STATUS=${JSON.stringify(worker)}`);
-          console.log(`CURRENT_ACTIVE=${Boolean(current.active)}`);
+          console.log(`CURRENT_SOURCE=${String(current.source || '')}`);
+          console.log(`RENDER_HEALTH=${JSON.stringify(health)}`);
           console.log(`RENDER_STORAGE_SCOPE=${render.storage_scope}`);
           NODE
 
