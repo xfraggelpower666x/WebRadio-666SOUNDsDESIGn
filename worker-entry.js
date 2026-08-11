@@ -2,6 +2,7 @@ import { DurableObject } from 'cloudflare:workers';
 import worker from './worker.js';
 import { handleDiscordNotifyWithGlobalTrackGate } from './worker-addons/discord-global-gate-router.js';
 import { DiscordNowPlayingGateCore } from './worker-addons/discord-nowplaying-gate.js';
+import { handlePlayerAlertWithGlobalFallback } from './worker-addons/player-alert-global-fallback.js';
 
 export class DiscordNowPlayingGate extends DurableObject {
   constructor(ctx, env) {
@@ -16,9 +17,14 @@ export class DiscordNowPlayingGate extends DurableObject {
 
 /*
  * 666SOUNDsDESIGn — Production Worker Entry
- * Version: V1.1-20260810-DISCORD-GLOBAL-NOWPLAYING-GATE
- * Scope: intercept automatic /api/discord/nowplaying only, then delegate every
- * other route and all existing radio behavior unchanged to worker.js.
+ * Version: V1.2-20260811-GLOBAL-PLAYER-ALERT-FALLBACK
+ * Scope:
+ * - preserve automatic Discord Now Playing global gate
+ * - preserve worker.js as authoritative radio/player implementation
+ * - add a global Durable Object fallback for /api/player-alert/* so an
+ *   unavailable Render/KV path cannot degrade cross-network messaging to an
+ *   edge-local cache only
+ * No new Worker/resource and no audio/stream/EQ/boost changes.
  */
 export default {
   async fetch(request, env, ctx) {
@@ -26,6 +32,13 @@ export default {
     const path = url.pathname.replace(/\/+$/, '');
     if (path === '/api/discord/nowplaying' && request.method === 'POST') {
       return handleDiscordNotifyWithGlobalTrackGate(
+        request,
+        env,
+        (forwardRequest, forwardEnv) => worker.fetch(forwardRequest, forwardEnv, ctx)
+      );
+    }
+    if (path.startsWith('/api/player-alert/')) {
+      return handlePlayerAlertWithGlobalFallback(
         request,
         env,
         (forwardRequest, forwardEnv) => worker.fetch(forwardRequest, forwardEnv, ctx)
