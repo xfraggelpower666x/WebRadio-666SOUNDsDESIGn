@@ -279,6 +279,9 @@
   }
 
   function mountTrigger() {
+    if (document.body && document.body.getAttribute('data-veluna-page') === 'veluna') {
+      return Boolean(document.getElementById('s666VelunaMessageButton'));
+    }
     var target = desiredTarget();
     if (!target) return false;
     var button = document.getElementById('s666MessageControlButton');
