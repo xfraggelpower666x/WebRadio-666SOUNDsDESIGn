@@ -156,7 +156,7 @@ jobs:
           grep -Fq "/js/messenger-overlay.js" "$workdir/internal.html"
 
           grep -Fq "/api/player-alert/send" "$workdir/player-alert-client.js"
-          grep -Fq "/api/player-alert/current" "$workdir/player-alert-client.js"
+          grep -Fq "current: function () { return get('current'); }" "$workdir/player-alert-client.js"
           grep -Fq "Broadcast-Nachricht senden" "$workdir/messenger-overlay.js"
 
           node - "$workdir/player-alert-status.json" "$workdir/player-alert-current.json" "$workdir/render-health.json" "$workdir/render-openapi.json" "$workdir/render-player-alert-status.json" "$render_status_code" <<'NODE'
