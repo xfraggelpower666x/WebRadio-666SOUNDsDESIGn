@@ -1,13 +1,16 @@
 /*
  * 666SOUNDsDESIGn — Discord Now Playing Global Gate Core
- * Version: V1.1-20260810
- * Scope: central dedupe/serialization logic for automatic Now Playing only.
+ * Version: V1.2-20260811
+ * Scope: existing global Discord dedupe plus isolated Player Alert fallback
+ * storage inside separately named Durable Object instances.
  * The Cloudflare DurableObject wrapper lives in worker-entry.js so this core
  * remains directly testable under Node without Cloudflare runtime imports.
  * No webhook URLs, no secrets, no audio/stream/EQ/boost changes.
  */
 
 const PENDING_TTL_MS = 90000;
+const PLAYER_ALERT_TTL_MS = 900000;
+const PLAYER_ALERT_MAX_HISTORY = 30;
 
 function gateJson(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -25,6 +28,42 @@ function cleanKey(value) {
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 800);
+}
+
+function cleanAlertText(value, limit = 240) {
+  return String(value || '')
+    .replace(/[<>]/g, '')
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, limit);
+}
+
+function publicAlert(input = {}) {
+  const now = Date.now();
+  const timestamp = Number(input.timestamp || 0) || now;
+  const senderId = cleanAlertText(input.senderId || input.clientId || 'anonymous', 80) || 'anonymous';
+  const message = cleanAlertText(input.message, 240);
+  if (!message) return null;
+  return {
+    ok: true,
+    active: true,
+    id: cleanAlertText(input.id, 80) || `do-${timestamp}`,
+    message,
+    username: cleanAlertText(input.username || 'Broadcast', 28) || 'Broadcast',
+    senderId,
+    clientId: senderId,
+    timestamp,
+    createdAt: cleanAlertText(input.createdAt, 80) || new Date(timestamp).toISOString(),
+    version: cleanAlertText(input.version, 80),
+    source: cleanAlertText(input.clientSource || input.source || 'durable-object-fallback', 80)
+  };
+}
+
+function alertActive(alert) {
+  if (!alert || !alert.message) return false;
+  const timestamp = Number(alert.timestamp || 0);
+  return Boolean(timestamp && (Date.now() - timestamp) < PLAYER_ALERT_TTL_MS);
 }
 
 function newToken() {
@@ -48,6 +87,56 @@ export class DiscordNowPlayingGateCore {
     return next;
   }
 
+  async handlePlayerAlert(path, requestMethod, input) {
+    if (path === '/player-alert/status' && requestMethod === 'GET') {
+      const current = await this.state.storage.get('playerAlertCurrent');
+      const history = await this.state.storage.get('playerAlertHistory');
+      return gateJson({
+        ok: true,
+        backend: 'durable-object',
+        storage_scope: 'global-durable-object',
+        shared_persistence: true,
+        current_active: alertActive(current),
+        history_size: Array.isArray(history) ? history.length : 0
+      });
+    }
+
+    if (path === '/player-alert/current' && requestMethod === 'GET') {
+      const current = await this.state.storage.get('playerAlertCurrent');
+      if (!alertActive(current)) {
+        return gateJson({ ok: true, active: false, source: 'durable-object-fallback' });
+      }
+      return gateJson({ ...current, ok: true, active: true, source: 'durable-object-fallback' });
+    }
+
+    if (path === '/player-alert/history' && requestMethod === 'GET') {
+      const history = await this.state.storage.get('playerAlertHistory');
+      const items = Array.isArray(history) ? history.slice(0, PLAYER_ALERT_MAX_HISTORY) : [];
+      return gateJson({ ok: true, source: 'durable-object-fallback', items });
+    }
+
+    if (path === '/player-alert/store' && requestMethod === 'POST') {
+      const alert = publicAlert(input);
+      if (!alert) return gateJson({ ok: false, error: 'empty_message' }, 400);
+      const storedHistory = await this.state.storage.get('playerAlertHistory');
+      const history = Array.isArray(storedHistory) ? storedHistory : [];
+      const deduped = history.filter((item) => item && item.id !== alert.id);
+      deduped.unshift(alert);
+      const bounded = deduped.slice(0, PLAYER_ALERT_MAX_HISTORY);
+      await this.state.storage.put('playerAlertCurrent', alert);
+      await this.state.storage.put('playerAlertHistory', bounded);
+      return gateJson({
+        ok: true,
+        stored: true,
+        storage_scope: 'global-durable-object',
+        alert,
+        history_size: bounded.length
+      });
+    }
+
+    return gateJson({ ok: false, error: 'not_found' }, 404);
+  }
+
   async handle(request) {
     if (request.method !== 'POST' && request.method !== 'GET') {
       return gateJson({ ok: false, error: 'method_not_allowed' }, 405);
@@ -58,6 +147,10 @@ export class DiscordNowPlayingGateCore {
     let input = {};
     if (request.method === 'POST') {
       try { input = await request.json(); } catch (_) { input = {}; }
+    }
+
+    if (path.startsWith('/player-alert/')) {
+      return this.handlePlayerAlert(path, request.method, input);
     }
 
     if (path === '/status') {
