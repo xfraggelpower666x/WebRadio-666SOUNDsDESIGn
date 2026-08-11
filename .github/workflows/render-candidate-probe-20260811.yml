@@ -11,7 +11,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 7
     steps:
       - name: Compare Render candidates and RadioBotAI bridge status
         shell: bash
@@ -43,6 +43,17 @@ jobs:
             fi
           }
 
+          probe_headers() {
+            local name="$1"
+            local base="$2"
+            echo "===== HEADERS ${name} ====="
+            curl --silent --show-error --location --connect-timeout 10 --max-time 35 \
+              --dump-header - --output /dev/null \
+              --header 'Cache-Control: no-cache' \
+              "${base}/health?probe=${GITHUB_SHA}-headers-$(date +%s)" || true
+            echo "===== END HEADERS ${name} ====="
+          }
+
           for path in /health /openapi.json /api/player-alert/status; do
             probe configured "$CONFIGURED_URL" "$path"
           done
@@ -58,3 +69,7 @@ jobs:
           for path in /health /api/player-alert/status /render/status; do
             probe radiobotai "$RADIOBOTAI_URL" "$path"
           done
+
+          probe_headers service-name "$SERVICE_NAME_URL"
+          probe_headers radiobot-player-alert-alias "$RADIOBOT_PLAYER_ALERT_ALIAS"
+          probe_headers radiobot-backend-alias "$RADIOBOT_BACKEND_ALIAS"
