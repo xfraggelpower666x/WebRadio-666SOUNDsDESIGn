@@ -758,7 +758,7 @@ async function handlePlayerAlertV152(request, env){
       const last = Number(rate.last || 0);
       if(last && (now - last) < PLAYER_ALERT_RATE_MS) return playerAlertJson({ok:false,error:'rate_limited',retryAfterMs:PLAYER_ALERT_RATE_MS - (now-last)},429);
     }
-    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,username,senderId,clientId:senderId,createdAt:new Date(now).toISOString(),timestamp:now,version:playerAlertCleanText(payload.version||''),source:playerAlertCleanText(payload.source||'web-player')};
+    const alert = {ok:true,active:true,id:String(now)+'-'+Math.random().toString(36).slice(2,8),message,username,senderId,clientId:senderId,createdAt:new Date(now).toISOString(),timestamp:now,version:playerAlertCleanText(payload.version||''),source:playerAlertCleanText(payload.source||'web-player'),rateKey};
     const backend = await playerAlertBackendFetch(env, '/send', {method:'POST', body:JSON.stringify(alert)});
     if(backend && backend.ok){
       await playerAlertKvPut(env, rateKvKey, {last:now}, 180);

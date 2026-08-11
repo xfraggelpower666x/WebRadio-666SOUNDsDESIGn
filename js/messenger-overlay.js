@@ -273,9 +273,9 @@
 
   function desiredTarget() {
     if (window.innerWidth <= 760) {
-      return document.getElementById('s666StageMobileActions') || document.getElementById('s666MobileExtraRow') || document.querySelector('#mffApp .mff-discord-slot');
+      return document.getElementById('s666StageMobileActions') || document.getElementById('s666MobileExtraRow') || document.querySelector('#mffApp .mff-discord-slot') || document.querySelector('.tool-strip');
     }
-    return document.querySelector('.player-shell .bottom-console .control-toolbar') || document.getElementById('s666MessageActionSlot');
+    return document.querySelector('.player-shell .bottom-console .control-toolbar') || document.getElementById('s666MessageActionSlot') || document.querySelector('.tool-strip');
   }
 
   function mountTrigger() {
