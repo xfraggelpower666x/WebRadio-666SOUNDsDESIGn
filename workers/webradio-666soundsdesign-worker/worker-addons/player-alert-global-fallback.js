@@ -216,11 +216,17 @@ export async function handlePlayerAlertWithGlobalFallback(request, env, forward)
       }, primary.status);
     }
 
-    if (primaryHasItems) return primary;
+    if (primaryHasItems) {
+      return json({
+        ...data,
+        items: mergeHistoryItems(data, null)
+      }, primary.status);
+    }
 
     if (busHasItems) {
       return json({
         ...bus.data,
+        items: mergeHistoryItems(null, bus.data),
         source: 'durable-object-fallback',
         fallbackFrom: responseSource(data) || 'none'
       });
