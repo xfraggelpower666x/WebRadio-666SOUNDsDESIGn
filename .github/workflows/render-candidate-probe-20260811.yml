@@ -11,7 +11,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
       - name: Compare Render candidates and RadioBotAI bridge status
         shell: bash
@@ -19,6 +19,8 @@ jobs:
           CONFIGURED_URL: https://666soundsdesign-alert-service.onrender.com
           SERVICE_NAME_URL: https://auto-setup-render-for-backend-mp3.onrender.com
           RADIOBOTAI_URL: https://666radiobotai.666soundsdesign-broadcaster.com
+          RADIOBOT_PLAYER_ALERT_ALIAS: https://666webradio.666soundsdesign-broadcaster.com
+          RADIOBOT_BACKEND_ALIAS: https://666radiobotai-backend.666soundsdesign-broadcaster.com
         run: |
           set -Eeuo pipefail
           workdir="$(mktemp -d)"
@@ -46,6 +48,12 @@ jobs:
           done
           for path in /health /openapi.json /api/player-alert/status; do
             probe service-name "$SERVICE_NAME_URL" "$path"
+          done
+          for path in /health /openapi.json /api/player-alert/status; do
+            probe radiobot-player-alert-alias "$RADIOBOT_PLAYER_ALERT_ALIAS" "$path"
+          done
+          for path in /health /openapi.json /api/player-alert/status; do
+            probe radiobot-backend-alias "$RADIOBOT_BACKEND_ALIAS" "$path"
           done
           for path in /health /api/player-alert/status /render/status; do
             probe radiobotai "$RADIOBOTAI_URL" "$path"
