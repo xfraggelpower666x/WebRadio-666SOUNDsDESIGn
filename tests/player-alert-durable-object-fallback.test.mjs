@@ -353,6 +353,69 @@ test('merged history deduplicates mirrored ids, sorts newest-first and limits LA
   }
 });
 
+test('backend-only history is normalized, deduplicated, sorted and limited to LAST 20', async () => {
+  const core = new DiscordNowPlayingGateCore(memoryState(), {});
+  const env = durableEnv(core);
+  const now = Date.now();
+  const backendItems = [];
+  for (let index = 1; index <= 25; index += 1) {
+    backendItems.push({
+      id: `backend-only-${index}`,
+      message: `backend-only message ${index}`,
+      timestamp: now - (index * 1000),
+      senderId: 'sender-backend-only',
+      source: 'backend'
+    });
+  }
+  backendItems.push({ ...backendItems[0] });
+  backendItems.reverse();
+
+  const response = await handlePlayerAlertWithGlobalFallback(
+    new Request('https://radio.test/api/player-alert/history'),
+    env,
+    async () => json({ ok: true, source: 'backend', items: backendItems })
+  );
+  const data = await response.json();
+
+  assert.equal(data.source, 'backend');
+  assert.equal(data.items.length, 20);
+  assert.equal(data.items.filter((item) => item.id === 'backend-only-1').length, 1);
+  assert.equal(data.items[0].id, 'backend-only-1');
+  for (let index = 1; index < data.items.length; index += 1) {
+    assert.ok(Number(data.items[index - 1].timestamp) >= Number(data.items[index].timestamp));
+  }
+});
+
+test('Durable-Object-only history is normalized and limited to LAST 20 at the public route', async () => {
+  const core = new DiscordNowPlayingGateCore(memoryState(), {});
+  const env = durableEnv(core);
+  const now = Date.now();
+
+  for (let index = 1; index <= 25; index += 1) {
+    await store(core, {
+      id: `do-only-${index}`,
+      message: `do-only message ${index}`,
+      timestamp: now - (index * 1000),
+      senderId: 'sender-do-only',
+      source: 'cache-tertiary'
+    });
+  }
+
+  const response = await handlePlayerAlertWithGlobalFallback(
+    new Request('https://radio.test/api/player-alert/history'),
+    env,
+    async () => json({ ok: true, source: 'none', items: [] })
+  );
+  const data = await response.json();
+
+  assert.equal(data.source, 'durable-object-fallback');
+  assert.equal(data.items.length, 20);
+  assert.equal(data.items[0].id, 'do-only-1');
+  for (let index = 1; index < data.items.length; index += 1) {
+    assert.ok(Number(data.items[index - 1].timestamp) >= Number(data.items[index].timestamp));
+  }
+});
+
 test('status advertises the global Durable Object fallback without exposing secrets', async () => {
   const core = new DiscordNowPlayingGateCore(memoryState(), {});
   const env = durableEnv(core);
