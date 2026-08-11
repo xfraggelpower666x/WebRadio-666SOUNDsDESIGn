@@ -218,7 +218,7 @@ jobs:
               echo "FAIL primary-player-actions.css still owns visualizer geometry" >&2
               exit 1
             fi
-            grep -Fq "VELUNA Central UI Runtime v1.2.26" "$workdir/veluna-ui.js"
+            grep -Fq "VELUNA Central UI Runtime v1.2.32" "$workdir/veluna-ui.js"
             grep -Fq "installPersistentActiveState" "$workdir/veluna-ui.js"
             grep -Fq "velunaVolumeSlider" "$workdir/veluna-ui.js"
             grep -Fq "veluna_volume_v1" "$workdir/veluna-ui.js"
