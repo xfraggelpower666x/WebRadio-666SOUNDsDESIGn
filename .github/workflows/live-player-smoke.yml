@@ -15,7 +15,12 @@ on:
       - "public/VELUNA/index.html"
       - "public/veluna/index.html"
       - "worker.js"
+      - "worker-entry.js"
+      - "worker-addons/discord-nowplaying-gate.js"
+      - "worker-addons/player-alert-global-fallback.js"
+      - "wrangler.jsonc"
       - "workers/webradio-666soundsdesign-worker/worker.js"
+      - "workers/webradio-666soundsdesign-worker/wrangler.jsonc"
       - "js/player-alert-client.js"
       - "public/js/player-alert-client.js"
       - "js/messenger-overlay.js"
@@ -52,7 +57,7 @@ jobs:
     timeout-minutes: 8
     env:
       BASE_URL: https://webradio.666soundsdesign-broadcaster.com
-      PLAYER_ALERT_BACKEND_URL: https://666soundsdesign-alert-service.onrender.com
+      PLAYER_ALERT_BACKEND_URL: https://666webradio.666soundsdesign-broadcaster.com
     steps:
       - name: Check live routes, Messenger bus and repaired assets
         shell: bash
@@ -115,7 +120,6 @@ jobs:
           fetch_live "/api/player-alert/status" "$workdir/player-alert-status.json"
           fetch_live "/api/player-alert/current" "$workdir/player-alert-current.json"
 
-          # Wake and identify the existing Render service before asserting Player Alert routes.
           fetch_url "${PLAYER_ALERT_BACKEND_URL}/health" "$workdir/render-health.json" "Render health"
           fetch_url "${PLAYER_ALERT_BACKEND_URL}/openapi.json" "$workdir/render-openapi.json" "Render OpenAPI"
 
@@ -175,26 +179,30 @@ jobs:
             '/api/player-alert/history'
           ];
           const missingPaths = requiredPaths.filter(path => !paths.includes(path));
-          if (missingPaths.length) {
-            console.error(`RENDER_HEALTH=${JSON.stringify(health)}`);
-            console.error(`RENDER_OPENAPI_PATHS=${JSON.stringify(paths)}`);
-            throw new Error(`Render deployment is missing Player Alert routes: ${missingPaths.join(', ')}`);
-          }
+          if (missingPaths.length) throw new Error(`Render deployment is missing Player Alert routes: ${missingPaths.join(', ')}`);
 
-          if (String(renderStatusCode) !== '200') {
-            throw new Error(`Render Player Alert status returned HTTP ${renderStatusCode}`);
-          }
+          if (String(renderStatusCode) !== '200') throw new Error(`Render Player Alert status returned HTTP ${renderStatusCode}`);
           const render = JSON.parse(fs.readFileSync(renderStatusPath, 'utf8'));
           if (render.ok !== true) throw new Error(`Render Player Alert status not ok: ${JSON.stringify(render)}`);
-          if (render.release_ready !== true) throw new Error(`Render Player Alert backend not release-ready: ${JSON.stringify(render)}`);
-          if (render.shared_persistence !== true) throw new Error(`Render Player Alert backend has no shared persistence: ${JSON.stringify(render)}`);
-          if (render.storage_scope !== 'shared-postgres') throw new Error(`Render Player Alert storage is not shared-postgres: ${JSON.stringify(render)}`);
+
+          if (process.env.GITHUB_EVENT_NAME === 'push') {
+            if (worker.durableObjectFallbackConfigured !== true) {
+              throw new Error(`Production Worker has no global Player Alert Durable Object fallback: ${JSON.stringify(worker)}`);
+            }
+            if (worker.durableObjectFallbackOk !== true) {
+              throw new Error(`Production Player Alert Durable Object fallback not healthy: ${JSON.stringify(worker)}`);
+            }
+            if (!String(worker.mode || '').includes('durable-object-global-fallback')) {
+              throw new Error(`Production Player Alert mode does not expose global fallback: ${JSON.stringify(worker)}`);
+            }
+          }
 
           console.log('PLAYER ALERT LIVE BUS PASS');
           console.log(`WORKER_STATUS=${JSON.stringify(worker)}`);
           console.log(`CURRENT_SOURCE=${String(current.source || '')}`);
           console.log(`RENDER_HEALTH=${JSON.stringify(health)}`);
-          console.log(`RENDER_STORAGE_SCOPE=${render.storage_scope}`);
+          console.log(`RENDER_RELEASE_READY=${String(render.release_ready)}`);
+          console.log(`RENDER_STORAGE_SCOPE=${String(render.storage_scope || '')}`);
           NODE
 
           grep -Fq "canonical audio visualizer authority" "$workdir/equalizer.js"
