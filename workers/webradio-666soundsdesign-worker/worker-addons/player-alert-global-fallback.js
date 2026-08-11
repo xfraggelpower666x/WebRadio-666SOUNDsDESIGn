@@ -1,16 +1,19 @@
 /*
  * 666SOUNDsDESIGn — Player Alert Global Durable Object Fallback
- * Version: V1.1-20260811
+ * Version: V1.2-20260811
  *
  * Render remains the primary Player Alert backend. This wrapper mirrors every
  * successful send into the already-existing Durable Object binding and uses a
  * dedicated Durable Object instance when Render/KV fall back to edge-local
- * cache or when the global Durable Object has fresher state. No new Worker or
- * Cloudflare resource is created; the existing DISCORD_NOWPLAYING_GATE binding
- * is reused with a separate instance name and separate storage keys.
+ * cache or when the global Durable Object has fresher state. History is merged
+ * across primary + global state so recovery never hides older valid messages.
+ * No new Worker or Cloudflare resource is created; the existing
+ * DISCORD_NOWPLAYING_GATE binding is reused with a separate instance name and
+ * separate storage keys.
  */
 
 const PLAYER_ALERT_DO_INSTANCE = 'player-alert-global-v1';
+const PLAYER_ALERT_HISTORY_LIMIT = 20;
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -78,9 +81,41 @@ function hasItems(data) {
   return Boolean(data && Array.isArray(data.items) && data.items.length);
 }
 
-function firstItemTimestamp(data) {
-  if (!hasItems(data)) return 0;
-  return Number(data.items[0] && data.items[0].timestamp || 0) || 0;
+function historyItemTimestamp(item) {
+  const numeric = Number(item && item.timestamp || 0) || 0;
+  if (numeric) return numeric;
+  const parsed = Date.parse(String(item && item.createdAt || ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function historyItemKey(item) {
+  const id = String(item && item.id || '').trim();
+  if (id) return `id:${id}`;
+  return [
+    historyItemTimestamp(item),
+    String(item && (item.senderId || item.clientId) || '').trim(),
+    String(item && item.message || '').trim()
+  ].join('|');
+}
+
+function mergeHistoryItems(primaryData, busData) {
+  const combined = [
+    ...(primaryData && Array.isArray(primaryData.items) ? primaryData.items : []),
+    ...(busData && Array.isArray(busData.items) ? busData.items : [])
+  ]
+    .filter((item) => item && item.message)
+    .sort((a, b) => historyItemTimestamp(b) - historyItemTimestamp(a));
+
+  const seen = new Set();
+  const merged = [];
+  for (const item of combined) {
+    const key = historyItemKey(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(item);
+    if (merged.length >= PLAYER_ALERT_HISTORY_LIMIT) break;
+  }
+  return merged;
 }
 
 function isActive(data) {
@@ -171,22 +206,29 @@ export async function handlePlayerAlertWithGlobalFallback(request, env, forward)
     const primaryHasItems = hasItems(data);
     const busHasItems = Boolean(bus && bus.ok && hasItems(bus.data));
 
-    if (busHasItems && (!primaryHasItems || firstItemTimestamp(bus.data) > firstItemTimestamp(data))) {
+    if (primaryHasItems && busHasItems) {
       return json({
-        ...bus.data,
-        source: 'durable-object-fallback',
+        ...data,
+        ok: data.ok !== false,
+        items: mergeHistoryItems(data, bus.data),
+        source: 'merged-player-alert-history',
         fallbackFrom: responseSource(data) || 'none'
-      });
+      }, primary.status);
     }
 
-    const source = responseSource(data);
-    if (primaryHasItems && (source === 'backend' || source === 'kv-fallback' || source === 'render-backend')) return primary;
+    if (primaryHasItems) {
+      return json({
+        ...data,
+        items: mergeHistoryItems(data, null)
+      }, primary.status);
+    }
 
     if (busHasItems) {
       return json({
         ...bus.data,
+        items: mergeHistoryItems(null, bus.data),
         source: 'durable-object-fallback',
-        fallbackFrom: source || 'none'
+        fallbackFrom: responseSource(data) || 'none'
       });
     }
     return primary;
