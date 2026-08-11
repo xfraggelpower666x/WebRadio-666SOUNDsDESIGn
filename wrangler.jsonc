@@ -35,8 +35,8 @@
     }
   ],
   "vars": {
-    "PLAYER_ALERT_BACKEND_URL": "https://666soundsdesign-alert-service.onrender.com",
-    "PLAYER_ALERT_STORAGE_MODE": "RENDER_BACKEND_PRIMARY_OPTIONAL_KV_CACHE_LAST_V120",
+    "PLAYER_ALERT_BACKEND_URL": "https://666webradio.666soundsdesign-broadcaster.com",
+    "PLAYER_ALERT_STORAGE_MODE": "RENDER_PRIMARY_DURABLE_OBJECT_GLOBAL_FALLBACK_KV_CACHE_LAST_V121",
     "GITHUB_CONFIG_PATH": "config/radio-runtime.json",
     "GITHUB_BACKUP_DIR": "config/backups",
     "ENABLE_PUBLIC_DEBUG": "false",
