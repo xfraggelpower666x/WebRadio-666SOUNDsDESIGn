@@ -24,7 +24,7 @@ window.VELUNA_ASSETS = Object.freeze({
 (() => {
   'use strict';
   const version = '2026-07-23-reactive-visual-v183';
-  const bootVersion = '2026-08-10-central-radio-boot-v2';
+  const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const head = document.head || document.documentElement;
   if (!head) return;
 
@@ -149,13 +149,12 @@ window.VELUNA_ASSETS = Object.freeze({
   });
 
   /*
-   * CENTRAL_RADIO_BOOT_OWNER_v1
-   * Ein Owner für Main, VELUNA und internen Notfallplayer.
-   * Die Boot-Optik stammt aus dem vorhandenen NEOCITIES-LYVRA-Bootscreen;
-   * Redirect-/Navigationsteile sind nicht Bestandteil des Radio-Runtimes.
+   * CENTRAL_RADIO_BOOT_OWNER_v2
+   * Ein Owner für Hub/Main, iPhone, Android, VELUNA und internen Notfallplayer.
+   * Zusätzlich setzt der Owner die routenspezifische PWA-/Lockscreen-Identität.
    */
   loadStyle(`/css/central-boot-screen.css?v=${bootVersion}`, 'smfpCentralRadioBoot');
-  void loadScript(
+  void loadCurrentScript(
     `/js/central-boot-screen.js?v=${bootVersion}`,
     'smfpCentralRadioBoot',
     () => !!window.S666CentralBootScreen
