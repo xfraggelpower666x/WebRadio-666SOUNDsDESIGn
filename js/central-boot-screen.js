@@ -1,17 +1,18 @@
-/* 666SOUNDsDESIGn Radio — Central LYVRA Boot Screen v1.1.0
- * Optik/HTML aus NEOCITIES_REDIRECT_LYVRA_v1.1.1 übernommen.
- * Redirect-/Navigation-Code absichtlich entfernt.
- * EIN zentraler Boot-Owner für Main + VELUNA + Internal auf Desktop/iPhone/Android.
- * v1.1.0: keine versteckten Legacy-Layer, keine Bestätigung; alte Boot-DOMs werden entfernt.
+/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.0.0
+ * One boot owner for Hub/Main, iPhone, Android, VELUNA and Internal.
+ * Also owns route-specific PWA identity used when the OS re-opens the media app.
+ * No stream/audio graph/EQ/boost/Discord transport changes.
  */
 (function installS666CentralBootScreen(global){
   'use strict';
   if(global.S666CentralBootScreen) return;
 
-  const VERSION='1.1.0';
-  const TEMPLATE_URL='/components/boot-screen/boot-screen.html?v=20260810-v110';
-  const STYLE_URL='/css/central-boot-screen.css?v=20260810-v110';
+  const VERSION='2.0.0';
+  const STYLE_URL='/css/central-boot-screen.css?v=20260812-v200';
   const DEFAULT_DURATION=4200;
+  const OWNER_KEY='s666_active_player_owner_v2';
+  const BOOT_MARKER='2026-08-12-unified-lockscreen-boot-v3';
+
   let root=null,raf=0,startAt=0,duration=DEFAULT_DURATION,lastPhase=-1,readyPromise=null;
 
   const phases=[
@@ -22,56 +23,205 @@
     {at:98,status:'BOOT COMPLETE',label:'666SOUNDsDESIGn READY',step:3}
   ];
 
+  function isIOS(){
+    const ua=String(global.navigator?.userAgent||'');
+    return /iPad|iPhone|iPod/i.test(ua) || (global.navigator?.platform==='MacIntel' && Number(global.navigator?.maxTouchPoints||0)>1);
+  }
+
+  function deviceClass(){
+    const ua=String(global.navigator?.userAgent||'');
+    if(isIOS()) return 'iphone';
+    if(/Android/i.test(ua)) return 'android';
+    return 'desktop';
+  }
+
+  function pageClass(){
+    const declared=String(document.body?.dataset?.velunaPage||'').toLowerCase();
+    if(declared==='veluna'||declared==='internal'||declared==='main') return declared;
+    const path=String(global.location?.pathname||'/').toLowerCase();
+    if(path==='/veluna'||path.startsWith('/veluna/')) return 'veluna';
+    if(path==='/internal'||path.startsWith('/internal/')) return 'internal';
+    return 'main';
+  }
+
+  function playerIdentity(){
+    const page=pageClass();
+    const device=deviceClass();
+    if(page==='veluna') return {page,device,playerId:'veluna',route:'/veluna/',manifest:'/veluna.webmanifest',title:'VELUNA LYVRA'};
+    if(page==='internal') return {page,device,playerId:'internal',route:'/internal/',manifest:'/internal.webmanifest',title:'666 Internal Player'};
+    if(device==='iphone') return {page,device,playerId:'iphone',route:'/',manifest:'/site.webmanifest',title:'666 WebRadio iPhone'};
+    if(device==='android') return {page,device,playerId:'android',route:'/',manifest:'/site.webmanifest',title:'666 WebRadio Android'};
+    return {page,device,playerId:'hub',route:'/',manifest:'/site.webmanifest',title:'666 WebRadio Hub'};
+  }
+
+  function upsertMeta(name,value){
+    if(!document.head) return;
+    let node=document.head.querySelector(`meta[name="${name}"]`);
+    if(!node){
+      node=document.createElement('meta');
+      node.name=name;
+      document.head.appendChild(node);
+    }
+    node.content=String(value);
+  }
+
+  function installPlayerIdentity(){
+    const identity=playerIdentity();
+    const html=document.documentElement;
+    html.dataset.s666PlayerId=identity.playerId;
+    html.dataset.s666PlayerPage=identity.page;
+    html.dataset.s666PlayerDevice=identity.device;
+    html.dataset.s666PlayerRoute=identity.route;
+    html.dataset.s666PlayerIdentityVersion=VERSION;
+
+    if(document.head){
+      let manifest=document.head.querySelector('link[rel="manifest"]');
+      if(!manifest){
+        manifest=document.createElement('link');
+        manifest.rel='manifest';
+        document.head.appendChild(manifest);
+      }
+      const wanted=`${identity.manifest}?v=${BOOT_MARKER}`;
+      if(manifest.getAttribute('href')!==wanted) manifest.setAttribute('href',wanted);
+      manifest.dataset.s666PlayerOwned='1';
+      upsertMeta('apple-mobile-web-app-title',identity.title);
+      upsertMeta('application-name',identity.title);
+      upsertMeta('s666-player-id',identity.playerId);
+      upsertMeta('s666-player-route',identity.route);
+    }
+
+    const markActive=(reason='runtime')=>{
+      const payload={
+        version:2,
+        playerId:identity.playerId,
+        page:identity.page,
+        device:identity.device,
+        route:identity.route,
+        pathname:String(global.location?.pathname||identity.route),
+        origin:String(global.location?.origin||''),
+        reason:String(reason),
+        at:Date.now()
+      };
+      try{global.sessionStorage?.setItem(OWNER_KEY,JSON.stringify(payload));}catch(_){}
+      try{global.localStorage?.setItem(OWNER_KEY,JSON.stringify(payload));}catch(_){}
+      html.dataset.s666PlayerOwnerReason=String(reason);
+      html.dataset.s666PlayerOwnerAt=String(payload.at);
+      try{global.dispatchEvent(new CustomEvent('s666:player-owner',{detail:payload}));}catch(_){}
+      return payload;
+    };
+
+    const bindAudio=()=>{
+      const audio=document.getElementById('radio')||document.querySelector('audio');
+      if(!audio||audio.dataset.s666PlayerOwnerBound==='1') return false;
+      audio.dataset.s666PlayerOwnerBound='1';
+      audio.addEventListener('play',()=>markActive('audio-play'),true);
+      audio.addEventListener('playing',()=>markActive('audio-playing'),true);
+      return true;
+    };
+
+    markActive('page-load');
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded',()=>{bindAudio();markActive('dom-ready');},{once:true});
+    }else{
+      bindAudio();
+    }
+    global.addEventListener('pageshow',()=>{bindAudio();markActive('pageshow');},{passive:true});
+    global.addEventListener('focus',()=>markActive('focus'),{passive:true});
+    document.addEventListener('visibilitychange',()=>{
+      if(!document.hidden){bindAudio();markActive('visible');}
+    },true);
+
+    global.S666PlayerIdentity=Object.freeze({
+      version:VERSION,
+      ownerKey:OWNER_KEY,
+      identity:Object.freeze({...identity}),
+      markActive,
+      bindAudio,
+      readLastOwner:()=>{
+        try{return JSON.parse(global.localStorage?.getItem(OWNER_KEY)||'null');}catch(_){return null;}
+      }
+    });
+    return identity;
+  }
+
+  const identity=installPlayerIdentity();
+
   function domReady(){
     if(document.readyState!=='loading') return Promise.resolve();
     return new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
   }
 
   function ensureStyle(){
-    if(document.querySelector('link[data-s666-central-boot-style]')) return;
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href=STYLE_URL;
-    link.dataset.s666CentralBootStyle='1';
-    (document.head||document.documentElement).appendChild(link);
+    let bootLink=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(link=>String(link.getAttribute('href')||'').includes('/css/central-boot-screen.css'));
+    if(!bootLink){
+      bootLink=document.createElement('link');
+      bootLink.rel='stylesheet';
+      (document.head||document.documentElement).appendChild(bootLink);
+    }
+    bootLink.href=STYLE_URL;
+    bootLink.dataset.s666CentralBootStyle='1';
+    if(!document.getElementById('s666CentralBootPreflightStyle')){
+      const style=document.createElement('style');
+      style.id='s666CentralBootPreflightStyle';
+      style.textContent='#s666CentralBoot{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;width:100vw;height:100vh;height:100svh;background:#020006;color:#f7edff;overflow:hidden;font-family:Segoe UI,Inter,Arial,sans-serif}#s666CentralBoot .s666boot-panel{width:min(91vw,42rem);padding:1rem;text-align:center;border:1px solid rgba(194,112,255,.72);background:rgba(5,0,20,.82);box-shadow:0 0 32px rgba(145,55,255,.3)}#s666CentralBoot #s666boot-title{letter-spacing:.24em}html.s666-central-boot-active,html.s666-central-boot-active body{overflow:hidden!important}';
+      (document.head||document.documentElement).appendChild(style);
+    }
   }
 
-  function detachLegacyBootDom(){
-    const legacy=document.getElementById('bootOverlay');
-    if(!legacy) return {removed:false,handoff:false};
+  function bootMarkup(){
+    return '<div class="s666boot-scanlines" aria-hidden="true"></div>'+
+      '<section class="s666boot-panel" aria-live="polite">'+
+      '<p class="s666boot-eyebrow">666SOUNDsDESIGn RADIO SYSTEM</p>'+
+      '<h1 id="s666boot-title">CYBER BOOTING</h1>'+
+      '<p class="s666boot-status" id="s666boot-status">INITIALIZING PLAYER</p>'+
+      '<div class="s666boot-core" aria-hidden="true"></div>'+
+      '<div class="s666boot-progress-wrap" aria-label="Player boot progress">'+
+      '<div class="s666boot-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="s666boot-track"><div class="s666boot-bar" id="s666boot-bar"></div></div>'+
+      '<div class="s666boot-percent" id="s666boot-percent">0%</div></div>'+
+      '<p class="s666boot-phase-label" id="s666boot-phase">CONNECTING RADIO CORE</p>'+
+      '<div class="s666boot-steps" aria-hidden="true">'+
+      '<div class="s666boot-step active" data-step="0">Connect</div><div class="s666boot-step" data-step="1">Audio</div><div class="s666boot-step" data-step="2">Systems</div><div class="s666boot-step" data-step="3">Player</div>'+
+      '</div></section>';
+  }
 
-    const page=String(document.body?.dataset?.velunaPage||'').toLowerCase();
-    let handoff=false;
-
-    // INTERNAL besitzt historisch Audio-Startlogik am alten bootButton.
-    // Handler nach DOMContentLoaded automatisch auslösen, dann den alten DOM wirklich entfernen.
-    if(page==='internal'){
-      const legacyButton=document.getElementById('bootButton');
-      if(legacyButton&&typeof legacyButton.click==='function'){
-        try{legacyButton.click();handoff=true;}catch(_){}
-      }
+  function primeBootShell(){
+    ensureStyle();
+    const existing=document.getElementById('s666CentralBoot');
+    if(existing){root=existing;}
+    if(!root){
+      root=document.createElement('main');
+      root.id='s666CentralBoot';
+      root.className='s666boot-scene';
+      root.setAttribute('aria-labelledby','s666boot-title');
+      root.dataset.state='booting';
+      root.dataset.player=identity.playerId;
+      root.dataset.playerRoute=identity.route;
+      root.dataset.bootOwner=BOOT_MARKER;
+      root.innerHTML=bootMarkup();
+      (document.body||document.documentElement).appendChild(root);
     }
+    document.documentElement.classList.add('s666-central-boot-active');
+    return root;
+  }
 
-    try{legacy.remove();}catch(_){legacy.parentNode?.removeChild?.(legacy);}
-    return {removed:true,handoff};
+  primeBootShell();
+
+  function detachLegacyBootDom(){
+    for(const legacy of Array.from(document.querySelectorAll('#bootOverlay,[data-veluna-central-splash="1"]'))){
+      const isBootOverlay=legacy.id==='bootOverlay';
+      if(isBootOverlay && pageClass()==='internal'){
+        const legacyButton=document.getElementById('bootButton');
+        if(legacyButton&&typeof legacyButton.click==='function'){
+          try{legacyButton.click();}catch(_){}
+        }
+      }
+      try{legacy.remove();}catch(_){legacy.parentNode?.removeChild?.(legacy);}
+    }
   }
 
   async function mount(){
     if(root&&root.isConnected) return root;
-    await domReady();
-    ensureStyle();
-
-    // Kein Layer-Hide: vorhandener alter Boot-DOM wird nach initialisierten Handlern physisch entfernt.
-    detachLegacyBootDom();
-
-    const response=await fetch(TEMPLATE_URL,{cache:'no-store',credentials:'same-origin'});
-    if(!response.ok) throw new Error('central_boot_template_http_'+response.status);
-    const holder=document.createElement('div');
-    holder.innerHTML=await response.text();
-    root=holder.firstElementChild;
-    if(!root) throw new Error('central_boot_template_empty');
-    document.body.appendChild(root);
-    document.documentElement.classList.add('s666-central-boot-active');
+    primeBootShell();
     return root;
   }
 
@@ -149,7 +299,6 @@
     global.setTimeout(()=>{
       if(root){root.remove();root=null;}
       document.documentElement.classList.remove('s666-central-boot-active');
-      // Guard: auch verspätet erzeugte historische Boot-DOMs nicht verstecken, sondern entfernen.
       detachLegacyBootDom();
     },300);
   }
@@ -170,9 +319,18 @@
     return readyPromise;
   }
 
+  void domReady().then(()=>{
+    if(root&&document.body&&root.parentNode!==document.body) document.body.appendChild(root);
+    detachLegacyBootDom();
+    global.S666PlayerIdentity?.bindAudio?.();
+  });
+
   global.S666CentralBootScreen=Object.freeze({
-    version:VERSION,show,hide,complete,setProgress,status,bootOnce,
+    version:VERSION,
+    marker:BOOT_MARKER,
+    show,hide,complete,setProgress,status,bootOnce,
     removeLegacyBootDom:detachLegacyBootDom,
+    playerIdentity:()=>global.S666PlayerIdentity?.identity||identity,
     isActive:()=>Boolean(root&&root.isConnected)
   });
   bootOnce();
