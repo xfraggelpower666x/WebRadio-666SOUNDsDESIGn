@@ -28,6 +28,10 @@ window.VELUNA_ASSETS = Object.freeze({
   const head = document.head || document.documentElement;
   if (!head) return;
 
+  /*
+   * Synchronous graph bridge: captures the player graph before a potentially cached old
+   * boost-core can be replaced by the current central runtime.
+   */
   const installAudioGraphBridge = () => {
     if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
     const graphs = new WeakMap();
