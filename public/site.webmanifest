@@ -1,45 +1,32 @@
 {
+  "id": "/",
   "name": "666SOUNDsDESIGn WebRadio",
   "short_name": "666RADIO",
-  "description": "666SOUNDsDESIGn WebRadio — VELUNA / LYVRA compatible app icons and media artwork.",
+  "description": "666SOUNDsDESIGn WebRadio — Hub / iPhone / Android main player.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#08080d",
   "theme_color": "#17181d",
   "orientation": "any",
+  "launch_handler": { "client_mode": "navigate-existing" },
   "icons": [
-    {
-      "src": "/assets/veluna/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/veluna/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/veluna/icons/maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    {"src":"/assets/veluna/icons/icon-192x192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/assets/veluna/icons/icon-512x512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/assets/veluna/icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
   "shortcuts": [
     {
-      "name": "VELUNA Minimal Player",
-      "short_name": "VELUNA",
-      "url": "/veluna/",
-      "icons": [
-        {
-          "src": "/assets/veluna/icons/icon-192x192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "name":"VELUNA Minimal Player",
+      "short_name":"VELUNA",
+      "url":"/veluna/",
+      "icons":[{"src":"/assets/veluna/icons/icon-192x192.png","sizes":"192x192","type":"image/png"}]
+    },
+    {
+      "name":"Internal Emergency Player",
+      "short_name":"INTERNAL",
+      "url":"/internal/",
+      "icons":[{"src":"/assets/veluna/icons/icon-192x192.png","sizes":"192x192","type":"image/png"}]
     }
   ]
 }
