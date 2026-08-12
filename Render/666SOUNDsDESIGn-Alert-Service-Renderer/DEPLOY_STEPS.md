@@ -1,18 +1,52 @@
-# Deploy Steps
+# Deploy Steps — Current Player Alert Backend
 
-## Render backend
-1. Create a new Render web service from this folder.
-2. Use build command: `pip install -r requirements.txt`
-3. Use start command: `gunicorn src.server:app`
-4. Set env vars from `.env.example`.
-5. Test `/health`.
-6. Test `/analyze` and `/master` with a real audio file.
+## Authority
+- This `Render/666SOUNDsDESIGn-Alert-Service-Renderer/` folder is the canonical backend source.
+- Do **not** create a parallel Player Alert backend or a new WebRadio Worker.
+- The production WebRadio Worker remains the public bridge and keeps Render primary with the existing global Durable Object fallback.
 
-## Cloudflare Worker bridge
-1. Open `worker-bridge/`.
-2. Set `MASTERING_BACKEND_URL` in `wrangler.toml`.
-3. Add secrets:
-   - `ADMIN_PASSWORD`
-   - `MASTERING_BACKEND_TOKEN`
-   - `OPENAI_API_KEY`
-4. Deploy with `wrangler deploy`.
+## Render service
+Use the existing/current Player Alert backend service identity:
+`666soundsdesign-audio-player-alert-backend`
+
+Build command:
+`pip install -r requirements.txt`
+
+Start command:
+`uvicorn src.server:app --host 0.0.0.0 --port $PORT`
+
+Health check:
+`/health`
+
+## Required production environment
+Set these values in the Render dashboard/service environment. Never commit their secret values.
+
+- `PLAYER_ALERT_SERVICE_TOKEN` — required; must match the server-side Worker secret used for authenticated writes.
+- `DATABASE_URL` — required for production release readiness; must point to shared PostgreSQL storage.
+- `REQUIRE_SHARED_PERSISTENCE=true`
+- `MASTER_ADMIN_PASSWORD` — required only for protected admin/audio-processing routes that use it.
+
+Non-secret defaults are documented in `.env.example` and `render.yaml`.
+
+## Release-ready verification
+`GET /health` must report all of the following:
+
+- `ok: true`
+- `database_backend: "postgres"`
+- `database_ok: true`
+- `shared_persistence: true`
+- `shared_persistence_required: true`
+- `player_alert_write_auth_configured: true`
+- `release_ready: true`
+
+Then verify:
+
+- `GET /api/player-alert/status`
+- `GET /api/player-alert/current`
+- `GET /api/player-alert/history`
+- OpenAPI contains `POST /api/player-alert/send`
+
+Do not perform a synthetic production `POST /api/player-alert/send` unless a user-visible live alert is intended.
+
+## WebRadio integration
+The WebRadio production Worker already owns the bridge. Keep its existing `PLAYER_ALERT_BACKEND_URL`, server-controlled rate identity, Durable Object global fallback and cache-tertiary safety path. Do not add a second Worker or browser-side secret.

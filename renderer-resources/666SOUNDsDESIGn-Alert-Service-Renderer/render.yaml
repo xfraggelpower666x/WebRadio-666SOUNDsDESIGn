@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: auto-setup-render-for-backend-mp3
+    name: 666soundsdesign-audio-player-alert-backend
     env: python
     plan: free
     rootDir: .
