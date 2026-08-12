@@ -1,0 +1,135 @@
+name: Live Player PWA Smoke
+
+on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/live-player-pwa-smoke.yml"
+      - "site.webmanifest"
+      - "public/site.webmanifest"
+      - "veluna.webmanifest"
+      - "public/veluna.webmanifest"
+      - "internal.webmanifest"
+      - "public/internal.webmanifest"
+      - "js/central-boot-screen.js"
+      - "public/js/central-boot-screen.js"
+      - "config/veluna-assets.js"
+      - "public/config/veluna-assets.js"
+      - "js/veluna-splash.js"
+      - "public/js/veluna-splash.js"
+  workflow_dispatch:
+  schedule:
+    - cron: "47 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-player-pwa-smoke
+  cancel-in-progress: false
+
+jobs:
+  production-pwa-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BASE_URL: https://webradio.666soundsdesign-broadcaster.com
+    steps:
+      - name: Check live player PWA ownership and central boot
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+
+          fetch_live() {
+            local path="$1"
+            local output="$2"
+            local attempt code url
+            for attempt in $(seq 1 18); do
+              url="${BASE_URL}${path}"
+              if [[ "$url" == *\?* ]]; then
+                url="${url}&smoke=${GITHUB_SHA}-${attempt}"
+              else
+                url="${url}?smoke=${GITHUB_SHA}-${attempt}"
+              fi
+              code="$(curl \
+                --silent \
+                --show-error \
+                --location \
+                --connect-timeout 10 \
+                --max-time 35 \
+                --header 'Cache-Control: no-cache' \
+                --header 'Pragma: no-cache' \
+                --output "$output" \
+                --write-out '%{http_code}' \
+                "$url" || true)"
+              if [[ "$code" == "200" && -s "$output" ]]; then
+                echo "PASS ${path} (${code}, $(wc -c < "$output") bytes)"
+                return 0
+              fi
+              echo "WAIT ${path}: attempt ${attempt}/18 returned ${code:-curl_error}"
+              sleep 10
+            done
+            echo "FAIL ${path}: live service did not return a usable HTTP 200 response" >&2
+            return 1
+          }
+
+          fetch_live "/site.webmanifest" "$workdir/site.webmanifest"
+          fetch_live "/veluna.webmanifest" "$workdir/veluna.webmanifest"
+          fetch_live "/internal.webmanifest" "$workdir/internal.webmanifest"
+          fetch_live "/js/central-boot-screen.js" "$workdir/central-boot-screen.js"
+          fetch_live "/config/veluna-assets.js" "$workdir/veluna-assets.js"
+          fetch_live "/js/veluna-splash.js" "$workdir/veluna-splash.js"
+
+          node - "$workdir/site.webmanifest" "$workdir/veluna.webmanifest" "$workdir/internal.webmanifest" <<'NODE'
+          const fs = require('node:fs');
+          const [rootPath, velunaPath, internalPath] = process.argv.slice(2);
+          const entries = [
+            ['root', JSON.parse(fs.readFileSync(rootPath, 'utf8')), '/', '/'],
+            ['veluna', JSON.parse(fs.readFileSync(velunaPath, 'utf8')), '/veluna/', '/veluna/'],
+            ['internal', JSON.parse(fs.readFileSync(internalPath, 'utf8')), '/internal/', '/internal/']
+          ];
+          for (const [name, manifest, id, route] of entries) {
+            if (manifest.id !== id) throw new Error(`${name} manifest id mismatch: ${JSON.stringify(manifest.id)}`);
+            if (manifest.start_url !== route) throw new Error(`${name} start_url mismatch: ${JSON.stringify(manifest.start_url)}`);
+            if (manifest.scope !== route) throw new Error(`${name} scope mismatch: ${JSON.stringify(manifest.scope)}`);
+            if (manifest.display !== 'standalone') throw new Error(`${name} display is not standalone`);
+            if (manifest.launch_handler?.client_mode !== 'navigate-existing') {
+              throw new Error(`${name} launch_handler is not navigate-existing: ${JSON.stringify(manifest.launch_handler)}`);
+            }
+          }
+          console.log('PLAYER PWA MANIFEST OWNERSHIP PASS');
+          NODE
+
+          grep -Fq "Central Player Boot + Session Identity v2.0.0" "$workdir/central-boot-screen.js"
+          grep -Fq "2026-08-12-unified-lockscreen-boot-v3" "$workdir/central-boot-screen.js"
+          grep -Fq "playerId:'hub'" "$workdir/central-boot-screen.js"
+          grep -Fq "playerId:'iphone'" "$workdir/central-boot-screen.js"
+          grep -Fq "playerId:'android'" "$workdir/central-boot-screen.js"
+          grep -Fq "playerId:'veluna'" "$workdir/central-boot-screen.js"
+          grep -Fq "playerId:'internal'" "$workdir/central-boot-screen.js"
+          grep -Fq "s666_active_player_owner_v2" "$workdir/central-boot-screen.js"
+          grep -Fq "audio-playing" "$workdir/central-boot-screen.js"
+          grep -Fq "pageshow" "$workdir/central-boot-screen.js"
+          grep -Fq "visibilitychange" "$workdir/central-boot-screen.js"
+          grep -Fq "primeBootShell" "$workdir/central-boot-screen.js"
+
+          grep -Fq "2026-08-12-unified-lockscreen-boot-v3" "$workdir/veluna-assets.js"
+          grep -Fq "CENTRAL_RADIO_BOOT_OWNER_v2" "$workdir/veluna-assets.js"
+          grep -Fq "loadCurrentScript(" "$workdir/veluna-assets.js"
+          grep -Fq "/js/central-boot-screen.js" "$workdir/veluna-assets.js"
+
+          grep -Fq "Compatibility stub" "$workdir/veluna-splash.js"
+          if grep -Fq "document.createElement('video')" "$workdir/veluna-splash.js"; then
+            echo "FAIL legacy VELUNA video splash still creates a competing startup surface" >&2
+            exit 1
+          fi
+          if grep -Fq "setTimeout(finish,7200)" "$workdir/veluna-splash.js"; then
+            echo "FAIL legacy delayed VELUNA splash timer is still active" >&2
+            exit 1
+          fi
+
+          echo "LIVE PLAYER PWA SMOKE PASS"
