@@ -122,7 +122,7 @@ jobs:
           grep -Fq "loadCurrentScript(" "$workdir/veluna-assets.js"
           grep -Fq "/js/central-boot-screen.js" "$workdir/veluna-assets.js"
 
-          grep -Fq "Compatibility stub" "$workdir/veluna-splash.js"
+          grep -Fq "legacy splash compatibility stub v2.0.0" "$workdir/veluna-splash.js"
           if grep -Fq "document.createElement('video')" "$workdir/veluna-splash.js"; then
             echo "FAIL legacy VELUNA video splash still creates a competing startup surface" >&2
             exit 1
