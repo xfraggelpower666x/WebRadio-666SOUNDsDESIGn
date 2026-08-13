@@ -36,7 +36,7 @@ test('central boot is an early single owner and removes legacy splash surfaces',
   assert.equal(await read('public/components/boot-screen/boot-screen.html'), template);
   assert.equal(await read('public/js/veluna-splash.js'), legacySplash);
 
-  assert.match(boot, /Central Player Boot \+ Session Identity v2\.0\.0/);
+  assert.match(boot, /Central Player Boot \+ Session Identity v2\.1\.0/);
   assert.match(boot, /primeBootShell\(\);/);
   assert.match(boot, /document\.documentElement\.classList\.add\('s666-central-boot-active'\)/);
   assert.match(boot, /#bootOverlay,\[data-veluna-central-splash=/);
