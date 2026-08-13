@@ -1,17 +1,17 @@
-/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.0.0
+/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.1.0
  * One boot owner for Hub/Main, iPhone, Android, VELUNA and Internal.
- * Also owns route-specific PWA identity used when the OS re-opens the media app.
+ * Also owns route-specific PWA + MediaSession identity used by system media surfaces.
  * No stream/audio graph/EQ/boost/Discord transport changes.
  */
 (function installS666CentralBootScreen(global){
   'use strict';
   if(global.S666CentralBootScreen) return;
 
-  const VERSION='2.0.0';
+  const VERSION='2.1.0';
   const STYLE_URL='/css/central-boot-screen.css?v=20260812-v200';
   const DEFAULT_DURATION=4200;
   const OWNER_KEY='s666_active_player_owner_v2';
-  const BOOT_MARKER='2026-08-12-unified-lockscreen-boot-v3';
+  const BOOT_MARKER='2026-08-13-root-identity-regression-v4';
 
   let root=null,raf=0,startAt=0,duration=DEFAULT_DURATION,lastPhase=-1,readyPromise=null;
 
@@ -54,6 +54,35 @@
     return {page,device,playerId:'hub',route:'/',manifest:'/site.webmanifest',title:'666 WebRadio Hub'};
   }
 
+  function mediaIdentity(identity){
+    if(identity.page==='veluna') return {
+      title:'VELUNA WebRadio',artist:'LYVRA DJ',album:'VELUNA / LYVRA / 666SOUNDsDESIGn',
+      artwork:[
+        {src:'/assets/veluna/covers/veluna-stream-fallback.webp',sizes:'1200x1200',type:'image/webp'},
+        {src:'/assets/veluna/icons/icon-512x512.png',sizes:'512x512',type:'image/png'}
+      ]
+    };
+    if(identity.page==='internal') return {
+      title:'666 Internal Player',artist:'666SOUNDsDESIGn',album:'Emergency WebRadio Player',
+      artwork:[{src:'/assets/logos/phase10-new-header-logo.png',type:'image/png'}]
+    };
+    return {
+      title:'666SOUNDsDESIGn WebRadio',artist:'RadioBotAI DJ',album:'666SOUNDsDESIGn',
+      artwork:[{src:'/assets/logos/phase10-new-header-logo.png',type:'image/png'}]
+    };
+  }
+
+  function applyMediaIdentity(identity,reason='identity'){
+    if(!('mediaSession' in navigator)||typeof MediaMetadata==='undefined') return false;
+    try{
+      const meta=mediaIdentity(identity);
+      navigator.mediaSession.metadata=new MediaMetadata(meta);
+      document.documentElement.dataset.s666MediaIdentityOwner=identity.playerId;
+      document.documentElement.dataset.s666MediaIdentityReason=String(reason);
+      return true;
+    }catch(_){return false;}
+  }
+
   function upsertMeta(name,value){
     if(!document.head) return;
     let node=document.head.querySelector(`meta[name="${name}"]`);
@@ -90,6 +119,11 @@
       upsertMeta('s666-player-route',identity.route);
     }
 
+    const reassertMedia=(reason)=>{
+      applyMediaIdentity(identity,reason);
+      global.setTimeout(()=>applyMediaIdentity(identity,`${reason}-settled`),0);
+    };
+
     const markActive=(reason='runtime')=>{
       const payload={
         version:2,
@@ -106,6 +140,7 @@
       try{global.localStorage?.setItem(OWNER_KEY,JSON.stringify(payload));}catch(_){}
       html.dataset.s666PlayerOwnerReason=String(reason);
       html.dataset.s666PlayerOwnerAt=String(payload.at);
+      reassertMedia(reason);
       try{global.dispatchEvent(new CustomEvent('s666:player-owner',{detail:payload}));}catch(_){}
       return payload;
     };
@@ -137,6 +172,7 @@
       identity:Object.freeze({...identity}),
       markActive,
       bindAudio,
+      applyMediaIdentity:(reason='manual')=>applyMediaIdentity(identity,reason),
       readLastOwner:()=>{
         try{return JSON.parse(global.localStorage?.getItem(OWNER_KEY)||'null');}catch(_){return null;}
       }
@@ -323,6 +359,7 @@
     if(root&&document.body&&root.parentNode!==document.body) document.body.appendChild(root);
     detachLegacyBootDom();
     global.S666PlayerIdentity?.bindAudio?.();
+    global.S666PlayerIdentity?.applyMediaIdentity?.('dom-ready-final');
   });
 
   global.S666CentralBootScreen=Object.freeze({
