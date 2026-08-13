@@ -9,6 +9,7 @@
   "background_color": "#07080f",
   "theme_color": "#16fff3",
   "orientation": "portrait-primary",
+  "launch_handler": { "client_mode": "navigate-existing" },
   "icons": [],
   "shortcuts": [
     {
