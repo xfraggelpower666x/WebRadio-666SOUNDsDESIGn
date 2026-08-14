@@ -21,4 +21,11 @@
   #eqBars,#mffEqBars{cursor:pointer;}
   @media(max-width:760px){#smfpMobileEqPanel{width:94vw;padding:13px 12px 15px;}#smfpMobileEqPanel .smfp-mobile-eq-row{grid-template-columns:54px 1fr 38px;gap:7px;margin:8px 0;}}
 
-  
+/* Desktop rail visibility regression repair: the level meters and DNA towers share
+   the outer gutters. Keep the non-interactive meters visibly above the towers. */
+@media(min-width:761px){
+  html body[data-veluna-page="main"] .frame-stage > .side-meter{
+    z-index:10!important;
+    pointer-events:none!important;
+  }
+}
