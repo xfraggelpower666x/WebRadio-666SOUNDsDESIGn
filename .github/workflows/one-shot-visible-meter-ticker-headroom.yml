@@ -1,0 +1,92 @@
+name: One Shot Visible Meter Ticker Headroom Repair
+
+on:
+  push:
+    branches:
+      - repair/visible-meter-ticker-volume-headroom-20260814
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/visible-meter-ticker-volume-headroom-20260814
+          fetch-depth: 0
+
+      - name: Repair existing player authorities only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one match, found {count}: {old[:120]}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          # 1) Audio visual response: restore only the verified PR #62 proportional
+          # volume/boost scale. Do not touch analyser graph, filters, limiter,
+          # attack/release, gate, tilt or transient logic.
+          for path in ('js/equalizer.js', 'public/js/equalizer.js'):
+              replace_once(path,
+                  'const visualGainCompensation = Math.pow(boostGain, -0.18);',
+                  'const visualGainCompensation = Math.pow(boostGain, -0.55);')
+              replace_once(path,
+                  'const visualVolumeScale = 0.72 + Math.pow(volume, 0.85) * 0.28;',
+                  'const visualVolumeScale = Math.pow(volume, 0.85);')
+              replace_once(path,
+                  'const visualSignalScale = clamp(visualGainCompensation * visualVolumeScale, 0.62, 1);',
+                  'const visualSignalScale = visualGainCompensation * visualVolumeScale;')
+
+          # 2) Desktop Now Playing ticker: use the original working tickerMove
+          # animation already defined in layout.css instead of the later Stage-V2
+          # marquee path. Existing DOM/metadata writer remains canonical.
+          for path in ('css/player-stage-v2.css', 'public/css/player-stage-v2.css'):
+              replace_once(path,
+                  'animation:s666TitleMarquee 16s linear infinite!important;',
+                  'animation:tickerMove 14s linear infinite!important;')
+
+          # 3) Fixed-canvas edge meters: the July fixed canvas places 64px meter
+          # columns exactly at both outer canvas edges. Move each existing meter
+          # 12px inward into the existing 23px side gap; no width/height change.
+          for path in ('css/desktop.css', 'public/css/desktop.css'):
+              replace_once(path,
+                  'html.pc-fixed-canvas body > .frame-stage > .side-meter.left  { grid-column: 1 !important; }',
+                  'html.pc-fixed-canvas body > .frame-stage > .side-meter.left  { grid-column: 1 !important; transform: translateX(12px) !important; }')
+              replace_once(path,
+                  'html.pc-fixed-canvas body > .frame-stage > .side-meter.right { grid-column: 5 !important; }',
+                  'html.pc-fixed-canvas body > .frame-stage > .side-meter.right { grid-column: 5 !important; transform: translateX(-12px) !important; }')
+
+          # Mirror hardlock.
+          pairs = [
+              ('js/equalizer.js','public/js/equalizer.js'),
+              ('css/player-stage-v2.css','public/css/player-stage-v2.css'),
+              ('css/desktop.css','public/css/desktop.css'),
+          ]
+          for a,b in pairs:
+              if Path(a).read_bytes() != Path(b).read_bytes():
+                  raise SystemExit(f'mirror mismatch: {a} != {b}')
+          PY
+
+          # Self-remove. Only real player files remain in the resulting commit.
+          rm -f .github/workflows/one-shot-visible-meter-ticker-headroom.yml
+
+      - name: Commit repaired player files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'fix: restore ticker visibility and proportional meter headroom'
+          git push origin HEAD:repair/visible-meter-ticker-volume-headroom-20260814
