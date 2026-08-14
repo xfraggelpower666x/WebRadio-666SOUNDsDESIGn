@@ -3928,11 +3928,11 @@ PURPOSE:
     box-sizing: border-box !important;
   }
 
-  html.pc-fixed-canvas body > .frame-stage > .side-meter.left  { grid-column: 1 !important; }
+  html.pc-fixed-canvas body > .frame-stage > .side-meter.left  { grid-column: 1 !important; transform: translateX(12px) !important; }
   html.pc-fixed-canvas body > .frame-stage > .pc-side-addon-left  { grid-column: 2 !important; }
   html.pc-fixed-canvas body > .frame-stage > .player-shell { grid-column: 3 !important; }
   html.pc-fixed-canvas body > .frame-stage > .pc-side-addon-right { grid-column: 4 !important; }
-  html.pc-fixed-canvas body > .frame-stage > .side-meter.right { grid-column: 5 !important; }
+  html.pc-fixed-canvas body > .frame-stage > .side-meter.right { grid-column: 5 !important; transform: translateX(-12px) !important; }
 
   html.pc-fixed-canvas body > .frame-stage > .side-meter {
     display: flex !important;
