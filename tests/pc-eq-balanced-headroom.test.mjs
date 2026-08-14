@@ -1,10 +1,10 @@
-// PC EQ high-response headroom regression contract v1.1.0.
+// PC EQ proportional headroom regression contract v1.2.0.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('PC EQ keeps logarithmic mapping while restoring high-response visual headroom', async () => {
+test('PC EQ keeps logarithmic mapping with proportional visual headroom', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
   assert.match(eq, /canonical audio visualizer authority V14/);
@@ -15,9 +15,10 @@ test('PC EQ keeps logarithmic mapping while restoring high-response visual headr
   assert.match(eq, /const spectral = Math\.pow\(absolute, 0\.74\) \* visualTilt/);
   assert.match(eq, /const localGate = clamp\(\(local - 6\) \/ 26/);
   assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.82\) \* 0\.065 \* localGate/);
+  assert.match(eq, /const transient = clamp\(\(localPeak - average\) \/ 255/);
   assert.match(eq, /clamp\(energy, 0\.012, peakHeadroom\)/);
   assert.match(eq, /visualCeiling: 'peak-dependent'/);
-  assert.doesNotMatch(eq, /Math\.sin|useHybrid|const mirrored|localPeak - average/);
+  assert.doesNotMatch(eq, /Math\.sin|useHybrid|const mirrored/);
 });
 
 test('balanced-headroom cache marker is mirrored', async () => {
