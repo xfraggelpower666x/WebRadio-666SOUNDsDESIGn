@@ -85,12 +85,12 @@ test('route manifests have stable ids and exact launch routes', async () => {
   }
 });
 
-test('main player audio reactivity remains on the restored working pre-141 runtime', async () => {
+test('main player audio reactivity preserves working analyzer runtime with proportional headroom', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
-  assert.match(eq, /const visualGainCompensation = Math\.pow\(boostGain, -0\.18\)/);
-  assert.match(eq, /const visualVolumeScale = 0\.72 \+ Math\.pow\(volume, 0\.85\) \* 0\.28/);
-  assert.match(eq, /const visualSignalScale = clamp\(visualGainCompensation \* visualVolumeScale, 0\.62, 1\)/);
+  assert.match(eq, /const visualGainCompensation = Math\.pow\(boostGain, -0\.55\)/);
+  assert.match(eq, /const visualVolumeScale = Math\.pow\(volume, 0\.85\)/);
+  assert.match(eq, /const visualSignalScale = visualGainCompensation \* visualVolumeScale/);
   assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
   assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
   assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
