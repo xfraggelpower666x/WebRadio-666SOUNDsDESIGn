@@ -88,12 +88,12 @@ test('route manifests have stable ids and exact launch routes', async () => {
 test('main player high-response audio reactivity remains the verified PR122 runtime', async () => {
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
-  assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
-  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
-  assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
-  assert.match(eq, /const release = 0\.15 \+ position \* 0\.03/);
-  assert.match(eq, /spectralResponse \* 0\.92 \+ adaptiveResponse/);
-  assert.doesNotMatch(eq, /localPeak - average/);
+  assert.match(eq, /const localGate = clamp\(\(local - 6\) \/ 26/);
+  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.24\) \* 0\.34/);
+  assert.match(eq, /const attack = 0\.62 \+ position \* 0\.08/);
+  assert.match(eq, /const release = 0\.13 \+ position \* 0\.02/);
+  assert.match(eq, /energy/);
+  assert.match(eq, /const transient = clamp\(\(localPeak - average\) \/ 255/);
 
   const player = await read('js/player-core.js');
   assert.match(player, /const visualizer = startVisualizer\(\{ audio, bars, leftMeters, rightMeters, bottomMeterSegments \}\)/);

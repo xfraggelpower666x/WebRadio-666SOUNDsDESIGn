@@ -16,25 +16,6 @@
     overflow:hidden!important;
     box-sizing:border-box!important;
   }
-  body .frame-stage .player-shell .now-playing .ticker-window{
-    position:absolute!important;
-    left:170px!important;
-    right:20px!important;
-    bottom:96px!important;
-    top:auto!important;
-    height:30px!important;
-    min-height:30px!important;
-    max-height:30px!important;
-    z-index:22!important;
-    width:auto!important;
-    max-width:none!important;
-    margin:0!important;
-  }
-  body .frame-stage .player-shell .now-playing .ticker-window #nowPlayingTicker,
-  body .frame-stage .player-shell .now-playing .ticker-window .ticker-text{
-    height:30px!important;
-    line-height:30px!important;
-  }
   body .frame-stage .player-shell .now-playing #playerAlertPcBox.player-alert-pc-box{
     position:absolute!important;
     right:122px!important;
@@ -53,26 +34,6 @@
     justify-content:flex-end!important;
     gap:7px!important;
     padding:0!important;
-    margin:0!important;
-    box-sizing:border-box!important;
-  }
-  body .frame-stage .player-shell .now-playing #historyToggle{
-    position:absolute!important;
-    right:20px!important;
-    bottom:58px!important;
-    top:auto!important;
-    left:auto!important;
-    z-index:33!important;
-    width:96px!important;
-    min-width:96px!important;
-    max-width:96px!important;
-    height:34px!important;
-    min-height:34px!important;
-    max-height:34px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    padding:0 10px!important;
     margin:0!important;
     box-sizing:border-box!important;
   }

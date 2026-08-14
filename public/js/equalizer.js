@@ -447,11 +447,11 @@ const stopFallback = () => {
       const rms = Math.sqrt(sumSq / Math.max(1, timeData.length));
       const volume = clamp(audio?.volume ?? 1, 0, 1);
       const boostGain = Math.max(1, Number(gainNode?.gain?.value || (window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]) || 1));
-      // Visual-only response guard: keep real analyser dynamics readable without
-      // making meter motion grow with Boost or collapse at normal listening volume.
-      const visualGainCompensation = Math.pow(boostGain, -0.18);
-      const visualVolumeScale = 0.72 + Math.pow(volume, 0.85) * 0.28;
-      const visualSignalScale = clamp(visualGainCompensation * visualVolumeScale, 0.62, 1);
+      // PR62 proportional MeterBus reference: visual motion follows the actual
+      // listening volume while compensating Boost, preserving usable headroom.
+      const visualGainCompensation = Math.pow(boostGain, -0.55);
+      const visualVolumeScale = Math.pow(volume, 0.85);
+      const visualSignalScale = visualGainCompensation * visualVolumeScale;
 
       const bandCount = Math.max(1, bars.length);
       const nyquist = Math.max(1, ctx.sampleRate / 2);
@@ -491,23 +491,27 @@ count += 1;
         const local = value * 0.86 + before * 0.07 + after * 0.07;
         const position = index / Math.max(1, bandCount - 1);
         const absolute = clamp(local / 255, 0, 1);
-        const localGate = clamp((local - 2) / 14, 0, 1);
-        const currentReference = bandReference[index] || 18;
-        const desiredReference = Math.max(8, local);
+        const localGate = clamp((local - 6) / 26, 0, 1);
+        const currentReference = bandReference[index] || 24;
+        const desiredReference = Math.max(14, local);
         bandReference[index] = desiredReference > currentReference
-? currentReference + (desiredReference - currentReference) * 0.08
-: Math.max(8, currentReference * 0.9985);
-        const relative = clamp(local / Math.max(8, bandReference[index]), 0, 1);
-        const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;
-        const spectral = Math.pow(absolute, 0.52) * visualTilt;
-        const spectralResponse = spectral * (0.35 + localGate * 0.65);
-        const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;
+? currentReference + (desiredReference - currentReference) * 0.025
+: Math.max(14, currentReference * 0.9994);
+        const relative = clamp(local / Math.max(14, bandReference[index]), 0, 1);
+        const visualTilt = 1 + Math.pow(position, 1.24) * 0.34;
+        const spectral = Math.pow(absolute, 0.74) * visualTilt;
+        const spectralResponse = spectral * (0.20 + localGate * 0.80);
+        const adaptiveResponse = Math.pow(relative, 0.82) * 0.065 * localGate;
+        const transient = clamp((localPeak - average) / 255, 0, 1);
+        const transientResponse = Math.pow(transient, 0.72) * 0.14 * localGate;
+        const energy = spectralResponse * 0.68 + adaptiveResponse + transientResponse;
+        const peakHeadroom = 0.78 + clamp(localPeak / 255, 0, 1) * 0.22;
         const target = signalPresent && localGate > 0
-? clamp(spectralResponse * 0.92 + adaptiveResponse, 0.012, 1)
+? clamp(energy, 0.012, peakHeadroom)
 : 0.012;
         const previous = bandEnvelope[index] || 0.012;
-        const attack = 0.76 + position * 0.12;
-        const release = 0.15 + position * 0.03;
+        const attack = 0.62 + position * 0.08;
+        const release = 0.13 + position * 0.02;
         bandEnvelope[index] = previous + (target - previous) * (target > previous ? attack : release);
         return bandEnvelope[index];
       });
