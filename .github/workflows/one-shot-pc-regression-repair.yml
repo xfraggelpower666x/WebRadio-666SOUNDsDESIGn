@@ -1,0 +1,107 @@
+name: One-shot PC regression repair
+
+on:
+  push:
+    branches:
+      - repair/pc-layout-ticker-proportional-meter-20260814
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.event.head_commit.message != 'Apply PC layout ticker proportional meter regression repair'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/pc-layout-ticker-proportional-meter-20260814
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply verified historical regression repair
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_exact(path, old, new, expected=1):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != expected:
+                  raise SystemExit(f'{path}: expected {expected} matches, got {count}')
+              p.write_text(text.replace(old, new), encoding='utf-8')
+
+          patch_files = ['css/player-patches.css', 'public/css/player-patches.css']
+          ticker_rule = '''  body .frame-stage .player-shell .now-playing .ticker-window{\n    position:absolute!important;\n    left:170px!important;\n    right:20px!important;\n    bottom:96px!important;\n    top:auto!important;\n    height:30px!important;\n    min-height:30px!important;\n    max-height:30px!important;\n    z-index:22!important;\n    width:auto!important;\n    max-width:none!important;\n    margin:0!important;\n  }\n  body .frame-stage .player-shell .now-playing .ticker-window #nowPlayingTicker,\n  body .frame-stage .player-shell .now-playing .ticker-window .ticker-text{\n    height:30px!important;\n    line-height:30px!important;\n  }\n'''
+          history_rule = '''  body .frame-stage .player-shell .now-playing #historyToggle{\n    position:absolute!important;\n    right:20px!important;\n    bottom:58px!important;\n    top:auto!important;\n    left:auto!important;\n    z-index:33!important;\n    width:96px!important;\n    min-width:96px!important;\n    max-width:96px!important;\n    height:34px!important;\n    min-height:34px!important;\n    max-height:34px!important;\n    display:flex!important;\n    align-items:center!important;\n    justify-content:center!important;\n    padding:0 10px!important;\n    margin:0!important;\n    box-sizing:border-box!important;\n  }\n'''
+          for path in patch_files:
+              replace_exact(path, ticker_rule, '')
+              replace_exact(path, history_rule, '')
+
+          stage_files = ['css/player-stage-v2.css', 'public/css/player-stage-v2.css']
+          old_side = 'body[data-veluna-page="main"] .side-meter{top:clamp(210px,24vh,275px)!important;bottom:clamp(48px,6vh,72px)!important;width:clamp(54px,3.7vw,72px)!important}'
+          new_side = 'body[data-veluna-page="main"] .side-meter{top:clamp(210px,24vh,275px)!important;bottom:clamp(48px,6vh,72px)!important;height:auto!important;width:clamp(54px,3.7vw,72px)!important}'
+          for path in stage_files:
+              replace_exact(path, old_side, new_side)
+
+          eq_files = ['js/equalizer.js', 'public/js/equalizer.js']
+          old_scale = '''      // Visual-only response guard: keep real analyser dynamics readable without\n      // making meter motion grow with Boost or collapse at normal listening volume.\n      const visualGainCompensation = Math.pow(boostGain, -0.18);\n      const visualVolumeScale = 0.72 + Math.pow(volume, 0.85) * 0.28;\n      const visualSignalScale = clamp(visualGainCompensation * visualVolumeScale, 0.62, 1);\n'''
+          new_scale = '''      // PR62 proportional MeterBus reference: visual motion follows the actual\n      // listening volume while compensating Boost, preserving usable headroom.\n      const visualGainCompensation = Math.pow(boostGain, -0.55);\n      const visualVolumeScale = Math.pow(volume, 0.85);\n      const visualSignalScale = visualGainCompensation * visualVolumeScale;\n'''
+          old_response = '''        const localGate = clamp((local - 2) / 14, 0, 1);\n        const currentReference = bandReference[index] || 18;\n        const desiredReference = Math.max(8, local);\n        bandReference[index] = desiredReference > currentReference\n? currentReference + (desiredReference - currentReference) * 0.08\n: Math.max(8, currentReference * 0.9985);\n        const relative = clamp(local / Math.max(8, bandReference[index]), 0, 1);\n        const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;\n        const spectral = Math.pow(absolute, 0.52) * visualTilt;\n        const spectralResponse = spectral * (0.35 + localGate * 0.65);\n        const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;\n        const target = signalPresent && localGate > 0\n? clamp(spectralResponse * 0.92 + adaptiveResponse, 0.012, 1)\n: 0.012;\n        const previous = bandEnvelope[index] || 0.012;\n        const attack = 0.76 + position * 0.12;\n        const release = 0.15 + position * 0.03;\n'''
+          new_response = '''        const localGate = clamp((local - 6) / 26, 0, 1);\n        const currentReference = bandReference[index] || 24;\n        const desiredReference = Math.max(14, local);\n        bandReference[index] = desiredReference > currentReference\n? currentReference + (desiredReference - currentReference) * 0.025\n: Math.max(14, currentReference * 0.9994);\n        const relative = clamp(local / Math.max(14, bandReference[index]), 0, 1);\n        const visualTilt = 1 + Math.pow(position, 1.24) * 0.34;\n        const spectral = Math.pow(absolute, 0.74) * visualTilt;\n        const spectralResponse = spectral * (0.20 + localGate * 0.80);\n        const adaptiveResponse = Math.pow(relative, 0.82) * 0.065 * localGate;\n        const transient = clamp((localPeak - average) / 255, 0, 1);\n        const transientResponse = Math.pow(transient, 0.72) * 0.14 * localGate;\n        const energy = spectralResponse * 0.68 + adaptiveResponse + transientResponse;\n        const peakHeadroom = 0.78 + clamp(localPeak / 255, 0, 1) * 0.22;\n        const target = signalPresent && localGate > 0\n? clamp(energy, 0.012, peakHeadroom)\n: 0.012;\n        const previous = bandEnvelope[index] || 0.012;\n        const attack = 0.62 + position * 0.08;\n        const release = 0.13 + position * 0.02;\n'''
+          for path in eq_files:
+              replace_exact(path, old_scale, new_scale)
+              replace_exact(path, old_response, new_response)
+
+          # Update existing regression contracts from PR122 high-response back to the
+          # verified PR62 proportional response, while retaining the current graph owner.
+          tests = ['tests/pc-eq-balanced-headroom.test.mjs', 'tests/pc-high-frequency-response.test.mjs', 'tests/central-boot-all-player-runtime.test.mjs']
+          substitutions = [
+              ('const visualTilt = 1 \\+ Math\\.pow\\(position, 1\\.18\\) \\* 1\\.10', 'const visualTilt = 1 \\+ Math\\.pow\\(position, 1\\.24\\) \\* 0\\.34'),
+              ('const spectral = Math\\.pow\\(absolute, 0\\.52\\) \\* visualTilt', 'const spectral = Math\\.pow\\(absolute, 0\\.74\\) \\* visualTilt'),
+              ('const localGate = clamp\\(\\(local - 2\\) \\/ 14', 'const localGate = clamp\\(\\(local - 6\\) \\/ 26'),
+              ('const adaptiveResponse = Math\\.pow\\(relative, 0\\.70\\) \\* 0\\.22 \\* localGate', 'const adaptiveResponse = Math\\.pow\\(relative, 0\\.82\\) \\* 0\\.065 \\* localGate'),
+              ('const attack = 0\\.76 \\+ position \\* 0\\.12', 'const attack = 0\\.62 \\+ position \\* 0\\.08'),
+              ('const release = 0\\.15 \\+ position \\* 0\\.03', 'const release = 0\\.13 \\+ position \\* 0\\.02'),
+              ('clamp\\(spectralResponse \\* 0\\.92 \\+ adaptiveResponse, 0\\.012, 1\\)', 'clamp\\(energy, 0\\.012, peakHeadroom\\)'),
+              ('spectralResponse \\* 0\\.92 \\+ adaptiveResponse', 'energy'),
+              ('assert.doesNotMatch(eq, /localPeak - average/);', 'assert.match(eq, /const transient = clamp\\(\\(localPeak - average\\) \\/ 255/);')
+          ]
+          for path in tests:
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              for old, new in substitutions:
+                  text = text.replace(old, new)
+              p.write_text(text, encoding='utf-8')
+
+          # Strengthen the main headroom test with the exact proportional-volume contract.
+          p = Path('tests/pc-eq-balanced-headroom.test.mjs')
+          text = p.read_text(encoding='utf-8')
+          needle = "  assert.match(eq, /canonical audio visualizer authority V14/);\n"
+          insert = "  assert.match(eq, /const visualVolumeScale = Math\\.pow\\(volume, 0\\.85\\)/);\n  assert.match(eq, /const visualGainCompensation = Math\\.pow\\(boostGain, -0\\.55\\)/);\n  assert.doesNotMatch(eq, /visualVolumeScale = 0\\.72|visualSignalScale = clamp\\([^\\n]*0\\.62/);\n"
+          if needle not in text:
+              raise SystemExit('headroom test insertion anchor missing')
+          text = text.replace(needle, needle + insert, 1)
+          p.write_text(text, encoding='utf-8')
+
+          # Layout regression contract: canonical Stage owns ticker/history geometry and
+          # side meters must not combine 100dvh with top+bottom clipping.
+          Path('tests/pc-layout-ticker-meter-regression.test.mjs').write_text('''import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\nconst read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');\n\ntest('desktop ticker and history use canonical stage geometry without v157 absolute drift', async () => {\n  const patches = await read('css/player-patches.css');\n  const stage = await read('css/player-stage-v2.css');\n  const html = await read('index.html');\n  assert.equal(await read('public/css/player-patches.css'), patches);\n  assert.equal(await read('public/css/player-stage-v2.css'), stage);\n  assert.match(html, /id="nowPlayingTicker" class="ticker-text"/);\n  assert.doesNotMatch(patches, /now-playing \\.ticker-window\\{\\s*position:absolute!important;[\\s\\S]*bottom:96px/);\n  assert.doesNotMatch(patches, /now-playing #historyToggle\\{\\s*position:absolute!important;[\\s\\S]*bottom:58px/);\n  assert.match(stage, /now-playing \\.ticker-window\\{position:relative!important;inset:auto!important;grid-column:2!important;grid-row:2!important/);\n  assert.match(stage, /now-playing #historyToggle\\{position:relative!important;inset:auto!important/);\n  assert.match(stage, /animation:s666TitleMarquee 16s linear infinite!important/);\n});\n\ntest('desktop side meters fit between top and bottom bounds instead of clipping a 100dvh element', async () => {\n  const stage = await read('css/player-stage-v2.css');\n  assert.match(stage, /\\.side-meter\\{top:clamp\\(210px,24vh,275px\\)!important;bottom:clamp\\(48px,6vh,72px\\)!important;height:auto!important/);\n});\n''', encoding='utf-8')
+
+          # Remove this one-shot runner from the resulting tree.
+          Path('.github/workflows/one-shot-pc-regression-repair.yml').unlink()
+      - name: Verify changed scope
+        run: |
+          git diff --check
+          git status --short
+          node --check js/equalizer.js
+          node --check public/js/equalizer.js
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add css/player-patches.css public/css/player-patches.css css/player-stage-v2.css public/css/player-stage-v2.css js/equalizer.js public/js/equalizer.js tests/pc-eq-balanced-headroom.test.mjs tests/pc-high-frequency-response.test.mjs tests/central-boot-all-player-runtime.test.mjs tests/pc-layout-ticker-meter-regression.test.mjs .github/workflows/one-shot-pc-regression-repair.yml
+          git commit -m "Apply PC layout ticker proportional meter regression repair"
+          git push origin HEAD:repair/pc-layout-ticker-proportional-meter-20260814
