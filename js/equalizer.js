@@ -449,9 +449,9 @@ const stopFallback = () => {
       const boostGain = Math.max(1, Number(gainNode?.gain?.value || (window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage]) || 1));
       // Visual-only response guard: keep real analyser dynamics readable without
       // making meter motion grow with Boost or collapse at normal listening volume.
-      const visualGainCompensation = Math.pow(boostGain, -0.18);
-      const visualVolumeScale = 0.72 + Math.pow(volume, 0.85) * 0.28;
-      const visualSignalScale = clamp(visualGainCompensation * visualVolumeScale, 0.62, 1);
+      const visualGainCompensation = Math.pow(boostGain, -0.55);
+      const visualVolumeScale = Math.pow(volume, 0.85);
+      const visualSignalScale = visualGainCompensation * visualVolumeScale;
 
       const bandCount = Math.max(1, bars.length);
       const nyquist = Math.max(1, ctx.sampleRate / 2);
