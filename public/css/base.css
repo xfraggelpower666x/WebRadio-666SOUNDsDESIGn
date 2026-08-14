@@ -57,6 +57,25 @@ button, input { font: inherit; }
   background-position: center top;
   background-size: contain;
 }
+
+/*
+==========================================
+GEÄNDERT: 2026-08-14
+ÄNDERUNG: PC SINGLE BACKGROUND OWNER REGRESSION REPAIR.
+ZWECK:
+- Auf Main/Desktop ist body der einzige Bild-Hintergrund-Owner.
+- Die Basis-Stage darf dort nicht dasselbe VELUNA-Artwork ein zweites Mal
+  mit contain-Skalierung zeichnen.
+- Mobile bleibt unverändert.
+==========================================
+*/
+@media (min-width: 761px) {
+  body[data-veluna-page="main"] .frame-stage {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+}
+
 .frame-overlay {
   position: absolute;
   inset: 0;
