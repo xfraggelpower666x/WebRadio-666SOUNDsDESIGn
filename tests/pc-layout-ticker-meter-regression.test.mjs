@@ -17,7 +17,11 @@ test('desktop ticker and history use canonical stage geometry without v157 absol
   assert.match(stage, /animation:s666TitleMarquee 16s linear infinite!important/);
 });
 
-test('desktop side meters fit between top and bottom bounds instead of clipping a 100dvh element', async () => {
+test('desktop side meters stay fully visible above overlapping DNA side rails', async () => {
   const stage = await read('css/player-stage-v2.css');
+  const overlay = await read('css/eq-overlay.css');
+  assert.equal(await read('public/css/eq-overlay.css'), overlay);
   assert.match(stage, /\.side-meter\{top:clamp\(210px,24vh,275px\)!important;bottom:clamp\(48px,6vh,72px\)!important;height:auto!important/);
+  assert.match(stage, /\.frame-stage \.pc-side-addon\{[^}]*z-index:7!important/);
+  assert.match(overlay, /\.frame-stage > \.side-meter\{\s*z-index:10!important;/);
 });
