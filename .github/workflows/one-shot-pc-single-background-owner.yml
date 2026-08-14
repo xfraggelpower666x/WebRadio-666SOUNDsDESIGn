@@ -1,0 +1,63 @@
+name: One Shot PC Single Background Owner
+
+on:
+  push:
+    branches:
+      - repair/pc-single-background-owner-20260814
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/pc-single-background-owner-20260814
+          fetch-depth: 0
+      - name: Apply single-background-owner regression repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          paths = [Path('css/desktop.css'), Path('public/css/desktop.css')]
+          marker = "    background-repeat: no-repeat !important;\n  }\n\n  /* Hauptplayer: eine klare Spalte, nicht mehr vertauschte Reihenfolge */"
+          replacement = "    background-repeat: no-repeat !important;\n  }\n\n  /* PC background regression repair: body is the single desktop background owner.\n     The base .frame-stage image used the same VELUNA artwork a second time with\n     contain scaling, creating a doubled/offset side-stage impression. */\n  body[data-veluna-page=\"main\"] .frame-stage {\n    background-color: transparent !important;\n    background-image: none !important;\n  }\n\n  /* Hauptplayer: eine klare Spalte, nicht mehr vertauschte Reihenfolge */"
+
+          for path in paths:
+              text = path.read_text(encoding='utf-8')
+              if 'PC background regression repair: body is the single desktop background owner.' not in text:
+                  if marker not in text:
+                      raise SystemExit(f'patch marker missing in {path}')
+                  text = text.replace(marker, replacement, 1)
+                  path.write_text(text, encoding='utf-8')
+
+          root = paths[0].read_text(encoding='utf-8')
+          public = paths[1].read_text(encoding='utf-8')
+          if root != public:
+              raise SystemExit('desktop.css root/public mirror mismatch after repair')
+
+          test = Path('tests/pc-single-background-owner.test.mjs')
+          test.write_text("""import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+
+test('PC main stage has exactly one desktop background owner', async () => {
+  const desktop = await read('css/desktop.css');
+  assert.equal(await read('public/css/desktop.css'), desktop);
+  assert.match(desktop, /body\s*\{[\s\S]*?background-image:[\s\S]*?veluna-player-background\.webp/);
+  assert.match(desktop, /body\[data-veluna-page=\"main\"\] \.frame-stage\s*\{[\s\S]*?background-color:\s*transparent !important;[\s\S]*?background-image:\s*none !important;/);
+});
+""", encoding='utf-8')
+          PY
+          rm .github/workflows/one-shot-pc-single-background-owner.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add css/desktop.css public/css/desktop.css tests/pc-single-background-owner.test.mjs .github/workflows/one-shot-pc-single-background-owner.yml
+          git commit -m "repair: restore single desktop background owner"
+          git push origin HEAD:repair/pc-single-background-owner-20260814
