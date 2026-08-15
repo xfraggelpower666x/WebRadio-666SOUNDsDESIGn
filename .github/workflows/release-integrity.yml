@@ -108,13 +108,15 @@ jobs:
             const pub=await read('public/index.html');
             const core=await read('js/player-core.js');
             assert.equal(pub,html);
-            assert.match(html,new RegExp(`player-stage-v2\\.css\\?v=${MARK}`));
-            assert.match(html,new RegExp(`player-stage-v2\\.js\\?v=${MARK}`));
-            assert.match(html,new RegExp(`player-core\\.js\\?v=${MARK}`));
-            assert.match(core,new RegExp(`equalizer\\.js\\?v=${MARK}`));
+            assert.ok(html.includes(`/css/player-stage-v2.css?v=${MARK}`));
+            assert.ok(html.includes(`/js/player-stage-v2.js?v=${MARK}`));
+            assert.ok(html.includes(`/js/player-core.js?v=${MARK}`));
+            assert.ok(core.includes(`./equalizer.js?v=${MARK}`));
             assert.equal(await read('public/js/player-core.js'),core);
-            assert.doesNotMatch(html,/player-stage-v2\\.css\\?v=2026-07-24-balanced-headroom-v14|player-stage-v2\\.js\\?v=2026-07-24-balanced-headroom-v14|player-core\\.js\\?v=2026-08-06-runtime-owner-v1/);
-            assert.doesNotMatch(core,/equalizer\\.js\\?v=2026-08-06-runtime-owner-v1/);
+            assert.ok(!html.includes('/css/player-stage-v2.css?v=2026-07-24-balanced-headroom-v14'));
+            assert.ok(!html.includes('/js/player-stage-v2.js?v=2026-07-24-balanced-headroom-v14'));
+            assert.ok(!html.includes('/js/player-core.js?v=2026-08-06-runtime-owner-v1'));
+            assert.ok(!core.includes('./equalizer.js?v=2026-08-06-runtime-owner-v1'));
           });
           """), encoding='utf-8')
           PY
