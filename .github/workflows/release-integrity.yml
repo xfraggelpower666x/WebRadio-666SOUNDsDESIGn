@@ -57,6 +57,7 @@ jobs:
           set -Eeuo pipefail
           python3 <<'PY'
           from pathlib import Path
+          from textwrap import dedent
           mark = '2026-08-15-runtime-cache-identity-v1'
           old_stage = '2026-07-24-balanced-headroom-v14'
           old_core = '2026-08-06-runtime-owner-v1'
@@ -95,7 +96,8 @@ jobs:
                   raise SystemExit(f'missing stale test marker in {rel}')
               p.write_text(s.replace(old_core, mark), encoding='utf-8')
 
-          Path('tests/runtime-cache-identity.test.mjs').write_text("""import test from 'node:test';
+          Path('tests/runtime-cache-identity.test.mjs').write_text(dedent("""\
+          import test from 'node:test';
           import assert from 'node:assert/strict';
           import { readFile } from 'node:fs/promises';
           const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -114,7 +116,7 @@ jobs:
             assert.doesNotMatch(html,/player-stage-v2\\.css\\?v=2026-07-24-balanced-headroom-v14|player-stage-v2\\.js\\?v=2026-07-24-balanced-headroom-v14|player-core\\.js\\?v=2026-08-06-runtime-owner-v1/);
             assert.doesNotMatch(core,/equalizer\\.js\\?v=2026-08-06-runtime-owner-v1/);
           });
-          """.replace(/^          /gm,''), encoding='utf-8')
+          """), encoding='utf-8')
           PY
       - name: Run full repository verification before commit
         run: npm run verify
