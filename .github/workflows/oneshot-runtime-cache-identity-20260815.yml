@@ -15,71 +15,57 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout repair branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: repair/runtime-cache-identity-20260815
           fetch-depth: 0
           persist-credentials: true
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '22'
           cache: npm
-
-      - name: Install locked dependencies
-        run: npm ci
-
+      - run: npm ci
       - name: Apply deterministic cache identity repair
-        shell: python
+        shell: bash
         run: |
+          set -Eeuo pipefail
+          python3 <<'PY'
           from pathlib import Path
-
-          mark = "2026-08-15-runtime-cache-identity-v1"
-          old_stage = "2026-07-24-balanced-headroom-v14"
-          old_core = "2026-08-06-runtime-owner-v1"
-
-          for rel in ("index.html", "public/index.html"):
+          mark = '2026-08-15-runtime-cache-identity-v1'
+          old_stage = '2026-07-24-balanced-headroom-v14'
+          old_core = '2026-08-06-runtime-owner-v1'
+          for rel in ('index.html', 'public/index.html'):
               p = Path(rel)
-              s = p.read_text(encoding="utf-8")
+              s = p.read_text(encoding='utf-8')
               replacements = {
-                  f"/css/player-stage-v2.css?v={old_stage}": f"/css/player-stage-v2.css?v={mark}",
-                  f"/js/player-stage-v2.js?v={old_stage}": f"/js/player-stage-v2.js?v={mark}",
-                  f"/js/player-core.js?v={old_core}": f"/js/player-core.js?v={mark}",
+                  f'/css/player-stage-v2.css?v={old_stage}': f'/css/player-stage-v2.css?v={mark}',
+                  f'/js/player-stage-v2.js?v={old_stage}': f'/js/player-stage-v2.js?v={mark}',
+                  f'/js/player-core.js?v={old_core}': f'/js/player-core.js?v={mark}',
               }
               for before, after in replacements.items():
                   if before not in s:
-                      raise SystemExit(f"missing expected cache marker in {rel}: {before}")
+                      raise SystemExit(f'missing expected cache marker in {rel}: {before}')
                   s = s.replace(before, after)
-              p.write_text(s, encoding="utf-8")
-
-          for rel in ("js/player-core.js", "public/js/player-core.js"):
+              p.write_text(s, encoding='utf-8')
+          for rel in ('js/player-core.js', 'public/js/player-core.js'):
               p = Path(rel)
-              s = p.read_text(encoding="utf-8")
-              before = f"./equalizer.js?v={old_core}"
-              after = f"./equalizer.js?v={mark}"
+              s = p.read_text(encoding='utf-8')
+              before = f'./equalizer.js?v={old_core}'
+              after = f'./equalizer.js?v={mark}'
               if before not in s:
-                  raise SystemExit(f"missing expected equalizer import in {rel}")
-              p.write_text(s.replace(before, after), encoding="utf-8")
-
-          for rel in (
-              "tests/pc-high-frequency-response.test.mjs",
-              "tests/pc-eq-balanced-headroom.test.mjs",
-              "tests/pc-real-spectrum-layout.test.mjs",
-          ):
+                  raise SystemExit(f'missing expected equalizer import in {rel}')
+              p.write_text(s.replace(before, after), encoding='utf-8')
+          for rel in ('tests/pc-high-frequency-response.test.mjs','tests/pc-eq-balanced-headroom.test.mjs','tests/pc-real-spectrum-layout.test.mjs'):
               p = Path(rel)
-              s = p.read_text(encoding="utf-8")
+              s = p.read_text(encoding='utf-8')
               if old_core not in s:
-                  raise SystemExit(f"missing stale test marker in {rel}")
-              p.write_text(s.replace(old_core, mark), encoding="utf-8")
-
-          Path("tests/runtime-cache-identity.test.mjs").write_text('''import test from 'node:test';
+                  raise SystemExit(f'missing stale test marker in {rel}')
+              p.write_text(s.replace(old_core, mark), encoding='utf-8')
+          Path('tests/runtime-cache-identity.test.mjs').write_text("""import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 const MARK='2026-08-15-runtime-cache-identity-v1';
-
 test('repaired PC runtime assets use one fresh cache identity', async () => {
   const html=await read('index.html');
   const pub=await read('public/index.html');
@@ -93,20 +79,17 @@ test('repaired PC runtime assets use one fresh cache identity', async () => {
   assert.doesNotMatch(html,/player-stage-v2\\.css\\?v=2026-07-24-balanced-headroom-v14|player-stage-v2\\.js\\?v=2026-07-24-balanced-headroom-v14|player-core\\.js\\?v=2026-08-06-runtime-owner-v1/);
   assert.doesNotMatch(core,/equalizer\\.js\\?v=2026-08-06-runtime-owner-v1/);
 });
-''', encoding="utf-8")
-
-          Path(".github/workflows/oneshot-runtime-cache-identity-20260815.yml").unlink()
-
-      - name: Verify repository
-        run: npm test
-
-      - name: Commit repaired branch and self-delete runner
+""", encoding='utf-8')
+          Path('.github/workflows/oneshot-runtime-cache-identity-20260815.yml').unlink()
+          PY
+      - run: npm test
+      - name: Commit repaired branch
         shell: bash
         run: |
           set -Eeuo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html public/index.html js/player-core.js public/js/player-core.js tests .github/workflows/oneshot-runtime-cache-identity-20260815.yml
           git diff --cached --check
-          git commit -m "repair: refresh repaired player runtime cache identity"
+          git commit -m 'repair: refresh repaired player runtime cache identity'
           git push origin HEAD:repair/runtime-cache-identity-20260815
