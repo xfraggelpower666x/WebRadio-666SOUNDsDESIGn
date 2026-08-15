@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+const MARK='2026-08-15-runtime-cache-identity-v1';
+
+test('repaired PC runtime assets use one fresh cache identity', async () => {
+  const html=await read('index.html');
+  const pub=await read('public/index.html');
+  const core=await read('js/player-core.js');
+  assert.equal(pub,html);
+  assert.ok(html.includes(`/css/player-stage-v2.css?v=${MARK}`));
+  assert.ok(html.includes(`/js/player-stage-v2.js?v=${MARK}`));
+  assert.ok(html.includes(`/js/player-core.js?v=${MARK}`));
+  assert.ok(core.includes(`./equalizer.js?v=${MARK}`));
+  assert.equal(await read('public/js/player-core.js'),core);
+  assert.ok(!html.includes('/css/player-stage-v2.css?v=2026-07-24-balanced-headroom-v14'));
+  assert.ok(!html.includes('/js/player-stage-v2.js?v=2026-07-24-balanced-headroom-v14'));
+  assert.ok(!html.includes('/js/player-core.js?v=2026-08-06-runtime-owner-v1'));
+  assert.ok(!core.includes('./equalizer.js?v=2026-08-06-runtime-owner-v1'));
+});

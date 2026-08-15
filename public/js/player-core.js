@@ -14,7 +14,7 @@ HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=2026-08-06-runtime-owner-v1';
+import { createBars, startVisualizer } from './equalizer.js?v=2026-08-15-runtime-cache-identity-v1';
 import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
 import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
 
