@@ -12,26 +12,43 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
     steps:
-      - name: Inspect public live metadata fields
+      - name: Inspect public stream status capacity
         shell: bash
         run: |
           set -Eeuo pipefail
-          live="$(mktemp)"
-          upstream="$(mktemp)"
-          trap 'rm -f "$live" "$upstream"' EXIT
-          curl -fsSL --max-time 30 -H 'Cache-Control: no-cache' 'https://webradio.666soundsdesign-broadcaster.com/api/nowplaying?diag=listener-capacity' -o "$live"
-          curl -fsSL --max-time 30 -H 'Cache-Control: no-cache' 'https://my.idjstream.com/cp/get_info.php?p=8686&diag=listener-capacity' -o "$upstream"
-          node - "$live" "$upstream" <<'NODE'
-          const fs = require('node:fs');
-          for (const [label, path] of [['LIVE_PROXY', process.argv[2]], ['UPSTREAM', process.argv[3]]]) {
-            const raw = fs.readFileSync(path, 'utf8');
-            let value;
-            try { value = JSON.parse(raw); } catch { value = { __nonJsonLength: raw.length }; }
-            const obj = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-            const numeric = Object.fromEntries(Object.entries(obj).filter(([k,v]) => /listen|max|client|slot|capacity/i.test(k) && (typeof v === 'number' || /^\d+$/.test(String(v)))));
-            console.log(`${label}_KEYS=${Object.keys(obj).sort().join(',')}`);
-            console.log(`${label}_LISTENER_FIELDS=${JSON.stringify(numeric)}`);
-          }
-          NODE
+          urls=(
+            'https://webradio.666soundsdesign-broadcaster.com/api/nowplaying?diag=listener-capacity'
+            'https://my.idjstream.com/cp/get_info.php?p=8686&diag=listener-capacity'
+            'https://my.idjstream.com:8686/status-json.xsl'
+            'https://my.idjstream.com:8686/stats?sid=1&json=1'
+            'https://my.idjstream.com:8686/statistics?json=1'
+          )
+          labels=(LIVE_PROXY UPSTREAM_META ICECAST_STATUS SHOUTCAST_STATS SHOUTCAST_STATISTICS)
+          for i in "${!urls[@]}"; do
+            file="$(mktemp)"
+            code="$(curl -k -sS -L --connect-timeout 4 --max-time 6 -H 'Cache-Control: no-cache' -o "$file" -w '%{http_code}' "${urls[$i]}" || true)"
+            echo "${labels[$i]}_HTTP=${code:-curl_error}"
+            if [[ "$code" == "200" && -s "$file" ]]; then
+              LABEL="${labels[$i]}" FILE="$file" node <<'NODE'
+              const fs = require('node:fs');
+              const raw = fs.readFileSync(process.env.FILE, 'utf8');
+              let value;
+              try { value = JSON.parse(raw); } catch { value = { __nonJsonLength: raw.length, __preview: raw.slice(0, 100).replace(/\s+/g, ' ') }; }
+              const found = {};
+              const walk = (v, p='') => {
+                if (!v || typeof v !== 'object') return;
+                for (const [k, x] of Object.entries(v)) {
+                  const path = p ? `${p}.${k}` : k;
+                  if (/listen|max|client|slot|capacity/i.test(k) && (typeof x === 'number' || /^\d+$/.test(String(x)))) found[path] = x;
+                  if (x && typeof x === 'object') walk(x, path);
+                }
+              };
+              walk(value);
+              console.log(`${process.env.LABEL}_KEYS=${Object.keys(value).sort().join(',')}`);
+              console.log(`${process.env.LABEL}_LISTENER_FIELDS=${JSON.stringify(found)}`);
+              NODE
+            fi
+            rm -f "$file"
+          done
