@@ -1,0 +1,37 @@
+name: Diagnose Live Listener Capacity
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/diagnose-live-listener-capacity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect public live metadata fields
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          live="$(mktemp)"
+          upstream="$(mktemp)"
+          trap 'rm -f "$live" "$upstream"' EXIT
+          curl -fsSL --max-time 30 -H 'Cache-Control: no-cache' 'https://webradio.666soundsdesign-broadcaster.com/api/nowplaying?diag=listener-capacity' -o "$live"
+          curl -fsSL --max-time 30 -H 'Cache-Control: no-cache' 'https://my.idjstream.com/cp/get_info.php?p=8686&diag=listener-capacity' -o "$upstream"
+          node - "$live" "$upstream" <<'NODE'
+          const fs = require('node:fs');
+          for (const [label, path] of [['LIVE_PROXY', process.argv[2]], ['UPSTREAM', process.argv[3]]]) {
+            const raw = fs.readFileSync(path, 'utf8');
+            let value;
+            try { value = JSON.parse(raw); } catch { value = { __nonJsonLength: raw.length }; }
+            const obj = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+            const numeric = Object.fromEntries(Object.entries(obj).filter(([k,v]) => /listen|max|client|slot|capacity/i.test(k) && (typeof v === 'number' || /^\d+$/.test(String(v)))));
+            console.log(`${label}_KEYS=${Object.keys(obj).sort().join(',')}`);
+            console.log(`${label}_LISTENER_FIELDS=${JSON.stringify(numeric)}`);
+          }
+          NODE
