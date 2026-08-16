@@ -608,11 +608,13 @@ function extractCoverUrl(payload) {
   return '';
 }
 
+const MAX_LISTENERS_UNKNOWN = '—';
+
 function parseMetadata(payload) {
   if (!payload || typeof payload !== 'object') {
     return {
       title: '',
-      listeners: '0 / 250',
+      listeners: `0 / ${MAX_LISTENERS_UNKNOWN}` ,
       bitrate: 'Unknown',
       dj: getDefaultDjName(),
       cover: ''
@@ -645,7 +647,11 @@ function parseMetadata(payload) {
 
   const listeners = payload.listeners || payload.currentlisteners || payload.currentListeners || payload.listener_count || 0;
   const bitrate = payload.bitrate || payload.stream_bitrate || payload.streamBitrate || 'Unknown';
-  const max = payload.maxlisteners || payload.maxListeners || payload.listener_capacity || 250;
+  const rawMaxListeners = payload.maxlisteners ?? payload.maxListeners ?? payload.listener_capacity ?? payload.listenerCapacity;
+  const parsedMaxListeners = Number(rawMaxListeners);
+  const max = Number.isFinite(parsedMaxListeners) && parsedMaxListeners > 0
+    ? Math.round(parsedMaxListeners)
+    : MAX_LISTENERS_UNKNOWN;
   const rawDj = firstMetadataText(
     payload.dj_display, payload.dj, payload.djusername, payload.djstatus, payload.presenter,
     payload.live_dj, payload.streamer, payload.client,
