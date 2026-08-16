@@ -1,0 +1,40 @@
+name: Readback Live Mute
+on:
+  push:
+    branches:
+      - feature/all-player-mute-20260816
+permissions:
+  contents: read
+jobs:
+  readback:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify live mute assets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base='https://webradio.666soundsdesign-broadcaster.com'
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          for path in /config/veluna-assets.js /js/all-player-mute.js /css/all-player-mute.css; do
+            code="$(curl -sS -L --connect-timeout 10 --max-time 35 -H 'Cache-Control: no-cache' -o "$tmp/$(basename "$path")" -w '%{http_code}' "${base}${path}?readback=${GITHUB_SHA}")"
+            echo "LIVE ${path} HTTP=${code} BYTES=$(wc -c < "$tmp/$(basename "$path")")"
+            test "$code" = '200'
+          done
+          grep -Fq '/css/all-player-mute.css' "$tmp/veluna-assets.js"
+          grep -Fq '/js/all-player-mute.js' "$tmp/veluna-assets.js"
+          grep -Fq 'S666AllPlayerMute' "$tmp/veluna-assets.js"
+          grep -Fq 'audio.muted = !audio.muted' "$tmp/all-player-mute.js"
+          grep -Fq 'aria-pressed' "$tmp/all-player-mute.js"
+          grep -Fq 'MutationObserver' "$tmp/all-player-mute.js"
+          if grep -Eq 'audio\.volume\s*=' "$tmp/all-player-mute.js"; then
+            echo 'FAIL: live mute runtime rewrites audio.volume' >&2
+            exit 1
+          fi
+          if grep -Eq 'AudioContext|webkitAudioContext|createMediaElementSource|createGain|createBiquadFilter|DynamicsCompressor' "$tmp/all-player-mute.js"; then
+            echo 'FAIL: live mute runtime creates or modifies audio graph' >&2
+            exit 1
+          fi
+          grep -Fq '.s666-mute-button' "$tmp/all-player-mute.css"
+          echo 'LIVE ALL-PLAYER MUTE READBACK PASS'
