@@ -18,10 +18,19 @@ test('live listener capacity parser accepts provider values without a runtime ha
   assert.doesNotMatch(addon, /maxlisteners\s*[:=]\s*500/);
 });
 
+test('nowplaying metadata is never blocked by the secondary listener-capacity fetch', () => {
+  const addon = read('worker-addons/live-listener-capacity.js');
+  assert.doesNotMatch(addon, /Promise\.all\s*\(/);
+  assert.match(addon, /const response = await forward\(request, env\)/);
+  assert.match(addon, /ctx\?\.waitUntil/);
+  assert.match(addon, /Primary metadata must never wait/);
+});
+
 test('production entry enriches only GET nowplaying through the live capacity addon', () => {
   const entry = read('worker-entry.js');
   assert.match(entry, /enrichNowPlayingWithLiveListenerCapacity/);
   assert.match(entry, /path === '\/api\/nowplaying' && request\.method === 'GET'/);
+  assert.match(entry, /,\s*ctx\s*\)/);
 });
 
 test('main player does not invent a static maximum listener count', () => {
