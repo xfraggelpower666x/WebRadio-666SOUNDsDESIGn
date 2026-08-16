@@ -1,37 +1,68 @@
-name: Diagnose Live Listener Capacity
+name: Apply Live Listener Capacity Repair
 
 on:
   pull_request:
     paths:
       - ".github/workflows/diagnose-live-listener-capacity.yml"
-  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 8
     steps:
-      - name: Inspect public stream status capacity
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/live-maxlisteners-20260816
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Patch player max-listener fallback and remove diagnostics
         shell: bash
         run: |
           set -Eeuo pipefail
-          urls=(
-            'https://webradio.666soundsdesign-broadcaster.com/api/nowplaying?diag=listener-capacity'
-            'https://my.idjstream.com/cp/get_info.php?p=8686&diag=listener-capacity'
-            'https://my.idjstream.com:8686/status-json.xsl'
-            'https://my.idjstream.com:8686/stats?sid=1&json=1'
-            'https://my.idjstream.com:8686/statistics?json=1'
-          )
-          labels=(LIVE_PROXY UPSTREAM_META ICECAST_STATUS SHOUTCAST_STATS SHOUTCAST_STATISTICS)
-          for i in "${!urls[@]}"; do
-            file="$(mktemp)"
-            code="$(curl -k -sS -L --connect-timeout 4 --max-time 6 -H 'Cache-Control: no-cache' -o "$file" -w '%{http_code}' "${urls[$i]}" || true)"
-            echo "${labels[$i]}_HTTP=${code:-curl_error}"
-            if [[ "$code" == "200" && -s "$file" ]]; then
-              LABEL="${labels[$i]}" FILE="$file" node -e 'const fs=require("node:fs");const raw=fs.readFileSync(process.env.FILE,"utf8");let v;try{v=JSON.parse(raw)}catch{v={__nonJsonLength:raw.length,__preview:raw.slice(0,100).replace(/\s+/g," ")}}const found={};const walk=(x,p="")=>{if(!x||typeof x!=="object")return;for(const [k,y] of Object.entries(x)){const q=p?`${p}.${k}`:k;if(/listen|max|client|slot|capacity/i.test(k)&&(typeof y==="number"||/^\d+$/.test(String(y))))found[q]=y;if(y&&typeof y==="object")walk(y,q)}};walk(v);console.log(`${process.env.LABEL}_KEYS=${Object.keys(v).sort().join(",")}`);console.log(`${process.env.LABEL}_LISTENER_FIELDS=${JSON.stringify(found)}`);'
-            fi
-            rm -f "$file"
-          done
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [Path('js/player-core.js'), Path('public/js/player-core.js')]
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              marker = "function parseMetadata(payload) {"
+              if text.count(marker) != 1:
+                  raise SystemExit(f'{path}: parseMetadata marker count != 1')
+              text = text.replace(marker, "const MAX_LISTENERS_UNKNOWN = '—';\n\nfunction parseMetadata(payload) {", 1)
+
+              old_idle = "      listeners: '0 / 250',"
+              new_idle = "      listeners: `0 / ${MAX_LISTENERS_UNKNOWN}` ,"
+              if text.count(old_idle) != 1:
+                  raise SystemExit(f'{path}: idle 250 marker count != 1')
+              text = text.replace(old_idle, new_idle, 1)
+
+              old_max = "  const max = payload.maxlisteners || payload.maxListeners || payload.listener_capacity || 250;"
+              new_max = "  const rawMaxListeners = payload.maxlisteners ?? payload.maxListeners ?? payload.listener_capacity ?? payload.listenerCapacity;\n  const parsedMaxListeners = Number(rawMaxListeners);\n  const max = Number.isFinite(parsedMaxListeners) && parsedMaxListeners > 0\n    ? Math.round(parsedMaxListeners)\n    : MAX_LISTENERS_UNKNOWN;"
+              if text.count(old_max) != 1:
+                  raise SystemExit(f'{path}: max 250 marker count != 1')
+              text = text.replace(old_max, new_max, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+          rm -f tests/live-listener-capacity-diagnostic.test.mjs
+          rm -f .github/workflows/diagnose-live-listener-capacity.yml
+      - name: Verify repository
+        run: |
+          npm ci
+          npm run verify
+      - name: Commit clean repair
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git status --short
+          git commit -m 'fix: read max listeners from live stream stats'
+          git push origin HEAD:repair/live-maxlisteners-20260816
