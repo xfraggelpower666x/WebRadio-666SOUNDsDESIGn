@@ -104,8 +104,8 @@ jobs:
           console.log('PLAYER PWA MANIFEST OWNERSHIP PASS');
           NODE
 
-          grep -Fq "Central Player Boot + Session Identity v2.0.0" "$workdir/central-boot-screen.js"
-          grep -Fq "2026-08-12-unified-lockscreen-boot-v3" "$workdir/central-boot-screen.js"
+          grep -Fq "Central Player Boot + Session Identity v2.1.0" "$workdir/central-boot-screen.js"
+          grep -Fq "2026-08-13-root-identity-regression-v4" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'hub'" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'iphone'" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'android'" "$workdir/central-boot-screen.js"
