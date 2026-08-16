@@ -2,6 +2,7 @@ const DEFAULT_STATS_URL = 'https://my.idjstream.com:8686/stats?sid=1&json=1';
 const CACHE_TTL_MS = 15000;
 const STALE_TTL_MS = 600000;
 const FETCH_TIMEOUT_MS = 1500;
+const UNKNOWN_CAPACITY = '—';
 
 let cache = { value: null, fetchedAt: 0, pending: null };
 
@@ -51,20 +52,17 @@ async function fetchCapacity(env) {
 
 function scheduleCapacityRefresh(env, ctx) {
   const refresh = fetchCapacity(env).catch(() => null);
-  if (ctx?.waitUntil) {
-    ctx.waitUntil(refresh);
-  } else {
-    void refresh;
-  }
+  if (ctx?.waitUntil) ctx.waitUntil(refresh);
+  else void refresh;
 }
 
 export async function enrichNowPlayingWithLiveListenerCapacity(request, env, forward, ctx) {
   // Primary metadata must never wait for the secondary Shoutcast stats endpoint.
   const response = await forward(request, env);
-  const maxlisteners = getCachedCapacity();
+  const maxlisteners = getCachedCapacity() ?? UNKNOWN_CAPACITY;
   scheduleCapacityRefresh(env, ctx);
 
-  if (!response || !response.ok || maxlisteners == null) return response;
+  if (!response || !response.ok) return response;
 
   let payload;
   try {
