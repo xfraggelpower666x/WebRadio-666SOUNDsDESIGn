@@ -14,6 +14,7 @@ test('live listener capacity parser accepts provider values without a runtime ha
   assert.equal(parseLiveListenerCapacity({}), null);
   const addon = read('worker-addons/live-listener-capacity.js');
   assert.match(addon, /stats\?sid=1&json=1/);
+  assert.match(addon, /LISTENER_STATS_URL/);
   assert.doesNotMatch(addon, /maxlisteners\s*[:=]\s*500/);
 });
 
@@ -29,5 +30,6 @@ test('main player does not invent a static maximum listener count', () => {
     assert.doesNotMatch(source, /listeners:\s*'0 \/ 250'/);
     assert.doesNotMatch(source, /listener_capacity\s*\|\|\s*250/);
     assert.match(source, /MAX_LISTENERS_UNKNOWN/);
+    assert.match(source, /MAX_LISTENERS_UNKNOWN = '—'/);
   }
 });
