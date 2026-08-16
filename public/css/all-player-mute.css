@@ -1,0 +1,69 @@
+/* 666SOUNDsDESIGn — shared all-player mute control */
+.s666-mute-button {
+  min-width: 72px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid rgba(0, 234, 255, .72);
+  border-radius: 10px;
+  background: rgba(8, 12, 24, .88);
+  color: #dffcff;
+  font: 700 11px/1 system-ui, sans-serif;
+  letter-spacing: .08em;
+  box-shadow: 0 0 12px rgba(0, 234, 255, .18), inset 0 0 8px rgba(0, 234, 255, .08);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 2147483000;
+}
+
+.s666-mute-button:hover,
+.s666-mute-button:focus-visible {
+  border-color: rgba(255, 43, 214, .92);
+  outline: none;
+  box-shadow: 0 0 14px rgba(255, 43, 214, .32), inset 0 0 8px rgba(255, 43, 214, .10);
+}
+
+.s666-mute-button.is-muted {
+  border-color: rgba(255, 43, 214, .96);
+  color: #ffd9fa;
+  box-shadow: 0 0 16px rgba(255, 43, 214, .34), inset 0 0 9px rgba(255, 43, 214, .12);
+}
+
+.s666-mute-button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.s666-mute-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* Fallback placement only when no player-native control row exists. */
+body > .s666-mute-button {
+  position: fixed;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(72px, calc(env(safe-area-inset-bottom) + 60px));
+}
+
+@media (max-width: 860px) {
+  .s666-mute-button {
+    min-width: 60px;
+    min-height: 36px;
+    padding: 6px 9px;
+    gap: 5px;
+    font-size: 10px;
+    border-radius: 9px;
+  }
+
+  .s666-mute-icon { font-size: 14px; }
+
+  body > .s666-mute-button {
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(58px, calc(env(safe-area-inset-bottom) + 50px));
+  }
+}
