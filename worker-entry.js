@@ -3,6 +3,7 @@ import worker from './worker.js';
 import { handleDiscordNotifyWithGlobalTrackGate } from './worker-addons/discord-global-gate-router.js';
 import { DiscordNowPlayingGateCore } from './worker-addons/discord-nowplaying-gate.js';
 import { handlePlayerAlertWithGlobalFallback } from './worker-addons/player-alert-global-fallback.js';
+import { enrichNowPlayingWithLiveListenerCapacity } from './worker-addons/live-listener-capacity.js';
 
 export class DiscordNowPlayingGate extends DurableObject {
   constructor(ctx, env) {
@@ -17,13 +18,14 @@ export class DiscordNowPlayingGate extends DurableObject {
 
 /*
  * 666SOUNDsDESIGn — Production Worker Entry
- * Version: V1.2-20260811-GLOBAL-PLAYER-ALERT-FALLBACK
+ * Version: V1.2-20260816-LIVE-LISTENER-CAPACITY
  * Scope:
  * - preserve automatic Discord Now Playing global gate
  * - preserve worker.js as authoritative radio/player implementation
  * - add a global Durable Object fallback for /api/player-alert/* so an
  *   unavailable Render/KV path cannot degrade cross-network messaging to an
  *   edge-local cache only
+ * - enrich /api/nowplaying with the live Shoutcast max-listener capacity
  * No new Worker/resource and no audio/stream/EQ/boost changes.
  */
 export default {
@@ -39,6 +41,13 @@ export default {
     }
     if (path.startsWith('/api/player-alert/')) {
       return handlePlayerAlertWithGlobalFallback(
+        request,
+        env,
+        (forwardRequest, forwardEnv) => worker.fetch(forwardRequest, forwardEnv, ctx)
+      );
+    }
+    if (path === '/api/nowplaying' && request.method === 'GET') {
+      return enrichNowPlayingWithLiveListenerCapacity(
         request,
         env,
         (forwardRequest, forwardEnv) => worker.fetch(forwardRequest, forwardEnv, ctx)
