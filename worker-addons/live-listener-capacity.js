@@ -12,6 +12,12 @@ export function parseLiveListenerCapacity(payload) {
   return Number.isFinite(value) && value > 0 ? Math.round(value) : null;
 }
 
+function getCachedCapacity(now = Date.now()) {
+  if (cache.value == null) return null;
+  if (now - cache.fetchedAt >= STALE_TTL_MS) return null;
+  return cache.value;
+}
+
 async function fetchCapacity(env) {
   const now = Date.now();
   if (cache.value != null && now - cache.fetchedAt < CACHE_TTL_MS) return cache.value;
@@ -33,8 +39,7 @@ async function fetchCapacity(env) {
       cache = { value, fetchedAt: Date.now(), pending: null };
       return value;
     } catch (error) {
-      if (cache.value != null && now - cache.fetchedAt < STALE_TTL_MS) return cache.value;
-      return null;
+      return getCachedCapacity(now);
     } finally {
       clearTimeout(timer);
       if (cache.pending) cache.pending = null;
@@ -44,11 +49,21 @@ async function fetchCapacity(env) {
   return cache.pending;
 }
 
-export async function enrichNowPlayingWithLiveListenerCapacity(request, env, forward) {
-  const [response, maxlisteners] = await Promise.all([
-    forward(request, env),
-    fetchCapacity(env)
-  ]);
+function scheduleCapacityRefresh(env, ctx) {
+  const refresh = fetchCapacity(env).catch(() => null);
+  if (ctx?.waitUntil) {
+    ctx.waitUntil(refresh);
+  } else {
+    void refresh;
+  }
+}
+
+export async function enrichNowPlayingWithLiveListenerCapacity(request, env, forward, ctx) {
+  // Primary metadata must never wait for the secondary Shoutcast stats endpoint.
+  const response = await forward(request, env);
+  const maxlisteners = getCachedCapacity();
+  scheduleCapacityRefresh(env, ctx);
+
   if (!response || !response.ok || maxlisteners == null) return response;
 
   let payload;
