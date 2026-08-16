@@ -31,24 +31,7 @@ jobs:
             code="$(curl -k -sS -L --connect-timeout 4 --max-time 6 -H 'Cache-Control: no-cache' -o "$file" -w '%{http_code}' "${urls[$i]}" || true)"
             echo "${labels[$i]}_HTTP=${code:-curl_error}"
             if [[ "$code" == "200" && -s "$file" ]]; then
-              LABEL="${labels[$i]}" FILE="$file" node <<'NODE'
-              const fs = require('node:fs');
-              const raw = fs.readFileSync(process.env.FILE, 'utf8');
-              let value;
-              try { value = JSON.parse(raw); } catch { value = { __nonJsonLength: raw.length, __preview: raw.slice(0, 100).replace(/\s+/g, ' ') }; }
-              const found = {};
-              const walk = (v, p='') => {
-                if (!v || typeof v !== 'object') return;
-                for (const [k, x] of Object.entries(v)) {
-                  const path = p ? `${p}.${k}` : k;
-                  if (/listen|max|client|slot|capacity/i.test(k) && (typeof x === 'number' || /^\d+$/.test(String(x)))) found[path] = x;
-                  if (x && typeof x === 'object') walk(x, path);
-                }
-              };
-              walk(value);
-              console.log(`${process.env.LABEL}_KEYS=${Object.keys(value).sort().join(',')}`);
-              console.log(`${process.env.LABEL}_LISTENER_FIELDS=${JSON.stringify(found)}`);
-              NODE
+              LABEL="${labels[$i]}" FILE="$file" node -e 'const fs=require("node:fs");const raw=fs.readFileSync(process.env.FILE,"utf8");let v;try{v=JSON.parse(raw)}catch{v={__nonJsonLength:raw.length,__preview:raw.slice(0,100).replace(/\s+/g," ")}}const found={};const walk=(x,p="")=>{if(!x||typeof x!=="object")return;for(const [k,y] of Object.entries(x)){const q=p?`${p}.${k}`:k;if(/listen|max|client|slot|capacity/i.test(k)&&(typeof y==="number"||/^\d+$/.test(String(y))))found[q]=y;if(y&&typeof y==="object")walk(y,q)}};walk(v);console.log(`${process.env.LABEL}_KEYS=${Object.keys(v).sort().join(",")}`);console.log(`${process.env.LABEL}_LISTENER_FIELDS=${JSON.stringify(found)}`);'
             fi
             rm -f "$file"
           done
