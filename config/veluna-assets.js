@@ -23,7 +23,7 @@ window.VELUNA_ASSETS = Object.freeze({
  */
 (() => {
   'use strict';
-  const version = '2026-07-23-reactive-visual-v183';
+  const version = '2026-08-16-all-player-mute-v184';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const head = document.head || document.documentElement;
   if (!head) return;
@@ -162,6 +162,7 @@ window.VELUNA_ASSETS = Object.freeze({
 
   loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
+  loadStyle(`/css/all-player-mute.css?v=${version}`, 's666AllPlayerMute');
 
   const activateOverlay = () => {
     try {
@@ -179,11 +180,18 @@ window.VELUNA_ASSETS = Object.freeze({
   const audioReady = () => !!window.SMFPBoostCore?.centralPolicyVersion;
   const policyReady = () => !!window.SMFPAudioPolicyUI;
   const artworkReady = () => !!window.SMFPArtworkCore;
+  const muteReady = () => !!window.S666AllPlayerMute?.version;
 
   void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
     .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
     .then(() => {
       try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {}
+    })
+    .catch(() => {});
+
+  void loadScript(`/js/all-player-mute.js?v=${version}`, 's666AllPlayerMute', muteReady)
+    .then(() => {
+      try { window.S666AllPlayerMute?.sync?.(); } catch (_) {}
     })
     .catch(() => {});
 
