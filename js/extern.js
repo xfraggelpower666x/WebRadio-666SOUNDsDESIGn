@@ -1,17 +1,16 @@
 // ==================================================
 // DATEI: js/extern.js
 // ERSTELLT: 2026-04-20
-// GEÄNDERT: 2026-04-20
+// GEÄNDERT: 2026-08-17
 // STATUS: MINIMAL ROOT PLAYER
 // ZWECK: Schlanke Audio-/Metadata-Logik für den externen Root-Player.
-// ÄNDERUNG: Nutzt nur relative Pfade über dieselbe Domain.
+// ÄNDERUNG: Listener-Kapazität ausschließlich live aus /api/nowplaying.
 // ==================================================
 
 const STREAMS = {
   main: "/stream",
   backup: "/fallback-stream",
   metadata: "/api/nowplaying",
-  listenerCapacity: 250,
   pollMs: 8000
 };
 
@@ -151,11 +150,14 @@ async function fetchMetadata() {
     lastTitle = normalizeTitle(data);
     trackTitle.textContent = lastTitle;
 
-    const listeners = Number.parseInt(pickValue(data, ["listeners"], 0), 10);
+    const listeners = Number.parseInt(pickValue(data, ["listeners", "currentlisteners", "currentListeners", "listener_count"], 0), 10);
+    const maxListenersRaw = pickValue(data, ["maxlisteners", "maxListeners", "listener_capacity", "listenerCapacity"], "—");
+    const maxListenersParsed = Number.parseInt(maxListenersRaw, 10);
+    const maxListeners = Number.isFinite(maxListenersParsed) && maxListenersParsed > 0 ? String(maxListenersParsed) : "—";
     const bitrate = pickValue(data, ["bitrate"], "--");
     const dj = normalizeDj(firstMetaText(data?.dj_display, data?.dj, data?.djusername, data?.djstatus, data?.live_dj, data?.streamer, data?.presenter, data?.client, data?.live?.streamer_name, data?.live?.streamer, data?.live?.name));
 
-    listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${STREAMS.listenerCapacity}`;
+    listenersText.textContent = `${Number.isFinite(listeners) ? listeners : 0} / ${maxListeners}`;
     bitrateText.textContent = bitrate ? `${bitrate} kbps` : "--";
     djText.textContent = String(dj);
     metaMode.textContent = "API";
