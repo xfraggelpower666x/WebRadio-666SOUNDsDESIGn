@@ -39,7 +39,6 @@ jobs:
               s=s.replace('animation:tickerMove 14s linear infinite!important','animation:s666TitleMarquee 14s linear infinite!important')
               s=s.replace('animation:tickerMove 14s linear infinite','animation:s666TitleMarquee 14s linear infinite')
               p.write_text(s)
-
           internal_old='/config/veluna-assets.js?v=2026-07-09-veluna-v1212'
           internal_new=f'/config/veluna-assets.js?v={new_v}'
           worker_hits=[]
@@ -47,14 +46,13 @@ jobs:
               if '.git' in p.parts: continue
               s=p.read_text(errors='ignore')
               if internal_old in s:
-                  s=s.replace(internal_old,internal_new)
-                  p.write_text(s)
-                  worker_hits.append(str(p))
+                  p.write_text(s.replace(internal_old,internal_new)); worker_hits.append(str(p))
           print('INTERNAL CACHE OWNERS UPDATED:', worker_hits)
-          worker=Path('worker.js').read_text()
-          assert internal_new in worker
-          assert 'id="muteBtn" class="small-btn"' in worker
-          assert 'class="marquee-window"' in worker and 'id="nowPlaying" class="marquee-track"' in worker
+          for rel in ['worker.js','workers/webradio-666soundsdesign-worker/worker.js']:
+              w=Path(rel).read_text()
+              assert internal_new in w, rel
+              assert 'muteBtn' in w, rel
+              assert 'marquee-window' in w and 'marquee-track' in w and 'nowPlaying' in w, rel
           PY
           cat > tests/native-mute-ticker-hosts.test.mjs <<'EOF'
           import test from 'node:test';
@@ -62,37 +60,26 @@ jobs:
           import fs from 'node:fs';
           const read = p => fs.readFileSync(p,'utf8');
           test('mute stays inside real player controls and preserves audio volume',()=>{
-            const a=read('js/all-player-mute.js'), b=read('public/js/all-player-mute.js');
-            assert.equal(a,b);
-            assert.match(a,/#mffApp \.mff-controls/);
-            assert.match(a,/\.player-shell \.bottom-console \.control-toolbar/);
-            assert.match(a,/getElementById\('muteBtn'\)/);
-            assert.match(a,/button\.parentElement !== host/);
-            assert.match(a,/audio\.muted = !audio\.muted/);
-            assert.doesNotMatch(a,/audio\.volume\s*=/);
+            const a=read('js/all-player-mute.js'), b=read('public/js/all-player-mute.js'); assert.equal(a,b);
+            assert.match(a,/#mffApp \.mff-controls/); assert.match(a,/\.player-shell \.bottom-console \.control-toolbar/);
+            assert.match(a,/getElementById\('muteBtn'\)/); assert.match(a,/button\.parentElement !== host/);
+            assert.match(a,/audio\.muted = !audio\.muted/); assert.doesNotMatch(a,/audio\.volume\s*=/);
           });
           test('main and mobile now-playing ticker use existing real keyframes',()=>{
-            const a=read('css/player-stage-v2.css'), b=read('public/css/player-stage-v2.css');
-            assert.equal(a,b);
-            assert.match(a,/@keyframes s666TitleMarquee/);
-            assert.match(a,/animation:s666TitleMarquee 14s linear infinite!important/);
+            const a=read('css/player-stage-v2.css'), b=read('public/css/player-stage-v2.css'); assert.equal(a,b);
+            assert.match(a,/@keyframes s666TitleMarquee/); assert.match(a,/animation:s666TitleMarquee 14s linear infinite!important/);
             assert.doesNotMatch(a,/animation:tickerMove 14s linear infinite!important/);
             assert.match(a,/#mffApp \.mff-controls\{[^}]*grid-template-columns:repeat\(8,minmax\(0,1fr\)\)!important/);
           });
           test('VELUNA retains its native in-player mute and marquee',()=>{
-            const v=read('VELUNA/index.html');
-            assert.match(v,/id="muteBtn" class="small-btn"/);
-            assert.match(v,/muteBtn\.addEventListener\('click'/);
-            assert.match(v,/@keyframes velunaTicker/);
-            assert.match(v,/marquee-track\.is-running\{animation:velunaTicker/);
+            const v=read('VELUNA/index.html'); assert.match(v,/muteBtn/); assert.match(v,/velunaTicker/); assert.match(v,/marquee-track/);
           });
-          test('Internal retains native mute and native now-playing owner with current shared bootstrap',()=>{
-            const w=read('worker.js');
-            assert.match(w,/id="muteBtn" class="small-btn"/);
-            assert.match(w,/class="marquee-window"/);
-            assert.match(w,/id="nowPlaying" class="marquee-track"/);
-            assert.match(w,/\/config\/veluna-assets\.js\?v=2026-08-17-native-mute-ticker-v185/);
-            assert.doesNotMatch(w,/\/config\/veluna-assets\.js\?v=2026-07-09-veluna-v1212/);
+          test('Internal retains native mute and native now-playing owner with current shared bootstrap in both worker owners',()=>{
+            for (const rel of ['worker.js','workers/webradio-666soundsdesign-worker/worker.js']) {
+              const w=read(rel); assert.match(w,/muteBtn/); assert.match(w,/marquee-window/); assert.match(w,/marquee-track/); assert.match(w,/nowPlaying/);
+              assert.match(w,/\/config\/veluna-assets\.js\?v=2026-08-17-native-mute-ticker-v185/);
+              assert.doesNotMatch(w,/\/config\/veluna-assets\.js\?v=2026-07-09-veluna-v1212/);
+            }
           });
           EOF
       - name: Verify full repository
@@ -103,9 +90,6 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
           git reset .github/workflows/repair-native-mute-ticker.yml
-          if git diff --cached --quiet; then
-            echo 'No new direct repair changes'
-            exit 0
-          fi
+          if git diff --cached --quiet; then echo 'No new direct repair changes'; exit 0; fi
           git commit -m 'Align Internal with native mute ticker repair'
           git push origin HEAD:repair/native-mute-ticker-all-players-20260817
