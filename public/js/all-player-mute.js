@@ -8,7 +8,7 @@
 
   if (window.S666AllPlayerMute?.version) return;
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const BUTTON_ID = 's666MuteButton';
   let boundAudio = null;
   let observer = null;
@@ -19,8 +19,23 @@
     return document.querySelector('audio,video');
   };
 
+  const isMobilePlayer = () => {
+    try { return window.matchMedia('(max-width: 860px)').matches; }
+    catch (_) { return window.innerWidth <= 860; }
+  };
+
   const findHost = () => {
+    if (isMobilePlayer()) {
+      const mobileControls = document.querySelector('#mffApp .mff-controls');
+      if (mobileControls) return mobileControls;
+    }
+
+    const mainControls = document.querySelector('.player-shell .bottom-console .control-toolbar');
+    if (mainControls) return mainControls;
+
     const selectors = [
+      '.tool-strip',
+      '.control-strip',
       '[data-transport-controls]',
       '.transport-controls',
       '.player-controls',
@@ -38,27 +53,34 @@
   };
 
   const ensureButton = () => {
+    const nativeButton = document.getElementById('muteBtn');
+    if (nativeButton) {
+      nativeButton.setAttribute('data-s666-mute-control', '1');
+      return nativeButton;
+    }
+
+    const host = findHost();
     let button = document.getElementById(BUTTON_ID);
-    if (button) return button;
+    if (!button) {
+      button = document.createElement('button');
+      button.id = BUTTON_ID;
+      button.type = 'button';
+      button.className = 's666-mute-button';
+      button.setAttribute('data-s666-mute-control', '1');
+      button.setAttribute('aria-label', 'Mute audio');
+      button.setAttribute('aria-pressed', 'false');
+      button.innerHTML = '<span class="s666-mute-icon" aria-hidden="true">🔊</span><span class="s666-mute-label">MUTE</span>';
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const audio = bindAudio();
+        if (!audio) return;
+        audio.muted = !audio.muted;
+        syncButton(audio);
+      });
+    }
 
-    button = document.createElement('button');
-    button.id = BUTTON_ID;
-    button.type = 'button';
-    button.className = 's666-mute-button';
-    button.setAttribute('data-s666-mute-control', '1');
-    button.setAttribute('aria-label', 'Mute audio');
-    button.setAttribute('aria-pressed', 'false');
-    button.innerHTML = '<span class="s666-mute-icon" aria-hidden="true">🔊</span><span class="s666-mute-label">MUTE</span>';
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const audio = bindAudio();
-      if (!audio) return;
-      audio.muted = !audio.muted;
-      syncButton(audio);
-    });
-
-    findHost().appendChild(button);
+    if (host && button.parentElement !== host) host.appendChild(button);
     return button;
   };
 
@@ -101,7 +123,8 @@
     bindAudio();
     if (!observer && document.documentElement) {
       observer = new MutationObserver(() => {
-        if (!document.getElementById(BUTTON_ID) || findAudio() !== boundAudio) bindAudio();
+        ensureButton();
+        if (findAudio() !== boundAudio) bindAudio();
       });
       observer.observe(document.documentElement, { childList: true, subtree: true });
     }
