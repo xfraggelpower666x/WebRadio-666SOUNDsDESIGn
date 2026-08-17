@@ -2,6 +2,7 @@ const DEFAULT_STATS_URL = 'https://my.idjstream.com:8686/stats?sid=1&json=1';
 const CACHE_TTL_MS = 15000;
 const STALE_TTL_MS = 600000;
 const FETCH_TIMEOUT_MS = 1500;
+const UNKNOWN_CAPACITY = '—';
 
 let cache = { value: null, fetchedAt: 0, pending: null };
 
@@ -10,6 +11,12 @@ export function parseLiveListenerCapacity(payload) {
   const raw = payload.maxlisteners ?? payload.maxListeners ?? payload.listener_capacity ?? payload.listenerCapacity;
   const value = Number(raw);
   return Number.isFinite(value) && value > 0 ? Math.round(value) : null;
+}
+
+function getCachedCapacity(now = Date.now()) {
+  if (cache.value == null) return null;
+  if (now - cache.fetchedAt >= STALE_TTL_MS) return null;
+  return cache.value;
 }
 
 async function fetchCapacity(env) {
@@ -33,8 +40,7 @@ async function fetchCapacity(env) {
       cache = { value, fetchedAt: Date.now(), pending: null };
       return value;
     } catch (error) {
-      if (cache.value != null && now - cache.fetchedAt < STALE_TTL_MS) return cache.value;
-      return null;
+      return getCachedCapacity(now);
     } finally {
       clearTimeout(timer);
       if (cache.pending) cache.pending = null;
@@ -44,12 +50,19 @@ async function fetchCapacity(env) {
   return cache.pending;
 }
 
-export async function enrichNowPlayingWithLiveListenerCapacity(request, env, forward) {
-  const [response, maxlisteners] = await Promise.all([
-    forward(request, env),
-    fetchCapacity(env)
-  ]);
-  if (!response || !response.ok || maxlisteners == null) return response;
+function scheduleCapacityRefresh(env, ctx) {
+  const refresh = fetchCapacity(env).catch(() => null);
+  if (ctx?.waitUntil) ctx.waitUntil(refresh);
+  else void refresh;
+}
+
+export async function enrichNowPlayingWithLiveListenerCapacity(request, env, forward, ctx) {
+  // Primary metadata must never wait for the secondary Shoutcast stats endpoint.
+  const response = await forward(request, env);
+  const maxlisteners = getCachedCapacity() ?? UNKNOWN_CAPACITY;
+  scheduleCapacityRefresh(env, ctx);
+
+  if (!response || !response.ok) return response;
 
   let payload;
   try {

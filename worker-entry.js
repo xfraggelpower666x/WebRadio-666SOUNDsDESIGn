@@ -18,14 +18,15 @@ export class DiscordNowPlayingGate extends DurableObject {
 
 /*
  * 666SOUNDsDESIGn — Production Worker Entry
- * Version: V1.2-20260816-LIVE-LISTENER-CAPACITY
+ * Version: V1.2-20260817-NONBLOCKING-METADATA-CAPACITY
  * Scope:
  * - preserve automatic Discord Now Playing global gate
  * - preserve worker.js as authoritative radio/player implementation
  * - add a global Durable Object fallback for /api/player-alert/* so an
  *   unavailable Render/KV path cannot degrade cross-network messaging to an
  *   edge-local cache only
- * - enrich /api/nowplaying with the live Shoutcast max-listener capacity
+ * - enrich /api/nowplaying with live Shoutcast max-listener capacity without
+ *   ever delaying the primary metadata response
  * No new Worker/resource and no audio/stream/EQ/boost changes.
  */
 export default {
@@ -50,7 +51,8 @@ export default {
       return enrichNowPlayingWithLiveListenerCapacity(
         request,
         env,
-        (forwardRequest, forwardEnv) => worker.fetch(forwardRequest, forwardEnv, ctx)
+        (forwardRequest, forwardEnv) => worker.fetch(forwardRequest, forwardEnv, ctx),
+        ctx
       );
     }
     return worker.fetch(request, env, ctx);
