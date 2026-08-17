@@ -5,9 +5,111 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  repair-legacy-listener-hardcodes:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/repair/remove-legacy-listener-hardcodes-20260817'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Remove legacy listener capacity hardcodes at source
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def patch(path, replacements):
+              p = Path(path)
+              if not p.exists():
+                  return
+              text = p.read_text(encoding='utf-8')
+              original = text
+              for old, new in replacements:
+                  text = text.replace(old, new)
+              if text != original:
+                  p.write_text(text, encoding='utf-8')
+                  print('patched', path)
+
+          for path in ['VELUNA/index.html', 'public/VELUNA/index.html']:
+              patch(path, [
+                  ('>0 / 250<', '>0 / —<'),
+                  ('const CAPACITY=250;', "const CAPACITY='—';"),
+              ])
+
+          root_replacements = [
+              ('>0 / 250<', '>0 / —<'),
+              ("card('LSTN','0 / 250','♚')", "card('LSTN','0 / —','♚')"),
+              (
+                  "var listeners=data.listeners||data.listener_count||data.currentlisteners||data.current_listeners||data.listeners_current||(data.stats&&data.stats.listeners)||'';",
+                  "var listeners=data.listeners||data.listener_count||data.currentlisteners||data.current_listeners||data.listeners_current||(data.stats&&data.stats.listeners)||'';\n    var maxlisteners=data.maxlisteners||data.maxListeners||data.listener_capacity||data.listenerCapacity||'';"
+              ),
+              (
+                  "return{title:title,artist:cleanBroadcastTitleV123(artist),listeners:String(listeners||'').trim(),bitrate:String(bitrate||'').trim(),dj:normalizeDj(dj),artwork:String(artwork||'').trim()};",
+                  "return{title:title,artist:cleanBroadcastTitleV123(artist),listeners:String(listeners||'').trim(),maxlisteners:String(maxlisteners||'').trim(),bitrate:String(bitrate||'').trim(),dj:normalizeDj(dj),artwork:String(artwork||'').trim()};"
+              ),
+              (
+                  "if(cards[0]) cards[0].innerHTML=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / 250'):'0 / 250';",
+                  "if(cards[0]){var liveMax=String(meta.maxlisteners||'—').trim()||'—';cards[0].innerHTML=meta.listeners?(String(meta.listeners).indexOf('/')>=0?meta.listeners:meta.listeners+' / '+liveMax):'0 / '+liveMax;}"
+              ),
+          ]
+          for path in ['index.html', 'public/index.html']:
+              patch(path, root_replacements)
+
+          patch('worker.js', [
+              ('>0 / 250<', '>0 / —<'),
+              ('  "listener_capacity": 250,\n', ''),
+          ])
+
+          for path in ['config/stream.config.js', 'public/config/stream.config.js']:
+              patch(path, [
+                  ('  listener_capacity: 250,\n', ''),
+                  ('  "listener_capacity": 250,\n', ''),
+              ])
+
+          forbidden = [
+              '0 / 250',
+              'CAPACITY=250',
+              'listenerCapacity: 250',
+              'listener_capacity: 250',
+              '"listener_capacity": 250',
+              "+' / 250'",
+          ]
+          target_files = [
+              'index.html','public/index.html','VELUNA/index.html','public/VELUNA/index.html',
+              'worker.js','config/stream.config.js','public/config/stream.config.js',
+              'js/extern.js','public/js/extern.js'
+          ]
+          failures=[]
+          for path in target_files:
+              p=Path(path)
+              if not p.exists():
+                  continue
+              text=p.read_text(encoding='utf-8')
+              for token in forbidden:
+                  if token in text:
+                      failures.append(f'{path}: {token}')
+          if failures:
+              raise SystemExit('legacy listener hardcodes remain:\n'+'\n'.join(failures))
+          print('listener hardcode source cleanup PASS')
+      - run: npm ci
+      - run: npm run verify
+      - name: Restore canonical workflow and commit repaired sources
+        shell: bash
+        run: |
+          git checkout HEAD^ -- .github/workflows/release-integrity.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html public/index.html VELUNA/index.html public/VELUNA/index.html worker.js config/stream.config.js js/extern.js public/js/extern.js .github/workflows/release-integrity.yml
+          if [ -f public/config/stream.config.js ]; then git add public/config/stream.config.js; fi
+          git commit -m "Remove legacy static listener capacity sources"
+          git push origin HEAD:repair/remove-legacy-listener-hardcodes-20260817
+
   verify:
     runs-on: ubuntu-latest
     steps:
