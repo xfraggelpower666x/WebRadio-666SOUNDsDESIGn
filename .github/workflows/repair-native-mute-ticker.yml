@@ -36,6 +36,11 @@ jobs:
               s=p.read_text(errors='ignore')
               t=s.replace(old_v,new_v)
               if t!=s: p.write_text(t)
+          for rel in ['tests/frontend-contracts.test.mjs','tests/pc-layout-ticker-meter-regression.test.mjs']:
+              p=Path(rel); s=p.read_text()
+              s=s.replace('animation:tickerMove 14s linear infinite!important','animation:s666TitleMarquee 14s linear infinite!important')
+              s=s.replace('animation:tickerMove 14s linear infinite','animation:s666TitleMarquee 14s linear infinite')
+              p.write_text(s)
           PY
           cat > tests/native-mute-ticker-hosts.test.mjs <<'EOF'
           import test from 'node:test';
