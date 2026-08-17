@@ -1,0 +1,45 @@
+name: Live Native Mute Ticker Readback
+on:
+  push:
+    branches: [repair/native-mute-ticker-all-players-20260817]
+permissions:
+  contents: read
+jobs:
+  readback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify live native player owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://webradio.666soundsdesign-broadcaster.com'
+          curl -fsSL --retry 3 "$BASE/js/all-player-mute.js?readback=53d2445" -o /tmp/mute.js
+          curl -fsSL --retry 3 "$BASE/css/player-stage-v2.css?readback=53d2445" -o /tmp/stage.css
+          curl -fsSL --retry 3 "$BASE/config/veluna-assets.js?readback=53d2445" -o /tmp/assets.js
+          curl -fsSL --retry 3 "$BASE/" -o /tmp/main.html
+          curl -fsSL --retry 3 "$BASE/veluna" -o /tmp/veluna.html
+          curl -fsSL --retry 3 "$BASE/internal" -o /tmp/internal.html
+
+          grep -Fq "#mffApp .mff-controls" /tmp/mute.js
+          grep -Fq ".player-shell .bottom-console .control-toolbar" /tmp/mute.js
+          grep -Fq "button.parentElement !== host" /tmp/mute.js
+          grep -Fq "audio.muted = !audio.muted" /tmp/mute.js
+          ! grep -Eq 'audio\.volume\s*=' /tmp/mute.js
+
+          grep -Fq '@keyframes s666TitleMarquee' /tmp/stage.css
+          grep -Fq 'animation:s666TitleMarquee 14s linear infinite!important' /tmp/stage.css
+          ! grep -Fq 'animation:tickerMove 14s linear infinite!important' /tmp/stage.css
+          grep -Fq 'grid-template-columns:repeat(8,minmax(0,1fr))!important' /tmp/stage.css
+
+          grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/assets.js
+          grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/main.html
+
+          grep -Fq 'muteBtn' /tmp/veluna.html
+          grep -Fq 'velunaTicker' /tmp/veluna.html
+          grep -Fq 'marquee-track' /tmp/veluna.html
+
+          grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/internal.html
+          grep -Fq 'muteBtn' /tmp/internal.html
+          grep -Eq 'nowPlaying|marquee' /tmp/internal.html
+
+          echo 'LIVE NATIVE MUTE TICKER READBACK PASS'
