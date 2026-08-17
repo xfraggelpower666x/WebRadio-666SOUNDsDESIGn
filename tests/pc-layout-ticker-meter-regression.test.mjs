@@ -14,7 +14,7 @@ test('desktop ticker and history use canonical stage geometry without v157 absol
   assert.doesNotMatch(patches, /now-playing #historyToggle\{\s*position:absolute!important;[\s\S]*bottom:58px/);
   assert.match(stage, /now-playing \.ticker-window\{position:relative!important;inset:auto!important;grid-column:2!important;grid-row:2!important/);
   assert.match(stage, /now-playing #historyToggle\{position:relative!important;inset:auto!important/);
-  assert.match(stage, /animation:tickerMove 14s linear infinite!important/);
+  assert.match(stage, /animation:s666TitleMarquee 14s linear infinite!important/);
 });
 
 test('desktop side meters stay fully visible above overlapping DNA side rails', async () => {
