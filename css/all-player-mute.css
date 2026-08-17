@@ -67,3 +67,35 @@ body > .s666-mute-button {
     bottom: max(58px, calc(env(safe-area-inset-bottom) + 50px));
   }
 }
+
+/*
+ * iPhone bottom visibility repair 2026-08-17.
+ * The canonical mobile level meter already exists as .mff-bottom/#mffBottomBars.
+ * Keep that existing meter inside the visible safe viewport instead of allowing
+ * the fixed-height mobile shell to clip it below the Home-indicator area.
+ * No audio graph, analyser, EQ, boost or meter writer is changed here.
+ */
+@media (max-width: 760px) {
+  #mffApp .mff-bottom {
+    position: fixed !important;
+    left: max(27px, calc(env(safe-area-inset-left) + 27px)) !important;
+    right: max(27px, calc(env(safe-area-inset-right) + 27px)) !important;
+    bottom: calc(env(safe-area-inset-bottom) + 12px) !important;
+    width: auto !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 6px 10px !important;
+    box-sizing: border-box !important;
+    z-index: 42 !important;
+  }
+
+  #mffApp .mff-bottom-bars {
+    height: 28px !important;
+  }
+
+  #mffApp .mff-bottom-bars i {
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+  }
+}
