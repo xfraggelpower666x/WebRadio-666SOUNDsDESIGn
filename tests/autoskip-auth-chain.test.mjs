@@ -1,4 +1,4 @@
-// AutoSkip authority and authentication-chain regression contract v1.1.0.
+// AutoSkip dedicated-worker authority and all-player authentication-chain regression contract v1.4.0.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -12,58 +12,71 @@ function req(path, init = {}) { return new Request(`https://radio.test${path}`, 
 async function withMockFetch(mock, fn) { const original = globalThis.fetch; globalThis.fetch = mock; try { return await fn(); } finally { globalThis.fetch = original; } }
 function validAuth() { return Response.json({ ok: true, valid: true, payload: { iss: "666-system-pw", aud: AUDIENCE, scope: "admin", exp: FUTURE } }); }
 
-test("protected AutoSkip delegates to 666myidjstreamadmin with a server-side token", async () => {
-  const seen = [];
-  await withMockFetch(async (url, init = {}) => {
-    const value = String(url); const headers = new Headers(init.headers || {}); seen.push({ value, authorization: headers.get("authorization"), adminToken: headers.get("x-admin-token") });
-    if (value.includes("auth.test")) return validAuth();
-    if (value.includes("myidj.test")) return Response.json({ ok: true, action: "skip", status: 200 });
-    throw new Error(`unexpected_fetch:${value}`);
-  }, async () => {
-    const response = await handleRadioAdminConfigAddon(req("/api/admin/skip", { method: "POST", headers: { origin: "https://radio.test", authorization: "Bearer player-token", "content-type": "application/json" }, body: "{}" }), {
-      ADMIN_AUTH_VERIFY_URL: "https://auth.test/verify", AUTH_AUDIENCE: AUDIENCE,
-      MYIDJ_WORKER_SKIP_URL: "https://myidj.test/api/radio/skip", MYIDJ_WORKER_ADMIN_TOKEN: "myidj-secret"
-    });
-    const data = await response.json();
-    assert.equal(response.status, 200); assert.equal(data.ok, true); assert.equal(data.skipAuthority, "666myidjstreamadmin");
-    assert.equal(seen.length, 2); assert.equal(seen[1].authorization, "Bearer myidj-secret"); assert.equal(seen[1].adminToken, "myidj-secret");
-    assert.doesNotMatch(seen.map(item => item.value).join(" "), /admin\.cgi/);
-  });
-});
+function dedicatedEnv(extra = {}) {
+  return {
+    ADMIN_AUTH_VERIFY_URL: "https://auth.test/verify",
+    AUTH_AUDIENCE: AUDIENCE,
+    S666_AUTODJ_SKIP_URL: "https://autodj.test/autodj/skip",
+    S666_AUTODJ_SKIP_ACCESS_TOKEN: "autodj-secret",
+    ...extra
+  };
+}
 
-test("authenticated compatibility alias stays behind the Player Admin gate", async () => {
+test("protected AutoSkip delegates to the dedicated worker with a server-side-only token", async () => {
   const seen = [];
   await withMockFetch(async (url, init = {}) => {
     const value = String(url);
     const headers = new Headers(init.headers || {});
-    seen.push({ value, authorization: headers.get("authorization"), adminToken: headers.get("x-admin-token") });
+    seen.push({ value, authorization: headers.get("authorization"), body: init.body || "" });
     if (value.includes("auth.test")) return validAuth();
-    if (value.includes("myidj.test")) return Response.json({ ok: true, action: "skip", status: 200 });
+    if (value.includes("autodj.test")) return Response.json({ ok: true, service: "666-autodj-skip", version: "1.2.0", action: "autodj_skip", verified: true });
     throw new Error(`unexpected_fetch:${value}`);
   }, async () => {
-    const response = await handleRadioAdminConfigAddon(req("/api/radio/skip", {
+    const response = await handleRadioAdminConfigAddon(req("/api/admin/skip", {
       method: "POST",
-      headers: {
-        origin: "https://radio.test",
-        authorization: "Bearer player-token",
-        "cf-connecting-ip": "198.51.100.42",
-        "content-type": "application/json"
-      },
+      headers: { origin: "https://radio.test", authorization: "Bearer player-token", "content-type": "application/json" },
       body: "{}"
-    }), {
-      ADMIN_AUTH_VERIFY_URL: "https://auth.test/verify",
-      AUTH_AUDIENCE: AUDIENCE,
-      MYIDJ_WORKER_SKIP_URL: "https://myidj.test/api/radio/skip",
-      MYIDJ_WORKER_ADMIN_TOKEN: "myidj-secret"
-    });
+    }), dedicatedEnv());
     const data = await response.json();
     assert.equal(response.status, 200);
     assert.equal(data.ok, true);
-    assert.equal(data.skipAuthority, "666myidjstreamadmin");
+    assert.equal(data.upstream, "666-autodj-skip");
     assert.equal(seen.length, 2);
-    assert.equal(seen[1].authorization, "Bearer myidj-secret");
-    assert.equal(seen[1].adminToken, "myidj-secret");
+    assert.equal(seen[1].authorization, "Bearer autodj-secret");
+    assert.match(String(seen[1].body), /admin-player/);
+    assert.doesNotMatch(seen.map(item => item.value).join(" "), /admin\.cgi|666myidjstreamadmin/);
   });
+});
+
+test("authenticated compatibility aliases stay behind the same Player Admin gate", async () => {
+  for (const path of COMPATIBILITY_PATHS) {
+    const seen = [];
+    await withMockFetch(async (url, init = {}) => {
+      const value = String(url);
+      const headers = new Headers(init.headers || {});
+      seen.push({ value, authorization: headers.get("authorization") });
+      if (value.includes("auth.test")) return validAuth();
+      if (value.includes("autodj.test")) return Response.json({ ok: true, service: "666-autodj-skip", action: "autodj_skip", verified: true });
+      throw new Error(`unexpected_fetch:${value}`);
+    }, async () => {
+      const response = await handleRadioAdminConfigAddon(req(path, {
+        method: "POST",
+        headers: {
+          origin: "https://radio.test",
+          authorization: "Bearer player-token",
+          "cf-connecting-ip": `198.51.100.${COMPATIBILITY_PATHS.indexOf(path) + 20}`,
+          "content-type": "application/json"
+        },
+        body: "{}"
+      }), dedicatedEnv());
+      const data = await response.json();
+      assert.equal(response.status, 200, path);
+      assert.equal(data.ok, true, path);
+      assert.equal(data.upstream, "666-autodj-skip", path);
+      assert.equal(seen.length, 2, path);
+      assert.equal(seen[1].authorization, "Bearer autodj-secret", path);
+    });
+  }
 });
 
 test("all compatibility write aliases reject requests without Player Admin auth", async () => {
@@ -97,7 +110,7 @@ test("standalone compatibility handler cannot proxy a write around the admin gat
         method: "POST",
         headers: { origin: "https://radio.test", "content-type": "application/json" },
         body: "{}"
-      }), { MYIDJ_WORKER_ADMIN_TOKEN: "must-not-be-used" });
+      }), { S666_AUTODJ_SKIP_ACCESS_TOKEN: "must-not-be-used" });
       const data = await response.json();
       assert.equal(response.status, 404, path);
       assert.equal(data.error, "protected_route_required", path);
@@ -107,34 +120,74 @@ test("standalone compatibility handler cannot proxy a write around the admin gat
   assert.equal(fetchCalls, 0);
 });
 
-test("missing MyIDJ worker token is reported as configuration error, not wrong password", async () => {
+test("missing dedicated worker token is a configuration error, not a Player Admin password error", async () => {
   await withMockFetch(async (url) => String(url).includes("auth.test") ? validAuth() : (() => { throw new Error("unexpected"); })(), async () => {
-    const response = await handleRadioAdminConfigAddon(req("/api/admin/skip", { method: "POST", headers: { origin: "https://radio.test", authorization: "Bearer player-token", "content-type": "application/json" }, body: "{}" }), {
-      ADMIN_AUTH_VERIFY_URL: "https://auth.test/verify", AUTH_AUDIENCE: AUDIENCE, MYIDJ_WORKER_SKIP_URL: "https://myidj.test/api/radio/skip"
-    });
+    const response = await handleRadioAdminConfigAddon(req("/api/admin/skip", {
+      method: "POST",
+      headers: { origin: "https://radio.test", authorization: "Bearer player-token", "content-type": "application/json" },
+      body: "{}"
+    }), dedicatedEnv({ S666_AUTODJ_SKIP_ACCESS_TOKEN: "" }));
     const data = await response.json();
-    assert.equal(response.status, 503); assert.equal(data.error, "myidj_admin_token_missing"); assert.notEqual(data.error, "password_rejected");
+    assert.equal(response.status, 503);
+    assert.equal(data.error, "autodj_skip_access_token_missing");
+    assert.notEqual(data.error, "password_rejected");
   });
 });
 
-test("MyIDJ token rejection remains distinct from Player Admin password rejection", async () => {
+test("dedicated worker token rejection remains distinct from Player Admin password rejection", async () => {
   await withMockFetch(async (url) => {
-    const value = String(url); if (value.includes("auth.test")) return validAuth();
-    if (value.includes("myidj.test")) return Response.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+    const value = String(url);
+    if (value.includes("auth.test")) return validAuth();
+    if (value.includes("autodj.test")) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
     throw new Error(`unexpected_fetch:${value}`);
   }, async () => {
-    const response = await handleRadioAdminConfigAddon(req("/api/admin/skip", { method: "POST", headers: { origin: "https://radio.test", authorization: "Bearer player-token", "content-type": "application/json" }, body: "{}" }), {
-      ADMIN_AUTH_VERIFY_URL: "https://auth.test/verify", AUTH_AUDIENCE: AUDIENCE,
-      MYIDJ_WORKER_SKIP_URL: "https://myidj.test/api/radio/skip", MYIDJ_WORKER_ADMIN_TOKEN: "wrong-token"
-    });
+    const response = await handleRadioAdminConfigAddon(req("/api/admin/skip", {
+      method: "POST",
+      headers: { origin: "https://radio.test", authorization: "Bearer player-token", "content-type": "application/json" },
+      body: "{}"
+    }), dedicatedEnv({ S666_AUTODJ_SKIP_ACCESS_TOKEN: "wrong-token" }));
     const data = await response.json();
-    assert.equal(response.status, 502); assert.equal(data.upstreamStatus, 401);
-    assert.equal(data.error, "myidj_admin_token_rejected"); assert.notEqual(data.error, "password_rejected");
+    assert.equal(response.status, 401);
+    assert.equal(data.upstreamStatus, 401);
+    assert.equal(data.error, "autodj_skip_access_token_rejected");
+    assert.notEqual(data.error, "password_rejected");
   });
 });
 
-test("documented runtime config includes the canonical MyIDJ worker route and secret name", async () => {
+test("root and public skip controllers are byte-identical and have no obsolete MyIDJ fallback", async () => {
+  const root = await readFile(new URL("../js/skip-control.js", import.meta.url), "utf8");
+  const mirror = await readFile(new URL("../public/js/skip-control.js", import.meta.url), "utf8");
+  assert.equal(root, mirror);
+  assert.match(root, /S666AdminAuth\.fetch\('\/api\/admin\/skip'/);
+  assert.doesNotMatch(root, /\/api\/radio\/skip|myidj/i);
+});
+
+test("Main desktop, Main iPhone, VELUNA and Internal all delegate SKIP to S666SkipControl", async () => {
+  const mainHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const stage = await readFile(new URL("../js/player-stage-v2.js", import.meta.url), "utf8");
+  const veluna = await readFile(new URL("../veluna/index.html", import.meta.url), "utf8");
+  const velunaMirror = await readFile(new URL("../public/veluna/index.html", import.meta.url), "utf8");
+  const worker = await readFile(new URL("../worker.js", import.meta.url), "utf8");
+
+  assert.match(mainHtml, /\/js\/skip-control\.js/);
+  assert.match(stage, /id,'s666StageSkip'|makeButton\('s666StageSkip'/);
+  assert.match(stage, /makeButton\('s666StageMobileSkip'/);
+  assert.match(stage, /S666SkipControl\.skip/);
+
+  for (const [name, html] of [["VELUNA", veluna], ["VELUNA public mirror", velunaMirror]]) {
+    assert.match(html, /id="skipBtn"/, name);
+    assert.match(html, /\/js\/skip-control\.js/, name);
+    assert.match(html, /S666SkipControl\.skip/, name);
+  }
+
+  assert.match(worker, /id="skipBtn"/);
+  assert.match(worker, /\/js\/skip-control\.js/);
+  assert.match(worker, /S666SkipControl\.skip/);
+});
+
+test("documented runtime config names the dedicated AutoDJ Worker route and secret", async () => {
   const envExample = await readFile(new URL("../config/admin-runtime.env.example", import.meta.url), "utf8");
-  assert.match(envExample, /^MYIDJ_WORKER_SKIP_URL=https:\/\/666myidjstreamadmin\.666soundsdesign-broadcaster\.com\/api\/radio\/skip$/m);
-  assert.match(envExample, /^MYIDJ_WORKER_ADMIN_TOKEN=put_matching_myidj_worker_admin_token_in_worker_secret_only$/m);
+  assert.match(envExample, /^S666_AUTODJ_SKIP_URL=https:\/\/666-autodj-skip\.666soundsdesign-broadcaster\.com\/autodj\/skip$/m);
+  assert.match(envExample, /^S666_AUTODJ_SKIP_ACCESS_TOKEN=put_matching_dedicated_autodj_skip_access_token_in_worker_secret_only$/m);
+  assert.doesNotMatch(envExample, /^MYIDJ_WORKER_SKIP_URL=/m);
 });
