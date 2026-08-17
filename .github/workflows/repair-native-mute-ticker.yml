@@ -1,0 +1,273 @@
+name: Repair Native Mute Ticker
+on:
+  push:
+    branches:
+      - repair/native-mute-ticker-all-players-20260817
+permissions:
+  contents: write
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/native-mute-ticker-all-players-20260817
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Repair existing mute placement and ticker animation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          mute = r'''/*
+           * 666SOUNDsDESIGn — Shared All-Player Mute Control
+           * Scope: Main, mobile, VELUNA and internal fallback player.
+           * Contract: toggle only HTMLMediaElement.muted; never rewrite volume, boost, EQ or audio graph.
+           */
+          (() => {
+            'use strict';
+
+            if (window.S666AllPlayerMute?.version) return;
+
+            const VERSION = '1.1.0';
+            const BUTTON_ID = 's666MuteButton';
+            let boundAudio = null;
+            let observer = null;
+
+            const findAudio = () => {
+              const direct = document.getElementById('radio');
+              if (direct instanceof HTMLMediaElement) return direct;
+              return document.querySelector('audio,video');
+            };
+
+            const isMobilePlayer = () => {
+              try { return window.matchMedia('(max-width: 860px)').matches; }
+              catch (_) { return window.innerWidth <= 860; }
+            };
+
+            const findHost = () => {
+              if (isMobilePlayer()) {
+                const mobileControls = document.querySelector('#mffApp .mff-controls');
+                if (mobileControls) return mobileControls;
+              }
+
+              const mainControls = document.querySelector('.player-shell .bottom-console .control-toolbar');
+              if (mainControls) return mainControls;
+
+              const selectors = [
+                '.tool-strip',
+                '.control-strip',
+                '[data-transport-controls]',
+                '.transport-controls',
+                '.player-controls',
+                '.bottom-controls',
+                '.mobile-controls',
+                '.controls',
+                '.transport-row',
+                '.control-row'
+              ];
+              for (const selector of selectors) {
+                const node = document.querySelector(selector);
+                if (node) return node;
+              }
+              return document.body || document.documentElement;
+            };
+
+            const findButton = () => {
+              const nativeButton = document.getElementById('muteBtn');
+              if (nativeButton) {
+                nativeButton.setAttribute('data-s666-mute-control', '1');
+                return nativeButton;
+              }
+              return document.getElementById(BUTTON_ID);
+            };
+
+            const ensureButton = () => {
+              const nativeButton = document.getElementById('muteBtn');
+              if (nativeButton) {
+                nativeButton.setAttribute('data-s666-mute-control', '1');
+                return nativeButton;
+              }
+
+              const host = findHost();
+              let button = document.getElementById(BUTTON_ID);
+              if (!button) {
+                button = document.createElement('button');
+                button.id = BUTTON_ID;
+                button.type = 'button';
+                button.className = 's666-mute-button';
+                button.setAttribute('data-s666-mute-control', '1');
+                button.setAttribute('aria-label', 'Mute audio');
+                button.setAttribute('aria-pressed', 'false');
+                button.innerHTML = '<span class="s666-mute-icon" aria-hidden="true">🔊</span><span class="s666-mute-label">MUTE</span>';
+                button.addEventListener('click', (event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  const audio = bindAudio();
+                  if (!audio) return;
+                  audio.muted = !audio.muted;
+                  syncButton(audio);
+                });
+              }
+
+              if (host && button.parentElement !== host) host.appendChild(button);
+              return button;
+            };
+
+            const syncButton = (audio = boundAudio) => {
+              const button = ensureButton();
+              const muted = !!audio?.muted;
+              button.classList.toggle('is-muted', muted);
+              button.setAttribute('aria-pressed', muted ? 'true' : 'false');
+              button.setAttribute('aria-label', muted ? 'Unmute audio' : 'Mute audio');
+              const icon = button.querySelector('.s666-mute-icon');
+              const label = button.querySelector('.s666-mute-label');
+              if (icon) icon.textContent = muted ? '🔇' : '🔊';
+              if (label) label.textContent = muted ? 'SOUND' : 'MUTE';
+              document.documentElement.toggleAttribute('data-s666-muted', muted);
+            };
+
+            const onVolumeChange = () => syncButton(boundAudio);
+
+            function bindAudio() {
+              const audio = findAudio();
+              if (!audio) {
+                ensureButton().disabled = true;
+                return null;
+              }
+
+              const button = ensureButton();
+              button.disabled = false;
+
+              if (audio !== boundAudio) {
+                boundAudio?.removeEventListener?.('volumechange', onVolumeChange);
+                boundAudio = audio;
+                boundAudio.addEventListener('volumechange', onVolumeChange);
+              }
+              syncButton(boundAudio);
+              return boundAudio;
+            }
+
+            const mount = () => {
+              ensureButton();
+              bindAudio();
+              if (!observer && document.documentElement) {
+                observer = new MutationObserver(() => {
+                  ensureButton();
+                  if (findAudio() !== boundAudio) bindAudio();
+                });
+                observer.observe(document.documentElement, { childList: true, subtree: true });
+              }
+            };
+
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', mount, { once: true });
+            } else {
+              mount();
+            }
+
+            window.S666AllPlayerMute = Object.freeze({
+              version: VERSION,
+              get muted() { return !!boundAudio?.muted; },
+              toggle() {
+                const audio = bindAudio();
+                if (!audio) return false;
+                audio.muted = !audio.muted;
+                syncButton(audio);
+                return audio.muted;
+              },
+              sync: bindAudio
+            });
+          })();
+          '''
+          mute = '\n'.join(line[10:] if line.startswith('          ') else line for line in mute.splitlines()) + '\n'
+          Path('js/all-player-mute.js').write_text(mute, encoding='utf-8')
+          Path('public/js/all-player-mute.js').write_text(mute, encoding='utf-8')
+
+          for rel in ['css/player-stage-v2.css', 'public/css/player-stage-v2.css']:
+              p = Path(rel)
+              text = p.read_text(encoding='utf-8')
+              old = 'animation:tickerMove 14s linear infinite!important;'
+              new = 'animation:s666TitleMarquee 14s linear infinite!important;'
+              if old not in text:
+                  raise SystemExit(f'missing stale ticker animation in {rel}')
+              text = text.replace(old, new)
+              text = text.replace('grid-template-columns:repeat(7,minmax(0,1fr))!important', 'grid-template-columns:repeat(8,minmax(0,1fr))!important')
+              p.write_text(text, encoding='utf-8')
+
+          version = '2026-08-17-native-mute-ticker-v185'
+          for rel in ['config/veluna-assets.js', 'public/config/veluna-assets.js']:
+              p = Path(rel)
+              text = p.read_text(encoding='utf-8')
+              text = text.replace("const version = '2026-08-16-all-player-mute-v184';", f"const version = '{version}';")
+              p.write_text(text, encoding='utf-8')
+
+          html_files = [p for p in Path('.').rglob('*.html') if '.git' not in p.parts]
+          for p in html_files:
+              text = p.read_text(encoding='utf-8')
+              updated = re.sub(r'(/config/veluna-assets\.js\?v=)[^\"\'<> ]+', rf'\g<1>{version}', text)
+              updated = re.sub(r'(/css/player-stage-v2\.css\?v=)[^\"\'<> ]+', rf'\g<1>{version}', updated)
+              if updated != text:
+                  p.write_text(updated, encoding='utf-8')
+
+          test = r'''import test from 'node:test';
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+
+          const read = (path) => fs.readFileSync(path, 'utf8');
+
+          test('shared mute uses real player control hosts and rehomes after mobile DOM mount', () => {
+            const root = read('js/all-player-mute.js');
+            const mirror = read('public/js/all-player-mute.js');
+            assert.equal(root, mirror);
+            assert.match(root, /#mffApp \.mff-controls/);
+            assert.match(root, /\.player-shell \.bottom-console \.control-toolbar/);
+            assert.match(root, /getElementById\('muteBtn'\)/);
+            assert.match(root, /button\.parentElement !== host/);
+            assert.match(root, /MutationObserver\(\(\) => \{\s*ensureButton\(\)/);
+            assert.match(root, /audio\.muted = !audio\.muted/);
+            assert.doesNotMatch(root, /audio\.volume\s*=/);
+          });
+
+          test('now playing ticker uses a keyframe that exists in the same player-stage stylesheet', () => {
+            const root = read('css/player-stage-v2.css');
+            const mirror = read('public/css/player-stage-v2.css');
+            assert.equal(root, mirror);
+            assert.match(root, /@keyframes s666TitleMarquee/);
+            assert.match(root, /animation:s666TitleMarquee 14s linear infinite!important/);
+            assert.doesNotMatch(root, /animation:tickerMove 14s linear infinite!important/);
+            assert.match(root, /#mffApp \.mff-controls\{[^}]*grid-template-columns:repeat\(8,minmax\(0,1fr\)\)!important/);
+          });
+
+          test('VELUNA keeps its native in-player mute and native marquee instead of receiving a duplicate control', () => {
+            const veluna = read('VELUNA/index.html');
+            assert.match(veluna, /id="muteBtn" class="small-btn"/);
+            assert.match(veluna, /class="tool-strip"/);
+            assert.match(veluna, /@keyframes velunaTicker/);
+            assert.match(veluna, /marquee-track\.is-running\{animation:velunaTicker/);
+          });
+          '''
+          test = '\n'.join(line[10:] if line.startswith('          ') else line for line in test.splitlines()) + '\n'
+          Path('tests/native-mute-ticker-hosts.test.mjs').write_text(test, encoding='utf-8')
+          PY
+      - name: Verify full repository
+        run: npm ci && npm run verify
+      - name: Commit repair
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add js/all-player-mute.js public/js/all-player-mute.js css/player-stage-v2.css public/css/player-stage-v2.css config/veluna-assets.js public/config/veluna-assets.js tests/native-mute-ticker-hosts.test.mjs '*.html' public VELUNA veluna 2>/dev/null || true
+          git add -A
+          git reset .github/workflows/repair-native-mute-ticker.yml
+          if git diff --cached --quiet; then
+            echo 'No repair changes to commit'
+            exit 1
+          fi
+          git commit -m 'Repair native mute placement and now playing ticker'
+          git push origin HEAD:repair/native-mute-ticker-all-players-20260817
