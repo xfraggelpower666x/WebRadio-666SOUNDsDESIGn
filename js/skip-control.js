@@ -1,6 +1,7 @@
 /*
  * 666SOUNDsDESIGn authoritative Auto-DJ skip controller.
- * All players delegate interactive auth and the protected API request to this module.
+ * All players delegate interactive Player Admin auth and the protected same-origin API request to this module.
+ * The dedicated AutoDJ Worker secret is server-side only.
  */
 (function () {
   'use strict';
@@ -13,15 +14,20 @@
   }
 
   function normalizeError(response, data) {
-    if (data && (data.retryAfterMs || data.remainingMs)) return 'Skip-Cooldown: ' + Math.max(1, Math.ceil(Number(data.retryAfterMs || data.remainingMs) / 1000)) + ' s';
+    if (data && (data.retryAfterMs || data.remainingMs)) {
+      return 'Skip-Cooldown: ' + Math.max(1, Math.ceil(Number(data.retryAfterMs || data.remainingMs) / 1000)) + ' s';
+    }
     var code = String((data && (data.error || data.message)) || (response ? 'HTTP ' + response.status : 'skip_failed'));
     var messages = {
-      myidj_admin_token_missing: 'MyIDJ-Worker-Token fehlt im Haupt-Worker. Das Player-Passwort ist nicht die Ursache.',
-      myidj_admin_token_rejected: 'MyIDJ-Worker-Token wurde abgelehnt. ADMIN_TOKEN und MYIDJ_WORKER_ADMIN_TOKEN müssen übereinstimmen.',
-      skip_target_not_configured: 'Der MyIDJ-Worker hat kein gültiges Shoutcast-Skip-Ziel konfiguriert.',
-      myidj_skip_unreachable: 'Der zentrale MyIDJ-Skip-Worker ist nicht erreichbar.',
-      myidj_skip_timeout: 'Der zentrale MyIDJ-Skip-Worker antwortet nicht rechtzeitig.',
-      myidj_worker_exception: 'Der zentrale MyIDJ-Skip-Worker meldet einen internen Fehler.'
+      autodj_skip_access_token_missing: 'AutoDJ-Skip-Worker-Token fehlt im Haupt-Worker.',
+      autodj_skip_access_token_rejected: 'AutoDJ-Skip-Worker-Token wurde abgelehnt.',
+      autodj_skip_url_missing: 'AutoDJ-Skip-Worker-URL fehlt im Haupt-Worker.',
+      autodj_skip_unreachable: 'Der dedizierte AutoDJ-Skip-Worker ist nicht erreichbar.',
+      autodj_skip_timeout: 'Der dedizierte AutoDJ-Skip-Worker antwortet nicht rechtzeitig.',
+      autodj_sonicpanel_login_failed: 'Der dedizierte Worker konnte SonicPanel nicht anmelden.',
+      autodj_skip_not_verified: 'SonicPanel hat den Skip nicht eindeutig bestätigt.',
+      auth_token_missing: 'Keine aktive Player-Admin-Sitzung.',
+      origin_rejected: 'Die Player-Anfrage wurde wegen ungültiger Herkunft abgelehnt.'
     };
     return messages[code] || code;
   }
@@ -32,7 +38,7 @@
       throw new Error('admin_auth_client_missing');
     }
     return window.S666AdminAuth.ensure({
-      message: options.prompt || 'Player-Admin-Passwort für Auto-DJ Skip eingeben (nicht Shoutcast-Login):'
+      message: options.prompt || 'Player-Admin-Passwort für Auto-DJ Skip eingeben (nicht SonicPanel/Shoutcast-Login):'
     });
   }
 
@@ -41,8 +47,8 @@
     return window.S666AdminAuth.check(Boolean(force));
   }
 
-  async function postViaAdminAuth(path, payload) {
-    var response = await window.S666AdminAuth.fetch(path, {
+  async function postViaAdminAuth(payload) {
+    var response = await window.S666AdminAuth.fetch('/api/admin/skip', {
       method: 'POST',
       headers: { 'content-type': 'application/json', accept: 'application/json' },
       credentials: 'same-origin',
@@ -63,22 +69,17 @@
     try {
       if (options.ensureAuth !== false) await ensureInteractiveAuth(options);
       dispatch({ phase: 'sending' });
-      var payload = { source: options.source || 'player-stage-v2' };
-      var result = await postViaAdminAuth('/api/admin/skip', payload);
+
+      var result = await postViaAdminAuth({ source: options.source || 'player-stage-v2' });
       var response = result.response;
       var data = result.data;
-
-      if ((!response.ok || data.ok !== true) && (data.error === 'skip_not_configured' || data.error === 'skip_upstream_unreachable' || data.error === 'skip_timeout')) {
-        result = await postViaAdminAuth('/api/radio/skip', Object.assign({}, payload, { fallback: 'myidj-compat' }));
-        response = result.response;
-        data = result.data;
-      }
 
       if (!response.ok || data.ok !== true) {
         var error = normalizeError(response, data);
         dispatch({ phase: 'error', error: error, status: response.status });
         return { ok: false, error: error, status: response.status, data: data };
       }
+
       dispatch({ phase: 'success', data: data });
       return { ok: true, data: data };
     } catch (error) {
