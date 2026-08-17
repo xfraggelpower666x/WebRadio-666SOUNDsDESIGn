@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Repair existing ticker and cache identity
+      - name: Repair existing owners only
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -24,23 +24,37 @@ jobs:
           new_v='2026-08-17-native-mute-ticker-v185'
           for rel in ['css/player-stage-v2.css','public/css/player-stage-v2.css']:
               p=Path(rel); s=p.read_text()
-              old='animation:tickerMove 14s linear infinite!important;'
-              assert old in s, rel
-              s=s.replace(old,'animation:s666TitleMarquee 14s linear infinite!important;')
+              s=s.replace('animation:tickerMove 14s linear infinite!important;','animation:s666TitleMarquee 14s linear infinite!important;')
               s=s.replace('grid-template-columns:repeat(7,minmax(0,1fr))!important','grid-template-columns:repeat(8,minmax(0,1fr))!important')
+              assert 'animation:s666TitleMarquee 14s linear infinite!important;' in s
               p.write_text(s)
           for rel in ['config/veluna-assets.js','public/config/veluna-assets.js']:
-              p=Path(rel); s=p.read_text(); assert old_v in s, rel; p.write_text(s.replace(old_v,new_v))
+              p=Path(rel); s=p.read_text().replace(old_v,new_v); assert new_v in s; p.write_text(s)
           for p in Path('.').rglob('*.html'):
-              if '.git' in p.parts: continue
-              s=p.read_text(errors='ignore')
-              t=s.replace(old_v,new_v)
-              if t!=s: p.write_text(t)
+              if '.git' not in p.parts:
+                  s=p.read_text(errors='ignore'); t=s.replace(old_v,new_v)
+                  if t!=s: p.write_text(t)
           for rel in ['tests/frontend-contracts.test.mjs','tests/pc-layout-ticker-meter-regression.test.mjs']:
               p=Path(rel); s=p.read_text()
               s=s.replace('animation:tickerMove 14s linear infinite!important','animation:s666TitleMarquee 14s linear infinite!important')
               s=s.replace('animation:tickerMove 14s linear infinite','animation:s666TitleMarquee 14s linear infinite')
               p.write_text(s)
+
+          internal_old='/config/veluna-assets.js?v=2026-07-09-veluna-v1212'
+          internal_new=f'/config/veluna-assets.js?v={new_v}'
+          worker_hits=[]
+          for p in Path('.').rglob('worker*.js'):
+              if '.git' in p.parts: continue
+              s=p.read_text(errors='ignore')
+              if internal_old in s:
+                  s=s.replace(internal_old,internal_new)
+                  p.write_text(s)
+                  worker_hits.append(str(p))
+          print('INTERNAL CACHE OWNERS UPDATED:', worker_hits)
+          worker=Path('worker.js').read_text()
+          assert internal_new in worker
+          assert 'id="muteBtn" class="small-btn"' in worker
+          assert 'class="marquee-window"' in worker and 'id="nowPlaying" class="marquee-track"' in worker
           PY
           cat > tests/native-mute-ticker-hosts.test.mjs <<'EOF'
           import test from 'node:test';
@@ -57,7 +71,7 @@ jobs:
             assert.match(a,/audio\.muted = !audio\.muted/);
             assert.doesNotMatch(a,/audio\.volume\s*=/);
           });
-          test('main now-playing ticker uses existing real keyframes',()=>{
+          test('main and mobile now-playing ticker use existing real keyframes',()=>{
             const a=read('css/player-stage-v2.css'), b=read('public/css/player-stage-v2.css');
             assert.equal(a,b);
             assert.match(a,/@keyframes s666TitleMarquee/);
@@ -72,6 +86,14 @@ jobs:
             assert.match(v,/@keyframes velunaTicker/);
             assert.match(v,/marquee-track\.is-running\{animation:velunaTicker/);
           });
+          test('Internal retains native mute and native now-playing owner with current shared bootstrap',()=>{
+            const w=read('worker.js');
+            assert.match(w,/id="muteBtn" class="small-btn"/);
+            assert.match(w,/class="marquee-window"/);
+            assert.match(w,/id="nowPlaying" class="marquee-track"/);
+            assert.match(w,/\/config\/veluna-assets\.js\?v=2026-08-17-native-mute-ticker-v185/);
+            assert.doesNotMatch(w,/\/config\/veluna-assets\.js\?v=2026-07-09-veluna-v1212/);
+          });
           EOF
       - name: Verify full repository
         run: npm ci && npm run verify
@@ -81,5 +103,9 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
           git reset .github/workflows/repair-native-mute-ticker.yml
-          git commit -m 'Repair native mute placement and now playing ticker'
+          if git diff --cached --quiet; then
+            echo 'No new direct repair changes'
+            exit 0
+          fi
+          git commit -m 'Align Internal with native mute ticker repair'
           git push origin HEAD:repair/native-mute-ticker-all-players-20260817
