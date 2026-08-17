@@ -8,38 +8,43 @@ jobs:
   readback:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify live native player owners
+      - name: Diagnose live native player owners
         shell: bash
         run: |
-          set -euo pipefail
+          set -u
           BASE='https://webradio.666soundsdesign-broadcaster.com'
-          curl -fsSL --retry 3 "$BASE/js/all-player-mute.js?readback=53d2445" -o /tmp/mute.js
-          curl -fsSL --retry 3 "$BASE/css/player-stage-v2.css?readback=53d2445" -o /tmp/stage.css
-          curl -fsSL --retry 3 "$BASE/config/veluna-assets.js?readback=53d2445" -o /tmp/assets.js
-          curl -fsSL --retry 3 "$BASE/" -o /tmp/main.html
-          curl -fsSL --retry 3 "$BASE/veluna" -o /tmp/veluna.html
-          curl -fsSL --retry 3 "$BASE/internal" -o /tmp/internal.html
+          curl -fsSL --retry 3 "$BASE/js/all-player-mute.js?readback=53d2445" -o /tmp/mute.js || exit 10
+          curl -fsSL --retry 3 "$BASE/css/player-stage-v2.css?readback=53d2445" -o /tmp/stage.css || exit 11
+          curl -fsSL --retry 3 "$BASE/config/veluna-assets.js?readback=53d2445" -o /tmp/assets.js || exit 12
+          curl -fsSL --retry 3 "$BASE/" -o /tmp/main.html || exit 13
+          curl -fsSL --retry 3 "$BASE/veluna" -o /tmp/veluna.html || exit 14
+          curl -fsSL --retry 3 "$BASE/internal" -o /tmp/internal.html || exit 15
 
-          grep -Fq "#mffApp .mff-controls" /tmp/mute.js
-          grep -Fq ".player-shell .bottom-console .control-toolbar" /tmp/mute.js
-          grep -Fq "button.parentElement !== host" /tmp/mute.js
-          grep -Fq "audio.muted = !audio.muted" /tmp/mute.js
-          ! grep -Eq 'audio\.volume\s*=' /tmp/mute.js
+          check(){ label="$1"; shift; if "$@"; then echo "PASS $label"; else echo "FAIL $label"; return 1; fi; }
+          fail=0
+          check 'mute mobile host' grep -Fq '#mffApp .mff-controls' /tmp/mute.js || fail=1
+          check 'mute desktop host' grep -Fq '.player-shell .bottom-console .control-toolbar' /tmp/mute.js || fail=1
+          check 'mute rehome' grep -Fq 'button.parentElement !== host' /tmp/mute.js || fail=1
+          check 'mute muted-only' grep -Fq 'audio.muted = !audio.muted' /tmp/mute.js || fail=1
+          if grep -Eq 'audio\.volume\s*=' /tmp/mute.js; then echo 'FAIL mute volume untouched'; fail=1; else echo 'PASS mute volume untouched'; fi
 
-          grep -Fq '@keyframes s666TitleMarquee' /tmp/stage.css
-          grep -Fq 'animation:s666TitleMarquee 14s linear infinite!important' /tmp/stage.css
-          ! grep -Fq 'animation:tickerMove 14s linear infinite!important' /tmp/stage.css
-          grep -Fq 'grid-template-columns:repeat(8,minmax(0,1fr))!important' /tmp/stage.css
+          check 'ticker keyframes exist' grep -Fq '@keyframes s666TitleMarquee' /tmp/stage.css || fail=1
+          check 'ticker uses real keyframes' grep -Fq 'animation:s666TitleMarquee 14s linear infinite!important' /tmp/stage.css || fail=1
+          if grep -Fq 'animation:tickerMove 14s linear infinite!important' /tmp/stage.css; then echo 'FAIL stale tickerMove'; fail=1; else echo 'PASS stale tickerMove absent'; fi
+          check 'mobile controls 8 slots' grep -Fq 'grid-template-columns:repeat(8,minmax(0,1fr))!important' /tmp/stage.css || fail=1
 
-          grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/assets.js
-          grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/main.html
+          check 'live shared asset v185' grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/assets.js || fail=1
+          echo 'MAIN BOOTSTRAP:'; grep -oE '/config/veluna-assets\.js\?v=[^"'"'"'<> ]+' /tmp/main.html | head -5 || true
+          echo 'VELUNA BOOTSTRAP:'; grep -oE '/config/veluna-assets\.js\?v=[^"'"'"'<> ]+' /tmp/veluna.html | head -5 || true
+          echo 'INTERNAL BOOTSTRAP:'; grep -oE '/config/veluna-assets\.js\?v=[^"'"'"'<> ]+' /tmp/internal.html | head -5 || true
 
-          grep -Fq 'muteBtn' /tmp/veluna.html
-          grep -Fq 'velunaTicker' /tmp/veluna.html
-          grep -Fq 'marquee-track' /tmp/veluna.html
+          check 'VELUNA native mute' grep -Fq 'muteBtn' /tmp/veluna.html || fail=1
+          check 'VELUNA native ticker keyframe' grep -Fq 'velunaTicker' /tmp/veluna.html || fail=1
+          check 'VELUNA native ticker owner' grep -Fq 'marquee-track' /tmp/veluna.html || fail=1
 
-          grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/internal.html
-          grep -Fq 'muteBtn' /tmp/internal.html
-          grep -Eq 'nowPlaying|marquee' /tmp/internal.html
+          check 'Internal v185 bootstrap' grep -Fq '2026-08-17-native-mute-ticker-v185' /tmp/internal.html || fail=1
+          check 'Internal native mute' grep -Fq 'muteBtn' /tmp/internal.html || fail=1
+          check 'Internal now playing owner' grep -Eq 'nowPlaying|marquee' /tmp/internal.html || fail=1
 
+          if [ "$fail" -ne 0 ]; then echo 'LIVE NATIVE MUTE TICKER READBACK FAIL'; exit 1; fi
           echo 'LIVE NATIVE MUTE TICKER READBACK PASS'
