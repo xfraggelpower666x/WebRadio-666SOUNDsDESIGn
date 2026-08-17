@@ -75,7 +75,7 @@ test("main player restores responsive header, cockpit buttons and clean Now Play
   assert.match(css, /nth-child\(13\)[\s\S]*nth-child\(16\)/);
   assert.match(css, /\.now-playing \.now-cover-wrap[\s\S]*grid-column:1/);
   assert.match(css, /\.now-playing \.section-kicker/);
-  assert.match(css, /animation:tickerMove 14s linear infinite/);
+  assert.match(css, /animation:s666TitleMarquee 14s linear infinite/);
   assert.match(css, /#phase10NowVersion[\s\S]*#pcTickerRebuildLane/);
   assert.match(css, /\.side-meter-stack\{display:grid!important;grid-template-columns:repeat\(3/);
   assert.match(stage, /veluna-player-header\.webp/);

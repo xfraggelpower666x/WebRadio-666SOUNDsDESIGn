@@ -240,7 +240,7 @@ const HTML = `<!DOCTYPE html>
   </main>
 
   <script type="module" src="/js/app.js?v=smfp-v83-discord-embed-pc-iphone-integration-20260505-0245"></script>
-  <script src="/config/veluna-assets.js?v=2026-07-09-veluna-v1212"></script>
+  <script src="/config/veluna-assets.js?v=2026-08-17-native-mute-ticker-v185"></script>
   <script src="/js/admin-auth-client.js?v=2026-07-24-autoskip-auth-v1222"></script>
   <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2"></script>
   <script src="/js/player-alert-client.js?v=2026-07-19-overlay-inert-v121"></script>

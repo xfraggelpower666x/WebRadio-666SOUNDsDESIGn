@@ -23,7 +23,7 @@ window.VELUNA_ASSETS = Object.freeze({
  */
 (() => {
   'use strict';
-  const version = '2026-08-16-all-player-mute-v184';
+  const version = '2026-08-17-native-mute-ticker-v185';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const head = document.head || document.documentElement;
   if (!head) return;
