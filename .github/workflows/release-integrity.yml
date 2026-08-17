@@ -61,10 +61,12 @@ jobs:
           for path in ['index.html', 'public/index.html']:
               patch(path, root_replacements)
 
-          patch('worker.js', [
+          worker_replacements = [
               ('>0 / 250<', '>0 / —<'),
               ('  "listener_capacity": 250,\n', ''),
-          ])
+          ]
+          for path in ['worker.js', 'workers/webradio-666soundsdesign-worker/worker.js']:
+              patch(path, worker_replacements)
 
           for path in ['config/stream.config.js', 'public/config/stream.config.js']:
               patch(path, [
@@ -82,7 +84,8 @@ jobs:
           ]
           target_files = [
               'index.html','public/index.html','VELUNA/index.html','public/VELUNA/index.html',
-              'worker.js','config/stream.config.js','public/config/stream.config.js',
+              'worker.js','workers/webradio-666soundsdesign-worker/worker.js',
+              'config/stream.config.js','public/config/stream.config.js',
               'js/extern.js','public/js/extern.js'
           ]
           failures=[]
@@ -105,7 +108,7 @@ jobs:
           git checkout HEAD^ -- .github/workflows/release-integrity.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html public/index.html VELUNA/index.html public/VELUNA/index.html worker.js config/stream.config.js js/extern.js public/js/extern.js .github/workflows/release-integrity.yml
+          git add index.html public/index.html VELUNA/index.html public/VELUNA/index.html worker.js workers/webradio-666soundsdesign-worker/worker.js config/stream.config.js js/extern.js public/js/extern.js .github/workflows/release-integrity.yml
           if [ -f public/config/stream.config.js ]; then git add public/config/stream.config.js; fi
           git commit -m "Remove legacy static listener capacity sources"
           git push origin HEAD:repair/remove-legacy-listener-hardcodes-20260817
