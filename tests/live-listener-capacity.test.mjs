@@ -26,6 +26,14 @@ test('nowplaying metadata is never blocked by the secondary listener-capacity fe
   assert.match(addon, /Primary metadata must never wait/);
 });
 
+test('cold metadata responses expose unknown capacity instead of falling back to 250', () => {
+  const addon = read('worker-addons/live-listener-capacity.js');
+  assert.match(addon, /UNKNOWN_CAPACITY = '—'/);
+  assert.match(addon, /getCachedCapacity\(\) \?\? UNKNOWN_CAPACITY/);
+  assert.match(addon, /JSON\.stringify\(\{ \.\.\.payload, maxlisteners \}\)/);
+  assert.doesNotMatch(addon, /maxlisteners\s*[:=]\s*250/);
+});
+
 test('production entry enriches only GET nowplaying through the live capacity addon', () => {
   const entry = read('worker-entry.js');
   assert.match(entry, /enrichNowPlayingWithLiveListenerCapacity/);
