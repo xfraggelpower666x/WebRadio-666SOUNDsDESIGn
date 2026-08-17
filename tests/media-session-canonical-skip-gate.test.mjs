@@ -22,11 +22,11 @@ test('MediaSession next-track delegates to the canonical protected skip controll
   assert.doesNotMatch(block,/fetch\(|\/api\/admin\/skip/);
 });
 
-test('canonical skip controller retains auth and compatibility fallback',()=>{
+test('canonical skip controller retains auth and dedicated admin skip route',()=>{
   assert.match(skip,/S666AdminAuth\.ensure/);
   assert.match(skip,/S666AdminAuth\.fetch/);
-  assert.match(skip,/postViaAdminAuth\('\/api\/admin\/skip'/);
-  assert.match(skip,/postViaAdminAuth\('\/api\/radio\/skip'/);
+  assert.match(skip,/S666AdminAuth\.fetch\('\/api\/admin\/skip'/);
+  assert.doesNotMatch(skip,/\/api\/radio\/skip/);
 });
 
 test('skip-control loads before MediaSession',()=>{
