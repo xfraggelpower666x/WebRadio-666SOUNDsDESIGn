@@ -1,0 +1,72 @@
+name: PR UI owner continuity repair
+
+on:
+  push:
+    branches: [repair/ui-owner-continuity-20260818]
+
+permissions:
+  contents: write
+
+jobs:
+  repair-ui-owner-continuity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/ui-owner-continuity-20260818
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Repair existing canonical owners
+        run: python3 scripts/ops_ui_owner_continuity_20260818.py
+
+      - name: JavaScript syntax audit
+        run: |
+          node --check js/phase10-stability-iphone-panel-hud.js
+          node --check js/player-stage-v2.js
+          node --check js/equalizer.js
+
+      - name: Targeted UI owner regression
+        run: node --test tests/ui-owner-continuity-repair.test.mjs
+
+      - name: Protected subsystem regressions
+        run: |
+          node --test tests/pc-side-meter-real-signal-only.test.mjs \
+            tests/main-player-reactive-visual-contract.test.mjs \
+            tests/media-session-canonical-skip-gate.test.mjs \
+            tests/discord-messenger-complete-full-repair.test.mjs
+
+      - name: Diff sanity
+        run: git diff --check
+
+      - name: Remove temporary repair automation
+        run: |
+          rm -f .github/workflows/ops-ui-owner-continuity-pr.yml
+          rm -f scripts/ops_ui_owner_continuity_20260818.py
+
+      - name: Full release verification
+        run: npm run verify
+
+      - name: Commit repaired existing owners
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No repair changes to commit."
+            exit 0
+          fi
+          git commit -m "repair: restore canonical UI ownership and proportional reactivity"
+          git push origin HEAD:repair/ui-owner-continuity-20260818
