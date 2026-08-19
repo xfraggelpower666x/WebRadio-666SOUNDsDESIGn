@@ -40,3 +40,14 @@ test('PC layout controller no longer activates late fixed canvas and restores in
   assert.match(controller, /style\.setProperty\('width',[\s\S]*'important'\)/);
   assert.match(controller, /style\.setProperty\('transform',[\s\S]*'important'\)/);
 });
+
+test('PC layout controller reuses upper HUD for VELUNA and removes desktop runtime timeline from lower controls', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.match(controller, /playerDesignSwitch/);
+  assert.match(controller, /\.top-hud \.systempanel-right/);
+  assert.match(controller, /topRight\.appendChild\(veluna\)/);
+  assert.match(controller, /veluna\.textContent = 'VELUNA'/);
+  assert.match(controller, /\.bottom-console \.timeline-wrap/);
+  assert.match(controller, /timeline\.style\.setProperty\('display', 'none', 'important'\)/);
+  assert.match(controller, /grid-template-columns', 'minmax\(0,1fr\) minmax\(142px,174px\)'/);
+});
