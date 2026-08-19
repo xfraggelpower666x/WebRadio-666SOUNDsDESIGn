@@ -13,6 +13,11 @@
   const DESKTOP_MIN = 761;
   const ADDON_LAYOUT_MIN = 1221;
   const STORAGE_KEY = 's666_pc_addon_fx_v128';
+  const CHIP_STATE_CLASSES = [
+    'state-main', 'state-backup', 'state-api', 'state-fallback', 'state-external',
+    'state-internal', 'state-error', 'state-ok', 'state-warn', 'state-empty',
+    'state-stopped', 'state-paused', 'state-off', 'is-active'
+  ];
 
   let raf = 0;
   let fxState = readStoredState();
@@ -79,6 +84,102 @@
       if (enabled) nodes.panel.style.removeProperty('display');
       else nodes.panel.style.setProperty('display', 'none', 'important');
       nodes.panel.setAttribute('aria-hidden', enabled ? 'false' : 'true');
+    }
+  }
+
+  function setPanelChipState(chip, state, title) {
+    if (!chip) return;
+    CHIP_STATE_CLASSES.forEach((className) => chip.classList.remove(className));
+    const normalized = String(state || 'empty').toLowerCase();
+    const nextClass = normalized === 'ok' || normalized === 'online' || normalized === 'success'
+      ? 'state-main'
+      : normalized === 'warn' || normalized === 'warning' || normalized === 'sending'
+        ? 'state-warn'
+        : normalized === 'error' || normalized === 'offline' || normalized === 'failed'
+          ? 'state-error'
+          : 'state-empty';
+    chip.classList.add(nextClass);
+    if (nextClass !== 'state-empty') chip.classList.add('is-active');
+    chip.dataset.ledState = nextClass.replace(/^state-/, '');
+    if (title) chip.title = title;
+  }
+
+  function updateDiscordPanelState(detail = {}) {
+    const chip = document.getElementById('statusDiscord');
+    if (!chip) return;
+    const phase = String(detail.phase || '').toLowerCase();
+    if (phase === 'status') {
+      setPanelChipState(chip, detail.ok === true ? 'online' : 'error', detail.ok === true ? 'Discord Worker verbunden — Klick öffnet Shooter' : 'Discord Worker nicht bereit — Klick öffnet Shooter');
+      return;
+    }
+    if (phase === 'sending') {
+      setPanelChipState(chip, 'sending', 'Discord sendet — Klick öffnet Shooter');
+      return;
+    }
+    if (phase === 'success' || phase.endsWith('-success')) {
+      setPanelChipState(chip, 'success', 'Discord Versand erfolgreich — Klick öffnet Shooter');
+      return;
+    }
+    if (phase === 'warning' || phase.endsWith('-warning')) {
+      setPanelChipState(chip, 'warning', 'Discord meldet Warnung — Klick öffnet Shooter');
+      return;
+    }
+    if (phase === 'error' || phase.endsWith('-error')) {
+      setPanelChipState(chip, 'error', 'Discord Fehler — Klick öffnet Shooter');
+    }
+  }
+
+  function bindSystemPanel() {
+    if (!isDesktop()) return;
+
+    const statusOnly = [
+      'statusStream', 'statusBuffer', 'statusSource', 'statusMeta',
+      'statusWorker', 'statusAudio', 'statusWatchdog', 'statusMeter', 'statusGovee'
+    ];
+    statusOnly.forEach((id) => {
+      const chip = document.getElementById(id);
+      if (chip) chip.dataset.panelRole = 'status';
+    });
+
+    ['mainBtn', 'fallbackBtn', 'statusAdmin'].forEach((id) => {
+      const chip = document.getElementById(id);
+      if (chip) chip.dataset.panelRole = 'action';
+    });
+
+    const reconnect = document.getElementById('statusReconnect');
+    const reconnectButton = document.getElementById('reconnectBtn');
+    if (reconnect) {
+      reconnect.dataset.panelRole = 'action';
+      reconnect.title = 'Reconnect — Stream kontrolliert neu verbinden';
+      if (reconnectButton && reconnect.dataset.s666PanelActionBound !== '1') {
+        reconnect.dataset.s666PanelActionBound = '1';
+        reconnect.addEventListener('click', () => reconnectButton.click());
+      }
+    }
+
+    const discord = document.getElementById('statusDiscord');
+    if (discord) {
+      discord.dataset.panelRole = 'action-status';
+      if (discord.dataset.s666PanelActionBound !== '1') {
+        discord.dataset.s666PanelActionBound = '1';
+        discord.addEventListener('click', () => {
+          const addon = window.S666DiscordPlayerAddonV3;
+          if (addon && typeof addon.messagePost === 'function') {
+            addon.messagePost().catch(() => {});
+          }
+        });
+      }
+    }
+
+    if (!window.__S666_SYSTEM_PANEL_DISCORD_BRIDGE__) {
+      window.__S666_SYSTEM_PANEL_DISCORD_BRIDGE__ = true;
+      window.addEventListener('s666:discord-state', (event) => updateDiscordPanelState(event.detail || {}));
+    }
+
+    const addon = window.S666DiscordPlayerAddonV3;
+    if (addon && typeof addon.checkStatus === 'function' && discord?.dataset.s666InitialStatusChecked !== '1') {
+      discord.dataset.s666InitialStatusChecked = '1';
+      addon.checkStatus().catch(() => {});
     }
   }
 
@@ -205,6 +306,7 @@
     applyAddonVisualState('left');
     applyAddonVisualState('right');
     normalizeExistingControls();
+    bindSystemPanel();
     applyResponsivePlayerExpansion();
     normalizeTicker();
   }
