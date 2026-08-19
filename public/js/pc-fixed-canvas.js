@@ -7,8 +7,8 @@
    * The former fixed 1720x980 canvas activated late in boot and replaced the
    * already rendered responsive player with a second geometry system. Keep the
    * existing file/loader as the canonical PC layout owner, but do not create a
-   * fixed canvas anymore. This controller now restores the documented L-FX /
-   * R-FX state and normalizes existing PC controls without adding wrappers.
+   * fixed canvas anymore. This controller restores documented PC state and
+   * normalizes existing controls without adding wrappers or a second layout.
    */
   const DESKTOP_MIN = 761;
   const ADDON_LAYOUT_MIN = 1221;
@@ -125,6 +125,43 @@
     }
   }
 
+  function normalizeTicker() {
+    if (!isDesktop()) return;
+
+    const viewport = document.querySelector('body[data-veluna-page="main"] .now-playing .ticker-window');
+    const ticker = viewport?.querySelector('#nowPlayingTicker');
+    if (!viewport || !ticker) return;
+
+    /* The stage CSS used 100% left padding, so a fresh title starts completely
+       outside the visible ticker. Keep the same canonical ticker element, start
+       it flush-left and only move by the real overflow distance. */
+    ticker.style.setProperty('padding-left', '0', 'important');
+    ticker.style.setProperty('padding-right', '0', 'important');
+    ticker.style.setProperty('min-width', '0', 'important');
+    ticker.style.setProperty('width', 'max-content', 'important');
+    ticker.style.setProperty('text-align', 'left', 'important');
+    ticker.style.setProperty('animation', 'none', 'important');
+
+    if (ticker.__s666TickerAnimation) {
+      ticker.__s666TickerAnimation.cancel();
+      ticker.__s666TickerAnimation = null;
+    }
+
+    const overflow = Math.max(0, ticker.scrollWidth - viewport.clientWidth + 4);
+    if (overflow <= 4 || !ticker.textContent?.trim()) return;
+
+    const duration = clamp(8000, 7000 + overflow * 34, 22000);
+    ticker.__s666TickerAnimation = ticker.animate(
+      [
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(0)', offset: 0.12 },
+        { transform: `translateX(-${overflow}px)`, offset: 0.88 },
+        { transform: `translateX(-${overflow}px)` }
+      ],
+      { duration, iterations: Infinity, direction: 'alternate', easing: 'linear', fill: 'both' }
+    );
+  }
+
   function applyResponsivePlayerExpansion() {
     const player = document.querySelector('body[data-veluna-page="main"] .frame-stage .player-shell');
     if (!player) return;
@@ -169,6 +206,7 @@
     applyAddonVisualState('right');
     normalizeExistingControls();
     applyResponsivePlayerExpansion();
+    normalizeTicker();
   }
 
   function toggleAddon(side) {
@@ -205,4 +243,5 @@
   window.addEventListener('resize', schedule, { passive: true });
   window.addEventListener('orientationchange', schedule, { passive: true });
   window.visualViewport?.addEventListener('resize', schedule, { passive: true });
+  window.addEventListener('s666:metadata-live', schedule, { passive: true });
 })();
