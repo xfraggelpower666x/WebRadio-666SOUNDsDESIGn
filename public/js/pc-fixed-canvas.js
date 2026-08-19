@@ -7,8 +7,8 @@
    * The former fixed 1720x980 canvas activated late in boot and replaced the
    * already rendered responsive player with a second geometry system. Keep the
    * existing file/loader as the canonical PC layout owner, but do not create a
-   * fixed canvas anymore. This controller now only restores the documented
-   * L-FX/R-FX state and lets the existing responsive CSS remain authoritative.
+   * fixed canvas anymore. This controller now restores the documented L-FX /
+   * R-FX state and normalizes existing PC controls without adding wrappers.
    */
   const DESKTOP_MIN = 761;
   const ADDON_LAYOUT_MIN = 1221;
@@ -82,6 +82,49 @@
     }
   }
 
+  function normalizeExistingControls() {
+    if (!isDesktop()) return;
+
+    const shell = document.querySelector('body[data-veluna-page="main"] .player-shell');
+    if (!shell) return;
+
+    const veluna = document.getElementById('playerDesignSwitch');
+    const topRight = shell.querySelector('.top-hud .systempanel-right');
+    if (veluna && topRight && veluna.parentElement !== topRight) {
+      topRight.appendChild(veluna);
+    }
+    if (veluna && topRight) {
+      veluna.textContent = 'VELUNA';
+      veluna.setAttribute('aria-label', 'Zum VELUNA Player wechseln');
+      veluna.title = 'VELUNA Player öffnen';
+      veluna.style.setProperty('position', 'relative', 'important');
+      veluna.style.setProperty('inset', 'auto', 'important');
+      veluna.style.setProperty('flex', '0 0 auto', 'important');
+      veluna.style.setProperty('width', 'auto', 'important');
+      veluna.style.setProperty('min-width', '66px', 'important');
+      veluna.style.setProperty('max-width', '78px', 'important');
+      veluna.style.setProperty('height', '28px', 'important');
+      veluna.style.setProperty('min-height', '28px', 'important');
+      veluna.style.setProperty('margin', '0', 'important');
+      veluna.style.setProperty('padding', '0 8px', 'important');
+      veluna.style.setProperty('font-size', '9px', 'important');
+      veluna.style.setProperty('font-weight', '900', 'important');
+      veluna.style.setProperty('letter-spacing', '.06em', 'important');
+      veluna.style.setProperty('white-space', 'nowrap', 'important');
+    }
+
+    const timeline = shell.querySelector('.bottom-console .timeline-wrap');
+    if (timeline) {
+      timeline.setAttribute('aria-hidden', 'true');
+      timeline.style.setProperty('display', 'none', 'important');
+    }
+
+    const bottom = shell.querySelector('.bottom-console');
+    if (bottom) {
+      bottom.style.setProperty('grid-template-columns', 'minmax(0,1fr) minmax(142px,174px)', 'important');
+    }
+  }
+
   function applyResponsivePlayerExpansion() {
     const player = document.querySelector('body[data-veluna-page="main"] .frame-stage .player-shell');
     if (!player) return;
@@ -124,6 +167,7 @@
     clearFixedCanvasState();
     applyAddonVisualState('left');
     applyAddonVisualState('right');
+    normalizeExistingControls();
     applyResponsivePlayerExpansion();
   }
 
