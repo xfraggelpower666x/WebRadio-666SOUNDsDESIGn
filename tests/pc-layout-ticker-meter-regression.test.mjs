@@ -63,3 +63,19 @@ test('canonical desktop ticker starts visible at the left edge and only travels 
   assert.match(controller, /s666:metadata-live/);
   assert.doesNotMatch(controller, /cloneNode|createElement\([^)]*ticker/i);
 });
+
+test('desktop system panel distinguishes status indicators from real actions and reuses existing controllers', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.match(controller, /function bindSystemPanel\(\)/);
+  assert.match(controller, /'statusStream', 'statusBuffer', 'statusSource', 'statusMeta'/);
+  assert.match(controller, /'statusWorker', 'statusAudio', 'statusWatchdog', 'statusMeter', 'statusGovee'/);
+  assert.match(controller, /chip\.dataset\.panelRole = 'status'/);
+  assert.match(controller, /\['mainBtn', 'fallbackBtn', 'statusAdmin'\]/);
+  assert.match(controller, /reconnect\.dataset\.panelRole = 'action'/);
+  assert.match(controller, /reconnectButton\.click\(\)/);
+  assert.match(controller, /discord\.dataset\.panelRole = 'action-status'/);
+  assert.match(controller, /S666DiscordPlayerAddonV3/);
+  assert.match(controller, /addon\.messagePost\(\)/);
+  assert.match(controller, /s666:discord-state/);
+  assert.match(controller, /addon\.checkStatus\(\)/);
+});
