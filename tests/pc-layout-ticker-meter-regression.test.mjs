@@ -51,3 +51,15 @@ test('PC layout controller reuses upper HUD for VELUNA and removes desktop runti
   assert.match(controller, /timeline\.style\.setProperty\('display', 'none', 'important'\)/);
   assert.match(controller, /grid-template-columns', 'minmax\(0,1fr\) minmax\(142px,174px\)'/);
 });
+
+test('canonical desktop ticker starts visible at the left edge and only travels its measured overflow', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.match(controller, /function normalizeTicker\(\)/);
+  assert.match(controller, /ticker\.style\.setProperty\('padding-left', '0', 'important'\)/);
+  assert.match(controller, /ticker\.style\.setProperty\('animation', 'none', 'important'\)/);
+  assert.match(controller, /ticker\.scrollWidth - viewport\.clientWidth/);
+  assert.match(controller, /ticker\.animate\(/);
+  assert.match(controller, /translateX\(0\)/);
+  assert.match(controller, /s666:metadata-live/);
+  assert.doesNotMatch(controller, /cloneNode|createElement\([^)]*ticker/i);
+});
