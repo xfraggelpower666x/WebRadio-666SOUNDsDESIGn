@@ -25,3 +25,18 @@ test('desktop side meters stay fully visible above overlapping DNA side rails', 
   assert.match(stage, /\.frame-stage \.pc-side-addon\{[^}]*z-index:7!important/);
   assert.match(overlay, /\.frame-stage > \.side-meter\{\s*z-index:10!important;/);
 });
+
+test('PC layout controller no longer activates late fixed canvas and restores independent FX toggles', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.equal(await read('public/js/pc-fixed-canvas.js'), controller);
+  assert.doesNotMatch(controller, /classList\.add\(['"]pc-fixed-canvas['"]\)/);
+  assert.doesNotMatch(controller, /CANVAS_WIDTH|CANVAS_HEIGHT|MAX_SCALE/);
+  assert.match(controller, /classList\.remove\(['"]pc-fixed-canvas['"]\)/);
+  assert.match(controller, /s666_pc_addon_fx_v128/);
+  assert.match(controller, /pcLeftFxToggle/);
+  assert.match(controller, /pcRightFxToggle/);
+  assert.match(controller, /pc-\$\{side\}-addon-off/);
+  assert.match(controller, /applyResponsivePlayerExpansion/);
+  assert.match(controller, /style\.setProperty\('width',[\s\S]*'important'\)/);
+  assert.match(controller, /style\.setProperty\('transform',[\s\S]*'important'\)/);
+});
