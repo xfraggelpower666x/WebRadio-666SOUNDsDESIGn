@@ -1,0 +1,131 @@
+name: Live All-Player Skip Smoke
+
+on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/live-all-player-skip-smoke.yml"
+      - "index.html"
+      - "public/index.html"
+      - "VELUNA/index.html"
+      - "veluna/index.html"
+      - "public/VELUNA/index.html"
+      - "public/veluna/index.html"
+      - "worker.js"
+      - "workers/webradio-666soundsdesign-worker/worker.js"
+      - "js/player-stage-v2.js"
+      - "public/js/player-stage-v2.js"
+      - "js/skip-control.js"
+      - "public/js/skip-control.js"
+      - "worker-addons/skip-api-addon.js"
+      - "worker-addons/radio-admin-config-addon.js"
+      - "wrangler.jsonc"
+      - ".github/workflows/deploy-cloudflare-workers.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/live-all-player-skip-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-all-player-skip-smoke
+  cancel-in-progress: false
+
+jobs:
+  all-player-skip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      BASE_URL: https://webradio.666soundsdesign-broadcaster.com
+    steps:
+      - name: Verify Desktop, iPhone, VELUNA and Internal live skip ownership
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          workdir="$(mktemp -d)"
+          trap 'rm -rf "$workdir"' EXIT
+
+          fetch_live() {
+            local path="$1"
+            local output="$2"
+            local attempt code url
+            for attempt in $(seq 1 12); do
+              url="${BASE_URL}${path}"
+              if [[ "$url" == *\?* ]]; then
+                url="${url}&smoke=${GITHUB_SHA}-${attempt}"
+              else
+                url="${url}?smoke=${GITHUB_SHA}-${attempt}"
+              fi
+              code="$(curl --silent --show-error --location --connect-timeout 10 --max-time 35 \
+                --header 'Cache-Control: no-cache' --header 'Pragma: no-cache' \
+                --output "$output" --write-out '%{http_code}' "$url" || true)"
+              if [[ "$code" == "200" && -s "$output" ]]; then
+                echo "PASS ${path} (${code}, $(wc -c < "$output") bytes)"
+                return 0
+              fi
+              echo "WAIT ${path}: attempt ${attempt}/12 returned ${code:-curl_error}"
+              sleep 10
+            done
+            echo "FAIL ${path}: live service did not return usable HTTP 200" >&2
+            return 1
+          }
+
+          fetch_live "/" "$workdir/root.html"
+          fetch_live "/js/player-stage-v2.js" "$workdir/player-stage-v2.js"
+          fetch_live "/js/skip-control.js" "$workdir/skip-control.js"
+          fetch_live "/veluna/" "$workdir/veluna.html"
+          fetch_live "/internal/" "$workdir/internal.html"
+          fetch_live "/api/skip/status" "$workdir/skip-status.json"
+
+          # Main Desktop + Main iPhone share the canonical stage owner.
+          grep -Fq "/js/skip-control.js" "$workdir/root.html"
+          grep -Fq "s666StageSkip" "$workdir/player-stage-v2.js"
+          grep -Fq "s666StageMobileSkip" "$workdir/player-stage-v2.js"
+          grep -Fq "S666SkipControl.skip" "$workdir/player-stage-v2.js"
+
+          # VELUNA must keep its own complete UI while delegating SKIP centrally.
+          grep -Fq 'data-veluna-page="veluna"' "$workdir/veluna.html"
+          grep -Fq 'id="skipBtn"' "$workdir/veluna.html"
+          grep -Fq "/js/skip-control.js" "$workdir/veluna.html"
+          grep -Fq "S666SkipControl.skip" "$workdir/veluna.html"
+
+          # Internal emergency player uses the same protected owner.
+          grep -Fq 'data-veluna-page="internal"' "$workdir/internal.html"
+          grep -Fq 'id="skipBtn"' "$workdir/internal.html"
+          grep -Fq "/js/skip-control.js" "$workdir/internal.html"
+          grep -Fq "S666SkipControl.skip" "$workdir/internal.html"
+
+          # Browser code must never bypass the protected Main-Worker route.
+          grep -Fq "S666AdminAuth.fetch('/api/admin/skip'" "$workdir/skip-control.js"
+          if grep -Fq "666-autodj-skip.666soundsdesign-broadcaster.com" "$workdir/skip-control.js"; then
+            echo "FAIL browser skip controller exposes dedicated AutoDJ Worker URL" >&2
+            exit 1
+          fi
+          if grep -Fq "S666_AUTODJ_SKIP_ACCESS_TOKEN" "$workdir/skip-control.js"; then
+            echo "FAIL browser skip controller references server-side AutoDJ secret" >&2
+            exit 1
+          fi
+
+          node - "$workdir/skip-status.json" <<'NODE'
+          const fs = require('node:fs');
+          const status = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          if (status.ok !== true) throw new Error(`AutoDJ status not ok: ${JSON.stringify(status)}`);
+          if (status.protectedWriteRoute !== '/api/admin/skip') throw new Error(`Protected route mismatch: ${JSON.stringify(status)}`);
+          if (status.secretTransport !== 'server-side-only') throw new Error(`Secret transport mismatch: ${JSON.stringify(status)}`);
+          if (typeof status.configured !== 'boolean') throw new Error(`configured must be boolean: ${JSON.stringify(status)}`);
+          if (typeof status.accessTokenConfigured !== 'boolean') throw new Error(`accessTokenConfigured must be boolean: ${JSON.stringify(status)}`);
+          for (const key of ['accessToken', 'token', 'secret']) {
+            if (Object.prototype.hasOwnProperty.call(status, key)) throw new Error(`Forbidden secret field exposed: ${key}`);
+          }
+          if (process.env.GITHUB_EVENT_NAME !== 'pull_request') {
+            if (status.configured !== true) throw new Error(`Production AutoDJ bridge is not configured: ${JSON.stringify(status)}`);
+            if (status.accessTokenConfigured !== true) throw new Error(`Production AutoDJ token is not configured: ${JSON.stringify(status)}`);
+          }
+          console.log(`ALL_PLAYER_AUTODJ_STATUS=${JSON.stringify(status)}`);
+          NODE
+
+          echo "LIVE ALL-PLAYER SKIP OWNERSHIP PASS"
