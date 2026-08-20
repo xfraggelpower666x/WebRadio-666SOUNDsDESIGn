@@ -1,8 +1,8 @@
 name: PR UI visual continuity audit
 
 on:
-  push:
-    branches: [repair/ui-owner-continuity-20260818]
+  pull_request:
+    branches: [WebRadio-666SOUNDsDESIGn]
 
 permissions:
   contents: read
