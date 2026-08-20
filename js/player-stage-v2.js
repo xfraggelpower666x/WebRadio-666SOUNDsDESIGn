@@ -76,6 +76,36 @@
     }
   }
 
+  function ensureMainLayoutControls(){
+    var topRight=q('body[data-veluna-page="main"] .top-hud .systempanel-right');
+    var switchLink=q('#playerDesignSwitch');
+    if(topRight&&switchLink&&switchLink.parentNode!==topRight){switchLink.classList.add('s666-top-veluna-link');topRight.appendChild(switchLink);}
+    var timeline=q('body[data-veluna-page="main"] .player-shell .bottom-console .timeline-wrap');
+    if(timeline){timeline.hidden=true;timeline.setAttribute('aria-hidden','true');}
+  }
+
+  function readFxState(side){
+    try{var saved=localStorage.getItem('s666-pc-'+side+'-fx');if(saved==='off')return false;if(saved==='on')return true;}catch(error){}
+    return true;
+  }
+
+  function applyFxState(side,on,save){
+    var button=q(side==='left'?'#pcLeftFxToggle':'#pcRightFxToggle');
+    var addon=q(side==='left'?'#pcLeftFxAddon':'#pcRightFxAddon');
+    if(button){button.classList.toggle('is-on',on);button.setAttribute('aria-pressed',on?'true':'false');}
+    document.documentElement.setAttribute('data-s666-'+side+'-fx',on?'on':'off');
+    if(addon){addon.hidden=!on;addon.setAttribute('aria-hidden',on?'false':'true');}
+    if(save){try{localStorage.setItem('s666-pc-'+side+'-fx',on?'on':'off');}catch(error){}}
+  }
+
+  function installFxToggles(){
+    ['left','right'].forEach(function(side){
+      var button=q(side==='left'?'#pcLeftFxToggle':'#pcRightFxToggle');if(!button)return;
+      if(!button.__s666FxBound){button.__s666FxBound=true;button.addEventListener('click',function(){var on=button.getAttribute('aria-pressed')!=='true';applyFxState(side,on,true);});}
+      applyFxState(side,readFxState(side),false);
+    });
+  }
+
   function normalizeHeaderImage(image){
     if(!image)return;
     image.src='/assets/veluna/header/veluna-player-header.webp';
@@ -241,7 +271,7 @@
     driveStatus(bus,level,peak);driveReactiveVisuals(bus,level,peak,pulse,bands);requestAnimationFrame(consumeMeterBus);
   }
 
-  function normalizeUi(){ensureActionButtons();ensureMainHeader();renderDesktopNowPlaying();renderMobileNowPlaying();}
+  function normalizeUi(){ensureActionButtons();ensureMainHeader();ensureMainLayoutControls();installFxToggles();renderDesktopNowPlaying();renderMobileNowPlaying();}
   function scheduleNormalize(){if(state.normalizeQueued)return;state.normalizeQueued=true;requestAnimationFrame(function(){state.normalizeQueued=false;normalizeUi();});}
   function boot(){
     installTouchFeedback();state.metadata=Object.assign(state.metadata,readDomMetadata());normalizeUi();sidePanel('left');sidePanel('right');
