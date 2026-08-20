@@ -187,12 +187,17 @@ jobs:
           if (health.ok !== true) throw new Error(`Render health not ok: ${JSON.stringify(health)}`);
 
           if (autoDj.ok !== true) throw new Error(`AutoDJ bridge status not ok: ${JSON.stringify(autoDj)}`);
-          if (autoDj.configured !== true) throw new Error(`AutoDJ dedicated Worker bridge is not configured: ${JSON.stringify(autoDj)}`);
-          if (autoDj.accessTokenConfigured !== true) throw new Error(`AutoDJ server-side access token is not configured: ${JSON.stringify(autoDj)}`);
+          if (typeof autoDj.configured !== 'boolean') throw new Error(`AutoDJ configured state is not boolean: ${JSON.stringify(autoDj)}`);
+          if (typeof autoDj.accessTokenConfigured !== 'boolean') throw new Error(`AutoDJ access-token state is not boolean: ${JSON.stringify(autoDj)}`);
           if (autoDj.protectedWriteRoute !== '/api/admin/skip') throw new Error(`AutoDJ protected write route mismatch: ${JSON.stringify(autoDj)}`);
           if (autoDj.secretTransport !== 'server-side-only') throw new Error(`AutoDJ secret transport contract mismatch: ${JSON.stringify(autoDj)}`);
           for (const forbidden of ['accessToken', 'token', 'secret']) {
             if (Object.prototype.hasOwnProperty.call(autoDj, forbidden)) throw new Error(`AutoDJ status exposed forbidden field: ${forbidden}`);
+          }
+
+          if (process.env.GITHUB_EVENT_NAME !== 'pull_request') {
+            if (autoDj.configured !== true) throw new Error(`Production AutoDJ dedicated Worker bridge is not configured: ${JSON.stringify(autoDj)}`);
+            if (autoDj.accessTokenConfigured !== true) throw new Error(`Production AutoDJ server-side access token is not configured: ${JSON.stringify(autoDj)}`);
           }
 
           const requiredPaths = [
