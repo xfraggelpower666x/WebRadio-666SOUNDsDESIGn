@@ -1,0 +1,66 @@
+name: One-shot Phase10 UI owner demotion
+
+on:
+  push:
+    branches:
+      - repair/ui-owner-consolidation-20260820
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/ui-owner-consolidation-20260820
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Demote legacy Phase10 visual owners only
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const paths = [
+            'js/phase10-stability-iphone-panel-hud.js',
+            'public/js/phase10-stability-iphone-panel-hud.js'
+          ];
+          const replacements = [
+            ['    uiFinetuneV1();\n', '    document.documentElement.setAttribute("data-phase10-legacy-ui-owner","demoted");\n'],
+            ['    forcedUiApplyV1();\n', ''],
+            ['    startSideMeterReactV1();\n', ''],
+            ['    directfixTickerAndMessage();\n', ''],
+            ['    phase10RelocatePcPanels();\n', ''],
+            ['    mountBottomSafe();\n', '']
+          ];
+          for (const path of paths) {
+            let src = fs.readFileSync(path, 'utf8');
+            for (const [needle, replacement] of replacements) {
+              const count = src.split(needle).length - 1;
+              if (count !== 1) throw new Error(`${path}: expected exactly one boot call ${JSON.stringify(needle.trim())}, found ${count}`);
+              src = src.replace(needle, replacement);
+            }
+            fs.writeFileSync(path, src);
+          }
+          const root = fs.readFileSync(paths[0], 'utf8');
+          const pub = fs.readFileSync(paths[1], 'utf8');
+          if (root !== pub) throw new Error('Phase10 root/public mirror drift after repair');
+          NODE
+      - name: Run focused visual ownership contract
+        run: node --test tests/main-player-reactive-visual-contract.test.mjs
+      - name: Commit surgical repair
+        shell: bash
+        run: |
+          if git diff --quiet -- js/phase10-stability-iphone-panel-hud.js public/js/phase10-stability-iphone-panel-hud.js; then
+            echo 'No Phase10 repair diff produced' >&2
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add js/phase10-stability-iphone-panel-hud.js public/js/phase10-stability-iphone-panel-hud.js
+          git commit -m 'fix: demote legacy Phase10 visual owners'
+          git push origin HEAD:repair/ui-owner-consolidation-20260820
