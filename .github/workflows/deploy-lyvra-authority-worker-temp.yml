@@ -27,6 +27,7 @@ jobs:
           path: lyvra-worker-src
 
       - name: Preservation preflight
+        id: preflight
         shell: bash
         run: |
           set -euo pipefail
@@ -36,10 +37,36 @@ jobs:
           grep -F 'compatibility_date = "2026-04-09"' wrangler.toml
           grep -F 'WORKER_SCOPE = "MAIN_PERSONAL_ONLY"' wrangler.toml
           grep -F 'PORTABLE_WORKER_BINDING = "DISABLED"' wrangler.toml
-          grep -F 'LYVRA_BOOT_SIGNING_SECRET' worker.js
+          grep -F 'LYVRA_BOOT_SIGNING_SECRET' worker.js >/dev/null
           echo "PREFLIGHT=PASS"
 
+      - name: Check whether v2 is already live
+        id: before
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://lyvrasystem.666soundsdesign-broadcaster.com'
+          if curl --fail --silent --show-error --retry 3 --retry-delay 2 "$BASE/health" > /tmp/health-before.json; then
+            version=$(jq -r '.version // "unknown"' /tmp/health-before.json)
+            service=$(jq -r '.service // "unknown"' /tmp/health-before.json)
+          else
+            version=unreachable
+            service=unknown
+          fi
+          echo "before_version=$version" >> "$GITHUB_OUTPUT"
+          echo "before_service=$service" >> "$GITHUB_OUTPUT"
+          if [ "$version" = "2.0.0" ] && [ "$service" = "666_MAIN_SYSTEM_AUTHORITY_EVIDENCE_GATE" ]; then
+            echo "needs_deploy=false" >> "$GITHUB_OUTPUT"
+            echo "V2_ALREADY_LIVE=TRUE"
+          else
+            echo "needs_deploy=true" >> "$GITHUB_OUTPUT"
+            echo "V2_ALREADY_LIVE=FALSE"
+          fi
+
       - name: Deploy v2 to existing lyvrasystem script
+        id: deploy
+        if: steps.before.outputs.needs_deploy == 'true'
+        continue-on-error: true
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -50,26 +77,30 @@ jobs:
 
       - name: Live endpoint readback
         id: live
+        if: always()
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           BASE='https://lyvrasystem.666soundsdesign-broadcaster.com'
-          curl --fail --silent --show-error --retry 5 --retry-delay 2 "$BASE/health" > /tmp/health.json
-          curl --fail --silent --show-error --retry 5 --retry-delay 2 "$BASE/v1/authority-root" > /tmp/v1.json
-          curl --fail --silent --show-error --retry 5 --retry-delay 2 "$BASE/v2/systems" > /tmp/v2systems.json
-          curl --fail --silent --show-error --retry 5 --retry-delay 2 "$BASE/v2/authority-root?system=LYVRA" > /tmp/v2lyvra.json
+          curl --fail --silent --show-error --retry 6 --retry-delay 2 "$BASE/health" > /tmp/health.json
+          curl --fail --silent --show-error --retry 6 --retry-delay 2 "$BASE/v1/authority-root" > /tmp/v1.json
+          curl --fail --silent --show-error --retry 6 --retry-delay 2 "$BASE/v2/systems" > /tmp/v2systems.json
+          curl --fail --silent --show-error --retry 6 --retry-delay 2 "$BASE/v2/authority-root?system=LYVRA" > /tmp/v2lyvra.json
 
           jq -e '.ok == true and .version == "2.0.0" and .status == "HEALTHY"' /tmp/health.json >/dev/null
           jq -e '.ok == true and .authority_root.system_id == "LYVRA" and .signing_secret_exposed == false' /tmp/v1.json >/dev/null
           jq -e '.ok == true and .personal_worker_applies_to == "MAIN_PERSONAL_ONLY" and .portable_worker_binding == false' /tmp/v2systems.json >/dev/null
           jq -e '.ok == true and .worker_status == "WORKER_VERIFIED" and .authority_root.system_id == "LYVRA" and .secret_exposed == false' /tmp/v2lyvra.json >/dev/null
 
-          echo "LIVE_READBACK=PASS"
           echo "health_version=$(jq -r '.version' /tmp/health.json)" >> "$GITHUB_OUTPUT"
           echo "enabled_count=$(jq -r '.enabled_system_count' /tmp/health.json)" >> "$GITHUB_OUTPUT"
+          echo "LIVE_READBACK=PASS"
 
-      - name: Read post-deploy Cloudflare checkpoint
+      - name: Read post-state Cloudflare checkpoint
         id: checkpoint
+        if: always()
+        continue-on-error: true
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -86,13 +117,15 @@ jobs:
           echo "version_id=$(jq -r '.result.deployments[0].versions[0].version_id' /tmp/deployments-after.json)" >> "$GITHUB_OUTPUT"
           echo "created_on=$(jq -r '.result.deployments[0].created_on' /tmp/deployments-after.json)" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout isolated audit branch for sanitized deploy receipt
+      - name: Checkout isolated audit branch for receipt
+        if: always()
         uses: actions/checkout@v4
         with:
           ref: cloudflare-authority-audit-20260820
           path: audit-receipt
 
-      - name: Persist sanitized deploy receipt
+      - name: Persist sanitized deploy receipt regardless of outcome
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
@@ -106,21 +139,34 @@ jobs:
           WRANGLER_VERSION=4.111.0
           SOURCE_REPO=xfraggelpower666x/LYVRA-Living-Yielding-Vibration-and-Resonance-Architecture
           SOURCE_REF=worker-v2-main-system-authority
-          SOURCE_PATH=cloudflare-workers/personal-main-system-authority
+          BEFORE_VERSION=${{ steps.before.outputs.before_version }}
+          BEFORE_SERVICE=${{ steps.before.outputs.before_service }}
+          NEEDS_DEPLOY=${{ steps.before.outputs.needs_deploy }}
+          DEPLOY_STEP_OUTCOME=${{ steps.deploy.outcome }}
+          LIVE_STEP_OUTCOME=${{ steps.live.outcome }}
+          CHECKPOINT_STEP_OUTCOME=${{ steps.checkpoint.outcome }}
           LIVE_VERSION=${{ steps.live.outputs.health_version }}
           ENABLED_SYSTEM_COUNT=${{ steps.live.outputs.enabled_count }}
           POST_DEPLOYMENT_ID=${{ steps.checkpoint.outputs.deployment_id }}
           POST_VERSION_ID=${{ steps.checkpoint.outputs.version_id }}
           POST_CREATED_ON=${{ steps.checkpoint.outputs.created_on }}
-          LIVE_HEALTH=PASS
-          V1_COMPATIBILITY=PASS
-          V2_SYSTEMS=PASS
-          V2_LYVRA_AUTHORITY=PASS
           SECRET_VALUES_EXPOSED=FALSE
-          DEPLOY_STATUS=DEPLOYED_VERIFIED
           EOF
+          if [ "${{ steps.live.outcome }}" = "success" ]; then
+            echo "DEPLOY_STATUS=DEPLOYED_OR_ALREADY_LIVE_VERIFIED" >> cloudflare-authority-deploy-v2-20260820.md
+          else
+            echo "DEPLOY_STATUS=NOT_VERIFIED" >> cloudflare-authority-deploy-v2-20260820.md
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add cloudflare-authority-deploy-v2-20260820.md
-          git commit -m "Record verified lyvrasystem Worker v2 deployment"
+          git commit -m "Record lyvrasystem Worker v2 deploy outcome" || true
           git push origin HEAD:cloudflare-authority-audit-20260820
+
+      - name: Enforce verified live state
+        if: always()
+        shell: bash
+        run: |
+          [ "${{ steps.live.outcome }}" = "success" ] || exit 31
+          [ "${{ steps.checkpoint.outcome }}" = "success" ] || exit 32
+          echo "LYVRASYSTEM_V2_DEPLOYMENT=VERIFIED"
