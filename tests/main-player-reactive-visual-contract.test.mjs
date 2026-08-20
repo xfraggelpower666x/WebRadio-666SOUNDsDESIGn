@@ -1,4 +1,4 @@
-// Main/all-player live audio-reactive visual and metadata contract v1.0.2.
+// Main/all-player live audio-reactive visual and metadata contract v1.0.3.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -48,6 +48,25 @@ test('Now Playing uses live static information plus purple bass-reactive title t
   assert.match(stage, /s666-now-meta-detail/);
   assert.match(css, /#c56cff/);
   assert.match(css, /--s666-ticker-pulse/);
+  assert.match(css, /#nowPlayingTicker[\s\S]*?padding-left:0!important/);
+  assert.doesNotMatch(css, /#nowPlayingTicker[\s\S]{0,500}?padding-left:100%!important/);
+});
+
+test('main layout preserves existing VELUNA link and gives FX toggles one persistent owner', async () => {
+  const html = await read('index.html');
+  const stage = await read('js/player-stage-v2.js');
+  const css = await read('css/player-stage-v2.css');
+  assert.match(html, /id="playerDesignSwitch"[^>]+href="\/veluna"/);
+  assert.match(stage, /function ensureMainLayoutControls\(\)/);
+  assert.match(stage, /top-hud \.systempanel-right/);
+  assert.match(stage, /timeline\.hidden=true/);
+  assert.match(stage, /s666-pc-'\+side\+'-fx/);
+  assert.match(stage, /setAttribute\('aria-pressed',on\?'true':'false'\)/);
+  assert.match(stage, /data-s666-'\+side\+'-fx/);
+  assert.match(css, /data-s666-left-fx="off"/);
+  assert.match(css, /data-s666-right-fx="off"/);
+  assert.match(css, /--s666-side-release/);
+  assert.match(css, /grid-template-columns:minmax\(0,1fr\) minmax\(142px,174px\)/);
 });
 
 test('metadata and artwork truth stays live and local', async () => {
