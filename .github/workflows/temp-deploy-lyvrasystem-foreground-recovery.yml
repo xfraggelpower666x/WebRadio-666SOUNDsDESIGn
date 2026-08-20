@@ -1,0 +1,107 @@
+name: TEMP Deploy lyvrasystem foreground recovery evidence adapter
+
+on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/temp-deploy-lyvrasystem-foreground-recovery.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lyvrasystem-external-worker-maintenance
+  cancel-in-progress: false
+
+jobs:
+  deploy-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout external Worker source only
+        uses: actions/checkout@v4
+        with:
+          repository: xfraggelpower666x/LYVRA-Living-Yielding-Vibration-and-Resonance-Architecture
+          ref: worker-v2-main-system-authority
+          path: worker-source
+
+      - name: Syntax and preservation checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd worker-source/cloudflare-workers/personal-main-system-authority
+          node --check worker.js
+          node --check worker-runtime-adapter.js
+          grep -q '^name = "lyvrasystem"$' wrangler.toml
+          grep -q '^main = "worker-runtime-adapter.js"$' wrangler.toml
+          grep -q '^compatibility_date = "2026-04-09"$' wrangler.toml
+          grep -q 'WORKER_SCOPE = "MAIN_PERSONAL_ONLY"' wrangler.toml
+          grep -q 'PORTABLE_WORKER_BINDING = "DISABLED"' wrangler.toml
+
+      - name: Deploy existing lyvrasystem Worker in place
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker-source/cloudflare-workers/personal-main-system-authority
+          wranglerVersion: "4.111.0"
+          command: deploy
+
+      - name: Live verify health foreground recovery and v1 compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://lyvrasystem.666soundsdesign-broadcaster.com'
+
+          curl -fsS "$BASE/health" -o health.json
+          grep -q 'FOREGROUND_RECOVERY_CONTEXT_V1' health.json
+          grep -q '/v2/foreground-evidence' health.json
+          grep -q '/v2/recovery-evidence' health.json
+
+          curl -fsS "$BASE/v1/authority-root" -o v1.json
+          grep -q 'LYVRA_AUTHORITY_ROOT_V1' v1.json
+
+          curl -fsS -X POST "$BASE/v2/foreground-evidence" \
+            -H 'Content-Type: application/json' \
+            --data '{"system":"LYVRA","expected_system_id":"LYVRA","expected_namespace":"LYVRA","expected_authority_context":"LYVRA_MAIN_PERSONAL","expected_root_revision":"LYVRA-AUTHORITY-ROOT-1.0.0","current_pointer_revision":"DRIVE_CURRENT_POINTER","current_root_revision":"LYVRA-AUTHORITY-ROOT-1.0.0","session_state_id":"WORKFLOW_LIVE_TEST"}' \
+            -o foreground.json
+          grep -q '"valid": true' foreground.json
+          grep -q '"purpose": "FOREGROUND"' foreground.json
+          grep -q '"native_operation": "SYSTEM_VORNE"' foreground.json
+          grep -q 'EVIDENCE_ONLY_NON_MUTATING' foreground.json
+
+          FGTICKET=$(node -e "const x=require('./foreground.json'); process.stdout.write(x.ticket||'')")
+          test -n "$FGTICKET"
+          curl -fsS -X POST "$BASE/v2/verify-evidence" \
+            -H 'Content-Type: application/json' \
+            --data "$(node -e 'process.stdout.write(JSON.stringify({ticket:process.argv[1]}))' "$FGTICKET")" \
+            -o foreground-verify.json
+          grep -q '"valid": true' foreground-verify.json
+          grep -q '"purpose": "FOREGROUND"' foreground-verify.json
+
+          curl -fsS -X POST "$BASE/v2/recovery-evidence" \
+            -H 'Content-Type: application/json' \
+            --data '{"system":"LYVRA","expected_system_id":"LYVRA","expected_namespace":"LYVRA","expected_authority_context":"LYVRA_MAIN_PERSONAL","expected_root_revision":"LYVRA-AUTHORITY-ROOT-1.0.0","current_pointer_revision":"DRIVE_CURRENT_POINTER","current_root_revision":"LYVRA-AUTHORITY-ROOT-1.0.0","session_state_id":"WORKFLOW_LIVE_TEST","session_revision":"CURRENT"}' \
+            -o recovery.json
+          grep -q '"valid": true' recovery.json
+          grep -q '"purpose": "RECOVERY"' recovery.json
+          grep -q '"native_operation": "FUCK_HORST"' recovery.json
+          grep -q 'EVIDENCE_ONLY_NON_MUTATING' recovery.json
+
+          RCTICKET=$(node -e "const x=require('./recovery.json'); process.stdout.write(x.ticket||'')")
+          test -n "$RCTICKET"
+          curl -fsS -X POST "$BASE/v2/verify-evidence" \
+            -H 'Content-Type: application/json' \
+            --data "$(node -e 'process.stdout.write(JSON.stringify({ticket:process.argv[1]}))' "$RCTICKET")" \
+            -o recovery-verify.json
+          grep -q '"valid": true' recovery-verify.json
+          grep -q '"purpose": "RECOVERY"' recovery-verify.json
+
+          curl -sS -o mismatch.json -w '%{http_code}' -X POST "$BASE/v2/recovery-evidence" \
+            -H 'Content-Type: application/json' \
+            --data '{"system":"LYVRA","expected_namespace":"666CLIC"}' > mismatch-status.txt
+          grep -q '^409$' mismatch-status.txt
+          grep -q 'WORKER_CONFLICT' mismatch.json
+
+          echo 'LIVE_FOREGROUND_RECOVERY_VERIFY=PASS'
