@@ -25,6 +25,7 @@ window.VELUNA_ASSETS = Object.freeze({
   'use strict';
   const version = '2026-08-17-native-mute-ticker-v185';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
+  const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
   const head = document.head || document.documentElement;
   if (!head) return;
 
@@ -181,6 +182,7 @@ window.VELUNA_ASSETS = Object.freeze({
   const policyReady = () => !!window.SMFPAudioPolicyUI;
   const artworkReady = () => !!window.SMFPArtworkCore;
   const muteReady = () => !!window.S666AllPlayerMute?.version;
+  const discordRecoveryReady = () => !!window.S666DiscordStartupRecovery?.version;
 
   void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
     .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
@@ -200,4 +202,10 @@ window.VELUNA_ASSETS = Object.freeze({
       try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {}
     })
     .catch(() => {});
+
+  void loadScript(
+    `/js/discord-startup-autopost-recovery.js?v=${discordRecoveryVersion}`,
+    's666DiscordStartupRecovery',
+    discordRecoveryReady
+  ).catch(() => {});
 })();
