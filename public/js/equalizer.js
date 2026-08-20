@@ -450,7 +450,7 @@ const stopFallback = () => {
       // Visual-only response guard: keep real analyser dynamics readable without
       // making meter motion grow with Boost or collapse at normal listening volume.
       const visualGainCompensation = Math.pow(boostGain, -0.55);
-      const visualVolumeScale = Math.pow(volume, 0.85);
+      const visualVolumeScale = Math.pow(volume, 1.15);
       const visualSignalScale = visualGainCompensation * visualVolumeScale;
 
       const bandCount = Math.max(1, bars.length);
@@ -498,12 +498,12 @@ count += 1;
 ? currentReference + (desiredReference - currentReference) * 0.08
 : Math.max(8, currentReference * 0.9985);
         const relative = clamp(local / Math.max(8, bandReference[index]), 0, 1);
-        const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;
-        const spectral = Math.pow(absolute, 0.52) * visualTilt;
-        const spectralResponse = spectral * (0.35 + localGate * 0.65);
-        const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;
+        const visualTilt = 1 + Math.pow(position, 1.18) * 0.48;
+        const spectral = Math.pow(absolute, 0.78) * visualTilt;
+        const spectralResponse = spectral * (0.30 + localGate * 0.56);
+        const adaptiveResponse = Math.pow(relative, 0.82) * 0.14 * localGate;
         const target = signalPresent && localGate > 0
-? clamp(spectralResponse * 0.92 + adaptiveResponse, 0.012, 1)
+? clamp(spectralResponse * 0.86 + adaptiveResponse, 0.012, 1)
 : 0.012;
         const previous = bandEnvelope[index] || 0.012;
         const attack = 0.76 + position * 0.12;
@@ -519,8 +519,8 @@ count += 1;
         eq.push(value);
       });
 
-      const level = clamp(rms * visualSignalScale * 2.40, 0, 1);
-      const peak = clamp(Math.max(samplePeak * visualSignalScale * 1.08, level), 0, 1);
+      const level = clamp(rms * visualSignalScale * 1.85, 0, 1);
+      const peak = clamp(Math.max(samplePeak * visualSignalScale * 0.96, level), 0, 1);
       const sliceAverage = (start, end, fallback) => {
         const slice = values.slice(start, end);
         return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : fallback;
