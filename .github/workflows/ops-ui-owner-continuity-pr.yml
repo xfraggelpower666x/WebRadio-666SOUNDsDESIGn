@@ -32,6 +32,9 @@ jobs:
       - name: Repair existing canonical owners
         run: python3 scripts/ops_ui_owner_continuity_20260818.py
 
+      - name: Align legacy regression contracts
+        run: python3 scripts/ops_ui_owner_continuity_contract_refresh_20260820.py
+
       - name: JavaScript syntax audit
         run: |
           node --check js/phase10-stability-iphone-panel-hud.js
@@ -55,6 +58,7 @@ jobs:
         run: |
           rm -f .github/workflows/ops-ui-owner-continuity-pr.yml
           rm -f scripts/ops_ui_owner_continuity_20260818.py
+          rm -f scripts/ops_ui_owner_continuity_contract_refresh_20260820.py
 
       - name: Release structural check
         shell: bash
