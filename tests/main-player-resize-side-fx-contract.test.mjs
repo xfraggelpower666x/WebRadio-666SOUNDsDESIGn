@@ -26,9 +26,9 @@ test('narrow desktop collapses side add-ons instead of deforming the player', ()
 
 test('wide desktop releases each disabled FX side independently', () => {
   assert.match(css, /--s666-side-release:calc\(var\(--s666-side-panel-width\) \+ var\(--s666-side-panel-gap\)\)/);
-  assert.match(css, /data-s666-left-fx=\\"off\\"\]\[data-s666-right-fx=\\"on\\"\][\s\S]*?translateX\(calc\(var\(--s666-side-release\) \* -\.5\)\)/);
-  assert.match(css, /data-s666-left-fx=\\"on\\"\]\[data-s666-right-fx=\\"off\\"\][\s\S]*?translateX\(calc\(var\(--s666-side-release\) \* \.5\)\)/);
-  assert.match(css, /data-s666-left-fx=\\"off\\"\]\[data-s666-right-fx=\\"off\\"\][\s\S]*?var\(--s666-side-release\) \* 2/);
+  assert.match(css, /data-s666-left-fx="off"\]\[data-s666-right-fx="on"\][\s\S]*?translateX\(calc\(var\(--s666-side-release\) \* -\.5\)\)/);
+  assert.match(css, /data-s666-left-fx="on"\]\[data-s666-right-fx="off"\][\s\S]*?translateX\(calc\(var\(--s666-side-release\) \* \.5\)\)/);
+  assert.match(css, /data-s666-left-fx="off"\]\[data-s666-right-fx="off"\][\s\S]*?var\(--s666-side-release\) \* 2/);
   assert.match(css, /calc\(100vw - 24px\)/);
 });
 
