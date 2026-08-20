@@ -18,6 +18,7 @@ on:
       - "worker-entry.js"
       - "worker-addons/discord-nowplaying-gate.js"
       - "worker-addons/player-alert-global-fallback.js"
+      - "worker-addons/skip-api-addon.js"
       - "wrangler.jsonc"
       - "workers/webradio-666soundsdesign-worker/worker.js"
       - "workers/webradio-666soundsdesign-worker/wrangler.jsonc"
@@ -25,6 +26,8 @@ on:
       - "public/js/player-alert-client.js"
       - "js/messenger-overlay.js"
       - "public/js/messenger-overlay.js"
+      - "js/skip-control.js"
+      - "public/js/skip-control.js"
       - "js/equalizer.js"
       - "public/js/equalizer.js"
       - "js/player-stage-v2.js"
@@ -59,7 +62,7 @@ jobs:
       BASE_URL: https://webradio.666soundsdesign-broadcaster.com
       PLAYER_ALERT_BACKEND_URL: https://666webradio.666soundsdesign-broadcaster.com
     steps:
-      - name: Check live routes, Messenger bus and repaired assets
+      - name: Check live routes, Messenger bus, AutoDJ bridge and repaired assets
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -117,8 +120,10 @@ jobs:
           fetch_live "/internal/" "$workdir/internal.html"
           fetch_live "/js/player-alert-client.js" "$workdir/player-alert-client.js"
           fetch_live "/js/messenger-overlay.js" "$workdir/messenger-overlay.js"
+          fetch_live "/js/skip-control.js" "$workdir/skip-control.js"
           fetch_live "/api/player-alert/status" "$workdir/player-alert-status.json"
           fetch_live "/api/player-alert/current" "$workdir/player-alert-current.json"
+          fetch_live "/api/skip/status" "$workdir/autodj-skip-status.json"
 
           fetch_url "${PLAYER_ALERT_BACKEND_URL}/health" "$workdir/render-health.json" "Render health"
           fetch_url "${PLAYER_ALERT_BACKEND_URL}/openapi.json" "$workdir/render-openapi.json" "Render OpenAPI"
@@ -145,32 +150,55 @@ jobs:
           grep -Fq "app.id='mffApp'" "$workdir/root.html"
           grep -Fq "/js/player-alert-client.js" "$workdir/root.html"
           grep -Fq "/js/messenger-overlay.js" "$workdir/root.html"
+          grep -Fq "/js/skip-control.js" "$workdir/root.html"
 
           grep -Fq 'data-veluna-page="veluna"' "$workdir/veluna.html"
           grep -Fq "/js/player-alert-client.js" "$workdir/veluna.html"
           grep -Fq "/js/messenger-overlay.js" "$workdir/veluna.html"
+          grep -Fq "/js/skip-control.js" "$workdir/veluna.html"
 
           grep -Fq 'data-veluna-page="internal"' "$workdir/internal.html"
           grep -Fq 'id="internalMessageBtn"' "$workdir/internal.html"
           grep -Fq "/js/player-alert-client.js" "$workdir/internal.html"
           grep -Fq "/js/messenger-overlay.js" "$workdir/internal.html"
+          grep -Fq "/js/skip-control.js" "$workdir/internal.html"
 
           grep -Fq "/api/player-alert/send" "$workdir/player-alert-client.js"
           grep -Fq "current: function () { return get('current'); }" "$workdir/player-alert-client.js"
           grep -Fq "Broadcast-Nachricht senden" "$workdir/messenger-overlay.js"
+          grep -Fq "S666AdminAuth.fetch('/api/admin/skip'" "$workdir/skip-control.js"
+          if grep -Fq "666-autodj-skip.666soundsdesign-broadcaster.com" "$workdir/skip-control.js"; then
+            echo "FAIL live browser skip controller exposes dedicated AutoDJ Worker URL" >&2
+            exit 1
+          fi
 
-          node - "$workdir/player-alert-status.json" "$workdir/player-alert-current.json" "$workdir/render-health.json" "$workdir/render-openapi.json" "$workdir/render-player-alert-status.json" "$render_status_code" <<'NODE'
+          node - "$workdir/player-alert-status.json" "$workdir/player-alert-current.json" "$workdir/render-health.json" "$workdir/render-openapi.json" "$workdir/render-player-alert-status.json" "$render_status_code" "$workdir/autodj-skip-status.json" <<'NODE'
           const fs = require('node:fs');
-          const [workerPath, currentPath, healthPath, openapiPath, renderStatusPath, renderStatusCode] = process.argv.slice(2);
+          const [workerPath, currentPath, healthPath, openapiPath, renderStatusPath, renderStatusCode, autoDjStatusPath] = process.argv.slice(2);
           const worker = JSON.parse(fs.readFileSync(workerPath, 'utf8'));
           const current = JSON.parse(fs.readFileSync(currentPath, 'utf8'));
           const health = JSON.parse(fs.readFileSync(healthPath, 'utf8'));
           const openapi = JSON.parse(fs.readFileSync(openapiPath, 'utf8'));
+          const autoDj = JSON.parse(fs.readFileSync(autoDjStatusPath, 'utf8'));
           const paths = Object.keys(openapi.paths || {});
 
           if (worker.ok !== true) throw new Error(`Worker Player Alert status not ok: ${JSON.stringify(worker)}`);
           if (typeof current.active !== 'boolean') throw new Error(`Worker Player Alert current contract invalid: ${JSON.stringify(current)}`);
           if (health.ok !== true) throw new Error(`Render health not ok: ${JSON.stringify(health)}`);
+
+          if (autoDj.ok !== true) throw new Error(`AutoDJ bridge status not ok: ${JSON.stringify(autoDj)}`);
+          if (typeof autoDj.configured !== 'boolean') throw new Error(`AutoDJ configured state is not boolean: ${JSON.stringify(autoDj)}`);
+          if (typeof autoDj.accessTokenConfigured !== 'boolean') throw new Error(`AutoDJ access-token state is not boolean: ${JSON.stringify(autoDj)}`);
+          if (autoDj.protectedWriteRoute !== '/api/admin/skip') throw new Error(`AutoDJ protected write route mismatch: ${JSON.stringify(autoDj)}`);
+          if (autoDj.secretTransport !== 'server-side-only') throw new Error(`AutoDJ secret transport contract mismatch: ${JSON.stringify(autoDj)}`);
+          for (const forbidden of ['accessToken', 'token', 'secret']) {
+            if (Object.prototype.hasOwnProperty.call(autoDj, forbidden)) throw new Error(`AutoDJ status exposed forbidden field: ${forbidden}`);
+          }
+
+          if (process.env.GITHUB_EVENT_NAME !== 'pull_request') {
+            if (autoDj.configured !== true) throw new Error(`Production AutoDJ dedicated Worker bridge is not configured: ${JSON.stringify(autoDj)}`);
+            if (autoDj.accessTokenConfigured !== true) throw new Error(`Production AutoDJ server-side access token is not configured: ${JSON.stringify(autoDj)}`);
+          }
 
           const requiredPaths = [
             '/api/player-alert/status',
@@ -198,6 +226,7 @@ jobs:
           }
 
           console.log('PLAYER ALERT LIVE BUS PASS');
+          console.log(`AUTODJ_STATUS=${JSON.stringify(autoDj)}`);
           console.log(`WORKER_STATUS=${JSON.stringify(worker)}`);
           console.log(`CURRENT_SOURCE=${String(current.source || '')}`);
           console.log(`RENDER_HEALTH=${JSON.stringify(health)}`);

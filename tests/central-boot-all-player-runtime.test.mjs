@@ -92,7 +92,9 @@ test('main player audio reactivity preserves working analyzer runtime with propo
   assert.match(eq, /const visualVolumeScale = Math\.pow\(volume, 0\.85\)/);
   assert.match(eq, /const visualSignalScale = visualGainCompensation \* visualVolumeScale/);
   assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
-  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
+  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 0\.62/);
+  assert.match(eq, /const spectral = Math\.pow\(absolute, 0\.62\) \* visualTilt/);
+  assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.74\) \* 0\.14 \* localGate/);
   assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
   assert.match(eq, /const release = 0\.15 \+ position \* 0\.03/);
 
