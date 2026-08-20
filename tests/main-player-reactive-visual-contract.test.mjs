@@ -1,4 +1,4 @@
-// Main/all-player live audio-reactive visual and metadata contract v1.0.1.
+// Main/all-player live audio-reactive visual and metadata contract v1.0.2.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -7,14 +7,24 @@ const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
 test('main player has one visual writer per responsibility', async () => {
   const html = await read('index.html');
   const stage = await read('js/player-stage-v2.js');
+  const phase10 = await read('js/phase10-stability-iphone-panel-hud.js');
   const effects = await read('css/effects.css');
+  const boot = phase10.match(/function boot\(\)\{([\s\S]*?)window\.S666Phase10/)?.[1] || '';
   assert.equal(await read('public/index.html'), html);
+  assert.equal(await read('public/js/phase10-stability-iphone-panel-hud.js'), phase10);
   assert.doesNotMatch(html, /v140PcSideAddonContentScript|fraggledna-rail-led-js/);
   assert.equal((html.match(/id="nowCover"/g) || []).length, 1);
   assert.doesNotMatch(stage, /\.eq-bar-fill|\.side-meter-fill|pcBottomSyncMeter/);
   assert.match(stage, /single MeterBus consumer/i);
   assert.match(stage, /dnaRailLedLeft/);
   assert.doesNotMatch(effects, /pulseGlow|side-meter-fill|eq-bar-fill/);
+  assert.ok(boot, 'Phase10 boot block must remain discoverable');
+  assert.doesNotMatch(boot, /\buiFinetuneV1\s*\(\s*\)/, 'legacy Phase10 UI finetune must not own boot-time layout');
+  assert.doesNotMatch(boot, /\bforcedUiApplyV1\s*\(\s*\)/, 'legacy forced UI must not overwrite canonical header/version');
+  assert.doesNotMatch(boot, /\bstartSideMeterReactV1\s*\(\s*\)/, 'legacy 120ms side-meter writer must stay demoted');
+  assert.doesNotMatch(boot, /\bdirectfixTickerAndMessage\s*\(\s*\)/, 'legacy ticker writer must stay demoted');
+  assert.doesNotMatch(boot, /\bphase10RelocatePcPanels\s*\(\s*\)/, 'legacy panel relocation must stay demoted');
+  assert.doesNotMatch(boot, /\bmountBottomSafe\s*\(\s*\)/, 'legacy duplicate mobile bottom meter must stay demoted');
 });
 
 test('header is one canonical 1536 by 509 asset without destructive rebuild', async () => {
@@ -69,7 +79,7 @@ test('one bus exposes real frequency zones and all-player graphics use varied si
 });
 
 test('all canonical runtime and style mirrors remain byte-identical', async () => {
-  for (const path of ['js/player-stage-v2.js','css/player-stage-v2.css','css/effects.css','css/audio-policy-core.css','js/equalizer.js','js/player-core.js','js/veluna-ui.js','config/veluna-assets.js']) {
+  for (const path of ['js/player-stage-v2.js','js/phase10-stability-iphone-panel-hud.js','css/player-stage-v2.css','css/effects.css','css/audio-policy-core.css','js/equalizer.js','js/player-core.js','js/veluna-ui.js','config/veluna-assets.js']) {
     assert.equal(await read(path), await read(`public/${path}`), path);
   }
 });
