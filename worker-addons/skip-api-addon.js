@@ -43,6 +43,10 @@ function normalizeDedicatedError(data = {}, status = 0) {
   return normalized || `autodj_skip_http_${status || 502}`;
 }
 
+function cleanTrack(value) {
+  return String(value == null ? "" : value).replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 320);
+}
+
 export async function callMyIdjSkip(payload = {}, env = {}) {
   const target = dedicatedSkipUrl(env);
   const token = dedicatedSkipToken(env);
@@ -95,7 +99,9 @@ export async function callMyIdjSkip(payload = {}, env = {}) {
       service: data.service || "666-autodj-skip",
       version: data.version || null,
       action: data.action || "autodj_skip",
-      verified: data.verified !== false
+      verified: data.verified !== false,
+      previousTrack: cleanTrack(data.previousTrack),
+      currentTrack: cleanTrack(data.currentTrack)
     };
   } catch (error) {
     return {
