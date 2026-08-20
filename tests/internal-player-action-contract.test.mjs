@@ -34,5 +34,6 @@ test('internal action buttons remain wired for skip, Discord and messenger', () 
   assert.match(worker, /id="discordBtn"[^>]*data-action="discord"/);
   assert.match(worker, /id="internalMessageBtn"[^>]*data-action="message"/);
   assert.match(worker, /S666DiscordPlayerAddonV3/);
-  assert.match(worker, /S666MessengerOverlay/);
+  assert.match(worker, /window\.S666Messenger/);
+  assert.match(worker, /S666Messenger\.open/);
 });
