@@ -1,0 +1,110 @@
+name: Repair Audio Visual Headroom Once
+
+on:
+  push:
+    branches:
+      - repair/ui-owner-consolidation-20260820
+    paths:
+      - ".github/workflows/repair-audio-visual-headroom-once.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repair-audio-visual-headroom-once
+  cancel-in-progress: false
+
+jobs:
+  patch-verify-commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/ui-owner-consolidation-20260820
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply exact visual-only headroom repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const paths = ['js/equalizer.js', 'public/js/equalizer.js'];
+          const replacements = [
+            [
+              'const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;',
+              'const visualTilt = 1 + Math.pow(position, 1.18) * 0.62;'
+            ],
+            [
+              'const spectral = Math.pow(absolute, 0.52) * visualTilt;',
+              'const spectral = Math.pow(absolute, 0.62) * visualTilt;'
+            ],
+            [
+              'const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;',
+              'const adaptiveResponse = Math.pow(relative, 0.74) * 0.14 * localGate;'
+            ]
+          ];
+          for (const path of paths) {
+            let text = fs.readFileSync(path, 'utf8');
+            for (const [before, after] of replacements) {
+              const count = text.split(before).length - 1;
+              if (count !== 1) throw new Error(`${path}: expected one exact match for ${before}, got ${count}`);
+              text = text.replace(before, after);
+            }
+            fs.writeFileSync(path, text, 'utf8');
+          }
+          if (fs.readFileSync(paths[0], 'utf8') !== fs.readFileSync(paths[1], 'utf8')) {
+            throw new Error('equalizer root/public mirror mismatch after patch');
+          }
+
+          const testPath = 'tests/pc-visual-headroom-calibration.test.mjs';
+          fs.writeFileSync(testPath, `import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+
+const read = path => readFile(new URL(\`../\${path}\`, import.meta.url), 'utf8');
+
+test('PC visual spectrum keeps normal mastered material below hard ceiling while preserving real peaks', async () => {
+  const eq = await read('js/equalizer.js');
+  assert.equal(await read('public/js/equalizer.js'), eq);
+  assert.match(eq, /const visualGainCompensation = Math\\.pow\\(boostGain, -0\\.55\\)/);
+  assert.match(eq, /const visualVolumeScale = Math\\.pow\\(volume, 0\\.85\\)/);
+  assert.match(eq, /const visualTilt = 1 \\+ Math\\.pow\\(position, 1\\.18\\) \\* 0\\.62/);
+  assert.match(eq, /const spectral = Math\\.pow\\(absolute, 0\\.62\\) \\* visualTilt/);
+  assert.match(eq, /const adaptiveResponse = Math\\.pow\\(relative, 0\\.74\\) \\* 0\\.14 \\* localGate/);
+  assert.doesNotMatch(eq, /Math\\.pow\\(position, 1\\.18\\) \\* 1\\.10/);
+  assert.doesNotMatch(eq, /Math\\.pow\\(absolute, 0\\.52\\)/);
+});
+
+test('volume matrix remains monotonic and leaves visible headroom below full volume', () => {
+  const scale = volume => Math.pow(volume, 0.85);
+  const points = [0.25, 0.50, 0.75, 0.85, 1.00].map(scale);
+  for (let i = 1; i < points.length; i += 1) assert.ok(points[i] > points[i - 1]);
+  assert.ok(points[3] < 0.90, '85% listening volume must retain visual headroom');
+  assert.equal(points[4], 1);
+});
+`, 'utf8');
+          NODE
+
+      - name: Verify full release before commit
+        run: npm run verify
+
+      - name: Commit repair and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add js/equalizer.js public/js/equalizer.js tests/pc-visual-headroom-calibration.test.mjs
+          git rm .github/workflows/repair-audio-visual-headroom-once.yml
+          git diff --cached --check
+          git commit -m "repair: restore visual spectrum headroom"
+          git push origin HEAD:repair/ui-owner-consolidation-20260820
