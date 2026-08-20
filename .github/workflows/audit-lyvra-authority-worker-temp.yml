@@ -17,93 +17,102 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      TARGET_SCRIPT: lyvrasystem
     steps:
       - uses: actions/checkout@v4
         with:
           ref: cloudflare-authority-audit-20260820
 
-      - name: Discover existing Cloudflare Worker ownership read-only
+      - name: Audit existing lyvrasystem read-only
         id: audit
         shell: bash
         run: |
           set -uo pipefail
           REPORT=cloudflare-authority-audit-20260820.md
           {
-            echo "# Cloudflare LYVRA Authority Worker Discovery"
+            echo "# Cloudflare LYVRA Authority Worker Preservation Audit"
             echo
             echo "GENERATED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "PURPOSE=READ_ONLY_CLOUDFLARE_DISCOVERY_ONLY"
+            echo "TARGET_SCRIPT=${TARGET_SCRIPT}"
+            echo "PURPOSE=READ_ONLY_PRESERVATION_AUDIT"
             echo "DEPLOY_EXECUTED=FALSE"
             echo "WORKER_MUTATION=FALSE"
           } > "$REPORT"
 
-          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
-            echo "CLOUDFLARE_API_TOKEN_BINDING=MISSING" >> "$REPORT"
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "AUTH_BINDINGS=INCOMPLETE" >> "$REPORT"
             echo "AUDIT_STATUS=AUTH_BINDING_MISSING" >> "$REPORT"
             code=21
-          elif [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
-            echo "CLOUDFLARE_API_TOKEN_BINDING=PRESENT" >> "$REPORT"
-            echo "CLOUDFLARE_ACCOUNT_ID_BINDING=MISSING" >> "$REPORT"
-            echo "AUDIT_STATUS=AUTH_BINDING_MISSING" >> "$REPORT"
-            code=22
           else
-            echo "CLOUDFLARE_API_TOKEN_BINDING=PRESENT" >> "$REPORT"
-            echo "CLOUDFLARE_ACCOUNT_ID_BINDING=PRESENT" >> "$REPORT"
+            echo "AUTH_BINDINGS=PRESENT" >> "$REPORT"
+            base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${TARGET_SCRIPT}"
+            auth=(-H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json")
 
-            scripts_http=$(curl -sS -o /tmp/workers.json -w '%{http_code}' \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json" \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts" || true)
-            domains_http=$(curl -sS -o /tmp/domains.json -w '%{http_code}' \
-              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              -H "Content-Type: application/json" \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" || true)
+            script_http=$(curl -sS -o /tmp/script.bin -w '%{http_code}' "${auth[@]}" "$base" || true)
+            dep_http=$(curl -sS -o /tmp/deployments.json -w '%{http_code}' "${auth[@]}" "$base/deployments" || true)
+            sec_http=$(curl -sS -o /tmp/secrets.json -w '%{http_code}' "${auth[@]}" "$base/secrets" || true)
+            set_http=$(curl -sS -o /tmp/settings.json -w '%{http_code}' "${auth[@]}" "$base/settings" || true)
+            domains_http=$(curl -sS -o /tmp/domains.json -w '%{http_code}' "${auth[@]}" "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" || true)
 
-            echo "WORKERS_API_HTTP=${scripts_http}" >> "$REPORT"
+            echo "SCRIPT_DOWNLOAD_HTTP=${script_http}" >> "$REPORT"
+            echo "DEPLOYMENTS_API_HTTP=${dep_http}" >> "$REPORT"
+            echo "SECRETS_API_HTTP=${sec_http}" >> "$REPORT"
+            echo "SETTINGS_API_HTTP=${set_http}" >> "$REPORT"
             echo "DOMAINS_API_HTTP=${domains_http}" >> "$REPORT"
 
-            scripts_ok=false
-            domains_ok=false
-            [ "$scripts_http" = "200" ] && jq -e '.success == true' /tmp/workers.json >/dev/null 2>&1 && scripts_ok=true
-            [ "$domains_http" = "200" ] && jq -e '.success == true' /tmp/domains.json >/dev/null 2>&1 && domains_ok=true
-
-            echo >> "$REPORT"
-            echo "## Candidate scripts" >> "$REPORT"
-            if [ "$scripts_ok" = true ]; then
-              candidates=$(jq -r '.result[]? | select((.id // "") | test("lyvra|authority|evidence|boot"; "i")) | "SCRIPT=\(.id)|MODIFIED=\(.modified_on // "unknown")"' /tmp/workers.json)
-              [ -n "$candidates" ] && printf '%s\n' "$candidates" >> "$REPORT" || echo "NONE_MATCHING_NAME_FILTER" >> "$REPORT"
+            if [ "$script_http" = "200" ]; then
+              echo "LIVE_SCRIPT_SHA256=$(sha256sum /tmp/script.bin | awk '{print $1}')" >> "$REPORT"
+              echo "LIVE_SCRIPT_BYTES=$(wc -c < /tmp/script.bin | tr -d ' ')" >> "$REPORT"
             else
-              echo "UNAVAILABLE" >> "$REPORT"
+              echo "LIVE_SCRIPT_SHA256=UNAVAILABLE" >> "$REPORT"
             fi
 
             echo >> "$REPORT"
-            echo "## LYVRA custom domain ownership" >> "$REPORT"
-            if [ "$domains_ok" = true ]; then
-              owner=$(jq -r '.result[]? | select((.hostname // "") == "lyvrasystem.666soundsdesign-broadcaster.com") | "HOSTNAME=\(.hostname)|SERVICE=\(.service // "unknown")|ENVIRONMENT=\(.environment // "unknown")"' /tmp/domains.json)
-              if [ -n "$owner" ]; then
-                printf '%s\n' "$owner" >> "$REPORT"
-                echo "LIVE_DOMAIN_OWNER_RESOLVED=TRUE" >> "$REPORT"
-              else
-                echo "NO_MATCHING_CUSTOM_DOMAIN" >> "$REPORT"
-                echo "LIVE_DOMAIN_OWNER_RESOLVED=FALSE" >> "$REPORT"
-              fi
+            echo "## Active deployment checkpoint" >> "$REPORT"
+            if [ "$dep_http" = "200" ] && jq -e '.success == true' /tmp/deployments.json >/dev/null 2>&1; then
+              jq -r '.result.deployments[0]? | "DEPLOYMENT_ID=\(.id // "unknown")\nDEPLOYMENT_CREATED_ON=\(.created_on // "unknown")\nDEPLOYMENT_SOURCE=\(.source // "unknown")\nDEPLOYMENT_VERSIONS=" + ((.versions // []) | map((.version_id // "unknown") + "@" + ((.percentage // 0)|tostring) + "%") | join(","))' /tmp/deployments.json >> "$REPORT"
             else
-              echo "UNAVAILABLE" >> "$REPORT"
-              echo "LIVE_DOMAIN_OWNER_RESOLVED=FALSE" >> "$REPORT"
+              echo "DEPLOYMENT_CHECKPOINT=UNAVAILABLE" >> "$REPORT"
             fi
 
-            if [ "$scripts_ok" = true ] && [ "$domains_ok" = true ]; then
+            echo >> "$REPORT"
+            echo "## Secret names only" >> "$REPORT"
+            if [ "$sec_http" = "200" ] && jq -e '.success == true' /tmp/secrets.json >/dev/null 2>&1; then
+              jq -r '.result[]? | "SECRET_NAME=\(.name // "unknown")|TYPE=\(.type // "unknown")"' /tmp/secrets.json >> "$REPORT"
+            else
+              echo "SECRET_NAMES=UNAVAILABLE" >> "$REPORT"
+            fi
+
+            echo >> "$REPORT"
+            echo "## Binding names/types only" >> "$REPORT"
+            if [ "$set_http" = "200" ] && jq -e '.success == true' /tmp/settings.json >/dev/null 2>&1; then
+              jq -r '.result.bindings[]? | "BINDING_NAME=\(.name // "unknown")|TYPE=\(.type // "unknown")"' /tmp/settings.json >> "$REPORT"
+              jq -r '"COMPATIBILITY_DATE=" + (.result.compatibility_date // "unknown")' /tmp/settings.json >> "$REPORT"
+              jq -r '"USAGE_MODEL=" + (.result.usage_model // "unknown")' /tmp/settings.json >> "$REPORT"
+            else
+              echo "SETTINGS_SUMMARY=UNAVAILABLE" >> "$REPORT"
+            fi
+
+            echo >> "$REPORT"
+            echo "## Custom domain owner" >> "$REPORT"
+            if [ "$domains_http" = "200" ] && jq -e '.success == true' /tmp/domains.json >/dev/null 2>&1; then
+              jq -r '.result[]? | select((.hostname // "") == "lyvrasystem.666soundsdesign-broadcaster.com") | "HOSTNAME=\(.hostname)|SERVICE=\(.service // "unknown")|ENVIRONMENT=\(.environment // "unknown")"' /tmp/domains.json >> "$REPORT"
+            else
+              echo "DOMAIN_OWNER=UNAVAILABLE" >> "$REPORT"
+            fi
+
+            if [ "$script_http" = "200" ] && [ "$dep_http" = "200" ] && [ "$sec_http" = "200" ] && [ "$set_http" = "200" ] && [ "$domains_http" = "200" ]; then
               echo "AUDIT_STATUS=PASS_READ_ONLY" >> "$REPORT"
               code=0
             else
-              echo "AUDIT_STATUS=CLOUDFLARE_API_READ_FAILED" >> "$REPORT"
+              echo "AUDIT_STATUS=PARTIAL_READ_ONLY" >> "$REPORT"
               code=23
             fi
           fi
 
           echo "code=${code:-0}" >> "$GITHUB_OUTPUT"
 
-      - name: Persist receipt only on isolated audit branch
+      - name: Persist sanitized receipt only on isolated audit branch
         shell: bash
         run: |
           set -euo pipefail
@@ -111,7 +120,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add cloudflare-authority-audit-20260820.md
           if ! git diff --cached --quiet; then
-            git commit -m "Record read-only LYVRA authority Worker discovery"
+            git commit -m "Record LYVRA Worker preservation audit"
             git push origin HEAD:cloudflare-authority-audit-20260820
           fi
 
@@ -120,4 +129,4 @@ jobs:
         run: |
           code="${{ steps.audit.outputs.code }}"
           [ "$code" = "0" ] || exit "$code"
-          echo "READ_ONLY_AUDIT=PASS"
+          echo "READ_ONLY_PRESERVATION_AUDIT=PASS"
