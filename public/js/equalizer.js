@@ -498,10 +498,10 @@ count += 1;
 ? currentReference + (desiredReference - currentReference) * 0.08
 : Math.max(8, currentReference * 0.9985);
         const relative = clamp(local / Math.max(8, bandReference[index]), 0, 1);
-        const visualTilt = 1 + Math.pow(position, 1.18) * 1.10;
-        const spectral = Math.pow(absolute, 0.52) * visualTilt;
+        const visualTilt = 1 + Math.pow(position, 1.18) * 0.62;
+        const spectral = Math.pow(absolute, 0.62) * visualTilt;
         const spectralResponse = spectral * (0.35 + localGate * 0.65);
-        const adaptiveResponse = Math.pow(relative, 0.70) * 0.22 * localGate;
+        const adaptiveResponse = Math.pow(relative, 0.74) * 0.14 * localGate;
         const target = signalPresent && localGate > 0
 ? clamp(spectralResponse * 0.92 + adaptiveResponse, 0.012, 1)
 : 0.012;
