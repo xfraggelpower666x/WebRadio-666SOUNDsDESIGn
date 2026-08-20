@@ -41,6 +41,18 @@ jobs:
     env:
       BASE_URL: https://webradio.666soundsdesign-broadcaster.com
     steps:
+      - name: Report AutoDJ repository secret presence safely
+        shell: bash
+        env:
+          S666_AUTODJ_SKIP_ACCESS_TOKEN: ${{ secrets.S666_AUTODJ_SKIP_ACCESS_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${S666_AUTODJ_SKIP_ACCESS_TOKEN:-}" ]]; then
+            echo "AUTODJ_GITHUB_SECRET_PRESENT=true"
+          else
+            echo "AUTODJ_GITHUB_SECRET_PRESENT=false"
+          fi
+
       - name: Verify Desktop, iPhone, VELUNA and Internal live skip ownership
         shell: bash
         run: |
