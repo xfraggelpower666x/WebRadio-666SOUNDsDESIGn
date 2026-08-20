@@ -25,9 +25,14 @@ test('main Worker deploy binds AutoDJ access token through wrangler-action secre
 });
 
 test('workflow never contains an AutoDJ access-token literal', () => {
-  const assignments = [...workflow.matchAll(/S666_AUTODJ_SKIP_ACCESS_TOKEN:\s*([^\n]+)/g)].map(match => match[1].trim());
-  assert.ok(assignments.length >= 2);
-  for (const value of assignments) {
-    assert.equal(value, '${{ secrets.S666_AUTODJ_SKIP_ACCESS_TOKEN }}');
+  const secretReference = '${{ secrets.S666_AUTODJ_SKIP_ACCESS_TOKEN }}';
+  const yamlEnvLines = workflow
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.startsWith('S666_AUTODJ_SKIP_ACCESS_TOKEN: '));
+
+  assert.equal(yamlEnvLines.length, 2);
+  for (const line of yamlEnvLines) {
+    assert.equal(line, `S666_AUTODJ_SKIP_ACCESS_TOKEN: ${secretReference}`);
   }
 });
