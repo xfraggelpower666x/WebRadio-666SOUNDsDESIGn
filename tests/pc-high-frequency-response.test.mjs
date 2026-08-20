@@ -1,4 +1,4 @@
-// PC high-frequency response regression contract v1.2.0.
+// PC high-frequency response regression contract v1.3.0.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -16,12 +16,12 @@ test('PC spectrum maps all bars logarithmically through the audible range', asyn
   assert.doesNotMatch(eq, /analysisWindow|normalizedStart|normalizedEnd/);
 });
 
-test('right-side bands use real high-response compensation without synthetic motion', async () => {
+test('right-side bands use real calibrated compensation without synthetic motion', async () => {
   const eq = await read('js/equalizer.js');
   assert.match(eq, /let bandReference = \[\]/);
-  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
+  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 0\.62/);
   assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
-  assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.70\) \* 0\.22 \* localGate/);
+  assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.74\) \* 0\.14 \* localGate/);
   assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
   assert.match(eq, /const release = 0\.15 \+ position \* 0\.03/);
   assert.match(eq, /clamp\(spectralResponse \* 0\.92 \+ adaptiveResponse, 0\.012, 1\)/);
