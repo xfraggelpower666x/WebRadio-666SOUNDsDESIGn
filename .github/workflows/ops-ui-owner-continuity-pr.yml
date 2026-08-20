@@ -56,8 +56,28 @@ jobs:
           rm -f .github/workflows/ops-ui-owner-continuity-pr.yml
           rm -f scripts/ops_ui_owner_continuity_20260818.py
 
-      - name: Full release verification
-        run: npm run verify
+      - name: Release structural check
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run check 2>&1 | tee /tmp/release-check.log
+
+      - name: Full regression suite
+        shell: bash
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee /tmp/full-test.log
+
+      - name: Upload verification diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-owner-continuity-verification-${{ github.run_id }}
+          path: |
+            /tmp/release-check.log
+            /tmp/full-test.log
+          if-no-files-found: ignore
+          retention-days: 3
 
       - name: Commit repaired existing owners
         run: |
