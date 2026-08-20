@@ -8,7 +8,7 @@ on:
       - ".github/workflows/temp-deploy-lyvrasystem-foreground-recovery.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: lyvrasystem-external-worker-maintenance
@@ -19,6 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Checkout transport repository
+        uses: actions/checkout@v4
+
       - name: Checkout external Worker source only
         uses: actions/checkout@v4
         with:
@@ -104,4 +107,33 @@ jobs:
           grep -q '^409$' mismatch-status.txt
           grep -q 'WORKER_CONFLICT' mismatch.json
 
-          echo 'LIVE_FOREGROUND_RECOVERY_VERIFY=PASS'
+      - name: Write verified deployment receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .worker-maintenance-receipts
+          cat > .worker-maintenance-receipts/lyvrasystem-foreground-recovery-latest.txt <<EOF
+          RESULT=PASS
+          LIVE_SCRIPT=lyvrasystem
+          CAPABILITY_REVISION=FOREGROUND_RECOVERY_CONTEXT_V1
+          FOREGROUND_ENDPOINT=/v2/foreground-evidence
+          FOREGROUND_NATIVE_OPERATION=SYSTEM_VORNE
+          RECOVERY_ENDPOINT=/v2/recovery-evidence
+          RECOVERY_NATIVE_OPERATION=FUCK_HORST
+          EXECUTION_SEMANTICS=EVIDENCE_ONLY_NON_MUTATING
+          V1_COMPATIBILITY=PASS
+          SIGNED_FOREGROUND_VERIFY=PASS
+          SIGNED_RECOVERY_VERIFY=PASS
+          NAMESPACE_MISMATCH_REJECTION=PASS
+          DUPLICATE_WORKER_CREATED=FALSE
+          SECRET_VALUES_EXPOSED=FALSE
+          SOURCE_COMMIT_ADAPTER=5ca5788c55c4d932e59cacf98f9ae4e6183dc6c7
+          SOURCE_COMMIT_WRANGLER=6eba477fe2841bd8155577ca96a9cf27c98ac9a1
+          WORKFLOW_RUN_ID=${GITHUB_RUN_ID}
+          VERIFIED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          EOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .worker-maintenance-receipts/lyvrasystem-foreground-recovery-latest.txt
+          git commit -m 'Record lyvrasystem foreground recovery deploy verification'
+          git push
