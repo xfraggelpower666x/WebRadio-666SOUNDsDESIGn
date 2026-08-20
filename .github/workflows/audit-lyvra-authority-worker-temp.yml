@@ -1,0 +1,123 @@
+name: Temporary Audit LYVRA Authority Worker
+
+on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - ".github/workflows/audit-lyvra-authority-worker-temp.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cloudflare-authority-audit-20260820
+
+      - name: Discover existing Cloudflare Worker ownership read-only
+        id: audit
+        shell: bash
+        run: |
+          set -uo pipefail
+          REPORT=cloudflare-authority-audit-20260820.md
+          {
+            echo "# Cloudflare LYVRA Authority Worker Discovery"
+            echo
+            echo "GENERATED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "PURPOSE=READ_ONLY_CLOUDFLARE_DISCOVERY_ONLY"
+            echo "DEPLOY_EXECUTED=FALSE"
+            echo "WORKER_MUTATION=FALSE"
+          } > "$REPORT"
+
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "CLOUDFLARE_API_TOKEN_BINDING=MISSING" >> "$REPORT"
+            echo "AUDIT_STATUS=AUTH_BINDING_MISSING" >> "$REPORT"
+            code=21
+          elif [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "CLOUDFLARE_API_TOKEN_BINDING=PRESENT" >> "$REPORT"
+            echo "CLOUDFLARE_ACCOUNT_ID_BINDING=MISSING" >> "$REPORT"
+            echo "AUDIT_STATUS=AUTH_BINDING_MISSING" >> "$REPORT"
+            code=22
+          else
+            echo "CLOUDFLARE_API_TOKEN_BINDING=PRESENT" >> "$REPORT"
+            echo "CLOUDFLARE_ACCOUNT_ID_BINDING=PRESENT" >> "$REPORT"
+
+            scripts_http=$(curl -sS -o /tmp/workers.json -w '%{http_code}' \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts" || true)
+            domains_http=$(curl -sS -o /tmp/domains.json -w '%{http_code}' \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" || true)
+
+            echo "WORKERS_API_HTTP=${scripts_http}" >> "$REPORT"
+            echo "DOMAINS_API_HTTP=${domains_http}" >> "$REPORT"
+
+            scripts_ok=false
+            domains_ok=false
+            [ "$scripts_http" = "200" ] && jq -e '.success == true' /tmp/workers.json >/dev/null 2>&1 && scripts_ok=true
+            [ "$domains_http" = "200" ] && jq -e '.success == true' /tmp/domains.json >/dev/null 2>&1 && domains_ok=true
+
+            echo >> "$REPORT"
+            echo "## Candidate scripts" >> "$REPORT"
+            if [ "$scripts_ok" = true ]; then
+              candidates=$(jq -r '.result[]? | select((.id // "") | test("lyvra|authority|evidence|boot"; "i")) | "SCRIPT=\(.id)|MODIFIED=\(.modified_on // "unknown")"' /tmp/workers.json)
+              [ -n "$candidates" ] && printf '%s\n' "$candidates" >> "$REPORT" || echo "NONE_MATCHING_NAME_FILTER" >> "$REPORT"
+            else
+              echo "UNAVAILABLE" >> "$REPORT"
+            fi
+
+            echo >> "$REPORT"
+            echo "## LYVRA custom domain ownership" >> "$REPORT"
+            if [ "$domains_ok" = true ]; then
+              owner=$(jq -r '.result[]? | select((.hostname // "") == "lyvrasystem.666soundsdesign-broadcaster.com") | "HOSTNAME=\(.hostname)|SERVICE=\(.service // "unknown")|ENVIRONMENT=\(.environment // "unknown")"' /tmp/domains.json)
+              if [ -n "$owner" ]; then
+                printf '%s\n' "$owner" >> "$REPORT"
+                echo "LIVE_DOMAIN_OWNER_RESOLVED=TRUE" >> "$REPORT"
+              else
+                echo "NO_MATCHING_CUSTOM_DOMAIN" >> "$REPORT"
+                echo "LIVE_DOMAIN_OWNER_RESOLVED=FALSE" >> "$REPORT"
+              fi
+            else
+              echo "UNAVAILABLE" >> "$REPORT"
+              echo "LIVE_DOMAIN_OWNER_RESOLVED=FALSE" >> "$REPORT"
+            fi
+
+            if [ "$scripts_ok" = true ] && [ "$domains_ok" = true ]; then
+              echo "AUDIT_STATUS=PASS_READ_ONLY" >> "$REPORT"
+              code=0
+            else
+              echo "AUDIT_STATUS=CLOUDFLARE_API_READ_FAILED" >> "$REPORT"
+              code=23
+            fi
+          fi
+
+          echo "code=${code:-0}" >> "$GITHUB_OUTPUT"
+
+      - name: Persist receipt only on isolated audit branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cloudflare-authority-audit-20260820.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Record read-only LYVRA authority Worker discovery"
+            git push origin HEAD:cloudflare-authority-audit-20260820
+          fi
+
+      - name: Enforce audit result after receipt persistence
+        shell: bash
+        run: |
+          code="${{ steps.audit.outputs.code }}"
+          [ "$code" = "0" ] || exit "$code"
+          echo "READ_ONLY_AUDIT=PASS"
