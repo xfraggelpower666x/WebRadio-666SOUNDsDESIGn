@@ -1114,39 +1114,19 @@ RULES:
 
     function phase10IsMobileAudioDevice(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || (window.innerWidth||9999) <= 860; }
     function boot(){
-      mountHudLogo();
-    hardfixInstallManualBackupFlag();
-    hardfixMoveLedsBehindDj();
-    hardfixTickerNoEmptyGap();
-    hardfixMessageBox();
-    hardfixForceMainOnlyPc();
-    uiFinetuneV1();
-    iphonePcParityV1();
-    forcedUiApplyV1();
-    startSideMeterReactV1();
-    startIphoneAudioStabilityGuardV2();
-    directfixRestoreStatusLeds();
-    directfixTickerAndMessage();
-    installPcMainBackupGuard();
-    directfixPcNoAutoFallback();
-    phase10RelocatePcPanels();
-    mountMobilePanelRow();
-    bindMobileStreamLedSwitch();
-    mountBottomSafe();
-    bindEqTriggers();
-    installAudioFocusGuard();
-    normalizeBoostStatusTooltip();
-    // Stable maintenance only: do not relocate or delete layout nodes after first render.
-    setInterval(function(){
-      mountMobilePanelRow();
-      bindMobileStreamLedSwitch();
-      bindEqTriggers();
-        installAudioFocusGuard();
-      normalizeBoostStatusTooltip();
+      // UI-OWNER-HARDLOCK 2026-08-18:
+      // Phase10 bleibt Stabilitaets-/Recovery-Sensor. Kanonische Player-UI, Ticker,
+      // Side-Meter und mobile Bottom-Meter werden hier nicht mehr umgebaut.
       hardfixInstallManualBackupFlag();
-    }, 5000);
-    document.documentElement.setAttribute("data-phase10-stability", VERSION);
-  }
+      startIphoneAudioStabilityGuardV2();
+      installPcMainBackupGuard();
+      directfixPcNoAutoFallback();
+      bindMobileStreamLedSwitch();
+      installAudioFocusGuard();
+      normalizeBoostStatusTooltip();
+      document.documentElement.setAttribute("data-phase10-ui-owner","canonical-player-stage");
+      document.documentElement.setAttribute("data-phase10-stability", VERSION);
+    }
 
   window.S666Phase10 = { toggleMobileStream:toggleMobileStream, recoverAudio:recoverAudio, openSoundControl:openSoundControl, openAdmin:openAdmin, version:VERSION };
 

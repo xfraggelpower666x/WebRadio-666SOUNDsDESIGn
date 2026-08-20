@@ -89,10 +89,10 @@ test('main player audio reactivity preserves working analyzer runtime with propo
   const eq = await read('js/equalizer.js');
   assert.equal(await read('public/js/equalizer.js'), eq);
   assert.match(eq, /const visualGainCompensation = Math\.pow\(boostGain, -0\.55\)/);
-  assert.match(eq, /const visualVolumeScale = Math\.pow\(volume, 0\.85\)/);
+  assert.match(eq, /const visualVolumeScale = Math\.pow\(volume, 1\.15\)/);
   assert.match(eq, /const visualSignalScale = visualGainCompensation \* visualVolumeScale/);
   assert.match(eq, /const localGate = clamp\(\(local - 2\) \/ 14/);
-  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 1\.10/);
+  assert.match(eq, /const visualTilt = 1 \+ Math\.pow\(position, 1\.18\) \* 0\.48/);
   assert.match(eq, /const attack = 0\.76 \+ position \* 0\.12/);
   assert.match(eq, /const release = 0\.15 \+ position \* 0\.03/);
 

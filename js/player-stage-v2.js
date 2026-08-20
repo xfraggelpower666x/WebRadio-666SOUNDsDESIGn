@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn Player Stage V11.
+ * 666SOUNDsDESIGn Player Stage V12.
  * Single MeterBus consumer for all non-core visuals.
  * EQ, side meters and bottom meter remain exclusively owned by equalizer.js.
  */
@@ -46,6 +46,78 @@
     var result=await window.S666SkipControl.skip({source:'player-stage-v2',prompt:'Admin-Passwort für Auto-DJ Skip eingeben:'});
     if(result&&result.ok)toast('AUTO-DJ SKIP ausgeführt.');else toast(result&&result.error?result.error:'Auto-DJ Skip abgelehnt.','error');
     return !!(result&&result.ok);
+  }
+
+  function setPanelChipState(button,state){
+    if(!button)return;
+    ['state-empty','state-off','state-ok','state-warn','state-error','state-main','state-api','state-external','state-backup'].forEach(function(name){button.classList.remove(name);});
+    button.classList.add(state||'state-empty');
+  }
+
+  function openAdminPanel(){
+    if(window.FPAdminOverlay&&typeof window.FPAdminOverlay.open==='function'){window.FPAdminOverlay.open();return true;}
+    if(window.S666AdminOverlay&&typeof window.S666AdminOverlay.open==='function'){window.S666AdminOverlay.open();return true;}
+    var trigger=q('#fp-admin-button,#fp-admin-open,.fp-admin-open,[data-admin-open],#adminButton,#adminBtn');
+    if(trigger&&typeof trigger.click==='function'){trigger.click();return true;}
+    toast('Admin-Panel ist nicht bereit.','error');return false;
+  }
+
+  async function toggleGoveePanel(){
+    try{
+      var runtime=window.S666GoveeSync;
+      if(!runtime||typeof runtime.setEnabled!=='function')throw new Error('govee_runtime_not_ready');
+      var current=typeof runtime.getState==='function'?runtime.getState():null;
+      var next=!(current&&current.enabled===true);
+      await runtime.setEnabled(next);
+      toast('GOVEE / FX '+(next?'EIN':'AUS'));
+      return next;
+    }catch(error){toast(error&&error.message?error.message:'GOVEE / FX ist nicht bereit.','error');return false;}
+  }
+
+  function bindPanelButton(id,handler){
+    var button=q('#'+id);if(!button||button.__s666PanelBound)return;
+    button.__s666PanelBound=true;
+    button.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();handler(button);});
+  }
+
+  function bindSystemPanelActions(){
+    bindPanelButton('statusStream',function(){var audio=q('#radio')||q('audio');toast(audio&&!audio.paused?'STREAM: PLAY':'STREAM: READY');});
+    bindPanelButton('statusBuffer',function(){var audio=q('#radio')||q('audio');var seconds=0;try{if(audio&&audio.buffered&&audio.buffered.length)seconds=Math.max(0,audio.buffered.end(audio.buffered.length-1)-audio.currentTime);}catch(_){}toast('BUFFER: '+seconds.toFixed(1)+' s');});
+    bindPanelButton('statusSource',function(){var audio=q('#radio')||q('audio');var src=String(audio&&(audio.currentSrc||audio.getAttribute('src'))||'');toast(/fallback|backup/i.test(src)?'SOURCE: BACKUP':'SOURCE: MAIN');});
+    bindPanelButton('statusMeta',function(){var meta=state.metadata.title?state.metadata:readDomMetadata();toast(meta.title?'META: '+meta.title:'META: WAIT');});
+    bindPanelButton('statusWorker',async function(button){try{var response=await fetch('/health?t='+Date.now(),{cache:'no-store',credentials:'same-origin'});setPanelChipState(button,response.ok?'state-ok':'state-error');toast(response.ok?'WORKER: ONLINE':'WORKER: ERROR',response.ok?'':'error');}catch(error){setPanelChipState(button,'state-error');toast('WORKER: OFFLINE','error');}});
+    bindPanelButton('statusAudio',function(){var audio=q('#radio')||q('audio');var ctx=window.__mffAudioContext||window.__radioAudioContext||window.__smfpAudioContext;toast('AUDIO: '+(audio&&!audio.paused?'PLAY':'READY')+' · '+(ctx&&ctx.state?ctx.state.toUpperCase():'MEDIA'));});
+    bindPanelButton('statusWatchdog',function(){var root=document.documentElement;var stateName=root.getAttribute('data-central-audio-stability-v2')||'READY';var reason=root.getAttribute('data-central-audio-reason')||'';toast('WATCHDOG: '+stateName.toUpperCase()+(reason?' · '+reason:''));});
+    bindPanelButton('statusReconnect',function(){var button=q('#reconnectBtn');if(button&&typeof button.click==='function'){button.click();toast('RECONNECT ausgelöst.');}else toast('Reconnect ist nicht bereit.','error');});
+    bindPanelButton('statusMeter',function(){var bus=window.__MeterBus||{};var fresh=bus.ts&&Date.now()-Number(bus.ts)<1000;toast(fresh?'METER: '+Math.round(clamp(bus.level,0,1)*100)+'% · PEAK '+Math.round(clamp(bus.peak||0,0,1)*100)+'%':'METER: WAIT');});
+    bindPanelButton('statusDiscord',function(){openDiscordShooter();});
+    bindPanelButton('statusAdmin',function(){openAdminPanel();});
+    bindPanelButton('statusGovee',function(){toggleGoveePanel();});
+  }
+
+  function addonStorageKey(side){return 's666_'+side+'_addon_fx';}
+  function initialAddonState(side){try{return localStorage.getItem(addonStorageKey(side))!=='off';}catch(_){return true;}}
+  function syncAddonLayoutMode(){
+    var leftOff=document.body.classList.contains('pc-left-addon-off');
+    var rightOff=document.body.classList.contains('pc-right-addon-off');
+    document.body.classList.toggle('pc-single-addon-off',leftOff!==rightOff);
+    document.body.classList.toggle('pc-both-addons-off',leftOff&&rightOff);
+  }
+  function applyAddonFx(side,on,persist){
+    var offClass=side==='left'?'pc-left-addon-off':'pc-right-addon-off';
+    var button=q(side==='left'?'#pcLeftFxToggle':'#pcRightFxToggle');
+    var label=q(side==='left'?'#pcLeftFxState':'#pcRightFxState');
+    document.body.classList.toggle(offClass,!on);
+    document.documentElement.setAttribute('data-s666-'+side+'-fx',on?'on':'off');
+    if(button){button.classList.toggle('is-on',on);button.setAttribute('aria-pressed',on?'true':'false');}
+    if(label)label.textContent=on?'ON':'OFF';
+    if(persist){try{localStorage.setItem(addonStorageKey(side),on?'on':'off');}catch(_){}}
+    syncAddonLayoutMode();
+  }
+  function bindAddonFxToggles(){
+    var left=q('#pcLeftFxToggle');var right=q('#pcRightFxToggle');
+    if(left&&!left.__s666FxBound){left.__s666FxBound=true;applyAddonFx('left',initialAddonState('left'),false);left.addEventListener('click',function(){applyAddonFx('left',!left.classList.contains('is-on'),true);});}
+    if(right&&!right.__s666FxBound){right.__s666FxBound=true;applyAddonFx('right',initialAddonState('right'),false);right.addEventListener('click',function(){applyAddonFx('right',!right.classList.contains('is-on'),true);});}
   }
 
   function installTouchFeedback(){
@@ -200,7 +272,7 @@
   }
 
   function setBars(selector,values,prefix,attack,release){
-    qa(selector).forEach(function(element,index){var value=smooth(prefix+index,values[index%values.length]||0,attack,release);element.style.height=(5+value*93).toFixed(1)+'%';element.style.opacity=(.24+value*.76).toFixed(2);element.style.filter='brightness('+(1+value*.52).toFixed(2)+') saturate('+(1+value*.66).toFixed(2)+')';element.dataset.level=value.toFixed(3);});
+    qa(selector).forEach(function(element,index){var value=smooth(prefix+index,values[index%values.length]||0,attack,release);var visual=Math.pow(clamp(value,0,1),1.18);element.style.height=(5+visual*93).toFixed(1)+'%';element.style.opacity=(.24+visual*.72).toFixed(2);element.style.filter='brightness('+(1+visual*.42).toFixed(2)+') saturate('+(1+visual*.54).toFixed(2)+')';element.dataset.level=visual.toFixed(3);});
   }
 
   function setRailLed(id,level,peak){
@@ -241,7 +313,7 @@
     driveStatus(bus,level,peak);driveReactiveVisuals(bus,level,peak,pulse,bands);requestAnimationFrame(consumeMeterBus);
   }
 
-  function normalizeUi(){ensureActionButtons();ensureMainHeader();renderDesktopNowPlaying();renderMobileNowPlaying();}
+  function normalizeUi(){ensureActionButtons();bindSystemPanelActions();bindAddonFxToggles();ensureMainHeader();renderDesktopNowPlaying();renderMobileNowPlaying();}
   function scheduleNormalize(){if(state.normalizeQueued)return;state.normalizeQueued=true;requestAnimationFrame(function(){state.normalizeQueued=false;normalizeUi();});}
   function boot(){
     installTouchFeedback();state.metadata=Object.assign(state.metadata,readDomMetadata());normalizeUi();sidePanel('left');sidePanel('right');
