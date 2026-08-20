@@ -1,3 +1,4 @@
+# RETRIGGER 2026-08-20: count-guarded safe-branch repair only
 name: One-shot main layout controls repair
 
 on:
