@@ -8,9 +8,68 @@
   if (window.S666SkipControl) return;
 
   var inFlight = false;
+  var skipNoticeTimer = 0;
 
   function dispatch(detail) {
     try { window.dispatchEvent(new CustomEvent('s666:skip-state', { detail: detail || {} })); } catch (_) {}
+  }
+
+  function cleanTrack(value) {
+    return String(value == null ? '' : value).replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 320);
+  }
+
+  function skipNoticeText(data) {
+    var previous = cleanTrack(data && data.previousTrack);
+    var current = cleanTrack(data && data.currentTrack);
+    if (!previous && !current) return '';
+    if (previous && current) return 'SKIPPED · PREVIOUS: ' + previous + '  ◆  NOW: ' + current;
+    if (current) return 'SKIPPED TO: ' + current;
+    return 'SKIPPED · PREVIOUS: ' + previous;
+  }
+
+  function setTemporaryText(element, text) {
+    if (!element || !text) return;
+    if (!element.dataset.s666SkipOriginal) element.dataset.s666SkipOriginal = element.textContent || '';
+    element.textContent = text;
+    element.dataset.s666SkipNotice = '1';
+  }
+
+  function restoreTemporaryText(element, text) {
+    if (!element || element.dataset.s666SkipNotice !== '1') return;
+    if ((element.textContent || '') === text) element.textContent = element.dataset.s666SkipOriginal || '';
+    delete element.dataset.s666SkipOriginal;
+    delete element.dataset.s666SkipNotice;
+  }
+
+  function showSkipTickerNotice(data) {
+    var text = skipNoticeText(data);
+    if (!text) return;
+    clearTimeout(skipNoticeTimer);
+
+    var targets = [];
+    function add(element) { if (element && targets.indexOf(element) < 0) targets.push(element); }
+
+    add(document.getElementById('nowPlayingTicker'));
+    add(document.querySelector('#mffApp .mff-title h1 span'));
+    add(document.querySelector('#mffApp .mff-title h1'));
+    add(document.getElementById('nowPlaying'));
+    add(document.getElementById('nowPlayingClone'));
+
+    targets.forEach(function (element) { setTemporaryText(element, text); });
+
+    var tickerTrack = document.getElementById('tickerTrack');
+    if (tickerTrack) {
+      tickerTrack.classList.remove('is-static');
+      tickerTrack.classList.add('is-running');
+    }
+
+    try { window.dispatchEvent(new Event('resize')); } catch (_) {}
+
+    skipNoticeTimer = setTimeout(function () {
+      targets.forEach(function (element) { restoreTemporaryText(element, text); });
+      try { window.dispatchEvent(new Event('resize')); } catch (_) {}
+      skipNoticeTimer = 0;
+    }, 9000);
   }
 
   function normalizeError(response, data) {
@@ -80,7 +139,8 @@
         return { ok: false, error: error, status: response.status, data: data };
       }
 
-      dispatch({ phase: 'success', data: data });
+      showSkipTickerNotice(data);
+      dispatch({ phase: 'success', data: data, previousTrack: data.previousTrack || '', currentTrack: data.currentTrack || '' });
       return { ok: true, data: data };
     } catch (error) {
       var message = error && error.message ? error.message : 'skip_unreachable';
@@ -92,9 +152,11 @@
   }
 
   window.S666SkipControl = {
+    version: '2.1.0-all-player-skip-ticker',
     check: check,
     ensure: ensureInteractiveAuth,
     skip: skip,
+    showSkipTickerNotice: showSkipTickerNotice,
     isBusy: function () { return inFlight; }
   };
 })();
