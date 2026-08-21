@@ -40,13 +40,15 @@ test('closing either side panel no longer resizes or shifts the central player',
   assert.match(css, /transform:none!important/);
 });
 
-test('left and right side meters use identical symmetric three-track geometry', () => {
-  assert.match(css, /\.side-meter\.left,[\s\S]*?\.side-meter\.right\{[\s\S]*?direction:ltr!important;[\s\S]*?transform:none!important/);
-  assert.match(css, /grid-template-columns:repeat\(3,minmax\(13px,1fr\)\)!important/);
+test('left and right side meters use exact identical three-track geometry', () => {
+  assert.match(css, /\.side-meter\.left,[\s\S]*?\.side-meter\.right\{[\s\S]*?width:76px!important;[\s\S]*?min-width:76px!important;[\s\S]*?max-width:76px!important;[\s\S]*?direction:ltr!important;[\s\S]*?transform:none!important/);
+  assert.match(css, /grid-template-columns:repeat\(3,14px\)!important/);
+  assert.match(css, /grid-auto-columns:14px!important/);
   assert.match(css, /grid-auto-flow:column!important/);
   assert.match(css, /gap:8px!important/);
   assert.match(css, /padding:4px!important/);
-  assert.match(css, /\.side-meter \.side-meter-track\{[\s\S]*?order:initial!important;[\s\S]*?transform:none!important/);
+  assert.match(css, /justify-content:center!important/);
+  assert.match(css, /\.side-meter \.side-meter-track\{[\s\S]*?order:initial!important;[\s\S]*?width:14px!important;[\s\S]*?min-width:14px!important;[\s\S]*?max-width:14px!important;[\s\S]*?transform:none!important/);
 });
 
 test('side meters keep existing fill ownership and use stronger segmented neon skin', () => {
