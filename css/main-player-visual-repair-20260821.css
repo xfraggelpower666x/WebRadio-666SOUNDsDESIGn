@@ -39,7 +39,6 @@
     right:12px!important;
     top:43px!important;
     bottom:58px!important;
-    inset-block:auto 58px!important;
     margin:0!important;
     z-index:90!important;
     overflow:auto!important;
@@ -56,7 +55,6 @@
     width:max-content!important;
     min-width:100%!important;
     white-space:nowrap!important;
-    transform:translate3d(0,0,0)!important;
     animation-name:s666MainTickerTravel!important;
     animation-duration:12.5s!important;
     animation-timing-function:linear!important;
