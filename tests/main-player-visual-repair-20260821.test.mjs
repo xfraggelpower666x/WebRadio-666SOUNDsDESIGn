@@ -40,10 +40,21 @@ test('closing either side panel no longer resizes or shifts the central player',
   assert.match(css, /transform:none!important/);
 });
 
-test('side meters keep existing fill ownership and receive only segmented visual skin', () => {
-  assert.match(css, /\.side-meter-fill\{/);
+test('left and right side meters use identical symmetric three-track geometry', () => {
+  assert.match(css, /\.side-meter\.left,[\s\S]*?\.side-meter\.right\{[\s\S]*?direction:ltr!important;[\s\S]*?transform:none!important/);
+  assert.match(css, /grid-template-columns:repeat\(3,minmax\(13px,1fr\)\)!important/);
+  assert.match(css, /grid-auto-flow:column!important/);
+  assert.match(css, /gap:8px!important/);
+  assert.match(css, /padding:4px!important/);
+  assert.match(css, /\.side-meter \.side-meter-track\{[\s\S]*?order:initial!important;[\s\S]*?transform:none!important/);
+});
+
+test('side meters keep existing fill ownership and use stronger segmented neon skin', () => {
+  assert.match(css, /\.side-meter \.side-meter-fill\{/);
   assert.match(css, /mask:repeating-linear-gradient\(to top,#000 0 9px,transparent 9px 13px\)!important/);
-  assert.match(css, /grid-template-columns:repeat\(3,minmax\(12px,1fr\)\)!important/);
+  assert.match(css, /brightness\(1\.48\) saturate\(1\.38\) contrast\(1\.06\)/);
+  assert.match(css, /0 0 26px rgba\(22,255,243,\.74\)!important/);
+  assert.match(css, /opacity:1!important/);
 });
 
 test('visual repair cannot mutate protected Discord Messenger Skip audio or Worker behavior', () => {
