@@ -1,6 +1,6 @@
 /*
  * 666SOUNDsDESIGn — Main Player visual-only repair 2026-08-21
- * Scope: desktop History placement, ticker motion, side-FX close geometry, segmented side meters.
+ * Scope: desktop History placement, static ticker, side-FX close geometry, segmented side meters.
  * Hardlock: no Discord, Messenger, Skip, audio graph, EQ math, MeterBus, stream or Worker behavior changes.
  */
 
@@ -20,7 +20,7 @@
   }
   body[data-veluna-page="main"] .now-playing #historyToggle{
     position:absolute!important;
-    top:-5px!important;
+    top:-14px!important;
     right:0!important;
     width:88px!important;
     height:30px!important;
@@ -32,40 +32,37 @@
     padding-right:2px!important;
   }
 
-  /* HISTORY PANEL: open below the title header, not across the title/ticker ownership area. */
+  /* HISTORY PANEL: follows the raised utility button while staying clear of Now Playing content. */
   body[data-veluna-page="main"] .now-playing .history-panel{
     position:absolute!important;
     left:calc(clamp(164px,12vw,198px) + 26px)!important;
     right:12px!important;
-    top:43px!important;
+    top:36px!important;
     bottom:58px!important;
     margin:0!important;
     z-index:90!important;
     overflow:auto!important;
   }
 
-  /* TICKER: explicit independent motion owner; old generic animation cannot freeze this lane. */
+  /* TICKER: static single-line owner; no horizontal marquee movement. */
   body[data-veluna-page="main"] .now-playing .ticker-window{
     contain:layout paint!important;
     overflow:hidden!important;
   }
   body[data-veluna-page="main"] .now-playing :is(#nowPlayingTicker,.ticker-text).s666-title-marquee{
     position:relative!important;
-    display:inline-block!important;
-    width:max-content!important;
-    min-width:100%!important;
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
     white-space:nowrap!important;
-    animation-name:s666MainTickerTravel!important;
-    animation-duration:12.5s!important;
-    animation-timing-function:linear!important;
-    animation-iteration-count:infinite!important;
-    animation-play-state:running!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    animation:none!important;
+    transform:none!important;
+    animation-play-state:paused!important;
     animation-delay:0s!important;
-    will-change:transform!important;
-  }
-  @keyframes s666MainTickerTravel{
-    0%,7%{transform:translate3d(0,0,0)}
-    93%,100%{transform:translate3d(calc(-100% - 34px),0,0)}
+    will-change:auto!important;
   }
 
   /* PANEL CLOSE: side FX may disappear, but the central player geometry is frozen. */
@@ -145,11 +142,5 @@
   }
   body[data-veluna-page="main"] .side-meter .side-meter-track.tertiary .side-meter-fill{
     filter:brightness(1.36) saturate(1.30) contrast(1.04)!important;
-  }
-}
-
-@media (prefers-reduced-motion:reduce) and (min-width:761px){
-  body[data-veluna-page="main"] .now-playing :is(#nowPlayingTicker,.ticker-text).s666-title-marquee{
-    animation-duration:22s!important;
   }
 }
