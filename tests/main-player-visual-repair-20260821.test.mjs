@@ -18,18 +18,17 @@ test('shared bootstrap loads the visual-only repair with a cache identity', () =
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
-test('History has a reserved utility lane and cannot cover the title', () => {
+test('History sits higher and remains in its reserved utility lane', () => {
   assert.match(css, /padding-right:108px!important/);
-  assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:-5px!important;[\s\S]*?right:0!important/);
-  assert.match(css, /\.history-panel\{[\s\S]*?top:43px!important;[\s\S]*?bottom:58px!important/);
+  assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:-14px!important;[\s\S]*?right:0!important/);
+  assert.match(css, /\.history-panel\{[\s\S]*?top:36px!important;[\s\S]*?bottom:58px!important/);
 });
 
-test('desktop ticker has an explicit running transform animation', () => {
-  assert.match(css, /animation-name:s666MainTickerTravel!important/);
-  assert.match(css, /animation-play-state:running!important/);
-  assert.match(css, /@keyframes s666MainTickerTravel/);
-  assert.match(css, /translate3d\(calc\(-100% - 34px\),0,0\)/);
-  assert.doesNotMatch(css, /\.s666-title-marquee\{[^}]*transform:[^}]*!important/s);
+test('desktop ticker is static and no longer uses marquee motion', () => {
+  assert.match(css, /\.ticker-window\{[\s\S]*?overflow:hidden!important/);
+  assert.match(css, /\.s666-title-marquee\{[\s\S]*?display:block!important;[\s\S]*?width:100%!important;[\s\S]*?text-overflow:ellipsis!important;[\s\S]*?animation:none!important;[\s\S]*?transform:none!important/);
+  assert.doesNotMatch(css, /animation-name:s666MainTickerTravel!important/);
+  assert.doesNotMatch(css, /@keyframes s666MainTickerTravel/);
 });
 
 test('closing either side panel no longer resizes or shifts the central player', () => {
