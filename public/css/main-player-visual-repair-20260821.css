@@ -84,16 +84,20 @@
   body[data-veluna-page="main"] .side-meter,
   body[data-veluna-page="main"] .side-meter.left,
   body[data-veluna-page="main"] .side-meter.right{
-    width:clamp(68px,4.2vw,82px)!important;
+    width:76px!important;
+    min-width:76px!important;
+    max-width:76px!important;
     direction:ltr!important;
     transform:none!important;
+    box-sizing:border-box!important;
     filter:drop-shadow(0 0 11px rgba(22,255,243,.34)) drop-shadow(0 0 16px rgba(255,61,187,.30))!important;
   }
   body[data-veluna-page="main"] .side-meter .side-meter-stack,
   body[data-veluna-page="main"] .side-meter.left .side-meter-stack,
   body[data-veluna-page="main"] .side-meter.right .side-meter-stack{
     display:grid!important;
-    grid-template-columns:repeat(3,minmax(13px,1fr))!important;
+    grid-template-columns:repeat(3,14px)!important;
+    grid-auto-columns:14px!important;
     grid-auto-flow:column!important;
     gap:8px!important;
     padding:4px!important;
@@ -103,13 +107,15 @@
     transform:none!important;
     align-items:stretch!important;
     justify-items:stretch!important;
+    justify-content:center!important;
     box-sizing:border-box!important;
   }
   body[data-veluna-page="main"] .side-meter .side-meter-track{
     position:relative!important;
     order:initial!important;
-    width:100%!important;
-    min-width:0!important;
+    width:14px!important;
+    min-width:14px!important;
+    max-width:14px!important;
     height:100%!important;
     min-height:0!important;
     transform:none!important;
