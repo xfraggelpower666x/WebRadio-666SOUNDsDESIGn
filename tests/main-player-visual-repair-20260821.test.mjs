@@ -14,21 +14,22 @@ test('visual repair root/public mirrors remain byte-identical', () => {
 });
 
 test('shared bootstrap loads the visual-only repair with the current cache identity', () => {
-  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-history-up-cyan-marquee-v3'/);
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-history-panel-anchor-cyan-left-v4'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
-test('History is moved onto the upper utility row so the static pink title keeps full width', () => {
-  assert.match(css, /padding-right:0!important/);
-  assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:-48px!important;[\s\S]*?right:0!important/);
+test('History is anchored to the whole Now Playing panel above the static pink title row', () => {
+  assert.match(css, /\.now-playing\{[\s\S]*?position:relative!important/);
+  assert.match(css, /\.section-topline\{[\s\S]*?position:static!important/);
+  assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:18px!important;[\s\S]*?right:22px!important/);
   assert.match(css, /\.s666-now-static-title\{[\s\S]*?max-width:100%!important;[\s\S]*?white-space:nowrap!important;[\s\S]*?text-overflow:ellipsis!important/);
 });
 
-test('cyan ticker spans the full content lane and runs as the marquee owner', () => {
-  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:1 \/ -1!important;[\s\S]*?width:100%!important;[\s\S]*?justify-self:stretch!important;[\s\S]*?overflow:hidden!important/);
-  assert.match(css, /\.s666-title-marquee\{[\s\S]*?display:inline-block!important;[\s\S]*?width:max-content!important;[\s\S]*?min-width:100%!important;[\s\S]*?animation-name:s666MainTickerTravel!important;[\s\S]*?animation-play-state:running!important/);
-  assert.match(css, /@keyframes s666MainTickerTravel/);
-  assert.match(css, /translate3d\(calc\(-100% - 34px\),0,0\)/);
+test('cyan ticker spans full lane and animates the real ticker element by container-relative left position', () => {
+  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:1 \/ -1!important;[\s\S]*?position:relative!important;[\s\S]*?width:100%!important;[\s\S]*?overflow:hidden!important/);
+  assert.match(css, /#nowPlayingTicker\.ticker-text[\s\S]*?animation:s666MainTickerTravel 14s linear infinite!important/);
+  assert.match(css, /will-change:left!important/);
+  assert.match(css, /@keyframes s666MainTickerTravel\{[\s\S]*?0%,8%\{left:0\}[\s\S]*?92%,100%\{left:-200%\}/);
 });
 
 test('closing either side panel no longer resizes or shifts the central player', () => {

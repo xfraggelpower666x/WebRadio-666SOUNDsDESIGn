@@ -5,9 +5,12 @@
  */
 
 @media (min-width:761px){
-  /* HISTORY: move the control onto the upper utility row so the static pink title keeps full width. */
-  body[data-veluna-page="main"] .now-playing .section-topline{
+  /* HISTORY: anchor the control to the whole Now Playing panel, not to the pink title row. */
+  body[data-veluna-page="main"] .now-playing{
     position:relative!important;
+  }
+  body[data-veluna-page="main"] .now-playing .section-topline{
+    position:static!important;
     display:block!important;
     padding-top:2px!important;
     padding-right:0!important;
@@ -21,8 +24,8 @@
   }
   body[data-veluna-page="main"] .now-playing #historyToggle{
     position:absolute!important;
-    top:-48px!important;
-    right:0!important;
+    top:18px!important;
+    right:22px!important;
     width:88px!important;
     height:30px!important;
     margin:0!important;
@@ -49,10 +52,11 @@
     overflow:auto!important;
   }
 
-  /* CYAN TICKER: span the full content lane and run as the marquee owner. */
+  /* CYAN TICKER: full-width lane; animate the real #nowPlayingTicker directly. */
   body[data-veluna-page="main"] .now-playing .ticker-window{
     grid-column:1 / -1!important;
     grid-row:2!important;
+    position:relative!important;
     width:100%!important;
     min-width:0!important;
     max-width:100%!important;
@@ -62,26 +66,24 @@
     contain:layout paint!important;
     overflow:hidden!important;
   }
-  body[data-veluna-page="main"] .now-playing :is(#nowPlayingTicker,.ticker-text).s666-title-marquee{
+  body[data-veluna-page="main"] .now-playing #nowPlayingTicker.ticker-text,
+  body[data-veluna-page="main"] .now-playing #nowPlayingTicker.ticker-text.s666-title-marquee{
     position:relative!important;
+    left:0;
     display:inline-block!important;
     width:max-content!important;
-    min-width:100%!important;
+    min-width:0!important;
     max-width:none!important;
     white-space:nowrap!important;
     overflow:visible!important;
     text-overflow:clip!important;
-    animation-name:s666MainTickerTravel!important;
-    animation-duration:14s!important;
-    animation-timing-function:linear!important;
-    animation-iteration-count:infinite!important;
+    animation:s666MainTickerTravel 14s linear infinite!important;
     animation-play-state:running!important;
-    animation-delay:0s!important;
-    will-change:transform!important;
+    will-change:left!important;
   }
   @keyframes s666MainTickerTravel{
-    0%,8%{transform:translate3d(0,0,0)}
-    92%,100%{transform:translate3d(calc(-100% - 34px),0,0)}
+    0%,8%{left:0}
+    92%,100%{left:-200%}
   }
 
   /* PANEL CLOSE: side FX may disappear, but the central player geometry is frozen. */
