@@ -14,7 +14,7 @@ test('visual repair root/public mirrors remain byte-identical', () => {
 });
 
 test('shared bootstrap loads the visual-only repair with the current cache identity', () => {
-  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-history-panel-anchor-cyan-left-v4'/);
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-cyan-ticker-content-column-marquee-v5'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
@@ -25,11 +25,14 @@ test('History is anchored to the whole Now Playing panel above the static pink t
   assert.match(css, /\.s666-now-static-title\{[\s\S]*?max-width:100%!important;[\s\S]*?white-space:nowrap!important;[\s\S]*?text-overflow:ellipsis!important/);
 });
 
-test('cyan ticker spans full lane and animates the real ticker element by container-relative left position', () => {
-  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:1 \/ -1!important;[\s\S]*?position:relative!important;[\s\S]*?width:100%!important;[\s\S]*?overflow:hidden!important/);
-  assert.match(css, /#nowPlayingTicker\.ticker-text[\s\S]*?animation:s666MainTickerTravel 14s linear infinite!important/);
-  assert.match(css, /will-change:left!important/);
-  assert.match(css, /@keyframes s666MainTickerTravel\{[\s\S]*?0%,8%\{left:0\}[\s\S]*?92%,100%\{left:-200%\}/);
+test('cyan ticker stays beside the cover and animates the canonical text with transform', () => {
+  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:2 \/ -1!important;[\s\S]*?position:relative!important;[\s\S]*?width:100%!important;[\s\S]*?overflow:hidden!important/);
+  assert.match(css, /#nowPlayingTicker\.ticker-text[\s\S]*?left:auto!important;[\s\S]*?padding-left:100%!important;[\s\S]*?animation:s666MainTickerTravel 14s linear infinite!important/);
+  assert.match(css, /will-change:transform!important/);
+  assert.match(css, /@keyframes s666MainTickerTravel\{[\s\S]*?0%\{transform:translateX\(0\)\}[\s\S]*?100%\{transform:translateX\(-100%\)\}/);
+  assert.doesNotMatch(css, /grid-column:1 \/ -1!important/);
+  assert.doesNotMatch(css, /will-change:left!important/);
+  assert.doesNotMatch(css, /left:-200%/);
 });
 
 test('closing either side panel no longer resizes or shifts the central player', () => {
