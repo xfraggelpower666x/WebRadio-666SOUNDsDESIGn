@@ -14,7 +14,7 @@ test('visual repair root/public mirrors remain byte-identical', () => {
 });
 
 test('shared bootstrap loads the visual-only repair with the current cache identity', () => {
-  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-cyan-ticker-content-column-marquee-v5'/);
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-cyan-ticker-wide-visible-marquee-v6'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
@@ -25,13 +25,24 @@ test('History is anchored to the whole Now Playing panel above the static pink t
   assert.match(css, /\.s666-now-static-title\{[\s\S]*?max-width:100%!important;[\s\S]*?white-space:nowrap!important;[\s\S]*?text-overflow:ellipsis!important/);
 });
 
-test('cyan ticker stays beside the cover and animates the canonical text with transform', () => {
-  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:2 \/ -1!important;[\s\S]*?position:relative!important;[\s\S]*?width:100%!important;[\s\S]*?overflow:hidden!important/);
-  assert.match(css, /#nowPlayingTicker\.ticker-text[\s\S]*?left:auto!important;[\s\S]*?padding-left:100%!important;[\s\S]*?animation:s666MainTickerTravel 14s linear infinite!important/);
-  assert.match(css, /will-change:transform!important/);
-  assert.match(css, /@keyframes s666MainTickerTravel\{[\s\S]*?0%\{transform:translateX\(0\)\}[\s\S]*?100%\{transform:translateX\(-100%\)\}/);
-  assert.doesNotMatch(css, /grid-column:1 \/ -1!important/);
-  assert.doesNotMatch(css, /will-change:left!important/);
+test('cyan ticker uses the full remaining lane beside the cover and keeps the frame fixed', () => {
+  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:1 \/ -1!important;[\s\S]*?width:calc\(100% - \(clamp\(164px,12vw,198px\) \+ 14px\)\)!important/);
+  assert.match(css, /margin-left:calc\(clamp\(164px,12vw,198px\) \+ 14px\)!important/);
+  assert.match(css, /justify-self:start!important/);
+  assert.match(css, /overflow:hidden!important/);
+  assert.doesNotMatch(css, /grid-column:2 \/ -1!important/);
+});
+
+test('cyan ticker text stays visible and travels through the fixed lane without padding hacks', () => {
+  assert.match(css, /#nowPlayingTicker\.ticker-text[\s\S]*?position:absolute!important;[\s\S]*?top:50%!important;[\s\S]*?left:100%!important/);
+  assert.match(css, /width:max-content!important/);
+  assert.match(css, /min-width:max-content!important/);
+  assert.match(css, /padding-left:0!important/);
+  assert.match(css, /animation:s666MainTickerTravel 14s linear infinite!important/);
+  assert.match(css, /animation-delay:-3\.5s!important/);
+  assert.match(css, /will-change:left,transform!important/);
+  assert.match(css, /@keyframes s666MainTickerTravel\{[\s\S]*?0%\{left:100%;transform:translate\(0,-50%\)\}[\s\S]*?100%\{left:0;transform:translate\(-100%,-50%\)\}/);
+  assert.doesNotMatch(css, /padding-left:100%/);
   assert.doesNotMatch(css, /left:-200%/);
 });
 
