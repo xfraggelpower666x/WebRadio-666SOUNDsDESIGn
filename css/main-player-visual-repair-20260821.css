@@ -52,9 +52,9 @@
     overflow:auto!important;
   }
 
-  /* CYAN TICKER: full-width lane; animate the real #nowPlayingTicker directly. */
+  /* CYAN TICKER: stay in the content column beside the cover; animate only the canonical text. */
   body[data-veluna-page="main"] .now-playing .ticker-window{
-    grid-column:1 / -1!important;
+    grid-column:2 / -1!important;
     grid-row:2!important;
     position:relative!important;
     width:100%!important;
@@ -69,21 +69,22 @@
   body[data-veluna-page="main"] .now-playing #nowPlayingTicker.ticker-text,
   body[data-veluna-page="main"] .now-playing #nowPlayingTicker.ticker-text.s666-title-marquee{
     position:relative!important;
-    left:0;
+    left:auto!important;
     display:inline-block!important;
-    width:max-content!important;
+    width:auto!important;
     min-width:0!important;
     max-width:none!important;
+    padding-left:100%!important;
     white-space:nowrap!important;
     overflow:visible!important;
     text-overflow:clip!important;
     animation:s666MainTickerTravel 14s linear infinite!important;
     animation-play-state:running!important;
-    will-change:left!important;
+    will-change:transform!important;
   }
   @keyframes s666MainTickerTravel{
-    0%,8%{left:0}
-    92%,100%{left:-200%}
+    0%{transform:translateX(0)}
+    100%{transform:translateX(-100%)}
   }
 
   /* PANEL CLOSE: side FX may disappear, but the central player geometry is frozen. */
