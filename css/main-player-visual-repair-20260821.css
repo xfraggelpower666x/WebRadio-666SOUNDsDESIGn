@@ -1,26 +1,27 @@
 /*
  * 666SOUNDsDESIGn — Main Player visual-only repair 2026-08-21
- * Scope: desktop History placement, static ticker, side-FX close geometry, segmented side meters.
+ * Scope: desktop History placement, cyan ticker marquee, side-FX close geometry, segmented side meters.
  * Hardlock: no Discord, Messenger, Skip, audio graph, EQ math, MeterBus, stream or Worker behavior changes.
  */
 
 @media (min-width:761px){
-  /* HISTORY: reserve a real utility lane so the button never covers the static title. */
+  /* HISTORY: move the control onto the upper utility row so the static pink title keeps full width. */
   body[data-veluna-page="main"] .now-playing .section-topline{
     position:relative!important;
     display:block!important;
     padding-top:2px!important;
-    padding-right:108px!important;
+    padding-right:0!important;
     overflow:visible!important;
   }
   body[data-veluna-page="main"] .now-playing .section-topline>div:first-child{
     min-width:0!important;
     width:100%!important;
+    max-width:100%!important;
     padding-right:0!important;
   }
   body[data-veluna-page="main"] .now-playing #historyToggle{
     position:absolute!important;
-    top:-14px!important;
+    top:-48px!important;
     right:0!important;
     width:88px!important;
     height:30px!important;
@@ -28,11 +29,15 @@
     z-index:12!important;
   }
   body[data-veluna-page="main"] .now-playing .s666-now-static-title{
+    display:block!important;
     max-width:100%!important;
     padding-right:2px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
   }
 
-  /* HISTORY PANEL: follows the raised utility button while staying clear of Now Playing content. */
+  /* HISTORY PANEL: keep the overlay ownership unchanged. */
   body[data-veluna-page="main"] .now-playing .history-panel{
     position:absolute!important;
     left:calc(clamp(164px,12vw,198px) + 26px)!important;
@@ -44,25 +49,39 @@
     overflow:auto!important;
   }
 
-  /* TICKER: static single-line owner; no horizontal marquee movement. */
+  /* CYAN TICKER: span the full content lane and run as the marquee owner. */
   body[data-veluna-page="main"] .now-playing .ticker-window{
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    justify-self:stretch!important;
     contain:layout paint!important;
     overflow:hidden!important;
   }
   body[data-veluna-page="main"] .now-playing :is(#nowPlayingTicker,.ticker-text).s666-title-marquee{
     position:relative!important;
-    display:block!important;
-    width:100%!important;
-    min-width:0!important;
-    max-width:100%!important;
+    display:inline-block!important;
+    width:max-content!important;
+    min-width:100%!important;
+    max-width:none!important;
     white-space:nowrap!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-    animation:none!important;
-    transform:none!important;
-    animation-play-state:paused!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    animation-name:s666MainTickerTravel!important;
+    animation-duration:14s!important;
+    animation-timing-function:linear!important;
+    animation-iteration-count:infinite!important;
+    animation-play-state:running!important;
     animation-delay:0s!important;
-    will-change:auto!important;
+    will-change:transform!important;
+  }
+  @keyframes s666MainTickerTravel{
+    0%,8%{transform:translate3d(0,0,0)}
+    92%,100%{transform:translate3d(calc(-100% - 34px),0,0)}
   }
 
   /* PANEL CLOSE: side FX may disappear, but the central player geometry is frozen. */

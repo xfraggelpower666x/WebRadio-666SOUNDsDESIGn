@@ -14,21 +14,21 @@ test('visual repair root/public mirrors remain byte-identical', () => {
 });
 
 test('shared bootstrap loads the visual-only repair with the current cache identity', () => {
-  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-21-history-ticker-side-meter-v2'/);
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-history-up-cyan-marquee-v3'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
-test('History sits higher and remains in its reserved utility lane', () => {
-  assert.match(css, /padding-right:108px!important/);
-  assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:-14px!important;[\s\S]*?right:0!important/);
-  assert.match(css, /\.history-panel\{[\s\S]*?top:36px!important;[\s\S]*?bottom:58px!important/);
+test('History is moved onto the upper utility row so the static pink title keeps full width', () => {
+  assert.match(css, /padding-right:0!important/);
+  assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:-48px!important;[\s\S]*?right:0!important/);
+  assert.match(css, /\.s666-now-static-title\{[\s\S]*?max-width:100%!important;[\s\S]*?white-space:nowrap!important;[\s\S]*?text-overflow:ellipsis!important/);
 });
 
-test('desktop ticker is static and no longer uses marquee motion', () => {
-  assert.match(css, /\.ticker-window\{[\s\S]*?overflow:hidden!important/);
-  assert.match(css, /\.s666-title-marquee\{[\s\S]*?display:block!important;[\s\S]*?width:100%!important;[\s\S]*?text-overflow:ellipsis!important;[\s\S]*?animation:none!important;[\s\S]*?transform:none!important/);
-  assert.doesNotMatch(css, /animation-name:s666MainTickerTravel!important/);
-  assert.doesNotMatch(css, /@keyframes s666MainTickerTravel/);
+test('cyan ticker spans the full content lane and runs as the marquee owner', () => {
+  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:1 \/ -1!important;[\s\S]*?width:100%!important;[\s\S]*?justify-self:stretch!important;[\s\S]*?overflow:hidden!important/);
+  assert.match(css, /\.s666-title-marquee\{[\s\S]*?display:inline-block!important;[\s\S]*?width:max-content!important;[\s\S]*?min-width:100%!important;[\s\S]*?animation-name:s666MainTickerTravel!important;[\s\S]*?animation-play-state:running!important/);
+  assert.match(css, /@keyframes s666MainTickerTravel/);
+  assert.match(css, /translate3d\(calc\(-100% - 34px\),0,0\)/);
 });
 
 test('closing either side panel no longer resizes or shifts the central player', () => {
