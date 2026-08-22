@@ -32,16 +32,23 @@ test('PFS selectors are advertised but resolved only by the external PFS registr
   assert.equal(link.selectorResolution, 'PFS_EXTERNAL_REGISTRY');
   assert.equal(link.releaseQualification, 'POST_DEPLOY_VERIFIED_TREE');
   assert.equal(link.restoreSourceKey, 'sourceCommit');
-  assert.equal(link.restoreMode, 'RESTORE_BRANCH_PR_GATED');
+  assert.equal(link.restoreMode, 'RESTORE_COMMIT_ON_CURRENT_PRODUCTION_PR_GATED');
+  assert.equal(link.restoreBranchBase, 'CURRENT_PRODUCTION');
+  assert.equal(link.restoreTreeSource, 'VERIFIED_RELEASE_SOURCE_COMMIT');
+  assert.equal(link.restoreCommitRequired, true);
 });
 
-test('restore remains branch PR gate deploy readback controlled', () => {
+test('historical restore is materialized as an explicit commit on current production', () => {
   assert.deepEqual(link.restoreTransaction, [
     'resolve-selector-in-external-pfs',
     'verify-release-class-and-sha256',
     'resolve-source-commit',
-    'create-recovery-branch-from-source-commit',
-    'compare-against-current-production',
+    'read-current-production-head',
+    'create-recovery-branch-from-current-production',
+    'materialize-verified-release-tree-on-recovery-branch',
+    'create-explicit-restore-commit',
+    'compare-recovery-branch-against-current-production',
+    'reject-empty-restore-pr-unless-selected-tree-already-current',
     'run-repository-verification',
     'open-reviewed-pull-request',
     'require-release-integrity-and-child-freeze',
@@ -50,14 +57,18 @@ test('restore remains branch PR gate deploy readback controlled', () => {
     'require-commit-bound-live-readback',
     'register-new-verified-child-release'
   ]);
+  assert.equal(link.restoreTransaction.includes('create-recovery-branch-from-source-commit'), false);
   assert.equal(link.safety.failClosed, true);
   assert.equal(link.safety.requireHashVerification, true);
+  assert.equal(link.safety.requireCurrentProductionBase, true);
+  assert.equal(link.safety.requireExplicitRestoreCommit, true);
   assert.equal(link.safety.requireDiffBeforeRestore, true);
+  assert.equal(link.safety.rejectEmptyRestorePr, true);
   assert.equal(link.safety.requirePrBeforeProduction, true);
   assert.equal(link.safety.requireGreenGates, true);
 });
 
-test('existing child release marker links to the new manifest without changing activation semantics', () => {
+test('existing child release marker links to the repaired manifest without changing activation semantics', () => {
   assert.equal(release.childLinkPath, '/666pfs-child-link.json');
   assert.equal(release.childLinkSchema, '666pfs-child-external-link-v1');
   assert.equal(release.childAutoload, false);
@@ -65,9 +76,12 @@ test('existing child release marker links to the new manifest without changing a
   assert.equal(release.secondUpdateRoute, false);
 });
 
-test('contract explicitly forbids moving parent cores into the radio repo', () => {
+test('contract forbids parent-core migration and ancestor-based empty restore PRs', () => {
   assert.match(contract, /PFS_CORE_IN_REPOSITORY=FORBIDDEN/);
   assert.match(contract, /666CSM_CORE_IN_REPOSITORY=FORBIDDEN/);
   assert.match(contract, /DIRECT_PRODUCTION_RESTORE=FORBIDDEN/);
   assert.match(contract, /selectorResolution=PFS_EXTERNAL_REGISTRY/);
+  assert.match(contract, /Create the recovery branch from current production HEAD\./);
+  assert.match(contract, /Create an explicit restore commit representing the selected tree\./);
+  assert.match(contract, /Reject an empty restore PR unless the selected verified tree is already identical to current production/);
 });
