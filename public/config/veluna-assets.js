@@ -26,14 +26,10 @@ window.VELUNA_ASSETS = Object.freeze({
   const version = '2026-08-17-native-mute-ticker-v185';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
-  const mainVisualRepairVersion = '2026-08-22-history-up-cyan-marquee-v3';
+  const mainVisualRepairVersion = '2026-08-22-history-panel-anchor-cyan-left-v4';
   const head = document.head || document.documentElement;
   if (!head) return;
 
-  /*
-   * Synchronous graph bridge: captures the player graph before a potentially cached old
-   * boost-core can be replaced by the current central runtime.
-   */
   const installAudioGraphBridge = () => {
     if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
     const graphs = new WeakMap();
@@ -150,64 +146,21 @@ window.VELUNA_ASSETS = Object.freeze({
     head.appendChild(script);
   });
 
-  /*
-   * CENTRAL_RADIO_BOOT_OWNER_v2
-   * Ein Owner für Hub/Main, iPhone, Android, VELUNA und internen Notfallplayer.
-   * Zusätzlich setzt der Owner die routenspezifische PWA-/Lockscreen-Identität.
-   */
   loadStyle(`/css/central-boot-screen.css?v=${bootVersion}`, 'smfpCentralRadioBoot');
-  void loadCurrentScript(
-    `/js/central-boot-screen.js?v=${bootVersion}`,
-    'smfpCentralRadioBoot',
-    () => !!window.S666CentralBootScreen
-  ).catch(() => {});
-
+  void loadCurrentScript(`/js/central-boot-screen.js?v=${bootVersion}`,'smfpCentralRadioBoot',() => !!window.S666CentralBootScreen).catch(() => {});
   loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
   loadStyle(`/css/all-player-mute.css?v=${version}`, 's666AllPlayerMute');
   loadStyle(`/css/main-player-visual-repair-20260821.css?v=${mainVisualRepairVersion}`, 's666MainVisualRepair');
-
-  const activateOverlay = () => {
-    try {
-      window.SMFPOverlayCore?.updateViewport?.();
-      window.SMFPOverlayCore?.scanOverlays?.(document);
-    } catch (_) {}
-  };
-
-  void loadScript(
-    `/core/overlay/overlay-core.js?v=${version}`,
-    'smfpOverlayCore',
-    () => !!window.SMFPOverlayCore
-  ).then(activateOverlay).catch(() => {});
-
+  const activateOverlay = () => { try { window.SMFPOverlayCore?.updateViewport?.(); window.SMFPOverlayCore?.scanOverlays?.(document); } catch (_) {} };
+  void loadScript(`/core/overlay/overlay-core.js?v=${version}`,'smfpOverlayCore',() => !!window.SMFPOverlayCore).then(activateOverlay).catch(() => {});
   const audioReady = () => !!window.SMFPBoostCore?.centralPolicyVersion;
   const policyReady = () => !!window.SMFPAudioPolicyUI;
   const artworkReady = () => !!window.SMFPArtworkCore;
   const muteReady = () => !!window.S666AllPlayerMute?.version;
   const discordRecoveryReady = () => !!window.S666DiscordStartupRecovery?.version;
-
-  void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
-    .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
-    .then(() => {
-      try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {}
-    })
-    .catch(() => {});
-
-  void loadScript(`/js/all-player-mute.js?v=${version}`, 's666AllPlayerMute', muteReady)
-    .then(() => {
-      try { window.S666AllPlayerMute?.sync?.(); } catch (_) {}
-    })
-    .catch(() => {});
-
-  void loadScript(`/js/artwork-core.js?v=${version}`, 'smfpArtworkCore', artworkReady)
-    .then(() => {
-      try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {}
-    })
-    .catch(() => {});
-
-  void loadScript(
-    `/js/discord-startup-autopost-recovery.js?v=${discordRecoveryVersion}`,
-    's666DiscordStartupRecovery',
-    discordRecoveryReady
-  ).catch(() => {});
+  void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady).then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady)).then(() => { try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {} }).catch(() => {});
+  void loadScript(`/js/all-player-mute.js?v=${version}`, 's666AllPlayerMute', muteReady).then(() => { try { window.S666AllPlayerMute?.sync?.(); } catch (_) {} }).catch(() => {});
+  void loadScript(`/js/artwork-core.js?v=${version}`, 'smfpArtworkCore', artworkReady).then(() => { try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {} }).catch(() => {});
+  void loadScript(`/js/discord-startup-autopost-recovery.js?v=${discordRecoveryVersion}`,'s666DiscordStartupRecovery',discordRecoveryReady).catch(() => {});
 })();
