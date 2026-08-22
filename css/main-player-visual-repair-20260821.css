@@ -171,3 +171,11 @@
     filter:brightness(1.36) saturate(1.30) contrast(1.04)!important;
   }
 }
+
+/* Short desktop: player-stage-v2 shrinks the cover to 138px, so keep the ticker aligned to that exact cover width + 14px gap. */
+@media (min-width:761px) and (max-height:820px){
+  body[data-veluna-page="main"] .now-playing .ticker-window{
+    width:calc(100% - 152px)!important;
+    margin-left:152px!important;
+  }
+}
