@@ -7,6 +7,8 @@
   "releaseClass": "commit-bound-post-deploy-readback-and-child-backup-bootstrap",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "productionBranch": "WebRadio-666SOUNDsDESIGn",
+  "childLinkPath": "/666pfs-child-link.json",
+  "childLinkSchema": "666pfs-child-external-link-v1",
   "freezeTrigger": "successful Deploy WebRadio Cloudflare Workers workflow_run",
   "deploymentIdentityPath": "/666pfs-deployed-commit.json",
   "deploymentIdentitySchema": "666pfs-666stream-deployed-commit-v1",
