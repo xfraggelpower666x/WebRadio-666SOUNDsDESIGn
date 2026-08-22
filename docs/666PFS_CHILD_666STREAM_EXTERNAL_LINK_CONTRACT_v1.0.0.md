@@ -1,5 +1,5 @@
 # 666PFS Child 666STREAM External Link Contract
-## Version 1.0.0
+## Version 1.0.1 — Historical Restore P1 Repair
 
 SYSTEM_ID=666PFS-666STREAM-DEPLOYMENT-001
 PARENT_SYSTEM=666PFS
@@ -72,23 +72,29 @@ The repository does not resolve those selectors. `selectorResolution=PFS_EXTERNA
 
 ## Restore transaction
 
-A selected verified release is not copied directly into production. The required recovery path is:
+A selected verified release is not copied directly into production and a recovery branch must not be based directly on an older ancestor commit. Doing that can create a branch with no commits ahead of production and therefore an empty pull request.
+
+The required recovery path is:
 
 1. Resolve selector in external 666PFS.
 2. Require a verified `POST_DEPLOY_VERIFIED_TREE` release.
 3. Verify stored SHA-256 and release receipt.
-4. Resolve the release `sourceCommit`.
-5. Create a recovery branch from that exact commit.
-6. Compare it against current production.
-7. Run repository verification.
-8. Open a reviewed pull request.
-9. Require Release Integrity and 666PFS 666STREAM Child Freeze gates.
-10. Merge only after green gates.
-11. Deploy production normally.
-12. Require commit-bound live readback.
-13. Register the resulting state as a new verified child release.
+4. Resolve the release `sourceCommit` only as the verified tree source.
+5. Read the current production HEAD.
+6. Create the recovery branch from current production HEAD.
+7. Materialize the complete verified selected-release tree on that recovery branch.
+8. Create an explicit restore commit representing the selected tree.
+9. Compare that recovery commit against current production.
+10. Reject an empty restore PR unless the selected verified tree is already identical to current production, in which case no restore is required.
+11. Run repository verification.
+12. Open a reviewed pull request.
+13. Require Release Integrity and 666PFS 666STREAM Child Freeze gates.
+14. Merge only after green gates.
+15. Deploy production normally.
+16. Require commit-bound live readback.
+17. Register the resulting state as a new verified child release.
 
-This is a controlled restore transaction, not a blind rollback.
+This is a controlled restore transaction, not a blind rollback. Historical selectors are fail-closed if the host cannot materialize an explicit restore commit on top of current production.
 
 ## Discovery rule
 
