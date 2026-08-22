@@ -26,7 +26,7 @@ window.VELUNA_ASSETS = Object.freeze({
   const version = '2026-08-17-native-mute-ticker-v185';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
-  const mainVisualRepairVersion = '2026-08-22-cyan-ticker-content-column-marquee-v5';
+  const mainVisualRepairVersion = '2026-08-22-cyan-ticker-wide-visible-marquee-v6';
   const head = document.head || document.documentElement;
   if (!head) return;
 
