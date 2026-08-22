@@ -13,8 +13,8 @@ test('visual repair root/public mirrors remain byte-identical', () => {
   assert.equal(publicBootstrap, bootstrap);
 });
 
-test('shared bootstrap loads the visual-only repair with a cache identity', () => {
-  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-21-history-ticker-side-meter-v1'/);
+test('shared bootstrap loads the visual-only repair with the current cache identity', () => {
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-21-history-ticker-side-meter-v2'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
