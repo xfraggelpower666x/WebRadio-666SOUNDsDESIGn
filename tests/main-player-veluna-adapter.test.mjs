@@ -22,14 +22,20 @@ test('ticker adapts VELUNA measured static-vs-running behavior on the existing c
   assert.match(js,/measureTextWidth\(ticker\)/);
   assert.match(js,/viewportWidth=Math\.floor\(windowNode\.clientWidth/);
   assert.match(js,/itemWidth<=Math\.max\(0,viewportWidth-24\)/);
-  assert.match(js,/shift=itemWidth\+gapWidth/);
+  assert.match(js,/measureSeparatorWidth\(ticker\)/);
+  assert.match(js,/shift=itemWidth\+gapPadding\+separatorWidth/);
   assert.match(js,/Math\.max\(14,Math\.min\(42,shift\/34\)\)/);
   assert.match(js,/MutationObserver/);
   assert.match(css,/#nowPlayingTicker\.s666-veluna-main-ticker\.is-running/);
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
   assert.doesNotMatch(js,/createElement\(['"](?:div|span)['"]\).*nowPlayingTicker/);
 });
-test('cyber boot delegates only to existing main play authority and waits for real playing',()=>{
+test('cyber boot waits for central boot owner then delegates only to existing main play authority',()=>{
+  assert.match(js,/installBootAfterCentralOwner/);
+  assert.match(js,/window\.S666CentralBootScreen/);
+  assert.match(js,/central\?\.isActive\?\.\(\)/);
+  assert.match(js,/s666-central-boot-active/);
+  assert.match(js,/#s666CentralBoot/);
   assert.match(js,/const play=q\('#playBtn'\)/);
   assert.match(js,/play\.click\(\)/);
   assert.match(js,/audio\.addEventListener\('playing',success/);
