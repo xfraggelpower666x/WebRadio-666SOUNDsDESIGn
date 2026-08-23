@@ -28,14 +28,11 @@ window.VELUNA_ASSETS = Object.freeze({
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
   const mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7';
   const playerStageVersion = '2026-08-23-header-owner-cascade-v2';
-  const mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v2';
+  const mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4';
+  const velunaThemeVersion = '2026-08-23-iphone-bottom-history-owner-v1';
   const head = document.head || document.documentElement;
   if (!head) return;
 
-  /*
-   * Synchronous graph bridge: captures the player graph before a potentially cached old
-   * boost-core can be replaced by the current central runtime.
-   */
   const installAudioGraphBridge = () => {
     if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
     const graphs = new WeakMap();
@@ -152,11 +149,6 @@ window.VELUNA_ASSETS = Object.freeze({
     head.appendChild(script);
   });
 
-  /*
-   * CENTRAL_RADIO_BOOT_OWNER_v2
-   * Ein Owner für Hub/Main, iPhone, Android, VELUNA und internen Notfallplayer.
-   * Zusätzlich setzt der Owner die routenspezifische PWA-/Lockscreen-Identität.
-   */
   loadStyle(`/css/central-boot-screen.css?v=${bootVersion}`, 'smfpCentralRadioBoot');
   window.__S666_CENTRAL_BOOT_LOAD_STATE__ = window.S666CentralBootScreen ? 'loaded' : 'pending';
   void loadCurrentScript(
@@ -173,6 +165,8 @@ window.VELUNA_ASSETS = Object.freeze({
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
   loadStyle(`/css/all-player-mute.css?v=${version}`, 's666AllPlayerMute');
   loadStyle(`/css/main-player-visual-repair-20260821.css?v=${mainVisualRepairVersion}`, 's666MainVisualRepair');
+  const existingVelunaTheme = document.querySelector('link[href*="/css/veluna-theme.css"]');
+  if (existingVelunaTheme) existingVelunaTheme.href = `/css/veluna-theme.css?v=${velunaThemeVersion}`;
   const existingPlayerStage = document.querySelector('link[href*="/css/player-stage-v2.css"]');
   if (existingPlayerStage) existingPlayerStage.href = `/css/player-stage-v2.css?v=${playerStageVersion}`;
   loadStyle(`/css/main-veluna-adapter.css?v=${mainVelunaAdapterVersion}`, 's666MainVelunaAdapter');
