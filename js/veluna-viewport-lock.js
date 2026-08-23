@@ -94,7 +94,7 @@ node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-br
     root.setAttribute('data-veluna-iphone-safe','1');
     root.setAttribute('data-veluna-stable-fullscreen','1');
     root.style.setProperty('--veluna-safe-player-top','max(56px, calc(env(safe-area-inset-top) + 10px))');
-    root.style.setProperty('--veluna-safe-player-bottom','max(1px, calc(env(safe-area-inset-bottom) - 12px))');
+    root.style.setProperty('--veluna-safe-player-bottom','max(54px, calc(env(safe-area-inset-bottom) + 24px))');
     root.style.setProperty('--veluna-stable-screen-width', `${state.width}px`);
     root.style.setProperty('--veluna-stable-screen-height', `${state.height}px`);
 
