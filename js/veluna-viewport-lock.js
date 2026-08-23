@@ -89,12 +89,13 @@ node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-br
     if (!app || !card || !isMobileViewport() || !state.locked) return;
 
     const compact = state.height < 720;
+    // Protect the LYVRA artwork/title area; reclaim height from chrome, not from the display row.
     const displayMinimum = compact ? 150 : 188;
 
     root.setAttribute('data-veluna-iphone-safe','1');
     root.setAttribute('data-veluna-stable-fullscreen','1');
     root.style.setProperty('--veluna-safe-player-top','max(56px, calc(env(safe-area-inset-top) + 10px))');
-    root.style.setProperty('--veluna-safe-player-bottom','max(54px, calc(env(safe-area-inset-bottom) + 24px))');
+    root.style.setProperty('--veluna-safe-player-bottom','max(66px, calc(env(safe-area-inset-bottom) + 30px))');
     root.style.setProperty('--veluna-stable-screen-width', `${state.width}px`);
     root.style.setProperty('--veluna-stable-screen-height', `${state.height}px`);
 
@@ -126,17 +127,17 @@ node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-br
       'important'
     );
     card.style.setProperty('align-content','stretch','important');
-    card.style.setProperty('gap',compact ? '3px' : '4px','important');
-    card.style.setProperty('padding','6px','important');
+    card.style.setProperty('gap',compact ? '3px' : '3px','important');
+    card.style.setProperty('padding','5px','important');
     card.style.setProperty('overflow','hidden','important');
 
     const header = card.querySelector('.veluna-global-header');
     const headerImage = header?.querySelector('img');
     placeInRow(header, 1);
     if (header) {
-      header.style.setProperty('height', compact ? 'clamp(94px,13svh,124px)' : 'clamp(112px,15svh,158px)', 'important');
-      header.style.setProperty('min-height', compact ? '94px' : '112px', 'important');
-      header.style.setProperty('max-height', compact ? '124px' : '158px', 'important');
+      header.style.setProperty('height', compact ? 'clamp(94px,13svh,124px)' : 'clamp(104px,14svh,148px)', 'important');
+      header.style.setProperty('min-height', compact ? '94px' : '104px', 'important');
+      header.style.setProperty('max-height', compact ? '124px' : '148px', 'important');
       header.style.setProperty('overflow','hidden','important');
     }
     if (headerImage) {
@@ -186,14 +187,14 @@ node.querySelector?.('.veluna-global-header,.veluna-volume-row,.veluna-bottom-br
       miniGrid.style.setProperty('display','grid','important');
       miniGrid.style.setProperty('visibility','visible','important');
       miniGrid.style.setProperty('opacity','1','important');
-      miniGrid.style.setProperty('min-height',compact ? '38px' : '44px','important');
+      miniGrid.style.setProperty('min-height',compact ? '38px' : '42px','important');
       miniGrid.style.setProperty('z-index','4','important');
     }
     miniGrid?.querySelectorAll('.mini-box').forEach(node => {
       node.style.setProperty('display','flex','important');
       node.style.setProperty('visibility','visible','important');
       node.style.setProperty('opacity','1','important');
-      node.style.setProperty('min-height',compact ? '36px' : '42px','important');
+      node.style.setProperty('min-height',compact ? '36px' : '40px','important');
     });
     if (sourceSwitch) {
       sourceSwitch.style.setProperty('display','grid','important');
