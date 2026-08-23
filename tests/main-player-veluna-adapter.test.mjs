@@ -14,7 +14,7 @@ test('main VELUNA adapter root/public mirrors are byte-identical',()=>{
 });
 test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(headers,/\/config\/\*\n  Cache-Control: no-cache, must-revalidate/);
-  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v1'/);
+  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v2'/);
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
@@ -32,16 +32,17 @@ test('ticker adapts VELUNA measured static-vs-running behavior on the existing c
 });
 test('cyber boot waits fail-closed for the actual central boot script owner',()=>{
   assert.match(js,/installBootAfterCentralOwner/);
-  assert.match(js,/centralScript=.*central-boot-screen\.js/);
+  assert.match(bootstrap,/__S666_CENTRAL_BOOT_LOAD_STATE__ = window\.S666CentralBootScreen \? 'loaded' : 'pending'/);
+  assert.match(bootstrap,/__S666_CENTRAL_BOOT_LOAD_STATE__ = 'loaded'/);
+  assert.match(bootstrap,/__S666_CENTRAL_BOOT_LOAD_STATE__ = 'error'/);
   assert.match(js,/window\.S666CentralBootScreen/);
   assert.match(js,/central\?\.isActive\?\.\(\)/);
   assert.match(js,/s666-central-boot-active/);
   assert.match(js,/#s666CentralBoot/);
-  assert.match(js,/script\.addEventListener\('load',finishAfterOwner/);
-  assert.match(js,/script\.addEventListener\('error'/);
-  assert.match(js,/!script&&document\.readyState==='complete'/);
-  assert.doesNotMatch(js,/5200|Date\.now\(\)-started/);
-  assert.doesNotMatch(js,/document\.readyState==='complete'&&script&&!window\.S666CentralBootScreen/);
+  assert.match(js,/__S666_CENTRAL_BOOT_LOAD_STATE__/);
+  assert.match(js,/loadState==='error'/);
+  assert.match(js,/loadState==='loaded'/);
+  assert.doesNotMatch(js,/5200|Date\.now\(\)-started|centralScript=/);
   assert.match(js,/const play=q\('#playBtn'\)/);
   assert.match(js,/play\.click\(\)/);
   assert.match(js,/audio\.addEventListener\('playing',success/);
