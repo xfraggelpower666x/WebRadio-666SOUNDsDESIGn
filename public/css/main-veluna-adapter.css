@@ -1,17 +1,15 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.0
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.4
  * Single existing ticker element; boot delegates to existing play authority.
  * DNA effects consume canonical player-stage CSS variables only.
  */
 @keyframes s666VelunaMainTicker{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--ticker-shift,500px)),0,0)}}
 @media (min-width:761px){
-  body[data-veluna-page="main"] .now-playing .ticker-window{overflow:hidden!important;contain:layout paint!important}
+  body[data-veluna-page="main"] .now-playing .ticker-window{grid-column:1/-1!important;grid-row:2!important;width:calc(100% - var(--s666-main-ticker-offset,0px))!important;min-width:0!important;max-width:none!important;margin-left:var(--s666-main-ticker-offset,0px)!important;margin-right:0!important;justify-self:start!important;overflow:hidden!important;contain:layout paint!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{position:relative!important;left:auto!important;display:inline-block!important;width:max-content!important;min-width:0!important;max-width:none!important;padding:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;animation:none!important;will-change:transform!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;transform:none!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running{animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
-
-  /* Only the three owner-approved DNA modules are amplified. */
-  body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform i{max-height:96%!important;min-height:7%!important;transform-origin:center!important;transform:scaleY(calc(.92 + var(--s666-stage-pulse)*.34 + var(--s666-stage-peak)*.24))!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.72)) saturate(calc(1.12 + var(--s666-stage-mid)*.58)) drop-shadow(0 0 calc(4px + var(--s666-stage-pulse)*12px) rgba(22,255,243,.58))!important;opacity:calc(.42 + var(--s666-stage-level)*.50)!important}
+  body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform{overflow:hidden!important;align-items:flex-end!important}body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform i{max-height:calc(100% - 6px)!important;min-height:7%!important;transform:none!important;transform-origin:bottom!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.72)) saturate(calc(1.12 + var(--s666-stage-mid)*.58)) drop-shadow(0 0 calc(4px + var(--s666-stage-pulse)*12px) rgba(22,255,243,.58))!important;opacity:calc(.42 + var(--s666-stage-level)*.50)!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-core{transform:scale(calc(.90 + var(--s666-stage-low)*.22 + var(--s666-stage-pulse)*.14)) rotate(calc(var(--s666-stage-mid)*28deg))!important;filter:brightness(calc(1.02 + var(--s666-stage-low)*.78 + var(--s666-stage-pulse)*.34)) saturate(calc(1.18 + var(--s666-stage-mid)*.92)) drop-shadow(0 0 calc(9px + var(--s666-stage-peak)*25px) rgba(255,61,187,.58))!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-wave{opacity:calc(.42 + var(--s666-stage-level)*.34 + var(--s666-stage-pulse)*.22)!important;filter:brightness(calc(1.05 + var(--s666-stage-pulse)*.82)) drop-shadow(0 0 calc(10px + var(--s666-stage-peak)*24px) rgba(255,61,187,.68))!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-dot{transform:scale(calc(.86 + var(--s666-stage-pulse)*.72 + var(--s666-stage-peak)*.24))!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.84)) saturate(1.42)!important}
