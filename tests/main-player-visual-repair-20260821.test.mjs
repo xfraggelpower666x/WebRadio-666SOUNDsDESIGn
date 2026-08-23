@@ -5,45 +5,46 @@ import fs from 'node:fs';
 const read = (path) => fs.readFileSync(path, 'utf8');
 const css = read('css/main-player-visual-repair-20260821.css');
 const publicCss = read('public/css/main-player-visual-repair-20260821.css');
+const stageCss = read('css/player-stage-v2.css');
+const publicStageCss = read('public/css/player-stage-v2.css');
 const bootstrap = read('config/veluna-assets.js');
 const publicBootstrap = read('public/config/veluna-assets.js');
 
 test('visual repair root/public mirrors remain byte-identical', () => {
   assert.equal(publicCss, css);
+  assert.equal(publicStageCss, stageCss);
   assert.equal(publicBootstrap, bootstrap);
 });
 
-test('shared bootstrap loads the visual-only repair with the current cache identity', () => {
+test('shared bootstrap still loads the visual-only repair', () => {
   assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-cyan-ticker-wide-visible-marquee-v6'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
-test('History is anchored to the whole Now Playing panel above the static pink title row', () => {
+test('History remains anchored to the accepted Now Playing position', () => {
   assert.match(css, /\.now-playing\{[\s\S]*?position:relative!important/);
   assert.match(css, /\.section-topline\{[\s\S]*?position:static!important/);
   assert.match(css, /#historyToggle\{[\s\S]*?position:absolute!important;[\s\S]*?top:18px!important;[\s\S]*?right:22px!important/);
   assert.match(css, /\.s666-now-static-title\{[\s\S]*?max-width:100%!important;[\s\S]*?white-space:nowrap!important;[\s\S]*?text-overflow:ellipsis!important/);
 });
 
-test('cyan ticker uses the full remaining lane beside the cover and keeps the frame fixed', () => {
-  assert.match(css, /\.ticker-window\{[\s\S]*?grid-column:1 \/ -1!important;[\s\S]*?width:calc\(100% - \(clamp\(164px,12vw,198px\) \+ 14px\)\)!important/);
-  assert.match(css, /margin-left:calc\(clamp\(164px,12vw,198px\) \+ 14px\)!important/);
-  assert.match(css, /justify-self:start!important/);
-  assert.match(css, /overflow:hidden!important/);
-  assert.doesNotMatch(css, /grid-column:2 \/ -1!important/);
+test('visual repair does not own ticker geometry or marquee animation anymore', () => {
+  assert.doesNotMatch(css, /\.ticker-window\{/);
+  assert.doesNotMatch(css, /#nowPlayingTicker/);
+  assert.doesNotMatch(css, /s666MainTickerTravel/);
 });
 
-test('cyan ticker text stays visible and travels through the fixed lane without padding hacks', () => {
-  assert.match(css, /#nowPlayingTicker\.ticker-text[\s\S]*?position:absolute!important;[\s\S]*?top:50%!important;[\s\S]*?left:100%!important/);
-  assert.match(css, /width:max-content!important/);
-  assert.match(css, /min-width:max-content!important/);
-  assert.match(css, /padding-left:0!important/);
-  assert.match(css, /animation:s666MainTickerTravel 14s linear infinite!important/);
-  assert.match(css, /animation-delay:-3\.5s!important/);
-  assert.match(css, /will-change:left,transform!important/);
-  assert.match(css, /@keyframes s666MainTickerTravel\{[\s\S]*?0%\{left:100%;transform:translate\(0,-50%\)\}[\s\S]*?100%\{left:0;transform:translate\(-100%,-50%\)\}/);
-  assert.doesNotMatch(css, /padding-left:100%/);
-  assert.doesNotMatch(css, /left:-200%/);
+test('player-stage remains the single canonical desktop ticker owner', () => {
+  assert.match(stageCss, /\.now-playing \.ticker-window\{[\s\S]*?grid-column:2!important;[\s\S]*?grid-row:2!important;[\s\S]*?width:100%!important;[\s\S]*?height:44px!important/);
+  assert.match(stageCss, /\.now-playing :is\(#nowPlayingTicker,\.ticker-text\)\{[\s\S]*?animation:s666TitleMarquee 14s linear infinite!important/);
+  assert.match(stageCss, /grid-template-columns:138px minmax\(0,1fr\)!important/);
+  assert.match(stageCss, /\.now-playing \.ticker-window\{height:38px!important\}/);
+});
+
+test('DNA wave visual amplitude is capped without changing MeterBus or audio math', () => {
+  assert.match(css, /#pcLeftFxAddon \.pc-addon-waveform i\{[\s\S]*?max-height:68%!important/);
+  assert.doesNotMatch(css, /__MeterBus/);
+  assert.doesNotMatch(css, /AudioContext/);
 });
 
 test('closing either side panel no longer resizes or shifts the central player', () => {

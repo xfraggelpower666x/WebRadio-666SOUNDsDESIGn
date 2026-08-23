@@ -1,7 +1,8 @@
 /*
  * 666SOUNDsDESIGn — Main Player visual-only repair 2026-08-21
- * Scope: desktop History placement, cyan ticker marquee, side-FX close geometry, segmented side meters.
+ * Scope: desktop History placement, side-FX close geometry, segmented side meters, DNA-wave visual cap.
  * Hardlock: no Discord, Messenger, Skip, audio graph, EQ math, MeterBus, stream or Worker behavior changes.
+ * Ticker ownership: player-stage-v2.css only. No duplicate ticker geometry or animation in this layer.
  */
 
 @media (min-width:761px){
@@ -52,44 +53,10 @@
     overflow:auto!important;
   }
 
-  /* CYAN TICKER: full remaining lane beside the cover; frame fixed, canonical text moves. */
-  body[data-veluna-page="main"] .now-playing .ticker-window{
-    grid-column:1 / -1!important;
-    grid-row:2!important;
-    position:relative!important;
-    width:calc(100% - (clamp(164px,12vw,198px) + 14px))!important;
-    min-width:0!important;
-    max-width:none!important;
-    margin-left:calc(clamp(164px,12vw,198px) + 14px)!important;
-    margin-right:0!important;
-    justify-self:start!important;
-    box-sizing:border-box!important;
-    contain:layout paint!important;
-    overflow:hidden!important;
-  }
-  body[data-veluna-page="main"] .now-playing #nowPlayingTicker.ticker-text,
-  body[data-veluna-page="main"] .now-playing #nowPlayingTicker.ticker-text.s666-title-marquee{
-    position:absolute!important;
-    top:50%!important;
-    left:100%!important;
-    display:block!important;
-    width:max-content!important;
-    min-width:max-content!important;
-    max-width:none!important;
-    padding-left:0!important;
-    margin:0!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
-    text-overflow:clip!important;
-    transform:translate(0,-50%)!important;
-    animation:s666MainTickerTravel 14s linear infinite!important;
-    animation-delay:-3.5s!important;
-    animation-play-state:running!important;
-    will-change:left,transform!important;
-  }
-  @keyframes s666MainTickerTravel{
-    0%{left:100%;transform:translate(0,-50%)}
-    100%{left:0;transform:translate(-100%,-50%)}
+  /* DNA WAVE: visual limiter only. Runtime signal/MeterBus values remain untouched. */
+  body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform i{
+    max-height:68%!important;
+    transform-origin:center!important;
   }
 
   /* PANEL CLOSE: side FX may disappear, but the central player geometry is frozen. */
