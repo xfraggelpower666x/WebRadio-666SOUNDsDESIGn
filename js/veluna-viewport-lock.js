@@ -1,4 +1,4 @@
-/* VELUNA stable iPhone fullscreen geometry lock v1.3.1 */
+/* VELUNA stable iPhone fullscreen geometry lock v1.3.0 */
 (() => {
   'use strict';
 
