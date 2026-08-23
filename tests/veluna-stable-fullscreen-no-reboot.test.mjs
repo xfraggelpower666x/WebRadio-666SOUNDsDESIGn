@@ -13,7 +13,7 @@ test('VELUNA has one boot owner and no delayed UI splash', async () => {
 
 test('VELUNA iPhone uses one stable full-screen size per orientation', async () => {
   const lock = await read('js/veluna-viewport-lock.js');
-  assert.match(lock, /stable iPhone fullscreen geometry lock v1\.3\.1/);
+  assert.match(lock, /stable iPhone fullscreen geometry lock v1\.3\.0/);
   assert.match(lock, /100lvh/);
   assert.match(lock, /data-veluna-stable-fullscreen/);
   assert.match(lock, /state\.locked && state\.orientation === orientation/);
