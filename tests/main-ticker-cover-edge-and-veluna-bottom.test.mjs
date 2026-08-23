@@ -12,9 +12,14 @@ test('main ticker geometry measures the real cover edge relative to now-playing'
   assert.equal(read('public/js/main-veluna-adapter.js'),main);
 });
 
-test('VELUNA iPhone viewport owner reserves visible bottom space for meter and footer',()=>{
+test('VELUNA iPhone viewport owner shortens chrome while protecting the LYVRA display row',()=>{
   assert.match(viewport,/stable iPhone fullscreen geometry lock v1\.3\.0/);
-  assert.match(viewport,/--veluna-safe-player-bottom','max\(54px, calc\(env\(safe-area-inset-bottom\) \+ 24px\)\)'/);
-  assert.doesNotMatch(viewport,/--veluna-safe-player-bottom','max\(1px, calc\(env\(safe-area-inset-bottom\) - 12px\)\)'/);
+  assert.match(viewport,/Protect the LYVRA artwork\/title area; reclaim height from chrome, not from the display row/);
+  assert.match(viewport,/const displayMinimum = compact \? 150 : 188/);
+  assert.match(viewport,/--veluna-safe-player-bottom','max\(66px, calc\(env\(safe-area-inset-bottom\) \+ 30px\)\)'/);
+  assert.match(viewport,/clamp\(104px,14svh,148px\)/);
+  assert.match(viewport,/card\.style\.setProperty\('padding','5px','important'\)/);
+  assert.match(viewport,/miniGrid\.style\.setProperty\('min-height',compact \? '38px' : '42px','important'\)/);
+  assert.doesNotMatch(viewport,/--veluna-safe-player-bottom','max\(54px, calc\(env\(safe-area-inset-bottom\) \+ 24px\)\)'/);
   assert.equal(read('public/js/veluna-viewport-lock.js'),viewport);
 });
