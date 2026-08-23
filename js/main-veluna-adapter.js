@@ -1,4 +1,4 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.1
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.2
  * Adapts proven VELUNA measured-marquee + cyber boot to the existing main player.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
@@ -110,17 +110,26 @@
   }
 
   function installBootAfterCentralOwner(){
-    const started=Date.now();
-    let centralSeen=false;
-    function wait(){
+    let settled=false;
+    const centralScript=()=>Array.from(document.scripts).find(script=>String(script.src||'').includes('/js/central-boot-screen.js'))||null;
+    function finishAfterOwner(){
+      if(settled) return;
       const central=window.S666CentralBootScreen;
       const active=Boolean(central?.isActive?.()||document.documentElement.classList.contains('s666-central-boot-active')||q('#s666CentralBoot'));
-      if(central||active) centralSeen=true;
-      if(active){setTimeout(wait,120);return;}
-      if(!centralSeen&&Date.now()-started<5200){setTimeout(wait,120);return;}
-      installBoot();
+      if(active){setTimeout(finishAfterOwner,120);return;}
+      if(central){settled=true;installBoot();return;}
+      const script=centralScript();
+      if(!script&&document.readyState==='complete'){settled=true;installBoot();return;}
+      setTimeout(finishAfterOwner,120);
     }
-    wait();
+    const script=centralScript();
+    if(window.S666CentralBootScreen){finishAfterOwner();return;}
+    if(script){
+      script.addEventListener('load',finishAfterOwner,{once:true});
+      script.addEventListener('error',()=>{settled=true;installBoot();},{once:true});
+    }
+    window.addEventListener('load',finishAfterOwner,{once:true});
+    finishAfterOwner();
   }
 
   function boot(){installTicker();installBootAfterCentralOwner();}
