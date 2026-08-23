@@ -17,7 +17,7 @@ test('visual repair root/public mirrors remain byte-identical', () => {
 });
 
 test('shared bootstrap still loads the visual-only repair', () => {
-  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-22-cyan-ticker-wide-visible-marquee-v6'/);
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7'/);
   assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
 });
 
