@@ -140,64 +140,18 @@
 }
 
 /* 2026-08-23 VISUAL OWNER CONSOLIDATION BRIDGE
- * No new visual owner: this late repair layer only neutralizes legacy desktop.css wrappers
- * and restores the already-canonical player-stage-v2 ticker animation.
- * Audio graph, EQ, Boost, MeterBus, stream, Worker, Discord, Messenger and Skip stay untouched.
+ * Neutralizes legacy desktop.css wrapper reactivity only.
+ * No ticker selector or geometry is owned here.
  */
 @media (min-width:761px){
-  /* Stop legacy desktop.css from adding a second audio-reactive envelope around stage-owned visuals. */
-  html body[data-veluna-page="main"] .frame-stage::before{
-    opacity:.22!important;
-    filter:blur(8px) saturate(1.08)!important;
-    transform:none!important;
-    transition:none!important;
-  }
-  html body[data-veluna-page="main"] .now-cover-wrap{
-    filter:none!important;
-    transform:none!important;
-    box-shadow:0 0 18px rgba(22,255,243,.30),0 0 12px rgba(180,92,255,.18)!important;
-    transition:none!important;
-  }
-  html body[data-veluna-page="main"] .now-cover-wrap::before{
-    opacity:.22!important;
-    filter:blur(9px)!important;
-    transform:none!important;
-    transition:none!important;
-  }
-  html body[data-veluna-page="main"] .pc-header-logo-cell::before,
-  html body[data-veluna-page="main"] .pc-header-logo-cell-center::before{
-    opacity:.24!important;
-    filter:blur(12px)!important;
-    transform:none!important;
-    transition:none!important;
-  }
-  html body[data-veluna-page="main"] .pc-header-logo-center-666{
-    filter:none!important;
-    transform:none!important;
-    transition:none!important;
-  }
-  html body[data-veluna-page="main"] :is(#playBtn,.play-btn,button[aria-label="Play"],button[title="Play"])::before{
-    background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.34),rgba(142,69,255,.16) 46%,rgba(22,255,243,.08) 68%,transparent 80%)!important;
-    filter:blur(10px) saturate(1.06)!important;
-    opacity:.24!important;
-    transform:none!important;
-    transition:none!important;
-  }
-
-  /* Restore player-stage-v2's canonical ticker owner without touching ticker geometry. */
-  html body[data-veluna-page="main"] .frame-stage .player-shell>.now-playing .ticker-window #nowPlayingTicker.ticker-text.s666-title-marquee,
-  html body[data-veluna-page="main"] .frame-stage .player-shell>.now-playing .ticker-window #nowPlayingTicker.s666-title-marquee,
-  html body[data-veluna-page="main"] .frame-stage .player-shell>.now-playing .ticker-window .ticker-text.s666-title-marquee{
-    display:inline-block!important;
-    width:max-content!important;
-    min-width:100%!important;
-    padding-left:0!important;
-    padding-right:24px!important;
-    margin:0!important;
-    white-space:nowrap!important;
-    animation:s666TitleMarquee 14s linear infinite!important;
-    animation-delay:-2.5s!important;
-    animation-play-state:running!important;
-    will-change:transform!important;
-  }
+  html body[data-veluna-page="main"] .frame-stage::before{opacity:.22!important;filter:blur(8px) saturate(1.08)!important;transform:none!important;transition:none!important}
+  html body[data-veluna-page="main"] .now-cover-wrap{filter:none!important;transform:none!important;box-shadow:0 0 18px rgba(22,255,243,.30),0 0 12px rgba(180,92,255,.18)!important;transition:none!important}
+  html body[data-veluna-page="main"] .now-cover-wrap::before{opacity:.22!important;filter:blur(9px)!important;transform:none!important;transition:none!important}
+  html body[data-veluna-page="main"] .pc-header-logo-cell::before,html body[data-veluna-page="main"] .pc-header-logo-cell-center::before{opacity:.24!important;filter:blur(12px)!important;transform:none!important;transition:none!important}
+  html body[data-veluna-page="main"] .pc-header-logo-center-666{filter:none!important;transform:none!important;transition:none!important}
+  html body[data-veluna-page="main"] :is(#playBtn,.play-btn,button[aria-label="Play"],button[title="Play"])::before{background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.34),rgba(142,69,255,.16) 46%,rgba(22,255,243,.08) 68%,transparent 80%)!important;filter:blur(10px) saturate(1.06)!important;opacity:.24!important;transform:none!important;transition:none!important}
 }
+
+/* Legacy desktop.css references this animation name but shipped without keyframes.
+ * Compatibility definition only; no ticker selector/geometry ownership here. */
+@keyframes v73TickerRun{0%{transform:translate3d(100%,0,0)}100%{transform:translate3d(-100%,0,0)}}
