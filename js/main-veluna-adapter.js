@@ -1,4 +1,4 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.3
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.4
  * Adapts proven VELUNA measured-marquee + cyber boot to the existing main player.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
@@ -38,7 +38,21 @@
     return width;
   }
 
+  function syncTickerGeometry(){
+    const now=q('body[data-veluna-page="main"] .now-playing');
+    const cover=q('.now-cover-wrap',now||document);
+    if(!now) return;
+    let offset=0;
+    if(cover){
+      const style=getComputedStyle(cover);
+      const rect=cover.getBoundingClientRect();
+      if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8&&rect.height>8) offset=Math.ceil(rect.width+14);
+    }
+    now.style.setProperty('--s666-main-ticker-offset',offset+'px');
+  }
+
   function syncTickerMotion(){
+    syncTickerGeometry();
     const windowNode=q('body[data-veluna-page="main"] .now-playing .ticker-window');
     const ticker=q('#nowPlayingTicker',windowNode||document);
     if(!windowNode||!ticker) return;
@@ -52,10 +66,6 @@
     const itemWidth=measureTextWidth(ticker);
     const viewportWidth=Math.floor(windowNode.clientWidth||0);
     ticker.setAttribute('data-s666-marquee-text',text);
-    if(itemWidth<=Math.max(0,viewportWidth-24)){
-      ticker.classList.add('is-static');
-      return;
-    }
     const gapPadding=48;
     const separatorWidth=measureSeparatorWidth(ticker);
     const shift=itemWidth+gapPadding+separatorWidth;
@@ -72,7 +82,7 @@
     ticker.dataset.s666VelunaTicker='1';
     const observer=new MutationObserver(()=>requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion)));
     observer.observe(ticker,{childList:true,characterData:true,subtree:true});
-    window.addEventListener('resize',syncTickerMotion,{passive:true});
+    window.addEventListener('resize',()=>{syncTickerGeometry();syncTickerMotion();},{passive:true});
     requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion));
   }
 
