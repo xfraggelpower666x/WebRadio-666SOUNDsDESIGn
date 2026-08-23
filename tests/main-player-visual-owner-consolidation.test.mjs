@@ -53,7 +53,7 @@ test('player-stage-v2 wins the active header image cascade over legacy phase10',
 test('changed visual styles and main VELUNA adapter have fresh identities', () => {
   assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7'/);
   assert.match(bootstrap, /playerStageVersion = '2026-08-23-header-owner-cascade-v2'/);
-  assert.match(bootstrap, /mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v2'/);
+  assert.match(bootstrap, /mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4'/);
   assert.match(bootstrap, /main-veluna-adapter\.css\?v=\$\{mainVelunaAdapterVersion\}/);
   assert.match(bootstrap, /main-veluna-adapter\.js\?v=\$\{mainVelunaAdapterVersion\}/);
 });
