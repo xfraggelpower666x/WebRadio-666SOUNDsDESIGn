@@ -1,4 +1,4 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.4
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.5
  * Adapts proven VELUNA measured-marquee + cyber boot to the existing main player.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
@@ -45,8 +45,11 @@
     let offset=0;
     if(cover){
       const style=getComputedStyle(cover);
+      const nowRect=now.getBoundingClientRect();
       const rect=cover.getBoundingClientRect();
-      if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8&&rect.height>8) offset=Math.ceil(rect.width+14);
+      if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8&&rect.height>8){
+        offset=Math.max(0,Math.ceil(rect.right-nowRect.left+14));
+      }
     }
     now.style.setProperty('--s666-main-ticker-offset',offset+'px');
   }
@@ -64,7 +67,6 @@
     const text=(ticker.textContent||'').replace(/\s+/g,' ').trim();
     if(!text){ticker.classList.add('is-static');return;}
     const itemWidth=measureTextWidth(ticker);
-    const viewportWidth=Math.floor(windowNode.clientWidth||0);
     ticker.setAttribute('data-s666-marquee-text',text);
     const gapPadding=48;
     const separatorWidth=measureSeparatorWidth(ticker);
