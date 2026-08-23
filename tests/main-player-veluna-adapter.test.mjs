@@ -14,27 +14,33 @@ test('main VELUNA adapter root/public mirrors are byte-identical',()=>{
 });
 test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(headers,/\/config\/\*\n  Cache-Control: no-cache, must-revalidate/);
-  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v2'/);
+  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4'/);
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
-test('ticker adapts VELUNA measured static-vs-running behavior on the existing canonical element',()=>{
+test('main ticker uses VELUNA measured travel and always runs non-empty canonical text',()=>{
   assert.match(js,/measureTextWidth\(ticker\)/);
-  assert.match(js,/viewportWidth=Math\.floor\(windowNode\.clientWidth/);
-  assert.match(js,/itemWidth<=Math\.max\(0,viewportWidth-24\)/);
   assert.match(js,/measureSeparatorWidth\(ticker\)/);
   assert.match(js,/shift=itemWidth\+gapPadding\+separatorWidth/);
   assert.match(js,/Math\.max\(14,Math\.min\(42,shift\/34\)\)/);
+  assert.doesNotMatch(js,/itemWidth<=Math\.max\(0,viewportWidth-24\)/);
+  assert.match(js,/ticker\.classList\.add\('is-running'\)/);
   assert.match(js,/MutationObserver/);
   assert.match(css,/#nowPlayingTicker\.s666-veluna-main-ticker\.is-running/);
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
   assert.doesNotMatch(js,/createElement\(['"](?:div|span)['"]\).*nowPlayingTicker/);
 });
-test('cyber boot waits fail-closed for the actual central boot script owner',()=>{
+test('main ticker lane expands dynamically when the cover is not visibly occupying column one',()=>{
+  assert.match(js,/function syncTickerGeometry\(\)/);
+  assert.match(js,/getComputedStyle\(cover\)/);
+  assert.match(js,/rect\.width>8&&rect\.height>8/);
+  assert.match(js,/--s666-main-ticker-offset/);
+  assert.match(css,/grid-column:1\/-1!important/);
+  assert.match(css,/width:calc\(100% - var\(--s666-main-ticker-offset,0px\)\)!important/);
+  assert.match(css,/margin-left:var\(--s666-main-ticker-offset,0px\)!important/);
+});
+test('cyber boot waits fail-closed for the persistent central boot load state',()=>{
   assert.match(js,/installBootAfterCentralOwner/);
-  assert.match(bootstrap,/__S666_CENTRAL_BOOT_LOAD_STATE__ = window\.S666CentralBootScreen \? 'loaded' : 'pending'/);
-  assert.match(bootstrap,/__S666_CENTRAL_BOOT_LOAD_STATE__ = 'loaded'/);
-  assert.match(bootstrap,/__S666_CENTRAL_BOOT_LOAD_STATE__ = 'error'/);
   assert.match(js,/window\.S666CentralBootScreen/);
   assert.match(js,/central\?\.isActive\?\.\(\)/);
   assert.match(js,/s666-central-boot-active/);
@@ -42,14 +48,15 @@ test('cyber boot waits fail-closed for the actual central boot script owner',()=
   assert.match(js,/__S666_CENTRAL_BOOT_LOAD_STATE__/);
   assert.match(js,/loadState==='error'/);
   assert.match(js,/loadState==='loaded'/);
-  assert.doesNotMatch(js,/5200|Date\.now\(\)-started|centralScript=/);
+  assert.doesNotMatch(js,/centralScript=|5200|Date\.now\(\)-started/);
   assert.match(js,/const play=q\('#playBtn'\)/);
   assert.match(js,/play\.click\(\)/);
   assert.match(js,/audio\.addEventListener\('playing',success/);
   assert.doesNotMatch(js,/new AudioContext|webkitAudioContext|createMediaElementSource|fetch\(/);
 });
-test('only DNA wave reactor and phase are visually amplified using stage variables',()=>{
-  assert.match(css,/#pcLeftFxAddon \.pc-addon-waveform i/);
+test('DNA wave stays contained while reactor and phase keep strong stage-driven reactivity',()=>{
+  assert.match(css,/#pcLeftFxAddon \.pc-addon-waveform\{overflow:hidden!important;align-items:flex-end!important\}/);
+  assert.match(css,/#pcLeftFxAddon \.pc-addon-waveform i\{max-height:calc\(100% - 6px\)!important;min-height:7%!important;transform:none!important;transform-origin:bottom!important/);
   assert.match(css,/#pcLeftFxAddon \.pc-addon-reactor-core/);
   assert.match(css,/#pcRightFxAddon \.pc-addon-phase/);
   assert.match(css,/--s666-stage-pulse/);
