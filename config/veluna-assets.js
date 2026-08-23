@@ -28,7 +28,7 @@ window.VELUNA_ASSETS = Object.freeze({
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
   const mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7';
   const playerStageVersion = '2026-08-23-header-owner-cascade-v2';
-  const mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v1';
+  const mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v2';
   const head = document.head || document.documentElement;
   if (!head) return;
 
@@ -158,11 +158,16 @@ window.VELUNA_ASSETS = Object.freeze({
    * Zusätzlich setzt der Owner die routenspezifische PWA-/Lockscreen-Identität.
    */
   loadStyle(`/css/central-boot-screen.css?v=${bootVersion}`, 'smfpCentralRadioBoot');
+  window.__S666_CENTRAL_BOOT_LOAD_STATE__ = window.S666CentralBootScreen ? 'loaded' : 'pending';
   void loadCurrentScript(
     `/js/central-boot-screen.js?v=${bootVersion}`,
     'smfpCentralRadioBoot',
     () => !!window.S666CentralBootScreen
-  ).catch(() => {});
+  ).then(() => {
+    window.__S666_CENTRAL_BOOT_LOAD_STATE__ = 'loaded';
+  }).catch(() => {
+    window.__S666_CENTRAL_BOOT_LOAD_STATE__ = 'error';
+  });
 
   loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
