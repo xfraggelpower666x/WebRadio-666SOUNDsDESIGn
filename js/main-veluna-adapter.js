@@ -119,8 +119,7 @@
       if(active){setTimeout(finishAfterOwner,120);return;}
       if(central){settled=true;installBoot();return;}
       const script=centralScript();
-      if(document.readyState==='complete'&&!script){settled=true;installBoot();return;}
-      if(document.readyState==='complete'&&script&&!window.S666CentralBootScreen){settled=true;installBoot();return;}
+      if(!script&&document.readyState==='complete'){settled=true;installBoot();return;}
       setTimeout(finishAfterOwner,120);
     }
     const script=centralScript();
