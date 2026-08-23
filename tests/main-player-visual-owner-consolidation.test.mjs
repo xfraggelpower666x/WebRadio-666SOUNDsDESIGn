@@ -6,12 +6,18 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const css = read('css/main-player-visual-repair-20260821.css');
 const publicCss = read('public/css/main-player-visual-repair-20260821.css');
 const stageCss = read('css/player-stage-v2.css');
+const publicStageCss = read('public/css/player-stage-v2.css');
 const stageJs = read('js/player-stage-v2.js');
 const equalizer = read('js/equalizer.js');
+const phase10Css = read('css/phase10-stability-iphone-panel-hud.css');
+const bootstrap = read('config/veluna-assets.js');
+const publicBootstrap = read('public/config/veluna-assets.js');
 const index = read('index.html');
 
-test('visual repair mirrors remain identical', () => {
+test('visual repair, player stage and bootstrap mirrors remain identical', () => {
   assert.equal(publicCss, css);
+  assert.equal(publicStageCss, stageCss);
+  assert.equal(publicBootstrap, bootstrap);
 });
 
 test('legacy wrapper reactivity is neutralized without audio mutation', () => {
@@ -35,7 +41,23 @@ test('active single-logo wrapper cannot remain a legacy audio-reactive owner', (
   assert.doesNotMatch(wrapperRule, /--pc-audio-energy/);
   assert.match(stageJs, /image\.classList\.add\('s666-main-header-image'\);normalizeHeaderImage\(image\)/);
   assert.match(stageJs, /image\.classList\.add\('s666-canonical-header-image'\)/);
-  assert.match(stageCss, /\.s666-canonical-header-image\{[^}]*var\(--s666-stage-mid\)[^}]*var\(--s666-stage-high\)/);
+});
+
+test('player-stage-v2 wins the active header image cascade over legacy phase10', () => {
+  assert.match(phase10Css, /#pcHeaderNewLogo\{[^}]*transform:none!important;[^}]*filter:[^}]*!important/);
+  const stageHeaderRule = stageCss.match(/body\[data-veluna-page="main"\] #pcHeaderNewLogo\.s666-canonical-header-image\.s666-main-header-image\{([^}]*)\}/)?.[1] || '';
+  assert.match(stageHeaderRule, /transform:[^;]*var\(--s666-stage-mid\)[^;]*var\(--s666-stage-high\)[^;]*!important/);
+  assert.match(stageHeaderRule, /filter:[^;]*var\(--s666-stage-high\)[^;]*var\(--s666-stage-mid\)[^;]*var\(--s666-stage-peak\)[^;]*!important/);
+  assert.match(stageHeaderRule, /transform-origin:center!important/);
+  assert.match(stageHeaderRule, /will-change:transform,filter!important/);
+});
+
+test('changed visual styles receive fresh cache identities', () => {
+  assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7'/);
+  assert.match(bootstrap, /playerStageVersion = '2026-08-23-header-owner-cascade-v2'/);
+  assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
+  assert.match(bootstrap, /link\[href\*=\"\/css\/player-stage-v2\.css\"\]/);
+  assert.match(bootstrap, /existingPlayerStage\.href = `\/css\/player-stage-v2\.css\?v=\$\{playerStageVersion\}`/);
 });
 
 test('visual repair owns no ticker selector but repairs the missing legacy keyframes', () => {
