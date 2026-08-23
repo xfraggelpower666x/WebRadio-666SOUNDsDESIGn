@@ -15,3 +15,6 @@
 
 /css/*
   Cache-Control: no-cache, must-revalidate
+
+/config/*
+  Cache-Control: no-cache, must-revalidate

@@ -28,6 +28,7 @@ window.VELUNA_ASSETS = Object.freeze({
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
   const mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7';
   const playerStageVersion = '2026-08-23-header-owner-cascade-v2';
+  const mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v1';
   const head = document.head || document.documentElement;
   if (!head) return;
 
@@ -169,6 +170,8 @@ window.VELUNA_ASSETS = Object.freeze({
   loadStyle(`/css/main-player-visual-repair-20260821.css?v=${mainVisualRepairVersion}`, 's666MainVisualRepair');
   const existingPlayerStage = document.querySelector('link[href*="/css/player-stage-v2.css"]');
   if (existingPlayerStage) existingPlayerStage.href = `/css/player-stage-v2.css?v=${playerStageVersion}`;
+  loadStyle(`/css/main-veluna-adapter.css?v=${mainVelunaAdapterVersion}`, 's666MainVelunaAdapter');
+  void loadScript(`/js/main-veluna-adapter.js?v=${mainVelunaAdapterVersion}`, 's666MainVelunaAdapter', () => !!window.__S666_MAIN_VELUNA_ADAPTER__).catch(() => {});
 
   const activateOverlay = () => {
     try {

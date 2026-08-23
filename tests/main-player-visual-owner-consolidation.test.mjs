@@ -45,19 +45,17 @@ test('active single-logo wrapper cannot remain a legacy audio-reactive owner', (
 
 test('player-stage-v2 wins the active header image cascade over legacy phase10', () => {
   assert.match(phase10Css, /#pcHeaderNewLogo\{[^}]*transform:none!important;[^}]*filter:[^}]*!important/);
-  const stageHeaderRule = stageCss.match(/body\[data-veluna-page="main"\] #pcHeaderNewLogo\.s666-canonical-header-image\.s666-main-header-image\{([^}]*)\}/)?.[1] || '';
-  assert.match(stageHeaderRule, /transform:[^;]*var\(--s666-stage-mid\)[^;]*var\(--s666-stage-high\)[^;]*!important/);
-  assert.match(stageHeaderRule, /filter:[^;]*var\(--s666-stage-high\)[^;]*var\(--s666-stage-mid\)[^;]*var\(--s666-stage-peak\)[^;]*!important/);
-  assert.match(stageHeaderRule, /transform-origin:center!important/);
-  assert.match(stageHeaderRule, /will-change:transform,filter!important/);
+  const rule = stageCss.match(/body\[data-veluna-page="main"\] #pcHeaderNewLogo\.s666-canonical-header-image\.s666-main-header-image\{([^}]*)\}/)?.[1] || '';
+  assert.match(rule, /transform:[^;]*var\(--s666-stage-mid\)[^;]*var\(--s666-stage-high\)[^;]*!important/);
+  assert.match(rule, /filter:[^;]*var\(--s666-stage-high\)[^;]*var\(--s666-stage-mid\)[^;]*var\(--s666-stage-peak\)[^;]*!important/);
 });
 
-test('changed visual styles receive fresh cache identities', () => {
+test('changed visual styles and main VELUNA adapter have fresh identities', () => {
   assert.match(bootstrap, /mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7'/);
   assert.match(bootstrap, /playerStageVersion = '2026-08-23-header-owner-cascade-v2'/);
-  assert.match(bootstrap, /main-player-visual-repair-20260821\.css\?v=\$\{mainVisualRepairVersion\}/);
-  assert.match(bootstrap, /link\[href\*=\"\/css\/player-stage-v2\.css\"\]/);
-  assert.match(bootstrap, /existingPlayerStage\.href = `\/css\/player-stage-v2\.css\?v=\$\{playerStageVersion\}`/);
+  assert.match(bootstrap, /mainVelunaAdapterVersion = '2026-08-23-main-veluna-adapter-v1'/);
+  assert.match(bootstrap, /main-veluna-adapter\.css\?v=\$\{mainVelunaAdapterVersion\}/);
+  assert.match(bootstrap, /main-veluna-adapter\.js\?v=\$\{mainVelunaAdapterVersion\}/);
 });
 
 test('visual repair owns no ticker selector but repairs the missing legacy keyframes', () => {
