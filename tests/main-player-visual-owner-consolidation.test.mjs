@@ -15,7 +15,10 @@ test('visual repair mirrors remain identical', () => {
 
 test('legacy wrapper reactivity is neutralized without audio mutation', () => {
   assert.match(css, /VISUAL OWNER CONSOLIDATION BRIDGE/);
-  assert.match(css, /\.frame-stage::before\{[^}]*transition:none!important/);
+  const frameRule = css.match(/\.frame-stage::before\{([^}]*)\}/)?.[1] || '';
+  assert.match(frameRule, /background:radial-gradient/);
+  assert.doesNotMatch(frameRule, /--pc-audio-energy/);
+  assert.match(frameRule, /transition:none!important/);
   assert.match(css, /\.now-cover-wrap\{[^}]*filter:none!important;[^}]*transition:none!important/);
   assert.match(stageJs, /function driveReactiveVisuals/);
   assert.match(equalizer, /window\.__MeterBus\s*=\s*\{/);
