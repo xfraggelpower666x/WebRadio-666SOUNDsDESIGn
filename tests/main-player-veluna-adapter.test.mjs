@@ -30,12 +30,18 @@ test('ticker adapts VELUNA measured static-vs-running behavior on the existing c
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
   assert.doesNotMatch(js,/createElement\(['"](?:div|span)['"]\).*nowPlayingTicker/);
 });
-test('cyber boot waits for central boot owner then delegates only to existing main play authority',()=>{
+test('cyber boot waits fail-closed for the actual central boot script owner',()=>{
   assert.match(js,/installBootAfterCentralOwner/);
+  assert.match(js,/centralScript=.*central-boot-screen\.js/);
   assert.match(js,/window\.S666CentralBootScreen/);
   assert.match(js,/central\?\.isActive\?\.\(\)/);
   assert.match(js,/s666-central-boot-active/);
   assert.match(js,/#s666CentralBoot/);
+  assert.match(js,/script\.addEventListener\('load',finishAfterOwner/);
+  assert.match(js,/script\.addEventListener\('error'/);
+  assert.match(js,/!script&&document\.readyState==='complete'/);
+  assert.doesNotMatch(js,/5200|Date\.now\(\)-started/);
+  assert.doesNotMatch(js,/document\.readyState==='complete'&&script&&!window\.S666CentralBootScreen/);
   assert.match(js,/const play=q\('#playBtn'\)/);
   assert.match(js,/play\.click\(\)/);
   assert.match(js,/audio\.addEventListener\('playing',success/);
