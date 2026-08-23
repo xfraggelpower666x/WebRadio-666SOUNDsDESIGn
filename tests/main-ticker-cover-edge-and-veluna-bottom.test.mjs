@@ -13,7 +13,7 @@ test('main ticker geometry measures the real cover edge relative to now-playing'
 });
 
 test('VELUNA iPhone viewport owner reserves visible bottom space for meter and footer',()=>{
-  assert.match(viewport,/stable iPhone fullscreen geometry lock v1\.3\.1/);
+  assert.match(viewport,/stable iPhone fullscreen geometry lock v1\.3\.0/);
   assert.match(viewport,/--veluna-safe-player-bottom','max\(54px, calc\(env\(safe-area-inset-bottom\) \+ 24px\)\)'/);
   assert.doesNotMatch(viewport,/--veluna-safe-player-bottom','max\(1px, calc\(env\(safe-area-inset-bottom\) - 12px\)\)'/);
   assert.equal(read('public/js/veluna-viewport-lock.js'),viewport);
