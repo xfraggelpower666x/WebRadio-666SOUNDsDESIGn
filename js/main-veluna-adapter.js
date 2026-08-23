@@ -1,4 +1,4 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.0
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.1
  * Adapts proven VELUNA measured-marquee + cyber boot to the existing main player.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
@@ -9,7 +9,6 @@
   if(document.body?.dataset?.velunaPage!=='main') return;
 
   const q=(s,r=document)=>r.querySelector(s);
-  const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||0));
 
   function measureTextWidth(node){
     if(!node) return 0;
@@ -21,6 +20,22 @@
       if(width>0) return Math.ceil(width);
     }catch(_){ }
     return Math.ceil(node.scrollWidth||node.getBoundingClientRect().width||0);
+  }
+
+  function measureSeparatorWidth(ticker){
+    if(!ticker) return 0;
+    const probe=document.createElement('span');
+    const style=getComputedStyle(ticker);
+    probe.textContent=' ◆ ';
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;left:-10000px;top:-10000px;visibility:hidden;white-space:nowrap;pointer-events:none;';
+    probe.style.font=style.font;
+    probe.style.letterSpacing=style.letterSpacing;
+    probe.style.fontKerning=style.fontKerning;
+    document.body.appendChild(probe);
+    const width=Math.ceil(probe.getBoundingClientRect().width||probe.scrollWidth||0);
+    probe.remove();
+    return width;
   }
 
   function syncTickerMotion(){
@@ -41,8 +56,9 @@
       ticker.classList.add('is-static');
       return;
     }
-    const gapWidth=48;
-    const shift=itemWidth+gapWidth;
+    const gapPadding=48;
+    const separatorWidth=measureSeparatorWidth(ticker);
+    const shift=itemWidth+gapPadding+separatorWidth;
     const duration=Math.max(14,Math.min(42,shift/34));
     ticker.style.setProperty('--ticker-shift',shift+'px');
     ticker.style.setProperty('--ticker-duration',duration.toFixed(2)+'s');
@@ -93,7 +109,21 @@
     });
   }
 
-  function boot(){installTicker();installBoot();}
+  function installBootAfterCentralOwner(){
+    const started=Date.now();
+    let centralSeen=false;
+    function wait(){
+      const central=window.S666CentralBootScreen;
+      const active=Boolean(central?.isActive?.()||document.documentElement.classList.contains('s666-central-boot-active')||q('#s666CentralBoot'));
+      if(central||active) centralSeen=true;
+      if(active){setTimeout(wait,120);return;}
+      if(!centralSeen&&Date.now()-started<5200){setTimeout(wait,120);return;}
+      installBoot();
+    }
+    wait();
+  }
+
+  function boot(){installTicker();installBootAfterCentralOwner();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',boot,{once:true});
+  window.addEventListener('load',()=>{installTicker();},{once:true});
 })();
