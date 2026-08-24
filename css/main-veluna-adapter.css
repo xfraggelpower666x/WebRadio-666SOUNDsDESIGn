@@ -1,17 +1,64 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.4
- * Single existing ticker element; boot delegates to existing play authority.
- * DNA effects consume canonical player-stage CSS variables only.
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.0
+ * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
+ * No legacy main cyber-boot CSS remains here.
  */
 @keyframes s666VelunaMainTicker{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--ticker-shift,500px)),0,0)}}
 @media (min-width:761px){
-  body[data-veluna-page="main"] .now-playing .ticker-window{grid-column:1/-1!important;grid-row:2!important;width:calc(100% - var(--s666-main-ticker-offset,0px))!important;min-width:0!important;max-width:none!important;margin-left:var(--s666-main-ticker-offset,0px)!important;margin-right:0!important;justify-self:start!important;overflow:hidden!important;contain:layout paint!important}
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{position:relative!important;left:auto!important;display:inline-block!important;width:max-content!important;min-width:0!important;max-width:none!important;padding:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;animation:none!important;will-change:transform!important}
+  body[data-veluna-page="main"] .now-playing{position:relative!important;isolation:isolate!important}
+  body[data-veluna-page="main"] .now-playing .now-cover-wrap{position:relative!important;z-index:3!important}
+  body[data-veluna-page="main"] .now-playing .section-topline{position:relative!important;z-index:5!important}
+  body[data-veluna-page="main"] .now-playing #historyToggle{position:relative!important;z-index:7!important}
+  body[data-veluna-page="main"] .now-playing #historyPanel{z-index:12!important}
+
+  body[data-veluna-page="main"] .now-playing .ticker-window{
+    grid-column:1/-1!important;
+    grid-row:2!important;
+    width:var(--s666-main-ticker-width,calc(100% - 220px))!important;
+    min-width:96px!important;
+    max-width:none!important;
+    margin-left:var(--s666-main-ticker-left,0px)!important;
+    margin-right:var(--s666-main-ticker-right,0px)!important;
+    justify-self:start!important;
+    position:relative!important;
+    z-index:2!important;
+    overflow:hidden!important;
+    isolation:isolate!important;
+    contain:paint!important;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{
+    position:relative!important;
+    left:auto!important;
+    z-index:1!important;
+    display:inline-block!important;
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:0!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    animation:none!important;
+    will-change:transform!important;
+    transform:translate3d(0,0,0);
+  }
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;transform:none!important}
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running{animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{
+    content:" ◆ " attr(data-s666-marquee-text);
+    display:inline-block!important;
+    padding-left:48px!important;
+    color:inherit!important;
+    text-shadow:inherit!important;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{
+    animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{
+    animation:none!important;
+  }
 
   /* Only the three owner-approved DNA modules are amplified. */
-  body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform{overflow:hidden!important;align-items:flex-end!important}body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform i{max-height:calc(100% - 6px)!important;min-height:7%!important;transform:none!important;transform-origin:bottom!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.72)) saturate(calc(1.12 + var(--s666-stage-mid)*.58)) drop-shadow(0 0 calc(4px + var(--s666-stage-pulse)*12px) rgba(22,255,243,.58))!important;opacity:calc(.42 + var(--s666-stage-level)*.50)!important}
+  body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform{overflow:hidden!important;align-items:flex-end!important}
+  body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform i{max-height:calc(100% - 6px)!important;min-height:7%!important;transform:none!important;transform-origin:bottom!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.72)) saturate(calc(1.12 + var(--s666-stage-mid)*.58)) drop-shadow(0 0 calc(4px + var(--s666-stage-pulse)*12px) rgba(22,255,243,.58))!important;opacity:calc(.42 + var(--s666-stage-level)*.50)!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-core{transform:scale(calc(.90 + var(--s666-stage-low)*.22 + var(--s666-stage-pulse)*.14)) rotate(calc(var(--s666-stage-mid)*28deg))!important;filter:brightness(calc(1.02 + var(--s666-stage-low)*.78 + var(--s666-stage-pulse)*.34)) saturate(calc(1.18 + var(--s666-stage-mid)*.92)) drop-shadow(0 0 calc(9px + var(--s666-stage-peak)*25px) rgba(255,61,187,.58))!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-wave{opacity:calc(.42 + var(--s666-stage-level)*.34 + var(--s666-stage-pulse)*.22)!important;filter:brightness(calc(1.05 + var(--s666-stage-pulse)*.82)) drop-shadow(0 0 calc(10px + var(--s666-stage-peak)*24px) rgba(255,61,187,.68))!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-dot{transform:scale(calc(.86 + var(--s666-stage-pulse)*.72 + var(--s666-stage-peak)*.24))!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.84)) saturate(1.42)!important}
@@ -20,11 +67,3 @@
   body[data-veluna-page="main"] #pcRightFxAddon .phase-line{height:5px!important;opacity:calc(.58 + var(--s666-stage-pulse)*.38)!important;filter:brightness(calc(1.10 + var(--s666-stage-peak)*.72)) saturate(calc(1.42 + var(--s666-stage-mid)*.70))!important;box-shadow:0 0 calc(12px + var(--s666-stage-peak)*28px) rgba(255,61,187,.62),0 0 calc(10px + var(--s666-stage-level)*24px) rgba(22,255,243,.48)!important}
   body[data-veluna-page="main"] #pcRightFxAddon .phase-cloud{opacity:calc(.48 + var(--s666-stage-level)*.44)!important;filter:saturate(calc(1.42 + var(--s666-stage-mid)*.88)) brightness(calc(1.02 + var(--s666-stage-peak)*.54))!important;border-color:rgba(255,61,187,calc(.30 + var(--s666-stage-peak)*.54))!important;box-shadow:0 0 calc(12px + var(--s666-stage-level)*30px) rgba(255,61,187,.40),inset 0 0 calc(10px + var(--s666-stage-peak)*22px) rgba(22,255,243,.28)!important}
 }
-.s666-main-cyber-boot{position:fixed;inset:0;z-index:2147483300;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));background:radial-gradient(circle at 50% 44%,rgba(180,92,255,.18),transparent 38%),radial-gradient(circle at 50% 58%,rgba(22,255,243,.13),transparent 44%),rgba(0,0,0,.965);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:1;transition:opacity .35s ease}
-.s666-main-cyber-boot.is-complete{opacity:0;pointer-events:none}
-.s666-main-cyber-boot-panel{width:min(92vw,560px);padding:26px 24px;border:1px solid rgba(22,255,243,.62);border-radius:20px;background:linear-gradient(180deg,rgba(12,18,38,.985),rgba(4,7,20,.99));box-shadow:0 0 34px rgba(22,255,243,.24),0 0 40px rgba(180,92,255,.24),inset 0 0 28px rgba(255,61,187,.06);text-align:center;color:#eaffff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.s666-main-cyber-boot-title{font-size:clamp(16px,3.4vw,25px);font-weight:950;letter-spacing:.10em;color:#16fff3;text-shadow:0 0 14px rgba(22,255,243,.62)}
-.s666-main-cyber-boot-sub{margin-top:7px;color:#d7a7ff;font-size:clamp(9px,1.8vw,12px);font-weight:800;letter-spacing:.14em}
-.s666-main-cyber-boot-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:20px 0 18px}.s666-main-cyber-boot-grid span{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid rgba(22,255,243,.22);border-radius:9px;background:rgba(255,255,255,.025);font-size:10px;color:#9bb8c8}.s666-main-cyber-boot-grid b{color:#ff63cf;text-shadow:0 0 8px rgba(255,61,187,.54)}
-#s666MainCyberBootStart{min-width:180px!important;height:44px!important;border:1px solid rgba(22,255,243,.66)!important;border-radius:12px!important;background:linear-gradient(135deg,rgba(180,92,255,.38),rgba(22,139,255,.26)),#071020!important;color:#fff!important;font-weight:950!important;letter-spacing:.10em!important;box-shadow:0 0 18px rgba(22,255,243,.28),0 0 20px rgba(180,92,255,.24)!important;cursor:pointer!important}
-#s666MainCyberBootStart:disabled{opacity:.58!important;cursor:wait!important}.s666-main-cyber-boot #s666MainCyberBootState{min-height:1.2em;margin-top:12px;color:#ff72d7;font-size:10px;font-weight:800;letter-spacing:.06em}
