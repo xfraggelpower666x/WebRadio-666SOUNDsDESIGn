@@ -1,6 +1,6 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.5
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.6
  * Adapts the proven VELUNA measured-marquee to the existing main player.
- * The shared central boot screen is the sole boot owner; no second audio-confirmation boot is created here.
+ * The exact shared VELUNA Central Boot Screen is reused on Main; no second audio-confirmation boot is created here.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
 (function(){
@@ -10,6 +10,30 @@
   if(document.body?.dataset?.velunaPage!=='main') return;
 
   const q=(s,r=document)=>r.querySelector(s);
+  const CENTRAL_BOOT_SRC='/js/central-boot-screen.js?v=20260812-v200';
+
+  function ensureVelunaCentralBoot(){
+    const showExisting=()=>{
+      const central=window.S666CentralBootScreen;
+      if(!central) return false;
+      if(!central.isActive?.()) central.show?.().catch?.(()=>{});
+      return true;
+    };
+    if(showExisting()) return;
+
+    const existing=Array.from(document.scripts).find(script=>String(script.src||'').includes('/js/central-boot-screen.js'));
+    if(existing){
+      existing.addEventListener('load',()=>showExisting(),{once:true});
+      return;
+    }
+
+    const script=document.createElement('script');
+    script.src=CENTRAL_BOOT_SRC;
+    script.async=false;
+    script.dataset.s666MainVelunaCentralBoot='1';
+    script.addEventListener('load',()=>showExisting(),{once:true});
+    (document.head||document.documentElement).appendChild(script);
+  }
 
   function measureTextWidth(node){
     if(!node) return 0;
@@ -89,7 +113,7 @@
     requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion));
   }
 
-  function boot(){installTicker();}
+  function boot(){ensureVelunaCentralBoot();installTicker();}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',()=>{installTicker();},{once:true});
+  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();},{once:true});
 })();
