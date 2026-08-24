@@ -1,7 +1,8 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.0
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.1
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and History control so idle/play states share one lane.
+ * Marquee motion uses the independent CSS translate property so legacy transform:none!important cannot suppress motion.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
 (function(){
@@ -18,8 +19,6 @@
   function ensureVelunaCentralBoot(){
     const central=window.S666CentralBootScreen;
     if(central){
-      // bootOnce() is idempotent inside the shared VELUNA owner. This repairs cases where
-      // Main receives the owner object but the automatic sequence was not started yet.
       try{central.bootOnce?.();}catch(_){}
       return;
     }
@@ -113,7 +112,7 @@
     if(typeof ticker.animate==='function'){
       try{
         tickerAnimation=ticker.animate(
-          [{transform:'translate3d(0,0,0)'},{transform:`translate3d(-${shift}px,0,0)`}],
+          [{translate:'0 0'},{translate:`-${shift}px 0`}],
           {duration:Math.round(duration*1000),iterations:Infinity,easing:'linear'}
         );
         tickerAnimation.id='s666-main-marquee';
