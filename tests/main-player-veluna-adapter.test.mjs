@@ -40,13 +40,18 @@ test('main ticker lane expands dynamically when the cover is not visibly occupyi
   assert.match(css,/width:calc\(100% - var\(--s666-main-ticker-offset,0px\)\)!important/);
   assert.match(css,/margin-left:var\(--s666-main-ticker-offset,0px\)!important/);
 });
-test('shared central cyber boot is the sole automatic boot owner for the main player',()=>{
+test('main explicitly reuses the exact shared VELUNA central cyber boot',()=>{
   assert.match(centralBoot,/CYBER BOOTING/);
   assert.match(centralBoot,/CONNECTING RADIO CORE/);
   assert.match(centralBoot,/STARTING AUDIO PATH/);
   assert.match(centralBoot,/SYNCHRONIZING SYSTEMS/);
   assert.match(centralBoot,/PLAYER SEQUENCE ARMED/);
   assert.match(centralBoot,/requestAnimationFrame\(tick\)/);
+  assert.match(js,/function ensureVelunaCentralBoot\(\)/);
+  assert.match(js,/S666CentralBootScreen/);
+  assert.match(js,/\/js\/central-boot-screen\.js\?v=20260812-v200/);
+  assert.match(js,/central\.isActive\?\.\(\)/);
+  assert.match(js,/central\.show\?\.\(\)/);
   assert.doesNotMatch(js,/installBootAfterCentralOwner/);
   assert.doesNotMatch(js,/s666MainCyberBoot/);
   assert.doesNotMatch(js,/START AUDIO/);
