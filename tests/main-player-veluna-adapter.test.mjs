@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(p,'utf8');
 const js=read('js/main-veluna-adapter.js');
 const css=read('css/main-veluna-adapter.css');
+const centralBoot=read('js/central-boot-screen.js');
 const headers=read('_headers');
 const bootstrap=read('config/veluna-assets.js');
 
@@ -39,19 +40,18 @@ test('main ticker lane expands dynamically when the cover is not visibly occupyi
   assert.match(css,/width:calc\(100% - var\(--s666-main-ticker-offset,0px\)\)!important/);
   assert.match(css,/margin-left:var\(--s666-main-ticker-offset,0px\)!important/);
 });
-test('cyber boot waits fail-closed for the persistent central boot load state',()=>{
-  assert.match(js,/installBootAfterCentralOwner/);
-  assert.match(js,/window\.S666CentralBootScreen/);
-  assert.match(js,/central\?\.isActive\?\.\(\)/);
-  assert.match(js,/s666-central-boot-active/);
-  assert.match(js,/#s666CentralBoot/);
-  assert.match(js,/__S666_CENTRAL_BOOT_LOAD_STATE__/);
-  assert.match(js,/loadState==='error'/);
-  assert.match(js,/loadState==='loaded'/);
-  assert.doesNotMatch(js,/centralScript=|5200|Date\.now\(\)-started/);
-  assert.match(js,/const play=q\('#playBtn'\)/);
-  assert.match(js,/play\.click\(\)/);
-  assert.match(js,/audio\.addEventListener\('playing',success/);
+test('shared central cyber boot is the sole automatic boot owner for the main player',()=>{
+  assert.match(centralBoot,/CYBER BOOTING/);
+  assert.match(centralBoot,/CONNECTING RADIO CORE/);
+  assert.match(centralBoot,/STARTING AUDIO PATH/);
+  assert.match(centralBoot,/SYNCHRONIZING SYSTEMS/);
+  assert.match(centralBoot,/PLAYER SEQUENCE ARMED/);
+  assert.match(centralBoot,/requestAnimationFrame\(tick\)/);
+  assert.doesNotMatch(js,/installBootAfterCentralOwner/);
+  assert.doesNotMatch(js,/s666MainCyberBoot/);
+  assert.doesNotMatch(js,/START AUDIO/);
+  assert.doesNotMatch(js,/USER GESTURE REQUIRED/);
+  assert.doesNotMatch(js,/play\.click\(\)/);
   assert.doesNotMatch(js,/new AudioContext|webkitAudioContext|createMediaElementSource|fetch\(/);
 });
 test('DNA wave stays contained while reactor and phase keep strong stage-driven reactivity',()=>{
