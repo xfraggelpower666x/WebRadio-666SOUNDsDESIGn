@@ -19,28 +19,35 @@ test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
-test('main ticker uses VELUNA measured travel and always runs non-empty canonical text',()=>{
+test('main ticker uses one measured lane and a deterministic animation driver',()=>{
   assert.match(js,/measureTextWidth\(ticker\)/);
   assert.match(js,/measureSeparatorWidth\(ticker\)/);
-  assert.match(js,/shift=itemWidth\+gapPadding\+separatorWidth/);
-  assert.match(js,/Math\.max\(14,Math\.min\(42,shift\/34\)\)/);
-  assert.doesNotMatch(js,/itemWidth<=Math\.max\(0,viewportWidth-24\)/);
+  assert.match(js,/shift=Math\.max\(1,itemWidth\+gapPadding\+separatorWidth\)/);
+  assert.match(js,/Math\.max\(12,Math\.min\(38,shift\/42\)\)/);
+  assert.match(js,/ticker\.animate\(/);
+  assert.match(js,/tickerAnimation\.id='s666-main-marquee'/);
+  assert.match(js,/data-s666-ticker-driver/);
   assert.match(js,/ticker\.classList\.add\('is-running'\)/);
   assert.match(js,/MutationObserver/);
-  assert.match(css,/#nowPlayingTicker\.s666-veluna-main-ticker\.is-running/);
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
-  assert.doesNotMatch(js,/createElement\(['"](?:div|span)['"]\).*nowPlayingTicker/);
+  assert.match(css,/data-s666-ticker-driver="waapi"/);
+  assert.match(css,/data-s666-ticker-driver="css"/);
 });
-test('main ticker lane expands dynamically when the cover is not visibly occupying column one',()=>{
+test('main ticker geometry reserves both visible cover and History button in idle and playing states',()=>{
   assert.match(js,/function syncTickerGeometry\(\)/);
-  assert.match(js,/getComputedStyle\(cover\)/);
-  assert.match(js,/rect\.width>8&&rect\.height>8/);
-  assert.match(js,/--s666-main-ticker-offset/);
-  assert.match(css,/grid-column:1\/-1!important/);
-  assert.match(css,/width:calc\(100% - var\(--s666-main-ticker-offset,0px\)\)!important/);
-  assert.match(css,/margin-left:var\(--s666-main-ticker-offset,0px\)!important/);
+  assert.match(js,/const history=q\('#historyToggle'/);
+  assert.match(js,/rect\.right-nowRect\.left\+14/);
+  assert.match(js,/nowRect\.right-rect\.left\+12/);
+  assert.match(js,/--s666-main-ticker-left/);
+  assert.match(js,/--s666-main-ticker-right/);
+  assert.match(js,/--s666-main-ticker-width/);
+  assert.match(js,/\['play','playing','pause','loadedmetadata','durationchange'\]/);
+  assert.match(css,/width:var\(--s666-main-ticker-width/);
+  assert.match(css,/margin-left:var\(--s666-main-ticker-left/);
+  assert.match(css,/#historyToggle\{position:relative!important;z-index:7!important\}/);
+  assert.match(css,/\.ticker-window\{[\s\S]*overflow:hidden!important;[\s\S]*isolation:isolate!important/);
 });
-test('main ensures the exact shared VELUNA central cyber boot owner without replaying it',()=>{
+test('main reuses the exact shared VELUNA central cyber boot through idempotent bootOnce only',()=>{
   assert.match(centralBoot,/CYBER BOOTING/);
   assert.match(centralBoot,/CONNECTING RADIO CORE/);
   assert.match(centralBoot,/STARTING AUDIO PATH/);
@@ -49,15 +56,14 @@ test('main ensures the exact shared VELUNA central cyber boot owner without repl
   assert.match(centralBoot,/requestAnimationFrame\(tick\)/);
   assert.match(centralBoot,/bootOnce\(\);/);
   assert.match(js,/function ensureVelunaCentralBoot\(\)/);
-  assert.match(js,/if\(window\.S666CentralBootScreen\) return;/);
+  assert.match(js,/central\.bootOnce\?\.\(\)/);
+  assert.match(js,/S666CentralBootScreen\?\.bootOnce\?\.\(\)/);
   assert.match(js,/\/js\/central-boot-screen\.js\?v=20260812-v200/);
-  assert.match(js,/includes\('\/js\/central-boot-screen\.js'\)/);
   assert.doesNotMatch(js,/central\.show|S666CentralBootScreen\.show|\.isActive\?\.\(\)/);
   assert.doesNotMatch(js,/installBootAfterCentralOwner/);
   assert.doesNotMatch(js,/s666MainCyberBoot/);
-  assert.doesNotMatch(js,/START AUDIO/);
-  assert.doesNotMatch(js,/USER GESTURE REQUIRED/);
-  assert.doesNotMatch(js,/play\.click\(\)/);
+  assert.doesNotMatch(css,/s666-main-cyber-boot/);
+  assert.doesNotMatch(js,/START AUDIO|USER GESTURE REQUIRED|play\.click\(\)/);
   assert.doesNotMatch(js,/new AudioContext|webkitAudioContext|createMediaElementSource|fetch\(/);
 });
 test('DNA wave stays contained while reactor and phase keep strong stage-driven reactivity',()=>{
