@@ -1,8 +1,8 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.0
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.1
  * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
  * No legacy main cyber-boot CSS remains here.
  */
-@keyframes s666VelunaMainTicker{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--ticker-shift,500px)),0,0)}}
+@keyframes s666VelunaMainTicker{from{translate:0 0}to{translate:calc(-1 * var(--ticker-shift,500px)) 0}}
 @media (min-width:761px){
   body[data-veluna-page="main"] .now-playing{position:relative!important;isolation:isolate!important}
   body[data-veluna-page="main"] .now-playing .now-cover-wrap{position:relative!important;z-index:3!important}
@@ -10,9 +10,11 @@
   body[data-veluna-page="main"] .now-playing #historyToggle{position:relative!important;z-index:7!important}
   body[data-veluna-page="main"] .now-playing #historyPanel{z-index:12!important}
 
-  body[data-veluna-page="main"] .now-playing .ticker-window{
+  body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{
     grid-column:1/-1!important;
     grid-row:2!important;
+    left:auto!important;
+    right:auto!important;
     width:var(--s666-main-ticker-width,calc(100% - 220px))!important;
     min-width:96px!important;
     max-width:none!important;
@@ -38,10 +40,10 @@
     overflow:visible!important;
     text-overflow:clip!important;
     animation:none!important;
-    will-change:transform!important;
-    transform:translate3d(0,0,0);
+    will-change:translate!important;
+    translate:0 0;
   }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;transform:none!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;translate:0 0!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{
     content:" ◆ " attr(data-s666-marquee-text);
     display:inline-block!important;
