@@ -1,7 +1,7 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.0.7
- * Adapts the proven VELUNA measured-marquee to the existing main player.
- * The exact shared VELUNA Central Boot Screen is reused on Main; no second audio-confirmation boot is created here.
- * The central owner starts itself exactly once; Main only ensures that owner script exists and never replays a completed boot.
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.0
+ * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
+ * Main never creates a second boot surface and never calls central show() directly.
+ * Ticker width is measured against the visible cover and History control so idle/play states share one lane.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
 (function(){
@@ -12,15 +12,30 @@
 
   const q=(s,r=document)=>r.querySelector(s);
   const CENTRAL_BOOT_SRC='/js/central-boot-screen.js?v=20260812-v200';
+  let tickerAnimation=null;
+  let layoutRaf=0;
 
   function ensureVelunaCentralBoot(){
-    if(window.S666CentralBootScreen) return;
+    const central=window.S666CentralBootScreen;
+    if(central){
+      // bootOnce() is idempotent inside the shared VELUNA owner. This repairs cases where
+      // Main receives the owner object but the automatic sequence was not started yet.
+      try{central.bootOnce?.();}catch(_){}
+      return;
+    }
     const existing=Array.from(document.scripts).find(script=>String(script.src||'').includes('/js/central-boot-screen.js'));
-    if(existing) return;
+    if(existing){
+      if(existing.dataset.s666MainBootBound!=='1'){
+        existing.dataset.s666MainBootBound='1';
+        existing.addEventListener('load',()=>{try{window.S666CentralBootScreen?.bootOnce?.();}catch(_){}},{once:true});
+      }
+      return;
+    }
     const script=document.createElement('script');
     script.src=CENTRAL_BOOT_SRC;
     script.async=false;
     script.dataset.s666MainVelunaCentralBoot='1';
+    script.addEventListener('load',()=>{try{window.S666CentralBootScreen?.bootOnce?.();}catch(_){}},{once:true});
     (document.head||document.documentElement).appendChild(script);
   }
 
@@ -55,17 +70,58 @@
   function syncTickerGeometry(){
     const now=q('body[data-veluna-page="main"] .now-playing');
     const cover=q('.now-cover-wrap',now||document);
+    const history=q('#historyToggle',now||document);
     if(!now) return;
-    let offset=0;
+
+    const nowRect=now.getBoundingClientRect();
+    let left=14;
+    let right=14;
+
     if(cover){
       const style=getComputedStyle(cover);
-      const nowRect=now.getBoundingClientRect();
       const rect=cover.getBoundingClientRect();
       if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8&&rect.height>8){
-        offset=Math.max(0,Math.ceil(rect.right-nowRect.left+14));
+        left=Math.max(left,Math.ceil(rect.right-nowRect.left+14));
       }
     }
-    now.style.setProperty('--s666-main-ticker-offset',offset+'px');
+    if(history){
+      const style=getComputedStyle(history);
+      const rect=history.getBoundingClientRect();
+      if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8){
+        right=Math.max(right,Math.ceil(nowRect.right-rect.left+12));
+      }
+    }
+
+    const width=Math.max(96,Math.floor(nowRect.width-left-right));
+    now.style.setProperty('--s666-main-ticker-left',left+'px');
+    now.style.setProperty('--s666-main-ticker-right',right+'px');
+    now.style.setProperty('--s666-main-ticker-width',width+'px');
+  }
+
+  function stopTickerAnimation(ticker){
+    try{tickerAnimation?.cancel?.();}catch(_){}
+    tickerAnimation=null;
+    try{
+      for(const animation of ticker?.getAnimations?.()||[]){
+        if(animation?.id==='s666-main-marquee') animation.cancel();
+      }
+    }catch(_){}
+  }
+
+  function startTickerAnimation(ticker,shift,duration){
+    stopTickerAnimation(ticker);
+    if(typeof ticker.animate==='function'){
+      try{
+        tickerAnimation=ticker.animate(
+          [{transform:'translate3d(0,0,0)'},{transform:`translate3d(-${shift}px,0,0)`}],
+          {duration:Math.round(duration*1000),iterations:Infinity,easing:'linear'}
+        );
+        tickerAnimation.id='s666-main-marquee';
+        ticker.dataset.s666TickerDriver='waapi';
+        return;
+      }catch(_){}
+    }
+    ticker.dataset.s666TickerDriver='css';
   }
 
   function syncTickerMotion(){
@@ -73,36 +129,68 @@
     const windowNode=q('body[data-veluna-page="main"] .now-playing .ticker-window');
     const ticker=q('#nowPlayingTicker',windowNode||document);
     if(!windowNode||!ticker) return;
+
     ticker.classList.add('s666-veluna-main-ticker');
     ticker.classList.remove('is-running','is-static');
     ticker.style.removeProperty('--ticker-shift');
     ticker.style.removeProperty('--ticker-duration');
     ticker.removeAttribute('data-s666-marquee-text');
+    ticker.removeAttribute('data-s666-ticker-driver');
+    stopTickerAnimation(ticker);
+
     const text=(ticker.textContent||'').replace(/\s+/g,' ').trim();
-    if(!text){ticker.classList.add('is-static');return;}
+    if(!text){
+      ticker.classList.add('is-static');
+      return;
+    }
+
     const itemWidth=measureTextWidth(ticker);
-    ticker.setAttribute('data-s666-marquee-text',text);
     const gapPadding=48;
     const separatorWidth=measureSeparatorWidth(ticker);
-    const shift=itemWidth+gapPadding+separatorWidth;
-    const duration=Math.max(14,Math.min(42,shift/34));
+    const shift=Math.max(1,itemWidth+gapPadding+separatorWidth);
+    const duration=Math.max(12,Math.min(38,shift/42));
+
+    ticker.setAttribute('data-s666-marquee-text',text);
     ticker.style.setProperty('--ticker-shift',shift+'px');
     ticker.style.setProperty('--ticker-duration',duration.toFixed(2)+'s');
-    void ticker.offsetWidth;
     ticker.classList.add('is-running');
+    void ticker.offsetWidth;
+    startTickerAnimation(ticker,shift,duration);
+  }
+
+  function scheduleTickerSync(){
+    cancelAnimationFrame(layoutRaf);
+    layoutRaf=requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion));
   }
 
   function installTicker(){
     const ticker=q('#nowPlayingTicker');
-    if(!ticker||ticker.dataset.s666VelunaTicker==='1') return;
-    ticker.dataset.s666VelunaTicker='1';
-    const observer=new MutationObserver(()=>requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion)));
-    observer.observe(ticker,{childList:true,characterData:true,subtree:true});
-    window.addEventListener('resize',()=>{syncTickerGeometry();syncTickerMotion();},{passive:true});
-    requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion));
+    if(!ticker) return;
+    if(ticker.dataset.s666VelunaTicker!=='1'){
+      ticker.dataset.s666VelunaTicker='1';
+      const observer=new MutationObserver(scheduleTickerSync);
+      observer.observe(ticker,{childList:true,characterData:true,subtree:true});
+    }
+    scheduleTickerSync();
   }
 
-  function boot(){ensureVelunaCentralBoot();installTicker();}
+  function bindLayoutSignals(){
+    if(document.documentElement.dataset.s666MainTickerSignals==='1') return;
+    document.documentElement.dataset.s666MainTickerSignals='1';
+    window.addEventListener('resize',scheduleTickerSync,{passive:true});
+    window.addEventListener('orientationchange',scheduleTickerSync,{passive:true});
+    for(const name of ['play','playing','pause','loadedmetadata','durationchange']){
+      q('#radio')?.addEventListener(name,scheduleTickerSync,{passive:true});
+    }
+    q('#nowCover')?.addEventListener('load',scheduleTickerSync,{passive:true});
+    try{document.fonts?.ready?.then(scheduleTickerSync);}catch(_){}
+  }
+
+  function boot(){
+    ensureVelunaCentralBoot();
+    bindLayoutSignals();
+    installTicker();
+  }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();},{once:true});
+  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();scheduleTickerSync();},{once:true});
 })();
