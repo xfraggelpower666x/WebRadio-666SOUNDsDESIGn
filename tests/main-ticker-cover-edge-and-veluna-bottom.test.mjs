@@ -5,9 +5,14 @@ const read=p=>fs.readFileSync(p,'utf8');
 const main=read('js/main-veluna-adapter.js');
 const viewport=read('js/veluna-viewport-lock.js');
 
-test('main ticker geometry measures the real cover edge relative to now-playing',()=>{
+test('main ticker geometry measures real cover and History edges relative to now-playing',()=>{
   assert.match(main,/const nowRect=now\.getBoundingClientRect\(\)/);
-  assert.match(main,/offset=Math\.max\(0,Math\.ceil\(rect\.right-nowRect\.left\+14\)\)/);
+  assert.match(main,/left=Math\.max\(left,Math\.ceil\(rect\.right-nowRect\.left\+14\)\)/);
+  assert.match(main,/right=Math\.max\(right,Math\.ceil\(nowRect\.right-rect\.left\+12\)\)/);
+  assert.match(main,/const width=Math\.max\(96,Math\.floor\(nowRect\.width-left-right\)\)/);
+  assert.match(main,/--s666-main-ticker-left/);
+  assert.match(main,/--s666-main-ticker-right/);
+  assert.match(main,/--s666-main-ticker-width/);
   assert.doesNotMatch(main,/offset=Math\.ceil\(rect\.width\+14\)/);
   assert.equal(read('public/js/main-veluna-adapter.js'),main);
 });
