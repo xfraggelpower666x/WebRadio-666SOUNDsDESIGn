@@ -17,7 +17,7 @@
     left:var(--s666-main-ticker-left,14px)!important;
     right:auto!important;
     top:auto!important;
-    bottom:16px!important;
+    bottom:42px!important;
     width:var(--s666-main-ticker-width,calc(100% - 180px))!important;
     min-width:96px!important;
     max-width:none!important;
