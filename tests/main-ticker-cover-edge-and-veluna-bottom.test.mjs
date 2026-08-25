@@ -8,7 +8,8 @@ const viewport=read('js/veluna-viewport-lock.js');
 test('main ticker geometry measures real cover and History edges relative to now-playing',()=>{
   assert.match(main,/const nowRect=now\.getBoundingClientRect\(\)/);
   assert.match(main,/left=Math\.max\(left,Math\.ceil\(rect\.right-nowRect\.left\+14\)\)/);
-  assert.match(main,/right=Math\.max\(right,Math\.ceil\(nowRect\.right-rect\.left\+12\)\)/);
+  assert.match(main,/right=Math\.max\(14,Math\.ceil\(nowRect\.right-rect\.right\)\)/);
+  assert.doesNotMatch(main,/right=Math\.max\(right,Math\.ceil\(nowRect\.right-rect\.left\+12\)\)/);
   assert.match(main,/const width=Math\.max\(96,Math\.floor\(nowRect\.width-left-right\)\)/);
   assert.match(main,/--s666-main-ticker-left/);
   assert.match(main,/--s666-main-ticker-right/);
