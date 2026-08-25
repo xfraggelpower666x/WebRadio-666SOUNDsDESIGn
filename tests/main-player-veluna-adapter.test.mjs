@@ -23,7 +23,7 @@ test('main ticker uses one measured lane and a deterministic animation driver',(
   assert.match(js,/measureTextWidth\(ticker\)/);
   assert.match(js,/measureSeparatorWidth\(ticker\)/);
   assert.match(js,/shift=Math\.max\(1,itemWidth\+gapPadding\+separatorWidth\)/);
-  assert.match(js,/Math\.max\(12,Math\.min\(38,shift\/42\)\)/);
+  assert.match(js,/Math\.max\(12,Math\.min\(52,shift\/42\)\)/);
   assert.match(js,/ticker\.animate\(/);
   assert.match(js,/tickerAnimation\.id='s666-main-marquee'/);
   assert.match(js,/data-s666-ticker-driver/);
@@ -33,11 +33,12 @@ test('main ticker uses one measured lane and a deterministic animation driver',(
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
 });
-test('main ticker geometry reserves both visible cover and History button in idle and playing states',()=>{
+test('main ticker geometry starts after the cover and ends at the History button right edge',()=>{
   assert.match(js,/function syncTickerGeometry\(\)/);
   assert.match(js,/const history=q\('#historyToggle'/);
   assert.match(js,/rect\.right-nowRect\.left\+14/);
-  assert.match(js,/nowRect\.right-rect\.left\+12/);
+  assert.match(js,/nowRect\.right-rect\.right/);
+  assert.doesNotMatch(js,/nowRect\.right-rect\.left\+12/);
   assert.match(js,/--s666-main-ticker-left/);
   assert.match(js,/--s666-main-ticker-right/);
   assert.match(js,/--s666-main-ticker-width/);
@@ -46,6 +47,24 @@ test('main ticker geometry reserves both visible cover and History button in idl
   assert.match(css,/margin-left:var\(--s666-main-ticker-left/);
   assert.match(css,/#historyToggle\{position:relative!important;z-index:7!important\}/);
   assert.match(css,/\.ticker-window\{[\s\S]*overflow:hidden!important;[\s\S]*isolation:isolate!important/);
+});
+test('main ticker panel is lower and taller while keeping text vertically centered',()=>{
+  assert.match(css,/min-height:44px!important/);
+  assert.match(css,/height:44px!important/);
+  assert.match(css,/margin-top:7px!important/);
+  assert.match(css,/display:flex!important/);
+  assert.match(css,/align-items:center!important/);
+  assert.match(css,/line-height:34px!important/);
+});
+test('unchanged repeated metadata does not restart a long-title marquee before a full cycle',()=>{
+  assert.match(js,/const laneWidth=Math\.round\(windowNode\.getBoundingClientRect\(\)\.width\|\|windowNode\.clientWidth\|\|0\)/);
+  assert.match(js,/const signature=text\+'\|'\+laneWidth/);
+  assert.match(js,/ticker\.dataset\.s666TickerSignature===signature/);
+  assert.match(js,/if\(unchanged&&active\) return/);
+  assert.match(js,/ticker\.dataset\.s666TickerSignature=signature/);
+  const signatureCheck=js.indexOf("if(unchanged&&active) return");
+  const stopCheck=js.indexOf('stopTickerAnimation(ticker);',js.indexOf('function syncTickerMotion'));
+  assert.ok(signatureCheck>0&&stopCheck>signatureCheck,'signature guard must run before animation cancellation');
 });
 test('main reuses the exact shared VELUNA central cyber boot through idempotent bootOnce only',()=>{
   assert.match(centralBoot,/CYBER BOOTING/);
