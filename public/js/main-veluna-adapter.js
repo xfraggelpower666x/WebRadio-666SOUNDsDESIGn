@@ -1,9 +1,10 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.2
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.3
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and History control so idle/play states share one lane.
  * Marquee motion uses the independent CSS translate property so legacy transform:none!important cannot suppress motion.
  * Repeated metadata refreshes do not restart an unchanged marquee, so long titles complete their full cycle.
+ * Marquee duration scales with the full rendered title length without a maximum cap, preserving constant readable speed.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
 (function(){
@@ -157,7 +158,7 @@
     const gapPadding=48;
     const separatorWidth=measureSeparatorWidth(ticker);
     const shift=Math.max(1,itemWidth+gapPadding+separatorWidth);
-    const duration=Math.max(12,Math.min(52,shift/42));
+    const duration=Math.max(12,shift/42);
 
     ticker.setAttribute('data-s666-marquee-text',text);
     ticker.style.setProperty('--ticker-shift',shift+'px');
