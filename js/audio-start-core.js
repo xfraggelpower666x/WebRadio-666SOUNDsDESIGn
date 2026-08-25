@@ -1,18 +1,52 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.17
+VERSION: v1.2.18
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
 - WebAudio/DSP wird erst nach erfolgreichem Play durch den jeweiligen Player aktiviert.
 - Keine EQ-, Booster-, Limiter- oder Visualizer-Logik in dieser Datei.
+- v1.2.18: keine doppelten load()-Zyklen bei reset:false; Foreground-/Suspend-Recovery bleibt bei gleicher Stream-URL soft.
+- v1.2.18: Main lädt den bestehenden Central-Boot-Owner bereits im frühen Head-Pfad vor.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
   'use strict';
 
   if (global.S666AudioStartCore) return;
+
+  function installEarlyMainCentralBoot() {
+    try {
+      const path = String(global.location?.pathname || '/').toLowerCase();
+      if (path !== '/' && path !== '/index.html') return;
+      const head = document.head || document.documentElement;
+      if (!head) return;
+
+      const cssBase = '/css/central-boot-screen.css';
+      if (!Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(link => String(link.getAttribute('href') || '').includes(cssBase))) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = cssBase + '?v=20260825-main-early-boot-v1';
+        link.dataset.s666MainEarlyBoot = 'css';
+        head.appendChild(link);
+      }
+
+      if (global.S666CentralBootScreen) {
+        global.S666CentralBootScreen.bootOnce?.();
+        return;
+      }
+      const jsBase = '/js/central-boot-screen.js';
+      if (Array.from(document.scripts).some(script => String(script.src || '').includes(jsBase))) return;
+      const script = document.createElement('script');
+      script.src = jsBase + '?v=20260825-main-early-boot-v1';
+      script.async = false;
+      script.defer = false;
+      script.dataset.s666MainEarlyBoot = 'js';
+      head.appendChild(script);
+    } catch (_) {}
+  }
+  installEarlyMainCentralBoot();
 
   function withTimeout(promise, timeoutMs, label) {
     let timer = 0;
@@ -29,6 +63,7 @@ ZWECK:
     }
 
     const timeoutMs = Math.max(1000, Number(options.timeoutMs) || 9000);
+    const softResumeReasons = new Set(['focus','pageshow','visibility','visible','suspend','stalled','interrupted','system-interruption']);
     let requestToken = 0;
 
     function currentToken() {
@@ -44,7 +79,28 @@ ZWECK:
       return token === requestToken;
     }
 
+    function sameTarget(target) {
+      const attr = String(audio.getAttribute('src') || '').trim();
+      const current = String(audio.currentSrc || '').trim();
+      if (attr === target) return true;
+      if (!current) return false;
+      try {
+        return new URL(current, global.location?.href).href === new URL(target, global.location?.href).href;
+      } catch (_) {
+        return current === target;
+      }
+    }
+
     function reset(target, reason, beforeReset) {
+      const why = String(reason || 'play').toLowerCase();
+      if (softResumeReasons.has(why) && sameTarget(target)) {
+        try {
+          audio.dataset.audioStartReason = why;
+          audio.dataset.audioStartState = 'resume-prepared';
+        } catch (_) {}
+        return;
+      }
+
       if (typeof beforeReset === 'function') {
         try { beforeReset(reason); } catch (_) {}
       }
@@ -69,8 +125,8 @@ ZWECK:
 
       if (shouldReset) {
         reset(target, reason, config && config.beforeReset);
-      } else {
-        if (audio.getAttribute('src') !== target) audio.src = target;
+      } else if (!sameTarget(target)) {
+        audio.src = target;
         try { audio.load(); } catch (_) {}
       }
 
