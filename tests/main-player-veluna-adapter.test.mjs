@@ -51,7 +51,7 @@ test('main ticker geometry starts after the cover and ends at the History button
 test('main ticker panel is lower and taller while keeping text vertically centered',()=>{
   assert.match(css,/min-height:44px!important/);
   assert.match(css,/height:44px!important/);
-  assert.match(css,/margin-top:7px!important/);
+  assert.match(css,/margin-top:12px!important/);
   assert.match(css,/display:flex!important/);
   assert.match(css,/align-items:center!important/);
   assert.match(css,/line-height:34px!important/);
