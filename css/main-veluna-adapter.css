@@ -1,4 +1,4 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.3
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.4
  * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
  * No legacy main cyber-boot CSS remains here.
  */
@@ -23,7 +23,7 @@
     box-sizing:border-box!important;
     margin-left:var(--s666-main-ticker-left,0px)!important;
     margin-right:var(--s666-main-ticker-right,0px)!important;
-    margin-top:12px!important;
+    margin-top:18px!important;
     justify-self:start!important;
     position:relative!important;
     z-index:2!important;
