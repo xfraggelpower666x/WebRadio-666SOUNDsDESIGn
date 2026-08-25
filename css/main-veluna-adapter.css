@@ -1,5 +1,6 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.7
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.8
  * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
+ * Horizontal fallback geometry now matches the measured 18px outer inset; runtime JS anchors the right edge directly to History.
  * No legacy main cyber-boot CSS remains here.
  */
 @keyframes s666VelunaMainTicker{from{translate:0 0}to{translate:calc(-1 * var(--ticker-shift,500px)) 0}}
@@ -14,11 +15,11 @@
     grid-column:auto!important;
     grid-row:auto!important;
     position:absolute!important;
-    left:var(--s666-main-ticker-left,14px)!important;
+    left:var(--s666-main-ticker-left,18px)!important;
     right:auto!important;
     top:auto!important;
     bottom:42px!important;
-    width:var(--s666-main-ticker-width,calc(100% - 180px))!important;
+    width:var(--s666-main-ticker-width,calc(100% - 184px))!important;
     min-width:96px!important;
     max-width:none!important;
     min-height:44px!important;
