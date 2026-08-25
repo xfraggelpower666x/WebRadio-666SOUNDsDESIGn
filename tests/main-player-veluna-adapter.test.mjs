@@ -19,17 +19,20 @@ test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
-test('main ticker uses one measured lane and a deterministic animation driver',()=>{
+test('main ticker uses one measured lane and a deterministic infinite animation driver',()=>{
   assert.match(js,/measureTextWidth\(ticker\)/);
   assert.match(js,/measureSeparatorWidth\(ticker\)/);
   assert.match(js,/shift=Math\.max\(1,itemWidth\+gapPadding\+separatorWidth\)/);
-  assert.match(js,/Math\.max\(12,Math\.min\(52,shift\/42\)\)/);
+  assert.match(js,/const duration=Math\.max\(12,shift\/42\)/);
+  assert.doesNotMatch(js,/Math\.min\(52,shift\/42\)/);
+  assert.match(js,/iterations:Infinity/);
   assert.match(js,/ticker\.animate\(/);
   assert.match(js,/tickerAnimation\.id='s666-main-marquee'/);
   assert.match(js,/data-s666-ticker-driver/);
   assert.match(js,/ticker\.classList\.add\('is-running'\)/);
   assert.match(js,/MutationObserver/);
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
+  assert.match(css,/linear infinite!important/);
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
 });
@@ -48,13 +51,16 @@ test('main ticker geometry starts after the cover and ends at the History button
   assert.match(css,/#historyToggle\{position:relative!important;z-index:7!important\}/);
   assert.match(css,/\.ticker-window\{[\s\S]*overflow:hidden!important;[\s\S]*isolation:isolate!important/);
 });
-test('main ticker panel is lower and taller while keeping text vertically centered',()=>{
+test('main ticker reserves vertical row space and sits lower without clipping',()=>{
+  assert.match(css,/\.frame-stage \.player-shell>\.now-playing\{grid-template-rows:minmax\(0,1fr\) 62px!important\}/);
   assert.match(css,/min-height:44px!important/);
   assert.match(css,/height:44px!important/);
-  assert.match(css,/margin-top:12px!important/);
+  assert.match(css,/margin-top:0!important/);
+  assert.match(css,/align-self:end!important/);
   assert.match(css,/display:flex!important/);
   assert.match(css,/align-items:center!important/);
   assert.match(css,/line-height:34px!important/);
+  assert.doesNotMatch(css,/margin-top:18px!important/);
 });
 test('unchanged repeated metadata does not restart a long-title marquee before a full cycle',()=>{
   assert.match(js,/const laneWidth=Math\.round\(windowNode\.getBoundingClientRect\(\)\.width\|\|windowNode\.clientWidth\|\|0\)/);
