@@ -51,10 +51,11 @@ test('main ticker geometry starts after the cover and ends at the History button
   assert.match(css,/#historyToggle\{position:relative!important;z-index:7!important\}/);
   assert.match(css,/\.ticker-window\{[\s\S]*overflow:hidden!important;[\s\S]*isolation:isolate!important/);
 });
-test('main ticker is absolutely anchored in the lower third with breathing room below',()=>{
+test('main ticker is absolutely anchored in the lower third with responsive breathing room',()=>{
   assert.match(css,/position:absolute!important/);
   assert.match(css,/top:auto!important/);
   assert.match(css,/bottom:42px!important/);
+  assert.match(css,/@media \(min-width:761px\) and \(max-height:820px\)\{[\s\S]*ticker-window\{bottom:18px!important\}/);
   assert.match(css,/min-height:44px!important/);
   assert.match(css,/height:44px!important/);
   assert.match(css,/margin:0!important/);
