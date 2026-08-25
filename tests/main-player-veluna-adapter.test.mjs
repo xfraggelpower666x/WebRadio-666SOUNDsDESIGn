@@ -47,20 +47,24 @@ test('main ticker geometry starts after the cover and ends at the History button
   assert.match(js,/--s666-main-ticker-width/);
   assert.match(js,/\['play','playing','pause','loadedmetadata','durationchange'\]/);
   assert.match(css,/width:var\(--s666-main-ticker-width/);
-  assert.match(css,/margin-left:var\(--s666-main-ticker-left/);
+  assert.match(css,/left:var\(--s666-main-ticker-left,14px\)!important/);
   assert.match(css,/#historyToggle\{position:relative!important;z-index:7!important\}/);
   assert.match(css,/\.ticker-window\{[\s\S]*overflow:hidden!important;[\s\S]*isolation:isolate!important/);
 });
-test('main ticker reserves vertical row space and sits lower without clipping',()=>{
-  assert.match(css,/\.frame-stage \.player-shell>\.now-playing\{grid-template-rows:minmax\(0,1fr\) 62px!important\}/);
+test('main ticker is absolutely anchored in the lower third with responsive breathing room',()=>{
+  assert.match(css,/position:absolute!important/);
+  assert.match(css,/top:auto!important/);
+  assert.match(css,/bottom:42px!important/);
+  assert.match(css,/@media \(min-width:761px\) and \(max-height:820px\)\{[\s\S]*ticker-window\{bottom:18px!important\}/);
   assert.match(css,/min-height:44px!important/);
   assert.match(css,/height:44px!important/);
-  assert.match(css,/margin-top:0!important/);
-  assert.match(css,/align-self:end!important/);
+  assert.match(css,/margin:0!important/);
+  assert.match(css,/align-self:auto!important/);
   assert.match(css,/display:flex!important/);
   assert.match(css,/align-items:center!important/);
   assert.match(css,/line-height:34px!important/);
-  assert.doesNotMatch(css,/margin-top:18px!important/);
+  assert.doesNotMatch(css,/grid-template-rows:minmax\(0,1fr\) 62px!important/);
+  assert.doesNotMatch(css,/bottom:16px!important/);
 });
 test('unchanged repeated metadata does not restart a long-title marquee before a full cycle',()=>{
   assert.match(js,/const laneWidth=Math\.round\(windowNode\.getBoundingClientRect\(\)\.width\|\|windowNode\.clientWidth\|\|0\)/);

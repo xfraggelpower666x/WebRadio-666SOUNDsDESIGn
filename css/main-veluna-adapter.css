@@ -1,33 +1,32 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.5
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.7
  * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
  * No legacy main cyber-boot CSS remains here.
  */
 @keyframes s666VelunaMainTicker{from{translate:0 0}to{translate:calc(-1 * var(--ticker-shift,500px)) 0}}
 @media (min-width:761px){
   body[data-veluna-page="main"] .now-playing{position:relative!important;isolation:isolate!important}
-  body[data-veluna-page="main"] .frame-stage .player-shell>.now-playing{grid-template-rows:minmax(0,1fr) 62px!important}
   body[data-veluna-page="main"] .now-playing .now-cover-wrap{position:relative!important;z-index:3!important}
   body[data-veluna-page="main"] .now-playing .section-topline{position:relative!important;z-index:5!important}
   body[data-veluna-page="main"] .now-playing #historyToggle{position:relative!important;z-index:7!important}
   body[data-veluna-page="main"] .now-playing #historyPanel{z-index:12!important}
 
   body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{
-    grid-column:1/-1!important;
-    grid-row:2!important;
-    left:auto!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    position:absolute!important;
+    left:var(--s666-main-ticker-left,14px)!important;
     right:auto!important;
+    top:auto!important;
+    bottom:42px!important;
     width:var(--s666-main-ticker-width,calc(100% - 180px))!important;
     min-width:96px!important;
     max-width:none!important;
     min-height:44px!important;
     height:44px!important;
     box-sizing:border-box!important;
-    margin-left:var(--s666-main-ticker-left,0px)!important;
-    margin-right:var(--s666-main-ticker-right,0px)!important;
-    margin-top:0!important;
-    align-self:end!important;
-    justify-self:start!important;
-    position:relative!important;
+    margin:0!important;
+    align-self:auto!important;
+    justify-self:auto!important;
     z-index:2!important;
     display:flex!important;
     align-items:center!important;
@@ -77,4 +76,7 @@
   body[data-veluna-page="main"] #pcRightFxAddon .phase-grid{opacity:calc(.50 + var(--s666-stage-level)*.42)!important;filter:saturate(calc(1.25 + var(--s666-stage-mid)*.72)) brightness(calc(1 + var(--s666-stage-peak)*.34))!important}
   body[data-veluna-page="main"] #pcRightFxAddon .phase-line{height:5px!important;opacity:calc(.58 + var(--s666-stage-pulse)*.38)!important;filter:brightness(calc(1.10 + var(--s666-stage-peak)*.72)) saturate(calc(1.42 + var(--s666-stage-mid)*.70))!important;box-shadow:0 0 calc(12px + var(--s666-stage-peak)*28px) rgba(255,61,187,.62),0 0 calc(10px + var(--s666-stage-level)*24px) rgba(22,255,243,.48)!important}
   body[data-veluna-page="main"] #pcRightFxAddon .phase-cloud{opacity:calc(.48 + var(--s666-stage-level)*.44)!important;filter:saturate(calc(1.42 + var(--s666-stage-mid)*.88)) brightness(calc(1.02 + var(--s666-stage-peak)*.54))!important;border-color:rgba(255,61,187,calc(.30 + var(--s666-stage-peak)*.54))!important;box-shadow:0 0 calc(12px + var(--s666-stage-level)*30px) rgba(255,61,187,.40),inset 0 0 calc(10px + var(--s666-stage-peak)*22px) rgba(22,255,243,.28)!important}
+}
+@media (min-width:761px) and (max-height:820px){
+  body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{bottom:18px!important}
 }
