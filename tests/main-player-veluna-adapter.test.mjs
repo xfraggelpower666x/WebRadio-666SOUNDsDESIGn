@@ -19,17 +19,20 @@ test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
-test('main ticker uses one measured lane and a deterministic animation driver',()=>{
+test('main ticker uses one measured lane and a deterministic infinite animation driver',()=>{
   assert.match(js,/measureTextWidth\(ticker\)/);
   assert.match(js,/measureSeparatorWidth\(ticker\)/);
   assert.match(js,/shift=Math\.max\(1,itemWidth\+gapPadding\+separatorWidth\)/);
-  assert.match(js,/Math\.max\(12,Math\.min\(52,shift\/42\)\)/);
+  assert.match(js,/const duration=Math\.max\(12,shift\/42\)/);
+  assert.doesNotMatch(js,/Math\.min\(52,shift\/42\)/);
+  assert.match(js,/iterations:Infinity/);
   assert.match(js,/ticker\.animate\(/);
   assert.match(js,/tickerAnimation\.id='s666-main-marquee'/);
   assert.match(js,/data-s666-ticker-driver/);
   assert.match(js,/ticker\.classList\.add\('is-running'\)/);
   assert.match(js,/MutationObserver/);
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
+  assert.match(css,/linear infinite!important/);
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
 });
@@ -51,7 +54,7 @@ test('main ticker geometry starts after the cover and ends at the History button
 test('main ticker panel is lower and taller while keeping text vertically centered',()=>{
   assert.match(css,/min-height:44px!important/);
   assert.match(css,/height:44px!important/);
-  assert.match(css,/margin-top:12px!important/);
+  assert.match(css,/margin-top:18px!important/);
   assert.match(css,/display:flex!important/);
   assert.match(css,/align-items:center!important/);
   assert.match(css,/line-height:34px!important/);
