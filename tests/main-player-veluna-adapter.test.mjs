@@ -36,20 +36,33 @@ test('main ticker uses one measured lane and a deterministic infinite animation 
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
 });
-test('main ticker geometry starts after the cover and ends at the History button right edge',()=>{
+test('main ticker geometry keeps extra cover breathing room and ends at the real History outer edge',()=>{
+  assert.match(js,/const TICKER_EDGE_INSET=18/);
+  assert.match(js,/const TICKER_COVER_GAP=20/);
+  assert.match(js,/const TICKER_MIN_WIDTH=96/);
   assert.match(js,/function syncTickerGeometry\(\)/);
   assert.match(js,/const history=q\('#historyToggle'/);
-  assert.match(js,/rect\.right-nowRect\.left\+14/);
-  assert.match(js,/nowRect\.right-rect\.right/);
-  assert.doesNotMatch(js,/nowRect\.right-rect\.left\+12/);
+  assert.match(js,/rect\.right-nowRect\.left\+TICKER_COVER_GAP/);
+  assert.match(js,/const historyRight=Math\.round\(rect\.right-nowRect\.left\)/);
+  assert.match(js,/rightEdge=Math\.min\(Math\.round\(nowRect\.width\),Math\.max\(left\+TICKER_MIN_WIDTH,historyRight\)\)/);
+  assert.match(js,/const width=Math\.max\(TICKER_MIN_WIDTH,Math\.round\(rightEdge-left\)\)/);
+  assert.match(js,/const right=Math\.max\(0,Math\.round\(nowRect\.width-rightEdge\)\)/);
+  assert.doesNotMatch(js,/nowRect\.right-rect\.right/);
   assert.match(js,/--s666-main-ticker-left/);
   assert.match(js,/--s666-main-ticker-right/);
+  assert.match(js,/--s666-main-ticker-right-edge/);
   assert.match(js,/--s666-main-ticker-width/);
   assert.match(js,/\['play','playing','pause','loadedmetadata','durationchange'\]/);
   assert.match(css,/width:var\(--s666-main-ticker-width/);
-  assert.match(css,/left:var\(--s666-main-ticker-left,14px\)!important/);
+  assert.match(css,/left:var\(--s666-main-ticker-left,18px\)!important/);
   assert.match(css,/#historyToggle\{position:relative!important;z-index:7!important\}/);
   assert.match(css,/\.ticker-window\{[\s\S]*overflow:hidden!important;[\s\S]*isolation:isolate!important/);
+});
+test('main ticker geometry continuously resyncs when cover, panel or History dimensions change',()=>{
+  assert.match(js,/typeof ResizeObserver==='function'/);
+  assert.match(js,/const observer=new ResizeObserver\(scheduleTickerSync\)/);
+  assert.match(js,/\[q\('\.now-playing'\),q\('\.now-cover-wrap'\),q\('#historyToggle'\)\]\.filter\(Boolean\)/);
+  assert.match(js,/window\.__S666_MAIN_TICKER_RESIZE_OBSERVER__=observer/);
 });
 test('main ticker is absolutely anchored in the lower third with responsive breathing room',()=>{
   assert.match(css,/position:absolute!important/);
