@@ -1,8 +1,9 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.1
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.2
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and History control so idle/play states share one lane.
  * Marquee motion uses the independent CSS translate property so legacy transform:none!important cannot suppress motion.
+ * Repeated metadata refreshes do not restart an unchanged marquee, so long titles complete their full cycle.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
 (function(){
@@ -87,7 +88,7 @@
       const style=getComputedStyle(history);
       const rect=history.getBoundingClientRect();
       if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8){
-        right=Math.max(right,Math.ceil(nowRect.right-rect.left+12));
+        right=Math.max(14,Math.ceil(nowRect.right-rect.right));
       }
     }
 
@@ -130,6 +131,16 @@
     if(!windowNode||!ticker) return;
 
     ticker.classList.add('s666-veluna-main-ticker');
+    const text=(ticker.textContent||'').replace(/\s+/g,' ').trim();
+    const laneWidth=Math.round(windowNode.getBoundingClientRect().width||windowNode.clientWidth||0);
+    const signature=text+'|'+laneWidth;
+    const unchanged=ticker.dataset.s666TickerSignature===signature;
+    const active=ticker.classList.contains('is-static')||(
+      ticker.classList.contains('is-running')&&!!ticker.dataset.s666TickerDriver
+    );
+    if(unchanged&&active) return;
+    ticker.dataset.s666TickerSignature=signature;
+
     ticker.classList.remove('is-running','is-static');
     ticker.style.removeProperty('--ticker-shift');
     ticker.style.removeProperty('--ticker-duration');
@@ -137,7 +148,6 @@
     ticker.removeAttribute('data-s666-ticker-driver');
     stopTickerAnimation(ticker);
 
-    const text=(ticker.textContent||'').replace(/\s+/g,' ').trim();
     if(!text){
       ticker.classList.add('is-static');
       return;
@@ -147,7 +157,7 @@
     const gapPadding=48;
     const separatorWidth=measureSeparatorWidth(ticker);
     const shift=Math.max(1,itemWidth+gapPadding+separatorWidth);
-    const duration=Math.max(12,Math.min(38,shift/42));
+    const duration=Math.max(12,Math.min(52,shift/42));
 
     ticker.setAttribute('data-s666-marquee-text',text);
     ticker.style.setProperty('--ticker-shift',shift+'px');
