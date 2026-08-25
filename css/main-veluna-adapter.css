@@ -1,33 +1,32 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.5
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.6
  * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
  * No legacy main cyber-boot CSS remains here.
  */
 @keyframes s666VelunaMainTicker{from{translate:0 0}to{translate:calc(-1 * var(--ticker-shift,500px)) 0}}
 @media (min-width:761px){
   body[data-veluna-page="main"] .now-playing{position:relative!important;isolation:isolate!important}
-  body[data-veluna-page="main"] .frame-stage .player-shell>.now-playing{grid-template-rows:minmax(0,1fr) 62px!important}
   body[data-veluna-page="main"] .now-playing .now-cover-wrap{position:relative!important;z-index:3!important}
   body[data-veluna-page="main"] .now-playing .section-topline{position:relative!important;z-index:5!important}
   body[data-veluna-page="main"] .now-playing #historyToggle{position:relative!important;z-index:7!important}
   body[data-veluna-page="main"] .now-playing #historyPanel{z-index:12!important}
 
   body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{
-    grid-column:1/-1!important;
-    grid-row:2!important;
-    left:auto!important;
+    grid-column:auto!important;
+    grid-row:auto!important;
+    position:absolute!important;
+    left:var(--s666-main-ticker-left,14px)!important;
     right:auto!important;
+    top:auto!important;
+    bottom:16px!important;
     width:var(--s666-main-ticker-width,calc(100% - 180px))!important;
     min-width:96px!important;
     max-width:none!important;
     min-height:44px!important;
     height:44px!important;
     box-sizing:border-box!important;
-    margin-left:var(--s666-main-ticker-left,0px)!important;
-    margin-right:var(--s666-main-ticker-right,0px)!important;
-    margin-top:0!important;
-    align-self:end!important;
-    justify-self:start!important;
-    position:relative!important;
+    margin:0!important;
+    align-self:auto!important;
+    justify-self:auto!important;
     z-index:2!important;
     display:flex!important;
     align-items:center!important;
