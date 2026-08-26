@@ -36,7 +36,7 @@ test('main ticker uses one measured lane and a deterministic infinite animation 
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
 });
-test('main ticker geometry calibrates rendered viewport edges to cover and History',()=>{
+test('main ticker geometry calibrates rendered viewport edges to the real cover and History edges',()=>{
   assert.match(js,/const TICKER_EDGE_INSET=18/);
   assert.match(js,/const TICKER_COVER_GAP=20/);
   assert.match(js,/const TICKER_MIN_WIDTH=96/);
