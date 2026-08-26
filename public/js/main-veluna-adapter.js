@@ -1,8 +1,8 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.4
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.5
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and the real History-button outer edge so idle/play states share one lane.
- * Left geometry keeps deliberate breathing room after the cover; the right edge is anchored directly to History instead of inferred by subtraction.
+ * Runtime calibration compares the rendered ticker viewport edges to the desired cover/History viewport coordinates, eliminating containing-block/padding drift.
  * Marquee motion uses the independent CSS translate property so legacy transform:none!important cannot suppress motion.
  * Repeated metadata refreshes do not restart an unchanged marquee, so long titles complete their full cycle.
  * Marquee duration scales with the full rendered title length without a maximum cap, preserving constant readable speed.
@@ -77,34 +77,51 @@
     const now=q('body[data-veluna-page="main"] .now-playing');
     const cover=q('.now-cover-wrap',now||document);
     const history=q('#historyToggle',now||document);
+    const tickerWindow=q('.ticker-window',now||document);
     if(!now) return;
 
     const nowRect=now.getBoundingClientRect();
-    let left=TICKER_EDGE_INSET;
-    let rightEdge=Math.max(left+TICKER_MIN_WIDTH,Math.round(nowRect.width-TICKER_EDGE_INSET));
+    let desiredLeft=nowRect.left+TICKER_EDGE_INSET;
+    let desiredRight=nowRect.right-TICKER_EDGE_INSET;
 
     if(cover){
       const style=getComputedStyle(cover);
       const rect=cover.getBoundingClientRect();
       if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8&&rect.height>8){
-        left=Math.max(left,Math.round(rect.right-nowRect.left+TICKER_COVER_GAP));
+        desiredLeft=Math.max(desiredLeft,rect.right+TICKER_COVER_GAP);
       }
     }
     if(history){
       const style=getComputedStyle(history);
       const rect=history.getBoundingClientRect();
       if(style.display!=='none'&&style.visibility!=='hidden'&&rect.width>8){
-        const historyRight=Math.round(rect.right-nowRect.left);
-        rightEdge=Math.min(Math.round(nowRect.width),Math.max(left+TICKER_MIN_WIDTH,historyRight));
+        desiredRight=Math.min(nowRect.right,Math.max(desiredLeft+TICKER_MIN_WIDTH,rect.right));
       }
     }
 
-    const width=Math.max(TICKER_MIN_WIDTH,Math.round(rightEdge-left));
-    const right=Math.max(0,Math.round(nowRect.width-rightEdge));
+    let left=Math.round(desiredLeft-nowRect.left);
+    let width=Math.max(TICKER_MIN_WIDTH,Math.round(desiredRight-desiredLeft));
     now.style.setProperty('--s666-main-ticker-left',left+'px');
+    now.style.setProperty('--s666-main-ticker-width',width+'px');
+
+    if(tickerWindow){
+      const rendered=tickerWindow.getBoundingClientRect();
+      if(rendered.width>0){
+        const leftError=desiredLeft-rendered.left;
+        const rightError=desiredRight-rendered.right;
+        if(Math.abs(leftError)>0.5||Math.abs(rightError)>0.5){
+          left=Math.round(left+leftError);
+          width=Math.max(TICKER_MIN_WIDTH,Math.round(width+rightError-leftError));
+          now.style.setProperty('--s666-main-ticker-left',left+'px');
+          now.style.setProperty('--s666-main-ticker-width',width+'px');
+        }
+      }
+    }
+
+    const rightEdge=Math.round(left+width);
+    const right=Math.max(0,Math.round(nowRect.width-rightEdge));
     now.style.setProperty('--s666-main-ticker-right',right+'px');
     now.style.setProperty('--s666-main-ticker-right-edge',rightEdge+'px');
-    now.style.setProperty('--s666-main-ticker-width',width+'px');
   }
 
   function stopTickerAnimation(ticker){
