@@ -1,11 +1,12 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.5
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.6
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and the real History-button outer edge so idle/play states share one lane.
  * Runtime calibration compares the rendered ticker viewport edges to the desired cover/History viewport coordinates, eliminating containing-block/padding drift.
- * Marquee motion uses the independent CSS translate property so legacy transform:none!important cannot suppress motion.
+ * Short titles that fit the measured lane stay fully visible and static instead of being needlessly clipped by a marquee cycle.
+ * Long-title marquee distance is measured as one complete rendered text/gap/separator segment so every repeat lands on the next full-title boundary without seam drift.
  * Repeated metadata refreshes do not restart an unchanged marquee, so long titles complete their full cycle.
- * Marquee duration scales with the full rendered title length without a maximum cap, preserving constant readable speed.
+ * Marquee duration scales with the full rendered segment length without a maximum cap, preserving constant readable speed.
  * ResizeObserver keeps cover/History/ticker geometry synchronized without introducing a second layout owner.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
@@ -20,6 +21,8 @@
   const TICKER_EDGE_INSET=18;
   const TICKER_COVER_GAP=20;
   const TICKER_MIN_WIDTH=96;
+  const TICKER_STATIC_PADDING=24;
+  const TICKER_REPEAT_GAP=48;
   let tickerAnimation=null;
   let layoutRaf=0;
 
@@ -57,18 +60,28 @@
     return Math.ceil(node.scrollWidth||node.getBoundingClientRect().width||0);
   }
 
-  function measureSeparatorWidth(ticker){
-    if(!ticker) return 0;
+  function measureLoopSegmentWidth(ticker,text){
+    if(!ticker||!text) return 0;
     const probe=document.createElement('span');
+    const first=document.createElement('span');
+    const gap=document.createElement('span');
+    const separator=document.createElement('span');
+    const second=document.createElement('span');
     const style=getComputedStyle(ticker);
-    probe.textContent=' ◆ ';
     probe.setAttribute('aria-hidden','true');
     probe.style.cssText='position:fixed;left:-10000px;top:-10000px;visibility:hidden;white-space:nowrap;pointer-events:none;';
     probe.style.font=style.font;
     probe.style.letterSpacing=style.letterSpacing;
     probe.style.fontKerning=style.fontKerning;
+    first.textContent=text;
+    gap.style.cssText=`display:inline-block;width:${TICKER_REPEAT_GAP}px;height:1px;`;
+    separator.textContent=' ◆ ';
+    second.textContent=text;
+    probe.append(first,gap,separator,second);
     document.body.appendChild(probe);
-    const width=Math.ceil(probe.getBoundingClientRect().width||probe.scrollWidth||0);
+    const firstRect=first.getBoundingClientRect();
+    const secondRect=second.getBoundingClientRect();
+    const width=Math.ceil(Math.max(0,secondRect.left-firstRect.left));
     probe.remove();
     return width;
   }
@@ -170,6 +183,7 @@
     ticker.classList.remove('is-running','is-static');
     ticker.style.removeProperty('--ticker-shift');
     ticker.style.removeProperty('--ticker-duration');
+    ticker.style.removeProperty('--ticker-segment-width');
     ticker.removeAttribute('data-s666-marquee-text');
     ticker.removeAttribute('data-s666-ticker-driver');
     stopTickerAnimation(ticker);
@@ -180,13 +194,17 @@
     }
 
     const itemWidth=measureTextWidth(ticker);
-    const gapPadding=48;
-    const separatorWidth=measureSeparatorWidth(ticker);
-    const shift=Math.max(1,itemWidth+gapPadding+separatorWidth);
+    if(itemWidth<=Math.max(0,laneWidth-TICKER_STATIC_PADDING)){
+      ticker.classList.add('is-static');
+      return;
+    }
+
+    const shift=Math.max(1,measureLoopSegmentWidth(ticker,text));
     const duration=Math.max(12,shift/42);
 
     ticker.setAttribute('data-s666-marquee-text',text);
     ticker.style.setProperty('--ticker-shift',shift+'px');
+    ticker.style.setProperty('--ticker-segment-width',shift+'px');
     ticker.style.setProperty('--ticker-duration',duration.toFixed(2)+'s');
     ticker.classList.add('is-running');
     void ticker.offsetWidth;
