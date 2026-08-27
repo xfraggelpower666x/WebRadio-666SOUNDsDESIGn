@@ -19,12 +19,24 @@ test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
-test('main ticker uses one measured lane and a deterministic infinite animation driver',()=>{
-  assert.match(js,/measureTextWidth\(ticker\)/);
-  assert.match(js,/measureSeparatorWidth\(ticker\)/);
-  assert.match(js,/shift=Math\.max\(1,itemWidth\+gapPadding\+separatorWidth\)/);
+test('main ticker keeps fitting titles whole and only scrolls genuinely long titles',()=>{
+  assert.match(js,/const TICKER_STATIC_PADDING=24/);
+  assert.match(js,/const itemWidth=measureTextWidth\(ticker\)/);
+  assert.match(js,/if\(itemWidth<=Math\.max\(0,laneWidth-TICKER_STATIC_PADDING\)\)\{/);
+  assert.match(js,/ticker\.classList\.add\('is-static'\)/);
+  assert.match(css,/\.is-static\{min-width:100%!important;translate:0 0!important\}/);
+});
+test('long-title ticker measures one complete repeat segment and loops infinitely without seam drift',()=>{
+  assert.match(js,/const TICKER_REPEAT_GAP=48/);
+  assert.match(js,/function measureLoopSegmentWidth\(ticker,text\)/);
+  assert.match(js,/gap\.style\.cssText=`display:inline-block;width:\$\{TICKER_REPEAT_GAP\}px;height:1px;`/);
+  assert.match(js,/separator\.textContent=' ◆ '/);
+  assert.match(js,/probe\.append\(first,gap,separator,second\)/);
+  assert.match(js,/secondRect\.left-firstRect\.left/);
+  assert.match(js,/const shift=Math\.max\(1,measureLoopSegmentWidth\(ticker,text\)\)/);
   assert.match(js,/const duration=Math\.max\(12,shift\/42\)/);
   assert.doesNotMatch(js,/Math\.min\(52,shift\/42\)/);
+  assert.match(js,/--ticker-segment-width/);
   assert.match(js,/iterations:Infinity/);
   assert.match(js,/ticker\.animate\(/);
   assert.match(js,/tickerAnimation\.id='s666-main-marquee'/);
@@ -32,6 +44,7 @@ test('main ticker uses one measured lane and a deterministic infinite animation 
   assert.match(js,/ticker\.classList\.add\('is-running'\)/);
   assert.match(js,/MutationObserver/);
   assert.match(css,/content:" ◆ " attr\(data-s666-marquee-text\)/);
+  assert.match(css,/padding-left:48px!important/);
   assert.match(css,/linear infinite!important/);
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
