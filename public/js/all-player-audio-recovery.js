@@ -1,7 +1,8 @@
 /*
- * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.1
+ * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.2
  * One conservative recovery owner for Main Desktop, Main Mobile/MFF, VELUNA and Internal.
  * waiting/stalled/suspend are sensors only. Recovery requires confirmed playback loss.
+ * Polling also seeds candidates for silent currentTime/readyState/network stalls that emit no media event.
  * Legacy phase10 recovery is held inside its existing orchestra cooldown while this owner is active.
  * No EQ, Boost, limiter, MeterBus, stream endpoint, auth, skip, Discord or Messenger logic.
  */
@@ -9,7 +10,7 @@
   'use strict';
   if(global.S666AllPlayerAudioRecovery) return;
 
-  const VERSION='1.0.1';
+  const VERSION='1.0.2';
   const OWNER='all-player-audio-recovery-v1';
   const states=new WeakMap();
   const attached=new WeakSet();
@@ -18,8 +19,8 @@
 
   const isMobile=()=>/iphone|ipad|ipod|android/i.test(navigator.userAgent||'')||global.innerWidth<=760;
   const profile=()=>isMobile()
-    ? {pausedConfirmMs:5000,stallConfirmMs:14000,readyLowConfirmMs:9000,hardConfirmMs:4500,cooldownMs:10000,hardReloadMs:26000}
-    : {pausedConfirmMs:8000,stallConfirmMs:18000,readyLowConfirmMs:12000,hardConfirmMs:6500,cooldownMs:14000,hardReloadMs:32000};
+    ? {pausedConfirmMs:5000,stallConfirmMs:14000,readyLowConfirmMs:9000,hardConfirmMs:4500,cooldownMs:10000,hardReloadMs:26000,pollSeedMs:3000}
+    : {pausedConfirmMs:8000,stallConfirmMs:18000,readyLowConfirmMs:12000,hardConfirmMs:6500,cooldownMs:14000,hardReloadMs:32000,pollSeedMs:4000};
 
   function now(){return Date.now();}
   function sourceOf(audio){return String(audio?.currentSrc||audio?.getAttribute?.('src')||audio?.src||'').trim();}
@@ -108,14 +109,26 @@
     const p=profile();
     const t=now();
     const stalledFor=Math.max(0,t-s.lastMoveAt);
-    const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;
     const ready=Number(audio.readyState||0),network=Number(audio.networkState||0);
+
+    if(!s.candidateAt){
+      if(audio.paused){s.candidateAt=t;s.candidateReason='poll-paused';}
+      else if(network===3){s.candidateAt=t;s.candidateReason='poll-network-no-source';}
+      else if(ready<2){s.candidateAt=t;s.candidateReason='poll-ready-low';}
+      else if(stalledFor>=p.pollSeedMs){s.candidateAt=t;s.candidateReason='poll-currenttime-stall';}
+      if(s.candidateAt){
+        setDiag('data-audio-recovery-sensor',s.candidateReason);
+        setDiag('data-audio-recovery-candidate-since',s.candidateAt);
+      }
+    }
+
+    const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;
     const hard=/error|abort|emptied|no-source|decode/i.test(String(s.candidateReason||trigger||''))||network===3||!sourceOf(audio);
     setDiag('data-audio-recovery-stall-ms',stalledFor);
     setDiag('data-audio-recovery-ready',ready);
     setDiag('data-audio-recovery-network',network);
 
-    if(!audio.paused&&ready>=2&&network===2&&stalledFor<p.stallConfirmMs){return;}
+    if(!audio.paused&&ready>=2&&network===2&&stalledFor<p.pollSeedMs){clearCandidate(audio);return;}
     if(audio.paused&&candidateFor>=p.pausedConfirmMs){void softRecover(audio,s,'paused-confirmed');return;}
     if(hard&&candidateFor>=p.hardConfirmMs){
       if(stalledFor>=p.hardReloadMs) void hardRecover(audio,s,'hard-stall-confirmed');
