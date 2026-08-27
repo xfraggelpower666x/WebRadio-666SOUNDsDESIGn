@@ -1,14 +1,15 @@
 /*
- * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.0
+ * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.1
  * One conservative recovery owner for Main Desktop, Main Mobile/MFF, VELUNA and Internal.
  * waiting/stalled/suspend are sensors only. Recovery requires confirmed playback loss.
+ * Legacy phase10 recovery is held inside its existing orchestra cooldown while this owner is active.
  * No EQ, Boost, limiter, MeterBus, stream endpoint, auth, skip, Discord or Messenger logic.
  */
 (function installS666AllPlayerAudioRecovery(global){
   'use strict';
   if(global.S666AllPlayerAudioRecovery) return;
 
-  const VERSION='1.0.0';
+  const VERSION='1.0.1';
   const OWNER='all-player-audio-recovery-v1';
   const states=new WeakMap();
   const attached=new WeakSet();
@@ -40,6 +41,15 @@
     if(Math.abs(t-s.lastTime)>.05){s.lastTime=t;s.lastMoveAt=now();s.candidateAt=0;s.candidateReason='';s.softAttempts=0;}
   }
   function setDiag(name,value){try{document.documentElement.setAttribute(name,String(value));}catch(_){} }
+  function suppressLegacyRecovery(){
+    try{
+      const orchestra=global.S666_AUDIO_HEALING_ORCHESTRA;
+      if(!orchestra||orchestra.owner!==OWNER) return;
+      orchestra.active=true;
+      orchestra.lastRecoveryAt=now();
+      setDiag('data-audio-legacy-recovery','cooldown-muted');
+    }catch(_){}
+  }
   function resumeContexts(){
     for(const key of ['__radioAudioContext','__mffAudioContext']){
       try{const ctx=global[key];if(ctx&&ctx.state==='suspended'){const p=ctx.resume();p?.catch?.(()=>{});}}catch(_){}
@@ -92,6 +102,7 @@
 
   function evaluate(audio,trigger){
     if(!audio) return;
+    suppressLegacyRecovery();
     const s=stateFor(audio);markMove(audio,s);
     if(!expectedToPlay(audio,s)){clearCandidate(audio);return;}
     const p=profile();
@@ -149,9 +160,10 @@
     global.S666_AUDIO_AUTHORITY=Object.assign({},global.S666_AUDIO_AUTHORITY||{}, {transport:'player-owned',recovery:OWNER,legacyRecoveryMuted:true});
     global.S666_AUDIO_HEALING_ORCHESTRA=Object.assign(global.S666_AUDIO_HEALING_ORCHESTRA||{}, {active:true,owner:OWNER,version:VERSION});
     document.documentElement.setAttribute('data-audio-orchestra','active');
+    suppressLegacyRecovery();
     scan();installIntentGuard();installSensorHandoff();
     if(!scanObserver&&document.body){scanObserver=new MutationObserver(scan);scanObserver.observe(document.body,{childList:true,subtree:true});}
-    global.setInterval(()=>document.querySelectorAll('audio').forEach(a=>evaluate(a,'tick')),1000);
+    global.setInterval(()=>{suppressLegacyRecovery();document.querySelectorAll('audio').forEach(a=>evaluate(a,'tick'));},1000);
     for(const ev of ['focus','pageshow','online']) global.addEventListener(ev,()=>document.querySelectorAll('audio').forEach(a=>noteCandidate(a,ev)),{passive:true});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden) document.querySelectorAll('audio').forEach(a=>noteCandidate(a,'visibility'));},{passive:true});
   }
