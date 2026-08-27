@@ -54,13 +54,7 @@
     translate:0 0;
   }
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;translate:0 0!important}
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{
-    content:" ◆ " attr(data-s666-marquee-text);
-    display:inline-block!important;
-    padding-left:48px!important;
-    color:inherit!important;
-    text-shadow:inherit!important;
-  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{animation:none!important}
 
@@ -77,53 +71,17 @@
 @media (min-width:761px) and (max-height:820px){body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{bottom:18px!important}}
 
 @media (max-width:760px){
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{
-    position:relative!important;left:auto!important;display:inline-block!important;width:max-content!important;min-width:0!important;max-width:none!important;padding-left:0!important;padding-right:0!important;margin:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;transform:none!important;animation:none!important;will-change:translate!important;translate:0 0
-  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{position:relative!important;left:auto!important;display:inline-block!important;width:max-content!important;min-width:0!important;max-width:none!important;padding-left:0!important;padding-right:0!important;margin:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;transform:none!important;animation:none!important;will-change:translate!important;translate:0 0}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;padding-left:0!important;transform:none!important;animation:none!important;translate:0 0!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{transform:none!important;animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{transform:none!important;animation:none!important}
 
-  /* Actual rendered Main mobile title: this survives killOldDom() while .player-shell/#nowPlayingTicker does not. */
   html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker{
-    display:inline-block!important;
-    position:relative!important;
-    width:max-content!important;
-    min-width:0!important;
-    max-width:none!important;
-    padding-left:0!important;
-    padding-right:0!important;
-    margin:0!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
-    text-overflow:clip!important;
-    transform:none!important;
-    animation:none!important;
-    will-change:translate!important;
-    translate:0 0;
+    display:inline-block!important;position:relative!important;width:max-content!important;min-width:0!important;max-width:none!important;padding-left:0!important;padding-right:0!important;margin:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;transform:none!important;animation:none!important;will-change:translate!important;translate:0 0
   }
-  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-static{
-    min-width:100%!important;
-    padding-left:0!important;
-    padding-right:0!important;
-    transform:none!important;
-    animation:none!important;
-    translate:0 0!important;
-  }
-  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running::after{
-    content:" ◆ " attr(data-s666-marquee-text);
-    display:inline-block!important;
-    padding-left:48px!important;
-    color:inherit!important;
-    text-shadow:inherit!important;
-  }
-  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running[data-s666-mff-ticker-driver="css"]{
-    transform:none!important;
-    animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important;
-  }
-  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running[data-s666-mff-ticker-driver="waapi"]{
-    transform:none!important;
-    animation:none!important;
-  }
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-static{min-width:100%!important;padding-left:0!important;padding-right:0!important;transform:none!important;animation:none!important;translate:0 0!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running[data-s666-mff-ticker-driver="css"]{transform:none!important;animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running[data-s666-mff-ticker-driver="waapi"]{transform:none!important;animation:none!important}
 }
