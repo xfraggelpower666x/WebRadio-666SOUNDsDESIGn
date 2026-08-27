@@ -5,6 +5,9 @@ const read=p=>fs.readFileSync(p,'utf8');
 const js=read('js/main-veluna-adapter.js');
 const css=read('css/main-veluna-adapter.css');
 const desktopCss=read('css/desktop.css');
+const stageCss=read('css/player-stage-v2.css');
+const patchesCss=read('css/player-patches.css');
+const indexHtml=read('index.html');
 const centralBoot=read('js/central-boot-screen.js');
 const headers=read('_headers');
 const bootstrap=read('config/veluna-assets.js');
@@ -27,13 +30,35 @@ test('main ticker keeps fitting titles whole and only scrolls genuinely long tit
   assert.match(js,/ticker\.classList\.add\('is-static'\)/);
   assert.match(css,/\.is-static\{min-width:100%!important;translate:0 0!important\}/);
 });
-test('mobile adapter ownership neutralizes legacy full-field marquee for fitting titles and preserves owned long-title drivers',()=>{
+test('mobile adapter ownership neutralizes legacy full-field marquee for fitting desktop-DOM titles and preserves owned long-title drivers',()=>{
   assert.match(desktopCss,/padding-left:100%!important/);
   assert.match(desktopCss,/MobileTicker[\w-]*[^\n]*infinite!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*#nowPlayingTicker\.s666-veluna-main-ticker\{[\s\S]*padding-left:0!important;[\s\S]*transform:none!important;[\s\S]*animation:none!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*#nowPlayingTicker\.s666-veluna-main-ticker\.is-static\{[\s\S]*min-width:100%!important;[\s\S]*padding-left:0!important;[\s\S]*animation:none!important;[\s\S]*translate:0 0!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="css"\][\s\S]*animation:s666VelunaMainTicker var\(--ticker-duration,18s\) linear infinite!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="waapi"\][\s\S]*animation:none!important/);
+});
+test('actual rendered <=760px MFF title is discovered, classified and overrides legacy unconditional marquees',()=>{
+  assert.match(indexHtml,/id='mffApp'/);
+  assert.match(indexHtml,/class="mff-title"><small>NOW PLAYING<\/small><h1><span>666SOUNDsDESIGn WebRadio<\/span><\/h1>/);
+  assert.match(indexHtml,/\.player-shell/);
+  assert.match(indexHtml,/try\{n\.remove\(\)\}catch\(e\)\{\}/);
+  assert.match(stageCss,/#mffApp \.mff-title h1 \.s666-title-marquee\{[\s\S]*animation:s666TitleMarquee 15s linear infinite!important/);
+  assert.match(patchesCss,/\.mff-title h1 span\{[\s\S]*padding-left:100%!important;[\s\S]*animation:mffMarquee 13s linear infinite!important/);
+  assert.match(js,/function syncMffTickerMotion\(\)/);
+  assert.match(js,/if\(window\.innerWidth>760\) return/);
+  assert.match(js,/#mffApp \.mff-title h1/);
+  assert.match(js,/ticker\.classList\.add\('s666-veluna-mff-ticker'\)/);
+  assert.match(js,/ticker\.dataset\.s666MffTickerSignature===signature/);
+  assert.match(js,/ticker\.dataset\.s666MffTickerDriver/);
+  assert.match(js,/mffTickerAnimation\.id='s666-mff-marquee'/);
+  assert.match(js,/function installMffTicker\(\)/);
+  assert.match(js,/function discoverMffTicker\(\)/);
+  assert.match(js,/mffDiscoveryObserver\.observe\(document\.body,\{childList:true,subtree:true\}\)/);
+  assert.match(css,/#mffApp \.mff-title h1 span\.s666-veluna-mff-ticker\{[\s\S]*padding-left:0!important;[\s\S]*transform:none!important;[\s\S]*animation:none!important/);
+  assert.match(css,/#mffApp \.mff-title h1 span\.s666-veluna-mff-ticker\.is-static\{[\s\S]*min-width:100%!important;[\s\S]*animation:none!important;[\s\S]*translate:0 0!important/);
+  assert.match(css,/s666-veluna-mff-ticker\.is-running\[data-s666-mff-ticker-driver="css"\][\s\S]*animation:s666VelunaMainTicker var\(--ticker-duration,18s\) linear infinite!important/);
+  assert.match(css,/s666-veluna-mff-ticker\.is-running\[data-s666-mff-ticker-driver="waapi"\][\s\S]*animation:none!important/);
 });
 test('long-title ticker measures one complete repeat segment and loops infinitely without seam drift',()=>{
   assert.match(js,/const TICKER_REPEAT_GAP=48/);
