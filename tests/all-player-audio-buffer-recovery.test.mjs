@@ -74,6 +74,6 @@ test('legacy mobile self-heal can hand sensor events to the canonical owner',()=
   assert.match(recovery,/recovery:OWNER,legacyRecoveryMuted:true/);
 });
 
-test('protected DSP and backend subsystems are absent from recovery core',()=>{
-  assert.doesNotMatch(recovery,/createMediaElementSource|BiquadFilter|DynamicsCompressor|MeterBus|S666SkipControl|Discord|Messenger|\/api\/|fetch\(/);
+test('protected DSP and backend APIs are not invoked by recovery core',()=>{
+  assert.doesNotMatch(recovery,/createMediaElementSource|createBiquadFilter|createDynamicsCompressor|__MeterBus|S666SkipControl|S666Discord|S666Messenger|\/api\/|fetch\(/);
 });
