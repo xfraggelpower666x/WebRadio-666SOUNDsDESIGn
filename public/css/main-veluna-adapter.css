@@ -1,6 +1,7 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.8
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.9
  * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
  * Horizontal fallback geometry now matches the measured 18px outer inset; runtime JS anchors the right edge directly to History.
+ * Adapter-managed mobile titles override legacy desktop.css marquee padding/transform so fitting titles can remain whole and static.
  * No legacy main cyber-boot CSS remains here.
  */
 @keyframes s666VelunaMainTicker{from{translate:0 0}to{translate:calc(-1 * var(--ticker-shift,500px)) 0}}
@@ -80,4 +81,48 @@
 }
 @media (min-width:761px) and (max-height:820px){
   body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{bottom:18px!important}
+}
+
+/* Main mobile ticker ownership: neutralize legacy desktop.css transform/padding animations only after the adapter has claimed the ticker. */
+@media (max-width:760px){
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{
+    position:relative!important;
+    left:auto!important;
+    display:inline-block!important;
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    margin:0!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    transform:none!important;
+    animation:none!important;
+    will-change:translate!important;
+    translate:0 0;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{
+    min-width:100%!important;
+    padding-left:0!important;
+    transform:none!important;
+    animation:none!important;
+    translate:0 0!important;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{
+    content:" ◆ " attr(data-s666-marquee-text);
+    display:inline-block!important;
+    padding-left:48px!important;
+    color:inherit!important;
+    text-shadow:inherit!important;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{
+    transform:none!important;
+    animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important;
+  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{
+    transform:none!important;
+    animation:none!important;
+  }
 }

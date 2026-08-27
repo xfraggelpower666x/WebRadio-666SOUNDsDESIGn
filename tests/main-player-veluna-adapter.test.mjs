@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(p,'utf8');
 const js=read('js/main-veluna-adapter.js');
 const css=read('css/main-veluna-adapter.css');
+const desktopCss=read('css/desktop.css');
 const centralBoot=read('js/central-boot-screen.js');
 const headers=read('_headers');
 const bootstrap=read('config/veluna-assets.js');
@@ -25,6 +26,14 @@ test('main ticker keeps fitting titles whole and only scrolls genuinely long tit
   assert.match(js,/if\(itemWidth<=Math\.max\(0,laneWidth-TICKER_STATIC_PADDING\)\)\{/);
   assert.match(js,/ticker\.classList\.add\('is-static'\)/);
   assert.match(css,/\.is-static\{min-width:100%!important;translate:0 0!important\}/);
+});
+test('mobile adapter ownership neutralizes legacy full-field marquee for fitting titles and preserves owned long-title drivers',()=>{
+  assert.match(desktopCss,/padding-left:100%!important/);
+  assert.match(desktopCss,/MobileTicker[\w-]*[^\n]*infinite!important/);
+  assert.match(css,/@media \(max-width:760px\)\{[\s\S]*#nowPlayingTicker\.s666-veluna-main-ticker\{[\s\S]*padding-left:0!important;[\s\S]*transform:none!important;[\s\S]*animation:none!important/);
+  assert.match(css,/@media \(max-width:760px\)\{[\s\S]*#nowPlayingTicker\.s666-veluna-main-ticker\.is-static\{[\s\S]*min-width:100%!important;[\s\S]*padding-left:0!important;[\s\S]*animation:none!important;[\s\S]*translate:0 0!important/);
+  assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="css"\][\s\S]*animation:s666VelunaMainTicker var\(--ticker-duration,18s\) linear infinite!important/);
+  assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="waapi"\][\s\S]*animation:none!important/);
 });
 test('long-title ticker measures one complete repeat segment and loops infinitely without seam drift',()=>{
   assert.match(js,/const TICKER_REPEAT_GAP=48/);
