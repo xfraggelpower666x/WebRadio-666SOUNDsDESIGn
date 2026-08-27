@@ -5,23 +5,23 @@ const read=p=>fs.readFileSync(p,'utf8');
 const main=read('js/main-veluna-adapter.js');
 const viewport=read('js/veluna-viewport-lock.js');
 
-test('main ticker geometry measures real cover and History edges relative to now-playing',()=>{
+test('main ticker geometry calibrates real rendered cover and History viewport edges',()=>{
   assert.match(main,/const TICKER_EDGE_INSET=18/);
   assert.match(main,/const TICKER_COVER_GAP=20/);
   assert.match(main,/const TICKER_MIN_WIDTH=96/);
   assert.match(main,/const nowRect=now\.getBoundingClientRect\(\)/);
-  assert.match(main,/left=Math\.max\(left,Math\.round\(rect\.right-nowRect\.left\+TICKER_COVER_GAP\)\)/);
-  assert.match(main,/const historyRight=Math\.round\(rect\.right-nowRect\.left\)/);
-  assert.match(main,/rightEdge=Math\.min\(Math\.round\(nowRect\.width\),Math\.max\(left\+TICKER_MIN_WIDTH,historyRight\)\)/);
-  assert.match(main,/const width=Math\.max\(TICKER_MIN_WIDTH,Math\.round\(rightEdge-left\)\)/);
-  assert.match(main,/const right=Math\.max\(0,Math\.round\(nowRect\.width-rightEdge\)\)/);
-  assert.doesNotMatch(main,/nowRect\.right-rect\.right/);
-  assert.doesNotMatch(main,/right=Math\.max\(right,Math\.ceil\(nowRect\.right-rect\.left\+12\)\)/);
+  assert.match(main,/const tickerWindow=q\('\.ticker-window',now\|\|document\)/);
+  assert.match(main,/desiredLeft=Math\.max\(desiredLeft,rect\.right\+TICKER_COVER_GAP\)/);
+  assert.match(main,/desiredRight=Math\.min\(nowRect\.right,Math\.max\(desiredLeft\+TICKER_MIN_WIDTH,rect\.right\)\)/);
+  assert.match(main,/const rendered=tickerWindow\.getBoundingClientRect\(\)/);
+  assert.match(main,/const leftError=desiredLeft-rendered\.left/);
+  assert.match(main,/const rightError=desiredRight-rendered\.right/);
+  assert.match(main,/left=Math\.round\(left\+leftError\)/);
+  assert.match(main,/width=Math\.max\(TICKER_MIN_WIDTH,Math\.round\(width\+rightError-leftError\)\)/);
   assert.match(main,/--s666-main-ticker-left/);
   assert.match(main,/--s666-main-ticker-right/);
   assert.match(main,/--s666-main-ticker-right-edge/);
   assert.match(main,/--s666-main-ticker-width/);
-  assert.doesNotMatch(main,/offset=Math\.ceil\(rect\.width\+14\)/);
   assert.equal(read('public/js/main-veluna-adapter.js'),main);
 });
 

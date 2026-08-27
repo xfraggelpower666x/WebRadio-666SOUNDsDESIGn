@@ -36,18 +36,18 @@ test('main ticker uses one measured lane and a deterministic infinite animation 
   assert.match(css,/data-s666-ticker-driver="waapi"/);
   assert.match(css,/data-s666-ticker-driver="css"/);
 });
-test('main ticker geometry keeps extra cover breathing room and ends at the real History outer edge',()=>{
+test('main ticker geometry calibrates rendered viewport edges to the real cover and History edges',()=>{
   assert.match(js,/const TICKER_EDGE_INSET=18/);
   assert.match(js,/const TICKER_COVER_GAP=20/);
   assert.match(js,/const TICKER_MIN_WIDTH=96/);
   assert.match(js,/function syncTickerGeometry\(\)/);
-  assert.match(js,/const history=q\('#historyToggle'/);
-  assert.match(js,/rect\.right-nowRect\.left\+TICKER_COVER_GAP/);
-  assert.match(js,/const historyRight=Math\.round\(rect\.right-nowRect\.left\)/);
-  assert.match(js,/rightEdge=Math\.min\(Math\.round\(nowRect\.width\),Math\.max\(left\+TICKER_MIN_WIDTH,historyRight\)\)/);
-  assert.match(js,/const width=Math\.max\(TICKER_MIN_WIDTH,Math\.round\(rightEdge-left\)\)/);
-  assert.match(js,/const right=Math\.max\(0,Math\.round\(nowRect\.width-rightEdge\)\)/);
-  assert.doesNotMatch(js,/nowRect\.right-rect\.right/);
+  assert.match(js,/const tickerWindow=q\('\.ticker-window',now\|\|document\)/);
+  assert.match(js,/desiredLeft=Math\.max\(desiredLeft,rect\.right\+TICKER_COVER_GAP\)/);
+  assert.match(js,/desiredRight=Math\.min\(nowRect\.right,Math\.max\(desiredLeft\+TICKER_MIN_WIDTH,rect\.right\)\)/);
+  assert.match(js,/const rendered=tickerWindow\.getBoundingClientRect\(\)/);
+  assert.match(js,/const leftError=desiredLeft-rendered\.left/);
+  assert.match(js,/const rightError=desiredRight-rendered\.right/);
+  assert.match(js,/width=Math\.max\(TICKER_MIN_WIDTH,Math\.round\(width\+rightError-leftError\)\)/);
   assert.match(js,/--s666-main-ticker-left/);
   assert.match(js,/--s666-main-ticker-right/);
   assert.match(js,/--s666-main-ticker-right-edge/);
