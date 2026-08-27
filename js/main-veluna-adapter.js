@@ -1,10 +1,11 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.6
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.7
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and the real History-button outer edge so idle/play states share one lane.
  * Runtime calibration compares the rendered ticker viewport edges to the desired cover/History viewport coordinates, eliminating containing-block/padding drift.
  * Short titles that fit the measured lane stay fully visible and static instead of being needlessly clipped by a marquee cycle.
  * Long-title marquee distance is measured as one complete rendered text/gap/separator segment so every repeat lands on the next full-title boundary without seam drift.
+ * The actual <=760px MFF title receives the same ownership/classification after mobile DOM replacement.
  * Repeated metadata refreshes do not restart an unchanged marquee, so long titles complete their full cycle.
  * Marquee duration scales with the full rendered segment length without a maximum cap, preserving constant readable speed.
  * ResizeObserver keeps cover/History/ticker geometry synchronized without introducing a second layout owner.
@@ -24,7 +25,9 @@
   const TICKER_STATIC_PADDING=24;
   const TICKER_REPEAT_GAP=48;
   let tickerAnimation=null;
+  let mffTickerAnimation=null;
   let layoutRaf=0;
+  let mffDiscoveryObserver=null;
 
   function ensureVelunaCentralBoot(){
     const central=window.S666CentralBootScreen;
@@ -147,6 +150,16 @@
     }catch(_){}
   }
 
+  function stopMffTickerAnimation(ticker){
+    try{mffTickerAnimation?.cancel?.();}catch(_){}
+    mffTickerAnimation=null;
+    try{
+      for(const animation of ticker?.getAnimations?.()||[]){
+        if(animation?.id==='s666-mff-marquee') animation.cancel();
+      }
+    }catch(_){}
+  }
+
   function startTickerAnimation(ticker,shift,duration){
     stopTickerAnimation(ticker);
     if(typeof ticker.animate==='function'){
@@ -161,6 +174,22 @@
       }catch(_){}
     }
     ticker.dataset.s666TickerDriver='css';
+  }
+
+  function startMffTickerAnimation(ticker,shift,duration){
+    stopMffTickerAnimation(ticker);
+    if(typeof ticker.animate==='function'){
+      try{
+        mffTickerAnimation=ticker.animate(
+          [{translate:'0 0'},{translate:`-${shift}px 0`}],
+          {duration:Math.round(duration*1000),iterations:Infinity,easing:'linear'}
+        );
+        mffTickerAnimation.id='s666-mff-marquee';
+        ticker.dataset.s666MffTickerDriver='waapi';
+        return;
+      }catch(_){}
+    }
+    ticker.dataset.s666MffTickerDriver='css';
   }
 
   function syncTickerMotion(){
@@ -211,9 +240,59 @@
     startTickerAnimation(ticker,shift,duration);
   }
 
+  function syncMffTickerMotion(){
+    if(window.innerWidth>760) return;
+    const lane=q('body[data-veluna-page="main"] #mffApp .mff-title h1');
+    const ticker=q('span',lane||document);
+    if(!lane||!ticker) return;
+
+    ticker.classList.add('s666-veluna-mff-ticker');
+    const text=(ticker.textContent||'').replace(/\s+/g,' ').trim();
+    const laneWidth=Math.round(lane.getBoundingClientRect().width||lane.clientWidth||0);
+    const signature=text+'|'+laneWidth;
+    const unchanged=ticker.dataset.s666MffTickerSignature===signature;
+    const active=ticker.classList.contains('is-static')||(
+      ticker.classList.contains('is-running')&&!!ticker.dataset.s666MffTickerDriver
+    );
+    if(unchanged&&active) return;
+    ticker.dataset.s666MffTickerSignature=signature;
+
+    ticker.classList.remove('is-running','is-static');
+    ticker.style.removeProperty('--ticker-shift');
+    ticker.style.removeProperty('--ticker-duration');
+    ticker.style.removeProperty('--ticker-segment-width');
+    ticker.removeAttribute('data-s666-marquee-text');
+    ticker.removeAttribute('data-s666-mff-ticker-driver');
+    stopMffTickerAnimation(ticker);
+
+    if(!text){
+      ticker.classList.add('is-static');
+      return;
+    }
+
+    const itemWidth=measureTextWidth(ticker);
+    if(itemWidth<=Math.max(0,laneWidth-TICKER_STATIC_PADDING)){
+      ticker.classList.add('is-static');
+      return;
+    }
+
+    const shift=Math.max(1,measureLoopSegmentWidth(ticker,text));
+    const duration=Math.max(12,shift/42);
+    ticker.setAttribute('data-s666-marquee-text',text);
+    ticker.style.setProperty('--ticker-shift',shift+'px');
+    ticker.style.setProperty('--ticker-segment-width',shift+'px');
+    ticker.style.setProperty('--ticker-duration',duration.toFixed(2)+'s');
+    ticker.classList.add('is-running');
+    void ticker.offsetWidth;
+    startMffTickerAnimation(ticker,shift,duration);
+  }
+
   function scheduleTickerSync(){
     cancelAnimationFrame(layoutRaf);
-    layoutRaf=requestAnimationFrame(()=>requestAnimationFrame(syncTickerMotion));
+    layoutRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      syncTickerMotion();
+      syncMffTickerMotion();
+    }));
   }
 
   function installTicker(){
@@ -225,6 +304,42 @@
       observer.observe(ticker,{childList:true,characterData:true,subtree:true});
     }
     scheduleTickerSync();
+  }
+
+  function installMffTicker(){
+    const lane=q('body[data-veluna-page="main"] #mffApp .mff-title h1');
+    const ticker=q('span',lane||document);
+    if(!lane||!ticker) return false;
+    if(ticker.dataset.s666VelunaMffTicker!=='1'){
+      ticker.dataset.s666VelunaMffTicker='1';
+      const observer=new MutationObserver(scheduleTickerSync);
+      observer.observe(ticker,{childList:true,characterData:true,subtree:true});
+      if(typeof ResizeObserver==='function'){
+        try{
+          const resizeObserver=new ResizeObserver(scheduleTickerSync);
+          resizeObserver.observe(lane);
+          window.__S666_MAIN_MFF_TICKER_RESIZE_OBSERVER__=resizeObserver;
+        }catch(_){}
+      }
+    }
+    scheduleTickerSync();
+    return true;
+  }
+
+  function discoverMffTicker(){
+    if(installMffTicker()){
+      try{mffDiscoveryObserver?.disconnect?.();}catch(_){}
+      mffDiscoveryObserver=null;
+      return;
+    }
+    if(mffDiscoveryObserver||!document.body) return;
+    mffDiscoveryObserver=new MutationObserver(()=>{
+      if(installMffTicker()){
+        try{mffDiscoveryObserver?.disconnect?.();}catch(_){}
+        mffDiscoveryObserver=null;
+      }
+    });
+    mffDiscoveryObserver.observe(document.body,{childList:true,subtree:true});
   }
 
   function bindLayoutSignals(){
@@ -250,7 +365,8 @@
     ensureVelunaCentralBoot();
     bindLayoutSignals();
     installTicker();
+    discoverMffTicker();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();scheduleTickerSync();},{once:true});
+  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();discoverMffTicker();scheduleTickerSync();},{once:true});
 })();
