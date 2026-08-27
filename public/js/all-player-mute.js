@@ -2,16 +2,33 @@
  * 666SOUNDsDESIGn — Shared All-Player Mute Control
  * Scope: Main, mobile, VELUNA and internal fallback player.
  * Contract: toggle only HTMLMediaElement.muted; never rewrite volume, boost, EQ or audio graph.
+ * v1.2.0: shared infrastructure also bootstraps the canonical all-player audio recovery owner.
  */
 (() => {
   'use strict';
 
   if (window.S666AllPlayerMute?.version) return;
 
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const BUTTON_ID = 's666MuteButton';
   let boundAudio = null;
   let observer = null;
+
+  const ensureAudioRecoveryOwner = () => {
+    if (window.S666AllPlayerAudioRecovery?.version) {
+      try { window.S666AllPlayerAudioRecovery.scan?.(); } catch (_) {}
+      return;
+    }
+    const base = '/js/all-player-audio-recovery.js';
+    if (Array.from(document.scripts).some(script => String(script.src || '').includes(base))) return;
+    const script = document.createElement('script');
+    script.src = base + '?v=20260827-all-player-buffer-recovery-v1';
+    script.defer = false;
+    script.async = false;
+    script.dataset.s666AllPlayerAudioRecovery = 'js';
+    (document.head || document.documentElement).appendChild(script);
+  };
+  ensureAudioRecoveryOwner();
 
   const findAudio = () => {
     const direct = document.getElementById('radio');
@@ -115,10 +132,12 @@
       boundAudio.addEventListener('volumechange', onVolumeChange);
     }
     syncButton(boundAudio);
+    try { window.S666AllPlayerAudioRecovery?.attach?.(audio); } catch (_) {}
     return boundAudio;
   }
 
   const mount = () => {
+    ensureAudioRecoveryOwner();
     ensureButton();
     bindAudio();
     if (!observer && document.documentElement) {
