@@ -38,21 +38,30 @@ test('mobile adapter ownership neutralizes legacy full-field marquee for fitting
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="css"\][\s\S]*animation:s666VelunaMainTicker var\(--ticker-duration,18s\) linear infinite!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="waapi"\][\s\S]*animation:none!important/);
 });
-test('actual rendered <=760px MFF title is discovered, classified and overrides legacy unconditional marquees',()=>{
+test('actual rendered <=760px MFF lane owns every replacement span and normalizes the legacy doubled payload',()=>{
   assert.match(indexHtml,/id='mffApp'/);
   assert.match(indexHtml,/class="mff-title"><small>NOW PLAYING<\/small><h1><span>666SOUNDsDESIGn WebRadio<\/span><\/h1>/);
   assert.match(indexHtml,/\.player-shell/);
   assert.match(indexHtml,/try\{n\.remove\(\)\}catch\(e\)\{\}/);
   assert.match(stageCss,/#mffApp \.mff-title h1 \.s666-title-marquee\{[\s\S]*animation:s666TitleMarquee 15s linear infinite!important/);
   assert.match(patchesCss,/\.mff-title h1 span\{[\s\S]*padding-left:100%!important;[\s\S]*animation:mffMarquee 13s linear infinite!important/);
+  assert.match(js,/function normalizeMffTickerText\(value\)/);
+  assert.match(js,/const marker=' • '/);
+  assert.match(js,/return first&&second===first\?first:clean/);
   assert.match(js,/function syncMffTickerMotion\(\)/);
   assert.match(js,/if\(window\.innerWidth>760\) return/);
   assert.match(js,/#mffApp \.mff-title h1/);
+  assert.match(js,/const raw=\(ticker\.textContent\|\|''\)\.replace/);
+  assert.match(js,/const text=normalizeMffTickerText\(raw\)/);
+  assert.match(js,/if\(text!==raw\) ticker\.textContent=text/);
   assert.match(js,/ticker\.classList\.add\('s666-veluna-mff-ticker'\)/);
   assert.match(js,/ticker\.dataset\.s666MffTickerSignature===signature/);
   assert.match(js,/ticker\.dataset\.s666MffTickerDriver/);
   assert.match(js,/mffTickerAnimation\.id='s666-mff-marquee'/);
   assert.match(js,/function installMffTicker\(\)/);
+  assert.match(js,/lane\.dataset\.s666VelunaMffTickerLane!=='1'/);
+  assert.match(js,/observer\.observe\(lane,\{childList:true,characterData:true,subtree:true\}\)/);
+  assert.match(js,/window\.__S666_MAIN_MFF_TICKER_MUTATION_OBSERVER__=observer/);
   assert.match(js,/function discoverMffTicker\(\)/);
   assert.match(js,/mffDiscoveryObserver\.observe\(document\.body,\{childList:true,subtree:true\}\)/);
   assert.match(css,/#mffApp \.mff-title h1 span\.s666-veluna-mff-ticker\{[\s\S]*padding-left:0!important;[\s\S]*transform:none!important;[\s\S]*animation:none!important/);
