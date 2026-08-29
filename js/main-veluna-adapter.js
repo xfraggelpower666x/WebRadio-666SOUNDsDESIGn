@@ -25,6 +25,28 @@
   let tickerAnimation=null;
   let layoutRaf=0;
 
+  function ensureVelunaCentralBoot(){
+    const central=window.S666CentralBootScreen;
+    if(central){
+      try{central.bootOnce?.();}catch(_){}
+      return;
+    }
+    const existing=Array.from(document.scripts).find(script=>String(script.src||'').includes('/js/central-boot-screen.js'));
+    if(existing){
+      if(existing.dataset.s666MainBootBound!=='1'){
+        existing.dataset.s666MainBootBound='1';
+        existing.addEventListener('load',()=>{try{window.S666CentralBootScreen?.bootOnce?.();}catch(_){}},{once:true});
+      }
+      return;
+    }
+    const script=document.createElement('script');
+    script.src=CENTRAL_BOOT_SRC;
+    script.async=false;
+    script.dataset.s666MainVelunaCentralBoot='1';
+    script.addEventListener('load',()=>{try{window.S666CentralBootScreen?.bootOnce?.();}catch(_){}},{once:true});
+    (document.head||document.documentElement).appendChild(script);
+  }
+
   function measureLoopSegmentWidth(ticker,text){
     if(!ticker||!text) return 0;
     const probe=document.createElement('span');
