@@ -30,7 +30,6 @@ window.VELUNA_ASSETS = Object.freeze({
   const playerStageVersion = '2026-08-23-header-owner-cascade-v2';
   const mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4';
   const velunaThemeVersion = '2026-08-23-iphone-bottom-history-owner-v1';
-  const fraggelPulseBpmVersion = '2026-08-29-v1';
   const head = document.head || document.documentElement;
   if (!head) return;
 
@@ -181,7 +180,6 @@ window.VELUNA_ASSETS = Object.freeze({
   if (existingPlayerStage) existingPlayerStage.href = `/css/player-stage-v2.css?v=${playerStageVersion}`;
   loadStyle(`/css/main-veluna-adapter.css?v=${mainVelunaAdapterVersion}`, 's666MainVelunaAdapter');
   void loadScript(`/js/main-veluna-adapter.js?v=${mainVelunaAdapterVersion}`, 's666MainVelunaAdapter', () => !!window.__S666_MAIN_VELUNA_ADAPTER__).catch(() => {});
-  void loadScript(`/js/fraggel-pulse-bpm.js?v=${fraggelPulseBpmVersion}`, 's666FraggelPulseBpm', () => !!window.S666FraggelPulseBpm?.version).catch(() => {});
 
   const activateOverlay = () => {
     try {
