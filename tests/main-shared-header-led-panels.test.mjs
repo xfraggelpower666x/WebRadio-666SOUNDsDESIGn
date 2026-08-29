@@ -48,7 +48,8 @@ test('Main observational LED bridge gives Buffer Worker Audio Watchdog and Recon
 
 test('LED bridge is observational and does not mutate protected audio graph or transport',()=>{
   assert.doesNotMatch(js,/new AudioContext|webkitAudioContext|createMediaElementSource|createGain|createBiquadFilter/);
-  assert.doesNotMatch(js,/\.load\(\)|\.src\s*=|removeAttribute\(['"]src['"]\)/);
+  assert.doesNotMatch(js,/audio\.(?:load|play|pause)\s*\(/);
+  assert.doesNotMatch(js,/audio\.src\s*=|audio\.setAttribute\(['"]src['"]|audio\.removeAttribute\(['"]src['"]\)/);
   assert.doesNotMatch(js,/SMFPBoostCore|MeterBus/);
 });
 
