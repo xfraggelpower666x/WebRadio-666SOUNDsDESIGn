@@ -1,4 +1,4 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.7
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.8
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and the real History-button outer edge so idle/play states share one lane.
@@ -6,9 +6,8 @@
  * Every non-empty title owns the continuous marquee again; fitting titles are no longer forced static.
  * Marquee distance is measured as one complete rendered text/gap/separator segment so every repeat lands on the next full-title boundary without seam drift.
  * Repeated metadata refreshes do not restart an unchanged marquee, so titles complete their full cycle.
- * Marquee duration scales with the full rendered segment length without a maximum cap, preserving constant readable speed.
+ * Main HUD LEDs are observational only: Buffer, Worker, Audio, Watchdog and Reconnect now reflect real runtime state without owning those systems.
  * ResizeObserver keeps cover/History/ticker geometry synchronized without introducing a second layout owner.
- * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
  */
 (function(){
   'use strict';
@@ -22,8 +21,11 @@
   const TICKER_COVER_GAP=20;
   const TICKER_MIN_WIDTH=96;
   const TICKER_REPEAT_GAP=48;
+  const LED_STATE_CLASSES=['state-main','state-backup','state-api','state-fallback','state-external','state-internal','state-error','state-ok','state-warn','state-empty','state-stopped','state-paused','state-off','is-active'];
   let tickerAnimation=null;
   let layoutRaf=0;
+  let workerTimer=0;
+  let reconnectTimer=0;
 
   function ensureVelunaCentralBoot(){
     const central=window.S666CentralBootScreen;
@@ -208,6 +210,82 @@
     scheduleTickerSync();
   }
 
+  function setObservedLed(id,state,title){
+    const led=q('#'+id);
+    if(!led) return;
+    LED_STATE_CLASSES.forEach(name=>led.classList.remove(name));
+    const safe=['main','backup','api','fallback','external','internal','error','ok','warn','empty','stopped','paused','off'].includes(state)?state:'empty';
+    led.classList.add('state-'+safe);
+    if(!['empty','off'].includes(safe)) led.classList.add('is-active');
+    led.dataset.ledState=safe;
+    if(title) led.title=title;
+  }
+
+  function syncAudioHudLeds(){
+    const audio=q('#radio')||q('audio');
+    if(!audio){
+      setObservedLed('statusBuffer','error','Stream Buffer — kein Audioelement');
+      setObservedLed('statusAudio','error','Audio-Core — Audioelement fehlt');
+      return;
+    }
+    if(audio.error){
+      setObservedLed('statusBuffer','error','Stream Buffer — Mediafehler');
+      setObservedLed('statusAudio','error','Audio-Core — Mediafehler');
+    }else if(audio.paused){
+      setObservedLed('statusBuffer','empty','Stream Buffer — wartet auf Wiedergabe');
+      setObservedLed('statusAudio','empty','Audio-Core — bereit / pausiert');
+    }else if(Number(audio.readyState)<2){
+      setObservedLed('statusBuffer','warn','Stream Buffer — puffert');
+      setObservedLed('statusAudio','main','Audio-Core — Wiedergabe angefordert');
+    }else{
+      setObservedLed('statusBuffer','main','Stream Buffer — stabil');
+      setObservedLed('statusAudio','main','Audio-Core — aktiv');
+    }
+    const recovery=window.S666AllPlayerAudioRecovery;
+    const owner=document.documentElement.getAttribute('data-audio-recovery-owner')||'';
+    if(recovery?.owner||owner==='all-player-audio-recovery-v1'){
+      setObservedLed('statusWatchdog','main','Watchdog — zentraler All-Player Recovery-Owner aktiv');
+    }else{
+      setObservedLed('statusWatchdog','warn','Watchdog — zentraler Recovery-Owner noch nicht bestätigt');
+    }
+  }
+
+  function pulseReconnectLed(){
+    const action=document.documentElement.getAttribute('data-audio-recovery-action')||'';
+    if(!action) return;
+    setObservedLed('statusReconnect',action==='confirmed-reload'?'warn':'api','Reconnect — '+action);
+    clearTimeout(reconnectTimer);
+    reconnectTimer=setTimeout(()=>setObservedLed('statusReconnect','empty','Reconnect — standby'),2200);
+  }
+
+  async function probeWorkerLed(){
+    try{
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),3500);
+      const response=await fetch('/health?t='+Date.now(),{cache:'no-store',signal:controller.signal});
+      clearTimeout(timeout);
+      setObservedLed('statusWorker',response.ok?'main':'error',response.ok?'Worker — online':'Worker — HTTP '+response.status);
+    }catch(_){
+      setObservedLed('statusWorker','error','Worker — nicht erreichbar');
+    }
+  }
+
+  function installSystemLedBridge(){
+    if(document.documentElement.dataset.s666MainLedBridge==='1') return;
+    document.documentElement.dataset.s666MainLedBridge='1';
+    const audio=q('#radio')||q('audio');
+    for(const name of ['play','playing','pause','waiting','stalled','suspend','canplay','loadeddata','error','emptied']){
+      audio?.addEventListener(name,syncAudioHudLeds,{passive:true});
+    }
+    const observer=new MutationObserver(pulseReconnectLed);
+    observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-audio-recovery-action']});
+    window.__S666_MAIN_LED_OBSERVER__=observer;
+    syncAudioHudLeds();
+    void probeWorkerLed();
+    workerTimer=window.setInterval(probeWorkerLed,15000);
+    window.__S666_MAIN_LED_WORKER_TIMER__=workerTimer;
+  }
+
   function bindLayoutSignals(){
     if(document.documentElement.dataset.s666MainTickerSignals==='1') return;
     document.documentElement.dataset.s666MainTickerSignals='1';
@@ -231,7 +309,8 @@
     ensureVelunaCentralBoot();
     bindLayoutSignals();
     installTicker();
+    installSystemLedBridge();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
-  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();scheduleTickerSync();},{once:true});
+  window.addEventListener('load',()=>{ensureVelunaCentralBoot();installTicker();installSystemLedBridge();scheduleTickerSync();},{once:true});
 })();
