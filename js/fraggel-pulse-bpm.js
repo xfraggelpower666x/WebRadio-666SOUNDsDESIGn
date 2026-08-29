@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn — FRAGGEL PULSE BPM v1.0.0
+ * 666SOUNDsDESIGn — FRAGGEL PULSE BPM v1.0.1
  * Display-only tempo estimator for the existing Fraggel Pulse HUD.
  * Uses existing metadata / MeterBus signals only; never creates or rewires an audio graph.
  */
@@ -7,7 +7,7 @@
   'use strict';
   if (window.S666FraggelPulseBpm?.version) return;
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
   const FALLBACK_BPM = 145;
   const MIN_BPM = 120;
   const MAX_BPM = 180;
@@ -28,13 +28,15 @@
   };
 
   const metadataBpm = () => {
-    const nodes = [document.documentElement, document.body, document.querySelector('#nowPlayingTicker'), document.querySelector('#metaLine')];
-    for (const node of nodes) {
+    for (const node of [document.documentElement, document.body]) {
       if (!node) continue;
       for (const attr of ['data-bpm', 'data-track-bpm', 'data-tempo']) {
         const value = normalizeBpm(node.getAttribute?.(attr));
         if (value) return value;
       }
+    }
+    for (const node of [document.querySelector('#nowPlayingTicker'), document.querySelector('#metaLine')]) {
+      if (!node) continue;
       const text = String(node.textContent || '');
       const match = text.match(/\b(\d{2,3}(?:\.\d)?)\s*BPM\b/i);
       const value = normalizeBpm(match?.[1]);
