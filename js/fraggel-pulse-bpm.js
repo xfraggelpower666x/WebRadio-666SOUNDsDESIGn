@@ -1,5 +1,5 @@
 /*
- * 666SOUNDsDESIGn — FRAGGEL PULSE BPM v1.0.1
+ * 666SOUNDsDESIGn — FRAGGEL PULSE BPM v1.0.2
  * Display-only tempo estimator for the existing Fraggel Pulse HUD.
  * Uses existing metadata / MeterBus signals only; never creates or rewires an audio graph.
  */
@@ -7,7 +7,7 @@
   'use strict';
   if (window.S666FraggelPulseBpm?.version) return;
 
-  const VERSION = '1.0.1';
+  const VERSION = '1.0.2';
   const FALLBACK_BPM = 145;
   const MIN_BPM = 120;
   const MAX_BPM = 180;
@@ -16,7 +16,7 @@
   const HISTORY_MS = 18000;
   const MIN_INTERVALS = 8;
   const bpmTarget = () => document.querySelector('.pc-addon-module-beat .pc-addon-beat p b');
-  const state = { peaks: [], lastPeakAt: 0, smooth: 0, baseline: 0, value: FALLBACK_BPM, source: 'fallback' };
+  const state = { peaks: [], lastPeakAt: 0, smooth: 0, baseline: 0, armed: true, value: FALLBACK_BPM, source: 'fallback' };
 
   const normalizeBpm = raw => {
     let bpm = Number(raw);
@@ -83,6 +83,7 @@
     const bus = window.__MeterBus;
     const fresh = !!(bus && bus.source === 'real' && Number.isFinite(Number(bus.level)) && Date.now() - Number(bus.ts || 0) < 1000);
     if (!fresh) {
+      state.armed = true;
       if (state.source !== 'fallback') publish(FALLBACK_BPM, 'fallback');
       return;
     }
@@ -91,8 +92,12 @@
     state.smooth = state.smooth * 0.58 + level * 0.42;
     state.baseline = state.baseline * 0.97 + state.smooth * 0.03;
     const now = Date.now();
-    const threshold = Math.max(0.10, state.baseline + 0.085);
-    if (state.smooth >= threshold && now - state.lastPeakAt >= MIN_PEAK_GAP_MS) {
+    const thresholdHigh = Math.max(0.10, state.baseline + 0.085);
+    const thresholdLow = Math.max(0.06, state.baseline + 0.035);
+
+    if (state.smooth <= thresholdLow) state.armed = true;
+    if (state.armed && state.smooth >= thresholdHigh && now - state.lastPeakAt >= MIN_PEAK_GAP_MS) {
+      state.armed = false;
       state.lastPeakAt = now;
       state.peaks.push(now);
     }
