@@ -1,11 +1,11 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.6
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.7
  * Canonical Main ticker geometry + exact shared VELUNA Central Boot reuse.
  * Main never creates a second boot surface and never calls central show() directly.
  * Ticker width is measured against the visible cover and the real History-button outer edge so idle/play states share one lane.
  * Runtime calibration compares the rendered ticker viewport edges to the desired cover/History viewport coordinates, eliminating containing-block/padding drift.
- * Short titles that fit the measured lane stay fully visible and static instead of being needlessly clipped by a marquee cycle.
- * Long-title marquee distance is measured as one complete rendered text/gap/separator segment so every repeat lands on the next full-title boundary without seam drift.
- * Repeated metadata refreshes do not restart an unchanged marquee, so long titles complete their full cycle.
+ * Every non-empty title owns the continuous marquee again; fitting titles are no longer forced static.
+ * Marquee distance is measured as one complete rendered text/gap/separator segment so every repeat lands on the next full-title boundary without seam drift.
+ * Repeated metadata refreshes do not restart an unchanged marquee, so titles complete their full cycle.
  * Marquee duration scales with the full rendered segment length without a maximum cap, preserving constant readable speed.
  * ResizeObserver keeps cover/History/ticker geometry synchronized without introducing a second layout owner.
  * Visual reactivity consumes player-stage CSS variables only; no audio-bus access occurs here.
@@ -21,7 +21,6 @@
   const TICKER_EDGE_INSET=18;
   const TICKER_COVER_GAP=20;
   const TICKER_MIN_WIDTH=96;
-  const TICKER_STATIC_PADDING=24;
   const TICKER_REPEAT_GAP=48;
   let tickerAnimation=null;
   let layoutRaf=0;
@@ -46,18 +45,6 @@
     script.dataset.s666MainVelunaCentralBoot='1';
     script.addEventListener('load',()=>{try{window.S666CentralBootScreen?.bootOnce?.();}catch(_){}},{once:true});
     (document.head||document.documentElement).appendChild(script);
-  }
-
-  function measureTextWidth(node){
-    if(!node) return 0;
-    try{
-      const range=document.createRange();
-      range.selectNodeContents(node);
-      const width=range.getBoundingClientRect().width;
-      range.detach?.();
-      if(width>0) return Math.ceil(width);
-    }catch(_){ }
-    return Math.ceil(node.scrollWidth||node.getBoundingClientRect().width||0);
   }
 
   function measureLoopSegmentWidth(ticker,text){
@@ -189,12 +176,6 @@
     stopTickerAnimation(ticker);
 
     if(!text){
-      ticker.classList.add('is-static');
-      return;
-    }
-
-    const itemWidth=measureTextWidth(ticker);
-    if(itemWidth<=Math.max(0,laneWidth-TICKER_STATIC_PADDING)){
       ticker.classList.add('is-static');
       return;
     }

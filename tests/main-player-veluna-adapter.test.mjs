@@ -20,14 +20,16 @@ test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
-test('main ticker keeps fitting titles whole and only scrolls genuinely long titles',()=>{
-  assert.match(js,/const TICKER_STATIC_PADDING=24/);
-  assert.match(js,/const itemWidth=measureTextWidth\(ticker\)/);
-  assert.match(js,/if\(itemWidth<=Math\.max\(0,laneWidth-TICKER_STATIC_PADDING\)\)\{/);
-  assert.match(js,/ticker\.classList\.add\('is-static'\)/);
+test('main ticker scrolls every non-empty title and keeps only an empty lane static',()=>{
+  assert.doesNotMatch(js,/TICKER_STATIC_PADDING/);
+  assert.doesNotMatch(js,/const itemWidth=measureTextWidth\(ticker\)/);
+  assert.doesNotMatch(js,/itemWidth<=Math\.max\(0,laneWidth/);
+  assert.match(js,/if\(!text\)\{\s*ticker\.classList\.add\('is-static'\);\s*return;\s*\}/);
+  assert.match(js,/const shift=Math\.max\(1,measureLoopSegmentWidth\(ticker,text\)\)/);
+  assert.match(js,/ticker\.classList\.add\('is-running'\)/);
   assert.match(css,/\.is-static\{min-width:100%!important;translate:0 0!important\}/);
 });
-test('mobile adapter ownership neutralizes legacy full-field marquee for fitting titles and preserves owned long-title drivers',()=>{
+test('mobile adapter ownership neutralizes legacy full-field marquee and preserves the owned continuous ticker driver',()=>{
   assert.match(desktopCss,/padding-left:100%!important/);
   assert.match(desktopCss,/MobileTicker[\w-]*[^\n]*infinite!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*#nowPlayingTicker\.s666-veluna-main-ticker\{[\s\S]*padding-left:0!important;[\s\S]*transform:none!important;[\s\S]*animation:none!important/);
@@ -35,7 +37,7 @@ test('mobile adapter ownership neutralizes legacy full-field marquee for fitting
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="css"\][\s\S]*animation:s666VelunaMainTicker var\(--ticker-duration,18s\) linear infinite!important/);
   assert.match(css,/@media \(max-width:760px\)\{[\s\S]*is-running\[data-s666-ticker-driver="waapi"\][\s\S]*animation:none!important/);
 });
-test('long-title ticker measures one complete repeat segment and loops infinitely without seam drift',()=>{
+test('ticker measures one complete repeat segment and loops infinitely without seam drift',()=>{
   assert.match(js,/const TICKER_REPEAT_GAP=48/);
   assert.match(js,/function measureLoopSegmentWidth\(ticker,text\)/);
   assert.match(js,/gap\.style\.cssText=`display:inline-block;width:\$\{TICKER_REPEAT_GAP\}px;height:1px;`/);
@@ -101,7 +103,7 @@ test('main ticker is absolutely anchored in the lower third with responsive brea
   assert.doesNotMatch(css,/grid-template-rows:minmax\(0,1fr\) 62px!important/);
   assert.doesNotMatch(css,/bottom:16px!important/);
 });
-test('unchanged repeated metadata does not restart a long-title marquee before a full cycle',()=>{
+test('unchanged repeated metadata does not restart a ticker before a full cycle',()=>{
   assert.match(js,/const laneWidth=Math\.round\(windowNode\.getBoundingClientRect\(\)\.width\|\|windowNode\.clientWidth\|\|0\)/);
   assert.match(js,/const signature=text\+'\|'\+laneWidth/);
   assert.match(js,/ticker\.dataset\.s666TickerSignature===signature/);
