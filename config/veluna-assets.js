@@ -26,28 +26,21 @@ window.VELUNA_ASSETS = Object.freeze({
   const version = '2026-08-17-native-mute-ticker-v185';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
-  const mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7';
+  const mainVisualRepairVersion = '2026-08-30-shared-header-led-repair-v2';
   const playerStageVersion = '2026-08-23-header-owner-cascade-v2';
-  const mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4';
+  const mainVelunaAdapterVersion = '2026-08-30-shared-header-led-repair-v2';
   const velunaThemeVersion = '2026-08-23-iphone-bottom-history-owner-v1';
   const fraggelPulseBpmVersion = '2026-08-29-v1';
   const head = document.head || document.documentElement;
   if (!head) return;
 
-  /*
-   * Synchronous graph bridge: captures the player graph before a potentially cached old
-   * boost-core can be replaced by the current central runtime.
-   */
   const installAudioGraphBridge = () => {
     if (window.__SMFPAudioGraphBridge) return window.__SMFPAudioGraphBridge;
     const graphs = new WeakMap();
     const graphFor = audio => {
       if (!audio) return null;
       let graph = graphs.get(audio);
-      if (!graph) {
-        graph = { audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null };
-        graphs.set(audio, graph);
-      }
+      if (!graph) { graph = { audio, context:null, source:null, gains:[], filters:[], limiter:null, analyser:null }; graphs.set(audio, graph); }
       return graph;
     };
     const nodeType = node => {
@@ -154,22 +147,11 @@ window.VELUNA_ASSETS = Object.freeze({
     head.appendChild(script);
   });
 
-  /*
-   * CENTRAL_RADIO_BOOT_OWNER_v2
-   * Ein Owner für Hub/Main, iPhone, Android, VELUNA und internen Notfallplayer.
-   * Zusätzlich setzt der Owner die routenspezifische PWA-/Lockscreen-Identität.
-   */
   loadStyle(`/css/central-boot-screen.css?v=${bootVersion}`, 'smfpCentralRadioBoot');
   window.__S666_CENTRAL_BOOT_LOAD_STATE__ = window.S666CentralBootScreen ? 'loaded' : 'pending';
-  void loadCurrentScript(
-    `/js/central-boot-screen.js?v=${bootVersion}`,
-    'smfpCentralRadioBoot',
-    () => !!window.S666CentralBootScreen
-  ).then(() => {
-    window.__S666_CENTRAL_BOOT_LOAD_STATE__ = 'loaded';
-  }).catch(() => {
-    window.__S666_CENTRAL_BOOT_LOAD_STATE__ = 'error';
-  });
+  void loadCurrentScript(`/js/central-boot-screen.js?v=${bootVersion}`,'smfpCentralRadioBoot',() => !!window.S666CentralBootScreen)
+    .then(() => { window.__S666_CENTRAL_BOOT_LOAD_STATE__ = 'loaded'; })
+    .catch(() => { window.__S666_CENTRAL_BOOT_LOAD_STATE__ = 'error'; });
 
   loadStyle(`/core/overlay/overlay-core.css?v=${version}`, 'smfpOverlayCore');
   loadStyle(`/css/audio-policy-core.css?v=${version}`, 'smfpAudioPolicy');
@@ -183,18 +165,8 @@ window.VELUNA_ASSETS = Object.freeze({
   void loadScript(`/js/main-veluna-adapter.js?v=${mainVelunaAdapterVersion}`, 's666MainVelunaAdapter', () => !!window.__S666_MAIN_VELUNA_ADAPTER__).catch(() => {});
   void loadScript(`/js/fraggel-pulse-bpm.js?v=${fraggelPulseBpmVersion}`, 's666FraggelPulseBpm', () => !!window.S666FraggelPulseBpm?.version).catch(() => {});
 
-  const activateOverlay = () => {
-    try {
-      window.SMFPOverlayCore?.updateViewport?.();
-      window.SMFPOverlayCore?.scanOverlays?.(document);
-    } catch (_) {}
-  };
-
-  void loadScript(
-    `/core/overlay/overlay-core.js?v=${version}`,
-    'smfpOverlayCore',
-    () => !!window.SMFPOverlayCore
-  ).then(activateOverlay).catch(() => {});
+  const activateOverlay = () => { try { window.SMFPOverlayCore?.updateViewport?.(); window.SMFPOverlayCore?.scanOverlays?.(document); } catch (_) {} };
+  void loadScript(`/core/overlay/overlay-core.js?v=${version}`,'smfpOverlayCore',() => !!window.SMFPOverlayCore).then(activateOverlay).catch(() => {});
 
   const audioReady = () => !!window.SMFPBoostCore?.centralPolicyVersion;
   const policyReady = () => !!window.SMFPAudioPolicyUI;
@@ -204,26 +176,16 @@ window.VELUNA_ASSETS = Object.freeze({
 
   void loadCurrentScript(`/js/boost-core.js?v=${version}`, 'smfpBoostCore', audioReady)
     .then(() => loadScript(`/js/audio-policy-core.js?v=${version}`, 'smfpAudioPolicy', policyReady))
-    .then(() => {
-      try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {}
-    })
+    .then(() => { try { window.SMFPAudioPolicyUI?.activate?.(); } catch (_) {} })
     .catch(() => {});
 
   void loadScript(`/js/all-player-mute.js?v=${version}`, 's666AllPlayerMute', muteReady)
-    .then(() => {
-      try { window.S666AllPlayerMute?.sync?.(); } catch (_) {}
-    })
+    .then(() => { try { window.S666AllPlayerMute?.sync?.(); } catch (_) {} })
     .catch(() => {});
 
   void loadScript(`/js/artwork-core.js?v=${version}`, 'smfpArtworkCore', artworkReady)
-    .then(() => {
-      try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {}
-    })
+    .then(() => { try { window.SMFPArtworkCore?.enforce?.(); } catch (_) {} })
     .catch(() => {});
 
-  void loadScript(
-    `/js/discord-startup-autopost-recovery.js?v=${discordRecoveryVersion}`,
-    's666DiscordStartupRecovery',
-    discordRecoveryReady
-  ).catch(() => {});
+  void loadScript(`/js/discord-startup-autopost-recovery.js?v=${discordRecoveryVersion}`,'s666DiscordStartupRecovery',discordRecoveryReady).catch(() => {});
 })();
