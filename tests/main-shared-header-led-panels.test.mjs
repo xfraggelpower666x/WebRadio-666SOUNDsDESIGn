@@ -14,6 +14,8 @@ test('Main desktop and iPhone keep one shared LYVRA header asset owner',()=>{
     fs.readFileSync('assets/veluna/header/veluna-player-header.webp'),
     fs.readFileSync('public/assets/veluna/header/veluna-player-header.webp')
   );
+  assert.match(js,/HEADER_ASSET_SRC='\/assets\/veluna\/header\/veluna-player-header\.webp\?v=20260830-shared-lyvra-header-v2'/);
+  assert.match(js,/querySelectorAll\('#pcHeaderNewLogo,\.hero-brand-image'\)/);
 });
 
 test('Main shared visual mirrors remain byte-identical',()=>{
@@ -22,28 +24,39 @@ test('Main shared visual mirrors remain byte-identical',()=>{
 });
 
 test('redundant outer header and system-panel shells are visually removed',()=>{
-  assert.match(css,/2026-08-29 SHARED LYVRA HEADER \+ PANEL CLEANUP/);
+  assert.match(css,/2026-08-30 SHARED LYVRA HEADER \+ PANEL CLEANUP/);
   assert.match(css,/body\[data-veluna-page="main"\] \.hero,[\s\S]*border:0!important;[\s\S]*background:transparent!important;[\s\S]*box-shadow:none!important/);
   assert.match(css,/body\[data-veluna-page="main"\] \.status-cluster,[\s\S]*\.systempanel-grid-v74\{[\s\S]*border:0!important;[\s\S]*background:transparent!important;[\s\S]*box-shadow:none!important/);
 });
 
-test('shared header is larger on desktop and responsively uses the same asset on iPhone',()=>{
+test('shared header is larger on desktop and the canonical visible image is responsive on iPhone',()=>{
   assert.match(css,/#pcHeaderNewLogo\.pc-header-new-logo\{[\s\S]*width:min\(560px,100%\)!important;[\s\S]*max-height:none!important;[\s\S]*object-fit:contain!important/);
-  assert.match(css,/\.hero-brand-image\{[\s\S]*width:min\(360px,94vw\)!important;[\s\S]*max-height:none!important;[\s\S]*object-fit:contain!important/);
+  assert.match(css,/@media \(max-width:760px\)\{[\s\S]*#pcHeaderNewLogo\.pc-header-new-logo,[\s\S]*\.hero-brand-image\{[\s\S]*width:min\(360px,94vw\)!important;[\s\S]*max-height:none!important/);
 });
 
-test('Main observational LED bridge gives Buffer Worker Audio Watchdog and Reconnect real state inputs',()=>{
-  for(const id of ['statusBuffer','statusWorker','statusAudio','statusWatchdog','statusReconnect']){
-    assert.match(js,new RegExp(id));
-  }
-  assert.match(js,/function syncAudioHudLeds\(\)/);
+test('Main observational LED bridge consumes existing runtime truth without creating a network owner',()=>{
+  for(const id of ['statusBuffer','statusWorker','statusAudio','statusWatchdog','statusReconnect']) assert.match(js,new RegExp(id));
+  assert.match(js,/function syncAudioHudLeds\(reason='state'\)/);
+  assert.match(js,/function syncWorkerLedFromExistingTruth\(\)/);
+  assert.match(js,/statusStream/);
+  assert.match(js,/statusMeta/);
+  assert.match(js,/navigator\.onLine/);
   assert.match(js,/audio\.readyState/);
   assert.match(js,/audio\.error/);
   assert.match(js,/S666AllPlayerAudioRecovery/);
   assert.match(js,/data-audio-recovery-owner/);
   assert.match(js,/data-audio-recovery-action/);
-  assert.match(js,/fetch\('\/health\?t='/);
-  assert.match(js,/setInterval\(probeWorkerLed,15000\)/);
+  assert.doesNotMatch(js,/fetch\(/);
+  assert.doesNotMatch(js,/setInterval\(probeWorkerLed/);
+});
+
+test('Buffer LED retains waiting stalled and suspend truth until playback recovery clears it',()=>{
+  assert.match(js,/let bufferEventState=''/);
+  assert.match(js,/\['waiting','stalled','suspend'\]\.includes\(reason\)/);
+  assert.match(js,/bufferEventState==='stalled'/);
+  assert.match(js,/Stall erkannt, wartet auf Recovery/);
+  assert.match(js,/\['playing','canplay','loadeddata'\]\.includes\(reason\)/);
+  assert.match(js,/event=>syncAudioHudLeds\(event\.type\)/);
 });
 
 test('LED bridge is observational and does not mutate protected audio graph or transport',()=>{
