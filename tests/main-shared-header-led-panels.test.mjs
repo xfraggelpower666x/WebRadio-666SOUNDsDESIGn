@@ -5,15 +5,13 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(p,'utf8');
 const js=read('js/main-veluna-adapter.js');
 const css=read('css/main-player-visual-repair-20260821.css');
+const config=read('config/veluna-assets.js');
 const index=read('index.html');
 
 test('Main desktop and iPhone keep one shared LYVRA header asset owner',()=>{
   const hits=index.match(/\/assets\/veluna\/header\/veluna-player-header\.webp/g)||[];
   assert.ok(hits.length>=2,'desktop and mobile Main must reference the shared header asset');
-  assert.deepEqual(
-    fs.readFileSync('assets/veluna/header/veluna-player-header.webp'),
-    fs.readFileSync('public/assets/veluna/header/veluna-player-header.webp')
-  );
+  assert.deepEqual(fs.readFileSync('assets/veluna/header/veluna-player-header.webp'),fs.readFileSync('public/assets/veluna/header/veluna-player-header.webp'));
   assert.match(js,/HEADER_ASSET_SRC='\/assets\/veluna\/header\/veluna-player-header\.webp\?v=20260830-shared-lyvra-header-v2'/);
   assert.match(js,/querySelectorAll\('#pcHeaderNewLogo,\.hero-brand-image'\)/);
 });
@@ -21,6 +19,12 @@ test('Main desktop and iPhone keep one shared LYVRA header asset owner',()=>{
 test('Main shared visual mirrors remain byte-identical',()=>{
   assert.equal(read('public/js/main-veluna-adapter.js'),js);
   assert.equal(read('public/css/main-player-visual-repair-20260821.css'),css);
+  assert.equal(read('public/config/veluna-assets.js'),config);
+});
+
+test('shared visual bootstrap has fresh cache identities',()=>{
+  assert.match(config,/mainVisualRepairVersion = '2026-08-30-shared-header-led-repair-v2'/);
+  assert.match(config,/mainVelunaAdapterVersion = '2026-08-30-shared-header-led-repair-v2'/);
 });
 
 test('redundant outer header and system-panel shells are visually removed',()=>{
