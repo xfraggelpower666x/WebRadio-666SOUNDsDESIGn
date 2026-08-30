@@ -51,7 +51,7 @@ test('Main observational LED bridge consumes existing runtime truth without crea
   assert.match(js,/data-audio-recovery-owner/);
   assert.match(js,/data-audio-recovery-action/);
   assert.doesNotMatch(js,/fetch\(/);
-  assert.doesNotMatch(js,/setInterval\(probeWorkerLed/);
+  assert.doesNotMatch(js,/probeWorkerLed|__S666_MAIN_LED_WORKER_TIMER__/);
 });
 
 test('Buffer LED retains waiting stalled and suspend truth until playback recovery clears it',()=>{
