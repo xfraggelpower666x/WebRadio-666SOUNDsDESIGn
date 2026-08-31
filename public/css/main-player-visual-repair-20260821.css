@@ -37,10 +37,7 @@
   body[data-veluna-page="main"] .side-meter .side-meter-track.tertiary .side-meter-fill{filter:brightness(1.36) saturate(1.30) contrast(1.04)!important}
 }
 
-/* 2026-08-23 VISUAL OWNER CONSOLIDATION BRIDGE
- * Neutralizes legacy desktop.css wrapper reactivity only.
- * No ticker selector or geometry is owned here.
- */
+/* 2026-08-23 VISUAL OWNER CONSOLIDATION BRIDGE */
 @media (min-width:761px){
   html body[data-veluna-page="main"] .frame-stage::before{background:radial-gradient(circle at 18% 72%,rgba(255,61,187,.16),transparent 34%),radial-gradient(circle at 82% 34%,rgba(22,255,243,.14),transparent 36%),linear-gradient(120deg,rgba(255,61,187,.055),transparent 42%,rgba(22,255,243,.055))!important;opacity:.22!important;filter:blur(8px) saturate(1.08)!important;transform:none!important;transition:none!important}
   html body[data-veluna-page="main"] .now-cover-wrap{filter:none!important;transform:none!important;box-shadow:0 0 18px rgba(22,255,243,.30),0 0 12px rgba(180,92,255,.18)!important;transition:none!important}
@@ -51,6 +48,31 @@
   html body[data-veluna-page="main"] :is(#playBtn,.play-btn,button[aria-label="Play"],button[title="Play"])::before{background:radial-gradient(circle at 50% 50%,rgba(255,61,187,.34),rgba(142,69,255,.16) 46%,rgba(22,255,243,.08) 68%,transparent 80%)!important;filter:blur(10px) saturate(1.06)!important;opacity:.24!important;transform:none!important;transition:none!important}
 }
 
-/* Legacy desktop.css references this animation name but shipped without keyframes.
- * Compatibility definition only; no ticker selector/geometry ownership here. */
+/* 2026-08-30 SHARED LYVRA HEADER + PANEL CLEANUP */
+body[data-veluna-page="main"] .hero,
+body[data-veluna-page="main"] #pcHeaderBrandSplit.pc-header-brand-split,
+body[data-veluna-page="main"] .hero-brand{border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important}
+body[data-veluna-page="main"] #pcHeaderBrandSplit.pc-header-brand-split,
+body[data-veluna-page="main"] .hero-brand{display:flex!important;justify-content:center!important;align-items:center!important;padding:0!important;margin-left:auto!important;margin-right:auto!important;overflow:visible!important}
+body[data-veluna-page="main"] .status-cluster,
+body[data-veluna-page="main"] .status-bar,
+body[data-veluna-page="main"] .systempanel-grid-v74{border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@media (min-width:761px){
+  body[data-veluna-page="main"] #pcHeaderNewLogo.pc-header-new-logo{width:min(560px,100%)!important;max-width:560px!important;height:auto!important;max-height:none!important;object-fit:contain!important;border:0!important;box-shadow:none!important}
+}
+@media (max-width:760px){
+  html body[data-veluna-page="main"] #pcHeaderNewLogo.pc-header-new-logo,
+  html body[data-veluna-page="main"] .hero-brand-image{display:block!important;width:min(360px,94vw)!important;max-width:94vw!important;height:auto!important;max-height:none!important;object-fit:contain!important;border:0!important;box-shadow:none!important}
+}
+
+/* LED meaning: cyan healthy/active, pink transition/warning, red error, purple backup/fallback, hollow white idle/off. */
+body[data-veluna-page="main"] .status-chip.state-error .status-dot{background:#ff304f!important;border-color:#ff667d!important;box-shadow:0 0 9px rgba(255,48,79,.95),0 0 18px rgba(255,48,79,.42)!important}
+body[data-veluna-page="main"] .status-chip.state-warn .status-dot,
+body[data-veluna-page="main"] .status-chip.state-paused .status-dot,
+body[data-veluna-page="main"] .status-chip.state-stopped .status-dot{background:#ff3dbb!important;border-color:#ff82d4!important;box-shadow:0 0 9px rgba(255,61,187,.92),0 0 18px rgba(255,61,187,.36)!important}
+body[data-veluna-page="main"] .status-chip.state-backup .status-dot,
+body[data-veluna-page="main"] .status-chip.state-fallback .status-dot{background:#b45cff!important;border-color:#d6a7ff!important;box-shadow:0 0 9px rgba(180,92,255,.95),0 0 18px rgba(180,92,255,.40)!important}
+body[data-veluna-page="main"] .status-chip.state-empty .status-dot,
+body[data-veluna-page="main"] .status-chip.state-off .status-dot{background:transparent!important;border-color:rgba(225,238,255,.78)!important;box-shadow:0 0 6px rgba(225,238,255,.24)!important}
+
 @keyframes v73TickerRun{0%{transform:translate3d(100%,0,0)}100%{transform:translate3d(-100%,0,0)}}

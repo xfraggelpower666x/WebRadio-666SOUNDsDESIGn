@@ -16,7 +16,7 @@ test('main VELUNA adapter root/public mirrors are byte-identical',()=>{
 });
 test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(headers,/\/config\/\*\n  Cache-Control: no-cache, must-revalidate/);
-  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4'/);
+  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-30-shared-header-led-repair-v2'/);
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
