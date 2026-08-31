@@ -1,17 +1,20 @@
 /*
- * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.2
+ * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.3
  * One conservative recovery owner for Main Desktop, Main Mobile/MFF, VELUNA and Internal.
  * waiting/stalled/suspend are sensors only. Recovery requires confirmed playback loss.
  * Polling also seeds candidates for silent currentTime/readyState/network stalls that emit no media event.
  * Legacy phase10 recovery is held inside its existing orchestra cooldown while this owner is active.
- * No EQ, Boost, limiter, MeterBus, stream endpoint, auth, skip, Discord or Messenger logic.
+ * Confirmed failure of the backup/fallback stream fails over to the already-stable primary /stream route.
+ * No EQ, Boost, limiter, MeterBus, auth, skip, Discord or Messenger logic.
  */
 (function installS666AllPlayerAudioRecovery(global){
   'use strict';
   if(global.S666AllPlayerAudioRecovery) return;
 
-  const VERSION='1.0.2';
+  const VERSION='1.0.3';
   const OWNER='all-player-audio-recovery-v1';
+  const PRIMARY_ROUTE='/stream';
+  const BACKUP_ROUTE='/fallback-stream';
   const states=new WeakMap();
   const attached=new WeakSet();
   let scanObserver=null;
@@ -24,6 +27,15 @@
 
   function now(){return Date.now();}
   function sourceOf(audio){return String(audio?.currentSrc||audio?.getAttribute?.('src')||audio?.src||'').trim();}
+  function isBackupSource(src){
+    const value=String(src||'').trim().toLowerCase();
+    if(!value) return false;
+    if(value===BACKUP_ROUTE||value.endsWith(BACKUP_ROUTE)) return true;
+    try{
+      const url=new URL(value,global.location?.href||'https://local.invalid/');
+      return url.pathname===BACKUP_ROUTE||url.pathname.endsWith(BACKUP_ROUTE)||(/:8686$/).test(url.host)&&url.pathname==='/stream';
+    }catch(_){return value.includes('/fallback-stream')||value.includes(':8686/stream');}
+  }
   function uiSaysStopped(){
     const body=String(document.body?.getAttribute('data-player-state')||'').toLowerCase();
     const mff=String(document.documentElement.getAttribute('data-mff-transport')||'').toLowerCase();
@@ -88,13 +100,15 @@
     if(now()-s.lastRecoverAt<p.cooldownMs) return false;
     if(!expectedToPlay(audio,s)) return false;
     const src=sourceOf(audio);if(!src) return false;
+    const targetSrc=isBackupSource(src)?PRIMARY_ROUTE:src;
     s.lastRecoverAt=now();s.hardAttempts+=1;
     resumeContexts();
-    setDiag('data-audio-recovery-action','confirmed-reload');
+    setDiag('data-audio-recovery-action',targetSrc===PRIMARY_ROUTE&&src!==PRIMARY_ROUTE?'backup-to-primary':'confirmed-reload');
+    setDiag('data-audio-recovery-route',targetSrc===PRIMARY_ROUTE&&src!==PRIMARY_ROUTE?'backup-to-primary':'same-source');
     setDiag('data-audio-recovery-reason',reason||'confirmed-hard-stall');
     try{
       audio.pause();
-      if(audio.getAttribute('src')!==src) audio.src=src;
+      if(sourceOf(audio)!==targetSrc||audio.getAttribute('src')!==targetSrc) audio.src=targetSrc;
       audio.load();
       await Promise.resolve(audio.play());
       return true;
@@ -110,6 +124,7 @@
     const t=now();
     const stalledFor=Math.max(0,t-s.lastMoveAt);
     const ready=Number(audio.readyState||0),network=Number(audio.networkState||0);
+    const src=sourceOf(audio);
 
     if(!s.candidateAt){
       if(audio.paused){s.candidateAt=t;s.candidateReason='poll-paused';}
@@ -123,7 +138,7 @@
     }
 
     const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;
-    const hard=/error|abort|emptied|no-source|decode/i.test(String(s.candidateReason||trigger||''))||network===3||!sourceOf(audio);
+    const hard=/error|abort|emptied|no-source|decode/i.test(String(s.candidateReason||trigger||''))||network===3||!src;
     setDiag('data-audio-recovery-stall-ms',stalledFor);
     setDiag('data-audio-recovery-ready',ready);
     setDiag('data-audio-recovery-network',network);
@@ -131,8 +146,12 @@
     if(!audio.paused&&ready>=2&&network===2&&stalledFor<p.pollSeedMs){clearCandidate(audio);return;}
     if(audio.paused&&candidateFor>=p.pausedConfirmMs){void softRecover(audio,s,'paused-confirmed');return;}
     if(hard&&candidateFor>=p.hardConfirmMs){
-      if(stalledFor>=p.hardReloadMs) void hardRecover(audio,s,'hard-stall-confirmed');
+      if(stalledFor>=p.hardReloadMs) void hardRecover(audio,s,isBackupSource(src)?'backup-hard-stall-primary-failover':'hard-stall-confirmed');
       else void softRecover(audio,s,'hard-sensor-soft-first');
+      return;
+    }
+    if(isBackupSource(src)&&candidateFor>=p.stallConfirmMs&&stalledFor>=p.hardReloadMs){
+      void hardRecover(audio,s,'backup-stall-primary-failover');
       return;
     }
     if(ready<2&&candidateFor>=p.readyLowConfirmMs&&stalledFor>=p.readyLowConfirmMs){void softRecover(audio,s,'ready-low-confirmed');return;}
@@ -181,6 +200,6 @@
     document.addEventListener('visibilitychange',()=>{if(!document.hidden) document.querySelectorAll('audio').forEach(a=>noteCandidate(a,'visibility'));},{passive:true});
   }
 
-  global.S666AllPlayerAudioRecovery=Object.freeze({version:VERSION,owner:OWNER,attach,scan,evaluate,noteCandidate,markManualStop,markWanted});
+  global.S666AllPlayerAudioRecovery=Object.freeze({version:VERSION,owner:OWNER,attach,scan,evaluate,noteCandidate,markManualStop,markWanted,isBackupSource});
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })(window);
