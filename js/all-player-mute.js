@@ -22,7 +22,7 @@
     const base = '/js/all-player-audio-recovery.js';
     if (Array.from(document.scripts).some(script => String(script.src || '').includes(base))) return;
     const script = document.createElement('script');
-    script.src = base + '?v=20260827-all-player-buffer-recovery-v1';
+    script.src = base + '?v=20260831-backup-primary-failover-v2';
     script.defer = false;
     script.async = false;
     script.dataset.s666AllPlayerAudioRecovery = 'js';
