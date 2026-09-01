@@ -5,72 +5,13 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: repair/audio-interruption-owner-collision-20260901
-          fetch-depth: 0
-      - name: One-shot PR201 Phase10 owner repair
-        shell: python
-        run: |
-          from pathlib import Path
-
-          phase_path = Path('js/phase10-stability-iphone-panel-hud.js')
-          phase = phase_path.read_text(encoding='utf-8')
-          anchor = "  function directfixPcNoAutoFallback(){\n    if(!phase10IsDesktopPlayer || !phase10IsDesktopPlayer()) return;"
-          replacement = "  function directfixPcNoAutoFallback(){\n    if(window.__phase10PcDirectfixAutoResetDemoted === true){\n      document.documentElement.setAttribute(\"data-phase10-pc-auto-fallback\",\"canonical-owner-only\");\n      return;\n    }\n    if(!phase10IsDesktopPlayer || !phase10IsDesktopPlayer()) return;"
-          if anchor not in phase and '__phase10PcDirectfixAutoResetDemoted === true' not in phase:
-              raise SystemExit('phase10 directfix anchor missing')
-          if anchor in phase:
-              phase = phase.replace(anchor, replacement, 1)
-          phase_path.write_text(phase, encoding='utf-8')
-          Path('public/js/phase10-stability-iphone-panel-hud.js').write_text(phase, encoding='utf-8')
-
-          test_path = Path('tests/audio-interruption-owner-collision.test.mjs')
-          test = test_path.read_text(encoding='utf-8')
-          addition = r'''
-
-test('early authority permanently cooldown-blocks the lexical Phase10 healing orchestra before canonical recovery loads', () => {
-  assert.match(audioStart, /global\.S666_AUDIO_HEALING_ORCHESTRA = global\.S666_AUDIO_HEALING_ORCHESTRA \|\| \{\}/);
-  assert.match(audioStart, /healingOrchestra\.owner = CANONICAL_OWNER/);
-  assert.match(audioStart, /healingOrchestra\.lastRecoveryAt = Infinity/);
-});
-
-test('Phase10 boot-time directfix cannot hard-reset backup while canonical recovery authority is seeded', () => {
-  assert.match(audioStart, /global\.__phase10PcDirectfixAutoResetDemoted = true/);
-  const directfix = phase10.match(/function directfixPcNoAutoFallback\(\)\{([\s\S]*?)\n  \}/)?.[1] || '';
-  assert.match(directfix, /__phase10PcDirectfixAutoResetDemoted === true/);
-  assert.match(directfix, /canonical-owner-only/);
-  const demotionIndex = directfix.indexOf('__phase10PcDirectfixAutoResetDemoted === true');
-  const pauseIndex = directfix.indexOf('audio.pause()');
-  assert.ok(demotionIndex >= 0 && pauseIndex > demotionIndex, 'canonical demotion must guard the legacy hard reset');
-});
-
-test('Phase10 root/public mirror remains byte-identical after owner collision repair', () => {
-  assert.equal(fs.readFileSync('public/js/phase10-stability-iphone-panel-hud.js', 'utf8'), phase10);
-});
-'''
-          if 'early authority permanently cooldown-blocks' not in test:
-              test_path.write_text(test + addition, encoding='utf-8')
-      - name: Restore canonical workflow and commit one-shot repair
-        shell: bash
-        run: |
-          git fetch origin WebRadio-666SOUNDsDESIGn --depth=1
-          git checkout FETCH_HEAD -- .github/workflows/release-integrity.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/release-integrity.yml js/phase10-stability-iphone-panel-hud.js public/js/phase10-stability-iphone-panel-hud.js tests/audio-interruption-owner-collision.test.mjs
-          if git diff --cached --quiet; then
-            echo "No repair delta to commit"
-          else
-            git commit -m "repair: close Phase10 boot-time hard recovery path"
-            git push origin HEAD:repair/audio-interruption-owner-collision-20260901
-          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22
