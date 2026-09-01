@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.18
+VERSION: v1.2.19
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
@@ -9,12 +9,30 @@ ZWECK:
 - Keine EQ-, Booster-, Limiter- oder Visualizer-Logik in dieser Datei.
 - v1.2.18: keine doppelten load()-Zyklen bei reset:false; Foreground-/Suspend-Recovery bleibt bei gleicher Stream-URL soft.
 - v1.2.18: Main lädt den bestehenden Central-Boot-Owner bereits im frühen Head-Pfad vor.
+- v1.2.19: frühe Recovery-Authority verhindert, dass der alte Phase10-PC-Backup-Guard oder AudioFocus-Fallback vor dem kanonischen Recovery-Owner einen zweiten pause/src/load-Pfad startet.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
   'use strict';
 
   if (global.S666AudioStartCore) return;
+
+  function seedCanonicalRecoveryAuthority() {
+    try {
+      const CANONICAL_OWNER = 'all-player-audio-recovery-v1';
+      const LEGACY_COMPAT_OWNER = 'central-audio-guard-v2';
+      global.S666_AUDIO_AUTHORITY = Object.assign({}, global.S666_AUDIO_AUTHORITY || {}, {
+        transport: 'player-owned',
+        recovery: LEGACY_COMPAT_OWNER,
+        canonicalRecovery: CANONICAL_OWNER,
+        legacyRecoveryMuted: true
+      });
+      global.__phase10PcMainBackupGuardInstalled = true;
+      document.documentElement?.setAttribute('data-audio-early-recovery-authority', CANONICAL_OWNER);
+      document.documentElement?.setAttribute('data-phase10-pc-backup-auto-guard', 'demoted');
+    } catch (_) {}
+  }
+  seedCanonicalRecoveryAuthority();
 
   function installEarlyMainCentralBoot() {
     try {
@@ -136,7 +154,6 @@ ZWECK:
 
       let playPromise;
       try {
-        // Wichtig: play() ohne vorgeschaltetes await auslösen.
         playPromise = audio.play();
         audio.dataset.audioStartState = 'play-requested';
       } catch (error) {
