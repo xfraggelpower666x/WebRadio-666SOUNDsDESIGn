@@ -35,7 +35,7 @@ test('soft buffering events stay sensor-only and hard reload remains confirmatio
 });
 
 test('recovery loader cache identity is refreshed in both mirrors', () => {
-  assert.match(mute, /\?v=20260831-backup-primary-failover-v2/);
+  assert.match(mute, /\?v=20260901-interruption-owner-collision-v3/);
 });
 
 test('repair does not add a parallel audio graph or protected DSP ownership', () => {
