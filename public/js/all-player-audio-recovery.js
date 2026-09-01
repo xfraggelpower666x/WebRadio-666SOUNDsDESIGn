@@ -1,9 +1,9 @@
 /*
- * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.4
+ * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.5
  * One conservative recovery owner for Main Desktop, Main Mobile/MFF, VELUNA and Internal.
  * waiting/stalled/suspend are sensors only. Recovery requires confirmed playback loss.
  * Polling also seeds candidates for silent currentTime/readyState/network stalls that emit no media event.
- * Legacy phase10 recovery is handed into this owner instead of running a second pause/src/load recovery path.
+ * Legacy Phase10 recovery is permanently cooldown-muted; its sensors/UI may remain, but it cannot execute a second recovery stage.
  * Confirmed failure of the backup/fallback stream fails over to the already-stable primary /stream route.
  * No EQ, Boost, limiter, MeterBus, auth, skip, Discord or Messenger logic.
  */
@@ -11,7 +11,7 @@
   'use strict';
   if(global.S666AllPlayerAudioRecovery) return;
 
-  const VERSION='1.0.4';
+  const VERSION='1.0.5';
   const OWNER='all-player-audio-recovery-v1';
   const LEGACY_COMPAT_OWNER='central-audio-guard-v2';
   const PRIMARY_ROUTE='/stream';
@@ -53,7 +53,10 @@
     try{
       const orchestra=global.S666_AUDIO_HEALING_ORCHESTRA;
       if(!orchestra||orchestra.owner!==OWNER) return;
-      orchestra.active=true;orchestra.lastRecoveryAt=now();setDiag('data-audio-legacy-recovery','handoff-muted');
+      orchestra.active=true;
+      orchestra.legacyRecoveryMuted=true;
+      orchestra.lastRecoveryAt=Number.POSITIVE_INFINITY;
+      setDiag('data-audio-legacy-recovery','permanently-muted');
     }catch(_){}
   }
   function resumeContexts(){for(const key of ['__radioAudioContext','__mffAudioContext']){try{const ctx=global[key];if(ctx&&ctx.state==='suspended'){const p=ctx.resume();p?.catch?.(()=>{});}}catch(_){}}}
@@ -85,8 +88,10 @@
   function installLegacyCompatibility(){
     global.centralAudioGuardV2Recover=legacyHandoff;
     global.S666_AUDIO_AUTHORITY=Object.assign({},global.S666_AUDIO_AUTHORITY||{}, {transport:'player-owned',recovery:LEGACY_COMPAT_OWNER,canonicalRecovery:OWNER,legacyRecoveryMuted:true});
+    global.S666_AUDIO_HEALING_ORCHESTRA=Object.assign(global.S666_AUDIO_HEALING_ORCHESTRA||{}, {active:true,owner:OWNER,version:VERSION,legacyRecoveryMuted:true,lastRecoveryAt:Number.POSITIVE_INFINITY});
     setDiag('data-audio-recovery-owner',OWNER);
     setDiag('data-audio-recovery-compat-owner',LEGACY_COMPAT_OWNER);
+    suppressLegacyRecovery();
   }
 
   function markManualStop(audio){const s=stateFor(audio);s.wanted=false;s.manualStopAt=now();clearCandidate(audio);setDiag('data-audio-recovery-intent','stopped');}
@@ -95,7 +100,7 @@
   function scan(){document.querySelectorAll('audio').forEach(attach);}
   function installIntentGuard(){document.addEventListener('click',ev=>{const control=ev.target?.closest?.('#pauseBtn,#stopBtn,[data-mff="pause"],[data-mff="stop"],[data-action="pause"],[data-action="stop"],button[aria-label*="Pause" i],button[aria-label*="Stop" i]');if(!control) return;document.querySelectorAll('audio').forEach(markManualStop);},true);}
   function installSensorHandoff(){if(sensorObserver) return;sensorObserver=new MutationObserver(()=>{const reason=document.documentElement.getAttribute('data-audio-sensor-event');if(!reason) return;document.querySelectorAll('audio').forEach(a=>noteCandidate(a,reason));});sensorObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-audio-sensor-event']});}
-  function boot(){installLegacyCompatibility();global.S666_AUDIO_HEALING_ORCHESTRA=Object.assign(global.S666_AUDIO_HEALING_ORCHESTRA||{}, {active:true,owner:OWNER,version:VERSION});document.documentElement.setAttribute('data-audio-orchestra','active');suppressLegacyRecovery();scan();installIntentGuard();installSensorHandoff();if(!scanObserver&&document.body){scanObserver=new MutationObserver(scan);scanObserver.observe(document.body,{childList:true,subtree:true});}global.setInterval(()=>{suppressLegacyRecovery();document.querySelectorAll('audio').forEach(a=>evaluate(a,'tick'));},1000);for(const ev of ['focus','pageshow','online']) global.addEventListener(ev,()=>document.querySelectorAll('audio').forEach(a=>noteCandidate(a,ev)),{passive:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden) document.querySelectorAll('audio').forEach(a=>noteCandidate(a,'visibility'));},{passive:true});}
+  function boot(){installLegacyCompatibility();document.documentElement.setAttribute('data-audio-orchestra','active');scan();installIntentGuard();installSensorHandoff();if(!scanObserver&&document.body){scanObserver=new MutationObserver(scan);scanObserver.observe(document.body,{childList:true,subtree:true});}global.setInterval(()=>{suppressLegacyRecovery();document.querySelectorAll('audio').forEach(a=>evaluate(a,'tick'));},1000);for(const ev of ['focus','pageshow','online']) global.addEventListener(ev,()=>document.querySelectorAll('audio').forEach(a=>noteCandidate(a,ev)),{passive:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden) document.querySelectorAll('audio').forEach(a=>noteCandidate(a,'visibility'));},{passive:true});}
 
   global.S666AllPlayerAudioRecovery=Object.freeze({version:VERSION,owner:OWNER,compatOwner:LEGACY_COMPAT_OWNER,attach,scan,evaluate,noteCandidate,markManualStop,markWanted,isBackupSource,legacyHandoff});
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
