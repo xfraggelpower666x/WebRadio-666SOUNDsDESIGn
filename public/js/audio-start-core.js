@@ -28,6 +28,11 @@ ZWECK:
         legacyRecoveryMuted: true
       });
       global.__phase10PcMainBackupGuardInstalled = true;
+      global.__phase10PcDirectfixAutoResetDemoted = true;
+      const healingOrchestra = global.S666_AUDIO_HEALING_ORCHESTRA = global.S666_AUDIO_HEALING_ORCHESTRA || {};
+      healingOrchestra.owner = CANONICAL_OWNER;
+      healingOrchestra.active = true;
+      healingOrchestra.lastRecoveryAt = Infinity;
       document.documentElement?.setAttribute('data-audio-early-recovery-authority', CANONICAL_OWNER);
       document.documentElement?.setAttribute('data-phase10-pc-backup-auto-guard', 'demoted');
     } catch (_) {}
