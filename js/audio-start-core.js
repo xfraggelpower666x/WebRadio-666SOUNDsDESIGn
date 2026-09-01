@@ -27,8 +27,6 @@ ZWECK:
         canonicalRecovery: CANONICAL_OWNER,
         legacyRecoveryMuted: true
       });
-      // Phase10 owns an obsolete automatic desktop backup->main interval behind this flag.
-      // Manual H/B buttons remain owned by player-core; only the competing auto-loader is suppressed.
       global.__phase10PcMainBackupGuardInstalled = true;
       document.documentElement?.setAttribute('data-audio-early-recovery-authority', CANONICAL_OWNER);
       document.documentElement?.setAttribute('data-phase10-pc-backup-auto-guard', 'demoted');
