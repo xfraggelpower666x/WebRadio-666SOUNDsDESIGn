@@ -6,11 +6,14 @@ const recovery = fs.readFileSync('js/all-player-audio-recovery.js', 'utf8');
 const recoveryPublic = fs.readFileSync('public/js/all-player-audio-recovery.js', 'utf8');
 const mute = fs.readFileSync('js/all-player-mute.js', 'utf8');
 const mutePublic = fs.readFileSync('public/js/all-player-mute.js', 'utf8');
+const audioStart = fs.readFileSync('js/audio-start-core.js', 'utf8');
+const audioStartPublic = fs.readFileSync('public/js/audio-start-core.js', 'utf8');
 const phase10 = fs.readFileSync('js/phase10-stability-iphone-panel-hud.js', 'utf8');
 
-test('interruption repair keeps root/public recovery and loader mirrors byte-identical', () => {
+test('interruption repair keeps root/public recovery, loader and early authority mirrors byte-identical', () => {
   assert.equal(recoveryPublic, recovery);
   assert.equal(mutePublic, mute);
+  assert.equal(audioStartPublic, audioStart);
 });
 
 test('canonical recovery exposes the legacy phase10 compatibility owner without creating a second recovery engine', () => {
@@ -21,7 +24,15 @@ test('canonical recovery exposes the legacy phase10 compatibility owner without 
   assert.match(recovery, /recovery:LEGACY_COMPAT_OWNER/);
 });
 
-test('phase10 handoff can now resolve before its legacy hard pause-src-load fallback', () => {
+test('early audio core demotes the obsolete Phase10 automatic PC backup loader before deferred Phase10 boots', () => {
+  assert.match(audioStart, /canonicalRecovery: CANONICAL_OWNER/);
+  assert.match(audioStart, /recovery: LEGACY_COMPAT_OWNER/);
+  assert.match(audioStart, /global\.__phase10PcMainBackupGuardInstalled = true/);
+  assert.match(audioStart, /data-phase10-pc-backup-auto-guard', 'demoted'/);
+  assert.match(phase10, /if\(window\.__phase10PcMainBackupGuardInstalled\) return;/);
+});
+
+test('phase10 focus guard sees the compatibility authority instead of falling into recoverAudio hard reload', () => {
   assert.match(phase10, /window\.S666_AUDIO_AUTHORITY\.recovery === "central-audio-guard-v2"/);
   assert.match(phase10, /typeof centralAudioGuardV2Recover === "function"/);
   assert.match(recovery, /function legacyHandoff\(reason\)/);
@@ -36,6 +47,14 @@ test('soft interruption handoff remains candidate/evaluate only and does not har
   assert.doesNotMatch(handoff, /removeAttribute\(['"]src['"]\)/);
 });
 
+test('manual H/B ownership is preserved while only the legacy automatic backup guard is demoted', () => {
+  assert.match(phase10, /\{led:"main",target:"main",canonical:"mainBtn"\}/);
+  assert.match(phase10, /\{led:"backup",target:"backup",canonical:"fallbackBtn"\}/);
+  assert.match(phase10, /tap\(canonical,"mobile-"\+entry\.target\+"-stream"\)/);
+  assert.doesNotMatch(audioStart, /mainBtn.*click/);
+  assert.doesNotMatch(audioStart, /fallbackBtn.*click/);
+});
+
 test('cache identity forces browsers onto the repaired recovery owner bridge', () => {
   assert.match(mute, /20260901-interruption-owner-collision-v3/);
 });
@@ -45,4 +64,5 @@ test('protected DSP graph ownership remains untouched by interruption repair', (
   assert.doesNotMatch(recovery, /createGain\s*\(/);
   assert.doesNotMatch(recovery, /createBiquadFilter\s*\(/);
   assert.doesNotMatch(recovery, /MeterBus\s*=/);
+  assert.doesNotMatch(audioStart, /createMediaElementSource\s*\(/);
 });
