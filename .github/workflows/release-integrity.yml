@@ -22,17 +22,7 @@ jobs:
       - run: npm ci
       - name: Release checker
         run: npm run check
-      - name: Audio start lifecycle regression
-        run: node --test tests/audio-start-lifecycle-main-boot.test.mjs
-      - name: Audio interruption owner regression
-        run: node --test tests/audio-interruption-owner-collision.test.mjs
-      - name: Phase10 canonical recovery regression
-        run: node --test tests/phase10-canonical-recovery-delegation.test.mjs
-      - name: Backup primary failover regression
-        run: node --test tests/backup-stream-primary-failover.test.mjs
-      - name: Audio cache identity regression
-        run: node --test tests/audio-cache-identity-owner-collision.test.mjs
-      - name: Full Node regression suite
+      - name: Node regression tests
         run: npm test
       - name: Python syntax audit without bytecode
         shell: python
