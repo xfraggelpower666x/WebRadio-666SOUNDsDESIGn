@@ -16,17 +16,20 @@ test('main VELUNA adapter root/public mirrors are byte-identical',()=>{
 });
 test('bootstrap config is revalidated and loads one main adapter',()=>{
   assert.match(headers,/\/config\/\*\n  Cache-Control: no-cache, must-revalidate/);
-  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4'/);
+  assert.match(bootstrap,/mainVelunaAdapterVersion = '2026-09-02-mobile-mff-marquee-owner-v1'/);
   assert.match(bootstrap,/main-veluna-adapter\.css/);
   assert.match(bootstrap,/main-veluna-adapter\.js/);
 });
 test('main ticker scrolls every non-empty title and keeps only an empty lane static',()=>{
-  assert.doesNotMatch(js,/TICKER_STATIC_PADDING/);
-  assert.doesNotMatch(js,/const itemWidth=measureTextWidth\(ticker\)/);
-  assert.doesNotMatch(js,/itemWidth<=Math\.max\(0,laneWidth/);
-  assert.match(js,/if\(!text\)\{\s*ticker\.classList\.add\('is-static'\);\s*return;\s*\}/);
-  assert.match(js,/const shift=Math\.max\(1,measureLoopSegmentWidth\(ticker,text\)\)/);
-  assert.match(js,/ticker\.classList\.add\('is-running'\)/);
+  const desktopStart=js.indexOf('function syncTickerMotion()');
+  const mobileStart=js.indexOf('function syncMffTickerMotion()');
+  const desktopBody=mobileStart>desktopStart?js.slice(desktopStart,mobileStart):js.slice(desktopStart);
+  assert.doesNotMatch(desktopBody,/TICKER_STATIC_PADDING/);
+  assert.doesNotMatch(desktopBody,/const itemWidth=measureTextWidth\(ticker\)/);
+  assert.doesNotMatch(desktopBody,/itemWidth<=Math\.max\(0,laneWidth/);
+  assert.match(desktopBody,/if\(!text\)\{ticker\.classList\.add\('is-static'\);return;\}/);
+  assert.match(desktopBody,/const shift=Math\.max\(1,measureLoopSegmentWidth\(ticker,text\)\)/);
+  assert.match(desktopBody,/ticker\.classList\.add\('is-running'\)/);
   assert.match(css,/\.is-static\{min-width:100%!important;translate:0 0!important\}/);
 });
 test('mobile adapter ownership neutralizes legacy full-field marquee and preserves the owned continuous ticker driver',()=>{
@@ -112,6 +115,27 @@ test('unchanged repeated metadata does not restart a ticker before a full cycle'
   const signatureCheck=js.indexOf("if(unchanged&&active) return");
   const stopCheck=js.indexOf('stopTickerAnimation(ticker);',js.indexOf('function syncTickerMotion'));
   assert.ok(signatureCheck>0&&stopCheck>signatureCheck,'signature guard must run before animation cancellation');
+});
+test('rendered mobile MFF title has one stable owner without changing desktop continuous marquee',()=>{
+  assert.match(js,/const TICKER_STATIC_PADDING=24/);
+  assert.match(js,/function normalizeMffTickerText\(value\)/);
+  assert.match(js,/second===first\?first:clean/);
+  assert.match(js,/function syncMffTickerMotion\(\)/);
+  assert.match(js,/#mffApp \.mff-title h1/);
+  assert.match(js,/observer\.observe\(lane,\{childList:true,characterData:true,subtree:true\}\)/);
+  assert.match(js,/window\.__S666_MAIN_MFF_TICKER_MUTATION_OBSERVER__=observer/);
+  assert.match(js,/itemWidth<=Math\.max\(0,laneWidth-TICKER_STATIC_PADDING\)/);
+  assert.match(js,/mffTickerAnimation\.id='s666-mff-marquee'/);
+  assert.match(js,/s666MffTickerDriver/);
+  assert.match(css,/#mffApp \.mff-title h1 span\.s666-veluna-mff-ticker/);
+  assert.match(css,/s666-veluna-mff-ticker\.is-static/);
+  assert.match(css,/data-s666-mff-ticker-driver="css"/);
+  assert.match(css,/data-s666-mff-ticker-driver="waapi"/);
+  const desktopStart=js.indexOf('function syncTickerMotion()');
+  const mobileStart=js.indexOf('function syncMffTickerMotion()');
+  const desktopBody=js.slice(desktopStart,mobileStart);
+  assert.doesNotMatch(desktopBody,/measureTextWidth\(ticker\)/);
+  assert.match(desktopBody,/const shift=Math\.max\(1,measureLoopSegmentWidth\(ticker,text\)\)/);
 });
 test('main reuses the exact shared VELUNA central cyber boot through idempotent bootOnce only',()=>{
   assert.match(centralBoot,/CYBER BOOTING/);

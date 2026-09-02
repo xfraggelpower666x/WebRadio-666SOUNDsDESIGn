@@ -1,7 +1,7 @@
-/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.1.9
- * Canonical ticker lane + layer cleanup. The shared central VELUNA boot owns all startup visuals.
- * Horizontal fallback geometry now matches the measured 18px outer inset; runtime JS anchors the right edge directly to History.
- * Adapter-managed mobile titles override legacy desktop.css marquee padding/transform so fitting titles can remain whole and static.
+/* 666SOUNDsDESIGn — Main VELUNA Adapter v1.2.0
+ * Canonical desktop ticker lane + rendered mobile MFF ticker ownership. The shared central VELUNA boot owns all startup visuals.
+ * Horizontal fallback geometry matches the measured 18px outer inset; runtime JS anchors the right edge directly to History.
+ * Desktop keeps the current continuous ticker contract; <=760px MFF short titles stay whole/static and long titles loop seam-exactly.
  * No legacy main cyber-boot CSS remains here.
  */
 @keyframes s666VelunaMainTicker{from{translate:0 0}to{translate:calc(-1 * var(--ticker-shift,500px)) 0}}
@@ -13,62 +13,23 @@
   body[data-veluna-page="main"] .now-playing #historyPanel{z-index:12!important}
 
   body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{
-    grid-column:auto!important;
-    grid-row:auto!important;
-    position:absolute!important;
-    left:var(--s666-main-ticker-left,18px)!important;
-    right:auto!important;
-    top:auto!important;
-    bottom:42px!important;
-    width:var(--s666-main-ticker-width,calc(100% - 184px))!important;
-    min-width:96px!important;
-    max-width:none!important;
-    min-height:44px!important;
-    height:44px!important;
-    box-sizing:border-box!important;
-    margin:0!important;
-    align-self:auto!important;
-    justify-self:auto!important;
-    z-index:2!important;
-    display:flex!important;
-    align-items:center!important;
-    overflow:hidden!important;
-    isolation:isolate!important;
-    contain:paint!important;
+    grid-column:auto!important;grid-row:auto!important;position:absolute!important;
+    left:var(--s666-main-ticker-left,18px)!important;right:auto!important;top:auto!important;bottom:42px!important;
+    width:var(--s666-main-ticker-width,calc(100% - 184px))!important;min-width:96px!important;max-width:none!important;
+    min-height:44px!important;height:44px!important;box-sizing:border-box!important;margin:0!important;
+    align-self:auto!important;justify-self:auto!important;z-index:2!important;display:flex!important;align-items:center!important;
+    overflow:hidden!important;isolation:isolate!important;contain:paint!important;
   }
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{
-    position:relative!important;
-    left:auto!important;
-    z-index:1!important;
-    display:inline-block!important;
-    width:max-content!important;
-    min-width:0!important;
-    max-width:none!important;
-    padding:0!important;
-    line-height:34px!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
-    text-overflow:clip!important;
-    animation:none!important;
-    will-change:translate!important;
-    translate:0 0;
+    position:relative!important;left:auto!important;z-index:1!important;display:inline-block!important;width:max-content!important;
+    min-width:0!important;max-width:none!important;padding:0!important;line-height:34px!important;white-space:nowrap!important;
+    overflow:visible!important;text-overflow:clip!important;animation:none!important;will-change:translate!important;translate:0 0;
   }
   body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;translate:0 0!important}
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{
-    content:" ◆ " attr(data-s666-marquee-text);
-    display:inline-block!important;
-    padding-left:48px!important;
-    color:inherit!important;
-    text-shadow:inherit!important;
-  }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{
-    animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important;
-  }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{
-    animation:none!important;
-  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{animation:none!important}
 
-  /* Only the three owner-approved DNA modules are amplified. */
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform{overflow:hidden!important;align-items:flex-end!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-waveform i{max-height:calc(100% - 6px)!important;min-height:7%!important;transform:none!important;transform-origin:bottom!important;filter:brightness(calc(1.06 + var(--s666-stage-peak)*.72)) saturate(calc(1.12 + var(--s666-stage-mid)*.58)) drop-shadow(0 0 calc(4px + var(--s666-stage-pulse)*12px) rgba(22,255,243,.58))!important;opacity:calc(.42 + var(--s666-stage-level)*.50)!important}
   body[data-veluna-page="main"] #pcLeftFxAddon .pc-addon-reactor-core{transform:scale(calc(.90 + var(--s666-stage-low)*.22 + var(--s666-stage-pulse)*.14)) rotate(calc(var(--s666-stage-mid)*28deg))!important;filter:brightness(calc(1.02 + var(--s666-stage-low)*.78 + var(--s666-stage-pulse)*.34)) saturate(calc(1.18 + var(--s666-stage-mid)*.92)) drop-shadow(0 0 calc(9px + var(--s666-stage-peak)*25px) rgba(255,61,187,.58))!important}
@@ -79,50 +40,19 @@
   body[data-veluna-page="main"] #pcRightFxAddon .phase-line{height:5px!important;opacity:calc(.58 + var(--s666-stage-pulse)*.38)!important;filter:brightness(calc(1.10 + var(--s666-stage-peak)*.72)) saturate(calc(1.42 + var(--s666-stage-mid)*.70))!important;box-shadow:0 0 calc(12px + var(--s666-stage-peak)*28px) rgba(255,61,187,.62),0 0 calc(10px + var(--s666-stage-level)*24px) rgba(22,255,243,.48)!important}
   body[data-veluna-page="main"] #pcRightFxAddon .phase-cloud{opacity:calc(.48 + var(--s666-stage-level)*.44)!important;filter:saturate(calc(1.42 + var(--s666-stage-mid)*.88)) brightness(calc(1.02 + var(--s666-stage-peak)*.54))!important;border-color:rgba(255,61,187,calc(.30 + var(--s666-stage-peak)*.54))!important;box-shadow:0 0 calc(12px + var(--s666-stage-level)*30px) rgba(255,61,187,.40),inset 0 0 calc(10px + var(--s666-stage-peak)*22px) rgba(22,255,243,.28)!important}
 }
-@media (min-width:761px) and (max-height:820px){
-  body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{bottom:18px!important}
-}
+@media (min-width:761px) and (max-height:820px){body[data-veluna-page="main"] .frame-stage .player-shell .now-playing .ticker-window{bottom:18px!important}}
 
-/* Main mobile ticker ownership: neutralize legacy desktop.css transform/padding animations only after the adapter has claimed the ticker. */
 @media (max-width:760px){
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{
-    position:relative!important;
-    left:auto!important;
-    display:inline-block!important;
-    width:max-content!important;
-    min-width:0!important;
-    max-width:none!important;
-    padding-left:0!important;
-    padding-right:0!important;
-    margin:0!important;
-    white-space:nowrap!important;
-    overflow:visible!important;
-    text-overflow:clip!important;
-    transform:none!important;
-    animation:none!important;
-    will-change:translate!important;
-    translate:0 0;
-  }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{
-    min-width:100%!important;
-    padding-left:0!important;
-    transform:none!important;
-    animation:none!important;
-    translate:0 0!important;
-  }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{
-    content:" ◆ " attr(data-s666-marquee-text);
-    display:inline-block!important;
-    padding-left:48px!important;
-    color:inherit!important;
-    text-shadow:inherit!important;
-  }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{
-    transform:none!important;
-    animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important;
-  }
-  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{
-    transform:none!important;
-    animation:none!important;
-  }
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker{position:relative!important;left:auto!important;display:inline-block!important;width:max-content!important;min-width:0!important;max-width:none!important;padding-left:0!important;padding-right:0!important;margin:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;transform:none!important;animation:none!important;will-change:translate!important;translate:0 0}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-static{min-width:100%!important;padding-left:0!important;transform:none!important;animation:none!important;translate:0 0!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="css"]{transform:none!important;animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
+  body[data-veluna-page="main"] #nowPlayingTicker.s666-veluna-main-ticker.is-running[data-s666-ticker-driver="waapi"]{transform:none!important;animation:none!important}
+
+  html body[data-veluna-page="main"] #mffApp .mff-title h1{overflow:hidden!important;white-space:nowrap!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker{display:inline-block!important;position:relative!important;width:max-content!important;min-width:0!important;max-width:none!important;padding-left:0!important;padding-right:0!important;margin:0!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;transform:none!important;animation:none!important;will-change:translate!important;translate:0 0}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-static{min-width:100%!important;padding-left:0!important;padding-right:0!important;transform:none!important;animation:none!important;translate:0 0!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running::after{content:" ◆ " attr(data-s666-marquee-text);display:inline-block!important;padding-left:48px!important;color:inherit!important;text-shadow:inherit!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running[data-s666-mff-ticker-driver="css"]{transform:none!important;animation:s666VelunaMainTicker var(--ticker-duration,18s) linear infinite!important}
+  html body[data-veluna-page="main"] #mffApp .mff-title h1 span.s666-veluna-mff-ticker.is-running[data-s666-mff-ticker-driver="waapi"]{transform:none!important;animation:none!important}
 }
