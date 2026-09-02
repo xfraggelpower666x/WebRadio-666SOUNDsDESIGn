@@ -63,6 +63,16 @@ test('a superseded start request cannot pause the newer shared audio playback', 
   assert.match(audioStart, /if \(config && typeof config\.isStopped === 'function' && config\.isStopped\(\)\) \{[\s\S]*?audio\.pause\(\)/);
 });
 
+test('top cockpit restores STR SRC and MTR visibility without adding duplicate owners', () => {
+  assert.match(audioStart, /function restoreCanonicalTopPanelStatusChips\(\)/);
+  for (const id of ['statusStream','statusSource','statusMeter']) {
+    assert.ok(audioStart.includes(`'${id}'`), id);
+  }
+  assert.match(audioStart, /chip\.style\.setProperty\('display', 'inline-flex', 'important'\)/);
+  assert.match(audioStart, /data-top-status-visibility', 'canonical'/);
+  assert.doesNotMatch(audioStart, /statusStream.*addEventListener|statusSource.*addEventListener|statusMeter.*addEventListener/);
+});
+
 test('manual H/B ownership is preserved while only the legacy automatic backup guard is demoted', () => {
   assert.match(phase10, /\{led:"main",target:"main",canonical:"mainBtn"\}/);
   assert.match(phase10, /\{led:"backup",target:"backup",canonical:"fallbackBtn"\}/);
