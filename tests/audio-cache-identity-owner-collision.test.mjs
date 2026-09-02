@@ -9,11 +9,15 @@ const htmls = [
 const AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';
 const OLD_AUDIO_CACHE = 'audio-start-core.js?v=2026-07-12-v1217';
 
+function literal(value) {
+  return new RegExp(String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+}
+
 test('all Main and VELUNA entrypoints force the repaired early audio-start authority runtime', () => {
   for (const file of htmls) {
     const text = fs.readFileSync(file, 'utf8');
-    assert.match(text, new RegExp(AUDIO_CACHE.replace(/[.*+?^${}()|[\]\\]/g, '\$&')));
-    assert.doesNotMatch(text, new RegExp(OLD_AUDIO_CACHE.replace(/[.*+?^${}()|[\]\\]/g, '\$&')));
+    assert.match(text, literal(AUDIO_CACHE), file);
+    assert.doesNotMatch(text, literal(OLD_AUDIO_CACHE), file);
   }
 });
 
