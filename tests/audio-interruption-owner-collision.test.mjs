@@ -49,6 +49,20 @@ test('soft interruption handoff remains candidate/evaluate only and does not har
   assert.doesNotMatch(handoff, /removeAttribute\(['"]src['"]\)/);
 });
 
+test('automatic browser interruption reasons never enter the audio-start hard reset path', () => {
+  assert.match(audioStart, /const softResumeReasons = new Set\(\['focus','pageshow','visibility','visible','suspend','stalled','interrupted','system-interruption'\]\)/);
+  assert.match(audioStart, /if \(softResumeReasons\.has\(why\)\) \{[\s\S]*?handoffAutomaticRecovery\(why\);[\s\S]*?return;[\s\S]*?\}/);
+  assert.match(audioStart, /owner\.owner === 'all-player-audio-recovery-v1'/);
+  assert.match(audioStart, /owner\.legacyHandoff\(why \|\| 'audio-start-core-sensor'\)/);
+});
+
+test('a superseded start request cannot pause the newer shared audio playback', () => {
+  const superseded = audioStart.match(/if \(!isCurrent\(token\)\) \{([\s\S]*?)\n      \}/)?.[1] || '';
+  assert.match(superseded, /stale-superseded/);
+  assert.doesNotMatch(superseded, /audio\.pause\(/);
+  assert.match(audioStart, /if \(config && typeof config\.isStopped === 'function' && config\.isStopped\(\)\) \{[\s\S]*?audio\.pause\(\)/);
+});
+
 test('manual H/B ownership is preserved while only the legacy automatic backup guard is demoted', () => {
   assert.match(phase10, /\{led:"main",target:"main",canonical:"mainBtn"\}/);
   assert.match(phase10, /\{led:"backup",target:"backup",canonical:"fallbackBtn"\}/);
