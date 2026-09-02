@@ -46,23 +46,21 @@ jobs:
               path.write_text(text.replace(old, new), encoding='utf-8')
 
           test_path = Path('tests/audio-cache-identity-owner-collision.test.mjs')
-          lines = test_path.read_text(encoding='utf-8').splitlines()
-          out = []
-          inserted_previous = False
-          inserted_assertion = False
-          for line in lines:
-              if line == "const AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';":
-                  out.append("const AUDIO_CACHE = 'audio-start-core.js?v=20260902-owner-collision-v2';")
-                  out.append("const PREVIOUS_AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';")
-                  inserted_previous = True
-                  continue
-              if 'assert.doesNotMatch(text, new RegExp(OLD_AUDIO_CACHE.replace' in line and not inserted_assertion:
-                  out.append(line.replace('OLD_AUDIO_CACHE', 'PREVIOUS_AUDIO_CACHE'))
-                  inserted_assertion = True
-              out.append(line)
-          if not inserted_previous or not inserted_assertion:
+          text = test_path.read_text(encoding='utf-8')
+          audio_line = "const AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';"
+          old_line = "const OLD_AUDIO_CACHE = 'audio-start-core.js?v=2026-07-12-v1217';"
+          assertion = "    assert.doesNotMatch(text, literal(OLD_AUDIO_CACHE), file);"
+          if text.count(audio_line) != 1 or text.count(old_line) != 1 or text.count(assertion) != 1:
               raise SystemExit('cache regression contract insertion point not found')
-          test_path.write_text('\n'.join(out) + '\n', encoding='utf-8')
+          text = text.replace(
+              audio_line,
+              "const AUDIO_CACHE = 'audio-start-core.js?v=20260902-owner-collision-v2';\nconst PREVIOUS_AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';"
+          )
+          text = text.replace(
+              assertion,
+              "    assert.doesNotMatch(text, literal(PREVIOUS_AUDIO_CACHE), file);\n" + assertion
+          )
+          test_path.write_text(text, encoding='utf-8')
       - name: Targeted cache regression
         run: node --test tests/audio-cache-identity-owner-collision.test.mjs
       - name: Full repository verify
