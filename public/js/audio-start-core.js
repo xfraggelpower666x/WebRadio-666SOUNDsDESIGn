@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.20
+VERSION: v1.2.21
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
@@ -11,6 +11,7 @@ ZWECK:
 - v1.2.18: Main lädt den bestehenden Central-Boot-Owner bereits im frühen Head-Pfad vor.
 - v1.2.19: frühe Recovery-Authority verhindert, dass der alte Phase10-PC-Backup-Guard oder AudioFocus-Fallback vor dem kanonischen Recovery-Owner einen zweiten pause/src/load-Pfad startet.
 - v1.2.20: Browser-Sensoren (focus/pageshow/visibility/suspend/stalled/interrupted) dürfen keinen harten Transport-Reset mehr auslösen; sie delegieren an den kanonischen Recovery-Owner. Ein überholter Startrequest darf einen bereits neueren Start nicht mehr pausieren.
+- v1.2.21: alte Phase10-CSS-Ausblendung von STR/SRC/MTR wird im Main-Header neutralisiert; bestehende Status-Owner und H/B-Aktionen bleiben unverändert.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
@@ -39,6 +40,21 @@ ZWECK:
     } catch (_) {}
   }
   seedCanonicalRecoveryAuthority();
+
+  function restoreCanonicalTopPanelStatusChips() {
+    const apply = () => {
+      for (const id of ['statusStream','statusSource','statusMeter']) {
+        try {
+          const chip = document.getElementById(id);
+          if (chip) chip.style.setProperty('display', 'inline-flex', 'important');
+        } catch (_) {}
+      }
+      try { document.documentElement?.setAttribute('data-top-status-visibility', 'canonical'); } catch (_) {}
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply, { once: true });
+    else apply();
+  }
+  restoreCanonicalTopPanelStatusChips();
 
   function installEarlyMainCentralBoot() {
     try {
