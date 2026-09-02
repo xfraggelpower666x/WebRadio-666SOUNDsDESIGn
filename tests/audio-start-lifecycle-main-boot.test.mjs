@@ -32,3 +32,13 @@ test('main route preloads the existing shared central boot owner early',()=>{
   assert.match(root,/S666CentralBootScreen\.bootOnce/);
   assert.doesNotMatch(root,/START AUDIO|USER GESTURE REQUIRED/);
 });
+
+test('main cyberboot suppresses both player DOM layers until the single boot owner hands off',()=>{
+  assert.match(root,/s666-main-boot-preflight/);
+  assert.match(root,/\.frame-stage,html\.s666-main-boot-preflight #mffApp\{visibility:hidden!important\}/);
+  assert.match(root,/let bootSeen = Boolean\(document\.getElementById\('s666CentralBoot'\)\)/);
+  assert.match(root,/if \(boot\) \{[\s\S]*bootSeen = true;[\s\S]*return;[\s\S]*\}/);
+  assert.match(root,/if \(bootSeen\) releasePreflight\('boot-handoff-complete'\)/);
+  assert.match(root,/releasePreflight\('failsafe-release'\), 9000/);
+  assert.match(root,/releasePreflight\('boot-script-error'\)/);
+});
