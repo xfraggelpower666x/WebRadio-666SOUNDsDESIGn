@@ -41,6 +41,13 @@ jobs:
           if text.count(expected) != 1:
               raise SystemExit("adapter version assertion not found exactly once")
           text = text.replace(expected, "mainVelunaAdapterVersion = '2026-09-02-mobile-mff-marquee-owner-v1'")
+
+          old_desktop = """test('main ticker scrolls every non-empty title and keeps only an empty lane static',()=>{\n  assert.doesNotMatch(js,/TICKER_STATIC_PADDING/);\n  assert.doesNotMatch(js,/const itemWidth=measureTextWidth\\(ticker\\)/);\n  assert.doesNotMatch(js,/itemWidth<=Math\\.max\\(0,laneWidth/);\n  assert.match(js,/if\\(!text\\)\\{\\s*ticker\\.classList\\.add\\('is-static'\\);\\s*return;\\s*\\}/);\n  assert.match(js,/const shift=Math\\.max\\(1,measureLoopSegmentWidth\\(ticker,text\\)\\)/);\n  assert.match(js,/ticker\\.classList\\.add\\('is-running'\\)/);\n  assert.match(css,/\\.is-static\\{min-width:100%!important;translate:0 0!important\\}/);\n});"""
+          new_desktop = """test('main ticker scrolls every non-empty title and keeps only an empty lane static',()=>{\n  const desktopStart=js.indexOf('function syncTickerMotion()');\n  const mobileStart=js.indexOf('function syncMffTickerMotion()');\n  const desktopBody=mobileStart>desktopStart?js.slice(desktopStart,mobileStart):js.slice(desktopStart);\n  assert.doesNotMatch(desktopBody,/TICKER_STATIC_PADDING/);\n  assert.doesNotMatch(desktopBody,/const itemWidth=measureTextWidth\\(ticker\\)/);\n  assert.doesNotMatch(desktopBody,/itemWidth<=Math\\.max\\(0,laneWidth/);\n  assert.match(desktopBody,/if\\(!text\\)\\{ticker\\.classList\\.add\\('is-static'\\);return;\\}/);\n  assert.match(desktopBody,/const shift=Math\\.max\\(1,measureLoopSegmentWidth\\(ticker,text\\)\\)/);\n  assert.match(desktopBody,/ticker\\.classList\\.add\\('is-running'\\)/);\n  assert.match(css,/\\.is-static\\{min-width:100%!important;translate:0 0!important\\}/);\n});"""
+          if text.count(old_desktop) != 1:
+              raise SystemExit("desktop ticker contract block not found exactly once")
+          text = text.replace(old_desktop, new_desktop)
+
           marker = "test('main reuses the exact shared VELUNA central cyber boot through idempotent bootOnce only',()=>{"
           if marker not in text:
               raise SystemExit("test insertion marker not found")
