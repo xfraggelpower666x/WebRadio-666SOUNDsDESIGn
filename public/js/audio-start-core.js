@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.21
+VERSION: v1.2.22
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
@@ -12,6 +12,7 @@ ZWECK:
 - v1.2.19: frühe Recovery-Authority verhindert, dass der alte Phase10-PC-Backup-Guard oder AudioFocus-Fallback vor dem kanonischen Recovery-Owner einen zweiten pause/src/load-Pfad startet.
 - v1.2.20: Browser-Sensoren (focus/pageshow/visibility/suspend/stalled/interrupted) dürfen keinen harten Transport-Reset mehr auslösen; sie delegieren an den kanonischen Recovery-Owner. Ein überholter Startrequest darf einen bereits neueren Start nicht mehr pausieren.
 - v1.2.21: alte Phase10-CSS-Ausblendung von STR/SRC/MTR wird im Main-Header neutralisiert; bestehende Status-Owner und H/B-Aktionen bleiben unverändert.
+- v1.2.22: stale/cancelled Startrequests dürfen das gemeinsame Audioelement niemals pausieren; echter Stop/Pause bleibt ausschließlich beim jeweiligen Transport-Owner.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
@@ -202,7 +203,6 @@ ZWECK:
         throw new Error('stale_play_request');
       }
       if (config && typeof config.isStopped === 'function' && config.isStopped()) {
-        try { audio.pause(); } catch (_) {}
         audio.dataset.audioStartState = 'stale-stopped';
         throw new Error('stale_play_request');
       }
