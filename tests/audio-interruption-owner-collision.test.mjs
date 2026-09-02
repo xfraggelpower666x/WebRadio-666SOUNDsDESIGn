@@ -56,11 +56,13 @@ test('automatic browser interruption reasons never enter the audio-start hard re
   assert.match(audioStart, /owner\.legacyHandoff\(why \|\| 'audio-start-core-sensor'\)/);
 });
 
-test('a superseded start request cannot pause the newer shared audio playback', () => {
+test('stale and cancelled start requests cannot pause newer shared audio playback', () => {
   const superseded = audioStart.match(/if \(!isCurrent\(token\)\) \{([\s\S]*?)\n      \}/)?.[1] || '';
+  const stopped = audioStart.match(/if \(config && typeof config\.isStopped === 'function' && config\.isStopped\(\)\) \{([\s\S]*?)\n      \}/)?.[1] || '';
   assert.match(superseded, /stale-superseded/);
+  assert.match(stopped, /stale-stopped/);
   assert.doesNotMatch(superseded, /audio\.pause\(/);
-  assert.match(audioStart, /if \(config && typeof config\.isStopped === 'function' && config\.isStopped\(\)\) \{[\s\S]*?audio\.pause\(\)/);
+  assert.doesNotMatch(stopped, /audio\.pause\(/);
 });
 
 test('top cockpit restores STR SRC and MTR visibility without adding duplicate owners', () => {
