@@ -24,12 +24,14 @@ test('canonical recovery exposes the legacy phase10 compatibility owner without 
   assert.match(recovery, /recovery:LEGACY_COMPAT_OWNER/);
 });
 
-test('early audio core demotes the obsolete Phase10 automatic PC backup loader before deferred Phase10 boots', () => {
+test('early audio core demotes only the obsolete Phase10 automatic PC backup loader while preserving manual bindings', () => {
   assert.match(audioStart, /canonicalRecovery: CANONICAL_OWNER/);
   assert.match(audioStart, /recovery: LEGACY_COMPAT_OWNER/);
   assert.match(audioStart, /global\.__phase10PcMainBackupGuardInstalled = true/);
   assert.match(audioStart, /data-phase10-pc-backup-auto-guard', 'demoted'/);
-  assert.match(phase10, /if\(window\.__phase10PcMainBackupGuardInstalled\) return;/);
+  assert.match(phase10, /var wasMarkedInstalled = !!window\.__phase10PcMainBackupGuardInstalled;/);
+  assert.match(phase10, /if\(s666CanonicalRecoveryOwner\(\)\)\{[\s\S]*?data-phase10-stream-guard","canonical-owner-sensor-only"[\s\S]*?return;[\s\S]*?\}/);
+  assert.match(phase10, /if\(wasMarkedInstalled\) return;/);
 });
 
 test('phase10 focus guard sees the compatibility authority instead of falling into recoverAudio hard reload', () => {
