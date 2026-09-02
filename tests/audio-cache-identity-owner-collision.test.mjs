@@ -6,7 +6,8 @@ const htmls = [
   'index.html','VELUNA/index.html','veluna/index.html',
   'public/index.html','public/VELUNA/index.html','public/veluna/index.html'
 ];
-const AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';
+const AUDIO_CACHE = 'audio-start-core.js?v=20260902-owner-collision-v2';
+const PREVIOUS_AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';
 const OLD_AUDIO_CACHE = 'audio-start-core.js?v=2026-07-12-v1217';
 
 function literal(value) {
@@ -17,6 +18,7 @@ test('all Main and VELUNA entrypoints force the repaired early audio-start autho
   for (const file of htmls) {
     const text = fs.readFileSync(file, 'utf8');
     assert.match(text, literal(AUDIO_CACHE), file);
+    assert.doesNotMatch(text, literal(PREVIOUS_AUDIO_CACHE), file);
     assert.doesNotMatch(text, literal(OLD_AUDIO_CACHE), file);
   }
 });
