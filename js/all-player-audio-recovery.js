@@ -1,9 +1,9 @@
 /*
- * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.3
+ * 666SOUNDsDESIGn — ALL-PLAYER AUDIO BUFFER / RECOVERY CORE v1.0.5
  * One conservative recovery owner for Main Desktop, Main Mobile/MFF, VELUNA and Internal.
  * waiting/stalled/suspend are sensors only. Recovery requires confirmed playback loss.
  * Polling also seeds candidates for silent currentTime/readyState/network stalls that emit no media event.
- * Legacy phase10 recovery is held inside its existing orchestra cooldown while this owner is active.
+ * Legacy Phase10 recovery is permanently cooldown-muted; its sensors/UI may remain, but it cannot execute a second recovery stage.
  * Confirmed failure of the backup/fallback stream fails over to the already-stable primary /stream route.
  * No EQ, Boost, limiter, MeterBus, auth, skip, Discord or Messenger logic.
  */
@@ -11,8 +11,9 @@
   'use strict';
   if(global.S666AllPlayerAudioRecovery) return;
 
-  const VERSION='1.0.3';
+  const VERSION='1.0.5';
   const OWNER='all-player-audio-recovery-v1';
+  const LEGACY_COMPAT_OWNER='central-audio-guard-v2';
   const PRIMARY_ROUTE='/stream';
   const BACKUP_ROUTE='/fallback-stream';
   const states=new WeakMap();
@@ -43,163 +44,64 @@
   }
   function stateFor(audio){
     let s=states.get(audio);
-    if(!s){
-      s={wanted:false,lastTime:Number(audio.currentTime||0),lastMoveAt:now(),candidateAt:0,candidateReason:'',lastRecoverAt:0,softAttempts:0,hardAttempts:0,manualStopAt:0};
-      states.set(audio,s);
-    }
+    if(!s){s={wanted:false,lastTime:Number(audio.currentTime||0),lastMoveAt:now(),candidateAt:0,candidateReason:'',lastRecoverAt:0,softAttempts:0,hardAttempts:0,manualStopAt:0};states.set(audio,s);}
     return s;
   }
-  function markMove(audio,s){
-    const t=Number(audio.currentTime||0);
-    if(Math.abs(t-s.lastTime)>.05){s.lastTime=t;s.lastMoveAt=now();s.candidateAt=0;s.candidateReason='';s.softAttempts=0;}
-  }
+  function markMove(audio,s){const t=Number(audio.currentTime||0);if(Math.abs(t-s.lastTime)>.05){s.lastTime=t;s.lastMoveAt=now();s.candidateAt=0;s.candidateReason='';s.softAttempts=0;}}
   function setDiag(name,value){try{document.documentElement.setAttribute(name,String(value));}catch(_){} }
   function suppressLegacyRecovery(){
     try{
       const orchestra=global.S666_AUDIO_HEALING_ORCHESTRA;
       if(!orchestra||orchestra.owner!==OWNER) return;
       orchestra.active=true;
-      orchestra.lastRecoveryAt=now();
-      setDiag('data-audio-legacy-recovery','cooldown-muted');
+      orchestra.legacyRecoveryMuted=true;
+      orchestra.lastRecoveryAt=Number.POSITIVE_INFINITY;
+      setDiag('data-audio-legacy-recovery','permanently-muted');
     }catch(_){}
   }
-  function resumeContexts(){
-    for(const key of ['__radioAudioContext','__mffAudioContext']){
-      try{const ctx=global[key];if(ctx&&ctx.state==='suspended'){const p=ctx.resume();p?.catch?.(()=>{});}}catch(_){}
-    }
-  }
-  function expectedToPlay(audio,s){
-    if(!audio||uiSaysStopped()) return false;
-    if(now()-s.manualStopAt<2500) return false;
-    const mff=String(document.documentElement.getAttribute('data-mff-playing')||'');
-    return s.wanted||mff==='1'||(!audio.paused&&!audio.ended&&!!sourceOf(audio));
-  }
-  function noteCandidate(audio,reason){
-    const s=stateFor(audio);
-    if(!expectedToPlay(audio,s)) return;
-    if(!s.candidateAt) s.candidateAt=now();
-    s.candidateReason=String(reason||'sensor');
-    setDiag('data-audio-recovery-sensor',s.candidateReason);
-    setDiag('data-audio-recovery-candidate-since',s.candidateAt);
-  }
+  function resumeContexts(){for(const key of ['__radioAudioContext','__mffAudioContext']){try{const ctx=global[key];if(ctx&&ctx.state==='suspended'){const p=ctx.resume();p?.catch?.(()=>{});}}catch(_){}}}
+  function expectedToPlay(audio,s){if(!audio||uiSaysStopped()) return false;if(now()-s.manualStopAt<2500) return false;const mff=String(document.documentElement.getAttribute('data-mff-playing')||'');return s.wanted||mff==='1'||(!audio.paused&&!audio.ended&&!!sourceOf(audio));}
+  function noteCandidate(audio,reason){const s=stateFor(audio);if(!expectedToPlay(audio,s)) return;if(!s.candidateAt) s.candidateAt=now();s.candidateReason=String(reason||'sensor');setDiag('data-audio-recovery-sensor',s.candidateReason);setDiag('data-audio-recovery-candidate-since',s.candidateAt);}
   function clearCandidate(audio){const s=stateFor(audio);s.candidateAt=0;s.candidateReason='';}
 
-  async function softRecover(audio,s,reason){
-    const p=profile();
-    if(now()-s.lastRecoverAt<p.cooldownMs) return false;
-    if(!expectedToPlay(audio,s)||!sourceOf(audio)) return false;
-    s.lastRecoverAt=now();s.softAttempts+=1;
-    resumeContexts();
-    setDiag('data-audio-recovery-action','soft-play');
-    setDiag('data-audio-recovery-reason',reason||s.candidateReason||'confirmed-stall');
-    try{await Promise.resolve(audio.play());return true;}catch(_){return false;}
-  }
-
-  async function hardRecover(audio,s,reason){
-    const p=profile();
-    if(now()-s.lastRecoverAt<p.cooldownMs) return false;
-    if(!expectedToPlay(audio,s)) return false;
-    const src=sourceOf(audio);if(!src) return false;
-    const targetSrc=isBackupSource(src)?PRIMARY_ROUTE:src;
-    s.lastRecoverAt=now();s.hardAttempts+=1;
-    resumeContexts();
-    setDiag('data-audio-recovery-action',targetSrc===PRIMARY_ROUTE&&src!==PRIMARY_ROUTE?'backup-to-primary':'confirmed-reload');
-    setDiag('data-audio-recovery-route',targetSrc===PRIMARY_ROUTE&&src!==PRIMARY_ROUTE?'backup-to-primary':'same-source');
-    setDiag('data-audio-recovery-reason',reason||'confirmed-hard-stall');
-    try{
-      audio.pause();
-      if(sourceOf(audio)!==targetSrc||audio.getAttribute('src')!==targetSrc) audio.src=targetSrc;
-      audio.load();
-      await Promise.resolve(audio.play());
-      return true;
-    }catch(_){return false;}
-  }
+  async function softRecover(audio,s,reason){const p=profile();if(now()-s.lastRecoverAt<p.cooldownMs) return false;if(!expectedToPlay(audio,s)||!sourceOf(audio)) return false;s.lastRecoverAt=now();s.softAttempts+=1;resumeContexts();setDiag('data-audio-recovery-action','soft-play');setDiag('data-audio-recovery-reason',reason||s.candidateReason||'confirmed-stall');try{await Promise.resolve(audio.play());return true;}catch(_){return false;}}
+  async function hardRecover(audio,s,reason){const p=profile();if(now()-s.lastRecoverAt<p.cooldownMs) return false;if(!expectedToPlay(audio,s)) return false;const src=sourceOf(audio);if(!src) return false;const targetSrc=isBackupSource(src)?PRIMARY_ROUTE:src;s.lastRecoverAt=now();s.hardAttempts+=1;resumeContexts();setDiag('data-audio-recovery-action',targetSrc===PRIMARY_ROUTE&&src!==PRIMARY_ROUTE?'backup-to-primary':'confirmed-reload');setDiag('data-audio-recovery-route',targetSrc===PRIMARY_ROUTE&&src!==PRIMARY_ROUTE?'backup-to-primary':'same-source');setDiag('data-audio-recovery-reason',reason||'confirmed-hard-stall');try{audio.pause();if(sourceOf(audio)!==targetSrc||audio.getAttribute('src')!==targetSrc) audio.src=targetSrc;audio.load();await Promise.resolve(audio.play());return true;}catch(_){return false;}}
 
   function evaluate(audio,trigger){
-    if(!audio) return;
-    suppressLegacyRecovery();
-    const s=stateFor(audio);markMove(audio,s);
-    if(!expectedToPlay(audio,s)){clearCandidate(audio);return;}
-    const p=profile();
-    const t=now();
-    const stalledFor=Math.max(0,t-s.lastMoveAt);
-    const ready=Number(audio.readyState||0),network=Number(audio.networkState||0);
-    const src=sourceOf(audio);
-
-    if(!s.candidateAt){
-      if(audio.paused){s.candidateAt=t;s.candidateReason='poll-paused';}
-      else if(network===3){s.candidateAt=t;s.candidateReason='poll-network-no-source';}
-      else if(ready<2){s.candidateAt=t;s.candidateReason='poll-ready-low';}
-      else if(stalledFor>=p.pollSeedMs){s.candidateAt=t;s.candidateReason='poll-currenttime-stall';}
-      if(s.candidateAt){
-        setDiag('data-audio-recovery-sensor',s.candidateReason);
-        setDiag('data-audio-recovery-candidate-since',s.candidateAt);
-      }
-    }
-
-    const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;
-    const hard=/error|abort|emptied|no-source|decode/i.test(String(s.candidateReason||trigger||''))||network===3||!src;
-    setDiag('data-audio-recovery-stall-ms',stalledFor);
-    setDiag('data-audio-recovery-ready',ready);
-    setDiag('data-audio-recovery-network',network);
-
+    if(!audio) return;suppressLegacyRecovery();const s=stateFor(audio);markMove(audio,s);if(!expectedToPlay(audio,s)){clearCandidate(audio);return;}const p=profile();const t=now();const stalledFor=Math.max(0,t-s.lastMoveAt);const ready=Number(audio.readyState||0),network=Number(audio.networkState||0);const src=sourceOf(audio);
+    if(!s.candidateAt){if(audio.paused){s.candidateAt=t;s.candidateReason='poll-paused';}else if(network===3){s.candidateAt=t;s.candidateReason='poll-network-no-source';}else if(ready<2){s.candidateAt=t;s.candidateReason='poll-ready-low';}else if(stalledFor>=p.pollSeedMs){s.candidateAt=t;s.candidateReason='poll-currenttime-stall';}if(s.candidateAt){setDiag('data-audio-recovery-sensor',s.candidateReason);setDiag('data-audio-recovery-candidate-since',s.candidateAt);}}
+    const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;const hard=/error|abort|emptied|no-source|decode/i.test(String(s.candidateReason||trigger||''))||network===3||!src;setDiag('data-audio-recovery-stall-ms',stalledFor);setDiag('data-audio-recovery-ready',ready);setDiag('data-audio-recovery-network',network);
     if(!audio.paused&&ready>=2&&network===2&&stalledFor<p.pollSeedMs){clearCandidate(audio);return;}
     if(audio.paused&&candidateFor>=p.pausedConfirmMs){void softRecover(audio,s,'paused-confirmed');return;}
-    if(hard&&candidateFor>=p.hardConfirmMs){
-      if(stalledFor>=p.hardReloadMs) void hardRecover(audio,s,isBackupSource(src)?'backup-hard-stall-primary-failover':'hard-stall-confirmed');
-      else void softRecover(audio,s,'hard-sensor-soft-first');
-      return;
-    }
-    if(isBackupSource(src)&&candidateFor>=p.stallConfirmMs&&stalledFor>=p.hardReloadMs){
-      void hardRecover(audio,s,'backup-stall-primary-failover');
-      return;
-    }
+    if(hard&&candidateFor>=p.hardConfirmMs){if(stalledFor>=p.hardReloadMs) void hardRecover(audio,s,isBackupSource(src)?'backup-hard-stall-primary-failover':'hard-stall-confirmed');else void softRecover(audio,s,'hard-sensor-soft-first');return;}
+    if(isBackupSource(src)&&candidateFor>=p.stallConfirmMs&&stalledFor>=p.hardReloadMs){void hardRecover(audio,s,'backup-stall-primary-failover');return;}
     if(ready<2&&candidateFor>=p.readyLowConfirmMs&&stalledFor>=p.readyLowConfirmMs){void softRecover(audio,s,'ready-low-confirmed');return;}
     if(candidateFor>=p.stallConfirmMs&&stalledFor>=p.stallConfirmMs){void softRecover(audio,s,'time-stall-confirmed');}
   }
 
+  function legacyHandoff(reason){
+    setDiag('data-audio-legacy-handoff',reason||'phase10');
+    let handed=false;
+    document.querySelectorAll('audio').forEach(audio=>{attach(audio);noteCandidate(audio,reason||'phase10-handoff');evaluate(audio,reason||'phase10-handoff');handed=true;});
+    return handed;
+  }
+  function installLegacyCompatibility(){
+    global.centralAudioGuardV2Recover=legacyHandoff;
+    global.S666_AUDIO_AUTHORITY=Object.assign({},global.S666_AUDIO_AUTHORITY||{}, {transport:'player-owned',recovery:LEGACY_COMPAT_OWNER,canonicalRecovery:OWNER,legacyRecoveryMuted:true});
+    global.S666_AUDIO_HEALING_ORCHESTRA=Object.assign(global.S666_AUDIO_HEALING_ORCHESTRA||{}, {active:true,owner:OWNER,version:VERSION,legacyRecoveryMuted:true,lastRecoveryAt:Number.POSITIVE_INFINITY});
+    setDiag('data-audio-recovery-owner',OWNER);
+    setDiag('data-audio-recovery-compat-owner',LEGACY_COMPAT_OWNER);
+    suppressLegacyRecovery();
+  }
+
   function markManualStop(audio){const s=stateFor(audio);s.wanted=false;s.manualStopAt=now();clearCandidate(audio);setDiag('data-audio-recovery-intent','stopped');}
   function markWanted(audio){const s=stateFor(audio);s.wanted=true;s.lastMoveAt=now();setDiag('data-audio-recovery-intent','play');}
-
-  function attach(audio){
-    if(!audio||attached.has(audio)||typeof audio.play!=='function') return false;
-    attached.add(audio);const s=stateFor(audio);
-    for(const ev of ['play','playing','canplay','canplaythrough']) audio.addEventListener(ev,()=>{markWanted(audio);markMove(audio,s);clearCandidate(audio);},{passive:true});
-    for(const ev of ['timeupdate','progress','loadeddata']) audio.addEventListener(ev,()=>markMove(audio,s),{passive:true});
-    for(const ev of ['waiting','stalled','suspend']) audio.addEventListener(ev,()=>noteCandidate(audio,ev),{passive:true});
-    for(const ev of ['error','abort','emptied']) audio.addEventListener(ev,()=>noteCandidate(audio,ev),{passive:true});
-    audio.addEventListener('pause',()=>{if(expectedToPlay(audio,s)) noteCandidate(audio,'pause');},{passive:true});
-    setDiag('data-audio-recovery-owner',OWNER);
-    return true;
-  }
-
+  function attach(audio){if(!audio||attached.has(audio)||typeof audio.play!=='function') return false;attached.add(audio);const s=stateFor(audio);for(const ev of ['play','playing','canplay','canplaythrough']) audio.addEventListener(ev,()=>{markWanted(audio);markMove(audio,s);clearCandidate(audio);},{passive:true});for(const ev of ['timeupdate','progress','loadeddata']) audio.addEventListener(ev,()=>markMove(audio,s),{passive:true});for(const ev of ['waiting','stalled','suspend']) audio.addEventListener(ev,()=>noteCandidate(audio,ev),{passive:true});for(const ev of ['error','abort','emptied']) audio.addEventListener(ev,()=>noteCandidate(audio,ev),{passive:true});audio.addEventListener('pause',()=>{if(expectedToPlay(audio,s)) noteCandidate(audio,'pause');},{passive:true});setDiag('data-audio-recovery-owner',OWNER);return true;}
   function scan(){document.querySelectorAll('audio').forEach(attach);}
-  function installIntentGuard(){
-    document.addEventListener('click',ev=>{
-      const control=ev.target?.closest?.('#pauseBtn,#stopBtn,[data-mff="pause"],[data-mff="stop"],[data-action="pause"],[data-action="stop"],button[aria-label*="Pause" i],button[aria-label*="Stop" i]');
-      if(!control) return;document.querySelectorAll('audio').forEach(markManualStop);
-    },true);
-  }
-  function installSensorHandoff(){
-    if(sensorObserver) return;
-    sensorObserver=new MutationObserver(()=>{
-      const reason=document.documentElement.getAttribute('data-audio-sensor-event');
-      if(!reason) return;document.querySelectorAll('audio').forEach(a=>noteCandidate(a,reason));
-    });
-    sensorObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-audio-sensor-event']});
-  }
-  function boot(){
-    global.S666_AUDIO_AUTHORITY=Object.assign({},global.S666_AUDIO_AUTHORITY||{}, {transport:'player-owned',recovery:OWNER,legacyRecoveryMuted:true});
-    global.S666_AUDIO_HEALING_ORCHESTRA=Object.assign(global.S666_AUDIO_HEALING_ORCHESTRA||{}, {active:true,owner:OWNER,version:VERSION});
-    document.documentElement.setAttribute('data-audio-orchestra','active');
-    suppressLegacyRecovery();
-    scan();installIntentGuard();installSensorHandoff();
-    if(!scanObserver&&document.body){scanObserver=new MutationObserver(scan);scanObserver.observe(document.body,{childList:true,subtree:true});}
-    global.setInterval(()=>{suppressLegacyRecovery();document.querySelectorAll('audio').forEach(a=>evaluate(a,'tick'));},1000);
-    for(const ev of ['focus','pageshow','online']) global.addEventListener(ev,()=>document.querySelectorAll('audio').forEach(a=>noteCandidate(a,ev)),{passive:true});
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden) document.querySelectorAll('audio').forEach(a=>noteCandidate(a,'visibility'));},{passive:true});
-  }
+  function installIntentGuard(){document.addEventListener('click',ev=>{const control=ev.target?.closest?.('#pauseBtn,#stopBtn,[data-mff="pause"],[data-mff="stop"],[data-action="pause"],[data-action="stop"],button[aria-label*="Pause" i],button[aria-label*="Stop" i]');if(!control) return;document.querySelectorAll('audio').forEach(markManualStop);},true);}
+  function installSensorHandoff(){if(sensorObserver) return;sensorObserver=new MutationObserver(()=>{const reason=document.documentElement.getAttribute('data-audio-sensor-event');if(!reason) return;document.querySelectorAll('audio').forEach(a=>noteCandidate(a,reason));});sensorObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-audio-sensor-event']});}
+  function boot(){installLegacyCompatibility();document.documentElement.setAttribute('data-audio-orchestra','active');scan();installIntentGuard();installSensorHandoff();if(!scanObserver&&document.body){scanObserver=new MutationObserver(scan);scanObserver.observe(document.body,{childList:true,subtree:true});}global.setInterval(()=>{suppressLegacyRecovery();document.querySelectorAll('audio').forEach(a=>evaluate(a,'tick'));},1000);for(const ev of ['focus','pageshow','online']) global.addEventListener(ev,()=>document.querySelectorAll('audio').forEach(a=>noteCandidate(a,ev)),{passive:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden) document.querySelectorAll('audio').forEach(a=>noteCandidate(a,'visibility'));},{passive:true});}
 
-  global.S666AllPlayerAudioRecovery=Object.freeze({version:VERSION,owner:OWNER,attach,scan,evaluate,noteCandidate,markManualStop,markWanted,isBackupSource});
+  global.S666AllPlayerAudioRecovery=Object.freeze({version:VERSION,owner:OWNER,compatOwner:LEGACY_COMPAT_OWNER,attach,scan,evaluate,noteCandidate,markManualStop,markWanted,isBackupSource,legacyHandoff});
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 })(window);

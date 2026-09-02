@@ -11,7 +11,7 @@ RULES:
 */
 (function(){
   "use strict";
-  var VERSION = "phase10-stability-iphone-panel-hud-20260716-single-tap";
+  var VERSION = "phase10-stability-iphone-panel-hud-20260901-canonical-recovery-v1";
   var lastAudibleAt = Date.now();
 
   // AUDIO_CORE_AUTHORITY_LOCK_V1_20260610
@@ -23,7 +23,28 @@ RULES:
     legacyRecoveryMuted: true
   };
 
+  function s666CanonicalRecoveryOwner(){
+    try{
+      var owner = window.S666AllPlayerAudioRecovery;
+      return owner && owner.owner === "all-player-audio-recovery-v1" && typeof owner.legacyHandoff === "function" ? owner : null;
+    }catch(_){ return null; }
+  }
+
+  function s666LegacyRecoveryHandoff(source, reason){
+    var owner = s666CanonicalRecoveryOwner();
+    if(!owner) return false;
+    var handoffReason = reason || source || "legacy-recovery-signal";
+    try{ owner.legacyHandoff(handoffReason); }catch(_){}
+    try{
+      document.documentElement.setAttribute("data-phase10-recovery-owner","all-player-audio-recovery-v1");
+      document.documentElement.setAttribute("data-phase10-recovery-handoff", String(handoffReason));
+      document.documentElement.setAttribute("data-phase10-recovery-source", String(source || "phase10"));
+    }catch(_){}
+    return true;
+  }
+
   function s666CentralAudioAuthorityActive(){
+    if(s666CanonicalRecoveryOwner()) return true;
     return !!(
       window.S666_AUDIO_AUTHORITY &&
       window.S666_AUDIO_AUTHORITY.recovery === "central-audio-guard-v2" &&
@@ -40,6 +61,8 @@ RULES:
       document.documentElement.setAttribute("data-phase10-audio-focus", state || "handoff-to-central-authority");
       document.documentElement.setAttribute("data-audio-authority-handoff", reason || "audio-focus-handoff");
     } catch(e) {}
+
+    if(s666LegacyRecoveryHandoff("phase10-audio-focus", reason || "audio-focus-handoff")) return true;
 
     if (typeof centralAudioGuardV2Recover === "function") {
       centralAudioGuardV2Recover(reason || "audio-focus-handoff");
@@ -500,7 +523,7 @@ RULES:
   }
 
   function installPcMainBackupGuard(){
-    if(window.__phase10PcMainBackupGuardInstalled) return;
+    var wasMarkedInstalled = !!window.__phase10PcMainBackupGuardInstalled;
     window.__phase10PcMainBackupGuardInstalled = true;
 
     ["#mainBtn","#fallbackBtn","#backupBtn","[data-source='main']","[data-source='backup']","[data-source='fallback']"].forEach(function(sel){
@@ -513,6 +536,12 @@ RULES:
       });
     });
 
+    if(s666CanonicalRecoveryOwner()){
+      document.documentElement.setAttribute("data-phase10-stream-guard","canonical-owner-sensor-only");
+      return;
+    }
+    if(wasMarkedInstalled) return;
+
     setInterval(function(){
       if(!phase10IsDesktopPlayer()) return;
       var audio = getAudio();
@@ -520,6 +549,10 @@ RULES:
       var src = String(audio.currentSrc || audio.getAttribute("src") || "");
       var isBackup = /fallback-stream|backup/i.test(src) || document.documentElement.getAttribute("data-phase10-stream-target") === "backup";
       if(isBackup && !phase10ManualStreamSwitchRecent()){
+        if(s666LegacyRecoveryHandoff("phase10-pc-backup-guard","backup-detected")){
+          document.documentElement.setAttribute("data-phase10-stream-guard","canonical-owner-handoff");
+          return;
+        }
         document.documentElement.setAttribute("data-phase10-stream-guard","forced-main");
         try{
           var wasPlaying = !audio.paused;
@@ -576,6 +609,10 @@ RULES:
     var target = document.documentElement.getAttribute("data-phase10-stream-target");
     var backupActive = /fallback-stream|backup/i.test(src) || target === "backup";
     if(backupActive && !phase10ManualStreamSwitchRecent()){
+      if(s666LegacyRecoveryHandoff("phase10-pc-directfix","backup-detected")){
+        document.documentElement.setAttribute("data-phase10-pc-auto-fallback","canonical-owner-handoff");
+        return;
+      }
       document.documentElement.setAttribute("data-phase10-stream-target","main");
       document.documentElement.setAttribute("data-phase10-pc-auto-fallback","blocked");
       var wasPlaying = !audio.paused;
@@ -1024,6 +1061,7 @@ RULES:
   }
 
   function centralAudioGuardV2Recover(reason){
+    if(s666LegacyRecoveryHandoff("phase10-central-guard", reason || "phase10-recovery")) return;
     return s666AudioOrchestraDecide(reason);
   }
   function centralAudioGuardV2Tick(){

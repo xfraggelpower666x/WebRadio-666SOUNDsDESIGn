@@ -24,6 +24,7 @@ window.VELUNA_ASSETS = Object.freeze({
 (() => {
   'use strict';
   const version = '2026-08-17-native-mute-ticker-v185';
+  const muteVersion = '2026-09-01-owner-collision-v1';
   const bootVersion = '2026-08-12-unified-lockscreen-boot-v3';
   const discordRecoveryVersion = '2026-08-21-discord-startup-recovery-v1';
   const mainVisualRepairVersion = '2026-08-23-active-single-logo-owner-v7';
@@ -209,7 +210,7 @@ window.VELUNA_ASSETS = Object.freeze({
     })
     .catch(() => {});
 
-  void loadScript(`/js/all-player-mute.js?v=${version}`, 's666AllPlayerMute', muteReady)
+  void loadScript(`/js/all-player-mute.js?v=${muteVersion}`, 's666AllPlayerMute', muteReady)
     .then(() => {
       try { window.S666AllPlayerMute?.sync?.(); } catch (_) {}
     })
