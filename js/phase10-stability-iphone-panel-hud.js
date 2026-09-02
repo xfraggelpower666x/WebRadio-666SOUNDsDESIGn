@@ -26,17 +26,19 @@ RULES:
   function s666CanonicalRecoveryOwner(){
     try{
       var owner = window.S666AllPlayerAudioRecovery;
-      return owner && owner.owner && owner.owner.id === "all-player-audio-recovery-v1" && typeof owner.legacyHandoff === "function" ? owner : null;
+      return owner && owner.owner === "all-player-audio-recovery-v1" && typeof owner.legacyHandoff === "function" ? owner : null;
     }catch(_){ return null; }
   }
 
   function s666LegacyRecoveryHandoff(source, reason){
     var owner = s666CanonicalRecoveryOwner();
     if(!owner) return false;
-    try{ owner.legacyHandoff(source || "phase10", reason || "legacy-recovery-signal"); }catch(_){}
+    var handoffReason = reason || source || "legacy-recovery-signal";
+    try{ owner.legacyHandoff(handoffReason); }catch(_){}
     try{
       document.documentElement.setAttribute("data-phase10-recovery-owner","all-player-audio-recovery-v1");
-      document.documentElement.setAttribute("data-phase10-recovery-handoff", String(reason || "legacy-recovery-signal"));
+      document.documentElement.setAttribute("data-phase10-recovery-handoff", String(handoffReason));
+      document.documentElement.setAttribute("data-phase10-recovery-source", String(source || "phase10"));
     }catch(_){}
     return true;
   }
