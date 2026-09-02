@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.19
+VERSION: v1.2.20
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
@@ -10,6 +10,7 @@ ZWECK:
 - v1.2.18: keine doppelten load()-Zyklen bei reset:false; Foreground-/Suspend-Recovery bleibt bei gleicher Stream-URL soft.
 - v1.2.18: Main lädt den bestehenden Central-Boot-Owner bereits im frühen Head-Pfad vor.
 - v1.2.19: frühe Recovery-Authority verhindert, dass der alte Phase10-PC-Backup-Guard oder AudioFocus-Fallback vor dem kanonischen Recovery-Owner einen zweiten pause/src/load-Pfad startet.
+- v1.2.20: Browser-Sensoren (focus/pageshow/visibility/suspend/stalled/interrupted) dürfen keinen harten Transport-Reset mehr auslösen; sie delegieren an den kanonischen Recovery-Owner. Ein überholter Startrequest darf einen bereits neueren Start nicht mehr pausieren.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
@@ -114,12 +115,24 @@ ZWECK:
       }
     }
 
+    function handoffAutomaticRecovery(why) {
+      try {
+        const owner = global.S666AllPlayerAudioRecovery;
+        if (owner && owner.owner === 'all-player-audio-recovery-v1' && typeof owner.legacyHandoff === 'function') {
+          owner.legacyHandoff(why || 'audio-start-core-sensor');
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+
     function reset(target, reason, beforeReset) {
       const why = String(reason || 'play').toLowerCase();
-      if (softResumeReasons.has(why) && sameTarget(target)) {
+      if (softResumeReasons.has(why)) {
+        handoffAutomaticRecovery(why);
         try {
           audio.dataset.audioStartReason = why;
-          audio.dataset.audioStartState = 'resume-prepared';
+          audio.dataset.audioStartState = sameTarget(target) ? 'resume-prepared' : 'sensor-handoff';
         } catch (_) {}
         return;
       }
@@ -168,9 +181,13 @@ ZWECK:
 
       await withTimeout(Promise.resolve(playPromise), timeoutMs, 'audio_play_timeout');
 
-      if (!isCurrent(token) || (config && typeof config.isStopped === 'function' && config.isStopped())) {
+      if (!isCurrent(token)) {
+        audio.dataset.audioStartState = 'stale-superseded';
+        throw new Error('stale_play_request');
+      }
+      if (config && typeof config.isStopped === 'function' && config.isStopped()) {
         try { audio.pause(); } catch (_) {}
-        audio.dataset.audioStartState = 'stale';
+        audio.dataset.audioStartState = 'stale-stopped';
         throw new Error('stale_play_request');
       }
 
