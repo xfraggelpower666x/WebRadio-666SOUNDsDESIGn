@@ -10,9 +10,12 @@ test('Phase10 root/public mirror stays byte-identical', () => {
 });
 
 test('Phase10 recognizes and delegates to canonical all-player recovery owner', () => {
-  assert.match(root, /owner\.owner\.id === "all-player-audio-recovery-v1"/);
+  assert.match(root, /owner\.owner === "all-player-audio-recovery-v1"/);
   assert.match(root, /typeof owner\.legacyHandoff === "function"/);
-  assert.match(root, /owner\.legacyHandoff\(source \|\| "phase10", reason \|\| "legacy-recovery-signal"\)/);
+  assert.match(root, /var handoffReason = reason \|\| source \|\| "legacy-recovery-signal"/);
+  assert.match(root, /owner\.legacyHandoff\(handoffReason\)/);
+  assert.doesNotMatch(root, /owner\.owner\.id === "all-player-audio-recovery-v1"/);
+  assert.doesNotMatch(root, /owner\.legacyHandoff\(source \|\| "phase10", reason \|\| "legacy-recovery-signal"\)/);
   assert.match(root, /function centralAudioGuardV2Recover\(reason\)\{\s*if\(s666LegacyRecoveryHandoff\("phase10-central-guard", reason \|\| "phase10-recovery"\)\) return;/);
 });
 
