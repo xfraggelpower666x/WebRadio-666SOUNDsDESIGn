@@ -1,0 +1,82 @@
+name: Mobile MFF Marquee Owner One Shot
+
+on:
+  push:
+    branches:
+      - repair/mobile-mff-marquee-owner-20260902
+    paths:
+      - .github/workflows/mobile-mff-marquee-owner-one-shot.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/mobile-mff-marquee-owner-20260902
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Bump adapter cache identity and extend regression contract
+        shell: python
+        run: |
+          from pathlib import Path
+          old = "2026-08-23-main-ticker-dynamic-lane-dna-contained-v4"
+          new = "2026-09-02-mobile-mff-marquee-owner-v1"
+          for name in ["config/veluna-assets.js", "public/config/veluna-assets.js"]:
+              p = Path(name)
+              text = p.read_text(encoding="utf-8")
+              if text.count(old) != 1:
+                  raise SystemExit(f"{name}: expected one old cache identity, found {text.count(old)}")
+              p.write_text(text.replace(old, new), encoding="utf-8")
+
+          p = Path("tests/main-player-veluna-adapter.test.mjs")
+          text = p.read_text(encoding="utf-8")
+          expected = "mainVelunaAdapterVersion = '2026-08-23-main-ticker-dynamic-lane-dna-contained-v4'"
+          if text.count(expected) != 1:
+              raise SystemExit("adapter version assertion not found exactly once")
+          text = text.replace(expected, "mainVelunaAdapterVersion = '2026-09-02-mobile-mff-marquee-owner-v1'")
+          marker = "test('main reuses the exact shared VELUNA central cyber boot through idempotent bootOnce only',()=>{"
+          if marker not in text:
+              raise SystemExit("test insertion marker not found")
+          extra = r'''test('rendered mobile MFF title has one stable owner without changing desktop continuous marquee',()=>{
+            assert.match(js,/const TICKER_STATIC_PADDING=24/);
+            assert.match(js,/function normalizeMffTickerText\(value\)/);
+            assert.match(js,/second===first\?first:clean/);
+            assert.match(js,/function syncMffTickerMotion\(\)/);
+            assert.match(js,/#mffApp \.mff-title h1/);
+            assert.match(js,/observer\.observe\(lane,\{childList:true,characterData:true,subtree:true\}\)/);
+            assert.match(js,/window\.__S666_MAIN_MFF_TICKER_MUTATION_OBSERVER__=observer/);
+            assert.match(js,/itemWidth<=Math\.max\(0,laneWidth-TICKER_STATIC_PADDING\)/);
+            assert.match(js,/mffTickerAnimation\.id='s666-mff-marquee'/);
+            assert.match(js,/s666MffTickerDriver/);
+            assert.match(css,/#mffApp \.mff-title h1 span\.s666-veluna-mff-ticker/);
+            assert.match(css,/s666-veluna-mff-ticker\.is-static/);
+            assert.match(css,/data-s666-mff-ticker-driver="css"/);
+            assert.match(css,/data-s666-mff-ticker-driver="waapi"/);
+            const desktopStart=js.indexOf('function syncTickerMotion()');
+            const mobileStart=js.indexOf('function syncMffTickerMotion()');
+            const desktopBody=js.slice(desktopStart,mobileStart);
+            assert.doesNotMatch(desktopBody,/measureTextWidth\(ticker\)/);
+            assert.match(desktopBody,/const shift=Math\.max\(1,measureLoopSegmentWidth\(ticker,text\)\)/);
+          });
+          '''
+          text = text.replace(marker, extra + marker)
+          p.write_text(text, encoding="utf-8")
+      - name: Verify focused mobile owner contract
+        run: node --test tests/main-player-veluna-adapter.test.mjs
+      - name: Full repository verify
+        run: npm run verify
+      - name: Commit verified cache and regression update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/veluna-assets.js public/config/veluna-assets.js tests/main-player-veluna-adapter.test.mjs
+          git diff --cached --quiet && { echo "No expected delta produced"; exit 1; }
+          git commit -m "Guard mobile MFF marquee owner"
+          git push origin HEAD:repair/mobile-mff-marquee-owner-20260902
