@@ -560,10 +560,6 @@ RULES:
           audio.setAttribute("src","/stream?t="+Date.now());
           audio.load();
           document.documentElement.setAttribute("data-phase10-stream-target","main");
-          var mainBtn = qs("#mainBtn");
-          var fbBtn = qs("#fallbackBtn") || qs("#backupBtn");
-          if(mainBtn) mainBtn.classList.add("is-active");
-          if(fbBtn) fbBtn.classList.remove("is-active");
           if(wasPlaying){
             var p = audio.play();
             if(p && p.catch) p.catch(function(){});
