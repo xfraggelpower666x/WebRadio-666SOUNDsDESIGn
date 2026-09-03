@@ -528,7 +528,7 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 .phase10-status-led-row{display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
 .phase10-status-led-row .status-chip{min-width:48px!important;width:48px!important;height:25px!important;min-height:25px!important;padding:2px 5px!important;font-size:8px!important}
 .phase10-status-led-row #statusMeter{width:58px!important;min-width:58px!important}
-.systempanel-left #statusStream,.systempanel-left #statusMeter,.systempanel-left #statusSource{display:none!important}
+
 .now-playing{position:relative!important}
 #phase10NowVersion{position:absolute!important;right:10px!important;bottom:8px!important;z-index:18!important}
 #phase10NowVersion #pcVersionBadge,#pcVersionBadge{min-width:128px!important;height:30px!important;min-height:30px!important;padding:4px 10px!important;font-size:12px!important;border-color:rgba(22,139,255,.48)!important;box-shadow:0 0 10px rgba(22,139,255,.24)!important}
@@ -635,7 +635,7 @@ html[data-phase10-stream-guard="forced-main"] #mainBtn{
 .phase10-status-led-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;width:100%!important}
 .phase10-status-led-row .status-chip{width:68px!important;min-width:68px!important;max-width:68px!important;height:31px!important;min-height:31px!important;padding:3px 7px!important;font-size:9px!important}
 .phase10-status-led-row #statusMeter{width:76px!important;min-width:76px!important;max-width:76px!important}
-.systempanel-left #statusStream,.systempanel-left #statusMeter,.systempanel-left #statusSource{display:none!important}
+
 .left-meter,.right-meter,.mff-left-meter,.mff-right-meter,.side-meter-left,.side-meter-right,[data-meter-side='left'],[data-meter-side='right']{display:flex!important;align-items:flex-end!important;justify-content:center!important;gap:10px!important;height:100%!important;min-height:100%!important;overflow:hidden!important}
 .left-meter,.mff-left-meter,.side-meter-left,[data-meter-side='left']{flex-direction:row!important}
 .right-meter,.mff-right-meter,.side-meter-right,[data-meter-side='right']{flex-direction:row-reverse!important}
