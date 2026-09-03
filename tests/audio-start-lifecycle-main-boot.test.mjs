@@ -33,11 +33,25 @@ test('main route preloads the existing shared central boot owner early',()=>{
   assert.doesNotMatch(root,/START AUDIO|USER GESTURE REQUIRED/);
 });
 
-test('main cyberboot suppresses both player DOM layers until the single boot owner hands off',()=>{
+test('main cyberboot never exposes a partial player while the boot owner is pending',()=>{
   assert.match(root,/s666-main-boot-preflight/);
-  assert.match(root,/\.frame-stage,html\.s666-main-boot-preflight #mffApp\{visibility:hidden!important\}/);
-  assert.match(root,/let bootSeen = Boolean\(document\.getElementById\('s666CentralBoot'\)\)/);
-  assert.match(root,/if \(boot\) \{[\s\S]*bootSeen = true;[\s\S]*return;[\s\S]*\}/);
+  assert.match(root,/body>\*\{visibility:hidden!important\}/);
+  assert.match(root,/body>#s666CentralBoot\{visibility:visible!important\}/);
+  assert.match(root,/#s666CentralBoot \*\{visibility:visible!important\}/);
+  assert.doesNotMatch(root,/\.frame-stage,html\.s666-main-boot-preflight #mffApp\{visibility:hidden!important\}/);
+});
+
+test('main cyberboot waits for document.body before starting the central boot owner',()=>{
+  assert.match(root,/const startBootOwner = \(\) => \{/);
+  assert.match(root,/if \(document\.readyState === 'loading' \|\| !document\.body\) \{[\s\S]*DOMContentLoaded', startBootOwner/);
+  assert.match(root,/script\.src = jsBase \+ '\?v=20260903-main-boot-body-mount-v2'/);
+});
+
+test('main cyberboot fails open quickly if the central boot never mounts',()=>{
+  assert.match(root,/let bootMountTimer = 0/);
+  assert.match(root,/releasePreflight\('boot-mount-timeout'\)/);
+  assert.match(root,/\}, 1500\)/);
+  assert.match(root,/if \(boot\) \{[\s\S]*bootSeen = true;[\s\S]*clearTimeout\(bootMountTimer\)/);
   assert.match(root,/if \(bootSeen\) releasePreflight\('boot-handoff-complete'\)/);
   assert.match(root,/releasePreflight\('failsafe-release'\), 9000/);
   assert.match(root,/releasePreflight\('boot-script-error'\)/);
