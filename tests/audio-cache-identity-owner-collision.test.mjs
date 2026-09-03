@@ -6,8 +6,8 @@ const htmls = [
   'index.html','VELUNA/index.html','veluna/index.html',
   'public/index.html','public/VELUNA/index.html','public/veluna/index.html'
 ];
-const AUDIO_CACHE = 'audio-start-core.js?v=20260902-owner-collision-v2';
-const PREVIOUS_AUDIO_CACHE = 'audio-start-core.js?v=20260901-owner-collision-v1';
+const AUDIO_CACHE = 'audio-start-core.js?v=20260903-main-boot-body-mount-v3';
+const PREVIOUS_AUDIO_CACHE = 'audio-start-core.js?v=20260902-owner-collision-v2';
 const OLD_AUDIO_CACHE = 'audio-start-core.js?v=2026-07-12-v1217';
 
 function literal(value) {
