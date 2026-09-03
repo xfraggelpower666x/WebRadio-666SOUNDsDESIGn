@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.23
+VERSION: v1.2.24
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
@@ -14,6 +14,7 @@ ZWECK:
 - v1.2.21: alte Phase10-CSS-Ausblendung von STR/SRC/MTR wird im Main-Header neutralisiert; bestehende Status-Owner und H/B-Aktionen bleiben unverändert.
 - v1.2.22: stale/cancelled Startrequests dürfen das gemeinsame Audioelement niemals pausieren; echter Stop/Pause bleibt ausschließlich beim jeweiligen Transport-Owner.
 - v1.2.23: Main-Cyberboot erhält einen frühen Pre-Paint-Lock. Desktop-Frame und Mobile-MFF werden erst nach Entfernung des einmal gesehenen Central-Boot-Owners sichtbar; Failsafe verhindert einen hängenbleibenden schwarzen Screen.
+- v1.2.24: der Main-Cyberboot-Owner startet erst nach vorhandenem document.body. Während Preflight ist der komplette normale Body verborgen; nur der Central Boot darf sichtbar sein. Fehlt dessen Mount nach 1.5 s, wird der Player fail-open vollständig freigegeben statt als halber Zwischenzustand stehenzubleiben.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
@@ -69,12 +70,14 @@ ZWECK:
       let bootSeen = Boolean(document.getElementById('s666CentralBoot'));
       let released = false;
       let failSafeTimer = 0;
+      let bootMountTimer = 0;
       let observer = null;
 
       const releasePreflight = (reason) => {
         if (released) return;
         released = true;
         try { global.clearTimeout(failSafeTimer); } catch (_) {}
+        try { global.clearTimeout(bootMountTimer); } catch (_) {}
         try { observer?.disconnect(); } catch (_) {}
         try {
           html.classList.remove('s666-main-boot-preflight');
@@ -85,7 +88,7 @@ ZWECK:
       if (!document.getElementById('s666MainBootPreflightStyle')) {
         const style = document.createElement('style');
         style.id = 's666MainBootPreflightStyle';
-        style.textContent = 'html.s666-main-boot-preflight .frame-stage,html.s666-main-boot-preflight #mffApp{visibility:hidden!important}html.s666-main-boot-preflight body{background:#020006!important}html.s666-main-boot-preflight #s666CentralBoot{visibility:visible!important}';
+        style.textContent = 'html.s666-main-boot-preflight body{background:#020006!important}html.s666-main-boot-preflight body>*{visibility:hidden!important}html.s666-main-boot-preflight body>#s666CentralBoot{visibility:visible!important}html.s666-main-boot-preflight #s666CentralBoot,html.s666-main-boot-preflight #s666CentralBoot *{visibility:visible!important}';
         head.appendChild(style);
       }
       html.classList.add('s666-main-boot-preflight');
@@ -96,6 +99,7 @@ ZWECK:
         const boot = document.getElementById('s666CentralBoot');
         if (boot) {
           bootSeen = true;
+          try { global.clearTimeout(bootMountTimer); } catch (_) {}
           html.setAttribute('data-main-boot-preflight', 'boot-visible');
           return;
         }
@@ -112,29 +116,59 @@ ZWECK:
       if (!Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(link => String(link.getAttribute('href') || '').includes(cssBase))) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = cssBase + '?v=20260902-main-single-layer-boot-v1';
+        link.href = cssBase + '?v=20260903-main-boot-body-mount-v2';
         link.dataset.s666MainEarlyBoot = 'css';
         head.appendChild(link);
       }
 
-      if (global.S666CentralBootScreen) {
-        global.S666CentralBootScreen.bootOnce?.();
-        inspectBootLifecycle();
-        return;
+      const startBootOwner = () => {
+        if (released) return;
+        html.setAttribute('data-main-boot-preflight', 'starting-boot-owner');
+        bootMountTimer = global.setTimeout(() => {
+          if (!bootSeen && !document.getElementById('s666CentralBoot')) releasePreflight('boot-mount-timeout');
+        }, 1500);
+
+        if (global.S666CentralBootScreen) {
+          try { global.S666CentralBootScreen.bootOnce?.(); } catch (_) { releasePreflight('boot-owner-error'); }
+          inspectBootLifecycle();
+          return;
+        }
+        const jsBase = '/js/central-boot-screen.js';
+        const existing = Array.from(document.scripts).find(script => String(script.src || '').includes(jsBase));
+        if (existing) {
+          if (global.S666CentralBootScreen) {
+            try { global.S666CentralBootScreen.bootOnce?.(); } catch (_) { releasePreflight('boot-owner-error'); }
+            inspectBootLifecycle();
+            return;
+          }
+          if (existing.dataset.s666MainBootBodyBound !== '1') {
+            existing.dataset.s666MainBootBodyBound = '1';
+            existing.addEventListener('load', () => {
+              try { global.S666CentralBootScreen?.bootOnce?.(); } catch (_) { releasePreflight('boot-owner-error'); }
+              inspectBootLifecycle();
+            }, { once: true });
+            existing.addEventListener('error', () => releasePreflight('boot-script-error'), { once: true });
+          }
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = jsBase + '?v=20260903-main-boot-body-mount-v2';
+        script.async = false;
+        script.defer = false;
+        script.dataset.s666MainEarlyBoot = 'js';
+        script.addEventListener('load', () => {
+          try { global.S666CentralBootScreen?.bootOnce?.(); } catch (_) { releasePreflight('boot-owner-error'); }
+          inspectBootLifecycle();
+        }, { once: true });
+        script.addEventListener('error', () => releasePreflight('boot-script-error'), { once: true });
+        head.appendChild(script);
+      };
+
+      if (document.readyState === 'loading' || !document.body) {
+        document.addEventListener('DOMContentLoaded', startBootOwner, { once: true });
+      } else {
+        startBootOwner();
       }
-      const jsBase = '/js/central-boot-screen.js';
-      if (Array.from(document.scripts).some(script => String(script.src || '').includes(jsBase))) {
-        inspectBootLifecycle();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = jsBase + '?v=20260902-main-single-layer-boot-v1';
-      script.async = false;
-      script.defer = false;
-      script.dataset.s666MainEarlyBoot = 'js';
-      script.addEventListener('load', inspectBootLifecycle, { once: true });
-      script.addEventListener('error', () => releasePreflight('boot-script-error'), { once: true });
-      head.appendChild(script);
     } catch (_) {
       try { document.documentElement?.classList.remove('s666-main-boot-preflight'); } catch (_) {}
     }
