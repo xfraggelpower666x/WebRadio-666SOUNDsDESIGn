@@ -1,10 +1,15 @@
 name: Top Status Owner Finish One Shot
+
 on:
   push:
-    branches: [repair/top-status-phase10-visibility-20260903]
-    paths: [.github/workflows/top-status-owner-finish-one-shot.yml]
+    branches:
+      - repair/top-status-phase10-visibility-20260903
+    paths:
+      - .github/workflows/top-status-owner-finish-one-shot.yml
+
 permissions:
   contents: write
+
 jobs:
   finish:
     runs-on: ubuntu-latest
