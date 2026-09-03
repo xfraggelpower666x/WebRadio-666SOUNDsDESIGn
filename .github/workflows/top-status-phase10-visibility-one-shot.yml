@@ -1,0 +1,70 @@
+name: Top Status Phase10 Visibility One Shot
+
+on:
+  push:
+    branches:
+      - repair/top-status-phase10-visibility-20260903
+    paths:
+      - .github/workflows/top-status-phase10-visibility-one-shot.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/top-status-phase10-visibility-20260903
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Remove stale Phase10 top-status hide hardlock
+        shell: python
+        run: |
+          from pathlib import Path
+          target = ".systempanel-left #statusStream,.systempanel-left #statusMeter,.systempanel-left #statusSource{display:none!important}"
+          for name in ["css/phase10-stability-iphone-panel-hud.css", "public/css/phase10-stability-iphone-panel-hud.css"]:
+              p = Path(name)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(target)
+              if count < 1:
+                  raise SystemExit(f"{name}: stale hide hardlock not found")
+              text = text.replace(target, "")
+              if target in text:
+                  raise SystemExit(f"{name}: stale hide hardlock remains")
+              p.write_text(text, encoding="utf-8")
+
+          test_path = Path("tests/top-system-panel-visibility-runtime.test.mjs")
+          test_path.write_text(r'''import test from 'node:test';
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+
+          const css = fs.readFileSync('css/phase10-stability-iphone-panel-hud.css','utf8');
+          const cssPublic = fs.readFileSync('public/css/phase10-stability-iphone-panel-hud.css','utf8');
+          const html = fs.readFileSync('index.html','utf8');
+
+          test('top system panel keeps STR SRC and MTR visible after Phase10 boot',()=>{
+            assert.equal(cssPublic, css);
+            const forbidden = '.systempanel-left #statusStream,.systempanel-left #statusMeter,.systempanel-left #statusSource{display:none!important}';
+            assert.doesNotMatch(css, new RegExp(forbidden.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')));
+            for (const id of ['statusStream','statusSource','statusMeter']) {
+              assert.match(html, new RegExp(`id=["']${id}["']`));
+            }
+          });
+          ''', encoding="utf-8")
+      - name: Verify focused visibility contract
+        run: node --test tests/top-system-panel-visibility-runtime.test.mjs
+      - name: Full repository verify
+        run: npm run verify
+      - name: Commit verified repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add css/phase10-stability-iphone-panel-hud.css public/css/phase10-stability-iphone-panel-hud.css tests/top-system-panel-visibility-runtime.test.mjs
+          git diff --cached --quiet && { echo "No expected delta produced"; exit 1; }
+          git commit -m "Remove stale Phase10 top status hide hardlock"
+          git push origin HEAD:repair/top-status-phase10-visibility-20260903
