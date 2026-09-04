@@ -1053,9 +1053,9 @@ audio?.addEventListener('waiting', () => { if (!userStopped) { panelBuffering = 
 audio?.addEventListener('canplay', () => { panelBuffering = false; panelAudioFault = false; updateCanonicalPanelStatus('canplay'); });
 audio?.addEventListener('stalled', () => { panelBuffering = true; updateCanonicalPanelStatus('stalled'); setTimeout(() => recoverInterruptedAudio('stalled'), 350); });
 audio?.addEventListener('suspend', () => { updateCanonicalPanelStatus('suspend'); setTimeout(() => recoverInterruptedAudio('suspend'), 350); });
-window.addEventListener('focus', () => setTimeout(() => recoverInterruptedAudio('focus'), 220), { passive: true });
-window.addEventListener('pageshow', () => setTimeout(() => recoverInterruptedAudio('pageshow'), 220), { passive: true });
-document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => recoverInterruptedAudio('visibility'), 220); });
+// iPhone app-return: canonical all-player-audio-recovery-v1 is the only foreground recovery owner.
+// player-core remains sensor-only for transport faults and does not emit duplicate focus/pageshow/visibility handoffs.
+document.documentElement.setAttribute('data-player-core-app-return-owner','all-player-audio-recovery-v1');
 
 audio?.addEventListener('ended', () => {
   visualizer.stop?.();
