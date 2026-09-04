@@ -21,7 +21,9 @@ jobs:
           python-version: "3.12"
       - name: Apply full panel LED owner repair
         if: github.ref == 'refs/heads/repair/full-panel-led-owner-audit-20260904' && github.actor != 'github-actions[bot]'
-        run: node scripts/repair-full-panel-led-owner.mjs
+        run: |
+          node scripts/fix-repair-full-panel-led-owner.mjs
+          node scripts/repair-full-panel-led-owner.mjs
       - run: npm ci
       - name: Release checker
         run: npm run check
