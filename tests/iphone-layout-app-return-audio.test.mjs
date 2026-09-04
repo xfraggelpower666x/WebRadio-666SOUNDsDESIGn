@@ -24,7 +24,7 @@ test('media session leaves healthy app return transport neutral',async()=>{
 
 test('Veluna healthy app return does not restart sound graph',async()=>{
  const files=await Promise.all(['veluna/index.html','VELUNA/index.html','public/veluna/index.html','public/VELUNA/index.html'].map(read));
- files.forEach(v=>{assert.match(v,/data-veluna-app-return','healthy-noop/);assert.match(v,/if\(!audio\.paused&&!audio\.ended&&audio\.readyState>=2\)/);});
+ files.forEach(v=>{assert.match(v,/data-veluna-app-return','healthy-context-resume/);assert.match(v,/if\(!audio\.paused&&!audio\.ended&&audio\.readyState>=2\)\{await soundEngine\.resume\(\)/);assert.doesNotMatch(v,/healthy-context-resume[^}]*audio\.play\(/);});
 });
 
 test('main iPhone final geometry neutralizes stale HUD shift and stretches header logo',async()=>{
