@@ -73,7 +73,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-25-hardlock1" />
   <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-09-04-recovery-single-owner-v3" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
-  <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
+  <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-09-04-iphone-layout-appreturn-v4">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
   <meta name="msapplication-TileColor" content="#12061f">
   <meta name="msapplication-TileImage" content="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
@@ -325,7 +325,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-09-04-recovery-single-owner-v3"></script>
+<script type="module" src="/js/player-core.js?v=2026-09-04-iphone-layout-appreturn-v4"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -997,9 +997,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       a.addEventListener('suspend',function(){setTimeout(function(){recoverMffInterruptedAudio('suspend')},360)},{passive:true});
       a.addEventListener('error',function(){setTimeout(function(){recoverMffInterruptedAudio('audio-error')},500)},{passive:true});
     }
-    window.addEventListener('focus',function(){setTimeout(function(){recoverMffInterruptedAudio('focus')},220)},{passive:true});
-    window.addEventListener('pageshow',function(){setTimeout(function(){recoverMffInterruptedAudio('pageshow')},220)},{passive:true});
-    document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(function(){recoverMffInterruptedAudio('visibility')},220)});
+    // iPhone app-return is owned by all-player-audio-recovery-v1. MFF does not issue a second foreground handoff.
+    document.documentElement.setAttribute('data-mff-app-return-owner','all-player-audio-recovery-v1');
   }
 
   function killOldDom(){
@@ -2190,7 +2189,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2" defer></script>
     <script src="/js/player-stage-v2.js?v=2026-09-04-recovery-single-owner-v3" defer></script>
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
-    <script src="/js/media-session-ios.js?v=2026-06-25-hardlock1" defer></script>
+    <script src="/js/media-session-ios.js?v=2026-09-04-iphone-layout-appreturn-v4" defer></script>
     <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>
   <script src="/config/veluna-assets.js?v=2026-07-23-reactive-visual-v183"></script>
   <script defer src="/js/veluna-splash.js?v=2026-07-11-veluna-v1214"></script>

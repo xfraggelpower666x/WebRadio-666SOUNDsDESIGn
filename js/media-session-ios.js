@@ -212,14 +212,12 @@
       var audio = getAudio();
       if (!audio) return;
 
-      // If hidden for < 2 seconds: probably just a notification — try resume context
-      if (hiddenMs < 2000) {
-        ['__radioAudioContext', '__mffAudioContext'].forEach(function (key) {
-          var ctx = window[key];
-          if (ctx && ctx.state === 'suspended') ctx.resume().catch(function () {});
-        });
+      // Healthy foreground return must be transport-neutral. The canonical recovery owner decides whether recovery is needed.
+      if (!audio.paused && !audio.ended && audio.readyState >= 2) {
+        document.documentElement.setAttribute('data-media-session-app-return','healthy-noop');
         return;
       }
+      if (hiddenMs < 2000) return;
 
       // If hidden longer and audio is now paused/ended → restart
       if (audio.paused) {
