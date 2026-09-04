@@ -71,7 +71,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   
     <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-25-hardlock1" />
-  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-09-04-panel-led-owner-v2" />
+  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-09-04-recovery-single-owner-v3" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
   <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
@@ -325,7 +325,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-09-04-panel-led-owner-v2"></script>
+<script type="module" src="/js/player-core.js?v=2026-09-04-recovery-single-owner-v3"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -514,9 +514,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       document.documentElement.getAttribute('data-audio-orchestra') === 'active'
     ){
       try{
+        mffAudioDirtyReason='';
+        document.documentElement.removeAttribute('data-mff-audio-dirty');
         document.documentElement.setAttribute('data-mff-audio-selfheal-muted', reason || 'orchestra-active');
-        document.documentElement.setAttribute('data-mff-audio-selfheal-handoff', 'audio-healing-orchestra');
-        document.documentElement.setAttribute('data-audio-sensor-event', 'mff:' + (reason || 'interrupted'));
+        document.documentElement.setAttribute('data-mff-audio-selfheal-handoff', 'all-player-audio-recovery-v1');
+        var owner=window.S666AllPlayerAudioRecovery;
+        var handoffReason='mff:'+(reason||'interrupted');
+        if(owner && owner.owner==='all-player-audio-recovery-v1' && typeof owner.legacyHandoff==='function'){
+          owner.legacyHandoff(handoffReason);
+        }else{
+          document.documentElement.setAttribute('data-audio-sensor-event',handoffReason);
+        }
       }catch(e){}
       return;
     }
@@ -936,7 +944,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     app.innerHTML='<div class="smfp-version-badge">v2026.07.12-veluna16</div><div class="mff-history-backdrop" id="mffHistoryBackdrop" data-mff-history-close></div><section class="mff-history-overlay" id="mffHistoryOverlay" aria-hidden="true"><div class="mff-history-head"><strong>PLAYED HISTORY</strong><button type="button" class="mff-history-close" data-mff-history-close>×</button></div><div class="mff-history-list" id="mffHistoryList"><div class="mff-history-empty">Loading history ...</div></div></section><div class="mff-side mff-left"></div><div class="mff-side mff-right"></div><main class="mff-shell">'+
       '<section class="mff-cyber-header" aria-label="Cyberstream Cockpit" style="display:flex;align-items:center;gap:8px"><img src="/assets/veluna/header/veluna-player-header.webp?v=veluna-v1212" alt="CyberStream AI Cockpit Edition"></section>'+
       '<section class="mff-now"><div class="mff-symbol"><span></span></div><div class="mff-title"><small>NOW PLAYING</small><h1><span>666SOUNDsDESIGn WebRadio</span></h1><h2>Press PLAY for playback and live metadata</h2></div><button class="mff-history" type="button">↺ History</button></section>'+
-      '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Hauptstream" data-info="Hauptstream aktiv"><i></i><b>H</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','LYVRA DJ','◖')+'</section>'+
+      '<section class="mff-panel-led-panel" id="mffPanelLedPanel"><button type="button" class="mff-panel-led" data-led="worker" data-state="off" data-label="Worker" data-info="Worker/UI Runtime aktiv"><i></i><b>W</b></button><button type="button" class="mff-panel-led" data-led="source" data-state="off" data-label="Source" data-info="Streamquelle erkannt"><i></i><b>S</b></button><button type="button" class="mff-panel-led" data-led="meta" data-state="off" data-label="Meta" data-info="Metadaten empfangen"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="main" data-state="off" data-label="Main Stream" data-info="Main Stream active"><i></i><b>M</b></button><button type="button" class="mff-panel-led" data-led="backup" data-state="off" data-label="Backupstream" data-info="Backupstream aktiv"><i></i><b>B</b></button></section><div data-discord-addon-slot class="mff-discord-slot" aria-label="Discord Webhook Control"></div><div class="mff-led-tip" id="mffLedTip" aria-hidden="true"></div><section class="mff-cards">'+card('LSTN','0 / 250','♚')+card('BITRATE','Unknown','≋')+card('DJ / STATUS','LYVRA DJ','◖')+'</section>'+
       '<section class="mff-eq"><header><span>EQ</span><b>20 BANDS <em class="mff-analyser-mode" id="mffAnalyserMode">· INIT</em></b></header><div id="mffEqBars" class="mff-eq-bars"></div><footer>20 BANDS</footer></section>'+
       '<section class="mff-controls"><button type="button" data-mff="play" class="mff-play">▶</button><button type="button" data-mff="pause">Ⅱ</button><button type="button" data-mff="stop" class="mff-stop">■</button><button type="button" data-mff="reset">↺</button><button type="button" data-mff="down">−</button><button type="button" data-mff="boost" id="mffBoost">BST 0</button><button type="button" data-mff="up">+</button></section>'+
       '<section class="mff-boost-row-panel" id="mffBoostRowPanel"><div class="mff-boost-led-row" id="mffBoostLedRow"><span class="mff-boost-led-label">BOOST</span><span class="mff-boost-led-wrap"><i class="mff-boost-led" data-led="1"></i><i class="mff-boost-led" data-led="2"></i><i class="mff-boost-led" data-led="3"></i><i class="mff-boost-led" data-led="4"></i><i class="mff-boost-led" data-led="5"></i></span><span class="mff-boost-gain" id="mffBoostGain">1.00×</span></div></section><section class="mff-bottom"><div id="mffBottomBars" class="mff-bottom-bars"></div></section></main>';
@@ -984,10 +992,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     window.__mffAudioSelfHealV105Installed=true;
     var a=getAudio();
     if(a){
-      a.addEventListener('pause',function(){if(!mffUserStopped){markMffAudioDirty('unexpected-pause');setTimeout(function(){recoverMffInterruptedAudio('unexpected-pause')},260)}},{passive:true});
-      a.addEventListener('stalled',function(){markMffAudioDirty('stalled');setTimeout(function(){recoverMffInterruptedAudio('stalled')},360)},{passive:true});
-      a.addEventListener('suspend',function(){markMffAudioDirty('suspend');setTimeout(function(){recoverMffInterruptedAudio('suspend')},360)},{passive:true});
-      a.addEventListener('error',function(){markMffAudioDirty('audio-error');setTimeout(function(){recoverMffInterruptedAudio('audio-error')},500)},{passive:true});
+      a.addEventListener('pause',function(){if(!mffUserStopped){setTimeout(function(){recoverMffInterruptedAudio('unexpected-pause')},260)}},{passive:true});
+      a.addEventListener('stalled',function(){setTimeout(function(){recoverMffInterruptedAudio('stalled')},360)},{passive:true});
+      a.addEventListener('suspend',function(){setTimeout(function(){recoverMffInterruptedAudio('suspend')},360)},{passive:true});
+      a.addEventListener('error',function(){setTimeout(function(){recoverMffInterruptedAudio('audio-error')},500)},{passive:true});
     }
     window.addEventListener('focus',function(){setTimeout(function(){recoverMffInterruptedAudio('focus')},220)},{passive:true});
     window.addEventListener('pageshow',function(){setTimeout(function(){recoverMffInterruptedAudio('pageshow')},220)},{passive:true});
@@ -1433,14 +1441,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     var active=inferActiveStream(meta);
     if(playing && sourceOk){
       if(manualStreamTarget==='backup' || active==='backup'){
-        setPanelLed('main','off','Hauptstream nicht aktiv');
+        setPanelLed('main','off','Main Stream inactive');
         setPanelLed('backup','ok','Backupstream aktiv');
       }else{
-        setPanelLed('main','ok','Hauptstream aktiv');
+        setPanelLed('main','ok','Main Stream active');
         setPanelLed('backup','off','Backupstream nicht aktiv');
       }
     }else{
-      setPanelLed('main','off','Hauptstream nicht aktiv');
+      setPanelLed('main','off','Main Stream inactive');
       setPanelLed('backup','off','Backupstream nicht aktiv');
     }
   }
@@ -1454,7 +1462,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     setPanelLed('worker','ok','Mobile UI Runtime läuft');
     setPanelLed('source','warn','Streamquelle nicht aktiv');
     setPanelLed('meta','off','noch keine Metadaten');
-    setPanelLed('main','off','Hauptstream nicht aktiv');
+    setPanelLed('main','off','Main Stream inactive');
     setPanelLed('backup','off','Backupstream nicht aktiv');
   }
 
@@ -2180,7 +2188,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   
   <!-- Skip-Button: Vote-Skip + Admin-Skip fuer alle Hoerer -->
     <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2" defer></script>
-    <script src="/js/player-stage-v2.js?v=2026-09-04-panel-led-owner-v2" defer></script>
+    <script src="/js/player-stage-v2.js?v=2026-09-04-recovery-single-owner-v3" defer></script>
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
     <script src="/js/media-session-ios.js?v=2026-06-25-hardlock1" defer></script>
     <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>
