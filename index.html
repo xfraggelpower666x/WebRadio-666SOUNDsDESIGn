@@ -71,7 +71,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   
     <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-25-hardlock1" />
-  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-09-04-mainstream-single-owner-v1" />
+  <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-09-04-panel-led-owner-v2" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
   <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-06-15-fix1">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
@@ -325,7 +325,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-09-04-mainstream-single-owner-v1"></script>
+<script type="module" src="/js/player-core.js?v=2026-09-04-panel-led-owner-v2"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -1749,7 +1749,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     // Meter folgt Peak, aber mit Headroom und ohne Boost-Sättigung.
     var bottomLevel=mffMeterHeadroom(pack.level);
-    updateBottomCenterOutSegments(bottomLevel,pack.pulse||0);
+    // Bottom meter segments are written only by equalizer.js (canonical visual writer).
     document.documentElement.style.setProperty('--mff-level',bottomLevel.toFixed(3));
     return bottomLevel;
   }
@@ -2180,7 +2180,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   
   <!-- Skip-Button: Vote-Skip + Admin-Skip fuer alle Hoerer -->
     <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2" defer></script>
-    <script src="/js/player-stage-v2.js?v=2026-09-04-mainstream-single-owner-v1" defer></script>
+    <script src="/js/player-stage-v2.js?v=2026-09-04-panel-led-owner-v2" defer></script>
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
     <script src="/js/media-session-ios.js?v=2026-06-25-hardlock1" defer></script>
     <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>

@@ -14,7 +14,7 @@ HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=2026-09-04-mainstream-single-owner-v1';
+import { createBars, startVisualizer } from './equalizer.js?v=2026-09-04-panel-led-owner-v2';
 import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
 import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
 
@@ -50,6 +50,12 @@ const fallbackBtn = document.getElementById('fallbackBtn');
 const statusStream = document.getElementById('statusStream');
 const statusMeta = document.getElementById('statusMeta');
 const statusSource = document.getElementById('statusSource');
+const statusBuffer = document.getElementById('statusBuffer');
+const statusWorker = document.getElementById('statusWorker');
+const statusAudio = document.getElementById('statusAudio');
+const statusWatchdog = document.getElementById('statusWatchdog');
+const statusReconnect = document.getElementById('statusReconnect');
+const statusMeter = document.getElementById('statusMeter');
 const statusMain = document.getElementById('mainBtn');
 const statusBackup = document.getElementById('fallbackBtn');
 const volumeSlider = document.getElementById('volumeSlider');
@@ -70,6 +76,13 @@ let metadataTimer = 0;
 let historyItems = [];
 let playRequestToken = 0;
 let switchingStream = false;
+let panelWorkerOnline = false;
+let panelMetadataOnline = false;
+let panelBuffering = false;
+let panelAudioFault = false;
+let panelReconnectState = 'idle';
+let panelReconnectClearTimer = 0;
+let panelStatusTimer = 0;
 const PLAY_START_TIMEOUT_MS = 6500;
 const AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;
 const METADATA_TIMEOUT_MS = 4500;
@@ -197,10 +210,8 @@ function installV95DesktopHistoryRepair() {
   }, true);
 }
 installV95DesktopHistoryRepair();
-applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
-applyStatusChip(statusStream, 'ok', 'Stream aktiv');
-applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
-updateStreamPanelLeds(currentSource);
+panelMetadataOnline = false;
+updateCanonicalPanelStatus('boot');
 markSourceButtons(mainBtn, fallbackBtn, currentSource);
 if (audio) audio.volume = Number(volumeSlider?.value || 0.75);
 
@@ -291,35 +302,75 @@ setBoostStage(0);
 function updateStreamPanelLeds(source) {
   const active = source === 'fallback' || source === 'backup' ? 'backup' : 'main';
   if (active === 'main') {
-    applyStatusChip(statusMain, 'ok', 'Main stream active');
-    applyStatusChip(statusBackup, 'empty', 'Backup stream inactive');
+    applyStatusChip(statusMain, userStopped ? 'stopped' : 'ok', userStopped ? 'Main Stream selected but stopped' : 'Main Stream active');
+    applyStatusChip(statusBackup, 'empty', 'Backup Stream inactive');
   } else {
-    applyStatusChip(statusMain, 'empty', 'Main stream inactive');
-    applyStatusChip(statusBackup, 'ok', 'Backup stream active');
+    applyStatusChip(statusMain, 'empty', 'Main Stream inactive');
+    applyStatusChip(statusBackup, userStopped ? 'stopped' : 'ok', userStopped ? 'Backup Stream selected but stopped' : 'Backup Stream active');
   }
 }
 
+function canonicalWatchdogAvailable() {
+  try {
+    const owner = window.S666AllPlayerAudioRecovery;
+    return !!(owner && owner.owner === 'all-player-audio-recovery-v1' && typeof owner.legacyHandoff === 'function');
+  } catch (err) {
+    return false;
+  }
+}
 
+function meterBusIsFresh() {
+  try {
+    const bus = window.__MeterBus;
+    return !!(bus && Number(bus.ts) > 0 && Date.now() - Number(bus.ts) < 1500 && bus.source === 'real');
+  } catch (err) {
+    return false;
+  }
+}
+
+function audioGraphIsHealthy() {
+  try {
+    return audio?.dataset?.visualizerGraph === 'GRAPH_OK' || document.documentElement.getAttribute('data-visualizer-graph') === 'ok';
+  } catch (err) {
+    return false;
+  }
+}
+
+function updateCanonicalPanelStatus(reason = 'tick') {
+  const playing = !!(audio && !userStopped && !audio.paused && !audio.ended && (audio.currentSrc || audio.getAttribute('src')));
+  const sourceIsBackup = currentSource === 'fallback' || currentSource === 'backup';
+  const watchdogReady = canonicalWatchdogAvailable();
+  const meterReady = meterBusIsFresh();
+
+  applyStatusChip(statusStream, userStopped ? 'stopped' : panelAudioFault ? 'warn' : playing ? 'ok' : panelBuffering ? 'buffer' : 'empty',
+    userStopped ? 'Stream stopped' : panelAudioFault ? 'Stream error' : playing ? 'Stream active' : panelBuffering ? 'Stream buffering' : 'Stream idle');
+  applyStatusChip(statusBuffer, userStopped ? 'empty' : panelBuffering ? 'buffer' : playing ? 'stable' : 'empty',
+    userStopped ? 'Buffer inactive' : panelBuffering ? 'Stream buffering' : playing ? 'Buffer stable' : 'Buffer idle');
+  applyStatusChip(statusSource, sourceIsBackup ? 'backup' : 'main', sourceIsBackup ? 'Source: Backup Stream' : 'Source: Main Stream');
+  applyStatusChip(statusMeta, userStopped ? 'empty' : panelMetadataOnline ? 'api' : 'warn',
+    userStopped ? 'Metadata idle' : panelMetadataOnline ? 'Metadata live' : 'Metadata unavailable');
+  applyStatusChip(statusWorker, panelWorkerOnline ? 'online' : 'warn', panelWorkerOnline ? 'Worker / health online' : 'Worker / health unavailable');
+  applyStatusChip(statusAudio, userStopped ? 'empty' : panelAudioFault ? 'error' : playing ? (audioGraphIsHealthy() ? 'ok' : 'warn') : 'empty',
+    userStopped ? 'Audio idle' : panelAudioFault ? 'Audio fault' : playing ? (audioGraphIsHealthy() ? 'Audio graph active' : 'Audio graph waiting') : 'Audio idle');
+  applyStatusChip(statusWatchdog, watchdogReady ? 'ready' : 'warn', watchdogReady ? 'Canonical watchdog ready' : 'Canonical watchdog unavailable');
+  applyStatusChip(statusReconnect, panelReconnectState === 'running' ? 'warn' : panelReconnectState === 'failed' ? 'error' : panelReconnectState === 'ok' ? 'ok' : 'empty',
+    panelReconnectState === 'running' ? 'Reconnect running' : panelReconnectState === 'failed' ? 'Reconnect failed' : panelReconnectState === 'ok' ? 'Reconnect completed' : 'Reconnect idle');
+  applyStatusChip(statusMeter, userStopped ? 'empty' : meterReady ? 'active' : playing ? 'warn' : 'empty',
+    userStopped ? 'Meter idle' : meterReady ? 'MeterBus live' : playing ? 'MeterBus waiting' : 'Meter idle');
+
+  updateStreamPanelLeds(currentSource);
+  try {
+    document.documentElement.setAttribute('data-panel-status-owner', 'player-core-v2');
+    document.documentElement.setAttribute('data-panel-status-reason', String(reason));
+  } catch (err) {}
+}
 
 function setActivePanelLeds() {
-  applyStatusChip(statusStream, 'ok', 'Stream aktiv');
-  applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
-  applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
-  updateStreamPanelLeds(currentSource);
+  updateCanonicalPanelStatus('active');
 }
 
 function setStoppedPanelLeds() {
-  applyStatusChip(statusStream, 'stopped', 'Stream gestoppt');
-  applyStatusChip(statusMeta, 'warn', 'Metadaten gestoppt');
-  applyStatusChip(statusSource, 'warn', 'Quelle gestoppt');
-
-  if (currentSource === 'fallback' || currentSource === 'backup') {
-    applyStatusChip(statusMain, 'empty', 'Main stream inactive');
-    applyStatusChip(statusBackup, 'stopped', 'Backup stream selected but stopped');
-  } else {
-    applyStatusChip(statusMain, 'stopped', 'Main stream selected but stopped');
-    applyStatusChip(statusBackup, 'empty', 'Backup stream inactive');
-  }
+  updateCanonicalPanelStatus('stopped');
 }
 
 function syncStreamLedFromStatus(text) {
@@ -706,7 +757,8 @@ async function fetchMetadata() {
         title:data.title, dj:data.dj, set:data.set, bitrate:data.bitrate, listeners:data.listeners, source:currentSource, raw
       } }));
     } catch (eventError) {}
-    applyStatusChip(statusMeta, 'ok', 'Metadaten aktiv');
+    panelMetadataOnline = true;
+    updateCanonicalPanelStatus('metadata-ok');
 updateHistory(data.title);
     normalizeNowPlayingDuplicateFallback();
   } catch (err) {
@@ -714,7 +766,8 @@ updateHistory(data.title);
     if (fallbackTitle && !/metadata|metadaten|loading|laden|error|fehler/i.test(fallbackTitle)) {
       if (!userStopped) setDesktopTickerLiveV113(fallbackTitle);
     }
-    applyStatusChip(statusMeta, 'warn', 'Metadaten aktuell nicht erreichbar');
+    panelMetadataOnline = false;
+    updateCanonicalPanelStatus('metadata-fail');
   } finally {
     window.clearTimeout(timer);
     keepControlsUnlocked();
@@ -861,9 +914,11 @@ async function healthPing() {
     const response = await fetch(`${ENDPOINTS.health}?t=${Date.now()}`, { cache: 'no-store' });
     await response.text().catch(() => {}); // v107: Body auslesen, sonst hängt der Tab-Ladekreis ewig
     if (!response.ok) throw new Error('health_http_error');
-    applyStatusChip(statusSource, 'ok', 'Quelle aktiv');
+    panelWorkerOnline = true;
+    updateCanonicalPanelStatus('health-ok');
   } catch (err) {
-    applyStatusChip(statusSource, 'warn', 'Externer Hauptplayer meldet Fehler');
+    panelWorkerOnline = false;
+    updateCanonicalPanelStatus('health-fail');
   }
 }
 
@@ -908,9 +963,18 @@ stopBtn?.addEventListener('click', () => {
   stopPlayback('STOPPED');
 });
 reconnectBtn?.addEventListener('click', async () => {
+  panelReconnectState = 'running';
+  updateCanonicalPanelStatus('reconnect-start');
   stopPlayback('RECONNECT');
   userStopped = false;
   await playCurrent();
+  panelReconnectState = audio && !audio.paused ? 'ok' : 'failed';
+  updateCanonicalPanelStatus('reconnect-end');
+  window.clearTimeout(panelReconnectClearTimer);
+  panelReconnectClearTimer = window.setTimeout(() => {
+    panelReconnectState = 'idle';
+    updateCanonicalPanelStatus('reconnect-clear');
+  }, 1800);
 });
 mainBtn?.addEventListener('click', async () => {
   setSource('main');
@@ -930,17 +994,16 @@ boostStepButtons.forEach((btn) => {
 volumeSlider?.addEventListener('input', () => {
   if (audio) audio.volume = Number(volumeSlider.value);
 });
-audio?.addEventListener('error', async () => {
+audio?.addEventListener('error', () => {
   if (userStopped) return;
-  if (currentSource === 'main') {
-    setSource('fallback');
-    await playCurrent();
-  } else {
-    applyStatusChip(statusStream, 'warn', 'Streamfehler auf Main und Backup');
-    setStatus('STREAM ERROR');
-  }
+  panelAudioFault = true;
+  panelBuffering = false;
+  setStatus(currentSource === 'main' ? 'MAIN STREAM ERROR' : 'BACKUP STREAM ERROR');
+  updateCanonicalPanelStatus('audio-error');
 });
 audio?.addEventListener('playing', async () => {
+  panelAudioFault = false;
+  panelBuffering = false;
   lockVisualStage();
   await visualizer.start?.();
   setStatus(currentSource === 'main' ? 'PLAYING MAIN' : 'PLAYING BACKUP');
@@ -956,6 +1019,8 @@ fetchMetadata();
 startMetadataLoop();
 updateTimeline();
 setDesktopTransportState('stop');
+panelStatusTimer = window.setInterval(() => updateCanonicalPanelStatus('tick'), 1000);
+updateCanonicalPanelStatus('init');
 
 
 audio?.addEventListener('pause', () => {
@@ -965,8 +1030,10 @@ audio?.addEventListener('pause', () => {
   }
 });
 
-audio?.addEventListener('stalled', () => { markAudioSelfHealDirty('stalled'); setTimeout(() => recoverInterruptedAudio('stalled'), 350); });
-audio?.addEventListener('suspend', () => { markAudioSelfHealDirty('suspend'); setTimeout(() => recoverInterruptedAudio('suspend'), 350); });
+audio?.addEventListener('waiting', () => { if (!userStopped) { panelBuffering = true; updateCanonicalPanelStatus('waiting'); } });
+audio?.addEventListener('canplay', () => { panelBuffering = false; panelAudioFault = false; updateCanonicalPanelStatus('canplay'); });
+audio?.addEventListener('stalled', () => { panelBuffering = true; updateCanonicalPanelStatus('stalled'); markAudioSelfHealDirty('stalled'); setTimeout(() => recoverInterruptedAudio('stalled'), 350); });
+audio?.addEventListener('suspend', () => { updateCanonicalPanelStatus('suspend'); markAudioSelfHealDirty('suspend'); setTimeout(() => recoverInterruptedAudio('suspend'), 350); });
 window.addEventListener('focus', () => setTimeout(() => recoverInterruptedAudio('focus'), 220), { passive: true });
 window.addEventListener('pageshow', () => setTimeout(() => recoverInterruptedAudio('pageshow'), 220), { passive: true });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => recoverInterruptedAudio('visibility'), 220); });

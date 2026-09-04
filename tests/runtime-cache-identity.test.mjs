@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
-const MARK='2026-09-04-mainstream-single-owner-v1';
+const MARK='2026-09-04-panel-led-owner-v2';
 
 test('repaired PC runtime assets use one fresh cache identity', async () => {
   const html=await read('index.html');
