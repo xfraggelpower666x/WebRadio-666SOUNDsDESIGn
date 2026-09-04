@@ -14,7 +14,7 @@ HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=2026-09-04-panel-led-owner-v2';
+import { createBars, startVisualizer } from './equalizer.js?v=2026-09-04-recovery-single-owner-v3';
 import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
 import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
 
@@ -162,7 +162,26 @@ function prepareAudioElementForFreshPlay(target, reason = 'play') {
   } catch (err) {}
 }
 
+function canonicalRecoveryHandoff(reason = 'interrupted') {
+  try {
+    const owner = window.S666AllPlayerAudioRecovery;
+    if (owner && owner.owner === 'all-player-audio-recovery-v1' && typeof owner.legacyHandoff === 'function') {
+      const handoffReason = 'player-core:' + (reason || 'interrupted');
+      try {
+        audioSelfHealDirtyReason = '';
+        document.documentElement.removeAttribute('data-audio-selfheal-dirty');
+        document.documentElement.setAttribute('data-audio-selfheal-handoff', 'all-player-audio-recovery-v1');
+        document.documentElement.setAttribute('data-audio-sensor-event', handoffReason);
+      } catch (err) {}
+      try { owner.legacyHandoff(handoffReason); } catch (err) {}
+      return true;
+    }
+  } catch (err) {}
+  return false;
+}
+
 function recoverInterruptedAudio(reason = 'interrupted') {
+  if (canonicalRecoveryHandoff(reason)) return;
   /* v109: this recovery is only allowed on mobile/iOS. On desktop it caused Play/Stop loops. */
   if (!isMobileViewport()) return;
   if (!audio || userStopped) return;
@@ -1032,8 +1051,8 @@ audio?.addEventListener('pause', () => {
 
 audio?.addEventListener('waiting', () => { if (!userStopped) { panelBuffering = true; updateCanonicalPanelStatus('waiting'); } });
 audio?.addEventListener('canplay', () => { panelBuffering = false; panelAudioFault = false; updateCanonicalPanelStatus('canplay'); });
-audio?.addEventListener('stalled', () => { panelBuffering = true; updateCanonicalPanelStatus('stalled'); markAudioSelfHealDirty('stalled'); setTimeout(() => recoverInterruptedAudio('stalled'), 350); });
-audio?.addEventListener('suspend', () => { updateCanonicalPanelStatus('suspend'); markAudioSelfHealDirty('suspend'); setTimeout(() => recoverInterruptedAudio('suspend'), 350); });
+audio?.addEventListener('stalled', () => { panelBuffering = true; updateCanonicalPanelStatus('stalled'); setTimeout(() => recoverInterruptedAudio('stalled'), 350); });
+audio?.addEventListener('suspend', () => { updateCanonicalPanelStatus('suspend'); setTimeout(() => recoverInterruptedAudio('suspend'), 350); });
 window.addEventListener('focus', () => setTimeout(() => recoverInterruptedAudio('focus'), 220), { passive: true });
 window.addEventListener('pageshow', () => setTimeout(() => recoverInterruptedAudio('pageshow'), 220), { passive: true });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(() => recoverInterruptedAudio('visibility'), 220); });
