@@ -5,13 +5,15 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -19,6 +21,37 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Apply Main Stream stability repair
+        if: github.event_name == 'push' && github.ref_name == 'repair/mainstream-single-owner-stability-20260904'
+        shell: python
+        run: |
+          from pathlib import Path
+          old_mark = '2026-08-15-runtime-cache-identity-v1'
+          new_mark = '2026-09-04-mainstream-single-owner-v1'
+          for rel in ['index.html','public/index.html']:
+              p=Path(rel); s=p.read_text()
+              old='<button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Hauptstream — Klick schaltet auf Hauptstream"><span class="status-dot"></span><span class="status-code">H</span></button>'
+              new='<button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Main Stream — Click to switch to Main Stream"><span class="status-dot"></span><span class="status-code">M</span></button>'
+              if old in s: s=s.replace(old,new)
+              if old_mark in s: s=s.replace(old_mark,new_mark)
+              p.write_text(s)
+          for rel in ['js/player-core.js','public/js/player-core.js']:
+              p=Path(rel); s=p.read_text()
+              needle='const PLAY_START_TIMEOUT_MS = 6500;'
+              flag='const AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;'
+              if flag not in s: s=s.replace(needle,needle+'\n'+flag,1)
+              old="if (currentSource === 'main' && !switchingStream) {"
+              new="if (AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER && currentSource === 'main' && !switchingStream) {"
+              if old in s: s=s.replace(old,new,1)
+              s=s.replace("main.title='Mainstream';","main.title='Main Stream';")
+              if old_mark in s: s=s.replace(old_mark,new_mark)
+              p.write_text(s)
+          for rel in ['tests/runtime-cache-identity.test.mjs','tests/pc-real-spectrum-layout.test.mjs','tests/pc-eq-balanced-headroom.test.mjs','tests/pc-high-frequency-response.test.mjs']:
+              p=Path(rel); s=p.read_text()
+              if old_mark in s: p.write_text(s.replace(old_mark,new_mark))
+          t=Path('tests/main-stream-single-owner-stability.test.mjs')
+          if not t.exists():
+              t.write_text("""import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport fs from 'node:fs';\nconst html=fs.readFileSync('index.html','utf8');\nconst htmlPublic=fs.readFileSync('public/index.html','utf8');\nconst core=fs.readFileSync('js/player-core.js','utf8');\nconst corePublic=fs.readFileSync('public/js/player-core.js','utf8');\nconst recovery=fs.readFileSync('js/all-player-audio-recovery.js','utf8');\ntest('Main Stream has one English naming owner',()=>{assert.equal(htmlPublic,html);assert.match(html,/id=\\\"mainBtn\\\"[\\s\\S]*?title=\\\"Main Stream — Click to switch to Main Stream\\\"[\\s\\S]*?<span class=\\\"status-code\\\">M<\\/span>/);assert.doesNotMatch(html,/Hauptstream — Klick schaltet auf Hauptstream/);assert.doesNotMatch(html,/id=\\\"mainBtn\\\"[\\s\\S]{0,300}<span class=\\\"status-code\\\">H<\\/span>/);assert.match(core,/main\\.title='Main Stream';/);assert.equal(corePublic,core);});\ntest('ordinary Main play timeout cannot auto-switch the player to Backup',()=>{assert.match(core,/const AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;/);assert.match(core,/if \\(AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER && currentSource === 'main' && !switchingStream\\) \\{/);assert.match(core,/fallbackBtn\\?\\.addEventListener\\('click',[\\s\\S]*?setSource\\('fallback'\\)/);});\ntest('canonical recovery keeps confirmed Backup to Main hard-failure direction',()=>{assert.match(recovery,/const targetSrc=isBackupSource\\(src\\)\\?PRIMARY_ROUTE:src/);});\n""")
       - run: npm ci
       - name: Release checker
         run: npm run check
@@ -29,12 +62,18 @@ jobs:
         run: |
           from pathlib import Path
           import ast
-          failures = []
+          failures=[]
           for path in Path('.').rglob('*.py'):
-              try:
-                  ast.parse(path.read_text(encoding='utf-8'), filename=str(path))
-              except Exception as exc:
-                  failures.append(f"{path}: {exc}")
-          if failures:
-              raise SystemExit("\n".join(failures))
+              try: ast.parse(path.read_text(encoding='utf-8'),filename=str(path))
+              except Exception as exc: failures.append(f"{path}: {exc}")
+          if failures: raise SystemExit("\n".join(failures))
           print("Python files valid")
+      - name: Commit verified Main Stream repair
+        if: github.event_name == 'push' && github.ref_name == 'repair/mainstream-single-owner-stability-20260904'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html public/index.html js/player-core.js public/js/player-core.js tests/runtime-cache-identity.test.mjs tests/pc-real-spectrum-layout.test.mjs tests/pc-eq-balanced-headroom.test.mjs tests/pc-high-frequency-response.test.mjs tests/main-stream-single-owner-stability.test.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "Repair Main Stream single owner and disable timeout failover loop"
+          git push origin HEAD:repair/mainstream-single-owner-stability-20260904
