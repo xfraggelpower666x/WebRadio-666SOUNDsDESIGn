@@ -1,0 +1,106 @@
+name: Main Stream Single Owner One Shot
+on:
+  push:
+    branches:
+      - repair/mainstream-single-owner-stability-20260904
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/mainstream-single-owner-stability-20260904
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply single-owner Main Stream repair
+        shell: python
+        run: |
+          from pathlib import Path
+
+          root = Path('.')
+          old_mark = '2026-08-15-runtime-cache-identity-v1'
+          new_mark = '2026-09-04-mainstream-single-owner-v1'
+
+          for rel in ['index.html','public/index.html']:
+              p = root / rel
+              s = p.read_text()
+              old = '<button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Hauptstream — Klick schaltet auf Hauptstream"><span class="status-dot"></span><span class="status-code">H</span></button>'
+              new = '<button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Main Stream — Click to switch to Main Stream"><span class="status-dot"></span><span class="status-code">M</span></button>'
+              assert s.count(old) == 1, (rel, 'main button contract', s.count(old))
+              s = s.replace(old, new)
+              assert old_mark in s, (rel, 'cache mark missing')
+              s = s.replace(old_mark, new_mark)
+              p.write_text(s)
+
+          for rel in ['js/player-core.js','public/js/player-core.js']:
+              p = root / rel
+              s = p.read_text()
+              needle = 'const PLAY_START_TIMEOUT_MS = 6500;'
+              assert s.count(needle) == 1, (rel, 'timeout const', s.count(needle))
+              s = s.replace(needle, needle + "\nconst AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;", 1)
+              cond = "if (currentSource === 'main' && !switchingStream) {"
+              assert s.count(cond) == 1, (rel, 'auto failover condition', s.count(cond))
+              s = s.replace(cond, "if (AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER && currentSource === 'main' && !switchingStream) {", 1)
+              assert "main.title='Mainstream';" in s, (rel, 'runtime label missing')
+              s = s.replace("main.title='Mainstream';", "main.title='Main Stream';")
+              assert old_mark in s, (rel, 'core cache mark missing')
+              s = s.replace(old_mark, new_mark)
+              p.write_text(s)
+
+          for rel in [
+              'tests/runtime-cache-identity.test.mjs',
+              'tests/pc-real-spectrum-layout.test.mjs',
+              'tests/pc-eq-balanced-headroom.test.mjs',
+              'tests/pc-high-frequency-response.test.mjs'
+          ]:
+              p = root / rel
+              s = p.read_text()
+              assert old_mark in s, (rel, 'test cache mark missing')
+              p.write_text(s.replace(old_mark, new_mark))
+
+          test_path = root / 'tests/main-stream-single-owner-stability.test.mjs'
+          test_path.write_text("""import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const html = fs.readFileSync('index.html','utf8');
+const htmlPublic = fs.readFileSync('public/index.html','utf8');
+const core = fs.readFileSync('js/player-core.js','utf8');
+const corePublic = fs.readFileSync('public/js/player-core.js','utf8');
+const recovery = fs.readFileSync('js/all-player-audio-recovery.js','utf8');
+
+test('Main Stream has one English H/M naming owner', () => {
+  assert.equal(htmlPublic, html);
+  assert.match(html, /id=\"mainBtn\"[\s\S]*?title=\"Main Stream — Click to switch to Main Stream\"[\s\S]*?<span class=\"status-code\">M<\/span>/);
+  assert.doesNotMatch(html, /Hauptstream — Klick schaltet auf Hauptstream/);
+  assert.doesNotMatch(html, /id=\"mainBtn\"[\s\S]{0,300}<span class=\"status-code\">H<\/span>/);
+  assert.match(core, /main\.title='Main Stream';/);
+  assert.equal(corePublic, core);
+});
+
+test('ordinary Main play timeout cannot auto-switch the player to Backup', () => {
+  assert.match(core, /const AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;/);
+  assert.match(core, /if \(AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER && currentSource === 'main' && !switchingStream\) \{/);
+  assert.match(core, /fallbackBtn\?\.addEventListener\('click',[\s\S]*?setSource\('fallback'\)/);
+});
+
+test('canonical recovery keeps only confirmed Backup to Main hard-failure direction', () => {
+  assert.match(recovery, /const targetSrc=isBackupSource\(src\)\?PRIMARY_ROUTE:src/);
+  assert.doesNotMatch(recovery, /PRIMARY_ROUTE.*BACKUP_ROUTE.*hardRecover/);
+});
+""")
+
+      - name: Verify repair
+        run: npm run verify
+      - name: Commit repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html public/index.html js/player-core.js public/js/player-core.js tests/runtime-cache-identity.test.mjs tests/pc-real-spectrum-layout.test.mjs tests/pc-eq-balanced-headroom.test.mjs tests/pc-high-frequency-response.test.mjs tests/main-stream-single-owner-stability.test.mjs
+          git diff --cached --quiet && exit 0
+          git commit -m "Repair Main Stream single owner and disable timeout failover loop"
+          git push origin HEAD:repair/mainstream-single-owner-stability-20260904
