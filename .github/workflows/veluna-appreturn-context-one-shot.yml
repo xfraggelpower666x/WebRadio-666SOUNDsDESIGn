@@ -1,0 +1,35 @@
+name: Veluna App Return Context One Shot
+
+on:
+  push:
+    branches:
+      - repair/iphone-layout-appreturn-audio-20260904
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply context resume repair
+        run: node scripts/repair-veluna-appreturn-context-resume.mjs
+      - name: Install dependencies
+        run: npm ci
+      - name: Focus regression
+        run: node --test tests/iphone-layout-app-return-audio.test.mjs
+      - name: Full verify
+        run: npm run verify
+      - name: Commit verified repair
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add veluna/index.html VELUNA/index.html public/veluna/index.html public/VELUNA/index.html tests/iphone-layout-app-return-audio.test.mjs
+          git commit -m "Resume Veluna sound graph on healthy app return"
+          git push
