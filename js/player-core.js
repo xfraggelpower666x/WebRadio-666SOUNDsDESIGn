@@ -14,7 +14,7 @@ HINWEIS: Audio, Metadaten und Fallback weiter nur über bestehende Worker-Routen
 ==========================================
 */
 import { setText, markSourceButtons } from './controls.js?v=smfp-v177-version-core-20260519';
-import { createBars, startVisualizer } from './equalizer.js?v=2026-08-15-runtime-cache-identity-v1';
+import { createBars, startVisualizer } from './equalizer.js?v=2026-09-04-mainstream-single-owner-v1';
 import { installResponsiveHelpers } from './responsive-ui.js?v=smfp-v177-version-core-20260519';
 import { applyStatusChip } from './shared-status.js?v=smfp-v177-version-core-20260519';
 
@@ -71,6 +71,7 @@ let historyItems = [];
 let playRequestToken = 0;
 let switchingStream = false;
 const PLAY_START_TIMEOUT_MS = 6500;
+const AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;
 const METADATA_TIMEOUT_MS = 4500;
 const isMobileViewport = () => window.innerWidth <= 860;
 const IDLE_TICKER_TEXT_V113 = '666SOUNDsDESIGn WebRadio';
@@ -817,7 +818,7 @@ async function playCurrent() {
     keepControlsUnlocked();
     if (token !== playRequestToken || userStopped) return;
 
-    if (currentSource === 'main' && !switchingStream) {
+    if (AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER && currentSource === 'main' && !switchingStream) {
       switchingStream = true;
       setSource('fallback');
       setStatus('MAIN TIMEOUT → BACKUP');
@@ -1066,7 +1067,7 @@ try {
     if(main){
       const code=main.querySelector('.status-code')||main;
       if(code.textContent.trim()!=='M')code.textContent='M';
-      main.title='Mainstream';
+      main.title='Main Stream';
       main.setAttribute('aria-label','Mainstream');
       main.classList.add('source-mini-chip-v80');
     }
