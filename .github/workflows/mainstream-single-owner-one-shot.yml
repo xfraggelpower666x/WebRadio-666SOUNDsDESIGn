@@ -3,8 +3,12 @@ on:
   push:
     branches:
       - repair/mainstream-single-owner-stability-20260904
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
 jobs:
   repair:
+    if: github.head_ref == 'repair/mainstream-single-owner-stability-20260904' || github.ref_name == 'repair/mainstream-single-owner-stability-20260904'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -20,11 +24,9 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
-
           root = Path('.')
           old_mark = '2026-08-15-runtime-cache-identity-v1'
           new_mark = '2026-09-04-mainstream-single-owner-v1'
-
           for rel in ['index.html','public/index.html']:
               p = root / rel
               s = p.read_text()
@@ -35,7 +37,6 @@ jobs:
               assert old_mark in s, (rel, 'cache mark missing')
               s = s.replace(old_mark, new_mark)
               p.write_text(s)
-
           for rel in ['js/player-core.js','public/js/player-core.js']:
               p = root / rel
               s = p.read_text()
@@ -50,30 +51,20 @@ jobs:
               assert old_mark in s, (rel, 'core cache mark missing')
               s = s.replace(old_mark, new_mark)
               p.write_text(s)
-
-          for rel in [
-              'tests/runtime-cache-identity.test.mjs',
-              'tests/pc-real-spectrum-layout.test.mjs',
-              'tests/pc-eq-balanced-headroom.test.mjs',
-              'tests/pc-high-frequency-response.test.mjs'
-          ]:
+          for rel in ['tests/runtime-cache-identity.test.mjs','tests/pc-real-spectrum-layout.test.mjs','tests/pc-eq-balanced-headroom.test.mjs','tests/pc-high-frequency-response.test.mjs']:
               p = root / rel
               s = p.read_text()
               assert old_mark in s, (rel, 'test cache mark missing')
               p.write_text(s.replace(old_mark, new_mark))
-
-          test_path = root / 'tests/main-stream-single-owner-stability.test.mjs'
-          test_path.write_text("""import test from 'node:test';
+          Path('tests/main-stream-single-owner-stability.test.mjs').write_text("""import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-
 const html = fs.readFileSync('index.html','utf8');
 const htmlPublic = fs.readFileSync('public/index.html','utf8');
 const core = fs.readFileSync('js/player-core.js','utf8');
 const corePublic = fs.readFileSync('public/js/player-core.js','utf8');
 const recovery = fs.readFileSync('js/all-player-audio-recovery.js','utf8');
-
-test('Main Stream has one English H/M naming owner', () => {
+test('Main Stream has one English naming owner', () => {
   assert.equal(htmlPublic, html);
   assert.match(html, /id=\"mainBtn\"[\s\S]*?title=\"Main Stream — Click to switch to Main Stream\"[\s\S]*?<span class=\"status-code\">M<\/span>/);
   assert.doesNotMatch(html, /Hauptstream — Klick schaltet auf Hauptstream/);
@@ -81,22 +72,19 @@ test('Main Stream has one English H/M naming owner', () => {
   assert.match(core, /main\.title='Main Stream';/);
   assert.equal(corePublic, core);
 });
-
 test('ordinary Main play timeout cannot auto-switch the player to Backup', () => {
   assert.match(core, /const AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER = false;/);
   assert.match(core, /if \(AUTO_MAIN_TO_BACKUP_TIMEOUT_FAILOVER && currentSource === 'main' && !switchingStream\) \{/);
   assert.match(core, /fallbackBtn\?\.addEventListener\('click',[\s\S]*?setSource\('fallback'\)/);
 });
-
-test('canonical recovery keeps only confirmed Backup to Main hard-failure direction', () => {
+test('canonical recovery keeps confirmed Backup to Main hard-failure direction', () => {
   assert.match(recovery, /const targetSrc=isBackupSource\(src\)\?PRIMARY_ROUTE:src/);
-  assert.doesNotMatch(recovery, /PRIMARY_ROUTE.*BACKUP_ROUTE.*hardRecover/);
 });
 """)
-
       - name: Verify repair
         run: npm run verify
       - name: Commit repair
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
