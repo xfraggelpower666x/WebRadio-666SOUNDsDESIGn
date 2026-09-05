@@ -321,11 +321,11 @@ setBoostStage(0);
 function updateStreamPanelLeds(source) {
   const active = source === 'fallback' || source === 'backup' ? 'backup' : 'main';
   if (active === 'main') {
-    applyStatusChip(statusMain, userStopped ? 'stopped' : 'ok', userStopped ? 'Main Stream selected but stopped' : 'Main Stream active');
+    applyStatusChip(statusMain, userStopped ? 'empty' : 'ok', userStopped ? 'Main Stream selected, transport stopped' : 'Main Stream active');
     applyStatusChip(statusBackup, 'empty', 'Backup Stream inactive');
   } else {
     applyStatusChip(statusMain, 'empty', 'Main Stream inactive');
-    applyStatusChip(statusBackup, userStopped ? 'stopped' : 'ok', userStopped ? 'Backup Stream selected but stopped' : 'Backup Stream active');
+    applyStatusChip(statusBackup, userStopped ? 'empty' : 'ok', userStopped ? 'Backup Stream selected, transport stopped' : 'Backup Stream active');
   }
 }
 
@@ -365,7 +365,8 @@ function updateCanonicalPanelStatus(reason = 'tick') {
     userStopped ? 'Stream stopped' : panelAudioFault ? 'Stream error' : playing ? 'Stream active' : panelBuffering ? 'Stream buffering' : 'Stream idle');
   applyStatusChip(statusBuffer, userStopped ? 'empty' : panelBuffering ? 'buffer' : playing ? 'stable' : 'empty',
     userStopped ? 'Buffer inactive' : panelBuffering ? 'Stream buffering' : playing ? 'Buffer stable' : 'Buffer idle');
-  applyStatusChip(statusSource, sourceIsBackup ? 'backup' : 'main', sourceIsBackup ? 'Source: Backup Stream' : 'Source: Main Stream');
+  applyStatusChip(statusSource, userStopped ? 'empty' : playing ? (sourceIsBackup ? 'backup' : 'main') : 'empty',
+    userStopped ? 'Source idle' : playing ? (sourceIsBackup ? 'Source: Backup Stream' : 'Source: Main Stream') : 'Source selected, transport idle');
   applyStatusChip(statusMeta, userStopped ? 'empty' : panelMetadataOnline ? 'api' : 'warn',
     userStopped ? 'Metadata idle' : panelMetadataOnline ? 'Metadata live' : 'Metadata unavailable');
   applyStatusChip(statusWorker, panelWorkerOnline ? 'online' : 'warn', panelWorkerOnline ? 'Worker / health online' : 'Worker / health unavailable');
@@ -397,7 +398,7 @@ function syncStreamLedFromStatus(text) {
   if (value.includes('error') || value.includes('fehler') || value.includes('timeout')) {
     applyStatusChip(statusStream, 'warn', 'Stream Fehler');
   } else if (value.includes('stopped') || value.includes('stop') || value.includes('pause')) {
-    applyStatusChip(statusStream, 'stopped', 'Stream nicht aktiv');
+    applyStatusChip(statusStream, 'empty', 'Stream inactive');
   } else {
     applyStatusChip(statusStream, 'ok', 'Stream aktiv');
   }

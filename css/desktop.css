@@ -4001,3 +4001,56 @@ PURPOSE:
     box-sizing: border-box !important;
   }
 }
+
+
+/* HEADER_PANEL_TRANSPARENCY_LED_COMPACT_V1_20260905 */
+@media (min-width:761px){
+  /* Keep only the outer .player-shell frame. Header logo and system LED rows float directly inside it. */
+  .player-shell > .hero{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  .top-hud .status-cluster,
+  .top-hud .status-bar,
+  .top-hud .systempanel-grid-v74{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    min-height:34px!important;
+    padding:2px 4px!important;
+  }
+  .systempanel-v74 .systempanel-group{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  .systempanel-v74 .status-chip{
+    min-width:auto!important;
+    height:25px!important;
+    min-height:25px!important;
+    padding:0 7px!important;
+    gap:5px!important;
+    font-size:9px!important;
+    letter-spacing:.075em!important;
+  }
+  .systempanel-v74 .status-code{
+    font-size:9px!important;
+    letter-spacing:.075em!important;
+    line-height:1!important;
+  }
+  .systempanel-v74 .status-dot{
+    width:7px!important;
+    height:7px!important;
+    flex:0 0 7px!important;
+  }
+  .systempanel-v74 .source-chip.is-selected:not(.is-active){
+    border-color:rgba(40,255,244,.42)!important;
+    box-shadow:inset 0 0 0 1px rgba(40,255,244,.05)!important;
+  }
+  .systempanel-v74 .source-chip.is-selected:not(.is-active) .status-dot{
+    background:transparent!important;
+    border:1px solid rgba(255,255,255,.82)!important;
+    box-shadow:0 0 6px rgba(255,255,255,.24)!important;
+  }
+}

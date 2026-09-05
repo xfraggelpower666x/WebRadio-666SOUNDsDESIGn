@@ -73,7 +73,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <link rel="stylesheet" href="/css/player-patches.css?v=2026-06-25-hardlock1" />
   <link rel="stylesheet" href="/css/player-stage-v2.css?v=2026-09-04-recovery-single-owner-v3" />
   <link rel="stylesheet" href="/css/eq-overlay.css?v=2026-06-15-fix1">
-  <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-09-04-iphone-layout-appreturn-v4">
+  <link rel="stylesheet" href="/css/mobile-patches.css?v=2026-09-05-header-panels-led-idle-v1">
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
   <meta name="msapplication-TileColor" content="#12061f">
   <meta name="msapplication-TileImage" content="/assets/veluna/icons/icon-192x192.png?v=veluna-v1212">
@@ -128,10 +128,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       <header class="top-hud systempanel-v74" aria-label="Systempanel">
         <div class="status-cluster status-bar systempanel-grid-v74" aria-label="Systemstatus">
           <div class="systempanel-group systempanel-left led-strip-v108" aria-label="Stream-LEDs Leiste 1">
-            <button id="statusStream" class="status-chip led-state state-main" type="button" title="Stream aktiv — türkis: läuft, pink: Fehler, leer: aus"><span class="status-dot"></span><span class="status-code">STR</span></button>
+            <button id="statusStream" class="status-chip led-state state-empty" type="button" title="Stream aktiv — türkis: läuft, pink: Fehler, leer: aus"><span class="status-dot"></span><span class="status-code">STR</span></button>
             <button id="statusBuffer" class="status-chip led-state state-empty" type="button" title="Stream Buffering — grün: stabil, türkis: normaler Buffer, pink: Unterpufferung, rot: Stall"><span class="status-dot"></span><span class="status-code">SB</span></button>
-            <button id="statusSource" class="status-chip led-state state-external" type="button" title="Source / Quelle — Herkunft des Streams"><span class="status-dot"></span><span class="status-code">SRC</span></button>
-            <button id="statusMeta" class="status-chip led-state state-api" type="button" title="Metadaten aktiv — Titelinformationen werden empfangen"><span class="status-dot"></span><span class="status-code">MET</span></button>
+            <button id="statusSource" class="status-chip led-state state-empty" type="button" title="Source / Quelle — Herkunft des Streams"><span class="status-dot"></span><span class="status-code">SRC</span></button>
+            <button id="statusMeta" class="status-chip led-state state-empty" type="button" title="Metadaten aktiv — Titelinformationen werden empfangen"><span class="status-dot"></span><span class="status-code">MET</span></button>
             <button id="statusWorker" class="status-chip led-state state-empty" type="button" title="Worker — Hintergrundprozess Status"><span class="status-dot"></span><span class="status-code">WRK</span></button>
             <button id="statusAudio" class="status-chip led-state state-empty" type="button" title="Audio-Core — Selbstheilung aktiv"><span class="status-dot"></span><span class="status-code">AUD</span></button>
             <button id="statusWatchdog" class="status-chip led-state state-empty" type="button" title="Watchdog — überwacht Stream-Stabilität"><span class="status-dot"></span><span class="status-code">WCH</span></button>
@@ -139,7 +139,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="statusMeter" class="status-chip led-state state-empty" type="button" title="Meter — Audio-Level-Anzeige aktiv"><span class="status-dot"></span><span class="status-code">MTR</span></button>
           </div>
 <div class="systempanel-group systempanel-right led-strip-v108" aria-label="Stream-Schalter und Action-LEDs">
-            <button id="mainBtn" class="status-chip led-state state-main is-active source-chip source-mini-chip-v80" type="button" title="Main Stream — Click to switch to Main Stream"><span class="status-dot"></span><span class="status-code">M</span></button>
+            <button id="mainBtn" class="status-chip led-state state-empty source-chip source-mini-chip-v80 is-selected" type="button" title="Main Stream — Click to switch to Main Stream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state state-off source-chip source-mini-chip-v80" type="button" title="Backupstream — Klick schaltet auf Backupstream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <button id="statusDiscord" class="status-chip led-state state-empty" type="button" title="Discord — verbunden: türkis, sendet: pink, Fehler: rot"><span class="status-dot"></span><span class="status-code">DSC</span></button>
             <button id="statusAdmin" class="status-chip led-state state-empty" type="button" title="Admin — Admin-Zugang aktiv"><span class="status-dot"></span><span class="status-code">ADM</span></button>
@@ -325,7 +325,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-09-04-iphone-layout-appreturn-v4"></script>
+<script type="module" src="/js/player-core.js?v=2026-09-05-header-panels-led-idle-v1"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -2189,7 +2189,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <script src="/js/skip-control.js?v=2026-07-24-autoskip-authority-v2" defer></script>
     <script src="/js/player-stage-v2.js?v=2026-09-04-recovery-single-owner-v3" defer></script>
   <!-- iOS MediaSession: Lock-Screen-Controls + Auto-Resume nach Anruf -->
-    <script src="/js/media-session-ios.js?v=2026-09-04-iphone-layout-appreturn-v4" defer></script>
+    <script src="/js/media-session-ios.js?v=2026-09-05-header-panels-led-idle-v1" defer></script>
     <script src="/js/messenger-overlay.js?v=2026-06-25-hardlock1" defer></script>
   <script src="/config/veluna-assets.js?v=2026-07-23-reactive-visual-v183"></script>
   <script defer src="/js/veluna-splash.js?v=2026-07-11-veluna-v1214"></script>
