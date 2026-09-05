@@ -12,6 +12,6 @@ export function setText(el, text) {
 }
 
 export function markSourceButtons(mainBtn, fallbackBtn, source) {
-  mainBtn?.classList.toggle('is-active', source === 'main');
-  fallbackBtn?.classList.toggle('is-active', source === 'fallback');
+  mainBtn?.classList.toggle('is-selected', source === 'main');
+  fallbackBtn?.classList.toggle('is-selected', source === 'fallback');
 }
