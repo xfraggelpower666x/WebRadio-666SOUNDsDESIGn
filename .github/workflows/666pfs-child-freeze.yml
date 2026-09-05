@@ -40,12 +40,12 @@ jobs:
   verify-readback-and-freeze:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     env:
       FREEZE_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       BACKUP_CLASS: ${{ github.event_name == 'workflow_run' && 'POST_DEPLOY_VERIFIED_TREE' || 'PR_TREE_CANDIDATE' }}
       PRODUCTION_ORIGIN: https://webradio.666soundsdesign-broadcaster.com
-      PFS_DRIVE_FOLDER_ID: 1lLn_9SielBmxVEJ5WQE7X6554ZIbsc56
+      PFS_CHILD_TARGET: 666PFS/Child_Systems/666STREAM_DEPLOYMENT
     steps:
       - name: Checkout exact repository tree
         uses: actions/checkout@v4
@@ -58,6 +58,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install locked dependencies
         run: npm ci
@@ -139,7 +144,7 @@ jobs:
             echo "MARKER_PATH=/666pfs-child-release.json"
             echo "IDENTITY_PATH=/666pfs-deployed-commit.json"
             echo "MARKER_SCHEMA=666pfs-666stream-child-release-v1"
-            echo "IDENTITY_SCHEMA=666pfs-666stream-deployed-commit-v1"
+            echo "IDENTITY_SCHEMA=666pfs-deployed-commit-v1"
             echo "IDENTITY_SOURCE_COMMIT=${FREEZE_SHA}"
             echo "DEPLOYMENT_IDENTITY_MATCH=PASS"
             echo "DEPLOYMENT_READBACK=PASS"
@@ -178,6 +183,8 @@ jobs:
             echo "ZIP_CRC=PASS"
             echo "VERIFY_COMMAND=npm run verify"
             echo "BACKUP_CLASS=${BACKUP_CLASS}"
+            echo "PFS_CHILD_TARGET=${PFS_CHILD_TARGET}"
+            echo "PFS_STORAGE_OWNER=666PFS"
             echo "DEPLOYMENT_IDENTITY_MATCH=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
             echo "DEPLOYMENT_READBACK=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
           } > "$METADATA"
@@ -190,27 +197,19 @@ jobs:
           echo "metadata=${METADATA}" >> "$GITHUB_OUTPUT"
           echo "tree=${TREE}" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Python for canonical PFS Drive handoff
-        if: github.event_name == 'workflow_run'
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Google Drive handoff dependencies
-        if: github.event_name == 'workflow_run'
-        run: python -m pip install --disable-pip-version-check --no-cache-dir google-api-python-client==2.176.0 google-auth==2.40.3
-
-      - name: Transfer verified repository copy to 666PFS Child_Systems/666STREAM_DEPLOYMENT
-        if: github.event_name == 'workflow_run'
+      - name: Build 666PFS child handoff package
+        id: handoff
         env:
           PFS_ARCHIVE: ${{ steps.freeze.outputs.archive }}
           PFS_ARCHIVE_SHA256: ${{ steps.freeze.outputs.hash }}
           PFS_SOURCE_COMMIT: ${{ steps.freeze.outputs.source_commit }}
-          PFS_GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.PFS_GDRIVE_SERVICE_ACCOUNT_JSON }}
-        run: python scripts/pfs-drive-upload.py
+          PFS_TREE_FILE: ${{ steps.freeze.outputs.tree }}
+          PFS_METADATA_FILE: ${{ steps.freeze.outputs.metadata }}
+          PFS_BACKUP_CLASS: ${{ env.BACKUP_CLASS }}
+          PFS_CHILD_TARGET: ${{ env.PFS_CHILD_TARGET }}
+        run: python scripts/pfs-child-handoff-package.py
 
-      - name: Upload 666PFS child freeze artifact
-        if: always()
+      - name: Upload 666PFS child freeze and handoff artifacts
         uses: actions/upload-artifact@v4
         with:
           name: 666pfs-666stream-repository-tree-${{ steps.freeze.outputs.source_commit }}
@@ -223,12 +222,14 @@ jobs:
             PRODUCTION_READBACK_${{ steps.freeze.outputs.source_commit }}.json
             PRODUCTION_DEPLOYMENT_IDENTITY_${{ steps.freeze.outputs.source_commit }}.json
             PRODUCTION_READBACK_RECEIPT_${{ steps.freeze.outputs.source_commit }}.txt
-            PFS_DRIVE_TRANSFER_${{ steps.freeze.outputs.source_commit }}.json
+            666PFS_666STREAM_HANDOFF_${{ steps.freeze.outputs.source_commit }}.zip
+            666PFS_666STREAM_HANDOFF_${{ steps.freeze.outputs.source_commit }}.zip.sha256
+            PFS_HANDOFF_MANIFEST_${{ steps.freeze.outputs.source_commit }}.json
           if-no-files-found: warn
           retention-days: 30
 
       - name: Publish post-deploy receipt to associated pull request
-        if: github.event_name == 'workflow_run' && success()
+        if: github.event_name == 'workflow_run'
         uses: actions/github-script@v7
         env:
           SOURCE_COMMIT: ${{ steps.freeze.outputs.source_commit }}
@@ -240,11 +241,7 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const commit_sha = process.env.SOURCE_COMMIT;
-            const { data: pulls } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
-              owner,
-              repo,
-              commit_sha
-            });
+            const { data: pulls } = await github.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha });
             const body = [
               '## 666PFS 666STREAM Commit-Bound Post-Deploy Freeze Receipt',
               '',
@@ -261,11 +258,11 @@ jobs:
               `- ZIP_ENTRIES=${process.env.ARCHIVE_ENTRIES}`,
               `- ARTIFACT_NAME=${process.env.ARTIFACT_NAME}`,
               '- BACKUP_CLASS=POST_DEPLOY_VERIFIED_TREE',
-              '- PFS_DRIVE_HANDOFF=PASS',
-              '- PFS_DRIVE_DESTINATION=666PFS/Child_Systems/666STREAM_DEPLOYMENT',
-              '- PFS_CURRENT_REPOSITORY_COPY=CURRENT_666STREAM_PRODUCTION_REPOSITORY.zip',
-              '- PFS_CURRENT_POINTER=CURRENT_666STREAM_DEPLOYMENT.json',
-              '- CHILD_BACKUP_REGISTRATION=PASS',
+              '- PFS_HANDOFF_PACKAGE=READY',
+              '- PFS_CHILD_TARGET=666PFS/Child_Systems/666STREAM_DEPLOYMENT',
+              '- PFS_STORAGE_OWNER=666PFS',
+              '- RADIO_DRIVE_CREDENTIALS=NOT_REQUIRED',
+              '- CHILD_BACKUP_REGISTRATION=PFS_INTAKE_REQUIRED',
               '- LYVRA=EXTERNAL_UNCHANGED'
             ].join('\n');
             if (pulls.length === 0) {
@@ -273,10 +270,5 @@ jobs:
               return;
             }
             for (const pull of pulls) {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pull.number,
-                body
-              });
+              await github.rest.issues.createComment({ owner, repo, issue_number: pull.number, body });
             }
