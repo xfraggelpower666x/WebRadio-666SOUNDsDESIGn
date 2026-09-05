@@ -27,13 +27,13 @@ test('main player has one visual writer per responsibility', async () => {
   assert.doesNotMatch(boot, /\bmountBottomSafe\s*\(\s*\)/, 'legacy duplicate mobile bottom meter must stay demoted');
 });
 
-test('header is one canonical 1536 by 509 asset without destructive rebuild', async () => {
+test('header is one dedicated canonical 800 by 200 Main asset without destructive rebuild', async () => {
   const stage = await read('js/player-stage-v2.js');
   const css = await read('css/player-stage-v2.css');
-  assert.match(stage, /width','1536'/);
-  assert.match(stage, /height','509'/);
+  assert.match(stage, /width','800'/);
+  assert.match(stage, /height','200'/);
   assert.doesNotMatch(stage, /hero\.innerHTML\s*=/);
-  assert.match(css, /--s666-header-ratio:1536\/509/);
+  assert.match(css, /--s666-header-ratio:4\/1/);
   assert.match(css, /s666-canonical-header-image/);
 });
 
