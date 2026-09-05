@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const read=p=>readFile(new URL('../'+p,import.meta.url),'utf8');
-const MARK='2026-09-04-iphone-layout-appreturn-v4';
+const MARK='2026-09-05-header-panels-led-idle-v1';
 
 test('main iPhone foreground recovery has one canonical owner',async()=>{
  const core=await read('js/player-core.js'); const html=await read('index.html');
