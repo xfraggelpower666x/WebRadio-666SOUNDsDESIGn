@@ -78,7 +78,7 @@ test("main player restores responsive header, cockpit buttons and clean Now Play
   assert.match(css, /animation:s666TitleMarquee 14s linear infinite/);
   assert.match(css, /#phase10NowVersion[\s\S]*#pcTickerRebuildLane/);
   assert.match(css, /\.side-meter-stack\{display:grid!important;grid-template-columns:repeat\(3/);
-  assert.match(stage, /veluna-player-header\.webp/);
+  assert.match(stage, /assets\/main\/header\/666soundsdesign-lyvra-main-header\.webp/);
   assert.match(stage, /NOW PLAYING/);
   assert.match(stage, /s666-now-static-title/);
   assert.match(stage, /s666-title-marquee/);

@@ -2,7 +2,7 @@
 :root{
   --s666-cyan:#16fff3;--s666-blue:#168bff;--s666-violet:#b45cff;--s666-pink:#ff3dbb;--s666-deep:#050814;
   --s666-stage-level:0;--s666-stage-peak:0;--s666-stage-pulse:0;--s666-stage-low:0;--s666-stage-mid:0;--s666-stage-high:0;--s666-stage-stereo:0;--s666-ticker-pulse:0;
-  --s666-header-ratio:1536/509;
+  --s666-header-ratio:4/1;
 }
 body[data-veluna-page="main"] :is(button,a[href],[role="button"],.icon-btn,.status-chip,.s666-cockpit-action){
   touch-action:manipulation!important;-webkit-tap-highlight-color:rgba(180,92,255,.32)!important;transform-origin:center!important;
@@ -122,4 +122,36 @@ body[data-veluna-page="main"] :is(.eq-bar-fill,.side-meter-fill,.status-dot){ani
   html body[data-veluna-page="main"] #mffApp .mff-panel-led-panel{position:relative!important;flex:0 0 38px!important;width:100%!important;height:38px!important;margin:0!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;overflow:hidden!important}html body[data-veluna-page="main"] #mffApp .mff-panel-led{position:relative!important;width:100%!important;min-width:0!important;height:34px!important;margin:0!important;padding:0!important}
   html body[data-veluna-page="main"] #mffApp .mff-discord-slot{position:relative!important;flex:0 0 auto!important;min-height:36px!important;overflow:hidden!important}html body[data-veluna-page="main"] #s666StageMobileActions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important;width:100%!important}
   html body[data-veluna-page="main"] #mffApp .mff-cards{flex:0 0 auto!important;margin:0!important}html body[data-veluna-page="main"] #mffApp .mff-eq{flex:1 1 auto!important;min-height:110px!important;margin:0!important;overflow:hidden!important}html body[data-veluna-page="main"] #mffApp .mff-eq-bars{height:100%!important;min-height:90px!important}html body[data-veluna-page="main"] #mffApp .mff-controls{position:relative!important;flex:0 0 auto!important;margin:0!important;display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;gap:4px!important}html body[data-veluna-page="main"] #mffApp .mff-controls button{position:relative!important;width:100%!important;min-width:0!important;margin:0!important}html body[data-veluna-page="main"] #mffApp .mff-boost-row-panel,html body[data-veluna-page="main"] #mffApp .mff-bottom{position:relative!important;flex:0 0 auto!important;margin:0!important}
+}
+
+
+/* MAIN_HEADER_BRAND_V1_20260905
+   Dedicated Main-player brand only. VELUNA player assets/layout stay independent. */
+body[data-veluna-page="main"] #pcHeaderNewLogo.s666-canonical-header-image.s666-main-header-image{
+  width:min(420px,44vw)!important;
+  max-width:420px!important;
+  height:auto!important;
+  max-height:105px!important;
+  aspect-ratio:4/1!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+@media(max-width:760px){
+  body[data-veluna-page="main"] #mffApp .mff-cyber-header.s666-mobile-header{
+    min-height:64px!important;
+    height:64px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+  body[data-veluna-page="main"] #mffApp .mff-cyber-header .s666-mobile-header-image{
+    width:min(78vw,280px)!important;
+    max-width:280px!important;
+    height:auto!important;
+    max-height:60px!important;
+    aspect-ratio:4/1!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
 }
