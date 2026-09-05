@@ -1,0 +1,35 @@
+name: Header Panels LED Idle One Shot
+
+on:
+  push:
+    branches:
+      - repair/header-panels-led-idle-20260905
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply repair
+        run: node scripts/repair-header-panels-led-idle.mjs
+      - name: Install dependencies
+        run: npm ci
+      - name: Focus regression
+        run: node --test tests/header-panel-idle-led-contract.test.mjs
+      - name: Full verify
+        run: npm run verify
+      - name: Commit verified repair
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html public/index.html js/player-core.js public/js/player-core.js js/controls.js public/js/controls.js css/desktop.css public/css/desktop.css tests
+          git commit -m "Repair header panels and neutral idle LEDs"
+          git push
