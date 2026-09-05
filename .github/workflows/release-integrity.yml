@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -20,9 +20,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: npm ci
-      - name: Apply Main header brand one-shot
-        if: github.event_name == 'push' && github.ref_name == 'repair/main-header-brand-20260905'
-        run: node scripts/oneshot-main-header-brand.mjs
       - name: Release checker
         run: npm run check
       - name: Node regression tests
@@ -41,13 +38,3 @@ jobs:
           if failures:
               raise SystemExit("\n".join(failures))
           print("Python files valid")
-      - name: Commit verified Main header repair
-        if: github.event_name == 'push' && github.ref_name == 'repair/main-header-brand-20260905'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html public/index.html js/player-stage-v2.js public/js/player-stage-v2.js css/player-stage-v2.css public/css/player-stage-v2.css js/player-core.js public/js/player-core.js tests/
-          if ! git diff --cached --quiet; then
-            git commit -m "Integrate dedicated Main header brand asset"
-            git push
-          fi
