@@ -108,11 +108,11 @@
 
   function normalizeHeaderImage(image){
     if(!image)return;
-    image.src='/assets/veluna/header/veluna-player-header.webp';
-    image.alt='LYVRA · VELUNA · 666';
+    image.src='/assets/main/header/666soundsdesign-lyvra-main-header.webp?v=2026-09-05-main-header-v1';
+    image.alt='666SOUNDsDESIGn · LYVRA';
     image.classList.add('s666-canonical-header-image');
-    image.setAttribute('width','1536');
-    image.setAttribute('height','509');
+    image.setAttribute('width','800');
+    image.setAttribute('height','200');
     image.decoding='async';
   }
 

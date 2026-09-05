@@ -34,8 +34,8 @@ test('mobile main source LED uses the single English Main Stream identity', asyn
 test('repaired runtime uses fresh recovery-single-owner cache identity', async () => {
   const html = await read('index.html');
   const core = await read('js/player-core.js');
-  assert.match(html, /2026-09-04-recovery-single-owner-v3/);
-  assert.match(core, /2026-09-04-recovery-single-owner-v3/);
+  assert.match(html, /2026-09-05-main-header-brand-v1/);
+  assert.match(core, /2026-09-05-main-header-brand-v1/);
   assert.doesNotMatch(html, /2026-09-04-panel-led-owner-v2/);
   assert.doesNotMatch(core, /2026-09-04-panel-led-owner-v2/);
 });
