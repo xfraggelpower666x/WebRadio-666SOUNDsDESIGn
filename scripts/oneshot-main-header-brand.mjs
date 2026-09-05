@@ -58,17 +58,35 @@ for(const path of [
 {
   const path='tests/main-player-reactive-visual-contract.test.mjs';
   let text=read(path);
-  text=text.replace("header is one canonical 1536 by 509 asset without destructive rebuild","header is one dedicated canonical 800 by 200 Main asset without destructive rebuild");
-  text=text.replace("/width','1536'/","/width','800'/");
-  text=text.replace("/height','509'/","/height','200'/");
-  text=text.replace("/--s666-header-ratio:1536\\/509/","/--s666-header-ratio:4\\/1/");
+  text=text.replace("test('header is one canonical 1536 by 509 asset without destructive rebuild', () => {","test('header is one dedicated canonical 800 by 200 Main asset without destructive rebuild', () => {");
+  text=text.replace("assert.match(stageJs, /width','1536'/);","assert.match(stageJs, /width','800'/);");
+  text=text.replace("assert.match(stageJs, /height','509'/);","assert.match(stageJs, /height','200'/);");
+  text=text.replace("assert.match(stageCss, /--s666-header-ratio:1536\\/509/);","assert.match(stageCss, /--s666-header-ratio:4\\/1/);");
+  if(text.includes("width','1536")||text.includes("height','509")||text.includes('1536\\/509')) throw new Error('stale Main header dimension pin remains');
   write(path,text);
 }
 
-const scopeTest=`import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\n\nconst read = path => readFile(new URL(\`../\${path}\`, import.meta.url), 'utf8');\nconst bytes = path => readFile(new URL(\`../\${path}\`, import.meta.url));\nconst MAIN='/assets/main/header/666soundsdesign-lyvra-main-header.webp?v=2026-09-05-main-header-v1';\nconst VELUNA='/assets/veluna/header/veluna-player-header.webp';\n\ntest('dedicated Main header asset is mirrored and Main-only', async () => {\n  const html=await read('index.html');\n  const pub=await read('public/index.html');\n  const stage=await read('js/player-stage-v2.js');\n  const css=await read('css/player-stage-v2.css');\n  assert.equal(pub,html);\n  assert.equal(await read('public/js/player-stage-v2.js'),stage);\n  assert.equal(await read('public/css/player-stage-v2.css'),css);\n  assert.match(html,/assets\\/main\\/header\\/666soundsdesign-lyvra-main-header\\.webp/);\n  assert.match(stage,/assets\\/main\\/header\\/666soundsdesign-lyvra-main-header\\.webp/);\n  assert.doesNotMatch(html,/assets\\/veluna\\/header\\/veluna-player-header\\.webp/);\n  assert.match(css,/MAIN_HEADER_BRAND_V1_20260905/);\n  assert.match(css,/width:min\\(420px,44vw\\)/);\n  assert.match(css,/width:min\\(78vw,280px\\)/);\n  const rootAsset=await bytes('assets/main/header/666soundsdesign-lyvra-main-header.webp');\n  const publicAsset=await bytes('public/assets/main/header/666soundsdesign-lyvra-main-header.webp');\n  assert.ok(rootAsset.length>20000);\n  assert.deepEqual(rootAsset,publicAsset);\n  for(const path of ['veluna/index.html','VELUNA/index.html','public/veluna/index.html','public/VELUNA/index.html','config/veluna-assets.js','public/config/veluna-assets.js']){\n    const text=await read(path);\n    assert.ok(!text.includes(MAIN), path+' must not adopt Main header');\n  }\n  const velunaJoined=(await read('veluna/index.html'))+'\\n'+(await read('config/veluna-assets.js'));\n  assert.ok(velunaJoined.includes(VELUNA), 'VELUNA keeps its own header asset');\n});\n`;
+{
+  const path='tests/frontend-contracts.test.mjs';
+  let text=read(path);
+  text=text.replace("assert.match(stage, /veluna-player-header\\.webp/);","assert.match(stage, /assets\\/main\\/header\\/666soundsdesign-lyvra-main-header\\.webp/);");
+  write(path,text);
+}
+
+{
+  const path='tests/radio-only-cleanup.test.mjs';
+  let text=read(path);
+  text=text.replace('assert.equal(rootAssets.length, 18);','assert.equal(rootAssets.length, 19);');
+  text=text.replace('assert.equal(publicAssets.length, 18);','assert.equal(publicAssets.length, 19);');
+  if(!text.includes("normalizedRoot.includes('main/header/666soundsdesign-lyvra-main-header.webp')")){
+    text=text.replace("assert.ok(normalizedRoot.includes('boot-screen/lyvra-radio-boot.jpg'), 'central LYVRA radio boot image must be part of the mirrored production asset set');","assert.ok(normalizedRoot.includes('boot-screen/lyvra-radio-boot.jpg'), 'central LYVRA radio boot image must be part of the mirrored production asset set');\n  assert.ok(normalizedRoot.includes('main/header/666soundsdesign-lyvra-main-header.webp'), 'dedicated Main header image must be part of the mirrored production asset set');");
+  }
+  write(path,text);
+}
+
+const scopeTest=`import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { readFile } from 'node:fs/promises';\n\nconst read = path => readFile(new URL(\`../\${path}\`, import.meta.url), 'utf8');\nconst bytes = path => readFile(new URL(\`../\${path}\`, import.meta.url));\nconst MAIN='/assets/main/header/666soundsdesign-lyvra-main-header.webp?v=2026-09-05-main-header-v1';\nconst VELUNA='/assets/veluna/header/veluna-player-header.webp';\n\ntest('dedicated Main header asset is mirrored, valid WebP and Main-only', async () => {\n  const html=await read('index.html');\n  const pub=await read('public/index.html');\n  const stage=await read('js/player-stage-v2.js');\n  const css=await read('css/player-stage-v2.css');\n  assert.equal(pub,html);\n  assert.equal(await read('public/js/player-stage-v2.js'),stage);\n  assert.equal(await read('public/css/player-stage-v2.css'),css);\n  assert.match(html,/assets\\/main\\/header\\/666soundsdesign-lyvra-main-header\\.webp/);\n  assert.match(stage,/assets\\/main\\/header\\/666soundsdesign-lyvra-main-header\\.webp/);\n  assert.doesNotMatch(html,/assets\\/veluna\\/header\\/veluna-player-header\\.webp/);\n  assert.match(css,/MAIN_HEADER_BRAND_V1_20260905/);\n  assert.match(css,/width:min\\(420px,44vw\\)/);\n  assert.match(css,/width:min\\(78vw,280px\\)/);\n  const rootAsset=await bytes('assets/main/header/666soundsdesign-lyvra-main-header.webp');\n  const publicAsset=await bytes('public/assets/main/header/666soundsdesign-lyvra-main-header.webp');\n  assert.ok(rootAsset.length>20000);\n  assert.equal(rootAsset.subarray(0,4).toString('ascii'),'RIFF');\n  assert.equal(rootAsset.subarray(8,12).toString('ascii'),'WEBP');\n  assert.deepEqual(rootAsset,publicAsset);\n  for(const path of ['veluna/index.html','VELUNA/index.html','public/veluna/index.html','public/VELUNA/index.html','config/veluna-assets.js','public/config/veluna-assets.js']){\n    const text=await read(path);\n    assert.ok(!text.includes(MAIN), path+' must not adopt Main header');\n  }\n  const velunaJoined=(await read('veluna/index.html'))+'\\n'+(await read('config/veluna-assets.js'));\n  assert.ok(velunaJoined.includes(VELUNA), 'VELUNA keeps its own header asset');\n});\n`;
 write('tests/main-header-brand-scope.test.mjs',scopeTest);
 
-// Hard mirrors and scope boundary.
 if(read('index.html')!==read('public/index.html')) throw new Error('root/public index mismatch');
 if(read('js/player-stage-v2.js')!==read('public/js/player-stage-v2.js')) throw new Error('stage JS mirror mismatch');
 if(read('css/player-stage-v2.css')!==read('public/css/player-stage-v2.css')) throw new Error('stage CSS mirror mismatch');
