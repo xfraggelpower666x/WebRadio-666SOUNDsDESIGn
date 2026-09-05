@@ -25,3 +25,57 @@ test('desktop side meters stay fully visible above overlapping DNA side rails', 
   assert.match(stage, /\.frame-stage \.pc-side-addon\{[^}]*z-index:7!important/);
   assert.match(overlay, /\.frame-stage > \.side-meter\{\s*z-index:10!important;/);
 });
+
+test('PC layout controller no longer activates late fixed canvas and restores independent FX toggles', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.equal(await read('public/js/pc-fixed-canvas.js'), controller);
+  assert.doesNotMatch(controller, /classList\.add\(['"]pc-fixed-canvas['"]\)/);
+  assert.doesNotMatch(controller, /CANVAS_WIDTH|CANVAS_HEIGHT|MAX_SCALE/);
+  assert.match(controller, /classList\.remove\(['"]pc-fixed-canvas['"]\)/);
+  assert.match(controller, /s666_pc_addon_fx_v128/);
+  assert.match(controller, /pcLeftFxToggle/);
+  assert.match(controller, /pcRightFxToggle/);
+  assert.match(controller, /pc-\$\{side\}-addon-off/);
+  assert.match(controller, /applyResponsivePlayerExpansion/);
+  assert.match(controller, /style\.setProperty\('width',[\s\S]*'important'\)/);
+  assert.match(controller, /style\.setProperty\('transform',[\s\S]*'important'\)/);
+});
+
+test('PC layout controller reuses upper HUD for VELUNA and removes desktop runtime timeline from lower controls', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.match(controller, /playerDesignSwitch/);
+  assert.match(controller, /\.top-hud \.systempanel-right/);
+  assert.match(controller, /topRight\.appendChild\(veluna\)/);
+  assert.match(controller, /veluna\.textContent = 'VELUNA'/);
+  assert.match(controller, /\.bottom-console \.timeline-wrap/);
+  assert.match(controller, /timeline\.style\.setProperty\('display', 'none', 'important'\)/);
+  assert.match(controller, /grid-template-columns', 'minmax\(0,1fr\) minmax\(142px,174px\)'/);
+});
+
+test('canonical desktop ticker starts visible at the left edge and only travels its measured overflow', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.match(controller, /function normalizeTicker\(\)/);
+  assert.match(controller, /ticker\.style\.setProperty\('padding-left', '0', 'important'\)/);
+  assert.match(controller, /ticker\.style\.setProperty\('animation', 'none', 'important'\)/);
+  assert.match(controller, /ticker\.scrollWidth - viewport\.clientWidth/);
+  assert.match(controller, /ticker\.animate\(/);
+  assert.match(controller, /translateX\(0\)/);
+  assert.match(controller, /s666:metadata-live/);
+  assert.doesNotMatch(controller, /cloneNode|createElement\([^)]*ticker/i);
+});
+
+test('desktop system panel distinguishes status indicators from real actions and reuses existing controllers', async () => {
+  const controller = await read('js/pc-fixed-canvas.js');
+  assert.match(controller, /function bindSystemPanel\(\)/);
+  assert.match(controller, /'statusStream', 'statusBuffer', 'statusSource', 'statusMeta'/);
+  assert.match(controller, /'statusWorker', 'statusAudio', 'statusWatchdog', 'statusMeter', 'statusGovee'/);
+  assert.match(controller, /chip\.dataset\.panelRole = 'status'/);
+  assert.match(controller, /\['mainBtn', 'fallbackBtn', 'statusAdmin'\]/);
+  assert.match(controller, /reconnect\.dataset\.panelRole = 'action'/);
+  assert.match(controller, /reconnectButton\.click\(\)/);
+  assert.match(controller, /discord\.dataset\.panelRole = 'action-status'/);
+  assert.match(controller, /S666DiscordPlayerAddonV3/);
+  assert.match(controller, /addon\.messagePost\(\)/);
+  assert.match(controller, /s666:discord-state/);
+  assert.match(controller, /addon\.checkStatus\(\)/);
+});
