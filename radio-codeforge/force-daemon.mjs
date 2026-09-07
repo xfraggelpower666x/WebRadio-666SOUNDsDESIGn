@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 
 const root = process.cwd();
 const configPath = join(root, 'radio-codeforge', 'radio-codeforge.config.json');
+const learningProfilePath = join(root, 'radio-codeforge', 'learning-profile.json');
 
 function fail(message) {
   console.error(`RADIO_CODEFORGE_FORCE=FAIL ${message}`);
@@ -28,8 +29,13 @@ if (!existsSync(configPath)) {
   fail('missing radio-codeforge configuration');
   process.exit();
 }
+if (!existsSync(learningProfilePath)) {
+  fail('missing radio-codeforge learning profile');
+  process.exit();
+}
 
 const config = JSON.parse(readFileSync(configPath, 'utf8'));
+const learningProfile = JSON.parse(readFileSync(learningProfilePath, 'utf8'));
 const violations = [];
 const findings = [];
 const recommendations = [];
@@ -39,6 +45,25 @@ if (config.sourceMutationAuthority !== false) violations.push('sourceMutationAut
 if (config.deploymentMutationAuthority !== false) violations.push('deploymentMutationAuthority must remain false');
 if (config.pfsMutationAuthority !== false) violations.push('pfsMutationAuthority must remain false');
 if (config.activeDevelopmentAssistance !== true) violations.push('activeDevelopmentAssistance must remain true');
+
+if (config.learningSource?.system !== '666CODEFORGE') violations.push('learning source must remain 666CODEFORGE');
+if (config.learningSource?.mode !== 'learn-and-adapt-only') violations.push('learning mode must remain learn-and-adapt-only');
+for (const field of ['identityImport', 'triggerImport', 'authorityImport', 'namespaceImport']) {
+  if (config.learningSource?.[field] !== false) violations.push(`learning boundary ${field} must remain false`);
+}
+
+if (learningProfile.learningMode !== 'capability-adaptation-only') violations.push('learning profile must remain capability-adaptation-only');
+for (const [key, value] of Object.entries(learningProfile.identityBoundary ?? {})) {
+  if (value !== false) violations.push(`learning profile identity boundary ${key} must remain false`);
+}
+
+const codex = config.codexEscalation ?? {};
+if (codex.enabled !== true) violations.push('Codex escalation must remain enabled');
+if (codex.automaticProductionAuthority !== false) violations.push('Codex production authority must remain false');
+if (codex.automaticSourceMutationAuthority !== false) violations.push('Codex source mutation authority must remain false');
+if (codex.hostOrChatRoutingRequired !== true) violations.push('Codex escalation must require host/chat routing');
+if (codex.resultMustBeReviewedByRadioCodeForge !== true) violations.push('Codex result must require Radio-CodeForge review');
+if (codex.resultMustPassRadioAuditBeforePromotion !== true) violations.push('Codex result must pass Radio-CodeForge audit before promotion');
 
 const textExtensions = new Set(['.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.json', '.html', '.css', '.scss', '.md', '.yml', '.yaml', '.toml']);
 const trackedFiles = git(['ls-files']).split('\n').filter(Boolean);
@@ -126,8 +151,26 @@ for (const requiredScript of ['check', 'test', 'verify']) {
 if (!packageJson.scripts?.['radio:codeforge']) violations.push('package.json missing radio:codeforge force binding');
 
 const capabilities = config.activeCapabilities ?? [];
-for (const required of ['develop-assist', 'audit', 'verify', 'improve', 'evolve', 'continuity']) {
+for (const required of [
+  'develop-assist', 'audit', 'verify', 'improve', 'evolve', 'continuity',
+  'root-cause-analysis', 'repository-topology-analysis', 'deployment-relationship-analysis',
+  'research-before-repair', 'repair-revalidation', 'current-before-history', 'evidence-before-pass'
+]) {
   if (!capabilities.includes(required)) violations.push(`missing active capability: ${required}`);
+}
+
+const seriousFailedAttempts = Number.parseInt(process.env.RADIO_CODEFORGE_FAILED_ATTEMPTS ?? '0', 10) || 0;
+const complexitySignals = [
+  touchedDomains.length >= 3,
+  productionChanges.length >= 5,
+  workflowChanges.length > 0 && productionChanges.length > 0,
+  seriousFailedAttempts >= (codex.triggerAfterSeriousFailedAttempts ?? 3)
+].filter(Boolean).length;
+const codexEscalationRecommended = codex.enabled === true && (seriousFailedAttempts >= (codex.triggerAfterSeriousFailedAttempts ?? 3) || complexitySignals >= 2);
+
+if (codexEscalationRecommended) {
+  findings.push('complexity/blocker threshold reached for emergency Codex escalation');
+  recommendations.push('Request Codex assistance through the available host/chat route. Treat Codex as a helper only; review its result in Radio-CodeForge and run the full radio audit/revalidation before promotion.');
 }
 
 const finalRecommendations = unique(recommendations);
@@ -137,6 +180,9 @@ console.log(`RADIO_CODEFORGE_SYSTEM=${config.systemId}`);
 console.log('RADIO_CODEFORGE_MODE=ACTIVE_PARALLEL_DEVELOPMENT_ASSISTANT');
 console.log('RADIO_CODEFORGE_RUNTIME_INFILTRATION=FORBIDDEN');
 console.log('RADIO_CODEFORGE_MUTATION_AUTHORITY=NONE');
+console.log('RADIO_CODEFORGE_LEARNING_SOURCE=666CODEFORGE');
+console.log('RADIO_CODEFORGE_LEARNING_MODE=CAPABILITY_ADAPTATION_ONLY');
+console.log(`RADIO_CODEFORGE_LEARNED_CAPABILITIES=${learningProfile.adaptedCapabilities?.length ?? 0}`);
 console.log(`RADIO_CODEFORGE_BRANCH=${branch || 'DETACHED'}`);
 console.log(`RADIO_CODEFORGE_COMMIT=${commit}`);
 console.log(`RADIO_CODEFORGE_DIFF_RANGE=${diffRange || 'UNAVAILABLE'}`);
@@ -144,6 +190,8 @@ console.log(`RADIO_CODEFORGE_CHANGED_FILES=${changedNames.length}`);
 console.log(`RADIO_CODEFORGE_DOMAINS=${touchedDomains.join(',') || 'NONE'}`);
 console.log(`RADIO_CODEFORGE_FINDINGS=${finalFindings.length}`);
 console.log(`RADIO_CODEFORGE_RECOMMENDATIONS=${finalRecommendations.length}`);
+console.log(`RADIO_CODEFORGE_CODEX_ESCALATION=${codexEscalationRecommended ? 'RECOMMENDED' : 'NOT_REQUIRED'}`);
+console.log('RADIO_CODEFORGE_CODEX_AUTHORITY=NONE');
 for (const finding of finalFindings) console.log(`RADIO_CODEFORGE_FINDING=${finding}`);
 for (const recommendation of finalRecommendations) console.log(`RADIO_CODEFORGE_RECOMMENDATION=${recommendation}`);
 
@@ -155,6 +203,9 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Branch: \`${branch || 'DETACHED'}\``,
     `- Changed files: **${changedNames.length}**`,
     `- Touched domains: **${touchedDomains.join(', ') || 'none'}**`,
+    `- Learning source: **666CODEFORGE / capability-adaptation-only**`,
+    `- Adapted capabilities: **${learningProfile.adaptedCapabilities?.length ?? 0}**`,
+    `- Codex escalation: **${codexEscalationRecommended ? 'RECOMMENDED' : 'not required'}**`,
     `- Runtime infiltration: **FORBIDDEN**`,
     `- Source mutation authority: **NONE**`,
     '',
@@ -176,6 +227,7 @@ if (violations.length) {
   fail(`${violations.length} force contract violation(s)`);
 } else {
   console.log('RADIO_CODEFORGE_ACTIVE_ASSISTANCE=PASS');
+  console.log('RADIO_CODEFORGE_LEARNING_INTEGRATION=PASS');
   console.log('RADIO_CODEFORGE_ISOLATION=PASS');
   console.log('RADIO_CODEFORGE_FORCE=PASS');
 }
