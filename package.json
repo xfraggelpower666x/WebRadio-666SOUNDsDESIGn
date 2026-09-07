@@ -7,7 +7,8 @@
   "scripts": {
     "check": "node scripts/check-release.mjs",
     "test": "node --test tests/*.test.mjs",
-    "verify": "npm run check && npm test",
+    "radio:codeforge": "node radio-codeforge/force-daemon.mjs",
+    "verify": "npm run check && npm run radio:codeforge && npm test",
     "deploy": "npx wrangler deploy",
     "deploy:legacy-root": "cd workers/webradio-666soundsdesign-worker && npx wrangler deploy",
     "verify:deployment": "node scripts/verify-deployment.mjs"

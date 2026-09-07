@@ -1,0 +1,29 @@
+name: 666 RADIO-CODEFORGE Force Daemon
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  radio-codeforge-force:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run 666 RADIO-CODEFORGE parallel force daemon
+        run: npm run radio:codeforge
