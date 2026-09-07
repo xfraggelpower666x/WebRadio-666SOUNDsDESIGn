@@ -1,0 +1,41 @@
+{
+  "schema": "666-radio-codeforge-force-v1",
+  "systemId": "666-RADIO-CODEFORGE-001",
+  "systemName": "666 RADIO-CODEFORGE",
+  "mode": "parallel-development-assistant",
+  "runtimeIntegration": false,
+  "sourceMutationAuthority": false,
+  "deploymentMutationAuthority": false,
+  "pfsMutationAuthority": false,
+  "automatic": {
+    "npmVerify": true,
+    "githubPush": true,
+    "githubPullRequest": true
+  },
+  "forbiddenRuntimeRoots": [
+    "public",
+    "workers",
+    "functions",
+    "src",
+    "assets",
+    "666SOUNDsDESIGn"
+  ],
+  "forbiddenRuntimeReferencePatterns": [
+    "radio-codeforge/",
+    "radio-codeforge\\\\",
+    "force-daemon.mjs"
+  ],
+  "protectedForeignNamespaces": [
+    "666CF"
+  ],
+  "principles": [
+    "observe-before-change",
+    "readback-after-mutation",
+    "no-runtime-infiltration",
+    "no-source-identity-import",
+    "no-source-trigger-import",
+    "no-source-authority-import",
+    "no-blind-full-rewrite",
+    "repair-with-revalidation"
+  ]
+}
