@@ -1,17 +1,37 @@
 {
-  "schema": "666-radio-codeforge-force-v1",
+  "schema": "666-radio-codeforge-force-v2",
   "systemId": "666-RADIO-CODEFORGE-001",
   "systemName": "666 RADIO-CODEFORGE",
-  "mode": "parallel-development-assistant",
+  "mode": "active-parallel-development-assistant",
+  "activeDevelopmentAssistance": true,
   "runtimeIntegration": false,
   "sourceMutationAuthority": false,
   "deploymentMutationAuthority": false,
   "pfsMutationAuthority": false,
+  "activeCapabilities": [
+    "develop-assist",
+    "audit",
+    "verify",
+    "improve",
+    "evolve",
+    "continuity"
+  ],
   "automatic": {
     "npmVerify": true,
     "githubPush": true,
-    "githubPullRequest": true
+    "githubPullRequest": true,
+    "developmentRiskAnalysis": true,
+    "actionableRecommendations": true,
+    "isolationEnforcement": true
   },
+  "radioProductionRoots": [
+    "public",
+    "workers",
+    "functions",
+    "src",
+    "assets",
+    "666SOUNDsDESIGn"
+  ],
   "forbiddenRuntimeRoots": [
     "public",
     "workers",
@@ -30,6 +50,12 @@
   ],
   "principles": [
     "observe-before-change",
+    "understand-current-delta",
+    "develop-with-evidence",
+    "audit-every-material-change",
+    "verify-before-promotion",
+    "recommend-improvements",
+    "continue-from-last-verified-state",
     "readback-after-mutation",
     "no-runtime-infiltration",
     "no-source-identity-import",
