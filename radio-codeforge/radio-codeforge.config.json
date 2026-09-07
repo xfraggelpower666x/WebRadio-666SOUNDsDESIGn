@@ -1,17 +1,63 @@
 {
-  "schema": "666-radio-codeforge-force-v1",
+  "schema": "666-radio-codeforge-force-v3",
   "systemId": "666-RADIO-CODEFORGE-001",
   "systemName": "666 RADIO-CODEFORGE",
-  "mode": "parallel-development-assistant",
+  "mode": "active-parallel-development-assistant",
+  "activeDevelopmentAssistance": true,
   "runtimeIntegration": false,
   "sourceMutationAuthority": false,
   "deploymentMutationAuthority": false,
   "pfsMutationAuthority": false,
+  "learningSource": {
+    "system": "666CODEFORGE",
+    "mode": "learn-and-adapt-only",
+    "identityImport": false,
+    "triggerImport": false,
+    "authorityImport": false,
+    "namespaceImport": false
+  },
+  "activeCapabilities": [
+    "develop-assist",
+    "audit",
+    "verify",
+    "improve",
+    "evolve",
+    "continuity",
+    "root-cause-analysis",
+    "repository-topology-analysis",
+    "deployment-relationship-analysis",
+    "research-before-repair",
+    "repair-revalidation",
+    "current-before-history",
+    "evidence-before-pass"
+  ],
+  "codexEscalation": {
+    "enabled": true,
+    "role": "emergency-development-helper",
+    "automaticProductionAuthority": false,
+    "automaticSourceMutationAuthority": false,
+    "triggerAfterSeriousFailedAttempts": 3,
+    "hostOrChatRoutingRequired": true,
+    "resultMustBeReviewedByRadioCodeForge": true,
+    "resultMustPassRadioAuditBeforePromotion": true
+  },
   "automatic": {
     "npmVerify": true,
     "githubPush": true,
-    "githubPullRequest": true
+    "githubPullRequest": true,
+    "developmentRiskAnalysis": true,
+    "actionableRecommendations": true,
+    "isolationEnforcement": true,
+    "codexEscalationAssessment": true
   },
+  "radioProductionRoots": [
+    "public",
+    "workers",
+    "functions",
+    "src",
+    "assets",
+    "666SOUNDsDESIGn"
+  ],
   "forbiddenRuntimeRoots": [
     "public",
     "workers",
@@ -29,13 +75,25 @@
     "666CF"
   ],
   "principles": [
+    "rehydrate-before-development",
     "observe-before-change",
+    "understand-current-delta",
+    "current-before-history",
+    "develop-with-evidence",
+    "audit-every-material-change",
+    "verify-before-promotion",
+    "recommend-improvements",
+    "root-cause-before-rewrite",
+    "research-before-repair",
+    "continue-from-last-verified-state",
     "readback-after-mutation",
+    "repair-with-revalidation",
+    "codex-only-as-escalation-helper",
+    "codex-output-requires-radio-review",
     "no-runtime-infiltration",
     "no-source-identity-import",
     "no-source-trigger-import",
     "no-source-authority-import",
-    "no-blind-full-rewrite",
-    "repair-with-revalidation"
+    "no-blind-full-rewrite"
   ]
 }

@@ -1,0 +1,44 @@
+{
+  "schema": "666-radio-codeforge-learning-profile-v1",
+  "targetSystem": "666-RADIO-CODEFORGE-001",
+  "learningSource": "666CODEFORGE",
+  "learningMode": "capability-adaptation-only",
+  "identityBoundary": {
+    "identityImported": false,
+    "triggersImported": false,
+    "authorityImported": false,
+    "namespaceImported": false
+  },
+  "adaptedCapabilities": [
+    "force-rehydration-principle",
+    "interruption-resume-continuity",
+    "current-before-history",
+    "evidence-before-pass",
+    "audit-repair-reaudit",
+    "repository-topology-analysis",
+    "root-cause-before-rewrite",
+    "research-before-repair",
+    "deployment-relationship-analysis",
+    "continuity-daemon-principle",
+    "readback-after-mutation",
+    "no-silent-overwrite",
+    "history-supersession-awareness"
+  ],
+  "radioNativeExtensions": [
+    "player-audio-state-analysis",
+    "metadata-and-reconnect-analysis",
+    "worker-routing-and-cors-analysis",
+    "cloudflare-deployment-analysis",
+    "responsive-player-regression-analysis",
+    "runtime-non-infiltration-guard"
+  ],
+  "codexEscalation": {
+    "enabled": true,
+    "purpose": "emergency help for difficult development or repair blockers",
+    "defaultPath": "RADIO-CODEFORGE solves first",
+    "threshold": "after 3 serious failed repair attempts or when complexity exceeds safe local resolution",
+    "execution": "host-or-chat-routed; GitHub daemon emits escalation recommendation but does not impersonate or silently invoke Codex",
+    "authority": "NONE",
+    "review": "all Codex output must be reviewed, audited, and revalidated by RADIO-CODEFORGE before promotion"
+  }
+}
