@@ -1,3 +1,50 @@
+/*
+ * SYSTEM_MEDIA_CANONICAL_LAUNCH_GUARD_v1
+ * Player-only safety rail for stale GitHub Pages media ownership.
+ * It does NOT alter GitHub/Cloudflare deployment, Pages settings, DNS, workers or repo automation.
+ * If an old player surface is actually running on xfraggelpower666x.github.io, relinquish audio
+ * and navigate that player surface to the canonical WebRadio origin before shared media ownership starts.
+ */
+(() => {
+  'use strict';
+  const CANONICAL_ORIGIN = 'https://webradio.666soundsdesign-broadcaster.com';
+  const LEGACY_PLAYER_HOST = 'xfraggelpower666x.github.io';
+  const host = String(window.location?.hostname || '').toLowerCase();
+  if (host !== LEGACY_PLAYER_HOST) return;
+
+  const path = String(window.location?.pathname || '/').toLowerCase();
+  const declaredPage = String(document.body?.dataset?.velunaPage || '').toLowerCase();
+  const hasAudioSurface = Boolean(document.getElementById('radio') || document.querySelector('audio'));
+  const knownPlayerRoute = path === '/' || path.startsWith('/external-player') || path.startsWith('/extern') || path.startsWith('/veluna') || path.startsWith('/internal');
+  const declaredPlayer = declaredPage === 'main' || declaredPage === 'veluna' || declaredPage === 'internal';
+  if (!hasAudioSurface && !knownPlayerRoute && !declaredPlayer) return;
+
+  let route = '/';
+  if (declaredPage === 'veluna' || path.startsWith('/veluna')) route = '/veluna/';
+  else if (declaredPage === 'internal' || path.startsWith('/internal')) route = '/internal/';
+
+  const target = new URL(route, CANONICAL_ORIGIN);
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    if (params.get('autoplay') === '1') target.searchParams.set('autoplay', '1');
+  } catch (_) {}
+
+  const audio = document.getElementById('radio') || document.querySelector('audio');
+  if (audio) {
+    try { audio.pause?.(); } catch (_) {}
+    try { audio.removeAttribute?.('src'); audio.load?.(); } catch (_) {}
+  }
+
+  window.__S666_MEDIA_CANONICAL_REDIRECT__ = Object.freeze({
+    version: '1.0.0',
+    fromHost: host,
+    route,
+    target: target.toString(),
+    reason: 'legacy-github-pages-player-owner'
+  });
+  try { window.location.replace(target.toString()); } catch (_) {}
+})();
+
 /* Zentrale VELUNA-Asset-, Branding- und Shared-Infrastructure-Quelle. */
 window.VELUNA_ASSETS = Object.freeze({
   release: 'FULLVERSION_CENTRAL_REACTIVE_VISUAL_POLICY_v1.2.30',
