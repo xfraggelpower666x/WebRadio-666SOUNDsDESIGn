@@ -25,11 +25,50 @@ RADIO-CODEFORGE runs in parallel with WebRadio development and actively assists 
 - auditing every material change
 - verifying before promotion
 - finding root causes and recommending repairs
+- detecting duplicate owners, stale layers and competing state writers before adding another fix
+- auditing Root/Public mirror consistency when mirrored files are involved
+- planning regression coverage before promotion
 - analyzing repository topology and deployment relationships
 - recommending improvements and further development
 - preserving continuation from the last verified state
 - checking radio-specific player, audio, metadata, reconnect, worker, CORS and Cloudflare risks
 - enforcing the Radio-CodeForge isolation boundary
+
+## Chat-host development integration
+
+RADIO-CODEFORGE has two complementary development surfaces. They are deliberately separate and both are required for normal radio-code work.
+
+### 1. Chat / host development layer
+
+When radio code is being analyzed, repaired, extended or prepared for repository changes in a capable chat/host environment, the host applies the RADIO-CODEFORGE development contract automatically.
+
+This is not a claim that a second autonomous process is running inside the chat. The host must actively apply the RADIO-CODEFORGE rules as a development co-pilot and audit layer.
+
+Required sequence:
+
+1. rehydrate the current verified repository/project state
+2. inspect the current delta and authoritative owner before changing anything
+3. perform root-cause analysis
+4. audit duplicate owners, stale layers, timers, observers and competing writers
+5. prefer minimal cause-first repair over another overlay or parallel owner
+6. audit mirrored Root/Public files when applicable
+7. define regression coverage for the discovered failure mode
+8. perform controlled repository changes
+9. re-audit/read back the result
+10. hand the resulting commit/PR to the independent GitHub RADIO-CODEFORGE Force Daemon
+11. require Release Integrity before promotion/merge
+
+The chat-host layer does not receive production, deployment, PFS or autonomous mutation authority from RADIO-CODEFORGE. Repository writes still use the host's explicitly available/authorized repository tools and normal project authority.
+
+### 2. GitHub Force Daemon
+
+The GitHub workflow remains an independent second validation layer. It is not replaced by the chat-host development layer and must not be treated as evidence that the pre-change architecture/root-cause audit happened in chat.
+
+The intended development chain is therefore:
+
+`Chat analysis -> RADIO-CODEFORGE host audit -> cause-first repair -> regression plan/test -> controlled repo write/PR -> GitHub RADIO-CODEFORGE Force Daemon -> Release Integrity -> promotion`
+
+The machine-readable host contract is stored in `radio-codeforge/radio-codeforge.config.json` under `chatHostIntegration`.
 
 ## Learning from live 666CODEFORGE
 
@@ -72,6 +111,7 @@ Production source must not import, require, execute, bundle, fetch, or dynamical
 
 Allowed integration points are development-only:
 
+- chat/host application of the machine-readable RADIO-CODEFORGE development contract
 - `npm run radio:codeforge`
 - `npm run verify`
 - GitHub Actions workflow `.github/workflows/radio-codeforge-force.yml`
@@ -82,9 +122,10 @@ It may fail a development check when the isolation contract is violated.
 
 ## Automatic force behavior
 
-The daemon is intentionally automatic in two places:
+RADIO-CODEFORGE is intentionally automatic in three development contexts:
 
-1. local/CI `npm run verify`
-2. GitHub Actions on push and pull request
+1. chat/host radio development: host applies the RADIO-CODEFORGE development contract before and during material radio-code changes
+2. local/CI `npm run verify`
+3. GitHub Actions on push and pull request
 
-This makes RADIO-CODEFORGE run alongside radio development, audit and improvement work without entering the radio runtime.
+This keeps RADIO-CODEFORGE involved from architecture/root-cause analysis through final independent CI validation without entering the radio runtime.
