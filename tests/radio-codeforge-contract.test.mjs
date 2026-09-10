@@ -6,6 +6,7 @@ const config = JSON.parse(readFileSync('radio-codeforge/radio-codeforge.config.j
 const learning = JSON.parse(readFileSync('radio-codeforge/learning-profile.json', 'utf8'));
 const daemon = readFileSync('radio-codeforge/force-daemon.mjs', 'utf8');
 const workflow = readFileSync('.github/workflows/radio-codeforge-force.yml', 'utf8');
+const readme = readFileSync('radio-codeforge/README.md', 'utf8');
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 
 test('Radio-CodeForge remains a non-runtime development assistant', () => {
@@ -33,11 +34,48 @@ test('Radio-CodeForge learns capabilities from live 666CODEFORGE without identit
 test('Radio-CodeForge has active development, audit and evolution capabilities', () => {
   for (const capability of [
     'develop-assist', 'audit', 'verify', 'improve', 'evolve', 'continuity',
-    'root-cause-analysis', 'repository-topology-analysis', 'deployment-relationship-analysis',
+    'root-cause-analysis', 'owner-layer-conflict-analysis', 'mirror-consistency-analysis',
+    'regression-planning', 'repository-topology-analysis', 'deployment-relationship-analysis',
     'research-before-repair', 'repair-revalidation', 'current-before-history', 'evidence-before-pass'
   ]) {
     assert.ok(config.activeCapabilities.includes(capability), `missing ${capability}`);
   }
+});
+
+test('Radio-CodeForge chat-host integration is automatic for radio development and independent from GitHub daemon', () => {
+  const chat = config.chatHostIntegration;
+  assert.equal(chat.enabled, true);
+  assert.equal(chat.automaticForRadioDevelopment, true);
+  assert.equal(chat.mode, 'host-applied-development-contract');
+  assert.equal(chat.separateAutonomousProcessRequired, false);
+  assert.equal(chat.githubForceDaemonIndependent, true);
+  assert.equal(chat.githubForceDaemonReplacesChatLayer, false);
+  assert.equal(chat.mustRehydrateCurrentStateBeforeChange, true);
+  assert.equal(chat.mustRunRootCauseAnalysisBeforeRepair, true);
+  assert.equal(chat.mustAuditOwnerAndLayerConflicts, true);
+  assert.equal(chat.mustAuditMirrorConsistency, true);
+  assert.equal(chat.mustPlanRegressionCoverage, true);
+  assert.equal(chat.mustReauditAfterChange, true);
+  assert.equal(chat.mustVerifyBeforePromotion, true);
+  assert.equal(chat.mustPreserveNativeRadioAuthority, true);
+  assert.equal(chat.mustNotEnterRuntime, true);
+  assert.deepEqual(chat.developmentSequence, [
+    'rehydrate-current-state',
+    'inspect-current-delta',
+    'root-cause-analysis',
+    'owner-layer-conflict-audit',
+    'minimal-repair-plan',
+    'regression-test-plan',
+    'controlled-repo-write',
+    'post-change-re-audit',
+    'github-force-daemon',
+    'release-integrity',
+    'promotion'
+  ]);
+  assert.equal(config.automatic.chatRadioDevelopment, true);
+  assert.match(readme, /Chat \/ host development layer/);
+  assert.match(readme, /GitHub Force Daemon/);
+  assert.match(readme, /GitHub RADIO-CODEFORGE Force Daemon -> Release Integrity -> promotion/);
 });
 
 test('Radio-CodeForge force daemon enforces isolation instead of mutating radio code', () => {
