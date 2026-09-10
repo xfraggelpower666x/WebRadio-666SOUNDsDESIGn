@@ -1,9 +1,13 @@
 /*
 ==========================================
 DATEI: external-player/js/shared-status.js
-GEÄNDERT: 2026-04-30
-ZWECK: Zentrale Zustandsumschaltung für STR/META/SRC/H/B-Chips.
-ÄNDERUNG: v59 PC LED STATE LOGIC FIX REPAIRED.
+GEÄNDERT: 2026-09-10
+ZWECK: Zentrale Zustandsumschaltung für Systempanel-LEDs.
+ÄNDERUNG: STOP-IDLE-LOCK — wenn data-player-state="stopped" aktiv ist,
+          werden alle oberen Cockpit-Status-LEDs neutralisiert. Separate
+          Runtime-Owner (z. B. Worker/Watchdog/Govee/Discord/Admin) dürfen
+          weiterarbeiten, können aber im STOP-Zustand keine aktive/blinkende
+          LED mehr in die Header-Leiste schreiben.
 FARBLOGIK:
 - ok / main / api / external / active / playing / ready / online = türkis
 - warn / error / stopped / paused / offline / bad = pink
@@ -63,9 +67,34 @@ const ALL_STATE_CLASSES = [
   'is-active'
 ];
 
+const STOP_LOCKED_HEADER_LED_IDS = new Set([
+  'statusStream',
+  'statusBuffer',
+  'statusSource',
+  'statusMeta',
+  'statusWorker',
+  'statusAudio',
+  'statusWatchdog',
+  'statusReconnect',
+  'statusMeter',
+  'mainBtn',
+  'fallbackBtn',
+  'statusDiscord',
+  'statusAdmin',
+  'statusGovee'
+]);
+
+function isTransportStoppedForHeaderLed(el) {
+  if (!el || !STOP_LOCKED_HEADER_LED_IDS.has(el.id)) return false;
+  const rootState = String(document.documentElement?.getAttribute('data-player-state') || '').toLowerCase();
+  const bodyState = String(document.body?.getAttribute('data-player-state') || '').toLowerCase();
+  return rootState === 'stopped' || bodyState === 'stopped';
+}
+
 export function applyStatusChip(el, state = 'empty', tooltip = '') {
   if (!el) return;
-  const normalized = String(state || 'empty').toLowerCase();
+  const requested = String(state || 'empty').toLowerCase();
+  const normalized = isTransportStoppedForHeaderLed(el) ? 'empty' : requested;
   const nextClass = STATE_CLASS_MAP.get(normalized) || 'state-empty';
 
   ALL_STATE_CLASSES.forEach((className) => el.classList.remove(className));
