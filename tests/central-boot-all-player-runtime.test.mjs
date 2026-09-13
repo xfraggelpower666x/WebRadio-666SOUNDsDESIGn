@@ -36,7 +36,7 @@ test('central boot is an early single owner and removes legacy splash surfaces',
   assert.equal(await read('public/components/boot-screen/boot-screen.html'), template);
   assert.equal(await read('public/js/veluna-splash.js'), legacySplash);
 
-  assert.match(boot, /Central Player Boot \+ Session Identity v2\.1\.0/);
+  assert.match(boot, /Central Player Boot \+ Session Identity v2\.2\.0/);
   assert.match(boot, /primeBootShell\(\);/);
   assert.match(boot, /document\.documentElement\.classList\.add\('s666-central-boot-active'\)/);
   assert.match(boot, /#bootOverlay,\[data-veluna-central-splash=/);
@@ -49,6 +49,17 @@ test('central boot is an early single owner and removes legacy splash surfaces',
   assert.match(legacySplash, /compatibility stub v2\.0\.0/);
   assert.match(legacySplash, /disabled-central-boot-owner/);
   assert.doesNotMatch(legacySplash, /createElement\('video'\)|video\.play\(|setTimeout\(finish/);
+});
+
+test('main gets the Cyber HUD skin while Veluna and internal keep the legacy boot surface', async () => {
+  const boot = await read('js/central-boot-screen.js');
+  assert.match(boot, /function legacyBootMarkup\(\)/);
+  assert.match(boot, /function mainCyberHudMarkup\(\)/);
+  assert.match(boot, /identity\.page==='main' \? mainCyberHudMarkup\(\) : legacyBootMarkup\(\)/);
+  assert.match(boot, /data-main-cyber-hud=\\"1\\"/);
+  assert.match(boot, /root\.dataset\.bootSkin=identity\.page==='main'\?'main-cyber-hud-v1':'central-legacy'/);
+  assert.match(boot, /if\(page==='veluna'\) return \{page,device,playerId:'veluna'/);
+  assert.match(boot, /if\(page==='internal'\) return \{page,device,playerId:'internal'/);
 });
 
 test('player identity owns route-specific manifests for hub iphone android veluna and internal', async () => {
