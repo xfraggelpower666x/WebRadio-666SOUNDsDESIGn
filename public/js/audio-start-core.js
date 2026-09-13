@@ -1,7 +1,7 @@
 /*
 ==========================================
 DATEI: js/audio-start-core.js
-VERSION: v1.2.24
+VERSION: v1.2.25
 ZWECK:
 - Ein zentraler, iPhone-sicherer Audio-Startablauf für 666 PLAYER und VELUNA.
 - Native HTMLAudioElement-Wiedergabe wird direkt gestartet.
@@ -15,6 +15,7 @@ ZWECK:
 - v1.2.22: stale/cancelled Startrequests dürfen das gemeinsame Audioelement niemals pausieren; echter Stop/Pause bleibt ausschließlich beim jeweiligen Transport-Owner.
 - v1.2.23: Main-Cyberboot erhält einen frühen Pre-Paint-Lock. Desktop-Frame und Mobile-MFF werden erst nach Entfernung des einmal gesehenen Central-Boot-Owners sichtbar; Failsafe verhindert einen hängenbleibenden schwarzen Screen.
 - v1.2.24: der Main-Cyberboot-Owner startet erst nach vorhandenem document.body. Während Preflight ist der komplette normale Body verborgen; nur der Central Boot darf sichtbar sein. Fehlt dessen Mount nach 1.5 s, wird der Player fail-open vollständig freigegeben statt als halber Zwischenzustand stehenzubleiben.
+- v1.2.25: Main/iPhone Cyber-HUD-Boot nutzt neue cache-busted Central-Boot-CSS/JS-Versionen und markiert den sichtbaren Boot-Handoff explizit.
 ==========================================
 */
 (function installS666AudioStartCore(global) {
@@ -101,6 +102,7 @@ ZWECK:
           bootSeen = true;
           try { global.clearTimeout(bootMountTimer); } catch (_) {}
           html.setAttribute('data-main-boot-preflight', 'boot-visible');
+          html.setAttribute('data-main-cyber-hud-handoff', boot.dataset.bootSkin || 'central-boot-visible');
           return;
         }
         if (bootSeen) releasePreflight('boot-handoff-complete');
@@ -116,7 +118,7 @@ ZWECK:
       if (!Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(link => String(link.getAttribute('href') || '').includes(cssBase))) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = cssBase + '?v=20260903-main-boot-body-mount-v2';
+        link.href = cssBase + '?v=20260913-main-cyber-hud-v1';
         link.dataset.s666MainEarlyBoot = 'css';
         head.appendChild(link);
       }
@@ -152,7 +154,7 @@ ZWECK:
           return;
         }
         const script = document.createElement('script');
-        script.src = jsBase + '?v=20260903-main-boot-body-mount-v2';
+        script.src = jsBase + '?v=20260913-main-cyber-hud-v1';
         script.async = false;
         script.defer = false;
         script.dataset.s666MainEarlyBoot = 'js';

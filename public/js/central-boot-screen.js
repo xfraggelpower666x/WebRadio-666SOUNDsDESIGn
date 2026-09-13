@@ -1,5 +1,6 @@
-/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.1.0
+/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.2.0
  * One boot owner for Hub/Main, iPhone, Android, VELUNA and Internal.
+ * Main/iPhone use the 666 Cyber HUD boot skin; VELUNA/Internal keep their existing boot presentation.
  * Also owns route-specific PWA + MediaSession identity used by system media surfaces.
  * No stream/audio graph/EQ/boost/Discord transport changes.
  */
@@ -7,11 +8,12 @@
   'use strict';
   if(global.S666CentralBootScreen) return;
 
-  const VERSION='2.1.0';
-  const STYLE_URL='/css/central-boot-screen.css?v=20260812-v200';
+  const VERSION='2.2.0';
+  const STYLE_URL='/css/central-boot-screen.css?v=20260913-main-cyber-hud-v1';
   const DEFAULT_DURATION=4200;
+  const MAIN_DURATION=6000;
   const OWNER_KEY='s666_active_player_owner_v2';
-  const BOOT_MARKER='2026-08-13-root-identity-regression-v4';
+  const BOOT_MARKER='2026-09-13-main-cyber-hud-v1';
 
   let root=null,raf=0,startAt=0,duration=DEFAULT_DURATION,lastPhase=-1,readyPromise=null;
 
@@ -204,7 +206,7 @@
     }
   }
 
-  function bootMarkup(){
+  function legacyBootMarkup(){
     return '<div class="s666boot-scanlines" aria-hidden="true"></div>'+
       '<section class="s666boot-panel" aria-live="polite">'+
       '<p class="s666boot-eyebrow">666SOUNDsDESIGn RADIO SYSTEM</p>'+
@@ -220,6 +222,41 @@
       '</div></section>';
   }
 
+  function mainCyberHudMarkup(){
+    return '<div class="s666boot-main-hud" data-main-cyber-hud="1" aria-live="polite">'+
+      '<div class="s666boot-main-grid" aria-hidden="true"></div>'+
+      '<div class="s666boot-main-reactor" aria-hidden="true"></div>'+
+      '<div class="s666boot-main-circuit s666boot-main-circuit-left" aria-hidden="true"></div>'+
+      '<div class="s666boot-main-circuit s666boot-main-circuit-right" aria-hidden="true"></div>'+
+      '<p class="s666boot-main-system">SYSTEM ONLINE</p>'+
+      '<h1 id="s666boot-title" class="s666boot-main-title">666 CYBER BOOT</h1>'+
+      '<div class="s666boot-main-logo-wrap" aria-hidden="true">'+
+        '<div class="s666boot-main-six-arc"><span>6</span><span>6</span><span>6</span></div>'+
+        '<img class="s666boot-main-logo" src="/assets/boot-screen/666-cyber-hud-main-logo.webp?v=20260913-main-cyber-hud-v1" alt="">'+
+        '<div class="s666boot-main-om">ॐ</div>'+
+        '<div class="s666boot-main-eye s666boot-main-eye-left"></div><div class="s666boot-main-eye s666boot-main-eye-right"></div>'+
+      '</div>'+
+      '<div class="s666boot-main-label s666boot-main-label-left" data-text="666SOUNDsDESIGn">666SOUNDsDESIGn</div>'+
+      '<div class="s666boot-main-label s666boot-main-label-right" data-text="© FRAGGLEPOWER666">© FRAGGLEPOWER666</div>'+
+      '<div class="s666boot-main-progress-dock">'+
+        '<p class="s666boot-status" id="s666boot-status">INITIALIZING PLAYER</p>'+
+        '<div class="s666boot-progress-wrap" aria-label="Player boot progress">'+
+          '<div class="s666boot-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="s666boot-track"><div class="s666boot-bar" id="s666boot-bar"></div></div>'+
+          '<div class="s666boot-percent" id="s666boot-percent">0%</div>'+
+        '</div>'+
+        '<p class="s666boot-phase-label" id="s666boot-phase">CONNECTING RADIO CORE</p>'+
+        '<div class="s666boot-steps" aria-hidden="true">'+
+          '<div class="s666boot-step active" data-step="0">Connect</div><div class="s666boot-step" data-step="1">Audio</div><div class="s666boot-step" data-step="2">Systems</div><div class="s666boot-step" data-step="3">Player</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="s666boot-main-scanline" aria-hidden="true"></div>'+
+    '</div>';
+  }
+
+  function bootMarkup(){
+    return identity.page==='main' ? mainCyberHudMarkup() : legacyBootMarkup();
+  }
+
   function primeBootShell(){
     ensureStyle();
     const existing=document.getElementById('s666CentralBoot');
@@ -233,9 +270,11 @@
       root.dataset.player=identity.playerId;
       root.dataset.playerRoute=identity.route;
       root.dataset.bootOwner=BOOT_MARKER;
+      root.dataset.bootSkin=identity.page==='main'?'main-cyber-hud-v1':'central-legacy';
       root.innerHTML=bootMarkup();
       (document.body||document.documentElement).appendChild(root);
     }
+    if(identity.page==='main') document.documentElement.dataset.s666MainBootVisible='1';
     document.documentElement.classList.add('s666-central-boot-active');
     return root;
   }
@@ -279,6 +318,7 @@
     if(n.bar)n.bar.style.width=p+'%';
     if(n.percent)n.percent.textContent=p+'%';
     if(n.track)n.track.setAttribute('aria-valuenow',String(p));
+    root.dataset.progress=String(p);
     let current=phases[0];
     for(const phase of phases)if(p>=phase.at)current=phase;
     const idx=phases.indexOf(current);
@@ -305,7 +345,8 @@
   async function show(options={}){
     await mount();
     cancelAnimationFrame(raf);
-    duration=Math.max(600,Number(options.duration)||DEFAULT_DURATION);
+    const fallbackDuration=identity.page==='main'?MAIN_DURATION:DEFAULT_DURATION;
+    duration=Math.max(600,Number(options.duration)||fallbackDuration);
     startAt=performance.now();
     lastPhase=-1;
     root.dataset.state='booting';
@@ -334,6 +375,7 @@
     root.dataset.closeReason=String(reason);
     global.setTimeout(()=>{
       if(root){root.remove();root=null;}
+      if(identity.page==='main') delete document.documentElement.dataset.s666MainBootVisible;
       document.documentElement.classList.remove('s666-central-boot-active');
       detachLegacyBootDom();
     },300);
