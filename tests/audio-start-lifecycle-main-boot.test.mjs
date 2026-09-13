@@ -44,7 +44,14 @@ test('main cyberboot never exposes a partial player while the boot owner is pend
 test('main cyberboot waits for document.body before starting the central boot owner',()=>{
   assert.match(root,/const startBootOwner = \(\) => \{/);
   assert.match(root,/if \(document\.readyState === 'loading' \|\| !document\.body\) \{[\s\S]*DOMContentLoaded', startBootOwner/);
-  assert.match(root,/script\.src = jsBase \+ '\?v=20260903-main-boot-body-mount-v2'/);
+  assert.match(root,/script\.src = jsBase \+ '\?v=20260913-main-cyber-hud-v1'/);
+  assert.match(root,/link\.href = cssBase \+ '\?v=20260913-main-cyber-hud-v1'/);
+});
+
+test('main cyberboot records the visible Cyber HUD handoff so a mounted-but-hidden regression is detectable',()=>{
+  assert.match(root,/data-main-cyber-hud-handoff/);
+  assert.match(root,/boot\.dataset\.bootSkin \|\| 'central-boot-visible'/);
+  assert.match(root,/data-main-boot-preflight', 'boot-visible'/);
 });
 
 test('main cyberboot fails open quickly if the central boot never mounts',()=>{
