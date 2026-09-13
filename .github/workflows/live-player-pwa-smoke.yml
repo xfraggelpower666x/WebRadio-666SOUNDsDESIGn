@@ -27,7 +27,7 @@ permissions:
 
 concurrency:
   group: live-player-pwa-smoke
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   production-pwa-smoke:
@@ -36,6 +36,11 @@ jobs:
     env:
       BASE_URL: https://webradio.666soundsdesign-broadcaster.com
     steps:
+      - name: Checkout repository for deploy-scope detection
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
       - name: Check live player PWA ownership and central boot
         shell: bash
         run: |
@@ -44,7 +49,20 @@ jobs:
           workdir="$(mktemp -d)"
           trap 'rm -rf "$workdir"' EXIT
 
+          deploy_required=false
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]] && git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            while IFS= read -r changed; do
+              case "$changed" in
+                .github/workflows/deploy-cloudflare-workers.yml|external-workers/*|public/*|worker.js|wrangler.jsonc|package.json|package-lock.json|scripts/*|tests/*|worker-addons/*)
+                  deploy_required=true
+                  break
+                  ;;
+              esac
+            done < <(git diff --name-only HEAD^ HEAD)
+          fi
+
           wait_for_deployed_commit() {
+            local expected_sha="$1"
             local attempt code live_sha url identity="$workdir/deployed-commit.json"
             for attempt in $(seq 1 30); do
               url="${BASE_URL}/666pfs-deployed-commit.json?smoke=${GITHUB_SHA}-${attempt}"
@@ -60,18 +78,18 @@ jobs:
                 --write-out '%{http_code}' \
                 "$url" || true)"
               if [[ "$code" == "200" && -s "$identity" ]]; then
-                live_sha="$(node -e "try{const d=require('fs').readFileSync(process.argv[1],'utf8');process.stdout.write(String(JSON.parse(d).sourceCommit||''))}catch{}" "$identity")"
-                if [[ "$live_sha" == "$GITHUB_SHA" ]]; then
+                live_sha="$(node -e "try{const d=require('fs').readFileSync(process.argv[1],'utf8');const j=JSON.parse(d);if(j.schema!=='666pfs-666stream-deployed-commit-v1')process.exit(2);process.stdout.write(String(j.sourceCommit||''))}catch{process.exit(3)}" "$identity" || true)"
+                if [[ -n "$live_sha" && ( -z "$expected_sha" || "$live_sha" == "$expected_sha" ) ]]; then
                   echo "LIVE DEPLOYMENT IDENTITY PASS ${live_sha}"
                   return 0
                 fi
-                echo "WAIT deployment identity: attempt ${attempt}/30 live=${live_sha:-unknown} expected=${GITHUB_SHA}"
+                echo "WAIT deployment identity: attempt ${attempt}/30 live=${live_sha:-unknown} expected=${expected_sha:-current-live}"
               else
                 echo "WAIT deployment identity: attempt ${attempt}/30 returned ${code:-curl_error}"
               fi
               sleep 10
             done
-            echo "FAIL live deployment identity never reached ${GITHUB_SHA}" >&2
+            echo "FAIL live deployment identity did not reach expected state ${expected_sha:-current-live}" >&2
             return 1
           }
 
@@ -108,8 +126,15 @@ jobs:
             return 1
           }
 
-          # Do not validate stale-but-200 production assets while the parallel deploy is still running.
-          wait_for_deployed_commit
+          # Runtime-affecting pushes must be commit-bound to the new deployment.
+          # Workflow-only/scheduled checks validate the currently marked live deployment instead.
+          if [[ "$deploy_required" == "true" ]]; then
+            echo "DEPLOY_SCOPE=RUNTIME EXPECTED_SHA=${GITHUB_SHA}"
+            wait_for_deployed_commit "$GITHUB_SHA"
+          else
+            echo "DEPLOY_SCOPE=CHECK_ONLY EXPECTED_SHA=CURRENT_LIVE"
+            wait_for_deployed_commit ""
+          fi
 
           fetch_live "/site.webmanifest" "$workdir/site.webmanifest"
           fetch_live "/veluna.webmanifest" "$workdir/veluna.webmanifest"
