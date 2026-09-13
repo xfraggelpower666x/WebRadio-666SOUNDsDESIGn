@@ -1,6 +1,7 @@
-/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.2.0
+/* 666SOUNDsDESIGn Radio — Central Player Boot + Session Identity v2.2.1
  * One boot owner for Hub/Main, iPhone, Android, VELUNA and Internal.
  * Main/iPhone use the 666 Cyber HUD boot skin; VELUNA/Internal keep their existing boot presentation.
+ * Main Cyber HUD runs at least one complete 10s visual cycle, progresses from 1% to 100%, then hands off.
  * Also owns route-specific PWA + MediaSession identity used by system media surfaces.
  * No stream/audio graph/EQ/boost/Discord transport changes.
  */
@@ -8,12 +9,15 @@
   'use strict';
   if(global.S666CentralBootScreen) return;
 
-  const VERSION='2.2.0';
+  const VERSION='2.2.1';
   const STYLE_URL='/css/central-boot-screen.css?v=20260913-main-cyber-hud-v1';
   const DEFAULT_DURATION=4200;
-  const MAIN_DURATION=6000;
+  const MAIN_ANIMATION_CYCLE=10000;
+  const MAIN_DURATION=MAIN_ANIMATION_CYCLE;
+  const MAIN_START_PROGRESS=1;
+  const MAIN_COMPLETE_HOLD=500;
   const OWNER_KEY='s666_active_player_owner_v2';
-  const BOOT_MARKER='2026-09-13-main-cyber-hud-v1';
+  const BOOT_MARKER='2026-09-13-main-cyber-hud-v2';
 
   let root=null,raf=0,startAt=0,duration=DEFAULT_DURATION,lastPhase=-1,readyPromise=null;
 
@@ -241,8 +245,8 @@
       '<div class="s666boot-main-progress-dock">'+
         '<p class="s666boot-status" id="s666boot-status">INITIALIZING PLAYER</p>'+
         '<div class="s666boot-progress-wrap" aria-label="Player boot progress">'+
-          '<div class="s666boot-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="s666boot-track"><div class="s666boot-bar" id="s666boot-bar"></div></div>'+
-          '<div class="s666boot-percent" id="s666boot-percent">0%</div>'+
+          '<div class="s666boot-track" role="progressbar" aria-valuemin="1" aria-valuemax="100" aria-valuenow="1" id="s666boot-track"><div class="s666boot-bar" id="s666boot-bar" style="width:1%"></div></div>'+
+          '<div class="s666boot-percent" id="s666boot-percent">1%</div>'+
         '</div>'+
         '<p class="s666boot-phase-label" id="s666boot-phase">CONNECTING RADIO CORE</p>'+
         '<div class="s666boot-steps" aria-hidden="true">'+
@@ -314,7 +318,8 @@
   function setProgress(progress){
     if(!root) return;
     const n=nodes();
-    const p=Math.max(0,Math.min(100,Math.round(Number(progress)||0)));
+    const minimum=identity.page==='main'?MAIN_START_PROGRESS:0;
+    const p=Math.max(minimum,Math.min(100,Math.round(Number(progress)||minimum)));
     if(n.bar)n.bar.style.width=p+'%';
     if(n.percent)n.percent.textContent=p+'%';
     if(n.track)n.track.setAttribute('aria-valuenow',String(p));
@@ -336,7 +341,8 @@
   function tick(now){
     if(!root) return;
     const elapsed=now-startAt;
-    const progress=Math.min(100,(elapsed/duration)*100);
+    const ratio=Math.min(1,Math.max(0,elapsed/duration));
+    const progress=identity.page==='main' ? MAIN_START_PROGRESS+(99*ratio) : 100*ratio;
     setProgress(progress);
     if(elapsed<duration){raf=requestAnimationFrame(tick);return;}
     complete('timer');
@@ -346,30 +352,44 @@
     await mount();
     cancelAnimationFrame(raf);
     const fallbackDuration=identity.page==='main'?MAIN_DURATION:DEFAULT_DURATION;
-    duration=Math.max(600,Number(options.duration)||fallbackDuration);
+    const requestedDuration=Number(options.duration)||fallbackDuration;
+    duration=identity.page==='main' ? Math.max(MAIN_ANIMATION_CYCLE,requestedDuration) : Math.max(600,requestedDuration);
     startAt=performance.now();
     lastPhase=-1;
     root.dataset.state='booting';
+    root.dataset.minimumCycleMs=identity.page==='main'?String(MAIN_ANIMATION_CYCLE):String(duration);
     root.style.removeProperty('display');
     root.style.removeProperty('opacity');
-    setProgress(0);
+    setProgress(identity.page==='main'?MAIN_START_PROGRESS:0);
     raf=requestAnimationFrame(tick);
     return root;
   }
 
   function complete(reason='complete'){
     if(!root) return;
+    const elapsed=startAt?Math.max(0,performance.now()-startAt):0;
+    if(identity.page==='main' && elapsed<duration){
+      root.dataset.earlyCompleteBlocked=String(reason);
+      cancelAnimationFrame(raf);
+      raf=requestAnimationFrame(tick);
+      return;
+    }
     cancelAnimationFrame(raf);
     setProgress(100);
     const n=nodes();
     if(n.status)n.status.textContent='BOOT COMPLETE';
     if(n.phase)n.phase.textContent='666SOUNDsDESIGn READY';
     n.steps?.forEach(step=>{step.classList.remove('active');step.classList.add('done');});
-    global.setTimeout(()=>hide(reason),180);
+    root.dataset.fullCycleComplete=identity.page==='main'?'1':'legacy';
+    global.setTimeout(()=>hide(reason),identity.page==='main'?MAIN_COMPLETE_HOLD:180);
   }
 
   function hide(reason='hide'){
     if(!root) return;
+    if(identity.page==='main' && root.dataset.fullCycleComplete!=='1'){
+      complete(reason);
+      return;
+    }
     cancelAnimationFrame(raf);
     root.dataset.state='leaving';
     root.dataset.closeReason=String(reason);
