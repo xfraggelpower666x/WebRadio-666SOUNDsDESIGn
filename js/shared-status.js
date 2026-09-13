@@ -1,16 +1,16 @@
 /*
 ==========================================
 DATEI: external-player/js/shared-status.js
-GEÄNDERT: 2026-09-10
+GEÄNDERT: 2026-09-13
 ZWECK: Zentrale Zustandsumschaltung für Systempanel-LEDs.
 ÄNDERUNG: STOP-IDLE-LOCK — wenn data-player-state="stopped" aktiv ist,
           werden alle oberen Cockpit-Status-LEDs neutralisiert. Separate
           Runtime-Owner (z. B. Worker/Watchdog/Govee/Discord/Admin) dürfen
           weiterarbeiten, können aber im STOP-Zustand keine aktive/blinkende
           LED mehr in die Header-Leiste schreiben.
-ÄNDERUNG: SOURCE-LABEL-LOCK — Main/Backup-Chips besitzen hier die kanonische
-          sichtbare Bezeichnung M / B. Alte Legacy-Owner dürfen H/Hauptstream
-          nicht mehr dauerhaft zurückschreiben.
+ÄNDERUNG: SOURCE-LABEL-CANONICALIZATION — Main/Backup-Chips verwenden M / B.
+          Legacy-Owner wurden an der Quelle vereinheitlicht; deshalb ist kein
+          dauerhafter MutationObserver mehr nötig.
 FARBLOGIK:
 - ok / main / api / external / active / playing / ready / online = türkis
 - warn / error / stopped / paused / offline / bad = pink
@@ -102,20 +102,6 @@ function enforceCanonicalSourceLabel(el) {
   if (el.getAttribute('aria-label') !== canonical.title) el.setAttribute('aria-label', canonical.title);
 }
 
-function installCanonicalSourceLabelLock() {
-  const bind = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    enforceCanonicalSourceLabel(el);
-    const target = el.querySelector?.('.status-code') || el;
-    if (!target || typeof MutationObserver !== 'function') return;
-    const observer = new MutationObserver(() => enforceCanonicalSourceLabel(el));
-    observer.observe(target, { childList: true, characterData: true, subtree: true });
-  };
-  bind('mainBtn');
-  bind('fallbackBtn');
-}
-
 function isTransportStoppedForHeaderLed(el) {
   if (!el || !STOP_LOCKED_HEADER_LED_IDS.has(el.id)) return false;
   const rootState = String(document.documentElement?.getAttribute('data-player-state') || '').toLowerCase();
@@ -140,10 +126,4 @@ export function applyStatusChip(el, state = 'empty', tooltip = '') {
   el.setAttribute('data-led-state', nextClass.replace(/^state-/, ''));
 
   if (tooltip && !CANONICAL_SOURCE_LABELS[el.id]) el.title = tooltip;
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', installCanonicalSourceLabelLock, { once: true });
-} else {
-  installCanonicalSourceLabelLock();
 }
