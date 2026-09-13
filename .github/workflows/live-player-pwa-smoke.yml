@@ -44,6 +44,37 @@ jobs:
           workdir="$(mktemp -d)"
           trap 'rm -rf "$workdir"' EXIT
 
+          wait_for_deployed_commit() {
+            local attempt code live_sha url identity="$workdir/deployed-commit.json"
+            for attempt in $(seq 1 30); do
+              url="${BASE_URL}/666pfs-deployed-commit.json?smoke=${GITHUB_SHA}-${attempt}"
+              code="$(curl \
+                --silent \
+                --show-error \
+                --location \
+                --connect-timeout 10 \
+                --max-time 35 \
+                --header 'Cache-Control: no-cache' \
+                --header 'Pragma: no-cache' \
+                --output "$identity" \
+                --write-out '%{http_code}' \
+                "$url" || true)"
+              if [[ "$code" == "200" && -s "$identity" ]]; then
+                live_sha="$(node -e "try{const d=require('fs').readFileSync(process.argv[1],'utf8');process.stdout.write(String(JSON.parse(d).sourceCommit||''))}catch{}" "$identity")"
+                if [[ "$live_sha" == "$GITHUB_SHA" ]]; then
+                  echo "LIVE DEPLOYMENT IDENTITY PASS ${live_sha}"
+                  return 0
+                fi
+                echo "WAIT deployment identity: attempt ${attempt}/30 live=${live_sha:-unknown} expected=${GITHUB_SHA}"
+              else
+                echo "WAIT deployment identity: attempt ${attempt}/30 returned ${code:-curl_error}"
+              fi
+              sleep 10
+            done
+            echo "FAIL live deployment identity never reached ${GITHUB_SHA}" >&2
+            return 1
+          }
+
           fetch_live() {
             local path="$1"
             local output="$2"
@@ -77,6 +108,9 @@ jobs:
             return 1
           }
 
+          # Do not validate stale-but-200 production assets while the parallel deploy is still running.
+          wait_for_deployed_commit
+
           fetch_live "/site.webmanifest" "$workdir/site.webmanifest"
           fetch_live "/veluna.webmanifest" "$workdir/veluna.webmanifest"
           fetch_live "/internal.webmanifest" "$workdir/internal.webmanifest"
@@ -104,8 +138,13 @@ jobs:
           console.log('PLAYER PWA MANIFEST OWNERSHIP PASS');
           NODE
 
-          grep -Fq "Central Player Boot + Session Identity v2.1.0" "$workdir/central-boot-screen.js"
-          grep -Fq "2026-08-13-root-identity-regression-v4" "$workdir/central-boot-screen.js"
+          grep -Fq "Central Player Boot + Session Identity v2.2.1" "$workdir/central-boot-screen.js"
+          grep -Fq "2026-09-13-main-cyber-hud-v2" "$workdir/central-boot-screen.js"
+          grep -Fq "MAIN_ANIMATION_CYCLE=10000" "$workdir/central-boot-screen.js"
+          grep -Fq "MAIN_START_PROGRESS=1" "$workdir/central-boot-screen.js"
+          grep -Fq "MAIN_COMPLETE_HOLD=500" "$workdir/central-boot-screen.js"
+          grep -Fq "fullCycleComplete" "$workdir/central-boot-screen.js"
+          grep -Fq "earlyCompleteBlocked" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'hub'" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'iphone'" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'android'" "$workdir/central-boot-screen.js"
