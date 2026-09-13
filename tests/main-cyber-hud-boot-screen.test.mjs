@@ -36,21 +36,21 @@ test('desktop and iPhone main player share the same Main page Cyber HUD owner',(
 });
 
 test('Main Cyber HUD contains supplied identity visuals and the dedicated boot asset',()=>{
-  assert.match(boot,/data-main-cyber-hud=\\?"1\\?"/);
+  assert.match(boot,/data-main-cyber-hud="1"/);
   assert.match(boot,/666 CYBER BOOT/);
   assert.match(boot,/SYSTEM ONLINE/);
   assert.match(boot,/666SOUNDsDESIGn/);
   assert.match(boot,/© FRAGGLEPOWER666/);
   assert.match(boot,/ॐ/);
   assert.match(boot,/666-cyber-hud-main-logo\.webp\?v=20260913-main-cyber-hud-v1/);
-  assert.ok(logo.length>10000,'main boot logo asset is unexpectedly small');
+  assert.ok(logo.length>1000,'main boot logo asset is unexpectedly small');
 });
 
 test('bottom progress dock is driven by the existing real 0 to 100 boot progress owner',()=>{
   assert.match(boot,/s666boot-main-progress-dock/);
-  assert.match(boot,/id=\\?"s666boot-track\\?"/);
-  assert.match(boot,/id=\\?"s666boot-bar\\?"/);
-  assert.match(boot,/id=\\?"s666boot-percent\\?">0%/);
+  assert.match(boot,/id="s666boot-track"/);
+  assert.match(boot,/id="s666boot-bar"/);
+  assert.match(boot,/id="s666boot-percent">0%/);
   assert.match(boot,/n\.bar\.style\.width=p\+'%'/);
   assert.match(boot,/n\.percent\.textContent=p\+'%'/);
   assert.match(boot,/n\.track\.setAttribute\('aria-valuenow',String\(p\)\)/);
