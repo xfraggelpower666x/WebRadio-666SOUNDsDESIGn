@@ -46,11 +46,13 @@ test('Main Cyber HUD contains supplied identity visuals and the dedicated boot a
   assert.ok(logo.length>1000,'main boot logo asset is unexpectedly small');
 });
 
-test('bottom progress dock is driven by the existing real 0 to 100 boot progress owner',()=>{
+test('Main progress starts visibly at 1 percent and is driven to 100 by the existing boot owner',()=>{
   assert.match(boot,/s666boot-main-progress-dock/);
-  assert.match(boot,/id="s666boot-track"/);
-  assert.match(boot,/id="s666boot-bar"/);
-  assert.match(boot,/id="s666boot-percent">0%/);
+  assert.match(boot,/aria-valuemin="1" aria-valuemax="100" aria-valuenow="1"/);
+  assert.match(boot,/id="s666boot-bar" style="width:1%"/);
+  assert.match(boot,/id="s666boot-percent">1%/);
+  assert.match(boot,/const MAIN_START_PROGRESS=1/);
+  assert.match(boot,/MAIN_START_PROGRESS\+\(99\*ratio\)/);
   assert.match(boot,/n\.bar\.style\.width=p\+'%'/);
   assert.match(boot,/n\.percent\.textContent=p\+'%'/);
   assert.match(boot,/n\.track\.setAttribute\('aria-valuenow',String\(p\)\)/);
@@ -66,8 +68,20 @@ test('Main boot is made explicitly visible and records its handoff to prevent a 
   assert.match(audioStart,/20260913-main-cyber-hud-v1/);
 });
 
-test('Main gets a longer six-second presentation without changing the legacy Veluna duration',()=>{
+test('Main runs at least one complete ten-second visual cycle before player handoff while legacy duration stays unchanged',()=>{
   assert.match(boot,/const DEFAULT_DURATION=4200/);
-  assert.match(boot,/const MAIN_DURATION=6000/);
-  assert.match(boot,/const fallbackDuration=identity\.page==='main'\?MAIN_DURATION:DEFAULT_DURATION/);
+  assert.match(boot,/const MAIN_ANIMATION_CYCLE=10000/);
+  assert.match(boot,/const MAIN_DURATION=MAIN_ANIMATION_CYCLE/);
+  assert.match(boot,/duration=identity\.page==='main' \? Math\.max\(MAIN_ANIMATION_CYCLE,requestedDuration\) : Math\.max\(600,requestedDuration\)/);
+  assert.match(css,/\.s666boot-main-reactor\{[^}]*animation:s666MainReactor 10s linear infinite/);
+});
+
+test('Main cannot be hidden or completed early and exposes 100 percent before handoff',()=>{
+  assert.match(boot,/if\(identity\.page==='main' && elapsed<duration\)/);
+  assert.match(boot,/root\.dataset\.earlyCompleteBlocked=String\(reason\)/);
+  assert.match(boot,/root\.dataset\.fullCycleComplete=identity\.page==='main'\?'1':'legacy'/);
+  assert.match(boot,/if\(identity\.page==='main' && root\.dataset\.fullCycleComplete!=='1'\)/);
+  assert.match(boot,/const MAIN_COMPLETE_HOLD=500/);
+  assert.match(boot,/setProgress\(100\)/);
+  assert.match(boot,/global\.setTimeout\(\(\)=>hide\(reason\),identity\.page==='main'\?MAIN_COMPLETE_HOLD:180\)/);
 });
