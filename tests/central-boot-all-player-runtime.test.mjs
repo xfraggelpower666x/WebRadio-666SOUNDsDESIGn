@@ -56,7 +56,7 @@ test('main gets the Cyber HUD skin while Veluna and internal keep the legacy boo
   assert.match(boot, /function legacyBootMarkup\(\)/);
   assert.match(boot, /function mainCyberHudMarkup\(\)/);
   assert.match(boot, /identity\.page==='main' \? mainCyberHudMarkup\(\) : legacyBootMarkup\(\)/);
-  assert.match(boot, /data-main-cyber-hud=\\"1\\"/);
+  assert.match(boot, /data-main-cyber-hud="1"/);
   assert.match(boot, /root\.dataset\.bootSkin=identity\.page==='main'\?'main-cyber-hud-v1':'central-legacy'/);
   assert.match(boot, /if\(page==='veluna'\) return \{page,device,playerId:'veluna'/);
   assert.match(boot, /if\(page==='internal'\) return \{page,device,playerId:'internal'/);
