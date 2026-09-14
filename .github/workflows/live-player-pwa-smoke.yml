@@ -79,17 +79,17 @@ jobs:
                 "$url" || true)"
               if [[ "$code" == "200" && -s "$identity" ]]; then
                 live_sha="$(node -e "try{const d=require('fs').readFileSync(process.argv[1],'utf8');const j=JSON.parse(d);if(j.schema!=='666pfs-666stream-deployed-commit-v1')process.exit(2);process.stdout.write(String(j.sourceCommit||''))}catch{process.exit(3)}" "$identity" || true)"
-                if [[ -n "$live_sha" && ( -z "$expected_sha" || "$live_sha" == "$expected_sha" ) ]]; then
+                if [[ -n "$live_sha" && "$live_sha" == "$expected_sha" ]]; then
                   echo "LIVE DEPLOYMENT IDENTITY PASS ${live_sha}"
                   return 0
                 fi
-                echo "WAIT deployment identity: attempt ${attempt}/30 live=${live_sha:-unknown} expected=${expected_sha:-current-live}"
+                echo "WAIT deployment identity: attempt ${attempt}/30 live=${live_sha:-unknown} expected=${expected_sha}"
               else
                 echo "WAIT deployment identity: attempt ${attempt}/30 returned ${code:-curl_error}"
               fi
               sleep 10
             done
-            echo "FAIL live deployment identity did not reach expected state ${expected_sha:-current-live}" >&2
+            echo "FAIL live deployment identity did not reach expected state ${expected_sha}" >&2
             return 1
           }
 
@@ -126,14 +126,14 @@ jobs:
             return 1
           }
 
-          # Runtime-affecting pushes must be commit-bound to the new deployment.
-          # Workflow-only/scheduled checks validate the currently marked live deployment instead.
+          # Runtime-affecting pushes must be commit-bound to their new deployment.
+          # Workflow-only, scheduled, and manual checks validate the live assets directly;
+          # the deployment marker is intentionally not a durable production endpoint.
           if [[ "$deploy_required" == "true" ]]; then
             echo "DEPLOY_SCOPE=RUNTIME EXPECTED_SHA=${GITHUB_SHA}"
             wait_for_deployed_commit "$GITHUB_SHA"
           else
-            echo "DEPLOY_SCOPE=CHECK_ONLY EXPECTED_SHA=CURRENT_LIVE"
-            wait_for_deployed_commit ""
+            echo "DEPLOY_SCOPE=CHECK_ONLY MARKER_GATE=SKIPPED"
           fi
 
           fetch_live "/site.webmanifest" "$workdir/site.webmanifest"
