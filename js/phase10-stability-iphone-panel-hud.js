@@ -11,7 +11,7 @@ RULES:
 */
 (function(){
   "use strict";
-  var VERSION = "phase10-stability-iphone-panel-hud-20260901-canonical-recovery-v1";
+  var VERSION = "phase10-stability-iphone-panel-hud-20260920-mobile-recovery-v2";
   var lastAudibleAt = Date.now();
 
   // AUDIO_CORE_AUTHORITY_LOCK_V1_20260610
@@ -110,7 +110,8 @@ RULES:
     if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(row, anchor.nextSibling);
     else app.appendChild(row);
 
-    qsa('[data-mff="down"],[data-mff="boost"],[data-mff="up"],.mff-boost-row-panel', app).forEach(function(el){ el.remove(); });
+    // Mobile recovery v2: preserve native main-player boost controls and LED row.
+    // VELUNA-style state discipline must not delete existing controls.
 
     row.addEventListener("click", function(ev){
       var sound = ev.target.closest && ev.target.closest("#s666SoundControlButton");
@@ -1146,6 +1147,44 @@ RULES:
       });
     }
 
+    function syncMobileTransportUi(){
+      if((window.innerWidth||9999) > 760) return;
+      var app=qs("#mffApp");
+      if(!app) return;
+      var audio=getAudio();
+      var bodyState=(document.body&&document.body.getAttribute("data-player-state"))||"";
+      var stopped=bodyState==="stopped" || (document.body&&document.body.classList.contains("is-stopped"));
+      var state=stopped ? "stop" : (audio && !audio.paused && !audio.ended ? "play" : "pause");
+      app.setAttribute("data-mff-transport-state",state);
+      qsa('.mff-controls [data-mff="play"],.mff-controls [data-mff="pause"],.mff-controls [data-mff="stop"]',app).forEach(function(btn){
+        var active=btn.getAttribute("data-mff")===state;
+        btn.setAttribute("data-state",active?"active":"idle");
+        btn.setAttribute("aria-pressed",active?"true":"false");
+        btn.classList.toggle("mff-active",active);
+      });
+    }
+
+    function installMobileTransportUiBridge(){
+      if((window.innerWidth||9999) > 760) return;
+      var app=qs("#mffApp");
+      if(!app || app.__phase10TransportStateBridge) return;
+      app.__phase10TransportStateBridge=true;
+      var audio=getAudio();
+      var schedule=function(){ setTimeout(syncMobileTransportUi,0); setTimeout(syncMobileTransportUi,180); };
+      if(audio){
+        ["play","playing","pause","ended","waiting","error"].forEach(function(evt){
+          audio.addEventListener(evt,schedule,{passive:true});
+        });
+      }
+      app.addEventListener("click",function(ev){
+        if(ev.target && ev.target.closest && ev.target.closest(".mff-controls [data-mff]")) schedule();
+      },true);
+      app.addEventListener("touchend",function(ev){
+        if(ev.target && ev.target.closest && ev.target.closest(".mff-controls [data-mff]")) schedule();
+      },{passive:true,capture:true});
+      syncMobileTransportUi();
+    }
+
     function phase10IsMobileAudioDevice(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent||"") || (window.innerWidth||9999) <= 860; }
     function boot(){
       mountHudLogo();
@@ -1161,6 +1200,8 @@ RULES:
     installPcMainBackupGuard();
     directfixPcNoAutoFallback();
     mountMobilePanelRow();
+    mountBottomSafe();
+    installMobileTransportUiBridge();
     bindMobileStreamLedSwitch();
     bindEqTriggers();
     installAudioFocusGuard();
@@ -1168,6 +1209,8 @@ RULES:
     // Stable maintenance only: do not relocate or delete layout nodes after first render.
     setInterval(function(){
       mountMobilePanelRow();
+      mountBottomSafe();
+      installMobileTransportUiBridge();
       bindMobileStreamLedSwitch();
       bindEqTriggers();
         installAudioFocusGuard();
