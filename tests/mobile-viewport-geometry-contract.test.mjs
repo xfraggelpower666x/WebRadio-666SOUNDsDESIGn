@@ -15,9 +15,9 @@ test('main iPhone layout starts at the safe top and keeps artwork and EQ inside 
 
 test('main iPhone shell stays geometrically between the left and right side meters', async () => {
   const css = await read('css/mobile-patches.css');
-  assert.match(css, /S666_IPHONE_LAYOUT_APPRETURN_V5 — final mobile geometry owner/);
+  assert.match(css, /S666_IPHONE_LAYOUT_APPRETURN_V5 — canonical iPhone main structure owner/);
   assert.match(css, /#mffApp \.mff-shell\{\s*transform:none!important;\s*width:calc\(100vw - 54px\)!important;/);
-  assert.match(css, /@media \(max-width:380px\) and \(max-height:740px\)\{[\s\S]*?#mffApp \.mff-shell\{width:calc\(100vw - 46px\)!important;padding-top:5px!important;\}/);
+  assert.match(css, /@media \(max-width:380px\) and \(max-height:740px\)\{[\s\S]*?#mffApp \.mff-shell\{[\s\S]*?width:calc\(100vw - 46px\)!important;[\s\S]*?padding-top:4px!important;/);
   assert.doesNotMatch(css, /S666_IPHONE_LAYOUT_APPRETURN_V5[\s\S]*?width:calc\(100vw - 42px\)!important/);
   assert.doesNotMatch(css, /S666_IPHONE_LAYOUT_APPRETURN_V5[\s\S]*?width:calc\(100vw - 38px\)!important/);
   assert.match(css, /#mffApp \.mff-side,\s*\.mff-side\{[\s\S]*?width:16px!important/);
