@@ -634,7 +634,7 @@
 @media (max-width:760px){
   #mffApp .mff-shell{
     transform:none!important;
-    width:calc(100vw - 42px)!important;
+    width:calc(100vw - 54px)!important;
     max-width:430px!important;
     margin:0 auto!important;
     padding-top:clamp(8px,1.35dvh,16px)!important;
@@ -663,6 +663,6 @@
   }
 }
 @media (max-width:380px) and (max-height:740px){
-  #mffApp .mff-shell{width:calc(100vw - 38px)!important;padding-top:5px!important;}
+  #mffApp .mff-shell{width:calc(100vw - 46px)!important;padding-top:5px!important;}
   #mffApp .mff-cyber-header{height:40px!important;min-height:40px!important;}
 }
