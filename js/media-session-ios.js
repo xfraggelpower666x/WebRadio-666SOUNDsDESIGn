@@ -36,7 +36,7 @@
       var audio = getAudio();
       if (!audio) return;
 
-      // Resume AudioContext first
+      // Resume AudioContext first, but keep the current HTMLMediaElement session intact.
       ['__radioAudioContext', '__mffAudioContext'].forEach(function (key) {
         var ctx = window[key];
         if (ctx && ctx.state === 'suspended') {
@@ -44,28 +44,45 @@
         }
       });
 
-      // If audio is already playing, nothing to do
-      if (!audio.paused) return;
-
-      var src = getCurrentSrc();
-      var cacheBust = src + (src.indexOf('?') > -1 ? '&' : '?') + 'r=' + Date.now();
+      // Healthy lock-screen / foreground return is transport-neutral.
+      if (!audio.paused && !audio.ended) {
+        document.documentElement.setAttribute('data-media-session-last-resume', reason || 'unknown');
+        document.documentElement.setAttribute('data-media-session-last-resume-mode', 'healthy-noop');
+        return;
+      }
 
       try {
-        // For interruption recovery: reload src to force reconnect
-        audio.setAttribute('src', cacheBust);
-        audio.load();
+        // Same session first: never rewrite src/load() just because iOS foregrounded the player.
         var p = audio.play();
-        if (p && typeof p.catch === 'function') {
-          p.catch(function (err) {
-            // AbortError = another play() is pending, that's OK
+        if (p && typeof p.then === 'function') {
+          p.then(function () {
+            document.documentElement.setAttribute('data-media-session-last-resume', reason || 'unknown');
+            document.documentElement.setAttribute('data-media-session-last-resume-mode', 'in-place-play');
+          }).catch(function (err) {
             if (err && err.name !== 'AbortError') {
-              console.warn('[media-session-ios] play() failed (' + reason + '):', err.message || err);
+              console.warn('[media-session-ios] in-place play() failed (' + reason + '):', err.message || err);
             }
+            try {
+              var owner = window.S666AllPlayerAudioRecovery;
+              if (owner && owner.owner === 'all-player-audio-recovery-v1' && typeof owner.legacyHandoff === 'function') {
+                owner.legacyHandoff('media-session:' + (reason || 'resume-failed'));
+                document.documentElement.setAttribute('data-media-session-last-resume-mode', 'canonical-recovery-handoff');
+              }
+            } catch (_) {}
           });
+        } else {
+          document.documentElement.setAttribute('data-media-session-last-resume', reason || 'unknown');
+          document.documentElement.setAttribute('data-media-session-last-resume-mode', 'in-place-play');
         }
-        document.documentElement.setAttribute('data-media-session-last-resume', reason || 'unknown');
       } catch (e) {
         console.warn('[media-session-ios] safePlay error:', e);
+        try {
+          var owner = window.S666AllPlayerAudioRecovery;
+          if (owner && owner.owner === 'all-player-audio-recovery-v1' && typeof owner.legacyHandoff === 'function') {
+            owner.legacyHandoff('media-session:' + (reason || 'resume-exception'));
+            document.documentElement.setAttribute('data-media-session-last-resume-mode', 'canonical-recovery-handoff');
+          }
+        } catch (_) {}
       }
     }
 
