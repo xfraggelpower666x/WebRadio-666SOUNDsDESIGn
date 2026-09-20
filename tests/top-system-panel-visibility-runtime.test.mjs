@@ -16,6 +16,6 @@ test('top panel ownership survives Phase10 boot',()=>{
   for(const id of ['statusStream','statusSource','statusMeter']) assert.ok(html.includes('id="'+id+'"'));
   assert.ok(!phase10.includes('mainBtn.classList.add("is-active")'));
   assert.ok(!phase10.includes('fbBtn.classList.remove("is-active")'));
-  assert.ok(html.includes('phase10-stability-iphone-panel-hud.css?v=2026-09-03-top-panel-owner-v1'));
-  assert.ok(html.includes('phase10-stability-iphone-panel-hud.js?v=2026-09-03-top-panel-owner-v1'));
+  assert.ok(html.includes('phase10-stability-iphone-panel-hud.css?v=2026-09-20-mobile-recovery-v2'));
+  assert.ok(html.includes('phase10-stability-iphone-panel-hud.js?v=2026-09-20-mobile-recovery-v2'));
 });
