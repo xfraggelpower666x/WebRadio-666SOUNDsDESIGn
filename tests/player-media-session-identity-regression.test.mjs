@@ -12,6 +12,7 @@ assert.deepEqual(rootManifest, publicManifest, 'root/public manifests must stay 
 assert.equal(rootManifest.id, '/');
 assert.equal(rootManifest.start_url, '/');
 assert.equal(rootManifest.scope, '/');
+assert.equal(rootManifest.launch_handler?.client_mode, 'focus-existing');
 assert.ok(!JSON.stringify(rootManifest).includes('/assets/veluna/'), 'root manifest must not carry VELUNA artwork identity');
 assert.ok(!(rootManifest.shortcuts || []).some(x => /veluna|internal/i.test(`${x.name||''} ${x.short_name||''} ${x.url||''}`)), 'root shortcuts must not claim VELUNA/Internal ownership');
 
@@ -24,6 +25,8 @@ assert.match(boot, /phase10-new-header-logo\.png/);
 assert.match(boot, /applyMediaIdentity/);
 
 assert.equal(velunaManifest.start_url, '/veluna/');
+assert.equal(velunaManifest.launch_handler?.client_mode, 'focus-existing');
 assert.equal(internalManifest.start_url, '/internal/');
+assert.equal(internalManifest.launch_handler?.client_mode, 'focus-existing');
 
 console.log('PLAYER MEDIA SESSION IDENTITY REGRESSION PASS');

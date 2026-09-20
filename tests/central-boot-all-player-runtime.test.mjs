@@ -92,7 +92,7 @@ test('route manifests have stable ids and exact launch routes', async () => {
     assert.equal(manifest.start_url, startUrl, `${rootPath} start_url`);
     assert.equal(manifest.scope, scope, `${rootPath} scope`);
     assert.equal(manifest.display, 'standalone', `${rootPath} display`);
-    assert.equal(manifest.launch_handler?.client_mode, 'navigate-existing', `${rootPath} launch handler`);
+    assert.equal(manifest.launch_handler?.client_mode, 'focus-existing', `${rootPath} launch handler`);
   }
 });
 

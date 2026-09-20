@@ -156,8 +156,8 @@ jobs:
             if (manifest.start_url !== route) throw new Error(`${name} start_url mismatch: ${JSON.stringify(manifest.start_url)}`);
             if (manifest.scope !== route) throw new Error(`${name} scope mismatch: ${JSON.stringify(manifest.scope)}`);
             if (manifest.display !== 'standalone') throw new Error(`${name} display is not standalone`);
-            if (manifest.launch_handler?.client_mode !== 'navigate-existing') {
-              throw new Error(`${name} launch_handler is not navigate-existing: ${JSON.stringify(manifest.launch_handler)}`);
+            if (manifest.launch_handler?.client_mode !== 'focus-existing') {
+              throw new Error(`${name} launch_handler is not focus-existing: ${JSON.stringify(manifest.launch_handler)}`);
             }
           }
           console.log('PLAYER PWA MANIFEST OWNERSHIP PASS');
