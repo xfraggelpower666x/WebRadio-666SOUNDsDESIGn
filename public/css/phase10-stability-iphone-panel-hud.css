@@ -239,6 +239,23 @@ html[data-mff-boost="5"] #pcBoostLabel::after{background:var(--s666-pink);box-sh
     border-color:rgba(180,92,255,.75)!important;
     box-shadow:0 0 12px rgba(180,92,255,.32)!important;
   }
+  .s666-mobile-footer-safe{
+    position:fixed!important;
+    left:50%!important;
+    transform:translateX(-50%)!important;
+    bottom:max(var(--s666-safe-bottom),3px)!important;
+    z-index:2147482900!important;
+    pointer-events:none!important;
+    max-width:calc(100vw - 20px)!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    color:rgba(234,244,255,.84)!important;
+    font-size:9px!important;
+    line-height:1.1!important;
+    letter-spacing:.04em!important;
+    text-shadow:0 0 7px rgba(22,139,255,.35)!important;
+  }
   .s666-mobile-bottom-safe{
     position:fixed!important;
     left:0!important;
