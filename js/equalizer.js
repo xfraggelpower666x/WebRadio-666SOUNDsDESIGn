@@ -390,9 +390,9 @@ const stopFallback = () => {
       gainNode.gain.value = window.SMFPBoostCore ? window.SMFPBoostCore.getGain(boostStage) : BOOST_MULTIPLIERS[boostStage];
       const eqNodes = createRealEqNodes(ctx);
       limiterNode = ctx.createDynamicsCompressor();
-      limiterNode.threshold.value = -1;
-      limiterNode.knee.value = 3;
-      limiterNode.ratio.value = 20;
+      limiterNode.threshold.value = mobileLike() ? -0.8 : -1;
+      limiterNode.knee.value = mobileLike() ? 1 : 3;
+      limiterNode.ratio.value = mobileLike() ? 14 : 20;
       limiterNode.attack.value = 0.001;
       limiterNode.release.value = 0.10;
 

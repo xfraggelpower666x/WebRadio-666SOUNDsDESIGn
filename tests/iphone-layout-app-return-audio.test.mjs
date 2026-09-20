@@ -29,6 +29,6 @@ test('Veluna healthy app return does not restart sound graph',async()=>{
 
 test('main iPhone final geometry neutralizes stale HUD shift and stretches header logo',async()=>{
  const css=await read('css/mobile-patches.css'); assert.equal(await read('public/css/mobile-patches.css'),css);
- assert.match(css,/S666_IPHONE_LAYOUT_APPRETURN_V4/); assert.match(css,/transform:none!important/);
+ assert.match(css,/S666_IPHONE_LAYOUT_APPRETURN_V5/); assert.match(css,/transform:none!important/);
  assert.match(css,/object-fit:fill!important/); assert.match(css,/width:100%!important/);
 });
