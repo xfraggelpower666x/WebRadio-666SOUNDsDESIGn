@@ -184,7 +184,29 @@ html[data-mff-boost="5"] #pcBoostLabel::after{background:var(--s666-pink);box-sh
     box-sizing:border-box!important;
     padding-bottom:calc(54px + var(--s666-safe-bottom))!important;
   }
+  #mffApp .mff-controls{
+    position:relative!important;
+    z-index:2147482800!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+  #mffApp .mff-controls button{
+    position:relative!important;
+    z-index:1!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+  #mffApp .mff-boost-row-panel,
+  #mffApp .mff-panel-led-panel{
+    position:relative!important;
+    z-index:2147482700!important;
+    pointer-events:auto!important;
+  }
   .s666-mobile-extra-row{
+    position:relative!important;
+    z-index:2147482750!important;
+    pointer-events:auto!important;
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
@@ -222,7 +244,7 @@ html[data-mff-boost="5"] #pcBoostLabel::after{background:var(--s666-pink);box-sh
     left:0!important;
     right:0!important;
     bottom:max(var(--s666-safe-bottom),6px)!important;
-    z-index:40!important;
+    z-index:2147482900!important;
     pointer-events:none!important;
     display:flex!important;
     flex-direction:column!important;
