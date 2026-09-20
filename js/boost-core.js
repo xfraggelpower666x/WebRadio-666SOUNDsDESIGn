@@ -27,6 +27,8 @@ ZWECK:
     { stage:4, gain:2.82, label:'BST 4', danger:true  },
     { stage:5, gain:3.98, label:'BST 5', danger:true  }
   ];
+  // Mobile loudness profile: phones need more useful gain travel while desktop remains conservative.
+  var MOBILE_GAINS = [1.00, 1.45, 2.10, 2.85, 3.60, 4.80];
   var EQ_BANDS = [
     { key:'sub', type:'lowshelf', freq:55, q:0.70 },
     { key:'low', type:'peaking', freq:160, q:0.95 },
@@ -70,7 +72,10 @@ ZWECK:
     return Math.max(0, Math.min(maxStage(), Math.round(number)));
   }
   function getStageInfo(value){ return STAGES[clampStage(value)] || STAGES[0]; }
-  function getGain(value){ return getStageInfo(value).gain; }
+  function getGain(value){
+    var stage = clampStage(value);
+    return isMobileDevice() ? (MOBILE_GAINS[stage] || 1) : ((STAGES[stage] || STAGES[0]).gain);
+  }
   function getLabel(value){ return getStageInfo(value).label; }
   function isDanger(value){ return !!getStageInfo(value).danger; }
   function loadStage(){
@@ -263,9 +268,10 @@ ZWECK:
       var gain = context.createGain();
       attachParamContext(gain, context);
       var limiter = context.createDynamicsCompressor();
-      limiter.threshold.value = -2.5;
-      limiter.knee.value = 1.5;
-      limiter.ratio.value = 20;
+      var mobilePower = isMobileDevice();
+      limiter.threshold.value = mobilePower ? -0.8 : -2.5;
+      limiter.knee.value = mobilePower ? 1.0 : 1.5;
+      limiter.ratio.value = mobilePower ? 14 : 20;
       limiter.attack.value = 0.003;
       limiter.release.value = 0.14;
       var analyser = context.createAnalyser();
@@ -511,6 +517,7 @@ ZWECK:
     storageKey:STORAGE_KEY,
     eqStorageKey:EQ_STORAGE_KEY,
     stages:STAGES.slice(),
+    mobileGains:MOBILE_GAINS.slice(),
     eqBands:EQ_BANDS.map(function(band){ return Object.assign({}, band); }),
     rampSeconds:RAMP_SECONDS,
     eqRampSeconds:EQ_RAMP_SECONDS,
