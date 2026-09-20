@@ -308,6 +308,18 @@ RULES:
     startMobileBottomMeter();
   }
 
+  function mountMobileFooter(){
+    if((window.innerWidth||9999) > 760) return;
+    var footer=qs("#s666MobileFooterSafe");
+    if(!footer){
+      footer=document.createElement("div");
+      footer.id="s666MobileFooterSafe";
+      footer.className="s666-mobile-footer-safe";
+      footer.textContent="© 666SOUNDsDESIGn WebRadio";
+      document.body.appendChild(footer);
+    }
+  }
+
   function bindEqTriggers(){
     // SOUND is opened only by the primary action button.
   }
@@ -1200,7 +1212,7 @@ RULES:
     installPcMainBackupGuard();
     directfixPcNoAutoFallback();
     mountMobilePanelRow();
-    mountBottomSafe();
+    mountMobileFooter();
     installMobileTransportUiBridge();
     bindMobileStreamLedSwitch();
     bindEqTriggers();
@@ -1209,7 +1221,7 @@ RULES:
     // Stable maintenance only: do not relocate or delete layout nodes after first render.
     setInterval(function(){
       mountMobilePanelRow();
-      mountBottomSafe();
+      mountMobileFooter();
       installMobileTransportUiBridge();
       bindMobileStreamLedSwitch();
       bindEqTriggers();
