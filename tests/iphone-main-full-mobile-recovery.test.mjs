@@ -8,11 +8,11 @@ test('iPhone main recovery keeps native controls and mounts visible bottom meter
   const js = await read('js/phase10-stability-iphone-panel-hud.js');
   const css = await read('css/phase10-stability-iphone-panel-hud.css');
 
-  assert.match(js, /mountMobilePanelRow\(\);\s*mountBottomSafe\(\);\s*installMobileTransportUiBridge\(\);/);
+  assert.match(js, /mountMobilePanelRow\(\);\s*mountMobileFooter\(\);\s*installMobileTransportUiBridge\(\);/);
   assert.doesNotMatch(js, /qsa\('\[data-mff="down"\],\[data-mff="boost"\],\[data-mff="up"\],\.mff-boost-row-panel', app\)\.forEach\(function\(el\)\{ el\.remove\(\); \}\);/);
   assert.match(js, /function syncMobileTransportUi\(\)/);
   assert.match(js, /data-mff-transport-state/);
-  assert.match(css, /\.s666-mobile-bottom-safe\{[\s\S]*?z-index:2147482900!important/);
+  assert.match(css, /\.s666-mobile-footer-safe\{[\s\S]*?z-index:2147482900!important/);
   assert.match(css, /#mffApp \.mff-controls\{[\s\S]*?pointer-events:auto!important/);
 
   assert.equal(await read('public/js/phase10-stability-iphone-panel-hud.js'), js);
