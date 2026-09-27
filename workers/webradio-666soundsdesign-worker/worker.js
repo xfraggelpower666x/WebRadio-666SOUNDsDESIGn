@@ -924,6 +924,33 @@ function isVelunaPlayerPath(pathname){
   const path = normalizedRoutePath(pathname);
   return path === '/veluna' || path === '/veluna/index.html';
 }
+function isTwitchPlayerPath(pathname){
+  const path = normalizedRoutePath(pathname);
+  return path === '/twitch' || path === '/twitch/index.html';
+}
+async function serveTwitchPlayer(request, env){
+  if(request.method !== 'GET' && request.method !== 'HEAD'){
+    return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
+  }
+  const response = await serveProjectAsset(request, env, "/TWITCH/index.html") || await serveProjectAsset(request, env, "/twitch/index.html");
+  if(!response){
+    return new Response("TWITCH visual player asset unavailable",{status:503,headers:{"content-type":"text/plain; charset=UTF-8","cache-control":"no-store","x-player-mode":"twitch-asset-missing"}});
+  }
+  const headers = new Headers(response.headers);
+  headers.set("cache-control","no-store, no-cache, must-revalidate, max-age=0");
+  headers.set("pragma","no-cache");
+  headers.set("expires","0");
+  headers.set("content-location","/TWITCH");
+  headers.set("x-player-mode","twitch-audio-reactive-visual");
+  headers.set("x-player-version","v1");
+  return new Response(request.method === "HEAD" ? null : response.body,{status:response.status,statusText:response.statusText,headers});
+}
+async function proxyTwitchStream(request, env){
+  return proxyStreamPlan(request,env,[
+    {name:'twitch-main-8686',urls:['https://my.idjstream.com:8686/stream','https://my.idjstream.com:8686']},
+    {name:'twitch-backup-named',urls:['https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com/666soundsdesign']}
+  ],'twitch_stream_proxy_failed');
+}
 async function serveVelunaPlayer(request, env){
   if(request.method !== 'GET' && request.method !== 'HEAD'){
     return new Response(JSON.stringify({ok:false,error:'method_not_allowed',allowed:['GET','HEAD']}),{status:405,headers:{'content-type':'application/json; charset=UTF-8','cache-control':'no-store','allow':'GET, HEAD'}});
@@ -976,6 +1003,7 @@ function s666RouteTable() {
     { priority: 6, route: "/api/admin/skip + /skip", handler: "handleSkipApi", purpose: "protected shoutcast autodj skip" },
     { priority: 9, route: "/external-player /extern", handler: "root alias", purpose: "external player alias" },
     { priority: 10, route: "/veluna", handler: "serveVelunaPlayer", purpose: "VELUNA LYVRA minimal recovery player" },
+    { priority: 10.5, route: "/TWITCH + /TWITCH/stream", handler: "serveTwitchPlayer / proxyTwitchStream", purpose: "Twitch audio-reactive visual stream page" },
     { priority: 11, route: "/internal", handler: "embedded internal player", purpose: "existing internal emergency player" },
     { priority: 12, route: "/stream", handler: "stream proxy/failover", purpose: "primary stream" },
     { priority: 13, route: "/fallback-stream", handler: "fallback stream proxy", purpose: "hard fallback stream" },
@@ -1103,6 +1131,8 @@ export default {
     if (__darkDancerResponse) return __darkDancerResponse;
 const url=new URL(request.url);
     if(isVelunaPlayerPath(url.pathname)) return await serveVelunaPlayer(request, env);
+    if(isTwitchPlayerPath(url.pathname)) return await serveTwitchPlayer(request, env);
+    if(normalizedRoutePath(url.pathname) === '/twitch/stream') return await proxyTwitchStream(request, env);
     if (url.pathname === "/health") return s666LiveHealth(request, env);
     if (url.pathname === "/api/runtime-config/status" && (request.method === "GET" || request.method === "HEAD")) {
       const runtime = await loadRadioRuntimeConfig(request, env, true);
