@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05000b">
+<title>666SOUNDsDESIGn · TWITCH VISUAL</title>
+<style>
+:root{color-scheme:dark;--energy:.08;--bass:.08;--mid:.08;--high:.08;--hue:300deg}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020006;font-family:Arial,Helvetica,sans-serif}
+body{isolation:isolate}
+#bg{position:fixed;inset:-3%;z-index:-5;background:#05000b url('/TWITCH/background.jpg?v=1') center/cover no-repeat;transform:scale(calc(1.015 + var(--bass)*.035));filter:saturate(calc(1.05 + var(--energy)*.55)) brightness(calc(.82 + var(--energy)*.24)) contrast(1.08);transition:filter 90ms linear,transform 90ms linear}
+#veil{position:fixed;inset:0;z-index:-4;background:radial-gradient(circle at 50% 48%,transparent 0 28%,rgba(0,0,0,.05) 58%,rgba(0,0,0,.28) 100%);pointer-events:none}
+.reactor{position:fixed;width:min(18vw,260px);aspect-ratio:1;border-radius:50%;z-index:-1;opacity:calc(.28 + var(--energy)*.42);filter:hue-rotate(var(--hue)) drop-shadow(0 0 calc(16px + var(--bass)*34px) #ff20e6);transform:scale(calc(.92 + var(--bass)*.15));pointer-events:none}
+.reactor::before,.reactor::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(0,238,255,.82);box-shadow:0 0 10px #00eaff,inset 0 0 18px #a100ff,0 0 34px #ff00d4;animation:spin 11s linear infinite}
+.reactor::after{inset:15%;border-style:dashed;border-color:#ff37df;animation-direction:reverse;animation-duration:7s}
+.r1{left:4vw;top:32vh}.r2{right:4vw;top:32vh}.r3{left:24vw;bottom:4vh;width:min(11vw,170px)}.r4{right:24vw;bottom:4vh;width:min(11vw,170px)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.laser{position:fixed;z-index:4;pointer-events:none;mix-blend-mode:screen;filter:hue-rotate(var(--hue))}
+.laser-h{left:-15vw;width:130vw;height:3px;background:#fff;box-shadow:0 0 5px #fff,0 0 12px #00eaff,0 0 25px #ff00df,0 0 55px #9b00ff;animation:laserY 8.6s ease-in-out infinite alternate}
+.laser-v{top:-15vh;height:130vh;width:3px;background:#fff;box-shadow:0 0 5px #fff,0 0 12px #00eaff,0 0 25px #ff00df,0 0 55px #9b00ff;animation:laserX 10.2s ease-in-out infinite alternate}
+@keyframes laserY{0%{top:2vh}100%{top:97vh}}@keyframes laserX{0%{left:2vw}100%{left:97vw}}
+#ticker{position:fixed;left:0;right:0;top:50%;transform:translateY(-50%);height:clamp(92px,14vh,180px);overflow:hidden;z-index:8;display:flex;align-items:center;background:linear-gradient(90deg,transparent,rgba(0,0,0,.48) 12%,rgba(0,0,0,.6) 50%,rgba(0,0,0,.48) 88%,transparent);border-top:1px solid rgba(0,238,255,.42);border-bottom:1px solid rgba(255,0,222,.42);box-shadow:0 0 30px rgba(255,0,222,.16)}
+#track{display:inline-block;white-space:nowrap;padding-left:100vw;font-weight:900;font-size:clamp(42px,6.1vw,104px);letter-spacing:.035em;text-transform:none;color:#fff;text-shadow:0 0 4px #fff,0 0 11px #00d9ff,0 0 22px #ff00d4,0 0 38px #8d00ff;animation:marquee var(--ticker-seconds,22s) linear infinite;will-change:transform}
+@keyframes marquee{to{transform:translateX(-100%)}}
+#source{position:fixed;right:18px;bottom:12px;z-index:9;font:700 11px/1.2 monospace;letter-spacing:.14em;color:rgba(255,255,255,.58);text-shadow:0 0 8px currentColor}
+audio{display:none}
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="veil"></div>
+<div class="reactor r1"></div><div class="reactor r2"></div><div class="reactor r3"></div><div class="reactor r4"></div>
+<div class="laser laser-h"></div><div class="laser laser-v"></div>
+<div id="ticker"><div id="track">666SOUNDsDESIGn · LYVRA · LIVE 24/7</div></div>
+<div id="source">TWITCH · CONNECTING</div>
+<audio id="radio" autoplay preload="auto" playsinline crossorigin="anonymous"></audio>
+<script>
+(()=>{
+'use strict';
+const audio=document.getElementById('radio'),track=document.getElementById('track'),source=document.getElementById('source');
+const STREAM='/TWITCH/stream',META='/api/nowplaying';
+let ctx=null,analyser=null,data=null,raf=0,retry=0,lastTitle='';
+const first=(...v)=>{for(const x of v){if(typeof x==='string'&&x.trim())return x.trim();}return ''};
+function setTitle(v){const t=String(v||'').replace(/\s+/g,' ').trim()||'666SOUNDsDESIGn · LYVRA · LIVE 24/7';if(t===lastTitle)return;lastTitle=t;track.textContent=t+'   ✦   '+t+'   ✦   ';const sec=Math.max(18,Math.min(42,12+t.length*.22));track.style.setProperty('--ticker-seconds',sec+'s');}
+async function metadata(){try{const r=await fetch(META+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();setTitle(first(d.display_title,d.normalized_title,d.title_display,d.song,d.title,d.songtitle,d.track,d.currentSong,d.current_song,d.nowplaying,d.nowPlaying));}catch(_){if(!lastTitle)setTitle('666SOUNDsDESIGn · LYVRA · LIVE 24/7')}}
+function graph(){if(ctx)return;try{ctx=new (window.AudioContext||window.webkitAudioContext)();analyser=ctx.createAnalyser();analyser.fftSize=512;analyser.smoothingTimeConstant=.82;data=new Uint8Array(analyser.frequencyBinCount);const src=ctx.createMediaElementSource(audio);src.connect(analyser);analyser.connect(ctx.destination);}catch(_){ctx=null;analyser=null}}
+function frame(){if(analyser&&data){analyser.getByteFrequencyData(data);let lo=0,mi=0,hi=0;const n=data.length;for(let i=0;i<n;i++){const v=data[i]/255;if(i<n*.12)lo+=v;else if(i<n*.48)mi+=v;else hi+=v}lo/=Math.max(1,Math.floor(n*.12));mi/=Math.max(1,Math.floor(n*.36));hi/=Math.max(1,n-Math.floor(n*.48));const e=Math.min(1,(lo*1.25+mi*.75+hi*.45)/2.1);const s=document.documentElement.style;s.setProperty('--bass',lo.toFixed(3));s.setProperty('--mid',mi.toFixed(3));s.setProperty('--high',hi.toFixed(3));s.setProperty('--energy',e.toFixed(3));s.setProperty('--hue',((Date.now()/55)%360).toFixed(1)+'deg');}raf=requestAnimationFrame(frame)}
+async function start(){clearTimeout(retry);graph();try{if(ctx&&ctx.state==='suspended')await ctx.resume();if(!audio.src)audio.src=STREAM+'?t='+Date.now();await audio.play();source.textContent='TWITCH · LIVE · 8686 MAIN → NAMED BACKUP';}catch(_){source.textContent='TWITCH · AUTOPLAY RETRY';retry=setTimeout(()=>{audio.src=STREAM+'?t='+Date.now();start()},2500)}}
+audio.addEventListener('playing',()=>{graph();source.textContent='TWITCH · LIVE · AUTO FAILOVER'});
+audio.addEventListener('error',()=>{source.textContent='TWITCH · STREAM RECOVERY';clearTimeout(retry);retry=setTimeout(()=>{audio.src=STREAM+'?t='+Date.now();start()},1800)});
+audio.addEventListener('stalled',()=>{source.textContent='TWITCH · STREAM STALLED · RECOVERY'});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&audio.paused)start()});
+metadata();setInterval(metadata,6000);start();frame();
+})();
+</script>
+</body>
+</html>
