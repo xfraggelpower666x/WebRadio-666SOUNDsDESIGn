@@ -28,3 +28,14 @@ test('twitch visual has autoplay, nowplaying and audio-reactive analyser',()=>{
   assert.match(root,/class="reactor/);
   assert.match(root,/\/TWITCH\/background\.jpg/);
 });
+
+test('twitch background asset exists in root/public and stays byte-identical',()=>{
+  const rootPath='TWITCH/background.jpg';
+  const publicPath='public/TWITCH/background.jpg';
+  assert.equal(fs.existsSync(rootPath),true,'missing TWITCH/background.jpg');
+  assert.equal(fs.existsSync(publicPath),true,'missing public/TWITCH/background.jpg');
+  const a=fs.readFileSync(rootPath);
+  const b=fs.readFileSync(publicPath);
+  assert.ok(a.length>100000,'twitch background unexpectedly small');
+  assert.equal(Buffer.compare(a,b),0,'twitch background mirrors differ');
+});
