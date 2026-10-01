@@ -1,0 +1,28 @@
+name: Embed MiniPlayer Contract
+on:
+  push:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+      - feature/666-embed-miniplayer-v1
+  pull_request:
+    paths:
+      - 'public/embed/**'
+      - 'worker.js'
+      - 'worker-entry.js'
+      - 'public/js/boost-core.js'
+      - 'public/js/admin-auth-client.js'
+      - 'public/js/skip-control.js'
+      - 'public/js/addons/player-broadcast-alert-v148.js'
+      - 'tests/embed-miniplayer-contract.test.mjs'
+      - 'docs/EMBED_MINIPLAYER_SYNC_CONTRACT.md'
+      - '.github/workflows/embed-miniplayer-contract.yml'
+  workflow_dispatch:
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/embed-miniplayer-contract.test.mjs

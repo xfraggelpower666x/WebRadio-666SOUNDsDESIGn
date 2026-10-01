@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10091e">
+<title>666SOUNDsDESIGn — Embed MiniPlayer</title>
+<style>
+:root{color-scheme:dark;font:14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;background:transparent}
+*{box-sizing:border-box}body{margin:0;padding:4px;color:#eafcff}
+.player{min-height:156px;display:grid;grid-template-columns:auto 60px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border:1px solid #46e5ed;border-radius:17px;background:linear-gradient(125deg,#0b1020,#230b38 68%,#190c2d);box-shadow:inset 0 0 20px #18f7ff12,0 0 14px #b63df522}
+.play{width:58px;height:58px;border-radius:50%;border:2px solid #5cf9ff;background:#112536;color:#8bffff;font-size:25px;cursor:pointer;box-shadow:0 0 16px #00dfff55}
+.play:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ff68d4;outline-offset:3px}
+.title{font-size:14px;letter-spacing:.07em;font-weight:800;color:#f4b4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cover{width:60px;height:60px;object-fit:cover;border-radius:9px;background:#241136}
+.marquee{overflow:hidden;white-space:nowrap;max-width:100%;min-height:20px;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.track{display:inline-block;font-size:13px;white-space:nowrap;max-width:none}
+.track.scroll{padding-left:100%;animation:scrolltitle 16s linear infinite}
+@keyframes scrolltitle{to{transform:translateX(-100%)}}
+@media(prefers-reduced-motion:reduce){.track.scroll{animation:none;padding-left:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}}
+.eq{height:21px;display:flex;gap:3px;align-items:end;margin:5px 0}
+.eq i{display:block;width:5px;height:3px;border-radius:3px;background:linear-gradient(#fa63da,#4beaf1);transition:height .08s linear}
+.stats{display:flex;gap:9px;flex-wrap:wrap;color:#bdc7e9;font-size:10px}
+.status{font-size:11px;color:#9beef5;min-height:16px}.controls{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoration:none;font-size:12px;font-weight:700}a:hover{text-decoration:underline}
+@media(max-width:470px){.player{grid-template-columns:auto 45px minmax(0,1fr);gap:8px;padding:11px}.cover{width:45px;height:45px}.controls{grid-column:1/-1}.play{width:48px;height:48px}.controls{grid-column:1/-1;justify-content:space-between;padding-left:4px}.title{font-size:12px}}
+@media(prefers-reduced-motion:no-preference){.play:hover{box-shadow:0 0 23px #ff52dbaa}}
+.tools{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tools button,.tools a{background:#1b1740;border:1px solid #56dbe9;border-radius:8px;color:#d5fbff;padding:6px 10px;font-size:11px;cursor:pointer}.panel{grid-column:1/-1;border-top:1px solid #724f9c;padding-top:10px}.panel[hidden]{display:none}.eqgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.eqgrid label{font-size:10px;display:grid;gap:4px}.eqgrid input{width:100%}.msgrow{display:flex;gap:6px;flex-wrap:wrap}.msgrow input{min-width:90px;flex:1;background:#110f24;border:1px solid #536d96;color:#fff;padding:7px;border-radius:7px}.msgrow input[name=message]{flex:4;min-width:140px}.feedback{font-size:11px;color:#83f3ee;margin-top:5px}.boost{max-width:160px}.panel h2{font-size:12px;margin:6px 0;color:#efa8ff}
+</style>
+</head>
+<body>
+<section class="player" aria-label="666SOUNDsDESIGn WebRadio MiniPlayer">
+<button class="play" id="toggle" aria-label="Radio abspielen" type="button">▶</button>
+<img id="cover" class="cover" src="/assets/veluna/covers/veluna-stream-fallback.webp" alt="666SOUNDsDESIGn Streambild">
+<div><div class="title">666SOUNDsDESIGn · LIVE RADIO</div>
+<div class="marquee"><span id="track" class="track" aria-label="Now Playing">Live-Stream</span></div>
+<div class="eq" id="eq" aria-label="Audiofrequenzanzeige"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="stats"><span id="dj">DJ: —</span><span id="listeners">Listener: —</span><span id="quality">Qualität: —</span></div>
+<div id="status" class="status" role="status">Bereit · Play drücken</div></div>
+<div class="controls"><label for="volume" aria-label="Lautstärke">🔊</label><input id="volume" type="range" min="0" max="100" value="75" aria-label="Lautstärke"><a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer">PLAYER ↗</a></div>
+<div class="tools"><button id="soundBtn" type="button" aria-expanded="false">🎚 EQ + BOOST</button><button id="messageBtn" type="button" aria-expanded="false">📡 MESSAGE</button><button id="skipBtn" type="button">⏭ AUTO-DJ SKIP 🔒</button><a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer" title="Discord im vollständigen WebRadio öffnen">DISCORD ↗</a></div>
+<div id="soundPanel" class="panel" hidden><h2>Sound · 5-Band-EQ</h2><div class="eqgrid">
+<label>SUB<input data-eq="0" type="range" min="-12" max="12" value="0"></label><label>LOW<input data-eq="1" type="range" min="-12" max="12" value="0"></label><label>MID<input data-eq="2" type="range" min="-12" max="12" value="0"></label><label>HIGH<input data-eq="3" type="range" min="-12" max="12" value="0"></label><label>AIR<input data-eq="4" type="range" min="-12" max="12" value="0"></label></div><label>BOOST <select id="boost"><option value="0">0 · Normal</option><option value="1">1 · +2 dB</option><option value="2">2 · +4 dB</option><option value="3">3 · +6 dB</option><option value="4">4 · +8 dB</option><option value="5">5 · +10 dB</option></select></label><div id="soundStatus" class="feedback">Audioeffekte nach Play aktivierbar · Lautstärke vorsichtig einstellen.</div></div>
+<div id="messagePanel" class="panel" hidden><h2>Broadcast Messenger</h2><div class="msgrow"><input id="sender" maxlength="28" aria-label="Anzeigename" placeholder="Name"><input id="message" name="message" maxlength="240" aria-label="Nachricht" placeholder="Nachricht an Hörer"><button id="send" type="button">SEND</button></div><div id="messageStatus" class="feedback" role="status">Maximal 240 Zeichen · Versand über Radio-Backend</div></div>
+</section>
+<audio id="radio" preload="none"></audio>
+<script src="/js/boost-core.js"></script>
+<script src="/js/admin-auth-client.js"></script>
+<script src="/js/skip-control.js"></script>
+<script>
+(()=>{'use strict';
+const audio=document.getElementById('radio'),toggle=document.getElementById('toggle'),status=document.getElementById('status'),track=document.getElementById('track'),volume=document.getElementById('volume');
+const cover=document.getElementById('cover'),dj=document.getElementById('dj'),listeners=document.getElementById('listeners'),quality=document.getElementById('quality'),bars=[...document.querySelectorAll('#eq i')];
+const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
+cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
+let audioContext,analyser,frequencyData,visualActive=false;
+function visualizer(){if(!visualActive||!analyser)return;analyser.getByteFrequencyData(frequencyData);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}if(!audio.paused&&!document.hidden)requestAnimationFrame(visualizer)}
+function enableVisualizer(){if(visualActive)return;try{const core=window.SMFPBoostCore;if(!core)return;const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;frequencyData=new Uint8Array(analyser.frequencyBinCount);visualActive=true;applySound();void core.resume(audio);requestAnimationFrame(visualizer)}catch(_){visualActive=false}}
+const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
+const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
+function applySound(){const core=window.SMFPBoostCore;if(!core)return;const values={};['sub','low','mid','high','air'].forEach((key,i)=>values[key]=Number(sliders[i].value));core.applyEq(audio,values,'embed-shared-core');const stage=core.applyBoost(audio,Number(boost.value),'embed-shared-core');boost.value=String(stage);soundStatus.textContent='Gemeinsamer Audio-Core · EQ aktiv · '+core.getLabel(stage)}
+function togglePanel(btn,panel){panel.hidden=!panel.hidden;btn.setAttribute('aria-expanded',String(!panel.hidden))}
+soundBtn.addEventListener('click',()=>togglePanel(soundBtn,soundPanel));messageBtn.addEventListener('click',()=>togglePanel(messageBtn,messagePanel));
+sliders.forEach(x=>x.addEventListener('input',applySound));boost.addEventListener('change',applySound);
+document.getElementById('skipBtn').addEventListener('click',async()=>{const btn=document.getElementById('skipBtn');if(!window.S666SkipControl){label('Admin-Funktion nicht geladen');return}btn.disabled=true;label('Admin-Authentifizierung …');try{const result=await window.S666SkipControl.skip({source:'embed-miniplayer'});label(result.ok?'Auto-DJ Skip bestätigt':('Skip: '+String(result.error||'fehlgeschlagen').slice(0,110)))}catch(_){label('Skip nicht verfügbar')}finally{btn.disabled=false}});
+document.getElementById('send').addEventListener('click',async()=>{const button=document.getElementById('send'),message=document.getElementById('message').value.trim().slice(0,240),username=document.getElementById('sender').value.trim().slice(0,28)||'Guest';if(!message){messageStatus.textContent='Bitte Nachricht eingeben';return}button.disabled=true;messageStatus.textContent='Sende …';try{const response=await fetch('/api/player-alert/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,username,clientId:'embed-'+(crypto.randomUUID?.()||String(Date.now())),version:'embed-v1.2'})});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw new Error(String(data.error||'Backend lehnt Versand ab'));messageStatus.textContent='Gesendet · Bestätigung vom Backend';document.getElementById('message').value=''}catch(e){messageStatus.textContent='Nicht gesendet: '+String(e.message||'Netzwerkfehler').slice(0,100)}finally{button.disabled=false}});
+const sources=[new URL('/stream',location.origin).href,'https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com:8686/stream'];
+let sourceIndex=0,wanted=false,retrying=false;audio.volume=.75;
+// WebAudio analyser requires a CORS-enabled stream; keep native audio unmodified when unavailable.
+// Visualizer activation is opt-in and must be tested with the production stream.
+function label(message){status.textContent=message}
+function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
+async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
+volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
+audio.addEventListener('playing',()=>{retrying=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
+audio.addEventListener('waiting',()=>{if(wanted)label('Puffert …')});
+audio.addEventListener('pause',()=>{state();bars.forEach(b=>b.style.height='3px')});
+audio.addEventListener('error',async()=>{if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+async function metadata(){try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),4500);try{const response=await fetch('https://webradio.666soundsdesign-broadcaster.com/api/nowplaying',{signal:controller.signal,cache:'no-store'});if(!response.ok)return;const data=await response.json();const candidate=data?.now_playing?.song?.text||data?.nowplaying?.song?.text||data?.songtitle||data?.title||data?.song?.title||data?.nowplaying?.title;
+if(typeof candidate==='string'&&candidate.trim()){const text=candidate.trim().slice(0,180);if(track.textContent!==text){track.textContent=text;track.classList.toggle('scroll',text.length>38)}}
+const djName=data?.dj?.name||data?.dj_name||data?.current_dj||data?.streamer?.name;if(typeof djName==='string'&&djName.trim())dj.textContent='DJ: '+djName.trim().slice(0,45);
+const count=data?.listeners?.current??data?.currentlisteners??data?.listeners_current??data?.listener_count;
+if(Number.isFinite(Number(count))&&count!==null&&count!==''&&Number(count)>=0)listeners.textContent='Listener: '+Math.floor(Number(count));
+const bitrate=data?.bitrate??data?.stream?.bitrate??data?.quality?.bitrate;
+if(Number.isFinite(Number(bitrate))&&Number(bitrate)>0)quality.textContent='Qualität: '+Math.round(Number(bitrate))+' kbps';
+const art=data?.now_playing?.song?.art||data?.nowplaying?.song?.art||data?.cover||data?.artwork;
+if(typeof art==='string'&&art.trim()){try{const u=new URL(art,location.origin);if(u.protocol==='https:'&&u.href!==cover.src)cover.src=u.href}catch(_){}}}finally{clearTimeout(timeout)}}catch(_){/* metadata is optional; playback independent */}}
+metadata();setInterval(()=>{if(!document.hidden)metadata()},12000);
+})();
+</script>
+</body>
+</html>
