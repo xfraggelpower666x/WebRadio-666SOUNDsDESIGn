@@ -157,7 +157,17 @@ class GoveeLan:
                     message = json.loads(raw.decode("utf-8", "replace"))
                 except (UnicodeDecodeError, ValueError):
                     continue
-                return {"ok": True, "source_ip": sender[0], "response": message}
+                envelope = message.get("msg", {}) if isinstance(message, dict) else {}
+                if not isinstance(envelope, dict) or envelope.get("cmd") != "devStatus":
+                    continue
+                data = envelope.get("data")
+                if not isinstance(data, dict):
+                    continue
+                if data.get("onOff") not in (0, 1) or not isinstance(data.get("brightness"), int):
+                    continue
+                if not 1 <= data["brightness"] <= 100:
+                    continue
+                return {"ok": True, "source_ip": sender[0], "status": data}
             return {"ok": False, "reason": "no_matching_udp_response"}
         except OSError as exc:
             return {"ok": False, "reason": "udp_port_unavailable", "details": str(exc)}
