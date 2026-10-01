@@ -16,7 +16,7 @@ except Exception:
     BleakClient = None
     BleakScanner = None
 
-VERSION = "0.2.0"
+VERSION = "0.5.0-dev"
 LENZE_SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
 LENZE_WRITE_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
 LENZE_NOTIFY_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"
@@ -25,7 +25,7 @@ MAGIC_WRITE_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
 MAGIC_NOTIFY_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"
 
 DEFAULT_CONFIG = {
-    "server": {"host": "127.0.0.1", "port": 3000},
+    "server": {"host": "127.0.0.1", "port": 3000, "allowed_origins": ["https://webradio.666soundsdesign-broadcaster.com", "http://localhost:3000", "http://127.0.0.1:3000"]},
     "engine": {"enabled": True, "mode": "cyber"},
     "govee": {
         "enabled": True,
@@ -49,6 +49,8 @@ DEFAULT_CONFIG = {
         "write_uuid": MAGIC_WRITE_UUID,
         "notify_uuid": MAGIC_NOTIFY_UUID,
         "write_enabled": False,
+        "protocol_verified": False,
+        "approved_windows_addresses": [],
         "disconnect_after_write": True,
         "color_order": "RGB",
     },
@@ -80,6 +82,7 @@ class GoveeLan:
         self.online = False
         self.detail = "not started"
         self.last_color = None
+        self._last_audio_write = 0.0
 
     async def start(self):
         if not self.cfg.get("enabled", True):
@@ -180,11 +183,17 @@ class GoveeLan:
         self.detail = "LAN probe confirmed" if self.online else "LAN probe: " + str(result.get("reason", "unknown"))
         return result
 
+    def _require_confirmed_lan(self):
+        if not self.cfg.get("enabled", True) or not self.online:
+            raise RuntimeError("GOVEE_LAN_UNVERIFIED: run successful /api/govee/probe first")
+
     async def set_power(self, on):
+        self._require_confirmed_lan()
         await asyncio.to_thread(self._send, "turn", {"value": 1 if on else 0})
         self.detail = "power UDP sent (no ack)"
 
     async def set_color(self, r, g, b, brightness=65):
+        self._require_confirmed_lan()
         r, g, b = [max(0, min(255, int(x))) for x in (r, g, b)]
         brightness = max(1, min(100, int(brightness)))
         await asyncio.to_thread(self._send, "colorwc", {"color": {"r": r, "g": g, "b": b}, "colorTemInKelvin": 0})
@@ -193,6 +202,11 @@ class GoveeLan:
         self.detail = "color UDP sent (no ack)"
 
     async def audio(self, payload):
+        if not self.online:
+            return {"ok": False, "reason": "govee_probe_required"}
+        now = time.monotonic()
+        if now - self._last_audio_write < 0.20:
+            return {"ok": True, "throttled": True}
         energy = max(0, min(255, int(payload.get("energy", 0))))
         bass = max(0, min(255, int(payload.get("bass", 0))))
         mid = max(0, min(255, int(payload.get("mid", 0))))
@@ -207,6 +221,8 @@ class GoveeLan:
         brightness = max(8, min(100, round(18 + energy * 82 / 255)))
         if (*rgb, brightness) != self.last_color:
             await self.set_color(*rgb, brightness)
+            self._last_audio_write = time.monotonic()
+        return {"ok": True}
 
     def status(self):
         return {"kind": "govee", "name": self.cfg.get("device_name") or "Govee", "online": self.online, "detail": self.detail, "ip": self.ip, "model": self.cfg.get("model")}
@@ -317,10 +333,13 @@ class MagicLanternFleet:
         return tuple(values[ch] for ch in order)
 
     async def _write_all(self, payload):
+        if not self.cfg.get("write_enabled", False) or not self.cfg.get("protocol_verified", False):
+            raise RuntimeError("MAGIC_LANTERN_WRITE_BLOCKED: unverified controller protocol")
+        allowed = set(self.cfg.get("approved_windows_addresses") or [])
+        if not allowed or any(address not in allowed for address in self.devices):
+            raise RuntimeError("MAGIC_LANTERN_WRITE_BLOCKED: Windows BLE address allowlist required")
         if BleakClient is None:
             raise RuntimeError("bleak not installed")
-        if not self.cfg.get("write_enabled", False):
-            raise RuntimeError("MAGIC_LANTERN_WRITE_BLOCKED: enable only after identifying the OC21W bars")
         if not self.devices:
             await self.scan()
         results = []
@@ -361,8 +380,8 @@ class MagicLanternFleet:
         return result
 
     async def audio(self, payload):
-        if not self.cfg.get("write_enabled", False):
-            return
+        if not self.cfg.get("write_enabled", False) or not self.cfg.get("protocol_verified", False):
+            return {"ok": False, "reason": "magic_lantern_write_blocked"}
         energy = max(0, min(255, int(payload.get("energy", 0))))
         bass = max(0, min(255, int(payload.get("bass", 0))))
         mid = max(0, min(255, int(payload.get("mid", 0))))
@@ -407,7 +426,11 @@ class Engine:
         self.lock = asyncio.Lock()
 
     async def start(self):
-        await asyncio.gather(*(d.start() for d in self.devices), return_exceptions=True)
+        self.start_errors = []
+        outcomes = await asyncio.gather(*(d.start() for d in self.devices), return_exceptions=True)
+        for adapter, outcome in zip(self.devices, outcomes):
+            if isinstance(outcome, BaseException):
+                self.start_errors.append({"device": adapter.status()["kind"], "error": str(outcome)})
 
     async def set_enabled(self, enabled):
         self.enabled = bool(enabled)
@@ -425,7 +448,7 @@ class Engine:
                 out.append({"device": d.status()["kind"], "ok": True})
             except Exception as e:
                 out.append({"device": d.status()["kind"], "ok": False, "error": str(e)})
-        return {"ok": True, "results": out}
+        return {"ok": all(x["ok"] for x in out), "results": out}
 
     async def set_color(self, r, g, b, brightness=65):
         out = []
@@ -435,15 +458,16 @@ class Engine:
                 out.append({"device": d.status()["kind"], "ok": True})
             except Exception as e:
                 out.append({"device": d.status()["kind"], "ok": False, "error": str(e)})
-        return {"ok": True, "results": out}
+        return {"ok": all(x["ok"] for x in out), "results": out}
 
     async def audio(self, payload):
         self.last_audio = payload
         if not self.enabled:
             return {"ok": True, "enabled": False}
         async with self.lock:
-            await asyncio.gather(*(d.audio(payload) for d in self.devices), return_exceptions=True)
-        return {"ok": True, "enabled": True}
+            results = await asyncio.gather(*(d.audio(payload) for d in self.devices), return_exceptions=True)
+        errors = [{"device": adapter.status()["kind"], "error": str(value)} for adapter, value in zip(self.devices, results) if isinstance(value, BaseException)]
+        return {"ok": not errors, "enabled": True, "errors": errors}
 
     def status(self):
         return {
@@ -456,6 +480,7 @@ class Engine:
             "uptime_s": int(time.time() - self.started_at),
             "devices": [d.status() for d in self.devices],
             "last_audio": self.last_audio,
+            "start_errors": getattr(self, "start_errors", []),
         }
 
 
@@ -478,7 +503,11 @@ class Bridge:
             def headers_json(self, code=200):
                 self.send_response(code)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
-                self.send_header("Access-Control-Allow-Origin", "*")
+                origin = self.headers.get("Origin")
+                allowed = bridge.engine.cfg.get("server", {}).get("allowed_origins", [])
+                if origin and origin in allowed:
+                    self.send_header("Access-Control-Allow-Origin", origin)
+                    self.send_header("Vary", "Origin")
                 self.send_header("Access-Control-Allow-Headers", "Content-Type")
                 self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
                 self.end_headers()
@@ -489,12 +518,29 @@ class Bridge:
 
             def body(self):
                 n = int(self.headers.get("Content-Length") or 0)
-                return json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+                if n < 0 or n > 65536:
+                    raise ValueError("request_body_size_limit")
+                result = json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+                if not isinstance(result, dict):
+                    raise ValueError("json_body_must_be_object")
+                return result
+
+            def _authorized(self):
+                host = self.headers.get("Host", "").split(":")[0].lower()
+                origin = self.headers.get("Origin")
+                allowed = bridge.engine.cfg.get("server", {}).get("allowed_origins", [])
+                if host not in ("localhost", "127.0.0.1") or (origin is not None and origin not in allowed):
+                    self.reply({"ok": False, "error": "forbidden_origin_or_host"}, 403)
+                    return False
+                return True
 
             def do_OPTIONS(self):
-                self.headers_json(204)
+                if self._authorized():
+                    self.headers_json(204)
 
             def do_GET(self):
+                if not self._authorized():
+                    return
                 path = urlparse(self.path).path
                 if path in ("/", "/api/status"):
                     self.reply(engine.status())
@@ -506,6 +552,8 @@ class Bridge:
                     self.reply({"ok": False, "error": "not_found"}, 404)
 
             def do_POST(self):
+                if not self._authorized():
+                    return
                 path = urlparse(self.path).path
                 try:
                     body = self.body()
