@@ -68,6 +68,8 @@ class App(tk.Tk):
             try:
                 result = self.bridge.run_async(coro)
                 errors = [x for x in result.get("results", []) if isinstance(x, dict) and not x.get("ok", True)] if isinstance(result, dict) else []
+                if isinstance(result, dict) and result.get("ok") is False and not errors:
+                    errors = [result]
                 self.after(0, self.refresh)
                 if errors:
                     self.after(0, lambda: messagebox.showinfo("Teilstatus", json.dumps(errors, indent=2, ensure_ascii=False)))
