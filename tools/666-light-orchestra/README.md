@@ -1,4 +1,4 @@
-# 666SOUNDsDESIGn LIGHT ORCHESTRA v0.2.0
+# 666SOUNDsDESIGn LIGHT ORCHESTRA v0.5.0-dev
 
 Lokale Python-Lichtbridge und Windows-GUI für das bestehende WebRadio.
 
@@ -87,3 +87,16 @@ python -m unittest discover -s tests -v
 ```
 
 **Wichtig:** Kein Live-Hardwaretest erfolgt allein durch diese Codeintegration. Die Windows-BLE-Adressen müssen vor einer Einzelzuordnung auf dem Windows-PC erfasst werden.
+
+
+## v0.5.0-dev — Deep-audit safety improvements (source-only candidate)
+
+- Govee UDP RGB/power commands require a successful read-only status probe against the configured IP. Proof expires after 5 minutes and must be refreshed; a UDP send is **never** hardware acknowledgement.
+- Audio update writes are capped at about five Govee color updates per second to avoid spamming LAN control.
+- Magic Lantern writes remain blocked unless `write_enabled`, `protocol_verified`, and a nonempty allowlist of specifically discovered **Windows** BLE addresses are ALL present; this is not permission to enable without hardware evidence.
+- HTTP API binds to loopback and validates request Host and browser Origin against `server.allowed_origins`; default whitelist includes official radio origin and local testing origins; request bodies capped at 64 KiB.
+- Startup exceptions and audio-adapter failures are reported; no false all-success status when an adapter throws.
+- Extra regression tests in `tests/test_safety.py` target fail-closed behavior, local simulation only.
+- Security caveat: Windows executable and actual hardware behavior NOT validated. This version is **DEVELOPMENT / SOURCE AUDIT**, not a production release or validated ZIP freeze.
+
+Use `python -m unittest discover -s tests -v` from the native tools directory. The GitHub Release Integrity workflow currently validates Python syntax and general radio tests, NOT necessarily LIGHT ORCHESTRA runtime. Our dedicated workflow must report its own successful test run before marking unit tests PASS.
