@@ -20,3 +20,21 @@ Any release changing stream routing, nowplaying schema, shared EQ/boost, admin a
 
 ## Production gates
 Development branch and draft PR are not deployment. Verify embedded audio playback, WebAudio/CORS behavior, mobile controls, server authorization, messenger feedback, cache behavior and frame-ancestor embedding before merging. Preserve the normal 666PFS source → tests → deploy → live readback → backup → registry → CURRENT-pointer order.
+
+## Embed code and height contract
+
+```html
+<iframe src="https://webradio.666soundsdesign-broadcaster.com/embed/miniplayer.html"
+  title="666SOUNDsDESIGn WebRadio" loading="lazy" allow="autoplay"
+  width="100%" height="365"
+  style="display:block;max-width:680px;border:0;border-radius:18px"></iframe>
+```
+
+Because EQ and Broadcast panels expand **inside** an iframe, reserve at least 365px height on narrow layouts; 165px is insufficient for the expanded controls. The embed never requests or stores the AutoDJ Worker secret: authentication is through the canonical player admin service. The iframe must be hosted on the **radio domain** so relative authenticated endpoints remain same-origin. If a deployment has restrictive `Content-Security-Policy: frame-ancestors` or `X-Frame-Options`, configure explicit trusted embedding origins; do not disable the radio's security policy globally.
+
+## Limitations
+- The Discord control currently opens the full player; this is not an embedded Discord panel.
+- Existing changes to full-player-only markup/CSS do not automatically update MiniPlayer markup.
+- The MiniPlayer's separate Broadcast composer calls the same backend but does not reuse the full player's UI component.
+- Live production CORS, iframe and server responses remain to be verified.
+- After activating WebAudio, cross-origin fallback audio is blocked when CORS support is unknown, rather than claiming playback success.
