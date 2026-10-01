@@ -70,7 +70,7 @@ let sourceIndex=0,wanted=false,retrying=false;audio.volume=.75;
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');// Keep native stream playback isolated from WebAudio: CORS/redirected Shoutcast sources may otherwise be silenced or stall.\n// Visualizer stays inactive until an explicitly validated CORS-safe stream path exists.}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
 audio.addEventListener('playing',()=>{retrying=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
