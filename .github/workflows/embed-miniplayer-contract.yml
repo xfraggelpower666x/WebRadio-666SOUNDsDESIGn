@@ -7,6 +7,8 @@ on:
   pull_request:
     paths:
       - 'public/embed/**'
+      - 'worker.js'
+      - 'worker-entry.js'
       - 'public/js/boost-core.js'
       - 'public/js/admin-auth-client.js'
       - 'public/js/skip-control.js'
