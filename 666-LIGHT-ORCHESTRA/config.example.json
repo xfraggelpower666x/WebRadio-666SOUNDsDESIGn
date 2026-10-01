@@ -1,0 +1,36 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 3000
+  },
+  "engine": {
+    "enabled": true,
+    "mode": "cyber"
+  },
+  "govee": {
+    "enabled": true,
+    "auto_discover": true,
+    "device_ip": "192.168.2.32",
+    "device_name": "GOVEE-LIGHT-BARS",
+    "model": "H6047",
+    "mac": "60:74:F4:40:D9:A2"
+  },
+  "lenze": {
+    "enabled": true,
+    "device_name_prefix": "LENZE-RGB",
+    "service_uuid": "0000fff0-0000-1000-8000-00805f9b34fb",
+    "write_uuid": "0000fff3-0000-1000-8000-00805f9b34fb",
+    "notify_uuid": "0000fff4-0000-1000-8000-00805f9b34fb",
+    "write_enabled": false
+  },
+  "magic_lantern": {
+    "enabled": true,
+    "device_name_prefix": "OC21W",
+    "service_uuid": "0000fff0-0000-1000-8000-00805f9b34fb",
+    "write_uuid": "0000fff3-0000-1000-8000-00805f9b34fb",
+    "notify_uuid": "0000fff4-0000-1000-8000-00805f9b34fb",
+    "write_enabled": false,
+    "disconnect_after_write": true,
+    "color_order": "RGB"
+  }
+}
