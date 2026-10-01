@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10091e">
+<title>666SOUNDsDESIGn — Embed MiniPlayer</title>
+<style>
+:root{color-scheme:dark;font:14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;background:transparent}
+*{box-sizing:border-box}body{margin:0;padding:4px;color:#eafcff}
+.player{min-height:120px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border:1px solid #46e5ed;border-radius:17px;background:linear-gradient(125deg,#0b1020,#230b38 68%,#190c2d);box-shadow:inset 0 0 20px #18f7ff12,0 0 14px #b63df522}
+.play{width:58px;height:58px;border-radius:50%;border:2px solid #5cf9ff;background:#112536;color:#8bffff;font-size:25px;cursor:pointer;box-shadow:0 0 16px #00dfff55}
+.play:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ff68d4;outline-offset:3px}
+.title{font-size:14px;letter-spacing:.07em;font-weight:800;color:#f4b4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;min-height:19px}
+.status{font-size:11px;color:#9beef5;min-height:16px}.controls{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoration:none;font-size:12px;font-weight:700}a:hover{text-decoration:underline}
+@media(max-width:470px){.player{grid-template-columns:auto minmax(0,1fr);gap:9px;padding:11px}.play{width:48px;height:48px}.controls{grid-column:1/-1;justify-content:space-between;padding-left:4px}.title{font-size:12px}}
+@media(prefers-reduced-motion:no-preference){.play:hover{box-shadow:0 0 23px #ff52dbaa}}
+</style>
+</head>
+<body>
+<section class="player" aria-label="666SOUNDsDESIGn WebRadio MiniPlayer">
+<button class="play" id="toggle" aria-label="Radio abspielen" type="button">▶</button>
+<div><div class="title">666SOUNDsDESIGn · LIVE RADIO</div><div id="track" class="track" aria-live="polite">Live-Stream</div><div id="status" class="status" role="status">Bereit · Play drücken</div></div>
+<div class="controls"><label for="volume" aria-label="Lautstärke">🔊</label><input id="volume" type="range" min="0" max="100" value="75" aria-label="Lautstärke"><a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer">PLAYER ↗</a></div>
+</section>
+<audio id="radio" preload="none"></audio>
+<script>
+(()=>{'use strict';
+const audio=document.getElementById('radio'),toggle=document.getElementById('toggle'),status=document.getElementById('status'),track=document.getElementById('track'),volume=document.getElementById('volume');
+const sources=['https://webradio.666soundsdesign-broadcaster.com/stream','https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com:8686/stream'];
+let sourceIndex=0,wanted=false,retrying=false;audio.volume=.75;
+function label(message){status.textContent=message}
+function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
+async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden')}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
+volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
+audio.addEventListener('playing',()=>{retrying=false;label('LIVE · Läuft');state()});
+audio.addEventListener('waiting',()=>{if(wanted)label('Puffert …')});
+audio.addEventListener('pause',state);
+audio.addEventListener('error',async()=>{if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;audio.src=sources[sourceIndex];retrying=false;await play()});
+async function metadata(){try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),4500);try{const response=await fetch('https://webradio.666soundsdesign-broadcaster.com/api/nowplaying',{signal:controller.signal,cache:'no-store'});if(!response.ok)return;const data=await response.json();const candidate=data?.now_playing?.song?.text||data?.nowplaying?.song?.text||data?.songtitle||data?.title||data?.song?.title||data?.nowplaying?.title;if(typeof candidate==='string'&&candidate.trim())track.textContent=candidate.trim().slice(0,180)}finally{clearTimeout(timeout)}}catch(_){/* metadata is optional; playback independent */}}
+metadata();setInterval(()=>{if(!document.hidden)metadata()},12000);
+})();
+</script>
+</body>
+</html>
