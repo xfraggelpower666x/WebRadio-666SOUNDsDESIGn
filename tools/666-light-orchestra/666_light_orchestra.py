@@ -8,6 +8,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
+from device_registry import DeviceRegistry
 
 try:
     from bleak import BleakClient, BleakScanner
@@ -352,6 +353,7 @@ class Engine:
         self.cfg = cfg
         self.enabled = bool(cfg["engine"].get("enabled", True))
         self.mode = str(cfg["engine"].get("mode", "cyber"))
+        self.registry = DeviceRegistry()
         self.govee = GoveeLan(cfg["govee"])
         self.lenze = LenzeFleet(cfg["lenze"])
         self.magic_lantern = MagicLanternFleet(cfg["magic_lantern"])
@@ -402,6 +404,7 @@ class Engine:
     def status(self):
         return {
             "ok": True,
+            "registry": self.registry.all(),
             "name": "666SOUNDsDESIGn LIGHT ORCHESTRA",
             "version": VERSION,
             "enabled": self.enabled,
@@ -452,7 +455,9 @@ class Bridge:
                 if path in ("/", "/api/status"):
                     self.reply(engine.status())
                 elif path == "/api/devices":
-                    self.reply({"devices": engine.status()["devices"]})
+                    self.reply({"devices": engine.status()["devices"], "registry": engine.registry.all()})
+                elif path == "/api/registry":
+                    self.reply({"ok": True, "devices": engine.registry.all()})
                 else:
                     self.reply({"ok": False, "error": "not_found"}, 404)
 
@@ -472,6 +477,16 @@ class Bridge:
                         result = bridge.run_async(engine.set_power(False))
                     elif path == "/api/test/color":
                         result = bridge.run_async(engine.set_color(body.get("r", 0), body.get("g", 180), body.get("b", 255), body.get("brightness", 65)))
+                    elif path == "/api/registry/update":
+                        result = {"ok": True, "device": engine.registry.edit(str(body.get("id", "")), body.get("updates", {}))}
+                    elif path == "/api/device/test-color":
+                        device_id = str(body.get("id", ""))
+                        entry = engine.registry.get(device_id)
+                        if entry is None:
+                            raise ValueError("unknown_device")
+                        if device_id != "govee_h6047" or not entry.get("enabled"):
+                            raise ValueError("WRITE_BLOCKED: individual hardware test requires verified and enabled Govee H6047")
+                        result = {"ok": True, "result": bridge.run_async(engine.govee.set_color(body.get("r", 0), body.get("g", 180), body.get("b", 255), body.get("brightness", 65)))}
                     elif path == "/api/lenze/scan":
                         result = {"ok": True, "result": bridge.run_async(engine.lenze.scan())}
                     elif path == "/api/magic-lantern/scan":
