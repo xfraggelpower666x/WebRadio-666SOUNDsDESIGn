@@ -5,13 +5,9 @@ import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-from importlib.util import spec_from_file_location, module_from_spec
-from pathlib import Path
+from importlib import import_module
 
-CORE_PATH = Path(__file__).with_name("666_light_orchestra.py")
-spec = spec_from_file_location("light_orchestra_core", CORE_PATH)
-core = module_from_spec(spec)
-spec.loader.exec_module(core)
+core = import_module("666_light_orchestra")
 
 
 class App(tk.Tk):
@@ -40,6 +36,7 @@ class App(tk.Tk):
         ttk.Button(master, text="ALL OFF", command=lambda: self.run(self.engine.set_power(False))).pack(side="left", padx=4)
         ttk.Button(master, text="BLE Scan", command=self.scan).pack(side="left", padx=4)
         ttk.Button(master, text="Refresh", command=self.refresh).pack(side="left", padx=4)
+        ttk.Button(master, text="Govee LAN prüfen (read-only)", command=lambda: self.run(self.engine.govee.probe())).pack(side="left", padx=4)
 
         color = ttk.LabelFrame(self, text="Testfarbe", padding=10)
         color.pack(fill="x", padx=12, pady=6)
@@ -62,7 +59,7 @@ class App(tk.Tk):
         safety.pack(fill="x", padx=12, pady=(0,12))
         ttk.Label(
             safety,
-            text="Govee: LAN aktiv.  Magic Lantern OC21W: FFF0/FFF3 implementiert, Writes standardmäßig gesperrt.  LENZE-RGB: Discovery/Notify aktiv, Command-Frames bleiben WRITE_BLOCKED.",
+            text="*Erreichbarkeit ist Familienstatus, kein Einzelgeräte-Readback. Govee LAN laut App aktiv. Magic Lantern und LENZE-Hardware-Writes standardmäßig gesperrt.",
             wraplength=800
         ).pack(anchor="w")
 
@@ -96,12 +93,14 @@ class App(tk.Tk):
         self.status.set(f"v{state['version']} · http://{self.cfg['server']['host']}:{self.cfg['server']['port']}")
         for item in self.tree.get_children():
             self.tree.delete(item)
-        for d in state["devices"]:
-            found = d.get("found") or []
-            detail = str(d.get("detail", ""))
-            if found:
-                detail += f" · found={len(found)}"
-            self.tree.insert("", "end", values=(d.get("name", d.get("kind")), "ONLINE" if d.get("online") else "READY/OFFLINE", detail))
+        runtime = {d["kind"]: d for d in state["devices"]}
+        for d in state["registry"]:
+            family = d["family"]
+            live = runtime.get(family, {})
+            active = ("DEAKTIVIERT" if not d.get("enabled") else
+                      "ERREICHBAR*" if live.get("online") else "OFFEN")
+            detail = str(d.get("role", "unassigned")) + " · " + str(d.get("verified", "unknown"))
+            self.tree.insert("", "end", values=(d["label"], active, detail))
         self.after(2500, self.refresh)
 
 
