@@ -1,0 +1,1 @@
+@echo off\r\ncd /d "%~dp0"\r\nif not exist config.json copy /Y config.example.json config.json >nul\r\npy 666_light_orchestra_gui.py\r\n
