@@ -83,6 +83,7 @@ class GoveeLan:
         self.detail = "not started"
         self.last_color = None
         self._last_audio_write = 0.0
+        self._last_probe_ok = 0.0
 
     async def start(self):
         if not self.cfg.get("enabled", True):
@@ -180,12 +181,14 @@ class GoveeLan:
     async def probe(self):
         result = await asyncio.to_thread(self._probe_sync)
         self.online = bool(result.get("ok"))
+        self._last_probe_ok = time.monotonic() if self.online else 0.0
         self.detail = "LAN probe confirmed" if self.online else "LAN probe: " + str(result.get("reason", "unknown"))
         return result
 
     def _require_confirmed_lan(self):
-        if not self.cfg.get("enabled", True) or not self.online:
-            raise RuntimeError("GOVEE_LAN_UNVERIFIED: run successful /api/govee/probe first")
+        if not self.cfg.get("enabled", True) or not self.online or (time.monotonic() - self._last_probe_ok > 300.0):
+            self.online = False
+            raise RuntimeError("GOVEE_LAN_UNVERIFIED_OR_STALE: run successful /api/govee/probe first")
 
     async def set_power(self, on):
         self._require_confirmed_lan()
@@ -202,8 +205,9 @@ class GoveeLan:
         self.detail = "color UDP sent (no ack)"
 
     async def audio(self, payload):
-        if not self.online:
-            return {"ok": False, "reason": "govee_probe_required"}
+        if not self.online or (time.monotonic() - self._last_probe_ok > 300.0):
+            self.online = False
+            return {"ok": False, "reason": "govee_probe_required_or_stale"}
         now = time.monotonic()
         if now - self._last_audio_write < 0.20:
             return {"ok": True, "throttled": True}
@@ -336,7 +340,7 @@ class MagicLanternFleet:
         if not self.cfg.get("write_enabled", False) or not self.cfg.get("protocol_verified", False):
             raise RuntimeError("MAGIC_LANTERN_WRITE_BLOCKED: unverified controller protocol")
         allowed = set(self.cfg.get("approved_windows_addresses") or [])
-        if not allowed or any(address not in allowed for address in self.devices):
+        if not allowed or not self.devices or any(address not in allowed for address in self.devices):
             raise RuntimeError("MAGIC_LANTERN_WRITE_BLOCKED: Windows BLE address allowlist required")
         if BleakClient is None:
             raise RuntimeError("bleak not installed")
@@ -381,7 +385,7 @@ class MagicLanternFleet:
 
     async def audio(self, payload):
         if not self.cfg.get("write_enabled", False) or not self.cfg.get("protocol_verified", False):
-            return {"ok": False, "reason": "magic_lantern_write_blocked"}
+            return {"ok": True, "skipped": "magic_lantern_write_blocked"}
         energy = max(0, min(255, int(payload.get("energy", 0))))
         bass = max(0, min(255, int(payload.get("bass", 0))))
         mid = max(0, min(255, int(payload.get("mid", 0))))
@@ -466,7 +470,9 @@ class Engine:
             return {"ok": True, "enabled": False}
         async with self.lock:
             results = await asyncio.gather(*(d.audio(payload) for d in self.devices), return_exceptions=True)
-        errors = [{"device": adapter.status()["kind"], "error": str(value)} for adapter, value in zip(self.devices, results) if isinstance(value, BaseException)]
+        errors = [{"device": adapter.status()["kind"], "error": str(value) if isinstance(value, BaseException) else str(value.get("reason") or value.get("error") or "adapter_reported_failure")}
+                  for adapter, value in zip(self.devices, results)
+                  if isinstance(value, BaseException) or (isinstance(value, dict) and value.get("ok") is False)]
         return {"ok": not errors, "enabled": True, "errors": errors}
 
     def status(self):
