@@ -38,3 +38,21 @@ jobs:
           if failures:
               raise SystemExit("\n".join(failures))
           print("Python files valid")
+      - name: LIGHT ORCHESTRA hardware-free Python regression
+        run: python -m unittest discover -s tools/666-light-orchestra/tests -v
+      - name: LIGHT ORCHESTRA native-root mirror audit
+        shell: python
+        run: |
+          from pathlib import Path
+          native = Path("tools/666-light-orchestra")
+          mirror = Path("666-LIGHT-ORCHESTRA")
+          files = [p for p in native.rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"]
+          assert files, "missing native LIGHT ORCHESTRA files"
+          for path in files:
+              counterpart = mirror / path.relative_to(native)
+              assert counterpart.is_file(), f"missing root mirror: {counterpart}"
+              assert path.read_bytes() == counterpart.read_bytes(), f"diverged mirror: {path}"
+          for path in Path("docs").glob("LIGHT_ORCHESTRA_*.md"):
+              counterpart = mirror / "docs" / path.name
+              assert counterpart.is_file() and path.read_bytes() == counterpart.read_bytes(), f"diverged document: {path}"
+          print(f"PASS: {len(files)} native files and audit docs mirrored")
