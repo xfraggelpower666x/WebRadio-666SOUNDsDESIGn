@@ -82,5 +82,53 @@ class SafetyRegression(unittest.TestCase):
         self.assertNotIn("*", core.DEFAULT_CONFIG["server"]["allowed_origins"])
 
 
+    def test_master_disabled_blocks_manual_commands(self):
+        import tempfile
+        from device_registry import DeviceRegistry
+        with tempfile.TemporaryDirectory() as tmp:
+            registry = DeviceRegistry(Path(tmp) / "registry.json")
+            with mock.patch.object(core, "DeviceRegistry", return_value=registry):
+                engine = core.Engine(core.DEFAULT_CONFIG)
+            engine.enabled = False
+            with mock.patch.object(engine.govee, "_send") as sender:
+                self.assertEqual(asyncio.run(engine.set_power(True))["error"], "MASTER_DISABLED")
+                self.assertEqual(asyncio.run(engine.set_color(5, 15, 25))["error"], "MASTER_DISABLED")
+                with self.assertRaisesRegex(RuntimeError, "MASTER_DISABLED"):
+                    asyncio.run(engine.test_device_color("govee_h6047", 1, 2, 3))
+                sender.assert_not_called()
+
+    def test_registry_disabled_govee_prevents_all_hardware_commands(self):
+        import tempfile
+        from device_registry import DeviceRegistry
+        with tempfile.TemporaryDirectory() as tmp:
+            registry = DeviceRegistry(Path(tmp) / "registry.json")
+            registry.edit("govee_h6047", {"enabled": False})
+            with mock.patch.object(core, "DeviceRegistry", return_value=registry):
+                engine = core.Engine(core.DEFAULT_CONFIG)
+            with mock.patch.object(engine.govee, "_send") as sender:
+                power = asyncio.run(engine.set_power(True))
+                color = asyncio.run(engine.set_color(1, 2, 3))
+                audio = asyncio.run(engine.audio({"energy": 255, "kick": True}))
+                self.assertTrue(power["ok"])
+                self.assertTrue(color["ok"])
+                self.assertTrue(audio["ok"])
+                self.assertTrue(any(x.get("skipped") for x in color["results"]))
+                with self.assertRaisesRegex(RuntimeError, "WRITE_BLOCKED"):
+                    asyncio.run(engine.test_device_color("govee_h6047", 1, 2, 3))
+                sender.assert_not_called()
+
+    def test_bluetooth_controller_needs_verified_windows_addresses(self):
+        import tempfile
+        from device_registry import DeviceRegistry
+        with tempfile.TemporaryDirectory() as tmp:
+            registry = DeviceRegistry(Path(tmp) / "registry.json")
+            registry.edit("oc21w_1", {"enabled": True})
+            with mock.patch.object(core, "DeviceRegistry", return_value=registry):
+                engine = core.Engine(core.DEFAULT_CONFIG)
+            self.assertFalse(engine._device_selected(engine.magic_lantern))
+            engine.magic_lantern.devices = {"FAKE-WINDOWS": object()}
+            self.assertFalse(engine._device_selected(engine.magic_lantern))
+
+
 if __name__ == "__main__":
     unittest.main()
