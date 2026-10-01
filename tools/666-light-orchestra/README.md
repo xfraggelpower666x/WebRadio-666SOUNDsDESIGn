@@ -64,3 +64,26 @@ build_windows.bat
 ```
 
 Die GUI zeigt Govee, LENZE und OC21W getrennt und verwendet dieselbe lokale Bridge wie das Radio.
+
+
+## v0.3.0 — Geräte-Registry und Testgrenzen
+
+Die neue `device_registry.py` hält acht physische Leisten in sieben Gerätezielen fest:
+- Govee H6047: zwei Bars hinter einem Controller, Ziel `192.168.2.32`.
+- Govee TV: separat erkannt, Modell/Transport noch offen, standardmäßig deaktiviert.
+- LENZE-RGB: zwei Controller, iOS-UUIDs nur als Hinweise.
+- OC21W: vier Controller, iOS-UUIDs nur als Hinweise.
+
+Die Registry wird atomar unter `~/.666soundsdesign/light-orchestra/devices.local.json` gespeichert.
+`GET /api/registry` liefert die Einträge, `POST /api/registry/update` ändert ausschließlich Label, Rolle und Enabled. Keine Hardwareadresse kann darüber überschrieben werden.
+
+`POST /api/govee/probe` fragt über UDP ausschließlich den Status ab, ohne Farben oder Power zu verändern. Ein nicht beantwortetes Paket ist *kein* Erfolgsnachweis.
+
+`POST /api/device/test-color` unterstützt zurzeit ausschließlich den aktivierten Govee-H6047-Controller. LENZE/OC21W werden über diesen Einzelgerätetest strikt gesperrt. Der bestehende generische Radio-Contract bleibt bestehen.
+
+Offline-Regressionsprüfung:
+```bash
+python -m unittest discover -s tests -v
+```
+
+**Wichtig:** Kein Live-Hardwaretest erfolgt allein durch diese Codeintegration. Die Windows-BLE-Adressen müssen vor einer Einzelzuordnung auf dem Windows-PC erfasst werden.
