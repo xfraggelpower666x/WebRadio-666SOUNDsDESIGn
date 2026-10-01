@@ -68,7 +68,7 @@ Die GUI zeigt Govee, LENZE und OC21W getrennt und verwendet dieselbe lokale Brid
 
 ## v0.3.0 — Geräte-Registry und Testgrenzen
 
-Die neue `device_registry.py` hält acht physische Leisten in sieben Gerätezielen fest:
+Die neue `device_registry.py` führt acht Controller-Einträge: sieben bekannte Lichtziele (H6047, 2 LENZE, 4 OC21W) und zusätzlich Govee-TV als deaktivierten Kandidaten. Die H6047 betreibt zwei physische Bars:
 - Govee H6047: zwei Bars hinter einem Controller, Ziel `192.168.2.32`.
 - Govee TV: separat erkannt, Modell/Transport noch offen, standardmäßig deaktiviert.
 - LENZE-RGB: zwei Controller, iOS-UUIDs nur als Hinweise.
