@@ -24,3 +24,10 @@ test('worker allows framing only on the public embed route',()=>{
   assert.ok(worker.includes('frame-ancestors https:;'));
   assert.ok(worker.includes('if(!embedded)return new Response("Not found"'));
 });
+
+test('native playback does not auto-activate a CORS-sensitive audio graph',()=>{
+  const playBody=embed.split('async function play(){')[1]?.split('toggle.addEventListener')[0]||'';
+  assert.ok(playBody.includes('await audio.play()'));
+  assert.ok(!playBody.includes('enableVisualizer()'));
+  assert.ok(!playBody.includes('core.ensureGraph('));
+});
