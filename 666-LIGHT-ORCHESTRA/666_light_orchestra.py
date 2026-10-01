@@ -492,7 +492,12 @@ class Bridge:
         self.loop = asyncio.new_event_loop()
 
     def run_async(self, coro):
-        return asyncio.run_coroutine_threadsafe(coro, self.loop).result(timeout=15)
+        future = asyncio.run_coroutine_threadsafe(coro, self.loop)
+        try:
+            return future.result(timeout=15)
+        except Exception:
+            future.cancel()
+            raise
 
     def start(self):
         threading.Thread(target=self._loop, daemon=True).start()
@@ -554,6 +559,8 @@ class Bridge:
             def do_POST(self):
                 if not self._authorized():
                     return
+                if self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() != "application/json":
+                    return self.reply({"ok": False, "error": "json_required"}, 415)
                 path = urlparse(self.path).path
                 try:
                     body = self.body()
