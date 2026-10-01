@@ -39,7 +39,7 @@ ALLOWED_EDIT_FIELDS = {"label","role","enabled"}
 
 class DeviceRegistry:
     def __init__(self, path=None):
-        self.path = Path(path or Path(__file__).with_name("devices.local.json"))
+        self.path = Path(path) if path is not None else (Path.home() / ".666soundsdesign" / "light-orchestra" / "devices.local.json")
         self._entries = self._load()
 
     def _load(self):
