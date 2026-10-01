@@ -136,6 +136,37 @@ class GoveeLan:
         finally:
             sock.close()
 
+    def _probe_sync(self):
+        """Read-only UDP status query; no color/power changes."""
+        if not self.ip:
+            return {"ok": False, "reason": "no_configured_address"}
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(1.5)
+        try:
+            sock.bind(("", 4002))
+            self._send("devStatus", {})
+            until = time.monotonic() + 2.0
+            while time.monotonic() < until:
+                try:
+                    raw, sender = sock.recvfrom(4096)
+                except socket.timeout:
+                    break
+                if sender[0] != self.ip:
+                    continue
+                try:
+                    message = json.loads(raw.decode("utf-8", "replace"))
+                except (UnicodeDecodeError, ValueError):
+                    continue
+                return {"ok": True, "source_ip": sender[0], "response": message}
+            return {"ok": False, "reason": "no_matching_udp_response"}
+        except OSError as exc:
+            return {"ok": False, "reason": "udp_port_unavailable", "details": str(exc)}
+        finally:
+            sock.close()
+
+    async def probe(self):
+        return await asyncio.to_thread(self._probe_sync)
+
     async def set_power(self, on):
         await asyncio.to_thread(self._send, "turn", {"value": 1 if on else 0})
         self.online = True
@@ -477,6 +508,8 @@ class Bridge:
                         result = bridge.run_async(engine.set_power(False))
                     elif path == "/api/test/color":
                         result = bridge.run_async(engine.set_color(body.get("r", 0), body.get("g", 180), body.get("b", 255), body.get("brightness", 65)))
+                    elif path == "/api/govee/probe":
+                        result = bridge.run_async(engine.govee.probe())
                     elif path == "/api/registry/update":
                         result = {"ok": True, "device": engine.registry.edit(str(body.get("id", "")), body.get("updates", {}))}
                     elif path == "/api/device/test-color":
