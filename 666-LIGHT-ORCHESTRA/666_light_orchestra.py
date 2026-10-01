@@ -602,7 +602,7 @@ class Bridge:
                         result = {"ok": True, "result": bridge.run_async(engine.magic_lantern.set_mode(body.get("mode", 0), body.get("speed")))}
                     else:
                         return self.reply({"ok": False, "error": "not_found"}, 404)
-                    self.reply(result)
+                    self.reply(result, 200 if result.get("ok", True) else 502)
                 except Exception as e:
                     self.reply({"ok": False, "error": str(e)}, 500)
 
