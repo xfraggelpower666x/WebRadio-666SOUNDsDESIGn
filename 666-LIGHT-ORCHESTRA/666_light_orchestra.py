@@ -444,9 +444,38 @@ class Engine:
         self.mode = str(mode or "cyber")[:32]
         return self.status()
 
+    def _device_selected(self, device):
+        """Registry enables individual hardware; BLE addresses require separate proof."""
+        if device is self.govee:
+            entry = self.registry.get("govee_h6047")
+            return bool(entry and entry.get("enabled") and self.govee.cfg.get("enabled", True))
+        if device is self.lenze:
+            return any(d["family"] == "lenze" and d["enabled"] for d in self.registry.all())
+        if device is self.magic_lantern:
+            selected = [d for d in self.registry.all() if d["family"] == "magic_lantern" and d["enabled"]]
+            if not selected:
+                return False
+            windows = {d["windows_ble_address"] for d in selected if d.get("windows_ble_address")}
+            discovered = set(self.magic_lantern.devices)
+            return bool(discovered and discovered <= windows)
+        return True  # injected mock/adapters still surface their failures in offline tests
+
+    async def test_device_color(self, device_id, r, g, b, brightness=65):
+        if not self.enabled:
+            raise RuntimeError("MASTER_DISABLED")
+        if device_id != "govee_h6047" or not self._device_selected(self.govee):
+            raise RuntimeError("WRITE_BLOCKED: device not selected or protocol not validated")
+        await self.govee.set_color(r, g, b, brightness)
+        return {"ok": True, "device": device_id, "notice": "UDP sent; device acknowledgement not implied"}
+
     async def set_power(self, on):
+        if not self.enabled:
+            return {"ok": False, "error": "MASTER_DISABLED", "results": []}
         out = []
         for d in self.devices:
+            if not self._device_selected(d):
+                out.append({"device": d.status()["kind"], "ok": True, "skipped": "registry_disabled_or_identity_unverified"})
+                continue
             try:
                 await d.set_power(on)
                 out.append({"device": d.status()["kind"], "ok": True})
@@ -455,8 +484,13 @@ class Engine:
         return {"ok": all(x["ok"] for x in out), "results": out}
 
     async def set_color(self, r, g, b, brightness=65):
+        if not self.enabled:
+            return {"ok": False, "error": "MASTER_DISABLED", "results": []}
         out = []
         for d in self.devices:
+            if not self._device_selected(d):
+                out.append({"device": d.status()["kind"], "ok": True, "skipped": "registry_disabled_or_identity_unverified"})
+                continue
             try:
                 await d.set_color(r, g, b, brightness)
                 out.append({"device": d.status()["kind"], "ok": True})
@@ -469,9 +503,10 @@ class Engine:
         if not self.enabled:
             return {"ok": True, "enabled": False}
         async with self.lock:
-            results = await asyncio.gather(*(d.audio(payload) for d in self.devices), return_exceptions=True)
+            selected = [d for d in self.devices if self._device_selected(d)]
+            results = await asyncio.gather(*(d.audio(payload) for d in selected), return_exceptions=True)
         errors = [{"device": adapter.status()["kind"], "error": str(value) if isinstance(value, BaseException) else str(value.get("reason") or value.get("error") or "adapter_reported_failure")}
-                  for adapter, value in zip(self.devices, results)
+                  for adapter, value in zip(selected, results)
                   if isinstance(value, BaseException) or (isinstance(value, dict) and value.get("ok") is False)]
         return {"ok": not errors, "enabled": True, "errors": errors}
 
@@ -593,7 +628,7 @@ class Bridge:
                             raise ValueError("unknown_device")
                         if device_id != "govee_h6047" or not entry.get("enabled"):
                             raise ValueError("WRITE_BLOCKED: individual hardware test requires verified and enabled Govee H6047")
-                        result = {"ok": True, "result": bridge.run_async(engine.govee.set_color(body.get("r", 0), body.get("g", 180), body.get("b", 255), body.get("brightness", 65)))}
+                        result = bridge.run_async(engine.test_device_color(device_id, body.get("r", 0), body.get("g", 180), body.get("b", 255), body.get("brightness", 65)))
                     elif path == "/api/lenze/scan":
                         result = {"ok": True, "result": bridge.run_async(engine.lenze.scan())}
                     elif path == "/api/magic-lantern/scan":
