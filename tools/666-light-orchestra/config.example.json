@@ -1,7 +1,12 @@
 {
   "server": {
     "host": "127.0.0.1",
-    "port": 3000
+    "port": 3000,
+    "allowed_origins": [
+      "https://webradio.666soundsdesign-broadcaster.com",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000"
+    ]
   },
   "engine": {
     "enabled": true,
@@ -31,6 +36,8 @@
     "notify_uuid": "0000fff4-0000-1000-8000-00805f9b34fb",
     "write_enabled": false,
     "disconnect_after_write": true,
-    "color_order": "RGB"
+    "color_order": "RGB",
+    "protocol_verified": false,
+    "approved_windows_addresses": []
   }
 }
