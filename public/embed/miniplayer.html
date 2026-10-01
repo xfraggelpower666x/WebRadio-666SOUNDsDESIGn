@@ -54,13 +54,13 @@ let sourceIndex=0,wanted=false,retrying=false;audio.volume=.75;
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
 audio.addEventListener('playing',()=>{retrying=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
 audio.addEventListener('waiting',()=>{if(wanted)label('Puffert …')});
 audio.addEventListener('pause',()=>{state();bars.forEach(b=>b.style.height='3px')});
-audio.addEventListener('error',async()=>{if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;audio.src=sources[sourceIndex];retrying=false;await play()});
+audio.addEventListener('error',async()=>{if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){label('Backup-Stream benötigt CORS für Audioanalyse')}audio.src=sources[sourceIndex];retrying=false;await play()});
 async function metadata(){try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),4500);try{const response=await fetch('https://webradio.666soundsdesign-broadcaster.com/api/nowplaying',{signal:controller.signal,cache:'no-store'});if(!response.ok)return;const data=await response.json();const candidate=data?.now_playing?.song?.text||data?.nowplaying?.song?.text||data?.songtitle||data?.title||data?.song?.title||data?.nowplaying?.title;
 if(typeof candidate==='string'&&candidate.trim()){const text=candidate.trim().slice(0,180);if(track.textContent!==text){track.textContent=text;track.classList.toggle('scroll',text.length>38)}}
 const djName=data?.dj?.name||data?.dj_name||data?.current_dj||data?.streamer?.name;if(typeof djName==='string'&&djName.trim())dj.textContent='DJ: '+djName.trim().slice(0,45);
