@@ -87,8 +87,8 @@ class GoveeLan:
             return
         if not self.ip and self.cfg.get("auto_discover", True):
             self.ip = await asyncio.to_thread(self._discover)
-        self.online = bool(self.ip)
-        self.detail = f"LAN {self.ip}" if self.ip else "not discovered"
+        self.online = False  # IP-Konfiguration ist kein Erreichbarkeitsnachweis
+        self.detail = f"LAN target {self.ip}; probe pending" if self.ip else "not discovered"
 
     def _discover(self):
         msg = json.dumps({"msg": {"cmd": "scan", "data": {"account_topic": "reserve"}}}).encode()
@@ -165,11 +165,14 @@ class GoveeLan:
             sock.close()
 
     async def probe(self):
-        return await asyncio.to_thread(self._probe_sync)
+        result = await asyncio.to_thread(self._probe_sync)
+        self.online = bool(result.get("ok"))
+        self.detail = "LAN probe confirmed" if self.online else "LAN probe: " + str(result.get("reason", "unknown"))
+        return result
 
     async def set_power(self, on):
         await asyncio.to_thread(self._send, "turn", {"value": 1 if on else 0})
-        self.online = True
+        self.detail = "power UDP sent (no ack)"
 
     async def set_color(self, r, g, b, brightness=65):
         r, g, b = [max(0, min(255, int(x))) for x in (r, g, b)]
@@ -177,7 +180,7 @@ class GoveeLan:
         await asyncio.to_thread(self._send, "colorwc", {"color": {"r": r, "g": g, "b": b}, "colorTemInKelvin": 0})
         await asyncio.to_thread(self._send, "brightness", {"value": brightness})
         self.last_color = (r, g, b, brightness)
-        self.online = True
+        self.detail = "color UDP sent (no ack)"
 
     async def audio(self, payload):
         energy = max(0, min(255, int(payload.get("energy", 0))))
