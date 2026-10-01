@@ -1221,6 +1221,19 @@ const url=new URL(request.url);
       return new Response(CONFIG_JS,{headers:{"content-type":"application/javascript; charset=UTF-8"}});
     }
 
+    // Dedicated third-party iframe route: permit framing only for this public embed document.
+    // No wildcard frame policy for the main radio or privileged endpoints.
+    if(url.pathname==="/embed/miniplayer.html" && (request.method==="GET" || request.method==="HEAD")){
+      const embedded=await serveProjectAsset(request,env,"/embed/miniplayer.html");
+      if(!embedded)return new Response("Not found",{status:404});
+      const headers=new Headers(embedded.headers);
+      headers.delete("x-frame-options");
+      headers.set("content-security-policy","frame-ancestors https:;");
+      headers.set("cache-control","no-cache, must-revalidate");
+      headers.set("x-content-type-options","nosniff");
+      return new Response(embedded.body,{status:embedded.status,statusText:embedded.statusText,headers});
+    }
+
     if(url.pathname==="/dashboard" || url.pathname==="/dashboard/"){
       const dashboard = await serveProjectAsset(request, env, "/dashboard/index.html");
       if(dashboard) return dashboard;
