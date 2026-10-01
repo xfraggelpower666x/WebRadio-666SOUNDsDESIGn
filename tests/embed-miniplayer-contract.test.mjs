@@ -16,3 +16,11 @@ test('mini player uses shared radio APIs and protects skip',()=>{
 test('shared modules and integration contract exist',()=>{
   for(const file of ['public/js/boost-core.js','public/js/admin-auth-client.js','public/js/skip-control.js','docs/EMBED_MINIPLAYER_SYNC_CONTRACT.md'])assert.ok(existsSync(new URL('../'+file,import.meta.url)),file);
 });
+
+test('worker allows framing only on the public embed route',()=>{
+  const worker=readFileSync(new URL('../worker.js',import.meta.url),'utf8');
+  assert.ok(worker.includes('url.pathname==="/embed/miniplayer.html"'));
+  assert.ok(worker.includes('headers.delete("x-frame-options")'));
+  assert.ok(worker.includes('frame-ancestors https:;'));
+  assert.ok(worker.includes('if(!embedded)return new Response("Not found"'));
+});
