@@ -38,3 +38,72 @@ jobs:
           if failures:
               raise SystemExit("\n".join(failures))
           print("Python files valid")
+      - name: LIGHT ORCHESTRA hardware-free Python regression
+        run: python -m unittest discover -s tools/666-light-orchestra/tests -v
+      - name: LIGHT ORCHESTRA native-root mirror audit
+        shell: python
+        run: |
+          from pathlib import Path
+          native = Path("tools/666-light-orchestra")
+          mirror = Path("666-LIGHT-ORCHESTRA")
+          files = [p for p in native.rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc"]
+          assert files, "missing native LIGHT ORCHESTRA files"
+          for path in files:
+              counterpart = mirror / path.relative_to(native)
+              assert counterpart.is_file(), f"missing root mirror: {counterpart}"
+              assert path.read_bytes() == counterpart.read_bytes(), f"diverged mirror: {path}"
+          for path in Path("docs").glob("LIGHT_ORCHESTRA_*.md"):
+              counterpart = mirror / "docs" / path.name
+              assert counterpart.is_file() and path.read_bytes() == counterpart.read_bytes(), f"diverged document: {path}"
+          print(f"PASS: {len(files)} native files and audit docs mirrored")
+      - name: LIGHT ORCHESTRA version-bound binary source archive
+        env:
+          SOURCE_COMMIT: ${{ github.sha }}
+          ARTIFACT_OUTPUT: ${{ runner.temp }}
+        shell: python
+        run: |
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          import hashlib, json, os
+
+          root = Path("666-LIGHT-ORCHESTRA")
+          assert root.is_dir()
+          files = sorted(p for p in root.rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix not in (".pyc", ".zip"))
+          assert len(files) >= 17, f"unexpected source tree count: {len(files)}"
+          report = {
+              "type": "SOURCE_ONLY_NOT_HARDWARE_RELEASE",
+              "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+              "branch": "feature/666-light-orchestra-v0.1.0",
+              "source_commit": os.environ["SOURCE_COMMIT"],
+              "source_file_count": len(files),
+              "windows_tests": "PENDING",
+              "device_tests": "PENDING",
+              "files": [
+                  {"path": p.relative_to(root).as_posix(),
+                   "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+                   "bytes": p.stat().st_size}
+                  for p in files
+              ],
+          }
+          out = Path(os.environ["ARTIFACT_OUTPUT"]) / "light-orchestra-source-r4"
+          out.mkdir(parents=True, exist_ok=True)
+          manifest = out / "manifest.json"
+          manifest.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+          archive = out / "666_LIGHT_ORCHESTRA_SOURCE_R4.zip"
+          with ZipFile(archive, "w", compression=ZIP_DEFLATED) as z:
+              for path in files:
+                  z.write(path, "666-LIGHT-ORCHESTRA/" + path.relative_to(root).as_posix())
+              z.write(manifest, "manifest.json")
+          with ZipFile(archive, "r") as z:
+              assert z.testzip() is None
+              for item in report["files"]:
+                  assert hashlib.sha256(z.read("666-LIGHT-ORCHESTRA/" + item["path"])).hexdigest() == item["sha256"]
+          print(f"PASS: {len(files)} files, verified CRC and SHA256")
+          print("SOURCE_ARCHIVE_SHA256=" + hashlib.sha256(archive.read_bytes()).hexdigest())
+      - name: Upload LIGHT ORCHESTRA source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: LIGHT_ORCHESTRA_SOURCE_R4
+          path: ${{ runner.temp }}/light-orchestra-source-r4/
+          if-no-files-found: error
+          retention-days: 30
