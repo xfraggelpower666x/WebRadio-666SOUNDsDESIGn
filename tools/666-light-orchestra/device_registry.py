@@ -37,6 +37,20 @@ SEED_DEVICES = [
 ]
 ALLOWED_EDIT_FIELDS = {"label","role","enabled"}
 
+def _validated_updates(updates):
+    """Validate persisted and interactive edits through the same fail-closed gate."""
+    if not isinstance(updates, dict) or not updates or set(updates) - ALLOWED_EDIT_FIELDS:
+        raise ValueError("Only label, role, enabled are editable")
+    if "enabled" in updates and type(updates["enabled"]) is not bool:
+        raise ValueError("enabled must be boolean")
+    for field in ("label", "role"):
+        if field in updates and (
+            not isinstance(updates[field], str) or len(updates[field]) > 100
+            or any(ord(ch) < 32 for ch in updates[field])
+        ):
+            raise ValueError(field + " must be printable text <= 100 chars")
+    return dict(updates)
+
 class DeviceRegistry:
     def __init__(self, path=None):
         self.path = Path(path) if path is not None else (Path.home() / ".666soundsdesign" / "light-orchestra" / "devices.local.json")
@@ -48,13 +62,22 @@ class DeviceRegistry:
             saved = json.loads(self.path.read_text(encoding="utf-8"))
             if not isinstance(saved,dict) or saved.get("schema") != SCHEMA_VERSION:
                 raise ValueError("Registry-Schema unbekannt – keine automatische Migration")
-            for item in saved.get("devices",[]):
-                identifier = item.get("id")
-                if identifier not in base:  # nie stillschweigend eine fremde Geräteidentität übernehmen
+            items = saved.get("devices")
+            if not isinstance(items, list):
+                raise ValueError("Registry devices must be a list")
+            seen = set()
+            for item in items:
+                if not isinstance(item, dict) or not isinstance(item.get("id"), str):
+                    raise ValueError("Registry device record must have a string ID")
+                identifier = item["id"]
+                if identifier in seen:
+                    raise ValueError("Duplicate registry device ID")
+                seen.add(identifier)
+                if identifier not in base:  # foreign hardware is never implicitly adopted
                     continue
-                for k in ALLOWED_EDIT_FIELDS:
-                    if k in item:
-                        base[identifier][k] = item[k]
+                edits = {k: item[k] for k in ALLOWED_EDIT_FIELDS if k in item}
+                if edits:
+                    base[identifier].update(_validated_updates(edits))
         return base
 
     def all(self):
@@ -67,14 +90,7 @@ class DeviceRegistry:
     def edit(self, device_id, updates):
         if device_id not in self._entries:
             raise KeyError("unknown_device")
-        if not isinstance(updates, dict) or not updates or set(updates) - ALLOWED_EDIT_FIELDS:
-            raise ValueError("Only label, role, enabled are editable")
-        if "enabled" in updates and not isinstance(updates["enabled"],bool):
-            raise ValueError("enabled must be boolean")
-        for field in ("label","role"):
-            if field in updates and (not isinstance(updates[field],str) or len(updates[field])>100):
-                raise ValueError(field+" must be text <= 100 chars")
-        self._entries[device_id].update(updates)
+        self._entries[device_id].update(_validated_updates(updates))
         self.save()
         return self.get(device_id)
 
