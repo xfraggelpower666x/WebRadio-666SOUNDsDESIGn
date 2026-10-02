@@ -55,5 +55,41 @@ class RegistryTests(unittest.TestCase):
         self.assertEqual(data,bytes.fromhex("7e 04 04 01 00 01 ff 00 ef"))
 
 
+    def test_corrupt_saved_values_fail_closed(self):
+        bad_cases = [
+            [{"id": "govee_h6047", "enabled": "false"}],
+            [{"id": "govee_h6047", "enabled": 1}],
+            [{"id": "govee_h6047", "label": ["invalid"]}],
+            [{"id": "govee_h6047", "role": "invalid\\ncontrol"}],
+            [{"id": "govee_h6047"}, {"id": "govee_h6047", "enabled": True}],
+            ["invalid_item"],
+        ]
+        for devices in bad_cases:
+            with self.subTest(devices=devices), tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / "registry.json"
+                path.write_text(json.dumps({"schema": 1, "devices": devices}), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    DeviceRegistry(path)
+
+    def test_invalid_saved_collection_fails_closed(self):
+        for devices in (None, {"govee_h6047": True}, "devices"):
+            with self.subTest(devices=devices), tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / "registry.json"
+                path.write_text(json.dumps({"schema": 1, "devices": devices}), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    DeviceRegistry(path)
+
+    def test_loaded_protected_identity_is_not_overwritten(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "registry.json"
+            path.write_text(json.dumps({"schema": 1, "devices": [
+                {"id": "govee_h6047", "enabled": False, "host": "203.0.113.99", "model": "FAKE"},
+            ]}), encoding="utf-8")
+            loaded = DeviceRegistry(path).get("govee_h6047")
+            self.assertFalse(loaded["enabled"])
+            self.assertEqual(loaded["host"], "192.168.2.32")
+            self.assertEqual(loaded["model"], "H6047")
+
+
 if __name__=="__main__":
     unittest.main()
