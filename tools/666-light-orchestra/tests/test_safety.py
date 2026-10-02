@@ -130,5 +130,51 @@ class SafetyRegression(unittest.TestCase):
             self.assertFalse(engine._device_selected(engine.magic_lantern))
 
 
+    def test_bridge_rejects_non_loopback_bindings(self):
+        for host in ("0.0.0.0", "192.168.2.32", "example.com", "::"):
+            with self.subTest(host=host), self.assertRaisesRegex(ValueError, "LOOPBACK_ONLY"):
+                core.Bridge(object(), host, 3000)
+        for host in ("127.0.0.1", "localhost", "::1"):
+            bridge = core.Bridge(object(), host, 3000)
+            self.assertEqual(bridge.host, host)
+            bridge.loop.close()
+
+    def test_direct_magic_mode_obeys_master_and_registry_gates(self):
+        import tempfile
+        from device_registry import DeviceRegistry
+        with tempfile.TemporaryDirectory() as temp:
+            registry = DeviceRegistry(Path(temp) / "registry.json")
+            with mock.patch.object(core, "DeviceRegistry", return_value=registry):
+                engine = core.Engine(core.DEFAULT_CONFIG)
+            with mock.patch.object(engine.magic_lantern, "set_mode") as send:
+                engine.enabled = False
+                with self.assertRaisesRegex(RuntimeError, "MASTER_DISABLED"):
+                    asyncio.run(engine.set_magic_mode(1))
+                engine.enabled = True
+                with self.assertRaisesRegex(RuntimeError, "MAGIC_LANTERN_WRITE_BLOCKED"):
+                    asyncio.run(engine.set_magic_mode(1))
+                send.assert_not_called()
+
+    def test_govee_probe_rejects_boolean_udp_status_fields(self):
+        # Strict validation: Python bool is an int subclass, but not a real LAN status integer.
+        import socket
+        from unittest.mock import patch
+        g = core.GoveeLan({"enabled": True, "device_ip": "192.168.2.32"})
+        class FakeSocket:
+            def __init__(self):
+                self.received = False
+            def settimeout(self, *_): pass
+            def bind(self, *_): pass
+            def close(self): pass
+            def recvfrom(self, *_):
+                if not self.received:
+                    self.received = True
+                    return (b'{"msg":{"cmd":"devStatus","data":{"onOff":true,"brightness":true}}}', ("192.168.2.32", 4003))
+                raise socket.timeout()
+        with patch.object(core.socket, "socket", return_value=FakeSocket()), patch.object(g, "_send"):
+            status = g._probe_sync()
+        self.assertFalse(status["ok"])
+
+
 if __name__ == "__main__":
     unittest.main()
