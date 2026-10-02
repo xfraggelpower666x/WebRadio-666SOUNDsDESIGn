@@ -49,6 +49,7 @@ input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoratio
 <script src="/js/boost-core.js"></script>
 <script src="/js/admin-auth-client.js"></script>
 <script src="/js/skip-control.js"></script>
+<script src="/js/audio-levels.js"></script>
 <script>
 (()=>{'use strict';
 const audio=document.getElementById('radio'),toggle=document.getElementById('toggle'),status=document.getElementById('status'),track=document.getElementById('track'),volume=document.getElementById('volume');
@@ -56,7 +57,7 @@ const cover=document.getElementById('cover'),dj=document.getElementById('dj'),li
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
 let audioContext,analyser,frequencyData,visualActive=false;
-function visualizer(){if(!visualActive||!analyser)return;analyser.getByteFrequencyData(frequencyData);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}if(!audio.paused&&!document.hidden)requestAnimationFrame(visualizer)}
+function visualizer(){if(!visualActive||!analyser)return;analyser.getByteFrequencyData(frequencyData);window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext?.sampleRate);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}if(!audio.paused&&!document.hidden)requestAnimationFrame(visualizer)}
 function enableVisualizer(){if(visualActive)return;try{const core=window.SMFPBoostCore;if(!core)return;const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;frequencyData=new Uint8Array(analyser.frequencyBinCount);visualActive=true;applySound();void core.resume(audio);requestAnimationFrame(visualizer)}catch(_){visualActive=false}}
 const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
 const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
