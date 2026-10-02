@@ -60,7 +60,7 @@ class RegistryTests(unittest.TestCase):
             [{"id": "govee_h6047", "enabled": "false"}],
             [{"id": "govee_h6047", "enabled": 1}],
             [{"id": "govee_h6047", "label": ["invalid"]}],
-            [{"id": "govee_h6047", "role": "invalid\\ncontrol"}],
+            [{"id": "govee_h6047", "role": "invalid" + chr(10) + "control"}],
             [{"id": "govee_h6047"}, {"id": "govee_h6047", "enabled": True}],
             ["invalid_item"],
         ]
