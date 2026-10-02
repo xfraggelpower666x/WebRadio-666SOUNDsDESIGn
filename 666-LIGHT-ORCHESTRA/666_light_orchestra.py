@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import ipaddress
 import socket
 import threading
 import time
@@ -167,7 +168,7 @@ class GoveeLan:
                 data = envelope.get("data")
                 if not isinstance(data, dict):
                     continue
-                if data.get("onOff") not in (0, 1) or not isinstance(data.get("brightness"), int):
+                if type(data.get("onOff")) is not int or data["onOff"] not in (0, 1) or type(data.get("brightness")) is not int:
                     continue
                 if not 1 <= data["brightness"] <= 100:
                     continue
@@ -460,6 +461,15 @@ class Engine:
             return bool(discovered and discovered <= windows)
         return True  # injected mock/adapters still surface their failures in offline tests
 
+    async def set_magic_mode(self, mode, speed=None):
+        # Every hardware path must pass the engine-level safety gates.
+        if not self.enabled:
+            raise RuntimeError("MASTER_DISABLED")
+        if not self._device_selected(self.magic_lantern):
+            raise RuntimeError("MAGIC_LANTERN_WRITE_BLOCKED: registry or Windows identity unverified")
+        result = await self.magic_lantern.set_mode(mode, speed)
+        return {"ok": all(item.get("ok", False) for item in result), "results": result}
+
     async def test_device_color(self, device_id, r, g, b, brightness=65):
         if not self.enabled:
             raise RuntimeError("MASTER_DISABLED")
@@ -527,6 +537,16 @@ class Engine:
 
 class Bridge:
     def __init__(self, engine, host, port):
+        # A permissive Host header cannot protect a server bound to the LAN.
+        host = str(host).strip()
+        if host != "localhost":
+            try:
+                if not ipaddress.ip_address(host).is_loopback:
+                    raise ValueError("LOOPBACK_ONLY: refusing non-loopback HTTP binding")
+            except ValueError as exc:
+                if str(exc).startswith("LOOPBACK_ONLY"):
+                    raise
+                raise ValueError("LOOPBACK_ONLY: invalid HTTP binding") from exc
         self.engine = engine
         self.host = host
         self.port = int(port)
@@ -634,7 +654,7 @@ class Bridge:
                     elif path == "/api/magic-lantern/scan":
                         result = {"ok": True, "result": bridge.run_async(engine.magic_lantern.scan())}
                     elif path == "/api/magic-lantern/mode":
-                        result = {"ok": True, "result": bridge.run_async(engine.magic_lantern.set_mode(body.get("mode", 0), body.get("speed")))}
+                        result = bridge.run_async(engine.set_magic_mode(body.get("mode", 0), body.get("speed")))
                     else:
                         return self.reply({"ok": False, "error": "not_found"}, 404)
                     self.reply(result, 200 if result.get("ok", True) else 502)
