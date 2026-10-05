@@ -1,2 +1,11 @@
+# Canonical checkout contract for Soundwave source integrity
+# Text files are normalized to LF in the repository and on checkout so SHA-256
+# manifests remain platform-independent across Windows/Linux/macOS.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
 *.exe filter=lfs diff=lfs merge=lfs -text
 *.dll filter=lfs diff=lfs merge=lfs -text
