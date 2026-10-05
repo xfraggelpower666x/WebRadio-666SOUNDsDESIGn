@@ -1,35 +1,33 @@
-# SoundwaveStudio 666 v1.18.2 — SOURCE IMPORT DEEP AUDIT STATUS
+# SoundwaveStudio 666 v1.16.0 — FORCE GO FULL PYTHON HOST HARDENING
 
 STATUS=SOURCE_CANDIDATE
-SOURCE_VERSION=1.18.2
-GITHUB_SOURCE_IMPORT=VERIFIED
 FREEZE=NO
 PRODUCTION_WEBRADIO_MUTATION=NONE
 SOUNDWAVE_UI_OWNER=PRESERVED
-RADIO=ADDITIVE_SOURCE_AND_FUNCTIONS
 PYTHON_HOST=ADDITIVE_WINDOWS_ORCHESTRATOR
 
 VERIFIED_SOURCE_STATIC:
-- Full Soundwave v1.18.2 source candidate imported to dedicated GitHub branch.
-- Remote GitHub readback confirmed the source tree.
-- package.json reports version 1.18.2.
-- Previously verified static deep-integration suite: 116/116 PASS.
-- Previously verified JS/CJS syntax suite: 22/22 PASS.
-- Previously verified release integrity / secret / production-mutation scan: PASS.
-- SoundCloud library error rendering repaired to use DOM textContent instead of unsafe error-string innerHTML.
-- Two unverified precompiled MilkDrop donor executables were removed from the source branch.
-- MilkDrop source, project files, shaders, notices and licenses remain preserved.
+- v1.15.0 baseline rehydrated: 101/101 gates + release integrity PASS before mutation.
+- Critical Python-host build defect repaired: BUILD PORTABLE now calls the existing release-gated `npm run package`, not nonexistent `npm run build`.
+- Python host now performs Node/npm/package preflight before start/check/build.
+- Electron dependency readiness is checked before START/BUILD; dependency installation is an explicit `INSTALL DEPS` user action only.
+- Optional SoundCloud client ID/secret can be entered in the host and are handed to Electron through the child-process environment only; Python host never persists them.
+- Tkinter background maintenance output/status is marshalled onto the UI event loop.
+- Concurrent maintenance tasks are blocked to prevent overlapping integrity/build jobs.
+- Windows STOP terminates the Electron child process tree via taskkill /T /F.
+- OPEN DIST control added.
+- Explicit optional PyInstaller one-file host EXE builder added; it never installs dependencies automatically.
+- Existing Messenger/Discord/SoundCloud/radio-resilience v1.15 logic preserved.
 - Production WebRadio mutation remains NONE.
-- No force push was used.
+- 109/109 static integration gates PASS.
+- 22/22 JS/CJS syntax PASS.
+- Python py_compile PASS.
+- release secret/mutation scan PASS.
+- release integrity PASS.
 
-INTEGRITY_REPAIR_PENDING:
-- SOURCE_SHA256SUMS.txt predates the final v1.18.2 GitHub repair state and MUST be regenerated from the final source tree before source freeze.
-- Re-run static suites against the post-repair GitHub checkout before freeze.
-- Classify remaining archive-versus-repository entry differences; excluded build/dependency artifacts are not source-loss by themselves.
-
-RUNTIME_READBACK_PENDING:
+READBACK_PENDING:
 - Real Windows Python-host GUI launch/readback.
-- Optional PyInstaller host EXE build/readback.
+- Optional PyInstaller host EXE build/readback (PyInstaller unavailable in current Linux audit environment).
 - Windows Portable Electron EXE build/readback.
 - Forced MAIN→FALLBACK→DEGRADED→MAIN network test.
 - Player Messenger live current/history/status provider-shape readback.
