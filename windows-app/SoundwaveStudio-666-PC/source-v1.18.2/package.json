@@ -12,10 +12,40 @@
     "check:release": "node scripts/release-integrity.cjs",
     "prebuild": "npm run check:release"
   },
-  "keywords": ["soundwave","visualizer","music","video","electron","desktop"],
+  "keywords": [
+    "soundwave",
+    "visualizer",
+    "music",
+    "video",
+    "electron",
+    "desktop"
+  ],
   "author": "Antigravity",
   "license": "MIT",
-  "devDependencies": {"electron":"^31.0.0","electron-builder":"^26.8.1","electron-packager":"^17.1.2"},
-  "build": {"appId":"com.vkmr007.soundwavestudio","productName":"SoundwaveStudio","win":{"target":["portable"]},"files":["main.js","preload.js","src/**/*","docs/**/*","DEEP_AUDIT_STATUS.md","package.json"],"directories":{"output":"dist"}},
-  "productName":"SoundwaveStudio 666"
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.vkmr007.soundwavestudio",
+    "productName": "SoundwaveStudio",
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "docs/**/*",
+      "DEEP_AUDIT_STATUS.md",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "productName": "SoundwaveStudio 666"
 }
