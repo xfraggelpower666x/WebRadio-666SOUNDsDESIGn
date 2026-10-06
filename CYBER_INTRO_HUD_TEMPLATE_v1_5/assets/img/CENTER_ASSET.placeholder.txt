@@ -1,0 +1,4 @@
+CENTER ASSET SLOT
+
+No graphic is used by default.
+The center slot is intentionally neutral and effect-free.
