@@ -12,6 +12,7 @@ from ble_evidence_learning import collect_samples
 
 EXPERIMENT_PLANS = {
     "lenze": [
+        {"label": "baseline_no_action", "min_captures": 2, "purpose": "ambient/background notification baseline"},
         {"label": "official_app_power_on", "min_captures": 2, "purpose": "power-on differential"},
         {"label": "official_app_power_off", "min_captures": 2, "purpose": "power-off differential"},
         {"label": "official_app_color_red", "min_captures": 2, "purpose": "RGB field isolation"},
@@ -22,6 +23,7 @@ EXPERIMENT_PLANS = {
         {"label": "official_app_brightness_100", "min_captures": 2, "purpose": "brightness field isolation"},
     ],
     "magic_lantern": [
+        {"label": "baseline_no_action", "min_captures": 2, "purpose": "ambient/background notification baseline"},
         {"label": "official_app_power_on", "min_captures": 2, "purpose": "candidate power-frame confirmation"},
         {"label": "official_app_power_off", "min_captures": 2, "purpose": "candidate power-frame confirmation"},
         {"label": "official_app_color_red", "min_captures": 2, "purpose": "candidate RGB-frame confirmation"},
