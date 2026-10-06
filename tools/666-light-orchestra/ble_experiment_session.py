@@ -11,6 +11,7 @@ import os
 import time
 from pathlib import Path
 
+from ble_capture_quality import audit_capture_result
 from ble_capture_store import default_evidence_dir, load_capture_evidence
 from ble_protocol_inference import experiment_plan
 
@@ -104,6 +105,18 @@ def _step(payload: dict, label: str) -> dict:
     raise ValueError("experiment_label_not_in_session_plan")
 
 
+def _revalidate_quality(ep: dict) -> dict:
+    """Recompute capture quality instead of trusting stored quality metadata."""
+    fresh = audit_capture_result(ep, min_samples=1)
+    stored = ep.get("quality")
+    if not isinstance(stored, dict) or stored.get("quality_pass") is not True:
+        raise ValueError("evidence_quality_not_passed")
+    if fresh.get("quality_pass") is not True:
+        reasons = ",".join(fresh.get("blocking_reasons", [])) or "unknown"
+        raise ValueError(f"evidence_quality_reaudit_failed:{reasons}")
+    return fresh
+
+
 def register_evidence(session: dict, evidence_path: str | Path, directory: str | Path | None = None) -> dict:
     record = session if "payload" in session and "sha256" in session else session.get("session", session)
     payload = json.loads(json.dumps(record["payload"]))
@@ -115,9 +128,7 @@ def register_evidence(session: dict, evidence_path: str | Path, directory: str |
         raise ValueError("evidence_device_mismatch")
     if ep.get("family") != payload.get("family"):
         raise ValueError("evidence_family_mismatch")
-    quality = ep.get("quality")
-    if not isinstance(quality, dict) or quality.get("quality_pass") is not True:
-        raise ValueError("evidence_quality_not_passed")
+    _revalidate_quality(ep)
     label = ep.get("experiment_label") or ""
     step = _step(payload, label)
     sha = evidence["sha256"]

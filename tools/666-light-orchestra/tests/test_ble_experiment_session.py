@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import tempfile
 import unittest
-from pathlib import Path
 
 from ble_capture_store import save_capture_evidence
 from ble_experiment_session import create_session, load_session, register_evidence, progress, list_sessions
@@ -17,7 +16,13 @@ class BleExperimentSessionTests(unittest.TestCase):
             "device_id": device,
             "family": family,
             "experiment_label": label,
-            "capture": {"samples": [], "characteristics": [], "write_operations": 0},
+            "capture": {
+                "samples": [{"payload_hex": "01 02"}],
+                "errors": [],
+                "characteristics": [{"characteristic_uuid": "fff4"}],
+                "subscribed": ["fff4"],
+                "write_operations": 0,
+            },
             "analysis": {"hardware_verified": False, "rows": []},
             "quality": {"quality_pass": True},
         }
@@ -66,6 +71,27 @@ class BleExperimentSessionTests(unittest.TestCase):
             record = load_session(created["path"])
             evidence = save_capture_evidence(self.capture("lenze_1", "lenze", "unlabeled"), td)
             with self.assertRaisesRegex(ValueError, "label_not_in_session_plan"):
+                register_evidence(record, evidence["path"], td)
+
+    def test_forged_quality_pass_is_reaudited_and_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            created = create_session("lenze", "lenze_1", td)
+            record = load_session(created["path"])
+            forged = self.capture("lenze_1", "lenze", "official_app_power_on")
+            forged["capture"]["samples"] = []
+            forged["quality"] = {"quality_pass": True}
+            evidence = save_capture_evidence(forged, td)
+            with self.assertRaisesRegex(ValueError, "evidence_quality_reaudit_failed"):
+                register_evidence(record, evidence["path"], td)
+
+    def test_stored_quality_failure_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            created = create_session("lenze", "lenze_1", td)
+            record = load_session(created["path"])
+            capture = self.capture("lenze_1", "lenze", "official_app_power_on")
+            capture["quality"] = {"quality_pass": False}
+            evidence = save_capture_evidence(capture, td)
+            with self.assertRaisesRegex(ValueError, "evidence_quality_not_passed"):
                 register_evidence(record, evidence["path"], td)
 
     def test_list_sessions_reads_valid_records(self):
