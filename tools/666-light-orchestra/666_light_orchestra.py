@@ -17,6 +17,8 @@ from ble_protocol_design import (
     audio_intent as design_audio_intent,
     plan_command as design_plan_command,
 )
+from ble_readonly_capture import scan_known as ble_scan_known, capture_read_only as ble_capture_read_only
+from ble_protocol_observation import Observation as ProtocolObservation, evidence_summary as protocol_evidence_summary
 
 try:
     from bleak import BleakClient, BleakScanner
@@ -553,6 +555,60 @@ class Engine:
         result["intent"] = {"command": intent.command, "params": intent.params, "target_family": intent.target_family}
         return result
 
+    async def scan_known_ble(self, timeout=5.0):
+        found = await ble_scan_known(timeout=timeout)
+        return {
+            "ok": True,
+            "hardware_io": "READ_ONLY_SCAN",
+            "devices": [
+                {"name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi}
+                for d in found
+            ],
+        }
+
+    def bind_windows_ble(self, device_id, address):
+        bound = self.registry.bind_windows_address(str(device_id or ""), address)
+        return {
+            "ok": True,
+            "hardware_io": False,
+            "device": bound,
+            "notice": "Binding saved disabled; no hardware write permission granted",
+        }
+
+    async def capture_ble_read_only(self, device_id, duration_s=5.0):
+        item = self.registry.get(str(device_id or ""))
+        if item is None or item.get("transport") != "ble":
+            raise ValueError("unknown_or_non_ble_device")
+        address = item.get("windows_ble_address")
+        if not address:
+            raise ValueError("windows_ble_address_not_bound")
+        family = item.get("family")
+        notify_uuid = LENZE_NOTIFY_UUID if family == "lenze" else (
+            MAGIC_NOTIFY_UUID if family == "magic_lantern" else None
+        )
+        if notify_uuid is None:
+            raise ValueError("unsupported_ble_family")
+        capture = await ble_capture_read_only(address, [notify_uuid], duration_s=duration_s)
+        observations = [
+            ProtocolObservation(
+                family=family,
+                direction="notify",
+                characteristic_uuid=sample["characteristic_uuid"],
+                payload_hex=sample["payload_hex"],
+                label=str(device_id),
+                source="windows_readonly_capture",
+            )
+            for sample in capture.get("samples", [])
+        ]
+        return {
+            "ok": capture.get("ok", False),
+            "hardware_io": "READ_ONLY",
+            "device_id": str(device_id),
+            "family": family,
+            "capture": capture,
+            "analysis": protocol_evidence_summary(observations),
+        }
+
     async def set_magic_mode(self, mode, speed=None):
         # Every hardware path must pass the engine-level safety gates.
         if not self.enabled:
@@ -750,6 +806,12 @@ class Bridge:
                         result = {"ok": True, "result": bridge.run_async(engine.magic_lantern.scan())}
                     elif path == "/api/magic-lantern/mode":
                         result = bridge.run_async(engine.set_magic_mode(body.get("mode", 0), body.get("speed")))
+                    elif path == "/api/ble/scan":
+                        result = bridge.run_async(engine.scan_known_ble(body.get("timeout", 5.0)))
+                    elif path == "/api/ble/bind":
+                        result = engine.bind_windows_ble(body.get("id"), body.get("address"))
+                    elif path == "/api/ble/capture":
+                        result = bridge.run_async(engine.capture_ble_read_only(body.get("id"), body.get("duration_s", 5.0)))
                     elif path == "/api/protocol/plan":
                         result = engine.plan_protocol_command(body.get("family"), body.get("command"), body.get("params", {}))
                     elif path == "/api/protocol/audio-plan":
