@@ -30,7 +30,7 @@ class BleExperimentSessionTests(unittest.TestCase):
             self.assertFalse(record["payload"]["automatic_promotion_allowed"])
             p = progress(record)
             self.assertFalse(p["complete"])
-            self.assertEqual(p["next_required_label"], "official_app_power_on")
+            self.assertEqual(p["next_required_label"], "baseline_no_action")
 
     def test_register_evidence_advances_progress(self):
         with tempfile.TemporaryDirectory() as td:
@@ -40,7 +40,7 @@ class BleExperimentSessionTests(unittest.TestCase):
             saved = register_evidence(record, evidence["path"], td)
             p = progress(saved["session"])
             self.assertEqual(p["completed_required_captures"], 1)
-            self.assertEqual(p["next_required_label"], "official_app_power_on")
+            self.assertEqual(p["next_required_label"], "baseline_no_action")
 
     def test_duplicate_evidence_is_idempotent(self):
         with tempfile.TemporaryDirectory() as td:
