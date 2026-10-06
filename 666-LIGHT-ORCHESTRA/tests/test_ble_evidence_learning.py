@@ -18,12 +18,13 @@ from ble_evidence_learning import (
 
 
 class BleEvidenceLearningTests(unittest.TestCase):
-    def make_capture(self, device_id, family, frames):
+    def make_capture(self, device_id, family, frames, label=""):
         return {
             "ok": True,
             "hardware_io": "READ_ONLY",
             "device_id": device_id,
             "family": family,
+            "experiment_label": label,
             "capture": {
                 "samples": [
                     {"characteristic_uuid": "fff4", "payload_hex": frame}
@@ -71,6 +72,17 @@ class BleEvidenceLearningTests(unittest.TestCase):
         result = compare_frames("01 02 03 04", "01 02 09 04")
         self.assertFalse(result["equal"])
         self.assertEqual(result["differences"], [{"index": 2, "a": "03", "b": "09"}])
+
+    def test_learning_groups_frames_by_experiment_label(self):
+        with tempfile.TemporaryDirectory() as td:
+            save_capture_evidence(self.make_capture("lenze_1", "lenze", ["01 02 03 04"], "official_app_power_on"), td)
+            save_capture_evidence(self.make_capture("lenze_1", "lenze", ["01 02 09 04"], "official_app_power_off"), td)
+            loaded = load_evidence_directory(td)
+            summary = learning_summary(loaded["valid"], family="lenze")
+            self.assertEqual(summary["experiment_label_counts"]["official_app_power_on"], 1)
+            self.assertEqual(summary["experiment_label_counts"]["official_app_power_off"], 1)
+            self.assertEqual(summary["label_groups"]["official_app_power_on"]["exact_frames"][0]["payload_hex"], "01 02 03 04")
+            self.assertFalse(summary["hardware_verified"])
 
     def test_filter_by_device(self):
         with tempfile.TemporaryDirectory() as td:
