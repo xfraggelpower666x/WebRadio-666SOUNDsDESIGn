@@ -8,6 +8,7 @@ from importlib import import_module
 
 core = import_module("666_light_orchestra")
 gui_model = import_module("ble_gui_model")
+capture_store = import_module("ble_capture_store")
 
 
 class App(tk.Tk):
@@ -301,7 +302,9 @@ class App(tk.Tk):
         def job():
             try:
                 result = self.bridge.run_async(self.engine.capture_ble_read_only(target, self.capture_seconds.get()))
+                evidence = capture_store.save_capture_evidence(result)
                 summary = gui_model.capture_summary(result)
+                summary["evidence"] = evidence
                 self.after(0, lambda: self._set_analysis(summary))
                 self.after(0, self.refresh)
             except Exception as exc:
