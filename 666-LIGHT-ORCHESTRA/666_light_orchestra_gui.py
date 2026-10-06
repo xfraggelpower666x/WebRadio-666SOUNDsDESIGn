@@ -9,6 +9,7 @@ from importlib import import_module
 core = import_module("666_light_orchestra")
 gui_model = import_module("ble_gui_model")
 capture_store = import_module("ble_capture_store")
+evidence_learning = import_module("ble_evidence_learning")
 
 
 class App(tk.Tk):
@@ -37,11 +38,14 @@ class App(tk.Tk):
 
         self.dashboard_tab = ttk.Frame(self.tabs)
         self.ble_tab = ttk.Frame(self.tabs)
+        self.evidence_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.dashboard_tab, text="Dashboard")
         self.tabs.add(self.ble_tab, text="BLE LAB · READ ONLY")
+        self.tabs.add(self.evidence_tab, text="EVIDENCE LAB")
 
         self._build_dashboard(self.dashboard_tab)
         self._build_ble_lab(self.ble_tab)
+        self._build_evidence_lab(self.evidence_tab)
 
     def _build_dashboard(self, parent):
         master = ttk.LabelFrame(parent, text="Master", padding=10)
@@ -181,6 +185,129 @@ class App(tk.Tk):
         })
 
         self.refresh_ble_registry()
+
+    def _build_evidence_lab(self, parent):
+        info = ttk.LabelFrame(parent, text="Offline Protocol Learning", padding=10)
+        info.pack(fill="x", padx=8, pady=6)
+        ttk.Label(
+            info,
+            text=(
+                "Lädt lokal gespeicherte READ-ONLY Captures, prüft deren SHA-256, gruppiert Frames "
+                "und zeigt variable Bytepositionen. Ergebnisse sind Hypothesen und setzen niemals VERIFIED."
+            ),
+            wraplength=980,
+        ).pack(anchor="w")
+
+        controls = ttk.Frame(parent, padding=(8, 4))
+        controls.pack(fill="x")
+        ttk.Label(controls, text="Familie:").pack(side="left")
+        self.evidence_family = tk.StringVar(value="lenze")
+        ttk.Combobox(
+            controls,
+            textvariable=self.evidence_family,
+            state="readonly",
+            values=("lenze", "magic_lantern", "all"),
+            width=18,
+        ).pack(side="left", padx=5)
+        ttk.Label(controls, text="Device-ID:").pack(side="left", padx=(12, 2))
+        self.evidence_device = tk.StringVar(value="")
+        self.evidence_device_combo = ttk.Combobox(controls, textvariable=self.evidence_device, width=18)
+        self.evidence_device_combo.pack(side="left", padx=5)
+        ttk.Button(controls, text="Evidence laden", command=self.refresh_evidence_lab).pack(side="left", padx=5)
+        ttk.Button(controls, text="Learning Summary", command=self.show_learning_summary).pack(side="left", padx=5)
+
+        split = ttk.Panedwindow(parent, orient="horizontal")
+        split.pack(fill="both", expand=True, padx=8, pady=6)
+
+        left = ttk.LabelFrame(split, text="Lokale Evidence-Dateien", padding=6)
+        right = ttk.LabelFrame(split, text="Learning / Frame Analyse", padding=6)
+        split.add(left, weight=1)
+        split.add(right, weight=2)
+
+        self.evidence_tree = ttk.Treeview(
+            left,
+            columns=("file", "device", "family", "sha"),
+            show="headings",
+            height=15,
+        )
+        for key, title, width in (
+            ("file", "Datei", 200),
+            ("device", "Device", 95),
+            ("family", "Familie", 105),
+            ("sha", "SHA-256", 120),
+        ):
+            self.evidence_tree.heading(key, text=title)
+            self.evidence_tree.column(key, width=width, stretch=True)
+        self.evidence_tree.pack(fill="both", expand=True)
+        self.evidence_tree.bind("<<TreeviewSelect>>", lambda _e: self.show_selected_evidence())
+
+        self.evidence_text = tk.Text(right, wrap="word", font=("Consolas", 9))
+        self.evidence_text.pack(fill="both", expand=True)
+
+        footer = ttk.Label(parent, text="Hardware-Verifikation wird hier niemals automatisch gesetzt.")
+        footer.pack(anchor="w", padx=12, pady=(0, 8))
+        self.evidence_loaded = {"valid": [], "invalid": []}
+        self.refresh_evidence_lab()
+
+    def _set_evidence_text(self, data):
+        self.evidence_text.configure(state="normal")
+        self.evidence_text.delete("1.0", "end")
+        self.evidence_text.insert("1.0", json.dumps(data, indent=2, ensure_ascii=False))
+        self.evidence_text.configure(state="disabled")
+
+    def refresh_evidence_lab(self):
+        base = capture_store.default_evidence_dir()
+        loaded = evidence_learning.load_evidence_directory(base)
+        self.evidence_loaded = loaded
+        if hasattr(self, "evidence_tree"):
+            for item in self.evidence_tree.get_children():
+                self.evidence_tree.delete(item)
+            device_ids = set()
+            for index, entry in enumerate(loaded["valid"]):
+                payload = entry["record"]["payload"]
+                device_ids.add(str(payload.get("device_id") or ""))
+                self.evidence_tree.insert(
+                    "",
+                    "end",
+                    iid=str(index),
+                    values=(
+                        entry["path"].split("\\")[-1].split("/")[-1],
+                        payload.get("device_id"),
+                        payload.get("family"),
+                        entry["record"].get("sha256", "")[:16],
+                    ),
+                )
+            self.evidence_device_combo["values"] = [""] + sorted(x for x in device_ids if x)
+        summary = {
+            "directory": str(base),
+            "valid_files": loaded["valid_count"],
+            "invalid_files": loaded["invalid_count"],
+            "invalid": loaded["invalid"],
+            "hardware_verified": False,
+        }
+        self._set_evidence_text(summary)
+
+    def show_selected_evidence(self):
+        selected = self.evidence_tree.selection()
+        if not selected:
+            return
+        index = int(selected[0])
+        entry = self.evidence_loaded["valid"][index]
+        self._set_evidence_text({
+            "path": entry["path"],
+            "sha256": entry["record"].get("sha256"),
+            "payload": entry["record"].get("payload"),
+        })
+
+    def show_learning_summary(self):
+        family = self.evidence_family.get().strip()
+        device = self.evidence_device.get().strip()
+        summary = evidence_learning.learning_summary(
+            self.evidence_loaded.get("valid", []),
+            family=None if family == "all" else family,
+            device_id=device or None,
+        )
+        self._set_evidence_text(summary)
 
     def _set_analysis(self, data):
         self.analysis.configure(state="normal")
