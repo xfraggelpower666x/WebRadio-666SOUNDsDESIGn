@@ -12,6 +12,7 @@ capture_store = import_module("ble_capture_store")
 evidence_learning = import_module("ble_evidence_learning")
 protocol_inference = import_module("ble_protocol_inference")
 experiment_session = import_module("ble_experiment_session")
+capture_quality = import_module("ble_capture_quality")
 
 
 class App(tk.Tk):
@@ -186,6 +187,7 @@ class App(tk.Tk):
             textvariable=self.experiment_label,
             values=(
                 "unlabeled",
+                "baseline_no_action",
                 "official_app_power_on",
                 "official_app_power_off",
                 "official_app_color_pink",
@@ -549,6 +551,7 @@ class App(tk.Tk):
                 result = self.bridge.run_async(self.engine.capture_ble_read_only(target, self.capture_seconds.get()))
                 result["experiment_label"] = self.experiment_label.get().strip() or "unlabeled"
                 result["notes"] = self.experiment_notes.get().strip()
+                result["quality"] = capture_quality.audit_capture_result(result, min_samples=1)
                 evidence = capture_store.save_capture_evidence(result)
                 summary = gui_model.capture_summary(result)
                 summary["experiment_label"] = result["experiment_label"]
