@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>666 / LYVRA Cyber Intro HUD Template</title>
+<style>
+:root{
+  --cyan:#00f5ff;--pink:#ff00d4;--purple:#9b35ff;--text:#f7edff;--muted:#c6acd7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:#020006;color:var(--text);font-family:"Segoe UI",Inter,Arial,sans-serif}
+body{min-height:100vh;min-height:100svh;overflow:hidden}
+#template-host{position:relative;width:100vw;height:100vh;height:100svh}
+.lyvra-cyber-sequence{position:relative;width:100%;height:100%;isolation:isolate;overflow:hidden}
+.lyvra-cyber-sequence::before{
+  content:"";position:absolute;inset:0;z-index:-3;
+  background:var(--intro-bg,url("assets/intro/lyvra-intro-background.jpg")) center/cover no-repeat #020006;
+}
+.lyvra-cyber-sequence::after{
+  content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:radial-gradient(circle at 50% 53%,rgba(100,20,180,.05),rgba(3,0,10,.18) 35%,rgba(0,0,0,.22)),
+             linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.20));
+}
+.lyvra-intro-stage,.lyvra-hud-stage{position:absolute;inset:0}
+.lyvra-intro-stage{z-index:20;display:grid;place-items:center;transition:opacity .9s ease,filter .9s ease,transform .9s ease}
+.lyvra-intro-scanlines{position:absolute;inset:0;pointer-events:none;opacity:.14;background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(178,98,255,.22) 4px);animation:scan 9s linear infinite}
+.lyvra-intro-panel{position:relative;z-index:2;width:min(42rem,46vw);padding:clamp(1rem,2vw,1.8rem) clamp(1rem,2.5vw,2rem);text-align:center;border:1px solid rgba(194,112,255,.72);background:linear-gradient(180deg,rgba(8,0,24,.72),rgba(4,0,15,.62));box-shadow:0 0 22px rgba(145,55,255,.32),0 0 55px rgba(80,20,150,.18);clip-path:polygon(4% 0,96% 0,100% 10%,100% 90%,96% 100%,4% 100%,0 90%,0 10%);backdrop-filter:blur(8px) saturate(120%);transition:opacity .78s ease,filter .78s ease,transform .78s ease}
+.lyvra-intro-eyebrow,.lyvra-intro-status,.lyvra-intro-phase-label{letter-spacing:.22em;text-transform:uppercase}
+.lyvra-intro-title{margin:.5rem 0 .35rem;font-size:clamp(1.45rem,2.6vw,2.2rem);font-weight:500;letter-spacing:.38em;text-indent:.38em;text-shadow:0 0 10px rgba(220,165,255,.85),0 0 24px rgba(130,45,255,.75)}
+.lyvra-intro-core{width:clamp(3.7rem,7vw,5.5rem);aspect-ratio:1;margin:.5rem auto 1.1rem;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(192,116,255,.7);box-shadow:0 0 24px rgba(152,63,255,.35),inset 0 0 20px rgba(86,36,160,.3);animation:corePulse 1.35s ease-in-out infinite}
+.lyvra-intro-core::before{content:"✦";font-size:clamp(1.7rem,4vw,3.1rem);color:#efd5ff;text-shadow:0 0 7px #fff,0 0 16px #bd64ff,0 0 28px #6d2cff;animation:spin 3.5s linear infinite}
+.lyvra-intro-progress-wrap{display:grid;grid-template-columns:1fr auto;gap:.85rem;align-items:center}
+.lyvra-intro-track{height:1rem;overflow:hidden;border:1px solid rgba(196,119,255,.72);background:rgba(18,4,31,.82)}
+.lyvra-intro-bar{width:0;height:100%;background:linear-gradient(90deg,#7d35ff,#d38aff,#f0d4ff);box-shadow:0 0 18px rgba(211,138,255,.85)}
+.lyvra-intro-percent{min-width:4.2ch;text-align:right;font-variant-numeric:tabular-nums}
+.lyvra-intro-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.8rem}
+.lyvra-intro-step{font-size:.7rem;color:#886f99;letter-spacing:.08em;text-transform:uppercase}
+.lyvra-intro-step::before{content:"◇";display:block;font-size:1.15rem}.lyvra-intro-step.done::before{content:"◆"}.lyvra-intro-step.active,.lyvra-intro-step.done{color:#e4c4ff;text-shadow:0 0 10px rgba(176,83,255,.55)}
+.lyvra-transition-fx{position:absolute;inset:0;z-index:30;pointer-events:none;opacity:0}
+.lyvra-transition-fx::before{content:"";position:absolute;left:-18%;right:-18%;top:50%;height:4px;transform:translateY(-50%) scaleX(.08);opacity:0;background:linear-gradient(90deg,transparent,var(--pink),#fff 45%,var(--cyan) 55%,transparent);box-shadow:0 0 12px #fff,0 0 34px var(--cyan),0 0 62px var(--pink)}
+.lyvra-transition-fx::after{content:"";position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.7),rgba(0,245,255,.3) 10%,rgba(155,53,255,.22) 23%,transparent 47%);mix-blend-mode:screen}
+.lyvra-hud-stage{z-index:10;display:grid;place-items:center;opacity:0;visibility:hidden;pointer-events:none;filter:blur(12px) brightness(.68);transform:scale(.965);transition:opacity .95s ease,filter .95s ease,transform .95s ease}
+.cyber-hud-logo{position:relative;width:min(96vw,1500px);min-height:260px;display:grid;place-items:center}
+.hud-boot{position:absolute;top:17%;left:50%;transform:translateX(-50%);font-weight:900;letter-spacing:.22em;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 18px rgba(0,245,255,.65)}
+.hud-circuit{position:absolute;top:50%;width:42%;height:70px;border-radius:999px;background:linear-gradient(90deg,transparent,rgba(255,0,212,.8),rgba(0,245,255,.9),rgba(255,0,212,.72),transparent);box-shadow:0 0 12px var(--pink),0 0 26px var(--cyan)}
+.hud-circuit-left{left:2%}.hud-circuit-right{right:2%}
+.hud-label{position:absolute;top:50%;transform:translateY(-50%);font-weight:1000;letter-spacing:.055em;white-space:nowrap;background:linear-gradient(90deg,var(--cyan),#7efcff,var(--purple),var(--pink),#ff7be8);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 5px rgba(255,255,255,.7),0 0 12px rgba(0,245,255,.88),0 0 24px rgba(155,53,255,.76),0 0 42px rgba(255,0,212,.58)}
+.hud-label-left{left:5.8%;font-size:clamp(16px,3vw,48px)}.hud-label-right{right:4.2%;font-size:clamp(14px,2.55vw,42px)}
+.hud-center-logo-wrap{position:absolute;left:50%;top:50%;width:clamp(220px,30vw,430px);aspect-ratio:1;transform:translate(-50%,-50%);animation:none!important;filter:none!important}
+.hud-om{position:absolute;top:16%;left:50%;transform:translateX(-50%);font-size:clamp(32px,6vw,82px);color:var(--cyan);text-shadow:0 0 7px #fff,0 0 15px var(--cyan),0 0 32px var(--cyan),0 0 54px var(--pink)}
+.hud-six-arc{position:absolute;left:50%;top:-7%;width:112%;height:47%;transform:translateX(-50%);border-top:4px solid rgba(0,245,255,.9);border-radius:50% 50% 0 0;box-shadow:0 -7px 22px var(--cyan),inset 0 9px 20px rgba(255,0,212,.35)}
+.hud-six-arc span{position:absolute;top:-35%;color:var(--pink);font-weight:1000;font-size:clamp(28px,5vw,72px);text-shadow:0 0 5px #fff,0 0 14px var(--pink),0 0 32px var(--cyan)}
+.hud-six-arc span:nth-child(1){left:30%}.hud-six-arc span:nth-child(2){left:47%}.hud-six-arc span:nth-child(3){right:30%}
+.lyvra-cyber-sequence.is-transitioning .lyvra-intro-panel{opacity:0;filter:blur(8px) brightness(1.38);transform:scale(1.025)}
+.lyvra-cyber-sequence.is-transitioning .lyvra-transition-fx{opacity:1}
+.lyvra-cyber-sequence.is-transitioning .lyvra-transition-fx::before{animation:energySweep .9s ease forwards}
+.lyvra-cyber-sequence.is-transitioning .lyvra-transition-fx::after{animation:flash .76s ease-out forwards}
+.lyvra-cyber-sequence.is-transitioning .lyvra-hud-stage,.lyvra-cyber-sequence.intro-complete .lyvra-hud-stage{opacity:1;visibility:visible;pointer-events:auto;filter:none;transform:scale(1)}
+.lyvra-cyber-sequence.intro-complete .lyvra-intro-stage{opacity:0;visibility:hidden;pointer-events:none}
+@keyframes scan{from{transform:translateY(-12px)}to{transform:translateY(12px)}}@keyframes corePulse{0%,100%{transform:scale(.96);opacity:.75}50%{transform:scale(1.04);opacity:1}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes energySweep{0%{opacity:0;transform:translateY(-50%) scaleX(.06)}18%{opacity:1}58%{opacity:1;transform:translateY(-50%) scaleX(1)}100%{opacity:0;transform:translateY(-50%) scaleX(1.08)}}@keyframes flash{0%,12%{opacity:0}34%{opacity:.95}58%{opacity:.35}100%{opacity:0}}
+@media(max-width:760px){.lyvra-intro-panel{width:min(91vw,35rem)}.hud-label-left{left:50%;top:78%;transform:translate(-50%,-50%)}.hud-label-right{right:auto;left:50%;top:91%;transform:translate(-50%,-50%)}}
+</style>
+</head>
+<body>
+<div id="template-host">
+  <div class="lyvra-cyber-sequence" data-intro-duration="4200" data-transition-duration="1100">
+    <section class="lyvra-intro-stage" aria-labelledby="lyvra-intro-title">
+      <div class="lyvra-intro-scanlines" aria-hidden="true"></div>
+      <section class="lyvra-intro-panel" aria-live="polite">
+        <p class="lyvra-intro-eyebrow">666SOUNDsDESIGn · LYVRA interface</p>
+        <h1 class="lyvra-intro-title" id="lyvra-intro-title">CYBER BOOTING</h1>
+        <p class="lyvra-intro-status">INITIALIZING INTERFACE</p>
+        <div class="lyvra-intro-core" aria-hidden="true"></div>
+        <div class="lyvra-intro-progress-wrap" aria-label="Intro progress">
+          <div class="lyvra-intro-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="lyvra-intro-bar"></div></div>
+          <div class="lyvra-intro-percent">0%</div>
+        </div>
+        <p class="lyvra-intro-phase-label">CONNECTING PROJECT SIGNAL</p>
+        <div class="lyvra-intro-steps" aria-hidden="true">
+          <div class="lyvra-intro-step active">Connect</div><div class="lyvra-intro-step">Authenticate</div><div class="lyvra-intro-step">Initialize</div><div class="lyvra-intro-step">Handoff</div>
+        </div>
+      </section>
+    </section>
+
+    <div class="lyvra-transition-fx" aria-hidden="true"></div>
+
+    <section class="lyvra-hud-stage" aria-label="Project interface">
+      <section class="cyber-hud-logo" aria-label="666SOUNDsDESIGn Cyber HUD Logo">
+        <div class="hud-boot">SYSTEM ONLINE</div>
+        <div class="hud-circuit hud-circuit-left"></div>
+        <div class="hud-circuit hud-circuit-right"></div>
+        <div class="hud-label hud-label-left">666SOUNDsDESIGn</div>
+        <div class="hud-label hud-label-right">© FRAGGLEPOWER666</div>
+        <div class="hud-center-logo-wrap">
+          <div class="hud-six-arc" aria-hidden="true"><span>6</span><span>6</span><span>6</span></div>
+          <!-- CENTER ASSET SLOT intentionally empty. No graphic / no effects. -->
+          <div class="hud-om">ॐ</div>
+        </div>
+      </section>
+    </section>
+  </div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const root=document.querySelector('.lyvra-cyber-sequence');if(!root)return;
+const duration=Math.max(800,Number(root.dataset.introDuration||4200));
+const transitionDuration=Math.max(300,Number(root.dataset.transitionDuration||1100));
+const bar=root.querySelector('.lyvra-intro-bar'),percent=root.querySelector('.lyvra-intro-percent'),track=root.querySelector('.lyvra-intro-track'),status=root.querySelector('.lyvra-intro-status'),phaseLabel=root.querySelector('.lyvra-intro-phase-label'),steps=[...root.querySelectorAll('.lyvra-intro-step')];
+const phases=[
+{at:0,status:'INITIALIZING INTERFACE',label:'CONNECTING PROJECT SIGNAL',step:0},
+{at:24,status:'AUTHENTICATING MODULES',label:'VERIFYING LOCAL COMPONENTS',step:1},
+{at:52,status:'SYNCHRONIZING PROTOCOLS',label:'PREPARING CYBER INTERFACE',step:2},
+{at:82,status:'INTRO SEQUENCE ARMED',label:'HANDING OFF TO PROJECT UI',step:3},
+{at:98,status:'SEQUENCE COMPLETE',label:'PROJECT INTERFACE ONLINE',step:3}
+];
+let start=0,lastPhase=-1,finished=false,raf=0;
+function setPhase(p){let cur=phases[0];for(const x of phases)if(p>=x.at)cur=x;const i=phases.indexOf(cur);if(i===lastPhase)return;lastPhase=i;status.textContent=cur.status;phaseLabel.textContent=cur.label;steps.forEach((s,n)=>{s.classList.toggle('done',n<cur.step);s.classList.toggle('active',n===cur.step)})}
+function complete(){if(finished)return;finished=true;if(raf)cancelAnimationFrame(raf);bar.style.width='100%';percent.textContent='100%';track.setAttribute('aria-valuenow','100');root.classList.add('is-transitioning');window.dispatchEvent(new CustomEvent('lyvra:intro-transition-start',{detail:{root}}));setTimeout(()=>{root.classList.add('intro-complete');root.classList.remove('is-transitioning');window.dispatchEvent(new CustomEvent('lyvra:intro-complete',{detail:{root}}))},transitionDuration)}
+function tick(now){if(!start)start=now;const elapsed=now-start,p=Math.min(100,Math.round(elapsed/duration*100));bar.style.width=p+'%';percent.textContent=p+'%';track.setAttribute('aria-valuenow',String(p));setPhase(p);if(elapsed<duration)raf=requestAnimationFrame(tick);else complete()}
+window.LyvraCyberIntro={complete,skip:complete};
+raf=requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
