@@ -4,9 +4,9 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "70b8414f996df7055e7f65e4a7f06156bed2a0a7",
+  "body_head_before_pointer": "7ee3a6b9af60723cd598dd7db4b1b13347c702b8",
   "prechange_recovery_branch": "666stream-pre-current-state-repair-20261006-1808",
-  "body_readback": "PASS_CURRENT_STATE_REPAIR",
+  "body_readback": "PASS_HORST_ROUTE_REVERT",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
   "project_map": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
   "session_governor": "666STREAM_STRUCTURE_CONTROL/current/SESSION_GOVERNOR.md",
@@ -23,7 +23,7 @@
   "current_state_status": "CURRENT_PRODUCTIVE_PROJECT_SCOPED_RUNTIME",
   "open_gates": [
     "FRESH_CHAT_REHYDRATION_RUNTIME_TEST",
-    "LIGHT_ORCHESTRA_VERIFIED_DIRECTORY_RESOLUTION",
-    "PFS_CSM_NATIVE_CHILD_REGISTRATION"
+    "PFS_CSM_NATIVE_CHILD_REGISTRATION",
+    "LIGHT_ORCHESTRA_SEPARATE_CHILD_ROUTE_PRESERVED_UNRESOLVED"
   ]
 }
