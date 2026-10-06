@@ -11,6 +11,7 @@ gui_model = import_module("ble_gui_model")
 capture_store = import_module("ble_capture_store")
 evidence_learning = import_module("ble_evidence_learning")
 protocol_inference = import_module("ble_protocol_inference")
+experiment_session = import_module("ble_experiment_session")
 
 
 class App(tk.Tk):
@@ -23,6 +24,7 @@ class App(tk.Tk):
         self.engine = core.Engine(self.cfg)
         self.bridge = core.Bridge(self.engine, self.cfg["server"]["host"], self.cfg["server"]["port"])
         self.discovered_rows = []
+        self.active_experiment_session = None
         self._build()
         threading.Thread(target=self.bridge.start, daemon=True).start()
         self.after(1200, self.refresh)
@@ -244,6 +246,8 @@ class App(tk.Tk):
         ttk.Button(controls, text="Learning Summary", command=self.show_learning_summary).pack(side="left", padx=5)
         ttk.Button(controls, text="Experiment Plan", command=self.show_experiment_plan).pack(side="left", padx=5)
         ttk.Button(controls, text="Infer Candidate Fields", command=self.show_protocol_inference).pack(side="left", padx=5)
+        ttk.Button(controls, text="Start Session", command=self.start_experiment_session).pack(side="left", padx=5)
+        ttk.Button(controls, text="Session Progress", command=self.show_session_progress).pack(side="left", padx=5)
 
         split = ttk.Panedwindow(parent, orient="horizontal")
         split.pack(fill="both", expand=True, padx=8, pady=6)
@@ -273,6 +277,11 @@ class App(tk.Tk):
 
         self.evidence_text = tk.Text(right, wrap="word", font=("Consolas", 9))
         self.evidence_text.pack(fill="both", expand=True)
+
+        session_frame = ttk.LabelFrame(parent, text="Active Experiment Session", padding=6)
+        session_frame.pack(fill="x", padx=8, pady=(0, 6))
+        self.session_status = tk.StringVar(value="Keine aktive Session")
+        ttk.Label(session_frame, textvariable=self.session_status, wraplength=980).pack(anchor="w")
 
         footer = ttk.Label(parent, text="Hardware-Verifikation wird hier niemals automatisch gesetzt.")
         footer.pack(anchor="w", padx=12, pady=(0, 8))
@@ -376,6 +385,48 @@ class App(tk.Tk):
                 "hardware_verified": False,
                 "automatic_promotion_allowed": False,
             })
+
+    def start_experiment_session(self):
+        family = self._selected_evidence_family()
+        device = self.evidence_device.get().strip() or self.capture_target.get().strip()
+        if family == "all":
+            return self._set_evidence_text({"ok": False, "error": "Session benötigt eine einzelne Gerätefamilie."})
+        if not device:
+            return self._set_evidence_text({"ok": False, "error": "Bitte zuerst Device-ID auswählen."})
+        try:
+            created = experiment_session.create_session(family, device)
+            self.active_experiment_session = created["session"]
+            self._update_session_status()
+            self.show_session_progress()
+        except Exception as exc:
+            self._set_evidence_text({"ok": False, "error": str(exc), "hardware_verified": False})
+
+    def _update_session_status(self):
+        if not self.active_experiment_session:
+            self.session_status.set("Keine aktive Session")
+            return
+        p = experiment_session.progress(self.active_experiment_session)
+        self.session_status.set(
+            f"{p['device_id']} · {p['family']} · {p['progress_percent']}% · "
+            f"nächstes Experiment: {p['next_required_label'] or 'COMPLETE'}"
+        )
+        if p["next_required_label"]:
+            self.experiment_label.set(p["next_required_label"])
+
+    def show_session_progress(self):
+        if not self.active_experiment_session:
+            return self._set_evidence_text({"ok": False, "error": "Keine aktive Session.", "hardware_verified": False})
+        p = experiment_session.progress(self.active_experiment_session)
+        self._set_evidence_text(p)
+        self._update_session_status()
+
+    def _register_capture_with_active_session(self, evidence_path):
+        if not self.active_experiment_session:
+            return None
+        saved = experiment_session.register_evidence(self.active_experiment_session, evidence_path)
+        self.active_experiment_session = saved["session"]
+        self._update_session_status()
+        return experiment_session.progress(self.active_experiment_session)
 
     def _set_analysis(self, data):
         self.analysis.configure(state="normal")
@@ -504,7 +555,14 @@ class App(tk.Tk):
                 summary["experiment_label"] = result["experiment_label"]
                 summary["notes"] = result["notes"]
                 summary["evidence"] = evidence
+                try:
+                    session_progress = self._register_capture_with_active_session(evidence["path"])
+                except Exception as exc:
+                    session_progress = {"ok": False, "error": str(exc)}
+                if session_progress is not None:
+                    summary["session_progress"] = session_progress
                 self.after(0, lambda: self._set_analysis(summary))
+                self.after(0, self.refresh_evidence_lab)
                 self.after(0, self.refresh)
             except Exception as exc:
                 self.after(0, lambda: messagebox.showerror("READ-ONLY Capture", str(exc)))
