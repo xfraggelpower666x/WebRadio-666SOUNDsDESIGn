@@ -1,0 +1,7 @@
+BACKGROUND ASSET SLOT
+
+Expected optional file:
+lyvra-intro-background.jpg
+
+The code keeps one persistent shared background across Phase 1 and Phase 2.
+A project may replace this file or override --intro-bg without modifying the sequence logic.
