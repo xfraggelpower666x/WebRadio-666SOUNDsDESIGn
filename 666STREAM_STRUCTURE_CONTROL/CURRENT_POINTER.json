@@ -1,0 +1,23 @@
+{
+  "system": "666STREAM_STRUCTURE_CONTROL",
+  "status": "CURRENT_PRODUCTIVE_PROJECT_SCOPED_RUNTIME",
+  "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "authority_branch": "WebRadio-666SOUNDsDESIGn",
+  "authority": "GITHUB_REPOSITORY",
+  "body_head_before_pointer": "708f1146a605513952bf032017c4b65951e7fbc8",
+  "prechange_recovery_branch": "666stream-pre-structure-control-20261006-1759",
+  "body_readback": "PASS_8_OF_8",
+  "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
+  "project_map": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
+  "session_governor": "666STREAM_STRUCTURE_CONTROL/current/SESSION_GOVERNOR.md",
+  "live_circle": "666STREAM_STRUCTURE_CONTROL/continuity/LIVE_CIRCLE.md",
+  "new_chat_contract": "666STREAM_STRUCTURE_CONTROL/continuity/NEW_CHAT_CONTRACT.md",
+  "pfs_csm_backup_contract": "666STREAM_STRUCTURE_CONTROL/relations/PFS_CSM_BACKUP_CONTRACT.md",
+  "project_scope_model": "ONE_ACTIVE_PROJECT_PER_CHAT",
+  "parallel_project_chats": true,
+  "global_active_project": false,
+  "codeforge_all_projects": true,
+  "codeforge_scope": "ACTIVE_PROJECT_ONLY",
+  "pointer_written_last": true,
+  "no_post_pointer_mutation": true
+}
