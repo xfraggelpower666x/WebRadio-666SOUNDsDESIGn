@@ -115,6 +115,9 @@ def register_evidence(session: dict, evidence_path: str | Path, directory: str |
         raise ValueError("evidence_device_mismatch")
     if ep.get("family") != payload.get("family"):
         raise ValueError("evidence_family_mismatch")
+    quality = ep.get("quality")
+    if not isinstance(quality, dict) or quality.get("quality_pass") is not True:
+        raise ValueError("evidence_quality_not_passed")
     label = ep.get("experiment_label") or ""
     step = _step(payload, label)
     sha = evidence["sha256"]
