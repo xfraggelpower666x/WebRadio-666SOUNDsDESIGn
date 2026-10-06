@@ -425,7 +425,6 @@ class App(tk.Tk):
             return None
         saved = experiment_session.register_evidence(self.active_experiment_session, evidence_path)
         self.active_experiment_session = saved["session"]
-        self._update_session_status()
         return experiment_session.progress(self.active_experiment_session)
 
     def _set_analysis(self, data):
@@ -561,6 +560,7 @@ class App(tk.Tk):
                     session_progress = {"ok": False, "error": str(exc)}
                 if session_progress is not None:
                     summary["session_progress"] = session_progress
+                    self.after(0, self._update_session_status)
                 self.after(0, lambda: self._set_analysis(summary))
                 self.after(0, self.refresh_evidence_lab)
                 self.after(0, self.refresh)
