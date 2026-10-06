@@ -19,6 +19,7 @@ class BleExperimentSessionTests(unittest.TestCase):
             "experiment_label": label,
             "capture": {"samples": [], "characteristics": [], "write_operations": 0},
             "analysis": {"hardware_verified": False, "rows": []},
+            "quality": {"quality_pass": True},
         }
 
     def test_create_session_is_read_only_and_has_plan(self):
