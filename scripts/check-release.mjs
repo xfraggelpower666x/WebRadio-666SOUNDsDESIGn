@@ -13,6 +13,32 @@ if (process.env.S666_ENFORCE_RELEASE_FOLDER === "1" && releaseManifest.expectedT
   throw new Error(`top-level folder mismatch: expected ${releaseManifest.expectedTopLevelFolder}, got ${basename(rootPath)}`);
 }
 if (releaseManifest.hardAuditPolicy !== true) throw new Error("HARD AUDIT policy flag missing");
+if (releaseManifest.version !== release.version) {
+  throw new Error(`release manifest/config version drift: manifest=${releaseManifest.version} config=${release.version}`);
+}
+if (releaseManifest.releaseType !== release.release) {
+  throw new Error(`release manifest/config release drift: manifest=${releaseManifest.releaseType} config=${release.release}`);
+}
+if (releaseManifest.repoFirstAuthority !== true) {
+  throw new Error("release manifest repo-first authority flag missing");
+}
+
+const pfsChildRelease = JSON.parse(await readFile(new URL("public/666pfs-child-release.json", rootUrl), "utf8"));
+if (pfsChildRelease.systemId !== "666PFS-666STREAM-DEPLOYMENT-001") {
+  throw new Error("666STREAM child marker system identity drift");
+}
+if (pfsChildRelease.version !== "1.0.3") {
+  throw new Error(`666STREAM child marker version drift: ${pfsChildRelease.version}`);
+}
+if (pfsChildRelease.pfsControlRepository !== "xfraggelpower666x/666PFS_CSM") {
+  throw new Error("666STREAM child marker PFS/CSM repository drift");
+}
+if (pfsChildRelease.pfsChildPath !== "children/STREAM-5001/") {
+  throw new Error("666STREAM child marker child-path drift");
+}
+if (pfsChildRelease.driveRole !== "HISTORY_BACKUP_RECOVERY_ONLY") {
+  throw new Error("666STREAM child marker Drive authority regression");
+}
 
 const required = [
   "worker.js", "wrangler.jsonc", "index.html", "package.json", "package-lock.json",
@@ -183,6 +209,7 @@ for (const addon of ["radio-admin-config-addon.js", "discord-notify-addon-v3.js"
 }
 
 if (packageJson.version !== release.version) throw new Error("package/release version drift");
+if (releaseManifest.version !== packageJson.version) throw new Error("release manifest/package version drift");
 const versionCore = await readFile(new URL("js/version-core.js", rootUrl), "utf8");
 if (!versionCore.includes(release.frontendVersion) || !versionCore.includes(release.build)) throw new Error("frontend version core drift");
 
