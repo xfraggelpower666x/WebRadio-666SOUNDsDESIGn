@@ -36,6 +36,7 @@ SEED_DEVICES = [
      "windows_ble_address":None,"role":"unassigned","verified":"ios_bound","enabled":False}
 ]
 ALLOWED_EDIT_FIELDS = {"label","role","enabled"}
+PERSISTED_BINDING_FIELDS = {"windows_ble_address"}
 
 def _validated_updates(updates):
     """Validate persisted and interactive edits through the same fail-closed gate."""
@@ -50,6 +51,16 @@ def _validated_updates(updates):
         ):
             raise ValueError(field + " must be printable text <= 100 chars")
     return dict(updates)
+
+def _validated_windows_ble_address(value):
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError("windows_ble_address must be text or null")
+    value = value.strip()
+    if not value or len(value) > 128 or any(ord(ch) < 33 or ord(ch) > 126 for ch in value):
+        raise ValueError("windows_ble_address must be printable non-empty text <= 128 chars")
+    return value
 
 class DeviceRegistry:
     def __init__(self, path=None):
@@ -78,6 +89,10 @@ class DeviceRegistry:
                 edits = {k: item[k] for k in ALLOWED_EDIT_FIELDS if k in item}
                 if edits:
                     base[identifier].update(_validated_updates(edits))
+                if "windows_ble_address" in item:
+                    if base[identifier].get("transport") != "ble":
+                        raise ValueError("windows_ble_address allowed only for BLE devices")
+                    base[identifier]["windows_ble_address"] = _validated_windows_ble_address(item["windows_ble_address"])
         return base
 
     def all(self):
@@ -93,6 +108,20 @@ class DeviceRegistry:
         self._entries[device_id].update(_validated_updates(updates))
         self.save()
         return self.get(device_id)
+
+    def bind_windows_address(self, device_id, address):
+        if device_id not in self._entries:
+            raise KeyError("unknown_device")
+        item = self._entries[device_id]
+        if item.get("transport") != "ble":
+            raise ValueError("windows BLE binding allowed only for BLE devices")
+        item["windows_ble_address"] = _validated_windows_ble_address(address)
+        item["enabled"] = False
+        self.save()
+        return self.get(device_id)
+
+    def clear_windows_address(self, device_id):
+        return self.bind_windows_address(device_id, None)
 
     def save(self):
         data={"schema":SCHEMA_VERSION,"devices":self.all()}
