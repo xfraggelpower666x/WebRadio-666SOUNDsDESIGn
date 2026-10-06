@@ -8,6 +8,7 @@ from ble_capture_quality import audit_capture_result
 from ble_capture_store import save_capture_evidence
 from ble_experiment_session import create_session, load_session, register_evidence
 from ble_inference_review import build_inference_review
+from ble_review_store import compare_final_reports
 
 
 class InferenceReviewTests(unittest.TestCase):
@@ -67,6 +68,36 @@ class InferenceReviewTests(unittest.TestCase):
             self.assertGreater(len(review["ranked_candidate_fields"]), 0)
             self.assertFalse(review["hardware_verified"])
             self.assertFalse(review["automatic_promotion_allowed"])
+
+    def test_report_comparison_tracks_stable_added_removed_and_changed_fields(self):
+        left = {
+            "family": "lenze", "device_id": "lenze_1", "session_id": "s1",
+            "review": {"ranked_candidate_fields": [
+                {"index": 2, "cross_label_difference_count": 4},
+                {"index": 5, "cross_label_difference_count": 1},
+            ]},
+        }
+        right = {
+            "family": "lenze", "device_id": "lenze_1", "session_id": "s2",
+            "review": {"ranked_candidate_fields": [
+                {"index": 2, "cross_label_difference_count": 4},
+                {"index": 5, "cross_label_difference_count": 3},
+                {"index": 7, "cross_label_difference_count": 1},
+            ]},
+        }
+        result = compare_final_reports(left, right)
+        self.assertEqual(result["stable_candidate_indexes"], [2])
+        self.assertEqual(result["added_candidate_indexes"], [7])
+        self.assertEqual(result["removed_candidate_indexes"], [])
+        self.assertEqual(result["changed_candidate_strength"], [{"index": 5, "left_count": 1, "right_count": 3}])
+        self.assertFalse(result["hardware_verified"])
+        self.assertFalse(result["automatic_promotion_allowed"])
+
+    def test_report_comparison_rejects_cross_device(self):
+        left = {"family": "lenze", "device_id": "lenze_1", "review": {"ranked_candidate_fields": []}}
+        right = {"family": "lenze", "device_id": "lenze_2", "review": {"ranked_candidate_fields": []}}
+        with self.assertRaisesRegex(ValueError, "report_device_mismatch"):
+            compare_final_reports(left, right)
 
 
 if __name__ == "__main__":
