@@ -12,6 +12,7 @@
     "continuity/LIVE_CIRCLE.md",
     "current/OPERATIONS_CENTER.md",
     "continuity/NEW_CHAT_CONTRACT.md",
+    "recovery/RECOVERY_CONTRACT.md",
     "relations/PFS_CSM_BACKUP_CONTRACT.md"
   ],
   "resolution_order": [
@@ -34,5 +35,12 @@
     "NO_CROSS_CHAT_PROJECT_INHERITANCE": true,
     "POINTER_LAST": true,
     "NO_MUTATION_AFTER_POINTER": true
+  },
+  "recovery": {
+    "mode": "BODY_SCOPE_EXACT_HEAD",
+    "zip_pointer_authority": false,
+    "restore_requires_readback": true,
+    "pointer_last_after_restore": true,
+    "cross_project_restore": false
   }
 }
