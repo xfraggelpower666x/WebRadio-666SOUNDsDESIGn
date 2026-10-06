@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.0.0",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "projects": [
     {
@@ -59,15 +59,10 @@
         "govee",
         "light orchestra"
       ],
-      "roots": [
-        "tools/666-light-orchestra/",
-        "666-LIGHT-ORCHESTRA/"
-      ],
+      "roots": [],
       "scope": "SEPARATE_LIGHT_ORCHESTRA_CHILD_ROUTE",
-      "verified_directory": true,
-      "source_branch": "feature/666-light-orchestra-v0.1.0",
-      "verified_source_head": "55613be74e1ba5bc2ba62225247d6fd07caf1e37",
-      "route_evidence": "666PFS_CSM children/LIGHT-35001/SOURCE_BINDING.md"
+      "verified_directory": false,
+      "activation_rule": "RESOLVE_FROM_CURRENT_VERIFIED_ROUTE_OR_REGISTRY_NEVER_GUESS"
     }
   ],
   "systemstart": {
