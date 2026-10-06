@@ -41,6 +41,8 @@ def save_capture_evidence(result: dict, directory: str | Path | None = None) -> 
         "device_id": str(result.get("device_id")),
         "family": str(result.get("family") or ""),
         "hardware_io": "READ_ONLY",
+        "experiment_label": str(result.get("experiment_label") or "")[:120],
+        "notes": str(result.get("notes") or "")[:1000],
         "capture": result.get("capture", {}),
         "analysis": result.get("analysis", {}),
     }
