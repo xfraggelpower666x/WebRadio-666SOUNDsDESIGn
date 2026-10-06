@@ -10,6 +10,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 from device_registry import DeviceRegistry
+from ble_protocol_design import (
+    LENZE_PROFILE,
+    OC21W_PROFILE,
+    CommandIntent,
+    audio_intent as design_audio_intent,
+    plan_command as design_plan_command,
+)
 
 try:
     from bleak import BleakClient, BleakScanner
@@ -297,6 +304,16 @@ class LenzeFleet:
             "notify_uuid": self.cfg.get("notify_uuid", LENZE_NOTIFY_UUID),
             "write_enabled": False,
             "command_protocol_verified": False,
+            "protocol_profile": LENZE_PROFILE.profile_id,
+            "frame_verification": LENZE_PROFILE.frame_verification.value,
+            "capabilities": {
+                name: {
+                    "supported": cap.supported,
+                    "verification": cap.verification.value,
+                    "notes": cap.notes,
+                }
+                for name, cap in LENZE_PROFILE.capabilities.items()
+            },
             "notifications": dict(self.notifications),
         }
 
@@ -411,7 +428,17 @@ class MagicLanternFleet:
             "write_uuid": self.cfg.get("write_uuid", MAGIC_WRITE_UUID),
             "notify_uuid": self.cfg.get("notify_uuid", MAGIC_NOTIFY_UUID),
             "write_enabled": bool(self.cfg.get("write_enabled", False)),
-            "command_protocol_verified": "public-wl.smartled.rgb-fff0-family",
+            "command_protocol_verified": bool(self.cfg.get("protocol_verified", False)),
+            "protocol_profile": OC21W_PROFILE.profile_id,
+            "frame_verification": OC21W_PROFILE.frame_verification.value,
+            "capabilities": {
+                name: {
+                    "supported": cap.supported,
+                    "verification": cap.verification.value,
+                    "notes": cap.notes,
+                }
+                for name, cap in OC21W_PROFILE.capabilities.items()
+            },
             "last_frame": self.last_frame,
         }
 
@@ -460,6 +487,71 @@ class Engine:
             discovered = set(self.magic_lantern.devices)
             return bool(discovered and discovered <= windows)
         return True  # injected mock/adapters still surface their failures in offline tests
+
+    def protocol_design_status(self):
+        """Return hardware-free protocol design metadata for UI/dashboard/API."""
+        def profile(profile):
+            return {
+                "profile_id": profile.profile_id,
+                "family": profile.identity.family,
+                "name_prefix": profile.identity.name_prefix,
+                "service_uuid": profile.identity.service_uuid,
+                "write_uuid": profile.identity.write_uuid,
+                "notify_uuid": profile.identity.notify_uuid,
+                "expected_count": profile.identity.expected_count,
+                "frame_family": profile.frame_family,
+                "frame_verification": profile.frame_verification.value,
+                "hardware_writes_allowed_by_design": profile.hardware_writes_allowed,
+                "capabilities": {
+                    name: {
+                        "supported": cap.supported,
+                        "verification": cap.verification.value,
+                        "notes": cap.notes,
+                    }
+                    for name, cap in profile.capabilities.items()
+                },
+                "notes": list(profile.notes),
+            }
+        return {
+            "ok": True,
+            "hardware_io": False,
+            "lenze": profile(LENZE_PROFILE),
+            "oc21w": profile(OC21W_PROFILE),
+        }
+
+    def plan_protocol_command(self, family, command, params=None):
+        """Compile a dry-run plan only; this method can never write BLE hardware."""
+        family = str(family or "").strip().lower()
+        profile = LENZE_PROFILE if family in ("lenze", "lenze-rgb") else (
+            OC21W_PROFILE if family in ("oc21w", "magic_lantern", "magic-lantern") else None
+        )
+        if profile is None:
+            raise ValueError("unknown_protocol_family")
+        params = params if isinstance(params, dict) else {}
+        intent = CommandIntent(str(command or "").strip().lower(), dict(params), profile.identity.family)
+        plan = design_plan_command(profile, intent)
+        return {
+            "ok": True,
+            "hardware_io": False,
+            "profile_id": plan.profile_id,
+            "command": plan.command,
+            "status": plan.status,
+            "candidate_frames_hex": list(plan.candidate_frames_hex),
+            "reason": plan.reason,
+        }
+
+    def plan_audio_protocol(self, family, payload):
+        """Preview audio-reactive intent + protocol plan without device writes."""
+        family = str(family or "").strip().lower()
+        normalized = "lenze" if family in ("lenze", "lenze-rgb") else (
+            "magic_lantern" if family in ("oc21w", "magic_lantern", "magic-lantern") else None
+        )
+        if normalized is None:
+            raise ValueError("unknown_protocol_family")
+        intent = design_audio_intent(normalized, payload if isinstance(payload, dict) else {})
+        result = self.plan_protocol_command(normalized, intent.command, intent.params)
+        result["intent"] = {"command": intent.command, "params": intent.params, "target_family": intent.target_family}
+        return result
 
     async def set_magic_mode(self, mode, speed=None):
         # Every hardware path must pass the engine-level safety gates.
@@ -532,6 +624,7 @@ class Engine:
             "devices": [d.status() for d in self.devices],
             "last_audio": self.last_audio,
             "start_errors": getattr(self, "start_errors", []),
+            "protocol_design": self.protocol_design_status(),
         }
 
 
@@ -614,6 +707,8 @@ class Bridge:
                     self.reply({"devices": engine.status()["devices"], "registry": engine.registry.all()})
                 elif path == "/api/registry":
                     self.reply({"ok": True, "devices": engine.registry.all()})
+                elif path == "/api/protocols":
+                    self.reply(engine.protocol_design_status())
                 else:
                     self.reply({"ok": False, "error": "not_found"}, 404)
 
@@ -655,6 +750,10 @@ class Bridge:
                         result = {"ok": True, "result": bridge.run_async(engine.magic_lantern.scan())}
                     elif path == "/api/magic-lantern/mode":
                         result = bridge.run_async(engine.set_magic_mode(body.get("mode", 0), body.get("speed")))
+                    elif path == "/api/protocol/plan":
+                        result = engine.plan_protocol_command(body.get("family"), body.get("command"), body.get("params", {}))
+                    elif path == "/api/protocol/audio-plan":
+                        result = engine.plan_audio_protocol(body.get("family"), body.get("payload", {}))
                     else:
                         return self.reply({"ok": False, "error": "not_found"}, 404)
                     self.reply(result, 200 if result.get("ok", True) else 502)
