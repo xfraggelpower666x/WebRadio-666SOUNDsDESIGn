@@ -20,3 +20,7 @@ Rules:
 - project switch requires direct current user intent or a valid project-bound fresh-chat handoff;
 - newer verified valid evolution wins over stale handoff/history;
 - CodeForge is available in every project but inherits and may not escape active project scope.
+
+- structure-control audit/repair/freeze may mutate only 666STREAM_STRUCTURE_CONTROL/ plus its dedicated no-deploy workflow;
+- productive radio/player/worker/public/config assets remain immutable during structure-control freeze;
+- repository-tree ZIP backups are forbidden by radio Release Integrity; systemsicherung ZIP is a GitHub Actions artifact with manifest and readback;
