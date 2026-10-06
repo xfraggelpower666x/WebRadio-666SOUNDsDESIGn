@@ -45,6 +45,7 @@ def save_capture_evidence(result: dict, directory: str | Path | None = None) -> 
         "notes": str(result.get("notes") or "")[:1000],
         "capture": result.get("capture", {}),
         "analysis": result.get("analysis", {}),
+        "quality": result.get("quality", {}),
     }
     digest = evidence_hash(payload)
     record = {
