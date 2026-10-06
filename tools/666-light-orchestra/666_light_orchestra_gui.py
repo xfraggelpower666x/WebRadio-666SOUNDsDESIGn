@@ -10,6 +10,7 @@ core = import_module("666_light_orchestra")
 gui_model = import_module("ble_gui_model")
 capture_store = import_module("ble_capture_store")
 evidence_learning = import_module("ble_evidence_learning")
+protocol_inference = import_module("ble_protocol_inference")
 
 
 class App(tk.Tk):
@@ -241,6 +242,8 @@ class App(tk.Tk):
         self.evidence_device_combo.pack(side="left", padx=5)
         ttk.Button(controls, text="Evidence laden", command=self.refresh_evidence_lab).pack(side="left", padx=5)
         ttk.Button(controls, text="Learning Summary", command=self.show_learning_summary).pack(side="left", padx=5)
+        ttk.Button(controls, text="Experiment Plan", command=self.show_experiment_plan).pack(side="left", padx=5)
+        ttk.Button(controls, text="Infer Candidate Fields", command=self.show_protocol_inference).pack(side="left", padx=5)
 
         split = ttk.Panedwindow(parent, orient="horizontal")
         split.pack(fill="both", expand=True, padx=8, pady=6)
@@ -336,6 +339,43 @@ class App(tk.Tk):
             device_id=device or None,
         )
         self._set_evidence_text(summary)
+
+    def _selected_evidence_family(self):
+        family = self.evidence_family.get().strip()
+        return "magic_lantern" if family == "oc21w" else family
+
+    def show_experiment_plan(self):
+        family = self._selected_evidence_family()
+        if family == "all":
+            return self._set_evidence_text({
+                "error": "Bitte für den Experiment Plan LENZE oder magic_lantern auswählen.",
+                "hardware_verified": False,
+            })
+        try:
+            gate = protocol_inference.readiness(self.evidence_loaded.get("valid", []), family)
+            gate["plan"] = protocol_inference.experiment_plan(family)
+            self._set_evidence_text(gate)
+        except Exception as exc:
+            self._set_evidence_text({"ok": False, "error": str(exc), "hardware_verified": False})
+
+    def show_protocol_inference(self):
+        family = self._selected_evidence_family()
+        if family == "all":
+            return self._set_evidence_text({
+                "error": "Inference immer pro Gerätefamilie ausführen.",
+                "hardware_verified": False,
+                "automatic_promotion_allowed": False,
+            })
+        try:
+            result = protocol_inference.infer_candidate_fields(self.evidence_loaded.get("valid", []), family)
+            self._set_evidence_text(result)
+        except Exception as exc:
+            self._set_evidence_text({
+                "ok": False,
+                "error": str(exc),
+                "hardware_verified": False,
+                "automatic_promotion_allowed": False,
+            })
 
     def _set_analysis(self, data):
         self.analysis.configure(state="normal")
