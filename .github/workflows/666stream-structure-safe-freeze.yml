@@ -1,0 +1,203 @@
+name: 666STREAM Structure Control Safe Freeze
+
+on:
+  push:
+    branches:
+      - audit/666stream-structure-safe-freeze-20261006
+    paths:
+      - "666STREAM_STRUCTURE_CONTROL/**"
+      - ".github/workflows/666stream-structure-safe-freeze.yml"
+  pull_request:
+    branches:
+      - WebRadio-666SOUNDsDESIGn
+    paths:
+      - "666STREAM_STRUCTURE_CONTROL/**"
+      - ".github/workflows/666stream-structure-safe-freeze.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Radio-safe scope guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin WebRadio-666SOUNDsDESIGn --depth=1
+          BASE="$(git merge-base HEAD origin/WebRadio-666SOUNDsDESIGn)"
+          git diff --name-only "$BASE"...HEAD > STRUCTURE_SAFE_FREEZE_CHANGED_FILES.txt
+          cat STRUCTURE_SAFE_FREEZE_CHANGED_FILES.txt
+          while IFS= read -r path; do
+            [[ -z "$path" ]] && continue
+            case "$path" in
+              666STREAM_STRUCTURE_CONTROL/*|.github/workflows/666stream-structure-safe-freeze.yml) ;;
+              *) echo "::error::RADIO_SCOPE_ESCAPE: $path"; exit 1 ;;
+            esac
+          done < STRUCTURE_SAFE_FREEZE_CHANGED_FILES.txt
+
+      - name: Verify complete radio repository without deployment
+        run: npm run verify
+
+      - name: Structure-control audit
+        shell: python
+        run: |
+          from pathlib import Path
+          import json
+
+          root = Path("666STREAM_STRUCTURE_CONTROL")
+          required = [
+              root / "rehydration/PRE_REHYDRATION_SCOPE_GUARD.md",
+              root / "AUTHORITY_CONTRACT.md",
+              root / "CURRENT_POINTER.json",
+              root / "current/CURRENT_STATE.md",
+              root / "current/PROJECT_MAP.json",
+              root / "current/SESSION_GOVERNOR.md",
+              root / "continuity/PROJECT_CONTINUITY_INDEX.md",
+              root / "continuity/LIVE_CIRCLE.md",
+              root / "current/OPERATIONS_CENTER.md",
+              root / "continuity/NEW_CHAT_CONTRACT.md",
+              root / "recovery/RECOVERY_CONTRACT.md",
+              root / "relations/PFS_CSM_BACKUP_CONTRACT.md",
+              root / "recovery/SAFE_FREEZE_CONTRACT.md",
+          ]
+          missing = [str(p) for p in required if not p.is_file()]
+          if missing:
+              raise SystemExit("MISSING_REQUIRED_STRUCTURE_FILES=" + ",".join(missing))
+
+          pointer = json.loads((root / "CURRENT_POINTER.json").read_text(encoding="utf-8"))
+          manifest = json.loads((root / "REHYDRATION_MANIFEST.json").read_text(encoding="utf-8"))
+          if pointer.get("authority") != "GITHUB_REPOSITORY":
+              raise SystemExit("CURRENT_POINTER_AUTHORITY_MISMATCH")
+          if pointer.get("authority_branch") != "WebRadio-666SOUNDsDESIGn":
+              raise SystemExit("CURRENT_POINTER_BRANCH_MISMATCH")
+          if not manifest.get("invariants", {}).get("POINTER_LAST"):
+              raise SystemExit("MANIFEST_POINTER_LAST_DISABLED")
+
+          tracked_zips = list(root.rglob("*.zip"))
+          if tracked_zips:
+              raise SystemExit("ACTIVE_TREE_ZIP_FORBIDDEN=" + ",".join(str(p) for p in tracked_zips))
+
+          state = (root / "current/CURRENT_STATE.md").read_text(encoding="utf-8")
+          if "ACTIVE_TREE_BINARY_ZIP=FORBIDDEN" not in state:
+              raise SystemExit("SAFE_FREEZE_MODEL_NOT_ACTIVE")
+          if "SYSTEMSICHERUNG_PATH=" in state:
+              raise SystemExit("STALE_IN_TREE_ZIP_REFERENCE_PRESENT")
+
+          receipt = (root / "recovery/FREEZE_RECEIPT_2026-10-06.md").read_text(encoding="utf-8")
+          if "STATUS=HISTORICAL_SUPERSEDED_BINARY_MIRROR" not in receipt:
+              raise SystemExit("LEGACY_RECEIPT_NOT_DOWNGRADED")
+
+          print("PASS: structure-control audit")
+
+      - name: Build structure-only immutable ZIP artifact
+        shell: python
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          import hashlib, json, os
+
+          source = Path("666STREAM_STRUCTURE_CONTROL")
+          out = Path("structure-safe-freeze")
+          out.mkdir(exist_ok=True)
+          files = sorted(
+              p for p in source.rglob("*")
+              if p.is_file()
+              and p.name != "CURRENT_POINTER.json"
+              and p.suffix.lower() != ".zip"
+          )
+          if len(files) < 10:
+              raise SystemExit(f"unexpected structure file count: {len(files)}")
+
+          manifest = {
+              "schema": "666stream-structure-safe-freeze-v1",
+              "system": "666STREAM_STRUCTURE_CONTROL",
+              "source_repository": os.environ["GITHUB_REPOSITORY"],
+              "source_commit": os.environ["SOURCE_SHA"],
+              "authority_branch": "WebRadio-666SOUNDsDESIGn",
+              "scope": "666STREAM_STRUCTURE_CONTROL_ONLY",
+              "current_pointer_embedded": False,
+              "active_tree_binary_zip": False,
+              "production_deployment": False,
+              "files": [
+                  {
+                      "path": p.relative_to(source).as_posix(),
+                      "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+                      "bytes": p.stat().st_size,
+                  }
+                  for p in files
+              ],
+          }
+          manifest_path = out / "STRUCTURE_SAFE_FREEZE_MANIFEST.json"
+          manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+          archive = out / f"666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_{os.environ['SOURCE_SHA']}.zip"
+          with ZipFile(archive, "w", compression=ZIP_DEFLATED) as z:
+              for p in files:
+                  z.write(p, "666STREAM_STRUCTURE_CONTROL/" + p.relative_to(source).as_posix())
+              z.write(manifest_path, "STRUCTURE_SAFE_FREEZE_MANIFEST.json")
+
+          with ZipFile(archive, "r") as z:
+              bad = z.testzip()
+              if bad is not None:
+                  raise SystemExit(f"ZIP_CRC_FAIL={bad}")
+              expected = {x["path"]: x["sha256"] for x in manifest["files"]}
+              for rel, digest in expected.items():
+                  data = z.read("666STREAM_STRUCTURE_CONTROL/" + rel)
+                  if hashlib.sha256(data).hexdigest() != digest:
+                      raise SystemExit(f"ZIP_HASH_MISMATCH={rel}")
+
+          archive_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
+          receipt = out / "STRUCTURE_SAFE_FREEZE_RECEIPT.txt"
+          receipt.write_text(
+              "\n".join([
+                  "SYSTEM_ID=666STREAM_STRUCTURE_CONTROL",
+                  f"SOURCE_COMMIT={os.environ['SOURCE_SHA']}",
+                  "SCOPE=666STREAM_STRUCTURE_CONTROL_ONLY",
+                  "RADIO_RUNTIME_MUTATION=NONE",
+                  "PRODUCTION_DEPLOYMENT=NONE",
+                  "CURRENT_POINTER_EMBEDDED=FALSE",
+                  f"ARCHIVE={archive.name}",
+                  f"ARCHIVE_SHA256={archive_hash}",
+                  f"ARCHIVE_SIZE_BYTES={archive.stat().st_size}",
+                  f"ARCHIVE_ENTRIES={len(files)+1}",
+                  "ZIP_CRC=PASS",
+                  "FILE_SHA256_READBACK=PASS",
+                  "SAFE_FREEZE=PASS",
+                  "",
+              ]),
+              encoding="utf-8",
+          )
+          (out / "ARCHIVE_SHA256.txt").write_text(f"{archive_hash}  {archive.name}\n", encoding="utf-8")
+
+      - name: Upload safe structure-control freeze
+        uses: actions/upload-artifact@v4
+        with:
+          name: 666stream-structure-control-safe-freeze-${{ github.sha }}
+          path: |
+            structure-safe-freeze/
+            STRUCTURE_SAFE_FREEZE_CHANGED_FILES.txt
+          if-no-files-found: error
+          retention-days: 90
