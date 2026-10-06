@@ -1,0 +1,74 @@
+{
+  "version": "1.0.0",
+  "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "projects": [
+    {
+      "id": "WEBRADIO",
+      "aliases": [
+        "webradio",
+        "radio",
+        "player",
+        "html player",
+        "embed",
+        "twitch",
+        "veluna",
+        "dashboard"
+      ],
+      "roots": [
+        "public/"
+      ],
+      "scope": "HTML_WEBRADIO_RUNTIME_AND_BROWSER_PLAYERS",
+      "verified": true
+    },
+    {
+      "id": "INTRO",
+      "aliases": [
+        "intro",
+        "intros",
+        "cyber intro",
+        "cyberintro",
+        "bootscreen"
+      ],
+      "roots": [
+        "CYBER_INTRO_HUD_TEMPLATE_v1_10_AUDIT_REPAIR_FREEZE/",
+        "CYBER_INTRO_HUD_TEMPLATE_v1_5/"
+      ],
+      "scope": "INTRO_AND_BOOT_VISUAL_PROJECTS",
+      "verified": true
+    },
+    {
+      "id": "WINDOWS_APP",
+      "aliases": [
+        "windows app",
+        "soundwave",
+        "soundwave pc",
+        "pc app"
+      ],
+      "roots": [
+        "windows-app/SoundwaveStudio-666-PC/"
+      ],
+      "scope": "PORTABLE_WINDOWS_WEBRADIO_APP",
+      "verified": true
+    },
+    {
+      "id": "LIGHT_ORCHESTRA",
+      "aliases": [
+        "symphony",
+        "symphony light",
+        "symphony light pro",
+        "govee",
+        "light orchestra"
+      ],
+      "roots": [],
+      "scope": "SEPARATE_LIGHT_ORCHESTRA_CHILD_ROUTE",
+      "verified_directory": false,
+      "activation_rule": "RESOLVE_FROM_CURRENT_VERIFIED_ROUTE_OR_REGISTRY_NEVER_GUESS"
+    }
+  ],
+  "systemstart": {
+    "direct_description_resolution": true,
+    "ambiguous_request": "ASK_PROJECT_SELECTION",
+    "no_description_and_no_valid_handoff": "ASK_PROJECT_SELECTION",
+    "valid_project_handoff": "CONTINUE_HANDOFF_PROJECT_IF_NOT_SUPERSEDED"
+  }
+}
