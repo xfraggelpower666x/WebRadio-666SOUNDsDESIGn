@@ -1,6 +1,10 @@
 """Offline tests for BLE capture quality gates."""
 from collections import Counter
+import sys
 import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from ble_capture_quality import audit_capture_result, subtract_baseline
 
