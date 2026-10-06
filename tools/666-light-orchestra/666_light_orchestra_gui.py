@@ -174,6 +174,32 @@ class App(tk.Tk):
         ttk.Button(capture_bar, text="3 · READ-ONLY CAPTURE", command=self.capture_selected).pack(side="left", padx=4)
         ttk.Button(capture_bar, text="Protocol Status", command=self.show_protocol_status).pack(side="left", padx=4)
 
+        experiment_bar = ttk.Frame(registry_frame)
+        experiment_bar.pack(fill="x", pady=(0, 6))
+        ttk.Label(experiment_bar, text="Experiment:").pack(side="left")
+        self.experiment_label = tk.StringVar(value="unlabeled")
+        ttk.Combobox(
+            experiment_bar,
+            textvariable=self.experiment_label,
+            values=(
+                "unlabeled",
+                "official_app_power_on",
+                "official_app_power_off",
+                "official_app_color_pink",
+                "official_app_color_red",
+                "official_app_color_green",
+                "official_app_color_blue",
+                "official_app_brightness_25",
+                "official_app_brightness_50",
+                "official_app_brightness_100",
+                "official_app_mode_change",
+            ),
+            width=30,
+        ).pack(side="left", padx=5)
+        ttk.Label(experiment_bar, text="Notiz:").pack(side="left", padx=(10, 2))
+        self.experiment_notes = tk.StringVar()
+        ttk.Entry(experiment_bar, textvariable=self.experiment_notes, width=38).pack(side="left", fill="x", expand=True)
+
         protocol_frame = ttk.LabelFrame(parent, text="Capture / Protocol Analyse", padding=6)
         protocol_frame.pack(fill="both", expand=True, padx=8, pady=(0, 8))
         self.analysis = tk.Text(protocol_frame, height=12, wrap="word", font=("Consolas", 9))
@@ -226,7 +252,7 @@ class App(tk.Tk):
 
         self.evidence_tree = ttk.Treeview(
             left,
-            columns=("file", "device", "family", "sha"),
+            columns=("file", "device", "family", "label", "sha"),
             show="headings",
             height=15,
         )
@@ -234,6 +260,7 @@ class App(tk.Tk):
             ("file", "Datei", 200),
             ("device", "Device", 95),
             ("family", "Familie", 105),
+            ("label", "Experiment", 155),
             ("sha", "SHA-256", 120),
         ):
             self.evidence_tree.heading(key, text=title)
@@ -274,6 +301,7 @@ class App(tk.Tk):
                         entry["path"].split("\\")[-1].split("/")[-1],
                         payload.get("device_id"),
                         payload.get("family"),
+                        payload.get("experiment_label") or "(unlabeled)",
                         entry["record"].get("sha256", "")[:16],
                     ),
                 )
@@ -429,8 +457,12 @@ class App(tk.Tk):
         def job():
             try:
                 result = self.bridge.run_async(self.engine.capture_ble_read_only(target, self.capture_seconds.get()))
+                result["experiment_label"] = self.experiment_label.get().strip() or "unlabeled"
+                result["notes"] = self.experiment_notes.get().strip()
                 evidence = capture_store.save_capture_evidence(result)
                 summary = gui_model.capture_summary(result)
+                summary["experiment_label"] = result["experiment_label"]
+                summary["notes"] = result["notes"]
                 summary["evidence"] = evidence
                 self.after(0, lambda: self._set_analysis(summary))
                 self.after(0, self.refresh)
