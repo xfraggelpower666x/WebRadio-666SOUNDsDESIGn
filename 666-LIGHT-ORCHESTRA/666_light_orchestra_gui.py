@@ -4,21 +4,22 @@ import json
 import threading
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 from importlib import import_module
 
 core = import_module("666_light_orchestra")
+gui_model = import_module("ble_gui_model")
 
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("666SOUNDsDESIGn LIGHT ORCHESTRA")
-        self.geometry("860x620")
-        self.minsize(760, 540)
+        self.geometry("1080x760")
+        self.minsize(920, 660)
         self.cfg = core.load_config()
         self.engine = core.Engine(self.cfg)
         self.bridge = core.Bridge(self.engine, self.cfg["server"]["host"], self.cfg["server"]["port"])
+        self.discovered_rows = []
         self._build()
         threading.Thread(target=self.bridge.start, daemon=True).start()
         self.after(1200, self.refresh)
@@ -30,38 +31,161 @@ class App(tk.Tk):
         self.status = tk.StringVar(value="Bridge startet …")
         ttk.Label(top, textvariable=self.status).pack(side="right")
 
-        master = ttk.LabelFrame(self, text="Master", padding=10)
-        master.pack(fill="x", padx=12, pady=6)
+        self.tabs = ttk.Notebook(self)
+        self.tabs.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        self.dashboard_tab = ttk.Frame(self.tabs)
+        self.ble_tab = ttk.Frame(self.tabs)
+        self.tabs.add(self.dashboard_tab, text="Dashboard")
+        self.tabs.add(self.ble_tab, text="BLE LAB · READ ONLY")
+
+        self._build_dashboard(self.dashboard_tab)
+        self._build_ble_lab(self.ble_tab)
+
+    def _build_dashboard(self, parent):
+        master = ttk.LabelFrame(parent, text="Master", padding=10)
+        master.pack(fill="x", padx=8, pady=6)
         ttk.Button(master, text="ALL ON", command=lambda: self.run(self.engine.set_power(True))).pack(side="left", padx=4)
         ttk.Button(master, text="ALL OFF", command=lambda: self.run(self.engine.set_power(False))).pack(side="left", padx=4)
-        ttk.Button(master, text="BLE Scan", command=self.scan).pack(side="left", padx=4)
+        ttk.Button(master, text="BLE Scan (read-only)", command=self.scan_ble).pack(side="left", padx=4)
         ttk.Button(master, text="Refresh", command=self.refresh).pack(side="left", padx=4)
         ttk.Button(master, text="Govee LAN prüfen (read-only)", command=lambda: self.run(self.engine.govee.probe())).pack(side="left", padx=4)
 
-        color = ttk.LabelFrame(self, text="Testfarbe", padding=10)
-        color.pack(fill="x", padx=12, pady=6)
-        self.r = tk.IntVar(value=255); self.g = tk.IntVar(value=35); self.b = tk.IntVar(value=210); self.br = tk.IntVar(value=65)
+        color = ttk.LabelFrame(parent, text="Testfarbe", padding=10)
+        color.pack(fill="x", padx=8, pady=6)
+        self.r = tk.IntVar(value=255)
+        self.g = tk.IntVar(value=35)
+        self.b = tk.IntVar(value=210)
+        self.br = tk.IntVar(value=65)
         for name, var, maxv in (("R", self.r, 255), ("G", self.g, 255), ("B", self.b, 255), ("Brightness", self.br, 100)):
-            ttk.Label(color, text=name).pack(side="left", padx=(6,2))
+            ttk.Label(color, text=name).pack(side="left", padx=(6, 2))
             ttk.Spinbox(color, from_=0, to=maxv, width=5, textvariable=var).pack(side="left")
         ttk.Button(color, text="Senden", command=self.send_color).pack(side="left", padx=10)
 
-        self.tree = ttk.Treeview(self, columns=("family","state","detail"), show="headings", height=12)
-        self.tree.heading("family", text="Gerätefamilie")
+        self.tree = ttk.Treeview(parent, columns=("family", "state", "detail"), show="headings", height=12)
+        self.tree.heading("family", text="Gerät")
         self.tree.heading("state", text="Status")
         self.tree.heading("detail", text="Detail")
-        self.tree.column("family", width=210)
-        self.tree.column("state", width=110)
-        self.tree.column("detail", width=500)
-        self.tree.pack(fill="both", expand=True, padx=12, pady=8)
+        self.tree.column("family", width=230)
+        self.tree.column("state", width=130)
+        self.tree.column("detail", width=620)
+        self.tree.pack(fill="both", expand=True, padx=8, pady=8)
 
-        safety = ttk.LabelFrame(self, text="Safety", padding=10)
-        safety.pack(fill="x", padx=12, pady=(0,12))
+        safety = ttk.LabelFrame(parent, text="Safety", padding=10)
+        safety.pack(fill="x", padx=8, pady=(0, 8))
         ttk.Label(
             safety,
-            text="*Erreichbarkeit ist Familienstatus, kein Einzelgeräte-Readback. Govee LAN laut App aktiv. Magic Lantern und LENZE-Hardware-Writes standardmäßig gesperrt.",
-            wraplength=800
+            text=(
+                "Erreichbarkeit ist Familienstatus, kein Einzelgeräte-Readback. "
+                "Govee benötigt bestätigten LAN-Probe. LENZE/OC21W Hardware-Writes bleiben "
+                "gesperrt, bis Protokoll und Identität separat verifiziert wurden."
+            ),
+            wraplength=980,
         ).pack(anchor="w")
+
+    def _build_ble_lab(self, parent):
+        notice = ttk.LabelFrame(parent, text="READ-ONLY Sicherheitszone", padding=10)
+        notice.pack(fill="x", padx=8, pady=6)
+        ttk.Label(
+            notice,
+            text=(
+                "Dieser Bereich scannt BLE-Geräte, bindet Windows-Adressen und sammelt Notifications. "
+                "Binding setzt das Gerät absichtlich auf DEAKTIVIERT. Capture führt keine GATT-Write-Operation aus."
+            ),
+            wraplength=980,
+        ).pack(anchor="w")
+
+        controls = ttk.Frame(parent, padding=(8, 4))
+        controls.pack(fill="x")
+        ttk.Button(controls, text="1 · Windows BLE SCAN", command=self.scan_ble).pack(side="left", padx=4)
+        ttk.Button(controls, text="Refresh Registry", command=self.refresh_ble_registry).pack(side="left", padx=4)
+        ttk.Label(controls, text="Capture Sekunden:").pack(side="left", padx=(16, 4))
+        self.capture_seconds = tk.DoubleVar(value=5.0)
+        ttk.Spinbox(controls, from_=0.5, to=30.0, increment=0.5, width=6, textvariable=self.capture_seconds).pack(side="left")
+
+        body = ttk.Panedwindow(parent, orient="horizontal")
+        body.pack(fill="both", expand=True, padx=8, pady=6)
+
+        left = ttk.Frame(body)
+        right = ttk.Frame(body)
+        body.add(left, weight=1)
+        body.add(right, weight=1)
+
+        scan_frame = ttk.LabelFrame(left, text="Gefundene LENZE / OC21W", padding=6)
+        scan_frame.pack(fill="both", expand=True)
+
+        self.ble_tree = ttk.Treeview(
+            scan_frame,
+            columns=("name", "family", "address", "rssi", "suggestion", "binding"),
+            show="headings",
+            height=10,
+        )
+        for key, title, width in (
+            ("name", "Name", 140),
+            ("family", "Familie", 100),
+            ("address", "Windows BLE-Adresse", 170),
+            ("rssi", "RSSI", 55),
+            ("suggestion", "Vorschlag", 100),
+            ("binding", "Status", 90),
+        ):
+            self.ble_tree.heading(key, text=title)
+            self.ble_tree.column(key, width=width, stretch=True)
+        self.ble_tree.pack(fill="both", expand=True)
+        self.ble_tree.bind("<<TreeviewSelect>>", lambda _e: self._sync_selected_suggestion())
+
+        bind_frame = ttk.Frame(scan_frame)
+        bind_frame.pack(fill="x", pady=(6, 0))
+        ttk.Label(bind_frame, text="Registry-Slot:").pack(side="left")
+        self.bind_target = tk.StringVar()
+        self.bind_combo = ttk.Combobox(bind_frame, textvariable=self.bind_target, state="readonly", width=18)
+        self.bind_combo.pack(side="left", padx=5)
+        ttk.Button(bind_frame, text="2 · Adresse binden (bleibt OFF)", command=self.bind_selected).pack(side="left", padx=5)
+
+        registry_frame = ttk.LabelFrame(right, text="BLE Registry / Capture", padding=6)
+        registry_frame.pack(fill="both", expand=True)
+
+        self.registry_tree = ttk.Treeview(
+            registry_frame,
+            columns=("id", "family", "enabled", "address"),
+            show="headings",
+            height=8,
+        )
+        for key, title, width in (
+            ("id", "Device-ID", 110),
+            ("family", "Familie", 110),
+            ("enabled", "Enabled", 70),
+            ("address", "Windows BLE-Adresse", 190),
+        ):
+            self.registry_tree.heading(key, text=title)
+            self.registry_tree.column(key, width=width, stretch=True)
+        self.registry_tree.pack(fill="both", expand=True)
+        self.registry_tree.bind("<<TreeviewSelect>>", lambda _e: self._sync_capture_target())
+
+        capture_bar = ttk.Frame(registry_frame)
+        capture_bar.pack(fill="x", pady=6)
+        self.capture_target = tk.StringVar()
+        self.capture_combo = ttk.Combobox(capture_bar, textvariable=self.capture_target, state="readonly", width=18)
+        self.capture_combo.pack(side="left", padx=(0, 6))
+        ttk.Button(capture_bar, text="3 · READ-ONLY CAPTURE", command=self.capture_selected).pack(side="left", padx=4)
+        ttk.Button(capture_bar, text="Protocol Status", command=self.show_protocol_status).pack(side="left", padx=4)
+
+        protocol_frame = ttk.LabelFrame(parent, text="Capture / Protocol Analyse", padding=6)
+        protocol_frame.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+        self.analysis = tk.Text(protocol_frame, height=12, wrap="word", font=("Consolas", 9))
+        self.analysis.pack(fill="both", expand=True)
+        self._set_analysis({
+            "status": "READY",
+            "hardware_writes": "BLOCKED",
+            "instruction": "BLE Scan starten, Gerät auswählen, Adresse binden, danach READ-ONLY Capture.",
+        })
+
+        self.refresh_ble_registry()
+
+    def _set_analysis(self, data):
+        self.analysis.configure(state="normal")
+        self.analysis.delete("1.0", "end")
+        self.analysis.insert("1.0", json.dumps(data, indent=2, ensure_ascii=False))
+        self.analysis.configure(state="disabled")
 
     def run(self, coro):
         def job():
@@ -78,14 +202,126 @@ class App(tk.Tk):
         threading.Thread(target=job, daemon=True).start()
 
     def scan(self):
+        self.scan_ble()
+
+    def scan_ble(self):
         def job():
             try:
-                self.bridge.run_async(self.engine.lenze.scan())
-                self.bridge.run_async(self.engine.magic_lantern.scan())
+                result = self.bridge.run_async(self.engine.scan_known_ble(5.0))
+                rows = gui_model.propose_bindings(result.get("devices", []), self.engine.registry.all())
+                self.discovered_rows = rows
+                self.after(0, lambda: self._render_scan(rows))
+                self.after(0, self.refresh_ble_registry)
+            except Exception as exc:
+                self.after(0, lambda: messagebox.showerror("BLE Scan", str(exc)))
+        threading.Thread(target=job, daemon=True).start()
+
+    def _render_scan(self, rows):
+        for item in self.ble_tree.get_children():
+            self.ble_tree.delete(item)
+        for index, row in enumerate(rows):
+            self.ble_tree.insert(
+                "",
+                "end",
+                iid=str(index),
+                values=(
+                    row["name"],
+                    row["family"],
+                    row["address"],
+                    row.get("rssi"),
+                    row.get("suggested_device_id") or "—",
+                    row["binding_state"],
+                ),
+            )
+
+    def _sync_selected_suggestion(self):
+        selected = self.ble_tree.selection()
+        if not selected:
+            return
+        row = self.discovered_rows[int(selected[0])]
+        if row.get("suggested_device_id"):
+            self.bind_target.set(row["suggested_device_id"])
+
+    def bind_selected(self):
+        selected = self.ble_tree.selection()
+        target = self.bind_target.get().strip()
+        if not selected:
+            return messagebox.showwarning("BLE Binding", "Bitte zuerst ein gefundenes Gerät auswählen.")
+        if not target:
+            return messagebox.showwarning("BLE Binding", "Bitte einen Registry-Slot auswählen.")
+        row = self.discovered_rows[int(selected[0])]
+        if not messagebox.askyesno(
+            "BLE Binding",
+            f"{row['name']}\n{row['address']}\n\nmit {target} verbinden?\nDas Gerät bleibt DEAKTIVIERT.",
+        ):
+            return
+        try:
+            result = self.engine.bind_windows_ble(target, row["address"])
+            self._set_analysis(result)
+            self.refresh_ble_registry()
+            self.scan_ble()
+        except Exception as exc:
+            messagebox.showerror("BLE Binding", str(exc))
+
+    def refresh_ble_registry(self):
+        registry = gui_model.ble_registry_entries(self.engine.registry.all())
+        ids = [item["id"] for item in registry]
+        self.bind_combo["values"] = ids
+        self.capture_combo["values"] = ids
+        if ids and not self.bind_target.get():
+            self.bind_target.set(ids[0])
+        if ids and not self.capture_target.get():
+            self.capture_target.set(ids[0])
+        if hasattr(self, "registry_tree"):
+            for item in self.registry_tree.get_children():
+                self.registry_tree.delete(item)
+            for item in registry:
+                self.registry_tree.insert(
+                    "",
+                    "end",
+                    iid=item["id"],
+                    values=(
+                        item["id"],
+                        item["family"],
+                        "ON" if item.get("enabled") else "OFF",
+                        item.get("windows_ble_address") or "—",
+                    ),
+                )
+
+    def _sync_capture_target(self):
+        selected = self.registry_tree.selection()
+        if selected:
+            self.capture_target.set(selected[0])
+
+    def capture_selected(self):
+        target = self.capture_target.get().strip()
+        if not target:
+            return messagebox.showwarning("BLE Capture", "Bitte ein BLE-Registry-Gerät auswählen.")
+
+        def job():
+            try:
+                result = self.bridge.run_async(self.engine.capture_ble_read_only(target, self.capture_seconds.get()))
+                summary = gui_model.capture_summary(result)
+                self.after(0, lambda: self._set_analysis(summary))
                 self.after(0, self.refresh)
             except Exception as exc:
-                self.after(0, lambda: messagebox.showerror("Scan", str(exc)))
+                self.after(0, lambda: messagebox.showerror("READ-ONLY Capture", str(exc)))
         threading.Thread(target=job, daemon=True).start()
+
+    def show_protocol_status(self):
+        status = self.engine.protocol_design_status()
+        compact = {
+            "hardware_io": status["hardware_io"],
+            "lenze": {
+                "badge": gui_model.protocol_badge(status["lenze"]),
+                "profile": status["lenze"],
+            },
+            "oc21w": {
+                "badge": gui_model.protocol_badge(status["oc21w"]),
+                "profile": status["oc21w"],
+            },
+        }
+        self._set_analysis(compact)
 
     def send_color(self):
         self.run(self.engine.set_color(self.r.get(), self.g.get(), self.b.get(), self.br.get()))
@@ -99,10 +335,16 @@ class App(tk.Tk):
         for d in state["registry"]:
             family = d["family"]
             live = runtime.get(family, {})
-            active = ("DEAKTIVIERT" if not d.get("enabled") else
-                      "ERREICHBAR*" if live.get("online") else "OFFEN")
+            active = (
+                "DEAKTIVIERT" if not d.get("enabled") else
+                "ERREICHBAR*" if live.get("online") else "OFFEN"
+            )
+            binding = d.get("windows_ble_address")
             detail = str(d.get("role", "unassigned")) + " · " + str(d.get("verified", "unknown"))
+            if binding:
+                detail += " · WIN BLE " + binding
             self.tree.insert("", "end", values=(d["label"], active, detail))
+        self.refresh_ble_registry()
         self.after(2500, self.refresh)
 
 
