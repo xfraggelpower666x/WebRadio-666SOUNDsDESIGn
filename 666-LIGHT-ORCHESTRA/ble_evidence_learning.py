@@ -48,6 +48,8 @@ def _samples_from_record(entry: dict) -> list[dict]:
     samples = capture.get("samples", [])
     family = str(payload.get("family") or "")
     device_id = str(payload.get("device_id") or "")
+    experiment_label = str(payload.get("experiment_label") or "")
+    notes = str(payload.get("notes") or "")
     source_path = str(entry.get("path") or "")
     out = []
     for sample in samples if isinstance(samples, list) else []:
@@ -70,6 +72,8 @@ def _samples_from_record(entry: dict) -> list[dict]:
         out.append({
             "device_id": device_id,
             "family": family,
+            "experiment_label": experiment_label,
+            "notes": notes,
             "payload_hex": normalized,
             "bytes": bytes.fromhex(normalized),
             "characteristic_uuid": observation.characteristic_uuid,
@@ -129,6 +133,7 @@ def learning_summary(entries: Iterable[dict], family: str | None = None, device_
     )
     devices = Counter(row["device_id"] for row in samples)
     characteristics = Counter(row["characteristic_uuid"] for row in samples)
+    labels = Counter(row["experiment_label"] or "(unlabeled)" for row in samples)
 
     grouped_by_length = defaultdict(list)
     for row in samples:
@@ -143,6 +148,22 @@ def learning_summary(entries: Iterable[dict], family: str | None = None, device_
         {"payload_hex": payload, "count": count}
         for payload, count in exact.most_common()
     ]
+
+    label_groups = {}
+    for label in sorted(labels):
+        group = [row for row in samples if (row["experiment_label"] or "(unlabeled)") == label]
+        frames = Counter(row["payload_hex"] for row in group)
+        lengths = defaultdict(list)
+        for row in group:
+            lengths[len(row["bytes"])].append(row["bytes"])
+        label_groups[label] = {
+            "sample_count": len(group),
+            "exact_frames": [{"payload_hex": p, "count": c} for p, c in frames.most_common()],
+            "variability_by_length": {
+                str(length): _byte_variability(payloads)
+                for length, payloads in sorted(lengths.items())
+            },
+        }
 
     hypotheses = []
     if samples:
@@ -160,10 +181,12 @@ def learning_summary(entries: Iterable[dict], family: str | None = None, device_
         "sample_count": len(samples),
         "device_counts": dict(devices),
         "characteristic_counts": dict(characteristics),
+        "experiment_label_counts": dict(labels),
         "frame_family_counts": dict(frame_families),
         "candidate_command_counts": dict(candidate_commands),
         "exact_frames": exact_frames,
         "variability_by_length": variability,
+        "label_groups": label_groups,
         "hypotheses": hypotheses,
     }
 
