@@ -64,11 +64,9 @@ def save_final_report(session: dict, directory: str | Path | None = None, source
     safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in str(report["session_id"]))[:140]
     target = base / f"{safe}.final-report.json"
     temp = target.with_suffix(".tmp")
-    encoded = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "
-"
+    encoded = json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\\n"
     try:
-        with temp.open("w", encoding="utf-8", newline="
-") as fh:
+        with temp.open("w", encoding="utf-8", newline="\\n") as fh:
             fh.write(encoded); fh.flush(); os.fsync(fh.fileno())
         os.replace(temp, target)
     finally:
