@@ -14,13 +14,14 @@ from ble_protocol_inference import experiment_plan, readiness, infer_candidate_f
 
 
 class BleProtocolInferenceTests(unittest.TestCase):
-    def capture(self, device, family, label, frames):
+    def capture(self, device, family, label, frames, notes=""):
         return {
             "ok": True,
             "hardware_io": "READ_ONLY",
             "device_id": device,
             "family": family,
             "experiment_label": label,
+            "notes": notes,
             "capture": {
                 "samples": [{"characteristic_uuid": "fff4", "payload_hex": frame} for frame in frames],
                 "characteristics": [{"characteristic_uuid": "fff4"}],
@@ -45,12 +46,22 @@ class BleProtocolInferenceTests(unittest.TestCase):
             self.assertFalse(gate["ready_for_manual_inference_review"])
             self.assertGreater(len(gate["missing"]), 0)
 
+    def test_two_samples_in_one_evidence_do_not_count_as_two_captures(self):
+        with tempfile.TemporaryDirectory() as td:
+            save_capture_evidence(self.capture("lenze_1", "lenze", "official_app_power_on", ["01 02", "01 02"]), td)
+            loaded = load_evidence_directory(td)
+            gate = readiness(loaded["valid"], "lenze")
+            row = next(x for x in gate["missing"] if x["label"] == "official_app_power_on")
+            self.assertEqual(row["captures"], 1)
+            self.assertEqual(row["samples"], 2)
+            self.assertIn("independent evidence records", gate["counting_rule"])
+
     def test_inference_finds_stable_cross_label_difference(self):
         with tempfile.TemporaryDirectory() as td:
-            for frame in ("01 02 10 04", "01 02 10 04"):
-                save_capture_evidence(self.capture("lenze_1", "lenze", "official_app_power_on", [frame]), td)
-            for frame in ("01 02 00 04", "01 02 00 04"):
-                save_capture_evidence(self.capture("lenze_1", "lenze", "official_app_power_off", [frame]), td)
+            for i, frame in enumerate(("01 02 10 04", "01 02 10 04")):
+                save_capture_evidence(self.capture("lenze_1", "lenze", "official_app_power_on", [frame], f"on-{i}"), td)
+            for i, frame in enumerate(("01 02 00 04", "01 02 00 04")):
+                save_capture_evidence(self.capture("lenze_1", "lenze", "official_app_power_off", [frame], f"off-{i}"), td)
             loaded = load_evidence_directory(td)
             inferred = infer_candidate_fields(loaded["valid"], "lenze")
             self.assertFalse(inferred["hardware_verified"])

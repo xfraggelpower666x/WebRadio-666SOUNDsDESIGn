@@ -70,16 +70,31 @@ def _within_label_stable(rows: list[dict]) -> dict:
     return result
 
 
+def _capture_counts(entries) -> Counter:
+    counts = Counter()
+    for entry in entries:
+        record = entry.get("record", {}) if isinstance(entry, dict) else {}
+        payload = record.get("payload", {}) if isinstance(record, dict) else {}
+        label = str(payload.get("experiment_label") or "(unlabeled)")
+        counts[label] += 1
+    return counts
+
+
 def readiness(entries, family: str) -> dict:
     family = "magic_lantern" if str(family).lower() == "oc21w" else str(family).lower()
     plan = experiment_plan(family)
+    capture_counts = _capture_counts(entries)
     samples = collect_samples(entries, family=family)
-    counts = Counter(row["experiment_label"] or "(unlabeled)" for row in samples)
+    sample_counts = Counter(row["experiment_label"] or "(unlabeled)" for row in samples)
     missing = []
     satisfied = []
     for item in plan:
-        have = counts.get(item["label"], 0)
-        row = {**item, "captures": have}
+        have = capture_counts.get(item["label"], 0)
+        row = {
+            **item,
+            "captures": have,
+            "samples": sample_counts.get(item["label"], 0),
+        }
         (satisfied if have >= item["min_captures"] else missing).append(row)
     return {
         "family": family,
@@ -88,7 +103,9 @@ def readiness(entries, family: str) -> dict:
         "ready_for_manual_inference_review": not missing,
         "satisfied": satisfied,
         "missing": missing,
-        "capture_count": len(samples),
+        "capture_count": sum(capture_counts.values()),
+        "sample_count": len(samples),
+        "counting_rule": "min_captures counts independent evidence records, not notification samples.",
     }
 
 
