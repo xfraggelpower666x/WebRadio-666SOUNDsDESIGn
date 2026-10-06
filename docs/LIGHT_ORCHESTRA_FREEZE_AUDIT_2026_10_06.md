@@ -36,3 +36,24 @@ A freeze is valid only after:
 3. version-bound ZIP CRC/SHA256 PASS,
 4. repo backup copy is written outside the production radio branch,
 5. backup readback matches the source manifest.
+
+
+## Repo backup relocation
+
+During the freeze re-audit, Release Integrity correctly detected a nested recovery ZIP on the current radio base branch:
+
+`666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip`
+
+Before removal, that ZIP was copied byte-for-byte to the dedicated PFS/CSM backup branch:
+
+`xfraggelpower666x/666PFS_CSM@backup/666stream-structure-control-2026-10-06`
+
+Backup path:
+
+`backups/666STREAM_STRUCTURE_CONTROL/2026-10-06/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip`
+
+Source and backup Git blob SHA are identical:
+
+`e38218cf31e28e3063737e293fe009f149ef6138`
+
+Only the nested ZIP was removed from the active WebRadio tree. Recovery contract and freeze receipt remain. No player, worker or deployment source was modified.
