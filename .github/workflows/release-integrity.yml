@@ -85,11 +85,11 @@ jobs:
                   for p in files
               ],
           }
-          out = Path(os.environ["ARTIFACT_OUTPUT"]) / "light-orchestra-source-r4"
+          out = Path(os.environ["ARTIFACT_OUTPUT"]) / "light-orchestra-source-freeze"
           out.mkdir(parents=True, exist_ok=True)
           manifest = out / "manifest.json"
           manifest.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n", encoding="utf-8")
-          archive = out / "666_LIGHT_ORCHESTRA_SOURCE_R4.zip"
+          archive = out / f"666_LIGHT_ORCHESTRA_SOURCE_FREEZE_{os.environ['SOURCE_COMMIT'][:12]}.zip"
           with ZipFile(archive, "w", compression=ZIP_DEFLATED) as z:
               for path in files:
                   z.write(path, "666-LIGHT-ORCHESTRA/" + path.relative_to(root).as_posix())
@@ -103,7 +103,7 @@ jobs:
       - name: Upload LIGHT ORCHESTRA source archive
         uses: actions/upload-artifact@v4
         with:
-          name: LIGHT_ORCHESTRA_SOURCE_R4
-          path: ${{ runner.temp }}/light-orchestra-source-r4/
+          name: LIGHT_ORCHESTRA_SOURCE_FREEZE_${{ github.sha }}
+          path: ${{ runner.temp }}/light-orchestra-source-freeze/
           if-no-files-found: error
           retention-days: 30
