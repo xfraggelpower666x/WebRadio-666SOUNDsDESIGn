@@ -11,13 +11,14 @@ from ble_session_quality import session_quality_report
 
 
 class SessionQualityTests(unittest.TestCase):
-    def capture(self, device, family, label, frame):
+    def capture(self, device, family, label, frame, notes=""):
         result = {
             "ok": True,
             "hardware_io": "READ_ONLY",
             "device_id": device,
             "family": family,
             "experiment_label": label,
+            "notes": notes,
             "capture": {
                 "samples": [{"payload_hex": frame, "characteristic_uuid": "fff4"}],
                 "errors": [],
@@ -30,8 +31,8 @@ class SessionQualityTests(unittest.TestCase):
         result["quality"] = audit_capture_result(result)
         return result
 
-    def add(self, record, td, device, family, label, frame):
-        ev = save_capture_evidence(self.capture(device, family, label, frame), td)
+    def add(self, record, td, device, family, label, frame, notes=""):
+        ev = save_capture_evidence(self.capture(device, family, label, frame, notes), td)
         return register_evidence(record, ev["path"], td)["session"]
 
     def test_incomplete_session_blocks_quality_pass(self):
@@ -68,9 +69,10 @@ class SessionQualityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             created = create_session("lenze", "lenze_1", td)
             record = load_session(created["path"])
-            record = self.add(record, td, "lenze_1", "lenze", "baseline_no_action", "AA")
-            record = self.add(record, td, "lenze_1", "lenze", "baseline_no_action", "AA")
+            record = self.add(record, td, "lenze_1", "lenze", "baseline_no_action", "AA", "repeat-1")
+            record = self.add(record, td, "lenze_1", "lenze", "baseline_no_action", "AA", "repeat-2")
             report = session_quality_report(record)
+            self.assertEqual(report["valid_evidence_count"], 2)
             self.assertGreater(report["duplicate_payload_count"], 0)
             self.assertGreater(report["duplicate_payload_ratio"], 0)
 
