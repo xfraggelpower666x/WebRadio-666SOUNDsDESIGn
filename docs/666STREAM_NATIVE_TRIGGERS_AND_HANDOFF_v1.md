@@ -25,3 +25,21 @@ Store under `docs/handoffs/666stream/` when actually creating a new-chat handoff
 
 ## LYVRA website link contract
 All deployed browser-player entrypoints (main, embed, TWITCH, VELUNA upper/lower, dashboard) expose a visible, accessible, new-tab link to https://weblyvra.666soundsdesign-broadcaster.com/ . Use a shared, nonintrusive fixed link with focus-visible styling, pointer access and safe z-index. Do not obstruct stream controls. Offline SOUNDWAVE PC integration remains separately scoped and unverified.
+
+
+## Project-scoped Structure Control
+Canonical structure runtime: `666STREAM_STRUCTURE_CONTROL/`.
+
+One repository may contain several independent projects. Repository HEAD is repository currentness, not project selection.
+
+Current project routes: WEBRADIO; INTRO/CYBER INTRO; WINDOWS_APP/SOUNDWAVE PC; LIGHT_ORCHESTRA/SYMPHONY/GOVEE.
+
+`666STREAM SYSTEMSTART <project description>` resolves one project from direct current user intent. If neither direct intent nor a valid non-superseded project handoff identifies exactly one project, project selection is required.
+
+After selection, WEITER / UPDATE / AUDIT / REPAIR / FREEZE / NEW CHAT / NEXT CHAT / CODEFORGE are scoped to that project in that chat. Parallel chats may bind to different projects. `GLOBAL_ACTIVE_PROJECT=FORBIDDEN`; `NO_CROSS_CHAT_PROJECT_INHERITANCE=true`; `NO_CROSS_PROJECT_AUTOSWITCH=true`.
+
+CodeForge is available in all projects, inherits active project scope, and may not switch or merge project scope.
+
+NEW CHAT handoffs are stored project-bound under `docs/handoffs/666stream/<PROJECT_ID>/` and must preserve repository, branch, source commit, project ID/root, active component, last verified state/task, return anchor, next step, blockers, rollback and readback evidence. Handoff creation alone does not prove fresh-chat rehydration.
+
+PFS/CSM is backup/recovery/registry for Structure Control and project-specific backups. PFS-owned mutation requires native `666PFS UPDATE`; 666STREAM does not claim external backup registration without independent PFS readback.
