@@ -19,6 +19,8 @@ class BleCaptureStoreTests(unittest.TestCase):
             "hardware_io": "READ_ONLY",
             "device_id": "lenze_1",
             "family": "lenze",
+            "experiment_label": "official_app_power_on",
+            "notes": "user tapped power in original app",
             "capture": {
                 "samples": [{"payload_hex": "01 02 03 04"}],
                 "characteristics": [{"characteristic_uuid": "fff4"}],
@@ -37,6 +39,8 @@ class BleCaptureStoreTests(unittest.TestCase):
             loaded = load_capture_evidence(path)
             self.assertEqual(loaded["sha256"], saved["sha256"])
             self.assertEqual(loaded["payload"]["device_id"], "lenze_1")
+            self.assertEqual(loaded["payload"]["experiment_label"], "official_app_power_on")
+            self.assertEqual(loaded["payload"]["notes"], "user tapped power in original app")
             self.assertEqual(loaded["payload"]["capture"]["write_operations"], 0)
 
     def test_tampering_is_detected(self):
