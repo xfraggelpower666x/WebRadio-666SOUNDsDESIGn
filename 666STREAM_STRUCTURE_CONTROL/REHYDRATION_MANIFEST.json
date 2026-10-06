@@ -3,6 +3,7 @@
   "authority": "GITHUB_REPOSITORY",
   "required_order": [
     "rehydration/PRE_REHYDRATION_SCOPE_GUARD.md",
+    "rehydration/RADIO_NON_MUTATION_GUARD.md",
     "AUTHORITY_CONTRACT.md",
     "CURRENT_POINTER.json",
     "current/CURRENT_STATE.md",
@@ -34,13 +35,17 @@
     "NO_CROSS_PROJECT_AUTOSWITCH": true,
     "NO_CROSS_CHAT_PROJECT_INHERITANCE": true,
     "POINTER_LAST": true,
-    "NO_MUTATION_AFTER_POINTER": true
+    "NO_MUTATION_AFTER_POINTER": true,
+    "RADIO_RUNTIME_MUTATION_DURING_STRUCTURE_FREEZE": false,
+    "NESTED_ZIP_IN_WEBRADIO_TREE": false
   },
   "recovery": {
     "mode": "BODY_SCOPE_EXACT_HEAD",
     "zip_pointer_authority": false,
     "restore_requires_readback": true,
     "pointer_last_after_restore": true,
-    "cross_project_restore": false
+    "cross_project_restore": false,
+    "systemsicherung_artifact": "GITHUB_ACTIONS_ARTIFACT",
+    "archive_in_repository_tree": false
   }
 }
