@@ -1,0 +1,158 @@
+name: LIGHT ORCHESTRA Windows EXE build + package
+
+on:
+  push:
+    branches:
+      - feature/666-light-orchestra-v0.1.0
+    paths:
+      - "666-LIGHT-ORCHESTRA/**"
+      - "tools/666-light-orchestra/**"
+      - ".github/workflows/light-orchestra-windows-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build:
+    name: Windows 3.12 EXE build and Symphony smoke test
+    runs-on: windows-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "666-LIGHT-ORCHESTRA/requirements.txt"
+
+      - name: Install and update build requirements
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade -r 666-LIGHT-ORCHESTRA/requirements.txt
+          python -c "import sys, tkinter, bleak, PyInstaller; print(sys.version); print('WINDOWS MODULE CHECK PASS')"
+
+      - name: Offline regression tests on Windows
+        shell: pwsh
+        working-directory: 666-LIGHT-ORCHESTRA
+        run: |
+          python -m compileall -q .
+          python -m unittest discover -s tests -v
+
+      - name: Build three Windows executables
+        shell: pwsh
+        working-directory: 666-LIGHT-ORCHESTRA
+        run: |
+          if (Test-Path build) { Remove-Item build -Recurse -Force }
+          if (Test-Path dist) { Remove-Item dist -Recurse -Force }
+
+          python -m PyInstaller --noconfirm --clean --onefile --name "666_LIGHT_ORCHESTRA" --hidden-import=device_registry --hidden-import=light_control_state 666_light_orchestra.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_SYMPHONY" --hidden-import=666_light_orchestra --hidden-import=device_registry --hidden-import=light_control_state 666_light_orchestra_control_center.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_LAB" --hidden-import=666_light_orchestra --hidden-import=device_registry 666_light_orchestra_gui.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $expected = @(
+            "dist\666_LIGHT_ORCHESTRA.exe",
+            "dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe",
+            "dist\666_LIGHT_ORCHESTRA_LAB.exe"
+          )
+          foreach ($path in $expected) {
+            if (-not (Test-Path $path)) { throw "Missing EXE: $path" }
+            if ((Get-Item $path).Length -lt 1000000) { throw "Unexpectedly small EXE: $path" }
+          }
+
+      - name: Symphony EXE startup smoke test
+        shell: pwsh
+        working-directory: 666-LIGHT-ORCHESTRA
+        run: |
+          $exe = Resolve-Path "dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe"
+          $proc = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 5
+          if ($proc.HasExited) {
+            throw "SYMPHONY EXE exited during startup smoke test with code $($proc.ExitCode)"
+          }
+          Stop-Process -Id $proc.Id -Force
+          Write-Host "PASS: SYMPHONY EXE remained alive for startup smoke window"
+
+      - name: Assemble Windows package and integrity manifest
+        shell: pwsh
+        working-directory: 666-LIGHT-ORCHESTRA
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          $pkg = "release\666_LIGHT_ORCHESTRA_SYMPHONY_WINDOWS"
+          New-Item -ItemType Directory -Force -Path $pkg | Out-Null
+          New-Item -ItemType Directory -Force -Path "$pkg\dist" | Out-Null
+
+          Copy-Item "dist\666_LIGHT_ORCHESTRA.exe" "$pkg\dist\"
+          Copy-Item "dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe" "$pkg\dist\"
+          Copy-Item "dist\666_LIGHT_ORCHESTRA_LAB.exe" "$pkg\dist\"
+
+          $packageFiles = @(
+            "ONE_CLICK_SETUP_BUILD_RUN.bat",
+            "START_SYMPHONY.bat",
+            "start.bat",
+            "BUILD_EXE.bat",
+            "build_windows.bat",
+            "bootstrap_windows.bat",
+            "README_FIRST_WINDOWS.txt",
+            "README.md",
+            "requirements.txt",
+            "config.example.json"
+          )
+          foreach ($file in $packageFiles) {
+            if (-not (Test-Path $file)) { throw "Package source missing: $file" }
+            Copy-Item $file "$pkg\"
+          }
+
+          $manifestFiles = Get-ChildItem $pkg -File -Recurse | Sort-Object FullName | ForEach-Object {
+            [ordered]@{
+              path = $_.FullName.Substring((Resolve-Path $pkg).Path.Length + 1).Replace("\\","/")
+              size = $_.Length
+              sha256 = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            }
+          }
+
+          $manifest = [ordered]@{
+            source_commit = $env:SOURCE_SHA
+            source_branch = "feature/666-light-orchestra-v0.1.0"
+            release_class = "WINDOWS_BUILD_VALIDATED_HARDWARE_UNVERIFIED"
+            python = (python --version 2>&1 | Out-String).Trim()
+            symphony_startup_smoke = "PASS_5_SECONDS"
+            hardware_verified = $false
+            lenze_writes_verified = $false
+            oc21w_writes_verified = $false
+            files = @($manifestFiles)
+          }
+
+          $manifest | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 "$pkg\WINDOWS_BUILD_MANIFEST.json"
+
+          $zip = "release\666_LIGHT_ORCHESTRA_SYMPHONY_WINDOWS.zip"
+          Compress-Archive -Path "$pkg\*" -DestinationPath $zip -CompressionLevel Optimal -Force
+          if (-not (Test-Path $zip)) { throw "Package ZIP not created" }
+
+          $zipHash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          $zipSize = (Get-Item $zip).Length
+          "sha256=$zipHash" | Set-Content -Encoding ASCII "release\WINDOWS_ZIP_SHA256.txt"
+          "size=$zipSize" | Add-Content -Encoding ASCII "release\WINDOWS_ZIP_SHA256.txt"
+          "source_commit=$env:SOURCE_SHA" | Add-Content -Encoding ASCII "release\WINDOWS_ZIP_SHA256.txt"
+
+          Write-Host "WINDOWS PACKAGE PASS"
+          Write-Host "ZIP SHA256: $zipHash"
+          Write-Host "ZIP SIZE: $zipSize"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LIGHT_ORCHESTRA_SYMPHONY_WINDOWS_PACKAGE
+          path: |
+            666-LIGHT-ORCHESTRA/release/666_LIGHT_ORCHESTRA_SYMPHONY_WINDOWS.zip
+            666-LIGHT-ORCHESTRA/release/WINDOWS_ZIP_SHA256.txt
+          if-no-files-found: error
+          retention-days: 30
