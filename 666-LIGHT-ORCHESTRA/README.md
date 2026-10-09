@@ -100,3 +100,35 @@ python -m unittest discover -s tests -v
 - Security caveat: Windows executable and actual hardware behavior NOT validated. This version is **DEVELOPMENT / SOURCE AUDIT**, not a production release or validated ZIP freeze.
 
 Use `python -m unittest discover -s tests -v` from the native tools directory. The GitHub Release Integrity workflow currently validates Python syntax and general radio tests, NOT necessarily LIGHT ORCHESTRA runtime. Our dedicated workflow must report its own successful test run before marking unit tests PASS.
+
+
+## v0.6.0-dev — Symphony Control Center
+
+The default Windows/Python launcher now opens `666_light_orchestra_control_center.py`, a dedicated cyber-neon controller UI. The previous `666_light_orchestra_gui.py` is preserved as the advanced BLE/Evidence laboratory.
+
+Control Center capabilities:
+- device dashboard for H6047, LENZE-RGB and OC21W registry slots;
+- per-device selection with connection/verification actions;
+- Single / Pair / All / Custom target routing;
+- master power and brightness controls;
+- persistent color presets and motion presets;
+- scene library with built-in and user-saved scenes;
+- audio-reactive WebRadio MeterBus controls and test-beat input;
+- registry label/role editing and explicit hardware safety status.
+
+Safety remains fail-closed. Govee writes still require a fresh successful LAN probe. LENZE writes remain blocked until command frames are hardware-verified. OC21W writes remain blocked unless all existing protocol and Windows-address verification gates are satisfied. The GUI never changes those gates.
+
+Windows launch:
+```bat
+start.bat
+```
+
+Manual launch:
+```bat
+py 666_light_orchestra_control_center.py
+```
+
+Advanced BLE/Evidence lab:
+```bat
+py 666_light_orchestra_gui.py
+```
