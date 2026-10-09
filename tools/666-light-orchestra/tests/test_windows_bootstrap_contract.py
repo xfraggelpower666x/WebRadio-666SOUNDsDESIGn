@@ -29,6 +29,15 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn("pip install --upgrade -r requirements.txt", text)
         self.assertIn("import tkinter, bleak, pyinstaller", text)
 
+    def test_start_prefers_packaged_exe_and_has_source_fallback(self):
+        text = self.read("START_SYMPHONY.bat")
+        self.assertIn('set "SYMPHONY_EXE=dist\\666_LIGHT_ORCHESTRA_SYMPHONY.exe"', text)
+        self.assertIn('if exist "%SYMPHONY_EXE%"', text)
+        self.assertIn('start "" "%SYMPHONY_EXE%"', text)
+        self.assertIn('set "SYMPHONY_SOURCE=666_light_orchestra_control_center.py"', text)
+        self.assertIn('if not exist "%SYMPHONY_SOURCE%"', text)
+        self.assertIn('bootstrap_windows.bat', text)
+
     def test_build_creates_all_expected_executables(self):
         text = self.read("BUILD_EXE.bat")
         self.assertIn('666_LIGHT_ORCHESTRA_SYMPHONY', text)
@@ -36,7 +45,7 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn('666_LIGHT_ORCHESTRA"', text)
         self.assertIn("bootstrap_windows.bat", text)
 
-    def test_one_click_builds_then_runs_symhony(self):
+    def test_one_click_builds_then_runs_symphony(self):
         text = self.read("ONE_CLICK_SETUP_BUILD_RUN.bat")
         self.assertIn("BUILD_EXE.bat", text)
         self.assertIn("dist\\666_LIGHT_ORCHESTRA_SYMPHONY.exe", text)

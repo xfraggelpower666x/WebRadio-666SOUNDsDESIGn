@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   windows-build:
-    name: Windows 3.12 EXE build and Symphony smoke test
+    name: Windows 3.12 EXE build and Symphony package validation
     runs-on: windows-latest
     timeout-minutes: 25
 
@@ -81,7 +81,7 @@ jobs:
           Stop-Process -Id $proc.Id -Force
           Write-Host "PASS: SYMPHONY EXE remained alive for startup smoke window"
 
-      - name: Assemble Windows package and integrity manifest
+      - name: Assemble complete rebuildable Windows package
         shell: pwsh
         working-directory: 666-LIGHT-ORCHESTRA
         env:
@@ -108,8 +108,32 @@ jobs:
             "config.example.json"
           )
           foreach ($file in $packageFiles) {
-            if (-not (Test-Path $file)) { throw "Package source missing: $file" }
+            if (-not (Test-Path $file)) { throw "Package file missing: $file" }
             Copy-Item $file "$pkg\"
+          }
+
+          # Include all Python source modules so BUILD_EXE.bat really works
+          # after the user extracts only this Windows package.
+          $pythonFiles = Get-ChildItem -Path "." -Filter "*.py" -File
+          if ($pythonFiles.Count -lt 10) { throw "Unexpectedly incomplete Python source set" }
+          foreach ($file in $pythonFiles) {
+            Copy-Item $file.FullName "$pkg\"
+          }
+
+          # Validate the exact package contract that failed in real user testing.
+          $requiredPackagePaths = @(
+            "$pkg\dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe",
+            "$pkg\666_light_orchestra_control_center.py",
+            "$pkg\666_light_orchestra.py",
+            "$pkg\666_light_orchestra_gui.py",
+            "$pkg\device_registry.py",
+            "$pkg\light_control_state.py",
+            "$pkg\START_SYMPHONY.bat",
+            "$pkg\BUILD_EXE.bat",
+            "$pkg\ONE_CLICK_SETUP_BUILD_RUN.bat"
+          )
+          foreach ($path in $requiredPackagePaths) {
+            if (-not (Test-Path $path)) { throw "Complete-package contract failed: $path" }
           }
 
           $manifestFiles = Get-ChildItem $pkg -File -Recurse | Sort-Object FullName | ForEach-Object {
@@ -126,6 +150,7 @@ jobs:
             release_class = "WINDOWS_BUILD_VALIDATED_HARDWARE_UNVERIFIED"
             python = (python --version 2>&1 | Out-String).Trim()
             symphony_startup_smoke = "PASS_5_SECONDS"
+            complete_package_contract = "PASS_EXE_PLUS_REBUILD_SOURCES"
             hardware_verified = $false
             lenze_writes_verified = $false
             oc21w_writes_verified = $false
@@ -144,9 +169,26 @@ jobs:
           "size=$zipSize" | Add-Content -Encoding ASCII "release\WINDOWS_ZIP_SHA256.txt"
           "source_commit=$env:SOURCE_SHA" | Add-Content -Encoding ASCII "release\WINDOWS_ZIP_SHA256.txt"
 
-          Write-Host "WINDOWS PACKAGE PASS"
+          Write-Host "WINDOWS COMPLETE PACKAGE PASS"
           Write-Host "ZIP SHA256: $zipHash"
           Write-Host "ZIP SIZE: $zipSize"
+
+      - name: Validate packaged START_SYMPHONY prefers built EXE
+        shell: pwsh
+        working-directory: 666-LIGHT-ORCHESTRA
+        run: |
+          $pkg = Resolve-Path "release\666_LIGHT_ORCHESTRA_SYMPHONY_WINDOWS"
+          $bat = Get-Content "$pkg\START_SYMPHONY.bat" -Raw
+          if ($bat -notmatch 'if exist "%SYMPHONY_EXE%"') {
+            throw "START_SYMPHONY does not prefer the packaged EXE"
+          }
+          if (-not (Test-Path "$pkg\dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe")) {
+            throw "Packaged Symphony EXE missing"
+          }
+          if (-not (Test-Path "$pkg\666_light_orchestra_control_center.py")) {
+            throw "Packaged rebuild source missing"
+          }
+          Write-Host "PASS: packaged START/EXE/source contract"
 
       - uses: actions/upload-artifact@v4
         with:
