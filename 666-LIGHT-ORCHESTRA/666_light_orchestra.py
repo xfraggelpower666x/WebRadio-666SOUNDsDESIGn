@@ -104,6 +104,22 @@ class GoveeLan:
         self.online = False  # IP-Konfiguration ist kein Erreichbarkeitsnachweis
         self.detail = f"LAN target {self.ip}; probe pending" if self.ip else "not discovered"
 
+    async def discover(self):
+        """Read-only LAN discovery. Stores only the candidate IP; sends no control write."""
+        ip = await asyncio.to_thread(self._discover)
+        self.ip = ip
+        self.online = False
+        self._last_probe_ok = 0.0
+        self.detail = f"LAN candidate {ip}; probe pending" if ip else "not discovered"
+        return {
+            "ok": bool(ip),
+            "hardware_io": "READ_ONLY_DISCOVERY",
+            "ip": ip,
+            "model": self.cfg.get("model"),
+            "hardware_verified": False,
+            "write_allowed": False,
+        }
+
     def _discover(self):
         msg = json.dumps({"msg": {"cmd": "scan", "data": {"account_topic": "reserve"}}}).encode()
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)

@@ -9,6 +9,7 @@ from importlib import import_module
 
 core = import_module("666_light_orchestra")
 state = import_module("light_control_state")
+ble_model = import_module("ble_gui_model")
 
 BG = "#03050d"
 PANEL = "#071225"
@@ -55,6 +56,9 @@ class App(tk.Tk):
         self.brightness = tk.IntVar(value=80)
         self.global_speed = tk.IntVar(value=50)
         self.status_text = tk.StringVar(value="INITIALIZING")
+        self.discovery_status = tk.StringVar(value="READY TO SCAN")
+        self.discovery_slot = tk.StringVar(value="")
+        self.discovery_rows = {}
         self.page_title = tk.StringVar(value="DASHBOARD")
         self.device_widgets = {}
         self.pages = {}
@@ -204,17 +208,39 @@ class App(tk.Tk):
 
     def _build_devices(self, parent):
         toolbar = tk.Frame(parent, bg=BG)
-        toolbar.pack(fill="x", padx=12, pady=12)
-        NeonButton(toolbar, "BLE SCAN", self.scan_devices).pack(side="left", padx=4)
-        NeonButton(toolbar, "GOVEE PROBE", lambda: self._run(self.engine.govee.probe()), accent=GREEN).pack(side="left", padx=4)
+        toolbar.pack(fill="x", padx=12, pady=(12,6))
+        NeonButton(toolbar, "SEARCH BLE DEVICES", self.scan_devices).pack(side="left", padx=4)
+        NeonButton(toolbar, "SEARCH GOVEE LAN", self.discover_govee, accent=GREEN).pack(side="left", padx=4)
         NeonButton(toolbar, "REFRESH", self.refresh_all, accent=LILAC).pack(side="left", padx=4)
-        self.device_tree = ttk.Treeview(parent, columns=("id","family","label","role","enabled","binding","status"), show="headings")
+        tk.Label(toolbar, textvariable=self.discovery_status, bg=BG, fg=YELLOW, font=("Segoe UI", 9, "bold")).pack(side="right", padx=8)
+
+        discover_panel, discover = self._panel(parent, "DEVICE DISCOVERY · LIVE SEARCH")
+        discover_panel.pack(fill="x", padx=12, pady=(0,8))
+        self.discovery_tree = ttk.Treeview(discover, columns=("name","family","address","rssi","state","slot"), show="headings", height=6)
+        for key,title,width in [
+            ("name","Found device",210),("family","Detected family",130),("address","Windows BLE address",260),
+            ("rssi","Signal",80),("state","Binding",110),("slot","Suggested slot",130)
+        ]:
+            self.discovery_tree.heading(key,text=title); self.discovery_tree.column(key,width=width)
+        self.discovery_tree.pack(fill="x", expand=True)
+        self.discovery_tree.bind("<<TreeviewSelect>>", self._discovery_selected)
+        discover_actions = tk.Frame(discover, bg=PANEL)
+        discover_actions.pack(fill="x", pady=(8,0))
+        tk.Label(discover_actions,text="Target slot",bg=PANEL,fg=TEXT).pack(side="left",padx=(0,6))
+        self.discovery_slot_combo = ttk.Combobox(discover_actions,textvariable=self.discovery_slot,state="readonly",width=18)
+        self.discovery_slot_combo.pack(side="left",padx=4)
+        NeonButton(discover_actions,"BIND FOUND DEVICE",self.bind_discovered,accent=GREEN).pack(side="left",padx=6)
+        tk.Label(discover_actions,text="Discovery is read-only. Binding stores identity but never enables hardware writes.",bg=PANEL,fg=MUTED).pack(side="left",padx=10)
+
+        registry_panel, registry_inner = self._panel(parent, "CONFIGURED DEVICES")
+        registry_panel.pack(fill="both", expand=True, padx=12, pady=(0,8))
+        self.device_tree = ttk.Treeview(registry_inner, columns=("id","family","label","role","enabled","binding","status"), show="headings")
         for key,title,width in [
             ("id","Device",130),("family","Family",120),("label","Label",210),("role","Role",120),
             ("enabled","Enabled",80),("binding","Connection / Address",260),("status","Status",180)
         ]:
             self.device_tree.heading(key,text=title); self.device_tree.column(key,width=width)
-        self.device_tree.pack(fill="both", expand=True, padx=12, pady=(0,8))
+        self.device_tree.pack(fill="both", expand=True)
         self.device_tree.bind("<<TreeviewSelect>>", self._device_tree_selected)
         actions = tk.Frame(parent, bg=BG)
         actions.pack(fill="x", padx=12, pady=(0,12))
@@ -371,11 +397,86 @@ class App(tk.Tk):
         if sel: self.selected_device.set(sel[0])
 
     def scan_devices(self):
-        self._run(self.engine.scan_known_ble(5.0), self._scan_done)
+        self.discovery_status.set("SCANNING BLE · 6 SECONDS...")
+        if hasattr(self, "discovery_tree"):
+            for item in self.discovery_tree.get_children():
+                self.discovery_tree.delete(item)
+        self._run(self.engine.scan_known_ble(6.0), self._scan_done)
 
     def _scan_done(self, result):
-        rows=result.get("devices",[])
-        messagebox.showinfo("BLE Scan", f"{len(rows)} bekannte BLE-Geräte gefunden.\n\n" + "\n".join(f"{x.get('name')} · {x.get('address')}" for x in rows[:12]))
+        discovered = result.get("devices", []) if isinstance(result, dict) else []
+        proposals = ble_model.propose_bindings(discovered, self.engine.registry.all())
+        self.discovery_rows = {}
+        ble_slots = [x["id"] for x in ble_model.ble_registry_entries(self.engine.registry.all())]
+        if hasattr(self, "discovery_slot_combo"):
+            self.discovery_slot_combo["values"] = tuple(ble_slots)
+        if hasattr(self, "discovery_tree"):
+            for item in self.discovery_tree.get_children():
+                self.discovery_tree.delete(item)
+            for index, row in enumerate(proposals):
+                iid = f"found_{index}"
+                self.discovery_rows[iid] = row
+                rssi = row.get("rssi")
+                signal = "" if rssi is None else str(rssi)
+                self.discovery_tree.insert("", "end", iid=iid, values=(
+                    row.get("name") or "(unnamed)",
+                    row.get("family") or "unknown",
+                    row.get("address") or "",
+                    signal,
+                    row.get("binding_state") or "",
+                    row.get("suggested_device_id") or "",
+                ))
+        known = [x for x in proposals if x.get("family") in ("lenze","magic_lantern")]
+        self.discovery_status.set(f"SCAN COMPLETE · {len(proposals)} FOUND · {len(known)} RECOGNIZED")
+        if not proposals:
+            messagebox.showinfo("BLE Discovery", "No known LENZE-RGB / OC21W devices were found in this scan. Keep the lamps powered and close to the PC, then scan again.")
+
+    def _discovery_selected(self, _event=None):
+        if not hasattr(self, "discovery_tree"):
+            return
+        selected = self.discovery_tree.selection()
+        if not selected:
+            return
+        row = self.discovery_rows.get(selected[0], {})
+        suggestion = row.get("suggested_device_id")
+        if suggestion:
+            self.discovery_slot.set(suggestion)
+
+    def bind_discovered(self):
+        if not hasattr(self, "discovery_tree"):
+            return
+        selected = self.discovery_tree.selection()
+        if not selected:
+            return messagebox.showinfo("Discovery", "Select a found BLE device first.")
+        row = self.discovery_rows.get(selected[0], {})
+        slot = self.discovery_slot.get().strip()
+        address = str(row.get("address") or "").strip()
+        family = str(row.get("family") or "")
+        target = self.engine.registry.get(slot) if slot else None
+        if not address or not target:
+            return messagebox.showwarning("Discovery", "A valid found address and target slot are required.")
+        if target.get("family") != family:
+            return messagebox.showwarning("Discovery", f"Family mismatch: found {family}, slot {slot} is {target.get('family')}.")
+        try:
+            self.engine.bind_windows_ble(slot, address)
+            self.selected_device.set(slot)
+            self.discovery_status.set(f"BOUND · {row.get('name') or address} → {slot}")
+            self.refresh_all()
+            messagebox.showinfo("Discovery", f"{row.get('name') or address} was bound to {slot}.\n\nThe slot stays disabled until you explicitly enable it. No hardware command was sent.")
+        except Exception as exc:
+            messagebox.showerror("Discovery", str(exc))
+
+    def discover_govee(self):
+        self.discovery_status.set("SEARCHING GOVEE LAN...")
+        self._run(self.engine.govee.discover(), self._govee_discovery_done)
+
+    def _govee_discovery_done(self, result):
+        if result.get("ok"):
+            self.discovery_status.set(f"GOVEE FOUND · {result.get('ip')}")
+            messagebox.showinfo("Govee LAN Discovery", f"Govee candidate found at {result.get('ip')}.\nA read-only status probe is still required before any write.")
+        else:
+            self.discovery_status.set("GOVEE NOT FOUND")
+            messagebox.showinfo("Govee LAN Discovery", "No matching Govee LAN device answered the discovery scan.")
 
     def connect_selected(self):
         did=self.selected_device.get()

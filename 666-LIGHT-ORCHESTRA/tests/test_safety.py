@@ -22,6 +22,20 @@ class SafetyRegression(unittest.TestCase):
                 asyncio.run(g.set_color(100, 20, 50))
             sender.assert_not_called()
 
+    def test_govee_discovery_is_read_only_and_does_not_unlock_writes(self):
+        g = core.GoveeLan({"enabled": True, "device_ip": None, "model": "H6047"})
+        with mock.patch.object(g, "_discover", return_value="192.168.2.32"), mock.patch.object(g, "_send") as sender:
+            result = asyncio.run(g.discover())
+            self.assertTrue(result["ok"])
+            self.assertEqual(result["hardware_io"], "READ_ONLY_DISCOVERY")
+            self.assertEqual(result["ip"], "192.168.2.32")
+            self.assertFalse(result["hardware_verified"])
+            self.assertFalse(result["write_allowed"])
+            self.assertFalse(g.online)
+            with self.assertRaisesRegex(RuntimeError, "GOVEE_LAN_UNVERIFIED"):
+                asyncio.run(g.set_power(True))
+            sender.assert_not_called()
+
     def test_govee_probe_unlocks_but_expires(self):
         g = core.GoveeLan({"enabled": True, "device_ip": "192.168.2.32"})
         with mock.patch.object(g, "_probe_sync", return_value={"ok": True, "status": {"onOff": 1, "brightness": 40}}):
