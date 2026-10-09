@@ -4,7 +4,7 @@ import asyncio
 import json
 import threading
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, messagebox, simpledialog, colorchooser
 from importlib import import_module
 
 core = import_module("666_light_orchestra")
@@ -223,6 +223,8 @@ class App(tk.Tk):
         NeonButton(actions, "POWER ON", lambda: self.device_power(True)).pack(side="left", padx=4)
         NeonButton(actions, "POWER OFF", lambda: self.device_power(False), accent=PINK).pack(side="left", padx=4)
         NeonButton(actions, "EDIT LABEL / ROLE", self.edit_selected_device, accent=LILAC).pack(side="left", padx=4)
+        NeonButton(actions, "BIND BLE ADDRESS", self.bind_selected_address, accent=CYAN).pack(side="left", padx=4)
+        NeonButton(actions, "ENABLE / DISABLE", self.toggle_selected_enabled, accent=YELLOW).pack(side="left", padx=4)
 
     def _build_groups(self, parent):
         p, inner = self._panel(parent, "TARGET ROUTING")
@@ -267,6 +269,7 @@ class App(tk.Tk):
     def _fill_color_buttons(self, parent, compact=False):
         for i, name in enumerate(state.COLOR_SCHEMES):
             NeonButton(parent, name, lambda n=name: self.apply_color_scheme(n), accent=[PINK,CYAN,LILAC,YELLOW,CYAN][i%5]).pack(fill="x" if compact else None, side="top" if compact else "left", padx=5, pady=5)
+        NeonButton(parent, "Custom RGB", self.apply_custom_color, accent=GREEN).pack(fill="x" if compact else None, side="top" if compact else "left", padx=5, pady=5)
 
     def _build_motion(self, parent):
         p, inner = self._panel(parent, "MOTION SCHEMES")
@@ -410,6 +413,50 @@ class App(tk.Tk):
             self.refresh_all()
         except Exception as exc:
             messagebox.showerror("Registry",str(exc))
+
+    def bind_selected_address(self):
+        did=self.selected_device.get(); item=self.engine.registry.get(did)
+        if not item or item.get("transport")!="ble":
+            return messagebox.showinfo("BLE Binding","Selected device is not a BLE registry slot.")
+        value=simpledialog.askstring("BLE Binding","Windows BLE address / identifier:",initialvalue=item.get("windows_ble_address") or "")
+        if value is None:return
+        try:
+            self.engine.bind_windows_ble(did,value.strip())
+            self.refresh_all()
+            messagebox.showinfo("BLE Binding","Address saved. Device remains disabled by design until you explicitly enable it.")
+        except Exception as exc:
+            messagebox.showerror("BLE Binding",str(exc))
+
+    def toggle_selected_enabled(self):
+        did=self.selected_device.get(); item=self.engine.registry.get(did)
+        if not item:return
+        try:
+            updated=self.engine.registry.edit(did,{"enabled":not bool(item.get("enabled"))})
+            self.refresh_all()
+            messagebox.showinfo("Registry",f"{did}: enabled={updated.get('enabled')}")
+        except Exception as exc:
+            messagebox.showerror("Registry",str(exc))
+
+    def target_power(self, on):
+        targets=self._current_targets()
+        if self.target_mode.get()=="all":
+            return self._run(self.engine.set_power(on))
+        if targets==["govee_h6047"]:
+            return self._run(self.engine.govee.set_power(on))
+        if not targets:
+            return messagebox.showinfo("Target Power","No target selected.")
+        messagebox.showwarning("Safety Gate",f"Target power {'ON' if on else 'OFF'} for {', '.join(targets)} is represented in the controller, but BLE hardware writes stay blocked until protocol + hardware validation.")
+
+    def apply_custom_color(self):
+        chosen=colorchooser.askcolor(title="Custom RGB")
+        if not chosen or not chosen[0]:return
+        r,g,b=[int(x) for x in chosen[0]]
+        targets=self._current_targets()
+        if targets==["govee_h6047"]:
+            return self._run(self.engine.test_device_color("govee_h6047",r,g,b,self.brightness.get()))
+        if self.target_mode.get()=="all":
+            return self._run(self.engine.set_color(r,g,b,self.brightness.get()))
+        messagebox.showinfo("Custom RGB",f"RGB({r},{g},{b}) selected for {', '.join(targets) or 'no target'}. Unverified BLE writes remain blocked.")
 
     def apply_color_scheme(self, name):
         spec=state.COLOR_SCHEMES[name]
