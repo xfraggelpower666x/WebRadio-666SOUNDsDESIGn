@@ -132,3 +132,21 @@ Advanced BLE/Evidence lab:
 ```bat
 py 666_light_orchestra_gui.py
 ```
+
+
+## Windows ZIP one-click bootstrap
+
+For the packaged Windows/source ZIP, the recommended entry point is:
+
+```bat
+ONE_CLICK_SETUP_BUILD_RUN.bat
+```
+
+The bootstrap checks for a compatible Python installation, uses `winget` to install Python 3.12 when Python is missing, initializes/updates `pip`, creates an isolated `.venv`, upgrades `pip/setuptools/wheel`, installs or upgrades every package from `requirements.txt`, verifies `tkinter`, `bleak` and `PyInstaller`, creates `config.json` on first use, builds all Windows executables, and starts the Symphony GUI.
+
+Additional entry points:
+- `START_SYMPHONY.bat` / `start.bat`: bootstrap + run the Python GUI.
+- `BUILD_EXE.bat` / `build_windows.bat`: bootstrap + build all executable variants.
+- `bootstrap_windows.bat`: prerequisites only.
+
+The bootstrap is additive and does not modify the existing hardware write gates.
