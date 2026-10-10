@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('api', {
   openOutputs: (ids) => ipcRenderer.invoke('display:open-output', ids),
   outputStatus: () => ipcRenderer.invoke('display:status'),
   outputHeartbeat: (payload) => ipcRenderer.invoke('display:heartbeat', payload),
+  sendVisualFrame: (payload) => ipcRenderer.invoke('visual:frame', payload),
+  onVisualFrame: (fn) => ipcRenderer.on('visual:frame', (_e, frame) => fn(frame)),
   runtimeDiagnostics: () => ipcRenderer.invoke('runtime:diagnostics'),
   exportRuntimeDiagnostics: () => ipcRenderer.invoke('runtime:export-diagnostics'),
   syncSource: (state) => ipcRenderer.invoke('source:sync', state),
