@@ -239,6 +239,15 @@ registerIpc('display:list','main', () => displayList());
 registerIpc('display:open-output','main', (_e, ids) => openOutputWindows(ids));
 registerIpc('display:status','main', () => outputStatus());
 registerIpc('display:heartbeat','output', (e, payload={}) => { const hit=Array.from(outputWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id); if(!hit)return {ok:false}; const id=hit[0]; outputHealth.set(id,{lastHeartbeat:Date.now(),engine:String(payload.engine||'unknown').slice(0,40),fps:Math.max(0,Math.min(240,Number(payload.fps)||0))}); return {ok:true}; });
+registerIpc('visual:frame','main', (_e, payload={}) => {
+  const freq=payload.frequency, wave=payload.time;
+  if(!Array.isArray(freq)||!Array.isArray(wave))throw new Error('visual_frame_invalid');
+  if(freq.length<8||freq.length>4096||wave.length<16||wave.length>8192)throw new Error('visual_frame_size_invalid');
+  const clamp=a=>a.map(v=>Math.max(0,Math.min(255,Number(v)||0)));
+  const frame={frequency:clamp(freq),time:clamp(wave),at:Date.now()};
+  for(const w of outputWindows.values())if(w&&!w.isDestroyed())w.webContents.send('visual:frame',frame);
+  return {ok:true,outputs:outputWindows.size};
+});
 function runtimeDiagnostics(){const m=process.memoryUsage();return {generatedAt:new Date().toISOString(),version:app.getVersion(),platform:process.platform,arch:process.arch,electron:process.versions.electron,chrome:process.versions.chrome,node:process.versions.node,gpu:app.getGPUFeatureStatus(),memory:{rss:m.rss,heapTotal:m.heapTotal,heapUsed:m.heapUsed,external:m.external,arrayBuffers:m.arrayBuffers||0},source:{mode:sharedSourceState.mode,outputs:outputWindows.size},events:runtimeEvents.slice(-100),outputs:outputStatus(),displays:displayList().map(d=>({id:d.id,bounds:d.bounds,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,internal:d.internal}))};}
 registerIpc('runtime:diagnostics','main', async()=>runtimeDiagnostics());
 registerIpc('runtime:export-diagnostics','main', async()=>{const report=runtimeDiagnostics();const stamp=new Date().toISOString().replace(/[:.]/g,'-');const r=await dialog.showSaveDialog(mainWindow,{title:'Export SoundwaveStudio 666 Diagnostics',defaultPath:`RADIO-WAVE-v6.66-diagnostics-${stamp}.json`,filters:[{name:'JSON diagnostics',extensions:['json']}]});if(r.canceled||!r.filePath)return {ok:false,canceled:true};fs.writeFileSync(r.filePath,JSON.stringify(report,null,2),'utf8');return {ok:true,filePath:r.filePath};});
