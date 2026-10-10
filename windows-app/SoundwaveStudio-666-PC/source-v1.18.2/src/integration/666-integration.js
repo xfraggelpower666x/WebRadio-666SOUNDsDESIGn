@@ -197,7 +197,16 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   audio.addEventListener('ended',async()=>{if(mode==='soundcloud'&&!outputMode){try{await playSoundCloud(await window.api.soundCloudNext());}catch(err){q('#soundcloud-state').textContent='SoundCloud queue · '+err.message;}}});
   audio.addEventListener('error',async()=>{if(mode!=='soundcloud'||outputMode||soundCloudErrorSkips>=3)return;soundCloudErrorSkips++;q('#soundcloud-state').textContent=`SoundCloud stream error · skipping ${soundCloudErrorSkips}/3`;try{const x=await window.api.soundCloudNext();await new Promise(r=>setTimeout(r,500*soundCloudErrorSkips));await playSoundCloud(x);}catch(err){q('#soundcloud-state').textContent='SoundCloud recovery · '+err.message;}});
   window.addEventListener('offline',()=>{if(mode==='radio')state('NETWORK OFFLINE · STREAM MAY CONTINUE FROM BUFFER');if(mode==='soundcloud')q('#soundcloud-state').textContent='Network offline · waiting for connection';});
-  window.api.onRuntimeLifecycle?.(async ev=>{if(ev?.type!=='resume'||outputMode)return;state('SYSTEM RESUME · REHYDRATING');try{if(mode==='radio'){await refreshNP();if(radioUsingFallback)scheduleRadioRecovery(1500);else if(audio.paused){rt.enablePlayback();await audio.play().catch(()=>{});}scheduleNowPlaying();}else if(mode==='soundcloud'&&audio.src&&audio.paused){rt.enablePlayback();await audio.play().catch(()=>{});}syncVisual();state('SYSTEM RESUME · READY');}catch(e){state('SYSTEM RESUME · '+e.message);}});
+  window.api.onRuntimeLifecycle?.(async ev=>{
+    if(ev?.type==='lyvra:system-start'){
+      window.dispatchEvent(new CustomEvent('lyvra:system-start',{detail:{product:ev.product||'RADIO WAVE v6.66'}}));
+      rt.setStatus('RADIO WAVE v6.66 · SYSTEM ONLINE');
+      return;
+    }
+    if(ev?.type!=='resume'||outputMode)return;
+    state('SYSTEM RESUME · REHYDRATING');
+    try{if(mode==='radio'){await refreshNP();if(radioUsingFallback)scheduleRadioRecovery(1500);else if(audio.paused){rt.enablePlayback();await audio.play().catch(()=>{});}scheduleNowPlaying();}else if(mode==='soundcloud'&&audio.src&&audio.paused){rt.enablePlayback();await audio.play().catch(()=>{});}syncVisual();state('SYSTEM RESUME · READY');}catch(e){state('SYSTEM RESUME · '+e.message);}
+  });
   // Best-effort media clock correction for secondary output windows. Radio is live and does not seek.
   if(!outputMode){let lastSync=0;const syncClock=()=>{const now=Date.now();if(now-lastSync<900)return;lastSync=now;window.api.syncSource({mode,src:audio.currentSrc||audio.src,paused:audio.paused,time:(mode==='radio'?null:audio.currentTime)});};audio.addEventListener('play',syncClock);audio.addEventListener('pause',syncClock);audio.addEventListener('seeked',syncClock);audio.addEventListener('timeupdate',syncClock);}
 
