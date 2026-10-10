@@ -186,7 +186,10 @@ function sanitizeSourceState(next){
   const out={};
   if(next.mode!==undefined){if(!['local','radio','soundcloud'].includes(next.mode))throw new Error('source_mode_invalid');out.mode=next.mode;}
   if(next.src!==undefined){const v=String(next.src);if(v.length>4096)throw new Error('source_url_too_long');const u=new URL(v);if(!['file:','swmedia:','swsc:','http:','https:'].includes(u.protocol))throw new Error('source_protocol_blocked');out.src=v;}
-  for(const k of ['name','artist','dj','permalink','artwork'])if(next[k]!==undefined)out[k]=String(next[k]).slice(0,1024);
+  for(const k of ['name','title','artist','dj','permalink','artwork','station','bitrate','codec','sampleRate','routeState','overlayMode'])if(next[k]!==undefined)out[k]=String(next[k]).slice(0,1024);
+  if(next.listeners!==undefined)out.listeners=String(next.listeners).slice(0,64);
+  if(next.tickerEnabled!==undefined)out.tickerEnabled=!!next.tickerEnabled;
+  if(next.statusEnabled!==undefined)out.statusEnabled=!!next.statusEnabled;
   if(next.paused!==undefined)out.paused=!!next.paused;
   if(next.time!==undefined)out.time=Number.isFinite(Number(next.time))?Math.max(0,Number(next.time)):null;
   for(const k of ['queueIndex','queueLength'])if(next[k]!==undefined)out[k]=Math.max(0,Math.min(100000,Number(next[k])||0));
@@ -197,10 +200,10 @@ function broadcastSourceState(next){ sharedSourceState={...sharedSourceState,...
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 1024,
-    minHeight: 700,
+    width: 1600,
+    height: 1000,
+    minWidth: 1280,
+    minHeight: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -209,7 +212,7 @@ function createWindow() {
       webSecurity: true,
       backgroundThrottling: false // Crucial so background recording doesn't stall
     },
-    title: 'Soundwave Visualizer Studio',
+    title: 'RADIO WAVE v6.66',
     autoHideMenuBar: true,
     show: false
   });
@@ -238,7 +241,7 @@ registerIpc('display:status','main', () => outputStatus());
 registerIpc('display:heartbeat','output', (e, payload={}) => { const hit=Array.from(outputWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id); if(!hit)return {ok:false}; const id=hit[0]; outputHealth.set(id,{lastHeartbeat:Date.now(),engine:String(payload.engine||'unknown').slice(0,40),fps:Math.max(0,Math.min(240,Number(payload.fps)||0))}); return {ok:true}; });
 function runtimeDiagnostics(){const m=process.memoryUsage();return {generatedAt:new Date().toISOString(),version:app.getVersion(),platform:process.platform,arch:process.arch,electron:process.versions.electron,chrome:process.versions.chrome,node:process.versions.node,gpu:app.getGPUFeatureStatus(),memory:{rss:m.rss,heapTotal:m.heapTotal,heapUsed:m.heapUsed,external:m.external,arrayBuffers:m.arrayBuffers||0},source:{mode:sharedSourceState.mode,outputs:outputWindows.size},events:runtimeEvents.slice(-100),outputs:outputStatus(),displays:displayList().map(d=>({id:d.id,bounds:d.bounds,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,internal:d.internal}))};}
 registerIpc('runtime:diagnostics','main', async()=>runtimeDiagnostics());
-registerIpc('runtime:export-diagnostics','main', async()=>{const report=runtimeDiagnostics();const stamp=new Date().toISOString().replace(/[:.]/g,'-');const r=await dialog.showSaveDialog(mainWindow,{title:'Export SoundwaveStudio 666 Diagnostics',defaultPath:`SoundwaveStudio666-diagnostics-${stamp}.json`,filters:[{name:'JSON diagnostics',extensions:['json']}]});if(r.canceled||!r.filePath)return {ok:false,canceled:true};fs.writeFileSync(r.filePath,JSON.stringify(report,null,2),'utf8');return {ok:true,filePath:r.filePath};});
+registerIpc('runtime:export-diagnostics','main', async()=>{const report=runtimeDiagnostics();const stamp=new Date().toISOString().replace(/[:.]/g,'-');const r=await dialog.showSaveDialog(mainWindow,{title:'Export SoundwaveStudio 666 Diagnostics',defaultPath:`RADIO-WAVE-v6.66-diagnostics-${stamp}.json`,filters:[{name:'JSON diagnostics',extensions:['json']}]});if(r.canceled||!r.filePath)return {ok:false,canceled:true};fs.writeFileSync(r.filePath,JSON.stringify(report,null,2),'utf8');return {ok:true,filePath:r.filePath};});
 registerIpc('source:sync','main', (_e, state) => broadcastSourceState(state));
 registerIpc('window:fullscreen','main', (_e, enabled) => { if(mainWindow&&!mainWindow.isDestroyed()) mainWindow.setFullScreen(!!enabled); return {ok:true,fullscreen:!!enabled}; });
 registerIpc('soundcloud:status','main',()=>({configured:soundCloudCredentials().configured,creatorUrl:SOUND_CLOUD_CREATOR_URL}));
@@ -365,7 +368,7 @@ registerIpc('dialog:openBackground','main', async () => {
 registerIpc('dialog:getSavePath','main', async () => {
   const result = await dialog.showSaveDialog(mainWindow, {
     title: 'Save Soundwave Video',
-    defaultPath: path.join(app.getPath('videos'), 'soundwave-video.mp4'),
+    defaultPath: path.join(app.getPath('videos'), 'RADIO-WAVE-v6.66-visual.mp4'),
     filters: [
       { name: 'MP4 Video', extensions: ['mp4'] },
       { name: 'WebM Video', extensions: ['webm'] }
