@@ -8,6 +8,10 @@ const remoteLocks = new Set();
 const radioOrigin = new URL(radioCfg.radioBase).origin;
 
 let mainWindow;
+let introWindow;
+let mainReady=false;
+let introComplete=false;
+let introFailsafeTimer=null;
 const outputWindows = new Map();
 const outputHealth = new Map();
 const outputRecovery = new Map();
@@ -34,16 +38,19 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock();
 if (!gotSingleInstanceLock) app.quit();
 else app.on('second-instance',()=>{ if(mainWindow&&!mainWindow.isDestroyed()){ if(mainWindow.isMinimized())mainWindow.restore(); mainWindow.show(); mainWindow.focus(); runtimeEvent('second-instance-blocked'); }});
 
-function trustedAppUrl(value) {
+function trustedLocalFile(value,relativePath) {
   try {
     const u = new URL(String(value || ''));
-    const expected = pathToFileURL(path.join(__dirname, 'src', 'index.html'));
+    const expected = pathToFileURL(path.join(__dirname, relativePath));
     return u.protocol === 'file:' && u.pathname === expected.pathname;
   } catch { return false; }
 }
+const trustedAppUrl=value=>trustedLocalFile(value,path.join('src','index.html'));
+const trustedIntroUrl=value=>trustedLocalFile(value,path.join('src','intro.html'));
 function senderRole(event) {
   if (!event?.sender || event.sender.isDestroyed()) return 'invalid';
   if (mainWindow && !mainWindow.isDestroyed() && event.sender.id === mainWindow.webContents.id) return 'main';
+  if (introWindow && !introWindow.isDestroyed() && event.sender.id === introWindow.webContents.id) return 'intro';
   for (const w of outputWindows.values()) if (w && !w.isDestroyed() && event.sender.id === w.webContents.id) return 'output';
   return 'invalid';
 }
@@ -198,6 +205,56 @@ function sanitizeSourceState(next){
 }
 function broadcastSourceState(next){ sharedSourceState={...sharedSourceState,...sanitizeSourceState(next||{})}; for(const w of outputWindows.values())if(!w.isDestroyed())w.webContents.send('source:state',sharedSourceState); return {ok:true,state:sharedSourceState}; }
 
+function destroyIntroWindow(){
+  if(introFailsafeTimer){clearTimeout(introFailsafeTimer);introFailsafeTimer=null;}
+  if(introWindow&&!introWindow.isDestroyed()){try{introWindow.destroy();}catch{}}
+  introWindow=null;
+}
+function showMainAfterIntro(){
+  if(!introComplete||!mainReady||!mainWindow||mainWindow.isDestroyed())return false;
+  mainWindow.maximize();
+  mainWindow.show();
+  mainWindow.focus();
+  mainWindow.webContents.send('runtime:lifecycle',{type:'lyvra:system-start',product:'RADIO WAVE v6.66'});
+  destroyIntroWindow();
+  runtimeEvent('intro-handoff-complete',{event:'lyvra:system-start'});
+  return true;
+}
+function createIntroWindow(){
+  introWindow=new BrowserWindow({
+    width:960,
+    height:600,
+    minWidth:760,
+    minHeight:480,
+    resizable:true,
+    frame:false,
+    center:true,
+    show:false,
+    autoHideMenuBar:true,
+    backgroundColor:'#03030a',
+    webPreferences:{
+      preload:path.join(__dirname,'intro-preload.js'),
+      contextIsolation:true,
+      nodeIntegration:false,
+      sandbox:true,
+      webSecurity:true,
+      backgroundThrottling:false
+    }
+  });
+  introWindow.webContents.setWindowOpenHandler(()=>({action:'deny'}));
+  introWindow.webContents.on('will-navigate',(e,url)=>{if(!trustedIntroUrl(url))e.preventDefault();});
+  introWindow.loadFile(path.join(__dirname,'src','intro.html'));
+  introWindow.once('ready-to-show',()=>{if(introWindow&&!introWindow.isDestroyed())introWindow.show();});
+  introWindow.on('closed',()=>{introWindow=null;});
+  introFailsafeTimer=setTimeout(()=>{
+    runtimeEvent('intro-failsafe-handoff');
+    introComplete=true;
+    showMainAfterIntro();
+  },14000);
+  introFailsafeTimer.unref?.();
+  runtimeEvent('intro-created');
+}
+
 function createWindow() {
   const radioWaveIcon=path.join(__dirname,'build','radio-wave-v6.66.ico');
   mainWindow = new BrowserWindow({
@@ -224,8 +281,9 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.maximize();
-    mainWindow.show();
+    mainReady=true;
+    runtimeEvent('main-ready-hidden');
+    showMainAfterIntro();
   });
 
   mainWindow.on('closed', () => {
@@ -236,6 +294,14 @@ function createWindow() {
   });
 }
 
+
+registerIpc('intro:complete','intro', async()=>{
+  if(introComplete)return {ok:true,duplicate:true};
+  introComplete=true;
+  runtimeEvent('intro-sequence-complete');
+  showMainAfterIntro();
+  return {ok:true};
+});
 
 registerIpc('display:list','main', () => displayList());
 registerIpc('display:open-output','main', (_e, ids) => openOutputWindows(ids));
@@ -295,6 +361,7 @@ app.whenReady().then(() => {
     for(const w of BrowserWindow.getAllWindows())if(!w.isDestroyed())w.webContents.send('display:changed',displayList());
   };
   screen.on('display-added',displayChanged); screen.on('display-removed',displayChanged); screen.on('display-metrics-changed',displayChanged);
+  createIntroWindow();
   createWindow();
   startOutputWatchdog();
   powerMonitor.on('suspend',()=>{runtimeEvent('system-suspend');for(const w of BrowserWindow.getAllWindows())if(!w.isDestroyed())w.webContents.send('runtime:lifecycle',{type:'suspend'});});
@@ -314,7 +381,7 @@ app.whenReady().then(() => {
   });
 });
 
-app.on('before-quit',()=>{if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(fileWriteStream){try{fileWriteStream.end();}catch{} fileWriteStream=null;} adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
+app.on('before-quit',()=>{destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(fileWriteStream){try{fileWriteStream.end();}catch{} fileWriteStream=null;} adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
