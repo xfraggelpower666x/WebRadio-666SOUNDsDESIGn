@@ -199,6 +199,7 @@ function sanitizeSourceState(next){
 function broadcastSourceState(next){ sharedSourceState={...sharedSourceState,...sanitizeSourceState(next||{})}; for(const w of outputWindows.values())if(!w.isDestroyed())w.webContents.send('source:state',sharedSourceState); return {ok:true,state:sharedSourceState}; }
 
 function createWindow() {
+  const radioWaveIcon=path.join(__dirname,'build','radio-wave-v6.66.ico');
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -213,6 +214,7 @@ function createWindow() {
       backgroundThrottling: false // Crucial so background recording doesn't stall
     },
     title: 'RADIO WAVE v6.66',
+    icon: fs.existsSync(radioWaveIcon) ? radioWaveIcon : undefined,
     autoHideMenuBar: true,
     show: false
   });
