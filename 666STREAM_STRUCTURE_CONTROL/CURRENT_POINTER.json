@@ -4,7 +4,7 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "52110e7a486a91b8775e70e1bcb6ff3fe2ec69ea",
+  "body_head_before_pointer": "fd19a7df6153546d2cfd15a8f6a49891a1fba78f",
   "prechange_recovery_branch": "backup/pre-streamctrl-freeze-rebase-20261006-1823",
   "body_readback": "PASS_FREEZE_READBACK_6_OF_6",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
@@ -31,5 +31,15 @@
   "systemsicherung_size_bytes": 9617,
   "systemsicherung_git_blob": "e38218cf31e28e3063737e293fe009f149ef6138",
   "freeze_receipt": "666STREAM_STRUCTURE_CONTROL/recovery/FREEZE_RECEIPT_2026-10-06.md",
-  "concurrent_newer_state_rebased": true
+  "concurrent_newer_state_rebased": false,
+  "active_project_context": "WINDOWS_APP",
+  "windows_app_source_branch": "soundwave-v1-18-2-source-import-20261002",
+  "windows_app_source_update_commit": "6c2ae44dbc668861db66531f7b6cdb6facb955a8",
+  "windows_app_current_doc": "windows-app/SoundwaveStudio-666-PC/source-v1.18.2/docs/STARTUP_INSTALLER_CURRENT_2026-10-10.md",
+  "windows_app_baseline_retest_required": false,
+  "windows_app_radio_integration_source": "FROZEN",
+  "windows_app_start_sequence": "CYBER_INTRO_BEFORE_APP",
+  "windows_app_installer_target": "NSIS",
+  "windows_app_portable_role": "RECOVERY_BACKUP_ONLY",
+  "windows_app_next_step": "IMPLEMENT_BOOT_SPLASH_HANDOFF_AND_NSIS_PACKAGING_PROFILE"
 }
