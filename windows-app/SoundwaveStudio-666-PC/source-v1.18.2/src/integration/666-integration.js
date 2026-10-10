@@ -50,7 +50,11 @@
   }
   function composeStage(kind,data={}){
     const art=artworkOf(data);
-    if(artBg){artBg.style.backgroundImage=art?`url(${JSON.stringify(art).slice(1,-1)})`:'';artBg.classList.toggle('active',!!art&&kind!=='local');}
+    if(artBg){
+      artBg.style.backgroundImage=art?`url(${JSON.stringify(art).slice(1,-1)})`:'';
+      // Radio artwork belongs in the HD status panel; never blow it up behind Soundwave.
+      artBg.classList.toggle('active',!!art&&kind==='soundcloud');
+    }
     if(visualHeader)visualHeader.classList.toggle('hidden',kind!=='radio');
     const prefs=overlayPrefs();
     const outputOverlay=String(data.overlayMode||prefs.overlayMode);
