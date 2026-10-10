@@ -55,6 +55,38 @@ class FakeClient:
 
 
 class BleReadOnlyCaptureTests(unittest.TestCase):
+
+    def test_scan_all_keeps_unknown_devices_and_uses_advertisement_name(self):
+        class Dev:
+            def __init__(self, name, address):
+                self.name, self.address = name, address
+        class Adv:
+            def __init__(self, local_name, rssi, service_uuids=None):
+                self.local_name, self.rssi = local_name, rssi
+                self.service_uuids = service_uuids or []
+        class Scanner:
+            @staticmethod
+            async def discover(timeout=5.0, return_adv=False):
+                self_map = {
+                    "A": (Dev(None, "AA"), Adv("LENZE-RGB X", -42, ["fff0"])),
+                    "B": (Dev(None, "BB"), Adv(None, -65, [])),
+                    "C": (Dev("Other BLE", "CC"), Adv("Other BLE", -55, [])),
+                }
+                return self_map if return_adv else [x[0] for x in self_map.values()]
+        with mock.patch.object(capture, "BleakScanner", Scanner):
+            rows = asyncio.run(capture.scan_all(0.1))
+        self.assertEqual(len(rows), 3)
+        by_address = {x.address: x for x in rows}
+        self.assertEqual(by_address["AA"].family, "lenze")
+        self.assertEqual(by_address["AA"].advertised_name, "LENZE-RGB X")
+        self.assertEqual(by_address["BB"].family, "unknown")
+        self.assertEqual(by_address["CC"].family, "unknown")
+
+    def test_classify_name_accepts_embedded_known_names(self):
+        self.assertEqual(capture.classify_name("LED LENZE-RGB Living"), "lenze")
+        self.assertEqual(capture.classify_name("Magic OC21W Strip"), "magic_lantern")
+        self.assertIsNone(capture.classify_name("Generic BLE"))
+
     def test_registry_binding_persists_but_disables_device(self):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "registry.json"

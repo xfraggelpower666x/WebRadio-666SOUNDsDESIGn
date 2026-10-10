@@ -401,7 +401,7 @@ class App(tk.Tk):
         if hasattr(self, "discovery_tree"):
             for item in self.discovery_tree.get_children():
                 self.discovery_tree.delete(item)
-        self._run(self.engine.scan_known_ble(6.0), self._scan_done)
+        self._run(self.engine.scan_all_ble(8.0), self._scan_done)
 
     def _scan_done(self, result):
         discovered = result.get("devices", []) if isinstance(result, dict) else []
@@ -428,8 +428,10 @@ class App(tk.Tk):
                 ))
         known = [x for x in proposals if x.get("family") in ("lenze","magic_lantern")]
         self.discovery_status.set(f"SCAN COMPLETE · {len(proposals)} FOUND · {len(known)} RECOGNIZED")
-        if not proposals:
-            messagebox.showinfo("BLE Discovery", "No known LENZE-RGB / OC21W devices were found in this scan. Keep the lamps powered and close to the PC, then scan again.")
+        if not result.get("ok", True):
+            messagebox.showwarning("BLE Discovery", "Windows BLE scan failed:\n" + str(result.get("error") or "unknown error"))
+        elif not proposals:
+            messagebox.showinfo("BLE Discovery", "Windows reported no visible BLE devices. Check Bluetooth, power the lamps, close the phone app if it is holding a connection, and scan again.")
 
     def _discovery_selected(self, _event=None):
         if not hasattr(self, "discovery_tree"):
@@ -455,7 +457,7 @@ class App(tk.Tk):
         target = self.engine.registry.get(slot) if slot else None
         if not address or not target:
             return messagebox.showwarning("Discovery", "A valid found address and target slot are required.")
-        if target.get("family") != family:
+        if family not in ("", "unknown") and target.get("family") != family:
             return messagebox.showwarning("Discovery", f"Family mismatch: found {family}, slot {slot} is {target.get('family')}.")
         try:
             self.engine.bind_windows_ble(slot, address)
@@ -472,11 +474,18 @@ class App(tk.Tk):
 
     def _govee_discovery_done(self, result):
         if result.get("ok"):
-            self.discovery_status.set(f"GOVEE FOUND · {result.get('ip')}")
-            messagebox.showinfo("Govee LAN Discovery", f"Govee candidate found at {result.get('ip')}.\nA read-only status probe is still required before any write.")
+            source = result.get("source") or "LAN"
+            verified = bool(result.get("probe", {}).get("ok"))
+            self.discovery_status.set(f"GOVEE {'CONFIRMED' if verified else 'FOUND'} · {result.get('ip')}")
+            if verified:
+                messagebox.showinfo("Govee LAN Discovery", f"Govee H6047 confirmed at {result.get('ip')} via {source}.\nThe read-only devStatus probe passed.")
+            else:
+                messagebox.showinfo("Govee LAN Discovery", f"Govee candidate found at {result.get('ip')} via {source}.\nA read-only status probe is still required before any write.")
         else:
             self.discovery_status.set("GOVEE NOT FOUND")
-            messagebox.showinfo("Govee LAN Discovery", "No matching Govee LAN device answered the discovery scan.")
+            candidates = result.get("candidates") or []
+            details = "\n".join(f"{x.get('ip')} · {x.get('source')} · {x.get('probe_reason') or 'no response'}" for x in candidates)
+            messagebox.showinfo("Govee LAN Discovery", "No Govee LAN device answered the read-only status/discovery checks." + (("\n\nChecked:\n" + details) if details else ""))
 
     def connect_selected(self):
         did=self.selected_device.get()

@@ -17,7 +17,7 @@ from ble_protocol_design import (
     audio_intent as design_audio_intent,
     plan_command as design_plan_command,
 )
-from ble_readonly_capture import scan_known as ble_scan_known, capture_read_only as ble_capture_read_only
+from ble_readonly_capture import scan_known as ble_scan_known, scan_all as ble_scan_all, capture_read_only as ble_capture_read_only
 from ble_protocol_observation import Observation as ProtocolObservation, evidence_summary as protocol_evidence_summary
 
 try:
@@ -105,19 +105,71 @@ class GoveeLan:
         self.detail = f"LAN target {self.ip}; probe pending" if self.ip else "not discovered"
 
     async def discover(self):
-        """Read-only LAN discovery. Stores only the candidate IP; sends no control write."""
-        ip = await asyncio.to_thread(self._discover)
-        self.ip = ip
+        """Read-only LAN discovery with configured-IP verification first."""
+        configured = str(self.cfg.get("device_ip") or self.ip or "").strip()
+        candidates = []
+        if configured:
+            probe = await asyncio.to_thread(self._probe_ip_sync, configured)
+            candidates.append({
+                "ip": configured,
+                "source": "configured_ip",
+                "probe_ok": bool(probe.get("ok")),
+                "probe_reason": probe.get("reason"),
+            })
+            if probe.get("ok"):
+                self.ip = configured
+                self.online = True
+                self._last_probe_ok = time.monotonic()
+                self.detail = f"LAN confirmed {configured}"
+                return {
+                    "ok": True,
+                    "hardware_io": "READ_ONLY_DISCOVERY",
+                    "ip": configured,
+                    "source": "configured_ip_probe",
+                    "candidates": candidates,
+                    "probe": probe,
+                    "model": self.cfg.get("model"),
+                    "hardware_verified": False,
+                    "write_allowed": True,
+                    "write_gate": "PROBE_CONFIRMED_5_MINUTES",
+                }
+
+        found = await asyncio.to_thread(self._discover)
+        if found:
+            candidates.append({"ip": found, "source": "multicast", "probe_ok": False})
+            self.ip = found
+            probe = await asyncio.to_thread(self._probe_ip_sync, found)
+            candidates[-1]["probe_ok"] = bool(probe.get("ok"))
+            candidates[-1]["probe_reason"] = probe.get("reason")
+            self.online = bool(probe.get("ok"))
+            self._last_probe_ok = time.monotonic() if self.online else 0.0
+            self.detail = f"LAN confirmed {found}" if self.online else f"LAN candidate {found}; probe pending"
+            return {
+                "ok": True,
+                "hardware_io": "READ_ONLY_DISCOVERY",
+                "ip": found,
+                "source": "multicast",
+                "candidates": candidates,
+                "probe": probe,
+                "model": self.cfg.get("model"),
+                "hardware_verified": False,
+                "write_allowed": bool(self.online),
+                "write_gate": "PROBE_CONFIRMED_5_MINUTES" if self.online else "PROBE_REQUIRED",
+            }
+
         self.online = False
         self._last_probe_ok = 0.0
-        self.detail = f"LAN candidate {ip}; probe pending" if ip else "not discovered"
+        self.detail = "not discovered"
         return {
-            "ok": bool(ip),
+            "ok": False,
             "hardware_io": "READ_ONLY_DISCOVERY",
-            "ip": ip,
+            "ip": None,
+            "source": "none",
+            "candidates": candidates,
             "model": self.cfg.get("model"),
             "hardware_verified": False,
             "write_allowed": False,
+            "write_gate": "PROBE_REQUIRED",
         }
 
     def _discover(self):
@@ -148,8 +200,14 @@ class GoveeLan:
                         return ip
                     if wanted_name and name and wanted_name.lower() in name.lower():
                         return ip
-                    if not wanted_model and not wanted_name:
+                    # Some Govee LAN firmware omits SKU/deviceName in scan replies.
+                    # A syntactically valid IPv4 response from the Govee discovery
+                    # multicast is kept as a candidate and still must pass devStatus.
+                    try:
+                        ipaddress.ip_address(ip)
                         return ip
+                    except ValueError:
+                        continue
                 except Exception:
                     pass
         finally:
@@ -166,22 +224,28 @@ class GoveeLan:
         finally:
             sock.close()
 
-    def _probe_sync(self):
-        """Read-only UDP status query; no color/power changes."""
-        if not self.ip:
+    def _probe_ip_sync(self, ip):
+        """Read-only UDP devStatus query for one explicit candidate IP."""
+        ip = str(ip or "").strip()
+        if not ip:
             return {"ok": False, "reason": "no_configured_address"}
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            return {"ok": False, "reason": "invalid_ip"}
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(1.5)
         try:
             sock.bind(("", 4002))
-            self._send("devStatus", {})
+            packet = json.dumps({"msg": {"cmd": "devStatus", "data": {}}}, separators=(",", ":")).encode()
+            sock.sendto(packet, (ip, self.CONTROL_PORT))
             until = time.monotonic() + 2.0
             while time.monotonic() < until:
                 try:
                     raw, sender = sock.recvfrom(4096)
                 except socket.timeout:
                     break
-                if sender[0] != self.ip:
+                if sender[0] != ip:
                     continue
                 try:
                     message = json.loads(raw.decode("utf-8", "replace"))
@@ -203,6 +267,9 @@ class GoveeLan:
             return {"ok": False, "reason": "udp_port_unavailable", "details": str(exc)}
         finally:
             sock.close()
+
+    def _probe_sync(self):
+        return self._probe_ip_sync(self.ip)
 
     async def probe(self):
         result = await asyncio.to_thread(self._probe_sync)
@@ -576,8 +643,33 @@ class Engine:
         return {
             "ok": True,
             "hardware_io": "READ_ONLY_SCAN",
+            "scope": "RECOGNIZED_ONLY",
             "devices": [
-                {"name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi}
+                {
+                    "name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi,
+                    "advertised_name": d.advertised_name, "service_uuids": list(d.service_uuids),
+                }
+                for d in found
+            ],
+        }
+
+    async def scan_all_ble(self, timeout=6.0):
+        try:
+            found = await ble_scan_all(timeout=timeout)
+        except Exception as exc:
+            return {
+                "ok": False, "hardware_io": "READ_ONLY_SCAN", "scope": "ALL_VISIBLE_BLE",
+                "devices": [], "error": str(exc),
+            }
+        return {
+            "ok": True,
+            "hardware_io": "READ_ONLY_SCAN",
+            "scope": "ALL_VISIBLE_BLE",
+            "devices": [
+                {
+                    "name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi,
+                    "advertised_name": d.advertised_name, "service_uuids": list(d.service_uuids),
+                }
                 for d in found
             ],
         }

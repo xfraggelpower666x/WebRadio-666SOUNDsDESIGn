@@ -22,9 +22,11 @@ class SafetyRegression(unittest.TestCase):
                 asyncio.run(g.set_color(100, 20, 50))
             sender.assert_not_called()
 
-    def test_govee_discovery_is_read_only_and_does_not_unlock_writes(self):
+    def test_govee_discovery_candidate_without_probe_does_not_unlock_writes(self):
         g = core.GoveeLan({"enabled": True, "device_ip": None, "model": "H6047"})
-        with mock.patch.object(g, "_discover", return_value="192.168.2.32"), mock.patch.object(g, "_send") as sender:
+        with mock.patch.object(g, "_discover", return_value="192.168.2.32"), mock.patch.object(
+            g, "_probe_ip_sync", return_value={"ok": False, "reason": "no_matching_udp_response"}
+        ), mock.patch.object(g, "_send") as sender:
             result = asyncio.run(g.discover())
             self.assertTrue(result["ok"])
             self.assertEqual(result["hardware_io"], "READ_ONLY_DISCOVERY")
@@ -35,6 +37,20 @@ class SafetyRegression(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "GOVEE_LAN_UNVERIFIED"):
                 asyncio.run(g.set_power(True))
             sender.assert_not_called()
+
+    def test_govee_discovery_checks_configured_ip_before_multicast(self):
+        g = core.GoveeLan({"enabled": True, "device_ip": "192.168.2.32", "model": "H6047"})
+        with mock.patch.object(
+            g, "_probe_ip_sync", return_value={"ok": True, "status": {"onOff": 1, "brightness": 40}}
+        ) as probe, mock.patch.object(g, "_discover") as multicast:
+            result = asyncio.run(g.discover())
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["source"], "configured_ip_probe")
+        self.assertEqual(result["ip"], "192.168.2.32")
+        self.assertTrue(result["write_allowed"])
+        self.assertTrue(g.online)
+        probe.assert_called_once_with("192.168.2.32")
+        multicast.assert_not_called()
 
     def test_govee_probe_unlocks_but_expires(self):
         g = core.GoveeLan({"enabled": True, "device_ip": "192.168.2.32"})
