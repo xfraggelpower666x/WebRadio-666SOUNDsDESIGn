@@ -195,6 +195,7 @@ class SafetyRegression(unittest.TestCase):
                 self.received = False
             def settimeout(self, *_): pass
             def bind(self, *_): pass
+            def sendto(self, *_): pass
             def close(self): pass
             def recvfrom(self, *_):
                 if not self.received:
