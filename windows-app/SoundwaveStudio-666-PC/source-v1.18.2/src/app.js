@@ -1256,9 +1256,9 @@ function drawVoiceAssistant(data, bass, mid, volume) {
     const fIdx = Math.floor((w / waveCount) * (bufferLength * 0.45));
     const audioMultiplier = (data[fIdx] * sensitivity) / 255;
     
-    // Scale amplitude dynamic pulse (add a small breathing term so waves wiggle slightly when silent)
-    const silentPulse = Math.sin(time * 0.5 + w) * 4;
-    const peakAmplitude = 200 * (volume * 0.35 + audioMultiplier * 0.65 + bass * 0.15) + silentPulse;
+    // RADIO WAVE hardlock: reactive amplitude comes only from the live analyser.
+    // The decorative resting baseline above may move gently, but it never feeds fake audio amplitude.
+    const peakAmplitude = 200 * (volume * 0.35 + audioMultiplier * 0.65 + bass * 0.15);
 
     const points = 120; // higher density points for smoother lines
     const phase = time * params.phaseSpeed;
