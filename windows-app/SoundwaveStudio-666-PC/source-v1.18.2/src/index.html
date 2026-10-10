@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Soundwave Visualizer Studio</title>
+  <title>RADIO WAVE v6.66</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https: swmedia: swsc:; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,8 +15,8 @@
       <header class="studio-header">
         <div class="logo">
           <div class="logo-orb"></div>
-          <h1>SOUNDWAVE</h1>
-          <span>STUDIO</span>
+          <h1>RADIO WAVE</h1>
+          <span>v6.66 · SOUNDWAVE CORE</span>
         </div>
       </header>
 
@@ -200,6 +200,16 @@
           <div class="control-group"><label>MilkDrop Preset</label><select id="milkdrop-preset" class="custom-select"><option value="0">Kutup Işığı</option><option value="1">Erimiş Altın</option><option value="2">Dingin Halkalar</option><option value="3">Sonsuz Tünel</option><option value="4">Nabız Örgüsü</option></select><button id="milkdrop-import" class="btn btn-secondary">IMPORT .MILK</button></div>
           <div class="control-group"><label>Shader Scene</label><select id="shader-preset" class="custom-select"><option value="neon">Neon Plasma</option><option value="tunnel">Cyber Tunnel</option><option value="grid">Spectrum Grid</option></select></div><div class="control-group"><label>3D Scene</label><select id="geometry-preset" class="custom-select"><option value="surface:torus">Torus</option><option value="surface:sphere">Sphere</option><option value="surface:klein">Klein Bottle</option><option value="attractor:lorenz">Lorenz Attractor</option><option value="attractor:rossler">Rössler Attractor</option><option value="solid:geodesic">Geodesic Sphere</option><option value="solid:icosahedron">Icosahedron</option></select></div><button id="btn-fullscreen" class="btn btn-secondary">FULLSCREEN</button>
           <div class="control-group"><label>Display 1</label><select id="display-one" class="custom-select"></select><label>Display 2 (optional)</label><select id="display-two" class="custom-select"><option value="">Disabled</option></select></div>
+          <div class="control-group radio-visual-options">
+            <label class="checkbox-container"><input type="checkbox" id="radio-ticker-enabled" checked><span class="checkmark"></span> Radio metadata ticker</label>
+            <label class="checkbox-container"><input type="checkbox" id="radio-status-enabled" checked><span class="checkmark"></span> Radio status panel</label>
+            <label>Second display mode</label>
+            <select id="display-visual-mode" class="custom-select">
+              <option value="visual">Visualizer only</option>
+              <option value="visual+ticker">Visualizer + ticker</option>
+              <option value="visual+ticker+status" selected>Visualizer + ticker + status</option>
+            </select>
+          </div>
           <div class="file-meta-tag" id="display-state">Display discovery pending</div>
           <button id="export-diagnostics" class="btn btn-secondary">EXPORT RUNTIME DIAGNOSTICS</button>
         </section>
@@ -254,8 +264,22 @@
         <!-- The actual video aspect ratio container -->
         <div class="video-frame-container" id="video-frame-outer">
           <div id="source-artwork-bg" class="source-artwork-bg"></div>
-          <div id="radio-visual-header" class="radio-visual-header hidden"><span class="radio-666">666</span><span>666SOUNDsDESIGn</span><small>WEBRADIO & BROADCASTER</small></div>
+          <div id="radio-visual-header" class="radio-visual-header hidden"><span class="radio-666">666</span><span>RADIO WAVE v6.66</span><small>666SOUNDsDESIGn · SOUNDWAVE CORE</small></div>
           <canvas id="visualizer-canvas"></canvas>
+          <aside id="radio-status-panel" class="radio-status-panel hidden" aria-live="polite">
+            <div class="radio-status-art"><img id="radio-status-artwork" alt="Stream artwork"></div>
+            <div class="radio-status-copy">
+              <div class="radio-status-kicker">LIVE STREAM STATUS</div>
+              <strong id="radio-status-title">RADIO WAVE v6.66</strong>
+              <span id="radio-status-artist">666SOUNDsDESIGn</span>
+              <div class="radio-status-grid">
+                <span>DJ</span><b id="radio-status-dj">—</b>
+                <span>ROUTE</span><b id="radio-status-route">MAIN</b>
+                <span>LISTENERS</span><b id="radio-status-listeners">—</b>
+                <span>STREAM</span><b id="radio-status-stream">—</b>
+              </div>
+            </div>
+          </aside>
           <div id="source-nowplaying-ticker" class="source-nowplaying-ticker hidden"><div id="source-nowplaying-track" class="source-nowplaying-track">666SOUNDsDESIGn</div></div>
         </div>
       </div>
