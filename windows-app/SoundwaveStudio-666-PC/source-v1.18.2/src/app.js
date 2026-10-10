@@ -453,7 +453,7 @@ function drawFrame() {
     // Dynamic diagnostics tags updates
     diagBass.textContent = bass.toFixed(2);
     
-    // Direct BPM Pulse simulator based on transient threshold
+    // Real bass transient indicator from live analyser data
     if (bass > 0.6) {
       diagBpm.textContent = 'BASS HIT';
       document.querySelector('.bpm-pill').style.boxShadow = '0 0 10px var(--color-primary)';
@@ -616,23 +616,23 @@ function drawVisualizer(style, data, timeData, bass, mid, treble, volume) {
   ctx.shadowBlur = 0; // reset glow
 }
 
-// Dummy waveform drawing for static presentation when idle
+// Idle state is deliberately non-reactive: no audio signal means no fake waveform.
 function drawDummyWave() {
-  ctx.shadowBlur = glowIntensity;
-  ctx.strokeStyle = primaryColor;
-  ctx.shadowColor = primaryColor;
-  ctx.lineWidth = 4;
-  
+  ctx.save();
+  ctx.shadowBlur = glowIntensity * 0.45;
+  ctx.strokeStyle = 'rgba(32,232,255,0.48)';
+  ctx.shadowColor = 'rgba(255,43,214,0.55)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  const width = 600;
-  for (let i = -width / 2; i < width / 2; i++) {
-    const time = visualizerTime / 150;
-    const y = Math.sin(i * 0.05 - time) * 15 * Math.exp(-Math.pow(i * 0.007, 2));
-    if (i === -width / 2) ctx.moveTo(i, y);
-    else ctx.lineTo(i, y);
-  }
+  ctx.moveTo(-300, 0);
+  ctx.lineTo(300, 0);
   ctx.stroke();
   ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(235,242,255,0.72)';
+  ctx.font = '600 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('NO AUDIO SIGNAL', 0, -22);
+  ctx.restore();
 }
 
 // Design style 1: Glowing Linear Bars
