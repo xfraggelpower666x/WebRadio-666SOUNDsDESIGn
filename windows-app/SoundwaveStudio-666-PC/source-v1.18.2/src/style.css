@@ -852,7 +852,7 @@ body{background:
 .radio-status-panel{position:absolute;z-index:8;right:18px;top:18px;width:min(360px,34%);display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;padding:12px;border:1px solid rgba(32,232,255,.42);border-radius:14px;background:linear-gradient(145deg,rgba(4,8,20,.90),rgba(27,7,36,.84));box-shadow:0 0 24px rgba(32,232,255,.18),0 0 32px rgba(255,43,214,.12);backdrop-filter:blur(8px);}
 .radio-status-panel.hidden{display:none!important;}
 .radio-status-art{width:112px;height:112px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,43,214,.42);background:radial-gradient(circle,rgba(155,92,255,.35),rgba(5,7,17,.96));}
-.radio-status-art img{width:100%;height:100%;object-fit:cover;display:block;}
+.radio-status-art img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;image-rendering:auto;background:radial-gradient(circle,rgba(155,92,255,.18),rgba(4,7,18,.96));}
 .radio-status-copy{min-width:0;display:flex;flex-direction:column;gap:4px;}
 .radio-status-kicker{font-size:9px;letter-spacing:.18em;color:var(--rw-cyan);}
 .radio-status-copy strong{font-size:15px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 10px rgba(255,43,214,.48);}
