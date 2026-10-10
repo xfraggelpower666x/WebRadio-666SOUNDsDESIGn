@@ -8,7 +8,16 @@
   const state=(t)=>{const e=q('#radio-action-state');if(e)e.textContent=t;};
   const artBg=q('#source-artwork-bg'), visualHeader=q('#radio-visual-header'), ticker=q('#source-nowplaying-ticker'), tickerTrack=q('#source-nowplaying-track');
   const statusPanel=q('#radio-status-panel'), statusArtwork=q('#radio-status-artwork'), statusTitle=q('#radio-status-title'), statusArtist=q('#radio-status-artist'), statusDj=q('#radio-status-dj'), statusRoute=q('#radio-status-route'), statusListeners=q('#radio-status-listeners'), statusStream=q('#radio-status-stream');
-  const artworkOf=o=>String(o?.artwork||o?.artwork_url||o?.cover||o?.image||o?.album_art||o?.thumbnail||'').replace('-large.','-t500x500.');
+  // Stream artwork hardlock: supplied stream artwork always wins. Fallback branding is only allowed when artwork is absent.
+  const artworkOf=o=>{
+    const raw=String(
+      o?.artwork_hd||o?.artworkHD||o?.cover_hd||o?.coverHD||o?.image_hd||o?.imageHD||
+      o?.artwork||o?.artwork_url||o?.cover||o?.image||o?.album_art||o?.thumbnail||''
+    ).trim();
+    if(!raw)return '';
+    // Preserve provider artwork. Only request a higher SoundCloud rendition when the known token is present.
+    return raw.replace('-large.','-t1080x1080.').replace('-t500x500.','-t1080x1080.');
+  };
   const cleanText=(v,fallback='—')=>{const s=String(v??'').trim();return s||fallback;};
   const radioRoute=()=>radioFallbackFailed?'DEGRADED':(radioUsingFallback?'FALLBACK':'MAIN');
   const radioStreamSummary=(data={})=>[data.bitrate||data.kbps||'',data.codec||data.format||'',data.sampleRate||data.sample_rate||data.samplerate||''].filter(Boolean).map(String).join(' · ')||'LIVE';
@@ -21,7 +30,17 @@
     statusPanel.classList.toggle('hidden',!showStatus);
     if(!showStatus)return;
     const art=artworkOf(data);
-    if(statusArtwork){if(art){statusArtwork.src=art;statusArtwork.style.visibility='visible';}else{statusArtwork.removeAttribute('src');statusArtwork.style.visibility='hidden';}}
+    if(statusArtwork){
+      if(art){
+        statusArtwork.src=art;
+        statusArtwork.dataset.artworkSource='stream';
+        statusArtwork.style.visibility='visible';
+      }else{
+        statusArtwork.removeAttribute('src');
+        statusArtwork.dataset.artworkSource='fallback';
+        statusArtwork.style.visibility='hidden';
+      }
+    }
     if(statusTitle)statusTitle.textContent=cleanText(data.title||data.name||data.track,'RADIO WAVE v6.66');
     if(statusArtist)statusArtist.textContent=cleanText(data.artist||data.user||data.station,'666SOUNDsDESIGn');
     if(statusDj)statusDj.textContent=cleanText(data.dj);
