@@ -1,7 +1,7 @@
 {
-  "name": "soundwave-visualizer",
+  "name": "radio-wave-v666",
   "version": "1.18.2",
-  "description": "Desktop Soundwave Visualizer & Video Studio",
+  "description": "RADIO WAVE v6.66 · Soundwave visual music player with 666 WebRadio addon",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -13,14 +13,16 @@
     "prebuild": "npm run check:release"
   },
   "keywords": [
+    "radio-wave",
     "soundwave",
     "visualizer",
     "music",
-    "video",
+    "radio",
+    "soundcloud",
     "electron",
     "desktop"
   ],
-  "author": "Antigravity",
+  "author": "FRAGGLEPOWER666 / 666SOUNDsDESIGN",
   "license": "MIT",
   "devDependencies": {
     "electron": "^31.0.0",
@@ -28,11 +30,16 @@
     "electron-packager": "^17.1.2"
   },
   "build": {
-    "appId": "com.vkmr007.soundwavestudio",
-    "productName": "SoundwaveStudio",
+    "appId": "com.666soundsdesign.radiowave.v666",
+    "productName": "RADIO WAVE v6.66",
     "win": {
       "target": [
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "files": [
@@ -45,7 +52,15 @@
     ],
     "directories": {
       "output": "dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RADIO WAVE v6.66",
+      "artifactName": "RADIO-WAVE-v6.66-Setup.${ext}"
     }
   },
-  "productName": "SoundwaveStudio 666"
+  "productName": "RADIO WAVE v6.66"
 }
