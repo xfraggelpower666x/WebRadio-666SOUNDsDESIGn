@@ -51,7 +51,8 @@
       "docs/**/*",
       "DEEP_AUDIT_STATUS.md",
       "package.json",
-      "build/windowsIconBase64.cjs"
+      "build/windowsIconBase64.cjs",
+      "intro-preload.js"
     ],
     "directories": {
       "output": "dist"
