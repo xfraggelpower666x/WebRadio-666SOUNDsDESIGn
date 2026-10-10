@@ -31,12 +31,11 @@
     if(!showStatus)return;
     const art=artworkOf(data);
     if(statusArtwork){
-      const fallbackArt='assets/radio-wave/radio-wave-inapp-logo-ui.webp';
+      const fallbackArt=window.RWAssets?.inAppLogo||'';
       const useFallback=()=>{
         if(statusArtwork.dataset.artworkSource==='fallback')return;
         statusArtwork.dataset.artworkSource='fallback';
-        statusArtwork.src=fallbackArt;
-        statusArtwork.style.visibility='visible';
+        if(fallbackArt){statusArtwork.src=fallbackArt;statusArtwork.style.visibility='visible';}else{statusArtwork.removeAttribute('src');statusArtwork.style.visibility='hidden';}
       };
       statusArtwork.onerror=()=>{
         if(statusArtwork.dataset.artworkSource==='stream')useFallback();
@@ -170,10 +169,18 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   const visualState=()=>({engine:q('#visual-engine').value,milkdropPreset:q('#milkdrop-preset').value,shaderPreset:q('#shader-preset').value,geometryPreset:q('#geometry-preset').value,importedMilkdrop});
   const syncVisual=()=>{if(!outputMode)window.api.syncSource({visual:visualState()});};
   ['#visual-engine','#milkdrop-preset','#shader-preset','#geometry-preset'].forEach(sel=>q(sel)?.addEventListener('change',syncVisual));
-  // Branding binaries fail soft: missing optional files must never break Soundwave or radio playback.
-  ['#rw-brand-banner-img','#rw-brand-logo-img','#rw-stage-branding img'].forEach(sel=>{
+  // Apply supplied RADIO WAVE artwork from embedded package assets.
+  const brandingMap=[
+    ['#rw-brand-banner-img','banner'],
+    ['#rw-brand-logo-img','inAppLogo'],
+    ['#rw-stage-branding img','stage']
+  ];
+  brandingMap.forEach(([sel,key])=>{
     const img=q(sel);
-    if(img)img.addEventListener('error',()=>{img.style.display='none';});
+    if(!img)return;
+    img.addEventListener('error',()=>{img.style.display='none';});
+    const src=window.RWAssets?.[key];
+    if(src){img.src=src;img.style.display='block';}else img.style.display='none';
   });
 
   // Current SoundCloud API: credentials and OAuth stay in main process; renderer only receives metadata + internal media URL.
