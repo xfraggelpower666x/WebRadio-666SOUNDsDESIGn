@@ -879,3 +879,38 @@ body.controls-collapsed .app-container{grid-template-columns:0 minmax(0,1fr);}
 body.controls-collapsed .control-panel{width:0;min-width:0;overflow:hidden;border-right:0;opacity:0;pointer-events:none;}
 body.controls-collapsed .preview-viewport-container{padding:6px;}
 body.controls-collapsed .radio-status-panel{width:min(390px,30%);}
+
+/* RADIO WAVE v6.66 branding visibility contract */
+.rw-brand-banner{width:100%;height:clamp(72px,8vw,118px);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:6px 8px 0;}
+.rw-brand-banner img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;object-position:center;}
+.studio-header .logo{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;}
+.rw-brand-logo-wrap{width:clamp(62px,6vw,92px);height:clamp(62px,6vw,92px);display:grid;place-items:center;position:relative;overflow:visible;flex:none;}
+.rw-brand-logo{grid-area:1/1;width:100%;height:100%;object-fit:contain;object-position:center;display:block;filter:drop-shadow(0 0 10px rgba(32,232,255,.35)) drop-shadow(0 0 16px rgba(255,43,214,.22));}
+.rw-brand-logo-wrap .logo-orb{grid-area:1/1;opacity:.22;z-index:-1;}
+.rw-brand-title{min-width:0;}
+.rw-stage-branding{position:absolute;z-index:1;inset:5% 8% 9%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.13;overflow:hidden;}
+.rw-stage-branding img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;object-position:center;filter:saturate(.92) contrast(1.04);}
+body.source-radio .rw-stage-branding{opacity:.10;}
+body.source-soundcloud .rw-stage-branding{opacity:.05;}
+body.source-local .rw-stage-branding{opacity:.12;}
+
+.radio-status-panel{width:min(520px,42%);grid-template-columns:clamp(150px,13vw,190px) minmax(0,1fr);gap:14px;padding:14px;}
+.radio-status-art{width:clamp(150px,13vw,190px);height:clamp(150px,13vw,190px);display:flex;align-items:center;justify-content:center;}
+.radio-status-art img{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;object-position:center;image-rendering:auto;}
+.radio-status-copy strong{font-size:clamp(15px,1.15vw,21px);}
+.radio-status-copy>span{font-size:clamp(11px,.8vw,14px);}
+.radio-status-grid{font-size:clamp(9px,.65vw,12px);gap:6px 9px;}
+body.controls-collapsed .radio-status-panel{width:min(600px,36%);grid-template-columns:clamp(170px,15vw,220px) minmax(0,1fr);}
+body.controls-collapsed .radio-status-art{width:clamp(170px,15vw,220px);height:clamp(170px,15vw,220px);}
+
+@media(max-width:1250px){
+  .rw-brand-banner{height:78px;}
+  .rw-brand-logo-wrap{width:68px;height:68px;}
+  .radio-status-panel{width:min(430px,46%);grid-template-columns:128px minmax(0,1fr);}
+  .radio-status-art{width:128px;height:128px;}
+}
+@media(max-width:980px){
+  .rw-brand-banner{height:62px;}
+  .radio-status-panel{width:min(360px,54%);grid-template-columns:108px minmax(0,1fr);padding:10px;gap:10px;}
+  .radio-status-art{width:108px;height:108px;}
+}
