@@ -5,12 +5,13 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "npm run check:release && electron-builder --win --x64 --publish never",
-    "package": "npm run check:release && node scripts/build.js",
+    "dist": "npm run prepare:branding && npm run check:release && electron-builder --win --x64 --publish never",
+    "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
     "test": "node tests/deep-integration.test.cjs",
     "check:syntax": "node scripts/check-syntax.cjs",
     "check:release": "node scripts/release-integrity.cjs",
-    "prebuild": "npm run check:release"
+    "prebuild": "npm run prepare:branding && npm run check:release",
+    "prepare:branding": "node scripts/prepare-radio-wave-branding.cjs"
   },
   "keywords": [
     "radio-wave",
@@ -40,7 +41,8 @@
             "x64"
           ]
         }
-      ]
+      ],
+      "icon": "build/radio-wave-v6.66.ico"
     },
     "files": [
       "main.js",
@@ -48,7 +50,8 @@
       "src/**/*",
       "docs/**/*",
       "DEEP_AUDIT_STATUS.md",
-      "package.json"
+      "package.json",
+      "build/windowsIconBase64.cjs"
     ],
     "directories": {
       "output": "dist"
