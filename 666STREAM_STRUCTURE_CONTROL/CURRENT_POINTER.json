@@ -4,7 +4,7 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "fd19a7df6153546d2cfd15a8f6a49891a1fba78f",
+  "body_head_before_pointer": "e41b5a3b3c78a4f94e867c2e23106e672eb0fbc8",
   "prechange_recovery_branch": "backup/pre-streamctrl-freeze-rebase-20261006-1823",
   "body_readback": "PASS_FREEZE_READBACK_6_OF_6",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
@@ -41,5 +41,22 @@
   "windows_app_start_sequence": "CYBER_INTRO_BEFORE_APP",
   "windows_app_installer_target": "NSIS",
   "windows_app_portable_role": "RECOVERY_BACKUP_ONLY",
-  "windows_app_next_step": "IMPLEMENT_BOOT_SPLASH_HANDOFF_AND_NSIS_PACKAGING_PROFILE"
+  "windows_app_next_step": "IMPLEMENT_RADIO_WAVE_DESIGN_ON_PRESERVED_SOUNDWAVE_CORE",
+  "windows_app_product": "RADIO WAVE v6.66",
+  "windows_app_source_architecture_commit": "469eb1074ea9317d495f9a896853fc2fa6632012",
+  "windows_app_architecture_doc": "windows-app/SoundwaveStudio-666-PC/source-v1.18.2/docs/RADIO_WAVE_V6_66_ARCHITECTURE_LOCK_2026-10-10.md",
+  "soundwave_core": "PRESERVE",
+  "soundwave_function_removal": "FORBIDDEN",
+  "radio_role": "ADDITIVE_ADDON",
+  "player_pipeline": [
+    "LOCAL",
+    "RADIO",
+    "SOUNDCLOUD"
+  ],
+  "visualization_primary_surface": true,
+  "radio_metadata_ticker": true,
+  "radio_status_panel": true,
+  "second_monitor_visual_output": "OPTIONAL_USER_SWITCH",
+  "second_monitor_duplicate_audio_stream": false,
+  "production_webradio_mutation": "NONE"
 }
