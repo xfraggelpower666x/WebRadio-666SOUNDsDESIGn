@@ -52,7 +52,7 @@ jobs:
           python -m PyInstaller --noconfirm --clean --onefile --name "666_LIGHT_ORCHESTRA" --hidden-import=device_registry --hidden-import=light_control_state 666_light_orchestra.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-          python -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_SYMPHONY" --hidden-import=666_light_orchestra --hidden-import=device_registry --hidden-import=light_control_state 666_light_orchestra_control_center.py
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_SYMPHONY" --hidden-import=666_light_orchestra --hidden-import=device_registry --hidden-import=light_control_state --hidden-import=ble_gui_model 666_light_orchestra_control_center.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
           python -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_LAB" --hidden-import=666_light_orchestra --hidden-import=device_registry 666_light_orchestra_gui.py
@@ -80,6 +80,9 @@ jobs:
           }
           Stop-Process -Id $proc.Id -Force
           Write-Host "PASS: SYMPHONY EXE remained alive for startup smoke window"
+
+          # Guard against dynamic-import omissions in the packaged controller.
+          python -c "import importlib; importlib.import_module('ble_gui_model'); print('DISCOVERY MODULE IMPORT PASS')"
 
       - name: Assemble complete rebuildable Windows package
         shell: pwsh
