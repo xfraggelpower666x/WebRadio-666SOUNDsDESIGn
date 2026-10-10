@@ -7,6 +7,7 @@
 let audioContext = null;
 let audioSource = null;
 let analyserNode = null;
+let externalAnalyserFrame = null; // real analyzer snapshot from primary player for visual-only output windows
 let audioDestinationNode = null; // Node for recording audio track
 let dataArray = null;
 let timeDataArray = null;
@@ -416,6 +417,12 @@ function drawFrame() {
   let mid = 0;
   let treble = 0;
   let volume = 0;
+  const activeAnalyser = analyserNode || (externalAnalyserFrame ? {
+    frequencyBinCount: dataArray?.length || 0,
+    fftSize: timeDataArray?.length || 0,
+    getByteFrequencyData(target) { if (dataArray) target.set(dataArray.subarray(0, target.length)); },
+    getByteTimeDomainData(target) { if (timeDataArray) target.set(timeDataArray.subarray(0, target.length)); }
+  } : null);
 
   // Advance time: tie to export FPS frame steps during record, else use real time
   if (isRecording) {
@@ -424,9 +431,9 @@ function drawFrame() {
     visualizerTime = Date.now();
   }
 
-  if (analyserNode) {
-    analyserNode.getByteFrequencyData(dataArray);
-    analyserNode.getByteTimeDomainData(timeDataArray);
+  if (activeAnalyser) {
+    activeAnalyser.getByteFrequencyData(dataArray);
+    activeAnalyser.getByteTimeDomainData(timeDataArray);
     
     // Standard diagnostics analysis
     let bassSum = 0, midSum = 0, trebleSum = 0;
@@ -468,10 +475,10 @@ function drawFrame() {
   ctx.translate(customX, customY);
   ctx.scale(scaleFactor, scaleFactor);
   
-  if (analyserNode) {
+  if (activeAnalyser) {
     let extensionHandled = false;
     try {
-      extensionHandled = !!(window.SoundwaveExtensionRenderer && window.SoundwaveExtensionRenderer.draw({ctx,canvas,width:canvasWidth,height:canvasHeight,analyser:analyserNode,dataArray,timeDataArray,bass,mid,treble,volume,time:visualizerTime}));
+      extensionHandled = !!(window.SoundwaveExtensionRenderer && window.SoundwaveExtensionRenderer.draw({ctx,canvas,width:canvasWidth,height:canvasHeight,analyser:activeAnalyser,dataArray,timeDataArray,bass,mid,treble,volume,time:visualizerTime}));
     } catch (extensionError) {
       // Additive engines must never take down the Soundwave core render loop.
       console.error('[SoundwaveExtensionRenderer] fail-soft fallback', extensionError);
@@ -1707,6 +1714,16 @@ window.SoundwaveRuntime = Object.freeze({
   getAudioContext: () => audioContext,
   getFrequencyData: () => dataArray,
   getTimeData: () => timeDataArray,
+  setExternalAnalyserFrame: (frame) => {
+    const freq=frame?.frequency, wave=frame?.time;
+    if(!freq || !wave || typeof freq.length!=='number' || typeof wave.length!=='number') return false;
+    if(freq.length<8 || freq.length>4096 || wave.length<16 || wave.length>8192) return false;
+    dataArray=Uint8Array.from(freq, v=>Math.max(0,Math.min(255,Number(v)||0)));
+    timeDataArray=Uint8Array.from(wave, v=>Math.max(0,Math.min(255,Number(v)||0)));
+    bufferLength=dataArray.length;
+    externalAnalyserFrame={receivedAt:Date.now()};
+    return true;
+  },
   enablePlayback: () => { btnPlayPause.classList.remove('disabled'); btnPlayPause.disabled=false; },
   setStatus: (text) => { diagStatus.textContent=String(text||''); }
 });
