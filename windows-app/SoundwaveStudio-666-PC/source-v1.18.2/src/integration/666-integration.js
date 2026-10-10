@@ -31,14 +31,23 @@
     if(!showStatus)return;
     const art=artworkOf(data);
     if(statusArtwork){
+      const fallbackArt='assets/radio-wave/radio-wave-inapp-logo-ui.webp';
+      const useFallback=()=>{
+        if(statusArtwork.dataset.artworkSource==='fallback')return;
+        statusArtwork.dataset.artworkSource='fallback';
+        statusArtwork.src=fallbackArt;
+        statusArtwork.style.visibility='visible';
+      };
+      statusArtwork.onerror=()=>{
+        if(statusArtwork.dataset.artworkSource==='stream')useFallback();
+        else statusArtwork.style.visibility='hidden';
+      };
       if(art){
-        statusArtwork.src=art;
         statusArtwork.dataset.artworkSource='stream';
+        statusArtwork.src=art;
         statusArtwork.style.visibility='visible';
       }else{
-        statusArtwork.removeAttribute('src');
-        statusArtwork.dataset.artworkSource='fallback';
-        statusArtwork.style.visibility='hidden';
+        useFallback();
       }
     }
     if(statusTitle)statusTitle.textContent=cleanText(data.title||data.name||data.track,'RADIO WAVE v6.66');
@@ -75,7 +84,10 @@
   }
 
   function setMode(next){
-    mode=next; qa('.source-btn').forEach(b=>b.classList.toggle('active',b.dataset.source===next));
+    mode=next;
+    document.body.classList.remove('source-local','source-radio','source-soundcloud');
+    document.body.classList.add('source-'+next);
+    qa('.source-btn').forEach(b=>b.classList.toggle('active',b.dataset.source===next));
     q('#radio-controls').classList.toggle('hidden',next!=='radio'); q('#soundcloud-controls').classList.toggle('hidden',next!=='soundcloud');
     window.api.syncSource({mode:next});if(next==='radio') startRadio(); else {clearTimeout(poll);clearTimeout(radioRecoveryTimer);poll=0;radioRecoveryTimer=0;radioUsingFallback=false;radioFallbackFailed=false;radioFailoverAttempts=0;radioFailoverBusy=false;radioRecoveryBusy=false;if(next==='local'){rt.setStatus('Local mode');composeStage('local');}}
   }
@@ -158,6 +170,12 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   const visualState=()=>({engine:q('#visual-engine').value,milkdropPreset:q('#milkdrop-preset').value,shaderPreset:q('#shader-preset').value,geometryPreset:q('#geometry-preset').value,importedMilkdrop});
   const syncVisual=()=>{if(!outputMode)window.api.syncSource({visual:visualState()});};
   ['#visual-engine','#milkdrop-preset','#shader-preset','#geometry-preset'].forEach(sel=>q(sel)?.addEventListener('change',syncVisual));
+  // Branding binaries fail soft: missing optional files must never break Soundwave or radio playback.
+  ['#rw-brand-banner-img','#rw-brand-logo-img','#rw-stage-branding img'].forEach(sel=>{
+    const img=q(sel);
+    if(img)img.addEventListener('error',()=>{img.style.display='none';});
+  });
+
   // Current SoundCloud API: credentials and OAuth stay in main process; renderer only receives metadata + internal media URL.
   (async()=>{try{const x=await window.api.soundCloudStatus();q('#soundcloud-state').textContent=x.configured?'SoundCloud API configured · secure resolver ready':'SoundCloud API credentials required in environment';}catch{}})();
   q('#soundcloud-open').onclick=()=>window.api.soundCloudOpenCurrent().catch(e=>{q('#soundcloud-state').textContent='SoundCloud link · '+e.message;});
