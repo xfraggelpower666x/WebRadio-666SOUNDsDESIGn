@@ -164,10 +164,14 @@ jobs:
           NODE
 
           grep -Fq "Central Player Boot + Session Identity v2.2.1" "$workdir/central-boot-screen.js"
-          grep -Fq "2026-09-13-main-cyber-hud-v2" "$workdir/central-boot-screen.js"
+          grep -Fq "20261016-main-iphone-two-phase-cyberintro-r01" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_ANIMATION_CYCLE=10000" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_START_PROGRESS=1" "$workdir/central-boot-screen.js"
-          grep -Fq "MAIN_COMPLETE_HOLD=500" "$workdir/central-boot-screen.js"
+          grep -Fq "MAIN_COMPLETE_HOLD=0" "$workdir/central-boot-screen.js"
+          grep -Fq "MAIN_PHASE2_FADE_MS=5400" "$workdir/central-boot-screen.js"
+          grep -Fq "MAIN_PHASE2_HOLD_MS=2000" "$workdir/central-boot-screen.js"
+          grep -Fq "usesOriginalTwoPhase()" "$workdir/central-boot-screen.js"
+          grep -Fq "root.dataset.cyberStage=\x27online\x27" "$workdir/central-boot-screen.js"
           grep -Fq "fullCycleComplete" "$workdir/central-boot-screen.js"
           grep -Fq "earlyCompleteBlocked" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'hub'" "$workdir/central-boot-screen.js"
