@@ -1,7 +1,7 @@
 // Read-only Pegelbrücke für den bestehenden MiniPlayer-Analyser.
 (() => {
   'use strict';
-  const allowed = new Set(['https://weblyvra.666soundsdesign-broadcaster.com', 'https://lyvra-living-universe.crisp-siren-2613.chatgpt.site']);
+  const allowed = new Set(['https://weblyvra.666soundsdesign-broadcaster.com', 'https://lyvra-living-universe.crisp-siren-2613.chatgpt.site', 'https://webradio.666soundsdesign-broadcaster.com']);
   let subscriber = null, sequence = 0, last = -Infinity;
   function send(playing, bands) {
     if (!subscriber) return;
