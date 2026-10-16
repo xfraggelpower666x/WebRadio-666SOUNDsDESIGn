@@ -65,14 +65,19 @@ test('Main boot is made explicitly visible and records its handoff to prevent a 
   assert.match(audioStart,/html\.setAttribute\('data-main-boot-preflight', 'boot-visible'\)/);
   assert.match(audioStart,/html\.setAttribute\('data-main-cyber-hud-handoff', boot\.dataset\.bootSkin \|\| 'central-boot-visible'\)/);
   assert.match(audioStart,/central-boot-screen\.css/);
-  assert.match(audioStart,/20260913-main-cyber-hud-v1/);
+  assert.match(audioStart,/20261016-two-phase-r01/);
 });
 
-test('Main runs at least one complete ten-second visual cycle before player handoff while legacy duration stays unchanged',()=>{
+test('Desktop and iPhone run READY then three SYSTEM ONLINE fades and hold, other players retain legacy duration',()=>{
   assert.match(boot,/const DEFAULT_DURATION=4200/);
   assert.match(boot,/const MAIN_ANIMATION_CYCLE=10000/);
-  assert.match(boot,/const MAIN_DURATION=MAIN_ANIMATION_CYCLE/);
-  assert.match(boot,/duration=identity\.page==='main' \? Math\.max\(MAIN_ANIMATION_CYCLE,requestedDuration\) : Math\.max\(600,requestedDuration\)/);
+  assert.match(boot,/const MAIN_PHASE2_FADE_MS=5400/);
+  assert.match(boot,/const MAIN_PHASE2_HOLD_MS=2000/);
+  assert.match(boot,/const MAIN_DURATION=MAIN_ANIMATION_CYCLE\+MAIN_PHASE2_FADE_MS\+MAIN_PHASE2_HOLD_MS/);
+  assert.match(boot,/identity\.playerId==='hub'\|\|identity\.playerId==='iphone'/);
+  assert.match(boot,/root\.dataset\.cyberStage='online'/);
+  assert.match(css,/s666CyberOnlineTriple 1\.8s ease-in-out 3/);
+  assert.match(boot,/duration=usesOriginalTwoPhase\(\)\?Math\.max\(MAIN_DURATION,requestedDuration\):identity\.page==='main'\?Math\.max\(MAIN_ANIMATION_CYCLE,requestedDuration\):Math\.max\(600,requestedDuration\)/);
   assert.match(css,/\.s666boot-main-reactor\{[^}]*animation:s666MainReactor 10s linear infinite/);
 });
 
@@ -81,7 +86,7 @@ test('Main cannot be hidden or completed early and exposes 100 percent before ha
   assert.match(boot,/root\.dataset\.earlyCompleteBlocked=String\(reason\)/);
   assert.match(boot,/root\.dataset\.fullCycleComplete=identity\.page==='main'\?'1':'legacy'/);
   assert.match(boot,/if\(identity\.page==='main' && root\.dataset\.fullCycleComplete!=='1'\)/);
-  assert.match(boot,/const MAIN_COMPLETE_HOLD=500/);
+  assert.match(boot,/const MAIN_COMPLETE_HOLD=0/);
   assert.match(boot,/setProgress\(100\)/);
   assert.match(boot,/global\.setTimeout\(\(\)=>hide\(reason\),identity\.page==='main'\?MAIN_COMPLETE_HOLD:180\)/);
 });
