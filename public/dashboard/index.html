@@ -103,26 +103,50 @@
   #pollDot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);margin-right:5px;vertical-align:middle;animation:pollP 2s ease-in-out infinite;}
   @keyframes pollP{0%,100%{opacity:.2}50%{opacity:1}}
   </style>
+  <link rel="stylesheet" href="./audio-neon.css">
+  <style id="dashboard-hud-css">
+  .dash-header{gap:14px;flex-wrap:wrap;padding-right:20px}.dash-header .dash-brand{flex:1 1 170px;min-width:0}.dash-header .dash-head-controls{display:flex;align-items:center;gap:14px;flex:0 1 auto;justify-content:flex-end;min-width:0;flex-wrap:wrap}.dash-header .dash-time{min-width:0;text-align:right}.dash-clock{font-size:clamp(17px,3vw,28px);letter-spacing:.045em;white-space:nowrap}.dash-date{text-align:right;white-space:nowrap}.dash-header .lyvra-site-link{position:static!important;flex:0 0 auto;max-width:100%;white-space:nowrap}.dash-grid{grid-template-columns:minmax(0,1fr) minmax(270px,320px)}.dash-grid>div{min-width:0}.card{transition:border-color .2s ease,box-shadow .2s ease}.card:hover,.card:focus-within{border-color:#16fff380;box-shadow:0 0 24px #16fff329,inset 0 0 15px #ff3dbb11}.cyber-frequency{border-color:#ff3dbb66;position:relative;isolation:isolate}.cyber-frequency::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 24px #ff3dbb12}.frequency-heading{font-size:clamp(19px,2.7vw,28px);color:#fff;margin:0 0 8px}.frequency-heading span{color:var(--pink)}.frequency-intro{font-size:12px;line-height:1.55;color:#b5c8da;margin-bottom:16px}.radio-embed{width:100%;max-width:680px;margin:0 auto}.radio-embed iframe{display:block;width:100%;height:390px;min-height:365px;border:0;border-radius:18px}.hud-telemetry{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:15px}.hud-telemetry details{border:1px solid #16fff342;border-radius:12px;padding:10px;min-width:0;background:#050e1cbb;cursor:pointer}.hud-telemetry details:hover,.hud-telemetry details[open]{border-color:var(--pink);box-shadow:0 0 12px #ff3dbb32}.hud-telemetry summary{list-style:none}.hud-telemetry summary::-webkit-details-marker{display:none}.hud-telemetry small{display:block;color:#86b4bb;letter-spacing:.12em;font-size:9px}.hud-telemetry strong{display:block;margin-top:5px;color:var(--cyan);font-size:clamp(13px,1.8vw,19px);overflow-wrap:anywhere}.hud-telemetry details p{font-size:11px;line-height:1.5;color:#d9d5ea;margin-top:10px}.hud-subline{color:#a4afc7;font-size:11px;margin-top:10px}.audio-neon-controls{margin-top:14px}.radio-cyber-hud{position:relative;z-index:2}.dash-footer{position:relative;z-index:2}@media(max-width:860px){.dash-grid{grid-template-columns:1fr}}@media(max-width:600px){.dash-grid{padding:12px;gap:12px}.dash-header{padding:12px;gap:8px}.dash-header .dash-brand{flex:1 1 150px}.dash-header .dash-head-controls{gap:8px}.dash-date{font-size:8px;letter-spacing:0}.dash-header .lyvra-site-link{font-size:10px;padding:5px 8px}.hud-telemetry{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}.radio-embed iframe{height:410px}}@media(max-width:380px){.dash-header .dash-brand{flex-basis:100%}.dash-header .dash-head-controls{flex:1 1 100%;justify-content:space-between}.dash-header .dash-time{text-align:left}.dash-date{text-align:left}}@media(prefers-reduced-motion:reduce){.card{transition:none}}
+  </style>
   <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
   <body>
-<a class="lyvra-site-link" href="https://weblyvra.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer" aria-label="LYVRA Website in neuem Tab öffnen">💜 LYVRA</a>
+
 
   <header class="dash-header">
-    <div>
+    <div class="dash-brand">
       <div class="dash-logo">666<span>SOUNDs</span>DESIGn</div>
       <div style="font-size:10px;color:rgba(22,255,243,.4);letter-spacing:.12em;margin-top:2px;">LIVE DASHBOARD</div>
     </div>
-    <div style="text-align:right">
+    <div class="dash-head-controls"><div class="dash-time">
       <div class="dash-clock" id="clock">--:--:--</div>
       <div class="dash-date"  id="dateStr">---</div>
-    </div>
+    </div><a class="lyvra-site-link" href="https://weblyvra.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer" aria-label="LYVRA Website in neuem Tab öffnen">💜 LYVRA</a></div>
   </header>
 
   <main class="dash-grid">
 
     <!-- LEFT COLUMN -->
     <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Einziger Audio-Player: originaler WebRadio MiniPlayer mit sämtlichen Funktionen. -->
+      <section class="card cyber-frequency radio-cyber-hud" aria-label="Radio MiniPlayer und audioreaktives Cyber HUD">
+        <div class="card-label">CYBER FREQUENCY HUD · LIVE STREAM</div>
+        <h2 class="frequency-heading">Ein gemeinsamer <span>Frequenzraum.</span></h2>
+        <p class="frequency-intro">Klang wird Licht. Der unveränderte MiniPlayer bietet seine vollständigen Audio-, EQ-, Boost-, Stream- und Radiofunktionen. Die äußeren HUD-Effekte reagieren ausschließlich auf echte Audiodaten.</p>
+        <div class="radio-embed"><iframe src="https://webradio.666soundsdesign-broadcaster.com/embed/miniplayer.html" title="666SOUNDsDESIGn WebRadio MiniPlayer" width="100%" height="390" loading="eager" allow="autoplay"></iframe></div>
+        <aside id="audio-neon-controls" class="audio-neon-controls" aria-labelledby="audio-neon-title">
+          <h3 id="audio-neon-title">Klang wird Licht.</h3><button type="button" aria-pressed="false">Neon-Effekte einschalten</button>
+          <p data-neon-status role="status">Effekte aus</p>
+          <div class="neon-band-meter" role="img" aria-label="Echte Audiosignal-Pegel: Bass, Mitten und Höhen"><span>BASS<i data-neon-band="bass"></i></span><span>MITTEN<i data-neon-band="mid"></i></span><span>HÖHEN<i data-neon-band="high"></i></span></div>
+          <p data-neon-note>Bass, Mitten und Höhen steuern das Neonlicht. Keine Mikrofonfreigabe, keine Audioaufzeichnung.</p>
+        </aside>
+        <div class="hud-telemetry" aria-label="Radio-Statuspanels mit PC-Hover und iPhone-Tap">
+          <details title="Aktuell verbundene Hörer"><summary><small>LISTENERS ⓘ</small><strong id="hudListeners">–</strong></summary><p>Aktuell gemeldete Verbindungen zum Radiostream.</p></details>
+          <details title="Aktuelle Bitrate"><summary><small>BITRATE ⓘ</small><strong id="hudBitrate">–</strong></summary><p>Vom Radio gemeldete Audio-Bitrate.</p></details>
+          <details title="DJ und Live-Status"><summary><small>DJ / AUTO-DJ ⓘ</small><strong id="hudDj">–</strong></summary><p>Der aktuell in den Radiometadaten gemeldete DJ oder Auto-DJ.</p></details>
+          <details title="Letzter Metadatenabruf"><summary><small>UPDATED ⓘ</small><strong id="hudUpdated">–</strong></summary><p>Zeitpunkt des letzten erfolgreichen Metadatenabrufs.</p></details>
+        </div><p class="hud-subline">Desktop: Maus über die Statusflächen · iPhone: Antippen für Details. Die bisherigen Status- und Verlaufspanels bleiben erhalten.</p>
+      </section>
 
       <!-- NOW PLAYING -->
       <section class="card">
@@ -144,7 +168,7 @@
             </div>
           </div>
         </div>
-        <div class="eq-bars paused" id="eqBars"></div>
+        <!-- Ehemaliger Fake-EQ entfernt: echtes Pegelsignal kommt aus dem originalen MiniPlayer. -->
       </section>
 
       <!-- RECENTLY PLAYED -->
@@ -228,14 +252,6 @@
     document.getElementById('dateStr').textContent=days[n.getDay()]+', '+n.getDate()+'. '+months[n.getMonth()]+' '+n.getFullYear();
   }
   setInterval(updateClock,1000); updateClock();
-
-  /* ── EQ bars ── */
-  var eqBars=document.getElementById('eqBars');
-  [14,22,30,18,26,36,20,32,16,28,24,12,34,22,18,30].forEach(function(h,i){
-    var b=document.createElement('div'); b.className='eq-bar';
-    b.style.setProperty('--h',h+'px'); b.style.setProperty('--d',(0.38+(i%5)*0.12)+'s');
-    eqBars.appendChild(b);
-  });
 
   /* ── Helpers ── */
   function esc(s){var d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
@@ -376,12 +392,16 @@
     el('stBitrate').textContent=bitrate?bitrate+' kbps':'–';
     el('stDj').textContent=dj;
     el('stUpdated').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    el('hudListeners').textContent=listeners||'–';
+    el('hudBitrate').textContent=bitrate?bitrate+' kbps':'–';
+    el('hudDj').textContent=dj;
+    el('hudUpdated').textContent=el('stUpdated').textContent;
 
     // ── Artwork ──
     setArtwork(art);
 
     // ── EQ on ──
-    el('eqBars').classList.remove('paused');
+    /* Kein künstlicher EQ: echte MiniPlayer-Pegel steuern die externen Neon-Effekte. */
 
     // ── History ──
     if(Array.isArray(history) && history.length){
@@ -394,7 +414,7 @@
 
   function applyOffline(){
     el('stStream').innerHTML='<span class="led off"></span>OFFLINE';
-    el('eqBars').classList.add('paused');
+    /* Bei Offline bleiben die Pegel ohne künstliche Bewegung. */
   }
 
   /* ── Poll /api/nowplaying ── */
@@ -431,5 +451,8 @@
 
   })();
   </script>
+  <!-- Globaler Layer direkt unter body: echte Audioreaktivität über postMessage. -->
+  <div id="audio-neon-layer" aria-hidden="true"><span class="audio-neon-orbit"></span><span class="audio-neon-orbit"></span><span class="audio-neon-edge"></span><span class="audio-neon-midfield"></span><span class="audio-neon-bass-field"></span><span class="audio-neon-high-field"></span></div>
+  <script type="module" src="./audio-neon.js"></script>
   </body>
   </html>
