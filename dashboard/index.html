@@ -138,6 +138,7 @@
   .hud-modal-body{min-height:120px;max-height:57dvh;overflow:auto;background:#040914;border:1px solid #16fff32f;border-radius:10px;padding:12px}
   .hud-modal-body pre{color:#c6f9f5;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.6 Consolas,monospace}
   .hud-html-frame{width:100%;height:48dvh;background:#fff;border:0;border-radius:7px}
+  .hud-modal-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.hud-modal-actions span{font-size:11px;color:#16fff3}
   .hud-render-toggle{align-self:flex-start;border:1px solid #16fff35c;border-radius:9px;background:#071522;color:#d7f9fa;cursor:pointer;padding:8px;font:11px monospace}
   body.hud-modal-open{overflow:hidden}
   @media(max-width:860px){.dash-grid{grid-template-columns:minmax(0,1fr)}.hud-status-bar{padding:9px 12px}}
@@ -335,7 +336,7 @@
       <div class="hud-dialog-header"><h2 id="hudModalTitle">HUD Antwort</h2><button type="button" id="hudClose" aria-label="Overlay schließen">✕</button></div>
       <div class="hud-endpoint" id="hudEndpoint"></div>
       <div class="hud-modal-body" id="hudModalBody"><pre id="hudResponse">Warte auf Antwort …</pre></div>
-      <button type="button" class="hud-render-toggle" id="hudRender" hidden>HTML-Vorschau anzeigen</button>
+      <div class="hud-modal-actions"><button type="button" class="hud-render-toggle" id="hudRender" hidden>HTML-Vorschau anzeigen</button><button type="button" class="hud-render-toggle" id="hudCopy">📋 Antwort kopieren</button><span id="hudCopyStatus" role="status" aria-live="polite"></span></div>
     </section>
   </div>
   <footer class="dash-footer">
@@ -646,7 +647,7 @@
       title=document.getElementById('hudModalTitle'),endpoint=document.getElementById('hudEndpoint'),
       body=document.getElementById('hudModalBody'),close=document.getElementById('hudClose'),
       preview=document.getElementById('hudRender'),buttons=[...document.querySelectorAll('[data-hud-path]')];
-    let previouslyFocused=null,controller=null,lastHTML=null,previewing=false,activeButton=null;
+    let previouslyFocused=null,controller=null,lastHTML=null,previewing=false,activeButton=null,rawResponse="",httpStatus="";
     const safePath=new Set([...buttons].map(x=>x.dataset.hudPath));
     function clean(){while(body.firstChild)body.removeChild(body.firstChild);}
     function showText(s){clean();const pre=document.createElement('pre');pre.textContent=s;body.appendChild(pre);}
@@ -661,6 +662,7 @@
       if(!safePath.has(path)||!path.startsWith('/')||path.startsWith('//'))return;
       controller?.abort();controller=new AbortController();activeButton?.setAttribute('aria-pressed','false');activeButton=button;button.setAttribute('aria-pressed','true');
       previouslyFocused=document.activeElement;title.textContent=button.dataset.hudTitle||'Status';endpoint.textContent=new URL(path,location.origin).href;
+      rawResponse='Antwort wird geladen …';httpStatus='';document.getElementById('hudCopyStatus').textContent='';
       modal.hidden=false;document.body.classList.add('hud-modal-open');dialog.focus();preview.hidden=true;lastHTML=null;previewing=false;showText('Antwort wird geladen …');
       const signal=controller.signal,timeout=setTimeout(()=>controller?.abort(),12000);
       try{
@@ -671,12 +673,23 @@
         if(mime.includes('json'))try{displayed=JSON.stringify(JSON.parse(text),null,2)}catch(_){}
         if(signal.aborted)return;
         button.dataset.health=response.ok?'ok':'warn';
-        title.textContent=(button.dataset.hudTitle||'Status')+' · HTTP '+response.status;
+        httpStatus='HTTP '+response.status;rawResponse=displayed||'(Leere Antwort)';
+        title.textContent=(button.dataset.hudTitle||'Status')+' · '+httpStatus;
         showText(displayed||'(Leere Antwort)');
         if(mime.includes('text/html')){lastHTML=text;preview.hidden=false;preview.textContent='HTML-Vorschau anzeigen';}
-      }catch(e){if(signal.aborted)return;button.dataset.health='warn';showText('Abruf fehlgeschlagen: '+String(e?.message||e));}
+      }catch(e){if(signal.aborted)return;button.dataset.health='warn';rawResponse='Abruf fehlgeschlagen: '+String(e?.message||e);httpStatus='Netzwerkfehler';showText(rawResponse);}
       finally{clearTimeout(timeout);}
     }
+    document.getElementById('hudCopy').addEventListener('click',async()=>{
+      const output=['666STREAM HUD DIAGNOSE','Panel: '+title.textContent,'Endpunkt: '+endpoint.textContent,'Status: '+httpStatus,'Zeit: '+new Date().toISOString(),'','Antwort:',rawResponse].join('\n');
+      const feedback=document.getElementById('hudCopyStatus');
+      try{await navigator.clipboard.writeText(output);feedback.textContent='✓ Kopiert';}
+      catch(_){
+        const field=document.createElement('textarea');field.value=output;field.setAttribute('readonly','');field.style.cssText='position:fixed;left:-10000px;top:0';document.body.append(field);field.select();
+        try{feedback.textContent=document.execCommand('copy')?'✓ Kopiert':'Bitte Text markieren und kopieren';}catch(e){feedback.textContent='Kopieren nicht verfügbar'}
+        field.remove();
+      }
+    });
     preview.addEventListener('click',()=>{
       if(!lastHTML)return;
       previewing=!previewing;
