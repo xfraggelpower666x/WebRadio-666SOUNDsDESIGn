@@ -139,6 +139,14 @@
   @media(max-width:860px){.dash-grid{grid-template-columns:minmax(0,1fr)}.hud-status-bar{padding:9px 12px}}
   @media(max-width:600px){.hud-pill{font-size:10px;min-height:38px}.hud-spacer{display:none}.radio-embed iframe{height:390px;min-height:390px}#radio .audio-neon-controls{padding:13px}.hud-dialog{padding:12px;max-height:92dvh}}
   </style>
+  <style id="dash-miniplayer-framefit-v3">
+  /* Nicht mit starrer Iframe-Höhe 365px leeren Raum reservieren. Miniplayer-Panels expandieren trotzdem. */
+  #radio .radio-embed{max-width:680px;margin-inline:auto}
+  #radio .radio-embed iframe{height:198px;min-height:0!important;max-height:none;border:0;overflow:hidden;background:transparent}
+  #radio .audio-neon-controls{margin:12px auto 0}
+  #radio .audio-neon-controls button{white-space:normal}
+  @media(max-width:600px){#radio .radio-embed iframe{height:245px;min-height:0!important}}
+  </style>
   <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
   <body>
@@ -155,23 +163,22 @@
     </div><a class="lyvra-site-link" href="https://weblyvra.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer" aria-label="LYVRA Website in neuem Tab öffnen">💜 LYVRA</a></div>
   </header>
 
+<!-- 666STREAM HUD: reine Status-/Diagnose-Panels. Die originalen Wiedergabe-, Boost-, Discord- und Streamwechsel-Funktionen befinden sich ausschließlich im originalen MiniPlayer. -->
   <nav class="hud-status-bar" aria-label="Cyber HUD Endpunkte">
     <button class="hud-pill" type="button" data-hud-title="Stream / Health" data-hud-path="/health" aria-pressed="false" title="Stream / Health · /health"><span class="hud-led" aria-hidden="true"></span><span>STR</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Skip Bridge" data-hud-path="/api/skip/status" aria-pressed="false" title="Skip Bridge · /api/skip/status"><span class="hud-led" aria-hidden="true"></span><span>SB</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Stream Buffer · Verbindungsdiagnose" data-hud-path="/health" aria-pressed="false" title="Stream Buffer · Audio-Wiedergabe wird im MiniPlayer überwacht, Serverstatus hier"><span class="hud-led" aria-hidden="true"></span><span>SB</span></button>
     <button class="hud-pill" type="button" data-hud-title="Stream-Quellen" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Stream-Quellen · /api/runtime-config/status"><span class="hud-led" aria-hidden="true"></span><span>SRC</span></button>
     <button class="hud-pill" type="button" data-hud-title="Metadaten" data-hud-path="/api/nowplaying" aria-pressed="false" title="Metadaten · /api/nowplaying"><span class="hud-led" aria-hidden="true"></span><span>MET</span></button>
     <button class="hud-pill" type="button" data-hud-title="Worker" data-hud-path="/health" aria-pressed="false" title="Worker · /health"><span class="hud-led" aria-hidden="true"></span><span>WRK</span></button>
     <button class="hud-pill" type="button" data-hud-title="Audio-Konfiguration" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Audio-Konfiguration · /api/runtime-config/status"><span class="hud-led" aria-hidden="true"></span><span>AUD</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Player Alert" data-hud-path="/api/player-alert/status" aria-pressed="false" title="Player Alert · /api/player-alert/status"><span class="hud-led" aria-hidden="true"></span><span>WCH</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Watchdog · Player-Alert-Backend" data-hud-path="/api/player-alert/status" aria-pressed="false" title="Player Alert · /api/player-alert/status"><span class="hud-led" aria-hidden="true"></span><span>WCH</span></button>
     <button class="hud-pill" type="button" data-hud-title="Recovery-Konfiguration" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Recovery-Konfiguration · /api/runtime-config/status"><span class="hud-led" aria-hidden="true"></span><span>RCN</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Metadaten-Monitor" data-hud-path="/api/nowplaying" aria-pressed="false" title="Metadaten-Monitor · /api/nowplaying"><span class="hud-led" aria-hidden="true"></span><span>MTR</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Meter · Metadaten / echte Audio-Pegel im Frequenzraum" data-hud-path="/api/nowplaying" aria-pressed="false" title="Metadaten-Monitor · /api/nowplaying"><span class="hud-led" aria-hidden="true"></span><span>MTR</span></button>
     <span class="hud-spacer" aria-hidden="true"></span>
-    <button class="hud-pill" type="button" data-hud-title="Discord" data-hud-path="/api/discord/status" aria-pressed="false" title="Discord · /api/discord/status"><span class="hud-led" aria-hidden="true"></span><span>DSC</span></button>
     <button class="hud-pill" type="button" data-hud-title="Admin-Bridge (öffentlicher Status)" data-hud-path="/api/skip/status" aria-pressed="false" title="Admin-Bridge (öffentlicher Status) · /api/skip/status"><span class="hud-led" aria-hidden="true"></span><span>ADM</span></button>
     <button class="hud-pill" type="button" data-hud-title="Runtime Governance" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Runtime Governance · /api/runtime-config/status"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
-    <button class="hud-pill" type="button" data-hud-title="VELUNA-Player" data-hud-path="/veluna/" aria-pressed="false" title="VELUNA-Player · /veluna/"><span class="hud-led" aria-hidden="true"></span><span>VELUNA</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Broadcast aktuell" data-hud-path="/api/player-alert/current" aria-pressed="false" title="Broadcast aktuell · /api/player-alert/current"><span class="hud-led" aria-hidden="true"></span><span>M</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Broadcast-Verlauf" data-hud-path="/api/player-alert/history" aria-pressed="false" title="Broadcast-Verlauf · /api/player-alert/history"><span class="hud-led" aria-hidden="true"></span><span>B</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Main Stream · Quellenkonfiguration (kein Umschalten)" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Main Stream · Konfiguration lesen, Umschalten über MiniPlayer"><span class="hud-led" aria-hidden="true"></span><span>M</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Backup Stream · Quellenkonfiguration (kein Umschalten)" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Backup Stream · Konfiguration lesen, Umschalten über MiniPlayer"><span class="hud-led" aria-hidden="true"></span><span>B</span></button>
   </nav>
 
   <main class="dash-grid">
@@ -184,7 +191,7 @@
         <div class="card-label">CYBER FREQUENCY HUD · LIVE STREAM</div>
         <h2 class="frequency-heading">Ein gemeinsamer <span>Frequenzraum.</span></h2>
         <p class="frequency-intro">Klang wird Licht. Der unveränderte MiniPlayer bietet seine vollständigen Audio-, EQ-, Boost-, Stream- und Radiofunktionen. Die äußeren HUD-Effekte reagieren ausschließlich auf echte Audiodaten.</p>
-        <div class="radio-embed"><iframe src="https://webradio.666soundsdesign-broadcaster.com/embed/miniplayer.html" title="666SOUNDsDESIGn WebRadio MiniPlayer" width="100%" height="390" loading="eager" allow="autoplay"></iframe></div>
+        <div class="radio-embed"><iframe id="dashboardMiniPlayer" src="https://webradio.666soundsdesign-broadcaster.com/embed/miniplayer.html" title="666SOUNDsDESIGn WebRadio MiniPlayer" width="100%" height="198" loading="eager" allow="autoplay"></iframe></div>
         <aside id="audio-neon-controls" class="audio-neon-controls" aria-labelledby="audio-neon-title">
           <h3 id="audio-neon-title">Klang wird Licht.</h3><button type="button" aria-pressed="false">Neon-Effekte einschalten</button>
           <p data-neon-status role="status">Effekte aus</p>
@@ -448,6 +455,42 @@
   setInterval(pollMeta,      10000);
   setInterval(pollBroadcast, 15000);
 
+  })();
+  </script>
+  <script id="dash-miniplayer-autofit-v3">
+  (() => {
+    'use strict';
+    const frame=document.getElementById('dashboardMiniPlayer');
+    if(!frame)return;
+    let observer=null,disposed=false;
+    function fit(){
+      try{
+        const doc=frame.contentDocument;
+        if(!doc||disposed)return;
+        const body=doc.body;
+        // Same-origin only; reads original MiniPlayer document, does not modify its functions.
+        const height=Math.max(170,Math.min(1200,Math.ceil(Math.max(body.scrollHeight,doc.documentElement.scrollHeight)+4)));
+        if(Math.abs(frame.getBoundingClientRect().height-height)>2)frame.style.height=height+'px';
+      }catch(_){
+        // On a cross-origin deployment preserve conservative fallback and all MiniPlayer controls.
+        frame.style.height=matchMedia('(max-width:600px)').matches?'245px':'198px';
+      }
+    }
+    function bind(){
+      observer?.disconnect();
+      try{
+        const doc=frame.contentDocument;
+        if(!doc||!doc.body)return fit();
+        observer=new ResizeObserver(fit);
+        observer.observe(doc.body);
+        doc.addEventListener('click',()=>requestAnimationFrame(fit),{passive:true});
+        fit();
+      }catch(_){fit()}
+    }
+    frame.addEventListener('load',bind);
+    if(frame.contentDocument?.readyState==='complete')bind();
+    window.addEventListener('resize',fit,{passive:true});
+    window.addEventListener('pagehide',()=>{disposed=true;observer?.disconnect()},{once:true});
   })();
   </script>
   <script id="dashboard-hud-endpoint-runtime">
