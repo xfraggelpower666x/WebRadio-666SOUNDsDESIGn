@@ -1134,6 +1134,20 @@ const url=new URL(request.url);
     if(isTwitchPlayerPath(url.pathname)) return await serveTwitchPlayer(request, env);
     if(normalizedRoutePath(url.pathname) === '/twitch/stream') return await proxyTwitchStream(request, env);
     if (url.pathname === "/health") return s666LiveHealth(request, env);
+    // 666STREAM: ausschliesslich lesbare, echte Shoutcast-Statistik; Stream- und Metadata-Routen bleiben unberuehrt.
+    if(url.pathname==="/api/shoutcast/stats" && (request.method==="GET" || request.method==="HEAD")){
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),4500);
+      try{
+        const upstream=await fetch("https://my.idjstream.com:8686/stats?sid=1&json=1",{signal:controller.signal,headers:{"accept":"application/json"},cf:{cacheTtl:0}});
+        if(!upstream.ok)throw new Error("shoutcast_http_"+upstream.status);
+        const json=await upstream.json();
+        const take=key=>{const value=Number(json[key]);return Number.isSafeInteger(value)&&value>=0?value:null;};
+        return s666Json({ok:true,source:"shoutcast-dnas-v2",timestamp:new Date().toISOString(),currentlisteners:take("currentlisteners"),peaklisteners:take("peaklisteners"),uniquelisteners:take("uniquelisteners"),maxlisteners:take("maxlisteners"),streamstatus:take("streamstatus")});
+      }catch(error){
+        return s666Json({ok:false,error:"shoutcast_stats_unavailable"},502);
+      }finally{clearTimeout(timeout)}
+    }
     if (url.pathname === "/api/runtime-config/status" && (request.method === "GET" || request.method === "HEAD")) {
       const runtime = await loadRadioRuntimeConfig(request, env, true);
       return s666Json({
