@@ -241,8 +241,8 @@
           <span class="status-val" id="stUpdated">–</span>
         </div>
         <div class="status-item">
-          <span class="status-key">Tracks heute</span>
-          <span class="status-val cyan" id="stTrackCount">0</span>
+          <span class="status-key" title="Anzahl der vom Upstream gelieferten gespielten Titel. Keine verifizierte Tageszählung.">Tracks im Verlauf</span>
+          <span class="status-val cyan" id="stTrackCount">–</span>
         </div>
       </section>
 
@@ -277,7 +277,7 @@
   /* ── State ── */
   var localHistory = [];
   var lastTitle    = '';
-  var trackCount   = 0;
+  // Keine scheinpräzise lokale Tageszählung aus Browser-Polls.
 
   /* ── Clock ── */
   function updateClock(){
@@ -323,10 +323,10 @@
 
   function addLocalHistory(title){
     if(!title||title===lastTitle)return;
-    lastTitle=title; trackCount++;
+    lastTitle=title;
     localHistory.unshift({title:title,time:new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});
     if(localHistory.length>20)localHistory.pop();
-    el('stTrackCount').textContent=trackCount;
+    /* Der tatsächliche Verlauf wird bei jedem Metadatenabruf neu ausgewertet. */
   }
 
   function dashCleanText(value){return String(value??'').replace(/<[^>]*>/g,' ').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim();}
@@ -374,7 +374,7 @@
     var title    = servedTitle ? dashCleanTitle(servedTitle) : dashNormalizeTitle(rawTitle,rawArtist);
     var art      = d.art_full || d.art          || d.artwork      || d.cover             || d.icon || d.logo || '';
     var listeners= d.listeners|| d.currentlisteners || d.listener_count || '';
-    var uniq     = d.uniq     || d.unique_listeners || '';
+    var uniq     = d.ulistener ?? d.uniq ?? d.unique_listeners ?? d.uniqueListeners ?? d.unique ?? '';
     var bitrate  = d.bitrate  || d.kbps         || '';
     var dj       = dashFirstText(d.dj_display,d.dj,d.djusername,d.streamer,d.presenter,d.live_dj,d.dj_status,d.client,d.live&&d.live.streamer_name,d.live&&d.live.streamer,d.live&&d.live.name);
     var djpic    = d.dj_profile || d.dj_image   || '';
@@ -400,7 +400,7 @@
     // ── Status card ──
     el('stStream').innerHTML='<span class="led on"></span>ONLINE';
     el('stListeners').textContent=listeners||'–';
-    el('stUniq').textContent=uniq||'–';
+    el('stUniq').textContent=uniq!==''?uniq:'–';
     el('stBitrate').textContent=bitrate?bitrate+' kbps':'–';
     el('stDj').textContent=dj;
     el('stUpdated').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -411,8 +411,12 @@
 
     // ── History ──
     if(Array.isArray(history) && history.length){
+      el('stTrackCount').textContent=String(history.length);
+      el('stTrackCount').title='Echte Einträge im Upstream-Verlauf; nicht notwendigerweise alle Titel von heute.';
       renderHistory(history);
     } else {
+      el('stTrackCount').textContent='–';
+      el('stTrackCount').title='Upstream liefert keine vollständig auswertbare Verlaufsliste.';
       addLocalHistory(title);
       renderHistory(null);
     }
