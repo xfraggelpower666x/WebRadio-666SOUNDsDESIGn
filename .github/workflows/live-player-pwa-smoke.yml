@@ -171,7 +171,7 @@ jobs:
           grep -Fq "MAIN_PHASE2_FADE_MS=5400" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_PHASE2_HOLD_MS=2000" "$workdir/central-boot-screen.js"
           grep -Fq "usesOriginalTwoPhase()" "$workdir/central-boot-screen.js"
-          grep -Fq "root.dataset.cyberStage=\x27online\x27" "$workdir/central-boot-screen.js"
+          grep -Fq "root.dataset.cyberStage='online'" "$workdir/central-boot-screen.js"
           grep -Fq "fullCycleComplete" "$workdir/central-boot-screen.js"
           grep -Fq "earlyCompleteBlocked" "$workdir/central-boot-screen.js"
           grep -Fq "playerId:'hub'" "$workdir/central-boot-screen.js"
