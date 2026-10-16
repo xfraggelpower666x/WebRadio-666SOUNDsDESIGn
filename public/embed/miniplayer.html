@@ -107,9 +107,15 @@ async function metadata(){
       data.song?.title,data.nowplaying?.title);
     const djName=metadataText(data.dj_display,typeof data.dj==='string'?data.dj:'',
       data.dj?.name,data.dj_name,data.current_dj,data.streamer?.name);
-    const count=metadataCount(data.listeners?.current??data.currentlisteners??
+    const count=metadataCount(data.listeners?.current??data.listeners?.count??
+      data.listeners?.listeners??data.currentlisteners??data.currentListeners??
       data.listeners_current??data.listener_count??
-      (typeof data.listeners==='number'?data.listeners:null));
+      (typeof data.listeners==='number'||typeof data.listeners==='string'?data.listeners:null));
+    const capacityRaw=data.maxlisteners??data.maxListeners??
+      data.listener_capacity??data.listenerCapacity;
+    const capacityNumber=Number(capacityRaw);
+    const capacity=capacityRaw!==null&&capacityRaw!==undefined&&capacityRaw!==''&&
+      Number.isFinite(capacityNumber)&&capacityNumber>0?Math.round(capacityNumber):null;
     const rawBitrate=data.bitrate??data.stream?.bitrate??data.quality?.bitrate;
     const bitrate=Number(rawBitrate);
     const art=metadataText(data.now_playing?.song?.art,data.nowplaying?.song?.art,data.cover,data.artwork);
@@ -118,7 +124,8 @@ async function metadata(){
     const text=title?title.slice(0,180):'Titel nicht verfügbar';
     if(track.textContent!==text){track.textContent=text;track.classList.toggle('scroll',text.length>38)}
     dj.textContent='DJ: '+(djName?djName.slice(0,45):'—');
-    listeners.textContent='Listener: '+(count===null?'—':String(count));
+    listeners.textContent='Listener: '+(count===null?'—':String(count))+
+      ' / '+(capacity===null?'—':String(capacity));
     quality.textContent='Qualität: '+(Number.isFinite(bitrate)&&bitrate>0?Math.round(bitrate)+' kbps':'—');
     // Metadata artwork is authoritative; only a genuinely invalid image uses the preexisting fallback.
     if(art){try{const url=new URL(art,'https://webradio.666soundsdesign-broadcaster.com/');
