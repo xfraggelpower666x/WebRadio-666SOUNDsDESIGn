@@ -86,8 +86,12 @@
   .led.off{background:#333;}
 
   /* ── HISTORY ── */
-  .history-list{list-style:none;}
-  .history-item{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid rgba(22,255,243,.06);}
+  .history-list{list-style:none;max-height:calc(5 * 28px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--cyan) rgba(22,255,243,.09);overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;}
+  .history-list::-webkit-scrollbar{width:8px;}
+  .history-list::-webkit-scrollbar-track{background:rgba(22,255,243,.06);border-radius:8px;}
+  .history-list::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--cyan),var(--pink));border-radius:8px;border:1px solid #08101c;}
+  .history-list:focus-visible{outline:2px solid var(--pink);outline-offset:3px;}
+  .history-item{display:flex;align-items:center;gap:8px;min-height:28px;height:28px;padding:4px 0;border-bottom:1px solid rgba(22,255,243,.06);}
   .history-item:last-child{border-bottom:none;}
   .history-num{font-size:10px;color:rgba(22,255,243,.28);width:20px;flex-shrink:0;text-align:right;}
   .history-title{flex:1;font-size:12px;color:#c0dede;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -203,7 +207,7 @@
       <!-- RECENTLY PLAYED -->
       <section class="card">
         <div class="card-label">Recently Played (letzte 20 Tracks)</div>
-        <ul class="history-list" id="historyList">
+        <ul class="history-list" id="historyList" tabindex="0" aria-label="Die letzten 20 gespielten Titel, fünf gleichzeitig sichtbar, weitere Einträge scrollbar">
           <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
         </ul>
       </section>
@@ -313,12 +317,14 @@
       list.innerHTML='<li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Noch keine Tracks gespielt.</span></li>';
       return;
     }
+    var previousScroll=list.scrollTop;
     list.innerHTML=items.slice(0,20).map(function(item,i){
       return '<li class="history-item'+(i===0?' fresh':'')+'">'+
         '<span class="history-num">'+item.num+'</span>'+
         '<span class="history-title">'+esc(item.title)+'</span>'+
       '</li>';
     }).join('');
+    list.scrollTop=previousScroll;
   }
 
   function addLocalHistory(title){
