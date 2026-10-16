@@ -151,6 +151,53 @@
   #radio .audio-neon-controls button{white-space:normal}
   @media(max-width:600px){#radio .radio-embed iframe{height:245px;min-height:0!important}}
   </style>
+
+  <style id="dashboard-one-screen-layout-v1">
+  /* PC command surface: no outer scrolling on typical laptop screens; only song list scrolls. */
+  @media (min-width: 861px) {
+    :root{--dash-gap:10px}
+    body{min-height:100dvh}
+    .dash-header{position:relative;padding:10px 18px 9px;min-height:62px}
+    .dash-logo{font-size:12px}
+    .dash-clock{font-size:clamp(19px,2.2vw,25px)}
+    .hud-status-bar{padding:8px 14px;gap:6px}
+    .hud-pill{min-height:28px;padding:5px 9px}
+    .dash-grid{grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:var(--dash-gap);padding:6px 14px 8px;max-width:1600px;align-items:start}
+    .dash-grid>div{gap:var(--dash-gap)!important;min-width:0}
+    .card{padding:11px 14px;border-radius:13px}
+    .card-label{margin-bottom:7px}
+    #radio .frequency-heading{font-size:clamp(18px,2vw,24px);margin-bottom:4px}
+    #radio .frequency-intro{font-size:11px;margin-bottom:8px;line-height:1.4}
+    #radio .radio-embed{max-width:680px}
+    #radio .audio-neon-controls{padding:10px 12px;margin:8px auto 0;border-radius:12px}
+    #radio .audio-neon-controls h3{font-size:15px;margin:0 0 5px}
+    #radio .audio-neon-controls button{min-height:30px;padding:5px 11px;font-size:11px}
+    #radio .audio-neon-controls p{margin:5px 0;font-size:10px;line-height:1.35}
+    #radio .neon-band-meter{padding:6px 8px;gap:8px}
+    #radio .neon-band-meter i{height:13px;margin-top:3px}
+    .status-item{padding:6px 0;font-size:11px;min-height:29px}
+    .history-item{height:27px;min-height:27px}
+    .history-list{max-height:calc(5 * 27px)}
+    .history-title{font-size:11px}
+    .broadcast-msg{font-size:12px;min-height:30px;line-height:1.4}
+    .dash-footer{padding:7px 10px;font-size:9px}
+  }
+  @media (min-width:861px) and (max-height:730px) {
+    .dash-header{min-height:52px;padding:6px 14px}
+    .hud-status-bar{padding-block:4px}
+    .hud-pill{min-height:26px}
+    .dash-grid{padding-block:4px}
+    #radio .frequency-intro{margin-bottom:5px}
+    #radio .audio-neon-controls p[data-neon-note]{display:none}
+    .status-item{padding:4px 0;min-height:25px}
+    .history-item{height:25px;min-height:25px}
+    .history-list{max-height:125px}
+  }
+  @media(max-width:860px) {
+    .dash-grid{grid-template-columns:1fr}
+    .dash-grid>div{min-width:0}
+  }
+  </style>
   <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
   <body>
@@ -204,13 +251,6 @@
         </aside>
       </section>
 
-      <!-- RECENTLY PLAYED -->
-      <section class="card">
-        <div class="card-label">Recently Played (letzte 20 Tracks)</div>
-        <ul class="history-list" id="historyList" tabindex="0" aria-label="Die letzten 20 gespielten Titel, fünf gleichzeitig sichtbar, weitere Einträge scrollbar">
-          <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
-        </ul>
-      </section>
 
     </div>
 
@@ -249,6 +289,15 @@
           <span class="status-val cyan" id="stTrackCount">–</span>
         </div>
       </section>
+
+      <!-- RECENTLY PLAYED -->
+      <section class="card">
+        <div class="card-label">Recently Played (letzte 20 Tracks)</div>
+        <ul class="history-list" id="historyList" tabindex="0" aria-label="Die letzten 20 gespielten Titel, fünf gleichzeitig sichtbar, weitere Einträge scrollbar">
+          <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
+        </ul>
+      </section>
+
 
       <!-- BROADCAST -->
       <section class="card">
