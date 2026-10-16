@@ -211,6 +211,15 @@
   @media(min-width:861px){.radio-brand-logo{width:clamp(80px,8.5vw,116px)}.dash-history-wide .card{padding:10px 14px}}
   @media(max-width:600px){.radio-brand-logo{width:74px;max-height:90px}.radio-head-brand{gap:9px}.radio-head-subtitle{font-size:8px}}
   </style>
+  <link rel="stylesheet" href="/css/player-admin-overlay.css?v=666stream-hud-real-v4">
+  <style id="dash-true-status-v4">
+  .hud-pill[data-health="pending"] .hud-led{background:#ffbd3b;box-shadow:0 0 8px #ffbd3b}
+  .hud-pill[data-health="error"] .hud-led{background:#ff3b64;box-shadow:0 0 9px #ff3b64}
+  .hud-pill[data-health="off"] .hud-led{background:#43545d;box-shadow:none}
+  .hud-pill[data-health="ok"] .hud-led{background:#0fffe9;box-shadow:0 0 9px #0fffe9}
+  #goveeHudModal .hud-dialog{gap:15px}
+  #goveeResponse{white-space:pre-wrap;word-break:break-word;color:#bffaff;font-size:12px}
+  </style>
   <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
   <body>
@@ -239,10 +248,10 @@
     <button class="hud-pill" type="button" data-hud-title="Recovery-Konfiguration" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Recovery-Konfiguration · /api/runtime-config/status"><span class="hud-led" aria-hidden="true"></span><span>RCN</span></button>
     <button class="hud-pill" type="button" data-hud-title="Meter · Metadaten / echte Audio-Pegel im Frequenzraum" data-hud-path="/api/nowplaying" aria-pressed="false" title="Metadaten-Monitor · /api/nowplaying"><span class="hud-led" aria-hidden="true"></span><span>MTR</span></button>
     <span class="hud-spacer" aria-hidden="true"></span>
-    <button class="hud-pill" type="button" data-hud-title="Admin-Bridge (öffentlicher Status)" data-hud-path="/api/skip/status" aria-pressed="false" title="Admin-Bridge (öffentlicher Status) · /api/skip/status"><span class="hud-led" aria-hidden="true"></span><span>ADM</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Runtime Governance" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Runtime Governance · /api/runtime-config/status"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Main Stream · Quellenkonfiguration (kein Umschalten)" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Main Stream · Konfiguration lesen, Umschalten über MiniPlayer"><span class="hud-led" aria-hidden="true"></span><span>M</span></button>
-    <button class="hud-pill" type="button" data-hud-title="Backup Stream · Quellenkonfiguration (kein Umschalten)" data-hud-path="/api/runtime-config/status" aria-pressed="false" title="Backup Stream · Konfiguration lesen, Umschalten über MiniPlayer"><span class="hud-led" aria-hidden="true"></span><span>B</span></button>
+    <button id="statusAdmin" class="hud-pill" type="button" data-hud-title="Geschütztes Admin-Panel" data-hud-action="admin" aria-pressed="false" title="Geschütztes Radio-Admin-Menü öffnen"><span class="hud-led" aria-hidden="true"></span><span>ADM</span></button>
+    <button class="hud-pill" type="button" data-hud-title="GOVEE lokale Bridge" data-hud-action="govee" aria-pressed="false" title="Lokale Govee-Bridge steuern"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Hauptstream" data-hud-action="main" aria-pressed="false" title="Im MiniPlayer auf Hauptstream umschalten"><span class="hud-led" aria-hidden="true"></span><span>M</span></button>
+    <button class="hud-pill" type="button" data-hud-title="Backupstream" data-hud-action="backup" aria-pressed="false" title="Im MiniPlayer auf Backupstream umschalten"><span class="hud-led" aria-hidden="true"></span><span>B</span></button>
   </nav>
 
   <main class="dash-grid">
@@ -339,6 +348,7 @@
       <div class="hud-modal-actions"><button type="button" class="hud-render-toggle" id="hudRender" hidden>HTML-Vorschau anzeigen</button><button type="button" class="hud-render-toggle" id="hudCopy">📋 Antwort kopieren</button><span id="hudCopyStatus" role="status" aria-live="polite"></span></div>
     </section>
   </div>
+  <div id="goveeHudModal" class="hud-modal" hidden role="presentation"><section class="hud-dialog" role="dialog" aria-modal="true" aria-labelledby="goveeHudTitle"><div class="hud-dialog-header"><h2 id="goveeHudTitle">GOVEE · Lokale Licht-Bridge</h2><button id="goveeClose" type="button" aria-label="Schließen">✕</button></div><p>Steuerung der lokalen GOVEE-Bridge auf diesem Gerät. LEDs leuchten erst nach einer echten Bridge-Bestätigung.</p><div class="hud-modal-actions"><button type="button" class="hud-render-toggle" data-govee-command="enable">SYNC EIN</button><button type="button" class="hud-render-toggle" data-govee-command="disable">SYNC AUS</button><button type="button" class="hud-render-toggle" data-govee-command="teston">TEST EIN</button><button type="button" class="hud-render-toggle" data-govee-command="testoff">TEST AUS</button></div><pre id="goveeResponse" role="status">Bridge noch nicht geprüft.</pre></section></div>
   <footer class="dash-footer">
     <span id="pollDot"></span>
     LIVE · nowplaying alle 10s · broadcast alle 15s &nbsp;|&nbsp; 666SOUNDsDESIGn WebRadio
@@ -579,64 +589,75 @@
     window.addEventListener('pagehide',()=>{disposed=true;observer?.disconnect()},{once:true});
   })();
   </script>
-  <script id="dash-hud-live-status-v3">
+
+
+  <script src="/js/admin-auth-client.js?v=dash-real-v4"></script>
+  <script src="/js/player-admin-overlay.js?v=dash-real-v4"></script>
+  <script id="dash-real-status-v4">
   (() => {
     'use strict';
-    // Nur Werte anzeigen, deren Bedeutung mit dem jeweiligen Endpoint belegbar ist.
-    const buttons=[...document.querySelectorAll('.hud-pill')];
-    const byCode=new Map(buttons.map(b=>[b.querySelector('span:last-child')?.textContent?.trim(),b]));
-    const status=(code,value,why)=>{
-      const el=byCode.get(code);if(!el)return;
-      el.dataset.health=value;
-      el.setAttribute('aria-label',code+': '+why+'; '+el.dataset.hudTitle);
-      el.title=why+' · Anklicken für Endpoint-Antwort';
-    };
-    async function get(path){
-      const controller=new AbortController(),id=setTimeout(()=>controller.abort(),4500);
-      try{const r=await fetch(path,{cache:'no-store',credentials:'omit',signal:controller.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(id)}
+    const frame=document.getElementById('dashboardMiniPlayer');
+    const buttons=[...document.querySelectorAll('button.hud-pill')];
+    const code=label=>buttons.find(b=>b.lastElementChild?.textContent?.trim()===label);
+    const mark=(label,kind,info)=>{const b=code(label);if(b){b.dataset.health=kind;b.title=info;}};
+    function player(){try{return frame?.contentWindow?.S666EmbedControl||null}catch(_){return null}}
+    function clientState(){
+      const state=player()?.getState?.();
+      if(!state){['AUD','SB','RCN','WCH','MTR','M','B'].forEach(k=>mark(k,'off','MiniPlayer nicht bereit'));return;}
+      mark('AUD',state.playing?'ok':state.error?'error':'off',state.playing?'Audio spielt':state.error?'Audiofehler':'Audio pausiert');
+      mark('SB',state.waiting?'pending':state.playing?'ok':'off',state.waiting?'Stream puffert':state.playing?'Wiedergabe ohne Pufferereignis':'Kein aktiver Stream');
+      mark('RCN',state.recovering?'pending':state.error?'error':'off',state.recovering?'Aktive Wiederverbindung':state.error?'Streamfehler':'Keine Recovery aktiv');
+      mark('WCH',state.recovering?'pending':state.error?'error':'off',state.recovering?'Recovery-Überwachung aktiv':state.error?'Fehler erkannt':'Keine separate Watchdog-Telemetrie');
+      mark('MTR',state.meterAvailable?'ok':'off',state.meterAvailable?'Echte FFT-Audioanalyse läuft':'Keine bestätigten aktuellen Audiopegel');
+      mark('M',state.source==='main'?'ok':'off','Hauptstream '+(state.source==='main'?'ausgewählt':'nicht ausgewählt'));
+      mark('B',state.source==='backup'?'ok':'off','Backupstream '+(state.source==='backup'?'ausgewählt':'nicht ausgewählt'));
     }
-    async function update(){
-      if(document.hidden)return;
-      const results=await Promise.allSettled([get('/health'),get('/api/nowplaying'),get('/api/runtime-config/status'),get('/api/player-alert/status'),get('/api/skip/status')]);
-      const item=i=>results[i].status==='fulfilled'?results[i].value:null;
-      const health=item(0),meta=item(1),config=item(2),alerts=item(3),skip=item(4);
-      status('STR',health?.ok===true?'ok':'warn',health?'Server online':'Serverstatus nicht erreichbar');
-      status('WRK',health?.ok===true?'ok':'warn',health?'Worker-Health erreichbar':'Worker-Health nicht erreichbar');
-      status('MET',meta&&typeof meta==='object'?'ok':'warn',meta?'Metadaten erreichbar':'Metadaten nicht erreichbar');
-      status('SRC',config?.ok===true?'ok':'warn',config?'Quellenkonfiguration geladen':'Quellenkonfiguration nicht erreichbar');
-      status('AUD',config?.ok===true?'ok':'warn',config?'Quellenkonfiguration verfügbar; Audio läuft nur im MiniPlayer':'Audio-Konfiguration nicht erreichbar');
-      status('WCH',alerts?.ok===true?'ok':'warn',alerts?'Player-Alert-Backend erreichbar':'Player-Alert-Backend nicht erreichbar');
-      status('RCN',config?.ok===true?'ok':'warn',config?'Recovery-Konfiguration abrufbar':'Recovery-Konfiguration nicht erreichbar');
-      status('MTR',meta?'ok':'warn',meta?'Metadaten verfügbar; echte Pegel nur beim Abspielen':'Metadaten nicht erreichbar');
-      status('SB',health?.ok===true?'ok':'warn',health?'Streamserver erreichbar; Pufferzustand nur im MiniPlayer':'Streamserver nicht erreichbar');
-      status('ADM',skip?.ok===true?'ok':'warn',skip?'Öffentlicher Admin-Bridge-Status verfügbar; kein Login':'Öffentlicher Admin-Bridge-Status nicht erreichbar');
-      status('GOV',config?.ok===true?'ok':'warn',config?'Runtime-Konfiguration verfügbar; kein Govee-Gerätestatus':'Runtime-Konfiguration nicht erreichbar');
-      status('M',config?.ok===true?'ok':'warn',config?'Main-Quelle konfiguriert; Streamwechsel nur im MiniPlayer':'Main-Konfiguration nicht erreichbar');
-      status('B',config?.ok===true?'ok':'warn',config?'Backup-Quelle konfiguriert; Streamwechsel nur im MiniPlayer':'Backup-Konfiguration nicht erreichbar');
+    for(const target of ['main','backup']){
+      document.querySelector('[data-hud-action="'+target+'"]')?.addEventListener('click',async()=>{
+        const p=player();if(!p){mark(target==='main'?'M':'B','error','MiniPlayer nicht bereit');return;}
+        const key=target==='main'?'M':'B';mark(key,'pending','Wechsle Streamquelle');
+        try{await p.switchStream(target);}catch(e){mark(key,'error',String(e?.message||e));}
+        clientState();
+      });
     }
-    update();setInterval(update,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
-  })();
-  </script>
-  <script id="dashboard-shoutcast-peak-v1">
-  (() => {
-    'use strict';
-    const peak=document.getElementById('stPeak'),limit=document.getElementById('stLimit');
-    if(!peak||!limit)return;
-    async function update(){
-      const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),5500);
+    mark('ADM','off','Geschützter Admin-Zugang, kein Loginstatus bestätigt');
+    mark('GOV','off','Govee-Bridge noch nicht bestätigt');
+    const gov=document.querySelector('[data-hud-action="govee"'),modal=document.getElementById('goveeHudModal'),response=document.getElementById('goveeResponse');
+    gov?.addEventListener('click',()=>{modal.hidden=false;document.getElementById('goveeClose').focus()});
+    const close=()=>{modal.hidden=true;gov?.focus()};
+    document.getElementById('goveeClose')?.addEventListener('click',close);
+    modal?.addEventListener('click',e=>{if(e.target===modal)close()});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close()});
+    modal?.querySelectorAll('[data-govee-command]').forEach(button=>button.addEventListener('click',async()=>{
+      const command=button.dataset.goveeCommand;button.disabled=true;mark('GOV','pending','Lokale Bridge wird kontaktiert');response.textContent='Verbinde lokale GOVEE-Bridge …';
       try{
-        const r=await fetch('/api/shoutcast/stats',{cache:'no-store',signal:ctrl.signal});
-        if(!r.ok)throw Error('HTTP '+r.status);
-        const data=await r.json();
-        const valid=n=>Number.isSafeInteger(n)&&n>=0;
-        peak.textContent=valid(data.peaklisteners)?String(data.peaklisteners):'–';
-        limit.textContent=valid(data.maxlisteners)?String(data.maxlisteners):'–';
-        peak.title='Originalwert vom Shoutcast DNAS, Zeitpunkt '+(data.timestamp||'unbekannt');
-      }catch(_){peak.textContent='–';limit.textContent='–';peak.title='Shoutcast Statistik derzeit nicht erreichbar'}
-      finally{clearTimeout(timeout)}
+        const g=await import('/js/system-extra/govee/govee-bridge-client.js');
+        const result=command==='enable'?await g.goveeSetEnabled(true):command==='disable'?await g.goveeSetEnabled(false):command==='teston'?await g.goveeTestOn():await g.goveeTestOff();
+        if(result?.ok===false)throw Error(result.error||'Bridge meldet Fehler');
+        mark('GOV',command==='enable'||command==='teston'?'ok':'off','GOVEE Bridge: '+command+' bestätigt');
+        response.textContent='Bridge bestätigt: '+JSON.stringify(result||{},null,2);
+      }catch(e){mark('GOV','error','Govee-Bridge nicht erreichbar');response.textContent='Nicht bestätigt: '+String(e?.message||e)}
+      finally{button.disabled=false}
+    }));
+    async function fetchData(url){
+      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
+      try{const r=await fetch(url,{cache:'no-store',signal:controller.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}
+      catch(_){return null}finally{clearTimeout(timer)}
     }
-    update();setInterval(()=>{if(!document.hidden)update()},30000);
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+    async function server(){
+      const [health,meta,config,stats]=await Promise.all([fetchData('/health'),fetchData('/api/nowplaying'),fetchData('/api/runtime-config/status'),fetchData('/api/shoutcast/stats')]);
+      mark('STR',health?.ok===true?'ok':'error',health?.ok?'Radio Worker erreichbar':'Worker nicht erreichbar');
+      mark('WRK',health?.ok===true?'ok':'error',health?.ok?'Worker-Health bestätigt':'Worker-Health fehlt');
+      mark('MET',meta?.title?'ok':'error',meta?.title?'Metadaten empfangen':'Keine Titeldaten bestätigt');
+      mark('SRC',config?.ok===true?'ok':'error',config?.ok?'Streamkonfiguration verfügbar':'Quellenstatus unbekannt');
+      const valid=n=>Number.isSafeInteger(n)&&n>=0;
+      document.getElementById('stPeak').textContent=stats?.ok===true&&valid(stats.peaklisteners)?String(stats.peaklisteners):'–';
+      document.getElementById('stLimit').textContent=stats?.ok===true&&valid(stats.maxlisteners)?String(stats.maxlisteners):'–';
+    }
+    frame?.addEventListener('load',clientState);
+    clientState();server();
+    setInterval(clientState,750);setInterval(()=>{if(!document.hidden)server()},20000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden){server();clientState();}});
   })();
   </script>
   <script id="dashboard-hud-endpoint-runtime">
