@@ -112,13 +112,13 @@ ZWECK:
         observer = new MutationObserver(() => global.setTimeout(inspectBootLifecycle, 0));
         observer.observe(document.documentElement, { childList: true, subtree: true });
       } catch (_) {}
-      failSafeTimer = global.setTimeout(() => releasePreflight('failsafe-release'), 9000);
+      failSafeTimer = global.setTimeout(() => releasePreflight('failsafe-release'), 24000);
 
       const cssBase = '/css/central-boot-screen.css';
       if (!Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(link => String(link.getAttribute('href') || '').includes(cssBase))) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = cssBase + '?v=20260913-main-cyber-hud-v1';
+        link.href = cssBase + '?v=20261016-two-phase-r01';
         link.dataset.s666MainEarlyBoot = 'css';
         head.appendChild(link);
       }
@@ -154,7 +154,7 @@ ZWECK:
           return;
         }
         const script = document.createElement('script');
-        script.src = jsBase + '?v=20260913-main-cyber-hud-v1';
+        script.src = jsBase + '?v=20261016-two-phase-r01';
         script.async = false;
         script.defer = false;
         script.dataset.s666MainEarlyBoot = 'js';
