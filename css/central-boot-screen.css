@@ -44,3 +44,23 @@ html[data-s666-player-page="main"] #s666CentralBoot::after{background:linear-gra
 @media (max-width:760px){html[data-s666-player-page="main"] #s666CentralBoot{place-items:stretch}.s666boot-main-reactor{top:37%;width:min(88vw,430px)}.s666boot-main-logo-wrap{top:37%;width:min(76vw,390px)}.s666boot-main-circuit{top:38%;width:70%;height:52px}.s666boot-main-circuit-left{left:-18%}.s666boot-main-circuit-right{right:-18%}.s666boot-main-system{top:5%;font-size:.62rem}.s666boot-main-title{top:9%;font-size:clamp(.78rem,4vw,1.2rem)!important;letter-spacing:.19em!important}.s666boot-main-label{top:67%;left:50%!important;right:auto!important;transform:translate(-50%,-50%);font-size:clamp(.9rem,5vw,1.5rem)}.s666boot-main-label-right{top:72%;font-size:clamp(.7rem,3.8vw,1.15rem)}.s666boot-main-progress-dock{bottom:max(2.5vh,env(safe-area-inset-bottom));width:min(94vw,760px);padding:.55rem .7rem .45rem}.s666boot-main-progress-dock .s666boot-steps{display:none}.s666boot-main-progress-dock .s666boot-status{font-size:.55rem;letter-spacing:.14em}.s666boot-main-progress-dock .s666boot-phase-label{font-size:.5rem;letter-spacing:.12em}.s666boot-main-progress-dock .s666boot-progress-wrap{grid-template-columns:1fr 3.8rem}.s666boot-main-progress-dock .s666boot-percent{font-size:1rem}}
 @media (max-height:620px){html[data-s666-player-page="main"] .s666boot-main-logo-wrap{width:min(30vw,330px);top:36%}html[data-s666-player-page="main"] .s666boot-main-reactor{width:min(36vw,400px);top:36%}html[data-s666-player-page="main"] .s666boot-main-label{top:39%}html[data-s666-player-page="main"] .s666boot-main-progress-dock{bottom:1.5vh}}
 @media (prefers-reduced-motion:reduce){.s666boot-main-reactor,.s666boot-main-reactor::after,.s666boot-main-circuit,.s666boot-main-logo-wrap,.s666boot-main-eye,.s666boot-main-scanline,.s666boot-main-system{animation:none!important}}
+
+/* Main desktop and iPhone two-phase v1.10 choreography. VELUNA/internal unaffected. */
+#s666CentralBoot[data-cyber-stage="ready-progress"] .s666boot-main-system{opacity:0;animation:none!important}
+#s666CentralBoot[data-cyber-stage="online"] .s666boot-main-system,
+#s666CentralBoot[data-cyber-stage="terminal"] .s666boot-main-system{
+  top:65%;width:min(90vw,760px);text-align:center;z-index:10;
+  font-size:clamp(1.05rem,3vw,2rem);
+  animation:s666CyberOnlineTriple 1.8s ease-in-out 3,
+    s666CyberOnlineFinal .01s linear 5.4s forwards!important;
+}
+#s666CentralBoot[data-cyber-stage="online"] .s666boot-main-logo-wrap,
+#s666CentralBoot[data-cyber-stage="terminal"] .s666boot-main-logo-wrap{animation:none!important;filter:none}
+#s666CentralBoot[data-cyber-stage="online"] .s666boot-main-progress-dock,
+#s666CentralBoot[data-cyber-stage="terminal"] .s666boot-main-progress-dock{opacity:0;pointer-events:none}
+@keyframes s666CyberOnlineTriple{0%,100%{opacity:0}26%,72%{opacity:1}}
+@keyframes s666CyberOnlineFinal{to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  #s666CentralBoot[data-cyber-stage="online"] .s666boot-main-system,
+  #s666CentralBoot[data-cyber-stage="terminal"] .s666boot-main-system{animation:none!important;opacity:1}
+}
