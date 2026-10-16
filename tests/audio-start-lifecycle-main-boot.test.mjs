@@ -44,8 +44,8 @@ test('main cyberboot never exposes a partial player while the boot owner is pend
 test('main cyberboot waits for document.body before starting the central boot owner',()=>{
   assert.match(root,/const startBootOwner = \(\) => \{/);
   assert.match(root,/if \(document\.readyState === 'loading' \|\| !document\.body\) \{[\s\S]*DOMContentLoaded', startBootOwner/);
-  assert.match(root,/script\.src = jsBase \+ '\?v=20260913-main-cyber-hud-v1'/);
-  assert.match(root,/link\.href = cssBase \+ '\?v=20260913-main-cyber-hud-v1'/);
+  assert.match(root,/script\.src = jsBase \+ '\?v=20261016-two-phase-r01'/);
+  assert.match(root,/link\.href = cssBase \+ '\?v=20261016-two-phase-r01'/);
 });
 
 test('main cyberboot records the visible Cyber HUD handoff so a mounted-but-hidden regression is detectable',()=>{
@@ -60,6 +60,6 @@ test('main cyberboot fails open quickly if the central boot never mounts',()=>{
   assert.match(root,/\}, 1500\)/);
   assert.match(root,/if \(boot\) \{[\s\S]*bootSeen = true;[\s\S]*clearTimeout\(bootMountTimer\)/);
   assert.match(root,/if \(bootSeen\) releasePreflight\('boot-handoff-complete'\)/);
-  assert.match(root,/releasePreflight\('failsafe-release'\), 9000/);
+  assert.match(root,/releasePreflight\('failsafe-release'\), 24000/);
   assert.match(root,/releasePreflight\('boot-script-error'\)/);
 });
