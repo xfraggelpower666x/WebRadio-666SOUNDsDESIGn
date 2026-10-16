@@ -39,3 +39,13 @@ test('twitch background asset exists in root/public and stays byte-identical',()
   assert.ok(a.length>100000,'twitch background unexpectedly small');
   assert.equal(Buffer.compare(a,b),0,'twitch background mirrors differ');
 });
+
+test('twitch autoplay unlock separates browser permission from stream recovery',()=>{
+  assert.match(root,/NotAllowedError/);
+  assert.match(root,/audio-unlock/);
+  assert.match(root,/document\.addEventListener\('pointerdown',onGesture/);
+  assert.match(root,/document\.addEventListener\('keydown',onGesture/);
+  assert.match(root,/awaitingGesture/);
+  assert.match(root,/TWITCH · STREAM RECOVERY/);
+  assert.doesNotMatch(root,/TWITCH · AUTOPLAY RETRY/);
+});
