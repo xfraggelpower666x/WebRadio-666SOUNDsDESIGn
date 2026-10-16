@@ -10,14 +10,17 @@
   if(global.S666CentralBootScreen) return;
 
   const VERSION='2.2.1';
-  const STYLE_URL='/css/central-boot-screen.css?v=20260913-main-cyber-hud-v1';
+  const STYLE_URL='/css/central-boot-screen.css?v=20261016-two-phase-r01';
   const DEFAULT_DURATION=4200;
   const MAIN_ANIMATION_CYCLE=10000;
-  const MAIN_DURATION=MAIN_ANIMATION_CYCLE;
+  const MAIN_PHASE2_FADE_MS=5400;
+  const MAIN_PHASE2_HOLD_MS=2000;
+  const MAIN_DURATION=MAIN_ANIMATION_CYCLE+MAIN_PHASE2_FADE_MS+MAIN_PHASE2_HOLD_MS;
+  function usesOriginalTwoPhase(){return identity.page==='main'&&(identity.playerId==='hub'||identity.playerId==='iphone')}
   const MAIN_START_PROGRESS=1;
-  const MAIN_COMPLETE_HOLD=500;
+  const MAIN_COMPLETE_HOLD=0;
   const OWNER_KEY='s666_active_player_owner_v2';
-  const BOOT_MARKER='2026-09-13-main-cyber-hud-v2';
+  const BOOT_MARKER='20261016-main-iphone-two-phase-cyberintro-r01';
 
   let root=null,raf=0,startAt=0,duration=DEFAULT_DURATION,lastPhase=-1,readyPromise=null;
 
@@ -341,9 +344,18 @@
   function tick(now){
     if(!root) return;
     const elapsed=now-startAt;
-    const ratio=Math.min(1,Math.max(0,elapsed/duration));
+    const twoPhase=usesOriginalTwoPhase();
+    const firstDuration=twoPhase?MAIN_ANIMATION_CYCLE:duration;
+    const ratio=Math.min(1,Math.max(0,elapsed/firstDuration));
     const progress=identity.page==='main' ? MAIN_START_PROGRESS+(99*ratio) : 100*ratio;
     setProgress(progress);
+    if(twoPhase&&elapsed>=MAIN_ANIMATION_CYCLE&&root.dataset.cyberStage!=='online'){
+      root.dataset.cyberStage='online';
+      const n=nodes();
+      if(n.status)n.status.textContent='READY';
+      if(n.phase)n.phase.textContent='SYSTEM ONLINE';
+      root.dataset.phase2Armed='1';
+    }
     if(elapsed<duration){raf=requestAnimationFrame(tick);return;}
     complete('timer');
   }
@@ -353,10 +365,13 @@
     cancelAnimationFrame(raf);
     const fallbackDuration=identity.page==='main'?MAIN_DURATION:DEFAULT_DURATION;
     const requestedDuration=Number(options.duration)||fallbackDuration;
-    duration=identity.page==='main' ? Math.max(MAIN_ANIMATION_CYCLE,requestedDuration) : Math.max(600,requestedDuration);
+    duration=usesOriginalTwoPhase()?Math.max(MAIN_DURATION,requestedDuration):identity.page==='main'?Math.max(MAIN_ANIMATION_CYCLE,requestedDuration):Math.max(600,requestedDuration);
     startAt=performance.now();
     lastPhase=-1;
     root.dataset.state='booting';
+    root.dataset.cyberStage=usesOriginalTwoPhase()?'ready-progress':'legacy';
+    delete root.dataset.phase2Armed;
+    delete root.dataset.fullCycleComplete;
     root.dataset.minimumCycleMs=identity.page==='main'?String(MAIN_ANIMATION_CYCLE):String(duration);
     root.style.removeProperty('display');
     root.style.removeProperty('opacity');
@@ -381,6 +396,7 @@
     if(n.phase)n.phase.textContent='666SOUNDsDESIGn READY';
     n.steps?.forEach(step=>{step.classList.remove('active');step.classList.add('done');});
     root.dataset.fullCycleComplete=identity.page==='main'?'1':'legacy';
+    if(usesOriginalTwoPhase())root.dataset.cyberStage='terminal';
     global.setTimeout(()=>hide(reason),identity.page==='main'?MAIN_COMPLETE_HOLD:180);
   }
 
