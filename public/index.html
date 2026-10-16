@@ -41,6 +41,17 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <meta name="apple-mobile-web-app-title" content="666 WebRadio">
 <meta name="application-name" content="666 WebRadio">
 
+  <!-- MAIN/IPPONE CYBERINTRO: reserve the screen before first body paint.
+       The central boot owner remains the only owner; no audio or VELUNA changes. -->
+  <style id="s666MainEarlyBootVisibility">
+    html.s666-main-boot-preflight body > :not(#s666CentralBoot),
+    html.s666-main-boot-preflight body > :not(#s666CentralBoot) * {visibility:hidden!important}
+    html.s666-main-boot-preflight body > #s666CentralBoot,
+    html.s666-main-boot-preflight body > #s666CentralBoot * {visibility:visible!important}
+  </style>
+  <script>document.documentElement.classList.add('s666-main-boot-preflight');document.documentElement.dataset.mainBootEarlyGuard='20261016-r01';</script>
+  <link rel="stylesheet" href="/css/central-boot-screen.css?v=20261016-two-phase-r01">
+  <script src="/js/central-boot-screen.js?v=20261016-two-phase-r01" defer></script>
   <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=2026-06-15-fix1">
   <script src="/js/version-core.js?v=smfp-v2026-07-08-veluna128"></script>
   <script src="/js/boost-core.js?v=2026-06-15-fix1"></script>
