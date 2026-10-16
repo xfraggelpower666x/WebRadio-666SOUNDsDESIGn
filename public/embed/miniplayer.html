@@ -85,16 +85,50 @@ audio.addEventListener('playing',()=>{retrying=false;label('LIVE · Läuft');sta
 audio.addEventListener('waiting',()=>{if(wanted)label('Puffert …')});
 audio.addEventListener('pause',()=>{state();bars.forEach(b=>b.style.height='3px')});
 audio.addEventListener('error',async()=>{if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
-async function metadata(){try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),4500);try{const response=await fetch('https://webradio.666soundsdesign-broadcaster.com/api/nowplaying',{signal:controller.signal,cache:'no-store'});if(!response.ok)return;const data=await response.json();const candidate=data?.now_playing?.song?.text||data?.nowplaying?.song?.text||data?.songtitle||data?.title||data?.song?.title||data?.nowplaying?.title;
-if(typeof candidate==='string'&&candidate.trim()){const text=candidate.trim().slice(0,180);if(track.textContent!==text){track.textContent=text;track.classList.toggle('scroll',text.length>38)}}
-const djName=data?.dj?.name||data?.dj_name||data?.current_dj||data?.streamer?.name;if(typeof djName==='string'&&djName.trim())dj.textContent='DJ: '+djName.trim().slice(0,45);
-const count=data?.listeners?.current??data?.currentlisteners??data?.listeners_current??data?.listener_count;
-if(Number.isFinite(Number(count))&&count!==null&&count!==''&&Number(count)>=0)listeners.textContent='Listener: '+Math.floor(Number(count));
-const bitrate=data?.bitrate??data?.stream?.bitrate??data?.quality?.bitrate;
-if(Number.isFinite(Number(bitrate))&&Number(bitrate)>0)quality.textContent='Qualität: '+Math.round(Number(bitrate))+' kbps';
-const art=data?.now_playing?.song?.art||data?.nowplaying?.song?.art||data?.cover||data?.artwork;
-if(typeof art==='string'&&art.trim()){try{const u=new URL(art,location.origin);if(u.protocol==='https:'&&u.href!==cover.src)cover.src=u.href}catch(_){}}}finally{clearTimeout(timeout)}}catch(_){/* metadata is optional; playback independent */}}
-metadata();setInterval(()=>{if(!document.hidden)metadata()},12000);
+// 666STREAM WEBRADIO metadata repair: existing Worker-normalized values are canonical.
+let lastMetadataSuccess=0;
+const METADATA_STALE_MS=36000;
+function metadataText(...values){for(const value of values){if(typeof value==='string'&&value.trim())return value.trim()}return ''}
+function metadataCount(value){if(value===null||value===undefined||value==='')return null;const n=Number(value);return Number.isFinite(n)&&n>=0?Math.floor(n):null}
+function markMetadataStale(){
+  if(lastMetadataSuccess&&Date.now()-lastMetadataSuccess<METADATA_STALE_MS)return;
+  track.textContent='Metadaten momentan nicht verfügbar';track.classList.remove('scroll');
+  dj.textContent='DJ: —';listeners.textContent='Listener: —';quality.textContent='Qualität: —';
+}
+async function metadata(){
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),4500);
+  try{
+    const response=await fetch('https://webradio.666soundsdesign-broadcaster.com/api/nowplaying',{signal:controller.signal,cache:'no-store'});
+    if(!response.ok)throw new Error('Metadata HTTP '+response.status);
+    const data=await response.json();
+    if(!data||typeof data!=='object'||Array.isArray(data)||data.error)throw new Error('Invalid metadata');
+    const title=metadataText(data.display_title,data.normalized_title,data.title_display,
+      data.now_playing?.song?.text,data.nowplaying?.song?.text,data.songtitle,data.title,
+      data.song?.title,data.nowplaying?.title);
+    const djName=metadataText(data.dj_display,typeof data.dj==='string'?data.dj:'',
+      data.dj?.name,data.dj_name,data.current_dj,data.streamer?.name);
+    const count=metadataCount(data.listeners?.current??data.currentlisteners??
+      data.listeners_current??data.listener_count??
+      (typeof data.listeners==='number'?data.listeners:null));
+    const rawBitrate=data.bitrate??data.stream?.bitrate??data.quality?.bitrate;
+    const bitrate=Number(rawBitrate);
+    const art=metadataText(data.now_playing?.song?.art,data.nowplaying?.song?.art,data.cover,data.artwork);
+    if(!title&&!djName&&count===null&&!(Number.isFinite(bitrate)&&bitrate>0)&&!art)throw new Error('No usable metadata');
+    lastMetadataSuccess=Date.now();
+    const text=title?title.slice(0,180):'Titel nicht verfügbar';
+    if(track.textContent!==text){track.textContent=text;track.classList.toggle('scroll',text.length>38)}
+    dj.textContent='DJ: '+(djName?djName.slice(0,45):'—');
+    listeners.textContent='Listener: '+(count===null?'—':String(count));
+    quality.textContent='Qualität: '+(Number.isFinite(bitrate)&&bitrate>0?Math.round(bitrate)+' kbps':'—');
+    // Metadata artwork is authoritative; only a genuinely invalid image uses the preexisting fallback.
+    if(art){try{const url=new URL(art,'https://webradio.666soundsdesign-broadcaster.com/');
+      if(url.protocol==='https:'&&url.href!==cover.src)cover.src=url.href;
+    }catch(_){}}
+  }catch(_){markMetadataStale()}
+  finally{clearTimeout(timeout)}
+}
+metadata();setInterval(()=>{if(!document.hidden)metadata();else markMetadataStale()},12000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)metadata()});
 })();
 </script>
 </body>
