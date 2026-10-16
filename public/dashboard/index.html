@@ -198,6 +198,18 @@
     .dash-grid>div{min-width:0}
   }
   </style>
+  <style id="dashboard-peak-brand-history-v2">
+  .radio-head-brand{display:flex;align-items:center;gap:14px;margin:0 0 8px;min-width:0}
+  .radio-head-brand>div{min-width:0;flex:1}
+  .radio-brand-logo{width:clamp(75px,9vw,122px);max-height:122px;height:auto;object-fit:contain;object-position:center;flex:none;filter:drop-shadow(0 0 13px rgba(255,61,187,.26))}
+  .radio-head-subtitle{color:#88dce7;font-size:10px;letter-spacing:.1em;line-height:1.4;margin-top:5px}
+  .dash-history-wide{grid-column:1/-1;min-width:0}
+  .dash-history-wide .card{width:100%}
+  .dash-history-wide .history-list{max-height:calc(5 * 27px)}
+  .dash-history-wide .history-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  @media(min-width:861px){.radio-brand-logo{width:clamp(80px,8.5vw,116px)}.dash-history-wide .card{padding:10px 14px}}
+  @media(max-width:600px){.radio-brand-logo{width:74px;max-height:90px}.radio-head-brand{gap:9px}.radio-head-subtitle{font-size:8px}}
+  </style>
   <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
   <body>
@@ -240,7 +252,7 @@
       <!-- Einziger Audio-Player: originaler WebRadio MiniPlayer mit sämtlichen Funktionen. -->
       <section id="radio" class="card cyber-frequency radio-cyber-hud" aria-label="Radio MiniPlayer und audioreaktives Cyber HUD">
         <div class="card-label">CYBER FREQUENCY HUD · LIVE STREAM</div>
-        <h2 class="frequency-heading">Ein gemeinsamer <span>Frequenzraum.</span></h2>
+        <div class="radio-head-brand"><img class="radio-brand-logo" src="https://weblyvra.666soundsdesign-broadcaster.com/assets/lyvra-frequency-room-original.png" alt="LYVRA — Original Cyber-Logo" loading="eager" decoding="async" width="1254" height="1254"><div><h2 class="frequency-heading">Ein gemeinsamer <span>Frequenzraum.</span></h2><p class="radio-head-subtitle">666SOUNDsDESIGn · LIVE FREQUENCY</p></div></div>
         <p class="frequency-intro">Klang wird Licht. Der unveränderte MiniPlayer bietet seine vollständigen Audio-, EQ-, Boost-, Stream- und Radiofunktionen. Die äußeren HUD-Effekte reagieren ausschließlich auf echte Audiodaten.</p>
         <div class="radio-embed"><iframe id="dashboardMiniPlayer" src="https://webradio.666soundsdesign-broadcaster.com/embed/miniplayer.html" title="666SOUNDsDESIGn WebRadio MiniPlayer" width="100%" height="198" loading="eager" allow="autoplay"></iframe></div>
         <aside id="audio-neon-controls" class="audio-neon-controls" aria-labelledby="audio-neon-title">
@@ -269,6 +281,14 @@
           <span class="status-val cyan" id="stListeners">–</span>
         </div>
         <div class="status-item">
+          <span class="status-key" title="Echter Peak vom Shoutcast-DNAS v2.6 Statistik-Endpunkt">Peak Zuhörer</span>
+          <span class="status-val cyan" id="stPeak">–</span>
+        </div>
+        <div class="status-item">
+          <span class="status-key">Zuhörer Limit</span>
+          <span class="status-val" id="stLimit">–</span>
+        </div>
+        <div class="status-item">
           <span class="status-key">Unique Listeners</span>
           <span class="status-val" id="stUniq">–</span>
         </div>
@@ -290,15 +310,6 @@
         </div>
       </section>
 
-      <!-- RECENTLY PLAYED -->
-      <section class="card">
-        <div class="card-label">Recently Played (letzte 20 Tracks)</div>
-        <ul class="history-list" id="historyList" tabindex="0" aria-label="Die letzten 20 gespielten Titel, fünf gleichzeitig sichtbar, weitere Einträge scrollbar">
-          <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
-        </ul>
-      </section>
-
-
       <!-- BROADCAST -->
       <section class="card">
         <div class="card-label">📡 Broadcast-Nachricht</div>
@@ -306,6 +317,15 @@
         <div class="broadcast-time" id="broadcastTime"></div>
       </section>
 
+    </div>
+
+    <div class="dash-history-wide">      <!-- RECENTLY PLAYED -->
+      <section class="card">
+        <div class="card-label">Recently Played (letzte 20 Tracks)</div>
+        <ul class="history-list" id="historyList" tabindex="0" aria-label="Die letzten 20 gespielten Titel, fünf gleichzeitig sichtbar, weitere Einträge scrollbar">
+          <li class="history-item"><span class="history-title" style="color:rgba(22,255,243,.25);font-style:italic">Warte auf Daten…</span></li>
+        </ul>
+      </section>
     </div>
 
   </main>
@@ -594,6 +614,28 @@
       status('B',config?.ok===true?'ok':'warn',config?'Backup-Quelle konfiguriert; Streamwechsel nur im MiniPlayer':'Backup-Konfiguration nicht erreichbar');
     }
     update();setInterval(update,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+  })();
+  </script>
+  <script id="dashboard-shoutcast-peak-v1">
+  (() => {
+    'use strict';
+    const peak=document.getElementById('stPeak'),limit=document.getElementById('stLimit');
+    if(!peak||!limit)return;
+    async function update(){
+      const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),5500);
+      try{
+        const r=await fetch('/api/shoutcast/stats',{cache:'no-store',signal:ctrl.signal});
+        if(!r.ok)throw Error('HTTP '+r.status);
+        const data=await r.json();
+        const valid=n=>Number.isSafeInteger(n)&&n>=0;
+        peak.textContent=valid(data.peaklisteners)?String(data.peaklisteners):'–';
+        limit.textContent=valid(data.maxlisteners)?String(data.maxlisteners):'–';
+        peak.title='Originalwert vom Shoutcast DNAS, Zeitpunkt '+(data.timestamp||'unbekannt');
+      }catch(_){peak.textContent='–';limit.textContent='–';peak.title='Shoutcast Statistik derzeit nicht erreichbar'}
+      finally{clearTimeout(timeout)}
+    }
+    update();setInterval(()=>{if(!document.hidden)update()},30000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
   })();
   </script>
   <script id="dashboard-hud-endpoint-runtime">
