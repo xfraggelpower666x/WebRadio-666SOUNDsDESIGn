@@ -493,6 +493,44 @@
     window.addEventListener('pagehide',()=>{disposed=true;observer?.disconnect()},{once:true});
   })();
   </script>
+  <script id="dash-hud-live-status-v3">
+  (() => {
+    'use strict';
+    // Nur Werte anzeigen, deren Bedeutung mit dem jeweiligen Endpoint belegbar ist.
+    const buttons=[...document.querySelectorAll('.hud-pill')];
+    const byCode=new Map(buttons.map(b=>[b.querySelector('span:last-child')?.textContent?.trim(),b]));
+    const status=(code,value,why)=>{
+      const el=byCode.get(code);if(!el)return;
+      el.dataset.health=value;
+      el.setAttribute('aria-label',code+': '+why+'; '+el.dataset.hudTitle);
+      el.title=why+' · Anklicken für Endpoint-Antwort';
+    };
+    async function get(path){
+      const controller=new AbortController(),id=setTimeout(()=>controller.abort(),4500);
+      try{const r=await fetch(path,{cache:'no-store',credentials:'omit',signal:controller.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(id)}
+    }
+    async function update(){
+      if(document.hidden)return;
+      const results=await Promise.allSettled([get('/health'),get('/api/nowplaying'),get('/api/runtime-config/status'),get('/api/player-alert/status'),get('/api/skip/status')]);
+      const item=i=>results[i].status==='fulfilled'?results[i].value:null;
+      const health=item(0),meta=item(1),config=item(2),alerts=item(3),skip=item(4);
+      status('STR',health?.ok===true?'ok':'warn',health?'Server online':'Serverstatus nicht erreichbar');
+      status('WRK',health?.ok===true?'ok':'warn',health?'Worker-Health erreichbar':'Worker-Health nicht erreichbar');
+      status('MET',meta&&typeof meta==='object'?'ok':'warn',meta?'Metadaten erreichbar':'Metadaten nicht erreichbar');
+      status('SRC',config?.ok===true?'ok':'warn',config?'Quellenkonfiguration geladen':'Quellenkonfiguration nicht erreichbar');
+      status('AUD',config?.ok===true?'ok':'warn',config?'Quellenkonfiguration verfügbar; Audio läuft nur im MiniPlayer':'Audio-Konfiguration nicht erreichbar');
+      status('WCH',alerts?.ok===true?'ok':'warn',alerts?'Player-Alert-Backend erreichbar':'Player-Alert-Backend nicht erreichbar');
+      status('RCN',config?.ok===true?'ok':'warn',config?'Recovery-Konfiguration abrufbar':'Recovery-Konfiguration nicht erreichbar');
+      status('MTR',meta?'ok':'warn',meta?'Metadaten verfügbar; echte Pegel nur beim Abspielen':'Metadaten nicht erreichbar');
+      status('SB',health?.ok===true?'ok':'warn',health?'Streamserver erreichbar; Pufferzustand nur im MiniPlayer':'Streamserver nicht erreichbar');
+      status('ADM',skip?.ok===true?'ok':'warn',skip?'Öffentlicher Admin-Bridge-Status verfügbar; kein Login':'Öffentlicher Admin-Bridge-Status nicht erreichbar');
+      status('GOV',config?.ok===true?'ok':'warn',config?'Runtime-Konfiguration verfügbar; kein Govee-Gerätestatus':'Runtime-Konfiguration nicht erreichbar');
+      status('M',config?.ok===true?'ok':'warn',config?'Main-Quelle konfiguriert; Streamwechsel nur im MiniPlayer':'Main-Konfiguration nicht erreichbar');
+      status('B',config?.ok===true?'ok':'warn',config?'Backup-Quelle konfiguriert; Streamwechsel nur im MiniPlayer':'Backup-Konfiguration nicht erreichbar');
+    }
+    update();setInterval(update,20000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)update()});
+  })();
+  </script>
   <script id="dashboard-hud-endpoint-runtime">
   (() => {
     'use strict';
