@@ -467,22 +467,26 @@
 
   })();
   </script>
-  <script id="dash-miniplayer-autofit-v3">
+  <script id="dash-miniplayer-autofit-v4">
   (() => {
     'use strict';
     const frame=document.getElementById('dashboardMiniPlayer');
     if(!frame)return;
     let observer=null,disposed=false;
     function fit(){
+      if(disposed)return;
       try{
         const doc=frame.contentDocument;
-        if(!doc||disposed)return;
-        const body=doc.body;
-        // Same-origin only; reads original MiniPlayer document, does not modify its functions.
-        const height=Math.max(170,Math.min(1200,Math.ceil(Math.max(body.scrollHeight,doc.documentElement.scrollHeight)+4)));
+        const player=doc?.querySelector('.player');
+        if(!player)return;
+        // Wichtig: NIE body.scrollHeight oder documentElement.scrollHeight messen:
+        // diese enthalten bei expandiertem Iframe dessen eigene leere Fläche.
+        const rect=player.getBoundingClientRect();
+        const pad=Number.parseFloat(getComputedStyle(doc.body).paddingBottom)||0;
+        const height=Math.max(150,Math.min(1100,Math.ceil(rect.bottom+pad+3)));
         if(Math.abs(frame.getBoundingClientRect().height-height)>2)frame.style.height=height+'px';
       }catch(_){
-        // On a cross-origin deployment preserve conservative fallback and all MiniPlayer controls.
+        // MiniPlayer bleibt bedienbar, falls die Origin künftig abweichen sollte.
         frame.style.height=matchMedia('(max-width:600px)').matches?'245px':'198px';
       }
     }
@@ -490,10 +494,12 @@
       observer?.disconnect();
       try{
         const doc=frame.contentDocument;
-        if(!doc||!doc.body)return fit();
-        observer=new ResizeObserver(fit);
-        observer.observe(doc.body);
-        doc.addEventListener('click',()=>requestAnimationFrame(fit),{passive:true});
+        const player=doc?.querySelector('.player');
+        if(!player)return;
+        observer=new ResizeObserver(()=>requestAnimationFrame(fit));
+        observer.observe(player);
+        player.addEventListener('click',()=>requestAnimationFrame(fit),{passive:true});
+        doc.fonts?.ready?.then(fit);
         fit();
       }catch(_){fit()}
     }
