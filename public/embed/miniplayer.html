@@ -62,7 +62,7 @@ const cover=document.getElementById('cover'),dj=document.getElementById('dj'),li
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
 let audioContext,analyser,frequencyData,visualActive=false;
-function visualizer(){if(!visualActive||!analyser)return;analyser.getByteFrequencyData(frequencyData);window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext?.sampleRate);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}if(!audio.paused&&!document.hidden)requestAnimationFrame(visualizer)}
+function visualizer(){if(!visualActive||!analyser)return;analyser.getByteFrequencyData(frequencyData);lastMeterAt=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext?.sampleRate);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}if(!audio.paused&&!document.hidden)requestAnimationFrame(visualizer)}
 function enableVisualizer(){if(visualActive)return;try{const core=window.SMFPBoostCore;if(!core)return;const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;frequencyData=new Uint8Array(analyser.frequencyBinCount);visualActive=true;applySound();void core.resume(audio);requestAnimationFrame(visualizer)}catch(_){visualActive=false}}
 const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
 const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
@@ -72,8 +72,8 @@ soundBtn.addEventListener('click',()=>togglePanel(soundBtn,soundPanel));messageB
 sliders.forEach(x=>x.addEventListener('input',applySound));boost.addEventListener('change',applySound);
 document.getElementById('skipBtn').addEventListener('click',async()=>{const btn=document.getElementById('skipBtn');if(!window.S666SkipControl){label('Admin-Funktion nicht geladen');return}btn.disabled=true;label('Admin-Authentifizierung …');try{const result=await window.S666SkipControl.skip({source:'embed-miniplayer'});label(result.ok?'Auto-DJ Skip bestätigt':('Skip: '+String(result.error||'fehlgeschlagen').slice(0,110)))}catch(_){label('Skip nicht verfügbar')}finally{btn.disabled=false}});
 document.getElementById('send').addEventListener('click',async()=>{const button=document.getElementById('send'),message=document.getElementById('message').value.trim().slice(0,240),username=document.getElementById('sender').value.trim().slice(0,28)||'Guest';if(!message){messageStatus.textContent='Bitte Nachricht eingeben';return}button.disabled=true;messageStatus.textContent='Sende …';try{const response=await fetch('/api/player-alert/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,username,clientId:'embed-'+(crypto.randomUUID?.()||String(Date.now())),version:'embed-v1.2'})});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw new Error(String(data.error||'Backend lehnt Versand ab'));messageStatus.textContent='Gesendet · Bestätigung vom Backend';document.getElementById('message').value=''}catch(e){messageStatus.textContent='Nicht gesendet: '+String(e.message||'Netzwerkfehler').slice(0,100)}finally{button.disabled=false}});
-const sources=[new URL('/stream',location.origin).href,'https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com:8686/stream'];
-let sourceIndex=0,wanted=false,retrying=false;audio.volume=.75;
+const sources=[new URL('/stream',location.origin).href,new URL('/fallback-stream',location.origin).href,'https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com:8686/stream'];
+let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=false,lastMeterAt=0;audio.volume=.75;
 // WebAudio analyser requires a CORS-enabled stream; keep native audio unmodified when unavailable.
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
@@ -81,10 +81,34 @@ function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'�
 async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
-audio.addEventListener('playing',()=>{retrying=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
-audio.addEventListener('waiting',()=>{if(wanted)label('Puffert …')});
+audio.addEventListener('playing',()=>{retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
+audio.addEventListener('waiting',()=>{audioWaiting=true;if(wanted)label('Puffert …')});
 audio.addEventListener('pause',()=>{state();bars.forEach(b=>b.style.height='3px')});
-audio.addEventListener('error',async()=>{if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+audio.addEventListener('error',async()=>{audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+// Dashboardschnittstelle: nur die vorhandene Audioinstanz steuern, nie neuen Player erzeugen.
+window.S666EmbedControl=Object.freeze({
+  getState(){
+    const playing=!audio.paused&&!audio.ended&&audio.readyState>=2;
+    return {
+      playing,waiting:!!audioWaiting,recovering:!!retrying,error:!!audioFault,
+      source:sourceIndex===0?'main':'backup',
+      wanted:!!wanted,readyState:audio.readyState,
+      meterAvailable:!!(playing&&visualActive&&analyser&&performance.now()-lastMeterAt<2200)
+    };
+  },
+  async switchStream(target){
+    if(target!=='main'&&target!=='backup')throw new Error('Ungültige Streamquelle');
+    const next=target==='main'?0:1;
+    if(sourceIndex===next)return this.getState();
+    const resume=!audio.paused&&!audio.ended;
+    wanted=false;audio.pause();retrying=false;audioWaiting=false;audioFault=false;
+    sourceIndex=next;audio.src=sources[sourceIndex];audio.load();
+    label((target==='main'?'Hauptstream':'Backupstream')+' gewählt');
+    state();
+    if(resume)await play();
+    return this.getState();
+  }
+});
 // 666STREAM WEBRADIO metadata repair: existing Worker-normalized values are canonical.
 let lastMetadataSuccess=0;
 const METADATA_STALE_MS=36000;
