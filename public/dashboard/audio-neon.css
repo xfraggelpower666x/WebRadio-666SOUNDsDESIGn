@@ -1,0 +1,52 @@
+/* Audiopegel erzeugen langsame Übergänge, keine Blitz- oder Stroboskopeffekte. */
+#audio-neon-layer{--audio-bass:0;--audio-mid:0;--audio-high:0;--audio-energy:0;position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden;contain:strict;opacity:0;transition:opacity .8s ease;background:radial-gradient(ellipse at 5% 85%,rgb(33 229 246 / 7%),transparent 52%),radial-gradient(ellipse at 95% 20%,rgb(212 62 245 / 6%),transparent 48%)}
+#audio-neon-layer[data-active="true"]{opacity:.72}
+.audio-neon-orbit{position:absolute;width:min(85vw,1100px);aspect-ratio:1;border:1px solid #65e8f2;border-radius:50%;left:-30%;bottom:-65%;opacity:.48;box-shadow:0 0 42px #20d6ef40,inset 0 0 35px #20d6ef20;transform:scale(1);transition:transform .16s ease-out,opacity .2s ease-out}
+.audio-neon-orbit:nth-child(2){left:auto;right:-28%;bottom:auto;top:-60%;border-color:#b381fa;box-shadow:0 0 48px #b381fa30;transform:scale(1);opacity:.38}
+.audio-neon-edge{position:absolute;inset:2px;border:1px solid #ed63c5;border-radius:16px;box-shadow:inset 0 0 30px #d967f52b;opacity:.34;transition:opacity .2s ease-out}
+.audio-neon-controls{margin-top:30px;padding:24px;border:1px solid #4a627b;border-radius:18px;background:#0a1221e8;max-width:680px}
+.audio-neon-controls h3{margin:0 0 12px;font-size:1.45rem;color:#c7f7ff}.audio-neon-controls p{margin:10px 0;font-size:.9rem;line-height:1.6}.audio-neon-controls button{font:inherit;min-height:44px;padding:10px 18px;max-width:100%;color:#e1fcff;background:#112333;border:1px solid #63d5ef;border-radius:8px;cursor:pointer}.audio-neon-controls button:focus-visible{outline:3px solid #f58eda;outline-offset:4px}.audio-neon-controls button[aria-pressed="true"]{border-color:#f58eda}.audio-neon-controls button:disabled{opacity:.65;cursor:default}.audio-neon-controls [data-neon-status]{color:#c7f7ff}
+@media(max-width:700px){.audio-neon-controls{padding:18px}.audio-neon-orbit{width:130vw;left:-80%;bottom:-30%}.audio-neon-orbit:nth-child(2){right:-85%;top:-25%}}
+@media(prefers-reduced-motion:reduce){#audio-neon-layer{display:none}#audio-neon-layer,.audio-neon-orbit,.audio-neon-edge{transition:none}}
+
+/* Sichtbare, ausschließlich von validierten Echtpegeln getriebene HUD-Bänder. */
+#radio .neon-band-meter{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end;padding:12px;border:1px solid #60dded55;border-radius:10px;background:#040b1b}
+#radio .neon-band-meter span{font:600 11px/1.5 var(--heading,Arial,sans-serif);letter-spacing:.08em;color:#b9eaf5;min-width:0}
+#radio .neon-band-meter i{display:block;height:18px;margin-top:7px;border-radius:3px;background:linear-gradient(90deg,#18d8f3,#ef65d7);transform:scaleX(var(--neon-level,0));transform-origin:left center;transition:transform 85ms ease-out;box-shadow:0 0 16px #73dffaaa}
+@media(max-width:700px){#radio .neon-band-meter{width:100%;gap:6px;padding:8px}#radio .neon-band-meter span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){#radio .neon-band-meter i{transition:none}}
+
+/* Fixed, click-through global neon lighting: visible while scrolling across all sections. */
+#audio-neon-layer{position:fixed;inset:0;isolation:isolate}
+
+/* Three independent visual outputs from the same verified radio frequency bands.
+   Viewport-fixed and non-interactive: coverage remains visible across site sections. */
+#audio-neon-layer .audio-neon-bass-field,
+#audio-neon-layer .audio-neon-midfield,
+#audio-neon-layer .audio-neon-high-field{position:absolute;inset:0;pointer-events:none;transition:opacity .22s ease-out}
+#audio-neon-layer .audio-neon-bass-field{
+  opacity:calc(var(--audio-bass) * .80);
+  background:radial-gradient(ellipse 42vw 35vh at 23% 54%,#08cfe620,transparent 80%),
+             radial-gradient(ellipse 43vw 38vh at 78% 56%,#c962f020,transparent 80%);
+  filter:drop-shadow(0 0 20px #35cfea44);
+}
+#audio-neon-layer .audio-neon-midfield{
+  opacity:calc(var(--audio-mid) * .88);
+  background:linear-gradient(120deg,transparent 13%,#18daef22 24%,transparent 37%,transparent 58%,#d36cf522 74%,transparent 87%);
+  background-size:100% 100%;
+  mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent);
+}
+#audio-neon-layer .audio-neon-high-field{
+  inset:4% 1.5%;
+  border-left:2px solid #65e7f3;
+  border-right:2px solid #ef7ae4;
+  border-top:1px solid #ed75ec88;
+  border-bottom:1px solid #56ddf088;
+  border-radius:22px;
+  box-shadow:inset 0 0 27px #10deef28,0 0 18px #e963e52b;
+  opacity:calc(var(--audio-high) * .8);
+}
+@media(max-width:700px){
+ #audio-neon-layer .audio-neon-midfield{background:linear-gradient(130deg,transparent 5%,#1adbf122 30%,transparent 50%,#df63ec22 74%,transparent 95%)}
+ #audio-neon-layer .audio-neon-high-field{inset:3% 2%;border-radius:12px}
+}
