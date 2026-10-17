@@ -477,5 +477,20 @@
     "artificial_revision": false,
     "production_radio_mutation": "NONE",
     "foreign_mutation": "NONE"
+  },
+  "visual_host_receipt_regression_20261017": {
+    "status": "TEN_ADDITIONAL_ISOLATED_GUARD_CASES_PASS_TEST_SOURCE_SAVED",
+    "body_head": "0a80e6d7295bcc36ef74749b6c63b2d730682964",
+    "backup_branch": "backup/pre-stream-visual-receipt-negative-tests-20261017",
+    "test_path": "tests/stream-semantic-visual-enforcement.test.mjs",
+    "test_blob": "66213f538d111b8b0d10ebf9010e61489dad9959",
+    "isolated_guard_cases": "PASS_10_OF_10",
+    "full_node_suite": "NOT_RUN",
+    "github_ci": "NOT_CONFIRMED",
+    "fresh_host": "READBACK_PENDING",
+    "plugin_release_parity": "READBACK_PENDING",
+    "scope": "CORE",
+    "no_second_visual_engine": true,
+    "production_radio_mutation": "NONE"
   }
 }
