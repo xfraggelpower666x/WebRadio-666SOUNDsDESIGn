@@ -135,3 +135,9 @@ Each related interruption preserves problem identity, hypothesis, performed chec
 ## Core intelligence facets by reference — 2026-10-17
 CAPABILITY_FILES=development/DEVELOPMENT_OBLIGATION_LEDGER.json|rehydration/RELATIONAL_REHYDRATION_CONTRACT.md|skills/NATIVE_SKILL_REGISTRY.json|learning/CAUSAL_LEARNING_CONTRACT.md|integration/PARITY_AND_HANDOFF_CONTRACT.md|current/CORE_DASHBOARD_CONTRACT.md
 These are existing 666STREAM governance capabilities, not new native identities/foreign CLIC or LYVRA facets. Rehydrate relevant semantic meaning, relations, obligations and codeforge outcomes by current references; inactive adapters stay reachable but not foreground. Pause/resume includes obligation state, checked hypothesis, parity candidate, bridge job/receipt, exact valid next step. Fresh host PASS cannot follow from a repository readback alone.
+
+## 2026-10-17 — Bridge-Test Nebenast, native Chat-Fortsetzung
+
+Project chat foreground after direct user correction: `WEBRADIO`, workstream `DASHBOARD`, return to the last verified state **before** the topic “666STREAM — CodeForge Bridge gefunden”, maintaining later valid WCH checkpoint `c5045cabb46bef8e2dcec7a76fe6abdd3c149119` as the last verified dashboard work. The explicitly authorized GOVEE binary transport proof remains preserved on isolated test branch and must not be replayed or automatically foregrounded. Integrate its reusable transport capability via the existing CodeForge registry + rehydration manifest. No rollback, no cross-project activation, no PFS claim.
+
+Pending WEBRADIO gates: real browser acceptance of WCH, RCN, MTR, M/B, protected ADM, local GOV, diagnostics copy and layout/brand checks. `666STREAM WEITER` in this chat resumes these tasks, not GOVEE binary import. Other chats preserve their own scope.
