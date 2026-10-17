@@ -1,0 +1,62 @@
+{
+  "schema": "666stream-core-function-smoke-receipt-v1",
+  "date": "2026-10-17",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "scope": "CORE",
+  "source_commit": "727fb3ce488c3cc6b09483fe9e8bab413ed5cf7e",
+  "source_path": "666STREAM_STRUCTURE_CONTROL/runtime/core-intelligence.mjs",
+  "source_blob_sha": "9b026a7812c64cac60bf8cf467fc02f8ebc6f00e",
+  "execution_environment": "isolated-JavaScript-evaluation-of-fetched-pure-core-module",
+  "method": "Read live GitHub source, remove ESM export tokens for in-process evaluation; invoke exported pure functions with fixed fixtures; collect boolean assertions",
+  "executed_tests": [
+    {
+      "name": "native owner",
+      "result": "PASS"
+    },
+    {
+      "name": "cross-scope resume rejection",
+      "result": "PASS"
+    },
+    {
+      "name": "same-scope verified return anchor",
+      "result": "PASS"
+    },
+    {
+      "name": "promotion without evidence rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "foreign skill rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "names-only relation incomplete",
+      "result": "PASS"
+    },
+    {
+      "name": "conflicting learning quarantined",
+      "result": "PASS"
+    },
+    {
+      "name": "plugin release without readback pending",
+      "result": "PASS"
+    },
+    {
+      "name": "dashboard has no decision authority",
+      "result": "PASS"
+    }
+  ],
+  "summary": "PASS_9_OF_9",
+  "limits": [
+    "NOT_NODE_TEST_RUNNER",
+    "NOT_FULL_NPM_VERIFY",
+    "NOT_GITHUB_ACTIONS_CI",
+    "NOT_FRESH_HOST_BOOT",
+    "NOT_BINARY_BRIDGE_TRANSPORT",
+    "NOT_PLUGIN_RELEASE_PARITY"
+  ],
+  "existing_ci_visibility": "PUSH_ACTION_RUNS_NOT_VISIBLE_FROM_AVAILABLE_COMMIT_WORKFLOW_QUERY; COMBINED_STATUSES_EMPTY",
+  "production_mutation": "NONE",
+  "foreign_system_mutation": "NONE",
+  "next_gate": "NODE_NPM_VERIFY_AND_FRESH_HOST_ACCEPTANCE"
+}
