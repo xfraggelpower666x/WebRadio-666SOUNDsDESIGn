@@ -75,3 +75,21 @@ The exact user-designated CLIC return handoff blob and current native Repository
 
 ### Receipt evidence schema contract
 A real `DELIVERED_EVIDENCED` claim must cite separate source repository/head/hash/size, target repo/branch/HEAD before/expected, actual target commit/tree/blob/path, pre-push head recheck, independently fetched commit/tree/blob and remote actual bytes/sha256. Untrusted peer claims cannot self-certify those independent reads. On any mismatch or missing proof: READBACK_PENDING or CONFLICT_QUARANTINE with return anchor. STREAM native update must decide any candidate adoption and publish its CURRENT_POINTER last.
+
+## Full original archive binary transport evidence — 2026-10-17
+ORIGINAL_ZIP=GOVEE_FX_SCENE_SYNC_ADDON.zip
+SOURCE_BYTES=9123
+SOURCE_SHA256=2692989cf391c17fd2afb53065763289c2b622d272877c4b9cdc722bb3b26834
+SOURCE_GIT_BLOB_SHA=9a75b296c05b066efe1ad26680a774e2c41a36e4
+ISOLATED_BRANCH=test/codeforge-full-original-govee-fx-20261017
+TRANSFER_COMMIT=c3db40cfa2c89434c646f78e6e55e5aee53cde63
+READBACK_HEAD=99a662b1bed1c5a211e4ef2fe0edf351e846bf28
+SOURCE_AND_REMOTE_BASE64_EXACT_IDENTITY=PASS
+INDEPENDENT_RECEIPT=projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/GOVEE_FULL_ORIGINAL_TRANSFER_PASS_RECEIPT.json
+RECEIPT_BLOB=dab6ec5fcb2dd7afb134f6a898a91381c90a0fe7
+EXECUTION_SCOPE=ISOLATED_DIRECT_GITHUB_GIT_OBJECT_TRANSPORT_ONLY
+LOCAL_WINDOWS_OFFLINE_FALLBACK=NOT_TESTED
+LOCAL_HELPER_EXECUTION=NOT_TESTED
+PRODUCTIVE_ARCHIVE_IMPORT=NOT_PERFORMED
+GOVEE_DEVICE_ACTION=NONE
+This qualifies the **existing** canonical bridge direct-binary path for complete original archives in this tested isolated scope. It neither adds a second bridge nor implies production import, plugin delivery, general all-filetype acceptance, or host fallback execution. The prior 582-byte derived ZIP test remains separately valid. VERSION remains 1.0.0 (no artificial revision).
