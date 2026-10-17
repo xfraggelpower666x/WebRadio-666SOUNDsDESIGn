@@ -40,7 +40,8 @@
     "CORE_EVOLUTION_FRESH_HOST_ACCEPTANCE",
     "CORE_EVOLUTION_PLUGIN_SKILL_PARITY_READBACK",
     "CORE_VERIFY_WORKFLOW_EXECUTION_READBACK",
-    "CORE_VERIFY_REGRESSION_RESULTS_READBACK"
+    "CORE_VERIFY_REGRESSION_RESULTS_READBACK",
+    "CORE_NODE_VERIFICATION_AND_CI_READBACK"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -207,5 +208,17 @@
     "host_adapter_parity": "READBACK_PENDING",
     "production_radio_change": "NONE",
     "foreign_mutation": "NONE"
+  },
+  "core_function_smoke_20261017": {
+    "status": "ISOLATED_FUNCTION_SMOKE_PASS_9_OF_9",
+    "source_commit": "727fb3ce488c3cc6b09483fe9e8bab413ed5cf7e",
+    "receipt_commit": "27a67c6c2b08b5ab60c54da05207c2a45cfc9fab",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/CORE_FUNCTION_SMOKE_RECEIPT_2026-10-17.json",
+    "prechange_recovery_branch": "backup/pre-streamctrl-core-function-readback-20261017",
+    "node_test_runner": "NOT_RUN",
+    "github_ci": "NOT_CONFIRMED",
+    "fresh_host": "READBACK_PENDING",
+    "binary_transport": "READBACK_PENDING",
+    "native_owner": "666STREAM_STRUCTURE_CONTROL"
   }
 }
