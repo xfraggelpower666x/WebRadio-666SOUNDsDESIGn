@@ -131,3 +131,7 @@ UNSAFE_OR_UNAUTHORIZED=BLOCKED_WITH_EVIDENCE
 MANDATORY_SECURITY_REGRESSION_READBACK_NOT_CAPPED=true
 CODEX_ESCALATION_FAILED_REPAIR_ATTEMPTS=SEPARATE_COUNTER
 Each related interruption preserves problem identity, hypothesis, performed checks and evidence, last verified step, measured outcome or blocker. Learning candidates require observed outcome validation; repeated check loops must not become a new project, new bridge or separate mutable learning authority.
+
+## Core intelligence facets by reference — 2026-10-17
+CAPABILITY_FILES=development/DEVELOPMENT_OBLIGATION_LEDGER.json|rehydration/RELATIONAL_REHYDRATION_CONTRACT.md|skills/NATIVE_SKILL_REGISTRY.json|learning/CAUSAL_LEARNING_CONTRACT.md|integration/PARITY_AND_HANDOFF_CONTRACT.md|current/CORE_DASHBOARD_CONTRACT.md
+These are existing 666STREAM governance capabilities, not new native identities/foreign CLIC or LYVRA facets. Rehydrate relevant semantic meaning, relations, obligations and codeforge outcomes by current references; inactive adapters stay reachable but not foreground. Pause/resume includes obligation state, checked hypothesis, parity candidate, bridge job/receipt, exact valid next step. Fresh host PASS cannot follow from a repository readback alone.
