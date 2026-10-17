@@ -1,0 +1,34 @@
+{
+  "schema": "666stream-visual-core-ci-verification-v1",
+  "date": "2026-10-17",
+  "scope": "CORE_VISUAL_COMPLETION_AND_FIVE_OPTIONS",
+  "source_head_at_validation": "b09ba998e6230a327cf02896039b0d5f0f512fa4",
+  "prechange_backup": "backup/pre-stream-core-ci-visual-trigger-20261017",
+  "workflow": ".github/workflows/stream-core-verify.yml",
+  "workflow_blob": "f8bf8595711e10ec6852a5594e1d0468f54535b7",
+  "ci_workflow_changes": [
+    "ADDED_MANUAL_WORKFLOW_DISPATCH",
+    "WATCH_SYMPHONY_VISUAL_TEST_IN_PUSH_AND_PULL_REQUEST"
+  ],
+  "script": "npm run verify:stream-core",
+  "included_visual_script": "npm run verify:stream-visual",
+  "node_version_in_workflow": "22",
+  "static_workflow_and_package_checks": "PASS_8_OF_8",
+  "source_test_presence": "PASS_3_OF_3",
+  "full_repository_node_execution": "NOT_EXECUTED_LOCALLY",
+  "local_full_checkout": "UNAVAILABLE_GITHUB_DNS_RESOLUTION",
+  "commit_status_api": "NO_STATUSES_RETURNED",
+  "workflow_run_query": "NO_RUNS_RETURNED_PR_FILTERED_QUERY",
+  "github_actions_execution": "NOT_CONFIRMED",
+  "fresh_host": "READBACK_PENDING",
+  "plugin_account_release": "UNRESOLVED",
+  "plugin_native_release": "UNRESOLVED",
+  "notes": [
+    "CI checks and workflow execution cannot be inferred from workflow configuration or successful source readback.",
+    "The GitHub workflow-runs connector is PR-filtered and not an exhaustive view of push-triggered workflows.",
+    "Concurrent Govee commit at prechange head preserved; only CI workflow changed."
+  ],
+  "no_production_radio_mutation": true,
+  "no_foreign_writes": true,
+  "no_artificial_revision": true
+}
