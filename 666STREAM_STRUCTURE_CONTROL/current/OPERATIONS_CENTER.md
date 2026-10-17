@@ -18,3 +18,6 @@ The UI is a projection of native state, not a separate task controller. Clearly 
 
 ## Core Evolution Dashboard v1 — 2026-10-17
 Native contract: `current/CORE_DASHBOARD_CONTRACT.md`; verified tasks: `development/DEVELOPMENT_OBLIGATION_LEDGER.json`. Render chat-local scope, pending obligations, anchor, source HEAD, change receipt, adapter parity and source-vs-host tests. `runtime/core-intelligence.mjs` provides pure evidence projection only, not host dispatch. Support user-controlled Bearbeiten & Weiterentwickeln navigation without auto-developing at SYSTEMSTART; do not claim UNKNOWN acceptance complete.
+
+## Visual peer forward controls — 2026-10-17
+When a verified peer Master Bridge proposal exists, project a clear visual **LYVRA** and **666CLIC** peer handoff path using `visual/MASTER_BRIDGE_HANDOFF_NAVIGATION.json`. Each control must perform a genuine action (copy the exact target-native command or open an actual GitHub file); otherwise present a non-interactive status. Distinguish PREPARED_NOT_DELIVERED, PEER_RECEIVED_VERIFIED and PEER_ADOPTED_VERIFIED. The dashboard is not a message-delivery engine; retain local scope and return anchor.
