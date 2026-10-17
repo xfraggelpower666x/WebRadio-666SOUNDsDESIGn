@@ -23,3 +23,20 @@ Presentation-only native visual facet. Repository files, JSON contracts and isol
 
 ## Failure/recovery
 If a host cannot render native controls, use plain-text exact continuation without presenting fake buttons. If host acceptance is missing or diverges from source, status is READBACK_PENDING or BLOCKED with a scoped return anchor. Never mutate foreign systems or production radio to fix a presentation failure.
+
+## Current verified CI baseline / unfinished host handoff — 2026-10-17
+FULL_REPOSITORY_CORE_NODE_CI=PASS_34_OF_34_AT_COMMIT_3330957bcda839b336572de937f7e8bb360bb03f
+INDEPENDENT_ACTIONS_RUN=39007506095
+CORE_CODEFORGE=PASS_22_OF_22
+VISUAL_COMPLETION=PASS_12_OF_12
+OLDER_33_OF_33_PASS=PRESERVED
+ORIGINAL_ZIP_DIRECT_GITHUB_TRANSPORT=PASS_9123_BYTES_EXACT_REMOTE_READBACK
+GOVEE_PRODUCTION_IMPORT=NONE
+ACCOUNT_PLUGIN_RELEASE_ID=UNRESOLVED
+NATIVE_PLUGIN_RELEASE_ID=UNRESOLVED
+FRESH_HOST_PASS=NOT_CLAIMED
+OPTIONAL_WINDOWS_OFFLINE_FALLBACK=NOT_REQUIRED_WHILE_DIRECT_GITHUB_TRANSPORT_WORKS; EXECUTION_NOT_TESTED
+
+Genuine fresh-host acceptance still requires a **new 666STREAM project chat**. Invoke `666STREAM SYSTEMSTART` and verify real current, native project-selection choices and non-foreground of unrelated projects. Then invoke `666STREAM DASHBOARD`, choose one actually rendered native action and inspect the received follow-up turn. Maintain a stable scoped CORE return anchor. Capture any actual independent host action/turn receipt before accepting HOST_PASS. A pasted action prompt alone does not establish a native button-click event.
+
+Existing visual test command includes three test files: semantic visual enforcement, master handoff and Symphony project identity. Earlier isolated 6/6 checks are historical, not a replacement for the actual 34/34 GitHub Actions run. Never rerun or roll back already accepted CI merely to satisfy another host gate.
