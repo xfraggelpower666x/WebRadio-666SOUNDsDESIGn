@@ -48,5 +48,22 @@
     "source_link_is_delivery": false,
     "copy_is_adoption": false,
     "keep_local_return_anchor": true
+  },
+  "clic_return_review_20261017": {
+    "source_repository": "xfraggelpower666x/666CLICPRO",
+    "branch": "clic-migration-rev79-staging",
+    "handoff": "666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-STREAM-MASTER-BRIDGE-REVIEW-20261017.md",
+    "source_blob": "0de24c554225716cdff1efa1556f0048b3295dae",
+    "stream_scope_adoption": "SOURCE_UPDATE_PENDING_POINTER",
+    "peer_origin_delivery": "NOT_PROVEN_BY_SOURCE",
+    "visual_states": [
+      "SOURCE_READBACK",
+      "DELIVERED_EVIDENCED",
+      "NATIVE_ADOPTION",
+      "FRESH_HOST_PASS"
+    ],
+    "semantic_evidence_module": "radio-codeforge/bridge/master-evidence.mjs",
+    "visual_compliance": "UNKNOWN_UNTIL_EVIDENCED",
+    "no_fake_host_pass": true
   }
 }
