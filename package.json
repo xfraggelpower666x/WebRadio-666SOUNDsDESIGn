@@ -11,7 +11,8 @@
     "verify": "npm run check && npm run radio:codeforge && npm test",
     "deploy": "npx wrangler deploy",
     "deploy:legacy-root": "cd workers/webradio-666soundsdesign-worker && npx wrangler deploy",
-    "verify:deployment": "node scripts/verify-deployment.mjs"
+    "verify:deployment": "node scripts/verify-deployment.mjs",
+    "verify:stream-core": "node scripts/verify-stream-core.mjs && node --test tests/stream-core-evolution.test.mjs tests/codeforge-bridge-reuse.test.mjs tests/radio-codeforge-contract.test.mjs"
   },
   "engines": {
     "node": ">=20"
