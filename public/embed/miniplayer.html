@@ -73,7 +73,7 @@ sliders.forEach(x=>x.addEventListener('input',applySound));boost.addEventListene
 document.getElementById('skipBtn').addEventListener('click',async()=>{const btn=document.getElementById('skipBtn');if(!window.S666SkipControl){label('Admin-Funktion nicht geladen');return}btn.disabled=true;label('Admin-Authentifizierung …');try{const result=await window.S666SkipControl.skip({source:'embed-miniplayer'});label(result.ok?'Auto-DJ Skip bestätigt':('Skip: '+String(result.error||'fehlgeschlagen').slice(0,110)))}catch(_){label('Skip nicht verfügbar')}finally{btn.disabled=false}});
 document.getElementById('send').addEventListener('click',async()=>{const button=document.getElementById('send'),message=document.getElementById('message').value.trim().slice(0,240),username=document.getElementById('sender').value.trim().slice(0,28)||'Guest';if(!message){messageStatus.textContent='Bitte Nachricht eingeben';return}button.disabled=true;messageStatus.textContent='Sende …';try{const response=await fetch('/api/player-alert/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,username,clientId:'embed-'+(crypto.randomUUID?.()||String(Date.now())),version:'embed-v1.2'})});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw new Error(String(data.error||'Backend lehnt Versand ab'));messageStatus.textContent='Gesendet · Bestätigung vom Backend';document.getElementById('message').value=''}catch(e){messageStatus.textContent='Nicht gesendet: '+String(e.message||'Netzwerkfehler').slice(0,100)}finally{button.disabled=false}});
 const sources=[new URL('/stream',location.origin).href,new URL('/fallback-stream',location.origin).href,'https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com:8686/stream'];
-let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=false,lastMeterAt=0;audio.volume=.75;
+let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=false,lastMeterAt=0,watchdogStatus='idle',watchdogLastEventAt=0;audio.volume=.75;
 // WebAudio analyser requires a CORS-enabled stream; keep native audio unmodified when unavailable.
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
@@ -81,10 +81,12 @@ function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'�
 async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
-audio.addEventListener('playing',()=>{retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
-audio.addEventListener('waiting',()=>{audioWaiting=true;if(wanted)label('Puffert …')});
-audio.addEventListener('pause',()=>{state();bars.forEach(b=>b.style.height='3px')});
-audio.addEventListener('error',async()=>{audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+audio.addEventListener('playing',()=>{watchdogStatus='healthy';watchdogLastEventAt=Date.now();retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
+audio.addEventListener('waiting',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();audioWaiting=true;if(wanted)label('Puffert …')});
+audio.addEventListener('pause',()=>{watchdogStatus='idle';watchdogLastEventAt=Date.now();state();bars.forEach(b=>b.style.height='3px')});
+audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+// Passiver Watchdog: beobachtet ausschliesslich reale Audiozustände, erzeugt weder einen neuen Player noch Recovery-Aktionen.
+setInterval(()=>{if(audioFault){watchdogStatus='fault';return}if(!wanted||audio.paused){watchdogStatus='idle';return}if(audioWaiting||audio.readyState<2){watchdogStatus='buffering';return}if(!audio.paused&&audio.readyState>=2){watchdogStatus='healthy';watchdogLastEventAt=Date.now()}},2000);
 // Dashboardschnittstelle: nur die vorhandene Audioinstanz steuern, nie neuen Player erzeugen.
 window.S666EmbedControl=Object.freeze({
   getState(){
@@ -93,6 +95,7 @@ window.S666EmbedControl=Object.freeze({
       playing,waiting:!!audioWaiting,recovering:!!retrying,error:!!audioFault,
       source:sourceIndex===0?'main':'backup',
       wanted:!!wanted,readyState:audio.readyState,
+      watchdogStatus,watchdogLastEventAt,
       meterAvailable:!!(playing&&visualActive&&analyser&&performance.now()-lastMeterAt<2200)
     };
   },
