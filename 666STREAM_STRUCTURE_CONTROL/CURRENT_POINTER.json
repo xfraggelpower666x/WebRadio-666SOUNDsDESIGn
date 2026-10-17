@@ -50,7 +50,11 @@
     "CODEFORGE_MASTER_REGRESSION_EXECUTION",
     "MASTER_BRIDGE_VISUAL_HOST_ACCEPTANCE",
     "MASTER_BRIDGE_PEER_DELIVERY_RECEIPTS",
-    "MASTER_BRIDGE_VISUAL_REGRESSION_EXECUTION"
+    "MASTER_BRIDGE_VISUAL_REGRESSION_EXECUTION",
+    "CLIC_MASTER_INDEPENDENT_LIVE_COMMIT_TREE_BLOB_TRANSPORT_TEST",
+    "CLIC_MASTER_NODE_TEST_SUITE_EXECUTION",
+    "CLIC_MASTER_VISUAL_FRESH_HOST_ACCEPTANCE",
+    "CLIC_MASTER_PLUGIN_BINARY_PARITY_READBACK"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -299,5 +303,30 @@
     "regression_test": "tests/stream-visual-master-handoff.test.mjs",
     "regression_execution": "NOT_RUN",
     "no_foreign_mutation": true
+  },
+  "clic_stream_master_bridge_adoption_20261017": {
+    "status": "STREAM_NATIVE_SOURCE_ADOPTED_READBACK_VERIFIED",
+    "source_repo": "xfraggelpower666x/666CLICPRO",
+    "source_branch": "clic-migration-rev79-staging",
+    "source_handoff": "666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-STREAM-MASTER-BRIDGE-REVIEW-20261017.md",
+    "source_blob_sha": "0de24c554225716cdff1efa1556f0048b3295dae",
+    "source_facet_blob_sha": "7478ea7d1ab913e4963a2d47961295b5c57675e5",
+    "master_id": "666STREAM-CODEFORGE-BRIDGE-MASTER",
+    "master_version": "1.0.0",
+    "native_receipt": "radio-codeforge/bridge/receipts/CLIC_STREAM_MASTER_REVIEW_INTAKE_20261017.json",
+    "native_evidence_module": "radio-codeforge/bridge/master-evidence.mjs",
+    "backup_branch": "backup/pre-streamctrl-clic-master-bridge-adoption-20261017",
+    "body_head": "aab2644106dd7632a03eb62154deeb1d793a7ed4",
+    "source_readback": "PASS_9_OF_9",
+    "isolated_function_smoke": "PASS_9_OF_9",
+    "node_test_suite": "NOT_RUN",
+    "independent_real_transport_commit_tree_blob": "NOT_TESTED_IN_THIS_UPDATE",
+    "peer_delivery": "NOT_PROVEN_BY_SOURCE_READBACK",
+    "fresh_host": "READBACK_PENDING",
+    "plugin_binary_parity": "READBACK_PENDING",
+    "clic_offline_runner": "NOT_LOCATED_DISABLED",
+    "production_radio_mutation": "NONE",
+    "clic_mutation": "NONE",
+    "pointer_last": true
   }
 }
