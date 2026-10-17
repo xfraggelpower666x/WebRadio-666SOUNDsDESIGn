@@ -1,0 +1,34 @@
+{
+  "schema": "666stream-visual-node-component-run-v1",
+  "date": "2026-10-17",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "source_current": "abacf86c985834c94efb8e8807daeaa83cfc55dd",
+  "scope": "SEMANTIC_VISUAL_INTELLIGENCE_COMPONENT_ONLY",
+  "runner": "Node.js v22.16.0 / node --test",
+  "executed_test": "tests/stream-semantic-visual-enforcement.test.mjs",
+  "source_git_blob_sha": "6b47eeaef755ee82e7dc887dd0a96226f468c970",
+  "test_git_blob_sha": "68f3673ac0a6fb520a25759bf0023f4c6a9cb115",
+  "contract_git_blob_sha": "99d29cc4f42d578c6ef2724a66100e5c268bb284",
+  "identity_method": "Verified each locally reconstructed exact source, test and visual contract by git hash-object matching independently GitHub-fetched blob SHA",
+  "fixture_scope": "Referenced manifest, skills and dashboard replaced with minimal field-equivalent fixture extracts; complete repository checkout unavailable",
+  "result": "PASS_6_OF_6",
+  "tests": [
+    "visual is a required native presentation facet not an authority",
+    "all native triggers have visual coverage and return choices",
+    "verified state requires independent actual source identity",
+    "no fake green when evidence missing or contradictory",
+    "only real evidence-approved actions are surfaced",
+    "four evidence lanes do not infer host from source"
+  ],
+  "proof": "NODE_TAP_6_PASS_0_FAIL",
+  "limitations": [
+    "NOT_FULL_REPOSITORY_NODE_TEST_SUITE",
+    "NOT_GITHUB_ACTIONS_PASS",
+    "NOT_ACTUAL_FRESH_CHAT_HOST_RENDERING",
+    "NOT_INTERACTIVE_HOST_CLICK_ACCEPTANCE"
+  ],
+  "ci_status": "NOT_CONFIRMED",
+  "host_status": "READBACK_PENDING",
+  "production_radio_mutation": "NONE",
+  "no_foreign_writes": true
+}
