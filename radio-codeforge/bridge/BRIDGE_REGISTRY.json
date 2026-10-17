@@ -115,5 +115,25 @@
     "automatic_foreign_dispatch": false,
     "offline_execution": "NOT_TESTED",
     "source_receipt_ne_execution_pass": true
+  },
+  "master_reference": {
+    "id": "666STREAM-CODEFORGE-BRIDGE-MASTER",
+    "version": "1.0.0",
+    "owner": "666STREAM_STRUCTURE_CONTROL",
+    "source": "radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md",
+    "status": "CANONICAL_666STREAM_MASTER_REFERENCE",
+    "other_systems_adoption": "PROPOSAL_ONLY",
+    "peer_handoffs": {
+      "LYVRA": "radio-codeforge/bridge/peer-handoffs/LYVRA_MASTER_BRIDGE_PROPOSAL_2026-10-17.md",
+      "CLIC": "radio-codeforge/bridge/peer-handoffs/CLIC_MASTER_BRIDGE_PROPOSAL_2026-10-17.md"
+    },
+    "source_provenance": {
+      "lyvra_original_blob_sha": "d0f58f4b1b3cda4c85125f0c2d6f086fc7d9cc6a",
+      "stream_direct_test_git_blob_sha": "111abe5921d9f62303648c96f648bd924e0cafe1",
+      "clic_original": "NOT_VERIFIED"
+    },
+    "tested_direct_scope": "582_BYTE_DERIVED_ZIP_ISOLATED_BRANCH_ONLY",
+    "offline_runner": "NOT_TESTED",
+    "no_foreign_auto_adoption": true
   }
 }
