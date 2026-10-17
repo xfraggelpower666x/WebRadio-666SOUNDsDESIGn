@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "projects": [
     {
@@ -34,7 +34,24 @@
         "CYBER_INTRO_HUD_TEMPLATE_v1_5/"
       ],
       "scope": "INTRO_AND_BOOT_VISUAL_PROJECTS",
-      "verified": true
+      "verified": true,
+      "subprojects": [
+        {
+          "id": "INTRO_V1_10",
+          "name": "CYBER INTRO v1.10",
+          "root": "CYBER_INTRO_HUD_TEMPLATE_v1_10_AUDIT_REPAIR_FREEZE/",
+          "source_status": "FROZEN_AUDIT_PASS",
+          "verified": true
+        },
+        {
+          "id": "INTRO_V1_5",
+          "name": "CYBER INTRO v1.5",
+          "root": "CYBER_INTRO_HUD_TEMPLATE_v1_5/",
+          "source_status": "REUSABLE_TEMPLATE",
+          "verified": true
+        }
+      ],
+      "selection_rule": "INTRO_ONLY_WITHOUT_VERSION_SELECT_VARIANT; DO_NOT_AUTO_MERGE"
     },
     {
       "id": "WINDOWS_APP",
@@ -63,6 +80,25 @@
       "scope": "SEPARATE_LIGHT_ORCHESTRA_CHILD_ROUTE",
       "verified_directory": false,
       "activation_rule": "RESOLVE_FROM_CURRENT_VERIFIED_ROUTE_OR_REGISTRY_NEVER_GUESS"
+    },
+    {
+      "id": "GOVEE_CONTROL",
+      "name": "666 GOVEE CONTROLLER",
+      "aliases": [
+        "666 govee controller",
+        "666 govee control",
+        "govee controller",
+        "govee control"
+      ],
+      "roots": [
+        "projects/666-GOVEE-CONTROL/"
+      ],
+      "scope": "INDEPENDENT_GOVEE_DEVICE_CONTROL_AND_WORKER_DEVELOPMENT",
+      "verified_checkpoint": true,
+      "implementation_status": "PARTIAL_NO_LIVE_PROMOTION",
+      "continuity_checkpoint": "projects/666-GOVEE-CONTROL/checkpoints/2026-10-17-initial/PROJECT_CHECKPOINT.md",
+      "separate_from": "LIGHT_ORCHESTRA",
+      "activation_rule": "EXPLICIT_CHAT_LOCAL_INTENT_AND_CURRENT_READBACK"
     }
   ],
   "systemstart": {
@@ -70,5 +106,11 @@
     "ambiguous_request": "ASK_PROJECT_SELECTION",
     "no_description_and_no_valid_handoff": "ASK_PROJECT_SELECTION",
     "valid_project_handoff": "CONTINUE_HANDOFF_PROJECT_IF_NOT_SUPERSEDED"
+  },
+  "routing_disambiguation": {
+    "govee_controller_vs_light_orchestra": "Explicit 'GOVEE CONTROLLER' routes GOVEE_CONTROL, not LIGHT_ORCHESTRA. Bare 'govee' remains context-dependent/ambiguous.",
+    "intro_variants": "Explicit v1.10 or v1.5 selects the corresponding subproject. Bare INTRO requires variant choice when variant matters.",
+    "preserve_legacy_intro_id": true,
+    "no_auto_foreign_activation": true
   }
 }
