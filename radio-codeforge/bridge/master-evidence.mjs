@@ -9,8 +9,15 @@ export function assessTransportReceipt(r){
   if(r.source_bytes!==r.remote_bytes||r.source_sha256!==r.remote_sha256)failures.push('BYTE_IDENTITY_MISMATCH');
   if(r.expected_target_head && r.expected_target_head!==r.target_head_before)failures.push('HEAD_CONFLICT');
   if(r.source_head_at_intake && r.source_head_at_intake!==r.source_head && !r.source_supersession_reviewed)failures.push('SOURCE_SUPERSESSION_UNREVIEWED');
-  // These proofs must be independently observed, not claimed by sender.
-  for(const k of ['independent_commit_readback','independent_tree_readback','independent_blob_readback','independent_remote_bytes_readback','source_authority_verified','target_authority_verified'])if(r[k]!==true)failures.push('UNVERIFIED_'+k.toUpperCase());
+  // A sender-supplied Boolean alone is never evidence. Independently fetched
+  // commit -> tree -> blob -> bytes/hash must be cross-bound by exact identity.
+  const p=r.evidence;
+  if(!p || p.observer!=='INDEPENDENT_REPOSITORY_READBACK' || !present(p.observation_id) || p.sender_self_attestation===true)failures.push('MISSING_INDEPENDENT_OBSERVER_EVIDENCE');
+  if(!p?.commit || p.commit.sha!==r.target_commit || p.commit.tree_sha!==r.target_tree || !present(p.commit.readback_source))failures.push('COMMIT_TREE_BINDING_UNVERIFIED');
+  if(!p?.tree || p.tree.sha!==r.target_tree || p.tree.path!==r.target_path || p.tree.blob_sha!==r.target_blob || !present(p.tree.readback_source))failures.push('TREE_BLOB_PATH_BINDING_UNVERIFIED');
+  if(!p?.blob || p.blob.sha!==r.target_blob || p.blob.byte_size!==r.remote_bytes || p.blob.sha256!==r.remote_sha256 || !present(p.blob.readback_source))failures.push('BLOB_BYTES_HASH_BINDING_UNVERIFIED');
+  if(!p?.freshness || p.freshness.target_head_before!==r.target_head_before || p.freshness.target_commit_after!==r.target_commit || p.freshness.head_rechecked!==true || !present(p.freshness.readback_source))failures.push('HEAD_FRESHNESS_UNVERIFIED');
+  if(r.source_authority_verified!==true || r.target_authority_verified!==true)failures.push('SCOPE_AUTHORITY_UNVERIFIED');
   if(r.force_push===true||r.unauthorized_paths===true||r.secrets_in_receipt===true)failures.push('FORBIDDEN_TRANSFER');
   return {status:failures.length?'READBACK_PENDING':'DELIVERED_EVIDENCED',failures,adoption:'NOT_PROVEN',host:'NOT_PROVEN'};
 }
