@@ -141,3 +141,10 @@ These are existing 666STREAM governance capabilities, not new native identities/
 Project chat foreground after direct user correction: `WEBRADIO`, workstream `DASHBOARD`, return to the last verified state **before** the topic “666STREAM — CodeForge Bridge gefunden”, maintaining later valid WCH checkpoint `c5045cabb46bef8e2dcec7a76fe6abdd3c149119` as the last verified dashboard work. The explicitly authorized GOVEE binary transport proof remains preserved on isolated test branch and must not be replayed or automatically foregrounded. Integrate its reusable transport capability via the existing CodeForge registry + rehydration manifest. No rollback, no cross-project activation, no PFS claim.
 
 Pending WEBRADIO gates: real browser acceptance of WCH, RCN, MTR, M/B, protected ADM, local GOV, diagnostics copy and layout/brand checks. `666STREAM WEITER` in this chat resumes these tasks, not GOVEE binary import. Other chats preserve their own scope.
+
+## Dual offline transport fallback continuity — 2026-10-17
+BRIDGE_ID=666STREAM-CODEFORGE-ARTIFACT-BRIDGE
+TRANSPORT_ORDER=DIRECT_GITHUB_BINARY|LYVRA_V1_OFFLINE_ADAPTER|CLIC_OFFLINE_ADAPTER_SOURCE_VERIFICATION_REQUIRED
+OFFLINE_LYVRA_PROCEDURE=SOURCE_VERIFIED_EXECUTION_PENDING
+OFFLINE_CLIC_PROCEDURE=UNVERIFIED_DISABLED
+Preserve the same canonical bridge ID, transfer manifest, source hash/bytes, branch/HEAD, prior transport error and next verified action across WEITER / NEW CHAT / NEXT CHAT. A fallback attempt may resume but may not switch project, silently write Current or claim unobserved successful transport.
