@@ -54,7 +54,7 @@ test('LYVRA local fallback is reusable and CLIC stays disabled until exact sourc
   assert.equal(chain.no_new_bridge, true);
   assert.equal(chain.lyvra_offline.status, 'PROCEDURE_SOURCE_VERIFIED_EXECUTION_NOT_TESTED');
   assert.ok(chain.lyvra_offline.required.includes('source_size_and_sha256'));
-  assert.equal(chain.clic_offline.status, 'REFERENCE_NOT_VERIFIED_DISABLED');
+  assert.equal(chain.clic_offline.status, 'NATIVE_FACET_VERIFIED_RUNNER_NOT_LOCATED_DISABLED');
   assert.equal(chain.clic_offline.no_invented_tooling, true);
   assert.equal(chain.offline_execution, 'NOT_TESTED');
   assert.equal(chain.automatic_foreign_dispatch, false);
