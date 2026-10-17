@@ -54,7 +54,9 @@
     "CLIC_MASTER_INDEPENDENT_LIVE_COMMIT_TREE_BLOB_TRANSPORT_TEST",
     "CLIC_MASTER_NODE_TEST_SUITE_EXECUTION",
     "CLIC_MASTER_VISUAL_FRESH_HOST_ACCEPTANCE",
-    "CLIC_MASTER_PLUGIN_BINARY_PARITY_READBACK"
+    "CLIC_MASTER_PLUGIN_BINARY_PARITY_READBACK",
+    "SEMANTIC_VISUAL_NATIVE_HOST_PRESENTATION_ACCEPTANCE",
+    "SEMANTIC_VISUAL_NODE_TEST_EXECUTION"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -341,5 +343,34 @@
     "node_test_runner": "NOT_RUN",
     "fresh_host_acceptance": "READBACK_PENDING",
     "no_production_mutation": true
+  },
+  "visual_intelligence_enforcement_20261017": {
+    "status": "SOURCE_CONTRACT_AND_ISOLATED_PROJECTION_READBACK_PASS",
+    "body_head": "b4fe144d61543798035686d811112d2c21714c48",
+    "backup_branch": "backup/pre-streamctrl-visual-enforcement-20261017",
+    "contract": "666STREAM_STRUCTURE_CONTROL/visual/VISUAL_ENFORCEMENT_CONTRACT.json",
+    "renderer": "666STREAM_STRUCTURE_CONTROL/visual/semantic-visual-intelligence.mjs",
+    "native_skill": "semantic-visual-intelligence",
+    "source_readback": "PASS_8_OF_8",
+    "isolated_function_checks": "PASS_11_OF_11",
+    "node_test_execution": "NOT_RUN",
+    "fresh_host_visual_acceptance": "READBACK_PENDING",
+    "native_triggers": [
+      "SYSTEMSTART",
+      "UPDATE",
+      "WEITER",
+      "NEW CHAT",
+      "NEXT CHAT",
+      "AUDIT",
+      "DASHBOARD",
+      "VORNE",
+      "FUCK HORST",
+      "MASTER BRIDGE HANDOFF"
+    ],
+    "requires_visible_next_choices": true,
+    "no_fake_buttons": true,
+    "no_evidence_free_pass": true,
+    "foreign_mutation": "NONE",
+    "production_radio_mutation": "NONE"
   }
 }
