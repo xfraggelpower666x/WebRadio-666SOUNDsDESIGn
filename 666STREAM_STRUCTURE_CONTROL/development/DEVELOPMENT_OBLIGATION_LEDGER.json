@@ -1,0 +1,67 @@
+{
+  "schema": "666stream-obligation-ledger-v1",
+  "authority": "666STREAM_STRUCTURE_CONTROL",
+  "version": "1.0.0",
+  "status": "CURRENT_CANDIDATE_EVIDENCE_RECONCILIATION",
+  "allowed_states": [
+    "PROPOSED",
+    "DEV_ACTIVE",
+    "PAUSED",
+    "BLOCKED",
+    "ACCEPTED_PENDING_PROMOTION",
+    "DEFERRED_WITH_REASON",
+    "REJECTED_WITH_REASON",
+    "SUPERSEDED",
+    "PROMOTED_CURRENT",
+    "READBACK_PENDING"
+  ],
+  "rules": [
+    "NO_SILENT_PROMOTION",
+    "NO_SILENT_LOSS",
+    "SCOPE_LOCAL",
+    "EVIDENCE_REQUIRED_FOR_PROMOTED_CURRENT",
+    "ACCEPTANCE_NE_SOURCE_COMMIT"
+  ],
+  "obligations": [
+    {
+      "id": "CORE_FRESH_HOST_ACCEPTANCE",
+      "project_id": "CORE",
+      "state": "READBACK_PENDING",
+      "summary": "Fresh-chat routing and host dispatch for VORNE/FUCK HORST/continuity",
+      "source": "666STREAM_STRUCTURE_CONTROL/CURRENT_POINTER.json",
+      "return_anchor": "VERIFY_NEW_CHAT_NATIVE_HOST"
+    },
+    {
+      "id": "CODEFORGE_TRANSPORT_ACCEPTANCE",
+      "project_id": "CORE",
+      "state": "READBACK_PENDING",
+      "summary": "Binary Bridge transport, independent readback and three-check execution",
+      "source": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+      "return_anchor": "RUN_BRIDGE_TRANSPORT_AB"
+    },
+    {
+      "id": "LIGHT_ORCHESTRA_ROUTE",
+      "project_id": "LIGHT_ORCHESTRA",
+      "state": "BLOCKED",
+      "summary": "Separate native child route not yet proven",
+      "source": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
+      "return_anchor": "VERIFY_CHILD_ROUTE"
+    },
+    {
+      "id": "GOVEE_CONTROL_CAPABILITIES",
+      "project_id": "GOVEE_CONTROL",
+      "state": "READBACK_PENDING",
+      "summary": "Device capability, group API and guarded controller acceptance",
+      "source": "projects/666-GOVEE-CONTROL/checkpoints/2026-10-17-initial/PROJECT_CHECKPOINT.md",
+      "return_anchor": "VERIFY_AUTHENTICATED_CAPABILITIES"
+    },
+    {
+      "id": "INTRO_VARIANT_ROUTING",
+      "project_id": "CORE",
+      "state": "READBACK_PENDING",
+      "summary": "Fresh chat routing for v1.5 and v1.10 independent variants",
+      "source": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
+      "return_anchor": "VERIFY_TWO_INTRO_FRESH_BOOT"
+    }
+  ]
+}
