@@ -109,3 +109,12 @@ Bei binären GitHub-Artefakten zuerst den direkten GitHub-Connector-Transport de
 
 ### Chat-Rückkehr nach Nutzerkorrektur
 Der GOVEE-Binärtest ist ein gültiger, isolierter Nebenast, **kein Foreground-Wechsel**. Der aktive Entwicklungsanker dieses Chats geht zurück auf WEBRADIO Dashboard nach WCH-Reparatur (Commit `c5045cabb46bef8e2dcec7a76fe6abdd3c149119`). Die neueren CORE- und CodeForge-Commits werden bewahrt. Kein GitHub-Revert.
+
+## Offline fallback chain: LYVRA + CLIC — 2026-10-17
+The **same canonical 666STREAM bridge** owns direct transport and fallback adapters. Do not create sibling bridges, import foreign authority, or activate foreign systems.
+Routing:
+1. DIRECT_GITHUB_BINARY_BLOB when supported, authorized and byte identity can be independently verified.
+2. On actual direct transport failure/unavailability, use the existing local Windows/PowerShell + Git adapter following **LYVRA Binary Repository Bridge v1.0.0** verified native procedure. Verify source path, byte length, SHA256, destination allowlist, fresh branch/HEAD, HEAD immediately before push, no force, independent remote byte/hash readback and machine receipt. Offline refers to preparing/handling payload locally; final GitHub publication still requires suitable connectivity/authorization.
+3. **CLIC offline profile** is registered but disabled until its exact current native implementation/source and permission/transport contracts can be verified. Do not guess a script, endpoint or runnable CLIC bridge based on the system name; after verification adapt its applicable features into the existing bridge, not a duplicate.
+4. If all verified paths are unavailable, preserve the transport job as BLOCKED with exact return anchor, never claim import or create a new bridge to bypass gates.
+A fallback profile never writes current pointers, changes user foreground, runs PFS backups, deploys players or sends device commands. Existing 582-byte isolated direct-blob PASS does not prove offline runner execution or full original archive upload.
