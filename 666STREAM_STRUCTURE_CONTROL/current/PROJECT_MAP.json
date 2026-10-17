@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "projects": [
     {
@@ -74,12 +74,23 @@
         "symphony light",
         "symphony light pro",
         "govee",
-        "light orchestra"
+        "light orchestra",
+        "666 light orchestra symphony",
+        "light orchestra symphony",
+        "666 symphony"
       ],
       "roots": [],
       "scope": "SEPARATE_LIGHT_ORCHESTRA_CHILD_ROUTE",
       "verified_directory": false,
-      "activation_rule": "RESOLVE_FROM_CURRENT_VERIFIED_ROUTE_OR_REGISTRY_NEVER_GUESS"
+      "activation_rule": "DIRECT_EXPLICIT_SYMPHONY_SELECTS_LIGHT_ORCHESTRA; DO_NOT_INVENT_DIRECTORY",
+      "name": "666 LIGHT ORCHESTRA SYMPHONY",
+      "product_identity": "SYMPHONY_LIGHT_PRO",
+      "identity_verified_by": [
+        "USER_DIRECT_CLARIFICATION_2026-10-17",
+        "docs/666STREAM_NATIVE_TRIGGERS_AND_HANDOFF_v1.md"
+      ],
+      "project_selection_status": "KNOWN_NATIVE_PROJECT_CAN_SELECT",
+      "directory_readback_status": "UNVERIFIED_SEPARATE_CHILD_PATH"
     },
     {
       "id": "GOVEE_CONTROL",
@@ -111,6 +122,7 @@
     "govee_controller_vs_light_orchestra": "Explicit 'GOVEE CONTROLLER' routes GOVEE_CONTROL, not LIGHT_ORCHESTRA. Bare 'govee' remains context-dependent/ambiguous.",
     "intro_variants": "Explicit v1.10 or v1.5 selects the corresponding subproject. Bare INTRO requires variant choice when variant matters.",
     "preserve_legacy_intro_id": true,
-    "no_auto_foreign_activation": true
+    "no_auto_foreign_activation": true,
+    "symphony_identity": "SYMPHONY|SYMPHONY_LIGHT_PRO|LIGHT_ORCHESTRA means LIGHT_ORCHESTRA; identity is known even when separate child directory path remains unresolved"
   }
 }
