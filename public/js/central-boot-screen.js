@@ -10,7 +10,7 @@
   if(global.S666CentralBootScreen) return;
 
   const VERSION='2.2.1';
-  const STYLE_URL='/css/central-boot-screen.css?v=20261016-two-phase-r01';
+  const STYLE_URL='/css/central-boot-screen.css?v=20261017-two-phase-first-paint-r03';
   const DEFAULT_DURATION=4200;
   const MAIN_ANIMATION_CYCLE=10000;
   const MAIN_PHASE2_FADE_MS=5400;
@@ -20,7 +20,7 @@
   const MAIN_START_PROGRESS=1;
   const MAIN_COMPLETE_HOLD=0;
   const OWNER_KEY='s666_active_player_owner_v2';
-  const BOOT_MARKER='20261016-main-iphone-two-phase-cyberintro-r01';
+  const BOOT_MARKER='20261017-main-iphone-static-first-paint-r03';
 
   let root=null,raf=0,startAt=0,duration=DEFAULT_DURATION,lastPhase=-1,readyPromise=null;
 
@@ -267,20 +267,23 @@
   function primeBootShell(){
     ensureStyle();
     const existing=document.getElementById('s666CentralBoot');
-    if(existing){root=existing;}
+    if(existing) root=existing;
     if(!root){
       root=document.createElement('main');
       root.id='s666CentralBoot';
       root.className='s666boot-scene';
       root.setAttribute('aria-labelledby','s666boot-title');
-      root.dataset.state='booting';
-      root.dataset.player=identity.playerId;
-      root.dataset.playerRoute=identity.route;
-      root.dataset.bootOwner=BOOT_MARKER;
-      root.dataset.bootSkin=identity.page==='main'?'main-cyber-hud-v1':'central-legacy';
       root.innerHTML=bootMarkup();
       (document.body||document.documentElement).appendChild(root);
+    }else if(identity.page==='main'&&!root.querySelector('[data-main-cyber-hud="1"]')){
+      root.innerHTML=bootMarkup();
     }
+    root.classList.add('s666boot-scene');
+    root.dataset.state='booting';
+    root.dataset.player=identity.playerId;
+    root.dataset.playerRoute=identity.route;
+    root.dataset.bootOwner=BOOT_MARKER;
+    root.dataset.bootSkin=identity.page==='main'?'main-cyber-hud-v1':'central-legacy';
     if(identity.page==='main') document.documentElement.dataset.s666MainBootVisible='1';
     document.documentElement.classList.add('s666-central-boot-active');
     return root;
