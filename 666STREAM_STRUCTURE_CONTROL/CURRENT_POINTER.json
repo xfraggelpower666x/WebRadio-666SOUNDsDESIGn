@@ -66,7 +66,8 @@
     "FIVE_OPTION_FULL_NODE_REGRESSION",
     "VISUAL_COMPLETION_FRESH_HOST_ACCEPTANCE",
     "STREAM_ACCOUNT_PLUGIN_RELEASE_ID_READBACK",
-    "STREAM_NATIVE_PLUGIN_RELEASE_ID_READBACK"
+    "STREAM_NATIVE_PLUGIN_RELEASE_ID_READBACK",
+    "CI_CORE_REAL_RUN_LOG_AND_CONCLUSION_READBACK"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -492,5 +493,21 @@
     "scope": "CORE",
     "no_second_visual_engine": true,
     "production_radio_mutation": "NONE"
+  },
+  "visual_completion_ci_gate_20261017": {
+    "status": "CI_WIRING_VERIFIED_FULL_EXECUTION_PENDING",
+    "body_head": "6bfe47a7c80179f054db076b5fbc49bb83a211ba",
+    "backup_branch": "backup/pre-stream-core-ci-visual-trigger-20261017",
+    "receipt_path": "666STREAM_STRUCTURE_CONTROL/recovery/VISUAL_CORE_CI_GATE_20261017.json",
+    "receipt_blob": "dbd27943eeed608e9aaa3ea51429b36c27afc516",
+    "workflow": ".github/workflows/stream-core-verify.yml",
+    "workflow_validation": "PASS_8_OF_8",
+    "full_node_suite": "NOT_EXECUTED",
+    "github_actions_run": "NOT_CONFIRMED",
+    "fresh_host": "READBACK_PENDING",
+    "plugin_parity": "READBACK_PENDING",
+    "production_radio_mutation": "NONE",
+    "foreign_mutation": "NONE",
+    "pointer_last": true
   }
 }
