@@ -607,7 +607,7 @@
       mark('AUD',state.playing?'ok':state.error?'error':'off',state.playing?'Audio spielt':state.error?'Audiofehler':'Audio pausiert');
       mark('SB',state.waiting?'pending':state.playing?'ok':'off',state.waiting?'Stream puffert':state.playing?'Wiedergabe ohne Pufferereignis':'Kein aktiver Stream');
       mark('RCN',state.recovering?'pending':state.error?'error':'off',state.recovering?'Aktive Wiederverbindung':state.error?'Streamfehler':'Keine Recovery aktiv');
-      mark('WCH',state.recovering?'pending':state.error?'error':'off',state.recovering?'Recovery-Überwachung aktiv':state.error?'Fehler erkannt':'Keine separate Watchdog-Telemetrie');
+      mark('WCH',state.watchdogStatus==='healthy'?'ok':state.watchdogStatus==='buffering'?'pending':state.watchdogStatus==='fault'?'error':'off',state.watchdogStatus==='healthy'?'Audio-Watchdog: Wiedergabe stabil':state.watchdogStatus==='buffering'?'Audio-Watchdog: Pufferung beobachtet':state.watchdogStatus==='fault'?'Audio-Watchdog: Audiofehler erkannt':'Audio-Watchdog: inaktiv');
       mark('MTR',state.meterAvailable?'ok':'off',state.meterAvailable?'Echte FFT-Audioanalyse läuft':'Keine bestätigten aktuellen Audiopegel');
       mark('M',state.source==='main'?'ok':'off','Hauptstream '+(state.source==='main'?'ausgewählt':'nicht ausgewählt'));
       mark('B',state.source==='backup'?'ok':'off','Backupstream '+(state.source==='backup'?'ausgewählt':'nicht ausgewählt'));
