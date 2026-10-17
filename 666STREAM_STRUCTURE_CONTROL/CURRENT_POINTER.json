@@ -41,7 +41,9 @@
     "CORE_EVOLUTION_PLUGIN_SKILL_PARITY_READBACK",
     "CORE_VERIFY_WORKFLOW_EXECUTION_READBACK",
     "CORE_VERIFY_REGRESSION_RESULTS_READBACK",
-    "CORE_NODE_VERIFICATION_AND_CI_READBACK"
+    "CORE_NODE_VERIFICATION_AND_CI_READBACK",
+    "CODEFORGE_LYVRA_OFFLINE_EXECUTION_TEST",
+    "CODEFORGE_CLIC_OFFLINE_SOURCE_VERIFICATION"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -238,5 +240,22 @@
     "readback": "PASS_4_OF_4",
     "pointer_last": true,
     "production_radio_modified": false
+  },
+  "codeforge_offline_fallback_20261017": {
+    "status": "SOURCE_CONTRACT_READBACK_PASS",
+    "body_head": "2f34f5619b17c39472773a21da99e7a54b56f6d0",
+    "backup_branch": "backup/pre-streamctrl-dual-offline-fallback-20261017",
+    "single_bridge": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+    "transport_order": [
+      "DIRECT_VERIFIED_GITHUB_BINARY",
+      "LYVRA_V1_LOCAL_GIT_FALLBACK",
+      "CLIC_OFFLINE_WHEN_NATIVE_SOURCE_VERIFIED"
+    ],
+    "lyvra_fallback": "SOURCE_VERIFIED_EXECUTION_PENDING",
+    "clic_fallback": "SOURCE_NOT_VERIFIED_DISABLED",
+    "source_readback": "PASS_4_OF_4",
+    "tests": "NOT_RUN",
+    "production_radio_mutation": "NONE",
+    "foreign_system_mutation": "NONE"
   }
 }
