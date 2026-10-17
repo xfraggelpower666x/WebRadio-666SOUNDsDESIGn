@@ -43,3 +43,35 @@ CLIC_NATIVE_OFFLINE_ORIGINAL=NOT_VERIFIED
 PEER_ADOPTION_LYVRA=NOT_REQUESTED
 PEER_ADOPTION_CLIC=NOT_REQUESTED
 FRESH_HOST_PARITY=READBACK_PENDING
+
+## CLIC original native peer review adopted as STREAM-owned delta — 2026-10-17
+SOURCE_REPO=xfraggelpower666x/666CLICPRO
+SOURCE_BRANCH=clic-migration-rev79-staging
+SOURCE_HANDOFF=666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-STREAM-MASTER-BRIDGE-REVIEW-20261017.md
+SOURCE_HANDOFF_BLOB=0de24c554225716cdff1efa1556f0048b3295dae
+CLIC_FACET_SOURCE=666CLIC_NATIVE_RUNTIME/facets/repository_bridge/FACET_CONTRACT.md
+CLIC_FACET_CURRENT_READBACK_BLOB=7478ea7d1ab913e4963a2d47961295b5c57675e5
+CLIC_FACET_PRECHANGE_BLOB=3229f39dbb7c4f6836c9b87f427f85271f2e6492
+STREAM_MASTER_ORIGINAL_BLOB=197793077d081f6c28970d4bdfffc6a483cdafca
+CLIC_OFFLINE_RUNNER=NOT_LOCATED
+CLIC_DIRECT_BINARY_RUNTIME=NOT_TESTED
+PEER_PROPOSAL_RECEIVED_AS_SOURCE=YES
+PEER_DELIVERY_RECEIPT=NOT_PROVEN
+STREAM_NATIVE_ADOPTION=ONLY_AFTER_BODY_READBACK_AND_POINTER_LAST
+LYVRA_OR_CLIC_AUTO_ADOPTION=FORBIDDEN
+
+The exact user-designated CLIC return handoff blob and current native Repository Bridge facet were read directly. CLIC's registered whole-system facet is a provenance reference, NOT a runnable CLIC offline runner. Its native SOURCE_RECEIPT != DELIVERY_RECEIPT != ADOPTION != FRESH_HOST semantics are adapted as 666STREAM-only governance, not foreign authority.
+
+### CLIC-origin technical improvements integrated by reference and native implementation
+- Use `radio-codeforge/bridge/master-evidence.mjs` as the **same bridge's** fail-closed evidence-policy module. It provides receipt decision, handoff-level separation, provenance conflict checks, visual card projection and bounded repetitive discovery; it does NOT execute GitHub transports or autonomously mutate state.
+- Verify source bytes, source SHA256, original source head and intake head; capture target expected/pre-push HEAD and independently read actual Git **commit, tree, blob and remote bytes**. An arbitrary Boolean field from the sender is never alone proof: independent observation and signed/verified provenance are needed for real acceptance.
+- Distinguish `SOURCE_READBACK`, `DELIVERED_EVIDENCED`, `NATIVE_ADOPTION` and `FRESH_HOST_PASS` with each own evidence. The 666STREAM observation of the CLIC source proves only `SOURCE_READBACK` here.
+- Source supersession and conflicting duplicate event IDs/fingerprints produce `CONFLICT_QUARANTINE`, not blind replay or adoption. Protect newer valid native current.
+- Preserve one canonical Bridge and chat-local sub-LifeCircle return anchors; `PAUSE > INGEST > CAUSAL_RECONCILIATION > RESUME`. Do not create another bridge.
+- Every master handoff gets a semantic visual evidence card that separately renders SOURCE, DELIVERY, ADOPTION, HOST, unknown visual-compliance status and relevant source citation. Visual presentation must not gain native decision authority.
+- Plugin release IDs/actual binary SHA256/approved backup and host release are separate from Git text parity, master source receipts and PFS backup.
+- Enforce MAX_3_CHECKS_THEN_LEARNING_BY_DOING only for redundant hypothesis discovery, **never** for authorization, HEAD conflicts, security, source integrity, regression, independent readback or backup gates.
+- Keep direct GitHub binary as preferred tested technique (582-byte derived ZIP on isolated branch), LYVRA v1.0 local Git procedure as fallback; CLIC offline runner disabled pending actual source/host confirmation. This review does not magically import either system's runner.
+
+### Receipt evidence schema contract
+A real `DELIVERED_EVIDENCED` claim must cite separate source repository/head/hash/size, target repo/branch/HEAD before/expected, actual target commit/tree/blob/path, pre-push head recheck, independently fetched commit/tree/blob and remote actual bytes/sha256. Untrusted peer claims cannot self-certify those independent reads. On any mismatch or missing proof: READBACK_PENDING or CONFLICT_QUARANTINE with return anchor. STREAM native update must decide any candidate adoption and publish its CURRENT_POINTER last.
