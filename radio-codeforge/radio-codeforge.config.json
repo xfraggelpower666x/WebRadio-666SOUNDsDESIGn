@@ -62,7 +62,9 @@
     "research-before-repair",
     "repair-revalidation",
     "current-before-history",
-    "evidence-before-pass"
+    "evidence-before-pass",
+    "max-three-discovery-checks",
+    "learning-by-doing-outcome-loop"
   ],
   "codexEscalation": {
     "enabled": true,
@@ -137,5 +139,31 @@
     "no-source-trigger-import",
     "no-source-authority-import",
     "no-blind-full-rewrite"
-  ]
+  ],
+  "threeChecksLearningByDoing": {
+    "policy": "MAX_3_CHECKS_THEN_LEARNING_BY_DOING",
+    "enabled": true,
+    "applicability": "REPETITIVE_SAME_HYPOTHESIS_DISCOVERY_CHECKS",
+    "maxDiscoveryChecksPerHypothesis": 3,
+    "countOnlyEvidenceSeekingChecks": true,
+    "deduplicateEquivalentChecks": true,
+    "afterLimit": "IMPLEMENT_SMALLEST_SAFE_REVERSIBLE_STEP_AND_COLLECT_OUTCOME",
+    "whenUnsafeOrMissingAuthority": "BLOCK_WITH_EVIDENCE_AND_RETURN_ANCHOR",
+    "distinctFromCodexFailedRepairAttempts": true,
+    "mandatoryGatesNeverSkipped": [
+      "current-authority-and-scope",
+      "prechange-backup",
+      "concurrency-head",
+      "required-security-checks",
+      "targeted-regressions",
+      "independent-readback",
+      "pointer-last"
+    ],
+    "learning": "OBSERVATION->HYPOTHESIS->SAFE_ACTION->MEASURED_OUTCOME->CAUSAL_UPDATE",
+    "outcomePromotion": "EVIDENCE_REQUIRED",
+    "contradictoryEvidence": "QUARANTINE_AND_REVALIDATE",
+    "scope": "CURRENT_666STREAM_PROJECT_ONLY",
+    "autonomousWrites": false,
+    "foreignLearningMutation": false
+  }
 }
