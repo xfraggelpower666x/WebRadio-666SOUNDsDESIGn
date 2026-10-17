@@ -42,8 +42,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <meta name="application-name" content="666 WebRadio">
 
   <!-- Main / iPhone: preload the existing single boot owner; never hide the page if it fails. -->
-  <link rel="stylesheet" href="/css/central-boot-screen.css?v=20261016-two-phase-r02">
-  <script src="/js/central-boot-screen.js?v=20261016-two-phase-r02" defer></script>
+  <link rel="stylesheet" href="/css/central-boot-screen.css?v=20261017-two-phase-first-paint-r03">
+  <script src="/js/central-boot-screen.js?v=20261017-two-phase-first-paint-r03" defer></script>
   <link rel="stylesheet" href="/css/addons/discord-player-addon-v3.css?v=2026-06-15-fix1">
   <script src="/js/version-core.js?v=smfp-v2026-07-08-veluna128"></script>
   <script src="/js/boost-core.js?v=2026-06-15-fix1"></script>
@@ -83,6 +83,37 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
 <body data-veluna-ui="1" data-veluna-page="main">
+  <!-- MAIN/iPhone CYBERINTRO first-paint surface. The existing Central Boot JS remains the only lifecycle owner. -->
+  <main id="s666CentralBoot" class="s666boot-scene s666boot-static-preflight" aria-labelledby="s666boot-title" data-state="booting" data-player="preflight" data-player-route="/" data-boot-owner="20261017-main-iphone-static-first-paint-r03" data-boot-skin="main-cyber-hud-v1">
+    <div class="s666boot-main-hud" data-main-cyber-hud="1" aria-live="polite">
+      <div class="s666boot-main-grid" aria-hidden="true"></div>
+      <div class="s666boot-main-reactor" aria-hidden="true"></div>
+      <div class="s666boot-main-circuit s666boot-main-circuit-left" aria-hidden="true"></div>
+      <div class="s666boot-main-circuit s666boot-main-circuit-right" aria-hidden="true"></div>
+      <p class="s666boot-main-system">SYSTEM ONLINE</p>
+      <h1 id="s666boot-title" class="s666boot-main-title">666 CYBER BOOT</h1>
+      <div class="s666boot-main-logo-wrap" aria-hidden="true">
+        <div class="s666boot-main-six-arc"><span>6</span><span>6</span><span>6</span></div>
+        <img class="s666boot-main-logo" src="/assets/boot-screen/666-cyber-hud-main-logo.webp?v=20260913-main-cyber-hud-v1" alt="">
+        <div class="s666boot-main-om">ॐ</div>
+        <div class="s666boot-main-eye s666boot-main-eye-left"></div><div class="s666boot-main-eye s666boot-main-eye-right"></div>
+      </div>
+      <div class="s666boot-main-label s666boot-main-label-left" data-text="666SOUNDsDESIGn">666SOUNDsDESIGn</div>
+      <div class="s666boot-main-label s666boot-main-label-right" data-text="© FRAGGLEPOWER666">© FRAGGLEPOWER666</div>
+      <div class="s666boot-main-progress-dock">
+        <p class="s666boot-status" id="s666boot-status">INITIALIZING PLAYER</p>
+        <div class="s666boot-progress-wrap" aria-label="Player boot progress">
+          <div class="s666boot-track" role="progressbar" aria-valuemin="1" aria-valuemax="100" aria-valuenow="1" id="s666boot-track"><div class="s666boot-bar" id="s666boot-bar" style="width:1%"></div></div>
+          <div class="s666boot-percent" id="s666boot-percent">1%</div>
+        </div>
+        <p class="s666boot-phase-label" id="s666boot-phase">CONNECTING RADIO CORE</p>
+        <div class="s666boot-steps" aria-hidden="true">
+          <div class="s666boot-step active" data-step="0">Connect</div><div class="s666boot-step" data-step="1">Audio</div><div class="s666boot-step" data-step="2">Systems</div><div class="s666boot-step" data-step="3">Player</div>
+        </div>
+      </div>
+      <div class="s666boot-main-scanline" aria-hidden="true"></div>
+    </div>
+  </main>
 <a class="lyvra-site-link" href="https://weblyvra.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer" aria-label="LYVRA Website in neuem Tab öffnen">💜 LYVRA</a>
   <div class="frame-stage">
     <div class="frame-overlay"></div>
