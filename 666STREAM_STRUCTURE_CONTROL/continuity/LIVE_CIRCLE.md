@@ -177,3 +177,11 @@ VISUAL_REQUIREMENT=SHOW_ALL_LEVELS_WITH_INDEPENDENT_EVIDENCE
 CHECK_BUDGET=3_NONREDUNDANT_DISCOVERY_ONLY
 HOST_ACCEPTANCE=READBACK_PENDING
 Preserve direct GitHub binary, LYVRA offline fallback, CLIC offline runner disabled, all newer STREAM evolution and current chat-local return anchors; CLIC peer source readback is not an actual foreign delivery receipt, plugin release or fresh-host pass.
+
+## Always-visible next navigation for native continuity (2026-10-17)
+VISUAL_FACET=visual/VISUAL_ENFORCEMENT_CONTRACT.json
+VISUAL_MODULE=visual/semantic-visual-intelligence.mjs
+MANDATORY_AT_NATIVE_RESULT=true
+CHOICES_FROM_VERIFIED_CURRENT_ONLY=true
+NO_DEAD_END_ON_UPDATE=true
+On each verified native operation, present current scope and evidence alongside valid next steps, user-selectable when the host supports actual interactions. If interrupted or frozen, display the return anchor and why a choice is unavailable. This does not activate a separate facet or reset the chat-local project.
