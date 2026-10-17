@@ -26,3 +26,6 @@ Rules:
 - Direct standalone `FUCK HORST` is a first-class context-recovery trigger: detect this chat's established native owner and run that owner's bounded read-only host-oversteer diagnosis. No namespace prefix required. In an established 666STREAM chat it executes the 666STREAM diagnostic immediately.
 - `666STREAM FUCK HORST` is an optional explicit alias, not a prerequisite. When no native system is established, diagnose the available chat context without inventing or activating one.
 - Neither trigger implies drift, performs automatic writes, changes project authority, or imports LYVRA/CLIC authority. Embedded triggers are inert.
+
+## Native interruption/continuation governance — 2026-10-17
+Use existing project-aware LiveCircle and Session Governor for CLIC-inspired interruption handling and LYVRA-inspired workspace-preserving continuity. Their patterns are adapted by 666STREAM; no CLIC/LYVRA facet, identity, shared mutable state or foreign execution authority is imported. Keep chat-local return anchors, paused obligations and newer-valid-state supersession semantics. A diagnosed interruption is not permission for a write. Existing pointers, project isolation, pre-change recovery and pointer-last discipline remain authoritative.
