@@ -1,0 +1,76 @@
+{
+  "schema": "666stream-core-ci-actual-github-actions-proof-v1",
+  "date": "2026-10-17",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "scope": "CORE_VISUAL_COMPLETION_FIVE_OPTIONS_AND_CODEFORGE",
+  "verified_tested_commit": "4bbf179cb2ac437b6cb162839df2e2a5075b0a28",
+  "latest_head_prior_to_evidence": "7cc5b469dcc0263da0f42aea55d96b94a85e837e",
+  "workflow": ".github/workflows/stream-core-verify.yml",
+  "run_id": 38998278852,
+  "job_id": 117295561319,
+  "run_url": "https://github.com/xfraggelpower666x/WebRadio-666SOUNDsDESIGn/actions/runs/38998278852",
+  "job_result": "COMPLETED_SUCCESS",
+  "executed_command": "npm run verify:stream-core",
+  "contract_validator": "SOURCE_CONTRACT_VALIDATION_PASS",
+  "core_codeforge_regression": {
+    "tests": 21,
+    "passed": 21,
+    "failed": 0,
+    "log_confirmed": true
+  },
+  "visual_completion_regression": {
+    "tests": 12,
+    "passed": 12,
+    "failed": 0,
+    "log_confirmed": true,
+    "files": [
+      "tests/stream-semantic-visual-enforcement.test.mjs",
+      "tests/stream-visual-master-handoff.test.mjs",
+      "tests/stream-symphony-project-identity.test.mjs"
+    ]
+  },
+  "total": {
+    "tests": 33,
+    "passed": 33,
+    "failed": 0
+  },
+  "independent_job_log_source": "mcp__GitHub__fetch_workflow_job_logs",
+  "job_log_readback": "PASS",
+  "corroborating_runs": [
+    {
+      "commit": "49a59280abfd61671c0bc1a2733b0ce3b933abed",
+      "run_id": 38994866028,
+      "job_id": 117285084563,
+      "conclusion": "SUCCESS",
+      "tests": 33,
+      "failed": 0
+    },
+    {
+      "commit": "4ca5c44d84e41656d19f27b7a280d610535492cf",
+      "run_id": 38994198721,
+      "job_id": 117282970376,
+      "conclusion": "SUCCESS",
+      "tests": 32,
+      "failed": 0
+    }
+  ],
+  "latest_head_scope_comparison": {
+    "base": "4bbf179cb2ac437b6cb162839df2e2a5075b0a28",
+    "head": "7cc5b469dcc0263da0f42aea55d96b94a85e837e",
+    "ahead_commits": 11,
+    "changed_files": 11,
+    "core_visual_codeforge_manifest_package_ci_paths_changed": 0,
+    "comparison": "AHEAD_ONLY"
+  },
+  "important_limits": [
+    "TEST_PASS_FOR_SPECIFIC_COMMIT_NOT_LIVE_HOST_PASS",
+    "DOES_NOT_COVER_SEPARATE_WEBRADIO_RELEASE_TESTS",
+    "NO_PLUGIN_BINARY_RELEASE_PARITY_PROVEN",
+    "NO_FRESH_HOST_INTERACTION_TELEMETRY",
+    "ACTIONS_CHECK_API_EMPTY_DID_NOT_MEAN_RUN_ABSENT"
+  ],
+  "runtime_scope_production_mutation": "NONE",
+  "no_foreign_writes": true,
+  "backup_branch": "backup/pre-stream-core-ci-real-run-evidence-20261017",
+  "pointer_last_required": true
+}
