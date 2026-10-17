@@ -118,7 +118,7 @@ ZWECK:
       if (!Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(link => String(link.getAttribute('href') || '').includes(cssBase))) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = cssBase + '?v=20261016-two-phase-r01';
+        link.href = cssBase + '?v=20261017-two-phase-first-paint-r03';
         link.dataset.s666MainEarlyBoot = 'css';
         head.appendChild(link);
       }
@@ -154,7 +154,7 @@ ZWECK:
           return;
         }
         const script = document.createElement('script');
-        script.src = jsBase + '?v=20261016-two-phase-r01';
+        script.src = jsBase + '?v=20261017-two-phase-first-paint-r03';
         script.async = false;
         script.defer = false;
         script.dataset.s666MainEarlyBoot = 'js';
