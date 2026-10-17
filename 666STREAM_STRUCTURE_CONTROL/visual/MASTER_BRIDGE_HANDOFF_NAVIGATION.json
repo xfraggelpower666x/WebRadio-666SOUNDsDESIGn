@@ -1,0 +1,52 @@
+{
+  "schema": "666stream-native-visual-handoff-v1",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "role": "PRESENTATION_AND_USER_INITIATED_NAVIGATION_ONLY",
+  "source": "radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md",
+  "master_reference_id": "666STREAM-CODEFORGE-BRIDGE-MASTER",
+  "master_version": "1.0.0",
+  "display_trigger_context": [
+    "666STREAM UPDATE",
+    "666STREAM DASHBOARD",
+    "666STREAM VORNE",
+    "MASTER BRIDGE HANDOFF"
+  ],
+  "visual_requirement": "RENDER_TARGET_CARDS_WITH_SOURCE_AND_COPYABLE_INTAKE_COMMAND",
+  "targets": [
+    {
+      "id": "LYVRA",
+      "title": "An LYVRA übergeben",
+      "status": "PREPARED_NOT_DELIVERED",
+      "native_trigger": "LYVRA UPDATE",
+      "handoff_path": "radio-codeforge/bridge/peer-handoffs/LYVRA_MASTER_BRIDGE_PROPOSAL_2026-10-17.md",
+      "target_repo": "xfraggelpower666x/LYVRA-Living-Yielding-Vibration-and-Resonance-Architecture",
+      "action": "COPY_AND_USE_IN_LYVRA_CHAT",
+      "intake_text": "LYVRA UPDATE — Rehydriere den neuesten kanonischen GitHub-Current. Prüfe die 666STREAM Master Bridge v1.0.0 als Peer-Proposal: Repository xfraggelpower666x/WebRadio-666SOUNDsDESIGn, Branch WebRadio-666SOUNDsDESIGn, Pfad radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md sowie peer-handoffs/LYVRA_MASTER_BRIDGE_PROPOSAL_2026-10-17.md unter radio-codeforge/bridge/. Vergleiche gegen die native LYVRA Binary Repository Bridge 1.0.0; bewahre ihre Autorität und bessere bestehende Funktionen. Übernimm geeignete Transportfunktionen nur nach LYVRA-eigener Freigabe, Tests, Backup, Readback und Pointer-last. Gib einen evidenzbasierten Adoption-Receipt zurück."
+    },
+    {
+      "id": "666CLIC",
+      "title": "An 666CLIC übergeben",
+      "status": "PREPARED_NOT_DELIVERED",
+      "native_trigger": "666CLIC UPDATE",
+      "handoff_path": "radio-codeforge/bridge/peer-handoffs/CLIC_MASTER_BRIDGE_PROPOSAL_2026-10-17.md",
+      "target_repo": "xfraggelpower666x/666CLICPRO",
+      "action": "COPY_AND_USE_IN_CLIC_CHAT",
+      "intake_text": "666CLIC UPDATE — Rehydriere den neuesten kanonischen CLIC-GitHub-Current. Prüfe zunächst die tatsächliche CLIC-Offline-Bridge-Originalquelle samt Version, Quelle und Hash. Verwende die 666STREAM Master Bridge v1.0.0 als Peer-Proposal: Repository xfraggelpower666x/WebRadio-666SOUNDsDESIGn, Branch WebRadio-666SOUNDsDESIGn, Pfad radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md sowie radio-codeforge/bridge/peer-handoffs/CLIC_MASTER_BRIDGE_PROPOSAL_2026-10-17.md. Übernimm nur CLIC-native freigegebene Deltas nach Backup, Tests, Readback und Pointer-last; gib Quellbelege für den noch unbestätigten CLIC-Offline-Adapter und einen Adoption-Receipt zurück."
+    }
+  ],
+  "delivery_states": [
+    "PREPARED_NOT_DELIVERED",
+    "USER_COPIED",
+    "PEER_RECEIVED_VERIFIED",
+    "PEER_ADOPTED_VERIFIED",
+    "BLOCKED"
+  ],
+  "boundaries": {
+    "automatic_cross_chat_dispatch": false,
+    "foreign_repository_write": false,
+    "open_external_target_chat_guaranteed": false,
+    "source_link_is_delivery": false,
+    "copy_is_adoption": false,
+    "keep_local_return_anchor": true
+  }
+}
