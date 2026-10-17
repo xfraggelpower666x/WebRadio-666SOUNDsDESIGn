@@ -148,3 +148,13 @@ TRANSPORT_ORDER=DIRECT_GITHUB_BINARY|LYVRA_V1_OFFLINE_ADAPTER|CLIC_OFFLINE_ADAPT
 OFFLINE_LYVRA_PROCEDURE=SOURCE_VERIFIED_EXECUTION_PENDING
 OFFLINE_CLIC_PROCEDURE=UNVERIFIED_DISABLED
 Preserve the same canonical bridge ID, transfer manifest, source hash/bytes, branch/HEAD, prior transport error and next verified action across WEITER / NEW CHAT / NEXT CHAT. A fallback attempt may resume but may not switch project, silently write Current or claim unobserved successful transport.
+
+## Master Bridge reference and peer proposal continuity — 2026-10-17
+MASTER_REFERENCE_ID=666STREAM-CODEFORGE-BRIDGE-MASTER
+MASTER_VERSION=1.0.0
+MASTER_SOURCE=radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md
+PEER_LYVRA_HANDOFF=radio-codeforge/bridge/peer-handoffs/LYVRA_MASTER_BRIDGE_PROPOSAL_2026-10-17.md
+PEER_CLIC_HANDOFF=radio-codeforge/bridge/peer-handoffs/CLIC_MASTER_BRIDGE_PROPOSAL_2026-10-17.md
+PEER_ADOPTION=PROPOSAL_ONLY
+CLIC_OFFLINE_NATIVE_SOURCE=UNVERIFIED
+Never reset or re-create the master bridge per NEW/NEXT CHAT; always rehydrate the canonical registry/source first. Peer handoff files are informational proposals, not proof of delivery or foreign adoption. Native project return anchors retain precedence.
