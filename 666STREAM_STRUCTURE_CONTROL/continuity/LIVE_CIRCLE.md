@@ -166,3 +166,14 @@ PEER_DELIVERY=PREPARED_NOT_DELIVERED
 SOURCE_LINK_NE_DELIVERY=true
 COPY_NE_PEER_ADOPTION=true
 Present both evidence-bound target cards on demand, preserve current chat-local project and current task across copy/link actions, and update delivery status only from actual peer-native receipt/readback. No automatic foreign foreground or remote write.
+
+## CLIC return → Master Bridge evidence continuity — 2026-10-17
+SOURCE=CLIC_STAGING_BLOB_0de24c554225716cdff1efa1556f0048b3295dae
+FACET=CLIC_REPOSITORY_BRIDGE_READ_ONLY
+NATIVE_POLICY_MODULE=radio-codeforge/bridge/master-evidence.mjs
+RECEIPT_LEVELS=SOURCE_READBACK|DELIVERED_EVIDENCED|NATIVE_ADOPTION|FRESH_HOST_PASS
+CONFLICT=QUARANTINE_DUPLICATE_OR_SUPERSEDED_PROVENANCE
+VISUAL_REQUIREMENT=SHOW_ALL_LEVELS_WITH_INDEPENDENT_EVIDENCE
+CHECK_BUDGET=3_NONREDUNDANT_DISCOVERY_ONLY
+HOST_ACCEPTANCE=READBACK_PENDING
+Preserve direct GitHub binary, LYVRA offline fallback, CLIC offline runner disabled, all newer STREAM evolution and current chat-local return anchors; CLIC peer source readback is not an actual foreign delivery receipt, plugin release or fresh-host pass.
