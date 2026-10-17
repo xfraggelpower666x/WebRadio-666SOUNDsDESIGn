@@ -1,0 +1,19 @@
+{
+  "schema": "666stream-bridge-test-manifest-v1",
+  "bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+  "mode": "DIRECT_SOURCE_REPOSITORY_MIRROR",
+  "project": "666-GOVEE-CONTROL",
+  "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "branch": "test/codeforge-govee-bridge-20261017",
+  "source_archive": "GOVEE_FX_SCENE_SYNC_ADDON.zip",
+  "source_archive_bytes": 9123,
+  "source_archive_sha256": "2692989cf391c17fd2afb53065763289c2b622d272877c4b9cdc722bb3b26834",
+  "source_entry": "GOVEE_FX_SCENE_SYNC_ADDON/js/system-extra/govee/govee-sync-config.js",
+  "source_entry_bytes": 869,
+  "source_entry_sha256": "a16e635899e92232a2b20ce85df766a7425d7a62ea28a9e1310d002a99e792cf",
+  "target": "projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/original/govee-sync-config.js",
+  "expected_git_blob_sha": "5e6efa65c1bf7509dd97b573e0ff7ccaec20bf48",
+  "allowlist_only": true,
+  "no_prod_runtime_mutation": true,
+  "full_zip_transfer_status": "NOT_TESTED"
+}
