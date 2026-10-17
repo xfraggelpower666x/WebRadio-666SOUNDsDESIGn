@@ -108,3 +108,11 @@ Keep the interrupted task PAUSED, not completed. Distinguish DISCUSSED from APPR
 5. A direct creator scope switch preserves the previous area's return anchor but does not autoactivate it again. Parallel chats are independently scoped.
 
 `666STREAM WEITER` resumes the newest *valid chat-local* return anchor of the active scope. `666STREAM VORNE` and standalone `FUCK HORST` preserve and inspect that anchor; neither completes or discards it. A generic global latest handoff never controls this chat.
+
+## CodeForge bridge continuity — 2026-10-17
+CANONICAL_BRIDGE=666STREAM-CODEFORGE-ARTIFACT-BRIDGE
+CANONICAL_REGISTRY=radio-codeforge/bridge/BRIDGE_REGISTRY.json
+BRIDGE_REUSE_BEFORE_BUILD=REQUIRED
+DUPLICATE_BRIDGE_CONSTRUCTION=FORBIDDEN
+PER_TASK_MANIFEST_NE_NEW_BRIDGE=true
+Continue the same bridge identity and active job phase across PAUSE/INGEST/CAUSAL_RECONCILIATION/RESUME and project-bound NEW/NEXT CHAT. Reconcile registry version and repository HEAD first; classify missing proof as READBACK_PENDING. Capability deficits trigger audit/repair of the existing bridge, not a new competing copy. Do not let a paused transfer switch another chat's active scope.
