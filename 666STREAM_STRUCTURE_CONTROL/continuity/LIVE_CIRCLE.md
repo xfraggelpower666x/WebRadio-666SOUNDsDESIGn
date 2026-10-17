@@ -116,3 +116,7 @@ BRIDGE_REUSE_BEFORE_BUILD=REQUIRED
 DUPLICATE_BRIDGE_CONSTRUCTION=FORBIDDEN
 PER_TASK_MANIFEST_NE_NEW_BRIDGE=true
 Continue the same bridge identity and active job phase across PAUSE/INGEST/CAUSAL_RECONCILIATION/RESUME and project-bound NEW/NEXT CHAT. Reconcile registry version and repository HEAD first; classify missing proof as READBACK_PENDING. Capability deficits trigger audit/repair of the existing bridge, not a new competing copy. Do not let a paused transfer switch another chat's active scope.
+
+
+## Bridge 1.0 reference continuity — 2026-10-17
+The existing 666STREAM bridge consumes LYVRA's Binary Repository Bridge v1.0.0 as a read-only procedural reference. Prefer direct verified binary mirroring, invoke the single canonical reusable fallback only when direct transport is blocked, preserve each transfer's manifest, source identity, size/hash, authorization, remote HEAD, fresh clone/readback and receipt across interruption. Neither a reference bridge nor a paused transfer may take foreign authority or promote CURRENT.
