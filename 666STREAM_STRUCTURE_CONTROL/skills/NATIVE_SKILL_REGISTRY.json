@@ -62,6 +62,21 @@
       "requires": [
         "EVIDENCE_SOURCE"
       ]
+    },
+    {
+      "id": "semantic-visual-intelligence",
+      "native_owner": "666STREAM_STRUCTURE_CONTROL",
+      "canonical_contract": "666STREAM_STRUCTURE_CONTROL/visual/VISUAL_ENFORCEMENT_CONTRACT.json",
+      "allowed_scopes": [
+        "ANY_VERIFIED_SCOPE"
+      ],
+      "requires": [
+        "CURRENT_POINTER",
+        "REHYDRATION_MANIFEST",
+        "EVIDENCE_SOURCE"
+      ],
+      "presentation_only": true,
+      "always_on_for_native_triggers": true
     }
   ],
   "foreign_autoactivation": false,
