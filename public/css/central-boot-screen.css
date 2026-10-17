@@ -64,3 +64,9 @@ html[data-s666-player-page="main"] #s666CentralBoot::after{background:linear-gra
   #s666CentralBoot[data-cyber-stage="online"] .s666boot-main-system,
   #s666CentralBoot[data-cyber-stage="terminal"] .s666boot-main-system{animation:none!important;opacity:1}
 }
+
+
+/* MAIN/iPhone static first-paint shell — fail open if the Central Boot owner never activates. */
+#s666CentralBoot.s666boot-static-preflight{animation:s666StaticBootFailOpen .01s linear 3s forwards}
+html.s666-central-boot-active #s666CentralBoot.s666boot-static-preflight{animation:none}
+@keyframes s666StaticBootFailOpen{to{opacity:0;visibility:hidden;pointer-events:none}}
