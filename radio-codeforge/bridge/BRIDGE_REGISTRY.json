@@ -58,5 +58,24 @@
     "requires_explicit_target_and_permission": true,
     "requires_independent_remote_byte_identity": true,
     "release_promotion_by_native_update_only": true
+  },
+  "direct_github_binary_transport_20261017": {
+    "status": "PASS_EXACT_BINARY_READBACK_ISOLATED_TEST_BRANCH",
+    "method": "GITHUB_CONNECTOR_CREATE_BLOB_BASE64_CREATE_TREE_CREATE_COMMIT_UPDATE_REF",
+    "host": "GITHUB_CONNECTOR_NO_WINDOWS_REQUIRED_FOR_TESTED_METHOD",
+    "tested_size_bytes": 582,
+    "remote_blob_sha": "111abe5921d9f62303648c96f648bd924e0cafe1",
+    "test_branch": "test/codeforge-govee-bridge-20261017",
+    "test_commit": "e5876afa45b6a01557740a779865aa1ae42f604e",
+    "tested_artifact": "projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/GOVEE_REAL_SOURCE_BINARY_BRIDGE_TEST.zip",
+    "independent_receipt": "projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/binary-zip-readback-receipt.json",
+    "readback": "PASS_EXACT_BASE64_BYTES_AND_GIT_BLOB_SHA",
+    "source_type": "DERIVED_ZIP_WITH_ORIGINAL_GOVEE_SOURCE_ENTRY",
+    "original_archive_verbatim_import": "NOT_TESTED",
+    "standalone_powershell_runner": "NOT_TESTED",
+    "normal_preferred_path": "DIRECT_GITHUB_BINARY_BLOB_WHEN_AVAILABLE",
+    "legacy_windows_transport": "OPTIONAL_FALLBACK_ONLY",
+    "production_runtime_impact": "NONE",
+    "new_bridge_created": false
   }
 }
