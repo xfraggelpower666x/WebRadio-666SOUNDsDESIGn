@@ -1,0 +1,70 @@
+{
+  "schema": "666stream-native-skills-v1",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "policy": "REFERENCE_DONT_CLONE",
+  "entrypoint": "666STREAM_STRUCTURE_CONTROL/runtime/core-intelligence.mjs",
+  "skills": [
+    {
+      "id": "continuity",
+      "native_owner": "666STREAM_STRUCTURE_CONTROL",
+      "canonical_contract": "666STREAM_STRUCTURE_CONTROL/continuity/LIVE_CIRCLE.md",
+      "allowed_scopes": [
+        "ANY_VERIFIED_SCOPE"
+      ],
+      "requires": [
+        "CURRENT_POINTER",
+        "PROJECT_MAP"
+      ]
+    },
+    {
+      "id": "codeforge-transport",
+      "native_owner": "666STREAM_STRUCTURE_CONTROL",
+      "canonical_contract": "radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md",
+      "allowed_scopes": [
+        "ANY_VERIFIED_SCOPE"
+      ],
+      "requires": [
+        "BRIDGE_REGISTRY",
+        "SCOPE_APPROVAL"
+      ]
+    },
+    {
+      "id": "relational-rehydration",
+      "native_owner": "666STREAM_STRUCTURE_CONTROL",
+      "canonical_contract": "666STREAM_STRUCTURE_CONTROL/rehydration/RELATIONAL_REHYDRATION_CONTRACT.md",
+      "allowed_scopes": [
+        "ANY_VERIFIED_SCOPE"
+      ],
+      "requires": [
+        "CURRENT_POINTER",
+        "REHYDRATION_MANIFEST"
+      ]
+    },
+    {
+      "id": "core-dashboard",
+      "native_owner": "666STREAM_STRUCTURE_CONTROL",
+      "canonical_contract": "666STREAM_STRUCTURE_CONTROL/current/OPERATIONS_CENTER.md",
+      "allowed_scopes": [
+        "CORE"
+      ],
+      "requires": [
+        "CURRENT_POINTER",
+        "OBLIGATION_LEDGER"
+      ]
+    },
+    {
+      "id": "local-learning",
+      "native_owner": "666STREAM_STRUCTURE_CONTROL",
+      "canonical_contract": "666STREAM_STRUCTURE_CONTROL/learning/CAUSAL_LEARNING_CONTRACT.md",
+      "allowed_scopes": [
+        "ANY_VERIFIED_SCOPE"
+      ],
+      "requires": [
+        "EVIDENCE_SOURCE"
+      ]
+    }
+  ],
+  "foreign_autoactivation": false,
+  "decision_authority": "NATIVE_ONLY",
+  "install_vs_source": "FRESH_HOST_READBACK_REQUIRED"
+}
