@@ -44,8 +44,8 @@ test('main cyberboot never exposes a partial player while the boot owner is pend
 test('main cyberboot waits for document.body before starting the central boot owner',()=>{
   assert.match(root,/const startBootOwner = \(\) => \{/);
   assert.match(root,/if \(document\.readyState === 'loading' \|\| !document\.body\) \{[\s\S]*DOMContentLoaded', startBootOwner/);
-  assert.match(root,/script\.src = jsBase \+ '\?v=20261016-two-phase-r01'/);
-  assert.match(root,/link\.href = cssBase \+ '\?v=20261016-two-phase-r01'/);
+  assert.match(root,/script\.src = jsBase \+ '\?v=20261017-two-phase-first-paint-r03'/);
+  assert.match(root,/link\.href = cssBase \+ '\?v=20261017-two-phase-first-paint-r03'/);
 });
 
 test('main cyberboot records the visible Cyber HUD handoff so a mounted-but-hidden regression is detectable',()=>{
