@@ -120,3 +120,14 @@ Continue the same bridge identity and active job phase across PAUSE/INGEST/CAUSA
 
 ## Bridge 1.0 reference continuity — 2026-10-17
 The existing 666STREAM bridge consumes LYVRA's Binary Repository Bridge v1.0.0 as a read-only procedural reference. Prefer direct verified binary mirroring, invoke the single canonical reusable fallback only when direct transport is blocked, preserve each transfer's manifest, source identity, size/hash, authorization, remote HEAD, fresh clone/readback and receipt across interruption. Neither a reference bridge nor a paused transfer may take foreign authority or promote CURRENT.
+
+## RADIO-CODEFORGE three-check continuation — 2026-10-17
+POLICY=MAX_3_CHECKS_THEN_LEARNING_BY_DOING
+CHECK_SCOPE=SAME_HYPOTHESIS_NONREDUNDANT_DISCOVERY_ONLY
+MAX_DISCOVERY_CHECKS=3
+CHECK_COUNT_PERSISTS_IN_CHAT_LOCAL_RETURN_ANCHOR=true
+AFTER_LIMIT=SAFE_REVERSIBLE_ACTION_PLUS_OUTCOME_MEASUREMENT
+UNSAFE_OR_UNAUTHORIZED=BLOCKED_WITH_EVIDENCE
+MANDATORY_SECURITY_REGRESSION_READBACK_NOT_CAPPED=true
+CODEX_ESCALATION_FAILED_REPAIR_ATTEMPTS=SEPARATE_COUNTER
+Each related interruption preserves problem identity, hypothesis, performed checks and evidence, last verified step, measured outcome or blocker. Learning candidates require observed outcome validation; repeated check loops must not become a new project, new bridge or separate mutable learning authority.
