@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mapAudioEvent} from '../src/audio-mapping.js';
+import {validateCapability} from '../src/capability-validation.js';
+import worker from '../src/index.js';
+const env={GOVEE_API_KEY:'test-placeholder',CONTROL_TOKEN:'test-token'};
+const req=(path,body,token='test-token')=>new Request('https://example.invalid'+path,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+test('scene mapping preserves explicit drop and boosts bass',()=>{const x=mapAudioEvent({scene:'drop',bass:.4,energy:.8,playing:true});assert.equal(x.scene,'drop');assert.equal(x.drop,true);assert.ok(x.bass>0);});
+test('capability allowlist accepts only advertised valid values',()=>{const d={capabilities:[{type:'devices.capabilities.on_off',instance:'powerSwitch'},{type:'devices.capabilities.range',instance:'brightness',parameters:{range:{min:1,max:100}}},{type:'devices.capabilities.color_setting',instance:'colorRgb'}]};assert.equal(validateCapability(d,{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}),true);assert.equal(validateCapability(d,{type:'devices.capabilities.on_off',instance:'powerSwitch',value:'1'}),false);assert.equal(validateCapability(d,{type:'devices.capabilities.range',instance:'brightness',value:101}),false);assert.equal(validateCapability(d,{type:'devices.capabilities.range',instance:'brightness',value:80}),true);assert.equal(validateCapability(d,{type:'devices.capabilities.color_setting',instance:'colorRgb',value:0x00ffcc}),true);});
+test('unknown advertised range fails closed',()=>assert.equal(validateCapability({capabilities:[{type:'devices.capabilities.range',instance:'brightness'}]},{type:'devices.capabilities.range',instance:'brightness',value:20}),false));
+test('audio dry-run authenticates and never invokes upstream',async()=>{const x=await worker.fetch(req('/api/audio/preview',{energy:.6,scene:'build'}),env);assert.equal(x.status,200);assert.equal((await x.json()).executed,false);});
+test('group rejects duplicates before upstream',async()=>{const m={sku:'H6047',device:'60:74:F4:40:D9:A2'},x=await worker.fetch(req('/api/groups/control',{members:[m,m],capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),env);assert.equal(x.status,400);});
+test('missing secret locks protected endpoints',async()=>{const x=await worker.fetch(req('/api/audio/preview',{}),{});assert.equal(x.status,503);});
