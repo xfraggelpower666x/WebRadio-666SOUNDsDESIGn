@@ -328,5 +328,18 @@
     "production_radio_mutation": "NONE",
     "clic_mutation": "NONE",
     "pointer_last": true
+  },
+  "master_bridge_functional_validation_20261017": {
+    "status": "ISOLATED_FUNCTIONAL_PASS_13_OF_13",
+    "body_head": "69e490a11495b4b3b957371ceec5a6c500eb2944",
+    "backup_branch": "backup/pre-master-bridge-functional-validation-20261017",
+    "receipt_path": "radio-codeforge/bridge/receipts/MASTER_BRIDGE_FUNCTIONAL_VALIDATION_20261017.json",
+    "historical_commit": "e5876afa45b6a01557740a779865aa1ae42f604e",
+    "historical_blob": "111abe5921d9f62303648c96f648bd924e0cafe1",
+    "git_file_base64_readback": "PASS",
+    "full_independent_tree_receipt": "OPEN",
+    "node_test_runner": "NOT_RUN",
+    "fresh_host_acceptance": "READBACK_PENDING",
+    "no_production_mutation": true
   }
 }
