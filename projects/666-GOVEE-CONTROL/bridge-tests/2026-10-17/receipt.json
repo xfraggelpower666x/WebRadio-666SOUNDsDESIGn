@@ -1,0 +1,18 @@
+{
+  "schema": "666stream-bridge-test-receipt-v1",
+  "bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+  "transport": "GITHUB_DIRECT_TEXT_SOURCE",
+  "source_entry_sha256": "a16e635899e92232a2b20ce85df766a7425d7a62ea28a9e1310d002a99e792cf",
+  "source_archive_sha256": "2692989cf391c17fd2afb53065763289c2b622d272877c4b9cdc722bb3b26834",
+  "remote_path": "projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/original/govee-sync-config.js",
+  "source_bytes": 869,
+  "remote_bytes": 869,
+  "source_git_blob_sha": "5e6efa65c1bf7509dd97b573e0ff7ccaec20bf48",
+  "remote_git_blob_sha": "5e6efa65c1bf7509dd97b573e0ff7ccaec20bf48",
+  "remote_readback": "PASS_GIT_BLOB_IDENTITY",
+  "transfer_commit": "7c17c4bf074f860ae72d4863f5b941137f0bebb7",
+  "canonical_bridge_host_execution": "NOT_TESTED",
+  "binary_zip_transport": "NOT_TESTED",
+  "production_release": "NOT_PROMOTED",
+  "note": "Verified direct source-file transport and independent GitHub blob readback. The universal PowerShell/Git bridge runner and complete source ZIP transfer remain separately unverified."
+}
