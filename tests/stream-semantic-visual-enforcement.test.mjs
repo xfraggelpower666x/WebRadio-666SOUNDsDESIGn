@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {TRIGGERS,normalizeEvidence,projectView,evidenceLanes,validateVisualContract} from '../666STREAM_STRUCTURE_CONTROL/visual/semantic-visual-intelligence.mjs';
+const root='666STREAM_STRUCTURE_CONTROL/';
+const c=JSON.parse(readFileSync(root+'visual/VISUAL_ENFORCEMENT_CONTRACT.json','utf8'));
+const m=JSON.parse(readFileSync(root+'REHYDRATION_MANIFEST.json','utf8'));
+const s=JSON.parse(readFileSync(root+'skills/NATIVE_SKILL_REGISTRY.json','utf8'));
+const dashboard=readFileSync(root+'current/CORE_DASHBOARD_CONTRACT.md','utf8');
+test('visual is a required native presentation facet not an authority',()=>{assert.equal(validateVisualContract(c).status,'SOURCE_CONTRACT_READY');assert.equal(c.decision_authority,false);assert.equal(c.no_automatic_foreign_activation,true);assert.equal(c.pseudo_buttons_allowed,false);assert.ok(m.semantic_visual_intelligence.always_for_native_triggers);assert.ok(s.skills.some(x=>x.id==='semantic-visual-intelligence'));assert.match(dashboard,/NO_DEAD_END_ON_UPDATE=true/);});
+test('all native triggers have visual coverage and return choices',()=>{for(const trigger of TRIGGERS){assert.ok(c.required_triggers.includes(trigger));assert.equal(projectView({trigger,head:'c',pointer:'p',evidence:[]}).status,'PARTIAL');}});
+test('verified state requires independent actual source identity',()=>{assert.equal(normalizeEvidence({source_path:'p'}).status,'READBACK_PENDING');assert.equal(normalizeEvidence({source_path:'p',source_commit:'c',source_blob:'b',independent_readback:true}).status,'VERIFIED');});
+test('no fake green when evidence missing or contradictory',()=>{assert.equal(projectView({head:'h',pointer:'p'}).status,'PARTIAL');assert.equal(projectView({head:'h',pointer:'p',evidence:[{source_path:'p',source_commit:'c',source_blob:'b',conflict:true}]}).status,'CONFLICT_QUARANTINE');});
+test('only real evidence-approved actions are surfaced',()=>{const x=projectView({trigger:'UPDATE',head:'h',pointer:'p',actions:[{kind:'COPY',label:'Copy',payload:'text',evidence_verified:true},{kind:'OPEN_VERIFIED_URL',label:'Bogus',payload:'url',evidence_verified:false},{kind:'FAKE_BUTTON',label:'Fake',payload:'x',evidence_verified:true}]});assert.equal(x.actions.length,1);assert.equal(x.actions[0].label,'Copy');assert.equal(x.decision_authority,false);});
+test('four evidence lanes do not infer host from source',()=>{const x=evidenceLanes({SOURCE:{status:'VERIFIED',evidence:'blob'}});assert.equal(x.SOURCE.status,'VERIFIED');assert.equal(x.DELIVERY.status,'READBACK_PENDING');assert.equal(x.ADOPTION.status,'READBACK_PENDING');assert.equal(x.HOST.status,'READBACK_PENDING');});
