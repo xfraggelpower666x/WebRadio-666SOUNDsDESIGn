@@ -51,7 +51,9 @@
       "skills/NATIVE_SKILL_REGISTRY.json",
       "learning/CAUSAL_LEARNING_CONTRACT.md",
       "integration/PARITY_AND_HANDOFF_CONTRACT.md",
-      "current/CORE_DASHBOARD_CONTRACT.md"
+      "current/CORE_DASHBOARD_CONTRACT.md",
+      "rehydration/RELATIONAL_DEPENDENCY_MAP.json",
+      "integration/ADAPTER_PARITY_LEDGER.json"
     ],
     "runtime_helper": "runtime/core-intelligence.mjs",
     "required_rehydration_stage_after_existing_order": [
@@ -60,7 +62,9 @@
       "RESOLVE_NATIVE_SKILLS_BY_REFERENCE",
       "RECONCILE_LOCAL_LEARNING",
       "ADAPTER_PLUGIN_HOST_PARITY_IMPACT",
-      "RENDER_CORE_DEVELOPMENT_POSITION"
+      "RENDER_CORE_DEVELOPMENT_POSITION",
+      "READ_VERIFIED_DEPENDENCY_GRAPH",
+      "CHECK_ADAPTER_PARITY_LEDGER"
     ],
     "no_foreign_autoactivation": true,
     "no_new_root_identity": true,
