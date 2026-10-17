@@ -43,7 +43,11 @@
     "CORE_VERIFY_REGRESSION_RESULTS_READBACK",
     "CORE_NODE_VERIFICATION_AND_CI_READBACK",
     "CODEFORGE_LYVRA_OFFLINE_EXECUTION_TEST",
-    "CODEFORGE_CLIC_OFFLINE_SOURCE_VERIFICATION"
+    "CODEFORGE_CLIC_OFFLINE_SOURCE_VERIFICATION",
+    "CODEFORGE_MASTER_PEER_NATIVE_ADOPTION_LYVRA",
+    "CODEFORGE_MASTER_PEER_NATIVE_ADOPTION_CLIC",
+    "CODEFORGE_CLIC_ORIGINAL_SOURCE_READBACK",
+    "CODEFORGE_MASTER_REGRESSION_EXECUTION"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -257,5 +261,23 @@
     "tests": "NOT_RUN",
     "production_radio_mutation": "NONE",
     "foreign_system_mutation": "NONE"
+  },
+  "codeforge_master_reference_20261017": {
+    "status": "NATIVE_MASTER_REFERENCE_SOURCE_READBACK_VERIFIED",
+    "body_head": "cfb95aa5539a1e42257773d62779302047f8f628",
+    "backup_branch": "backup/pre-streamctrl-master-bridge-source-20261017",
+    "version": "1.0.0",
+    "bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+    "master_reference_id": "666STREAM-CODEFORGE-BRIDGE-MASTER",
+    "master_source": "radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md",
+    "registry": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+    "readback": "PASS_7_OF_7",
+    "lyvra_origin": "VERIFIED_BLOB_SHA",
+    "clic_original": "NOT_VERIFIED",
+    "peer_proposals": "PREPARED_NOT_DELIVERED_NOT_ADOPTED",
+    "direct_binary_proof": "ISOLATED_582_BYTE_PASS",
+    "original_zip_and_offline_runner": "NOT_TESTED",
+    "regression_execution": "NOT_RUN",
+    "native_adoption_only": true
   }
 }
