@@ -43,3 +43,12 @@ CodeForge is available in all projects, inherits active project scope, and may n
 NEW CHAT handoffs are stored project-bound under `docs/handoffs/666stream/<PROJECT_ID>/` and must preserve repository, branch, source commit, project ID/root, active component, last verified state/task, return anchor, next step, blockers, rollback and readback evidence. Handoff creation alone does not prove fresh-chat rehydration.
 
 PFS/CSM is backup/recovery/registry for Structure Control and project-specific backups. PFS-owned mutation requires native `666PFS UPDATE`; 666STREAM does not claim external backup registration without independent PFS readback.
+
+## Additive native context-recovery triggers — 2026-10-17
+| Command | Meaning |
+| --- | --- |
+| 666STREAM VORNE | Foreground Whole-STREAM core chat-locally, preserving project work and return anchor. |
+| FUCK HORST | **Standalone direct trigger without namespace**. Resolve existing native chat owner. In 666STREAM context diagnose 666STREAM host/trigger drift and interrupted continuity read-only. |
+| 666STREAM FUCK HORST | Optional explicit alias for 666STREAM diagnosis. |
+
+Never require `666STREAM` in front of `FUCK HORST`. Only direct user input activates. Existing `666STREAM FRONT` remains compact status, not VORNE. No automatic repair/write on a diagnostic. Native host/plugin acceptance is separate from GitHub source readback.
