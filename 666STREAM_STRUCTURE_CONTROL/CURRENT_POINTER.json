@@ -435,5 +435,21 @@
     "node_execution": "NOT_RUN",
     "host_project_routing": "READBACK_PENDING",
     "production_mutation": "NONE"
+  },
+  "semantic_visual_dashboard_navigation_observation_20261017": {
+    "status": "OBSERVED_DASHBOARD_FOLLOWUP_HOST_PARTIAL",
+    "source_head": "8d82cb84c934fb3803ca69efe330c93759c3134e",
+    "body_head": "8c47333c5907b8d457aa844f23d5d9fe99baa069",
+    "backup_branch": "backup/pre-visual-dashboard-navigation-receipt-20261017",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/visual/receipts/DASHBOARD_FOLLOWUP_OBSERVATION_20261017.json",
+    "receipt_source_readback": "PASS",
+    "scope": "CHAT_LOCAL_CORE",
+    "dashboard_rendered": "OBSERVED_IN_THIS_RESPONSE",
+    "project_cards": "WEBRADIO|WINDOWS_APP|INTRO|LIGHT_ORCHESTRA_SYMPHONY|GOVEE_CONTROL",
+    "native_click_attribution": "NOT_INDEPENDENTLY_VERIFIED",
+    "fresh_chat_host_pass": "READBACK_PENDING",
+    "full_node_ci": "NOT_CONFIRMED",
+    "no_production_change": true,
+    "no_foreign_write": true
   }
 }
