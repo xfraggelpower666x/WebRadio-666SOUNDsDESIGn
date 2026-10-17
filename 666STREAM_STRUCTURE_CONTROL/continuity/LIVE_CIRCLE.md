@@ -158,3 +158,11 @@ PEER_CLIC_HANDOFF=radio-codeforge/bridge/peer-handoffs/CLIC_MASTER_BRIDGE_PROPOS
 PEER_ADOPTION=PROPOSAL_ONLY
 CLIC_OFFLINE_NATIVE_SOURCE=UNVERIFIED
 Never reset or re-create the master bridge per NEW/NEXT CHAT; always rehydrate the canonical registry/source first. Peer handoff files are informational proposals, not proof of delivery or foreign adoption. Native project return anchors retain precedence.
+
+## Master Bridge visual handoff return anchor — 2026-10-17
+VISUAL_NAVIGATION=visual/MASTER_BRIDGE_HANDOFF_NAVIGATION.json
+TARGET_CHOICES=LYVRA|666CLIC
+PEER_DELIVERY=PREPARED_NOT_DELIVERED
+SOURCE_LINK_NE_DELIVERY=true
+COPY_NE_PEER_ADOPTION=true
+Present both evidence-bound target cards on demand, preserve current chat-local project and current task across copy/link actions, and update delivery status only from actual peer-native receipt/readback. No automatic foreign foreground or remote write.
