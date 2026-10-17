@@ -11,3 +11,7 @@ NO_GLOBAL_PROJECT_FOREGROUND=true
 
 ## VORNE / FUCK HORST presentation
 VORNE displays Whole-STREAM current, scoped workspace and return anchor without reset. Standalone FUCK HORST displays actual observed host/trigger/continuity drift versus suspicion, current source evidence, interrupted tasks, smallest safe corrective path and pending readback. Source contracts are not fresh-host execution proof.
+
+## Interruption / continuation position — 2026-10-17
+For direct WEITER/VORNE and relevant recovery diagnostics, show ACTIVE_TASK, PAUSED_TASKS, LAST_VERIFIED_STEP, WORK_PHASE, COMPLETED, OPEN_TODO, INTERRUPTIONS, OBLIGATIONS, RETURN_ANCHOR, SOURCE_CURRENTNESS, RESUME_DECISION, NEXT_MEANINGFUL_STEP and BLOCKERS when supported by evidence.
+The UI is a projection of native state, not a separate task controller. Clearly distinguish VERIFIED / DERIVED / PROPOSED / BLOCKED / READBACK_PENDING. Do not present a successful resume if no actual resumed action has occurred.
