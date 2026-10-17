@@ -185,3 +185,11 @@ MANDATORY_AT_NATIVE_RESULT=true
 CHOICES_FROM_VERIFIED_CURRENT_ONLY=true
 NO_DEAD_END_ON_UPDATE=true
 On each verified native operation, present current scope and evidence alongside valid next steps, user-selectable when the host supports actual interactions. If interrupted or frozen, display the return anchor and why a choice is unavailable. This does not activate a separate facet or reset the chat-local project.
+
+## Visual completion guard continuity — 2026-10-17
+FINAL_NATIVE_OUTPUT=REQUIRES_FIVE_OPTION_PROJECTION_AND_COMPLETION_GUARD
+CONTRACT=visual/VISUAL_ENFORCEMENT_CONTRACT.json
+RENDERER=visual/semantic-visual-intelligence.mjs
+NO_SECOND_VISUAL_ENGINE=true
+CONTINUITY_ANCHOR=CHAT_LOCAL_SCOPE_AND_LAST_VERIFIED_RETURN_POINT
+For SYSTEMSTART/UPDATE/WEITER/NEW/NEXT CHAT/AUDIT/DASHBOARD/VORNE, rehydrate latest source, verify return anchors, project five slots with honest unavailable reasons, and prevent a dead-end completion. No independent decision or foreign write authority.
