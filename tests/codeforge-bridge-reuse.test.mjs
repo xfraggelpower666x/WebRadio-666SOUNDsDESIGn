@@ -46,3 +46,16 @@ test('LYVRA 1.0 is a transport reference, not foreign authority', () => {
   assert.equal(registry.binary_transport_policy.release_promotion_by_native_update_only, true);
   assert.equal(registry.owner, config.systemId);
 });
+
+test('LYVRA local fallback is reusable and CLIC stays disabled until exact source verification', () => {
+  const chain = registry.offline_fallback_chain_20261017;
+  assert.equal(chain.bridge_id, registry.bridge_id);
+  assert.equal(chain.implementation_count, 1);
+  assert.equal(chain.no_new_bridge, true);
+  assert.equal(chain.lyvra_offline.status, 'PROCEDURE_SOURCE_VERIFIED_EXECUTION_NOT_TESTED');
+  assert.ok(chain.lyvra_offline.required.includes('source_size_and_sha256'));
+  assert.equal(chain.clic_offline.status, 'REFERENCE_NOT_VERIFIED_DISABLED');
+  assert.equal(chain.clic_offline.no_invented_tooling, true);
+  assert.equal(chain.offline_execution, 'NOT_TESTED');
+  assert.equal(chain.automatic_foreign_dispatch, false);
+});
