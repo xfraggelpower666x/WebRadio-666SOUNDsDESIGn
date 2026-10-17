@@ -65,7 +65,7 @@ test('Main boot is made explicitly visible and records its handoff to prevent a 
   assert.match(audioStart,/html\.setAttribute\('data-main-boot-preflight', 'boot-visible'\)/);
   assert.match(audioStart,/html\.setAttribute\('data-main-cyber-hud-handoff', boot\.dataset\.bootSkin \|\| 'central-boot-visible'\)/);
   assert.match(audioStart,/central-boot-screen\.css/);
-  assert.match(audioStart,/20261016-two-phase-r01/);
+  assert.match(audioStart,/20261017-two-phase-first-paint-r03/);
 });
 
 test('Desktop and iPhone run READY then three SYSTEM ONLINE fades and hold, other players retain legacy duration',()=>{
@@ -89,4 +89,18 @@ test('Main cannot be hidden or completed early and exposes 100 percent before ha
   assert.match(boot,/const MAIN_COMPLETE_HOLD=0/);
   assert.match(boot,/setProgress\(100\)/);
   assert.match(boot,/global\.setTimeout\(\(\)=>hide\(reason\),identity\.page==='main'\?MAIN_COMPLETE_HOLD:180\)/);
+});
+
+
+test('static first-paint shell is present in both main entries and fails open only when the owner never activates',()=>{
+  const html=fs.readFileSync('index.html','utf8');
+  const publicHtml=fs.readFileSync('public/index.html','utf8');
+  assert.equal(publicHtml,html);
+  assert.match(html,/id="s666CentralBoot"[^>]*s666boot-static-preflight/);
+  assert.match(html,/data-main-cyber-hud="1"/);
+  assert.match(html,/SYSTEM ONLINE/);
+  assert.match(html,/20261017-two-phase-first-paint-r03/);
+  assert.match(css,/#s666CentralBoot\.s666boot-static-preflight\{animation:s666StaticBootFailOpen \.01s linear 3s forwards\}/);
+  assert.match(css,/html\.s666-central-boot-active #s666CentralBoot\.s666boot-static-preflight\{animation:none\}/);
+  assert.match(boot,/else if\(identity\.page==='main'&&!root\.querySelector\('\[data-main-cyber-hud="1"\]'\)\)/);
 });
