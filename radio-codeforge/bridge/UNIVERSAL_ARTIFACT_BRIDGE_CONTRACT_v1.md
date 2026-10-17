@@ -57,3 +57,35 @@ AUTOMATIC_SOURCE_MUTATION=FORBIDDEN
 - Existing `PREPARED_NOT_LIVE_TESTED` remains the transport qualification until actual remote host/PowerShell execution and fresh-clone SHA-256 readback are observed.
 - WEITER / NEW CHAT / NEXT CHAT preserve canonical bridge ID, registry version, active transfer job, last verified phase and return anchor; never rebuild from chat reset.
 - `FUCK HORST` checks accidental duplicate bridge creation, drift, stale transfers and claims of fabricated readbacks as part of relevant native diagnostics.
+
+
+## LYVRA Binary Repository Bridge 1.0.0 — adopted process reference (2026-10-17)
+Reference repository: `xfraggelpower666x/LYVRA-Living-Yielding-Vibration-and-Resonance-Architecture`, branch `lyvra`.
+Reference carrier: `LYVRA_NATIVE_RUNTIME/current/repository/BINARY_REPOSITORY_BRIDGE.md`.
+Verified reference blob: `d0f58f4b1b3cda4c85125f0c2d6f086fc7d9cc6a`. LYVRA is the source of this procedure only, not 666STREAM authority.
+
+### Binary routing: direct first, reusable fallback second
+For binary payloads prefer a complete directly supported repository transport with verified byte identity. Use the **existing** 666STREAM canonical Bridge as fallback only if direct binary transport is unavailable or blocked. For text/source transfers, existing direct authorized GitHub tooling remains preferred; do not force binary fallback. Never create a second implementation.
+
+### Eligibility gate — all required
+- Available original source bytes and verified source identity/path.
+- Independently measured source byte size and SHA-256 (not invented or taken solely from a name).
+- Exact target repository, branch, destination allowlist and authorization.
+- Read current remote HEAD and fresh clone/read of target before transport.
+- For fallback: documented direct binary transport limitation or failure.
+
+### Transfer and readback sequence
+1. Verify original source path, byte count and SHA-256.
+2. Capture target repository branch HEAD and perform a fresh remote clone/read.
+3. Copy and stage *only* allowlisted exact payload files; do not silently unpack/transform.
+4. Re-read remote HEAD immediately before push; abort on unexpected change.
+5. Require explicit transport approval; push without force.
+6. Independently freshly clone/read remote after push.
+7. Confirm remote path, byte size and SHA-256 equality to source.
+8. Emit machine-readable receipt with source/target hashes, commit and verified phase.
+9. Report `PASS_REMOTE_READBACK` only after independent remote verification.
+10. Native 666STREAM UPDATE (not Bridge) may subsequently govern promotion and CURRENT_POINTER-last.
+
+### Non-negotiable fences
+NO_FORCE_PUSH; NO_POINTER_MUTATION_BY_BRIDGE; NO_SOURCE_STATE_MUTATION_BY_BRIDGE; NO_PLUGIN_OR_DEPLOYMENT_MUTATION_BY_BRIDGE; NO_CROSS_SYSTEM_MERGE; NO_PRIVATE_PAYLOAD_TO_PUBLIC_REPO; NO_UNVERIFIED_HASH_OR_SIZE; NO_SILENT_CANDIDATE_PROMOTION; READY_WITHOUT_REMOTE_READBACK_FORBIDDEN.
+Current fallback implementation status remains `PREPARED_NOT_LIVE_TESTED`. The existence of a documented LYVRA successful use is *not* a 666STREAM host PASS.
