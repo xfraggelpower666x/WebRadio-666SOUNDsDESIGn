@@ -21,3 +21,11 @@ PRESENTATION_HELPER=666STREAM_STRUCTURE_CONTROL/visual/semantic-visual-intellige
 For every native SYSTEMSTART, UPDATE, WEITER, NEW/NEXT CHAT, AUDIT, DASHBOARD, VORNE, FUCK HORST and MASTER BRIDGE HANDOFF, after current readback display native evidence-first UI and contextual next actions selected from actual valid gates/return anchors. Always present next-step choices when at least one action is evidence-supported. If none is possible, clearly show blocked reason and exact next verified step. No dead-end closing message after an update.
 Do not pretend clickable controls exist if the host cannot render them: use real buttons with actual copy/open/native-turn actions when supported, otherwise a concise textual continuation prompt. This is presentation only, never new authority, scope activation, or background operation. Distinguish SOURCE, DELIVERY, ADOPTION, HOST.
 NO_DEAD_END_ON_UPDATE=true
+
+## Symphony project-card identity — 2026-10-17
+LIGHT_ORCHESTRA_DISPLAY_NAME=666 LIGHT ORCHESTRA SYMPHONY
+LIGHT_ORCHESTRA_ALIASES=SYMPHONY|SYMPHONY_LIGHT_PRO|LIGHT_ORCHESTRA
+LIGHT_ORCHESTRA_PROJECT_SELECTION=AVAILABLE
+LIGHT_ORCHESTRA_DIRECTORY_READBACK=UNVERIFIED
+GOVEE_CONTROL_IS_SEPARATE_PROJECT=true
+Render the Symphony card as a recognized selectable project, not as an unknown identity. Note only the separate child directory/host source route is unverified; selecting Symphony must not guess a path or activate GOVEE_CONTROL. Provide a real selection action for the verified native project ID.
