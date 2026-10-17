@@ -60,7 +60,9 @@
     "SEMANTIC_VISUAL_FULL_REPOSITORY_NODE_TEST",
     "SEMANTIC_VISUAL_ACTUAL_FRESH_HOST_CLICK_TEST",
     "SEMANTIC_VISUAL_CLICK_TELEMETRY_OR_INDEPENDENT_ACTION_CONFIRMATION",
-    "SEMANTIC_VISUAL_FRESH_CHAT_COMPLETE_ACCEPTANCE"
+    "SEMANTIC_VISUAL_FRESH_CHAT_COMPLETE_ACCEPTANCE",
+    "SYMPHONY_SEPARATE_CHILD_DIRECTORY_SOURCE_READBACK",
+    "SYMPHONY_NATIVE_HOST_PROJECT_SELECTION_TEST"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -417,5 +419,21 @@
     "full_repo_ci": "NOT_CONFIRMED",
     "production_runtime_change": "NONE",
     "foreign_system_mutation": "NONE"
+  },
+  "symphony_project_identity_correction_20261017": {
+    "status": "SOURCE_READBACK_VERIFIED",
+    "body_head": "c79ce875ccdd8397b7f4c619c09cb44fd2c9a5cc",
+    "backup_branch": "backup/pre-streamctrl-symphony-identity-correction-20261017",
+    "native_project_id": "LIGHT_ORCHESTRA",
+    "display_name": "666 LIGHT ORCHESTRA SYMPHONY",
+    "selection": "AVAILABLE_EXPLICIT_USER_TRIGGER",
+    "project_map_version": "1.1.1",
+    "directory_root": "UNVERIFIED_NO_GUESSED_PATH",
+    "separate_govee_controller": true,
+    "readback": "PASS_4_OF_4",
+    "regression_test": "tests/stream-symphony-project-identity.test.mjs",
+    "node_execution": "NOT_RUN",
+    "host_project_routing": "READBACK_PENDING",
+    "production_mutation": "NONE"
   }
 }
