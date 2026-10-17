@@ -25,7 +25,9 @@
     "FRESH_CHAT_REHYDRATION_RUNTIME_TEST",
     "LIGHT_ORCHESTRA_SEPARATE_CHILD_ROUTE_PRESERVED_UNRESOLVED",
     "FUCK_HORST_FRESH_HOST_DISPATCH_TEST",
-    "VORNE_FRESH_HOST_DISPATCH_TEST"
+    "VORNE_FRESH_HOST_DISPATCH_TEST",
+    "INTERRUPTION_RESUME_FRESH_CHAT_TEST",
+    "INTERRUPTION_RESUME_HOST_ACCEPTANCE"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -88,5 +90,16 @@
     "fresh_host_dispatch": "READBACK_PENDING",
     "mutation_on_diagnosis": "FORBIDDEN",
     "scope": "666STREAM_STRUCTURE_CONTROL"
+  },
+  "interruption_continuation_20261017": {
+    "status": "SOURCE_CONTRACT_READBACK_VERIFIED",
+    "source_body_head": "8109729eb42de4556a3b27f8a97ab54c9093c786",
+    "prechange_recovery_branch": "backup/pre-streamctrl-interruption-continuity-20261017",
+    "modified_contracts": 5,
+    "readback": "PASS_5_OF_5",
+    "architecture": "EXISTING_LIVECIRCLE_AND_SESSION_GOVERNOR",
+    "sequence": "PAUSE_INGEST_CAUSAL_RECONCILIATION_RESUME",
+    "fresh_host_acceptance": "READBACK_PENDING",
+    "scope": "CHAT_LOCAL_NO_FOREIGN_AUTOACTIVATION"
   }
 }
