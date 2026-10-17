@@ -64,11 +64,13 @@
       "ADAPTER_PLUGIN_HOST_PARITY_IMPACT",
       "RENDER_CORE_DEVELOPMENT_POSITION",
       "READ_VERIFIED_DEPENDENCY_GRAPH",
-      "CHECK_ADAPTER_PARITY_LEDGER"
+      "CHECK_ADAPTER_PARITY_LEDGER",
+      "RESOLVE_MASTER_BRIDGE_VISUAL_PEER_HANDOFF_WHEN_RELEVANT"
     ],
     "no_foreign_autoactivation": true,
     "no_new_root_identity": true,
-    "host_acceptance_separate": true
+    "host_acceptance_separate": true,
+    "visual_master_bridge_handoff": "visual/MASTER_BRIDGE_HANDOFF_NAVIGATION.json"
   },
   "codeforge_bridge_direct_binary_20261017": {
     "registry": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
