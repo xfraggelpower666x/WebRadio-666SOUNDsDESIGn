@@ -65,7 +65,7 @@ export function projectFiveOptions({available_actions=[],blocked_reasons={}}={})
 export function visualCompletionGuard({
   projection,options=[],rendered_sections=[],source_verified=false,
   host_action_observed=false,host_action_independently_verified=false,
-  fresh_chat_verified=false,plugin_parity={}
+  fresh_chat_verified=false,host_receipt=null,plugin_parity={}
 }={}){
   const missing=[];
   if(!projection || !valid(projection.identity?.head)||!valid(projection.identity?.pointer))missing.push('CURRENT_MISSING');
@@ -79,7 +79,18 @@ export function visualCompletionGuard({
   const explainedBlock=slots.every(o=>o?.available===false&&valid(o.reason));
   if(!actionable&&!explainedBlock)missing.push('NO_REAL_NEXT_STEP_OR_EXPLAINED_BLOCK');
   const source_ready=missing.length===0;
-  const host_verified=source_ready && host_action_observed===true && host_action_independently_verified===true && fresh_chat_verified===true;
+  const host_receipt_bound=host_receipt?.type==='INDEPENDENT_HOST_ACTION_READBACK'
+    && valid(host_receipt?.session_id) && valid(host_receipt?.user_action_id)
+    && valid(host_receipt?.turn_id) && valid(host_receipt?.observed_action)
+    && valid(host_receipt?.independent_readback_source)
+    && host_receipt?.current_head===projection?.identity?.head
+    && host_receipt?.current_pointer===projection?.identity?.pointer
+    && host_receipt?.same_scoped_session===true
+    && host_receipt?.fresh_chat_observed===true
+    && host_receipt?.sender_self_attestation!==true;
+  const host_verified=source_ready && host_action_observed===true
+    && host_action_independently_verified===true && fresh_chat_verified===true
+    && host_receipt_bound;
   return {
     status:host_verified?'HOST_PASS':source_ready?'SOURCE_COMPLETION_READY':'BLOCKED',
     missing,source_ready,host_verified,
