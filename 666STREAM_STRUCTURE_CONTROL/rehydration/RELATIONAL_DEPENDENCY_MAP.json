@@ -1,0 +1,89 @@
+{
+  "schema": "666stream-relational-dependency-map-v1",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "rules": [
+    "NO_NAMES_ONLY_PASS",
+    "NO_CROSS_PROJECT_WRITE",
+    "RELATIONSHIP_REQUIRES_CAUSAL_MEANING_AND_BOUNDARY"
+  ],
+  "relations": [
+    {
+      "id": "CORE_PROJECT_ROUTING",
+      "source": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
+      "meaning": "Routes explicit native user intent to project-local scope",
+      "why": "Parallel project chats must remain independently bound",
+      "boundaries": [
+        "HEAD never selects foreground",
+        "No cross-chat inheritance"
+      ],
+      "affected": [
+        "WEBRADIO",
+        "WINDOWS_APP",
+        "INTRO_V1_5",
+        "INTRO_V1_10",
+        "LIGHT_ORCHESTRA",
+        "GOVEE_CONTROL"
+      ],
+      "verification": "SOURCE_EXISTENCE_ONLY"
+    },
+    {
+      "id": "CORE_LIVECIRCLE",
+      "source": "666STREAM_STRUCTURE_CONTROL/continuity/LIVE_CIRCLE.md",
+      "meaning": "Preserves paused tasks and valid return anchors",
+      "why": "Interrupted development must resume from last verified step",
+      "boundaries": [
+        "No automatic background execution",
+        "No globally latest handoff"
+      ],
+      "affected": [
+        "ALL_SCOPES"
+      ],
+      "verification": "SOURCE_EXISTENCE_ONLY"
+    },
+    {
+      "id": "CODEFORGE_SINGLE_BRIDGE",
+      "source": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+      "meaning": "Stable transport contract shared by scoped tasks",
+      "why": "Prevent rebuilding separate bridge per import/project",
+      "boundaries": [
+        "Transport is not deployment",
+        "No foreign authority",
+        "No pointer writes"
+      ],
+      "affected": [
+        "ALL_SCOPES"
+      ],
+      "verification": "SOURCE_EXISTENCE_ONLY"
+    },
+    {
+      "id": "GOVEE_CONTROLLER_ISOLATION",
+      "source": "projects/666-GOVEE-CONTROL/checkpoints/2026-10-17-initial/PROJECT_CHECKPOINT.md",
+      "meaning": "Govee device controller is separate from Light Orchestra",
+      "why": "Device/worker/control boundaries must not merge",
+      "boundaries": [
+        "No device commands via core",
+        "Secrets never enter repository"
+      ],
+      "affected": [
+        "GOVEE_CONTROL",
+        "LIGHT_ORCHESTRA"
+      ],
+      "verification": "SOURCE_EXISTENCE_ONLY"
+    },
+    {
+      "id": "INTRO_VARIANT_SEPARATION",
+      "source": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
+      "meaning": "Intro v1.10 freeze and v1.5 template have distinct continuity",
+      "why": "Prevent older template overriding independent frozen version",
+      "boundaries": [
+        "No automatic merge",
+        "No silent variant foreground"
+      ],
+      "affected": [
+        "INTRO_V1_5",
+        "INTRO_V1_10"
+      ],
+      "verification": "SOURCE_EXISTENCE_ONLY"
+    }
+  ]
+}
