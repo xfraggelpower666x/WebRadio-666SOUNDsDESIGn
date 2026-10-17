@@ -1,0 +1,29 @@
+{
+  "schema": "666stream-codeforge-original-binary-transfer-pass-v1",
+  "date": "2026-10-17",
+  "native_owner": "666STREAM_STRUCTURE_CONTROL",
+  "bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+  "source": "GOVEE_FX_SCENE_SYNC_ADDON.zip",
+  "source_size_bytes": 9123,
+  "source_sha256": "2692989cf391c17fd2afb53065763289c2b622d272877c4b9cdc722bb3b26834",
+  "source_git_blob_sha": "9a75b296c05b066efe1ad26680a774e2c41a36e4",
+  "source_zip_integrity": "PASS_17_ENTRIES",
+  "branch": "test/codeforge-full-original-govee-fx-20261017",
+  "target": "projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/GOVEE_FX_SCENE_SYNC_ADDON.zip",
+  "transfer_commit": "c3db40cfa2c89434c646f78e6e55e5aee53cde63",
+  "remote_sha": "9a75b296c05b066efe1ad26680a774e2c41a36e4",
+  "remote_size_bytes": 9123,
+  "source_base64_chars": 12164,
+  "remote_base64_chars": 12164,
+  "independent_remote_readback": "GITHUB_REST_CONTENTS_JSON_VIA_INDEPENDENT_WEB_CHANNEL",
+  "comparison": "EXACT_SOURCE_VS_REMOTE_BASE64_EQUAL",
+  "independent_blob_readback": "GITHUB_REST_BLOB_JSON_BASE64_EQUAL",
+  "status": "PASS_EXACT_ORIGINAL_BINARY_TRANSFER_AND_REMOTE_READBACK",
+  "production_branch_mutation": "NONE",
+  "new_bridge_created": false,
+  "client_source_repair": "radio-codeforge/bridge/tools/verified-original-zip-upload.mjs",
+  "notes": [
+    "Prior incomplete manual base64 blob was never committed; erroneous transport preserved in separate blocked forensic receipt.",
+    "Proof is limited to isolated test branch; no production deployment, device actions, or plugin release."
+  ]
+}
