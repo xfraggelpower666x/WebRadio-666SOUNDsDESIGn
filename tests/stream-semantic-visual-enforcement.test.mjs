@@ -44,3 +44,19 @@ test('no valid actions requires explicit reasons for all slots',()=>{
   assert.equal(passed.status,'SOURCE_COMPLETION_READY');
   assert.equal(passed.host_verified,false);
 });
+
+
+test('independent host receipt rejects forged, stale and incomplete identity bindings',()=>{
+  const projection=projectView({head:'fixture-head',pointer:'fixture-pointer'});
+  const options=projectFiveOptions({available_actions:[{slot:'WEITER',label:'Weiter',kind:'ISSUE_NATIVE_TURN',payload:'666STREAM WEITER',evidence_verified:true}]});
+  const base={projection,options,rendered_sections:c.required_sections,source_verified:true,host_action_observed:true,host_action_independently_verified:true,fresh_chat_verified:true};
+  const validReceipt={type:'INDEPENDENT_HOST_ACTION_READBACK',session_id:'fixture-session',user_action_id:'fixture-action',turn_id:'fixture-turn',observed_action:'ISSUE_NATIVE_TURN',independent_readback_source:'fixture-observer',current_head:'fixture-head',current_pointer:'fixture-pointer',same_scoped_session:true,fresh_chat_observed:true};
+  const invalid=[null,{...validReceipt,sender_self_attestation:true},{...validReceipt,current_head:'stale'},{...validReceipt,current_pointer:'stale'},{...validReceipt,same_scoped_session:false},{...validReceipt,fresh_chat_observed:false},{...validReceipt,turn_id:''},{...validReceipt,user_action_id:''},{...validReceipt,independent_readback_source:''}];
+  for(const host_receipt of invalid){
+    const result=visualCompletionGuard({...base,host_receipt});
+    assert.equal(result.host_verified,false);
+    assert.equal(result.status,'SOURCE_COMPLETION_READY');
+  }
+  // Synthetic structural positive, not evidence of a real ChatGPT host event.
+  assert.equal(visualCompletionGuard({...base,host_receipt:validReceipt}).status,'HOST_PASS');
+});
