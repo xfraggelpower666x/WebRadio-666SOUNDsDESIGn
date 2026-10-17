@@ -77,3 +77,24 @@ test('666STREAM master reference stays native, versioned and peer-adoption gated
   assert.match(read(master.peer_handoffs.LYVRA), /PROPOSAL_ONLY_NOT_DELIVERED_NOT_ADOPTED/);
   assert.match(read(master.peer_handoffs.CLIC), /PROPOSAL_ONLY_NOT_DELIVERED_NOT_ADOPTED/);
 });
+
+test('full original ZIP evidence is integrated in the same bridge without production promotion', () => {
+  const proof=registry.full_original_binary_transport_20261017;
+  assert.equal(proof.bridge_id,registry.bridge_id);
+  assert.equal(proof.status,'PASS_EXACT_ORIGINAL_BINARY_REMOTE_READBACK_ISOLATED_BRANCH');
+  assert.equal(proof.original_size_bytes,9123);
+  assert.equal(proof.original_sha256,'2692989cf391c17fd2afb53065763289c2b622d272877c4b9cdc722bb3b26834');
+  assert.equal(proof.original_git_blob_sha,'9a75b296c05b066efe1ad26680a774e2c41a36e4');
+  assert.equal(proof.receipt_git_blob_sha,'dab6ec5fcb2dd7afb134f6a898a91381c90a0fe7');
+  assert.equal(proof.test_branch,'test/codeforge-full-original-govee-fx-20261017');
+  assert.equal(proof.remote_readback,'PASS_EXACT_SOURCE_REMOTE_BASE64_AND_GIT_BLOB_SHA_9123_BYTES');
+  assert.equal(proof.local_transfer_helper_isolated_branch_only,true);
+  assert.equal(proof.helper_execution,'NOT_CLAIMED_DIRECT_GITHUB_CONNECTOR_TRANSPORT_USED');
+  assert.equal(proof.offline_windows_runner,'NOT_TESTED');
+  assert.equal(proof.production_archive_import,'NOT_PERFORMED');
+  assert.equal(proof.new_bridge_created,false);
+  assert.equal(proof.foreign_write,false);
+  assert.equal(registry.direct_github_binary_transport_20261017.tested_size_bytes,582);
+  assert.equal(registry.production_runtime_integration,false);
+  assert.match(read('radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md'),/SOURCE_BYTES=9123/);
+});
