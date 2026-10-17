@@ -1,0 +1,41 @@
+{
+  "schema": "666stream-semantic-visual-intelligence-v1",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "type": "NATIVE_PRESENTATION_FACET",
+  "version": "1.0.0",
+  "mode": "ALWAYS_ON_WHEN_NATIVE_TRIGGER_IN_SCOPE",
+  "canonical_renderer": "666STREAM_STRUCTURE_CONTROL/visual/semantic-visual-intelligence.mjs",
+  "governed_by": "666STREAM_STRUCTURE_CONTROL/current/CORE_DASHBOARD_CONTRACT.md",
+  "required_triggers": [
+    "SYSTEMSTART",
+    "UPDATE",
+    "WEITER",
+    "NEW CHAT",
+    "NEXT CHAT",
+    "AUDIT",
+    "DASHBOARD",
+    "VORNE",
+    "FUCK HORST",
+    "MASTER BRIDGE HANDOFF"
+  ],
+  "required_sections": [
+    "NATIVE_IDENTITY_AND_CURRENT",
+    "EVIDENCE_LEVELS_SOURCE_DELIVERY_ADOPTION_HOST",
+    "ACTIVE_SCOPE_AND_RETURN_ANCHOR",
+    "COMPLETED_AND_OPEN_OBLIGATIONS",
+    "BLOCKERS_AND_REGRESSION",
+    "VALID_CONTEXTUAL_ACTIONS"
+  ],
+  "presentation": "GPT_NATIVE_COMPONENTS_MARKDOWN_AND_REAL_HOST_ACTIONS_ONLY",
+  "pseudo_buttons_allowed": false,
+  "ascii_dashboards_forbidden": true,
+  "source_to_host_pass_automatic": false,
+  "no_global_foreground": true,
+  "no_automatic_foreign_activation": true,
+  "decision_authority": false,
+  "source_contract_state": "PREPARED_FOR_HOST_PRESENTATION",
+  "fresh_host_status": "READBACK_PENDING",
+  "tests": "tests/stream-semantic-visual-enforcement.test.mjs",
+  "fallback": "IF_NATIVE_UI_CONTROLS_UNAVAILABLE_USE_CLEAR_TEXT_AND_COPYABLE_HANDOFF_WITHOUT_FAKE_BUTTON",
+  "relationship": "VISUAL_IS_PROJECTION_NOT_NEW_NATIVE_CONTROLLER"
+}
