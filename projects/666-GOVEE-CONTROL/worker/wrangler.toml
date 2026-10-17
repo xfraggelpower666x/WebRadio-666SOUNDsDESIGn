@@ -1,0 +1,7 @@
+name = "666-govee-control"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+# Secrets are configured in Cloudflare, NEVER committed.
+# GOVEE_API_KEY / CONTROL_TOKEN / optional ALLOWED_ORIGIN
