@@ -33,3 +33,16 @@ Scope guard: no mutation of unrelated Govee child, Windows Soundwave, Intro, or 
 - Before any patch: fetch and compare latest HEAD, create recovery branch, repair source and public mirrors, verify syntax/tests/readback, then deploy/readback; only update project-scoped pointers after verified writes.
 - No fabricated tests, delivered handoffs, bridge receipts, or cross-project activation.
 - Last direct user instruction: `666STREAM UPDATE`; persist valid progress and preserve open tasks. Previous direction: in this active WEBRADIO development chat, direct build/repair is authorized; user does not want more trigger-prompt formulation.
+
+## UPDATE follow-on 2026-10-17 — WCH observed-state repair
+
+Checkpoint previous prechange HEAD: `9d6abb53e98fd6560c20a1d858552479ca344f9c`
+Recovery branch: `backup/webradio-watchdog-parity-prechange-20261017`
+New WCH repair HEAD before this checkpoint: `babb0d1603ac7e8ca7aa382553aadac49aad6af1`
+
+- Root-cause parity check: main `js/player-core.js` / `public/js/player-core.js` already uses `canonicalWatchdogAvailable()` to check its real `S666AllPlayerAudioRecovery` owner; no main-player defect was proven. Those files were deliberately left unchanged.
+- Embedded MiniPlayer now publishes `watchdogStatus` plus last observed audio event through its existing `S666EmbedControl.getState()`. States are `idle`, `buffering`, `healthy`, `fault`. This is passive observation, **not** an independent automatic recovery engine.
+- Dashboard WCH maps to those *observed* signals and no longer derives readiness from merely a recovery/error flag. `dashboard/index.html` and `public/dashboard/index.html` were verified identical.
+- Source evidence gate: all inline HTML JavaScript blocks in both MiniPlayer and Dashboard parsed without syntax errors. This is a syntax/source PASS, not a real browser audio-interaction PASS.
+- Continue next: actual host playback/buffering/recovery tests, M/B switch, GOVEE local device access, authenticated ADM, copy-to-clipboard, and viewport/branding checks. Prevent false LED activity under stop state. Evaluate `RCN` semantics against canonical main-player events without overriding the main player unnecessarily.
+- Newer CodeForge max-three-checks learning-by-doing commits/pointer through `9d6abb53e98fd6560c20a1d858552479ca344f9c` preserved. No global structure/current pointer mutation; no PFS receipt claimed.
