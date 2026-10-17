@@ -14,3 +14,9 @@ When master Bridge or its peer handoffs are presented, show two separate GPT-nat
 
 ## CLIC-origin master bridge semantic visual evidence — 2026-10-17
 The master bridge UI must render four separately grounded evidence rows: SOURCE_READBACK, DELIVERED_EVIDENCED, NATIVE_ADOPTION and FRESH_HOST_PASS. Show corresponding repo/branch/commit/tree/blob provenance and confidence, contradiction and stale-state warnings, independent test receipt and UNKNOWN visual compliance without implying system health. On source-only receipt, only SOURCE may be marked verified. Adapt CLIC visual facets read-only; do not import CLIC runtime or claim peer delivery. Read `visual/MASTER_BRIDGE_HANDOFF_NAVIGATION.json` and `radio-codeforge/bridge/master-evidence.mjs` by reference, no separate dashboard controller.
+
+## Semantic Visual Intelligence — mandatory native presentation (2026-10-17)
+ENFORCEMENT_CONTRACT=666STREAM_STRUCTURE_CONTROL/visual/VISUAL_ENFORCEMENT_CONTRACT.json
+PRESENTATION_HELPER=666STREAM_STRUCTURE_CONTROL/visual/semantic-visual-intelligence.mjs
+For every native SYSTEMSTART, UPDATE, WEITER, NEW/NEXT CHAT, AUDIT, DASHBOARD, VORNE, FUCK HORST and MASTER BRIDGE HANDOFF, after current readback display native evidence-first UI and contextual next actions selected from actual valid gates/return anchors. Always present next-step choices when at least one action is evidence-supported. If none is possible, clearly show blocked reason and exact next verified step. No dead-end closing message after an update.
+Do not pretend clickable controls exist if the host cannot render them: use real buttons with actual copy/open/native-turn actions when supported, otherwise a concise textual continuation prompt. This is presentation only, never new authority, scope activation, or background operation. Distinguish SOURCE, DELIVERY, ADOPTION, HOST.
