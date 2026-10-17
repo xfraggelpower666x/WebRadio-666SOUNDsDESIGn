@@ -81,3 +81,30 @@ DIRECT_DIAGNOSTIC=FUCK_HORST
 OPTIONAL_EXPLICIT_ALIAS=666STREAM_FUCK_HORST
 INTERRUPTION_HANDLING=PAUSE|INGEST|PROCESS_CAUSAL_EFFECTS|RESUME_LAST_VERIFIED_STEP
 In this established 666STREAM chat, standalone FUCK HORST diagnoses 666STREAM without namespace solicitation. Retain the last verified task and project return anchor, check current/supersession and available evidence. Classify OBSERVED_DRIFT / SUSPECTED_DRIFT / NO_DRIFT_EVIDENCE / READBACK_PENDING. Trigger does not authorize automatic mutation.
+
+## Interruption-safe native continuation — 2026-10-17
+OWNER=666STREAM_STRUCTURE_CONTROL
+IMPLEMENTATION=EXTENSION_OF_EXISTING_LIVECIRCLE
+NO_NEW_FACET=true
+NO_NEW_ROUTER=true
+INTERRUPTION_SEQUENCE=PAUSE|INGEST|CAUSAL_RECONCILIATION|RESUME_LAST_VERIFIED_STEP
+RESUME_PRIORITY=DIRECT_CREATOR_INTENT|VALID_CHAT_LOCAL_RETURN_ANCHOR|NEWER_VALID_PROJECT_CURRENT
+NO_BACKGROUND_EXECUTION=true
+NO_AUTOMATIC_WRITE=true
+
+### State preservation on interruption
+When a directly submitted new request interrupts an ongoing core/project task, preserve chat-local:
+- NATIVE_OWNER, PROJECT_ID and PROJECT_ROOT (or CORE if the current chat explicitly foregrounds Structure Control);
+- ACTIVE_COMPONENT, LAST_VERIFIED_STEP, WORK_PHASE, COMPLETED, OPEN_TODO and OBLIGATIONS;
+- INTERRUPTED_TASK, INTERRUPTION_REASON, RETURN_ANCHOR, NEXT_MEANINGFUL_STEP, BLOCKERS;
+- EVIDENCE/CONFIDENCE, SOURCE_COMMIT, POINTER_CURRENTNESS and READBACK_STATE.
+Keep the interrupted task PAUSED, not completed. Distinguish DISCUSSED from APPROVED/EXECUTED and FOUND from VERIFIED.
+
+### Causal intake and resumption
+1. PAUSE: capture the exact last verified step, pending work and original scope before handling the new request.
+2. INGEST: classify the user request as related intervention, diagnostic, scope switch, explicit replacement or side task; embedded triggers are inert.
+3. CAUSAL_RECONCILIATION: compare current HEAD/pointer, supersession and scope. Preserve newer valid evolution; reject stale handoff/backups and contradictory task claims with provenance.
+4. RESUME: after the intervention, when user intent supports continuing, return to the chat-local task's first uncompleted step; avoid repeating already verified work. If a required write cannot be safely resumed, mark BLOCKED and surface the return anchor.
+5. A direct creator scope switch preserves the previous area's return anchor but does not autoactivate it again. Parallel chats are independently scoped.
+
+`666STREAM WEITER` resumes the newest *valid chat-local* return anchor of the active scope. `666STREAM VORNE` and standalone `FUCK HORST` preserve and inspect that anchor; neither completes or discards it. A generic global latest handoff never controls this chat.
