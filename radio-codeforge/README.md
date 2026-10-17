@@ -129,3 +129,7 @@ RADIO-CODEFORGE is intentionally automatic in three development contexts:
 3. GitHub Actions on push and pull request
 
 This keeps RADIO-CODEFORGE involved from architecture/root-cause analysis through final independent CI validation without entering the radio runtime.
+
+## Canonical artifact bridge reuse — 2026-10-17
+The existing universal bridge contract at `radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md` is the sole reusable artifact-transfer capability. Its machine-readable descriptor is `radio-codeforge/bridge/BRIDGE_REGISTRY.json`. Always discover and reuse it before suggesting or creating any new transport implementation. Per-task manifests and readback receipts are not new bridges.
+CodeForge's development/audit daemon is separate from the transport adapter and does not gain write/deployment authority from reuse governance. Current transport status is PREPARED_NOT_LIVE_TESTED; host execution must not be reported as PASS without direct independent evidence.
