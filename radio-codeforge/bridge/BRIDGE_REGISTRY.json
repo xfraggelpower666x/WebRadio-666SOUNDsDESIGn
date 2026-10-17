@@ -77,5 +77,43 @@
     "legacy_windows_transport": "OPTIONAL_FALLBACK_ONLY",
     "production_runtime_impact": "NONE",
     "new_bridge_created": false
+  },
+  "offline_fallback_chain_20261017": {
+    "policy": "DIRECT_VERIFIED_GITHUB_BINARY_FIRST_THEN_EXISTING_CANONICAL_OFFLINE_ADAPTER",
+    "bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+    "implementation_count": 1,
+    "adapter_selection": [
+      "DIRECT_GITHUB_BINARY_BLOB",
+      "LYVRA_V1_OFFLINE_PROCEDURE_ADAPTED_TO_NATIVE_WINDOWS_GIT",
+      "CLIC_OFFLINE_PROFILE_IF_SOURCE_VERIFIED"
+    ],
+    "lyvra_offline": {
+      "status": "PROCEDURE_SOURCE_VERIFIED_EXECUTION_NOT_TESTED",
+      "reference_path": "LYVRA_NATIVE_RUNTIME/current/repository/BINARY_REPOSITORY_BRIDGE.md",
+      "reference_blob_sha": "d0f58f4b1b3cda4c85125f0c2d6f086fc7d9cc6a",
+      "required": [
+        "original_binary_bytes",
+        "source_size_and_sha256",
+        "exact_allowlisted_target",
+        "fresh_clone",
+        "HEAD_recheck",
+        "no_force_push",
+        "independent_remote_binary_readback",
+        "receipt"
+      ],
+      "native_owner_only": true
+    },
+    "clic_offline": {
+      "status": "REFERENCE_NOT_VERIFIED_DISABLED",
+      "source_repository_candidate": "xfraggelpower666x/666CLICPRO",
+      "known_readback": "README_ONLY_NO_OFFLINE_CONTRACT_FOUND",
+      "enable_only_after": "EXACT_NATIVE_CLIC_CURRENT_SOURCE_AND_TRANSPORT_CONTRACT_READBACK",
+      "no_invented_tooling": true
+    },
+    "no_new_bridge": true,
+    "blocked_route_behavior": "REPORT_BLOCKER_AND_PRESERVE_RETURN_ANCHOR",
+    "automatic_foreign_dispatch": false,
+    "offline_execution": "NOT_TESTED",
+    "source_receipt_ne_execution_pass": true
   }
 }
