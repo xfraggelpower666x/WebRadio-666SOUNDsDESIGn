@@ -45,7 +45,7 @@ jobs:
       FREEZE_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       BACKUP_CLASS: ${{ github.event_name == 'workflow_run' && 'POST_DEPLOY_VERIFIED_TREE' || 'PR_TREE_CANDIDATE' }}
       PRODUCTION_ORIGIN: https://webradio.666soundsdesign-broadcaster.com
-      PFS_CHILD_TARGET: 666PFS/Child_Systems/666STREAM_DEPLOYMENT
+      PFS_CHILD_TARGET: xfraggelpower666x/666PFS_CSM/children/STREAM-5001
     steps:
       - name: Checkout exact repository tree
         uses: actions/checkout@v6
@@ -109,7 +109,7 @@ jobs:
           const expected = {
             systemId: '666PFS-666STREAM-DEPLOYMENT-001',
             parentSystem: '666PFS',
-            version: '1.0.2',
+            version: '1.0.3',
             backupAllowedAfter: 'DEPLOYMENT_READBACK_PASS',
             childAutoload: false,
             secondBootstrap: false,
@@ -184,7 +184,7 @@ jobs:
             echo "VERIFY_COMMAND=npm run verify"
             echo "BACKUP_CLASS=${BACKUP_CLASS}"
             echo "PFS_CHILD_TARGET=${PFS_CHILD_TARGET}"
-            echo "PFS_STORAGE_OWNER=666PFS"
+            echo "PFS_STORAGE_OWNER=GITHUB_666PFS_CSM"
             echo "DEPLOYMENT_IDENTITY_MATCH=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
             echo "DEPLOYMENT_READBACK=$([[ \"${GITHUB_EVENT_NAME}\" == \"workflow_run\" ]] && echo PASS || echo PENDING)"
           } > "$METADATA"
@@ -259,9 +259,9 @@ jobs:
               `- ARTIFACT_NAME=${process.env.ARTIFACT_NAME}`,
               '- BACKUP_CLASS=POST_DEPLOY_VERIFIED_TREE',
               '- PFS_HANDOFF_PACKAGE=READY',
-              '- PFS_CHILD_TARGET=666PFS/Child_Systems/666STREAM_DEPLOYMENT',
-              '- PFS_STORAGE_OWNER=666PFS',
-              '- RADIO_DRIVE_CREDENTIALS=NOT_REQUIRED',
+              '- PFS_CHILD_TARGET=xfraggelpower666x/666PFS_CSM/children/STREAM-5001',
+              '- PFS_STORAGE_OWNER=GITHUB_666PFS_CSM',
+              '- DRIVE_ROLE=HISTORY_BACKUP_RECOVERY_ONLY',
               '- CHILD_BACKUP_REGISTRATION=PFS_INTAKE_REQUIRED',
               '- LYVRA=EXTERNAL_UNCHANGED'
             ].join('\n');

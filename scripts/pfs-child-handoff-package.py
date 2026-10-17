@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build a self-contained 666PFS child handoff package.
 
-The radio side only prepares a verified transfer package. 666PFS remains the
-owner of child storage, current pointers, retention, and final registration.
-No Google Drive credentials are required in the radio repository.
+The radio side only prepares a verified transfer package. The repo-first
+666PFS/CSM repository remains the owner of child metadata, current pointers,
+retention and final registration. Google Drive is history/recovery only.
 """
 
 from __future__ import annotations
@@ -75,15 +75,18 @@ def main() -> None:
         "backupClass": backup_class,
         "targetChild": child_target,
         "handoffState": "READY_FOR_PFS_INTAKE",
-        "storageOwner": "666PFS",
+        "storageOwner": "GITHUB_666PFS_CSM",
+        "controlRepository": "xfraggelpower666x/666PFS_CSM",
+        "controlBranch": "main",
+        "driveRole": "HISTORY_BACKUP_RECOVERY_ONLY",
         "radioDriveCredentialsRequired": False,
         "pfsResponsibilities": [
-            "store immutable repository copy",
-            "update current repository copy",
-            "update current pointer",
-            "register child backup",
+            "store repo-first child recovery metadata under children/STREAM-5001",
+            "bind the verified source commit and archive hash",
+            "update current pointer last",
+            "register child backup metadata",
             "apply PFS retention and freeze rules",
-            "verify stored copy against repositoryArchiveSha256",
+            "verify referenced artifact against repositoryArchiveSha256",
         ],
     }
 
