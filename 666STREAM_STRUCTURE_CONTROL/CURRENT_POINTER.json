@@ -29,7 +29,9 @@
     "INTERRUPTION_RESUME_FRESH_CHAT_TEST",
     "INTERRUPTION_RESUME_HOST_ACCEPTANCE",
     "CODEFORGE_BRIDGE_TEST_EXECUTION",
-    "CODEFORGE_BRIDGE_HOST_REMOTE_READBACK"
+    "CODEFORGE_BRIDGE_HOST_REMOTE_READBACK",
+    "CODEFORGE_LYVRA_V1_REFERENCE_TEST_EXECUTION",
+    "CODEFORGE_V1_BINARY_FALLBACK_HOST_TEST"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -117,5 +119,18 @@
     "host_transport": "PREPARED_NOT_LIVE_TESTED",
     "fresh_host_dispatch": "READBACK_PENDING",
     "immutable_scope": "ACTIVE_CHAT_PROJECT_ONLY"
+  },
+  "codeforge_bridge_lyvra_reference_20261017": {
+    "status": "SOURCE_CONTRACT_READBACK_VERIFIED",
+    "reference_version": "1.0.0",
+    "reference_path": "LYVRA_NATIVE_RUNTIME/current/repository/BINARY_REPOSITORY_BRIDGE.md",
+    "reference_blob_sha": "d0f58f4b1b3cda4c85125f0c2d6f086fc7d9cc6a",
+    "native_registry": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+    "body_head": "360d2b805ba01cb84650ab499162d33f47c7e98d",
+    "prechange_recovery_branch": "backup/pre-codeforge-lyvra-bridge-1-0-20261017",
+    "readback": "PASS_4_OF_4",
+    "test_execution": "NOT_RUN",
+    "host_transport": "READBACK_PENDING",
+    "foreign_authority_import": false
   }
 }
