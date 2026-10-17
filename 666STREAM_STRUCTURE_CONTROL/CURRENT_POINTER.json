@@ -47,7 +47,10 @@
     "CODEFORGE_MASTER_PEER_NATIVE_ADOPTION_LYVRA",
     "CODEFORGE_MASTER_PEER_NATIVE_ADOPTION_CLIC",
     "CODEFORGE_CLIC_ORIGINAL_SOURCE_READBACK",
-    "CODEFORGE_MASTER_REGRESSION_EXECUTION"
+    "CODEFORGE_MASTER_REGRESSION_EXECUTION",
+    "MASTER_BRIDGE_VISUAL_HOST_ACCEPTANCE",
+    "MASTER_BRIDGE_PEER_DELIVERY_RECEIPTS",
+    "MASTER_BRIDGE_VISUAL_REGRESSION_EXECUTION"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -279,5 +282,22 @@
     "original_zip_and_offline_runner": "NOT_TESTED",
     "regression_execution": "NOT_RUN",
     "native_adoption_only": true
+  },
+  "master_bridge_visual_handoff_20261017": {
+    "status": "SOURCE_INTEGRATION_READBACK_VERIFIED",
+    "body_head": "3c48b13932c12c6df8e4c30fef1784af364fb7ce",
+    "backup_branch": "backup/pre-streamctrl-visual-master-handoff-20261017",
+    "navigation": "666STREAM_STRUCTURE_CONTROL/visual/MASTER_BRIDGE_HANDOFF_NAVIGATION.json",
+    "visual_targets": [
+      "LYVRA",
+      "666CLIC"
+    ],
+    "source_readback": "PASS_6_OF_6",
+    "delivery": "PREPARED_NOT_DELIVERED",
+    "peer_adoption": "NOT_VERIFIED",
+    "host_visual_acceptance": "READBACK_PENDING",
+    "regression_test": "tests/stream-visual-master-handoff.test.mjs",
+    "regression_execution": "NOT_RUN",
+    "no_foreign_mutation": true
   }
 }
