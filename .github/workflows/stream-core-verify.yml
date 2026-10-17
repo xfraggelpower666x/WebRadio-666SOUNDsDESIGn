@@ -1,0 +1,34 @@
+name: 666STREAM Core Verification
+on:
+  push:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    paths:
+      - '666STREAM_STRUCTURE_CONTROL/**'
+      - 'radio-codeforge/**'
+      - 'scripts/verify-stream-core.mjs'
+      - 'tests/stream-core-evolution.test.mjs'
+      - 'tests/codeforge-bridge-reuse.test.mjs'
+      - 'tests/radio-codeforge-contract.test.mjs'
+      - '.github/workflows/stream-core-verify.yml'
+  pull_request:
+    paths:
+      - '666STREAM_STRUCTURE_CONTROL/**'
+      - 'radio-codeforge/**'
+      - 'scripts/verify-stream-core.mjs'
+      - 'tests/stream-core-evolution.test.mjs'
+      - 'tests/codeforge-bridge-reuse.test.mjs'
+      - 'tests/radio-codeforge-contract.test.mjs'
+      - '.github/workflows/stream-core-verify.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify native 666STREAM Core
+        run: npm run verify:stream-core
