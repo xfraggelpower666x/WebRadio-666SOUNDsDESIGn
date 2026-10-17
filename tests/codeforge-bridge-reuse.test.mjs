@@ -34,3 +34,15 @@ test('bridge retains native, transport and release safety boundaries', () => {
   assert.equal(registry.force_push_forbidden, true);
   assert.equal(config.runtimeIntegration, false);
 });
+
+test('LYVRA 1.0 is a transport reference, not foreign authority', () => {
+  assert.equal(registry.reference_model.version, '1.0.0');
+  assert.equal(registry.reference_model.system, 'LYVRA');
+  assert.equal(registry.reference_model.no_identity_import, true);
+  assert.equal(registry.binary_transport_policy.preferred, 'DIRECT_BINARY_REPOSITORY_MIRROR');
+  assert.equal(registry.binary_transport_policy.fallback_only_when_direct_blocked, true);
+  assert.equal(registry.binary_transport_policy.requires_expected_sha256, true);
+  assert.equal(registry.binary_transport_policy.requires_independent_remote_byte_identity, true);
+  assert.equal(registry.binary_transport_policy.release_promotion_by_native_update_only, true);
+  assert.equal(registry.owner, config.systemId);
+});
