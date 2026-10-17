@@ -37,5 +37,54 @@
   "fresh_host_status": "READBACK_PENDING",
   "tests": "tests/stream-semantic-visual-enforcement.test.mjs",
   "fallback": "IF_NATIVE_UI_CONTROLS_UNAVAILABLE_USE_CLEAR_TEXT_AND_COPYABLE_HANDOFF_WITHOUT_FAKE_BUTTON",
-  "relationship": "VISUAL_IS_PROJECTION_NOT_NEW_NATIVE_CONTROLLER"
+  "relationship": "VISUAL_IS_PROJECTION_NOT_NEW_NATIVE_CONTROLLER",
+  "five_option_contract": {
+    "type": "NATIVE_PRESENTATION_SLOTS_NOT_SECOND_ROUTER",
+    "count": 5,
+    "slots": [
+      "PROJECT_SELECTION",
+      "BEARBEITEN_WEITERENTWICKELN",
+      "WEITER",
+      "DASHBOARD",
+      "VORNE"
+    ],
+    "selection_source": "VERIFIED_CURRENT_AND_CHAT_LOCAL_SCOPE",
+    "render_rule": "REAL_ACTION_OR_EXPLAINED_UNAVAILABLE",
+    "no_fake_buttons": true,
+    "all_five_as_visible_slots": true,
+    "never_guess_unverified_project_route": true
+  },
+  "visual_completion_guard": {
+    "implementation": "666STREAM_STRUCTURE_CONTROL/visual/semantic-visual-intelligence.mjs#visualCompletionGuard",
+    "required_sections": [
+      "NATIVE_IDENTITY_AND_CURRENT",
+      "EVIDENCE_LEVELS_SOURCE_DELIVERY_ADOPTION_HOST",
+      "ACTIVE_SCOPE_AND_RETURN_ANCHOR",
+      "COMPLETED_AND_OPEN_OBLIGATIONS",
+      "BLOCKERS_AND_REGRESSION",
+      "VALID_CONTEXTUAL_ACTIONS"
+    ],
+    "require_source_current_and_pointer": true,
+    "source_completion_ne_host_pass": true,
+    "require_independent_actual_host_action": true,
+    "require_fresh_chat_for_host_pass": true,
+    "block_incomplete_without_claiming_success": true,
+    "prevents_dead_end_when_valid_action_exists": true
+  },
+  "plugin_parity": {
+    "account_surface": {
+      "identity": "UNRESOLVED",
+      "current_release": "NOT_VERIFIED",
+      "source_impact": "VISUAL_CONTRACT_CHANGED",
+      "live_host_parity": "READBACK_PENDING"
+    },
+    "native_surface": {
+      "identity": "UNRESOLVED",
+      "current_release": "NOT_VERIFIED",
+      "source_impact": "VISUAL_CONTRACT_CHANGED",
+      "live_host_parity": "READBACK_PENDING"
+    },
+    "no_plugin_release_claim": true,
+    "no_automatic_plugin_update": true
+  }
 }
