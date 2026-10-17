@@ -220,5 +220,23 @@
     "fresh_host": "READBACK_PENDING",
     "binary_transport": "READBACK_PENDING",
     "native_owner": "666STREAM_STRUCTURE_CONTROL"
+  },
+  "codeforge_direct_binary_integration_20261017": {
+    "status": "SOURCE_INTEGRATION_READBACK_PASS",
+    "canonical_bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+    "source_body_head": "3ffbe7e321197b831e8d1100aa54eec4cdce8c99",
+    "backup_branch": "backup/pre-codeforge-bridge-direct-binary-integration-20261017",
+    "bridge_registry": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+    "bridge_contract": "radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md",
+    "test_branch": "test/codeforge-govee-bridge-20261017",
+    "proof": "PASS_EXACT_BINARY_READBACK_582_BYTES",
+    "legacy_windows_bridge": "OPTIONAL_FALLBACK",
+    "original_complete_zip_test": "NOT_TESTED",
+    "standalone_runner": "NOT_TESTED",
+    "chat_return_anchor": "WEBRADIO_DASHBOARD_WCH_LAST_VERIFIED",
+    "global_project_switch": false,
+    "readback": "PASS_4_OF_4",
+    "pointer_last": true,
+    "production_radio_modified": false
   }
 }
