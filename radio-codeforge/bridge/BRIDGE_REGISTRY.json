@@ -104,11 +104,13 @@
       "native_owner_only": true
     },
     "clic_offline": {
-      "status": "REFERENCE_NOT_VERIFIED_DISABLED",
+      "status": "NATIVE_FACET_VERIFIED_RUNNER_NOT_LOCATED_DISABLED",
       "source_repository_candidate": "xfraggelpower666x/666CLICPRO",
-      "known_readback": "README_ONLY_NO_OFFLINE_CONTRACT_FOUND",
-      "enable_only_after": "EXACT_NATIVE_CLIC_CURRENT_SOURCE_AND_TRANSPORT_CONTRACT_READBACK",
-      "no_invented_tooling": true
+      "known_readback": "CLIC_NATIVE_FACET_REGISTERED_OFFLINE_RUNNER_NOT_LOCATED",
+      "enable_only_after": "EXACT_RUNNABLE_OFFLINE_ADAPTER_SOURCE_HASH_AND_HOST_PERMISSION_READBACK",
+      "no_invented_tooling": true,
+      "verified_facet": "666CLIC_NATIVE_RUNTIME/facets/repository_bridge/FACET_CONTRACT.md",
+      "verified_facet_blob": "7478ea7d1ab913e4963a2d47961295b5c57675e5"
     },
     "no_new_bridge": true,
     "blocked_route_behavior": "REPORT_BLOCKER_AND_PRESERVE_RETURN_ANCHOR",
@@ -135,5 +137,41 @@
     "tested_direct_scope": "582_BYTE_DERIVED_ZIP_ISOLATED_BRANCH_ONLY",
     "offline_runner": "NOT_TESTED",
     "no_foreign_auto_adoption": true
+  },
+  "clic_return_adoption_20261017": {
+    "status": "CLIC_PEER_SOURCE_REVIEWED_STREAM_NATIVE_DELTA_ADOPTED",
+    "peer_repository": "xfraggelpower666x/666CLICPRO",
+    "peer_branch": "clic-migration-rev79-staging",
+    "peer_handoff": "666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-STREAM-MASTER-BRIDGE-REVIEW-20261017.md",
+    "peer_handoff_blob": "0de24c554225716cdff1efa1556f0048b3295dae",
+    "peer_facet": "666CLIC_NATIVE_RUNTIME/facets/repository_bridge/FACET_CONTRACT.md",
+    "peer_facet_readback_blob": "7478ea7d1ab913e4963a2d47961295b5c57675e5",
+    "peer_original_prechange_blob": "3229f39dbb7c4f6836c9b87f427f85271f2e6492",
+    "source_status": "SOURCE_BLOB_READBACK_VERIFIED",
+    "peer_delivery": "NOT_PROVEN_BY_SOURCE_ONLY",
+    "native_adoption": "STREAM_SCOPE_UPDATE_IN_PROGRESS",
+    "fresh_host": "NOT_VERIFIED",
+    "clic_offline_runner": "NOT_LOCATED_RUNTIME_DISABLED",
+    "receipt_module": "radio-codeforge/bridge/master-evidence.mjs",
+    "evidence_levels": [
+      "SOURCE_READBACK",
+      "DELIVERED_EVIDENCED",
+      "NATIVE_ADOPTION",
+      "FRESH_HOST_PASS"
+    ],
+    "requirements": [
+      "independent_commit_readback",
+      "independent_tree_readback",
+      "independent_blob_readback",
+      "independent_remote_bytes_readback",
+      "source_and_target_head_freshness",
+      "source_sha256_and_byte_count",
+      "conflict_quarantine",
+      "visual_evidence_impact",
+      "no_plugin_binary_parity_inference",
+      "three_discovery_checks_only_not_safety"
+    ],
+    "reference_only": true,
+    "foreign_write": false
   }
 }
