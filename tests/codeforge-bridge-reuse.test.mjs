@@ -59,3 +59,21 @@ test('LYVRA local fallback is reusable and CLIC stays disabled until exact sourc
   assert.equal(chain.offline_execution, 'NOT_TESTED');
   assert.equal(chain.automatic_foreign_dispatch, false);
 });
+
+test('666STREAM master reference stays native, versioned and peer-adoption gated', () => {
+  const master = registry.master_reference;
+  assert.equal(master.id, '666STREAM-CODEFORGE-BRIDGE-MASTER');
+  assert.equal(master.version, '1.0.0');
+  assert.equal(master.owner, '666STREAM_STRUCTURE_CONTROL');
+  assert.equal(master.status, 'CANONICAL_666STREAM_MASTER_REFERENCE');
+  assert.equal(master.other_systems_adoption, 'PROPOSAL_ONLY');
+  assert.equal(master.no_foreign_auto_adoption, true);
+  assert.equal(master.source_provenance.clic_original, 'NOT_VERIFIED');
+  assert.equal(master.offline_runner, 'NOT_TESTED');
+  const source = read(master.source);
+  assert.match(source, /DIRECT_582_BYTE_ISOLATED_ZIP=PASS/);
+  assert.match(source, /WINDOWS_POWERSHELL_RUNNER=NOT_TESTED/);
+  assert.match(source, /CLIC_NATIVE_OFFLINE_ORIGINAL=NOT_VERIFIED/);
+  assert.match(read(master.peer_handoffs.LYVRA), /PROPOSAL_ONLY_NOT_DELIVERED_NOT_ADOPTED/);
+  assert.match(read(master.peer_handoffs.CLIC), /PROPOSAL_ONLY_NOT_DELIVERED_NOT_ADOPTED/);
+});
