@@ -81,5 +81,25 @@
     "fallback": "EXISTING_WINDOWS_BRIDGE_IF_DIRECT_UNAVAILABLE",
     "source_scope_only": true,
     "chat_continuity": "WEBRADIO_DASHBOARD_WCH_RETURN_ANCHOR"
+  },
+  "semantic_visual_intelligence": {
+    "contract": "visual/VISUAL_ENFORCEMENT_CONTRACT.json",
+    "module": "visual/semantic-visual-intelligence.mjs",
+    "stage": "AFTER_CURRENT_REHYDRATION_BEFORE_NATIVE_RESULT_PRESENTATION",
+    "always_for_native_triggers": true,
+    "presentation_only": true,
+    "required_for": [
+      "SYSTEMSTART",
+      "UPDATE",
+      "WEITER",
+      "NEW CHAT",
+      "NEXT CHAT",
+      "AUDIT",
+      "DASHBOARD",
+      "VORNE",
+      "FUCK HORST",
+      "MASTER BRIDGE HANDOFF"
+    ],
+    "host_execution": "READBACK_PENDING"
   }
 }
