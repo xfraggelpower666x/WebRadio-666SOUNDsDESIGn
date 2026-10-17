@@ -105,3 +105,19 @@ test('Radio-CodeForge runs automatically with verification and GitHub developmen
   assert.match(workflow, /npm run radio:codeforge/);
   assert.match(workflow, /permissions:\s*\n\s*contents: read/);
 });
+
+test('MAX_3_CHECKS_THEN_LEARNING_BY_DOING limits redundant discovery, not verification', () => {
+  const policy = config.threeChecksLearningByDoing;
+  assert.equal(policy.enabled, true);
+  assert.equal(policy.policy, 'MAX_3_CHECKS_THEN_LEARNING_BY_DOING');
+  assert.equal(policy.maxDiscoveryChecksPerHypothesis, 3);
+  assert.equal(policy.deduplicateEquivalentChecks, true);
+  assert.equal(policy.distinctFromCodexFailedRepairAttempts, true);
+  assert.equal(policy.autonomousWrites, false);
+  assert.equal(policy.foreignLearningMutation, false);
+  for (const gate of ['current-authority-and-scope','prechange-backup','concurrency-head','required-security-checks','targeted-regressions','independent-readback','pointer-last']) {
+    assert.ok(policy.mandatoryGatesNeverSkipped.includes(gate));
+  }
+  assert.equal(config.codexEscalation.triggerAfterSeriousFailedAttempts, 3);
+  assert.match(readme, /MAX_3_CHECKS_THEN_LEARNING_BY_DOING/);
+});
