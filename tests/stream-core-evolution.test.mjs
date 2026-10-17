@@ -7,9 +7,9 @@ const load=x=>JSON.parse(readFileSync(base+x,'utf8'));
 const ledger=load('development/DEVELOPMENT_OBLIGATION_LEDGER.json');
 const skills=load('skills/NATIVE_SKILL_REGISTRY.json');
 const manifest=load('REHYDRATION_MANIFEST.json');
-test('native owner and rehydration requires all six capability contracts',()=>{
+test('native owner and rehydration requires all eight capability contracts',()=>{
   assert.equal(OWNER,'666STREAM_STRUCTURE_CONTROL');
-  assert.equal(manifest.core_evolution_v1.required_carriers.length,6);
+  assert.equal(manifest.core_evolution_v1.required_carriers.length,8);
   for(const path of manifest.core_evolution_v1.required_carriers){
     assert.ok(readFileSync(base+path,'utf8').length>40);
   }
