@@ -53,7 +53,10 @@ async function walk(directory) {
   }
   return out;
 }
-const files = await walk(rootPath);
+const repositoryFiles = await walk(rootPath);
+// 666STREAM is a multi-project repository. The WebRadio release audit owns the
+// radio production tree, not independent native project workspaces under projects/.
+const files = repositoryFiles.filter(file => relative(rootPath, file).split(sep)[0] !== "projects");
 const nestedZips = files.filter(file => file.toLowerCase().endsWith(".zip"));
 const bytecode = files.filter(file => /(?:__pycache__|\.pyc$)/i.test(file));
 if (nestedZips.length) throw new Error(`nested ZIP files forbidden: ${nestedZips.map(file => relative(rootPath, file)).join(", ")}`);
