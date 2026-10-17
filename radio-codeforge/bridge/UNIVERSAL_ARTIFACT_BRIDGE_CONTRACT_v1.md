@@ -89,3 +89,23 @@ For binary payloads prefer a complete directly supported repository transport wi
 ### Non-negotiable fences
 NO_FORCE_PUSH; NO_POINTER_MUTATION_BY_BRIDGE; NO_SOURCE_STATE_MUTATION_BY_BRIDGE; NO_PLUGIN_OR_DEPLOYMENT_MUTATION_BY_BRIDGE; NO_CROSS_SYSTEM_MERGE; NO_PRIVATE_PAYLOAD_TO_PUBLIC_REPO; NO_UNVERIFIED_HASH_OR_SIZE; NO_SILENT_CANDIDATE_PROMOTION; READY_WITHOUT_REMOTE_READBACK_FORBIDDEN.
 Current fallback implementation status remains `PREPARED_NOT_LIVE_TESTED`. The existence of a documented LYVRA successful use is *not* a 666STREAM host PASS.
+
+## Verifizierter GitHub-Connector-Binärtransport — 2026-10-17
+
+BRIDGE_ID=666STREAM-CODEFORGE-ARTIFACT-BRIDGE
+DIRECT_GITHUB_BINARY_BLOB=PASS_ISOLATED_582_BYTE_ZIP
+WINDOWS_BRIDGE_REQUIRED_FOR_TESTED_TRANSPORT=FALSE
+SAME_CANONICAL_BRIDGE=TRUE
+
+Ein echter, neu erstellter ZIP-Container aus einem GOVEE-Originalquelltext wurde per vorhandenem GitHub-Connector als Base64-Blob gespeichert, in einen Git-Tree eingebunden, als Commit auf den isolierten Branch `test/codeforge-govee-bridge-20261017` geschrieben und anschließend über den Connector unabhängig rückgelesen. 582/582 Bytes wurden durch Base64-Gleichheit und Git-Blob-SHA `111abe5921d9f62303648c96f648bd924e0cafe1` bestätigt. Nachweis: `projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/binary-zip-readback-receipt.json` auf diesem **Testbranch**.
+
+### Native Routing
+Bei binären GitHub-Artefakten zuerst den direkten GitHub-Connector-Transport der bestehenden Bridge auf Eignung prüfen. Wenn Rechte, API oder Dateigröße die direkte Variante nicht erlauben, auf die **bereits bestehende** Windows/PowerShell-Git-Bridge zurückfallen; niemals stillschweigend eine neue Bridge pro Aufgabe erzeugen. Preflight, Allowlist, Source-Hash und Bytezahl, HEAD-Gegenprüfung, explizite Schreibfreigabe, unabhängiger Remote-Readback und separate Freigabe für Produktiv-Promotion bleiben obligatorisch. Die eigentliche Testbranch-Operation war nur aufgrund direkter ausdrücklicher Nutzerauthorisierung ausführbar.
+
+### Nicht verifiziert
+- Ursprüngliches gesamtes 9123-Byte-GOVEE-Archiv **nicht** als identischer Container importiert.
+- Ungeprüfte Dateigrößen-/API-Grenzen, kein allgemeines Versprechen, dass alle GitHub-Connector-Binäruploads funktionieren.
+- Der kanonische PowerShell-Runner wurde nicht ausgeführt. Kein Produktionsdeploy, keine GOVEE-Gerätesteuerung und kein PFS-Receipt.
+
+### Chat-Rückkehr nach Nutzerkorrektur
+Der GOVEE-Binärtest ist ein gültiger, isolierter Nebenast, **kein Foreground-Wechsel**. Der aktive Entwicklungsanker dieses Chats geht zurück auf WEBRADIO Dashboard nach WCH-Reparatur (Commit `c5045cabb46bef8e2dcec7a76fe6abdd3c149119`). Die neueren CORE- und CodeForge-Commits werden bewahrt. Kein GitHub-Revert.
