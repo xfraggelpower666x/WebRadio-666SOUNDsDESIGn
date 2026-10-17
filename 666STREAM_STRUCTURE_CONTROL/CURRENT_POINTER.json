@@ -23,7 +23,9 @@
   "current_state_status": "CURRENT_PRODUCTIVE_PROJECT_SCOPED_RUNTIME",
   "open_gates": [
     "FRESH_CHAT_REHYDRATION_RUNTIME_TEST",
-    "LIGHT_ORCHESTRA_SEPARATE_CHILD_ROUTE_PRESERVED_UNRESOLVED"
+    "LIGHT_ORCHESTRA_SEPARATE_CHILD_ROUTE_PRESERVED_UNRESOLVED",
+    "FUCK_HORST_FRESH_HOST_DISPATCH_TEST",
+    "VORNE_FRESH_HOST_DISPATCH_TEST"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -75,5 +77,16 @@
   "second_display": "VISUAL_ONLY_FROM_PRIMARY_ANALYSER",
   "second_display_duplicate_audio": "FORBIDDEN",
   "installer_target": "NSIS",
-  "portable_role": "RECOVERY_BACKUP_ONLY"
+  "portable_role": "RECOVERY_BACKUP_ONLY",
+  "native_context_recovery_20261017": {
+    "source_body_head": "d486c5fa797af525e9e8b9326d6134da82a55f70",
+    "prechange_recovery_branch": "backup/pre-streamctrl-vorne-horst-20261017",
+    "trigger_vorne": "666STREAM VORNE",
+    "trigger_horst": "FUCK HORST",
+    "optional_explicit_alias": "666STREAM FUCK HORST",
+    "source_contract_readback": "PASS_5_OF_5",
+    "fresh_host_dispatch": "READBACK_PENDING",
+    "mutation_on_diagnosis": "FORBIDDEN",
+    "scope": "666STREAM_STRUCTURE_CONTROL"
+  }
 }
