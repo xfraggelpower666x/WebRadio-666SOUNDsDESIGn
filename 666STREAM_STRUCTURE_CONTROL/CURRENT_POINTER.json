@@ -56,7 +56,9 @@
     "CLIC_MASTER_VISUAL_FRESH_HOST_ACCEPTANCE",
     "CLIC_MASTER_PLUGIN_BINARY_PARITY_READBACK",
     "SEMANTIC_VISUAL_NATIVE_HOST_PRESENTATION_ACCEPTANCE",
-    "SEMANTIC_VISUAL_NODE_TEST_EXECUTION"
+    "SEMANTIC_VISUAL_NODE_TEST_EXECUTION",
+    "SEMANTIC_VISUAL_FULL_REPOSITORY_NODE_TEST",
+    "SEMANTIC_VISUAL_ACTUAL_FRESH_HOST_CLICK_TEST"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -372,5 +374,30 @@
     "no_evidence_free_pass": true,
     "foreign_mutation": "NONE",
     "production_radio_mutation": "NONE"
+  },
+  "semantic_visual_node_and_host_gates_20261017": {
+    "status": "NODE_COMPONENT_EXECUTED_PASS_FULL_REPOSITORY_AND_HOST_PENDING",
+    "body_head": "1108509ef910b80e427ddca4b66dea8f10f6d4c7",
+    "backup_branch": "backup/pre-streamctrl-visual-node-gate-20261017",
+    "node_version": "22.16.0",
+    "exact_git_blob_sources": [
+      "6b47eeaef755ee82e7dc887dd0a96226f468c970",
+      "68f3673ac0a6fb520a25759bf0023f4c6a9cb115",
+      "99d29cc4f42d578c6ef2724a66100e5c268bb284"
+    ],
+    "node_component_test": "PASS_6_OF_6",
+    "fixture_scope": "MINIMAL_DEPENDENCY_FIXTURES_NOT_FULL_REPOSITORY",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/VISUAL_NODE_COMPONENT_RUN_2026-10-17.json",
+    "core_test_entrypoint": "npm run verify:stream-core",
+    "visual_test_entrypoint": "npm run verify:stream-visual",
+    "workflow": ".github/workflows/stream-core-verify.yml",
+    "source_readback": "PASS_6_OF_6",
+    "fresh_host_runbook": "666STREAM_STRUCTURE_CONTROL/visual/FRESH_HOST_ACCEPTANCE_RUNBOOK.md",
+    "full_repo_node_suite": "READBACK_PENDING",
+    "github_actions_ci": "NOT_CONFIRMED",
+    "fresh_chat_interaction": "READBACK_PENDING",
+    "source_to_host_pass_automatic": false,
+    "production_radio_mutation": "NONE",
+    "foreign_mutation": "NONE"
   }
 }
