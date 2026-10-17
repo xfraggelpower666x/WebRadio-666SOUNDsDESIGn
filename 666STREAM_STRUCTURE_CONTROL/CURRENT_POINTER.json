@@ -31,7 +31,9 @@
     "CODEFORGE_BRIDGE_TEST_EXECUTION",
     "CODEFORGE_BRIDGE_HOST_REMOTE_READBACK",
     "CODEFORGE_LYVRA_V1_REFERENCE_TEST_EXECUTION",
-    "CODEFORGE_V1_BINARY_FALLBACK_HOST_TEST"
+    "CODEFORGE_V1_BINARY_FALLBACK_HOST_TEST",
+    "CODEFORGE_THREE_CHECKS_TEST_EXECUTION",
+    "CODEFORGE_THREE_CHECKS_FRESH_HOST_ACCEPTANCE"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -132,5 +134,16 @@
     "test_execution": "NOT_RUN",
     "host_transport": "READBACK_PENDING",
     "foreign_authority_import": false
+  },
+  "codeforge_three_checks_20261017": {
+    "status": "SOURCE_READBACK_VERIFIED",
+    "policy": "MAX_3_CHECKS_THEN_LEARNING_BY_DOING",
+    "source_body_head": "7c870378597408acd692c688f87c3abdddab35cb",
+    "prechange_recovery_branch": "backup/pre-codeforge-three-checks-20261017",
+    "source_readback": "PASS_4_OF_4",
+    "test_execution": "NOT_RUN",
+    "fresh_host_acceptance": "READBACK_PENDING",
+    "scope": "RADIO_CODEFORGE_ONLY",
+    "safety_gates_not_capped": true
   }
 }
