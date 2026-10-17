@@ -29,3 +29,6 @@ Rules:
 
 ## Native interruption/continuation governance — 2026-10-17
 Use existing project-aware LiveCircle and Session Governor for CLIC-inspired interruption handling and LYVRA-inspired workspace-preserving continuity. Their patterns are adapted by 666STREAM; no CLIC/LYVRA facet, identity, shared mutable state or foreign execution authority is imported. Keep chat-local return anchors, paused obligations and newer-valid-state supersession semantics. A diagnosed interruption is not permission for a write. Existing pointers, project isolation, pre-change recovery and pointer-last discipline remain authoritative.
+
+## Core Evolution v1 capability boundaries — 2026-10-17
+The native Structure Control authorizes scope only. Its Development Obligation Ledger, relational rehydration, native skill registry, local learning, parity review, and evidence dashboard are subordinate capabilities without independent decision/write authority. Source current is authoritative only for repository-native state; host/plugin release acceptance requires independent proof. No cloning LYVRA or CLIC identity/facets, no new controller, no change to product/runtime ownership, no automatic foreign mutation. Core may be explicitly foregrounded while retaining project return anchors.
