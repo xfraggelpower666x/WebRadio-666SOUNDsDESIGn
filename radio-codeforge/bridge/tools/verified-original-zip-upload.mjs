@@ -15,7 +15,7 @@ if(!input) throw Error('Provide --file=/absolute/path/GOVEE_FX_SCENE_SYNC_ADDON.
 if(basename(input)!=='GOVEE_FX_SCENE_SYNC_ADDON.zip') throw Error('Original archive filename required');
 const data=readFileSync(resolve(input));
 const hash=x=>createHash('sha256').update(x).digest('hex');
-const blobSha=x=>createHash('sha1').update(Buffer.from('blob '+x.length+'\\0','utf8')).update(x).digest('hex');
+const blobSha=x=>createHash('sha1').update(Buffer.from('blob '+x.length+'\0','utf8')).update(x).digest('hex');
 const manifest={bridge:'666STREAM-CODEFORGE-ARTIFACT-BRIDGE',repo,branch,target,size:data.length,sha256:hash(data),git_blob_sha:blobSha(data),mode:execute?'ISOLATED_TEST_UPLOAD':'DRY_RUN'};
 if(data.length!==expected.size||manifest.sha256!==expected.sha256||manifest.git_blob_sha!==expected.gitBlob) throw Error('SOURCE_ORIGINAL_MISMATCH: '+JSON.stringify(manifest));
 if(!execute){console.log(JSON.stringify({...manifest,status:'SOURCE_PRECHECK_PASS_NO_REMOTE_WRITE'},null,2));process.exit(0);}
@@ -38,7 +38,7 @@ const created=await gh('POST','/git/blobs',{content:data.toString('base64'),enco
 if(created.sha!==expected.gitBlob) throw Error('STOP: UPLOAD_GIT_BLOB_MISMATCH expected='+expected.gitBlob+' actual='+created.sha);
 const remoteBlob=await gh('GET','/git/blobs/'+created.sha);
 if(remoteBlob.encoding!=='base64') throw Error('STOP: GitHub did not return base64 blob');
-const received=Buffer.from(remoteBlob.content.replace(/\\s/g,''),'base64');
+const received=Buffer.from(remoteBlob.content.replace(/\s/g,''),'base64');
 if(received.length!==expected.size||hash(received)!==expected.sha256||blobSha(received)!==expected.gitBlob||!received.equals(data))throw Error('STOP: INDEPENDENT_GITHUB_BLOB_BYTE_READBACK_MISMATCH');
 const tree=await gh('POST','/git/trees',{base_tree:parentCommit.tree.sha,tree:[{path:target,mode:'100644',type:'blob',sha:created.sha}]});
 const commit=await gh('POST','/git/commits',{message:'test(codeforge): verified full original Govee ZIP bytes on isolated branch',tree:tree.sha,parents:[parent]});
@@ -46,6 +46,6 @@ if((await getRef()).object.sha!==parent)throw Error('STOP: CONCURRENT_BRANCH_UPD
 await gh('PATCH',refPath,{sha:commit.sha,force:false});
 if((await getRef()).object.sha!==commit.sha)throw Error('STOP: REMOTE_REF_READBACK_MISMATCH');
 const file=await gh('GET','/contents/'+target.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(branch));
-const final=Buffer.from(String(file.content||'').replace(/\\s/g,''),'base64');
+const final=Buffer.from(String(file.content||'').replace(/\s/g,''),'base64');
 if(final.length!==expected.size||hash(final)!==expected.sha256||!final.equals(data))throw Error('STOP: FINAL_BRANCH_FILE_BYTE_READBACK_MISMATCH');
 console.log(JSON.stringify({...manifest,status:'PASS_EXACT_REMOTE_BYTES_AND_SHA256',commit:commit.sha,remote_git_blob_sha:created.sha,final_size:final.length,branch_readback:true,production_branch_mutated:false},null,2));
