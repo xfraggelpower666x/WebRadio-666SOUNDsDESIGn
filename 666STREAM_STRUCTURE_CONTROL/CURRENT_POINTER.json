@@ -35,7 +35,10 @@
     "CODEFORGE_THREE_CHECKS_TEST_EXECUTION",
     "CODEFORGE_THREE_CHECKS_FRESH_HOST_ACCEPTANCE",
     "GOVEE_CONTROL_PROJECT_ROUTE_FRESH_CHAT_TEST",
-    "TWO_INTRO_VARIANTS_ROUTE_FRESH_CHAT_TEST"
+    "TWO_INTRO_VARIANTS_ROUTE_FRESH_CHAT_TEST",
+    "CORE_EVOLUTION_REGRESSION_EXECUTION",
+    "CORE_EVOLUTION_FRESH_HOST_ACCEPTANCE",
+    "CORE_EVOLUTION_PLUGIN_SKILL_PARITY_READBACK"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -160,5 +163,32 @@
     "source_readback": "PASS_2_OF_2",
     "fresh_chat_route_acceptance": "READBACK_PENDING",
     "light_orchestra_route": "PRESERVED_UNRESOLVED"
+  },
+  "core_evolution_20261017": {
+    "status": "SOURCE_INTEGRATION_READBACK_VERIFIED",
+    "body_head": "fdb7803c66d6676ae4b2619ba71006ce70a48f84",
+    "prechange_recovery_branch": "backup/pre-streamctrl-core-evolution-20261017",
+    "native_runtime_module": "666STREAM_STRUCTURE_CONTROL/runtime/core-intelligence.mjs",
+    "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
+    "development_ledger": "666STREAM_STRUCTURE_CONTROL/development/DEVELOPMENT_OBLIGATION_LEDGER.json",
+    "dependency_map": "666STREAM_STRUCTURE_CONTROL/rehydration/RELATIONAL_DEPENDENCY_MAP.json",
+    "skill_registry": "666STREAM_STRUCTURE_CONTROL/skills/NATIVE_SKILL_REGISTRY.json",
+    "causal_learning": "666STREAM_STRUCTURE_CONTROL/learning/CAUSAL_LEARNING_CONTRACT.md",
+    "parity_ledger": "666STREAM_STRUCTURE_CONTROL/integration/ADAPTER_PARITY_LEDGER.json",
+    "dashboard": "666STREAM_STRUCTURE_CONTROL/current/CORE_DASHBOARD_CONTRACT.md",
+    "coverage": {
+      "github_source_readback": "PASS_15_OF_15",
+      "manifest_linkage": "PASS_8_OF_8",
+      "obligations": 5,
+      "skill_adapters": 5,
+      "relations": 5,
+      "parity_surfaces": 5
+    },
+    "regression_test_file": "tests/stream-core-evolution.test.mjs",
+    "regression_execution": "NOT_RUN",
+    "fresh_host_acceptance": "READBACK_PENDING",
+    "production_web_radio_mutation": "NONE",
+    "foreign_system_mutation": "NONE",
+    "previous_verified_evolution": "PRESERVED"
   }
 }
