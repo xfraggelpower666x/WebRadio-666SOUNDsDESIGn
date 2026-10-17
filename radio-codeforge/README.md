@@ -133,3 +133,13 @@ This keeps RADIO-CODEFORGE involved from architecture/root-cause analysis throug
 ## Canonical artifact bridge reuse — 2026-10-17
 The existing universal bridge contract at `radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md` is the sole reusable artifact-transfer capability. Its machine-readable descriptor is `radio-codeforge/bridge/BRIDGE_REGISTRY.json`. Always discover and reuse it before suggesting or creating any new transport implementation. Per-task manifests and readback receipts are not new bridges.
 CodeForge's development/audit daemon is separate from the transport adapter and does not gain write/deployment authority from reuse governance. Current transport status is PREPARED_NOT_LIVE_TESTED; host execution must not be reported as PASS without direct independent evidence.
+
+## MAX_3_CHECKS_THEN_LEARNING_BY_DOING — 2026-10-17
+A native, scope-bound RADIO-CODEFORGE development policy adapted from CLIC/LYVRA learning practices without importing their authority.
+
+- At most **three nonredundant discovery checks of the same hypothesis** before an evidence-backed implementation decision. Repeated identical checks do not reset the counter or count as productive progress.
+- After three checks, shift from speculative auditing to the **smallest safe reversible implementation or experiment**, measure the actual result and update the causal explanation.
+- If a protected write is not authorized, its prerequisites are missing, or risks remain uncontrolled, report **BLOCKED** with findings and a resumable next action. Never equate learning-by-doing with permission to force a write.
+- Required currentness/permission/concurrency checks, pre-change backup, security tests, regression tests, post-change readbacks and pointer-last publication are **not subject to the 3-check ceiling**.
+- Record hypothesis, checks already performed, results, attempted action, observed outcome, contradicting evidence and next return anchor so NEW/NEXT CHAT or WEITER does not repeat the same three checks.
+- This is independent of `codexEscalation.triggerAfterSeriousFailedAttempts=3`, which counts *failed repair attempts*, not discovery checks. Learning evidence stays 666STREAM-local and can never rewrite CLIC/LYVRA knowledge.
