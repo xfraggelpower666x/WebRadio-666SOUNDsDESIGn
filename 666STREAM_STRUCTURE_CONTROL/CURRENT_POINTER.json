@@ -58,7 +58,9 @@
     "SEMANTIC_VISUAL_NATIVE_HOST_PRESENTATION_ACCEPTANCE",
     "SEMANTIC_VISUAL_NODE_TEST_EXECUTION",
     "SEMANTIC_VISUAL_FULL_REPOSITORY_NODE_TEST",
-    "SEMANTIC_VISUAL_ACTUAL_FRESH_HOST_CLICK_TEST"
+    "SEMANTIC_VISUAL_ACTUAL_FRESH_HOST_CLICK_TEST",
+    "SEMANTIC_VISUAL_CLICK_TELEMETRY_OR_INDEPENDENT_ACTION_CONFIRMATION",
+    "SEMANTIC_VISUAL_FRESH_CHAT_COMPLETE_ACCEPTANCE"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -399,5 +401,21 @@
     "source_to_host_pass_automatic": false,
     "production_radio_mutation": "NONE",
     "foreign_mutation": "NONE"
+  },
+  "semantic_visual_followup_observation_20261017": {
+    "status": "FOLLOWUP_ROUNDTRIP_OBSERVED_CLICK_TELEMETRY_UNVERIFIED",
+    "body_head": "c239e7c5ec86efbf76c1f3ca24ff52360b36d56c",
+    "receipt_path": "666STREAM_STRUCTURE_CONTROL/visual/receipts/FRESH_HOST_FOLLOWUP_OBSERVATION_20261017.json",
+    "receipt_readback": "PASS",
+    "prechange_backup_branch": "backup/pre-visual-fresh-followup-evidence-20261017",
+    "same_conversation_command_received": true,
+    "source_head_unchanged": true,
+    "scope": "CORE",
+    "host_click_attribution": "NOT_INDEPENDENTLY_VERIFIED",
+    "fresh_chat_host_test": "READBACK_PENDING",
+    "native_visual_host_pass": "READBACK_PENDING",
+    "full_repo_ci": "NOT_CONFIRMED",
+    "production_runtime_change": "NONE",
+    "foreign_system_mutation": "NONE"
   }
 }
