@@ -37,5 +37,26 @@
   "repair_existing_first": true,
   "scope": "ACTIVE_CHAT_PROJECT_ONLY",
   "continuity": "CANONICAL_BRIDGE_ID_AND_JOB_RETURN_ANCHOR",
-  "source_provenance": "radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md"
+  "source_provenance": "radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md",
+  "reference_model": {
+    "system": "LYVRA",
+    "version": "1.0.0",
+    "repository": "xfraggelpower666x/LYVRA-Living-Yielding-Vibration-and-Resonance-Architecture",
+    "branch": "lyvra",
+    "source_path": "LYVRA_NATIVE_RUNTIME/current/repository/BINARY_REPOSITORY_BRIDGE.md",
+    "source_blob_sha": "d0f58f4b1b3cda4c85125f0c2d6f086fc7d9cc6a",
+    "transfer_only": true,
+    "no_identity_import": true
+  },
+  "binary_transport_policy": {
+    "preferred": "DIRECT_BINARY_REPOSITORY_MIRROR",
+    "fallback": "EXISTING_CANONICAL_BRIDGE",
+    "fallback_only_when_direct_blocked": true,
+    "requires_verified_source_path": true,
+    "requires_expected_byte_size": true,
+    "requires_expected_sha256": true,
+    "requires_explicit_target_and_permission": true,
+    "requires_independent_remote_byte_identity": true,
+    "release_promotion_by_native_update_only": true
+  }
 }
