@@ -17,7 +17,7 @@ export function projectView({trigger='UPDATE',scope='CORE',repository,branch,hea
   const rows=(Array.isArray(evidence)?evidence:[]).map(normalizeEvidence);
   const verified=rows.filter(x=>x.status==='VERIFIED').length;
   const conflicts=rows.filter(x=>x.status==='CONFLICT_QUARANTINE').length;
-  const projectStatus=!valid(head)||!valid(pointer)?'READBACK_PENDING':conflicts?'CONFLICT_QUARANTINE':rows.some(x=>x.status!=='VERIFIED')?'PARTIAL':'VERIFIED';
+  const projectStatus=!valid(head)||!valid(pointer)?'READBACK_PENDING':conflicts?'CONFLICT_QUARANTINE':rows.length===0||rows.some(x=>x.status!=='VERIFIED')?'PARTIAL':'VERIFIED';
   const safeActions=(Array.isArray(actions)?actions:[]).filter(a=>a&&valid(a.label)&&['COPY','OPEN_VERIFIED_URL','ISSUE_NATIVE_TURN'].includes(a.kind)&&valid(a.payload)&&a.evidence_verified===true);
   return {owner:VISUAL_OWNER,status:projectStatus,trigger,scope,identity:{repository:repository||null,branch:branch||null,head:head||null,pointer:pointer||null},evidence:rows,measured:{verified,total:rows.length},open_gates:Array.isArray(gates)?gates.filter(valid):[],actions:safeActions,return_anchor,decision_authority:false,host_acceptance:'INDEPENDENT_PROOF_REQUIRED'};
 }
