@@ -27,7 +27,9 @@
     "FUCK_HORST_FRESH_HOST_DISPATCH_TEST",
     "VORNE_FRESH_HOST_DISPATCH_TEST",
     "INTERRUPTION_RESUME_FRESH_CHAT_TEST",
-    "INTERRUPTION_RESUME_HOST_ACCEPTANCE"
+    "INTERRUPTION_RESUME_HOST_ACCEPTANCE",
+    "CODEFORGE_BRIDGE_TEST_EXECUTION",
+    "CODEFORGE_BRIDGE_HOST_REMOTE_READBACK"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -101,5 +103,19 @@
     "sequence": "PAUSE_INGEST_CAUSAL_RECONCILIATION_RESUME",
     "fresh_host_acceptance": "READBACK_PENDING",
     "scope": "CHAT_LOCAL_NO_FOREIGN_AUTOACTIVATION"
+  },
+  "codeforge_bridge_reuse_20261017": {
+    "status": "SOURCE_CONTRACT_READBACK_VERIFIED",
+    "source_body_head": "95c7ccc6859535b0febd1811b044b8a8fae10765",
+    "backup_branch": "backup/pre-codeforge-bridge-reuse-20261017",
+    "bridge_id": "666STREAM-CODEFORGE-ARTIFACT-BRIDGE",
+    "registry": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+    "contract": "radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md",
+    "source_readback": "PASS_6_OF_6",
+    "test_source": "tests/codeforge-bridge-reuse.test.mjs",
+    "test_execution": "NOT_RUN",
+    "host_transport": "PREPARED_NOT_LIVE_TESTED",
+    "fresh_host_dispatch": "READBACK_PENDING",
+    "immutable_scope": "ACTIVE_CHAT_PROJECT_ONLY"
   }
 }
