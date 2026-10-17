@@ -1,5 +1,6 @@
 name: 666STREAM Core Verification
 on:
+  workflow_dispatch:
   push:
     branches: [WebRadio-666SOUNDsDESIGn]
     paths:
@@ -9,6 +10,7 @@ on:
       - 'tests/stream-core-evolution.test.mjs'
       - 'tests/stream-semantic-visual-enforcement.test.mjs'
       - 'tests/stream-visual-master-handoff.test.mjs'
+      - 'tests/stream-symphony-project-identity.test.mjs'
       - 'package.json'
       - 'tests/codeforge-bridge-reuse.test.mjs'
       - 'tests/radio-codeforge-contract.test.mjs'
@@ -21,6 +23,7 @@ on:
       - 'tests/stream-core-evolution.test.mjs'
       - 'tests/stream-semantic-visual-enforcement.test.mjs'
       - 'tests/stream-visual-master-handoff.test.mjs'
+      - 'tests/stream-symphony-project-identity.test.mjs'
       - 'package.json'
       - 'tests/codeforge-bridge-reuse.test.mjs'
       - 'tests/radio-codeforge-contract.test.mjs'
