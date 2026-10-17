@@ -69,5 +69,15 @@
     "no_foreign_autoactivation": true,
     "no_new_root_identity": true,
     "host_acceptance_separate": true
+  },
+  "codeforge_bridge_direct_binary_20261017": {
+    "registry": "radio-codeforge/bridge/BRIDGE_REGISTRY.json",
+    "contract": "radio-codeforge/bridge/UNIVERSAL_ARTIFACT_BRIDGE_CONTRACT_v1.md",
+    "stage": "RESOLVE_CANONICAL_BRIDGE_BEFORE_ANY_ARTIFACT_TRANSFER",
+    "result": "ISOLATED_DIRECT_GITHUB_BINARY_READBACK_PASS",
+    "original_complete_zip": "NOT_TESTED",
+    "fallback": "EXISTING_WINDOWS_BRIDGE_IF_DIRECT_UNAVAILABLE",
+    "source_scope_only": true,
+    "chat_continuity": "WEBRADIO_DASHBOARD_WCH_RETURN_ANCHOR"
   }
 }
