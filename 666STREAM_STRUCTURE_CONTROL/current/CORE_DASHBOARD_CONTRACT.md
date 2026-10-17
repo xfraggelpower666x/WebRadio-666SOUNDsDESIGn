@@ -29,3 +29,6 @@ LIGHT_ORCHESTRA_PROJECT_SELECTION=AVAILABLE
 LIGHT_ORCHESTRA_DIRECTORY_READBACK=UNVERIFIED
 GOVEE_CONTROL_IS_SEPARATE_PROJECT=true
 Render the Symphony card as a recognized selectable project, not as an unknown identity. Note only the separate child directory/host source route is unverified; selecting Symphony must not guess a path or activate GOVEE_CONTROL. Provide a real selection action for the verified native project ID.
+
+## Mandatory five-slot native completion — 2026-10-17
+Use the EXISTING semantic visual intelligence engine and its VISUAL_ENFORCEMENT_CONTRACT.json: exactly five contextual navigation slots PROJECT_SELECTION, BEARBEITEN_WEITERENTWICKELN, WEITER, DASHBOARD, VORNE. For each slot, show only a verified real action or a concise unavailable reason; never create fake buttons. At native completion, invoke visualCompletionGuard from the same visual helper with HEAD/pointer, six evidence sections, grounded actions or explained BLOCKED, and separate observed host interaction/fresh-chat evidence. Source-ready never implies fresh-host PASS. No second engine, controller or forced revision.
