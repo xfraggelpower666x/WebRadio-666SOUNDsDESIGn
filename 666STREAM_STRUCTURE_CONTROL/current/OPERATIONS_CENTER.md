@@ -21,3 +21,6 @@ Native contract: `current/CORE_DASHBOARD_CONTRACT.md`; verified tasks: `developm
 
 ## Visual peer forward controls — 2026-10-17
 When a verified peer Master Bridge proposal exists, project a clear visual **LYVRA** and **666CLIC** peer handoff path using `visual/MASTER_BRIDGE_HANDOFF_NAVIGATION.json`. Each control must perform a genuine action (copy the exact target-native command or open an actual GitHub file); otherwise present a non-interactive status. Distinguish PREPARED_NOT_DELIVERED, PEER_RECEIVED_VERIFIED and PEER_ADOPTED_VERIFIED. The dashboard is not a message-delivery engine; retain local scope and return anchor.
+
+## User navigation continuity — visual selection required (2026-10-17)
+After every native trigger, show contextual navigation and development position: current, last verified action, open gates, resume anchor and at least one appropriate supported continuation when available. Do not make the creator guess which command to use. Contextual selections may include 666STREAM WEITER, 666STREAM DASHBOARD, 666STREAM UPDATE, 666STREAM VORNE, active project return and exact master bridge peer handoff; show only actions genuinely grounded in current authority. Controls that copy must copy; controls that navigate must navigate. Disabled/unavailable paths are text with reason, not fake buttons.
