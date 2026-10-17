@@ -42,5 +42,28 @@
     "restore_requires_readback": true,
     "pointer_last_after_restore": true,
     "cross_project_restore": false
+  },
+  "core_evolution_v1": {
+    "mode": "ADDITIVE_NATIVE_CAPABILITIES",
+    "required_carriers": [
+      "development/DEVELOPMENT_OBLIGATION_LEDGER.json",
+      "rehydration/RELATIONAL_REHYDRATION_CONTRACT.md",
+      "skills/NATIVE_SKILL_REGISTRY.json",
+      "learning/CAUSAL_LEARNING_CONTRACT.md",
+      "integration/PARITY_AND_HANDOFF_CONTRACT.md",
+      "current/CORE_DASHBOARD_CONTRACT.md"
+    ],
+    "runtime_helper": "runtime/core-intelligence.mjs",
+    "required_rehydration_stage_after_existing_order": [
+      "RECONCILE_DEVELOPMENT_OBLIGATIONS",
+      "RELATIONAL_CAUSAL_CONTEXT",
+      "RESOLVE_NATIVE_SKILLS_BY_REFERENCE",
+      "RECONCILE_LOCAL_LEARNING",
+      "ADAPTER_PLUGIN_HOST_PARITY_IMPACT",
+      "RENDER_CORE_DEVELOPMENT_POSITION"
+    ],
+    "no_foreign_autoactivation": true,
+    "no_new_root_identity": true,
+    "host_acceptance_separate": true
   }
 }
