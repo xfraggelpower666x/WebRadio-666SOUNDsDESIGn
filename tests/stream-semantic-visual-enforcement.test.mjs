@@ -32,7 +32,10 @@ test('completion guard blocks incomplete UI rather than inventing host success',
   assert.equal(source.host_verified,false);
   assert.equal(source.account_plugin_parity,'READBACK_PENDING');
   assert.equal(source.native_plugin_parity,'READBACK_PENDING');
-  assert.equal(visualCompletionGuard({projection,options:slots,rendered_sections:sections,source_verified:true,host_action_observed:true,host_action_independently_verified:true,fresh_chat_verified:true}).status,'HOST_PASS');
+  assert.equal(visualCompletionGuard({projection,options:slots,rendered_sections:sections,source_verified:true,host_action_observed:true,host_action_independently_verified:true,fresh_chat_verified:true}).status,'SOURCE_COMPLETION_READY');
+  const host_receipt={type:'INDEPENDENT_HOST_ACTION_READBACK',session_id:'session',user_action_id:'action',turn_id:'turn',observed_action:'ISSUE_NATIVE_TURN',independent_readback_source:'host-observer',current_head:'h',current_pointer:'p',same_scoped_session:true,fresh_chat_observed:true};
+  assert.equal(visualCompletionGuard({projection,options:slots,rendered_sections:sections,source_verified:true,host_action_observed:true,host_action_independently_verified:true,fresh_chat_verified:true,host_receipt}).status,'HOST_PASS');
+  assert.equal(visualCompletionGuard({projection,options:slots,rendered_sections:sections,source_verified:true,host_action_observed:true,host_action_independently_verified:true,fresh_chat_verified:true,host_receipt:{...host_receipt,current_head:'forged'}}).status,'SOURCE_COMPLETION_READY');
 });
 test('no valid actions requires explicit reasons for all slots',()=>{
   const projection=projectView({head:'h',pointer:'p'});
