@@ -1,0 +1,54 @@
+{
+  "schema": "666stream-master-bridge-functional-validation-v1",
+  "date": "2026-10-17",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "starting_current": "08e3d4efbb70f2f54d4ca1813961261045c6d74f",
+  "prechange_backup": "backup/pre-master-bridge-functional-validation-20261017",
+  "master_reference": "radio-codeforge/bridge/MASTER_BRIDGE_REFERENCE_v1.0.0.md",
+  "source_module": "radio-codeforge/bridge/master-evidence.mjs",
+  "source_git_blob": "be1cc24869e50ec5a04253cc7334005cdd353c1c",
+  "scope": "READ_ONLY_VALIDATION_OF_EXISTING_BRIDGE_AND_HISTORICAL_ISOLATED_TEST",
+  "isolated_validation": {
+    "engine": "IN_PROCESS_JAVASCRIPT_FUNCTION_EVALUATION",
+    "result": "PASS_13_OF_13",
+    "cases": [
+      "complete_structural_fixture",
+      "missing_tree",
+      "wrong_tree_sha",
+      "wrong_blob_sha",
+      "wrong_bytes",
+      "head_change",
+      "forged_bool_only",
+      "source_without_delivery",
+      "conflict_quarantine",
+      "visual_no_host",
+      "three_checks",
+      "safety_not_capped",
+      "clic_runner_disabled"
+    ],
+    "node_test_runner": "NOT_RUN",
+    "real_remote_transport": "NOT_EXECUTED"
+  },
+  "remote_historical_readback": {
+    "branch": "test/codeforge-govee-bridge-20261017",
+    "test_commit": "e5876afa45b6a01557740a779865aa1ae42f604e",
+    "path": "projects/666-GOVEE-CONTROL/bridge-tests/2026-10-17/GOVEE_REAL_SOURCE_BINARY_BRIDGE_TEST.zip",
+    "confirmed_fetch_encoding": "base64",
+    "confirmed_git_blob": "111abe5921d9f62303648c96f648bd924e0cafe1",
+    "commit_fetch": "PASS",
+    "blob_path_fetch": "PASS",
+    "independent_tree_readback": "NOT_AVAILABLE_WITH_CURRENT_CONNECTOR",
+    "full_commit_tree_blob_chained_acceptance": "NOT_PROVEN",
+    "original_archive_9123_bytes": "NOT_TESTED"
+  },
+  "limits": [
+    "No real Node test runner execution from complete GitHub checkout",
+    "No current full independent commit-tree-blob transfer receipt",
+    "No fresh-host or plugin binary parity approval",
+    "Source can carry structural proof fields but live tool observations must independently substantiate them",
+    "GitHub network unavailable in isolated shell runtime"
+  ],
+  "production_runtime_mutation": "NONE",
+  "foreign_mutation": "NONE",
+  "next": "FULL_NODE_TEST_RUNNER_AND_INDEPENDENT_TREE_READBACK"
+}
