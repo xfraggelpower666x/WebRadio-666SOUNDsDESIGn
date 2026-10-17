@@ -33,7 +33,9 @@
     "CODEFORGE_LYVRA_V1_REFERENCE_TEST_EXECUTION",
     "CODEFORGE_V1_BINARY_FALLBACK_HOST_TEST",
     "CODEFORGE_THREE_CHECKS_TEST_EXECUTION",
-    "CODEFORGE_THREE_CHECKS_FRESH_HOST_ACCEPTANCE"
+    "CODEFORGE_THREE_CHECKS_FRESH_HOST_ACCEPTANCE",
+    "GOVEE_CONTROL_PROJECT_ROUTE_FRESH_CHAT_TEST",
+    "TWO_INTRO_VARIANTS_ROUTE_FRESH_CHAT_TEST"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -145,5 +147,18 @@
     "fresh_host_acceptance": "READBACK_PENDING",
     "scope": "RADIO_CODEFORGE_ONLY",
     "safety_gates_not_capped": true
+  },
+  "project_map_extension_20261017": {
+    "source_body_head": "8b909b6a310115c4cf3b02bfc6246f67ed4f9cdf",
+    "prechange_backup_branch": "backup/pre-streamctrl-map-govee-two-intros-20261017",
+    "project_map_version": "1.1.0",
+    "registered_independent_project": "GOVEE_CONTROL",
+    "intro_subprojects": [
+      "INTRO_V1_10",
+      "INTRO_V1_5"
+    ],
+    "source_readback": "PASS_2_OF_2",
+    "fresh_chat_route_acceptance": "READBACK_PENDING",
+    "light_orchestra_route": "PRESERVED_UNRESOLVED"
   }
 }
