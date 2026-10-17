@@ -14,3 +14,7 @@ CodeForge inherits the active project scope and may not escape it.
 
 ## Native foreground and standalone diagnostic routing
 `666STREAM VORNE` selects Structure Control as chat-local foreground without discarding the valid child project return anchor. `FUCK HORST` must be accepted standalone, resolve the existing chat-native owner and immediately diagnose 666STREAM when this chat is already within 666STREAM. `666STREAM FUCK HORST` is an optional alias. A diagnosis checks current HEAD/pointer, scope, interrupted work, trigger dispatch, actual host support, plugin parity and readback. No cross-chat selection, foreign autoactivation, implied repair or write.
+
+## Interruption and resume governance — 2026-10-17
+Every chat carries one isolated active work scope plus zero or more paused return anchors; paused anchors do not count as simultaneously active projects. Explicit CORE foreground is a native governance surface rather than a new child project. A new direct user request may pause the task, but does not silently cancel or finish it.
+WEITER resolves ONLY this chat's current valid native/project anchor; if the user selected a different scope, keep old anchors reachable without automatic foreground. Review currentness before resuming. Maintain the sequence PAUSE -> INGEST -> CAUSAL_RECONCILIATION -> RESUME_LAST_VERIFIED_STEP; never restart completed work, never invent resume success. State tracking has no independent authority to perform writes or dispatch unrequested tasks.
