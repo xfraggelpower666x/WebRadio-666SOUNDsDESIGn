@@ -551,5 +551,26 @@
     "fresh_host": "NOT_PROMOTED",
     "second_bridge": false,
     "root_pointer_last": true
+  },
+  "remaining_core_host_parity_fallback_review_20261017": {
+    "status": "READBACK_VERIFIED_GATES_CLASSIFIED_NO_FALSE_HOST_OR_PLUGIN_PASS",
+    "body_head": "94daa3c6e4177dc5662c8c9b881e8662b24bcff9",
+    "backup_branch": "backup/pre-stream-core-host-parity-offline-gates-20261017",
+    "runbook": "666STREAM_STRUCTURE_CONTROL/visual/FRESH_HOST_ACCEPTANCE_RUNBOOK.md",
+    "runbook_blob": "2b41fcb7425874bf6ebfe2ab15b565966441adda",
+    "parity_ledger": "666STREAM_STRUCTURE_CONTROL/integration/ADAPTER_PARITY_LEDGER.json",
+    "parity_blob": "06fe4e4b971f54e89d75f327c6252840ee9342e7",
+    "readback": "PASS_7_OF_7",
+    "github_actions_run": 39007506095,
+    "core_ci": "PASS_34_OF_34_PRESERVED",
+    "original_binary_transfer": "PASS_9123_BYTES_ISOLATED_BRANCH_PRESERVED",
+    "fresh_host": "NEEDS_GENUINE_NEW_666STREAM_CHAT_AND_INDEPENDENT_ACTION_RECEIPT",
+    "account_plugin_release": "UNRESOLVED",
+    "native_plugin_release": "UNRESOLVED",
+    "windows_offline_fallback": "OPTIONAL_NOT_REQUIRED_NOT_EXECUTED",
+    "production_radio_mutation": "NONE",
+    "foreign_mutation": "NONE",
+    "no_second_bridge": true,
+    "pointer_last": true
   }
 }
