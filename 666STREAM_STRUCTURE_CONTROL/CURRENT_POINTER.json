@@ -700,5 +700,25 @@
     "no_foreign_write": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_MINIPLAYER_MUTE_NODE_DEPLOYMENT_DEVICE_HOST_AND_IOS_AUDIO_LEVELS"
+  },
+  "webradio_ios_audio_cors_repair_20261018": {
+    "status": "SOURCE_AND_REAL_NODE_CI_PASS_14_OF_14_HOST_PENDING",
+    "scope": "WEBRADIO",
+    "prechange_head": "b22478cd6eb4032932776ccf1b7889882ef038ce",
+    "backup_branch": "backup/pre-webradio-ios-analyser-cors-20261018",
+    "repair_receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_IOS_AUDIO_CORS_REPAIR_20261018.json",
+    "receipt_blob": "ab86cceab07c09637757af2982374594cd1ce60c",
+    "repair_html_blob": "d8a6a04e3a05d072eb181c94a920059c39b6c2e7",
+    "test_blob": "647193a1a4ae3c76776a3badd480f180a719a1d9",
+    "ci_run": 39154550569,
+    "node_test_result": "REAL_GITHUB_ACTIONS_PASS_14_OF_14",
+    "deployment": "READBACK_PENDING",
+    "iphone_edge": "NEW_PATCH_NOT_YET_DEVICE_TESTED",
+    "iphone_safari": "NEW_PATCH_NOT_YET_DEVICE_TESTED",
+    "stream_cors": "WORKER_SOURCE_CORS_CONFIRMED_LIVE_HEADER_PENDING",
+    "lyvra_adoption": "NOT_VERIFIED",
+    "no_foreign_mutation": true,
+    "pointer_last": true,
+    "return_anchor": "WEBRADIO_IOS_AUDIO_CORS_PATCH_DEPLOYMENT_AND_IPHONE_HOST_RECHECK"
   }
 }
