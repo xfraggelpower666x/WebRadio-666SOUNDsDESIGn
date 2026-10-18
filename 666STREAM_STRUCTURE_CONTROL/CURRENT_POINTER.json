@@ -572,5 +572,27 @@
     "foreign_mutation": "NONE",
     "no_second_bridge": true,
     "pointer_last": true
+  },
+  "clic_starbridge_whole_network_receipt_20261018": {
+    "status": "STREAM_SOURCE_RECEIPT_VERIFIED_CLIC_DELIVERY_READBACK_PENDING",
+    "base_head": "25711843451cbf1fc2dbbba5e55dae0b22c01369",
+    "recovery": "backup/pre-stream-starbridge-network-source-receipt-20261018",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/continuity/CLIC_STARBRIDGE_WHOLE_NET_666STREAM_20261018_R01_RECEIPT.json",
+    "receipt_blob": "150a7f59016cc0a7f6e98bf013d5c75b785a7705",
+    "manifest_blob": "ffcf9ff758e5c14860178fb1f56221a4e0f4ccb3",
+    "source_commit": "381825f336999a027f526e3f4370b739a4798b27",
+    "source_blob": "4b2f61f064ff4fd239a363749360ba96d595bf12",
+    "source": "PASS",
+    "native_receipt": "PASS",
+    "clic_reciprocal_delivery": "PENDING",
+    "adoption": "NOT_VERIFIED",
+    "host": "NOT_VERIFIED",
+    "automatic_transport": "NOT_VERIFIED",
+    "supercodeforge_host": "BLOCKED",
+    "radio_changes": "NONE",
+    "project_autoactivation": false,
+    "plugin_impact": "DATA_ONLY_NO_RUNTIME_SKILL_CHANGE",
+    "pointer_last": true,
+    "return_anchor": "KEEP_PREEXISTING_STREAM_PROJECT_WORK"
   }
 }
