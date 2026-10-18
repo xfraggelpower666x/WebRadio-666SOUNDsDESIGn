@@ -1,0 +1,69 @@
+{
+  "schema": "666stream-mobile-visual-only-fallback-v1",
+  "owner": "666STREAM",
+  "scope": "WEBRADIO_MINIPLAYER_AND_MAIN_IPHONE",
+  "date": "2026-10-18",
+  "status": "SOURCE_AND_REAL_CI_PASS_21_OF_21_LYVRA_RECEIVER_PENDING",
+  "prechange_head": "45f62f1fd96a334917e6cd2c2de7b554022ff0f3",
+  "recovery_branch": "backup/pre-webradio-iphone-visual-fallback-20261018",
+  "files": [
+    {
+      "path": "public/js/equalizer.js",
+      "commit": "d16621a149380417c67f4cadaeb9b9ea950d6ad3",
+      "blob": "c7b7dd985f46a6811329b71ea46486a31b2ec257",
+      "scope": "main-player mobile display-only fallback"
+    },
+    {
+      "path": "public/embed/miniplayer.html",
+      "commit": "56b34f675b7488b0ddc18162bc5db5108ce6e62e",
+      "blob": "0e754de7346a7683c89bce2ad391ba82072bba76",
+      "scope": "MiniPlayer visual-only on real sample zeros for >1.2s"
+    },
+    {
+      "path": "public/js/audio-levels.js",
+      "commit": "e48cd19e4394c1515b414c91a17cc09cfbf68d51",
+      "blob": "69a87cb60cd215a46d24dad1e0f6c2c9d471d338",
+      "scope": "distinct message type lyvra:audio:visual-fallback mode synthetic; preserve true level message unchanged"
+    },
+    {
+      "path": "tests/stream-ios-audio-levels.test.mjs",
+      "commit": "f0018b1c682ae4fa32e243498d9ba27107ce32cf",
+      "blob": "633baa187f0903832eb99363e2a0663eae701a59",
+      "scope": "3 fallback contract tests"
+    }
+  ],
+  "ci": {
+    "run_id": 39165168941,
+    "job_id": 117786477482,
+    "real_node": "PASS_21_OF_21"
+  },
+  "host": {
+    "main_iphone": "NOT_TESTED",
+    "miniplayer_iphone": "NOT_TESTED",
+    "lyvra_parent": "NOT_YET_ADOPTED",
+    "live_deployment": "NOT_VERIFIED",
+    "actual_ios_webkit_zero_samples": "PERSISTS"
+  },
+  "contracts": {
+    "fallback_type": "lyvra:audio:visual-fallback",
+    "version": 1,
+    "mode": "synthetic",
+    "playing": true,
+    "bass": "0..1",
+    "mid": "0..1",
+    "high": "0..1",
+    "energy": "0..1",
+    "origin_target": "https://weblyvra.666soundsdesign-broadcaster.com",
+    "real_levels_type": "lyvra:audio:levels",
+    "real_only": "unchanged"
+  },
+  "safety": {
+    "visual_only": true,
+    "no_secondary_audio": true,
+    "no_changes_to_worker": true,
+    "no_synthetic_as_real": true,
+    "pause_mute_visibility_gated": true,
+    "foreign_write": "NONE"
+  },
+  "return_anchor": "WEBRADIO_IPHONE_VISUAL_FALLBACK_LYVRA_RECEIVER_ADOPTION_PENDING"
+}
