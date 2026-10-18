@@ -15,6 +15,11 @@
     if (subscriber) send(false, zero);
   });
   window.S666AudioLevels = Object.freeze({
+    publishVisualFallback(bands) {
+      if (!subscriber || document.hidden || !bands || !['bass','mid','high','energy'].every(k=>typeof bands[k]==='number'&&Number.isFinite(bands[k])&&bands[k]>=0&&bands[k]<=1)) return;
+      // Separate contract: cannot be mistaken for measured lyvra:audio:levels.
+      window.parent.postMessage({type:'lyvra:audio:visual-fallback',version:1,mode:'synthetic',playing:true,...bands},subscriber);
+    },
     publish(audio, analyser, data, sampleRate, contextState) {
       if (!subscriber || document.hidden || performance.now() - last < 50) return;
       last = performance.now();
