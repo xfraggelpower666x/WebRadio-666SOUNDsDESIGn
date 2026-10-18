@@ -798,5 +798,13 @@
     "no_foreign_mutation": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_IOS_WEBKIT_MEDIAELEMENT_ZERO_SAMPLES_NATIVE_PLAYBACK_PRESERVED"
+  },
+  "webradio_iphone_visual_fallback_20261018": {
+    "status": "SOURCE_CI_PASS_21_OF_21_RECEIVER_HOST_PENDING",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_MOBILE_SYNTHETIC_VISUAL_FALLBACK_20261018.json",
+    "lyvra_handoff": "666STREAM_STRUCTURE_CONTROL/continuity/outbox/LYVRA/STREAM_TO_LYVRA_VISUAL_FALLBACK_20261018_R01.json",
+    "lyvra_receiver": "NOT_ADOPTED",
+    "ios_host": "NOT_TESTED",
+    "return_anchor": "WEBRADIO_IPHONE_VISUAL_FALLBACK_LYVRA_RECEIVER_ADOPTION_PENDING"
   }
 }
