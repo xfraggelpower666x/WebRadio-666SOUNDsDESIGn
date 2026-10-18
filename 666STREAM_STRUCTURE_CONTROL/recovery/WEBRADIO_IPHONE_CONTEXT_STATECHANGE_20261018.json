@@ -1,0 +1,45 @@
+{
+  "schema": "666stream-webradio-ios-statechange-recovery-v1",
+  "owner": "666STREAM",
+  "scope": "WEBRADIO",
+  "date": "2026-10-18",
+  "status": "SOURCE_CI_PASS_IPHONE_HOST_PENDING",
+  "prechange_head": "6981f0ab4460d398acfecc45ad51741b2bdf6cba",
+  "recovery_branch": "backup/pre-webradio-ios-context-statechange-resume-20261018",
+  "source": {
+    "path": "public/embed/miniplayer.html",
+    "commit": "ed321ba014c08bdb9f6e1e5b7a375c27265bf018",
+    "blob": "99a3c2136e570b4129bcc00d640c4e0cdb0d1f7e",
+    "change": "Restart genuine analyser RAF on existing AudioContext statechange to running"
+  },
+  "test": {
+    "path": "tests/stream-ios-audio-levels.test.mjs",
+    "commit": "822cfe94ac2a43d48e832f32f587fc2719974776",
+    "blob": "07351ab0e1b87331de03a6d710ab3a9877e5a18c",
+    "github_run": 39161650499,
+    "github_job": 117776022068,
+    "real_node": "PASS_16_OF_16"
+  },
+  "provenance": {
+    "original_iphone_edge_failure": "USER_CONFIRMED_AFTER_CORS_PATCH",
+    "headless_browser_pipeline": "WORKING_DESKTOP_BROWSER_NOT_IOS_WEBKIT",
+    "veluna_visualizer": "HAS_SYNTHETIC_FALLBACK_CANNOT_PROVE_REAL_IPHONE_ANALYSER",
+    "cause": "CONFIRMED_RESUME_LOGIC_GAP_IN_SOURCE_NOT_VERIFIED_AS_IPHONE_ROOT_CAUSE"
+  },
+  "gates": {
+    "source_readback": "VERIFIED",
+    "node_ci": "PASS_16_OF_16",
+    "live_deployment": "READBACK_PENDING",
+    "iphone_edge": "NOT_RETESTED_AFTER_STATECHANGE_PATCH",
+    "iphone_safari": "NOT_RETESTED",
+    "lyvra_peer": "NOT_ADOPTED",
+    "host": "NOT_PASS"
+  },
+  "boundaries": {
+    "preserve_existing_graph": true,
+    "no_duplicate_stream": true,
+    "no_synthetic_audio": true,
+    "no_foreign_writes": true
+  },
+  "return_anchor": "WEBRADIO_IPHONE_AUDIOCONTEXT_STATECHANGE_PATCH_REAL_HOST_RETEST"
+}
