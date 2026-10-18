@@ -61,9 +61,10 @@ const audio=document.getElementById('radio'),toggle=document.getElementById('tog
 const cover=document.getElementById('cover'),dj=document.getElementById('dj'),listeners=document.getElementById('listeners'),quality=document.getElementById('quality'),bars=[...document.querySelectorAll('#eq i')];
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
-let audioContext,analyser,frequencyData,visualActive=false;
-function visualizer(){if(!visualActive||!analyser)return;analyser.getByteFrequencyData(frequencyData);lastMeterAt=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext?.sampleRate);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}if(!audio.paused&&!document.hidden)requestAnimationFrame(visualizer)}
-function enableVisualizer(){if(visualActive)return;try{const core=window.SMFPBoostCore;if(!core)return;const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;frequencyData=new Uint8Array(analyser.frequencyBinCount);visualActive=true;applySound();void core.resume(audio);requestAnimationFrame(visualizer)}catch(_){visualActive=false}}
+let audioContext,analyser,frequencyData,visualActive=false,visualFramePending=false;
+function startVisualizer(){if(!visualFramePending&&visualActive&&!audio.paused&&!document.hidden){visualFramePending=true;requestAnimationFrame(visualizer)}}
+function visualizer(){visualFramePending=false;if(!visualActive||!analyser||audio.paused||document.hidden)return;const running=audioContext?.state==='running';if(running){analyser.getByteFrequencyData(frequencyData);lastMeterAt=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}}startVisualizer()}
+function enableVisualizer(){if(sourceIndex!==0)return;try{const core=window.SMFPBoostCore;if(!core)return;if(!visualActive){const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;frequencyData=new Uint8Array(analyser.frequencyBinCount);visualActive=true;applySound()}void core.resume(audio).then(ok=>{if(ok)startVisualizer()}).catch(()=>{});startVisualizer()}catch(_){visualActive=false}}
 const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
 const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
 function applySound(){const core=window.SMFPBoostCore;if(!core)return;const values={};['sub','low','mid','high','air'].forEach((key,i)=>values[key]=Number(sliders[i].value));core.applyEq(audio,values,'embed-shared-core');const stage=core.applyBoost(audio,Number(boost.value),'embed-shared-core');boost.value=String(stage);soundStatus.textContent='Gemeinsamer Audio-Core · EQ aktiv · '+core.getLabel(stage)}
@@ -78,10 +79,10 @@ let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=fals
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();if(audioContext)audioContext.resume()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
-audio.addEventListener('playing',()=>{watchdogStatus='healthy';watchdogLastEventAt=Date.now();retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(visualActive)requestAnimationFrame(visualizer)});
+audio.addEventListener('playing',()=>{watchdogStatus='healthy';watchdogLastEventAt=Date.now();retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex===0){enableVisualizer();startVisualizer()}});
 audio.addEventListener('waiting',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();audioWaiting=true;if(wanted)label('Puffert …')});
 audio.addEventListener('pause',()=>{watchdogStatus='idle';watchdogLastEventAt=Date.now();state();bars.forEach(b=>b.style.height='3px')});
 audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
@@ -96,7 +97,8 @@ window.S666EmbedControl=Object.freeze({
       source:sourceIndex===0?'main':'backup',
       wanted:!!wanted,readyState:audio.readyState,
       watchdogStatus,watchdogLastEventAt,
-      meterAvailable:!!(playing&&visualActive&&analyser&&performance.now()-lastMeterAt<2200)
+      meterAvailable:!!(playing&&visualActive&&analyser&&audioContext?.state==='running'&&performance.now()-lastMeterAt<2200),
+       audioContextState:audioContext?.state||'unavailable',graphAvailable:!!analyser,lastGenuineMeterAt:lastMeterAt
     };
   },
   async switchStream(target){
@@ -162,7 +164,8 @@ async function metadata(){
   finally{clearTimeout(timeout)}
 }
 metadata();setInterval(()=>{if(!document.hidden)metadata();else markMetadataStale()},12000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)metadata()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){metadata();if(!audio.paused&&sourceIndex===0){enableVisualizer();startVisualizer()}}});
+window.addEventListener('pageshow',()=>{if(!audio.paused&&sourceIndex===0){enableVisualizer();startVisualizer()}});
 })();
 </script>
 </body>
