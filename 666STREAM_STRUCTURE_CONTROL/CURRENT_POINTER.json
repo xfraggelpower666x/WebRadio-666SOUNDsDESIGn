@@ -720,5 +720,25 @@
     "no_foreign_mutation": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_IOS_AUDIO_CORS_PATCH_DEPLOYMENT_AND_IPHONE_HOST_RECHECK"
+  },
+  "webradio_iphone_edge_diagnostic_20261018": {
+    "status": "DIAGNOSTIC_SOURCE_CI_VERIFIED_15_OF_15_DEVICE_CAUSE_PENDING",
+    "project": "WEBRADIO",
+    "recovery_branch": "backup/pre-webradio-ios-device-diagnostics-20261018",
+    "source_head": "246bccc8dd3398f4043c8b1b4a29db19279c76ab",
+    "diagnostic_html_blob": "a56b5846f534d6c0e630938b2f871a2a11f29ec0",
+    "test_blob": "f5d73e9fee9a6f92cfc2d5f7308411f15f7897d6",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_IPHONE_EDGE_DIAGNOSTIC_20261018.json",
+    "receipt_blob": "8f30ab80a58aa99479f5ba2429ba2a55335c44d7",
+    "ci_run": 39155883129,
+    "real_node": "PASS_15_OF_15",
+    "deployment": "READBACK_PENDING",
+    "iphone_edge": "NO_AUDIO_LEVELS_AFTER_PREVIOUS_FIX_NEW_DIAGNOSTIC_PENDING",
+    "iphone_safari": "NOT_TESTED",
+    "stream_cors": "LIVE_HEADER_NOT_VERIFIED",
+    "lyvra_peer": "NOT_DELIVERED",
+    "no_foreign_mutation": true,
+    "pointer_last": true,
+    "return_anchor": "WEBRADIO_IPHONE_EDGE_DEVICE_DIAGNOSTIC_INTAKE_AND_REAL_REPAIR"
   }
 }
