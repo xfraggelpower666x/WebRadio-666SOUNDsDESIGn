@@ -105,5 +105,20 @@
     "completion_guard": "visual/semantic-visual-intelligence.mjs#visualCompletionGuard",
     "lifecycle_stage": "AFTER_NATIVE_READBACK_BEFORE_VISUAL_COMPLETION",
     "plugin_parity": "BOTH_SURFACES_REQUIRE_REAL_RELEASE_READBACK"
+  },
+  "clic_starbridge_whole_network_receipt_20261018": {
+    "status": "STREAM_NATIVE_SOURCE_RECEIPT_READBACK_PASS_CLIC_DELIVERY_CONFIRMATION_PENDING",
+    "handoff_id": "CLIC-STARBRIDGE-WHOLE-NET-666STREAM-20261018-R01",
+    "receipt": "continuity/CLIC_STARBRIDGE_WHOLE_NET_666STREAM_20261018_R01_RECEIPT.json",
+    "receipt_blob": "150a7f59016cc0a7f6e98bf013d5c75b785a7705",
+    "source_commit": "381825f336999a027f526e3f4370b739a4798b27",
+    "source_blob": "4b2f61f064ff4fd239a363749360ba96d595bf12",
+    "recovery": "backup/pre-stream-starbridge-network-source-receipt-20261018",
+    "native_adoption": "NOT_VERIFIED",
+    "host": "NOT_VERIFIED",
+    "automatic_transport": "NOT_VERIFIED",
+    "radio_production_mutation": false,
+    "plugin_impact": "DATA_ONLY",
+    "no_project_autoactivation": true
   }
 }
