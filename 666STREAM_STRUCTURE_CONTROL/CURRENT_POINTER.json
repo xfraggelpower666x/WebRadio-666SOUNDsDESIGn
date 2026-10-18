@@ -4,7 +4,7 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "4b821f366a45ad546d0b955e90f85e8b9c4ac1e8",
+  "body_head_before_pointer": "8080927c66df9bd4de4536399dfee4d0eea5e9ef",
   "prechange_recovery_branch": "backup/pre-streamctrl-freeze-rebase-20261006-1823",
   "body_readback": "PASS_FREEZE_READBACK_6_OF_6",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
@@ -61,7 +61,8 @@
     "SYMPHONY_NATIVE_HOST_PROJECT_SELECTION_TEST",
     "VISUAL_COMPLETION_FRESH_HOST_ACCEPTANCE",
     "STREAM_ACCOUNT_PLUGIN_RELEASE_ID_READBACK",
-    "STREAM_NATIVE_PLUGIN_RELEASE_ID_READBACK"
+    "STREAM_NATIVE_PLUGIN_RELEASE_ID_READBACK",
+    "WEBRADIO_CYBERINTRO_EXACT_THREE_FADE_AND_2S_HOLD_VISUAL_ACCEPTANCE"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -594,5 +595,24 @@
     "plugin_impact": "DATA_ONLY_NO_RUNTIME_SKILL_CHANGE",
     "pointer_last": true,
     "return_anchor": "KEEP_PREEXISTING_STREAM_PROJECT_WORK"
+  },
+  "webradio_cyberintro_first_paint_update_20261018": {
+    "status": "SOURCE_READBACK_DEPLOY_AND_LIVE_HANDOFF_VERIFIED_EXACT_FADE_TIMING_PARTIAL",
+    "project": "WEBRADIO",
+    "recovery_branch": "backup/pre-webradio-cyberintro-update-20261018",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_CYBERINTRO_FIRST_PAINT_UPDATE_2026-10-18.json",
+    "receipt_blob": "8808bddeed00766a96f9a38fdc628b2420e810a9",
+    "manifest_blob": "844e6c00e675ec3f23ac28dc315b329c651362da",
+    "source_repair_head": "7cc5b469dcc0263da0f42aea55d96b94a85e837e",
+    "release_integrity_run": 38999644030,
+    "cloudflare_deploy_run": 38999644071,
+    "source_readback": "PASS",
+    "deploy": "PASS",
+    "live_boot_progress": "PASS",
+    "live_handoff": "PASS",
+    "exact_three_fade_and_two_second_hold": "PARTIAL",
+    "production_radio_mutation": "PRESERVED_REPAIR_ALREADY_DEPLOYED",
+    "foreign_mutation": "NONE",
+    "return_anchor": "WEBRADIO_MAIN_PLAYER_CYBERINTRO_POST_REPAIR"
   }
 }
