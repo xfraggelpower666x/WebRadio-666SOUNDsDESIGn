@@ -1,0 +1,42 @@
+{
+  "schema": "666stream-webradio-cyberintro-update-v1",
+  "system": "666STREAM_STRUCTURE_CONTROL",
+  "project": "WEBRADIO",
+  "scope": "MAIN_PLAYER_AND_CYBERINTRO_ONLY",
+  "update_date": "2026-10-18",
+  "base_whole_stream_head": "2b0609eb17f2f0719995fbd8b48a789c3f6b6e71",
+  "prechange_recovery_branch": "backup/pre-webradio-cyberintro-update-20261018",
+  "source_repair_head": "7cc5b469dcc0263da0f42aea55d96b94a85e837e",
+  "source_evidence": {
+    "public_index_blob": "51fce7ec54987f9315396323e6fd4e99dfb062b5",
+    "central_boot_js_blob": "b6532c1125d768f83d5757e58aec1710661cc41c",
+    "first_paint_shell": true,
+    "cache_identity": "20261017-two-phase-first-paint-r03",
+    "boot_marker": "20261017-main-iphone-static-first-paint-r03",
+    "release_integrity_run": 38999644030,
+    "release_integrity": "SUCCESS",
+    "cloudflare_deploy_run": 38999644071,
+    "cloudflare_deploy": "SUCCESS"
+  },
+  "live_acceptance": {
+    "boot_visible": "PASS",
+    "progress_1_to_100": "PASS",
+    "system_online_visible": "PASS",
+    "handoff_to_main_player": "PASS",
+    "permanent_black_screen": "NOT_OBSERVED",
+    "simultaneous_player_overlay": "NOT_OBSERVED",
+    "runtime_failure": "NOT_OBSERVED",
+    "exact_three_fade_count_and_two_second_hold": "PARTIAL_FRAME_LEVEL_NOT_INDEPENDENTLY_COUNTED"
+  },
+  "preserved": {
+    "stream_audio_runtime": true,
+    "eq_boost_discord": true,
+    "veluna": true,
+    "govee_project": true,
+    "windows_app": true,
+    "clic_starbridge_state": true,
+    "no_foreign_mutation": true
+  },
+  "update_status": "SOURCE_READBACK_AND_DEPLOY_VERIFIED_LIVE_ACCEPTANCE_PARTIAL_ON_EXACT_FADE_TIMING",
+  "return_anchor": "WEBRADIO_MAIN_PLAYER_CYBERINTRO_POST_REPAIR"
+}
