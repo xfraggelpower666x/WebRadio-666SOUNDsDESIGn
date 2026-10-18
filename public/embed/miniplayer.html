@@ -61,10 +61,26 @@ const audio=document.getElementById('radio'),toggle=document.getElementById('tog
 const cover=document.getElementById('cover'),dj=document.getElementById('dj'),listeners=document.getElementById('listeners'),quality=document.getElementById('quality'),bars=[...document.querySelectorAll('#eq i')];
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
-let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0;
+let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0,silentSince=0,lastFallbackPublish=0,visualMode='idle';
+function renderVisualFallback(){
+  const active=audio&&!audio.paused&&!audio.muted&&audio.readyState>=2&&!document.hidden&&sourceIndex===0;
+  visualMode=active?'synthetic':'idle';
+  const phase=performance.now()/235;
+  const values=bars.map((bar,i)=>{
+    const value=active ? Math.min(0.74,0.10+Math.abs(Math.sin(phase+i*0.46))*(0.20+0.23*Math.abs(Math.sin(phase*0.49)))) : 0;
+    bar.style.height=(3+value*18)+'px';
+    return value;
+  });
+  // Visual-only fallback; distinct type, never the genuine audio-levels contract.
+  if(active&&performance.now()-lastFallbackPublish>=200){
+    lastFallbackPublish=performance.now();
+    window.S666AudioLevels?.publishVisualFallback?.({bass:values[1]||0,mid:values[5]||0,high:values[9]||0,energy:(values[1]+values[5]+values[9])/3});
+  }
+}
+
 function onVisualContextStateChange(){if(audioContext?.state==='running')startVisualizer();}
 function startVisualizer(){if(!visualFramePending&&visualActive&&!audio.paused&&!document.hidden){visualFramePending=true;requestAnimationFrame(visualizer)}}
-function visualizer(){visualFramePending=false;if(!visualActive||!analyser||audio.paused||document.hidden)return;const running=audioContext?.state==='running';if(running){analyser.getByteFrequencyData(frequencyData);lastFrequencyPeak=frequencyData.reduce((peak,bin)=>Math.max(peak,bin),0);if(timeDomainData){analyser.getByteTimeDomainData(timeDomainData);let power=0;for(let i=0;i<timeDomainData.length;i++){const sample=(timeDomainData[i]-128)/128;power+=sample*sample}lastWaveformRms=Math.sqrt(power/timeDomainData.length)}lastMeterAt=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}startVisualizer()}}
+function visualizer(){visualFramePending=false;if(!visualActive||!analyser||audio.paused||document.hidden)return;const running=audioContext?.state==='running';if(running){analyser.getByteFrequencyData(frequencyData);lastFrequencyPeak=frequencyData.reduce((peak,bin)=>Math.max(peak,bin),0);if(timeDomainData){analyser.getByteTimeDomainData(timeDomainData);let power=0;for(let i=0;i<timeDomainData.length;i++){const sample=(timeDomainData[i]-128)/128;power+=sample*sample}lastWaveformRms=Math.sqrt(power/timeDomainData.length)}lastMeterAt=performance.now();const hasRealSignal=lastFrequencyPeak>0||lastWaveformRms>0.001;if(hasRealSignal){silentSince=0;visualMode='real'}else if(!silentSince)silentSince=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);if(!hasRealSignal&&performance.now()-silentSince>1200){renderVisualFallback();startVisualizer();return}for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}startVisualizer()}}
 function enableVisualizer(){if(sourceIndex!==0)return;try{const core=window.SMFPBoostCore;if(!core)return;if(!visualActive){const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;analyser.fftSize=1024;frequencyData=new Uint8Array(analyser.frequencyBinCount);timeDomainData=new Uint8Array(analyser.fftSize);visualActive=true;if(visualContextObserved!==audioContext){visualContextObserved?.removeEventListener?.('statechange',onVisualContextStateChange);audioContext.addEventListener('statechange',onVisualContextStateChange);visualContextObserved=audioContext}applySound()}void core.resume(audio).then(ok=>{if(ok)startVisualizer()}).catch(()=>{});startVisualizer()}catch(_){visualActive=false}}
 const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
 const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
@@ -107,7 +123,7 @@ function refreshAudioDiagnostics(){
     +'source='+(sourceIndex===0?'main':'backup')+' playing='+(!audio.paused)+' ready='+audio.readyState+' muted='+audio.muted+'\n'
     +'context='+state+' graph='+!!analyser+' error='+graphError+'\n'
     +'subscribed='+!!bridge.subscribed+' sequence='+(Number(bridge.sequence)||0)+'\n'
-    +'analyserAge='+fresh(lastMeterAt)+' publishAge='+signalAge+'\n'+'fftSize='+(analyser?.fftSize||0)+' fftPeak='+lastFrequencyPeak+' waveRms='+lastWaveformRms.toFixed(4);
+    +'analyserAge='+fresh(lastMeterAt)+' publishAge='+signalAge+'\n'+'fftSize='+(analyser?.fftSize||0)+' fftPeak='+lastFrequencyPeak+' waveRms='+lastWaveformRms.toFixed(4)+'\n'+'visualMode='+visualMode+' (synthetic = display only)';
 }
 setInterval(refreshAudioDiagnostics,1000);
 // Passiver Watchdog: beobachtet ausschliesslich reale Audiozustände, erzeugt weder einen neuen Player noch Recovery-Aktionen.
