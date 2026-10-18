@@ -1,0 +1,42 @@
+{
+  "schema": "666stream-to-lyvra-visual-fallback-handoff-v1",
+  "owner": "666STREAM",
+  "target": "LYVRA_WEBLYVRA_RECEIVER",
+  "state": "SOURCE_PROPOSAL_ONLY_NO_DELIVERY_OR_ADOPTION_PROVEN",
+  "date": "2026-10-18",
+  "native_source_repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "native_branch": "WebRadio-666SOUNDsDESIGn",
+  "source_receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_MOBILE_SYNTHETIC_VISUAL_FALLBACK_20261018.json",
+  "source_ci": "REAL_GITHUB_ACTIONS_21_OF_21_RUN_39165168941",
+  "receiver_repo": "xfraggelpower666x/LYVRA-Living-Yielding-Vibration-and-Resonance-Architecture",
+  "receiver_branch": "lyvra",
+  "receiver_path": "WEBLyvra/live/dist/audio-neon.js",
+  "receiver_blob_readonly": "55255a307bacb3c24d74b7bbffd8c2283164deac",
+  "request": "After LYVRA native CURRENT_POINTER full read and authorized receiver adoption, accept separate origin/source validated lyvra:audio:visual-fallback v1 mode synthetic from trusted MiniPlayer iframe. Show label 'Visueller Fallback · nicht audioreaktiv' (English equivalent too), animate visually using provided values only while current trusted frame is playing/visible and activated by toggle, clear on timeout/pause/mute, prioritize real lyvra:audio:levels whenever genuine energy present, never label synthetic as real audio.",
+  "message": {
+    "type": "lyvra:audio:visual-fallback",
+    "version": 1,
+    "mode": "synthetic",
+    "playing": true,
+    "bass": 0.2,
+    "mid": 0.3,
+    "high": 0.1,
+    "energy": 0.2,
+    "source": "trusted iframe postMessage existing origin whitelist"
+  },
+  "existing_real_message": "lyvra:audio:levels v1 unchanged; playing false on zero FFT frames",
+  "boundaries": {
+    "no_foreign_mutation": true,
+    "no_second_stream": true,
+    "no_synthetic_as_genuine": true,
+    "no_receiver_autoactivation": true,
+    "no_native_authority_transfer": true
+  },
+  "gates": {
+    "source_created": "YES",
+    "receiver_delivery": "NOT_VERIFIED",
+    "receiver_adoption": "NOT_VERIFIED",
+    "iphone_host": "NOT_TESTED"
+  },
+  "return_anchor": "LYVRA_WEBLYVRA_VISUAL_FALLBACK_RECEIVER_NATIVE_ADOPTION_PENDING"
+}
