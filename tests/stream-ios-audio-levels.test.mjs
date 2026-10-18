@@ -73,3 +73,16 @@ test('MiniPlayer reaktiviert echten Analyser bei AudioContext statechange ohne n
  assert.match(player,/visualContextObserved\?\.removeEventListener\?\.\('statechange',onVisualContextStateChange\)/);
  assert.equal([...player.matchAll(/<audio\b/g)].length,1);
 });
+
+test('MiniPlayer mobile FFT resolves 30-250Hz band and measures real waveform',()=>{
+ assert.match(player,/analyser\.fftSize=1024/);
+ assert.match(player,/timeDomainData=new Uint8Array\(analyser\.fftSize\)/);
+ assert.match(player,/analyser\.getByteTimeDomainData\(timeDomainData\)/);
+ assert.match(player,/lastFrequencyPeak=frequencyData\.reduce/);
+ assert.match(player,/lastWaveformRms=Math\.sqrt/);
+ assert.match(player,/fftPeak=/);
+ assert.match(player,/waveRms=/);
+ assert.equal([...player.matchAll(/<audio\b/g)].length,1);
+ const width=48000/1024;
+ assert.ok(Math.ceil(250/width)-Math.floor(30/width)>1);
+});
