@@ -102,10 +102,10 @@ function refreshAudioDiagnostics(){
   const graphError=String(audio.dataset.centralAudioError||'none').slice(0,90);
   const signalAge=fresh(bridge.lastGenuinePublish);
   miniAudioDiag.hidden=false;
-  miniAudioDiag.textContent='iOS AUDIO DIAG (local only)\\n'
-    +'source='+(sourceIndex===0?'main':'backup')+' playing='+(!audio.paused)+' ready='+audio.readyState+' muted='+audio.muted+'\\n'
-    +'context='+state+' graph='+!!analyser+' error='+graphError+'\\n'
-    +'subscribed='+!!bridge.subscribed+' sequence='+(Number(bridge.sequence)||0)+'\\n'
+  miniAudioDiag.textContent='iOS AUDIO DIAG (local only)\n'
+    +'source='+(sourceIndex===0?'main':'backup')+' playing='+(!audio.paused)+' ready='+audio.readyState+' muted='+audio.muted+'\n'
+    +'context='+state+' graph='+!!analyser+' error='+graphError+'\n'
+    +'subscribed='+!!bridge.subscribed+' sequence='+(Number(bridge.sequence)||0)+'\n'
     +'analyserAge='+fresh(lastMeterAt)+' publishAge='+signalAge;
 }
 setInterval(refreshAudioDiagnostics,1000);
