@@ -778,5 +778,25 @@
     "no_foreign_mutation": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_IPHONE_FFT_REAL_BAND_DIAG_HOST_RETEST"
+  },
+  "webradio_ios_webkit_zero_samples_20261018": {
+    "status": "REAL_CI_PASS_18_OF_18_ZERO_SIGNAL_GUARD_IPHONE_AUDIO_REACTIVITY_NOT_FIXED",
+    "scope": "WEBRADIO",
+    "recovery_branch": "backup/pre-webradio-ios-zero-samples-guard-20261018",
+    "repair_commit": "be0e5f228ef97ed4b40af183c35d8d91750dfbf2",
+    "audio_levels_blob": "be5157733be4161413215a1b37324951bfb0c3b0",
+    "test_commit": "2386d6fca74f0a12247ab9bcb3762b44577cd5fc",
+    "test_blob": "ebe3395ffbc84fd72758041f82bee1ae13f68b85",
+    "ci_run": 39164587402,
+    "ci": "PASS_18_OF_18",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_IOS_WEBKIT_ZERO_SAMPLES_20261018.json",
+    "receipt_blob": "6f9354b6564a094587c235c96ea37cd43297f88b",
+    "iphone_edge": "AUDIBLE_STREAM_FFT_PEAK_ZERO_WAVE_RMS_ZERO_HOST_FAIL",
+    "live_deployment": "NOT_VERIFIED",
+    "source_sample_recovery": "NOT_FIXED",
+    "no_fake_audio": true,
+    "no_foreign_mutation": true,
+    "pointer_last": true,
+    "return_anchor": "WEBRADIO_IOS_WEBKIT_MEDIAELEMENT_ZERO_SAMPLES_NATIVE_PLAYBACK_PRESERVED"
   }
 }
