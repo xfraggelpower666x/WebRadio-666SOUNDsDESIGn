@@ -10,7 +10,7 @@
 *{box-sizing:border-box}body{margin:0;padding:4px;color:#eafcff}
 .player{min-height:156px;display:grid;grid-template-columns:auto 60px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border:1px solid #46e5ed;border-radius:17px;background:linear-gradient(125deg,#0b1020,#230b38 68%,#190c2d);box-shadow:inset 0 0 20px #18f7ff12,0 0 14px #b63df522}
 .play{width:58px;height:58px;border-radius:50%;border:2px solid #5cf9ff;background:#112536;color:#8bffff;font-size:25px;cursor:pointer;box-shadow:0 0 16px #00dfff55}
-.play:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ff68d4;outline-offset:3px}
+.play:focus-visible,.mini-mute:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ff68d4;outline-offset:3px}
 .title{font-size:14px;letter-spacing:.07em;font-weight:800;color:#f4b4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cover{width:60px;height:60px;object-fit:cover;border-radius:9px;background:#241136}
 .marquee{overflow:hidden;white-space:nowrap;max-width:100%;min-height:20px;mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
@@ -22,7 +22,7 @@
 .eq i{display:block;width:5px;height:3px;border-radius:3px;background:linear-gradient(#fa63da,#4beaf1);transition:height .08s linear}
 .stats{display:flex;gap:9px;flex-wrap:wrap;color:#bdc7e9;font-size:10px}
 .status{font-size:11px;color:#9beef5;min-height:16px}.controls{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
-input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoration:none;font-size:12px;font-weight:700}a:hover{text-decoration:underline}
+.mini-mute{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:74px;min-height:44px;padding:8px 10px;border:1px solid #56dbe9;border-radius:9px;background:#1b1740;color:#d5fbff;font:700 11px/1 system-ui,sans-serif;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.mini-mute[aria-pressed=true]{border-color:#ff65d6;color:#ffd9fa;background:#381133}.mini-mute-icon{font-size:17px;line-height:1}input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoration:none;font-size:12px;font-weight:700}a:hover{text-decoration:underline}
 @media(max-width:470px){.player{grid-template-columns:auto 45px minmax(0,1fr);gap:8px;padding:11px}.cover{width:45px;height:45px}.controls{grid-column:1/-1}.play{width:48px;height:48px}.controls{grid-column:1/-1;justify-content:space-between;padding-left:4px}.title{font-size:12px}}
 @media(prefers-reduced-motion:no-preference){.play:hover{box-shadow:0 0 23px #ff52dbaa}}
 .tools{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tools button,.tools a{background:#1b1740;border:1px solid #56dbe9;border-radius:8px;color:#d5fbff;padding:6px 10px;font-size:11px;cursor:pointer}.panel{grid-column:1/-1;border-top:1px solid #724f9c;padding-top:10px}.panel[hidden]{display:none}.eqgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.eqgrid label{font-size:10px;display:grid;gap:4px}.eqgrid input{width:100%}.msgrow{display:flex;gap:6px;flex-wrap:wrap}.msgrow input{min-width:90px;flex:1;background:#110f24;border:1px solid #536d96;color:#fff;padding:7px;border-radius:7px}.msgrow input[name=message]{flex:4;min-width:140px}.feedback{font-size:11px;color:#83f3ee;margin-top:5px}.boost{max-width:160px}.panel h2{font-size:12px;margin:6px 0;color:#efa8ff}
@@ -43,7 +43,7 @@ input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoratio
 <div class="eq" id="eq" aria-label="Audiofrequenzanzeige"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <div class="stats"><span id="dj">DJ: —</span><span id="listeners">Listener: —</span><span id="quality">Qualität: —</span></div>
 <div id="status" class="status" role="status">Bereit · Play drücken</div></div>
-<div class="controls"><label for="volume" aria-label="Lautstärke">🔊</label><input id="volume" type="range" min="0" max="100" value="75" aria-label="Lautstärke"><a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer">PLAYER ↗</a></div>
+<div class="controls"><button id="miniMuteBtn" class="mini-mute" type="button" aria-label="Ton ausschalten" aria-pressed="false" title="Ton ausschalten"><span class="mini-mute-icon" aria-hidden="true">🔊</span><span class="mini-mute-label" aria-hidden="true">MUTE</span></button><label for="volume" aria-label="Lautstärke">🔊</label><input id="volume" type="range" min="0" max="100" value="75" aria-label="Lautstärke"><a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer">PLAYER ↗</a></div>
 <div class="tools"><button id="soundBtn" type="button" aria-expanded="false">🎚 EQ + BOOST</button><button id="messageBtn" type="button" aria-expanded="false">📡 MESSAGE</button><button id="skipBtn" type="button">⏭ AUTO-DJ SKIP 🔒</button><a href="https://webradio.666soundsdesign-broadcaster.com/" target="_blank" rel="noopener noreferrer" title="Discord im vollständigen WebRadio öffnen">DISCORD ↗</a><button id="embedBtn" type="button" aria-expanded="false" aria-controls="embedPanel">&lt;/&gt; HTML einbetten / Embed</button></div>
 <div id="soundPanel" class="panel" hidden><h2>Sound · 5-Band-EQ</h2><div class="eqgrid">
 <label>SUB<input data-eq="0" type="range" min="-12" max="12" value="0"></label><label>LOW<input data-eq="1" type="range" min="-12" max="12" value="0"></label><label>MID<input data-eq="2" type="range" min="-12" max="12" value="0"></label><label>HIGH<input data-eq="3" type="range" min="-12" max="12" value="0"></label><label>AIR<input data-eq="4" type="range" min="-12" max="12" value="0"></label></div><label>BOOST <select id="boost"><option value="0">0 · Normal</option><option value="1">1 · +2 dB</option><option value="2">2 · +4 dB</option><option value="3">3 · +6 dB</option><option value="4">4 · +8 dB</option><option value="5">5 · +10 dB</option></select></label><div id="soundStatus" class="feedback">Audioeffekte nach Play aktivierbar · Lautstärke vorsichtig einstellen.</div></div>
@@ -57,7 +57,7 @@ input[type=range]{width:76px;accent-color:#ff65d6}a{color:#84f9ff;text-decoratio
 <script src="/js/audio-levels.js"></script>
 <script>
 (()=>{'use strict';
-const audio=document.getElementById('radio'),toggle=document.getElementById('toggle'),status=document.getElementById('status'),track=document.getElementById('track'),volume=document.getElementById('volume');
+const audio=document.getElementById('radio'),toggle=document.getElementById('toggle'),status=document.getElementById('status'),track=document.getElementById('track'),volume=document.getElementById('volume'),muteButton=document.getElementById('miniMuteBtn');
 const cover=document.getElementById('cover'),dj=document.getElementById('dj'),listeners=document.getElementById('listeners'),quality=document.getElementById('quality'),bars=[...document.querySelectorAll('#eq i')];
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
@@ -81,6 +81,11 @@ function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
 async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
+// Plattformunabhaengiger Mute: nur die bestehende Audioinstanz, kein Eingriff in Pegel, EQ oder Boost.
+function syncMuteButton(){const muted=!!audio.muted;muteButton.setAttribute('aria-pressed',String(muted));const label=muted?'Ton einschalten':'Ton ausschalten';muteButton.setAttribute('aria-label',label);muteButton.title=label;muteButton.querySelector('.mini-mute-icon').textContent=muted?'🔇':'🔊';muteButton.querySelector('.mini-mute-label').textContent=muted?'SOUND':'MUTE'}
+muteButton.addEventListener('click',()=>{audio.muted=!audio.muted;syncMuteButton()});
+audio.addEventListener('volumechange',syncMuteButton);
+syncMuteButton();
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
 audio.addEventListener('playing',()=>{watchdogStatus='healthy';watchdogLastEventAt=Date.now();retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex===0){enableVisualizer();startVisualizer()}});
 audio.addEventListener('waiting',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();audioWaiting=true;if(wanted)label('Puffert …')});
