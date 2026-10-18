@@ -1,0 +1,54 @@
+{
+  "schema": "666stream-webradio-ios-audio-device-diagnostic-v1",
+  "owner": "666STREAM",
+  "project": "WEBRADIO",
+  "date": "2026-10-18",
+  "status": "DIAGNOSTIC_SOURCE_AND_NODE_CI_VERIFIED_ROOT_CAUSE_AND_DEVICE_HOST_PENDING",
+  "recovery_branch": "backup/pre-webradio-ios-device-diagnostics-20261018",
+  "prechange_head": "de6e2592e26a774518176ac74b64a381c889aac3",
+  "source": [
+    {
+      "path": "public/embed/miniplayer.html",
+      "commit": "246bccc8dd3398f4043c8b1b4a29db19279c76ab",
+      "blob": "a56b5846f534d6c0e630938b2f871a2a11f29ec0",
+      "change": "Read-only local diagnostic display inside existing EQ+BOOST panel; no new player/stream"
+    },
+    {
+      "path": "tests/stream-ios-audio-levels.test.mjs",
+      "commit": "d221724574e7f6498544a4149beda278ca405eca",
+      "blob": "f5d73e9fee9a6f92cfc2d5f7308411f15f7897d6",
+      "change": "Regression for local diagnostic and single audio element"
+    }
+  ],
+  "ci": {
+    "run_id": 39155883129,
+    "job_id": 117758893016,
+    "head": "246bccc8dd3398f4043c8b1b4a29db19279c76ab",
+    "real_node": "PASS_15_OF_15",
+    "independent_job_log_readback": true
+  },
+  "evidence": {
+    "iphone_edge_user_retest": "NO_AUDIO_LEVELS_AFTER_PREVIOUS_CORS_FIX",
+    "iframe_bridge": "Parent receives initial zero message; no real levels proven",
+    "audio_context_on_iphone": "NOT_MEASURED",
+    "stream_cors_live_headers": "NOT_VERIFIED",
+    "production_deployment_parity": "NOT_VERIFIED"
+  },
+  "next_step": "Verify deployment then in iPhone Edge open EQ + BOOST and capture iOS AUDIO DIAG including source, playing, ready, context, graph, error, subscribed, sequence, analyserAge, publishAge. Diagnose before touching stream or WebAudio architecture.",
+  "gates": {
+    "source": "VERIFIED",
+    "node_ci": "PASS",
+    "deployment": "READBACK_PENDING",
+    "iphone_edge": "FAIL_PRIOR_FIX_NEW_DIAG_UNTESTED",
+    "iphone_safari": "NOT_TESTED_NEW_DIAG",
+    "lyvra_peer": "RECEIPT_NOT_DELIVERED",
+    "host": "NOT_PASS"
+  },
+  "boundaries": {
+    "existing_mute_preserved": true,
+    "no_duplicate_stream": true,
+    "no_fabricated_audio": true,
+    "no_foreign_write": true
+  },
+  "return_anchor": "WEBRADIO_IPHONE_EDGE_DEVICE_DIAGNOSTIC_INTAKE_AND_REAL_REPAIR"
+}
