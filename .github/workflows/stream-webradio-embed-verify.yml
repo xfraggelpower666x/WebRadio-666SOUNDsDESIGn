@@ -1,0 +1,35 @@
+name: 666STREAM WEBRADIO MiniPlayer Regression
+on:
+  workflow_dispatch:
+  push:
+    branches: [WebRadio-666SOUNDsDESIGn]
+    paths:
+      - 'public/embed/miniplayer.html'
+      - 'public/js/audio-levels.js'
+      - 'public/js/all-player-mute.js'
+      - 'tests/embed-miniplayer-mute.test.mjs'
+      - 'tests/stream-ios-audio-levels.test.mjs'
+      - 'tests/embed-miniplayer-contract.test.mjs'
+      - '.github/workflows/stream-webradio-embed-verify.yml'
+  pull_request:
+    paths:
+      - 'public/embed/miniplayer.html'
+      - 'public/js/audio-levels.js'
+      - 'public/js/all-player-mute.js'
+      - 'tests/embed-miniplayer-mute.test.mjs'
+      - 'tests/stream-ios-audio-levels.test.mjs'
+      - 'tests/embed-miniplayer-contract.test.mjs'
+      - '.github/workflows/stream-webradio-embed-verify.yml'
+permissions:
+  contents: read
+jobs:
+  verify-mini-player:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test MiniPlayer mute, iOS audio levels and embed contract
+        run: node --test tests/embed-miniplayer-mute.test.mjs tests/stream-ios-audio-levels.test.mjs tests/embed-miniplayer-contract.test.mjs
