@@ -44,16 +44,21 @@
   "verification": {
     "source_readback": "PASS_BOTH_FILES",
     "test_file_readback": "PENDING",
-    "node_tests": "NOT_EXECUTED",
-    "production_deployment": "NOT_VERIFIED",
+    "node_tests": "PASS_13_OF_13_REAL_GITHUB_ACTIONS",
+    "production_deployment": "NOT_VERIFIED_LIVE_FETCH_UNAVAILABLE",
     "iphone_safari": "NOT_TESTED",
     "iphone_edge": "NOT_TESTED",
     "cors_of_active_stream": "NOT_VERIFIED",
-    "lyvra_parent_code": "NOT_CHANGED"
+    "lyvra_parent_code": "NOT_CHANGED",
+    "node_ci_run": 39153351015,
+    "node_ci_job": 117751374126,
+    "node_ci_commit": "a545ad895058c3ac6304d189158cd57a1be74c85",
+    "node_ci_receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_MINIPLAYER_TARGETED_NODE_CI_20261018.json",
+    "node_ci_receipt_blob": "333b635b26addb7e102f48fa51840f7da5e3497b"
   },
   "evidence": {
-    "source": "REPAIR_SOURCE_READBACK_PASS",
-    "delivery": "STREAM_OUTBOX_PUBLICATION_PENDING",
+    "source": "REPAIR_SOURCE_AND_REAL_NODE_CI_13_OF_13_VERIFIED",
+    "delivery": "STREAM_OUTBOX_PUBLISHED_LYVRA_PEER_RECEIPT_PENDING",
     "adoption": "LYVRA_NATIVE_INTAKE_PENDING",
     "host": "READBACK_PENDING"
   },
@@ -64,5 +69,12 @@
     "no_secrets": true,
     "no_plugin_pass": true
   },
-  "return_anchor": "WEBRADIO_IOS_AUDIO_LEVELS_HOST_AND_LYVRA_PEER_RECEIPT"
+  "return_anchor": "WEBRADIO_IOS_AUDIO_LEVELS_HOST_AND_LYVRA_PEER_RECEIPT",
+  "miniplayer_mute_addendum": {
+    "status": "STREAM_NATIVE_SOURCE_ADOPTED_REAL_NODE_CI_PASS",
+    "player_blob": "85f1bd962773e4beccfa5926707c7154d452f0a2",
+    "test_blob": "5726761204e7d574f6decb72764b2fcfee743dbd",
+    "mobile_and_desktop_host": "NOT_TESTED",
+    "semantics": "MUTED_ONLY_NO_VOLUME_EQ_BOOST_CHANGE"
+  }
 }
