@@ -759,5 +759,24 @@
     "no_foreign_mutation": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_IPHONE_AUDIOCONTEXT_STATECHANGE_PATCH_REAL_HOST_RETEST"
+  },
+  "webradio_iphone_fft_real_signal_20261018": {
+    "status": "SOURCE_AND_REAL_NODE_CI_PASS_17_OF_17_IPHONE_HOST_PENDING",
+    "scope": "WEBRADIO",
+    "recovery_branch": "backup/pre-webradio-iphone-fft-diagnostics-20261018",
+    "repair_commit": "a2e6a9ae3ff06c33ac448ccf7b1b10e92924dd51",
+    "repair_html_blob": "66da33459548b07fe5796b3a1cc4d23a1163525d",
+    "test_commit": "b88ec70fbd69e82e6fc7d3bd392799edc28b3e93",
+    "test_blob": "0a050e33a3d828a31bd8463ce0b4a9fec638de67",
+    "ci_run": 39163228026,
+    "ci": "PASS_17_OF_17",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_IPHONE_FFT_REAL_SIGNAL_20261018.json",
+    "receipt_blob": "4f8178798fdd6ecb45c079c2711446c68fd7d8d6",
+    "iphone_edge_evidence": "CONTEXT_AND_ANALYSER_ACTIVE_NO_NEON_SIGNAL_USER_SCREENSHOT",
+    "iphone_edge_new_fft_host": "NOT_RETESTED",
+    "deployment": "NOT_VERIFIED",
+    "no_foreign_mutation": true,
+    "pointer_last": true,
+    "return_anchor": "WEBRADIO_IPHONE_FFT_REAL_BAND_DIAG_HOST_RETEST"
   }
 }
