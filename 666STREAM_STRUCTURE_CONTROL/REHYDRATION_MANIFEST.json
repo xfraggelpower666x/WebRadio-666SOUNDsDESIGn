@@ -120,5 +120,20 @@
     "radio_production_mutation": false,
     "plugin_impact": "DATA_ONLY",
     "no_project_autoactivation": true
+  },
+  "webradio_cyberintro_first_paint_update_20261018": {
+    "status": "SOURCE_READBACK_DEPLOY_AND_LIVE_HANDOFF_VERIFIED_EXACT_FADE_TIMING_PARTIAL",
+    "project": "WEBRADIO",
+    "receipt": "recovery/WEBRADIO_CYBERINTRO_FIRST_PAINT_UPDATE_2026-10-18.json",
+    "source_repair_head": "7cc5b469dcc0263da0f42aea55d96b94a85e837e",
+    "release_integrity_run": 38999644030,
+    "cloudflare_deploy_run": 38999644071,
+    "root_public_mirrors": "VERIFIED_BY_IDENTICAL_BLOBS",
+    "first_paint_shell": "VERIFIED_PRESENT_ON_CURRENT_HEAD",
+    "live_handoff": "PASS",
+    "exact_three_fade_count": "PARTIAL",
+    "exact_two_second_hold": "PARTIAL",
+    "no_project_autoswitch": true,
+    "return_anchor": "WEBRADIO_MAIN_PLAYER_CYBERINTRO_POST_REPAIR"
   }
 }
