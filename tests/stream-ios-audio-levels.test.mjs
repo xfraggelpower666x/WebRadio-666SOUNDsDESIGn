@@ -54,3 +54,14 @@ test('MiniPlayer nutzt CORS-fähiges einziges Audioelement vor MediaElementSourc
  assert.match(elements[0][0],/\bplaysinline\b/);
  assert.ok(player.indexOf(elements[0][0]) < player.indexOf('window.S666AudioLevels?.publish'));
 });
+
+// iPhone diagnostics are observational, local and reuse the existing EQ panel.
+test('iOS diagnosis shows real WebAudio and bridge states without another audio player',()=>{
+ assert.match(player,/id="miniAudioDiag"/);
+ assert.match(player,/audioContext\?\.state\|\|'unavailable'/);
+ assert.match(player,/S666AudioLevels\?\.getDiagnostics/);
+ assert.match(player,/lastGenuinePublish/);
+ assert.match(player,/centralAudioError/);
+ assert.match(player,/if\(soundPanel\.hidden\)/);
+ assert.equal([...player.matchAll(/<audio\b/g)].length,1);
+});
