@@ -1,0 +1,60 @@
+{
+  "schema": "666stream-webradio-ios-audio-zero-samples-guard-v1",
+  "native_owner": "666STREAM",
+  "scope": "WEBRADIO",
+  "date": "2026-10-18",
+  "status": "BRIDGE_ZERO_FRAME_SOURCE_AND_CI_PASS_IOS_SAMPLES_MISSING",
+  "prechange_head": "ff6122cd1fda80d6d04e4f258a61884527700a95",
+  "recovery_branch": "backup/pre-webradio-ios-zero-samples-guard-20261018",
+  "device_evidence": {
+    "platform": "iPhone Microsoft Edge",
+    "stream_audible": "CONFIRMED_BY_USER",
+    "playing": true,
+    "readyState": 4,
+    "context": "running",
+    "graph": true,
+    "subscribed": true,
+    "sequence": 529,
+    "analyserAgeMs": 2,
+    "publishAgeMs": 35,
+    "fftSize": 1024,
+    "fftPeak": 0,
+    "waveRms": 0,
+    "lyvra": "Kein aktuelles Audiosignal",
+    "interpretation": "Audible native media with zero samples at WebAudio analyser; JavaScript cannot infer actual audio magnitude from zero frames"
+  },
+  "repair": {
+    "path": "public/js/audio-levels.js",
+    "commit": "be0e5f228ef97ed4b40af183c35d8d91750dfbf2",
+    "blob": "be5157733be4161413215a1b37324951bfb0c3b0",
+    "behavior": "Reject all-zero FFT data as genuine levels; publish playing:false zero; expose silent frame count and timestamp for diagnostics; no stream change"
+  },
+  "test": {
+    "path": "tests/stream-ios-audio-levels.test.mjs",
+    "commit": "2386d6fca74f0a12247ab9bcb3762b44577cd5fc",
+    "blob": "ebe3395ffbc84fd72758041f82bee1ae13f68b85",
+    "ci_run": 39164587402,
+    "job_id": 117784761511,
+    "real_node": "PASS_18_OF_18"
+  },
+  "related_webkit_evidence": [
+    "https://bugs.webkit.org/show_bug.cgi?id=180696",
+    "https://bugs.webkit.org/show_bug.cgi?id=266922"
+  ],
+  "boundaries": {
+    "preserve_audio_playback": true,
+    "no_second_stream": true,
+    "no_fake_levels": true,
+    "no_foreign_writes": true
+  },
+  "gates": {
+    "source_readback": "VERIFIED",
+    "ci": "PASS_18_OF_18",
+    "device_audio_reactivity": "FAIL_CONFIRMED_BEFORE_GUARD_NO_NEW_HOST_PASS",
+    "recovery_of_real_samples": "NOT_FIXED",
+    "deployment": "NOT_VERIFIED",
+    "host": "NOT_PASS"
+  },
+  "next_step": "Protect native playback; evaluate browser-supported real-sample capture or explicit opt-in separate authorized backend measurement design before changes; no synthetic audio and no direct-stream mutation.",
+  "return_anchor": "WEBRADIO_IOS_WEBKIT_MEDIAELEMENT_ZERO_SAMPLES_NATIVE_PLAYBACK_PRESERVED"
+}
