@@ -1,0 +1,60 @@
+{
+  "schema": "666stream-webradio-ios-frequency-diagnostics-v1",
+  "owner": "666STREAM",
+  "scope": "WEBRADIO",
+  "date": "2026-10-18",
+  "status": "FFT_RESOLUTION_SOURCE_CI_VERIFIED_HOST_RETEST_PENDING",
+  "prechange_head": "edd86fea7ba81cbf675cf603b79fb1769c4076db",
+  "recovery_branch": "backup/pre-webradio-iphone-fft-diagnostics-20261018",
+  "iphone_edge_evidence": {
+    "observed_at": "2026-10-18 22:23 user screenshot",
+    "source": "user-provided iPhone Edge screenshot",
+    "playing": true,
+    "ready_state": 4,
+    "muted": false,
+    "context": "running",
+    "graph": true,
+    "error": "none",
+    "subscribed": true,
+    "sequence": 200,
+    "analyser_age_ms": 6,
+    "publish_age_ms": 23,
+    "lyvra_status": "Kein aktuelles Audiosignal",
+    "inference": "Actual analyser reads and publish attempts are recent, but positive frequencies and parent delivery remain unproven"
+  },
+  "repair": {
+    "path": "public/embed/miniplayer.html",
+    "commit": "a2e6a9ae3ff06c33ac448ccf7b1b10e92924dd51",
+    "blob": "66da33459548b07fe5796b3a1cc4d23a1163525d",
+    "details": [
+      "MiniPlayer-only analyser fftSize 1024 instead of mobile 128",
+      "Measured real getByteFrequencyData peak and getByteTimeDomainData RMS in local diagnostics; no synthesized signal"
+    ]
+  },
+  "tests": {
+    "path": "tests/stream-ios-audio-levels.test.mjs",
+    "commit": "b88ec70fbd69e82e6fc7d3bd392799edc28b3e93",
+    "blob": "0a050e33a3d828a31bd8463ce0b4a9fec638de67",
+    "real_gitHub_actions": "PASS_17_OF_17",
+    "run_id": 39163228026,
+    "job_id": 117780734477
+  },
+  "gates": {
+    "source_readback": "VERIFIED",
+    "ci": "PASS_17_OF_17",
+    "deployment": "NOT_YET_VERIFIED",
+    "iphone_edge": "NEW_FFT_PATCH_NOT_YET_DEVICE_TESTED",
+    "iphone_safari": "NOT_TESTED",
+    "live_cors": "PREVIOUSLY_VERIFIED",
+    "parent_receiver": "POSITIVE_LEVEL_RECEIPT_NOT_PROVEN",
+    "host": "NOT_PASS"
+  },
+  "boundaries": {
+    "no_new_audio_player": true,
+    "no_synthetic_audio_levels": true,
+    "maintain_mute_eq_boost": true,
+    "no_foreign_write": true
+  },
+  "next_action": "Read live asset parity, then user on iPhone Edge compare fftPeak waveRms and Neon status with radio playing; if values zero, isolate WebAudio source or CORS-decoding; if nonzero but Neon idle, inspect band mapping and parent received messages.",
+  "return_anchor": "WEBRADIO_IPHONE_FFT_REAL_BAND_DIAG_HOST_RETEST"
+}
