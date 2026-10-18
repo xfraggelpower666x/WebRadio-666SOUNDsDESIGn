@@ -45,3 +45,12 @@ test('Player initialisiert Graph vor await play und resümiert bei visibility/pa
  assert.match(player,/document\.addEventListener\('visibilitychange',[^\n]*enableVisualizer\(\)/);
  assert.match(player,/audioContext\?\.state==='running'/);
 });
+
+// Gleiche WebAudio-CORS-Voraussetzung wie Hauptplayer und VELUNA.
+test('MiniPlayer nutzt CORS-fähiges einziges Audioelement vor MediaElementSource',()=>{
+ const elements=[...player.matchAll(/<audio\b[^>]*\bid="radio"[^>]*>/g)];
+ assert.equal(elements.length,1);
+ assert.match(elements[0][0],/\bcrossorigin="anonymous"/);
+ assert.match(elements[0][0],/\bplaysinline\b/);
+ assert.ok(player.indexOf(elements[0][0]) < player.indexOf('window.S666AudioLevels?.publish'));
+});
