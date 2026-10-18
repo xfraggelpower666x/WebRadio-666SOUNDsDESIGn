@@ -86,3 +86,16 @@ test('MiniPlayer mobile FFT resolves 30-250Hz band and measures real waveform',(
  const width=48000/1024;
  assert.ok(Math.ceil(250/width)-Math.floor(30/width)>1);
 });
+
+test('iPhone zero-sample WebAudio frames never masquerade as genuine signal',()=>{
+ const x=fixture();x.subscribe();x.tick();
+ x.window.S666AudioLevels.publish(x.audio,{fftSize:1024},new Uint8Array(512),48000,'running');
+ assert.equal(x.messages.at(-1).data.playing,false);
+ assert.equal(x.messages.at(-1).data.energy,0);
+ assert.equal(x.window.S666AudioLevels.getDiagnostics().lastGenuinePublish,0);
+ assert.equal(x.window.S666AudioLevels.getDiagnostics().silentFrameCount,1);
+ x.tick();
+ x.window.S666AudioLevels.publish(x.audio,{fftSize:1024},new Uint8Array(512).fill(80),48000,'running');
+ assert.equal(x.messages.at(-1).data.playing,true);
+ assert.ok(x.window.S666AudioLevels.getDiagnostics().lastGenuinePublish>0);
+});
