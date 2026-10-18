@@ -1,0 +1,52 @@
+{
+  "schema": "666stream-webradio-ios-audio-cors-repair-v1",
+  "native_owner": "666STREAM",
+  "project": "WEBRADIO",
+  "date": "2026-10-18",
+  "status": "SOURCE_CI_PASS_DEPLOYMENT_AND_IPHONE_HOST_PENDING",
+  "prechange_head": "b22478cd6eb4032932776ccf1b7889882ef038ce",
+  "backup_branch": "backup/pre-webradio-ios-analyser-cors-20261018",
+  "evidence": {
+    "creator_iphone_edge_post_previous_patch": "FAIL_AUDIO_LEVELS_OBSERVED",
+    "creator_iphone_safari_prior": "FAIL_REPORTED",
+    "root_cause": "CORS_AUDIO_ELEMENT_CONFIGURATION_MISSING_VERIFIED_SOURCE_DIFFERENCE_NOT_YET_DEVICE_PROVEN",
+    "worker_cors_source": "worker.js passthroughHeaders sets access-control-allow-origin *; live response header not verified"
+  },
+  "changes": [
+    {
+      "path": "public/embed/miniplayer.html",
+      "source_commit": "5f60678f5c3234d6db0aae2d1a05dd1a883a0db8",
+      "blob": "d8a6a04e3a05d072eb181c94a920059c39b6c2e7",
+      "change": "add playsinline crossorigin anonymous to existing single audio element"
+    },
+    {
+      "path": "tests/stream-ios-audio-levels.test.mjs",
+      "source_commit": "495ba851e628a477a5427943535ac7651944e47a",
+      "blob": "647193a1a4ae3c76776a3badd480f180a719a1d9",
+      "change": "assert single CORS-configured inline audio source"
+    }
+  ],
+  "tests": {
+    "run_id": 39154550569,
+    "job_id": 117754950973,
+    "commit": "495ba851e628a477a5427943535ac7651944e47a",
+    "status": "PASS_14_OF_14",
+    "log_readback": "VERIFIED"
+  },
+  "gates": {
+    "github_source_readback": "VERIFIED",
+    "live_asset_exact_parity": "READBACK_PENDING",
+    "production_deployment_binding": "READBACK_PENDING",
+    "real_stream_cors_response": "READBACK_PENDING",
+    "iphone_edge_host": "FAIL_PRIOR_REPAIR_NEW_PATCH_NOT_TESTED",
+    "iphone_safari_host": "NOT_TESTED_AFTER_NEW_PATCH",
+    "lyvra_peer_adoption": "NOT_VERIFIED"
+  },
+  "restrictions": {
+    "no_second_audio": true,
+    "no_fake_signal": true,
+    "preserve_mute_eq_boost": true,
+    "no_foreign_write": true
+  },
+  "return_anchor": "WEBRADIO_IOS_AUDIO_CORS_PATCH_DEPLOYMENT_AND_IPHONE_HOST_RECHECK"
+}
