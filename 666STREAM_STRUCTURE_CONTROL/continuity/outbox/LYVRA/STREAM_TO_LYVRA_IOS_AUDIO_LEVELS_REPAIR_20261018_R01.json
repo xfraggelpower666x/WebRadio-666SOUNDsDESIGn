@@ -1,0 +1,68 @@
+{
+  "schema": "666stream-lyvra-ios-audio-repair-outbox-v1",
+  "owner": "666STREAM",
+  "target": "LYVRA",
+  "handoff_id": "STREAM-LYVRA-IOS-AUDIO-REPAIR-20261018-R01",
+  "source_handoff": "docs/handoffs/666stream/WEBRADIO/LYVRA_TO_666STREAM_IOS_AUDIO_LEVELS_REPAIR_2026-10-17.md",
+  "scope": "WEBRADIO_EXISTING_MINIPLAYER",
+  "recovery_branch": "backup/pre-stream-ios-audio-levels-repair-20261018",
+  "source_head_before": "8617708fb4148ad2da05178ed3a8bf62bb0fda74",
+  "changes": [
+    {
+      "path": "public/embed/miniplayer.html",
+      "commit": "87cd6bb56b4616840431104480d0f5d52ed3f6d3",
+      "blob": "3c8fa25b4c722612b4b7ead140d0b77aa8e58e14",
+      "notes": [
+        "synchronous existing WebAudio graph setup before awaited audio.play",
+        "resumption on visibility/pageshow",
+        "single scheduled analyser frame",
+        "meter availability restricted to running AudioContext"
+      ]
+    },
+    {
+      "path": "public/js/audio-levels.js",
+      "commit": "76155337645c533110bfc82129fa96cc08f09f50",
+      "blob": "7b1d277d205bd6b80392b7efb0b1105d71495170",
+      "notes": [
+        "no playing:true without running AudioContext",
+        "privacy safe diagnostic counters"
+      ]
+    },
+    {
+      "path": "tests/stream-ios-audio-levels.test.mjs",
+      "commit": "a494b2ed333f6dd55ae065dcba7cc72b1448879c",
+      "notes": [
+        "origin verification",
+        "real levels",
+        "suspended context",
+        "missing analyser/muted",
+        "visibility",
+        "gesture order"
+      ]
+    }
+  ],
+  "verification": {
+    "source_readback": "PASS_BOTH_FILES",
+    "test_file_readback": "PENDING",
+    "node_tests": "NOT_EXECUTED",
+    "production_deployment": "NOT_VERIFIED",
+    "iphone_safari": "NOT_TESTED",
+    "iphone_edge": "NOT_TESTED",
+    "cors_of_active_stream": "NOT_VERIFIED",
+    "lyvra_parent_code": "NOT_CHANGED"
+  },
+  "evidence": {
+    "source": "REPAIR_SOURCE_READBACK_PASS",
+    "delivery": "STREAM_OUTBOX_PUBLICATION_PENDING",
+    "adoption": "LYVRA_NATIVE_INTAKE_PENDING",
+    "host": "READBACK_PENDING"
+  },
+  "restrictions": {
+    "no_fake_levels": true,
+    "no_second_player": true,
+    "no_foreign_write": true,
+    "no_secrets": true,
+    "no_plugin_pass": true
+  },
+  "return_anchor": "WEBRADIO_IOS_AUDIO_LEVELS_HOST_AND_LYVRA_PEER_RECEIPT"
+}
