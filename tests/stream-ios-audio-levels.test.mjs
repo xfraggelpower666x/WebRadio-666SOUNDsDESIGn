@@ -99,3 +99,33 @@ test('iPhone zero-sample WebAudio frames never masquerade as genuine signal',()=
  assert.equal(x.messages.at(-1).data.playing,true);
  assert.ok(x.window.S666AudioLevels.getDiagnostics().lastGenuinePublish>0);
 });
+
+test('synthetic fallback has its own message type and never impersonates real audio',()=>{
+ const x=fixture();x.subscribe();x.tick();
+ const realZero=new Uint8Array(512);
+ x.window.S666AudioLevels.publish(x.audio,{fftSize:1024},realZero,48000,'running');
+ assert.equal(x.messages.at(-1).data.type,'lyvra:audio:levels');
+ assert.equal(x.messages.at(-1).data.playing,false);
+ x.window.S666AudioLevels.publishVisualFallback({bass:.25,mid:.31,high:.2,energy:.26});
+ const fallback=x.messages.at(-1);
+ assert.equal(fallback.data.type,'lyvra:audio:visual-fallback');
+ assert.equal(fallback.data.mode,'synthetic');
+ assert.equal(fallback.origin,'https://weblyvra.666soundsdesign-broadcaster.com');
+ x.window.S666AudioLevels.publishVisualFallback({bass:2,mid:.31,high:.2,energy:.26});
+ assert.equal(x.messages.length,3);
+});
+test('MiniPlayer visual fallback is opt-in only while playing and silent for 1.2 seconds',()=>{
+ assert.match(player,/function renderVisualFallback\(\)/);
+ assert.match(player,/visualMode=active\?'synthetic':'idle'/);
+ assert.match(player,/performance\.now\(\)-silentSince>1200/);
+ assert.match(player,/publishVisualFallback/);
+ assert.match(player,/synthetic = display only/);
+ assert.equal([...player.matchAll(/<audio\b/g)].length,1);
+});
+test('main mobile visual fallback remains explicitly synthetic and respects actual playback',()=>{
+ const main=readFileSync(new URL('../public/js/equalizer.js',import.meta.url),'utf8');
+ assert.match(main,/synthetic = mobileLike\(\) && audio && !audio\.paused && !audio\.muted/);
+ assert.match(main,/publish\(level, level, synthetic \? 'synthetic' : 'unavailable'/);
+ assert.match(main,/if \(!signalPresent && mobileLike\(\)/);
+ assert.match(main,/if \(!running\) return/);
+});
