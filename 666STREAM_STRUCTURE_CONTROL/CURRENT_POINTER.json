@@ -740,5 +740,24 @@
     "no_foreign_mutation": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_IPHONE_EDGE_DEVICE_DIAGNOSTIC_INTAKE_AND_REAL_REPAIR"
+  },
+  "webradio_iphone_context_statechange_20261018": {
+    "status": "SOURCE_AND_REAL_NODE_CI_PASS_16_OF_16_HOST_PENDING",
+    "scope": "WEBRADIO",
+    "recovery_branch": "backup/pre-webradio-ios-context-statechange-resume-20261018",
+    "source_commit": "ed321ba014c08bdb9f6e1e5b7a375c27265bf018",
+    "source_blob": "99a3c2136e570b4129bcc00d640c4e0cdb0d1f7e",
+    "test_commit": "822cfe94ac2a43d48e832f32f587fc2719974776",
+    "test_blob": "07351ab0e1b87331de03a6d710ab3a9877e5a18c",
+    "ci_run": 39161650499,
+    "ci": "PASS_16_OF_16",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_IPHONE_CONTEXT_STATECHANGE_20261018.json",
+    "receipt_blob": "7c16b5b19d28c8fcf41b9cf63d748c94a11e8b3e",
+    "iphone_edge": "HOST_RETEST_PENDING",
+    "deployment": "READBACK_PENDING",
+    "no_fake_audio": true,
+    "no_foreign_mutation": true,
+    "pointer_last": true,
+    "return_anchor": "WEBRADIO_IPHONE_AUDIOCONTEXT_STATECHANGE_PATCH_REAL_HOST_RETEST"
   }
 }
