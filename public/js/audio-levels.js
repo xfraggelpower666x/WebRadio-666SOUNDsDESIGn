@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const allowed = new Set(['https://weblyvra.666soundsdesign-broadcaster.com', 'https://lyvra-living-universe.crisp-siren-2613.chatgpt.site', 'https://webradio.666soundsdesign-broadcaster.com']);
-  let subscriber = null, sequence = 0, last = -Infinity, lastGenuinePublish = 0;
+  let subscriber = null, sequence = 0, last = -Infinity, lastGenuinePublish = 0, lastSilentFrameAt = 0, silentFrameCount = 0;
   function send(playing, bands) {
     if (!subscriber) return;
     window.parent.postMessage({ type: 'lyvra:audio:levels', version: 1, sequence: ++sequence, playing, ...bands }, subscriber);
@@ -19,6 +19,8 @@
       if (!subscriber || document.hidden || performance.now() - last < 50) return;
       last = performance.now();
       if (audio.paused || audio.readyState < 3 || contextState !== 'running' || !analyser || !data?.length || !Number.isFinite(sampleRate) || sampleRate <= 0) { send(false, zero); return; }
+      const hasFrequencySignal = data.some(value => value > 0);
+      if (!hasFrequencySignal) { lastSilentFrameAt = performance.now(); silentFrameCount++; send(false, zero); return; }
       const width = sampleRate / analyser.fftSize;
       function rms(low, high) {
         const start = Math.max(0, Math.floor(low / width));
@@ -32,7 +34,7 @@
       lastGenuinePublish = performance.now();
       send(!audio.muted, audio.muted ? zero : { bass, mid, high, energy: Math.min(1, (bass * 2 + mid + high) / 4) });
     },
-    getDiagnostics() { return Object.freeze({ subscribed: !!subscriber, sequence, lastGenuinePublish, visible: !document.hidden }); }
+    getDiagnostics() { return Object.freeze({ subscribed: !!subscriber, sequence, lastGenuinePublish, lastSilentFrameAt, silentFrameCount, visible: !document.hidden }); }
   });
   function stop() { send(false, zero); }
   const audio = document.getElementById('radio');
