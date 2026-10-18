@@ -65,3 +65,11 @@ test('iOS diagnosis shows real WebAudio and bridge states without another audio 
  assert.match(player,/if\(soundPanel\.hidden\)/);
  assert.equal([...player.matchAll(/<audio\b/g)].length,1);
 });
+
+test('MiniPlayer reaktiviert echten Analyser bei AudioContext statechange ohne neue Quelle',()=>{
+ assert.match(player,/function onVisualContextStateChange\(\)\{if\(audioContext\?\.state==='running'\)startVisualizer\(\)\}/);
+ assert.match(player,/audioContext\.addEventListener\('statechange',onVisualContextStateChange\)/);
+ assert.match(player,/visualContextObserved!==audioContext/);
+ assert.match(player,/visualContextObserved\?\.removeEventListener\?\.\('statechange',onVisualContextStateChange\)/);
+ assert.equal([...player.matchAll(/<audio\b/g)].length,1);
+});
