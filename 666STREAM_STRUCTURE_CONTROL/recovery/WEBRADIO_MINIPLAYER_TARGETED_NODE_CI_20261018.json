@@ -1,0 +1,42 @@
+{
+  "schema": "666stream-webradio-miniplayer-node-ci-v1",
+  "system": "666STREAM_STRUCTURE_CONTROL",
+  "project": "WEBRADIO",
+  "scope": "MUTE_AND_IOS_AUDIO_LEVELS",
+  "workflow_path": ".github/workflows/stream-webradio-embed-verify.yml",
+  "workflow_blob": "0f1db13cbb524c208a520392f21b83e86ad0d1a9",
+  "execution": {
+    "kind": "GITHUB_ACTIONS_REAL_NODE22",
+    "run_id": 39153351015,
+    "job_id": 117751374126,
+    "commit": "a545ad895058c3ac6304d189158cd57a1be74c85",
+    "status": "COMPLETED",
+    "conclusion": "SUCCESS",
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "source": "INDEPENDENT_JOB_LOG_READBACK"
+  },
+  "commands": [
+    "node --test tests/embed-miniplayer-mute.test.mjs tests/stream-ios-audio-levels.test.mjs tests/embed-miniplayer-contract.test.mjs"
+  ],
+  "preserved_previous_ci": "CORE_CI_34_OF_34_HISTORICAL_PASS_NOT_RERUN",
+  "recovery_branch": "backup/pre-stream-webradio-update-targeted-ci-20261018",
+  "gates": {
+    "source": "VERIFIED",
+    "node": "PASS_13_OF_13",
+    "delivery": "LYVRA_PEER_DELIVERY_NOT_VERIFIED",
+    "adoption": "LYVRA_NATIVE_ADOPTION_NOT_VERIFIED",
+    "deployment": "LIVE_ASSET_READBACK_UNAVAILABLE",
+    "iphone_safari": "NOT_TESTED",
+    "iphone_edge": "NOT_TESTED",
+    "android": "NOT_TESTED",
+    "desktop": "NOT_TESTED",
+    "plugin": "NOT_PROMOTED",
+    "host": "NOT_PROMOTED"
+  },
+  "no_foreign_write": true,
+  "no_production_deploy": true,
+  "pointer_last_required": true,
+  "return_anchor": "WEBRADIO_MINIPLAYER_MUTE_NODE_DEPLOYMENT_DEVICE_HOST_AND_IOS_AUDIO_LEVELS"
+}
