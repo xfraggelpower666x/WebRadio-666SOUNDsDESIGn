@@ -10,6 +10,8 @@ on:
       - 'tests/embed-miniplayer-mute.test.mjs'
       - 'tests/stream-ios-audio-levels.test.mjs'
       - 'tests/embed-miniplayer-contract.test.mjs'
+      - 'tests/embed-miniplayer-recovery.test.mjs'
+      - 'public/js/all-player-audio-recovery.js'
       - '.github/workflows/stream-webradio-embed-verify.yml'
   pull_request:
     paths:
@@ -19,6 +21,8 @@ on:
       - 'tests/embed-miniplayer-mute.test.mjs'
       - 'tests/stream-ios-audio-levels.test.mjs'
       - 'tests/embed-miniplayer-contract.test.mjs'
+      - 'tests/embed-miniplayer-recovery.test.mjs'
+      - 'public/js/all-player-audio-recovery.js'
       - '.github/workflows/stream-webradio-embed-verify.yml'
 permissions:
   contents: read
@@ -32,4 +36,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test MiniPlayer mute, iOS audio levels and embed contract
-        run: node --test tests/embed-miniplayer-mute.test.mjs tests/stream-ios-audio-levels.test.mjs tests/embed-miniplayer-contract.test.mjs
+        run: node --test tests/embed-miniplayer-mute.test.mjs tests/stream-ios-audio-levels.test.mjs tests/embed-miniplayer-contract.test.mjs tests/embed-miniplayer-recovery.test.mjs
