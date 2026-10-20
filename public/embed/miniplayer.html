@@ -55,6 +55,7 @@
 <script src="/js/admin-auth-client.js"></script>
 <script src="/js/skip-control.js"></script>
 <script src="/js/audio-levels.js"></script>
+<script src="/js/all-player-audio-recovery.js"></script>
 <script>
 (()=>{'use strict';
 const audio=document.getElementById('radio'),toggle=document.getElementById('toggle'),status=document.getElementById('status'),track=document.getElementById('track'),volume=document.getElementById('volume'),muteButton=document.getElementById('miniMuteBtn');
@@ -96,8 +97,8 @@ let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=fals
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
-toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audio.pause();label('Pausiert');state()}else play()});
+async function play(){wanted=true;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();label('Pausiert');state()}else play()});
 // Plattformunabhaengiger Mute: nur die bestehende Audioinstanz, kein Eingriff in Pegel, EQ oder Boost.
 function syncMuteButton(){const muted=!!audio.muted;muteButton.setAttribute('aria-pressed',String(muted));const label=muted?'Ton einschalten':'Ton ausschalten';muteButton.setAttribute('aria-label',label);muteButton.title=label;muteButton.querySelector('.mini-mute-icon').textContent=muted?'🔇':'🔊';muteButton.querySelector('.mini-mute-label').textContent=muted?'SOUND':'MUTE'}
 muteButton.addEventListener('click',()=>{audio.muted=!audio.muted;syncMuteButton()});
@@ -107,7 +108,7 @@ volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
 audio.addEventListener('playing',()=>{watchdogStatus='healthy';watchdogLastEventAt=Date.now();retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex===0){enableVisualizer();startVisualizer()}});
 audio.addEventListener('waiting',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();audioWaiting=true;if(wanted)label('Puffert …')});
 audio.addEventListener('pause',()=>{watchdogStatus='idle';watchdogLastEventAt=Date.now();state();bars.forEach(b=>b.style.height='3px')});
-audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
 // iOS-Diagnose nur lokal sichtbar im bereits vorhandenen EQ-Panel. Keine Netzwerk-Telemetrie.
 const miniAudioDiag=document.getElementById('miniAudioDiag');
 function refreshAudioDiagnostics(){
@@ -126,7 +127,7 @@ function refreshAudioDiagnostics(){
     +'analyserAge='+fresh(lastMeterAt)+' publishAge='+signalAge+'\n'+'fftSize='+(analyser?.fftSize||0)+' fftPeak='+lastFrequencyPeak+' waveRms='+lastWaveformRms.toFixed(4)+'\n'+'visualMode='+visualMode+' (synthetic = display only)';
 }
 setInterval(refreshAudioDiagnostics,1000);
-// Passiver Watchdog: beobachtet ausschliesslich reale Audiozustände, erzeugt weder einen neuen Player noch Recovery-Aktionen.
+// Bestehender Watchdog bleibt nur Statussensor; allein der gemeinsame all-player-audio-recovery Core besitzt Recovery-Autorität.
 setInterval(()=>{if(audioFault){watchdogStatus='fault';return}if(!wanted||audio.paused){watchdogStatus='idle';return}if(audioWaiting||audio.readyState<2){watchdogStatus='buffering';return}if(!audio.paused&&audio.readyState>=2){watchdogStatus='healthy';watchdogLastEventAt=Date.now()}},2000);
 // Dashboardschnittstelle: nur die vorhandene Audioinstanz steuern, nie neuen Player erzeugen.
 window.S666EmbedControl=Object.freeze({
@@ -146,7 +147,7 @@ window.S666EmbedControl=Object.freeze({
     const next=target==='main'?0:1;
     if(sourceIndex===next)return this.getState();
     const resume=!audio.paused&&!audio.ended;
-    wanted=false;audio.pause();retrying=false;audioWaiting=false;audioFault=false;
+    wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();retrying=false;audioWaiting=false;audioFault=false;
     sourceIndex=next;audio.src=sources[sourceIndex];audio.load();
     label((target==='main'?'Hauptstream':'Backupstream')+' gewählt');
     state();
