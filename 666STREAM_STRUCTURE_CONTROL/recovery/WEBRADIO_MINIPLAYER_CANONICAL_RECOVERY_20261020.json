@@ -1,0 +1,57 @@
+{
+  "schema": "666stream-webradio-miniplayer-recovery-v1",
+  "date": "2026-10-20",
+  "native_system": "666STREAM",
+  "scope": "WEBRADIO_EXISTING_MINIPLAYER",
+  "trigger": "user_reports_long_buffering_and_occasional_dropout",
+  "diagnosis": {
+    "mini_watchdog": "PASSIVE_STATUS_ONLY_NO_RECOVERY",
+    "main_player": "USES_CANONICAL_ALL_PLAYER_AUDIO_RECOVERY_V1_0_5",
+    "mini_error": "VISUAL_GRAPH_BACKUP_CORS_FAIL_CLOSED",
+    "runtime_root_cause": "DEVICE_REPRODUCTION_PENDING"
+  },
+  "prechange_recovery_branch": "backup/pre-webradio-mini-shared-recovery-20261020",
+  "prechange_head": "493e4e5bcb84bfb2efbef535541f74ab53b9b3ea",
+  "repair": {
+    "html": "public/embed/miniplayer.html",
+    "html_blob": "f11bb0b31c67425e4ab9d45896eb3e5ed5aecc32",
+    "shared_module": "public/js/all-player-audio-recovery.js",
+    "shared_module_unchanged": true,
+    "one_recovery_owner": true,
+    "explicit_manual_pause_guard": true,
+    "stream_urls_unchanged": true,
+    "analyser_unchanged": true,
+    "synthetic_visual_fallback_unchanged": true
+  },
+  "regression": {
+    "test": "tests/embed-miniplayer-recovery.test.mjs",
+    "test_blob": "bbce28fa8a9e6b9c5cd2819611ba5789de077744",
+    "ci_workflow": ".github/workflows/stream-webradio-embed-verify.yml",
+    "ci_workflow_blob": "f1808bd9c7a8b96e3e03bf04e173690b9232efe9",
+    "run_id": 39454624622,
+    "job_id": 118738102704,
+    "real_node": "PASS_24_OF_24",
+    "embed_contract": "PASS"
+  },
+  "release_integrity": {
+    "status": "FAIL_PREEXISTING_UNRELATED_MIRROR_DRIFT",
+    "run_id": 39454624739,
+    "prior_failed_run_id": 39454589487,
+    "failing_path": "js/equalizer.js",
+    "not_fixed_in_this_scope": true,
+    "full_release_pass": false
+  },
+  "deployment": {
+    "live_html": "NOT_REVERIFIED_AFTER_THIS_PATCH",
+    "live_js_audio_levels": "PRIOR_BYTE_PASS",
+    "host_buffering": "NOT_RETESTED",
+    "iphone_edge_audio": "HISTORICAL_ZERO_SAMPLES_NOT_FIXED",
+    "iphone_safari": "NOT_TESTED",
+    "mobile_fallback": "SYNTHETIC_DISPLAY_ONLY"
+  },
+  "other_ci": "PREVIOUS_13_14_15_16_17_18_21_PASSES_PRESERVED_NO_RERUN",
+  "foreign_writes": false,
+  "production_stream_config_modified": false,
+  "pointer_last_required": true,
+  "return_anchor": "WEBRADIO_MINIPLAYER_CANONICAL_RECOVERY_REAL_HOST_RETEST"
+}
