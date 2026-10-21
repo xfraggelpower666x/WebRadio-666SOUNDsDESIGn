@@ -30,5 +30,16 @@ Rules:
 ## Native interruption/continuation governance — 2026-10-17
 Use existing project-aware LiveCircle and Session Governor for CLIC-inspired interruption handling and LYVRA-inspired workspace-preserving continuity. Their patterns are adapted by 666STREAM; no CLIC/LYVRA facet, identity, shared mutable state or foreign execution authority is imported. Keep chat-local return anchors, paused obligations and newer-valid-state supersession semantics. A diagnosed interruption is not permission for a write. Existing pointers, project isolation, pre-change recovery and pointer-last discipline remain authoritative.
 
+## Preserve-understand-refine evolution principle — 2026-10-21
+Applies to all projects in this repository, and to RADIO-CODEFORGE whenever it acts within the currently selected 666STREAM project. This is a development decision policy subordinate to existing Authority, Session Governor, native project scope, security, pre-change backup, CI and pointer-last rules; it grants no autonomous writes.
+- REMEMBER: Rehydrate latest verified current and relevant history/decisions, original architecture, working baseline and real operational experience. Superseded historical evidence is context, never authority over newer valid current.
+- UNDERSTAND: Explain the causal chain, owners, existing fallback/recovery/lifecycle layers, their original purpose and proven strengths before proposing any change. Separate confirmed defect, hypothesis and untested host behavior.
+- REFINE: Reuse and tune existing validated components first. Do not replace functioning architecture, create parallel owners, add unneeded fallback sources, or do speculative rewrites.
+- APPLY: When there is a demonstrated opportunity and native write authority, make the smallest reversible project-scoped change after backup; protect production playback and unrelated subsystems.
+- VERIFY & LEARN: Run targeted regression, independent source readback, relevant deployment/host checks; compare measured outcomes and counterevidence to the baseline; preserve findings and return anchors for subsequent work.
+- NO DEFECT / NO PROVEN BENEFIT: Observe, document and refrain from a production mutation. A user insight may refine policy but must never masquerade as a runtime fix or successful live acceptance.
+- A direct custom instruction may inform or interrupt a task but must not silently cancel its previous valid return anchor.
+This principle reuses existing native Local Causal Learning, LiveCircle, Development Obligation Ledger and RADIO-CODEFORGE contracts; no new execution authority, workflow owner, bridge, cross-system identity or runtime integration is created.
+
 ## Core Evolution v1 capability boundaries — 2026-10-17
 The native Structure Control authorizes scope only. Its Development Obligation Ledger, relational rehydration, native skill registry, local learning, parity review, and evidence dashboard are subordinate capabilities without independent decision/write authority. Source current is authoritative only for repository-native state; host/plugin release acceptance requires independent proof. No cloning LYVRA or CLIC identity/facets, no new controller, no change to product/runtime ownership, no automatic foreign mutation. Core may be explicitly foregrounded while retaining project return anchors.
