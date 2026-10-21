@@ -27,6 +27,8 @@
     "developmentSequence": [
       "rehydrate-current-state",
       "inspect-current-delta",
+      "reconstruct-working-history-and-original-intent",
+      "identify-proven-behavior-and-regression-constraints",
       "root-cause-analysis",
       "owner-layer-conflict-audit",
       "minimal-repair-plan",
@@ -36,7 +38,10 @@
       "github-force-daemon",
       "release-integrity",
       "promotion"
-    ]
+    ],
+    "mustInspectHistoricalRationaleAndProvenBaseline": true,
+    "mustPreserveFunctionalArchitectureUnlessProvenReasonToChange": true,
+    "mustCompareMeasuredOutcomeToBaseline": true
   },
   "learningSource": {
     "system": "666CODEFORGE",
@@ -138,7 +143,12 @@
     "no-source-identity-import",
     "no-source-trigger-import",
     "no-source-authority-import",
-    "no-blind-full-rewrite"
+    "no-blind-full-rewrite",
+    "remember-proven-architecture-before-redesign",
+    "understand-existing-behavior-before-refinement",
+    "minimal-refinement-before-new-component",
+    "measure-outcome-against-working-baseline",
+    "no-defect-no-production-write"
   ],
   "threeChecksLearningByDoing": {
     "policy": "MAX_3_CHECKS_THEN_LEARNING_BY_DOING",
