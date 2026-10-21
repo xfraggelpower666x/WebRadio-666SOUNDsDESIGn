@@ -22,7 +22,11 @@
     "continuity-daemon-principle",
     "readback-after-mutation",
     "no-silent-overwrite",
-    "history-supersession-awareness"
+    "history-supersession-awareness",
+    "historical-intent-and-proven-baseline-reconstruction",
+    "understand-before-refine",
+    "preserve-functioning-architecture",
+    "measured-causal-outcome-against-baseline"
   ],
   "radioNativeExtensions": [
     "player-audio-state-analysis",
@@ -30,7 +34,9 @@
     "worker-routing-and-cors-analysis",
     "cloudflare-deployment-analysis",
     "responsive-player-regression-analysis",
-    "runtime-non-infiltration-guard"
+    "runtime-non-infiltration-guard",
+    "stream-source-topology-preservation",
+    "mobile-network-transition-buffer-and-failover-evidence"
   ],
   "codexEscalation": {
     "enabled": true,
