@@ -835,5 +835,19 @@
     "no_stream_endpoint_mutation": true,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_MINIPLAYER_CANONICAL_RECOVERY_REAL_HOST_RETEST"
+  },
+  "preserve_understand_refine_codeforge_20261021": {
+    "status": "NATIVE_SOURCE_READBACK_VERIFIED_HOST_EFFECT_NOT_ASSERTED",
+    "scope": "ALL_666STREAM_REPO_PROJECTS_WITH_CHAT_LOCAL_ACTIVE_SCOPE",
+    "baseline_head": "10c13059220a019b3884528d321cd5c7ba8fc10a",
+    "backup_branch": "backup/pre-stream-understand-refine-codeforge-20261021",
+    "authority": "666STREAM_STRUCTURE_CONTROL/AUTHORITY_CONTRACT.md",
+    "codeforge_readme": "radio-codeforge/README.md",
+    "codeforge_config": "radio-codeforge/radio-codeforge.config.json",
+    "learning_profile": "radio-codeforge/learning-profile.json",
+    "principle": "REMEMBER_UNDERSTAND_REFINE_APPLY_VERIFY_LEARN",
+    "runtime_mutation": false,
+    "host_behavior": "NOT_INDEPENDENTLY_VERIFIED",
+    "return_anchor": "WEBRADIO_NETWORK_TRANSITION_RECOVERY_BASELINE_STUDY"
   }
 }
