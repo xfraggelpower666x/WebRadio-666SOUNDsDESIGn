@@ -295,17 +295,30 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   const renderFallbackFrame = () => {
   if (!running) return;
   refreshVisualizerTargets();
-  const eq = bars.map((bar) => {
-    const value = 0.025;
+  const synthetic = mobileLike() && audio && !audio.paused && !audio.muted && audio.readyState >= 2 && !document.hidden;
+  const phase = performance.now() / 245;
+  const eq = bars.map((bar, index) => {
+    const value = synthetic ? clamp(0.09 + Math.abs(Math.sin(phase + index * 0.39)) * (0.22 + Math.abs(Math.sin(phase * 0.51)) * 0.24), 0.04, 0.70) : 0.025;
     setBar(bar, value);
     return value;
   });
-  const meters = setMeters(0.015, 0.02, 0.015, 0.015, 0.015);
-  publish(0.015, 0.02, 'unavailable', eq, meters, { low:0.015, mid:0.015, high:0.015 });
+  const low = synthetic ? eq.slice(0, Math.max(1, Math.ceil(eq.length * 0.34))).reduce((a,b)=>a+b,0)/Math.max(1,Math.ceil(eq.length*0.34)) : 0.015;
+  const mid = synthetic ? eq[Math.floor(eq.length / 2)] || low : 0.015;
+  const high = synthetic ? eq[eq.length - 1] || low : 0.015;
+  const level = synthetic ? clamp((low + mid + high) / 3, 0, 1) : 0.015;
+  const meters = setMeters(level, level, low, mid, high);
+  // "synthetic" is visualization only; never represents measured acoustic data.
+  publish(level, level, synthetic ? 'synthetic' : 'unavailable', eq, meters, { low, mid, high });
 };
 
 const startFallback = () => {
-  renderFallbackFrame();
+  stopFallback();
+  const tick = () => {
+    if (!running) return;
+    renderFallbackFrame();
+    fallbackRafId = window.requestAnimationFrame(tick);
+  };
+  fallbackRafId = window.requestAnimationFrame(tick);
 };
 
 const stopFallback = () => {
@@ -482,6 +495,11 @@ count += 1;
       }
 
       const signalPresent = globalMax >= 3 || rms > 0.004;
+      if (!signalPresent && mobileLike() && audio && !audio.paused && audio.readyState >= 2) {
+        renderFallbackFrame();
+        rafId = window.requestAnimationFrame(frame);
+        return;
+      }
       if (bandEnvelope.length !== bandCount) bandEnvelope = new Array(bandCount).fill(0.012);
       if (bandReference.length !== bandCount) bandReference = new Array(bandCount).fill(18);
 
