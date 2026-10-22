@@ -3,7 +3,7 @@
   "systemId": "666PFS-666STREAM-DEPLOYMENT-001",
   "parentSystem": "666PFS",
   "namespace": "666PFS/Child_Systems/666STREAM_DEPLOYMENT",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "releaseClass": "commit-bound-post-deploy-readback-and-child-backup-bootstrap",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "productionBranch": "WebRadio-666SOUNDsDESIGn",
@@ -29,5 +29,9 @@
   "childAutoload": false,
   "secondBootstrap": false,
   "secondUpdateRoute": false,
-  "lyvra": "EXTERNAL_UNCHANGED"
+  "lyvra": "EXTERNAL_UNCHANGED",
+  "pfsControlRepository": "xfraggelpower666x/666PFS_CSM",
+  "pfsChildPath": "children/STREAM-5001/",
+  "backupAuthority": "GITHUB_666PFS_CSM",
+  "driveRole": "HISTORY_BACKUP_RECOVERY_ONLY"
 }
