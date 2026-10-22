@@ -48,6 +48,6 @@ test('asset mirrors contain only the referenced production set', async () => {
   assert.deepEqual(normalizedPublic, normalizedRoot);
   assert.ok(normalizedRoot.includes('boot-screen/lyvra-radio-boot.jpg'), 'central LYVRA radio boot image must be part of the mirrored production asset set');
   assert.ok(normalizedRoot.includes('boot-screen/666-cyber-hud-main-logo.webp'), 'Main Cyber HUD boot logo must be part of the mirrored production asset set');
-  assert.ok(normalizedRoot.includes('boot-screen/lyvra-cyberintro-background.webp'), 'LYVRA fullscreen CYBERINTRO background must be part of the mirrored production asset set');
+  assert.ok(normalizedRoot.includes('boot-screen/lyvra-cyberintro-background.jpg'), 'LYVRA fullscreen CYBERINTRO HQ background must be part of the mirrored production asset set');
   assert.ok(normalizedRoot.includes('main/header/666soundsdesign-lyvra-main-header.webp'), 'dedicated Main header image must be part of the mirrored production asset set');
 });
