@@ -14,7 +14,9 @@ test('PC EQ keeps logarithmic mapping while preserving calibrated visual headroo
   assert.match(eq, /const adaptiveResponse = Math\.pow\(relative, 0\.74\) \* 0\.14 \* localGate/);
   assert.match(eq, /clamp\(spectralResponse \* 0\.92 \+ adaptiveResponse, 0\.012, 1\)/);
   assert.match(eq, /visualCeiling: 'peak-dependent'/);
-  assert.doesNotMatch(eq, /Math\.sin|useHybrid|const mirrored|localPeak - average/);
+  assert.match(eq, /const synthetic = mobileLike\(\) && audio && !audio\.paused && !audio\.muted && audio\.readyState >= 2 && !document\.hidden/);
+  assert.match(eq, /synthetic \? 'synthetic' : 'unavailable'/);
+  assert.doesNotMatch(eq, /useHybrid|const mirrored|localPeak - average/);
 });
 
 test('balanced-headroom cache marker is mirrored', async () => {

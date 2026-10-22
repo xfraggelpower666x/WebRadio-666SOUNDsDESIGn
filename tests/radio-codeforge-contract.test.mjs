@@ -62,6 +62,8 @@ test('Radio-CodeForge chat-host integration is automatic for radio development a
   assert.deepEqual(chat.developmentSequence, [
     'rehydrate-current-state',
     'inspect-current-delta',
+    'reconstruct-working-history-and-original-intent',
+    'identify-proven-behavior-and-regression-constraints',
     'root-cause-analysis',
     'owner-layer-conflict-audit',
     'minimal-repair-plan',
