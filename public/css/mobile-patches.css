@@ -925,3 +925,18 @@
     -webkit-tap-highlight-color:transparent!important;
   }
 }
+
+
+/* S666_MAIN_IPHONE_VISUAL_FALLBACK_WRITER_V1_20261023
+   Main iPhone only. Consume canonical equalizer.js MeterBus values whether source is real or visual-only synthetic.
+   No desktop and no VELUNA selectors. */
+@media (max-width:760px){
+  html body[data-veluna-page="main"] #mffApp .mff-eq-bars i{
+    transform:scaleY(var(--mff-eq-scale,var(--eq-scale,.075)))!important;
+    opacity:var(--mff-eq-opacity,.60)!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-bottom-bars i{
+    transform:scaleY(calc(.34 + var(--v,.04) * .74))!important;
+    opacity:calc(.12 + var(--v,.04) * .88)!important;
+  }
+}
