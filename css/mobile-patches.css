@@ -940,3 +940,186 @@
     opacity:calc(.12 + var(--v,.04) * .88)!important;
   }
 }
+
+
+/* S666_MAIN_IPHONE_COMPACT_UI_V7_20261023
+   Scope hardlock: Main iPhone only. PC Main and VELUNA excluded.
+   Remove redundant card framing, keep all functions, and fit all four mobile actions in one visible row. */
+@media (max-width:760px){
+  html body[data-veluna-page="main"] #mffApp .mff-shell{
+    gap:3px!important;
+  }
+
+  html body[data-veluna-page="main"] #mffApp .mff-now{
+    flex-basis:112px!important;
+    height:112px!important;
+    min-height:112px!important;
+    max-height:112px!important;
+    padding:7px!important;
+  }
+
+  /* LED status = slim signal strip, not five oversized framed cards. */
+  html body[data-veluna-page="main"] #mffApp .mff-panel-led-panel{
+    flex:0 0 28px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    padding:0 4px!important;
+    gap:5px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-panel-led{
+    min-width:0!important;
+    width:auto!important;
+    height:26px!important;
+    min-height:26px!important;
+    max-height:26px!important;
+    padding:0 6px!important;
+    gap:5px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-panel-led i{
+    width:8px!important;
+    height:8px!important;
+    min-width:8px!important;
+    min-height:8px!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-panel-led b{
+    font-size:10px!important;
+    letter-spacing:.08em!important;
+  }
+
+  /* One compact action row: DISCORD · SKIP · MESSAGE · LOG. */
+  html body[data-veluna-page="main"] #mffApp .mff-discord-slot{
+    flex:0 0 38px!important;
+    width:100%!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    padding:0!important;
+    margin:0!important;
+    display:block!important;
+    overflow:visible!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-discord-slot>.smfp-version-badge{
+    display:none!important;
+  }
+  html body[data-veluna-page="main"] #mffApp #s666StageMobileActions{
+    width:100%!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-auto-rows:36px!important;
+    gap:4px!important;
+    padding:0!important;
+    margin:0!important;
+    align-items:stretch!important;
+    overflow:visible!important;
+  }
+  html body[data-veluna-page="main"] #mffApp #s666StageMobileActions>button{
+    width:100%!important;
+    min-width:0!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+    margin:0!important;
+    padding:0 3px!important;
+    border-radius:10px!important;
+    font-size:8.5px!important;
+    line-height:1.05!important;
+    letter-spacing:.03em!important;
+    white-space:normal!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+
+  /* Listener / bitrate / DJ become one information strip instead of three giant cards. */
+  html body[data-veluna-page="main"] #mffApp .mff-cards{
+    flex:0 0 52px!important;
+    width:100%!important;
+    height:52px!important;
+    min-height:52px!important;
+    max-height:52px!important;
+    padding:0!important;
+    margin:0!important;
+    gap:0!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    border:0!important;
+    border-top:1px solid rgba(22,255,243,.20)!important;
+    border-bottom:1px solid rgba(255,61,187,.16)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card{
+    width:100%!important;
+    height:52px!important;
+    min-height:52px!important;
+    max-height:52px!important;
+    padding:4px 6px!important;
+    margin:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:2px!important;
+    border:0!important;
+    border-right:1px solid rgba(22,255,243,.14)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card:last-child{
+    border-right:0!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card>div{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:4px!important;
+    min-width:0!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card .mff-ico{
+    font-size:10px!important;
+    line-height:1!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card small{
+    font-size:8px!important;
+    line-height:1!important;
+    letter-spacing:.10em!important;
+    white-space:nowrap!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card strong{
+    font-size:15px!important;
+    line-height:1!important;
+    letter-spacing:.02em!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    max-width:100%!important;
+  }
+  html body[data-veluna-page="main"] #mffApp .mff-card p{
+    display:none!important;
+  }
+
+  /* Reclaimed height goes to the actual EQ instead of decorative boxes. */
+  html body[data-veluna-page="main"] #mffApp .mff-eq{
+    min-height:128px!important;
+  }
+}
