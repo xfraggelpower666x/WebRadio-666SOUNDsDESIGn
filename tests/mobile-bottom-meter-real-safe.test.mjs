@@ -13,18 +13,19 @@ test('mobile bottom-meter mirrors remain byte-identical', () => {
   assert.equal(css, cssMirror);
 });
 
-test('mobile bottom meter uses only fresh real MeterBus data', () => {
+test('mobile bottom meter uses fresh canonical MeterBus data with visual-only synthetic fallback', () => {
   const start = js.indexOf('  var mobileBottomMeterState');
   const end = js.indexOf('  function bindEqTriggers()', start);
   assert.ok(start >= 0 && end > start);
   const block = js.slice(start, end);
   assert.ok(block.includes('window.__MeterBus'));
-  assert.ok(block.includes('bus.source === "real"'));
+  assert.ok(block.includes('bus.source === "real" || bus.source === "synthetic"'));
   assert.ok(block.includes('Date.now() - Number(bus.ts || 0) < 700'));
-  assert.ok(block.includes('audio && !audio.paused'));
+  assert.ok(block.includes('audio && !audio.paused && !audio.muted && !document.hidden'));
   assert.ok(block.includes('scaleX('));
-  assert.ok(block.includes('real-unavailable'));
-  for (const forbidden of ['Math.sin', 'pseudo', 'synthetic', 'AudioContext', 'createMediaElementSource', 'createAnalyser']) {
+  assert.ok(block.includes('meterbus-synthetic-visual-only'));
+  assert.ok(block.includes('signal-unavailable'));
+  for (const forbidden of ['Math.sin', 'pseudo', 'AudioContext', 'createMediaElementSource', 'createAnalyser']) {
     assert.ok(!block.includes(forbidden), forbidden);
   }
 });
