@@ -129,3 +129,18 @@ test('main mobile visual fallback remains explicitly synthetic and respects actu
  assert.match(main,/if \(!signalPresent && mobileLike\(\)/);
  assert.match(main,/if \(!running\) return/);
 });
+
+
+test('Main iPhone consumes visual-only fallback consistently across EQ and all meter surfaces',()=>{
+ const main=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+ const phase10=readFileSync(new URL('../public/js/phase10-stability-iphone-panel-hud.js',import.meta.url),'utf8');
+ const css=readFileSync(new URL('../public/css/mobile-patches.css',import.meta.url),'utf8');
+ assert.match(main,/\(bus\.source==='real'\|\|bus\.source==='synthetic'\)/);
+ assert.match(main,/meterbus-synthetic/);
+ assert.match(main,/visual-fallback-v1/);
+ assert.match(phase10,/bus\.source === "real" \|\| bus\.source === "synthetic"/);
+ assert.match(phase10,/meterbus-synthetic-visual-only/);
+ assert.match(css,/S666_MAIN_IPHONE_VISUAL_FALLBACK_WRITER_V1_20261023/);
+ assert.match(css,/var\(--mff-eq-scale,var\(--eq-scale,\.075\)\)/);
+ assert.match(css,/var\(--v,\.04\)/);
+});
