@@ -271,14 +271,15 @@ RULES:
     if(!fill) return;
     var audio = getAudio();
     var bus = window.__MeterBus;
-    var fresh = !!(bus && bus.source === "real" && typeof bus.level === "number" && Date.now() - Number(bus.ts || 0) < 700);
-    var level = fresh && audio && !audio.paused ? Math.max(0, Math.min(1, Number(bus.level) || 0)) : 0;
+    var busMode = bus && (bus.source === "real" || bus.source === "synthetic") ? bus.source : "";
+    var fresh = !!(busMode && typeof bus.level === "number" && Date.now() - Number(bus.ts || 0) < 700);
+    var level = fresh && audio && !audio.paused && !audio.muted && !document.hidden ? Math.max(0, Math.min(1, Number(bus.level) || 0)) : 0;
     mobileBottomMeterState.smooth = mobileBottomMeterState.smooth*.72 + level*.28;
     if(level === 0 && mobileBottomMeterState.smooth < .01) mobileBottomMeterState.smooth = 0;
     fill.style.setProperty("width", "100%", "important");
     fill.style.setProperty("transform", "scaleX(" + mobileBottomMeterState.smooth.toFixed(4) + ")", "important");
     fill.style.setProperty("opacity", fresh ? "1" : ".32", "important");
-    document.documentElement.setAttribute("data-mobile-bottom-meter-source", fresh ? "meterbus-real" : "real-unavailable");
+    document.documentElement.setAttribute("data-mobile-bottom-meter-source", fresh ? (busMode === "synthetic" ? "meterbus-synthetic-visual-only" : "meterbus-real") : "signal-unavailable");
   }
 
   function startMobileBottomMeter(){
@@ -773,7 +774,7 @@ RULES:
       rms = 0;
       document.documentElement.setAttribute("data-side-meter-signal","real-unavailable");
     }else{
-      document.documentElement.setAttribute("data-side-meter-signal", busFresh ? "meterbus-real" : "legacy-real-level");
+      document.documentElement.setAttribute("data-side-meter-signal", busFresh ? (bus && bus.source === "synthetic" ? "meterbus-synthetic-visual-only" : "meterbus-real") : "legacy-real-level");
     }
     var level = Math.max(0, Math.min(1, rms));
     sideMeterReactV1State.smooth = sideMeterReactV1State.smooth*.64 + level*.36;
