@@ -60,3 +60,24 @@ test('main root/public entrypoints carry the new mobile recovery cache keys', as
   assert.match(html, /phase10-stability-iphone-panel-hud\.js\?v=2026-09-20-mobile-recovery-v2/);
   assert.equal(await read('public/index.html'), html);
 });
+
+
+test('main iPhone V7 compacts decorative panels and keeps all four action buttons visible', async () => {
+  const css = await read('css/mobile-patches.css');
+  assert.match(css, /S666_MAIN_IPHONE_COMPACT_UI_V7_20261023/);
+  assert.match(css, /grid-template-columns:repeat\(4,minmax\(0,1fr\)\)!important/);
+  assert.match(css, /#mffApp \.mff-panel-led-panel\{[\s\S]*?border:0!important;[\s\S]*?background:transparent!important/);
+  assert.match(css, /#mffApp \.mff-cards\{[\s\S]*?height:52px!important;[\s\S]*?border-radius:0!important/);
+  assert.match(css, /#mffApp \.mff-card p\{\s*display:none!important/);
+  assert.equal(await read('public/css/mobile-patches.css'), css);
+});
+
+test('main iPhone visual fallback remains explicitly visual-only across EQ and bottom meter', async () => {
+  const html = await read('index.html');
+  const phase10 = await read('js/phase10-stability-iphone-panel-hud.js');
+  const css = await read('css/mobile-patches.css');
+  assert.match(html, /bus\.source==='real'\|\|bus\.source==='synthetic'/);
+  assert.match(html, /visual-fallback-v1/);
+  assert.match(phase10, /meterbus-synthetic-visual-only/);
+  assert.match(css, /S666_MAIN_IPHONE_VISUAL_FALLBACK_WRITER_V1_20261023/);
+});
