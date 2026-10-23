@@ -1738,7 +1738,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       var sourceIndex=source.length?Math.round((i/Math.max(1,count-1))*(source.length-1)):0;
       targets.push(mffClamp(Number(source[sourceIndex])||0,.012,.96));
     }
-    return {targets:targets,level:mffClamp(Number(bus&&bus.level)||0,.012,.96),pulse:mffClamp(Number(bus&&bus.pulse)||0,0,1),mode:'meterbus-real'};
+    return {targets:targets,level:mffClamp(Number(bus&&bus.level)||0,.012,.96),pulse:mffClamp(Number(bus&&bus.pulse)||0,0,1),mode:(bus&&bus.source==='synthetic'?'meterbus-synthetic':'meterbus-real')};
   }
 
   function mffCleanEqTargetsSynthetic(count){
@@ -1752,7 +1752,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     mffCleanEqEnsure(bars);
     var bus=window.__MeterBus||null;
-    var busFresh=!!(bus&&bus.ts&&(Date.now()-Number(bus.ts)<1000)&&bus.source==='real'&&Array.isArray(bus.eq));
+    var busFresh=!!(bus&&bus.ts&&(Date.now()-Number(bus.ts)<1000)&&(bus.source==='real'||bus.source==='synthetic')&&Array.isArray(bus.eq));
     var data=busFresh?null:mffCleanEqReadAnalyser();
     var pack=busFresh
       ? mffCleanEqTargetsFromMeterBus(bus,bars.length)
@@ -1786,7 +1786,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
     var app=q('#mffApp');
     if(app){
-      app.setAttribute('data-mff-eq-engine',pack.mode==='meterbus-real'?'canonical-meterbus-v15':'idle-no-fake-motion');
+      app.setAttribute('data-mff-eq-engine',pack.mode==='meterbus-real'?'canonical-meterbus-v15':(pack.mode==='meterbus-synthetic'?'visual-fallback-v1':'idle-no-fake-motion'));
       app.setAttribute('data-mff-meter-mode',pack.mode);
     }
 
