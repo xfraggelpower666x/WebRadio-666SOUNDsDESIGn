@@ -99,3 +99,16 @@ body > .s666-mute-button {
     max-height: 20px !important;
   }
 }
+
+
+/* S666_MAIN_IPHONE_MUTE_FIT_V6_20261023 — Main iPhone control-row fit only. */
+@media (max-width:760px){
+  body[data-veluna-page="main"] #mffApp .mff-controls .s666-mute-button{
+    width:100%!important; min-width:0!important; max-width:none!important;
+    height:44px!important; min-height:44px!important; max-height:44px!important;
+    padding:0 2px!important; gap:2px!important;
+    font-size:9px!important; letter-spacing:.02em!important;
+    overflow:hidden!important;
+  }
+  body[data-veluna-page="main"] #mffApp .mff-controls .s666-mute-icon{display:none!important}
+}
