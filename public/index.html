@@ -1041,18 +1041,18 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     if(!isMobile())return;
     ensureCanonicalRuntimeOwnerHost();
     qa('body > *').forEach(function(n){
-      if(n.id==='mffApp'||n.id==='mffAudio'||n.id==='s666CanonicalRuntimeOwners'||n.id==='s666DiscordGateOverlay'||n.id==='s666DiscordDeniedOverlay'||n.id==='s666SoundControlOverlay'||n.id==='s666MsgOverlay'||n.id==='fp-admin-overlay')return;
+      if(n.id==='mffApp'||n.id==='mffAudio'||n.id==='s666CentralBoot'||n.id==='s666CanonicalRuntimeOwners'||n.id==='s666DiscordGateOverlay'||n.id==='s666DiscordDeniedOverlay'||n.id==='s666SoundControlOverlay'||n.id==='s666MsgOverlay'||n.id==='fp-admin-overlay')return;
       if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
       n.setAttribute('data-smfp-hidden','1');
       try{n.remove()}catch(e){}
     });
     qa('header,main:not(.mff-shell),.hero,.hero-image,.site-header,.main-header,.mobile-shell,.player-shell,.hud-panel,.panel:not(.mff-now):not(.mff-card):not(.mff-eq):not(.mff-controls):not(.mff-bottom),#mfmApp,#mobileHudDomMeterRepair,#mobileControlsLayerReset,#mobileInlineTopControlsForce,#mobileTopControlsInBoostPanel,#mobileTransportRepair,.mobile-hud-dom-meter-repair,.mobile-transport-repair,.mobile-top-controls-in-boost,.mobile-dom-side-meter,.mobile-dom-bottom-guard,.mobile-dom-bottom-track,.mobile-dom-bottom-left,.mobile-dom-bottom-right,.bottom-meter,.bottom-levelmeter,.gesture-guard,.mobile-bottom-meter,[class*="bottom"][class*="meter"],[class*="bottom"][class*="guard"],[class*="gesture"][class*="guard"]').forEach(function(n){
-      if(n.closest&&n.closest('#mffApp,#s666CanonicalRuntimeOwners,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
+      if(n.closest&&n.closest('#mffApp,#s666CentralBoot,#s666CanonicalRuntimeOwners,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
       n.setAttribute('data-smfp-hidden','1');
       try{n.remove()}catch(e){}
     });
     qa('body *').forEach(function(n){
-      if(n.closest&&n.closest('#mffApp,#s666CanonicalRuntimeOwners,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
+      if(n.closest&&n.closest('#mffApp,#s666CentralBoot,#s666CanonicalRuntimeOwners,#s666SoundControlOverlay,#s666MsgOverlay,#fp-admin-overlay'))return;
       if(n.tagName==='SCRIPT'||n.tagName==='STYLE'||n.tagName==='LINK')return;
       var r=n.getBoundingClientRect?n.getBoundingClientRect():null;
       if(!r)return;
