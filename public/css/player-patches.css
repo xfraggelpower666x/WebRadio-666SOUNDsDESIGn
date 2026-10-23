@@ -144,7 +144,7 @@
   body[data-smfp-active="1"]{
     padding:calc(4px + env(safe-area-inset-top)) 0 calc(14px + env(safe-area-inset-bottom)) 0!important;
   }
-  body[data-smfp-active="1"] > *:not(#mffApp):not(script):not(style):not(link):not(#mffAudio):not(#s666DiscordGateOverlay):not(#s666DiscordDeniedOverlay):not(#mffAlertEditorBackdrop):not(#mffExtremeBoostBackdrop):not(#playerAlertReceiveBackdrop):not(#s666SoundControlOverlay):not(#s666MsgOverlay):not(#fp-admin-overlay){
+  body[data-smfp-active="1"] > *:not(#mffApp):not(#s666CentralBoot):not(script):not(style):not(link):not(#mffAudio):not(#s666DiscordGateOverlay):not(#s666DiscordDeniedOverlay):not(#mffAlertEditorBackdrop):not(#mffExtremeBoostBackdrop):not(#playerAlertReceiveBackdrop):not(#s666SoundControlOverlay):not(#s666MsgOverlay):not(#fp-admin-overlay){
     display:none!important;
     visibility:hidden!important;
     opacity:0!important;
