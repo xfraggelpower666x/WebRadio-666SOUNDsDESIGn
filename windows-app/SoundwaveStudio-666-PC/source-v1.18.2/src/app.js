@@ -122,6 +122,7 @@ const seekProgressFill = document.getElementById('seek-progress-fill');
 const currentTimeLabel = document.getElementById('current-time');
 const totalDurationLabel = document.getElementById('total-duration');
 const volumeSlider = document.getElementById('volume-slider');
+const btnMute = document.getElementById('btn-mute');
 
 // Modal Elements
 const exportModal = document.getElementById('export-modal');
@@ -226,9 +227,37 @@ function setupEventListeners() {
     seekProgressFill.style.width = `${pct}%`;
   });
 
+  const updateMuteUi = () => {
+    if (!btnMute) return;
+    const muted = !!audioElement.muted;
+    btnMute.classList.toggle('is-muted', muted);
+    btnMute.setAttribute('aria-pressed', String(muted));
+    btnMute.title = muted ? 'Unmute audio' : 'Mute audio';
+    btnMute.querySelector('.mute-icon-on')?.classList.toggle('hidden', muted);
+    btnMute.querySelector('.mute-icon-off')?.classList.toggle('hidden', !muted);
+    const label = btnMute.querySelector('small');
+    if (label) label.textContent = muted ? 'MUTED' : 'MUTE';
+  };
+
   volumeSlider.addEventListener('input', () => {
     audioElement.volume = volumeSlider.value;
+    if (Number(volumeSlider.value) > 0 && audioElement.muted) audioElement.muted = false;
+    updateMuteUi();
   });
+
+  btnMute?.addEventListener('click', () => {
+    audioElement.muted = !audioElement.muted;
+    try { localStorage.setItem('rw666-player-muted', audioElement.muted ? '1' : '0'); } catch {}
+    updateMuteUi();
+  });
+
+  audioElement.addEventListener('volumechange', () => {
+    try { localStorage.setItem('rw666-player-muted', audioElement.muted ? '1' : '0'); } catch {}
+    updateMuteUi();
+  });
+
+  try { audioElement.muted = localStorage.getItem('rw666-player-muted') === '1'; } catch {}
+  updateMuteUi();
 
   // Customization controls
   selectVisualizerStyle.addEventListener('change', (e) => {
