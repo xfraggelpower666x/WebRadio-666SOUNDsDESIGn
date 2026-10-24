@@ -474,6 +474,14 @@ function drawFrame() {
     mid = (midSum / 55) / 255;
     treble = (trebleSum / (bufferLength - 65)) / 255;
     volume = Math.sqrt(volume / bufferLength) / 255;
+
+    // Real analyzer-driven cyber LED meters. No synthetic/random level animation.
+    const ledLow=document.getElementById('rw-led-low');
+    const ledMid=document.getElementById('rw-led-mid');
+    const ledHigh=document.getElementById('rw-led-high');
+    if(ledLow)ledLow.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,bass))));
+    if(ledMid)ledMid.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,mid))));
+    if(ledHigh)ledHigh.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,treble))));
     
     // Dynamic diagnostics tags updates
     diagBass.textContent = bass.toFixed(2);
