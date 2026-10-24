@@ -103,6 +103,11 @@ check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-re
 check(/window\.SVMilkdropCycle=Object\.freeze/.test(text('src/vendor/cayatur/milkdrop-cycle.js')),'milkdrop-cycle-layer');
 check(/hardCutBass/.test(integration)&&/hardCutTreb/.test(integration),'milkdrop-real-audio-hardcut-controls');
 check(/milkdrop-never-repeat/.test(html)&&/milkdrop-lock/.test(html)&&/milkdrop-auto/.test(html),'milkdrop-overlay-advanced-controls');
+check(/openMilkdropPack/.test(text('preload.js'))&&/dialog:openMilkdropPack/.test(main),'milkdrop-pack-import-ipc');
+check(/MAX_FILES=128/.test(main)&&/MAX_TOTAL=16\*1024\*1024/.test(main),'milkdrop-pack-import-bounds');
+check(/SVPresets\?\.byKind\?\.\('milkdrop'\)/.test(integration),'milkdrop-dynamic-library-consumer');
+check(/milkdropLiveSyncId/.test(integration)&&/importedMilkdrop:\{id:lp\.id/.test(integration),'milkdrop-follower-source-sync');
+check(/new window\.SVMilkdrop\.Preset|new window\.SVMilkdrop\?\.Preset/.test(integration)||/new window\.SVMilkdrop\.Preset/.test(integration),'milkdrop-import-compatibility-probe');
 const mdTest=cp.spawnSync(process.execPath,[path.join(root,'tests/milkdrop-control-layer.test.cjs')],{encoding:'utf8'});
 check(mdTest.status===0,'milkdrop-control-layer-node-test');
 if(mdTest.status!==0)fail.push((mdTest.stderr||mdTest.stdout||'').trim());
