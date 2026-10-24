@@ -37,9 +37,9 @@
 <div class="remote-row"><input id="radio-password" class="custom-input" type="password" placeholder="Admin password"><button id="radio-login" class="btn btn-secondary">LOGIN</button><button id="radio-skip" class="btn btn-secondary">AUTODJ SKIP</button></div>
 <textarea id="player-message" class="custom-input" maxlength="240" placeholder="Player Messenger · 240 chars"></textarea><button id="player-message-send" class="btn btn-secondary">SEND → PLAYERS</button><div id="player-message-receive" class="file-meta-tag">PLAYER MESSENGER · WAITING</div>
 <textarea id="discord-message" class="custom-input" maxlength="1800" placeholder="Discord message"></textarea><div class="remote-row"><button id="discord-send" class="btn btn-secondary">SEND → DISCORD</button><button id="discord-now" class="btn btn-secondary">NOW PLAYING</button></div>
-<div id="radio-action-state" class="file-meta-tag">REMOTE · READY</div>
+<div id="radio-action-state" class="file-meta-tag">REMOTE · READY</div><div id="radio-runtime-health" class="file-meta-tag">REMOTE HEALTH · CHECKING</div>
 </div>
-<div id="soundcloud-controls" class="source-pane hidden"><div class="soundcloud-library-head"><strong>666SOUNDsDESIGN · Fraggelpower666</strong><button id="soundcloud-library-refresh" class="btn btn-secondary">REFRESH MY MUSIC</button></div><div id="soundcloud-library" class="soundcloud-library"><div class="file-meta-tag">Library loads from the official SoundCloud API.</div></div><input id="soundcloud-url" class="custom-input" placeholder="Optional: SoundCloud track / playlist URL"><button id="soundcloud-load" class="btn btn-secondary">LOAD URL</button><button id="soundcloud-prev" class="btn btn-secondary">◀ PREV</button><button id="soundcloud-next" class="btn btn-secondary">NEXT ▶</button><button id="soundcloud-open" class="btn btn-secondary">OPEN ON SOUNDCLOUD</button><div id="soundcloud-queue" class="file-meta-tag">Queue · 0 / 0</div><div class="file-meta-tag">Audio source: SoundCloud · creator attribution shown after resolve</div><div id="soundcloud-state" class="file-meta-tag">Secure Main-Process resolver · credentials not stored in renderer</div></div>
+<div id="soundcloud-controls" class="source-pane hidden"><div class="soundcloud-library-head"><strong>666SOUNDsDESIGN · Fraggelpower666</strong><button id="soundcloud-library-refresh" class="btn btn-secondary">REFRESH MY MUSIC</button></div><div id="soundcloud-library" class="soundcloud-library"><div class="file-meta-tag">Library loads from the official SoundCloud API.</div></div><input id="soundcloud-url" class="custom-input" placeholder="Optional: SoundCloud track / playlist URL"><button id="soundcloud-load" class="btn btn-secondary">LOAD URL</button><button id="soundcloud-prev" class="btn btn-secondary">◀ PREV</button><button id="soundcloud-next" class="btn btn-secondary">NEXT ▶</button><button id="soundcloud-open" class="btn btn-secondary">OPEN ON SOUNDCLOUD</button><div id="soundcloud-queue" class="file-meta-tag">Queue · 0 / 0</div><div class="file-meta-tag">Audio source: SoundCloud · creator attribution shown after resolve</div><div id="soundcloud-state" class="file-meta-tag">Secure Main-Process resolver · credentials not stored in renderer</div><div id="soundcloud-runtime-health" class="file-meta-tag">SOUNDCLOUD HEALTH · CHECKING</div></div>
 </div>
 
         
@@ -340,6 +340,13 @@
           <div class="rw-diag-toolbar">
             <button id="rw-diag-refresh" class="btn btn-secondary" type="button">REFRESH</button>
             <button id="rw-diag-export" class="btn btn-secondary" type="button">EXPORT JSON</button>
+          </div>
+          <div class="control-group">
+            <label for="app-language">UI LANGUAGE / SPRACHE</label>
+            <select id="app-language" class="custom-select">
+              <option value="de">Deutsch</option>
+              <option value="en">English</option>
+            </select>
           </div>
           <div class="file-meta-tag" id="rw-diag-state">READY</div>
           <h3 class="section-subtitle">Displays / Monitor</h3>
