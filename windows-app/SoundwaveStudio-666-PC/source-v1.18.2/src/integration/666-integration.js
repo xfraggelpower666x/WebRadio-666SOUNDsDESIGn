@@ -188,16 +188,43 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   const milkdropGpuStatus=q('#milkdrop-gpu-status');
   const milkdropHistory=[];
   let milkdropLastIndex=milkdropPreset?.selectedIndex??0;
+  let milkdropLibraryFilter='all';
+  let personalMilkdropDoubles=[];
+  let personalMilkdropMeta=null;
+
+  const personalStateText=()=>{
+    const el=q('#milkdrop-personal-state');
+    if(!el)return;
+    if(!personalMilkdropMeta?.installed){el.textContent='PERSONAL LIBRARY · NOT INSTALLED';return;}
+    el.textContent=`PERSONAL LIBRARY · ${personalMilkdropMeta.milk} .MILK · ${personalMilkdropMeta.milk2} .MILK2 · TOP100 ${personalMilkdropMeta.top100Count||0}`;
+  };
+
   const refreshMilkdropPresetOptions=(preferredId)=>{
-    if(!milkdropPreset)return;
-    const list=window.SVPresets?.byKind?.('milkdrop')||window.SVMilkdropBuiltins||[];
+    if(!milkdropPreset)return [];
+    let list=window.SVPresets?.byKind?.('milkdrop')||window.SVMilkdropBuiltins||[];
+    if(milkdropLibraryFilter==='classic')list=list.filter(p=>!p.personal||p.format==='milk');
+    if(milkdropLibraryFilter==='top100')list=list.filter(p=>p.top100===true);
     const current=preferredId||milkdropPreset.value;
     milkdropPreset.replaceChildren();
+
+    if(milkdropLibraryFilter==='double'){
+      for(const p of personalMilkdropDoubles){
+        const o=document.createElement('option');
+        o.value=String(p.id||'');
+        o.textContent=String(p.name||p.id||'MilkDrop3 Double')+' · DOUBLE · INDEXED';
+        o.disabled=true;
+        milkdropPreset.appendChild(o);
+      }
+      if(milkdropState)milkdropState.textContent=`MilkDrop3 double presets · ${personalMilkdropDoubles.length} indexed · native .milk2 renderer pending`;
+      return personalMilkdropDoubles;
+    }
+
     for(const p of list){
       const o=document.createElement('option');
       o.value=String(p.id||'');
       o.textContent=String(p.name||p.id||'MilkDrop');
-      if(!p.builtin)o.textContent+=' · IMPORT';
+      if(p.personal)o.textContent+=(p.top100?' · PERSONAL · TOP100':' · PERSONAL');
+      else if(!p.builtin)o.textContent+=' · IMPORT';
       milkdropPreset.appendChild(o);
     }
     if([...milkdropPreset.options].some(o=>o.value===current))milkdropPreset.value=current;
@@ -205,7 +232,30 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
     milkdropLastIndex=milkdropPreset.selectedIndex;
     return list;
   };
+
+  const installPersonalMilkdropLibrary=lib=>{
+    personalMilkdropMeta=lib||null;
+    personalMilkdropDoubles=Array.isArray(lib?.doubles)?lib.doubles:[];
+    let accepted=0;
+    for(const item of lib?.presets||[]){
+      if(!item?.source)continue;
+      window.SVPresets?.upsert?.({
+        id:item.id,name:item.name||item.relativePath||item.id,source:item.source,
+        kind:'milkdrop',engine:'milkdrop',builtin:false,personal:true,format:'milk',
+        top100:item.top100===true,relativePath:item.relativePath||''
+      });
+      accepted++;
+    }
+    personalStateText();
+    refreshMilkdropPresetOptions();
+    return accepted;
+  };
+
   refreshMilkdropPresetOptions();
+  window.api?.personalMilkdropLibrary?.().then(lib=>{
+    const accepted=installPersonalMilkdropLibrary(lib);
+    if(lib?.installed&&milkdropState)milkdropState.textContent=`Personal library ready · ${accepted} classic presets renderable · ${lib.milk2||0} double presets indexed`;
+  }).catch(()=>{});
   const milkdropActivate=()=>{q('#visual-engine').value='milkdrop';q('#visual-engine').dispatchEvent(new Event('change',{bubbles:true}));syncVisual();if(milkdropState)milkdropState.textContent='MilkDrop active · GPU feedback renderer';};
   q('#milkdrop-activate')?.addEventListener('click',milkdropActivate);
   const selectMilkdropIndex=(index,remember=true)=>{
@@ -230,6 +280,38 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   // Controlled MilkDrop import: text-only .milk preset, max size enforced in main process.
   q('#milkdrop-import').onclick=async()=>{try{const f=await window.api.openMilkdrop();if(!f)return;let compat='COMPATIBILITY · UNKNOWN';try{const probe=window.SVMilkdrop?.Preset?new window.SVMilkdrop.Preset(f.source,{accurate:true,name:f.name}):null;if(probe){const errs=Array.isArray(probe.errors)?probe.errors:[];const waves=Array.isArray(probe.waves)?probe.waves.filter(x=>x?.enabled).length:0;const shapes=Array.isArray(probe.shapes)?probe.shapes.filter(x=>x?.enabled).length:0;const warp=String(probe.file?.warpShader||'').trim()?1:0;const comp=String(probe.file?.compShader||'').trim()?1:0;compat=(errs.length?'PARTIAL':'PASS')+` · WAVES ${waves} · SHAPES ${shapes} · WARP ${warp} · COMP ${comp}`+(errs.length?` · WARN ${errs.length}`:'');}}catch(err){compat='PARTIAL · PARSER '+String(err.message||err).slice(0,80);}importedMilkdrop={id:'imported:'+f.name,name:f.name,source:f.source,kind:'milkdrop',engine:'milkdrop',builtin:false};window.SVPresets?.upsert?.(importedMilkdrop);refreshMilkdropPresetOptions(importedMilkdrop.id);milkdropActivate();if(milkdropState)milkdropState.textContent='Imported .milk · '+f.name+' · '+compat;}catch(e){if(milkdropState)milkdropState.textContent='MilkDrop import error · '+e.message;state('MILKDROP IMPORT ERROR · '+e.message);}};
   milkdropPreset?.addEventListener('change',()=>{if(milkdropPreset.selectedIndex!==milkdropLastIndex){milkdropHistory.push(milkdropLastIndex);if(milkdropHistory.length>64)milkdropHistory.shift();milkdropLastIndex=milkdropPreset.selectedIndex;}const selected=window.SVPresets?.get?.(milkdropPreset.value);importedMilkdrop=selected&&!selected.builtin?{id:selected.id,name:selected.name||selected.id,source:selected.source,kind:'milkdrop',engine:'milkdrop'}:null;milkdropLiveSyncId='';if(milkdropState)milkdropState.textContent='Preset · '+milkdropPreset.options[milkdropPreset.selectedIndex]?.textContent;});
+
+  q('#milkdrop-import-personal')?.addEventListener('click',async()=>{
+    try{
+      if(milkdropState)milkdropState.textContent='Personal MilkDrop library · importing ZIP…';
+      const stateResult=await window.api.importMilkdropPersonalLibrary();
+      if(!stateResult)return;
+      const lib=await window.api.personalMilkdropLibrary();
+      const accepted=installPersonalMilkdropLibrary(lib);
+      milkdropLibraryFilter='all';
+      refreshMilkdropPresetOptions();
+      if(milkdropState)milkdropState.textContent=`Personal library installed · ${accepted} .milk renderable · ${lib.milk2||0} .milk2 indexed · LICENSE RETAINED`;
+    }catch(e){
+      if(milkdropState)milkdropState.textContent='Personal library error · '+String(e.message||e);
+      state('MILKDROP PERSONAL LIBRARY ERROR · '+String(e.message||e));
+    }
+  });
+
+  const setMilkdropFilter=filter=>{
+    milkdropLibraryFilter=filter;
+    const list=refreshMilkdropPresetOptions();
+    if(milkdropState)milkdropState.textContent=`Library filter · ${filter.toUpperCase()} · ${list?.length||0}`;
+  };
+  q('#milkdrop-filter-all')?.addEventListener('click',()=>setMilkdropFilter('all'));
+  q('#milkdrop-filter-top100')?.addEventListener('click',()=>setMilkdropFilter('top100'));
+  q('#milkdrop-filter-classic')?.addEventListener('click',()=>setMilkdropFilter('classic'));
+  q('#milkdrop-filter-double')?.addEventListener('click',()=>setMilkdropFilter('double'));
+  q('#milkdrop-license')?.addEventListener('click',async()=>{
+    try{
+      const x=await window.api.personalMilkdropLibraryLicense();
+      if(milkdropState)milkdropState.textContent=x?.license?String(x.license).split(/\r?\n/).filter(Boolean)[0]:'Personal library license not installed';
+    }catch(e){if(milkdropState)milkdropState.textContent='License read error · '+String(e.message||e);}
+  });
 
   q('#milkdrop-import-pack')?.addEventListener('click',async()=>{
     try{
