@@ -433,6 +433,16 @@ registerIpc('intro:complete','intro', async()=>{
 registerIpc('workspace:overlay-open','main',(_e,payload)=>openDetachedOverlay(payload));
 registerIpc('workspace:overlay-state','main',()=>detachedOverlayState());
 registerIpc('workspace:overlay-focus','main',(_e,key)=>{const w=detachedOverlayWindows.get(String(key||''));if(w&&!w.isDestroyed()){w.show();w.focus();return {ok:true};}return {ok:false};});
+registerIpc('workspace:overlay-sync','main',(_e,key,payload={})=>{
+  const k=String(key||'');
+  if(!DETACHED_OVERLAY_KEYS.has(k))throw new Error('overlay_key_invalid');
+  const w=detachedOverlayWindows.get(k);
+  if(!w||w.isDestroyed())return {ok:false};
+  const html=payload.html===undefined?undefined:String(payload.html||'').slice(0,512*1024);
+  const controls=Array.isArray(payload.controls)?payload.controls.slice(0,256):undefined;
+  w.webContents.send('workspace:overlay-sync',{html,controls});
+  return {ok:true};
+});
 registerIpc('workspace:overlay-ready','overlay',(e)=>{const hit=Array.from(detachedOverlayWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id);return {ok:!!hit,key:hit?.[0]||''};});
 registerIpc('workspace:overlay-action','overlay',(_e,payload={})=>{if(!mainWindow||mainWindow.isDestroyed())return {ok:false};const key=String(payload.key||'');if(!DETACHED_OVERLAY_KEYS.has(key))throw new Error('overlay_key_invalid');const kind=String(payload.kind||'');if(!['input','change','click'].includes(kind))throw new Error('overlay_action_invalid');const id=String(payload.id||'').slice(0,120);if(!id)throw new Error('overlay_control_invalid');mainWindow.webContents.send('workspace:overlay-action',{key,kind,id,value:String(payload.value??'').slice(0,8192),checked:!!payload.checked});return {ok:true};});
 registerIpc('display:list','main', () => displayList());
