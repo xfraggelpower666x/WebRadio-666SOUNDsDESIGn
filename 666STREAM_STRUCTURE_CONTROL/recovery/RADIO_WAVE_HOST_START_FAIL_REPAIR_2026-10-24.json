@@ -1,0 +1,38 @@
+{
+  "schema": "666STREAM_RADIO_WAVE_HOST_START_FAIL_REPAIR_V1",
+  "system": "666STREAM",
+  "project": "WINDOWS_APP",
+  "product": "RADIO WAVE v6.66",
+  "observed_host_result": "USER_REPORT_EXECUTE_NO_VISIBLE_RESULT",
+  "prior_source_head": "6fece349422be82c6d4b3e69892a353de1ae4b4a",
+  "repaired_source_head": "968a095873fb8e12d0b0d994cb9dca7ef6090f46",
+  "recovery_branch": "backup/pre-radio-wave-fail-visible-startup-20261024",
+  "repair": [
+    "startup log in TEMP/RADIO-WAVE-v6.66-startup.log",
+    "uncaught exception visible error dialog",
+    "unhandled rejection visible error dialog",
+    "intro load failure logging and main-window fallback",
+    "intro renderer crash logging and main-window fallback",
+    "main UI load failure dialog",
+    "main renderer crash dialog",
+    "explicit assisted NSIS installer",
+    "desktop shortcut always",
+    "start menu shortcut",
+    "run after finish true",
+    "per-user install",
+    "elevation allowed"
+  ],
+  "windows_ci": {
+    "run_id": 40102481799,
+    "job_id": 120897292190,
+    "conclusion": "success",
+    "targeted_gates": "PASS_43_OF_43",
+    "installer_build": "PASS",
+    "installer_sha256": "f233f25e0070bebe7a2a3164f440cd49fca931a8756e1dd9359c963be75004aa",
+    "artifact_id": 12563008960,
+    "artifact_zip_sha256": "4d3e0652a1300070fec41600f481ad91afd34907f999d991b955d813ddfc2ab2"
+  },
+  "host_retest": "PENDING_USER_WINDOWS",
+  "pointer_updated": false,
+  "reason_pointer_not_updated": "WEITER_NOT_UPDATE"
+}
