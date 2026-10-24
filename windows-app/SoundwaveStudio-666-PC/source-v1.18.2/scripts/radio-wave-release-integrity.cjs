@@ -136,6 +136,10 @@ check(/milkdrop-import-personal/.test(html)&&/milkdrop-filter-top100/.test(html)
 check(/installPersonalMilkdropLibrary/.test(integration)&&/personalMilkdropDoubles/.test(integration),'personal-milkdrop-runtime-registration');
 check(/native \.milk2 renderer pending/.test(integration),'milk2-no-fake-compatibility');
 check(/\.milk renderable/.test(integration)&&/\.milk2 indexed/.test(integration),'personal-library-evidence-status');
+check(/id="btn-mute"/.test(html)&&/aria-pressed="false"/.test(html),'main-player-mute-ui');
+check(/audioElement\.muted = !audioElement\.muted/.test(text('src/app.js')),'main-player-real-mute-toggle');
+check(/rw666-player-muted/.test(text('src/app.js')),'main-player-mute-persistence');
+check(/mute-btn\.is-muted/.test(css),'main-player-cyber-mute-state');
 
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
