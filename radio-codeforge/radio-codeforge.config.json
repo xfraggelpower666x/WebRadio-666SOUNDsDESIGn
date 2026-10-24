@@ -69,7 +69,12 @@
     "current-before-history",
     "evidence-before-pass",
     "max-three-discovery-checks",
-    "learning-by-doing-outcome-loop"
+    "learning-by-doing-outcome-loop",
+    "peer-capability-evidence-classification",
+    "immutable-source-and-blob-gating",
+    "replay-supersession-guard",
+    "source-ci-host-separation",
+    "peer-permission-boundary-audit"
   ],
   "codexEscalation": {
     "enabled": true,
@@ -175,5 +180,29 @@
     "scope": "CURRENT_666STREAM_PROJECT_ONLY",
     "autonomousWrites": false,
     "foreignLearningMutation": false
+  },
+  "peerCapabilityAdapters": {
+    "lyvraSuperCodeForge": {
+      "enabled": true,
+      "mode": "read-only-capability-adaptation",
+      "profile": "radio-codeforge/peers/lyvra-supercodeforge.profile.json",
+      "adapter": "radio-codeforge/peers/lyvra-supercodeforge-peer-adapter.mjs",
+      "tests": "radio-codeforge/peers/lyvra-supercodeforge-peer-adapter.test.mjs",
+      "authorityImport": false,
+      "identityImport": false,
+      "triggerImport": false,
+      "foreignWrites": false,
+      "foreignActivation": false,
+      "noNewRouter": true,
+      "evidenceSeparation": [
+        "SOURCE",
+        "CI",
+        "DELIVERY",
+        "ADOPTION",
+        "HOST"
+      ],
+      "replaySupersessionGuard": true,
+      "immutableSourceRequired": true
+    }
   }
 }
