@@ -341,6 +341,10 @@ function resizeCanvas() {
 }
 
 function fitVisualizerToViewport() {
+  if(window.RWVisualFrame?.fit){
+    window.RWVisualFrame.fit();
+    return;
+  }
   const outerFrame=document.getElementById('video-frame-outer');
   const viewport=document.querySelector('.preview-viewport-container');
   if(!outerFrame||!viewport)return;
