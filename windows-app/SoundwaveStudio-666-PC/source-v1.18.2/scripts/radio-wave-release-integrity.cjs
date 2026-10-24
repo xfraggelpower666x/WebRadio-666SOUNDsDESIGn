@@ -62,6 +62,11 @@ check(/show:\s*false/.test(main),'main-starts-hidden');
 check(/destroyIntroWindow\(\)/.test(main),'intro-destroy-after-handoff');
 check(/lyvra:system-start/.test(main),'system-start-event');
 check(/setTimeout\([^]*?14000\)/.test(main),'intro-failsafe');
+check(/RADIO-WAVE-v6\.66-startup\.log/.test(main),'startup-log-path');
+check(/showErrorBox\('RADIO WAVE v6\.66 · Startup Error'/.test(main),'startup-error-dialog');
+check(/INTRO_LOAD_FAIL/.test(main)&&/MAIN_LOAD_FAIL/.test(main),'startup-load-failure-evidence');
+check(pkg.build?.nsis?.runAfterFinish===true,'nsis-run-after-finish');
+check(pkg.build?.nsis?.createDesktopShortcut==='always','nsis-desktop-shortcut');
 
 const integration=text('src/integration/666-integration.js');
 check(/getByteFrequencyData/.test(integration)&&/getByteTimeDomainData/.test(integration),'real-analyser-data');
