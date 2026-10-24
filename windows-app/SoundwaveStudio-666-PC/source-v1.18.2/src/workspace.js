@@ -78,7 +78,12 @@
       double:'MilkDrop3-Doppelpresets (.milk2) anzeigen.',
       license:'Lizenz der lokalen persönlichen MilkDrop-Bibliothek anzeigen.',
       fullscreen:'Visualizer im Vollbild anzeigen.',
-      export:'Videoexport starten.'
+      export:'Videoexport starten.',
+      skip:'Aktuellen AutoDJ-Titel überspringen. Benötigt eine gültige Admin-Anmeldung.',
+      discord:'Nachricht an Discord senden. Benötigt eine gültige Admin-Anmeldung.',
+      discordNow:'Aktuellen Titel manuell als Now Playing an Discord senden.',
+      messenger:'Nachricht an die verbundenen Player senden.',
+      soundcloud:'SoundCloud-Quelle öffnen oder laden. Der API-Zugang muss konfiguriert sein.'
     };
     const en={
       detachDock:'Detach the menu bar as its own window and move it to another monitor.',
@@ -93,7 +98,12 @@
       double:'Show MilkDrop3 double presets (.milk2).',
       license:'Show the license for the local personal MilkDrop library.',
       fullscreen:'Show the visualizer in fullscreen.',
-      export:'Start video export.'
+      export:'Start video export.',
+      skip:'Skip the current AutoDJ track. Requires a valid admin login.',
+      discord:'Send a message to Discord. Requires a valid admin login.',
+      discordNow:'Send the current track to Discord as manual Now Playing.',
+      messenger:'Send a message to connected players.',
+      soundcloud:'Open or load the SoundCloud source. API access must be configured.'
     };
     if(String(key).startsWith('open:')){
       const k=String(key).slice(5);
@@ -111,7 +121,10 @@
       'milkdrop-import-personal':'importPersonal','milkdrop-filter-top100':'top100',
       'milkdrop-filter-classic':'classic','milkdrop-filter-double':'double',
       'milkdrop-license':'license','btn-fullscreen':'fullscreen','btn-export':'export',
-      'rw-diag-export':'diagnostics'
+      'rw-diag-export':'diagnostics','radio-skip':'skip','discord-send':'discord',
+      'discord-now':'discordNow','player-message-send':'messenger','soundcloud-load':'soundcloud',
+      'soundcloud-library-refresh':'soundcloud','soundcloud-prev':'soundcloud','soundcloud-next':'soundcloud',
+      'soundcloud-open':'soundcloud'
     };
     return map[el?.id]||'';
   };
