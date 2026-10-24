@@ -1196,3 +1196,34 @@ body.rw-dock-collapsed .rw-window-dock{transform:translateX(118px);opacity:.08;p
 .radio-status-panel.rw-draggable-status .radio-status-grid{
   grid-template-columns:max-content minmax(0,1fr);
 }
+
+
+/* Adaptive content scaling driven by workspace ResizeObserver */
+.rw-floating-window-body{
+  --rw-content-scale:1;
+  zoom:var(--rw-content-scale);
+  width:calc(100% / var(--rw-content-scale));
+  height:calc(100% / var(--rw-content-scale));
+  overflow:hidden!important;
+}
+.rw-floating-window-body[data-compact="1"]{
+  padding:6px;
+}
+.rw-floating-window-body[data-compact="1"] .control-group{
+  margin-bottom:5px;
+}
+.rw-floating-window-body[data-compact="1"] .section-subtitle{
+  display:none;
+}
+.rw-floating-window-body[data-compact="1"] .btn{
+  min-height:28px;
+}
+.rw-floating-window-body[data-compact="1"] textarea{
+  min-height:44px;
+  max-height:64px;
+}
+
+/* App-level resize should never introduce page scrollbars */
+html,body,.app-container,.preview-area,.preview-viewport-container{
+  overflow:hidden!important;
+}
