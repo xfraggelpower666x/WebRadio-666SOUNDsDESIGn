@@ -4,6 +4,8 @@
   const SETTINGS='rw666-ui-settings-v1';
   const q=s=>document.querySelector(s);
   const qa=s=>Array.from(document.querySelectorAll(s));
+  const outputMode=new URLSearchParams(location.search).get('output')==='1';
+  if(outputMode)return;
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   const safeParse=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback;}catch{return fallback;}};
 
@@ -48,6 +50,7 @@
   document.body.appendChild(dock);
 
   const windows=new Map();
+  const detached=new Set();
   let z=30;
 
   function stateFor(key,def){
@@ -119,6 +122,7 @@
       saveWorkspace();return;
     }
     const win=windows.get(key);if(!win)return;
+    if(detached.has(key)){window.api?.focusDetachedOverlay?.(key).catch(()=>{});return;}
     win.classList.remove('rw-window-closed');
     bringToFront(win);clampWindow(win);saveWorkspace();
   }
@@ -132,6 +136,34 @@
     }
     const win=windows.get(key);if(!win)return;
     win.classList.add('rw-window-closed');saveWorkspace();
+  }
+
+  function controlsSnapshot(win){
+    return qaFrom(win,'input[id],select[id],textarea[id],button[id]').map(el=>({
+      id:el.id,tag:el.tagName,type:el.type||'',value:el.value??'',checked:!!el.checked,disabled:!!el.disabled
+    }));
+  }
+  function qaFrom(root,sel){return Array.from(root?.querySelectorAll?.(sel)||[]);}
+  async function detachWindow(key,restoring=false){
+    const win=windows.get(key);if(!win||detached.has(key)||!window.api?.openDetachedOverlay)return false;
+    const def=sectionDefs.find(x=>x.key===key);if(!def)return false;
+    const body=win.querySelector('.rw-floating-window-body');
+    const r=win.getBoundingClientRect();
+    try{
+      const res=await window.api.openDetachedOverlay({
+        key,title:def.title,html:body?.innerHTML||'',
+        controls:controlsSnapshot(win),
+        width:Math.max(320,Math.round(r.width)),height:Math.max(220,Math.round(r.height))
+      });
+      if(!res?.ok)return false;
+      detached.add(key);
+      win.classList.add('rw-window-closed','rw-window-detached');
+      if(!restoring)saveWorkspace();
+      return true;
+    }catch(e){
+      console.error('Detach overlay failed',key,e);
+      return false;
+    }
   }
 
   function makeDraggable(win,handle,key,boundsProvider=()=>document.documentElement){
@@ -172,12 +204,13 @@
 
     const head=document.createElement('header');
     head.className='rw-floating-window-head';
-    head.innerHTML=`<span class="rw-window-grip">⠿</span><strong>${def.icon} ${def.title}</strong><button type="button" class="rw-window-close" aria-label="Close ${def.title}">×</button>`;
+    head.innerHTML=`<span class="rw-window-grip">⠿</span><strong>${def.icon} ${def.title}</strong><button type="button" class="rw-window-detach" aria-label="Detach ${def.title} to another monitor" title="Detach to another monitor">↗</button><button type="button" class="rw-window-close" aria-label="Close ${def.title}">×</button>`;
     const body=document.createElement('div');body.className='rw-floating-window-body';
     def.node.classList.add('rw-window-content');body.appendChild(def.node);
     win.append(head,body);document.body.appendChild(win);
     windows.set(def.key,win);
 
+    head.querySelector('.rw-window-detach').addEventListener('click',()=>detachWindow(def.key));
     head.querySelector('.rw-window-close').addEventListener('click',()=>closeWindow(def.key));
     win.addEventListener('pointerdown',()=>bringToFront(win));
     win.addEventListener('mouseup',saveWorkspace);
@@ -218,7 +251,7 @@
 
   // Keep the existing top button as dock toggle rather than old scrolling-sidebar toggle.
   window.RWWorkspace=Object.freeze({
-    open:openWindow,close:closeWindow,
+    open:openWindow,close:closeWindow,detach:detachWindow,
     toggleDock(){
       document.body.classList.toggle('rw-dock-collapsed');
       saveWorkspace();
@@ -226,6 +259,29 @@
     },
     save(){saveSettings();saveWorkspace();}
   });
+
+  window.api?.onDetachedOverlayAction?.(payload=>{
+    const key=String(payload?.key||'');
+    const win=windows.get(key);
+    if(!win)return;
+    const el=document.getElementById(String(payload?.id||''));
+    if(!el||!win.contains(el))return;
+    if(payload.kind==='click'&&el.tagName==='BUTTON'){el.click();return;}
+    if(!el.matches('input,select,textarea'))return;
+    if(el.type==='checkbox'||el.type==='radio')el.checked=!!payload.checked;
+    else el.value=String(payload.value??'');
+    el.dispatchEvent(new Event(payload.kind==='input'?'input':'change',{bubbles:true}));
+  });
+  window.api?.onDetachedOverlayClosed?.(({key}={})=>{
+    const k=String(key||'');detached.delete(k);
+    windows.get(k)?.classList.remove('rw-window-detached');
+    saveWorkspace();
+  });
+  window.api?.detachedOverlayState?.().then(state=>{
+    for(const [key,s] of Object.entries(state?.windows||{})){
+      if(s?.open===true&&windows.has(key))detachWindow(key,true);
+    }
+  }).catch(()=>{});
 
   // Save all user-adjustable controls continuously and again on exit.
   const queueSave=(()=>{let t;return()=>{clearTimeout(t);t=setTimeout(()=>{saveSettings();saveWorkspace();},120);};})();
