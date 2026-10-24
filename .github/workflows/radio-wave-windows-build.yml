@@ -46,14 +46,22 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: npx electron-builder --win --x64 --publish never
 
-      - name: Verify installer artifact
+      - name: Verify installer and portable artifacts
         run: |
           $installer = Get-ChildItem -Path dist -Filter 'RADIO-WAVE-v6.66-Setup*.exe' | Select-Object -First 1
           if (-not $installer) { throw 'RADIO_WAVE_NSIS_INSTALLER_MISSING' }
-          $hash = (Get-FileHash -Algorithm SHA256 $installer.FullName).Hash.ToLower()
-          "$hash  $($installer.Name)" | Set-Content -Encoding ascii dist\RADIO-WAVE-v6.66-SHA256SUMS.txt
+          $installerHash = (Get-FileHash -Algorithm SHA256 $installer.FullName).Hash.ToLower()
+          $portable = Get-ChildItem -Path dist -Filter 'RADIO-WAVE-v6.66-Portable*.exe' | Select-Object -First 1
+          if (-not $portable) { throw 'RADIO_WAVE_PORTABLE_EXE_MISSING' }
+          $portableHash = (Get-FileHash -Algorithm SHA256 $portable.FullName).Hash.ToLower()
+          @(
+            "$installerHash  $($installer.Name)"
+            "$portableHash  $($portable.Name)"
+          ) | Set-Content -Encoding ascii dist\RADIO-WAVE-v6.66-SHA256SUMS.txt
           Write-Host "PASS installer: $($installer.FullName)"
-          Write-Host "SHA256: $hash"
+          Write-Host "INSTALLER SHA256: $installerHash"
+          Write-Host "PASS portable: $($portable.FullName)"
+          Write-Host "PORTABLE SHA256: $portableHash"
 
       - name: Upload RADIO WAVE installer
         uses: actions/upload-artifact@v4
@@ -62,6 +70,14 @@ jobs:
           path: |
             windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/RADIO-WAVE-v6.66-Setup*.exe
             windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/RADIO-WAVE-v6.66-SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload RADIO WAVE portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: RADIO-WAVE-v6.66-Windows-Portable
+          path: windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/RADIO-WAVE-v6.66-Portable*.exe
           if-no-files-found: error
           retention-days: 14
 
