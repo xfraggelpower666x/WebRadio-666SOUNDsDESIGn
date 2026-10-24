@@ -27,6 +27,7 @@ console.log('=== RADIO WAVE v6.66 Targeted Release Integrity ===');
   'src/app.js',
   'src/intro.js',
   'src/overlay-window.js',
+  'src/diagnostics.js',
   'src/workspace.js',
   'src/integration/666-integration.js',
   'src/vendor/cayatur/preset-registry.js',
@@ -52,7 +53,9 @@ for(const p of [
   'src/overlay-window.html',
   'src/overlay-window.js',
   'src/overlay-window.css',
+  'src/diagnostics.js',
   'overlay-preload.js',
+  'docs/RADIO_WAVE_INTERRUPTED_WORK_CHECKPOINT_2026-10-24.md',
   'src/assets/radio-wave/banner.asset.js',
   'src/assets/radio-wave/appIconSource.asset.js',
   'src/assets/radio-wave/inAppLogo.asset.js',
@@ -109,6 +112,19 @@ check(pkg.build?.files?.includes('overlay-preload.js'),'detached-overlay-preload
 check(/fitVisualizerToViewport/.test(text('src/app.js'))&&/onWindowMetrics/.test(text('preload.js')),'monitor-aware-visualizer-fit');
 check(/mainWindow\.on\(ev,\(\)=>emitMainWindowMetrics/.test(main),'main-window-monitor-metrics');
 check(/output-only \.rw-window-dock/.test(css),'output-window-no-control-overlays');
+check(/key:'diagnostics'/.test(workspace)&&/id="rw-diagnostics"/.test(html),'diagnostics-own-menu-overlay');
+check(/exportRuntimeDiagnostics/.test(text('src/diagnostics.js'))&&/runtime:export-diagnostics/.test(main),'diagnostics-json-export');
+check(/workspace:\{mainWindow:/.test(main)&&/detachedOverlays:overlays/.test(main),'diagnostics-overlay-monitor-state');
+check(/saved\.dock=out\.dock/.test(workspace)&&/makeDraggable\(dock,dockHead,'dock'\)/.test(workspace),'movable-persistent-menu-dock');
+check(/\.rw-window-dock\{[^}]*resize:both/.test(css),'resizable-menu-dock');
+check(/rw-workspace-visual-frame/.test(workspace)&&/makeDraggable\(visualFrame,grip,'visualFrame'/.test(workspace),'movable-visualizer-stage');
+check(/rw-workspace-visual-frame\{[^}]*resize:both/.test(css),'resizable-visualizer-stage');
+check(/saved\.visualFrame=out\.visualFrame/.test(workspace)&&/rw-visual-frame-manual/.test(workspace),'visualizer-stage-persistence');
+check(/RWVisualFrame\?\.fit/.test(text('src/app.js')),'visualizer-stage-monitor-auto-fit');
+check(/--rw-neon-purple:#a855f7/.test(css)&&/--rw-neon-cyan:#19f7ff/.test(css)&&/--rw-neon-pink:#ff2bd6/.test(css),'cyber-system-color-hardlock');
+check(/rw-led-low/.test(html)&&/rw-led-mid/.test(html)&&/rw-led-high/.test(html),'cyber-led-meter-ui');
+check(/ledLow\.style\.setProperty\('--rw-level'/.test(text('src/app.js'))&&/ledMid\.style\.setProperty\('--rw-level'/.test(text('src/app.js'))&&/ledHigh\.style\.setProperty\('--rw-level'/.test(text('src/app.js')),'cyber-led-real-analyser-drive');
+check(exists('docs/RADIO_WAVE_INTERRUPTED_WORK_CHECKPOINT_2026-10-24.md'),'interrupted-work-checkpoint');
 
 const html=text('src/index.html');
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
