@@ -458,9 +458,27 @@ registerIpc('visual:frame','main', (_e, payload={}) => {
   for(const w of outputWindows.values())if(w&&!w.isDestroyed())w.webContents.send('visual:frame',frame);
   return {ok:true,outputs:outputWindows.size};
 });
-function runtimeDiagnostics(){const m=process.memoryUsage();return {generatedAt:new Date().toISOString(),version:app.getVersion(),platform:process.platform,arch:process.arch,electron:process.versions.electron,chrome:process.versions.chrome,node:process.versions.node,gpu:app.getGPUFeatureStatus(),memory:{rss:m.rss,heapTotal:m.heapTotal,heapUsed:m.heapUsed,external:m.external,arrayBuffers:m.arrayBuffers||0},source:{mode:sharedSourceState.mode,outputs:outputWindows.size},events:runtimeEvents.slice(-100),outputs:outputStatus(),displays:displayList().map(d=>({id:d.id,bounds:d.bounds,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,internal:d.internal}))};}
+function runtimeDiagnostics(){
+  const m=process.memoryUsage();
+  const mainBounds=mainWindow&&!mainWindow.isDestroyed()?mainWindow.getBounds():null;
+  const mainDisplay=mainBounds?screen.getDisplayMatching(mainBounds):null;
+  const overlays=Array.from(detachedOverlayWindows.entries()).filter(([,w])=>w&&!w.isDestroyed()).map(([key,w])=>{
+    const bounds=w.getBounds();const d=screen.getDisplayMatching(bounds);
+    return {key,bounds,displayId:d.id,scaleFactor:d.scaleFactor,visible:w.isVisible(),focused:w.isFocused()};
+  });
+  return {
+    generatedAt:new Date().toISOString(),product:'RADIO WAVE v6.66',version:app.getVersion(),
+    platform:process.platform,arch:process.arch,electron:process.versions.electron,chrome:process.versions.chrome,node:process.versions.node,
+    gpu:app.getGPUFeatureStatus(),
+    memory:{rss:m.rss,heapTotal:m.heapTotal,heapUsed:m.heapUsed,external:m.external,arrayBuffers:m.arrayBuffers||0},
+    source:{mode:sharedSourceState.mode,outputs:outputWindows.size},
+    workspace:{mainWindow:mainBounds?{bounds:mainBounds,displayId:mainDisplay?.id,scaleFactor:mainDisplay?.scaleFactor}:null,detachedOverlays:overlays},
+    events:runtimeEvents.slice(-100),outputs:outputStatus(),
+    displays:displayList().map(d=>({id:d.id,bounds:d.bounds,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,internal:d.internal}))
+  };
+}
 registerIpc('runtime:diagnostics','main', async()=>runtimeDiagnostics());
-registerIpc('runtime:export-diagnostics','main', async()=>{const report=runtimeDiagnostics();const stamp=new Date().toISOString().replace(/[:.]/g,'-');const r=await dialog.showSaveDialog(mainWindow,{title:'Export SoundwaveStudio 666 Diagnostics',defaultPath:`RADIO-WAVE-v6.66-diagnostics-${stamp}.json`,filters:[{name:'JSON diagnostics',extensions:['json']}]});if(r.canceled||!r.filePath)return {ok:false,canceled:true};fs.writeFileSync(r.filePath,JSON.stringify(report,null,2),'utf8');return {ok:true,filePath:r.filePath};});
+registerIpc('runtime:export-diagnostics','main', async()=>{const report=runtimeDiagnostics();const stamp=new Date().toISOString().replace(/[:.]/g,'-');const r=await dialog.showSaveDialog(mainWindow,{title:'Export RADIO WAVE v6.66 Diagnostics',defaultPath:`RADIO-WAVE-v6.66-diagnostics-${stamp}.json`,filters:[{name:'JSON diagnostics',extensions:['json']}]});if(r.canceled||!r.filePath)return {ok:false,canceled:true};fs.writeFileSync(r.filePath,JSON.stringify(report,null,2),'utf8');return {ok:true,filePath:r.filePath};});
 registerIpc('source:sync','main', (_e, state) => broadcastSourceState(state));
 registerIpc('window:fullscreen','main', (_e, enabled) => { if(mainWindow&&!mainWindow.isDestroyed()) mainWindow.setFullScreen(!!enabled); return {ok:true,fullscreen:!!enabled}; });
 registerIpc('soundcloud:status','main',()=>({configured:soundCloudCredentials().configured,creatorUrl:SOUND_CLOUD_CREATOR_URL}));
