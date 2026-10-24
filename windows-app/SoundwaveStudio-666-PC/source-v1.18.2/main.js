@@ -40,6 +40,7 @@ let introComplete=false;
 let introFailsafeTimer=null;
 const outputWindows = new Map();
 const detachedOverlayWindows = new Map();
+let detachedVisualizerWindow=null;
 let appQuitting=false;
 const outputHealth = new Map();
 const outputRecovery = new Map();
@@ -81,6 +82,7 @@ function senderRole(event) {
   if (mainWindow && !mainWindow.isDestroyed() && event.sender.id === mainWindow.webContents.id) return 'main';
   if (introWindow && !introWindow.isDestroyed() && event.sender.id === introWindow.webContents.id) return 'intro';
   for (const w of outputWindows.values()) if (w && !w.isDestroyed() && event.sender.id === w.webContents.id) return 'output';
+  if (detachedVisualizerWindow && !detachedVisualizerWindow.isDestroyed() && event.sender.id === detachedVisualizerWindow.webContents.id) return 'output';
   for (const w of detachedOverlayWindows.values()) if (w && !w.isDestroyed() && event.sender.id === w.webContents.id) return 'overlay';
   return 'invalid';
 }
@@ -179,7 +181,7 @@ async function soundCloudCreatorLibrary(){
 function soundCloudStep(delta){return activateSoundCloudIndex(soundCloudQueueIndex+(Number(delta)||0));}
 function soundCloudQueueState(){return {index:soundCloudQueueIndex,length:soundCloudQueue.length,current:soundCloudCurrent?{title:soundCloudCurrent.title,artist:soundCloudCurrent.artist,permalink:soundCloudCurrent.permalink}:null};}
 
-const DETACHED_OVERLAY_KEYS=new Set(['source','media','wave','position','text','engines','milkdrop','export']);
+const DETACHED_OVERLAY_KEYS=new Set(['source','media','wave','position','text','engines','milkdrop','diagnostics','export','dock']);
 function overlayStatePath(){return path.join(app.getPath('userData'),'radio-wave-detached-overlays.json');}
 function readOverlayState(){try{return JSON.parse(fs.readFileSync(overlayStatePath(),'utf8'));}catch{return {windows:{}};}}
 function writeOverlayState(state){try{fs.writeFileSync(overlayStatePath(),JSON.stringify(state,null,2),'utf8');}catch{}}
@@ -245,8 +247,47 @@ function emitMainWindowMetrics(reason='window'){
   const display=screen.getDisplayMatching(bounds);
   mainWindow.webContents.send('window:metrics',{reason,bounds,contentBounds:mainWindow.getContentBounds(),display:{id:display.id,bounds:display.bounds,workArea:display.workArea,scaleFactor:display.scaleFactor,rotation:display.rotation}});
 }
+function openDetachedVisualizer(){
+  if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()){
+    detachedVisualizerWindow.show();detachedVisualizerWindow.focus();return {ok:true,focused:true,bounds:detachedVisualizerWindow.getBounds()};
+  }
+  const state=readOverlayState(); const s=state.windows?.visualizerNative||{};
+  const d=screen.getDisplayMatching(mainWindow.getBounds());
+  const wa=d.workArea;
+  const b=(Number.isFinite(s.x)&&Number.isFinite(s.y)&&Number.isFinite(s.width)&&Number.isFinite(s.height))
+    ? {x:s.x,y:s.y,width:Math.max(480,s.width),height:Math.max(300,s.height)}
+    : {x:wa.x+40,y:wa.y+40,width:Math.min(1100,wa.width-80),height:Math.min(720,wa.height-80)};
+  const w=new BrowserWindow({
+    ...b,minWidth:480,minHeight:300,resizable:true,frame:true,show:false,
+    title:'RADIO WAVE v6.66 · VISUALIZER',
+    backgroundColor:'#01000f',autoHideMenuBar:true,
+    webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false,sandbox:true,webSecurity:true,backgroundThrottling:false}
+  });
+  detachedVisualizerWindow=w;
+  const persist=()=>{
+    if(!w||w.isDestroyed())return;
+    const st=readOverlayState();if(!st.windows)st.windows={};
+    const bounds=w.getBounds();const disp=screen.getDisplayMatching(bounds);
+    st.windows.visualizerNative={...bounds,displayId:disp.id,scaleFactor:disp.scaleFactor,open:true};
+    writeOverlayState(st);
+  };
+  w.webContents.setWindowOpenHandler(()=>({action:'deny'}));
+  w.webContents.on('will-navigate',(e,url)=>{if(!trustedAppUrl(url))e.preventDefault();});
+  w.loadFile(path.join(__dirname,'src','index.html'),{query:{output:'1',windowed:'1',visualDetached:'1'}});
+  w.webContents.on('did-finish-load',()=>{w.webContents.send('source:state',sharedSourceState);});
+  w.once('ready-to-show',()=>{w.show();w.focus();});
+  w.on('move',persist);w.on('resize',persist);
+  w.on('close',()=>{if(!appQuitting){const st=readOverlayState();if(!st.windows)st.windows={};st.windows.visualizerNative={...(st.windows.visualizerNative||{}),...w.getBounds(),open:false};writeOverlayState(st);}});
+  w.on('closed',()=>{detachedVisualizerWindow=null;if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('visualizer:detached-closed');});
+  persist();
+  return {ok:true,bounds:w.getBounds()};
+}
+function focusDetachedVisualizer(){
+  if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()){detachedVisualizerWindow.show();detachedVisualizerWindow.focus();return {ok:true};}
+  return {ok:false};
+}
 function displayList(){ const primary=screen.getPrimaryDisplay(); return screen.getAllDisplays().map((d,i)=>({id:d.id,index:i,label:`Display ${i+1}${d.id===primary.id?' (Primary)':''}`,bounds:d.bounds,size:d.size,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,isPrimary:d.id===primary.id})); }
-function outputStatus(){ const now=Date.now(); return {active:Array.from(outputWindows.entries()).filter(([,w])=>w&&!w.isDestroyed()).map(([id,w])=>{const h=outputHealth.get(id)||{};return {id,bounds:w.getBounds(),fullscreen:w.isFullScreen(),responsive:!!h.lastHeartbeat&&(now-h.lastHeartbeat)<15000,lastHeartbeat:h.lastHeartbeat||0,engine:h.engine||'unknown',fps:Number(h.fps)||0,recoveries:outputRecovery.get(id)||0};}),available:displayList()}; }
+function outputStatus(){ const now=Date.now(); return {detachedVisualizer:detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()?{bounds:detachedVisualizerWindow.getBounds(),visible:detachedVisualizerWindow.isVisible(),focused:detachedVisualizerWindow.isFocused()}:null,active:Array.from(outputWindows.entries()).filter(([,w])=>w&&!w.isDestroyed()).map(([id,w])=>{const h=outputHealth.get(id)||{};return {id,bounds:w.getBounds(),fullscreen:w.isFullScreen(),responsive:!!h.lastHeartbeat&&(now-h.lastHeartbeat)<15000,lastHeartbeat:h.lastHeartbeat||0,engine:h.engine||'unknown',fps:Number(h.fps)||0,recoveries:outputRecovery.get(id)||0};}),available:displayList()}; }
 function startOutputWatchdog(){
   if(outputWatchdog)clearInterval(outputWatchdog);
   outputWatchdog=setInterval(()=>{
@@ -299,7 +340,7 @@ function sanitizeSourceState(next){
   if(next.visual!==undefined){const v=next.visual;if(!v||typeof v!=='object'||Array.isArray(v))throw new Error('visual_state_invalid');out.visual={engine:String(v.engine||'soundwave').slice(0,40),milkdropPreset:String(v.milkdropPreset??'').slice(0,120),shaderPreset:String(v.shaderPreset||'').slice(0,120),geometryPreset:String(v.geometryPreset||'').slice(0,120)};if(v.importedMilkdrop&&typeof v.importedMilkdrop==='object'){const src=String(v.importedMilkdrop.source||'');if(Buffer.byteLength(src,'utf8')>2*1024*1024)throw new Error('visual_preset_too_large');out.visual.importedMilkdrop={id:String(v.importedMilkdrop.id||'imported').slice(0,240),source:src};}}
   return out;
 }
-function broadcastSourceState(next){ sharedSourceState={...sharedSourceState,...sanitizeSourceState(next||{})}; for(const w of outputWindows.values())if(!w.isDestroyed())w.webContents.send('source:state',sharedSourceState); return {ok:true,state:sharedSourceState}; }
+function broadcastSourceState(next){ sharedSourceState={...sharedSourceState,...sanitizeSourceState(next||{})}; for(const w of outputWindows.values())if(!w.isDestroyed())w.webContents.send('source:state',sharedSourceState); if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed())detachedVisualizerWindow.webContents.send('source:state',sharedSourceState); return {ok:true,state:sharedSourceState}; }
 
 function destroyIntroWindow(){
   if(introFailsafeTimer){clearTimeout(introFailsafeTimer);introFailsafeTimer=null;}
@@ -449,7 +490,14 @@ registerIpc('workspace:overlay-action','overlay',(_e,payload={})=>{if(!mainWindo
 registerIpc('display:list','main', () => displayList());
 registerIpc('display:open-output','main', (_e, ids) => openOutputWindows(ids));
 registerIpc('display:status','main', () => outputStatus());
-registerIpc('display:heartbeat','output', (e, payload={}) => { const hit=Array.from(outputWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id); if(!hit)return {ok:false}; const id=hit[0]; outputHealth.set(id,{lastHeartbeat:Date.now(),engine:String(payload.engine||'unknown').slice(0,40),fps:Math.max(0,Math.min(240,Number(payload.fps)||0))}); return {ok:true}; });
+registerIpc('display:open-detached-visualizer','main',()=>openDetachedVisualizer());
+registerIpc('display:focus-detached-visualizer','main',()=>focusDetachedVisualizer());
+registerIpc('display:heartbeat','output', (e, payload={}) => {
+  const hit=Array.from(outputWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id);
+  if(hit){const id=hit[0];outputHealth.set(id,{lastHeartbeat:Date.now(),engine:String(payload.engine||'unknown').slice(0,40),fps:Math.max(0,Math.min(240,Number(payload.fps)||0))});return {ok:true};}
+  if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()&&detachedVisualizerWindow.webContents.id===e.sender.id)return {ok:true,detached:true};
+  return {ok:false};
+});
 registerIpc('visual:frame','main', (_e, payload={}) => {
   const freq=payload.frequency, wave=payload.time;
   if(!Array.isArray(freq)||!Array.isArray(wave))throw new Error('visual_frame_invalid');
@@ -457,7 +505,8 @@ registerIpc('visual:frame','main', (_e, payload={}) => {
   const clamp=a=>a.map(v=>Math.max(0,Math.min(255,Number(v)||0)));
   const frame={frequency:clamp(freq),time:clamp(wave),at:Date.now()};
   for(const w of outputWindows.values())if(w&&!w.isDestroyed())w.webContents.send('visual:frame',frame);
-  return {ok:true,outputs:outputWindows.size};
+  if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed())detachedVisualizerWindow.webContents.send('visual:frame',frame);
+  return {ok:true,outputs:outputWindows.size+(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()?1:0)};
 });
 function runtimeDiagnostics(){
   const m=process.memoryUsage();
