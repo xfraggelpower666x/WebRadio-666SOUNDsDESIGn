@@ -539,6 +539,22 @@ function runtimeDiagnostics(){
     displays:displayList().map(d=>({id:d.id,bounds:d.bounds,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,internal:d.internal}))
   };
 }
+registerIpc('runtime:remote-health','main', async()=>{
+  const health={generatedAt:new Date().toISOString(),radioBase:radioCfg.radioBase,soundcloud:soundCloudCredentials().configured?'CONFIGURED':'CREDENTIALS_MISSING'};
+  try{
+    const p=await radioJson(radioCfg.playerAlertStatusRoute);
+    health.messenger={ok:p.ok,status:p.status,error:p.data?.error||null};
+  }catch(e){health.messenger={ok:false,status:0,error:String(e.message||e)};}
+  try{
+    const s=await radioJson('/api/skip/status');
+    health.skip={ok:s.ok,status:s.status,configured:s.data?.configured===true,error:s.data?.error||null};
+  }catch(e){health.skip={ok:false,status:0,error:String(e.message||e)};}
+  try{
+    const a=await authCheck();
+    health.admin={ok:a.ok,error:a.error||null};
+  }catch(e){health.admin={ok:false,error:String(e.message||e)};}
+  return health;
+});
 registerIpc('runtime:diagnostics','main', async()=>runtimeDiagnostics());
 registerIpc('runtime:export-diagnostics','main', async()=>{const report=runtimeDiagnostics();const stamp=new Date().toISOString().replace(/[:.]/g,'-');const r=await dialog.showSaveDialog(mainWindow,{title:'Export RADIO WAVE v6.66 Diagnostics',defaultPath:`RADIO-WAVE-v6.66-diagnostics-${stamp}.json`,filters:[{name:'JSON diagnostics',extensions:['json']}]});if(r.canceled||!r.filePath)return {ok:false,canceled:true};fs.writeFileSync(r.filePath,JSON.stringify(report,null,2),'utf8');return {ok:true,filePath:r.filePath};});
 registerIpc('source:sync','main', (_e, state) => broadcastSourceState(state));
