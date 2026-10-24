@@ -228,7 +228,29 @@
   const queueSave=(()=>{let t;return()=>{clearTimeout(t);t=setTimeout(()=>{saveSettings();saveWorkspace();},120);};})();
   document.addEventListener('input',e=>{if(e.target?.matches?.('input,select,textarea'))queueSave();},true);
   document.addEventListener('change',e=>{if(e.target?.matches?.('input,select,textarea'))queueSave();},true);
-  window.addEventListener('resize',()=>{for(const w of windows.values())clampWindow(w);saveWorkspace();});
+  // Persist dynamic resizing immediately; CSS resize handles are not treated as fixed presets.
+  if('ResizeObserver' in window){
+    const ro=new ResizeObserver(entries=>{
+      if(!entries.length)return;
+      queueSave();
+    });
+    for(const w of windows.values())ro.observe(w);
+    const status=q('#radio-status-panel');if(status)ro.observe(status);
+  }
+
+  window.addEventListener('resize',()=>{
+    for(const w of windows.values())clampWindow(w);
+    const status=q('#radio-status-panel'),frame=q('#video-frame-outer');
+    if(status&&frame){
+      const fr=frame.getBoundingClientRect(),sr=status.getBoundingClientRect();
+      const maxLeft=Math.max(4,fr.width-sr.width-4);
+      const maxTop=Math.max(4,fr.height-sr.height-4);
+      status.style.left=clamp(parseFloat(status.style.left)||Math.max(4,fr.width-sr.width-16),4,maxLeft)+'px';
+      status.style.top=clamp(parseFloat(status.style.top)||16,4,maxTop)+'px';
+      status.style.right='auto';
+    }
+    saveWorkspace();
+  });
   window.addEventListener('beforeunload',()=>{saveSettings();saveWorkspace();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){saveSettings();saveWorkspace();}});
 
