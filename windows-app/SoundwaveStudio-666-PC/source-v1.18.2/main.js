@@ -38,6 +38,8 @@ let mainReady=false;
 let introComplete=false;
 let introFailsafeTimer=null;
 const outputWindows = new Map();
+const detachedOverlayWindows = new Map();
+let appQuitting=false;
 const outputHealth = new Map();
 const outputRecovery = new Map();
 let sharedSourceState = {mode:'local'};
@@ -72,11 +74,13 @@ function trustedLocalFile(value,relativePath) {
 }
 const trustedAppUrl=value=>trustedLocalFile(value,path.join('src','index.html'));
 const trustedIntroUrl=value=>trustedLocalFile(value,path.join('src','intro.html'));
+const trustedOverlayUrl=value=>trustedLocalFile(value,path.join('src','overlay-window.html'));
 function senderRole(event) {
   if (!event?.sender || event.sender.isDestroyed()) return 'invalid';
   if (mainWindow && !mainWindow.isDestroyed() && event.sender.id === mainWindow.webContents.id) return 'main';
   if (introWindow && !introWindow.isDestroyed() && event.sender.id === introWindow.webContents.id) return 'intro';
   for (const w of outputWindows.values()) if (w && !w.isDestroyed() && event.sender.id === w.webContents.id) return 'output';
+  for (const w of detachedOverlayWindows.values()) if (w && !w.isDestroyed() && event.sender.id === w.webContents.id) return 'overlay';
   return 'invalid';
 }
 function registerIpc(channel, roles, handler) {
@@ -174,6 +178,72 @@ async function soundCloudCreatorLibrary(){
 function soundCloudStep(delta){return activateSoundCloudIndex(soundCloudQueueIndex+(Number(delta)||0));}
 function soundCloudQueueState(){return {index:soundCloudQueueIndex,length:soundCloudQueue.length,current:soundCloudCurrent?{title:soundCloudCurrent.title,artist:soundCloudCurrent.artist,permalink:soundCloudCurrent.permalink}:null};}
 
+const DETACHED_OVERLAY_KEYS=new Set(['source','media','wave','position','text','engines','milkdrop','export']);
+function overlayStatePath(){return path.join(app.getPath('userData'),'radio-wave-detached-overlays.json');}
+function readOverlayState(){try{return JSON.parse(fs.readFileSync(overlayStatePath(),'utf8'));}catch{return {windows:{}};}}
+function writeOverlayState(state){try{fs.writeFileSync(overlayStatePath(),JSON.stringify(state,null,2),'utf8');}catch{}}
+function overlayBoundsFor(key,fallback={}){
+  const state=readOverlayState(); const s=state.windows?.[key]||{};
+  const base={x:Number(s.x),y:Number(s.y),width:Number(s.width),height:Number(s.height)};
+  const valid=Number.isFinite(base.x)&&Number.isFinite(base.y)&&Number.isFinite(base.width)&&Number.isFinite(base.height);
+  if(valid){
+    const all=screen.getAllDisplays();
+    const intersects=all.some(d=>base.x+base.width>d.workArea.x&&base.x<d.workArea.x+d.workArea.width&&base.y+base.height>d.workArea.y&&base.y<d.workArea.y+d.workArea.height);
+    if(intersects)return {x:Math.round(base.x),y:Math.round(base.y),width:Math.max(320,Math.round(base.width)),height:Math.max(220,Math.round(base.height))};
+  }
+  const d=mainWindow&&!mainWindow.isDestroyed()?screen.getDisplayMatching(mainWindow.getBounds()):screen.getPrimaryDisplay();
+  const wa=d.workArea;
+  const width=Math.min(Math.max(320,Number(fallback.width)||440),Math.max(320,wa.width-40));
+  const height=Math.min(Math.max(220,Number(fallback.height)||520),Math.max(220,wa.height-40));
+  return {x:wa.x+Math.max(20,wa.width-width-40),y:wa.y+Math.max(20,Math.round((wa.height-height)/2)),width,height};
+}
+function saveDetachedOverlayWindow(key,w,open=true){
+  if(!w||w.isDestroyed())return;
+  const state=readOverlayState(); if(!state.windows)state.windows={};
+  const b=w.getBounds(); const d=screen.getDisplayMatching(b);
+  state.windows[key]={x:b.x,y:b.y,width:b.width,height:b.height,displayId:d.id,scaleFactor:d.scaleFactor,open:!!open};
+  writeOverlayState(state);
+}
+function openDetachedOverlay(payload={}){
+  const key=String(payload.key||'');
+  if(!DETACHED_OVERLAY_KEYS.has(key))throw new Error('overlay_key_invalid');
+  const title=String(payload.title||key).slice(0,80);
+  const html=String(payload.html||'');
+  if(Buffer.byteLength(html,'utf8')>512*1024)throw new Error('overlay_markup_too_large');
+  const controls=Array.isArray(payload.controls)?payload.controls.slice(0,256):[];
+  const existing=detachedOverlayWindows.get(key);
+  if(existing&&!existing.isDestroyed()){existing.show();existing.focus();existing.webContents.send('workspace:overlay-sync',{controls});return {ok:true,key,focused:true};}
+  const bounds=overlayBoundsFor(key,payload);
+  const w=new BrowserWindow({
+    ...bounds,
+    minWidth:320,minHeight:220,
+    title:'RADIO WAVE · '+title,
+    icon:fs.existsSync(path.join(__dirname,'build','radio-wave-v6.66.ico'))?path.join(__dirname,'build','radio-wave-v6.66.ico'):undefined,
+    autoHideMenuBar:true,
+    show:false,
+    backgroundColor:'#05030d',
+    webPreferences:{preload:path.join(__dirname,'overlay-preload.js'),contextIsolation:true,nodeIntegration:false,sandbox:true,webSecurity:true}
+  });
+  detachedOverlayWindows.set(key,w);
+  w.webContents.setWindowOpenHandler(()=>({action:'deny'}));
+  w.webContents.on('will-navigate',(e,url)=>{if(!trustedOverlayUrl(url))e.preventDefault();});
+  w.loadFile(path.join(__dirname,'src','overlay-window.html'),{query:{key}});
+  w.webContents.on('did-finish-load',()=>w.webContents.send('workspace:overlay-init',{key,title,html,controls}));
+  w.once('ready-to-show',()=>{w.show();w.focus();});
+  const persist=()=>saveDetachedOverlayWindow(key,w,true);
+  w.on('move',persist);w.on('resize',persist);
+  w.on('close',()=>{if(!appQuitting)saveDetachedOverlayWindow(key,w,false);});
+  w.on('closed',()=>{detachedOverlayWindows.delete(key);if(mainWindow&&!mainWindow.isDestroyed())mainWindow.webContents.send('workspace:overlay-closed',{key});});
+  saveDetachedOverlayWindow(key,w,true);
+  return {ok:true,key,bounds:w.getBounds()};
+}
+function detachedOverlayState(){return readOverlayState();}
+function emitMainWindowMetrics(reason='window'){
+  if(!mainWindow||mainWindow.isDestroyed())return;
+  const bounds=mainWindow.getBounds();
+  const display=screen.getDisplayMatching(bounds);
+  mainWindow.webContents.send('window:metrics',{reason,bounds,contentBounds:mainWindow.getContentBounds(),display:{id:display.id,bounds:display.bounds,workArea:display.workArea,scaleFactor:display.scaleFactor,rotation:display.rotation}});
+}
 function displayList(){ const primary=screen.getPrimaryDisplay(); return screen.getAllDisplays().map((d,i)=>({id:d.id,index:i,label:`Display ${i+1}${d.id===primary.id?' (Primary)':''}`,bounds:d.bounds,size:d.size,workArea:d.workArea,scaleFactor:d.scaleFactor,rotation:d.rotation,isPrimary:d.id===primary.id})); }
 function outputStatus(){ const now=Date.now(); return {active:Array.from(outputWindows.entries()).filter(([,w])=>w&&!w.isDestroyed()).map(([id,w])=>{const h=outputHealth.get(id)||{};return {id,bounds:w.getBounds(),fullscreen:w.isFullScreen(),responsive:!!h.lastHeartbeat&&(now-h.lastHeartbeat)<15000,lastHeartbeat:h.lastHeartbeat||0,engine:h.engine||'unknown',fps:Number(h.fps)||0,recoveries:outputRecovery.get(id)||0};}),available:displayList()}; }
 function startOutputWatchdog(){
@@ -340,6 +410,9 @@ function createWindow() {
     showMainAfterIntro();
   });
 
+  ['resize','move','maximize','unmaximize','restore','enter-full-screen','leave-full-screen'].forEach(ev=>mainWindow.on(ev,()=>emitMainWindowMetrics(ev)));
+  mainWindow.webContents.on('did-finish-load',()=>setTimeout(()=>emitMainWindowMetrics('did-finish-load'),0));
+
   mainWindow.on('closed', () => {
     mainWindow = null;
     if (fileWriteStream) {
@@ -357,6 +430,11 @@ registerIpc('intro:complete','intro', async()=>{
   return {ok:true};
 });
 
+registerIpc('workspace:overlay-open','main',(_e,payload)=>openDetachedOverlay(payload));
+registerIpc('workspace:overlay-state','main',()=>detachedOverlayState());
+registerIpc('workspace:overlay-focus','main',(_e,key)=>{const w=detachedOverlayWindows.get(String(key||''));if(w&&!w.isDestroyed()){w.show();w.focus();return {ok:true};}return {ok:false};});
+registerIpc('workspace:overlay-ready','overlay',(e)=>{const hit=Array.from(detachedOverlayWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id);return {ok:!!hit,key:hit?.[0]||''};});
+registerIpc('workspace:overlay-action','overlay',(_e,payload={})=>{if(!mainWindow||mainWindow.isDestroyed())return {ok:false};const key=String(payload.key||'');if(!DETACHED_OVERLAY_KEYS.has(key))throw new Error('overlay_key_invalid');const kind=String(payload.kind||'');if(!['input','change','click'].includes(kind))throw new Error('overlay_action_invalid');const id=String(payload.id||'').slice(0,120);if(!id)throw new Error('overlay_control_invalid');mainWindow.webContents.send('workspace:overlay-action',{key,kind,id,value:String(payload.value??'').slice(0,8192),checked:!!payload.checked});return {ok:true};});
 registerIpc('display:list','main', () => displayList());
 registerIpc('display:open-output','main', (_e, ids) => openOutputWindows(ids));
 registerIpc('display:status','main', () => outputStatus());
@@ -414,6 +492,7 @@ app.whenReady().then(() => {
   const displayChanged=()=>{
     reconcileOutputWindows();
     for(const w of BrowserWindow.getAllWindows())if(!w.isDestroyed())w.webContents.send('display:changed',displayList());
+    emitMainWindowMetrics('display-metrics-changed');
   };
   screen.on('display-added',displayChanged); screen.on('display-removed',displayChanged); screen.on('display-metrics-changed',displayChanged);
   createIntroWindow();
@@ -440,7 +519,7 @@ app.whenReady().then(() => {
   try{app.exit(1);}catch{}
 });
 
-app.on('before-quit',()=>{startupLog('APP_BEFORE_QUIT');destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(fileWriteStream){try{fileWriteStream.end();}catch{} fileWriteStream=null;} adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
+app.on('before-quit',()=>{appQuitting=true;startupLog('APP_BEFORE_QUIT');destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(fileWriteStream){try{fileWriteStream.end();}catch{} fileWriteStream=null;} adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
