@@ -5,6 +5,12 @@ contextBridge.exposeInMainWorld('api', {
   openBackground: () => ipcRenderer.invoke('dialog:openBackground'),
   openMilkdrop: () => ipcRenderer.invoke('dialog:openMilkdrop'),
   openMilkdropPack: () => ipcRenderer.invoke('dialog:openMilkdropPack'),
+  openDetachedOverlay: (payload) => ipcRenderer.invoke('workspace:overlay-open', payload),
+  detachedOverlayState: () => ipcRenderer.invoke('workspace:overlay-state'),
+  focusDetachedOverlay: (key) => ipcRenderer.invoke('workspace:overlay-focus', key),
+  onDetachedOverlayAction: (fn) => ipcRenderer.on('workspace:overlay-action', (_e, payload) => fn(payload)),
+  onDetachedOverlayClosed: (fn) => ipcRenderer.on('workspace:overlay-closed', (_e, payload) => fn(payload)),
+  onWindowMetrics: (fn) => ipcRenderer.on('window:metrics', (_e, payload) => fn(payload)),
   getSavePath: () => ipcRenderer.invoke('dialog:getSavePath'),
   startFileWrite: (savePath) => ipcRenderer.invoke('file:startWrite', savePath),
   writeFileChunk: (chunkArrayBuffer) => {
