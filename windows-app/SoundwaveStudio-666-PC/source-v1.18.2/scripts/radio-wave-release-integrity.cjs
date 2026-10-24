@@ -126,6 +126,16 @@ check(/--rw-neon-purple:#a855f7/.test(css)&&/--rw-neon-cyan:#19f7ff/.test(css)&&
 check(/rw-led-low/.test(html)&&/rw-led-mid/.test(html)&&/rw-led-high/.test(html),'cyber-led-meter-ui');
 check(/ledLow\.style\.setProperty\('--rw-level'/.test(text('src/app.js'))&&/ledMid\.style\.setProperty\('--rw-level'/.test(text('src/app.js'))&&/ledHigh\.style\.setProperty\('--rw-level'/.test(text('src/app.js')),'cyber-led-real-analyser-drive');
 check(exists('docs/RADIO_WAVE_INTERRUPTED_WORK_CHECKPOINT_2026-10-24.md'),'interrupted-work-checkpoint');
+check(/dialog:importMilkdropPersonalLibrary/.test(main)&&/personalMilkdropRoot/.test(main),'personal-milkdrop-persistent-library');
+check(/Expand-Archive/.test(main)&&/256\*1024\*1024/.test(main),'personal-milkdrop-bounded-zip-import');
+check(/personal_library_no_milk_presets/.test(main)&&/512\*1024\*1024/.test(main),'personal-milkdrop-extraction-bounds');
+check(/docs[\\\\/]license\\.txt/.test(main)&&/license:licenseFile/.test(main),'personal-milkdrop-license-retention');
+check(/top100\\.txt/.test(main)&&/top100Count/.test(main),'personal-milkdrop-top100-index');
+check(/importMilkdropPersonalLibrary/.test(text('preload.js'))&&/personalMilkdropLibrary/.test(text('preload.js')),'personal-milkdrop-preload-bridge');
+check(/milkdrop-import-personal/.test(html)&&/milkdrop-filter-top100/.test(html)&&/milkdrop-filter-double/.test(html),'personal-milkdrop-library-ui');
+check(/installPersonalMilkdropLibrary/.test(integration)&&/personalMilkdropDoubles/.test(integration),'personal-milkdrop-runtime-registration');
+check(/native \.milk2 renderer pending/.test(integration),'milk2-no-fake-compatibility');
+check(/\.milk renderable/.test(integration)&&/\.milk2 indexed/.test(integration),'personal-library-evidence-status');
 
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
