@@ -27,3 +27,41 @@ AUDIO_OWNER=SOUNDWAVE_ONLY
 SECOND_AUDIO_OWNER=FORBIDDEN
 REAL_SIGNAL_ONLY=TRUE
 PRODUCTION_WEBRADIO_MUTATION=NONE
+
+
+## Continuation update — cyber shell / diagnostics / workspace
+CURRENT_WORK_HEAD_AT_UPDATE=81d14cd6d668955c1140bc1ceee13d60532b236c
+STATUS=IN_PROGRESS_CI
+
+### Implemented after checkpoint
+- Dedicated DIAGNOSTICS menu item and floating overlay.
+- Diagnostics live display/monitor cards.
+- GPU/runtime/output telemetry.
+- JSON diagnostics export.
+- Detached diagnostics live synchronization.
+- Native detached overlay windows remain available for second-monitor placement.
+- Window dock/menu is now draggable, resizable and persistent.
+- Dock layout adapts when narrow/wide.
+- Main visualization stage is draggable, resizable and persistent.
+- Visualization geometry is stored normalized relative to viewport.
+- Monitor/DPI/app-resize reflow preserves manual geometry; AUTO restores fitted aspect layout.
+- System color hardlock: neon purple / neon cyan / neon pink.
+- Stronger cyber shell: technical cut corners, HUD grid, glow rails, LED panel styling.
+- LOW/MID/HIGH LED meters added and driven exclusively by real analyser bass/mid/treble values.
+
+### MilkDrop preset evidence
+UPLOADED_ARCHIVE=/mnt/data/MilkDrop3-MilkDrop3(1).zip
+UPLOADED_ARCHIVE_FILE_COUNT=3
+UPLOADED_ARCHIVE_MILK_FILES=0
+UPLOADED_ARCHIVE_CONTENTS=MilkDrop3.exe|MilkDrop3.jpg
+OFFICIAL_RELEASE_3_37_CLAIMS=+500_PRESETS
+OFFICIAL_RELEASE_ASSET=MilkDrop3.exe_92005440_BYTES
+OFFICIAL_REPOSITORY_DECLARED_LICENSE=NONE
+BUNDLED_500_PRESETS_IN_RADIO_WAVE=NOT_DONE_LICENSE_AND_SOURCE_NOT_VERIFIED_FOR_REDISTRIBUTION
+SAFE_IMPORT_PATH=EXISTING_BOUNDED_PRESET_FOLDER_IMPORT
+
+### Continuation rule
+Do not restart or repeat accepted work.
+Continue from newest source HEAD.
+If CI fails, repair only the concrete failing gate.
+After exact-head CI success, publish a NO-INSTALL host-test artifact.
