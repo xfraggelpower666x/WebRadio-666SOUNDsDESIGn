@@ -2,7 +2,32 @@ const { app, BrowserWindow, ipcMain, dialog, screen, protocol, net, shell, power
 const { pathToFileURL } = require('url');
 const path = require('path');
 const fs = require('fs');
-const radioCfg = require('./src/shared/radio-config.cjs');
+const os = require('os');
+
+const STARTUP_LOG_PATH = path.join(os.tmpdir(), 'RADIO-WAVE-v6.66-startup.log');
+function startupLog(type, detail='') {
+  try {
+    const line = `${new Date().toISOString()} [${type}] ${typeof detail==='string'?detail:JSON.stringify(detail)}\n`;
+    fs.appendFileSync(STARTUP_LOG_PATH, line, 'utf8');
+  } catch {}
+}
+function fatalStartup(code, error) {
+  const message = `${code}: ${error?.stack || error?.message || error || 'unknown error'}`;
+  startupLog('FATAL', message);
+  try { dialog.showErrorBox('RADIO WAVE v6.66 · Startup Error', message + `\n\nLog: ${STARTUP_LOG_PATH}`); } catch {}
+}
+startupLog('BOOT', `pid=${process.pid} argv=${process.argv.join(' ')}`);
+process.on('uncaughtException', error => { fatalStartup('UNCAUGHT_EXCEPTION', error); try { app.exit(1); } catch { process.exit(1); } });
+process.on('unhandledRejection', error => { fatalStartup('UNHANDLED_REJECTION', error); });
+
+let radioCfg;
+try {
+  radioCfg = require('./src/shared/radio-config.cjs');
+  startupLog('CONFIG', 'radio-config loaded');
+} catch (error) {
+  fatalStartup('RADIO_CONFIG_LOAD_FAILED', error);
+  throw error;
+}
 let adminToken = '';
 const remoteLocks = new Set();
 const radioOrigin = new URL(radioCfg.radioBase).origin;
@@ -243,9 +268,26 @@ function createIntroWindow(){
   });
   introWindow.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   introWindow.webContents.on('will-navigate',(e,url)=>{if(!trustedIntroUrl(url))e.preventDefault();});
-  introWindow.loadFile(path.join(__dirname,'src','intro.html'));
-  introWindow.once('ready-to-show',()=>{if(introWindow&&!introWindow.isDestroyed())introWindow.show();});
-  introWindow.on('closed',()=>{introWindow=null;});
+  introWindow.webContents.on('did-fail-load',(_e,code,desc,url)=>{
+    startupLog('INTRO_LOAD_FAIL',{code,desc,url});
+    introComplete=true;
+    showMainAfterIntro();
+  });
+  introWindow.webContents.on('render-process-gone',(_e,details)=>{
+    startupLog('INTRO_RENDER_GONE',details||{});
+    introComplete=true;
+    showMainAfterIntro();
+  });
+  introWindow.loadFile(path.join(__dirname,'src','intro.html')).catch(error=>{
+    startupLog('INTRO_LOAD_PROMISE_FAIL',error?.stack||error?.message||String(error));
+    introComplete=true;
+    showMainAfterIntro();
+  });
+  introWindow.once('ready-to-show',()=>{
+    startupLog('INTRO_READY_TO_SHOW');
+    if(introWindow&&!introWindow.isDestroyed())introWindow.show();
+  });
+  introWindow.on('closed',()=>{startupLog('INTRO_CLOSED');introWindow=null;});
   introFailsafeTimer=setTimeout(()=>{
     runtimeEvent('intro-failsafe-handoff');
     introComplete=true;
@@ -278,10 +320,22 @@ function createWindow() {
 
   mainWindow.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   mainWindow.webContents.on('will-navigate',(e,url)=>{if(!trustedAppUrl(url))e.preventDefault();});
-  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+  mainWindow.webContents.on('did-fail-load',(_e,code,desc,url)=>{
+    startupLog('MAIN_LOAD_FAIL',{code,desc,url});
+    fatalStartup('MAIN_UI_LOAD_FAILED',`${code} ${desc} ${url}`);
+  });
+  mainWindow.webContents.on('render-process-gone',(_e,details)=>{
+    startupLog('MAIN_RENDER_GONE',details||{});
+    fatalStartup('MAIN_RENDERER_GONE',JSON.stringify(details||{}));
+  });
+  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html')).catch(error=>{
+    startupLog('MAIN_LOAD_PROMISE_FAIL',error?.stack||error?.message||String(error));
+    fatalStartup('MAIN_UI_LOAD_PROMISE_FAILED',error);
+  });
 
   mainWindow.once('ready-to-show', () => {
     mainReady=true;
+    startupLog('MAIN_READY_HIDDEN');
     runtimeEvent('main-ready-hidden');
     showMainAfterIntro();
   });
@@ -343,7 +397,8 @@ registerIpc('player-alert:history','main',async()=>{const r=await radioJson(radi
 registerIpc('player-alert:status','main',async()=>{const r=await radioJson(radioCfg.playerAlertStatusRoute);if(!r.ok||r.data?.ok===false)throw new Error(r.data?.error||`HTTP_${r.status}`);return r.data;});
 
 app.whenReady().then(() => {
-  if(!gotSingleInstanceLock)return;
+  startupLog('APP_READY');
+  if(!gotSingleInstanceLock){startupLog('SINGLE_INSTANCE_LOCK_DENIED');return;}
   const ses=require('electron').session.defaultSession;
   ses.setPermissionCheckHandler(()=>false); ses.setPermissionRequestHandler((_wc,_perm,cb)=>cb(false));
   protocol.handle('swsc', async(request)=>{
@@ -370,6 +425,7 @@ app.whenReady().then(() => {
   powerMonitor.on('unlock-screen',()=>runtimeEvent('screen-unlock'));
 
   app.on('activate', () => {
+    startupLog('APP_ACTIVATE');
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
   startOutputWatchdog();
@@ -379,9 +435,12 @@ app.whenReady().then(() => {
   powerMonitor.on('unlock-screen',()=>runtimeEvent('screen-unlock'));
     }
   });
+}).catch(error=>{
+  fatalStartup('APP_READY_CHAIN_FAILED',error);
+  try{app.exit(1);}catch{}
 });
 
-app.on('before-quit',()=>{destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(fileWriteStream){try{fileWriteStream.end();}catch{} fileWriteStream=null;} adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
+app.on('before-quit',()=>{startupLog('APP_BEFORE_QUIT');destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(fileWriteStream){try{fileWriteStream.end();}catch{} fileWriteStream=null;} adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
