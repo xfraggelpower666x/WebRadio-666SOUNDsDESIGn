@@ -1263,3 +1263,45 @@ html,body,.app-container,.preview-area,.preview-viewport-container{
   .milkdrop-hero{align-items:flex-start;}
   .milkdrop-orb{width:40px;height:40px;}
 }
+
+
+/* MilkDrop Studio advanced control surface */
+.milkdrop-control-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px 10px;
+  margin:8px 0 12px;
+}
+.milkdrop-control-grid .checkbox-container{
+  min-width:0;
+  font-size:10px;
+}
+.milkdrop-threshold-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.milkdrop-runtime-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin:8px 0;
+}
+.milkdrop-runtime-row span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding:7px 8px;
+  border:1px solid rgba(32,232,255,.22);
+  border-radius:8px;
+  background:rgba(5,8,22,.70);
+  font-size:9px;
+  letter-spacing:.06em;
+  color:#c9faff;
+}
+@container (max-width:360px){
+  .milkdrop-control-grid,
+  .milkdrop-threshold-grid,
+  .milkdrop-runtime-row{grid-template-columns:1fr;}
+}
