@@ -54,6 +54,81 @@
   const detached=new Set();
   let z=30;
 
+  const tooltip=document.createElement('div');
+  tooltip.className='rw-smart-tooltip';
+  tooltip.setAttribute('role','tooltip');
+  document.body.appendChild(tooltip);
+
+  const languageCode=()=>{
+    const explicit=document.querySelector('#language-select,#lang-select,#app-language,[data-language-setting]');
+    const value=String(explicit?.value||localStorage.getItem('rw666-language')||localStorage.getItem('language')||localStorage.getItem('lang')||document.documentElement.lang||navigator.language||'en').toLowerCase();
+    return value.startsWith('de')?'de':'en';
+  };
+  const tipText=(key)=>{
+    const de={
+      detachDock:'Menüleiste als eigenes Fenster lösen und auf einen anderen Monitor verschieben.',
+      detachVisualizer:'Visualizer als echtes Windows-Fenster lösen und auf Monitor 2 oder 3 verschieben.',
+      autoFit:'Visualizer automatisch an die verfügbare Fenstergröße anpassen.',
+      mute:'Audio stummschalten oder wieder einschalten.',
+      play:'Wiedergabe starten oder pausieren.',
+      diagnostics:'Diagnose öffnen: Monitore, GPU, Runtime und JSON-Export.',
+      importPersonal:'Persönliche MilkDrop-Bibliothek aus ZIP importieren und lokal speichern.',
+      top100:'Nur Presets aus der Top-100-Liste anzeigen.',
+      classic:'Nur klassische .milk-Presets anzeigen.',
+      double:'MilkDrop3-Doppelpresets (.milk2) anzeigen.',
+      license:'Lizenz der lokalen persönlichen MilkDrop-Bibliothek anzeigen.',
+      fullscreen:'Visualizer im Vollbild anzeigen.',
+      export:'Videoexport starten.'
+    };
+    const en={
+      detachDock:'Detach the menu bar as its own window and move it to another monitor.',
+      detachVisualizer:'Detach the visualizer as a real Windows window and move it to monitor 2 or 3.',
+      autoFit:'Automatically fit the visualizer to the available window size.',
+      mute:'Mute or unmute audio.',
+      play:'Start or pause playback.',
+      diagnostics:'Open diagnostics for displays, GPU, runtime and JSON export.',
+      importPersonal:'Import the personal MilkDrop library ZIP and store it locally.',
+      top100:'Show only presets from the Top 100 list.',
+      classic:'Show classic .milk presets only.',
+      double:'Show MilkDrop3 double presets (.milk2).',
+      license:'Show the license for the local personal MilkDrop library.',
+      fullscreen:'Show the visualizer in fullscreen.',
+      export:'Start video export.'
+    };
+    if(String(key).startsWith('open:')){
+      const k=String(key).slice(5);
+      const def=sectionDefs.find(x=>x.key===k);
+      const title=def?.title||k.toUpperCase();
+      return languageCode()==='de'?('Öffnet '+title+'.'):('Open '+title+'.');
+    }
+    return (languageCode()==='de'?de:en)[key]||'';
+  };
+  const inferredTipKey=el=>{
+    if(el?.dataset?.rwTipKey)return el.dataset.rwTipKey;
+    const map={
+      'btn-mute':'mute','btn-play-pause':'play','rw-dock-detach':'detachDock',
+      'rw-visual-detach':'detachVisualizer','rw-visual-auto':'autoFit',
+      'milkdrop-import-personal':'importPersonal','milkdrop-filter-top100':'top100',
+      'milkdrop-filter-classic':'classic','milkdrop-filter-double':'double',
+      'milkdrop-license':'license','btn-fullscreen':'fullscreen','btn-export':'export',
+      'rw-diag-export':'diagnostics'
+    };
+    return map[el?.id]||'';
+  };
+  const showTip=(el)=>{
+    const key=inferredTipKey(el);const text=tipText(key);if(!text)return;
+    tooltip.textContent=text;tooltip.classList.add('visible');
+    const r=el.getBoundingClientRect(),tr=tooltip.getBoundingClientRect();
+    const left=clamp(r.left+r.width/2-tr.width/2,8,Math.max(8,window.innerWidth-tr.width-8));
+    const top=(r.top-tr.height-10>8)?r.top-tr.height-10:Math.min(window.innerHeight-tr.height-8,r.bottom+10);
+    tooltip.style.left=Math.round(left)+'px';tooltip.style.top=Math.round(top)+'px';
+  };
+  const hideTip=()=>tooltip.classList.remove('visible');
+  document.addEventListener('mouseover',e=>{const el=e.target.closest('button,[data-rw-tip-key]');if(el)showTip(el);},true);
+  document.addEventListener('mouseout',e=>{if(e.target.closest('button,[data-rw-tip-key]'))hideTip();},true);
+  document.addEventListener('focusin',e=>{const el=e.target.closest('button,[data-rw-tip-key]');if(el)showTip(el);},true);
+  document.addEventListener('focusout',hideTip,true);
+
   function stateFor(key,def){
     const s=saved.windows?.[key]||{};
     return {
