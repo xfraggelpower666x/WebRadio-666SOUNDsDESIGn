@@ -109,13 +109,26 @@
     updateRadioStatus(kind,data);
   }
 
-  function setMode(next){
+  async function setMode(next){
     mode=next;
     document.body.classList.remove('source-local','source-radio','source-soundcloud');
     document.body.classList.add('source-'+next);
     qa('.source-btn').forEach(b=>b.classList.toggle('active',b.dataset.source===next));
     q('#radio-controls').classList.toggle('hidden',next!=='radio'); q('#soundcloud-controls').classList.toggle('hidden',next!=='soundcloud');
-    window.api.syncSource({mode:next});if(next==='radio') startRadio(); else {clearTimeout(poll);clearTimeout(radioRecoveryTimer);poll=0;radioRecoveryTimer=0;radioUsingFallback=false;radioFallbackFailed=false;radioFailoverAttempts=0;radioFailoverBusy=false;radioRecoveryBusy=false;if(next==='local'){rt.setStatus('Local mode');composeStage('local');}}
+    window.api.syncSource({mode:next});
+    if(next==='radio'){
+      await startRadio();
+      return;
+    }
+    clearTimeout(poll);clearTimeout(radioRecoveryTimer);poll=0;radioRecoveryTimer=0;radioUsingFallback=false;radioFallbackFailed=false;radioFailoverAttempts=0;radioFailoverBusy=false;radioRecoveryBusy=false;
+    if(next==='local'){
+      rt.setStatus('Local mode');
+      composeStage('local');
+      try{
+        const state=await window.RWLocalQueue?.resumeCurrent?.({autoplay:true});
+        if(!state?.count){audio.pause();rt.setStatus('Local mode · add audio files');}
+      }catch(e){state('LOCAL · '+String(e.message||e));}
+    }
   }
   const radioUrl=(fallback=false)=>new URL(fallback?radioCfg.fallback:radioCfg.stream,radioCfg.radioBase).href;
   const stopRadioRecovery=()=>{clearTimeout(radioRecoveryTimer);radioRecoveryTimer=0;};
@@ -181,7 +194,7 @@
       throw e;
     }
   }
-  qa('.source-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.source)));
+  qa('.source-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.source).catch(e=>state('SOURCE SWITCH · '+String(e.message||e)))));
   q('#radio-login').onclick=()=>act('LOGIN',async()=>{const r=await window.api.adminLogin(q('#radio-password').value);discordAutoEnabled=true;lastDiscordTrack='';await refreshNP();return r;}).catch(()=>{});
   q('#radio-skip').onclick=()=>act('SKIP',()=>window.api.radioSkip()).catch(()=>{});
   q('#player-message-send').onclick=()=>act('PLAYER',()=>window.api.playerAlertSend({message:q('#player-message').value,senderId})).catch(()=>{});
@@ -310,12 +323,40 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   };
 
   refreshMilkdropPresetOptions();
-  window.api?.personalMilkdropLibrary?.().then(lib=>{
+  const personalMilkdropBoot=window.api?.personalMilkdropLibrary?.().then(lib=>{
     const accepted=installPersonalMilkdropLibrary(lib);
-    if(lib?.installed&&milkdropState)milkdropState.textContent=`Personal library ready · ${accepted} classic presets renderable · ${lib.milk2||0} double presets indexed`;
-  }).catch(()=>{});
-  const milkdropActivate=()=>{q('#visual-engine').value='milkdrop';q('#visual-engine').dispatchEvent(new Event('change',{bubbles:true}));syncVisual();if(milkdropState)milkdropState.textContent='MilkDrop active · GPU feedback renderer';};
+    if(lib?.installed){
+      if(milkdropState)milkdropState.textContent=`AUTOLOADED · ${accepted} .milk ready · ${lib.milk2||0} .milk2 indexed`;
+      if(q('#milkdrop-personal-state'))q('#milkdrop-personal-state').textContent=`AUTOLOADED PERSONAL LIBRARY · ${lib.milk||0} .MILK · ${lib.milk2||0} .MILK2 · TOP100 ${lib.top100Count||0}`;
+    }
+    return {lib,accepted};
+  }).catch(e=>{
+    if(milkdropState)milkdropState.textContent='Personal library autoload error · '+String(e.message||e);
+    return {lib:null,accepted:0,error:e};
+  });
+  window.RWPersonalMilkdropBoot=personalMilkdropBoot;
+  const visualEngine=q('#visual-engine');
+  const setVisualEngine=(engine)=>{
+    const allowed=['soundwave','spectrum','analysis','shader','geometry3d','milkdrop'];
+    const next=allowed.includes(engine)?engine:'soundwave';
+    visualEngine.value=next;
+    localStorage.setItem('rw666-visual-engine',next);
+    visualEngine.dispatchEvent(new Event('change',{bubbles:true}));
+    return next;
+  };
+  const savedVisualEngine=localStorage.getItem('rw666-visual-engine');
+  if(savedVisualEngine&&['soundwave','spectrum','analysis','shader','geometry3d','milkdrop'].includes(savedVisualEngine))visualEngine.value=savedVisualEngine;
+  const milkdropActivate=()=>{setVisualEngine('milkdrop');syncVisual();if(milkdropState)milkdropState.textContent='MilkDrop active · GPU feedback renderer';};
+  const milkdropDeactivate=()=>{setVisualEngine('soundwave');syncVisual();if(milkdropState)milkdropState.textContent='MilkDrop OFF · Soundwave Classic active';};
   q('#milkdrop-activate')?.addEventListener('click',milkdropActivate);
+  q('#milkdrop-deactivate')?.addEventListener('click',milkdropDeactivate);
+  visualEngine?.addEventListener('change',()=>{
+    const engine=visualEngine.value||'soundwave';
+    localStorage.setItem('rw666-visual-engine',engine);
+    document.body.classList.toggle('milkdrop-active',engine==='milkdrop');
+    if(engine!=='milkdrop'&&milkdropState)milkdropState.textContent='MilkDrop OFF · '+(visualEngine.options[visualEngine.selectedIndex]?.textContent||engine)+' active';
+  });
+  q('#visualizer-style')?.addEventListener('change',()=>{if(visualEngine?.value==='milkdrop')milkdropDeactivate();});
   const selectMilkdropIndex=(index,remember=true)=>{
     if(!milkdropPreset||!milkdropPreset.options.length)return;
     const count=milkdropPreset.options.length;
@@ -384,7 +425,7 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
       }
       importedMilkdrop=null;
       const list=refreshMilkdropPresetOptions();
-      if(milkdropState)milkdropState.textContent=`Preset folder · ${pack.folder||'folder'} · ${accepted} loaded${pack.truncated?' · LIMIT REACHED':''} · LIBRARY ${list?.length||0}`;
+      if(milkdropState)milkdropState.textContent=`Preset folder · ${pack.folder||'folder'} · ${accepted} loaded · ${pack.persisted||0} PERSISTED${pack.truncated?' · LIMIT REACHED':''} · LIBRARY ${list?.length||0}`;
     }catch(e){
       if(milkdropState)milkdropState.textContent='Preset folder error · '+String(e.message||e);
       state('MILKDROP PACK ERROR · '+String(e.message||e));
@@ -422,7 +463,7 @@ const a=q('#display-one'),b=q('#display-two');const prevA=a.value||localStorage.
   }catch{
     if(milkdropGpuStatus)milkdropGpuStatus.textContent='WEBGL2 · GPU CHECK FAILED';
   }
-  const visualState=()=>({engine:q('#visual-engine').value,milkdropPreset:q('#milkdrop-preset').value,shaderPreset:q('#shader-preset').value,geometryPreset:q('#geometry-preset').value,importedMilkdrop});
+  const visualState=()=>({engine:q('#visual-engine').value||'soundwave',milkdropPreset:q('#milkdrop-preset').value,shaderPreset:q('#shader-preset').value,geometryPreset:q('#geometry-preset').value,importedMilkdrop});
   const syncVisual=()=>{if(!outputMode)window.api.syncSource({visual:visualState()});};
   ['#visual-engine','#milkdrop-preset','#shader-preset','#geometry-preset'].forEach(sel=>q(sel)?.addEventListener('change',syncVisual));
   // Apply supplied RADIO WAVE artwork from embedded package assets.
