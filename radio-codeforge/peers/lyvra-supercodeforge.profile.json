@@ -15,7 +15,7 @@
   "new_router": false,
   "imported_runtime_code": false,
   "peer_evidence": {
-    "facet_contract_blob": "d641f0fb7d?placeholder"
+    "facet_contract_blob": "6c5eae255fd68e6b0d03daf269cd00d641f0fb7d"
   },
   "adapted_gates": [
     "CAPABILITY_LIBRARY_NE_HOST_EXECUTION",
@@ -48,7 +48,7 @@
   "source_references": [
     {
       "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/FACET_CONTRACT.md",
-      "blob": "d641f0fb7d9f0d?"
+      "blob": "6c5eae255fd68e6b0d03daf269cd00d641f0fb7d"
     },
     {
       "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/CURRENT_STATE.json",
