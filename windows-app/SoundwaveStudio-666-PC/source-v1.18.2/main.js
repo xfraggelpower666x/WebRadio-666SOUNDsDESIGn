@@ -3,6 +3,7 @@ const { pathToFileURL } = require('url');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const cp = require('child_process');
 
 const STARTUP_LOG_PATH = path.join(os.tmpdir(), 'RADIO-WAVE-v6.66-startup.log');
 function startupLog(type, detail='') {
@@ -582,6 +583,69 @@ registerIpc('dialog:openMilkdrop','main', async()=>{
   const source=fs.readFileSync(filePath,'utf8'); if(!source.trim())throw new Error('milk_preset_empty'); return {name:path.basename(filePath),source};
 });
 
+function personalMilkdropRoot(){return path.join(app.getPath('userData'),'milkdrop-personal-library');}
+function personalMilkdropManifestPath(){return path.join(personalMilkdropRoot(),'RADIO-WAVE-PERSONAL-LIBRARY.json');}
+function safeWalkMilkdropLibrary(root){
+  const allowed=new Set(['.milk','.milk2','.txt','.jpg','.jpeg','.png','.gif','.shape','.wave','.fx']);
+  const files=[];let total=0;
+  const walk=dir=>{
+    for(const ent of fs.readdirSync(dir,{withFileTypes:true})){
+      const full=path.join(dir,ent.name);
+      if(ent.isSymbolicLink())continue;
+      if(ent.isDirectory()){walk(full);continue;}
+      if(!ent.isFile())continue;
+      const ext=path.extname(ent.name).toLowerCase();
+      if(!allowed.has(ext))continue;
+      const st=fs.statSync(full);
+      if(st.size<=0||st.size>8*1024*1024)continue;
+      total+=st.size;
+      if(total>512*1024*1024)throw new Error('personal_library_too_large');
+      files.push({full,relativePath:path.relative(root,full),name:ent.name,ext,size:st.size});
+      if(files.length>5000)throw new Error('personal_library_too_many_files');
+    }
+  };
+  if(fs.existsSync(root))walk(root);
+  return files;
+}
+function personalMilkdropLibraryState(includeSources=false){
+  const root=personalMilkdropRoot();
+  if(!fs.existsSync(root))return {installed:false,root,count:0,milk:0,milk2:0,presets:[],top100:[],license:null};
+  const files=safeWalkMilkdropLibrary(root);
+  const milk=files.filter(x=>x.ext==='.milk');
+  const milk2=files.filter(x=>x.ext==='.milk2');
+  const licenseFile=files.find(x=>/docs[\\/]license\.txt$/i.test(x.relativePath)||/^license\.txt$/i.test(x.relativePath));
+  const topFile=files.find(x=>/playlist[\\/]top100\.txt$/i.test(x.relativePath));
+  const top100=topFile?fs.readFileSync(topFile.full,'utf8').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(x=>path.basename(x.replace(/\\/g,'/'))):[];
+  const topSet=new Set(top100.map(x=>x.toLowerCase()));
+  const presets=milk.map(x=>({id:'personal:'+x.relativePath.replace(/\\/g,'/'),name:x.name,relativePath:x.relativePath.replace(/\\/g,'/'),source:includeSources?fs.readFileSync(x.full,'utf8'):undefined,top100:topSet.has(x.name.toLowerCase()),format:'milk'}));
+  const doubles=milk2.map(x=>({id:'personal2:'+x.relativePath.replace(/\\/g,'/'),name:x.name,relativePath:x.relativePath.replace(/\\/g,'/'),top100:topSet.has(x.name.toLowerCase()),format:'milk2'}));
+  return {installed:true,root,count:milk.length+milk2.length,milk:milk.length,milk2:milk2.length,presets,doubles,top100Count:top100.length,license:licenseFile?fs.readFileSync(licenseFile.full,'utf8'):null};
+}
+function extractPersonalMilkdropZip(zipPath){
+  if(process.platform!=='win32')throw new Error('personal_library_import_windows_only');
+  const st=fs.statSync(zipPath);
+  if(!st.isFile()||st.size<=0||st.size>256*1024*1024)throw new Error('personal_library_zip_invalid');
+  const root=personalMilkdropRoot();
+  const temp=root+'-incoming';
+  try{fs.rmSync(temp,{recursive:true,force:true});}catch{}
+  fs.mkdirSync(temp,{recursive:true});
+  const escapedZip=String(zipPath).replace(/'/g,"''");
+  const escapedDest=String(temp).replace(/'/g,"''");
+  const script=`$ErrorActionPreference='Stop'; Expand-Archive -LiteralPath '${escapedZip}' -DestinationPath '${escapedDest}' -Force`;
+  const r=cp.spawnSync('powershell.exe',['-NoProfile','-NonInteractive','-Command',script],{encoding:'utf8',windowsHide:true,timeout:120000,maxBuffer:4*1024*1024});
+  if(r.status!==0)throw new Error('personal_library_extract_failed:'+String(r.stderr||r.stdout||'').slice(0,600));
+  const files=safeWalkMilkdropLibrary(temp);
+  const milk=files.filter(x=>x.ext==='.milk').length;
+  const milk2=files.filter(x=>x.ext==='.milk2').length;
+  if(milk<1)throw new Error('personal_library_no_milk_presets');
+  try{fs.rmSync(root,{recursive:true,force:true});}catch{}
+  fs.renameSync(temp,root);
+  const state=personalMilkdropLibraryState(false);
+  fs.writeFileSync(personalMilkdropManifestPath(),JSON.stringify({installedAt:new Date().toISOString(),sourceZip:path.basename(zipPath),milk:state.milk,milk2:state.milk2,count:state.count,personalUse:true,redistribution:false},null,2),'utf8');
+  runtimeEvent('personal-milkdrop-library-imported',{milk:state.milk,milk2:state.milk2,count:state.count});
+  return state;
+}
+
 registerIpc('dialog:openMilkdropPack','main', async()=>{
   const result=await dialog.showOpenDialog(mainWindow,{title:'Import MilkDrop Preset Folder',properties:['openDirectory']});
   if(result.canceled||!result.filePaths[0])return null;
@@ -607,6 +671,14 @@ registerIpc('dialog:openMilkdropPack','main', async()=>{
   walk(root);
   return {folder:path.basename(root),count:out.length,totalBytes:total,truncated:out.length>=MAX_FILES||total>=MAX_TOTAL,presets:out};
 });
+
+registerIpc('dialog:importMilkdropPersonalLibrary','main',async()=>{
+  const result=await dialog.showOpenDialog(mainWindow,{title:'Import Personal MilkDrop3 Library ZIP',filters:[{name:'ZIP archives',extensions:['zip']}],properties:['openFile']});
+  if(result.canceled||!result.filePaths[0])return null;
+  return extractPersonalMilkdropZip(result.filePaths[0]);
+});
+registerIpc('milkdrop:personal-library','main',async()=>personalMilkdropLibraryState(true));
+registerIpc('milkdrop:personal-library-license','main',async()=>{const s=personalMilkdropLibraryState(false);return {installed:s.installed,license:s.license||''};});
 
 registerIpc('dialog:openBackground','main', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
