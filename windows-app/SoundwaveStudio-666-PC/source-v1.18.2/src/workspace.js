@@ -29,7 +29,8 @@
     {key:'text',title:'TEXT OVERLAYS',icon:'✏️',match:'Text Overlays',x:220,y:155,w:410,h:430},
     {key:'engines',title:'PRESENTATION & ENGINES',icon:'🖥️',match:'Presentation & Engines',x:260,y:105,w:440,h:610},
     {key:'milkdrop',title:'MILKDROP STUDIO',icon:'🌌',node:q('#milkdrop-studio'),x:300,y:120,w:430,h:470},
-    {key:'export',title:'EXPORT STUDIO',icon:'📹',match:'Export Studio',x:340,y:145,w:410,h:420}
+    {key:'diagnostics',title:'DIAGNOSTICS',icon:'🩺',node:q('#rw-diagnostics'),x:330,y:125,w:500,h:600},
+    {key:'export',title:'EXPORT STUDIO',icon:'📹',match:'Export Studio',x:360,y:145,w:410,h:420}
   ];
 
   const sectionNodes=qa('.panel-section');
@@ -67,6 +68,8 @@
 
   function saveWorkspace(){
     const out={dockOpen:!document.body.classList.contains('rw-dock-collapsed'),windows:{}};
+    const dr=dock.getBoundingClientRect();
+    out.dock={x:Math.round(dr.left),y:Math.round(dr.top),w:Math.round(dr.width),h:Math.round(dr.height)};
     for(const [key,win] of windows){
       const r=win.getBoundingClientRect();
       out.windows[key]={
@@ -86,6 +89,19 @@
         w:Math.round(sr.width),h:Math.round(sr.height),
         open:!status.classList.contains('hidden'),
         z:Number(status.style.zIndex)||0
+      };
+    }
+    const vf=q('#video-frame-outer'),vp=q('.preview-viewport-container');
+    if(vf&&vp){
+      const vr=vf.getBoundingClientRect(),pr=vp.getBoundingClientRect();
+      out.visualFrame={
+        x:Math.round(vr.left-pr.left),y:Math.round(vr.top-pr.top),
+        w:Math.round(vr.width),h:Math.round(vr.height),
+        nx:pr.width?((vr.left-pr.left)/pr.width):0,
+        ny:pr.height?((vr.top-pr.top)/pr.height):0,
+        nw:pr.width?(vr.width/pr.width):1,
+        nh:pr.height?(vr.height/pr.height):1,
+        manual:document.body.classList.contains('rw-visual-frame-manual')
       };
     }
     try{localStorage.setItem(STORAGE,JSON.stringify(out));}catch{}
@@ -184,12 +200,22 @@
         win.style.left=(left-bounds.left)+'px';win.style.top=(top-bounds.top)+'px';
         win.style.right='auto';
       }else{
+        if(key==='dock')win.style.right='auto';
         win.style.left=left+'px';win.style.top=top+'px';
       }
     });
     const done=e=>{if(!active)return;active=false;try{handle.releasePointerCapture?.(e.pointerId);}catch{}saveWorkspace();};
     handle.addEventListener('pointerup',done);handle.addEventListener('pointercancel',done);
   }
+
+  if(saved.dock){
+    const ds=saved.dock;
+    if(Number.isFinite(ds.x)){dock.style.left=ds.x+'px';dock.style.right='auto';}
+    if(Number.isFinite(ds.y))dock.style.top=ds.y+'px';
+    if(Number.isFinite(ds.w))dock.style.width=Math.max(86,ds.w)+'px';
+    if(Number.isFinite(ds.h))dock.style.height=Math.max(180,ds.h)+'px';
+  }
+  makeDraggable(dock,dockHead,'dock');
 
   for(const def of sectionDefs){
     if(!def.node)continue;
@@ -246,12 +272,64 @@
     btn.addEventListener('click',()=>openWindow('status'));dock.appendChild(btn);
   }
 
+  // Main visualization stage behaves like a workspace window too.
+  const visualFrame=q('#video-frame-outer');
+  const visualViewport=q('.preview-viewport-container');
+  if(visualFrame&&visualViewport){
+    visualFrame.classList.add('rw-workspace-visual-frame');
+    const grip=document.createElement('div');
+    grip.className='rw-visual-frame-grip';
+    grip.innerHTML='<span>⠿ VISUALIZER</span><button type="button" class="rw-visual-frame-auto" title="Auto fit">AUTO</button>';
+    visualFrame.prepend(grip);
+
+    const fitVisualFrame=()=>{
+      const pr=visualViewport.getBoundingClientRect();
+      if(pr.width<1||pr.height<1)return false;
+      const savedV=saved.visualFrame;
+      if(document.body.classList.contains('rw-visual-frame-manual')&&savedV?.manual){
+        const w=clamp((savedV.nw||.8)*pr.width,320,Math.max(320,pr.width-8));
+        const h=clamp((savedV.nh||.7)*pr.height,200,Math.max(200,pr.height-8));
+        const x=clamp((savedV.nx||0)*pr.width,4,Math.max(4,pr.width-w-4));
+        const y=clamp((savedV.ny||0)*pr.height,4,Math.max(4,pr.height-h-4));
+        visualFrame.style.left=x+'px';visualFrame.style.top=y+'px';
+        visualFrame.style.width=w+'px';visualFrame.style.height=h+'px';
+      }else{
+        const ratio=(q('#select-aspect-ratio')?.value==='9-16')?9/16:(q('#select-aspect-ratio')?.value==='1-1'?1:16/9);
+        let w=pr.width-8,h=w/ratio;
+        if(h>pr.height-8){h=pr.height-8;w=h*ratio;}
+        visualFrame.style.left=Math.max(4,(pr.width-w)/2)+'px';
+        visualFrame.style.top=Math.max(4,(pr.height-h)/2)+'px';
+        visualFrame.style.width=Math.max(1,w)+'px';visualFrame.style.height=Math.max(1,h)+'px';
+      }
+      return true;
+    };
+
+    if(saved.visualFrame?.manual)document.body.classList.add('rw-visual-frame-manual');
+    makeDraggable(visualFrame,grip,'visualFrame',()=>visualViewport);
+    grip.querySelector('.rw-visual-frame-auto').addEventListener('click',e=>{
+      e.stopPropagation();
+      document.body.classList.remove('rw-visual-frame-manual');
+      if(saved.visualFrame)saved.visualFrame.manual=false;
+      fitVisualFrame();saveWorkspace();
+    });
+    visualFrame.addEventListener('pointerdown',e=>{
+      if(e.target.closest('.rw-visual-frame-grip')&&!e.target.closest('button'))document.body.classList.add('rw-visual-frame-manual');
+    });
+    visualFrame.addEventListener('mouseup',()=>{document.body.classList.add('rw-visual-frame-manual');saveWorkspace();});
+    if('ResizeObserver' in window)new ResizeObserver(()=>{
+      if(visualFrame.matches(':hover'))document.body.classList.add('rw-visual-frame-manual');
+      saveWorkspace();
+    }).observe(visualFrame);
+    window.RWVisualFrame=Object.freeze({fit:fitVisualFrame,auto(){document.body.classList.remove('rw-visual-frame-manual');fitVisualFrame();saveWorkspace();}});
+    requestAnimationFrame(()=>requestAnimationFrame(fitVisualFrame));
+  }
+
   document.body.classList.add('rw-workspace-enabled');
   document.body.classList.toggle('rw-dock-collapsed',saved.dockOpen===false);
 
   // Keep the existing top button as dock toggle rather than old scrolling-sidebar toggle.
   window.RWWorkspace=Object.freeze({
-    open:openWindow,close:closeWindow,detach:detachWindow,
+    open:openWindow,close:closeWindow,detach:detachWindow,fitVisualFrame:()=>window.RWVisualFrame?.fit?.(),
     toggleDock(){
       document.body.classList.toggle('rw-dock-collapsed');
       saveWorkspace();
@@ -315,6 +393,13 @@
 
   window.addEventListener('resize',()=>{
     for(const w of windows.values())clampWindow(w);
+    if(dock){
+      const r=dock.getBoundingClientRect();
+      dock.style.left=clamp(r.left,4,Math.max(4,window.innerWidth-r.width-4))+'px';
+      dock.style.top=clamp(r.top,4,Math.max(4,window.innerHeight-r.height-4))+'px';
+      dock.style.right='auto';
+    }
+    window.RWVisualFrame?.fit?.();
     const status=q('#radio-status-panel'),frame=q('#video-frame-outer');
     if(status&&frame){
       const fr=frame.getBoundingClientRect(),sr=status.getBoundingClientRect();
