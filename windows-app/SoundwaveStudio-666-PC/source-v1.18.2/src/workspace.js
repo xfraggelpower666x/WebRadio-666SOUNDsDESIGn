@@ -76,7 +76,6 @@
     languageSelect.value=initialLanguage;
     languageSelect.addEventListener('change',()=>applyLanguage(languageSelect.value));
   }
-  applyLanguage(initialLanguage);
   const languageCode=()=>normalizeLanguage(languageSelect?.value||localStorage.getItem('rw666-language')||'en-US').startsWith('de')?'de':'en';
   const tipText=(key)=>{
     const de={
@@ -151,6 +150,7 @@
     tooltip.style.left=Math.round(left)+'px';tooltip.style.top=Math.round(top)+'px';
   };
   const hideTip=()=>tooltip.classList.remove('visible');
+  applyLanguage(initialLanguage);
   document.addEventListener('mouseover',e=>{const el=e.target.closest('button,[data-rw-tip-key]');if(el)showTip(el);},true);
   document.addEventListener('mouseout',e=>{if(e.target.closest('button,[data-rw-tip-key]'))hideTip();},true);
   document.addEventListener('focusin',e=>{const el=e.target.closest('button,[data-rw-tip-key]');if(el)showTip(el);},true);
