@@ -1,0 +1,36 @@
+{
+  "schema": "666STREAM_RADIO_WAVE_WINDOWS_BUILD_ACCEPTANCE_V1",
+  "system": "666STREAM",
+  "project": "WINDOWS_APP",
+  "product": "RADIO WAVE v6.66",
+  "source_branch": "soundwave-v1-18-2-source-import-20261002",
+  "source_head": "6fece349422be82c6d4b3e69892a353de1ae4b4a",
+  "workflow": ".github/workflows/radio-wave-windows-build.yml",
+  "workflow_run_id": 40101875954,
+  "workflow_job_id": 120895534550,
+  "workflow_conclusion": "success",
+  "targeted_release_gates": "PASS_38_OF_38",
+  "installer_build": "PASS",
+  "installer_file": "RADIO-WAVE-v6.66-Setup.exe",
+  "installer_sha256": "0bb1531aebd106933be46bb61ffaf8decd31b70989227348f1cbc3f563e546de",
+  "artifact_id": 12563286876,
+  "artifact_name": "RADIO-WAVE-v6.66-Windows-Installer",
+  "artifact_size_bytes": 79497903,
+  "artifact_zip_sha256": "684ade6aa7a293bdbc7b5f240f3e4408ff45fbbe6b3444a0decc7737a063e13c",
+  "independent_local_readback": {
+    "zip_contents": [
+      "RADIO-WAVE-v6.66-Setup.exe",
+      "RADIO-WAVE-v6.66-SHA256SUMS.txt"
+    ],
+    "exe_sha_matches_manifest": true,
+    "zip_sha_matches_github_artifact_digest": true,
+    "exe_type": "PE32 GUI Nullsoft Installer self-extracting archive"
+  },
+  "soundwave_core": "PRESERVE",
+  "radio_role": "ADDITIVE_ADDON",
+  "production_webradio_mutation": "NONE",
+  "windows_host_launch_acceptance": "PENDING_REAL_WINDOWS_HOST",
+  "installer_interactive_acceptance": "PENDING_REAL_WINDOWS_HOST",
+  "pointer_updated": false,
+  "reason_pointer_not_updated": "WEITER_NOT_UPDATE"
+}
