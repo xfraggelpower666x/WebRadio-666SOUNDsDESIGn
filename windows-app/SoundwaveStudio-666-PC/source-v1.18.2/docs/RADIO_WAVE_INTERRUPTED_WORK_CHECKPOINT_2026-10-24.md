@@ -65,3 +65,30 @@ Do not restart or repeat accepted work.
 Continue from newest source HEAD.
 If CI fails, repair only the concrete failing gate.
 After exact-head CI success, publish a NO-INSTALL host-test artifact.
+
+
+## Personal MilkDrop library continuation
+PERSONAL_LIBRARY_SOURCE=USER_PROVIDED_playlist.zip
+SOURCE_ARCHIVE_SIZE_BYTES=68728078
+SOURCE_ARCHIVE_ENTRIES=773
+CLASSIC_MILK_PRESETS=333
+DOUBLE_MILK2_PRESETS=146
+TOTAL_PRESET_FILES=479
+TOP100_INDEX=playlist/top100.txt
+LICENSE_SOURCE=docs/LICENSE.txt
+PERSONAL_USE_ONLY=TRUE
+PUBLIC_REDISTRIBUTION=FALSE
+
+### Implemented
+- Windows ZIP import into app userData/milkdrop-personal-library.
+- Controlled extraction bounds: ZIP <=256 MiB, extracted supported assets <=512 MiB, <=5000 files, per-file <=8 MiB.
+- License retained in local extracted library and exposed in MilkDrop Studio.
+- Top100 list indexed.
+- 333 classic .milk presets loaded into SVPresets and immediately renderable by current engine.
+- 146 .milk2 double presets indexed separately.
+- .milk2 is not falsely treated as classic .milk; native double-preset renderer remains a distinct future capability.
+- Personal library persists across app restarts without re-selecting the ZIP.
+- Library filters: ALL / TOP100 / .MILK / .MILK2.
+- Personal library is not embedded into public repository/build artifacts.
+
+NEXT_HOST_TEST=IMPORT_playlist.zip_AND_VERIFY_333_RENDERABLE_146_INDEXED_LICENSE_TOP100
