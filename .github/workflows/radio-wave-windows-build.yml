@@ -64,3 +64,21 @@ jobs:
             windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/RADIO-WAVE-v6.66-SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 14
+
+      - name: Prepare unpacked diagnostic package
+        run: |
+          Copy-Item "START_RADIO_WAVE_DIAGNOSTIC.cmd" "dist\win-unpacked\START_RADIO_WAVE_DIAGNOSTIC.cmd" -Force
+          $app = Get-ChildItem -Path "dist\win-unpacked" -Filter "*.exe" | Where-Object { $_.Name -eq "RADIO WAVE v6.66.exe" } | Select-Object -First 1
+          if (-not $app) { throw "RADIO_WAVE_UNPACKED_EXE_MISSING" }
+          $hash = (Get-FileHash -Algorithm SHA256 $app.FullName).Hash.ToLower()
+          "$hash  $($app.Name)" | Set-Content -Encoding ascii "dist\win-unpacked\RADIO-WAVE-v6.66-UNPACKED-SHA256.txt"
+          Write-Host "PASS unpacked app: $($app.FullName)"
+          Write-Host "UNPACKED SHA256: $hash"
+
+      - name: Upload RADIO WAVE unpacked diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: RADIO-WAVE-v6.66-Windows-Unpacked-Diagnostic
+          path: windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/win-unpacked/**
+          if-no-files-found: error
+          retention-days: 14
