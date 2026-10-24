@@ -324,6 +324,23 @@
           <div class="file-meta-tag" id="milkdrop-state">GPU feedback renderer · real audio analyser</div>
         </section>
 
+        <section class="panel-section" id="rw-diagnostics">
+          <h2 class="section-title"><span class="icon">🩺</span> Diagnostics</h2>
+          <div class="rw-diag-toolbar">
+            <button id="rw-diag-refresh" class="btn btn-secondary" type="button">REFRESH</button>
+            <button id="rw-diag-export" class="btn btn-secondary" type="button">EXPORT JSON</button>
+          </div>
+          <div class="file-meta-tag" id="rw-diag-state">READY</div>
+          <h3 class="section-subtitle">Displays / Monitor</h3>
+          <div id="rw-diag-displays" class="rw-diag-grid"></div>
+          <h3 class="section-subtitle">Visualizer Outputs</h3>
+          <div id="rw-diag-outputs" class="rw-diag-grid"></div>
+          <h3 class="section-subtitle">GPU</h3>
+          <pre id="rw-diag-gpu" class="rw-diag-json">—</pre>
+          <h3 class="section-subtitle">Runtime</h3>
+          <pre id="rw-diag-runtime" class="rw-diag-json">—</pre>
+        </section>
+
         <!-- SECTION 5: Video Export Engine -->
         <section class="panel-section">
           <h2 class="section-title"><span class="icon">📹</span> Export Studio</h2>
@@ -466,6 +483,7 @@
   <script src="vendor/cayatur/milkdrop-cycle.js"></script>
   <script src="vendor/cayatur/milkdrop-renderer.js"></script>
   <script src="workspace.js"></script>
+  <script src="diagnostics.js"></script>
   <script src="app.js"></script>
   <script src="integration/666-integration.js"></script>
 </body>
