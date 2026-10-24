@@ -41,6 +41,12 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "build/radio-wave-v6.66.ico"
@@ -67,7 +73,10 @@
       "artifactName": "RADIO-WAVE-v6.66-Setup.${ext}",
       "runAfterFinish": true,
       "perMachine": false,
-      "allowElevation": true
+      "allowElevation": false
+    },
+    "portable": {
+      "artifactName": "RADIO-WAVE-v6.66-Portable.${ext}"
     }
   },
   "productName": "RADIO WAVE v6.66"
