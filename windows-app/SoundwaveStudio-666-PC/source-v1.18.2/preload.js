@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('api', {
   sendVisualFrame: (payload) => ipcRenderer.invoke('visual:frame', payload),
   onVisualFrame: (fn) => ipcRenderer.on('visual:frame', (_e, frame) => fn(frame)),
   runtimeDiagnostics: () => ipcRenderer.invoke('runtime:diagnostics'),
+  remoteHealth: () => ipcRenderer.invoke('runtime:remote-health'),
   exportRuntimeDiagnostics: () => ipcRenderer.invoke('runtime:export-diagnostics'),
   syncSource: (state) => ipcRenderer.invoke('source:sync', state),
   onSourceState: (fn) => ipcRenderer.on('source:state', (_e, state) => fn(state)),
