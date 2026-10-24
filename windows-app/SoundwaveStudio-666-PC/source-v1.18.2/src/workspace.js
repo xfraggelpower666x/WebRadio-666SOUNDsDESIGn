@@ -59,11 +59,25 @@
   tooltip.setAttribute('role','tooltip');
   document.body.appendChild(tooltip);
 
-  const languageCode=()=>{
-    const explicit=document.querySelector('#language-select,#lang-select,#app-language,[data-language-setting]');
-    const value=String(explicit?.value||localStorage.getItem('rw666-language')||localStorage.getItem('language')||localStorage.getItem('lang')||document.documentElement.lang||navigator.language||'en').toLowerCase();
-    return value.startsWith('de')?'de':'en';
+  const languageSelect=document.getElementById('app-language');
+  const normalizeLanguage=value=>String(value||'').toLowerCase().startsWith('de')?'de-DE':'en-US';
+  const applyLanguage=value=>{
+    const lang=normalizeLanguage(value);
+    try{localStorage.setItem('rw666-language',lang);}catch{}
+    document.documentElement.lang=lang;
+    if(languageSelect&&languageSelect.value!==lang)languageSelect.value=lang;
+    document.body.dataset.uiLanguage=lang;
+    window.dispatchEvent(new CustomEvent('rw:language-changed',{detail:{language:lang}}));
+    hideTip();
+    return lang;
   };
+  const initialLanguage=normalizeLanguage(localStorage.getItem('rw666-language')||'en-US');
+  if(languageSelect){
+    languageSelect.value=initialLanguage;
+    languageSelect.addEventListener('change',()=>applyLanguage(languageSelect.value));
+  }
+  applyLanguage(initialLanguage);
+  const languageCode=()=>normalizeLanguage(languageSelect?.value||localStorage.getItem('rw666-language')||'en-US').startsWith('de')?'de':'en';
   const tipText=(key)=>{
     const de={
       detachDock:'Menüleiste als eigenes Fenster lösen und auf einen anderen Monitor verschieben.',
