@@ -26,7 +26,8 @@
     {key:'position',title:'POSITION & SIZE',icon:'📐',match:'Position & Size',x:170,y:135,w:420,h:500},
     {key:'text',title:'TEXT OVERLAYS',icon:'✏️',match:'Text Overlays',x:220,y:155,w:410,h:430},
     {key:'engines',title:'PRESENTATION & ENGINES',icon:'🖥️',match:'Presentation & Engines',x:260,y:105,w:440,h:610},
-    {key:'export',title:'EXPORT STUDIO',icon:'📹',match:'Export Studio',x:310,y:145,w:410,h:420}
+    {key:'milkdrop',title:'MILKDROP STUDIO',icon:'🌌',node:q('#milkdrop-studio'),x:300,y:120,w:430,h:470},
+    {key:'export',title:'EXPORT STUDIO',icon:'📹',match:'Export Studio',x:340,y:145,w:410,h:420}
   ];
 
   const sectionNodes=qa('.panel-section');
