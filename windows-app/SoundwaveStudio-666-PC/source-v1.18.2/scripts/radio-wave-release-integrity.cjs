@@ -150,6 +150,18 @@ check(/startsWith\('de'\)/.test(workspace)&&/detachVisualizer/.test(workspace),'
 check(/tuneTicker/.test(integration)&&/scrollWidth/.test(integration)&&/clientWidth/.test(integration),'adaptive-ticker-width-measurement');
 check(/rw-ticker-static/.test(integration)&&/rw-ticker-static/.test(css),'adaptive-ticker-short-title-static');
 check(/--rw-ticker-duration/.test(integration)&&/s666TickerAdaptive/.test(css),'adaptive-ticker-dynamic-duration');
+check(/CSS\.escape\(b\.dataset\.source\)/.test(text('src/overlay-window.js')),'detached-source-tab-forwarding');
+check(/workspace:overlay-action[^]*selector/.test(main),'detached-overlay-selector-ipc');
+check(/MutationObserver[^]*syncDetachedWindow/.test(workspace),'detached-source-live-sync');
+check(/#export-diagnostics'\)\?\.addEventListener/.test(integration),'stale-diagnostics-null-safe');
+check(/runtime:remote-health/.test(main)&&/remoteHealth/.test(text('preload.js')),'remote-health-ipc');
+check(/radio-runtime-health/.test(html)&&/soundcloud-runtime-health/.test(html),'remote-health-ui');
+check(/refreshRemoteHealth/.test(integration)&&/SOUNDCLOUD HEALTH/.test(integration),'remote-health-renderer');
+check(/q\('#radio-skip'\)\.onclick[^]*\.catch/.test(integration),'skip-action-error-contained');
+check(/q\('#player-message-send'\)\.onclick[^]*\.catch/.test(integration),'messenger-action-error-contained');
+check(/q\('#discord-send'\)\.onclick[^]*\.catch/.test(integration),'discord-action-error-contained');
+check(/SoundCloud API credentials required/.test(integration),'soundcloud-credential-diagnostic');
+check(/id="app-language"/.test(html)&&/languageCode/.test(workspace),'explicit-de-en-language-setting');
 
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
