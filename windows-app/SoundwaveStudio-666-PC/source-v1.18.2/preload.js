@@ -1,7 +1,16 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
   openAudio: () => ipcRenderer.invoke('dialog:openAudio'),
+  localQueueState: () => ipcRenderer.invoke('local:queue-state'),
+  localQueueAddPaths: (paths) => ipcRenderer.invoke('local:queue-add-paths', paths),
+  localQueueActivate: (index) => ipcRenderer.invoke('local:queue-activate', index),
+  localQueueRemove: (index) => ipcRenderer.invoke('local:queue-remove', index),
+  localQueueClear: () => ipcRenderer.invoke('local:queue-clear'),
+  localQueueShuffle: () => ipcRenderer.invoke('local:queue-shuffle'),
+  getPathForFile: (file) => {
+    try { return webUtils?.getPathForFile ? webUtils.getPathForFile(file) : String(file?.path || ''); } catch { return String(file?.path || ''); }
+  },
   openBackground: () => ipcRenderer.invoke('dialog:openBackground'),
   openMilkdrop: () => ipcRenderer.invoke('dialog:openMilkdrop'),
   openMilkdropPack: () => ipcRenderer.invoke('dialog:openMilkdropPack'),
