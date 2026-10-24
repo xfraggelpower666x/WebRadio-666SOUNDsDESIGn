@@ -36,6 +36,9 @@
     applyControls(payload?.controls||[]);
     wire();
   });
-  window.rwOverlay.onSync(payload=>applyControls(payload?.controls||[]));
+  window.rwOverlay.onSync(payload=>{
+    if(payload?.html!==undefined)root.innerHTML=String(payload.html||'');
+    applyControls(payload?.controls||[]);
+  });
   window.rwOverlay.ready().catch(()=>{});
 })();
