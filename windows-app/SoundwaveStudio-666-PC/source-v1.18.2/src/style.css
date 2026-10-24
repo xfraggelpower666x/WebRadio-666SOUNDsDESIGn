@@ -1737,3 +1737,63 @@ input[type="range"]{accent-color:var(--rw-neon-pink);}
   box-shadow:0 0 12px rgba(255,43,214,.28),inset 0 0 12px rgba(255,43,214,.08);
 }
 .mute-btn small{font:inherit;}
+
+
+/* Adaptive now-playing ticker: short text stays visible; long text uses measured JS timing. */
+.source-nowplaying-track{
+  min-width:0!important;
+  padding-left:0!important;
+  animation:s666TickerAdaptive var(--rw-ticker-duration,12s) linear infinite!important;
+}
+.source-nowplaying-track.rw-ticker-static{
+  display:block!important;
+  width:100%;
+  text-align:center;
+  animation:none!important;
+  transform:none!important;
+  padding:0 18px!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+@keyframes s666TickerAdaptive{
+  from{transform:translateX(var(--rw-ticker-start,100vw))}
+  to{transform:translateX(var(--rw-ticker-end,-100%))}
+}
+
+/* True native detach controls. */
+.rw-dock-detach,.rw-visual-frame-detach{
+  border:1px solid rgba(25,247,255,.38);
+  background:rgba(2,8,18,.86);
+  color:var(--rw-neon-cyan);
+  border-radius:5px;
+  cursor:pointer;
+  font:900 12px/1 monospace;
+  padding:4px 6px;
+}
+.rw-dock-detach:hover,.rw-visual-frame-detach:hover{
+  border-color:var(--rw-neon-pink);
+  box-shadow:0 0 10px rgba(255,43,214,.28);
+}
+.rw-window-dock-title{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.rw-window-dock.rw-dock-native-detached{opacity:.22;pointer-events:none;}
+.rw-detached-dock{display:grid;gap:7px;padding:4px;}
+.rw-detached-dock .rw-dock-button{width:100%;}
+
+/* Localized smart tooltip */
+.rw-smart-tooltip{
+  position:fixed;
+  z-index:20000;
+  max-width:min(340px,calc(100vw - 16px));
+  padding:8px 10px;
+  border:1px solid rgba(25,247,255,.44);
+  background:linear-gradient(135deg,rgba(8,5,24,.97),rgba(3,12,20,.97));
+  color:#eefcff;
+  font:700 10px/1.35 monospace;
+  letter-spacing:.025em;
+  box-shadow:0 0 14px rgba(25,247,255,.18),0 0 22px rgba(255,43,214,.10);
+  pointer-events:none;
+  opacity:0;
+  transform:translateY(3px);
+  transition:opacity .1s ease,transform .1s ease;
+}
+.rw-smart-tooltip.visible{opacity:1;transform:none;}
