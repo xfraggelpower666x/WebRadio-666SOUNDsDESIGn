@@ -146,3 +146,29 @@ A native, scope-bound RADIO-CODEFORGE development policy adapted from CLIC/LYVRA
 - Required currentness/permission/concurrency checks, pre-change backup, security tests, regression tests, post-change readbacks and pointer-last publication are **not subject to the 3-check ceiling**.
 - Record hypothesis, checks already performed, results, attempted action, observed outcome, contradicting evidence and next return anchor so NEW/NEXT CHAT or WEITER does not repeat the same three checks.
 - This is independent of `codexEscalation.triggerAfterSeriousFailedAttempts=3`, which counts *failed repair attempts*, not discovery checks. Learning evidence stays 666STREAM-local and can never rewrite CLIC/LYVRA knowledge.
+
+
+## LYVRA SuperCodeForge peer-gate adaptation — 2026-10-24
+
+666 RADIO-CODEFORGE now has a **read-only peer capability profile** for verified Whole-LYVRA SuperCodeForge development contracts.
+
+This is a capability combination, not an identity/system merge:
+
+- 666STREAM remains native authority and project owner.
+- RADIO-CODEFORGE remains the local executor/auditor.
+- LYVRA SuperCodeForge remains LYVRA-owned and is never autoactivated or mutated.
+- No LYVRA runtime module is imported into 666STREAM production code.
+- No foreign write, trigger, namespace, pointer or decision authority is inherited.
+- Source, CI, delivery, adoption and host-runtime evidence stay separate.
+- Immutable commit/blob references are required for peer-source evidence.
+- Replay/supersession and permission boundaries are evaluated before a peer handoff may influence a local development decision.
+- A peer source readback can strengthen analysis, but it can never self-promote to CI PASS, host PASS or foreign adoption.
+
+Native files:
+- `radio-codeforge/peers/lyvra-supercodeforge.profile.json`
+- `radio-codeforge/peers/lyvra-supercodeforge-peer-adapter.mjs`
+- `radio-codeforge/peers/lyvra-supercodeforge-peer-adapter.test.mjs`
+
+Combined development chain:
+
+`666STREAM current -> RADIO-CODEFORGE cause-first audit -> SuperCodeForge peer evidence gates -> smallest safe reversible action -> targeted regression -> independent readback -> evidence classification -> promotion only under native 666STREAM authority`
