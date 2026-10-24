@@ -70,6 +70,8 @@
     const out={dockOpen:!document.body.classList.contains('rw-dock-collapsed'),windows:{}};
     const dr=dock.getBoundingClientRect();
     out.dock={x:Math.round(dr.left),y:Math.round(dr.top),w:Math.round(dr.width),h:Math.round(dr.height)};
+    saved.dock=out.dock;
+    saved.dockOpen=out.dockOpen;
     for(const [key,win] of windows){
       const r=win.getBoundingClientRect();
       out.windows[key]={
@@ -103,7 +105,9 @@
         nh:pr.height?(vr.height/pr.height):1,
         manual:document.body.classList.contains('rw-visual-frame-manual')
       };
+      saved.visualFrame=out.visualFrame;
     }
+    saved.windows=out.windows;
     try{localStorage.setItem(STORAGE,JSON.stringify(out));}catch{}
   }
 
