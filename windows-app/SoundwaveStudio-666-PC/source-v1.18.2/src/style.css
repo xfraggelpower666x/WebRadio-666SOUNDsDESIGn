@@ -1106,3 +1106,93 @@ body.rw-dock-collapsed .rw-window-dock{transform:translateX(118px);opacity:.08;p
   .rw-dock-button{min-height:52px;}
   .rw-dock-button>small{font-size:7px;}
 }
+
+
+/* Responsive floating-window content: prefer reflow/scale over scrollbars */
+.rw-floating-window{
+  container-type:inline-size;
+}
+.rw-floating-window-body{
+  overflow:hidden;
+  scrollbar-width:none;
+}
+.rw-floating-window-body::-webkit-scrollbar{display:none;}
+.rw-floating-window .rw-window-content{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+}
+.rw-floating-window .control-group,
+.rw-floating-window .source-pane,
+.rw-floating-window .remote-row,
+.rw-floating-window .color-options-row,
+.rw-floating-window .export-actions{
+  min-width:0;
+}
+.rw-floating-window .remote-row,
+.rw-floating-window .color-options-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:clamp(5px,1.2cqw,10px);
+}
+.rw-floating-window .btn,
+.rw-floating-window .custom-input,
+.rw-floating-window .custom-select,
+.rw-floating-window .custom-select-small,
+.rw-floating-window textarea{
+  max-width:100%;
+  min-width:0;
+  font-size:clamp(10px,2.2cqw,14px);
+}
+.rw-floating-window .control-group{
+  margin-bottom:clamp(7px,1.8cqh,14px);
+}
+.rw-floating-window label,
+.rw-floating-window .section-subtitle,
+.rw-floating-window .file-meta-tag{
+  font-size:clamp(9px,2cqw,13px);
+}
+.rw-floating-window .btn{
+  min-height:clamp(30px,7cqh,40px);
+  padding:clamp(6px,1.4cqh,10px) clamp(8px,2cqw,14px);
+}
+.rw-floating-window .custom-range{width:100%;}
+
+@container (max-width: 360px){
+  .rw-floating-window .remote-row,
+  .rw-floating-window .color-options-row{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .rw-floating-window .btn,
+  .rw-floating-window .custom-input,
+  .rw-floating-window .custom-select,
+  .rw-floating-window .custom-select-small,
+  .rw-floating-window textarea{
+    width:100%;
+  }
+}
+@container (max-height: 330px){
+  .rw-floating-window .control-group{margin-bottom:6px;}
+  .rw-floating-window .btn{min-height:28px;padding:5px 8px;}
+  .rw-floating-window textarea{min-height:48px;max-height:72px;}
+}
+
+/* Status overlay scales as a card instead of creating inner scrollbars */
+.radio-status-panel.rw-draggable-status{
+  overflow:hidden!important;
+}
+.radio-status-panel.rw-draggable-status .radio-status-copy{
+  overflow:hidden;
+}
+.radio-status-panel.rw-draggable-status .radio-status-copy strong{
+  font-size:clamp(13px,2.1cqw,21px);
+}
+.radio-status-panel.rw-draggable-status .radio-status-copy>span,
+.radio-status-panel.rw-draggable-status .radio-status-grid{
+  font-size:clamp(9px,1.55cqw,13px);
+}
+.radio-status-panel.rw-draggable-status .radio-status-grid{
+  grid-template-columns:max-content minmax(0,1fr);
+}
