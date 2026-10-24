@@ -5,13 +5,14 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "npm run prepare:branding && npm run check:release && electron-builder --win --x64 --publish never",
+    "dist": "npm run prepare:branding && npm run check:radio-wave-release && electron-builder --win --x64 --publish never",
     "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
     "test": "node tests/deep-integration.test.cjs",
     "check:syntax": "node scripts/check-syntax.cjs",
     "check:release": "node scripts/release-integrity.cjs",
-    "prebuild": "npm run prepare:branding && npm run check:release",
-    "prepare:branding": "node scripts/prepare-radio-wave-branding.cjs"
+    "prebuild": "npm run prepare:branding && npm run check:radio-wave-release",
+    "prepare:branding": "node scripts/prepare-radio-wave-branding.cjs",
+    "check:radio-wave-release": "node scripts/radio-wave-release-integrity.cjs"
   },
   "keywords": [
     "radio-wave",
