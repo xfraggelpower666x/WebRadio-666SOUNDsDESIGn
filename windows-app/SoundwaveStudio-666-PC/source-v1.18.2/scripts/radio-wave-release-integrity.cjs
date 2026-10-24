@@ -81,6 +81,7 @@ check(/INTRO_LOAD_FAIL/.test(main)&&/MAIN_LOAD_FAIL/.test(main),'startup-load-fa
 check(pkg.build?.nsis?.runAfterFinish===true,'nsis-run-after-finish');
 check(pkg.build?.nsis?.createDesktopShortcut==='always','nsis-desktop-shortcut');
 
+const html=text('src/index.html');
 const integration=text('src/integration/666-integration.js');
 check(/getByteFrequencyData/.test(integration)&&/getByteTimeDomainData/.test(integration),'real-analyser-data');
 check(/stream artwork hardlock/i.test(integration),'stream-artwork-priority');
@@ -126,7 +127,6 @@ check(/rw-led-low/.test(html)&&/rw-led-mid/.test(html)&&/rw-led-high/.test(html)
 check(/ledLow\.style\.setProperty\('--rw-level'/.test(text('src/app.js'))&&/ledMid\.style\.setProperty\('--rw-level'/.test(text('src/app.js'))&&/ledHigh\.style\.setProperty\('--rw-level'/.test(text('src/app.js')),'cyber-led-real-analyser-drive');
 check(exists('docs/RADIO_WAVE_INTERRUPTED_WORK_CHECKPOINT_2026-10-24.md'),'interrupted-work-checkpoint');
 
-const html=text('src/index.html');
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
 check(/window\.SVMilkdropCycle=Object\.freeze/.test(text('src/vendor/cayatur/milkdrop-cycle.js')),'milkdrop-cycle-layer');
