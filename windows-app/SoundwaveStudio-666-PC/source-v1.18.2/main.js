@@ -827,7 +827,10 @@ registerIpc('dialog:openMilkdropPack','main', async()=>{
   if(result.canceled||!result.filePaths[0])return null;
   const root=path.resolve(result.filePaths[0]);
   const out=[]; let total=0;
-  const MAX_FILES=128, MAX_FILE=2*1024*1024, MAX_TOTAL=16*1024*1024;
+  const MAX_FILES=1024, MAX_FILE=2*1024*1024, MAX_TOTAL=64*1024*1024;
+  const persistRoot=path.join(personalMilkdropRoot(),'user-imports',path.basename(root).replace(/[^a-z0-9._-]+/gi,'_').slice(0,80)||'folder');
+  fs.mkdirSync(persistRoot,{recursive:true});
+  let persisted=0;
   const walk=dir=>{
     if(out.length>=MAX_FILES||total>=MAX_TOTAL)return;
     for(const ent of fs.readdirSync(dir,{withFileTypes:true})){
@@ -840,12 +843,21 @@ registerIpc('dialog:openMilkdropPack','main', async()=>{
       if(st.size<=0||st.size>MAX_FILE||total+st.size>MAX_TOTAL)continue;
       const source=fs.readFileSync(full,'utf8');
       if(!source.trim())continue;
+      const rel=path.relative(root,full);
+      if(!rel||rel.startsWith('..')||path.isAbsolute(rel))continue;
+      const target=path.resolve(persistRoot,rel);
+      if(target!==persistRoot&&!target.startsWith(persistRoot+path.sep))continue;
+      fs.mkdirSync(path.dirname(target),{recursive:true});
+      fs.copyFileSync(full,target);persisted++;
       total+=st.size;
-      out.push({name:ent.name,relativePath:path.relative(root,full),source});
+      out.push({name:ent.name,relativePath:rel,source});
     }
   };
   walk(root);
-  return {folder:path.basename(root),count:out.length,totalBytes:total,truncated:out.length>=MAX_FILES||total>=MAX_TOTAL,presets:out};
+  const state=personalMilkdropLibraryState(false);
+  fs.writeFileSync(personalMilkdropManifestPath(),JSON.stringify({installedAt:new Date().toISOString(),sourceFolder:path.basename(root),milk:state.milk,milk2:state.milk2,count:state.count,personalUse:true,redistribution:false},null,2),'utf8');
+  runtimeEvent('milkdrop-folder-persisted',{folder:path.basename(root),count:out.length,persisted,totalBytes:total});
+  return {folder:path.basename(root),count:out.length,totalBytes:total,persisted,truncated:out.length>=MAX_FILES||total>=MAX_TOTAL,presets:out};
 });
 
 registerIpc('dialog:importMilkdropPersonalLibrary','main',async()=>{
