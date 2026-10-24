@@ -27,6 +27,9 @@ console.log('=== RADIO WAVE v6.66 Targeted Release Integrity ===');
   'src/intro.js',
   'src/workspace.js',
   'src/integration/666-integration.js',
+  'src/vendor/cayatur/preset-registry.js',
+  'src/vendor/cayatur/milkdrop-cycle.js',
+  'tests/milkdrop-control-layer.test.cjs',
   'scripts/prepare-radio-wave-branding.cjs'
 ].forEach(syntax);
 
@@ -93,6 +96,16 @@ check(/slider-visual-opacity/.test(text('src/index.html')),'visualizer-opacity-c
 check(/visualizerCanvas\.style\.opacity/.test(text('src/app.js')),'visualizer-opacity-application');
 check(/getContext\('webgl2'/.test(text('src/vendor/cayatur/shaderhost.js')),'gpu-webgl2-shader-path');
 check(/\.rw-window-dock\{[^}]*right:8px/.test(css),'workspace-right-side-dock');
+
+const html=text('src/index.html');
+check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
+check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
+check(/window\.SVMilkdropCycle=Object\.freeze/.test(text('src/vendor/cayatur/milkdrop-cycle.js')),'milkdrop-cycle-layer');
+check(/hardCutBass/.test(integration)&&/hardCutTreb/.test(integration),'milkdrop-real-audio-hardcut-controls');
+check(/milkdrop-never-repeat/.test(html)&&/milkdrop-lock/.test(html)&&/milkdrop-auto/.test(html),'milkdrop-overlay-advanced-controls');
+const mdTest=cp.spawnSync(process.execPath,[path.join(root,'tests/milkdrop-control-layer.test.cjs')],{encoding:'utf8'});
+check(mdTest.status===0,'milkdrop-control-layer-node-test');
+if(mdTest.status!==0)fail.push((mdTest.stderr||mdTest.stdout||'').trim());
 
 if(fail.length){
   console.error('FAIL '+fail.length+' targeted release gate(s)');
