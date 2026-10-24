@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('api', {
   openAudio: () => ipcRenderer.invoke('dialog:openAudio'),
   openBackground: () => ipcRenderer.invoke('dialog:openBackground'),
   openMilkdrop: () => ipcRenderer.invoke('dialog:openMilkdrop'),
+  openMilkdropPack: () => ipcRenderer.invoke('dialog:openMilkdropPack'),
   getSavePath: () => ipcRenderer.invoke('dialog:getSavePath'),
   startFileWrite: (savePath) => ipcRenderer.invoke('file:startWrite', savePath),
   writeFileChunk: (chunkArrayBuffer) => {
