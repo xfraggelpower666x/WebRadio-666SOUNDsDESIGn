@@ -51,9 +51,27 @@
             <label>1. Audio Song File</label>
             <button id="btn-select-audio" class="btn btn-primary select-btn">
               <span class="btn-icon">🎵</span>
-              <span id="label-audio-file">Select Song File</span>
+              <span id="label-audio-file">Add Audio Files</span>
             </button>
             <div id="audio-meta" class="file-meta-tag hidden">No audio loaded</div>
+            <div id="local-drop-zone" class="local-drop-zone" tabindex="0">
+              <strong>DROP AUDIO FILES HERE</strong>
+              <span>MP3 · WAV · M4A · FLAC · AAC · OGG</span>
+            </div>
+            <div class="local-queue-toolbar">
+              <button id="local-prev" class="btn btn-secondary" type="button">◀ PREV</button>
+              <button id="local-next" class="btn btn-secondary" type="button">NEXT ▶</button>
+              <button id="local-shuffle" class="btn btn-secondary" type="button">SHUFFLE</button>
+              <button id="local-clear" class="btn btn-secondary" type="button">CLEAR</button>
+            </div>
+            <div class="local-queue-settings">
+              <label class="checkbox-container"><input type="checkbox" id="local-shuffle-mode"><span class="checkmark"></span> Shuffle playback</label>
+              <label for="local-crossfade">Track transition</label>
+              <div class="slider-header"><span>Fade</span><span id="local-crossfade-value">1.5s</span></div>
+              <input type="range" id="local-crossfade" min="0" max="8" step="0.1" value="1.5" class="custom-range">
+            </div>
+            <div id="local-queue-state" class="file-meta-tag">LOCAL QUEUE · 0 TRACKS</div>
+            <div id="local-queue-list" class="local-queue-list" aria-label="Local audio queue"></div>
           </div>
 
           <div class="control-group">
@@ -238,8 +256,9 @@
               <span id="milkdrop-gpu-status">WEBGL2 · CHECKING GPU</span>
             </div>
           </div>
-          <div class="control-group">
+          <div class="control-group milkdrop-engine-switch">
             <button id="milkdrop-activate" class="btn btn-primary">ACTIVATE MILKDROP</button>
+            <button id="milkdrop-deactivate" class="btn btn-secondary" type="button">MILKDROP OFF · SOUNDWAVE</button>
           </div>
           <div class="control-group">
             <label for="milkdrop-preset">Preset</label>
