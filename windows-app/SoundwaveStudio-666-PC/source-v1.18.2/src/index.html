@@ -449,7 +449,9 @@
           </div>
 
           <div class="volume-container">
-            <span class="volume-icon">🔊</span>
+            <button id="btn-mute" class="mute-btn" type="button" aria-pressed="false" title="Mute audio">
+              <span class="mute-icon-on">🔊</span><span class="mute-icon-off hidden">🔇</span><small>MUTE</small>
+            </button>
             <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7" class="volume-bar">
           </div>
 
