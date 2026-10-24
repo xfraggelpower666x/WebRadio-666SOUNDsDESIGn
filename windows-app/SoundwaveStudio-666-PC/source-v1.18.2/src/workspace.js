@@ -448,7 +448,9 @@
     }
     const win=windows.get(key);
     if(!win)return;
-    const el=document.getElementById(String(payload?.id||''));
+    const id=String(payload?.id||'');
+    const selector=String(payload?.selector||'');
+    const el=id?document.getElementById(id):(selector?win.querySelector(selector):null);
     if(!el||!win.contains(el))return;
     if(payload.kind==='click'&&el.tagName==='BUTTON'){el.click();return;}
     if(!el.matches('input,select,textarea'))return;
@@ -462,6 +464,24 @@
     windows.get(k)?.classList.remove('rw-window-detached');
     saveWorkspace();
   });
+  const syncDetachedWindow=(key)=>{
+    if(!detached.has(key)||key==='dock')return;
+    const win=windows.get(key);if(!win)return;
+    const body=win.querySelector('.rw-floating-window-body');
+    if(!body)return;
+    window.api?.syncDetachedOverlay?.(key,{html:body.innerHTML,controls:controlsSnapshot(win)}).catch(()=>{});
+  };
+  const scheduleDetachedSync=(()=>{const timers=new Map();return key=>{clearTimeout(timers.get(key));timers.set(key,setTimeout(()=>syncDetachedWindow(key),80));};})();
+  if('MutationObserver' in window){
+    for(const [key,win] of windows){
+      const body=win.querySelector('.rw-floating-window-body');
+      if(!body)continue;
+      new MutationObserver(()=>scheduleDetachedSync(key)).observe(body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','disabled','aria-pressed','value']});
+      body.addEventListener('input',()=>scheduleDetachedSync(key),true);
+      body.addEventListener('change',()=>scheduleDetachedSync(key),true);
+    }
+  }
+
   window.api?.detachedOverlayState?.().then(state=>{
     for(const [key,s] of Object.entries(state?.windows||{})){
       if(s?.open===true&&key==='dock')detachDock();
