@@ -46,7 +46,7 @@
   dock.setAttribute('aria-label','RADIO WAVE windows');
   const dockHead=document.createElement('div');
   dockHead.className='rw-window-dock-title';
-  dockHead.textContent='WINDOWS';
+  dockHead.innerHTML='<span>WINDOWS</span><button id="rw-dock-detach" type="button" class="rw-dock-detach" data-rw-tip-key="detachDock">↗</button>';
   dock.appendChild(dockHead);
   document.body.appendChild(dock);
 
@@ -249,7 +249,7 @@
     makeDraggable(win,head,def.key);
 
     const btn=document.createElement('button');
-    btn.type='button';btn.className='rw-dock-button';btn.dataset.openWindow=def.key;
+    btn.type='button';btn.className='rw-dock-button';btn.id='rw-dock-open-'+def.key;btn.dataset.openWindow=def.key;btn.dataset.rwTipKey='open:'+def.key;
     btn.innerHTML=`<span>${def.icon}</span><small>${def.title}</small>`;
     btn.addEventListener('click',()=>openWindow(def.key));
     dock.appendChild(btn);
@@ -274,7 +274,7 @@
     handle.querySelector('.rw-status-close').addEventListener('click',()=>closeWindow('status'));
     makeDraggable(status,handle,'status',()=>frame);
     const btn=document.createElement('button');
-    btn.type='button';btn.className='rw-dock-button';btn.innerHTML='<span>📡</span><small>LIVE STATUS</small>';
+    btn.type='button';btn.className='rw-dock-button';btn.id='rw-dock-open-status';btn.dataset.rwTipKey='open:status';btn.innerHTML='<span>📡</span><small>LIVE STATUS</small>';
     btn.addEventListener('click',()=>openWindow('status'));dock.appendChild(btn);
   }
 
@@ -285,7 +285,7 @@
     visualFrame.classList.add('rw-workspace-visual-frame');
     const grip=document.createElement('div');
     grip.className='rw-visual-frame-grip';
-    grip.innerHTML='<span>⠿ VISUALIZER</span><button type="button" class="rw-visual-frame-auto" title="Auto fit">AUTO</button>';
+    grip.innerHTML='<span>⠿ VISUALIZER</span><button id="rw-visual-detach" type="button" class="rw-visual-frame-detach" data-rw-tip-key="detachVisualizer">↗</button><button id="rw-visual-auto" type="button" class="rw-visual-frame-auto" data-rw-tip-key="autoFit">AUTO</button>';
     visualFrame.prepend(grip);
 
     const fitVisualFrame=()=>{
@@ -312,6 +312,15 @@
 
     if(saved.visualFrame?.manual)document.body.classList.add('rw-visual-frame-manual');
     makeDraggable(visualFrame,grip,'visualFrame',()=>visualViewport);
+    let visualDetached=false;
+    grip.querySelector('.rw-visual-frame-detach').addEventListener('click',async e=>{
+      e.stopPropagation();
+      try{
+        const r=visualDetached?await window.api.focusDetachedVisualizer?.():await window.api.openDetachedVisualizer?.();
+        if(r?.ok){visualDetached=true;document.body.classList.add('rw-visual-native-detached');saveWorkspace();}
+      }catch(err){console.error('Detach visualizer failed',err);}
+    });
+    window.api?.onDetachedVisualizerClosed?.(()=>{visualDetached=false;document.body.classList.remove('rw-visual-native-detached');});
     grip.querySelector('.rw-visual-frame-auto').addEventListener('click',e=>{
       e.stopPropagation();
       document.body.classList.remove('rw-visual-frame-manual');
@@ -330,6 +339,17 @@
     requestAnimationFrame(()=>requestAnimationFrame(fitVisualFrame));
   }
 
+  async function detachDock(){
+    if(detached.has('dock')){await window.api?.focusDetachedOverlay?.('dock');return;}
+    try{
+      const html='<div class="rw-detached-dock">'+Array.from(dock.querySelectorAll('.rw-dock-button')).map(b=>b.outerHTML).join('')+'</div>';
+      const controls=controlsSnapshot(dock);
+      const r=await window.api?.openDetachedOverlay?.({key:'dock',title:'WINDOWS',html,controls,width:190,height:640});
+      if(r?.ok){detached.add('dock');dock.classList.add('rw-dock-native-detached');}
+    }catch(e){console.error('Detach dock failed',e);}
+  }
+  dock.querySelector('#rw-dock-detach')?.addEventListener('click',e=>{e.stopPropagation();detachDock();});
+
   document.body.classList.add('rw-workspace-enabled');
   document.body.classList.toggle('rw-dock-collapsed',saved.dockOpen===false);
 
@@ -346,6 +366,11 @@
 
   window.api?.onDetachedOverlayAction?.(payload=>{
     const key=String(payload?.key||'');
+    if(key==='dock'){
+      const el=document.getElementById(String(payload?.id||''));
+      if(el?.classList.contains('rw-dock-button'))el.click();
+      return;
+    }
     const win=windows.get(key);
     if(!win)return;
     const el=document.getElementById(String(payload?.id||''));
@@ -358,12 +383,14 @@
   });
   window.api?.onDetachedOverlayClosed?.(({key}={})=>{
     const k=String(key||'');detached.delete(k);
+    if(k==='dock')dock.classList.remove('rw-dock-native-detached');
     windows.get(k)?.classList.remove('rw-window-detached');
     saveWorkspace();
   });
   window.api?.detachedOverlayState?.().then(state=>{
     for(const [key,s] of Object.entries(state?.windows||{})){
-      if(s?.open===true&&windows.has(key))detachWindow(key,true);
+      if(s?.open===true&&key==='dock')detachDock();
+      else if(s?.open===true&&windows.has(key))detachWindow(key,true);
     }
   }).catch(()=>{});
 
