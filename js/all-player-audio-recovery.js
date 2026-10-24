@@ -28,6 +28,7 @@
 
   function now(){return Date.now();}
   function sourceOf(audio){return String(audio?.currentSrc||audio?.getAttribute?.('src')||audio?.src||'').trim();}
+  function isMainPlayerPage(){return String(document.body?.getAttribute?.('data-veluna-page')||'').toLowerCase()==='main';}
   function isBackupSource(src){
     const value=String(src||'').trim().toLowerCase();
     if(!value) return false;
@@ -70,9 +71,10 @@
   function evaluate(audio,trigger){
     if(!audio) return;suppressLegacyRecovery();const s=stateFor(audio);markMove(audio,s);if(!expectedToPlay(audio,s)){clearCandidate(audio);return;}const p=profile();const t=now();const stalledFor=Math.max(0,t-s.lastMoveAt);const ready=Number(audio.readyState||0),network=Number(audio.networkState||0);const src=sourceOf(audio);
     if(!s.candidateAt){if(audio.paused){s.candidateAt=t;s.candidateReason='poll-paused';}else if(network===3){s.candidateAt=t;s.candidateReason='poll-network-no-source';}else if(ready<2){s.candidateAt=t;s.candidateReason='poll-ready-low';}else if(stalledFor>=p.pollSeedMs){s.candidateAt=t;s.candidateReason='poll-currenttime-stall';}if(s.candidateAt){setDiag('data-audio-recovery-sensor',s.candidateReason);setDiag('data-audio-recovery-candidate-since',s.candidateAt);}}
-    const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;const hard=/error|abort|emptied|no-source|decode/i.test(String(s.candidateReason||trigger||''))||network===3||!src;setDiag('data-audio-recovery-stall-ms',stalledFor);setDiag('data-audio-recovery-ready',ready);setDiag('data-audio-recovery-network',network);
+    const candidateFor=s.candidateAt?Math.max(0,t-s.candidateAt):0;const reasonText=String(s.candidateReason||trigger||'');const mainTechnicalEnded=isMainPlayerPage()&&/ended/i.test(reasonText);const hard=mainTechnicalEnded||/error|abort|emptied|no-source|decode/i.test(reasonText)||network===3||!src;setDiag('data-audio-recovery-stall-ms',stalledFor);setDiag('data-audio-recovery-ready',ready);setDiag('data-audio-recovery-network',network);
     if(!audio.paused&&ready>=2&&network===2&&stalledFor<p.pollSeedMs){clearCandidate(audio);return;}
-    if(audio.paused&&candidateFor>=p.pausedConfirmMs){void softRecover(audio,s,'paused-confirmed');return;}
+    if(audio.paused&&candidateFor>=p.pausedConfirmMs&&!mainTechnicalEnded){void softRecover(audio,s,'paused-confirmed');return;}
+    if(mainTechnicalEnded&&candidateFor>=p.hardConfirmMs){void hardRecover(audio,s,'main-live-ended-reopen');return;}
     if(hard&&candidateFor>=p.hardConfirmMs){if(stalledFor>=p.hardReloadMs) void hardRecover(audio,s,isBackupSource(src)?'backup-hard-stall-primary-failover':'hard-stall-confirmed');else void softRecover(audio,s,'hard-sensor-soft-first');return;}
     if(isBackupSource(src)&&candidateFor>=p.stallConfirmMs&&stalledFor>=p.hardReloadMs){void hardRecover(audio,s,'backup-stall-primary-failover');return;}
     if(ready<2&&candidateFor>=p.readyLowConfirmMs&&stalledFor>=p.readyLowConfirmMs){void softRecover(audio,s,'ready-low-confirmed');return;}

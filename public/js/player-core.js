@@ -1059,9 +1059,14 @@ audio?.addEventListener('suspend', () => { updateCanonicalPanelStatus('suspend')
 document.documentElement.setAttribute('data-player-core-app-return-owner','all-player-audio-recovery-v1');
 
 audio?.addEventListener('ended', () => {
-  visualizer.stop?.();
-  setStatus('STOPPED');
-  setDesktopTransportState('stop');
+  if (userStopped) return;
+  panelBuffering = true;
+  setStatus(currentSource === 'main' ? 'MAIN STREAM RECONNECTING' : 'BACKUP STREAM RECONNECTING');
+  updateCanonicalPanelStatus('ended-recovering');
+  // Live-radio ended is a transport fault, not a user stop.
+  // Keep PLAY intent visible so the canonical recovery owner remains authorized.
+  setDesktopTransportState('play');
+  canonicalRecoveryHandoff('ended');
 });
 
 
