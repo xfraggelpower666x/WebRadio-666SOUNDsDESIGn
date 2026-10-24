@@ -1665,3 +1665,37 @@ input[type="range"]{accent-color:var(--rw-neon-pink);}
   .rw-window-dock .rw-dock-button{grid-template-columns:32px 1fr;text-align:left;}
   .rw-window-dock .rw-dock-button small{white-space:normal;}
 }
+
+
+/* Personal MilkDrop3 library */
+.milkdrop-personal-library{
+  display:grid;
+  gap:8px;
+  margin:8px 0 12px;
+  padding:9px;
+  border:1px solid rgba(168,85,247,.24);
+  background:
+    linear-gradient(135deg,rgba(168,85,247,.08),transparent 54%),
+    rgba(2,6,15,.82);
+  box-shadow:inset 0 0 14px rgba(25,247,255,.035);
+}
+.milkdrop-library-actions{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:5px;
+}
+.milkdrop-library-actions .btn{
+  min-width:0;
+  padding:7px 5px;
+  font-size:8px;
+  font-family:monospace;
+  letter-spacing:.06em;
+}
+#milkdrop-personal-state{
+  color:var(--rw-neon-cyan);
+  font-family:monospace;
+  text-shadow:0 0 7px rgba(25,247,255,.34);
+}
+@media(max-width:720px){
+  .milkdrop-library-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
