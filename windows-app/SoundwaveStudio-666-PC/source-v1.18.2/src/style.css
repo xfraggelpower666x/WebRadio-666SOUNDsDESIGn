@@ -1227,3 +1227,39 @@ body.rw-dock-collapsed .rw-window-dock{transform:translateX(118px);opacity:.08;p
 html,body,.app-container,.preview-area,.preview-viewport-container{
   overflow:hidden!important;
 }
+
+
+/* Dedicated MilkDrop Studio overlay */
+.milkdrop-hero{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px;
+  margin-bottom:10px;
+  border:1px solid rgba(155,92,255,.30);
+  border-radius:12px;
+  background:radial-gradient(circle at 18% 30%,rgba(32,232,255,.13),transparent 36%),rgba(8,7,23,.72);
+}
+.milkdrop-hero>div:last-child{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.milkdrop-hero strong{font-size:14px;letter-spacing:.12em;color:#fff;}
+.milkdrop-hero span{font-size:9px;letter-spacing:.08em;color:#20e8ff;}
+.milkdrop-orb{
+  width:52px;height:52px;flex:none;border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 30%,#fff 0 4%,#20e8ff 5% 14%,transparent 15%),
+    conic-gradient(from 30deg,#ff2bd6,#9b5cff,#20e8ff,#ff2bd6);
+  box-shadow:0 0 18px rgba(32,232,255,.35),0 0 28px rgba(255,43,214,.20);
+  filter:saturate(1.15);
+}
+.milkdrop-transport{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:7px;
+  margin:8px 0 12px;
+}
+.milkdrop-transport .btn{min-width:0;}
+@container (max-width:340px){
+  .milkdrop-transport{grid-template-columns:1fr;}
+  .milkdrop-hero{align-items:flex-start;}
+  .milkdrop-orb{width:40px;height:40px;}
+}
