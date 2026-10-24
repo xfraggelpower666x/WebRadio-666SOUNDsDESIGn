@@ -332,12 +332,37 @@ function updateAspectSettings() {
   
   diagResolution.textContent = `${canvasWidth} x ${canvasHeight}`;
   resizeCanvas();
+  requestAnimationFrame(fitVisualizerToViewport);
 }
 
 function resizeCanvas() {
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 }
+
+function fitVisualizerToViewport() {
+  const outerFrame=document.getElementById('video-frame-outer');
+  const viewport=document.querySelector('.preview-viewport-container');
+  if(!outerFrame||!viewport)return;
+  const outputOnly=document.body.classList.contains('output-only');
+  const vr=viewport.getBoundingClientRect();
+  const cs=getComputedStyle(viewport);
+  const availW=Math.max(1,vr.width-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0));
+  const availH=Math.max(1,vr.height-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0));
+  if(outputOnly||document.body.classList.contains('fullframe')){
+    outerFrame.style.width=availW+'px';
+    outerFrame.style.height=availH+'px';
+    return;
+  }
+  const ratio=activeAspectRatio==='9-16'?9/16:(activeAspectRatio==='1-1'?1:16/9);
+  let w=availW,h=w/ratio;
+  if(h>availH){h=availH;w=h*ratio;}
+  outerFrame.style.width=Math.max(1,Math.floor(w))+'px';
+  outerFrame.style.height=Math.max(1,Math.floor(h))+'px';
+  outerFrame.style.maxWidth='none';
+  outerFrame.style.maxHeight='none';
+}
+
 
 // Setup audio nodes on initial user interaction
 function ensureAudioContext() {
@@ -1729,8 +1754,18 @@ if(visualOpacitySlider&&visualizerCanvas){
   applyVisualizerOpacity();
 }
 
-// Run initial configurations
-init();
+// Monitor/DPI aware preview fit. The logical render resolution stays stable for export,
+ // while the displayed stage always fits the current Electron viewport.
+ window.addEventListener('resize',()=>requestAnimationFrame(fitVisualizerToViewport));
+ if('ResizeObserver' in window){
+   const previewViewport=document.querySelector('.preview-viewport-container');
+   if(previewViewport)new ResizeObserver(()=>requestAnimationFrame(fitVisualizerToViewport)).observe(previewViewport);
+ }
+ window.api?.onWindowMetrics?.(()=>requestAnimationFrame(()=>requestAnimationFrame(fitVisualizerToViewport)));
+
+ // Run initial configurations
+ init();
+ requestAnimationFrame(()=>requestAnimationFrame(fitVisualizerToViewport));
 
 
 // Additive integration bridge: read-only runtime access for analyzer/render modules.
