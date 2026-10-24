@@ -1714,6 +1714,21 @@ if (controlPanelToggle) {
   });
 }
 
+// RADIO WAVE visualizer opacity: applies to the rendered visual layer without dimming background/artwork/UI.
+const visualOpacitySlider=document.getElementById('slider-visual-opacity');
+const visualOpacityValue=document.getElementById('val-visual-opacity');
+const visualizerCanvas=document.getElementById('visualizer-canvas');
+if(visualOpacitySlider&&visualizerCanvas){
+  const applyVisualizerOpacity=()=>{
+    const pct=Math.max(0,Math.min(100,Number(visualOpacitySlider.value)||0));
+    visualizerCanvas.style.opacity=String(pct/100);
+    if(visualOpacityValue)visualOpacityValue.textContent=pct+'%';
+  };
+  visualOpacitySlider.addEventListener('input',applyVisualizerOpacity);
+  visualOpacitySlider.addEventListener('change',applyVisualizerOpacity);
+  applyVisualizerOpacity();
+}
+
 // Run initial configurations
 init();
 
