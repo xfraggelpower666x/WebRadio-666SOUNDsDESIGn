@@ -213,7 +213,6 @@
         <section class="panel-section">
           <h2 class="section-title"><span class="icon">🖥️</span> Presentation & Engines</h2>
           <div class="control-group"><label>Visual Engine</label><select id="visual-engine" class="custom-select"><option value="soundwave">Soundwave Classic</option><option value="spectrum">CaYatur Spectrum</option><option value="analysis">CaYatur Deep Analyzer</option><option value="shader">CaYatur Shader Engine</option><option value="geometry3d">CaYatur 3D Geometry</option><option value="milkdrop">CaYatur MilkDrop</option></select></div>
-          <div class="control-group"><label>MilkDrop Preset</label><select id="milkdrop-preset" class="custom-select"><option value="0">Kutup Işığı</option><option value="1">Erimiş Altın</option><option value="2">Dingin Halkalar</option><option value="3">Sonsuz Tünel</option><option value="4">Nabız Örgüsü</option></select><button id="milkdrop-import" class="btn btn-secondary">IMPORT .MILK</button></div>
           <div class="control-group"><label>Shader Scene</label><select id="shader-preset" class="custom-select"><option value="neon">Neon Plasma</option><option value="tunnel">Cyber Tunnel</option><option value="grid">Spectrum Grid</option></select></div><div class="control-group"><label>3D Scene</label><select id="geometry-preset" class="custom-select"><option value="surface:torus">Torus</option><option value="surface:sphere">Sphere</option><option value="surface:klein">Klein Bottle</option><option value="attractor:lorenz">Lorenz Attractor</option><option value="attractor:rossler">Rössler Attractor</option><option value="solid:geodesic">Geodesic Sphere</option><option value="solid:icosahedron">Icosahedron</option></select></div><button id="btn-fullscreen" class="btn btn-secondary">FULLSCREEN</button>
           <div class="control-group"><label>Display 1</label><select id="display-one" class="custom-select"></select><label>Display 2 (optional)</label><select id="display-two" class="custom-select"><option value="">Disabled</option></select></div>
           <div class="control-group radio-visual-options">
@@ -228,6 +227,39 @@
           </div>
           <div class="file-meta-tag" id="display-state">Display discovery pending</div>
           <button id="export-diagnostics" class="btn btn-secondary">EXPORT RUNTIME DIAGNOSTICS</button>
+        </section>
+
+        <section class="panel-section" id="milkdrop-studio">
+          <h2 class="section-title"><span class="icon">🌌</span> MilkDrop Studio</h2>
+          <div class="milkdrop-hero">
+            <div class="milkdrop-orb" aria-hidden="true"></div>
+            <div>
+              <strong>MILKDROP GPU</strong>
+              <span id="milkdrop-gpu-status">WEBGL2 · CHECKING GPU</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <button id="milkdrop-activate" class="btn btn-primary">ACTIVATE MILKDROP</button>
+          </div>
+          <div class="control-group">
+            <label for="milkdrop-preset">Preset</label>
+            <select id="milkdrop-preset" class="custom-select">
+              <option value="0">Kutup Işığı</option>
+              <option value="1">Erimiş Altın</option>
+              <option value="2">Dingin Halkalar</option>
+              <option value="3">Sonsuz Tünel</option>
+              <option value="4">Nabız Örgüsü</option>
+            </select>
+          </div>
+          <div class="milkdrop-transport">
+            <button id="milkdrop-prev" class="btn btn-secondary" type="button">◀ PREV</button>
+            <button id="milkdrop-random" class="btn btn-secondary" type="button">⤨ RANDOM</button>
+            <button id="milkdrop-next" class="btn btn-secondary" type="button">NEXT ▶</button>
+          </div>
+          <div class="control-group">
+            <button id="milkdrop-import" class="btn btn-secondary">IMPORT .MILK</button>
+          </div>
+          <div class="file-meta-tag" id="milkdrop-state">GPU feedback renderer · real audio analyser</div>
         </section>
 
         <!-- SECTION 5: Video Export Engine -->
