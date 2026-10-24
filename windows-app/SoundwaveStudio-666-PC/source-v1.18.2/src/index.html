@@ -341,13 +341,6 @@
             <button id="rw-diag-refresh" class="btn btn-secondary" type="button">REFRESH</button>
             <button id="rw-diag-export" class="btn btn-secondary" type="button">EXPORT JSON</button>
           </div>
-          <div class="control-group">
-            <label for="app-language">UI LANGUAGE / SPRACHE</label>
-            <select id="app-language" class="custom-select">
-              <option value="de">Deutsch</option>
-              <option value="en">English</option>
-            </select>
-          </div>
           <div class="file-meta-tag" id="rw-diag-state">READY</div>
           <h3 class="section-subtitle">Displays / Monitor</h3>
           <div id="rw-diag-displays" class="rw-diag-grid"></div>
@@ -396,6 +389,13 @@
       <!-- Top header bar for quick diagnostics -->
       <div class="preview-top-bar">
         <button id="toggle-control-panel" class="preview-panel-toggle" type="button" aria-pressed="false">☰ CONTROLS</button>
+        <label class="rw-language-switch" for="app-language">
+          <span>LANGUAGE</span>
+          <select id="app-language" aria-label="Application language">
+            <option value="en-US" selected>🇺🇸 English (USA)</option>
+            <option value="de-DE">🇩🇪 German</option>
+          </select>
+        </label>
         <div class="diagnostic-tag"><span class="diag-bullet" id="diag-status-color"></span> Status: <span id="diag-status">Idle</span></div>
         <div class="diagnostic-tag">Bass Peak: <span id="diag-bass">0.00</span></div>
         <div class="diagnostic-tag bpm-pill">Audio Signal: <span id="diag-bpm">--</span></div>
