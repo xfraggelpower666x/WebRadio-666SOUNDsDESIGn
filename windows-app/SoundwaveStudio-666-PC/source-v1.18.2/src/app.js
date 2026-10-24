@@ -295,8 +295,8 @@ function setupEventListeners() {
       const state=await window.api.openAudio();
       if(state?.count){
         renderLocalQueue(state);
-        document.querySelector('.source-btn[data-source="local"]')?.click();
-        await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:true,fade:false});
+        if(!document.body.classList.contains('source-local'))document.querySelector('.source-btn[data-source="local"]')?.click();
+        else await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:true,fade:false});
       }
     }catch(err){console.error(err);diagStatus.textContent='Local Audio Load Error';}
   });
@@ -309,8 +309,11 @@ function setupEventListeners() {
     }
     const track=e.target.closest('[data-index]');
     if(track){
-      document.querySelector('.source-btn[data-source="local"]')?.click();
-      await activateLocalQueueIndex(Number(track.dataset.index),{autoplay:true,fade:true});
+      const index=Number(track.dataset.index);
+      if(!document.body.classList.contains('source-local')){
+        renderLocalQueue(await window.api.localQueueActivate(index));
+        document.querySelector('.source-btn[data-source="local"]')?.click();
+      }else await activateLocalQueueIndex(index,{autoplay:true,fade:true});
     }
   });
   localPrev?.addEventListener('click',()=>localQueuePrevTrack().catch(console.error));
@@ -338,8 +341,8 @@ function setupEventListeners() {
     const before=localQueueSnapshot.count||0;
     const state=await window.api.localQueueAddPaths(paths);
     renderLocalQueue(state);
-    document.querySelector('.source-btn[data-source="local"]')?.click();
-    if(before===0&&state.count)await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:true,fade:false});
+    if(!document.body.classList.contains('source-local'))document.querySelector('.source-btn[data-source="local"]')?.click();
+    else if(before===0&&state.count)await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:true,fade:false});
   });
   restoreLocalQueue();
 
