@@ -165,6 +165,8 @@
     win.className='rw-floating-window'+(st.open?'':' rw-window-closed');
     win.dataset.rwWindow=def.key;
     win.style.left=st.x+'px';win.style.top=st.y+'px';win.style.width=st.w+'px';win.style.height=st.h+'px';
+    win.dataset.baseWidth=String(def.w);
+    win.dataset.baseHeight=String(def.h);
     win.style.zIndex=String(st.z||++z);
 
     const head=document.createElement('header');
@@ -228,13 +230,29 @@
   const queueSave=(()=>{let t;return()=>{clearTimeout(t);t=setTimeout(()=>{saveSettings();saveWorkspace();},120);};})();
   document.addEventListener('input',e=>{if(e.target?.matches?.('input,select,textarea'))queueSave();},true);
   document.addEventListener('change',e=>{if(e.target?.matches?.('input,select,textarea'))queueSave();},true);
-  // Persist dynamic resizing immediately; CSS resize handles are not treated as fixed presets.
+  // Persist dynamic resizing and adapt content scale so smaller windows reflow instead of scrolling.
+  const applyAdaptiveScale=win=>{
+    const body=win.querySelector?.('.rw-floating-window-body');
+    if(!body)return;
+    const baseW=Math.max(280,Number(win.dataset.baseWidth)||420);
+    const baseH=Math.max(180,Number(win.dataset.baseHeight)||420);
+    const r=win.getBoundingClientRect();
+    const sx=(r.width-18)/Math.max(1,baseW-18);
+    const sy=(r.height-46)/Math.max(1,baseH-46);
+    const scale=clamp(Math.min(sx,sy),0.68,1.12);
+    body.style.setProperty('--rw-content-scale',scale.toFixed(3));
+    body.dataset.compact=scale<0.86?'1':'0';
+  };
+
   if('ResizeObserver' in window){
     const ro=new ResizeObserver(entries=>{
-      if(!entries.length)return;
-      queueSave();
+      for(const entry of entries){
+        const win=entry.target;
+        if(win.classList?.contains('rw-floating-window'))applyAdaptiveScale(win);
+      }
+      if(entries.length)queueSave();
     });
-    for(const w of windows.values())ro.observe(w);
+    for(const w of windows.values()){ro.observe(w);applyAdaptiveScale(w);}
     const status=q('#radio-status-panel');if(status)ro.observe(status);
   }
 
