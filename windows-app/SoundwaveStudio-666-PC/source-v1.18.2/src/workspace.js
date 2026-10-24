@@ -96,7 +96,13 @@
       discord:'Nachricht an Discord senden. Benötigt eine gültige Admin-Anmeldung.',
       discordNow:'Aktuellen Titel manuell als Now Playing an Discord senden.',
       messenger:'Nachricht an die verbundenen Player senden.',
-      soundcloud:'SoundCloud-Quelle öffnen oder laden. Der API-Zugang muss konfiguriert sein.'
+      soundcloud:'SoundCloud-Quelle öffnen oder laden. Der API-Zugang muss konfiguriert sein.',
+      localAdd:'Lokale Audiodateien zur Wiedergabeliste hinzufügen.',
+      localPrev:'Vorherigen Titel der lokalen Wiedergabeliste abspielen.',
+      localNext:'Nächsten Titel der lokalen Wiedergabeliste abspielen.',
+      localShuffle:'Reihenfolge der lokalen Wiedergabeliste mischen.',
+      localClear:'Lokale Wiedergabeliste leeren.',
+      milkdropOff:'MilkDrop ausschalten und zum Soundwave-Visualizer zurückkehren.'
     };
     const en={
       detachDock:'Detach the menu bar as its own window and move it to another monitor.',
@@ -116,7 +122,13 @@
       discord:'Send a message to Discord. Requires a valid admin login.',
       discordNow:'Send the current track to Discord as manual Now Playing.',
       messenger:'Send a message to connected players.',
-      soundcloud:'Open or load the SoundCloud source. API access must be configured.'
+      soundcloud:'Open or load the SoundCloud source. API access must be configured.',
+      localAdd:'Add local audio files to the playback queue.',
+      localPrev:'Play the previous track in the local queue.',
+      localNext:'Play the next track in the local queue.',
+      localShuffle:'Shuffle the local queue order.',
+      localClear:'Clear the local playback queue.',
+      milkdropOff:'Turn MilkDrop off and return to the Soundwave visualizer.'
     };
     if(String(key).startsWith('open:')){
       const k=String(key).slice(5);
@@ -137,7 +149,9 @@
       'rw-diag-export':'diagnostics','radio-skip':'skip','discord-send':'discord',
       'discord-now':'discordNow','player-message-send':'messenger','soundcloud-load':'soundcloud',
       'soundcloud-library-refresh':'soundcloud','soundcloud-prev':'soundcloud','soundcloud-next':'soundcloud',
-      'soundcloud-open':'soundcloud'
+      'soundcloud-open':'soundcloud','btn-select-audio':'localAdd','local-prev':'localPrev',
+      'local-next':'localNext','local-shuffle':'localShuffle','local-clear':'localClear',
+      'milkdrop-deactivate':'milkdropOff'
     };
     return map[el?.id]||'';
   };
