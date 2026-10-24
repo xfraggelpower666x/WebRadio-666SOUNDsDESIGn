@@ -25,6 +25,7 @@ console.log('=== RADIO WAVE v6.66 Targeted Release Integrity ===');
   'intro-preload.js',
   'src/app.js',
   'src/intro.js',
+  'src/workspace.js',
   'src/integration/666-integration.js',
   'scripts/prepare-radio-wave-branding.cjs'
 ].forEach(syntax);
@@ -77,6 +78,18 @@ const css=text('src/style.css');
 check(/\.radio-status-art img\{[^}]*object-fit:contain/.test(css),'stream-artwork-contain');
 check(/\.rw-brand-banner img\{[^}]*object-fit:contain/.test(css),'banner-contain');
 check(/\.rw-brand-logo\{[^}]*object-fit:contain/.test(css),'logo-contain');
+
+const workspace=text('src/workspace.js');
+check(/rw666-workspace-v1/.test(workspace),'workspace-state-storage');
+check(/rw666-ui-settings-v1/.test(workspace),'workspace-settings-storage');
+check(/rw-window-close/.test(workspace)&&/closeWindow/.test(workspace),'workspace-close-buttons');
+check(/pointerdown/.test(workspace)&&/pointermove/.test(workspace),'workspace-pointer-drag');
+check(/rw-window-dock/.test(workspace)&&/toggleDock/.test(workspace),'workspace-right-dock');
+check(/beforeunload/.test(workspace)&&/visibilitychange/.test(workspace),'workspace-exit-persistence');
+check(/radio-password/.test(workspace)&&/type==='password'/.test(workspace),'workspace-password-not-persisted');
+check(/status.*LIVE STREAM STATUS|LIVE STREAM STATUS.*status/s.test(workspace),'stream-status-draggable-overlay');
+check(/resize:both/.test(css),'workspace-resizable-overlays');
+check(/\.rw-window-dock\{[^}]*right:8px/.test(css),'workspace-right-side-dock');
 
 if(fail.length){
   console.error('FAIL '+fail.length+' targeted release gate(s)');
