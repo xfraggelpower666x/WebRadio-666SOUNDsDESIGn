@@ -1797,3 +1797,32 @@ input[type="range"]{accent-color:var(--rw-neon-pink);}
   transition:opacity .1s ease,transform .1s ease;
 }
 .rw-smart-tooltip.visible{opacity:1;transform:none;}
+
+
+/* Main HUD language selector — exactly English (USA) / German */
+.rw-language-switch{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-height:30px;
+  padding:4px 7px;
+  border:1px solid rgba(168,85,247,.34);
+  border-radius:5px;
+  background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(25,247,255,.06)),rgba(2,6,15,.9);
+  color:#dffcff;
+  font:800 8px/1 monospace;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+.rw-language-switch>span{color:var(--rw-neon-cyan);text-shadow:0 0 7px rgba(25,247,255,.4);}
+.rw-language-switch select{
+  min-width:124px;
+  border:1px solid rgba(255,43,214,.32);
+  border-radius:4px;
+  background:#040716;
+  color:#fff;
+  padding:4px 6px;
+  font:700 9px/1 monospace;
+  cursor:pointer;
+}
+.rw-language-switch select:focus-visible{outline:1px solid var(--rw-neon-cyan);outline-offset:2px;}
