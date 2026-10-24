@@ -46,6 +46,9 @@ const outputHealth = new Map();
 const outputRecovery = new Map();
 let sharedSourceState = {mode:'local'};
 let selectedLocalAudioPath = '';
+let localAudioQueue = [];
+let localAudioQueueIndex = -1;
+let localAudioRevision = 0;
 let soundCloudCurrent = null;
 let soundCloudQueue = [];
 let soundCloudQueueIndex = -1;
@@ -66,6 +69,77 @@ function runtimeEvent(type, detail={}) { runtimeEvents.push({at:new Date().toISO
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
 if (!gotSingleInstanceLock) app.quit();
 else app.on('second-instance',()=>{ if(mainWindow&&!mainWindow.isDestroyed()){ if(mainWindow.isMinimized())mainWindow.restore(); mainWindow.show(); mainWindow.focus(); runtimeEvent('second-instance-blocked'); }});
+
+const LOCAL_AUDIO_EXTENSIONS=new Set(['.mp3','.wav','.m4a','.flac','.aac','.ogg']);
+function localQueueStorePath(){return path.join(app.getPath('userData'),'radio-wave-local-queue.json');}
+function validLocalAudioPath(value){
+  try{
+    const full=path.resolve(String(value||''));
+    const st=fs.statSync(full);
+    return st.isFile()&&LOCAL_AUDIO_EXTENSIONS.has(path.extname(full).toLowerCase())?full:'';
+  }catch{return '';}
+}
+function persistLocalQueue(){
+  try{
+    fs.writeFileSync(localQueueStorePath(),JSON.stringify({
+      version:1,
+      index:localAudioQueueIndex,
+      items:localAudioQueue
+    },null,2),'utf8');
+  }catch(e){runtimeEvent('local-queue-persist-error',{error:String(e.message||e)});}
+}
+function loadLocalQueueFromDisk(){
+  try{
+    const store=localQueueStorePath();
+    if(!fs.existsSync(store))return;
+    const data=JSON.parse(fs.readFileSync(store,'utf8'));
+    const items=Array.isArray(data?.items)?data.items.map(validLocalAudioPath).filter(Boolean).slice(0,500):[];
+    localAudioQueue=items;
+    localAudioQueueIndex=items.length?Math.max(0,Math.min(items.length-1,Number(data?.index)||0)):-1;
+    selectedLocalAudioPath=localAudioQueueIndex>=0?items[localAudioQueueIndex]:'';
+    runtimeEvent('local-queue-restored',{count:items.length,index:localAudioQueueIndex});
+  }catch(e){runtimeEvent('local-queue-restore-error',{error:String(e.message||e)});}
+}
+function localQueuePublicState(){
+  return {
+    count:localAudioQueue.length,
+    index:localAudioQueueIndex,
+    current:localAudioQueueIndex>=0?path.basename(localAudioQueue[localAudioQueueIndex]):'',
+    items:localAudioQueue.map((p,i)=>({index:i,name:path.basename(p),active:i===localAudioQueueIndex})),
+    mediaUrl:selectedLocalAudioPath?('swmedia://audio/current?v='+localAudioRevision):''
+  };
+}
+function addLocalQueuePaths(paths,{replace=false}={}){
+  const incoming=(Array.isArray(paths)?paths:[]).map(validLocalAudioPath).filter(Boolean);
+  if(!incoming.length)return localQueuePublicState();
+  const base=replace?[]:localAudioQueue.slice();
+  const seen=new Set(base.map(x=>x.toLowerCase()));
+  for(const p of incoming){
+    if(base.length>=500)break;
+    if(seen.has(p.toLowerCase()))continue;
+    seen.add(p.toLowerCase());base.push(p);
+  }
+  localAudioQueue=base;
+  if(localAudioQueueIndex<0&&base.length)localAudioQueueIndex=0;
+  if(localAudioQueueIndex>=base.length)localAudioQueueIndex=Math.max(0,base.length-1);
+  selectedLocalAudioPath=localAudioQueueIndex>=0?base[localAudioQueueIndex]:'';
+  localAudioRevision++;
+  persistLocalQueue();
+  runtimeEvent('local-queue-updated',{count:base.length,index:localAudioQueueIndex,replace});
+  return localQueuePublicState();
+}
+function activateLocalQueueIndex(index){
+  if(!localAudioQueue.length)throw new Error('local_queue_empty');
+  const n=Math.max(0,Math.min(localAudioQueue.length-1,Number(index)||0));
+  localAudioQueueIndex=n;
+  selectedLocalAudioPath=localAudioQueue[n];
+  localAudioRevision++;
+  persistLocalQueue();
+  const state=localQueuePublicState();
+  broadcastSourceState({mode:'local',src:state.mediaUrl,name:state.current,queueIndex:n,queueLength:state.count});
+  runtimeEvent('local-queue-activate',{index:n,name:state.current});
+  return state;
+}
 
 function trustedLocalFile(value,relativePath) {
   try {
@@ -590,6 +664,7 @@ app.whenReady().then(() => {
     if(u.hostname!=='audio'||u.pathname!=='/current'||!soundCloudCurrent)return new Response('Not found',{status:404});
     try{const token=await soundCloudAccessToken();const r=await net.fetch(`${SOUND_CLOUD_API}/tracks/${encodeURIComponent(soundCloudCurrent.urn||soundCloudCurrent.id)}/stream`,{headers:{authorization:`OAuth ${token}`,accept:'*/*'}});if(r.status===401){soundCloudToken=null;const retry=await soundCloudAccessToken();return await net.fetch(`${SOUND_CLOUD_API}/tracks/${encodeURIComponent(soundCloudCurrent.urn||soundCloudCurrent.id)}/stream`,{headers:{authorization:`OAuth ${retry}`,accept:'*/*'}});}return r;}catch(e){return new Response(String(e.message||e),{status:502});}
   });
+  loadLocalQueueFromDisk();
   protocol.handle('swmedia', (request) => {
     const u = new URL(request.url);
     if (u.hostname !== 'audio' || u.pathname !== '/current' || !selectedLocalAudioPath) return new Response('Not found', {status:404});
@@ -636,22 +711,46 @@ app.on('window-all-closed', () => {
 // IPC handlers for Native Dialogs and File operations
 registerIpc('dialog:openAudio','main', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'Select Audio Song',
-    filters: [
-      { name: 'Audio Files', extensions: ['mp3', 'wav', 'm4a', 'flac', 'aac', 'ogg'] }
-    ],
-    properties: ['openFile']
+    title: 'Add Local Audio Files',
+    filters: [{ name: 'Audio Files', extensions: ['mp3', 'wav', 'm4a', 'flac', 'aac', 'ogg'] }],
+    properties: ['openFile','multiSelections']
   });
-
-  if (result.canceled || result.filePaths.length === 0) {
-    return null;
+  if (result.canceled || result.filePaths.length === 0) return null;
+  const state=addLocalQueuePaths(result.filePaths,{replace:false});
+  if(state.count&&state.index>=0)return activateLocalQueueIndex(state.index);
+  return state;
+});
+registerIpc('local:queue-state','main',async()=>localQueuePublicState());
+registerIpc('local:queue-add-paths','main',async(_e,paths)=>addLocalQueuePaths(paths,{replace:false}));
+registerIpc('local:queue-activate','main',async(_e,index)=>activateLocalQueueIndex(index));
+registerIpc('local:queue-remove','main',async(_e,index)=>{
+  const n=Number(index);
+  if(!Number.isInteger(n)||n<0||n>=localAudioQueue.length)return localQueuePublicState();
+  const wasCurrent=n===localAudioQueueIndex;
+  localAudioQueue.splice(n,1);
+  if(!localAudioQueue.length){localAudioQueueIndex=-1;selectedLocalAudioPath='';}
+  else{
+    if(n<localAudioQueueIndex)localAudioQueueIndex--;
+    else if(wasCurrent)localAudioQueueIndex=Math.min(n,localAudioQueue.length-1);
+    selectedLocalAudioPath=localAudioQueue[localAudioQueueIndex]||'';
   }
-
-  const filePath = result.filePaths[0];
-  selectedLocalAudioPath = filePath;
-  const mediaUrl = 'swmedia://audio/current';
-  broadcastSourceState({mode:'local',src:mediaUrl,name:path.basename(filePath)});
-  return { name: path.basename(filePath), mediaUrl };
+  localAudioRevision++;persistLocalQueue();
+  return localQueuePublicState();
+});
+registerIpc('local:queue-clear','main',async()=>{
+  localAudioQueue=[];localAudioQueueIndex=-1;selectedLocalAudioPath='';localAudioRevision++;persistLocalQueue();
+  broadcastSourceState({mode:'local',name:'',queueIndex:0,queueLength:0});
+  return localQueuePublicState();
+});
+registerIpc('local:queue-shuffle','main',async()=>{
+  if(localAudioQueue.length<2)return localQueuePublicState();
+  const current=selectedLocalAudioPath;
+  for(let i=localAudioQueue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[localAudioQueue[i],localAudioQueue[j]]=[localAudioQueue[j],localAudioQueue[i]];}
+  localAudioQueueIndex=current?localAudioQueue.indexOf(current):0;
+  if(localAudioQueueIndex<0)localAudioQueueIndex=0;
+  selectedLocalAudioPath=localAudioQueue[localAudioQueueIndex]||'';
+  persistLocalQueue();runtimeEvent('local-queue-shuffled',{count:localAudioQueue.length,index:localAudioQueueIndex});
+  return localQueuePublicState();
 });
 
 registerIpc('dialog:openMilkdrop','main', async()=>{
