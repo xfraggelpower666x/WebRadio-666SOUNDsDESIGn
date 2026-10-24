@@ -475,6 +475,32 @@ registerIpc('dialog:openMilkdrop','main', async()=>{
   const source=fs.readFileSync(filePath,'utf8'); if(!source.trim())throw new Error('milk_preset_empty'); return {name:path.basename(filePath),source};
 });
 
+registerIpc('dialog:openMilkdropPack','main', async()=>{
+  const result=await dialog.showOpenDialog(mainWindow,{title:'Import MilkDrop Preset Folder',properties:['openDirectory']});
+  if(result.canceled||!result.filePaths[0])return null;
+  const root=path.resolve(result.filePaths[0]);
+  const out=[]; let total=0;
+  const MAX_FILES=128, MAX_FILE=2*1024*1024, MAX_TOTAL=16*1024*1024;
+  const walk=dir=>{
+    if(out.length>=MAX_FILES||total>=MAX_TOTAL)return;
+    for(const ent of fs.readdirSync(dir,{withFileTypes:true})){
+      if(out.length>=MAX_FILES||total>=MAX_TOTAL)break;
+      const full=path.join(dir,ent.name);
+      if(ent.isSymbolicLink())continue;
+      if(ent.isDirectory()){walk(full);continue;}
+      if(!ent.isFile()||path.extname(ent.name).toLowerCase()!=='.milk')continue;
+      const st=fs.statSync(full);
+      if(st.size<=0||st.size>MAX_FILE||total+st.size>MAX_TOTAL)continue;
+      const source=fs.readFileSync(full,'utf8');
+      if(!source.trim())continue;
+      total+=st.size;
+      out.push({name:ent.name,relativePath:path.relative(root,full),source});
+    }
+  };
+  walk(root);
+  return {folder:path.basename(root),count:out.length,totalBytes:total,truncated:out.length>=MAX_FILES||total>=MAX_TOTAL,presets:out};
+});
+
 registerIpc('dialog:openBackground','main', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     title: 'Select Background Image',
