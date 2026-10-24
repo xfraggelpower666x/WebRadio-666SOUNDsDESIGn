@@ -140,6 +140,16 @@ check(/id="btn-mute"/.test(html)&&/aria-pressed="false"/.test(html),'main-player
 check(/audioElement\.muted = !audioElement\.muted/.test(text('src/app.js')),'main-player-real-mute-toggle');
 check(/rw666-player-muted/.test(text('src/app.js')),'main-player-mute-persistence');
 check(/mute-btn\.is-muted/.test(css),'main-player-cyber-mute-state');
+check(/detachedVisualizerWindow/.test(main)&&/display:open-detached-visualizer/.test(main),'native-detached-visualizer-window');
+check(/visual:frame[^]*detachedVisualizerWindow/.test(main),'detached-visualizer-real-frame-sync');
+check(/broadcastSourceState[^]*detachedVisualizerWindow/.test(main),'detached-visualizer-source-sync');
+check(/key:'dock'|key:\'dock\'/.test(workspace)&&/detachDock/.test(workspace),'native-detached-menu-dock');
+check(/rw-dock-detach/.test(workspace)&&/rw-visual-frame-detach/.test(workspace),'cross-monitor-detach-controls');
+check(/languageCode/.test(workspace)&&/tipText/.test(workspace)&&/rw-smart-tooltip/.test(css),'localized-smart-tooltips');
+check(/startsWith\('de'\)/.test(workspace)&&/detachVisualizer/.test(workspace),'tooltip-de-en-language-follow');
+check(/tuneTicker/.test(integration)&&/scrollWidth/.test(integration)&&/clientWidth/.test(integration),'adaptive-ticker-width-measurement');
+check(/rw-ticker-static/.test(integration)&&/rw-ticker-static/.test(css),'adaptive-ticker-short-title-static');
+check(/--rw-ticker-duration/.test(integration)&&/s666TickerAdaptive/.test(css),'adaptive-ticker-dynamic-duration');
 
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
