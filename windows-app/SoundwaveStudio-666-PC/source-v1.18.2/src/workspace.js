@@ -417,7 +417,7 @@
   async function detachDock(){
     if(detached.has('dock')){await window.api?.focusDetachedOverlay?.('dock');return;}
     try{
-      const html='<div class="rw-detached-dock">'+Array.from(dock.querySelectorAll('.rw-dock-button')).map(b=>b.outerHTML).join('')+'</div>';
+      const html='<div class="rw-detached-dock">'+Array.from(dock.querySelectorAll('.rw-dock-button')).map(b=>{const clone=b.cloneNode(true);clone.title=tipText(clone.dataset.rwTipKey||'');return clone.outerHTML;}).join('')+'</div>';
       const controls=controlsSnapshot(dock);
       const r=await window.api?.openDetachedOverlay?.({key:'dock',title:'WINDOWS',html,controls,width:190,height:640});
       if(r?.ok){detached.add('dock');dock.classList.add('rw-dock-native-detached');}
