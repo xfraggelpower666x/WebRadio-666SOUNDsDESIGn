@@ -13,6 +13,12 @@
     const active=s?.active||[];
     el.innerHTML=active.map(o=>`<article class="rw-diag-card"><strong>OUTPUT ${esc(o.id)}</strong><span>${esc(o.bounds?.width)}×${esc(o.bounds?.height)} @ ${esc(o.bounds?.x)},${esc(o.bounds?.y)}</span><span>Engine ${esc(o.engine)} · FPS ${esc(o.fps)}</span><span>${o.responsive?'RESPONSIVE':'NO HEARTBEAT'} · Recoveries ${esc(o.recoveries)}</span></article>`).join('')||'<span class="rw-diag-empty">No secondary output window active</span>';
   };
+  const syncDetached=()=>{
+    const controls=Array.from(root.querySelectorAll('input[id],select[id],textarea[id],button[id]')).map(el=>({
+      id:el.id,tag:el.tagName,type:el.type||'',value:el.value??'',checked:!!el.checked,disabled:!!el.disabled
+    }));
+    window.api.syncDetachedOverlay?.('diagnostics',{html:root.innerHTML,controls}).catch(()=>{});
+  };
   const renderRuntime=d=>{
     const gpu=q('#rw-diag-gpu'),rt=q('#rw-diag-runtime');
     if(gpu)gpu.textContent=JSON.stringify(d?.gpu||{},null,2);
@@ -27,13 +33,14 @@
       const [displays,outputs,runtime]=await Promise.all([window.api.displays(),window.api.outputStatus(),window.api.runtimeDiagnostics()]);
       renderDisplays(displays);renderOutputs(outputs);renderRuntime(runtime);
       q('#rw-diag-state').textContent='LIVE · '+new Date().toLocaleTimeString();
-    }catch(e){q('#rw-diag-state').textContent='ERROR · '+String(e.message||e);}
+      syncDetached();
+    }catch(e){q('#rw-diag-state').textContent='ERROR · '+String(e.message||e);syncDetached();}
   }
   q('#rw-diag-refresh')?.addEventListener('click',refresh);
   q('#rw-diag-export')?.addEventListener('click',async()=>{
     const state=q('#rw-diag-state'); if(state)state.textContent='EXPORTING JSON…';
-    try{const r=await window.api.exportRuntimeDiagnostics();if(state)state.textContent=r?.ok?'JSON EXPORTED':'EXPORT CANCELLED';}
-    catch(e){if(state)state.textContent='EXPORT ERROR · '+String(e.message||e);}
+    try{const r=await window.api.exportRuntimeDiagnostics();if(state)state.textContent=r?.ok?'JSON EXPORTED · '+String(r.filePath||''):'EXPORT CANCELLED';syncDetached();}
+    catch(e){if(state)state.textContent='EXPORT ERROR · '+String(e.message||e);syncDetached();}
   });
   window.api.onDisplaysChanged?.(renderDisplays);
   window.api.onWindowMetrics?.(()=>refresh());
