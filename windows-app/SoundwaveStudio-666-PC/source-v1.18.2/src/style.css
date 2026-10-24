@@ -1305,3 +1305,40 @@ html,body,.app-container,.preview-area,.preview-viewport-container{
   .milkdrop-threshold-grid,
   .milkdrop-runtime-row{grid-template-columns:1fr;}
 }
+
+
+/* Native detachable overlay controls */
+.rw-window-detach{
+  width:28px;height:26px;
+  border:1px solid rgba(32,232,255,.42);
+  border-radius:8px;
+  background:rgba(4,22,31,.88);
+  color:#20e8ff;
+  font-size:16px;
+  line-height:20px;
+  cursor:pointer;
+}
+.rw-window-detach:hover{
+  border-color:#20e8ff;
+  box-shadow:0 0 12px rgba(32,232,255,.30);
+}
+.rw-floating-window.rw-window-detached{display:none!important;}
+.output-only .rw-window-dock,.output-only .rw-floating-window{display:none!important;}
+
+/* Final monitor-aware stage sizing: JS supplies fitted pixel geometry. */
+body.rw-workspace-enabled .preview-viewport-container{
+  align-items:center;
+  justify-content:center;
+}
+body.rw-workspace-enabled .video-frame-container,
+body.rw-workspace-enabled .video-frame-container.widescreen,
+body.rw-workspace-enabled .video-frame-container.vertical,
+body.rw-workspace-enabled .video-frame-container.square{
+  max-width:none!important;
+  max-height:none!important;
+  flex:none;
+}
+body.rw-workspace-enabled #visualizer-canvas{
+  width:100%!important;
+  height:100%!important;
+}
