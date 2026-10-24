@@ -1,0 +1,74 @@
+{
+  "schema": "666STREAM_LYVRA_SUPERCODEFORGE_PEER_PROFILE_V1",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "local_executor": "666-RADIO-CODEFORGE-001",
+  "peer_system": "WHOLE_LYVRA",
+  "peer_facet": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge",
+  "peer_branch": "lyvra",
+  "peer_head": "5c83afc09b91f1aa506068377230bdcfdcbd515a",
+  "mode": "READ_ONLY_CAPABILITY_ADAPTATION",
+  "identity_import": false,
+  "trigger_import": false,
+  "authority_import": false,
+  "foreign_writes": false,
+  "foreign_activation": false,
+  "new_router": false,
+  "imported_runtime_code": false,
+  "peer_evidence": {
+    "facet_contract_blob": "d641f0fb7d?placeholder"
+  },
+  "adapted_gates": [
+    "CAPABILITY_LIBRARY_NE_HOST_EXECUTION",
+    "SOURCE_NE_DELIVERY_NE_ADOPTION_NE_HOST",
+    "NO_FOREIGN_AUTOMUTATION",
+    "NO_PERMISSION_ESCALATION",
+    "IMMUTABLE_COMMIT_AND_EXPECTED_BLOB_REQUIRED",
+    "REPLAY_AND_SUPERSESSION_GUARD",
+    "PROVIDER_RESPONSE_NE_INDEPENDENT_HOST_EVIDENCE",
+    "SOURCE_READBACK_NE_CI_PASS_NE_FRESH_HOST_PASS",
+    "SEPARATE_SOURCE_DELIVERY_ADOPTION_HOST_ACCEPTANCE"
+  ],
+  "stream_native_execution": [
+    "rehydrate-current-state",
+    "root-cause-analysis",
+    "owner-layer-conflict-audit",
+    "peer-gate-evaluation",
+    "minimal-reversible-action",
+    "targeted-regression",
+    "independent-readback",
+    "evidence-classification",
+    "pointer-last-on-update-only"
+  ],
+  "current_peer_limitations": [
+    "LYVRA verified_live_capabilities=0",
+    "LYVRA native/alive plugin host not independently verified",
+    "cross-repository transport not independently verified",
+    "external caller access not authorized by LYVRA"
+  ],
+  "source_references": [
+    {
+      "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/FACET_CONTRACT.md",
+      "blob": "d641f0fb7d9f0d?"
+    },
+    {
+      "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/CURRENT_STATE.json",
+      "blob": "b0f8fa654b54b427d0727c298e4620ff393416f2"
+    },
+    {
+      "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/read-only-capability-adapter.mjs",
+      "blob": "c3baa1944355eeb9af43eb16331eb0aa0336b46d"
+    },
+    {
+      "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/authorized-host-executor.mjs",
+      "blob": "61f063d5e890b09b7cebc1b9ad7a6161a7bc4b07"
+    },
+    {
+      "path": "LYVRA_NATIVE_RUNTIME/facets/super_codeforge/repository-handoff-protocol.mjs",
+      "blob": "6b8847c49d8b4e5b8126c2383f6d6f3d19715ffb"
+    },
+    {
+      "path": "LYVRA_NATIVE_RUNTIME/development/verification/CODEFORGE_CI_EVIDENCE_CONTRACT.md",
+      "blob": "755625dc1104c43d31b0a7858933e38e3eed1e86"
+    }
+  ]
+}
