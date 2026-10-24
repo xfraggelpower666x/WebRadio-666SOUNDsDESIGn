@@ -126,7 +126,9 @@
   }
 
   function clampWindow(win){
-    const dockWidth=document.body.classList.contains('rw-dock-collapsed')?14:116;
+    const dr=dock.getBoundingClientRect();
+    const dockAtRight=dr.right>=window.innerWidth-24;
+    const dockWidth=document.body.classList.contains('rw-dock-collapsed')?14:(dockAtRight?dr.width+12:8);
     const r=win.getBoundingClientRect();
     const maxX=Math.max(0,window.innerWidth-dockWidth-r.width-8);
     const maxY=Math.max(0,window.innerHeight-r.height-8);
