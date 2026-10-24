@@ -1699,3 +1699,41 @@ input[type="range"]{accent-color:var(--rw-neon-pink);}
 @media(max-width:720px){
   .milkdrop-library-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
+
+
+/* Main player mute control */
+.volume-container{
+  width:220px;
+}
+.mute-btn{
+  min-width:68px;
+  height:34px;
+  display:grid;
+  grid-template-columns:18px 1fr;
+  align-items:center;
+  gap:5px;
+  padding:0 8px;
+  border:1px solid rgba(25,247,255,.30);
+  border-radius:5px;
+  background:
+    linear-gradient(135deg,rgba(168,85,247,.14),rgba(25,247,255,.07)),
+    rgba(2,6,15,.92);
+  color:#eefcff;
+  font:800 9px/1 monospace;
+  letter-spacing:.06em;
+  cursor:pointer;
+  box-shadow:inset 0 0 10px rgba(25,247,255,.05);
+}
+.mute-btn:hover{
+  border-color:var(--rw-neon-cyan);
+  box-shadow:0 0 10px rgba(25,247,255,.32),inset 0 0 12px rgba(168,85,247,.10);
+}
+.mute-btn.is-muted{
+  border-color:var(--rw-neon-pink);
+  color:#fff;
+  background:
+    linear-gradient(135deg,rgba(255,43,214,.20),rgba(168,85,247,.10)),
+    rgba(9,2,13,.94);
+  box-shadow:0 0 12px rgba(255,43,214,.28),inset 0 0 12px rgba(255,43,214,.08);
+}
+.mute-btn small{font:inherit;}
