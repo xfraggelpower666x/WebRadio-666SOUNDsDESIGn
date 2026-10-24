@@ -17,7 +17,7 @@ assert.strictEqual(P.registerBuiltin([
   {id:'b',kind:'milkdrop',source:'B'},
   {id:'c',kind:'shader',source:'C'}
 ]),3);
-assert.deepStrictEqual(P.byKind('milkdrop').map(x=>x.id),['a','b']);
+assert.strictEqual(JSON.stringify(Array.from(P.byKind('milkdrop'),x=>x.id)),JSON.stringify(['a','b']));
 
 const {Cycle,normalize}=sandbox.window.SVMilkdropCycle;
 assert.strictEqual(normalize({autoNext:true,autoNextSeconds:15}).seconds,15);
