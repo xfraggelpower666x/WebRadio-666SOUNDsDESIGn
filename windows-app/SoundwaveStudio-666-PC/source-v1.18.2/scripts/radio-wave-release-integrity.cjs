@@ -167,6 +167,8 @@ check(/value="de-DE"/.test(html)&&/>🇩🇪 German</.test(html),'language-germa
 check(/localStorage\.setItem\('rw666-language',lang\)/.test(workspace),'language-persistence');
 check(/localStorage\.getItem\('rw666-language'\)\|\|'en-US'/.test(workspace),'language-no-browser-auto-default');
 check(/rw-language-switch/.test(css),'language-main-hud-visibility');
+check(/const hideTip=.*applyLanguage\(initialLanguage\)/s.test(workspace),'language-boot-after-tooltip-runtime');
+check(workspace.indexOf('applyLanguage(initialLanguage)')>workspace.indexOf('const hideTip'),'workspace-no-language-tdz-startup-abort');
 
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
