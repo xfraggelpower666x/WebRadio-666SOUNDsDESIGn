@@ -89,6 +89,9 @@ check(/beforeunload/.test(workspace)&&/visibilitychange/.test(workspace),'worksp
 check(/radio-password/.test(workspace)&&/type==='password'/.test(workspace),'workspace-password-not-persisted');
 check(/status.*LIVE STREAM STATUS|LIVE STREAM STATUS.*status/s.test(workspace),'stream-status-draggable-overlay');
 check(/resize:both/.test(css),'workspace-resizable-overlays');
+check(/slider-visual-opacity/.test(text('src/index.html')),'visualizer-opacity-control');
+check(/visualizerCanvas\.style\.opacity/.test(text('src/app.js')),'visualizer-opacity-application');
+check(/getContext\('webgl2'/.test(text('src/vendor/cayatur/shaderhost.js')),'gpu-webgl2-shader-path');
 check(/\.rw-window-dock\{[^}]*right:8px/.test(css),'workspace-right-side-dock');
 
 if(fail.length){
