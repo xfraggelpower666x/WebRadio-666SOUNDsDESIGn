@@ -159,8 +159,8 @@
   refreshPlayerMessenger();
   q('#discord-send').onclick=()=>act('DISCORD',()=>window.api.discordMessage(q('#discord-message').value));
   q('#discord-now').onclick=()=>act('NOW PLAYING',()=>window.api.discordNowPlaying(metadata()));
-  q('#btn-fullscreen').onclick=async()=>{document.body.classList.toggle('fullframe');await window.api.setFullscreen(document.body.classList.contains('fullframe'));};
-  q('#export-diagnostics').onclick=async()=>{try{const r=await window.api.exportRuntimeDiagnostics();state(r?.ok?'DIAGNOSTICS EXPORTED':'DIAGNOSTICS CANCELLED');}catch(e){state('DIAGNOSTICS ERROR · '+e.message);}};
+  q('#btn-fullscreen')?.addEventListener('click',async()=>{document.body.classList.toggle('fullframe');await window.api.setFullscreen(document.body.classList.contains('fullframe'));});
+  q('#export-diagnostics')?.addEventListener('click',async()=>{try{const r=await window.api.exportRuntimeDiagnostics();state(r?.ok?'DIAGNOSTICS EXPORTED':'DIAGNOSTICS CANCELLED');}catch(e){state('DIAGNOSTICS ERROR · '+e.message);}});
   async function displays(){try{const ds=await window.api.displays();
   const applyOutputs=async()=>{const ids=[q('#display-one').value,q('#display-two').value].filter(Boolean).map(Number);try{const r=await window.api.openOutputs(ids);localStorage.setItem('s666-display-one',q('#display-one').value||'');localStorage.setItem('s666-display-two',q('#display-two').value||'');q('#display-state').textContent=`${r.displayIds.length} fullscreen output${r.displayIds.length===1?'':'s'} active · leader/follower sync`; }catch(e){q('#display-state').textContent='Output error · '+e.message;}};
   q('#display-one').addEventListener('change',applyOutputs);q('#display-two').addEventListener('change',applyOutputs);
