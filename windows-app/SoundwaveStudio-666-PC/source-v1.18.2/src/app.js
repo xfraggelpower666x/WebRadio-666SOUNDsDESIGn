@@ -1702,18 +1702,16 @@ function drawNeonFiber(data, bass, mid, treble) {
   ctx.restore();
 }
 
-// RADIO WAVE visual-first layout: collapse controls without hiding or replacing Soundwave.
+// RADIO WAVE workspace: top button toggles the right-side window dock.
 const controlPanelToggle = document.getElementById('toggle-control-panel');
 if (controlPanelToggle) {
-  const applyControlPanelState = (collapsed) => {
-    document.body.classList.toggle('controls-collapsed', collapsed);
-    controlPanelToggle.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
-    controlPanelToggle.textContent = collapsed ? '☰ SHOW CONTROLS' : '☰ CONTROLS';
-    try { localStorage.setItem('rw666-controls-collapsed', collapsed ? '1' : '0'); } catch {}
-    setTimeout(resizeCanvas, 0);
-  };
-  controlPanelToggle.addEventListener('click', () => applyControlPanelState(!document.body.classList.contains('controls-collapsed')));
-  applyControlPanelState(localStorage.getItem('rw666-controls-collapsed') === '1');
+  controlPanelToggle.textContent='☰ WINDOWS';
+  controlPanelToggle.setAttribute('aria-pressed','true');
+  controlPanelToggle.addEventListener('click', () => {
+    const open=window.RWWorkspace?.toggleDock?.();
+    if(typeof open==='boolean')controlPanelToggle.setAttribute('aria-pressed',open?'true':'false');
+    setTimeout(resizeCanvas,0);
+  });
 }
 
 // Run initial configurations
