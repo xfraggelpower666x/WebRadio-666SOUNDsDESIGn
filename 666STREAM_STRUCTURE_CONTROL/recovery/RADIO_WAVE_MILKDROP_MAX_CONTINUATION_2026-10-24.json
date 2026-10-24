@@ -1,0 +1,86 @@
+{
+  "schema": "666STREAM_RADIO_WAVE_MILKDROP_MAX_CONTINUATION_V1",
+  "date": "2026-10-24",
+  "system": "666STREAM",
+  "project": "WINDOWS_APP",
+  "product": "RADIO WAVE v6.66",
+  "source_branch": "soundwave-v1-18-2-source-import-20261002",
+  "source_head": "eb98e7e4dd1bcd0a3c996955906a5e50711e9bde",
+  "recovery_branch": "backup/pre-radio-wave-milkdrop-control-layer-20261024",
+  "structural_recovery_branch": "backup/pre-radio-wave-milkdrop-max-receipt-20261024",
+  "authority": {
+    "native": "666STREAM",
+    "local_executor": "666 RADIO-CODEFORGE",
+    "lyvra_supercodeforge": "READ_ONLY_PEER_EVIDENCE_ONLY",
+    "lyvra_head_observed": "4e1240530b988f826c3f2ce074f9744cdcf152e4",
+    "foreign_activation": false,
+    "foreign_writes": false,
+    "source_delivery_adoption_host_separated": true
+  },
+  "user_reference_archives": [
+    "BeatDrop2077-master.zip",
+    "milkdrop2077-main.zip",
+    "projectm-master.zip",
+    "MilkDrop3-main (1).zip",
+    "MilkDrop3-MilkDrop3.zip"
+  ],
+  "reference_policy": "STUDY_ONLY_NO_FOREIGN_EXE_OR_AUDIO_OWNER_IMPORTED",
+  "implemented": [
+    "persistent draggable/resizable overlay workspace",
+    "responsive overlay scaling without normal scrollbars",
+    "visualizer opacity control",
+    "dedicated MilkDrop Studio overlay",
+    "real WebGL2 GPU status probe",
+    "native SVPresets registry",
+    "native MilkDrop cycle control layer",
+    "real-signal seconds/bars auto cycle",
+    "real-audio bass/treble/smart hardcuts",
+    "preset lock",
+    "never-repeat memory",
+    "track-change advance",
+    "previous/history behavior",
+    "dynamic preset registry/browser",
+    "single .milk compatibility probe",
+    "bounded recursive preset-folder import",
+    "secondary-display live preset source synchronization"
+  ],
+  "pack_import_limits": {
+    "max_files": 128,
+    "max_file_bytes": 2097152,
+    "max_total_bytes": 16777216,
+    "symlinks": "SKIPPED"
+  },
+  "verification": {
+    "prior_control_layer_run": {
+      "run_id": 40108192924,
+      "conclusion": "success",
+      "targeted_gates": "66/66 PASS"
+    },
+    "exact_head_windows_run": {
+      "run_id": 40108339262,
+      "job_id": 120914611734,
+      "conclusion": "success",
+      "targeted_gates": "71/71 PASS",
+      "installer_sha256": "948ed080205d36204626877728c016bf242e52eeb7215ca12db06d457d32ff88",
+      "unpacked_exe_sha256": "c513d17d164d5a8750172e45bd77532401a5f3fb94fe6a8d37374614b498596c",
+      "installer_artifact_id": 12565836258,
+      "installer_artifact_digest": "sha256:1b87eda5eafccddb7537769ac55e15ac83b51ba388d86ff15e08b7d78d286f52",
+      "unpacked_artifact_id": 12564893654,
+      "unpacked_artifact_digest": "sha256:16fc24201be001ef3eeed64188b9f5cab66c1d3a231b47b83834d5639ce86604"
+    }
+  },
+  "evidence_classification": {
+    "source": "PASS",
+    "functional_unit": "PASS",
+    "windows_ci": "PASS",
+    "installer_artifact": "PASS",
+    "unpacked_artifact": "PASS",
+    "interactive_windows_host_new_milkdrop_controls": "PENDING_USER_TEST"
+  },
+  "soundwave_core": "PRESERVED",
+  "audio_owner": "SOUNDWAVE_ONLY",
+  "second_audio_owner": false,
+  "production_webradio_mutated": false,
+  "pointer_updated": false,
+  "pointer_reason": "USER_TRIGGER_WAS_WEITER_NOT_UPDATE"
+}
