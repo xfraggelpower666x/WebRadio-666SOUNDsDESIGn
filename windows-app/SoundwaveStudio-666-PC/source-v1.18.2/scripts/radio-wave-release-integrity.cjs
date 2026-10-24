@@ -162,6 +162,11 @@ check(/q\('#player-message-send'\)\.onclick[^]*\.catch/.test(integration),'messe
 check(/q\('#discord-send'\)\.onclick[^]*\.catch/.test(integration),'discord-action-error-contained');
 check(/SoundCloud API credentials required/.test(integration),'soundcloud-credential-diagnostic');
 check(/id="app-language"/.test(html)&&/languageCode/.test(workspace),'explicit-de-en-language-setting');
+check(/value="en-US" selected/.test(html)&&/English \(USA\)/.test(html),'language-default-en-us');
+check(/value="de-DE"/.test(html)&&/>🇩🇪 German</.test(html),'language-german-option');
+check(/localStorage\.setItem\('rw666-language',lang\)/.test(workspace),'language-persistence');
+check(/localStorage\.getItem\('rw666-language'\)\|\|'en-US'/.test(workspace),'language-no-browser-auto-default');
+check(/rw-language-switch/.test(css),'language-main-hud-visibility');
 
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
 check(/window\.SVPresets=Object\.freeze/.test(text('src/vendor/cayatur/preset-registry.js')),'milkdrop-preset-registry');
