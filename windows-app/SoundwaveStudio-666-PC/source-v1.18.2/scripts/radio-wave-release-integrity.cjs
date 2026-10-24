@@ -23,9 +23,15 @@ console.log('=== RADIO WAVE v6.66 Targeted Release Integrity ===');
   'main.js',
   'preload.js',
   'intro-preload.js',
+  'overlay-preload.js',
   'src/app.js',
   'src/intro.js',
+  'src/overlay-window.html',
+  'src/overlay-window.js',
+  'src/overlay-window.css',
+  'overlay-preload.js',
   'src/workspace.js',
+  'src/overlay-window.js',
   'src/integration/666-integration.js',
   'src/vendor/cayatur/preset-registry.js',
   'src/vendor/cayatur/milkdrop-cycle.js',
@@ -96,6 +102,13 @@ check(/slider-visual-opacity/.test(text('src/index.html')),'visualizer-opacity-c
 check(/visualizerCanvas\.style\.opacity/.test(text('src/app.js')),'visualizer-opacity-application');
 check(/getContext\('webgl2'/.test(text('src/vendor/cayatur/shaderhost.js')),'gpu-webgl2-shader-path');
 check(/\.rw-window-dock\{[^}]*right:8px/.test(css),'workspace-right-side-dock');
+check(/rw-window-detach/.test(workspace)&&/detachWindow/.test(workspace),'workspace-native-detach-control');
+check(/openDetachedOverlay/.test(text('preload.js'))&&/workspace:overlay-open/.test(main),'workspace-native-overlay-ipc');
+check(/detachedOverlayWindows/.test(main)&&/overlay-preload\.js/.test(main),'workspace-native-browserwindows');
+check(pkg.build?.files?.includes('overlay-preload.js'),'detached-overlay-preload-packaged');
+check(/fitVisualizerToViewport/.test(text('src/app.js'))&&/onWindowMetrics/.test(text('preload.js')),'monitor-aware-visualizer-fit');
+check(/mainWindow\.on\(ev,\(\)=>emitMainWindowMetrics/.test(main),'main-window-monitor-metrics');
+check(/output-only \.rw-window-dock/.test(css),'output-window-no-control-overlays');
 
 const html=text('src/index.html');
 check(/preset-registry\.js[^]*presets-milkdrop\.js[^]*milkdrop-cycle\.js[^]*milkdrop-renderer\.js/.test(html),'milkdrop-control-script-order');
