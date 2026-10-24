@@ -1,0 +1,87 @@
+{
+  "schema": "666STREAM_RADIO_WAVE_LOCAL_QUEUE_VISUAL_SWITCH_UPDATE_V1",
+  "date": "2026-10-24",
+  "system": "666STREAM",
+  "project": "WINDOWS_APP",
+  "product": "RADIO WAVE v6.66",
+  "authority": "GITHUB_REPOSITORY",
+  "source_branch": "soundwave-v1-18-2-source-import-20261002",
+  "source_head": "8484453046d95f17389976188dcb86590e22eeb7",
+  "structural_prechange_head": "8edacbceb8ded006abcab2a6e1697fce9d8e13d3",
+  "structural_recovery_branch": "backup/pre-streamctrl-radio-wave-local-queue-visual-switch-update-20261024",
+  "source_recovery_branch": "backup/pre-radio-wave-local-queue-crossfade-visual-switch-20261024",
+  "implemented": [
+    "explicit MilkDrop OFF mode returning to classic Soundwave visualizers",
+    "changing classic wave style exits MilkDrop mode",
+    "personal MilkDrop library autoload from persistent userData on startup",
+    "preset folder import persistence with expanded bounded library limits",
+    "automatic local playback when switching from radio back to local source",
+    "local audio drag and drop",
+    "persistent local queue up to 500 tracks",
+    "sequential and shuffle local queue modes",
+    "automatic queue advance",
+    "single-audio-owner fade-out switch fade-in transitions",
+    "workspace language startup regression repair preserved",
+    "cross-monitor native detach preserved",
+    "DE EN tooltip system preserved",
+    "remote health and SoundCloud initialization repairs preserved"
+  ],
+  "invariants": {
+    "soundwave_core": "PRESERVED",
+    "audio_owner": "SOUNDWAVE_ONLY",
+    "second_local_audio_owner": false,
+    "second_audio_owner": false,
+    "production_webradio_mutated": false,
+    "foreign_system_activation": false,
+    "foreign_system_writes": false
+  },
+  "local_queue": {
+    "max_tracks": 500,
+    "modes": [
+      "SEQUENTIAL",
+      "SHUFFLE"
+    ],
+    "persistence": "radio-wave-local-queue.json",
+    "transition": "FADE_OUT_SWITCH_FADE_IN_SINGLE_AUDIO_OWNER"
+  },
+  "milkdrop": {
+    "explicit_off": true,
+    "off_target": "SOUNDWAVE_CLASSIC",
+    "personal_library_autoload": true,
+    "folder_import_persistent": true,
+    "folder_max_files": 1024,
+    "folder_max_total_bytes": 67108864
+  },
+  "verification": {
+    "exact_head_windows_run": {
+      "run_id": 40131444713,
+      "job_id": 120983813434,
+      "conclusion": "success",
+      "targeted_gates": "156/156 PASS",
+      "installer_sha256": "d92c4e6b6b82064ed71324d86f41e95c105c1101040ebc76c118242613ba7571",
+      "portable_sha256": "0ec343d91def07e6d5848e25a5af13e159d3b25168bbf8f47e891a3884e76882",
+      "unpacked_exe_sha256": "b3b9f674ed54627c7436ef314090490a961bc7d19494ec19535b5cfd1c4f7460",
+      "installer_artifact_id": 12575216235,
+      "installer_artifact_digest": "sha256:c4a7ac820751327873a6ef6bc8008a01a8aea9e75b1dfd6edae2feadbd32d689",
+      "portable_artifact_id": 12574733943,
+      "portable_artifact_digest": "sha256:55d96c86804c579ca4ce972c15e3736c3a8df16549a4b7c70e82bc521b45b26d",
+      "unpacked_artifact_id": 12574119201,
+      "unpacked_artifact_digest": "sha256:55dfcd2b496765b6372bd5404e8f6f21ed2c6b539c18a7d6a0d674026d63560d"
+    }
+  },
+  "evidence_classification": {
+    "source": "PASS",
+    "targeted_release_gates": "PASS",
+    "windows_ci": "PASS",
+    "artifacts": "PASS",
+    "milkdrop_off_switch": "PENDING_USER_HOST_TEST",
+    "radio_to_local_autoplay": "PENDING_USER_HOST_TEST",
+    "personal_milkdrop_autoload": "PENDING_USER_HOST_TEST",
+    "local_drag_drop": "PENDING_USER_HOST_TEST",
+    "local_queue": "PENDING_USER_HOST_TEST",
+    "shuffle": "PENDING_USER_HOST_TEST",
+    "fade_transition": "PENDING_USER_HOST_TEST"
+  },
+  "next_step": "REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_TO_LOCAL_AUTOPLAY_PRESET_AUTOLOAD_DRAGDROP_QUEUE_SHUFFLE_AND_FADE",
+  "pointer_updated": "PENDING_POINTER_LAST"
+}
