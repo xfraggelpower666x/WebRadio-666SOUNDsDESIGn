@@ -24,9 +24,11 @@
       window.rwOverlay.action({key:overlayKey,kind:'change',id:el.id,value:el.value,checked:!!el.checked}).catch(()=>{});
     },true);
     root.addEventListener('click',e=>{
-      const b=e.target.closest('button[id]');
+      const b=e.target.closest('button');
       if(!b)return;
-      window.rwOverlay.action({key:overlayKey,kind:'click',id:b.id}).catch(()=>{});
+      const action=b.id?{id:b.id}:{selector:b.dataset.source?('[data-source="'+CSS.escape(b.dataset.source)+'"]'):(b.dataset.openWindow?('[data-open-window="'+CSS.escape(b.dataset.openWindow)+'"]'):'')};
+      if(!action.id&&!action.selector)return;
+      window.rwOverlay.action({key:overlayKey,kind:'click',...action}).catch(()=>{});
     },true);
   };
   window.rwOverlay.onInit(payload=>{
