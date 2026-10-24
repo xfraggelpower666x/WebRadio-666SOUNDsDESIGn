@@ -259,6 +259,67 @@
           <div class="control-group">
             <button id="milkdrop-import" class="btn btn-secondary">IMPORT .MILK</button>
           </div>
+
+          <div class="milkdrop-control-grid">
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-auto"><span class="checkmark"></span> Auto Cycle</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-lock"><span class="checkmark"></span> Lock Preset</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-never-repeat" checked><span class="checkmark"></span> Never Repeat</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-on-track"><span class="checkmark"></span> Next on Track Change</label>
+          </div>
+
+          <div class="control-group">
+            <label for="milkdrop-auto-unit">Auto Cycle Mode</label>
+            <select id="milkdrop-auto-unit" class="custom-select">
+              <option value="seconds">SECONDS</option>
+              <option value="bars">BARS · REAL BEAT</option>
+            </select>
+          </div>
+
+          <div class="control-group" id="milkdrop-seconds-group">
+            <div class="slider-header"><label for="milkdrop-auto-seconds">Seconds per Preset</label><span id="milkdrop-auto-seconds-value">30s</span></div>
+            <input type="range" id="milkdrop-auto-seconds" min="5" max="300" step="5" value="30" class="custom-range">
+          </div>
+
+          <div class="control-group" id="milkdrop-bars-group">
+            <div class="slider-header"><label for="milkdrop-auto-bars">Bars per Preset</label><span id="milkdrop-auto-bars-value">8</span></div>
+            <input type="range" id="milkdrop-auto-bars" min="1" max="32" step="1" value="8" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header"><label for="milkdrop-blend-time">Transition</label><span id="milkdrop-blend-time-value">1.5s</span></div>
+            <input type="range" id="milkdrop-blend-time" min="0" max="8" step="0.1" value="1.5" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <label for="milkdrop-hardcut">Audio Hardcut</label>
+            <select id="milkdrop-hardcut" class="custom-select">
+              <option value="off">OFF</option>
+              <option value="bass">BASS IMPACT</option>
+              <option value="treb">TREBLE IMPACT</option>
+              <option value="smart">SMART · BASS OR TREBLE</option>
+            </select>
+          </div>
+
+          <div class="milkdrop-threshold-grid">
+            <div class="control-group">
+              <div class="slider-header"><label for="milkdrop-hardcut-bass">Bass</label><span id="milkdrop-hardcut-bass-value">1.5</span></div>
+              <input type="range" id="milkdrop-hardcut-bass" min="1.05" max="6" step="0.05" value="1.5" class="custom-range">
+            </div>
+            <div class="control-group">
+              <div class="slider-header"><label for="milkdrop-hardcut-treb">Treble</label><span id="milkdrop-hardcut-treb-value">2.9</span></div>
+              <input type="range" id="milkdrop-hardcut-treb" min="1.05" max="10" step="0.05" value="2.9" class="custom-range">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header"><label for="milkdrop-repeat-window">No-Repeat Memory</label><span id="milkdrop-repeat-window-value">8</span></div>
+            <input type="range" id="milkdrop-repeat-window" min="1" max="50" step="1" value="8" class="custom-range">
+          </div>
+
+          <div class="milkdrop-runtime-row">
+            <span id="milkdrop-live-preset">PRESET · MANUAL</span>
+            <span id="milkdrop-cycle-state">CYCLE · OFF</span>
+          </div>
           <div class="file-meta-tag" id="milkdrop-state">GPU feedback renderer · real audio analyser</div>
         </section>
 
@@ -399,9 +460,12 @@
   <script src="vendor/cayatur/milkdrop-core.js"></script>
   <script src="vendor/cayatur/milkdrop-shader.js"></script>
   <script src="vendor/cayatur/milkdrop-audio.js"></script>
+  <script src="vendor/cayatur/preset-registry.js"></script>
   <script src="vendor/cayatur/presets-milkdrop.js"></script>
+  <script src="vendor/cayatur/milkdrop-cycle.js"></script>
   <script src="vendor/cayatur/milkdrop-renderer.js"></script>
-  <script src="workspace.js"></script>\n  <script src="app.js"></script>
+  <script src="workspace.js"></script>
+  <script src="app.js"></script>
   <script src="integration/666-integration.js"></script>
 </body>
 </html>
