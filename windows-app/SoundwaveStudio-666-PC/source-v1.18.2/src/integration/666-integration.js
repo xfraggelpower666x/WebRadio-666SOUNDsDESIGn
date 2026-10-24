@@ -7,6 +7,33 @@
   if(!senderId){senderId='sw666-'+crypto.randomUUID();localStorage.setItem('s666-sender-id',senderId);}
   const state=(t)=>{const e=q('#radio-action-state');if(e)e.textContent=t;};
   const artBg=q('#source-artwork-bg'), visualHeader=q('#radio-visual-header'), ticker=q('#source-nowplaying-ticker'), tickerTrack=q('#source-nowplaying-track');
+  const tuneTicker=()=>{
+    if(!ticker||!tickerTrack||ticker.classList.contains('hidden'))return;
+    requestAnimationFrame(()=>{
+      const viewport=Math.max(1,ticker.clientWidth);
+      const textWidth=Math.max(1,tickerTrack.scrollWidth);
+      const fits=textWidth<=viewport*.82;
+      tickerTrack.classList.toggle('rw-ticker-static',fits);
+      if(fits){
+        tickerTrack.style.removeProperty('--rw-ticker-start');
+        tickerTrack.style.removeProperty('--rw-ticker-end');
+        tickerTrack.style.removeProperty('--rw-ticker-duration');
+        return;
+      }
+      const gap=Math.max(70,Math.min(220,viewport*.16));
+      const distance=viewport+textWidth+gap;
+      const speed=Math.max(85,Math.min(150,viewport/8));
+      const duration=Math.max(7,Math.min(18,distance/speed));
+      tickerTrack.style.setProperty('--rw-ticker-start',viewport+'px');
+      tickerTrack.style.setProperty('--rw-ticker-end',(-textWidth-gap)+'px');
+      tickerTrack.style.setProperty('--rw-ticker-duration',duration.toFixed(2)+'s');
+      tickerTrack.style.animation='none';
+      void tickerTrack.offsetWidth;
+      tickerTrack.style.animation='';
+    });
+  };
+  if('ResizeObserver' in window&&ticker)new ResizeObserver(tuneTicker).observe(ticker);
+  window.addEventListener('resize',tuneTicker);
   const statusPanel=q('#radio-status-panel'), statusArtwork=q('#radio-status-artwork'), statusTitle=q('#radio-status-title'), statusArtist=q('#radio-status-artist'), statusDj=q('#radio-status-dj'), statusRoute=q('#radio-status-route'), statusListeners=q('#radio-status-listeners'), statusStream=q('#radio-status-stream');
   // Stream artwork hardlock: supplied stream artwork always wins. Fallback branding is only allowed when artwork is absent.
   const artworkOf=o=>{
@@ -75,8 +102,8 @@
         const dj=cleanText(data.dj,'');
         if(kind==='radio'){
           const bits=[artist,title&&title!=='—'?title:'',dj&&dj!=='—'&&dj!==artist?'DJ: '+dj:'',data.listeners||data.listener_count?('Listeners: '+(data.listeners||data.listener_count)):'',data.bitrate||data.kbps?((data.bitrate||data.kbps)+' kbps'):'',cleanText(data.routeState,radioRoute())].filter(Boolean);
-          tickerTrack.textContent=bits.join('   •   ');
-        }else tickerTrack.textContent=`${artist} — ${title}`;
+          tickerTrack.textContent=bits.join('   •   '); tuneTicker();
+        }else { tickerTrack.textContent=`${artist} — ${title}`; tuneTicker(); }
       }
     }
     updateRadioStatus(kind,data);
