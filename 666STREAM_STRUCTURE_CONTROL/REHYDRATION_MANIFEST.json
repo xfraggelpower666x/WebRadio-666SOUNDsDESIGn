@@ -135,5 +135,15 @@
     "exact_two_second_hold": "PARTIAL",
     "no_project_autoswitch": true,
     "return_anchor": "WEBRADIO_MAIN_PLAYER_CYBERINTRO_POST_REPAIR"
+  },
+  "cost_governance": {
+    "contract": "governance/ZERO_ADDITIONAL_COST_POLICY.md",
+    "inheritance": "ALL_NATIVE_REGISTERED_PROJECTS_AND_CODEFORGE",
+    "per_action_cost_gate": true,
+    "new_charges_without_owner_approval": "FORBIDDEN",
+    "unknown_cost": "COST_BLOCKED",
+    "foreign_activation": false,
+    "plugin_release_impact": "NONE_UNTIL_NATIVE_ADOPTION",
+    "provider_cost_verification": "REQUIRED_PER_ACTION"
   }
 }
