@@ -4,9 +4,9 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "25a1968d49ee91e4cc3972eea713eb069064cdf2",
-  "prechange_recovery_branch": "backup/pre-streamctrl-zero-additional-cost-20261104",
-  "body_readback": "PASS_ZERO_ADDITIONAL_COST_GOVERNANCE_9_OF_9",
+  "body_head_before_pointer": "d6af3892c4106256d9111bc71a841f85ef2ba1bc",
+  "prechange_recovery_branch": "backup/pre-streamctrl-cost-policy-enforcement-20261104",
+  "body_readback": "PASS_ZERO_ADDITIONAL_COST_SOURCE_PATCH_REMOTE_READBACK",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
   "project_map": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
   "session_governor": "666STREAM_STRUCTURE_CONTROL/current/SESSION_GOVERNOR.md",
@@ -927,16 +927,21 @@
     "pointer_last": true
   },
   "cost_governance_20261104": {
-    "status": "OWNER_POLICY_SOURCE_INTEGRATED",
+    "status": "SOURCE_PATCH_READBACK_VERIFIED_EXECUTION_PENDING",
     "contract": "666STREAM_STRUCTURE_CONTROL/governance/ZERO_ADDITIONAL_COST_POLICY.md",
     "inheritance": "ALL_REGISTERED_NATIVE_PROJECTS",
     "per_action_cost_check": "REQUIRED",
     "new_charges_without_owner_approval": "FORBIDDEN",
     "unknown_cost": "COST_BLOCKED",
-    "source_readback": "PASS_9_OF_9",
-    "provider_cost_assessment": "PER_ACTION_PENDING",
+    "source_readback": "PASS_8_OF_8_ISOLATED_CHECKS",
+    "provider_cost_assessment": "REQUIRED_PER_ACTION",
     "plugin_host_parity": "READBACK_PENDING",
     "production_runtime_mutation": "NONE",
-    "foreign_system_mutation": "NONE"
+    "foreign_system_mutation": "NONE",
+    "required_rehydration": true,
+    "core_verifier_extended": true,
+    "regression_test_added": true,
+    "node_test_execution": "NOT_RUN",
+    "github_ci": "NOT_RUN"
   }
 }
