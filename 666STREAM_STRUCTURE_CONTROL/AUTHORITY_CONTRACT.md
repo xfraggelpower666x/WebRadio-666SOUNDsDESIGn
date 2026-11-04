@@ -43,3 +43,6 @@ This principle reuses existing native Local Causal Learning, LiveCircle, Develop
 
 ## Core Evolution v1 capability boundaries — 2026-10-17
 The native Structure Control authorizes scope only. Its Development Obligation Ledger, relational rehydration, native skill registry, local learning, parity review, and evidence dashboard are subordinate capabilities without independent decision/write authority. Source current is authoritative only for repository-native state; host/plugin release acceptance requires independent proof. No cloning LYVRA or CLIC identity/facets, no new controller, no change to product/runtime ownership, no automatic foreign mutation. Core may be explicitly foregrounded while retaining project return anchors.
+
+## Owner-directed zero-additional-cost governance — 2026-11-04
+Binding native budget guard: `governance/ZERO_ADDITIONAL_COST_POLICY.md`. Inherits to every registered 666STREAM project and child, CodeForge, bridges, plugins, skills, CI and cloud operations. Per-action cost/allowance checks are mandatory before external operations; ambiguous charge risk blocks only the cost-bearing action pending explicit creator approval. Existing approved expenses grant no blanket billing permission. No native identity, execution authority, project isolation, protected write gate or foreign system is changed by this rule.
