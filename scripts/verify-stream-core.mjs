@@ -12,6 +12,27 @@ const skills=json('skills/NATIVE_SKILL_REGISTRY.json');
 const graph=json('rehydration/RELATIONAL_DEPENDENCY_MAP.json');
 const parity=json('integration/ADAPTER_PARITY_LEDGER.json');
 const pointer=json('CURRENT_POINTER.json');
+// Bindende Kosten-Governance: fail-closed vor externen CORE-Aktionen.
+const costPath='governance/ZERO_ADDITIONAL_COST_POLICY.md';
+const costPolicy=readFileSync(root+costPath,'utf8');
+assert.equal(manifest.required_order.filter(x=>x===costPath).length,1,'cost policy must be mandatory once');
+assert.ok(manifest.required_order.indexOf(costPath)>manifest.required_order.indexOf('AUTHORITY_CONTRACT.md'),'cost policy must follow authority');
+assert.ok(manifest.required_order.indexOf(costPath)<manifest.required_order.indexOf('CURRENT_POINTER.json'),'cost policy must load before current pointer');
+assert.equal(manifest.cost_governance.contract,costPath);
+assert.equal(manifest.cost_governance.per_action_cost_gate,true);
+assert.equal(manifest.cost_governance.new_charges_without_owner_approval,'FORBIDDEN');
+assert.equal(manifest.cost_governance.unknown_cost,'COST_BLOCKED');
+assert.equal(manifest.cost_governance.required_rehydration,true);
+assert.equal(manifest.cost_governance.check_before_external_operations,true);
+assert.equal(manifest.cost_governance.missing_policy,'COST_BLOCKED');
+for(const line of [
+ 'OWNER_SCOPE=WHOLE_666STREAM_STRUCTURE_CONTROL_AND_ALL_REGISTERED_NATIVE_PROJECTS',
+ 'ZERO_ADDITIONAL_COST_POLICY=true',
+ 'NEW_CHARGES_WITHOUT_OWNER_APPROVAL=FORBIDDEN',
+ 'COST_FREE_OPERATION_CHECK=REQUIRED_PER_ACTION',
+ 'FOREIGN_AUTOACTIVATION=FORBIDDEN'
+]) assert.ok(costPolicy.split(/\r?\n/).includes(line),'missing binding cost rule: '+line);
+
 assert.equal(manifest.system, OWNER);
 assert.equal(pointer.system, OWNER);
 assert.equal(ledger.authority, OWNER);
@@ -49,4 +70,4 @@ for(const surface of parity.surfaces){
 }
 const result=dashboardProjection({obligations:ledger.obligations,scope:'CORE',head:pointer.core_evolution_20261017?.body_head,gates:pointer.open_gates});
 assert.equal(result.decision_authority,false);
-console.log(JSON.stringify({status:'SOURCE_CONTRACT_VALIDATION_PASS',manifest_carriers:8,projects:projectIds.size,intro_variants:2,obligations:ledger.obligations.length,relations:graph.relations.length,skills:skills.skills.length,parity_surfaces:parity.surfaces.length,host_runtime:'NOT_TESTED'},null,2));
+console.log(JSON.stringify({status:'SOURCE_CONTRACT_VALIDATION_PASS',manifest_carriers:8,projects:projectIds.size,intro_variants:2,obligations:ledger.obligations.length,relations:graph.relations.length,skills:skills.skills.length,parity_surfaces:parity.surfaces.length,cost_policy:'SOURCE_CONTRACT_VALIDATED_ONLY',host_runtime:'NOT_TESTED'},null,2));
