@@ -61,3 +61,45 @@ test('core dashboard keeps project obligations scoped',()=>{
  assert.ok(d.open.every(x=>x.project_id==='CORE'));
  assert.ok(d.open_gates.includes('FRESH_HOST_PENDING'));
 });
+
+test('owner zero-additional-cost policy is mandatory on native rehydration, fail closed',()=>{
+ const relative='governance/ZERO_ADDITIONAL_COST_POLICY.md';
+ const original=readFileSync(base+relative,'utf8');
+ const required=[
+  'OWNER_SCOPE=WHOLE_666STREAM_STRUCTURE_CONTROL_AND_ALL_REGISTERED_NATIVE_PROJECTS',
+  'ZERO_ADDITIONAL_COST_POLICY=true',
+  'NEW_CHARGES_WITHOUT_OWNER_APPROVAL=FORBIDDEN',
+  'COST_FREE_OPERATION_CHECK=REQUIRED_PER_ACTION',
+  'FOREIGN_AUTOACTIVATION=FORBIDDEN'
+ ];
+ const validate=(m,policy)=>{
+  assert.equal(m.cost_governance.contract,relative);
+  assert.equal(m.cost_governance.per_action_cost_gate,true);
+  assert.equal(m.cost_governance.required_rehydration,true);
+  assert.equal(m.cost_governance.check_before_external_operations,true);
+  assert.equal(m.cost_governance.missing_policy,'COST_BLOCKED');
+  assert.equal(m.cost_governance.unknown_cost,'COST_BLOCKED');
+  assert.equal(m.cost_governance.new_charges_without_owner_approval,'FORBIDDEN');
+  assert.equal(m.required_order.filter(x=>x===relative).length,1);
+  const i=m.required_order.indexOf(relative);
+  assert.ok(i>m.required_order.indexOf('AUTHORITY_CONTRACT.md'));
+  assert.ok(i<m.required_order.indexOf('CURRENT_POINTER.json'));
+  for(const item of required)assert.ok(policy.split(/\r?\n/).includes(item),'missing '+item);
+ };
+ validate(manifest,original);
+ const mutation=()=>structuredClone(manifest);
+ const noRoute=mutation();noRoute.required_order=noRoute.required_order.filter(x=>x!==relative);
+ assert.throws(()=>validate(noRoute,original));
+ const duplicate=mutation();duplicate.required_order.push(relative);
+ assert.throws(()=>validate(duplicate,original));
+ const relaxed=mutation();relaxed.cost_governance.new_charges_without_owner_approval='ALLOWED';
+ assert.throws(()=>validate(relaxed,original));
+ const missingPolicy=original.replace('ZERO_ADDITIONAL_COST_POLICY=true','ZERO_ADDITIONAL_COST_POLICY=false');
+ assert.throws(()=>validate(manifest,missingPolicy));
+ const missingFile='';
+ assert.throws(()=>validate(manifest,missingFile));
+ const rehydrationOff=mutation();rehydrationOff.cost_governance.required_rehydration=false;
+ assert.throws(()=>validate(rehydrationOff,original));
+ const costBypass=mutation();costBypass.cost_governance.unknown_cost='ALLOW';
+ assert.throws(()=>validate(costBypass,original));
+});
