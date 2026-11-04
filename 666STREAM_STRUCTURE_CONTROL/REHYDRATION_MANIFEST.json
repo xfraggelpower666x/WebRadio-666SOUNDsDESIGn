@@ -4,6 +4,7 @@
   "required_order": [
     "rehydration/PRE_REHYDRATION_SCOPE_GUARD.md",
     "AUTHORITY_CONTRACT.md",
+    "governance/ZERO_ADDITIONAL_COST_POLICY.md",
     "CURRENT_POINTER.json",
     "current/CURRENT_STATE.md",
     "current/PROJECT_MAP.json",
@@ -144,6 +145,9 @@
     "unknown_cost": "COST_BLOCKED",
     "foreign_activation": false,
     "plugin_release_impact": "NONE_UNTIL_NATIVE_ADOPTION",
-    "provider_cost_verification": "REQUIRED_PER_ACTION"
+    "provider_cost_verification": "REQUIRED_PER_ACTION",
+    "required_rehydration": true,
+    "check_before_external_operations": true,
+    "missing_policy": "COST_BLOCKED"
   }
 }
