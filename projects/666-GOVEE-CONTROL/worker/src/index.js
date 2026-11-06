@@ -11,7 +11,10 @@ const cors=(req,env)=>{const o=req.headers.get('Origin');return o&&env.ALLOWED_O
 async function api(env,path,method='GET',body){
  const res=await fetch(BASE+path,{method,headers:{'Govee-API-Key':env.GOVEE_API_KEY,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
  const result=await res.json().catch(()=>null);
- if(!res.ok||result?.code && result.code!==200)return {ok:false,httpStatus:res.status,error:res.status===429?'Govee rate limit exceeded':'Govee upstream error',upstreamCode:result?.code??null};
+ if(!res.ok || (result?.code != null && Number(result.code)!==200)){
+  const limited=res.status===429 || Number(result?.code)===429;
+  return {ok:false,httpStatus:limited?429:(res.ok?502:res.status),error:limited?'Govee rate limit exceeded':'Govee upstream error',upstreamCode:result?.code??null};
+ }
  return {ok:true,result};
 }
 const isSku=x=>typeof x==='string'&&/^H[0-9A-Z]{4,10}$/.test(x);
