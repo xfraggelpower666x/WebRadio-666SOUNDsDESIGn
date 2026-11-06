@@ -1,6 +1,6 @@
 import {mapAudioEvent} from './audio-mapping.js';
 import {validateCapability} from './capability-validation.js';
-import {reserveGoveeControl} from './rate-gate.js';
+import {reserveGoveeControl,getCachedGoveeDevices} from './rate-gate.js';
 export {GoveeRateGate} from './rate-gate.js';
 // 666SOUNDsDESIGn native GOVEE CLOUD CONTROL. No client secrets.
 const BASE='https://openapi.api.govee.com';
@@ -19,12 +19,7 @@ const isDevice=x=>typeof x==='string'&&/^[0-9A-Fa-f:]{12,35}$/.test(x);
 const isType=x=>typeof x==='string'&&/^devices\.capabilities\.[a-z_]{2,60}$/.test(x);
 const isInstance=x=>typeof x==='string'&&/^[a-zA-Z][a-zA-Z0-9_]{0,60}$/.test(x);
 async function owned(env){
- const r=await api(env,'/router/api/v1/user/devices');if(!r.ok)return r;
- // Govee v1 responds with data: [device, ...], not data.devices.
- const data=r.result?.data;
- const devices=Array.isArray(data)?data:data?.devices??r.result?.payload?.devices??[];
- if(!Array.isArray(devices))return {ok:false,error:'Unexpected Govee device list schema'};
- return {ok:true,devices};
+ return getCachedGoveeDevices(env);
 }
 const kinds=['devices.capabilities.on_off','devices.capabilities.range','devices.capabilities.color_setting','devices.capabilities.color_temperature'];
 const goodCapability=c=>c&&isType(c.type)&&isInstance(c.instance)&&Object.hasOwn(c,'value')&&kinds.includes(c.type);
