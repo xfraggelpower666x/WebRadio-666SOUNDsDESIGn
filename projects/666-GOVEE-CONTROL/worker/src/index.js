@@ -1,5 +1,7 @@
 import {mapAudioEvent} from './audio-mapping.js';
 import {validateCapability} from './capability-validation.js';
+import {reserveGoveeControl} from './rate-gate.js';
+export {GoveeRateGate} from './rate-gate.js';
 // 666SOUNDsDESIGn native GOVEE CLOUD CONTROL. No client secrets.
 const BASE='https://openapi.api.govee.com';
 const H={'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'};
@@ -27,6 +29,8 @@ async function owned(env){
 const kinds=['devices.capabilities.on_off','devices.capabilities.range','devices.capabilities.color_setting','devices.capabilities.color_temperature'];
 const goodCapability=c=>c&&isType(c.type)&&isInstance(c.instance)&&Object.hasOwn(c,'value')&&kinds.includes(c.type);
 async function control(env,m,c){
+ const gate=await reserveGoveeControl(env,m.sku,m.device);
+ if(!gate.ok)return {ok:false,httpStatus:gate.error==='rate_limited'?429:503,error:gate.error,retryAfterMs:gate.retryAfterMs??null};
  return api(env,'/router/api/v1/device/control','POST',{requestId:crypto.randomUUID(),payload:{sku:m.sku,device:m.device,capability:{type:c.type,instance:c.instance,value:c.value}}});
 }
 export default {async fetch(request,env){
@@ -55,7 +59,7 @@ export default {async fetch(request,env){
    const d=r.devices.find(x=>x.sku===b.sku&&x.device===b.device);
    if(!d)return reply({ok:false,error:'Device not registered to account'},403);
    if(!validateCapability(d,c))return reply({ok:false,error:'Capability or value not supported by device'},400);
-   const x=await control(env,b,c);return reply(x,x.ok?200:x.httpStatus===429?429:502);
+   const x=await control(env,b,c);return reply(x,x.ok?200:x.httpStatus===429?429:x.httpStatus===503?503:502);
   }
   if(u.pathname==='/api/audio/preview'&&request.method==='POST'){
    const b=await request.json().catch(()=>null);
@@ -74,7 +78,7 @@ export default {async fetch(request,env){
    for(let i=0;i<members.length;i++){
     const m=members[i],d=devices[i];
     if(!validateCapability(d,c)){results.push({sku:m.sku,device:m.device,ok:false,error:'Capability or value not supported'});continue;}
-    const x=await control(env,m,c);results.push({sku:m.sku,device:m.device,ok:x.ok,upstreamStatus:x.httpStatus??null});
+    const x=await control(env,m,c);results.push({sku:m.sku,device:m.device,ok:x.ok,upstreamStatus:x.httpStatus??null,error:x.error??null});
    }
    const ok=results.every(x=>x.ok);return reply({ok,results,executed:results.filter(x=>x.ok).length},ok?200:207);
   }
