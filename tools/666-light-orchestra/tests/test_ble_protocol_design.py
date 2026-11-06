@@ -29,20 +29,20 @@ class BleProtocolDesignTests(unittest.TestCase):
         )
 
     def test_oc21w_power_plan_preserves_conflicting_public_variants(self):
-        on_plan = design.plan_command(
-            design.OC21W_PROFILE,
-            design.CommandIntent("power", {"on": True}, "magic_lantern"),
+        on_plan = plan_command(
+            OC21W_PROFILE,
+            CommandIntent("power", {"on": True}, "magic_lantern"),
         )
-        off_plan = design.plan_command(
-            design.OC21W_PROFILE,
-            design.CommandIntent("power", {"on": False}, "magic_lantern"),
+        off_plan = plan_command(
+            OC21W_PROFILE,
+            CommandIntent("power", {"on": False}, "magic_lantern"),
         )
         self.assertEqual(on_plan.status, "candidate_only")
         self.assertGreaterEqual(len(on_plan.candidate_frames_hex), 3)
         self.assertIn("7E 04 04 01 00 01 FF 00 EF", on_plan.candidate_frames_hex)
         self.assertIn("7E 04 04 F0 00 01 FF 00 EF", on_plan.candidate_frames_hex)
         self.assertGreaterEqual(len(off_plan.candidate_frames_hex), 2)
-        self.assertFalse(design.OC21W_PROFILE.hardware_writes_allowed)
+        self.assertFalse(OC21W_PROFILE.hardware_writes_allowed)
 
     def test_oc21w_candidate_frames_are_offline_only(self):
         self.assertFalse(OC21W_PROFILE.hardware_writes_allowed)
