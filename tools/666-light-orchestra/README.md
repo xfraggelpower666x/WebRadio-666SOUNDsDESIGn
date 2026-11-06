@@ -190,3 +190,13 @@ The read-only diagnostics report also separates:
 - Govee LAN `devStatus` protocol response.
 
 This distinction helps identify a reachable H6047 whose LAN Control/UDP path is unavailable.
+
+
+## v0.7.2-dev — Connection Verification & Readiness
+
+- `CONNECT / VERIFY` now performs an actual read-only BLE GATT connection check.
+- Expected FFF0 service plus FFF3/FFF4 characteristics are verified without any characteristic write.
+- Govee H6047 IP and auto-discovery can be edited in the Settings UI and are atomically persisted to `config.json`.
+- Saving Govee connection settings never grants write permission; a fresh read-only devStatus probe remains required.
+- New Readiness page visualizes the evidence pipeline per device: Bluetooth → Binding → GATT → Protocol → Control Gate.
+- Readiness state is guidance only and never promotes hardware verification or protocol write authority.

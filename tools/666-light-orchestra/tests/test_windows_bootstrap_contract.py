@@ -52,6 +52,7 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn('666_LIGHT_ORCHESTRA_DIAGNOSTICS', text)
         self.assertIn('666_LIGHT_ORCHESTRA"', text)
         self.assertIn("--hidden-import=ble_gui_model", text)
+        self.assertIn("--hidden-import=readiness_model", text)
         self.assertIn("bootstrap_windows.bat", text)
 
     def test_bluetooth_recovery_is_minimal_and_non_destructive(self):

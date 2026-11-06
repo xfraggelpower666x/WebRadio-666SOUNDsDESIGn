@@ -13,6 +13,7 @@ from importlib import import_module
 core = import_module("666_light_orchestra")
 state = import_module("light_control_state")
 ble_model = import_module("ble_gui_model")
+readiness_model = import_module("readiness_model")
 
 BG = "#03050d"
 PANEL = "#071225"
@@ -66,6 +67,8 @@ class App(tk.Tk):
         self.discovery_status = tk.StringVar(value="READY TO SCAN")
         self.discovery_slot = tk.StringVar(value="")
         self.discovery_rows = {}
+        self.last_bluetooth = {}
+        self.gatt_results = {}
         self.page_title = tk.StringVar(value="DASHBOARD")
         self.device_widgets = {}
         self.pages = {}
@@ -128,6 +131,7 @@ class App(tk.Tk):
             ("Colors", "◉"),
             ("Motion", "≈"),
             ("Settings", "⚙"),
+            ("Readiness", "✓"),
             ("Lab", "⌁"),
         ]
         for name, icon in nav:
@@ -144,7 +148,7 @@ class App(tk.Tk):
         tk.Label(foot, text="SAFE CONTROL", bg="#050a17", fg=PINK, font=("Segoe UI", 9, "bold")).pack(anchor="w")
         tk.Label(foot, text="LENZE / OC21W writes gated", bg="#050a17", fg=MUTED, font=("Segoe UI", 8)).pack(anchor="w")
 
-        for name in ("Dashboard", "Devices", "Groups", "Scenes", "Audio", "Colors", "Motion", "Settings", "Lab"):
+        for name in ("Dashboard", "Devices", "Groups", "Scenes", "Audio", "Colors", "Motion", "Settings", "Readiness", "Lab"):
             frame = tk.Frame(self.content, bg=BG)
             self.pages[name] = frame
 
@@ -156,6 +160,7 @@ class App(tk.Tk):
         self._build_colors(self.pages["Colors"])
         self._build_motion(self.pages["Motion"])
         self._build_settings(self.pages["Settings"])
+        self._build_readiness(self.pages["Readiness"])
         self._build_lab(self.pages["Lab"])
 
     def _build_header(self):
@@ -355,6 +360,59 @@ class App(tk.Tk):
         NeonButton(actionbar,"EXPORT EVIDENCE",self.export_evidence,accent=CYAN).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"OPEN ADVANCED LAB INFO",lambda:self._show_page("Lab"),accent=CYAN).pack(side="left")
 
+    def _build_readiness(self, parent):
+        p, inner = self._panel(parent, "DEVICE READINESS · EVIDENCE-FIRST")
+        p.pack(fill="both", expand=True, padx=12, pady=12)
+        self.readiness_tree = ttk.Treeview(
+            inner,
+            columns=("device","family","stage","state","binding","next"),
+            show="headings",
+            height=12,
+        )
+        for key,title,width in [
+            ("device","Device",140),
+            ("family","Family",120),
+            ("stage","Stage",120),
+            ("state","State",180),
+            ("binding","Binding / IP",190),
+            ("next","Next real action",520),
+        ]:
+            self.readiness_tree.heading(key,text=title)
+            self.readiness_tree.column(key,width=width)
+        self.readiness_tree.pack(fill="both", expand=True)
+        bar = tk.Frame(inner, bg=PANEL)
+        bar.pack(fill="x", pady=(8,0))
+        NeonButton(bar,"BLUETOOTH CHECK",self.check_bluetooth,accent=LILAC).pack(side="left",padx=4)
+        NeonButton(bar,"SEARCH BLE",self.scan_devices,accent=CYAN).pack(side="left",padx=4)
+        NeonButton(bar,"SEARCH GOVEE",self.discover_govee,accent=GREEN).pack(side="left",padx=4)
+        NeonButton(bar,"DIAGNOSTICS",self.run_diagnostics,accent=YELLOW).pack(side="left",padx=4)
+        self.readiness_summary = tk.StringVar(value="READINESS NOT EVALUATED")
+        tk.Label(inner,textvariable=self.readiness_summary,bg=PANEL,fg=PINK,font=("Segoe UI",10,"bold")).pack(anchor="w",pady=(8,0))
+
+    def _refresh_readiness(self, registry, status):
+        if not hasattr(self, "readiness_tree"):
+            return
+        model = readiness_model.build_readiness(
+            registry,
+            status.get("devices", []) if isinstance(status, dict) else [],
+            self.last_bluetooth,
+            self.gatt_results,
+        )
+        for item in self.readiness_tree.get_children():
+            self.readiness_tree.delete(item)
+        for row in model.get("rows", []):
+            self.readiness_tree.insert("", "end", values=(
+                row.get("device_id"),
+                row.get("family"),
+                row.get("stage"),
+                row.get("state"),
+                row.get("binding") or "",
+                row.get("next_action") or "",
+            ))
+        counts = model.get("counts", {})
+        blocked = sum(v for k,v in counts.items() if k in ("WRITE_BLOCKED","VERIFY_FAILED","ADAPTER_REQUIRED","DEVICE_NOT_BOUND","READ_ONLY_PROBE_REQUIRED","IP_REQUIRED"))
+        self.readiness_summary.set(f"{len(model.get('rows', []))} DEVICES · {blocked} REQUIRE ACTION · HARDWARE VERIFIED: NO")
+
     def _build_lab(self, parent):
         p, inner = self._panel(parent, "ADVANCED BLE / EVIDENCE LAB")
         p.pack(fill="both", expand=True, padx=12, pady=12)
@@ -473,6 +531,7 @@ class App(tk.Tk):
         self.status_text.set("SYSTEM ONLINE" if status.get("ok") else "SYSTEM CHECK")
         self._refresh_device_cards(registry, status)
         self._refresh_device_tree(registry, status)
+        self._refresh_readiness(registry, status)
         self._refresh_scenes()
         self._sync_audio_label()
 
@@ -521,6 +580,7 @@ class App(tk.Tk):
         threading.Thread(target=worker, daemon=True).start()
 
     def _bluetooth_checked(self, result, show_dialog=True):
+        self.last_bluetooth = dict(result or {})
         state = str(result.get("adapter_state") or "UNKNOWN")
         reason = str(result.get("reason") or "")
         service = str(result.get("service_state") or "UNKNOWN")
@@ -614,6 +674,7 @@ class App(tk.Tk):
             return messagebox.showwarning("Discovery", f"Family mismatch: found {family}, slot {slot} is {target.get('family')}.")
         try:
             self.engine.bind_windows_ble(slot, address)
+            self.gatt_results.pop(slot, None)
             self.selected_device.set(slot)
             self.discovery_status.set(f"BOUND · {row.get('name') or address} → {slot}")
             self.refresh_all()
@@ -675,6 +736,7 @@ class App(tk.Tk):
 
     def _ble_verify_done(self, result):
         did = result.get("device_id") or self.selected_device.get()
+        self.gatt_results[did] = dict(result or {})
         checks = result.get("checks") or {}
         ok = bool(result.get("ok"))
         self.discovery_status.set(f"GATT {'PASS' if ok else 'BLOCKED'} · {did}")
