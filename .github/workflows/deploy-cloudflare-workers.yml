@@ -106,13 +106,35 @@ jobs:
           );
           NODE
 
+      # Cloudflare 10215: upload the AutoDJ token in the same Worker code deploy.
+      # No secret values are printed or committed; the transient payload is deleted.
+      - name: Prepare ephemeral Wrangler secrets file
+        shell: bash
+        env:
+          S666_AUTODJ_SKIP_ACCESS_TOKEN: ${{ secrets.S666_AUTODJ_SKIP_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          umask 077
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const token = process.env.S666_AUTODJ_SKIP_ACCESS_TOKEN;
+          if (!token) {
+            console.error('Required AutoDJ secret not configured');
+            process.exit(1);
+          }
+          const file = path.join(process.env.RUNNER_TEMP, '666stream-webradio-deploy-secrets.json');
+          fs.writeFileSync(file, JSON.stringify({ S666_AUTODJ_SKIP_ACCESS_TOKEN: token }), { mode: 0o600 });
+          NODE
+
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.111.0"
-          secrets: |
-            S666_AUTODJ_SKIP_ACCESS_TOKEN
-          command: deploy
-        env:
-          S666_AUTODJ_SKIP_ACCESS_TOKEN: ${{ secrets.S666_AUTODJ_SKIP_ACCESS_TOKEN }}
+          command: deploy --secrets-file ${{ runner.temp }}/666stream-webradio-deploy-secrets.json
+
+      - name: Remove ephemeral Wrangler secrets file
+        if: always()
+        shell: bash
+        run: rm -f "${RUNNER_TEMP}/666stream-webradio-deploy-secrets.json"
