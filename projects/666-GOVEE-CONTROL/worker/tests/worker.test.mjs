@@ -34,3 +34,43 @@ test('missing gate fails closed even when API secret exists',async()=>{
  const result=await worker.fetch(new Request('https://example.invalid/api/devices',{headers:{Authorization:'Bearer test-token'}}),env);
  assert.equal(result.status,502);
 });
+
+test('valid device command reserves rate quota before calling upstream',async()=>{
+ const old=globalThis.fetch,steps=[],device={sku:'H6047',device:'60:74:F4:40:D9:A2',capabilities:[{type:'devices.capabilities.on_off',instance:'powerSwitch'}]};
+ const controlled={...env,GOVEE_RATE_GATE:{idFromName:()=> 'account',get:()=>({fetch:async(url)=>{
+   const path=new URL(url).pathname;steps.push(path);
+   return path==='/devices'?Response.json({ok:true,devices:[device]}):Response.json({ok:true});
+ }})}};
+ globalThis.fetch=async(url)=>{steps.push(new URL(url).pathname);return Response.json({code:200,data:{}});};
+ try{
+  const r=await worker.fetch(req('/api/control',{sku:device.sku,device:device.device,capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),controlled);
+  assert.equal(r.status,200);
+  assert.deepEqual(steps,['/devices','/reserve','/router/api/v1/device/control']);
+ }finally{globalThis.fetch=old;}
+});
+test('rejected rate gate cannot send any device command',async()=>{
+ const old=globalThis.fetch,steps=[],device={sku:'H6047',device:'60:74:F4:40:D9:A2',capabilities:[{type:'devices.capabilities.on_off',instance:'powerSwitch'}]};
+ const controlled={...env,GOVEE_RATE_GATE:{idFromName:()=> 'account',get:()=>({fetch:async(url)=>{
+   const path=new URL(url).pathname;steps.push(path);
+   return path==='/devices'?Response.json({ok:true,devices:[device]}):Response.json({ok:false,retryAfterMs:1000},{status:429});
+ }})}};
+ globalThis.fetch=async()=>{steps.push('FORBIDDEN_EXTERNAL_FETCH');throw Error('Unexpected API call');};
+ try{
+  const r=await worker.fetch(req('/api/control',{sku:device.sku,device:device.device,capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),controlled);
+  assert.equal(r.status,429);
+  assert.deepEqual(steps,['/devices','/reserve']);
+ }finally{globalThis.fetch=old;}
+});
+test('unadvertised capability is blocked before rate quota and external fetch',async()=>{
+ const old=globalThis.fetch,steps=[],device={sku:'H6047',device:'60:74:F4:40:D9:A2',capabilities:[]};
+ const controlled={...env,GOVEE_RATE_GATE:{idFromName:()=> 'account',get:()=>({fetch:async(url)=>{
+   const path=new URL(url).pathname;steps.push(path);
+   return Response.json({ok:true,devices:[device]});
+ }})}};
+ globalThis.fetch=async()=>{throw Error('Unexpected API call');};
+ try{
+  const r=await worker.fetch(req('/api/control',{sku:device.sku,device:device.device,capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),controlled);
+  assert.equal(r.status,400);
+  assert.deepEqual(steps,['/devices']);
+ }finally{globalThis.fetch=old;}
+});
