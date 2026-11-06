@@ -355,6 +355,7 @@ class App(tk.Tk):
         tk.Label(inner,text="LENZE / OC21W write controls remain visible in the controller but are intentionally blocked until protocol + real hardware validation.",bg=PANEL,fg=RED,wraplength=980,justify="left").pack(anchor="w",pady=4)
         actionbar = tk.Frame(inner, bg=PANEL)
         actionbar.pack(anchor="w", pady=10)
+        NeonButton(actionbar,"RUN SYSTEM CHECK",self.run_system_check,accent=PINK).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"RUN READ-ONLY DIAGNOSTICS",self.run_diagnostics,accent=GREEN).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"VERIFY PACKAGE",self.verify_package,accent=LILAC).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"EXPORT EVIDENCE",self.export_evidence,accent=CYAN).pack(side="left",padx=(0,8))
@@ -385,6 +386,7 @@ class App(tk.Tk):
         NeonButton(bar,"BLUETOOTH CHECK",self.check_bluetooth,accent=LILAC).pack(side="left",padx=4)
         NeonButton(bar,"SEARCH BLE",self.scan_devices,accent=CYAN).pack(side="left",padx=4)
         NeonButton(bar,"SEARCH GOVEE",self.discover_govee,accent=GREEN).pack(side="left",padx=4)
+        NeonButton(bar,"SYSTEM CHECK",self.run_system_check,accent=PINK).pack(side="left",padx=4)
         NeonButton(bar,"DIAGNOSTICS",self.run_diagnostics,accent=YELLOW).pack(side="left",padx=4)
         self.readiness_summary = tk.StringVar(value="READINESS NOT EVALUATED")
         tk.Label(inner,textvariable=self.readiness_summary,bg=PANEL,fg=PINK,font=("Segoe UI",10,"bold")).pack(anchor="w",pady=(8,0))
@@ -418,6 +420,23 @@ class App(tk.Tk):
         p.pack(fill="both", expand=True, padx=12, pady=12)
         tk.Label(inner,text="The original 666_light_orchestra_gui.py remains preserved as the full READ-ONLY BLE/Evidence laboratory.",bg=PANEL,fg=TEXT,wraplength=920,justify="left").pack(anchor="w",pady=8)
         tk.Label(inner,text="Use it for binding, evidence capture, session quality, protocol inference and manual review. This Control Center does not bypass those gates.",bg=PANEL,fg=MUTED,wraplength=920,justify="left").pack(anchor="w",pady=8)
+
+    def run_system_check(self):
+        base = Path.cwd()
+        batch = base / "RUN_SYSTEM_CHECK.bat"
+        script = base / "RUN_SYSTEM_CHECK.ps1"
+        try:
+            if batch.is_file():
+                subprocess.Popen(["cmd.exe", "/c", "start", "", str(batch)], cwd=str(base))
+                self.discovery_status.set("SYSTEM CHECK STARTED")
+                return
+            if script.is_file():
+                subprocess.Popen(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)], cwd=str(base))
+                self.discovery_status.set("SYSTEM CHECK STARTED")
+                return
+            messagebox.showwarning("System Check", "System check script is missing from this package.")
+        except Exception as exc:
+            messagebox.showerror("System Check", str(exc))
 
     def run_bluetooth_recovery(self):
         base = Path.cwd()

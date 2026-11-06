@@ -91,6 +91,7 @@ def bluetooth_preflight() -> dict:
         "service_state": "UNKNOWN",
         "adapters": [],
         "all_bluetooth_devices": [],
+        "drivers": [],
         "reason": None,
     }
     if platform.system().lower() != "windows":
@@ -102,10 +103,14 @@ def bluetooth_preflight() -> dict:
         "$svc=Get-Service bthserv;"
         "$devs=@(Get-PnpDevice -Class Bluetooth | "
         "Select-Object FriendlyName,Status,InstanceId,Problem);"
+        "$drivers=@(Get-CimInstance Win32_PnPSignedDriver | "
+        "Where-Object {$_.DeviceClass -eq 'Bluetooth'} | "
+        "Select-Object DeviceName,DriverVersion,Manufacturer,DriverProviderName,InfName);"
         "[pscustomobject]@{"
         "service_status=if($svc){$svc.Status.ToString()}else{'MISSING'};"
-        "devices=$devs"
-        "}|ConvertTo-Json -Depth 5 -Compress"
+        "devices=$devs;"
+        "drivers=$drivers"
+        "}|ConvertTo-Json -Depth 6 -Compress"
     )
     try:
         flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -164,6 +169,10 @@ def bluetooth_preflight() -> dict:
     result["service_state"] = service
     result["all_bluetooth_devices"] = normalized
     result["adapters"] = adapters
+    drivers = payload.get("drivers") or []
+    if isinstance(drivers, dict):
+        drivers = [drivers]
+    result["drivers"] = [dict(x) for x in drivers if isinstance(x, dict)]
 
     if healthy:
         result["ok"] = True

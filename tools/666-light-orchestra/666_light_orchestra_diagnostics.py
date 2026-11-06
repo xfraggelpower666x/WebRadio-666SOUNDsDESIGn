@@ -36,6 +36,40 @@ def ping_host(ip: str) -> dict:
 
 
 
+def windows_network_context() -> dict:
+    if platform.system().lower() != "windows":
+        return {"ok": False, "reason": "WINDOWS_ONLY"}
+    command = (
+        "$ErrorActionPreference='SilentlyContinue';"
+        "$profiles=@(Get-NetConnectionProfile | Select-Object Name,InterfaceAlias,NetworkCategory,IPv4Connectivity,IPv6Connectivity);"
+        "$firewall=@(Get-NetFirewallProfile | Select-Object Name,Enabled,DefaultInboundAction,DefaultOutboundAction);"
+        "[pscustomobject]@{profiles=$profiles;firewall=$firewall}|ConvertTo-Json -Depth 5 -Compress"
+    )
+    try:
+        flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        proc = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", command],
+            capture_output=True,
+            text=True,
+            timeout=8,
+            creationflags=flags,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"ok": False, "reason": "NETWORK_CONTEXT_QUERY_FAILED", "details": str(exc)}
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return {"ok": False, "reason": "NETWORK_CONTEXT_EMPTY", "details": (proc.stderr or "").strip()}
+    try:
+        payload = json.loads(proc.stdout)
+    except (TypeError, ValueError) as exc:
+        return {"ok": False, "reason": "NETWORK_CONTEXT_JSON_INVALID", "details": str(exc)}
+    return {
+        "ok": True,
+        "profiles": payload.get("profiles") or [],
+        "firewall": payload.get("firewall") or [],
+    }
+
+
 async def collect():
     cfg = core.load_config()
     engine = core.Engine(cfg)
@@ -53,6 +87,7 @@ async def collect():
     govee = await engine.govee.discover()
     govee_ip = govee.get("ip") or cfg.get("govee", {}).get("device_ip")
     govee_network = await asyncio.to_thread(ping_host, govee_ip)
+    network_context = await asyncio.to_thread(windows_network_context)
 
     return {
         "schema": 1,
@@ -65,6 +100,7 @@ async def collect():
         "ble_scan": ble,
         "govee": govee,
         "govee_network": {"ip": govee_ip, **govee_network},
+        "network_context": network_context,
         "registry": engine.registry.all(),
         "safety": {
             "lenze_write_verified": False,
@@ -88,9 +124,15 @@ def main():
     print("============================================================")
     print(f"Bluetooth: {bt.get('adapter_state')} / {bt.get('reason')}")
     print(f"Bluetooth service: {bt.get('service_state')}")
+    drivers = bt.get("drivers") or []
+    if drivers:
+        first = drivers[0]
+        print(f"Bluetooth driver: {first.get('DeviceName')} / {first.get('DriverVersion')} / {first.get('DriverProviderName')}")
     print(f"BLE visible devices: {len(ble.get('devices') or [])}")
     print(f"Govee: {'FOUND' if g.get('ok') else 'NOT FOUND'} / {g.get('ip')} / {g.get('source')}")
     print(f"Govee network reachability: {gn.get('reason')} / {gn.get('ip')}")
+    nc = report.get("network_context") or {}
+    print(f"Windows network context: {'AVAILABLE' if nc.get('ok') else nc.get('reason')}")
     print(f"Hardware writes performed: {report['hardware_writes_performed']}")
     print(f"Report: {REPORT_FILE.resolve()}")
     return 0

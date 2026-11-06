@@ -64,6 +64,7 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
                 {"FriendlyName": "Intel(R) Wireless Bluetooth(R)", "Status": "OK", "InstanceId": "USB\\VID_1", "Problem": 0},
                 {"FriendlyName": "Microsoft Bluetooth LE Enumerator", "Status": "OK", "InstanceId": "BTH\\MS", "Problem": 0},
             ],
+            "drivers": [{"DeviceName":"Intel(R) Wireless Bluetooth(R)","DriverVersion":"23.1.2.3","Manufacturer":"Intel","DriverProviderName":"Intel","InfName":"oem42.inf"}],
         }
         proc = SimpleNamespace(returncode=0, stdout=__import__("json").dumps(payload), stderr="")
         with mock.patch.object(capture.platform, "system", return_value="Windows"), mock.patch.object(
@@ -75,6 +76,7 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
         self.assertEqual(result["service_state"], "RUNNING")
         self.assertEqual(len(result["adapters"]), 1)
         self.assertIn("Intel", result["adapters"][0]["name"])
+        self.assertEqual(result["drivers"][0]["DriverVersion"], "23.1.2.3")
 
     def test_bluetooth_preflight_reports_missing_adapter(self):
         payload = {

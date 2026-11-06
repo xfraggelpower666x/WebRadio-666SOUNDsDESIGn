@@ -88,3 +88,12 @@ EVIDENZ EXPORT:
         -> sammelt vorhandene READ-ONLY Diagnose, lokale Registry und BLE-Evidenz
         -> erzeugt ein ZIP unter exports\ mit SHA-256 Manifest
         -> fuehrt keine Hardware-Writes aus
+
+
+SYSTEM CHECK:
+    RUN_SYSTEM_CHECK.bat
+        -> prueft Paketintegritaet und fuehrt READ-ONLY Diagnostics aus
+        -> bewertet Bluetooth/Driver, BLE-Sichtbarkeit, Govee Netzwerk/LAN-Control und Registry
+        -> erzeugt diagnostics\LIGHT_ORCHESTRA_SYSTEM_CHECK.json
+        -> zeigt die naechsten realen Schritte
+        -> Hardware-Writes: 0

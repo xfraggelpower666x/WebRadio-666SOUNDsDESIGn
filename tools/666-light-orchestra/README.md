@@ -200,3 +200,8 @@ This distinction helps identify a reachable H6047 whose LAN Control/UDP path is 
 - Saving Govee connection settings never grants write permission; a fresh read-only devStatus probe remains required.
 - New Readiness page visualizes the evidence pipeline per device: Bluetooth → Binding → GATT → Protocol → Control Gate.
 - Readiness state is guidance only and never promotes hardware verification or protocol write authority.
+
+
+### System Check orchestrator
+
+`RUN_SYSTEM_CHECK.bat` combines package integrity and read-only hardware diagnostics into one operator flow. It records Bluetooth adapter/driver state, visible BLE count, Govee network/LAN-Control status and evidence-based next actions in `diagnostics/LIGHT_ORCHESTRA_SYSTEM_CHECK.json`. It performs zero hardware writes and never changes protocol authority.

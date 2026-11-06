@@ -22,6 +22,8 @@ class WindowsBootstrapContractTests(unittest.TestCase):
             "VERIFY_PACKAGE.bat",
             "EXPORT_EVIDENCE.ps1",
             "EXPORT_EVIDENCE.bat",
+            "RUN_SYSTEM_CHECK.ps1",
+            "RUN_SYSTEM_CHECK.bat",
             "README_FIRST_WINDOWS.txt",
         ):
             self.assertTrue((ROOT / name).is_file(), name)
@@ -76,6 +78,15 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn("hardware_writes_performed = 0", text)
         self.assertIn("get-filehash", text)
         self.assertIn("compress-archive", text)
+        self.assertNotIn("write_gatt", text)
+        self.assertNotIn("devcontrol", text)
+
+    def test_system_check_is_read_only_and_action_oriented(self):
+        text = self.read("RUN_SYSTEM_CHECK.ps1").lower()
+        self.assertIn("hardware_writes_performed = 0", text)
+        self.assertIn("next_actions", text)
+        self.assertIn("run_bluetooth_recovery.bat", text)
+        self.assertIn("govee", text)
         self.assertNotIn("write_gatt", text)
         self.assertNotIn("devcontrol", text)
 
