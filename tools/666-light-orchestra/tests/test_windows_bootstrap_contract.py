@@ -18,6 +18,8 @@ class WindowsBootstrapContractTests(unittest.TestCase):
             "RUN_DIAGNOSTICS.bat",
             "RUN_BLUETOOTH_RECOVERY.bat",
             "BLUETOOTH_RECOVERY.ps1",
+            "VERIFY_PACKAGE.ps1",
+            "VERIFY_PACKAGE.bat",
             "README_FIRST_WINDOWS.txt",
         ):
             self.assertTrue((ROOT / name).is_file(), name)
@@ -57,6 +59,14 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertNotIn("remove-pnpdevice", text)
         self.assertNotIn("uninstall", text)
         self.assertNotIn("restart-computer", text)
+        self.assertIn("-Verb RunAs", self.read("BLUETOOTH_RECOVERY.ps1"))
+
+    def test_package_verifier_checks_hashes(self):
+        text = self.read("VERIFY_PACKAGE.ps1").lower()
+        self.assertIn("windows_build_manifest.json", text)
+        self.assertIn("get-filehash", text)
+        self.assertIn("sha256", text)
+        self.assertIn("hash_mismatch", text)
 
     def test_one_click_builds_then_runs_symphony(self):
         text = self.read("ONE_CLICK_SETUP_BUILD_RUN.bat")

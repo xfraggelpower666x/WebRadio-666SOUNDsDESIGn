@@ -74,3 +74,10 @@ Wenn Govee unter 192.168.2.32 im Router sichtbar ist, aber der UDP-LAN-Probe sch
     -> RUN_DIAGNOSTICS.bat ausfuehren
     -> ICMP_REACHABLE + devStatus FAIL deutet auf LAN-Control/Firewall/UDP-Pfad hin
     -> LAN Control in der Govee-App pruefen
+
+
+PAKET PRUEFEN:
+    VERIFY_PACKAGE.bat
+        -> liest WINDOWS_BUILD_MANIFEST.json
+        -> prueft alle gelisteten Dateien mit SHA-256
+        -> meldet fehlende oder veraenderte Dateien

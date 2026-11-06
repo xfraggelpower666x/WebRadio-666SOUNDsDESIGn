@@ -113,6 +113,8 @@ jobs:
             "RUN_DIAGNOSTICS.bat",
             "RUN_BLUETOOTH_RECOVERY.bat",
             "BLUETOOTH_RECOVERY.ps1",
+            "VERIFY_PACKAGE.ps1",
+            "VERIFY_PACKAGE.bat",
             "README_FIRST_WINDOWS.txt",
             "README.md",
             "requirements.txt",
@@ -150,7 +152,9 @@ jobs:
             "$pkg\ONE_CLICK_SETUP_BUILD_RUN.bat",
             "$pkg\RUN_DIAGNOSTICS.bat",
             "$pkg\RUN_BLUETOOTH_RECOVERY.bat",
-            "$pkg\BLUETOOTH_RECOVERY.ps1"
+            "$pkg\BLUETOOTH_RECOVERY.ps1",
+            "$pkg\VERIFY_PACKAGE.ps1",
+            "$pkg\VERIFY_PACKAGE.bat"
           )
           foreach ($path in $requiredPackagePaths) {
             if (-not (Test-Path $path)) { throw "Complete-package contract failed: $path" }
@@ -192,6 +196,12 @@ jobs:
           Write-Host "WINDOWS COMPLETE PACKAGE PASS"
           Write-Host "ZIP SHA256: $zipHash"
           Write-Host "ZIP SIZE: $zipSize"
+
+      - name: Validate package integrity script
+        shell: pwsh
+        working-directory: 666-LIGHT-ORCHESTRA/release/666_LIGHT_ORCHESTRA_SYMPHONY_WINDOWS
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\VERIFY_PACKAGE.ps1"
 
       - name: Validate packaged START_SYMPHONY prefers built EXE
         shell: pwsh

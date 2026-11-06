@@ -1,17 +1,36 @@
+param([switch]$Elevated)
+
 $ErrorActionPreference = "Stop"
 
 function Write-Status($label, $value) {
     Write-Host ("[{0}] {1}" -f $label, $value)
 }
 
+$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+    [Security.Principal.WindowsBuiltInRole]::Administrator
+)
+
+if (-not $admin -and -not $Elevated) {
+    Write-Host "[INFO] Bluetooth service recovery needs administrator rights."
+    try {
+        $args = @(
+            "-NoProfile",
+            "-ExecutionPolicy", "Bypass",
+            "-File", ('"{0}"' -f $PSCommandPath),
+            "-Elevated"
+        )
+        $proc = Start-Process -FilePath "powershell.exe" -Verb RunAs -ArgumentList $args -Wait -PassThru
+        exit $proc.ExitCode
+    } catch {
+        Write-Host "[WARN] Administrator elevation was not granted: $($_.Exception.Message)"
+        exit 5
+    }
+}
+
 Write-Host "============================================================"
 Write-Host " 666 LIGHT ORCHESTRA - BLUETOOTH RECOVERY"
 Write-Host "============================================================"
 Write-Host ""
-
-$admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
-    [Security.Principal.WindowsBuiltInRole]::Administrator
-)
 
 Write-Status "INFO" ("Administrator: " + $admin)
 

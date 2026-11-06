@@ -338,6 +338,7 @@ class App(tk.Tk):
         actionbar = tk.Frame(inner, bg=PANEL)
         actionbar.pack(anchor="w", pady=10)
         NeonButton(actionbar,"RUN READ-ONLY DIAGNOSTICS",self.run_diagnostics,accent=GREEN).pack(side="left",padx=(0,8))
+        NeonButton(actionbar,"VERIFY PACKAGE",self.verify_package,accent=LILAC).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"OPEN ADVANCED LAB INFO",lambda:self._show_page("Lab"),accent=CYAN).pack(side="left")
 
     def _build_lab(self, parent):
@@ -364,6 +365,21 @@ class App(tk.Tk):
             messagebox.showwarning("Bluetooth Recovery", "Recovery script is missing from this package.")
         except Exception as exc:
             messagebox.showerror("Bluetooth Recovery", str(exc))
+
+    def verify_package(self):
+        base = Path.cwd()
+        batch = base / "VERIFY_PACKAGE.bat"
+        script = base / "VERIFY_PACKAGE.ps1"
+        try:
+            if batch.is_file():
+                subprocess.Popen(["cmd.exe", "/c", "start", "", str(batch)], cwd=str(base))
+                return
+            if script.is_file():
+                subprocess.Popen(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)], cwd=str(base))
+                return
+            messagebox.showwarning("Package Verify", "Package verification script is missing.")
+        except Exception as exc:
+            messagebox.showerror("Package Verify", str(exc))
 
     def run_diagnostics(self):
         base = Path.cwd()
