@@ -217,7 +217,8 @@ function waitForLocalCanPlay(timeout=8000){
 async function activateLocalQueueIndex(index,{autoplay=true,fade=true}={}){
   if(localTransitionBusy)return localQueueSnapshot;
   localTransitionBusy=true;
-  const preferredVolume=Math.max(0,Math.min(1,Number(volumeSlider.value)||0.7));
+  const volumeRaw=Number(volumeSlider.value);
+  const preferredVolume=Math.max(0,Math.min(1,Number.isFinite(volumeRaw)?volumeRaw:0.7));
   const fadeMs=Math.round(localSettings.crossfade*1000);
   try{
     if(fade&&isPlaying&&fadeMs>0)await fadeAudioTo(0,Math.min(2500,Math.round(fadeMs/2)));
@@ -304,8 +305,22 @@ function setupEventListeners() {
   localQueueList?.addEventListener('click',async e=>{
     const remove=e.target.closest('[data-remove-index]');
     if(remove){
-      const state=await window.api.localQueueRemove(Number(remove.dataset.removeIndex));
-      renderLocalQueue(state);return;
+      const removeIndex=Number(remove.dataset.removeIndex);
+      const wasActive=removeIndex===localQueueSnapshot.index;
+      const shouldResume=wasActive&&isPlaying&&document.body.classList.contains('source-local');
+      const state=await window.api.localQueueRemove(removeIndex);
+      renderLocalQueue(state);
+      if(wasActive&&document.body.classList.contains('source-local')){
+        if(state?.count){
+          await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:shouldResume,fade:false});
+        }else{
+          audioElement.pause();
+          audioElement.removeAttribute('src');
+          audioElement.load();
+          setPlayerUiPlaying(false);
+        }
+      }
+      return;
     }
     const track=e.target.closest('[data-index]');
     if(track){
@@ -601,23 +616,27 @@ function ensureAudioContext() {
   }
 }
 
-function togglePlayback() {
+async function togglePlayback() {
   ensureAudioContext();
   
   if (isPlaying) {
     audioElement.pause();
-    isPlaying = false;
-    btnPlayPause.querySelector('.play-icon').classList.remove('hidden');
-    btnPlayPause.querySelector('.pause-icon').classList.add('hidden');
+    setPlayerUiPlaying(false);
     diagStatus.textContent = 'Paused';
     diagStatusColor.style.backgroundColor = '#ffa502';
-  } else {
-    audioElement.play().then(()=>setPlayerUiPlaying(true)).catch(err=>{console.error(err);setPlayerUiPlaying(false);});
-    isPlaying = true;
-    btnPlayPause.querySelector('.play-icon').classList.add('hidden');
-    btnPlayPause.querySelector('.pause-icon').classList.remove('hidden');
+    return;
+  }
+  try{
+    diagStatus.textContent='Starting…';
+    await audioElement.play();
+    setPlayerUiPlaying(true);
     diagStatus.textContent = 'Playing';
     diagStatusColor.style.backgroundColor = '#2ed573';
+  }catch(err){
+    console.error(err);
+    setPlayerUiPlaying(false);
+    diagStatus.textContent='Playback Error · '+String(err?.message||err);
+    diagStatusColor.style.backgroundColor='#ff4757';
   }
 }
 
