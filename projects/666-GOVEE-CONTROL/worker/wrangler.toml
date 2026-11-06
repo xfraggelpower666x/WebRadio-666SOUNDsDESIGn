@@ -5,3 +5,12 @@ workers_dev = true
 
 # Secrets are configured in Cloudflare, NEVER committed.
 # GOVEE_API_KEY / CONTROL_TOKEN / optional ALLOWED_ORIGIN
+
+# R02: shared SQLite-backed Durable Object rate gate (Free-plan compatible).
+[[durable_objects.bindings]]
+name = "GOVEE_RATE_GATE"
+class_name = "GoveeRateGate"
+
+[[migrations]]
+tag = "govee-rate-gate-v1"
+new_sqlite_classes = ["GoveeRateGate"]
