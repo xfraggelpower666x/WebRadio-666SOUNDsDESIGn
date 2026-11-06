@@ -31,7 +31,7 @@ test('MiniPlayer watchdog observes actual currentTime progress without owning re
   assert.match(html,/staleMs>=10000\?'stalled'/);
   assert.match(html,/watchdogStaleMs:watchdogProgressAt/);
   assert.match(html,/watchdogProgressAt=0;return/);
-  assert.match(html,/S666AllPlayerAudioRecovery\\?\\.markManualStop\\(audio\\)/);
+  assert.match(html,/S666AllPlayerAudioRecovery\?\.markManualStop\(audio\)/);
   assert.doesNotMatch(html,/setInterval\([^)]*hardRecover\(/);
 });
 
