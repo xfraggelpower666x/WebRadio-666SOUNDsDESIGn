@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import subprocess
+import sys
 import threading
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk, messagebox, simpledialog, colorchooser
 from importlib import import_module
 
@@ -39,6 +42,8 @@ class App(tk.Tk):
         self.geometry("1540x920")
         self.minsize(1180, 760)
         self.configure(bg=BG)
+        self._brand_icon = None
+        self._apply_optional_branding()
 
         self.cfg = core.load_config()
         self.engine = core.Engine(self.cfg)
@@ -70,6 +75,19 @@ class App(tk.Tk):
         threading.Thread(target=self.bridge.start, daemon=True).start()
         self.after(900, self.refresh_all)
         self.after(1300, self.check_bluetooth)
+
+    def _apply_optional_branding(self):
+        base = Path.cwd()
+        ico = base / "assets" / "LOS_APP_ICON.ico"
+        png = base / "assets" / "LOS_APP_ICON.png"
+        try:
+            if ico.is_file():
+                self.iconbitmap(default=str(ico))
+            elif png.is_file():
+                self._brand_icon = tk.PhotoImage(file=str(png))
+                self.iconphoto(True, self._brand_icon)
+        except Exception:
+            self._brand_icon = None
 
     def _configure_ttk(self):
         s = ttk.Style(self)
@@ -316,13 +334,38 @@ class App(tk.Tk):
         tk.Label(inner,text=f"Bridge: http://{self.cfg['server']['host']}:{self.cfg['server']['port']}",bg=PANEL,fg=TEXT).pack(anchor="w",pady=4)
         tk.Label(inner,text="Govee H6047 requires a successful read-only LAN probe before any write.",bg=PANEL,fg=YELLOW).pack(anchor="w",pady=4)
         tk.Label(inner,text="LENZE / OC21W write controls remain visible in the controller but are intentionally blocked until protocol + real hardware validation.",bg=PANEL,fg=RED,wraplength=980,justify="left").pack(anchor="w",pady=4)
-        NeonButton(inner,"OPEN ADVANCED LAB INFO",lambda:self._show_page("Lab"),accent=CYAN).pack(anchor="w",pady=10)
+        actionbar = tk.Frame(inner, bg=PANEL)
+        actionbar.pack(anchor="w", pady=10)
+        NeonButton(actionbar,"RUN READ-ONLY DIAGNOSTICS",self.run_diagnostics,accent=GREEN).pack(side="left",padx=(0,8))
+        NeonButton(actionbar,"OPEN ADVANCED LAB INFO",lambda:self._show_page("Lab"),accent=CYAN).pack(side="left")
 
     def _build_lab(self, parent):
         p, inner = self._panel(parent, "ADVANCED BLE / EVIDENCE LAB")
         p.pack(fill="both", expand=True, padx=12, pady=12)
         tk.Label(inner,text="The original 666_light_orchestra_gui.py remains preserved as the full READ-ONLY BLE/Evidence laboratory.",bg=PANEL,fg=TEXT,wraplength=920,justify="left").pack(anchor="w",pady=8)
         tk.Label(inner,text="Use it for binding, evidence capture, session quality, protocol inference and manual review. This Control Center does not bypass those gates.",bg=PANEL,fg=MUTED,wraplength=920,justify="left").pack(anchor="w",pady=8)
+
+    def run_diagnostics(self):
+        base = Path.cwd()
+        exe = base / "dist" / "666_LIGHT_ORCHESTRA_DIAGNOSTICS.exe"
+        source = base / "666_light_orchestra_diagnostics.py"
+        venv_py = base / ".venv" / "Scripts" / "python.exe"
+        try:
+            if exe.is_file():
+                subprocess.Popen([str(exe)], cwd=str(base))
+                self.discovery_status.set("READ-ONLY DIAGNOSTICS STARTED")
+                return
+            if source.is_file() and venv_py.is_file():
+                subprocess.Popen([str(venv_py), str(source)], cwd=str(base))
+                self.discovery_status.set("READ-ONLY DIAGNOSTICS STARTED")
+                return
+            if source.is_file():
+                subprocess.Popen([sys.executable, str(source)], cwd=str(base))
+                self.discovery_status.set("READ-ONLY DIAGNOSTICS STARTED")
+                return
+            messagebox.showwarning("Diagnostics", "Diagnostics executable/source is missing from this package.")
+        except Exception as exc:
+            messagebox.showerror("Diagnostics", str(exc))
 
     def _show_page(self, name):
         for f in self.pages.values():
@@ -379,7 +422,12 @@ class App(tk.Tk):
             self.dashboard_devices.grid_columnconfigure(col,weight=1)
             fam = status_by_family.get(d.get("family"),{})
             selected = d["id"] == self.selected_device.get()
-            tk.Label(card,text=d["label"],bg="#06101f",fg=PINK if selected else TEXT,font=("Segoe UI",10,"bold")).pack(pady=(8,2))
+            indicator = tk.Canvas(card, width=18, height=18, bg="#06101f", highlightthickness=0)
+            indicator.pack(pady=(7,0))
+            live = bool(d.get("enabled")) and bool(d.get("windows_ble_address") or d.get("family") == "govee")
+            dot = GREEN if live else RED
+            indicator.create_oval(4,4,14,14,fill=dot,outline=dot)
+            tk.Label(card,text=d["label"],bg="#06101f",fg=PINK if selected else TEXT,font=("Segoe UI",10,"bold")).pack(pady=(2,2))
             tk.Label(card,text=f"{d['family']} · {d.get('role','')}",bg="#06101f",fg=MUTED,font=("Segoe UI",8)).pack()
             badge = "ENABLED" if d.get("enabled") else "OFF"
             tk.Label(card,text=badge,bg="#06101f",fg=GREEN if d.get("enabled") else RED,font=("Segoe UI",8,"bold")).pack(pady=3)

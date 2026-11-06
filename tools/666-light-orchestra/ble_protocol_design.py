@@ -119,7 +119,7 @@ OC21W_PROFILE = ProtocolProfile(
     frame_verification=Verification.CANDIDATE,
     notes=[
         "Candidate frames may be generated offline but MUST NOT imply hardware validation.",
-        "Power-frame conflict remains open until observed on the real controller.",
+        "Power-frame conflict remains open: multiple public FFF0 variants are retained as candidate-only frames until tested on the real OC21W controller.",
         "Windows BLE allowlist and explicit protocol_verified gate remain mandatory.",
     ],
 )
@@ -133,6 +133,20 @@ def oc21w_frame(length: int, cmd: int, p1: int, p2: int, p3: int, p4: int, p5: i
     """Pure candidate-frame encoder. No IO."""
     return bytes((0x7E, length & 0xFF, cmd & 0xFF, p1 & 0xFF, p2 & 0xFF,
                   p3 & 0xFF, p4 & 0xFF, p5 & 0xFF, 0xEF))
+
+
+def oc21w_power_candidate_frames(on: bool) -> tuple[bytes, ...]:
+    """Return conflicting public FFF0-family power candidates for hardware validation only."""
+    if on:
+        return (
+            bytes.fromhex("7E 04 04 01 00 01 FF 00 EF"),
+            bytes.fromhex("7E 04 04 F0 00 01 FF 00 EF"),
+            bytes.fromhex("7E 04 04 F0 00 FF FF 00 EF"),
+        )
+    return (
+        bytes.fromhex("7E 04 04 00 00 00 FF 00 EF"),
+        bytes.fromhex("7E 04 04 00 00 FF FF 00 EF"),
+    )
 
 
 def plan_command(profile: ProtocolProfile, intent: CommandIntent) -> FramePlan:
@@ -155,8 +169,7 @@ def plan_command(profile: ProtocolProfile, intent: CommandIntent) -> FramePlan:
     p = intent.params
     frames: list[bytes] = []
     if intent.command == "power":
-        b = 1 if bool(p.get("on")) else 0
-        frames.append(oc21w_frame(0x04, 0x04, b, 0x00, b, 0xFF, 0x00))
+        frames.extend(oc21w_power_candidate_frames(bool(p.get("on"))))
     elif intent.command == "rgb":
         r, g, b = (_clamp(p.get(k, 0), 0, 255) for k in ("r", "g", "b"))
         frames.append(oc21w_frame(0x07, 0x05, 0x03, r, g, b, 0x10))

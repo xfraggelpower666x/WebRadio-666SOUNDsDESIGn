@@ -54,3 +54,11 @@ WICHTIG:
 - OC21W Writes bleiben hinter den vorhandenen Protokoll- und
   Windows-Adress-Gates.
 - Govee H6047 benoetigt vor Writes weiterhin einen erfolgreichen LAN-Probe.
+
+
+DIAGNOSE:
+    RUN_DIAGNOSTICS.bat
+        -> prueft Bluetooth-Adapter, Windows-Bluetoothstatus, sichtbare BLE-Geraete,
+           Govee-LAN-Erkennung und Registry READ-ONLY.
+        -> erzeugt diagnostics\LIGHT_ORCHESTRA_DIAGNOSTICS.json
+        -> fuehrt keine Hardware-Writes aus.

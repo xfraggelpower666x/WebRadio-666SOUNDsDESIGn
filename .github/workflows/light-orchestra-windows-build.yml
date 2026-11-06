@@ -121,6 +121,10 @@ jobs:
             Copy-Item $file "$pkg\"
           }
 
+          if (Test-Path "assets") {
+            Copy-Item "assets" "$pkg\assets" -Recurse -Force
+          }
+
           # Include all Python source modules so BUILD_EXE.bat really works
           # after the user extracts only this Windows package.
           $pythonFiles = Get-ChildItem -Path "." -Filter "*.py" -File

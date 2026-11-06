@@ -150,3 +150,27 @@ Additional entry points:
 - `bootstrap_windows.bat`: prerequisites only.
 
 The bootstrap is additive and does not modify the existing hardware write gates.
+
+
+## v0.7.0-dev — Hardware Recovery, Diagnostics & Guided Discovery
+
+Additive repair layer; existing LAB, protocol evidence and safety gates remain intact.
+
+- Windows Bluetooth preflight queries the local Bluetooth PnP stack read-only before scanning.
+- GUI distinguishes READY, PRESENT_NOT_READY, NO_PHYSICAL_ADAPTER and MISSING instead of reporting a misleading empty scan.
+- Broad BLE discovery remains read-only and lists unknown/nonnamed advertisements instead of discarding them.
+- `RUN_DIAGNOSTICS.bat` and `666_LIGHT_ORCHESTRA_DIAGNOSTICS.exe` produce a local JSON diagnostic report with Bluetooth state, visible BLE devices, Govee discovery/probe result and registry state.
+- Diagnostics report declares `hardware_writes_performed=0`.
+- Govee discovery checks configured IP first, then multicast, and still requires a valid read-only devStatus proof before writes.
+- OC21W power keeps multiple conflicting public FFF0 frames as candidate-only evidence; no candidate is promoted without real hardware validation.
+- Optional branding hook loads `assets/LOS_APP_ICON.ico` or `assets/LOS_APP_ICON.png` when a verified original asset is present.
+- The original BLE/Evidence LAB remains preserved and hardware write gates remain fail-closed.
+
+Recommended troubleshooting order:
+
+1. `RUN_DIAGNOSTICS.bat`
+2. Bluetooth preflight in Devices
+3. SEARCH BLE DEVICES
+4. bind a discovered device to the correct family slot
+5. use the READ-ONLY LAB for GATT/evidence capture
+6. only after real protocol evidence consider a separately governed write-validation step
