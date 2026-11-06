@@ -111,6 +111,8 @@ jobs:
             "build_windows.bat",
             "bootstrap_windows.bat",
             "RUN_DIAGNOSTICS.bat",
+            "RUN_BLUETOOTH_RECOVERY.bat",
+            "BLUETOOTH_RECOVERY.ps1",
             "README_FIRST_WINDOWS.txt",
             "README.md",
             "requirements.txt",
@@ -146,7 +148,9 @@ jobs:
             "$pkg\START_SYMPHONY.bat",
             "$pkg\BUILD_EXE.bat",
             "$pkg\ONE_CLICK_SETUP_BUILD_RUN.bat",
-            "$pkg\RUN_DIAGNOSTICS.bat"
+            "$pkg\RUN_DIAGNOSTICS.bat",
+            "$pkg\RUN_BLUETOOTH_RECOVERY.bat",
+            "$pkg\BLUETOOTH_RECOVERY.ps1"
           )
           foreach ($path in $requiredPackagePaths) {
             if (-not (Test-Path $path)) { throw "Complete-package contract failed: $path" }

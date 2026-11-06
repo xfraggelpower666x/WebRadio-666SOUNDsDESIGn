@@ -62,3 +62,15 @@ DIAGNOSE:
            Govee-LAN-Erkennung und Registry READ-ONLY.
         -> erzeugt diagnostics\LIGHT_ORCHESTRA_DIAGNOSTICS.json
         -> fuehrt keine Hardware-Writes aus.
+
+
+BLUETOOTH RECOVERY:
+    RUN_BLUETOOTH_RECOVERY.bat
+        -> startet/restartet nur den Windows Bluetooth Support Service,
+           loest einen Windows Hardware-Neuscan aus und zeigt gefundene Adapter.
+        -> deinstalliert KEINEN Treiber, loescht KEIN Geraet und erzwingt KEINEN Neustart.
+
+Wenn Govee unter 192.168.2.32 im Router sichtbar ist, aber der UDP-LAN-Probe scheitert:
+    -> RUN_DIAGNOSTICS.bat ausfuehren
+    -> ICMP_REACHABLE + devStatus FAIL deutet auf LAN-Control/Firewall/UDP-Pfad hin
+    -> LAN Control in der Govee-App pruefen

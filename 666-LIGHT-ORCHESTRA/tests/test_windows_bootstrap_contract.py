@@ -16,6 +16,8 @@ class WindowsBootstrapContractTests(unittest.TestCase):
             "build_windows.bat",
             "ONE_CLICK_SETUP_BUILD_RUN.bat",
             "RUN_DIAGNOSTICS.bat",
+            "RUN_BLUETOOTH_RECOVERY.bat",
+            "BLUETOOTH_RECOVERY.ps1",
             "README_FIRST_WINDOWS.txt",
         ):
             self.assertTrue((ROOT / name).is_file(), name)
@@ -47,6 +49,14 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn('666_LIGHT_ORCHESTRA"', text)
         self.assertIn("--hidden-import=ble_gui_model", text)
         self.assertIn("bootstrap_windows.bat", text)
+
+    def test_bluetooth_recovery_is_minimal_and_non_destructive(self):
+        text = self.read("BLUETOOTH_RECOVERY.ps1").lower()
+        self.assertIn("bthserv", text)
+        self.assertIn("pnputil.exe /scan-devices", text)
+        self.assertNotIn("remove-pnpdevice", text)
+        self.assertNotIn("uninstall", text)
+        self.assertNotIn("restart-computer", text)
 
     def test_one_click_builds_then_runs_symphony(self):
         text = self.read("ONE_CLICK_SETUP_BUILD_RUN.bat")

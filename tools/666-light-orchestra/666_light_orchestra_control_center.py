@@ -231,6 +231,7 @@ class App(tk.Tk):
         toolbar = tk.Frame(parent, bg=BG)
         toolbar.pack(fill="x", padx=12, pady=(12,6))
         NeonButton(toolbar, "BLUETOOTH CHECK", self.check_bluetooth, accent=LILAC).pack(side="left", padx=4)
+        NeonButton(toolbar, "BLUETOOTH RECOVERY", self.run_bluetooth_recovery, accent=YELLOW).pack(side="left", padx=4)
         NeonButton(toolbar, "SEARCH BLE DEVICES", self.scan_devices).pack(side="left", padx=4)
         NeonButton(toolbar, "SEARCH GOVEE LAN", self.discover_govee, accent=GREEN).pack(side="left", padx=4)
         NeonButton(toolbar, "REFRESH", self.refresh_all, accent=LILAC).pack(side="left", padx=4)
@@ -344,6 +345,25 @@ class App(tk.Tk):
         p.pack(fill="both", expand=True, padx=12, pady=12)
         tk.Label(inner,text="The original 666_light_orchestra_gui.py remains preserved as the full READ-ONLY BLE/Evidence laboratory.",bg=PANEL,fg=TEXT,wraplength=920,justify="left").pack(anchor="w",pady=8)
         tk.Label(inner,text="Use it for binding, evidence capture, session quality, protocol inference and manual review. This Control Center does not bypass those gates.",bg=PANEL,fg=MUTED,wraplength=920,justify="left").pack(anchor="w",pady=8)
+
+    def run_bluetooth_recovery(self):
+        base = Path.cwd()
+        batch = base / "RUN_BLUETOOTH_RECOVERY.bat"
+        script = base / "BLUETOOTH_RECOVERY.ps1"
+        try:
+            if batch.is_file():
+                subprocess.Popen(["cmd.exe", "/c", "start", "", str(batch)], cwd=str(base))
+                self.discovery_status.set("BLUETOOTH RECOVERY STARTED")
+                return
+            if script.is_file():
+                subprocess.Popen([
+                    "powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)
+                ], cwd=str(base))
+                self.discovery_status.set("BLUETOOTH RECOVERY STARTED")
+                return
+            messagebox.showwarning("Bluetooth Recovery", "Recovery script is missing from this package.")
+        except Exception as exc:
+            messagebox.showerror("Bluetooth Recovery", str(exc))
 
     def run_diagnostics(self):
         base = Path.cwd()

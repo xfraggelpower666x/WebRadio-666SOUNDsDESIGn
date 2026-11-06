@@ -174,3 +174,19 @@ Recommended troubleshooting order:
 4. bind a discovered device to the correct family slot
 5. use the READ-ONLY LAB for GATT/evidence capture
 6. only after real protocol evidence consider a separately governed write-validation step
+
+
+### Bluetooth Recovery helper
+
+`RUN_BLUETOOTH_RECOVERY.bat` is an explicit owner-triggered repair helper for the Windows case where the Bluetooth adapter disappears from Settings or Device Manager. It only:
+- starts/restarts `bthserv`;
+- requests `pnputil /scan-devices`;
+- prints the resulting Bluetooth PnP candidates.
+
+It does **not** uninstall drivers, remove paired devices, change write gates or force a reboot.
+
+The read-only diagnostics report also separates:
+- Govee IP/ICMP network reachability; and
+- Govee LAN `devStatus` protocol response.
+
+This distinction helps identify a reachable H6047 whose LAN Control/UDP path is unavailable.
