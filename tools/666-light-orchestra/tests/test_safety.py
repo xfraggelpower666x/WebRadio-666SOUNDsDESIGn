@@ -105,12 +105,33 @@ class SafetyRegression(unittest.TestCase):
         self.assertEqual({v["device"] for v in result["errors"]}, {"govee", "lenze"})
 
     def test_version_and_security_defaults(self):
-        self.assertEqual(core.VERSION, "0.5.0-dev")
+        self.assertEqual(core.VERSION, "0.7.2-dev")
         self.assertFalse(core.DEFAULT_CONFIG["magic_lantern"]["write_enabled"])
         self.assertFalse(core.DEFAULT_CONFIG["magic_lantern"]["protocol_verified"])
         self.assertEqual(core.DEFAULT_CONFIG["magic_lantern"]["approved_windows_addresses"], [])
         self.assertNotIn("*", core.DEFAULT_CONFIG["server"]["allowed_origins"])
 
+
+    def test_govee_connection_settings_validate_and_persist_without_unlocking(self):
+        import json
+        import tempfile
+        from device_registry import DeviceRegistry
+        with tempfile.TemporaryDirectory() as tmp:
+            config_path = Path(tmp) / "config.json"
+            registry = DeviceRegistry(Path(tmp) / "registry.json")
+            with mock.patch.object(core, "DeviceRegistry", return_value=registry):
+                engine = core.Engine(core.merge(core.DEFAULT_CONFIG, {"govee": {"device_ip": "192.168.2.32"}}))
+            result = engine.update_govee_connection("192.168.2.77", False, path=config_path)
+            self.assertTrue(result["ok"])
+            self.assertEqual(result["device_ip"], "192.168.2.77")
+            self.assertFalse(result["auto_discover"])
+            self.assertFalse(engine.govee.online)
+            self.assertEqual(engine.govee._last_probe_ok, 0.0)
+            saved = json.loads(config_path.read_text(encoding="utf-8"))
+            self.assertEqual(saved["govee"]["device_ip"], "192.168.2.77")
+            self.assertFalse(saved["govee"]["auto_discover"])
+            with self.assertRaisesRegex(ValueError, "invalid_govee_ip"):
+                engine.update_govee_connection("999.10.10.10", True, path=config_path)
 
     def test_master_disabled_blocks_manual_commands(self):
         import tempfile

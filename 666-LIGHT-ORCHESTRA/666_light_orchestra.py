@@ -17,7 +17,7 @@ from ble_protocol_design import (
     audio_intent as design_audio_intent,
     plan_command as design_plan_command,
 )
-from ble_readonly_capture import scan_known as ble_scan_known, scan_all as ble_scan_all, bluetooth_preflight as ble_bluetooth_preflight, capture_read_only as ble_capture_read_only
+from ble_readonly_capture import scan_known as ble_scan_known, scan_all as ble_scan_all, bluetooth_preflight as ble_bluetooth_preflight, verify_gatt_read_only as ble_verify_gatt_read_only, capture_read_only as ble_capture_read_only
 from ble_protocol_observation import Observation as ProtocolObservation, evidence_summary as protocol_evidence_summary
 
 try:
@@ -26,7 +26,7 @@ except Exception:
     BleakClient = None
     BleakScanner = None
 
-VERSION = "0.5.0-dev"
+VERSION = "0.7.2-dev"
 LENZE_SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
 LENZE_WRITE_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
 LENZE_NOTIFY_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"
@@ -80,6 +80,25 @@ def merge(base, override):
 def load_config(path="config.json"):
     p = Path(path)
     return merge(DEFAULT_CONFIG, json.loads(p.read_text("utf-8"))) if p.exists() else DEFAULT_CONFIG
+
+
+def save_config(config: dict, path="config.json"):
+    if not isinstance(config, dict):
+        raise ValueError("config_must_be_dict")
+    target = Path(path)
+    temp = target.with_suffix(target.suffix + ".tmp")
+    encoded = json.dumps(config, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    try:
+        with temp.open("w", encoding="utf-8", newline="\n") as fh:
+            fh.write(encoded)
+            fh.flush()
+            import os
+            os.fsync(fh.fileno())
+        temp.replace(target)
+    finally:
+        if temp.exists():
+            temp.unlink()
+    return {"ok": True, "path": str(target), "bytes": target.stat().st_size}
 
 
 class GoveeLan:
@@ -699,6 +718,65 @@ class Engine:
             "hardware_io": False,
             "device": bound,
             "notice": "Binding saved disabled; no hardware write permission granted",
+        }
+
+    async def verify_ble_gatt(self, device_id):
+        item = self.registry.get(str(device_id or ""))
+        if item is None or item.get("transport") != "ble":
+            raise ValueError("unknown_or_non_ble_device")
+        address = item.get("windows_ble_address")
+        if not address:
+            raise ValueError("windows_ble_address_not_bound")
+        family = item.get("family")
+        if family == "lenze":
+            expected = (LENZE_SERVICE_UUID, LENZE_WRITE_UUID, LENZE_NOTIFY_UUID)
+        elif family == "magic_lantern":
+            expected = (MAGIC_SERVICE_UUID, MAGIC_WRITE_UUID, MAGIC_NOTIFY_UUID)
+        else:
+            raise ValueError("unsupported_ble_family")
+        result = await ble_verify_gatt_read_only(
+            address,
+            expected_service_uuid=expected[0],
+            expected_write_uuid=expected[1],
+            expected_notify_uuid=expected[2],
+        )
+        return {
+            **result,
+            "device_id": str(device_id),
+            "family": family,
+            "automatic_write_enable": False,
+        }
+
+    def update_govee_connection(self, device_ip=None, auto_discover=None, path="config.json"):
+        cfg = json.loads(json.dumps(self.cfg))
+        govee = cfg.setdefault("govee", {})
+        if device_ip is not None:
+            value = str(device_ip).strip()
+            if value:
+                try:
+                    ipaddress.ip_address(value)
+                except ValueError as exc:
+                    raise ValueError("invalid_govee_ip") from exc
+                govee["device_ip"] = value
+            else:
+                govee["device_ip"] = None
+        if auto_discover is not None:
+            if type(auto_discover) is not bool:
+                raise ValueError("auto_discover_must_be_boolean")
+            govee["auto_discover"] = auto_discover
+        save_config(cfg, path=path)
+        self.cfg = cfg
+        self.govee.cfg = cfg["govee"]
+        self.govee.ip = cfg["govee"].get("device_ip")
+        self.govee.online = False
+        self.govee._last_probe_ok = 0.0
+        self.govee.detail = f"LAN target {self.govee.ip}; probe pending" if self.govee.ip else "not discovered"
+        return {
+            "ok": True,
+            "hardware_io": False,
+            "device_ip": self.govee.ip,
+            "auto_discover": bool(cfg["govee"].get("auto_discover", True)),
+            "notice": "Connection settings saved; write authorization unchanged",
         }
 
     async def capture_ble_read_only(self, device_id, duration_s=5.0):

@@ -152,6 +152,23 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 registry.bind_windows_address("lenze_1", "bad\naddress")
 
+    def test_read_only_gatt_verify_enumerates_expected_profile_without_writes(self):
+        result = asyncio.run(capture.verify_gatt_read_only(
+            "AA:BB:CC:DD:EE:01",
+            expected_service_uuid="fff0",
+            expected_write_uuid="fff3",
+            expected_notify_uuid="fff4",
+            client_factory=FakeClient,
+        ))
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["hardware_io"], "READ_ONLY_GATT_VERIFY")
+        self.assertEqual(result["write_operations"], 0)
+        self.assertTrue(result["checks"]["connected"])
+        self.assertTrue(result["checks"]["service_uuid"])
+        self.assertTrue(result["checks"]["write_characteristic_present"])
+        self.assertTrue(result["checks"]["notify_characteristic_present"])
+        self.assertFalse(result["hardware_verified"])
+
     def test_read_only_capture_collects_services_and_notifications_without_writes(self):
         result = asyncio.run(capture.capture_read_only(
             "AA:BB:CC:DD:EE:01",

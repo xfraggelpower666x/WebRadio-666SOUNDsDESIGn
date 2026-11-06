@@ -244,6 +244,63 @@ def _services_from_client(client: Any) -> list[CharacteristicInfo]:
     return out
 
 
+async def verify_gatt_read_only(
+    address: str,
+    expected_service_uuid: str | None = None,
+    expected_write_uuid: str | None = None,
+    expected_notify_uuid: str | None = None,
+    client_factory: Callable[..., Any] | None = None,
+) -> dict:
+    """Connect, enumerate GATT, disconnect. No characteristic write is performed."""
+    if not isinstance(address, str) or not address.strip():
+        raise ValueError("address_required")
+    if client_factory is None:
+        if BleakClient is None:
+            raise RuntimeError("bleak not installed")
+        client_factory = BleakClient
+
+    client = client_factory(address)
+    connected = False
+    characteristics = []
+    errors = []
+    try:
+        await client.connect(timeout=10.0)
+        connected = bool(getattr(client, "is_connected", True))
+        characteristics = _services_from_client(client)
+    except Exception as exc:
+        errors.append(str(exc))
+    finally:
+        if getattr(client, "is_connected", False):
+            try:
+                await client.disconnect()
+            except Exception as exc:
+                errors.append("disconnect: " + str(exc))
+
+    service_values = {str(x.service_uuid).lower() for x in characteristics}
+    char_values = {str(x.characteristic_uuid).lower() for x in characteristics}
+    exp_service = str(expected_service_uuid or "").lower()
+    exp_write = str(expected_write_uuid or "").lower()
+    exp_notify = str(expected_notify_uuid or "").lower()
+
+    checks = {
+        "connected": connected,
+        "service_uuid": (not exp_service) or exp_service in service_values,
+        "write_characteristic_present": (not exp_write) or exp_write in char_values,
+        "notify_characteristic_present": (not exp_notify) or exp_notify in char_values,
+        "no_errors": not errors,
+    }
+    return {
+        "ok": all(checks.values()),
+        "hardware_io": "READ_ONLY_GATT_VERIFY",
+        "address": address,
+        "checks": checks,
+        "characteristics": [asdict(x) for x in characteristics],
+        "errors": errors,
+        "write_operations": 0,
+        "hardware_verified": False,
+    }
+
+
 async def capture_read_only(
     address: str,
     notify_uuids: list[str] | tuple[str, ...],

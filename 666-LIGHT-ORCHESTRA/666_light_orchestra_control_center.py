@@ -60,6 +60,8 @@ class App(tk.Tk):
         self.motion_name = tk.StringVar(value="Static")
         self.brightness = tk.IntVar(value=80)
         self.global_speed = tk.IntVar(value=50)
+        self.govee_ip = tk.StringVar(value=str(self.cfg.get("govee", {}).get("device_ip") or ""))
+        self.govee_auto_discover = tk.BooleanVar(value=bool(self.cfg.get("govee", {}).get("auto_discover", True)))
         self.status_text = tk.StringVar(value="INITIALIZING")
         self.discovery_status = tk.StringVar(value="READY TO SCAN")
         self.discovery_slot = tk.StringVar(value="")
@@ -333,6 +335,17 @@ class App(tk.Tk):
         p, inner = self._panel(parent, "SYSTEM SETTINGS")
         p.pack(fill="x", padx=12, pady=12)
         tk.Label(inner,text=f"Bridge: http://{self.cfg['server']['host']}:{self.cfg['server']['port']}",bg=PANEL,fg=TEXT).pack(anchor="w",pady=4)
+
+        govee_box = tk.Frame(inner, bg="#06101f", highlightthickness=1, highlightbackground="#1c4d80")
+        govee_box.pack(fill="x", pady=8)
+        tk.Label(govee_box,text="GOVEE H6047 CONNECTION",bg="#06101f",fg=CYAN,font=("Segoe UI",10,"bold")).grid(row=0,column=0,columnspan=5,sticky="w",padx=10,pady=(8,5))
+        tk.Label(govee_box,text="Device IP",bg="#06101f",fg=TEXT).grid(row=1,column=0,sticky="w",padx=10,pady=6)
+        tk.Entry(govee_box,textvariable=self.govee_ip,bg=PANEL_2,fg=TEXT,insertbackground=TEXT,relief="flat",width=22).grid(row=1,column=1,sticky="w",padx=4)
+        tk.Checkbutton(govee_box,text="Auto Discovery",variable=self.govee_auto_discover,bg="#06101f",fg=TEXT,selectcolor="#14264a",activebackground="#06101f",activeforeground=CYAN).grid(row=1,column=2,sticky="w",padx=8)
+        NeonButton(govee_box,"SAVE CONNECTION",self.save_govee_connection,accent=GREEN).grid(row=1,column=3,padx=6,pady=6)
+        NeonButton(govee_box,"SAVE + PROBE",self.save_and_probe_govee,accent=PINK).grid(row=1,column=4,padx=(0,10),pady=6)
+        tk.Label(govee_box,text="Saving connection settings does not unlock writes. A fresh read-only devStatus probe remains mandatory.",bg="#06101f",fg=MUTED,wraplength=950,justify="left").grid(row=2,column=0,columnspan=5,sticky="w",padx=10,pady=(0,8))
+
         tk.Label(inner,text="Govee H6047 requires a successful read-only LAN probe before any write.",bg=PANEL,fg=YELLOW).pack(anchor="w",pady=4)
         tk.Label(inner,text="LENZE / OC21W write controls remain visible in the controller but are intentionally blocked until protocol + real hardware validation.",bg=PANEL,fg=RED,wraplength=980,justify="left").pack(anchor="w",pady=4)
         actionbar = tk.Frame(inner, bg=PANEL)
@@ -608,6 +621,25 @@ class App(tk.Tk):
         except Exception as exc:
             messagebox.showerror("Discovery", str(exc))
 
+    def save_govee_connection(self):
+        try:
+            result = self.engine.update_govee_connection(
+                self.govee_ip.get(),
+                bool(self.govee_auto_discover.get()),
+            )
+            self.cfg = self.engine.cfg
+            self.discovery_status.set(f"GOVEE SETTINGS SAVED · {result.get('device_ip') or 'AUTO'}")
+            self.refresh_all()
+            messagebox.showinfo("Govee Connection", "Connection settings saved. Write authorization remains unchanged.")
+            return True
+        except Exception as exc:
+            messagebox.showerror("Govee Connection", str(exc))
+            return False
+
+    def save_and_probe_govee(self):
+        if self.save_govee_connection():
+            self.discover_govee()
+
     def discover_govee(self):
         self.discovery_status.set("SEARCHING GOVEE LAN...")
         self._run(self.engine.govee.discover(), self._govee_discovery_done)
@@ -632,12 +664,42 @@ class App(tk.Tk):
         item=self.engine.registry.get(did)
         if not item: return
         if item.get("family")=="govee":
-            return self._run(self.engine.govee.probe())
+            self.discovery_status.set("GOVEE READ-ONLY PROBE...")
+            return self._run(self.engine.govee.probe(), self._govee_probe_done)
         address=item.get("windows_ble_address")
         if not address:
-            messagebox.showinfo("Connect", "Windows BLE address is not bound yet. Use the preserved READ-ONLY lab to scan and bind this slot.")
+            messagebox.showinfo("Connect", "Windows BLE address is not bound yet. Use SEARCH BLE DEVICES and bind the discovered device first.")
             return
-        messagebox.showinfo("Connect", f"{did} is bound to {address}. Persistent BLE connect is intentionally not promoted to a write-capable session; use READ-ONLY capture / verification in the lab.")
+        self.discovery_status.set(f"GATT VERIFY · {did}...")
+        return self._run(self.engine.verify_ble_gatt(did), self._ble_verify_done)
+
+    def _ble_verify_done(self, result):
+        did = result.get("device_id") or self.selected_device.get()
+        checks = result.get("checks") or {}
+        ok = bool(result.get("ok"))
+        self.discovery_status.set(f"GATT {'PASS' if ok else 'BLOCKED'} · {did}")
+        detail = "\n".join([
+            f"Connected: {checks.get('connected')}",
+            f"FFF0 service: {checks.get('service_uuid')}",
+            f"FFF3 write characteristic present: {checks.get('write_characteristic_present')}",
+            f"FFF4 notify characteristic present: {checks.get('notify_characteristic_present')}",
+            f"Write operations performed: {result.get('write_operations', 0)}",
+            "",
+            "This verifies GATT presence only. Hardware write authorization remains unchanged.",
+        ])
+        if ok:
+            messagebox.showinfo("BLE GATT Verify", detail)
+        else:
+            errors = "\n".join(result.get("errors") or [])
+            messagebox.showwarning("BLE GATT Verify", detail + (("\n\nErrors:\n" + errors) if errors else ""))
+
+    def _govee_probe_done(self, result):
+        ok = bool(result.get("ok"))
+        self.discovery_status.set(f"GOVEE PROBE {'PASS' if ok else 'FAIL'}")
+        if ok:
+            messagebox.showinfo("Govee Probe", "Read-only devStatus probe passed. The temporary Govee write gate is now valid for this session window.")
+        else:
+            messagebox.showwarning("Govee Probe", "Read-only devStatus probe failed. No Govee write is allowed.")
 
     def disconnect_selected(self):
         messagebox.showinfo("Disconnect", "No persistent write-capable BLE session is held by this Control Center. Govee uses stateless LAN packets; BLE lab captures disconnect after their read-only session.")
