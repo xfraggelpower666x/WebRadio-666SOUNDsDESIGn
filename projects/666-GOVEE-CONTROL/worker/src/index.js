@@ -1,6 +1,6 @@
 import {mapAudioEvent} from './audio-mapping.js';
 import {validateCapability} from './capability-validation.js';
-import {reserveGoveeControl,getCachedGoveeDevices} from './rate-gate.js';
+import {reserveGoveeControl,reserveGoveeState,getCachedGoveeDevices} from './rate-gate.js';
 export {GoveeRateGate} from './rate-gate.js';
 // 666SOUNDsDESIGn native GOVEE CLOUD CONTROL. No client secrets.
 const BASE='https://openapi.api.govee.com';
@@ -47,6 +47,8 @@ export default {async fetch(request,env){
    if(!b||!isSku(b.sku)||!isDevice(b.device))return reply({ok:false,error:'Invalid device identification'},400);
    const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    if(!r.devices.some(d=>d.sku===b.sku&&d.device===b.device))return reply({ok:false,error:'Device not registered to account'},403);
+   const gate=await reserveGoveeState(env,b.sku,b.device);
+   if(!gate.ok)return reply({ok:false,error:gate.error,retryAfterMs:gate.retryAfterMs??null},gate.error==='rate_limited'?429:503);
    const s=await api(env,'/router/api/v1/device/state','POST',{requestId:crypto.randomUUID(),payload:{sku:b.sku,device:b.device}});
    return reply(s,s.ok?200:s.httpStatus===429?429:502);
   }
