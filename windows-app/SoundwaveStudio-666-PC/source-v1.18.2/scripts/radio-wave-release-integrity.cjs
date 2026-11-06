@@ -193,6 +193,13 @@ check(/source-local[^]*localQueueNextTrack/.test(text('src/app.js')),'local-queu
 check(/resumeCurrent\?\.\(\{autoplay:true\}\)/.test(integration),'radio-to-local-autoplay-resume');
 check(/radio-wave-local-queue\.json/.test(main)&&/loadLocalQueueFromDisk/.test(main),'local-queue-persistence');
 check(/LOCAL_AUDIO_EXTENSIONS/.test(main)&&/\.mp3/.test(main)&&/\.wav/.test(main),'local-queue-audio-extension-allowlist');
+check(/Number\.isFinite\(volumeRaw\)\?volumeRaw:0\.7/.test(text('src/app.js')),'local-queue-preserve-zero-volume');
+check(/const wasActive=removeIndex===localQueueSnapshot\.index/.test(text('src/app.js'))&&/activateLocalQueueIndex\(Math\.max\(0,state\.index\)/.test(text('src/app.js')),'local-queue-remove-active-rebinds-audio');
+check(/async function togglePlayback\(\)/.test(text('src/app.js'))&&/await audioElement\.play\(\)/.test(text('src/app.js'))&&/Playback Error/.test(text('src/app.js')),'play-state-follows-real-play-result');
+check(/id="rw-host-check"/.test(html)&&/id="rw-host-check-state"/.test(html),'real-host-check-ui');
+check(/runHostCheck/.test(text('src/diagnostics.js'))&&/window\.api\.displays\(\)/.test(text('src/diagnostics.js'))&&/window\.api\.remoteHealth\(\)/.test(text('src/diagnostics.js')),'real-host-check-runtime-reads');
+check(/Detached Visualizer/.test(text('src/diagnostics.js'))&&/MilkDrop Personal Library/.test(text('src/diagnostics.js'))&&/Player Messenger/.test(text('src/diagnostics.js')),'real-host-check-open-gates-visible');
+check(/rw-host-check-row\.pass/.test(css)&&/rw-host-check-row\.pending/.test(css),'real-host-check-visual-evidence-states');
 const mdTest=cp.spawnSync(process.execPath,[path.join(root,'tests/milkdrop-control-layer.test.cjs')],{encoding:'utf8'});
 check(mdTest.status===0,'milkdrop-control-layer-node-test');
 if(mdTest.status!==0)fail.push((mdTest.stderr||mdTest.stdout||'').trim());
