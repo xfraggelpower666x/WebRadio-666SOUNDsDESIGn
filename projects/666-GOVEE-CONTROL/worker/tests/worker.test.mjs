@@ -74,3 +74,17 @@ test('unadvertised capability is blocked before rate quota and external fetch',a
   assert.deepEqual(steps,['/devices']);
  }finally{globalThis.fetch=old;}
 });
+
+test('body-level Govee rate limit becomes HTTP 429 instead of a false 200',async()=>{
+ const old=globalThis.fetch;
+ const d={sku:'H6047',device:'60:74:F4:40:D9:A2',capabilities:[{type:'devices.capabilities.on_off',instance:'powerSwitch'}]};
+ const controlled={...env,GOVEE_RATE_GATE:{idFromName:()=> 'account',get:()=>({fetch:async(url)=>{
+  return new URL(url).pathname==='/devices'?Response.json({ok:true,devices:[d]}):Response.json({ok:true});
+ }})}};
+ globalThis.fetch=async()=>Response.json({code:429,message:'Limit exceeded'},{status:200});
+ try{
+  const r=await worker.fetch(req('/api/control',{sku:d.sku,device:d.device,capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),controlled);
+  assert.equal(r.status,429);
+  assert.equal((await r.json()).ok,false);
+ }finally{globalThis.fetch=old;}
+});
