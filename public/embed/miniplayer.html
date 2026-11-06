@@ -97,8 +97,8 @@ let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=fals
 // Visualizer activation is opt-in and must be tested with the production stream.
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
-toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();label('Pausiert');state()}else play()});
+async function play(){wanted=true;audioFault=false;audioWaiting=false;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audioFault=false;audioWaiting=false;retrying=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();label('Pausiert');state()}else play()});
 // Plattformunabhaengiger Mute: nur die bestehende Audioinstanz, kein Eingriff in Pegel, EQ oder Boost.
 function syncMuteButton(){const muted=!!audio.muted;muteButton.setAttribute('aria-pressed',String(muted));const label=muted?'Ton einschalten':'Ton ausschalten';muteButton.setAttribute('aria-label',label);muteButton.title=label;muteButton.querySelector('.mini-mute-icon').textContent=muted?'🔇':'🔊';muteButton.querySelector('.mini-mute-label').textContent=muted?'SOUND':'MUTE'}
 muteButton.addEventListener('click',()=>{audio.muted=!audio.muted;syncMuteButton()});
@@ -130,8 +130,9 @@ setInterval(refreshAudioDiagnostics,1000);
 // Passiver Sensor: Wiedergabefortschritt in ECHTER Audiozeit. Keine zweite Recovery-Engine.
 setInterval(()=>{
   const now=Date.now();
+  if(!wanted){watchdogStatus='idle';watchdogProgressAt=0;return}
   if(audioFault){watchdogStatus='fault';return}
-  if(!wanted||audio.paused){watchdogStatus='idle';watchdogProgressAt=0;return}
+  if(audio.paused){watchdogStatus='buffering';return}
   const current=Number(audio.currentTime)||0;
   if(!watchdogProgressAt){watchdogProgressAt=now;watchdogAudioTime=current}
   if(current>watchdogAudioTime+0.05){watchdogAudioTime=current;watchdogProgressAt=now;watchdogLastEventAt=now;audioWaiting=false}
@@ -144,7 +145,7 @@ window.S666EmbedControl=Object.freeze({
   getState(){
     const playing=!audio.paused&&!audio.ended&&audio.readyState>=2;
     return {
-      playing,waiting:!!audioWaiting,recovering:!!retrying,error:!!audioFault,
+      playing,waiting:!!wanted&&!!audioWaiting,recovering:!!wanted&&!!retrying,error:!!wanted&&!!audioFault,
       source:sourceIndex===0?'main':'backup',
       wanted:!!wanted,readyState:audio.readyState,
       watchdogStatus,watchdogLastEventAt,watchdogProgressAt,watchdogStaleMs:watchdogProgressAt?Math.max(0,Date.now()-watchdogProgressAt):null,
