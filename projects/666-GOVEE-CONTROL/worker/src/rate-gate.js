@@ -16,7 +16,7 @@ export class GoveeRateGate {
         const response=await fetch('https://openapi.api.govee.com/router/api/v1/user/devices',{headers:{'Govee-API-Key':this.env.GOVEE_API_KEY}});
         const payload=await response.json().catch(()=>null);
         const raw=Array.isArray(payload?.data)?payload.data:payload?.data?.devices;
-        if(!response.ok || payload?.code!==200 || !Array.isArray(raw))return {ok:false,error:response.status===429?'upstream_rate_limited':'catalog_unavailable'};
+        if(!response.ok || payload?.code!==200 || !Array.isArray(raw))return {ok:false,error:response.status===429?'upstream_rate_limited':'catalog_unavailable',httpStatus:response.status===429?429:503};
         // Cache only necessary fields, never API secrets.
         const devices=raw.map(d=>({sku:d.sku,device:d.device,deviceName:d.deviceName,capabilities:d.capabilities})).filter(d=>typeof d.sku==='string'&&typeof d.device==='string');
         await this.ctx.storage.put('govee-device-catalog',{expires:Date.now()+60000,devices});
@@ -30,7 +30,7 @@ export class GoveeRateGate {
     if (new URL(request.url).pathname==='/devices') {
       if(request.method!=='GET')return Response.json({ok:false,error:'method_not_allowed'},{status:405});
       const result=await this.getCatalog();
-      return Response.json(result,{status:result.ok?200:503});
+      return Response.json(result,{status:result.ok?200:result.httpStatus??503});
     }
     if (request.method !== 'POST') return Response.json({ok:false,error:'method_not_allowed'},{status:405});
     let body;
@@ -72,6 +72,6 @@ export async function getCachedGoveeDevices(env){
     const stub=env.GOVEE_RATE_GATE.get(env.GOVEE_RATE_GATE.idFromName('govee-account-control-v1'));
     const response=await stub.fetch('https://gate.internal/devices',{method:'GET'});
     const result=await response.json().catch(()=>null);
-    return response.ok&&result?.ok&&Array.isArray(result.devices)?{ok:true,devices:result.devices}:{ok:false,error:result?.error??'catalog_unavailable'};
+    return response.ok&&result?.ok&&Array.isArray(result.devices)?{ok:true,devices:result.devices}:{ok:false,error:result?.error??'catalog_unavailable',httpStatus:response.status};
   }catch{return {ok:false,error:'catalog_unavailable'};}
 }
