@@ -200,6 +200,9 @@ check(/id="rw-host-check"/.test(html)&&/id="rw-host-check-state"/.test(html),'re
 check(/runHostCheck/.test(text('src/diagnostics.js'))&&/window\.api\.displays\(\)/.test(text('src/diagnostics.js'))&&/window\.api\.remoteHealth\(\)/.test(text('src/diagnostics.js')),'real-host-check-runtime-reads');
 check(/Detached Visualizer/.test(text('src/diagnostics.js'))&&/MilkDrop Personal Library/.test(text('src/diagnostics.js'))&&/Player Messenger/.test(text('src/diagnostics.js')),'real-host-check-open-gates-visible');
 check(/rw-host-check-row\.pass/.test(css)&&/rw-host-check-row\.pending/.test(css),'real-host-check-visual-evidence-states');
+check(/overlayBoundsFor\('visualizerNative'/.test(main),'detached-visualizer-offscreen-safe-restore');
+check(/function boundsIntersectAnyDisplay/.test(main)&&/function reconcileDetachedWindows/.test(main),'detached-window-topology-recovery');
+check(/reconcileDetachedWindows\(\); return outputStatus\(\)/.test(main),'detached-window-recovery-on-display-change');
 const mdTest=cp.spawnSync(process.execPath,[path.join(root,'tests/milkdrop-control-layer.test.cjs')],{encoding:'utf8'});
 check(mdTest.status===0,'milkdrop-control-layer-node-test');
 if(mdTest.status!==0)fail.push((mdTest.stderr||mdTest.stdout||'').trim());
