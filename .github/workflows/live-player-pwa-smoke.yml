@@ -164,7 +164,7 @@ jobs:
           NODE
 
           grep -Fq "Central Player Boot + Session Identity v2.2.1" "$workdir/central-boot-screen.js"
-          grep -Fq "20261016-main-iphone-two-phase-cyberintro-r01" "$workdir/central-boot-screen.js"
+          grep -Fq "20261017-main-iphone-static-first-paint-r03" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_ANIMATION_CYCLE=10000" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_START_PROGRESS=1" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_COMPLETE_HOLD=0" "$workdir/central-boot-screen.js"
