@@ -39,18 +39,23 @@ export class GoveeRateGate {
     if (typeof sku !== 'string' || !/^H[0-9A-Z]{4,10}$/.test(sku) || typeof device !== 'string' || !/^[0-9A-Fa-f:]{12,35}$/.test(device)) {
       return Response.json({ok:false,error:'invalid_device'},{status:400});
     }
-    const key='device:'+sku+':'+device.toUpperCase(), now=Date.now();
+    const isState=new URL(request.url).pathname==='/reserve-state';
+    if(new URL(request.url).pathname!=='/reserve' && !isState)return Response.json({ok:false,error:'unknown_gate_route'},{status:404});
+    const key=(isState?'state:':'device:')+sku+':'+device.toUpperCase(), now=Date.now();
     // Sliding-window entries: konservativ 2 Gerätesteuerungen/1s, 12 Accountsteuerungen/1s.
     const decision=await this.ctx.storage.transaction(async txn=>{
-      const [account, perDevice]=await Promise.all([txn.get('account-window'),txn.get(key)]);
+      const account=isState?[]:await txn.get('account-window');
+      const perDevice=await txn.get(key);
+      const windowMs=isState?60000:1000;
+      const deviceMax=isState?30:2;
       const accountRecent=Array.isArray(account)?account.filter(t=>Number.isFinite(t)&&t>now-1000):[];
-      const deviceRecent=Array.isArray(perDevice)?perDevice.filter(t=>Number.isFinite(t)&&t>now-1000):[];
-      if (accountRecent.length>=12 || deviceRecent.length>=2) {
-        const oldest=Math.min(accountRecent.length>=12?accountRecent[0]:Infinity,deviceRecent.length>=2?deviceRecent[0]:Infinity);
-        return {ok:false,retryAfterMs:Math.max(100,1000-(now-oldest))};
+      const deviceRecent=Array.isArray(perDevice)?perDevice.filter(t=>Number.isFinite(t)&&t>now-windowMs):[];
+      if ((!isState&&accountRecent.length>=12) || deviceRecent.length>=deviceMax) {
+        const oldest=Math.min(!isState&&accountRecent.length>=12?accountRecent[0]:Infinity,deviceRecent.length>=deviceMax?deviceRecent[0]:Infinity);
+        return {ok:false,retryAfterMs:Math.max(100,windowMs-(now-oldest))};
       }
-      accountRecent.push(now); deviceRecent.push(now);
-      await txn.put('account-window',accountRecent); await txn.put(key,deviceRecent);
+      if(!isState){accountRecent.push(now);await txn.put('account-window',accountRecent);}
+      deviceRecent.push(now);await txn.put(key,deviceRecent);
       return {ok:true};
     });
     return Response.json(decision,{status:decision.ok?200:429,headers:decision.ok?{}:{'Retry-After':String(Math.ceil(decision.retryAfterMs/1000))}});
@@ -74,4 +79,14 @@ export async function getCachedGoveeDevices(env){
     const result=await response.json().catch(()=>null);
     return response.ok&&result?.ok&&Array.isArray(result.devices)?{ok:true,devices:result.devices}:{ok:false,error:result?.error??'catalog_unavailable',httpStatus:response.status};
   }catch{return {ok:false,error:'catalog_unavailable'};}
+}
+
+export async function reserveGoveeState(env,sku,device){
+  if(!env?.GOVEE_RATE_GATE || typeof env.GOVEE_RATE_GATE.idFromName!=='function')return {ok:false,error:'rate_gate_unavailable'};
+  try{
+    const stub=env.GOVEE_RATE_GATE.get(env.GOVEE_RATE_GATE.idFromName('govee-account-control-v1'));
+    const response=await stub.fetch('https://gate.internal/reserve-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sku,device})});
+    const data=await response.json().catch(()=>null);
+    return response.ok&&data?.ok?{ok:true}:{ok:false,error:response.status===429?'rate_limited':'rate_gate_error',retryAfterMs:data?.retryAfterMs??null};
+  }catch{return {ok:false,error:'rate_gate_unavailable'};}
 }
