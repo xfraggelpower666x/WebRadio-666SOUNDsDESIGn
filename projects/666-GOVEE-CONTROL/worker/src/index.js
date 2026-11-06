@@ -9,7 +9,7 @@ const cors=(req,env)=>{const o=req.headers.get('Origin');return o&&env.ALLOWED_O
 async function api(env,path,method='GET',body){
  const res=await fetch(BASE+path,{method,headers:{'Govee-API-Key':env.GOVEE_API_KEY,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
  const result=await res.json().catch(()=>null);
- if(!res.ok)return {ok:false,httpStatus:res.status,error:'Govee upstream error',upstreamCode:result?.code??null};
+ if(!res.ok||result?.code && result.code!==200)return {ok:false,httpStatus:res.status,error:res.status===429?'Govee rate limit exceeded':'Govee upstream error',upstreamCode:result?.code??null};
  return {ok:true,result};
 }
 const isSku=x=>typeof x==='string'&&/^H[0-9A-Z]{4,10}$/.test(x);
@@ -18,8 +18,11 @@ const isType=x=>typeof x==='string'&&/^devices\.capabilities\.[a-z_]{2,60}$/.tes
 const isInstance=x=>typeof x==='string'&&/^[a-zA-Z][a-zA-Z0-9_]{0,60}$/.test(x);
 async function owned(env){
  const r=await api(env,'/router/api/v1/user/devices');if(!r.ok)return r;
- const devices=r.result?.data?.devices??r.result?.payload?.devices??[];
- return {ok:true,devices:Array.isArray(devices)?devices:[]};
+ // Govee v1 responds with data: [device, ...], not data.devices.
+ const data=r.result?.data;
+ const devices=Array.isArray(data)?data:data?.devices??r.result?.payload?.devices??[];
+ if(!Array.isArray(devices))return {ok:false,error:'Unexpected Govee device list schema'};
+ return {ok:true,devices};
 }
 const kinds=['devices.capabilities.on_off','devices.capabilities.range','devices.capabilities.color_setting','devices.capabilities.color_temperature'];
 const goodCapability=c=>c&&isType(c.type)&&isInstance(c.instance)&&Object.hasOwn(c,'value')&&kinds.includes(c.type);
@@ -34,25 +37,25 @@ export default {async fetch(request,env){
  if(!equal(request.headers.get('Authorization')||'','Bearer '+env.CONTROL_TOKEN))return reply({ok:false,error:'Unauthorized'},401);
  try{
   if(u.pathname==='/api/devices'&&request.method==='GET'){
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    return reply({ok:true,devices:r.devices.map(d=>({sku:d.sku,device:d.device,deviceName:d.deviceName,capabilities:d.capabilities}))});
   }
   if(u.pathname==='/api/state'&&request.method==='POST'){
    const b=await request.json().catch(()=>null);
    if(!b||!isSku(b.sku)||!isDevice(b.device))return reply({ok:false,error:'Invalid device identification'},400);
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    if(!r.devices.some(d=>d.sku===b.sku&&d.device===b.device))return reply({ok:false,error:'Device not registered to account'},403);
    const s=await api(env,'/router/api/v1/device/state','POST',{requestId:crypto.randomUUID(),payload:{sku:b.sku,device:b.device}});
-   return reply(s,s.ok?200:502);
+   return reply(s,s.ok?200:s.httpStatus===429?429:502);
   }
   if(u.pathname==='/api/control'&&request.method==='POST'){
    const b=await request.json().catch(()=>null),c=b?.capability;
    if(!b||!isSku(b.sku)||!isDevice(b.device)||!goodCapability(c))return reply({ok:false,error:'Invalid control payload'},400);
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const d=r.devices.find(x=>x.sku===b.sku&&x.device===b.device);
    if(!d)return reply({ok:false,error:'Device not registered to account'},403);
    if(!validateCapability(d,c))return reply({ok:false,error:'Capability or value not supported by device'},400);
-   const x=await control(env,b,c);return reply(x,x.ok?200:502);
+   const x=await control(env,b,c);return reply(x,x.ok?200:x.httpStatus===429?429:502);
   }
   if(u.pathname==='/api/audio/preview'&&request.method==='POST'){
    const b=await request.json().catch(()=>null);
@@ -64,7 +67,7 @@ export default {async fetch(request,env){
    if(!Array.isArray(members)||members.length<1||members.length>8||!goodCapability(c))return reply({ok:false,error:'Invalid group payload'},400);
    if(members.some(m=>!m||!isSku(m.sku)||!isDevice(m.device)))return reply({ok:false,error:'Invalid group member'},400);
    if(new Set(members.map(m=>m.sku+'|'+m.device)).size!==members.length)return reply({ok:false,error:'Duplicate group members'},400);
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const devices=members.map(m=>r.devices.find(x=>x.sku===m.sku&&x.device===m.device));
    if(devices.some(d=>!d))return reply({ok:false,error:'Group contains a device not registered to account'},403);
    const results=[];
