@@ -88,3 +88,17 @@ test('body-level Govee rate limit becomes HTTP 429 instead of a false 200',async
   assert.equal((await r.json()).ok,false);
  }finally{globalThis.fetch=old;}
 });
+
+test('state endpoint refuses upstream when central state quota is exhausted',async()=>{
+ const old=globalThis.fetch,steps=[],d={sku:'H6047',device:'60:74:F4:40:D9:A2',capabilities:[]};
+ const controlled={...env,GOVEE_RATE_GATE:{idFromName:()=> 'account',get:()=>({fetch:async(url)=>{
+  const route=new URL(url).pathname;steps.push(route);
+  return route==='/devices'?Response.json({ok:true,devices:[d]}):Response.json({ok:false,retryAfterMs:3000},{status:429});
+ }})}};
+ globalThis.fetch=async()=>{throw Error('No Govee request may follow rejected quota');};
+ try{
+  const r=await worker.fetch(req('/api/state',{sku:d.sku,device:d.device}),controlled);
+  assert.equal(r.status,429);assert.equal((await r.json()).retryAfterMs,3000);
+  assert.deepEqual(steps,['/devices','/reserve-state']);
+ }finally{globalThis.fetch=old;}
+});
