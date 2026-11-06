@@ -81,3 +81,10 @@ PAKET PRUEFEN:
         -> liest WINDOWS_BUILD_MANIFEST.json
         -> prueft alle gelisteten Dateien mit SHA-256
         -> meldet fehlende oder veraenderte Dateien
+
+
+EVIDENZ EXPORT:
+    EXPORT_EVIDENCE.bat
+        -> sammelt vorhandene READ-ONLY Diagnose, lokale Registry und BLE-Evidenz
+        -> erzeugt ein ZIP unter exports\ mit SHA-256 Manifest
+        -> fuehrt keine Hardware-Writes aus

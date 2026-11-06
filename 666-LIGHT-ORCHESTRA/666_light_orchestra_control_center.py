@@ -339,6 +339,7 @@ class App(tk.Tk):
         actionbar.pack(anchor="w", pady=10)
         NeonButton(actionbar,"RUN READ-ONLY DIAGNOSTICS",self.run_diagnostics,accent=GREEN).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"VERIFY PACKAGE",self.verify_package,accent=LILAC).pack(side="left",padx=(0,8))
+        NeonButton(actionbar,"EXPORT EVIDENCE",self.export_evidence,accent=CYAN).pack(side="left",padx=(0,8))
         NeonButton(actionbar,"OPEN ADVANCED LAB INFO",lambda:self._show_page("Lab"),accent=CYAN).pack(side="left")
 
     def _build_lab(self, parent):
@@ -365,6 +366,21 @@ class App(tk.Tk):
             messagebox.showwarning("Bluetooth Recovery", "Recovery script is missing from this package.")
         except Exception as exc:
             messagebox.showerror("Bluetooth Recovery", str(exc))
+
+    def export_evidence(self):
+        base = Path.cwd()
+        batch = base / "EXPORT_EVIDENCE.bat"
+        script = base / "EXPORT_EVIDENCE.ps1"
+        try:
+            if batch.is_file():
+                subprocess.Popen(["cmd.exe", "/c", "start", "", str(batch)], cwd=str(base))
+                return
+            if script.is_file():
+                subprocess.Popen(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)], cwd=str(base))
+                return
+            messagebox.showwarning("Evidence Export", "Evidence export script is missing.")
+        except Exception as exc:
+            messagebox.showerror("Evidence Export", str(exc))
 
     def verify_package(self):
         base = Path.cwd()

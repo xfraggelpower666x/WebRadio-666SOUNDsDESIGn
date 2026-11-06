@@ -115,6 +115,8 @@ jobs:
             "BLUETOOTH_RECOVERY.ps1",
             "VERIFY_PACKAGE.ps1",
             "VERIFY_PACKAGE.bat",
+            "EXPORT_EVIDENCE.ps1",
+            "EXPORT_EVIDENCE.bat",
             "README_FIRST_WINDOWS.txt",
             "README.md",
             "requirements.txt",
@@ -154,7 +156,9 @@ jobs:
             "$pkg\RUN_BLUETOOTH_RECOVERY.bat",
             "$pkg\BLUETOOTH_RECOVERY.ps1",
             "$pkg\VERIFY_PACKAGE.ps1",
-            "$pkg\VERIFY_PACKAGE.bat"
+            "$pkg\VERIFY_PACKAGE.bat",
+            "$pkg\EXPORT_EVIDENCE.ps1",
+            "$pkg\EXPORT_EVIDENCE.bat"
           )
           foreach ($path in $requiredPackagePaths) {
             if (-not (Test-Path $path)) { throw "Complete-package contract failed: $path" }
