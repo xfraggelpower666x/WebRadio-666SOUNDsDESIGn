@@ -11,3 +11,20 @@ test('unknown advertised range fails closed',()=>assert.equal(validateCapability
 test('audio dry-run authenticates and never invokes upstream',async()=>{const x=await worker.fetch(req('/api/audio/preview',{energy:.6,scene:'build'}),env);assert.equal(x.status,200);assert.equal((await x.json()).executed,false);});
 test('group rejects duplicates before upstream',async()=>{const m={sku:'H6047',device:'60:74:F4:40:D9:A2'},x=await worker.fetch(req('/api/groups/control',{members:[m,m],capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),env);assert.equal(x.status,400);});
 test('missing secret locks protected endpoints',async()=>{const x=await worker.fetch(req('/api/audio/preview',{}),{});assert.equal(x.status,503);});
+
+test('official Govee data array returns registered devices',async()=>{
+ const saved=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;return new Response(JSON.stringify({code:200,data:[{sku:'H6047',device:'60:74:F4:40:D9:A2',deviceName:'Bars',capabilities:[]}]}),{status:200,headers:{'Content-Type':'application/json'}});};
+ try{
+  const x=await worker.fetch(new Request('https://example.invalid/api/devices',{headers:{Authorization:'Bearer test-token'}}),env);
+  assert.equal(x.status,200);const body=await x.json();assert.equal(body.devices.length,1);assert.equal(body.devices[0].sku,'H6047');assert.equal(calls,1);
+ }finally{globalThis.fetch=saved;}
+});
+test('Govee upstream 429 is surfaced without attempting control',async()=>{
+ const saved=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;return new Response(JSON.stringify({code:429,message:'Too many requests'}),{status:429,headers:{'Content-Type':'application/json'}});};
+ try{
+  const x=await worker.fetch(new Request('https://example.invalid/api/devices',{headers:{Authorization:'Bearer test-token'}}),env);
+  assert.equal(x.status,429);assert.equal((await x.json()).ok,false);assert.equal(calls,1);
+ }finally{globalThis.fetch=saved;}
+});
