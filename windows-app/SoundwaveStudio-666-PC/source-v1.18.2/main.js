@@ -325,12 +325,8 @@ function openDetachedVisualizer(){
   if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()){
     detachedVisualizerWindow.show();detachedVisualizerWindow.focus();return {ok:true,focused:true,bounds:detachedVisualizerWindow.getBounds()};
   }
-  const state=readOverlayState(); const s=state.windows?.visualizerNative||{};
-  const d=screen.getDisplayMatching(mainWindow.getBounds());
-  const wa=d.workArea;
-  const b=(Number.isFinite(s.x)&&Number.isFinite(s.y)&&Number.isFinite(s.width)&&Number.isFinite(s.height))
-    ? {x:s.x,y:s.y,width:Math.max(480,s.width),height:Math.max(300,s.height)}
-    : {x:wa.x+40,y:wa.y+40,width:Math.min(1100,wa.width-80),height:Math.min(720,wa.height-80)};
+  const base=overlayBoundsFor('visualizerNative',{width:1100,height:720});
+  const b={...base,width:Math.max(480,base.width),height:Math.max(300,base.height)};
   const w=new BrowserWindow({
     ...b,minWidth:480,minHeight:300,resizable:true,frame:true,show:false,
     title:'RADIO WAVE v6.66 · VISUALIZER',
@@ -378,7 +374,27 @@ function startOutputWatchdog(){
   },10000);
   outputWatchdog.unref?.();
 }
-function reconcileOutputWindows(){ const all=screen.getAllDisplays(); const valid=new Map(all.map(d=>[d.id,d])); for(const [id,w] of outputWindows){ const d=valid.get(id); if(!d){try{w.close();}catch{} outputWindows.delete(id); continue;} if(w&&!w.isDestroyed()){const b=d.bounds; try{w.setBounds({x:b.x,y:b.y,width:b.width,height:b.height},false); if(!w.isFullScreen())w.setFullScreen(true);}catch{}} } return outputStatus(); }
+function boundsIntersectAnyDisplay(b){
+  if(!b)return false;
+  return screen.getAllDisplays().some(d=>b.x+b.width>d.workArea.x&&b.x<d.workArea.x+d.workArea.width&&b.y+b.height>d.workArea.y&&b.y<d.workArea.y+d.workArea.height);
+}
+function reconcileDetachedWindows(){
+  for(const [key,w] of detachedOverlayWindows){
+    if(!w||w.isDestroyed())continue;
+    const b=w.getBounds();
+    if(!boundsIntersectAnyDisplay(b)){
+      try{w.setBounds(overlayBoundsFor(key,b),false);saveDetachedOverlayWindow(key,w,true);}catch{}
+    }
+  }
+  if(detachedVisualizerWindow&&!detachedVisualizerWindow.isDestroyed()){
+    const b=detachedVisualizerWindow.getBounds();
+    if(!boundsIntersectAnyDisplay(b)){
+      const next=overlayBoundsFor('visualizerNative',b);
+      try{detachedVisualizerWindow.setBounds({...next,width:Math.max(480,next.width),height:Math.max(300,next.height)},false);}catch{}
+    }
+  }
+}
+function reconcileOutputWindows(){ const all=screen.getAllDisplays(); const valid=new Map(all.map(d=>[d.id,d])); for(const [id,w] of outputWindows){ const d=valid.get(id); if(!d){try{w.close();}catch{} outputWindows.delete(id); continue;} if(w&&!w.isDestroyed()){const b=d.bounds; try{w.setBounds({x:b.x,y:b.y,width:b.width,height:b.height},false); if(!w.isFullScreen())w.setFullScreen(true);}catch{}} } reconcileDetachedWindows(); return outputStatus(); }
 
 
 
