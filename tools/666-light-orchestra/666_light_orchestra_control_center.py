@@ -69,6 +69,7 @@ class App(tk.Tk):
 
         threading.Thread(target=self.bridge.start, daemon=True).start()
         self.after(900, self.refresh_all)
+        self.after(1300, self.check_bluetooth)
 
     def _configure_ttk(self):
         s = ttk.Style(self)
@@ -153,7 +154,9 @@ class App(tk.Tk):
         self.connected_text = tk.StringVar(value="0 / 0 devices ready")
         tk.Label(right, textvariable=self.connected_text, bg="#02030a", fg=MUTED, font=("Segoe UI", 9)).pack(anchor="e")
         self.audio_text = tk.StringVar(value="Audio Reactive: OFF")
+        self.bluetooth_text = tk.StringVar(value="Bluetooth: NOT CHECKED")
         tk.Label(right, textvariable=self.audio_text, bg="#02030a", fg=CYAN, font=("Segoe UI", 9)).pack(anchor="e")
+        tk.Label(right, textvariable=self.bluetooth_text, bg="#02030a", fg=LILAC, font=("Segoe UI", 9, "bold")).pack(anchor="e")
 
     def _panel(self, parent, title):
         wrap = tk.Frame(parent, bg=PANEL, highlightthickness=1, highlightbackground="#17396d")
@@ -209,6 +212,7 @@ class App(tk.Tk):
     def _build_devices(self, parent):
         toolbar = tk.Frame(parent, bg=BG)
         toolbar.pack(fill="x", padx=12, pady=(12,6))
+        NeonButton(toolbar, "BLUETOOTH CHECK", self.check_bluetooth, accent=LILAC).pack(side="left", padx=4)
         NeonButton(toolbar, "SEARCH BLE DEVICES", self.scan_devices).pack(side="left", padx=4)
         NeonButton(toolbar, "SEARCH GOVEE LAN", self.discover_govee, accent=GREEN).pack(side="left", padx=4)
         NeonButton(toolbar, "REFRESH", self.refresh_all, accent=LILAC).pack(side="left", padx=4)
@@ -396,8 +400,37 @@ class App(tk.Tk):
         sel=self.device_tree.selection()
         if sel: self.selected_device.set(sel[0])
 
+    def check_bluetooth(self):
+        self.discovery_status.set("CHECKING BLUETOOTH ADAPTER...")
+        def worker():
+            result = self.engine.bluetooth_preflight()
+            self.after(0, lambda: self._bluetooth_checked(result, False))
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _bluetooth_checked(self, result, show_dialog=True):
+        state = str(result.get("adapter_state") or "UNKNOWN")
+        reason = str(result.get("reason") or "")
+        service = str(result.get("service_state") or "UNKNOWN")
+        adapters = result.get("adapters") or []
+        if result.get("ok"):
+            name = adapters[0].get("name") if adapters else "Bluetooth adapter"
+            self.bluetooth_text.set(f"Bluetooth: READY · {name}")
+            self.discovery_status.set("BLUETOOTH READY")
+            if show_dialog:
+                messagebox.showinfo("Bluetooth Preflight", f"Adapter ready:\n{name}\n\nBluetooth service: {service}")
+        else:
+            self.bluetooth_text.set(f"Bluetooth: {state}")
+            self.discovery_status.set(reason or state)
+            if show_dialog:
+                details = "\n".join(f"{x.get('name')} · {x.get('status')}" for x in adapters) or "No usable physical adapter reported."
+                messagebox.showwarning(
+                    "Bluetooth Preflight",
+                    f"{reason or state}\n\nBluetooth service: {service}\n\n{details}\n\n"
+                    "Windows must expose a working Bluetooth adapter before LIGHT ORCHESTRA can discover BLE lamps."
+                )
+
     def scan_devices(self):
-        self.discovery_status.set("SCANNING BLE · 6 SECONDS...")
+        self.discovery_status.set("SCANNING BLE · 8 SECONDS...")
         if hasattr(self, "discovery_tree"):
             for item in self.discovery_tree.get_children():
                 self.discovery_tree.delete(item)
@@ -405,6 +438,9 @@ class App(tk.Tk):
 
     def _scan_done(self, result):
         discovered = result.get("devices", []) if isinstance(result, dict) else []
+        preflight = result.get("preflight", {}) if isinstance(result, dict) else {}
+        if preflight:
+            self._bluetooth_checked(preflight, False)
         proposals = ble_model.propose_bindings(discovered, self.engine.registry.all())
         self.discovery_rows = {}
         ble_slots = [x["id"] for x in ble_model.ble_registry_entries(self.engine.registry.all())]
@@ -429,7 +465,11 @@ class App(tk.Tk):
         known = [x for x in proposals if x.get("family") in ("lenze","magic_lantern")]
         self.discovery_status.set(f"SCAN COMPLETE · {len(proposals)} FOUND · {len(known)} RECOGNIZED")
         if not result.get("ok", True):
-            messagebox.showwarning("BLE Discovery", "Windows BLE scan failed:\n" + str(result.get("error") or "unknown error"))
+            error = str(result.get("error") or "unknown error")
+            if error.startswith("BLUETOOTH_") or error == "ONLY_BLUETOOTH_ENUMERATORS_FOUND":
+                messagebox.showwarning("BLE Discovery", "Bluetooth adapter preflight failed:\n" + error + "\n\nCheck Windows Bluetooth / Device Manager before scanning again.")
+            else:
+                messagebox.showwarning("BLE Discovery", "Windows BLE scan failed:\n" + error)
         elif not proposals:
             messagebox.showinfo("BLE Discovery", "Windows reported no visible BLE devices. Check Bluetooth, power the lamps, close the phone app if it is holding a connection, and scan again.")
 

@@ -58,10 +58,14 @@ jobs:
           python -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_LAB" --hidden-import=666_light_orchestra --hidden-import=device_registry 666_light_orchestra_gui.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+          python -m PyInstaller --noconfirm --clean --onefile --name "666_LIGHT_ORCHESTRA_DIAGNOSTICS" --hidden-import=666_light_orchestra --hidden-import=ble_readonly_capture --hidden-import=device_registry 666_light_orchestra_diagnostics.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
           $expected = @(
             "dist\666_LIGHT_ORCHESTRA.exe",
             "dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe",
-            "dist\666_LIGHT_ORCHESTRA_LAB.exe"
+            "dist\666_LIGHT_ORCHESTRA_LAB.exe",
+            "dist\666_LIGHT_ORCHESTRA_DIAGNOSTICS.exe"
           )
           foreach ($path in $expected) {
             if (-not (Test-Path $path)) { throw "Missing EXE: $path" }
@@ -97,6 +101,7 @@ jobs:
           Copy-Item "dist\666_LIGHT_ORCHESTRA.exe" "$pkg\dist\"
           Copy-Item "dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe" "$pkg\dist\"
           Copy-Item "dist\666_LIGHT_ORCHESTRA_LAB.exe" "$pkg\dist\"
+          Copy-Item "dist\666_LIGHT_ORCHESTRA_DIAGNOSTICS.exe" "$pkg\dist\"
 
           $packageFiles = @(
             "ONE_CLICK_SETUP_BUILD_RUN.bat",
@@ -105,6 +110,7 @@ jobs:
             "BUILD_EXE.bat",
             "build_windows.bat",
             "bootstrap_windows.bat",
+            "RUN_DIAGNOSTICS.bat",
             "README_FIRST_WINDOWS.txt",
             "README.md",
             "requirements.txt",
@@ -126,14 +132,17 @@ jobs:
           # Validate the exact package contract that failed in real user testing.
           $requiredPackagePaths = @(
             "$pkg\dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe",
+            "$pkg\dist\666_LIGHT_ORCHESTRA_DIAGNOSTICS.exe",
             "$pkg\666_light_orchestra_control_center.py",
             "$pkg\666_light_orchestra.py",
             "$pkg\666_light_orchestra_gui.py",
+            "$pkg\666_light_orchestra_diagnostics.py",
             "$pkg\device_registry.py",
             "$pkg\light_control_state.py",
             "$pkg\START_SYMPHONY.bat",
             "$pkg\BUILD_EXE.bat",
-            "$pkg\ONE_CLICK_SETUP_BUILD_RUN.bat"
+            "$pkg\ONE_CLICK_SETUP_BUILD_RUN.bat",
+            "$pkg\RUN_DIAGNOSTICS.bat"
           )
           foreach ($path in $requiredPackagePaths) {
             if (-not (Test-Path $path)) { throw "Complete-package contract failed: $path" }

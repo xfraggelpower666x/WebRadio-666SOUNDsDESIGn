@@ -27,11 +27,15 @@ if errorlevel 1 goto :build_fail
 ".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onefile --windowed --name "666_LIGHT_ORCHESTRA_LAB" --hidden-import=666_light_orchestra --hidden-import=device_registry 666_light_orchestra_gui.py
 if errorlevel 1 goto :build_fail
 
+".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean --onefile --name "666_LIGHT_ORCHESTRA_DIAGNOSTICS" --hidden-import=666_light_orchestra --hidden-import=ble_readonly_capture --hidden-import=device_registry 666_light_orchestra_diagnostics.py
+if errorlevel 1 goto :build_fail
+
 echo.
 echo [PASS] EXE build complete:
 echo   dist\666_LIGHT_ORCHESTRA.exe
 echo   dist\666_LIGHT_ORCHESTRA_SYMPHONY.exe
 echo   dist\666_LIGHT_ORCHESTRA_LAB.exe
+echo   dist\666_LIGHT_ORCHESTRA_DIAGNOSTICS.exe
 exit /b 0
 
 :build_fail

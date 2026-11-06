@@ -15,6 +15,7 @@ class WindowsBootstrapContractTests(unittest.TestCase):
             "BUILD_EXE.bat",
             "build_windows.bat",
             "ONE_CLICK_SETUP_BUILD_RUN.bat",
+            "RUN_DIAGNOSTICS.bat",
             "README_FIRST_WINDOWS.txt",
         ):
             self.assertTrue((ROOT / name).is_file(), name)
@@ -42,6 +43,7 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         text = self.read("BUILD_EXE.bat")
         self.assertIn('666_LIGHT_ORCHESTRA_SYMPHONY', text)
         self.assertIn('666_LIGHT_ORCHESTRA_LAB', text)
+        self.assertIn('666_LIGHT_ORCHESTRA_DIAGNOSTICS', text)
         self.assertIn('666_LIGHT_ORCHESTRA"', text)
         self.assertIn("--hidden-import=ble_gui_model", text)
         self.assertIn("bootstrap_windows.bat", text)

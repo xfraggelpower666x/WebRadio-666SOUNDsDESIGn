@@ -6,6 +6,7 @@ import importlib
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 from unittest import mock
 
@@ -55,6 +56,51 @@ class FakeClient:
 
 
 class BleReadOnlyCaptureTests(unittest.TestCase):
+
+    def test_bluetooth_preflight_reports_ready_physical_adapter(self):
+        payload = {
+            "service_status": "Running",
+            "devices": [
+                {"FriendlyName": "Intel(R) Wireless Bluetooth(R)", "Status": "OK", "InstanceId": "USB\\VID_1", "Problem": 0},
+                {"FriendlyName": "Microsoft Bluetooth LE Enumerator", "Status": "OK", "InstanceId": "BTH\\MS", "Problem": 0},
+            ],
+        }
+        proc = SimpleNamespace(returncode=0, stdout=__import__("json").dumps(payload), stderr="")
+        with mock.patch.object(capture.platform, "system", return_value="Windows"), mock.patch.object(
+            capture.subprocess, "run", return_value=proc
+        ):
+            result = capture.bluetooth_preflight()
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["adapter_state"], "READY")
+        self.assertEqual(result["service_state"], "RUNNING")
+        self.assertEqual(len(result["adapters"]), 1)
+        self.assertIn("Intel", result["adapters"][0]["name"])
+
+    def test_bluetooth_preflight_reports_missing_adapter(self):
+        payload = {
+            "service_status": "Stopped",
+            "devices": [
+                {"FriendlyName": "Microsoft Bluetooth LE Enumerator", "Status": "OK", "InstanceId": "BTH\\MS", "Problem": 0}
+            ],
+        }
+        proc = SimpleNamespace(returncode=0, stdout=__import__("json").dumps(payload), stderr="")
+        with mock.patch.object(capture.platform, "system", return_value="Windows"), mock.patch.object(
+            capture.subprocess, "run", return_value=proc
+        ):
+            result = capture.bluetooth_preflight()
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["adapter_state"], "NO_PHYSICAL_ADAPTER")
+        self.assertEqual(result["reason"], "ONLY_BLUETOOTH_ENUMERATORS_FOUND")
+
+    def test_engine_broad_scan_stops_when_adapter_preflight_fails(self):
+        with mock.patch.object(core, "ble_bluetooth_preflight", return_value={
+            "ok": False, "adapter_state": "MISSING", "reason": "BLUETOOTH_ADAPTER_NOT_AVAILABLE"
+        }), mock.patch.object(core, "ble_scan_all") as scanner:
+            engine = core.Engine(core.DEFAULT_CONFIG)
+            result = asyncio.run(engine.scan_all_ble(1.0))
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["error"], "BLUETOOTH_ADAPTER_NOT_AVAILABLE")
+        scanner.assert_not_called()
 
     def test_scan_all_keeps_unknown_devices_and_uses_advertisement_name(self):
         class Dev:

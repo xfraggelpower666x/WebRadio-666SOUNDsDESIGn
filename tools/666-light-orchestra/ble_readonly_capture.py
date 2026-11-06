@@ -6,6 +6,9 @@ services/characteristics, subscribe to notifications, and disconnect.
 from __future__ import annotations
 
 import asyncio
+import json
+import platform
+import subprocess
 import time
 from dataclasses import dataclass, asdict
 from typing import Any, Callable
@@ -76,6 +79,106 @@ def _adv_rssi(dev, adv):
 def _adv_services(adv) -> tuple[str, ...]:
     values = getattr(adv, "service_uuids", None) or ()
     return tuple(sorted({str(x).lower() for x in values if x}))
+
+
+def bluetooth_preflight() -> dict:
+    """Diagnose the local Bluetooth stack without changing adapter/service state."""
+    result = {
+        "ok": False,
+        "platform": platform.system(),
+        "hardware_io": "READ_ONLY_DIAGNOSTIC",
+        "adapter_state": "UNKNOWN",
+        "service_state": "UNKNOWN",
+        "adapters": [],
+        "all_bluetooth_devices": [],
+        "reason": None,
+    }
+    if platform.system().lower() != "windows":
+        result["reason"] = "WINDOWS_REQUIRED_FOR_NATIVE_ADAPTER_PREFLIGHT"
+        return result
+
+    command = (
+        "$ErrorActionPreference='SilentlyContinue';"
+        "$svc=Get-Service bthserv;"
+        "$devs=@(Get-PnpDevice -Class Bluetooth | "
+        "Select-Object FriendlyName,Status,InstanceId,Problem);"
+        "[pscustomobject]@{"
+        "service_status=if($svc){$svc.Status.ToString()}else{'MISSING'};"
+        "devices=$devs"
+        "}|ConvertTo-Json -Depth 5 -Compress"
+    )
+    try:
+        flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        proc = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", command],
+            capture_output=True,
+            text=True,
+            timeout=8,
+            creationflags=flags,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        result["reason"] = "POWERSHELL_PREFLIGHT_FAILED"
+        result["details"] = str(exc)
+        return result
+
+    if proc.returncode != 0 or not proc.stdout.strip():
+        result["reason"] = "BLUETOOTH_PNP_QUERY_FAILED"
+        result["details"] = (proc.stderr or "").strip()
+        return result
+
+    try:
+        payload = json.loads(proc.stdout)
+    except (TypeError, ValueError) as exc:
+        result["reason"] = "BLUETOOTH_PNP_JSON_INVALID"
+        result["details"] = str(exc)
+        return result
+
+    devices = payload.get("devices") or []
+    if isinstance(devices, dict):
+        devices = [devices]
+    normalized = []
+    adapters = []
+    ignore_markers = (
+        "enumerator", "rfcomm", "protocol tdi", "personal area network",
+        "device identification service", "generic attribute service",
+    )
+    for row in devices if isinstance(devices, list) else []:
+        if not isinstance(row, dict):
+            continue
+        name = str(row.get("FriendlyName") or "").strip()
+        status = str(row.get("Status") or "").strip().upper()
+        item = {
+            "name": name,
+            "status": status or "UNKNOWN",
+            "instance_id": str(row.get("InstanceId") or ""),
+            "problem": row.get("Problem"),
+        }
+        normalized.append(item)
+        lname = name.lower()
+        if name and not any(marker in lname for marker in ignore_markers):
+            adapters.append(item)
+
+    service = str(payload.get("service_status") or "UNKNOWN").upper()
+    healthy = [x for x in adapters if x["status"] == "OK"]
+    result["service_state"] = service
+    result["all_bluetooth_devices"] = normalized
+    result["adapters"] = adapters
+
+    if healthy:
+        result["ok"] = True
+        result["adapter_state"] = "READY"
+        result["reason"] = "BLUETOOTH_ADAPTER_READY"
+    elif adapters:
+        result["adapter_state"] = "PRESENT_NOT_READY"
+        result["reason"] = "BLUETOOTH_ADAPTER_DISABLED_OR_DRIVER_ERROR"
+    elif normalized:
+        result["adapter_state"] = "NO_PHYSICAL_ADAPTER"
+        result["reason"] = "ONLY_BLUETOOTH_ENUMERATORS_FOUND"
+    else:
+        result["adapter_state"] = "MISSING"
+        result["reason"] = "BLUETOOTH_ADAPTER_NOT_AVAILABLE"
+    return result
 
 
 async def scan_all(timeout: float = 6.0) -> list[DiscoveredDevice]:

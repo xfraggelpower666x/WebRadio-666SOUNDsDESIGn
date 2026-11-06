@@ -17,7 +17,7 @@ from ble_protocol_design import (
     audio_intent as design_audio_intent,
     plan_command as design_plan_command,
 )
-from ble_readonly_capture import scan_known as ble_scan_known, scan_all as ble_scan_all, capture_read_only as ble_capture_read_only
+from ble_readonly_capture import scan_known as ble_scan_known, scan_all as ble_scan_all, bluetooth_preflight as ble_bluetooth_preflight, capture_read_only as ble_capture_read_only
 from ble_protocol_observation import Observation as ProtocolObservation, evidence_summary as protocol_evidence_summary
 
 try:
@@ -653,18 +653,36 @@ class Engine:
             ],
         }
 
+    def bluetooth_preflight(self):
+        return ble_bluetooth_preflight()
+
     async def scan_all_ble(self, timeout=6.0):
+        preflight = await asyncio.to_thread(ble_bluetooth_preflight)
+        if not preflight.get("ok"):
+            return {
+                "ok": False,
+                "hardware_io": "READ_ONLY_SCAN",
+                "scope": "ALL_VISIBLE_BLE",
+                "devices": [],
+                "preflight": preflight,
+                "error": preflight.get("reason") or "BLUETOOTH_PREFLIGHT_FAILED",
+            }
         try:
             found = await ble_scan_all(timeout=timeout)
         except Exception as exc:
             return {
-                "ok": False, "hardware_io": "READ_ONLY_SCAN", "scope": "ALL_VISIBLE_BLE",
-                "devices": [], "error": str(exc),
+                "ok": False,
+                "hardware_io": "READ_ONLY_SCAN",
+                "scope": "ALL_VISIBLE_BLE",
+                "devices": [],
+                "preflight": preflight,
+                "error": str(exc),
             }
         return {
             "ok": True,
             "hardware_io": "READ_ONLY_SCAN",
             "scope": "ALL_VISIBLE_BLE",
+            "preflight": preflight,
             "devices": [
                 {
                     "name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi,
