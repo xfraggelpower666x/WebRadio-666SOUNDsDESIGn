@@ -14,14 +14,22 @@ test('production deploy fails closed before Worker deploys when AutoDJ secret is
   assert.ok(verifyIndex > -1 && passwordDeployIndex > verifyIndex);
 });
 
-test('main Worker deploy binds AutoDJ access token through wrangler-action secrets input', () => {
+test('main Worker deploy binds AutoDJ secret atomically with the exact Worker version', () => {
   const mainDeployIndex = workflow.indexOf('deploy-webradio-worker:');
   assert.ok(mainDeployIndex > -1);
   const mainDeploy = workflow.slice(mainDeployIndex);
   assert.match(mainDeploy, /uses: cloudflare\/wrangler-action@v3/);
   assert.match(mainDeploy, /wranglerVersion: "4\.111\.0"/);
-  assert.match(mainDeploy, /secrets:\s*\|\s*\n\s*S666_AUTODJ_SKIP_ACCESS_TOKEN/);
-  assert.match(mainDeploy, /env:\s*\n\s*S666_AUTODJ_SKIP_ACCESS_TOKEN: \$\{\{ secrets\.S666_AUTODJ_SKIP_ACCESS_TOKEN \}\}/);
+  assert.match(mainDeploy, /command: deploy --secrets-file/);
+  assert.match(mainDeploy, /Prepare ephemeral Wrangler secrets file/);
+  assert.match(mainDeploy, /S666_AUTODJ_SKIP_ACCESS_TOKEN: /);
+  assert.match(mainDeploy, /umask 077/);
+  assert.match(mainDeploy, /mode: 0o600/);
+  assert.match(mainDeploy, /if \(!token\)/);
+  assert.match(mainDeploy, /Remove ephemeral Wrangler secrets file/);
+  assert.match(mainDeploy, /if: always\(\)/);
+  assert.match(mainDeploy, /rm -f/);
+  assert.doesNotMatch(mainDeploy, /secrets:\s*\|\s*\n\s*S666_AUTODJ_SKIP_ACCESS_TOKEN/);
 });
 
 test('workflow never contains an AutoDJ access-token literal', () => {

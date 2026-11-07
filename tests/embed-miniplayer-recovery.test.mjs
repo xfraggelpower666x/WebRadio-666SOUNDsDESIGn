@@ -56,3 +56,14 @@ test('iPhone display-only fallback retains separate non-measured contract and re
   assert.match(html,/meterAvailable:!!\(playing&&!audio\.muted&&visualActive/);
   assert.match(html,/lastFrequencyPeak>0\|\|lastWaveformRms>0\.001/);
 });
+
+test('manual STOP suppresses stale HUD faults while intended playback still reports real errors',()=>{
+  assert.match(html,/wanted=false;audioFault=false;audioWaiting=false;retrying=false;window\.S666AllPlayerAudioRecovery\?\.markManualStop\(audio\)/);
+  assert.match(html,/async function play\(\)\{wanted=true;audioFault=false;audioWaiting=false/);
+  assert.match(html,/if\(!wanted\)\{watchdogStatus='idle';watchdogProgressAt=0;return\}/);
+  assert.match(html,/if\(audioFault\)\{watchdogStatus='fault';return\}/);
+  assert.match(html,/if\(audio\.paused\)\{watchdogStatus='buffering';return\}/);
+  assert.match(html,/error:!!wanted&&!!audioFault/);
+  assert.match(html,/recovering:!!wanted&&!!retrying/);
+  assert.match(html,/waiting:!!wanted&&!!audioWaiting/);
+});
