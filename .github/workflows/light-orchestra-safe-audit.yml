@@ -1,0 +1,78 @@
+name: LIGHT ORCHESTRA offline audit + source archive
+on:
+  push:
+    branches:
+      - feature/666-light-orchestra-v0.1.0
+    paths:
+      - "tools/666-light-orchestra/**"
+      - "666-LIGHT-ORCHESTRA/**"
+      - ".github/workflows/light-orchestra-safe-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    name: Source-only Python audit (no hardware writes)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax compile
+        run: |
+          python -m compileall -q tools/666-light-orchestra 666-LIGHT-ORCHESTRA
+      - name: Offline regression tests
+        run: |
+          python -m unittest discover -s tools/666-light-orchestra/tests -v
+      - name: Verify source mirrors and create snapshot zip
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, zipfile
+          src = pathlib.Path("tools/666-light-orchestra")
+          root = pathlib.Path("666-LIGHT-ORCHESTRA")
+          checked = []
+          for p in sorted(src.rglob("*")):
+              if not p.is_file() or "__pycache__" in p.parts or p.suffix == ".pyc":
+                  continue
+              target = root / p.relative_to(src)
+              assert target.is_file(), f"Mirror missing: {target}"
+              assert p.read_bytes() == target.read_bytes(), f"Mirror diverged: {p}"
+              checked.append(p.relative_to(src).as_posix())
+          for p in sorted(pathlib.Path("docs").glob("LIGHT_ORCHESTRA_*.md")):
+              target = root / "docs" / p.name
+              if target.is_file():
+                  assert p.read_bytes() == target.read_bytes(), f"Document mirror diverged: {p}"
+          assert len(checked) >= 10, f"Unexpectedly incomplete source: {checked}"
+          files = sorted(p for p in root.rglob("*") if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc")
+          out = pathlib.Path("freeze")
+          out.mkdir(exist_ok=True)
+          manifest = {
+              "source_commit": os.environ["SOURCE_SHA"],
+              "source_branch": "feature/666-light-orchestra-v0.1.0",
+              "release_class": "SOURCE_ONLY_HARDWARE_UNVERIFIED",
+              "files": [
+                  {"path": p.relative_to(root).as_posix(), "sha256": hashlib.sha256(p.read_bytes()).hexdigest(), "size": p.stat().st_size}
+                  for p in files
+              ],
+              "source_mirror_checked": checked,
+          }
+          manifest_path = out / "manifest.json"
+          manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          with zipfile.ZipFile(out / "666_LIGHT_ORCHESTRA_SOURCE_FREEZE_CANDIDATE.zip", "w", compression=zipfile.ZIP_DEFLATED) as z:
+              for p in files:
+                  z.write(p, "666-LIGHT-ORCHESTRA/" + p.relative_to(root).as_posix())
+              z.write(manifest_path, "manifest.json")
+          with zipfile.ZipFile(out / "666_LIGHT_ORCHESTRA_SOURCE_FREEZE_CANDIDATE.zip") as z:
+              assert z.testzip() is None
+              assert len(z.namelist()) == len(files) + 1
+          print("PASS: mirror", len(checked), "source files; zip", len(files), "files")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LIGHT_ORCHESTRA_SOURCE_FREEZE_CANDIDATE
+          path: freeze/
+          if-no-files-found: error
+          retention-days: 30
