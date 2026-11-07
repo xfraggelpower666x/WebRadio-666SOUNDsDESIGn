@@ -221,3 +221,8 @@ This distinction helps identify a reachable H6047 whose LAN Control/UDP path is 
 ### Bound BLE GATT batch evidence
 
 The read-only diagnostics/system-check path now verifies every currently bound BLE slot using the same FFF0/FFF3/FFF4 GATT inspection contract as the GUI. The batch result is included in diagnostics and the system-check receipt, and the evidence export carries both receipts. This remains identity/protocol evidence only: write count stays zero and no capability is auto-promoted.
+
+
+### External protocol provenance
+
+See `EXTERNAL_PROTOCOL_EVIDENCE.md` for the current independently sourced Magic-Lantern/FFF0 evidence, contradictions and fail-closed promotion policy. External protocol research is candidate-only and never substitutes real owner hardware validation.

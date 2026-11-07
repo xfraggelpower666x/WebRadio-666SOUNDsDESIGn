@@ -55,7 +55,7 @@ def classify_name(name: str | None) -> str | None:
         return None
     if value.startswith("lenze-rgb") or "lenze-rgb" in value:
         return "lenze"
-    if value.startswith("oc21w") or "oc21w" in value:
+    if value.startswith("oc21w") or "oc21w" in value or value.startswith("melk-") or "melk-oc21" in value:
         return "magic_lantern"
     return None
 

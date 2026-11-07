@@ -138,6 +138,8 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
     def test_classify_name_accepts_embedded_known_names(self):
         self.assertEqual(capture.classify_name("LED LENZE-RGB Living"), "lenze")
         self.assertEqual(capture.classify_name("Magic OC21W Strip"), "magic_lantern")
+        self.assertEqual(capture.classify_name("MELK-OC21"), "magic_lantern")
+        self.assertEqual(capture.classify_name("MELK-FLOOR-LAMP"), "magic_lantern")
         self.assertIsNone(capture.classify_name("Generic BLE"))
 
     def test_registry_binding_persists_but_disables_device(self):
