@@ -34,3 +34,13 @@ test('MET diagnostic copy control and dialog remain present', () => {
   assert.match(dash, /id="hudCopyStatus"/);
   assert.match(dash, /id="hudModal"/);
 });
+
+test('Shoutcast peak and listener limit only use verified numeric API data', () => {
+  assert.match(dash,/let stats=await fetchData\('\/api\/shoutcast\/stats'\)/);
+  assert.match(dash,/if\(!stats\?\.ok\)\{stats=await fetchData\('\/api\/shoutcast\/stats'\);\}/);
+  assert.match(dash,/const realPeak=stats\?\.ok===true&&valid\(stats\.peaklisteners\)/);
+  assert.match(dash,/const realLimit=stats\?\.ok===true&&valid\(stats\.maxlisteners\)/);
+  assert.match(dash,/peak\.textContent=realPeak\?String\(stats\.peaklisteners\):'–'/);
+  assert.match(dash,/limit\.textContent=realLimit\?String\(stats\.maxlisteners\):'–'/);
+  assert.match(dash,/Shoutcast-Statistik derzeit nicht abrufbar; keine Ersatzwerte/);
+});
