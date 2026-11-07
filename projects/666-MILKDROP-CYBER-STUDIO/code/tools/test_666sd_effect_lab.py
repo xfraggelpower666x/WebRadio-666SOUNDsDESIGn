@@ -24,6 +24,17 @@ class EffectLabTests(unittest.TestCase):
                     self.assertIn("per_pixel_1=", text)
                     self.assertTrue(text.endswith("\n"))
 
+    def test_q_bus_uses_persistent_audio_memory(self):
+        text = lab.generate("vortex", "neon")
+        self.assertIn("per_frame_init_1=bass_smooth=0;", text)
+        self.assertIn("per_frame_init_2=treb_smooth=0;", text)
+        self.assertIn("bass_smooth=0.88*bass_smooth", text)
+        self.assertIn("treb_smooth=0.88*treb_smooth", text)
+        self.assertIn("q1=bass_smooth;", text)
+        self.assertIn("q2=treb_smooth;", text)
+        self.assertNotIn("q1=0.88*q1", text)
+        self.assertNotIn("q2=0.88*q2", text)
+
     def test_determinism(self):
         self.assertEqual(lab.generate("vortex", "neon"), lab.generate("vortex", "neon"))
 
