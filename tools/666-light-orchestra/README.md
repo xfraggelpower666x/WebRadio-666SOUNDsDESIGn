@@ -216,3 +216,8 @@ This distinction helps identify a reachable H6047 whose LAN Control/UDP path is 
 - Discovery binding persists the fingerprint alongside the Windows BLE identity.
 - `VERIFY ALL BOUND BLE` performs sequential read-only GATT checks for every bound LENZE/OC21W slot.
 - Batch verification performs zero writes and never changes hardware verification or write authority.
+
+
+### Bound BLE GATT batch evidence
+
+The read-only diagnostics/system-check path now verifies every currently bound BLE slot using the same FFF0/FFF3/FFF4 GATT inspection contract as the GUI. The batch result is included in diagnostics and the system-check receipt, and the evidence export carries both receipts. This remains identity/protocol evidence only: write count stays zero and no capability is auto-promoted.

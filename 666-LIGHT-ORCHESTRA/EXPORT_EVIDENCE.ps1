@@ -21,6 +21,7 @@ function Copy-IfExists($source, $destName) {
 }
 
 Copy-IfExists (Join-Path $base "diagnostics\LIGHT_ORCHESTRA_DIAGNOSTICS.json") "LIGHT_ORCHESTRA_DIAGNOSTICS.json"
+Copy-IfExists (Join-Path $base "diagnostics\LIGHT_ORCHESTRA_SYSTEM_CHECK.json") "LIGHT_ORCHESTRA_SYSTEM_CHECK.json"
 
 $localRoot = Join-Path $HOME ".666soundsdesign\light-orchestra"
 Copy-IfExists (Join-Path $localRoot "devices.local.json") "devices.local.json"

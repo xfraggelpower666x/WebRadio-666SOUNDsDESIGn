@@ -84,6 +84,17 @@ async def collect():
     if bluetooth.get("ok"):
         ble = await engine.scan_all_ble(8.0)
 
+    gatt_batch = await engine.verify_all_bound_ble() if bluetooth.get("ok") else {
+        "ok": False,
+        "hardware_io": "READ_ONLY_GATT_VERIFY_BATCH",
+        "results": [],
+        "bound_device_count": 0,
+        "write_operations": 0,
+        "hardware_verified": False,
+        "automatic_write_enable": False,
+        "error": bluetooth.get("reason") or "BLUETOOTH_NOT_READY",
+    }
+
     govee = await engine.govee.discover()
     govee_ip = govee.get("ip") or cfg.get("govee", {}).get("device_ip")
     govee_network = await asyncio.to_thread(ping_host, govee_ip)
@@ -98,6 +109,7 @@ async def collect():
         "hardware_writes_performed": 0,
         "bluetooth": bluetooth,
         "ble_scan": ble,
+        "gatt_batch": gatt_batch,
         "govee": govee,
         "govee_network": {"ip": govee_ip, **govee_network},
         "network_context": network_context,
@@ -117,6 +129,7 @@ def main():
 
     bt = report["bluetooth"]
     ble = report["ble_scan"]
+    gatt = report["gatt_batch"]
     g = report["govee"]
     gn = report["govee_network"]
     print("============================================================")
@@ -129,6 +142,9 @@ def main():
         first = drivers[0]
         print(f"Bluetooth driver: {first.get('DeviceName')} / {first.get('DriverVersion')} / {first.get('DriverProviderName')}")
     print(f"BLE visible devices: {len(ble.get('devices') or [])}")
+    gatt_rows = gatt.get("results") or []
+    gatt_pass = sum(1 for row in gatt_rows if row.get("ok"))
+    print(f"Bound BLE GATT verify: {gatt_pass}/{len(gatt_rows)} PASS / writes={gatt.get('write_operations', 0)}")
     print(f"Govee: {'FOUND' if g.get('ok') else 'NOT FOUND'} / {g.get('ip')} / {g.get('source')}")
     print(f"Govee network reachability: {gn.get('reason')} / {gn.get('ip')}")
     nc = report.get("network_context") or {}

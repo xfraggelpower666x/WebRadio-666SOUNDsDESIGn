@@ -39,6 +39,8 @@ $btState = "UNKNOWN"
 $bleCount = 0
 $goveeState = "UNKNOWN"
 $goveeNetwork = "UNKNOWN"
+$gattPass = 0
+$gattTotal = 0
 
 if (Test-Path $diagReport) {
     try {
@@ -47,6 +49,9 @@ if (Test-Path $diagReport) {
         $bleCount = @($diag.ble_scan.devices).Count
         $goveeState = if ($diag.govee.ok) { "FOUND" } else { "NOT_FOUND" }
         $goveeNetwork = [string]$diag.govee_network.reason
+        $gattRows = @($diag.gatt_batch.results)
+        $gattTotal = $gattRows.Count
+        $gattPass = @($gattRows | Where-Object { $_.ok -eq $true }).Count
 
         if (-not $diag.bluetooth.ok) {
             $next += "Run RUN_BLUETOOTH_RECOVERY.bat, then BLUETOOTH CHECK."
@@ -70,6 +75,11 @@ if (Test-Path $diagReport) {
         $ocBound = @($diag.registry | Where-Object { $_.family -eq "magic_lantern" -and $_.windows_ble_address }).Count
         if ($lenzeBound -lt 2) { $next += "LENZE: bind remaining Windows BLE addresses." }
         if ($ocBound -lt 4) { $next += "OC21W: bind remaining Windows BLE addresses." }
+        if ($gattTotal -gt 0 -and $gattPass -lt $gattTotal) {
+            $next += "One or more bound BLE devices failed read-only GATT verification: re-scan/re-bind or free the device from the phone app."
+        } elseif ($gattTotal -gt 0) {
+            $next += "All currently bound BLE devices passed read-only GATT verification."
+        }
         $next += "LENZE/OC21W writes remain blocked until real protocol evidence closes their hardware gates."
     } catch {
         $next += "Diagnostics report could not be parsed: $($_.Exception.Message)"
@@ -86,6 +96,8 @@ $summary = [ordered]@{
     diagnostics = $diagState
     bluetooth_adapter_state = $btState
     visible_ble_devices = $bleCount
+    bound_ble_gatt_pass = $gattPass
+    bound_ble_gatt_total = $gattTotal
     govee = $goveeState
     govee_network = $goveeNetwork
     hardware_writes_performed = 0
@@ -99,6 +111,7 @@ Write-Host ("Package integrity : " + $packageState)
 Write-Host ("Diagnostics       : " + $diagState)
 Write-Host ("Bluetooth adapter : " + $btState)
 Write-Host ("Visible BLE       : " + $bleCount)
+Write-Host ("Bound BLE GATT    : " + $gattPass + "/" + $gattTotal + " PASS")
 Write-Host ("Govee             : " + $goveeState)
 Write-Host ("Govee network     : " + $goveeNetwork)
 Write-Host "Hardware writes   : 0"

@@ -78,6 +78,7 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn("hardware_writes_performed = 0", text)
         self.assertIn("get-filehash", text)
         self.assertIn("compress-archive", text)
+        self.assertIn("light_orchestra_system_check.json", text)
         self.assertNotIn("write_gatt", text)
         self.assertNotIn("devcontrol", text)
 
@@ -87,6 +88,7 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertIn("next_actions", text)
         self.assertIn("run_bluetooth_recovery.bat", text)
         self.assertIn("govee", text)
+        self.assertIn("bound_ble_gatt", text)
         self.assertNotIn("write_gatt", text)
         self.assertNotIn("devcontrol", text)
 
