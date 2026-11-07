@@ -117,10 +117,10 @@ def generate(effect: str, palette: str, bpm: float = 146.0, intensity: float = 0
     for name in ("wave", "ob", "mv"):
         lines.extend(f"{name}_{axis}={value:.6f}" for axis, value in zip("rgb", (r, g, b)))
     lines.extend([
-        "per_frame_init_1=q1=0;",
-        "per_frame_init_2=q2=0;",
-        "per_frame_1=q1=0.88*q1+0.12*min(3,max(0,bass_att));",
-        "per_frame_2=q2=0.88*q2+0.12*min(3,max(0,treb_att));",
+        "per_frame_init_1=bass_smooth=0;",
+        "per_frame_init_2=treb_smooth=0;",
+        "per_frame_1=bass_smooth=0.88*bass_smooth+0.12*min(3,max(0,bass_att));q1=bass_smooth;",
+        "per_frame_2=treb_smooth=0.88*treb_smooth+0.12*min(3,max(0,treb_att));q2=treb_smooth;",
         f"per_frame_3=phase=time*{2*math.pi*bpm/60:.6f};",
         f"per_frame_4=zoom=1+{0.018*intensity:.6f}*sin(phase)+{0.013*intensity:.6f}*q1;",
         f"per_frame_5=rot={0.011*intensity:.6f}*sin(time*0.37);",
