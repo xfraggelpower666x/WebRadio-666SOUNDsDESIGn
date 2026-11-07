@@ -1,5 +1,5 @@
 {
-  "version": "1.1.2-dev-milkdrop",
+  "version": "1.1.2-dev-windows-app-milkdrop",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "projects": [
     {
@@ -62,10 +62,25 @@
         "pc app"
       ],
       "roots": [
-        "windows-app/SoundwaveStudio-666-PC/"
+        "windows-app/SoundwaveStudio-666-PC/",
+        "windows-app/SoundwaveStudio-666-PC/milkdrop-cyber-studio/"
       ],
       "scope": "PORTABLE_WINDOWS_WEBRADIO_APP",
-      "verified": true
+      "verified": true,
+      "subprojects": [
+        {
+          "id": "MILKDROP_CYBER_STUDIO",
+          "name": "666SOUNDsDESIGn MilkDrop Cyber Studio",
+          "root": "windows-app/SoundwaveStudio-666-PC/milkdrop-cyber-studio/",
+          "role": "ADDITIVE_MILKDROP_AUTHORING_TOOLING_FOR_RADIO_WAVE",
+          "runtime_owner": "WINDOWS_APP",
+          "audio_owner": "SOUNDWAVE_ONLY",
+          "source_status": "PARTIAL_MIGRATION_NOT_NATIVE_RENDERER",
+          "verified_checkpoint": true,
+          "separate_from_webradio": true,
+          "activation_rule": "WINDOWS_APP_PROJECT_SCOPE"
+        }
+      ]
     },
     {
       "id": "LIGHT_ORCHESTRA",
@@ -110,28 +125,6 @@
       "continuity_checkpoint": "projects/666-GOVEE-CONTROL/checkpoints/2026-10-17-initial/PROJECT_CHECKPOINT.md",
       "separate_from": "LIGHT_ORCHESTRA",
       "activation_rule": "EXPLICIT_CHAT_LOCAL_INTENT_AND_CURRENT_READBACK"
-    },
-    {
-      "id": "MILKDROP_CYBER_STUDIO",
-      "name": "666SOUNDsDESIGn MilkDrop Cyber Studio",
-      "aliases": [
-        "milkdrop cyber studio",
-        "milkdrop preset studio",
-        "666sd preset studio",
-        "cyber effect lab"
-      ],
-      "roots": [
-        "projects/666-MILKDROP-CYBER-STUDIO/"
-      ],
-      "scope": "INDEPENDENT_MILKDROP_PRESET_SHADER_GPU_STUDIO",
-      "verified_checkpoint": true,
-      "implementation_status": "PARTIAL_SOURCE_MIGRATION_DEV_ONLY",
-      "activation_rule": "EXPLICIT_CHAT_LOCAL_PROJECT_INTENT_ONLY",
-      "separate_from": [
-        "WEBRADIO",
-        "WINDOWS_APP"
-      ],
-      "production_deployment": false
     }
   ],
   "systemstart": {
