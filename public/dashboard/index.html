@@ -648,12 +648,21 @@
       catch(_){return null}finally{clearTimeout(timer)}
     }
     async function server(){
-      const [health,meta,stats]=await Promise.all([fetchData('/health'),fetchData('/api/nowplaying'),fetchData('/api/shoutcast/stats')]);
+      const [health,meta]=await Promise.all([fetchData('/health'),fetchData('/api/nowplaying')]);
       mark('WRK',health?.ok===true?'ok':'error',health?.ok?'Worker-Health bestätigt':'Worker-Health fehlt');
       mark('MET',meta?.title?'ok':'error',meta?.title?'Metadaten empfangen':'Keine Titeldaten bestätigt');
+      // Real Shoutcast values only. Retry a transient GET once; never invent peak/limit.
+      const peak=document.getElementById('stPeak'),limit=document.getElementById('stLimit');
+      let stats=await fetchData('/api/shoutcast/stats');
+      if(!stats?.ok){stats=await fetchData('/api/shoutcast/stats');}
       const valid=n=>Number.isSafeInteger(n)&&n>=0;
-      document.getElementById('stPeak').textContent=stats?.ok===true&&valid(stats.peaklisteners)?String(stats.peaklisteners):'–';
-      document.getElementById('stLimit').textContent=stats?.ok===true&&valid(stats.maxlisteners)?String(stats.maxlisteners):'–';
+      const realPeak=stats?.ok===true&&valid(stats.peaklisteners);
+      const realLimit=stats?.ok===true&&valid(stats.maxlisteners);
+      peak.textContent=realPeak?String(stats.peaklisteners):'–';
+      limit.textContent=realLimit?String(stats.maxlisteners):'–';
+      const note=stats?.ok===true?'Shoutcast-DNAS: '+(stats.timestamp||'Zeitpunkt unbekannt'):'Shoutcast-Statistik derzeit nicht abrufbar; keine Ersatzwerte';
+      peak.title=realPeak?note:'Peak nicht bestätigt · '+note;
+      limit.title=realLimit?note:'Zuhörerlimit nicht bestätigt · '+note;
     }
     frame?.addEventListener('load',clientState);
     clientState();server();
