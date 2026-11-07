@@ -105,7 +105,7 @@ class SafetyRegression(unittest.TestCase):
         self.assertEqual({v["device"] for v in result["errors"]}, {"govee", "lenze"})
 
     def test_version_and_security_defaults(self):
-        self.assertEqual(core.VERSION, "0.7.2-dev")
+        self.assertEqual(core.VERSION, "0.7.3-dev")
         self.assertFalse(core.DEFAULT_CONFIG["magic_lantern"]["write_enabled"])
         self.assertFalse(core.DEFAULT_CONFIG["magic_lantern"]["protocol_verified"])
         self.assertEqual(core.DEFAULT_CONFIG["magic_lantern"]["approved_windows_addresses"], [])

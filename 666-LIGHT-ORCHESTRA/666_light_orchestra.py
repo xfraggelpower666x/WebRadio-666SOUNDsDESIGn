@@ -26,7 +26,7 @@ except Exception:
     BleakClient = None
     BleakScanner = None
 
-VERSION = "0.7.2-dev"
+VERSION = "0.7.3-dev"
 LENZE_SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
 LENZE_WRITE_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
 LENZE_NOTIFY_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"
@@ -667,6 +667,9 @@ class Engine:
                 {
                     "name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi,
                     "advertised_name": d.advertised_name, "service_uuids": list(d.service_uuids),
+                    "manufacturer_data": [list(x) for x in d.manufacturer_data],
+                    "service_data": [list(x) for x in d.service_data],
+                    "fingerprint": d.fingerprint,
                 }
                 for d in found
             ],
@@ -706,18 +709,52 @@ class Engine:
                 {
                     "name": d.name, "address": d.address, "family": d.family, "rssi": d.rssi,
                     "advertised_name": d.advertised_name, "service_uuids": list(d.service_uuids),
+                    "manufacturer_data": [list(x) for x in d.manufacturer_data],
+                    "service_data": [list(x) for x in d.service_data],
+                    "fingerprint": d.fingerprint,
                 }
                 for d in found
             ],
         }
 
-    def bind_windows_ble(self, device_id, address):
-        bound = self.registry.bind_windows_address(str(device_id or ""), address)
+    def bind_windows_ble(self, device_id, address, fingerprint=None):
+        bound = self.registry.bind_windows_identity(str(device_id or ""), address, fingerprint)
         return {
             "ok": True,
             "hardware_io": False,
             "device": bound,
             "notice": "Binding saved disabled; no hardware write permission granted",
+        }
+
+    async def verify_all_bound_ble(self):
+        results = []
+        for item in self.registry.all():
+            if item.get("transport") != "ble" or not item.get("windows_ble_address"):
+                continue
+            device_id = item.get("id")
+            try:
+                result = await self.verify_ble_gatt(device_id)
+            except Exception as exc:
+                result = {
+                    "ok": False,
+                    "hardware_io": "READ_ONLY_GATT_VERIFY",
+                    "device_id": device_id,
+                    "family": item.get("family"),
+                    "address": item.get("windows_ble_address"),
+                    "errors": [str(exc)],
+                    "write_operations": 0,
+                    "hardware_verified": False,
+                    "automatic_write_enable": False,
+                }
+            results.append(result)
+        return {
+            "ok": all(x.get("ok") for x in results) if results else True,
+            "hardware_io": "READ_ONLY_GATT_VERIFY_BATCH",
+            "results": results,
+            "bound_device_count": len(results),
+            "write_operations": 0,
+            "hardware_verified": False,
+            "automatic_write_enable": False,
         }
 
     async def verify_ble_gatt(self, device_id):

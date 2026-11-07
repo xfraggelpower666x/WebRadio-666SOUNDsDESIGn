@@ -246,10 +246,10 @@ class App(tk.Tk):
 
         discover_panel, discover = self._panel(parent, "DEVICE DISCOVERY · LIVE SEARCH")
         discover_panel.pack(fill="x", padx=12, pady=(0,8))
-        self.discovery_tree = ttk.Treeview(discover, columns=("name","family","address","rssi","state","slot"), show="headings", height=6)
+        self.discovery_tree = ttk.Treeview(discover, columns=("name","family","address","fp","rssi","state","slot"), show="headings", height=6)
         for key,title,width in [
-            ("name","Found device",210),("family","Detected family",130),("address","Windows BLE address",260),
-            ("rssi","Signal",80),("state","Binding",110),("slot","Suggested slot",130)
+            ("name","Found device",190),("family","Detected family",120),("address","Windows BLE address",220),
+            ("fp","Fingerprint",110),("rssi","Signal",70),("state","Binding",130),("slot","Suggested slot",120)
         ]:
             self.discovery_tree.heading(key,text=title); self.discovery_tree.column(key,width=width)
         self.discovery_tree.pack(fill="x", expand=True)
@@ -275,6 +275,7 @@ class App(tk.Tk):
         actions = tk.Frame(parent, bg=BG)
         actions.pack(fill="x", padx=12, pady=(0,12))
         NeonButton(actions, "CONNECT / VERIFY", self.connect_selected, accent=GREEN).pack(side="left", padx=4)
+        NeonButton(actions, "VERIFY ALL BOUND BLE", self.verify_all_bound_ble, accent=CYAN).pack(side="left", padx=4)
         NeonButton(actions, "DISCONNECT", self.disconnect_selected, accent=RED).pack(side="left", padx=4)
         NeonButton(actions, "POWER ON", lambda: self.device_power(True)).pack(side="left", padx=4)
         NeonButton(actions, "POWER OFF", lambda: self.device_power(False), accent=PINK).pack(side="left", padx=4)
@@ -385,6 +386,7 @@ class App(tk.Tk):
         bar.pack(fill="x", pady=(8,0))
         NeonButton(bar,"BLUETOOTH CHECK",self.check_bluetooth,accent=LILAC).pack(side="left",padx=4)
         NeonButton(bar,"SEARCH BLE",self.scan_devices,accent=CYAN).pack(side="left",padx=4)
+        NeonButton(bar,"VERIFY ALL BOUND BLE",self.verify_all_bound_ble,accent=GREEN).pack(side="left",padx=4)
         NeonButton(bar,"SEARCH GOVEE",self.discover_govee,accent=GREEN).pack(side="left",padx=4)
         NeonButton(bar,"SYSTEM CHECK",self.run_system_check,accent=PINK).pack(side="left",padx=4)
         NeonButton(bar,"DIAGNOSTICS",self.run_diagnostics,accent=YELLOW).pack(side="left",padx=4)
@@ -650,6 +652,7 @@ class App(tk.Tk):
                     row.get("name") or "(unnamed)",
                     row.get("family") or "unknown",
                     row.get("address") or "",
+                    (row.get("fingerprint") or "")[:12],
                     signal,
                     row.get("binding_state") or "",
                     row.get("suggested_device_id") or "",
@@ -692,7 +695,7 @@ class App(tk.Tk):
         if family not in ("", "unknown") and target.get("family") != family:
             return messagebox.showwarning("Discovery", f"Family mismatch: found {family}, slot {slot} is {target.get('family')}.")
         try:
-            self.engine.bind_windows_ble(slot, address)
+            self.engine.bind_windows_ble(slot, address, row.get("fingerprint") or None)
             self.gatt_results.pop(slot, None)
             self.selected_device.set(slot)
             self.discovery_status.set(f"BOUND · {row.get('name') or address} → {slot}")
@@ -738,6 +741,32 @@ class App(tk.Tk):
             candidates = result.get("candidates") or []
             details = "\n".join(f"{x.get('ip')} · {x.get('source')} · {x.get('probe_reason') or 'no response'}" for x in candidates)
             messagebox.showinfo("Govee LAN Discovery", "No Govee LAN device answered the read-only status/discovery checks." + (("\n\nChecked:\n" + details) if details else ""))
+
+    def verify_all_bound_ble(self):
+        self.discovery_status.set("VERIFYING ALL BOUND BLE · READ-ONLY...")
+        self._run(self.engine.verify_all_bound_ble(), self._verify_all_bound_ble_done)
+
+    def _verify_all_bound_ble_done(self, result):
+        rows = result.get("results") or []
+        passed = 0
+        for row in rows:
+            did = row.get("device_id")
+            if did:
+                self.gatt_results[did] = dict(row)
+            if row.get("ok"):
+                passed += 1
+        self.refresh_all()
+        self.discovery_status.set(f"GATT BATCH · {passed}/{len(rows)} PASS · 0 WRITES")
+        details = []
+        for row in rows:
+            errors = "; ".join(row.get("errors") or [])
+            details.append(f"{row.get('device_id')}: {'PASS' if row.get('ok') else 'FAIL'}" + (f" · {errors}" if errors else ""))
+        message = "\n".join(details) if details else "No BLE slots are currently bound."
+        message += "\n\nWrite operations performed: 0\nNo hardware authority was promoted."
+        if rows and passed == len(rows):
+            messagebox.showinfo("Verify All Bound BLE", message)
+        else:
+            messagebox.showwarning("Verify All Bound BLE", message)
 
     def connect_selected(self):
         did=self.selected_device.get()

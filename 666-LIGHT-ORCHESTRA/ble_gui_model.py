@@ -40,11 +40,21 @@ def propose_bindings(discovered, registry):
             suggestion = candidates[idx] if idx < len(candidates) else None
             counters[family] = idx + 1
             state = "SUGGESTED" if suggestion else "NO_SLOT"
+        fingerprint = str(dev.get("fingerprint") or "")
+        fp_existing = next((x for x in slots if fingerprint and x.get("ble_fingerprint") == fingerprint), None)
+        if fp_existing and not existing:
+            suggestion = fp_existing["id"]
+            state = "FINGERPRINT_BOUND"
         rows.append({
             "name": str(dev.get("name") or ""),
             "address": address,
             "family": family,
             "rssi": dev.get("rssi"),
+            "advertised_name": str(dev.get("advertised_name") or ""),
+            "service_uuids": list(dev.get("service_uuids") or []),
+            "manufacturer_data": list(dev.get("manufacturer_data") or []),
+            "service_data": list(dev.get("service_data") or []),
+            "fingerprint": fingerprint,
             "suggested_device_id": suggestion,
             "binding_state": state,
         })

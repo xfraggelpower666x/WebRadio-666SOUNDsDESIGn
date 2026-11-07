@@ -35,6 +35,18 @@ class BleGuiModelTests(unittest.TestCase):
         self.assertEqual(result[2]["binding_state"], "BOUND")
         self.assertEqual(self.registry, before)
 
+    def test_fingerprint_bound_device_reuses_existing_slot_without_auto_binding(self):
+        registry = [
+            {"id":"lenze_1","family":"lenze","transport":"ble","windows_ble_address":"OLD","ble_fingerprint":"a"*64},
+            {"id":"lenze_2","family":"lenze","transport":"ble","windows_ble_address":None},
+        ]
+        result = propose_bindings([
+            {"name":"LENZE-RGB","address":"NEW","family":"lenze","rssi":-40,"fingerprint":"a"*64}
+        ], registry)
+        self.assertEqual(result[0]["binding_state"], "FINGERPRINT_BOUND")
+        self.assertEqual(result[0]["suggested_device_id"], "lenze_1")
+        self.assertEqual(registry[0]["windows_ble_address"], "OLD")
+
     def test_capture_summary_never_promotes_hardware(self):
         summary = capture_summary({
             "device_id": "oc21w_1",

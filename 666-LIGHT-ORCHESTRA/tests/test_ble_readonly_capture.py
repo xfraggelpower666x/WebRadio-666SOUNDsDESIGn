@@ -109,14 +109,16 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
             def __init__(self, name, address):
                 self.name, self.address = name, address
         class Adv:
-            def __init__(self, local_name, rssi, service_uuids=None):
+            def __init__(self, local_name, rssi, service_uuids=None, manufacturer_data=None, service_data=None):
                 self.local_name, self.rssi = local_name, rssi
                 self.service_uuids = service_uuids or []
+                self.manufacturer_data = manufacturer_data or {}
+                self.service_data = service_data or {}
         class Scanner:
             @staticmethod
             async def discover(timeout=5.0, return_adv=False):
                 self_map = {
-                    "A": (Dev(None, "AA"), Adv("LENZE-RGB X", -42, ["fff0"])),
+                    "A": (Dev(None, "AA"), Adv("LENZE-RGB X", -42, ["fff0"], {1234: b"\x01\x02"}, {"fff0": b"\x03"})),
                     "B": (Dev(None, "BB"), Adv(None, -65, [])),
                     "C": (Dev("Other BLE", "CC"), Adv("Other BLE", -55, [])),
                 }
@@ -127,6 +129,9 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
         by_address = {x.address: x for x in rows}
         self.assertEqual(by_address["AA"].family, "lenze")
         self.assertEqual(by_address["AA"].advertised_name, "LENZE-RGB X")
+        self.assertEqual(by_address["AA"].manufacturer_data, ((1234, "0102"),))
+        self.assertEqual(by_address["AA"].service_data, (("fff0", "03"),))
+        self.assertEqual(len(by_address["AA"].fingerprint), 64)
         self.assertEqual(by_address["BB"].family, "unknown")
         self.assertEqual(by_address["CC"].family, "unknown")
 
@@ -145,6 +150,17 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
             loaded = DeviceRegistry(path).get("lenze_1")
             self.assertEqual(loaded["windows_ble_address"], "AA:BB:CC:DD:EE:01")
             self.assertFalse(loaded["enabled"])
+
+    def test_registry_rejects_duplicate_ble_address_and_fingerprint(self):
+        with tempfile.TemporaryDirectory() as td:
+            registry = DeviceRegistry(Path(td) / "registry.json")
+            fp = "a" * 64
+            first = registry.bind_windows_identity("lenze_1", "AA:BB:CC:DD:EE:01", fp)
+            self.assertEqual(first["ble_fingerprint"], fp)
+            with self.assertRaisesRegex(ValueError, "already bound"):
+                registry.bind_windows_identity("lenze_2", "AA:BB:CC:DD:EE:01", "b" * 64)
+            with self.assertRaisesRegex(ValueError, "already bound"):
+                registry.bind_windows_identity("lenze_2", "AA:BB:CC:DD:EE:02", fp)
 
     def test_registry_rejects_non_ble_binding_and_bad_address(self):
         with tempfile.TemporaryDirectory() as td:
@@ -215,6 +231,27 @@ class BleReadOnlyCaptureTests(unittest.TestCase):
             self.assertTrue(result["ok"])
             self.assertFalse(result["analysis"]["hardware_verified"])
             self.assertEqual(result["analysis"]["candidate_commands"]["power_candidate"], 1)
+
+    def test_engine_verify_all_bound_ble_is_read_only_and_collects_failures(self):
+        with tempfile.TemporaryDirectory() as td:
+            registry = DeviceRegistry(Path(td) / "registry.json")
+            registry.bind_windows_address("lenze_1", "AA:01")
+            registry.bind_windows_address("oc21w_1", "BB:01")
+            with mock.patch.object(core, "DeviceRegistry", return_value=registry):
+                engine = core.Engine(core.DEFAULT_CONFIG)
+
+            async def fake_verify(device_id):
+                if device_id == "lenze_1":
+                    return {"ok": True, "device_id": device_id, "write_operations": 0, "hardware_verified": False}
+                raise RuntimeError("offline")
+
+            with mock.patch.object(engine, "verify_ble_gatt", side_effect=fake_verify):
+                result = asyncio.run(engine.verify_all_bound_ble())
+            self.assertFalse(result["ok"])
+            self.assertEqual(result["bound_device_count"], 2)
+            self.assertEqual(result["write_operations"], 0)
+            self.assertFalse(result["hardware_verified"])
+            self.assertEqual({x["device_id"] for x in result["results"]}, {"lenze_1", "oc21w_1"})
 
     def test_capture_requires_explicit_windows_binding(self):
         with tempfile.TemporaryDirectory() as td:

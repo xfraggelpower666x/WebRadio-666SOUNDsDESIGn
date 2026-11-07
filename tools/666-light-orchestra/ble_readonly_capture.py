@@ -6,6 +6,7 @@ services/characteristics, subscribe to notifications, and disconnect.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import platform
 import subprocess
@@ -28,6 +29,9 @@ class DiscoveredDevice:
     rssi: int | None = None
     advertised_name: str = ""
     service_uuids: tuple[str, ...] = ()
+    manufacturer_data: tuple[tuple[int, str], ...] = ()
+    service_data: tuple[tuple[str, str], ...] = ()
+    fingerprint: str = ""
 
 
 @dataclass(frozen=True)
@@ -79,6 +83,47 @@ def _adv_rssi(dev, adv):
 def _adv_services(adv) -> tuple[str, ...]:
     values = getattr(adv, "service_uuids", None) or ()
     return tuple(sorted({str(x).lower() for x in values if x}))
+
+
+def _adv_manufacturer_data(adv) -> tuple[tuple[int, str], ...]:
+    values = getattr(adv, "manufacturer_data", None) or {}
+    rows = []
+    if isinstance(values, dict):
+        for key, value in values.items():
+            try:
+                company = int(key)
+            except (TypeError, ValueError):
+                continue
+            try:
+                payload = bytes(value).hex().upper()
+            except Exception:
+                payload = str(value)
+            rows.append((company, payload))
+    return tuple(sorted(rows))
+
+
+def _adv_service_data(adv) -> tuple[tuple[str, str], ...]:
+    values = getattr(adv, "service_data", None) or {}
+    rows = []
+    if isinstance(values, dict):
+        for key, value in values.items():
+            try:
+                payload = bytes(value).hex().upper()
+            except Exception:
+                payload = str(value)
+            rows.append((str(key).lower(), payload))
+    return tuple(sorted(rows))
+
+
+def advertisement_fingerprint(name: str, service_uuids, manufacturer_data, service_data) -> str:
+    payload = {
+        "name": str(name or "").strip().lower(),
+        "service_uuids": list(service_uuids or ()),
+        "manufacturer_data": [list(x) for x in (manufacturer_data or ())],
+        "service_data": [list(x) for x in (service_data or ())],
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def bluetooth_preflight() -> dict:
@@ -220,13 +265,20 @@ async def scan_all(timeout: float = 6.0) -> list[DiscoveredDevice]:
         advertised_name = _adv_name(dev, adv)
         device_name = str(getattr(dev, "name", "") or advertised_name or "")
         family = classify_name(device_name) or classify_name(advertised_name) or "unknown"
+        services = _adv_services(adv)
+        manufacturer = _adv_manufacturer_data(adv)
+        service_data = _adv_service_data(adv)
+        fingerprint = advertisement_fingerprint(advertised_name or device_name, services, manufacturer, service_data)
         rows.append(DiscoveredDevice(
             name=device_name,
             address=address,
             family=family,
             rssi=_adv_rssi(dev, adv),
             advertised_name=advertised_name,
-            service_uuids=_adv_services(adv),
+            service_uuids=services,
+            manufacturer_data=manufacturer,
+            service_data=service_data,
+            fingerprint=fingerprint,
         ))
     rows.sort(key=lambda x: (0 if x.family != "unknown" else 1, -(x.rssi or -999), x.name.lower(), x.address))
     return rows

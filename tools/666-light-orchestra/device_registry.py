@@ -36,7 +36,7 @@ SEED_DEVICES = [
      "windows_ble_address":None,"role":"unassigned","verified":"ios_bound","enabled":False}
 ]
 ALLOWED_EDIT_FIELDS = {"label","role","enabled"}
-PERSISTED_BINDING_FIELDS = {"windows_ble_address"}
+PERSISTED_BINDING_FIELDS = {"windows_ble_address","ble_fingerprint"}
 
 def _validated_updates(updates):
     """Validate persisted and interactive edits through the same fail-closed gate."""
@@ -60,6 +60,16 @@ def _validated_windows_ble_address(value):
     value = value.strip()
     if not value or len(value) > 128 or any(ord(ch) < 33 or ord(ch) > 126 for ch in value):
         raise ValueError("windows_ble_address must be printable non-empty text <= 128 chars")
+    return value
+
+def _validated_ble_fingerprint(value):
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError("ble_fingerprint must be text or null")
+    value = value.strip().lower()
+    if len(value) != 64 or any(ch not in "0123456789abcdef" for ch in value):
+        raise ValueError("ble_fingerprint must be a 64-character sha256 hex string")
     return value
 
 class DeviceRegistry:
@@ -93,6 +103,10 @@ class DeviceRegistry:
                     if base[identifier].get("transport") != "ble":
                         raise ValueError("windows_ble_address allowed only for BLE devices")
                     base[identifier]["windows_ble_address"] = _validated_windows_ble_address(item["windows_ble_address"])
+                if "ble_fingerprint" in item:
+                    if base[identifier].get("transport") != "ble":
+                        raise ValueError("ble_fingerprint allowed only for BLE devices")
+                    base[identifier]["ble_fingerprint"] = _validated_ble_fingerprint(item["ble_fingerprint"])
         return base
 
     def all(self):
@@ -109,16 +123,34 @@ class DeviceRegistry:
         self.save()
         return self.get(device_id)
 
-    def bind_windows_address(self, device_id, address):
+    def bind_windows_identity(self, device_id, address, fingerprint=None):
         if device_id not in self._entries:
             raise KeyError("unknown_device")
         item = self._entries[device_id]
         if item.get("transport") != "ble":
             raise ValueError("windows BLE binding allowed only for BLE devices")
-        item["windows_ble_address"] = _validated_windows_ble_address(address)
+        address = _validated_windows_ble_address(address)
+        fingerprint = _validated_ble_fingerprint(fingerprint) if fingerprint is not None else None
+
+        for other_id, other in self._entries.items():
+            if other_id == device_id or other.get("transport") != "ble":
+                continue
+            if address is not None and other.get("windows_ble_address") == address:
+                raise ValueError(f"windows_ble_address already bound to {other_id}")
+            if fingerprint is not None and other.get("ble_fingerprint") == fingerprint:
+                raise ValueError(f"ble_fingerprint already bound to {other_id}")
+
+        item["windows_ble_address"] = address
+        if fingerprint is not None:
+            item["ble_fingerprint"] = fingerprint
+        elif address is None:
+            item["ble_fingerprint"] = None
         item["enabled"] = False
         self.save()
         return self.get(device_id)
+
+    def bind_windows_address(self, device_id, address):
+        return self.bind_windows_identity(device_id, address, None)
 
     def clear_windows_address(self, device_id):
         return self.bind_windows_address(device_id, None)

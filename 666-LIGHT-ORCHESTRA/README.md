@@ -205,3 +205,14 @@ This distinction helps identify a reachable H6047 whose LAN Control/UDP path is 
 ### System Check orchestrator
 
 `RUN_SYSTEM_CHECK.bat` combines package integrity and read-only hardware diagnostics into one operator flow. It records Bluetooth adapter/driver state, visible BLE count, Govee network/LAN-Control status and evidence-based next actions in `diagnostics/LIGHT_ORCHESTRA_SYSTEM_CHECK.json`. It performs zero hardware writes and never changes protocol authority.
+
+
+## v0.7.3-dev — BLE Identity Fingerprints & Batch Verification
+
+- BLE discovery records advertisement name, service UUIDs, manufacturer data and service data where Windows/Bleak exposes them.
+- A deterministic SHA-256 advertisement fingerprint is produced as additional identity evidence.
+- Fingerprints are evidence only; they do not auto-bind, auto-enable or promote protocol authority.
+- Device Registry now fail-closes duplicate Windows BLE addresses and duplicate BLE fingerprints across different slots.
+- Discovery binding persists the fingerprint alongside the Windows BLE identity.
+- `VERIFY ALL BOUND BLE` performs sequential read-only GATT checks for every bound LENZE/OC21W slot.
+- Batch verification performs zero writes and never changes hardware verification or write authority.
