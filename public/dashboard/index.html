@@ -608,7 +608,7 @@
       mark('STR',state.error?'error':state.waiting||state.recovering?'pending':playing?'ok':'off',state.error?'Streamfehler':state.waiting?'Stream puffert':playing?'Stream spielt im MiniPlayer':'Stream pausiert / nicht gestartet');
       mark('SRC',playing?'ok':state.waiting?'pending':'off',playing?'Aktive Quelle: '+state.source:'Quelle ausgewählt, Wiedergabe inaktiv');
       mark('AUD',state.playing?'ok':state.error?'error':'off',state.playing?'Audio spielt':state.error?'Audiofehler':'Audio pausiert');
-      mark('SB',state.waiting?'pending':state.playing?'ok':'off',state.waiting?'Stream puffert':state.playing?'Wiedergabe ohne Pufferereignis':'Kein aktiver Stream');
+      mark('SB',state.waiting?'pending':'off',state.waiting?'Stream puffert':'Kein aktiver Buffering-Zustand');
       mark('RCN',state.recovering?'pending':state.error?'error':'off',state.recovering?'Aktive Wiederverbindung':state.error?'Streamfehler':'Keine Recovery aktiv');
       mark('WCH',state.watchdogStatus==='healthy'?'ok':state.watchdogStatus==='buffering'||state.watchdogStatus==='stalled'?'pending':state.watchdogStatus==='fault'?'error':'off',state.watchdogStatus==='healthy'?'Audio-Watchdog: echte Audiozeit schreitet fort':state.watchdogStatus==='stalled'?'Audio-Watchdog: keine Audiozeit-Fortschritte (Recovery-Owner prüft)':state.watchdogStatus==='buffering'?'Audio-Watchdog: Puffern / Audiozeit wird geprüft':state.watchdogStatus==='fault'?'Audio-Watchdog: Audiofehler erkannt':'Audio-Watchdog: inaktiv');
       mark('MTR',state.meterAvailable?'ok':'off',state.meterAvailable?'Echte FFT-Audioanalyse läuft':'Keine bestätigten aktuellen Audiopegel');
@@ -694,12 +694,12 @@
         let displayed=text;
         if(mime.includes('json'))try{displayed=JSON.stringify(JSON.parse(text),null,2)}catch(_){}
         if(signal.aborted)return;
-        button.dataset.health=response.ok?'ok':'warn';
+        // Diagnostik ist READ-ONLY: HTTP-Erfolg darf keine Funktions-LED umschalten.
         httpStatus='HTTP '+response.status;rawResponse=displayed||'(Leere Antwort)';
         title.textContent=(button.dataset.hudTitle||'Status')+' · '+httpStatus;
         showText(displayed||'(Leere Antwort)');
         if(mime.includes('text/html')){lastHTML=text;preview.hidden=false;preview.textContent='HTML-Vorschau anzeigen';}
-      }catch(e){if(signal.aborted)return;button.dataset.health='warn';rawResponse='Abruf fehlgeschlagen: '+String(e?.message||e);httpStatus='Netzwerkfehler';showText(rawResponse);}
+      }catch(e){if(signal.aborted)return;rawResponse='Abruf fehlgeschlagen: '+String(e?.message||e);httpStatus='Netzwerkfehler';showText(rawResponse);}
       finally{clearTimeout(timeout);}
     }
     document.getElementById('hudCopy').addEventListener('click',async()=>{
