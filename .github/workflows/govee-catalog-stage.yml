@@ -1,0 +1,28 @@
+name: Stage Govee catalog WebRadio version
+
+on:
+  push:
+    branches: [dev/666stream-govee-catalog-stage]
+    paths: ['.github/workflows/govee-catalog-stage.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  stage-webradio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 7061f77f57002a7cc539ccb3226fcb071e24d2d5
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.111.0"
+          command: versions upload --keep-vars --message "Govee catalog 7061f77, stage only"
