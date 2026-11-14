@@ -42,7 +42,7 @@ jobs:
           python -m compileall -q .
           python -m unittest discover -s tests -v
 
-      - name: Build three Windows executables
+      - name: Build four Windows executables
         shell: pwsh
         working-directory: 666-LIGHT-ORCHESTRA
         run: |

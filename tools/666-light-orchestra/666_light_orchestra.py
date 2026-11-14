@@ -26,7 +26,7 @@ except Exception:
     BleakClient = None
     BleakScanner = None
 
-VERSION = "0.7.3-dev"
+VERSION = "0.7.4-dev"
 LENZE_SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
 LENZE_WRITE_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
 LENZE_NOTIFY_UUID = "0000fff4-0000-1000-8000-00805f9b34fb"

@@ -70,9 +70,92 @@ jobs:
               assert len(z.namelist()) == len(files) + 1
           print("PASS: mirror", len(checked), "source files; zip", len(files), "files")
           PY
+      - name: Create full system backup
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, zipfile
+          root = pathlib.Path(".")
+          include_roots = [
+              pathlib.Path("666-LIGHT-ORCHESTRA"),
+              pathlib.Path("tools/666-light-orchestra"),
+          ]
+          explicit = [
+              pathlib.Path(".github/workflows/light-orchestra-safe-audit.yml"),
+              pathlib.Path(".github/workflows/light-orchestra-windows-build.yml"),
+          ]
+          explicit.extend(sorted(pathlib.Path("docs").glob("LIGHT_ORCHESTRA_*.md")) if pathlib.Path("docs").exists() else [])
+          files = []
+          for base in include_roots:
+              for p in sorted(base.rglob("*")):
+                  if p.is_file() and "__pycache__" not in p.parts and p.suffix != ".pyc" and "/release/" not in p.as_posix():
+                      files.append(p)
+          for p in explicit:
+              if p.is_file():
+                  files.append(p)
+          # Deduplicate by repo-relative path while preserving deterministic order.
+          uniq = {p.as_posix(): p for p in files}
+          files = [uniq[k] for k in sorted(uniq)]
+
+          out = pathlib.Path("system-backup")
+          out.mkdir(exist_ok=True)
+          manifest = {
+              "schema": 1,
+              "kind": "LIGHT_ORCHESTRA_SYSTEM_BACKUP",
+              "source_commit": os.environ["SOURCE_SHA"],
+              "source_branch": "feature/666-light-orchestra-v0.1.0",
+              "release_class": "SYSTEM_BACKUP_HARDWARE_UNVERIFIED",
+              "hardware_verified": False,
+              "automatic_protocol_promotion": False,
+              "production_webradio_mutation": False,
+              "pfs_mutation": False,
+              "restore_contract": "666-LIGHT-ORCHESTRA/SYSTEM_BACKUP_RESTORE.md",
+              "files": [
+                  {
+                      "path": p.as_posix(),
+                      "sha256": hashlib.sha256(p.read_bytes()).hexdigest(),
+                      "size": p.stat().st_size,
+                  }
+                  for p in files
+              ],
+          }
+          manifest_path = out / "SYSTEM_BACKUP_MANIFEST.json"
+          manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          zip_path = out / "666_LIGHT_ORCHESTRA_SYSTEM_BACKUP.zip"
+          with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+              for p in files:
+                  z.write(p, p.as_posix())
+              z.write(manifest_path, "SYSTEM_BACKUP_MANIFEST.json")
+          with zipfile.ZipFile(zip_path) as z:
+              assert z.testzip() is None
+              assert "666-LIGHT-ORCHESTRA/SYSTEM_BACKUP_RESTORE.md" in z.namelist()
+              assert ".github/workflows/light-orchestra-safe-audit.yml" in z.namelist()
+              assert ".github/workflows/light-orchestra-windows-build.yml" in z.namelist()
+              assert len(z.namelist()) == len(files) + 1
+          digest = hashlib.sha256(zip_path.read_bytes()).hexdigest()
+          receipt = {
+              "zip": zip_path.name,
+              "sha256": digest,
+              "size": zip_path.stat().st_size,
+              "source_commit": os.environ["SOURCE_SHA"],
+              "file_count": len(files),
+              "hardware_verified": False,
+          }
+          (out / "SYSTEM_BACKUP_RECEIPT.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print("PASS: system backup", len(files), "files; sha256", digest)
+          PY
+
       - uses: actions/upload-artifact@v4
         with:
           name: LIGHT_ORCHESTRA_SOURCE_FREEZE_CANDIDATE
           path: freeze/
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LIGHT_ORCHESTRA_SYSTEM_BACKUP
+          path: system-backup/
           if-no-files-found: error
           retention-days: 30

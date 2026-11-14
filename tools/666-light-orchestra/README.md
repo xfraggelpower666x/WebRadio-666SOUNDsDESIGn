@@ -1,4 +1,4 @@
-# 666SOUNDsDESIGn LIGHT ORCHESTRA v0.5.0-dev
+# 666SOUNDsDESIGn LIGHT ORCHESTRA v0.7.4-dev
 
 Lokale Python-Lichtbridge und Windows-GUI für das bestehende WebRadio.
 
@@ -226,3 +226,13 @@ The read-only diagnostics/system-check path now verifies every currently bound B
 ### External protocol provenance
 
 See `EXTERNAL_PROTOCOL_EVIDENCE.md` for the current independently sourced Magic-Lantern/FFF0 evidence, contradictions and fail-closed promotion policy. External protocol research is candidate-only and never substitutes real owner hardware validation.
+
+
+## v0.7.4-dev — Freeze & System Backup
+
+- Dedicated source freeze remains byte-verified and mirror-checked.
+- A second full `LIGHT_ORCHESTRA_SYSTEM_BACKUP` artifact now preserves native source, tools mirror, LIGHT workflows, matching LIGHT docs and restore governance.
+- `SYSTEM_BACKUP_MANIFEST.json` contains repository-relative paths, sizes and SHA-256 hashes for every backed-up file.
+- `SYSTEM_BACKUP_RECEIPT.json` records backup ZIP digest, size, source commit and file count.
+- `SYSTEM_BACKUP_RESTORE.md` defines non-destructive restore rules and explicitly preserves hardware write gates.
+- The system backup never mutates production WebRadio or PFS and never promotes hardware verification.

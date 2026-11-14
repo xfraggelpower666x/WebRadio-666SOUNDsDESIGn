@@ -92,6 +92,13 @@ class WindowsBootstrapContractTests(unittest.TestCase):
         self.assertNotIn("write_gatt", text)
         self.assertNotIn("devcontrol", text)
 
+    def test_system_backup_restore_contract_exists(self):
+        text = self.read("SYSTEM_BACKUP_RESTORE.md").lower()
+        self.assertIn("system_backup_hardware_unverified", text)
+        self.assertIn("hardware_verified=false", text)
+        self.assertIn("automatic_protocol_promotion=false", text)
+        self.assertIn("do not replace or merge the production webradio tree", text)
+
     def test_one_click_builds_then_runs_symphony(self):
         text = self.read("ONE_CLICK_SETUP_BUILD_RUN.bat")
         self.assertIn("BUILD_EXE.bat", text)
