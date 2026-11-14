@@ -62,7 +62,7 @@ const audio=document.getElementById('radio'),toggle=document.getElementById('tog
 const cover=document.getElementById('cover'),dj=document.getElementById('dj'),listeners=document.getElementById('listeners'),quality=document.getElementById('quality'),bars=[...document.querySelectorAll('#eq i')];
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
-let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0,silentSince=0,lastFallbackPublish=0,visualMode='idle';
+let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0,lastMeterAt=0,silentSince=0,lastFallbackPublish=0,visualMode='idle';
 function renderVisualFallback(){
   const active=audio&&!audio.paused&&!audio.muted&&audio.readyState>=2&&!document.hidden&&sourceIndex===0;
   visualMode=active?'synthetic':'idle';
@@ -81,7 +81,7 @@ function renderVisualFallback(){
 
 function onVisualContextStateChange(){if(audioContext?.state==='running')startVisualizer();}
 function startVisualizer(){if(!visualFramePending&&visualActive&&!audio.paused&&!document.hidden){visualFramePending=true;requestAnimationFrame(visualizer)}}
-function visualizer(){visualFramePending=false;if(!visualActive||!analyser||audio.paused||document.hidden)return;const running=audioContext?.state==='running';if(running){analyser.getByteFrequencyData(frequencyData);lastFrequencyPeak=frequencyData.reduce((peak,bin)=>Math.max(peak,bin),0);if(timeDomainData){analyser.getByteTimeDomainData(timeDomainData);let power=0;for(let i=0;i<timeDomainData.length;i++){const sample=(timeDomainData[i]-128)/128;power+=sample*sample}lastWaveformRms=Math.sqrt(power/timeDomainData.length)}lastMeterAt=performance.now();const hasRealSignal=lastFrequencyPeak>0||lastWaveformRms>0.001;if(hasRealSignal){silentSince=0;visualMode='real'}else if(!silentSince)silentSince=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);if(!hasRealSignal&&performance.now()-silentSince>1200){renderVisualFallback();startVisualizer();return}for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}startVisualizer()}}
+function visualizer(){visualFramePending=false;if(!visualActive||!analyser||audio.paused||document.hidden)return;const running=audioContext?.state==='running';if(running){analyser.getByteFrequencyData(frequencyData);lastFrequencyPeak=frequencyData.reduce((peak,bin)=>Math.max(peak,bin),0);if(timeDomainData){analyser.getByteTimeDomainData(timeDomainData);let power=0;for(let i=0;i<timeDomainData.length;i++){const sample=(timeDomainData[i]-128)/128;power+=sample*sample}lastWaveformRms=Math.sqrt(power/timeDomainData.length)}const hasRealSignal=lastFrequencyPeak>0||lastWaveformRms>0.001;if(hasRealSignal){if(!audio.muted)lastMeterAt=performance.now();silentSince=0;visualMode='real'}else if(!silentSince)silentSince=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);if(!hasRealSignal&&performance.now()-silentSince>1200){renderVisualFallback();startVisualizer();return}for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}startVisualizer()}}
 function enableVisualizer(){if(sourceIndex!==0)return;try{const core=window.SMFPBoostCore;if(!core)return;if(!visualActive){const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;analyser.fftSize=1024;frequencyData=new Uint8Array(analyser.frequencyBinCount);timeDomainData=new Uint8Array(analyser.fftSize);visualActive=true;if(visualContextObserved!==audioContext){visualContextObserved?.removeEventListener?.('statechange',onVisualContextStateChange);audioContext.addEventListener('statechange',onVisualContextStateChange);visualContextObserved=audioContext}applySound()}void core.resume(audio).then(ok=>{if(ok)startVisualizer()}).catch(()=>{});startVisualizer()}catch(_){visualActive=false}}
 const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
 const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
@@ -95,19 +95,23 @@ const sources=[new URL('/stream',location.origin).href,new URL('/fallback-stream
 let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=false,watchdogStatus='idle',watchdogLastEventAt=0,watchdogProgressAt=0,watchdogAudioTime=0;audio.volume=.75;
 // WebAudio analyser requires a CORS-enabled stream; keep native audio unmodified when unavailable.
 // Visualizer activation is opt-in and must be tested with the production stream.
+function mediaRouteIndex(preferCurrent) {
+  const route = preferCurrent ? (audio.currentSrc || audio.src) : (audio.src || audio.currentSrc);
+  return route ? sources.indexOf(route) : sourceIndex;
+}
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
-toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();label('Pausiert');state()}else play()});
+async function play(){wanted=true;audioFault=false;audioWaiting=false;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;audioFault=false;audioWaiting=false;retrying=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();label('Pausiert');state()}else play()});
 // Plattformunabhaengiger Mute: nur die bestehende Audioinstanz, kein Eingriff in Pegel, EQ oder Boost.
-function syncMuteButton(){const muted=!!audio.muted;muteButton.setAttribute('aria-pressed',String(muted));const label=muted?'Ton einschalten':'Ton ausschalten';muteButton.setAttribute('aria-label',label);muteButton.title=label;muteButton.querySelector('.mini-mute-icon').textContent=muted?'🔇':'🔊';muteButton.querySelector('.mini-mute-label').textContent=muted?'SOUND':'MUTE'}
+function syncMuteButton(){const muted=!!audio.muted;if(muted)lastMeterAt=0;muteButton.setAttribute('aria-pressed',String(muted));const label=muted?'Ton einschalten':'Ton ausschalten';muteButton.setAttribute('aria-label',label);muteButton.title=label;muteButton.querySelector('.mini-mute-icon').textContent=muted?'🔇':'🔊';muteButton.querySelector('.mini-mute-label').textContent=muted?'SOUND':'MUTE'}
 muteButton.addEventListener('click',()=>{audio.muted=!audio.muted;syncMuteButton()});
 audio.addEventListener('volumechange',syncMuteButton);
 syncMuteButton();
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
-audio.addEventListener('playing',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();watchdogProgressAt=Date.now();watchdogAudioTime=Number(audio.currentTime)||0;retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex===0){enableVisualizer();startVisualizer()}});
+audio.addEventListener('playing',()=>{const activeIndex=mediaRouteIndex(true);if(activeIndex>=0)sourceIndex=activeIndex;watchdogStatus='buffering';watchdogLastEventAt=Date.now();watchdogProgressAt=Date.now();watchdogAudioTime=Number(audio.currentTime)||0;retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex===0){enableVisualizer();startVisualizer()}});
 audio.addEventListener('waiting',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();audioWaiting=true;if(wanted)label('Puffert …')});
-audio.addEventListener('pause',()=>{watchdogStatus='idle';watchdogLastEventAt=Date.now();state();bars.forEach(b=>b.style.height='3px')});
+audio.addEventListener('pause',()=>{lastMeterAt=0;watchdogStatus='idle';watchdogLastEventAt=Date.now();state();bars.forEach(b=>b.style.height='3px')});
 audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
 // iOS-Diagnose nur lokal sichtbar im bereits vorhandenen EQ-Panel. Keine Netzwerk-Telemetrie.
 const miniAudioDiag=document.getElementById('miniAudioDiag');
@@ -143,25 +147,29 @@ setInterval(()=>{
 window.S666EmbedControl=Object.freeze({
   getState(){
     const playing=!audio.paused&&!audio.ended&&audio.readyState>=2;
+    const routeIndex = mediaRouteIndex(playing);
     return {
-      playing,waiting:!!audioWaiting,recovering:!!retrying,error:!!audioFault,
-      source:sourceIndex===0?'main':'backup',
+      playing,waiting:!!wanted&&!!audioWaiting,recovering:!!wanted&&!!retrying,error:!!wanted&&!!audioFault,
+      source:routeIndex===0?'main':routeIndex>0?'backup':'unknown',
       wanted:!!wanted,readyState:audio.readyState,
       watchdogStatus,watchdogLastEventAt,watchdogProgressAt,watchdogStaleMs:watchdogProgressAt?Math.max(0,Date.now()-watchdogProgressAt):null,
-      meterAvailable:!!(playing&&!audio.muted&&visualActive&&analyser&&audioContext?.state==='running'&&performance.now()-lastMeterAt<2200&&(lastFrequencyPeak>0||lastWaveformRms>0.001)),
+      meterAvailable:!!(playing&&!audio.muted&&visualActive&&analyser&&audioContext?.state==='running'&&lastMeterAt>0&&performance.now()-lastMeterAt<2200&&(lastFrequencyPeak>0||lastWaveformRms>0.001)),
        audioContextState:audioContext?.state||'unavailable',graphAvailable:!!analyser,lastGenuineMeterAt:lastMeterAt
     };
   },
   async switchStream(target){
     if(target!=='main'&&target!=='backup')throw new Error('Ungültige Streamquelle');
     const next=target==='main'?0:1;
-    if(sourceIndex===next)return this.getState();
-    const resume=!audio.paused&&!audio.ended;
+    if(mediaRouteIndex(false)===next)return this.getState();
+    const resume=wanted||(!audio.paused&&!audio.ended);
     wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();retrying=false;audioWaiting=false;audioFault=false;
-    sourceIndex=next;audio.src=sources[sourceIndex];audio.load();
+    lastMeterAt=0;sourceIndex=next;audio.src=sources[sourceIndex];audio.load();
     label((target==='main'?'Hauptstream':'Backupstream')+' gewählt');
     state();
-    if(resume)await play();
+    if (resume) {
+      await play();
+      if (!wanted) throw new Error('Wiedergabe der gewählten Route fehlgeschlagen');
+    }
     return this.getState();
   }
 });

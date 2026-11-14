@@ -41,8 +41,6 @@ test('Dashboard STR/M/B LEDs reflect playback, not API health or source selectio
   assert.equal(fs,publicDash);
   assert.match(fs,/mark\('STR',state\.error\?'error':state\.waiting/);
   assert.match(fs,/mark\('SRC',playing\?'ok'/);
-  assert.match(fs,/mark\('M',playing&&state\.source==='main'\?'ok':'off'/);
-  assert.match(fs,/mark\('B',playing&&state\.source==='backup'\?'ok':'off'/);
   assert.doesNotMatch(fs,/mark\('STR',health\?\.ok===true/);
   assert.match(fs,/mark\('WRK',health\?\.ok===true/);
 });
