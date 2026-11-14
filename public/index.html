@@ -179,7 +179,8 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
             <button id="fallbackBtn" class="status-chip led-state state-off source-chip source-mini-chip-v80" type="button" title="Backupstream — Klick schaltet auf Backupstream"><span class="status-dot"></span><span class="status-code">B</span></button>
             <button id="statusDiscord" class="status-chip led-state state-empty" type="button" title="Discord — verbunden: türkis, sendet: pink, Fehler: rot"><span class="status-dot"></span><span class="status-code">DSC</span></button>
             <button id="statusAdmin" class="status-chip led-state state-empty" type="button" title="Admin — Admin-Zugang aktiv"><span class="status-dot"></span><span class="status-code">ADM</span></button>
-            <button id="statusGovee" class="status-chip led-state state-empty" type="button" title="GOVEE / FX — Lichtsteuerung Status"><span class="status-dot"></span><span class="status-code">GOV</span></button>
+            <button id="statusGovee" class="status-chip led-state state-empty" type="button" title="GOVEE / FX — Lichtsteuerung Status"><span class="status-dot"></span><span class="status-code">GOV</span></button><label><input id="goveeEnableSync" type="checkbox"> Govee FX</label>
+            <label>Gerät <select id="goveeModeSelect"><option value="bars">LightBars</option><option value="tv">TV</option></select></label>
 </div>
         </div>
       </header>
@@ -2211,10 +2212,10 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <link rel="stylesheet" href="/css/primary-player-actions.css?v=2026-07-12-veluna16">
 <script src="/js/sound-control-overlay-v1.js?v=2026-06-19-repair4" defer></script>
 <script src="/js/phase10-stability-iphone-panel-hud.js?v=2026-09-20-mobile-recovery-v2" defer></script>
-<script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=2026-06-15-fix1"></script>
-<script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=2026-06-15-fix1"></script>
-<script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=2026-06-15-fix1"></script>
-<script type="module" src="/js/system-extra/govee/govee-fx-control-hooks.js?v=2026-06-15-fix1"></script>
+<script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r01"></script>
+<script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r01"></script>
+<script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=govee-cloud-r01"></script>
+<script type="module" src="/js/system-extra/govee/govee-fx-control-hooks.js?v=govee-cloud-r01"></script>
 
   <!-- FRAGGLE DNA RAIL v1 — LEDs + Fixes + Umbenennung -->
   

@@ -7,5 +7,5 @@ export function mapAudioEvent(input={}) {
  const explicit=['idle','build','break','drop','storm'].includes(input.scene)?input.scene:null;
  const scene=explicit??((!input.playing&&energy<0.025)||energy<0.025?'idle':pulse>0.42||energy>0.78?'drop':energy>0.32?'build':energy<0.12?'break':'build');
  const level=(n,w)=>Math.round(clamp((Math.abs(Number(n)||0)<=1.25?(Number(n)||0)*255:Number(n)||0)*w,0,255));
- return {scene,mode:SCENE_MODE_MAP[scene],bass:level(input.bass??input.low,1.15),mid:level(input.mid??input.lowMid,0.95),high:level(input.high??input.highMid,1),energy:level(energy,1),kick:!!input.kick||!!input.beat||pulse>0.24,drop:scene==='drop'||scene==='storm',theme:THEME_COLORS[input.theme]||THEME_COLORS['pink-cyan']};
+ return {scene,mode:SCENE_MODE_MAP[scene],bass:level(input.bass??input.low,1.15),mid:level(input.mid??input.lowMid,0.95),high:level(input.high??input.highMid,1),energy:level(energy,1),kick:!!input.kick||!!input.beat||pulse>0.24,drop:scene==='drop'||scene==='storm',theme:Object.hasOwn(THEME_COLORS,input.theme)?THEME_COLORS[input.theme]:THEME_COLORS['pink-cyan']};
 }

@@ -22,17 +22,19 @@ test('player root mirror remains intact',()=>assert.equal(index,publicIndex));
 test('Govee runtime uses canonical MeterBus without a second audio graph',()=>{
   assert.match(scene,/window\.__MeterBus/);
   assert.match(scene,/analyzer:update/);
-  assert.match(scene,/toBridgeLevel/);
-  assert.match(scene,/numeric \* 255/);
+  assert.match(scene,/detail.source !== "real"/);
+  assert.match(scene,/Date.now\(\) - ts < 1500/);
   assert.match(scene,/reconnectDelayMs/);
   assert.match(scene,/inFlight/);
   assert.doesNotMatch(scene,/AudioContext|createMediaElementSource|createAnalyser/);
 });
-test('Govee bridge has timeout and offline recovery controls',()=>{
-  assert.match(config,/requestTimeoutMs: 1800/);
-  assert.match(config,/reconnectDelayMs: 5000/);
+test('Govee Cloud has bounded pacing and timeout',()=>{
+  assert.match(config,/requestTimeoutMs: 12000/);
+  assert.match(config,/reconnectDelayMs: 10000/);
   assert.match(bridge,/AbortController/);
-  assert.match(bridge,/Bridge timeout after/);
+  assert.match(bridge,/controller.abort\(\)/);
+  assert.match(config,/sendIntervalMs: 2500/);
+  assert.doesNotMatch(config,/localhost/);
 });
 test('Govee controls and module loading are wired',()=>{
   assert.match(hooks,/bootHooks/);

@@ -249,7 +249,7 @@
     <button class="hud-pill" type="button" data-hud-title="Meter · Metadaten / echte Audio-Pegel im Frequenzraum" data-hud-path="/api/nowplaying" aria-pressed="false" title="Metadaten-Monitor · /api/nowplaying"><span class="hud-led" aria-hidden="true"></span><span>MTR</span></button>
     <span class="hud-spacer" aria-hidden="true"></span>
     <button id="statusAdmin" class="hud-pill" type="button" data-hud-title="Geschütztes Admin-Panel" data-hud-action="admin" aria-pressed="false" title="Geschütztes Radio-Admin-Menü öffnen"><span class="hud-led" aria-hidden="true"></span><span>ADM</span></button>
-    <button class="hud-pill" type="button" data-hud-title="GOVEE lokale Bridge" data-hud-action="govee" aria-pressed="false" title="Lokale Govee-Bridge steuern"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
+    <button class="hud-pill" type="button" data-hud-title="GOVEE Cloud" data-hud-action="govee" aria-pressed="false" title="Govee-Cloud öffnen"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
     <button class="hud-pill" type="button" data-hud-title="Hauptstream" data-hud-action="main" aria-pressed="false" title="Im MiniPlayer auf Hauptstream umschalten"><span class="hud-led" aria-hidden="true"></span><span>M</span></button>
     <button class="hud-pill" type="button" data-hud-title="Backupstream" data-hud-action="backup" aria-pressed="false" title="Im MiniPlayer auf Backupstream umschalten"><span class="hud-led" aria-hidden="true"></span><span>B</span></button>
   </nav>
@@ -348,7 +348,18 @@
       <div class="hud-modal-actions"><button type="button" class="hud-render-toggle" id="hudRender" hidden>HTML-Vorschau anzeigen</button><button type="button" class="hud-render-toggle" id="hudCopy">📋 Antwort kopieren</button><span id="hudCopyStatus" role="status" aria-live="polite"></span></div>
     </section>
   </div>
-  <div id="goveeHudModal" class="hud-modal" hidden role="presentation"><section class="hud-dialog" role="dialog" aria-modal="true" aria-labelledby="goveeHudTitle"><div class="hud-dialog-header"><h2 id="goveeHudTitle">GOVEE · Lokale Licht-Bridge</h2><button id="goveeClose" type="button" aria-label="Schließen">✕</button></div><p>Steuerung der lokalen GOVEE-Bridge auf diesem Gerät. LEDs leuchten erst nach einer echten Bridge-Bestätigung.</p><div class="hud-modal-actions"><button type="button" class="hud-render-toggle" data-govee-command="enable">SYNC EIN</button><button type="button" class="hud-render-toggle" data-govee-command="disable">SYNC AUS</button><button type="button" class="hud-render-toggle" data-govee-command="teston">TEST EIN</button><button type="button" class="hud-render-toggle" data-govee-command="testoff">TEST AUS</button></div><pre id="goveeResponse" role="status">Bridge noch nicht geprüft.</pre></section></div>
+  <div id="goveeHudModal" class="hud-modal" hidden role="presentation"><section class="hud-dialog" role="dialog" aria-modal="true" aria-labelledby="goveeHudTitle"><div class="hud-dialog-header"><h2 id="goveeHudTitle">GOVEE · Cloud-Steuerung</h2><button id="goveeClose" type="button" aria-label="Schließen">✕</button></div>
+    <fieldset id="goveeDevices"><legend>Geräte auswählen</legend></fieldset>
+    <div class="hud-modal-actions">
+      <button type="button" class="hud-render-toggle" data-govee-command="read">GERÄTE LADEN</button>
+      <button type="button" class="hud-render-toggle" data-govee-command="state">STATUS</button>
+      <button type="button" class="hud-render-toggle" data-govee-command="on">EIN</button>
+      <button type="button" class="hud-render-toggle" data-govee-command="off">AUS</button>
+      <label>Farbe <input id="goveeColor" type="color" value="#00dcff"></label>
+      <button type="button" class="hud-render-toggle" data-govee-command="color">FARBE SETZEN</button>
+      <label>Helligkeit <input id="goveeBrightness" type="number" min="1" max="100" value="65"></label>
+      <button type="button" class="hud-render-toggle" data-govee-command="brightness">HELLIGKEIT SETZEN</button>
+    </div><pre id="goveeResponse" role="status">Gerätekatalog noch nicht geladen.</pre></section></div>
   <footer class="dash-footer">
     <span id="pollDot"></span>
     LIVE · nowplaying alle 10s · broadcast alle 15s &nbsp;|&nbsp; 666SOUNDsDESIGn WebRadio
@@ -624,23 +635,63 @@
       });
     }
     mark('ADM','off','Geschützter Admin-Zugang, kein Loginstatus bestätigt');
-    mark('GOV','off','Govee-Bridge noch nicht bestätigt');
+    mark('GOV','off','Govee-Gerätekatalog noch nicht geladen');
     const gov=document.querySelector('[data-hud-action="govee"'),modal=document.getElementById('goveeHudModal'),response=document.getElementById('goveeResponse');
     gov?.addEventListener('click',()=>{modal.hidden=false;document.getElementById('goveeClose').focus()});
     const close=()=>{modal.hidden=true;gov?.focus()};
     document.getElementById('goveeClose')?.addEventListener('click',close);
     modal?.addEventListener('click',e=>{if(e.target===modal)close()});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close()});
+    const goveeDevices=document.getElementById('goveeDevices');
+    let catalog=[];
     modal?.querySelectorAll('[data-govee-command]').forEach(button=>button.addEventListener('click',async()=>{
-      const command=button.dataset.goveeCommand;button.disabled=true;mark('GOV','pending','Lokale Bridge wird kontaktiert');response.textContent='Verbinde lokale GOVEE-Bridge …';
+      const command=button.dataset.goveeCommand;
+      const buttons=Array.from(modal.querySelectorAll('[data-govee-command]'));
+      buttons.forEach(control=>{control.disabled=true});
+      mark('GOV','pending','Govee-Cloud wird kontaktiert');
+      response.textContent='Govee-Anfrage läuft …';
       try{
-        const g=await import('/js/system-extra/govee/govee-bridge-client.js');
-        const result=command==='enable'?await g.goveeSetEnabled(true):command==='disable'?await g.goveeSetEnabled(false):command==='teston'?await g.goveeTestOn():await g.goveeTestOff();
-        if(result?.ok===false)throw Error(result.error||'Bridge meldet Fehler');
-        mark('GOV',command==='enable'||command==='teston'?'ok':'off','GOVEE Bridge: '+command+' bestätigt');
-        response.textContent='Bridge bestätigt: '+JSON.stringify(result||{},null,2);
-      }catch(e){mark('GOV','error','Govee-Bridge nicht erreichbar');response.textContent='Nicht bestätigt: '+String(e?.message||e)}
-      finally{button.disabled=false}
+        const g=await import('/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r01');
+        if(command==='read'){
+          ({devices:catalog}=await g.goveeDevices());
+          goveeDevices.querySelectorAll('label').forEach(label=>label.remove());
+          catalog.forEach((device,i)=>{
+            const label=document.createElement('label'), checkbox=document.createElement('input');
+            checkbox.type='checkbox';
+            checkbox.value=String(i);
+            label.append(checkbox,' '+(device.deviceName||device.sku)+' ('+device.sku+') ');
+            goveeDevices.append(label);
+          });
+          response.textContent=catalog.length+' Geräte gefunden.';
+          mark('GOV','ok','Govee-Gerätekatalog bestätigt');
+          return;
+        }
+        const selected=Array.from(goveeDevices.querySelectorAll('input:checked'),input=>catalog[Number(input.value)]);
+        if(!selected.length)throw Error('Bitte zuerst Geräte laden und auswählen.');
+        if(selected.length>8)throw Error('Bitte höchstens acht Geräte gleichzeitig auswählen.');
+        if(command==='state'){
+          const statuses=await Promise.allSettled(selected.map(device=>g.goveeState(device)));
+          response.textContent=statuses.map((item,i)=>(selected[i].deviceName||selected[i].sku)+': '+
+            (item.status==='fulfilled'?JSON.stringify(item.value.result?.payload?.capabilities||[]):String(item.reason?.message||item.reason))).join('\n');
+          mark('GOV',statuses.every(item=>item.status==='fulfilled')?'ok':'warn','Govee-Gerätestatus');
+          return;
+        }
+        let capability={type:'devices.capabilities.on_off',instance:'powerSwitch',value:command==='on'?1:0};
+        if(command==='color'){
+          capability={type:'devices.capabilities.color_setting',instance:'colorRgb',value:Number.parseInt(document.getElementById('goveeColor').value.slice(1),16)};
+        }
+        if(command==='brightness'){
+          const input=document.getElementById('goveeBrightness');
+          if(!input.value||!input.checkValidity())throw Error('Bitte eine gültige Helligkeit eingeben.');
+          capability={type:'devices.capabilities.range',instance:'brightness',value:input.valueAsNumber};
+        }
+        const result=await g.goveeControl(selected,capability);
+        response.textContent=result.results
+          ? result.results.map((item,i)=>(selected[i].deviceName||selected[i].sku)+': '+(item.ok?'Bestätigt':item.error||'Unbestätigt')).join('\n')
+          : 'Govee hat den Befehl bestätigt.';
+        mark('GOV',result.ok?'ok':'warn',result.ok?'Govee bestätigt':'Govee meldet Teilergebnis');
+      }catch(e){mark('GOV','error','Govee-Anfrage fehlgeschlagen');response.textContent=String(e?.message||e)}
+      finally{buttons.forEach(control=>{control.disabled=false})}
     }));
     async function fetchData(url){
       const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);

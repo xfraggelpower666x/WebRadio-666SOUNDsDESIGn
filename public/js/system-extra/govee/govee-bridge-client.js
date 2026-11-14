@@ -1,54 +1,64 @@
-import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js";
+import { GOVEE_SYNC_CONFIG } from "./govee-sync-config.js?v=govee-cloud-r01";
 
-async function post(path, payload) {
-  const url = `${GOVEE_SYNC_CONFIG.baseUrl}${path}`;
-  const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutMs = Math.max(250, Number(GOVEE_SYNC_CONFIG.requestTimeoutMs) || 1800);
-  const timeout = controller ? setTimeout(() => controller.abort(), timeoutMs) : 0;
-
+async function call(path, payload, { interactive = true } = {}) {
+  const auth = window.S666AdminAuth;
+  if (!auth) throw new Error("Admin-Anmeldung nicht verfügbar");
+  if (interactive) await auth.ensure({ message: "Admin-Passwort für Govee eingeben:" });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GOVEE_SYNC_CONFIG.requestTimeoutMs);
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      mode: "cors",
-      cache: "no-store",
-      credentials: "omit",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload || {}),
-      ...(controller ? { signal: controller.signal } : {})
+    const response = await auth.fetch(`${GOVEE_SYNC_CONFIG.baseUrl}${path}`, {
+      signal: controller.signal,
+      ...(payload === undefined ? {} : {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
     });
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`Bridge error ${res.status}: ${text}`);
-    }
-    return res.json().catch(() => ({}));
-  } catch (error) {
-    if (error?.name === "AbortError") throw new Error(`Bridge timeout after ${timeoutMs}ms`);
-    throw error;
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Govee HTTP ${response.status}`);
+    return result;
   } finally {
-    if (timeout) clearTimeout(timeout);
+    clearTimeout(timer);
   }
 }
 
+export const goveeDevices = () => call("/devices");
+
+export const goveeState = ({ sku, device }) => call("/state", { sku, device });
+
+export function goveeControl(members, capability) {
+  const targets = members.map(({ sku, device }) => ({ sku, device }));
+  return targets.length === 1
+    ? call("/control", { ...targets[0], capability })
+    : call("/groups/control", { members: targets, capability });
+}
+
 export async function goveeSetEnabled(enabled) {
-  return post("/api/enabled", { enabled: !!enabled });
+  if (enabled) await goveeDevices();
+  return { ok: true, enabled: !!enabled };
 }
 
-export async function goveeSetMode(mode) {
-  return post("/api/mode", { mode });
+export function goveeSetMode(mode) {
+  GOVEE_SYNC_CONFIG.area = mode === "tv" ? "tv" : "bars";
+  return { ok: true, area: GOVEE_SYNC_CONFIG.area };
 }
 
-export async function goveeSendAudio(payload) {
-  return post("/api/audio", payload);
+export function goveeSendAudio(payload) {
+  return call("/audio", { ...payload, area: GOVEE_SYNC_CONFIG.area }, { interactive: false });
 }
 
-export async function goveeTestOn() {
-  return post("/api/test/on");
+export function goveePreviewAudio(payload) {
+  return call("/audio/preview", payload);
 }
 
-export async function goveeTestOff() {
-  return post("/api/test/off");
-}
-
-export async function goveeTestColor({ r = 0, g = 180, b = 255, brightness = 65 } = {}) {
-  return post("/api/test/color", { r, g, b, brightness });
+export async function goveeTestColor({ r = 0, g = 180, b = 255 } = {}) {
+  const { devices } = await goveeDevices();
+  const sku = GOVEE_SYNC_CONFIG.area === "tv" ? "H6198" : "H6047";
+  const members = devices.filter(device => device.sku === sku &&
+    device.capabilities?.some(c => c.type === "devices.capabilities.color_setting" && c.instance === "colorRgb"));
+  if (!members.length) throw new Error("Keine RGB-fähigen Geräte in diesem Bereich");
+  return goveeControl(members, {
+    type: "devices.capabilities.color_setting", instance: "colorRgb", value: (r << 16) | (g << 8) | b
+  });
 }

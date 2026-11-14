@@ -1,5 +1,5 @@
-import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js";
-import { goveeSetEnabled, goveeSetMode, goveeTestColor } from "/js/system-extra/govee/govee-bridge-client.js";
+import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r01";
+import { goveeSetEnabled, goveeSetMode, goveeTestColor } from "/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r01";
 
 function runtime() {
   return window.S666GoveeSync || null;
@@ -21,7 +21,7 @@ export function initGoveeFxControlHooks() {
   if (enable) enable.checked = !!GOVEE_SYNC_CONFIG.enabled;
   if (bindControl(enable, "change", () => {
     const action = runtime()?.setEnabled?.(enable.checked) || goveeSetEnabled(enable.checked);
-    Promise.resolve(action).catch((e) => console.warn(e.message));
+    Promise.resolve(action).catch((e) => { enable.checked = !!GOVEE_SYNC_CONFIG.enabled; console.warn(e.message); });
   })) bound += 1;
 
   if (bindControl(mode, "change", () => {
@@ -31,7 +31,7 @@ export function initGoveeFxControlHooks() {
 
   if (bindControl(test, "click", () => {
     const payload = { r: 0, g: 220, b: 255, brightness: 70 };
-    // Test color has a dedicated bridge route; do not send it as an audio payload.
+    // Test color has a dedicated device control route; do not send it as an audio payload.
     Promise.resolve(goveeTestColor(payload)).catch((e) => console.warn(e.message));
   })) bound += 1;
 

@@ -1,79 +1,124 @@
 import {mapAudioEvent} from './audio-mapping.js';
 import {validateCapability} from './capability-validation.js';
+import {reserveGoveeControl,reserveGoveeState,getCachedGoveeDevices} from './rate-gate.js';
+export {GoveeRateGate} from './rate-gate.js';
 // 666SOUNDsDESIGn native GOVEE CLOUD CONTROL. No client secrets.
 const BASE='https://openapi.api.govee.com';
 const H={'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'};
 const json=(data,status=200,extra={})=>new Response(JSON.stringify(data),{status,headers:{...H,...extra}});
 const equal=(a,b)=>{if(typeof a!=='string'||typeof b!=='string')return false;const x=new TextEncoder().encode(a),y=new TextEncoder().encode(b);let v=x.length^y.length;for(let i=0;i<Math.max(x.length,y.length);i++)v|=(x[i]||0)^(y[i]||0);return v===0;};
-const cors=(req,env)=>{const o=req.headers.get('Origin');return o&&env.ALLOWED_ORIGIN&&o===env.ALLOWED_ORIGIN?{'access-control-allow-origin':o,'vary':'Origin','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'}:{};};
+const cors=(req,env)=>{const o=req.headers.get('Origin');return o&&env.ALLOWED_ORIGIN&&o===env.ALLOWED_ORIGIN?{'access-control-allow-origin':o,'vary':'Origin','access-control-allow-headers':'authorization,content-type','access-control-expose-headers':'Retry-After','access-control-allow-methods':'GET,POST,OPTIONS'}:{};};
 async function api(env,path,method='GET',body){
- const res=await fetch(BASE+path,{method,headers:{'Govee-API-Key':env.GOVEE_API_KEY,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
+ let res;
+ try{
+  res=await fetch(BASE+path,{method,headers:{'Govee-API-Key':env.GOVEE_API_KEY,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
+ }catch{
+  return {ok:false,httpStatus:502,error:'Govee response unavailable'};
+ }
  const result=await res.json().catch(()=>null);
- if(!res.ok)return {ok:false,httpStatus:res.status,error:'Govee upstream error',upstreamCode:result?.code??null};
+ const code=result?.code;
+ if(!res.ok || (code!==200 && code!=='200')){
+  const limited=res.status===429 || code===429 || code==='429';
+  return {ok:false,httpStatus:limited?429:(res.ok?502:res.status),error:limited?'Govee rate limit exceeded':'Govee upstream error',upstreamCode:result?.code??null};
+ }
  return {ok:true,result};
 }
+// Gerätebereiche wählen das Modell aus. Befehlsfreigaben kommen aus dem Gerätekatalog.
+const areaSkus=new Map([['bars','H6047'],['tv','H6198']]);
 const isSku=x=>typeof x==='string'&&/^H[0-9A-Z]{4,10}$/.test(x);
 const isDevice=x=>typeof x==='string'&&/^[0-9A-Fa-f:]{12,35}$/.test(x);
 const isType=x=>typeof x==='string'&&/^devices\.capabilities\.[a-z_]{2,60}$/.test(x);
 const isInstance=x=>typeof x==='string'&&/^[a-zA-Z][a-zA-Z0-9_]{0,60}$/.test(x);
 async function owned(env){
- const r=await api(env,'/router/api/v1/user/devices');if(!r.ok)return r;
- const devices=r.result?.data?.devices??r.result?.payload?.devices??[];
- return {ok:true,devices:Array.isArray(devices)?devices:[]};
+ return getCachedGoveeDevices(env);
 }
 const kinds=['devices.capabilities.on_off','devices.capabilities.range','devices.capabilities.color_setting','devices.capabilities.color_temperature'];
 const goodCapability=c=>c&&isType(c.type)&&isInstance(c.instance)&&Object.hasOwn(c,'value')&&kinds.includes(c.type);
 async function control(env,m,c){
+ const gate=await reserveGoveeControl(env,m.sku,m.device);
+ if(!gate.ok)return {ok:false,httpStatus:gate.error==='rate_limited'?429:503,error:gate.error,retryAfterMs:gate.retryAfterMs??null};
  return api(env,'/router/api/v1/device/control','POST',{requestId:crypto.randomUUID(),payload:{sku:m.sku,device:m.device,capability:{type:c.type,instance:c.instance,value:c.value}}});
 }
 export default {async fetch(request,env){
- const u=new URL(request.url),headers=cors(request,env),reply=(b,s=200)=>json(b,s,headers);
+ const u=new URL(request.url),headers=cors(request,env);
+ const reply=(body,status=200)=>{
+  const delay=body.retryAfterMs;
+  if(status===429 && Number.isFinite(delay) && delay>0){
+   return json(body,status,{...headers,'Retry-After':String(Math.ceil(delay/1000))});
+  }
+  return json(body,status,headers);
+ };
+ async function dispatchGroup(members,devices,c){
+   const results=[];
+   for(let i=0;i<members.length;i++){
+    const m=members[i],d=devices[i];
+    if(!validateCapability(d,c)){results.push({sku:m.sku,device:m.device,ok:false,error:'Capability or value not supported'});continue;}
+    const x=await control(env,m,c);results.push({sku:m.sku,device:m.device,ok:x.ok,upstreamStatus:x.httpStatus??null,error:x.error??null,...(Number.isFinite(x.retryAfterMs)?{retryAfterMs:x.retryAfterMs}:{})});
+   }
+   const ok=results.every(x=>x.ok);return reply({ok,results,executed:results.filter(x=>x.ok).length},ok?200:207);
+ }
  if(request.method==='OPTIONS')return Object.keys(headers).length?new Response(null,{status:204,headers}):reply({ok:false,error:'Origin not permitted'},403);
  if(u.pathname==='/health'&&request.method==='GET')return reply({ok:true,service:'666-govee-worker',version:'0.3-source',configured:!!env.GOVEE_API_KEY,locked:!env.CONTROL_TOKEN});
  if(!env.GOVEE_API_KEY||!env.CONTROL_TOKEN)return reply({ok:false,error:'Required secrets not configured'},503);
  if(!equal(request.headers.get('Authorization')||'','Bearer '+env.CONTROL_TOKEN))return reply({ok:false,error:'Unauthorized'},401);
  try{
   if(u.pathname==='/api/devices'&&request.method==='GET'){
-   const r=await owned(env);if(!r.ok)return reply(r,502);
-   return reply({ok:true,devices:r.devices.map(d=>({sku:d.sku,device:d.device,deviceName:d.deviceName,capabilities:d.capabilities}))});
+   const area=u.searchParams.get('area');
+   if(area!==null&&!areaSkus.has(area))return reply({ok:false,error:'Unknown device area'},400);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
+   const devices=area===null?r.devices:r.devices.filter(d=>d.sku===areaSkus.get(area));
+   return reply({ok:true,devices:devices.map(d=>({sku:d.sku,device:d.device,deviceName:d.deviceName,capabilities:d.capabilities}))});
   }
   if(u.pathname==='/api/state'&&request.method==='POST'){
    const b=await request.json().catch(()=>null);
    if(!b||!isSku(b.sku)||!isDevice(b.device))return reply({ok:false,error:'Invalid device identification'},400);
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    if(!r.devices.some(d=>d.sku===b.sku&&d.device===b.device))return reply({ok:false,error:'Device not registered to account'},403);
+   const gate=await reserveGoveeState(env,b.sku,b.device);
+   if(!gate.ok)return reply({ok:false,error:gate.error,retryAfterMs:gate.retryAfterMs??null},gate.error==='rate_limited'?429:503);
    const s=await api(env,'/router/api/v1/device/state','POST',{requestId:crypto.randomUUID(),payload:{sku:b.sku,device:b.device}});
-   return reply(s,s.ok?200:502);
+   return reply(s,s.ok?200:s.httpStatus===429?429:502);
   }
   if(u.pathname==='/api/control'&&request.method==='POST'){
    const b=await request.json().catch(()=>null),c=b?.capability;
    if(!b||!isSku(b.sku)||!isDevice(b.device)||!goodCapability(c))return reply({ok:false,error:'Invalid control payload'},400);
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const d=r.devices.find(x=>x.sku===b.sku&&x.device===b.device);
    if(!d)return reply({ok:false,error:'Device not registered to account'},403);
    if(!validateCapability(d,c))return reply({ok:false,error:'Capability or value not supported by device'},400);
-   const x=await control(env,b,c);return reply(x,x.ok?200:502);
+   const x=await control(env,b,c);return reply(x,x.ok?200:x.httpStatus===429?429:x.httpStatus===503?503:502);
   }
   if(u.pathname==='/api/audio/preview'&&request.method==='POST'){
    const b=await request.json().catch(()=>null);
    if(!b||typeof b!=='object'||Array.isArray(b))return reply({ok:false,error:'Invalid audio event'},400);
    return reply({ok:true,preview:mapAudioEvent(b),executed:false});
   }
+  if(u.pathname==='/api/audio'&&request.method==='POST'){
+   const b=await request.json().catch(()=>null);
+   if(!b||!Number.isFinite(b.energy)||b.energy<0||b.energy>1||!areaSkus.has(b.area)){
+    return reply({ok:false,error:'Invalid audio event'},400);
+   }
+   const mapped=mapAudioEvent(b);
+   if(b.energy<0.025||mapped.scene==='idle')return reply({ok:true,executed:0,reason:'idle'});
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
+   const {r:red,g:green,b:blue}=mapped.theme;
+   const scale=mapped.drop?1:mapped.scene==='break'?0.35:0.65;
+   const c={type:'devices.capabilities.color_setting',instance:'colorRgb',
+    value:(Math.round(red*scale)<<16)|(Math.round(green*scale)<<8)|Math.round(blue*scale)};
+   const devices=r.devices.filter(d=>d.sku===areaSkus.get(b.area)&&validateCapability(d,c));
+   if(!devices.length)return reply({ok:false,error:'No registered RGB device in selected area'},422);
+   if(devices.length>8)return reply({ok:false,error:'Too many RGB devices in selected area'},422);
+   return await dispatchGroup(devices,devices,c);
+  }
   if(u.pathname==='/api/groups/control'&&request.method==='POST'){
    const b=await request.json().catch(()=>null),members=b?.members,c=b?.capability;
    if(!Array.isArray(members)||members.length<1||members.length>8||!goodCapability(c))return reply({ok:false,error:'Invalid group payload'},400);
    if(members.some(m=>!m||!isSku(m.sku)||!isDevice(m.device)))return reply({ok:false,error:'Invalid group member'},400);
    if(new Set(members.map(m=>m.sku+'|'+m.device)).size!==members.length)return reply({ok:false,error:'Duplicate group members'},400);
-   const r=await owned(env);if(!r.ok)return reply(r,502);
+   const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const devices=members.map(m=>r.devices.find(x=>x.sku===m.sku&&x.device===m.device));
    if(devices.some(d=>!d))return reply({ok:false,error:'Group contains a device not registered to account'},403);
-   const results=[];
-   for(let i=0;i<members.length;i++){
-    const m=members[i],d=devices[i];
-    if(!validateCapability(d,c)){results.push({sku:m.sku,device:m.device,ok:false,error:'Capability or value not supported'});continue;}
-    const x=await control(env,m,c);results.push({sku:m.sku,device:m.device,ok:x.ok,upstreamStatus:x.httpStatus??null});
-   }
-   const ok=results.every(x=>x.ok);return reply({ok,results,executed:results.filter(x=>x.ok).length},ok?200:207);
+   return await dispatchGroup(members,devices,c);
   }
   return reply({ok:false,error:'Not found'},404);
  }catch(_){return reply({ok:false,error:'Request failed'},500);}
