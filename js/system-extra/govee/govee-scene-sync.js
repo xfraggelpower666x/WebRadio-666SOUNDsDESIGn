@@ -1,5 +1,5 @@
-import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r01";
-import { goveeSendAudio, goveeSetMode, goveeSetEnabled, goveePreviewAudio } from "/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r01";
+import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r02";
+import { goveeSendAudio, goveeSetMode, goveeSetEnabled, goveePreviewAudio } from "/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r02";
 import { applyStatusChip } from "/js/shared-status.js";
 
 function clamp(n, min, max) {
@@ -50,9 +50,9 @@ export function initGoveeSceneSync(ctx) {
   let destroyed = false;
   let lastError = "";
 
-  const markOffline = (error, now) => {
+  const markOffline = (error) => {
     connected = false;
-    retryAt = now + Math.max(1000, Number(GOVEE_SYNC_CONFIG.reconnectDelayMs) || 5000);
+    retryAt = Date.now() + Math.max(GOVEE_SYNC_CONFIG.reconnectDelayMs, error?.retryAfterMs || 0);
     const message = error?.message || String(error || "cloud_unavailable");
     if (message !== lastError) console.warn("Govee-Cloud nicht verfügbar:", message);
     lastError = message;
@@ -83,17 +83,22 @@ export function initGoveeSceneSync(ctx) {
       const energy = clamp(detail.energy ?? detail.level, 0, 1);
       const payload = { scene: fx.scene, theme: fx.theme, energy, pulse: clamp(detail.pulse, 0, 1) };
       const result = await goveeSendAudio(payload);
+      if (destroyed || !GOVEE_SYNC_CONFIG.enabled) return;
       connected = true;
       lastScene = fx.scene;
       if (fx.scene) document.documentElement.setAttribute("data-govee-scene", fx.scene);
       else document.documentElement.removeAttribute("data-govee-scene");
       document.documentElement.setAttribute("data-govee-scene-source", fx.sceneSource);
-      if (!result.ok) throw new Error("Govee-Cloud meldet Teilerfolg oder Fehler");
+      if (!result.ok) {
+        const error = new Error("Govee-Cloud meldet Teilerfolg oder Fehler");
+        error.retryAfterMs = Math.max(0, ...(result.results || []).map(item => Number(item.retryAfterMs) || 0));
+        throw error;
+      }
       lastSend = now;
       lastError = "";
       publishState("online");
     } catch (error) {
-      markOffline(error, now);
+      if (!destroyed && GOVEE_SYNC_CONFIG.enabled) markOffline(error);
     } finally {
       inFlight = false;
     }

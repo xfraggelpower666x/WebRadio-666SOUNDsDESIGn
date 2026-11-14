@@ -11,6 +11,9 @@ export function validateCapability(device,c){
  if(!advertised)return false;
  if(c.type==='devices.capabilities.on_off')return c.instance==='powerSwitch'&&(c.value===0||c.value===1);
  if(c.type==='devices.capabilities.range'||c.type==='devices.capabilities.color_temperature')return inAdvertisedRange(c.value,advertised.parameters);
- if(c.type==='devices.capabilities.color_setting')return c.instance==='colorRgb'&&int(c.value,0,0xffffff);
+ if(c.type==='devices.capabilities.color_setting'){
+  if(c.instance==='colorTemperatureK')return inAdvertisedRange(c.value,advertised.parameters);
+  return c.instance==='colorRgb'&&int(c.value,0,0xffffff);
+ }
  return false;
 }

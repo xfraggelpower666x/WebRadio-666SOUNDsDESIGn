@@ -1,4 +1,4 @@
-import { GOVEE_SYNC_CONFIG } from "./govee-sync-config.js?v=govee-cloud-r01";
+import { GOVEE_SYNC_CONFIG } from "./govee-sync-config.js?v=govee-cloud-r02";
 
 async function call(path, payload, { interactive = true } = {}) {
   const auth = window.S666AdminAuth;
@@ -16,7 +16,13 @@ async function call(path, payload, { interactive = true } = {}) {
       })
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || `Govee HTTP ${response.status}`);
+    if (!response.ok) {
+      const error = new Error(result.error || `Govee HTTP ${response.status}`);
+      const header = response.headers.get("Retry-After");
+      const seconds = header && /^\d+$/.test(header) ? Number(header) : 0;
+      error.retryAfterMs = Math.max(seconds * 1000, Number(result.retryAfterMs) || 0);
+      throw error;
+    }
     return result;
   } finally {
     clearTimeout(timer);

@@ -359,6 +359,8 @@
       <button type="button" class="hud-render-toggle" data-govee-command="color">FARBE SETZEN</button>
       <label>Helligkeit <input id="goveeBrightness" type="number" min="1" max="100" value="65"></label>
       <button type="button" class="hud-render-toggle" data-govee-command="brightness">HELLIGKEIT SETZEN</button>
+      <label id="goveeTemperatureLabel" hidden>Farbtemperatur (K) <input id="goveeTemperature" type="number" step="1"></label>
+      <button type="button" class="hud-render-toggle" data-govee-command="temperature" hidden>FARBTEMPERATUR SETZEN</button>
     </div><pre id="goveeResponse" role="status">Gerätekatalog noch nicht geladen.</pre></section></div>
   <footer class="dash-footer">
     <span id="pollDot"></span>
@@ -644,6 +646,45 @@
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close()});
     const goveeDevices=document.getElementById('goveeDevices');
     let catalog=[];
+    const temperature=document.getElementById('goveeTemperature');
+    const temperatureLabel=document.getElementById('goveeTemperatureLabel');
+    const temperatureButton=modal.querySelector('[data-govee-command="temperature"]');
+    const selection=()=>Array.from(goveeDevices.querySelectorAll('input:checked'),input=>catalog[Number(input.value)]);
+    function updateTemperature(){
+      const selected=selection();
+      const ranges=selected.map(device=>device.capabilities?.find(capability=>
+        capability.type==='devices.capabilities.color_setting'&&capability.instance==='colorTemperatureK'
+      )?.parameters?.range);
+      const valid=ranges.length>0&&ranges.every(range=>Number.isInteger(range?.min)&&Number.isInteger(range?.max));
+      const min=valid?Math.max(...ranges.map(range=>range.min)):0;
+      const max=valid?Math.min(...ranges.map(range=>range.max)):-1;
+      temperatureLabel.hidden=temperatureButton.hidden=min>max;
+      if(!temperatureLabel.hidden){
+        temperature.min=String(min);
+        temperature.max=String(max);
+        if(!temperature.value||!temperature.checkValidity())temperature.value=String(min);
+      }
+    }
+    goveeDevices.addEventListener('change',updateTemperature);
+    function readableState(result){
+      const capabilities=result?.payload?.capabilities;
+      if(!Array.isArray(capabilities))return 'Statusdaten fehlen';
+      const state=(type,instance)=>capabilities.find(item=>
+        item?.type===('devices.capabilities.'+type)&&item.instance===instance)?.state?.value;
+      const flag=value=>value===true||value===1?'Ja':value===false||value===0?'Nein':null;
+      const online=flag(state('online','online'));
+      const power=flag(state('on_off','powerSwitch'));
+      const brightness=state('range','brightness');
+      const rgb=state('color_setting','colorRgb');
+      const kelvin=state('color_setting','colorTemperatureK');
+      return [
+        online&&'Online: '+online,
+        power&&'Ein: '+power,
+        Number.isFinite(brightness)&&'Helligkeit: '+brightness+' %',
+        Number.isInteger(rgb)&&rgb>=0&&rgb<=0xffffff&&'Farbe: #'+rgb.toString(16).padStart(6,'0'),
+        Number.isFinite(kelvin)&&'Farbtemperatur: '+kelvin+' K'
+      ].filter(Boolean).join(' · ')||'Keine bekannten Statuswerte gemeldet';
+    }
     modal?.querySelectorAll('[data-govee-command]').forEach(button=>button.addEventListener('click',async()=>{
       const command=button.dataset.goveeCommand;
       const buttons=Array.from(modal.querySelectorAll('[data-govee-command]'));
@@ -651,7 +692,7 @@
       mark('GOV','pending','Govee-Cloud wird kontaktiert');
       response.textContent='Govee-Anfrage läuft …';
       try{
-        const g=await import('/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r01');
+        const g=await import('/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r02');
         if(command==='read'){
           ({devices:catalog}=await g.goveeDevices());
           goveeDevices.querySelectorAll('label').forEach(label=>label.remove());
@@ -662,17 +703,18 @@
             label.append(checkbox,' '+(device.deviceName||device.sku)+' ('+device.sku+') ');
             goveeDevices.append(label);
           });
+          updateTemperature();
           response.textContent=catalog.length+' Geräte gefunden.';
           mark('GOV','ok','Govee-Gerätekatalog bestätigt');
           return;
         }
-        const selected=Array.from(goveeDevices.querySelectorAll('input:checked'),input=>catalog[Number(input.value)]);
+        const selected=selection();
         if(!selected.length)throw Error('Bitte zuerst Geräte laden und auswählen.');
         if(selected.length>8)throw Error('Bitte höchstens acht Geräte gleichzeitig auswählen.');
         if(command==='state'){
           const statuses=await Promise.allSettled(selected.map(device=>g.goveeState(device)));
           response.textContent=statuses.map((item,i)=>(selected[i].deviceName||selected[i].sku)+': '+
-            (item.status==='fulfilled'?JSON.stringify(item.value.result?.payload?.capabilities||[]):String(item.reason?.message||item.reason))).join('\n');
+            (item.status==='fulfilled'?readableState(item.value.result):String(item.reason?.message||item.reason))).join('\n');
           mark('GOV',statuses.every(item=>item.status==='fulfilled')?'ok':'warn','Govee-Gerätestatus');
           return;
         }
@@ -684,6 +726,10 @@
           const input=document.getElementById('goveeBrightness');
           if(!input.value||!input.checkValidity())throw Error('Bitte eine gültige Helligkeit eingeben.');
           capability={type:'devices.capabilities.range',instance:'brightness',value:input.valueAsNumber};
+        }
+        if(command==='temperature'){
+          if(temperatureLabel.hidden||!temperature.value||!temperature.checkValidity())throw Error('Bitte eine gültige Farbtemperatur eingeben.');
+          capability={type:'devices.capabilities.color_setting',instance:'colorTemperatureK',value:temperature.valueAsNumber};
         }
         const result=await g.goveeControl(selected,capability);
         response.textContent=result.results

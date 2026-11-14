@@ -1,5 +1,5 @@
-import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r01";
-import { goveeSetEnabled, goveeSetMode, goveeTestColor } from "/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r01";
+import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r02";
+import { goveeSetEnabled, goveeSetMode, goveeTestColor } from "/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r02";
 
 function runtime() {
   return window.S666GoveeSync || null;

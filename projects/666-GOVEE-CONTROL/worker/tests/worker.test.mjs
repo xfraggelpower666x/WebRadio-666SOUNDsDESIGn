@@ -81,10 +81,11 @@ test('body-level Govee rate limit becomes HTTP 429 instead of a false 200',async
  const controlled={...env,GOVEE_RATE_GATE:{idFromName:()=> 'account',get:()=>({fetch:async(url)=>{
   return new URL(url).pathname==='/devices'?Response.json({ok:true,devices:[d]}):Response.json({ok:true});
  }})}};
- globalThis.fetch=async()=>Response.json({code:429,message:'Limit exceeded'},{status:200});
+ globalThis.fetch=async()=>Response.json({code:429,message:'Limit exceeded'},{status:200,headers:{'Retry-After':'12'}});
  try{
   const r=await worker.fetch(req('/api/control',{sku:d.sku,device:d.device,capability:{type:'devices.capabilities.on_off',instance:'powerSwitch',value:1}}),controlled);
   assert.equal(r.status,429);
+  assert.equal(r.headers.get('Retry-After'),'12');
   assert.equal((await r.json()).ok,false);
  }finally{globalThis.fetch=old;}
 });
@@ -198,4 +199,14 @@ test('live audio route applies only authorized, supported RGB to the selected ar
  assert.equal(calls.length,1);
  assert.equal(calls[0].sku,'H6047');
  assert.equal(calls[0].capability.value,0x00d2ff);
+});
+
+test('official Kelvin capability requires the advertised device range',()=>{
+ const capability={type:'devices.capabilities.color_setting',instance:'colorTemperatureK'};
+ const device={capabilities:[{...capability,parameters:{range:{min:2000,max:9000}}}]};
+ assert.equal(validateCapability(device,{...capability,value:3000}),true);
+ assert.equal(validateCapability(device,{...capability,value:1999}),false);
+ assert.equal(validateCapability(device,{...capability,value:9001}),false);
+ assert.equal(validateCapability(device,{...capability,value:3000.5}),false);
+ assert.equal(validateCapability({capabilities:[capability]},{...capability,value:3000}),false);
 });

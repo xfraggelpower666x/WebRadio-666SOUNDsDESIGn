@@ -23,3 +23,7 @@ node --test tests/govee*.test.mjs
 npm --prefix projects/666-GOVEE-CONTROL/worker run check
 npm --prefix projects/666-GOVEE-CONTROL/worker test
 ```
+
+## R02 · Gerätestatus, Kelvin und Audio-FX
+
+Das Dashboard zeigt die zurückgemeldeten Statuswerte in lesbarer Form. Ein Kelvin-Regler erscheint, wenn alle ausgewählten Geräte `colorTemperatureK` mit einem gemeinsamen gültigen Wertebereich veröffentlichen. Der Worker prüft den gesendeten Wert zusätzlich für jedes Gerät. Bei einem Rate-Limit verlängert der Hauptplayer seine Sendepause gemäß der gemeldeten Wartezeit. Nach der Pause verwendet er nur ein aktuelles MeterBus-Signal. Bereits gestartete Lichtbefehle können durch Ausschalten des FX-Schalters nicht rückgängig gemacht werden.

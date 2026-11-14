@@ -19,7 +19,12 @@ async function api(env,path,method='GET',body){
  const code=result?.code;
  if(!res.ok || (code!==200 && code!=='200')){
   const limited=res.status===429 || code===429 || code==='429';
-  return {ok:false,httpStatus:limited?429:(res.ok?502:res.status),error:limited?'Govee rate limit exceeded':'Govee upstream error',upstreamCode:result?.code??null};
+  const retryAfter=limited?res.headers.get('Retry-After'):null;
+  const seconds=retryAfter&&/^\d+$/.test(retryAfter)?Number(retryAfter):NaN;
+  const delay=Number.isFinite(seconds)?seconds*1000:Date.parse(retryAfter)-Date.now();
+  return {ok:false,httpStatus:limited?429:(res.ok?502:res.status),
+   error:limited?'Govee rate limit exceeded':'Govee upstream error',upstreamCode:result?.code??null,
+   ...(Number.isFinite(delay)&&delay>0?{retryAfterMs:delay}:{})};
  }
  return {ok:true,result};
 }
