@@ -85,6 +85,7 @@
       mute:'Audio stummschalten oder wieder einschalten.',
       play:'Wiedergabe starten oder pausieren.',
       diagnostics:'Diagnose öffnen: Monitore, GPU, Runtime und JSON-Export.',
+      openCyberStudio:'MilkDrop Cyber Studio für Presets, Assets und Bearbeitung öffnen.',
       importPersonal:'Persönliche MilkDrop-Bibliothek aus ZIP importieren und lokal speichern.',
       top100:'Nur Presets aus der Top-100-Liste anzeigen.',
       classic:'Nur klassische .milk-Presets anzeigen.',
@@ -111,6 +112,7 @@
       mute:'Mute or unmute audio.',
       play:'Start or pause playback.',
       diagnostics:'Open diagnostics for displays, GPU, runtime and JSON export.',
+      openCyberStudio:'Open MilkDrop Cyber Studio for presets, assets and editing.',
       importPersonal:'Import the personal MilkDrop library ZIP and store it locally.',
       top100:'Show only presets from the Top 100 list.',
       classic:'Show classic .milk presets only.',
@@ -370,6 +372,34 @@
     btn.addEventListener('click',()=>openWindow(def.key));
     dock.appendChild(btn);
   }
+
+  const cyberStudioButton = document.createElement('button');
+  cyberStudioButton.type = 'button';
+  cyberStudioButton.id = 'rw-dock-open-cyber-studio';
+  cyberStudioButton.className = 'rw-dock-button';
+  cyberStudioButton.dataset.rwTipKey = 'openCyberStudio';
+  cyberStudioButton.setAttribute('aria-label', 'MilkDrop Cyber Studio');
+  cyberStudioButton.innerHTML = '<span aria-hidden="true">✦</span><small>MilkDrop Cyber Studio</small>';
+  cyberStudioButton.addEventListener('click', async () => {
+    if (cyberStudioButton.disabled) return;
+    cyberStudioButton.disabled = true;
+    try {
+      const result = await window.api.openCyberStudio(languageCode());
+      if (result?.alreadyOpen) {
+        window.alert(languageCode() === 'de'
+          ? 'MilkDrop Cyber Studio ist bereits in einem eigenen Fenster geöffnet.'
+          : 'MilkDrop Cyber Studio is already open in its own window.');
+      }
+    } catch (error) {
+      console.error('MilkDrop Cyber Studio', error);
+      window.alert(languageCode() === 'de'
+        ? 'Radio Wave konnte den Studio-Start nicht anfordern.'
+        : 'Radio Wave could not request the studio launch.');
+    } finally {
+      cyberStudioButton.disabled = false;
+    }
+  });
+  dock.querySelector('#rw-dock-open-milkdrop')?.after(cyberStudioButton);
 
   // Stream status remains inside the video frame so it moves with the visual canvas.
   const status=q('#radio-status-panel');

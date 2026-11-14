@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('api', {
     try { return webUtils?.getPathForFile ? webUtils.getPathForFile(file) : String(file?.path || ''); } catch { return String(file?.path || ''); }
   },
   openBackground: () => ipcRenderer.invoke('dialog:openBackground'),
+  openCyberStudio: (language) => ipcRenderer.invoke('milkdrop:open-cyber-studio', language),
   openMilkdrop: () => ipcRenderer.invoke('dialog:openMilkdrop'),
   openMilkdropPack: () => ipcRenderer.invoke('dialog:openMilkdropPack'),
   importMilkdropPersonalLibrary: () => ipcRenderer.invoke('dialog:importMilkdropPersonalLibrary'),

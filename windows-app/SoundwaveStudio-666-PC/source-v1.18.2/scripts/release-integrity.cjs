@@ -2,7 +2,21 @@
 const fs=require('fs'),path=require('path'),cp=require('child_process'),crypto=require('crypto');
 function run(cmd,args){const r=cp.spawnSync(cmd,args,{stdio:'inherit',shell:false});if(r.status!==0)process.exit(r.status||1);}
 console.log('=== SoundwaveStudio 666 Release Integrity ===');
-run(process.execPath,['tests/deep-integration.test.cjs']);
+const checksumManifest = fs.readFileSync('SOURCE_SHA256SUMS.txt', 'utf8').trim();
+for (const line of checksumManifest.split(/\r?\n/)) {
+  const entry = /^([0-9a-f]{64})  (.+)$/.exec(line);
+  if (!entry || crypto.createHash('sha256').update(fs.readFileSync(entry[2])).digest('hex') !== entry[1]) {
+    throw new Error('Source checksum mismatch: ' + line);
+  }
+}
+console.log('PASS source checksums');
+for (const test of [
+  'tests/deep-integration.test.cjs',
+  'tests/diagnostics-host-check.test.cjs',
+  'tests/local-playback-output.test.cjs',
+  'tests/milkdrop-control-layer.test.cjs',
+  'tests/milkdrop-studio-bridge.test.cjs'
+]) run(process.execPath,[test]);
 run(process.execPath,['scripts/check-syntax.cjs']);
 // Scan shipped runtime/application content. Audit scripts/tests contain the detector literals themselves.
 const scanRoots=['main.js','preload.js','src','docs'];

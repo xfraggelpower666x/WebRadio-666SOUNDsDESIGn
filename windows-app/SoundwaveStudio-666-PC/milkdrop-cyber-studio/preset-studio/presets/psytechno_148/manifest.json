@@ -1,0 +1,47 @@
+[
+  {
+    "file": "666SD_psytechno_tunnel_00000666.milk",
+    "style": "psytechno",
+    "variant": "tunnel",
+    "bpm": 148.0,
+    "intensity": 0.8,
+    "seed": 666,
+    "sha256": "8dd2e9b18ea798aa75053140c40b74f755b36c54b387f58d57c2601243099f76"
+  },
+  {
+    "file": "666SD_psytechno_spiral_00000667.milk",
+    "style": "psytechno",
+    "variant": "spiral",
+    "bpm": 148.0,
+    "intensity": 0.8,
+    "seed": 667,
+    "sha256": "734802eeb7837e0be5a709de621f314fe47f7ec606d3ca9d899389491a8e3ece"
+  },
+  {
+    "file": "666SD_psytechno_vortex_00000668.milk",
+    "style": "psytechno",
+    "variant": "vortex",
+    "bpm": 148.0,
+    "intensity": 0.8,
+    "seed": 668,
+    "sha256": "f0481ec05cd928abcada829b9dc5c31aebad60277ae9017ae6f91026e10786ad"
+  },
+  {
+    "file": "666SD_psytechno_pulse_00000669.milk",
+    "style": "psytechno",
+    "variant": "pulse",
+    "bpm": 148.0,
+    "intensity": 0.8,
+    "seed": 669,
+    "sha256": "42dfbbb9eeae4db58703f44c5473deb65837001b37ff2c061ae53e788f44e34f"
+  },
+  {
+    "file": "666SD_psytechno_drift_00000670.milk",
+    "style": "psytechno",
+    "variant": "drift",
+    "bpm": 148.0,
+    "intensity": 0.8,
+    "seed": 670,
+    "sha256": "320def97cfa2c72434ae26cb709554de6fa66c2fac48612ebf1755b6b2e755de"
+  }
+]

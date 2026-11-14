@@ -1,0 +1,2 @@
+# Preset manifests hash the exact shipped bytes across operating systems.
+*.milk text eol=lf

@@ -33,31 +33,42 @@
     box.innerHTML='<div class="file-meta-tag">HOST CHECK · RUNNING REAL RUNTIME READS…</div>';
     const rows=[];
     try{
-      const [displays,outputs,remote,queue,milkdrop,sc]=await Promise.all([
-        window.api.displays(),
-        window.api.outputStatus(),
-        window.api.remoteHealth(),
-        window.api.localQueueState(),
-        window.api.personalMilkdropLibrary(),
-        window.api.soundCloudStatus()
-      ]);
+      const readers={
+        displays:()=>window.api.displays(),
+        outputStatus:()=>window.api.outputStatus(),
+        remoteHealth:()=>window.api.remoteHealth(),
+        localQueueState:()=>window.api.localQueueState(),
+        personalMilkdropLibrary:()=>window.api.personalMilkdropLibrary(),
+        soundCloudStatus:()=>window.api.soundCloudStatus()
+      };
+      const results=await Promise.allSettled(Object.values(readers).map(read=>Promise.resolve().then(read)));
+      const evidence=Object.fromEntries(Object.keys(readers).map((name,index)=>[name,results[index]]));
+      const [displays,outputs,remote,queue,milkdrop,sc]=results.map(result=>result.value);
+      const addEvidence=(source,label,status,detail)=>{
+        const result=evidence[source];
+        rows.push(result.status==='rejected'
+          ?hostRow(label,'ERROR',String(result.reason?.message??result.reason))
+          :hostRow(label,status,detail));
+      };
       const displayCount=Array.isArray(displays)?displays.length:0;
-      rows.push(hostRow('Displays',displayCount>=2?'PASS':'PENDING',displayCount+' detected'));
+      // Presence, configuration, and reachability are not functional host acceptance.
+      addEvidence('displays','Displays',displayCount>=2?'DETECTED':'PENDING',displayCount+' detected · multi-monitor output not yet verified');
       const detached=outputs?.detachedVisualizer;
       const db=detached?.bounds||{};
-      rows.push(hostRow('Detached Visualizer',detached?'PASS':'PENDING',detached?(String(db.width||0)+'×'+String(db.height||0)+' @ '+String(db.x||0)+','+String(db.y||0)):'Open VISUALIZER ↗ and move it to another monitor'));
+      addEvidence('outputStatus','Detached Visualizer',detached?.visible?'VISIBLE':detached?'DETECTED':'PENDING',detached?(String(db.width||0)+'×'+String(db.height||0)+' @ '+String(db.x||0)+','+String(db.y||0)+' · visual output not verified'):'Open VISUALIZER ↗ and move it to another monitor');
       const activeOutputs=Array.isArray(outputs?.active)?outputs.active:[];
-      rows.push(hostRow('Secondary Outputs',activeOutputs.some(x=>x.responsive)?'PASS':'PENDING',activeOutputs.length+' active'));
-      rows.push(hostRow('Local Queue',queue?.count>0?'PASS':'PENDING',String(queue?.count||0)+' tracks · index '+String(queue?.index??-1)));
-      rows.push(hostRow('MilkDrop Personal Library',milkdrop?.installed&&milkdrop?.milk>0?'PASS':'PENDING',milkdrop?.installed?(String(milkdrop.milk||0)+' .milk · '+String(milkdrop.milk2||0)+' .milk2'):'Not installed'));
-      rows.push(hostRow('SoundCloud API',sc?.configured?'PASS':'PENDING',sc?.configured?'Configured':'Credentials missing'));
-      rows.push(hostRow('Admin Session',remote?.admin?.ok?'PASS':'PENDING',remote?.admin?.ok?'Authenticated':String(remote?.admin?.error||'Login required')));
-      rows.push(hostRow('Skip Bridge',remote?.skip?.ok&&remote?.skip?.configured!==false?'PASS':'PENDING',remote?.skip?.ok?String(remote?.skip?.configured===false?'Bridge not configured':'Reachable'):String(remote?.skip?.error||remote?.skip?.status||'Unavailable')));
-      rows.push(hostRow('Player Messenger',remote?.messenger?.ok?'PASS':'PENDING',remote?.messenger?.ok?'Reachable':String(remote?.messenger?.error||remote?.messenger?.status||'Unavailable')));
+      addEvidence('outputStatus','Secondary Outputs',activeOutputs.some(x=>x.responsive)?'HEARTBEAT':'PENDING',activeOutputs.length+' active · rendering not verified');
+      addEvidence('localQueueState','Local Queue',queue?.count>0?'LOADED':'PENDING',String(queue?.count||0)+' tracks · index '+String(queue?.index??-1)+' · playback/transition not verified');
+      addEvidence('personalMilkdropLibrary','MilkDrop Personal Library',milkdrop?.installed&&milkdrop?.milk>0?'INDEXED':'PENDING',milkdrop?.installed?(String(milkdrop.milk||0)+' .milk · '+String(milkdrop.milk2||0)+' .milk2 · render not verified'):'Not installed');
+      addEvidence('soundCloudStatus','SoundCloud API',sc?.configured?'CONFIGURED':'PENDING',sc?.configured?'Credentials configured · playback not verified':'Credentials missing');
+      addEvidence('remoteHealth','Admin Session',remote?.admin?.ok?'AUTHENTICATED':'PENDING',remote?.admin?.ok?'Authenticated · actions not verified':String(remote?.admin?.error||'Login required'));
+      addEvidence('remoteHealth','Skip Bridge',remote?.skip?.ok&&remote?.skip?.configured!==false?'REACHABLE':'PENDING',remote?.skip?.ok?String(remote?.skip?.configured===false?'Bridge not configured':'Reachable · skip action not verified'):String(remote?.skip?.error||remote?.skip?.status||'Unavailable'));
+      addEvidence('remoteHealth','Player Messenger',remote?.messenger?.ok?'REACHABLE':'PENDING',remote?.messenger?.ok?'Reachable · message delivery not verified':String(remote?.messenger?.error||remote?.messenger?.status||'Unavailable'));
       const visual=document.getElementById('visual-engine')?.value||'unknown';
-      rows.push(hostRow('Visualizer Engine','PASS',visual));
+      rows.push(hostRow('Visualizer Engine',visual!=='unknown'?'SELECTED':'PENDING',visual+' · audio-driven rendering not verified'));
       box.innerHTML=rows.join('');
-      q('#rw-diag-state').textContent='HOST CHECK COMPLETE · '+new Date().toLocaleTimeString();
+      const partial=results.some(result=>result.status==='rejected');
+      q('#rw-diag-state').textContent=(partial?'HOST CHECK PARTIAL · ':'HOST CHECK COMPLETE · ')+new Date().toLocaleTimeString();
       syncDetached();
     }catch(e){
       box.innerHTML=hostRow('Host Check','ERROR',String(e.message||e));

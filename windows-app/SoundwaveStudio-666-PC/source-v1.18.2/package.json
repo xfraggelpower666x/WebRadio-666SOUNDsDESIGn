@@ -7,12 +7,13 @@
     "start": "electron .",
     "dist": "npm run prepare:branding && npm run check:radio-wave-release && electron-builder --win --x64 --publish never",
     "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
-    "test": "node tests/deep-integration.test.cjs",
+    "test": "node tests/deep-integration.test.cjs && node --test tests/diagnostics-host-check.test.cjs tests/local-playback-output.test.cjs && node tests/milkdrop-control-layer.test.cjs && node --test tests/milkdrop-studio-bridge.test.cjs",
     "check:syntax": "node scripts/check-syntax.cjs",
     "check:release": "node scripts/release-integrity.cjs",
     "prebuild": "npm run prepare:branding && npm run check:radio-wave-release",
     "prepare:branding": "node scripts/prepare-radio-wave-branding.cjs",
-    "check:radio-wave-release": "node scripts/radio-wave-release-integrity.cjs"
+    "check:radio-wave-release": "node scripts/radio-wave-release-integrity.cjs",
+    "check:electron": "node scripts/ensure-electron.cjs"
   },
   "keywords": [
     "radio-wave",
@@ -27,7 +28,7 @@
   "author": "FRAGGLEPOWER666 / 666SOUNDsDESIGN",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^31.0.0",
+    "electron": "45.3.2",
     "electron-builder": "^26.8.1",
     "electron-packager": "^17.1.2"
   },
@@ -62,6 +63,17 @@
       "intro-preload.js",
       "overlay-preload.js"
     ],
+    "extraResources": [
+      {
+        "from": "../milkdrop-cyber-studio/preset-studio",
+        "to": "milkdrop-cyber-studio",
+        "filter": [
+          "src/*.py",
+          "presets/**/*",
+          "scripts/directx_sdk.ps1"
+        ]
+      }
+    ],
     "directories": {
       "output": "dist"
     },
@@ -80,5 +92,11 @@
       "artifactName": "RADIO-WAVE-v6.66-Portable.${ext}"
     }
   },
-  "productName": "RADIO WAVE v6.66"
+  "productName": "RADIO WAVE v6.66",
+  "allowScripts": {
+    "electron-winstaller@5.4.0": true
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }

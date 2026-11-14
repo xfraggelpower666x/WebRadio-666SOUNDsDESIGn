@@ -19,7 +19,7 @@ pass('MilkDrop runtime promoted',fs.existsSync('src/vendor/cayatur/milkdrop-core
 pass('3D dependency closure present',fs.existsSync('src/vendor/cayatur/geometry3d.js')&&fs.existsSync('src/vendor/cayatur/formulas.js')&&fs.existsSync('src/vendor/cayatur/solids.js'));
 pass('3D runtime wired and selectable',html.includes('<option value="geometry3d">')&&i.includes("engine==='geometry3d'")&&i.includes('contextLost'));
 pass('local audio no longer base64 duplicated',main.includes('swmedia')&&!main.includes('audioData.toString'));
-pass('local output synchronization',i.includes("['radio','local','soundcloud'].includes(st.mode)"));
+pass('output receives the primary analyser frame through IPC',i.includes('window.api.sendVisualFrame({frequency:')&&main.includes("registerIpc('visual:frame','main'")&&pre.includes("ipcRenderer.on('visual:frame'")&&i.includes('rt.setExternalAnalyserFrame?.(frame)'));
 pass('display hotplug recovery',main.includes("screen.on('display-added'")&&main.includes("screen.on('display-removed'")&&pre.includes('onDisplaysChanged'));
 pass('3D scene selector',html.includes('geometry-preset')&&html.includes('surface:klein')&&html.includes('attractor:lorenz'));
 pass('maximized adaptive startup',main.includes('mainWindow.maximize()'));
@@ -40,8 +40,8 @@ pass('SoundCloud OAuth client credentials main-process flow',main.includes("gran
 pass('SoundCloud internal stream protocol',main.includes("scheme:'swsc'")&&main.includes("protocol.handle('swsc'")&&i.includes('swsc://audio/current')===false);
 pass('SoundCloud resolver renderer contract',pre.includes('soundCloudResolve')&&i.includes('window.api.soundCloudResolve')&&html.includes('soundcloud-state'));
 pass('SoundCloud attribution surface',html.includes('Audio source: SoundCloud')&&html.includes('OPEN ON SOUNDCLOUD')&&main.includes('soundcloud:open-current'));
-pass('secondary output supports SoundCloud',i.includes("['radio','local','soundcloud'].includes(st.mode)"));
-pass('secondary output clock correction',i.includes('Math.abs(audio.currentTime-st.time)>.35')&&i.includes("audio.addEventListener('timeupdate'"));
+pass('secondary output follows SoundCloud source and presentation state',i.includes("window.api.syncSource({mode:'soundcloud'")&&i.includes('window.api.onSourceState(st=>')&&i.includes('composeStage(st.mode,st)'));
+pass('secondary output consumes frames without a second media clock',i.includes('window.api.onVisualFrame?.(frame=>')&&app.includes('externalAnalyserFrame={receivedAt:performance.now()}')&&!i.slice(i.indexOf('window.api.onSourceState(st=>'),i.indexOf('window.api.onVisualFrame?.(frame=>')).includes('audio.'));
 pass('SoundCloud setup documented',fs.existsSync('docs/SOUNDCLOUD_SETUP.md'));
 pass('visual engine leader follower sync',i.includes('visualState')&&i.includes('st?.visual')&&i.includes('importedMilkdrop=v.importedMilkdrop'));
 pass('visual presets sync to outputs',i.includes('shaderPreset')&&i.includes('geometryPreset')&&i.includes('milkdropPreset'));
@@ -61,7 +61,7 @@ pass('secondary output unresponsive state tracking',main.includes("webContents.o
 pass('runtime GPU diagnostics exposed safely',main.includes('runtime:diagnostics')&&main.includes('getGPUFeatureStatus')&&pre.includes('runtimeDiagnostics'));
 pass('output health status includes fps and recovery count',main.includes('responsive:')&&main.includes('recoveries:')&&main.includes('lastHeartbeat'));
 pass('release integrity command wired',read('package.json').includes('check:release')&&read('package.json').includes('release-integrity.cjs'));
-pass('portable build is release-gated',read('BUILD_SOUNDWAVE_666_PORTABLE.bat').includes('npm run check:release'));
+pass('portable build is release-gated',read('BUILD_SOUNDWAVE_666_PORTABLE.bat').includes('call npm run check:release ||')&&JSON.parse(read('package.json')).scripts.package.includes('npm run check:release'));
 pass('Chromium license notice is not deleted by packager',!read('scripts/build.js').includes("fs.unlinkSync(licenseHtml)"));
 pass('syntax checker covers application tree',read('scripts/check-syntax.cjs').includes("'main.js','preload.js','src','scripts','tests'"));
 pass('release scan excludes audit self-literals but scans shipped runtime',read('scripts/release-integrity.cjs').includes("['main.js','preload.js','src','docs']"));
@@ -74,7 +74,7 @@ pass('IPC sender validation wraps privileged channels',main.includes('function r
 pass('secondary outputs are restricted to heartbeat IPC',main.includes("registerIpc('display:heartbeat','output'")&&main.includes("registerIpc('auth:login','main'")&&main.includes("registerIpc('file:startWrite','main'"));
 pass('video export write path requires dialog approval',main.includes('approvedSavePath')&&main.includes("throw new Error('save_path_not_approved')"));
 pass('video export IPC chunks are bounded',main.includes('8 * 1024 * 1024')&&main.includes('write_chunk_too_large'));
-pass('navigation is constrained to Soundwave index document',main.includes('function trustedAppUrl')&&main.includes("u.protocol === 'file:'")&&main.includes('u.pathname === expected.pathname'));
+pass('navigation is constrained to Soundwave index document',main.includes("const trustedAppUrl=value=>trustedLocalFile(value,path.join('src','index.html'))")&&main.includes("u.protocol === 'file:'")&&main.includes('u.pathname === expected.pathname'));
 pass('renderer CSP blocks object and frame embedding',html.includes('Content-Security-Policy')&&html.includes("object-src 'none'")&&html.includes("frame-src 'none'")&&!html.includes('fonts.googleapis.com'));
 pass('radio fallback is runtime-active',i.includes('RADIO FAILOVER · FALLBACK ACTIVE')&&i.includes('radioCfg.fallback')&&i.includes("audio.addEventListener('error'"));
 pass('radio failover is bounded against loops',i.includes('radioFailoverBusy')&&i.includes('radioUsingFallback'));
@@ -115,7 +115,7 @@ pass('Python host dependency install is explicit user action',py.includes('INSTA
 pass('Python host start and build require Electron dependencies',py.includes('dependencies_ready()')&&py.includes('node_modules')&&py.includes('electron-packager'));
 
 pass('MASTER Soundwave stage has additive radio composition',html.includes('source-artwork-bg')&&html.includes('radio-visual-header')&&html.includes('source-nowplaying-ticker')&&i.includes("composeStage('radio'"));
-pass('radio visual metadata survives source state hardening',main.includes("['name','artist','dj','permalink','artwork']")&&i.includes('composeStage(st.mode,st)'));
+pass('radio visual metadata survives source state hardening',main.includes("['name','title','artist','dj','permalink','artwork',")&&i.includes('composeStage(st.mode,st)'));
 pass('SoundCloud creator library is pinned to Fraggelpower666',main.includes('https://soundcloud.com/fraggelpower666')&&main.includes('soundCloudCreatorLibrary')&&pre.includes('soundCloudLibrary'));
 pass('SoundCloud library exposes playlists and tracks in Soundwave UI',html.includes('soundcloud-library')&&i.includes("section('PLAYLISTS / ALBUMS'")&&i.includes("section('TRACKS'"));
 pass('SoundCloud prefers URN track identity',main.includes('track.urn')&&main.includes('soundCloudCurrent.urn||soundCloudCurrent.id'));
