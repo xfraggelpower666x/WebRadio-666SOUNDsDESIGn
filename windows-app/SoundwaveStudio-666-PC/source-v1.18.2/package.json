@@ -7,7 +7,7 @@
     "start": "electron .",
     "dist": "npm run prepare:branding && npm run check:radio-wave-release && electron-builder --win --x64 --publish never",
     "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
-    "test": "node tests/deep-integration.test.cjs && node --test tests/diagnostics-host-check.test.cjs tests/local-playback-output.test.cjs && node tests/milkdrop-control-layer.test.cjs && node --test tests/milkdrop-studio-bridge.test.cjs",
+    "test": "node tests/deep-integration.test.cjs && node --test tests/diagnostics-host-check.test.cjs tests/local-playback-output.test.cjs && node tests/milkdrop-control-layer.test.cjs && node --test tests/milkdrop-studio-bridge.test.cjs tests/light-scenes.test.cjs",
     "check:syntax": "node scripts/check-syntax.cjs",
     "check:release": "node scripts/release-integrity.cjs",
     "prebuild": "npm run prepare:branding && npm run check:radio-wave-release",

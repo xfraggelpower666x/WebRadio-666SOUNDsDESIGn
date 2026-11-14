@@ -770,6 +770,10 @@ function drawFrame() {
 
   }
 
+  if (!isRecording && analyserNode) {
+    window.RWLightBass?.(audioElement.paused || audioElement.muted ? 0 : bass);
+  }
+
   // Real analyzer-driven cyber LED meters. No synthetic/random level animation.
   const ledLow=document.getElementById('rw-led-low');
   const ledMid=document.getElementById('rw-led-mid');
