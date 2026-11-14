@@ -32,7 +32,7 @@ test("main deploy pins the canonical Player Admin Worker contract without commit
   });
   assert.equal(Object.hasOwn(config, "compatibility_flags"), false);
   assert.equal(Object.hasOwn(config.vars, "ADMIN_SERVICE_TOKEN"), false);
-  assert.equal(Object.hasOwn(config.vars, "GOVEE_SERVICE_TOKEN"), false);
+  assert.equal(config.services.find(item => item.binding === "GOVEE_CONTROL_WORKER").entrypoint, "GoveeRadioService");
 });
 
 test("WebRadio Durable Object stays on Cloudflare declarative exports lifecycle", async () => {

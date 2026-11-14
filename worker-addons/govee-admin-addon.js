@@ -27,7 +27,7 @@ export async function handleGoveeAdmin(request, env) {
   try {
     const auth = verifyPwIssuedToken(await verifyAdminAuth(request, env));
     if (!auth.ok) return reply('govee_admin_required', 403);
-    if (!env.GOVEE_CONTROL_WORKER || !env.GOVEE_SERVICE_TOKEN) {
+    if (!env.GOVEE_CONTROL_WORKER) {
       return reply('govee_service_unconfigured', 503);
     }
 
@@ -35,7 +35,7 @@ export async function handleGoveeAdmin(request, env) {
     if (action === 'devices' && url.searchParams.has('area')) {
       target.searchParams.set('area', url.searchParams.get('area'));
     }
-    const headers = new Headers({ authorization: 'Bearer ' + env.GOVEE_SERVICE_TOKEN });
+    const headers = new Headers();
     if (method === 'POST') {
       if (request.headers.get('content-type')?.split(';')[0].trim() !== 'application/json') {
         return reply('json_required', 415);
