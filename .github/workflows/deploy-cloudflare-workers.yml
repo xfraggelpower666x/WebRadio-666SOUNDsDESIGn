@@ -106,13 +106,19 @@ jobs:
           );
           NODE
 
-      - uses: cloudflare/wrangler-action@v3
+      - name: Deploy WebRadio Worker
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.111.0"
-          secrets: |
-            S666_AUTODJ_SKIP_ACCESS_TOKEN
           command: deploy
+
+      - name: Update AutoDJ production secret
+        shell: bash
         env:
           S666_AUTODJ_SKIP_ACCESS_TOKEN: ${{ secrets.S666_AUTODJ_SKIP_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$S666_AUTODJ_SKIP_ACCESS_TOKEN" |
+            npx --yes wrangler@4.111.0 secret put S666_AUTODJ_SKIP_ACCESS_TOKEN
