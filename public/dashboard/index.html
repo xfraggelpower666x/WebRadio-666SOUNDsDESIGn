@@ -355,6 +355,8 @@
       <button type="button" class="hud-render-toggle" data-govee-command="state">STATUS</button>
       <button type="button" class="hud-render-toggle" data-govee-command="on">EIN</button>
       <button type="button" class="hud-render-toggle" data-govee-command="off">AUS</button>
+      <label>Szene <select id="goveeLightScene"></select></label>
+      <button type="button" class="hud-render-toggle" data-govee-command="scene">SZENE ANWENDEN</button>
       <label>Farbe <input id="goveeColor" type="color" value="#00dcff"></label>
       <button type="button" class="hud-render-toggle" data-govee-command="color">FARBE SETZEN</button>
       <label>Helligkeit <input id="goveeBrightness" type="number" min="1" max="100" value="65"></label>
@@ -638,7 +640,7 @@
     }
     mark('ADM','off','Geschützter Admin-Zugang, kein Loginstatus bestätigt');
     mark('GOV','off','Govee-Gerätekatalog noch nicht geladen');
-    const gov=document.querySelector('[data-hud-action="govee"'),modal=document.getElementById('goveeHudModal'),response=document.getElementById('goveeResponse');
+    const gov=document.querySelector('[data-hud-action="govee"]'),modal=document.getElementById('goveeHudModal'),response=document.getElementById('goveeResponse');
     gov?.addEventListener('click',()=>{modal.hidden=false;document.getElementById('goveeClose').focus()});
     const close=()=>{modal.hidden=true;gov?.focus()};
     document.getElementById('goveeClose')?.addEventListener('click',close);
@@ -685,6 +687,10 @@
         Number.isFinite(kelvin)&&'Farbtemperatur: '+kelvin+' K'
       ].filter(Boolean).join(' · ')||'Keine bekannten Statuswerte gemeldet';
     }
+    const sceneSelect=document.getElementById('goveeLightScene');
+    const sceneTools=import('/js/system-extra/govee/govee-light-scenes.js?v=light-scenes-r01');
+    const sceneReady=sceneTools.then(tools=>{tools.fillScenes(sceneSelect);return tools}).catch(()=>null);
+    let sceneSender;
     modal?.querySelectorAll('[data-govee-command]').forEach(button=>button.addEventListener('click',async()=>{
       const command=button.dataset.goveeCommand;
       const buttons=Array.from(modal.querySelectorAll('[data-govee-command]'));
@@ -695,6 +701,7 @@
         const g=await import('/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r02');
         if(command==='read'){
           ({devices:catalog}=await g.goveeDevices());
+          sceneSender?.reset();
           goveeDevices.querySelectorAll('label').forEach(label=>label.remove());
           catalog.forEach((device,i)=>{
             const label=document.createElement('label'), checkbox=document.createElement('input');
@@ -718,6 +725,15 @@
           mark('GOV',statuses.every(item=>item.status==='fulfilled')?'ok':'warn','Govee-Gerätestatus');
           return;
         }
+        if(command==='scene'){
+          const scenes=await sceneReady;
+          if(!scenes)throw Error('Lichtszenen konnten nicht geladen werden.');
+          sceneSender??=scenes.createSceneSender(g.goveeControl);
+          const result=await sceneSender.apply(selected,sceneSelect.value);
+          response.textContent=scenes.describeScene(result);
+          mark('GOV',result.ok?'ok':'warn',result.ok?'Govee bestätigt':'Govee meldet Teilergebnis');
+          return;
+        }
         let capability={type:'devices.capabilities.on_off',instance:'powerSwitch',value:command==='on'?1:0};
         if(command==='color'){
           capability={type:'devices.capabilities.color_setting',instance:'colorRgb',value:Number.parseInt(document.getElementById('goveeColor').value.slice(1),16)};
@@ -731,6 +747,7 @@
           if(temperatureLabel.hidden||!temperature.value||!temperature.checkValidity())throw Error('Bitte eine gültige Farbtemperatur eingeben.');
           capability={type:'devices.capabilities.color_setting',instance:'colorTemperatureK',value:temperature.valueAsNumber};
         }
+        sceneSender?.reset();
         const result=await g.goveeControl(selected,capability);
         response.textContent=result.results
           ? result.results.map((item,i)=>(selected[i].deviceName||selected[i].sku)+': '+(item.ok?'Bestätigt':item.error||'Unbestätigt')).join('\n')

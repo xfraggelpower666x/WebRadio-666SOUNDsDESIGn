@@ -94,6 +94,14 @@
       <div id="soundPanel" class="panel-overlay hidden mobile-only" aria-hidden="true"><div class="panel-title"><span>SOUND · BOOST 0–5 · 5-BAND EQ</span><button id="soundClose" class="panel-close" type="button">×</button></div><div id="boostRow" class="boost-row" aria-label="Booster-Stufen"></div><div class="eq-grid"><div class="eq-band"><label for="eqSub">SUB</label><input id="eqSub" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="sub"><div id="eqSubVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqLow">LOW</label><input id="eqLow" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="low"><div id="eqLowVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqMid">MID</label><input id="eqMid" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="mid"><div id="eqMidVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqHigh">HIGH</label><input id="eqHigh" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="high"><div id="eqHighVal" class="eq-value">0</div></div><div class="eq-band"><label for="eqAir">AIR</label><input id="eqAir" type="range" min="-12" max="12" step="1" value="0" data-veluna-eq="air"><div id="eqAirVal" class="eq-value">0</div></div></div><div class="panel-actions"><button id="soundReset" type="button">RESET</button><button id="soundApply" type="button">APPLY</button></div><div id="soundStatus" class="action-status">iPhone-Soundpanel: neutral bis Boost 5, EQ -12 bis +12 dB.</div></div>
       <div id="metaPanel" class="panel-overlay meta-panel hidden" aria-hidden="true"><div class="panel-title"><span>METADATA DETAIL</span><button id="metaClose" class="panel-close" type="button">×</button></div><pre id="metaDetailText">Noch keine Metadaten geladen.</pre><div id="actionStatus" class="action-status">Bereit</div></div>
     </section>
+<details id="playerLightScenes">
+  <summary>Lichtszenen · Govee</summary>
+  <fieldset><legend>RGB-Geräte auswählen</legend></fieldset>
+  <button type="button" data-light-load>Geräte laden</button>
+  <label>Szene <select></select></label>
+  <button type="button" data-light-apply>Szene anwenden</button>
+  <p role="status"></p>
+</details>
   </main>
   <script src="/js/boost-core.js?v=2026-07-22-central-audio-v202"></script>
   <script src="/js/audio-start-core.js?v=20260903-main-boot-body-mount-v3"></script>
@@ -267,5 +275,6 @@
   <script src="/js/messenger-overlay.js?v=2026-08-11-global-player-alert-v1"></script>
   <script src="/config/veluna-assets.js?v=2026-07-23-reactive-visual-v183"></script>
   <script defer src="/js/veluna-ui.js?v=2026-07-23-reactive-visual-v1232"></script>
+<script type="module" src="/js/system-extra/govee/govee-light-scenes-panel.js?v=light-scenes-r01"></script>
 </body>
 </html>
