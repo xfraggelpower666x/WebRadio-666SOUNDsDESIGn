@@ -29,6 +29,8 @@ test('main Worker deploys before updating the AutoDJ access token secret', () =>
   assert.doesNotMatch(deployStep, /secrets:/);
   assert.match(secretStep, /printf '%s' "\$S666_AUTODJ_SKIP_ACCESS_TOKEN" \|\s*npx --yes wrangler@4\.111\.0 secret put S666_AUTODJ_SKIP_ACCESS_TOKEN/);
   assert.match(secretStep, /env:\s*\n\s*S666_AUTODJ_SKIP_ACCESS_TOKEN: \$\{\{ secrets\.S666_AUTODJ_SKIP_ACCESS_TOKEN \}\}/);
+  assert.match(secretStep, /^\s*CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}\s*$/m);
+  assert.match(secretStep, /^\s*CLOUDFLARE_ACCOUNT_ID: \$\{\{ secrets\.CLOUDFLARE_ACCOUNT_ID \}\}\s*$/m);
 });
 
 test('workflow never contains an AutoDJ access-token literal', () => {
