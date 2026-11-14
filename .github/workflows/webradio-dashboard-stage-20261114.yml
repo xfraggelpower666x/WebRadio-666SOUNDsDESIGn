@@ -1,0 +1,28 @@
+name: Stage WebRadio dashboard repair
+
+on:
+  push:
+    branches: [dev/666stream-webradio-dashboard-stage-20261114]
+    paths: ['.github/workflows/webradio-dashboard-stage-20261114.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  stage-webradio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 08480dcb135e55cdc639a4efac7e2b65e7b30d30
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.111.0"
+          command: versions upload --keep-vars --preview-alias dashboard-repair-20261114 --message "WebRadio dashboard 08480dc, stage only"
