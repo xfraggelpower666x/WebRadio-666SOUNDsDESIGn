@@ -110,6 +110,7 @@
   }
 
   async function setMode(next){
+    if(next!=='local')window.RWLocalQueue?.cancelTransition();
     mode=next;
     document.body.classList.remove('source-local','source-radio','source-soundcloud');
     document.body.classList.add('source-'+next);
@@ -126,8 +127,8 @@
       composeStage('local');
       try{
         const state=await window.RWLocalQueue?.resumeCurrent?.({autoplay:true});
-        if(!state?.count){audio.pause();rt.setStatus('Local mode · add audio files');}
-      }catch(e){state('LOCAL · '+String(e.message||e));}
+        if(mode==='local'&&!state?.count){audio.pause();rt.setStatus('Local mode · add audio files');}
+      }catch(e){if(mode==='local')state('LOCAL · '+String(e.message||e));}
     }
   }
   const radioUrl=(fallback=false)=>new URL(fallback?radioCfg.fallback:radioCfg.stream,radioCfg.radioBase).href;
@@ -210,7 +211,7 @@
   q('#display-one').addEventListener('change',applyOutputs);q('#display-two').addEventListener('change',applyOutputs);
   if(outputMode){
     document.body.classList.add('fullframe','output-only');
-    window.api.onSourceState(st=>{if(st?.visual){const v=st.visual;q('#visual-engine').value=v.engine||'soundwave';if(v.milkdropPreset!=null)q('#milkdrop-preset').value=String(v.milkdropPreset);if(v.shaderPreset)q('#shader-preset').value=v.shaderPreset;if(v.geometryPreset)q('#geometry-preset').value=v.geometryPreset;if(v.importedMilkdrop)importedMilkdrop=v.importedMilkdrop;}if(st?.mode)composeStage(st.mode,st);});
+    window.api.onSourceState(st=>{if(st?.visual){const v=st.visual;q('#visual-engine').value=v.engine||'soundwave';if(v.milkdropPreset!=null)q('#milkdrop-preset').value=String(v.milkdropPreset);if(v.shaderPreset)q('#shader-preset').value=v.shaderPreset;if(v.geometryPreset)q('#geometry-preset').value=v.geometryPreset;importedMilkdrop=v.importedMilkdrop??null;}if(st?.mode)composeStage(st.mode,st);});
     window.api.onVisualFrame?.(frame=>{rt.setExternalAnalyserFrame?.(frame);});
   }
   if(outputMode){let frames=0,last=performance.now();const beat=()=>{frames++;const now=performance.now();if(now-last>=5000){const fps=frames*1000/(now-last);frames=0;last=now;window.api.outputHeartbeat({engine:q('#visual-engine')?.value||'soundwave',fps}).catch(()=>{});}requestAnimationFrame(beat);};requestAnimationFrame(beat);}

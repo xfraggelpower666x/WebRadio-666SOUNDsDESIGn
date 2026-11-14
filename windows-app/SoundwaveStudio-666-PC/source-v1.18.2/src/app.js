@@ -146,7 +146,10 @@ const btnStopExport = document.getElementById('btn-stop-export');
 // ==========================================================================
 
 let localQueueSnapshot={count:0,index:-1,current:'',items:[],mediaUrl:''};
-let localTransitionBusy=false;
+let localTransition=null;
+let localQueueClearing=false;
+let localTransitionGeneration=0;
+const EXTERNAL_FRAME_MAX_AGE_MS=1000;
 const localSettings={
   shuffle:localStorage.getItem('rw666-local-shuffle')==='1',
   crossfade:Math.max(0,Math.min(8,Number(localStorage.getItem('rw666-local-crossfade')||1.5)))
@@ -190,13 +193,15 @@ function renderLocalQueue(state){
   }
   return localQueueSnapshot;
 }
-function fadeAudioTo(target,ms){
+function fadeAudioTo(target,ms,signal){
+  if(signal.aborted)return Promise.resolve();
   const start=audioElement.volume;
   const end=Math.max(0,Math.min(1,Number(target)||0));
   if(!ms||Math.abs(start-end)<.005){audioElement.volume=end;return Promise.resolve();}
   return new Promise(resolve=>{
     const t0=performance.now();
     const step=now=>{
+      if(signal.aborted){resolve();return;}
       const p=Math.min(1,(now-t0)/ms);
       audioElement.volume=start+(end-start)*p;
       if(p<1)requestAnimationFrame(step);else resolve();
@@ -204,47 +209,87 @@ function fadeAudioTo(target,ms){
     requestAnimationFrame(step);
   });
 }
-function waitForLocalCanPlay(timeout=8000){
+function waitForLocalCanPlay(signal,timeout=8000){
+  if(signal.aborted)return Promise.reject(signal.reason);
+  if(audioElement.error)return Promise.reject(new Error('local_audio_load_failed'));
   if(audioElement.readyState>=2)return Promise.resolve();
   return new Promise((resolve,reject)=>{
-    let done=false;
-    const finish=(err)=>{if(done)return;done=true;clearTimeout(timer);audioElement.removeEventListener('canplay',ok);audioElement.removeEventListener('error',bad);err?reject(err):resolve();};
-    const ok=()=>finish();const bad=()=>finish(new Error('local_audio_load_failed'));
+    const finish=(error)=>{
+      clearTimeout(timer);
+      audioElement.removeEventListener('canplay',ready);
+      audioElement.removeEventListener('error',failed);
+      signal.removeEventListener('abort',cancelled);
+      if(error)reject(error);else resolve();
+    };
+    const ready=()=>finish();
+    const failed=()=>finish(new Error('local_audio_load_failed'));
+    const cancelled=()=>finish(signal.reason);
     const timer=setTimeout(()=>finish(new Error('local_audio_load_timeout')),timeout);
-    audioElement.addEventListener('canplay',ok,{once:true});audioElement.addEventListener('error',bad,{once:true});
+    audioElement.addEventListener('canplay',ready,{once:true});
+    audioElement.addEventListener('error',failed,{once:true});
+    signal.addEventListener('abort',cancelled,{once:true});
   });
 }
+function cancelLocalTransition(){
+  localTransitionGeneration++;
+  if(!localTransition)return;
+  localTransition.abort();
+  localTransition=null;
+  audioElement.pause();
+  const volume=Number(volumeSlider.value);
+  if(Number.isFinite(volume))audioElement.volume=Math.max(0,Math.min(1,volume));
+  setPlayerUiPlaying(false);
+}
 async function activateLocalQueueIndex(index,{autoplay=true,fade=true}={}){
-  if(localTransitionBusy)return localQueueSnapshot;
-  localTransitionBusy=true;
+  if(localTransition||localQueueClearing)return localQueueSnapshot;
+  const transition=new AbortController();
+  localTransition=transition;
+  const {signal}=transition;
   const volumeRaw=Number(volumeSlider.value);
   const preferredVolume=Math.max(0,Math.min(1,Number.isFinite(volumeRaw)?volumeRaw:0.7));
   const fadeMs=Math.round(localSettings.crossfade*1000);
+  const halfFade=Math.min(2500,Math.round(fadeMs/2));
   try{
-    if(fade&&isPlaying&&fadeMs>0)await fadeAudioTo(0,Math.min(2500,Math.round(fadeMs/2)));
+    if(fade&&isPlaying&&fadeMs>0)await fadeAudioTo(0,halfFade,signal);
+    signal.throwIfAborted();
     audioElement.pause();
+    setPlayerUiPlaying(false);
     const state=await window.api.localQueueActivate(index);
+    signal.throwIfAborted();
     renderLocalQueue(state);
-    if(!state?.mediaUrl)return state;
+    if(!state?.mediaUrl){audioElement.volume=preferredVolume;return state;}
     audioElement.src=state.mediaUrl;
     audioElement.load();
     enableLocalPlayer();
-    diagStatus.textContent='Local · '+(state.current||'ready');
-    await waitForLocalCanPlay().catch(()=>{});
+    diagStatus.textContent='Local · '+(state.current||'loading');
+    await waitForLocalCanPlay(signal);
+    signal.throwIfAborted();
     if(autoplay){
       ensureAudioContext();
       audioElement.volume=fade&&fadeMs>0?0:preferredVolume;
       await audioElement.play();
+      signal.throwIfAborted();
       setPlayerUiPlaying(true);
-      if(fade&&fadeMs>0)await fadeAudioTo(preferredVolume,Math.min(2500,Math.round(fadeMs/2)));
+      if(fade&&fadeMs>0)await fadeAudioTo(preferredVolume,halfFade,signal);
+      signal.throwIfAborted();
       diagStatus.textContent='Playing · '+(state.current||'LOCAL');
       diagStatusColor.style.backgroundColor='#2ed573';
     }else{
       audioElement.volume=preferredVolume;
-      setPlayerUiPlaying(false);
+      diagStatus.textContent='Local · '+(state.current||'ready');
     }
     return state;
-  }finally{localTransitionBusy=false;}
+  }catch(error){
+    if(signal.aborted)return localQueueSnapshot;
+    audioElement.pause();
+    audioElement.volume=preferredVolume;
+    setPlayerUiPlaying(false);
+    diagStatus.textContent='Local Audio Error · '+String(error?.message??error);
+    diagStatusColor.style.backgroundColor='#ff4757';
+    return localQueueSnapshot;
+  }finally{
+    if(localTransition===transition)localTransition=null;
+  }
 }
 function nextLocalIndex(direction=1){
   const count=localQueueSnapshot.count||0;if(!count)return -1;
@@ -267,7 +312,9 @@ async function restoreLocalQueue(){
   }catch(e){console.error('Local queue restore',e);return localQueueSnapshot;}
 }
 async function resumeLocalCurrent({autoplay=true}={}){
+  const generation=localTransitionGeneration;
   const state=await window.api.localQueueState();
+  if(generation!==localTransitionGeneration||localQueueClearing)return localQueueSnapshot;
   renderLocalQueue(state);
   if(!state?.count)return state;
   return activateLocalQueueIndex(Math.max(0,state.index),{autoplay,fade:false});
@@ -277,7 +324,8 @@ window.RWLocalQueue=Object.freeze({
   restore:restoreLocalQueue,
   resumeCurrent:resumeLocalCurrent,
   next:localQueueNextTrack,
-  previous:localQueuePrevTrack
+  previous:localQueuePrevTrack,
+  cancelTransition:cancelLocalTransition
 });
 
 function init() {
@@ -307,7 +355,8 @@ function setupEventListeners() {
     if(remove){
       const removeIndex=Number(remove.dataset.removeIndex);
       const wasActive=removeIndex===localQueueSnapshot.index;
-      const shouldResume=wasActive&&isPlaying&&document.body.classList.contains('source-local');
+      const shouldResume=wasActive&&(isPlaying||!!localTransition)&&document.body.classList.contains('source-local');
+      if(wasActive)cancelLocalTransition();
       const state=await window.api.localQueueRemove(removeIndex);
       renderLocalQueue(state);
       if(wasActive&&document.body.classList.contains('source-local')){
@@ -335,8 +384,23 @@ function setupEventListeners() {
   localNext?.addEventListener('click',()=>localQueueNextTrack().catch(console.error));
   localShuffle?.addEventListener('click',async()=>renderLocalQueue(await window.api.localQueueShuffle()));
   localClear?.addEventListener('click',async()=>{
-    audioElement.pause();audioElement.removeAttribute('src');audioElement.load();setPlayerUiPlaying(false);
-    renderLocalQueue(await window.api.localQueueClear());
+    if(localQueueClearing)return;
+    localQueueClearing=true;
+    cancelLocalTransition();
+    const isLocal=document.body.classList.contains('source-local');
+    if(isLocal){
+      audioElement.pause();
+      audioElement.removeAttribute('src');
+      audioElement.load();
+      const volume=Number(volumeSlider.value);
+      if(Number.isFinite(volume))audioElement.volume=Math.max(0,Math.min(1,volume));
+      setPlayerUiPlaying(false);
+    }
+    try{
+      renderLocalQueue(await window.api.localQueueClear());
+    }catch(error){
+      diagStatus.textContent='Local Queue Clear Error · '+String(error?.message??error);
+    }finally{localQueueClearing=false;}
   });
   localShuffleMode?.addEventListener('change',()=>{
     localSettings.shuffle=!!localShuffleMode.checked;
@@ -670,7 +734,8 @@ function drawFrame() {
   let mid = 0;
   let treble = 0;
   let volume = 0;
-  const activeAnalyser = analyserNode || (externalAnalyserFrame ? {
+  const freshExternalFrame=externalAnalyserFrame&&performance.now()-externalAnalyserFrame.receivedAt<=EXTERNAL_FRAME_MAX_AGE_MS;
+  const activeAnalyser = analyserNode || (freshExternalFrame ? {
     frequencyBinCount: dataArray?.length || 0,
     fftSize: timeDataArray?.length || 0,
     getByteFrequencyData(target) { if (dataArray) target.set(dataArray.subarray(0, target.length)); },
@@ -700,28 +765,29 @@ function drawFrame() {
     
     bass = (bassSum / 10) / 255;
     mid = (midSum / 55) / 255;
-    treble = (trebleSum / (bufferLength - 65)) / 255;
+    treble = (trebleSum / Math.max(1,bufferLength - 65)) / 255;
     volume = Math.sqrt(volume / bufferLength) / 255;
 
-    // Real analyzer-driven cyber LED meters. No synthetic/random level animation.
-    const ledLow=document.getElementById('rw-led-low');
-    const ledMid=document.getElementById('rw-led-mid');
-    const ledHigh=document.getElementById('rw-led-high');
-    if(ledLow)ledLow.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,bass))));
-    if(ledMid)ledMid.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,mid))));
-    if(ledHigh)ledHigh.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,treble))));
-    
-    // Dynamic diagnostics tags updates
-    diagBass.textContent = bass.toFixed(2);
-    
-    // Real bass transient indicator from live analyser data
-    if (bass > 0.6) {
-      diagBpm.textContent = 'BASS HIT';
-      document.querySelector('.bpm-pill').style.boxShadow = '0 0 10px var(--color-primary)';
-    } else {
-      diagBpm.textContent = '--';
-      document.querySelector('.bpm-pill').style.boxShadow = 'none';
-    }
+  }
+
+  // Real analyzer-driven cyber LED meters. No synthetic/random level animation.
+  const ledLow=document.getElementById('rw-led-low');
+  const ledMid=document.getElementById('rw-led-mid');
+  const ledHigh=document.getElementById('rw-led-high');
+  if(ledLow)ledLow.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,bass))));
+  if(ledMid)ledMid.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,mid))));
+  if(ledHigh)ledHigh.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,treble))));
+
+  // Dynamic diagnostics tags updates
+  diagBass.textContent = bass.toFixed(2);
+
+  // Real bass transient indicator from live analyser data
+  if (bass > 0.6) {
+    diagBpm.textContent = 'BASS HIT';
+    document.querySelector('.bpm-pill').style.boxShadow = '0 0 10px var(--color-primary)';
+  } else {
+    diagBpm.textContent = '--';
+    document.querySelector('.bpm-pill').style.boxShadow = 'none';
   }
 
   // Draw background frame
@@ -746,7 +812,7 @@ function drawFrame() {
       extensionHandled = false;
     }
     if (!extensionHandled) drawVisualizer(activeStyle, dataArray, timeDataArray, bass, mid, treble, volume);
-  } else {
+  } else if(!document.body.classList.contains('output-only')){
     // Draw dummy wave if no audio is connected yet
     drawDummyWave();
   }
@@ -2019,7 +2085,7 @@ window.SoundwaveRuntime = Object.freeze({
     dataArray=Uint8Array.from(freq, v=>Math.max(0,Math.min(255,Number(v)||0)));
     timeDataArray=Uint8Array.from(wave, v=>Math.max(0,Math.min(255,Number(v)||0)));
     bufferLength=dataArray.length;
-    externalAnalyserFrame={receivedAt:Date.now()};
+    externalAnalyserFrame={receivedAt:performance.now()};
     return true;
   },
   enablePlayback: () => { btnPlayPause.classList.remove('disabled'); btnPlayPause.disabled=false; },

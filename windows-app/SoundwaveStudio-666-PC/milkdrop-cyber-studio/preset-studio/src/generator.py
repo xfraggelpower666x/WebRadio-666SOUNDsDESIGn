@@ -75,11 +75,11 @@ def equations(s: Settings, rng: random.Random):
     amp = s.intensity
     hz = s.bpm / 60.0
     phase = rng.uniform(0, 6.28)
-    # q1 = smoothed kick level, q2 = high-frequency energy. EEL variables valid per guide.
-    init = ['q1=1;', 'q2=1;']
+    # Eigene Per-Frame-Variablen speichern den Filterzustand. q1/q2 übertragen ihn an andere Stufen.
+    init = ['bass_smooth=1;', 'treb_smooth=1;', 'q1=1;', 'q2=1;']
     frame = [
-        'q1=0.82*q1+0.18*bass;',
-        'q2=0.90*q2+0.10*treb;',
+        'bass_smooth=0.82*bass_smooth+0.18*bass;q1=bass_smooth;',
+        'treb_smooth=0.90*treb_smooth+0.10*treb;q2=treb_smooth;',
         f'beat=sin(time*{fmt(2*math.pi*hz)}+{fmt(phase)});',
         'kick=max(0,min(2,q1-0.65));',
         f'zoom=1+{fmt(style["zoom"]*amp)}*beat+{fmt(0.014*amp)}*kick;',

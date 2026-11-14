@@ -423,7 +423,7 @@ function sanitizeSourceState(next){
   if(!next||typeof next!=='object'||Array.isArray(next))throw new Error('source_state_invalid');
   const out={};
   if(next.mode!==undefined){if(!['local','radio','soundcloud'].includes(next.mode))throw new Error('source_mode_invalid');out.mode=next.mode;}
-  if(next.src!==undefined){const v=String(next.src);if(v.length>4096)throw new Error('source_url_too_long');const u=new URL(v);if(!['file:','swmedia:','swsc:','http:','https:'].includes(u.protocol))throw new Error('source_protocol_blocked');out.src=v;}
+  if(next.src!==undefined){const v=String(next.src);if(v.length>4096)throw new Error('source_url_too_long');if(v&&!['file:','swmedia:','swsc:','http:','https:'].includes(new URL(v).protocol))throw new Error('source_protocol_blocked');out.src=v;}
   for(const k of ['name','title','artist','dj','permalink','artwork','station','bitrate','codec','sampleRate','routeState','overlayMode'])if(next[k]!==undefined)out[k]=String(next[k]).slice(0,1024);
   if(next.listeners!==undefined)out.listeners=String(next.listeners).slice(0,64);
   if(next.tickerEnabled!==undefined)out.tickerEnabled=!!next.tickerEnabled;
@@ -708,11 +708,7 @@ app.whenReady().then(() => {
     startupLog('APP_ACTIVATE');
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
-  startOutputWatchdog();
-  powerMonitor.on('suspend',()=>{runtimeEvent('system-suspend');for(const w of BrowserWindow.getAllWindows())if(!w.isDestroyed())w.webContents.send('runtime:lifecycle',{type:'suspend'});});
-  powerMonitor.on('resume',()=>{runtimeEvent('system-resume');reconcileOutputWindows();for(const w of BrowserWindow.getAllWindows())if(!w.isDestroyed())w.webContents.send('runtime:lifecycle',{type:'resume'});});
-  powerMonitor.on('lock-screen',()=>runtimeEvent('screen-lock'));
-  powerMonitor.on('unlock-screen',()=>runtimeEvent('screen-unlock'));
+      startOutputWatchdog();
     }
   });
 }).catch(error=>{
@@ -759,7 +755,7 @@ registerIpc('local:queue-remove','main',async(_e,index)=>{
 });
 registerIpc('local:queue-clear','main',async()=>{
   localAudioQueue=[];localAudioQueueIndex=-1;selectedLocalAudioPath='';localAudioRevision++;persistLocalQueue();
-  broadcastSourceState({mode:'local',name:'',queueIndex:0,queueLength:0});
+  if(sharedSourceState.mode==='local')broadcastSourceState({name:'',src:'',paused:true,time:0,queueIndex:0,queueLength:0});
   return localQueuePublicState();
 });
 registerIpc('local:queue-shuffle','main',async()=>{

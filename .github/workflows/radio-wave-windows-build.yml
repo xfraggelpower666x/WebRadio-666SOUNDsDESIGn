@@ -6,6 +6,13 @@ on:
       - soundwave-v1-18-2-source-import-20261002
     paths:
       - 'windows-app/SoundwaveStudio-666-PC/source-v1.18.2/**'
+      - 'windows-app/SoundwaveStudio-666-PC/milkdrop-cyber-studio/**'
+      - '.github/workflows/radio-wave-windows-build.yml'
+  pull_request:
+    branches:
+      - soundwave-v1-18-2-source-import-20261002
+    paths:
+      - 'windows-app/SoundwaveStudio-666-PC/**'
       - '.github/workflows/radio-wave-windows-build.yml'
   workflow_dispatch:
 
@@ -25,21 +32,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node 20
+      - name: Setup Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: npm
           cache-dependency-path: windows-app/SoundwaveStudio-666-PC/source-v1.18.2/package-lock.json
 
       - name: Install locked dependencies
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: Prepare RADIO WAVE branding
         run: npm run prepare:branding
 
-      - name: Targeted RADIO WAVE release gates
-        run: npm run check:radio-wave-release
+      - name: Validate locked Electron runtime
+        run: npm run check:electron
+
+      - name: Verify Windows source and regressions
+        run: |
+          npm run check:release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run check:radio-wave-release
 
       - name: Build unsigned NSIS installer
         env:
@@ -48,6 +61,13 @@ jobs:
 
       - name: Verify installer and portable artifacts
         run: |
+          $studio = 'dist/win-unpacked/resources/milkdrop-cyber-studio'
+          foreach ($file in @('src/gui.py', 'src/generator.py', 'scripts/directx_sdk.ps1')) {
+            if (-not (Test-Path (Join-Path $studio $file) -PathType Leaf)) { throw "STUDIO_RESOURCE_MISSING: $file" }
+          }
+          if (@(Get-ChildItem (Join-Path $studio 'presets') -Recurse -Filter '*.milk').Count -ne 15) {
+            throw 'STUDIO_PRESET_RESOURCES_MISSING'
+          }
           $installer = Get-ChildItem -Path dist -Filter 'RADIO-WAVE-v6.66-Setup*.exe' | Select-Object -First 1
           if (-not $installer) { throw 'RADIO_WAVE_NSIS_INSTALLER_MISSING' }
           $installerHash = (Get-FileHash -Algorithm SHA256 $installer.FullName).Hash.ToLower()
@@ -62,6 +82,19 @@ jobs:
           Write-Host "INSTALLER SHA256: $installerHash"
           Write-Host "PASS portable: $($portable.FullName)"
           Write-Host "PORTABLE SHA256: $portableHash"
+
+      - name: Build legacy Windows portable ZIP
+        run: node scripts/build.js
+
+      - name: Upload legacy Windows portable ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: RADIO-WAVE-v6.66-Legacy-Portable-ZIP
+          path: |
+            windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/SoundwaveStudio-portable-win-x64.zip
+            windows-app/SoundwaveStudio-666-PC/source-v1.18.2/dist/RELEASE_ARTIFACT_SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload RADIO WAVE installer
         uses: actions/upload-artifact@v4

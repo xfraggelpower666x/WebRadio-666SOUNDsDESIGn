@@ -7,12 +7,14 @@ echo  RADIO WAVE v6.66 - WINDOWS NSIS INSTALLER BUILD
 echo ============================================================
 where node >nul 2>nul || (echo FAIL: Node.js missing & pause & exit /b 1)
 where npm >nul 2>nul || (echo FAIL: npm missing & pause & exit /b 1)
-if not exist node_modules\electron\dist\electron.exe (
+node scripts\ensure-electron.cjs --node-only || (pause & exit /b 1)
+if not exist node_modules\.bin\electron.cmd (
   echo [1/4] Installing locked dependencies...
-  call npm ci || (echo npm ci failed. & pause & exit /b 1)
+  call npm ci --include=dev || (echo npm ci failed. & pause & exit /b 1)
 ) else (
   echo [1/4] Dependencies present.
 )
+node scripts\ensure-electron.cjs || (pause & exit /b 1)
 echo [2/4] Preparing RADIO WAVE branding and Windows icon...
 call npm run prepare:branding || (echo BRANDING PREP FAILED & pause & exit /b 1)
 echo [3/4] Running targeted RADIO WAVE release gates...

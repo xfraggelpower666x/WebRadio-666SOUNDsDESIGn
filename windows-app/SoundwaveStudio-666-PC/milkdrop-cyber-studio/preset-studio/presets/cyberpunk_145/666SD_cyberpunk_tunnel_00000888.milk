@@ -80,10 +80,10 @@ wavecode_2_enabled=0
 shapecode_2_enabled=0
 wavecode_3_enabled=0
 shapecode_3_enabled=0
-per_frame_init_1=q1=1;
-per_frame_init_2=q2=1;
-per_frame_1=q1=0.82*q1+0.18*bass;
-per_frame_2=q2=0.90*q2+0.10*treb;
+per_frame_init_1=bass_smooth=1;q1=1;
+per_frame_init_2=treb_smooth=1;q2=1;
+per_frame_1=bass_smooth=0.82*bass_smooth+0.18*bass;q1=bass_smooth;
+per_frame_2=treb_smooth=0.90*treb_smooth+0.10*treb;q2=treb_smooth;
 per_frame_3=beat=sin(time*15.184364+2.712404);
 per_frame_4=kick=max(0,min(2,q1-0.65));
 per_frame_5=zoom=1+0.009100*beat+0.009100*kick;
