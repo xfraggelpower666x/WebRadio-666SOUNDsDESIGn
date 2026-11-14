@@ -35,7 +35,12 @@ const isDevice=x=>typeof x==='string'&&/^[0-9A-Fa-f:]{12,35}$/.test(x);
 const isType=x=>typeof x==='string'&&/^devices\.capabilities\.[a-z_]{2,60}$/.test(x);
 const isInstance=x=>typeof x==='string'&&/^[a-zA-Z][a-zA-Z0-9_]{0,60}$/.test(x);
 async function owned(env){
- return getCachedGoveeDevices(env);
+ if(env.GOVEE_RATE_GATE)return getCachedGoveeDevices(env);
+ const response=await api(env,'/router/api/v1/user/devices');
+ if(!response.ok)return response;
+ const devices=response.result.data;
+ if(!Array.isArray(devices))return {ok:false,error:'Invalid Govee device catalog'};
+ return {ok:true,devices:devices.filter(d=>isSku(d?.sku)&&isDevice(d.device))};
 }
 const kinds=['devices.capabilities.on_off','devices.capabilities.range','devices.capabilities.color_setting','devices.capabilities.color_temperature'];
 const goodCapability=c=>c&&isType(c.type)&&isInstance(c.instance)&&Object.hasOwn(c,'value')&&kinds.includes(c.type);
@@ -77,6 +82,7 @@ export default {async fetch(request,env){
   if(u.pathname==='/api/state'&&request.method==='POST'){
    const b=await request.json().catch(()=>null);
    if(!b||!isSku(b.sku)||!isDevice(b.device))return reply({ok:false,error:'Invalid device identification'},400);
+   if(!env.GOVEE_RATE_GATE)return reply({ok:false,error:'rate_gate_unavailable'},503);
    const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    if(!r.devices.some(d=>d.sku===b.sku&&d.device===b.device))return reply({ok:false,error:'Device not registered to account'},403);
    const gate=await reserveGoveeState(env,b.sku,b.device);
@@ -87,6 +93,7 @@ export default {async fetch(request,env){
   if(u.pathname==='/api/control'&&request.method==='POST'){
    const b=await request.json().catch(()=>null),c=b?.capability;
    if(!b||!isSku(b.sku)||!isDevice(b.device)||!goodCapability(c))return reply({ok:false,error:'Invalid control payload'},400);
+   if(!env.GOVEE_RATE_GATE)return reply({ok:false,error:'rate_gate_unavailable'},503);
    const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const d=r.devices.find(x=>x.sku===b.sku&&x.device===b.device);
    if(!d)return reply({ok:false,error:'Device not registered to account'},403);
@@ -105,6 +112,7 @@ export default {async fetch(request,env){
    }
    const mapped=mapAudioEvent(b);
    if(b.energy<0.025||mapped.scene==='idle')return reply({ok:true,executed:0,reason:'idle'});
+   if(!env.GOVEE_RATE_GATE)return reply({ok:false,error:'rate_gate_unavailable'},503);
    const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const {r:red,g:green,b:blue}=mapped.theme;
    const scale=mapped.drop?1:mapped.scene==='break'?0.35:0.65;
@@ -120,6 +128,7 @@ export default {async fetch(request,env){
    if(!Array.isArray(members)||members.length<1||members.length>8||!goodCapability(c))return reply({ok:false,error:'Invalid group payload'},400);
    if(members.some(m=>!m||!isSku(m.sku)||!isDevice(m.device)))return reply({ok:false,error:'Invalid group member'},400);
    if(new Set(members.map(m=>m.sku+'|'+m.device)).size!==members.length)return reply({ok:false,error:'Duplicate group members'},400);
+   if(!env.GOVEE_RATE_GATE)return reply({ok:false,error:'rate_gate_unavailable'},503);
    const r=await owned(env);if(!r.ok)return reply(r,r.httpStatus===429?429:502);
    const devices=members.map(m=>r.devices.find(x=>x.sku===m.sku&&x.device===m.device));
    if(devices.some(d=>!d))return reply({ok:false,error:'Group contains a device not registered to account'},403);

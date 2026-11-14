@@ -30,9 +30,28 @@ test('central catalog rate limit is forwarded without an external request',async
  assert.equal(result.status,429);
  assert.equal((await result.json()).ok,false);
 });
-test('missing gate fails closed even when API secret exists',async()=>{
- const result=await worker.fetch(new Request('https://example.invalid/api/devices',{headers:{Authorization:'Bearer test-token'}}),env);
- assert.equal(result.status,502);
+test('catalog reads the official API without a rate gate, while commands stay blocked',async t=>{
+ const calls=[];
+ t.mock.method(globalThis,'fetch',async(url,options)=>{
+  calls.push(new URL(url).pathname);
+  assert.equal(options.headers['Govee-API-Key'],env.GOVEE_API_KEY);
+  return Response.json({code:200,data:[
+   {sku:'H6047',device:'AA:AA:AA:AA:AA:AA'},
+   {sku:'H6198',device:'BB:BB:BB:BB:BB:BB'},null
+  ]});
+ });
+ const request=new Request('https://example.invalid/api/devices?area=tv',{
+  headers:{Authorization:'Bearer '+env.CONTROL_TOKEN}
+ });
+ const result=await worker.fetch(request,env);
+ assert.equal(result.status,200);
+ assert.deepEqual((await result.json()).devices.map(d=>d.sku),['H6198']);
+ const member={sku:'H6047',device:'AA:AA:AA:AA:AA:AA'};
+ const capability={type:'devices.capabilities.on_off',instance:'powerSwitch',value:1};
+ for(const [route,body] of [['state',member],['control',{...member,capability}],['groups/control',{members:[member],capability}],['audio',{area:'bars',energy:0.6}]]){
+  assert.equal((await worker.fetch(req('/api/'+route,body),env)).status,503);
+ }
+ assert.deepEqual(calls,['/router/api/v1/user/devices']);
 });
 
 test('valid device command reserves rate quota before calling upstream',async()=>{

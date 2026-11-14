@@ -27,3 +27,9 @@ npm --prefix projects/666-GOVEE-CONTROL/worker test
 ## R02 · Gerätestatus, Kelvin und Audio-FX
 
 Das Dashboard zeigt die zurückgemeldeten Statuswerte in lesbarer Form. Ein Kelvin-Regler erscheint, wenn alle ausgewählten Geräte `colorTemperatureK` mit einem gemeinsamen gültigen Wertebereich veröffentlichen. Der Worker prüft den gesendeten Wert zusätzlich für jedes Gerät. Bei einem Rate-Limit verlängert der Hauptplayer seine Sendepause gemäß der gemeldeten Wartezeit. Nach der Pause verwendet er nur ein aktuelles MeterBus-Signal. Bereits gestartete Lichtbefehle können durch Ausschalten des FX-Schalters nicht rückgängig gemacht werden.
+
+## Erste Abnahme ohne SQLite
+
+Für die erste Abnahme kann der Govee-Worker mit `worker/wrangler.catalog.toml` bereitgestellt werden. Diese Konfiguration enthält weder einen Durable Object noch eine Migration. Sie ist für die Einführung auf dem bisherigen Worker ohne Rate-Gate vorgesehen. Einen bestehenden Rate-Gate-Deploymentstand mit der vollständigen Konfiguration weiterbetreiben.
+
+Der private Entrypoint verwendet die bestehenden Secrets. Nach Bereitstellung des WebRadio-Bindings ruft `GET /api/admin/govee/devices` den offiziellen Govee-Gerätekatalog direkt auf. `?area=bars` und `?area=tv` sind optional. Der Abruf erfolgt manuell im Dashboard. Im Katalogmodus bleiben Gerätestatus, Einzel-/Gruppenbefehle und Audio-FX durch das fehlende Rate-Gate serverseitig gesperrt. Für die spätere Steuerung dient die vollständige `worker/wrangler.toml`.
