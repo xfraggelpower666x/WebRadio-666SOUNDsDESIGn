@@ -1,0 +1,47 @@
+[
+  {
+    "file": "666SD_cyberpunk_tunnel_00000888.milk",
+    "style": "cyberpunk",
+    "variant": "tunnel",
+    "bpm": 145.0,
+    "intensity": 0.65,
+    "seed": 888,
+    "sha256": "e793473bd603a1ce372816f4123b9d9b4f4ddaddf37924cdba1206dfec6e737e"
+  },
+  {
+    "file": "666SD_cyberpunk_spiral_00000889.milk",
+    "style": "cyberpunk",
+    "variant": "spiral",
+    "bpm": 145.0,
+    "intensity": 0.65,
+    "seed": 889,
+    "sha256": "24a96fd8a4ecb5284fb59f8cebb6cb7cd62b6be37adf202250d6921314373704"
+  },
+  {
+    "file": "666SD_cyberpunk_vortex_00000890.milk",
+    "style": "cyberpunk",
+    "variant": "vortex",
+    "bpm": 145.0,
+    "intensity": 0.65,
+    "seed": 890,
+    "sha256": "1b4505c3cbdf0771faeb59a36c184877fd48d2838007cea0e6f01d5131572046"
+  },
+  {
+    "file": "666SD_cyberpunk_pulse_00000891.milk",
+    "style": "cyberpunk",
+    "variant": "pulse",
+    "bpm": 145.0,
+    "intensity": 0.65,
+    "seed": 891,
+    "sha256": "d032aa7a764b1e4b860e478ec88f0088d78c7769b7de786651d378362910f4d2"
+  },
+  {
+    "file": "666SD_cyberpunk_drift_00000892.milk",
+    "style": "cyberpunk",
+    "variant": "drift",
+    "bpm": 145.0,
+    "intensity": 0.65,
+    "seed": 892,
+    "sha256": "2f8feb1757405b7d32b8e712d949e709eaa4355dadc02b3065ae451cbdc3d5ce"
+  }
+]

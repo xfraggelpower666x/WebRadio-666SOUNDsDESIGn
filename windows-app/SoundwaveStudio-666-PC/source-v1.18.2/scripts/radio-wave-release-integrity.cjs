@@ -93,6 +93,10 @@ check(/\.rw-brand-banner img\{[^}]*object-fit:contain/.test(css),'banner-contain
 check(/\.rw-brand-logo\{[^}]*object-fit:contain/.test(css),'logo-contain');
 
 const workspace=text('src/workspace.js');
+const studioFiles=pkg.build.extraResources?.find(resource=>resource.to==='milkdrop-cyber-studio');
+check(studioFiles?.filter?.includes('src/*.py')&&exists(path.join(studioFiles.from,'src/gui.py')),'cyber-studio-external-resource');
+check(workspace.includes('rw-dock-open-cyber-studio')&&workspace.includes('window.api.openCyberStudio(languageCode())'),'cyber-studio-own-dock-entry');
+check(text('preload.js').includes("ipcRenderer.invoke('milkdrop:open-cyber-studio', language)")&&main.includes("registerIpc('milkdrop:open-cyber-studio', 'main'"),'cyber-studio-main-window-ipc');
 check(/rw666-workspace-v1/.test(workspace),'workspace-state-storage');
 check(/rw666-ui-settings-v1/.test(workspace),'workspace-settings-storage');
 check(/rw-window-close/.test(workspace)&&/closeWindow/.test(workspace),'workspace-close-buttons');

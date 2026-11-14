@@ -4,6 +4,10 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const cp = require('child_process');
+const { createCyberStudioLauncher } = require('./src/shared/milkdrop-cyber-studio.cjs');
+
+const cyberStudioData = () => path.join(app.getPath('userData'), 'milkdrop-cyber-studio');
+let launchCyberStudio;
 
 const STARTUP_LOG_PATH = path.join(os.tmpdir(), 'RADIO-WAVE-v6.66-startup.log');
 function startupLog(type, detail='') {
@@ -769,6 +773,42 @@ registerIpc('local:queue-shuffle','main',async()=>{
   return localQueuePublicState();
 });
 
+registerIpc('milkdrop:open-cyber-studio', 'main', async (_event, language) => {
+  try {
+    launchCyberStudio ??= createCyberStudioLauncher({
+      studioRoot: app.isPackaged
+        ? path.join(process.resourcesPath, 'milkdrop-cyber-studio')
+        : path.resolve(__dirname, '..', 'milkdrop-cyber-studio', 'preset-studio'),
+      dataRoot: cyberStudioData()
+    });
+    return { ok: true, ...await launchCyberStudio() };
+  } catch (error) {
+    const german = language === 'de';
+    const messages = {
+      python_tkinter_missing: german
+        ? 'Installiere Python ab 3.10 mit Tcl/Tk und starte das Studio erneut.'
+        : 'Install Python 3.10 or later with Tcl/Tk, then open the studio again.',
+      studio_files_missing: german
+        ? 'Die Programmdateien des MilkDrop Cyber Studio fehlen.'
+        : 'The MilkDrop Cyber Studio program files are missing.',
+      windows_required: german ? 'Das Studio benötigt Windows.' : 'The studio requires Windows.'
+    };
+    const message = Object.hasOwn(messages, error.message) ? messages[error.message] : german
+      ? 'Das Studio konnte nicht gestartet werden. Startprotokoll:'
+      : 'Could not start the studio. Startup log:';
+    const logPath = path.join(cyberStudioData(), 'logs', 'RADIO_WAVE_STUDIO_START.log');
+    startupLog('CYBER_STUDIO_START_FAILED', error.message);
+    const options = {
+      type: 'error',
+      title: 'MilkDrop Cyber Studio',
+      message,
+      detail: Object.hasOwn(messages, error.message) ? '' : logPath
+    };
+    if (mainWindow && !mainWindow.isDestroyed()) await dialog.showMessageBox(mainWindow, options);
+    else await dialog.showMessageBox(options);
+    return { ok: false };
+  }
+});
 registerIpc('dialog:openMilkdrop','main', async()=>{
   const result=await dialog.showOpenDialog(mainWindow,{title:'Import MilkDrop Preset',filters:[{name:'MilkDrop Presets',extensions:['milk']}],properties:['openFile']});
   if(result.canceled||!result.filePaths[0])return null; const filePath=result.filePaths[0]; const st=fs.statSync(filePath); if(st.size>2*1024*1024)throw new Error('milk_preset_too_large');

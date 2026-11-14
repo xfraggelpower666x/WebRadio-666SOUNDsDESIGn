@@ -62,6 +62,17 @@
       "intro-preload.js",
       "overlay-preload.js"
     ],
+    "extraResources": [
+      {
+        "from": "../milkdrop-cyber-studio/preset-studio",
+        "to": "milkdrop-cyber-studio",
+        "filter": [
+          "src/*.py",
+          "presets/**/*",
+          "scripts/directx_sdk.ps1"
+        ]
+      }
+    ],
     "directories": {
       "output": "dist"
     },

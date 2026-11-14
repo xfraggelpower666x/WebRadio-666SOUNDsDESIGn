@@ -15,6 +15,16 @@ try {
     stdio: 'inherit',
     cwd: path.join(__dirname, '..')
   });
+  const studioRoot = path.resolve(__dirname, '../../milkdrop-cyber-studio/preset-studio');
+  const resourceRoot = path.join(packagedDir, 'resources', 'milkdrop-cyber-studio');
+  for (const dir of ['src', 'presets']) {
+    fs.cpSync(path.join(studioRoot, dir), path.join(resourceRoot, dir), {
+      recursive: true,
+      filter: file => path.basename(file) !== '__pycache__'
+    });
+  }
+  fs.mkdirSync(path.join(resourceRoot, 'scripts'), { recursive: true });
+  fs.copyFileSync(path.join(studioRoot, 'scripts', 'directx_sdk.ps1'), path.join(resourceRoot, 'scripts', 'directx_sdk.ps1'));
 } catch (error) {
   console.error('❌ electron-packager failed:', error.message);
   process.exit(1);
