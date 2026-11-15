@@ -255,3 +255,17 @@ WINDOWS_CI_ACCEPTANCE=PASS
 ARTIFACT_ACCEPTANCE=PASS
 HOST_ACCEPTANCE=PENDING_USER_TEST
 NEXT_STEP=REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_TO_LOCAL_AUTOPLAY_PRESET_AUTOLOAD_DRAGDROP_QUEUE_SHUFFLE_AND_FADE
+
+
+## WINDOWS_APP Current — RADIO WAVE v6.66 / 1.19.3 — 2026-11-15
+
+- Projektwurzel: `windows-app/SoundwaveStudio-666-PC/source-v1.19.3/`
+- Startdatei: `RADIO_WAVE.bat`, Anleitung: `START_HIER.md`
+- Verifizierter 666STREAM-Import: `6d81b81e0347780578cbd0ed2bf6416254748707` (`dev/radio-wave-1.19.3-import-92e5f3e`)
+- Herkunft: `xfraggelpower666x/666MAIN_BRAIN_MYCEL_SYSTEM@92e5f3e60c9f141ddd4c7a82926f46034ec74d59`, `PROJECTS/RADIO_WAVE_v6.66`
+- Git-Teilbaum: `d4c6a8b4e4aadd6f715b520d625ac350fd51af32`, 236 Dateien, bytegleich mit dem Import
+- Electron: `45.3.2`. Die übernommene Batch installiert fehlende Werkzeuge und Projektabhängigkeiten automatisch.
+- Vorherige Source-Linie: `soundwave-v1-18-2-source-import-20261002@0d036b4083c07e6b4cd23cb4aa2415a5dcec028d`
+- Quellprüfung des bytegleichen Imports: 116/116 statische Integrationschecks und 168/168 Release-Gates. Von 165 weiteren Tests bestanden 161, einer wurde übersprungen und drei benötigten die lokal fehlende Electron-Runtime.
+- Windows-Abnahme: offen für diesen Stand. Historische Windows-CI- und Artefaktbelege oben gelten für ihre jeweiligen Revisionen.
+- Nächster Schritt: `RADIO_WAVE.bat check /nopause` auf Windows im neuen Projektordner ausführen, anschließend die App starten und NSIS/Portable prüfen.

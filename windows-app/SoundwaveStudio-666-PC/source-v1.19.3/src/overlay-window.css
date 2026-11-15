@@ -1,0 +1,10 @@
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#05030d;}
+body.rw-native-overlay{background:
+ radial-gradient(circle at 15% 10%,rgba(255,43,214,.16),transparent 34%),
+ radial-gradient(circle at 85% 12%,rgba(32,232,255,.14),transparent 34%),
+ linear-gradient(145deg,#03020a,#090518 48%,#02070d);color:#eefaff;}
+#overlay-root{width:100%;height:100%;box-sizing:border-box;padding:12px;overflow:auto;scrollbar-width:thin;}
+#overlay-root>.panel-section,#overlay-root>.source-hub{display:block!important;width:100%!important;height:auto!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important;}
+#overlay-root .section-title{display:flex!important;margin:0 0 12px!important;}
+.rw-native-overlay-loading{height:100%;display:grid;place-items:center;color:#20e8ff;font:800 13px/1.2 sans-serif;letter-spacing:.12em;}
+@media(max-width:520px){#overlay-root{padding:8px}.remote-row,.color-options-row,.milkdrop-control-grid,.milkdrop-threshold-grid,.milkdrop-runtime-row{grid-template-columns:1fr!important;flex-direction:column!important;}}

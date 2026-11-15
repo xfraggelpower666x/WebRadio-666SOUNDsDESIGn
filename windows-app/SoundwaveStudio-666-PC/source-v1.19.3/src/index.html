@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIO WAVE v6.66</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https: swmedia: swsc: swvj:; connect-src 'self' swsc:; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR: Control Studio -->
+    <aside class="control-panel">
+      <header class="studio-header">
+        <div class="rw-brand-banner" aria-hidden="true">
+          <img id="rw-brand-banner-img" alt="">
+        </div>
+        <div class="logo">
+          <div class="rw-brand-logo-wrap">
+            <img id="rw-brand-logo-img" class="rw-brand-logo" alt="RADIO WAVE v6.66">
+            <div class="logo-orb"></div>
+          </div>
+          <div class="rw-brand-title">
+            <h1>RADIO WAVE</h1>
+            <span>v6.66 · SOUNDWAVE CORE</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="panel-sections">
+<div class="source-hub panel-section active" id="source-hub">
+<h2 class="section-title"><span class="icon">⚡</span> Source Hub</h2>
+<div class="source-tabs"><button class="source-btn active" data-source="local">LOCAL</button><button class="source-btn" data-source="radio">666 RADIO</button><button class="source-btn" data-source="soundcloud">SOUNDCLOUD</button></div>
+<div id="radio-controls" class="source-pane hidden">
+<div class="nowplaying-box"><strong id="radio-now-title">666SOUNDsDESIGn</strong><span id="radio-now-artist">RADIO READY</span></div>
+</div>
+<div id="soundcloud-controls" class="source-pane hidden"><div class="soundcloud-library-head"><strong>666SOUNDsDESIGN · Fraggelpower666</strong><button id="soundcloud-library-refresh" class="btn btn-secondary">REFRESH MY MUSIC</button></div>
+<div class="control-group"><label for="soundcloud-client-id">SoundCloud Client ID</label><input id="soundcloud-client-id" type="password" class="custom-input" autocomplete="off"></div>
+<div class="control-group"><label for="soundcloud-client-secret">SoundCloud Client Secret</label><input id="soundcloud-client-secret" type="password" class="custom-input" autocomplete="off"></div>
+<div class="control-group"><button id="soundcloud-save-credentials" class="btn btn-secondary" type="button">SAVE SECURELY</button><button id="soundcloud-test-credentials" class="btn btn-secondary" type="button">TEST CONNECTION</button><button id="soundcloud-clear-credentials" class="btn btn-secondary" type="button">REMOVE SAVED</button></div>
+<div id="soundcloud-library" class="soundcloud-library"><div class="file-meta-tag">Library loads from the official SoundCloud API.</div></div><input id="soundcloud-url" class="custom-input" placeholder="Optional: SoundCloud track / playlist URL"><button id="soundcloud-load" class="btn btn-secondary">LOAD URL</button><button id="soundcloud-prev" class="btn btn-secondary">◀ PREV</button><button id="soundcloud-next" class="btn btn-secondary">NEXT ▶</button><button id="soundcloud-open" class="btn btn-secondary">OPEN ON SOUNDCLOUD</button><div id="soundcloud-queue" class="file-meta-tag">Queue · 0 / 0</div><div class="file-meta-tag">Audio source: SoundCloud · creator attribution shown after resolve</div><div id="soundcloud-state" class="file-meta-tag">SoundCloud credentials are stored encrypted by Windows.</div><div id="soundcloud-runtime-health" class="file-meta-tag">SOUNDCLOUD HEALTH · CHECKING</div></div>
+</div>
+
+        <section class="panel-section" id="rw-radio-admin">
+          <h2 class="section-title"><span class="icon">📡</span> Online Radio Admin</h2>
+          <div id="radio-action-state" class="file-meta-tag" role="status" aria-live="polite">REMOTE · READY</div>
+          <div id="radio-runtime-health" class="file-meta-tag">REMOTE HEALTH · CHECKING</div>
+          <details class="rw-radio-menu" id="rw-radio-auth" open>
+            <summary>Authentication</summary>
+            <label for="radio-password">Admin password</label>
+            <input id="radio-password" class="custom-input" type="password" autocomplete="off">
+            <div class="remote-row"><button id="radio-login" class="btn btn-secondary" type="button">LOGIN</button><button id="radio-auth-check" class="btn btn-secondary" type="button">CHECK SESSION</button><button id="radio-logout" class="btn btn-secondary" type="button">LOGOUT</button></div>
+            <div id="radio-auth-state" class="file-meta-tag" role="status">SESSION · UNKNOWN</div>
+          </details>
+          <details class="rw-radio-menu" id="rw-radio-autodj">
+            <summary>AutoDJ</summary>
+            <button id="radio-skip" class="btn btn-secondary" type="button">SKIP TRACK</button>
+            <div class="file-meta-tag">Requires an authenticated session and a configured skip bridge.</div>
+          </details>
+          <details class="rw-radio-menu" id="rw-radio-probes">
+            <summary>Worker &amp; Debug Probes</summary>
+            <div class="file-meta-tag">Read-only. Auth/debug probes require the admin session. Optional debug tokens stay in the main process: RADIO_WAVE_AUTH_DEBUG_TOKEN and RADIO_WAVE_RADIO_DEBUG_TOKEN.</div>
+            <div class="remote-row">
+              <button id="radio-probe-password-health" class="btn btn-secondary" type="button">PASSWORD HEALTH</button>
+              <button id="radio-probe-auth-health" class="btn btn-secondary" type="button">AUTH HEALTH</button>
+              <button id="radio-probe-auth-debug" class="btn btn-secondary" type="button">AUTH DEBUG</button>
+              <button id="radio-probe-admin-debug" class="btn btn-secondary" type="button">ADMIN DEBUG</button>
+              <button id="radio-probe-radio-debug" class="btn btn-secondary" type="button">RADIO DEBUG</button>
+              <button id="radio-probe-discord-status" class="btn btn-secondary" type="button">DISCORD STATUS</button>
+            </div>
+            <pre id="radio-probe-result" class="rw-diag-json" role="status">No probe run.</pre>
+          </details>
+          <details class="rw-radio-menu" id="rw-radio-config">
+            <summary>Stream Configuration &amp; Backups</summary>
+            <div class="file-meta-tag">Production changes create backups and GitHub commits. Activation may require deployment. Existing URL paths and queries are hidden; unchanged fields are preserved. Lists are independent of single URLs.</div>
+            <div class="remote-row"><button id="radio-config-load" class="btn btn-secondary" type="button">LOAD CURRENT</button><button id="radio-config-list" class="btn btn-secondary" type="button">LIST BACKUPS</button><button id="radio-config-active" class="btn btn-secondary" type="button">CHECK ACTIVE</button></div>
+            <pre id="radio-config-current" class="rw-diag-json">Configuration not loaded.</pre>
+            <pre id="radio-config-backups" class="rw-diag-json">Backups not loaded.</pre>
+            <pre id="radio-config-active-state" class="rw-diag-json">Active configuration not checked.</pre>
+            <label for="radio-config-primary-mode">Primary stream</label><select id="radio-config-primary-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">SET</option><option value="clear">CLEAR</option></select><input id="radio-config-primary" class="custom-input" type="url" autocomplete="off" placeholder="New primary URL">
+            <label for="radio-config-backup-mode">Backup stream</label><select id="radio-config-backup-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">SET</option><option value="clear">CLEAR</option></select><input id="radio-config-backup" class="custom-input" type="url" autocomplete="off" placeholder="New backup URL">
+            <label for="radio-config-emergency-mode">Emergency stream</label><select id="radio-config-emergency-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">SET</option><option value="clear">CLEAR</option></select><input id="radio-config-emergency" class="custom-input" type="url" autocomplete="off" placeholder="New emergency URL">
+            <label for="radio-config-primary-list-mode">Primary stream list</label><select id="radio-config-primary-list-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">REPLACE</option><option value="clear">CLEAR</option></select><textarea id="radio-config-primary-list" class="custom-input" placeholder="One URL per line, maximum 12"></textarea>
+            <label for="radio-config-backup-list-mode">Backup stream list</label><select id="radio-config-backup-list-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">REPLACE</option><option value="clear">CLEAR</option></select><textarea id="radio-config-backup-list" class="custom-input" placeholder="One URL per line, maximum 12"></textarea>
+            <label for="radio-config-emergency-list-mode">Emergency stream list</label><select id="radio-config-emergency-list-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">REPLACE</option><option value="clear">CLEAR</option></select><textarea id="radio-config-emergency-list" class="custom-input" placeholder="One URL per line, maximum 12"></textarea>
+            <label for="radio-config-metadata-list-mode">Metadata upstream list</label><select id="radio-config-metadata-list-mode" class="custom-select"><option value="keep">KEEP</option><option value="set">REPLACE</option><option value="clear">CLEAR</option></select><textarea id="radio-config-metadata-list" class="custom-input" placeholder="One URL per line, maximum 12"></textarea>
+            <label for="radio-config-note">Change note</label><input id="radio-config-note" class="custom-input" maxlength="300" autocomplete="off">
+            <div class="remote-row"><button id="radio-config-preview" class="btn btn-secondary" type="button">PREVIEW</button><button id="radio-config-update" class="btn btn-secondary" type="button">BACKUP + UPDATE</button><button id="radio-config-rollback" class="btn btn-secondary" type="button">ROLLBACK LATEST</button></div>
+            <pre id="radio-config-preview-state" class="rw-diag-json">No changes previewed.</pre>
+            <div id="radio-config-state" class="file-meta-tag" role="status" aria-live="polite">CONFIGURATION · READY</div>
+          </details>
+          <details class="rw-radio-menu" id="rw-radio-messenger">
+            <summary>Player Messenger</summary>
+            <label for="player-message">Message to players</label>
+            <textarea id="player-message" class="custom-input" maxlength="240" placeholder="Player Messenger · 240 chars"></textarea>
+            <div class="remote-row"><button id="player-message-send" class="btn btn-secondary" type="button">SEND → PLAYERS</button><button id="player-message-history" class="btn btn-secondary" type="button">LOAD HISTORY</button><button id="radio-broadcast-test" class="btn btn-secondary" type="button">SEND REAL TEST</button></div>
+            <div id="player-message-receive" class="file-meta-tag">PLAYER MESSENGER · WAITING</div>
+            <div id="player-message-history-state" class="file-meta-tag">HISTORY · NOT LOADED</div>
+          </details>
+          <details class="rw-radio-menu" id="rw-radio-discord">
+            <summary>Discord</summary>
+            <label for="discord-message">Discord message</label>
+            <textarea id="discord-message" class="custom-input" maxlength="1800" placeholder="Discord message"></textarea>
+            <div class="remote-row"><button id="discord-send" class="btn btn-secondary" type="button">SEND → DISCORD</button><button id="radio-discord-test" class="btn btn-secondary" type="button">SEND REAL TEST</button></div>
+          </details>
+          <details class="rw-radio-menu" id="rw-radio-nowplaying">
+            <summary>Now Playing</summary>
+            <div class="file-meta-tag">Uses current radio metadata. Sending requires an authenticated session.</div>
+            <button id="discord-now" class="btn btn-secondary" type="button">SEND NOW PLAYING → DISCORD</button>
+            <label class="rw-radio-auto"><input id="discord-auto" type="checkbox"> Send track changes automatically while logged in</label>
+          </details>
+        </section>
+
+        
+        <!-- SECTION 1: Files & Media Selection -->
+        <section class="panel-section active">
+          <h2 class="section-title"><span class="icon">📁</span> Media Library</h2>
+          
+          <div class="control-group">
+            <label>1. Audio Song File</label>
+            <button id="btn-select-audio" class="btn btn-primary select-btn">
+              <span class="btn-icon">🎵</span>
+              <span id="label-audio-file">Add Audio Files</span>
+            </button>
+            <div id="audio-meta" class="file-meta-tag hidden">No audio loaded</div>
+            <div id="local-drop-zone" class="local-drop-zone" tabindex="0">
+              <strong>DROP AUDIO FILES HERE</strong>
+              <span>MP3 · WAV · M4A · FLAC · AAC · OGG</span>
+            </div>
+            <div class="local-queue-toolbar">
+              <button id="local-prev" class="btn btn-secondary" type="button">◀ PREV</button>
+              <button id="local-next" class="btn btn-secondary" type="button">NEXT ▶</button>
+              <button id="local-shuffle" class="btn btn-secondary" type="button">SHUFFLE</button>
+              <button id="local-clear" class="btn btn-secondary" type="button">CLEAR</button>
+            </div>
+            <div class="local-queue-settings">
+              <label class="checkbox-container"><input type="checkbox" id="local-shuffle-mode"><span class="checkmark"></span> Shuffle playback</label>
+              <label for="local-crossfade">Track transition</label>
+              <div class="slider-header"><span>Fade</span><span id="local-crossfade-value">1.5s</span></div>
+              <input type="range" id="local-crossfade" min="0" max="8" step="0.1" value="1.5" class="custom-range">
+            </div>
+            <div id="local-queue-state" class="file-meta-tag">LOCAL QUEUE · 0 TRACKS</div>
+            <div id="local-queue-list" class="local-queue-list" aria-label="Local audio queue"></div>
+            <div id="local-audio-library" class="local-library" aria-label="Audio Pool &amp; Playlists">
+              <h3>Audio Pool &amp; Playlists</h3>
+              <div class="file-meta-tag">Rate tracks from 1–5 stars or choose Unrated to clear. Ratings are shared between the pool and playlists, including missing playlist tracks.</div>
+              <h3>Named playlists</h3>
+              <label for="local-playlist-name">Playlist name</label>
+              <input id="local-playlist-name" class="custom-input" maxlength="100" placeholder="Enter a playlist name">
+              <div class="local-library-actions">
+                <button id="local-playlist-create" class="btn btn-secondary" type="button">CREATE</button>
+                <button id="local-playlist-rename" class="btn btn-secondary" type="button">RENAME</button>
+                <button id="local-playlist-delete" class="btn btn-secondary" type="button">DELETE</button>
+              </div>
+              <label for="local-playlist-select">Selected playlist</label>
+              <select id="local-playlist-select" class="custom-input" aria-label="Selected playlist"></select>
+              <div class="local-library-actions">
+                <button id="local-playlist-files" class="btn btn-secondary" type="button">BROWSE FILES TO ADD</button>
+                <button id="local-playlist-queue" class="btn btn-secondary" type="button">ADD PLAYLIST TO QUEUE</button>
+              </div>
+              <div id="local-playlist-tracks" class="local-queue-list" aria-label="Playlist tracks"></div>
+              <div class="local-library-actions">
+                <button id="local-playlist-page-prev" class="btn btn-secondary" type="button">PREVIOUS TRACKS</button>
+                <span id="local-playlist-page" class="file-meta-tag"></span>
+                <button id="local-playlist-page-next" class="btn btn-secondary" type="button">NEXT TRACKS</button>
+              </div>
+              <h3>Audio pool</h3>
+              <div class="file-meta-tag">Choose a folder to scan its audio files and subfolders. The pool refreshes automatically every 30 seconds; links are skipped.</div>
+              <div class="local-library-actions">
+                <button id="local-pool-folder" class="btn btn-secondary" type="button">CHOOSE FOLDER</button>
+                <button id="local-pool-refresh" class="btn btn-secondary" type="button">RESCAN</button>
+                <button id="local-pool-clear" class="btn btn-secondary" type="button">CLEAR FOLDER</button>
+              </div>
+              <div id="local-pool-state" class="file-meta-tag">No folder selected.</div>
+              <label for="local-pool-filter">Filter pool tracks</label>
+              <input id="local-pool-filter" class="custom-input" maxlength="200" placeholder="Filter by track or folder">
+              <div id="local-pool-list" class="local-queue-list" aria-label="Audio pool tracks"></div>
+              <div class="local-library-actions">
+                <button id="local-pool-page-prev" class="btn btn-secondary" type="button">PREVIOUS TRACKS</button>
+                <span id="local-pool-page" class="file-meta-tag"></span>
+                <button id="local-pool-page-next" class="btn btn-secondary" type="button">NEXT TRACKS</button>
+              </div>
+              <button id="local-pool-add" class="btn btn-secondary" type="button">ADD CHECKED TRACKS TO PLAYLIST</button>
+              <div id="local-library-status" class="file-meta-tag" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <section class="control-group" id="audio-fx" aria-label="Audio FX · 3-Band EQ">
+            <h3 class="section-subtitle">Audio FX · 3-Band EQ</h3>
+            <div class="file-meta-tag">Affects playback, visualization and exported audio; microphone input is unchanged. Boosting may clip.</div>
+            <label for="audio-fx-bass">Bass <output id="audio-fx-bass-value">0 dB</output></label>
+            <input id="audio-fx-bass" class="custom-range" type="range" min="-12" max="12" step="1" value="0">
+            <label for="audio-fx-mid">Mid <output id="audio-fx-mid-value">0 dB</output></label>
+            <input id="audio-fx-mid" class="custom-range" type="range" min="-12" max="12" step="1" value="0">
+            <label for="audio-fx-treble">Treble <output id="audio-fx-treble-value">0 dB</output></label>
+            <input id="audio-fx-treble" class="custom-range" type="range" min="-12" max="12" step="1" value="0">
+            <label for="audio-fx-width">Stereo width <output id="audio-fx-width-value">100%</output></label>
+            <input id="audio-fx-width" class="custom-range" type="range" min="0" max="200" step="5" value="100">
+            <div class="file-meta-tag">100% preserves the original channels. Other values output stereo; widening reduces center level to avoid added clipping.</div>
+            <label class="checkbox-container"><input id="audio-fx-bypass" type="checkbox"><span class="checkmark"></span> Bypass EQ</label>
+            <button id="audio-fx-reset" class="btn btn-secondary" type="button">RESET TO FLAT</button>
+          </section>
+          <div class="control-group" id="audio-device-controls">
+            <label>Audio devices</label>
+            <div class="file-meta-tag">Microphone is never played through speakers. Include it in video only if explicitly enabled below.</div>
+            <label for="audio-input-device">Microphone / input</label>
+            <select id="audio-input-device" class="custom-select"><option value="">System default microphone</option></select>
+            <div class="local-library-actions">
+              <button id="audio-input-start" class="btn btn-secondary" type="button">ENABLE MICROPHONE</button>
+              <button id="audio-input-stop" class="btn btn-secondary" type="button">STOP MICROPHONE</button>
+            </div>
+            <div id="audio-input-status" class="file-meta-tag" role="status" aria-live="polite">Microphone off. Permission is requested only when enabled.</div>
+            <label class="checkbox-container"><input id="audio-input-record" type="checkbox"><span class="checkmark"></span> Include microphone in video exports</label>
+            <label for="audio-output-device">Playback output</label>
+            <select id="audio-output-device" class="custom-select"><option value="">System default output</option></select>
+            <div class="local-library-actions">
+              <button id="audio-devices-refresh" class="btn btn-secondary" type="button">REFRESH DEVICES</button>
+              <button id="audio-output-apply" class="btn btn-secondary" type="button">APPLY OUTPUT</button>
+              <button id="audio-output-choose" class="btn btn-secondary" type="button">SYSTEM OUTPUT CHOOSER</button>
+            </div>
+            <div id="audio-output-status" class="file-meta-tag" role="status" aria-live="polite">Playback uses the system default output.</div>
+            <label class="checkbox-container"><input id="audio-surround-enable" type="checkbox"><span class="checkmark"></span> Enable 7.1 playback upmix</label>
+            <div class="file-meta-tag">Optional stereo-derived playback only; requires an output advertising at least 8 channels. Visualization and export are unchanged.</div>
+            <div id="audio-surround-status" class="file-meta-tag" role="status" aria-live="polite">7.1 upmix off; original playback routing unchanged.</div>
+          </div>
+          <div class="control-group">
+            <label>2. Background Image</label>
+            <button id="btn-select-bg" class="btn btn-secondary select-btn">
+              <span class="btn-icon">🖼️</span>
+              <span id="label-bg-file">Select Background Image</span>
+            </button>
+            <div id="bg-meta" class="file-meta-tag hidden">Default Starfield active</div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: Visualizer Wave Designs -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">🎨</span> Wave Design</h2>
+          
+          <div class="control-group">
+            <label for="visualizer-style">Soundwave Style</label>
+            <select id="visualizer-style" class="custom-select">
+              <option value="linear-bars">Glowing Linear Bars</option>
+              <option value="circular-ring">Circular Ripple Rings</option>
+              <option value="fluid-wave">Fluid Wave Curves</option>
+              <option value="starburst-particles">Radial Starburst Particles</option>
+              <option value="digital-matrix">Digital Matrix HUD</option>
+              <option value="oscilloscope">Neon Oscilloscope</option>
+              <option value="orbit-sphere">3D Wireframe Orbit</option>
+              <option value="mirrored-border">Mirrored Wave Borders</option>
+              <option value="voice-assistant">AI Voice Assistant Wave</option>
+              <option value="water-ripple">Digital Water Ripple</option>
+              <option value="glow-ribbon">Volumetric Glow Ribbon</option>
+              <option value="eq-ribbon">Equalizer Wave Ribbons</option>
+              <option value="voice-blobs">Orbital Voice Blobs</option>
+              <option value="matrix-sphere">Digital Matrix Sphere</option>
+              <option value="neon-fiber">Neon Fiber Wavefront</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Color Theme</label>
+            <div class="color-options-row">
+              <input type="color" id="color-primary" value="#00f2fe" title="Primary Color">
+              <input type="color" id="color-secondary" value="#4facfe" title="Secondary Color">
+              <select id="color-mode" class="custom-select-small">
+                <option value="gradient">Gradient Blend</option>
+                <option value="solid">Solid primary</option>
+                <option value="hsl-shift">Dynamic Rainbow</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-glow">Glow Intensity</label>
+              <span id="val-glow">20px</span>
+            </div>
+            <input type="range" id="slider-glow" min="0" max="60" value="20" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-sensitivity">Audio Sensitivity</label>
+              <span id="val-sensitivity">1.5x</span>
+            </div>
+            <input type="range" id="slider-sensitivity" min="0.5" max="3" step="0.1" value="1.5" class="custom-range">
+          </div>
+        </section>
+
+        <!-- SECTION 3: Custom Layout, Positioning & Resizing -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">📐</span> Position & Size</h2>
+          <p class="section-subtitle">Move and resize the wave animation anywhere in the frame.</p>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-scale">Visualizer Size Scale</label>
+              <span id="val-scale">1.0x</span>
+            </div>
+            <input type="range" id="slider-scale" min="0.2" max="2.5" step="0.05" value="1.0" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-visual-opacity">Visualizer Transparency</label>
+              <span id="val-visual-opacity">100%</span>
+            </div>
+            <input type="range" id="slider-visual-opacity" min="0" max="100" step="1" value="100" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-pos-x">X-Position (Horizontal)</label>
+              <span id="val-pos-x">Center</span>
+            </div>
+            <input type="range" id="slider-pos-x" min="-100" max="100" value="0" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-pos-y">Y-Position (Vertical)</label>
+              <span id="val-pos-y">Center</span>
+            </div>
+            <input type="range" id="slider-pos-y" min="-100" max="100" value="0" class="custom-range">
+          </div>
+
+          <!-- Dynamic contextual controls -->
+          <div class="control-group conditional-control" id="control-linear-only">
+            <div class="slider-header">
+              <label for="slider-bar-width">Bar Width</label>
+              <span id="val-bar-width">6px</span>
+            </div>
+            <input type="range" id="slider-bar-width" min="2" max="25" value="6" class="custom-range">
+          </div>
+
+          <div class="control-group conditional-control hidden" id="control-circular-only">
+            <div class="slider-header">
+              <label for="slider-inner-radius">Circle Inner Radius</label>
+              <span id="val-inner-radius">120px</span>
+            </div>
+            <input type="range" id="slider-inner-radius" min="30" max="300" value="120" class="custom-range">
+          </div>
+        </section>
+
+        <!-- SECTION 4: Typography & Overlay -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">✏️</span> Text Overlays</h2>
+          
+          <div class="control-group">
+            <label for="input-title">Song Title</label>
+            <input type="text" id="input-title" placeholder="E.g., Moonlight Sonar" class="custom-input">
+          </div>
+
+          <div class="control-group">
+            <label for="input-artist">Artist / Subtitle</label>
+            <input type="text" id="input-artist" placeholder="E.g., Synthwave Echo" class="custom-input">
+          </div>
+
+          <div class="control-group">
+            <label for="select-font">Typography Style</label>
+            <select id="select-font" class="custom-select">
+              <option value="Syne">Syne (Futuristic Bold)</option>
+              <option value="Outfit">Outfit (Sleek Modern)</option>
+              <option value="Montserrat">Montserrat (Classic Clean)</option>
+              <option value="Playfair Display">Playfair Display (Elegant Serif)</option>
+              <option value="Space Grotesk">Space Grotesk (Tech Monospace)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="checkbox-container">
+              <input type="checkbox" id="check-beat-react" checked>
+              <span class="checkmark"></span>
+              Beat Reactive Text (Pulses to Audio Bass)
+            </label>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">🖥️</span> Presentation & Engines</h2>
+          <div class="control-group"><label>Visual Engine</label><select id="visual-engine" class="custom-select"><option value="soundwave">Soundwave Classic</option><option value="spectrum">CaYatur Spectrum</option><option value="analysis">CaYatur Deep Analyzer</option><option value="shader">CaYatur Shader Engine</option><option value="geometry3d">CaYatur 3D Geometry</option><option value="milkdrop">CaYatur MilkDrop</option></select></div>
+          <div class="control-group"><label>Shader Scene</label><select id="shader-preset" class="custom-select"><option value="neon">Neon Plasma</option><option value="tunnel">Cyber Tunnel</option><option value="grid">Spectrum Grid</option></select></div><div class="control-group"><label>3D Scene</label><select id="geometry-preset" class="custom-select"><option value="surface:torus">Torus</option><option value="surface:sphere">Sphere</option><option value="surface:klein">Klein Bottle</option><option value="attractor:lorenz">Lorenz Attractor</option><option value="attractor:rossler">Rössler Attractor</option><option value="solid:geodesic">Geodesic Sphere</option><option value="solid:icosahedron">Icosahedron</option></select></div><button id="btn-fullscreen" class="btn btn-secondary">FULLSCREEN</button>
+          <div class="control-group"><label>Display 1</label><select id="display-one" class="custom-select"></select><label>Display 2 (optional)</label><select id="display-two" class="custom-select"><option value="">Disabled</option></select></div>
+          <div class="control-group radio-visual-options">
+            <label class="checkbox-container"><input type="checkbox" id="radio-ticker-enabled" checked><span class="checkmark"></span> Radio metadata ticker</label>
+            <label class="checkbox-container"><input type="checkbox" id="radio-status-enabled" checked><span class="checkmark"></span> Radio status panel</label>
+            <label>Second display mode</label>
+            <select id="display-visual-mode" class="custom-select">
+              <option value="visual">Visualizer only</option>
+              <option value="visual+ticker">Visualizer + ticker</option>
+              <option value="visual+ticker+status" selected>Visualizer + ticker + status</option>
+            </select>
+          </div>
+          <div class="file-meta-tag" id="display-state">Display discovery pending</div>
+          <button id="export-diagnostics" class="btn btn-secondary">EXPORT RUNTIME DIAGNOSTICS</button>
+        </section>
+
+        <section class="panel-section" id="milkdrop-studio">
+          <h2 class="section-title"><span class="icon">🌌</span> MilkDrop Studio</h2>
+          <div class="milkdrop-hero">
+            <div class="milkdrop-orb" aria-hidden="true"></div>
+            <div>
+              <strong>MILKDROP GPU</strong>
+              <span id="milkdrop-gpu-status">WEBGL2 · CHECKING GPU</span>
+            </div>
+          </div>
+          <div class="control-group milkdrop-engine-switch">
+            <button id="milkdrop-activate" class="btn btn-primary">ACTIVATE MILKDROP</button>
+            <button id="milkdrop-deactivate" class="btn btn-secondary" type="button">MILKDROP OFF · SOUNDWAVE</button>
+          </div>
+          <div class="control-group">
+            <label for="milkdrop-preset">Preset</label>
+            <select id="milkdrop-preset" class="custom-select">
+              <option value="0">Kutup Işığı</option>
+              <option value="1">Erimiş Altın</option>
+              <option value="2">Dingin Halkalar</option>
+              <option value="3">Sonsuz Tünel</option>
+              <option value="4">Nabız Örgüsü</option>
+            </select>
+          </div>
+          <div class="milkdrop-transport">
+            <button id="milkdrop-prev" class="btn btn-secondary" type="button">◀ PREV</button>
+            <button id="milkdrop-random" class="btn btn-secondary" type="button">⤨ RANDOM</button>
+            <button id="milkdrop-next" class="btn btn-secondary" type="button">NEXT ▶</button>
+          </div>
+          <div class="control-group milkdrop-import-row">
+            <button id="milkdrop-import" class="btn btn-secondary">IMPORT .MILK</button>
+            <button id="milkdrop-import-pack" class="btn btn-secondary">IMPORT PRESET FOLDER</button>
+            <button id="milkdrop-import-personal" class="btn btn-secondary">IMPORT PERSONAL LIBRARY ZIP</button>
+          </div>
+          <div class="milkdrop-personal-library">
+            <div class="file-meta-tag" id="milkdrop-personal-state">PERSONAL LIBRARY · NOT INSTALLED</div>
+            <div class="milkdrop-library-actions">
+              <button id="milkdrop-filter-all" class="btn btn-secondary" type="button">ALL</button>
+              <button id="milkdrop-filter-top100" class="btn btn-secondary" type="button">TOP100</button>
+              <button id="milkdrop-filter-classic" class="btn btn-secondary" type="button">.MILK</button>
+              <button id="milkdrop-filter-double" class="btn btn-secondary" type="button">.MILK2</button>
+              <button id="milkdrop-license" class="btn btn-secondary" type="button">LICENSE</button>
+            </div>
+          </div>
+
+          <div class="milkdrop-control-grid">
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-auto"><span class="checkmark"></span> Auto Cycle</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-lock"><span class="checkmark"></span> Lock Preset</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-never-repeat" checked><span class="checkmark"></span> Never Repeat</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-on-track"><span class="checkmark"></span> Next on Track Change</label>
+          </div>
+
+          <div class="control-group">
+            <label for="milkdrop-auto-unit">Auto Cycle Mode</label>
+            <select id="milkdrop-auto-unit" class="custom-select">
+              <option value="seconds">SECONDS</option>
+              <option value="bars">BARS · REAL BEAT</option>
+            </select>
+          </div>
+
+          <div class="control-group" id="milkdrop-seconds-group">
+            <div class="slider-header"><label for="milkdrop-auto-seconds">Seconds per Preset</label><span id="milkdrop-auto-seconds-value">30s</span></div>
+            <input type="range" id="milkdrop-auto-seconds" min="5" max="300" step="5" value="30" class="custom-range">
+          </div>
+
+          <div class="control-group" id="milkdrop-bars-group">
+            <div class="slider-header"><label for="milkdrop-auto-bars">Bars per Preset</label><span id="milkdrop-auto-bars-value">8</span></div>
+            <input type="range" id="milkdrop-auto-bars" min="1" max="32" step="1" value="8" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header"><label for="milkdrop-blend-time">Transition</label><span id="milkdrop-blend-time-value">1.5s</span></div>
+            <input type="range" id="milkdrop-blend-time" min="0" max="8" step="0.1" value="1.5" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <label for="milkdrop-hardcut">Audio Hardcut</label>
+            <select id="milkdrop-hardcut" class="custom-select">
+              <option value="off">OFF</option>
+              <option value="bass">BASS IMPACT</option>
+              <option value="treb">TREBLE IMPACT</option>
+              <option value="smart">SMART · BASS OR TREBLE</option>
+            </select>
+          </div>
+
+          <div class="milkdrop-threshold-grid">
+            <div class="control-group">
+              <div class="slider-header"><label for="milkdrop-hardcut-bass">Bass</label><span id="milkdrop-hardcut-bass-value">1.5</span></div>
+              <input type="range" id="milkdrop-hardcut-bass" min="1.05" max="6" step="0.05" value="1.5" class="custom-range">
+            </div>
+            <div class="control-group">
+              <div class="slider-header"><label for="milkdrop-hardcut-treb">Treble</label><span id="milkdrop-hardcut-treb-value">2.9</span></div>
+              <input type="range" id="milkdrop-hardcut-treb" min="1.05" max="10" step="0.05" value="2.9" class="custom-range">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header"><label for="milkdrop-repeat-window">No-Repeat Memory</label><span id="milkdrop-repeat-window-value">8</span></div>
+            <input type="range" id="milkdrop-repeat-window" min="1" max="50" step="1" value="8" class="custom-range">
+          </div>
+
+          <div class="milkdrop-runtime-row">
+            <span id="milkdrop-live-preset">PRESET · MANUAL</span>
+            <span id="milkdrop-cycle-state">CYCLE · OFF</span>
+          </div>
+          <div class="file-meta-tag" id="milkdrop-state">GPU feedback renderer · real audio analyser</div>
+        </section>
+
+        <section class="panel-section" id="rw-diagnostics">
+          <h2 class="section-title"><span class="icon">🩺</span> Diagnostics</h2>
+          <div class="rw-diag-toolbar">
+            <button id="rw-diag-refresh" class="btn btn-secondary" type="button">REFRESH</button>
+            <button id="rw-host-check" class="btn btn-secondary" type="button">RUN REAL HOST CHECK</button>
+            <button id="rw-diag-export" class="btn btn-secondary" type="button">EXPORT JSON</button>
+          </div>
+          <div class="file-meta-tag" id="rw-diag-state">READY</div>
+          <div id="rw-host-check-state" class="rw-host-check-state">
+            <div class="file-meta-tag">HOST CHECK · NOT RUN</div>
+          </div>
+          <h3 class="section-subtitle">Live Audio Analyser</h3>
+          <div class="file-meta-tag" id="rw-diag-audio-state">ANALYSER · UNAVAILABLE</div>
+          <div class="rw-diag-audio-leds" aria-label="Audio analyser frequency bands">
+            <div class="rw-diag-audio-led" id="rw-diag-audio-low"><span>LOW · 20–250 Hz</span><strong>—</strong><div class="rw-diag-audio-meter" role="meter" aria-label="Low frequency analyser level" aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
+            <div class="rw-diag-audio-led" id="rw-diag-audio-mid"><span>MID · 250–2000 Hz</span><strong>—</strong><div class="rw-diag-audio-meter" role="meter" aria-label="Mid frequency analyser level" aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
+            <div class="rw-diag-audio-led" id="rw-diag-audio-high"><span>HIGH · 2–16 kHz</span><strong>—</strong><div class="rw-diag-audio-meter" role="meter" aria-label="High frequency analyser level" aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
+          </div>
+          <div class="file-meta-tag">Mean analyser byte magnitude, relative to its 0–255 range; not a calibrated sound-pressure level.</div>
+          <h3 class="section-subtitle">Live Process / Output Measurements</h3>
+          <div class="rw-diag-leds">
+            <div class="rw-diag-led" id="rw-diag-led-memory"><span>MAIN PROCESS RSS</span><strong>—</strong></div>
+            <div class="rw-diag-led" id="rw-diag-led-heap"><span>MAIN PROCESS HEAP USED</span><strong>—</strong></div>
+            <div class="rw-diag-led" id="rw-diag-led-outputs"><span>OUTPUT HEARTBEATS</span><strong>—</strong></div>
+          </div>
+          <div class="rw-diag-graphs">
+            <div class="rw-diag-graph" id="rw-diag-graph-memory" aria-label="Main-process RSS history"><span>MAIN PROCESS RSS · MiB</span><div>Waiting for samples</div></div>
+            <div class="rw-diag-graph" id="rw-diag-graph-fps" aria-label="Responsive output average FPS history"><span>RESPONSIVE OUTPUT AVG FPS</span><div>Waiting for samples</div></div>
+          </div>
+          <h3 class="section-subtitle">Displays / Monitor</h3>
+          <div id="rw-diag-displays" class="rw-diag-grid"></div>
+          <h3 class="section-subtitle">Visualizer Outputs</h3>
+          <div id="rw-diag-outputs" class="rw-diag-grid"></div>
+          <h3 class="section-subtitle">GPU</h3>
+          <pre id="rw-diag-gpu" class="rw-diag-json">—</pre>
+          <h3 class="section-subtitle">Runtime</h3>
+          <pre id="rw-diag-runtime" class="rw-diag-json">—</pre>
+        </section>
+
+        <!-- SECTION 5: Video Export Engine -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">📹</span> Export Studio</h2>
+          
+          <div class="control-group">
+            <label for="select-aspect-ratio">Aspect Ratio / Layout</label>
+            <select id="select-aspect-ratio" class="custom-select">
+              <option value="16-9">Widescreen 16:9 (1920x1080) - YouTube</option>
+              <option value="9-16">Vertical 9:16 (1080x1920) - Shorts/TikTok</option>
+              <option value="1-1">Square 1:1 (1080x1080) - Instagram</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="select-fps">Export Framerate</label>
+            <select id="select-fps" class="custom-select">
+              <option value="60">60 FPS (Ultra Smooth)</option>
+              <option value="30">30 FPS (Standard)</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label for="export-audio-bitrate">Video export audio bitrate target</label>
+            <select id="export-audio-bitrate" class="custom-select">
+              <option value="96000">96 kbps</option>
+              <option value="128000">128 kbps</option>
+              <option value="192000" selected>192 kbps</option>
+              <option value="256000">256 kbps</option>
+            </select>
+            <div class="file-meta-tag">Encoder target; actual bitrate depends on the selected format and encoder.</div>
+          </div>
+
+          <div class="export-destination">
+            <label>Video destination and filename</label>
+            <div id="export-destination" class="export-path">No destination selected</div>
+            <button id="btn-browse-export" class="btn btn-secondary" type="button">Browse &amp; choose filename</button>
+            <div class="file-meta-tag">Choose MP4 or WebM supported by this browser.</div>
+            <div id="export-result" class="export-result" role="status" aria-live="polite">Ready to export</div>
+          </div>
+          <div class="export-actions">
+            <button id="btn-export" class="btn btn-record" disabled>
+              <span class="record-dot"></span>
+              <span id="label-export">Export Music Video</span>
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT: Live Interactive Preview Studio -->
+    <main class="preview-area">
+      <nav class="rw-quick-links" aria-label="666SOUNDsDESIGn links">
+        <strong>666SOUNDsDESIGn</strong>
+        <button type="button" data-external-site="radio">Radio</button>
+        <button type="button" data-external-site="lyvra">LYVRA</button>
+        <button type="button" data-external-site="neon">Neon Dashboard</button>
+        <button type="button" data-external-site="liveDashboard">Live Dashboard</button>
+        <button type="button" data-external-site="psyEngine">Psy Engine</button>
+        <span id="rw-app-version">RADIO WAVE v6.66 · Version …</span>
+      </nav>
+      <!-- Top header bar for quick diagnostics -->
+      <div class="preview-top-bar">
+        <button id="toggle-control-panel" class="preview-panel-toggle" type="button" aria-pressed="false">☰ CONTROLS</button>
+        <button id="vj-open" class="preview-panel-toggle" type="button" aria-controls="vj-studio">VJ STUDIO</button>
+        <label class="rw-language-switch" for="app-language">
+          <span>LANGUAGE</span>
+          <select id="app-language" aria-label="Application language">
+            <option value="en-US" selected>🇺🇸 English (USA)</option>
+            <option value="de-DE">🇩🇪 German</option>
+          </select>
+        </label>
+        <div class="diagnostic-tag"><span class="diag-bullet" id="diag-status-color"></span> Status: <span id="diag-status">Idle</span></div>
+        <div class="diagnostic-tag">Bass Peak: <span id="diag-bass">0.00</span></div>
+        <div class="diagnostic-tag bpm-pill">Audio Signal: <span id="diag-bpm">--</span></div>
+        <div class="diagnostic-tag">Active Resolution: <span id="diag-resolution">1920 x 1080</span></div>
+        <div class="rw-led-bank" aria-label="Live audio spectrum levels">
+          <div class="rw-led-meter"><span>LOW</span><i><b id="rw-led-low"></b></i></div>
+          <div class="rw-led-meter"><span>MID</span><i><b id="rw-led-mid"></b></i></div>
+          <div class="rw-led-meter"><span>HIGH</span><i><b id="rw-led-high"></b></i></div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE: Visual Preview Aspect-Ratio Frame Container -->
+      <div class="preview-viewport-container">
+        <!-- Live drag/position helper overlay info -->
+        <div class="interactive-helper">Drag slider coordinates to adjust soundwave location</div>
+        
+        <!-- The actual video aspect ratio container -->
+        <div class="video-frame-container" id="video-frame-outer">
+          <div id="rw-stage-branding" class="rw-stage-branding" aria-hidden="true"><img alt=""></div>
+          <div id="source-artwork-bg" class="source-artwork-bg"></div>
+          <div id="radio-visual-header" class="radio-visual-header hidden"><span class="radio-666">666</span><span>RADIO WAVE v6.66</span><small>666SOUNDsDESIGn · SOUNDWAVE CORE</small></div>
+          <canvas id="visualizer-canvas"></canvas>
+          <aside id="radio-status-panel" class="radio-status-panel hidden" aria-live="polite">
+            <div class="radio-status-art"><img id="radio-status-artwork" alt="Stream artwork"></div>
+            <div class="radio-status-copy">
+              <div class="radio-status-kicker">LIVE STREAM STATUS</div>
+              <strong id="radio-status-title">RADIO WAVE v6.66</strong>
+              <span id="radio-status-artist">666SOUNDsDESIGn</span>
+              <div class="radio-status-grid">
+                <span>DJ</span><b id="radio-status-dj">—</b>
+                <span>ROUTE</span><b id="radio-status-route">MAIN</b>
+                <span>LISTENERS</span><b id="radio-status-listeners">—</b>
+                <span>STREAM</span><b id="radio-status-stream">—</b>
+              </div>
+            </div>
+          </aside>
+          <div id="source-nowplaying-ticker" class="source-nowplaying-ticker hidden"><div id="source-nowplaying-track" class="source-nowplaying-track">666SOUNDsDESIGn</div></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAVIGATION: Studio Audio Controls -->
+      <footer class="player-controls">
+        <div class="control-row">
+          
+          <button id="btn-play-pause" class="player-btn disabled" disabled>
+            <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          
+          <div class="track-timeline">
+            <span id="current-time">00:00</span>
+            <div class="waveform-seekbar-container">
+              <!-- SoundCloud style custom seekbar -->
+              <input type="range" id="seek-slider" min="0" value="0" max="100" class="seek-bar" disabled>
+              <div class="seek-progress" id="seek-progress-fill"></div>
+            </div>
+            <span id="total-duration">00:00</span>
+          </div>
+
+          <div class="volume-container">
+            <button id="btn-mute" class="mute-btn" type="button" aria-pressed="false" title="Mute audio">
+              <span class="mute-icon-on">🔊</span><span class="mute-icon-off hidden">🔇</span><small>MUTE</small>
+            </button>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7" class="volume-bar">
+          </div>
+
+        </div>
+        <div class="player-radio-status" aria-label="Radio stream status">
+          <label for="player-radio-route">RADIO ROUTE</label>
+          <select id="player-radio-route" disabled title="Auto switches to fallback on failure; Main and Fallback stay on the selected route">
+            <option value="auto">AUTO</option>
+            <option value="main">MAIN</option>
+            <option value="fallback">FALLBACK</option>
+          </select>
+          <span id="player-radio-route-state" class="player-radio-route-state" role="status" aria-live="polite">RADIO INACTIVE</span>
+          <span id="player-radio-now" class="player-radio-now">—</span>
+          <span id="player-radio-details" class="player-radio-details">DJ: — · LISTENERS: — · STREAM: —</span>
+        </div>
+      </footer>
+      <div class="radio-wave-copyright">COPYRIGHT 2026 BY FRAGGLEPOWER666 - 666SOUNDsDESIGN</div>
+    </main>
+
+    <!-- Hidden audio element for Web Audio API input -->
+    <audio id="audio-element" crossOrigin="anonymous"></audio>
+
+    <section id="vj-studio" class="vj-studio" aria-labelledby="vj-title">
+      <h2 id="vj-title">VJ STUDIO</h2>
+      <p>Muted local video on the main visualizer and export. Playback follows the shared audio player.</p>
+      <div class="vj-actions"><button type="button" id="vj-choose" class="btn btn-secondary">CHOOSE VIDEOS</button><button type="button" id="vj-clear" class="btn btn-secondary">CLEAR POOL</button></div>
+      <label for="vj-selection">Video sequence</label>
+      <select id="vj-selection" class="custom-select" aria-label="Selected video"></select>
+      <div class="vj-actions"><button type="button" id="vj-toggle" class="btn btn-secondary" aria-pressed="false">ENABLE VJ</button><button type="button" id="vj-next" class="btn btn-secondary">NEXT VIDEO</button></div>
+      <label for="vj-layout">Layout</label>
+      <select id="vj-layout" class="custom-select"><option value="1">Single pane</option><option value="2">Dual pane</option><option value="3">Three panes</option></select>
+      <label for="vj-opacity">Video opacity <span id="vj-opacity-value">70%</span></label>
+      <input id="vj-opacity" type="range" min="0" max="100" value="70">
+      <label><input id="vj-loop" type="checkbox" checked> Loop sequence</label>
+      <div class="vj-data">
+        <h3>Audio sync and parity selection</h3>
+        <p>Load optional CSV bands. Missing bands use live audio analysis.</p>
+        <div class="vj-actions">
+          <button type="button" class="btn btn-secondary" id="vj-data-bass">BASS CSV</button>
+          <button type="button" class="btn btn-secondary" id="vj-data-snare">SNARE CSV</button>
+          <button type="button" class="btn btn-secondary" id="vj-data-hihat">HIHAT CSV</button>
+          <button type="button" class="btn btn-secondary" id="vj-data-clear-audio">CLEAR CSV</button>
+        </div>
+        <label><input type="checkbox" id="vj-data-audio-enabled"> Use loaded audio sync</label>
+        <p id="vj-data-audio-status" role="status" aria-live="polite">Live analysis for all bands.</p>
+        <div class="vj-actions">
+          <button type="button" class="btn btn-secondary" id="vj-data-parity">LOAD PARITY JSON</button>
+          <button type="button" class="btn btn-secondary" id="vj-data-clear-parity">CLEAR PARITY</button>
+        </div>
+        <p>Classical 24-bit simulation; no quantum hardware is used.</p>
+        <label for="vj-data-inputs">Input bits (24 per line, up to 64 lines)</label>
+        <textarea id="vj-data-inputs" rows="4" spellcheck="false">000000000000000000000000
+111111111111111111111111
+010101010101010101010101
+101010101010101010101010</textarea>
+        <label for="vj-data-shots">Measurements per input</label>
+        <input id="vj-data-shots" type="number" min="1" max="10000" value="1000">
+        <div class="vj-actions">
+          <button type="button" class="btn btn-secondary" id="vj-data-simulate">SIMULATE</button>
+          <button type="button" class="btn btn-secondary" id="vj-data-cancel" disabled>CANCEL</button>
+        </div>
+        <progress id="vj-data-progress" max="1" value="0" aria-label="Simulation progress"></progress>
+        <label for="vj-data-limit">Maximum videos</label>
+        <input id="vj-data-limit" type="number" min="1" max="1000" value="12">
+        <div class="vj-actions">
+          <button type="button" class="btn btn-secondary" id="vj-data-select">APPLY PARITY ORDER</button>
+          <button type="button" class="btn btn-secondary" id="vj-data-reset">RESTORE FULL ORDER</button>
+        </div>
+        <p id="vj-data-status" role="status" aria-live="polite">No parity data loaded.</p>
+      </div>
+      <p id="vj-status" role="status" aria-live="polite">Choose local MP4 or WebM videos.</p>
+      <p>Separate visualizer outputs follow the primary VJ playback.</p>
+    </section>
+
+    <!-- EXPORT MODAL overlay when writing to local disk -->
+    <div id="export-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+      <div class="modal-card">
+        <div class="export-pulse-ring"></div>
+        <h2 id="export-modal-title">Rendering Music Video</h2>
+        <p id="export-modal-description">Your audio and soundwaves are being rendered to a file.</p>
+        <div class="export-modal-destination">Destination: <span id="export-modal-path"></span></div>
+        <div class="progress-bar-container" id="export-progress-container" role="progressbar" aria-label="Recording progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-bar-fill" id="export-progress"></div>
+        </div>
+        <div class="export-stats">
+          <div>Time Encoded: <span id="export-time">00:00</span></div>
+          <div>Status: <span id="export-status-label" role="status" aria-live="polite">Writing stream...</span></div>
+        </div>
+        <button id="btn-stop-export" class="btn btn-danger">Stop & Save Video</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="assets/radio-wave/banner.asset.js"></script>
+  <script src="assets/radio-wave/appIconSource.asset.js"></script>
+  <script src="assets/radio-wave/inAppLogo.asset.js"></script>
+  <script src="assets/radio-wave/stage.asset.js"></script>
+  <script src="vendor/cayatur/analysis.js"></script>
+  <script src="vendor/cayatur/spectrum.js"></script>
+  <script src="vendor/cayatur/formulas.js"></script>
+  <script src="vendor/cayatur/solids.js"></script>
+  <script src="vendor/cayatur/color-helper.js"></script>
+  <script src="vendor/cayatur/geometry3d.js"></script>
+  <script src="vendor/cayatur/shaderhost.js"></script>
+  <script src="vendor/cayatur/milkdrop-core.js"></script>
+  <script src="vendor/cayatur/milkdrop-shader.js"></script>
+  <script src="vendor/cayatur/milkdrop-audio.js"></script>
+  <script src="vendor/cayatur/preset-registry.js"></script>
+  <script src="vendor/cayatur/presets-milkdrop.js"></script>
+  <script src="vendor/cayatur/milkdrop-cycle.js"></script>
+  <script src="vendor/cayatur/milkdrop-renderer.js"></script>
+  <script src="workspace.js"></script>
+  <script src="diagnostics.js"></script>
+  <script src="audio-devices.js"></script>
+  <script src="audio-eq.js"></script>
+  <script src="audio-surround.js"></script>
+  <script src="vj-studio.js"></script>
+  <script src="vj-audio-sync.js"></script>
+  <script src="vj-parity-selector.js"></script>
+  <script src="vj-quantum-sampler.js"></script>
+  <script src="vj-data.js"></script>
+  <script src="vj-data-controls.js"></script>
+  <script src="vj-follower.js"></script>
+  <script src="app.js"></script>
+  <script src="../node_modules/hls.js/dist/hls.min.js"></script>
+  <script src="soundcloud-playback.js"></script>
+  <script src="integration/666-integration.js"></script>
+</body>
+</html>
