@@ -4,6 +4,12 @@ A premium, hardware-accelerated Windows desktop application to design stunning, 
 
 ![Soundwave Studio Preview](images/app_preview_ui.png)
 
+## Windows-Start
+
+Den vollständigen Projektordner entpacken und `RADIO_WAVE.bat` starten.
+Im Menü **1 – Player starten** auswählen. Das Menü bietet auch den Windows-Installer
+mit portabler EXE und das portable ZIP als Build-Ziele an.
+
 ---
 
 ## 🌟 Key Features

@@ -5,7 +5,11 @@ console.log('=== SoundwaveStudio 666 Release Integrity ===');
 const checksumManifest = fs.readFileSync('SOURCE_SHA256SUMS.txt', 'utf8').trim();
 for (const line of checksumManifest.split(/\r?\n/)) {
   const entry = /^([0-9a-f]{64})  (.+)$/.exec(line);
-  if (!entry || crypto.createHash('sha256').update(fs.readFileSync(entry[2])).digest('hex') !== entry[1]) {
+  // Git speichert die Start-Batch mit LF und checkt sie unter Windows mit CRLF aus.
+  const bytes = entry && (entry[2] === 'RADIO_WAVE.bat'
+    ? fs.readFileSync(entry[2], 'utf8').replace(/\r\n/g, '\n')
+    : fs.readFileSync(entry[2]));
+  if (!entry || crypto.createHash('sha256').update(bytes).digest('hex') !== entry[1]) {
     throw new Error('Source checksum mismatch: ' + line);
   }
 }

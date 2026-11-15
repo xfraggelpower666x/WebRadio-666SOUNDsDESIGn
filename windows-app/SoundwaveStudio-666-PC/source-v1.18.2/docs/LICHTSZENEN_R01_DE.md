@@ -1,12 +1,14 @@
-# RADIO WAVE v6.66 · Lichtszenen R02
+# RADIO WAVE v6.66 · Lichtszenen R03
 
 Quellbasis `6f583ca8f87225c5ac746429d1a3d9a2490d613c`.
 Govee-Routen abgeglichen mit WebRadio-Commit `7061f77f57002a7cc539ccb3226fcb071e24d2d5`.
 
 ## Start unter Windows
 
-1. Paket vollständig entpacken und `START_RADIO_WAVE_v6.66.bat` starten.
-   Beim ersten Start installiert die vorhandene Startdatei die Abhängigkeiten via npm.
+1. Paket vollständig entpacken und `RADIO_WAVE.bat` starten. Im Menü **1 – Player starten** wählen.
+   Die Batch prüft Node.js, npm, PowerShell und die gesperrte Electron-Version und
+   kann fehlende Werkzeuge installieren oder die Electron-Runtime reparieren.
+   Der Start ist auch per `RADIO_WAVE.bat start` möglich.
 2. Für Govee unter **666 RADIO** mit dem vorhandenen Radio-Admin-Zugang anmelden.
    Im Panel **Lichtszenen** auf **Govee-Geräte laden** klicken und gewünschte RGB-Geräte markieren.
 3. Für die Notebook-Tastatur **ASUS Aura verwenden** aktivieren.
