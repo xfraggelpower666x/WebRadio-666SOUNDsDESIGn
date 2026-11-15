@@ -87,3 +87,11 @@ test('Govee-Teilantwort hält Retry-Hinweis ein und wiederholt nur fehlende Ger�
   assert.equal(JSON.parse(cloud[2].opts.body).device, 'two');
   await assert.rejects(lights.apply({ scene: '__proto__' }), /Unbekannte/);
 });
+
+test('Lichtpanel ist als GOV-Fenster im Windows-Dock registriert', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const read = name => fs.readFileSync(path.join(__dirname, '../src', name), 'utf8');
+  assert.match(read('index.html'), /<section [^>]*id="light-scenes"/);
+  assert.match(read('workspace.js'), /key:'lightScenes',title:'GOV · LIGHT SCENES'[^\n]*node:q\('#light-scenes'\)/);
+});
