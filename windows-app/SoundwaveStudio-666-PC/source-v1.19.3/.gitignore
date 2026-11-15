@@ -1,0 +1,47 @@
+# Dependency directories
+node_modules/
+
+# Local logs and run configurations
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.system_generated/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# User test media files (keep repo lightweight)
+*.mp3
+*.wav
+*.m4a
+*.flac
+*.aac
+*.ogg
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.bmp
+*.mp4
+*.webm
+
+# Production builds
+dist/*
+!dist/SoundwaveStudio-win32-x64/
+build/cyber-studio/
+build/cyber-studio-work/
+build/radio-wave-v6.66.ico
+.cyber-studio-validation/
+build/cyber-studio-env/
+build/cyber-studio-backups/
+build/cyber-studio-stage-*/
+build/cyber-studio.lock/
+
+# Allow repository assets
+!images/
+!images/**
+
+
+

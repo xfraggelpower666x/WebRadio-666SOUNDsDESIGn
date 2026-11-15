@@ -1,0 +1,105 @@
+{
+  "name": "radio-wave-v666",
+  "version": "1.19.3",
+  "description": "RADIO WAVE v6.66 · Soundwave visual music player with 666 WebRadio addon",
+  "main": "main.js",
+  "scripts": {
+    "prestart": "node scripts/build-cyber-studio.cjs",
+    "start": "electron .",
+    "predist": "node scripts/build-cyber-studio.cjs",
+    "dist": "npm run prepare:branding && npm run check:radio-wave-release && electron-builder --win --x64 --publish never",
+    "prepackage": "node scripts/build-cyber-studio.cjs",
+    "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
+    "test": "node tests/deep-integration.test.cjs && node --test --test-concurrency=4 tests/diagnostics-host-check.test.cjs tests/diagnostics-measurements.test.cjs tests/local-playback-output.test.cjs tests/audio-library.test.cjs tests/audio-devices.test.cjs tests/audio-eq.test.cjs tests/audio-surround.test.cjs tests/windows-launcher.test.cjs tests/soundcloud-credentials.test.cjs tests/soundcloud-playback.test.cjs tests/video-export.test.cjs tests/radio-service-contract.test.cjs tests/radio-player-status.test.cjs tests/radio-admin-ui.test.cjs tests/workspace-navigation.test.cjs tests/cyber-studio.test.cjs tests/cyber-studio-build.test.cjs tests/vj-studio.test.cjs tests/vj-follower.test.cjs tests/vj-data-files.test.cjs tests/vj-audio-sync.test.cjs tests/vj-parity-selector.test.cjs tests/vj-quantum-sampler.test.cjs tests/vj-data.test.cjs tests/vj-data-controls.test.cjs tests/personal-milkdrop-archive.test.cjs && node tests/milkdrop-control-layer.test.cjs",
+    "test:electron": "node tests/electron-runtime-smoke.cjs",
+    "check:syntax": "node scripts/check-syntax.cjs",
+    "check:release": "node scripts/release-integrity.cjs",
+    "prebuild": "npm run prepare:branding && npm run check:radio-wave-release",
+    "prepare:branding": "node scripts/prepare-radio-wave-branding.cjs",
+    "check:radio-wave-release": "node scripts/radio-wave-release-integrity.cjs"
+  },
+  "keywords": [
+    "radio-wave",
+    "soundwave",
+    "visualizer",
+    "music",
+    "radio",
+    "soundcloud",
+    "electron",
+    "desktop"
+  ],
+  "author": "FRAGGLEPOWER666 / 666SOUNDsDESIGN",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "allowScripts": {
+    "electron@45.3.2": true,
+    "electron-winstaller@5.4.0": true
+  },
+  "devDependencies": {
+    "electron": "45.3.2",
+    "electron-builder": "^26.18.0",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.666soundsdesign.radiowave.v666",
+    "productName": "RADIO WAVE v6.66",
+    "beforePack": "./scripts/check-cyber-studio-pack.cjs",
+    "extraResources": [
+      {
+        "from": "build/cyber-studio",
+        "to": "cyber-studio"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/radio-wave-v6.66.ico"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "docs/**/*",
+      "DEEP_AUDIT_STATUS.md",
+      "package.json",
+      "build/windowsIconBase64.cjs",
+      "intro-preload.js",
+      "overlay-preload.js"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "RADIO WAVE v6.66",
+      "artifactName": "RADIO-WAVE-v6.66-Setup.${ext}",
+      "runAfterFinish": true,
+      "perMachine": false,
+      "allowElevation": false
+    },
+    "portable": {
+      "artifactName": "RADIO-WAVE-v6.66-Portable.${ext}"
+    }
+  },
+  "productName": "RADIO WAVE v6.66",
+  "dependencies": {
+    "hls.js": "^1.7.4"
+  }
+}
