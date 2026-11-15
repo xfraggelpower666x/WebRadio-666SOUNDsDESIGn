@@ -40,5 +40,5 @@ test('Govee controls and module loading are wired',()=>{
   assert.match(hooks,/bootHooks/);
   assert.match(hooks,/window\.S666GoveeSync/);
   assert.match(index,/govee-scene-sync\.js/);
-  assert.match(index,/govee-fx-control-hooks\.js/);
+  assert.match(index,/player-govee-overlay\.js/);
 });
