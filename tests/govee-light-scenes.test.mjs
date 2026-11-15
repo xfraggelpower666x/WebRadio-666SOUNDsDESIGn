@@ -34,12 +34,23 @@ test('Szenen teilen die Windows-Farben und behandeln Teilerfolg pro Gerät', asy
 test('Hauptplayer, beide Veluna-Pfade und Dashboard haben einen Szenen-Einstieg', async () => {
   const pages = await Promise.all(['index.html', 'veluna/index.html', 'VELUNA/index.html', 'dashboard/index.html']
     .map(path => readFile(new URL('../public/' + path, import.meta.url), 'utf8')));
-  for (const player of pages.slice(0, 3)) {
+  for (const player of pages.slice(1, 3)) {
     assert.match(player, /id="playerLightScenes"/);
     assert.match(player, /type="module" src="[^"]+govee-light-scenes-panel.js/);
     assert.match(player, /admin-auth-client\.js/);
   }
   assert.equal(pages[1], pages[2]);
+  const main = pages[0];
+  assert.match(main, /id="statusGovee"[^>]*aria-controls="playerGoveeDialog"/);
+  assert.doesNotMatch(main, /id="statusDiscord"|id="playerLightScenes"/);
+  const overlay = main.slice(main.indexOf('<dialog id="playerGoveeDialog"'), main.indexOf('</dialog>', main.indexOf('<dialog id="playerGoveeDialog"')));
+  for (const id of ['goveeEnableSync', 'goveeModeSelect', 'playerGoveeScene']) {
+    assert.ok(overlay.includes('id="' + id + '"'));
+    assert.equal(main.split('id="' + id + '"').length, 2);
+  }
+  const script = await readFile(new URL('../public/js/system-extra/govee/player-govee-overlay.js', import.meta.url), 'utf8');
+  assert.match(script, /await window\.S666AdminAuth\.ensure\(\{ forceLogin: true[\s\S]*?dialog\.showModal\(\)/);
+  assert.match(script, /await sync\.setEnabled\(enabled\)/);
   assert.ok(pages[3].includes(`querySelector('[data-hud-action="govee"]')`));
   assert.match(pages[3], /data-govee-command="scene"/);
   assert.match(pages[3], /sceneSender\.apply\(selected,sceneSelect\.value\)/);

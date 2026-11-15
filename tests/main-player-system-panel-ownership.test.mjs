@@ -14,12 +14,12 @@ const statusOnlyIds = [
   'statusWatchdog',
   'statusReconnect',
   'statusMeter',
-  'statusDiscord',
   'statusGovee'
 ];
 
 test('top system panel keeps one DOM control for every existing status/action ID', async () => {
   const html = await read('index.html');
+  assert.doesNotMatch(html, /id="statusDiscord"/);
   for (const id of [...statusOnlyIds, 'mainBtn', 'fallbackBtn', 'statusAdmin']) {
     assert.equal((html.match(new RegExp(`id="${id}"`, 'g')) || []).length, 1, `${id} must exist exactly once`);
   }

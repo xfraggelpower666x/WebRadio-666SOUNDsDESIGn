@@ -177,22 +177,12 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <div class="systempanel-group systempanel-right led-strip-v108" aria-label="Stream-Schalter und Action-LEDs">
             <button id="mainBtn" class="status-chip led-state state-empty source-chip source-mini-chip-v80 is-selected" type="button" title="Main Stream — Click to switch to Main Stream"><span class="status-dot"></span><span class="status-code">M</span></button>
             <button id="fallbackBtn" class="status-chip led-state state-off source-chip source-mini-chip-v80" type="button" title="Backupstream — Klick schaltet auf Backupstream"><span class="status-dot"></span><span class="status-code">B</span></button>
-            <button id="statusDiscord" class="status-chip led-state state-empty" type="button" title="Discord — verbunden: türkis, sendet: pink, Fehler: rot"><span class="status-dot"></span><span class="status-code">DSC</span></button>
             <button id="statusAdmin" class="status-chip led-state state-empty" type="button" title="Admin — Admin-Zugang aktiv"><span class="status-dot"></span><span class="status-code">ADM</span></button>
-            <button id="statusGovee" class="status-chip led-state state-empty" type="button" title="GOVEE / FX — Lichtsteuerung Status"><span class="status-dot"></span><span class="status-code">GOV</span></button><label><input id="goveeEnableSync" type="checkbox"> Govee FX</label>
-            <label>Gerät <select id="goveeModeSelect"><option value="bars">LightBars</option><option value="tv">TV</option></select></label>
+            <button id="statusGovee" class="status-chip led-state state-empty" type="button" title="Lichtsteuerung öffnen" aria-haspopup="dialog" aria-controls="playerGoveeDialog"><span class="status-dot"></span><span class="status-code">GOV</span></button>
 </div>
         </div>
       </header>
 
-<details id="playerLightScenes">
-  <summary>Lichtszenen · Govee</summary>
-  <fieldset><legend>RGB-Geräte auswählen</legend></fieldset>
-  <button type="button" data-light-load>Geräte laden</button>
-  <label>Szene <select></select></label>
-  <button type="button" data-light-apply>Szene anwenden</button>
-  <p role="status"></p>
-</details>
 <section class="hero">
 
       
@@ -2223,7 +2213,6 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <script type="module" src="/js/system-extra/govee/govee-sync-config.js?v=govee-cloud-r02"></script>
 <script type="module" src="/js/system-extra/govee/govee-bridge-client.js?v=govee-cloud-r02"></script>
 <script type="module" src="/js/system-extra/govee/govee-scene-sync.js?v=govee-cloud-r02"></script>
-<script type="module" src="/js/system-extra/govee/govee-fx-control-hooks.js?v=govee-cloud-r02"></script>
 
   <!-- FRAGGLE DNA RAIL v1 — LEDs + Fixes + Umbenennung -->
   
@@ -2239,6 +2228,27 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <script src="/config/veluna-assets.js?v=2026-07-23-reactive-visual-v183"></script>
   <script defer src="/js/veluna-splash.js?v=2026-07-11-veluna-v1214"></script>
   <script src="/js/pc-fixed-canvas.js?v=2026-07-11-veluna15" defer></script>
-<script type="module" src="/js/system-extra/govee/govee-light-scenes-panel.js?v=light-scenes-r01"></script>
+<dialog id="playerGoveeDialog" aria-labelledby="playerGoveeTitle">
+  <header><h2 id="playerGoveeTitle">GOV · Lichtsteuerung</h2><form method="dialog"><button class="status-chip" type="submit" aria-label="Schließen">×</button></form></header>
+  <fieldset id="playerGoveeDevices"><legend>Govee-Geräte</legend><div data-gov-devices></div></fieldset>
+  <div class="gov-actions">
+    <button data-gov="load">Geräte laden</button><button data-gov="state">Status</button>
+    <button data-gov="on">Ein</button><button data-gov="off">Aus</button>
+  </div>
+  <div class="gov-actions">
+    <label>Szene <select id="playerGoveeScene"></select></label><button data-gov="scene">Anwenden</button>
+    <label>Farbe <input id="playerGoveeColor" type="color" value="#00dcff"></label><button data-gov="color">Setzen</button>
+    <label>Helligkeit <input id="playerGoveeBrightness" type="number" min="1" max="100" value="65"></label><button data-gov="brightness">Setzen</button>
+    <label>Weißtemperatur (K) <input id="playerGoveeKelvin" type="number" min="1" step="1" placeholder="Kelvin"></label><button data-gov="kelvin">Setzen</button>
+  </div>
+  <fieldset><legend>Audio-Reaktivität</legend>
+    <label><input id="goveeEnableSync" type="checkbox"> Govee FX</label>
+    <label>Gerät <select id="goveeModeSelect"><option value="bars">LightBars</option><option value="tv">TV</option></select></label>
+  </fieldset>
+  <fieldset><legend>ASUS Aura</legend><p>In RADIO WAVE für Windows unter <strong>GOV · LIGHT SCENES</strong> stehen Tastaturfarbe und Bassreaktion bereit.</p></fieldset>
+  <p id="playerGoveeStatus" role="status" aria-live="polite"></p>
+</dialog>
+<link rel="stylesheet" href="/css/player-govee-overlay.css?v=gov-r02">
+<script type="module" src="/js/system-extra/govee/player-govee-overlay.js?v=gov-r02"></script>
 </body>
 </html>

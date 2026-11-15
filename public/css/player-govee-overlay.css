@@ -1,0 +1,34 @@
+#playerGoveeDialog {
+  box-sizing: border-box;
+  width: min(38rem, calc(100% - 1.5rem));
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1rem;
+  color: #e2faff;
+  background: #090e1c;
+  border: 1px solid #29d9e9;
+  border-radius: 12px;
+}
+#playerGoveeDialog::backdrop { background: rgb(2 5 14 / 82%); }
+#playerGoveeDialog header, #playerGoveeDialog .gov-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-bottom: .6rem;
+}
+#playerGoveeDialog header { justify-content: space-between; }
+#playerGoveeDialog h2 { margin: 0; color: #62f7ff; font-size: 1.15rem; }
+#playerGoveeDialog fieldset { margin: .65rem 0; border: 1px solid #42576a; }
+#playerGoveeDialog fieldset p { margin: 0; }
+#playerGoveeDialog [data-gov-devices] { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+#playerGoveeDialog button, #playerGoveeDialog select, #playerGoveeDialog input:not([type=checkbox]) {
+  background: #131b30;
+  color: inherit;
+  border: 1px solid #5e5384;
+  border-radius: 5px;
+  padding: .32rem .5rem;
+}
+#playerGoveeDialog button:disabled { opacity: .55; }
+#playerGoveeDialog input[type=number] { width: 6rem; }
+#playerGoveeStatus { white-space: pre-wrap; overflow-wrap: anywhere; }
