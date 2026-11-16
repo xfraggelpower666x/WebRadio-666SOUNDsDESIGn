@@ -9,7 +9,7 @@
 
   function create() {
     const bands = { bass: null, snare: null, hihat: null };
-    let flags = null, previousMs = null, audioEnabled = false;
+    let flags = null, records = null, previousMs = null, audioEnabled = false;
     return {
       status() {
         return { bands: Object.keys(bands).filter(key => bands[key] !== null), audioEnabled, parityRecords: flags?.length || 0 };
@@ -47,14 +47,22 @@
         const parsed = texts.flatMap(text => parity.parse(text));
         if (parsed.length > 20000) throw new Error('Combined parity records exceed limit');
         flags = parsed;
+        records = texts.flatMap(text => JSON.parse(text));
         return parsed.length;
       },
       async simulate(inputs, options) {
-        const records = await sampler.generate(inputs, options);
-        flags = parity.parse(JSON.stringify(records));
-        return records;
+        const result = await sampler.generate(inputs, options);
+        flags = parity.parse(JSON.stringify(result));
+        records = result;
+        return result;
       },
-      clearParity() { flags = null; },
+      exportParity() {
+        if (!records?.length) throw new Error('Generate or load parity data first');
+        const text = JSON.stringify(records);
+        parity.parse(text);
+        return text;
+      },
+      clearParity() { flags = null; records = null; },
       select(candidates, limit, random) {
         if (!flags) throw new Error('Load or generate parity data first');
         return parity.select(candidates, flags, limit, random);

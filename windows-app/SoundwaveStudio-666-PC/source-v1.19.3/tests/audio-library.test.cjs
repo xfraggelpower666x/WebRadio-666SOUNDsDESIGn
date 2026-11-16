@@ -316,6 +316,8 @@ test('large detachable library pages stay bounded and retain selections across f
     }
     append(...items) { items.forEach(item => this.appendChild(item)); }
     appendChild(item) { this.children.push(item); if (this.id === 'local-playlist-select' && this.children.length === 1) this.value = item.value; }
+    get options() { return this.children; }
+    add(option) { this.appendChild(option); }
     replaceChildren() { this.children = []; if (this.id === 'local-playlist-select') this.value = ''; }
   }
   const elements = new Map();
@@ -352,6 +354,9 @@ test('large detachable library pages stay bounded and retain selections across f
     localPlaylistAddQueue: async () => ({ state: { count: 1, mediaUrl: 'swmedia://audio/current' }, missing: 0 })
   };
   const context = {
+    Option: class extends Element {
+      constructor(label,value) { super();this.textContent=label;this.value=value; }
+    },
     document: { getElementById: get, createElement: () => new Element(), body: { classList: { contains: () => false } } },
     window: { api, confirm: () => true },
     localQueueSnapshot: { count: 0 },

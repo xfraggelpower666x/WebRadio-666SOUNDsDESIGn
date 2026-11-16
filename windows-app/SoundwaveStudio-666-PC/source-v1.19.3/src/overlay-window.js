@@ -100,6 +100,11 @@
     applyControls(payload?.controls||[],new Set([editing?.id,held?.id].filter(Boolean)));
   };
   window.rwOverlay.onSync(payload=>{
+    if(Array.isArray(payload?.meters)) {
+      const meters=root.querySelectorAll('.rw-eq-bands meter');
+      meters.forEach((meter,index)=>{meter.value=payload.meters[index]||0;});
+      return;
+    }
     if(rangeGesture){pendingSync=payload;return;}
     syncOverlay(payload);
   });

@@ -4,14 +4,22 @@
 })(globalThis, function () {
   'use strict';
 
-  function create(context) {
+  const frequencies = Object.freeze([31, 63, 125, 250, 500, 1000, 2000, 4000, 8000]);
+
+  function create(context, { graphic = false } = {}) {
     const input = context.createGain();
     const output = context.createGain();
     const dry = context.createGain();
     const wet = context.createGain();
-    const bass = context.createBiquadFilter();
-    const mid = context.createBiquadFilter();
-    const treble = context.createBiquadFilter();
+    const centers = graphic ? frequencies : [200, 1000, 4000];
+    const filters = centers.map((frequency, index) => {
+      const filter = context.createBiquadFilter();
+      filter.type = index === 0 ? 'lowshelf' : index === centers.length - 1 ? 'highshelf' : 'peaking';
+      filter.frequency.value = frequency;
+      if (filter.type === 'peaking') filter.Q.value = graphic ? 1.4 : 0.7;
+      filter.gain.value = 0;
+      return filter;
+    });
     const mix = context.createGain();
     const direct = context.createGain();
     const stereo = context.createGain();
@@ -22,10 +30,6 @@
     const leftRight = context.createGain();
     const rightLeft = context.createGain();
     const rightRight = context.createGain();
-    bass.type = 'lowshelf'; bass.frequency.value = 200;
-    mid.type = 'peaking'; mid.frequency.value = 1000; mid.Q.value = 0.7;
-    treble.type = 'highshelf'; treble.frequency.value = 4000;
-    bass.gain.value = mid.gain.value = treble.gain.value = 0;
     dry.gain.value = 0;
     wet.gain.value = 1;
     direct.gain.value = 1;
@@ -36,7 +40,9 @@
     stereoInput.channelCountMode = 'explicit';
     stereoInput.channelInterpretation = 'speakers';
     input.connect(dry); dry.connect(mix);
-    input.connect(bass); bass.connect(mid); mid.connect(treble); treble.connect(wet); wet.connect(mix);
+    input.connect(filters[0]);
+    filters.forEach((filter, index) => filter.connect(filters[index + 1] || wet));
+    wet.connect(mix);
     mix.connect(direct); direct.connect(output);
     mix.connect(stereoInput); stereoInput.connect(splitter);
     splitter.connect(leftLeft, 0); leftLeft.connect(merger, 0, 0);
@@ -57,10 +63,9 @@
     }
     return {
       input, output,
-      set({ bass: low = 0, mid: middle = 0, treble: high = 0, bypass = false, width = 100 } = {}) {
-        setParam(bass.gain, level(low));
-        setParam(mid.gain, level(middle));
-        setParam(treble.gain, level(high));
+      set({ gains, bass: low = 0, mid: middle = 0, treble: high = 0, bypass = false, width = 100 } = {}) {
+        const values = graphic ? (gains || [0,0,low,0,middle,0,high,0,0]) : [low, middle, high];
+        filters.forEach((filter, index) => setParam(filter.gain, level(values[index])));
         setParam(dry.gain, bypass ? 1 : 0);
         setParam(wet.gain, bypass ? 0 : 1);
         const number = Number(width);
@@ -77,5 +82,5 @@
       }
     };
   }
-  return { create };
+  return { create, frequencies };
 });

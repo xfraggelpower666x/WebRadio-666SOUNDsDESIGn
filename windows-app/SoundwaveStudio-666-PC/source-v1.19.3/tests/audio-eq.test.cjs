@@ -8,7 +8,7 @@ const { test } = require('node:test');
 const { runInNewContext } = require('node:vm');
 const { create } = require('../src/audio-eq.js');
 
-function graph() {
+function graph(options) {
   const nodes = [];
   function param() {
     return { value: 0, calls: [], cancelScheduledValues(time) { this.calls.push(['cancel', time]); },
@@ -23,7 +23,7 @@ function graph() {
     createGain: () => node('gain'), createBiquadFilter: () => node('filter'),
     createChannelSplitter: () => node('splitter'), createChannelMerger: () => node('merger')
   };
-  return { context, nodes, eq: create(context) };
+  return { context, nodes, eq: create(context, options) };
 }
 
 test('flat EQ, three independent bounded controls, bypass and reset', () => {
@@ -57,6 +57,16 @@ test('flat EQ, three independent bounded controls, bypass and reset', () => {
     assert.deepEqual(control.calls.slice(-2), [['cancel', 2], ['target', control.value, 2, 0.015]]);
 });
 
+test('graphic mode inserts nine independent filters and preserves stereo width', () => {
+  const { nodes, eq } = graph({ graphic: true });
+  const filters = nodes.filter(node => node.kind === 'filter');
+  const centers = [31, 63, 125, 250, 500, 1000, 2000, 4000, 8000];
+  assert.deepEqual(filters.map(node => node.frequency.value), centers);
+  eq.set({ gains: [-12,-9,-6,-3,0,3,6,9,12], width: 100 });
+  assert.deepEqual(filters.map(node => node.gain.value), [-12,-9,-6,-3,0,3,6,9,12]);
+  filters.slice(0,-1).forEach((node,i)=>assert.deepEqual(node.connections,[filters[i+1]]));
+});
+
 test('EQ controls restore state without starting playback and reset all bands and bypass', () => {
   const app = fs.readFileSync(path.join(__dirname, '..', 'src', 'app.js'), 'utf8');
   const start = app.indexOf('function setupAudioFx()');
@@ -87,7 +97,10 @@ test('EQ controls restore state without starting playback and reset all bands an
   const applied = [];
   context.audioEq = { set(value) { applied.push({ ...value }); } };
   element('audio-fx-reset').handlers.click();
-  assert.deepEqual(applied.at(-1), { bass: 0, mid: 0, treble: 0, bypass: false, width: 100 });
+  const reset = applied.at(-1);
+  assert.deepEqual(Array.from(reset.gains), Array(9).fill(0));
+  assert.equal(reset.bypass, false);
+  assert.equal(reset.width, 100);
 });
 
 test('Chromium OfflineAudioContext renders synthetic stereo and band responses', () => {

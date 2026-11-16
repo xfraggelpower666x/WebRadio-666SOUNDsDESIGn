@@ -258,7 +258,8 @@
       refreshRemoteHealth();
       return r;
     }catch(e){
-      state(label+' · ERROR · '+e.message);
+      const rejected=label==='LOGIN' && /\bpassword_rejected\b/.test(String(e.message));
+      state(label+' · ERROR · '+(rejected?'The radio password service rejected the password. Use the same Radio Admin password as in the web player.':e.message));
       refreshRemoteHealth();
       throw e;
     }

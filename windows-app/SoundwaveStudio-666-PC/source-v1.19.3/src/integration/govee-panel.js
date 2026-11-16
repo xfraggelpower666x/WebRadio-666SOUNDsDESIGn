@@ -5,7 +5,7 @@
   const login = panel.querySelector('form');
   const password = login.querySelector('input');
   const controls = panel.querySelector('fieldset');
-  const status = panel.querySelector('[role=status]');
+  const status = document.getElementById('rw-govee-status');
   const mode = panel.querySelector('select');
   const color = panel.querySelector('input[type=color]');
   const brightness = panel.querySelector('input[type=range]');
@@ -16,6 +16,31 @@
   let spectrum;
   let generation = 0;
 
+  const asusDevice = document.getElementById('asus-openrgb-device');
+  const asusStatus = document.getElementById('asus-openrgb-status');
+  if (asusDevice && window.api.asusControl) {
+    for (const action of ['choose','list','apply','off']) {
+      document.getElementById('asus-openrgb-'+action).addEventListener('click',async()=>{
+        const attempt=generation;
+        try {
+          const changeColor=action==='apply'||action==='off';
+          if(changeColor&&!asusDevice.value)throw new Error('Choose a detected ASUS device.');
+          const result=await window.api.asusControl(changeColor?'color':action,changeColor?{
+            i:Number(asusDevice.value),
+            color:action==='off'?'000000':document.getElementById('asus-openrgb-color').value.slice(1)
+          }:undefined);
+          if(attempt!==generation||result===null)return;
+          if(changeColor)asusStatus.textContent='Color command accepted by OpenRGB.';
+          else {
+            asusDevice.replaceChildren(new Option('Choose ASUS device',''));
+            for(const item of result)asusDevice.add(new Option(item.name,String(item.i)));
+            asusStatus.textContent=result.length?result.length+' compatible ASUS device(s).':'No compatible ASUS device reported. Check the local SDK Server.';
+          }
+        } catch(error) { if(attempt===generation)asusStatus.textContent=String(error.message||error).split('Error: ').at(-1); }
+      });
+    }
+  }
+
   function reset() {
     ++generation;
     clearInterval(interval);
@@ -23,6 +48,8 @@
     sync.checked = false;
     login.hidden = false;
     login.reset();
+    asusDevice?.replaceChildren();
+    if (asusStatus) asusStatus.textContent = '';
     controls.hidden = true;
     controls.disabled = true;
   }

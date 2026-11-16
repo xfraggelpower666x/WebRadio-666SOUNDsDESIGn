@@ -341,7 +341,7 @@ window.RWLocalQueue=Object.freeze({
 });
 
 function setupAudioFx(){
-  const bands=['bass','mid','treble'];
+  const bands=['sub','low','bass','lomid','mid','presence','treble','high','air'];
   const inputs=Object.fromEntries(bands.map(band=>[band,document.getElementById('audio-fx-'+band)]));
   const bypass=document.getElementById('audio-fx-bypass');
   const reset=document.getElementById('audio-fx-reset');
@@ -353,6 +353,7 @@ function setupAudioFx(){
       audioEqSettings[band]=Number.isFinite(value)?Math.max(-12,Math.min(12,value)):0;
       document.getElementById('audio-fx-'+band+'-value').textContent=`${audioEqSettings[band]>0?'+':''}${audioEqSettings[band]} dB`;
     }
+    audioEqSettings.gains=bands.map(band=>audioEqSettings[band]);
     audioEqSettings.bypass=bypass.checked;
     const value=Number(width.value);
     audioEqSettings.width=Number.isFinite(value)?Math.max(0,Math.min(200,value)):100;
@@ -367,6 +368,74 @@ function setupAudioFx(){
     width.value='100';width.dispatchEvent(new Event('input',{bubbles:true}));
     bypass.checked=false;bypass.dispatchEvent(new Event('change',{bubbles:true}));
   });
+  const preset=document.getElementById('audio-fx-preset');
+  const slot=document.getElementById('audio-fx-slot');
+  const save=document.getElementById('audio-fx-save');
+  const notice=document.getElementById('audio-fx-preset-status');
+  if (preset && slot && save && notice && typeof localStorage !== 'undefined') {
+    const factory = {
+      Flat: [0,0,0,0,0,0,0,0,0],
+      'Club bass': [4,4,3,0,-1,-1,0,1,2],
+      'Dark techno': [3,4,2,-1,-2,0,1,0,-2],
+      'Vocal presence': [-3,-2,-1,0,1,2,3,1,0],
+      'Warm vinyl': [1,2,2,1,0,-1,-1,-2,-2],
+      'Bright detail': [-1,-1,0,0,0,1,2,3,3],
+      'Low-end cut': [-12,-9,-5,-2,0,0,0,0,0]
+    };
+    const key='rw666-eq-user-presets-v1';
+    let custom=[];
+    try { const saved=JSON.parse(localStorage.getItem(key)); if(Array.isArray(saved))custom=saved.slice(0,5); } catch {}
+    const valid = item => Array.isArray(item?.gains) && item.gains.length===9 && item.gains.every(Number.isFinite);
+    function updateBrowser(selected='') {
+      preset.replaceChildren(new Option('Choose a preset',''));
+      for(const name of Object.keys(factory))preset.add(new Option(name,'factory:'+name));
+      for(let i=0;i<5;i++)if(valid(custom[i]))preset.add(new Option('User '+(i+1),'user:'+i));
+      preset.value=selected;
+    }
+    preset.addEventListener('change',()=>{
+      const [kind,id]=preset.value.split(':');
+      const selection=kind==='factory' ? {gains:factory[id],width:100,bypass:false} : custom[Number(id)];
+      if(!valid(selection))return;
+      bands.forEach((band,i)=>{inputs[band].value=String(selection.gains[i]);});
+      width.value=String(selection.width??100);
+      bypass.checked=selection.bypass===true;
+      apply();
+      window.RWWorkspace?.save();
+    });
+    save.addEventListener('click',()=>{
+      const i=Number(slot.value);
+      if(!Number.isInteger(i)||i<0||i>=5)return;
+      const next=custom.slice();
+      next[i]={gains:audioEqSettings.gains.slice(),width:audioEqSettings.width,bypass:audioEqSettings.bypass};
+      try {
+        localStorage.setItem(key,JSON.stringify(next));
+        custom=next;
+        updateBrowser('user:'+i);
+        notice.textContent='Saved User '+(i+1);
+      } catch { notice.textContent='Could not save the EQ preset.'; }
+    });
+    updateBrowser();
+  }
+  if (typeof window !== 'undefined' && window.RWAudioEq?.frequencies) {
+    const meters=bands.map(band=>document.getElementById('audio-spectrum-'+band));
+    setInterval(()=>{
+      const active=analyserNode && audioContext?.state==='running' && !audioElement.paused && !audioElement.ended;
+      const data=active ? dataArray : null;
+      const levels=meters.map((meter,index)=>{
+        if(!meter)return 0;
+        const freq=window.RWAudioEq.frequencies[index];
+        const binHz=active ? audioContext.sampleRate/analyserNode.fftSize : 1;
+        const first=Math.max(1,Math.round(freq/Math.SQRT2/binHz));
+        const last=Math.min(data?.length||0,Math.max(first+1,Math.ceil(freq*Math.SQRT2/binHz)));
+        let sum=0;
+        for(let i=first;i<last;i++)sum+=data[i];
+        const value=last>first?Math.round(sum/(last-first)):0;
+        if(meter.value!==value)meter.value=value;
+        return value;
+      });
+      window.dispatchEvent(new CustomEvent('rw:audio-eq-levels',{detail:levels}));
+    },125);
+  }
   apply();
 }
 
@@ -501,6 +570,7 @@ function setupLocalLibrary(){
   const tracks=el('local-playlist-tracks');
   const status=el('local-library-status');
   const checked=new Set();
+  el('local-pool-directory')?.addEventListener('change',()=>{poolPage=0;render(snapshot);});
   const pageSize=40;
   let poolPage=0,playlistPage=0;
   let snapshot={folder:'',pool:[],playlists:[],errors:[]};
@@ -551,7 +621,23 @@ function setupLocalLibrary(){
     const ids=new Set(next.pool.map(item=>item.id));
     for(const id of checked)if(!ids.has(id))checked.delete(id);
     const filter=el('local-pool-filter').value.trim().toLowerCase();
-    const filtered=next.pool.filter(item=>item.name.toLowerCase().includes(filter));
+    const folders=el('local-pool-directory');
+    const current=folders?.value||'';
+    const group=name=>name.replaceAll('\\','/').split('/').slice(0,-1).join('/');
+    if(folders){
+      const directories=[...new Set(next.pool.map(item=>group(item.name)))].sort((a,b)=>a.localeCompare(b));
+      const signature=JSON.stringify(directories);
+      if(folders.dataset.signature!==signature){
+        folders.replaceChildren(new Option('All folders',''));
+        for(const dir of directories)folders.add(new Option(dir||'Pool root','folder:'+dir));
+        folders.value=Array.from(folders.options).some(option=>option.value===current)?current:'';
+        folders.dataset.signature=signature;
+      }
+    }
+    const directory=folders?.value||'';
+    const filtered=next.pool.filter(item=>
+      (!directory||directory==='folder:'+group(item.name))&&item.name.toLowerCase().includes(filter));
+
     const poolPages=Math.max(1,Math.ceil(filtered.length/pageSize));
     poolPage=Math.max(0,Math.min(poolPage,poolPages-1));
     el('local-pool-page').textContent=`Page ${poolPage+1}/${poolPages} · ${filtered.length} shown · ${checked.size} checked`;
@@ -738,22 +824,45 @@ function setupEventListeners() {
   setupAudioDevices();
   setupAudioFx();
 
-  // Background selection
-  btnSelectBg.addEventListener('click', async () => {
+  // Shared background for every visualizer engine in this workspace.
+  const backgroundScale=document.getElementById('background-scale');
+  const showScale=()=>{document.getElementById('background-scale-value').textContent=backgroundScale.value+'%';};
+  backgroundScale.addEventListener('input',showScale);
+  showScale();
+  let backgroundRequest=0;
+  async function showBackground(read) {
+    const request=++backgroundRequest;
     try {
-      const fileData = await window.api.openBackground();
-      if (fileData) {
-        bgFileName = fileData.name;
-        labelBgFile.textContent = bgFileName;
-        bgMeta.textContent = `Background: ${bgFileName}`;
-        bgMeta.classList.remove('hidden');
-
-        bgImage = new Image();
-        bgImage.src = fileData.dataUri;
-      }
-    } catch (err) {
-      console.error(err);
+      const file=await read();
+      if(!file||request!==backgroundRequest)return;
+      const image=new Image();
+      image.src=file.dataUri;
+      await image.decode();
+      if(request!==backgroundRequest)return;
+      bgImage=image;
+      bgFileName=file.name;
+      labelBgFile.textContent=file.name;
+      bgMeta.textContent='Background: '+file.name;
+      bgMeta.classList.remove('hidden');
+    } catch {
+      if(request!==backgroundRequest)return;
+      bgMeta.textContent='Could not load the background. Select the file again.';
+      bgMeta.classList.remove('hidden');
     }
+  }
+  void showBackground(()=>window.api.restoreBackground());
+  btnSelectBg.addEventListener('click',()=>showBackground(()=>window.api.openBackground()));
+  document.getElementById('btn-clear-bg').addEventListener('click',async()=>{
+    const request=++backgroundRequest;
+    try {
+      await window.api.clearBackground();
+      if(request!==backgroundRequest)return;
+      bgImage=null;
+      bgFileName='';
+      labelBgFile.textContent='Select Background Image';
+      bgMeta.textContent='Default Starfield active';
+    } catch { bgMeta.textContent='Could not clear the saved background.'; }
+    bgMeta.classList.remove('hidden');
   });
 
   // Player functionality
@@ -987,7 +1096,7 @@ function ensureAudioContext() {
     timeDataArray = new Uint8Array(bufferLength);
 
     audioSource = audioContext.createMediaElementSource(audioElement);
-    audioEq = window.RWAudioEq.create(audioContext);
+    audioEq = window.RWAudioEq.create(audioContext, { graphic: true });
     audioEq.set(audioEqSettings);
     audioSource.connect(audioEq.input);
     audioEq.output.connect(analyserNode);
@@ -1180,6 +1289,10 @@ function drawBackground(bass, mid, treble) {
       renderY = (canvasHeight - renderH) / 2;
     }
     
+    const scale = (Number(document.getElementById('background-scale')?.value) || 100) / 100;
+    renderW *= scale; renderH *= scale;
+    renderX = (canvasWidth - renderW) / 2;
+    renderY = (canvasHeight - renderH) / 2;
     ctx.globalAlpha = 0.35; // Overlay opacity mix
     ctx.drawImage(bgImage, renderX, renderY, renderW, renderH);
     ctx.globalAlpha = 1.0;
@@ -1788,6 +1901,10 @@ async function finishRecording(session) {
 
 async function startRecordingPipeline() {
   if (exportBusy) return;
+  if (!(audioElement.currentSrc||audioElement.getAttribute?.('src')||audioElement.src||audioDeviceController?.recordsInput())) {
+    exportResult.textContent = 'Choose an audio track or enable microphone recording.';
+    return;
+  }
   if (!exportSavePath && !await browseExportDestination()) return;
   if (exportBusy) return;
   const mimeType = recordingMimeForPath(exportSavePath);
@@ -1805,6 +1922,8 @@ async function startRecordingPipeline() {
     const hasMedia=!!(audioElement.currentSrc||audioElement.getAttribute?.('src')||audioElement.src);
     const includeMicrophone=audioDeviceController?.recordsInput()===true;
     if(!hasMedia&&!includeMicrophone)throw new Error('Choose an audio track or enable microphone recording');
+    if (typeof audioContext !== 'undefined' && audioContext?.state === 'suspended' && typeof audioContext.resume === 'function') await audioContext.resume();
+    if (typeof canvas.captureStream !== 'function') throw new Error('This runtime cannot capture the visualizer canvas.');
     const canvasStream = canvas.captureStream(exportFps);
     const videoTracks = canvasStream.getVideoTracks();
     const audioTracks = audioDestinationNode ? audioDestinationNode.stream.getAudioTracks() : [];
@@ -1841,6 +1960,7 @@ async function startRecordingPipeline() {
     diagStatusColor.style.backgroundColor = '#ff4757';
     diagStatusColor.style.boxShadow = '0 0 10px #ff4757';
     exportModal.classList.remove('hidden');
+    void window.api.focusVideoProgress?.().catch(()=>{});
     exportModalTitle.textContent = 'Rendering Music Video';
     exportModalDescription.textContent = 'Your audio and soundwaves are being rendered to a file.';
     exportModalPath.textContent = session.path;

@@ -2,6 +2,7 @@
 (() => {
   const STORAGE='rw666-workspace-v1';
   const SETTINGS='rw666-ui-settings-v1';
+  const movedWindows={audioPool:'media',audioDevices:'audioFx',position:'wave'};
   const q=s=>document.querySelector(s);
   const qa=s=>Array.from(document.querySelectorAll(s));
   const outputMode=new URLSearchParams(location.search).get('output')==='1';
@@ -10,6 +11,10 @@
   const safeParse=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback;}catch{return fallback;}};
 
   const saved=safeParse(localStorage.getItem(STORAGE),{windows:{},dockOpen:true});
+  for(const [oldKey,newKey] of Object.entries(movedWindows)){
+    const old=saved.windows?.[oldKey];
+    if(old?.open===true && saved.windows?.[newKey])saved.windows[newKey].open=true;
+  }
   const settings=safeParse(localStorage.getItem(SETTINGS),{});
 
   // Restore user-facing control values before app.js binds behavior.
@@ -24,14 +29,11 @@
   const sectionDefs=[
     {key:'source',title:'SOURCE HUB',icon:'⚡',node:q('#source-hub'),x:28,y:95,w:420,h:470,open:true},
     {key:'radioAdmin',title:'ONLINE RADIO ADMIN',icon:'📡',node:q('#rw-radio-admin'),x:65,y:100,w:520,h:620},
-    {key:'media',title:'MEDIA LIBRARY',icon:'📁',match:'Media Library',x:70,y:135,w:390,h:360},
-    {key:'audioPool',title:'AUDIO POOL & PLAYLISTS',icon:'🎵',node:q('#local-audio-library'),x:85,y:110,w:500,h:620},
-    {key:'audioFx',title:'AUDIO FX · EQ',icon:'🎚️',node:q('#audio-fx'),x:110,y:115,w:430,h:480},
-    {key:'audioDevices',title:'AUDIO DEVICES',icon:'🎙️',node:q('#audio-device-controls'),x:140,y:120,w:440,h:520},
+    {key:'media',title:'MEDIA LIBRARY',icon:'📁',match:'Media Library',x:70,y:135,w:610,h:660},
+    {key:'audioFx',title:'AUDIO FX · EQ',icon:'🎚️',node:q('#audio-fx'),x:110,y:115,w:610,h:660},
     {key:'wave',title:'WAVE DESIGN',icon:'🎨',match:'Wave Design',x:120,y:115,w:420,h:520},
-    {key:'position',title:'POSITION & SIZE',icon:'📐',match:'Position & Size',x:170,y:135,w:420,h:500},
     {key:'text',title:'TEXT OVERLAYS',icon:'✏️',match:'Text Overlays',x:220,y:155,w:410,h:430},
-    {key:'engines',title:'PRESENTATION & ENGINES',icon:'🖥️',match:'Presentation & Engines',x:260,y:105,w:440,h:610},
+    {key:'engines',title:'PRESENTATION & OUTPUT',icon:'🖥️',match:'Presentation & Output',x:260,y:105,w:440,h:610},
     {key:'milkdrop',title:'MILKDROP STUDIO',icon:'🌌',node:q('#milkdrop-studio'),x:300,y:120,w:430,h:470},
     {key:'vjStudio',title:'VJ STUDIO',icon:'🎬',node:q('#vj-studio'),x:250,y:100,w:440,h:600},
     {key:'diagnostics',title:'DIAGNOSTICS',icon:'🩺',node:q('#rw-diagnostics'),x:330,y:125,w:500,h:600},
@@ -392,13 +394,10 @@
     dock.appendChild(btn);
   }
 
-  const cyberStudioButton=document.createElement('button');
-  cyberStudioButton.type='button';
-  cyberStudioButton.id='rw-dock-open-cyber-studio';
-  cyberStudioButton.className='rw-dock-button';
+  const cyberStudioButton=q('#rw-dock-open-cyber-studio');
   cyberStudioButton.dataset.rwTipKey='openCyberStudio';
-  cyberStudioButton.setAttribute('aria-label','MilkDrop Cyber Studio');
-  cyberStudioButton.innerHTML='<span aria-hidden="true">✦</span><small>MilkDrop Cyber Studio</small>';
+  q('#local-library-open').addEventListener('click',()=>openWindow('media'));
+
   cyberStudioButton.addEventListener('click',async()=>{
     if(cyberStudioButton.disabled)return;
     cyberStudioButton.disabled=true;
@@ -410,7 +409,7 @@
       window.alert(languageCode()==='de'?'Studio-Start konnte nicht angefordert werden.':'Could not request the Studio launch.');
     } finally {cyberStudioButton.disabled=false;}
   });
-  dock.appendChild(cyberStudioButton);
+
 
   // Stream status remains inside the video frame so it moves with the visual canvas.
   const status=q('#radio-status-panel');
@@ -574,16 +573,23 @@
     for(const [key,win] of windows){
       const body=win.querySelector('.rw-floating-window-body');
       if(!body)continue;
-      new MutationObserver(()=>scheduleDetachedSync(key)).observe(body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','disabled','aria-pressed','value','open']});
+      new MutationObserver(records=>{
+        if(records.some(record=>record.target.tagName!=='METER'))scheduleDetachedSync(key);
+      }).observe(body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','disabled','aria-pressed','value','open']});
       body.addEventListener('input',()=>scheduleDetachedSync(key),true);
       body.addEventListener('change',()=>scheduleDetachedSync(key),true);
     }
   }
 
+  window.addEventListener('rw:audio-eq-levels',event=>{
+    if(detached.has('audioFx'))window.api?.syncDetachedOverlay?.('audioFx',{meters:event.detail}).catch(()=>{});
+  });
+
   window.api?.detachedOverlayState?.().then(state=>{
     for(const [key,s] of Object.entries(state?.windows||{})){
       if(s?.open===true&&key==='dock')detachDock();
       else if(s?.open===true&&windows.has(key))detachWindow(key,true);
+      else if(s?.open===true&&movedWindows[key])openWindow(movedWindows[key]);
     }
   }).catch(()=>{});
 

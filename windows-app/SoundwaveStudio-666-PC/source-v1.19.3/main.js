@@ -12,6 +12,7 @@ const { createCyberStudioLauncher } = require('./src/shared/milkdrop-cyber-studi
 const { createAudioLibrary } = require('./src/shared/audio-library.cjs');
 const { createAudioPermissionGate, forwardOverlayMicrophone } = require('./src/shared/audio-permissions.cjs');
 const { createVjFiles } = require('./src/shared/vj-files.cjs');
+const { listAsus, setAsus } = require('./src/shared/asus-openrgb.cjs');
 const { sendGovee } = require('./src/shared/govee-bridge.cjs');
 const { validateVjState } = require('./src/shared/vj-sync.cjs');
 
@@ -766,6 +767,22 @@ registerIpc('workspace:overlay-state','main',()=>detachedOverlayState());
 registerIpc('workspace:overlay-focus','main',(_e,key)=>{const w=detachedOverlayWindows.get(String(key||''));if(w&&!w.isDestroyed()){w.show();w.focus();return {ok:true};}return {ok:false};});
 registerIpc('workspace:overlay-close','main',(_e,key)=>{const w=detachedOverlayWindows.get(String(key||''));if(w&&!w.isDestroyed()){w.close();return {ok:true};}return {ok:false};});
 registerIpc('app:version','main',()=>app.getVersion());
+registerIpc('dialog:saveVjData','main',async(_event,kind,text)=>{
+  if (!['bass','snare','hihat','json'].includes(kind) || typeof text!=='string' ||
+      !text.length || Buffer.byteLength(text,'utf8')>2*1024*1024)throw new Error('Invalid or oversized VJ data');
+  const ext=kind==='json'?'json':'csv';
+  const parser=kind==='json'?require('./src/vj-parity-selector.js'):require('./src/vj-audio-sync.js');
+  parser.parse(text);
+  const result=await dialog.showSaveDialog(mainWindow,{
+    title:'Save VJ data',
+    defaultPath:path.join(app.getPath('documents'),kind==='json'?'vj-parity.json':'vj-'+kind+'.csv'),
+    filters:[{name:'VJ '+ext.toUpperCase(),extensions:[ext]}]
+  });
+  if(result.canceled||!result.filePath)return false;
+  if(path.extname(result.filePath).toLowerCase()!=='.'+ext)throw new Error('Use a .'+ext+' filename');
+  await fs.promises.writeFile(result.filePath,text,'utf8');
+  return true;
+});
 registerIpc('dialog:openVjData','main',async(_event,kind)=>{
   if(kind!=='sync'&&kind!=='parity')throw new Error('Invalid VJ data type');
   const result=await dialog.showOpenDialog(mainWindow,{
@@ -788,13 +805,15 @@ registerIpc('workspace:overlay-sync','main',(_e,key,payload={})=>{
   if(!w||w.isDestroyed())return {ok:false};
   const html=payload.html===undefined?undefined:String(payload.html||'').slice(0,512*1024);
   const controls=Array.isArray(payload.controls)?payload.controls.slice(0,256):undefined;
-  w.webContents.send('workspace:overlay-sync',{html,controls});
+  const meters=k==='audioFx'&&Array.isArray(payload.meters)&&payload.meters.length===9&&
+    payload.meters.every(n=>Number.isInteger(n)&&n>=0&&n<=255)?payload.meters:undefined;
+  w.webContents.send('workspace:overlay-sync',{html,controls,meters});
   return {ok:true};
 });
 registerIpc('workspace:overlay-ready','overlay',(e)=>{const hit=Array.from(detachedOverlayWindows.entries()).find(([,w])=>w&&!w.isDestroyed()&&w.webContents.id===e.sender.id);return {ok:!!hit,key:hit?.[0]||''};});
 registerIpc('audio:overlay-microphone','overlay',event=>forwardOverlayMicrophone(event,{
   getMainWindow:()=>mainWindow,
-  getDevicesWindow:()=>detachedOverlayWindows.get('audioDevices'),
+  getDevicesWindow:()=>detachedOverlayWindows.get('audioFx') || detachedOverlayWindows.get('audioDevices'),
   isTrustedOverlayUrl:trustedOverlayUrl
 }));
 registerIpc('workspace:overlay-action','overlay',(_e,payload={})=>{
@@ -957,6 +976,38 @@ registerIpc('govee:unlock', 'main', async (event, password) => {
   return { ok: true };
 });
 registerIpc('govee:close', 'main', () => { lockGovee(); return { ok: true }; });
+let asusExecutable = '';
+registerIpc('asus:control','main',async(event,action,value)=>{
+  const session=goveeSession;
+  const authorized=()=>session && session===goveeSession && session.sender===event.sender &&
+    session.token===adminToken && Date.now()<session.expires;
+  if(!authorized())throw new Error('govee_auth_required');
+  if(process.platform!=='win32')throw new Error('ASUS control requires Windows.');
+  if(session.asusBusy)throw new Error('An ASUS command is already running.');
+  session.asusBusy=true;
+  try {
+    if(action==='choose'){
+      const chosen=await dialog.showOpenDialog(mainWindow,{title:'Choose your installed OpenRGB.exe',
+        filters:[{name:'Windows application',extensions:['exe']}],properties:['openFile']});
+      if(!authorized())throw new Error('govee_auth_required');
+      if(chosen.canceled)return null;
+      const file=chosen.filePaths[0];
+      if(path.basename(file).toLowerCase()!=='openrgb.exe')throw new Error('Select OpenRGB.exe.');
+      asusExecutable=file;
+    }
+    if(!asusExecutable)throw new Error('Select OpenRGB.exe and start its local SDK Server.');
+    if(action==='choose'||action==='list'){
+      const devices=await listAsus(asusExecutable);
+      if(!authorized())throw new Error('govee_auth_required');
+      session.asusDevices=devices;
+      return devices.map(({i,name})=>({i,name}));
+    }
+    if(action!=='color')throw new Error('Invalid ASUS command.');
+    const selected=session.asusDevices?.find(device=>device.i===value?.i);
+    if(!selected)throw new Error('Select a detected ASUS device.');
+    return await setAsus(asusExecutable,selected,value.color,authorized);
+  } finally { session.asusBusy=false; }
+});
 registerIpc('govee:command', 'main', async (event, action, value) => {
   const session = goveeSession;
   const authorized = () => session && session === goveeSession && session.sender === event.sender &&
@@ -1114,7 +1165,7 @@ registerIpc('local:library-set-rating','main',(_e,id,rating)=>audioLibrary.setRa
 registerIpc('local:library-refresh','main',async()=>{await audioLibrary.refresh();return audioLibrary.state();});
 registerIpc('local:library-clear-folder','main',()=>audioLibrary.clearFolder());
 registerIpc('local:library-choose-folder','main',async()=>{
-  const result=await dialog.showOpenDialog(mainWindow,{title:'Choose Audio Pool Folder',properties:['openDirectory']});
+  const result=await dialog.showOpenDialog(mainWindow,{title:'Choose Audio Pool Folder',defaultPath:audioLibrary.state().folder||undefined,properties:['openDirectory']});
   if(result.canceled||!result.filePaths[0])return null;
   return audioLibrary.selectFolder(result.filePaths[0]);
 });
@@ -1272,31 +1323,46 @@ registerIpc('dialog:importMilkdropPersonalLibrary','main',async()=>{
 registerIpc('milkdrop:personal-library','main',async()=>personalMilkdropLibraryState(true));
 registerIpc('milkdrop:personal-library-license','main',async()=>{const s=personalMilkdropLibraryState(false);return {installed:s.installed,license:s.license||''};});
 
+const backgroundStore = () => path.join(app.getPath('userData'), 'radio-wave-background.json');
+
+async function loadBackground(filePath) {
+  const mime = {jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',bmp:'image/bmp'}[path.extname(filePath).slice(1).toLowerCase()];
+  if(!mime || !path.isAbsolute(filePath))throw new Error('background_type_blocked');
+  const file = await fs.promises.open(filePath, 'r');
+  try {
+    const stat = await file.stat();
+    if(!stat.isFile())throw new Error('background_not_file');
+    if(stat.size>32*1024*1024)throw new Error('background_too_large');
+    const data = Buffer.alloc(stat.size);
+    const {bytesRead} = await file.read(data,0,data.length,0);
+    return {name:path.basename(filePath),dataUri:'data:'+mime+';base64,'+data.subarray(0,bytesRead).toString('base64')};
+  } finally { await file.close(); }
+}
+
+registerIpc('background:restore','main',async()=>{
+  try {
+    const selected = JSON.parse(await fs.promises.readFile(backgroundStore(),'utf8'));
+    return await loadBackground(selected);
+  } catch(error) {
+    if(error.code==='ENOENT' && !fs.existsSync(backgroundStore()))return null;
+    throw error;
+  }
+});
+registerIpc('background:clear','main',async()=>{
+  await fs.promises.rm(backgroundStore(),{force:true});
+  return true;
+});
 registerIpc('dialog:openBackground','main', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     title: 'Select Background Image',
-    filters: [
-      { name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'bmp'] }
-    ],
+    filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'bmp'] }],
     properties: ['openFile']
   });
-
-  if (result.canceled || result.filePaths.length === 0) {
-    return null;
-  }
-
+  if (result.canceled || !result.filePaths.length) return null;
   const filePath = result.filePaths[0];
-  const st = fs.statSync(filePath); if(!st.isFile())throw new Error('background_not_file'); if(st.size>32*1024*1024)throw new Error('background_too_large');
-  const imgData = fs.readFileSync(filePath);
-  const ext = path.extname(filePath).slice(1).toLowerCase();
-  const mimeMap={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',bmp:'image/bmp'}; const mimeType=mimeMap[ext]; if(!mimeType)throw new Error('background_type_blocked');
-  const dataUri = `data:${mimeType};base64,${imgData.toString('base64')}`;
-
-  return {
-    path: filePath,
-    name: path.basename(filePath),
-    dataUri: dataUri
-  };
+  const image = await loadBackground(filePath);
+  fs.writeFileSync(backgroundStore(),JSON.stringify(filePath),'utf8');
+  return image;
 });
 
 function discardVideoWrite() {
@@ -1306,19 +1372,29 @@ function discardVideoWrite() {
   void closeVideoWrite(state);
 }
 
+registerIpc('video:focusProgress','main', () => {
+  if (mainWindow?.isMinimized()) mainWindow.restore();
+  mainWindow?.show();
+  mainWindow?.focus();
+});
 registerIpc('dialog:getSavePath','main', async (_event,formats) => {
   if (videoWriteState) throw new Error('video_write_in_progress');
   approvedSavePath = '';
   if(formats===undefined)formats=['mp4','webm'];
   if(!Array.isArray(formats)||!formats.length||formats.length>2||formats.some(format=>format!=='mp4'&&format!=='webm'))throw new Error('video_formats_invalid');
   const supported=[...new Set(formats)];
-  const result = await dialog.showSaveDialog(mainWindow, {
+  const parent = typeof detachedOverlayWindows === 'undefined' ? mainWindow : detachedOverlayWindows.get('export') || mainWindow;
+  const result = await dialog.showSaveDialog(parent, {
     title: 'Save Soundwave Video',
     defaultPath: path.join(app.getPath('videos'), `RADIO-WAVE-v6.66-visual.${supported[0]}`),
     filters: supported.map(format=>({name:format==='mp4'?'MP4 Video':'WebM Video',extensions:[format]}))
   });
 
   approvedSavePath = result.canceled || !result.filePath ? '' : path.resolve(result.filePath);
+  if(approvedSavePath && !supported.includes(path.extname(approvedSavePath).slice(1).toLowerCase())){
+    approvedSavePath='';
+    throw new Error('Use one of these filename extensions: '+supported.join(', '));
+  }
   return approvedSavePath || null;
 });
 

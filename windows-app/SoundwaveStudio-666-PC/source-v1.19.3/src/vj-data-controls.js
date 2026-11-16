@@ -121,5 +121,56 @@
       status.textContent = 'Full video order restored.';
     } catch (error) { status.textContent = `Could not restore order: ${String(error.message || error)}`; }
   });
+  const capture = el('vj-data-capture');
+  if (capture) {
+    const kinds = ['bass','snare','hihat'];
+    let samples = new Map(), timer, source;
+    function stopCapture() {
+      clearInterval(timer);
+      timer = null;
+      capture.textContent = 'RECORD LIVE ENVELOPES';
+      audioStatus.textContent = 'Captured '+samples.size+' live samples. Save each band as CSV.';
+    }
+    capture.addEventListener('click', () => {
+      if (timer) return stopCapture();
+      if (audio.paused || audio.ended || !audio.currentSrc) {
+        audioStatus.textContent = 'Play the audio track before capturing envelopes.';
+        return;
+      }
+      samples = new Map();
+      source = audio.currentSrc;
+      capture.textContent = 'STOP CAPTURE';
+      audioStatus.textContent = 'Capturing live audio at 10 samples per second…';
+      timer = setInterval(() => {
+        const runtime = window.SoundwaveRuntime;
+        const analyser = runtime?.getAnalyser();
+        if (audio.ended || audio.currentSrc!==source || samples.size>=20000) return stopCapture();
+        if (audio.paused || audio.seeking || audio.readyState<2 || analyser?.context.state!=='running') return;
+        const bins = runtime.getFrequencyData();
+        if (!bins?.length) return;
+        const binHz = analyser.context.sampleRate / analyser.fftSize;
+        const level = (from,to) => {
+          const first=Math.max(1,Math.ceil(from/binHz));
+          const last=Math.min(bins.length,Math.max(first+1,Math.ceil(to/binHz)));
+          let sum=0;
+          for(let i=first;i<last;i++)sum+=bins[i];
+          return last>first ? sum/(255*(last-first)) : 0;
+        };
+        samples.set(Math.round(audio.currentTime*1000),[level(25,160),level(160,2400),level(2400,12000)]);
+      },100);
+    });
+    for (const kind of [...kinds,'json']) {
+      el('vj-data-save-'+kind).addEventListener('click', async () => {
+        try {
+          if (kind!=='json' && timer) stopCapture();
+          if (kind!=='json' && !samples.size) throw new Error('Record live envelopes first');
+          const text = kind==='json' ? data.exportParity() : 'Time_ms,Bass_Amplitude\n'+
+            [...samples.entries()].sort((a,b)=>a[0]-b[0]).map(([ms,values])=>ms+','+values[kinds.indexOf(kind)].toFixed(5)).join('\n')+'\n';
+          const saved = await window.api.saveVjData(kind,text);
+          if (saved) (kind==='json'?status:audioStatus).textContent='File saved.';
+        } catch(error) { (kind==='json'?status:audioStatus).textContent=String(error.message||error); }
+      });
+    }
+  }
   showAudioStatus();
 })();

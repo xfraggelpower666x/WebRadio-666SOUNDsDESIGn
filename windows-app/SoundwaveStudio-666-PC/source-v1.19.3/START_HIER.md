@@ -51,6 +51,15 @@ Die drei optionalen Skripte für Python und Windows-Diagnose liegen unter
 1. Lokalen Govee-Bridge-Dienst auf demselben PC starten. Der Player verwendet den vorhandenen Endpunkt auf localhost, Port 3000. LAN Control muss für das Gerät aktiviert sein.
 2. Im Player auf GOV klicken und das Radio-Admin-Passwort eingeben. Die Freigabe gilt fünf Minuten und endet beim Schließen des Dialogs.
 3. Licht an/aus, Testfarbe samt Helligkeit oder Audio-Reaktivität auswählen. Die Audio-Reaktivität liest das Spektrum des vorhandenen Soundwave-Players während der Wiedergabe.
-4. ASUS Aura benötigt einen eigenen Adapter. Die Anzeige im Dialog markiert den offenen Anschluss.
+4. ASUS Aura: Unter GOV → ASUS Aura die installierte OpenRGB.exe wählen, den lokalen SDK-Server in OpenRGB auf Port 6742 starten und den erkannten ASUS-Controller auswählen. Für diese Anbindung stehen feste Farbe und Schwarz zur Verfügung.
 
 Eine Quittung im Dialog bestätigt die Antwort der lokalen Bridge. Die Reaktion der Leuchten lässt sich am Gerät prüfen.
+
+## Bedienoberfläche 1.19.4
+
+- **LOCAL → MEDIA LIBRARY** bündelt die Warteschlange, Datei- und Ordnerauswahl, den gespeicherten Audio-Pool, erneute Scans, einen Ordnerfilter und die Playlist-Verwaltung.
+- **Audio FX** enthält neun EQ-Bänder mit Live-Pegel, sieben feste und fünf eigene Speicherplätze. Die Hardware-Einstellungen stehen darunter.
+- **Wave Design** enthält die Position und Größe der Welle sowie den gemeinsamen Hintergrund mit Bildauswahl, Größenregler und Starfield-Rücksetzung. **Presentation & Output** bündelt Engine-Auswahl und Ausgabedisplays, Cyber Studio ist in **MilkDrop Studio**.
+- **VJ Studio** zeichnet während der Wiedergabe drei Frequenzhüllkurven für CSV-Dateien auf. Die Paritätsauswahl lässt sich als wieder importierbares JSON speichern.
+- **Export Studio** öffnet den Dateidialog beim auslösenden Exportfenster und holt beim Start der Aufnahme das Fortschrittsfenster nach vorn.
+- **GOV** steht im Hauptfenster beim Player. Die Admin-Freigabe verlangt das Radio-Admin-Passwort. OpenRGB und die Govee-Bridge laufen bei Verwendung als lokale Anwendungen bzw. Dienste.
