@@ -45,3 +45,14 @@ Voraussetzungen.
 
 Die drei optionalen Skripte für Python und Windows-Diagnose liegen unter
 `tools/windows`. Die B-01–B-03-Korrekturen sind Bestandteil dieses Pakets.
+
+
+## Lichtszenen mit Govee und ASUS Aura
+
+1. `RADIO_WAVE.bat` öffnen und **1 – Player starten** wählen.
+2. Für Govee die bestehende Radio-Admin-Anmeldung öffnen. Im WINDOWS-Dock **GOV · LIGHT SCENES** öffnen. Im Lichtpanel
+   Geräte laden und die gewünschten Leuchten markieren.
+3. Optional **ASUS Aura verwenden** aktivieren und die lokale Übernahme bestätigen.
+4. **Drop** wählen und **Szene anwenden**. Erwartet sind violette Govee-Leuchten
+   und Cyan an einer unterstützten Aura-Tastatur. Das Panel meldet beide Ergebnisse.
+5. Für die optionale Bassreaktion die Checkbox aktivieren und Musik im Player abspielen.

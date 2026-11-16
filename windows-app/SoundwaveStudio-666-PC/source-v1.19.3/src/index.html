@@ -113,6 +113,22 @@
         </section>
 
         
+        <section class="panel-section active" id="light-scenes">
+          <h2 class="section-title">Lichtszenen</h2>
+          <label for="light-scene">Szene</label>
+          <select id="light-scene" class="custom-input">
+            <option value="bunker">Bunker</option>
+            <option value="break">Break</option>
+            <option value="drop">Drop</option>
+          </select>
+          <button type="button" id="light-devices" class="btn btn-secondary">Govee-Geräte laden</button>
+          <div id="light-targets" role="group" aria-label="Govee-Geräte"></div>
+          <label><input id="light-aura" type="checkbox"> ASUS Aura verwenden</label>
+          <label><input id="light-reactive" type="checkbox" disabled> Aura reagiert auf Bass</label>
+          <button type="button" id="light-apply" class="btn btn-secondary">Szene anwenden</button>
+          <div id="light-status" class="file-meta-tag" role="status"></div>
+        </section>
+
         <!-- SECTION 1: Files & Media Selection -->
         <section class="panel-section active">
           <h2 class="section-title"><span class="icon">📁</span> Media Library</h2>
@@ -801,6 +817,7 @@
   <script src="vj-data.js"></script>
   <script src="vj-data-controls.js"></script>
   <script src="vj-follower.js"></script>
+  <script src="light-scenes-panel.js"></script>
   <script src="app.js"></script>
   <script src="../node_modules/hls.js/dist/hls.min.js"></script>
   <script src="soundcloud-playback.js"></script>
