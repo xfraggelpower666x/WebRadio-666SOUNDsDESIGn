@@ -6,6 +6,7 @@ const path = require('node:path');
 const { test } = require('node:test');
 const { runInNewContext } = require('node:vm');
 const radioCfg = require('../src/shared/radio-config.cjs');
+const lightScenesModule = require('../src/shared/light-scenes.cjs');
 
 function fixture() {
   const source = fs.readFileSync(path.join(__dirname, '../main.js'), 'utf8');
@@ -27,6 +28,10 @@ function fixture() {
   const context = {
     radioCfg, radioOrigin: origin, adminToken: '', remoteLocks: new Set(),
     process: { env: {} },
+    require(id) {
+      assert.equal(id, './src/shared/light-scenes.cjs');
+      return lightScenesModule;
+    },
     mainWindow: {},
     dialog: { showMessageBox: async (_window, options) => { dialogs.push(options); return confirmation(); } },
     radioUrl: route => new URL(route, radioCfg.radioBase).href,
@@ -43,6 +48,15 @@ function fixture() {
       if (endpoint === radioCfg.gateRoute) {
         if (expired || opts.headers.authorization !== 'Bearer test-token') return reply(403, { ok: false, authOk: false, pwOk: false });
         return reply(200, { ok: true, authOk: true, pwOk: true });
+      }
+      if (endpoint.startsWith('/api/admin/govee/')) {
+        if (opts.headers.origin !== origin || opts.headers.authorization !== 'Bearer test-token') {
+          return reply(403, { ok: false, error: 'auth_required' });
+        }
+        return reply(200, endpoint.endsWith('/devices') ? { ok: true, devices: [{
+          sku: 'H6047', device: 'test-device', deviceName: 'Testleuchte',
+          capabilities: [{ type: 'devices.capabilities.color_setting', instance: 'colorRgb' }]
+        }] } : { ok: true });
       }
       if (endpoint === radioCfg.skipRoute) {
         if (opts.headers.origin !== origin || opts.headers.authorization !== 'Bearer test-token') return reply(403, { error: 'origin_rejected' });
@@ -257,4 +271,21 @@ test('test messages require explicit native consent, correct contracts and fresh
   setConfirmation(async()=>{expire();return {response:1};});
   await assert.rejects(handlers['radio:admin-test-message']({},'discord'),/auth_required|auth_token_missing|gate_check_failed/);
   assert.equal(requests.filter(r=>r.endpoint==='/api/discord/test').length,prior);
+});
+
+test('Windows-Lichtpanel verwendet die Radio-Admin-Sitzung für Govee', async () => {
+  const { handlers, roles, requests, origin } = fixture();
+  assert.equal(roles['lights:apply'], 'main');
+  await assert.rejects(handlers['lights:devices'](), /auth_token_missing/);
+  await handlers['auth:login']({}, 'test-password');
+  const [device] = await handlers['lights:devices']();
+  const [result] = await handlers['lights:apply']({}, { scene: 'drop', ids: [device.id] });
+  assert.equal(result.ok, true);
+  const control = requests.find(request => request.endpoint === '/api/admin/govee/control');
+  assert.equal(control.headers.origin, origin);
+  assert.equal(control.redirect, 'error');
+  assert.equal(control.body.capability.value, 0x8800ff);
+  await handlers['auth:logout']();
+  const [loggedOut] = await handlers['lights:apply']({}, { scene: 'drop', ids: [device.id] });
+  assert.equal(loggedOut.ok, false);
 });

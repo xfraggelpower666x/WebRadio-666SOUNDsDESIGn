@@ -727,6 +727,7 @@ function createWindow() {
     fatalStartup('MAIN_UI_LOAD_FAILED',`${code} ${desc} ${url}`);
   });
   mainWindow.webContents.on('render-process-gone',(_e,details)=>{
+    void releaseAura();
     startupLog('MAIN_RENDER_GONE',details||{});
     fatalStartup('MAIN_RENDERER_GONE',JSON.stringify(details||{}));
   });
@@ -746,6 +747,7 @@ function createWindow() {
   mainWindow.webContents.on('did-finish-load',()=>setTimeout(()=>emitMainWindowMetrics('did-finish-load'),0));
 
   mainWindow.on('closed', () => {
+    if (!lightsClosing) void releaseAura();
     mainWindow = null;
     discardVideoWrite();
   });
@@ -918,9 +920,30 @@ registerIpc('soundcloud:queue-state','main',()=>soundCloudQueueState());
 registerIpc('soundcloud:open-current','main',async()=>{if(!soundCloudCurrent?.permalink)throw new Error('soundcloud_track_missing');await shell.openExternal(soundCloudPermalink(soundCloudCurrent.permalink));return {ok:true};});
 registerIpc('radio:config','main', () => ({stream:new URL(radioCfg.stream,radioCfg.radioBase).href,fallback:new URL(radioCfg.fallbackStream,radioCfg.radioBase).href,radioBase:radioCfg.radioBase}));
 registerIpc('radio:nowplaying','main', async()=>{const r=await radioJson(radioCfg.nowPlaying);if(!r.ok)throw new Error(`HTTP_${r.status}`);return r.data;});
-registerIpc('auth:login','main', async(_e,password)=>{const value=textValue(password,512,'password_invalid');adminToken='';const r=await radioJson(radioCfg.loginRoute,{method:'POST',headers:{origin:radioOrigin},body:JSON.stringify({password:value})});if(!r.ok||r.data?.ok!==true||!r.data?.token)throw new Error(r.data?.error||'login_rejected');adminToken=String(r.data.token);const gate=await authCheck();if(!gate.ok){adminToken='';throw new Error(gate.error||'gate_check_failed');}return gate;});
+const { createLightScenes } = require('./src/shared/light-scenes.cjs');
+const lightScenes = createLightScenes({
+  radioJson: (route, opts, auth) => radioJson(route, { ...opts, headers: { origin: radioOrigin }, redirect: 'error' }, auth)
+});
+function releaseAura() {
+  return lightScenes.stopAura().catch(error => startupLog('AURA_RELEASE_FAILED', error.message));
+}
+let lightsQuitReady = false;
+let lightsClosing = false;
+registerIpc('lights:devices', 'main', () => lightScenes.devices());
+registerIpc('lights:aura', 'main', (_event, enabled) => {
+  if (lightsClosing) throw new Error('Die App wird geschlossen');
+  return enabled === true ? lightScenes.startAura() : lightScenes.stopAura();
+});
+registerIpc('lights:apply', 'main', (_event, payload) => {
+  if (lightsClosing) throw new Error('Die App wird geschlossen');
+  return lightScenes.apply(payload);
+});
+registerIpc('lights:bass', 'main', (_event, level) => {
+  if (!lightsClosing) return lightScenes.bass(level);
+});
+registerIpc('auth:login','main', async(_e,password)=>{const value=textValue(password,512,'password_invalid');lightScenes.resetGovee();adminToken='';const r=await radioJson(radioCfg.loginRoute,{method:'POST',headers:{origin:radioOrigin},body:JSON.stringify({password:value})});if(!r.ok||r.data?.ok!==true||!r.data?.token)throw new Error(r.data?.error||'login_rejected');adminToken=String(r.data.token);const gate=await authCheck();if(!gate.ok){adminToken='';throw new Error(gate.error||'gate_check_failed');}return gate;});
 registerIpc('auth:check','main',()=>authCheck());
-registerIpc('auth:logout','main',()=>{adminToken='';return {ok:true};});
+registerIpc('auth:logout','main',()=>{lightScenes.resetGovee();adminToken='';return {ok:true};});
 registerIpc('radio:admin-config-current','main',async()=>{const r=await adminConfigRead(adminConfigRoutes.current);if(!r.config||typeof r.config!=='object'||Array.isArray(r.config))throw new Error('invalid_config_response');const config=r.config,fields={};for(const key of [...adminConfigScalars,...adminConfigLists])fields[key]=configFieldSummary(config[key]);return {ok:true,version:Number.isFinite(config.version)?config.version:null,fields};});
 registerIpc('radio:admin-config-backups','main',async()=>{const r=await adminConfigRead(adminConfigRoutes.backups);if(!Array.isArray(r.items))throw new Error('invalid_backups_response');return {ok:true,items:r.items.slice(0,100).map(item=>({name:typeof item?.name==='string'&&/^[\w.-]{1,180}$/.test(item.name)?item.name:'unavailable',size:Number.isFinite(item?.size)?item.size:null}))};});
 registerIpc('radio:admin-config-active','main',async()=>{const r=await adminConfigRead('/api/runtime-config/status');const fields={};for(const key of adminConfigScalars)fields[key]=configFieldSummary(r[key]);return {ok:true,source:typeof r.source==='string'&&/^[\w.-]{1,60}$/.test(r.source)?r.source:'unknown',version:Number.isFinite(r.version)?r.version:null,fields,metadataUpstreamCount:Number.isFinite(r.metadataUpstreamCount)?r.metadataUpstreamCount:null};});
@@ -984,7 +1007,17 @@ app.whenReady().then(() => {
   try{app.exit(1);}catch{}
 });
 
-app.on('before-quit',()=>{appQuitting=true;startupLog('APP_BEFORE_QUIT');destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(audioLibraryTimer)clearInterval(audioLibraryTimer); discardVideoWrite(); adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
+app.on('before-quit', event => {
+  if (lightsQuitReady) return;
+  event.preventDefault();
+  if (lightsClosing) return;
+  lightsClosing = true;
+  void releaseAura().then(() => {
+    lightsQuitReady = true;
+    app.quit();
+  });
+});
+app.on('before-quit',()=>{if (!lightsQuitReady) return;appQuitting=true;startupLog('APP_BEFORE_QUIT');destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(audioLibraryTimer)clearInterval(audioLibraryTimer); discardVideoWrite(); adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

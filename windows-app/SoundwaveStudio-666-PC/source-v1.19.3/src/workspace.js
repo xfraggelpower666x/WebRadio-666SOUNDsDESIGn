@@ -24,6 +24,7 @@
   const sectionDefs=[
     {key:'source',title:'SOURCE HUB',icon:'⚡',node:q('#source-hub'),x:28,y:95,w:420,h:470,open:true},
     {key:'radioAdmin',title:'ONLINE RADIO ADMIN',icon:'📡',node:q('#rw-radio-admin'),x:65,y:100,w:520,h:620},
+    {key:'lightScenes',title:'GOV · LIGHT SCENES',icon:'◉',node:q('#light-scenes'),x:85,y:105,w:460,h:445,detachable:false},
     {key:'media',title:'MEDIA LIBRARY',icon:'📁',match:'Media Library',x:70,y:135,w:390,h:360},
     {key:'audioPool',title:'AUDIO POOL & PLAYLISTS',icon:'🎵',node:q('#local-audio-library'),x:85,y:110,w:500,h:620},
     {key:'audioFx',title:'AUDIO FX · EQ',icon:'🎚️',node:q('#audio-fx'),x:110,y:115,w:430,h:480},
@@ -305,7 +306,7 @@
   function qaFrom(root,sel){return Array.from(root?.querySelectorAll?.(sel)||[]);}
   async function detachWindow(key,restoring=false){
     const win=windows.get(key);if(!win||detached.has(key)||!window.api?.openDetachedOverlay)return false;
-    const def=sectionDefs.find(x=>x.key===key);if(!def)return false;
+    const def=sectionDefs.find(x=>x.key===key);if(!def||def.detachable===false)return false;
     const body=win.querySelector('.rw-floating-window-body');
     const r=win.getBoundingClientRect();
     try{
@@ -379,7 +380,9 @@
     win.append(head,body);document.body.appendChild(win);
     windows.set(def.key,win);
 
-    head.querySelector('.rw-window-detach').addEventListener('click',()=>detachWindow(def.key));
+    const detachButton=head.querySelector('.rw-window-detach');
+    if(def.detachable===false)detachButton.remove();
+    else detachButton.addEventListener('click',()=>detachWindow(def.key));
     head.querySelector('.rw-window-close').addEventListener('click',()=>closeWindow(def.key));
     win.addEventListener('pointerdown',()=>bringToFront(win));
     win.addEventListener('mouseup',saveWorkspace);
