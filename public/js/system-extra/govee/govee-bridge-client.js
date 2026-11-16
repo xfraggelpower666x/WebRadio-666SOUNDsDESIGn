@@ -10,6 +10,7 @@ async function post(path, payload) {
     const res = await fetch(url, {
       method: "POST",
       mode: "cors",
+      redirect: "error",
       cache: "no-store",
       credentials: "omit",
       headers: { "Content-Type": "application/json" },
@@ -20,7 +21,9 @@ async function post(path, payload) {
       const text = await res.text().catch(() => "");
       throw new Error(`Bridge error ${res.status}: ${text}`);
     }
-    return res.json().catch(() => ({}));
+    const data = await res.json().catch(() => ({}));
+    if (data?.ok === false || data?.success === false) throw new Error("Bridge rejected the command");
+    return data;
   } catch (error) {
     if (error?.name === "AbortError") throw new Error(`Bridge timeout after ${timeoutMs}ms`);
     throw error;

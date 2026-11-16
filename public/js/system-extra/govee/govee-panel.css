@@ -1,0 +1,21 @@
+.govee-panel {
+  max-width: min(30rem, 90vw);
+  max-height: 85vh;
+  overflow: auto;
+  color: #fff;
+  background: #191226;
+  border: 1px solid #c281ed;
+  border-radius: .75rem;
+  padding: 1.25rem;
+}
+.govee-panel::backdrop { background: rgba(10, 5, 20, .78); }
+.govee-panel [hidden] { display: none !important; }
+.govee-panel label { display: flex; align-items: center; gap: .75rem; margin: .65rem 0; }
+.govee-panel button, .govee-panel select, .govee-panel input[type=password] {
+  color: #fff;
+  background: #362340;
+  border: 1px solid #a86aca;
+  border-radius: .3rem;
+  padding: .35rem .55rem;
+}
+.govee-panel :focus-visible { outline: 2px solid #64e7ed; outline-offset: 2px; }

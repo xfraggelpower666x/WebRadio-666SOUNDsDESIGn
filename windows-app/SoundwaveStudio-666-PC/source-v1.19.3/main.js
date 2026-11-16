@@ -12,6 +12,7 @@ const { createCyberStudioLauncher } = require('./src/shared/milkdrop-cyber-studi
 const { createAudioLibrary } = require('./src/shared/audio-library.cjs');
 const { createAudioPermissionGate, forwardOverlayMicrophone } = require('./src/shared/audio-permissions.cjs');
 const { createVjFiles } = require('./src/shared/vj-files.cjs');
+const { sendGovee } = require('./src/shared/govee-bridge.cjs');
 const { validateVjState } = require('./src/shared/vj-sync.cjs');
 
 const STARTUP_LOG_PATH = path.join(os.tmpdir(), 'RADIO-WAVE-v6.66-startup.log');
@@ -918,9 +919,65 @@ registerIpc('soundcloud:queue-state','main',()=>soundCloudQueueState());
 registerIpc('soundcloud:open-current','main',async()=>{if(!soundCloudCurrent?.permalink)throw new Error('soundcloud_track_missing');await shell.openExternal(soundCloudPermalink(soundCloudCurrent.permalink));return {ok:true};});
 registerIpc('radio:config','main', () => ({stream:new URL(radioCfg.stream,radioCfg.radioBase).href,fallback:new URL(radioCfg.fallbackStream,radioCfg.radioBase).href,radioBase:radioCfg.radioBase}));
 registerIpc('radio:nowplaying','main', async()=>{const r=await radioJson(radioCfg.nowPlaying);if(!r.ok)throw new Error(`HTTP_${r.status}`);return r.data;});
-registerIpc('auth:login','main', async(_e,password)=>{const value=textValue(password,512,'password_invalid');adminToken='';const r=await radioJson(radioCfg.loginRoute,{method:'POST',headers:{origin:radioOrigin},body:JSON.stringify({password:value})});if(!r.ok||r.data?.ok!==true||!r.data?.token)throw new Error(r.data?.error||'login_rejected');adminToken=String(r.data.token);const gate=await authCheck();if(!gate.ok){adminToken='';throw new Error(gate.error||'gate_check_failed');}return gate;});
+async function adminLogin(password) {const value=textValue(password,512,'password_invalid');adminToken='';const r=await radioJson(radioCfg.loginRoute,{method:'POST',headers:{origin:radioOrigin},body:JSON.stringify({password:value})});if(!r.ok||r.data?.ok!==true||!r.data?.token)throw new Error(r.data?.error||'login_rejected');adminToken=String(r.data.token);const gate=await authCheck();if(!gate.ok){adminToken='';throw new Error(gate.error||'gate_check_failed');}return gate;}
+let goveeSession = null;
+let goveeGeneration = 0;
+let goveeTimer;
+let goveePending = Promise.resolve();
+
+function lockGovee() {
+  ++goveeGeneration;
+  const previous = goveeSession;
+  goveeSession = null;
+  clearTimeout(goveeTimer);
+  if (previous) {
+    previous.sender.removeListener('destroyed', previous.onDestroyed);
+    goveePending = goveePending.then(async () => {
+      if (previous.enabled) await sendGovee('enabled', false).catch(() => {});
+    });
+  }
+}
+
+registerIpc('auth:login','main', (_e, password) => {
+  lockGovee();
+  return adminLogin(password);
+});
 registerIpc('auth:check','main',()=>authCheck());
-registerIpc('auth:logout','main',()=>{adminToken='';return {ok:true};});
+registerIpc('auth:logout','main',()=>{lockGovee();adminToken='';return {ok:true};});
+registerIpc('govee:unlock', 'main', async (event, password) => {
+  lockGovee();
+  const generation = goveeGeneration;
+  await adminLogin(password);
+  if (generation !== goveeGeneration) throw new Error('govee_auth_required');
+  const session = { sender: event.sender, token: adminToken, expires: Date.now() + 300000, enabled: false };
+  goveeSession = session;
+  goveeTimer = setTimeout(lockGovee, 300000);
+  session.onDestroyed = () => { if (goveeSession === session) lockGovee(); };
+  event.sender.once('destroyed', session.onDestroyed);
+  return { ok: true };
+});
+registerIpc('govee:close', 'main', () => { lockGovee(); return { ok: true }; });
+registerIpc('govee:command', 'main', async (event, action, value) => {
+  const session = goveeSession;
+  const authorized = () => session && session === goveeSession && session.sender === event.sender &&
+    session.token && session.token === adminToken && Date.now() < session.expires;
+  if (!authorized()) throw new Error('govee_auth_required');
+  if (session.pending) throw new Error('govee_busy');
+  if (action === 'audio' && !session.enabled) throw new Error('govee_sync_disabled');
+  session.pending = true;
+  const command = goveePending.then(async () => {
+    if (!authorized()) throw new Error('govee_auth_required');
+    const result = await sendGovee(action, value);
+    if (action === 'enabled') session.enabled = value;
+    return result;
+  });
+  goveePending = command.catch(() => {});
+  try {
+    return await command;
+  } finally {
+    session.pending = false;
+  }
+});
 registerIpc('radio:admin-config-current','main',async()=>{const r=await adminConfigRead(adminConfigRoutes.current);if(!r.config||typeof r.config!=='object'||Array.isArray(r.config))throw new Error('invalid_config_response');const config=r.config,fields={};for(const key of [...adminConfigScalars,...adminConfigLists])fields[key]=configFieldSummary(config[key]);return {ok:true,version:Number.isFinite(config.version)?config.version:null,fields};});
 registerIpc('radio:admin-config-backups','main',async()=>{const r=await adminConfigRead(adminConfigRoutes.backups);if(!Array.isArray(r.items))throw new Error('invalid_backups_response');return {ok:true,items:r.items.slice(0,100).map(item=>({name:typeof item?.name==='string'&&/^[\w.-]{1,180}$/.test(item.name)?item.name:'unavailable',size:Number.isFinite(item?.size)?item.size:null}))};});
 registerIpc('radio:admin-config-active','main',async()=>{const r=await adminConfigRead('/api/runtime-config/status');const fields={};for(const key of adminConfigScalars)fields[key]=configFieldSummary(r[key]);return {ok:true,source:typeof r.source==='string'&&/^[\w.-]{1,60}$/.test(r.source)?r.source:'unknown',version:Number.isFinite(r.version)?r.version:null,fields,metadataUpstreamCount:Number.isFinite(r.metadataUpstreamCount)?r.metadataUpstreamCount:null};});

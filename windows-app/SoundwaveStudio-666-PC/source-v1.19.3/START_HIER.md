@@ -45,3 +45,12 @@ Voraussetzungen.
 
 Die drei optionalen Skripte für Python und Windows-Diagnose liegen unter
 `tools/windows`. Die B-01–B-03-Korrekturen sind Bestandteil dieses Pakets.
+
+## GOV · lokale Lichtsteuerung
+
+1. Lokalen Govee-Bridge-Dienst auf demselben PC starten. Der Player verwendet den vorhandenen Endpunkt auf localhost, Port 3000. LAN Control muss für das Gerät aktiviert sein.
+2. Im Player auf GOV klicken und das Radio-Admin-Passwort eingeben. Die Freigabe gilt fünf Minuten und endet beim Schließen des Dialogs.
+3. Licht an/aus, Testfarbe samt Helligkeit oder Audio-Reaktivität auswählen. Die Audio-Reaktivität liest das Spektrum des vorhandenen Soundwave-Players während der Wiedergabe.
+4. ASUS Aura benötigt einen eigenen Adapter. Die Anzeige im Dialog markiert den offenen Anschluss.
+
+Eine Quittung im Dialog bestätigt die Antwort der lokalen Bridge. Die Reaktion der Leuchten lässt sich am Gerät prüfen.

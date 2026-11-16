@@ -93,6 +93,9 @@ export function initGoveeSceneSync(ctx) {
   let inFlight = false;
   let destroyed = false;
   let lastError = "";
+  let enabling = false;
+  const protectedPanel = document.getElementById("statusGovee")?.dataset.goveeRequiresAdmin === "true";
+  if (protectedPanel) GOVEE_SYNC_CONFIG.enabled = false;
 
   const markOffline = (error, now) => {
     connected = false;
@@ -104,24 +107,29 @@ export function initGoveeSceneSync(ctx) {
   };
 
   const onAnalyzer = async (event) => {
-    if (destroyed) return;
+    if (destroyed || enabling) return;
     if (!GOVEE_SYNC_CONFIG.enabled) {
       publishState("disabled");
       return;
     }
 
+    const detail = event.detail || {};
     const now = Date.now();
+    if (protectedPanel && (
+      document.documentElement.getAttribute("data-mff-playing") !== "1" ||
+      detail.source !== "real" || !Number.isFinite(detail.ts) || now - detail.ts > 1000
+    )) return;
     if (inFlight || now < retryAt || now - lastSend < GOVEE_SYNC_CONFIG.sendIntervalMs) return;
     inFlight = true;
 
     try {
       if (!connected) {
         publishState("connecting");
-        await goveeSetEnabled(true);
+        if (!protectedPanel) await goveeSetEnabled(true);
         connected = true;
       }
 
-      const detail = event.detail || {};
+      if (!GOVEE_SYNC_CONFIG.enabled) return;
       const fx = readFxContext(detail);
       const payload = mapAnalyzer(detail, fx);
       document.documentElement.setAttribute("data-govee-scene", fx.scene);
@@ -139,6 +147,7 @@ export function initGoveeSceneSync(ctx) {
         lastScene = fx.scene;
       }
 
+      if (!GOVEE_SYNC_CONFIG.enabled) return;
       await goveeSendAudio(payload);
       lastSend = now;
       lastError = "";
@@ -154,13 +163,19 @@ export function initGoveeSceneSync(ctx) {
 
   return {
     async setEnabled(enabled) {
-      GOVEE_SYNC_CONFIG.enabled = !!enabled;
+      const next = !!enabled;
+      GOVEE_SYNC_CONFIG.enabled = false;
+      enabling = true;
       retryAt = 0;
-      if (!enabled) {
-        connected = false;
-        publishState("disabled");
+      try {
+        const result = await goveeSetEnabled(next);
+        connected = next;
+        GOVEE_SYNC_CONFIG.enabled = next;
+        publishState(next ? "online" : "disabled");
+        return result;
+      } finally {
+        enabling = false;
       }
-      return goveeSetEnabled(!!enabled);
     },
     setMode(mode) {
       lastScene = null;
@@ -182,7 +197,7 @@ export function initGoveeSceneSync(ctx) {
   };
 }
 
-function bootFromCanonicalMeterBus() {
+export function bootFromCanonicalMeterBus() {
   if (window.__S666_GOVEE_METERBUS_RUNTIME__) return window.__S666_GOVEE_METERBUS_RUNTIME__;
 
   const analyzer = new EventTarget();
@@ -209,7 +224,8 @@ function bootFromCanonicalMeterBus() {
         peak: bus.peak,
         pulse,
         kick: pulse > 0.24,
-        source: bus.source
+        source: bus.source,
+        ts
       } }));
     }
     timer = window.setTimeout(pump, Math.max(40, Number(GOVEE_SYNC_CONFIG.sendIntervalMs) || 90));

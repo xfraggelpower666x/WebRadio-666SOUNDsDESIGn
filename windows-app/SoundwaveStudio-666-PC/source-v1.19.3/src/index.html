@@ -6,6 +6,7 @@
   <title>RADIO WAVE v6.66</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https: swmedia: swsc: swvj:; connect-src 'self' swsc:; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="integration/govee-panel.css">
 </head>
 <body>
   <div class="app-container">
@@ -689,6 +690,7 @@
             <option value="fallback">FALLBACK</option>
           </select>
           <span id="player-radio-route-state" class="player-radio-route-state" role="status" aria-live="polite">RADIO INACTIVE</span>
+          <button id="rw-gov" class="btn btn-secondary" type="button" aria-label="Govee Lichtsteuerung" aria-haspopup="dialog" aria-controls="rw-govee">GOV</button>
           <span id="player-radio-now" class="player-radio-now">—</span>
           <span id="player-radio-details" class="player-radio-details">DJ: — · LISTENERS: — · STREAM: —</span>
         </div>
@@ -804,6 +806,29 @@
   <script src="app.js"></script>
   <script src="../node_modules/hls.js/dist/hls.min.js"></script>
   <script src="soundcloud-playback.js"></script>
+  <dialog id="rw-govee" class="govee-panel" aria-labelledby="rw-govee-title">
+    <h2 id="rw-govee-title">Govee Lichtsteuerung</h2>
+    <form>
+      <label>Radio-Admin-Passwort <input type="password" autocomplete="current-password" required></label>
+      <button type="submit">Entsperren</button>
+    </form>
+    <fieldset hidden disabled>
+      <legend>Lokale Govee-Bridge</legend>
+      <label><input type="checkbox"> Audio-Reaktivität</label>
+      <label>Modus <select><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
+      <label>Testfarbe <input type="color" value="#00b4ff"></label>
+      <label>Helligkeit <input type="range" min="1" max="100" value="65"></label>
+      <div>
+        <button type="button" data-action="color">Farbe testen</button>
+        <button type="button" data-action="on">Licht an</button>
+        <button type="button" data-action="off">Licht aus</button>
+      </div>
+      <p>ASUS Aura · Anschluss noch offen</p>
+    </fieldset>
+    <p role="status" aria-live="polite"></p>
+    <button type="button" data-close>Schließen</button>
+  </dialog>
   <script src="integration/666-integration.js"></script>
+  <script src="integration/govee-panel.js"></script>
 </body>
 </html>

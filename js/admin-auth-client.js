@@ -240,7 +240,7 @@
       return Promise.resolve({ ok: false, authOk: false, pwOk: false, error: 'auth_token_missing' });
     }
     if (!force && cache.checkedAt && Date.now() - cache.checkedAt < CHECK_TTL_MS) {
-      return Promise.resolve(Object.assign({ ok: cache.ok }, cache.data || {}));
+      return Promise.resolve(Object.assign({}, cache.data || {}, { ok: cache.ok }));
     }
 
     return requestJson('/api/admin/gate-check?t=' + Date.now(), { method: 'GET' }).then(function (result) {
@@ -248,7 +248,7 @@
       cache = { checkedAt: Date.now(), ok: ok, data: result.data };
       if (!ok && (result.response.status === 401 || result.response.status === 403)) clear();
       emit(ok ? 'authenticated' : 'rejected', result.data);
-      return Object.assign({ ok: ok }, result.data || {});
+      return Object.assign({}, result.data || {}, { ok: ok });
     }).catch(function (error) {
       cache = { checkedAt: Date.now(), ok: false, data: null };
       var code = errorCode(error, 'auth_unreachable');

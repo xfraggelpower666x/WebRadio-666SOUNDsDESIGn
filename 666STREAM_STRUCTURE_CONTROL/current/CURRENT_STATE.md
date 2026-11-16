@@ -269,3 +269,11 @@ NEXT_STEP=REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_T
 - Quellprüfung des bytegleichen Imports: 116/116 statische Integrationschecks und 168/168 Release-Gates. Von 165 weiteren Tests bestanden 161, einer wurde übersprungen und drei benötigten die lokal fehlende Electron-Runtime.
 - Windows-Abnahme: offen für diesen Stand. Historische Windows-CI- und Artefaktbelege oben gelten für ihre jeweiligen Revisionen.
 - Nächster Schritt: `RADIO_WAVE.bat check /nopause` auf Windows im neuen Projektordner ausführen, anschließend die App starten und NSIS/Portable prüfen.
+
+## WINDOWS_APP · GOVEE-Integration · 2026-11-16
+
+- Basis: verifizierter 666STREAM-Current f1b17e94417622ef1ce3fde99cd7a0fe0fca9487, RADIO WAVE 1.19.3.
+- GOV öffnet ein passwortgeschütztes Bedienfeld. Der Main Process sendet an die vorhandene, lokale Govee-Bridge. Installierbare App und portable Targets enthalten den Player-Adapter via src/**/*.
+- Der Web-Hauptplayer verwendet GOV als sichtbaren Einstieg, mit Admin-Passwort und explizitem Sync-Opt-in. DSC im oberen LED-Panel ist ausgeblendet, Discord im unteren Bereich bleibt verfügbar.
+- Lokale Quellprüfung: 13 Web-Regressionschecks, 20 Windows-Radio-Regressionschecks und 3 zusätzliche vertragsbasierte GOV-Prüfungen bestanden.
+- Offen: echter Browser- und Windows-Test, Verbindung zur lokalen Bridge und tatsächliche Gerätewirkung. ASUS Aura benötigt einen verifizierten Adapter. Keine neue Windows-Binärdatei und keine Live-Freigabe.
