@@ -63,3 +63,10 @@ Eine Quittung im Dialog bestätigt die Antwort der lokalen Bridge. Die Reaktion 
 - **VJ Studio** zeichnet während der Wiedergabe drei Frequenzhüllkurven für CSV-Dateien auf. Die Paritätsauswahl lässt sich als wieder importierbares JSON speichern.
 - **Export Studio** öffnet den Dateidialog beim auslösenden Exportfenster und holt beim Start der Aufnahme das Fortschrittsfenster nach vorn.
 - **GOV** steht im Hauptfenster beim Player. Die Admin-Freigabe verlangt das Radio-Admin-Passwort. OpenRGB und die Govee-Bridge laufen bei Verwendung als lokale Anwendungen bzw. Dienste.
+
+## Videoexport 1.19.5
+
+1. In LOCAL eine Audiodatei laden oder eine spielbare Radio-/SoundCloud-Quelle wählen.
+2. **Export Studio → Export Music Video** öffnet bei Bedarf die Dateiauswahl. Als erstes Format wird WebM angeboten. MP4 wird zusätzlich angeboten, wenn der Recorder es meldet.
+3. Bei einer lokalen Datei endet der Mitschnitt am Dateiende. Bei einem laufenden Stream beendet **Stop & Save Video** die Aufnahme.
+4. Der Status meldet eine fehlende Audioquelle, einen Encoderfehler oder den tatsächlich gespeicherten Pfad.

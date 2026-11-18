@@ -178,7 +178,6 @@ function enableLocalPlayer(){
   btnPlayPause.classList.remove('disabled');
   btnPlayPause.disabled=false;
   seekSlider.disabled=false;
-  btnExport.disabled=false;
 }
 function renderLocalQueue(state){
   localQueueSnapshot=state||{count:0,index:-1,current:'',items:[],mediaUrl:''};
@@ -474,19 +473,13 @@ function setupAudioDevices(){
     onInputStopped:message=>{
       inputStatus.textContent=message;
       if(exportSession?.includeMicrophone)recordingError(exportSession,new Error(message));
-      updateExportAvailability();
     }
   });
   audioDeviceController=controller;
-  function updateExportAvailability(){
-    if(controller.recordsInput())btnExport.disabled=false;
-    else if(!audioElement.currentSrc&&!audioElement.getAttribute('src'))btnExport.disabled=true;
-  }
   function applyInputRecording(){
     try{
       controller.setInputRecording(audioInputRecord.checked);
       inputStatus.textContent=controller.recordsInput()?'Microphone active; included in video exports, not monitored.':'Microphone recording setting saved.';
-      updateExportAvailability();
     }catch(error){
       audioInputRecord.checked=controller.recordsInput();
       inputStatus.textContent='Microphone recording error · '+String(error?.message||error);
@@ -522,8 +515,7 @@ function setupAudioDevices(){
     try{
       if(await controller.startInput(input.value)){
         inputStatus.textContent=controller.recordsInput()?'Microphone active; included in video exports, not monitored.':'Microphone active for visualization only; not monitored or recorded.';
-        updateExportAvailability();
-        try {await refresh();} catch(error){outputStatus.textContent='Device discovery error · '+String(error?.message||error);}
+          try {await refresh();} catch(error){outputStatus.textContent='Device discovery error · '+String(error?.message||error);}
       }
     }catch(error){inputStatus.textContent='Microphone error · '+String(error?.message||error);}
   }
@@ -534,7 +526,7 @@ function setupAudioDevices(){
   window.api.onDetachedMicrophoneRequest(startMicrophone);
   el('audio-input-stop').addEventListener('click',()=>{
     if(exportSession?.includeMicrophone)recordingError(exportSession,new Error('Microphone stopped during recording'));
-    controller.stopInput();inputStatus.textContent='Microphone off.';updateExportAvailability();
+    controller.stopInput();inputStatus.textContent='Microphone off.';
   });
   el('audio-output-apply').addEventListener('click',async()=>{
     if(outputChanging)return;
@@ -1006,7 +998,8 @@ function setupEventListeners() {
 
   // Aspect settings
   selectAspectRatio.addEventListener('change', updateAspectSettings);
-  selectFps.addEventListener('change', (e) => exportFps = parseInt(e.target.value));
+  exportFps = Number(selectFps.value) === 30 ? 30 : 60;
+  selectFps.addEventListener('change', (e) => { if (!exportBusy) exportFps = Number(e.target.value) === 30 ? 30 : 60; });
 
   // Export engine button
   btnBrowseExport.addEventListener('click', browseExportDestination);
@@ -1805,7 +1798,7 @@ async function browseExportDestination() {
   btnBrowseExport.disabled = true;
   try {
     diagStatus.textContent = 'Opening Save Dialog...';
-    const formats=['mp4','webm'].filter(extension=>recordingMimeForPath('video.'+extension));
+    const formats=['webm','mp4'].filter(extension=>recordingMimeForPath('video.'+extension));
     if(!formats.length)throw new Error('No supported MP4 or WebM recording format is available.');
     exportSavePath = await window.api.getSavePath(formats);
     exportDestination.textContent = exportSavePath || 'No destination selected';
@@ -1824,15 +1817,29 @@ async function browseExportDestination() {
   }
 }
 
-function recordingMimeForPath(savePath) {
-  if (typeof MediaRecorder === 'undefined' || typeof MediaRecorder.isTypeSupported !== 'function') return null;
-  const extension = (savePath.match(/\.([^.\\\/]+)$/) || [])[1]?.toLowerCase();
+function recordingFormats(savePath) {
+  if (typeof MediaRecorder === 'undefined' || typeof MediaRecorder.isTypeSupported !== 'function') return [];
+  const extension = savePath.split('.').pop()?.toLowerCase();
   const candidates = extension === 'mp4'
     ? ['video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=h264,aac', 'video/mp4']
     : extension === 'webm'
-      ? ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
+      ? ['video/webm;codecs=vp8,opus', 'video/webm;codecs=vp9,opus', 'video/webm']
       : [];
-  return candidates.find(type => MediaRecorder.isTypeSupported(type)) || null;
+  return candidates.filter(type => MediaRecorder.isTypeSupported(type));
+}
+
+function recordingMimeForPath(savePath) {
+  return recordingFormats(savePath)[0] || null;
+}
+
+function hasExportMedia() {
+  if (audioElement.srcObject) return true;
+  if (typeof audioElement.getAttribute === 'function') {
+    // currentSrc may still refer to the previous track after an unload.
+    return !!(audioElement.getAttribute('src') ||
+      (audioElement.currentSrc && audioElement.querySelector?.('source[src]')));
+  }
+  return !!(audioElement.currentSrc || audioElement.src);
 }
 
 function recordingError(session, error) {
@@ -1881,7 +1888,7 @@ async function finishRecording(session) {
   exportSession = null;
   exportBusy = false;
   btnBrowseExport.disabled = false;
-  btnExport.disabled = !(audioElement.currentSrc||audioElement.getAttribute?.('src')||audioElement.src||audioDeviceController?.recordsInput());
+  btnExport.disabled = false;
   audioInputRecord.disabled = false;
   btnStopExport.disabled = false;
   btnStopExport.textContent = 'Close';
@@ -1901,14 +1908,14 @@ async function finishRecording(session) {
 
 async function startRecordingPipeline() {
   if (exportBusy) return;
-  if (!(audioElement.currentSrc||audioElement.getAttribute?.('src')||audioElement.src||audioDeviceController?.recordsInput())) {
+  if (!(hasExportMedia() || audioDeviceController?.recordsInput())) {
     exportResult.textContent = 'Choose an audio track or enable microphone recording.';
     return;
   }
   if (!exportSavePath && !await browseExportDestination()) return;
   if (exportBusy) return;
-  const mimeType = recordingMimeForPath(exportSavePath);
-  if (!mimeType) {
+  const formats = recordingFormats(exportSavePath);
+  if (!formats.length) {
     exportResult.textContent = 'Unsupported filename or recording format. Browse for a supported .mp4 or .webm destination.';
     diagStatus.textContent = 'Export format unavailable';
     return;
@@ -1919,7 +1926,7 @@ async function startRecordingPipeline() {
   let session;
   try {
     ensureAudioContext();
-    const hasMedia=!!(audioElement.currentSrc||audioElement.getAttribute?.('src')||audioElement.src);
+    const hasMedia=hasExportMedia();
     const includeMicrophone=audioDeviceController?.recordsInput()===true;
     if(!hasMedia&&!includeMicrophone)throw new Error('Choose an audio track or enable microphone recording');
     if (typeof audioContext !== 'undefined' && audioContext?.state === 'suspended' && typeof audioContext.resume === 'function') await audioContext.resume();
@@ -1934,10 +1941,20 @@ async function startRecordingPipeline() {
     session.tracks.forEach(track => combinedStream.addTrack(track));
     const requestedBitrate=Number(globalThis.document?.getElementById('export-audio-bitrate')?.value);
     const audioBitsPerSecond=[96000,128000,192000,256000].includes(requestedBitrate)?requestedBitrate:192000;
-    session.recorder = new MediaRecorder(combinedStream, { videoBitsPerSecond: 8000000, audioBitsPerSecond, mimeType });
-    if (session.recorder.mimeType && session.recorder.mimeType.split(';')[0].toLowerCase() !== mimeType.split(';')[0]) {
-      throw new Error('Recorder format does not match the selected filename');
+    let mimeType;
+    let encoderError;
+    for (const candidate of formats) {
+      try {
+        const recorder = new MediaRecorder(combinedStream, { videoBitsPerSecond: 8000000, audioBitsPerSecond, mimeType: candidate });
+        if (recorder.mimeType && recorder.mimeType.split(';')[0].toLowerCase() !== candidate.split(';')[0]) {
+          throw new Error('Recorder format does not match the selected filename');
+        }
+        session.recorder = recorder;
+        mimeType = candidate;
+        break;
+      } catch (error) { encoderError = error; }
     }
+    if (!session.recorder) throw new Error('Could not start a '+formats[0].split(';')[0]+' encoder: '+encoderError?.message);
     exportSavePath = null;
     exportDestination.textContent = `${session.path} (browse again for next export)`;
     const initRes = await window.api.startFileWrite(session.path);

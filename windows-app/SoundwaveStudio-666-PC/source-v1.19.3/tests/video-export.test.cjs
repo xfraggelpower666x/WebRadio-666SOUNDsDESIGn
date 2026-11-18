@@ -18,13 +18,13 @@ const slice = (source, start, end) => {
 };
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
-function renderer({ supported = ['video/mp4', 'video/webm'], write, close, play, microphone = false, noMedia = false } = {}) {
+function renderer({ supported = ['video/mp4', 'video/webm'], write, close, play, microphone = false, noMedia = false, rejectEncoder } = {}) {
   const events = [];
   let recorder;
   const node = () => ({ textContent: '', disabled: false, style: {}, classList: { add() {}, remove() {} }, setAttribute(name, value) { this[name] = value; } });
   class Recorder {
     static isTypeSupported(type) { return supported.some(value => type === value || type.startsWith(value + ';')); }
-    constructor(_stream, options) { this.mimeType = options.mimeType; this.options = options; this.state = 'inactive'; recorder = this; }
+    constructor(_stream, options) { if (rejectEncoder?.(options.mimeType)) throw new Error('encoder unavailable'); this.mimeType = options.mimeType; this.options = options; this.state = 'inactive'; recorder = this; }
     start() { this.state = 'recording'; }
     stop() {
       this.state = 'inactive';
@@ -80,6 +80,36 @@ function mainHandlers(fsImpl = fs) {
     + main.slice(main.indexOf('function discardVideoWrite()')), context);
   return { handlers, context, choose(value) { destination = value; }, get dialogOptions() { return dialogOptions; } };
 }
+
+test('export action is available before any source-specific setup', () => {
+  const html = fs.readFileSync(path.join(root, 'src', 'index.html'), 'utf8');
+  const button = html.match(/<button\b[^>]*id="btn-export"[^>]*>/)?.[0];
+  assert.ok(button);
+  assert.doesNotMatch(button, /\bdisabled\b/);
+  const integration = fs.readFileSync(path.join(root, 'src', 'integration', '666-integration.js'), 'utf8');
+  assert.match(integration, /rt\.enablePlayback\(\)/);
+  assert.doesNotMatch(app, /btnExport\.disabled\s*=\s*true(?!;\s*let session)/);
+});
+
+test('a stale currentSrc after an unload does not open a save dialog', async () => {
+  const f = renderer({ noMedia: true });
+  f.ctx.audioElement.currentSrc = 'swmedia://audio/current';
+  f.ctx.audioElement.getAttribute = () => null;
+  f.api.getSavePath = async () => assert.fail('unloaded source must not open the dialog');
+  await f.ctx.startRecordingPipeline();
+  assert.match(f.ctx.exportResult.textContent, /Choose an audio track/);
+  assert.equal(f.ctx.btnExport.disabled, false);
+});
+
+test('explicit WebM first and same-container encoder fallback', async () => {
+  const f = renderer({ rejectEncoder: mime => mime.includes('vp8') });
+  f.api.getSavePath = async choices => {
+    assert.deepEqual(Array.from(choices), ['webm','mp4']);
+    return path.join(__dirname, 'music.webm');
+  };
+  await f.ctx.startRecordingPipeline();
+  assert.equal(f.recorder.mimeType, 'video/webm;codecs=vp9,opus');
+});
 
 test('save dialog offers only supported recording formats and defaults to WebM when MP4 is unavailable', async () => {
   const f = renderer({ supported: ['video/webm'] });
