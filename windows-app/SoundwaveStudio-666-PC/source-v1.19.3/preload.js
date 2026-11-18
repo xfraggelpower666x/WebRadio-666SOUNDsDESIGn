@@ -72,6 +72,7 @@ contextBridge.exposeInMainWorld('api', {
   closeDetachedOverlay: (key) => ipcRenderer.invoke('workspace:overlay-close', key),
   appVersion: () => ipcRenderer.invoke('app:version'),
   openVjData: (kind) => ipcRenderer.invoke('dialog:openVjData', kind),
+  openYouTube: (input, external) => ipcRenderer.invoke('youtube:open', input, external),
   openApprovedWebsite: (key) => ipcRenderer.invoke('app:open-site', key),
   openDetachedVisualizer: () => ipcRenderer.invoke('display:open-detached-visualizer'),
   focusDetachedVisualizer: () => ipcRenderer.invoke('display:focus-detached-visualizer'),

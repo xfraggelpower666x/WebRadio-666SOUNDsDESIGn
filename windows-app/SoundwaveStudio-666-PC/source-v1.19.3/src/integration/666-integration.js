@@ -264,7 +264,40 @@
       throw e;
     }
   }
-  qa('.source-btn').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.source).catch(e=>state('SOURCE SWITCH · '+String(e.message||e)))));
+  const youtubeTab=q('#youtube-category');
+  const youtubeControls=q('#youtube-controls');
+  const youtubeStatus=q('#youtube-state');
+  function showYouTube(open) {
+    youtubeControls?.classList.toggle('hidden',!open);
+    youtubeTab?.classList.toggle('active',open);
+    youtubeTab?.setAttribute('aria-expanded',String(open));
+  }
+  youtubeTab?.addEventListener('click',()=>{
+    const open=youtubeControls.classList.contains('hidden');
+    showYouTube(open);
+    if(open){
+      q('#radio-controls').classList.add('hidden');
+      q('#soundcloud-controls').classList.add('hidden');
+    } else {
+      q('#radio-controls').classList.toggle('hidden',mode!=='radio');
+      q('#soundcloud-controls').classList.toggle('hidden',mode!=='soundcloud');
+    }
+  });
+  async function openYouTube(external) {
+    youtubeStatus.textContent='Opening YouTube…';
+    try {
+      await window.api.openYouTube(q('#youtube-url').value,external);
+      youtubeStatus.textContent=external?'Opened in your browser.':'Opened the YouTube player window.';
+    } catch (error) {
+      youtubeStatus.textContent='Could not open YouTube · '+String(error.message||error);
+    }
+  }
+  q('#youtube-open-player')?.addEventListener('click',()=>openYouTube(false));
+  q('#youtube-open-browser')?.addEventListener('click',()=>openYouTube(true));
+  qa('.source-btn[data-source]').forEach(b=>b.addEventListener('click',()=>{
+    showYouTube(false);
+    setMode(b.dataset.source).catch(e=>state('SOURCE SWITCH · '+String(e.message||e)));
+  }));
   q('#radio-login').onclick=()=>act('LOGIN',async()=>{disableDiscordAuto();try{return await window.api.adminLogin(q('#radio-password').value);}finally{q('#radio-password').value='';}}).catch(()=>{});
   q('#radio-auth-check')?.addEventListener('click',()=>act('SESSION CHECK',async()=>{try{const r=await window.api.adminCheck();if(!r?.ok)disableDiscordAuto();return r;}catch(e){disableDiscordAuto();throw e;}}).catch(()=>{}));
   q('#radio-logout')?.addEventListener('click',()=>act('LOGOUT',async()=>{disableDiscordAuto();return window.api.adminLogout();}).catch(()=>{}));

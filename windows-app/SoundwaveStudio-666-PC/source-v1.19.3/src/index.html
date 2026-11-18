@@ -32,7 +32,7 @@
       <div class="panel-sections">
 <div class="source-hub panel-section active" id="source-hub">
 <h2 class="section-title"><span class="icon">⚡</span> Source Hub</h2>
-<div class="source-tabs"><button class="source-btn active" data-source="local">LOCAL</button><button id="local-library-open" class="btn btn-secondary" type="button">MEDIA LIBRARY</button><button class="source-btn" data-source="radio">666 RADIO</button><button class="source-btn" data-source="soundcloud">SOUNDCLOUD</button></div>
+<div class="source-tabs"><button class="source-btn active" data-source="local">LOCAL</button><button id="local-library-open" class="btn btn-secondary" type="button">MEDIA LIBRARY</button><button class="source-btn" data-source="radio">666 RADIO</button><button class="source-btn" data-source="soundcloud">SOUNDCLOUD</button><button class="source-btn" id="youtube-category" type="button" aria-controls="youtube-controls" aria-expanded="false">YOUTUBE</button></div>
 <div id="radio-controls" class="source-pane hidden">
 <div class="nowplaying-box"><strong id="radio-now-title">666SOUNDsDESIGn</strong><span id="radio-now-artist">RADIO READY</span></div>
 </div>
@@ -41,6 +41,13 @@
 <div class="control-group"><label for="soundcloud-client-secret">SoundCloud Client Secret</label><input id="soundcloud-client-secret" type="password" class="custom-input" autocomplete="off"></div>
 <div class="control-group"><button id="soundcloud-save-credentials" class="btn btn-secondary" type="button">SAVE SECURELY</button><button id="soundcloud-test-credentials" class="btn btn-secondary" type="button">TEST CONNECTION</button><button id="soundcloud-clear-credentials" class="btn btn-secondary" type="button">REMOVE SAVED</button></div>
 <div id="soundcloud-library" class="soundcloud-library"><div class="file-meta-tag">Library loads from the official SoundCloud API.</div></div><input id="soundcloud-url" class="custom-input" placeholder="Optional: SoundCloud track / playlist URL"><button id="soundcloud-load" class="btn btn-secondary">LOAD URL</button><button id="soundcloud-prev" class="btn btn-secondary">◀ PREV</button><button id="soundcloud-next" class="btn btn-secondary">NEXT ▶</button><button id="soundcloud-open" class="btn btn-secondary">OPEN ON SOUNDCLOUD</button><div id="soundcloud-queue" class="file-meta-tag">Queue · 0 / 0</div><div class="file-meta-tag">Audio source: SoundCloud · creator attribution shown after resolve</div><div id="soundcloud-state" class="file-meta-tag">SoundCloud credentials are stored encrypted by Windows.</div><div id="soundcloud-runtime-health" class="file-meta-tag">SOUNDCLOUD HEALTH · CHECKING</div></div>
+<div id="youtube-controls" class="source-pane hidden">
+  <label for="youtube-url">YouTube video or playlist URL</label>
+  <input id="youtube-url" class="custom-input" type="url" maxlength="2048" placeholder="https://www.youtube.com/watch?v=…">
+  <div class="remote-row"><button id="youtube-open-player" class="btn btn-secondary" type="button">OPEN YOUTUBE PLAYER</button><button id="youtube-open-browser" class="btn btn-secondary" type="button">OPEN IN BROWSER</button></div>
+  <p class="file-meta-tag">YouTube plays in its own window. Visualizer and recording use the audio sources in RADIO WAVE.</p>
+  <div id="youtube-state" class="file-meta-tag" role="status" aria-live="polite"></div>
+</div>
 </div>
 
         <section class="panel-section" id="rw-radio-admin">

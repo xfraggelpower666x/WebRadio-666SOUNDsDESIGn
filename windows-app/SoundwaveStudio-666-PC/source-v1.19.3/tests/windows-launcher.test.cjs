@@ -35,6 +35,23 @@ function fixture(t, options = {}) {
   fs.mkdirSync(bin);
   fs.mkdirSync(scripts);
   fs.copyFileSync(path.join(root, 'RADIO_WAVE.bat'), path.join(dir, 'RADIO_WAVE.bat'));
+  const shared = path.join(dir, 'src', 'shared');
+  fs.mkdirSync(shared, { recursive: true });
+  fs.writeFileSync(path.join(shared, 'video-transcode.cjs'), [
+    "const fs=require('fs');",
+    "fs.appendFileSync('encoder.calls','check\\n');",
+    "process.exit(fs.existsSync('encoder.ok') ? 0 : 1);"
+  ].join('\n'));
+  const ffmpeg = path.join(dir, 'node_modules', 'ffmpeg-static');
+  fs.mkdirSync(ffmpeg, { recursive: true });
+  fs.writeFileSync(path.join(ffmpeg, 'install.js'), [
+    "const fs=require('fs');",
+    "fs.appendFileSync('encoder.calls','repair\\n');",
+    "if(fs.existsSync('fail-encoder')) process.exit(1);",
+    "fs.writeFileSync('encoder.ok','');"
+  ].join('\n'));
+  if (!options.missingEncoder) fs.writeFileSync(path.join(dir, 'encoder.ok'), '');
+  if (options.failEncoder) fs.writeFileSync(path.join(dir, 'fail-encoder'), '');
   fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ devDependencies: { electron: '^31.0.0' } }));
   fs.writeFileSync(path.join(dir, 'package-lock.json'), JSON.stringify({ packages: { 'node_modules/electron': { version: '31.7.7' } } }));
   fs.writeFileSync(path.join(dir, 'create-deps.cjs'), [
@@ -132,6 +149,18 @@ if (process.platform === 'win32') {
       assert.notEqual(result.status, 0, result.stdout + result.stderr);
       assert.match(result.stdout, /FEHLER/);
     }
+  });
+
+  test('launcher repairs a missing MP4 encoder before testing the app', t => {
+    const { dir, result } = fixture(t, { deps: true, runtime: true, missingEncoder: true });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.equal(fs.readFileSync(path.join(dir, 'encoder.calls'), 'utf8'), 'check\nrepair\ncheck\n');
+  });
+
+  test('launcher reports an MP4 encoder installation failure', t => {
+    const { result } = fixture(t, { deps: true, runtime: true, missingEncoder: true, failEncoder: true });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stdout, /FEHLER: MP4-Encoder/);
   });
 
   test('launcher installs missing Node.js and npm via WinGet', t => {

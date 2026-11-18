@@ -767,6 +767,42 @@ registerIpc('workspace:overlay-open','main',(_e,payload)=>openDetachedOverlay(pa
 registerIpc('workspace:overlay-state','main',()=>detachedOverlayState());
 registerIpc('workspace:overlay-focus','main',(_e,key)=>{const w=detachedOverlayWindows.get(String(key||''));if(w&&!w.isDestroyed()){w.show();w.focus();return {ok:true};}return {ok:false};});
 registerIpc('workspace:overlay-close','main',(_e,key)=>{const w=detachedOverlayWindows.get(String(key||''));if(w&&!w.isDestroyed()){w.close();return {ok:true};}return {ok:false};});
+let youtubeWindow;
+registerIpc('youtube:open', 'main', async (_event, input, external = false) => {
+  const url = require('./src/shared/youtube-url.cjs').youtubeUrl(input);
+  if (external === true) {
+    await shell.openExternal(url);
+    return { ok: true };
+  }
+  if (!youtubeWindow || youtubeWindow.isDestroyed()) {
+    const player = new BrowserWindow({
+      width: 1120, height: 800, autoHideMenuBar: true,
+      title: 'RADIO WAVE · YouTube',
+      webPreferences: {
+        partition: 'radio-wave-youtube', sandbox: true, contextIsolation: true,
+        nodeIntegration: false, webSecurity: true
+      }
+    });
+    const allowed = value => {
+      try {
+        const url = new URL(value);
+        return url.protocol === 'https:' && ['www.youtube.com','consent.youtube.com'].includes(url.host);
+      } catch { return false; }
+    };
+    player.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
+    player.webContents.session.setPermissionCheckHandler(() => false);
+    player.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+    for (const event of ['will-navigate','will-redirect']) {
+      player.webContents.on(event, (e, next) => { if (!allowed(e.url || next)) e.preventDefault(); });
+    }
+    player.on('closed', () => { if (youtubeWindow === player) youtubeWindow = null; });
+    youtubeWindow = player;
+  }
+  if (youtubeWindow.isMinimized()) youtubeWindow.restore();
+  youtubeWindow.focus();
+  await youtubeWindow.loadURL(url);
+  return { ok: true };
+});
 registerIpc('app:version','main',()=>app.getVersion());
 registerIpc('dialog:saveVjData','main',async(_event,kind,text)=>{
   if (!['bass','snare','hihat','json'].includes(kind) || typeof text!=='string' ||

@@ -167,8 +167,8 @@ exit /b 0
 :ensureVideoEncoder
 node.exe src\shared\video-transcode.cjs && exit /b 0
 echo [REPARATUR] Installiere den festgelegten MP4-Encoder.
-node.exe node_modules\ffmpeg-static\install.js || exit /b 1
-node.exe src\shared\video-transcode.cjs || exit /b 1
+node.exe node_modules\ffmpeg-static\install.js || (echo FEHLER: MP4-Encoder konnte nicht installiert werden. & exit /b 1)
+node.exe src\shared\video-transcode.cjs || (echo FEHLER: MP4-Encoder ist nach der Installation nicht startfaehig. & exit /b 1)
 exit /b 0
 
 :reportTools

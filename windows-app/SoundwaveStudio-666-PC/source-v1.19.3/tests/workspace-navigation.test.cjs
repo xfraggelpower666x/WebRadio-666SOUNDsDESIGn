@@ -157,3 +157,18 @@ test('disconnecting a monitor recovers detached windows without moving visible o
   context.reconcileDetachedWindows();
   assert.deepEqual(moved.map(x => x.key), ['source', 'text', 'visualizer']);
 });
+
+
+test('YouTube links use canonical HTTPS playback URLs', () => {
+  const { youtubeUrl } = require('../src/shared/youtube-url.cjs');
+  assert.equal(youtubeUrl(''), 'https://www.youtube.com/');
+  assert.equal(youtubeUrl('https://youtu.be/abcdefghijk?si=tracking'), 'https://www.youtube.com/watch?v=abcdefghijk');
+  assert.equal(youtubeUrl('https://m.youtube.com/playlist?list=PLexample123'), 'https://www.youtube.com/playlist?list=PLexample123');
+  assert.equal(youtubeUrl('https://youtube.com/shorts/abcdefghijk'), 'https://www.youtube.com/watch?v=abcdefghijk');
+  assert.equal(youtubeUrl('https://www.youtube.com/watch?v=abcdefghijk&list=PLexample123'), 'https://www.youtube.com/watch?v=abcdefghijk&list=PLexample123');
+  for (const input of ['file:///tmp/a','https://youtube.com.example.test/watch?v=abcdefghijk',
+    'https://www.youtube.com@evil.test/watch?v=abcdefghijk','https://youtu.be:444/abcdefghijk',
+    'https://www.youtube.com/redirect?q=https://evil.test','https://www.youtube.com/playlist?list=%20']) {
+    assert.throws(() => youtubeUrl(input));
+  }
+});

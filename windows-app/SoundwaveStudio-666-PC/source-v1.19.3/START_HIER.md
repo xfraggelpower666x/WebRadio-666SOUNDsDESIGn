@@ -73,3 +73,7 @@ Eine Quittung im Dialog bestätigt die Antwort der lokalen Bridge. Die Reaktion 
 5. Der Status meldet eine fehlende Audioquelle, einen Encoderfehler oder den tatsächlich gespeicherten Pfad.
 
 Die Startdatei prüft FFmpeg automatisch. Das Windows-Paket bündelt den Encoder über `ffmpeg-static@5.3.0`. Herkunft und Lizenz stehen in den mitgelieferten Materialien des [FFmpeg-Binärpakets](https://github.com/eugeneware/ffmpeg-static/tree/b6.1.1).
+
+## YouTube
+
+Im **Source Hub → YOUTUBE** eine Video- oder Playlist-Adresse eingeben. **Open YouTube Player** öffnet den offiziellen YouTube-Player in einem eigenen Fenster. Bei leerem Feld öffnet sich die YouTube-Startseite. **Open in Browser** nutzt den Standardbrowser, etwa für ein bestehendes YouTube-Konto. Ton und Video aus diesem Fenster liegen außerhalb des RADIO-WAVE-Visualizers und MP4-Exports.
