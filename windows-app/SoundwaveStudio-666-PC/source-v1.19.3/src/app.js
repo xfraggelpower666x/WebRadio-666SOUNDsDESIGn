@@ -1794,6 +1794,7 @@ function drawTextOverlays(bass) {
 
 async function browseExportDestination() {
   if (exportBusy) return false;
+  globalThis.document?.getElementById('media-link-player')?.pause?.();
   exportBusy = true;
   btnBrowseExport.disabled = true;
   try {
@@ -2641,7 +2642,7 @@ window.SoundwaveRuntime = Object.freeze({
   ensureAudioContext,
   getAnalyser: () => analyserNode,
   getAudioContext: () => audioContext,
-  isExporting: () => !!exportSession,
+  isExporting: () => exportBusy,
   reportPlaybackError,
   getFrequencyData: () => dataArray,
   getTimeData: () => timeDataArray,

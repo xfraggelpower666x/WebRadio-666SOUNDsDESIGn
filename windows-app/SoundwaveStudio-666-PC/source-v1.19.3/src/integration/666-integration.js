@@ -225,6 +225,103 @@
   });
   updatePlayerRadioStatus();
   function metadata(){const title=q('#radio-now-title').textContent,artist=q('#radio-now-artist').textContent;return {artist,title,track:title,nowPlaying:[artist,title].filter(Boolean).join(' – '),listeners:np.listeners||np.listener_count||'',bitrate:np.bitrate||np.kbps||'',dj:np.dj||'',source:'SoundwaveStudio 666 Radio',artwork:np.artwork||np.cover||np.image||''};}
+  const mediaLinkTab = q('#media-link-category');
+  const mediaLinkPane = q('#media-link-controls');
+  const mediaLinkPlayer = q('#media-link-player');
+  const mediaLinkStop = q('#media-link-stop');
+  const mediaLinkStatus = q('#media-link-status');
+  let mediaLinkRequest = 0;
+
+  function showMediaLink(open) {
+    if (!mediaLinkPane || !mediaLinkPlayer || !mediaLinkTab) return;
+    mediaLinkPane.classList.toggle('hidden', !open);
+    mediaLinkTab.classList.toggle('active', open);
+    mediaLinkTab.setAttribute('aria-expanded', String(open));
+    if (!open) mediaLinkPlayer.pause();
+  }
+
+  function parseMediaLink(value) {
+    const raw = value.trim();
+    if (!raw || /[\u0000-\u0020\u007f\\]/.test(raw)) throw new Error('Enter a valid HTTP or HTTPS media link.');
+    const url = new URL(/^[a-z][a-z\d+.-]*:/i.test(raw) ? raw : raw.startsWith('//') ? 'https:' + raw : 'https://' + raw);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+      throw new Error('Enter an HTTP or HTTPS media link without login credentials.');
+    }
+    return url;
+  }
+
+  mediaLinkTab?.addEventListener('click', () => {
+    const open = mediaLinkPane.classList.contains('hidden');
+    showYouTube(false);
+    showMediaLink(open);
+    q('#radio-controls').classList.toggle('hidden', open || mode !== 'radio');
+    q('#soundcloud-controls').classList.toggle('hidden', open || mode !== 'soundcloud');
+    if (open) q('#media-link-url').focus();
+  });
+
+  q('#media-link-form')?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (rt.isExporting()) {
+      mediaLinkStatus.textContent = 'Stop the active Export Studio recording before playing a link.';
+      return;
+    }
+    let url;
+    try {
+      url = parseMediaLink(q('#media-link-url').value);
+    } catch {
+      mediaLinkStatus.textContent = 'Enter a valid HTTP or HTTPS media link without login credentials.';
+      return;
+    }
+
+    const request = ++mediaLinkRequest;
+    // Keine Web-Audio-Verbindung: Direktlinks dürfen auch ohne CORS-Header abspielen.
+    mediaLinkPlayer.classList.toggle('audio-only', /\.(mp3|wav|flac|m4a|aac|ogg|opus)$/i.test(url.pathname));
+    mediaLinkStatus.textContent = 'Loading media…';
+    mediaLinkPlayer.hidden = false;
+    mediaLinkStop.disabled = false;
+    mediaLinkPlayer.src = url.href;
+    try {
+      await mediaLinkPlayer.play();
+    } catch (error) {
+      if (request !== mediaLinkRequest || error.name === 'AbortError' || mediaLinkPlayer.error) return;
+      mediaLinkStatus.textContent = 'Playback could not start. Use the player controls to try again.';
+    }
+  });
+
+  mediaLinkPlayer?.addEventListener('loadedmetadata', () => {
+    mediaLinkPlayer.classList.toggle('audio-only', mediaLinkPlayer.videoWidth === 0);
+  });
+  mediaLinkPlayer?.addEventListener('playing', () => {
+    if (rt.isExporting() || mediaLinkPane.classList.contains('hidden')) {
+      mediaLinkPlayer.pause();
+      return;
+    }
+    window.RWLocalQueue?.cancelTransition();
+    audio.pause();
+    mediaLinkStatus.textContent = 'Playing link';
+  });
+  mediaLinkPlayer?.addEventListener('pause', () => {
+    if (mediaLinkPlayer.hasAttribute('src') && !mediaLinkPlayer.ended && !mediaLinkPlayer.error) {
+      mediaLinkStatus.textContent = 'Link paused';
+    }
+  });
+  mediaLinkPlayer?.addEventListener('ended', () => { mediaLinkStatus.textContent = 'Playback finished'; });
+  mediaLinkPlayer?.addEventListener('error', () => {
+    if (mediaLinkPlayer.hasAttribute('src')) {
+      mediaLinkStatus.textContent = 'Media unavailable. Check that the link opens a playable file and that the server permits access.';
+    }
+  });
+  mediaLinkStop?.addEventListener('click', () => {
+    ++mediaLinkRequest;
+    mediaLinkPlayer.pause();
+    mediaLinkPlayer.removeAttribute('src');
+    mediaLinkPlayer.load();
+    mediaLinkPlayer.hidden = true;
+    mediaLinkStop.disabled = true;
+    mediaLinkStatus.textContent = 'Link stopped';
+  });
+  audio.addEventListener('play', () => mediaLinkPlayer?.pause());
+
   async function refreshRemoteHealth(){
     const remote=q('#radio-runtime-health'),sc=q('#soundcloud-runtime-health');
     const generation=++remoteHealthGeneration;
@@ -274,6 +371,7 @@
   }
   youtubeTab?.addEventListener('click',()=>{
     const open=youtubeControls.classList.contains('hidden');
+    showMediaLink(false);
     showYouTube(open);
     if(open){
       q('#radio-controls').classList.add('hidden');
@@ -295,6 +393,7 @@
   q('#youtube-open-player')?.addEventListener('click',()=>openYouTube(false));
   q('#youtube-open-browser')?.addEventListener('click',()=>openYouTube(true));
   qa('.source-btn[data-source]').forEach(b=>b.addEventListener('click',()=>{
+    showMediaLink(false);
     showYouTube(false);
     setMode(b.dataset.source).catch(e=>state('SOURCE SWITCH · '+String(e.message||e)));
   }));

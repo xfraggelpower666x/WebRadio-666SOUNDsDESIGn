@@ -77,3 +77,16 @@ Die Startdatei prüft FFmpeg automatisch. Das Windows-Paket bündelt den Encoder
 ## YouTube
 
 Im **Source Hub → YOUTUBE** eine Video- oder Playlist-Adresse eingeben. **Open YouTube Player** öffnet den offiziellen YouTube-Player in einem eigenen Fenster. Bei leerem Feld öffnet sich die YouTube-Startseite. **Open in Browser** nutzt den Standardbrowser, etwa für ein bestehendes YouTube-Konto. Ton und Video aus diesem Fenster liegen außerhalb des RADIO-WAVE-Visualizers und MP4-Exports.
+
+## Direkte Audio- und Videolinks · 1.19.8
+
+Im **Source Hub → MEDIA LINK** einen direkten Link zu MP3, WAV, MP4 oder WebM
+einfügen und **PLAY LINK** drücken. Bei Adressen wie `www.example.com/video.mp4`
+wird automatisch HTTPS ergänzt. Der Medienplayer zeigt bei Video das Bild und
+bietet Wiedergabe, Pause, Lautstärke und, sofern vom Server unterstützt, Spulen.
+**STOP & UNLOAD** beendet die Wiedergabe und entlädt die Datei.
+
+Beim Wechsel zu LOCAL, Radio, SoundCloud oder YouTube pausiert der Link-Player.
+Der Link-Player nutzt die Medienwiedergabe von Electron direkt. Visualizer, Audio
+FX und Export Studio verwenden weiterhin den Hauptplayer. Der Link muss auf eine
+abspielbare Datei zeigen. Die Abrufbarkeit hängt vom Server und vom Codec ab.

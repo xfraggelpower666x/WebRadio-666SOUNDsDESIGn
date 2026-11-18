@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RADIO WAVE v6.66</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https: swmedia: swsc: swvj:; connect-src 'self' swsc:; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https: http: swmedia: swsc: swvj:; connect-src 'self' swsc:; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="integration/govee-panel.css">
 </head>
@@ -32,7 +32,7 @@
       <div class="panel-sections">
 <div class="source-hub panel-section active" id="source-hub">
 <h2 class="section-title"><span class="icon">⚡</span> Source Hub</h2>
-<div class="source-tabs"><button class="source-btn active" data-source="local">LOCAL</button><button id="local-library-open" class="btn btn-secondary" type="button">MEDIA LIBRARY</button><button class="source-btn" data-source="radio">666 RADIO</button><button class="source-btn" data-source="soundcloud">SOUNDCLOUD</button><button class="source-btn" id="youtube-category" type="button" aria-controls="youtube-controls" aria-expanded="false">YOUTUBE</button></div>
+<div class="source-tabs"><button class="source-btn active" data-source="local">LOCAL</button><button id="local-library-open" class="btn btn-secondary" type="button">MEDIA LIBRARY</button><button class="source-btn" data-source="radio">666 RADIO</button><button class="source-btn" data-source="soundcloud">SOUNDCLOUD</button><button class="source-btn" id="youtube-category" type="button" aria-controls="youtube-controls" aria-expanded="false">YOUTUBE</button><button class="source-btn" id="media-link-category" type="button" aria-controls="media-link-controls" aria-expanded="false">MEDIA LINK</button></div>
 <div id="radio-controls" class="source-pane hidden">
 <div class="nowplaying-box"><strong id="radio-now-title">666SOUNDsDESIGn</strong><span id="radio-now-artist">RADIO READY</span></div>
 </div>
@@ -41,6 +41,20 @@
 <div class="control-group"><label for="soundcloud-client-secret">SoundCloud Client Secret</label><input id="soundcloud-client-secret" type="password" class="custom-input" autocomplete="off"></div>
 <div class="control-group"><button id="soundcloud-save-credentials" class="btn btn-secondary" type="button">SAVE SECURELY</button><button id="soundcloud-test-credentials" class="btn btn-secondary" type="button">TEST CONNECTION</button><button id="soundcloud-clear-credentials" class="btn btn-secondary" type="button">REMOVE SAVED</button></div>
 <div id="soundcloud-library" class="soundcloud-library"><div class="file-meta-tag">Library loads from the official SoundCloud API.</div></div><input id="soundcloud-url" class="custom-input" placeholder="Optional: SoundCloud track / playlist URL"><button id="soundcloud-load" class="btn btn-secondary">LOAD URL</button><button id="soundcloud-prev" class="btn btn-secondary">◀ PREV</button><button id="soundcloud-next" class="btn btn-secondary">NEXT ▶</button><button id="soundcloud-open" class="btn btn-secondary">OPEN ON SOUNDCLOUD</button><div id="soundcloud-queue" class="file-meta-tag">Queue · 0 / 0</div><div class="file-meta-tag">Audio source: SoundCloud · creator attribution shown after resolve</div><div id="soundcloud-state" class="file-meta-tag">SoundCloud credentials are stored encrypted by Windows.</div><div id="soundcloud-runtime-health" class="file-meta-tag">SOUNDCLOUD HEALTH · CHECKING</div></div>
+<div id="media-link-controls" class="source-pane hidden">
+  <form id="media-link-form">
+    <label for="media-link-url">Direct audio or video link</label>
+    <input id="media-link-url" class="custom-input" type="text" inputmode="url" maxlength="8192"
+      placeholder="https://example.com/track.mp3" autocomplete="off" spellcheck="false" required>
+    <div class="remote-row">
+      <button class="btn btn-secondary" type="submit">PLAY LINK</button>
+      <button id="media-link-stop" class="btn btn-secondary" type="button" disabled>STOP &amp; UNLOAD</button>
+    </div>
+  </form>
+  <video id="media-link-player" controls playsinline preload="metadata" hidden aria-label="Direct link player"></video>
+  <p id="media-link-status" class="file-meta-tag" role="status">Paste a direct MP3, WAV, MP4 or WebM link.</p>
+  <p class="file-meta-tag">Link playback uses these controls. For Soundwave visualization and export, use an audio track from the main player.</p>
+</div>
 <div id="youtube-controls" class="source-pane hidden">
   <label for="youtube-url">YouTube video or playlist URL</label>
   <input id="youtube-url" class="custom-input" type="url" maxlength="2048" placeholder="https://www.youtube.com/watch?v=…">
