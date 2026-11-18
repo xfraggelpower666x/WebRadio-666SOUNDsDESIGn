@@ -299,3 +299,12 @@ NEXT_STEP=REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_T
 - Quell-ZIP `RADIO_WAVE_v6.66_1.19.8_Media_Link.zip`: 243 Dateien bytegleich zum Arbeitsbaum, 41 Manifest-Prüfsummen, Archiv-SHA-256 `f124877c076436d768041ca09e108658fdeccf868b8517c5211c8358bc9cd354`.
 - Prüfstände: 39 gezielte Tests bestanden. Der FFmpeg-Integrationstest wurde mangels Paket-Encoder übersprungen. Syntaxprüfung, 116 statische Integrationsprüfungen und 168 Release-Prüfungen bestanden. Chromium konnte in der Prüfumgebung keinen lokalen Prozess-Socket öffnen. Die echte Medienwiedergabe und Build-Abnahme unter Windows sind offen.
 - Nächster Schritt unter Windows: `RADIO_WAVE.bat check /nopause`, einen MP3- oder WAV-Link und einen MP4-Link im Source Hub abspielen, Quellenwechsel prüfen und anschließend die frühere MP4-Exportabnahme mit einem lokalen Track fortsetzen.
+
+## WINDOWS_APP · RADIO WAVE v6.66 / 1.19.9 · 2026-11-18
+
+- Quellrevision: `2fbc2683e9e31057f7b0065a4c751708cc55a91b`. Paketversion 1.19.9 im bestehenden Quellpfad `windows-app/SoundwaveStudio-666-PC/source-v1.19.3/`.
+- Visuals R01/R02 mit zwölf bytegleichen Originalgrafiken. Separater App-Hintergrund, Presets und eigene Bilder im Visualizer, Branding- und Support-Dialog.
+- GOV nutzt wahlweise die FX Bridge auf Port 3000 mit expliziter JSON-Quittung oder den Local/Hybrid-Controller auf Port 8766 mit Geräteauswahl. UDP-Senden wird als unbestätigte Gerätewirkung ausgewiesen. ASUS Aura REST ergänzt OpenRGB um Übernahme, Freigabe, Farbe und Bassreaktion.
+- Quell-ZIP: `RADIO_WAVE_v6.66_1.19.9_Visuals_GOV_ASUS.zip`, 263 Dateien, 62 verifizierte Dateiprüfsummen. Archiv-SHA-256 `c73ac105961896c8820aad1ba7aa9b448f0048f5d063d88937b6218277b776cb`.
+- Prüfergebnis: 179 von 183 Tests bestanden, darunter 10 gezielte Visuals-/Lichtadaptertests und echte H.264/AAC-Konvertierung. Drei Electron-Tests durch fehlende Runtime blockiert, ein Test der Cyber-Studio-EXE übersprungen. 102 Syntax-, 116 statische und 168 Release-Prüfungen bestanden.
+- Offen bleiben Windows-Start, Setup, Portable, Zweitmonitor, physische Gerätewirkung und GOVEE-Cloud. Belege für Medienwiedergabe und MP4-Export unter Windows bleiben als getrennte Abnahmen offen.
