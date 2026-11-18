@@ -291,3 +291,11 @@ NEXT_STEP=REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_T
 - Native Projektwurzel: `windows-app/666AUDIO-LIGHT-WAVE/`.
 - Quellstand: `source-v0.1.2-R6/`, vollständiger R6-Stand mit neuer Produktidentität.
 - Windows-EXE, Setup und GPU-Hostabnahme: READBACK_PENDING.
+
+## WINDOWS_APP Current · RADIO WAVE v6.66 / 1.19.8 · 2026-11-18
+
+- Quellrevision: `af69bff68266ac0a417cd8343fcc8de0785b061b`. Paketversion 1.19.8 im bestehenden Quellpfad `windows-app/SoundwaveStudio-666-PC/source-v1.19.3/`.
+- **Source Hub → MEDIA LINK** spielt direkte HTTP(S)-Links zu MP3, WAV, MP4 und WebM über native Mediensteuerungen ab. Beim Quellenwechsel pausiert der Link-Player. Soundwave-Visualizer, Audio-FX und Export Studio verwenden den Hauptplayer.
+- Quell-ZIP `RADIO_WAVE_v6.66_1.19.8_Media_Link.zip`: 243 Dateien bytegleich zum Arbeitsbaum, 41 Manifest-Prüfsummen, Archiv-SHA-256 `f124877c076436d768041ca09e108658fdeccf868b8517c5211c8358bc9cd354`.
+- Prüfstände: 39 gezielte Tests bestanden. Der FFmpeg-Integrationstest wurde mangels Paket-Encoder übersprungen. Syntaxprüfung, 116 statische Integrationsprüfungen und 168 Release-Prüfungen bestanden. Chromium konnte in der Prüfumgebung keinen lokalen Prozess-Socket öffnen. Die echte Medienwiedergabe und Build-Abnahme unter Windows sind offen.
+- Nächster Schritt unter Windows: `RADIO_WAVE.bat check /nopause`, einen MP3- oder WAV-Link und einen MP4-Link im Source Hub abspielen, Quellenwechsel prüfen und anschließend die frühere MP4-Exportabnahme mit einem lokalen Track fortsetzen.
