@@ -26,7 +26,7 @@ test('local media revisions stay stable for queue edits and reject stale track r
   const routes = {}, fetched = [];
   let handler;
   const context = {
-    path, URL, Response, pathToFileURL, selectedLocalAudioPath: '',
+    path, URL, Response, Headers, pathToFileURL, selectedLocalAudioPath: '',
     localAudioQueue: [], localAudioQueueIndex: -1, localAudioRevision: 0,
     validLocalAudioPath: value => value, persistLocalQueue() {}, runtimeEvent() {}, broadcastSourceState() {},
     registerIpc: (name, _role, fn) => { routes[name] = fn; },
@@ -38,7 +38,11 @@ test('local media revisions stay stable for queue edits and reject stale track r
     + section("  protocol.handle('swmedia'", '  const displayChanged='), context);
   const first = context.addLocalQueuePaths(['C:\\synthetic\\first.mp3']);
   const request = url => ({ url, headers: new Headers({ range: 'bytes=0-9' }) });
-  assert.equal((await handler(request(first.mediaUrl))).status, 200);
+  const response = await handler(request(first.mediaUrl));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('access-control-allow-origin'), '*');
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.match(main, /scheme:'swmedia',privileges:\{[^}]*corsEnabled:true/);
   const added = context.addLocalQueuePaths(['C:\\synthetic\\second.mp3']);
   assert.equal(added.mediaUrl, first.mediaUrl);
   assert.equal((await handler(request(first.mediaUrl))).status, 200);

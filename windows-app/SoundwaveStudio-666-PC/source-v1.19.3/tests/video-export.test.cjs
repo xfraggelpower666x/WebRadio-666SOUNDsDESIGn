@@ -49,7 +49,7 @@ function renderer({ supported = ['video/mp4', 'video/webm'], write, close, play,
     audioInputRecord: node(), performance: { now: () => 4000 },
     ensureAudioContext() {}, setupProceduralParticles() {}, renderLoop() {}, drawFrame() {},
     setPlayerUiPlaying() {}, formatTime: value => String(value),
-    setInterval: () => 1, clearInterval() {}, cancelAnimationFrame() {},
+    setTimeout, clearTimeout, setInterval: () => 1, clearInterval() {}, cancelAnimationFrame() {},
     animationFrameId: null, recordingInterval: null, exportFps: 60,
     mediaRecorder: null, isRecording: false, exportSavePath: null, exportBusy: false, exportSession: null,
     btnBrowseExport: node(), btnExport: node(), btnStopExport: node(),
@@ -62,13 +62,13 @@ function renderer({ supported = ['video/mp4', 'video/webm'], write, close, play,
   return { ctx, api, track, events, get recorder() { return recorder; } };
 }
 
-function mainHandlers(fsImpl = fs) {
+function mainHandlers(fsImpl = fs, encoder) {
   const handlers = {};
   let destination;
   let dialogOptions;
   const ipcMain = { handle: (name, fn) => { handlers[name] = fn; } };
   const context = {
-    fs: fsImpl, path, require, Buffer, console: { error() {} },
+    fs: fsImpl, path, require, Buffer, AbortController, encoderPath: () => encoder, writeMp4: require('../src/shared/video-transcode.cjs').writeMp4, console: { error() {} },
     fileWriteStream: null, approvedSavePath: '', videoWriteState: null,
     mainWindow: { isDestroyed: () => false, webContents: { id: 1 } }, introWindow: null,
     outputWindows: new Map(), detachedVisualizerWindow: null, detachedOverlayWindows: new Map(),
@@ -101,22 +101,25 @@ test('a stale currentSrc after an unload does not open a save dialog', async () 
   assert.equal(f.ctx.btnExport.disabled, false);
 });
 
-test('explicit WebM first and same-container encoder fallback', async () => {
+test('explicit WebM selection and same-container encoder fallback', async () => {
   const f = renderer({ rejectEncoder: mime => mime.includes('vp8') });
   f.api.getSavePath = async choices => {
-    assert.deepEqual(Array.from(choices), ['webm','mp4']);
+    assert.deepEqual(Array.from(choices), ['mp4','webm']);
     return path.join(__dirname, 'music.webm');
   };
   await f.ctx.startRecordingPipeline();
   assert.equal(f.recorder.mimeType, 'video/webm;codecs=vp9,opus');
 });
 
-test('save dialog offers only supported recording formats and defaults to WebM when MP4 is unavailable', async () => {
+test('MP4 is offered first when only WebM can be recorded', async () => {
   const f = renderer({ supported: ['video/webm'] });
   let offered;
-  f.api.getSavePath = async formats => { offered = Array.from(formats); return 'C:\\Videos\\music.webm'; };
+  let captureFormat;
+  f.api.startFileWrite = async (_path, format) => { captureFormat=format; return {success:true}; };
+  f.api.getSavePath = async formats => { offered = Array.from(formats); return 'C:\\Videos\\music.mp4'; };
   await f.ctx.startRecordingPipeline();
-  assert.deepEqual(offered, ['webm']);
+  assert.deepEqual(offered, ['mp4','webm']);
+  assert.equal(captureFormat, 'webm');
   assert.match(f.recorder.mimeType, /^video\/webm/);
   const main = mainHandlers();
   const event = { sender: { id: 1, isDestroyed: () => false } };
@@ -247,6 +250,7 @@ test('unsupported extension is rejected without opening a file', async () => {
   const f = renderer({ supported: ['video/webm'] });
   let opens = 0;
   f.api.startFileWrite = async () => { opens++; return { success: true }; };
+  f.ctx.exportSavePath = 'music.avi';
   await f.ctx.startRecordingPipeline();
   assert.equal(opens, 0);
   assert.match(f.ctx.exportResult.textContent, /Unsupported/);
@@ -330,7 +334,7 @@ test('empty recordings, failed conversion and mismatched chunk formats are disca
     });
     await f.ctx.startRecordingPipeline();
     if (kind === 'conversion') f.recorder.chunk({ size: 1, arrayBuffer: async () => { throw new Error('conversion failed'); } });
-    if (kind === 'format') f.recorder.chunk({ size: 1, type: 'video/webm', arrayBuffer: async () => Uint8Array.of(1).buffer });
+    if (kind === 'format') f.recorder.chunk({ size: 1, type: 'video/mp4', arrayBuffer: async () => Uint8Array.of(1).buffer });
     f.ctx.stopRecordingAndSave();
     await tick(); await tick();
     assert.deepEqual(calls, [0]);
@@ -424,4 +428,41 @@ test('asynchronous stream write and finish errors propagate without hanging', as
     assert.equal(closed.success, false);
     assert.match(closed.error, /disk (write|finish) failed/);
   }
+});
+
+
+test('finalizing a WebM capture commits a real H.264/AAC MP4 and preserves previous output on failure', async t => {
+  const { execFileSync } = require('node:child_process');
+  const { mkdtempSync, rmSync } = require('node:fs');
+  let ffmpeg;
+  try { ffmpeg = require('../src/shared/video-transcode.cjs').checkEncoder(); }
+  catch { return t.skip('Local FFmpeg binary unavailable'); }
+  const dir = mkdtempSync(path.join(require('node:os').tmpdir(), 'radio-wave-mp4-'));
+  try {
+    const input = path.join(dir,'fixture.webm');
+    const output = path.join(dir,'video.mp4');
+    execFileSync(ffmpeg,['-loglevel','error','-f','lavfi','-i','color=magenta:s=160x90:r=25:d=1',
+      '-f','lavfi','-i','sine=frequency=440:sample_rate=48000:duration=1',
+      '-c:v','libvpx','-c:a','libopus','-shortest',input],{windowsHide:true});
+    const f = mainHandlers(fs,ffmpeg);
+    const event = {sender:{id:1,isDestroyed:()=>false}};
+    const invoke = (name,...args) => f.handlers[name](event,...args);
+    const save = async bytes => {
+      f.choose(output);
+      assert.equal(await invoke('dialog:getSavePath',['mp4','webm']),output);
+      assert.equal((await invoke('file:startWrite',output,'webm',128000)).success,true);
+      assert.equal((await invoke('file:writeChunk',Uint8Array.from(bytes).buffer)).success,true);
+      return invoke('file:close');
+    };
+    assert.equal((await save(fs.readFileSync(input))).success,true);
+    const mp4 = fs.readFileSync(output);
+    assert.equal(mp4.toString('ascii',4,8),'ftyp');
+    const probe = require('node:child_process').spawnSync(ffmpeg,['-hide_banner','-i',output,'-map','0:v:0','-map','0:a:0','-f','null','-'],{encoding:'utf8',windowsHide:true});
+    assert.equal(probe.status,0,probe.stderr);
+    assert.match(probe.stderr,/Video: h264/);
+    assert.match(probe.stderr,/Audio: aac/);
+    assert.equal((await save(Buffer.from('invalid recording'))).success,false);
+    assert.deepEqual(fs.readFileSync(output),mp4);
+    assert.deepEqual(fs.readdirSync(dir).sort(),['fixture.webm','video.mp4']);
+  } finally { rmSync(dir,{recursive:true,force:true}); }
 });

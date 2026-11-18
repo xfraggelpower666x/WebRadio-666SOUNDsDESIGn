@@ -13,6 +13,7 @@ const { createAudioLibrary } = require('./src/shared/audio-library.cjs');
 const { createAudioPermissionGate, forwardOverlayMicrophone } = require('./src/shared/audio-permissions.cjs');
 const { createVjFiles } = require('./src/shared/vj-files.cjs');
 const { listAsus, setAsus } = require('./src/shared/asus-openrgb.cjs');
+const { encoderPath, writeMp4 } = require('./src/shared/video-transcode.cjs');
 const { sendGovee } = require('./src/shared/govee-bridge.cjs');
 const { validateVjState } = require('./src/shared/vj-sync.cjs');
 
@@ -81,7 +82,7 @@ const soundCloudCredentialStore = createSoundCloudCredentialStore(safeStorage, (
 const SOUND_CLOUD_API='https://api.soundcloud.com';
 const SOUND_CLOUD_AUTH='https://secure.soundcloud.com';
 const SOUND_CLOUD_CREATOR_URL='https://soundcloud.com/fraggelpower666';
-protocol.registerSchemesAsPrivileged([{scheme:'swmedia',privileges:{standard:true,secure:true,supportFetchAPI:true,stream:true}},{scheme:'swsc',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true,stream:true}},{scheme:'swvj',privileges:{standard:true,secure:true,corsEnabled:true,stream:true}}]);
+protocol.registerSchemesAsPrivileged([{scheme:'swmedia',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true,stream:true}},{scheme:'swsc',privileges:{standard:true,secure:true,supportFetchAPI:true,corsEnabled:true,stream:true}},{scheme:'swvj',privileges:{standard:true,secure:true,corsEnabled:true,stream:true}}]);
 const vjFiles = createVjFiles({fetchFile:(url,options)=>net.fetch(url,options)});
 let vjPickerOpen = false;
 let vjFollowerState = null;
@@ -1060,10 +1061,17 @@ app.whenReady().then(() => {
   });
   audioLibrary.refresh().catch(error=>runtimeEvent('local-library-scan-error',{error:String(error.message||error)}));
   audioLibraryTimer=setInterval(()=>audioLibrary.refresh().catch(error=>runtimeEvent('local-library-scan-error',{error:String(error.message||error)})),30000);
-  protocol.handle('swmedia', (request) => {
+  protocol.handle('swmedia', async (request) => {
     const u = new URL(request.url);
     if (u.hostname !== 'audio' || u.pathname !== '/current' || u.search !== '?v='+localAudioRevision || !selectedLocalAudioPath) return new Response('Not found', {status:404});
-    return net.fetch(pathToFileURL(selectedLocalAudioPath).toString(), {headers: request.headers});
+    const range = request.headers.get('range');
+    const result = await net.fetch(pathToFileURL(selectedLocalAudioPath).toString(), {
+      headers: range ? { range } : {}
+    });
+    const headers = new Headers(result.headers);
+    headers.set('access-control-allow-origin', '*');
+    headers.set('cache-control', 'no-store');
+    return new Response(result.body, { status: result.status, headers });
   });
   const displayChanged=()=>{
     reconcileOutputWindows();
@@ -1367,8 +1375,9 @@ registerIpc('dialog:openBackground','main', async () => {
 
 function discardVideoWrite() {
   const state = videoWriteState;
-  if (!state || state.closing) return;
+  if (!state) return;
   state.aborted = true;
+  state.encoderAbort?.abort();
   void closeVideoWrite(state);
 }
 
@@ -1398,16 +1407,23 @@ registerIpc('dialog:getSavePath','main', async (_event,formats) => {
   return approvedSavePath || null;
 });
 
-registerIpc('file:startWrite','main', async (event, savePath) => {
+registerIpc('file:startWrite','main', async (event, savePath, recordedFormat, audioRate) => {
   let state;
   try {
     const resolved = path.resolve(String(savePath || ''));
     if (!approvedSavePath || resolved !== approvedSavePath) throw new Error('save_path_not_approved');
     if (videoWriteState) throw new Error('video_write_in_progress');
+    const destinationFormat = path.extname(resolved).slice(1).toLowerCase();
+    recordedFormat ??= destinationFormat;
+    const transcode = destinationFormat === 'mp4' && recordedFormat === 'webm';
+    if (!['mp4','webm'].includes(destinationFormat) || (!transcode && recordedFormat !== destinationFormat)) {
+      throw new Error('video_formats_invalid');
+    }
+    const ffmpeg = transcode ? encoderPath() : null;
     approvedSavePath = '';
     const temporaryPath = path.join(path.dirname(resolved), `.${path.basename(resolved)}.${require('crypto').randomBytes(12).toString('hex')}.partial`);
     const stream = fs.createWriteStream(temporaryPath, { flags: 'wx' });
-    state = { stream, destination: resolved, temporaryPath, error: null, aborted: false, opened: false, closing: null };
+    state = { stream, destination: resolved, temporaryPath, ffmpeg, audioRate, error: null, aborted: false, opened: false, closing: null };
     videoWriteState = state;
     fileWriteStream = stream;
     stream.on('error', error => { state.error ||= error; });
@@ -1454,6 +1470,7 @@ registerIpc('file:writeChunk','main', async (event, chunkBuffer) => {
 async function closeVideoWrite(state) {
   if (state.closing) return state.closing;
   state.closing = (async () => {
+    let convertedPath;
     try {
       const stream = state.stream;
       const closed = stream.closed ? Promise.resolve() : new Promise(resolve => stream.once('close', resolve));
@@ -1463,7 +1480,16 @@ async function closeVideoWrite(state) {
       if (state.error) throw state.error;
       if (state.aborted) throw new Error('video_write_aborted');
       if (!stream.writableFinished) throw new Error('video_write_incomplete');
-      await fs.promises.rename(state.temporaryPath, state.destination);
+      if (state.ffmpeg) {
+        convertedPath = state.temporaryPath + '.mp4';
+        state.encoderAbort = new AbortController();
+        await writeMp4(state.temporaryPath, convertedPath, state.encoderAbort.signal, state.ffmpeg, state.audioRate);
+        if (state.aborted) throw new Error('video_write_aborted');
+        if (!(await fs.promises.stat(convertedPath)).size) throw new Error('MP4-Konvertierung ergab eine leere Datei.');
+        await fs.promises.unlink(state.temporaryPath);
+      }
+      if (state.aborted) throw new Error('video_write_aborted');
+      await fs.promises.rename(convertedPath || state.temporaryPath, state.destination);
       return { success: true };
     } catch (error) {
       if (state.opened) {
@@ -1473,6 +1499,9 @@ async function closeVideoWrite(state) {
       }
       return { success: false, error: error.message };
     } finally {
+      if (convertedPath) await fs.promises.unlink(convertedPath).catch(error=>{
+        if(error.code!=='ENOENT') console.error('Could not remove MP4 staging file:',error.code);
+      });
       if (videoWriteState === state) {
         fileWriteStream = null;
         videoWriteState = null;

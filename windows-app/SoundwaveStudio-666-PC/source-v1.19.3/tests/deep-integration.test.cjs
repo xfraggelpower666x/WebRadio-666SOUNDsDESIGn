@@ -94,7 +94,7 @@ pass('Windows suspend resume lifecycle is surfaced',main.includes("powerMonitor.
 pass('stale output heartbeat has bounded watchdog recovery',main.includes('startOutputWatchdog')&&main.includes('output-heartbeat-timeout')&&main.includes('attempts>=3'));
 pass('runtime diagnostics retain bounded lifecycle event history',main.includes('runtimeEvents.length>200')&&main.includes('events:runtimeEvents.slice(-100)'));
 pass('background imports are size and type bounded',main.includes('background_too_large')&&main.includes('32*1024*1024')&&main.includes('background_type_blocked'));
-pass('local media bridge has no duplicate unreachable fetch', (main.match(/return net\.fetch\(pathToFileURL\(selectedLocalAudioPath\)/g)||[]).length===1);
+pass('local media bridge has no duplicate unreachable fetch', (main.match(/net\.fetch\(pathToFileURL\(selectedLocalAudioPath\)/g)||[]).length===1);
 pass('quit path clears transient credentials and aborts video writers',main.includes("app.on('before-quit'")&&main.includes("adminToken=''; soundCloudToken=null")&&main.includes('discardVideoWrite()')&&main.includes('state.aborted = true'));
 pass('Player Messenger receive polling and self suppression',i.includes('refreshPlayerMessenger')&&i.includes('from!==senderId')&&i.includes('document.hidden?30000:10000'));
 pass('Player Messenger history and status adapters stay main-process owned',main.includes("player-alert:history")&&main.includes("player-alert:status")&&pre.includes('playerAlertHistory')&&pre.includes('playerAlertStatus'));

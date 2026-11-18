@@ -82,7 +82,7 @@ contextBridge.exposeInMainWorld('api', {
   onWindowMetrics: (fn) => ipcRenderer.on('window:metrics', (_e, payload) => fn(payload)),
   focusVideoProgress: () => ipcRenderer.invoke('video:focusProgress'),
   getSavePath: (formats) => ipcRenderer.invoke('dialog:getSavePath', formats),
-  startFileWrite: (savePath) => ipcRenderer.invoke('file:startWrite', savePath),
+  startFileWrite: (savePath, recordedFormat, audioRate) => ipcRenderer.invoke('file:startWrite', savePath, recordedFormat, audioRate),
   writeFileChunk: (chunkArrayBuffer) => {
     // Convert ArrayBuffer to Uint8Array so it transfers cleanly over IPC
     const uint8Array = new Uint8Array(chunkArrayBuffer);

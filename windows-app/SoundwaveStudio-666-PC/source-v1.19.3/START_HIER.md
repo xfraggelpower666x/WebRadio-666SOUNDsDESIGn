@@ -64,9 +64,12 @@ Eine Quittung im Dialog bestätigt die Antwort der lokalen Bridge. Die Reaktion 
 - **Export Studio** öffnet den Dateidialog beim auslösenden Exportfenster und holt beim Start der Aufnahme das Fortschrittsfenster nach vorn.
 - **GOV** steht im Hauptfenster beim Player. Die Admin-Freigabe verlangt das Radio-Admin-Passwort. OpenRGB und die Govee-Bridge laufen bei Verwendung als lokale Anwendungen bzw. Dienste.
 
-## Videoexport 1.19.5
+## Videoexport 1.19.6
 
 1. In LOCAL eine Audiodatei laden oder eine spielbare Radio-/SoundCloud-Quelle wählen.
-2. **Export Studio → Export Music Video** öffnet bei Bedarf die Dateiauswahl. Als erstes Format wird WebM angeboten. MP4 wird zusätzlich angeboten, wenn der Recorder es meldet.
+2. **Export Studio → Export Music Video** öffnet bei Bedarf die Dateiauswahl. MP4 ist vorausgewählt. Electron zeichnet bei verfügbarem WebM zunächst intern auf und FFmpeg erzeugt daraus MP4 mit H.264 und AAC. WebM kann weiterhin direkt gewählt werden.
 3. Bei einer lokalen Datei endet der Mitschnitt am Dateiende. Bei einem laufenden Stream beendet **Stop & Save Video** die Aufnahme.
-4. Der Status meldet eine fehlende Audioquelle, einen Encoderfehler oder den tatsächlich gespeicherten Pfad.
+4. Beim Stoppen zeigt **Encoding MP4** die Konvertierung. Erst nach erfolgreicher Konvertierung erscheint der gespeicherte Zielpfad.
+5. Der Status meldet eine fehlende Audioquelle, einen Encoderfehler oder den tatsächlich gespeicherten Pfad.
+
+Die Startdatei prüft FFmpeg automatisch. Das Windows-Paket bündelt den Encoder über `ffmpeg-static@5.3.0`. Herkunft und Lizenz stehen in den mitgelieferten Materialien des [FFmpeg-Binärpakets](https://github.com/eugeneware/ffmpeg-static/tree/b6.1.1).

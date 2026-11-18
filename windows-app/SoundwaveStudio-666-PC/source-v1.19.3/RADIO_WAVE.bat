@@ -76,6 +76,7 @@ set "ELECTRON_SKIP_BINARY_DOWNLOAD="
 set "ELECTRON_INSTALL_PLATFORM="
 set "ELECTRON_INSTALL_ARCH="
 call :ensureElectron || exit /b 1
+call :ensureVideoEncoder || exit /b 1
 call :reportTools
 call npm.cmd test || exit /b
 call npm.cmd run check:release || exit /b
@@ -163,6 +164,13 @@ node.exe scripts\repair-electron-runtime.cjs || (echo FEHLER: Electron-Reparatur
 node.exe scripts\repair-electron-runtime.cjs --check || (echo FEHLER: Electron ist nach der Reparatur nicht startfaehig. & exit /b 1)
 exit /b 0
 
+:ensureVideoEncoder
+node.exe src\shared\video-transcode.cjs && exit /b 0
+echo [REPARATUR] Installiere den festgelegten MP4-Encoder.
+node.exe node_modules\ffmpeg-static\install.js || exit /b 1
+node.exe src\shared\video-transcode.cjs || exit /b 1
+exit /b 0
+
 :reportTools
 echo [OK] PowerShell
 if exist "node_modules\electron\dist\electron.exe" (echo [OK] Electron-Runtime) else echo [FEHLT] Electron-Runtime: node_modules\electron\dist\electron.exe
@@ -173,6 +181,7 @@ exit /b 0
 :checkRuntime
 call :ensureDependencies || exit /b 1
 call :ensureElectron || exit /b 1
+call :ensureVideoEncoder || exit /b 1
 goto run
 
 :run

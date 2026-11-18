@@ -1798,8 +1798,9 @@ async function browseExportDestination() {
   btnBrowseExport.disabled = true;
   try {
     diagStatus.textContent = 'Opening Save Dialog...';
-    const formats=['webm','mp4'].filter(extension=>recordingMimeForPath('video.'+extension));
-    if(!formats.length)throw new Error('No supported MP4 or WebM recording format is available.');
+    const formats=['mp4'];
+    if (recordingFormats('video.webm').length) formats.push('webm');
+    if(formats.length===1 && !recordingFormats('video.mp4').length)throw new Error('No supported MP4 or WebM recording format is available.');
     exportSavePath = await window.api.getSavePath(formats);
     exportDestination.textContent = exportSavePath || 'No destination selected';
     exportResult.textContent = exportSavePath ? 'Destination selected. Ready to record.' : 'Destination selection cancelled.';
@@ -1828,8 +1829,9 @@ function recordingFormats(savePath) {
   return candidates.filter(type => MediaRecorder.isTypeSupported(type));
 }
 
-function recordingMimeForPath(savePath) {
-  return recordingFormats(savePath)[0] || null;
+function exportRecordingFormats(savePath) {
+  const native = recordingFormats(savePath);
+  return /\.mp4$/i.test(savePath) ? [...recordingFormats('video.webm'), ...native] : native;
 }
 
 function hasExportMedia() {
@@ -1840,6 +1842,15 @@ function hasExportMedia() {
       (audioElement.currentSrc && audioElement.querySelector?.('source[src]')));
   }
   return !!(audioElement.currentSrc || audioElement.src);
+}
+
+async function waitForExportAudio(operation, errorMessage) {
+  let timer;
+  try {
+    await Promise.race([operation, new Promise((_resolve, reject) => {
+      timer = setTimeout(() => reject(new Error(errorMessage)), 10000);
+    })]);
+  } finally { clearTimeout(timer); }
 }
 
 function recordingError(session, error) {
@@ -1864,7 +1875,9 @@ async function finishRecording(session) {
   window.vjStudio?.setMicrophoneRecording(false);
   setPlayerUiPlaying(false);
   btnStopExport.disabled = true;
-  exportStatusLabel.textContent = 'Finishing and saving…';
+  const saveMessage = session.transcode ? 'Encoding MP4 (H.264 / AAC)…' : 'Finishing and saving…';
+  exportStatusLabel.textContent = saveMessage;
+  exportResult.textContent = saveMessage;
   await session.queue;
   if (!session.bytes && !session.error) session.error = new Error('No video data was recorded');
   try {
@@ -1914,7 +1927,7 @@ async function startRecordingPipeline() {
   }
   if (!exportSavePath && !await browseExportDestination()) return;
   if (exportBusy) return;
-  const formats = recordingFormats(exportSavePath);
+  const formats = exportRecordingFormats(exportSavePath);
   if (!formats.length) {
     exportResult.textContent = 'Unsupported filename or recording format. Browse for a supported .mp4 or .webm destination.';
     diagStatus.textContent = 'Export format unavailable';
@@ -1929,7 +1942,9 @@ async function startRecordingPipeline() {
     const hasMedia=hasExportMedia();
     const includeMicrophone=audioDeviceController?.recordsInput()===true;
     if(!hasMedia&&!includeMicrophone)throw new Error('Choose an audio track or enable microphone recording');
-    if (typeof audioContext !== 'undefined' && audioContext?.state === 'suspended' && typeof audioContext.resume === 'function') await audioContext.resume();
+    if (typeof audioContext !== 'undefined' && audioContext?.state === 'suspended') {
+      await waitForExportAudio(audioContext.resume(), 'Audio engine did not start. Play the source before exporting.');
+    }
     if (typeof canvas.captureStream !== 'function') throw new Error('This runtime cannot capture the visualizer canvas.');
     const canvasStream = canvas.captureStream(exportFps);
     const videoTracks = canvasStream.getVideoTracks();
@@ -1957,7 +1972,9 @@ async function startRecordingPipeline() {
     if (!session.recorder) throw new Error('Could not start a '+formats[0].split(';')[0]+' encoder: '+encoderError?.message);
     exportSavePath = null;
     exportDestination.textContent = `${session.path} (browse again for next export)`;
-    const initRes = await window.api.startFileWrite(session.path);
+    const recordedFormat = mimeType.split(';')[0].split('/')[1];
+    session.transcode = recordedFormat==='webm' && /\.mp4$/i.test(session.path);
+    const initRes = await window.api.startFileWrite(session.path, recordedFormat, audioBitsPerSecond);
     if (!initRes?.success) throw new Error(initRes?.error || 'Could not initialize video file');
     session.opened = true;
     if(session.error)throw session.error;
@@ -2022,7 +2039,7 @@ async function startRecordingPipeline() {
     }
     recordingInterval = setInterval(() => drawFrame(), 1000 / exportFps);
     if(!session.microphoneOnly){
-      await audioElement.play();
+      await waitForExportAudio(audioElement.play(), 'Audio source did not start. Check playback and try again.');
       if (!session.finishing && session.recorder.state !== 'inactive') setPlayerUiPlaying(true);
     }
   } catch (error) {

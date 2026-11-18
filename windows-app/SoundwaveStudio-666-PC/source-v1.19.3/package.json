@@ -1,6 +1,6 @@
 {
   "name": "radio-wave-v666",
-  "version": "1.19.5",
+  "version": "1.19.6",
   "description": "RADIO WAVE v6.66 · Soundwave visual music player with 666 WebRadio addon",
   "main": "main.js",
   "scripts": {
@@ -35,7 +35,8 @@
   },
   "allowScripts": {
     "electron@45.3.2": true,
-    "electron-winstaller@5.4.0": true
+    "electron-winstaller@5.4.0": true,
+    "ffmpeg-static@5.3.0": true
   },
   "devDependencies": {
     "electron": "45.3.2",
@@ -46,6 +47,7 @@
     "appId": "com.666soundsdesign.radiowave.v666",
     "productName": "RADIO WAVE v6.66",
     "beforePack": "./scripts/check-cyber-studio-pack.cjs",
+    "asarUnpack": ["node_modules/ffmpeg-static/ffmpeg*"],
     "extraResources": [
       {
         "from": "build/cyber-studio",
@@ -100,6 +102,7 @@
   },
   "productName": "RADIO WAVE v6.66",
   "dependencies": {
+    "ffmpeg-static": "5.3.0",
     "hls.js": "^1.7.4"
   }
 }
