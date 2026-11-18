@@ -4,9 +4,9 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "d21bc7a274fd8b1c252deede2c92bc36980d5f3e",
-  "prechange_recovery_branch": "backup/stream-before-gov-panel-20261116-f1b17e9",
-  "body_readback": "PASS_21_GOVEE_REPAIR_BLOB_SHAS",
+  "body_head_before_pointer": "6e8d5693ff7c45487e60f26e0ac526811d631637",
+  "prechange_recovery_branch": "backup/stream-windows-before-1.19.7-bdf4170",
+  "body_readback": "PASS_SCOPED_SOURCE_COMPARE_28_FILES_PLUS_2_CONTROL_DOCS_AND_PACKAGE_VERSION",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
   "project_map": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
   "session_governor": "666STREAM_STRUCTURE_CONTROL/current/SESSION_GOVERNOR.md",
@@ -66,7 +66,10 @@
     "RADIO_WAVE_LOCAL_QUEUE_VISUAL_SWITCH_REAL_WINDOWS_HOST_ACCEPTANCE",
     "RADIO_WAVE_1_19_3_LAUNCHER_NSIS_PORTABLE_REAL_WINDOWS_HOST_ACCEPTANCE",
     "RADIO_WAVE_AND_WEB_MAIN_GOVEE_REAL_HOST_AND_DEVICE_ACCEPTANCE",
-    "ASUS_AURA_ADAPTER_SOURCE_AND_HOST_ACCEPTANCE"
+    "ASUS_AURA_ADAPTER_SOURCE_AND_HOST_ACCEPTANCE",
+    "RADIO_WAVE_1_19_7_WINDOWS_LAUNCHER_MP4_NSIS_PORTABLE_REAL_HOST_ACCEPTANCE",
+    "RADIO_WAVE_1_19_7_YOUTUBE_OFFICIAL_PLAYER_REAL_HOST_ACCEPTANCE",
+    "RADIO_WAVE_1_19_7_ASUS_OPENRGB_ADAPTER_REAL_DEVICE_ACCEPTANCE"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -77,14 +80,14 @@
   "concurrent_newer_state_rebased": false,
   "active_project_context": "WINDOWS_APP",
   "windows_app_source_branch": "WebRadio-666SOUNDsDESIGn",
-  "windows_app_source_update_commit": "d21bc7a274fd8b1c252deede2c92bc36980d5f3e",
+  "windows_app_source_update_commit": "142d5ea7d60062102b6ed915a957193906e311e0",
   "windows_app_current_doc": "windows-app/SoundwaveStudio-666-PC/source-v1.19.3/START_HIER.md",
   "windows_app_baseline_retest_required": false,
   "windows_app_radio_integration_source": "FROZEN",
   "windows_app_start_sequence": "CYBER_INTRO_BEFORE_APP",
   "windows_app_installer_target": "NSIS",
   "windows_app_portable_role": "PORTABLE_EXE_AND_ZIP_BUILD_TARGETS",
-  "windows_app_next_step": "WINDOWS_1_19_3_LAUNCHER_NSIS_PORTABLE_AND_REAL_HOST_ACCEPTANCE_WITH_GOVEE",
+  "windows_app_next_step": "WINDOWS_1_19_7_LAUNCHER_CHECK_AND_LOCAL_MP4_WITH_AUDIO_THEN_INSTALLER_PORTABLE_YOUTUBE_AND_DEVICE_ACCEPTANCE",
   "windows_app_product": "RADIO WAVE v6.66",
   "windows_app_source_architecture_commit": "44691a320f0bcdebfcfb1b10bb9600a0f5247c80",
   "windows_app_architecture_doc": "windows-app/SoundwaveStudio-666-PC/source-v1.19.3/docs/ARCHITECTURE.md",
@@ -102,7 +105,7 @@
   "second_monitor_visual_output": "OPTIONAL_USER_SWITCH",
   "second_monitor_duplicate_audio_stream": false,
   "production_webradio_mutation": "NONE",
-  "windows_app_source_head": "d21bc7a274fd8b1c252deede2c92bc36980d5f3e",
+  "windows_app_source_head": "142d5ea7d60062102b6ed915a957193906e311e0",
   "audio_reactivity": "REAL_SIGNAL_ONLY",
   "random_visual_audio_simulation": "FORBIDDEN",
   "fake_eq_animation": "FORBIDDEN",
@@ -948,7 +951,7 @@
     "github_ci": "NOT_RUN"
   },
   "windows_app_source_root": "windows-app/SoundwaveStudio-666-PC/source-v1.19.3/",
-  "windows_app_source_version": "1.19.3",
+  "windows_app_source_version": "1.19.7",
   "radio_wave_source_import_20261115": {
     "source_repo": "xfraggelpower666x/666MAIN_BRAIN_MYCEL_SYSTEM",
     "source_commit": "92e5f3e60c9f141ddd4c7a82926f46034ec74d59",
@@ -977,5 +980,26 @@
     "hardware": "PENDING",
     "asus_aura": "ADAPTER_NOT_AVAILABLE",
     "production_deploy": "NOT_REQUESTED"
+  },
+  "windows_app_update_1_19_7_20261118": {
+    "status": "SOURCE_READBACK_VERIFIED_WINDOWS_HOST_PENDING",
+    "project": "WINDOWS_APP",
+    "prechange_head": "bdf417044f7191304f5aaeabfd07ec49596f86ce",
+    "source_commit": "142d5ea7d60062102b6ed915a957193906e311e0",
+    "source_changes": 28,
+    "source_version": "1.19.7",
+    "release_zip_sha256": "0969a10e21cc7e02f0aac3136179955781cc7cc4e771ae590e75420b51b60ea7",
+    "tests": {
+      "targeted_passed": 47,
+      "targeted_skipped": 1,
+      "static_checks_passed": 116,
+      "release_checks_passed": 168
+    },
+    "prior_mp4_runtime_evidence": "ELECTRON_LINUX_1_19_6_1080P_H264_AAC",
+    "windows_launcher": "1_19_6_HOST_FIXTURE_FAILURE_REPAIRED_IN_SOURCE_1_19_7_HOST_RERUN_PENDING",
+    "windows_installer_and_portable": "NOT_BUILT_FOR_THIS_REVISION",
+    "youtube_window_host": "PENDING",
+    "asus_openrgb_source": "IMPLEMENTED_DEVICE_ACCEPTANCE_PENDING",
+    "cloudflare_deploy": "NOT_PERFORMED"
   }
 }
