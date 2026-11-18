@@ -1,0 +1,62 @@
+// Might not render properly on some devices because of the very wacky spherical inversion
+// -15 by iq
+
+void mainImage(out vec4 O, vec2 I){
+    vec3 a, p;
+    float i, t, v;
+    for( O*=i; i++<40.;
+        // Iteration based color accumulation
+        O+=(1.+cos(i*.2+vec4(0,2,4,0)))/v)
+        // Raymarching
+        p=t*normalize(vec3(I+I,0) - iResolution.xyy),
+        // Move back camera
+        p.z+=.15,
+        // Rotate camera around center
+        p=dot(
+              a=normalize(cos(i*.003+iTime+vec3(6,3,0)))
+                                                        ,p)*a-cross(a,p),
+        // March forward & voxel effect
+        t+=.5*dot(
+                  p=ceil(1e3*p)/1e3
+                                   ,p)*(
+        // Triangle wave distortion & weird spherical inversion variant
+        // Density based on repeated sphere sdf
+        v=abs(length(mod(
+                         p+=asin(sin(
+                                     p/=dot(p,p.zxy)
+                                                    ))
+                                                      +2.,4.)-2.)-2.8)+.01);
+    O=tanh(O/7e2);
+}
+
+// Original [353]
+/*
+void mainImage(out vec4 O, vec2 I){
+    vec3 p, a, r = normalize(vec3(I+I,0) - iResolution.xyy);
+    float i, t, v, l;
+    for (O*=i;i++<40.; t+=.5*v*l*l){
+        // Raymarching
+        p=t*r;
+        // Move back camera
+        p.z+=.15; 
+        // Rotate camera around center
+        p=dot(
+              a=normalize(cos(i*.003+iTime+vec3(6,3,0)))
+                                                        ,p)*a-cross(a,p);
+        // Store length & voxel effect
+        l=length(
+                 p=ceil(1e3*p)/1e3
+                                  );
+        // Triangle wave distortion & weird spherical inversion variant
+        // Density based on repeated sphere sdf
+        v=abs(length(mod(
+                         p+=asin(sin(
+                                     p/=dot(p,p.zxy)
+                                                    ))
+                                                      -2.,4.)-2.)-2.8)+.01;
+        // Iteration based color accumulation
+        O+=(1.+cos(i*.2+vec4(0,2,4,0)))/v;
+    }
+    O=tanh(O/7e2);
+}
+*/

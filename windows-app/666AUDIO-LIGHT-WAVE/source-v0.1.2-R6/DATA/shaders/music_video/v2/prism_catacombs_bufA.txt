@@ -1,0 +1,253 @@
+// Prism Catacombs
+// Raymarched stone catacombs lit by rotating prism lamps; pytti-style vortex warps.
+// Violet/rainbow phase drifts into a teal/gold vortex phase and back (~90s cycle).
+//
+// AUDIO_REACTIVE 0 : runs standalone, no channels needed
+// AUDIO_REACTIVE 1 : set iChannel0 to a Music / SoundCloud / Mic input
+//   bass  -> caustic + light punch, fisheye zoom kick, vortex twist
+//   mids  -> spectrum hue rotation of the prism light
+//   highs -> sparkle on the neon dashes and gold bokeh
+#define AUDIO_REACTIVE 1
+
+#define P 9.0
+#define R 2.6
+#define BS 0.22
+
+float hash13(vec3 p){ p=fract(p*.1031); p+=dot(p,p.zyx+31.32); return fract((p.x+p.y)*p.z); }
+float hash12(vec2 p){ vec3 p3=fract(vec3(p.xyx)*.1031); p3+=dot(p3,p3.yzx+33.33); return fract((p3.x+p3.y)*p3.z); }
+mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+float sdBox(vec3 p, vec3 b){ vec3 q=abs(p)-b; return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.); }
+vec3 spectrum(float x){ return clamp(abs(mod(x*6.+vec3(0,4,2),6.)-3.)-1.,0.,1.); }
+float noise3(vec3 p){
+    vec3 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+    return mix(mix(mix(hash13(i),hash13(i+vec3(1,0,0)),f.x),mix(hash13(i+vec3(0,1,0)),hash13(i+vec3(1,1,0)),f.x),f.y),
+               mix(mix(hash13(i+vec3(0,0,1)),hash13(i+vec3(1,0,1)),f.x),mix(hash13(i+vec3(0,1,1)),hash13(i+vec3(1,1,1)),f.x),f.y),f.z);
+}
+
+vec3 gRd; float gPhase; float gBid;
+float gBass, gMid, gHigh;
+
+void readAudio(){
+#if AUDIO_REACTIVE
+    float b=0., m=0., h=0.;
+    for(int i=0;i<8;i++){
+        float fi=float(i);
+        b += texture(iChannel3, vec2((2.+fi*2.)/512., .25)).x;
+        m += texture(iChannel3, vec2((50.+fi*14.)/512., .25)).x;
+        h += texture(iChannel3, vec2((220.+fi*28.)/512., .25)).x;
+    }
+    gBass = smoothstep(.35,.95,b/8.); gMid = m/8.; gHigh = smoothstep(.1,.6,h/8.);
+#else
+    gBass = 0.; gMid = 0.; gHigh = 0.;
+#endif
+}
+vec2 path(float z){ return vec2(sin(z*.21)*1.7 + sin(z*.073)*2.5, sin(z*.13)*.9); }
+vec3 warp(vec3 p){ p.xy -= path(p.z); return p; }
+
+// brick relief: returns height 0..1-ish, sets gBid
+float masonry(vec2 uv, vec2 sz){
+    uv /= sz;
+    float row = floor(uv.y);
+    uv.x += row*.5;
+    vec2 id = floor(uv); vec2 f = fract(uv)-.5;
+    float h = hash12(id+row*7.);
+    vec2 b = (.5-abs(f))*sz;
+    float m = min(b.x,b.y);
+    gBid = h;
+    float pr = smoothstep(.0,.11,m-.012); return pr*(2.-pr) * (.6+.4*h);
+}
+
+float arch(vec3 q, float r, float axisCoord, vec2 sz){
+    // q.xy cross section, axisCoord along tunnel
+    float rr = length(q.xy);
+    float ang = atan(q.x, q.y);
+    float bw = masonry(vec2(ang*r, axisCoord), sz);
+    float rc = abs(mod(axisCoord, 3.2)-1.6);
+    float rib = smoothstep(.42,.22, rc);
+    float wall = rr - r + bw*.11 + rib*.2;
+    float fl = -(q.y + r*.62);
+    float bf = masonry(vec2(q.x*1.3, axisCoord), sz*vec2(1.,1.));
+    fl += bf*.07;
+    return max(wall, fl);
+}
+
+float emptySpace(vec3 p){
+    vec3 q = mod(p+P*.5, P)-P*.5;
+    float e = arch(q, R, p.z, vec2(.42,.26));
+    e = min(e, arch(vec3(q.z,q.y,q.x), R*.9, p.x, vec2(.42,.26)));
+    float sh = length(q.xz)-R*.45;
+    sh += masonry(vec2(atan(q.x,q.z)*R*.45, p.y), vec2(.4,.25))*.09;
+    e = min(e, sh);
+    float s = P/3.;
+    vec3 q2 = mod(p+s*.5, s)-s*.5;
+    float e2 = min(max(length(q2.xy)-s*.22, -(q2.y+s*.14)), max(length(q2.zy)-s*.22, -(q2.y+s*.14)));
+    e = min(e, max(e2, -e - 1.2));
+    return e;
+}
+
+vec2 map(vec3 p){
+    p = warp(p);
+    float e = emptySpace(p);
+    float bid = gBid;
+    vec2 res = vec2(-e, bid*.99);
+    if (abs(e) < BS*2.){
+        vec3 id = floor(p/BS); vec3 c = (id+.5)*BS;
+        float h = hash13(id);
+        float clus = noise3(c*.7);
+        if (clus > .55){
+            float ec = emptySpace(c);
+            if (ec > -BS*(.3+1.2*h)*(clus-.4)*3. && ec < BS*.5){
+                float sz = BS*(.28+.17*h);
+                float db = sdBox(p-c, vec3(sz))-BS*.05;
+                if (db < res.x) res = vec2(db, 2.+h);
+            }
+            vec3 ex = (c + sign(gRd)*BS*.5 - p)/gRd;
+            float tb = min(ex.x, min(ex.y, ex.z)) + .005;
+            res.x = min(res.x, max(tb, .005));
+        }
+    }
+    vec3 q = mod(p+P*.5, P)-P*.5;
+    float dp = length(vec2(q.x-1.9, q.y-1.05))-.1;
+    if (dp < res.x) res = vec2(dp, -1.);
+    return res;
+}
+
+vec3 calcNormal(vec3 p){
+    vec2 e = vec2(.0015,-.0015);
+    return normalize(e.xyy*map(p+e.xyy).x + e.yyx*map(p+e.yyx).x + e.yxy*map(p+e.yxy).x + e.xxx*map(p+e.xxx).x);
+}
+float calcAO(vec3 p, vec3 n){
+    float o=0., w=1.;
+    for(int i=1;i<=5;i++){ float h=.03+.12*float(i); o+=(h-map(p+n*h).x)*w; w*=.75; }
+    return clamp(1.-o*1.3,0.,1.);
+}
+
+
+// projected light from the "prism lamp" at each tunnel junction
+// returns rainbow caustics (rgb) ; gold bokeh written to gGold
+vec3 gGold;
+vec3 prism(vec3 p, float t){
+    vec3 node = floor(p/P+.5)*P + vec3(0,.4,0);
+    vec3 d = p-node; float dist = length(d); vec3 dir = d/dist;
+    float h = hash13(node+.7);
+    dir.xz *= rot(t*.12 + h*6.28);
+    dir.yz *= rot(h*3.+t*.05);
+    float az = atan(dir.z,dir.x), el = asin(clamp(dir.y,-1.,1.));
+    vec3 col = vec3(0);
+    for(int k=0;k<2;k++){
+        float fk=float(k);
+        vec2 g = vec2(az*(3.+3.*fk), el*(6.+5.*fk)) + fk*.37;
+        vec2 cid = floor(g); vec2 f = fract(g)-.5;
+        float ch = hash13(vec3(cid, h*17.+fk));
+        f *= rot(ch*6.28);
+        float len = .2+.28*fract(ch*7.1), wid = .045+.05*fract(ch*13.3);
+        float dash = smoothstep(len, len*.5, abs(f.x)) * smoothstep(wid, wid*.3, abs(f.y));
+        vec3 dc = mix(spectrum(fract(ch*3.7 + f.x*.7)+gMid*.6), spectrum(f.y/wid*.5+.5+gMid*.6), .5);
+        float halo = smoothstep(len*1.6, 0., abs(f.x)) * smoothstep(wid*4., 0., abs(f.y));
+        float spark = 1. + gHigh*2.5*step(.6, fract(ch*9.7 + floor(t*8.)*.618));
+        col += (dash*4. + halo*.5) * dc * step(.3, fract(ch*5.3)) * spark;
+    }
+    for(int i=0;i<6;i++){
+        float fi = float(i);
+        vec3 ax = normalize(vec3(hash13(node+fi), hash13(node+fi+3.1), hash13(node+fi+7.7))-.5);
+        float th = acos(clamp(dot(dir,ax),-1.,1.));
+        float th0 = .3 + 2.4*hash13(node+fi*9.1);
+        float w = .06+.05*hash13(node+fi*2.3);
+        float x = (th-th0)/w;
+        vec3 ref = normalize(cross(ax, vec3(.3,1,.1)));
+        float phi = atan(dot(dir, cross(ax,ref)), dot(dir,ref));
+        float seg = smoothstep(-.3,.6, sin(phi*(1.+fi)+fi*2.+t*.25));
+        col += spectrum(clamp(x*.5+.5,0.,1.)+gMid*.6) * smoothstep(1.,.4,abs(x)) * seg * 2.2;
+    }
+    // gold bokeh in spiral arms
+    vec3 gold = vec3(0);
+    for(int k=0;k<2;k++){
+        float fk=float(k);
+        vec2 g = vec2(az*(6.+4.*fk), el*(11.+6.*fk)) + fk*.5;
+        vec2 cid = floor(g); vec2 f = fract(g)-.5;
+        float ch = hash13(vec3(cid, h*31.+fk));
+        vec2 o = (vec2(fract(ch*11.3), fract(ch*23.7))-.5)*.5;
+        float r = length(f-o);
+        float arm = smoothstep(.1,.9, sin(az*3. + el*7. - log(dist+.5)*4. + t*.4 + fk));
+        float on = step(.45, ch) * arm;
+        gold += on * (exp(-r*r*60.)*2.5 + exp(-r*r*8.)*.35) * mix(vec3(1.,.85,.35), vec3(1.,.45,.1), fract(ch*5.));
+    }
+    gGold = gold * (1.+gHigh*1.5) / (1.+dist*.06);
+    return col * (1.+gBass*1.6) / (1. + dist*.07);
+}
+
+vec2 swirl(vec2 uv, vec2 c, float a, float k){
+    vec2 d = uv-c; float r2 = dot(d,d);
+    return c + d*rot(a*exp(-r2*k));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = (fragCoord - .5*iResolution.xy)/iResolution.y;
+    float t = iTime;
+    gPhase = smoothstep(.55,.85, .5-.5*cos(t*.07));
+    readAudio();
+
+    // pytti-style vortex warps of the view
+    float sw = mix(.7, 2.4, gPhase) + gBass*.9;
+    vec2 c1 = vec2(sin(t*.31), cos(t*.23))*vec2(.55,.3);
+    vec2 c2 = vec2(cos(t*.19+2.), sin(t*.27+1.))*vec2(.6,.3);
+    uv = swirl(uv, c1, sw*sin(t*.21), 9.);
+    uv = swirl(uv, c2, -sw*cos(t*.17), 12.);
+
+    float z = t*1.4;
+    vec3 ro = vec3(path(z) + vec2(sin(t*.23)*.4, -.3+sin(t*.31)*.25), z);
+    vec3 fw = normalize(vec3(path(z+2.)-path(z), 2.) + vec3(sin(t*.13)*1.1+sin(t*.041)*.6, sin(t*.17)*.45, 0));
+    vec3 rt = normalize(cross(vec3(0,1,0), fw)); vec3 up = cross(fw, rt);
+    float roll = sin(t*.11)*1.3 + sin(t*.05)*1.5;
+    uv *= rot(roll);
+    float r2 = dot(uv,uv);
+    vec2 fu = uv*(1.+.4*r2)*(1.-.14*gBass);
+    vec3 rd = normalize(fu.x*rt + fu.y*up + .7*fw);
+    gRd = rd;
+
+    float tt = .05; vec2 h = vec2(1); bool hit=false;
+    for(int i=0;i<200;i++){
+        h = map(ro+rd*tt);
+        if(abs(h.x) < .0008*tt){ hit=true; break; }
+        tt += h.x*.85;
+        if(tt>60.) break;
+    }
+    vec3 base = mix(vec3(.68,.64,.8), vec3(.42,.6,.62), gPhase);
+    vec3 fogC = mix(vec3(.85,.55,.95), vec3(.45,.75,.8), gPhase);
+    vec3 col = fogC;
+    if(hit){
+        vec3 p = ro+rd*tt; vec3 n = calcNormal(p);
+        vec3 wp = warp(p);
+        float ao = calcAO(p,n); ao = ao*ao;
+        vec3 node = floor(wp/P+.5)*P + vec3(0,.4,0);
+        vec3 L = normalize(node-wp);
+        float dif = max(dot(n,L),0.);
+        float head = max(dot(n,-rd),0.);
+        float hemi = .5+.5*n.y;
+        float bid = fract(h.y);
+        float grain = noise3(wp*9.)*.6+noise3(wp*23.)*.4;
+        vec3 alb = base * (.55+.45*bid) * (.75+.5*grain) * mix(vec3(1), vec3(1.15,.85,.75), step(.8,bid)*(1.-gPhase));
+        if(h.y >= 2.) alb = mix(base, vec3(1.), .55);
+        vec3 lin = mix(vec3(.2,.14,.34), vec3(.1,.22,.26), gPhase)*(.5+.5*hemi)
+                 + mix(vec3(.9,.82,1.), vec3(.8,1.,.9), gPhase)*dif*(.7+.6*gBass) + .2*head;
+        col = alb*lin*ao;
+        vec3 pc = prism(wp, t);
+        col += pc * (.5+.5*dif) * (.3+.7*ao) * (1.-gPhase*.65) * (.6+.6*alb.r);
+        col += gGold * (.4+.6*ao) * gPhase * 1.8;
+        if(h.y < -.5){
+            vec3 rf = reflect(rd,n);
+            vec3 env = mix(vec3(.1,.06,.16), vec3(1.), pow(max(rf.y*.5+.5,0.),2.));
+            env += spectrum(fract(rf.x*1.5+rf.z+t*.05))*.8*smoothstep(.2,.8,abs(rf.y));
+            float fr = pow(1.-max(dot(-rd,n),0.),3.);
+            col = env*(.6+.4*fr)*(.5+.5*ao) + pow(max(dot(rf,L),0.),30.)*2.;
+        }
+        col = mix(col, fogC, 1.-exp(-tt*.03));
+    }
+    col = max(col, 0.);
+    col = pow(col, vec3(.9));
+    float l = dot(col, vec3(.299,.587,.114));
+    col = mix(vec3(l), col, 1.2);
+    col *= .85;
+    col *= 1.-.15*r2;
+    fragColor = vec4(clamp(col,0.,1.),1.);
+}

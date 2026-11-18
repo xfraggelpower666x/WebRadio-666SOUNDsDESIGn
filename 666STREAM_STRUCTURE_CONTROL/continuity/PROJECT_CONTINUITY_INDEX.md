@@ -15,3 +15,9 @@ GOVEE_CONTROL=KEEP_REACHABLE|SEPARATE_FROM_LIGHT_ORCHESTRA|CHECKPOINT_PARTIAL
 INTRO_V1_10=KEEP_REACHABLE|FROZEN_AUDIT_PASS
 INTRO_V1_5=KEEP_REACHABLE|REUSABLE_TEMPLATE
 INTRO remains a compatible parent selector for these two separate variants, not a merge target. An explicit version selects its own current/return anchor. The Govee Controller uses projects/666-GOVEE-CONTROL/ and must not inherit LIGHT_ORCHESTRA's unverified child route. No cross-chat project autoactivation.
+
+## 666AUDIO LIGHT WAVE
+
+AUDIO_LIGHT_WAVE=KEEP_REACHABLE|WINDOWS_HOST_READBACK_PENDING
+
+Eigenständiges Windows-Studio mit Einstieg unter `windows-app/666AUDIO-LIGHT-WAVE/README.md`. Die explizite Projektauswahl bindet die aktuelle Chat-Sitzung.

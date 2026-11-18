@@ -1,0 +1,41 @@
+void mainImage(out vec4 O, vec2 F) {
+    vec2 u = (F * 3. - iResolution.xy) / iResolution.y;
+    
+    float t = iTime * .25;
+    vec3 p = vec3(
+        sin(t) * 7. + cos(t * .5) * 2.,
+        -5. + sin(t * 1.5) * 3.,
+        cos(t * .8) * 7. + sin(t * .3) * 2.
+    );
+    vec3 f = normalize(vec3(0., -1., 0.) - p),
+         r = normalize(cross(f, vec3(0., 1., 0.))),
+         v = normalize(u.x * r + u.y * normalize(cross(r, f)) + 1.2 * f);
+    
+    O = vec4(-.5);
+    
+    for (float i = 0.; i < 50.; i++) {
+        float l = length(p);
+        
+        vec3 c = vec3(
+            fract((log(l) - iTime * .5) * .2) * 6.,
+            exp(-p.y / l * 1.1),
+            atan(p.z, p.x)
+        );
+        
+        float d = max(
+            c.y - .8
+            - abs(dot(sin(c.yzx * 2.), cos(c * 11.))) * .13
+            - abs(dot(sin(c.yzx * 160.), cos(c * 1120.))) * 125e-6,
+            0.
+        );
+        
+        O.rgb += min(.3 - O.rgb, d * 3.) 
+               * (.5 + .2 * cos(l * .5 + iTime * .3 + vec3(1., 3., 5.))) 
+               * .04;
+        
+        p += v * max(.05, d) * l * .2;
+    }
+    
+    O.rgb = O.rgb * O.rgb / (O.rgb * (O.rgb + .4) + .2);
+    O.a = 1.;
+}

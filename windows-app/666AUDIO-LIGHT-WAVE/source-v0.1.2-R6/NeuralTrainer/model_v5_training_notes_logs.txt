@@ -1,0 +1,144 @@
+2026-10-22: the model is named v5 and maybe its fitting because the initial version was
+trained about a year ago both locally and later on runpod with two variations and code mods
+that then ended up the model that was used about 6 months; and this latest trainer
+had three major iterations; the model was named after the v5_trainer but effectively
+was trained on v6_trainer; here are some logs that will be updated as it progresses;
+runnin locally here and there as it takes around 8-9 hours per epoch, whenever there
+is time and free slot to use the local machine to do so.
+
+#   Validation MSE Loss: 1.0866
+#   *** NEW BEST VAL LOSS: 1.0866 ***
+# Epoch 1 took 11568.1s
+# Epoch 1/100 | Train loss: 261.1968 | Val loss: 1.0866
+#   Checkpoint saved (epoch 1)
+#   >>> New best model saved (val loss 1.0866)
+
+#   Validation MSE Loss: 0.9836
+#   *** NEW BEST VAL LOSS: 0.9836 ***
+# Epoch 2 took 11812.3s
+# Epoch 2/100 | Train loss: 0.9957 | Val loss: 0.9836
+#   Checkpoint saved (epoch 2)
+#   >>> New best model saved (val loss 0.9836)
+
+#   Validation MSE Loss: 1.0887
+# Epoch 3 took 11614.5s
+# Epoch 3/100 | Train loss: 172.9710 | Val loss: 1.0887
+#   Checkpoint saved (epoch 3)
+#   EarlyStopping counter: 1/10
+
+#   Validation MSE Loss: 1.0521
+# Epoch 4 took 11618.5s
+# Epoch 4/100 | Train loss: 80.1562 | Val loss: 1.0521
+#   Checkpoint saved (epoch 4)
+#   EarlyStopping counter: 2/10
+
+#   Validation MSE Loss: 1.0007
+#   *** NEW BEST VAL LOSS: 1.0007 ***
+# Epoch 5 took 30751.0s
+# Epoch 5/100 | Train loss: 56.5721 | Val loss: 1.0007
+
+#   Validation MSE Loss: 1.0074
+# Epoch 6 took 28605.3s
+# Epoch 6/100 | Train loss: 62.2195 | Val loss: 1.0074
+#   Checkpoint saved (epoch 6)
+#   EarlyStopping counter: 1/10
+
+#   Validation MSE Loss: 0.9902
+#   *** NEW BEST VAL LOSS: 0.9902 ***
+# Epoch 7 took 32879.4s
+# Epoch 7/100 | Train loss: 5.0900 | Val loss: 0.9902
+#   Checkpoint saved (epoch 7)
+#   >>> New best model saved (val loss 0.9902)
+
+#   Validation MSE Loss: 0.9836
+#   *** NEW BEST VAL LOSS: 0.9836 ***
+# Epoch 8 took 31336.7s
+# Epoch 8/100 | Train loss: 0.9859 | Val loss: 0.9836
+#   Checkpoint saved (epoch 8)
+#   >>> New best model saved (val loss 0.9836)
+
+#   Validation MSE Loss: 0.9835
+#   *** NEW BEST VAL LOSS: 0.9835 ***
+# Epoch 9 took 27857.6s
+# Epoch 9/100 | Train loss: 0.9840 | Val loss: 0.9835
+#   Checkpoint saved (epoch 9)
+#   >>> New best model saved (val loss 0.9835)
+
+#   Validation MSE Loss: 0.9833
+#   *** NEW BEST VAL LOSS: 0.9833 ***
+# Epoch 10 took 31165.6s
+# Epoch 10/100 | Train loss: 0.9837 | Val loss: 0.9833
+#   Checkpoint saved (epoch 10)
+#   >>> New best model saved (val loss 0.9833)
+
+#   Validation MSE Loss: 0.9831
+#   *** NEW BEST VAL LOSS: 0.9831 ***
+# Epoch 11 took 30068.9s
+# Epoch 11/100 | Train loss: 0.9836 | Val loss: 0.9831
+#   Checkpoint saved (epoch 11)
+#   >>> New best model saved (val loss 0.9831)
+
+#   Validation MSE Loss: 0.9824
+#   *** NEW BEST VAL LOSS: 0.9824 ***
+# Epoch 12 took 37667.7s
+# Epoch 12/100 | Train loss: 0.9830 | Val loss: 0.9824 | LR: 2.894665e-04
+#   Checkpoint saved (epoch 12)
+#   >>> New best model saved (val loss 0.9824)
+
+#   Validation MSE Loss: 0.9799
+#   *** NEW BEST VAL LOSS: 0.9799 ***
+# Epoch 13 took 27356.6s
+# Epoch 13/100 | Train loss: 0.9823 | Val loss: 0.9799 | LR: 2.876632e-04
+#   Checkpoint saved (epoch 13)
+#   >>> New best model saved (val loss 0.9799)
+
+#   Validation MSE Loss: 0.9605
+#   *** NEW BEST VAL LOSS: 0.9605 ***
+# Epoch 14 took 27428.5s
+# Epoch 14/100 | Train loss: 0.9774 | Val loss: 0.9605 | LR: 2.857241e-04
+#   Checkpoint saved (epoch 14)
+#  >>> New best model saved (val loss 0.9605)
+
+#   Validation MSE Loss: 0.8942
+#   *** NEW BEST VAL LOSS: 0.8942 ***
+# Epoch 15 took 27584.6s
+# Epoch 15/100 | Train loss: 0.9523 | Val loss: 0.8942 | LR: 2.836510e-04
+#   Checkpoint saved (epoch 15)
+#   >>> New best model saved (val loss 0.8942)
+
+#   Validation MSE Loss: 0.8033
+#   *** NEW BEST VAL LOSS: 0.8033 ***
+# Epoch 16 took 27541.7s
+# Epoch 16/100 | Train loss: 0.8938 | Val loss: 0.8033 | LR: 2.814460e-04
+#   Checkpoint saved (epoch 16)
+#   >>> New best model saved (val loss 0.8033)
+
+#   Validation MSE Loss: 0.7285
+#   *** NEW BEST VAL LOSS: 0.7285 ***
+# Epoch 17 took 27687.8s
+# Epoch 17/100 | Train loss: 0.8348 | Val loss: 0.7285 | LR: 2.791113e-04
+#   Checkpoint saved (epoch 17)
+#   >>> New best model saved (val loss 0.7285)
+
+____
+
+
+
+Notice anything weird? In Epoch 2, you achieved a best Val Loss of 0.9836. So why did the script celebrate 1.0007 as a "NEW BEST"?
+Because between Epoch 4 and 5, you switched hardware from the RTX 5080 to the RTX 3060. While the model weights loaded successfully, your Python script's internal variable (usually something like best_val_loss = float('inf')) reset to infinity when you restarted the script.
+To fix this in your training script for the future: Make sure you save and load best_val_loss into your .pth dictionary!
+code
+Python
+# When saving:
+torch.save({
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'best_val_loss': best_val_loss, # <-- Save this
+    ...
+}, 'checkpoint.pth')
+
+# When loading:
+checkpoint = torch.load('checkpoint.pth')
+best_val_loss = checkpoint.get('best_val_loss', float('inf')) # <-- Load this
+
+

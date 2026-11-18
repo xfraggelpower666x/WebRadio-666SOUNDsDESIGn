@@ -1,0 +1,42 @@
+/*
+    "Nucleus" by @XorDev
+
+    https://x.com/XorDev/status/1948016291413217752
+    
+    <512 playlist:
+    https://www.shadertoy.com/playlist/N3SyzR
+*/
+void mainImage(out vec4 O, vec2 I)
+{
+    //Animation time
+    float t = iTime,
+    //Raymarch depth
+    z,
+    //Step distance
+    d,
+    //Raymarch iterator
+    i;
+    
+    
+    //Clear fragColor and raymarch 100 steps
+    for(O*=i; i++<1e2;
+        //Coloring and brightness
+        O+=vec4(3,8,z,0)/d/9e4)
+    {
+        //Sample point (from ray direction)
+        vec3 p = z*normalize(vec3(I+I,0)-iResolution.xyy),
+        //Rotation axis
+        a = normalize(cos(vec3(4,2,0)+t-d/.1));
+        //Move camera back 8 units
+        p.z+=8.,
+        //Rotated coordinates
+        a = a*dot(a,p)-cross(a,p);
+        
+        //Turbulence loop
+        for(d=1.;d++<5.;)
+            a+=sin(a*d+t).yzx/d;
+        
+        //Distance to hollow sphere
+        z+=d=abs(length(a)-5.)/6.;
+    }
+}

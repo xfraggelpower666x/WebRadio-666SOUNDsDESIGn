@@ -1,0 +1,101 @@
+// Генераторы шума
+float hash(float f){
+    return 1.*(fract(sin(f*.2436245226)));
+}
+vec2 hash2(vec2 n){
+    return vec2(fract(sin(0.565123289*n.x))*2.- 1.,fract(sin(0.56142852*n.y)- 2.));
+}
+vec3 hash3(vec3 p){
+    return vec3(fract(sin(cos(p.x*2.64579))),fract(sin(cos(p.y*9.51235))),fract(sin(cos(p.z*1.51246))));
+}
+
+// 3D Матрицы поворота вокруг осей
+mat3 rotX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+mat3 rotY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+// Перевод макроса M_macro в 3D
+#define M_macro3D(p) { \
+    p = abs(p) - 0.5; \
+    p *= rotX(0.785) * rotY(0.785); \
+    p = abs(p) - 0.2; \
+ }
+
+// 3D функция света
+float light3D(vec3 p, float fade){
+    return fade * 0.05 / (abs(p.x) * abs(p.y) * abs(p.z) + 0.0001);
+}
+float happy_star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+ 
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord * 2.0 - iResolution.xy) / min(iResolution.x, iResolution.y);
+    uv*=dot(uv,uv)*10.;
+    vec3 ro = vec3(0.0, 0.0, -3.5); 
+    vec3 rd = normalize(vec3(uv, 0.320)); 
+    
+    // АВТОМАТИЧЕСКОЕ ВРАЩЕНИЕ (вместо iMouse)
+    // iTime * 0.4 дает плавное круговое вращение по оси Y
+    // sin(iTime * 0.25) * 0.8 дает плавное покачивание вверх/вниз по оси X
+    mat3 camRot = rotY(iTime * 0.4) * rotX(sin(iTime * 0.25) * 0.8);
+    ro *= camRot;
+    rd *= camRot;
+    
+    vec3 result = vec3(0.0);
+    
+    // НАСТРОЙКА СКОРОСТИ ВСПЫШЕК (Замедлено примерно в 3 раза)
+    float interval = 0.03; // Было 0.01 — увеличили интервал появления
+    float lifetime = 0.30; // Было 0.10 — увеличили время жизни вспышки, они гаснут медленнее
+    int maxSteps = int(floor(lifetime / interval));
+    
+    // Проход Raymarching
+    float t = 0.0; 
+    for(int step = 0; step < 30; step++) {
+        vec3 p = ro + rd * t; 
+        
+        M_macro3D(p);
+        M_macro3D(p);
+        
+        p *= 2.5; 
+        p.y += 1.5; 
+        
+        vec3 stepColor = vec3(0.0);
+        for(int i = 0; i < maxSteps; i++){
+            float seed = floor(iTime / interval) - float(i);
+            float birth = seed * interval;
+            float age = iTime - birth;
+            
+            if(age >= lifetime) break;
+            
+            vec3 lp = p;
+            M_macro3D(lp);
+            
+            vec3 flashPos = (hash3(vec3(seed)) - 0.5) * 2.0; 
+            
+            // Плавное затухание с измененным коэффициентом скорости
+            stepColor += light3D(lp - flashPos, lifetime - age) * hash3(vec3(seed + 42.0));
+        }
+        
+        result += stepColor * 0.04;
+        t += 0.1;
+    }
+    
+    result = pow(result, vec3(0.8)); 
+    fragColor = vec4(result*0.12, 1.0);
+    vec2 uv3 = ( fragCoord - .5*iResolution.xy ) / iResolution.y;
+    uv3 *= 2.0 * ( cos(iTime * 2.0) -2.5); // scale
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  // anim between 0.9 - 1.1 
+    fragColor+= vec4(happy_star(uv3, anim) * vec3(0.5,0.5,0.5)*0.2, 1.0);
+
+}

@@ -1,0 +1,22 @@
+# conda create -n llm-trainer python=3.9.12
+# conda activate llm-trainer
+# conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
+# python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+
+
+
+def Log_Neural_Indices_JSON(filepath):
+    log_file = "LOG_neural_indices_JSON.txt"
+    with open(log_file, "a", encoding="utf-8") as f:
+        f.write(f"{filepath}\n")
+
+
+
+
+        max_start_index = max(0, len(video_filenames_left) - 200)
+        start_index = random.randint(0, max_start_index)
+        video_filenames_left = video_filenames_left[start_index : start_index + 200]
+
+        max_start_index = max(0, len(video_filenames_right) - 200)
+        start_index = random.randint(0, max_start_index)
+        video_filenames_right = video_filenames_right[start_index : start_index + 200]

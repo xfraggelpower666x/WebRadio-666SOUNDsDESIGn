@@ -1,0 +1,80 @@
+// strict ribbons variant of https://shadertoy.com/view/fdXSz2
+// video-controled line width variant of https://shadertoy.com/view/NdXXRj
+// interpolated variant of https://shadertoy.com/view/sdsXzB
+
+#define hash(p )     ( 2.* fract(sin((p)*mat2(127.1,311.7, 269.5,183.3)) *43758.5453123) - 1. ) \
+                    *  mat2(cos(iTime+vec4(0,11,33,0)))
+#define draw(v,d,w)  clamp(1. - ( abs( fract(v-.5) - .5 ) -.1*(w-1.) ) / (d), 0.,1.)
+#define hue(v)       ( .6 + .6 * cos( 6.3*(v)  + vec4(0,23,21,0)  ) )
+#define Mix(c0,c1,v)     mix(c0,c1,v)
+
+// Automatically toggle between perlin and standard noise over time instead of using keyboard
+#define func( P )  ( mod(iTime,4.) > 2. ? perlin( .5*(P) ) : noise( P ) )
+#define grad(x,y)      dot( hash( i+vec2(x,y) ), f-vec2(x,y) )
+
+float noise( vec2 p )
+{
+    vec2 i = floor(p), f = fract(p), 
+                       u = f*f*f*( 10. +f*(6.*f-15.)); // better with derivatives
+    return mix( mix( grad(0,0), grad(1,0), u.x),
+                mix( grad(0,1), grad(1,1), u.x), u.y);
+}
+
+float perlin( vec2 U ) { // inspired from https://www.shadertoy.com/view/XdXGW8
+    float v = 0., s = .5;
+    mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+    for( int i=0; i<3; i++, s/=2., U*=m )
+        v  += s * noise( U ); 
+    return v;
+}
+
+void mainImage( out vec4 O, vec2 u )
+{
+    vec2 R = iResolution.xy;
+    
+    // Normalized coordinates (0.0 to 1.0)
+    vec2 U_uv = u / R; 
+    
+    // 1. Calculate diagonal separation distance
+    // U_uv.x == U_uv.y forms a diagonal line from bottom-left to top-right.
+    // We scale by R.y so the line thickness remains a constant amount of pixels.
+    float diagDist = abs(U_uv.x - U_uv.y) * R.y;
+    
+    // 2. Sample the original video frame
+    vec4 T = texture(iChannel0, U_uv);
+    
+    // 3. Compute the flownoise effect for the screen
+    // (We do this unconditionally to avoid fwidth derivative artifacts)
+    vec2 P = 4.*u/360. - vec2(0., .5*iTime);	
+    
+    float l, dl, f = func(P), df, v;
+    
+    l = exp2(floor(log2(.5/22./fwidth(f))));     // subvid amount (absolute)
+    dl = fract(log2(.5/22./fwidth(f)));
+
+    df = fwidth(f);
+    l *= 12.;
+    v = 4.*T.x*T.x + .1;
+    
+    vec4 flownoiseColor = vec4(0.0);
+    // AA: replace too thin ribbons by intensity
+    flownoiseColor += Mix( draw(    f*l,    l*df , max(v,1.) ),
+                           draw( 2.*f*l, 2.*l*df , max(v,1.) ),
+                           dl ) * min(v,1.);
+                           
+    flownoiseColor = sqrt(flownoiseColor);       // to sRGB
+    
+    // 4. Output Selection based on diagonal split
+    if ( diagDist < 1.5 ) {
+        // Draw white diagonal separator (approx 3 pixels thick total)
+        O = vec4(1.0, 1.0, 1.0, 1.0);
+    } 
+    else if ( U_uv.x > U_uv.y ) {
+        // Bottom-Right half: Show original video unchanged
+        O = T;
+    } 
+    else {
+        // Top-Left half: Show flownoise applied video
+        O = flownoiseColor;
+    }
+}

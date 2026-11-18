@@ -1,0 +1,178 @@
+//////////////////////////////////////////////////////////////////////////////////
+// Magic Carpet - Copyright 2017 Frank Force
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+//////////////////////////////////////////////////////////////////////////////////
+
+const float zoomSpeed			= 0.5;	// how fast to zoom (negative to zoom out)
+const float zoomScale			= 0.1;	// how much to multiply overall zoom (closer to zero zooms in)
+const int recursionCount		= 5;	// how deep to recurse
+const int glyphSize				= 5;	// width & height of glyph in pixels
+const float curvature			= 2.0;	// time warp to add curvature
+
+//////////////////////////////////////////////////////////////////////////////////
+// Precached values and math
+
+const float glyphSizeF = float(glyphSize);
+const float glyphSizeLog = log(glyphSizeF);
+
+const float e = 2.718281828459;
+const float pi = 3.14159265359;
+float RandFloat(int i) { return (fract(sin(float(i)) * 43758.5453)); }
+int RandInt(int i) { return int(100000.0*RandFloat(i)); }
+
+vec3 HsvToRgb(vec3 c) 
+{
+    float s = c.y * c.z;
+    float s_n = c.z - s * .5;
+    return vec3(s_n) + vec3(s) * cos(2.0 * pi * (c.x + vec3(1.0, 0.6666, .3333)));
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// Color and image manipulation
+
+float GetRecursionFade(int r, float timePercent)
+{
+    if (r > recursionCount)
+        return timePercent;
+    
+    // fade in and out recusion
+    float rt = max(float(r) - timePercent, 0.0);
+    float rc = float(recursionCount);
+    return rt / rc;
+}
+
+vec3 InitPixelColor() { return vec3(0); }
+vec3 CombinePixelColor(vec3 color, float timePercent, int i, int r, vec2 pos, ivec2 glyphPos, ivec2 glyphPosLast)
+{
+    int ir =  (i+r);
+    ir += (glyphPos.y + 2*glyphPosLast.y);
+    ir += (glyphPos.x + 2*glyphPosLast.x);
+
+    vec3 myColor = vec3
+    (
+    	mix(-0.7, 0.7, RandFloat(ir)),
+    	mix(0.0, 0.8, RandFloat(ir + 10)),
+        mix(0.0, 0.8, RandFloat(ir + 20))
+    );
+    
+    float f = GetRecursionFade(r, timePercent);
+    
+    // make round
+    if (length(2.0*(pos - vec2(0.5))) > 1.0)
+        f = 0.0;
+    
+    myColor.x = pow(myColor.x, 2.0);
+    myColor.y = pow(myColor.y, 3.0);
+    myColor.z = pow(myColor.z, 3.0);
+    color += myColor*f;
+    return color;
+}
+
+vec3 FinishPixel(vec3 color, vec2 uv)
+{
+    // color wander
+    color.x += 0.01*iTime;
+    
+    // convert to rgb
+    color = HsvToRgb(color);
+    return color;
+}
+
+vec2 InitUV(vec2 uv)
+{
+    
+    float theta = pi*3.0/4.0;
+	float c = cos(theta);
+	float s = sin(theta);
+	uv = vec2((uv.x*c - uv.y*s), (uv.x*s + uv.y*c));
+    
+	//// wave
+	//uv.x += 0.01*sin(10.0*uv.y + 0.053*iTime);
+	//uv.y += 0.01*sin(10.0*uv.x + 0.033*iTime);
+	//uv.x += 0.03*sin(2.0*uv.y + 0.113*iTime);
+	//uv.y += 0.03*sin(2.0*uv.x + 0.073*iTime);
+    
+    uv = abs(uv);
+    
+    return uv;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// Fractal functions
+
+ivec2 GetFocusPos(int i) { return ivec2(glyphSize/2); }
+      
+// get color of pos, where pos is 0-1 point in the glyph
+vec3 GetPixelFractal(vec2 pos, int iterations, float timePercent)
+{
+	ivec2 glyphPosLast = GetFocusPos(-2);
+	ivec2 glyphPos =     GetFocusPos(-1);
+	vec3 color = InitPixelColor();
+    
+	for (int r = 0; r <= recursionCount + 1; ++r)
+	{
+        color = CombinePixelColor(color, timePercent, iterations, r, pos, glyphPos, glyphPosLast);
+        if (r > recursionCount)
+			return color;
+           
+        // update pos
+        pos *= glyphSizeF;
+
+        // get glyph and pos within that glyph
+        glyphPosLast = glyphPos;
+        glyphPos = ivec2(pos);
+        
+        // next glyph
+		pos -= vec2(floor(pos));
+	}
+}
+ 
+//////////////////////////////////////////////////////////////////////////////////
+
+	
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    
+	// use square aspect ratio
+	vec2 uv = fragCoord;
+	uv = fragCoord / iResolution.y;
+	uv -= vec2(0.5*iResolution.x / iResolution.y, 0.5);
+    uv = InitUV(uv);
+    
+    vec4 tweak = vec4(505, 205, 640, 164);	// preset
+    //vec4 tweak = iMouse; // mouse control
+    tweak -= vec4(320, 180, 320, 180);
+    tweak /= vec4(320, 180, 320, 180);
+    
+    // time warp
+    float time = iTime*zoomSpeed ;
+    time += curvature*(tweak.x)*(pow(2.0 - length(uv), (1.0*tweak.z)));
+    
+	// get time 
+	float timePercent = time ;
+	int iterations =int(floor(timePercent));
+	timePercent -= float(iterations);
+	
+	// update zoom, apply pow to make rate constant
+	float zoom = pow(e, -glyphSizeLog*timePercent);
+    
+    // apply pow to the time by distance from center to make it fade
+    zoom *= zoomScale;
+	zoom *= (2.0*tweak.y)*pow(length(uv), 5.0*tweak.w);
+ 
+	// get offset
+	vec2 offset = vec2(0);
+    const float gsfi = 1.0 / glyphSizeF;
+	for (int i = 0; i < 13; ++i)
+		offset += (vec2(GetFocusPos(i)) * gsfi) * pow(gsfi,float(i));
+    
+	// apply zoom & offset
+    vec2 uvFractal = uv * zoom + offset;
+	
+	// check pixel recursion depth
+	vec3 pixelFractalColor = GetPixelFractal(uvFractal, iterations, timePercent);
+    pixelFractalColor = FinishPixel(pixelFractalColor, uv);
+    
+	// apply final color
+	fragColor = vec4(pixelFractalColor, 1.0);
+}

@@ -1,0 +1,103 @@
+precision lowp float;
+#define numOfPoints 50
+#define seed (653165)
+#define PointDist 0.4
+#define Thickness 0.003
+#define RandomPoints 1000
+
+vec2 posCache[numOfPoints];
+vec2 points[numOfPoints];
+vec3 colors[numOfPoints];
+
+float ConvertToFloat(uint n)
+{
+    uint ieeeMantissa = 0x007FFFFFu; // binary32 mantissa bitmask
+    uint ieeeOne = 0x3F800000u;      // 1.0 in IEEE binary32
+
+    n &= ieeeMantissa;
+    n |= ieeeOne;
+
+    float f = uintBitsToFloat(n);
+    return f - 1.0;
+}
+//pcg_hash https://stackoverflow.com/questions/70985360/how-to-create-a-3d-random-gradient-out-of-3-passed-values-in-a-fragment-shader
+//minor change to add a seed value
+float rand(uint i) {
+    uint state = i + (i * 747796405u + 2891336453u) ^ uint(seed);
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return ConvertToFloat((word >> 22u) ^ word);
+}
+
+float rand(float i) { return rand(floatBitsToUint(i)); }
+
+vec3 hash23(vec2 src) {
+    vec3 randV = vec3(rand(src.x), rand(src.y), rand(src.x * src.y + src.x + src.y + 8912.2793));
+    randV += dot(randV, randV+vec3(3799.6274,9567.3518,8575.2724));
+    
+    return fract(randV);
+}
+vec2 hash32(vec3 src) {
+    vec2 randV = vec2(rand(src.x), rand(src.y));
+    randV *= dot(randV, vec2(8183.0119, src.z));
+    
+    return fract(randV);
+}
+vec2 hash12(float i) {
+    vec2 randV = vec2(rand(i), rand(i + 6939.9375));
+    randV *= dot(randV, vec2(8183.0119,4912.9833));
+    
+    return fract(randV);
+}
+vec2 hash12(int i) {return hash12(intBitsToFloat(i));}
+vec2 pointPos(int pointId, float t) {
+    vec2 pos = posCache[pointId];
+    vec2 aceleration = hash32(vec3(pos, float(seed)));
+    vec2 A = vec2(
+        abs(mod(t * aceleration.x + pos.x, 2.0) - 1.0),
+        abs(mod(t * aceleration.y + pos.y, 2.0) - 1.0)
+    );
+    return A;
+}
+
+float dist2segment(vec2 p1, vec2 p2, vec2 p) {
+    vec2 ab = p2 - p1;
+    vec2 ap = p - p1;
+
+    float t = dot(ap, ab) / dot(ab, ab);
+
+    t = clamp(t, 0.0, 1.0);
+
+    vec2 closestPoint = p1 + t * ab;
+
+    return length(p - closestPoint);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - iResolution.xy * 0.5) / iResolution.y;
+    float time = iTime * 0.2;
+    vec3 col = vec3(0);
+    vec3 mixColor;
+    float dist, lineDist, t, dist2Pixel;
+    for (int i = numOfPoints - 1; i >= 0; --i) {
+        posCache[i] = hash12(i);
+        points[i] = (pointPos(i, time) - 0.5) * iResolution.xy / iResolution.y;
+        colors[i] = hash23(posCache[i]);
+        dist2Pixel = distance(points[i], uv);
+        if(dist2Pixel > PointDist) continue;
+        
+        for (int j = i + 1; j < numOfPoints; ++j) {
+            dist = distance(points[i], points[j]);
+            if (dist > PointDist) continue;
+            lineDist = dist2segment(points[i], points[j], uv);
+            if (lineDist >= Thickness) continue;
+            
+            vec2 ab = points[j] - points[i];
+            vec2 ap = uv - points[i];
+            t = dot(ap, ab) / dot(ab, ab);
+            mixColor = mix(colors[i], colors[j], clamp(t, 0.0, 1.0));
+            col += mixColor * (PointDist - dist) * 2.0;
+        }
+    }
+
+    fragColor = vec4(col, 1.0);
+}

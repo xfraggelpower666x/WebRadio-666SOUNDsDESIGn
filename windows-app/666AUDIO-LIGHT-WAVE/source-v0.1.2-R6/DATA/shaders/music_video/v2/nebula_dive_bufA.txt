@@ -1,0 +1,18 @@
+// Nebula Dive - 250 chars
+//
+// Volumetric raymarching through a turbulent cylinder.
+// Each ray takes 80 steps and never stops at a surface: it
+// accumulates glow along the way, brighter where it grazes the walls.
+//
+
+void mainImage(out vec4 O, vec2 I) {
+    float i, z, d;
+    for (O *= i; i++ < 80.;) {
+        vec3 p = z * normalize(vec3(I+I, 0) - iResolution.xyy);
+        p.z = p.z * .5 - iTime * 2.;
+        for (d = 1.; d++ < 11.;)
+            p += cos(p.yzx * d + iTime) / d;
+        z += d = .01 + abs(3. - length(p.xy)) / 6.;
+        O += (cos(p.z + vec4(6,1,2,0)) + 1.) / d / z / 11e2;
+    }
+}

@@ -1,0 +1,228 @@
+// --- PORTAL SEQUENCE SHADER ---
+// Translates the described sequence: Void -> Point -> Line -> Pivots -> Doorway -> Flash White
+
+#define MAX_STEPS 100
+#define MAX_DIST 50.0
+#define SURF_DIST 0.001
+
+// Global animation variables updated every frame
+float animZ;      // Distance from camera
+float animW;      // Width of the portal (local X)
+float animH;      // Height of the portal (local Y)
+float animRotZ;   // Pivot angle
+
+// 2D Rotation Matrix
+mat2 rot(float a) {
+    float s = sin(a), c = cos(a);
+    return mat2(c, -s, s, c);
+}
+
+// 3D Box Distance Function
+float sdBox(vec3 p, vec3 b) {
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+// Sequence Timeline (0 to 10 seconds)
+void updateAnimation(float t) {
+    // If we are at the very beginning, hide the object deep in the background
+    if (t < 0.5) {
+        animZ = 1000.0; animW = 0.0; animH = 0.0; animRotZ = 0.0;
+        return;
+    }
+
+    // 1. Point grows to form a horizontal line (t: 0.5 -> 2.0)
+    float w_prog = smoothstep(0.5, 2.0, t);
+    animW = mix(0.001, 1.5, w_prog);
+
+    // 2. Line pivots toward the right / rotates to vertical (t: 2.5 -> 4.5)
+    float rot_prog = smoothstep(2.5, 4.5, t);
+    // Pivots -90 degrees (so local X becomes world Y)
+    animRotZ = mix(0.0, -1.570796, rot_prog); 
+
+    // 3. Line opens up to form a rectangle / doorway (t: 4.5 -> 6.5)
+    float h_prog = smoothstep(4.5, 6.5, t);
+    animH = mix(0.02, 0.8, h_prog);
+
+    // 4. Object approaches camera (t: 1.0 -> 9.0)
+    // Starts far, accelerates towards z=0
+    float z_prog = smoothstep(1.0, 9.0, t);
+    z_prog = pow(z_prog, 1.5); // Add easing for an accelerating zoom effect
+    animZ = mix(20.0, -2.0, z_prog);
+}
+
+// Scene Map: Returns distance and Material ID
+vec2 map(vec3 p) {
+    // Void Floor (y = -1.0)
+    float dFloor = p.y + 1.0;
+    
+    // If portal hasn't appeared yet, just render floor
+    if (animZ > 500.0) return vec2(dFloor, 0.0);
+
+    // Setup coordinates for the Portal
+    vec3 q = p;
+    q.z -= animZ;
+    q.y -= 0.5; // Lift it so it rests perfectly on the floor when vertical
+    q.xy *= rot(animRotZ);
+
+    // 1. Glowing Portal Frame (Cyan Rect)
+    vec3 frameSize = vec3(animW, animH, 0.05);
+    float dFrame = sdBox(q, frameSize);
+    // Hollow out the center
+    vec3 holeSize = vec3(max(0.0, animW - 0.05), max(0.0, animH - 0.05), 0.5);
+    float dHole = sdBox(q, holeSize);
+    dFrame = max(dFrame, -dHole);
+
+    // 2. Portal Interior (Stone structure)
+    vec3 qTun = q;
+    qTun.z -= -2.5; // Push the tunnel back behind the frame
+    float dTun = sdBox(qTun, vec3(animW, animH, 2.5));
+    // Hollow out interior tunnel
+    vec3 tunHole = vec3(max(0.0, animW - 0.15), max(0.0, animH - 0.15), 3.0);
+    float dTunHole = sdBox(qTun, tunHole);
+    dTun = max(dTun, -dTunHole);
+    // Slice off the front so it doesn't poke through the glowing frame
+    dTun = max(dTun, -(q.z - 0.05));
+
+    // Combine Frame and Tunnel
+    float dPortal = min(dFrame, dTun);
+    float matID = (dFrame < dTun) ? 1.0 : 2.0; // 1 = Frame, 2 = Tunnel
+
+    // Combine with Floor
+    if (dFloor < dPortal) return vec2(dFloor, 0.0);
+    return vec2(dPortal, matID);
+}
+
+// Calculate normals for lighting
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0.0);
+    return normalize(vec3(
+        map(p + e.xyy).x - map(p - e.xyy).x,
+        map(p + e.yxy).x - map(p - e.yxy).x,
+        map(p + e.yyx).x - map(p - e.yyx).x
+    ));
+}
+
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // Normalized pixel coordinates (from -1 to 1)
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+
+    // ----- ADJUST ANIMATION SPEED HERE -----
+    float animSpeed = 1.0; 
+    float t = mod(iTime * animSpeed, 10.0); // 10-second repeating loop
+    updateAnimation(t);
+
+    // Camera setup
+    vec3 ro = vec3(0.0, 0.0, 0.0); // Fixed camera at origin
+    vec3 rd = normalize(vec3(uv, 1.0)); // Ray direction facing Z+
+
+    // Raymarching variables
+    float d0 = 0.0;
+    float matID = -1.0;
+    float glowAccum = 0.0;
+
+    // Main Raymarching Loop
+    for (int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ro + rd * d0;
+        vec2 res = map(p);
+        float d = res.x;
+        matID = res.y;
+
+        // Accumulate Glow independently from the glowing frame
+        if (animZ < 500.0) {
+            vec3 qGlow = p;
+            qGlow.z -= animZ;
+            qGlow.y -= 0.5;
+            qGlow.xy *= rot(animRotZ);
+            float dF = sdBox(qGlow, vec3(animW, animH, 0.05));
+            float dH = sdBox(qGlow, vec3(max(0.0, animW - 0.05), max(0.0, animH - 0.05), 0.5));
+            float distToFrame = max(dF, -dH);
+            
+            // Additive glow based on proximity to the frame
+            glowAccum += 0.005 / (0.005 + abs(distToFrame) * abs(distToFrame));
+        }
+
+        if (d < SURF_DIST || d0 > MAX_DIST) break;
+        d0 += d;
+    }
+
+    // Coloring & Lighting
+    vec3 col = vec3(0.0);
+    
+    // Background Dark Void / Fog
+    vec3 skyCol = mix(vec3(0.01, 0.012, 0.015), vec3(0.0), rd.y * 0.2 + 0.2);
+
+    if (d0 < MAX_DIST) {
+        vec3 p = ro + rd * d0;
+        vec3 n = getNormal(p);
+        vec3 lightDir = normalize(vec3(0.3, 0.9, -0.3));
+        float dif = max(dot(n, lightDir), 0.0);
+        float amb = 0.1 + 0.1 * clamp(0.2 + 0.2 * n.y, 0.0, 1.0);
+
+        if (matID == 0.0) {
+            // Material 0: Void Floor (Shades of Gray / Horizon)
+            col = vec3(0.005) * amb + vec3(0.001) * dif;
+            
+            // Subtle vanishing grid lines
+            vec2 grid = fract(p.xz * 1.5);
+            if (grid.x < 0.01 || grid.y < 0.01) col += vec3(0.02);
+            
+        } else if (matID == 1.0) {
+            // Material 1: Cyan Glowing Portal Frame
+            col = vec3(0.2, 1.0, 1.0) + vec3(0.0, 0.5, 0.5) * dif;
+            
+        } else if (matID == 2.0) {
+            // Material 2: Inside the Tunnel (Stone/Brown texture)
+            col = vec3(0.5, 0.35, 0.2) * (dif * 0.8 + amb * 0.2);
+            
+            // Add procedural blocky texture to mimic stone structure
+            vec3 pTun = p;
+            pTun.z -= animZ;
+            pTun.y -= 0.5;
+            pTun.xy *= rot(animRotZ); 
+            float pattern = smoothstep(0.9, 1.0, sin(pTun.x * 12.0)) + 
+                            smoothstep(0.9, 1.0, sin(pTun.y * 12.0)) + 
+                            smoothstep(0.9, 1.0, sin(pTun.z * 8.0));
+            col = mix(col, vec3(0.02, 0.01, 0.05), clamp(pattern, 0.0, 1.0));
+            
+            // Fade into darkness deep inside the tunnel
+            float depth = clamp((p.z - animZ) / 4.0, 0.0, 1.0);
+            col *= mix(1.0, 0.0, depth);
+        }
+
+        // Add distance fog to blend the floor into the void horizon
+        float fog = smoothstep(10.0, 40.0, d0);
+        col = mix(col, skyCol, fog);
+    } else {
+        col = skyCol;
+    }
+
+    // Apply the accumulated cyan glow
+    //col += vec3(0.0, 1.0, 1.0) * glowAccum * 0.03;
+
+
+    // rainbow
+    //col += (0.5 + 0.5 * cos(iTime + vec3(0.0, 2.0, 4.0))) * glowAccum * 0.03;
+    // Twice as fast
+    col += (0.5 + 0.5 * cos(iTime * 2.0 + vec3(0.0, 2.0, 4.0))) * glowAccum * 0.03;
+    // Make the rainbow spread across the screen (Space + Time)
+    //col += (0.5 + 0.5 * cos(iTime + uv.x * 5.0 + vec3(0.0, 2.0, 4.0))) * glowAccum * 0.03;
+
+    // --- FLASH TO WHITE AS IT CROSSES CAMERA ---
+    // animZ approaches 0.0 as it hits the camera. It passes behind to -2.0
+    // smoothstep creates a ramp from 0.0 to 1.0 as the doorway swallows the camera.
+    float flashAmt = 1.0 - smoothstep(-1.0, 1.0, animZ);
+    col = mix(col, vec3(1.0), flashAmt);
+
+    // Output to screen (with slight gamma correction)
+    fragColor = vec4(pow(col, vec3(0.4545)), 1.0);
+}
+

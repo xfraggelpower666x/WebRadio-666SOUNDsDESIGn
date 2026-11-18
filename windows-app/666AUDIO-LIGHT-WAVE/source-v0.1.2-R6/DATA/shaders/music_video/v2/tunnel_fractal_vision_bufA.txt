@@ -1,0 +1,176 @@
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define H(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+
+
+const int MAXITER = 52;
+
+vec3 field(vec3 p) {
+	p *= .1;
+	float f = .1;
+	for (int i = 0; i < 5; i++) {
+		p = p.yzx*mat3(.8,.6,0,-.6,.8,0,0,0,1);
+		p += vec3(.123*cos(iTime*0.021)*float(i),.456*sin(iTime*0.021)*float(i),.789)*float(i);
+		p = abs(fract(p)-.5);
+		p *= 2.0;
+		f *= 2.0;
+	}
+	p *= p;
+	return sqrt(p+p.yzx)/f-.002;
+}
+
+vec2 rotate(vec2 a, float b)
+{
+    float c = cos(b);
+    float s = sin(b);
+    return vec2(
+        a.x * c - a.y * s,
+        a.x * s + a.y * c
+    );
+}
+
+#define time iTime*0.1
+#define resolution iResolution.xy
+
+float sdBox(vec3 p, vec3 r)
+{
+    p=abs(p)-r;
+    return max(max(p.x*p.y,p.y),p.z);
+}
+
+float sdXor(float a, float b)
+{
+    return min(max(a,-b),max(-a,b));
+}
+
+float scene2(vec3 p)
+{
+    p=abs(p)-0.6*.1;
+
+
+    return max(p.x,p.y)-.05;
+
+    return sdBox(p,vec3(.3));
+}
+#define pi acos(-1.)
+#define tau (pi*2.)
+const float REP = 9.;
+float happy_star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+ 
+float scene3(vec3 p)
+{
+ p.y-=iTime*10.;
+    vec3 cell = floor((p-REP)/(REP*2.));
+    p = mod(p+REP,REP*2.)-REP;
+   
+    p.xz= rotate(p.xz, iTime*0.0+cell.x+cell.y/2./4.);
+    vec3 a=vec3(
+        length(p.xz)-3.,
+        p.z,
+        atan(p.x,p.z)/tau
+    );
+
+    return max(sdXor(p.x,p.z),scene2(a));
+}
+
+float scene4(vec3 p)
+{
+    return min(
+        scene3(p),
+        scene3(p+vec3(REP))
+    );
+}
+
+float scene(vec3 p)
+{
+    // experimental mirroring thing
+    //p = abs(mod(p,REP*4.)-REP*2.);
+
+    return min(
+        scene4(p.xyz),
+        min(
+            scene4(p.yzx+vec3(0,0,REP)),
+            scene4(p.zxy+vec3(REP,0,0))
+        )
+    );
+}
+void mainImage(out vec4 O, vec2 C)
+{
+    O=vec4(0);
+     vec2 uv = C / iResolution.xy-.5;
+    vec3 dir = normalize(vec3((gl_FragCoord.xy-resolution*.5)/resolution.x,1.));
+	vec3 pos = vec3(1.,1.,-time);
+	vec3 color = vec3(0);
+	for (int i = 0; i < MAXITER; i++) {
+		vec3 f2 = field(pos);
+		float f = min(min(f2.x,f2.y),f2.z);
+		
+		pos += dir*f;
+		color += float(MAXITER-i)/(f2+.001);
+	}
+	vec3 color3 = vec3(1.-1./(1.+color*(.09/float(MAXITER*MAXITER))));
+	
+    vec3 cam = vec3(0,0,-9);
+    vec3 dir2 = normalize(vec3(uv, 1));
+
+
+
+
+    float t = 0.;
+    float k = 0.;
+    for (int i=0;i<100;++i) {
+        k=scene(cam+dir2*t);
+        t+=k;
+        if(abs(k)<.001)
+        {
+            break;
+        }
+    }
+
+    vec3 h = cam+dir*t;
+    vec2 o = vec2(.001, 0);
+    vec3 n = normalize(vec3(
+        scene(h+o.xyy)-scene(h-o.xyy),
+        scene(h+o.yxy)-scene(h-o.yxy),
+        scene(h+o.yyx)-scene(h-o.yyx)
+    ));
+    vec3 n1,q,r=iResolution,
+    d=normalize(vec3((C*2.-r.xy)/r.y,1));  
+    for(float i=0.,a,s,e,g=0.;
+        ++i<70.;
+        O.xyz+=mix(vec3(0.,1.,10.),H(g*.1),.8)*10./e/8e3
+    )
+    {
+        n1=g*d+n;
+          n1.z+=iTime;
+        a=30.;
+        n1=mod(n1-a,a*2.)-a;
+        s=1.;
+    
+        for(int i=0;i++<8;){
+        
+            n1=.5-abs(n1);
+            
+            n1.x<n1.z?n1=n1.zxy:n1;
+           n1.z<n1.y?n1=n1.xzy:n1;
+                  n1.y<n1.x?n1=n1.xyz:n1;
+            s*=e=1.7+sin(iTime*.0011)*.1;
+            n1=abs(n1)*e-
+                vec3(
+                    10.*3.,
+                    120,
+                    5.*5.
+                 )+n;
+         }
+         g+=e=length(n1.yz)/s;
+    }
+     
+    uv *= 2.0 * ( cos(iTime * 2.0) -2.5); // scale
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  // anim between 0.9 - 1.1 
+   O*= vec4(happy_star(uv, anim) * vec3(0.35,0.2,0.25)*0.3, 1.0);
+}

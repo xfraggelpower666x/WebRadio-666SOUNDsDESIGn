@@ -1,0 +1,82 @@
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 R = iResolution.xy;
+    vec2 u = (fragCoord - 0.5 * R) / R.y;
+
+    float t = iTime * 0.8; 
+    
+    
+    float breath = (sin(iTime * 1.2) + sin(iTime * 0.7 + 1.0)) * 0.25 + 0.5;
+    
+    u *= 2.1 - breath * 0.1;
+
+    vec3 finalColor = vec3(0.0);
+    vec2 pos = u; 
+
+    
+    float ang = 8.4;
+    mat2 rot = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
+
+    for (float i = 0.0; i < 65.0; i += 2.0) {
+        
+       
+        u.x += atan(u.y * 1.5 + t + i * 0.07) * 0.05;
+        u.y += cos(u.x * 2.5 - t + i * 0.06) * 0.05;
+
+        
+        u *= rot;
+        u *= 0.97;
+        
+        
+        vec2 p = u - vec2(0.35 + breath * 0.1, 0.0);
+
+        float d = length(vec2(p.x * 3.0, p.y * 0.2));
+
+        
+        float glow = 0.002 / (d * d + 0.001); 
+        glow *= (0.35 + breath * 0.6); 
+
+        
+        vec3 colorA = vec3(0.15, 0.0, 0.45); 
+        vec3 colorB = vec3(1.0, 0.35, 0.05); 
+        vec3 palette = mix(colorA, colorB, sin(i * 0.15 + t * 1.2 + length(u) * 2.0) * 0.5 + 0.5);
+
+
+        float core = smoothstep(0.12, 0.0, d);
+        float intensidadNucleo = clamp(core * (0.8 + breath * 1.0), 0.0, 0.9);
+        palette = mix(palette, vec3(0.0, 1.0, 0.8), intensidadNucleo);
+
+        
+        finalColor += glow * palette * exp(-length(u) * 1.2);
+    }
+
+    
+    float dust = 0.0;
+    for(float j = 1.0; j <= 3.0; j++) {
+        float timeOffset = t * (0.2 + j * 0.1);
+        float c = cos(timeOffset), s = sin(timeOffset);
+        vec2 p_dust = pos * mat2(c, -s, s, c);
+        
+        vec2 grid = fract(p_dust * (3.0 + j * 2.0) + vec2(sin(t * 0.2), -t * (0.2 + j * 0.1))) - 0.5;
+        float twinkle = sin(iTime * 4.0 + j * 5.0 + pos.x * 10.0) * 0.5 + 0.5;
+        dust += (0.000015 / (dot(grid, grid) + 0.00005)) * twinkle;
+    }
+    
+ 
+    finalColor += vec3(1.0, 0.8, 0.5) * dust * (0.6 + breath * 0.8);
+
+    
+    finalColor *= 1.5; 
+    
+   
+    finalColor = (finalColor * (2.51 * finalColor + 0.03)) / (finalColor * (2.43 * finalColor + 0.59) + 0.14);
+    finalColor = clamp(finalColor, 0.0, 1.0);
+    
+   
+    finalColor = pow(finalColor, vec3(0.85, 0.92, 0.98));
+
+   
+    finalColor *= 1.0 - smoothstep(0.3, 1.8, length(pos));
+
+    fragColor = vec4(finalColor, 1.0);
+}

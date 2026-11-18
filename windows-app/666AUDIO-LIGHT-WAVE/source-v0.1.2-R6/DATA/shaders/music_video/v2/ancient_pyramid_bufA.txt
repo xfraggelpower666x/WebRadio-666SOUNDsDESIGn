@@ -1,0 +1,278 @@
+// CC0: Ancient pyramid at dawn
+//  WIP - Had the intention to expand more on this but stalled.
+//  Thought better to share it in the state its in than not.
+
+#define TIME        iTime
+#define RESOLUTION  iResolution
+#define PI          3.141592654
+#define TAU         (2.0*PI)
+
+// License: WTFPL, author: sam hocevar, found: https://stackoverflow.com/a/17897228/418488
+const vec4 hsv2rgb_K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+vec3 hsv2rgb(vec3 c) {
+  vec3 p = abs(fract(c.xxx + hsv2rgb_K.xyz) * 6.0 - hsv2rgb_K.www);
+  return c.z * mix(hsv2rgb_K.xxx, clamp(p - hsv2rgb_K.xxx, 0.0, 1.0), c.y);
+}
+// License: WTFPL, author: sam hocevar, found: https://stackoverflow.com/a/17897228/418488
+//  Macro version of above to enable compile-time constants
+#define HSV2RGB(c)  (c.z * mix(hsv2rgb_K.xxx, clamp(abs(fract(c.xxx + hsv2rgb_K.xyz) * 6.0 - hsv2rgb_K.www) - hsv2rgb_K.xxx, 0.0, 1.0), c.y))
+
+#define ROTY(a)               \
+  mat3(                       \
+    +cos(a) , 0.0 , +sin(a) \
+  , 0.0     , 1.0 , 0.0     \
+  , -sin(a) , 0.0 , +cos(a) \
+  )
+
+#define ROTZ(a)               \
+  mat3(                       \
+    +cos(a) , +sin(a) , 0.0   \
+  , -sin(a) , +cos(a) , 0.0   \
+  , 0.0     , 0.0     , 1.0   \
+  )
+
+#define ROTX(a)               \
+  mat3(                       \
+    1.0 , 0.0     , 0.0       \
+  , 0.0 , +cos(a) , +sin(a)   \
+  , 0.0 , -sin(a) , +cos(a)   \
+  )
+
+const mat3 roty       = ROTY(radians(10.0));
+const vec3 sunDir     = normalize(vec3(0.0, -0.01, 1.0))*roty;
+const vec3 lightPos   = vec3(0.0, -60.0, -200.0)*roty;
+const float hoff      = 0.725;
+const vec3 sunColor   = HSV2RGB(vec3(hoff+0.0, 0.9, 0.0005));
+const vec3 topColor   = HSV2RGB(vec3(hoff+0.0, 0.9, 0.0001));
+const vec3 glowColor0 = HSV2RGB(vec3(hoff+0.0, 0.9, 0.0001));
+const vec3 glowColor2 = HSV2RGB(vec3(hoff+0.3, 0.95, 0.001));
+const vec3 diffColor  = HSV2RGB(vec3(hoff+0.0, 0.9, .25));
+
+// License: Unknown, author: nmz (twitter: @stormoid), found: https://www.shadertoy.com/view/NdfyRM
+vec3 sRGB(vec3 t) {
+  return mix(1.055*pow(t, vec3(1./2.4)) - 0.055, 12.92*t, step(t, vec3(0.0031308)));
+}
+
+// License: Unknown, author: Matt Taylor (https://github.com/64), found: https://64.github.io/tonemapping/
+vec3 aces_approx(vec3 v) {
+  v = max(v, 0.0);
+  v *= 0.6f;
+  float a = 2.51f;
+  float b = 0.03f;
+  float c = 2.43f;
+  float d = 0.59f;
+  float e = 0.14f;
+  return clamp((v*(a*v+b))/(v*(c*v+d)+e), 0.0f, 1.0f);
+}
+
+float rayPlane(vec3 ro, vec3 rd, vec4 dim) {
+  return -(dot(ro,dim.xyz)+dim.w)/dot(rd,dim.xyz);
+}
+
+vec2 planeCoord(vec3 p, vec3 c, vec3 up, vec4 dim) {
+  vec3 d = p - c;
+  vec3 xx = (cross(up,dim.xyz));
+  vec3 yy = (cross(xx,dim.xyz));
+  return vec2(dot(d,xx), dot(d,yy));
+}
+
+// License: MIT, author: Inigo Quilez, found: https://iquilezles.org/www/articles/distfunctions2d/distfunctions2d.htm
+float triIso(vec2 p, vec2 q) {
+  p.x = abs(p.x);
+  vec2 a = p - q*clamp( dot(p,q)/dot(q,q), 0.0, 1.0 );
+  vec2 b = p - q*vec2( clamp( p.x/q.x, 0.0, 1.0 ), 1.0 );
+  float s = -sign( q.y );
+  vec2 d = min( vec2( dot(a,a), s*(p.x*q.y-p.y*q.x) ),
+                vec2( dot(b,b), s*(p.y-q.y)  ));
+  return -sqrt(d.x)*sign(d.y);
+}
+
+// License: MIT, author: Inigo Quilez, found: https://iquilezles.org/articles/intersectors/
+vec2 rayBox(vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal)  {
+  vec3 m = 1.0/rd; // can precompute if traversing a set of aligned boxes
+  vec3 n = m*ro;   // can precompute if traversing a set of aligned boxes
+  vec3 k = abs(m)*boxSize;
+  vec3 t1 = -n - k;
+  vec3 t2 = -n + k;
+  float tN = max( max( t1.x, t1.y ), t1.z );
+  float tF = min( min( t2.x, t2.y ), t2.z );
+  if( tN>tF || tF<0.0) return vec2(-1.0); // no intersection
+  outNormal = (tN>0.0) ? step(vec3(tN),t1)  : // ro ouside the box
+                         step(t2,vec3(tF))  ;  // ro inside the box
+  outNormal *= -sign(rd);
+  return vec2( tN, tF );
+}
+
+vec3 sky(vec3 ro, vec3 rd) {
+  vec3 col = vec3(0.0);
+  col += sunColor/(1.0+0.00001 - dot(sunDir, rd));
+  float hd = max(abs(rd.y+0.15), 0.00066);
+  col += 100.0*glowColor0/sqrt(hd);
+  col += glowColor2/(hd);
+  return col;
+}
+
+// License: Unknown, author: Claude Brezinski, found: https://mathr.co.uk/blog/2017-09-06_approximating_hyperbolic_tangent.html
+float tanh_approx(float x) {
+  //  Found this somewhere on the interwebs
+  //  return tanh(x);
+  float x2 = x*x;
+  return clamp(x*(27.0 + x2)/(27.0+9.0*x2), -1.0, 1.0);
+}
+
+vec3 glow(vec3 ro, vec3 rd) {
+  vec3 bn;
+  vec3 bro = ro;
+  bro.y += -1000.0+70.0;
+  vec2 bi = rayBox(bro, rd, vec3(90.0, 1000.0, 90.0), bn);
+  float lightDist = distance(lightPos, ro);
+  vec3 lightDir   = normalize(lightPos-ro);
+  float g3        = 1.0+0.00001 - dot(lightDir, rd);
+  vec3 col = vec3(0.0);
+  col += 8.0*glowColor0/(g3);
+  vec3 rrd = rd*transpose(roty)*ROTX(0.027);
+  if (bi != vec2(-1.0)) {
+    float bdi = tanh_approx(0.00125*(bi.y-bi.x));
+    col += 1000.0*glowColor0*(bdi/max(rrd.y, 0.005));
+  }
+  
+  float sx = abs(rrd.x);
+  col += 20.0*glowColor0/(abs(mix(20.0*rrd.y*rrd.y, abs(rrd.y), tanh_approx(4.0*sx)))+2.0*sx*sx*sx+0.0001);
+  
+  return col;
+}
+
+vec3 side(vec3 col, vec3 ro, vec3 rd, vec3 nrd, float t, float nt, vec4 dim, vec3 c) {
+  vec3 n = dim.xyz;
+
+  vec3 p = ro + rd*t;
+  vec3 np = ro + nrd*t;
+
+  vec3 r = reflect(rd, n);
+  vec3 ldiff = p - lightPos;
+  vec3 ld = normalize(ldiff);
+  vec3 rcol0 = sky(p, r);
+  float dcol = max(dot(ld, n), 0.0);
+  dcol *= dcol;
+  float aa = distance(p, np);
+  vec2 pp = planeCoord(p, c, vec3(0.0, 1.0, 0.0), dim);
+  vec2 p0 = pp;
+  vec2 p1 = pp;
+  const vec2 tri =vec2(485, sqrt(3.0)*356.0);
+  float d0 = triIso(p0, tri);
+  float d1 = triIso(p1, 0.11*tri);
+  float d = d0;
+  vec3 bcol = col;
+  float hf = smoothstep(-600.0, -400.0, p.y);
+  vec3 pcol = 3.0*diffColor*dcol;  
+  pcol += rcol0;
+  pcol = mix(clamp(col, 0.0, 0.1), pcol, hf); 
+  col = mix(col, pcol, smoothstep(aa, 0.0, d));
+  col += topColor/max(0.00005*(d1-1.), 0.000025)*hf;
+  return col;
+}
+
+vec3 pyramid(vec3 col, vec3 ro, vec3 rd, vec3 nrd) {
+  const mat3 rotx = ROTX(radians(-51.8));
+  const mat3 rr0  = rotx;
+  const mat3 rr1  = rr0*ROTY(PI/2.0);
+  const mat3 rr2  = rr0*ROTY(PI);
+  const mat3 rr3  = rr0*ROTY(3.0*PI/2.0);
+
+  const vec3 c = vec3(0.0);
+  
+  const vec3 n0 = normalize(vec3(.0, 0.0, 1.0))*rr0;
+  const vec4 dim0 = vec4(n0, 0.0);
+
+  const vec3 n1 = normalize(vec3(.0, 0.0, 1.0))*rr1;
+  const vec4 dim1 = vec4(n1, 0.0);
+
+  const vec3 n2 = normalize(vec3(.0, 0.0, 1.0))*rr2;
+  const vec4 dim2 = vec4(n2, 0.0);
+
+  const vec3 n3 = normalize(vec3(.0, 0.0, 1.0))*rr3;
+  const vec4 dim3 = vec4(n3, 0.0);
+
+  // Front face
+  float t0  = rayPlane(ro, rd , dim0);
+  float nt0 = rayPlane(ro, nrd, dim0);
+  if (t0 > 0.0 && nt0 > 0.0 && dot(rd, n0) > 0.0) {
+    col = side(col, ro, rd, nrd, t0, nt0, dim0, c);
+  }
+
+  // Right face
+  float t1  = rayPlane(ro, rd , dim1);
+  float nt1 = rayPlane(ro, nrd, dim1);
+  if (t1 > 0.0 && nt1 > 0.0 && dot(rd, n1) > 0.0) {
+    col = side(col, ro, rd, nrd, t1, nt1, dim1, c);
+  }
+
+  // Back face
+  float t2  = rayPlane(ro, rd , dim2);
+  float nt2 = rayPlane(ro, nrd, dim2);
+  if (t2 > 0.0 && nt2 > 0.0 && dot(rd, n2) > 0.0) {
+    col = side(col, ro, rd, nrd, t2, nt2, dim2, c);
+  }
+
+  // Left face
+  float t3  = rayPlane(ro, rd , dim3);
+  float nt3 = rayPlane(ro, nrd, dim3);
+  if (t3 > 0.0 && nt3 > 0.0 && dot(rd, n3) > 0.0) {
+    col = side(col, ro, rd, nrd, t3, nt3, dim3, c);
+  }
+
+  return col;
+}
+vec3 color(vec3 ww, vec3 uu, vec3 vv, vec3 ro, vec2 p) {
+  const float rdd = 3.0;
+  const float mm = 4.0;
+  vec2 np = p + 4.0/RESOLUTION.y;
+
+  vec3 rd   = normalize(-p.x*uu + p.y*vv + rdd*ww);
+  vec3 nrd  = normalize(-np.x*uu + np.y*vv + rdd*ww);
+  vec3 glowCol = glow(ro, rd);
+  
+  vec3 col = sky(ro, rd); 
+  col = pyramid(col, ro, rd, nrd);
+  col += glowCol;  
+  return col;
+}
+
+vec3 effect(vec2 p, vec2 pp) {
+  // Control variables for the camera movement
+  float speed = 0.2; 
+  float camTime = TIME * speed;
+  float camDist = 2700.0;
+  
+  // Oscillate the camera height smoothly between roughly +100 and +500 using a sine wave
+  float camY = sin(TIME * speed * 1.5) * 200.0 + 300.0; 
+  
+  // Calculate dynamic camera position using trigonometry for the circular orbit
+  vec3 ro = vec3(sin(camTime) * camDist, camY, -cos(camTime) * camDist);
+  
+  const vec3 la = vec3(0.0, 0.0, 0.0); // Look-at point remains anchored to the pyramid tip
+  const vec3 up = vec3(0.0, 1.0, 0.0);
+  
+  vec3 ww = normalize(la - ro);
+  vec3 uu = normalize(cross(up, ww));
+  vec3 vv = (cross(ww, uu));
+  
+  vec3 col = color(ww, uu, vv, ro, p);
+  col = aces_approx(col);
+  col = sRGB(col);
+  
+  return col;
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+  vec2 q = fragCoord/RESOLUTION.xy;
+  vec2 p = -1. + 2. * q;
+  vec2 pp = p;
+  p.x *= RESOLUTION.x/RESOLUTION.y;
+  vec3 col = effect(p, pp);
+  
+  fragColor = vec4(col, 1.0);
+
+}
+

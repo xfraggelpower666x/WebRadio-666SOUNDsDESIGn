@@ -1,0 +1,24 @@
+#define R(p,a,t) mix(a*dot(p,a),p,cos(t))+sin(t)*cross(p,a)
+#define H(h) (cos((h)*6.3+vec3(0,23,21))*.5+.5)
+
+void mainImage(out vec4 O, vec2 C)
+{
+    vec3 p,q,r=iResolution,c=vec3(0),
+    d=normalize(vec3((C-.5*r.xy)/r.y,1));
+    float i=0.,s,e,g=0.,t=iTime;
+	for(;i++<90.;){
+        p=g*d;
+        p.z-=mix(.9,9.,step(0.,sin(t*.3)));
+        p=R(p,normalize(cos(t*.5+vec3(1,8,3))),clamp(sin(t*.3)*3.,-5.,.5));
+        p=abs(p);
+        q=p*1.5;
+        s=3.;
+        for(int i=0;i++<8;)
+            p=1.-abs(abs(p-2.)-1.),
+            s*=e=-13.*min(.3*max(1./dot(p,p),.8),1.),
+            p=p*e+q;
+        g+=e=length(p)/s-.003;
+        c+=mix(vec3(1),H(log(s)*.2+t*.6),.6)*.01/exp(i*i*e);  
+    }
+    O=vec4(c,1);
+}

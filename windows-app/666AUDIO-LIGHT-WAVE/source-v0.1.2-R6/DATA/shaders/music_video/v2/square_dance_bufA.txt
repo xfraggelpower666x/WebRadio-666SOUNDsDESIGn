@@ -1,0 +1,58 @@
+////////////////////////////////////////////////////////////////////////////////
+// Variant on https://www.shadertoy.com/view/WlByRW by @FabriceNeyret2
+// mla, 2020
+////////////////////////////////////////////////////////////////////////////////
+
+float square(vec2 z, float r) {
+  float d = max(abs(z.x),abs(z.y));
+  return 1.0-smoothstep(0.0,0.1,abs(d-r));
+}
+
+void mainImage(out vec4 outcolor, vec2 fragcoord) {
+  vec2 z = (2.0*fragcoord - iResolution.xy)/iResolution.y;
+  float scale = 8.0;
+  z *= scale;
+  float tt = iTime;
+  z += 0.5*z*mat2(cos(0.25*z+tt),sin(0.25*z-tt));
+  
+  // If f(z) is our function, then f(z+dz) = f(z)+J*dz
+  // ie. J approximates f locally as a linear function.
+  mat2 J = mat2(dFdx(z),dFdy(z))*iResolution.y/(2.0*scale);
+
+  // Fold in to [-1,1]
+  z /= 2.0;
+  vec2 index = round(z);
+  z -= round(z);
+  z *= 2.0;
+  vec2 z1 = z;
+
+  // Apply inverse coordinate transform
+  z = inverse(J)*z;
+
+  vec3 col = vec3(0);
+  // red channel shows distances (from the cell centre) in transformed coordinates
+  col.r = (0.5+0.5*sin(length(20.0*z1)))*0.6;
+  // blue shows distances in the inverse transformed coordinates
+  col.b = (0.5+0.5*sin(length(20.0*z)))*0.6;
+  col.g = abs(1.0-pow(abs(determinant(J)),0.5));
+
+  // A square in inverse coordinates, so (approximately) screen aligned
+  // and the same size.
+  //float t = fract(0.5*iTime);
+  // Phased and random square by Fabrice, thanks.
+  //float t = fract(0.5*iTime+0.1*(index.x+10.0*index.y));
+  float t = fract(0.5*iTime+sin(dot(index,iResolution.xy)));
+  col = mix(col,vec3(1),0.75*square(z,t));
+
+  // Transformed cell boundaries
+  z1 = abs(z1);
+  if (z1.y > z1.x) z1 = z1.yx;
+  col *= 0.25+0.75*smoothstep(0.0,0.2,1.0-z1.x);
+
+  // Inverse transformed cell axes.
+  z = abs(z);
+  if (z.y > z.x) z = z.yx;
+  col *= 0.25+0.75*smoothstep(0.0,0.1,z.y);
+  col = pow(col,vec3(0.4545));
+  outcolor = vec4(col,1);
+}

@@ -1,0 +1,9 @@
+//Hi! It's me https://x.com/awesomefishe
+void mainImage(out vec4 O, vec2 I) 
+{
+    vec2 u = iResolution.xy;
+    u = (I+I-u)/u.y;
+    float c = length(u+u);
+    u = vec2(c,atan(u.yx,u))*mat2(9,0,7,3);
+    O = tanh(sin(c+vec4(1,2,0,0))/length(tan(u-iTime*3.0)/c/c/c-c*c));
+}

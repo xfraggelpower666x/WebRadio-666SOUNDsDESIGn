@@ -1,0 +1,159 @@
+const float pi = 3.1415926;
+const float tau = 2.0 * pi;
+
+float _sin(float percent)
+{
+  return sin(percent * tau);
+}
+
+float _cos(float percent)
+{
+  return cos(percent * tau);
+}
+
+float _atan(float x, float y)
+{
+  return atan(x, y) / tau;
+}
+
+mat2 rotate(float percent)
+{
+  float c = _cos(percent);
+  float s = _sin(percent);
+  return mat2(c, s, -s, c);
+}
+
+
+
+// settings
+const vec3 background = vec3(0.25, 0.00, 0.20);
+const vec3 colorA = vec3(0.04, 0.58, 0.59);
+const vec3 colorB = vec3(1.00, 0.29, 0.29);
+const vec3 colorC = vec3(0.96, 0.64, 0.35);
+const vec3 colors[3] = vec3[3](colorA, colorB, colorC);
+const float brightness = 0.5;
+const float falloff = 0.35;
+const float glow = 0.15;
+const int steps = 10;
+const int copies = 6;
+const float sides = 6.0;
+const float turning = 1.0;
+const float size = 0.2;
+const float radius = 0.4;
+const vec3 spacing = vec3(2.0, 2.0, 1.0);
+const float height = 0.1;
+const float speed = 1.0;
+const float fall = 1.0;
+const float revolve = 0.1;
+float vertigo(float time)
+{
+  return 0.025 * _sin(0.01 * time);
+}
+
+// https://iquilezles.org/articles/distfunctions2d/
+// https://www.jdawiseman.com/papers/easymath/surds_star_inner_radius.html
+float star(vec2 point, float sides, float radius, float turning)
+{
+  float sideAngle = 0.5 / sides;
+  float spikeAngle = 0.25 - 0.5 * (turning - 1.0) / sides;
+  float pointAngle = _atan(point.x, point.y);
+  vec2 side = vec2(_cos(sideAngle), _sin(sideAngle));
+  vec2 spike = vec2(_cos(spikeAngle), _sin(spikeAngle));
+  float foldedAngle = mod(pointAngle, 2.0 * sideAngle) - sideAngle;
+  point = length(point) * vec2(_cos(foldedAngle), abs(_sin(foldedAngle)));
+  point -= radius * side;
+  point += spike * clamp(-dot(point, spike), 0.0, radius * side.y / spike.y);
+  return length(point) * sign(point.x);
+}
+
+// https://iquilezles.org/articles/distfunctions/
+float extrude(float distance, float z, float height)
+{
+  vec2 hypot = vec2(distance, abs(z) - height);
+  return min(max(hypot.x, hypot.y), 0.0) + length(max(hypot, 0.0));
+}
+
+// https://iquilezles.org/articles/distfunctions/
+vec3 repeat(vec3 point, vec3 spacing)
+{
+  return point - spacing * round(point / spacing);
+}
+
+// map percent value to color in looping gradient
+vec3 colorLoop(float percent)
+{
+  const int count = colors.length();
+  percent = mod(percent, 1.0);
+  float blend = mod(percent * float(count), 1.0);
+  int aIndex = int(floor(percent * float(count)));
+  int bIndex = (aIndex + 1) % count;
+  vec3 aColor = colors[aIndex];
+  vec3 bColor = colors[bIndex];
+  return mix(aColor, bColor, blend);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+  float time = iTime * speed;
+
+  // input pixel coordinates
+  vec2 uv = (fragCoord.xy * 2.0 - iResolution.xy) / min(iResolution.x, iResolution.y);
+  vec3 ray = normalize(vec3(uv, 1.0));
+
+  // rotate scene
+  ray.xy *= rotate(revolve * time);
+  ray.yz *= rotate(vertigo(time));
+
+  // starting color
+  vec3 color = background;
+
+  // total distance marched
+  float totalDistance = 0.0;
+
+  // ray march
+  for (int step = 0; step < steps; step++)
+  {
+    // copy shape
+    for (int copy = 0; copy < copies; copy++)
+    {
+      float copyPercent = float(copy) / float(copies);
+      // primary color for copy
+      vec3 hue = colorLoop(copyPercent + 0.75 * length(ray.xy));
+      // starting position of ray, position copies in ring
+      vec3 start = vec3(_sin(copyPercent) * radius, _cos(copyPercent) * radius, fall * time);
+      // current position of ray
+      vec3 position = start + ray * totalDistance;
+      // how many shape planes away from camera we are
+      float level = round(position.z / spacing.z) * spacing.z;
+      // tile shapes in 3d
+      position = repeat(position, spacing);
+      // shape rotation
+      float angle = copyPercent;
+      // rotate shape
+      position.xy *= rotate(angle);
+      // signed distance to 2d shape
+      float distance = star(position.xy, sides, size, turning);
+      // extrude shape to 3d
+      distance = extrude(distance, position.z, height);
+      // brightness based on distance to shape
+      float distanceBrightness = exp(-distance / glow);
+      // brightness based on distance marched away from camera
+      float falloffBrightness = exp(-falloff * totalDistance);
+      // total brightness
+      float totalBrightness = brightness * distanceBrightness * falloffBrightness;
+      // new color to mix in with current color
+      vec3 newColor = vec3(totalBrightness);
+      // colorize to hue
+      newColor *= hue;
+      // add color to current
+      color += newColor;
+      // mix color with current
+      color = max(color, newColor);
+      // march ray forward
+      totalDistance += distance * 0.5;
+    }
+  }
+
+  // output color
+  fragColor = vec4(color, 1.0);
+}

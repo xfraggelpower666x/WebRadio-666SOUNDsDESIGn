@@ -1,0 +1,30 @@
+/*
+    "Simplex" by @XorDev
+    
+    I know this isn't a real simplex, but it reminded me
+    of simplex grids anyway.
+    https://x.com/XorDev/status/1920855494861672654
+*/
+
+void mainImage(out vec4 O, vec2 I)
+{
+    //Iterator, raymarch depth and step distance
+    float i, z, d;
+    //Clear frag color and raymarch 50 steps
+    for(O *= i; i++<5e1;)
+    {
+        //Compute raymarch point from raymarch distance and ray direction
+        vec3 p = z*normalize(vec3(I+I,0)-iResolution.xyy),
+        //Temporary vector for sine waves
+        v;
+        //Scroll forward
+        p.z -= (iTime*4);
+        //Compute distance for sine pattern (and step forward)
+        z += d = 1e-4+.5*length(max(v=cos(p)-sin(p).yzx,v.yzx*.2));
+        //Use position for coloring
+        O.rgb += (cos(p)+1.2)/d;
+    }
+    //Tonemapping
+    O /= O + 1e3;
+}
+

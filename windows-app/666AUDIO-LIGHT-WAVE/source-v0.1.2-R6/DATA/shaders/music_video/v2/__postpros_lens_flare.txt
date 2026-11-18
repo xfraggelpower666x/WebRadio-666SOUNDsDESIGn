@@ -1,0 +1,197 @@
+// USING https://www.shadertoy.com/view/4d2Xzw FOR BOKEH
+ 
+// Controls randomness
+const int seed = 7;
+// Amount of circles in flare
+const int circles = 20;
+// Max size of circles
+const float circleSize = 1. / 10.;
+// Outside color
+const vec3 col1 = vec3(0.2,0.1,0.0);
+// Inside color
+const vec3 col2 = vec3(0.9,1.,1.);
+// Percentage of screen toward the center to start fading out circles
+const float fadeRadius = 0.7;
+// Overall circle opacity multiplier
+const float overallOpacity = 5.;
+// Iterations for bokeh blur
+const int bokehIterations = 5;
+// Radius for bokeh blur
+const float bokehRadius = 0.4;
+
+float easeOutQuad(float x) {
+    return x * x;
+}
+
+float random(float seed) {
+    return fract(sin(seed) * 100000.0);
+}
+
+float getPointDist(vec2 point1, vec2 point2) {
+    float x = point2.x - point1.x;
+    float y = point2.y - point1.y;
+    return length(vec2(x, y));
+}
+
+float lerp(float a, float b, float t) {
+    return a + (b - a) * t;
+}
+
+vec3 lerp(vec3 a, vec3 b, float t) {
+    return vec3(
+        lerp(a.x, b.x, t),
+        lerp(a.y, b.y, t),
+        lerp(a.z, b.z, t)
+    );
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+vec3 drawRainbowCircle(vec2 circlePos, vec2 pixelPos, float radius) {
+    float dist = getPointDist(circlePos, pixelPos) / radius;
+    if (dist > 1.) return vec3(0,0,0);
+    
+    float colorMul = (dist - 0.4) / (dist + 1.);
+    vec3 col = hsv2rgb(vec3(colorMul * 8., 0.5, 1));
+    col *= colorMul;
+    col = max(col, 0.);
+    if (dist > 0.5) col *= 1. - dist;
+    
+    return col;
+}
+
+vec3 drawCircle(vec2 circlePos, vec2 pixelPos, float radius, float falloff, vec3 startColor, vec3 endColor) {
+    float dist = getPointDist(circlePos, pixelPos) / radius;
+    if (dist > 1.) return vec3(0,0,0);
+    
+    float colorMul = (dist - falloff) / (dist + 1.);
+    vec3 col = lerp(startColor, endColor, colorMul);
+    col *= colorMul;
+    col = max(col, 0.);
+    
+    return col;
+}
+
+vec2 getFlarePoint(vec2 centerPos, vec2 centerVec, float position) {
+    vec2 delta = centerVec * position;
+    delta += centerPos;
+    return delta;
+}
+
+float angleBetween(vec2 v1, vec2 v2) {
+    return acos(dot(v1, v2) / (length(v1) * length(v2)));
+}
+
+#define GOLDEN_ANGLE 2.3999632
+#define BLUR 1.
+#define PI 3.14159265359 
+
+mat2 rot = mat2(cos(GOLDEN_ANGLE), sin(GOLDEN_ANGLE), -sin(GOLDEN_ANGLE), cos(GOLDEN_ANGLE));
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = fragCoord / iResolution.x;
+    vec3 col = vec3(0,0,0);
+    
+    // --- MODIFIED SECTION ---
+    // Variables controlling the originating point (x, y coordinates).
+    float speed = 0.2;
+    float originX = (fract(iTime * speed) * 1.5 - 0.25) * iResolution.x;
+    
+    // Try changing this! (e.g., iResolution.y * 0.8) 
+    float originY = iResolution.y * 0.85; 
+    
+    vec2 centerPos = vec2(originX, originY);
+    
+    // By locking the Y coordinate of the "lens center" to the same Y coordinate as the origin,
+    // the resulting vector becomes purely horizontal. This completely stops the "tilting" effect.
+    vec2 lensCenter = vec2(iResolution.x / 2., originY);
+    vec2 centerVec = (lensCenter - centerPos) * 2.;
+    // ------------------------
+
+    float centerVecLength = length(centerVec);
+    
+    float centerProximity = centerVecLength / 170.;
+    if (centerProximity < 1.) centerProximity = 1.;
+    
+    float opacityMul = centerVecLength / iResolution.x / fadeRadius;
+    if (opacityMul > 1.) opacityMul = 1.;
+    opacityMul = 1. - easeOutQuad(1. - opacityMul);
+    
+    float circleOpacityMul = centerVecLength / iResolution.x / 0.2;
+    if (circleOpacityMul > 1.) circleOpacityMul = 1.;
+    
+    vec3 acc = vec3(0), div = acc;
+    float r = 1.;
+    vec2 vangle = vec2(0.0,bokehRadius*.01 / sqrt(float(bokehIterations)));
+    
+	for (int j = 0; j < bokehIterations; j++)
+    {  
+	    vangle = rot * vangle;
+        vec2 pixelPos = (uv + (BLUR) * vangle) * iResolution.x;
+        
+        float baseRadius = (1. - circleOpacityMul) / 4. + 3. / 4.;
+        float circleBoost = 1. + (1. - circleOpacityMul) * 0.1;
+        col = drawCircle(getFlarePoint(centerPos, centerVec, 0.), pixelPos, iResolution.x / 1.5 * baseRadius, circleBoost, vec3(0,0,0), vec3(1,1,1));
+    
+        for (int i = 0; i < circles; i++) {
+            float newSeed = float(seed) / (float(i) + 10.);
+            float pos = random(newSeed);
+            float dist = 1. - pos;
+            float radius = iResolution.x * circleSize * random(newSeed * 2.) * dist;
+            float falloff = 0.35 + random(newSeed * 3.) * 0.5;
+            float opacity = (0.8 + random(newSeed * 4.) * 0.2) * opacityMul * overallOpacity;
+            opacity *= dist;
+            
+            vec2 flarePoint = getFlarePoint(centerPos, centerVec, pos);
+            vec2 pointToFlare = flarePoint - pixelPos;
+            float angle = angleBetween(pointToFlare, centerVec) / PI;
+            angle = easeOutQuad(angle);
+            angle = clamp(angle, 0., 1.);
+            opacity *= angle;
+            opacity /= centerProximity;
+        
+            col += drawCircle(flarePoint, pixelPos, radius, falloff, col1, col2) * opacity;
+        }
+        
+        vec2 flarePoint = getFlarePoint(centerPos, centerVec, 0.25);
+        vec2 pointToFlare = flarePoint - pixelPos;
+        float angle = angleBetween(pointToFlare, centerVec) / PI;
+        angle = easeOutQuad(easeOutQuad(angle));
+        angle = clamp(angle, 0., 1.);
+        angle = lerp(1., angle, opacityMul);
+        float opacity = angle * 1.5;
+        opacity /= centerProximity / 1.5;
+        col += drawRainbowCircle(flarePoint, pixelPos, iResolution.x / 5.) * opacity;
+        
+        vec2 distToCenter = pixelPos - centerPos;
+        float res = iResolution.x / 80.;
+        opacity = (1. - opacityMul) * 0.9 + 0.1;
+        
+        float dist = 1. - (abs(distToCenter.x / 16.) + abs(distToCenter.y * 4.)) / res;
+        col += max(dist, 0.) * 0.3 * opacity;
+       
+        dist = 1. - (abs(distToCenter.x * 4.) + abs(distToCenter.y / 16.)) / res;
+        col += max(dist, 0.) * 0.3 * opacity;
+        
+        res = iResolution.x / 80.;
+        
+        dist = 1. - (abs(distToCenter.x / 9.) + abs(distToCenter.y)) / res;
+        col += max(dist, 0.) * 0.3 * opacity;
+       
+        dist = 1. - (abs(distToCenter.x) + abs(distToCenter.y / 9.)) / res;
+        col += max(dist, 0.) * 0.3 * opacity;
+        
+        
+		vec3 bokeh = pow(col, vec3(4));
+		acc += col * bokeh;
+		div += bokeh;
+	}
+
+    fragColor = vec4(acc / div, 1.0);
+}

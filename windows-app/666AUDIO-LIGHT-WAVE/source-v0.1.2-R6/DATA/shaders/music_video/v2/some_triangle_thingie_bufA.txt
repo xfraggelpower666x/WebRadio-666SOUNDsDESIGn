@@ -1,0 +1,80 @@
+// CC0: A rough copy of twitter art
+//  @tequibo shared their most popular piece. I really liked it and thought I
+//  should make a stab at shaderify it. It's kind of there but not really.
+//  Lots of hacking with little thought to try to replicate the original roughly.
+//  Original: https://x.com/tequibo/status/1720022416452190249
+
+//  I really like how something so simple looks very cool
+
+#define TIME        iTime
+#define RESOLUTION  iResolution
+#define PI          3.141592654
+#define TAU         (2.0*PI)
+#define ROT(a)      mat2(cos(a), sin(a), -sin(a), cos(a))
+
+
+float tri(vec2 p, float r) {
+  p = -p;
+  const float k = sqrt(3.0);
+  p.x = abs(p.x) - r;
+  p.y = p.y + r/k;
+  if( p.x+k*p.y>0.0 ) p = vec2(p.x-k*p.y,-k*p.x-p.y)/2.0;
+  p.x -= clamp( p.x, -2.0*r, 0.0 );
+  return -length(p)*sign(p.y);
+}
+
+// License: WTFPL, author: sam hocevar, found: https://stackoverflow.com/a/17897228/418488
+const vec4 hsv2rgb_K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+vec3 hsv2rgb(vec3 c) {
+  vec3 p = abs(fract(c.xxx + hsv2rgb_K.xyz) * 6.0 - hsv2rgb_K.www);
+  return c.z * mix(hsv2rgb_K.xxx, clamp(p - hsv2rgb_K.xxx, 0.0, 1.0), c.y);
+}
+// License: WTFPL, author: sam hocevar, found: https://stackoverflow.com/a/17897228/418488
+//  Macro version of above to enable compile-time constants
+#define HSV2RGB(c)  (c.z * mix(hsv2rgb_K.xxx, clamp(abs(fract(c.xxx + hsv2rgb_K.xyz) * 6.0 - hsv2rgb_K.www) - hsv2rgb_K.xxx, 0.0, 1.0), c.y))
+
+float dot2(vec2 p) {
+  return dot(p,p);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+  const float stp = max(0.1, 0.01);
+  const float mx = 1.;
+  const float cnt = 1.0/stp;
+  const float add = 0.05;
+  const vec3 bgcol = HSV2RGB(vec3(0., 0.95, 0.025));
+  vec2 q = fragCoord/RESOLUTION.xy;
+  vec2 p = -1. + 2. * q;
+  p.x *= (RESOLUTION.x/RESOLUTION.y);
+  float aa = sqrt(2.0)/RESOLUTION.y;
+  vec3 col = vec3(0.0);
+  float hue = min(0.4 + (iMusicSync0 / 3.0), 1.0);
+  float tm = TIME;
+  for (float i = mx; i > 0.; i -= stp) {
+    float r0 = i;
+    vec2 p0 = p;
+    mat2 r = ROT(TAU/6.0*sin(tm-2.25*i));
+    vec3 gcol0 = hsv2rgb(vec3(hue, 1.25*sqrt(r0), mix(1.0, 0.125, sqrt(r0))));
+    p0 *= r;
+    float d0 = tri(p0, i);
+    if (d0 < 0.0) {
+      col = mix(col, gcol0 , mix(1.0, 0.5*dot2(p), r0));
+    }
+
+    float r1 = i-min(0.5*(stp+(iMusicSync0/10)), 1.0);
+    vec2 p1 = p;    
+    vec3 gcol1 = hsv2rgb(vec3(hue, 1.25*sqrt(r1), mix(1.0, 0.125, sqrt(r1))));
+    p1 *= transpose(r-(iMusicSync0/2));
+    float d1 = tri(p1, i-0.5*stp);
+    if (d1 < 0.0) {
+      col = mix(col, gcol1, mix(1.0, 0.5*dot2(p), r1));
+    }
+  }
+  col *= smoothstep(1., 0.0, length(p));
+  col += bgcol;
+    
+  col = sqrt(col);
+  
+  fragColor = vec4(col, 1.0);
+}
+

@@ -1,0 +1,345 @@
+#define RAIN_SPEED 1.75 // Speed of rain droplets
+#define DROP_SIZE  3.0  // Higher value lowers, the size of individual droplets
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float rchar(vec2 outer, vec2 inner, float globalTime) {
+	//return float(rand(floor(inner * 2.0) + outer) > 0.9);
+	
+	vec2 seed = floor(inner * 4.0) + outer.y;
+	if (rand(vec2(outer.y, 23.0)) > 0.98) {
+		seed += floor((globalTime + rand(vec2(outer.y, 49.0))) * 3.0);
+	}
+	
+	return float(rand(seed) > 0.5);
+}
+
+// --- REUSABLE WAVE FUNCTION ---
+// fragCoord : Current pixel coordinates
+// amplitude : Height of the wave
+// yCenter   : The Y axis offset in pixels
+// baseColor : The RGB color of the wave
+// freq      : How tight the sine wave is (0.02 from your original code)
+// phaseShift: Used with time to make the waves scroll horizontally
+
+vec3 drawAudioWave(vec2 fragCoord, float amplitude, float yCenter, vec3 baseColor, float freq, float phaseShift) {
+        
+    // Graceful fallback from your Pygame code: 
+    // If amplitude is tiny, transition smoothly to a white line instead of snapping harshly.
+    vec3 waveColor = mix(vec3(1.0, 1.0, 1.0), baseColor, smoothstep(0.0, 2.0, amplitude));
+
+    // Calculate the mathematical Y position of the sine wave for this X pixel
+    float waveY = yCenter + amplitude * sin(fragCoord.x * freq + phaseShift);
+    
+    // Vertical distance from the current pixel to the wave
+    float dist = abs(fragCoord.y - waveY);
+    
+    // --- COOL FACTOR: THE GLOW ---
+    // Core thickness creates a bright center, exponential falloff creates a soft neon glow
+    float coreThickness = 0.0;
+
+    if (amplitude < 2.0) {
+        coreThickness = 0.1;
+    }
+    else {
+        coreThickness = 0.5;
+    }
+
+    float glowSpread = 3.0;
+    float intensity = (coreThickness / (dist + 1e-4)) + exp(-dist / glowSpread);
+    
+    // --- COOL FACTOR: SMOOTH EDGES ---
+    // Instead of hard cuts at 450 and (Width - 400), we fade the line in and out beautifully
+    float minX = 450.0;
+    float maxX = iResolution.x - 400.0; 
+    float mask = smoothstep(minX - 50.0, minX, fragCoord.x) * 
+                 (1.0 - smoothstep(maxX, maxX + 50.0, fragCoord.x));
+                 
+    return waveColor * intensity * mask;
+}
+
+
+vec3 B2_spline(vec3 x) { // returns 3 B-spline functions of degree 2
+    vec3 t = 3.0 * x;
+    vec3 b0 = step(0.0, t)     * step(0.0, 1.0-t);
+	vec3 b1 = step(0.0, t-1.0) * step(0.0, 2.0-t);
+	vec3 b2 = step(0.0, t-2.0) * step(0.0, 3.0-t);
+	return 0.5 * (
+    	b0 * pow(t, vec3(2.0)) +
+    	b1 * (-2.0*pow(t, vec3(2.0)) + 6.0*t - 3.0) + 
+    	b2 * pow(3.0-t,vec3(2.0))
+    );
+}
+
+float bump(float x) {
+	return abs(x) > 1.0 ? 0.0 : 1.0 - x * x;
+}
+
+
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+
+	vec2 position = fragCoord.xy / iResolution.xy;
+	vec2 uv = vec2(position.x, position.y);
+        uv.y = 1.0 - uv.y;
+
+        position.x /= iResolution.x / iResolution.y;
+	float globalTime = iTime * RAIN_SPEED;
+	
+	float scaledown = DROP_SIZE;
+	float rx = fragCoord.x / (40.0 * scaledown);
+	float mx = 40.0*scaledown*fract(position.x * 30.0 * scaledown);
+	vec4 result;
+	
+	if (mx > 12.0 * scaledown) {
+		result = vec4(0.0);
+	} else 
+	{
+        float x = floor(rx);
+		float r1x = floor(fragCoord.x / (15.0));
+		
+
+		float ry = position.y*600.0 + rand(vec2(x, x * 3.0)) * 100000.0 + globalTime* rand(vec2(r1x, 23.0)) * 120.0;
+		float my = mod(ry, 15.0);
+		if (my > 12.0 * scaledown) {
+			result = vec4(0.0);
+		} else {
+		
+			float y = floor(ry / 15.0);
+			
+			float b = rchar(vec2(rx, floor((ry) / 15.0)), vec2(mx, my) / 12.0, globalTime);
+			float col = max(mod(-y, 24.0) - 4.0, 0.0) / 20.0;
+			vec3 c = col < 0.8 ? vec3(0.0, col / 0.8, 0.0) : mix(vec3(0.2, 1.0, 0.5), vec3(1.0), (col - 0.8) / 0.2);
+			
+			result = vec4(c * b, 1.0);
+		}
+	}
+	
+	position.x += 0.05;
+
+	scaledown = DROP_SIZE;
+	rx = fragCoord.x / (40.0 * scaledown);
+	mx = 40.0*scaledown*fract(position.x * 30.0 * scaledown);
+	
+	if (mx > 12.0 * scaledown) {
+		result += vec4(0.0);
+	} else 
+	{
+        float x = floor(rx);
+		float r1x = floor(fragCoord.x / (12.0));
+		
+		float ry = position.y*700.0 + rand(vec2(x, x * 3.0)) * 100000.0 + globalTime* rand(vec2(r1x, 23.0)) * 120.0;
+		float my = mod(ry, 15.0);
+		if (my > 12.0 * scaledown) {
+			result += vec4(0.0);
+		} else {
+		
+			float y = floor(ry / 15.0);
+			
+			float b = rchar(vec2(rx, floor((ry) / 15.0)), vec2(mx, my) / 12.0, globalTime);
+			float col = max(mod(-y, 24.0) - 4.0, 0.0) / 20.0;
+			//vec3 c = col < 0.8 ? vec3(0.0, col / 0.8, 0.0) : mix(vec3(0.2, 1.0, 0.5), vec3(1.0), (col - 0.8) / 0.2);
+			vec3 c = col < 0.8 ? vec3(col / 0.8, 0.3, 0.4) : mix(vec3(0.8, 0.2, 0.5), vec3(0.0), (col - 0.8) / 0.2);
+				
+			result += vec4(c * b, 1.0);
+		}
+	}
+	
+	result = result * length(texture(iChannel0,uv).rgb) + 0.22 * vec4(texture(iChannel0,uv).r, 0., 0., 1.);
+	if(result.b < 0.5)
+	result.b = result.g * 0.5;
+	fragColor = result;
+
+    //vec4 coreColor = texture(iChannel0, uv);
+    //fragColor.rgb = mix(fragColor.rgb, coreColor.rgb, 0.2);
+
+
+
+    vec2 R = iResolution.xy;
+    // Normalized coordinates (0.0 to 1.0)
+    vec2 U_uv = fragCoord / R; 
+
+    // 1. Create a timer. (e.g., changes twice a second. Change 2.0 to whatever speed you want)
+    float flipTimer = floor(iTime * 1.0); 
+    
+    // 2. Get a random float between 0.0 and 1.0
+    float rawRandom = rand(flipTimer);
+    
+    // 3. Convert it to exactly 0.0 or 1.0 
+    // step(0.5, x) returns 0.0 if x is less than 0.5, and 1.0 if x is greater.
+    float randomFlip = step(0.5, rawRandom);
+    
+    if (U_uv.y > .498 && U_uv.y < .500) {
+        // Draw white separator
+        fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    } 
+    else if ( (U_uv.y > .5 && randomFlip == 0.0) || (U_uv.y < .498 && randomFlip == 1.0) ) {
+        // Show orig video
+        vec4 T = texture(iChannel0, uv);
+        fragColor = T;
+    } 
+    else {
+        vec4 coreColor = texture(iChannel0, uv);
+        fragColor.rgb = mix(fragColor.rgb, coreColor.rgb, 0.2);
+    }
+
+
+    // =========================================================================
+    // PART 4: WAVE FUNCTION
+    // =========================================================================
+
+    // Define your colors (Normalized from 0-255 to 0.0-1.0)
+    vec3 MAGENTA = vec3(250.0, 34.0, 197.0) / 255.0;
+    vec3 GREEN   = vec3(8.0, 240.0, 124.0) / 255.0;
+    vec3 CYAN    = vec3(8.0, 224.0, 240.0) / 255.0;
+    vec3 GOLD    = vec3(240.0, 224.0, 8.0) / 255.0;
+    vec3 PURPLE  = vec3(187.0, 34.0, 250.0) / 255.0;
+    vec3 WHITE   = vec3(1.0, 1.0, 1.0);
+    
+    // Calculate accurate Y offsets accounting for OpenGL's bottom-up coordinate system
+    //float yTop    = iResolution.y - 60.0;   // 60 pixels from the top
+    //float yBottom = iResolution.y - 1000.0; // 1410 pixels from the top (30 from bottom on 1440p)
+    //float yBottom = iResolution.y - 1410.0; // 1410 pixels from the top (30 from bottom on 1440p)
+
+    float yTop    = 1350.0;   // 60 pixels from the top
+    float yBottom = 255.0; // 1410 pixels from the top (30 from bottom on 1440p) 
+
+    vec3 finalColor = vec3(0.0);
+    float freq = 0.02; // From your python code
+    
+    // --- COOL FACTOR: TIME SCROLLING ---
+    // Multiplying time creates an offset so the waves visibly "flow" across the screen
+    float speed = iTime * 5.0;
+
+    // Additive blending: Adding the colors together means where they overlap, they blend brightly to white
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.x, yTop, MAGENTA, freq, speed * 1.5);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.y, yTop, GREEN,   freq, speed * 1.2);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.z, yTop, CYAN,    freq, speed * 1.0);
+    
+    // --- BOTTOM WAVES ---
+    // Use negative speed to make bottom waves flow in the opposite direction for contrast!
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.x*2.0, yBottom, MAGENTA,   freq, speed * -3.0);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.y*2.0, yBottom, GREEN, freq, speed * -3.2);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.z*2.0, yBottom, CYAN,  freq, speed * -3.5);
+
+    // Optional: Tone-mapping to prevent the glowing hot spots from burning out entirely
+    finalColor = finalColor / (1.0 + finalColor * 0.2); 
+
+    // Add the wave to the screen
+    finalColor = fragColor.rgb + finalColor;
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+
+
+
+
+    // =========================================================================
+    // PART 5: AUDIO SPECTRUM 1
+    // =========================================================================
+
+    // Get the standard normalized coordinates (0.0 to 1.0)
+    uv = (fragCoord.xy / iResolution.xy);
+
+    // --- START OF SCALING & POSITIONING ---
+    
+    // Set exactly where you want the CENTER of the visualizer (in pixels).
+    // X = middle of screen. Y = 100 pixels up from the bottom.
+    vec2 TARGET_POS = vec2(iResolution.x * 0.5, 400.0); 
+    
+    // Set exactly how large you want the visualizer to be (in pixels).
+    // X = full width of screen. Y = restricted to 100 pixels tall.
+    vec2 TARGET_SIZE = vec2((iResolution.x), 700.0);
+    
+    // Remap the UVs based on our targets
+    uv = (uv - (TARGET_POS / iResolution.xy)) * (iResolution.xy / TARGET_SIZE) + 0.5;
+
+    // --- END OF SCALING & POSITIONING ---
+    // (The rest of the code is unchanged, but uses our newly squished 'uv')
+
+    float fVBars = 40.0;
+    float fHSpacing = 1.00;
+    
+    float x = floor(uv.x * fVBars)/fVBars;
+    float fSample = texture(iChannel3, vec2(abs(2.0 * x - 1.0), 0.25)).x;
+  
+    float squarewave = sign(mod(uv.x, 1.0/fVBars)-0.004);
+    float fft = squarewave * fSample* 0.5; 
+    
+    float fHBars = 0.0; //100.0;
+    float fVSpacing = 0.0; //0.180;
+    float fVFreq = (uv.y * 3.14);
+    fVFreq = sign(sin(fVFreq * fHBars)+1.0-fVSpacing);
+
+    vec2 centered = vec2(1.0) * uv - vec2(1.0);
+    float t = iTime / 100.0;
+    float polychrome = 1.0;
+    vec3 spline_args = fract(vec3(polychrome*uv.x-t) + vec3(0.0, -1.0/3.0, -2.0/3.0));
+    vec3 spline = B2_spline(spline_args);
+    
+    float f = abs(centered.y);
+    vec3 base_color  = vec3(0.95, 0.95, 0.95) - f*spline;
+    vec3 flame_color = pow(base_color, vec3(3.0));
+    
+    float tt = 0.3 - uv.y;
+    float df = sign(tt);
+    df = 0.0; //(df + 1.0)/0.5;
+    vec3 col = flame_color * vec3(1.0 - step(fft, abs(0.3-uv.y))) * vec3(fVFreq);
+    col -= col * df * 0.0180;
+
+    // Add the audio viz to the screen
+    finalColor = fragColor.rgb + col;
+
+    // Output the final mixed color
+    //fragColor = vec4(finalColor, fragColor.a);
+    fragColor = vec4(finalColor, 0.0);
+
+
+    // =========================================================================
+    // PART 6: AUDIO SPECTRUM 2
+    // =========================================================================
+
+    // Set exactly where you want the CENTER of the visualizer (in pixels).
+    // X = middle of screen. Y = 100 pixels up from the bottom.
+    TARGET_POS = vec2(iResolution.x * 0.5, 430.0); 
+    
+    // Set exactly how large you want the visualizer to be (in pixels).
+    // X = full width of screen. Y = restricted to 100 pixels tall.
+    TARGET_SIZE = vec2(iResolution.x, 2400.0);
+    
+    // Remap the UVs based on our targets
+    uv = (uv - (TARGET_POS / iResolution.xy)) * (iResolution.xy / TARGET_SIZE) + 0.5;
+
+    
+    // Because the math in this shader stretches lines to infinity, 
+    // we need to "cut off" the rendering if the pixels are outside our 100px box.
+    //if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+    //    fragColor = vec4(0.0, 0.0, 0.0, 0.0); // Output transparent black
+    //    return;
+    //}
+
+
+    float c = 4.0;
+    vec3 color = vec3(1.0);
+    color.z = bump(c * (uv.x - 0.75));
+    color.y = bump(c * (uv.x - 0.5));
+    color.x = bump(c * (uv.x - 0.25));
+	
+    float line = abs(0.02 / abs(0.5-uv.y) );
+    uv.y = abs( uv.y - 0.5 );
+	
+    vec4 soundWave = texture( iChannel3, vec2(abs(0.5-uv.x)+0.005, uv.y) ).rrrr;
+    color *= line * (1.0 - 2.0 * abs( 0.5 - uv.xxx ) + pow( soundWave.y, 10.0 ) * 50.0 );
+	
+    fragColor = fragColor + vec4(color, 0.0); 
+
+}

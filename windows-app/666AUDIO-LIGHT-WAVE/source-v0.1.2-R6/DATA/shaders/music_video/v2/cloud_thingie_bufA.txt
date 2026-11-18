@@ -1,0 +1,52 @@
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+
+    float d,a,e,i,s,t = iTime;
+    vec3  p = iResolution;    
+    
+    // scale coords
+    fragCoord = (fragCoord+fragCoord-p.xy)/p.y;
+    
+    // cinema bars
+    //if (abs(fragCoord.y) > (1-(iMusicSync0/10.0))) { fragColor = vec4(0); return; }
+    
+    // camera movement
+    fragCoord += vec2(cos(t*.4)*.3, cos(t*.8)*.1);
+    
+    for(fragColor*=i; i++<128.;
+
+        
+        // accumulate distance
+        d += s = min(.01+.4*abs(s),e=max(.7*e, .01)),
+        
+        // purple, blue color
+        fragColor += (1.+cos(.1*p.z*vec4(3-(iMusicSync0/2.0),1,(iMusicSync0/4.0),0)))/(s+e*2.))
+        
+        
+        // noise loop start, march
+        for (p = vec3(fragCoord*d,d+t), // p = ro + rd *d, p.z + t;
+    
+            // entity (orb)
+            e = length(p - vec3(
+                sin(sin(t*.8)+t*.4) * 2.,
+                1.+sin(sin(t*.8)+t*.2) *2.,
+                12.+t+cos(t*.8)*8.))-.1,
+            
+            // spin by t, twist by p.z
+            p.xy *= mat2(cos(.1*t+p.z/16.+vec4(0,33,11,0))),
+            
+            // mirrored planes 4 units apart
+            s = 4. - abs(p.y),
+            
+            // noise starts at .42 up to 16., grow by a+=a
+            a = .42; a < 16.; a += a)
+            
+            // apply turbulence
+            p += cos(.4*t+p.yzx)*.3,
+            
+            // apply noise
+            s -= abs(dot(sin(.1*t+p * a ), .18+p-p)) / a;
+    
+    // tanh tonemap, brightness, light off-screen
+    fragCoord += (fragCoord.yx*.9+.3-vec2(-1.,.5));
+    fragColor = tanh(fragColor/6./max(dot(fragCoord,fragCoord), .001));
+}

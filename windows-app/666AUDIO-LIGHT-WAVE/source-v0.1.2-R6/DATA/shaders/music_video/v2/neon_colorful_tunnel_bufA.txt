@@ -1,0 +1,297 @@
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define H(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+// musk's lense flare, modified by icecool.
+// See the original at: https://www.shadertoy.com/view/4sX3Rs 
+
+float noise(float t)
+{
+	return texture(iChannel0,vec2(t, 0.0) / iChannelResolution[0].xy).x;
+}
+float noise(vec2 t)
+{
+	return texture(iChannel0,(t + vec2(iTime)) / iChannelResolution[0].xy).x;
+}
+
+vec3 lensflare(vec2 uv,vec2 pos)
+{
+	vec2 main = uv-pos;
+	vec2 uvd = uv*(length(uv));
+	
+	float ang = atan(main.y, main.x);
+	float dist=length(main); dist = pow(dist,.1);
+	float n = noise(vec2((ang-iTime/9.0)*16.0,dist*32.0));
+	
+	float f0 = 1.0/(length(uv-pos)*16.0+1.0);
+	
+	f0 = f0+f0*(sin((ang+iTime/18.0 + noise(abs(ang)+n/2.0)*2.0)*12.0)*.1+dist*.1+.8);
+
+	float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos),2.0)),.0)*00.25;
+	float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos),2.0)),.0)*00.23;
+	float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos),2.0)),.0)*00.21;
+	
+	vec2 uvx = mix(uv,uvd,-0.5);
+	
+	float f4 = max(0.01-pow(length(uvx+0.4*pos),2.4),.0)*6.0;
+	float f42 = max(0.01-pow(length(uvx+0.45*pos),2.4),.0)*5.0;
+	float f43 = max(0.01-pow(length(uvx+0.5*pos),2.4),.0)*3.0;
+	
+	uvx = mix(uv,uvd,-.4);
+	
+	float f5 = max(0.01-pow(length(uvx+0.2*pos),5.5),.0)*2.0;
+	float f52 = max(0.01-pow(length(uvx+0.4*pos),5.5),.0)*2.0;
+	float f53 = max(0.01-pow(length(uvx+0.6*pos),5.5),.0)*2.0;
+	
+	uvx = mix(uv,uvd,-0.5);
+	
+	float f6 = max(0.01-pow(length(uvx-0.3*pos),1.6),.0)*6.0;
+	float f62 = max(0.01-pow(length(uvx-0.325*pos),1.6),.0)*3.0;
+	float f63 = max(0.01-pow(length(uvx-0.35*pos),1.6),.0)*5.0;
+	
+	vec3 c = vec3(.0);
+	
+	c.r+=f2+f4+f5+f6; c.g+=f22+f42+f52+f62; c.b+=f23+f43+f53+f63;
+	c+=vec3(f0);
+	
+	return c;
+}
+
+vec3 cc(vec3 color, float factor,float factor2) // color modifier
+{
+	float w = color.x+color.y+color.z;
+	return mix(color,vec3(w)*factor,w*factor2);
+}
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S3(p) p /= dot(p, p); p = fract(p) - 0.5;
+#define G(p, s) p = floor(p * s) / s;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+#define L(p, s) p = mod(p + s/2., s) - s/2.;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M4(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define T3(p) p *= r(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5);
+#define K(p) p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx;
+#define D(p) p.xy = vec2(log(length(p.xy)), atan(p.y, p.x));
+#define Q2(p) p = abs(p-1.)-abs(p+1.)+p;
+void mainImage(out vec4 O, vec2 C)
+{
+    O=vec4(0);
+    vec3 p,q,r=iResolution,
+    d=normalize(vec3((C*2.-r.xy)/r.y,0.1)); 
+    
+    vec4 O2=O;
+
+vec2 I=C;
+    //Clear fragColor
+    O2 = vec4(0);
+    
+    vec3 p2, e, m, c;
+    
+    //Raymarch loop (i = step, z = depth, d = step distance, t = time)
+    for(float i = 0., z = -1.2, d, t = iTime*0.5; i++ < 105.; )
+    {
+        //Ray direction looking down +Z
+        p2 = z * normalize(vec3(I + I - r.xy, r.y));
+
+        M4(p2.xy);
+      
+                  p2.z-=iTime*1.21;
+                 
+        G(p2.xy,35.);
+       
+        // --- FIXED CENTRAL ROTATION ---
+        // Get the base angle and radial distance first
+        float a = atan(p2.y, p2.x),
+              R = length(p2.xy);
+              
+        
+        //Spiral grid cells (6 around circumference, repeating every 2.4 units in Z)
+        float z_id = floor(p2.z / 1.4),
+              ang  = a + z_id * 0.5236,
+              a_id = round(ang * .9549),
+              u    = (ang - a_id / .9549) * 0.0,
+              
+              //Per-cell hash for desynchronized blinking & mushroom sway
+              h = sin(z_id * 19.1 + a_id * 37.7);
+              
+        // --- 1. BLINKING EYEBALLS (Primary Grid) ---
+        e = vec3(u, 3.1 - R, mod(p2.z, 2.4) - 1.2);
+          
+        //Periodic blink: wide open (.35) most of the time, snaps shut (0.0)
+        float blink = .35 * smoothstep(.96, .80, abs(sin(t * 0.3 + h * 6.))),
+        
+        //Almond eyelid curve in Z as a function of horizontal eye position e.x
+              curve = blink * max(0., 1. - e.x * e.x * 3.0),
+              
+        //Upper and lower glowing eyelid rims that pinch shut when blinking
+              lids  = min(
+                  length(vec2(e.z - curve, e.y - .22 + e.x * e.x * .35)) - .035,
+                  length(vec2(e.z + curve, e.y - .22 + e.x * e.x * .35)) - .035
+              ),
+              
+        //Iris & sclera dome (clipped by `abs(e.z) - curve` when eyelids close)
+              r_eye = length(e.xz),
+              iris  = max(
+                  abs(length(e) - .38) - .01 + .012 * cos(r_eye * 48.),
+                  abs(e.z) - curve
+              ),
+              d_eye = min(lids, iris);
+              
+        // --- 2. BIOLUMINESCENT MUSHROOMS (own staggered grid between eyes) ---
+        //Mushroom rows get their own cell ids, so sway/size never tear mid-mushroom
+        float mz  = floor((p2.z + 1.2) / 2.4),
+              man = a + mz * .5236,
+              mid = round(man * .9549),
+              mh  = fract(sin(mz * 12.9898 + mod(mid, 6.) * 78.233) * 43758.5453),
+              msc = .85 + .3 * mh;
+        
+        //Local frame: x = arc length around tunnel (undistorted), y = up from wall, z = along tunnel
+        m = vec3((man - mid / .9549) * R, 3.35 - R, mod(p2.z + 1.2, 2.4) - 1.2) / msc;
+     M4(m.xy);
+        
+        //Lean down the tunnel so we see them in profile instead of straight onto the cap
+        m.yz = vec2(m.y * .878 + m.z * .479, m.z * .878 - m.y * .479);
+        
+        //Organic S-bend sway that grows with height so the root stays planted
+        m.xz += sin(m.y * 2.6 + t * 1.6 + mh * 6.28 + vec2(0, 1.6)) * .07 * m.y;
+         
+        //Cap: squashed ellipsoid shell with a scalloped, slightly curled rim
+        c = m - vec3(0, .62, 0);
+        float rc   = length(c.xz),
+              ga   = atan(c.z, c.x),
+              rim  = .022 * sin(ga * 7. + mh * 9.) - .045 - .09 * smoothstep(.26, .42, rc),
+              cap  = max(abs(length(vec2(rc, c.y * 1.55)) - .42) * .645 - .016, rim - c.y),
+              
+        //Gills: thin radial plates tucked under the cap, shallower toward the rim
+              gills = max(
+                  max(max(rc - .39, .1 - rc), abs(c.y + .01 - .06 * (1. - rc / .39)) - .045),
+                  abs(sin(ga * 6.)) * rc / 6. - .006
+              ),
+              
+        //Stem: tapered tube with a bulb at the root and a little skirt under the cap
+              sr   = .085 - .03 * m.y + .05 * exp(-m.y * 7.),
+              sl   = length(m.xz),
+              stem = min(
+                  max(abs(sl - sr) - .012, abs(m.y - .31) - .31),
+                  length(vec2(sl - sr - .045, m.y - .46 + (sl - sr) * .7)) - .01
+              );
+              
+        //Glowing spots: one on the crown + two staggered rings around the cap
+        float sz = 6.2832 / 6., sz2 = 6.2832 / 9.,
+              p1 = (round(ga / sz) * sz),
+              p2 = (round((ga - sz2 * .5) / sz2) + .5) * sz2,
+              spots = min(min(
+                  length(c - vec3(0, .27, 0)) - .045,
+                  length(c - vec3(cos(p1) * .25, .216, sin(p1) * .25)) - .036),
+                  length(c - vec3(cos(p2) * .37, .127, sin(p2) * .37)) - .03),
+              d_mush = min(min(cap, gills), min(stem, spots)) * msc;
+              
+        // --- 3. MYSTIC SACRED GEOMETRY PORTALS & MYCELIAL ROOTS ---
+        //8-pointed octagram star ring + rotating runic dashes
+        float octagram = 2.2 + .32 * cos(a * 8.) + .12 * cos(a * 4. - t),
+              z_ring   = mod(p.z + .6, 2.4) - 1.2,
+              d_portal = min(
+                  length(vec2(R - octagram, z_ring)) - .025,
+                  max(
+                      length(vec2(R - 1.95, z_ring)) - .04,
+                      abs(sin(a * 24. + t * 2.)) - .45
+                  )
+              ),
+              
+        //Outer lattice of twisting mycelial root tendrils
+              d_roots  = length(vec2(3.45 - R + .1 * sin(p.z * 2.), sin(a * 6. + p.z * 1.5) * .25)) - .045;
+              
+        //Closest surface in scene
+        d = min(min(d_eye, d_mush), min(d_portal, d_roots));
+        
+        //Psychedelic color phase & dark pupil masking
+        float phase = p.z * .25 - t * 1.2,
+              mask  = 1.;
+              
+        if(d == d_eye)
+        {
+            //Concentric rainbow iris + pitch-black central pupil
+         //   phase += r_eye * 29.+ a_id;
+         //   mask   = smoothstep(-0.42, 0.13, r_eye);
+        }
+        else if(d == d_mush)
+        {
+            //Each mushroom gets its own hue; parts are offset from it
+            phase += mh * 6.28;
+            float md = d / msc;
+            if(md == spots)
+            {
+                //Bioluminescent spots: complementary hue, slow breathing pulse
+                phase += 3.1 + t;
+                mask = 1.6 + .9 * sin(t * 2.5 + mh * 20.);
+            }
+            else if(md == cap)
+            {
+                //Cap fades from crown to rim
+                phase += c.y * 5.;
+                mask = .35 + .55 * smoothstep(.15, .42, rc);
+            }
+            else if(md == gills)
+            {
+                phase += 2. + rc * 6.;
+                mask = .4;
+            }
+            else
+            {
+                //Stem: dimmer, with a glow pulse that climbs from root to cap
+                phase += 4. + m.y * 3.;
+                mask = .55 + 1.1 * pow(.5 + .5 * sin(m.y * 9. - t * 4. + mh * 6.), 6.);
+            }
+        }
+        else
+        {
+            //Mystic octagram harmonic
+            phase += a * 4. + R * 13.5;
+        }
+        
+        //Translucent step (.014 floor + .35 understep)
+        float s = abs(d);
+        z += d = 0.014 + 0.10 * s;
+        
+        //Accumulate full-spectrum cosine palette (vec4(0,2,4,0) = 120-deg RGB split)
+        O2 += mask * (cos(phase + vec4(0, 2, 4, 0)) + 1.1)
+             / (1. + s * s * 6e2)
+             * exp(-z * .07);
+    }
+    
+    //Calibrated tanh tonemapping (1.2e2 instead of 1.8e4 = 150x brighter!)
+    O2 = tanh(O2 * O2 / 1.2e2);
+    
+    vec2 uv3 = C.xy / iResolution.xy - 1.0;
+	
+	vec3 mouse = vec3(uv3.xy/iResolution.xy - 0.5,0.);
+
+	
+	vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv3,mouse.xy);
+	color = cc(color,.5,.1);
+    
+    for(float i=0.,a,s,e,g=0.;
+        ++i<100.;
+        O.xyz+=mix(vec3(1),H(g*.1),.8)*3./e/8e3
+    )
+    {
+        p=g*d+O2.xyz;
+      
+        a=30.;
+        p=mod(p-a,a*2.)-a;
+        s=3.;
+        for(int i=0;i++<8;){
+            p=.3-abs(p);
+            p.x<p.z?p=p.zyx:p;
+            p.z<p.y?p=p.xzy:p;
+            s*=e=1.4+sin(iTime*.1)*.1;
+            p=abs(p)*e-
+                vec3(
+                    5.*3.,
+                    120,
+                    8.*5.
+                 );
+         }
+         g+=e=length(p.yzzz)/s;
+    }
+    O.rgb*=O2.xyz;
+     O.rgb+=color*0.5;
+}

@@ -1,0 +1,11 @@
+void mainImage(out vec4 O, vec2 C) {
+    O=vec4(0);
+	for(float g=0.,e,i=1.;i++<60.;){
+        vec3 p=g*vec3((C*2.-iResolution.xy)/iResolution.y,1.);
+        p.z+=iTime;
+        p.z=fract(p.z);
+        for(int j=0;j++<6;)p=abs(p)-.4;
+        g+=e=length(vec2(dot(abs(p.xy),vec2(.6))-.3,p.z))-.001;
+		e<.1?O.xyz+=sin(p*30.+length(p.xy)*15.)/e/30./i:p;
+    }
+}

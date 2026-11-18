@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shader Timeline Editor</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --card-bg: #2a2a3f;
+            --text-color: #cdd6f4;
+            --accent: #89b4fa;
+            --border: #45475a;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            padding: 20px 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        button, input[type="file"]::file-selector-button {
+            background-color: var(--accent);
+            color: #11111b;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        button:hover, input[type="file"]::file-selector-button:hover {
+            opacity: 0.8;
+        }
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .timeline-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            position: relative;
+        }
+        .timeline-item h3 {
+            grid-column: 1 / -1;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .timeline-item h3 span {
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 1.2em;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 0.85em;
+            margin-bottom: 4px;
+            color: #a6adc8;
+        }
+        input[type="text"], input[type="number"] {
+            background-color: #181825;
+            border: 1px solid var(--border);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        input:focus {
+            outline: 2px solid var(--accent);
+        }
+        .actions {
+            grid-column: 1 / -1;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .recalibrate-btn {
+            background-color: #a6e3a1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h2>Shader Timeline Editor</h2>
+            <input type="file" id="fileInput" accept=".json">
+        </div>
+        <div>
+            <span id="currentFileStatus" style="margin-right: 15px; font-family: monospace;">No file loaded</span>
+            <button id="exportBtn" style="display: none;">Export Versioned JSON</button>
+        </div>
+    </div>
+
+    <div id="timelineContainer" class="timeline-container">
+        <!-- Timeline items will be injected here by JavaScript -->
+    </div>
+
+    <script>
+        // Application State
+        let timelineData = [];
+        let originalFilename = "timeline.json";
+        let exportVersion = 1;
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const currentFileStatus = document.getElementById('currentFileStatus');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // 1. Read the JSON file
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            originalFilename = file.name;
+            currentFileStatus.innerText = `Editing: ${originalFilename}`;
+            exportVersion = 1;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (!Array.isArray(parsed.timeline) || parsed.timeline.some(item =>
+                        !item || typeof item !== 'object' || Array.isArray(item) ||
+                        !Number.isFinite(item.effect_start_time) || !Number.isFinite(item.effect_duration) ||
+                        item.effect_start_time < 0 || item.effect_duration < 0)) {
+                        throw new Error('Invalid timeline');
+                    }
+                    timelineData = parsed.timeline;
+                    renderTimeline();
+                    exportBtn.style.display = 'inline-block';
+                } catch (error) {
+                    alert("Error parsing JSON. Please ensure it's a valid JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Helper to format numeric display in UI to keep .0
+        function getDisplayValue(key, val) {
+            if (val === null || val === undefined) return '';
+            if (key === 'effect_start_time' || key === 'effect_duration') {
+                // If it's a clean integer (like 8), format it as "8.0"
+                return Number.isInteger(val) ? val.toFixed(1) : val;
+            }
+            return val;
+        }
+
+        // 2. Render the items dynamically
+        function renderTimeline() {
+            timelineContainer.innerHTML = ''; 
+
+            timelineData.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item';
+
+                const createInput = (label, key, type = "text") => `
+                    <div class="form-group">
+                        <label>${label}</label>
+                        <input type="${type}" 
+                               ${type === 'number' ? 'step="0.1"' : ''} 
+                               data-field="${key}" 
+                               onchange="updateData(${index}, '${key}', this.value, '${type}')"
+                               placeholder="null">
+                    </div>
+                `;
+
+                div.innerHTML = `
+                    <h3><span>#${index}</span> <input type="text" style="flex-grow: 1; font-weight: bold; font-size: 1em;" data-field="name" onchange="updateData(${index}, 'name', this.value, 'text')"></h3>
+                    
+                    ${createInput("Start Time (sec)", "effect_start_time", "number")}
+                    ${createInput("Duration (sec)", "effect_duration", "number")}
+                    
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Shader Effect File</label>
+                        <input type="text" data-field="shader_effect_file" onchange="updateData(${index}, 'shader_effect_file', this.value, 'text')">
+                    </div>
+
+                    ${createInput("Material 1", "material_1")}
+                    ${createInput("Material 2", "material_2")}
+                    ${createInput("Material 3", "material_3")}
+                    ${createInput("Material 4", "material_4")}
+
+                    <div class="actions">
+                        <span style="color: #6c7086; font-size: 0.9em;">Any changes auto-save to memory.</span>
+                        <button class="recalibrate-btn" onclick="recalibrateFrom(${index})">Recalibrate Time From Here ➔</button>
+                    </div>
+                `;
+                for (const input of div.querySelectorAll('input[data-field]')) {
+                    const key = input.dataset.field;
+                    const value = item[key];
+                    input.value = value == null ? '' : String(value);
+                }
+                timelineContainer.appendChild(div);
+            });
+        }
+
+        // 3. Update data when a user types something
+        window.updateData = function(index, key, value, type) {
+            if (type === 'text' && value.trim() === '') {
+                timelineData[index][key] = null;
+            } else if (type === 'number') {
+                timelineData[index][key] = parseFloat(value) || 0;
+            } else {
+                timelineData[index][key] = value;
+            }
+        };
+
+        // 4. The core logic: Recalibrate timeline math
+        window.recalibrateFrom = function(startIndex) {
+            for (let i = startIndex + 1; i < timelineData.length; i++) {
+                let previousItem = timelineData[i - 1];
+                let currentItem = timelineData[i];
+                
+                let calculatedStart = previousItem.effect_start_time + previousItem.effect_duration;
+                currentItem.effect_start_time = Math.round(calculatedStart * 1000) / 1000;
+            }
+            renderTimeline();
+        };
+
+        // 5. Export / Download functionality
+        exportBtn.addEventListener('click', () => {
+            const versionString = String(exportVersion).padStart(3, '0');
+            const baseName = originalFilename.replace(/\.json$/i, '');
+            const newFilename = `${baseName}_${versionString}.json`;
+
+            const finalData = { timeline: timelineData };
+            
+            // Generate standard JSON text first
+            let jsonText = JSON.stringify(finalData, null, 2);
+
+            // FIX: Use Regex to inject ".0" on whole numbers for specific time keys.
+            // This searches for "effect_start_time": 8, and changes it to "effect_start_time": 8.0, 
+            // without harming numbers that already have decimals like 8.5
+            jsonText = jsonText.replace(/"(effect_start_time|effect_duration)":\s*(-?\d+)(?=\s*[,}\n])/g, '"$1": $2.0');
+
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = newFilename;
+            
+            document.body.appendChild(a);
+            a.click();
+            
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            exportVersion++;
+            currentFileStatus.innerText = `Last exported: ${newFilename}`;
+        });
+    </script>
+</body>
+</html>

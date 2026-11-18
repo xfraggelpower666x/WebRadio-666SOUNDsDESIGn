@@ -1,0 +1,28 @@
+This codebase is free to use for non-commercial purposes (CC BY-NC 4.0 license). 
+If you use or modify this codebase, you must link back to this repository 
+and credit InfiniteQuantumZen / Sambodhi Padmasamadhi.
+https://creativecommons.org/licenses/by-nc/4.0
+
+Here we refer codebase a piece of art, glitch art to be specific, 
+and don't even label or call it software, 
+since it might as well be a complete non-sense 
+hallucination of ai vibe coding, 
+pure fantasy and not even work, 
+... or the real deal. 
+
+Thus, THE CODEBASE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE CODEBASE OR THE USE OR OTHER DEALINGS IN THE CODEBASE.
+
+As for the shaders found in DATA/shaders come with what shadertoy 
+has set out for them; the user has modded/evolved several of 
+them in their personal use with the system.
+
+As for the glitch this (MIT License) and stereowidener (CC0 Public Domain): 
+you need to figure them out on your own: 
+https://github.com/TotallyNotChase/glitch-this and
+https://github.com/orchidas/StereoWidener
+

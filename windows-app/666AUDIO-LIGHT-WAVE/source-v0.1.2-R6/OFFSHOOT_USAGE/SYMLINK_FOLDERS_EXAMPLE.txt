@@ -1,0 +1,1 @@
+mklink /J "C:\Users\You\Desktop\AI_Feed\video" "E:\StableDiffusion\Renders"

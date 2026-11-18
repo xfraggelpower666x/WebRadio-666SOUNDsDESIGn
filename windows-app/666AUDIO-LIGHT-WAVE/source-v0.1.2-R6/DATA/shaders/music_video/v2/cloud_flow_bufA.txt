@@ -1,0 +1,20 @@
+void mainImage(out vec4 o, vec2 u) {
+    float i,a,d,s,t=iTime;
+    vec3  p = iResolution;    
+    u = (u+u-p.xy)/p.y;
+        
+    u += vec2(cos(t*.4)*.3, cos(t*.8)*.1);
+    for(o*=i; i++<1e2; ) {
+        p = vec3(u * d, d+t*1e1);
+        p.y *= .7,
+        s =  4e1+p.y-cos(u.x*.5)*3e1;
+        for (a = .2; a < 2.6; a += a)
+            p += cos(t+p.yzx/2.)*.1,
+            s -= abs(dot(sin(t+.05*p.z+.3*p / a), vec3(a)));
+        d += s = .2 + abs(s)*.2;
+        o += 1./s
+          + .2*vec4(1,2,4,0)/abs(1.+2.5*u.y-cos(u.x*.5));
+    }
+    
+    o = tanh(o / 2e2 / length(u-.7)); 
+}

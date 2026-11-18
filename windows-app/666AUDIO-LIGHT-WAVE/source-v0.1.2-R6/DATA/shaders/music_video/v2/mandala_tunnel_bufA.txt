@@ -1,0 +1,219 @@
+// --- CONFIG & UTILS / НАСТРОЙКИ И УТИЛИТЫ ---
+#define NUM_LAYERS 3
+#define GRID_L 6.0
+
+float hash1( float n ) { return fract(sin(n)*437518.56453)+0.1; }
+
+vec3 hsb2rgb( in vec3 c ){
+    vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0 );
+    rgb = rgb*rgb*(3.0-2.0*rgb);
+    return c.z * mix(vec3(1.0), rgb, c.y);
+}
+
+float fbm (in vec2 st, float t) {
+    float value = (sin(t*5.0*hash1(st.x+hash1(st.y)))+4.0)*0.25;
+    return max(0.75,pow(value,3.));
+}
+
+vec3 squaresColors(vec2 p, float t) {
+    float i = p.x; float j = p.y;
+    return hsb2rgb(vec3((hash1(j+hash1(i))), 0.7, fbm(vec2(i,j), t)));
+}
+
+// EN: Original Disco Floor
+// RU: Оригинальный диско-пол
+vec3 getDiscoFloor(vec2 p, float border, float t) {
+    p *= 4.0; vec2 ip = floor(p); vec2 fp = fract(p); ip.x = mod(ip.x, 16.0);
+    vec3 tileColor = squaresColors(ip, t); float glow = 1.0 - length(fp - 0.5) * 1.2;
+    glow = clamp(glow, 0.4, 1.0); tileColor *= glow; float edgeDist = max(abs(fp.x - 0.5), abs(fp.y - 0.5));
+    float sm = 0.03; float borderMask = smoothstep(border - sm, border, edgeDist);
+    return mix(tileColor, vec3(0.01), borderMask);
+}
+
+// --- YOUR ORIGINAL COMPACT PATTERN MACROS (WRAPPED IN BLOCKS) ---
+// EN: Wrapped macros in {} to safely avoid 'else syntax error' conflicts
+// RU: Обернули макросы в {}, чтобы полностью избежать конфликтов с синтаксисом 'else'
+#define r_macro(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S_macro(p) { p /= dot(p, p); p = fract(p) - 0.5; }
+#define G_macro(p, s) { p = floor(p * s) / s; }
+#define F_macro(p, a) { p = abs(p * r_macro(a)); p.y -= 0.5; }
+#define Q_macro(p) { p *= r_macro(round(atan(p.x, p.y) * 4.) / 4.); }
+#define M_macro(p) { p = abs(p) - 0.5; p *= r_macro(0.785); p = abs(p) - 0.2; }
+#define T_macro(p) { p *= r_macro(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5); }
+#define K_macro(p) { p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx; }
+#define Q2_macro(p) { p = abs(p-1.)-abs(p+1.)+p; }
+
+// --- THE NEW CHOSEN MANDALA GENERATOR ENGINE ---
+// EN: Generates fast, variety-rich neon mandalas using your compact math
+// RU: Быстрый генератор разнообразных неоновых мандал на основе вашей математики
+vec3 getCompactNeonMandala(vec2 uv, float cellId, float dist, float iTime) {
+    // EN: Use cellId as unique seed for this specific wall panel
+    // RU: Используем cellId как уникальное семя случайности для конкретной панели стены
+    float h = fract(sin(cellId * 43758.5453));
+    int mode = int(h * 8.0); 
+    
+    vec2 fUV = uv;
+    
+    // EN: Select custom space warping macro pattern dynamically
+    // RU: Выбираем паттерн искажения пространства на основе режима панели
+    if(mode == 0)      { S_macro(fUV); }
+    else if(mode == 1) { G_macro(fUV, 4.0); }
+    else if(mode == 2) { F_macro(fUV, h * 6.28); }
+    else if(mode == 3) { Q_macro(fUV); }
+    else if(mode == 4) { M_macro(fUV); }
+    else if(mode == 5) { T_macro(fUV); }
+    else if(mode == 6) { K_macro(fUV); }
+    else               { Q2_macro(fUV); }
+
+    // EN: Logarithmic time-warp tunnel integration
+    // RU: Логарифмический временной туннель из вашего кода
+    fUV *= r_macro(iTime * 0.11);
+    vec2 J = 4.0 * vec2(log(length(fUV) + 0.001) + iTime, atan(fUV.y, fUV.x));
+    vec2 currI = J;
+
+    for (float n_i = 1.0; n_i < 18.0; n_i++) { // EN: Optimized iteration count for maze / RU: Снизили число итераций для оптимизации FPS
+        currI += 0.28 * sin(currI.yx * n_i + iTime) / n_i;
+    }
+    
+    // EN: Procedural rainbow/neon spectrum coloring engine
+    // RU: Процедурный спектральный неоновый движок окрашивания
+    float hue = cos(iTime * 0.5) * 3.5 + h * 6.28; 
+    vec3 dynamicColor = vec3(hue, hue * 3.1, hue + 4.2);
+
+    // EN: Calculate sharp neon lines glow accumulator
+    // RU: Рассчитываем свечение неоновых линий через tanh
+    vec3 col = tanh((1.0 + sin(currI.x + dynamicColor)) / max(abs(sin(iTime + 17.0 * length(currI - J))), 0.01) / 3.0);
+    
+    return clamp(col, 0.0, 1.0);
+}
+
+// --- GLOBAL TRACK DEFINITION FOR LABYRINTH / ТРАЕКТОРИЯ ЛАБИРИНТА ---
+vec3 getTrackNode(float seg) {
+    vec3 node = vec3(0.0);
+    float base = floor(seg / 3.0) * GRID_L;
+    
+    if (mod(seg, 3.0) == 0.0) {
+        node = vec3(base, base, base);
+    } else if (mod(seg, 3.0) == 1.0) {
+        node = vec3(base + GRID_L, base, base);
+    } else {
+        node = vec3(base + GRID_L, base + GRID_L, base);
+    }
+    return node;
+}
+
+// --- SAFE MATHEMATICAL 3D MAP / СИНХРОНИЗИРОВАННАЯ КАРТА ЛАБИРИНТА ---
+float map3D(vec3 p) {
+    vec3 id = floor(p);
+    float currentSeg = floor((p.x + p.y + p.z) / (GRID_L * 3.0)) * 3.0;
+    bool isWalkableSpace = false;
+    
+    for (float s = currentSeg - 3.0; s <= currentSeg + 6.0; s += 1.0) {
+        vec3 n0 = getTrackNode(s);
+        vec3 n1 = getTrackNode(s + 1.0);
+        
+        vec3 boxMin = min(n0, n1);
+        vec3 boxMax = max(n0, n1) + vec3(1.0);
+        
+        if (p.x >= boxMin.x && p.x < boxMax.x &&
+            p.y >= boxMin.y && p.y < boxMax.y &&
+            p.z >= boxMin.z && p.z < boxMax.z) {
+            isWalkableSpace = true;
+            break;
+        }
+    }
+    
+    if (isWalkableSpace) return 0.0; // Air corridor
+    
+    // EN: Unique voxel id used to seed macro variations
+    // RU: Уникальный ID вокселя стены для разветвления паттернов мандал
+    float n = fract(sin(dot(id, vec3(12.9898, 78.233, 45.164))) * 43758.5453);
+    return ceil(n * 200.0) + 1.0; 
+}
+
+// --- SYNCHRONIZED PATHFINDER / ПУТЕВОДИТЕЛЬ КАМЕРЫ ---
+void getCameraPath(float t, out vec3 ro, out vec3 targetDir) {
+    float speed = 5.2; 
+    float totalProgress = t * speed;
+    
+    float segIndex = floor(totalProgress / GRID_L);
+    float localProgress = fract(totalProgress / GRID_L) * GRID_L;
+    
+    vec3 p0 = getTrackNode(segIndex);
+    vec3 p1 = getTrackNode(segIndex + 1.0);
+    
+    ro = mix(p0, p1, localProgress / GRID_L) + vec3(0.5);
+    targetDir = normalize(p1 - p0);
+    
+    float turnBlend = smoothstep(GRID_L - 1.5, GRID_L, localProgress);
+    vec3 p2 = getTrackNode(segIndex + 2.0);
+    vec3 nextDir = normalize(p2 - p1);
+    
+    targetDir = normalize(mix(targetDir, nextDir, turnBlend));
+}
+
+// --- 3D RAYMARCHING ENGINE / СИСТЕМА ВИЗУАЛИЗАЦИИ ---
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 screenUV = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+ ;
+  float t = iTime; 
+    
+    vec3 ro, camForward;
+    getCameraPath(t, ro, camForward);
+    
+    vec3 worldUp = vec3(0.0, 1.0, 0.0);
+    if (abs(dot(camForward, worldUp)) > 0.95) worldUp = vec3(0.0, 0.0, 1.0); 
+    
+    vec3 camRight = normalize(cross(worldUp, camForward));
+    vec3 camUp = cross(camForward, camRight);
+    
+    vec3 rd = normalize(camRight * screenUV.x + camUp * screenUV.y + camForward * 1.1);
+    rd.xy*=dot( rd.xy, rd.xy)*2.;
+    float roll = sin(t * 0.4) * 0.08;
+    rd.xy *= mat2(cos(roll), -sin(roll), sin(roll), cos(roll));
+  
+    // --- RAYMARCHING CORE ---
+    float d = 0.0;
+    float cellId = 0.0;
+    vec3 p = vec3(0.0);
+    float maxDist = 25.0;
+    
+    for(int i = 0; i < 75; i++) {
+        p = ro + rd * d;
+        cellId = map3D(p);
+        if(cellId > 0.0 || d > maxDist) break;
+        
+        float dBox = length(max(abs(fract(p) - 0.5) - 0.48, 0.0));
+        d += max(dBox, 0.094); 
+    }
+    
+    vec3 finalCol = vec3(0.003, 0.001, 0.006); // EN: Base fog / RU: Базовый темный туман
+    
+    if(cellId > 0.0 && d < maxDist) {
+        vec3 localBoxPos = fract(p) - 0.5;
+        vec3 absNorm = abs(localBoxPos);
+        
+        if (absNorm.y > absNorm.x && absNorm.y > absNorm.z) {
+            // --- DISCO FLOOR OR CEILING ---
+            finalCol = getDiscoFloor(p.xz, 0.46, iTime + 1.0);
+            if(localBoxPos.y > 0.0) finalCol *= 0.3; 
+        } else {
+            // --- WALLS WITH MULTI-PATTERN NEON MANDALAS ---
+            vec2 wallUV = (absNorm.x > absNorm.z) ? p.zy : p.xy;
+            wallUV = fract(wallUV) * 2.0 - 1.0; 
+            
+            // EN: Compute the compact neon mandala on the safe wall grid plane
+            // RU: Вычисляем компактную неоновую мандалу на плоскости стены лабиринта
+            finalCol = getCompactNeonMandala(wallUV, cellId, d, iTime);
+            if(absNorm.z > absNorm.x) finalCol *= 0.6; 
+        }
+        
+        // EN: Volumetric space fog blending
+        // RU: Объемное смешивание с туманом
+        vec3 voidFog = vec3(0.003, 0.001, 0.006);
+        finalCol = mix(finalCol, voidFog, smoothstep(1.0, maxDist, d));
+    }
+    
+    fragColor = vec4(finalCol, 1.0);
+}

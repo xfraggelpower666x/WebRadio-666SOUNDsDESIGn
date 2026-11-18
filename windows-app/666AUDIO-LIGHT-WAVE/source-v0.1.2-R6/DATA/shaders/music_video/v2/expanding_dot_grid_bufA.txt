@@ -1,0 +1,66 @@
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{    
+    float u_time = iTime;
+    
+    vec2 st = fragCoord.xy/iResolution.xy;
+    st.x *= iResolution.x/iResolution.y;
+    st.x -= .7+iMusicSync2;
+            
+    // UNDULATING RING
+	
+    // Coords to center
+    vec2 rst = st - vec2(.5);
+    
+    // Displace with sin to get blobby
+    rst += sin(u_time + atan(sin(u_time/2.), cos(u_time))) / 10.;
+
+    float ringRadius = sin(u_time)/10. + .5 + (iMusicSync2*3);
+    
+    // Black circle where outer is white
+    float outerWhite = distance(rst, vec2(0));
+	// outerWhite -= .3*sin(atan(rst.x,rst.y)*.2);
+    
+    outerWhite = smoothstep(ringRadius-.4, ringRadius-.3, outerWhite);
+    float rc = outerWhite;
+    
+    // White circle where outer is black
+    float outerBlack = distance(rst, vec2(0)); // TODO don't replicate this 
+    outerBlack = smoothstep(ringRadius,ringRadius-0.788,outerBlack);
+    //outerBlack -= sin(rst.y+.1);
+
+    // Multiply to get a ring
+    rc = outerBlack * outerWhite + iMusicSync2;
+
+    // INITIAL DOTS
+    float divisions = 40.0;
+
+    // Create grid
+    vec2 dst = st * divisions;
+    
+    // Divide into squares
+    dst = mod(dst,1.0+iMusicSync2);
+    
+    // Create circles
+    float c;
+    c = distance(dst, vec2(.5+(iMusicSync2*10)));
+
+    // Use ring to size dots.
+    float rcClamped = clamp(rc, .01+iMusicSync2, .6);
+    c = smoothstep(rcClamped, rcClamped+.1, c);    
+        
+    // COLOR
+    float inverted  = 1.0-c;
+    
+    vec3 colorA = vec3(1.000,0.082,0.621);
+    vec3 colorB = vec3(1.000,0.152,0.009);
+    vec3 cPos = mix(colorA, colorB, st.x);
+    
+    vec3 color = cPos * inverted;
+    
+    vec3 colored = color + vec3(c);
+    colored = vec3(1.) - colored;
+    
+    colored = colored * clamp(rc*2.5, .4, 1.);
+
+    fragColor = vec4(vec3(colored),1.0);
+}

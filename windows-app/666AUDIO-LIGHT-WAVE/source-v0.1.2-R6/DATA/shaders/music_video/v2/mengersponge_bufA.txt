@@ -1,0 +1,90 @@
+//Rewritten as of 27-09-2019
+
+#define it 1024.
+#define pr .00001
+#define md 200.
+
+mat2 rotate(float a) {
+    float s = sin(radians(a));
+    float c = cos(radians(a));
+    return mat2(c,-s,s,c);
+}
+
+//Menger sponge SDF by fb39ca4
+//https://www.shadertoy.com/user/fb39ca4
+
+float sdCross(vec3 p) {
+	p = abs(p);
+	vec3 d = vec3(max(p.x, p.y),
+				  max(p.y, p.z),
+				  max(p.z, p.x));
+	return min(d.x, min(d.y, d.z)) - (1.0 / 3.0);
+}
+
+float sdCrossRep(vec3 p) {
+	vec3 q = mod(p + 1.0, 2.0) - 1.0;
+	return sdCross(q);
+}
+
+float sdCrossRepScale(vec3 p, float s) {
+	return sdCrossRep(p * s) / s;	
+}
+
+float sdScene(vec3 p) {
+    float s = 1.0;
+	float d = 0.0;
+	for (int i = 0; i < 5; i++) {
+		d = max(d, -sdCrossRepScale(p, s));
+		s *= 3.0;
+	}
+	return d;
+}
+
+vec4 raymarch(vec3 ro, vec3 rd) {
+    vec3 p = ro;
+    float d;
+    float i;
+    for (i=0.; i < it; i++) {
+        d = sdScene(p);
+        p += rd*d;
+        if (d < pr) break;
+    }
+    return vec4(p,i);
+}
+
+vec3 normals(vec3 p) {
+    vec2 o = vec2(pr,0.0);
+    return normalize(vec3(
+        sdScene(p+o.xyy)-sdScene(p-o.xyy),
+        sdScene(p+o.yxy)-sdScene(p-o.yxy),
+        sdScene(p+o.yyx)-sdScene(p-o.yyx)));
+}
+
+float ambientOcclusion(vec3 p, vec3 n, float s, float iterations, float intensity) {
+    float ao = 0.0;
+    for (float i = 1.0; i <= iterations; i++) {
+        float d = s * i;
+        ao += max((d - sdScene(p + n * d)) / d, 0.0);
+    }
+    return 1.0 - ao * intensity;
+}
+
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = fragCoord/iResolution.xy*2.-1.;
+    uv.y *= iResolution.y/iResolution.x;
+        
+    vec3 ro = vec3(0.0,0.0,mod(iTime,2.0));
+    vec3 rd = normalize(vec3(uv,0.6));
+    rd.xy *= rotate(iTime*15.);
+        
+    vec3 col = vec3(1.);
+    
+    vec4 rm = raymarch(ro,rd);
+    vec3 p = rm.xyz;
+    vec3 n = normals(p);
+    col = mix(vec3(ambientOcclusion(p, n, 0.4, 5.0, 0.2)), vec3(0.6,0.2,0.8), length(p-ro)/5.0) + rm.w / it;
+    
+    fragColor = vec4(col,1.0);
+}

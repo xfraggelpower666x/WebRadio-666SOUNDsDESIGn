@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: CC-BY-NC-SA-4.0
+// Copyright (c) 2026 @Frostbyte
+//[LICENSE] https://creativecommons.org/licenses/by-nc-sa/4.0/ 
+//Super Golfed: https://fragcoord.xyz/s/fg2f9rre
+
+//Code golfed down to 324 chars by Diatribes
+void mainImage(out vec4 O, vec2 C) {
+    float i,d,z;
+    vec3 p,r = iResolution;
+    for(O*=i;i++<1e2;O+=1./d){
+        p=z*normalize(vec3(C.xy-.5*r.xy,r.y));
+        p=abs(fract(vec3(mat2(cos(cos(z*.5)+vec4(0,11,33,0)))*p.xy*2.,p.z-iTime))-.5)-.5;
+        z+=(d=abs(length(max(p,.25))+max(p.x,max(p.y,p.z*3.)))/3.+abs(sin(z*.7-iTime))*.001)*.8;
+    }
+    O*=vec4(p+.8,0)*z/7e4;
+}
+
+/*Original 340 chars:
+void mainImage(out vec4 O, vec2 C) {
+float i,d,z,T=iTime;
+vec3 p,q,R=iResolution,U=normalize(vec3(C.xy-.5*R.xy,R.y));
+for(O*=i;i++<1e2;O+=1./d){
+p=z*U;
+q=abs(fract(vec3(mat2(cos(cos(z*.5)+vec4(0,11,33,0)))*p.xy*2.,p.z-T))-.5)-.5;
+z+=(d=abs(length(max(q,.25))+max(q.x,max(q.y,q.z*3.)))/3.+abs(sin(z*.7-T))*.001)*.8;
+}
+O*=vec4(q+.8,0)*z/ length(U)/7e4;
+}
+*/

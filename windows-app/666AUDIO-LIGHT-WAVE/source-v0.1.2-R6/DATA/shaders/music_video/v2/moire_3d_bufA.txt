@@ -1,0 +1,51 @@
+#define A(a) mat2(cos(a*6.2832 + vec4(0, -1.5708, 1.5708, 0)))  // rotate
+#define O(x,a,b) ((cos(x*6.2832)*.5+.5)*(a-b)+b)  // oscillate x between a & b
+#define H(v) O(radians(vec3(0, 60, 120))+(v), 1., 0.)  // hue
+
+// hex grid ( code yanked from FabriceNeyret2 )
+vec2 hg(vec2 u)
+{
+    vec2 o = vec2(.5, .866),
+         a = mod(u,   o+o)-o,
+         b = mod(u-o, o+o)-o;
+    return dot(a,a) < dot(b,b) ? a : b;
+}
+
+void mainImage( out vec4 C, in vec2 U )
+{
+    float localTime = mod(iTime, 6.0);
+    float t = localTime/1e3,
+          d = 0., i = d, s, x, y, n;
+    
+    vec2 R = iResolution.xy, h,
+         m = ((0.0, 0.0)*.5*R)/R.y;
+    
+    //if (iMouse.z < 1.) m *= 0.;
+    
+    vec3 o = vec3(0, 0, -90./(m.y+1.)),
+         u = normalize(vec3(U-R/2., R.y*.7)),
+         c = vec3(0), p, q;
+    
+    mat2 rh = A(m.x/2.), // rotate horizontal
+         rv = A((m.y+.5)/4.);   // vertical
+    
+    for (; i++<1e2;) // raymarch loop
+    {
+        p = o+u*d;
+        p.xz *= rh;
+        p.yz *= rv;
+        
+        q = round(p);
+        q.xy = p.xy-hg(p.xy); // xy to hex
+        x = q.x; y = q.y; // rounded coords
+        n = x*x + y*y; // pattern
+        p.z -= 2. + sin(n*t*6.2832); // move z
+        s = length(p-q*vec3(1,1,0)); // spheres
+        
+        if (s < 1e-3 || d > 1e3) break;
+        d += sqrt(s)*.6;
+        c += min(s, .005*sqrt(d/s)) * H(n*t) * O(n*t, 1., .4);
+    }
+    
+    C = vec4(tanh(c*c*c), 1);
+}

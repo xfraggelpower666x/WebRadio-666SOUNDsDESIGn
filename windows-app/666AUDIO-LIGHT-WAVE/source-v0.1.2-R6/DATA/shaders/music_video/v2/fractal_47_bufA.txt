@@ -1,0 +1,22 @@
+#define hue(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+#define rot(a)mat2(cos(a),sin(a),-sin(a),cos(a))
+
+void mainImage(out vec4 O, in vec2 C)
+{
+    O=vec4(0);
+    vec3 p,r=iResolution,
+    d=normalize(vec3((C-.5*r.xy)/r.y,1));  
+    for(float i=0.,j,g,e;i++<99.;){
+        vec3 p=d*g;
+        p.z-=-1.;
+        p.y-=p.z*.6;
+        p.xz*=rot(iTime*.1);
+        // https://www.shadertoy.com/view/MlfXW7
+        vec2 z=p.xz;
+        for(j=5.;dot(z,z)<4.&&j++<99.;)
+            z=mat2(z,-z.y,z.x)*z+vec2(.3,.48)*rot(sin(iTime)*.1);       
+        e=p.y+log2(log(j))*exp(-.002*j*j)*.1;
+        g+=e*.5;
+        O.rgb+=mix(vec3(1),hue(log(j)),.8)*log(1./abs(e))/1000.;
+    }
+}

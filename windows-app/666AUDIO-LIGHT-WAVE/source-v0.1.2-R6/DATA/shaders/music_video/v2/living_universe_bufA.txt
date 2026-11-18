@@ -1,0 +1,38 @@
+void mainImage(out vec4 O, vec2 I){
+    vec2 R = iResolution.xy,
+         u = abs(I+I-R)/R;
+    vec3 p, // Ray position
+         r = normalize(vec3(I+I,0) - R.xyy), // Ray direction
+         a = normalize(tan(iTime*.2+vec3(0,1,2))); // Rotation axis
+    float i, // Iterator
+          t, // Distance
+          v, // Density
+          l, // Length^2
+          g, // Gyroid plasma
+          n; // Noise iterator
+    // Raymarching loop
+    for (O*=i; i++<70.;t+=v*.04){
+    p=t*r;
+    // Move camera back
+    p.z+=6.;
+    // Rotate around rotation axis
+    p = a*dot(a,p)*2.-p;
+    // Store length^2
+    l = dot(p,p);
+    // Apply log transform to xy coordinates
+    p.xy = log(abs(p.xy)+.01);
+    // Gyroid plasma for highlights
+    g = abs(dot(cos(p*3.),vec3(1))) + .03;
+    // Turbulence
+    for (n=.5; n++<7.; p+=2.*sin(p.zxy*n+iTime*n)/n);
+    // Density based on distance to sphere
+    v = max(abs(length(p)-.9)+.05, g);
+    // Color accumulation based on iteration and density
+    O+=vec4(2,3,1,0)*exp(sin(i*.3+vec4(0,2,4,0)))/v + vec4(6,9,3,0)/l;
+    }
+    // Tone mapping
+    O = tanh(O/3e2
+    // Rainbow border
+    +.01/min(exp(sin(u.y*3.+iTime*5.+vec4(0,2,4,0)))*abs(u.x-1.),exp(sin(u.x*3.+iTime*5.+vec4(0,2,4,0)))*abs(u.y-1.))
+    );
+}

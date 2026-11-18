@@ -1,0 +1,45 @@
+#define R iResolution.xy
+#define C fragCoord                           
+
+vec3 magma(float t) { // from Mattz
+    const vec3 c0 = vec3(-0.002136485053939582, -0.000749655052795221, -0.005386127855323933);
+    const vec3 c1 = vec3(0.2516605407371642, 0.6775232436837668, 2.494026599312351);
+    const vec3 c2 = vec3(8.353717279216625, -3.577719514958484, 0.3144679030132573);
+    const vec3 c3 = vec3(-27.66873308576866, 14.26473078096533, -13.64921318813922);
+    const vec3 c4 = vec3(52.17613981234068, -27.94360607168351, 12.94416944238394);
+    const vec3 c5 = vec3(-50.76852536473588, 29.04658282127291, 4.23415299384598);
+    const vec3 c6 = vec3(18.65570506591883, -11.48977351997711, -5.601961508734096);
+    t *= 2.; if(t >= 1.) { t = 2. - t; }
+    return c0+t*(c1+t*(c2+t*(c3+t*(c4+t*(c5+t*c6)))));
+}
+
+vec2 cmul( vec2 a, vec2 b )  { return vec2( a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x ); } // from iq
+vec2 cdiv( vec2 a, vec2 b )  { float d = dot(b,b); return vec2( dot(a,b), a.y*b.x - a.x*b.y ) / d; }
+vec2 cpow( vec2 z, float n ) { float r = length( z ); float a = atan( z.y, z.x ); 
+                               return pow( r, n )*vec2( cos(a*n), sin(a*n) ); }
+
+float map(vec2 z, vec2 c, float n) {
+    float i=0., p = 3.0; // Degree
+    vec2 z_prev = vec2(0);
+    
+    // Animate the Julia constant 'c' over time instead of using mouse coordinates
+    c = 0.5 * vec2(cos(iTime * 0.5), sin(iTime * 0.3)) - vec2(0.5, 0.0);
+    
+    for(i=0.; i < n; i++) {
+        z_prev = z;
+        z = z - cdiv(cpow(z, p) - vec2(1, 0), cmul(vec2(p, 0), cpow(z, p-1.0))) + c;
+        if(abs(dot(z-z_prev, z-z_prev)) < 0.0001)
+            break;
+	}   
+    return i/n;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Compute a smooth, periodic zoom-in and zoom-out factor over time
+    float zoom = 0.75 * exp(-1.5 * (1.0 + sin(iTime * 0.4)));
+    // Map screen coordinates with the animated zoom factor centered around (-0.5, 0.0)
+    vec2 uv = zoom * (2.0 * C - R) / R.y - vec2(0.5, 0.0);
+    float t = map(uv, uv, 64.);
+    fragColor = vec4(magma(t), 1.0); 
+}

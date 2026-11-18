@@ -1,0 +1,10 @@
+666AUDIO LIGHT WAVE
+
+Light Wave Tech
+Original: InfiniteQuantumZen / Sambodhi Padmasamadhi
+https://github.com/InfiniteQuantumZen/light_wave_tech
+Original source terms: LICENSE.txt (CC BY-NC 4.0 for the codebase).
+
+Studio and Windows packaging: 666SOUNDsDESIGn / FRAGGLEPOWER666.
+Radio Wave Studio banner: RADIO_WAVE_1.19.3_VISUALS_R02.
+See the original notices for separately attributed components.

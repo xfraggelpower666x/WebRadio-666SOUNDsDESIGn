@@ -1,0 +1,144 @@
+IMAGE
+
+
+2026-04-12:
+ffmpeg -loop 1 -framerate 24 -i your_image.jpg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -vf "scale='min(1920,iw)':'min(1080,ih)':force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -c:a aac -t 6 -pix_fmt yuv420p output.mp4
+
+FULLHD
+
+ffmpeg -loop 1 -framerate 24 -i your_image.jpg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:-1:-1:color=black" -c:v libx264 -crf 17 -c:a aac -t 6 -pix_fmt yuv420p output.mp4
+
+
+___
+
+ffmpeg -loop 1 -r 24 -t 3 -i your_image.jpg -c:v libx264 -pix_fmt yuv420p output.mp4
+
+ffmpeg -loop 1 -r 30 -t 3 -i image1.jpg -loop 1 -r 30 -t 3 -i image2.jpg -loop 1 -r 30 -t 3 -i image3.jpg -loop 1 -r 30 -t 3 -i image4.jpg -loop 1 -r 30 -t 3 -i image5.jpg -filter_complex "[0:v][1:v][2:v][3:v][4:v]concat=n=5:v=1:a=0[v]" -map "[v]" -c:v libx264 -pix_fmt yuv420p output.mp4
+
+ffmpeg -f concat -safe 0 -i input.txt -vf "scale=1080:1080:force_original_aspect_ratio=decrease,pad=1080:1080:(ow-iw)/2:(oh-ih)/2,setsar=1,format=rgb24,fps=24" -c:v libx264 -pix_fmt yuv420p -r 24 output.mp4
+
+
+ffmpeg -i "C:/1/grok-video_glitch_elara/square\grok-video-db451d52-01d9-4858-a565-1a03afc5d2f7 (1).mp4" -i "C:/1/grok-video_glitch_elara/square\grok-video-e959e0aa-3b32-494a-8d11-7f2307251a80 (2).mp4" -i "C:/1/grok-video_glitch_elara/square\grok-video-f4586d90-b5c4-41bd-ac06-1c2dd3c4d536 (2).mp4" -i "C:/1/grok-video_glitch_elara/square\grok-video-97f2b880-f05c-43d9-912f-7a84e0aacaa1.mp4" -i "C:/1/grok-video_glitch_elara/vertical\grok-video-af671510-43ee-4afd-8dcb-3ed9ed1daaf3-4.mp4" -i "C:/1/grok-video_glitch_elara/square\grok-video-f7f699dc-2ec8-4002-9eac-56aa6e4a6e93 (2).mp4" -i "C:/1/grok-video_glitch_elara/square\grok-video-e81bd3d7-b423-4f0f-86b4-b0c324f3f380 (3).mp4" -i "C:/1/grok-video_glitch_elara/vertical\grok-video-f8b1306e-713a-4876-b7e8-051e7beb0c3d (2).mp4" -i "C:/1/grok-video_glitch_elara/square\grok-video-6180c9be-11f0-44aa-937a-8180714d8d1c (1).mp4" -i "C:/1/grok-video_glitch_elara/square\7grok-video-cbfa6c32-b36b-45d4-9e01-7b1be193b7fd.mp4" -loop 1 -r 24 -t 3 -i "C:/1/grok-video_glitch_elara/your_image.jpg" -filter_complex "anullsrc=channel_layout=stereo:sample_rate=44100[a_silent]; [a_silent]atrim=duration=3,asetpts=PTS-STARTPTS[a10]; [0:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; [1:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; [2:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v2]; [3:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v3]; [4:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v4]; [5:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v5]; [6:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v6]; [7:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v7]; [8:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v8]; [9:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v9]; [10:v]scale=640:640:force_original_aspect_ratio=decrease,pad=640:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v10]; [v0][0:a][v1][1:a][v2][2:a][v3][3:a][v4][4:a][v10][a10][v5][5:a][v6][6:a][v7][7:a][v8][8:a][v9][9:a]concat=n=11:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac C:/1/grok-video_glitch_elara/combined_random_collection/combined_random_014.mp4
+
+
+___
+
+mylist.txt:
+
+file 'input1.mp4'
+file 'input2.mp4'
+file 'input3.mp4'
+
+ffmpeg -f concat -safe 0 -i mylist.txt -c copy output.mp4
+
+
+
+____
+
+
+VERTICAL
+464x688 >> 480x640
+
+
+ffmpeg -i input1.mp4 -i input2.mp4 -filter_complex \
+"[0:v]scale=480:640:force_original_aspect_ratio=decrease,pad=480:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; \
+ [1:v]scale=480:640:force_original_aspect_ratio=decrease,pad=480:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; \
+ [v0][0:a][v1][1:a]concat=n=2:v=1:a=1[v][a]" \
+-map "[v]" -map "[a]" -c:v libx264 -c:a aac output.mp4
+
+
+ffmpeg -i input1.mp4 -i input2.mp4 -filter_complex "[0:v]scale=480:640:force_original_aspect_ratio=decrease,pad=480:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; [1:v]scale=480:640:force_original_aspect_ratio=decrease,pad=480:640:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; [v0][0:a][v1][1:a]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac output.mp4
+
+
+
+HORIZONTAL
+640x480 >> 752x416
+688x464 >> 752x416
+
+
+ffmpeg -i input1.mp4 -i input2.mp4 -filter_complex \
+"[0:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; \
+ [1:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; \
+ [v0][0:a][v1][1:a]concat=n=2:v=1:a=1[v][a]" \
+-map "[v]" -map "[a]" -c:v libx264 -c:a aac output.mp4
+
+ffmpeg -i input1.mp4 -i input2.mp4 -i input3.mp4 -filter_complex \
+"[0:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; \
+ [1:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; \
+ [2:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v2]; \
+ [v0][0:a][v1][1:a][v2][2:a]concat=n=3:v=1:a=1[v][a]" \
+-map "[v]" -map "[a]" -c:v libx264 -c:a aac output.mp4
+
+
+ffmpeg -i input1.mp4 -i input2.mp4 -filter_complex "[0:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; [1:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; [v0][0:a][v1][1:a]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac output.mp4
+
+
+ffmpeg -i input1.mp4 -i input2.mp4 -i input3.mp4 -filter_complex "[0:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v0]; [1:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v1]; [2:v]scale=752:416:force_original_aspect_ratio=decrease,pad=752:416:(ow-iw)/2:(oh-ih)/2,setsar=1[v2]; [v0][0:a][v1][1:a][v2][2:a]concat=n=3:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -c:a aac output.mp4
+
+
+#    base_filename = all_frames[i].strip()
+#    base_filename = base_filename.replace("\\", "/")
+#    base_filename = base_filename.split("/")
+#    base_filename = base_filename[len(base_filename)-1]
+#    shutil.copy2(f"{src_path}/{base_filename}", f"{dst_path}/frame_{i:05}.png")
+
+import shutil, subprocess, os, sys
+import blobfile as bf
+
+def _list_image_files_recursively(data_dir):
+  results = []
+  for entry in sorted(bf.listdir(data_dir)):
+    full_path = bf.join(data_dir, entry)
+    ext = entry.split(".")[-1]
+    if "." in entry and ext.lower() in ["jpg", "jpeg", "png", "gif"]:
+      results.append(full_path)
+    elif bf.isdir(full_path):
+      results.extend(_list_image_files_recursively(full_path))
+  return results
+
+def Make_Video(VIDEO_INPUT_PATH, anim_video_name, start_frame=0):
+  VIDEO_OUTPUT_PATH = "F:/Deep_Learning_Local/Extract_Video_Add_Overlay/DST_VIDEO"
+  FFMPEG_PATH = "F:/Deep_Learning_Local/VR3D-CODE/ffmpeg"
+  os.chdir(VIDEO_INPUT_PATH)
+
+  all_frames = _list_image_files_recursively(VIDEO_INPUT_PATH)
+  num_frames = len(all_frames)
+  print(f" - num_frames: {num_frames}")
+  MAX_FRAMES = num_frames
+
+  #FPS = 30
+  FPS = 16
+ 
+  cmd = [
+      f'{FFMPEG_PATH}/ffmpeg.exe',
+      '-y',
+      '-vcodec', 'png',
+      '-r', str(FPS),
+      '-start_number', f'{start_frame}',
+      '-i', 'frame_%05d.png',      #REGULAR 30 FPS
+      #'-i', '%08d.png',            #RIFE 60 FPS
+      '-frames:v', str(MAX_FRAMES),
+      '-c:v', 'libx264',
+      '-vf',
+      f'fps={FPS}',
+      '-pix_fmt', 'yuv420p',
+      '-crf', '17',
+      '-preset', 'faster', #'fast', #'medium',
+      f'{VIDEO_OUTPUT_PATH}/{anim_video_name}.mp4'
+  ]
+
+  print(cmd)
+  process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  stdout, stderr = process.communicate()
+  if process.returncode != 0:
+      print(stderr)
+      raise RuntimeError(stderr)
+
+
+#________________________________________________________
+
+FRAME_INPUT_PATH = "F:/Deep_Learning_Local/Extract_Video_Add_Overlay/SRC_VIDEO/1152x688_combined/combined_001/FINAL"
+Make_Video(FRAME_INPUT_PATH, "digital_dharma_video_600")
+
+
+

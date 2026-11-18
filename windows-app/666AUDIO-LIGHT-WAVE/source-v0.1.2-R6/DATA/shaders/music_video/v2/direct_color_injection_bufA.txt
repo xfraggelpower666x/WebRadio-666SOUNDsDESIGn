@@ -1,0 +1,48 @@
+#define P(z) vec3(tanh(cos((z) * .24) * .7) * 8., \
+                  tanh(cos((z) * .40) * .4) * 6., (z))
+#define T iTime*1.5
+
+void mainImage( out vec4 o, in vec2 u )
+{
+    // FIX: Initialized 'l' to 0.0 to be completely safe against strict compilers, 
+    // even though it gets set during the first inner-loop iteration.
+    float s=.002, l=0.0, w=1., d=0.; 
+    
+    vec3  r = iResolution,
+          e = vec3(.001,0,0),
+          p = P(T),ro=p,
+          Z = normalize( P(T+1.) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          D = vec3((u-r.xy/2.)/r.y, 1) 
+             * mat3(-X, cross(X, Z), Z);
+             
+    // FIX: Removed "o -= o;;" trick. Explicitly set to zero.
+    // This prevents NaN - NaN = NaN bugs from garbage memory.
+    o = vec4(0.0); 
+    
+    for(int i = 0; i++ < 160 && s > .001;) {
+        p = ro+D*d;
+        p.xy -= P(p.z).xy;
+        s = 4.75 - length(p.xy);
+        p.x = clamp(p.x, -.5, .5) * 3.0 - p.x;
+        p.x -=1.5;
+        w = .5;
+        
+        // FIX: Explicitly initialized loop counter 'j = 0'.
+        // Without this, desktop GLSL starts j at a random memory value and the loop breaks.
+        for (int j = 0; j++ < 8; p *= l, w *= l ) {
+            p  = abs(sin(p)) - 1.;
+            l = 1.6/dot(p,p);
+        }
+        
+        o.rgb += (abs(sin(p))*.05);
+        s = min(s, length(p)/w-.01);
+        d += s;
+    }
+    
+    o.rgb *= exp(-d/3.);
+    o.rgb = pow(o.rgb, vec3(.45));
+    
+    // FIX: Set the alpha channel to 1.0 at the end to ensure it renders correctly on desktop.
+    o.a = 1.0; 
+}

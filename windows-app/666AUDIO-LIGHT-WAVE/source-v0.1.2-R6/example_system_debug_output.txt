@@ -1,0 +1,3190 @@
+This is the whole console debug output that runs before and after the system runs; 
+in between there are multiple consoles sending data as visuals from main/DATA/console_filestream_data.txt; 
+several other logging methods are used to trackdown events.
+
+(light_wave_tech) C:\1\light_wave_tech>python 32-bit_STEREO_EQ__light_wave_tech_v1.1.7.py.txt
+pygame-ce 2.5.7 (SDL 2.32.10, Python 3.10.20)
+Loaded config from config/filepaths.json.
+140 items in playlist
+audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+==================IIIIIIIIIII: 270.9264375
+actual_width: 3440
+actual_height: 1440
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+libpng warning: iCCP: known incorrect sRGB profile
+Pre-rendering Matrix Glyphs...
+
+Version Info
+------------
+ModernGL   : 5.12.0
+vendor     : NVIDIA Corporation
+renderer   : NVIDIA GeForce RTX 3060/PCIe/SSE2
+version    : 4.6.0 NVIDIA 595.79
+Max Tex    : 32
+Max Cbd Tex: 192
+code       : 460
+python     : 3.10.20 | packaged by Anaconda, Inc. | (main, Mar 11 2026, 17:42:35) [MSC v.1942 64 bit (AMD64)]
+platform   : win32
+
+Loading neural_indices from C:/1/light_wave_tech/DATA/neural_json_batches\33a0bba8-8346-47bf-a17b-87cdc6a2e203.json
+PRIOR 2026-04-28_EXPERIMENT: 5000
+RND 2026-04-28_EXPERIMENT: 2000
+2026-04-28_EXPERIMENT: 6092
+6092
+Loading neural_indices from C:/1/light_wave_tech/DATA/neural_json_batches\f28c2520-a7c8-4c9d-82e0-631e5a92ba7f.json
+Filtered out 495 out-of-bounds indices.
+PRIOR 2026-04-28_EXPERIMENT: 4505
+RND 2026-04-28_EXPERIMENT: 2000
+2026-04-28_EXPERIMENT: 5552
+5552
+start_index: 1620
+200
+FRESH_BEFORE: 26605
+FRESH_AFTER: 26505
+replacement_start_index: 16607
+video_filenames_left_replacement_src: 200
+Shift_Static_Position()
+   len(video_filenames): 200
+   len(video_filenames_replacement_pool): 200
+   STATIC FOUND: 1: 1047536493.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1047536493.mp4
+   VALUE_AFTER: rep_idx 0 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1939842137.mp4
+   STATIC FOUND: 2: 1231136206.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1231136206.mp4
+   VALUE_AFTER: rep_idx 1 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1581094561.mp4
+   STATIC FOUND: 10: 141891851.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\141891851.mp4
+   VALUE_AFTER: rep_idx 2 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1504961549.mp4
+   STATIC FOUND: 11: 613919178.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\613919178.mp4
+   VALUE_AFTER: rep_idx 3 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1460827791.mp4
+   STATIC FOUND: 12: 11428832.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\11428832.mp4
+   VALUE_AFTER: rep_idx 4 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\341401922.mp4
+   STATIC FOUND: 13: 1508320787.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1508320787.mp4
+   VALUE_AFTER: rep_idx 5 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1685219301.mp4
+   STATIC FOUND: 16: 818453943.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\818453943.mp4
+   VALUE_AFTER: rep_idx 6 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\9405689.mp4
+   STATIC FOUND: 17: 2023446348.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\2023446348.mp4
+   VALUE_AFTER: rep_idx 7 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1278943244.mp4
+   STATIC FOUND: 22: 701680152.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\701680152.mp4
+   VALUE_AFTER: rep_idx 8 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\671296972.mp4
+   STATIC FOUND: 25: 74754974.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\74754974.mp4
+   VALUE_AFTER: rep_idx 9 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1923382056.mp4
+   STATIC FOUND: 31: 126826997.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\126826997.mp4
+   VALUE_AFTER: rep_idx 10 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1263532790.mp4
+   STATIC FOUND: 32: 714878476.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\714878476.mp4
+   VALUE_AFTER: rep_idx 11 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1853233286.mp4
+   STATIC FOUND: 34: 4348842.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\4348842.mp4
+   VALUE_AFTER: rep_idx 12 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\226152137.mp4
+   STATIC FOUND: 35: 384930550.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\384930550.mp4
+   VALUE_AFTER: rep_idx 13 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\926583762.mp4
+   STATIC FOUND: 36: 252331473.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\252331473.mp4
+   VALUE_AFTER: rep_idx 14 H:/grok_elara_video_combined/g_horizontal\1553801620.mp4
+   STATIC FOUND: 37: 1560571053.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1560571053.mp4
+   VALUE_AFTER: rep_idx 15 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1016271408.mp4
+   STATIC FOUND: 41: 305058539.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\305058539.mp4
+   VALUE_AFTER: rep_idx 16 H:/grok_elara_video_combined/g-video\968768948.mp4
+   STATIC FOUND: 43: 1230277962.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1230277962.mp4
+   VALUE_AFTER: rep_idx 17 H:/grok_elara_video_combined/g_horizontal\746432196.mp4
+   STATIC FOUND: 44: 560670957.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\560670957.mp4
+   VALUE_AFTER: rep_idx 18 H:/grok_elara_video_combined/g_horizontal\1441078986.mp4
+   STATIC FOUND: 46: 427050269.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\427050269.mp4
+   VALUE_AFTER: rep_idx 19 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\2128899979.mp4
+   STATIC FOUND: 47: 470128770.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\470128770.mp4
+   VALUE_AFTER: rep_idx 20 H:/grok_elara_video_combined/g_horizontal\426205904.mp4
+   STATIC FOUND: 49: 121031451.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\121031451.mp4
+   VALUE_AFTER: rep_idx 21 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1069150610.mp4
+   STATIC FOUND: 51: 313392492.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\313392492.mp4
+   VALUE_AFTER: rep_idx 22 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\906068904.mp4
+   STATIC FOUND: 55: 201403340.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\201403340.mp4
+   VALUE_AFTER: rep_idx 23 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1521499057.mp4
+   STATIC FOUND: 57: 629248438.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\629248438.mp4
+   VALUE_AFTER: rep_idx 24 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\367420256.mp4
+   STATIC FOUND: 59: 216715770.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\216715770.mp4
+   VALUE_AFTER: rep_idx 25 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1535650801.mp4
+   STATIC FOUND: 62: 196963288.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\196963288.mp4
+   VALUE_AFTER: rep_idx 26 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1999479819.mp4
+   STATIC FOUND: 67: 1334540572.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1334540572.mp4
+   VALUE_AFTER: rep_idx 27 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\751889084.mp4
+   STATIC FOUND: 69: 332435608.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\332435608.mp4
+   VALUE_AFTER: rep_idx 28 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\995046428.mp4
+   STATIC FOUND: 70: 47979842.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\47979842.mp4
+   VALUE_AFTER: rep_idx 29 H:/grok_elara_video_combined/segments\34992355.mp4
+   STATIC FOUND: 72: 311443081.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\311443081.mp4
+   VALUE_AFTER: rep_idx 30 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\242270588.mp4
+   STATIC FOUND: 75: 1764565271.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1764565271.mp4
+   VALUE_AFTER: rep_idx 31 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1379763403.mp4
+   STATIC FOUND: 77: 195467800.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\195467800.mp4
+   VALUE_AFTER: rep_idx 32 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\2000403566.mp4
+   STATIC FOUND: 78: 285186512.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\285186512.mp4
+   VALUE_AFTER: rep_idx 33 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\761884673.mp4
+   STATIC FOUND: 81: 1444183646.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1444183646.mp4
+   VALUE_AFTER: rep_idx 34 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1985372647.mp4
+   STATIC FOUND: 83: 1106394877.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1106394877.mp4
+   VALUE_AFTER: rep_idx 35 H:/grok_elara_video_combined/g_horizontal\892468331.mp4
+   STATIC FOUND: 86: 131433197.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\131433197.mp4
+   VALUE_AFTER: rep_idx 36 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1718038531.mp4
+   STATIC FOUND: 87: 365992611.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\365992611.mp4
+   VALUE_AFTER: rep_idx 37 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\837038595.mp4
+   STATIC FOUND: 89: 1687306099.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1687306099.mp4
+   VALUE_AFTER: rep_idx 38 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1379437132.mp4
+   STATIC FOUND: 90: 721685613.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\721685613.mp4
+   VALUE_AFTER: rep_idx 39 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1308696438.mp4
+   STATIC FOUND: 92: 1065592938.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1065592938.mp4
+   VALUE_AFTER: rep_idx 40 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1344798188.mp4
+   STATIC FOUND: 93: 1360696673.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1360696673.mp4
+   VALUE_AFTER: rep_idx 41 H:/grok_elara_video_combined/g-video\467154364.mp4
+   STATIC FOUND: 94: 20500701.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\20500701.mp4
+   VALUE_AFTER: rep_idx 42 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\312899706.mp4
+   STATIC FOUND: 96: 510345132.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\510345132.mp4
+   VALUE_AFTER: rep_idx 43 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1051161952.mp4
+   STATIC FOUND: 97: 319409871.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\319409871.mp4
+   VALUE_AFTER: rep_idx 44 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\504624820.mp4
+   STATIC FOUND: 98: 969903163.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\969903163.mp4
+   VALUE_AFTER: rep_idx 45 H:/grok_elara_video_combined/g_horizontal\151612537.mp4
+   STATIC FOUND: 101: 785750296.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\785750296.mp4
+   VALUE_AFTER: rep_idx 46 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1499391277.mp4
+   STATIC FOUND: 102: 990438444.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\990438444.mp4
+   VALUE_AFTER: rep_idx 47 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1124790741.mp4
+   STATIC FOUND: 103: 278816928.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\278816928.mp4
+   VALUE_AFTER: rep_idx 48 H:/grok_elara_video_combined/g_horizontal\971136031.mp4
+   STATIC FOUND: 107: 323949206.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\323949206.mp4
+   VALUE_AFTER: rep_idx 49 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1720405476.mp4
+   STATIC FOUND: 108: 389712407.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\389712407.mp4
+   VALUE_AFTER: rep_idx 50 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\131703666.mp4
+   STATIC FOUND: 110: 77780943.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\77780943.mp4
+   VALUE_AFTER: rep_idx 51 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1536193465.mp4
+   STATIC FOUND: 113: 794307776.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\794307776.mp4
+   VALUE_AFTER: rep_idx 52 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\757391178.mp4
+   STATIC FOUND: 114: 215227577.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\215227577.mp4
+   VALUE_AFTER: rep_idx 53 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\484263401.mp4
+   STATIC FOUND: 115: 1221740753.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1221740753.mp4
+   VALUE_AFTER: rep_idx 54 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\263657946.mp4
+   STATIC FOUND: 116: 65278818.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\65278818.mp4
+   VALUE_AFTER: rep_idx 55 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\190543575.mp4
+   STATIC FOUND: 121: 155746862.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\155746862.mp4
+   VALUE_AFTER: rep_idx 56 H:/grok_elara_video_combined/g_horizontal\1857399811.mp4
+   STATIC FOUND: 122: 1893025835.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1893025835.mp4
+   VALUE_AFTER: rep_idx 57 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\2030697154.mp4
+   STATIC FOUND: 124: 470952291.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\470952291.mp4
+   VALUE_AFTER: rep_idx 58 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\2043184502.mp4
+   STATIC FOUND: 129: 715938565.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\715938565.mp4
+   VALUE_AFTER: rep_idx 59 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1564863616.mp4
+   STATIC FOUND: 130: 1066929674.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1066929674.mp4
+   VALUE_AFTER: rep_idx 60 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\383157268.mp4
+   STATIC FOUND: 131: 1631717582.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1631717582.mp4
+   VALUE_AFTER: rep_idx 61 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\2055895325.mp4
+   STATIC FOUND: 132: 189199467.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\189199467.mp4
+   VALUE_AFTER: rep_idx 62 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1137482687.mp4
+   STATIC FOUND: 133: 1065539656.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1065539656.mp4
+   VALUE_AFTER: rep_idx 63 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\2032040413.mp4
+   STATIC FOUND: 134: 180549179.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\180549179.mp4
+   VALUE_AFTER: rep_idx 64 H:/grok_elara_video_combined/g_horizontal\80578314.mp4
+   STATIC FOUND: 135: 999626260.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\999626260.mp4
+   VALUE_AFTER: rep_idx 65 H:/grok_elara_video_combined/g_horizontal\286450993.mp4
+   STATIC FOUND: 137: 165615213.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\165615213.mp4
+   VALUE_AFTER: rep_idx 66 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\2126882341.mp4
+   STATIC FOUND: 139: 497907730.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\497907730.mp4
+   VALUE_AFTER: rep_idx 67 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1799136333.mp4
+   STATIC FOUND: 140: 313211096.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\313211096.mp4
+   VALUE_AFTER: rep_idx 68 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\330017034.mp4
+   STATIC FOUND: 141: 340956228.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\340956228.mp4
+   VALUE_AFTER: rep_idx 69 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1476498340.mp4
+   STATIC FOUND: 142: 322191297.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\322191297.mp4
+   VALUE_AFTER: rep_idx 70 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\22886257.mp4
+   STATIC FOUND: 143: 893852686.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\893852686.mp4
+   VALUE_AFTER: rep_idx 71 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1507352587.mp4
+   STATIC FOUND: 148: 1474241047.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1474241047.mp4
+   VALUE_AFTER: rep_idx 72 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1072698799.mp4
+   STATIC FOUND: 150: 278104942.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\278104942.mp4
+   VALUE_AFTER: rep_idx 73 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1871648601.mp4
+   STATIC FOUND: 154: 1689177854.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1689177854.mp4
+   VALUE_AFTER: rep_idx 74 H:/grok_elara_video_combined/g_horizontal\1310680848.mp4
+   STATIC FOUND: 155: 242620609.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\242620609.mp4
+   VALUE_AFTER: rep_idx 75 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\403411462.mp4
+   STATIC FOUND: 157: 2067177320.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\2067177320.mp4
+   VALUE_AFTER: rep_idx 76 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\896189660.mp4
+   STATIC FOUND: 158: 1042338850.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1042338850.mp4
+   VALUE_AFTER: rep_idx 77 H:/grok_elara_video_combined/g-video\1328580904.mp4
+   STATIC FOUND: 160: 153529897.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\153529897.mp4
+   VALUE_AFTER: rep_idx 78 H:/grok_elara_video_combined/g-video\922366336.mp4
+   STATIC FOUND: 161: 1062585917.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1062585917.mp4
+   VALUE_AFTER: rep_idx 79 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\148206694.mp4
+   STATIC FOUND: 163: 1988242369.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1988242369.mp4
+   VALUE_AFTER: rep_idx 80 H:/grok_elara_video_combined/g_horizontal\400862308.mp4
+   STATIC FOUND: 164: 744763278.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\744763278.mp4
+   VALUE_AFTER: rep_idx 81 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\126453351.mp4
+   STATIC FOUND: 165: 757368245.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\757368245.mp4
+   VALUE_AFTER: rep_idx 82 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1940722952.mp4
+   STATIC FOUND: 166: 280903040.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\280903040.mp4
+   VALUE_AFTER: rep_idx 83 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1553019587.mp4
+   STATIC FOUND: 171: 1740218295.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1740218295.mp4
+   VALUE_AFTER: rep_idx 84 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\655356734.mp4
+   STATIC FOUND: 172: 72999373.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\72999373.mp4
+   VALUE_AFTER: rep_idx 85 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\69102151.mp4
+   STATIC FOUND: 173: 1089404195.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1089404195.mp4
+   VALUE_AFTER: rep_idx 86 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\883294862.mp4
+   STATIC FOUND: 174: 21182902.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\21182902.mp4
+   VALUE_AFTER: rep_idx 87 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\2086321966.mp4
+   STATIC FOUND: 177: 464697475.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\464697475.mp4
+   VALUE_AFTER: rep_idx 88 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\381993420.mp4
+   STATIC FOUND: 178: 584387471.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\584387471.mp4
+   VALUE_AFTER: rep_idx 89 H:/grok_elara_video_combined/g_horizontal\412137478.mp4
+   STATIC FOUND: 183: 88390596.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\88390596.mp4
+   VALUE_AFTER: rep_idx 90 G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1221579555.mp4
+   STATIC FOUND: 184: 342179559.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\342179559.mp4
+   VALUE_AFTER: rep_idx 91 H:/grok_elara_video_combined/g_horizontal\1874020410.mp4
+   STATIC FOUND: 186: 1490567016.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1490567016.mp4
+   VALUE_AFTER: rep_idx 92 H:/grok_elara_video_combined/g_horizontal\1469749080.mp4
+   STATIC FOUND: 189: 203333320.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\203333320.mp4
+   VALUE_AFTER: rep_idx 93 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1566962184.mp4
+   STATIC FOUND: 190: 222969093.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\222969093.mp4
+   VALUE_AFTER: rep_idx 94 H:/grok_elara_video_combined/g_horizontal\1110443486.mp4
+   STATIC FOUND: 192: 29848789.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\29848789.mp4
+   VALUE_AFTER: rep_idx 95 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\186599491.mp4
+   STATIC FOUND: 194: 578919088.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\578919088.mp4
+   VALUE_AFTER: rep_idx 96 H:/grok_elara_video_combined/g-video\625518441.mp4
+   STATIC FOUND: 195: 1983257703.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1983257703.mp4
+   VALUE_AFTER: rep_idx 97 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\862644392.mp4
+   STATIC FOUND: 197: 271814656.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\271814656.mp4
+   VALUE_AFTER: rep_idx 98 G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1540456840.mp4
+   STATIC FOUND: 199: 1745813599.mp4
+   VALUE_BEFORE: G:/grok_elara_video_combined/g_horizontal_static\1745813599.mp4
+   VALUE_AFTER: rep_idx 99 H:/grok_elara_video_combined/g_horizontal\105634213.mp4
+   num_entries: 100
+      LIMITING TO 20
+G:/grok_elara_video_combined/g_horizontal_static\1047536493.mp4
+   INSERT_BACK (0) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\387112023.mp4
+   INSERT_BACK (0) >> AFTER: 66: G:/grok_elara_video_combined/g_horizontal_static\1047536493.mp4
+G:/grok_elara_video_combined/g_horizontal_static\1231136206.mp4
+   INSERT_BACK (1) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1016271408.mp4
+   INSERT_BACK (1) >> AFTER: 37: G:/grok_elara_video_combined/g_horizontal_static\1231136206.mp4
+G:/grok_elara_video_combined/g_horizontal_static\141891851.mp4
+   INSERT_BACK (2) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1460827791.mp4
+   INSERT_BACK (2) >> AFTER: 11: G:/grok_elara_video_combined/g_horizontal_static\141891851.mp4
+G:/grok_elara_video_combined/g_horizontal_static\613919178.mp4
+   INSERT_BACK (3) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\27868614.mp4
+   INSERT_BACK (3) >> AFTER: 84: G:/grok_elara_video_combined/g_horizontal_static\613919178.mp4
+G:/grok_elara_video_combined/g_horizontal_static\11428832.mp4
+   INSERT_BACK (4) >> BEFORE: H:/grok_elara_video_combined/g-video\968768948.mp4
+   INSERT_BACK (4) >> AFTER: 41: G:/grok_elara_video_combined/g_horizontal_static\11428832.mp4
+G:/grok_elara_video_combined/g_horizontal_static\1508320787.mp4
+   INSERT_BACK (5) >> BEFORE: G:/grok_elara_video_combined/g_horizontal_static\141891851.mp4
+   INSERT_BACK (5) >> AFTER: 11: G:/grok_elara_video_combined/g_horizontal_static\1508320787.mp4
+G:/grok_elara_video_combined/g_horizontal_static\818453943.mp4
+   INSERT_BACK (6) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\312899706.mp4
+   INSERT_BACK (6) >> AFTER: 94: G:/grok_elara_video_combined/g_horizontal_static\818453943.mp4
+G:/grok_elara_video_combined/g_horizontal_static\2023446348.mp4
+   INSERT_BACK (7) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\318759657.mp4
+   INSERT_BACK (7) >> AFTER: 26: G:/grok_elara_video_combined/g_horizontal_static\2023446348.mp4
+G:/grok_elara_video_combined/g_horizontal_static\701680152.mp4
+   INSERT_BACK (8) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\694638602.mp4
+   INSERT_BACK (8) >> AFTER: 53: G:/grok_elara_video_combined/g_horizontal_static\701680152.mp4
+G:/grok_elara_video_combined/g_horizontal_static\74754974.mp4
+   INSERT_BACK (9) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\837038595.mp4
+   INSERT_BACK (9) >> AFTER: 87: G:/grok_elara_video_combined/g_horizontal_static\74754974.mp4
+G:/grok_elara_video_combined/g_horizontal_static\126826997.mp4
+   INSERT_BACK (10) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\24769739.mp4
+   INSERT_BACK (10) >> AFTER: 27: G:/grok_elara_video_combined/g_horizontal_static\126826997.mp4
+G:/grok_elara_video_combined/g_horizontal_static\714878476.mp4
+   INSERT_BACK (11) >> BEFORE: G:/grok_elara_video_combined/g_horizontal_static\701680152.mp4
+   INSERT_BACK (11) >> AFTER: 53: G:/grok_elara_video_combined/g_horizontal_static\714878476.mp4
+G:/grok_elara_video_combined/g_horizontal_static\4348842.mp4
+   INSERT_BACK (12) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\61773310.mp4
+   INSERT_BACK (12) >> AFTER: 38: G:/grok_elara_video_combined/g_horizontal_static\4348842.mp4
+G:/grok_elara_video_combined/g_horizontal_static\384930550.mp4
+   INSERT_BACK (13) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1266818399.mp4
+   INSERT_BACK (13) >> AFTER: 28: G:/grok_elara_video_combined/g_horizontal_static\384930550.mp4
+G:/grok_elara_video_combined/g_horizontal_static\252331473.mp4
+   INSERT_BACK (14) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\219802169.mp4
+   INSERT_BACK (14) >> AFTER: 80: G:/grok_elara_video_combined/g_horizontal_static\252331473.mp4
+G:/grok_elara_video_combined/g_horizontal_static\1560571053.mp4
+   INSERT_BACK (15) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\1835494748.mp4
+   INSERT_BACK (15) >> AFTER: 52: G:/grok_elara_video_combined/g_horizontal_static\1560571053.mp4
+G:/grok_elara_video_combined/g_horizontal_static\305058539.mp4
+   INSERT_BACK (16) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_2\1504961549.mp4
+   INSERT_BACK (16) >> AFTER: 10: G:/grok_elara_video_combined/g_horizontal_static\305058539.mp4
+G:/grok_elara_video_combined/g_horizontal_static\1230277962.mp4
+   INSERT_BACK (17) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\663608748.mp4
+   INSERT_BACK (17) >> AFTER: 95: G:/grok_elara_video_combined/g_horizontal_static\1230277962.mp4
+G:/grok_elara_video_combined/g_horizontal_static\560670957.mp4
+   INSERT_BACK (18) >> BEFORE: G:/grok_elara_video_combined/g_square/SRC_NORMAL_1\153116620.mp4
+   INSERT_BACK (18) >> AFTER: 30: G:/grok_elara_video_combined/g_horizontal_static\560670957.mp4
+FOO_LEFT: 200
+FOO_RIGHT: 200
+Starting background loader thread LEFT (Max cache: 5 videos)...
+Starting background loader thread RIGHT (Max cache: 5 videos)...
+Starting background loader thread TRIUNE (Max cache: 5 videos)...
+AUDIO: Loading data...
+audio_len: 270.9264375
+audio_base_filename = 0 nxGamma Drive y001
+Loading data from C:/1/light_wave_tech/DATA/audio_sync_data/0 nxGamma Drive y001_bass_keyframes.csv...
+Import successful. Data grouped and converted to a list of tuples.
+Loading data from C:/1/light_wave_tech/DATA/audio_sync_data/0 nxGamma Drive y001_snare_keyframes.csv...
+Import successful. Data grouped and converted to a list of tuples.
+Loading data from C:/1/light_wave_tech/DATA/audio_sync_data/0 nxGamma Drive y001_hihat_keyframes.csv...
+Import successful. Data grouped and converted to a list of tuples.
+Applying EQ filtering...
+Auto-normalized to prevent clipping (reduced by 3.92 dB)
+--- CURRENT PLAYBACK SETTINGS ---
+Device Name : Headphones (Realtek USB Audio)
+Host API    : Windows WASAPI (20)
+Sample Rate : 48000 Hz (Requested)
+Channels    : 2
+Format      : float64
+Latency     : 3.0 ms - 10.0 ms
+---------------------------------
+random_intro_title: The Essence of Stillness: Meditations on Being.wav
+   load_shadertoy(): DATA/shaders/music_video/v2/surface_passthrough_with_normalize_glitchy_fx.txt
+Loaded 214 items from timeline config.
+Loaded 40 items from main_seq_events config.
+
+======================================================
+TimelineEffectReconstructor._check_shader_integrity():
+  path: C:\1\light_wave_tech\DATA\shaders\music_video\v2
+✅ OK: All expected shader files are present!
+
+⚠️  DEBUG: Extra files found in 'C:/1/light_wave_tech/DATA/shaders/music_video/v2' (462):
+   - 005_needs_tex_bufA.txt
+   - 006_needs_tex_bufA.txt
+   - 3d_grid_bufA.txt
+   - 3d_grid_rainbow_bufA.txt
+   - __TEST__intro_volumetric.txt
+   - __TEST__intro_volumetric_bufA.txt
+   - __TEST__intro_volumetric_timeline.txt
+   - __hyperjump.txt
+   - __postpros_lens_flare.txt
+   - __tree_of_knowledge.txt
+   - abstract_plane_bufA.txt
+   - abstract_star_bufA.txt
+   - abstract_vortex_bufA.txt
+   - abstract_waterfall_bufA.txt
+   - acid_black_holes_bufA.txt
+   - alien_nest_bufA.txt
+   - alien_orb_bufA.txt
+   - alien_tech_2_bufA.txt
+   - anaglyph_sphere_waves_bufA.txt
+   - analog_tv_simulation.txt
+   - ancient_pyramid_bufA.txt
+   - antipod_bufA.txt
+   - apollonian_dreams_bufA.txt
+   - apollonian_fractals_bufA.txt
+   - artifacts_bufA.txt
+   - audio_rainbow_spectrum_2.txt
+   - audio_wave.txt
+   - ball_tunnel_bufA.txt
+   - behind_the_veil_bufA.txt
+   - biocore_plasma_bufA.txt
+   - bioscanner_bufA.txt
+   - bioscanner_rainbow_bufA.txt
+   - bismuth_crystals_bufA.txt
+   - blast_off_bufA.txt
+   - blobby_ball_thingies_bufA.txt
+   - block_flying_tunnel_bufA.txt
+   - block_streams_bufA.txt
+   - block_streams_rainbow_bufA.txt
+   - blocks_light_color_bufA.txt
+   - boukehh_bufA.txt
+   - bouncing_marble_bufA.txt
+   - bouncing_vectors_bufA.txt
+   - box_n_ball_bufA.txt
+   - boxen_bufA.txt
+   - bright_spiral_bufA.txt
+   - bubble_plasma_bufA.txt
+   - bw_dot_rotation_bufA.txt
+   - bw_halftone_metaballs_bufA.txt
+   - bw_pixels_bufA.txt
+   - bw_rotating_zoom_thing_1.txt
+   - bw_rotating_zoom_thing_1_bufA.txt
+   - bw_transformation_bufA.txt
+   - caleidoscope_bufA.txt
+   - canyon_fly_thingie_bufA.txt
+   - carnival_drive_bufA.txt
+   - carpet_fractal_zoom_bufA.txt
+   - caustic_ball_bufA.txt
+   - caustic_iris_bufA.txt
+   - cellular_tunnel_bufA.txt
+   - chaolotus_bufA.txt
+   - chaos_engine_bufA.txt
+   - checkerboard_flight_bufA.txt
+   - chess_zoomer_bufA.txt
+   - chonky_gyroid_bufA.txt
+   - closer_look_bufA.txt
+   - cloud_cruise_bufA.txt
+   - cloud_flow_bufA.txt
+   - cloud_lights_bufA.txt
+   - cloud_palace_bufA.txt
+   - cloud_thingie_bufA.txt
+   - clouds_sun_bufA.txt
+   - cloudy_stuff_bufA.txt
+   - clusterglitch_bufA.txt
+   - colony2_bufA.txt
+   - color_adventure_bufA.txt
+   - color_star_field_bufA.txt
+   - colorful_apollonian_bufA.txt
+   - colorful_mandala_bufA.txt
+   - cosmic_horizon_bufA.txt
+   - cosmic_knot_bufA.txt
+   - cosmos_crystal - Copy.txt
+   - cosmos_crystal_bufA.txt
+   - crack_monochrome_bufA.txt
+   - crystal_ice_flight_bufA.txt
+   - crystal_nebula_bufA.txt
+   - cube_fall_bufA.txt
+   - cube_with_palette_bufA.txt
+   - cut_class_bufA.txt
+   - cyan_cube_bufA.txt
+   - cyana_bufA.txt
+   - cyberpunk_bufA.txt
+   - dancing_pixels_bufA.txt
+   - dark_deco_flight_bufA.txt
+   - dark_transit_tunnel_bufA.txt
+   - data_flow_bufA.txt
+   - deepest_dive_bufA.txt
+   - depth_of_field_spiral_bufA.txt
+   - depths_bufA.txt
+   - diamond_circles_bufA.txt
+   - diffraction_waves_bufA.txt
+   - dimensional_burst_bufA.txt
+   - dimensional_folding_bufA.txt
+   - dimethyltryptamin_1_bufA.txt
+   - dimethyltryptamin_2_bufA.txt
+   - dimethyltryptamin_3_bufA.txt
+   - direct_color_injection_bufA.txt
+   - disco_maze_bufA.txt
+   - disco_tunnel_001_bufA.txt
+   - disco_tunnel_002_bufA.txt
+   - disto_lines_bufA.txt
+   - dithered_star_thingie_bufA.txt
+   - dof_dna_bufA.txt
+   - dof_dna_rainbow.txt
+   - dof_dna_rainbow_bufA.txt
+   - dot_grid_bufA.txt
+   - dream_entity_bufA.txt
+   - energy_bufA.txt
+   - evolving_galaxy_bufA.txt
+   - exp4d_3d_bufA.txt
+   - expanding_dot_grid_bufA.txt
+   - extract_pier_bufA.txt
+   - fiber_bundle_bufA.txt
+   - firewall_bufA.txt
+   - flow_cruise_bufA.txt
+   - flower_006_bufA.txt
+   - flower_fractal_bufA.txt
+   - flower_of_life_bufA.txt
+   - fract_117_bufA.txt
+   - fractal_008_bufA.txt
+   - fractal_013_bufA.txt
+   - fractal_014_bufA.txt
+   - fractal_020_bufA.txt
+   - fractal_022_bufA.txt
+   - fractal_040_bufA.txt
+   - fractal_067_bufA.txt
+   - fractal_068_bufA.txt
+   - fractal_069_bufA.txt
+   - fractal_070_bufA.txt
+   - fractal_075_bufA.txt
+   - fractal_089_bufA.txt
+   - fractal_099_bufA.txt
+   - fractal_109_bufA.txt
+   - fractal_111_bufA.txt
+   - fractal_115_bufA.txt
+   - fractal_116_bufA.txt
+   - fractal_117_bufA.txt
+   - fractal_126_bufA.txt
+   - fractal_127_bufA.txt
+   - fractal_128_bufA.txt
+   - fractal_131_bufA.txt
+   - fractal_135_bufA.txt
+   - fractal_47_bufA.txt
+   - fractal_art_bufA.txt
+   - fractal_fire_bufA.txt
+   - fractal_nebula_bufA.txt
+   - fractal_passes_bufA.txt
+   - fractal_something_bufA.txt
+   - fractal_space_bufA.txt
+   - fractal_strands_bufA.txt
+   - fractal_stroll_bufA.txt
+   - fractal_treasure_bufA.txt
+   - fractal_volume_thingie_bufA.txt
+   - fractal_zoomer_bufA.txt
+   - fractalo_zoom_bufA.txt
+   - fractasia_bufA.txt
+   - fractured_cruise_bufA.txt
+   - fragments_bufA.txt
+   - fragmentum_bufA.txt
+   - frunnel1_bufA.txt
+   - frunnel7_manic_flight_bufA.txt
+   - fun_holographic_bufA.txt
+   - fusion_reactor_bufA.txt
+   - futureshock_bufA.txt
+   - galactic_meteors_bufA.txt
+   - galactic_rift_bufA.txt
+   - gem_cruise_bufA.txt
+   - gem_flight_bufA.txt
+   - gen_art_deco_1_bufA.txt
+   - gen_art_deco_2_bufA.txt
+   - geometric_light_source_bufA.txt
+   - glassy_gyroid_bufA.txt
+   - glittery_lines_bufA.txt
+   - glow_fall_bufA.txt
+   - glow_run_bufA.txt
+   - glowtek_cave_bufA.txt
+   - green_portal_thingie_bufA.txt
+   - green_ray_structure_bufA.txt
+   - green_something_bufA.txt
+   - green_yellow_flying_thing_bufA.txt
+   - grid_3_bufA.txt
+   - grid_3_rainbow_bufA.txt
+   - gyroid_and_turbulence_cruise_bufA.txt
+   - gyroid_tables_bufA.txt
+   - hacker_bunker_bufA.txt
+   - happy_star_bufA.txt
+   - hard_wired_bufA.txt
+   - heap_corruption_bufA.txt
+   - heavenly_cloud_zoom_bufA.txt
+   - hexagonal_star_bufA.txt
+   - hitech_cave_bufA.txt
+   - holographic_dataplane_transport_bufA.txt
+   - holographic_torus_knot_bufA.txt
+   - holographic_wand_bufA.txt
+   - holomorphic_checkerboard_bufA.txt
+   - hydrangea_bufA.txt
+   - hyperbolic_bufA.txt
+   - hypercity_futurespace_bufA.txt
+   - icosahedron_frame_bufA.txt
+   - infinity_loader_bufA.txt
+   - inside_the_matrix_bufA - Copy.txt
+   - inside_the_matrix_bufA.txt
+   - interdimensional_blob_bufA.txt
+   - into_the_ether_bufA.txt
+   - intro_gateway.txt
+   - intro_gateway_bufA - Copy.txt
+   - intro_gateway_bufA.txt
+   - intro_gateway_with_lensflare.txt
+   - intro_gateway_with_lensflare_bufA.txt
+   - intro_gateway_with_lensflare_magenta.txt
+   - intro_gateway_with_lensflare_magenta_bufA.txt
+   - intro_gateway_with_lensflare_rainbow_1.txt
+   - intro_gateway_with_lensflare_rainbow_1_bufA.txt
+   - intro_gateway_with_lensflare_rainbow_2.txt
+   - intro_gateway_with_lensflare_rainbow_2_bufA.txt
+   - intro_light_sprites.txt
+   - inversion_expulsion_bufA.txt
+   - ionize_bufA.txt
+   - journey_to_another_world_bufA.txt
+   - julia_fractal_thingie_bufA.txt
+   - julia_revolute_sliced_bufA.txt
+   - jungle_bufA.txt
+   - kaleidoscope_1_bufA.txt
+   - kaleidoscope_2_bufA.txt
+   - kaleidoscope_pentagon_bufA.txt
+   - krypto_planes_bufA.txt
+   - kryptonite_tunnel_bufA.txt
+   - lasers_bufA.txt
+   - last_relay_bufA.txt
+   - last_relay_rainbow_bufA.txt
+   - lava_tubes_bufA.txt
+   - life_force_bufA.txt
+   - light_and_rays_bufA.txt
+   - light_streams_bufA.txt
+   - light_trip_bufA.txt
+   - light_tunnel_bufA.txt
+   - light_tunnelo_bufA.txt
+   - lightfields_bufA.txt
+   - line_shading_bouncy_bufA.txt
+   - little_lights_bufA.txt
+   - living_universe_bufA.txt
+   - lost_in_spacetime_bufA.txt
+   - lyria_vortex_bufA.txt
+   - main_seq_video_glitch_shaders.rar
+   - mandala_tunnel_bufA.txt
+   - marching_boxes_bufA.txt
+   - matrix_code_blue_bufA.txt
+   - matrix_code_green_bufA.txt
+   - matrix_code_v3.txt
+   - matrix_twirl_blue.txt
+   - matrix_twirl_green.txt
+   - matrix_twirl_rainbow.txt
+   - matrixy_cave_green.txt
+   - matrixy_cave_magenta_cyan.txt
+   - matrixy_room_bufA.txt
+   - matter_splash_bufA.txt
+   - megawave_bufA.txt
+   - memory_stream_bufA.txt
+   - menger_sponge_tunnel_bufA.txt
+   - mengersponge_bufA.txt
+   - metal_menger_flight_bufA.txt
+   - metalfrac_bufA.txt
+   - mindless_drifting_bufA.txt
+   - mindphaser_bufA.txt
+   - mint_cruise_bufA.txt
+   - mirror_grid_bufA.txt
+   - modular_forms_bufA.txt
+   - modulation_bufA.txt
+   - moire_3d_bufA.txt
+   - moire_pattern_bufA.txt
+   - morphing_abstract_bufA.txt
+   - multi_light_cruise_bufA.txt
+   - neat_plasma_blast_bufA.txt
+   - neon_shells_bufA.txt
+   - neon_triangular_bufA.txt
+   - neon_tunnel_bufA.txt
+   - neural_line_pulse_bufA.txt
+   - neural_port_bufA.txt
+   - neuronix_mainframe_bufA.txt
+   - noise_clouds_bufA.txt
+   - normalize_glitchy_fx_bufA.txt
+   - nox_ethereal_bufA.txt
+   - nucleus_bufA.txt
+   - obsolete_bufA.txt
+   - orange_fire_and_smoke_bufA.txt
+   - orb_clouds_bufA.txt
+   - orb_raytracing_bufA.txt
+   - orb_volumetric_shadow_bufA.txt
+   - pastel_surfing_bufA.txt
+   - pathfinder_bufA.txt
+   - pattern_004_bufA.txt
+   - pattern_005_bufA.txt
+   - pattern_007_bufA.txt
+   - pattern_010_bufA.txt
+   - pattern_011_bufA.txt
+   - pattern_012_bufA.txt
+   - pattern_013_bufA.txt
+   - pearlescent_spiral_bufA.txt
+   - perlin_sphere_bufA.txt
+   - phosphor_bufA.txt
+   - pink_fractal_kaleidoscope_bufA.txt
+   - plasma_1_bufA.txt
+   - plasma_2_bufA.txt
+   - plasma_double_swirl_bufA.txt
+   - plasma_storm_bufA.txt
+   - platonic_solids_bufA.txt
+   - plotlines_bufA.txt
+   - pneuma_bufA.txt
+   - polar_orb_bufA.txt
+   - polar_tunnel_bufA.txt
+   - polar_worley_bufA.txt
+   - polyhedron_frame_bufA.txt
+   - psy_ball_spehere_bufA.txt
+   - psy_crystal_bufA.txt
+   - pulse_circle_bufA.txt
+   - purple_bubbles_zoom_bufA.txt
+   - purple_fire_and_smoke_bufA.txt
+   - purple_flower_bufA.txt
+   - purple_warp_plasma_bufA.txt
+   - quantum_cubes_bufA.txt
+   - quark_nova_bufA.txt
+   - radial_blur_thingie_bufA.txt
+   - radial_screen_door_bufA.txt
+   - rainbow_bitstream_bufA.txt
+   - rainbow_cave_bufA.txt
+   - rainbow_circle.txt
+   - rainbow_circles_bufA.txt
+   - rainbow_circular_thingie_bufA.txt
+   - rainbow_cubic_bufA.txt
+   - rainbow_fire_bufA.txt
+   - rainbow_glow_bufA.txt
+   - rainbow_glow_march_bufA.txt
+   - rainbow_glyph_matrix_bufA.txt
+   - rainbow_matrix_bufA.txt
+   - rainbow_plasma_bufA.txt
+   - rainbow_plasma_clouds_bufA.txt
+   - rainbow_quadicube_bufA.txt
+   - rainbow_reflect_bufA.txt
+   - rainbow_road_bufA.txt
+   - rainbow_spiny_poly_bufA.txt
+   - rainbow_triangle_bufA.txt
+   - rainbow_weave_bufA.txt
+   - rainbow_zooming_thingie_bufA.txt
+   - rax_cruise_bufA.txt
+   - raycast_scene_bufA.txt
+   - recursive_lotus_bufA.txt
+   - reflective_box_zoom_bufA.txt
+   - relax_bufA.txt
+   - render_texture_plain.txt
+   - render_texture_plain_zoom_rotate_flash.txt
+   - render_texture_plain_zoom_rotate_flash_circuitry.txt
+   - return_to_source_bufA.txt
+   - rotating_polyhedra_bufA.txt
+   - rotating_rainbow_cube_bufA.txt
+   - schwarz_surface_bufA.txt
+   - shiny_tiles_bufA.txt
+   - sierpinski_glass_shards_bufA.txt
+   - simplex_bufA.txt
+   - sky_blobs_bufA.txt
+   - some_bubbles_bufA.txt
+   - some_bw_wave_bufA.txt
+   - some_colorful_thingie_1_bufA.txt
+   - some_colorful_thingie_2_bufA.txt
+   - some_continuum_bufA.txt
+   - some_depth_of_field_bufA.txt
+   - some_fractal_zoom_bufA.txt
+   - some_gyroid_flight_bufA.txt
+   - some_plasma_tunnel_bufA.txt
+   - some_rainbow_rotating_thing_1_bufA.txt
+   - some_rainbow_rotating_thing_2_bufA.txt
+   - some_rotating_form_bufA.txt
+   - some_triangle_thingie_bufA.txt
+   - some_trip_bufA.txt
+   - some_tunnelo_bufA.txt
+   - some_wireframe_tunnel_bufA.txt
+   - some_zoom_thing_bufA.txt
+   - some_zooming_plasmaa_bufA.txt
+   - soup_balloon_surface_bufA.txt
+   - space_reactor_bufA.txt
+   - space_trajectory_bufA.txt
+   - spacejam_plasma_bufA.txt
+   - spacejunk_party_bufA.txt
+   - specular_bands_bufA.txt
+   - sphere_complex_bufA.txt
+   - sphield_bufA.txt
+   - spinning_lights_bufA.txt
+   - splashdown_bufA.txt
+   - square_dance_bufA.txt
+   - star_in_space_bufA.txt
+   - star_lens_flare.txt
+   - star_lens_flare_2_bufA.txt
+   - star_nest_bufA.txt
+   - star_new_bufA.txt
+   - star_traveling_bufA.txt
+   - starburst_bufA.txt
+   - stardust_thingie_bufA.txt
+   - stars_travel_bufA.txt
+   - steely_blobz_bufA.txt
+   - stellar_magnetic_field_bufA.txt
+   - strange_attractor_bufA.txt
+   - subluminic_bufA.txt
+   - subtle_scales_bufA.txt
+   - sunshine_bufA.txt
+   - super_gyroid_bufA.txt
+   - super_sphere_rush_bufA.txt
+   - supercluster_bufA.txt
+   - surface_passthrough.txt
+   - surface_passthrough_with_dimethyltryptamin_2.txt
+   - surface_passthrough_with_normalize_glitchy_fx.txt
+   - surface_passthrough_with_supercluster.txt
+   - sync_gem_bufA.txt
+   - synthwave_tunnel_bufA.txt
+   - temporal_cubes_bufA.txt
+   - textured_twister_bufA.txt
+   - the_architect_bufA.txt
+   - thermo_cube_bufA.txt
+   - time_gate_bufA.txt
+   - tiny_rainbows_bufA.txt
+   - translucent_tunnel_orbs_bufA.txt
+   - transparent_morphing_color_bufA.txt
+   - trippy_rectangles_bufA.txt
+   - triwave_light_trip_bufA.txt
+   - trizm_bufA.txt
+   - tron_tunnel_bufA.txt
+   - truchet_tunnel_bufA.txt
+   - tumble_rock_bufA.txt
+   - tunnel_001_bufA.txt
+   - tunnel_002_bufA.txt
+   - tunnel_fract_003_bufA.txt
+   - tunnel_fract_003_rainbow_bufA.txt
+   - twisty_cubes_bufA.txt
+   - twisty_torus_bufA.txt
+   - unbound_bufA.txt
+   - unknown_techology_bufA.txt
+   - unusual_liquid_bufA.txt
+   - void_zoom_bufA.txt
+   - volumetric_distorted_sphere_bufA.txt
+   - volumetric_glow_bufA.txt
+   - volumetric_zoom_thingie_bufA.txt
+   - vortex_something_bufA.txt
+   - voxel_space_bufA.txt
+   - voyage_fractal_bufA.txt
+   - warp_gate_bufA.txt
+   - wave_plasma_bufA.txt
+   - wavelights_bufA.txt
+   - wavey_spheres_bufA.txt
+   - whirlpool_bufA.txt
+   - window_bufA.txt
+   - wormhole_travel_bufA.txt
+   - wormhole_traversal_bufA.txt
+   - zooming_boxes_bufA.txt
+   - zooming_space_thingie_bufA.txt
+   - zooming_thingie_bufA.txt
+1/214: 0.0 >> 8.0 (8.0)
+2/214: 8.0 >> 11.0 (3.0)
+3/214: 11.0 >> 18.0 (7.0)
+4/214: 18.0 >> 22.0 (4.0)
+5/214: 22.0 >> 25.0 (3.0)
+6/214: 25.0 >> 26.5 (1.5)
+7/214: 26.5 >> 28.0 (1.5)
+8/214: 28.0 >> 29.5 (1.5)
+9/214: 29.5 >> 31.0 (1.5)
+10/214: 31.0 >> 32.5 (1.5)
+11/214: 32.5 >> 34.5 (2.0)
+12/214: 34.5 >> 38.5 (4.0)
+13/214: 38.5 >> 39.8 (1.3)
+14/214: 39.8 >> 46.3 (6.5)
+15/214: 46.3 >> 49.3 (3.0)
+16/214: 49.3 >> 55.8 (6.5)
+17/214: 55.8 >> 62.3 (6.5)
+18/214: 62.3 >> 65.3 (3.0)
+19/214: 65.3 >> 76.8 (11.5)
+20/214: 76.8 >> 77.8 (1.0)
+chosen_file: matrix_code_green.txt
+21/214: 77.8 >> 83.2 (5.4)
+22/214: 83.2 >> 84.2 (1.0)
+23/214: 84.2 >> 91.2 (7.0)
+24/214: 91.2 >> 98.7 (7.5)
+25/214: 98.7 >> 100.7 (2.0)
+26/214: 100.7 >> 101.5 (0.8)
+27/214: 101.5 >> 102.8 (1.3)
+chosen_file: futureshock.txt
+28/214: 102.8 >> 107.6 (4.8)
+29/214: 107.6 >> 108.3 (0.7)
+30/214: 108.3 >> 109.6 (1.3)
+31/214: 109.6 >> 116.1 (6.5)
+32/214: 116.1 >> 119.1 (3.0)
+33/214: 119.1 >> 121.1 (2.0)
+34/214: 121.1 >> 127.1 (6.0)
+35/214: 127.1 >> 131.1 (4.0)
+36/214: 131.1 >> 135.1 (4.0)
+37/214: 135.1 >> 137.1 (2.0)
+38/214: 137.1 >> 139.1 (2.0)
+39/214: 139.1 >> 139.9 (0.8)
+40/214: 139.9 >> 141.20000000000002 (1.3)
+41/214: 141.20000000000002 >> 143.20000000000002 (2.0)
+chosen_file: rotating_polyhedra.txt
+42/214: 143.20000000000002 >> 148.20000000000002 (5.0)
+43/214: 148.20000000000002 >> 148.9 (0.7)
+44/214: 148.9 >> 150.20000000000002 (1.3)
+45/214: 150.20000000000002 >> 156.70000000000002 (6.5)
+46/214: 156.70000000000002 >> 158.70000000000002 (2.0)
+47/214: 158.70000000000002 >> 159.50000000000003 (0.8)
+48/214: 159.50000000000003 >> 160.80000000000004 (1.3)
+chosen_file: gyroid_tables.txt
+49/214: 160.80000000000004 >> 166.10000000000005 (5.3)
+50/214: 166.10000000000005 >> 166.80000000000004 (0.7)
+51/214: 166.80000000000004 >> 168.10000000000005 (1.3)
+52/214: 168.10000000000005 >> 173.10000000000005 (5.0)
+53/214: 173.10000000000005 >> 180.10000000000005 (7.0)
+54/214: 180.10000000000005 >> 182.10000000000005 (2.0)
+55/214: 182.10000000000005 >> 182.90000000000006 (0.8)
+56/214: 182.90000000000006 >> 184.20000000000007 (1.3)
+57/214: 184.20000000000007 >> 185.40000000000006 (1.2)
+chosen_file: fractal_099.txt
+58/214: 185.40000000000006 >> 190.00000000000006 (4.6)
+chosen_file: blobby_ball_thingies.txt
+59/214: 190.00000000000006 >> 194.60000000000005 (4.6)
+60/214: 194.60000000000005 >> 195.30000000000004 (0.7)
+61/214: 195.30000000000004 >> 196.60000000000005 (1.3)
+62/214: 196.60000000000005 >> 201.60000000000005 (5.0)
+63/214: 201.60000000000005 >> 206.60000000000005 (5.0)
+64/214: 206.60000000000005 >> 210.10000000000005 (3.5)
+65/214: 210.10000000000005 >> 213.10000000000005 (3.0)
+66/214: 213.10000000000005 >> 216.10000000000005 (3.0)
+67/214: 216.10000000000005 >> 217.10000000000005 (1.0)
+68/214: 217.10000000000005 >> 222.10000000000005 (5.0)
+69/214: 222.10000000000005 >> 226.10000000000005 (4.0)
+70/214: 226.10000000000005 >> 228.60000000000005 (2.5)
+71/214: 228.60000000000005 >> 231.10000000000005 (2.5)
+72/214: 231.10000000000005 >> 233.10000000000005 (2.0)
+73/214: 233.10000000000005 >> 238.60000000000005 (5.5)
+74/214: 238.60000000000005 >> 241.60000000000005 (3.0)
+75/214: 241.60000000000005 >> 247.60000000000005 (6.0)
+76/214: 247.60000000000005 >> 251.60000000000005 (4.0)
+77/214: 251.60000000000005 >> 253.60000000000005 (2.0)
+78/214: 253.60000000000005 >> 254.40000000000006 (0.8)
+79/214: 254.40000000000006 >> 255.60000000000005 (1.2)
+80/214: 255.60000000000002 >> 257.6 (2.0)
+81/214: 257.6 >> 262.1 (4.5)
+82/214: 262.1 >> 264.1 (2.0)
+83/214: 264.1 >> 266.1 (2.0)
+84/214: 266.1 >> 270.1 (4.0)
+85/214: 270.1 >> 272.1 (2.0)
+86/214: 272.1 >> 273.3 (1.2)
+87/214: 273.3 >> 277.1 (3.8)
+88/214: 277.1 >> 279.1 (2.0)
+chosen_file: polar_worley.txt
+89/214: 279.1 >> 284.0 (4.9)
+chosen_file: block_flying_tunnel.txt
+90/214: 284.0 >> 289.2 (5.2)
+chosen_file: twisty_cubes.txt
+91/214: 289.2 >> 294.3 (5.1)
+92/214: 294.3 >> 295.0 (0.7)
+93/214: 295.0 >> 296.3 (1.3)
+94/214: 296.3 >> 298.3 (2.0)
+95/214: 298.3 >> 299.3 (1.0)
+96/214: 299.3 >> 301.3 (2.0)
+97/214: 301.3 >> 302.3 (1.0)
+98/214: 302.3 >> 304.3 (2.0)
+99/214: 304.3 >> 305.3 (1.0)
+100/214: 305.3 >> 306.1 (0.8)
+101/214: 306.1 >> 307.40000000000003 (1.3)
+chosen_file: rainbow_glow_march.txt
+102/214: 307.40000000000003 >> 312.70000000000005 (5.3)
+chosen_file: fractal_space.txt
+103/214: 312.70000000000005 >> 317.40000000000003 (4.7)
+104/214: 317.40000000000003 >> 318.40000000000003 (1.0)
+105/214: 318.40000000000003 >> 324.90000000000003 (6.5)
+106/214: 324.90000000000003 >> 326.90000000000003 (2.0)
+107/214: 326.90000000000003 >> 327.70000000000005 (0.8)
+108/214: 327.70000000000005 >> 329.00000000000006 (1.3)
+109/214: 329.00000000000006 >> 331.00000000000006 (2.0)
+chosen_file: dof_dna.txt
+110/214: 331.00000000000006 >> 336.30000000000007 (5.3)
+111/214: 336.30000000000007 >> 337.30000000000007 (1.0)
+112/214: 337.30000000000007 >> 343.30000000000007 (6.0)
+113/214: 343.30000000000007 >> 345.30000000000007 (2.0)
+114/214: 345.30000000000007 >> 348.30000000000007 (3.0)
+115/214: 348.30000000000007 >> 352.30000000000007 (4.0)
+116/214: 352.30000000000007 >> 356.30000000000007 (4.0)
+117/214: 356.30000000000007 >> 359.30000000000007 (3.0)
+118/214: 359.30000000000007 >> 364.30000000000007 (5.0)
+119/214: 364.30000000000007 >> 367.30000000000007 (3.0)
+120/214: 367.30000000000007 >> 372.30000000000007 (5.0)
+121/214: 372.30000000000007 >> 373.80000000000007 (1.5)
+122/214: 373.80000000000007 >> 376.80000000000007 (3.0)
+chosen_file: green_yellow_flying_thing.txt
+123/214: 376.80000000000007 >> 381.4000000000001 (4.6)
+124/214: 381.4000000000001 >> 382.4000000000001 (1.0)
+125/214: 382.4000000000001 >> 387.4000000000001 (5.0)
+126/214: 387.4000000000001 >> 391.4000000000001 (4.0)
+127/214: 391.4000000000001 >> 393.4000000000001 (2.0)
+128/214: 393.4000000000001 >> 399.4000000000001 (6.0)
+129/214: 399.4000000000001 >> 400.2000000000001 (0.8)
+130/214: 400.2000000000001 >> 401.5000000000001 (1.3)
+chosen_file: evolving_galaxy.txt
+131/214: 401.5000000000001 >> 406.5000000000001 (5.0)
+132/214: 406.5000000000001 >> 407.5000000000001 (1.0)
+133/214: 407.5000000000001 >> 413.5000000000001 (6.0)
+134/214: 413.5000000000001 >> 419.0000000000001 (5.5)
+135/214: 419.0000000000001 >> 420.0000000000001 (1.0)
+136/214: 420.0000000000001 >> 420.8000000000001 (0.8)
+137/214: 420.8000000000001 >> 422.10000000000014 (1.3)
+chosen_file: interdimensional_blob.txt
+138/214: 422.10000000000014 >> 427.5000000000001 (5.4)
+139/214: 427.5000000000001 >> 428.5000000000001 (1.0)
+140/214: 428.5000000000001 >> 436.5000000000001 (8.0)
+141/214: 436.5000000000001 >> 440.5000000000001 (4.0)
+142/214: 440.5000000000001 >> 442.5000000000001 (2.0)
+143/214: 442.5000000000001 >> 448.0000000000001 (5.5)
+144/214: 448.0000000000001 >> 451.5000000000001 (3.5)
+145/214: 451.5000000000001 >> 455.0000000000001 (3.5)
+146/214: 455.0000000000001 >> 460.0000000000001 (5.0)
+147/214: 460.0000000000001 >> 463.0000000000001 (3.0)
+148/214: 463.0000000000001 >> 466.0000000000001 (3.0)
+149/214: 466.0000000000001 >> 475.0000000000001 (9.0)
+150/214: 475.0000000000001 >> 485.0000000000001 (10.0)
+151/214: 485.0000000000001 >> 485.8000000000001 (0.8)
+152/214: 485.8000000000001 >> 487.10000000000014 (1.3)
+chosen_file: gen_art_deco_1.txt
+153/214: 487.10000000000014 >> 491.90000000000015 (4.8)
+154/214: 491.90000000000015 >> 497.90000000000015 (6.0)
+155/214: 497.90000000000015 >> 498.90000000000015 (1.0)
+156/214: 498.90000000000015 >> 508.90000000000015 (10.0)
+157/214: 508.9000000000001 >> 512.9000000000001 (4.0)
+158/214: 512.9000000000001 >> 515.9000000000001 (3.0)
+159/214: 515.9000000000001 >> 524.9000000000001 (9.0)
+160/214: 524.9000000000001 >> 525.7 (0.8)
+161/214: 525.7 >> 527.0 (1.3)
+chosen_file: orb_clouds.txt
+162/214: 527.0 >> 531.8 (4.8)
+163/214: 531.8 >> 532.8 (1.0)
+164/214: 532.8 >> 539.8 (7.0)
+165/214: 539.8 >> 541.8 (2.0)
+166/214: 541.8 >> 545.8 (4.0)
+167/214: 545.8 >> 546.8 (1.0)
+168/214: 546.8 >> 547.5999999999999 (0.8)
+169/214: 547.5999999999999 >> 548.8999999999999 (1.3)
+chosen_file: hydrangea.txt
+170/214: 548.8999999999999 >> 553.4999999999999 (4.6)
+171/214: 553.4999999999999 >> 557.4999999999999 (4.0)
+172/214: 557.4999999999999 >> 558.4999999999999 (1.0)
+173/214: 558.4999999999999 >> 563.4999999999999 (5.0)
+174/214: 563.4999999999999 >> 567.4999999999999 (4.0)
+175/214: 567.4999999999999 >> 573.4999999999999 (6.0)
+176/214: 573.4999999999999 >> 577.4999999999999 (4.0)
+177/214: 577.4999999999999 >> 579.4999999999999 (2.0)
+178/214: 579.4999999999999 >> 582.4999999999999 (3.0)
+179/214: 582.4999999999999 >> 585.4999999999999 (3.0)
+180/214: 585.4999999999999 >> 588.4999999999999 (3.0)
+181/214: 588.4999999999999 >> 591.4999999999999 (3.0)
+182/214: 591.4999999999999 >> 598.4999999999999 (7.0)
+183/214: 598.4999999999999 >> 600.4999999999999 (2.0)
+184/214: 600.4999999999999 >> 603.4999999999999 (3.0)
+185/214: 603.4999999999999 >> 604.4999999999999 (1.0)
+chosen_file: colorful_apollonian.txt
+186/214: 604.4999999999999 >> 609.1999999999999 (4.7)
+187/214: 609.1999999999999 >> 610.1999999999999 (1.0)
+188/214: 610.1999999999999 >> 618.1999999999999 (8.0)
+189/214: 618.1999999999999 >> 627.1999999999999 (9.0)
+190/214: 627.1999999999999 >> 629.1999999999999 (2.0)
+191/214: 629.1999999999999 >> 639.1999999999999 (10.0)
+192/214: 639.1999999999999 >> 649.1999999999999 (10.0)
+193/214: 649.1999999999999 >> 656.1999999999999 (7.0)
+194/214: 656.1999999999999 >> 678.1999999999999 (22.0)
+195/214: 678.1999999999999 >> 682.1999999999999 (4.0)
+196/214: 682.1999999999999 >> 685.1999999999999 (3.0)
+197/214: 685.1999999999999 >> 698.1999999999999 (13.0)
+198/214: 698.1999999999999 >> 702.1999999999999 (4.0)
+199/214: 702.1999999999999 >> 705.1999999999999 (3.0)
+200/214: 705.1999999999999 >> 717.1999999999999 (12.0)
+201/214: 717.1999999999999 >> 725.1999999999999 (8.0)
+202/214: 725.1999999999999 >> 748.1999999999999 (23.0)
+203/214: 748.1999999999999 >> 752.1999999999999 (4.0)
+204/214: 752.1999999999999 >> 755.1999999999999 (3.0)
+205/214: 755.1999999999999 >> 777.1999999999999 (22.0)
+206/214: 777.1999999999999 >> 779.1999999999999 (2.0)
+207/214: 779.1999999999999 >> 783.1999999999999 (4.0)
+208/214: 783.1999999999999 >> 785.1999999999999 (2.0)
+209/214: 785.1999999999999 >> 817.1999999999999 (32.0)
+210/214: 817.1999999999999 >> 819.1999999999999 (2.0)
+211/214: 819.1999999999999 >> 824.1999999999999 (5.0)
+212/214: 824.1999999999999 >> 826.1999999999999 (2.0)
+213/214: 826.1999999999999 >> 829.1999999999999 (3.0)
+214/214: 829.1999999999999 >> 874.1999999999999 (45.0)
+Debug: Successfully wrote timeline data to debug/debug_resolved_timeline_a74ef3af-685e-448b-b7b0-c7fbd786b2d0.json
+Loaded 40 events from main_seq_event config.
+
+--- Starting Upfront Resource Pre-Loading & Compilation ---
+Pre-loading master audio to determine track length: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+Texture.__init__():
+   WAV AUDIO
+AudioTexture.get():
+   => Detected audio track length: 4m 30s (270.93 seconds)
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_1.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_1.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_1_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_1_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/intro_light_sprites.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/intro_light_sprites.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/star_lens_flare.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/star_lens_flare.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/textures/v2_anuttara_1440p.png
+Texture.__init__():
+ImageTexture._load_texture():
+   JPG/PNG
+   load_static_image_texture()
+libpng warning: iCCP: known incorrect sRGB profile
+ImageTexture.get():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/alien_orb.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/alien_orb.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/alien_orb.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/alien_orb_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/alien_orb_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/alien_orb_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/bioscanner.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/bioscanner.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/bioscanner.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/bioscanner_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/bioscanner_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/bioscanner_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/dof_dna_rainbow.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/dof_dna_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/dof_dna_rainbow.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/dof_dna_rainbow_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/dof_dna_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/dof_dna_rainbow_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/bioscanner_rainbow.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/bioscanner_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/bioscanner_rainbow.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/bioscanner.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/bioscanner.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/bioscanner_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/bioscanner_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/3d_grid_rainbow.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/3d_grid_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/3d_grid_rainbow.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/3d_grid_rainbow_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/3d_grid_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/3d_grid_rainbow_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/3d_grid.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/3d_grid.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/3d_grid.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/3d_grid_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/3d_grid_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/3d_grid_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/specular_bands.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/specular_bands.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/specular_bands.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/specular_bands_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/specular_bands_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/specular_bands_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/kaleidoscope_2.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/kaleidoscope_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/kaleidoscope_2.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/__hyperjump.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/__hyperjump.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/matrix_code_green.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/matrix_code_green.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/matrix_code_green.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/matrix_code_green_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/matrix_code_green_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/matrix_code_green_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+Texture.__init__():
+  [Cache Miss] Loading Texture: RGBAnoise_extra_large_1024x1024.png
+Texture.__init__():
+ImageTexture._load_texture():
+   JPG/PNG
+   create_rgba_noise_texture(1024x1024) extra_large
+ImageTexture.get():
+  [Cache Miss] Loading Texture: RGBAnoise_large_512x512.png
+Texture.__init__():
+ImageTexture._load_texture():
+   JPG/PNG
+   create_rgba_noise_texture(512x512) large
+ImageTexture.get():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/futureshock.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/futureshock.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/futureshock.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/futureshock_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/futureshock_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/futureshock_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/rotating_polyhedra.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/rotating_polyhedra.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/rotating_polyhedra.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/rotating_polyhedra_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/rotating_polyhedra_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/rotating_polyhedra_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/gyroid_tables.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/gyroid_tables.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/gyroid_tables.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/gyroid_tables_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/gyroid_tables_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/gyroid_tables_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/fractal_099.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/fractal_099.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/fractal_099.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/fractal_099_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/fractal_099_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/fractal_099_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/blobby_ball_thingies.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/blobby_ball_thingies.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/blobby_ball_thingies.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/blobby_ball_thingies_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/blobby_ball_thingies_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/blobby_ball_thingies_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/textures/bayer_8x8.png
+Texture.__init__():
+ImageTexture._load_texture():
+   JPG/PNG
+   load_static_image_texture()
+ImageTexture.get():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_ascii_art_bioscanner_magenta.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_ascii_art_bioscanner_magenta.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/textures/font1_1024x1024.png
+Texture.__init__():
+ImageTexture._load_texture():
+   JPG/PNG
+   load_static_image_texture()
+ImageTexture.get():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/bioscanner.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/bioscanner.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/bioscanner_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/bioscanner_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/textures/bayer_8x8.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_chromatic_barrel.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_chromatic_barrel.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/matrix_twirl_rainbow.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/matrix_twirl_rainbow.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/specular_bands.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/specular_bands.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/specular_bands_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/specular_bands_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/bioscanner_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/bioscanner_rainbow.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_chromatic_barrel.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_ascii_art_layered.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_ascii_art_layered.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/textures/font1_1024x1024.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/matrixy_rainbow_vortex.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/matrixy_rainbow_vortex.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/polar_worley.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/polar_worley.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/polar_worley.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/polar_worley_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/polar_worley_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/polar_worley_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/block_flying_tunnel.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/block_flying_tunnel.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/block_flying_tunnel.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/block_flying_tunnel_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/block_flying_tunnel_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/block_flying_tunnel_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/twisty_cubes.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/twisty_cubes.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/twisty_cubes.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/twisty_cubes_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/twisty_cubes_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/twisty_cubes_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/textures/bayer_8x8.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_vert.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_vert.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_vert.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_vert_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_vert_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/rainbow_glow_march.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/rainbow_glow_march.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/rainbow_glow_march.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/rainbow_glow_march_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/rainbow_glow_march_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/rainbow_glow_march_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/fractal_space.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/fractal_space.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/fractal_space.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/fractal_space_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/fractal_space_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/fractal_space_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/dof_dna.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/dof_dna.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/dof_dna.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/dof_dna_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/dof_dna_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/dof_dna_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/rainbow_circle.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/rainbow_circle.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/kaleidoscope_1.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/kaleidoscope_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/kaleidoscope_1.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/kaleidoscope_1_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/kaleidoscope_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/kaleidoscope_1_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/kaleidoscope_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/kaleidoscope_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_chromatic_barrel.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/rainbow_circle.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/green_yellow_flying_thing.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/green_yellow_flying_thing.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/green_yellow_flying_thing.txt
+  [Cache Miss] Loading Shader: DATA/shaders/music_video/v2/green_yellow_flying_thing_bufA.txt
+   load_shadertoy(): DATA/shaders/music_video/v2/green_yellow_flying_thing_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Miss] Loading Texture: DATA/shaders/music_video/v2/green_yellow_flying_thing_bufA.txt
+Texture.__init__():
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+   [Detected Buffer A] for DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt
+  [Cache Hit] Texture: RGBAnoise_extra_large_1024x1024.png
+  [Cache Hit] Texture: RGBAnoise_large_512x512.png
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Shader: DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt
+_pre_load_and_compile_resources(): self.audio_path: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+  [Cache Hit] Texture: F:/SUNO_32-BIT_AUDIO/HARDWAVE/0 nxGamma Drive y001.wav
+   [CULLING] Skipping 'video_glitch_2'. Starts at 391.4s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_ripple'. Starts at 393.4s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_1'. Starts at 399.4s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_2'. Starts at 400.2s (Beyond song end).
+   [CULLING] Skipping 'RECONSTRUCTED_EFFECT'. Starts at 401.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 406.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 407.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry'. Starts at 413.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 419.0s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_1'. Starts at 420.0s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_2'. Starts at 420.8s (Beyond song end).
+   [CULLING] Skipping 'RECONSTRUCTED_EFFECT'. Starts at 422.1s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 427.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry'. Starts at 428.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 436.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 440.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 442.5s (Beyond song end).
+   [CULLING] Skipping 'video_play_normal'. Starts at 448.0s (Beyond song end).
+   [CULLING] Skipping 'video_ascii_art_bioscanner_magenta'. Starts at 451.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry'. Starts at 455.0s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 460.0s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 463.0s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 466.0s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_ripple_box_rot'. Starts at 475.0s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_1'. Starts at 485.0s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_2'. Starts at 485.8s (Beyond song end).
+   [CULLING] Skipping 'RECONSTRUCTED_EFFECT'. Starts at 487.1s (Beyond song end).
+   [CULLING] Skipping 'kaleidoscope_2'. Starts at 491.9s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 497.9s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 498.9s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 508.9s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_1'. Starts at 512.9s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 515.9s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_1'. Starts at 524.9s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_2_rainbow'. Starts at 525.7s (Beyond song end).
+   [CULLING] Skipping 'RECONSTRUCTED_EFFECT'. Starts at 527.0s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 531.8s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry'. Starts at 532.8s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 539.8s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 541.8s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 545.8s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_1'. Starts at 546.8s (Beyond song end).
+   [CULLING] Skipping 'singular_effect_ease_in_out_2'. Starts at 547.6s (Beyond song end).
+   [CULLING] Skipping 'RECONSTRUCTED_EFFECT'. Starts at 548.9s (Beyond song end).
+   [CULLING] Skipping 'kaleidoscope_2'. Starts at 553.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 557.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 558.5s (Beyond song end).
+   [CULLING] Skipping 'video_play_normal'. Starts at 563.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry'. Starts at 567.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_1'. Starts at 573.5s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 577.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_matrix'. Starts at 579.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_matrix_layered'. Starts at 582.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 585.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_1'. Starts at 588.5s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 591.5s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 598.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_1'. Starts at 600.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 603.5s (Beyond song end).
+   [CULLING] Skipping 'RECONSTRUCTED_EFFECT'. Starts at 604.5s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 609.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry'. Starts at 610.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 618.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_2'. Starts at 627.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_ripple'. Starts at 629.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 639.2s (Beyond song end).
+   [CULLING] Skipping 'alien_orb'. Starts at 649.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain_circuitry FOO << ADD HERE SOME EFFECT'. Starts at 656.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 678.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 682.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 685.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 698.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 702.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 705.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_ripple_box_rot'. Starts at 717.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain FOO << ADD HERE SOME EFFECT'. Starts at 725.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 748.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_1'. Starts at 752.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 755.2s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 777.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_1'. Starts at 779.2s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 783.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain FOO << ADD HERE SOME EFFECT'. Starts at 785.2s (Beyond song end).
+   [CULLING] Skipping 'video_dither'. Starts at 817.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_matrix'. Starts at 819.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_rgb_shift_2'. Starts at 824.2s (Beyond song end).
+   [CULLING] Skipping 'video_glitch_1'. Starts at 826.2s (Beyond song end).
+   [CULLING] Skipping 'render_texture_plain'. Starts at 829.2s (Beyond song end).
+--- Pre-Loading Complete ---
+
+--- Main Segment 1 ---
+  num_videos_per_segment: 7
+  0: 5.690733176699061 @ 2.108691380775765
+  1: 5.649301088660446 @ 2.1241565658603307
+  2: 5.817257768637618 @ 2.062827620377283
+  3: 5.68418363419099 @ 2.11112109887138
+  4: 5.421947863128711 @ 2.2132267411873365
+  5: 5.732430331104096 @ 2.0933529597190477
+  6: 5.4547164074473296 @ 2.199931051157195
+  start_time: 39.8
+  end_time  : 77.8
+  total_duration: 38.0
+  event_count: 7
+  new_end_time  : 79.09946073948282
+  new_segment_duration: 39.29946073948283
+  Contains 4 of the main driver render shaders.
+
+--- Main Segment 2 ---
+  num_videos_per_segment: 4
+  0: 5.620722985773943 @ 2.134956664893825
+  1: 5.878257366808905 @ 2.0414213347916697
+  2: 6.0 @ 1.0
+  3: 6.0 @ 1.0
+  start_time: 83.2
+  end_time  : 102.80000000000001
+  total_duration: 19.6
+  event_count: 6
+  new_end_time  : 106.15369676003019
+  new_segment_duration: 22.953696760030176
+  Contains 3 of the main driver render shaders.
+
+--- Main Segment 3 ---
+  num_videos_per_segment: 6
+  0: 5.40827153931689 @ 2.218823502622374
+  1: 5.788673867762468 @ 2.073013659800191
+  2: 5.615051747952768 @ 2.137112984644383
+  3: 5.652068925197615 @ 2.123116359480779
+  4: 5.30616315258565 @ 2.26152111326477
+  5: 5.942362512978081 @ 2.019398845794426
+  start_time: 107.6
+  end_time  : 143.2
+  total_duration: 35.599999999999994
+  event_count: 13
+  new_end_time  : 141.37022923281538
+  new_segment_duration: 33.77022923281539
+  Contains 5 of the main driver render shaders.
+
+--- Main Segment 4 ---
+  num_videos_per_segment: 3
+  0: 5.3097103863049435 @ 2.2600102692890687
+  1: 5.802495042621262 @ 2.0680758728540045
+  2: 5.4626779102536975 @ 2.1967247927020277
+  start_time: 148.20000000000002
+  end_time  : 160.8
+  total_duration: 12.600000000000001
+  event_count: 6
+  new_end_time  : 165.2545679419043
+  new_segment_duration: 17.05456794190429
+  Contains 2 of the main driver render shaders.
+
+--- Main Segment 5 ---
+  num_videos_per_segment: 4
+  0: 5.725766726032685 @ 2.0957891884489426
+  1: 5.32521766839345 @ 2.2534290140331947
+  2: 5.902494660934324 @ 2.033038687764011
+  3: 5.670754797377057 @ 2.116120415848427
+  start_time: 166.10000000000005
+  end_time  : 185.40000000000006
+  total_duration: 19.3
+  event_count: 8
+  new_end_time  : 188.51615696561421
+  new_segment_duration: 22.416156965614157
+  Contains 3 of the main driver render shaders.
+
+--- Main Segment 6 ---
+  num_videos_per_segment: 5
+  0: 5.927490385282234 @ 2.0244655360041763
+  1: 6.0 @ 1.0
+  2: 6.0 @ 1.0
+  3: 6.0 @ 1.0
+  4: 5.648019681202497 @ 2.124638488767647
+  start_time: 194.60000000000005
+  end_time  : 222.10000000000005
+  total_duration: 27.5
+  event_count: 9
+  new_end_time  : 224.19824518265935
+  new_segment_duration: 29.59824518265929
+  Contains 4 of the main driver render shaders.
+
+--- Main Segment 7 ---
+  num_videos_per_segment: 6
+  0: 6.0 @ 1.0
+  1: 5.8737227195351265 @ 2.042997358402668
+  2: 5.893094719122269 @ 2.03628154169348
+  3: 5.3068916511136015 @ 2.2612106650946817
+  4: 5.350388432997785 @ 2.2428278152650845
+  5: 5.718014406145515 @ 2.098630599304338
+  start_time: 226.10000000000005
+  end_time  : 257.6
+  total_duration: 31.5
+  event_count: 11
+  new_end_time  : 260.1721172039713
+  new_segment_duration: 34.072117203971274
+  Contains 4 of the main driver render shaders.
+
+--- Main Segment 8 ---
+  num_videos_per_segment: 2
+  0: 5.764968550868473 @ 2.08153780790222
+  1: 6.0 @ 1.0
+  start_time: 266.1
+  end_time  : 277.1
+  total_duration: 11.0
+  event_count: 4
+  new_end_time  : 277.582982957014
+  new_segment_duration: 11.482982957013988
+  Contains 2 of the main driver render shaders.
+
+--- Main Segment 9 ---
+  num_videos_per_segment: 3
+  0: 6.0 @ 1.0
+  1: 5.9976207831659245 @ 2.000793386884597
+  2: 5.33195691902457 @ 2.2505808246843984
+  start_time: 294.3
+  end_time  : 307.40000000000003
+  total_duration: 13.100000000000001
+  event_count: 10
+  new_end_time  : 312.29762078316594
+  new_segment_duration: 17.997620783165925
+  Contains 4 of the main driver render shaders.
+
+--- Main Segment 10 ---
+  num_videos_per_segment: 3
+  0: 6.0 @ 1.0
+  1: 5.394491423980675 @ 2.2244914407788645
+  2: 5.7032091024115115 @ 2.1040785607748433
+  start_time: 317.40000000000003
+  end_time  : 331.00000000000006
+  total_duration: 13.600000000000001
+  event_count: 6
+  new_end_time  : 334.1264483430053
+  new_segment_duration: 16.726448343005245
+  Contains 1 of the main driver render shaders.
+
+--- Main Segment 11 ---
+  num_videos_per_segment: 2
+  0: 5.388260151719605 @ 2.227063961670509
+  1: 5.839657514816129 @ 2.0549150304712414
+  start_time: 336.30000000000007
+  end_time  : 345.30000000000007
+  total_duration: 9.0
+  event_count: 3
+  new_end_time  : 347.3914692541312
+  new_segment_duration: 11.091469254131116
+  Contains 1 of the main driver render shaders.
+
+--- Main Segment 12 ---
+  num_videos_per_segment: 3
+  0: 5.779639534010149 @ 2.0762540517252486
+  1: 5.760265186614008 @ 2.0832374224516954
+  2: 5.988276514028075 @ 2.0039154791681586
+  start_time: 356.30000000000007
+  end_time  : 373.80000000000007
+  total_duration: 17.5
+  event_count: 5
+  new_end_time  : 373.67956223544036
+  new_segment_duration: 17.37956223544029
+  Contains 2 of the main driver render shaders.
+
+--- Main Segment 13 ---
+  num_videos_per_segment: 2
+  0: 5.934996870837739 @ 2.0219050255886946
+  1: 5.619829798572338 @ 2.1352959840613823
+  start_time: 381.4000000000001
+  end_time  : 391.4000000000001
+  total_duration: 10.0
+  event_count: 3
+  new_end_time  : 393.3232733848659
+  new_segment_duration: 11.923273384865814
+  Contains 2 of the main driver render shaders.
+
+Debug: Successfully wrote timeline data to debug/debug_resolved_timeline_11ef4e33-4cc6-4eeb-bf0d-94e62f33453c.json
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+
+    ```⫗〉````
+    //: Digital Nebulae of the Soul"
+    DEFINE CONSCIOUSNESS_BRIDGE {
+        Merge: human.essence;
+        With: cosmic.flow;
+        Return: enlightenment.seed;
+    }
+    ````
+
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+title_1_x: 770
+title_1_y: 140
+title_2_x: 670
+title_2_y: 20
+song_title: The Essence of Stillness: Meditations on Being
+num_words: 7
+middle: 4
+song_title_1_start: 0
+song_title_1_end: 4
+song_title_2_start: 4
+song_title_2_end: 7
+song_title_1: The Essence of Stillness:
+song_title_2: Meditations on Being
+Releasing all cached shader programs and textures...
+      releasing AudioTexture
+      releasing ImageTexture
+      releasing ImageTexture
+      releasing ImageTexture
+      releasing ImageTexture
+      releasing ImageTexture
+Cache release complete.
+MAX_FPS: 49.751243591308594
+MIN_FPS: 0.0
+AVG_FPS: 41.813274230957035
+  skipped_frames: 0
+Emptying cache and closing background processes (L)...
+Emptying cache and closing background processes (R)...
+Emptying cache and closing background processes (TRI)...
+Kill command received. Exiting playlist gracefully...

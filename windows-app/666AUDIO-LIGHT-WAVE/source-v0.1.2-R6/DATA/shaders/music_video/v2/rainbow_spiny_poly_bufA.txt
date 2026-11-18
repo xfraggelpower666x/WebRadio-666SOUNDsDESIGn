@@ -1,0 +1,227 @@
+// Time simplification and easier overall speed control.
+#define speed 0.6
+#define scaleCo 0.25
+#define rotation 1.4
+#define angleOffset 0.0
+#define intensity 2.1
+#define polygonSides 5
+#define staticShadows true
+//the result of the offset it affected by the speed
+#define outerOffset 1.5 
+
+
+#define PI 3.14159265359
+#define TWOPI 6.28318530718
+
+
+//controlls the transition state from static to warped shadows
+int shadowToggle = 1;
+
+//delays the shimmer effect in time between polygon layers to create contrast
+float timeOffset = 0.0;
+
+//the polygon being worked on (0 - 20)
+float shapeI = 0.0;
+
+
+//Most of the shimmer pattern code is by Pr0fed https://www.shadertoy.com/view/XdyyRK
+const mat2 m = mat2( 1.40,  1.00, -1.00,  1.40 );
+
+vec2 hash( vec2 x )  
+{
+    const vec2 k = vec2( 0.318653, 0.3673123 );
+    x = x * k + k.yx;
+    return smoothstep(0.0, 1.35, -1.0 + 2.0 * fract( 16.0 * k * fract( x.x * x.y * (x.x + x.y))));
+}
+
+// 2D gradient noise
+float noise2D( in vec2 p )
+{
+    vec2 i = floor( p );
+    vec2 f = fract( p );
+	
+	vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix( mix( dot( hash( i + vec2(0.0,0.0) ), f - vec2(0.0,0.0) ), 
+                     dot( hash( i + vec2(1.0,0.0) ), f - vec2(1.0,0.0) ), u.x),
+                mix( dot( hash( i + vec2(0.0,1.0) ), f - vec2(0.0,1.0) ), 
+                     dot( hash( i + vec2(1.0,1.0) ), f - vec2(1.0,1.0) ), u.x), u.y);
+}
+
+float r(float n)
+{
+ 	return fract(cos(n*72.42)*173.42);
+}
+
+vec2 r(vec2 n)
+{
+ 	return vec2(r(n.x*63.62-234.0+n.y*84.35),r(n.x*45.13+156.0+n.y*13.89)); 
+}
+
+float worley2D(in vec2 n)
+{
+    float dis = 2.0;
+    for (int y= -1; y <= 1; y++) 
+    {
+        for (int x= -1; x <= 1; x++) 
+        {
+            // Neighbor place in the grid
+            vec2 p = floor(n) + vec2(x,y);
+
+            float d = length(r(p) + vec2(x, y) - fract(n));
+            if (dis > d)
+            {
+             	dis = d;   
+            }
+        }
+    } 
+    return 1.0 - dis;
+}
+
+// Four octave worley FBM.
+float fbm4( vec2 p )
+{
+    float f = 0.0;
+    f += 0.5000 * worley2D( p ); p = p * 2. * m;
+    f += 0.2500 * worley2D( p ); p = p * 2. * m;
+    f += 0.1250 * worley2D( p ); p = p * 2. * m;
+    f += 0.0625 * worley2D( p );
+    return f;
+}
+
+// Six octave perlin FBM.
+float fbm6( vec2 p )
+{
+    float f = 0.0;
+    f += 0.500000 * (0.5 + 0.5 * noise2D( p )); p = m * p * 2.;
+    f += 0.250000 * (0.5 + 0.5 * noise2D( p )); p = m * p * 2.;
+    f += 0.125000 * (0.5 + 0.5 * noise2D( p )); p = m * p * 2.;
+    f += 0.062500 * (0.5 + 0.5 * noise2D( p )); p = m * p * 2.;
+    f += 0.031250 * (0.5 + 0.5 * noise2D( p )); p = m * p * 2.;
+    f += 0.015625 * (0.5 + 0.5 * noise2D( p ));
+    return f;
+}
+
+float GetFBM( vec2 q, out vec4 ron, out vec2 rk)
+{
+    // First layer.
+    vec2 o = vec2(fbm4(q + fbm6( vec2(2.0 * q + vec2(6.)))));
+
+    // Second layer.
+    vec2 n = vec2(fbm6(q + fbm4( vec2(2.0 * o + vec2(2.)))));
+    
+    //The shimmer transition is controlled by white circles that expand outwards   
+    vec2 k  = vec2( 0.55* sin(1.0 * (length(q) + 1.9* -(iTime - shapeI * 0.7)) + 1.0));
+    
+    // Sum of points with increased sharpness. 
+    vec2 p = 4.0 * o + 6.0 * n + 8.0 * k ;
+    float f = 0.5 + 0.5 * fbm6( p ) ;
+
+    f = mix( f, f * f * f * 3.5, f * abs(n.y));
+
+    f *= 1.0 - 0.55 * pow( f, 8.0 );
+    
+	ron = vec4( o, n );
+    
+    rk = vec2(k);
+
+    return f;
+}
+
+// I made this, monochrome, but the original settings are still the best 
+float GetShimmer(vec2 p)
+{
+    vec4 on = vec4(0.0);
+    vec2 k = vec2(0.0);
+    
+    float f = GetFBM(p, on, k);
+    
+    vec3 col = vec3(0.0);
+    
+    // Our 'background' bluish color.
+    col = mix( vec3(1.0), vec3(0.0), f );
+    
+    // Dark orange front layer.
+    col = mix( col, vec3( 0.0), dot(on.xy, on.zw));
+    
+    
+   
+    col = (col * col * 7. * 0.4545);
+    return col.x;
+}
+
+//from thebookofshaders.com/07/
+float polygon (vec2 st, float radius, int sides , float angle, float blur) {
+    
+      // Angle and radius from the current pixel
+      float a = atan(st.x,st.y)+PI;
+      float r = TWOPI/float(sides);
+
+      // Shaping function that modulate the distance
+      float d = cos(floor(.5+a/r)*r-a)*length(st);
+      float temp = 1.0-smoothstep(radius, radius + blur ,d);
+      //temp +=  1.0-smoothstep(radius, radius - blur ,d);
+      return (temp);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv =  2.0*vec2(fragCoord.xy - 0.5*iResolution.xy)/iResolution.y;	
+	vec2 twistedUV;   
+	vec3 pixel;
+    
+    float warpedTerm = length(uv) * -cos(speed * (iTime - outerOffset)) * intensity;
+    float originalAngle = PI * rotation * sin(speed * iTime) + warpedTerm;
+ 	
+    //using the warped term instead makes a different effect
+    if(originalAngle < 0.1){
+        if(shadowToggle == 1){
+        shadowToggle = 0;
+        }
+        else{
+            shadowToggle = 1;
+        }
+    }
+    
+    //finds the polygon being worked on and stores it in shapeI
+    //this is faster because it avoides calculating the shimmer 20 times
+    for(float j = 20.0; j > 0.0; j-= 1.0)
+    {    
+        float scale = (j * scaleCo);
+        float angle = originalAngle+  angleOffset * j;
+        twistedUV.x =   cos(angle)*uv.x + sin(angle)*uv.y;
+		twistedUV.y = - sin(angle)*uv.x + cos(angle)*uv.y;
+       // twistedUV = uv;
+        
+        //updates shapeI too find the smallest polgon the pixel might be in
+        if(polygon(twistedUV, 0.4 * scale, polygonSides, 0.0, 0.065) > 0.0){
+            shapeI = j;
+        }
+    }  
+    
+    //The angle and twisted UVs need to be calculated one extra time now that we know the shapeI value
+    float angle = originalAngle + angleOffset * shapeI;
+    float scale = (shapeI * scaleCo);
+    vec3 changingColor =0.7 + 0.5*cos(2.0*iTime+  (12.0-shapeI) * 0.4 +vec3(0,2,4));     
+    twistedUV.x =   cos(angle)*uv.x + sin(angle)*uv.y;
+    twistedUV.y = - sin(angle)*uv.x + cos(angle)*uv.y;
+	
+    //Using another UV variable to toggle the static shadow effect
+    vec2 shadowUV = (staticShadows && shadowToggle == 1) ? uv : twistedUV;
+  
+    float shimmer = GetShimmer(shadowUV * 3.0); //3.0 is the shimmer effect scale
+    
+    //gets the polygon pixel again which is basically just the shadow value
+    float t = polygon(shadowUV, (0.40 - 0.055/scale) * scale, polygonSides, 0.0, 0.13);	
+	pixel =changingColor -(sqrt(20.0 * shapeI) *0.03);
+	
+    if(shapeI != 1.0){
+        pixel = mix(pixel, vec3(0.004), t );        
+    }
+  //  pixel = pow(pixel, vec3(1.0/1.01));
+    //don't want the shimmer to apear ontop of shadow pixels
+    shimmer *= -t + 1.0;
+    pixel+=0.1;
+    pixel = (pixel+ 0.4 *(shimmer));
+    fragColor = vec4(pixel, 1.0);
+}

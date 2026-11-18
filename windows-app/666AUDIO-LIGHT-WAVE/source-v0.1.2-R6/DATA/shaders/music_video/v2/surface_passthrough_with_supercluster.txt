@@ -1,0 +1,39 @@
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    vec2 uv = fragCoord / iResolution.xy;
+    // Flip Y to match Pygame's coordinate system perfectly
+    uv.y = 1.0 - uv.y;
+
+    // Sample the texture
+    vec4 texColor = texture(iChannel0, uv);    
+
+    // Output the final mixed color
+    //fragColor = texColor;
+
+    vec3 a, p;
+    float i, t, v;
+    for( fragColor*=i; i++<40.;
+        // Iteration based color accumulation
+        fragColor+=(1.+cos(i*.2+vec4(0,2,4,0)))/v)
+        // Raymarching
+        p=t*normalize(vec3(fragCoord+fragCoord,0) - iResolution.xyy),
+        // Move back camera
+        p.z+=.15,
+        // Rotate camera around center
+        p=dot(
+              a=normalize(cos(i*.003+iTime+vec3(6,3,0)))
+                                                        ,p)*a-cross(a,p),
+        // March forward & voxel effect
+        t+=.5*dot(
+                  p=ceil(1e3*p)/1e3
+                                   ,p)*(
+        // Triangle wave distortion & weird spherical inversion variant
+        // Density based on repeated sphere sdf
+        v=abs(length(mod(
+                         p+=asin(sin(
+                                     p/=dot(p,p.zxy)
+                                                    ))
+                                                      +2.,4.)-2.)-2.8)+.01);
+    fragColor = texColor + tanh(fragColor/7e2);
+}

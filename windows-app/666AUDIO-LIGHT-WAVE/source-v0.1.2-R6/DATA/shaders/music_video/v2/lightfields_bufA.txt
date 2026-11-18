@@ -1,0 +1,49 @@
+#define RT(X) mat2(cos(X), sin(X), -sin(X), cos(X))
+#define FOO tan(3.1)
+
+vec3 layer0(vec2 uv)
+{
+    vec3 clr = vec3(0);
+    uv *= mat2(2.0, 0.5, FOO + cos(iTime) * 0.5, 0.0);
+    for (int i = 0; i < 4; i++)
+    {
+        uv = abs(uv) - vec2(0.2, 0.03);
+        uv *= RT(0.54);
+    }
+    
+    clr.r += 0.01 / max(abs(uv.x) - 0.25, abs(uv.y));
+    clr.g += 0.01 / max(abs(uv.x) - 0.25, abs(uv.y + 0.01));
+    clr.b += 0.01 / max(abs(uv.x) - 0.25, abs(uv.y + 0.02));
+    return clr;
+}
+
+vec3 layer1(vec2 uv)
+{
+
+    vec3 clr = vec3(0);
+    for (int i = 0; i < 5; i++)
+    {
+        clr += layer0(uv + vec2(cos(float(i) + iTime * 0.125), sin(float(i) + iTime * 0.125)));
+        uv *= 1.5;
+        uv *= RT(iTime * 0.125);
+    
+    }
+    return clr;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    vec3 clr = vec3(0);
+   
+    for (int i = 0; i < 4; i++)
+    {
+        clr += layer1(uv);
+        uv *= 1.2;
+        uv /= (float(i + 1) * 2.0 - length(uv));
+        uv += vec2(sin(float(i) + iTime * 0.25), cos(float(i) + iTime * 0.25));
+    }
+    
+    clr = pow(clr - 0.01, vec3(4));
+    fragColor = vec4(pow(clr, vec3(0.4545)), 1.0);
+}

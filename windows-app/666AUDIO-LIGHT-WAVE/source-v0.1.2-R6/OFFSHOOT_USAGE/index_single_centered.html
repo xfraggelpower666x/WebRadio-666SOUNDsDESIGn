@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Media Feed</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        button {
+            background: #1da1f2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { background: #0c85d0; }
+
+        #feed {
+            width: 100%;
+            margin-top: 100px;
+            padding-bottom: 100vh;
+            display: flex;
+            justify-content: center; /* This centers the single column horizontally */
+            align-items: flex-start; 
+        }
+
+        .feed-column {
+            display: flex;
+            flex-direction: column; 
+            gap: 30px; /* Increased gap to feel more like individual posts */
+            width: 100%; 
+            max-width: 600px; /* Limits the width so it looks like an Instagram feed, not a giant stretched image */
+        }
+
+        .media-container {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+        }
+
+        /* Notice we now style BOTH video and img exactly the same */
+        video, img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #111; /* Gives a dark placeholder while loading */
+        }
+
+        .media-title {
+            padding: 1px;
+            font-size: 14px;
+            color: #ccc;
+            text-align: center;
+            background: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <button id="toggleScrollBtn">Start Auto-Scroll</button>
+        <button id="rescanBtn" style="background-color: #28a745;">Rescan Folders</button>
+        <label for="speedSlider">Speed: <span id="speedValue">0.30</span>x</label>
+        <input type="range" id="speedSlider" min="0.05" max="10" step="0.05" value="0.3">
+    </div>
+
+    <div id="feed"></div>
+
+    <script>
+        // 1. SETTING UP THE SMART RAM OBSERVER (Handles both Images & Video)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.2
+        };
+
+        const mediaObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const media = entry.target;
+                const isVideo = media.tagName.toLowerCase() === 'video';
+                
+                if (entry.isIntersecting) {
+                    // IN VIEW: Re-attach the source file
+                    if (!media.hasAttribute('src')) {
+                        media.src = media.dataset.src;
+                    }
+                    if (isVideo) {
+                        media.play().catch(e => console.warn("Autoplay prevented:", e));
+                    }
+                } else {
+                    // OUT OF VIEW: Purge from RAM
+                    if (isVideo) media.pause();
+                    
+                    // Lock the exact aspect ratio before deleting so the layout doesn't collapse
+                    // Videos use videoWidth/Height, Images use naturalWidth/Height
+                    const w = isVideo ? media.videoWidth : media.naturalWidth;
+                    const h = isVideo ? media.videoHeight : media.naturalHeight;
+                    
+                    if (w && h) {
+                        media.style.aspectRatio = `${w} / ${h}`;
+                    }
+                    
+                    // Violently remove the source file to flush RAM
+                    media.removeAttribute('src');
+                    
+                    // Force the browser video buffer to empty
+                    if (isVideo) media.load(); 
+                }
+            });
+        }, observerOptions);
+
+        // RESCAN BUTTON LOGIC
+        const rescanBtn = document.getElementById('rescanBtn');
+        if (rescanBtn) {
+            rescanBtn.addEventListener('click', async () => {
+                // Change text and disable button to prevent spamming
+                rescanBtn.innerText = "Scanning...";
+                rescanBtn.disabled = true;
+                rescanBtn.style.background = "#555";
+
+                try {
+                    // 1. Tell the server to rescan the hard drive
+                    const response = await fetch('/api/refresh', {method: 'POST', headers: {'X-LWT-Refresh': '1'}});
+                    const data = await response.json();
+                    console.log(data.status, "Total files:", data.total_files);
+
+                    // 2. Clear the current feed completely
+                    const feed = document.getElementById('feed');
+                    feed.innerHTML = ""; 
+
+                    // 3. Re-fetch and render the new files!
+                    await loadMedia();
+
+                } catch (err) {
+                    console.error("Failed to rescan:", err);
+                    alert("Error reaching the server. Is it running?");
+                } finally {
+                    // Reset button appearance
+                    rescanBtn.innerText = "Rescan Folders";
+                    rescanBtn.disabled = false;
+                    rescanBtn.style.background = "#28a745";
+                }
+            });
+        }
+        
+        // Initial load
+        //loadMedia();
+
+        // 2. FETCH AND RENDER MIXED MEDIA
+        async function loadMedia() {
+            try {
+                // Fetch from our updated /api/media endpoint
+                const response = await fetch('/api/media');
+                const mediaFiles = await response.json();
+                const feed = document.getElementById('feed');
+
+                if(mediaFiles.length === 0) {
+                    feed.innerHTML = "<h3 style='text-align:center;'>No media files found.</h3>";
+                    return;
+                }
+
+                let colCount = 1;
+
+                const columns = [];
+                for (let i = 0; i < colCount; i++) {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'feed-column';
+                    feed.appendChild(colDiv);
+                    columns.push(colDiv);
+                }
+
+                // Check if file is an image using Regular Expressions
+                const imageRegex = /\.(jpg|jpeg|png|gif|webp)$/i;
+
+                mediaFiles.forEach((filename, index) => {
+                    const container = document.createElement('div');
+                    container.className = 'media-container';
+                    
+                    const isImage = imageRegex.test(filename);
+                    
+                    // Dynamically create an <img> or <video> element
+                    const mediaElement = document.createElement(isImage ? 'img' : 'video');
+                    
+                    // Save the file path to dataset.src for the RAM observer to use
+                    mediaElement.dataset.src = encodeURIComponent(filename); 
+                    
+                    if (!isImage) {
+                        // Apply video-specific settings
+                        mediaElement.loop = true;
+                        mediaElement.muted = true;
+                        mediaElement.controls = true;
+                        mediaElement.preload = "none"; 
+                    } else {
+                        // Image-specific settings
+                        mediaElement.alt = filename;
+                    }
+
+                    const title = document.createElement('div');
+                    title.className = 'media-title';
+                    title.innerText = filename;
+
+                    container.appendChild(mediaElement);
+                    //container.appendChild(title);
+
+                    const targetColumn = columns[index % colCount];
+                    targetColumn.appendChild(container);
+
+                    // Track it with our observer regardless of if it's an image or video!
+                    mediaObserver.observe(mediaElement);
+                });
+            } catch (err) {
+                console.error("Failed to load media:", err);
+            }
+        }
+
+
+        // 3. AUTO-SCROLL LOGIC (Unchanged)
+        let isAutoScrolling = false;
+        let scrollSpeed = 0.3; 
+        let animationFrameId;
+        let scrollAccumulator = 0; 
+
+        const toggleBtn = document.getElementById('toggleScrollBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+
+        if(speedValue) speedValue.innerText = scrollSpeed.toFixed(2);
+
+        if(toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                isAutoScrolling = !isAutoScrolling;
+                if (isAutoScrolling) {
+                    toggleBtn.innerText = "Stop Auto-Scroll";
+                    toggleBtn.style.background = "#e0245e"; 
+                    scrollAccumulator = 0; 
+                    autoScroll();
+                } else {
+                    toggleBtn.innerText = "Start Auto-Scroll";
+                    toggleBtn.style.background = "#1da1f2";
+                    cancelAnimationFrame(animationFrameId);
+                }
+            });
+        }
+
+        if(speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                scrollSpeed = parseFloat(e.target.value);
+                speedValue.innerText = scrollSpeed.toFixed(2); 
+            });
+        }
+
+        function autoScroll() {
+            if (!isAutoScrolling) return;
+
+            scrollAccumulator += scrollSpeed;
+
+            if (scrollAccumulator >= 1) {
+                const pixelsToScroll = Math.floor(scrollAccumulator);
+                window.scrollBy(0, pixelsToScroll);
+                scrollAccumulator -= pixelsToScroll; 
+            }
+            
+            if (Math.ceil(window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                isAutoScrolling = false;
+                toggleBtn.innerText = "Start Auto-Scroll";
+                toggleBtn.style.background = "#1da1f2";
+                return;
+            }
+            
+            animationFrameId = requestAnimationFrame(autoScroll);
+        }
+
+        loadMedia();
+    </script>
+</body>
+</html>

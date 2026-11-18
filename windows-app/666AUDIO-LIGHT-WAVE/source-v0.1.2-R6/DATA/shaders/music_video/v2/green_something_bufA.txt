@@ -1,0 +1,57 @@
+// 'screenburn' smooth remix - Del 05/12/2021
+
+vec2 smoothRot(vec2 p,float s,float m,float c,float d)
+{
+  s*=0.5;
+  float k=length(p);
+  float x=asin(sin(atan(p.x,p.y)*s)*(1.0-m))*k;
+  float ds=k*s;
+  float y=mix(ds,2.0*ds-sqrt(x*x+ds*ds),c);
+  return vec2(x/s,y/s-d);
+}
+
+mat2 rotate(float a)
+{
+	float c = cos(a);
+	float s = sin(a);
+	return mat2(c, s, -s, c);
+} 
+#define PI 3.14159
+
+float vDrop(vec2 uv,float t)
+{
+    float xoff = sin(uv.y*25.0)*0.16;
+     xoff *= smoothstep(0.0,1.0,0.5+sin(length(uv)+iTime*0.3)*0.5);
+    uv.x+=xoff;
+    uv.y *= 2.;
+    uv.x = uv.x*16.0;						// H-Count
+    float dx = fract(uv.x);
+    uv.x = floor(uv.x);
+    uv.y *= 0.5;							// stretch
+    float o=sin(uv.x*215.4);				// offset
+    float s=cos(uv.x*33.1)*.3 +.7;			// speed
+    float trail = mix(18.0,5.0,s);			// trail length
+    //float trail = 5.0;
+    float yv = fract(uv.y + t*s + o) * (trail*1.5);
+    yv = 1.0/yv;
+    yv = smoothstep(0.0,1.0,yv*yv);
+    yv = sin(yv*PI)*(s*5.0);
+    float d2 = sin(dx*PI);
+    return yv*(d2*d2);
+}
+
+void mainImage(out vec4 k, vec2 p)
+{
+    vec2 uv = (p.xy - 0.5 * iResolution.xy) / iResolution.y;
+    float dd0 = length(uv);
+    float dd1 = smoothstep(0.0,0.3,dd0);
+    uv *= rotate(fract(0.6+iTime*-0.01)*6.28);
+    uv = smoothRot(uv,4.0,0.35,16.0,0.05);
+    float drop = vDrop(uv.yx,iTime*0.5);
+    vec3 linecol1 = vec3(0.75,0.45,0.325)*1.5;
+    vec3 linecol2 = vec3(0.4,0.75,0.325)*1.5;
+    vec3 linecol = mix(linecol1,linecol2,0.5+sin(iTime*0.2+dd0*.7)*0.5);
+    vec3 backcol = vec3(0.01,0.04,0.1);
+    vec3 col = mix(backcol,linecol,drop)*dd1;
+    k = vec4(col,1.0);
+}

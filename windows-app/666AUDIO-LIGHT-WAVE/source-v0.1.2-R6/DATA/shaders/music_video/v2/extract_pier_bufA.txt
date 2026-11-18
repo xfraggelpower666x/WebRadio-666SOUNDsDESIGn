@@ -1,0 +1,118 @@
+shader_filenames = [
+    "alien_nest.txt",
+    "behind_the_veil.txt",
+    "biocore_plasma.txt",
+    "blast_off.txt",
+    "blocks_light_color.txt",
+    "boxen.txt",
+    "bright_spiral.txt",
+    "chonky_gyroid.txt",
+    "clouds_sun.txt",
+    "cloud_cruise.txt",
+    "cloud_flow.txt",
+    "cloud_lights.txt",
+    "cloud_palace.txt",
+    "colony2.txt",
+    "color_adventure.txt",
+    "crystal_ice_flight.txt",
+    "dark_deco_flight.txt",
+    "dark_transit_tunnel.txt",
+    "data_flow.txt",
+    "depths.txt",
+    "diamond_circles.txt",
+    "dimensional_burst.txt",
+    "direct_color_injection.txt",
+    "dream_entity.txt",
+    "flow_cruise.txt",
+    "fractal_fire.txt",
+    "fractal_stroll.txt",
+    "fractured_cruise.txt",
+    "frunnel1.txt",
+    "frunnel7_manic_flight.txt",
+    "futureshock.txt",
+    "galactic_rift.txt",
+    "gem_cruise.txt",
+    "gem_flight.txt",
+    "glassy_gyroid.txt",
+    "glowtek_cave.txt",
+    "glow_fall.txt",
+    "glow_run.txt",
+    "gyroid_and_turbulence_cruise.txt",
+    "gyroid_tables.txt",
+    "holographic_dataplane_transport.txt",
+    "holographic_wand.txt",
+    "hypercity_futurespace.txt",
+    "interdimensional_blob.txt",
+    "inversion_expulsion.txt",
+    "light_streams.txt",
+    "light_trip.txt",
+    "light_tunnel.txt",
+    "little_lights.txt",
+    "memory_stream.txt",
+    "metal_menger_flight.txt",
+    "mindphaser.txt",
+    "mint_cruise.txt",
+    "mirror_grid.txt",
+    "multi_light_cruise.txt",
+    "neat_plasma_blast.txt",
+    "neural_port.txt",
+    "neuronix_mainframe.txt",
+    "noise_clouds.txt",
+    "nox_ethereal.txt",
+    "orange_fire_and_smoke.txt",
+    "orb_clouds.txt",
+    "polar_orb.txt",
+    "purple_fire_and_smoke.txt",
+    "radial_screen_door.txt",
+    "rax_cruise.txt",
+    "relax.txt",
+    "schwarz_surface.txt",
+    "some_bw_wave.txt",
+    "some_gyroid_flight.txt",
+    "some_plasma_tunnel.txt",
+    "some_zooming_plasmaa.txt",
+    "spacejam_plasma.txt",
+    "spacejunk_party.txt",
+    "steely_blobz.txt",
+    "super_gyroid.txt",
+    "super_sphere_rush.txt",
+    "the_architect.txt",
+    "translucent_tunnel_orbs.txt",
+    "triwave_light_trip.txt",
+    "trizm.txt",
+    "tumble_rock.txt",
+    "unbound.txt",
+    "wavelights.txt",
+    "hacker_bunker.txt"
+]
+
+start_time = 0.0
+for filename in shader_filenames:
+    print(filename)
+    with open("shader_code.txt", "a", encoding="utf-8") as f_out:
+        data_file = f"{filename}"
+        output_str = f"""    {{
+      "name": "{data_file}",
+      "shader_effect_file": "shaders/music_video/NEW_with_flash_added/NNNNNENENEN/{data_file}",
+      "material_1": null,
+      "material_2": "textures/rusty_metal_512x512.jpg",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": {start_time},
+      "effect_duration": 20.0
+    }},"""
+
+        f_out.write(f"{output_str}\n")
+        start_time += 20.0
+
+"""for filename in shader_filenames:
+    print(filename)
+    with open("shader_code.txt", "a", encoding="utf-8") as f_out:
+        f_out.write(f"\nEXP_SHADER_FILE_{filename}\n\n")
+        data_file = f"{filename}"
+        with open(f"{data_file}", 'r', encoding='utf-8', errors='replace') as f_in:
+            lines = [line.strip() for line in f_in.readlines()]
+            for line in lines:
+                f_out.write(f"{line}\n")"""
+
+

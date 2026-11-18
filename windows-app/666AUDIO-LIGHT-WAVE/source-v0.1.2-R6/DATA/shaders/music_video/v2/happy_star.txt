@@ -1,0 +1,434 @@
+// --- SDF Helper Functions ---
+
+// Calculates distance to a line segment (x) and the 1D distance ALONG the segment (y)
+vec2 sdLineDist(vec2 p, vec2 a, vec2 b) {
+    vec2 pa = p - a, ba = b - a;
+    float l = length(ba);
+    if (l < 0.0001) return vec2(length(pa), 0.0);
+    float h = clamp(dot(pa, ba) / (l * l), 0.0, 1.0);
+    return vec2(length(pa - ba * h), h * l);
+}
+
+// Combines 3 connected segments into a single track
+// Returns vec3: (distance to track, distance along track, total length of track)
+vec3 circuitSDF(vec2 p, vec2 p1, vec2 p2, vec2 p3, vec2 p4) {
+    vec2 d1 = sdLineDist(p, p1, p2);
+    vec2 d2 = sdLineDist(p, p2, p3);
+    vec2 d3 = sdLineDist(p, p3, p4);
+
+    float l1 = length(p2 - p1);
+    float l2 = length(p3 - p2);
+    float l3 = length(p4 - p3);
+
+    // Offset distances for 2nd and 3rd segments to make the 1D length continuous
+    d2.y += l1;
+    d3.y += l1 + l2;
+
+    // Find the closest segment to our current pixel
+    vec2 minD = d1;
+    if(d2.x < minD.x) minD = d2;
+    if(d3.x < minD.x) minD = d3;
+
+    return vec3(minD.x, minD.y, l1 + l2 + l3);
+}
+
+// --- Circuit Rendering Logic ---
+
+vec3 renderCircuit(vec2 uv, vec2 p1, vec2 p2, vec2 p3, vec2 p4, float delay, vec3 color, float localTime) {
+    vec3 t = circuitSDF(uv, p1, p2, p3, p4);
+    float d = t.x;      // 2D distance to the line
+    float l = t.y;      // 1D distance along the path
+    float totalL = t.z; // Total length of the trace
+
+    // Define "Nodes" (the little circles at the ends of tracks)
+    float rNode = 0.002;
+    float dNode1 = length(uv - p1) - rNode;
+    float dNode4 = length(uv - p4) - rNode;
+
+    // 1. Draw Backbone (Outline / Darker Track) Animation
+    float drawProgress = max(0.0, localTime * 1.5 - delay);
+    float isDrawnStep = step(l, drawProgress); // 1.0 if track is drawn, 0.0 if not
+    
+    float node1Drawn = step(0.0, drawProgress);
+    float node4Drawn = step(totalL, drawProgress);
+    
+    // Track styling
+    float backboneWidth = 0.0008;
+    float backboneAlpha = smoothstep(backboneWidth + 0.003, backboneWidth, d) * 0.25;
+    backboneAlpha += smoothstep(0.015, 0.0, d) * 0.08; // subtle outer glow
+    backboneAlpha *= isDrawnStep;
+    
+    // Node hollow rings
+    float node1Alpha = smoothstep(0.003, 0.001, abs(dNode1)) * 0.5 * node1Drawn;
+    float node4Alpha = smoothstep(0.003, 0.001, abs(dNode4)) * 0.5 * node4Drawn;
+    backboneAlpha += node1Alpha + node4Alpha;
+    
+    // 2. Traveling Pulse / Current Animation
+    float pulseSpeed = 1.2;
+    float pulseCycle = totalL + 1.5; // add some pause between pulses
+    // Start pulses flowing based on global iTime so they never stop organically
+    float pulsePos = mod(iTime * pulseSpeed - delay, pulseCycle) - 0.2; 
+    
+    float pulseDist = l - pulsePos; // Distance from the pulse head
+    float pulseLength = 0.3;        // How long the light tail is
+    
+    // Shape the pulse: sharp head, fading tail
+    float pulseIntensity = 0.0;
+    if (pulseDist < 0.0 && pulseDist > -pulseLength) {
+        pulseIntensity = 1.0 - (abs(pulseDist) / pulseLength);
+        pulseIntensity = pow(pulseIntensity, 3.0); 
+    }
+    
+    // Hide pulse if it's on a section of track that hasn't been drawn yet
+    pulseIntensity *= isDrawnStep;
+    
+    // Add glow for the pulse
+    float pulseWidth = 0.0015;
+    float pulseGlow = smoothstep(pulseWidth + 0.006, pulseWidth, d) * pulseIntensity * 1.5;
+    pulseGlow += smoothstep(0.02, 0.0, d) * pulseIntensity * 0.4; // wider glow
+    
+    // Bright dot at the head of the pulse
+    float headDist = length(vec2(d, pulseDist));
+    float headDot = smoothstep(0.02, 0.002, headDist) * isDrawnStep;
+    if (pulsePos > totalL || pulsePos < 0.0) headDot = 0.0; // Hide dot when off track
+    pulseGlow += headDot * 1.5;
+    
+    // Flash the nodes when the pulse hits them
+    float node1Pulse = smoothstep(0.015, 0.0, dNode1) * max(0.0, 1.0 - abs(pulsePos)*6.0) * node1Drawn;
+    float node4Pulse = smoothstep(0.015, 0.0, dNode4) * max(0.0, 1.0 - abs(pulsePos - totalL)*6.0) * node4Drawn;
+    
+    return color * (backboneAlpha + pulseGlow + node1Pulse + node4Pulse);
+}
+
+// --- REUSABLE WAVE FUNCTION ---
+// fragCoord : Current pixel coordinates
+// amplitude : Height of the wave
+// yCenter   : The Y axis offset in pixels
+// baseColor : The RGB color of the wave
+// freq      : How tight the sine wave is (0.02 from your original code)
+// phaseShift: Used with time to make the waves scroll horizontally
+
+vec3 drawAudioWave(vec2 fragCoord, float amplitude, float yCenter, vec3 baseColor, float freq, float phaseShift) {
+        
+    // Graceful fallback from your Pygame code: 
+    // If amplitude is tiny, transition smoothly to a white line instead of snapping harshly.
+    vec3 waveColor = mix(vec3(1.0, 1.0, 1.0), baseColor, smoothstep(0.0, 2.0, amplitude));
+
+    // Calculate the mathematical Y position of the sine wave for this X pixel
+    float waveY = yCenter + amplitude * sin(fragCoord.x * freq + phaseShift);
+    
+    // Vertical distance from the current pixel to the wave
+    float dist = abs(fragCoord.y - waveY);
+    
+    // --- COOL FACTOR: THE GLOW ---
+    // Core thickness creates a bright center, exponential falloff creates a soft neon glow
+    float coreThickness = 0.0;
+
+    if (amplitude < 2.0) {
+        coreThickness = 0.1;
+    }
+    else {
+        coreThickness = 0.5;
+    }
+
+    float glowSpread = 3.0;
+    float intensity = (coreThickness / (dist + 1e-4)) + exp(-dist / glowSpread);
+    
+    // --- COOL FACTOR: SMOOTH EDGES ---
+    // Instead of hard cuts at 450 and (Width - 400), we fade the line in and out beautifully
+    float minX = 450.0;
+    float maxX = iResolution.x - 400.0; 
+    float mask = smoothstep(minX - 50.0, minX, fragCoord.x) * 
+                 (1.0 - smoothstep(maxX, maxX + 50.0, fragCoord.x));
+                 
+    return waveColor * intensity * mask;
+}
+
+
+vec3 B2_spline(vec3 x) { // returns 3 B-spline functions of degree 2
+    vec3 t = 3.0 * x;
+    vec3 b0 = step(0.0, t)     * step(0.0, 1.0-t);
+	vec3 b1 = step(0.0, t-1.0) * step(0.0, 2.0-t);
+	vec3 b2 = step(0.0, t-2.0) * step(0.0, 3.0-t);
+	return 0.5 * (
+    	b0 * pow(t, vec3(2.0)) +
+    	b1 * (-2.0*pow(t, vec3(2.0)) + 6.0*t - 3.0) + 
+    	b2 * pow(3.0-t,vec3(2.0))
+    );
+}
+
+float bump(float x) {
+	return abs(x) > 1.0 ? 0.0 : 1.0 - x * x;
+}
+
+
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+
+    // =========================================================================
+    // PART 1: CIRCUIT
+    // =========================================================================
+
+    // Adjust UVs so 0,0 is the center, and y goes from -1 to 1 (maintains aspect ratio)
+    vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+
+    vec3 finalCircuitColor = vec3(0.0);
+    vec3 baseColor = vec3(1, 0.95, 1.0); // Bright white/cyan aesthetic
+    
+    // Create a 6-second repeating loop for the track drawing animation
+    float localTime = mod(iTime, 6.0);
+    
+    // =========================================================================
+    // --- USER ADJUSTABLE CIRCUIT PLACEMENT ---
+    // Modify these variables to push the circuits further toward the edges.
+    // For a 3440x1440 ultrawide, an offset of ~1.2 pushes the innermost parts 
+    // of the circuitry to exactly about 700 pixels from the left/right edges.
+    // Feel free to tweak this value! (Higher = further away from the center).
+    // =========================================================================
+    float circuitOffsetX = 2.50;  // Pushes circuits horizontally outwards
+    float circuitOffsetY = 0.55;  // Pushes circuits vertically (if you ever need it)
+
+    // Loop to draw tracks in all 4 quadrants of the screen
+    for(int i = 0; i < 4; i++) {
+        vec2 qUV = uv*1.75;
+        
+        // Mirror quadrants (0: TopRight, 1: TopLeft, 2: BottomRight, 3: BottomLeft)
+        if(i == 1 || i == 3) qUV.x = -qUV.x;
+        if(i == 2 || i == 3) qUV.y = -qUV.y;
+        
+        // Apply the push-out offsets AFTER mirroring.
+        // This causes the coordinates evaluated for every quadrant to be shifted 
+        // outward, organically shortening the lines as they bleed off-screen.
+        qUV.x -= circuitOffsetX;
+        qUV.y -= circuitOffsetY;
+        
+        // Stagger the drawing times based on quadrant
+        float qDelay = float(i) * 1.5;
+        
+        // For half of the quadrants, reverse the path direction to make it look organic
+        if (i == 1 || i == 2) {
+             // Trace 1 (Horizontal dominant) - Reversed
+             finalCircuitColor += renderCircuit(qUV, vec2(2.0, 0.4), vec2(1.0, 0.4), vec2(0.8, 0.2), vec2(0.3, 0.2), qDelay + 0.0, baseColor, localTime);
+             // Trace 2 (Top side, corner) - Reversed
+             finalCircuitColor += renderCircuit(qUV, vec2(0.2, 0.6), vec2(0.7, 0.6), vec2(0.9, 0.8), vec2(1.6, 0.8), qDelay + 0.5, baseColor, localTime);
+             // Trace 3 (Vertical dominant) - Reversed
+             finalCircuitColor += renderCircuit(qUV, vec2(1.0, 1.1), vec2(1.0, 0.7), vec2(1.2, 0.5), vec2(1.2, 0.1), qDelay + 1.0, baseColor, localTime);
+        } else {
+             // Trace 1 (Horizontal dominant, features 45 deg angles)
+             finalCircuitColor += renderCircuit(qUV, vec2(0.3, 0.2), vec2(0.8, 0.2), vec2(1.0, 0.4), vec2(2.0, 0.4), qDelay + 0.0, baseColor, localTime);
+             // Trace 2 (Top side, corner, features 45 deg angles)
+             finalCircuitColor += renderCircuit(qUV, vec2(1.6, 0.8), vec2(0.9, 0.8), vec2(0.7, 0.6), vec2(0.2, 0.6), qDelay + 0.5, baseColor, localTime);
+             // Trace 3 (Vertical dominant, features 45 deg angles)
+             finalCircuitColor += renderCircuit(qUV, vec2(1.2, 0.1), vec2(1.2, 0.5), vec2(1.0, 0.7), vec2(1.0, 1.1), qDelay + 1.0, baseColor, localTime);
+        }
+    }
+	
+    // =========================================================================
+    // PART 1: EXACT ROTOZOOM EMULATION WITH DYNAMIC PIVOTS
+    // =========================================================================
+
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    uv = fragCoord / iResolution.xy;
+    // Flip Y to match Pygame's coordinate system perfectly
+    //uv.y = 1.0 - uv.y;
+    
+    // Convert UV to exact screen pixels (This prevents Ultrawide distortion)
+    vec2 px = uv * iResolution.xy;
+
+    // Apply the translation shake offset
+    vec2 local_px = px - u_pixel_offset;
+
+    // Prepare rotation math
+    float rad = radians(u_angle_deg);
+    float c = cos(rad);
+    float s = sin(rad);
+
+    // Calculate Pygame's expanded Bounding Box! 
+    float bbox_w = u_target_size.x * abs(c) + u_target_size.y * abs(s);
+    float bbox_h = u_target_size.x * abs(s) + u_target_size.y * abs(c);
+
+    // --> THE SECRET SAUCE MULTIPLIER <--
+    // If u_pivot is (0.5, 0.5), it perfectly centers the bounding box (Glitch 1).
+    // If u_pivot is (0.0, 0.0), it hinges violently from the top left (Glitch 2).
+    vec2 bbox_pivot = vec2(bbox_w, bbox_h) * u_pivot;
+
+    // Shift relative to the chosen pivot
+    vec2 centered_px = local_px - bbox_pivot;
+
+    // Apply the exact Inverse Rotation Matrix that matches your orientation
+    mat2 rotMat = mat2(c,-s, 
+                       s, c);
+    vec2 rotated_px = rotMat * centered_px;
+
+    // Shift back from the pivot to the original unrotated surface coordinates
+    vec2 surf_pivot = u_target_size * u_pivot;
+    vec2 final_px = rotated_px + surf_pivot;
+
+    // Normalize back to 0.0 - 1.0 UV space using the ZOOMED pixel dimensions
+    vec2 final_uv = final_px / u_target_size;
+
+    uv = final_uv;
+    // =========================================================================
+    
+    // Output the distorted texture from Buffer A
+    //fragColor = texture(iChannel0, final_uv);
+
+    vec4 texColor1 = texture(iChannel0, final_uv);
+    if (isnan(texColor1.r) || isnan(texColor1.g) || isnan(texColor1.b)) {
+        texColor1.rgb = vec3(0.0);
+    }
+    texColor1.rgb = clamp(texColor1.rgb, 0.0, 1.0);
+
+    vec2 uv_console_mask = final_uv;
+    uv_console_mask.y = 1.0 - uv_console_mask.y;    
+    vec4 texColor2 = texture(iChannel21, uv_console_mask);  
+    fragColor.rgb = mix(texColor1.rgb, texColor2.rgb, texColor2.a);
+
+    vec2 uv_console = fragCoord / iResolution.xy;
+    uv_console.y = 1.0 - uv_console.y;
+    vec4 texColor3 = texture(iChannel20, uv_console);
+    fragColor.rgb = max(fragColor.rgb, texColor3.rgb);
+
+    fragColor = vec4(fragColor.rgb + finalCircuitColor, 1.0);
+
+    // we need to "cut off" the rendering if the pixels are outside our 100px box.
+    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+        fragColor = vec4(0.0, 0.0, 0.0, 0.0); // Output transparent black
+        return;
+    }
+
+    // MUSIC_VIDEO__MOD
+    float colorTimer = floor(iTime * 2.0); 
+
+    vec3 flashColor = vec3(
+        rand(colorTimer),           
+        rand(colorTimer + 10.0),    
+        rand(colorTimer + 20.0)     
+    );
+
+    // Add the flash to the transformed screen
+    vec3 finalColor = fragColor.rgb + (flashColor * iMusicSync2*1.2);
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+    // --- UNIVERSAL FLASH TO WHITE (FIXED TIMING) ---
+    // 1. Define exactly how long this animation should take (e.g., 2.5 seconds)
+    float transitionTime = 1.0; 
+
+    // 2. Create a timer that stays at 0.0 for the whole video, 
+    // but starts counting up exactly 'transitionTime' seconds before the end.
+    float triggerTime = iEndTime - transitionTime;
+    float tFlash = clamp(iTime - triggerTime, 0.0, transitionTime);
+
+    // 3. Run your exact same math, but scale it to 'transitionTime' instead of 'duration'
+    float z_prog = smoothstep(0.0, transitionTime, tFlash);
+    z_prog = pow(z_prog, 1.5); // Easing for accelerating zoom effect
+    
+    float animZ = mix(20.0, -2.0, z_prog);
+    float flashAmt = 1.0 - smoothstep(-1.0, 1.0, animZ);
+    
+    // 4. Mix and output
+    vec3 colFlash = mix(fragColor.rgb, vec3(1.0), flashAmt);
+    fragColor = vec4(colFlash, 1.0);
+
+
+
+
+
+    // =========================================================================
+    // PART 4: WAVE FUNCTION
+    // =========================================================================
+
+    // Define your colors (Normalized from 0-255 to 0.0-1.0)
+    vec3 MAGENTA = vec3(250.0, 34.0, 197.0) / 255.0;
+    vec3 GREEN   = vec3(8.0, 240.0, 124.0) / 255.0;
+    vec3 CYAN    = vec3(8.0, 224.0, 240.0) / 255.0;
+    vec3 GOLD    = vec3(240.0, 224.0, 8.0) / 255.0;
+    vec3 PURPLE  = vec3(187.0, 34.0, 250.0) / 255.0;
+    vec3 WHITE   = vec3(1.0, 1.0, 1.0);
+    
+    // Calculate accurate Y offsets accounting for OpenGL's bottom-up coordinate system
+    //float yTop    = iResolution.y - 60.0;   // 60 pixels from the top
+    //float yBottom = iResolution.y - 1000.0; // 1410 pixels from the top (30 from bottom on 1440p)
+    //float yBottom = iResolution.y - 1410.0; // 1410 pixels from the top (30 from bottom on 1440p)
+
+    float yTop    = 1350.0;   // 60 pixels from the top
+    float yBottom = 25.0; // 1410 pixels from the top (30 from bottom on 1440p) 
+
+    finalColor = vec3(0.0);
+    float freq = 0.02; // From your python code
+    
+    // --- COOL FACTOR: TIME SCROLLING ---
+    // Multiplying time creates an offset so the waves visibly "flow" across the screen
+    float speed = iTime * 5.0;
+
+    // Additive blending: Adding the colors together means where they overlap, they blend brightly to white
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.x, yTop, MAGENTA, freq, speed * 1.5);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.y, yTop, GREEN,   freq, speed * 1.2);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.z, yTop, CYAN,    freq, speed * 1.0);
+    
+    // --- BOTTOM WAVES ---
+    // Use negative speed to make bottom waves flow in the opposite direction for contrast!
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.x*2.0, yBottom, MAGENTA, freq, speed * -3.0);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.y*2.0, yBottom, GREEN, freq, speed * -3.2);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.z*2.0, yBottom, CYAN, freq, speed * -3.5);
+
+    // Optional: Tone-mapping to prevent the glowing hot spots from burning out entirely
+    finalColor = finalColor / (1.0 + finalColor * 0.2); 
+
+    // Add the wave to the screen
+    finalColor = fragColor.rgb + finalColor;
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+
+    // =========================================================================
+    // PART 6: AUDIO SPECTRUM 2
+    // =========================================================================
+
+    // Set exactly where you want the CENTER of the visualizer (in pixels).
+    // X = middle of screen. Y = 100 pixels up from the bottom.
+    vec2 TARGET_POS = vec2(iResolution.x * 0.5, 25.0); 
+    
+    // Set exactly how large you want the visualizer to be (in pixels).
+    // X = full width of screen. Y = restricted to 100 pixels tall.
+    vec2 TARGET_SIZE = vec2(iResolution.x, 240.0);
+    
+    // Remap the UVs based on our targets
+    uv = (uv - (TARGET_POS / iResolution.xy)) * (iResolution.xy / TARGET_SIZE) + 0.5;
+
+    
+    // Because the math in this shader stretches lines to infinity, 
+    // we need to "cut off" the rendering if the pixels are outside our 100px box.
+    //if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+    //    fragColor = vec4(0.0, 0.0, 0.0, 0.0); // Output transparent black
+    //    return;
+    //}
+
+
+    c = 4.0;
+    vec3 color = vec3(1.0);
+    color.z = bump(c * (uv.x - 0.75));
+    color.y = bump(c * (uv.x - 0.5));
+    color.x = bump(c * (uv.x - 0.25));
+	
+    float line = abs(0.02 / abs(0.5-uv.y) );
+    uv.y = abs( uv.y - 0.5 );
+	
+    vec4 soundWave = texture( iChannel3, vec2(abs(0.5-uv.x)+0.005, uv.y) ).rrrr;
+    color *= line * (1.0 - 2.0 * abs( 0.5 - uv.xxx ) + pow( soundWave.y, 10.0 ) * 50.0 );
+	
+    fragColor = fragColor + vec4(color, 0.0); 
+
+	
+}

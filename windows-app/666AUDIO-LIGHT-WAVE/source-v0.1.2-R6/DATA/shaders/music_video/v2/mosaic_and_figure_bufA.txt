@@ -1,0 +1,314 @@
+//====================================================================
+// НАСТРОЙКИ СТЕКЛЯННОГО КУБА И ТРАССИРОВКИ ЛУЧЕЙ
+//====================================================================
+#define MAX_STEPS 80
+#define SURF_DIST 0.001
+#define MAX_DIST 20.0
+#define IOR_R 1.45
+#define IOR_G 1.50
+#define IOR_B 1.55
+#define ABSORPTION vec3(0.4, 0.15, 0.05)
+#define PATH_STEPS 4 
+
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define M4(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+
+mat2 rot2D(float angle) {
+    float s = sin(angle), c = cos(angle);
+    return mat2(c, -s, s, c);
+}
+
+float sdBox(vec3 p, vec3 b, float r) {
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r;
+}
+
+float map(vec3 p) {
+    p.xz *= rot2D(iTime * 0.35);
+    M4(p.zy);
+    M4(p.xy);
+    F(p.xy,2.);
+    M4(p.xy);
+    
+    float outerWall = sdBox(p, vec3(1.0), 0.06);
+    float innerVoid = sdBox(p, vec3(0.82), 0.02);
+    float outerHollowCube = max(outerWall, -innerVoid);
+    
+    float winX = sdBox(p, vec3(1.2, 0.5, 0.5), 0.02);
+    float winY = sdBox(p, vec3(0.5, 1.2, 0.5), 0.02);
+    float winZ = sdBox(p, vec3(0.5, 0.5, 1.2), 0.02);
+    float windows = min(winX, min(winY, winZ));
+    outerHollowCube = max(outerHollowCube, -windows); 
+    
+    float innerCube = sdBox(p, vec3(0.38), 0.04);
+    
+    return min(outerHollowCube, innerCube);
+}
+
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0.0);
+    float d = map(p);
+    vec3 n = d - vec3(
+        map(p - e.xyy),
+        map(p - e.yxy),
+        map(p - e.yyx)
+    );
+    return normalize(n);
+}
+
+vec3 getBackground(vec3 rd, vec3 ro) {
+    float sky = smoothstep(-0.2, 0.2, rd.y);
+    vec3 bg = mix(vec3(0.04, 0.02, 0.15), vec3(0.02, 0.04, 0.08), sky); 
+    
+    float t = dot(-ro, rd);
+    vec3 closestPoint = ro + rd * max(0.0, t);
+    float dToCenter = length(closestPoint);
+    
+    vec3 neonColor = vec3(1.0, 0.1, 0.6); 
+    if (t > 0.0) {
+        float glow = 0.08 / (dToCenter * dToCenter + 0.04);
+        bg += neonColor * glow;
+    }
+    
+    return bg;
+}
+
+vec3 traceChannel(vec3 ro, vec3 rd, float target_ior) {
+    vec3 p = ro;
+    vec3 dir = rd;
+    float total_thickness = 0.0;
+    
+    for(int depth = 0; depth < PATH_STEPS; depth++) {
+        float inside_glass = map(p) > 0.0 ? 1.0 : -1.0;
+        float d = 0.0;
+        for(int i = 0; i < MAX_STEPS; i++) {
+            vec3 pt = p + dir * d;
+            float dS = map(pt) * inside_glass;
+            d += dS;
+            if(d >= MAX_DIST || abs(dS) < SURF_DIST) break;
+        }
+        
+        if(d >= MAX_DIST) break;
+        
+        p = p + dir * d;
+        vec3 n = getNormal(p) * inside_glass;
+        if(inside_glass < 0.0) total_thickness += d;
+        
+        float eta = (inside_glass > 0.0) ? (1.0 / target_ior) : (target_ior / 1.0);
+        vec3 refrDir = refract(dir, n, eta);
+        
+        if(length(refrDir) < 0.1) {
+            dir = reflect(dir, n);
+        } else {
+            dir = refrDir;
+        }
+        p += dir * SURF_DIST * 2.0;
+    }
+    
+    vec3 finalBg = getBackground(dir, p);
+    float absorptionFactor = exp(-total_thickness * 0.6);
+    return finalBg * absorptionFactor;
+}
+
+// Изменено: теперь возвращает полную информацию о пикселе куба
+// .rgb = цвет куба, .a = маска (1.0 если попали в куб, 0.0 если промах)
+vec4 render3DScene(vec2 p_coord) {
+    vec3 ro = vec3(0.0, 0.0, -12.5);
+    vec3 rd = normalize(vec3(p_coord, 1.3));
+    vec3 finalCol = getBackground(rd, ro);
+    
+    float dFirst = 0.0;
+    float inside_glass = map(ro) > 0.0 ? 1.0 : -1.0;
+    for(int i = 0; i < MAX_STEPS; i++) {
+        float dS = map(ro + rd * dFirst) * inside_glass;
+        dFirst += dS;
+        if(dFirst >= MAX_DIST || abs(dS) < SURF_DIST) break;
+    }
+    
+    if(dFirst < MAX_DIST) {
+        vec3 pFirst = ro + rd * dFirst;
+        vec3 nFirst = getNormal(pFirst);
+        vec3 reflDir = reflect(rd, nFirst);
+        vec3 specReflection = getBackground(reflDir, pFirst) * 0.2; 
+        
+        vec3 rCol = traceChannel(ro, rd, IOR_R);
+        vec3 gCol = traceChannel(ro, rd, IOR_G);
+        vec3 bCol = traceChannel(ro, rd, IOR_B);
+        
+        vec3 glassCol = vec3(rCol.r, gCol.g, bCol.b);
+        glassCol.r *= (1.0 - ABSORPTION.r);
+        glassCol.g *= (1.0 - ABSORPTION.g);
+        glassCol.b *= (1.0 - ABSORPTION.b);
+        
+        finalCol = glassCol + specReflection;
+        return vec4(pow(finalCol, vec3(1.0 / 2.2)), 1.0); // Попали! Маска = 1.0
+    }
+    return vec4(pow(finalCol, vec3(1.0 / 2.2)), 0.0); // Промах! Маска = 0.0
+}
+float happy_star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+ 
+//====================================================================
+// НАСТРОЙКИ НАЛОЖЕНИЯ МАЗАИЧНОГО ПЕРЕХОДА
+//====================================================================
+#define BLOCK_SIZE   0.0185  
+#define VAR_SIZE     1       
+#define VAR_RANGE    0.22    
+#define GROW         1       
+#define GROW_WIDTH   0.55    
+#define MOSAIC_IN    0.03    
+#define MOSAIC_OUT   0.28    
+#define GRID_GAP     0.22    
+#define GAP_SHRINK   1       
+#define GAP_SHRINK_END 1.0   
+#define GAP_LEAD     0.55    
+#define JITTER       0.16    
+#define GAMMA        1.35    
+#define POP_WIDTH    0.06    
+#define PC_JITTER    0.28    
+#define CELL_TINT    0.10    
+#define SPARK        0.09    
+#define SPARK_GAIN   0.60    
+#define TRANS_TIME   4.00    
+#define HOLD_TIME    1.20    
+#define EASE         0.55    
+#define RESTART      1       
+#define MANUAL_SCRUB 0       
+#define LUMA_MODE    1       
+
+float hash21(vec2 p){
+    vec3 p3 = fract(vec3(p.x, p.y, p.x) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+float luma(vec3 c){
+#if LUMA_MODE == 0
+    return dot(c, vec3(0.299, 0.587, 0.114));
+#else
+    return dot(c, vec3(0.2126, 0.7152, 0.0722));
+#endif
+}
+
+float rawProgress(){
+#if MANUAL_SCRUB
+    if (iMouse.z > 0.0) return clamp(iMouse.x / max(iResolution.x, 1.0), 0.0, 1.0);
+#endif
+#if RESTART
+    float tt = mod(iTime, TRANS_TIME + HOLD_TIME);
+    return clamp(tt / TRANS_TIME, 0.0, 1.0);
+#else
+    return clamp(iTime / TRANS_TIME, 0.0, 1.0);
+#endif
+}
+
+float progress(){
+    float p = rawProgress();
+    return mix(p, p * p * (3.0 - 2.0 * p), EASE);
+}
+
+float mosaicAmount(float p){
+    float up   = smoothstep(0.0, MOSAIC_IN, p);                
+    float down = 1.0 - smoothstep(1.0 - MOSAIC_OUT, 1.0, p);   
+    return up * down;
+}
+
+float gapAmount(float p, float gapBase){
+#if GAP_SHRINK
+    float lo = 1.0 - MOSAIC_OUT;
+    float hi = min(max(GAP_SHRINK_END, lo + 1e-3), 1.0);
+    lo = min(lo + (hi - lo) * GAP_LEAD, hi - 1e-3);
+    float k = 1.0 - smoothstep(lo, hi, p);
+    return gapBase * k;
+#else
+    return gapBase;
+#endif
+}
+
+//====================================================================
+// ГЛАВНЫЙ КОНВЕЙЕР СБОРКИ
+//====================================================================
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 p  = (uv - 0.5) * vec2(iResolution.x / max(iResolution.y, 1.0), 1.0);
+
+    // Получаем оригинальный пиксель сцены и проверяем, объект ли это
+    vec4 sceneSample = render3DScene(p);
+    vec3 origSmooth = sceneSample.rgb;
+    float isObject = sceneSample.a; // 1.0 - куб, 0.0 - космос/фон
+
+    // ОПРЕДЕЛЕНИЕ: Если пиксель — чистый фон, мазаика полностью отключается
+    if (isObject < 0.1) {
+        fragColor = vec4(origSmooth, 1.0);
+        return;
+    }
+
+    float prog = progress();
+    float mAmt = mosaicAmount(prog);
+    float gap  = gapAmount(prog, GRID_GAP);
+
+    vec3 graySmooth = vec3(luma(origSmooth));
+
+    // Нарезка сетки
+    float cell = BLOCK_SIZE;
+#if VAR_SIZE
+    vec2 g0b = p / BLOCK_SIZE;
+    cell = BLOCK_SIZE * (1.0 + (hash21(floor(g0b / 8.0)) - 0.5) * 2.0 * VAR_RANGE);
+#endif
+    vec2 g  = p / cell;
+   
+    vec2 id = floor(g);
+    vec2 local = fract(g) - 0.5;      
+
+    // Берем цвет из центра мазаичной ячейки
+    vec2 jit = (vec2(hash21(id + 1.7), hash21(id + 9.3)) - 0.5) * PC_JITTER;
+    vec4 cellSample = render3DScene((id + 0.5 + jit) * cell);
+    vec3 tile = cellSample.rgb;
+    
+    // Если центр ячейки мазаики промахнулся мимо куба, красим этот пиксель в цвет фона
+    if (cellSample.a < 0.1) {
+        tile = origSmooth; 
+    }
+
+    float lum = luma(tile);
+    tile *= 1.0 + (hash21(id + 5.1) - 0.5) * 2.0 * CELL_TINT;
+
+    // Тайминги сборки на основе яркости
+    float t = pow(clamp(1.0 - lum, 0.0, 1.0), GAMMA);
+    t = clamp(t + (hash21(id + 3.7) - 0.5) * JITTER, 0.0, 1.0 - POP_WIDTH);
+    float a = smoothstep(t, t + POP_WIDTH, prog);       
+
+    // Геометрия ячеек
+    float grow = 1.0;
+#if GROW
+    grow = mix(0.30, 1.0, smoothstep(t, t + POP_WIDTH * GROW_WIDTH, prog));
+#endif
+
+    float rEdge = 0.5 * (1.0 - gap) * grow;
+    vec2 box = smoothstep(rEdge + 0.01, rEdge - 0.01, abs(local));
+    float mask = box.x * box.y;
+
+    // Вспышка на ребрах перехода
+    float fFront = smoothstep(t + SPARK, t, prog) * smoothstep(t, t + SPARK, prog);
+    tile += vec3(fFront * SPARK_GAIN);
+
+    vec3 cellColor = mix(vec3(luma(tile)), tile, a);
+
+    // Смешивание
+    vec3 backgroundLayer = mix(graySmooth, origSmooth, mAmt);
+    vec3 mosaicLayer = mix(backgroundLayer, cellColor, mask);
+    vec3 finalResult = mix(origSmooth, mosaicLayer, mAmt);
+
+   vec2 uv3 = ( fragCoord - .5*iResolution.xy ) / iResolution.y;
+  
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  // anim between 0.9 - 1.1 
+    
+    fragColor = vec4(finalResult, 1.0);
+    fragColor *= vec4(happy_star(uv3, anim) * vec3(0.5,0.5,0.55)*0.75, 1.0);
+}

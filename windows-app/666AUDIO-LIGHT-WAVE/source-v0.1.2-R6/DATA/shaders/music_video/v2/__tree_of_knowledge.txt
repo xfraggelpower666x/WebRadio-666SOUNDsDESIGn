@@ -1,0 +1,121 @@
+// Author: Rigel
+// licence: https://creativecommons.org/licenses/by/4.0/
+
+#define PI 3.14159265
+#define BW 0.
+#define WB 1.
+
+// hash function 1D
+float hash(float n) {
+   return fract(sin(n) * 43758.5453123);
+}
+
+// noise function 1D
+float noise(float p) {
+   float i = floor(p);
+   float f = fract(p);
+   return mix(hash(i), hash(i + 1.0), f);
+}
+
+// signed distance function for a square
+float sdfSquare(vec2 p) {
+   vec2 ap = abs(p);
+   return max(ap.x,ap.y) - 1.;
+}
+
+// signed distance function for a circle
+float sdfCircle(vec2 p) {
+   return length(p) - 1.0;
+}
+
+// render an sdf with a stroke with a witdth w, at the zero boundary
+// the combination of smoothstep and fwidth allow a proper scaled antialiasing
+float stroke(float d, float w, float i) {
+    return abs(smoothstep(w*0.5, w*0.5+fwidth(d),abs(d)) - i);
+}
+
+// render an sdf with a normal fill BW or inverse fill WB, at the zero boundary
+// the combination of smoothstep and fwidth allow a proper scaled antialiasing
+float fill(float d, float i) {
+    return abs(smoothstep(-1.,1.,d/fwidth(d)) - i);
+}
+
+//smooth min between two sdf from iq
+//https://iquilezles.org/articles/smin
+float smin(float a, float b, float k) {
+   float res = exp(-k*a)+exp(-k*b);
+   return -log(res)/k;
+}
+
+// signed distance function for a tree
+// level is the branching level of the tree
+// theta is the angle between the branches
+// scalef is the scaling factor between each level
+float sdfTree(vec2 p, int level, float theta, vec2 scalef) {
+    p += vec2(0.,1.);
+
+    // because the primitive is a square we need a base scale to transform it to a rectangle
+    vec2 scale = vec2(10.,3.);
+    vec2 trans = vec2(1.,2.)/scale;
+    
+    // so we start with the trunk...
+    scale *= scalef;
+    float d = sdfSquare(p * scale - vec2(0.,1.));
+	
+    // then for each level...
+    for (int i=0; i<level; i++) {
+        scale *= scalef;
+        trans /= scalef;
+      
+        // we translate the rectangle up, and mirror in the x axis with abs and rotate it
+        // the power of  symmetry creates all the branches from only a few (level) branches
+        // try to remove the abs to see the only branches needed.
+        p = vec2(abs(p.x),p.y)-trans;
+        // 2d rotation matrix
+        p *= mat2(cos(theta),-sin(theta),sin(theta),cos(theta));
+        
+        // calculate the intersection with the trunk.. and repeat.
+        d = smin(d,sdfSquare(p * scale- vec2(0.,1.)),2.);
+    }
+  
+    return d;
+}
+
+float treeAnim(vec2 p, float phase) {
+    float theta = (PI/6.)*cos(1.-2.*noise(iTime+phase));
+    return fill(sdfTree(p*2.2-vec2(0.,0.55),7,theta,vec2(1.4,1.3)),BW);
+}
+
+
+// scene description
+vec3 TheTreeOfKnowledge(vec2 p) {
+    vec3 color = vec3(0.);
+  
+   	// the iris of the eye
+    float c = sdfCircle(p*1.4);
+    color += fill(c,WB)*step(-0.2,p.y);
+    color += stroke(c,0.1,WB);
+    
+    // the tree and the roots
+    vec3 tree = vec3(treeAnim(p,0.),treeAnim(p,10.),treeAnim(p,20.)); 
+    float roots = fill(sdfTree(vec2(0.9*p.x,-1.5*p.y)*2.-vec2(0.,1.3),4,PI/6.,vec2(1.38,1.39)),WB);
+
+    color *= tree;
+    color += roots*tree.r;// masking the roots trunk
+
+   	// the eye and the rays
+    p.y = abs(p.y);
+   	float eye = sdfCircle(p*.6+vec2(0.,.5));
+    float rays = stroke(cos(atan(abs(p.y),abs(p.x))*12.+iTime*0.5),1.8,BW);
+
+    color += fill(eye,BW)*rays; // use the eye to mask the rays
+    color += stroke(eye,0.05,WB);
+
+    return color;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord ) {
+	vec2 p = (2. * fragCoord - iResolution.xy) /iResolution.y;
+
+	fragColor = vec4(TheTreeOfKnowledge(p), 1.0 );
+}

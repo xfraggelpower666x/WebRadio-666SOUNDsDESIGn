@@ -1,0 +1,411 @@
+// Inception Tunnel
+// Author : Sebastien Berube & Noztol
+
+// Sebastien work was Creative Commons licensed
+// Since I'm using large chunks of it same license
+// applies. original shader: https://www.shadertoy.com/view/MdcXzn
+
+
+const float PI = 3.14159;
+const float SCALE = 1.0;
+const float MAX_DIST = 1000.0;
+const float FLOOR_HEIGHT  = 0.0;
+const float X_REPEAT_DIST = 0.90*SCALE;
+const float Z_REPEAT_DIST = 1.05*SCALE;
+const float PRIM_HEIGHT    = 1.0;
+const float HEX_HALF_WIDTH = 0.26*SCALE;
+const float GEOMETRY_DISPLACEMENT = 1.00;
+
+
+// Calculate the exact curvature needed to fit 42 hexagons around the cylinder
+const float TUNNEL_HEX_COUNT = 42.0;
+const float TUNNEL_CIRCUMFERENCE = TUNNEL_HEX_COUNT * X_REPEAT_DIST;
+const float MAX_K = (2.0 * PI) / TUNNEL_CIRCUMFERENCE;
+const float TUNNEL_RADIUS = 1.0 / MAX_K; 
+
+float g_time;
+float g_warpFactor; 
+
+struct AnimationChannels {
+    float material_roughness;   
+    float geometry_width;       
+    float geometry_scale;       
+    float geometry_displacement;
+    float geometry_smoothness;  
+    vec3 camPos;                
+    vec3 camLookAt;             
+};
+AnimationChannels g_animationChannels;
+
+const int MATERIALID_NONE      = 0;
+const int MATERIALID_FLOOR     = 1;
+const int MATERIALID_SKY       = 2;
+const int MATERIALID_PLASTIC   = 3;
+
+#define saturate(x) clamp(x,0.0,1.0)
+#define normalized_wave(a) (0.5*a+0.5)
+#define zclamp(a) max(a,0.0) 
+
+struct Cam { vec3 R; vec3 U; vec3 D; vec3 o; float lens; float zoom; };
+
+struct repeatInfo {
+    vec3 smpl; 
+    vec3 anchor; 
+};
+    
+repeatInfo DF_repeatHex(vec3 p) {
+    float xRepeatDist = X_REPEAT_DIST;
+    float zRepeatDist = Z_REPEAT_DIST*0.5;
+    float latticeX = (fract(p.x/xRepeatDist+0.5)-0.5)*xRepeatDist;
+    float latticeY = (fract(p.z/zRepeatDist+0.5)-0.5)*zRepeatDist;
+    vec2 anchorPosXZ = p.xz-vec2(latticeX,latticeY);
+    p.x = latticeX; 
+    p.z = latticeY;
+    
+    float period = fract(g_time/30.)*3.0;
+    float theta = period*2.0*PI;
+    float overallAmplitude = normalized_wave(-cos(theta)); 
+    
+    // Attempt at an Angular wrap
+    float waveAngleX = (anchorPosXZ.x / TUNNEL_CIRCUMFERENCE) * 2.0 * PI;
+    float waveAmplitude = g_animationChannels.geometry_displacement
+                         *normalized_wave(sin(waveAngleX * 6.0 + anchorPosXZ.y + theta*4.0));
+                         
+    float primHeight = FLOOR_HEIGHT+overallAmplitude*waveAmplitude;
+     
+    repeatInfo outData;
+    outData.anchor = vec3(anchorPosXZ[0], primHeight, anchorPosXZ[1]);
+    outData.smpl = p;
+    
+    return outData;
+}
+
+float DF_RoundedHex( vec3 p, float width, float height) {
+    float smoothRadius = g_animationChannels.geometry_smoothness*0.2;
+    width -= smoothRadius*2.0;
+    
+    p = abs(p);
+    
+    float da = (p.x*0.866025+p.z*0.5)-width; 
+    float db = (p.x*0.866025-p.z*0.5)-width; 
+    float dc = p.z-width; 
+    
+    vec3 d = zclamp(vec3(da,db,dc));
+    float dw = length(d)-smoothRadius; 
+    float dh = p.y-height;
+    
+    float externalDistance = length(zclamp(vec2(dh,dw)))-smoothRadius; 
+    float internalDistance = max(max(da,dc),dh); 
+    return min(externalDistance,internalDistance);
+}
+
+struct DF_out {
+    float d;
+    int matID;
+    vec3 objectPos;
+};
+    
+
+DF_out DF_composition( in vec3 pos ) {
+    vec3 wPos = pos;
+    float k = g_warpFactor * MAX_K; 
+    
+    if (g_warpFactor > 0.0001) {
+        // Clamp the curvature to a safe minimum to prevent 
+        // the radius from reaching Infinity
+        float safeK = max(k, 0.002); // Max radius of 500 units
+        
+        vec2 cy = vec2(0.0, 1.0/safeK); 
+        vec2 d = pos.xy - cy;
+        
+        float angle = atan(d.x, -d.y);
+        float rad = length(d);
+        
+        vec3 warpedPos = pos;
+        warpedPos.x = angle / safeK;
+        warpedPos.y = 1.0/safeK - rad;
+        
+        // Smoothly crossfade the final 5% of the transition directly to 
+        // the true flat plane to hide the safety clamp seamlessly.
+        float blend = smoothstep(0.0, 0.05, g_warpFactor);
+        wPos = mix(pos, warpedPos, blend);
+    }
+
+    DF_out oHexA, oHexB;
+    
+    oHexA.matID = MATERIALID_PLASTIC;
+    repeatInfo infoA = DF_repeatHex(wPos-vec3(0));
+    oHexA.objectPos = infoA.anchor; 
+    oHexA.d = DF_RoundedHex( infoA.smpl-vec3(0,infoA.anchor.y,0),
+                             g_animationChannels.geometry_width*HEX_HALF_WIDTH, PRIM_HEIGHT );
+    
+    oHexB.matID = MATERIALID_PLASTIC;
+    repeatInfo infoB = DF_repeatHex(wPos-vec3(X_REPEAT_DIST*0.5,0, Z_REPEAT_DIST*0.25));
+    oHexB.objectPos = infoB.anchor;
+    oHexB.d = DF_RoundedHex( infoB.smpl-vec3(0,infoB.anchor.y,0),
+                             g_animationChannels.geometry_width*HEX_HALF_WIDTH, PRIM_HEIGHT );
+    
+    float dist = min(oHexA.d, oHexB.d) * mix(1.0, 0.4, g_warpFactor);
+    
+    if(oHexA.d < oHexB.d) {
+        oHexA.d = dist;
+        return oHexA;
+    } else {
+        oHexB.d = dist;
+        return oHexB;
+    }
+}
+
+vec3 DF_gradient( in vec3 p ) {
+    const float d = 0.001;
+    vec3 grad = vec3(DF_composition(p+vec3(d,0,0)).d-DF_composition(p-vec3(d,0,0)).d,
+                     DF_composition(p+vec3(0,d,0)).d-DF_composition(p-vec3(0,d,0)).d,
+                     DF_composition(p+vec3(0,0,d)).d-DF_composition(p-vec3(0,0,d)).d);
+    return grad/(2.0*d);
+}
+
+float RAYMARCH_isosurface( vec3 o, vec3 d, float isoSurfaceValue) {
+    const float tolerance = 0.0001;
+    float t = 0.0;
+    float dist = MAX_DIST;
+    
+    for( int i=0; i<120; i++ ) {
+        dist = DF_composition( o+d*t ).d;
+        dist -= isoSurfaceValue;
+        if( abs(dist) < tolerance ) break;
+        t += dist;
+        if(t > MAX_DIST) break;
+    }
+    return t;
+}
+
+float RAYMARCH_DFSS( vec3 o, vec3 L, float coneWidth ) {
+    float minAperture = 1.0; 
+    float t = 0.01; 
+    for( int i=0; i<7; i++ ) {
+        vec3 p = o+L*t; 
+        float dist = DF_composition( p ).d;
+        dist = min(dist,t);
+        float curAperture = dist/t; 
+        minAperture = min(minAperture,curAperture);
+        t += 0.02+min(dist,0.4);
+    }
+    return saturate(minAperture/coneWidth); 
+}
+
+float RAYMARCH_DFAO( vec3 o, vec3 N, float isoSurfaceValue) {
+    float MaxOcclusion = 0.0;
+    float TotalOcclusion = 0.0;
+    float stepSize = 0.11/4.0;
+    for( int i=0; i<4; i++ ) {
+        float t = 0.01 + stepSize;
+        stepSize = stepSize*2.0;
+        float dist = DF_composition( o+N*t ).d-isoSurfaceValue;
+        float occlusion = zclamp(t-dist);
+        TotalOcclusion += occlusion;
+        MaxOcclusion += t;
+    }
+    return saturate(1.0-TotalOcclusion/(MaxOcclusion*1.25));
+}
+
+struct TraceData {
+    float rayLen;  
+    vec3  rayDir;  
+    vec3  normal;  
+    vec3  objectPos; 
+    int   matID;     
+};
+
+vec3 PBR_HDRremap(vec3 c) {
+    float fHDR = smoothstep(2.900,3.0,c.x+c.y+c.z);
+    return mix(c,1.3*vec3(4.5,3.5,3.0),fHDR);
+}
+
+vec3 PBR_Fresnel_Schlick_Dielectric(vec3 n, float VdotH) {
+    vec3 F0 = abs ((1.0 - n) / (1.0 + n));
+    return F0 + (1.-F0) * pow( 1. - VdotH, 5.);
+}
+
+vec3 PBR_ABL_Equation(vec3 V, vec3 L, vec3 N, float roughness) {
+    roughness = max(roughness,0.01);
+    vec3 H = normalize(L+V);
+    float NdotH = dot(N,H);
+    float NdotL = dot(N,L);
+    float VdotH = dot(V,H);
+    float NdotV = dot(N,V);
+    
+    float alpha2 = roughness * roughness;
+    float NoH2 = NdotH * NdotH;
+    float D = (NdotH>0.) ? alpha2/(PI*pow(NoH2*(alpha2-1.0)+1.0, 2.0)) : 0.0;
+    
+    vec3 F = PBR_Fresnel_Schlick_Dielectric(vec3(1.49), VdotH);
+    
+    float Gk = (roughness+1.)*(roughness+1.)/8.; 
+    float Gl = max(NdotL,0.)/(NdotL*(1.0-Gk)+Gk);
+    float Gv = max(NdotV,0.)/(NdotV*(1.0-Gk)+Gk);
+    float G = Gl*Gv;
+    
+    return D*F*G / (4.*NdotV*NdotL*(1.0-0.2)+0.2);
+}
+
+// -----------------------------------------------------------------
+// Disco Hive colors https://www.shadertoy.com/view/7c3XRj
+// -----------------------------------------------------------------
+vec3 discoColors(vec2 objPos) {
+    // apple angular wrap math for colors
+    float angleX = (objPos.x / TUNNEL_CIRCUMFERENCE) * 2.0 * PI;
+    float py = objPos.y * 0.35 + g_time * 0.2; 
+    
+    vec3 orange = vec3(1.0, 0.4, 0.1) * 2.0;
+    vec3 purple = vec3(1.0, 0.2, 0.5) * 0.8;
+    
+    float l = pow(0.5 + 0.5 * cos(angleX * 12.0 + cos(py) * 8.0) * sin(py * 2.0), 4.0) * 2.0;
+    
+    vec3 c = pow(l * (mix(orange, purple, 0.5 + 0.5 * cos(angleX * 40.0 + sin(py * 10.0) * 3.0)) +
+                      mix(orange, purple, 0.5 + 0.5 * cos(angleX * 20.0 + sin(py * 3.0) * 3.0))), vec3(1.2)) * 0.7;
+                      
+    c += vec3(1.0, 0.8, 0.4) * pow(0.5 + 0.5 * cos(angleX * 20.0) * sin(py * 12.0), 20.0) * 2.0;
+    
+    vec2 waveVec = vec2(angleX * 20.0, py * 6.0);
+    c += vec3(0.1, 0.5 + 0.5 * cos(waveVec)) * vec3(0.05, 0.1, 0.4).bgr * 0.7;
+    
+    return c;
+}
+
+vec3 MAT_Plastic(TraceData traceData, vec3 cDiff, vec3 N, vec3 V, vec3 L0, vec3 L1, float dfao, float dfss0, float dfss1) {
+    vec3 col = vec3(0);
+    float fRoughness = g_animationChannels.material_roughness;
+    
+    vec3 cAmb  = cDiff * vec3(0.5+0.5*dot(traceData.normal,vec3(+0.08,1,+0.1)))
+               + cDiff * vec3(0.5+0.5*dot(traceData.normal,vec3(-0.28,1,-0.17)))
+               + cDiff * vec3(0.5+0.5*dot(traceData.normal,vec3(+0.28,1,-0.27)));
+               
+    vec3 CL0  = PBR_HDRremap(vec3(1))*PBR_ABL_Equation(V,L0,traceData.normal, fRoughness);
+    vec3 CL1  = PBR_HDRremap(vec3(1))*PBR_ABL_Equation(V,L1,traceData.normal, fRoughness);
+    
+    col = cAmb * dfao;
+    col += cDiff * max(0.0, dfao) * 0.8; 
+    
+    col *= saturate(0.30+fRoughness*0.5+0.2*(dfss0+dfss1));
+    col += (dfss0+fRoughness*0.25)*CL0;
+    col += (dfss1+fRoughness*0.25)*CL1;
+    return col*0.75;
+}
+
+float SAMPLER_trilinear(vec3 p) {
+    const float TEXTURE_RES = 256.0; 
+    p *= TEXTURE_RES;  
+    vec3 pixCoord = floor(p);
+    vec3 t = p-pixCoord;     
+    t = (3.0 - 2.0 * t) * t * t; 
+    vec2 layer_translation = -pixCoord.y*vec2(37.0,17.0)/TEXTURE_RES; 
+    vec2 layer1_layer2 = vec2(1.0);
+    //idk why the code had a texture?
+    //vec2 layer1_layer2 = texture(iChannel0,layer_translation+(pixCoord.xz+t.xz+0.5)/TEXTURE_RES,-100.0).xy; 
+    return mix( layer1_layer2.x, layer1_layer2.y, t.y ); 
+}
+
+float MAT_remap_angle_probability(float x_01) { return (1.0-cos(x_01*PI/2.0)); }
+
+vec4 MAT_apply(vec3 pos, TraceData traceData) {
+    vec3 c_atmosphere = mix(vec3(0.02, 0.0, 0.05), vec3(0.1, 0.0, 0.15), clamp(3.0*pos.y/length(pos.xz),0.,1.)); 
+    if(traceData.matID==MATERIALID_SKY) return vec4(c_atmosphere,1.0);
+    
+    vec4 col = vec4(0);
+    vec3 N = traceData.normal;
+    vec3 V = normalize(-traceData.rayDir);
+    vec3 L0 = normalize(vec3(0.5,1.2,0.3));
+    vec3 L1 = normalize(vec3(-L0.x,L0.y,-L0.z+0.5));
+    
+    float fNoiseAmplitude = 0.4;
+    float jitter_01 = SAMPLER_trilinear(pos*10.0+g_time*50.0);
+    float t = MAT_remap_angle_probability(jitter_01)*fNoiseAmplitude;
+    vec3 Na = vec3(N.xz*mat2(cos(t),sin(t),-sin(t),cos(t)),N.y).xzy; 
+    
+    jitter_01 = SAMPLER_trilinear(5.0+pos*9.11);
+    t = MAT_remap_angle_probability(jitter_01)*fNoiseAmplitude;
+    vec3 Nb = vec3(N.xz*mat2(cos(t),-sin(t),sin(t),cos(t)),N.y).xzy; 
+    
+    float dfaoAveraged = 0.5 * (RAYMARCH_DFAO(pos, Na, 0.02) + RAYMARCH_DFAO(pos, Nb, 0.02));
+    float dfss0 = RAYMARCH_DFSS( pos+L0*0.01, L0, 0.2);
+    float dfss1 = RAYMARCH_DFSS( pos+L1*0.01, L1, 0.2);
+    
+    if(traceData.matID==MATERIALID_PLASTIC) {
+        vec3 dColor = discoColors(traceData.objectPos.xz);
+        col.rgb = MAT_Plastic(traceData, dColor, N, V, L0, L1, dfaoAveraged, dfss0, dfss1);
+    }
+    
+    float a = 0.08;
+    float NORMALIZATION_TERM = log((1.+a)/a);
+    float da = log((traceData.rayLen*0.3/50.0+a)/a)/NORMALIZATION_TERM;
+    col.rgb = mix(col.rgb, c_atmosphere, saturate(da));
+    
+    return col;
+}
+
+TraceData TRACE_geometry(vec3 o, vec3 d) {
+    TraceData dfTrace;
+    float rayLen = RAYMARCH_isosurface(o,d,0.0);
+    vec3 dfHitPosition = o+rayLen*d;
+    
+    DF_out compInfo = DF_composition( dfHitPosition );
+    rayLen += compInfo.d;
+    dfHitPosition = o+rayLen*d;
+        
+    dfTrace.rayLen     = rayLen;
+    dfTrace.matID      = (rayLen < MAX_DIST) ? compInfo.matID : MATERIALID_SKY;
+    dfTrace.objectPos  = compInfo.objectPos;
+    dfTrace.rayDir     = d;
+    dfTrace.normal     = normalize(DF_gradient(dfHitPosition));
+    return dfTrace;
+}
+
+void ANIM_main(float fTime) {
+    g_animationChannels.geometry_smoothness = 0.12;
+    g_animationChannels.material_roughness = 0.45;
+    g_animationChannels.geometry_width = 0.95;
+    g_animationChannels.geometry_displacement = GEOMETRY_DISPLACEMENT;
+
+    float planeCamY = 4.2;
+    float camY = mix(planeCamY, TUNNEL_RADIUS, g_warpFactor);
+    g_animationChannels.camPos = vec3(0.0, camY, fTime * 4.0);
+    
+    vec3 lookOffset = vec3(0.0, -0.1, 1.0);
+    g_animationChannels.camLookAt = g_animationChannels.camPos + lookOffset;
+}
+
+Cam CAM_animate(float fTime) {
+    Cam cam;
+    cam.o = g_animationChannels.camPos;
+    cam.D = normalize(g_animationChannels.camLookAt-cam.o);
+    cam.R = normalize(cross(cam.D,vec3(0,1,0)));
+    cam.U = normalize(cross(cam.R,cam.D));
+    cam.lens = 1.2;
+    cam.zoom = 3.0;
+    return cam;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    g_time = iTime + 2.6; 
+    
+    float cycle = g_time * 0.25;
+    g_warpFactor = smoothstep(0.05, 0.95, 0.5 - 0.5 * cos(cycle));
+
+    vec2 uv = (fragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
+    
+    float roll = g_warpFactor * sin(g_time * 0.2) * 0.15;
+    mat2 rot = mat2(cos(roll), -sin(roll), sin(roll), cos(roll));
+    uv *= rot;
+
+    ANIM_main(g_time + 2.1);
+    Cam cam = CAM_animate(g_time + 2.1);
+    
+    vec2 p = cam.lens*uv/(cam.lens-length(uv)*length(uv));
+    p *= cam.zoom;
+    vec3 d = normalize(p.x*cam.R+p.y*cam.U+cam.D);
+    
+    TraceData traceData = TRACE_geometry(cam.o, d);
+    vec4 c = MAT_apply(cam.o + d * traceData.rayLen, traceData);
+    
+    fragColor = vec4(pow(c.rgb, vec3(0.4545)), 1.0);
+}

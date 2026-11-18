@@ -1,0 +1,277 @@
+/**
+ * Created by Kamil Kolaczynski (revers) - 2016
+ *
+ * Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+ *
+ * This shader uses geometry (except tetrahedron) and camera path from "Spherical polyhedra" 
+ * by nimitz. [ https://www.shadertoy.com/view/4dBXWD ]
+ * I must admit that you have used very clever way of modeling platonic solids, mr nimitz :]
+ * 
+ * The rendering is based on "Transparent Cube Field" by Shane. 
+ * [ https://www.shadertoy.com/view/Xds3zN ]
+ * Code clear and very well documented (as always), mr Shane :]
+ *
+ * Thanks for sharing your work, guys!
+ *
+ * From my side: added glow, tetrahedron and normalized size of the solids to be enclosed inside
+ * a fixed size sphere (see "Circumradius" parameter).
+ * 
+ * This shader was created and exported from Synthclipse [ http://synthclipse.sourceforge.net/ ].
+ */
+
+
+// The following block is needed for Clubber integration
+#ifndef CLUBBER
+vec4 iMusic[4];
+const float iTransition = 1.0;
+#define CLUBBER_R abs(sin(iTime * 1.33))
+#define CLUBBER_G abs(cos(iTime * 0.66))
+#define CLUBBER_B abs(cos(iTime))
+#define CLUBBER_A min(abs(cos(iTime * 0.33)),abs(sin(iTime * 0.66)))
+#endif
+// Clubber end
+
+const bool GlowEnabled = true;
+float Circumradius;
+const float WallDistance = 0.01;
+const float GlowDistance = 0.26974;
+
+const bool Jitter = false;
+const float MarchDumping = 0.658;
+const float Far = 5.0;
+const int MaxSteps = 156;
+
+#define PI 3.141592
+#define RADIANS(x) ((x) * (PI / 180.0))
+
+// https://en.wikipedia.org/wiki/Platonic_solid
+
+#define TETRAHEDRON_DIHEDRAL_ANGLE RADIANS(70.53)
+#define HEXAHEDRON_DIHEDRAL_ANGLE RADIANS(90.0)
+#define OCTAHEDRON_DIHEDRAL_ANGLE RADIANS(109.47)
+#define DODECAHEDRON_DIHEDRAL_ANGLE RADIANS(116.57)
+#define ICOSAHEDRON_DIHEDRAL_ANGLE RADIANS(138.19)
+
+#define TETRAHEDRON_SCHLAFLI_SYMBOL vec2(3.0, 3.0)
+#define HEXAHEDRON_SCHLAFLI_SYMBOL vec2(4.0, 3.0)
+#define OCTAHEDRON_SCHLAFLI_SYMBOL vec2(3.0, 4.0)
+#define DODECAHEDRON_SCHLAFLI_SYMBOL vec2(5.0, 3.0)
+#define ICOSAHEDRON_SCHLAFLI_SYMBOL vec2(3.0, 5.0)
+
+// Hash by iq
+float hash(float h) {
+	return fract(sin(h) * 43758.5453123);
+}
+
+vec3 rotx(vec3 p, float a) {
+	float s = sin(a), c = cos(a);
+	return vec3(p.x, c * p.y - s * p.z, s * p.y + c * p.z);
+}
+vec3 roty(vec3 p, float a) {
+	float s = sin(a), c = cos(a);
+	return vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z);
+}
+vec3 rotz(vec3 p, float a) {
+	float s = sin(a), c = cos(a);
+	return vec3(c * p.x - s * p.y, s * p.x + c * p.y, p.z);
+}
+
+float cot(float x) {
+	return 1.0 / tan(x);
+}
+
+float getInradius(vec2 pq, float diha) {
+	float tn = tan(diha * 0.5);
+	float a = 2.0 * Circumradius / (tan(PI / pq.y) * tn);
+	float r = 0.5 * a * cot(PI / pq.x) * tn;
+
+	return r;
+}
+
+float tetrahedron(vec3 p) {
+	float diha = -RADIANS(180.0 - 70.53); // 180 - "Dihedral angle"
+	float tria = -RADIANS(60.0); // triangle angle
+	float inra = getInradius(TETRAHEDRON_SCHLAFLI_SYMBOL, TETRAHEDRON_DIHEDRAL_ANGLE);
+
+	float d = p.x - inra;
+
+	p = rotz(p, diha);
+	d = max(d, p.x - inra);
+
+	p = rotx(p, tria);
+	p = rotz(p, diha);
+
+	d = max(d, p.x - inra);
+
+	p = rotx(p, -tria);
+	p = rotz(p, diha);
+	d = max(d, p.x - inra);
+
+	return d;
+}
+
+// cube
+float hexahedron(vec3 p) {
+	float inra = getInradius(HEXAHEDRON_SCHLAFLI_SYMBOL, HEXAHEDRON_DIHEDRAL_ANGLE);
+
+	float d = abs(p.x) - inra;
+
+	p = rotz(p, 1.5708); // 90 degrees
+	d = max(d, abs(p.x) - inra);
+
+	p = roty(p, 1.5708); // 90 degrees
+	d = max(d, abs(p.x) - inra);
+
+	return d;
+}
+
+float octahedron(vec3 p) {
+	float d = -1e5;
+
+	float inra = getInradius(OCTAHEDRON_SCHLAFLI_SYMBOL, OCTAHEDRON_DIHEDRAL_ANGLE);
+
+	for (float i = 0.0; i < 4.0; i++) {
+		p = rotz(p, 1.231); // 70.53110 degrees
+		p = rotx(p, 1.047); // 60 degrees
+
+		d = max(d, max(p.x - inra, -p.x - inra));
+	}
+	return d;
+}
+
+float dodecahedron(vec3 p) {
+	float d = -1e5;
+
+	float inra = getInradius(DODECAHEDRON_SCHLAFLI_SYMBOL, DODECAHEDRON_DIHEDRAL_ANGLE);
+
+	for (float i = 0.0; i <= 4.0; i++) {
+		p = roty(p, 0.81); // 46.40958 degrees
+		p = rotx(p, 0.759); // 43.48750 degrees
+		p = rotz(p, 0.3915); // 22.43130 degrees
+
+		d = max(d, max(p.x - inra, -p.x - inra));
+	}
+
+	p = roty(p, 0.577); // 33.05966 degrees
+	p = rotx(p, -0.266); // -15.24068 degrees
+	p = rotz(p, -0.848); // -48.58682 degrees
+
+	d = max(d, max(p.x - inra, -p.x - inra));
+
+	return d;
+}
+
+float icosahedron(vec3 p) {
+	float d = -1e5;
+
+	//center band
+	const float n1 = 0.7297; // 41.80873 degrees
+	const float n2 = 1.0472; // 60 degrees
+
+	float inra = getInradius(ICOSAHEDRON_SCHLAFLI_SYMBOL, ICOSAHEDRON_DIHEDRAL_ANGLE);
+
+	for (float i = 0.0; i < 5.0; i++) {
+
+		if (mod(i, 2.0) == 0.0) {
+			p = rotz(p, n1);
+			p = rotx(p, n2);
+		} else {
+			p = rotz(p, n1);
+			p = rotx(p, -n2);
+		}
+		d = max(d, max(p.x - inra, -p.x - inra));
+	}
+
+	p = roty(p, 1.048); // 60.04598 degrees
+	p = rotz(p, 0.8416); // 48.22013 degrees
+	p = rotx(p, 0.7772); // 44.53028 degrees
+
+	//top caps
+	for (float i = 0.0; i < 5.0; i++) {
+		p = rotz(p, n1);
+		p = rotx(p, n2);
+
+		d = max(d, max(p.x - inra, -p.x - inra));
+	}
+	return d;
+}
+
+float mapShape(vec3 p, float x) {
+    x = CLUBBER_G;
+    return mix(octahedron(p), icosahedron(p), smoothstep(0.33, 0.66,x));
+}
+
+float shapeProgress(float t) {
+	return 0.;
+}
+
+float map(vec3 p) {
+	return mapShape(p, shapeProgress(iTime));
+}
+
+vec3 render(vec3 ro, vec3 rd) {
+	float tmin = 0.0;
+	float tmax = Far;
+
+	float precis = 0.002;
+	float t = tmin;
+
+	vec3 accu = vec3(0.0);
+	float steps = 0.0;
+	float glowFactor = 0.0;
+
+	for (int i = 0; i < MaxSteps; i++) {
+		steps = float(i);
+		float d = map(ro + rd * t);
+		float absd = abs(d);
+
+		if (Jitter) {
+			absd *= 0.8 + hash(absd) * 0.2;
+		}
+		if (t > tmax) {
+			break;
+		}
+		glowFactor += pow(1.0 - smoothstep(0.0, GlowDistance, d), 14.0)
+				* step(0.0, d);
+		float f = absd * (1.0 - smoothstep(0.0, WallDistance, absd));
+		accu += vec3(f);
+
+		t += max(0.0002, absd * MarchDumping);
+	}
+	glowFactor /= steps * (mix(6.66, 0.66, CLUBBER_B)) ;
+
+	if (GlowEnabled) {
+		accu += 0.7 * pow(glowFactor, 1.2) * vec3(0.0, 1.0, 1.0);
+	}
+	return accu;
+}
+
+mat2 mm2(in float a) {
+	float c = cos(a), s = sin(a);
+	return mat2(c, -s, s, c);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+     Circumradius = 0.12 + 0.16 * min(1.0, CLUBBER_R);
+	vec2 p = fragCoord.xy / iResolution.xy;
+	vec2 uv = 2.0 * p - 1.0;
+	uv.x *= iResolution.x / iResolution.y;
+
+	vec3 ro = vec3(0.0, 0.0, -1.0);
+	vec3 rd = normalize(vec3(uv, 3.5));
+
+	vec2 um = (0.0, 0.0) / iResolution.xy - 0.5;
+	um.x *= iResolution.x / iResolution.y;
+
+	mat2 mx = mm2(iTime * 0.75 + um.x * 6.0);
+	mat2 my = mm2(iTime * 0.77 + um.y * 6.0);
+	ro.xz *= mx;
+	rd.xz *= mx;
+	ro.xy *= my;
+	rd.xy *= my;
+
+	vec3 col = render(ro, rd);
+	col = pow(col, vec3(0.4545));
+
+	fragColor = vec4(col, 1.0);
+}

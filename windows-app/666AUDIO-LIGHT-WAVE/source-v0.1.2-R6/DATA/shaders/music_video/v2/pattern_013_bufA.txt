@@ -1,0 +1,87 @@
+#define rot2(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+#define H(h,t) ( cos( h/2.2 + t + 2.*vec3(1,5,3) )*.5 + .2 )
+
+#define R iResolution
+
+vec4 qmul(vec4 a, vec4 b) {
+    return vec4(
+        a.x*b.x - a.y*b.y - a.z*b.z - a.w*b.w,
+        a.x*b.y + a.y*b.x + a.z*b.w - a.w*b.z,
+        a.x*b.z - a.y*b.w + a.z*b.x + a.w*b.y,
+        a.x*b.w + a.y*b.z - a.z*b.y + a.w*b.x
+    );
+}
+
+void mainImage( out vec4 O, vec2 U) {
+    vec3 c = vec3(0.);
+    float tt = iTime;
+
+    vec4 rd = normalize(vec4(U - .5*R.xy, R.y, -2.)) * 5.;
+
+    float totdist = 0.;
+
+    for (float i = 0.; i < 120.; i++) {
+        vec4 p = rd * totdist;
+
+        p.z -= .5;
+        p.x += .4;
+        p.y -= .5;
+
+        p.xz *= rot2( 1.4*(1. + 4.2*sin(tt/6.0)) );
+        p.xy *= rot2( 0.4*(1. + .2*sin(tt/3.)) );
+        p.yz *= rot2( tt/5. );
+
+        p.xw *= rot2( 17.15*sin(tt*0.07) );
+        p.yw *= rot2( -3.95*cos(tt*0.56) );
+
+        vec4 w = vec4(0.);
+        vec4 dz = vec4(0.);
+        vec4 z;
+
+        for (float j = 0.; j < 5.; j++) {
+            float ex = exp(w.x);
+            float cy = cos(w.y);
+            float sy = sin(w.y);
+            float cz = cos(w.z);
+            float sz = sin(w.z);
+            float cw = cos(w.w);
+            float sw = sin(w.w);
+
+            z = vec4(
+                ex*(cy*cz*cw - sy*sz*sw),
+                ex*(sy*cz*cw + cy*sz*sw),
+                ex*(cy*sz*cw - sy*cz*sw),
+                ex*(sy*sz*cw + cy*cz*sw)
+            );
+
+            dz = qmul(z, dz);
+            dz.x += 0.8;
+
+            float dotp = 2.5 * max(1./dot(z,z), 0.04);
+            dz *= dotp;
+            w = z * dotp + p;
+        }
+
+        float ddz = clamp(dot(dz,dz), 1e-3, 1e6);
+        float ddw = clamp(dot(w,w), 1e-3, 1e6);
+
+        float dist = sqrt(sqrt(ddw/ddz));
+        float stepsize = dist/50.;
+        totdist += stepsize;
+
+        c += .1 * H(log(ddz), i*.18) * exp(-i*i*dist*dist/30.);
+    }
+
+    c = 1. - exp(-c*c);
+
+    // Soft background glow and vignette.
+    vec2 uv = U/R.xy;
+    vec3 bg = vec3(.015,.012,.025);
+    bg += .25 * pow(max(0., 1. - length(uv - .5)), 3.) * vec3(.6,.7,1.);
+
+    c += bg;
+    c = pow(c, vec3(.4545)); // gamma
+
+    O = vec4(c, 1.);
+}

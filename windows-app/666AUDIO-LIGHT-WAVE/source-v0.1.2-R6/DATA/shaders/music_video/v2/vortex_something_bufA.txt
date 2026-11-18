@@ -1,0 +1,44 @@
+/*
+    "Surf 2" by @XorDev
+    
+    I discovered an interesting refraction effect
+    by adding the raymarch iterator to the turbulence!
+    https://x.com/XorDev/status/1936174781352517638
+
+    An experiment based on my "3D Fire":
+    https://www.shadertoy.com/view/3XXSWS
+*/
+
+void mainImage(out vec4 O, vec2 I)
+{
+    //Raymarch depth
+    float z,
+    //Step distance
+    d,
+    //Raymarch iterator
+    i,
+    //Animation time
+    t = iTime;
+    //Clear fragColor and raymarch 100 steps
+    for(O*=i; i++<1e2;
+        //Coloring and brightness
+        O += (1.+cos(i*.7+vec4(6,1,2,0)))/d/i)
+    {
+    
+        //Sample point (from ray direction)
+        vec3 p = z*normalize(vec3(I+I,0)-iResolution.xyx)+.1;
+        
+        //Polar coordinates
+        p = vec3(atan(p.y,p.x)*2., p.z/3., length(p.xy)-6.);
+        
+        //Apply turbulence
+        //https://mini.gmshaders.com/p/turbulence
+        for(d=0.; d++<9.;)
+            p += sin(p.yzx*d-t+.2*i)/d;
+            
+        //Distance to cylinder and waves
+        z+=d=.2*length(vec4(p.z,.1*cos(p*3.)-.1));
+    }
+    //Tanh tonemap
+    O=tanh(O*O/9e2);
+}

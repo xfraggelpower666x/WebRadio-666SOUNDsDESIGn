@@ -1,0 +1,192 @@
+
+const float PI = 3.14159265359;
+const float TAU = 6.28318530718;
+
+float currentTime = 0.0;
+vec2 globalBeamIndex;
+
+
+vec3 getNeonPalette(float t) {
+    vec3 brightness = vec3(0.5, 0.5, 0.5);
+    vec3 contrast = vec3(0.5, 0.5, 0.5);
+    vec3 oscillation = vec3(1.0, 1.0, 1.0);
+    vec3 phase = vec3(0.0, 0.33, 0.67);
+    return brightness + contrast * cos(TAU * (oscillation * t + phase));
+}
+
+
+vec2 getPath(float z) {
+    // Combine sine and cosine waves at different frequencies to create organic turns
+    float x = sin(z * 0.1) * 3.0 + cos(z * 0.05) * 1.5;
+    float y = cos(z * 0.08) * 2.5 + sin(z * 0.06) * 2.0;
+    return vec2(x, y);
+}
+
+float calculateBoxDistance(vec3 position, vec3 dimensions) {
+    vec3 offset = abs(position) - dimensions;
+    return max(max(offset.x, offset.y), offset.z);
+}
+
+mat2 rotate2D(float angle) {
+    float sine = sin(angle);
+    float cosine = cos(angle);
+    return mat2(cosine, sine, -sine, cosine);
+}
+
+vec2 applyGridRepetition(inout vec2 position, vec2 cellSize) {
+    vec2 cellIndex = floor((position + cellSize * 0.5) / cellSize);
+    position = mod(position + cellSize * 0.5, cellSize) - cellSize * 0.5;
+    return cellIndex;
+}
+
+float applyZRepetitionPositive(inout float zPosition, float size) {
+    float halfSize = size * 0.5;
+    float cellIndex = floor((zPosition + halfSize) / size);
+    if (zPosition >= 0.0) {
+        zPosition = mod(zPosition + halfSize, size) - halfSize;
+    }
+    return cellIndex;
+}
+
+vec2 createSymmetry(vec2 position, float sides) {
+    float angle = atan(position.x, -position.y);
+    float sector = PI / sides;
+    
+    // Fold space into a pie slice
+    angle = mod(angle + sector, 2.0 * sector) - sector;
+    position = length(position.xy) * vec2(cos(angle), sin(angle));
+    
+    // Fold space multiple times to generate the "petals"
+    position = abs(position) - 0.25;
+    position = abs(position) - 0.25;
+    position = abs(position) - 0.15; 
+    return position;
+}
+
+float calculateSceneDistance(vec3 position) {
+    // Anchor the geometry to our winding path
+    position.xy -= getPath(position.z);
+
+    float zRepeatDistance = 8.0;
+    float zIndex = applyZRepetitionPositive(position.z, zRepeatDistance);
+    
+    // Animate rotation based on depth and time
+    position.xy *= rotate2D(currentTime * TAU / 16.0 * sign(mod(zIndex, 2.0) - 0.5));
+    
+    // Create the pentagonal base (5 sides)
+    position.xy = createSymmetry(position.xy, 5.0);
+
+    // Add some wave distortion
+    position.y += 0.4 * sin(position.z * TAU / 4.0 + currentTime * TAU / 2.0);
+    position.xy *= rotate2D(0.25 * PI * mod(zIndex, 2.0));
+
+    float beamLength = 3.9;
+    float outerRadius = 1.3;
+    float innerRadius = 1.1;
+    
+    float outerMask = calculateBoxDistance(position, vec3(vec2(outerRadius), beamLength));
+    float innerMask = calculateBoxDistance(position, vec3(vec2(innerRadius), beamLength + 0.3));
+    
+    globalBeamIndex = applyGridRepetition(position.xy, vec2(0.1)); 
+    float beam = calculateBoxDistance(position, vec3(vec2(0.04), beamLength));
+    
+    float hollowFrame = max(outerMask, -innerMask);
+    float combinedShape = max(beam, outerMask);
+    combinedShape = max(combinedShape, hollowFrame);
+    
+    return combinedShape;
+}
+
+float calculateAmbientOcclusion(vec3 position, vec3 normal) {
+    float scale = 2.0;
+    float occlusion = 0.0;
+    for(int i = 0; i < 5; i++) {
+        float stepDistance = 0.01 + float(i) * 0.5 / 4.0;        
+        float distanceAtStep = calculateSceneDistance(normal * stepDistance + position);
+        occlusion += (stepDistance - distanceAtStep) * scale;
+        scale *= 0.7;
+    }
+    return clamp(1.0 - occlusion, 0.0, 1.0);    
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.x;
+    
+    currentTime = iTime + 0.1;
+    
+    // Calculate position and where we are looking
+    float cameraZ = 6.0 * currentTime; // Move forward over time
+    vec3 rayOrigin = vec3(getPath(cameraZ), cameraZ);
+    vec3 lookAtTarget = vec3(getPath(cameraZ + 3.0), cameraZ + 3.0); // Look 3 units ahead
+    
+    // Build the camera rotation matrix
+    vec3 forward = normalize(lookAtTarget - rayOrigin);
+    vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), forward));
+    
+    // Add dynamic camera roll based on the path's curves to bank into turns
+    float roll = sin(cameraZ * 0.08) * 0.4; 
+    vec3 up = normalize(cross(forward, right));
+    up = cos(roll) * up + sin(roll) * right; // Apply the roll
+    right = normalize(cross(up, forward));
+    
+    mat3 cameraMatrix = mat3(right, up, forward);
+    
+    // Multiply our UVs by the camera matrix to turn the ray direction
+    vec3 rayDirection = cameraMatrix * normalize(vec3(uv, 0.7)); // 0.7 controls Field of View
+    
+    // Place the light further down the tunnel so it illuminates the path ahead
+    vec3 lightPosition = vec3(getPath(cameraZ + 8.0), cameraZ + 8.0);
+    
+    vec3 finalColor = vec3(0.0);
+    float totalDistance = 0.0;
+    float distanceToScene = 0.1;
+    vec3 currentPosition = rayOrigin;
+    vec2 savedBeamIndex;
+    
+    float accumulatedGlow = 0.0;
+
+
+    for(float i = 0.0; i < 200.0; i++) {
+        distanceToScene = calculateSceneDistance(currentPosition);
+        savedBeamIndex = globalBeamIndex; 
+        
+        accumulatedGlow += 0.012 / (1.0 + abs(distanceToScene) * 25.0);
+        
+        if(distanceToScene < 0.001 || totalDistance > 100.0) break;
+            
+        // Multiply by 0.7 to prevent the ray from overstepping due to the bent space
+        currentPosition += rayDirection * distanceToScene * 0.7; 
+        totalDistance += distanceToScene;
+    }
+    
+    vec2 epsilon = vec2(0.0035, -0.0035);
+    
+    if(distanceToScene < 0.01) {
+        float colorOffset = savedBeamIndex.y * 0.1 + savedBeamIndex.x * 0.05 + sin(currentTime * TAU / 16.0);
+        vec3 surfaceColor = getNeonPalette(colorOffset);
+        
+        vec3 normal = normalize(
+            epsilon.xyy * calculateSceneDistance(currentPosition + epsilon.xyy) + 
+            epsilon.yyx * calculateSceneDistance(currentPosition + epsilon.yyx) +
+            epsilon.yxy * calculateSceneDistance(currentPosition + epsilon.yxy) + 
+            epsilon.xxx * calculateSceneDistance(currentPosition + epsilon.xxx)
+        );
+        
+        vec3 lightDirection = normalize(lightPosition - currentPosition);
+        float diffuseLight = max(dot(normal, lightDirection), 0.0);
+        float specularLight = pow(max(dot(reflect(-rayDirection, normal), -lightDirection), 0.0), 40.0);
+        float subsurfaceScattering = smoothstep(0.0, 1.0, calculateSceneDistance(currentPosition + lightDirection * 0.4)) / 0.4; 
+        float ambientOcclusion = calculateAmbientOcclusion(currentPosition, normal);
+        
+        finalColor = surfaceColor * mix(1.0, specularLight + 0.9 * (diffuseLight + 1.5 * subsurfaceScattering), 0.4);
+        finalColor = mix(finalColor, finalColor * ambientOcclusion, 0.9);
+    }
+
+    vec3 glowColor = getNeonPalette(currentTime * 0.2 + savedBeamIndex.y * 0.1);
+    finalColor += glowColor * accumulatedGlow * 0.6;
+    
+    float fogFactor = 1.0 - exp(-totalDistance * 0.04);
+    finalColor = mix(finalColor, vec3(0.02, 0.01, 0.05), fogFactor);
+
+    fragColor = vec4(finalColor, 1.0);
+}

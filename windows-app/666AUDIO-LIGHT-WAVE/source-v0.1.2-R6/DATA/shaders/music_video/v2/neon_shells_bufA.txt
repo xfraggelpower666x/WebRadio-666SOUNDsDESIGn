@@ -1,0 +1,26 @@
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p,r = normalize(vec3(I+I,0) - iResolution.xyy);
+    float i,j,t,v;
+    // Rotate camera
+    r.xy*=mat2(cos(iTime*.1+vec4(0,11,33,0)));
+    // Raymarching loop
+    for (O*=i; i++<50.;t+=v){
+    p=t*r;
+    // Rotate xz plane based on distance travelled
+    p.xz*=mat2(cos(t*.5+vec4(0,11,33,0)));
+    // Move forward
+    p.z-=iTime*.2;
+    // Density inspired by some fractals by yonatan found on https://jbaker.graphics/writings/DEC.html
+    p=fract(p.zyx-.5)-.5;
+    for(j=0.;j++<7.;){
+      p=abs(p);
+      p=(p.x<p.y?p.zxy:p.zyx);
+      p=p*1.5;
+      p.x--;
+    }
+    v=abs(min(length(p.yz+p.x),length(p.xy))+.005)/5e1;
+    // Color accumulation based on iteation count and density
+    O+=exp(sin(i*.1*vec4(1,2,3,1)))/v;
+    }
+    O = tanh(O/2e4);
+}

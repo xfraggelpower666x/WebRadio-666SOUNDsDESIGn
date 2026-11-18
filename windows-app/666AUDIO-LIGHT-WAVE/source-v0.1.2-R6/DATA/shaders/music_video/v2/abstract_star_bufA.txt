@@ -1,0 +1,31 @@
+void mainImage(out vec4 O, vec2 I){
+    vec3 p, // Ray position
+         r = normalize(vec3(I+I,0) - iResolution.xyy); // Ray direction
+    float i, // Iterator
+          t, // Distance
+          v, // Density
+          l, // Length^2
+          n; // Noise iterator
+    // Raymarching loop, correct for spherical inversion
+    for (O*=i; i++<60.;t+=v*.05*min(l,1.)){
+    // Zoom in with exp
+    p=t*normalize(vec3(r.xy,r.z*exp(t)));
+    // Move camera back
+    p.z+=1.;
+    // Mirror symmetry in xyz planes
+    p=abs(p);
+    // Store length^2
+    l = dot(p,p);
+    // Apply spherical inversion
+    p/=l;
+    // Turbulence, decrease intensity close to xyz planes
+    for (n=.3; n<7.; n+=.8, p+= (2.*smoothstep(vec3(-.4),vec3(.4),p)-1.)*
+                               6.*(abs(fract(p.zxy*n/6.+iTime*n/6.)-.5)-.25)/n);
+    // Density based on distance to sphere
+    v = abs(length(p)-5.)+.1;
+    // Color accumulation based on iteration and density
+    O+=vec4(5,2,1,0)*exp(sin(i*.2+vec4(0,2,4,0)))/v;
+    }
+    // Tone mapping
+    O = tanh(O/3e2);
+}

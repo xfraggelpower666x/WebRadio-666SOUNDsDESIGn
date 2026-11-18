@@ -1,0 +1,38 @@
+// was listening to Carbon Based Lifeforms
+// was cool to watch with it
+
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( 1e1+sin( .4*T*c*2. ) * 16.,        \
+                    sin( .5*T*c*4. ) * 16.,  \
+                    T*4.+Z+2e1+1e1*cos(T*.6) )  ) - c )
+void mainImage(out vec4 o, vec2 u) {
+
+    bool b;
+    float i, e, T = iTime,m,d,s;
+    vec3  c,r = iResolution;
+    
+    u = (u+u - r.xy) / r.y;
+
+    vec3  q,p = vec3(1e1,0,T*4.),
+          D = vec3(mat2(cos(cos(T*.3)*.3+vec4(0,33,11,0)))*u, 1);
+ 
+    for(;i++ < 1e2;
+        d += s = min(e,
+                  (b ? .03 : .0) + .6*max(abs(m), abs(.4+dot(sin(p/6.), cos(p.yzx/16.))))),
+        c += vec3(2,min(4e1/d,4.),3)/s + 2e1*vec3(0,1,3e1/d)/max(e, .1)
+    )
+        r = q = p += D * s,
+        e = max(    min( O( 1., .1),
+                    min( O( 2., .2),
+                    min( O( 3., .3),
+                    min( O( 4., .4),
+                         O( 5., .5) )))), .001),
+        q.y *= .6,
+        b = abs(q.y) > 1e1,
+        p = abs(fract(q) - .5),
+        m = sin(.6*T+r.z*.1) > .0 ? min(p.x, p.y) : max(p.x,p.y),
+        p = q = r;
+
+    o.rgb = tanh(c*c/1e7 + .15*dot(u,u));
+
+}

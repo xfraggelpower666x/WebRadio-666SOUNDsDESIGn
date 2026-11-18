@@ -1,0 +1,100 @@
+// iChanne1: rgba_noise_medium_256x256 try higher
+
+float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S3(p) p /= dot(p, p); p = fract(p) - 0.5;
+#define G(p, s) p = floor(p * s) / s;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+#define L(p, s) p = mod(p + s/2., s) - s/2.;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M4(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define T3(p) p *= r(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5);
+#define K(p) p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx;
+#define D(p) p.xy = vec2(log(length(p.xy)), atan(p.y, p.x));
+#define Q2(p) p = abs(p-1.)-abs(p+1.)+p;
+
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    Q(u);
+    
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+float fbm(vec2 p) {
+    float value = 0.0;
+    float amplitude = 0.5;
+    float frequency = 1.0;
+    
+    for (int i = 0; i < 25; i++) {
+        value += amplitude * noise(p * frequency);
+        frequency *= 5.50;
+        amplitude *= 0.50;
+    }
+    return value;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 R = iResolution.xy;
+    vec2 u = (fragCoord - 0.5 * R) / R.y;
+       
+    float t = iTime * 1.4;
+
+    float rawAudio = texture(iChannel1, vec2(0.02, 0.25)).r;
+    float bass = pow(rawAudio, 1.8); 
+
+    vec3 finalColor = vec3(0.0);
+    vec2 pos = u; 
+
+    float noiseLine = fbm(vec2(u.y * 20.0, t)) * 2.0 - 1.0;
+
+    for (float i = 0.0; i < 10.0; i += 1.5) {
+        float distortion = noiseLine * (0.35 + bass * 0.4);
+        float d = abs(u.y + u.x + distortion);
+
+        float glow = 0.0035 / (d + 0.004);
+        glow *= (0.9 + bass * 1.2);
+
+        vec3 palette = mix(vec3(0.2, 0.4, 1.0), vec3(0.6, 0.0, 1.0), cos(i * 0.15 + t * 0.1 + length(u)) * 0.5 + 0.5);
+
+        float core = smoothstep(0.1, 0.0, d);
+        float intensidadNaranja = clamp(core * bass * 1.5, 0.0, 1.0);
+        palette = mix(palette, vec3(1.0, 0.3, 0.0), intensidadNaranja);
+
+        finalColor += glow * palette * exp(-length(u) * 2.5);
+    }
+
+    float dust = 0.0;
+    for(float j = 1.0; j <= 13.0; j++) {
+        vec2 p = fract(pos * (2.0 + j * 2.0) + vec2(sin(t * 0.05), -t * (0.05 + j * 0.02))) - 0.5;
+        M4(p);
+        
+        float dustNoise = fbm(vec2(p.y, t * 5.2 + j));
+        p.y += sin(u.y * 22.5 + t * 0.2 + j) * 0.08;
+        p.x += (dustNoise - 0.5) * 0.15; 
+        Q(p);
+        
+        dust += 0.00001 / (dot(p, p) + 0.00009);
+    }
+    finalColor += vec3(1.0, 0.6, 0.2) * dust * (0.2 + bass * 3.0);
+
+    finalColor *= 2.0; 
+    
+    finalColor = clamp((finalColor * (2.51 * finalColor + 0.03)) / (finalColor * (2.43 * finalColor + 0.59) + 0.14), 0.0, 1.0);
+    finalColor = pow(finalColor, vec3(0.9)); 
+
+    fragColor = vec4(finalColor, 1.0);
+}

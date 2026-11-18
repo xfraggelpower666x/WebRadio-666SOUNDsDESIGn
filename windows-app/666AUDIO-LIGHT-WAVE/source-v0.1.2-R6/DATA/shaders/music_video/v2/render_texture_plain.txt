@@ -1,0 +1,104 @@
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Divide the screen coordinates by the TEXTURE'S resolution, 
+    // rather than the screen's resolution.
+    vec2 uv = fragCoord / iResolution.xy;
+
+    uv.y = 1.0 - uv.y;
+
+    // Sample the texture
+    vec4 texColor = texture(iChannel0, uv);
+
+
+    // 2. Create a "stepped" timer. 
+    // floor() rounds the time down to a whole number so the color holds 
+    // still until the next step, rather than flickering every single frame.
+    float timer = floor(iTime * 2.0); // Changes 2 times per second
+
+    // 3. Generate 3 random numbers for Red, Green, and Blue
+    vec3 flashColor = vec3(
+        rand(timer),           // Random Red
+        rand(timer + 10.0),    // Random Green (different seed)
+        rand(timer + 20.0)     // Random Blue (different seed)
+    );
+
+    // 4. Add the flash to the screen
+    vec3 finalColor = texColor.rgb + (flashColor * iMusicSync);
+
+    
+
+
+
+
+
+
+    //vec3 flashColor = vec3(0.0, 0.5, 0.8);
+
+
+    // iTime goes up every second. The vec3(0.0, 2.0, 4.0) creates offsets 
+    // for Red, Green, and Blue so they peak at different times.
+    //vec3 flashColor = 0.5 + 0.5 * cos(iTime * 2.0 + vec3(0.0, 2.0, 4.0));
+    // Then apply it to your flash just like before:
+    //vec3 finalColor = texColor.rgb + (flashColor * iMusicSync);
+
+
+    /*vec3 flashColor;
+
+    // iTime * 2.0 means it changes twice a second. 
+    // mod(..., 3.0) forces it to loop between 0, 1, and 2.
+    int colorIndex = int(mod(iTime * 2.0, 3.0));
+
+    if (colorIndex == 0) {
+        flashColor = vec3(1.0, 0.0, 0.5); // Neon Pink
+    } else if (colorIndex == 1) {
+        flashColor = vec3(0.0, 1.0, 1.0); // Cyan
+    } else {
+        flashColor = vec3(1.0, 1.0, 0.0); // Yellow
+    }
+
+    vec3 finalColor = texColor.rgb + (flashColor * iMusicSync);*/
+
+
+
+
+    // ==========================================
+    // CHOOSE ONE OF THE EFFECTS BELOW:
+    // ==========================================
+
+    // OPTION 1: Additive Flash (Highly Recommended for music!)
+    // This ADDS the light to your image. Dark areas get tinted, and bright 
+    // areas get brilliantly bright. It creates a "glowing beat" effect.
+    //vec3 finalColor = texColor.rgb + (flashColor * iMusicSync);
+
+    
+    // OPTION 2: Mix/Washout Overlay
+    // This BLENDS between the image and the solid color. When iMusicSync is 1.0, 
+    // the screen will be completely blue (hiding the image). When it's 0.0, it's normal.
+    //vec3 finalColor = mix(texColor.rgb, flashColor, iMusicSync);   
+    
+    // OPTION 3: Multiplicative Tint (Darker, moody pulse)
+    // This multiplies the colors. White parts of the image will turn cyan, 
+    // but black parts will stay pitch black.
+    //vec3 tintedTexture = texColor.rgb * flashColor * 2.0; // * 2.0 keeps it bright
+    //vec3 finalColor = mix(texColor.rgb, tintedTexture, iMusicSync);
+    
+
+    // Output the final mixed color, keeping the texture's original transparency (alpha)
+    fragColor = vec4(finalColor, texColor.a);
+
+
+    // Optional: Make the area outside the texture black so it doesn't wrap/repeat
+    //if(uv.x > 1.0 || uv.y > 1.0) {
+    //    texColor = vec4(0.0, 0.0, 0.0, 1.0);
+    //}
+
+    // Output
+    // fragColor = texColor;
+}

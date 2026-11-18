@@ -1,0 +1,2134 @@
+{
+  "timeline": [
+    {
+      "name": "intro_gateway",
+      "shader_effect_file": "DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/intro_gateway_with_lensflare_rainbow_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 0.0,
+      "effect_duration": 8.0
+    },
+    {
+      "name": "intro_light_sprites",
+      "shader_effect_file": "DATA/shaders/music_video/v2/intro_light_sprites.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 8.0,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "star_lens_flare",
+      "shader_effect_file": "DATA/shaders/music_video/v2/star_lens_flare.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/v2_anuttara_1440p.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 11.0,
+      "effect_duration": 7.0
+    },
+    {
+      "name": "alien_orb",
+      "shader_effect_file": "DATA/shaders/music_video/v2/alien_orb.txt",
+      "material_1": "DATA/shaders/music_video/v2/alien_orb_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 18.0,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "bioscanner",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bioscanner.txt",
+      "material_1": "DATA/shaders/music_video/v2/bioscanner_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 22.0,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "dof_dna",
+      "shader_effect_file": "DATA/shaders/music_video/v2/dof_dna_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/dof_dna_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 25.0,
+      "effect_duration": 1.5
+    },
+    {
+      "name": "bioscanner_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bioscanner_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 26.5,
+      "effect_duration": 1.5
+    },
+    {
+      "name": "bioscanner",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bioscanner.txt",
+      "material_1": "DATA/shaders/music_video/v2/bioscanner_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 28.0,
+      "effect_duration": 1.5
+    },
+    {
+      "name": "3d_grid_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/3d_grid_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/3d_grid_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 29.5,
+      "effect_duration": 1.5
+    },
+    {
+      "name": "3d_grid",
+      "shader_effect_file": "DATA/shaders/music_video/v2/3d_grid.txt",
+      "material_1": "DATA/shaders/music_video/v2/3d_grid_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 31.0,
+      "effect_duration": 1.5
+    },
+    {
+      "name": "specular_bands",
+      "shader_effect_file": "DATA/shaders/music_video/v2/specular_bands.txt",
+      "material_1": "DATA/shaders/music_video/v2/specular_bands_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 32.5,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "kaleidoscope_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/kaleidoscope_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 34.5,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "hyperjump",
+      "shader_effect_file": "DATA/shaders/music_video/v2/__hyperjump.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 38.5,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 39.8,
+      "effect_duration": 6.5
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 46.3,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 49.3,
+      "effect_duration": 6.5
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 55.8,
+      "effect_duration": 6.5
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 62.3,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 65.3,
+      "effect_duration": 11.5
+    },
+    {
+      "name": "video_glitch_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 76.8,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/some_zooming_plasmaa.txt",
+      "material_1": "DATA/shaders/music_video/v2/some_zooming_plasmaa_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 77.8,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 82.8,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "video_glitch_ripple",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 83.8,
+      "effect_duration": 7.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 90.8,
+      "effect_duration": 7.5
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 98.3,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 100.3,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 101.1,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/into_the_ether.txt",
+      "material_1": "DATA/shaders/music_video/v2/into_the_ether_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 102.39999999999999,
+      "effect_duration": 5.1
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 107.49999999999999,
+      "effect_duration": 0.7
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 108.19999999999999,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 109.49999999999999,
+      "effect_duration": 6.5
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 115.99999999999999,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 118.99999999999999,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 120.99999999999999,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 126.99999999999999,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 131.0,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 135.0,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 137.0,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 139.0,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 139.8,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "video_pixelated_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 141.10000000000002,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/normalize_glitchy_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/normalize_glitchy_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 143.10000000000002,
+      "effect_duration": 4.7
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 147.8,
+      "effect_duration": 0.7
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 148.5,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 149.8,
+      "effect_duration": 6.5
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 156.3,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 158.3,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 159.10000000000002,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/stars_travel.txt",
+      "material_1": "DATA/shaders/music_video/v2/stars_travel_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 160.40000000000003,
+      "effect_duration": 5.2
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 165.60000000000002,
+      "effect_duration": 0.7
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 166.3,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 167.60000000000002,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_glitch_ripple_box_rot",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 172.60000000000002,
+      "effect_duration": 7.0
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 179.60000000000002,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 181.60000000000002,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 182.40000000000003,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "video_pixelated_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 183.70000000000005,
+      "effect_duration": 1.2
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/inversion_expulsion.txt",
+      "material_1": "DATA/shaders/music_video/v2/inversion_expulsion_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 184.90000000000003,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/nucleus.txt",
+      "material_1": "DATA/shaders/music_video/v2/nucleus_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 189.90000000000003,
+      "effect_duration": 4.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 194.70000000000005,
+      "effect_duration": 0.7
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 195.40000000000003,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 196.70000000000005,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 201.70000000000005,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 206.70000000000005,
+      "effect_duration": 3.5
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 210.20000000000005,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 213.20000000000005,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 216.20000000000005,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "video_ascii_art_bioscanner_magenta",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_ascii_art_bioscanner_magenta.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/font1_1024x1024.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 217.20000000000005,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "bioscanner",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bioscanner.txt",
+      "material_1": "DATA/shaders/music_video/v2/bioscanner_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 222.20000000000005,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_flownoise_half_horiz",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_horiz_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 226.20000000000005,
+      "effect_duration": 2.5
+    },
+    {
+      "name": "video_flownoise_half_vert",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_half_vert_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 228.70000000000005,
+      "effect_duration": 2.5
+    },
+    {
+      "name": "video_pixelated_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 231.20000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 233.20000000000005,
+      "effect_duration": 5.5
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 238.70000000000005,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 241.70000000000005,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 247.70000000000005,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 251.70000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 253.70000000000005,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "video_chromatic_barrel",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_chromatic_barrel.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 254.50000000000006,
+      "effect_duration": 1.2
+    },
+    {
+      "name": "video_pixelated_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 255.70000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "matrix_twirl_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/matrix_twirl_rainbow.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 257.70000000000005,
+      "effect_duration": 4.5
+    },
+    {
+      "name": "specular_bands",
+      "shader_effect_file": "DATA/shaders/music_video/v2/specular_bands.txt",
+      "material_1": "DATA/shaders/music_video/v2/specular_bands_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 262.20000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "bioscanner_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bioscanner_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/bioscanner_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 264.20000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_flownoise_bioscanner",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_flownoise_bioscanner_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 266.20000000000005,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_ephemeral_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/ephemeral_fx.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 270.20000000000005,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_pixelated_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 275.20000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "matrixy_greenish_vortex",
+      "shader_effect_file": "DATA/shaders/music_video/v2/matrixy_rainbow_vortex.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 277.20000000000005,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bouncing_vectors.txt",
+      "material_1": "DATA/shaders/music_video/v2/bouncing_vectors_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 279.20000000000005,
+      "effect_duration": 4.7
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/bubble_plasma.txt",
+      "material_1": "DATA/shaders/music_video/v2/bubble_plasma_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 283.90000000000003,
+      "effect_duration": 4.9
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/psy_crystal.txt",
+      "material_1": "DATA/shaders/music_video/v2/psy_crystal_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 288.8,
+      "effect_duration": 4.6
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 293.40000000000003,
+      "effect_duration": 0.7
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 294.1,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 295.40000000000003,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 297.40000000000003,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "video_glitch_matrix_half_horiz",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 298.40000000000003,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_matrix",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 300.40000000000003,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "video_glitch_matrix_half_vert",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_vert.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_half_horiz_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 301.40000000000003,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_matrix_layered",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 303.40000000000003,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 304.40000000000003,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 305.20000000000005,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/biocore_plasma.txt",
+      "material_1": "DATA/shaders/music_video/v2/biocore_plasma_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 306.50000000000006,
+      "effect_duration": 4.9
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/obsolete.txt",
+      "material_1": "DATA/shaders/music_video/v2/obsolete_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 311.40000000000003,
+      "effect_duration": 5.5
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 316.90000000000003,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 317.90000000000003,
+      "effect_duration": 6.5
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 324.40000000000003,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 326.40000000000003,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 327.20000000000005,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "video_pixelated_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_pixelated_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 328.50000000000006,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/cosmic_knot.txt",
+      "material_1": "DATA/shaders/music_video/v2/cosmic_knot_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 330.50000000000006,
+      "effect_duration": 5.4
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 335.90000000000003,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 336.90000000000003,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "cubic_lens_dist",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/cubic_lens_dist_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 342.90000000000003,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "rainbow_circle",
+      "shader_effect_file": "DATA/shaders/music_video/v2/rainbow_circle.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 344.90000000000003,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "kaleidoscope_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/kaleidoscope_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/kaleidoscope_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 347.90000000000003,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "kaleidoscope_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/kaleidoscope_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 351.90000000000003,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 355.90000000000003,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 358.90000000000003,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 363.90000000000003,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 366.90000000000003,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_chromatic_barrel",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_chromatic_barrel.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 371.90000000000003,
+      "effect_duration": 1.5
+    },
+    {
+      "name": "rainbow_circle",
+      "shader_effect_file": "DATA/shaders/music_video/v2/rainbow_circle.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 373.40000000000003,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/gyroid_and_turbulence_cruise.txt",
+      "material_1": "DATA/shaders/music_video/v2/gyroid_and_turbulence_cruise_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 376.40000000000003,
+      "effect_duration": 4.7
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 381.1,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 382.1,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 387.1,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 391.1,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_ripple",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 393.1,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 399.1,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 399.90000000000003,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/modulation.txt",
+      "material_1": "DATA/shaders/music_video/v2/modulation_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 401.20000000000005,
+      "effect_duration": 5.4
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 406.6,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 407.6,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 413.6,
+      "effect_duration": 5.5
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 419.1,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 420.1,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 420.90000000000003,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/mindless_drifting.txt",
+      "material_1": "DATA/shaders/music_video/v2/mindless_drifting_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 422.20000000000005,
+      "effect_duration": 5.1
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 427.30000000000007,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 428.30000000000007,
+      "effect_duration": 8.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 436.30000000000007,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 440.30000000000007,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 442.30000000000007,
+      "effect_duration": 5.5
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 447.80000000000007,
+      "effect_duration": 3.5
+    },
+    {
+      "name": "video_ascii_art_bioscanner_magenta",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_ascii_art_bioscanner_magenta.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/font1_1024x1024.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 451.30000000000007,
+      "effect_duration": 3.5
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 454.80000000000007,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 459.80000000000007,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 462.80000000000007,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 465.80000000000007,
+      "effect_duration": 9.0
+    },
+    {
+      "name": "video_glitch_ripple_box_rot",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 474.80000000000007,
+      "effect_duration": 10.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 484.80000000000007,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 485.6000000000001,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/checkerboard_flight.txt",
+      "material_1": "DATA/shaders/music_video/v2/checkerboard_flight_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 486.9000000000001,
+      "effect_duration": 4.9
+    },
+    {
+      "name": "kaleidoscope_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/kaleidoscope_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 491.80000000000007,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 497.80000000000007,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 498.80000000000007,
+      "effect_duration": 10.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 508.80000000000007,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 512.8000000000001,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 515.8000000000001,
+      "effect_duration": 9.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 524.8000000000001,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2_rainbow",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_rainbow_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 525.6,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/neat_plasma_blast.txt",
+      "material_1": "DATA/shaders/music_video/v2/neat_plasma_blast_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 526.9,
+      "effect_duration": 5.1
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 532.0,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 533.0,
+      "effect_duration": 7.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 540.0,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 542.0,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 546.0,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "singular_effect_ease_in_out_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_1_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 547.0,
+      "effect_duration": 0.8
+    },
+    {
+      "name": "singular_effect_ease_in_out_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/singular_effect_ease_in_out_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 547.8,
+      "effect_duration": 1.3
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/galactic_rift.txt",
+      "material_1": "DATA/shaders/music_video/v2/galactic_rift_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 549.0999999999999,
+      "effect_duration": 5.3
+    },
+    {
+      "name": "kaleidoscope_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/kaleidoscope_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/kaleidoscope_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 554.3999999999999,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 558.3999999999999,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 559.3999999999999,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_play_normal",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_play_normal.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 564.3999999999999,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 568.3999999999999,
+      "effect_duration": 6.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 574.3999999999999,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 578.3999999999999,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_matrix",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 580.3999999999999,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_matrix_layered",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_layered_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 583.3999999999999,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 586.3999999999999,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 589.3999999999999,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 592.3999999999999,
+      "effect_duration": 7.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 599.3999999999999,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 601.3999999999999,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 604.3999999999999,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "RECONSTRUCTED_EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/rainbow_bitstream.txt",
+      "material_1": "DATA/shaders/music_video/v2/rainbow_bitstream_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 605.3999999999999,
+      "effect_duration": 4.8
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 610.1999999999998,
+      "effect_duration": 1.0
+    },
+    {
+      "name": "render_texture_plain_circuitry",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 611.1999999999998,
+      "effect_duration": 8.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 619.1999999999998,
+      "effect_duration": 9.0
+    },
+    {
+      "name": "video_glitch_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 628.1999999999998,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_ripple",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 630.1999999999998,
+      "effect_duration": 10.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 640.1999999999998,
+      "effect_duration": 10.0
+    },
+    {
+      "name": "alien_orb",
+      "shader_effect_file": "DATA/shaders/music_video/v2/alien_orb.txt",
+      "material_1": "DATA/shaders/music_video/v2/alien_orb_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 650.1999999999998,
+      "effect_duration": 7.0
+    },
+    {
+      "name": "render_texture_plain_circuitry FOO << ADD HERE SOME EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash_circuitry.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 657.1999999999998,
+      "effect_duration": 22.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 679.1999999999998,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 683.1999999999998,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 686.1999999999998,
+      "effect_duration": 13.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 699.1999999999998,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 703.1999999999998,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 706.1999999999998,
+      "effect_duration": 12.0
+    },
+    {
+      "name": "video_glitch_ripple_box_rot",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_ripple_box_rot_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 718.1999999999998,
+      "effect_duration": 8.0
+    },
+    {
+      "name": "render_texture_plain FOO << ADD HERE SOME EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 726.1999999999998,
+      "effect_duration": 23.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 749.1999999999998,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 753.1999999999998,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 756.1999999999998,
+      "effect_duration": 22.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 778.1999999999998,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 780.1999999999998,
+      "effect_duration": 4.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 784.1999999999998,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "render_texture_plain FOO << ADD HERE SOME EFFECT",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 786.1999999999998,
+      "effect_duration": 32.0
+    },
+    {
+      "name": "video_dither",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_dither.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/bayer_8x8.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 818.1999999999998,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_matrix",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_matrix_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 820.1999999999998,
+      "effect_duration": 5.0
+    },
+    {
+      "name": "video_glitch_rgb_shift_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_rgb_shift_2_bufA.txt",
+      "material_2": "RGBAnoise_extra_large_1024x1024.png",
+      "material_3": "RGBAnoise_large_512x512.png",
+      "material_4": null,
+      "effect_start_time": 825.1999999999998,
+      "effect_duration": 2.0
+    },
+    {
+      "name": "video_glitch_1",
+      "shader_effect_file": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1.txt",
+      "material_1": "DATA/shaders/music_video/v2/main_seq_video_glitch_shaders/video_glitch_1_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 827.1999999999998,
+      "effect_duration": 3.0
+    },
+    {
+      "name": "render_texture_plain",
+      "shader_effect_file": "DATA/shaders/music_video/v2/render_texture_plain_zoom_rotate_flash.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 830.1999999999998,
+      "effect_duration": 45.0
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec3 r = iResolution;
+    float t = iTime;
+    vec4 o = vec4(0.0);
+    vec3 FC = vec3(fragCoord, 1.0);
+    
+    float z = 2.0;
+    float d = 0.0;
+    float i = 0.0;
+    float fade_dist = 0.0;  // Adjust this to control fade distance (higher = longer fade)
+    
+    t = t * 0.35;
+    t += 2266.0;  // Phase shift (pi radians) for non-zero start
+
+    for(; z + i < 50.0; i += 1.0) {
+        vec3 p = abs(z * normalize(FC.rgb * 2.0 - r.xyy));
+        p.z += t * 4.0;
+
+        vec3 sine_perturb = abs(sin(p + p)) + 0.5 * cos(p * 0.1 + t * 0.3);
+        p += sine_perturb * 1.3; 
+        
+
+        for (int i = 2; i < 9; ++i) {
+            vec3 a = p * 0.71;
+            vec3 b = p.yzx * 0.64;
+
+            p += 0.05 * cos(a + t * 0.15)
+               + 0.53 * sin(b + t * 0.25);
+
+            // depends on updated p; recompute a/b
+            a = p * 2.71;
+            b = p.yzx * -1.36;
+
+            p += 0.05 * sin(a + t * 3.15)
+               + 0.53 * cos(b + t * 1.10);
+
+            p /= 1.01;
+        }
+        
+        d = 0.086 * sqrt(length(p.xxy * p.xyx));
+        
+        // Compute fade factor: 0 at z=0, approaches 1 as z increases
+        float fade = z / (z + fade_dist);
+        
+        z += d;
+        o += vec4(z*1.9, 9.0, 31.0, 1.0) / d * fade;
+    }
+    
+    o = tanh(o / 7000.0);
+    fragColor = o;
+}

@@ -1,0 +1,103 @@
+R1: Windows-Start, Preflight und reparierte Cache-Pfade siehe START_REPAIR.md.
+Die folgende Dokumentation beschreibt den Originalstand.
+
+As described in the /LICENSE.txt, this codebase is referred as a piece of art, and thus 
+we don't even label or call it software, or at least not a "out of the box" ready.
+The functional python code is not industry standard or strictly pythonic by any measure
+as the author has liberated software engineering from its utilitarian constraints 
+to create a piece of experiential art, which reflects their demoscene background
+and programming languages they are most familiar with (c/c++, php, javascript).
+
+[ HOW TO GET STARTED ]:
+
+∎ 1.) ANACONDA/PYTHON:
+
+conda create -n light_wave_tech python=3.10
+conda activate light_wave_tech
+
+pip install pygame-ce
+pip install opencv-python
+pip install pandas
+pip install scipy
+pip install mutagen
+pip install moderngl
+pip install pillow
+pip install pyloudnorm
+pip install sounddevice
+pip install soundfile
+
+- THESE ARE NEEDED FOR STEREOWIDENER:
+pip install matplotlib
+pip install loguru
+pip install sympy
+pip install pyfar
+
+- THESE ARE NEEDED FOR Qiskit:
+pip install qiskit qiskit-aer
+
+- MIGHT BE OTHERS BUT YOU SEE IT WHEN CREATING 
+THE ENV AND RUNNING FURTHER STEPS
+
+>>> >> USE IT LIKE THIS: 
+conda activate light_wave_tech
+
+∎ 2.1.) DATA ASSET STEPS:
+The system assumes .mp4 files to be present of some set resolutions; the system uses and code 
+assumes upscaled and frame interpolated specs that are derived from Grok Imagine SD format 
+> upscaled 2x the resolution and frame count via ComfyUI Custom Node; assumed framerate 
+24 fps which the system plays approximately 2xSPEED (with some random variation). See all 
+the resolutions used in the main file (32-bit_STEREO_EQ__light_wave_tech_v1.1.10.py 
+or whatever the revision might be)
+
+ComfyUI template will be made available when the author finds it somewhere... 
+interconnected and needed subsystems can already be found at 
+TOOLS/ComfyUI-Folder-Iterator
+TOOLS/ComfyUI-IMGFolder-Iterator
+
+∎ 2.2.) NOTE ON DATA/SIGNAL
+
+The system's core function is entirely dependent upon the quality and the nature of the data; 
+to the uninitiated this whole codebase in its entirety appears just "nonsense glitch art" or 
+real-time visualizer but to the initiated it is a treasure to behold; in other words, the output 
+of the system correlate with the input, that is, the SIGNAL, which means that the SIGNAL lives 
+in the DATA, and thus beauty is with the eye of the beholder; so too are the insights born out 
+of it — directly proportional to the AWARENESS of the user. In a nutshell, the more data you have, 
+the better the system is outputting emergent beauty, structure, and insights; the original data 
+is a total reflection of the creator of this codebase, so it's no wonder why aforementioned 
+are so meaningful and precise.
+
+∎ 3.) SETUP STEPS:
+
+Here are the steps you need to take to make it work if you have the data procured:
+
+1. For music sync you need to manually configure the code file for filepaths and run 
+/TOOLS/PfreqReact/USE_THIS__32-bit__instrumental_batch_extract_freq_all.py
+placing the resulting in files here DATA\audio_sync_data
+
+or additionally port the real-time version of fourier transforms from 
+/TOOLS/mini_audio_player/v3_32-bit_pygame_mini_audio_player.py into 
+the main file for the system to use it instead.
+
+2.) Edit CONFIG/filepaths.json to match your filestructure.
+
+3.) For config steps you need to run /CONFIG/config_preload_path_names.py 
+which is used to generate precalc version of the video filenames used
+by the system; this also precalc filenames from /DATA/neural_json_batches
+used to select the assets. 
+
+4.) If you don't have used /NeuralTrainer to train your own model, you need to
+modify the code from the main file (32-bit_STEREO_EQ__light_wave_tech_v1.1.10.py or 
+whatever the revision might be) to use random.shuffle instead, matching the amount 
+of videos you have in your dataset.
+
+Neural network (ai model) used by the system are custom/bespoke and remains that way, 
+although the code, the process, the notes, and their insights are available 
+through this repo under /NeuralTrainer.
+
+5.) Edit audio_vars_playlist.py to match your audio files or hardcode them into the main file 
+(32-bit_STEREO_EQ__light_wave_tech_v1.1.10.py) or whatever the revision might be.
+
+AND THAT'S PRETTY MUCH IT: WRITE python and the mainfile 
+    and you are SET!
+        "!!! LET THERE BE LIGHT !!!"
+            "!!! LET THE TRANSMISSION BEGIN !!!"

@@ -1,0 +1,96 @@
+# https://aistudio.google.com/prompts/1O0ukt_mWS_JN5HWJh__ZXRasOzK5ca5m
+
+import colorsys
+import cv2
+from PIL import Image
+
+class FastVideoClip:
+    """
+    A drop-in replacement for MoviePy's VideoFileClip using OpenCV.
+    Completely eliminates FFMPEG subprocess pipe overhead and GIL locks.
+    """
+    def __init__(self, filename):
+        self.cap = cv2.VideoCapture(filename)
+        
+        self.fps = self.cap.get(cv2.CAP_PROP_FPS)
+        if self.fps <= 0:
+            self.fps = 24.0 # Fallback
+            
+        self.frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.duration = self.frame_count / self.fps if self.fps > 0 else 0
+        
+        w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.size = (w, h)
+        
+        self.current_frame_idx = -1
+        self.last_rgb_frame = None
+
+    def get_frame(self, t):
+        # Calculate which frame index we need for this specific timestamp
+        target_idx = int(round(t * self.fps))
+
+        if target_idx >= self.frame_count:
+            target_idx = max(0, self.frame_count - 1)
+
+        # OPTIMIZATION: If the main loop runs faster than the video FPS, 
+        # we might query the same frame twice. Just return the cached frame instantly!
+        if target_idx == self.current_frame_idx and self.last_rgb_frame is not None:
+            return self.last_rgb_frame
+
+        # If the timeline jumps backwards (e.g. video loops or changes), reset pointer
+        if target_idx < self.current_frame_idx:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, target_idx)
+            self.current_frame_idx = target_idx - 1
+        
+        # Fast-forward without decoding (skips IPC/decoding overhead)
+        while self.current_frame_idx < target_idx:
+            success = self.cap.grab()
+            if not success:
+                break
+            self.current_frame_idx += 1
+            
+        # Retrieve and decode ONLY the frame we actually need
+        success, frame = self.cap.retrieve()
+        if success:
+            self.last_rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        elif self.last_rgb_frame is None:
+            self.last_rgb_frame = np.zeros((self.size[1], self.size[0], 3), dtype=np.uint8)
+            
+        return self.last_rgb_frame
+
+    def close(self):
+        if self.cap.isOpened():
+            self.cap.release()
+
+def get_video_hue_fingerprint(video_filepath, n=15):
+    """
+    Extracts the n-th frame of a video and returns its dominant Hue, 
+    entirely in memory without writing to disk.
+    """
+    clip = FastVideoClip(video_filepath)
+
+    #nth frame
+    #t = n / clip.fps if clip.fps > 0 else 0
+
+    # Grab the exact middle frame of the video
+    n = clip.frame_count // 2 
+    t = n / clip.fps if clip.fps > 0 else 0
+
+    frame_rgb = clip.get_frame(t)
+    clip.close()
+    
+    if frame_rgb is None:
+        return None
+        
+    # Convert the numpy array directly to a PIL Image in memory
+    img = Image.fromarray(frame_rgb)
+    
+    # Shrink to 1x1 to get average color (your idea!)
+    img_small = img.resize((1, 1), resample=Image.Resampling.LANCZOS)
+    r, g, b = img_small.getpixel((0, 0))
+    
+    # Convert to Hue
+    h, s, v = colorsys.rgb_to_hsv(r/255.0, g/255.0, b/255.0)
+    
+    return h  # Returns a float between 0.0 and 1.0

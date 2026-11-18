@@ -1,0 +1,45 @@
+// -5 thanks to ukeshet 🀄 
+ 
+void mainImage( out vec4 o, vec2 u )
+{
+    o.xyz = iResolution;
+    u = (u + u - o.xy) / o.y;
+    o = vec4(0.0); // Safely zero out the vector
+    
+    for (int a = 0; a < 3; a++)
+    for (float i = 0.0; i++ < 7.0; u /= .998)             
+        o[a] += .7 / i / length(exp(-9.0 * cos(i / (.3 + u * u) + iTime)) 
+                          + tan(o[a] * 5.0 - iTime / i)              
+                          + tan(u / i) * i / 2.0);
+}
+
+// No chromatic aberration [183 Chars]
+/*
+void mainImage( out vec4 o, vec2 u )
+{
+    o.xyz = iResolution;
+    u = (u+u-o.xy)/o.y;
+    o -= o;  
+    for (float i; i++ < 7.; u /= .998)             
+        o += .7/i/length(exp(-9.*cos(i/(.3+u*u) + iTime)) 
+                          + tan(o.x*5.-iTime/i)              
+                          + tan(u/i)*i/2.);
+} 
+//*/
+
+
+// Original [210 Chars]
+/*
+#define F(a) for (float i; i++ < 7.; u /= .998)             \
+        o.a += .7/i/length(exp(-9.*cos(i/(.3+u*u) + iTime)) \
+                         + tan(o.a*5.-iTime/i)              \
+                         + tan(u/i)*i/2.);                    
+                     
+void mainImage( out vec4 o, vec2 u )
+{
+    o.xyz = iResolution;
+    u = (u+u-o.xy)/o.y;
+    o -= o;
+    F(x) F(y) F(z) 
+}
+//*/

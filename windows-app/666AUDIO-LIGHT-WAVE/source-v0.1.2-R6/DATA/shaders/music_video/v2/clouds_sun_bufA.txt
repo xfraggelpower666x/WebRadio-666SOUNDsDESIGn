@@ -1,0 +1,45 @@
+/*
+    See nimitz' Cyclic noise 2D for cyclic2D source:
+        https://www.shadertoy.com/view/fcjXzh
+*/
+
+#define T iTime
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+float cyclic2D(vec2 p)
+{
+    mat2 m2 = mat2(0.97367, 0.22798, -0.22798, 0.97367)*1.5;
+    //mat2 m2 = mat2(0.88233, 0.47063, -0.47063, 0.88233)*1.5;
+    float result = 0.;
+    float z = .95;
+    float distort = 2.1;
+    float dstAmount = 0.09;
+    for(int i = 0; i < 9; i++)
+    {
+		p += sin(p.yx*distort + iTime*0.27*pow(distort,1.27))*dstAmount;
+        result += abs(dot(cos(p), sin(p))*z);
+        z *= 0.65;
+        distort *= 1.4;
+        p = p*m2;
+    }
+    return result;
+}
+void mainImage(out vec4 o, vec2 u) {
+    float a,i,s,d;
+    vec3  p = iResolution;    
+    
+    vec3 D = N(vec3(u = (u+u-p.xy)/p.y, 1));
+    for(o*=i; i++<1e2;
+        d += s = .1+.4*abs(s),
+        o += 6.*(1.+cos(T/2.+.1*i+vec4(5,4,3,0)))/s
+          +  .5*vec4(1,2,4,0)/abs(1.01+u.y-cos(u.x/3.3))
+          +  4.*vec4(6,2,1,0)/length(u*2.)
+    )
+        p = D*d,
+        s = 4.-abs(p.y),
+        s -= cyclic2D(p.xz/4.);
+
+
+    o = tanh(o/5e3*exp(1e2*vec4(5,2,1,0)/d/d));
+}

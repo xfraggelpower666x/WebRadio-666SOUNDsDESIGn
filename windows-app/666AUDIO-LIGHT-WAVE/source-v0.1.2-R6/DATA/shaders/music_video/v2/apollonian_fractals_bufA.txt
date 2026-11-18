@@ -1,0 +1,92 @@
+const bool alternateColor = true;//you can try disabling this but it doesnt work for a lot of people
+const int max_iterations = 50;//lower this to ~7 for alternateColor = false
+const bool colorShifting = false;
+const bool rotate = false;
+const float pi = 3.14159265;
+const vec2 c1 = vec2(0, .2);
+const vec2 c2 = vec2(.8, .8);
+const vec2 c3 = vec2(-.8, .8);
+const float r1 = .2;
+const float r2 = .8;
+const float r3 = .8;
+const vec2 tan12 = vec2(.2, .266667);
+const vec2 tan13 = vec2(-.2, .266667);
+
+vec2 cMult(vec2 a, vec2 b){return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);}
+
+vec2 cInv(vec2 z){return vec2(z.x, -z.y) / dot(z, z);}
+
+vec2 diskMap(vec2 z, vec2 a){//will be a bijection of the unit disk if |a|<1
+    return cMult(z-a, cInv(cMult(vec2(a.x, -a.y), z) - vec2(1.0, 0.0)));
+}
+
+vec2 circleInverse(vec2 pos, vec2 circlePos, float circleR){
+    vec2 pc = pos - circlePos;
+	return pc * circleR * circleR/dot(pc, pc) + circlePos;
+}
+
+vec3 gasket(vec2 pos){
+    float iteration = 0.0;
+	for(int n = 0; n < max_iterations; n++){
+		if(distance(pos,c1) < r1){
+			pos = circleInverse(pos, c1, r1);
+            iteration++;
+		}
+        else if(distance(pos, c2) < r2){
+			pos = circleInverse(pos, c2, r2);
+            iteration++;
+		}
+        else if(distance(pos, c3) < r3){
+			pos = circleInverse(pos, c3, r3);
+            iteration++;
+		}
+        else if(pos.y < 0.){
+			pos = vec2(pos.x, -pos.y);
+            iteration++;
+		}
+		else return vec3(pos, iteration);
+    }
+    return vec3(pos, iteration);
+}
+
+vec4 getCol(vec3 n){
+    float s = 0.08 * (4.0-length(n.xy)) + n.z;
+    if (n.z==50.0)return vec4(0);
+    float arg = pi * s / 20. + .76;
+    if(colorShifting) arg -= iTime;
+    arg -= 4.5;
+    vec3 col = sin(vec3(arg - pi * 3.5, arg - pi, arg - 1.2 * pi * 3.)) * 0.4 + 0.5;
+    return vec4(col*col, 1.);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ){
+    vec2 z = 2. * fragCoord.xy / iResolution.y - vec2(iResolution.x / iResolution.y, 1.0);
+    vec2 uv = z;
+    
+    // REPLACED: iMouse logic is removed.
+    // ADDED: Using iTime to create an automated smooth panning movement (Lissajous curve).
+    vec2 m = vec2(sin(iTime * 0.3), cos(iTime * 0.4));
+    m *= 5.0;
+    
+    if(rotate) z = cMult(z, vec2(cos(iTime / 3.0), sin(iTime / 3.0)));
+    z = diskMap(z, m);
+    vec3 data = gasket(z);
+    
+    if(alternateColor){
+    	fragColor = getCol(data);
+    	fragColor.xyz = pow(fragColor.xyz, vec3(1.2));
+    }
+    else {
+        float onGasket;
+        if(data.z == float(max_iterations)) onGasket = 1.0;
+        else onGasket = 0.0;
+    	fragColor = vec4(onGasket);
+        if(colorShifting && fragColor != vec4(0.0)){
+    		fragColor.x *= .5 + .5 * sin(0.25*iTime + 3.0 * uv.y);
+    		fragColor.y *= .5 + .5 * cos(0.25*iTime + 3.0 * uv.x);
+    		fragColor.z *= .5 - .5 * sin(0.25*iTime + 3.0 * dot(uv, uv));
+    		fragColor.xyz = fragColor.xyz;
+    		fragColor.xyz = pow(fragColor.xyz, vec3(.4545));
+        }
+    }
+}

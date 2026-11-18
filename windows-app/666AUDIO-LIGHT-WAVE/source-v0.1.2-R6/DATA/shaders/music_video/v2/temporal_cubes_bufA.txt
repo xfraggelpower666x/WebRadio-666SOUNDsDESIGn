@@ -1,0 +1,166 @@
+// 3D Temporal Droste
+
+#define MAX_DEPTH 6              // Maximum recursive nesting layers
+#define CONTRACTION_SIGMA 0.68   // Geometric scale reduction per layer
+#define BASE_TAU0 0.28           // Base time constant (seconds)
+#define EXP_BETA 1.75            // Exponential delay growth factor (> 1.0)
+#define FACE_PHASE_DELTA 1.35    // Phase desynchronization offset between faces
+#define FRAME_INNER_APERTURE 0.76// Window aperture cutoff ratio (0.0 to 1.0)
+#define PI 3.14159265359
+
+vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d) {
+    return a + b * cos(6.28318 * (c * t + d));
+}
+vec3 getFaceDimensionColor(int faceId, int layer) {
+    float hue = float(faceId) / 6.0 + float(layer) * 0.09;
+    return palette(hue, vec3(0.5), vec3(0.5), vec3(1.0), vec3(0.0, 0.33, 0.67));
+}
+// Analytical Temporal State 
+mat3 getPose(float t, vec2 mouseOffset) {
+    float yaw   = t * 0.60 + sin(t * 0.75) * 0.40 + mouseOffset.x;
+    float pitch = t * 0.42 + cos(t * 0.55) * 0.35 + mouseOffset.y;
+    float roll  = sin(t * 0.48) * 0.45 + cos(t * 0.95) * 0.20;
+    float cy = cos(yaw),   sy = sin(yaw);
+    float cp = cos(pitch), sp = sin(pitch);
+    float cr = cos(roll),  sr = sin(roll);
+    mat3 Ry = mat3(cy, 0.0, sy,   0.0, 1.0, 0.0,  -sy, 0.0, cy);
+    mat3 Rx = mat3(1.0, 0.0, 0.0,  0.0, cp, -sp,   0.0, sp, cp);
+    mat3 Rz = mat3(cr, -sr, 0.0,  sr, cr, 0.0,    0.0, 0.0, 1.0);
+    return Ry * Rx * Rz;
+}
+// Cumulative Exponential Latency 
+float getCumulativeLatency(int n) {
+    if (n <= 0) return 0.0;
+    if (abs(EXP_BETA - 1.0) < 0.001) return float(n) * BASE_TAU0;
+    return BASE_TAU0 * (pow(EXP_BETA, float(n)) - 1.0) / (EXP_BETA - 1.0);
+}
+bool intersectBox(vec3 ro, vec3 rd, vec3 rad, out float tNear, out float tFar, out vec3 nNear) {
+    vec3 m = 1.0 / rd;
+    vec3 n = m * ro;
+    vec3 k = abs(m) * rad;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    tNear = max(max(t1.x, t1.y), t1.z);
+    tFar  = min(min(t2.x, t2.y), t2.z);
+    if (tNear > tFar || tFar < 0.0) return false;
+    vec3 hitPos = ro + rd * tNear;
+    vec3 d = abs(hitPos) - rad;
+    vec3 s = -sign(rd);
+    if (d.x > d.y && d.x > d.z) nNear = vec3(s.x, 0.0, 0.0);
+    else if (d.y > d.z)         nNear = vec3(0.0, s.y, 0.0);
+    else                        nNear = vec3(0.0, 0.0, s.z);
+    return true;
+}
+int getFaceIndex(vec3 n) {
+    if (n.x > 0.5) return 0; // +X
+    if (n.x < -0.5) return 1; // -X
+    if (n.y > 0.5) return 2; // +Y
+    if (n.y < -0.5) return 3; // -Y
+    if (n.z > 0.5) return 4; // +Z
+    return 5;                // -Z
+}
+vec2 getFaceUV(vec3 p, int f) {
+    if (f == 0 || f == 1) return p.yz;
+    if (f == 2 || f == 3) return p.xz;
+    return p.xy;
+}
+vec3 shadeSolidFrame(vec3 p, vec3 n, vec3 rd, int faceId, int layer, float t) {
+    vec3 lightDir = normalize(vec3(0.6, 0.8, 0.5));
+    vec3 dimColor = getFaceDimensionColor(faceId, layer);
+    float diff = max(dot(n, lightDir), 0.0);
+    vec3 h = normalize(lightDir - rd);
+    float spec = pow(max(dot(n, h), 0.0), 32.0);
+    float fresnel = pow(1.0 - max(dot(-rd, n), 0.0), 4.0);
+    vec3 baseColor = vec3(0.08, 0.09, 0.11);
+    vec2 uv = getFaceUV(p, faceId);
+    float borderDist = max(abs(uv.x), abs(uv.y));
+    float neonStrip = smoothstep(0.01, 0.0, abs(borderDist - FRAME_INNER_APERTURE));
+    vec3 col = baseColor * (0.15 + 0.85 * diff);
+    col += spec * vec3(0.9, 0.95, 1.0) * 0.8;
+    col += fresnel * dimColor * 0.6;
+    col += neonStrip * dimColor * 3.5;
+    return col;
+}
+vec3 renderCore(vec3 ro, vec3 rd, float t, int faceId) {
+    float pulse = sin(t * 4.0) * 0.5 + 0.5;
+    vec3 coreColor = getFaceDimensionColor(faceId, MAX_DEPTH);
+    float d = length(cross(ro, rd)) - (0.15 + 0.05 * pulse);
+    float glow = 0.02 / (abs(d) + 0.015);
+    return coreColor * glow * 2.5;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    vec2 mouse = vec2(0.0);
+    vec3 ro = vec3(0.0, 0.0, 3.8);
+    vec3 rd = normalize(vec3(uv, -1.8));
+    vec3 col = mix(vec3(0.02, 0.02, 0.04), vec3(0.005, 0.005, 0.01), length(uv));
+    float curTime = iTime;
+    mat3 R0 = getPose(curTime, mouse);
+    vec3 ro_loc = transpose(R0) * ro;
+    vec3 rd_loc = transpose(R0) * rd;
+    float tNear, tFar;
+    vec3 nNear;
+    if (intersectBox(ro_loc, rd_loc, vec3(1.0), tNear, tFar, nNear)) {
+        vec3 pHit0 = ro_loc + rd_loc * tNear;
+        int rootFace = getFaceIndex(nNear);
+        vec2 faceUV0 = getFaceUV(pHit0, rootFace);
+        float uvMax0 = max(abs(faceUV0.x), abs(faceUV0.y));
+        if (uvMax0 > FRAME_INNER_APERTURE) {
+            vec3 worldN = R0 * nNear;
+            col = shadeSolidFrame(pHit0, worldN, rd, rootFace, 0, curTime);
+        } else {
+            float facePhase = float(rootFace) * FACE_PHASE_DELTA;
+            vec3 transmittance = vec3(1.0);
+            vec3 accumColor = vec3(0.0);
+            vec3 worldRayOrigin = ro + rd * tNear;
+            vec3 worldRayDir = rd;
+            bool hitSolid = false;
+            for (int layer = 1; layer <= MAX_DEPTH; layer++) {
+                float layerTau = getCumulativeLatency(layer);
+                float evalTime = curTime - facePhase - layerTau;
+                mat3 R_layer = getPose(evalTime, mouse);
+                float layerScale = pow(CONTRACTION_SIGMA, float(layer));
+                vec3 ro_layer = transpose(R_layer) * worldRayOrigin;
+                vec3 rd_layer = transpose(R_layer) * worldRayDir;
+                float tNearL, tFarL;
+                vec3 nNearL;
+                if (intersectBox(ro_layer, rd_layer, vec3(layerScale), tNearL, tFarL, nNearL)) {
+                    vec3 pHitL = ro_layer + rd_layer * tNearL;
+                    vec3 normP = pHitL / layerScale;
+                    int hitFaceL = getFaceIndex(nNearL);
+                    vec2 faceUV_L = getFaceUV(normP, hitFaceL);
+                    float uvMaxL = max(abs(faceUV_L.x), abs(faceUV_L.y));
+                    vec3 dimTint = getFaceDimensionColor(rootFace, layer);
+                    transmittance *= mix(vec3(0.85, 0.90, 0.95), dimTint, 0.12);
+                    if (uvMaxL > FRAME_INNER_APERTURE) {
+                        vec3 worldNormL = R_layer * nNearL;
+                        vec3 frameCol = shadeSolidFrame(normP, worldNormL, worldRayDir, rootFace, layer, evalTime);
+                        accumColor += transmittance * frameCol;
+                        hitSolid = true;
+                        break;
+                    } else {
+                        float rim = smoothstep(0.02, 0.0, abs(uvMaxL - FRAME_INNER_APERTURE));
+                        accumColor += transmittance * dimTint * rim * 1.8;
+                        worldRayOrigin = worldRayOrigin + worldRayDir * tNearL;
+                    }
+                } else {
+                    accumColor += transmittance * getFaceDimensionColor(rootFace, layer) * 0.15;
+                    hitSolid = true;
+                    break;
+                }
+            }
+            if (!hitSolid) {
+                float deepTime = curTime - facePhase - getCumulativeLatency(MAX_DEPTH);
+                mat3 R_deep = getPose(deepTime, mouse);
+                vec3 ro_core = transpose(R_deep) * worldRayOrigin;
+                vec3 rd_core = transpose(R_deep) * worldRayDir;
+                accumColor += transmittance * renderCore(ro_core, rd_core, deepTime, rootFace);
+            }
+            col = accumColor;
+        }
+    }
+    col = (col * (2.51 * col + 0.03)) / (col * (2.43 * col + 0.59) + 0.14);
+    col = pow(clamp(col, 0.0, 1.0), vec3(1.0 / 2.2));
+    fragColor = vec4(col, 1.0);
+}

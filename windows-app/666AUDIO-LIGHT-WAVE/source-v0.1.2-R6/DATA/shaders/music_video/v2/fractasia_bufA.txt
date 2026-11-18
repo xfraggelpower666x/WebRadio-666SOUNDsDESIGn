@@ -1,0 +1,54 @@
+#define _res iResolution.xy
+#define _t iTime
+
+const float PI=3.14159265359;
+
+float sabs(float x, float c) {
+    return sqrt(x*x+c);
+}
+
+mat2 rot(float a) {
+    float s=sin(a),c=cos(a);
+    return mat2(c,s,-s,c);
+}
+
+void mainImage(out vec4 fragColor,in vec2 fragCoord){
+    vec2 uv=(fragCoord/_res-0.5)/vec2(_res.y/_res.x,1);  
+    uv+=asin(sin(_t*.2)*.9)*.3;
+    uv.x+=asin(cos(_t*.3)*.9)*.2;
+    uv*=1.5;
+    vec3 c=vec3(0.);
+    for (float y=-2.; y<3.; y++) {
+        for (float x=-2.; x<3.; x++) {
+            float m=100.;
+            float d=1.;
+            float it=0.;
+            vec2 p=uv+vec2(x,y)/_res;
+            vec2 id=floor(p*7.)*.2;
+            float t=_t*2.+id.x*.5-id.y;
+            p*=2.;
+            p*=rot(.5*PI*smoothstep(-.2,.2,sin(t*.3)));
+            for (float i=0.; i<5.; i++) {
+                p.x=abs(p.x);
+                p.y=abs(p.y);
+                float sc=1./clamp(sabs(p.y*p.x,.05), .2+smoothstep(-.5,.5,cos(t*.3))*.4, 3.);
+                p*=sc;
+                d*=sc;
+                p-=1.;
+                float l=abs(p.y)/d;
+                c+=smoothstep(.01*d,d*.001,l)/length(p);
+                m=min(m,l);
+                if (m==l) {
+                    it=i;
+                }
+            }
+            c.rb*=rot(it*.5+t*2.);
+            c.rg*=rot(it*.3+t);
+            c=abs(c);
+            c.g*=.6;
+            c=normalize(100.+c)*length(c);
+        }
+    }
+    c*=.004;
+    fragColor=vec4(c,1.);
+}

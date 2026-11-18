@@ -1,0 +1,9 @@
+    {
+      "name": "intro_gateway",
+      "shader_effect_file": "shaders/music_video/v2/intro_volumetric.txt",
+      "material_1": "shaders/music_video/v2/intro_volumetric_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "effect_start_time": 0.0,
+      "effect_duration": 700.5
+    }

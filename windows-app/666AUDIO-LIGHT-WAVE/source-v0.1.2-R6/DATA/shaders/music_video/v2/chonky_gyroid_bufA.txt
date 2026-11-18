@@ -1,0 +1,80 @@
+// define T how you like :)
+#define T iTime
+
+// given z, get the position on the path
+#define P(z) vec3(64. * cos( (z)*vec2(.023,.021) ) , z)
+
+// golfed 2d rotation matrix
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+
+// the light spheres, note z coord is offset from T
+#define O(zoffs,c) ( length(                 /* orb */   \
+          p - vec3( X.x+sin( T*c*16. ) * 3.,        \
+                    X.y+sin( T*c*14. ) * 3. ,  \
+                    3.+T*1e1+zoffs+1e1+1e1*cos(T*.6) )  ) - c )
+
+// Tunnel
+float tunnel(vec3 p) {
+    return 6. - length(p.xy);
+}
+
+// gyroid
+float gyroid(vec3 p) {
+    float s;
+    
+    p /= 1e1;
+    
+    // scaled squrared off gyroid
+    s = abs(dot(cos(ceil(p*1e1)/12.), sin(p/2e1)));
+
+    // scale
+    return s*1e1;
+}
+
+void mainImage(out vec4 o, vec2 u) {
+
+    float e,i,s;
+    vec3  r = iResolution;
+    
+    // scaled coords
+    u = (u + u - r.xy) / r.y;
+    
+    // cinema bars I saw in a @Shane shader
+    // love these :)
+    //if (abs(u.y) > .8) { o*= i; return;}
+    
+    // start p on path at T * 1e1
+    // apply look-at a few steps ahead,
+    // so we look where we are going
+    vec3  p = P(T*1e1),
+          Z = normalize( P(T*1e1+1e1) - p),
+          X = normalize(vec3(Z.z,0,-Z)),
+          // Z and X used for the look-at
+          D = vec3(R(cos(.3*T)*.5) * u, 1)
+                   * mat3(-X, cross(X, Z), Z);
+                   
+    // angled light to the left
+    vec2 v = (.6+.6*sin(T))+u + (u.yx*.8+.2-vec2(-1.,.1));
+    
+    for(o *= i; i++<128.;
+        // min(lights, max(tunnel, gyroid))
+        s = .05 + abs(min(e, .6*max(tunnel(p - X), gyroid(p)))),
+        
+        // o += 1./s + 1./e + 1./length(v)
+        o += 2.*(1.+cos(.15*i+vec4(2,1,0,0)))/s
+          +  3e1*vec4(3,1,3,0)/max(e, .01)
+          +  2.*vec4(1,2,4,0)/length(v)
+    )
+        // advance and position in p
+        p += D * s,
+        // store path position in X
+        X = P(p.z),
+        // O macro makes a sphere (zoffs = z coord offset, c = radius)
+        e = max( min( O( 1., .05),
+                 min( O( 2., .1),
+                      O( 4., .15) )), .005);
+    
+    // tanh tone map, o*o for saturation, divide brightness
+    o = tanh(o*o/4e6);
+
+}

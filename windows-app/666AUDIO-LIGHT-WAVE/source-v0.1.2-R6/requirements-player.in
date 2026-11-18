@@ -1,0 +1,15 @@
+numpy==2.3.5
+scipy==1.17.0
+pygame-ce==2.5.8
+moderngl==5.13.0
+opencv-python==5.1.0.95
+pandas==2.2.3
+pyloudnorm==0.2.0
+sounddevice==0.5.6
+soundfile==0.14.0
+mutagen==1.48.1
+pyfar==0.8.1
+loguru==0.8.0
+matplotlib==3.10.8
+sympy==1.14.0
+Pillow==13.0.0

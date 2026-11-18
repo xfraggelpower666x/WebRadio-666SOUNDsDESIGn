@@ -1,0 +1,44 @@
+const float PI = 3.141592654;
+
+vec4 radialLines(vec2 fragCoord, vec2 center, float density, vec3 baseColor)
+{
+    const float lineWidth = 0.20;
+    float spacing = 2.0 * PI / density;
+    
+    vec2 ray = fragCoord - center;
+    float angle = atan(ray.y, ray.x);
+    
+    float intensity = step(mod(angle, spacing), lineWidth / length(ray));
+    
+	return vec4(baseColor * intensity, 1.0);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{    
+    const float baseDensity = 900.0;
+    const float centerExtraDensity = 500.0;
+    
+    vec2 center = iResolution.xy * 0.5;
+    float radius = distance(vec2(0.0), center) * 0.15;
+    float angle = iTime;
+    vec2 offset = vec2(cos(angle), sin(angle)) * radius;
+        
+    fragColor = radialLines(fragCoord, 
+        	  	            center + offset, 
+    	                    baseDensity, 
+    	                    vec3(0.5 + 0.5 * sin(iTime), 
+                                 0.5, 
+                                 0.5))  
+              + radialLines(fragCoord, 
+                     	    center - offset, 
+                          	baseDensity,
+                   	        vec3(0.5,
+                                 0.5 + 0.5 * sin(iTime * 0.3 + PI * 0.5), 
+                                 0.5))
+              + radialLines(fragCoord, 
+                     	    center, 
+                          	baseDensity + centerExtraDensity * sin(iTime),
+                   	        vec3(0.5,
+                                 0.5, 
+                                 0.5 + 0.5 * sin(iTime * 0.9 + PI)));
+}

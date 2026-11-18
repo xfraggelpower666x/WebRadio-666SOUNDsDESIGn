@@ -1,0 +1,36 @@
+void mainImage( out vec4 O, vec2 I ){
+    vec3 P, p, r = normalize(vec3(I+I,0) - iResolution.xyy);
+    float i, j, t, v, m=1.4, s;
+    // Raymarching loop
+    for (O*=i; i++<40.;t+=v*.6){
+    p=t*normalize(vec3(r.xy,r.z/exp(t*.1)));
+    // Move camera back, reflect around changing axis
+    p.z+=5.;
+    p=reflect(-p,normalize(tan(iTime*.2+i*.002+vec3(2,1,0))))-vec3(1,2,0);
+    // Voxel effect with varying size
+    s=fract(dot(P=round(p*8.)/8.+1e2,sin(P.zxy)));
+    p=round(p*8./s/s)/8.*s*s;
+    // Fractal from repeated scaling, translations and 90 degree folds
+    s=1.;
+    p=(p.x<p.z?p.zyx:p);
+    for(j=0.;j++<8.;){
+        p*=m;
+        s*=m;
+        p.y+=4.;
+        p=(p.y>p.z?p.xzy:p);
+        p*=m;
+        s*=m;
+        p.y+=4.;
+        p=(p.x<p.y?p.yxz:p);
+    }
+    // Repetition in all directions
+    p=mod(p,600.)-300.;
+    // Density from straight line
+    v = length(p.xz)/s;
+    // Color accumulation based on density and position
+    O+=vec4(2,1,3,0)*exp(sin(iTime*9.+p.xyzz))/v;
+    }
+    // Tone mapping
+    O = tanh(O/2e3);
+}
+

@@ -1,0 +1,19 @@
+void mainImage(out vec4 o, vec2 u) {
+    float i, d, s;
+    vec3 p = iResolution,
+         a = cos(vec3(2,3,1)+iTime),
+         D = normalize(vec3(u=(u+u-p.xy)/p.y, 1));
+    for(o*=i; i++<128.;
+        o += (1.+cos(i*.4+vec4(2,1,0,0)))/s + vec4(4,2,4,0)*1e1
+    )
+        p = D * d, p.x -= tan(iTime/4.), p.z -= 128.,
+        p = abs(a*dot(a,p)-cross(a,p)),
+        s = max(p.x, p.y) - 1e1,
+        p = p*8e2/dot(p,p), // <-- transform
+        s /= 2.,
+        p = abs(fract(p/s)*s - s*.5),
+        s = min(max(p.x, p.y), min(max(p.x, p.z),max(p.y, p.z))) - s/12., 
+        s = .001+abs(s),
+        d += s;
+    o = tanh(o*o/3e8);
+}

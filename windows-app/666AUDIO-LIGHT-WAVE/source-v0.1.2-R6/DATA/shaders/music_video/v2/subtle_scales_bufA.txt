@@ -1,0 +1,58 @@
+// Author: sukupaperu
+// Title: subtle scales
+
+#define P 6.2831853071795
+
+float rand(in vec2 st){ return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.585); }
+vec3 SpectrumPoly(in float x) {
+    // https://www.shadertoy.com/view/wlSBzD
+    return (vec3( 1.220023e0,-1.933277e0, 1.623776e0)+(vec3(-2.965000e1, 6.806567e1,-3.606269e1)+(vec3( 5.451365e2,-7.921759e2, 6.966892e2)+(vec3(-4.121053e3, 4.432167e3,-4.463157e3)+(vec3( 1.501655e4,-1.264621e4, 1.375260e4)+(vec3(-2.904744e4, 1.969591e4,-2.330431e4)+(vec3( 3.068214e4,-1.698411e4, 2.229810e4)+(vec3(-1.675434e4, 7.594470e3,-1.131826e4)+ vec3( 3.707437e3,-1.366175e3, 2.372779e3)*x)*x)*x)*x)*x)*x)*x)*x)*x;
+}
+mat2 rot(in float a) { return mat2(cos(a),sin(a),-sin(a),cos(a)); }
+
+vec4 tri(in vec2 p) {
+    #define R .86602544038
+    vec2 r = vec2(R,1.);
+    vec2 pr = p*r;
+    vec3 floorPy = vec3(floor(p.y)*.5,floor(p.y)*.5 + .5,0.);
+    
+    vec3 pTm1 = (fract(pr.xxy + floorPy.xyz));
+    vec4 pTm2 = (pTm1.xzyz - vec3(.5,1./3.,2./3.).xyxz)/r.xyxy;
+    vec2 pT = fract(pr + vec2(p.y*.5,0.));
+    vec2 pId;
+    if(pT.y < pT.x) {
+        pId = floor(pr + floorPy.xz);
+        pT = pTm2.xy;
+    } else {
+        pId = 1. + floor(pr + floorPy.yz);
+        pT = pTm2.zw;
+    }
+    return vec4(pT,pId);
+}
+float cosa(in float x, in float y, in float w) { return cos((x/P)*y + w)*.5+.5; }
+float sq(in vec2 p, in float s, in float r) { return length(max(abs(p) - s,0.)) - r; }
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 st = (fragCoord - .5*iResolution.xy )/iResolution.x;
+    float aa = 1./iResolution.x;
+    
+    st -= st*length(st)*.5;
+    float sz = 8.;
+    float t = iTime - 17.;
+    
+    st *= rot(P*.125 + .1*t);
+    vec2 p = st + vec2(t*.1,0.);
+    vec4 pT = tri(p*sz);
+    sz *= 1. + floor(rand(vec2(pT.zw))*15.);
+    pT = tri(p*sz);
+    
+    float taille = cosa(t,12.,pT.w*.25);
+    float d = (length(pT.xy) - taille/3.)/sz;
+    d = max(d,-sq(pT.xy*rot(P/8. + t*2. + pT.w),.2125*taille,.02)/sz);
+    float dd = (.3 - d*2.);
+    d = smoothstep(-aa,aa,-d) + dd;
+    
+    vec3 color = SpectrumPoly(rand(vec2(pT.zw))*.1 + mix(.2,.625, smoothstep(.46,.52,cosa(t + pT.w*.25,1.,0.)) ))*(dd*8.)*d;
+    
+    fragColor = vec4(pow(color - length(st)*length(st)*1.69,vec3(1.2)),1.0);
+}

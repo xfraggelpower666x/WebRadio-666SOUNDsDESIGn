@@ -1,0 +1,198 @@
+vec3 glow = vec3(0);
+vec3 glowG = vec3(0);
+#define pmod(p, x) mod(p, x) - 0.5*x
+#define pi acos(-1.)
+#define tau (2.*pi)
+// iMouse dependency removed from here:
+#define mx (iTime*(0.8 )+ sin(iTime*2.)*0.4)
+
+vec3 getRd(vec3 ro, vec3 lookAt, vec2 uv){
+	vec3 dir = normalize(lookAt - ro);
+	vec3 right = normalize(cross(vec3(0,1,0), dir));
+	vec3 up = normalize(cross(dir, right));
+    return normalize(dir + right*uv.x + up*uv.y);
+}
+
+vec3 path(float z){
+    z*= 0.4;
+	return vec3(
+    	sin(z),
+        cos(z),
+        0.
+    )*1.;
+
+}
+
+float sdBox(vec3 p, vec3 s){
+	p = abs(p) - s;
+    return max(p.x, max(p.y, p.z));
+}
+#define tunnW 0.4
+#define md  vec2(1./10., 1.)
+#define pal(a,b,c,d,e) (a + b*sin(c*d + e))
+#define rot(x) mat2(cos(x),-sin(x),sin(x),cos(x))
+
+vec3 pid;
+float did;
+
+vec2 sdBoxy(vec3 p, vec3 pC){
+	vec2 d = vec2(10e5);
+    did = 1.;
+    float iters = 5.;
+    vec3 boxSz = vec3(md.x*0.46,0.1,1.4*md.y/10.);
+    
+    d.x = min(d.x, sdBox(pC,boxSz ));
+    pC.y += tunnW*0.47;
+    
+    for (float i = 0.; i < iters; i++){
+        boxSz.xz *= 0.7;
+        boxSz.y *= 1.05;
+        
+        float dB =sdBox(pC,boxSz );
+        if(d.x < -dB ){
+        	d.x = -dB;
+        } else {
+        	did++;
+        }
+        
+    }
+    
+    return d;
+}
+
+vec2 sdInner(vec3 p, vec3 pC){
+	vec2 d = vec2(10e5);
+    float iters = 4.;
+    vec3 boxSz = vec3(md.x*0.46,0.1,1.4*md.y/10.)*0.3;
+    for (float i = 0.; i < 2.; i++){
+        pC = abs(pC);
+    
+        //pC.y -= 0.01;
+        pC.xz *= rot(0.);
+    }  
+    pC.y += tunnW*0.00;
+    d.x = min(d.x, sdBox(pC,boxSz ));
+
+    return d;
+}
+
+vec3 pCG;
+vec2 sdInnerB(vec3 p, vec3 pCG){
+	vec2 d = vec2(10e5);
+    float iters = 4.;
+    vec3 boxSz = vec3(md.x*0.46,0.04,1.4*md.y/10.)*0.3;
+    for (float i = 0.; i < 2.; i++){
+        pCG = abs(pCG);
+    
+        //pC.y -= 0.01;
+        pCG.xz *= rot(0.);
+    }  
+    
+    	pCG.y -= tunnW*0.1;
+    for(int i = 0; i < 2; i++){
+    	pCG = abs(pCG);
+        pCG.xz *= rot(0.1);
+        pCG.xy *= rot(0.5);
+        pCG.x += 0.01;
+        //d.x = min(d.x, sdBox(pCG,boxSz ));
+        //pCG.x += 0.1;
+    }
+
+    return d;
+}
+vec2 map(vec3 p){
+	vec2 d = vec2(10e6);
+	p -= path(p.z);
+    
+    //d.x = min(d.x, -length(p.xy) + 0.6);
+    vec3 pC = vec3(atan(p.y,p.x)/tau,length(p.xy),p.z);
+   	
+    vec3 pCC = pC;
+    pid = floor(vec3(pC.x/md.x, pC.y, pC.z/md.y));
+    vec3 pidB = floor(vec3(pC.x/md.x - 0.5, pC.y, pC.z/md.y));
+    pC.x = pmod(pC.x, md.x);
+    pC.z = pmod(pC.z, md.x*tau*0.4);
+    
+    pC.y -= tunnW;
+    d.x = min(d.x, sdBoxy(p, pC).x);
+    pC.y += 0.12;
+    pC.x = pmod(pC.x, md.x);
+    //pC.x -= md.x*0.5;
+    
+    float dTube = length(pC.xy) - 0.01;
+    
+    d.x = min(d.x, dTube);
+    
+    
+    glowG += exp(-dTube*200. )*pal(0.78, 0.2, vec3(4.,3.,1.), vec3(1.,1.,1.),2.9 )*1.2;
+	
+    glowG += exp(-dTube*100. )*pal(0.98, 0.2, vec3(1.,2.,1.), vec3(4.,4.3,2.6),2.9 )*pow(abs(sin(p.z*0.2 - iTime*0.5+ pidB.x) ), 300.)*1.;
+        
+    pCG = pC;
+    d.x = min(d.x, sdInner(p, pC).x);
+    float innB = sdInnerB(p, pCG).x;
+    d.x = min(d.x, innB);
+    glowG += exp(-innB*200. )*pal(0.98, 0.2, vec3(1.,2.,1.), vec3(4.,2.3,2.6),5.9 )*0.5;;
+
+    d.x *= 0.5;
+    glow += exp(-d.x*220. );
+    return d;
+}
+
+vec2 march(vec3 ro, vec3 rd, inout vec3 p, inout float t, inout bool hit){
+	vec2 d = vec2(10e6);
+	p = ro;
+    hit = false; t = 0.;
+    
+    for(int i = 0; i < 250 + min(0,iFrame); i++){
+    	d = map(p);
+        if(d.x < 0.001){
+        	hit = true;
+            break;
+        }
+        t += d.x;
+        p = ro + rd*t;
+    }
+    
+    return d;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord - 0.5*iResolution.xy)/iResolution.y;
+
+    vec3 col = vec3(0);
+	
+    vec3 ro = vec3(0);
+    ro.z += mx;
+    ro += path(ro.z);
+    vec3 lookAt = vec3(0,0,ro.z + 2.);
+    lookAt += path(lookAt.z);
+    
+    vec3 rd = getRd(ro, lookAt, uv);
+    
+    rd.xy *= rot(sin(iTime)*0.3);
+    
+    bool hit; float t; vec3 p;
+    vec2 d = march(ro, rd, p, t, hit);
+    
+    if(hit){
+    	col += pal(0.08, 0.2, vec3(4.,1.39,1.4 + sin(p.z)*0.4), vec3(1.,1.,1.),-6.4 - did*0.3)*0.24;
+        //col += pal(0.5, 0.4, vec3(3.,1.,1.), vec3(1.,1.,2.),2.6 - did*2.3 )*0.09;
+        //col += pal(0.5, 0.6, vec3(3.,1.1,1.), vec3(1.,1.,2.),0.4 - did*0.6 )*0.09;
+    	
+    } 
+    
+    col -= glow*0.008;
+    col += glowG*0.02;
+    col *= 1.2;
+    col.b *= 1.2;
+    col *= 5.;
+    col = mix(col,vec3(1.),t*0.2);
+    //col += pal(0.5, 0.5, vec3(4.,2.,1.), vec3(1.,1.,1.),2.9 + pid.x + did*2.);
+    col = pow(col, vec3(0.45));
+    col *= 1. - pow(max(abs(uv.x) - 0.25,0.),6. )*10.;
+    col *= 1. - pow(abs(uv.y) - 0.25,3. )*20.;
+    
+    fragColor = vec4(col,1.0);
+}

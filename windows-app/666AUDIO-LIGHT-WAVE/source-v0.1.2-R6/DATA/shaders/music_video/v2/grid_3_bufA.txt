@@ -1,0 +1,28 @@
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    vec3 ro = vec3(1.0, 1.0, -2.9);
+    vec3 rd = normalize(vec3(uv, 1.0));
+    float t = 0.0;
+    
+    for (int i = 0; i < 129; i++) {
+        vec3 p = ro + rd * t;
+        float d = 1e0;
+        
+        p.xy *= mat2(cos(iTime * 0.2), -sin(iTime * 0.2), sin(iTime * 0.2), cos(iTime * 0.2));
+        
+        for (int j = 0; j < 8; j++) {
+            p = abs(p) - 0.7;
+            if (p.x < p.y) p.xy = p.yx;
+            if (p.x < p.z) p.xz = p.zx;
+            if (p.y < p.z) p.yz = p.zy;
+            p = p * 1.5 - 0.3;
+        }
+        
+        d = (length(p.xy) - 0.0) / 79.4;
+        
+        if (d < 0.000 || t > 1.6) break;
+        t += d;
+    }
+    
+    fragColor = vec4(vec3(1.0 / (0.6 + t * t * 1.0)), 0.0);
+}

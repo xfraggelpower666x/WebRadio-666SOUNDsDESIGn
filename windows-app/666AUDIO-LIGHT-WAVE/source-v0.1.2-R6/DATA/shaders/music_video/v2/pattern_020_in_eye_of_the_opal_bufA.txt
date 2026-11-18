@@ -1,0 +1,38 @@
+#define R(a) mat2(cos(a),-sin(a),sin(a),cos(a))
+
+#define CUT_C vec3(0.0)   // centre of the kept ball (drop this sweep's offset in here)
+#define CUT_R 3.40        // radius of the kept ball
+
+void mainImage(out vec4 O, vec2 I) {
+    float i=-150.0, z=0.8, d, t=iTime*0.5, t1=t*.184;
+    for(O-=O; i++<-45.;) {
+        vec3 p = z * normalize(vec3(I+I-iResolution.xy, iResolution.y));
+        p.z -= 1.8;
+        vec3 q = p;                       // p is the real position; q is the folded one
+
+        q.xz *= R(t*0.4);
+        q.yz *= R(sin(t*1.25)*0.3);
+        q.xy *= R(t1);
+        q.yz *= R(t*0.152);
+        t1 += i*27.142;
+
+        for(d=1.; d++<7.; q+=cos(q.zxy*d*1.2+t*0.432)/(d*4.7)) {
+            q = abs(q) - 5.55;
+            if(q.x<q.y) q.xy=q.yx;
+            if(q.x<q.z) q.xz=q.zx;
+        }
+        if (z>11.0) continue;
+
+        float cut  = length(p-CUT_C) - CUT_R;                                 // 3D cut
+        float surf = max(abs(length(q)-2.35)-0.12,
+                         length(cross(sin(q*3.), cos(q.yzx*5.)))*0.20);       // folded surface
+
+        z += d = .002 + max(surf, cut) / 2.3;                                 // march inside the ball only
+
+        O += (cos(dot(q, vec3(1.4, 2.1, .7)) + t1*14. + vec4(0, 1.8, 3.6, 0)) + 1.3)
+             * step(cut, 0.0)                                                 // shade inside the ball only
+             / (.002 + surf / 2.5) / z / 120.;                                // same falloff as before
+    }
+
+    O = tanh(O*O*.55);
+}

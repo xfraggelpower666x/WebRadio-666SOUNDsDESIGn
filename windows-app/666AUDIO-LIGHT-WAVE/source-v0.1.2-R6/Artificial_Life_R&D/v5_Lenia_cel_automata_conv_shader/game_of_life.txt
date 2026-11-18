@@ -1,0 +1,35 @@
+// game_of_life.txt
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec2 uv = fragCoord / iResolution.xy;
+    
+    // Read the 4-channel PyTorch Tensor
+    vec4 state = texture(iChannel0, uv);
+    vec3 species = state.rgb;
+    float potential = state.a; // Mean Multi-ring convolution field U
+
+    vec3 bgColor = vec3(0.01, 0.02, 0.06);
+    
+    // Assign rich palettes to each of the 3 dimensions
+    vec3 colR = vec3(1.0, 0.2, 0.4) * smoothstep(0.05, 0.8, species.r);
+    vec3 colG = vec3(0.1, 0.9, 0.6) * smoothstep(0.05, 0.8, species.g);
+    vec3 colB = vec3(0.3, 0.5, 1.0) * smoothstep(0.05, 0.8, species.b);
+
+    // Additive/screen-like blending where species overlap
+    vec3 col = bgColor + colR + colG + colB;
+    
+    // Highlight dense cores where multiple species fuse
+    float totalDensity = dot(species, vec3(0.333));
+    col = mix(col, vec3(1.0, 0.95, 0.8), smoothstep(0.6, 0.95, totalDensity));
+
+    // Subtle ethereal glow showing the multi-ring halos surrounding the organisms
+    float ringHalo = smoothstep(0.12, 0.35, potential) * (1.0 - smoothstep(0.05, 0.25, totalDensity));
+    col += vec3(0.08, 0.18, 0.35) * ringHalo;
+
+    // Vignette
+    vec2 p = -1.0 + 2.0 * uv;
+    float r = sqrt(dot(p, p));
+    col *= 1.0 - 0.2 * r;
+
+    fragColor = vec4(col, 1.0);
+}

@@ -1,0 +1,21 @@
+{
+  "neural_indices_filenames_all": [],
+  "video_filenames_all_left": [
+    "DATA/demo/horizontal.mp4",
+    "DATA/demo/horizontal.mp4",
+    "DATA/demo/horizontal.mp4",
+    "DATA/demo/horizontal.mp4"
+  ],
+  "video_filenames_all_right": [
+    "DATA/demo/horizontal.mp4",
+    "DATA/demo/horizontal.mp4",
+    "DATA/demo/horizontal.mp4",
+    "DATA/demo/horizontal.mp4"
+  ],
+  "video_filenames_all_vertical": [
+    "DATA/demo/vertical.mp4",
+    "DATA/demo/vertical.mp4",
+    "DATA/demo/vertical.mp4",
+    "DATA/demo/vertical.mp4"
+  ]
+}

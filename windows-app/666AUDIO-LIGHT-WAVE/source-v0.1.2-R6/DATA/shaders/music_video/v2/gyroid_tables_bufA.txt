@@ -1,0 +1,32 @@
+#define P(z) vec3(cos((z)*.021)*64.,cos((z)*.016)*64., z)
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( sin( T*c*2. ) * 16.,        \
+                    sin( T*c*4. ) * 16.,  \
+                    T*2.+Z+2e1+1e1*cos(T*.6) )  ) - c )
+#define N normalize
+void mainImage(out vec4 o, vec2 u) {
+   
+    float i, T = iTime * 4.,m,d,s;
+    vec3  c,r = iResolution;
+    mat2 rot = mat2(cos(cos(T*.1)*.6+vec4(0,33,11,0)));
+    
+    u = (u+u - r.xy) / r.y;
+    
+    vec3  q,p = P(T*4.),
+          Z = N( P(T*4.+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = N(vec3(rot*u, 1) * mat3(-X, cross(X, Z), Z));
+ 
+    for(;i++ < 1e2;
+        d += s =    max(1e1-length((P(q.z)-q).xy),
+                    max(.01+.8*abs(m),(.7+2.*dot(sin(q/6.), cos(q.yzx/16.))))),
+        c += .1*vec3(1,2,4)*d + (1.+cos(i*.2+vec3(2,1,0)))/s
+    )
+        q = p += D * s,
+        p = abs(fract(q/8.)-.5),
+        m = 2.*min(max(p.x,p.y), p.z),
+        p = q;
+
+    o.rgb = tanh(c/2e4*exp(d/4e1));
+
+}

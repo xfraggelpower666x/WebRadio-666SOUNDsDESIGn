@@ -1,0 +1,57 @@
+SELECT binary_string FROM binary_table INTO OUTFILE '/path/to/output.txt' LINES TERMINATED BY '\n';
+
+This will create a text file where each binary string is on its own line. 
+Ensure the MySQL server has write permissions to the specified directory 
+(e.g., /var/tmp/ on many systems, or use a secure path). If the file path 
+is restricted due to secure_file_priv, check SHOW VARIABLES LIKE 
+'secure_file_priv'; and adjust accordingly or consult your admin. 
+For large datasets (>5M rows), this may take time and disk space—
+consider running it in batches with LIMIT/OFFSET if needed.
+To read the file in Python and convert the binary strings to decimals, 
+use this script (assuming the file is output.txt):
+
+
+# Read the file line by line to handle large files efficiently
+decimals = []
+with open('output.txt', 'r') as file:
+    for line in file:
+        binary_str = line.strip()  # Remove any trailing newline or whitespace
+        if binary_str:  # Skip empty lines
+            decimal = int(binary_str, 2)  # Convert binary string to integer (base 10)
+            decimals.append(decimal)
+
+# Now 'decimals' is a list of base-10 integers
+print(decimals[:10])  # Example: Print first 10 for verification
+
+def read_binaries_to_decimals(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            binary_str = line.strip()
+            if binary_str:
+                yield int(binary_str, 2)
+
+# Usage: Iterate over the generator
+for decimal in read_binaries_to_decimals('output.txt'):
+    # Process each decimal here, e.g., save to another file or use immediately
+    pass
+
+
+To use these decimals as a basis for generating numbers with a ceiling of 50,000 (i.e., integers from 0 to 49,999), 
+you can derive them by taking the modulo operation, which effectively scales down the large random decimals 
+while preserving randomness (assuming the originals are uniformly random and large 
+enough to avoid bias). Here's how to extend the Python code:
+
+CEILING = 50000
+
+def generate_capped_randoms(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            binary_str = line.strip()
+            if binary_str:
+                decimal = int(binary_str, 2)
+                capped_random = decimal % CEILING  # Derive a number in [0, CEILING-1]
+                yield capped_random
+
+# Example: Collect first 10 for demo
+capped_list = list(generate_capped_randoms('output.txt'))[:10]
+print(capped_list)

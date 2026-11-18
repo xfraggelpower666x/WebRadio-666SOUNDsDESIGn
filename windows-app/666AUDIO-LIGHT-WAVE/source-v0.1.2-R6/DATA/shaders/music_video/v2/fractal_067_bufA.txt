@@ -1,0 +1,57 @@
+// Rotation and color mapping macros (kept intact but spaced out for readability)
+#define R(p,a,r) mix(a*dot(p,a), p, cos(r)) + sin(r)*cross(p,a)
+#define H(h) (cos((h)*6.3 + vec3(0.0, 23.0, 21.0)) * 0.5 + 0.5)
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Your requested UV calculation
+    // This maps the screen from roughly -1.0 to 1.0 (adjusted for aspect ratio)
+    vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+    
+    // The original code calculated the ray direction as: (fragCoord - 0.5 * res) / res.y
+    // Since your 'uv' is exactly twice that scale, we divide 'uv' by 2.0 in the ray direction
+    // to maintain the exact same camera field-of-view as the original shader.
+    vec3 d = normalize(vec3(uv * 0.5, 1.0));  
+
+    vec3 a = normalize(vec3(1.0, 2.0, 3.0));
+    vec3 p;
+    
+    // Initialize output color (O.a = 1.0 ensures it's visible on desktop OpenGL)
+    vec4 O = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    // Explicitly declare these variables to fix scope/compilation issues
+    float s = 1.0;
+    float e = 1.0;
+    float g = 0.8;
+    
+    // Outer loop: fixed the golfed update block so older/stricter GLSL compilers don't complain
+    for(float i = 1.0; i < 100.0; i++)
+    {
+        p = g * d;
+        p.z += iTime * 0.5;
+        s = 4.0;
+        vec4 q = vec4(p, 0.05);
+        
+        q.xyw = R(q.xyw, a, 2.0 + iTime * 0.05);
+        q.xzw = R(q.xzw, a, 0.5 + cos(iTime * 0.05));
+        q.zyw = R(q.zyw, a, 1.0 + sin(iTime * 0.05));
+        
+        // CRITICAL FIX: The inner loop now uses 'j', and 'j' is explicitly set to 0.
+        // This solves the Desktop GLSL freeze/crash from the uninitialized 'int i;'
+        for(int j = 0; j < 8; j++)
+        {
+            q = mod(q - 1.0, 2.0) - 1.0;
+            e = 1.2 / dot(q, q) - 0.04;
+            s *= e;
+            q *= e;
+        }
+        
+        e = length(q - clamp(q, -0.5, 0.5)) / s + 5e-4;
+        g += e;
+        
+        // The visual accumulation color math, safely moved into the loop body
+        O.xyz += mix(vec3(1.0), H(cos(log(s))) * 0.5, 0.8) * 0.05 * exp(-0.5 * e * i * i);
+    }
+    
+    fragColor = O;
+}

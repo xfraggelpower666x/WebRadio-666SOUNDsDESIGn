@@ -1,0 +1,28 @@
+void mainImage( out vec4 O, vec2 I ){
+    float i,j,t,v,s,T=iTime;
+    vec3 q,p,r=normalize(vec3(I+I,0)-iResolution.xyy);
+    // Raymarching loop
+    for (O*=i; i++<70.;t+=v/6.){
+    p=t*normalize(vec3(r.xy,r.z/t));
+    // Prevent glitchy artifacts
+    p*=.95+.05*fract(dot(I,sin(I.yx+T)));
+    // Move forward
+    p.z-=.5*T;
+    // Move up or down depending on z position
+    p.y+=sin(ceil(p.z))*T;
+    // Repeatedly carve smaller cubes out of space
+    v=j=0., s=1.;
+    for(;j++<6.;){
+        p*=sqrt(j);
+        s*=sqrt(j);
+        p+=sin(p+p.xzy*3.)/2.; // Sine distortion for interesting shapes
+        q=abs(mod(p-1.,2.)-1.);
+        v=max(v,(.95-max(max(q.x,q.y),q.z))/s)+.001;
+    }
+    // Color accumulation based on iterator, distance travelled, and density
+    O+=exp(sin(i*.05+t*vec4(2,3,4,0)))/v;
+    }
+    // Tone mapping
+    O=tanh(O/1e3);
+    O*=O;
+}

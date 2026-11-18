@@ -1,0 +1,55 @@
+mat2 i(float c){
+    float g=cos(c),d=sin(c);
+    return mat2(g,-d,d,g);
+}// https://patrickjaillet.github.io/sandefjord-software
+
+float l(vec3 a,vec3 d){
+    vec3 e=abs(a)-d;
+    return length(max(e,0.))+min(max(e.x,max(e.y,e.z)),0.);
+}
+float m(float c,float d,float a){
+    float e=clamp(.5+.5*(d-c)/a,0.,1.);
+    return mix(d,c,e)-a*e*(1.-e);
+}
+float b(vec3 a){
+    a.xz*=i(iTime*.3);
+    a.xy*=i(iTime*.2);
+    vec3 e=a;
+    float h=l(a,vec3(1.)),d=1.;
+    for(int j=0;j<4;j++){
+        vec3 c=mod(a*d,2.)-1.;
+        d*=3.;
+        vec3 f=abs(1.-3.*abs(c));
+        float k=max(f.x,f.y),n=max(f.y,f.z),o=max(f.z,f.x),g=(min(k,min(n,o))-1.)/d;
+        h=max(h,-g);
+    }
+    float p=length(e+vec3(sin(iTime*1.5)*.5,cos(iTime*1.1)*.5,0.))-.75;
+    return m(h,p,.3);
+}
+vec3 q(vec3 a){
+    vec2 c=vec2(.001,0.);
+    return normalize(vec3(b(a+c.xyy)-b(a-c.xyy),b(a+c.yxy)-b(a-c.yxy),b(a+c.yyx)-b(a-c.yyx)));
+}
+void mainImage(out vec4 n,in vec2 o){
+    vec2 p=(o-.5*iResolution.xy)/iResolution.y;
+    vec3 h=vec3(0.,0.,-3.2),f=normalize(vec3(p,1.2));
+    float d=0.,j=20.;
+    for(int g=0;g<160;g++){
+        vec3 a=h+f*d;
+        float e=b(a);
+        if(abs(e)<1e-4||d>j)break;
+        d+=e*.75;
+    }
+    vec3 c=vec3(.01,.015,.02);
+    if(d<j){
+        vec3 a=h+f*d,e=q(a),k=normalize(vec3(1.,2.,-1.5));
+        float r=max(dot(e,k),0.),g=clamp(b(a+e*.05)/.05,0.,1.)*clamp(b(a+e*.15)/.15,0.,1.),s=pow(clamp(1.+dot(e,f),0.,1.),3.);
+        vec3 t=mix(vec3(.1,.4,.8),vec3(.9,.2,.1),sin(length(a)*4.+iTime)*.5+.5);
+        c=t*r*vec3(1.2,1.1,1.)*g;
+        c+=s*vec3(.8,.9,1.)*g;
+        c+=pow(max(dot(reflect(f,e),k),0.),32.)*vec3(1.)*g;
+    }
+    c=mix(c,vec3(.01,.015,.02),1.-exp(-.02*d*d));
+    c=pow(c,vec3(.4545));
+    n=vec4(c,1.);
+}

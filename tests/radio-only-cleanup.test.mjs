@@ -11,11 +11,12 @@ async function exists(path) {
   try { await access(new URL(path, rootUrl)); return true; } catch { return false; }
 }
 
-async function walk(dir) {
+async function walk(dir, excludedDir) {
   const out = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...await walk(full)); else out.push(full);
+    if (full === excludedDir) continue;
+    if (entry.isDirectory()) out.push(...await walk(full, excludedDir)); else out.push(full);
   }
   return out;
 }
@@ -29,7 +30,8 @@ test('radio-only release contains no Chaos or Suno worker payloads', async () =>
     'chaos-matrix-control.html'
   ]) assert.equal(await exists(path), false, `${path} must be absent`);
 
-  const files = await walk(rootPath);
+  // The standalone Windows source snapshot is not part of the WebRadio release.
+  const files = await walk(rootPath, join(rootPath, 'windows-app', '666AUDIO-LIGHT-WAVE', 'source-v0.1.2-R6'));
   const production = files.filter(file => !file.includes('/docs/') && !file.includes('RELEASE-FILE-INVENTORY') && !file.includes('RELEASE-TREE-SHA256SUMS') && !file.endsWith('radio-only-cleanup.test.mjs') && !file.endsWith('/scripts/check-release.mjs'));
   const forbidden = /666-chaos-ai-track-system|666-suno-system|CHAOS_ENGINE|\/api\/suno|\/chaos-system/i;
   for (const file of production.filter(file => /\.(?:js|mjs|json|jsonc|html|css|md|txt)$/i.test(file))) {

@@ -1,0 +1,44 @@
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( sin( T*c*2. ) * 16.,        \
+                    sin( T*c*4. ) * 6. + 1e1,  \
+                    T+Z+2e1+1e1*cos(T*.6) )  ) - c )
+// MENGERLAYER
+#define m(f, h)\
+    s /= (f), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	m = min(m, min(max(p.x, p.y), \
+               min(max(p.y, p.z), \
+               max(p.x, p.z))) - s/(h))
+
+void mainImage(out vec4 o, vec2 u) {
+   
+    float i, e, T = iTime * 1.5,m,d,s,l,
+          j = sin(T)*.003+.001*dot(sin(fract(u)), sin(u));
+    vec3  c,r = iResolution;
+    mat2 rot = mat2(cos(cos(T*.05)*.6+vec4(0,33,11,0)));
+    
+    u = (u+u - r.xy) / r.y;
+
+    vec3  q,p = vec3(0,0,T),
+          D = vec3(rot*u, 1);
+ 
+    for(;i++ < 1e2;
+        c += 1./s + 1e1*vec3(2,5,1)/max(e, .001)
+    )
+        q = p += j + D * s,
+        e = max( .6* min( O( 3., .1),
+                     min( O( 5., .2),
+                          O( 9., .3) )), .001),
+        m=.25,
+        s = 128.,
+        m(2., 4.),
+        s = 64.,
+        m(12., 4.),
+        s = 32.,
+        m(24., 4.),
+        d += s = min(e,
+                 max(.01+.7*abs(m), .01+.7*abs(.4+dot(sin(.3*T+q/6.), cos(q.yzx/16.))))),
+        p = q;
+    o.rgb = tanh(c*c/1e6);
+
+}

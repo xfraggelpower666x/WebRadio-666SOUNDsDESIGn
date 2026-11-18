@@ -1,0 +1,107 @@
+#define ti (iTime)
+float n1, n2, n3, n4, ta;
+
+mat2 r2d(float r){return mat2(cos(r),-sin(r),sin(r),cos(r));}
+
+vec3 hash3(vec3 p){
+    uvec3 q = floatBitsToUint(p);
+    q = ((q>>16u)^q.yzx)*1111111111u;
+    q = ((q>>16u)^q.yzx)*1111111111u;
+    q = ((q>>16u)^q.yzx)*1111111111u;
+  return vec3(q)/float(-1U);
+}
+
+float sdf(vec3 p)
+{
+    p.xy += sin(p.z/20.);
+    
+    p.z = mod(p.z+ti,100.)-50.;
+
+    p.xy *= r2d(1.1);
+    vec3 noise = hash3(floor(p*.5));
+    vec3 nois2 = hash3(floor(p*4.));
+    vec3 p2 = p;
+
+    float sp = 1.-length(max(abs(p.xy)-2.+noise.x*.2,0.));
+
+    p.z = mod(p.z,20.)-10.;
+    p = abs(p)-2.;
+    p.xy *= r2d(.785);
+    float ba = length(max(abs(p)-vec3(10.,.3,.1),0.));
+    ba = max(ba,.1-length(vec2(mod(p.x,.5)-.25,p.y)));
+
+    p = p2;
+    p.xy *= r2d(.785);
+    float pl = 1.-length(max(abs(p.xy)-2.4+noise.z*.1,0.));
+
+    p = p2;
+    
+    p.xy *= r2d(.23*(p.z/2.5));
+    
+    p.z = mod(p.z+ti*2.,20.)-10.;
+    
+    p.xz *= r2d(232.34);
+    p.yz *= r2d(0987.34);
+    p.xy *= r2d(537.34);
+    
+    float pa = length(max(abs(abs(p)-.4)-.2,0.));
+    float pe = length(max(abs(p)-.5,.0));
+
+    #define nn(s) .1/(s*s*40.+.1)
+    n1 += nn(min(sp,pe));
+    n2 += nn(pl); ta = pl;
+    n3 += nn(pa);
+    n4 += nn(ba);
+    
+    return min(min(min(min(pe,pa),sp),ba),pl);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord.xy/iResolution.xy-.5)/vec2(iResolution.y/iResolution.x,1.), uv2 = uv;
+    
+    uv = uv*r2d(-ti/16.);
+    
+    float it = 0., t;
+    vec3 col,
+         ro = vec3(2.,-0.9,-20.8);
+         ro.xy += sin(ro.z/20.)*.5;
+
+         //ro.xy *= r2d(-ti/20.);
+    vec3 fr = normalize(vec3(0.)-ro),
+         ri = normalize(cross(fr,vec3(0,1,0))),
+         up = normalize(cross(ri,fr)),
+         rd = normalize(ri*uv.x+up*uv.y+fr*3.);
+    
+    for(float i = 0.;i<128.;i++)
+    {
+        float d = sdf(ro+rd*t);
+        
+        if(d<.01)
+        {
+            vec2 e = vec2(.001,-.001);
+            vec3 p = ro+rd*t;
+            
+            #define q(s) s*sdf(p+s)
+            vec3 n = normalize(q(e.xyy)+q(e.yyx)+q(e.yxy)+q(e.xxx));
+
+            if(ta < .01 && it < 1.)
+            {
+                rd = reflect(rd,n);
+                ro = p+n*.1;
+                it += 1.;
+            }
+        }
+      
+        if(d<.001||t>100.)break;
+        t += d;
+    
+    }
+  
+    vec3 p = ro+rd*t;
+  
+    //float pat = ceil(-sin(uv2.y*4.-3.1415/2.));   
+    //fragColor = vec4(n1*.0015+n2*.01+n3*.03+n4*.0015)/pat;
+
+    fragColor = vec4(n1*.0015+n2*.01+n3*.03+n4*.0015);
+}

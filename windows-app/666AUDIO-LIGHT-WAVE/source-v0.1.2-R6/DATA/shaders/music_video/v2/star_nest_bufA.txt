@@ -1,0 +1,409 @@
+// Star Nest by Pablo RomÃ¡n Andrioli
+// copied from https://www.shadertoy.com/view/XlfGRj
+//
+// This content is under the MIT License.
+// (copied for API availability + VR)
+
+#define iterations 12
+#define formuparam 0.53
+
+#define volsteps 20
+#define stepsize 0.1
+
+#define zoom   0.800
+#define tile   0.850
+#define speed  0.000 
+
+#define brightness 0.0015
+#define darkmatter 0.300
+#define distfading 0.730
+#define saturation 0.850
+float happy_star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+ 
+
+void mainVR( out vec4 fragColor, in vec2 fragCoord, in vec3 ro, in vec3 rd )
+{
+	//get coords and direction
+	vec3 dir=rd;
+	vec3 from=ro;
+	
+	//volumetric rendering
+	float s=0.1,fade=1.;
+	vec3 v=vec3(0.);
+	for (int r=0; r<volsteps; r++) {
+		vec3 p=from+s*dir*.5;
+		p = abs(vec3(tile)-mod(p,vec3(tile*2.))); // tiling fold
+		float pa,a=pa=0.;
+		for (int i=0; i<iterations; i++) { 
+			p=abs(p)/dot(p,p)-formuparam;
+            p.xy*=mat2(cos(iTime*0.01),sin(iTime*0.01),-sin(iTime*0.01), cos(iTime*0.01));// the magic formula
+			a+=abs(length(p)-pa); // absolute sum of average change
+			pa=length(p);
+		}
+		float dm=max(0.,darkmatter-a*a*.001); //dark matter
+		a*=a*a; // add contrast
+		if (r>6) fade*=1.2-dm; // dark matter, don't render near
+		//v+=vec3(dm,dm*.5,0.);
+		v+=fade;
+		v+=vec3(s,s*s,s*s*s*s)*a*brightness*fade; // coloring based on distance
+		fade*=distfading; // distance fading
+		s+=stepsize;
+	}
+	v=mix(vec3(length(v)),v,saturation); //color adjust
+	fragColor = vec4(v*.01,1.);	
+}
+
+float numOct  = 4. ;  //number of fbm octaves
+float focus = 0.;
+float focus2 = 0.;
+#define pi  3.14159265
+
+float random(vec2 p) {
+    //a random modification of the one and only random() func
+    return fract( sin( dot( p, vec2(12., 90.)))* 5e5 );
+}
+
+mat2 rot2(float an){float cc=cos(an),ss=sin(an); return mat2(cc,-ss,ss,cc);}
+
+//this is the noise func everyone uses...
+float noise(vec3 p) {
+    vec2 i = floor(p.yz);
+    vec2 f = fract(p.yz);
+    float a = random(i + vec2(0.,0.));
+    float b = random(i + vec2(1.,0.));
+    float c = random(i + vec2(0.,1.));
+    float d = random(i + vec2(1.,1.));
+    vec2 u = f*f*(3.-2.*f); 
+    
+    return mix( mix(a,b,u.x), mix(c,d,u.x), u.y);
+}
+
+float fbm3d(vec3 p) {
+    float v = 0.;
+    float a = .35;
+
+    for (float i=0.; i<numOct; i++) {
+        v += a * noise(p);
+        a *= .25*(1.2+focus+focus2);
+    }
+    return v;
+}
+
+#define S (1. + sin(iTime) / 4.)
+#define C (1. + cos(iTime) / 4.)
+#define SMOOTH(r,R) (1.0-smoothstep(R-1.0,R+1.0, r))
+#define SMOOTH2(r,R) (1.0-smoothstep(R-0.01, R+0.01, r))
+#define SS(r,R) (smoothstep(r-0.005, r+0.005, R))
+#define ROT(p, a) (mat2(cos(a),-sin(a),sin(a),cos(a))*p)
+
+
+// fork1: https://www.shadertoy.com/view/fdK3DD
+// fork2: https://www.shadertoy.com/view/4dVXWy
+// fork3: https://www.shadertoy.com/view/MlyGzW
+
+const float PI = 3.14159;
+const float TAU = PI * 2.;
+const float QTR_PI = PI / 4.;
+
+
+
+float stroke(float x, float s, float w) { 
+    float d = SS(s, x + w / 2.) - SS(s, x - w / 2.);
+    return clamp(d, 0., 1.);
+}
+
+float fill(float x, float size) { 
+    return 1. - SS(size, x);
+}
+
+
+float sdCircle(vec2 st) { 
+    return length(st - 0.5) * 2.;
+}
+
+float sdSegment( in vec2 p, in vec2 a, in vec2 b )
+{
+    vec2 pa = p-a, ba = b-a;
+    float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+    return length( pa - ba*h );
+}
+
+float sdBox( in vec2 p, in vec2 b )
+{
+    vec2 d = abs(p)-b;
+    return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+}
+
+float cro(in vec2 a, in vec2 b ) { return a.x*b.y - a.y*b.x; }
+
+
+vec3 hash33(vec3 p3)
+{
+	p3 = fract(p3 * vec3(.1031,.11369,.13787));
+    p3 += dot(p3, p3.yxz+19.19);
+    return -1.0 + 2.0 * fract(vec3(p3.x+p3.y, p3.x+p3.z, p3.y+p3.z)*p3.zyx);
+}
+float snoise3(vec3 p)
+{
+    const float K1 = 0.333333333;
+    const float K2 = 0.866666667;
+    
+    vec3 i = floor(p + (p.x + p.y + p.z) * K1);
+    vec3 d0 = p - (i - (i.x + i.y + i.z) * K2);
+    
+    vec3 e = step(vec3(0.0), d0 - d0.yzx);
+	vec3 i1 = e * (1.0 - e.zxy);
+	vec3 i2 = 1.0 - e.zxy * (1.0 - e);
+    
+    vec3 d1 = d0 - (i1 - K2);
+    vec3 d2 = d0 - (i2 - K1);
+    vec3 d3 = d0 - 0.5;
+    
+    vec4 h = max(0.3 - vec4(dot(d0, d0), dot(d1, d1), dot(d2, d2), dot(d3, d3)), 0.0);
+    vec4 n = h * h * h * h * vec4(dot(d0, hash33(i)), dot(d1, hash33(i + i1)), dot(d2, hash33(i + i2)), dot(d3, hash33(i + 1.0)));
+    
+    return dot(vec4(301.316), n);
+}
+
+float sdUnevenCapsule( in vec2 p, in vec2 pa, in vec2 pb, in float ra, in float rb )
+{
+    p  -= pa;
+    pb -= pa;
+    float h = dot(pb,pb);
+    vec2  q = vec2( dot(p,vec2(pb.y,-pb.x)), dot(p,pb) )/h;
+    
+    //-----------
+    
+    q.x = abs(q.x);
+    
+    float b = ra-rb;
+    vec2  c = vec2(sqrt(h-b*b),b);
+    
+    float k = cro(c,q);
+    float m = dot(c,q);
+    float n = dot(q,q);
+    
+         if( k < 0.0 ) return sqrt(h*(n            )) - ra;
+    else if( k > c.x ) return sqrt(h*(n+1.0-2.0*q.y)) - rb;
+                       return m                       - ra;
+}
+
+float light0(float intensity, float attenuation, float dist) {
+    return intensity / (dist * attenuation);
+}
+
+float light1(float intensity, float attenuation, float dist)
+{
+    return intensity / (1.0 + dist * attenuation);
+}
+float light2(float intensity, float attenuation, float dist)
+{
+    return intensity / (1.0 + dist * dist * attenuation);
+}
+
+float circle2(float d, float radius, float vignette) {
+    return smoothstep(radius * vignette, radius, d);
+}
+
+float circle3(float d, float radius) {
+    return .1 - smoothstep(radius, radius + 0.01, d);
+}
+
+
+vec3 draw(vec2 st, vec2 tileXY, vec2 count) {
+
+
+    int cardNumber = int(tileXY.x + (-tileXY.y + count.y - 1.) * count.x);
+    vec3 retCol = vec3(0.);
+    float color = 0.0;
+     float t = iTime * .1 + ((.25 + .05 * sin(iTime * .1))/(length(st.xy) + .507)) * 1.2;
+	float si = sin(t);
+	float co = cos(t);
+
+	mat2 ma = mat2(co, si, -si, co);
+
+    switch(cardNumber) {
+    
+   
+    case 7: {
+        // https://www.shadertoy.com/view/3tBGRm
+        st = st * 2.0 - 1.0;
+;
+ const vec3 color1 = vec3(0.611765, 0.262745, 0.996078)*2.;
+ const vec3 color2 = vec3(0.298039, 0.760784, 0.913725)*2.;
+
+
+
+const vec3 color3 = vec3(0.2, 0.2, 0.2);
+const float innerRadius = 0.5;
+const float noiseScale = 0.65;
+
+
+
+        float angle = atan(st.y, st.x);
+        float len = length(st);
+
+        float n0 = snoise3( vec3(st * noiseScale, iTime * 23.5) ) * 0.5 + 0.5;
+        float r = mix(innerRadius-0.25, innerRadius+0.25, n0);
+        float dist = abs(len - r+cos(iTime));
+        float baseLight = light1(1.0, 10.0, dist);
+
+        // high light
+        float a = iTime * -1.0;
+        vec2 pos = vec2(cos(a), sin(a)) * r+cos(iTime); // 边缘点
+            pos*=ma;
+        dist = distance(st, pos);
+        float highLight = light2(5.5, 5.0, dist);
+        highLight *= light1(1.0, 10.0, dist);
+
+        // outer
+        float decay = smoothstep(r * 1.05, r, len);
+        // inner
+        float hole = smoothstep(innerRadius*0.5, innerRadius, len);
+
+        float cl = cos(angle + iTime * 2.0) * 0.5 + 0.5;
+        vec3 col = mix(color1, color2, cl);
+        col = mix(color3, col, baseLight);
+        retCol  = (col  + highLight)  * hole * decay;
+        break;   
+    }
+
+  
+   
+    
+    } // switch end
+    return retCol;
+}
+#define tt iTime 
+mat2 rot(float an) { float cc=cos(an),ss=sin(an); return mat2(cc,ss,-ss,cc); }
+vec3 F(vec3 p) {
+  vec4 q = vec4(p,1), jc = q; q.xz *= rot(tt/5.);
+  for (float i=0.;i<11.;i++){   
+#define C3(x) x = x>1. ? x=2.-x : (x<-1. ? -2.-x : x)
+#define D(x) x /= dot(x,x)  
+    C3(q.x); C3(q.y); C3(q.z); C3(q.w);  //4d Mandelbox (but not really)
+    D(q.xyz); D(q.yzw); D(q.zwx);
+    q.xyz*=.8; q.yzw*=.9; q.zwx*=1.3;
+    q.xy *= rot(-p.z*p.z); 
+    q += jc;   
+  } return q.xyz;    
+}
+#define SM(x) max( -x*.2, min(0.,x))
+vec3 march( vec3 ro, vec3 rd) {
+  vec3 p = ro, color = vec3(0);
+  for (float i=0.; i<3.; i++) {
+    vec3 cx = F(ro+i*.6*rd*(1.- SM(4.) ));
+    cx = 1. - exp(-cx*cx);
+    color += cx*cx * exp(-i*i/1.8*(1.+SM(2.)));
+  } return color; 
+}
+
+void mainImage0( out vec4 O, in vec2 U ) {
+  U = (2.*U - iResolution.xy) / iResolution.y * 2.; 
+  vec3 rd = normalize( vec3(U, 2) ), ro = vec3(0,0, -4.-SM(.5) );
+  rd.xy  *= rot(tt/5.);     
+  O = vec4( pow(march( ro, rd ),vec3(.45)), 1);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	//get coords and direction
+	vec2 uv=fragCoord.xy/iResolution.xy-.5;
+    	float t = iTime * .1 + ((.25 + .05 * sin(iTime * .1))/(length(uv.xy) + .07)) * 1.2;
+	float si = sin(t);
+	float co = cos(t);
+	mat2 ma = mat2(co, si, -si, co);
+  
+	uv.y*=iResolution.y/iResolution.x;
+	vec3 dir=vec3(uv*zoom,0.001);
+	float time=iTime*speed+.25;
+
+
+
+//aa by FabriceNeyret2 - makes a difference
+ vec4 O =fragColor;
+ vec2 U =fragCoord;
+    mainImage0(O,U);
+    if ( (length(O)) > .01 ) {  // difference threshold between neighbor pixels
+        vec4 o;
+        for (int k=0; k < 9; k+= k==3?2:1 )
+          { mainImage0(o,U+vec2(k%3-1,k/3-1)/3.); O += o; }
+        O /= 9.;
+                             
+    
+
+}
+
+vec2 uv2 = (2.*fragCoord-iResolution.xy)/iResolution.y * 2.5;
+	float aspectRatio = iResolution.x / iResolution.y;
+
+    vec3 rd = normalize( vec3(uv2, -1.2) );  
+    
+    vec3 ro = vec3(0); 
+      vec2 uv3 = fragCoord / iResolution.xy;
+     
+      uv3.y-=0.35;
+    float coordAspectRatio = iResolution.y / iResolution.x;
+    
+    vec2 count = vec2(3, 3);
+    
+    float tileW = iResolution.x / count.x;
+    float tileH = iResolution.y / count.y;
+    float tileAspectRatio = tileH / tileW;
+    vec2 tileXY = floor(uv3 * count);
+   
+    // coordinates for each tile
+    vec2 st = vec2(
+        uv3.x * count.x - tileXY.x, 
+        (uv3.y * count.y - tileXY.y - 0.5) * tileAspectRatio + .5
+    );
+       
+    vec2 gridBars = clamp(cos(uv3 * TAU * count) * 10. - 9.9, 0., 1.); // ---^---^---
+    float grid = max(gridBars.x, gridBars.y)*2.0;
+    
+    
+    vec3 color = draw(st, tileXY, count);
+    float delta = iTime / 1.5 ; 
+        
+    rd.yz *= rot2(-delta/2. );
+    rd.xz *= rot2(delta*3.);
+    vec3 p = ro + rd;
+
+    float bass = 1.5 +  .5*max(0.,2.*sin(iTime*3.));
+    
+    vec2 nudge = vec2( aspectRatio*cos(iTime*1.5), sin(iTime*1.5));
+
+    focus = length(uv2 + nudge);
+    focus = 2./(1.+focus) * bass;
+
+    focus2 = length(uv2 - nudge);
+    focus2 = 4./(1.+focus2*focus2) / bass;
+
+    vec3 q = vec3( fbm3d(p), fbm3d(p.yzx), fbm3d(p.zxy) ) ;
+
+    float f = fbm3d(p + q);
+    
+    vec3 cc = q;
+    cc *= 20.*f;   
+
+    cc.r += 5.*focus; cc.g+= 3.5*focus; 
+    cc.b += 7.*focus2; cc.r-= 3.5*focus2;    
+    cc /= 25.;
+
+	vec3 from=vec3(1.,.5,0.5)+O.xyz;
+	
+	
+    
+	mainVR(fragColor, fragCoord, from, dir);	
+      uv *= 2.0 * ( cos(iTime * 2.0) -2.5); // scale
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  // anim between 0.9 - 1.1 
+    fragColor*= vec4(happy_star(uv, anim) * vec3(0.35,0.2,0.55)*15.*O.xyz, 1.0);
+      fragColor+=vec4(cc*0.51+color,1.);
+}
+

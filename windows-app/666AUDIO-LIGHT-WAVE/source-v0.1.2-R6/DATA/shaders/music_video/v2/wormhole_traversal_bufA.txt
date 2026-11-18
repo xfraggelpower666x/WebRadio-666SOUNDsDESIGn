@@ -1,0 +1,100 @@
+const float PI = 3.14159265359;
+
+float hash(float n) { 
+    return fract(sin(n) * 43758.5453123);
+}
+
+// Get spiral position for tunnel shape
+vec2 getSpiral(float z, float angle, int set) {
+    float a = 2.0 + sin(z * 0.3) * 1.5;
+    float b = 1.0 + cos(z * 0.25) * 1.5;
+    float c = 0.5 + sin(z * 0.35) * 1.5;
+    
+    vec2 p = vec2(0.0);
+    for(int j = 0; j < 6; j++) {
+        float x = p.x;
+        float y = p.y;
+        p.x = y - sign(x) * sqrt(abs(b * x - c));
+        p.y = a - x;
+    }
+    
+    return p * 0.3;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Normalize pixel coordinates
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    // Camera and view setup
+    float fov = 1.2;
+    vec3 rayDir = normalize(vec3(uv * fov, 1.0));
+    vec3 rayPos = vec3(0.0, 0.0, iTime * 2.0); // Moving forward
+    
+    // Color accumulation
+    vec3 col = vec3(0.0);
+    
+    // Color palette
+    const vec3 colors[4] = vec3[4](
+        vec3(0.0, 1.0, 1.0),   // Cyan
+        vec3(1.0, 0.0, 1.0),   // Magenta
+        vec3(1.0, 1.0, 0.2),   // Yellow
+        vec3(0.2, 1.0, 0.5)    // Green
+    );
+    
+    // Raymarching steps
+    const float stepSize = 0.3;
+    const int MAX_STEPS = 100;
+    
+    // Raymarch through the tunnel
+    float t = 0.0;
+    for(int i = 0; i < MAX_STEPS; i++) {
+        vec3 pos = rayPos + rayDir * t;
+        float z = pos.z;
+        
+        // Get tunnel segment
+        float segment = floor(z);
+        float segmentFrac = fract(z);
+        
+        // Get spiral positions for this segment and next
+        vec2 spiral1 = getSpiral(segment, 0.0, 0);
+        vec2 spiral2 = getSpiral(segment + 1.0, 0.0, 0);
+        
+        // Interpolate between segments
+        vec2 spiral = mix(spiral1, spiral2, segmentFrac);
+        
+        // Calculate distance to tunnel center
+        vec2 p = pos.xy - spiral;
+        float r = length(p);
+        
+        // Tunnel shape
+        float tunnelWidth = 1.5;
+        float d = abs(r - tunnelWidth);
+        
+        // Add glow for each color layer
+        for(int j = 0; j < 4; j++) {
+            float offset = float(j) * 0.1;
+            float thickness = 0.02 + offset * 0.01;
+            
+            // Pattern variation
+            float pattern = sin(z * 5.0 + float(j) * PI/2.0 + iTime) * 0.5 + 0.5;
+            pattern *= sin(atan(p.y, p.x) * 8.0 + z * 2.0) * 0.5 + 0.5;
+            
+            // Calculate glow
+            float glow = exp(-d * 20.0) * pattern;
+            glow *= exp(-t * 0.2); // Distance fade
+            
+            // Add color
+            col += colors[j] * glow * 0.5;
+        }
+        
+        t += stepSize;
+    }
+    
+    // Final color adjustments
+    col = 1.0 - exp(-col * 2.0);
+    col = pow(col, vec3(0.8, 0.85, 0.9));
+    
+    // Output
+    fragColor = vec4(col, 1.0);
+}

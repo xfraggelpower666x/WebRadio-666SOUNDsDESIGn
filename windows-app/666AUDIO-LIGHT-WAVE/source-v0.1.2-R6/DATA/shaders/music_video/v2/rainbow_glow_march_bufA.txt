@@ -1,0 +1,12 @@
+void mainImage(out vec4 o, vec2 C) {
+  vec3 r=iResolution,p,K;vec4 O;
+  for(float d,i,z;++i<77.;O+=o.w/d*o)
+    p=z*normalize(vec3(C,r.y)-.5*r)
+  , p.xy*=mat2(cos(.4*p.z-vec4(0,11,33,0)))
+  , p.z+=iTime
+  , K=p-round(p)
+  , z+=d=.8*abs(.54-sqrt(length(K*K)))+abs(dot(sin(97.*K),r.zzz)/5e2)+1e-3
+  , o=1.+sin(.4*p.z+3.*p.x+vec4(5,7,9,0))
+  ;
+  o=tanh(O/7e3);
+}

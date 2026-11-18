@@ -1,0 +1,73 @@
+// Code by Flopine
+
+// Thanks to wsmind, leon, XT95, lsdlive, lamogui, 
+// Coyhot, Alkama,YX, NuSan, slerpy, wwrighter 
+// BigWings, FabriceNeyret and Blackle for teaching me
+
+// Thanks LJ for giving me the spark :3
+
+// Thanks to the Cookie Collective, which build a cozy and safe environment for me 
+// and other to sprout :)  
+// https://twitter.com/CookieDemoparty
+
+
+#define PI acos(-1.)
+
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a)) 
+#define crep(p,c,l) p-=c*clamp(round(p/c),-l,l)
+
+#define BPM (125./60.)
+
+float box (vec3 p, vec3 c)
+{
+    vec3 q = abs(p)-c;
+    return min(0., max(q.x,max(q.y,q.z)))+length(max(q,0.));
+}
+
+float g1;
+float SDF (vec3 p)
+{
+    p.x = floor((p.x)*5.)/5.;  
+    p.xz *= rot(iTime*BPM/2.);
+    
+    p.yz *= rot(-atan(1./sqrt(2.)));
+    p.xz *= rot(PI/4.);
+        
+    float d = length(p)-1.5;
+    g1 += 0.01/(0.01+d*d);
+    
+    vec3 id = round(p/0.45);   
+    float per = (0.45+sin(length(id*0.1)-iTime*BPM)*.5+.5);
+    crep(p,per,6.);
+    
+    return min(d,box(p,vec3(0.2)));
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (2.*fragCoord-iResolution.xy)/iResolution.y;
+
+    vec3 ro = vec3(uv*5.,-30.), rd=vec3(0.,0.,1.),
+    p=ro,
+    col=vec3(0.005);
+    
+    bool hit=false;float shad;
+    
+    for (float i=0.; i<64.;i++)
+    {
+        float d = SDF(p);
+        if (d<0.01)
+        {
+            hit=true;shad=i/64.;break;
+        }
+        p += d*rd;
+    }
+    
+    if (hit)
+    {
+        col = vec3(shad*.2);
+    }
+    col += g1*4.;
+    
+    fragColor = vec4(pow(col,vec3(0.6, 0.5, 0.4)),1.0);
+}

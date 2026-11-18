@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Media Feed (Horizontal)</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            
+            /* Center feed on the Y-axis and allow X-axis scrolling */
+            display: flex;
+            align-items: center; 
+            min-height: 100vh;
+            overflow-y: hidden;
+            overflow-x: auto;
+        }
+
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        button {
+            background: #1da1f2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { background: #0c85d0; }
+
+        #feed {
+            display: flex;
+            flex-direction: row; /* Horizontal alignment */
+            align-items: center; /* Vertically centered */
+            gap: 20px; /* Space between media items */
+            padding: 0 50vw 0 20px; /* Extra padding on right so the last item can reach the left edge */
+            height: 100%;
+        }
+
+        .media-container {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            flex-shrink: 0; /* Prevents items from squishing together */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Constrain media to the height/width of the screen */
+        video, img {
+            max-height: 90vh;
+            max-width: 90vw;
+            width: auto;
+            height: auto;
+            display: block;
+            background: #111;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <button id="toggleScrollBtn">Start Auto-Scroll</button>
+        <button id="rescanBtn" style="background-color: #28a745;">Rescan Folders</button>
+        <label for="speedSlider">Speed: <span id="speedValue">0.30</span>x</label>
+        <input type="range" id="speedSlider" min="0.05" max="10" step="0.05" value="0.3">
+    </div>
+
+    <div id="feed"></div>
+
+    <script>
+
+// 1. Observer for infinite scroll
+const endOfFeedObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        // When the watched item enters the screen
+        if (entry.isIntersecting && !isLoadingChunk) {
+            // Instantly unobserve this specific item so it doesn't trigger twice
+            observer.unobserve(entry.target);
+            
+            // Ask server for the next 50 items
+            loadMediaChunk(50); 
+        }
+    });
+}, { 
+    root: null,
+    // Trigger the fetch 1500px BEFORE the last item enters the screen 
+    // so the user never has to stop and wait for it to load
+    rootMargin: '1500px', 
+    threshold: 0 
+});
+
+let isLoadingChunk = false;
+
+async function loadMediaChunk(limit = 50) {
+    if (isLoadingChunk) return;
+    isLoadingChunk = true;
+    
+    try {
+        const response = await fetch(`/api/media?limit=${limit}`);
+        const mediaFiles = await response.json();
+        
+        const feed = document.getElementById('feed');
+        const imageRegex = /\.(jpg|jpeg|png|gif|webp)$/i;
+
+        mediaFiles.forEach((filename, index) => {
+            const container = document.createElement('div');
+            container.className = 'media-container';
+            
+            const isImage = imageRegex.test(filename);
+            const mediaElement = document.createElement(isImage ? 'img' : 'video');
+            
+            mediaElement.dataset.src = encodeURIComponent(filename); 
+            mediaElement.dataset.loaded = "false";
+            
+            if (!isImage) {
+                mediaElement.loop = true;
+                mediaElement.muted = true;
+                mediaElement.controls = true;
+                mediaElement.preload = "none"; 
+            } else {
+                mediaElement.alt = "media";
+            }
+
+            container.appendChild(mediaElement);
+            feed.appendChild(container);
+            
+            // 1. Give the media to the Memory Observer (to flush RAM)
+            mediaObserver.observe(mediaElement);
+
+            // 2. If this is the absolute LAST item in this 50-item batch, 
+            // tell the End-Of-Feed Observer to watch this specific container!
+            if (index === mediaFiles.length - 1) {
+                endOfFeedObserver.observe(container);
+            }
+        });
+
+    } catch (err) {
+        console.error("Failed to load chunk:", err);
+    } finally {
+        isLoadingChunk = false;
+    }
+}
+
+// Initial load (Start with 50 items)
+loadMediaChunk(50);
+
+
+
+// A tiny 1x1 transparent GIF to instantly flush RAM
+const blankPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+const observerOptions = {
+    root: null,
+    rootMargin: '0px', 
+    threshold: 0.1
+};
+
+const mediaObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        const media = entry.target;
+        const isVideo = media.tagName.toLowerCase() === 'video';
+        
+        if (entry.isIntersecting) {
+            
+            // 1. IN VIEW: Only set source if it hasn't been loaded yet
+            if (media.dataset.loaded !== "true") {
+                media.src = media.dataset.src;
+                media.dataset.loaded = "true";
+                
+                // 2. UNLOCK DIMENSIONS ONLY AFTER FULLY LOADED
+                // This completely prevents the layout from collapsing during the network fetch!
+                if (isVideo) {
+                    media.onloadeddata = () => {
+                        media.style.width = '';
+                        media.style.height = '';
+                    };
+                } else {
+                    media.onload = () => {
+                        media.style.width = '';
+                        media.style.height = '';
+                    };
+                }
+            }
+
+            if (isVideo) {
+                media.play().catch(e => console.warn("Autoplay prevented:", e));
+            }
+
+        } else {
+            // 3. OUT OF VIEW: Only flush if it was legitimately loaded before
+            // (This entirely prevents the 10,000 item infinite loop on startup)
+            if (media.dataset.loaded === "true") {
+                
+                if (isVideo) media.pause();
+                
+                // 4. LOCK DIMENSIONS: Keep exact physical footprint before unloading
+                const rect = media.getBoundingClientRect();
+                if (rect.width && rect.height) {
+                    media.style.width = `${rect.width}px`;
+                    media.style.height = `${rect.height}px`;
+                }
+                
+                // 5. VIOLENTLY FLUSH RAM
+                if (isVideo) {
+                    media.removeAttribute('src');
+                    media.load(); 
+                } else {
+                    media.src = blankPixel;
+                }
+                
+                // Mark as unloaded so it will re-fetch when you scroll back to it
+                media.dataset.loaded = "false";
+                
+                // Clear the onload handlers so they don't fire inappropriately
+                media.onload = null;
+                media.onloadeddata = null;
+            }
+        }
+    });
+}, observerOptions);
+
+
+
+
+
+        // RESCAN BUTTON LOGIC
+        const rescanBtn = document.getElementById('rescanBtn');
+        if (rescanBtn) {
+            rescanBtn.addEventListener('click', async () => {
+                rescanBtn.innerText = "Scanning...";
+                rescanBtn.disabled = true;
+                rescanBtn.style.background = "#555";
+
+                try {
+                    const response = await fetch('/api/refresh', {method: 'POST', headers: {'X-LWT-Refresh': '1'}});
+                    const data = await response.json();
+                    console.log(data.status, "Total files:", data.total_files);
+
+                    const feed = document.getElementById('feed');
+                    feed.innerHTML = ""; 
+
+                    await loadMediaChunk(50);
+                } catch (err) {
+                    console.error("Failed to rescan:", err);
+                    alert("Error reaching the server. Is it running?");
+                } finally {
+                    rescanBtn.innerText = "Rescan Folders";
+                    rescanBtn.disabled = false;
+                    rescanBtn.style.background = "#28a745";
+                }
+            });
+        }
+
+
+        // 3. AUTO-SCROLL LOGIC (Adapted for Horizontal/Right-ward scrolling)
+        let isAutoScrolling = false;
+        let scrollSpeed = 0.3; 
+        let animationFrameId;
+        let scrollAccumulator = 0; 
+
+        const toggleBtn = document.getElementById('toggleScrollBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+
+        if(speedValue) speedValue.innerText = scrollSpeed.toFixed(2);
+
+        if(toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                isAutoScrolling = !isAutoScrolling;
+                if (isAutoScrolling) {
+                    toggleBtn.innerText = "Stop Auto-Scroll";
+                    toggleBtn.style.background = "#e0245e"; 
+                    scrollAccumulator = 0; 
+                    autoScroll();
+                } else {
+                    toggleBtn.innerText = "Start Auto-Scroll";
+                    toggleBtn.style.background = "#1da1f2";
+                    cancelAnimationFrame(animationFrameId);
+                }
+            });
+        }
+
+        if(speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                scrollSpeed = parseFloat(e.target.value);
+                speedValue.innerText = scrollSpeed.toFixed(2); 
+            });
+        }
+
+        function autoScroll() {
+            if (!isAutoScrolling) return;
+
+            scrollAccumulator += scrollSpeed;
+
+            if (scrollAccumulator >= 1) {
+                const pixelsToScroll = Math.floor(scrollAccumulator);
+                // Scroll on the X axis, not Y axis
+                window.scrollBy(pixelsToScroll, 0); 
+                scrollAccumulator -= pixelsToScroll; 
+            }
+            
+            // Check width instead of height
+            if (Math.ceil(window.innerWidth + window.scrollX) >= document.documentElement.scrollWidth) {
+                isAutoScrolling = false;
+                toggleBtn.innerText = "Start Auto-Scroll";
+                toggleBtn.style.background = "#1da1f2";
+                return;
+            }
+            
+            animationFrameId = requestAnimationFrame(autoScroll);
+        }
+
+    </script>
+</body>
+</html>

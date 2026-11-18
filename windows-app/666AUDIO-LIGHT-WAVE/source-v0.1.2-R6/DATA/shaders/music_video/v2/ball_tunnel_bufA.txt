@@ -1,0 +1,140 @@
+//Constants
+#define TAU 6.2831853071795865
+
+//Parameters
+#define TUNNEL_LAYERS 35
+#define RING_POINTS 66
+#define POINT_SIZE 15.
+#define POINT_COLOR_A vec3(0.9)
+#define POINT_COLOR_B vec3(0.5)
+#define SPEED 0.45
+
+//Square of x
+float sq(float x)
+{
+	return x*x;   
+}
+
+//Angular repeat
+vec2 AngRep(vec2 uv, float angle)
+{
+    vec2 polar = vec2(atan(uv.y, uv.x), length(uv));
+    polar.x = mod(polar.x + angle / 2.0, angle) - angle / 2.0; 
+
+    return polar.y * vec2(cos(polar.x), sin(polar.x));
+}
+
+//Signed distance to circle
+float sdCircle(vec2 uv, float r)
+{
+    return length(uv) - r;
+}
+
+//Mix a shape defined by a distance field 'sd' with a 'target' color using the 'fill' color.
+vec3 MixShape(float sd, vec3 fill, vec3 target)
+{
+    float blend = smoothstep(0.0,1.0/iResolution.y, sd);
+    return mix(fill, target, blend);
+}
+
+//Tunnel/Camera path
+vec2 TunnelPath(float x)
+{
+    vec2 offs = vec2(0, 0);
+    
+    offs.x = 0.2 * sin(TAU * x * 0.5) + 0.4 * sin(TAU * x * 0.2 + 0.3);
+    offs.y = 0.3 * cos(TAU * x * 0.3) + 0.2 * cos(TAU * x * 0.1);
+    
+    offs *= smoothstep(1.0,4.0, x);
+    
+    return offs;
+}
+
+
+vec3 ColorPalette(in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d ) {
+    return a + b*cos( 6.28318*(c*t+d) );
+}
+
+vec4 sphere(float rad, vec4 col, vec4 orgCol, float AA, float dist) {
+    return mix(orgCol, col, smoothstep(1.-rad, 1.-AA, dist));
+}
+
+vec4 drawBall(vec4 col, float rad, float index, float bright, float dist, bool hl) {
+	vec4 ballCol = vec4(ColorPalette(float(index)*0.13, vec3(0.5, 0.5, 0.5), 
+                           vec3(0.5), 
+                           vec3(0.6, 0.4, 0.3), 
+                           vec3(0.6, 0.4, 0.3)) + 0.12, 1.) ;
+    dist=abs(dist);
+    float sz = dist/rad; 
+     
+    if (!hl) {
+        if (sz > 0.05) col = ballCol * 0.15;
+        col = sphere(1.3, ballCol * 1.55, col, 0.0,sz);
+        col = sphere(0.65, ballCol * 3., col, 0.0, sz);
+    }
+    else
+        col = sphere(0.15, vec4(1.)*2.1, col, 0.12, sz);
+    return col;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 res = iResolution.xy / iResolution.y;
+	vec2 uv = fragCoord.xy / iResolution.y;
+    
+    uv -= res/2.0;
+    
+    vec3 color = vec3(0);
+    
+    float repAngle = TAU / float(RING_POINTS);
+    float pointSize = POINT_SIZE/800.;
+    
+    float camZ = (iTime + 5.) * SPEED;
+    vec2 camOffs = TunnelPath(camZ);
+    
+    for(int i = 1;i <= TUNNEL_LAYERS;i++)
+    {
+        float pz = 1.0 - (float(i) / float(TUNNEL_LAYERS));
+        
+        //Scroll the points towards the screen
+        pz -= mod(camZ, 4.0 / float(TUNNEL_LAYERS));
+        
+        //Layer x/y offset
+        vec2 offs = TunnelPath(camZ + pz) - camOffs;
+        
+        //Radius of the current ring
+        float ringRad = 0.15 * (1.0 / sq(pz * 0.8 + 0.4));
+
+        float psiz = pointSize * (1. - 0.013*float(TUNNEL_LAYERS) + float(i)*0.013);
+
+        //Only draw points when uv is close to the ring.
+        if(abs(length(uv + offs) - ringRad) < psiz+0.01) 
+        {
+            //Angular repeated uv coords
+            vec2 aruv = AngRep(uv + offs, repAngle);
+
+            //Distance to the nearest point
+            float pdist = sdCircle(aruv - vec2(ringRad, 0), psiz);
+
+            //Stripes
+            vec3 ptColor = (mod(float(i / 2), 2.0) == 0.0) ? POINT_COLOR_A : POINT_COLOR_B;
+            
+            //Distance fade
+            float shade = (1.1-pz);
+            shade*=shade*1.2;
+
+            vec4 p4col=vec4(color,1.);
+            
+            // Replaced ternary iMouse check with the default fallback: float(i)/6.
+            p4col = drawBall(p4col, psiz, float(i)/6., 1., pdist, false);
+            
+            pdist = sdCircle(aruv-vec2(0.004,0.004) - vec2(ringRad, 0), psiz);
+            p4col = drawBall(p4col, psiz, 5., 1., pdist, true);
+            p4col *= vec4(ptColor,1.);
+
+            color = MixShape(pdist, p4col.xyz * shade, color);
+        }
+    }
+    
+	fragColor = vec4(color, 1.0);
+}

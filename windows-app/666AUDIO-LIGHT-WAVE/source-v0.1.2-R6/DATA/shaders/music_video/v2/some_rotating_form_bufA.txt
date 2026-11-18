@@ -1,0 +1,456 @@
+// helpers
+const float tau  = atan(1.)*8.;
+const float pi   = tau/2.;
+const float tauq = tau/4.;
+
+#define rot(a) mat2(cos((a)*tau + vec4(0.0, tauq, 3.0*tauq, 0.0)))
+
+// palette:
+// 0 neon, 1 pastel, 2 fire, 3 gold, 4 toy, 5 ice,
+// 6 legacyA (balanced), 7 legacyB_strong, 8 ssToyPlastic
+vec3 paletteSelect(float t, int pal) {
+    if(pal == 6) { // pastel v2.0
+        vec3 a = vec3(0.55, 0.52, 0.56);
+        vec3 b = vec3(0.35, 0.28, 0.33);
+        vec3 c = vec3(1.00);
+        vec3 d = vec3(0.00, 0.20, 0.55);
+        return a + b*cos(tau*(c*t + d));
+    }
+    if(pal == 7) { // LEGACY B STRONG
+        vec3 a = vec3(0.55, 0.45, 0.35);
+        vec3 b = vec3(0.65, 0.55, 0.45);
+        vec3 c = vec3(1.0);
+        vec3 d = vec3(0.00, 0.10, 0.20);
+        return a + b*cos(tau*(c*t + d));
+    }
+    if(pal == 8) { // SUBSURFACE TOY PLASTIC
+        vec3 a = vec3(0.78, 0.72, 0.62);
+        vec3 b = vec3(0.22, 0.28, 0.30);
+        vec3 c = vec3(1.00);
+        vec3 d = vec3(0.05, 0.22, 0.47);
+        vec3 p = a + b*cos(tau*(c*t + d));
+        p = mix(p, vec3(dot(p, vec3(0.333))), 0.10);
+        return clamp(p, 0.0, 1.2);
+    }
+
+    // IQ-like set 0..5
+    if(pal == 0) { // neon
+        vec3 a = vec3(0.50);
+        vec3 b = vec3(0.50);
+        vec3 c = vec3(1.0);
+        vec3 d = vec3(0.00, 0.33, 0.67);
+        return ( a + b*cos(tau*(c*t + d)) )/1.67;
+    }
+    if(pal == 1) { // pastel
+        vec3 a = vec3(0.55, 0.55, 0.60);
+        vec3 b = vec3(0.35, 0.30, 0.25);
+        vec3 c = vec3(1.0);
+        vec3 d = vec3(0.00, 0.15, 0.25);
+        return ( a + 1.3*b*cos(tau*(c*t + d)) );
+    }
+    if(pal == 2) { // fire
+        vec3 a = vec3(0.50, 0.20, 0.05);
+        vec3 b = vec3(0.50, 0.35, 0.10);
+        vec3 c = vec3(1.0);
+        vec3 d = vec3(0.00, 0.10, 0.20);
+        return a + b*cos(tau*(c*t + d));
+    }
+    if(pal == 3) { // gold
+        vec3 a = vec3(0.45, 0.35, 0.10);
+        vec3 b = vec3(0.55, 0.45, 0.20);
+        vec3 c = vec3(1.0);
+        vec3 d = vec3(0.00, 0.08, 0.18);
+        return a + b*cos(tau*(c*t + d));
+    }
+    if(pal == 4) { // toy
+        vec3 a = vec3(0.50);
+        vec3 b = vec3(0.50);
+        vec3 c = vec3(2.0, 1.0, 0.5);
+        vec3 d = vec3(0.00, 0.25, 0.50);
+        return a + b*cos(tau*(c*t + d));
+    }
+
+    // ice (default)
+    vec3 a = vec3(0.15, 0.35, 0.75);
+    vec3 b = vec3(0.35, 0.35, 0.25);
+    vec3 c = vec3(0.25);
+    vec3 d = vec3(0.00, 0.12, 0.18);
+    return a + b*cos(tau*(c*t + d)+.05);
+}
+
+// ---------------------- noise helpers ----------------------
+float hash13(vec3 p) {
+    p = fract(p*0.1031);
+    p += dot(p, p.yzx + 33.33);
+    return fract((p.x+p.y)*p.z);
+}
+
+float noise3(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    f = f*f*(3.0-2.0*f);
+
+    float n000 = hash13(i+vec3(0,0,0));
+    float n100 = hash13(i+vec3(1,0,0));
+    float n010 = hash13(i+vec3(0,1,0));
+    float n110 = hash13(i+vec3(1,1,0));
+    float n001 = hash13(i+vec3(0,0,1));
+    float n101 = hash13(i+vec3(1,0,1));
+    float n011 = hash13(i+vec3(0,1,1));
+    float n111 = hash13(i+vec3(1,1,1));
+
+    float nx00 = mix(n000,n100,f.x);
+    float nx10 = mix(n010,n110,f.x);
+    float nx01 = mix(n001,n101,f.x);
+    float nx11 = mix(n011,n111,f.x);
+
+    float nxy0 = mix(nx00,nx10,f.y);
+    float nxy1 = mix(nx01,nx11,f.y);
+
+    return mix(nxy0,nxy1,f.z);
+}
+
+float hash12(vec2 p)
+{
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+// tonemaps
+
+#define tonemap(x) ((x*1.05)/((x)+vec3(1.)))
+
+vec3 tonemap2(vec3 o)
+{
+	float w = 1.;
+	float l = dot(o.rgb, vec3(0.2126, 0.7152, 0.0722));
+	float L = l * (1. + l / (w*w)) / (1. + l);
+	o.rgb *= L / l;
+	return tanh( o*.75 )*.9; // twist
+}
+
+
+/// options 
+#define zoOM  (5./8.)
+#define Speed (4./8.)
+#define PALETTE 1
+             // 0 neon, 1 pastel, 2 fire, 3 gold, 4 toy, 5 ice,
+             // 6 legacyA, 7 legacyB, 8 ssToyPlastic
+
+const bool  RAYS = true;   // fake "rays" 
+const bool  RAYSsmoootha = true;
+
+const float GLOW_BASE   = 0.00009;
+const float GLOW_COLORK = 0.35;   // 0 = pure blue glow, 1 = strong palette modulation
+const float SURF_TINT   = 0.75;
+
+const float SIZE    = 1.0;
+const float EDGE    = 0.22;
+
+// H is half-height for extrusion. 
+const float H       = 0.0;
+const float ROUND_R = 0.05;
+
+#define ENABLE_GLITTER 1
+const float INC_THICK    = 0.05;
+const float GLITTER_FREQ  = 220.;
+const float GLITTER_RARE  = 0.7;
+const float GLITTER_INT   = 0.75;
+
+const float refractionIndex = 1.024;
+const float IOR_AIR = 1.00033;
+
+/// helpers 
+#define T (iTime*Speed/6.)
+#define col C.rgb
+#define res iResolution.xy
+#define N(p) ((1./zoOM)*((p)-res*0.5)/min(res.y,res.x))
+
+#define RayMarchSteps 112
+const float HIT_EPS  = 1e-5;
+const float HIT_STEP = 0.25;
+const float HIT_PUSH = 0.09;
+const float MARCH_K  = 0.7;
+
+
+float glitterField(vec3 pb, vec3 rd) 
+{
+    float n = noise3(pb * ( GLITTER_FREQ*iResolution.y/550. ) + 2.3);
+    float b = smoothstep( GLITTER_RARE, 1.0, n);
+    float rim = pow(clamp(1.0 - abs(dot(normalize(pb), normalize(rd))), 0.0, 1.0), 3.0);
+    return b * (0.25 + 0.75*rim);
+}
+
+// algebraic constants for the dodecahedron/icosahedron symmetry ( exact )
+const float SQ5 = sqrt(5.0);
+const float A   = sqrt((5.0 + SQ5)/10.0);
+const float B   = sqrt((5.0 - SQ5)/10.0);
+const float c36 = cos(pi/5.0),  s36 = sin(pi/5.0);
+const float c72 = cos(tau/5.0), s72 = sin(tau/5.0);
+const float a2 = 0.5*A, b2 = 0.5*B;
+
+const mat3 STAR_M[6] = mat3[6](
+    mat3(vec3(0,-A, B), vec3( 1,0,0), vec3(0, B, A)),
+    mat3(vec3(0, A, B), vec3(-1,0,0), vec3(0,-B, A)),
+    mat3(vec3(-a2, s36, A*c36), vec3(-c72,-c36, .5), vec3( A,0, B)),
+    mat3(vec3( a2, s36, A*c36), vec3(-c72, c36,-.5), vec3(-A,0, B)),
+    mat3(vec3(-0.5*B, B*c72, s72), vec3( c36,-.5, c72), vec3( B, A,0)),
+    mat3(vec3( 0.5*B, B*c72, s72), vec3( c36, .5,-c72), vec3(-B, A,0))
+);
+
+// pretranspose once (compile-time), so inner loop does mat3*vec3 only
+const mat3 STAR_T[6] = mat3[6](
+    mat3(STAR_M[0][0].x, STAR_M[0][1].x, STAR_M[0][2].x,
+         STAR_M[0][0].y, STAR_M[0][1].y, STAR_M[0][2].y,
+         STAR_M[0][0].z, STAR_M[0][1].z, STAR_M[0][2].z),
+
+    mat3(STAR_M[1][0].x, STAR_M[1][1].x, STAR_M[1][2].x,
+         STAR_M[1][0].y, STAR_M[1][1].y, STAR_M[1][2].y,
+         STAR_M[1][0].z, STAR_M[1][1].z, STAR_M[1][2].z),
+
+    mat3(STAR_M[2][0].x, STAR_M[2][1].x, STAR_M[2][2].x,
+         STAR_M[2][0].y, STAR_M[2][1].y, STAR_M[2][2].y,
+         STAR_M[2][0].z, STAR_M[2][1].z, STAR_M[2][2].z),
+
+    mat3(STAR_M[3][0].x, STAR_M[3][1].x, STAR_M[3][2].x,
+         STAR_M[3][0].y, STAR_M[3][1].y, STAR_M[3][2].y,
+         STAR_M[3][0].z, STAR_M[3][1].z, STAR_M[3][2].z),
+
+    mat3(STAR_M[4][0].x, STAR_M[4][1].x, STAR_M[4][2].x,
+         STAR_M[4][0].y, STAR_M[4][1].y, STAR_M[4][2].y,
+         STAR_M[4][0].z, STAR_M[4][1].z, STAR_M[4][2].z),
+
+    mat3(STAR_M[5][0].x, STAR_M[5][1].x, STAR_M[5][2].x,
+         STAR_M[5][0].y, STAR_M[5][1].y, STAR_M[5][2].y,
+         STAR_M[5][0].z, STAR_M[5][1].z, STAR_M[5][2].z)
+);
+
+float sdPentagram(vec2 p, float r) // inside is like outside in this 2d sdf version, so its actually an unsigned distance field.
+{
+    const vec2 v1 = vec2( c36, -s36 );
+    const vec2 v2 = vec2(-c36, -s36 );
+    const vec2 v3 = vec2( c72, -s72 );
+
+    p.x = abs(p.x);
+    p -= 2.*max(dot(v1,p),0.0)*v1;
+    p -= 2.*max(dot(v2,p),0.0)*v2;
+    p.x = abs(p.x);
+    p.y -= r;
+
+    return length(p - v3*clamp(dot(p,v3), 0.0, r));
+}
+
+float sdPentagramEdge(vec2 p, float size, float edge) // we actually don't need this
+{                                                     // since we are already using
+    float o = sdPentagram(p, size);                   // the "cut out" version of 
+                                                      // sdPentagram 2d sdf function
+    //float u = sdPentagram(p, size - edge);          // where inner distance is
+    //return max(o, -u);                              // turned to outer distance
+    return o;
+}
+
+float opExtrudeRound(float d2, float z, float h, float r) 
+{
+    vec2 w = vec2(d2, abs(z)-h);
+    return length(max(w,0.0)) - r;
+}
+
+vec3 toBase(vec3 p, mat2 R) 
+{
+    vec3 b = p;
+    b.xy = R*b.xy;
+    b.yz = R*b.yz;
+    return b;
+}
+
+// map that assumes p is already in "base space" (after toBase)
+vec2 mapBase(vec3 base) 
+{
+    float dMin = 1e6;
+    float iMin = 0.0;
+
+    for(int i=0;i<6;i++) 
+    {
+        vec3 q = STAR_T[i] * base;  // world->local via pretranspose basis
+        float d2 = sdPentagramEdge(q.xy, SIZE, EDGE);
+        float d  = opExtrudeRound(d2, q.z, H, ROUND_R);
+
+        if(d < dMin) { dMin = d; iMin = float(i); }
+    }
+    return vec2(dMin, iMin);
+}
+
+// convenience: full map for world p, given precomputed base-rotation R
+vec2 map(vec3 p, mat2 R) 
+{
+    vec3 base = toBase(p, R);
+    return mapBase(base);
+}
+
+float mapDist(vec3 p, mat2 R) { return map(p, R).x; }
+
+// 4-tap tetra normal ( maybe slightly faster than 6-tap central )
+vec3 normal(vec3 p, mat2 R) 
+{
+    const float e = 0.00085;
+    const vec3 k1 = vec3( 1.0, -1.0, -1.0);
+    const vec3 k2 = vec3(-1.0, -1.0,  1.0);
+    const vec3 k3 = vec3(-1.0,  1.0, -1.0);
+    const vec3 k4 = vec3( 1.0,  1.0,  1.0);
+
+    float d1 = mapDist(p + e*k1, R);
+    float d2 = mapDist(p + e*k2, R);
+    float d3 = mapDist(p + e*k3, R);
+    float d4 = mapDist(p + e*k4, R);
+
+    vec3 n = k1*d1 + k2*d2 + k3*d3 + k4*d4;
+    return normalize(n);
+}
+
+vec3 getLightDir()
+{
+    return normalize(vec3(0.45, 0.85, 0.30));
+}
+
+float fresnelSchlick(float cosTheta, float F0)
+{
+    float m = clamp(1.0 - cosTheta, 0.0, 1.0);
+    float m2 = m*m;
+    return 4.*F0 + (1.0 - F0) * (m2*m2*m);
+}
+
+
+
+vec3 shadeFast(vec3 surfCol, vec3 Nn, vec3 rd, float insideMask)
+{
+    vec3 L = getLightDir();
+    vec3 V = normalize(-rd);
+    vec3 Hh = normalize(L + V);
+
+    float NoL = max(dot(Nn, L), 0.0);
+    float NoH = max(dot(Nn, Hh), 0.0);
+    float NoV = max(dot(Nn, V), 0.0);
+
+    float diff = mix(NoL*6.65 + 0.35, NoL, 1.0 - insideMask);
+
+    float rough = .16;
+    float shin  = mix(260.0, 55.0, rough)/1.25;
+    float spec  = pow(NoH, shin) * (0.25 + 0.75*NoL);
+
+    float F0 = 100.;
+    float F  = fresnelSchlick(NoV, F0);
+
+    float specGain = mix(.55, 1.0, 1.0 - insideMask);
+
+    vec3 specCol = vec3(1.0);
+
+
+    vec3 colL = surfCol * (0.12 + 1.10*diff) + specCol * (spec * (0.35 + 1.65*F) * specGain);
+    return colL*1.5;
+}
+
+void mainImage(out vec4 C, in vec2 POS) 
+{
+    col = vec3(0.0);
+
+    vec2 uv = N(POS);
+    vec3 ro = vec3(0.0, 0.0, -2.0);
+    vec3 rd = vec3(uv, 1.2);
+
+    // PRECOMPUTE base rotation once
+    mat2 R = rot(T);
+
+    float t = 0.0;
+    bool inside = false;
+    float curIOR = IOR_AIR;
+
+    // mouse-click
+    int mInc = 0;
+    //if ( iMouse.z > 0. ) mInc = 5;
+
+    for(int i=0;i<RayMarchSteps;i++) 
+    {
+        if(t > 2.67) break;
+
+        vec3 p = ro + rd*t;
+
+        // compute base-space once per step, reuse for map + glitter
+        vec3 baseP = toBase(p, R);
+        vec2 dm = mapBase(baseP);
+
+        float d   = dm.x;
+        float idx = dm.y;
+
+        vec3 surfCol = paletteSelect((idx + 0.5)/6.0, PALETTE + mInc );
+
+        float ad = abs(d);
+        float glow = smoothstep(0.00015, 0.05, ad);
+        float dd = max(ad, 0.005);
+
+        vec3 blueGlow = vec3(0.0135, 0.388, 0.79)/2.;
+        vec3 glowCol  = mix(blueGlow, blueGlow * (0.35 + 0.85*surfCol), GLOW_COLORK);
+        col += GLOW_BASE/(dd*dd) * surfCol*glowCol * glow;
+
+        if ( inside ) { col += surfCol/50.0; }
+
+        if (!inside && RAYS ) 
+        {
+            float dither = hash12(POS.xy);          // 0..1
+            dither = (dither - 0.5) / 128.0;
+            col += ( surfCol / 42.0 * pow(length(p), .4) + dither )/1.67;
+
+            // kinda expensive per-step ( apply only sometimes )
+            if ( RAYSsmoootha == true ) 
+            {
+                if( (i & 3) == 0 ) { col = ( col + tonemap2( col ) )/1.75; }
+            }
+        }
+
+#if ENABLE_GLITTER
+        float matMask = smoothstep(INC_THICK, 0.0, ad);
+        if(matMask > 0.001) 
+        {
+            float bub = glitterField(baseP, rd);
+            col += GLITTER_INT * bub * matMask * (0.35 + 0.85*surfCol);
+        }
+#endif
+
+        if(ad < HIT_EPS) 
+        {
+            vec3 Nn = normal(p, R);
+            if(dot(rd,Nn) > 0.0) Nn = -Nn;
+
+            // --- NEW: lambert + spec glanz at hit ---
+            float insideMask = inside ? 1.0 : 0.0;
+            vec3 lit = shadeFast(surfCol, Nn, rd, insideMask);
+
+            col += lit * SURF_TINT;
+
+            bool entering = !inside;
+            float etaI = curIOR;
+            float etaT = entering ? refractionIndex : IOR_AIR;
+
+            vec3 refr = refract(rd, Nn, etaI/etaT);
+
+            if(length(refr) < 1e-6) 
+            {
+                rd = reflect(rd, Nn);
+            } 
+            else 
+            {
+                rd = refr;
+                inside = entering;
+                curIOR = inside ? refractionIndex : IOR_AIR;
+            }
+
+            t += HIT_STEP + HIT_PUSH;
+            continue; 
+        }
+
+        t += ad * MARCH_K;
+    }
+
+    col = tonemap(col);
+    C.a = 1.0;
+} /// aladiN

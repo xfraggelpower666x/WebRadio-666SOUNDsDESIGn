@@ -1,0 +1,57 @@
+#define V3 vec3
+#define V2 vec2
+#define S smoothstep
+#define C(x) clamp(x,0.,1.)
+#define FS(x) fract(sin(x)*43758.5453)
+#define H(n) FS((n)*12.9898)
+#define T(h) (.62+.38*cos(6.283*((h)+V3(0,.33,.67))))
+#define A(v) (atan((v).y,(v).x)*1.9099)
+#define PL p=o+D*r;l=p.xy-X(p.z);s=A(l)
+#define GL(x,K) min(1./(.02+(b+(x))*(K)),8.)*a
+#define N normalize
+
+float W(V2 p){return FS(dot(p,V2(12.9898,78.233)));}
+float Y(V2 p){V2 i=floor(p),f=fract(p);f*=f*(3.-2.*f);
+return mix(mix(W(i),W(i+V2(1,0)),f.x),mix(W(i+V2(0,1)),W(i+1.),f.x),f.y);}
+float B(V2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*Y(p);p*=mat2(1.68,1.15,-1.15,1.68);a*=.5;}return v;}
+V2 X(float z){float u=z*.18;
+return V2(Y(V2(u,3.7)),Y(V2(u,9.2)))*V2(2.4,2.)-V2(1.2,1.)+V2(.3*sin(z*.45+1.),.25*cos(z*.37));}
+
+void mainImage(out vec4 O,in V2 F){
+   float t=iTime,z=t*4.,r=.05+.1*W(F+fract(t*7.)*V2(13,7)),f,s,j,a,g=t*.1;
+   V2 c=(2.*F-iResolution.xy)/iResolution.y,l;
+   V3 o=V3(X(z),z),
+      w=N(V3(X(z+.8)+X(z+1.6)+X(z+2.4)-3.*X(z),4.8)),
+      x=N(cross(V3(0,1,0),w)),y=cross(w,x),G=V3(0),p;
+   c=mat2(cos(g),sin(g),-sin(g),cos(g))*c;
+   V3 D=N(c.x*x+c.y*y+1.3*w);
+   bool h=false;
+   for(int i=0;i<120;i++){
+    PL;
+    f=1.-max(abs(l.x)*.866+abs(l.y)*.5,abs(l.y));
+    j=max(f*.5,.05);a=exp(-r*.09)*S(0.,.8,r)*j;
+    float n=floor(s+.5),b=max(f,0.);b*=b;
+    for(int k=-1;k<2;k++){
+     float c=n+float(k),d=abs(s-c),v=C(1.-d/1.5);
+     G+=T(H(mod(c,12.)*4.7+3.9))*GL(d*d*.274,30.)*v*v;}
+    for(int k=0;k<2;k++){
+     float m=floor(p.z)+float(k),d=p.z-m,v=C(1.-abs(d));
+     G+=T(H(m*5.3+2.7))*GL(d*d,300.)*v*v*.7;}
+    if(f<.001){h=true;break;}
+    r+=min(j,.1+.02*r);
+    if(r>24.)break;}
+   h=h||r<23.5;PL;
+   float m=floor(s+.5),n=mod(m,12.),b=H(n*3.1+13.7),
+         q=(s-m)/(.05+.05*H(n*2.3+7.1)),
+         u=C(.66+.08*(b-.5)+.16*sqrt(max(1.-q*q,0.))-.12*q*q
+            -.38*(B(V2(q*2.,(p.z*1.1-t*(.8+.8*b)+H(n*1.7+.3)*31.)*2.5))-.5))
+           *(1.-S(.9,1.15,abs(q))),
+         i=floor(p.z+.5),d=p.z-i;
+   V3 P=T(H(n*4.7+3.9)),
+      e=mix(mix(P*.15,P,C(u/.6)),V3(1.05,1.,.95),C((u-.85)/.15))*(.02+3.*u*u*u)
+        +T(H(i*5.3+2.7))*exp(-d*d*2500.)*S(.4,2.,r)*2.9,
+      E=e*exp(-r*.07)*float(h)*(.25+.75*S(0.,.35,abs(dot(D.xy,l))/(length(l)+1e-6)))+G*.07;
+   E=clamp(E*(2.51*E+.03)/(E*(2.43*E+.59)+.14),0.,1.);
+   c=F/iResolution.xy;
+   O=vec4(pow(E*(.3+.7*pow(16.*c.x*c.y*(1.-c.x)*(1.-c.y),.18)),V3(.4545)),1);
+  }

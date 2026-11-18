@@ -1,0 +1,30 @@
+/*
+    "Chromatic Aberration" by @XorDev
+    
+    Here's a super simple "Chromatic Aberration" effect that you can easily
+    add as a post-process effect to other shaders.
+    
+    Used here: https://www.shadertoy.com/view/mdfGRs
+*/
+void mainImage(out vec4 fragColor, vec2 fragCoord)
+{
+    //Compute uv coordinates from fragcoordinates
+    vec2 u = fragCoord/iResolution.xy;
+    //Color output starts at 0.
+    vec4 c = vec4(0);
+	
+    //Iterate 20 times from 0 to 1
+	for(float i = 0.; i<1.; i+=.05)
+        //Add a texture sample approaching the center (0.5, 0.5)
+        //This center could moved to change how the direction of aberation
+        //The mix amount determines the intensity of the aberration smearing
+
+	c += texture(iChannel0, mix(u, vec2(.5), i*.2*cos(iTime*3.0))).rgba*
+        
+        //This makes each sample have a different color from red to green to blue
+        //The total should be multiplied by the 2/number of samples, (e.g. 0.1)
+        vec4(i,1.-abs(i+i-1.),1.-i,1)*.1;
+	
+    //Output the resulting color
+    fragColor = c;
+}

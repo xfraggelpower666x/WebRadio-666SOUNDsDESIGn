@@ -1,0 +1,130 @@
+// Disco Fever
+// By Noztol
+
+#define PI 3.1415926535
+
+float time;
+
+// Disco Color Scheme
+float hash1( float n ) { return fract(sin(n)*437518.56453)+0.1; }
+
+vec3 hsb2rgb( in vec3 c ){
+    vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0,0.0,1.0 );
+    rgb = rgb*rgb*(3.0-2.0*rgb);
+    return c.z * mix(vec3(1.0), rgb, c.y);
+}
+
+float fbm (in vec2 st) {
+    float value = (sin(time*5.*hash1(st.x+hash1(st.y)))+4.0)*0.25;
+    return max(0.75,pow(value,3.));
+}
+
+// Map the HSB logic to tile IDs
+vec3 squaresColors(vec2 p)
+{
+    float i = p.x;
+    float j = p.y;
+    return hsb2rgb(vec3((hash1(j+hash1(i))), 0.7, fbm(vec2(i,j))));
+}
+
+vec3 squaresTex(vec2 p, float border)
+{
+    vec2 ip = floor(p);
+    vec2 fp = fract(p);
+    
+    // this is why even when twisted tiles are
+    // color independent.
+    ip.x = mod(ip.x, 16.0);
+    
+    vec3 tileColor = squaresColors(ip);
+    
+    float glow = 1.0 - length(fp - 0.5) * 1.2;
+    glow = clamp(glow, 0.4, 1.0);
+    tileColor *= glow;
+    
+    float edgeDist = max(abs(fp.x - 0.5), abs(fp.y - 0.5));
+    
+    // Create grid lines
+    float sm = 0.03;
+    float borderMask = smoothstep(border - sm, border, edgeDist);
+    
+    vec3 col = mix(tileColor, vec3(0.01), borderMask);
+    
+    return col;
+}
+
+vec2 path(float z) 
+{
+    return vec2(sin(z * 0.15) * 2.5, cos(z * 0.1) * 2.0);
+}
+
+// Distance field for tunnel
+float map(vec3 p) 
+{
+    return 2.5 - length(p.xy - path(p.z)); 
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    time = iTime + 1.0;
+    vec2 uv = (fragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
+    
+    float camSpeed = 4.0;
+    float camZ = time * camSpeed;
+    
+    vec3 ro = vec3(path(camZ), camZ);
+    vec3 ta = vec3(path(camZ + 3.0), camZ + 3.0); 
+    
+    // Build camera orthonormal basis
+    vec3 fwd = normalize(ta - ro);
+    vec3 right = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)));
+    vec3 up = cross(right, fwd);
+    
+    // Keep the camera roll
+    float roll = sin(time * 0.6) * 0.2;
+    mat2 rot = mat2(cos(roll), -sin(roll), sin(roll), cos(roll));
+    uv *= rot;
+    
+    vec3 rd = normalize(uv.x * right + uv.y * up + 1.2 * fwd); 
+    
+    float t = 0.0;
+    for(int i = 0; i < 80; i++) 
+    {
+        vec3 p = ro + rd * t;
+        float d = map(p);
+        
+        if(d < 0.01 || t > 100.0) break;
+        t += d * 0.7; 
+    }
+    
+    vec3 col = vec3(0.0);
+    
+    if(t < 100.0) 
+    {
+        vec3 p = ro + rd * t;
+        vec2 tunObj = p.xy - path(p.z);
+        
+        float a = atan(tunObj.y, tunObj.x);
+        
+        a += p.z * 0.15; 
+        
+        // Ensure tiles wrap seamlessly 
+        float tilesAround = 16.0; 
+        float xuv = (a / PI) * (tilesAround * 0.5); 
+        float yuv = p.z * (tilesAround / (2.5 * 2.0 * PI)); 
+        
+        vec2 tUv = vec2(xuv, yuv);
+        
+        // 0.46 controls the boundary size of the squares
+        col = squaresTex(tUv, 0.46);
+        
+        // Fog to fade out the distance gracefully
+        float fog = exp(-0.005 * t * t);
+        col *= fog;
+    }
+    
+    vec2 q = fragCoord.xy / iResolution.xy;
+    col *= 0.5 + 0.5 * pow(16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.1);
+    
+    fragColor = vec4(col, 1.0);
+}

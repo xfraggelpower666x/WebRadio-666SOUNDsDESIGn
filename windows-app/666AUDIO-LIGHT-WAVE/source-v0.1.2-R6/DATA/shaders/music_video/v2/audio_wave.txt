@@ -1,0 +1,98 @@
+// --- REUSABLE WAVE FUNCTION ---
+// fragCoord : Current pixel coordinates
+// amplitude : Height of the wave
+// yCenter   : The Y axis offset in pixels
+// baseColor : The RGB color of the wave
+// freq      : How tight the sine wave is (0.02 from your original code)
+// phaseShift: Used with time to make the waves scroll horizontally
+
+vec3 drawAudioWave(vec2 fragCoord, float amplitude, float yCenter, vec3 baseColor, float freq, float phaseShift) {
+        
+    // Graceful fallback from your Pygame code: 
+    // If amplitude is tiny, transition smoothly to a white line instead of snapping harshly.
+    vec3 waveColor = mix(vec3(1.0, 1.0, 1.0), baseColor, smoothstep(0.0, 2.0, amplitude));
+
+    // Calculate the mathematical Y position of the sine wave for this X pixel
+    float waveY = yCenter + amplitude * sin(fragCoord.x * freq + phaseShift);
+    
+    // Vertical distance from the current pixel to the wave
+    float dist = abs(fragCoord.y - waveY);
+    
+    // --- COOL FACTOR: THE GLOW ---
+    // Core thickness creates a bright center, exponential falloff creates a soft neon glow
+    float coreThickness = 0.0;
+
+    if (amplitude < 2.0) {
+        coreThickness = 0.1;
+    }
+    else {
+        coreThickness = 0.5;
+    }
+
+    float glowSpread = 3.0;
+    float intensity = (coreThickness / (dist + 1e-4)) + exp(-dist / glowSpread);
+    
+    // --- COOL FACTOR: SMOOTH EDGES ---
+    // Instead of hard cuts at 450 and (Width - 400), we fade the line in and out beautifully
+    float minX = 450.0;
+    float maxX = iResolution.x - 400.0; 
+    float mask = smoothstep(minX - 50.0, minX, fragCoord.x) * 
+                 (1.0 - smoothstep(maxX, maxX + 50.0, fragCoord.x));
+                 
+    return waveColor * intensity * mask;
+}
+
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.y = 1.0 - uv.y;
+
+
+    // Current pixel coordinate (0,0 is bottom-left)
+    //vec2 fragCoord = gl_FragCoord.xy;
+    
+    // Define your colors (Normalized from 0-255 to 0.0-1.0)
+    vec3 MAGENTA = vec3(250.0, 34.0, 197.0) / 255.0;
+    vec3 GREEN   = vec3(8.0, 240.0, 124.0) / 255.0;
+    vec3 CYAN    = vec3(8.0, 224.0, 240.0) / 255.0;
+    vec3 GOLD    = vec3(240.0, 224.0, 8.0) / 255.0;
+    vec3 PURPLE  = vec3(187.0, 34.0, 250.0) / 255.0;
+    vec3 WHITE   = vec3(1.0, 1.0, 1.0);
+    
+    // Calculate accurate Y offsets accounting for OpenGL's bottom-up coordinate system
+    float yTop    = iResolution.y - 60.0;   // 60 pixels from the top
+    float yBottom = iResolution.y - 1000.0; // 1410 pixels from the top (30 from bottom on 1440p)
+    //float yBottom = iResolution.y - 1410.0; // 1410 pixels from the top (30 from bottom on 1440p)
+
+    vec3 finalColor = vec3(0.0);
+    float freq = 0.02; // From your python code
+    
+    // --- COOL FACTOR: TIME SCROLLING ---
+    // Multiplying time creates an offset so the waves visibly "flow" across the screen
+    float speed = iTime * 5.0;
+
+    // Additive blending: Adding the colors together means where they overlap, they blend brightly to white
+    finalColor += drawAudioWave(fragCoord, u_amp_top.x, yTop, MAGENTA, freq, speed * 1.5);
+    finalColor += drawAudioWave(fragCoord, u_amp_top.y, yTop, GREEN,   freq, speed * 1.2);
+    finalColor += drawAudioWave(fragCoord, u_amp_top.z, yTop, CYAN,    freq, speed * 1.0);
+    
+    // --- BOTTOM WAVES ---
+    // Use negative speed to make bottom waves flow in the opposite direction for contrast!
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.x, yBottom, GOLD,   freq, speed * -1.0);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.y, yBottom, PURPLE, freq, speed * -1.2);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.z, yBottom, WHITE,  freq, speed * -1.5);
+
+    // Optional: Tone-mapping to prevent the glowing hot spots from burning out entirely
+    finalColor = finalColor / (1.0 + finalColor * 0.2); 
+
+    fragColor = vec4(finalColor, 1.0);
+}

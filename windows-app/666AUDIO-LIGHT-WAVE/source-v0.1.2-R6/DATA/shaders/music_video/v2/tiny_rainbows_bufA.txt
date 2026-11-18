@@ -1,0 +1,5 @@
+void mainImage(out vec4 O, vec2 I){
+I/=90.;O=.1/abs(sin(length(I+clamp(tan(I.yx+iTime),-5.,5.))+vec4(0,.2,.4,0)));
+}
+
+// -1 by moonlightoctopus and -3 by diatribes

@@ -1,0 +1,225 @@
+// iChannel1: organic3
+
+// Created by Stephane Cuillerdier - @Aiekick/2019
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+
+// mouse x for cam rotation
+// mouse y for change count slices
+    
+#define ANGLE_CUTTER
+//#define RADIUS_CUTTER
+
+// a bit noisy
+//#define HEIGHT_CUTTER
+
+float countSlices;
+
+float fullAtan(vec2 p)
+{
+    return step(0.0,-p.x)*3.14159 + sign(p.x) * atan(p.x, sign(p.x) * p.y);
+}
+
+float julia(vec2 p, vec2 v)
+{
+	vec2 z = p;
+    vec2 c = v;
+	float k = 1., h = 1.0;    
+    for (int i=0;i<5;i++)
+    {
+        h *= 4.*k;
+		k = dot(z,z);
+        if(k > 4.) break;
+		z = vec2(z.x * z.x - z.y * z.y, 2. * z.x * z.y) + c;
+    }
+	return sqrt(k/h)*log(k);
+}
+
+float fractusSliced(vec3 p, float a, float n, float oa)
+{
+#ifdef HEIGHT_CUTTER
+    p.y += oa/n;
+	float cutterHeight = abs(abs(fract(p.y*n)-0.5) - 0.225)-0.225;
+	p.y = floor(p.y*n)/n;	
+#endif
+#ifdef ANGLE_CUTTER
+    a += oa/n;
+	float cutterAngle = abs(abs(fract(a*n)-0.5) - 0.225)-0.225;
+	a = floor(a*n)/n;	
+#endif
+    vec2 c = vec2(mix(0.2, -0.5, sin(a * 2.)), mix(0.5, 0.0, sin(a * 3.)));   
+    float path = length(p.xz) - 3.;
+#ifdef RADIUS_CUTTER
+    path += oa/n;
+	float cutterRadius = abs(abs(fract(path*n)-0.5) - 0.225)-0.225;
+	path = floor(path*n)/n;	
+#endif
+    vec2 rev = vec2(path, p.y);
+    float aa = a + iTime;
+    rev *= mat2(cos(aa),-sin(aa),sin(aa),cos(aa)); // rot near axis y
+    float d = julia(rev, c);
+#ifdef HEIGHT_CUTTER
+    d = max(cutterHeight,d);
+#endif
+#ifdef ANGLE_CUTTER
+    d = max(cutterAngle,d);
+#endif
+#ifdef RADIUS_CUTTER
+    d = max(cutterRadius,d);
+#endif
+	return d;
+}
+
+float dfFractus(vec3 p)
+{
+	float a = fullAtan(p.xz);
+	return min(
+        fractusSliced(p,a,countSlices,0.), 
+        fractusSliced(p,a,countSlices,0.5));
+}
+
+float map(vec3 p)
+{
+	return min(
+        p.y + 2.5 - sin(dot(p.xz,p.xz)*0.25 - iTime)*0.5, 
+        dfFractus(p));
+}
+
+float march( in vec3 ro, in vec3 rd )
+{
+	float s = 1.;
+    float d = 0.;
+	for( int i=min(iFrame,0); i<200; i++ )
+    {
+        if( 
+			//d*d/s>1e6||
+			abs(s)<0.0025*(d*.125 + 1.)|| // shane formula
+			d>100. ) break;
+	    s = map( ro+rd*d );
+        d += s * 0.1;
+    }
+    return d;
+}
+
+vec3 getNor( vec3 p, float k )
+{
+	vec3 eps = vec3( k, 0., 0. );
+	vec3 nor = vec3(
+	    map(p+eps.xyy) - map(p-eps.xyy),
+	    map(p+eps.yxy) - map(p-eps.yxy),
+	    map(p+eps.yyx) - map(p-eps.yyx) );
+	return normalize(nor);
+}
+
+// iq code
+float getSha( in vec3 ro, in vec3 rd, in float hn)
+{
+    float res = 1.0;
+    float t = 0.0005;
+	float h = 1.0;
+    for( int i=0; i<40; i++ )
+    {
+        h = map(ro + rd*t);
+        res = min( res, hn*h/t );
+		t += clamp( h, 0.02, 2.0 );
+    }
+    return clamp(res,0.0,1.0);
+}
+
+// iq code
+float getAO( in vec3 p, in vec3 nor )
+{
+	float occ = 0.0;
+    float sca = 1.0;
+    for( int i=0; i<5; i++ )
+    {
+        float hr = 0.01 + 0.12 * float(i)/4.0;
+        vec3 aopos =  nor * hr + p;
+        float dd = map( aopos );
+        occ += -(dd-hr)*sca;
+        sca *= 0.95;
+    }
+    return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );    
+}
+
+// shane code
+// Tri-Planar blending function. Based on an old Nvidia tutorial.
+vec3 tex3D( sampler2D tex, in vec3 p, in vec3 n ){
+    
+    //return cellTileColor(p);
+  
+    n = max((abs(n) - 0.2)*7., 0.001); // n = max(abs(n), 0.001), etc.
+    n /= (n.x + n.y + n.z ); 
+	return (texture(tex, p.yz)*n.x + texture(tex, p.zx)*n.y + texture(tex, p.xy)*n.z).xyz;
+}
+
+// shane code
+// Texture bump mapping. Four tri-planar lookups, or 12 texture lookups in total. I tried to 
+// make it as concise as possible. Whether that translates to speed, or not, I couldn't say.
+vec3 texBump( sampler2D tx, in vec3 p, in vec3 n, float bf){
+   
+    const vec2 e = vec2(0.002, 0);
+    
+    // Three gradient vectors rolled into a matrix, constructed with offset greyscale texture values.    
+    mat3 m = mat3( tex3D(tx, p - e.xyy, n), tex3D(tx, p - e.yxy, n), tex3D(tx, p - e.yyx, n));
+    
+    vec3 g = vec3(0.299, 0.587, 0.114)*m; // Converting to greyscale.
+    g = (g - dot(tex3D(tx,  p , n), vec3(0.299, 0.587, 0.114)) )/e.x; g -= n*dot(n, g);
+                      
+    return normalize( n + g*bf ); // Bumped normal. "bf" - bump factor.
+}
+
+vec3 light( in vec3 ld, in vec3 lc, in vec3 tex, in vec3 n, in vec3 rd )
+{    
+    float diff = pow(dot(n, -ld) * .5 + .5,2.0);
+    float spe = pow(max(dot(-rd, reflect(ld, n)), 0.0), 32.0);
+    
+    return (tex * diff + spe) * lc * 1.5;
+}
+
+vec3 shade( in vec3 ro , in vec3 rd, in float d )
+{    
+	vec3 p = ro + rd * d;
+	
+	vec3 n = getNor(p, 0.0001);
+    
+    vec3 d1 = -normalize(vec3(1,2.5,3));
+    vec3 d2 = -normalize(vec3(5,3.5,0.5));
+    
+	const float tSize0 = 0.5;
+	vec3 sn = texBump(iChannel1, p * tSize0, n, 0.01);
+	vec3 texCol = tex3D(iChannel1, p * tSize0, sn);
+
+    float sha = 0.5 + 0.5 * getSha(p, sn, 2.0);
+    float ao = getAO(p, sn);
+    
+    vec3 l1 = light(d1, vec3(1,1,1), texCol, sn, rd);
+    vec3 l2 = light(d2, vec3(1.2), texCol, sn, rd);
+    
+	vec3 col = texCol * 0.2 * ao + (l1 + l2) * sha;
+	
+    // cold
+    //float b = dot(sn,normalize(ro-p)) * 0.9;
+    //col /= (b * vec3(0.9,0.8,0.4) + pow(b, 0.2)) * (1.0 - d * .01);
+    
+	return mix(col, vec3(0), 1.0-exp(-0.005*d*d));
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    countSlices = 30.;
+    float ca = 3.6;
+    
+
+	vec2 uv = (fragCoord*2. - iResolution.xy)/min(iResolution.x, iResolution.y);
+    vec3 ro = vec3(cos(ca), 8., sin(ca)); ro.xz *= 8.;
+    vec3 rov = normalize(-ro);
+    vec3 u = normalize(cross(vec3(0,1,0),rov));
+  	vec3 v = cross(rov,u);
+  	vec3 rd = normalize(rov + 0.5*uv.x*u + 0.5*uv.y*v);
+    
+	float d = march(ro, rd);
+    
+	vec3 col = shade(ro, rd, d);
+ 
+	fragColor = vec4(sqrt(col*col*1.2),1.0);
+}

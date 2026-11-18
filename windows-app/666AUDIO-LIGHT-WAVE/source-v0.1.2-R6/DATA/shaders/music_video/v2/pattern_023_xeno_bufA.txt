@@ -1,0 +1,33 @@
+#define R(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+void mainImage(out vec4 O, vec2 I) {
+    float T = mod(iTime, 120.),
+          t1 = 3.6 + 9.5 * sin(T * .1570796),
+          e2 = cos(T * .6283185),
+          t2 = 1.5 + 2.2 * e2,
+          t3 = 3.7 + 0.8 * sin(T * .3141593),
+          sR = 1.98 + .05 * sin(T * .7853982),
+          i = 0., z = 0., d;
+
+    for (O -= O; i++ < 80.; ) {
+        vec3 p = z * normalize(vec3(I + I - iResolution.xy, iResolution.y * 1.6)), q;
+        p.z -= 7.9 + .25 * e2;
+        p.yz *= R(3. * sin(T * .1047198));
+        
+        q = p;
+        for (d = 1.; d++ < 6.; 
+            q = abs(q) - .28, q += sin(q.zxy * (.36 * d) + t3) * (1.05 / d));
+
+        float cut = max((dot(abs(p), vec3(1)) - 8.9) / 36.832, length(p) - 6.9);
+
+        z += d = .012 + max(abs(length(q) - sR 
+                              + sin(q.x * 4. + t3) * cos(q.y * 4. - t1) * .7 
+                              + sin(q.z * 6. - t2) * .25) / 4.4, cut * .725);
+
+        O += (cos(length(q) * 1.5 + length(p) * 1.2 + vec4(0, 1.2, 2.4, 0)) + 1.11)
+             * smoothstep(-.38, 0., cut) / (d * z * 141.);
+
+        if (d < .004) break;
+    }
+    O = tanh(O * O * .3);
+}

@@ -1,0 +1,16 @@
+void mainImage( out vec4 O, vec2 I ){
+    float i,t,v,D;
+    for (O*=i; i++<80.;t+=v*.3*min(D,1.)){
+    vec3 P,p=t*normalize(vec3(I+I,0)-iResolution.xyy);
+    p.z+=.06;
+    p=reflect(p/=D=dot(p,p),normalize(tan(iTime*.2+vec3(0,2,5))));
+    p.z-=iTime*8.;
+    P=ceil(p/4.);
+    p=ceil(5.*reflect(mod(p,vec3(4,4,12))-vec3(2,2,6),normalize(sin(iTime*.5+P))))/5.;
+    p+=sin(3.*p)/3.;
+    v=abs(length(p+sin(p*2.+iTime+P)/2.)-.9)+.03;
+    O+=exp(sin(i*.1+t*2e2+vec4(0,2,4,0)))/v;
+    }
+    O=tanh(O/4e2);
+    O*=O;
+}

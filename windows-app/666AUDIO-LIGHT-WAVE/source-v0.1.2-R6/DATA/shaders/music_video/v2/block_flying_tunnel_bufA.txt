@@ -1,0 +1,46 @@
+// visual inspiration https://www.shadertoy.com/view/4sSSWz
+
+#define HEIGHT_MAX 5.
+#define COLOR vec3(.2,.4,1.)
+
+mat2 rz2(float a){float c=cos(a),s=sin(a);return mat2(c,s,-s,c);}
+float rand(float x){return fract(sin(x)*1e4);}
+vec4 blend(vec4 d, vec4 s){return s*s.a + d*(1.-s.a);}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / iResolution.xy;
+    vec2 v=uv*(1.-uv);
+    uv-=.5;
+    uv.x*=iResolution.x/iResolution.y;
+    uv*=rz2(iTime*.5+sin(iTime*6.28318531)*.05);
+    
+    vec3 rd=normalize(vec3(uv,1.));
+    
+    vec4 c=vec4(0.);
+    vec2 md=vec2(5., 50.);
+    
+    for(int i=0;i<128;++i){
+        float f=float(i);
+        float y=mix(-HEIGHT_MAX, HEIGHT_MAX, rand(f+20.));
+        float d=y/rd.y;
+        vec2 st=rd.xz*d;
+        float dp=st.y;
+        st.x+=rand(f)*md.x;
+        st.y+=rand(f+10.)*md.y;
+        st.y+=iTime*40.;
+    	st=mod(st,md);
+        float m=(smoothstep(0.,0.1,st.x)-smoothstep(.4,.5,st.x))*(smoothstep(0.,.5,st.y)-smoothstep(4.5,5.,st.y));
+        m*=step(0.,d);
+        m*=rand(f+30.);
+        m*=1.-sqrt(1.-pow(rd.z,2.));
+        m*=1.-smoothstep(0.,1.,dp*dp*.0002);
+        m=clamp(m,0.,1.);
+        
+        c=blend(c, vec4(COLOR, mix(.0, .9, m)));
+    }
+    
+    c.rgb=pow(c.rgb*5.,vec3(1./2.2));
+    c.rgb*=pow(v.x*v.y * 25.0, 0.25);
+	fragColor = c;
+}

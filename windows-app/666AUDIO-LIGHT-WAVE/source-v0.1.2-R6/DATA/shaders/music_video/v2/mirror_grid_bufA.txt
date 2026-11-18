@@ -1,0 +1,49 @@
+/*
+    note the cool rot trick i saw in @OldEclipse's "Strangest Attractor"
+    https://www.shadertoy.com/view/33cBDS
+    
+    comes from @Xor's "Phosphor"
+    https://mini.gmshaders.com/p/decoding-phosphor
+*/
+
+
+void mainImage(out vec4 o, vec2 u) {
+   
+    float i, // raymarch iterator
+          d, // total dist
+          s; // sample dist
+    vec3 p,
+         r = iResolution,
+         D = vec3(u=(u+u - r.xy) / r.y, 1),
+         a = cos(vec3(2,3,1)+iTime);
+    
+    // diagonal light to the left
+    vec2 v = (.2+.2*sin(iTime*6.))+u + (u.yx*.8+.2-vec2(-1.,.1));
+    
+    // clear o, 42 iterations
+    for(o*=i;i++ < 42.;
+        
+        // accumulate color with cos palette offset by i
+        o += (1.+cos(i+vec4(2,1,0,0)))/s 
+          // add diagonal light to the left
+          + 4.*vec4(6,3,12.,0)/length(v)
+    
+    )
+        // march p, store to r
+        r = p += D * s,
+        // apply rotation
+        p = a*dot(a,p)-cross(a,p),
+        // distort p with some turbulence
+        p += cos(3.*iTime+p.yzx)*.4,
+        // repeat and  scale p
+        p = abs(fract(p/8.)*8. - 4.),
+        // get some square stuff
+        d += s = .001+.6*abs(min(max(p.x, p.y),max(p.y, p.z)) - .75),
+        // add gyroid distance to ray dir because why not
+        D += s < .01 ? 24.*abs(dot(sin(D/64.), cos(D.yzx/32.))) : 0.,
+        // restore p
+        p = r;
+    // tanh tonemap and divide brightness down
+    o = tanh(o/3e3);
+
+}

@@ -1,0 +1,26 @@
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p,r=normalize(vec3(I+I,0)-iResolution.xyy);
+    float i,t,v,e=iTime*.7,z;
+    // Raymarching loop
+    for (O*=i;i++<60.;t+=.2*v){
+        // Exp for zoomed out effect
+        p = t*normalize(vec3(r.xy,r.z/exp(t*.1)));
+        // Abs to mirror in all planes
+        p=abs(p);
+        // Alternate between stopping and rotating xy position, change offset based on distance travelled
+        p.xy*=mat2(cos( floor((e-t*.5)/3.)+min(3.*fract((e-t*.5)/3.),1.) + vec4(0,11,33,0)));
+        // Move forward
+        z=p.z-=e;
+        // Voxel effect
+        p=ceil(p*20.)/20.;
+        // Sine distortion
+        p+=sin(p.zxy);
+        // Repetition in all directions
+        p=abs(mod(p,4.)-2.);
+        // Density based on grid
+        v=abs(min(min(max(p.x,p.y),max(p.x,p.z)),max(p.y,p.z))-.2)+.01;
+        // Color accumulation based on density, position and iteration count
+        O.rgb+=exp(cos(i*.2+vec3(0,2,4)))/v/(abs(sin(z-e*2.-vec3(0,.2,.4)))+.1);
+    }
+    O=tanh(O/3e3);
+}

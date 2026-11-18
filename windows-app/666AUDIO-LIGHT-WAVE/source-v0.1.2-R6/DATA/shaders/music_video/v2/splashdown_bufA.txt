@@ -1,0 +1,23 @@
+void mainImage(out vec4 O, vec2 I){
+    vec3 p, r = normalize(vec3(I+I,0) - iResolution.xyy);
+    float i, t, v, s, l;
+    // Rotate camera up
+    r.yz*=mat2(.6,-.8,.8,.6);
+    for (O*=i; i++<50.;t+=v*.15){
+        // Move camera back
+        p=vec3(0,-9,5) + t*r;
+        // Store log length xy plane
+        l=log(length(p.xy));
+        // Log polar-like coordinates
+        p.xy=vec2(3.*l-iTime,sin(6.*atan(p.y,p.x)));
+        // Voxel effect
+        p=ceil(p*24.)/24.;
+        // Turbulence
+        for(s=-.2; s++<8.;p+=sin(p.zxy*s-iTime*s)/s)
+        // Density based on distance to z plane
+        v=abs(p.z)+.05;
+        // Color based on log length and density
+        O+=exp(sin(l*.5+vec4(0,1,2,0)))/v;
+    }
+    O = tanh(O/3e2);
+}

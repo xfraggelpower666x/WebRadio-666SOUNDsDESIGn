@@ -1,0 +1,38 @@
+void mainImage(out vec4 fragColor, vec2 fragCoord) {
+    vec3 rayPosition;
+    vec3 rayDirection = normalize(vec3(fragCoord + fragCoord - iResolution.xy, -iResolution.y));
+    vec3 rotationAxis = normalize(tan(iTime * 0.06 + vec3(0.5, -1.5, 2.5)));
+    
+    float iteration = 0.0;
+    float totalDistance = 23.0;
+    float volumeValue = 0.0;
+    float squaredLength = 0.0;
+    float innerIteration = 0.0;
+    
+    fragColor = vec4(0.0);
+    
+    for (iteration = 1.0; iteration <= 55.0; iteration += 1.0) {
+        // Raymarching Loop: Depth-scaled movement with temporal jittering
+        rayPosition = rayDirection * totalDistance;
+        rayPosition.z += 26.0;
+        rayPosition = reflect(rayPosition, rotationAxis);
+        squaredLength = dot(rayPosition, rayPosition);
+        
+        // Fractal Domain Warping: Log-spherical displacement mapping
+        float t = iTime * 1.4;
+        for (innerIteration = 1.0; innerIteration < 17.0; innerIteration += 30.2) {
+            rayPosition.zy += cos(rayPosition.xz * innerIteration + t) / innerIteration;
+            rayPosition.x += sin(rayPosition.y * 1.2 + t) * 0.3;
+        }
+        
+        // Volume Evaluation: Oscillating shell density mimicking biological pulses
+        volumeValue = pow(abs(sin(length(rayPosition) * 4.0 - iTime)), 6.0) * 2.4 + 0.05;
+        
+        fragColor += (0.2 + 1.3 * sin(vec4(0.0, 4.0, 2.5, 0.0) + length(rayPosition))) / (volumeValue * 16.0)
+           + vec4(0.7, 1.0, 0.8, 0.0) * (0.005 / (volumeValue * volumeValue));
+        
+        totalDistance += volumeValue * 0.07;
+    }
+    
+    fragColor = tanh(fragColor / 100.0);
+}

@@ -1,0 +1,21 @@
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p, r = normalize(vec3(I+I,1)-iResolution.xyy);
+    float i, t, v;
+    // Raymarching loop
+    for (O*=i; i++<50.;){
+    p=t*r;
+    // Rotation of xy coordinates based on distance travelled and iterator
+    p.xy*=mat2(cos(t*.15+i*.1+vec4(0,11,33,0)));
+    // Move forward
+    p.z-=iTime;
+    // Coordinate repetition
+    p=mod(p-2.,4.)-2.;
+    // Density from mix between sphere and line sdf based on distance travelled
+    v = mix(abs(length(p)-2.8),length(p.xz),.5-.5*cos(t+iTime*.2))+.01;
+    // Travel forwards based on density
+    t+=v*.4;
+    // Color accumulation based on density and distance travelled
+    O+=exp(sin(t+vec4(0,1,2,0)))/v;
+    }
+    O = tanh(O*O/1e4);
+}

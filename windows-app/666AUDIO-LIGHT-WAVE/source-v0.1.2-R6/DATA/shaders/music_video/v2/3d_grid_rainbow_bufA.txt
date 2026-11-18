@@ -1,0 +1,30 @@
+// remove imouse
+
+// variant of https://shadertoy.com/view/flGSRV
+
+#define rot(a)          mat2(cos(a+vec4(0,11,33,0)))  // rotation
+
+void mainImage(out vec4 O, vec2 U)
+{
+    float t=9.; 
+    
+    vec3  R = iResolution, Y = vec3(0,1,0),
+          D = normalize(vec3((U+U-R.xy)/R.y, -3.)),   // ray direction
+          p = vec3(0,0,25), q,a,                      // marching point along ray 
+          M = vec3(10,12,0)/1e2*cos(iTime+vec3(0,11,0))+vec3(0,.12,0); 
+
+    for ( O=vec4(1); O.x > 0. && t > .005; O-=.01 ) {
+        q = p,
+        q.yz *= rot(.5-6.3*M.y),                      // rotations
+        q.xz *= rot(-6.3*M.x), // t = 9.,
+        a = abs(q), 
+        q = fract(q)-.5,                              // cells
+        q = abs(q), t = max(q.x,max(q.y,q.z)) - .2,   // cubes
+        t = max( t, max(a.x, max(a.y,a.z))-6. ),      // clamp to cube
+     
+        p += .4*t*D;                                  // step forward = dist to obj
+    }
+    
+    // Smooth rainbow using 3D world coordinates
+    O *= 0.5 + 0.5 * cos(iTime + p.x + p.y + p.z + vec4(0, 2, 4, 0));
+}
