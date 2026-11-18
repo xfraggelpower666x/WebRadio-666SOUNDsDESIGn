@@ -14,7 +14,8 @@ const { createAudioPermissionGate, forwardOverlayMicrophone } = require('./src/s
 const { createVjFiles } = require('./src/shared/vj-files.cjs');
 const { listAsus, setAsus } = require('./src/shared/asus-openrgb.cjs');
 const { encoderPath, writeMp4 } = require('./src/shared/video-transcode.cjs');
-const { sendGovee } = require('./src/shared/govee-bridge.cjs');
+const { sendGovee, createLocalGovee } = require('./src/shared/govee-bridge.cjs');
+const { createAuraRest } = require('./src/shared/asus-aura-rest.cjs');
 const { validateVjState } = require('./src/shared/vj-sync.cjs');
 
 const STARTUP_LOG_PATH = path.join(os.tmpdir(), 'RADIO-WAVE-v6.66-startup.log');
@@ -980,6 +981,14 @@ let goveeSession = null;
 let goveeGeneration = 0;
 let goveeTimer;
 let goveePending = Promise.resolve();
+const auraRest = createAuraRest();
+let auraCleanup = Promise.resolve(true);
+function queueAuraCleanup() {
+  auraCleanup = auraRest.release().then(() => true, () => {
+    runtimeEvent('asus-aura-release-failed');
+    return false;
+  });
+}
 
 function lockGovee() {
   ++goveeGeneration;
@@ -989,8 +998,9 @@ function lockGovee() {
   if (previous) {
     previous.sender.removeListener('destroyed', previous.onDestroyed);
     goveePending = goveePending.then(async () => {
-      if (previous.enabled) await sendGovee('enabled', false).catch(() => {});
+      if (previous.enabled && previous.transport === 'bridge3000') await sendGovee('enabled', false).catch(() => {});
     });
+    queueAuraCleanup();
   }
 }
 
@@ -1005,7 +1015,8 @@ registerIpc('govee:unlock', 'main', async (event, password) => {
   const generation = goveeGeneration;
   await adminLogin(password);
   if (generation !== goveeGeneration) throw new Error('govee_auth_required');
-  const session = { sender: event.sender, token: adminToken, expires: Date.now() + 300000, enabled: false };
+  const session = { sender: event.sender, token: adminToken, expires: Date.now() + 300000,
+    enabled: false, transport: 'bridge3000', localGovee: createLocalGovee() };
   goveeSession = session;
   goveeTimer = setTimeout(lockGovee, 300000);
   session.onDestroyed = () => { if (goveeSession === session) lockGovee(); };
@@ -1040,10 +1051,28 @@ registerIpc('asus:control','main',async(event,action,value)=>{
       return devices.map(({i,name})=>({i,name}));
     }
     if(action!=='color')throw new Error('Invalid ASUS command.');
+    if(auraRest.isReserved())throw new Error('Release native ASUS Aura before applying an OpenRGB color.');
     const selected=session.asusDevices?.find(device=>device.i===value?.i);
     if(!selected)throw new Error('Select a detected ASUS device.');
     return await setAsus(asusExecutable,selected,value.color,authorized);
   } finally { session.asusBusy=false; }
+});
+registerIpc('asus:aura', 'main', async (event, action, value) => {
+  const session = goveeSession;
+  const authorized = () => session && session === goveeSession && session.sender === event.sender &&
+    session.token && session.token === adminToken && Date.now() < session.expires;
+  if (!authorized()) throw new Error('govee_auth_required');
+  if (session.asusBusy) throw new Error('An ASUS command is already running.');
+  session.asusBusy = true;
+  try {
+    if (action === 'acquire' && !await auraCleanup) {
+      await auraRest.release();
+      auraCleanup = Promise.resolve(true);
+    }
+    return await auraRest.command(action, value, authorized);
+  } finally {
+    session.asusBusy = false;
+  }
 });
 registerIpc('govee:command', 'main', async (event, action, value) => {
   const session = goveeSession;
@@ -1055,7 +1084,15 @@ registerIpc('govee:command', 'main', async (event, action, value) => {
   session.pending = true;
   const command = goveePending.then(async () => {
     if (!authorized()) throw new Error('govee_auth_required');
-    const result = await sendGovee(action, value);
+    if (action === 'transport') {
+      if (session.enabled || !['bridge3000', 'local8766'].includes(value)) throw new Error('govee_stop_sync_first');
+      session.transport = value;
+      return { configured: true };
+    }
+    if (session.enabled && ['devices', 'target'].includes(action)) throw new Error('govee_stop_sync_first');
+    const result = session.transport === 'local8766'
+      ? await session.localGovee.command(action, value)
+      : await sendGovee(action, value);
     if (action === 'enabled') session.enabled = value;
     return result;
   });
@@ -1136,7 +1173,38 @@ app.whenReady().then(() => {
   try{app.exit(1);}catch{}
 });
 
-app.on('before-quit',()=>{appQuitting=true;startupLog('APP_BEFORE_QUIT');destroyIntroWindow();if(outputWatchdog){clearInterval(outputWatchdog);outputWatchdog=null;} if(audioLibraryTimer)clearInterval(audioLibraryTimer); discardVideoWrite(); adminToken=''; soundCloudToken=null; runtimeEvent('app-before-quit');});
+let auraQuitPending = false;
+let resumeQuitAfterLights = false;
+app.on('before-quit', event => {
+  if (auraQuitPending) {
+    event.preventDefault();
+    return;
+  }
+  if (!resumeQuitAfterLights && (goveeSession || auraRest.isReserved())) {
+    event.preventDefault();
+    auraQuitPending = true;
+    const hadSession = Boolean(goveeSession);
+    lockGovee();
+    if (!hadSession) queueAuraCleanup();
+    void Promise.allSettled([auraCleanup, goveePending]).then(() => {
+      auraQuitPending = false;
+      resumeQuitAfterLights = true;
+      app.quit();
+    });
+    return;
+  }
+  appQuitting = true;
+  startupLog('APP_BEFORE_QUIT');
+  destroyIntroWindow();
+  if (outputWatchdog) {
+    clearInterval(outputWatchdog);
+    outputWatchdog = null;
+  }
+  if (audioLibraryTimer) clearInterval(audioLibraryTimer);
+  discardVideoWrite();
+  adminToken=''; soundCloudToken=null;
+  runtimeEvent('app-before-quit');
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

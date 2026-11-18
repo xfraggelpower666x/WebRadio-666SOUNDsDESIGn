@@ -239,7 +239,7 @@
   function saveSettings(){
     const out={};
     qa('input[id],select[id],textarea[id]').forEach(el=>{
-      if(el.id==='radio-password'||el.type==='password'||el.type==='file')return;
+      if(el.id==='radio-password'||el.id==='rw-background-preset'||el.id==='rw-app-background'||el.type==='password'||el.type==='file')return;
       out[el.id]=(el.type==='checkbox'||el.type==='radio')?!!el.checked:el.value;
     });
     try{localStorage.setItem(SETTINGS,JSON.stringify(out));}catch{}

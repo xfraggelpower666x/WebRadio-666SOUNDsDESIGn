@@ -386,15 +386,25 @@
           </div>
           </details>
           <div class="control-group">
-            <label>Shared visual background</label>
+            <h3 id="rw-background-title">Visualizer background</h3>
+            <label for="rw-background-preset" id="rw-background-label">Background preset</label>
+            <select id="rw-background-preset" class="custom-select">
+              <option value="starfield">Starfield</option>
+              <option value="lyvra-music-discovery">LYVRA Music Discovery</option>
+              <option value="lyvra-portal">LYVRA Portal</option>
+              <option value="lyvra-resonance">LYVRA Resonance Awakens</option>
+              <option value="radio-wave-v666">RADIO WAVE v6.66</option>
+              <option value="custom" disabled hidden>Custom image</option>
+            </select>
+            <div class="rw-background-preview"><img id="rw-background-preview" alt="" hidden></div>
             <button id="btn-select-bg" class="btn btn-secondary select-btn">
               <span class="btn-icon">🖼️</span>
               <span id="label-bg-file">Select Background Image</span>
             </button>
             <button id="btn-clear-bg" class="btn btn-secondary" type="button">STARFIELD</button>
-            <label for="background-scale">Image scale <output id="background-scale-value">100%</output></label>
+            <label for="background-scale">Custom image scale <output id="background-scale-value">100%</output></label>
             <input type="range" class="custom-range" id="background-scale" min="25" max="200" value="100">
-            <div id="bg-meta" class="file-meta-tag hidden">Default Starfield active</div>
+            <div id="bg-meta" class="file-meta-tag" role="status" aria-live="polite">Default Starfield active</div>
           </div>
         </section>
 
@@ -651,7 +661,9 @@
     <!-- RIGHT CONTENT: Live Interactive Preview Studio -->
     <main class="preview-area">
       <nav class="rw-quick-links" aria-label="666SOUNDsDESIGn links">
-        <strong>666SOUNDsDESIGn</strong>
+        <button id="rw-brand-open" type="button" aria-haspopup="dialog" aria-controls="rw-brand-dialog">
+          <img class="rw-header-wordmark" src="assets/radio-wave/visuals/666soundsdesign.png" alt="666SOUNDsDESIGn">
+        </button>
         <button type="button" data-external-site="radio">Radio</button>
         <button type="button" data-external-site="lyvra">LYVRA</button>
         <button type="button" data-external-site="neon">Neon Dashboard</button>
@@ -668,6 +680,15 @@
           <select id="app-language" aria-label="Application language">
             <option value="en-US" selected>🇺🇸 English (USA)</option>
             <option value="de-DE">🇩🇪 German</option>
+          </select>
+        </label>
+        <label class="rw-app-background-control" for="rw-app-background">
+          <span id="rw-app-background-label">App background</span>
+          <select id="rw-app-background" class="custom-select">
+            <option value="default">Default</option>
+            <option value="cyber-temple">Cyber Temple</option>
+            <option value="neon-grid">Neon Grid</option>
+            <option value="666-broadcaster">666 Broadcaster</option>
           </select>
         </label>
         <div class="diagnostic-tag"><span class="diag-bullet" id="diag-status-color"></span> Status: <span id="diag-status">Idle</span></div>
@@ -835,6 +856,19 @@
 
   </div>
 
+  <dialog id="rw-brand-dialog" class="rw-brand-dialog" aria-labelledby="rw-brand-dialog-title">
+    <h2 id="rw-brand-dialog-title">666SOUNDsDESIGn</h2>
+    <div class="rw-brand-gallery">
+      <img class="rw-brand-wordmark" src="assets/radio-wave/visuals/fraggelpower666-banner.png" alt="666SOUNDsDESIGn · FRAGGELPOWER666" loading="lazy">
+      <img class="rw-brand-wordmark" src="assets/radio-wave/visuals/lyvra-soundlogo.png" alt="LYVRA · Sound becomes feeling" loading="lazy">
+      <div class="rw-brand-support">
+        <img class="rw-brand-badge" src="assets/radio-wave/visuals/fraggel-paypal-badge.png" alt="FRAGGELPOWER666 · PayPal.me" loading="lazy">
+        <img class="rw-brand-paypal" src="assets/radio-wave/visuals/paypal-banner.png" alt="" loading="lazy">
+      </div>
+    </div>
+    <form method="dialog"><button id="rw-brand-close" type="submit" class="btn btn-secondary">Close</button></form>
+  </dialog>
+
   <script src="assets/radio-wave/banner.asset.js"></script>
   <script src="assets/radio-wave/appIconSource.asset.js"></script>
   <script src="assets/radio-wave/inAppLogo.asset.js"></script>
@@ -865,6 +899,8 @@
   <script src="vj-data.js"></script>
   <script src="vj-data-controls.js"></script>
   <script src="vj-follower.js"></script>
+  <script src="appearance.js"></script>
+  <script src="app-background.js"></script>
   <script src="app.js"></script>
   <script src="../node_modules/hls.js/dist/hls.min.js"></script>
   <script src="soundcloud-playback.js"></script>
@@ -876,8 +912,16 @@
     </form>
     <fieldset hidden disabled>
       <legend>Lokale Govee-Bridge</legend>
+      <label>Verbindung <select id="govee-transport">
+        <option value="bridge3000">FX Bridge · Port 3000</option>
+        <option value="local8766">GOVEE Local / Hybrid · Port 8766</option>
+      </select></label>
+      <div id="govee-local-controls" hidden>
+        <button type="button" id="govee-local-scan">Geräteliste laden</button>
+        <label>Govee-Gerät <select id="govee-local-target"></select></label>
+      </div>
       <label><input type="checkbox"> Audio-Reaktivität</label>
-      <label>Modus <select><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
+      <label>Modus <select id="govee-mode"><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
       <label>Testfarbe <input type="color" value="#00b4ff"></label>
       <label>Helligkeit <input type="range" min="1" max="100" value="65"></label>
       <div>
@@ -885,6 +929,16 @@
         <button type="button" data-action="on">Licht an</button>
         <button type="button" data-action="off">Licht aus</button>
       </div>
+      <details>
+        <summary>ASUS Aura · native REST-Steuerung</summary>
+        <button type="button" id="asus-aura-acquire">Aura übernehmen</button>
+        <button type="button" id="asus-aura-release" disabled>Aura freigeben</button>
+        <label>Tastatur <select id="asus-aura-device" disabled></select></label>
+        <label>Farbe <input type="color" value="#00b4ff" id="asus-aura-color"></label>
+        <button type="button" id="asus-aura-apply" disabled>Farbe anwenden</button>
+        <label><input type="checkbox" id="asus-aura-bass" disabled> Bassreaktion</label>
+        <p role="status" id="asus-aura-status" aria-live="polite"></p>
+      </details>
       <details>
         <summary>ASUS Aura · OpenRGB</summary>
         <p>Start the local SDK Server in OpenRGB on port 6742. Only detected ASUS/Aura devices with a compatible color mode are offered.</p>

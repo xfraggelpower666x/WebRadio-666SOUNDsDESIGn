@@ -117,6 +117,7 @@ contextBridge.exposeInMainWorld('api', {
   radioConfig: () => ipcRenderer.invoke('radio:config'),
   radioNowPlaying: () => ipcRenderer.invoke('radio:nowplaying'),
   adminLogin: (password) => ipcRenderer.invoke('auth:login', password),
+  asusAura: (action, value) => ipcRenderer.invoke('asus:aura', action, value),
   asusControl: (action, value) => ipcRenderer.invoke('asus:control', action, value),
   goveeUnlock: (password) => ipcRenderer.invoke('govee:unlock', password),
   goveeCommand: (action, value) => ipcRenderer.invoke('govee:command', action, value),

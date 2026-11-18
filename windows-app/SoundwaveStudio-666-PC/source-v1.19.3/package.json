@@ -1,6 +1,6 @@
 {
   "name": "radio-wave-v666",
-  "version": "1.19.8",
+  "version": "1.19.9",
   "description": "RADIO WAVE v6.66 · Soundwave visual music player with 666 WebRadio addon",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "dist": "npm run prepare:branding && npm run check:radio-wave-release && electron-builder --win --x64 --publish never",
     "prepackage": "node scripts/build-cyber-studio.cjs",
     "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
-    "test": "node tests/deep-integration.test.cjs && node --test --test-concurrency=4 tests/diagnostics-host-check.test.cjs tests/diagnostics-measurements.test.cjs tests/local-playback-output.test.cjs tests/audio-library.test.cjs tests/audio-devices.test.cjs tests/audio-eq.test.cjs tests/audio-surround.test.cjs tests/windows-launcher.test.cjs tests/soundcloud-credentials.test.cjs tests/soundcloud-playback.test.cjs tests/video-export.test.cjs tests/radio-service-contract.test.cjs tests/radio-player-status.test.cjs tests/radio-admin-ui.test.cjs tests/workspace-navigation.test.cjs tests/media-link.test.cjs tests/cyber-studio.test.cjs tests/cyber-studio-build.test.cjs tests/vj-studio.test.cjs tests/vj-follower.test.cjs tests/vj-data-files.test.cjs tests/vj-audio-sync.test.cjs tests/vj-parity-selector.test.cjs tests/vj-quantum-sampler.test.cjs tests/vj-data.test.cjs tests/vj-data-controls.test.cjs tests/personal-milkdrop-archive.test.cjs && node tests/milkdrop-control-layer.test.cjs",
+    "test": "node tests/deep-integration.test.cjs && node --test --test-concurrency=4 tests/diagnostics-host-check.test.cjs tests/diagnostics-measurements.test.cjs tests/local-playback-output.test.cjs tests/audio-library.test.cjs tests/audio-devices.test.cjs tests/audio-eq.test.cjs tests/audio-surround.test.cjs tests/windows-launcher.test.cjs tests/soundcloud-credentials.test.cjs tests/soundcloud-playback.test.cjs tests/video-export.test.cjs tests/radio-service-contract.test.cjs tests/radio-player-status.test.cjs tests/radio-admin-ui.test.cjs tests/workspace-navigation.test.cjs tests/media-link.test.cjs tests/appearance.test.cjs tests/lighting-adapters.test.cjs tests/cyber-studio.test.cjs tests/cyber-studio-build.test.cjs tests/vj-studio.test.cjs tests/vj-follower.test.cjs tests/vj-data-files.test.cjs tests/vj-audio-sync.test.cjs tests/vj-parity-selector.test.cjs tests/vj-quantum-sampler.test.cjs tests/vj-data.test.cjs tests/vj-data-controls.test.cjs tests/personal-milkdrop-archive.test.cjs && node tests/milkdrop-control-layer.test.cjs",
     "test:electron": "node tests/electron-runtime-smoke.cjs",
     "check:syntax": "node scripts/check-syntax.cjs",
     "check:release": "node scripts/release-integrity.cjs",

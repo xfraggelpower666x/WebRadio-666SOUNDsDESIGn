@@ -42,6 +42,5 @@ build/cyber-studio.lock/
 # Allow repository assets
 !images/
 !images/**
-
-
-
+!src/assets/radio-wave/visuals/*.png
+!src/assets/radio-wave/app-backgrounds/*.jpg

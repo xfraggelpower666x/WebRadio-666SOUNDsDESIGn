@@ -46,8 +46,6 @@ let canvasWidth = 1920;
 let canvasHeight = 1080;
 
 // Media Loading state
-let bgImage = null;
-let bgFileName = '';
 let audioFileName = '';
 
 // Particle systems for dynamic backgrounds
@@ -70,10 +68,6 @@ const audioElement = document.getElementById('audio-element');
 const btnSelectAudio = document.getElementById('btn-select-audio');
 const labelAudioFile = document.getElementById('label-audio-file');
 const audioMeta = document.getElementById('audio-meta');
-
-const btnSelectBg = document.getElementById('btn-select-bg');
-const labelBgFile = document.getElementById('label-bg-file');
-const bgMeta = document.getElementById('bg-meta');
 
 // Wave Design Elements
 const selectVisualizerStyle = document.getElementById('visualizer-style');
@@ -816,47 +810,6 @@ function setupEventListeners() {
   setupAudioDevices();
   setupAudioFx();
 
-  // Shared background for every visualizer engine in this workspace.
-  const backgroundScale=document.getElementById('background-scale');
-  const showScale=()=>{document.getElementById('background-scale-value').textContent=backgroundScale.value+'%';};
-  backgroundScale.addEventListener('input',showScale);
-  showScale();
-  let backgroundRequest=0;
-  async function showBackground(read) {
-    const request=++backgroundRequest;
-    try {
-      const file=await read();
-      if(!file||request!==backgroundRequest)return;
-      const image=new Image();
-      image.src=file.dataUri;
-      await image.decode();
-      if(request!==backgroundRequest)return;
-      bgImage=image;
-      bgFileName=file.name;
-      labelBgFile.textContent=file.name;
-      bgMeta.textContent='Background: '+file.name;
-      bgMeta.classList.remove('hidden');
-    } catch {
-      if(request!==backgroundRequest)return;
-      bgMeta.textContent='Could not load the background. Select the file again.';
-      bgMeta.classList.remove('hidden');
-    }
-  }
-  void showBackground(()=>window.api.restoreBackground());
-  btnSelectBg.addEventListener('click',()=>showBackground(()=>window.api.openBackground()));
-  document.getElementById('btn-clear-bg').addEventListener('click',async()=>{
-    const request=++backgroundRequest;
-    try {
-      await window.api.clearBackground();
-      if(request!==backgroundRequest)return;
-      bgImage=null;
-      bgFileName='';
-      labelBgFile.textContent='Select Background Image';
-      bgMeta.textContent='Default Starfield active';
-    } catch { bgMeta.textContent='Could not clear the saved background.'; }
-    bgMeta.classList.remove('hidden');
-  });
-
   // Player functionality
   btnPlayPause.addEventListener('click', togglePlayback);
   
@@ -1264,32 +1217,7 @@ function drawBackground(bass, mid, treble) {
   ctx.fillStyle = '#01000f';
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  if (bgImage && bgImage.complete) {
-    // Custom Background Image Fit cover
-    const aspectImg = bgImage.width / bgImage.height;
-    const aspectCanvas = canvasWidth / canvasHeight;
-    let renderW, renderH, renderX, renderY;
-
-    if (aspectImg > aspectCanvas) {
-      renderH = canvasHeight;
-      renderW = canvasHeight * aspectImg;
-      renderX = (canvasWidth - renderW) / 2;
-      renderY = 0;
-    } else {
-      renderW = canvasWidth;
-      renderH = canvasWidth / aspectImg;
-      renderX = 0;
-      renderY = (canvasHeight - renderH) / 2;
-    }
-    
-    const scale = (Number(document.getElementById('background-scale')?.value) || 100) / 100;
-    renderW *= scale; renderH *= scale;
-    renderX = (canvasWidth - renderW) / 2;
-    renderY = (canvasHeight - renderH) / 2;
-    ctx.globalAlpha = 0.35; // Overlay opacity mix
-    ctx.drawImage(bgImage, renderX, renderY, renderW, renderH);
-    ctx.globalAlpha = 1.0;
-  } else {
+  if (!window.RWAppearance.drawBackground(ctx, canvasWidth, canvasHeight)) {
     // Procedural Starfield moving preset background
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     const centerCX = canvasWidth / 2;

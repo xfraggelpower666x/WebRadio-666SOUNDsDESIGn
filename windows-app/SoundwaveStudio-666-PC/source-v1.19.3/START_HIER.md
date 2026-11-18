@@ -90,3 +90,27 @@ Beim Wechsel zu LOCAL, Radio, SoundCloud oder YouTube pausiert der Link-Player.
 Der Link-Player nutzt die Medienwiedergabe von Electron direkt. Visualizer, Audio
 FX und Export Studio verwenden weiterhin den Hauptplayer. Der Link muss auf eine
 abspielbare Datei zeigen. Die Abrufbarkeit hängt vom Server und vom Codec ab.
+
+## Visuals und Lichtsteuerung · 1.19.9
+
+- **App background** in der oberen Leiste wählt das Hauptfenster-Motiv und
+  speichert es unabhängig vom Visualizer. Cyber Temple, Neon Grid und
+  666 Broadcaster liegen als Originalgrafiken bei.
+- **Wave Design → Visualizer background** enthält vier Originalmotive und
+  Starfield. Eigene Bilder lassen sich weiterhin laden, skalieren und löschen.
+  Die Standardmotive stehen auch in der Visualizer-Ausgabe zur Verfügung.
+- Die Wortmarke oben öffnet den Branding- und Support-Dialog.
+- **GOV → Verbindung** wählt den zuvor gestarteten lokalen Dienst. **FX Bridge**
+  verwendet den vorhandenen Vertrag auf Port 3000. **GOVEE Local / Hybrid**
+  spricht Port 8766. Dort erst die Geräteliste laden und ein konfiguriertes Ziel
+  wählen. Ein gesendetes UDP-Paket bestätigt noch keine Gerätewirkung.
+- **GOV → ASUS Aura · native REST-Steuerung** nutzt den lokalen ASUS-Dienst
+  auf Port 27339. Nach der Übernahme eine erkannte Notebooktastatur wählen,
+  Farbe anwenden und bei Wunsch Bassreaktion aktivieren. Bei manueller
+  Freigabe setzt ASUS den Standardeffekt der Aura-Geräte zurück. Wenn die
+  Übernahme oder Freigabe unklar bleibt, in Armoury Crate prüfen.
+- **ASUS Aura · OpenRGB** bleibt für feste Farbe und Schwarz verfügbar.
+  Vor einem Wechsel zu OpenRGB zuerst die native Aura-Steuerung freigeben.
+
+Die Lichtsteuerung braucht die passenden lokalen Dienste auf dem Windows-PC.
+Für dieses Quellpaket stehen die Windows- und Geräteabnahme noch aus.

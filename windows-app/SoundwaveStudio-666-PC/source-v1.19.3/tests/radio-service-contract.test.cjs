@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { test } = require('node:test');
 const { runInNewContext } = require('node:vm');
+const { createAuraRest } = require('../src/shared/asus-aura-rest.cjs');
 const radioCfg = require('../src/shared/radio-config.cjs');
 
 function fixture() {
@@ -25,7 +26,7 @@ function fixture() {
   let confirmation = async () => ({ response: 0 });
   const reply = (status, data) => ({ status, ok: status >= 200 && status < 300, text: async () => JSON.stringify(data) });
   const context = {
-    radioCfg, radioOrigin: origin, adminToken: '', remoteLocks: new Set(),
+    createAuraRest, radioCfg, radioOrigin: origin, adminToken: '', remoteLocks: new Set(),
     process: { env: {} },
     mainWindow: {},
     dialog: { showMessageBox: async (_window, options) => { dialogs.push(options); return confirmation(); } },
