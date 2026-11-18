@@ -1,0 +1,78 @@
+void mainImage( out vec4 o, vec2 v )
+{
+    vec2 u = (v+v-(o.xy = iResolution.xy))/o.y;   
+    u /= .5 + .2*dot(u,u);
+    u += .2*cos(iTime) - 7.56;
+    
+    for (int i; i<3;
+         o[i++] = 1. - exp(-6./exp(6.*length(v+sin(5.*v.y-3.*iTime)/4.)))) 
+        v = sin(1.5*u.yx + 2.*cos(u -= .01));       
+}
+
+
+// v------------------------v
+//        Other stuff
+// v------------------------v
+
+// Red specular pattern [120 Chars]
+/*
+void mainImage( out vec4 o, vec2 u )
+{
+    u = sin(u /= 22.) + sin(u.yx + cos(u));
+    o = tanh(vec4(20,3,3,0)/exp(6.*length(u+cos(5.*u)/5.)));
+}
+//*/
+
+// Shortened first iteration
+/*
+void mainImage( out vec4 o, vec2 u )
+{
+    u = (u+u-(o.xy = iResolution.xy))/o.y;   
+    u /= 1. +.3*dot(u,u);
+
+    u += .14*cos(iTime)-3.8;
+    u = sin(3.*u + 2.3*cos(2.*u.yx));
+    o = vec4(6,3,3,0)/2./exp(1.5*length(u+cos(5.*u)/4.));      
+    o = 1.-exp(-o*o*o);
+}
+//*/
+
+
+// Original mess
+/*
+#define pi 3.14159
+#define dir(a) cos(a + vec2(0,11))
+#define rot(a) mat2(cos(a - vec4(0,11,33,0)))
+#define thc(a,b) tanh(a*cos(b))
+
+void mainImage( out vec4 o, vec2 u )
+{
+    vec2 R = iResolution.xy;
+    float s = 1.5;
+    u = (u+u-R)/R.y;      
+    o = 0.*o;
+    s = 4.2;
+    u /= 1. +.3*dot(u,u);//max(u.x*u.x, u.y*u.y)*-.3;
+    float d = 1e5, t = iTime;
+    vec2 v;
+    for (float i = 1.; i++ < 9.;)
+    {
+        s *= 1.-.1*cos(u.x*i+.5*t/i);
+
+        v = u*rot(i) - i*i + .2*t/i;
+        v += 3./i*cos(v.yx*i+o.z*i/4.*cos(u.y*3.))/i;
+        vec2 p = sin(v*s);
+        p += cos(p/i/.1)/4.;
+        d =  length(p)-.37;
+        
+        vec4 c = 1. - .4 * cos(vec4(3,0,0,0) - i*o);
+        o = max(o, (1.3-o)*exp(-2.8*d/i) * c/i);
+        //o *= .95;
+        //o *= 1.-.9/i;
+    }
+    //o *= 1.2;
+    o = 1.-exp(-7.*o*o*o) + vec4(0,.25,.15,0)*dot(u,u);
+    //o += pow(vec4(dot(u,u)), vec4(100,.4,100,0)) * 1.3*vec4(.1,.2,.1,0);
+    //o += .3*(u.y+u.x);//u.y*u.y-.5*u.x*u.x;//*abs(u.y);
+}
+//*/

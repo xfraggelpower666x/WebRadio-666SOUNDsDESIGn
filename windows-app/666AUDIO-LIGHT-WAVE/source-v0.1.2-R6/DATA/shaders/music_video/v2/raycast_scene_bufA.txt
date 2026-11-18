@@ -1,0 +1,163 @@
+
+const int RayStepCount = 320;
+const int SampleDepth = 12;
+
+const vec3 CamPos = vec3(0.0, 2.0, 7.0);
+const vec4 Sphere1 = vec4(0.0, 2.0, 0.0, 2.0);
+const vec4 Sphere2 = vec4(1.0, 1.0, 2.0, 1.0);
+const vec4 Sphere3 = vec4(-3.0, 1.0, 0.0, 1.0);
+const vec3 LightDir = vec3(1.0, -1.0, 1.0);
+const float LightPow = 20.0;
+const vec3 LightColor = vec3(1.0, 0.8, 0.6);
+const vec3 FogColor = vec3(0.8, 0.9, 1.0);
+const vec3 SkyColor = vec3(0.2, 0.5, 0.8);
+const float FogDistance = 100.0;
+const vec3 BoundBoxNeg = vec3(-5.0, -1.0, -3.0);
+const vec3 BoundBoxPos = vec3(3.0, 5.0, 4.0);
+
+const float Epsilon = 0.00001;
+const float CastEpsilon = 0.005;
+const float CastEpsilon2 = 0.01;
+
+bool IsAwayFromBB(in vec3 RayOrg, in vec3 RayDir)
+{
+    return
+        (RayOrg.x < BoundBoxNeg.x && RayDir.x <= 0.0) ||
+        (RayOrg.x > BoundBoxPos.x && RayDir.x >= 0.0) ||
+        (RayOrg.y < BoundBoxNeg.y && RayDir.y <= 0.0) ||
+        (RayOrg.y > BoundBoxPos.y && RayDir.y >= 0.0) ||
+        (RayOrg.z < BoundBoxNeg.z && RayDir.z <= 0.0) ||
+        (RayOrg.z > BoundBoxPos.z && RayDir.z >= 0.0);
+}
+
+vec3 GetSkyColor(in vec3 Dir)
+{
+    float SunLum = pow(max(dot(normalize(LightDir), -Dir), 0.0), LightPow);
+    float Foggy = 1.0 - abs(Dir.y);
+    return mix(SkyColor, FogColor, Foggy) + SunLum * LightColor;
+}
+
+vec2 MapDist(in vec3 Pos)
+{
+    float ResultDist = 9999999.0;
+    float ResultIndex = 0.0;
+    float Dist1 = Pos.y;
+    float Dist2 = distance(Pos, Sphere1.xyz) - Sphere1.w;
+    float Dist3 = distance(Pos, Sphere2.xyz) - Sphere2.w;
+    float Dist4 = distance(Pos, Sphere3.xyz) - Sphere3.w;
+    if(Dist1 < ResultDist)
+    {
+        ResultDist = Dist1;
+        ResultIndex = int(mod(Pos.x * 2.0, 2.0)) != int(mod(Pos.z * 2.0, 2.0)) ? 1.0 : 5.0;
+    }
+    if(Dist2 < ResultDist)
+    {
+        ResultDist = Dist2;
+        ResultIndex = 2.0;
+    }
+    if(Dist3 < ResultDist)
+    {
+        ResultDist = Dist3;
+        ResultIndex = 3.0;
+    }
+    if(Dist4 < ResultDist)
+    {
+        ResultDist = Dist4;
+        ResultIndex = 4.0;
+    }
+    return vec2(ResultDist, ResultIndex);
+}
+
+vec3 MapNormal(in vec3 Pos)
+{
+    vec2 Nearest = MapDist(Pos);
+    int Index = int(Nearest.y);
+    if (Index == 1 || Index == 5)
+        return vec3(0, 1, 0);
+    if (Index == 2)
+        return normalize(Pos - Sphere1.xyz);
+    if (Index == 3)
+        return normalize(Pos - Sphere2.xyz);
+    if (Index == 4)
+        return normalize(Pos - Sphere3.xyz);
+}
+
+vec3 MapColor(in vec3 Pos)
+{
+    vec2 Nearest = MapDist(Pos);
+    int Index = int(Nearest.y);
+    if (Index == 1)
+        return vec3(1.0, 1.0, 1.0);
+    if (Index == 2)
+        return vec3(0.7, 0.9, 0.1);
+    if (Index == 3)
+        return vec3(0.1, 0.7, 0.9);
+    if (Index == 4)
+        return vec3(0.9, 0.1, 0.7);
+    if (Index == 5)
+        return vec3(0.5, 0.5, 0.5);
+}
+
+float GroundCast(in vec3 RayOrg, in vec3 RayDir)
+{
+    if(abs(RayDir.y) <= Epsilon)
+    {
+        return -1.0;
+    }
+    else
+    {
+        return RayOrg.y / -RayDir.y;
+    }
+}
+
+float MapCast(in vec3 RayOrg, in vec3 RayDir)
+{
+    float Dist = 0.0;
+    for(int i = 0; i < RayStepCount; i++)
+    {
+        if(IsAwayFromBB(RayOrg, RayDir))
+        {
+            if(RayDir.y < 0.0)
+            {
+                float GroundDist = GroundCast(RayOrg, RayDir);
+                if(GroundDist >= 0.0)
+                	return Dist + GroundDist;
+            }
+            else return -1.0;
+        }
+        else
+        {
+            vec2 Nearest = MapDist(RayOrg + RayDir * Dist);
+            Dist += Nearest.x;
+            if(Nearest.x <= CastEpsilon) return Dist;
+        }
+    }
+    return -1.0;
+}
+
+vec3 RenderScene(in vec3 RayOrg, in vec3 RayDir)
+{
+    vec3 CurRayOrg = RayOrg;
+    vec3 CurRayDir = RayDir;
+    vec3 Mask = vec3(1.0, 1.0, 1.0);
+    for(int i = 0; i < SampleDepth; i++)
+    {
+       	float CastDist = MapCast(CurRayOrg, CurRayDir);
+        if(CastDist < 0.0) break;
+        vec3 CastPos = CurRayOrg + CurRayDir * CastDist;
+        float Foggy = CastDist / FogDistance;
+        vec3 CastNormal = MapNormal(CastPos);
+        Mask *= mix(MapColor(CastPos), FogColor, min(Foggy, 1.0));
+        CurRayOrg = CastPos;
+        CurRayDir = normalize(reflect(CurRayDir, CastNormal));
+        CurRayOrg += CurRayDir * CastEpsilon2;
+    }
+    return GetSkyColor(CurRayDir) * Mask;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec3 RayOrg = CamPos + vec3(cos(iTime * 0.5), sin(iTime * 0.5), sin(iTime * 0.25) * 4.0) * 0.5;
+    vec3 RayDir = normalize(vec3((fragCoord * 2.0 - iResolution.xy) / iResolution.yy, -1.75));
+    fragColor = vec4(RenderScene(RayOrg, RayDir), 1.0);
+}

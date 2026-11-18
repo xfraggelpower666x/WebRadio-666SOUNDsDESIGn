@@ -1,0 +1,16 @@
+// Ref: http://adrianboeing.blogspot.in/2011/02/ripple-effect-in-webgl.html
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) 
+{
+    // pixel position normalised to [-1, 1]
+	vec2 cPos = -1.0 + 2.0 * fragCoord.xy / iResolution.xy;
+    
+    // distance of current pixel from center
+	float cLength = length(cPos);
+
+	vec2 uv = fragCoord.xy/iResolution.xy+(cPos/cLength)*cos(cLength*12.0-iTime*4.0) * 0.03;
+	
+    
+    vec3 col = texture(iChannel0,uv).xyz;
+
+	fragColor = vec4(col,1.0);
+}

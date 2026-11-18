@@ -1,0 +1,122 @@
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+// Created by me_123. March 2023
+
+#define COUNT 30
+#define MAX 1000.
+
+vec3 getRay(in vec3 cameraDir, in vec2 uv) {
+    vec3 cameraPlaneU = vec3(normalize(vec2(cameraDir.y, -cameraDir.x)), 0);
+    vec3 cameraPlaneV = cross(cameraPlaneU, cameraDir);
+    return normalize(cameraDir + uv.x * cameraPlaneU + uv.y * cameraPlaneV);
+}
+
+vec3 hash33(uvec3 q) {
+    q *= uvec3(1597334673U, 3812015801U, 2798796415U);
+    q = (q.x ^ q.y ^ q.z)*uvec3(1597334673U, 3812015801U, 2798796415U);
+    return vec3(q) * (1.0 / float(0xffffffffU));
+}
+
+vec3 hash31(uint q) {
+    uvec3 n = q * uvec3(1597334673U, 3812015801U, 2798796415U);
+    n = (n.x ^ n.y ^ n.z) * uvec3(1597334673U, 3812015801U, 2798796415U);
+    return vec3(n) * (1.0 / float(0xffffffffU));
+}
+
+vec3 noise(in float x) {
+    return mix(hash31(uint(floor(x))),hash31(1u+uint(floor(x))),0.5*(1.-cos(3.14159*fract(x))));
+}
+
+vec3 fbm(in float x) {
+    vec3 v = vec3(0);
+    for (int i = 0; i < 5; i += 1) {
+        v += noise(x*float(1<<i))*pow(2., -float(i));
+    }
+    return v*0.5 - 0.5;
+}
+
+float fog(in vec3 o, in vec3 d, in vec2 x) {
+    // integral of 1/((o.x+d.x*x)^2 + (o.y+d.y*x)^2 + (o.y+d.y*x)^2) dx
+    // from x.x to x.y
+    float dd = dot(d, d),
+    d0 = dot(o, d),
+    q = 1./(sqrt(0.00005+dd*(o.z*o.z-d0*d0/dd+dot(o.xy, o.xy))));
+    vec2 k = atan((dd*x+d0)*q);
+    return (k.y-k.x)*q*0.05;
+}
+
+float time = 0.0;
+
+vec3 getColor(in vec3 ro, in vec3 rd) {
+    float dist = MAX; // Send the ray indefinitely into the distance
+    vec3 volumetric = vec3(0);
+    
+    // Calculate just the volumetric fog of the lights
+    for (int i = 0; i < COUNT; i += 1) {
+        vec3 lightPos = sin(hash31(uint(i+10))*10.+hash31(uint(i+100))*time*0.5)*2.5;
+        vec3 lightColor = 0.005/pow(hash31(uint(i+10)), vec3(1.25));
+        
+        if (i == 1) lightColor *= 10.;
+        
+        // Add volumetric scattering from the origin (0) to infinity (dist)
+        volumetric += lightColor * fog(ro - lightPos, rd, vec2(0.0, dist));
+    }
+    
+    // Tonemapping/color adjustments
+    return (2.0 - 1.0 / (volumetric * (3.0 + 0.5 * sin(time)) + 0.5)) * 0.5;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    time = 0.3*((sin(iTime)+1.0)*5.+time);
+    vec2 uv = (fragCoord.xy-iResolution.xy*0.5)/iResolution.y;
+    vec2 m = vec2(iTime*0.4, sin(iTime*0.25)*0.3+3.1415*0.5);
+    vec3 ro = vec3(sin(m.y) * cos(-m.x), sin(m.y) * sin(-m.x), max(cos(m.y), -0.1))*5.0;
+    vec3 rd = getRay(-normalize(ro), uv);
+    ro += fbm(iTime)*0.2;
+    
+    vec3 color = getColor(ro, rd) + hash33(uvec3(fragCoord.xy, iTime))*0.00390625; // added noise/dithering
+    
+    fragColor = vec4(color, 1);
+
+    // --- UNIVERSAL FLASH TO WHITE (FIXED TIMING) ---
+    // 1. Define exactly how long this animation should take (e.g., 2.5 seconds)
+    float transitionTime = 2.0; 
+
+    // 2. Create a timer that stays at 0.0 for the whole video, 
+    // but starts counting up exactly 'transitionTime' seconds before the end.
+    float triggerTime = iEndTime - transitionTime;
+    float tFlash = clamp(iTime - triggerTime, 0.0, transitionTime);
+
+    // 3. Run your exact same math, but scale it to 'transitionTime' instead of 'duration'
+    float z_prog = smoothstep(0.0, transitionTime, tFlash);
+    z_prog = pow(z_prog, 1.5); // Easing for accelerating zoom effect
+    
+    float animZ = mix(20.0, -2.0, z_prog);
+    float flashAmt = 1.0 - smoothstep(-1.0, 1.0, animZ);
+    
+    // 4. Mix and output
+    vec3 colFlash = mix(fragColor.rgb, vec3(1.0), flashAmt);
+    fragColor = vec4(colFlash, 1.0);
+
+    // MUSIC_VIDEO__MOD
+    float colorTimer = floor(iTime * 2.0); 
+
+    vec3 flashColor = vec3(
+        rand(colorTimer),           
+        rand(colorTimer + 10.0),    
+        rand(colorTimer + 20.0)     
+    );
+
+    // Add the flash to the transformed screen
+    vec3 finalColor = fragColor.rgb + (flashColor * iMusicSync2*1.2);
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+}

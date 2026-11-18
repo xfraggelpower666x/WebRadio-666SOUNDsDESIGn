@@ -1,0 +1,41 @@
+#define rand(x) fract(sin(x)*1e4)
+#define rand2(x) fract(sin(dot(x,vec2(12.9898,78.233)))*43758.5453123)
+#define rot(a) mat2(C=cos(a),S=sin(a),-S,C)
+float C,S;
+
+float noise(vec2 uv) {
+    vec2 i=floor(uv),f=smoothstep(0.,1.,fract(uv)),oi=vec2(0.,1.);
+    return mix(
+        mix(rand2(i),rand2(i+oi.yx),f.x),
+        mix(rand2(i+oi.xy),rand2(i+oi.yy),f.x),
+        f.y);
+}
+
+vec2 noise2(vec2 uv) {
+    return vec2(noise(uv),noise(uv+10.));
+}
+
+vec3 ck(vec2 uv) {
+    vec3 c=texture(iChannel0,uv).rgb;
+    float l=length(c-vec3(.188,.510,.090));
+    return mix(vec3(0.),smoothstep(0.,1.,c)*1.5,min(1.,l*2.));
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = fragCoord.xy / iResolution.xy;
+    vec2 st=uv;
+    st.x*=iResolution.x/iResolution.y;
+    st*=iResolution.x*10.*rot(.1);
+    vec4 c=vec4(1.);
+    for(int i=0;i<3;++i) {
+        st+=vec2(.3);
+        vec2 ist=floor(st),fst=fract(st),wp=ist+step(.5,fst),bp=ist+.5,
+            o=(noise2(vec2(i,float(i)*.2+iTime*5.))-.5)*.1;
+        float wl=length(st-wp),bl=length(st-bp);
+        float clr=step(wl/(wl+bl),ck(uv+o)[i]);
+        c[i]=clr;
+    }
+    c.rgb*=ck(uv);
+    fragColor = c;
+}

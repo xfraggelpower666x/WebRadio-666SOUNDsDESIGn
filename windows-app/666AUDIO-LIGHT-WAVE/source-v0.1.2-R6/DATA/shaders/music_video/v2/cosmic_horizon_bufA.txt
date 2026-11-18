@@ -1,0 +1,129 @@
+// iChannel1: gray noise medium 256x256
+
+// This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0
+// Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ 
+// or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+// =========================================================================================================
+
+const float PI = 3.14159265;
+mat2 r2d(float a){float sa = sin(a);float ca=cos(a);return mat2(ca,sa,-sa,ca);}
+
+float lenny(vec2 v)
+{
+  return abs(v.x)+abs(v.y);
+}
+float sat(float a)
+{
+  return clamp(a,0.,1.);
+}
+vec3 sat(vec3 v)
+{
+  return vec3(sat(v.x),sat(v.y), sat(v.z));
+}
+float _sub(float a, float b)
+{
+  return max(a,-b);
+}
+float _cir(vec2 uv, float sz)
+{
+  return length(uv)-sz;
+}
+
+float _loz(vec2 uv,float sz)
+{
+  return lenny(uv)-sz;
+}
+
+vec3 tunnel(vec2 uv,float sz)
+{
+  //uv += vec2(sin(length(uv)),cos(length(uv)))*.1;
+  float a = sz*atan(uv.y,uv.x)/PI;
+  float d = .021*iTime+.01/length(uv);
+  vec3 col = texture(iChannel1,vec2(d,a)).xxx;
+  return sat(1.-length(uv*.2))*col*sat(length(uv*20.))*mix(vec3(.28+abs(uv.x),.34,sat(.17+length(uv))),vec3(.8,.5,.7),length(uv)-.9);
+}
+
+vec3 rdrLand(vec2 uv)
+{
+  vec3 back;
+  vec3 col;
+  col += 2.*tunnel(uv,1.);
+ // col += 1.5*tunnel(uv*.8*r2d(iTime*.2),.2);
+  col += tunnel(uv*5.2*r2d(iTime*.2),.2);
+
+  for (int i = 0;i<8;++i)
+  {
+    float fi= float(i);
+    float sz = 5./(fi+1.);
+    float szc = 7.*mod(sz+iTime*.1,1./9.);
+    float cut = _cir(uv, szc-szc/10.);
+    float ci = _cir(uv, szc);
+    float cir = 1.-sat(_sub(ci,cut)*20.);
+    col += vec3(.53,.94,.58)*(cir)*(sz-.1)*.1;
+  }
+
+  return back+col*.5;
+}
+
+vec3 rdrSqr(vec2 uv)
+{
+  uv = uv *r2d(PI/4.);
+  vec3 acc;
+  for (int i = 0; i < 16; i++)
+  {
+     vec2 suv = uv;
+     suv = suv*r2d(.8*smoothstep(0.,.9,mod(iTime+float(i)*.5,.9)));
+     vec3 col;
+
+     float an = iTime*.1+.15*float(i)+atan(uv.y, uv.x)/PI;
+     float sz = mod(iTime/(float(i+1)*.7),1.);
+     float sqr = _sub(_loz(suv, sz),_loz(suv,sz*.999));
+     col = vec3(1.,float(i)/10.,uv.y*.5+.2)*((1.-sat(sqr*200.))+.7*(1.-sat(sqr*15.)))*sat(float((mod(an,.05)-.015))*20.);
+     acc += col;
+  }
+    return acc;
+}
+
+vec3 rdrScn(vec2 uv)
+{
+  float maskLand = 1.-sat(_cir(uv,.5)*50.);
+
+  vec3 land = rdrLand(uv).zyx;
+  land += rdrSqr(uv)*sat(lenny(uv*2.))*.7;
+  return land;
+}
+
+vec3 rdr2(vec2 uv)
+{
+    vec2 ouv = uv;
+    ouv.y *= 1.+cos((ouv.x*PI));
+    vec3 col = rdrScn(ouv);
+  	col *= vec3(.7, .34, .89)*sat(1.-lenny(uv))*2.;
+    vec3 col2;
+    col2 += 2.*vec3(.7, .54, .89).zyx*sat(1.-lenny(uv*vec2(1., 8.)));
+    col2 += vec3(.7, .54, .89).zyx*sat(1.-lenny(uv*vec2(.5, 90.)));
+    col2 += .9*vec3(.7, .54, .89).zyx*sat(1.-lenny((uv*r2d(PI/4.)*vec2(.5, 10.))));
+    col2 += .5*vec3(.7, .54, .89).zyx*sat(1.-lenny((uv*r2d(PI/4.)*vec2(.5, 2.))));
+    col2 += .5*vec3(.7, .54, .89).zyx*sat(1.-lenny(((uv+vec2(-.2, -.5))*r2d(PI/4.)*vec2(.5, 90.))));
+    col2 += .5*vec3(.7, .54, .89).zyx*sat(1.-lenny(((uv+vec2(-.2, .3))*r2d(PI/4.)*vec2(.5, 5.))));
+    
+    vec3 halo = vec3(.6,.7,.9)*(1.-sat(_sub(_cir(uv, .65), _cir(uv, .6))*15.));
+    return col+col2*.5+halo*.4;
+}
+
+vec3 rdrPost(vec2 uv)
+{
+    vec2 dir = uv*.05;
+    float r = rdr2(uv+dir).x;
+    float g = rdr2(uv).y;
+    float b = rdr2(uv-dir).z;
+    return vec3(r,g,b);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+  vec2 uv = fragCoord.xy / iResolution.xx;
+  uv -= vec2(.5)*iResolution.xy/iResolution.xx;
+  uv*= 1.5;
+  vec3 col = rdrPost(uv);
+  fragColor = vec4(col, 1.0);
+}

@@ -1,0 +1,411 @@
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+
+
+ 
+// Controls randomness
+const int seed = 7;
+// Amount of circles in flare
+const int circles = 20;
+// Max size of circles
+const float circleSize = 1. / 10.;
+// Outside color
+const vec3 col1 = vec3(0.2,0.1,0.0);
+// Inside color
+const vec3 col2 = vec3(0.9,1.,1.);
+// Percentage of screen toward the center to start fading out circles
+const float fadeRadius = 0.3;
+// Overall circle opacity multiplier
+const float overallOpacity = 4.;
+// Iterations for bokeh blur
+const int bokehIterations = 5;
+// Radius for bokeh blur
+const float bokehRadius = 0.3;
+
+float easeOutQuad(float x) {
+    return x * x;
+}
+
+float random(float seed) {
+    return fract(sin(seed) * 100000.0);
+}
+
+float getPointDist(vec2 point1, vec2 point2) {
+    float x = point2.x - point1.x;
+    float y = point2.y - point1.y;
+    return length(vec2(x, y));
+}
+
+float lerp(float a, float b, float t) {
+    return a + (b - a) * t;
+}
+
+vec3 lerp(vec3 a, vec3 b, float t) {
+    return vec3(
+        lerp(a.x, b.x, t),
+        lerp(a.y, b.y, t),
+        lerp(a.z, b.z, t)
+    );
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+vec3 drawRainbowCircle(vec2 circlePos, vec2 pixelPos, float radius) {
+    float dist = getPointDist(circlePos, pixelPos) / radius;
+    if (dist > 1.) return vec3(0,0,0);
+    
+    float colorMul = (dist - 0.4) / (dist + 1.);
+    vec3 col = hsv2rgb(vec3(colorMul * 8., 0.5, 1));
+    col *= colorMul;
+    col = max(col, 0.);
+    if (dist > 0.5) col *= 1. - dist;
+    
+    return col;
+}
+
+vec3 drawCircle(vec2 circlePos, vec2 pixelPos, float radius, float falloff, vec3 startColor, vec3 endColor) {
+    float dist = getPointDist(circlePos, pixelPos) / radius;
+    if (dist > 1.) return vec3(0,0,0);
+    
+    float colorMul = (dist - falloff) / (dist + 1.);
+    vec3 col = lerp(startColor, endColor, colorMul);
+    col *= colorMul;
+    col = max(col, 0.);
+    
+    return col;
+}
+
+vec2 getFlarePoint(vec2 centerPos, vec2 centerVec, float position) {
+    vec2 delta = centerVec * position;
+    delta += centerPos;
+    return delta;
+}
+
+float angleBetween(vec2 v1, vec2 v2) {
+    return acos(dot(v1, v2) / (length(v1) * length(v2)));
+}
+
+#define GOLDEN_ANGLE 2.3999632
+#define BLUR 1.
+#define PI 3.14159265359 
+
+mat2 rot = mat2(cos(GOLDEN_ANGLE), sin(GOLDEN_ANGLE), -sin(GOLDEN_ANGLE), cos(GOLDEN_ANGLE));
+
+// --- LENS FLARE FUNCTION ---
+// Takes screen coordinates, resolution, and time, and returns the flare color
+vec3 renderLensFlare_left(vec2 fragCoord, vec3 iResolution, float iTime) {
+    vec2 uv = fragCoord / iResolution.x;
+    vec3 col = vec3(0.0);
+    
+    // Variables controlling the originating point (x, y coordinates).
+    float speed = 0.35; 
+    float minX = 0.0; 
+    float maxX = 0.35; 
+    
+    // 1. Create a smooth back-and-forth wave that goes from 0.0 to 1.0
+    float pingPong = (sin(iTime * speed) * 0.5) + 0.5;
+    
+    // 2. Interpolate between minX and maxX, then scale to screen resolution
+    float originX = mix(minX, maxX, pingPong) * iResolution.x;
+    float originY = mix(minX, maxX, pingPong) + iResolution.y*0.85;
+    
+    vec2 centerPos = vec2(originX, originY);
+    
+    // Lock the Y coordinate of the "lens center" to the same Y coordinate as the origin
+    vec2 lensCenter = vec2(iResolution.x / 2.0, originY);
+    vec2 centerVec = (lensCenter - centerPos) * 2.0;
+
+    float centerVecLength = length(centerVec);
+    
+    float centerProximity = centerVecLength / 170.0;
+    if (centerProximity < 1.0) centerProximity = 1.0;
+    
+    float opacityMul = centerVecLength / iResolution.x / fadeRadius;
+    if (opacityMul > 1.0) opacityMul = 1.0;
+    opacityMul = 1.0 - easeOutQuad(1.0 - opacityMul);
+    
+    float circleOpacityMul = centerVecLength / iResolution.x / 0.2;
+    if (circleOpacityMul > 1.0) circleOpacityMul = 1.0;
+    
+    vec3 acc = vec3(0.0), div = acc;
+    float r = 1.0;
+    vec2 vangle = vec2(0.0, bokehRadius * 0.01 / sqrt(float(bokehIterations)));
+    
+    for (int j = 0; j < bokehIterations; j++) {  
+        vangle = rot * vangle;
+        // NOTE: Make sure 'BLUR' is defined globally or pass it into this function
+        vec2 pixelPos = (uv + (BLUR) * vangle) * iResolution.x;
+        
+        float baseRadius = (1.0 - circleOpacityMul) / 4.0 + 3.0 / 4.0;
+        float circleBoost = 1.0 + (1.0 - circleOpacityMul) * 0.1;
+        col = drawCircle(getFlarePoint(centerPos, centerVec, 0.0), pixelPos, iResolution.x / 1.5 * baseRadius, circleBoost, vec3(0.0), vec3(1.0));
+    
+        for (int i = 0; i < circles; i++) {
+            float newSeed = float(seed) / (float(i) + 10.0);
+            float pos = random(newSeed);
+            float dist = 1.0 - pos;
+            float radius = iResolution.x * circleSize * random(newSeed * 2.0) * dist;
+            float falloff = 0.35 + random(newSeed * 3.0) * 0.5;
+            float opacity = (0.8 + random(newSeed * 4.0) * 0.2) * opacityMul * overallOpacity;
+            opacity *= dist;
+            
+            vec2 flarePoint = getFlarePoint(centerPos, centerVec, pos);
+            vec2 pointToFlare = flarePoint - pixelPos;
+            float angle = angleBetween(pointToFlare, centerVec) / PI;
+            angle = easeOutQuad(angle);
+            angle = clamp(angle, 0.0, 1.0);
+            opacity *= angle;
+            opacity /= centerProximity;
+        
+            col += drawCircle(flarePoint, pixelPos, radius, falloff, col1, col2) * opacity;
+        }
+        
+        vec2 flarePoint = getFlarePoint(centerPos, centerVec, 0.25);
+        vec2 pointToFlare = flarePoint - pixelPos;
+        float angle = angleBetween(pointToFlare, centerVec) / PI;
+        angle = easeOutQuad(easeOutQuad(angle));
+        angle = clamp(angle, 0.0, 1.0);
+        angle = lerp(1.0, angle, opacityMul);
+        float opacity = angle * 1.5;
+        opacity /= centerProximity / 7.5;
+        col += drawRainbowCircle(flarePoint, pixelPos, iResolution.x / 5.0) * opacity;
+        
+        vec2 distToCenter = pixelPos - centerPos;
+        float res = iResolution.x / 80.0;
+        opacity = (1.0 - opacityMul) * 0.9 + 0.1;
+        
+        float dist = 1.0 - (abs(distToCenter.x / 16.0) + abs(distToCenter.y * 4.0)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+       
+        dist = 1.0 - (abs(distToCenter.x * 4.0) + abs(distToCenter.y / 16.0)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+        
+        res = iResolution.x / 80.0;
+        
+        dist = 1.0 - (abs(distToCenter.x / 9.0) + abs(distToCenter.y)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+       
+        dist = 1.0 - (abs(distToCenter.x) + abs(distToCenter.y / 9.0)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+        
+        vec3 bokeh = pow(col, vec3(4.0));
+        acc += col * bokeh;
+        div += bokeh;
+    }
+
+    // Protect against division by zero
+    vec3 finalFlare = acc / max(div, 0.00001);
+    
+    // Return JUST the flare color (we will add it to the scene later)
+    return finalFlare;
+}
+
+
+
+// --- LENS FLARE FUNCTION ---
+// Takes screen coordinates, resolution, and time, and returns the flare color
+vec3 renderLensFlare_right(vec2 fragCoord, vec3 iResolution, float iTime) {
+    vec2 uv = fragCoord / iResolution.x;
+    vec3 col = vec3(0.0);
+    
+    // Variables controlling the originating point (x, y coordinates).
+    float speed = 0.35; 
+    float minX = 0.0; 
+    float maxX = 0.2; 
+    
+    // 1. Create a smooth back-and-forth wave that goes from 0.0 to 1.0
+    float pingPong = (sin(iTime * speed) * 0.5) + 0.5;
+    
+    // 2. Interpolate between minX and maxX, then scale to screen resolution
+    // Invert the mix for the X axis to mirror it to the right side (1.0 to 0.6)
+    float originX = (1.0 - mix(minX, maxX, pingPong)) * iResolution.x;
+    float originY = mix(minX, maxX, pingPong) + iResolution.y*0.85;
+    
+    vec2 centerPos = vec2(originX, originY);
+    
+    // Lock the Y coordinate of the "lens center" to the same Y coordinate as the origin
+    vec2 lensCenter = vec2(iResolution.x / 2.0, originY);
+    vec2 centerVec = (lensCenter - centerPos) * 2.0;
+
+    float centerVecLength = length(centerVec);
+    
+    float centerProximity = centerVecLength / 170.0;
+    if (centerProximity < 1.0) centerProximity = 1.0;
+    
+    float opacityMul = centerVecLength / iResolution.x / fadeRadius;
+    if (opacityMul > 1.0) opacityMul = 1.0;
+    opacityMul = 1.0 - easeOutQuad(1.0 - opacityMul);
+    
+    float circleOpacityMul = centerVecLength / iResolution.x / 0.2;
+    if (circleOpacityMul > 1.0) circleOpacityMul = 1.0;
+    
+    vec3 acc = vec3(0.0), div = acc;
+    float r = 1.0;
+    vec2 vangle = vec2(0.0, bokehRadius * 0.01 / sqrt(float(bokehIterations)));
+    
+    for (int j = 0; j < bokehIterations; j++) {  
+        vangle = rot * vangle;
+        // NOTE: Make sure 'BLUR' is defined globally or pass it into this function
+        vec2 pixelPos = (uv + (BLUR) * vangle) * iResolution.x;
+        
+        float baseRadius = (1.0 - circleOpacityMul) / 4.0 + 3.0 / 4.0;
+        float circleBoost = 1.0 + (1.0 - circleOpacityMul) * 0.1;
+        col = drawCircle(getFlarePoint(centerPos, centerVec, 0.0), pixelPos, iResolution.x / 1.5 * baseRadius, circleBoost, vec3(0.0), vec3(1.0));
+    
+        for (int i = 0; i < circles; i++) {
+            float newSeed = float(seed) / (float(i) + 10.0);
+            float pos = random(newSeed);
+            float dist = 1.0 - pos;
+            float radius = iResolution.x * circleSize * random(newSeed * 2.0) * dist;
+            float falloff = 0.35 + random(newSeed * 3.0) * 0.5;
+            float opacity = (0.8 + random(newSeed * 4.0) * 0.2) * opacityMul * overallOpacity;
+            opacity *= dist;
+            
+            vec2 flarePoint = getFlarePoint(centerPos, centerVec, pos);
+            vec2 pointToFlare = flarePoint - pixelPos;
+            float angle = angleBetween(pointToFlare, centerVec) / PI;
+            angle = easeOutQuad(angle);
+            angle = clamp(angle, 0.0, 1.0);
+            opacity *= angle;
+            opacity /= centerProximity;
+        
+            col += drawCircle(flarePoint, pixelPos, radius, falloff, col1, col2) * opacity;
+        }
+        
+        vec2 flarePoint = getFlarePoint(centerPos, centerVec, 0.25);
+        vec2 pointToFlare = flarePoint - pixelPos;
+        float angle = angleBetween(pointToFlare, centerVec) / PI;
+        angle = easeOutQuad(easeOutQuad(angle));
+        angle = clamp(angle, 0.0, 1.0);
+        angle = lerp(1.0, angle, opacityMul);
+        float opacity = angle * 1.5;
+        opacity /= centerProximity / 1.5;
+        col += drawRainbowCircle(flarePoint, pixelPos, iResolution.x / 5.0) * opacity;
+        
+        vec2 distToCenter = pixelPos - centerPos;
+        float res = iResolution.x / 80.0;
+        opacity = (1.0 - opacityMul) * 0.9 + 0.1;
+        
+        float dist = 1.0 - (abs(distToCenter.x / 16.0) + abs(distToCenter.y * 4.0)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+       
+        dist = 1.0 - (abs(distToCenter.x * 4.0) + abs(distToCenter.y / 16.0)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+        
+        res = iResolution.x / 80.0;
+        
+        dist = 1.0 - (abs(distToCenter.x / 9.0) + abs(distToCenter.y)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+       
+        dist = 1.0 - (abs(distToCenter.x) + abs(distToCenter.y / 9.0)) / res;
+        col += max(dist, 0.0) * 0.3 * opacity;
+        
+        vec3 bokeh = pow(col, vec3(4.0));
+        acc += col * bokeh;
+        div += bokeh;
+    }
+
+    // Protect against division by zero
+    vec3 finalFlare = acc / max(div, 0.00001);
+    
+    // Return JUST the flare color (we will add it to the scene later)
+    return finalFlare;
+}
+
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    vec2 uv = fragCoord / iResolution.xy;
+    // Flip Y to match Pygame's coordinate system perfectly
+    //uv.y = 1.0 - uv.y;
+
+       
+    // Output the distorted texture from Buffer A
+    //fragColor = texture(iChannel0, uv);
+
+   
+    vec4 texColor1 = texture(iChannel0, uv);
+    vec2 uv_console = fragCoord / iResolution.xy;
+    uv_console.y = 1.0 - uv_console.y;
+    vec4 texColor2 = texture(iChannel20, uv_console);
+    fragColor.rgb = max(texColor1.rgb, texColor2.rgb);
+
+    //vec2 uv_console_mask = final_uv;
+    //uv_console_mask.y = 1.0 - uv_console_mask.y;    
+    //vec4 texColor3 = texture(iChannel21, uv_console_mask);
+
+    //fragColor.rgb = mix(fragColor.rgb, texColor3.rgb, texColor3.a);
+    //fragColor.a = max(fragColor.a, texColor3.a);
+    //mix(texColor1, texColor2, 0.4);
+
+
+    //fragColor = vec4(fragColor.rgb + finalCircuitColor, 1.0);
+    
+
+ 
+
+    // MUSIC_VIDEO__MOD
+    float colorTimer = floor(iTime * 2.0); 
+
+    vec3 flashColor = vec3(
+        rand(colorTimer),           
+        rand(colorTimer + 10.0),    
+        rand(colorTimer + 20.0)     
+    );
+
+    // Add the flash to the transformed screen
+    vec3 finalColor = fragColor.rgb + (flashColor * iMusicSync2*1.2);
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+    // --- UNIVERSAL FLASH TO WHITE (FIXED TIMING) ---
+    // 1. Define exactly how long this animation should take (e.g., 2.5 seconds)
+    float transitionTime = 1.0; 
+
+    // 2. Create a timer that stays at 0.0 for the whole video, 
+    // but starts counting up exactly 'transitionTime' seconds before the end.
+    float triggerTime = iEndTime - transitionTime;
+    float tFlash = clamp(iTime - triggerTime, 0.0, transitionTime);
+
+    // 3. Run your exact same math, but scale it to 'transitionTime' instead of 'duration'
+    float z_prog = smoothstep(0.0, transitionTime, tFlash);
+    z_prog = pow(z_prog, 1.5); // Easing for accelerating zoom effect
+    
+    float animZ = mix(20.0, -2.0, z_prog);
+    float flashAmt = 1.0 - smoothstep(-1.0, 1.0, animZ);
+    
+    // 4. Mix and output
+    vec3 colFlash = mix(fragColor.rgb, vec3(1.0), flashAmt);
+    fragColor = vec4(colFlash, 1.0);
+
+
+
+    // 2. Call the newly created flare function
+    vec3 flare_left = renderLensFlare_left(fragCoord, iResolution, iTime);
+    
+    // 3. Add the flare to the base scene color and output it
+    fragColor = vec4(fragColor.rgb + flare_left, 1.0);
+
+
+    // 2. Call the newly created flare function
+    //vec3 flare_right = renderLensFlare_right(fragCoord, iResolution, iTime);
+    
+    // 3. Add the flare to the base scene color and output it
+    //fragColor = vec4(fragColor.rgb + flare_right, 1.0);
+
+
+	
+}

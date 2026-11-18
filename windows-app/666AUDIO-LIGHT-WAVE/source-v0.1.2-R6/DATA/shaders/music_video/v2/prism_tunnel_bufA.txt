@@ -1,0 +1,210 @@
+// Name: Prism Tunnel  (checkerboard tunnel, chromatic ribbons, tumbling glass cube)
+// A mimic of the reference clip: a black/white checkered square tunnel flown
+// through toward a dark vanishing point, red/blue neon light-ribbons streaking
+// with chromatic aberration, and one faceted glass cube tumbling down the hall,
+// refracting the checker (rainbow dispersion) and catching the neon on its faces.
+//
+// Technique mash-up (diatribes): curving-centerline fly-through + square tube
+// (Deco Tunnel / Blue Red Shiny), squiggle light-tubes as glow (Red Blue Fly
+// Through), refract-and-march-again glass (Refract Fractal); glass cube shading
+// after "glass cube.txt" (rounded box, fresnel, IOR refraction).
+//
+// Audio (iChannel0 = music): the red ribbon's glow rides the bass, the blue one the mids,
+// and kicks + highs flash the white-hot cores and swell the halos. Walls and cube catch that light.
+
+// ===== PASS 0: Image =====
+
+#define N normalize
+mat2 rot(float a){ return mat2(cos(a),-sin(a),sin(a),cos(a)); }
+
+vec3 path(float z){ return vec3(cos(z*0.06)*2.2 + sin(z*0.043)*1.4, sin(z*0.05)*1.6, z); }
+vec2 rPath(float z){ return sin(z*0.16 + vec2(0.0,1.3))*1.7; }
+vec2 bPath(float z){ return sin(z*0.12 + vec2(1.0,0.4))*2.0; }
+float tubeW(float z){ return 3.4 + 0.35*sin(z*0.12 + 1.0); }
+
+// ribbon glow + light, set once per pixel from the music in mainImage
+vec3  G_R, G_B;        // red / blue halo colour * gain * march-step weight
+float G_C, G_K, G_T;   // core gain, halo width (r^2), tail cut (r^4)
+float L_R, L_B;        // how hard each ribbon lights the walls and the cube
+
+// neon ribbon glow at distance dr (red) / db (blue) from their centrelines.
+// The r^4 terms cut the long 1/r^2 tail, which summed into a grey haze over the whole hall.
+vec3 ribbonGlow(float dr, float db){
+    float r2 = dr*dr, b2 = db*db;
+    return G_R/(0.02 + r2*G_K + r2*r2*G_T) + G_B/(0.02 + b2*G_K + b2*b2*G_T)
+         + G_C*(1.0/(0.006 + r2*45.0 + r2*r2*60.0) + 1.0/(0.006 + b2*45.0 + b2*b2*60.0));
+}
+
+// ---- the one glass cube: tumbling, swaying, flying ~6 units ahead of us ----
+vec3 cubeCenter(){
+    float T = iTime*6.0;
+    vec3 cc = path(T + 5.5);                    // ride along, a bit ahead
+    cc.xy += vec2(0.95*sin(iTime*0.50),         // sway across the hall
+                 -0.30 + 0.65*sin(iTime*0.42)); // and up/down, sitting a touch low
+    return cc;
+}
+float sdRoundBox(vec3 p, vec3 b, float r){
+    vec3 d = abs(p)-b;
+    return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0)) - r;
+}
+float cubeDist(vec3 p){
+    vec3 lp = p - cubeCenter();
+    lp.xy *= rot(iTime*0.60);                    // tumble
+    lp.yz *= rot(iTime*0.47);
+    return sdRoundBox(lp, vec3(0.62), 0.05);     // sized to read without filling the hall
+}
+vec3 cubeNormal(vec3 p){
+    vec2 e = vec2(1.0,-1.0)*0.001;
+    return N(e.xyy*cubeDist(p+e.xyy) + e.yyx*cubeDist(p+e.yyx) +
+             e.yxy*cubeDist(p+e.yxy) + e.xxx*cubeDist(p+e.xxx));
+}
+
+// ---- tunnel-only shaded colour (HDR, pre-exposure) for a given ray.
+//      Used for the primary walls AND for the cube's reflection/refraction rays,
+//      so the glass shows the real checker + ribbons around it. ----
+vec3 tunnelColor(vec3 ro, vec3 rd){
+    vec3 glow = vec3(0.0);
+    float d = 0.1, hit = -1.0, z = 0.0;
+    vec2 q = vec2(0.0);
+    for(int i=0;i<120;i++){
+        vec3 p = ro + rd*d;
+        vec3 c = path(p.z);
+        vec2 qq = p.xy - c.xy;
+        float W = tubeW(p.z);
+        qq += 0.10*sin(p.z*0.4 + qq.yx*1.7);
+        float tun = W - max(abs(qq.x), abs(qq.y));
+        float dr = length(qq - rPath(p.z));
+        float db = length(qq - bPath(p.z));
+        glow += ribbonGlow(dr, db);
+        if(tun < 0.002){ hit=1.0; q=qq; z=p.z; d=d; break; }
+        d += tun*0.7;
+        if(d > 140.0) break;
+    }
+    vec3 col = vec3(0.0);
+    if(hit > 0.0){
+        vec3 p = ro + rd*d;
+        vec3 c = path(z);
+        vec2 sg = 1.0 - 2.0*step(0.0, q);            // -sign(q) without sign() (ANGLE bug)
+        vec3 n = (abs(q.x)>abs(q.y)) ? vec3(sg.x,0,0) : vec3(0,sg.y,0);
+        float sc = 0.7;
+        float chk = mod(floor(q.x*sc)+floor(q.y*sc)+floor(z*sc), 2.0);
+        vec3 alb = mix(vec3(0.006), vec3(0.95), chk);   // deep black squares
+        float head = 0.30 + 0.70*max(dot(n,-rd),0.0);
+        col = alb*head;
+        vec3 lr = vec3(c.xy+rPath(z), z), lb = vec3(c.xy+bPath(z), z);
+        vec3 dr = lr-p, dbv = lb-p;
+        col += alb*vec3(1.0,0.10,0.05)*max(dot(n,N(dr)),0.0)/(1.0+dot(dr,dr)*0.25)*3.0*L_R;
+        col += alb*vec3(0.06,0.22,1.0)*max(dot(n,N(dbv)),0.0)/(1.0+dot(dbv,dbv)*0.25)*3.0*L_B;
+        col += vec3(1.0,0.12,0.06)*pow(max(dot(reflect(rd,n),N(dr)),0.0),28.0)*L_R;
+        col += vec3(0.10,0.22,1.0)*pow(max(dot(reflect(rd,n),N(dbv)),0.0),28.0)*L_B;
+        col *= exp(-d*0.032);
+    }
+    return col + glow;
+}
+
+void mainImage(out vec4 O, in vec2 U){
+    vec2 R = iResolution.xy;
+    vec2 uv = (2.0*U - R)/R.y;
+
+    // ---- audio: FFT row of iChannel0. No music = steady base glow ----
+    float bass = 0.0, mid = 0.0, high = 0.0;
+    for(int i=0;i<6;i++){
+        float f = float(i)/5.0;
+        bass += texture(iChannel3, vec2(mix(0.02,0.09,f), 0.25)).x;
+        mid  += texture(iChannel3, vec2(mix(0.15,0.35,f), 0.25)).x;
+        high += texture(iChannel3, vec2(mix(0.45,0.75,f), 0.25)).x;
+    }
+    bass /= 6.0; mid /= 6.0; high /= 6.0;
+    // ranges measured on Shadertoy's X'TrackTure: bass ~0.2 quiet, 0.35-0.7 with the beat in; mids and highs 0-0.75
+    float kick = smoothstep(0.48, 0.66, bass);                        // bass-hit gate
+    float gR = 0.5 + 1.6*smoothstep(0.3, 0.68, bass) + 0.8*kick;       // red ribbon rides the bass
+    float gB = 0.5 + 1.8*smoothstep(0.4, 0.78, mid);                  // blue ribbon rides the mids
+    float hw = 1.0 + 0.8*kick;                                        // halos swell on the kick
+    G_R = vec3(1.0,0.10,0.05)*gR*0.024;
+    G_B = vec3(0.10,0.25,1.0)*gB*0.024;
+    G_C = 0.7*0.024*(0.7 + 1.6*kick + 1.5*smoothstep(0.35, 0.72, high));  // white-hot cores flash on kicks and highs
+    G_K = 13.0/hw;  G_T = 12.0/(hw*hw);
+    L_R = 0.6 + 0.4*gR;  L_B = 0.6 + 0.4*gB;             // walls and cube catch the same light
+
+    float T = iTime*6.0;
+    vec3 ro = path(T);
+    vec3 fwd = N(path(T+2.0) - ro);
+    vec3 rgt = N(cross(vec3(0,1,0), fwd));
+    vec3 up  = cross(fwd, rgt);
+    uv *= rot(sin(iTime*0.3)*0.25);
+    vec3 D = N(uv.x*rgt + uv.y*up + 1.6*fwd);
+
+    // ---- primary march: tunnel walls + the glass cube ----
+    vec3 glow = vec3(0.0);
+    float d = 0.1; int hitType = 0;
+    vec3 p = ro; vec2 q = vec2(0.0); float z = 0.0;
+    for(int i=0;i<170;i++){
+        p = ro + D*d;
+        vec3 c = path(p.z);
+        q = p.xy - c.xy;
+        float W = tubeW(p.z);
+        q += 0.10*sin(p.z*0.4 + q.yx*1.7);
+        float tun = W - max(abs(q.x), abs(q.y));
+        float cub = cubeDist(p);
+
+        float dr = length(q - rPath(p.z));
+        float db = length(q - bPath(p.z));
+        glow += ribbonGlow(dr, db);
+
+        if(cub < 0.003 && cub <= tun){ hitType=2; z=p.z; break; }
+        if(tun < 0.002){ hitType=1; z=p.z; break; }
+        d += min(tun, cub)*0.7;
+        if(d > 150.0) break;
+    }
+
+    vec3 outc;
+    if(hitType == 2){
+        // ---- GLASS CUBE ----
+        vec3 nc = cubeNormal(p);
+        float fres = pow(1.0 - max(dot(-D, nc), 0.0), 5.0);
+        fres = 0.06 + 0.94*fres;                       // schlick-ish, glassy rim
+
+        vec3 reflC = tunnelColor(p + nc*0.03, reflect(D, nc));   // reflection of the hall
+        vec3 tint  = vec3(0.90, 0.95, 1.03);
+        // refraction with per-channel dispersion (thin-glass approx -> rainbow edges)
+        vec3 rr  = tunnelColor(p, refract(D, nc, 1.0/1.50));
+        vec3 rgc = tunnelColor(p, refract(D, nc, 1.0/1.53));
+        vec3 rbc = tunnelColor(p, refract(D, nc, 1.0/1.57));
+        vec3 refrC = vec3(rr.r, rgc.g, rbc.b) * tint;
+
+        outc = mix(refrC, reflC, fres);
+
+        // bright neon glints off the faces (light reflecting off the cube)
+        vec3 c = path(p.z);
+        vec3 lr = vec3(c.xy+rPath(p.z), p.z), lb = vec3(c.xy+bPath(p.z), p.z);
+        vec3 rdir = reflect(D, nc);
+        outc += vec3(1.0,0.12,0.06)*pow(max(dot(rdir, N(lr-p)),0.0),60.0)*2.5*L_R;
+        outc += vec3(0.10,0.22,1.0)*pow(max(dot(rdir, N(lb-p)),0.0),60.0)*2.5*L_B;
+        outc += glow;
+    } else if(hitType == 1){
+        // ---- WALL (checker) ----
+        vec3 c = path(z);
+        vec2 sg = 1.0 - 2.0*step(0.0, q);
+        vec3 n = (abs(q.x)>abs(q.y)) ? vec3(sg.x,0,0) : vec3(0,sg.y,0);
+        float sc = 0.7;
+        float chk = mod(floor(q.x*sc)+floor(q.y*sc)+floor(z*sc), 2.0);
+        vec3 alb = mix(vec3(0.006), vec3(0.95), chk);   // deep black squares
+        float head = 0.30 + 0.70*max(dot(n,-D),0.0);
+        vec3 col = alb*head;
+        vec3 lr = vec3(c.xy+rPath(z), z), lb = vec3(c.xy+bPath(z), z);
+        vec3 dr = lr-p, dbv = lb-p;
+        col += alb*vec3(1.0,0.10,0.05)*max(dot(n,N(dr)),0.0)/(1.0+dot(dr,dr)*0.25)*3.0*L_R;
+        col += alb*vec3(0.06,0.22,1.0)*max(dot(n,N(dbv)),0.0)/(1.0+dot(dbv,dbv)*0.25)*3.0*L_B;
+        col += vec3(1.0,0.12,0.06)*pow(max(dot(reflect(D,n),N(dr)),0.0),28.0)*L_R;
+        col += vec3(0.10,0.22,1.0)*pow(max(dot(reflect(D,n),N(dbv)),0.0),28.0)*L_B;
+        col *= exp(-d*0.032);
+        outc = col + glow;
+    } else {
+        outc = glow;
+    }
+
+    O.rgb = outc * 1.6; // exposure — whites stay just under clipping so the checker keeps its shading
+    O.rgb = O.rgb*(2.51*O.rgb + 0.03)/(O.rgb*(2.43*O.rgb + 0.59) + 0.14); // ACES filmic: true blacks, crisp whites (Reinhard lifted the blacks to grey)
+    O.rgb = pow(clamp(O.rgb, 0.0, 1.0), vec3(1.0/2.2));
+    O.a = 1.0;
+}

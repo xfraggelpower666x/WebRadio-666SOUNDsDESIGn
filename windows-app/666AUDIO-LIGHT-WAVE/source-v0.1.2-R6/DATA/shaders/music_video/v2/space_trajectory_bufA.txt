@@ -1,0 +1,42 @@
+const float t=3.1415927e0;
+mat2 c(float a){
+    float b=cos(a);
+    float d=sin(a);
+    return mat2(b,-d,d,b);
+}
+float l(float a){
+    return .8*a-2./.73*cos(.73*a)-1.3/1.61*cos(1.61*a+1.7)-.8/3.11*cos(3.11*a+4.2);
+}
+void mainImage(out vec4 m,in vec2 n){
+    vec2 g=iResolution.xy;
+    float b=iTime;
+    float o=l(b);
+    float p=1.*sin(.41*b+2.1)+.6*sin(.97*b+.3);
+    float q=.7*sin(.53*b+4.)+.5*sin(1.13*b+1.1);
+    float r=.4*sin(.29*b+1.2);
+    vec4 h=vec4(0.);
+    float d=.7;
+    float e=0.;
+    float f=0.;
+    for(float i=0.;i<43.;i++){
+        vec3 a=vec3((n.xy*2.1-g)/g.y*d,d);
+        a.xy*=c(r);
+        a.yz*=c(q);
+        a.xz*=c(p);
+        a.z+=o;
+        a=mod(a-1.,2.)-1.;
+        e=4.;
+        for(int j=0;j<10;j++){
+            a=abs(a)-.7;
+            a.yz*=c(.5);
+            float k=max(dot(a,a)*.4,1e-2);
+            e/=k;
+            a/=k;
+        }
+        f=1./e;
+        d+=f;
+        vec4 s=1.1+sin(log(e)*.6+vec4(1.,2.,4.,0.));
+        h+=s*.12/exp(f*1e3+d*.15);
+    }
+    m=h;
+}

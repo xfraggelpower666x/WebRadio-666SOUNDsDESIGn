@@ -1,0 +1,97 @@
+#define T (sin(iTime*.6)*2.+iTime*1e1)
+#define P(z) (vec3(cos((z)*.08)*6.+cos((z) * .05)  *12., \
+                   cos((z)*.06)*7., (z)))
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+float boxen(vec3 p) {
+    vec3 q = p;
+    // FIX 1: Initialize m to a highly negative number for max() accumulation
+    float c, m = -1e5; 
+    for(c = 3e1; c > 1.5; c *= .4) {
+        p.xz *= mat2(cos(c + vec4(0,33,11,0)));
+        p = abs(fract(p/c)*c - c/2.) - c*.15;
+        m = max(m, min(p.x, min(p.y, p.z)));
+        p = q;
+    }
+        
+    return m;
+}
+
+vec4 lights;
+float map(vec3 p) {
+    vec3 q = P(p.z);
+    float m, top = q.y-p.y - 5.;
+
+    m = boxen(p);
+
+    float e = .001+abs(length(p - vec3(
+               q.x+sin(T*.2)/2.,
+               q.y+1.,
+               T+1e1))-.02);
+               
+    lights += 2.*vec4(5,3,1,0)/e;
+    p.xy -= q.xy;
+    p = abs(p);
+    
+    float tex = abs(length(sin(p*cos(p.yzx/4.)*15.)/(p*15.)));     
+    float tun = min(5.-p.x, 4.-p.y);
+
+
+    float d = max(top, tun - tex * 1.5);
+    return min(e, mix(d, m, .5));
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    // FIX 2: Initialize raymarching variables
+    float i=0., s=0., d=0.; 
+    vec3  r = iResolution;
+    
+    // FIX 3: Reset the global light accumulator per-pixel
+    lights = vec4(0.0);
+    
+    u = (u-r.xy/2.)/r.y;
+    
+    u.y -=.2;    
+    o = vec4(0);
+    vec3  p = P(T), ro=p,
+          Z = N( P(T+2.) - p),
+          X = N(vec3(Z.z,0,-Z)),
+          D = N(vec3(R(sin(T*.005)*.4)*u, 1) 
+             * mat3(-X, cross(X, Z), Z));
+    
+    for(; i++ < 1e2;) {
+        p = ro + D * d;
+        s = map(p);
+        d += s;
+        o += lights + 1./max(s, .01);
+    }
+
+
+    // normal
+    // tetrahedron technique: https://iquilezles.org/articles/normalsSDF/
+    const float h = 0.005;
+    const vec2 k = vec2(1,-1);
+    vec3 n = N(k.xyy*map( p + k.xyy*h ) + 
+               k.yyx*map( p + k.yyx*h ) + 
+               k.yxy*map( p + k.yxy*h ) + 
+               k.xxx*map( p + k.xxx*h ) );
+
+    // diffuse
+    o *= (.1 + max(dot(n, -D), 0.))/d;
+    
+    // reflection march
+    vec4 ref = vec4(0.0); // Make sure this is initialized too!
+    lights = vec4(0);
+    
+    // Note: You correctly initialized s and i for this second loop! (s=i=0.)
+    for(p += n*.05, D = reflect(D, n), s=i=0.; i++<32.; ) {
+        p += D*s;
+        s = map(p);
+        ref += lights + 1./max(s, .01);
+    }
+
+    o += o*ref/3.;
+    o = (o / 5e5);
+    o = tanh(o);
+}

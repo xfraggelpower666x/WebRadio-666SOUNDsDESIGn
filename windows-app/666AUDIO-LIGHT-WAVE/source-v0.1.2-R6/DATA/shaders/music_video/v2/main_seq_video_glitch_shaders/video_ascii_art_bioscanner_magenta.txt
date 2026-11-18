@@ -1,0 +1,480 @@
+// --- REUSABLE WAVE FUNCTION ---
+// fragCoord : Current pixel coordinates
+// amplitude : Height of the wave
+// yCenter   : The Y axis offset in pixels
+// baseColor : The RGB color of the wave
+// freq      : How tight the sine wave is (0.02 from your original code)
+// phaseShift: Used with time to make the waves scroll horizontally
+
+vec3 drawAudioWave(vec2 fragCoord, float amplitude, float yCenter, vec3 baseColor, float freq, float phaseShift) {
+        
+    // Graceful fallback from your Pygame code: 
+    // If amplitude is tiny, transition smoothly to a white line instead of snapping harshly.
+    vec3 waveColor = mix(vec3(1.0, 1.0, 1.0), baseColor, smoothstep(0.0, 2.0, amplitude));
+
+    // Calculate the mathematical Y position of the sine wave for this X pixel
+    float waveY = yCenter + amplitude * sin(fragCoord.x * freq + phaseShift);
+    
+    // Vertical distance from the current pixel to the wave
+    float dist = abs(fragCoord.y - waveY);
+    
+    // --- COOL FACTOR: THE GLOW ---
+    // Core thickness creates a bright center, exponential falloff creates a soft neon glow
+    float coreThickness = 0.0;
+
+    if (amplitude < 2.0) {
+        coreThickness = 0.1;
+    }
+    else {
+        coreThickness = 0.5;
+    }
+
+    float glowSpread = 3.0;
+    float intensity = (coreThickness / (dist + 1e-4)) + exp(-dist / glowSpread);
+    
+    // --- COOL FACTOR: SMOOTH EDGES ---
+    // Instead of hard cuts at 450 and (Width - 400), we fade the line in and out beautifully
+    float minX = 450.0;
+    float maxX = iResolution.x - 400.0; 
+    float mask = smoothstep(minX - 50.0, minX, fragCoord.x) * 
+                 (1.0 - smoothstep(maxX, maxX + 50.0, fragCoord.x));
+                 
+    return waveColor * intensity * mask;
+}
+
+
+vec3 B2_spline(vec3 x) { // returns 3 B-spline functions of degree 2
+    vec3 t = 3.0 * x;
+    vec3 b0 = step(0.0, t)     * step(0.0, 1.0-t);
+	vec3 b1 = step(0.0, t-1.0) * step(0.0, 2.0-t);
+	vec3 b2 = step(0.0, t-2.0) * step(0.0, 3.0-t);
+	return 0.5 * (
+    	b0 * pow(t, vec3(2.0)) +
+    	b1 * (-2.0*pow(t, vec3(2.0)) + 6.0*t - 3.0) + 
+    	b2 * pow(3.0-t,vec3(2.0))
+    );
+}
+
+float bump(float x) {
+	return abs(x) > 1.0 ? 0.0 : 1.0 - x * x;
+}
+
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+//REMOVE MOUSE
+
+#define pi 3.14159
+#define oz vec2(1,0)
+
+// random [0,1]
+float hash12(vec2 p) {
+	vec3 p3  = fract(vec3(p.xyx) * .1031);
+	p3 += dot(p3, p3.yzx + 33.33);
+	return fract((p3.x + p3.y) * p3.z);
+}
+
+// random normalized vector
+vec2 randVec(vec2 p) {
+	float a = hash12(p);
+	a *= 2.0*pi;
+	a += iTime;
+	return vec2(sin(a), cos(a));
+}
+
+// perlin noise
+float perlin_bioscanner(vec2 p) {
+	vec2 f = fract(p);
+	vec2 s = smoothstep(0.0, 1.0, f);
+	vec2 i = floor(p);
+	float a = dot(randVec(i), f);
+	float b = dot(randVec(i+oz.xy), f-oz.xy);
+	float c = dot(randVec(i+oz.yx), f-oz.yx);
+	float d = dot(randVec(i+oz.xx), f-oz.xx);
+	return mix(mix(a, b, s.x), mix(c, d, s.x), s.y)/0.707107;
+}
+
+// fractal noise
+float fbm(vec2 p) {
+	float a = 0.5;
+	float r = 0.0;
+	for (int i = 0; i < 8; i++) {
+		r += a*perlin_bioscanner(p);
+		a *= 0.5;
+		p *= 2.0;
+	}
+	return r;
+}
+
+// 2D square sdf
+float square(vec2 p, vec2 s) {
+	vec2 d = abs(p)-s;
+	return length(max(d, 0.)) + min(0., max(d.x,d.y));
+}
+
+
+
+
+
+vec3 sRGB_OETF(vec3 c) {
+    vec3 a = 1.055*pow(c, vec3(1.0/2.4)) - 0.055;
+    vec3 b = 12.92*c;
+    return mix(a, b, lessThanEqual(c, vec3(0.0031308)));
+}
+
+vec3 f(float x) {
+	const float pii = radians(180.0);
+    vec3 t = vec3(-1.0, 0.0, 1.0)/6.0 + 6.0*cos(pii*x) + iTime;
+    return 0.5 + x*(1.0 - x)*sin(pii*t);
+}
+
+vec3 f(vec2 xy) {
+    return f(xy.x) - xy.y;
+}
+
+vec3 sdf(vec2 xy, float px) {
+    return f(xy)/px;
+}
+
+vec3 sdf(vec2 xy, vec2 px) {
+    vec3 e = vec3(0.5*px, 0.0);
+    vec3 x = f(xy + e.xz) - f(xy - e.xz);
+    vec3 y = f(xy + e.zy) - f(xy - e.zy);
+    return f(xy)/sqrt(x*x + y*y);
+}
+
+vec3 sdf(vec2 xy) {
+    vec3 d = f(xy);
+    vec3 x = dFdx(d);
+    vec3 y = dFdy(d);
+    return d/sqrt(x*x + y*y);
+}
+
+
+
+
+
+
+
+void mainImage(out vec4 fragColor, vec2 fragCoord) {
+    // =========================================================================
+    // PART 1: EXACT ROTOZOOM EMULATION WITH DYNAMIC PIVOTS
+    // =========================================================================
+
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.y = 1.0 - uv.y;
+    
+    // Convert UV to exact screen pixels (This prevents Ultrawide distortion)
+    vec2 px = uv * iResolution.xy;
+
+    // Apply the translation shake offset
+    vec2 local_px = px - u_pixel_offset;
+
+    // Prepare rotation math
+    float rad = radians(u_angle_deg);
+    float c = cos(rad);
+    float s = sin(rad);
+
+    // Calculate Pygame's expanded Bounding Box! 
+    float bbox_w = u_target_size.x * abs(c) + u_target_size.y * abs(s);
+    float bbox_h = u_target_size.x * abs(s) + u_target_size.y * abs(c);
+
+    // --> THE SECRET SAUCE MULTIPLIER <--
+    vec2 bbox_pivot = vec2(bbox_w, bbox_h) * u_pivot;
+
+    // Shift relative to the chosen pivot
+    vec2 centered_px = local_px - bbox_pivot;
+
+    // Apply the exact Inverse Rotation Matrix that matches your orientation
+    mat2 rotMat = mat2(c, -s, 
+                       s,  c);
+    vec2 rotated_px = rotMat * centered_px;
+
+    // Shift back from the pivot to the original unrotated surface coordinates
+    vec2 surf_pivot = u_target_size * u_pivot;
+    vec2 final_px = rotated_px + surf_pivot;
+
+    // Normalize back to 0.0 - 1.0 UV space using the ZOOMED pixel dimensions
+    vec2 final_uv = final_px / u_target_size;
+
+    uv = final_uv;
+
+    vec2 uv_console = fragCoord / iResolution.xy;
+    uv_console.y = 1.0 - uv_console.y;
+    //uv_console.y -= 0.15;
+    //uv_console.x -= 0.3;
+    vec4 texColor2 = texture(iChannel20, uv_console);
+    fragColor = texColor2;
+
+    vec2 uv_console_mask = final_uv;
+    uv_console_mask.y = 1.0 - uv_console_mask.y;
+    uv_console_mask.y = 1.0 - uv_console_mask.y;
+    vec4 texColor3 = texture(iChannel21, uv_console_mask);
+
+    fragColor.rgb = mix(fragColor.rgb, texColor3.rgb, texColor3.a);
+
+
+    // we need to "cut off" the rendering if the pixels are outside our 100px box.
+    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+        fragColor = vec4(0.0, 0.0, 0.0, 0.0); // Output transparent black
+        return;
+    }
+
+
+    // =========================================================================
+    // PART 2: ASCII ART TRAIL GENERATION (Replacing standard texture sample)
+    // =========================================================================
+    
+    vec2 R = iResolution.xy;
+    vec2 S = vec2(8.0, 16.0);
+    
+    // Convert the transformed UV back into pseudo-screen coordinates.
+    // This makes the ASCII effect map onto the rotated/zoomed surface!
+    vec2 baseU = final_uv * R; 
+    
+    vec4 asciiColor = vec4(0.0);
+    vec4 colorMult = vec4(1.0, 0.5, 0.3, 1.0);
+    vec4 fadeColor = vec4(0.8, 0.9, 0.9, 0.0);
+
+    vec4 currentFade = vec4(1.0);
+    
+    // Look back 30 frames into the past
+    for(int i = 0; i < 30; i++) {
+        // Calculate the position this pixel was at "i" frames ago, 
+        // applying the spatial offset to the transformed coordinates.
+        vec2 pastU = baseU + float(i) * vec2(0.5, -2.0);
+        
+        // Check iChannel0 (Source Image/Video) at that past position
+        int charIdx = 140 + int[](68,82,63,69,0,1,54,37,51,21,-27,36)
+                          [int(12.0 * texture( iChannel0, ceil(pastU/S)*S/R ).r)];
+                          
+        // Get the character value from iChannel1 (Font Texture)
+        vec4 charColor = texture( iChannel1, ( mod(pastU,S) + vec2(4.0,0.0) )/256.0
+                                 + vec2(float(charIdx), float(charIdx/16)) / 16.0 ).r * colorMult;
+                                 
+        // Accumulate using the fading formula
+        asciiColor += (1.0 - asciiColor) * currentFade * charColor;
+        
+        // Advance the fade multiplier for the next iteration step further back
+        currentFade *= fadeColor;
+    }
+
+    // Assign the finished ASCII generation to fragColor
+    fragColor = fragColor + asciiColor;
+
+    // =========================================================================
+    // PART 3: MUSIC SYNC & FLASH FX
+    // =========================================================================
+
+    // MUSIC_VIDEO__MOD
+    float colorTimer = floor(iTime * 2.0); 
+
+    vec3 flashColor = vec3(
+        rand(colorTimer),           
+        rand(colorTimer + 10.0),    
+        rand(colorTimer + 20.0)     
+    );
+
+    // Add the flash to the transformed screen
+    vec3 finalColor = fragColor.rgb + (flashColor * iMusicSync2 * 1.2);
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+    // =========================================================================
+    // PART 4: WAVE FUNCTION
+    // =========================================================================
+
+    // Define your colors (Normalized from 0-255 to 0.0-1.0)
+    vec3 MAGENTA = vec3(250.0, 34.0, 197.0) / 255.0;
+    vec3 GREEN   = vec3(8.0, 240.0, 124.0) / 255.0;
+    vec3 CYAN    = vec3(8.0, 224.0, 240.0) / 255.0;
+    vec3 GOLD    = vec3(240.0, 224.0, 8.0) / 255.0;
+    vec3 PURPLE  = vec3(187.0, 34.0, 250.0) / 255.0;
+    vec3 WHITE   = vec3(1.0, 1.0, 1.0);
+    
+    // Calculate accurate Y offsets accounting for OpenGL's bottom-up coordinate system
+    //float yTop    = iResolution.y - 60.0;   // 60 pixels from the top
+    //float yBottom = iResolution.y - 1000.0; // 1410 pixels from the top (30 from bottom on 1440p)
+    //float yBottom = iResolution.y - 1410.0; // 1410 pixels from the top (30 from bottom on 1440p)
+
+    float yTop    = 1350.0;   // 60 pixels from the top
+    float yBottom = 45.0; // 1410 pixels from the top (30 from bottom on 1440p) 
+
+    finalColor = vec3(0.0);
+    float freq = 0.02; // From your python code
+    
+    // --- COOL FACTOR: TIME SCROLLING ---
+    // Multiplying time creates an offset so the waves visibly "flow" across the screen
+    float speed = iTime * 5.0;
+
+    // Additive blending: Adding the colors together means where they overlap, they blend brightly to white
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.x, yTop, MAGENTA, freq, speed * 1.5);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.y, yTop, GREEN,   freq, speed * 1.2);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.z, yTop, CYAN,    freq, speed * 1.0);
+    
+    // --- BOTTOM WAVES ---
+    // Use negative speed to make bottom waves flow in the opposite direction for contrast!
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.x*2.0, yBottom, MAGENTA, freq, speed * -3.0);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.y*2.0, yBottom, GREEN, freq, speed * -3.2);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.z*2.0, yBottom, CYAN, freq, speed * -3.5);
+
+    // Optional: Tone-mapping to prevent the glowing hot spots from burning out entirely
+    finalColor = finalColor / (1.0 + finalColor * 0.2); 
+
+    // Add the wave to the screen
+    finalColor = fragColor.rgb + finalColor;
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+
+    // =========================================================================
+    // PART 6: AUDIO SPECTRUM 2
+    // =========================================================================
+
+    // Set exactly where you want the CENTER of the visualizer (in pixels).
+    // X = middle of screen. Y = 100 pixels up from the bottom.
+    vec2 TARGET_POS = vec2(iResolution.x * 0.5, 60.0); 
+    
+    // Set exactly how large you want the visualizer to be (in pixels).
+    // X = full width of screen. Y = restricted to 100 pixels tall.
+    vec2 TARGET_SIZE = vec2(iResolution.x, 240.0);
+    
+    // Remap the UVs based on our targets
+    uv = (uv - (TARGET_POS / iResolution.xy)) * (iResolution.xy / TARGET_SIZE) + 0.5;
+    uv.y = 1.0 - uv.y;
+
+    
+    // Because the math in this shader stretches lines to infinity, 
+    // we need to "cut off" the rendering if the pixels are outside our 100px box.
+    //if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+    //    fragColor = vec4(0.0, 0.0, 0.0, 0.0); // Output transparent black
+    //    return;
+    //}
+
+
+    c = 4.0;
+    vec3 color = vec3(1.0);
+    color.z = bump(c * (uv.x - 0.75));
+    color.y = bump(c * (uv.x - 0.5));
+    color.x = bump(c * (uv.x - 0.25));
+	
+    float line = abs(0.02 / abs(0.5-uv.y) );
+    uv.y = abs( uv.y - 0.5 );
+	
+    vec4 soundWave = texture( iChannel3, vec2(abs(0.5-uv.x)+0.005, uv.y) ).rrrr;
+    color *= line * (1.0 - 2.0 * abs( 0.5 - uv.xxx ) + pow( soundWave.y, 10.0 ) * 50.0 );
+	
+    fragColor = fragColor + vec4(color, 0.0); 
+
+
+
+
+
+	// coordinates
+	uv = fragCoord.xy/iResolution.y;
+	uv.y = 1.-uv.y;
+	float ar = iResolution.x/iResolution.y;
+	uv -= vec2(ar/2.0,0.5);
+	float uxy = uv.x+uv.y;
+
+	// distortion noise
+	float n = fbm(vec2(10.*uv.y, 3.*iTime));
+	float g = 0.2*n-1.9+sin(0.3*iTime);
+	uv.x += smoothstep(0.15, 0., abs(g))*n;
+
+	// seeking box target position
+	s = perlin_bioscanner(vec2(0.3*iTime));
+	vec2 p = vec2(perlin_bioscanner(vec2(0.5*iTime)), 0.5*perlin_bioscanner(vec2(-iTime)))*0.5*(iResolution.xy - vec2(300, 300))/iResolution.y;
+	p.y -= 0.1*sin(6.*p.x+iTime);
+    
+    // Empty base color
+    float r = 0.;
+
+    // --- LINE THICKNESS SETTINGS ---
+    // Increase these values to make the lines wider. 
+    // 0.0 is the original 1-pixel width.
+    float outerBoxThickness   = 0.001; 
+    float crosshairThickness  = 0.002;
+    float seekingBoxThickness = 0.004; // <-- The moving box width
+
+	// ui
+	float ob = square(uv, 0.5*vec2(0.9*ar,1.-0.1*ar));
+    
+    // Outer border
+	float ui = 1.5*smoothstep(outerBoxThickness + fwidth(uxy), outerBoxThickness - fwidth(uxy), abs(ob));
+    
+	float ms = step(ob, -0.005) * smoothstep(0.01, 0.005, abs(abs(uv.y)-0.475*(1.-0.1*ar)));
+	ms *= smoothstep(2.*fwidth(uv.x), fwidth(uv.x), fract(uv.x*100.)/100.);
+	ui = max(ui, ms);
+    
+    // Crosshair lines inside the seeking box
+	float cr = smoothstep(crosshairThickness + fwidth(uxy), crosshairThickness - fwidth(uxy), abs(min(abs(uv.x-p.x), abs(uv.y-p.y))));
+    
+    // The seeking box shape
+	cr = max(cr, 3.*smoothstep(seekingBoxThickness + fwidth(uxy), seekingBoxThickness - fwidth(uxy), abs(square(uv-p, (0.1+smoothstep(-0.25, 0.5, s))*vec2(0.15)))));
+	
+    cr *= smoothstep(0., -0.1, ob);
+	ui = max(ui, cr);
+    
+    // combine
+	r = max(r, 2.*ui);
+	r *= 2.*pow(0.5+0.5*n, 2.);
+	r *= 0.5+0.5*hash12(fragCoord.xy+iTime);
+	r = clamp(r, 0., 1.);
+    
+	vec4 finalColorr = vec4(mix(r, pow(1.-r, 3.), smoothstep(-0.025, 0.025, g)));
+
+    fragColor.rgb = mix(fragColor.rgb, finalColorr.rgb, finalColorr.a);
+
+
+
+
+
+    R = iResolution.xy;
+    // Normalized coordinates (0.0 to 1.0)
+    vec2 U_uv = fragCoord / R; 
+
+    // 1. Create a timer. (e.g., changes twice a second. Change 2.0 to whatever speed you want)
+    float flipTimer = floor(iTime * 1.0); 
+    
+    // 2. Get a random float between 0.0 and 1.0
+    float rawRandom = rand(flipTimer);
+    
+    // 3. Convert it to exactly 0.0 or 1.0 
+    // step(0.5, x) returns 0.0 if x is less than 0.5, and 1.0 if x is greater.
+    float randomFlip = step(0.5, rawRandom);
+    
+    if (U_uv.x > .498 && U_uv.x < .500) {
+        // Draw white separator
+        fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    } 
+    else if ( (U_uv.x > .5 && randomFlip == 0.0) || (U_uv.x < .498 && randomFlip == 1.0) ) {
+        // Show orig video
+        vec4 T = texture(iChannel0, final_uv);
+        fragColor = T;
+    } 
+    else {
+        px = 1.0/iResolution.xy;
+        uv = px*fragCoord;
+        vec3 dist = mix(sdf(uv, px.y), sdf(uv, px), step(0.5, uv.x));
+        vec3 plot = smoothstep(2.0, 0.0, abs(dist));
+        line = smoothstep(1.0, 0.0, abs(0.5 - uv.x)/px.x);
+        finalColorr = vec4(sRGB_OETF(plot + line), 1.0);
+        fragColor.rgb = fragColor.rgb + finalColorr.rgb;
+    }
+
+    // Calculate the intensity of the UI action (how bright the lines/glitches should be)
+    float uiIntensity = mix(r, pow(1.-r, 3.), smoothstep(-0.025, 0.025, g));
+    
+    // Generate a dynamic rainbow color that shifts based on time and UV coordinates
+    vec3 rainbowColor = 0.5 + 0.5 * cos(iTime * 3.0 + (uv.x + uv.y) * 4.0 + vec3(0.0, 2.0, 4.0));
+
+    fragColor.rgb = mix(fragColor.rgb, rainbowColor, uiIntensity);
+}

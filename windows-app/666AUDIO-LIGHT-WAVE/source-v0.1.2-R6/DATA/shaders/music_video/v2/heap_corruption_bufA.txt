@@ -1,0 +1,154 @@
+// Heap Corruption
+//
+// Copyright: Tor Ringstad, 2026
+// License: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+// More info: https://www.pvv.ntnu.no/~torhr/shaders/
+//
+// A live allocator grid rotting in real time. Healthy blocks glow cold
+// phosphor teal; corruption spreads from a wandering epicenter, turning
+// cells hot magenta and ember as they decay. Row-tearing and stray memcpy
+// glitches add to the chaos.
+//
+// Tags: procedural, glitch, grid, noise, corruption
+
+// ---- tweakables ------------------------------------------------------------
+#define GRID_SIZE  (21.0)   // cells per vertical unit
+#define TEAR_ROWS  (26.0)   // row-tear resolution
+#define TEAR_RATE  (7.0)    // how fast row-tear slots change
+#define MEMCPY_RATE (1.6)   // misdirected-memcpy event frequency
+#define SWEEP_SPEED (0.13)  // scan-line sweep speed
+#define CA_BASE    (0.002)  // chromatic aberration base amount
+#define CA_SCALE   (0.010)  // chromatic aberration corruption scaling
+// ----------------------------------------------------------------------------
+
+// ---- hashes & noise --------------------------------------------------------
+float h12(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
+float h11(float n){ return fract(sin(n*127.1)*43758.5453); }
+
+float vnoise(vec2 p){
+    vec2 i = floor(p), f = fract(p);
+    f = f*f*(3.0-2.0*f);
+    float a = h12(i), b = h12(i+vec2(1,0)), c = h12(i+vec2(0,1)), d = h12(i+vec2(1,1));
+    return mix(mix(a,b,f.x), mix(c,d,f.x), f.y);
+}
+
+// ---- global corruption pressure: slow breathing + random spikes ------------
+float pressure(float t){
+    float breathe = 0.5 + 0.5*sin(t*0.45);
+    float slot = floor(t*0.8);
+    float spike = step(0.72, h11(slot))
+                * smoothstep(0.0, 0.08, fract(t*0.8))
+                * smoothstep(1.0, 0.55, fract(t*0.8));
+    return clamp(0.25 + 0.45*breathe + 0.9*spike, 0.0, 1.4);
+}
+
+// ---- corruption field over the plane: where memory is going bad ------------
+float corruption(vec2 p, float t){
+    float pr = pressure(t);
+    float n = vnoise(p*2.3 + vec2(t*0.18, -t*0.11));
+    n = 0.65*n + 0.35*vnoise(p*6.1 - vec2(t*0.07, t*0.23));
+    // a wandering epicenter that rot spreads from
+    vec2 c = vec2(0.9 + 0.55*sin(t*0.21), 0.5 + 0.42*cos(t*0.16));
+    float blob = smoothstep(0.75, 0.05, length(p - c));
+    return clamp(smoothstep(0.72 - 0.35*pr, 0.95, n + 0.35*blob*pr), 0.0, 1.0);
+}
+
+// ---- glitch displacements --------------------------------------------------
+vec2 displace(vec2 p, float t){
+    float pr = pressure(t);
+    // horizontal row tearing
+    float row = floor(p.y*TEAR_ROWS);
+    float rr = h12(vec2(row, floor(t*TEAR_RATE)));
+    float tearOn = step(0.965 - 0.12*pr, rr);
+    p.x += tearOn * (rr - 0.5) * 0.7 * pr;
+    // occasional misdirected memcpy: a rectangle reads from elsewhere
+    float slot = floor(t*MEMCPY_RATE);
+    float go = step(0.6, h11(slot+13.7)) * step(fract(t*MEMCPY_RATE), 0.4);
+    vec2 bmin = vec2(h11(slot+1.1)*1.4, h11(slot+2.2)*0.8);
+    vec2 bsz  = vec2(0.25+0.5*h11(slot+3.3), 0.06+0.18*h11(slot+4.4));
+    float inbox = step(bmin.x, p.x)*step(p.x, bmin.x+bsz.x)
+                * step(bmin.y, p.y)*step(p.y, bmin.y+bsz.y);
+    p += go * inbox * (vec2(h11(slot+5.5), h11(slot+6.6)) - 0.5) * 0.9;
+    return p;
+}
+
+// ---- the heap: a grid of allocated blocks with procedural glyphs -----------
+vec3 cells(vec2 p, float t, out float corrOut){
+    float corr = corruption(p, t);
+    corrOut = corr;
+
+    vec2 g  = p * GRID_SIZE;
+    vec2 id = floor(g);
+    vec2 f  = fract(g);
+
+    // healthy cells hold a stable value; corrupted ones reroll frantically
+    float flick = floor(t*(2.0 + 26.0*corr));
+    float val = h12(id + flick*0.1731*step(0.18, corr));
+
+    // chunk coloring: allocations come in runs of same hue
+    float chunk = h12(floor(id/vec2(5.0, 3.0)));
+
+    // 3x4 bit-glyph inside each cell
+    vec2 pad0 = vec2(0.16, 0.14), pad1 = vec2(0.84, 0.86);
+    float inpad = step(pad0.x,f.x)*step(f.x,pad1.x)*step(pad0.y,f.y)*step(f.y,pad1.y);
+    vec2 sub = floor((f - pad0)/(pad1 - pad0)*vec2(3.0, 4.0));
+    float bit = step(0.62 - 0.34*val, h12(id*3.17 + sub*vec2(0.71, 1.33) + flick*0.031));
+    float glyph = bit*inpad;
+
+    // palette: cold phosphor teal for live memory, hot magenta/ember for rot
+    vec3 live = mix(vec3(0.03, 0.22, 0.19), vec3(0.45, 0.95, 0.72), val) * (0.75 + 0.5*chunk);
+    vec3 rot  = mix(vec3(0.95, 0.10, 0.48), vec3(1.00, 0.55, 0.12), h12(id + 7.7 + flick*0.07));
+    float sick = smoothstep(0.15, 0.65, corr);
+    vec3 ink = mix(live, rot, sick);
+
+    vec3 col = ink * (0.10 + 1.05*glyph);
+
+    // fully-corrupted cells sometimes slam solid
+    float solid = step(0.72, corr) * step(0.55, h12(id + flick + 3.3));
+    col = mix(col, rot*1.15, solid*0.9);
+
+    // faint chunk boundaries
+    vec2 e = min(f, 1.0-f);
+    float line = 1.0 - smoothstep(0.0, 0.06, min(e.x, e.y));
+    col += line * mix(vec3(0.02,0.06,0.06), vec3(0.10,0.02,0.05), sick) * 2.0;
+
+    // dead zones: freed pages fade toward void
+    float free_ = smoothstep(0.35, 0.0, vnoise(id*0.13 + 4.2));
+    col *= 1.0 - 0.55*free_*(1.0-sick);
+
+    return col;
+}
+
+vec3 scene(vec2 p, float t){
+    p = displace(p, t);
+    float corr;
+    vec3 col = cells(p, t, corr);
+
+    // scan sweep
+    float sweep = fract(p.y*0.5 - t*SWEEP_SPEED);
+    col += vec3(0.06, 0.16, 0.13) * smoothstep(0.12, 0.0, sweep) * (1.0-corr);
+    return col;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = fragCoord.xy / iResolution.y;   // aspect-true, y in [0,1]
+    float t = iTime;
+
+    // chromatic aberration scales with local corruption
+    float ca = CA_BASE + CA_SCALE*corruption(uv, t)*pressure(t);
+    vec3 col;
+    col.r = scene(uv + vec2( ca, 0.0), t).r;
+    col.g = scene(uv,                  t).g;
+    col.b = scene(uv - vec2( ca, 0.0), t).b;
+
+    // scanlines, vignette, flicker
+    col *= 0.92 + 0.08*sin(fragCoord.y*3.14159*0.5);
+    vec2 q = fragCoord.xy / iResolution.xy;
+    col *= 0.55 + 0.45*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 0.28);
+    col *= 0.97 + 0.03*h11(floor(t*60.0));
+
+    // soft tonemap
+    col = col / (1.0 + 0.35*col);
+    col = pow(col, vec3(0.92));
+    fragColor = vec4(col, 1.0);
+}

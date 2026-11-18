@@ -1,0 +1,242 @@
+// ==========================================================================================
+// --- CUSTOM SPACE DEFORMATION MACROS | カस्टमные макросы деформации | 空間変形マクロ ---
+// ==========================================================================================
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S3(p) p /= dot(p, p); p = fract(p) - 0.5;
+#define G(p, s) p = floor(p * s) / s;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+#define L(p, s) p = mod(p + s/2., s) - s/2.;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M4(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define T3(p) p *= r(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5);
+#define K(p) p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx;
+#define D(p) p.xy = vec2(log(length(p.xy)), atan(p.y, p.x));
+#define Q2(p) p = abs(p-1.)-abs(p+1.)+p;
+
+// EN: Cosine palette function for Sci-Fi lines based on phase from buffer
+// RU: Функция для вычисления косинусной палитры Sci-Fi линий на основе фазы из буфера
+// JP: バッファからの位相に基づくSFラインのコサインパレット関数
+vec3 getPaletteColor(float phase) {
+    return cos(phase * 6.2831 + vec3(0.0, 0.4, 0.7)) * 0.5 + 0.5;
+}
+
+// EN: Distance function for a basic cube
+// RU: Функция расстояния для базового куба
+// JP: 基本的な立方体の距離関数 (SDF)
+float cube(vec3 p, vec3 s){
+    vec3 q = abs(p) - s;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+// EN: Fractal structure map with M4 transition and M4(p.zy) deformation
+// RU: Карта фрактальной структуры с переходом M4 и деформацией M4(p.zy)
+// JP: M4遷移とM4(p.zy)変形を伴うフラクタル構造マップ
+vec4 map(vec3 p) {
+    // EN: 1. Calculate smooth animation coefficient with deceleration at edges (smoothstep)
+    // RU: 1. Рассчитываем плавный коэффициент анимации с замедлением на краях (smoothstep)
+    // JP: 1. 端での減速を伴う滑らかなアニメーション係数の計算 (smoothstep)
+    float wave = sin(iTime * 0.5) * 0.5 + 0.5;
+    float blend = smoothstep(0.0, 1.0, wave); 
+
+    // EN: 2. Create independent copies of planes for deformation
+    // RU: 2. Делаем независимые копии плоскостей для деформации
+    // JP: 2. 変形用に独立した平面のコピーを作成
+    vec2 xz_deformed = p.xz;
+    vec2 yz_deformed = p.yz;
+
+    // EN: 3. Apply M4 macro to each plane separately
+    // RU: 3. Применяем макрос M4 к каждой плоскости отдельно
+    // JP: 3. 各平面に個別にM4マクロを適用
+    M4(xz_deformed);
+    M4(yz_deformed);
+
+    // EN: 4. Smoothly blend spaces together using mix and reconstruct vec3 p
+    // RU: 4. Плавно смешиваем два пространства через mix и собираем финальный vec3 p
+    // JP: 4. mixを使用して2つの空間を滑らかにブレンドし、vec3 pを再構築
+    vec3 p_xz_state = vec3(xz_deformed.x, p.y, xz_deformed.y); 
+    vec3 p_yz_state = vec3(p.x, yz_deformed.x, yz_deformed.y); 
+    p = mix(p_xz_state, p_yz_state, blend);
+
+    // EN: 5. Apply the additional deformation on the ZY plane
+    // RU: 5. Применяем дополнительную деформацию плоскости ZY
+    // JP: 5. ZY平面に段階的な追加変形を適用
+    M4(p.zy);
+
+    // EN: Menger Sponge / Fractal Cube generation
+    // RU: Генерация Губки Менгера / Фрактального куба
+    // JP: メンガースポンジ / フラクタル立方体の生成
+    float d = cube(p, vec3(1.0));
+    vec3 col = vec3(0.0);
+    float s = 1.0;
+    float k = 2.0 * pow(abs(sin(0.5 * iTime)), 0.2);
+
+    for(int m = 0; m < 4; m++) {
+        vec3 a = mod(p * s, 2.0) - 1.0;
+        s *= 3.0;
+        vec3 r = abs(1.1 - 3.0 * abs(a));
+
+        float da = max(r.x, r.y);
+        float db = max(r.y, r.z);
+        float dc = max(r.z, r.x);
+        
+        float factor = abs(float(m) - k) / 4.0;
+        if(r.x < r.y) col.z += 1.2 * factor;
+        if(r.y > r.z) { col.y += 1.0 * factor; col.z += 0.2 * factor; }
+        if(r.x > r.z) col.x += 1.2 * factor;
+        
+        float c = (min(da, min(db, dc)) - 1.0) / s;
+        d = max(d, c);
+    }
+
+    return vec4(col, d);
+}
+
+// EN: Global scene helper for volumetric glow calculation
+// RU: Вспомогательная функция сцены для расчета объемного свечения
+// JP: ボリューム発光計算のためのグローバルシーン関数
+vec4 dist(vec3 p){
+    vec4 sd = map(p);
+    vec3 col = 1.04 * sd.xyz * exp(-2.5 * sd.w); // Internal fractal glow
+    return vec4(col, sd.w);
+}
+
+// EN: Calculate surface normals using central differences
+// RU: Расчет нормалей поверхности методом центральных разностей
+// JP: 中心差分法を用いた法線ベクトルの計算
+vec3 gn(vec3 p){
+    vec2 e = vec2(0.001, 0.0);
+    return normalize(vec3(
+        dist(p + e.xyy).w - dist(p - e.xyy).w,
+        dist(p + e.yxy).w - dist(p - e.yxy).w,
+        dist(p + e.yyx).w - dist(p - e.yyx).w
+    ));
+}
+
+// EN: Sharp triplanar mapping of Sci-Fi circuit lines from Buffer A via textureLod
+// RU: Четкое трипланарное наложение Sci-Fi линий из Buffer A (через textureLod)
+// JP: textureLodを使用したBuffer AからのSF回路ラインの鮮明な三面マッピング
+vec3 getEnergyFromBuffer(vec3 p, vec3 normal) {
+    float textScale = 0.2; // Texture tiling scale
+    
+    vec2 uvX = p.yz * textScale;
+    vec2 uvY = p.zx * textScale;
+    vec2 uvZ = p.xy * textScale;
+    
+    // EN: textureLod disables mipmapping, completely removing digital noise artifacts
+    // RU: textureLod отключит мип-маппинг, полностью убирая мелкий цифровой шум
+    // JP: textureLodはミップマップを無効にし、エイリアシングノイズを完全に除去します
+    vec4 dataX = textureLod(iChannel0, fract(uvX), 0.0);
+    vec4 dataY = textureLod(iChannel0, fract(uvY), 0.0);
+    vec4 dataZ = textureLod(iChannel0, fract(uvZ), 0.0);
+    
+    // EN: Extract moving pulses (.x) and emissive nodes (.z)
+    // RU: Извлекаем ползающие импульсы (.x) и светящиеся узлы (.z)
+    // JP: 移動パルス(.x)と発光ノード(.z)の抽出
+    vec3 colX = getPaletteColor(dataX.w) * (smoothstep(0.1, 0.9, dataX.x) + dataX.z * 0.4);
+    vec3 colY = getPaletteColor(dataY.w) * (smoothstep(0.1, 0.9, dataY.x) + dataY.z * 0.4);
+    vec3 colZ = getPaletteColor(dataZ.w) * (smoothstep(0.1, 0.9, dataZ.x) + dataZ.z * 0.4);
+    
+    // EN: Sharp normal-based blending weights
+    // RU: Блендинг по нормалям с высокой степенью разделения границ
+    // JP: 法線に基づくシャープなブレンディングウェイトの計算
+    vec3 blendWeights = abs(normal);
+    blendWeights = pow(blendWeights, vec3(6.0));
+    blendWeights /= (blendWeights.x + blendWeights.y + blendWeights.z);
+    
+    return colX * blendWeights.x + colY * blendWeights.y + colZ * blendWeights.z;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // EN: Normalize screen coordinates
+    // RU: Нормализация координат экрана
+    // JP: 画面座標の正規化
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+
+    // EN: Setup camera with soft orbital rotation around origin
+    // RU: Настройка камеры с мягким орбитальным вращением вокруг центра
+    // JP: 原点中心の緩やかな軌道回転を伴うカメラ設定
+    vec3 ro = vec3(2.5, 2.0, 5.5);
+    vec3 ta = vec3(0.0, 0.0, 0.0);
+    
+    // EN: Apply orbital rotation directly to camera vectors to preserve normals accuracy
+    // RU: Применяем вращение к векторам камеры, чтобы не ломать расчет нормалей
+    // JP: 法線の精度を維持するため、カメラのベクトルに回転を直接適用します
+    mat2 rotTime = r(iTime * 0.3);
+    ro.xz *= rotTime;
+
+    vec3 cdir = normalize(ta - ro);
+    vec3 side = normalize(cross(cdir, vec3(0.0, 1.0, 0.0)));
+    vec3 up = cross(side, cdir);
+    vec3 rd = normalize(uv.x * side + uv.y * up + 1.2 * cdir);
+
+    vec3 finalColor = vec3(0.0);
+    float ep = 0.001; 
+    float alphaAccum = 0.0;
+
+    // EN: Raymarching loop with up to 2 reflection bounces
+    // RU: Цикл Raymarching + 2 отскока для симуляции отражений
+    // JP: 最大2回のリフレクションバウンスを含むレイマーチングループ
+    for(int bounce = 0; bounce < 3; bounce++) {
+        float t = (bounce == 0) ? 0.0 : 0.05;
+        vec3 ac = vec3(0.0);
+        bool hit = false;
+        vec3 hitPos = vec3(0.0);
+        
+        for(int i = 0; i < 90; i++){
+            hitPos = ro + rd * t;
+            vec4 rsd = dist(hitPos);
+            float d = max(rsd.w, 0.0);
+            
+            // EN: Crucial understepping (0.35) prevents ray-skipping due to intense fractal folding
+            // RU: Критически важно: подшаг 0.35 (understepping) предотвращает пролет луча сквозь фрактал
+            // JP: 重要なアンダーステップ(0.35)により、激しい空間変形によるレイの突き抜けを防ぎます
+            t += d * 0.35; 
+            
+            ac += rsd.xyz;
+            if(d < ep) { hit = true; break; }
+            if(t > 15.0) break;
+        }
+        
+        // EN: Accumulate fractal volumetric glow color
+        // RU: Добавляем накопленный цвет базового свечения фрактала
+        // JP: 蓄積されたフラクタルのボリューム発光色を追加
+        finalColor += 0.015 * ac;
+        
+        if(hit) {
+            vec3 nor = gn(hitPos);
+            
+            // EN: Apply Sci-Fi traces from Buffer A to the geometry surface
+            // RU: Накладываем Sci-Fi дорожки из Buffer A на поверхность геометрии
+            // JP: Buffer AからのSFラインをジオメトリ表面にマッピング
+            vec3 energyGlow = getEnergyFromBuffer(hitPos, nor);
+            
+            // EN: Inject circuit lines emissive illumination scaled by distance attenuation
+            // RU: Добавляем свечение дорожек с затуханием в зависимости от расстояния
+            // JP: 距離減衰を考慮した回路ラインの発光照明を追加
+            finalColor += energyGlow * 1.5 * exp(-0.1 * t);
+            
+            if (bounce == 0) alphaAccum = 1.0; // EN: Hit geometry -> object is opaque | RU: Попали по геометрии — объект непрозрачен
+            
+            // EN: Setup ray vectors for the next reflection bounce
+            // RU: Считаем отражение вектора направления для следующего bounce
+            // JP: 次のリフレクションバウンスのためのレイベクトル設定
+            ro = hitPos;
+            rd = reflect(rd, nor);
+        } else {
+            // EN: If primary ray misses, compute transparency based on accumulated volumetric glow
+            // RU: Если первичный луч улетел в космос, считаем прозрачность на основе Glow
+            // JP: 1次レイが外れた場合、蓄積されたボリューム発光に基づいて透明度を計算
+            if (bounce == 0) {
+                float glowIntensity = (finalColor.x + finalColor.y + finalColor.z) * 0.33;
+                alphaAccum = clamp(glowIntensity, 0.0, 1.0);
+            }
+            break; 
+        }
+    }
+
+    // EN: Post-processing: Enhance contrast and color saturation
+    // RU: Пост-обработка: Усиление контраста и цветовой сочности
+finalColor = pow(finalColor, vec3(1.1));
+fragColor = vec4(finalColor, alphaAccum);
+}

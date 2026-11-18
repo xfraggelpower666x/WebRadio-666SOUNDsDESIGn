@@ -1,0 +1,51 @@
+// funky step march
+
+#define T iTime
+#define R(a) mat2(cos(a + vec4(0, 33, 11, 0)))
+#define N normalize
+
+float map(vec3 p) {
+    float l, w;
+    p.z += T + T;
+    p /= 2e1;
+    w = 0.5;
+    // FIX 1: Initialize loop counter
+    for (int i = 0; i++ < 9; w *= l)
+        p *= l = 3.0 / dot(p = abs(sin(p)), p);
+    return length(p * 2e1) / w;
+}
+
+float light(vec3 p) {
+    // FIX 2: Initialize lighting accumulator
+    float s = 0.0; 
+    p.z -= T + T;
+    vec3 sun = cos(T + p.yzx / 4.0) * 3e1;
+    s += map(p + sun * 0.1);
+    s += map(p + sun * 0.2);
+    s += map(p + sun * 0.4);
+    s += map(p + sun * 0.8);
+    return exp(-s * 0.6);
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    vec2 r = iResolution.xy;
+    u = (u + u - r.xy) / r.y;
+
+    // FIX 3: Initialize raymarch loop counter (i)
+    float i = 0.0, a = 1.0, d, l;
+
+    // FIX 4: Initialize ray position (p) to origin
+    vec3 p = vec3(0.0), D = N(vec3(u, 5.0));
+    
+    // FIX 5: Properly initialize out variable 'o' directly instead of o *= i
+    for (o = vec4(0.0); i++ < 1e1;
+        p    += D * a * (2e1 + (4.0 + 4.0 * sin(T))),   // step
+        d     = map(p),                                 // density at pos
+        a    *= exp(-d),                                // extinction (dimming)
+        l     = light(p),                               // light
+        o    += d < 0.01 ? (1.0 + cos(i * 0.3 + vec4(2, 1, 0, 0))) * l * a * 1e1 : vec4(4, 2, 1, 0) * a * l * d
+    );
+    
+    o.r += 0.01 * dot(u, u);
+    o = tanh(o * o * 5e1); 
+}

@@ -1,0 +1,29 @@
+#define R(a)mat2(cos(a),sin(a),-sin(a),cos(a))
+void mainImage(out vec4 O, vec2 C)
+{
+    O=vec4(0);
+    float i,g,e,s,B=2.;
+    for(vec3 r=iResolution,p;
+        ++i<99.;
+        e<.001?O+=.5/i:O
+        )
+    {
+        p=vec3(g*(C.xy-.5*r.xy)/r.y,g-22.);
+        p.xy*=R(iTime*.5);
+        p.xz*=R(iTime*.5);
+        s=2.;
+        for(int j=0;j++<10;)
+        {
+            p=abs(p),
+            p.y<p.z?p.yz=p.zy:p.yz;
+            p.x<p.z?p.xz=p.zx:p.xz;
+            p.x=abs(p.x)-5.;
+            p.y=abs(p.y)-5.;
+            p.z=abs(p.z)+5.;
+            p*=B;
+            s*=B;
+        }
+        p-=s;
+        g+=e=length(p)/s-.01;
+    }
+}

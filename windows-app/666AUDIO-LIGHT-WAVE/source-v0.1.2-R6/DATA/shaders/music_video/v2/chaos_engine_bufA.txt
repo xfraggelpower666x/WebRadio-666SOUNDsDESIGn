@@ -1,0 +1,82 @@
+// -32 by FabriceNeyret2
+
+void mainImage( out vec4 O, vec2 I ) {
+    // 1. Explicitly initialize all variables. 
+    // F.y was missing entirely in the original so we ensure it starts at 0.0
+    vec3 C = vec3(1.0, 2.0, 3.0);
+    vec3 F = vec3(0.0); 
+    vec3 p = vec3(0.0);
+    
+    float t = 0.0;
+    float v = 0.0;
+    float T = iTime;
+      
+    // 2. Safely initialize the output variable O
+    O = vec4(0.0);
+    
+    // 3. Standardize the outer loop.
+    // Original i++ < 60. meant the body ran with i = 1.0 to 60.0
+    for (float i = 1.0; i <= 60.0; i++) {
+        
+        // 4. Force strict float types (0.0 instead of 0)
+        p = t * normalize( vec3(I + I, 0.0) - iResolution.xyy );
+        p.z += 4.0;
+        p = reflect( -p, normalize(tan( T*0.3 + t*0.01 + i/1000.0 + vec3(T, 2.0, 0.0))));
+        
+        F.xz = round( p.xy / 8.0 ); 
+        F.x += T;
+        
+        p = mod(p - 4.0, 8.0) - 4.0;
+        
+        // 5. Standardize the inner loop
+        // Moved the p.x -= 1.5 logic out of the for-loop declaration for clarity
+        for(int j = 0; j < 6; j++) {
+            p = 1.7 * abs(p);
+            p = ( p.x < p.z ? p.zxy : p.xzy ) - sin(F);
+            
+            p.x -= 1.5;
+        }
+        
+        v = ( length(p.xy) + 0.01 ) / 40.0;
+        O.rgb += exp( sin( t*0.1*C + i/20.0 + C ) ) / v;
+        
+        // Moved from the outer loop's increment block
+        t += v;
+    }
+    
+    O = tanh(O / 2000.0);
+    
+    // Good practice: explicitly set the alpha channel so the window system handles blending right
+    O.a = 1.0; 
+}
+
+/* Original
+void mainImage( out vec4 O, vec2 I ){
+    vec3 F,p,r=normalize(vec3(I+I,0) - iResolution.xyy);
+    float i,j,t,v;
+    // Raymarching loop
+    for (O*=i; i++<60.;t+=v){
+    p=t*r;
+    // Move camera back
+    p.z+=4.;
+    // Reflect around axis that changes based on time, distance travelled, and iteration count
+    p=reflect(-p,normalize(tan(iTime*.3+t*.01+i*.001+vec3(iTime,2,0))));
+    // Store rounded coordinates to use in fractal transformations
+    F=ceil(p/8.-.5);
+    // Transformations inspired by some fractals by yonatan found on https://jbaker.graphics/writings/DEC.html
+    p=mod(p-4.,8.)-4.;
+    for(j=0.;j++<6.;){
+      p=abs(p);
+      p=(p.x<p.z?p.zxy:p.xzy);
+      p=p*1.7;
+      p-=vec3(1.5+sin(iTime+F.x),0,sin(F.y));
+    }
+    // Density from cylinder
+    v=(length(p.xy)+.01)/40.;
+    // Color accumulation based on distance travelled, iteation count and density
+    O+=exp(sin(t*.1*vec4(1,2,3,1)+i*.05+vec4(1,2,3,1)))/v;
+    }
+    // Tone mapping
+    O = tanh(O/2e3);
+}
+*/

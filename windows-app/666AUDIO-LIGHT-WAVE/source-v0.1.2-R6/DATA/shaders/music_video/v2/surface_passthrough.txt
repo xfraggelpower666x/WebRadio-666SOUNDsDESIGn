@@ -1,0 +1,13 @@
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    vec2 uv = fragCoord / iResolution.xy;
+    // Flip Y to match Pygame's coordinate system perfectly
+    uv.y = 1.0 - uv.y;
+
+    // Sample the texture
+    vec4 texColor = texture(iChannel0, uv);    
+
+    // Output the final mixed color
+    fragColor = texColor;
+}

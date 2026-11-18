@@ -1,0 +1,95 @@
+#define R iResolution.xy
+#define T iTime
+#define PI 3.141592
+
+//Tweak parameters here! More lines, but I prefer my settings in one place
+//Noise
+#define FREQUENCY 20.0
+#define OCTAVES 4.0
+#define AMPLITUDE 0.45
+#define GAIN 0.55
+#define LACUNARITY 3.
+
+//Scroll
+#define MOVESPEED 0.17
+#define WARPMIN 0.015
+#define WARPMAX 0.045
+
+#define ROTATIONSPEED 0.1
+#define ROTDELTAMIN 0.0
+#define ROTDELTAMAX 0.1
+
+//FabriceNeyret2 + IQ hash
+//https://www.shadertoy.com/view/fsKBzw
+float hash( vec2 f ) {   
+    uvec2 x = uvec2( floatBitsToUint(f.x), floatBitsToUint(f.y) ),
+          q = 1103515245U * ( x>>1U ^ x.yx    );
+    return float( 1103515245U * (q.x ^ q.y>>3U) ) / float(0xffffffffU);
+}
+
+float cosErp(float min, float max, float p) {
+    float delta = max - min;
+    return (cos(p)*delta + delta) * 0.5 + min;
+}
+
+float worley(vec2 uv) {
+    vec2 index = floor(uv);
+    uv = fract(uv);
+
+    float minDist = 2.0;
+    for (float y = -1.0; y<=1.0; y++)
+    {
+        for (float x=-1.0; x<=1.0; x++)
+        {
+            float cellHash = hash(mod(index + vec2(x,y), FREQUENCY));
+            float cellTime = T * (cellHash * 2.0 + 0.1);
+            vec2 offset = vec2(cos(cellTime + cellHash * 100.0), sin(cellTime + cellHash)) * 0.5;
+            float dist = distance(vec2(0.5) + vec2(x,y) + offset, uv);
+
+            minDist = min(minDist, dist);
+        }
+    }
+    return minDist;
+}
+
+void mainImage( out vec4 O, in vec2 fragCoord ){
+    vec2 uv = (fragCoord - 0.5*R)/R.y; 
+    uv.x += sin(T)*0.2;
+    uv.y += cos(T)*0.2;
+    
+    vec2 pUV;
+    float d = dot(uv, uv);
+    pUV.x = pow(d, cosErp(WARPMIN, WARPMAX, T)) - T * MOVESPEED;
+    pUV.y = atan(uv.y, uv.x)/(2.*PI) + cosErp(ROTDELTAMIN, ROTDELTAMAX, T * 0.5) + T * ROTATIONSPEED;
+    
+    float frequency = FREQUENCY;
+    float amplitude = AMPLITUDE;
+    float value;
+    for (float i = 0.0; i < OCTAVES; i++)
+    {
+        value += worley(pUV * frequency) * amplitude;
+        amplitude *= GAIN;
+        frequency *= LACUNARITY;
+    }
+
+    vec3 col;
+    vec3 col1 = vec3(cosErp(2.5, 0.0, value),
+                     cosErp(3.0, 0.0, value),
+                     cosErp(5.0, 0.1, value));
+                     
+    vec3 col2 = vec3(cosErp(0.5, 0.0, value),
+                     cosErp(3.0, 0.1, value),
+                     cosErp(2.0, 0.1, value));
+                     
+    col = mix(col1, col2, worley(uv));
+               
+    //GLOW TUTORIAL by alro https://www.shadertoy.com/view/3s3GDn
+    vec3 glow = vec3(0.017 / pow(d, 0.5));
+    glow *= vec3(2.0, 2.7, 5.5);
+    glow = 1.0 - exp(-glow);
+    col += glow;
+    
+    col *= clamp(vec3(1.0 - pow(d, 0.7) * 1.1) + vec3(0.0, 0.35, 0.5), 0.0, 1.0); //vignette
+    
+    O = vec4(col, 1.0);
+}

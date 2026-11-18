@@ -1,0 +1,394 @@
+[0.1.2-R1] Repair snapshot
+- Portable preflight, synthetic demo, Windows launcher and hash-locked runtime.
+- Correct playlist count, cache names, render timeline bounds, device fallback and cleanup.
+- Restricted model and index loading, local media server, safe timeline imports.
+- Disjoint model validation and repaired auxiliary tools.
+- See START_REPAIR.md and RE_AUDIT_R1.md for verification and open hardware checks.
+
+The aim for this file is to try and log some major changes to the codebase/repository
+starting with the release notes of Light Wave Tech v0.1.1 and a comprehensive list of
+the files that record the extensive history of the project to its current form.
+
+In __LEGACY__ version numbers mean little if anything as the system started with a single python file, 
+extended to couple files, optimizing from CPU to GPU then it became about shaders, timelines, 
+further testing led to other aspects and versions that eventually settled to 
+32-bit_STEREO_EQ__light_wave_tech_v1.1.9.py where we're now (2026-10-22) for that main file; 
+the github repository / codebase will always have its own version number which represents 
+the whole (everything put out there publicly).
+
+NOTE ABOUT CODING: All development is done with windows notepad nothing else is needed.
+_____________________________________________________________________________________________________________________
+
+2026-11-01: Light Wave Tech v0.1.2:
+The following major changes and additions were made. This is v0.1.2 and the author is pleased with it.
+
+∎ 2026-10-30:
+- QuantumBlackBox has been migrated out of the main file into its own tool
+  located at /TOOLS/quantum_blackbox. This functionality can be run "real-time"
+  before actual graphics run but due to limitations in windows GPU cannot be used
+  to calculate the vectors/wave probs; also WSL seemed to have trouble with qiskit,
+  and also in linux it wasn't quite easy and still trying to compile from source the
+  CUDA support that seems to be a mixed bag of success for people... thus, precalc.
+
+∎ 2026-10-29:
+- Extended SIGNAL research:
+    Artificial_Life_R&D/2026-10-29_The_Butterfly_Effect_of_Intention_(Qubits).md
+
+- 32-bit_STEREO_EQ__light_wave_tech_v1.1.10.py
+    class QuantumBlackBox and upgraded video selection based on that.
+
+∎ 2026-10-28:
+- Extended SIGNAL research:
+    Artificial_Life_R&D/v4_Lenia_cel_automata_conv_shader
+    - This folder contains v4 of the Artificial Life, now in Lenia format with 
+    fourier transforms and convolution done directly in pytorch; neural network is feeding Lenia.
+
+    Artificial_Life_R&D/v5_Lenia_cel_automata_conv_shader
+    - This folder contains v5 of the Artificial Life; this version had 3 versions 5.1, 5.2, and the final v5.3, 
+    which transformed it to multidimensional; Lenia format of this project comes with 
+    fourier transforms and convolution done directly in pytorch; neural network is feeding Lenia.
+
+∎ 2026-10-27:
+- Created a new pivot point for SIGNAL research:
+    Artificial_Life_R&D/2026-10-26_game_of_life.md
+    Artificial_Life_R&D/2026-10-26_Bridging_Classical_Logic_and_Quantum.md
+    Artificial_Life_R&D/2026-10-27_Refactoring_Game_Of_Life_Shaders.md
+
+∎ 2026-10-25:
+- Modified shader_manager.py in preparation for v5_model neural data:
+    - Added: def _log_shader_info(self, shader_base_filepath):
+
+∎ 2026-10-23:
+- Modified shader_manager.py in preparation for v5_model neural data:
+- Affected classes:
+    ShaderTimelineManager
+    TimelineEffectReconstructor
+    TimelineEffectGenerator:
+
+    """
+    2026-10-23: neural indice-based approach
+    REPLACING _replenish_singular(self): random.shuffle
+    """
+    def _get_neural_singular_list(self, singular_list, neural_indices_filenames_all):
+
+∎ 2026-10-22:
+- Added this file CHANGELOG.txt
+- Added instructions: HOWTO_SETUP.txt
+
+- Added 34 new shaders into DATA\shaders\music_video\v2
+  these are _bufA.txt and for the filenames without that suffix 
+  run TOOLS\shader_boilerplate\copy_contents.py which just copies
+  updated boilerplate shader into ./shader_output (zoom_rot_flash_mask_shader_template.txt)
+  and from there you need to copy those files into DATA\shaders\music_video\v2 
+  the author is too lazy to separate these new files from all to rest to upload them
+  (not using git to commit... mostly manually copy&paste here as text)
+
+- Updated aforementioned file to match the updated shader files 
+  TOOLS\shader_boilerplate\copy_contents.py
+  TOOLS\shader_boilerplate\zoom_rot_flash_mask_shader_template.txt
+
+∎ 2026-10-22: Light Wave Tech v0.1.1:
+- Updated elements include base code, some bug fixes in the main file with regard to video frame multicore composition, 
+improved audio, DSP and EQ sections, ROG Theta 7.1 headphone specific code alterations, new v6 NeuralTrainer code, 
+many documentation improvements, new metaphysical lore additions; tested cloning the repo and rebuilding 
+config on RTX 2070 based rig and it worked just fine (meaning anyone can have it working if they are 
+ready to tinker with settings and match their dataset, neural selection can be bypassed by introducing 
+random.shuffle for instance). This is v0.1.1 and the author is pleased with it.
+
+∎__LEGACY__
+│   0x1_STEREO__light_wave_tech_v1.1.2.py.txt
+│   2026-06-02__shader_manager_v1.0.3.py
+│   2026-06-05__light_wave_tech_v1.0.2.py.txt
+│   2026-06-05__light_wave_tech_v1.0.3.py.txt
+│   2026-06-06__DEV__light_wave_tech_v1.0.4.py.txt
+│   2026-06-06__DEV__shader_manager_v1.0.4.py
+│   2026-06-10__shader_manager.py
+│   2026-06-13__light_wave_tech_v1.0.7.py.txt
+│   2026-06-25__notes.txt
+│   2026-07-02__NOTES.txt
+│   2026-08-16__BACKUP__BEFORE_RANDOMIZING__TO_CHECK_QUALITY___audio_vars.py
+│   2026-08-18__rating_system.txt
+│   2026-09-16__music_style_signal_but_v6_bad.txt
+│   2026-10-16__OLD_32-bit_STEREO_EQ__light_wave_tech_v1.1.8.py.txt
+│   2026-10__NESTED_PARALLELISM_EXP#1__32-bit_STEREO_EQ__light_wave_tech_v1.1.4.py.txt
+│   2026-10__NESTED_PARALLELISM_EXP#2__32-bit_STEREO_EQ__light_wave_tech_v1.1.4.py.txt
+│   32-bit_STEREO_EQ__light_wave_tech_v1.1.3.py.txt
+│   32-bit_STEREO_EQ__light_wave_tech_v1.1.4.py.txt
+│   32-bit_STEREO_EQ__light_wave_tech_v1.1.6.py.txt
+│   32-bit_STEREO_EQ__light_wave_tech_v1.1.7.py.txt
+│   32-bit_STEREO_EQ__light_wave_tech_v1.1.8.py - Copy.txt
+│   32-bit_STEREO_EQ__light_wave_tech_v1.1.8.py.txt
+│   ACTIVATE_7.1_ROG_THETA_DIRECT_SOUND__light_wave_tech_v1.1.3.py.txt
+│   AUDIO_STREAMING_EXP__32-bit_STEREO_EQ__light_wave_tech_v1.1.4.py.txt
+│   light_wave_tech_v1.0.8.py.txt
+│   light_wave_tech_v1.0.9.py.txt
+│   light_wave_tech_v1.1.0.py.txt
+│   light_wave_tech_v1.1.1.py.txt
+│   light_wave_tech_v1.1.2.py.txt
+│   light_wave_tech_v1.1.2__SOUND_LUF_NORM__ORIG_TEST.py.txt
+│   STEREO_WIDENING_EXPR_32-bit_STEREO_EQ__light_wave_tech_v1.1.5.py.txt
+│   TAKE_7.1___COMBINE_WITH_NEWEST_NORMAL______0x1_ROG7.1__light_wave_tech_v1.1.2.py.txt
+│   WHAT IS THIS record_video_dataset.py.txt
+│
+├───early_prototype_CPU
+│   │   001_LOG_neural_indices.txt
+│   │   FINAL_CANDIDATE_4__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│   │   gen_integrity_video_hashes.py.txt
+│   │   glitch_3440x1440.py.txt
+│   │   glitch_horizontal.py.txt
+│   │   glitch_square.py.txt
+│   │   glitch_this.py
+│   │   glitch_vertical_image.py.txt
+│   │   glitch_vertical_video.py.txt
+│   │   hash_test.py.txt
+│   │   helper_functions.py
+│   │   HTML_List_Neural_Log.py.txt
+│   │   integrity_check_video_hashes.py.txt
+│   │   INT_train__0038_model.pth
+│   │   model_005667790092976022.pth
+│   │   model_best.pth
+│   │   montecarlo.py.txt
+│   │   music_video.py.txt
+│   │   music_video_PRELOAD_PSEUDO.txt
+│   │   pier.txt
+│   │   precalc_values.py.txt
+│   │   Print_Neural_Log.py.txt
+│   │   random_combined_vert_square.py.txt
+│   │   random_horizontal_video.py.txt
+│   │   random_square_video.py.txt
+│   │   random_vertical_video.py.txt
+│   │   RUN_N_TEST - Copy.bat
+│   │   RUN_N_TEST.bat
+│   │   SIGNAL_HUNT.py.txt
+│   │   SIGNAL_random_combined_vert_square.py.txt
+│   │   SIGNAL_random_image.py.txt
+│   │   single_square.py.txt
+│   │   test.py.txt
+│   │   tmp_signal_indices_left.pkl
+│   │   tmp_signal_indices_right.pkl
+│   │   top_signal_indices_left.pkl
+│   │   top_signal_indices_right.pkl
+│   │   TST_pixel_draw.py.txt
+│   │   ttt.txt
+│   │   v2_model_01365030899930281.pth
+│   │   v3_model_007355181977456719.pth
+│   │   WITHOUT_VIDEO__LONGPLAY__FINAL_CANDIDATE_4__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py
+│   │   __LONGPLAY__FINAL_CANDIDATE_4__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│   │
+│   ├───GLITCH_TEST
+│   │       CACHE_LOADING_SINGULAR.py.txt
+│   │       EVOLVED__SINGULAR.py.txt
+│   │       glitch_notes.txt
+│   │       glitch_this.py
+│   │       ORIIG__SINGULAR.py.txt
+│   │       SINGULAR.py.txt
+│   │       test_script.py
+│   │
+│   ├───MATCH_UNDESIRED
+│   │       match_undesired_videos.py.txt
+│   │       NOTES_save_by_mtime.txt
+│   │
+│   └───old_code_and_notes
+│       │   1. The Holographic Enigma.txt
+│       │   2025-10-31-1800music_video.py.txt
+│       │   2025-10-31-2000music_video.py - Copy.txt
+│       │   2025-11-21__sort.py.txt
+│       │   2026-03-04--NEURAL_music_video.py - Copy.txt
+│       │   2026-03-23__glitch_this - Copy.py
+│       │   2026-03-25__BACKUP_NEURAL_music_video.py.txt
+│       │   2026-03-26__BACKUP_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-03-26__BACKUP_NEURAL_music_video.py.txt
+│       │   2026-03-26__NEURAL_music_video.py.txt
+│       │   2026-04-06_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-06__ALL_WORKING__CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-09-OLD_LOG_neural_indices.txt
+│       │   2026-04-09_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-25__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-26__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-26__pygame_pause_test.py.txt
+│       │   2026-04-27__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-28_1__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-28_2__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04-29__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-04_14__NOTES_ffmpeg_combine.txt
+│       │   2026-05-02__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-03__BEFORE_GLITCH_UPDATE_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-03__glitch_this_addon_notes.txt
+│       │   2026-05-03__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-04__HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-04__JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-04__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-05__x-box_controller_vibrate_expr.txt
+│       │   2026-05-08__CLEANED__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-09__CLEANED__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-10_improvements.txt
+│       │   2026-05-10__CLEANED__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-10__pygame_ce_music_video.py.txt
+│       │   2026-05-10__WITHOUT_VIDEO_music_sync.py.txt
+│       │   2026-05-11__1_pygame_console.py.txt
+│       │   2026-05-11__2_pygame_console.py.txt
+│       │   2026-05-11__EXPR_pygame_ce_music_video.py.txt
+│       │   2026-05-11__SEMIFINAL__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-12__visualizer_char_based.py.txt
+│       │   2026-05-12__visualizer_pixel_based.py.txt
+│       │   2026-05-13_notes.txt
+│       │   2026-05-13__bezier_expr_2.py.txt
+│       │   2026-05-13__LONGPLAY__SEMIFINAL__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-13__SEMIFINAL__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-13__WITHOUT_VIDEO__LONGPLAY__SEMIFINAL__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-14__FINAL_CANDIDATE_1__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-14__FINAL_CANDIDATE_2__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-15__FINAL_CANDIDATE_3__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   2026-05-15__improvements.txt
+│       │   2026-05-16__code_to_ai_analysis.txt
+│       │   2026-05-16__pixel_draw_notes.txt
+│       │   2026-05_11__helper_functions.py
+│       │   2026-05_13__bezier_expr_1.py.txt
+│       │   BACKUP__2026-05-13__SEMIFINAL__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py - Copy.txt
+│       │   CLEANED_2026-05-04__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   CLEANED__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py - Copy.txt
+│       │   DEV__CURVE_SEMIFINAL__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   filter_test.py.txt
+│       │   foo.py.txt
+│       │   glp_data.txt
+│       │   JSON_CACHE_HIDEF_NEURAL_music_video.py - Copy.txt
+│       │   JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   multi_core_test.py.txt.old
+│       │   music_video.py - OLD.txt
+│       │   music_video.py.2025-10-31_000.txt
+│       │   NEW_SYNC__CLEANED__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   NOTES_no-audio_probing.txt
+│       │   OLD_random_horizontal_video.py.txt
+│       │   OLD_random_vertical_video.py.txt
+│       │   OLD__glitch_3440x1440.py.txt
+│       │   OLD__SIGNAL_random_image.py.txt
+│       │   ORIG_CLEANED_2026-05-04__OPTIMIZED_JSON_CACHE_HIDEF_NEURAL_music_video.py.txt
+│       │   single_square.py - Copy.txt
+│       │   SUPERINTELLIGENCE HO.txt
+│       │   tt.py
+│       │   tt2.py.txt
+│       │   video_vertical_left_cache  = [].txt
+│       │
+│       └───expr_code
+│           └───qbit_random
+│                   bin_to_dec.py.txt
+│                   mysql_binary_to_python.txt
+│                   qbit_dec.txt
+│                   qbit_dec_random.txt
+│                   qbit_strings - Copy.txt
+│                   qbit_strings.txt
+│
+├───shadersys_RTX_2070__light_wave_tech_EARLY_DEV
+│       music_video_testbed_shader_timeline.py.txt
+│       music_video_v7.2__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.3__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.4_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.5_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.6_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.7_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       REVERT_ZOOM_LOGIC_music_video_testbed_shader_timeline.py.txt
+│       RTX_3060_TEST_music_video_v7.8.0_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.1_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.2_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.3_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.4_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.5_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.6_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.7_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.8_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.9_code_pygame_mgl_timeline_shaders_zoom.txt
+│       v2.0_music_video_testbed_shader_timeline.py.txt
+│       v2.1_music_video_testbed_shader_timeline.py.txt
+│       v3_music_video_testbed_shader_timeline.py.txt
+│       vid_test.txt
+│
+├───shadersys_RTX_3060__light_wave_tech_EARLY_DEV
+│       000_shadertoy.py.txt
+│       0_example.py.txt
+│       1_example.py.txt
+│       2026-05-18__shadersys.rar
+│       2026-05-19__shadersys.rar
+│       2026-05-20__timelines.rar
+│       2026-05-21__shadersys.rar
+│       2026-05-24__notes__SHADER_REUSABLE WAVE FUNCTION.txt
+│       2026-05-25__shadersys_music_video.rar
+│       2026-05-28__buffer imp.txt
+│       2026-05-28__shadersys_music_video.rar
+│       2026-05-31__ShaderSYS.rar
+│       2_example.py.txt
+│       2_shadertoy_with_effect_reader.py.txt
+│       9_example.py.txt
+│       config_test.txt
+│       glitch_this.py
+│       grok_elara_glitch_with_sharedtoy.py.txt
+│       helper_functions.py
+│       music_video_testbed_shader_timeline.py.txt
+│       music_video_v5__code_pygame_mgl.txt
+│       music_video_v5__code_pygame_mgl__blending_multi_shaders.txt
+│       music_video_v5__code_pygame_sdl.txt
+│       music_video_v7.1__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.2__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.3__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.4_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.5_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.6_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7.7_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       music_video_v7__code_pygame_mgl_timeline_shaders.txt
+│       music_video_v7__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.1_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.2_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.3_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.4_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.5_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.6_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.7_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.8_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       RTX_3060_TEST_music_video_v7.8.9_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+│       shadertoy.py.txt
+│       shadertoy_with_effect_reader.py.txt
+│       shader_exp_1.glsl
+│       shader_exp_2.glsl
+│       shader_exp_3.glsl
+│       shader_exp_extra_001.glsl
+│       shader_manager.py
+│       ttt_.txt
+│       v1_shader_manager.py
+│       v2_shader_manager.py
+│       v3_music_video_testbed_shader_timeline.py.txt
+│       v3_shader_manager.py
+│
+└───shader_testbed_RTX_2070
+        2026-05-16__demosys_notes.txt
+        2026-05-17__shadersys-py-master.rar
+        2026-05-18__shadersys.rar
+        2026-05-19_notes_process_video_code_orig.txt
+        2026-05-19_notes_process_video_code_unified.txt
+        2026-05-19__shadersys.rar
+        2026-05-20__shaders_music_video.rar
+        2026-05-20__timelines.rar
+        2026-05-21__shadersys.rar
+        2026-05-24_dev_notes.rar
+        2026-05-24_shaders_music_video.rar
+        2026-05-25__shadersys_music_video.rar
+        2026-05-28__shadersys_music_video.rar
+        2_shadertoy_with_effect_reader.py.txt
+        effect_reader.py.txt
+        effect_template_JSON.txt
+        FULL_TIME_LINE_TEST_COPY_THIS_TO_v2_timeline_glitch_prod.txt
+        glitch_this.py
+        helper_functions.py
+        music_video_v5__code_pygame_mgl.txt
+        music_video_v5__code_pygame_sdl.txt
+        music_video_v7.1__code_pygame_mgl_timeline_shaders_zoom.txt
+        rtx_2070__grok_elara_glitch_with_sharedtoy.py.txt
+        RTX_3060_TEST_music_video_v7.8.6_REVERT_ZOOM_LOGIC__code_pygame_mgl_timeline_shaders_zoom.txt
+        rtx_3060__grok_elara_glitch_with_sharedtoy.py.txt
+        shadertoy.py.txt
+        shadertoy_with_effect_reader.py.txt
+        shader_exp_1.txt
+        shader_exp_1_V2_or_is_it_check.txt
+        shader_exp_2.glsl
+        shader_exp_3.glsl
+        shader_manager.py
+        WORKS_BEFORE_REFACTORING__2026-05-19__music_video_v7__code_pygame_mgl_timeline_shaders.txt.py
+        WORKS_BEFORE_REFACTORING__2026-05-19__music_video_v7__code_pygame_mgl_timeline_shaders_zoom.txt

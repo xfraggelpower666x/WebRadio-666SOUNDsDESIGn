@@ -1,0 +1,143 @@
+#define hash(x) fract(sin(x) * 43758.5453123)
+
+vec3 pal(float t){return .5+.5*cos(6.28*(1.*t+vec3(.0,.1,.1)));}
+ float stepNoise(float x, float n) { // From Kamoshika shader
+   const float factor = 0.3;
+   float i = floor(x);
+   float f = x - i;
+   float u = smoothstep(0.5 - factor, 0.5 + factor, f);
+   float res = mix(floor(hash(i) * n), floor(hash(i + 1.) * n), u);
+   res /= (n - 1.) * 0.5;
+   return res - 1.;
+ }
+
+ vec3 path(vec3 p){
+   
+      vec3 o = vec3(0.);
+       o.x += stepNoise(p.z*.05,5.)*5.;
+      o.y += stepNoise(p.z*.07,3.975)*5.;
+     return o;
+   }
+   float diam2(vec2 p,float s){p=abs(p); return (p.x+p.y-s)*inversesqrt(3.);}
+   vec3 erot(vec3 p,vec3 ax,float t){return mix(dot(ax,p)*ax,p,cos(t))+cross(ax,p)*sin(t);}
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // 1. Get the screen coordinates (Code 1 actually centers them at 0,0 right here!)
+    vec2 uv = (fragCoord.xy - iResolution.xy*0.5)/iResolution.y;
+    
+    // =========================================================================
+    // PART 1: APPLY ZOOM AND ROTATE TO THE UV COORDINATES
+    // =========================================================================
+    
+    float MAX_ZOOM = 0.10;  
+    float MAX_ANGLE = 0.03; 
+    
+    float beatTimer = floor(iTime * 4.0);
+    float rDir = (rand(beatTimer) > 0.5) ? 1.0 : -1.0; 
+    float rMult = 1.0 + (rand(beatTimer + 5.0) * 0.2); 
+    
+    // Calculate current scales based on audio sync
+    float currentScale = 1.0 + (MAX_ZOOM * iMusicSync0);
+    float currentAngle = MAX_ANGLE * iMusicSync1 * rDir * rMult;
+
+    // Because Code 1's formula already centers 'uv' to (0,0), 
+    // we DON'T need to subtract and add 0.5 like we did with the texture!
+    
+    // Apply Scale (Zoom)
+    uv /= currentScale;
+    
+    // Apply Rotation
+    float s = sin(currentAngle);
+    float c = cos(currentAngle);
+    mat2 rotMat = mat2(c, -s, 
+                       s,  c);
+    uv = rotMat * uv; // The canvas is now zoomed and rotated
+
+
+
+    // Normalized pixel coordinates (from 0 to 1)
+    //vec2 uv = (fragCoord-.5*iResolution.xy)/iResolution.y;
+
+// vec3 col = vec3(0.);
+ vec3 col = vec3(0.0, 0.02, 0.08);
+  
+  vec3 ro = vec3(0.,0.,-1.),rt=vec3(0.);
+  ro.z+=iTime*5.;
+  rt.z += iTime*5.;
+  ro+=path(ro);
+  rt+=path(rt);
+  vec3 z = normalize(rt-ro);
+  vec3 x = vec3(z.z,0.,-z.x);
+  float i=0.,e=0.,g=0.;
+  vec3 rd = mat3(x,cross(z,x),z)*erot(normalize(vec3(uv,1.)),vec3(0.,0.,1.),stepNoise(iTime+hash(uv.x*uv.y*iTime)*.05,6.));
+
+  for(;i++<99.;){
+    vec3 p= ro+rd*g;
+
+    p-=path(p);
+    float r = 0.;
+    vec3 pp=p;
+    float sc=1.;
+    for(float j=0.;j++<4.;){
+        r = clamp(r+abs(dot(sin(pp*3.),cos(pp.yzx*2.))*.3-.1)/sc,-.5,.5);
+        pp=erot(pp,normalize(vec3(.05,.08,.1)),.785+j);
+        pp+=pp.yzx+j*50.;
+        sc*=1.5;
+        pp*=1.5;
+      }
+      
+     float h = abs(diam2(p.xy,7.))-3.-r;
+   
+     p=erot(p,vec3(0.,0.,1.),path(p).x*.5+p.z*.2);
+     float t = length(abs(p.xy)-.5)-.1;
+     h= min(t,h);
+     g+=e=max(.001,t==h ?abs(h):(h));
+     col +=(t==h ?vec3(.05,.08,.1)*(100.*exp(-20.*fract(p.z*.25+iTime)))*mod(floor(p.z*4.)+mod(floor(p.y*4.),2.),2.) :vec3(.1))*.0325/exp(i*i*e);;
+    }
+    col = mix(col,vec3(.9,.9,1.1),1.-exp(-.01*g*g*g));
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+
+    // MUSIC_VIDEO__MOD
+    float colorTimer = floor(iTime * 2.0); 
+
+    vec3 flashColor = vec3(
+        rand(colorTimer),           
+        rand(colorTimer + 10.0),    
+        rand(colorTimer + 20.0)     
+    );
+
+    // Add the flash to the transformed screen
+    vec3 finalColor = fragColor.rgb + (flashColor * iMusicSync2*1.2);
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+    // --- UNIVERSAL FLASH TO WHITE (FIXED TIMING) ---
+    // 1. Define exactly how long this animation should take (e.g., 2.5 seconds)
+    float transitionTime = 1.0; 
+
+    // 2. Create a timer that stays at 0.0 for the whole video, 
+    // but starts counting up exactly 'transitionTime' seconds before the end.
+    float triggerTime = iEndTime - transitionTime;
+    float tFlash = clamp(iTime - triggerTime, 0.0, transitionTime);
+
+    // 3. Run your exact same math, but scale it to 'transitionTime' instead of 'duration'
+    float z_prog = smoothstep(0.0, transitionTime, tFlash);
+    z_prog = pow(z_prog, 1.5); // Easing for accelerating zoom effect
+    
+    float animZ = mix(20.0, -2.0, z_prog);
+    float flashAmt = 1.0 - smoothstep(-1.0, 1.0, animZ);
+    
+    // 4. Mix and output
+    vec3 colFlash = mix(fragColor.rgb, vec3(1.0), flashAmt);
+    fragColor = vec4(colFlash, 1.0);
+}

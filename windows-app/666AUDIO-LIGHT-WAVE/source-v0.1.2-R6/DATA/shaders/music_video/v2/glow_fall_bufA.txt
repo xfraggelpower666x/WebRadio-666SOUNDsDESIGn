@@ -1,0 +1,39 @@
+// MENGERLAYER
+#define m(f, h)\
+    s /= (f), \
+    p = abs(fract(q/s)*s - s*.5), \
+ 	m = min(m, min(max(p.x, p.y), \
+               min(max(p.y, p.z), \
+               max(p.x, p.z))) - s/(h))
+
+
+void mainImage(out vec4 o, vec2 u) {
+   
+    float i,  T = iTime,m,d,s,pi = 3.14159;
+    vec3  c,r = iResolution;
+    
+    u = (u+u - r.xy) / r.y;
+
+    vec3  q,p, ro = vec3(cos(T*.2)*3e1, -T*1e1, cos(T*.3)*3e1),
+          D = vec3(u, 1);
+    mat2 rot = mat2(cos(ro.y*.02+vec4(0,33,11,0)));
+ 
+    for(;i++ < 1e2;
+        p = q*2.,
+        d += s = max(.01+.7*abs(m),.01+1.4*abs(.4+dot(sin(T+p/6.), cos(p.yzx/16.)))),
+        c += vec3(1.+sin(p*.15)*.4)/s + vec3(1,2,4)
+    )
+        q = p = ro + D * d,
+        q.xz *= rot,
+        q/=2.,
+        m=.25,
+        s = 512.,
+        m(2., 4.),
+        s = 128.,
+        m(12., 4.),
+        s = 64.,
+        m(24., 4.);
+
+    o.rgb = tanh(c*c/6e5);
+
+}

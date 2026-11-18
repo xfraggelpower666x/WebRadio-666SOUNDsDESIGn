@@ -1,0 +1,261 @@
+const int MAX_RAY_STEPS = 64;
+const float RAY_STOP_TRESHOLD = 0.0001;
+const int MENGER_ITERATIONS = 32;
+
+// Функция плавности (Ease In Out Cubic)
+float ease_in_out_cubic(float x) {
+    return x < 0.5 ? 4.0 * x * x * x : 1.0 - pow(-2.0 * x + 2.0, 3.0) / 2.0;
+}
+
+// Матрица вращения в 2D
+mat2 rot(float a) {
+    float c = cos(a), s = sin(a);
+    return mat2(c, -s, s, c);
+}
+float star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+ 
+// 3D хэш для генерации неоновой структуры
+float hash3(vec3 p) {
+    p = fract(p * vec3(443.8975, 397.2973, 491.1871));
+    p += dot(p.xyz, p.yzx + 19.19);
+    return fract(p.x * p.y * p.z);
+}
+
+float sdCross(vec3 p) {
+	p = abs(p);
+	vec3 d = vec3(max(p.x, p.y),
+				  max(p.y, p.z),
+				  max(p.z, p.x));
+	return min(d.x, min(d.y, d.z)) - (1.0 / 3.0);
+}
+
+float sdCrossRep(vec3 p) {
+	vec3 q = mod(p + 1.0, 2.0) - 1.0;
+	return sdCross(q);
+}
+
+float sdCrossRepScale(vec3 p, float s) {
+	return sdCrossRep(p * s) / s;	
+}
+
+// Сцена Менгера под бесконечные комнаты
+float scene(vec3 p, out vec3 cellId) {
+	float scale = 1.0;
+	float dist = 0.0;
+    vec3 id = vec3(0.0);
+    
+	for (int i = 0; i < MENGER_ITERATIONS; i++) {
+        float currentCross = -sdCrossRepScale(p, scale);
+		if (currentCross > dist) {
+            dist = currentCross;
+            id = floor((p * scale + 1.0) / 2.0);
+        }
+		scale *= 3.0;
+	}
+    cellId = id;
+	return dist;
+}
+
+float scene(vec3 p) {
+    vec3 dummy;
+    return scene(p, dummy);
+}
+
+// Численное вычисление normal
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0.0);
+    return normalize(vec3(
+        scene(p + e.xyy) - scene(p - e.xyy),
+        scene(p + e.yxy) - scene(p - e.yxy),
+        scene(p + e.yyx) - scene(p - e.yyx)
+    ));
+}
+
+// Преобразование HSV в RGB для цветного неона
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 screenPos = fragCoord.xy / iResolution.xy * 2.0 - 1.0;
+    
+    // --- ДИСКРЕТНОЕ ДВИЖЕНИЕ ПО ВЕТКАМ ---
+    vec3 cameraPos = vec3(0.0);
+    float tProgress = floor(iTime * 0.1) * 4.0;
+    float ksstx = clamp(3.0 * (fract(0.1 * iTime) - 2.0 / 3.0), 0.0, 1.0);
+    float kssty = clamp(3.0 * (fract(0.1 * iTime) - 1.0 / 3.0), 0.0, 1.0);
+    float ksstz = clamp(3.0 * fract(0.1 * iTime), 0.0, 1.0);
+    
+    cameraPos.x = tProgress + 4.0 * ease_in_out_cubic(ksstx);
+    cameraPos.y = tProgress + 4.0 * ease_in_out_cubic(kssty);
+    cameraPos.z = tProgress + 4.0 * ease_in_out_cubic(ksstz);
+
+    // ВЗГЛЯД КАМЕРЫ
+    vec3 targetDir = vec3(0.0, 0.0, 1.0);
+    if (ksstz >= 1.0 && kssty < 1.0) targetDir = vec3(0.0, 1.0, 0.0);
+    if (kssty >= 1.0 && ksstx < 1.0) targetDir = vec3(1.0, 0.0, 0.0);
+    
+    float blendZtoY = smoothstep(0.0, 0.2, kssty);
+    float blendYtoX = smoothstep(0.0, 0.2, ksstx);
+    vec3 cameraDir = mix(mix(vec3(0.0, 0.0, 1.0), vec3(0.0, 1.0, 0.0), blendZtoY), vec3(1.0, 0.0, 0.0), blendYtoX);
+    cameraDir = normalize(cameraDir);
+
+    vec3 up = vec3(0.0, 1.0, 0.0);
+    if (abs(cameraDir.y) > 0.9) up = vec3(0.0, 0.0, -1.0);
+    vec3 cameraPlaneU = normalize(cross(cameraDir, up));
+    vec3 cameraPlaneV = normalize(cross(cameraPlaneU, cameraDir)) * (iResolution.y / iResolution.x);
+
+    float shake = sin(fract(0.1 * iTime) * 3.1415 * 3.0) * 0.05;
+    cameraPlaneU.xy *= rot(shake);
+    cameraPlaneV.xy *= rot(shake);
+
+    vec3 rayPos = cameraPos;
+    vec3 rayDir = cameraDir + screenPos.x * cameraPlaneU + screenPos.y * cameraPlaneV;
+    rayDir = normalize(rayDir);
+    
+    float dist = scene(rayPos);
+    int stepsTaken = 0;
+    
+    for (int i = 0; i < MAX_RAY_STEPS; i++) {
+        if (dist < RAY_STOP_TRESHOLD) break;
+        rayPos += rayDir * dist;
+        dist = scene(rayPos);
+        stepsTaken = i;
+    }
+    
+    float ao = pow(float(stepsTaken) / float(MAX_RAY_STEPS), 0.9);
+    vec3 finalColor = vec3(0.005, 0.005, 0.012);
+    
+    if (dist < RAY_STOP_TRESHOLD) {
+        vec3 cellId;
+        scene(rayPos, cellId); 
+        vec3 normal = getNormal(rayPos);
+        
+        // Развертка текстуры
+        vec2 texCoord = abs(normal.x) > 0.5 ? rayPos.yz : (abs(normal.y) > 0.5 ? rayPos.xz : rayPos.xy);
+        
+        vec2 pUV = texCoord * 14.0; 
+        vec2 id = floor(pUV);
+        vec2 fv = fract(pUV);
+        
+        // ДИНАМИЧЕСКАЯ СМЕНА ПАТТЕРНОВ ПО МОДУЛЮ ВРЕМЕНИ
+        float timeMod = floor(iTime * 0.16); 
+        float wallType = fract(hash3(floor(cellId * 0.5) + vec3(floor(texCoord * 0.5), 0.0)) + timeMod * 0.23);
+        
+        float h = hash3(vec3(id, floor(cellId.z + cellId.x)));
+        
+        // Параметры движения тока
+        float dirX = mod(id.y, 2.0) < 1.0 ? 1.0 : -1.0;
+        float dirY = mod(id.x, 2.0) < 1.0 ? 1.0 : -1.0;
+        float pulseSpeed = iTime * 6.0;
+        float pShift = hash3(vec3(id * 1.5, floor(cellId.y)));
+
+        // Инициализация слоев
+        float chip = 0.0, boardLines = 0.0, matrix = 0.0, grille = 0.0, hex = 0.0;
+        float current = 0.0;
+        float currentDirShift = 0.0;
+
+        // --- ВЫБОР И ГЕНЕРАЦИЯ 5 ПАТТЕРНОВ НА СТЕНАХ ---
+        if (wallType < 0.2) {
+            // ПАТТЕРН 1: Процессорные чипы
+            float chipMask = step(0.75, h);
+            chip = smoothstep(0.43, 0.38, max(abs(fv.x - 0.5), abs(fv.y - 0.5))) * chipMask;
+            
+            vec2 linesWeight = smoothstep(0.06, 0.0, abs(fv - 0.5));
+            if (h > 0.15 && h <= 0.75) boardLines += linesWeight.x;
+            if (h > 0.35 && h <= 0.75) boardLines += linesWeight.y;
+            boardLines = clamp(boardLines, 0.0, 1.0) * (1.0 - chip);
+            
+            float flowX = smoothstep(0.15, 0.0, abs(fv.x - fract(pulseSpeed * dirX + pShift)));
+            float flowY = smoothstep(0.15, 0.0, abs(fv.y - fract(pulseSpeed * dirY - pShift)));
+            if (h > 0.15) current += flowX * smoothstep(0.08, 0.0, abs(fv.y - 0.5));
+            if (h > 0.35) current += flowY * smoothstep(0.08, 0.0, abs(fv.x - 0.5));
+            current *= step(0.4, hash3(vec3(cellId.xy, id.y))) * (1.0 - chip);
+            currentDirShift = dirX * 0.2;
+            
+        } else if (wallType < 0.4) {
+            // ПАТТЕРН 2: Скоростные шины данных
+            float linesCount = 4.0;
+            float dataLine = smoothstep(0.15, 0.0, abs(fract(fv.x * linesCount) - 0.5));
+            matrix = dataLine * step(0.2, h);
+            
+            current = matrix * smoothstep(0.3, 0.0, abs(fract(fv.y * dirY + pulseSpeed * 0.5) - 0.5));
+            currentDirShift = dirY * 0.5;
+            
+        } else if (wallType < 0.6) {
+            // ПАТТЕРН 3: Кибер-лабиринт
+            vec2 gridLines = smoothstep(0.04, 0.0, abs(fv - 0.5));
+            boardLines = (h > 0.3 ? gridLines.x : 0.0) + (h < 0.7 ? gridLines.y : 0.0);
+            boardLines = clamp(boardLines, 0.0, 1.0);
+            
+            float flowX = smoothstep(0.1, 0.0, abs(fv.x - fract(pulseSpeed * 1.5 * dirX)));
+            current = flowX * boardLines * step(0.6, h);
+            
+        } else if (wallType < 0.8) {
+            // ПАТТЕРН 4: Вентиляционные решетки
+            grille = smoothstep(0.2, 0.1, abs(fract(fv.y * 3.0) - 0.5)) * step(0.4, h);
+            current = grille * step(0.95, h) * (sin(iTime * 10.0 + h * 5.0) * 0.5 + 0.5);
+            
+        } else {
+            // ПАТТЕРН 5: Футуристические гексагональные ячейки
+            vec2 hexUV = texCoord * 8.0;
+            float h1 = sin(hexUV.x * 2.0) * sin(hexUV.y * 1.15);
+            float h2 = sin((hexUV.x + 0.78) * 2.0) * sin((hexUV.y + 1.36) * 1.15);
+            float grid = max(h1, h2);
+            hex = smoothstep(0.7, 0.8, grid) * step(0.1, h);
+            
+            current = hex * smoothstep(0.2, 0.0, abs(sin(grid * 4.0 - iTime * 4.0 + h * 5.0)));
+            currentDirShift = h * 0.3;
+        }
+
+        // --- РАБОТА С ЦВЕТОМ И НЕОНОМ ---
+        float baseHue = fract(h * 0.35 + iTime * 0.04 + currentDirShift);
+        
+        vec3 neonLines = hsv2rgb(vec3(baseHue, 0.9, 0.55)) * boardLines;
+        vec3 neonMatrix = hsv2rgb(vec3(fract(baseHue + 0.2), 0.95, 0.6)) * matrix;
+        vec3 neonHex = hsv2rgb(vec3(fract(baseHue - 0.3), 0.85, 0.5)) * hex * 0.7;
+        
+        float chipGlow = (sin(iTime * 5.0 + h * 30.0) * 0.5 + 0.5) * chip;
+        vec3 neonChip = hsv2rgb(vec3(fract(baseHue - 0.15), 0.9, 0.75)) * chipGlow * 0.6;
+        
+        vec3 neonCurrent = hsv2rgb(vec3(fract(baseHue + 0.1), 0.85, 1.0)) * current * 5.0;
+        vec3 colCore = vec3(1.0, 1.0, 1.0) * pow(current, 6.0) * 2.5;
+
+        vec3 colPlates = vec3(0.04, 0.05, 0.07) * (1.0 + chip * 0.3 - grille * 0.5 + hex * 0.2);
+        
+        finalColor = colPlates + neonLines + neonMatrix + neonChip + neonHex + neonCurrent + colCore;
+        finalColor *= (1.0 - ao * 0.75);
+    }
+    
+    // Расчет тумана и виньетки
+    float depth = length(rayPos - cameraPos);
+    finalColor = mix(finalColor, vec3(0.002, 0.004, 0.01), 1.0 - exp(-0.15 * depth));
+    finalColor *= 1.0 - length(screenPos) * 0.25;
+
+    // --- ЛОГИКА ИСЧЕЗНОВЕНИЯ ЭФФЕКТА НА ПОВОРОТАХ ---
+    // Скалярное произведение определяет, насколько направление камеры совпадает с целевым.
+    float rotationDot = dot(cameraDir, targetDir);
+    // Превращаем в маску: 1.0 при движении по прямой, падает до 0.0 на повороте.
+    float rotationFactor = smoothstep(0.98, 0.999, rotationDot);
+
+    // Расчет звездного фона
+    vec2 uv3 = ( fragCoord - .5*iResolution.xy ) / iResolution.y;
+    uv3 *= 2.0 * ( cos(iTime * 2.0) - 2.5);
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  
+    vec4 fc = vec4(star(uv3, anim) * vec3(0.35, 0.2, 0.15), 1.0);
+    
+    // Плавно заменяем текстуру fc.xyz на белый цвет (vec3(1.0)), когда камера поворачивает.
+    // Это сохраняет базовую яркость finalColor, убирая структуру звезд.
+    vec3 blendFc = mix(vec3(1.0 / 10.0), fc.xyz, rotationFactor);
+    
+    fragColor = vec4(finalColor * 5. * blendFc * 10.0, 1.0);
+}

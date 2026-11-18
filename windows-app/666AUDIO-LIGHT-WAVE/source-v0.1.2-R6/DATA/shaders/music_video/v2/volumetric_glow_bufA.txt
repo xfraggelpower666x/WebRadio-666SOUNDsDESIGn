@@ -1,0 +1,71 @@
+/*
+    "Volumetric: Glow" by @XorDev
+    
+    A lighting demo built for my tutorial on volumetric raymarching
+*/
+
+//Output brightness
+#define BRIGHTNESS 0.002
+
+//Raymarching steps
+#define STEPS 50.0
+//Camera y Field Of View ratio
+#define FOV 1.0
+
+//Fog density
+#define DENSITY 5.0
+
+//Density field
+float volume(vec3 p)
+{
+    //Spherical distance
+    float l = length(p);
+    //Projected sine waves
+    vec3 v = cos(abs(p) * 15.0 / max(4.0,l) + iTime);
+    //Combine cosine grid with sphere
+    return length(vec4(max(v, v.yzx) - 0.9, l-4.0)) / DENSITY;
+}
+//3D rotation function
+//Rotates 90 degrees from an arbitrary axis
+//https://x.com/XorDev/status/1947676805546361160
+vec3 rotate(vec3 p, vec3 a)
+{
+    return a*dot(p,a) + cross(p,a);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    //Center coordinates
+    vec2 center = 2.0*fragCoord - iResolution.xy;
+    
+    //Rotation axis
+    vec3 axis = normalize(cos(vec3(0.5*iTime + vec3(0,2,4))));
+    //Rotate ray direction
+    vec3 dir = rotate(normalize(vec3(center, FOV * iResolution.y)),axis);
+    
+    //Camera position
+    vec3 cam = rotate(vec3(0, 0, -8.0), axis);
+    //Raymarch sample point
+    vec3 pos = cam;
+    
+    //Output color
+    vec3 col = vec3(0.0);
+    
+    //Glow raymarch loop
+    for(float i = 0.0; i<STEPS; i++)
+    {
+        //Glow density
+        float vol = volume(pos);
+        //Step forward
+        pos += dir * vol;
+        
+        //Add sine wave coloring
+        col += (cos(pos.z/(1.0+vol)+iTime+vec3(6,1,2))+1.2) / vol;
+    }
+    //Tanh tonemapping
+    //https://mini.gmshaders.com/p/tonemaps
+    col = tanh(BRIGHTNESS*col);
+    
+    //Output the resulting color
+    fragColor = vec4(col, 1.0);
+}

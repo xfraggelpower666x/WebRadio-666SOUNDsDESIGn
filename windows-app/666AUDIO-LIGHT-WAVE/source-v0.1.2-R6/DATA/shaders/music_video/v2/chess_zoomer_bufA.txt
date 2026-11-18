@@ -1,0 +1,49 @@
+float distanceField(vec2 p, float t)
+{
+    float t1 = t * 1.4 - sqrt(length(p));
+    float t2 = t * 3.0 - length(p) * 0.4;
+    float a = sin(t2 / 20.0) * 20.0 + sin(t2) * 1.5;
+
+    p *= (exp(sin(t1) * -2.0) * 2.0) + 0.5;
+
+    p *= mat2x2(
+        cos(a), sin(a),
+        -sin(a), cos(a)
+    );
+    
+    p = p - floor(p) - 0.5;
+
+    p *= mat2x2(
+        0.5, 0.5,
+        -0.5, 0.5
+    );
+
+    return max(abs(p.x) - 0.25, abs(p.y) - 0.25);
+}
+
+float fill(vec2 screen, float t) {
+    // Fill distance field
+    float d = distanceField(screen, t);
+    float d2 = distanceField(screen, t + 0.001);
+    float v = length(vec2(dFdx(d), dFdy(d))) * max(1.0, abs(d2 - d) * 700.0);
+    float c = smoothstep(-v, v, d);
+    return c;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    // Pixel coordinate (from -1 to 1)
+    vec2 screen = (fragCoord - iResolution.xy * 0.5) / (iResolution.y * 0.5);
+    
+    // Draw with temporal chromatic abberation
+    vec3 c = vec3(
+        fill(screen, iTime + 0.000),
+        fill(screen, iTime + 0.003),
+        fill(screen, iTime + 0.006)
+    );
+    
+    // Gamma correct
+    c = pow(c, vec3(1.0/2.2));
+
+    fragColor = vec4(c, 1.0);
+}

@@ -1,0 +1,191 @@
+
+#define MAX_STEPS 80
+#define SURF_DIST 0.001
+#define MAX_DIST 20.0
+
+#define IOR_R 1.45
+#define IOR_G 1.50
+#define IOR_B 1.55
+#define ABSORPTION vec3(0.4, 0.15, 0.05)
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S3(p) p /= dot(p, p); p = fract(p) - 0.5;
+#define G(p, s) p = floor(p * s) / s;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+#define L(p, s) p = mod(p + s/2., s) - s/2.;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M4(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define T3(p) p *= r(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5);
+#define K(p) p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx;
+#define D(p) p.xy = vec2(log(length(p.xy)), atan(p.y, p.x));
+#define Q2(p) p = abs(p-1.)-abs(p+1.)+p;
+// Стеклянный "Кубик в кубике" с многослойной дисперсией света
+// Работает полностью во вкладке Image без буферов
+
+
+// Количество интерфейсов (граней), которые луч может пересечь (4 = внешняя оболочка + внутренний куб)
+#define PATH_STEPS 4 
+
+mat2 rot2D(float angle) {
+    float s = sin(angle), c = cos(angle);
+    return mat2(c, -s, s, c);
+}
+
+float sdBox(vec3 p, vec3 b, float r) {
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r;
+}
+
+// Сцена: Логика построения куба в кубике
+float map(vec3 p) {
+
+    p.xz *= rot2D(iTime * 0.35);
+    p.xy *= rot2D(iTime * 0.15);
+       M4(p.xy);
+        M4(p.xz);
+         Q(p.xy);
+         T3(p.xy);
+          Q2(p.xy);
+    // 1. ВНЕШНИЙ КУБ (Делаем его полым, вычитая внутреннюю область)
+    float outerWall = sdBox(p, vec3(1.0), 0.06);
+    float innerVoid = sdBox(p, vec3(0.82), 0.02);
+    float outerHollowCube = max(outerWall, -innerVoid);
+    
+    // Необязательно: сделаем окошки на гранях внешнего куба, чтобы лучше видеть внутренний
+    float winX = sdBox(p, vec3(1.2, 0.5, 0.5), 0.02);
+    float winY = sdBox(p, vec3(0.5, 1.2, 0.5), 0.02);
+    float winZ = sdBox(p, vec3(0.5, 0.5, 1.2), 0.02);
+    float windows = min(winX, min(winY, winZ));
+    outerHollowCube = max(outerHollowCube, -windows); // Вырезаем окна
+    
+    // 2. ВНУТРЕННИЙ КУБ (Маленький кубик в самом центре пустоты)
+    float innerCube = sdBox(p, vec3(0.38), 0.04);
+    
+    // Объединяем внешнюю конструкцию и внутреннее ядро
+    return min(outerHollowCube, innerCube);
+}
+
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.001, 0.0);
+    float d = map(p);
+    vec3 n = d - vec3(
+        map(p - e.xyy),
+        map(p - e.yxy),
+        map(p - e.yyx)
+    );
+    return normalize(n);
+}
+
+// Задний фон (Студийный свет)
+vec3 getBackground(vec3 rd) {
+    float sky = smoothstep(-0.2, 0.2, rd.y);
+    vec3 bg = mix(vec3(0.04, 0.02, 0.08), vec3(0.12, 0.16, 0.3), sky);
+    
+    // Вертикальные светящиеся пилоны
+    float stripes = smoothstep(0.97, 1.0, cos(atan(rd.x, rd.z) * 5.0 + rd.y * 1.5));
+    bg += vec3(0.7, 0.8, 1.0) * stripes * max(0.0, rd.y + 0.4);
+    
+    // Основной софтбокс сверху
+    float sun = pow(max(0.0, dot(rd, normalize(vec3(0.3, 1.0, -0.4)))), 32.0);
+    bg += vec3(1.3, 1.1, 0.9) * sun;
+    
+    return bg;
+}
+
+// Универсальная функция трассировки одного канала сквозь МНОЖЕСТВО граней
+float traceChannel(vec3 ro, vec3 rd, float target_ior) {
+    vec3 p = ro;
+    vec3 dir = rd;
+    float total_thickness = 0.0; // Копим общую толщину стекла для поглощения цвета
+    
+    // Цикл прохода через поверхности (PATH_STEPS)
+    for(int depth = 0; depth < PATH_STEPS; depth++) {
+        // Вычисляем, где мы: внутри стекла (map < 0) или в воздухе (map > 0)
+        float inside_glass = map(p) > 0.0 ? 1.0 : -1.0;
+        
+        // Маршируем до следующей ближайшей стенки
+        float d = 0.0;
+        for(int i = 0; i < MAX_STEPS; i++) {
+            vec3 pt = p + dir * d;
+            float dS = map(pt) * inside_glass;
+            d += dS;
+            if(d >= MAX_DIST || abs(dS) < SURF_DIST) break;
+        }
+        
+        // Если луч улетел в бесконечность, выходим из цикла граней
+        if(d >= MAX_DIST) break;
+        
+        // Сдвигаем точку на поверхность раздела сред
+        p = p + dir * d;
+        vec3 n = getNormal(p) * inside_glass;
+        
+        // Если мы только что прошли сквозь толщу стекла (inside_glass == -1), суммируем дистанцию
+        if(inside_glass < 0.0) {
+            total_thickness += d;
+        }
+        
+        // Коэффициент преломления: воздух->стекло или стекло->воздух
+        float eta = (inside_glass > 0.0) ? (1.0 / target_ior) : (target_ior / 1.0);
+        vec3 refrDir = refract(dir, n, eta);
+        
+        // Обработка полного внутреннего отражения
+        if(length(refrDir) < 0.1) {
+            dir = reflect(dir, n);
+        } else {
+            dir = refrDir;
+        }
+        
+        // Толкаем луч чуть вперед сквозь интерфейс, чтобы не застрять в бесконечном цикле на той же точке
+        p += dir * SURF_DIST * 2.0;
+    }
+    
+    // Запрашиваем текстуру окружения по финальному направлению луча после всех преломлений
+    vec3 bgCol = getBackground(dir);
+    
+    // Эффект затухания Beer-Lambert
+    float absorptionFactor = exp(-total_thickness * 0.6);
+    return bgCol.r * absorptionFactor;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    vec3 ro = vec3(0.0, 0.0, -12.5);
+    vec3 rd = normalize(vec3(uv, 1.3));
+    
+    vec3 finalCol = getBackground(rd);
+    
+    // Проверяем самое первое касание внешнего куба для бликов
+    float dFirst = 0.0;
+    float inside_glass = map(ro) > 0.0 ? 1.0 : -1.0;
+    for(int i = 0; i < MAX_STEPS; i++) {
+        float dS = map(ro + rd * dFirst) * inside_glass;
+        dFirst += dS;
+        if(dFirst >= MAX_DIST || abs(dS) < SURF_DIST) break;
+    }
+    
+    if(dFirst < MAX_DIST) {
+        // Зеркальный блик (отражение Френеля) на самой первой внешней грани
+        vec3 pFirst = ro + rd * dFirst;
+        vec3 nFirst = getNormal(pFirst);
+        vec3 reflDir = reflect(rd, nFirst);
+        vec3 specReflection = getBackground(reflDir) * 0.2; 
+        
+        // Запускаем спектральный просчет через структуру "куб в кубе"
+        float rCol = traceChannel(ro, rd, IOR_R);
+        float gCol = traceChannel(ro, rd, IOR_G);
+        float bCol = traceChannel(ro, rd, IOR_B);
+        
+        vec3 glassCol = vec3(rCol, gCol, bCol);
+        
+        // Окрашиваем каналы согласно поглощению
+        glassCol.r *= (1.0 - ABSORPTION.r);
+        glassCol.g *= (1.0 - ABSORPTION.g);
+        glassCol.b *= (1.0 - ABSORPTION.b);
+        
+        finalCol = glassCol + specReflection;
+    }
+    
+    // Коррекция цвета
+    finalCol = pow(finalCol, vec3(1.0 / 2.2));
+    fragColor = vec4(finalCol, 1.0);
+}

@@ -1,0 +1,149 @@
+// Disco Hive
+// By Noztol
+
+#define PI 3.1415926535
+
+// Global time
+float time;
+
+// Modified colors to use PI for seamless wrapping
+vec3 discoColors(vec2 p)
+{
+    p += vec2(time * 0.2);
+    
+    vec3 orange = vec3(1.0, 0.4, 0.1) * 2.0;
+    vec3 purple = vec3(1.0, 0.2, 0.5) * 0.8;
+    
+    float l = pow(0.5 + 0.5 * cos(p.x * PI * 2.0 + cos(p.y) * 8.0) * sin(p.y * 2.0), 4.0) * 2.0;
+    vec3 c = pow(l * (mix(orange, purple, 0.5 + 0.5 * cos(p.x * PI * 12.0 + sin(p.y * 10.0) * 3.0)) +
+                      mix(orange, purple, 0.5 + 0.5 * cos(p.x * PI * 6.0 + sin(p.y * 3.0) * 3.0))), vec3(1.2)) * 0.7;
+    
+    c += vec3(1.0, 0.8, 0.4) * pow(0.5 + 0.5 * cos(p.x * PI * 6.0) * sin(p.y * 12.0), 20.0) * 2.0;
+    
+    c += vec3(0.1, 0.5 + 0.5 * cos(p * PI * 6.0)) * vec3(0.05, 0.1, 0.4).bgr * 0.7;
+    
+    return c;
+}
+
+//generates hexagonal grid
+vec4 hexCoords(vec2 uv) 
+{
+    vec2 r = vec2(1.0, 1.7320508);
+    vec2 h = r * 0.5;
+    
+    vec2 a = mod(uv, r) - h;
+    vec2 b = mod(uv - h, r) - h;
+    
+    vec2 gv = dot(a, a) < dot(b, b) ? a : b;
+    vec2 id = uv - gv;
+    
+    return vec4(gv.x, gv.y, id.x, id.y);
+}
+
+vec3 hexTex(vec2 p, float border)
+{
+    vec4 hc = hexCoords(p);
+    vec2 gv = hc.xy;
+    
+    vec2 id = hc.zw * 0.125; 
+    
+    // Calculate distance to the hexagon's edge
+    float d = max(abs(gv.x), dot(abs(gv), vec2(0.5, 0.8660254)));
+    
+    float sm = 0.03;
+    
+    // Create the wireframe grid
+    float m = 1.0 - smoothstep(border - sm, border, d);
+    
+    // Add center glowing dot
+    m += 1.0 - smoothstep(0.0, 0.22, length(gv));
+    
+    return m * discoColors(id);
+}
+
+// Function to bend the tunnel's path over Z
+vec2 path(float z) 
+{
+    return vec2(sin(z * 0.15) * 2.5, cos(z * 0.1) * 2.0);
+}
+
+// Distance field for tunnel
+float map(vec3 p) 
+{
+    // Subtract the path XY offsets to bend it, 2.5 is the tunnel radius
+    return 2.5 - length(p.xy - path(p.z)); 
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    time = iTime + 1.0;
+    vec2 uv = (fragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
+    
+    float camSpeed = 4.0;
+    float camZ = time * camSpeed;
+    
+    // Camera position
+    vec3 ro = vec3(path(camZ), camZ);
+    // Look-at target slightly ahead in the tunnel
+    vec3 ta = vec3(path(camZ + 3.0), camZ + 3.0); 
+    
+    // Build camera orthonormal basis
+    vec3 fwd = normalize(ta - ro);
+    vec3 right = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)));
+    vec3 up = cross(right, fwd);
+    
+    // Add a slight banking roll to the camera as it turns
+    float roll = sin(time * 0.6) * 0.2;
+    mat2 rot = mat2(cos(roll), -sin(roll), sin(roll), cos(roll));
+    uv *= rot;
+    
+    // Ray direction (1.2 acts as FOV)
+    vec3 rd = normalize(uv.x * right + uv.y * up + 1.2 * fwd); 
+    
+    float t = 0.0;
+    for(int i = 0; i < 80; i++) 
+    {
+        vec3 p = ro + rd * t;
+        float d = map(p);
+        
+        if(d < 0.01 || t > 100.0) break;
+        t += d * 0.7;
+    }
+    
+    vec3 col = vec3(0.0);
+    
+    // tunnel walls
+    if(t < 100.0) 
+    {
+        vec3 p = ro + rd * t;
+        
+        // Get local coordinates relative to the tunnel center at this Z
+        vec2 tunObj = p.xy - path(p.z);
+        
+        // Calculate angle around the tunnel (-PI to PI)
+        float a = atan(tunObj.y, tunObj.x);
+        
+        float hexesAround = 16.0; // Must be an even whole number to wrap seamlessly
+        float xuv = (a / PI) * (hexesAround * 0.5); 
+        
+        
+        float yuv = p.z * (hexesAround / (2.5 * 2.0 * PI)); 
+        
+        vec2 tUv = vec2(xuv, yuv);
+        
+        // 0.46 controls the thickness of the honeycomb wall
+        col = hexTex(tUv, 0.46);
+        
+        // Fog based on distance to obscure the far end of the tunnel
+        float fog = exp(-0.006 * t * t);
+        col *= fog;
+        
+        // Brighten up the overall scene slightly
+        col *= 1.3;
+    }
+    
+    vec2 q = fragCoord.xy / iResolution.xy;
+    col *= 0.5 + 0.5 * pow(16.0 * q.x * q.y * (1.0 - q.x) * (1.0 - q.y), 0.1);
+    
+    fragColor = vec4(col, 1.0);
+}

@@ -1,0 +1,77 @@
+// Quantum Cubes
+// By Noztol
+
+// Palette
+#define H(h) (cos((h)*6.3+vec3(25,20,21))*2.5+.5)
+
+// 2D Rotation matrix macro
+#define rot(a) mat2(cos(a), sin(a), -sin(a), cos(a))
+
+void mainImage(out vec4 O, vec2 C) {
+    vec2 uv = (C - 0.5 * iResolution.xy) / iResolution.y;
+    
+    float time = iTime * 0.5;
+    vec3 ro = vec3(sin(time * 0.5) * 2.0, cos(time * 0.3) * 1.5, time * 3.0); 
+    vec3 ta = ro + vec3(sin(time * 0.4) * 0.5, cos(time * 0.3) * 0.5, 1.0); 
+    
+    vec3 cw = normalize(ta - ro);
+    vec3 cu = normalize(cross(cw, vec3(0, 1, 0)));
+    vec3 cv = normalize(cross(cu, cw));
+    vec3 rd = normalize(uv.x * cu + uv.y * cv + 1.2 * cw);
+    
+
+    float t2 = iTime * 0.15 + ((0.25 + 0.05 * sin(iTime * 0.1)) / (length(uv) + 0.51)) * 2.0;
+    rd.xy *= rot(t2);
+
+    float g = 0.0;
+    vec3 col = vec3(0.0);
+    
+    for(float i = 0.0; i < 90.0; i++) {
+        vec3 p = ro + g * rd; 
+        
+        p += sin(p.zxy * 5.0) * 0.05;
+        
+        vec3 n1 = p;
+        n1.xy *= rot(-t2 * 0.5); // Counter-twists the inner structure against the camera
+        float a = 7.0; 
+        n1 = mod(n1 - a, a * 2.0) - a;
+        
+        float s = 1.0;
+        float e = 1.0;
+        
+        // 3D KIFS Fold with Structural Movements
+        for(int j = 0; j < 8; j++) {
+            n1 = 0.4 - abs(n1); 
+            
+            // 3D Spatial folding
+            if(n1.x < n1.z) n1.xz = n1.zx;
+            if(n1.z < n1.y) n1.zy = n1.yz;
+            if(n1.y < n1.x) n1.xy = n1.yx;
+            
+            // Structural twist (forces the geometry to spiral)
+            n1.xz *= rot(0.15);
+            
+            s *= e = 1.4 + sin(iTime * 0.1) * 0.05; 
+            
+            // Tuned offsets to ensure dense geometry
+            n1 = abs(n1) * e - vec3(
+                1.2 + cos(iTime * 0.2) * 0.3,
+                2.5, 
+                1.2 + sin(iTime * 0.3) * 0.3
+            );
+        }
+        
+        // Blending box and sphere distance fields creates crystalline, cloud-like edges
+        float boxDist = max(abs(n1.x), max(abs(n1.y), abs(n1.z)));
+        float sphDist = length(n1);
+        float dist = mix(sphDist, boxDist, 0.4) / s; 
+        
+        g += dist * 0.5;
+        
+        col += mix(vec3(1.0), H(g * 0.3), 0.7) * 0.015 / (0.01 + dist * dist * 35.0);
+    }
+    
+    col *= exp(-g * 0.02);
+    
+    O = vec4(col, 1.0);
+}

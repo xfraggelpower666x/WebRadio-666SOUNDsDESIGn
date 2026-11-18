@@ -1,0 +1,54 @@
+#define H(a) (cos(radians(vec3(0, 60, 120))+(a)*6.2832)*.5+.5)  // hue
+
+// fraction grid
+float F(float x, float t)
+{
+    float p = 10., // precision
+          a = max(1.-abs(sin(3.1416*round(x)*t))*p, 0.), // denominator
+          b = max(sqrt(abs(x)), 1.),   // darken
+          c = (1.-abs(sin(x*3.1416))); // smooth
+    return a/b*c;
+}
+
+// points: 2d coords, overlap loop, value, size
+float P(vec2 u, float l, float t, float r)
+{
+    float i = 0., f = i, c = i;
+    vec2 w = fwidth(u), p;
+    for (; i++<l;)
+    {
+        p.x = round((u.x-i)/l)*l+i; // skip i rows
+        f = mod(trunc(p.x)*t, 1.);  // multiply ints with value
+        p.y = round(u.y-f)+f;       // set as y
+        c = max(c, r/length((u-p)/w));
+    }
+    return clamp(c, 0., 4.) / max(1., abs(u.x));
+}
+
+void mainImage( out vec4 C, in vec2 U )
+{
+    float t = 1. + mod(iTime, 600.)/60.,
+          pi2 = 6.2832, 
+          i, r;
+    vec2 R = iResolution.xy,
+         v = (U - R/2.)/R.y*30.,
+         u, g;
+    vec3 c = vec3(0);
+    vec2 m = vec2(sin(t*pi2)*2., sin(t*pi2*2.)); // fig-8 movement
+    for(i = .1; i < 1.; i += .1)
+    {
+        u = v*i; // scale coords with i
+        r = sqrt(length(u)); // radial
+        u = vec2( r, (r-3.)*u.y - u.x*sin(m.x/3.) ) - m; // coord transform
+        g = min( max(fwidth(u), .05) / abs(fract(u+.5)-.5), 2.) / max(abs(u), 1. ); // form grid
+        c += g.x*.1 + g.y*.2; // draw grid
+        c += F(u.x,   1./t+i) * vec3(.8, .6, .1) * .8; // numerator & multiples
+        c += F(u.y,      t+i) * vec3(.6, .4, .9) * .8; // denominator
+        c += P(u.yx, 2., t+i, 2.) * .6; // denominator points
+        r = length(u); // redefine
+        c += H(r+i) / max(1., sqrt(r)) * c * i; // color
+        c *= .6;
+    }
+    c -= .5*H(t+.5)*c; // adjust color
+    C = vec4(c*.7 + c*c, 1);
+}

@@ -1,0 +1,280 @@
+// iChannel0: rgba 256x256
+
+/* Creative Commons Licence Attribution-NonCommercial-ShareAlike 
+phreax/jiagual 2025 
+
+Based on https://www.shadertoy.com/view/3XjXzK
+
+Inspired by Xor's recent volumetric shaders
+https://www.shadertoy.com/view/tXlXDX
+*/
+
+/* Creative Commons Licence Attribution-NonCommercial-ShareAlike 
+   phreax/jiagual 2024
+
+*/
+
+#define COPY_COLOR(N, colorsK)  for(int i = 0; i < N; i++) { colors[i] = colorsK[i]; }
+#define SIN(t) (.5+.5*sin(t))
+
+
+const vec3 colors2[] = vec3[](
+    vec3(27, 231, 255) / 255.0, // Electric blue
+    vec3(110, 235, 131) / 255.0, // Light green
+    vec3(228, 255, 26) / 255.0, // Lemon Lime
+    vec3(255, 184, 0) / 255.0, // Selective yellow
+    vec3(255, 87, 20) / 255.0 // Giants orange
+);
+
+const vec3 colors1[] = vec3[](
+    vec3(84, 13, 110) / 255.0, // Indigo
+    vec3(238, 66, 102) / 255.0, // Red (Crayola)
+    vec3(255, 210, 63) / 255.0, // Sunglow
+    vec3(59, 206, 172) / 255.0, // Turquoise
+    vec3(14, 173, 105) / 255.0 // Jade
+);
+  
+
+const vec3 colors3[] = vec3[](
+    vec3(155, 93, 229) / 255.0, // Amethyst
+    vec3(241, 91, 181) / 255.0, // Brilliant rose
+    vec3(254, 228, 64) / 255.0, // Maize
+    vec3(0, 187, 249) / 255.0, // Deep Sky Blue
+    vec3(0, 245, 212) / 255.0 // Aquamarine
+);
+
+
+const vec3 colors4[] = vec3[](
+    vec3(0.169, 0.761, 0.718),
+    vec3(0.357, 0.518, 0.008),
+    vec3(0.604, 0.851, 0.259),
+    vec3(0.820, 0.235, 0.196),
+    vec3(0.522, 0.075, 0.020)
+);
+
+const vec3 colors5[] = vec3[](
+    vec3(237, 174, 73) / 255.0, // Hunyadi yellow
+    vec3(209, 73, 91) / 255.0, // Amaranth
+    vec3(0, 121, 140) / 255.0, // Caribbean Current
+    vec3(48, 99, 142) / 255.0, // Lapis Lazuli
+    vec3(0, 61, 91) / 255.0 // Indigo dye
+);
+
+
+const vec3 colors6[] = vec3[](
+    vec3(0, 204, 255) / 255.0, // Vivid sky blue
+    vec3(0, 255, 204) / 255.0, // Aquamarine
+    vec3(255, 255, 0) / 255.0, // Yellow
+    vec3(255, 0, 204) / 255.0, // Hot magenta
+    vec3(204, 0, 255) / 255.0 // Electric purple
+);
+
+const vec3 colors77[] = vec3[](
+    vec3(0.600,0.271,0.000), // Vivid sky blue
+    vec3(0.949,0.600,0.314), // Aquamarine
+    vec3(0.941,0.984,1.000), // Yellow
+    vec3(0.071,0.537,0.769), // Hot magenta
+    vec3(0.051,0.212,0.686) // Electric purple
+);
+
+const vec3 colors78[] = vec3[](
+    vec3(249, 65, 68) / 255.0, // Imperial red
+    vec3(243, 114, 44) / 255.0, // Orange (Crayola)
+    vec3(248, 150, 30) / 255.0, // Carrot orange
+    vec3(249, 132, 74) / 255.0, // Coral
+    vec3(249, 199, 79) / 255.0, // Saffron
+    vec3(144, 190, 109) / 255.0, // Pistachio
+    vec3(67, 170, 139) / 255.0, // Zomp
+    vec3(77, 144, 142) / 255.0, // Dark cyan
+    vec3(87, 117, 144) / 255.0, // Payne's gray
+    vec3(39, 125, 161) / 255.0 // Cerulean
+);
+
+const vec3 colors7[] = vec3[](
+vec3(176.,29.,30.) / 255.,
+vec3(241.,104.,38.) / 255.,
+vec3(234.,211.,95.) / 255.,
+vec3(0.,187.,173.) / 255.,
+vec3(0.,107.,228.) / 255.,
+vec3(126.,99.,180.) / 255.);
+
+
+const vec3 colors12[] = vec3[](
+vec3(0.173,0.106,0.412), // "Cotton Candy"
+vec3(0.396,0.086,0.831), // "Electric Indigo"
+vec3(0.6509, 0.2902, 1.0000), // "Violet (Crayola)"
+
+vec3(0.0000, 0.8980, 1.0000), // "Vivid Sky Blue"
+vec3(0.0000, 0.5098, 0.6078) // "Deep Cerulean"
+//vec3(0.369,0.851,0.537) // "Deep Cerulean"
+);
+const vec3 colors13[] = vec3[](
+vec3(0.173,0.106,0.412), // "Cotton Candy"
+vec3(0.4157, 0.0000, 1.0000), // "Electric Indigo"
+vec3(0.6509, 0.2902, 1.0000), // "Violet (Crayola)"
+
+vec3(0.0000, 0.8980, 1.0000), // "Vivid Sky Blue"
+vec3(0.329,0.678,0.145), // "Deep Cerulean"
+vec3(0.839,0.890,0.086) // "Deep Cerulean"
+);
+
+/*const vec3 colors1[] = vec3[](
+    vec3(60, 22, 66) / 255.0, // Russian violet
+    vec3(8, 99, 117) / 255.0, // Caribbean Current
+    vec3(29, 211, 176) / 255.0, // Turquoise
+    vec3(175, 252, 65) / 255.0, // Green Yellow
+    vec3(178, 255, 158) / 255.0 // Light green
+);*/
+/*const vec3 colors2[] = vec3[](
+    vec3(112, 214, 255) / 255.0, // Pale azure
+    vec3(255, 112, 166) / 255.0, // Cyclamen
+    vec3(255, 151, 112) / 255.0, // Atomic tangerine
+    vec3(255, 214, 112) / 255.0, // Naples yellow
+    vec3(233, 255, 112) / 255.0  // Mindaro
+);*/
+
+
+// zucconis spectral palette https://www.alanzucconi.com/2017/07/15/improving-the-rainbow-2/
+vec3 bump3y (vec3 x, vec3 yoffset)
+{
+    vec3 y = 1. - x * x;
+    y = clamp((y-yoffset), vec3(0), vec3(1));
+    return y;
+}
+// Zucconi's spectral palette
+vec3 spectral_zucconi6(float x) {
+    x = fract(x);
+    const vec3 c1 = vec3(3.54585104, 2.93225262, 2.41593945);
+    const vec3 x1 = vec3(0.69549072, 0.49228336, 0.27699880);
+    const vec3 y1 = vec3(0.02312639, 0.15225084, 0.52607955);
+    const vec3 c2 = vec3(3.90307140, 3.21182957, 3.96587128);
+    const vec3 x2 = vec3(0.11748627, 0.86755042, 0.66077860);
+    const vec3 y2 = vec3(0.84897130, 0.88445281, 0.73949448);
+    return bump3y(c1 * (x - x1), y1) + bump3y(c2 * (x - x2), y2) ;
+}
+
+vec3 getColorRamp(int palette, float x) {
+
+    x = fract(x);
+    vec3 colors[10];
+    int len;
+    
+    
+    if(palette == 0) {
+        len = colors1.length();
+        COPY_COLOR(len, colors1);       
+    }
+    
+    if(palette == 1) {
+        len = colors2.length();
+        COPY_COLOR(len, colors2);
+    }
+    if(palette == 2) {
+        len = colors3.length();
+        COPY_COLOR(len, colors3);
+        
+    }
+    if(palette == 3) {
+        len = colors4.length();
+        COPY_COLOR(len, colors4);    
+    }
+    
+    if(palette == 4) {
+        len = colors5.length();
+        COPY_COLOR(len, colors5);    
+    }
+    if(palette == 5) {
+        len = colors6.length();
+        COPY_COLOR(len, colors6);    
+    }
+    if(palette == 6) {
+        len = colors7.length();
+        COPY_COLOR(len, colors7);    
+    }
+    
+    if(palette == 7) {
+        len = colors12.length();
+        COPY_COLOR(len, colors12);    
+    }
+    if(palette == 8) {
+        len = colors13.length();
+        COPY_COLOR(len, colors13);    //0 + 7 
+         
+    }
+    
+    
+    int colorCount = len;
+    float stepSize = 1.0/float(colorCount);
+    // from MadMapper gradient
+    int stepId = int(x/stepSize);
+    vec3 col = mix(colors[stepId%colorCount],colors[(stepId+1)%colorCount],pow(x/stepSize-float(stepId),pow(1.0,6.)));
+    return col;
+   // return getColorRamp_(colors, len, x);
+
+}
+
+
+vec3 getPal(int pal, float x) {
+
+    return getColorRamp(pal, x);
+    // Wrap x to the 0-1 range
+    float wrappedX = fract(x);
+
+    // Determine the blend factor for the wrap-around edge
+    float blendFactor = smoothstep(0.7, 1.3, x);
+
+    // Get colors from the ramp
+    vec3 currentColor = getColorRamp(pal, wrappedX);
+    vec3 nextColor = getColorRamp(pal, fract(wrappedX + 0.3));
+
+    // Blend the colors smoothly
+    return mix(currentColor, nextColor, blendFactor);
+    
+    return currentColor;
+}
+
+
+mat2 rot(float x) {return mat2(cos(x), -sin(x), sin(x), cos(x));}
+vec3 pal(float x) {return .5+.5*cos(6.28*x-vec3(5,0,2));}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord - .5*iResolution.xy)/iResolution.y;
+    float tt = iTime*.5;
+    
+    uv.xy *= mix(.8, 1.2, SIN(-tt+5.*length(uv.xy)));
+    
+    vec3 col = vec3(0);
+    vec3 rd = vec3(uv, 1);
+    vec3 p = vec3(0);
+    float t =.1*texelFetch(iChannel0, ivec2(fragCoord)%1024, 0).a; 
+
+    
+    for(float i=0.; i<120.; i++) {
+        vec3 p = t*rd + rd;
+        p.z += tt;
+       // p = abs(p)-.3;
+        float z = p.z;
+        p.xy *= rot(p.z);
+      ///  p = abs(p)-.3;
+    
+       for(float j=0.; j < 3.; j++) {     
+            float  a= exp(j)/exp2(j);
+            p += cos(3.*p.yzx*a + .5*tt - length(p.xy)*9.)/a; 
+        }
+        float d = 0.007 + abs((exp2(1.3*p)-vec3(0,1.+.7*SIN(tt),0)).y-1.)/14.;
+  //     float d = 0.007 + abs(((1.3*p)-vec3(0,1.+.7*SIN(tt),0)).y-1.)/14.;
+        float k = t*.7 +length(p)*.1 - .2*tt + z*.1;
+        vec3 c = getPal(7, k);
+        c = mix(c, c*vec3(0.922,0.973,0.725), SIN(z*.5));
+        col += c*1e-3/d;       
+        t += d/4.;
+    }
+   
+    float gl = exp(-20.*length(uv.xy));
+    col += .4*mix(vec3(0.361,0.957,1.000), vec3(0.847,1.000,0.561), SIN(gl*2.-tt))*pow(gl*11., 1.);
+    
+    col *= tanh(col*.1);
+    col = pow(col, vec3(.45));
+    fragColor = vec4(col,1.0);
+}

@@ -1,0 +1,98 @@
+import keyboard
+import pygame
+import random
+import time
+
+import sounddevice as sd
+import soundfile as sf
+import pyloudnorm as pyln
+import pygame.sndarray
+import numpy as np
+
+def get_wasapi_71_device_id(device_name="ROG Theta"):
+    """
+    Scans all audio devices and returns the ID of the WASAPI device
+    that matches our headset and supports 8 output channels.
+    """
+    devices = sd.query_devices()
+    for i, dev in enumerate(devices):
+        # Find out the name of the Host API (e.g., MME, DirectSound, WASAPI)
+        hostapi_name = sd.query_hostapis(dev['hostapi'])['name']
+        
+        # Look for our specific combination
+#        if "WASAPI" in hostapi_name and device_name in dev['name'] and dev['max_output_channels'] >= 8:
+#            return i
+
+        if "Windows DirectSound" in hostapi_name and device_name in dev['name'] and dev['max_output_channels'] >= 8:
+            return i
+            
+    return None # Fallback if not found
+
+def play_true_71_audio(filepath, target_lufs=-13.0):
+    # 1. Read and normalize the audio (Same as before)
+    data, rate = sf.read(filepath)
+    if data.ndim == 1:
+        data = np.expand_dims(data, axis=1)
+
+    print(f"sample_rate: {rate}")
+        
+    meter = pyln.Meter(rate)
+    current_loudness = meter.integrated_loudness(data)
+    normalized_audio = pyln.normalize.loudness(data, current_loudness, target_lufs)
+    normalized_audio = np.clip(normalized_audio, -1.0, 1.0)
+    
+    # 2. Build the 8-channel array (Same as before)
+    # sounddevice expects float32 arrays natively, which is great!
+    padded_audio = np.zeros((normalized_audio.shape[0], 8), dtype=np.float32)
+    
+    left = normalized_audio[:, 0]
+    right = normalized_audio[:, 1]
+    mono = (left + right) * 0.5
+    
+    # Map to 7.1 Standard Windows Layout
+    padded_audio[:, 0] = left   # Front Left
+    padded_audio[:, 1] = right  # Front Right
+    padded_audio[:, 2] = mono   # Center
+    padded_audio[:, 3] = mono   # Subwoofer (LFE)
+    padded_audio[:, 4] = left   # Rear Left
+    padded_audio[:, 5] = right  # Rear Right
+    padded_audio[:, 6] = left   # Side Left
+    padded_audio[:, 7] = right  # Side Right
+
+    # Find the correct WASAPI driver ID
+    target_device = get_wasapi_71_device_id("ROG Theta")
+
+    if target_device is not None:
+        print(f"Success: Found true 7.1 WASAPI device at ID {target_device}")
+    else:
+        print("Warning: Could not find WASAPI 7.1 device. Falling back to default.")
+    
+    print("Sending discrete 7.1 stream to audio driver...")
+    
+    # This directly interfaces with WASAPI/DirectSound and forces 8 channels
+    #sd.play(padded_audio, samplerate=rate, device=target_device, mapping=[1, 2, 3, 4, 5, 6, 7, 8])
+    
+    # Wait until the audio is done playing
+    #sd.wait()
+
+
+songs_all_hardwave = [
+    "0 xThe Carrier Waves Merge 001.wav",
+    "0 xThe Luminous Code 001.wav",
+]
+
+
+songs_all_random = songs_all_hardwave
+
+#random.shuffle(songs_all_random)
+print(f"{len(songs_all_random)} items in playlist")
+#print(songs_all_random)
+
+pygame.mixer.init(frequency=48000, size=32, channels=2, buffer=512)
+print(f"MIXER_INIT: {pygame.mixer.get_init()}")
+
+print(sd.query_devices())
+
+audio_base_folder = "C:/1/light_wave_tech/DATA/SUNO_HIGHEST_QUALITY"
+play_true_71_audio(f"{audio_base_folder}/HARDWAVE/{songs_all_random[0]}", target_lufs=-14.0)
+

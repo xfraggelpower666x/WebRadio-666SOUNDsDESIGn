@@ -1,0 +1,497 @@
+float rad = 1.5;
+float pi = 3.1415926535897932384626433832795;
+int spherecolindex=0;
+
+vec3 curveC = vec3(0,0,2.5);//the center of the outer curved surface.
+float crad = 5.0; //radius of outer curve
+
+
+struct sphereHit
+{
+    float latitude;
+    float longitude;
+    float length;
+};
+
+struct sceneHit
+{
+    float length;
+    sphereHit sphere;
+};
+
+vec3 palette(float t)
+{
+    return 0.5 + 0.5 * cos(
+        6.28318530718 * (
+            vec3(0.0, 0.33, 0.67) + t
+        )
+    );
+}
+
+mat3 rotY(float a)
+{
+    float c = cos(a);
+    float s = sin(a);
+
+    return mat3(
+         c, 0.0,  s,
+       0.0, 1.0, 0.0,
+        -s, 0.0,  c
+    );
+}
+
+sphereHit sdSphere(vec3 p, vec3 c, float rad)
+{
+    vec3 ray = p - c;
+    float raylen = length(ray);
+    vec3 nray = ray / raylen;
+
+    sphereHit h;
+    h.longitude = atan(nray.z, nray.x);
+    h.latitude = asin(nray.y);
+    h.length = raylen - rad;
+    return h;
+}
+
+float sdPlane(vec3 p, vec3 q, vec3 n)
+{
+    return dot(p - q, normalize(n));
+}
+
+sceneHit sceneSDF(vec3 p)
+{
+    sceneHit h;
+
+    float angle = iTime * 0.5;
+    vec3 sphereC = vec3(0,0,0);
+
+    // Sphere, rotating around Z
+    vec3 sphereP = transpose(rotY(angle)) * p;
+    sphereHit sh = sdSphere(sphereP, sphereC, rad);
+
+  
+    h.length = sh.length;
+    h.sphere = sh;
+   
+    return h;
+}
+
+float rayMarch(vec3 ro, vec3 rd, out sceneHit hit)
+{
+    float t = 0.0;
+
+    for(int i = 0; i < 100; i++)
+    {
+        vec3 p = ro + rd * t;
+        hit = sceneSDF(p);
+
+        if(abs(hit.length) < 0.001)
+            return t;
+
+        if(t > 20.0)
+            break;
+
+        t += hit.length;
+    }
+
+    return -1.0;
+}
+
+
+vec3 sphereColour1(sceneHit hit)
+{
+   
+    float a = 7.0;
+    float b = 5.0;
+
+    float z = cos(hit.sphere.latitude * a)
+            + sin(hit.sphere.longitude * b + pi / 3.0) + sin(hit.sphere.latitude*b);
+
+    vec3 col = palette(z);
+    return col;
+
+}
+
+//lat lon
+vec3 sphereColour2(sceneHit hit)
+{
+   
+   
+    float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+    float meridians =
+    smoothstep(0.95,1.0,
+        abs(sin(12.0*x)));
+
+float parallels =
+    smoothstep(0.95,1.0,
+        abs(sin(8.0*y)));
+
+vec3 col =
+    mix(vec3(0.2,0.3,0.8),
+        vec3(1.0),
+        max(meridians,parallels));
+        return col;
+
+}
+
+//domain warping
+vec3 sphereColour3(sceneHit hit)
+{
+    float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+   vec2 p = vec2(x,y);
+
+p += 0.25*vec2(
+    sin(8.0*p.y),
+    cos(7.0*p.x));
+
+float z =
+    sin(12.0*p.x)
+  * cos(12.0*p.y);
+
+vec3 col = palette(z);
+return col;
+
+}
+
+
+//sphere harmonics
+vec3 sphereColour4(sceneHit hit)
+{
+    float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+float z =
+      sin(3.0*y)
+    * cos(5.0*x)
+  + 0.4*cos(7.0*y);
+
+vec3 col = palette(z);
+    return col;
+ }
+ 
+ //interference
+ vec3 sphereColour5(sceneHit hit)
+{
+    float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+ float d1 = length(vec2(x,y)-vec2(1.0,0.4));
+float d2 = length(vec2(x,y)-vec2(-1.2,-0.8));
+
+float z =
+    sin(20.0*d1)
+  + sin(20.0*d2);
+
+vec3 col = palette(z*0.15);
+return col;
+}
+
+
+//planet
+vec3 sphereColour6(sceneHit hit)
+{
+     float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+   float h =
+    sin(5.0*x)
+  + cos(4.0*y)
+  + 0.5*sin(12.0*(x+y));
+  vec3 col = vec3(0.0);
+
+if(h<0.0)
+    col=vec3(0.0,0.2,0.8);   // ocean
+else if(h<0.4)
+    col=vec3(0.1,0.6,0.2);   // land
+else
+    col=vec3(0.8);           // snow
+    return col;
+
+
+}
+
+//reaction diffusion
+vec3 sphereColour7(sceneHit hit)
+{
+     float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+    float z =
+    sin(20.0*x)
+    *cos(15.0*y);
+
+z +=
+    0.4*sin(35.0*(x+y));
+
+vec3 col =
+    palette(z*0.2);
+    return col;
+    }
+   
+
+//plasma
+vec3 sphereColour8(sceneHit hit)
+{
+     float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+
+    float z =
+    sin(7.0*x)
+  + sin(5.0*y)
+  + sin(6.0*(x+y))
+  + sin(sqrt(x*x+y*y)*12.0);
+
+vec3 col = palette(z*0.15);
+    return col;
+}
+
+//marble
+vec3 sphereColour9(sceneHit hit)
+{
+     float x = hit.sphere.longitude;
+    float y = hit.sphere.latitude;
+float t =
+    x +
+    0.3*sin(8.0*y);
+
+
+float m =
+    sin(20.*t);
+
+vec3 col =
+    mix(vec3(0.1),
+        vec3(1.0),
+        0.5+0.5*m);
+        return col;
+        }
+        
+        //contour
+ vec3 sphereColour10(sceneHit hit)
+{
+     float x = hit.sphere.longitude;
+       float y = hit.sphere.latitude;
+        
+float z =
+    sin(6.0*x) +
+    cos(8.0*y);
+
+float bands = fract(z * 3.0);
+
+vec3 col = palette(bands);
+return col;
+}
+
+
+vec3 estimateNormal(vec3 p)
+{
+    float e = 0.001;
+
+    return normalize(vec3(
+        sceneSDF(p + vec3(e, 0.0, 0.0)).length - sceneSDF(p - vec3(e, 0.0, 0.0)).length,
+        sceneSDF(p + vec3(0.0, e, 0.0)).length - sceneSDF(p - vec3(0.0, e, 0.0)).length,
+        sceneSDF(p + vec3(0.0, 0.0, e)).length - sceneSDF(p - vec3(0.0, 0.0, e)).length
+    ));
+}
+
+// Returns vec2(t_entry, t_exit). Returns -1.0 for no intersection.
+// ro: Ray Origin (starting point)
+// rd: Ray Direction (must be normalized vec3)
+// center: Center of the hemisphere
+// radius: Radius of the hemisphere
+// hemiNormal: Direction the hemisphere faces (normalized)
+vec2 intersectHemisphere(vec3 ro, vec3 rd, vec3 center, float radius, vec3 hemiNormal) {
+    vec3 oc = ro - center;
+    
+    // Compute quadratic coefficients (a = 1.0 since rd is normalized)
+    float b = 2.0 * dot(oc, rd);
+    float c = dot(oc, oc) - (radius * radius);
+    float discriminant = b * b - 4.0 * c;
+    
+    // Ray misses the sphere entirely
+    if (discriminant < 0.0) {
+        return vec2(-1.0, -1.0);
+    }
+    
+    float sqrtDisc = sqrt(discriminant);
+    float t0 = (-b - sqrtDisc) * 0.5;
+    float t1 = (-b + sqrtDisc) * 0.5;
+    
+    // Validate t0 against the hemisphere plane
+    if (t0 >= 0.0) {
+        vec3 hitPoint0 = ro + t0 * rd;
+        vec3 toHit0 = hitPoint0 - center;
+        // If the hit point is on the wrong side of the hemisphere normal, discard it
+        if (dot(toHit0, hemiNormal) < 0.0) {
+            t0 = -1.0;
+        }
+    }
+    
+    // Validate t1 against the hemisphere plane
+    if (t1 >= 0.0) {
+        vec3 hitPoint1 = ro + t1 * rd;
+        vec3 toHit1 = hitPoint1 - center;
+        if (dot(toHit1, hemiNormal) < 0.0) {
+            t1 = -1.0;
+        }
+    }
+    
+    // Order the results so the closest valid hit is in .x
+    if (t0 < 0.0 && t1 >= 0.0) {
+        return vec2(t1, -1.0);
+    }
+    
+    return vec2(t0, t1);
+}
+
+
+vec3 getSphereColour(
+    int index,
+    sceneHit hit)
+{
+    switch (index)
+    {
+        case 0:
+            return sphereColour1(hit);
+
+        case 1:
+            return sphereColour2(hit);
+
+        case 2:
+            return sphereColour3(hit);
+
+        case 3:
+            return sphereColour4(hit);
+        
+         case 4:
+            return sphereColour5(hit);
+         case 5:
+           return sphereColour6(hit);
+         case 6:
+            return sphereColour7(hit);
+         case 7:
+            return sphereColour8(hit);
+         case 8:
+            return sphereColour9(hit);
+         case 9:
+            return sphereColour10(hit);
+         
+         
+        
+    }
+
+    return vec3(1.0, 0.0, 1.0);
+
+}
+
+vec3 sphereColourSwitch(
+    float gap,
+    sceneHit hit)
+{
+    const int colourCount = 10;
+
+    float position = iTime / gap;
+
+    int currentIndex =
+        int(floor(position)) % colourCount;
+
+    int nextIndex =
+        (currentIndex + 1) % colourCount;
+
+    float blendAmount = fract(position);
+
+    // Optional smoother transition.
+    blendAmount = smoothstep(
+        0.0,
+        1.0,
+        blendAmount
+    );
+
+    vec3 currentColour =
+        getSphereColour(
+            currentIndex,
+            hit
+        );
+
+    vec3 nextColour =
+        getSphereColour(
+            nextIndex,
+            hit
+        );
+
+    return mix(
+        currentColour,
+        nextColour,
+        blendAmount
+    );
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+
+    vec3 ro = vec3(0.0, 0.0, 4.0);
+    vec3 rd = normalize(vec3(uv, -1.5));
+
+    float pi = 3.1415926535897932384626433832795;
+
+    sceneHit hit;
+    float t = rayMarch(ro, rd, hit);
+
+    vec3 col = vec3(0.02, 0.025, 0.04);
+    
+    if(t > 0.0)
+    {
+        vec3 p = ro + rd * t;
+        vec3 n = estimateNormal(p);
+
+        vec3 lightPos = vec3(3.0, 4.0, 3.0);
+        vec3 l = normalize(lightPos - p);
+        vec3 v = normalize(ro - p);
+        vec3 r = reflect(-l, n);
+
+        float diff = max(dot(n, l), 0.0);
+        float spec = pow(max(dot(r, v), 0.0), 32.0);
+        //colour of sphere
+        col = sphereColourSwitch(60.,hit);
+        
+    }
+    else
+    {
+          int bounce = 5;
+          for (int i=0;i<bounce;i++)
+          {
+              //work out the intersection with the curved mirror
+              vec2 entry_exit = intersectHemisphere(ro, rd, curveC, crad, vec3(0,0,-1.0));
+              if (entry_exit[0] >=0.0)
+              {
+                  float mirrorT = entry_exit[0];
+                  vec3 mirror_point = ro + rd *mirrorT;
+                  vec3 mirror_normal = normalize(mirror_point - curveC);
+                  vec3 ray_reflect = normalize(reflect(rd,mirror_normal));               
+                  
+                  sceneHit hit;
+                  float t = rayMarch(mirror_point, ray_reflect, hit);
+                  if(t > 0.0)
+                  {
+                        vec3 p =  mirror_point  + ray_reflect * t;
+                        vec3 n = estimateNormal(p);
+
+                        vec3 lightPos = vec3(3.0, 4.0, 3.0);
+                        vec3 l = normalize(lightPos - p);
+                        vec3 v = normalize(ro - p);
+                        vec3 r = reflect(-l, n);
+
+                        float diff = max(dot(n, l), 0.0);
+                        float spec = pow(max(dot(r, v), 0.0), 32.0);
+                        //colour of reflection
+                        col = sphereColourSwitch(60.,hit);
+                        break;
+                  }
+                  else
+                  {
+                      //col=vec3(0,1,0);
+                  }
+              }
+           }
+     }
+    fragColor = vec4(col, 1.0);
+}

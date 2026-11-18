@@ -1,0 +1,178 @@
+
+
+#define iterations 13
+#define formuparam 0.53
+
+#define volsteps 20
+#define stepsize 0.1
+
+#define zoom   0.800
+#define tile   0.850
+#define speed  0.010 
+
+#define brightness 0.0015
+#define darkmatter 0.300
+#define distfading 0.730
+#define saturation 0.850
+
+float sdStar(in vec2 p, in float r, in float n, in float w)
+{
+    // these 5 lines can be precomputed for a given shape
+    //float m = n*(1.0-w) + w*2.0;
+    float m = n + w*(2.0-n);
+    
+    float an = 3.1415927/n;
+    float en = 3.1415927/m;
+    vec2  racs = r*vec2(cos(an),sin(an));
+    vec2   ecs =   vec2(cos(en),sin(en)); // ecs=vec2(0,1) and simplify, for regular polygon,
+
+    // symmetry (optional)
+    p.x = abs(p.x);
+    
+    // reduce to first sector
+    float bn = mod(atan(p.x,p.y),2.0*an) - an;
+    p = length(p)*vec2(cos(bn),abs(sin(bn)));
+
+    // line sdf
+    p -= racs;
+    p += ecs*clamp( -dot(p,ecs), 0.0, racs.y/ecs.y);
+    return length(p)*sign(p.x);
+}
+
+
+void mainVR( out vec4 fragColor, in vec2 fragCoord, in vec3 ro, in vec3 rd )
+{
+	//get coords and direction
+	vec3 dir=rd;
+	vec3 from=ro;
+	
+	//volumetric rendering
+	float s=0.1,fade=1.;
+	vec3 v=vec3(0.);
+	for (int r=0; r<volsteps; r++) {
+		vec3 p=from+s*dir*.5;
+		p = abs(vec3(tile)-mod(p,vec3(tile*2.))); // tiling fold
+		float pa,a=pa=0.;
+		for (int i=0; i<iterations; i++) { 
+			p=abs(p)/dot(p,p)-formuparam;
+            p.xy*=mat2(cos(iTime*0.02),sin(iTime*0.02),-sin(iTime*0.02),cos(iTime*0.02) );// the magic formula
+			a+=abs(length(p)-pa); // absolute sum of average change
+			pa=length(p);
+		}
+		float dm=max(0.,darkmatter-a*a*.001); //dark matter
+		a*=a*a; // add contrast
+		if (r>6) fade*=1.2-dm; // dark matter, don't render near
+		//v+=vec3(dm,dm*.5,0.);
+		v+=fade;
+		v+=vec3(s,s*s,s*s*s*s)*a*brightness*fade; // coloring based on distance
+		fade*=distfading; // distance fading
+		s+=stepsize;
+	}
+	v=mix(vec3(length(v)),v,saturation); //color adjust
+	fragColor = vec4(v*.03,1.);	
+}
+const float a=1.0;
+const float b=.1759;
+const float PI=3.14159265359;
+#define THICKNESS .11
+#define ARMS 4.
+#define GRID 96.
+#define COLORS 2.
+#define STARS 2.
+#define SPEED 1.
+float happy_star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+float spiralSDF(vec2 p,vec2 c, float phase){
+    p = p - c;
+    float t=atan(p.y, p.x) + phase;
+    float r=length(p.xy);
+    float n=(log(r/a)/b-t)/(2.*PI);
+
+    // Cap the spiral
+    float upper_r=a*exp(b*(t+2.*PI*ceil(n)));
+    float lower_r=a*exp(b*(t+2.*PI*floor(n)));
+    return min(abs(upper_r-r),abs(r-lower_r));
+}
+#define SPEED2 0.2
+#define CENTER vec2(0.0,0.0);
+#define MAX_RADIUS 1.
+#define DISTORTION_RADIUS 1.7
+#define INTRO_END 0.07
+#define OUTRO_START 0.5
+#define EASE 1.5
+#define CHROMATIC_ABERRATION 0
+#define CHROMATIC_ABERRATION_DIFF 0.02
+
+vec2 normalize_coord(vec2 pos) { return (pos/iResolution.xy*2.-1.)*vec2(iResolution.x/iResolution.y,1.)*.5+.5; }
+
+vec2 get_offset(float t, vec2 pos, vec2 uv) {
+    //float r = MAX_RADIUS*t-DISTORTION_RADIUS;
+    float r = MAX_RADIUS * t;
+    float d = length(pos-uv)-r; // d is the magnitude of distortion
+    vec2 dir = normalize(pos-uv);
+    float distortion_mask = 1.-smoothstep(0., DISTORTION_RADIUS, abs(d));
+    float smooth_intro_mask = smoothstep(0., INTRO_END, t);
+    float smooth_outro_mask = 1.-smoothstep(OUTRO_START, 1., t);
+    return dir*d*distortion_mask*smooth_intro_mask*smooth_outro_mask;
+}
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	//get coords and direction
+	vec2 uv=fragCoord.xy/iResolution.xy-0.5;
+ 
+    float phase = 2.*3.14159/ARMS;
+    for(float i = 0.;i<ARMS;i++){
+float d2= 01.-spiralSDF(uv,vec2(0.),.3*SPEED*iTime*i);
+uv*=d2;
+
+}
+
+	uv.y*=iResolution.y/iResolution.x;
+    
+    
+     vec2 pos = CENTER;
+   
+    float t3 = pow(fract(iTime*SPEED2), 1./EASE); // t is the progress through the animation
+
+
+    vec2 offset = get_offset(t3, pos, uv);
+    vec3 col3 = texture(iChannel0, uv+offset).rgb;
+
+	vec3 dir=vec3(uv*zoom,iTime*0.001);
+	float time=iTime*speed+.25;
+vec2 p = (2.0*fragCoord-iResolution.xy)/iResolution.y;
+ dir.x+=cos(iTime*0.1);
+  dir.y+=sin(iTime*0.1);
+    vec2 m = (iResolution.xy)/iResolution.y;
+    // Normalized pixel coordinates (from 0 to 1)
+    ;
+    float t = iTime/3.0;
+     
+
+    float sn = 5.0;
+    float sw = fract(t);
+    float d = sdStar( p,0.7, sn, sw );
+
+    // Time varying pixel color
+    vec3 col = (d>0.0) ? vec3(0.9,0.6,0.3) : vec3(0.65,0.85,1.0);
+	col = mix( col, vec3(1.0), 1.0-smoothstep(0.0,0.015,abs(d)) );
+
+
+    
+    col = mix(col, vec3(1.0,1.0,0.0), 1.0-smoothstep(0.0, 0.005, abs(length(p-m)-abs(d))-0.0025));
+    
+	fragColor = vec4(col,1.0);
+
+	vec3 from=vec3(1.,.5,0.5);
+	
+	dir.xy+= get_offset(t3+CHROMATIC_ABERRATION_DIFF, pos, uv);
+	mainVR(fragColor, fragCoord, from, dir);	
+    uv *= 2.0 * ( cos(iTime * 2.0) -2.5); // scale
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  // anim between 0.9 - 1.1 
+    fragColor*= vec4(happy_star(uv, anim) * vec3(0.55,0.5,0.55)*0.5, 1.0);
+}

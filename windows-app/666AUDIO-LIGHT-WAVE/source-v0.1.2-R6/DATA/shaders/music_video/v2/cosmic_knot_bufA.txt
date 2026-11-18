@@ -1,0 +1,50 @@
+#define QP(v) P(u.v, l, t, R.y/8e2) * .7  // quick points
+
+// points: xy, overlap, value, size
+float P(vec2 u, float l, float t, float r)
+{
+    float i = 0., f = i, c = i;
+    vec2 w = fwidth(u), p;
+    for (; i++<l;)
+    {
+        p.x = round((u.x-i)/l)*l+i; // skip i rows
+        f = mod(trunc(p.x)*t, 1.);  // multiply ints with value
+        p.y = round(u.y-f)+f;       // set as y
+        c = max(c, r/length((u-p)/w));
+    }
+    c /= sqrt(max(1., min(abs(u.x), abs(u.y)))); // darken
+    return c;
+}
+
+// grid: xy, value, scale
+float G(vec2 u, float t, float s)
+{
+    vec2 l, g, v;
+    l = max(vec2(0), 1.-abs(fract(u+.5)-.5)/fwidth(u)/1.5); // lines
+    g = 1.-abs(sin(3.1416*u)); // glow
+    v = (l + g*.5) * max(vec2(0), 1.-abs(sin(3.1416*round(u)*t))*s); // blend
+    return v.x+v.y;
+}
+
+void mainImage( out vec4 C, in vec2 U )
+{
+    float t = .1+iTime/120.,
+          pi_2 = 1.5708,
+          pi = 3.1416,
+          pi2 = 6.2832,
+          s = 2.+cos(t*pi2), // scale
+          l = 10.; // overlap loop (detail)
+    vec2 h = vec2(2., -3.), // spiral arms
+         R = iResolution.xy;
+    vec3 u = normalize(vec3((U-.5*R)/R.y, 1))*s,
+         c = vec3(.1);
+    vec2 m = 4.*cos(t*pi-vec2(0, pi_2)); // circle movement
+    u.xy *= mat2(cos(cos(t*pi2)*pi_2-vec4(0, -pi_2, pi_2, 0))); // rotate
+    u.xy = tan(log(length(u.xy)) - atan(u.y, u.x)*h/2.) + m*10.; // log transform
+    u.z = max(u.x/u.y, u.y/u.x); // quotient transform
+    c += QP(xy) + QP(yx) + QP(yz) + QP(zy) + QP(zx) + QP(xz); // points
+    c += G(u.xy, t, s) * .2; // grid
+    c += (cos(radians(vec3(-30, 60, 120))+(u.z+t)*pi2)*.5+.5) * c;  // color
+    c *= pow(c, vec3(cos(t*pi2*2.)*.2+.3)); // oscillate contrast
+    C = vec4(tanh(c), 1);
+}

@@ -1,0 +1,23 @@
+// just unrolled the loop, i guess we only need 3 layers
+// to get some nice clouds :D
+
+// nice golf by fabrice 283 chars ( from 304 ) :D 
+
+#define N(a) abs(dot( sin( iTime + .1*p.z + .3*p/a) , vec3(a+a)) )
+
+void mainImage(out vec4 o, vec2 u) {
+    float i,s;
+    o*=i;
+    vec3 p,r = iResolution;    
+    u = ( u+u - r.xy ) / r.y;
+    
+    //if (abs(u.y) > .8) return;
+    
+    for( ; i++ < 1e2; )
+        p += vec3(u * s, s),
+        s = .1 + .2* abs( 6.-abs(p.y) - N(.08) - N(.2) - N(.6) ),
+        o +=  vec4(4,2,1,0)/s;
+
+    o = tanh(o /2e3/ length(u));
+}
+

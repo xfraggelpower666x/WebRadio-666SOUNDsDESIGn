@@ -1,0 +1,182 @@
+// Distance function for a standard 3D pyramid
+float sdPyramid(vec3 p, float h, float base) {
+    p.x = abs(p.x);
+    p.z = abs(p.z);
+    if(p.z > p.x) p.xz = p.zx;
+    p.x -= base * 0.5;
+    p.z -= base * 0.5;
+    vec3 m = vec3(0.0, h, 0.0);
+    vec3 n = normalize(vec3(h, base * 0.5, 0.0));
+    float d = dot(p - m, n);
+    return max(d, -p.y);
+}
+
+// Hash function for random vectors and particle directions
+vec3 hash31(float p) {
+   vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
+   p3 += dot(p3, p3.yzx + 33.33);
+   return fract((p3.xxy + p3.yzz) * p3.zyx); 
+}
+
+float map(vec3 p, out float smallGlow, out float bigGlow, out float lineGlow, out float particlesGlow, out vec3 smallPos) {
+    float bigH = 1.4;
+    float bigBase = 1.8;
+    vec3 pBig = p + vec3(0.0, 0.4, 0.0);
+    float dBig = sdPyramid(pBig, bigH, bigBase);
+    
+    float cellSize = 0.25; 
+    vec3 pSmall = pBig;
+    
+    // Store cell ID/coordinates before the mod operation to color each small pyramid uniquely
+    smallPos = floor((pSmall + cellSize * 0.5) / cellSize) * cellSize;
+    
+    pSmall = mod(pSmall + cellSize * 0.5, cellSize) - cellSize * 0.5;
+    float dSmall = sdPyramid(pSmall, cellSize * 0.45, cellSize * 0.5);
+    
+    float dFinal = max(dSmall, dBig);
+    
+    // Semi-transparent background made of small pyramids
+    smallGlow = exp(-abs(dSmall) * 90.0) * step(dBig, 0.005);
+    bigGlow = exp(-abs(dBig) * 50.0);
+    
+    // --- LINE MOVEMENT (CYCLE) ---
+    float speed = 0.5;
+    float cycleTime = mod(iTime * speed, 1.0);
+    
+    // The line is born ABOVE the pyramid (bigH + 0.4) and falls slightly below the bottom
+    float currentY = mix(bigH + 0.4, -0.05, cycleTime);
+    float pathSeed = floor(iTime * speed) * 7.0; 
+    
+    // Quantize height for 90-degree step cuts
+    float cellY = floor(pBig.y / cellSize) * cellSize;
+    float pathX = 0.0;
+    float pathZ = 0.0;
+    
+    // If the beam is inside the pyramid, it starts bending at 90 degrees
+    if (pBig.y < bigH) {
+        vec3 randDir1 = hash31(cellY * 13.0 + pathSeed);
+        vec3 randDir2 = hash31(cellY * 73.0 + pathSeed + 1.0);
+        
+        pathX = (floor(randDir1.x * 5.0) - 2.0) * cellSize;
+        pathZ = (floor(randDir2.z * 5.0) - 2.0) * cellSize;
+        
+        // Taper the path corridor towards the top apex
+        float bound = clamp((bigH - cellY) / bigH, 0.0, 1.0);
+        pathX *= bound;
+        pathZ *= bound;
+    }
+    
+    // Calculate distance to the laser trajectory
+    float dLineX = abs(pBig.x - pathX);
+    float dLineZ = abs(pBig.z - pathZ);
+    float distanceToLine = min(dLineX, dLineZ) + length(vec2(pBig.x - pathX, pBig.z - pathZ)) * 0.1;
+    
+    // Height restriction mask for the moving energy pulse
+    float heightMask = exp(-abs(pBig.y - currentY) * 6.0);
+    
+    // Allow laser glow both inside and outside above the pyramid apex
+    lineGlow = exp(-distanceToLine * 25.0) * heightMask * (step(dBig, 0.03) + step(bigH, pBig.y));
+    
+    // --- PARTICLE SYSTEM (SPARKS) AT THE BOTTOM ---
+    particlesGlow = 0.0;
+    
+    // Activate particles when the laser falls below the 0.2 mark
+    if (currentY < 0.2) {
+        // Particle lifetime starting from the impact moment (0 to 1)
+        float particleLife = smoothstep(0.2, -0.05, currentY); 
+        float fade = 1.0 - particleLife; // Fade intensity over time
+        
+        // Generate 12 individual sparks in a loop
+        for (int i = 0; i < 12; i++) {
+            // Unique velocity and direction vector for each particle
+            vec3 pDir = hash31(float(i) * 45.13 + pathSeed * 19.7) - 0.5;
+            
+            // Expand the vector across the XZ plane and add a slight upward lift along Y
+            pDir.y = abs(pDir.y) * 0.4; 
+            pDir.xz = normalize(pDir.xz) * 0.8;
+            
+            // Current physical offset of the spark from the center base
+            vec3 pPos = pDir * particleLife;
+            
+            // Distance from the current raymarching sample point to the flying spark
+            float distToParticle = length(pBig - pPos);
+            
+            // Accumulate particle glow intensity
+            particlesGlow += exp(-distToParticle * 45.0) * fade;
+        }
+    }
+    
+    return dFinal;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    
+    // --- CAMERA ORIENTATION SETUP ---
+    float angleX = iTime * 0.2; 
+    float angleY = 0.4; 
+    
+    // Update rotation angles based on mouse dragging
+    //if (iMouse.z > 0.0) {
+    //    angleX = (iMouse.x / iResolution.x) * 6.2831; 
+    //    angleY = (iMouse.y / iResolution.y) * 1.5;    
+    //}
+    
+    float radius = 10.0; 
+    vec3 ro = vec3(radius * cos(angleY) * sin(angleX), radius * sin(angleY), radius * cos(angleY) * cos(angleX));
+    vec3 ta = vec3(0.0, 0.0, 0.0);
+    
+    // --- CAMERA MATRIX ---
+    vec3 cw = normalize(ta - ro);
+    vec3 cp = vec3(0.0, 1.0, 0.0);
+    vec3 cu = normalize(cross(cw, cp));
+    vec3 cv = cross(cu, cw);
+    vec3 rd = normalize(uv.x * cu + uv.y * cv + 1.8 * cw);
+    
+    // --- RENDERING & RAYMARCHING LOOP ---
+    float t = 0.0;
+    float maxDist = 15.0; 
+    vec3 finalColor = vec3(0.0);
+    
+    // Base color palettes
+    vec3 outerColor = 0.5 + 0.5 * sin(iTime * 0.4 + vec3(3.0, 1.0, 5.0));
+    vec3 lineRainbow = 0.5 + 0.5 * cos(iTime * 6.0 + vec3(0.0, 2.0, 4.0));
+    
+    for(int i = 0; i <400; i++) {
+        vec3 p = ro + rd * t;
+        float smallGlow = 0.0;
+        float bigGlow = 0.0;
+        float lineGlow = 0.0;
+        float particlesGlow = 0.0;
+        vec3 smallPos = vec3(0.0);
+        
+        float d = map(p, smallGlow, bigGlow, lineGlow, particlesGlow, smallPos);
+        
+        // 1. Rainbow color palette for inner background pyramids
+        vec3 rainbowColor = 0.5 + 0.5 * cos(iTime + smallPos.xyz * 3.0 + vec3(0.0, 2.0, 4.0));
+        finalColor += rainbowColor * smallGlow * 0.012;
+        finalColor += vec3(1.0, 1.0, 1.0) * smallGlow * 0.004; // White core for neon look
+        
+        // 2. Add outer boundary shell glow
+        finalColor += outerColor * bigGlow * 0.005;
+        
+        // 3. Add neon wandering laser beam
+        finalColor += lineRainbow * lineGlow * 0.32;
+        finalColor += vec3(1.0) * lineGlow * 0.15; 
+        
+        // 4. Render particles explosion at the bottom
+        finalColor += lineRainbow * particlesGlow * 0.25;
+        finalColor += vec3(1.0) * particlesGlow * 3.15; // Bright core for each spark
+        
+        t += max(abs(d) * 0.25, 0.008);
+        if(t > maxDist) break;
+    }
+    
+    // Soft vignette background
+    vec3 background = vec3(0.005, 0.005, 0.01) * (1.0 - length(uv) * 0.5);
+    finalColor += background;
+    
+    // Contrast boost and gamma correction
+    finalColor = pow(finalColor, vec3(0.85));
+    fragColor = vec4(clamp(finalColor, 0.0, 1.0), 1.0);
+}

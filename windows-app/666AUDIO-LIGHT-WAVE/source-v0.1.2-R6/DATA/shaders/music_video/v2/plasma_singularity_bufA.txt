@@ -1,0 +1,18 @@
+void mainImage(out vec4 O,in vec2 I)
+{
+    vec2 u=(I*2.-iResolution.xy)/iResolution.y;
+    vec3 d=normalize(vec3(u,-1.65)),p,q;
+    float t=iTime,z=.05,r,g,k;
+    O=vec4(0);
+
+    for(int i=0;i++<110&&z<10.;z+=.045*(1.+abs(g)))
+    {
+        p=d*z; p.z+=4.2; q=p;
+        for(float f=1.;f<16.;f*=2.) q+=sin(q.yzx*f+t*.8+vec3(0,2,4))*.24/f;
+        r=length(p),g=dot(sin(q*1.25),cos(q.yzx*1.15)),k=4.*(.7*p.z+.35*p.x)/r;
+        O.rgb+=(.5+.5*cos(g*7.+sin(q.x*2.+q.y*3.-2.*t+r*4.)+t+vec3(k,1.5,4.-k)))*
+        (exp(-6.5*abs(g))*(.35+1.2*exp(-2.5*abs(r-1.65)))+.15*exp(-2.2*r))*exp(-.18*z)*.035;
+    }
+
+    O=vec4((1.-exp(-2.*O.rgb))*(.35+1.55*smoothstep(1.4,.2,length(u))),1);
+}

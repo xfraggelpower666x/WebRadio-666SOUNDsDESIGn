@@ -1,0 +1,28 @@
+/*
+    I saw ChunderFPV's "Magnetar" and started tinkering with the transform,
+    which I think is sphere inversion. Really fun to play with :D
+    
+        https://www.shadertoy.com/view/NclXWn
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+    
+    vec3 p = iResolution,
+         D = normalize(vec3(u = (u+u-p.xy)/p.y, .5));
+    mat2 r = mat2(cos(iTime/4.+vec4(0,33,11,0)));
+    
+    float i,d,s;
+    for(o=vec4(0); i++<1e2;) {
+        p = D *d, p.z -= 4e1;
+        p = p*9e2/dot(p,p); // <-- transform
+        for(s = .01; s < 2.; s += s )
+            p.z -= abs(dot(sin(p.z+iTime+p / s), vec3(s+s)));
+        p.xy /= 4.,
+        d += s = .05+.5*abs(length(p)-7.),
+        o += vec4(3.8,1.8,1,0)/s*d + 1e1*(1.+cos(i*.4+vec4(2,1,0,0)))/s;
+    }
+    
+    o = mix(o, o.zyxw, smoothstep(.2, 1., length(u)/2.25));
+    o = tanh(o*o/d/4e7/length(u));
+
+}

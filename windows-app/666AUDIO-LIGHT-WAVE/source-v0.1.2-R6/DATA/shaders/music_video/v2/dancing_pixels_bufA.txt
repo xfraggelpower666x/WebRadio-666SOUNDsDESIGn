@@ -1,0 +1,20 @@
+// modification of https://www.shadertoy.com/view/ldX3Wn
+
+const float Pi = 3.14159;
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / iResolution.xy;
+	vec2 p=(2.0*fragCoord.xy-iResolution.xy)/max(iResolution.x,iResolution.y);
+	
+	for(int i=1;i<45;i++)
+	{
+		vec2 newp=p;
+		newp.x+=(0.5/float(i))*cos(float(i)*p.y+iTime*11.0/37.0+0.03*float(i))+1.3;		
+		newp.y+=(0.5/float(i))*cos(float(i)*p.x+iTime*17.0/41.0+0.03*float(i+10))+1.9;
+		p=newp;
+	}
+
+	vec3 col=vec3(0.5*sin(3.0*p.x)+0.5,0.5*sin(3.0*p.y)+0.5,sin(1.3*p.x+1.7*p.y));
+	fragColor=vec4(col, 1.0);
+}

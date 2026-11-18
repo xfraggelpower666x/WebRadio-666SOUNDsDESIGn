@@ -1,0 +1,104 @@
+//@FabriceNeyret2 's golf to 406 characters!
+#define H(c) fract(sin(dot(vec2(floor(c)+42.), vec2(12.9898, 78.233))) * 43758.5453)
+
+void mainImage( out vec4 O, vec2 u ) {
+    float localTime = mod(iTime, 6.0);
+
+    vec2  R = iResolution.xy,
+          U = u /R.y * 30.,
+          M = vec2(.0184,.853);   
+    float N = 5.,
+          L = ceil( N * H( U.y ) ),
+          l = L/N;    
+    U.x += ( 3.*L - 2.) * localTime;
+
+    O = 2. - abs( 6.*fract(M*U).x - vec4(3,2,4,0) );  // hue
+    O.x = 1.-O.x;
+    R = step( abs( fract(U) -.5 ) , vec2(l-.1)/2. );  // rect
+    O = H(U)>.6 ? l* R.x*R.y
+                   * mod( vec4(L), 3. + M.y*  clamp(O-1., -1., 0.)*3. ) 
+                : O-O;
+}
+
+
+#ifdef ORIGINAL
+// Fork of "Abstract parallax effect" by Zokalyx. https://shadertoy.com/view/lcsSzs
+// 2024-01-19 01:18:13
+
+// Author: zokalyx
+// Title: parallax effect
+// Comment: inspired by the "ant highway" shader of the book of shaders
+
+#define ROWS 30.0
+#define COLS 30.0
+#define LAYERS 5.0
+#define DENSITY 0.4
+#define SEED 42.0
+
+// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+float rand(vec2 co){
+    return fract(sin(dot(co + SEED, vec2(12.9898, 78.233))) * 43758.5453);
+}
+float rand(float c){
+    return fract(sin(dot(vec2(c + SEED), vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float rect(in vec2 size, in vec2 _st) {
+    vec2 condition = step(_st, 0.5 - 0.5 * size) - step(_st, 0.5 + 0.5 * size);
+    return condition.x * condition.y;
+}
+
+
+// customizable color from @WhiteTophat  in https://www.shadertoy.com/view/dlBczW
+vec4 lerp(vec4 a, vec4 b, float t) {
+    return (a * vec4(t)) + (b * vec4(1.0-t));
+}
+vec4 lerp(vec4 a, vec4 b, vec4 t) {
+    return (a * t) + (b * (vec4(1.0) * t));
+}
+
+vec4 hue2rgb(float hue) {
+    hue = fract(hue); //only use fractional part of hue, making it loop
+    float r = abs(hue * 6.0 - 3.0) - 1.0; //red
+    float g = 2.0 - abs(hue * 6.0 - 2.0); //green
+    float b = 2.0 - abs(hue * 6.0 - 4.0); //blue
+    vec4 rgb = vec4(r,g,b, 1.0); //combine components
+    rgb = clamp(rgb, 0.0, 1.0); //clamp between 0 and 1
+    return rgb;
+}
+vec4 hsv2rgb(vec3 hsv) {
+    vec4 rgb = hue2rgb(hsv.x); //apply hue
+    rgb = lerp(vec4(1.0), rgb, 1.0 - hsv.y); //apply saturation
+    rgb = rgb * hsv.z; //apply value
+    return rgb;
+}
+
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+
+   float localTime = mod(iTime, 6.0);
+
+    vec2 st = fragCoord.xy / iResolution.y;
+	st *= vec2(COLS, ROWS);
+    
+    
+    float layer = floor( LAYERS * rand( floor(st.y) ) ) + 1.0;
+    
+    st.x += (3.0 * layer - 2.0) * localTime;
+    float show = step(1.0 - DENSITY, rand(floor(st)));
+  
+    vec2 mouse = vec2(0.01843,0.8532) * iResolution.xy;  // provide default that is colorful
+  
+    vec2 mouseUV = mouse / iResolution.xy;
+    vec4 mouseColor = hsv2rgb(vec3(mouseUV.x*st.x, mouseUV.y, 1.0));
+
+    st = fract(st);
+
+    vec3 color = (layer / LAYERS) * mod(vec3(layer), mouseColor.rgb*3.) * show * rect(vec2(layer / LAYERS - 0.1, layer / LAYERS - 0.1), st);
+    
+    fragColor = vec4(color, 1.0);
+    
+
+}
+#endif

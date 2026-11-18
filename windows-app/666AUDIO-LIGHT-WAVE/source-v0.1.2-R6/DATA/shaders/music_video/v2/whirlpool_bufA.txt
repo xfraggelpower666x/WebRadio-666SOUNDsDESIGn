@@ -1,0 +1,15 @@
+// Ap3demak
+void mainImage(out vec4 h,vec2 g){
+    vec3 i=vec3((g+g-iResolution.xy)/iResolution.y,1.7)*mat3(-.5,0,0,0,-.3,.4,0,.7,0),
+    b=vec3(0,-17,2),e;
+    float d=1.,a=0.,l,j=0.;
+    for(h-=h;j++<80.;){
+        l=length(b);
+        h+=min(d*a,.8-d)*(.015+.01*cos(l-iTime+vec4(0,1,2,0)));
+        e=vec3(log(l)-iTime*.6,exp(.005-b.y/l),atan(b.x,b.z));
+        d=e.y-.4;
+        for(a=8.;a<1e3;a+=a)d-=abs(dot(sin(e.yzx*a),.6-cos(e*a)))*.7/a;
+        b+=i*d*l*.3;
+    }
+    h*=h/(h*(h+.45)+.2);
+}

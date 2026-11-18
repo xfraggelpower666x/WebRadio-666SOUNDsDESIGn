@@ -1,0 +1,39 @@
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S3(p) p /= dot(p, p); p = fract(p) - 0.5;
+#define G(p, s) p = floor(p * s) / s;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+#define L(p, s) p = mod(p + s/2., s) - s/2.;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M4(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define T3(p) p *= r(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5);
+#define K(p) p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx;
+#define D(p) p.xy = vec2(log(length(p.xy)), atan(p.y, p.x));
+#define Q2(p) p = abs(p-1.)-abs(p+1.)+p;
+void mainImage(out vec4 O, vec2 C) {
+  const float BPM=85.;
+  float i,d,z,FT=1.,NT=(-iTime*BPM/60.),T=FT+NT;
+  vec4 p,o,P,S;
+  for(i=0.;i<100.;++i) {
+    p=vec4(z*normalize(vec3(C-.5*iResolution.xy, iResolution.y)),.0);
+    p.z+=T;
+    mat2 R=mat2(cos(1.*p.y+0.4*T+vec4(0,11,33,0)));
+    M4(p.xz);
+        M4(p.yz);
+            Q(p.xz);
+    P=p;
+    S=sin(117.*p);
+    p-=round(p);
+
+    d=.153-sqrt(length(p*p));
+    d+=0.018*(S.x+S.y+S.z);
+    d=abs(d)+1e-3;
+    O=1.+sin(2.5*P.z+4.*P.y+vec4(6,2,10,1));
+    o+=O.w/max(d,1e-3)*O;
+
+    
+    
+    z+=.8*d;
+  }
+  o+=pow(1.-FT,4.)*9.*pow(z,4.)*vec4(3,2,1,0);
+  O=tanh(o/2e4);
+}

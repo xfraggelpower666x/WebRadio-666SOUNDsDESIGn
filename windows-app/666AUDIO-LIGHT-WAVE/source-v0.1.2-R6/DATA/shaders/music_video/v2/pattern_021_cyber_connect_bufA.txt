@@ -1,0 +1,68 @@
+// xor-style wormhole — mutation 1fd2
+#define TAU 6.28318530718
+#define T   iTime
+
+mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c,-s,s,c); }
+
+float hash21(vec2 p){
+    p = fract(p*vec2(234.34, 435.345));
+    p += dot(p, p + 34.23);
+    return fract(p.x*p.y);
+}
+
+vec3 pal(float t){
+    vec3 c = .5 + .5*cos(TAU*(t + vec3(0.000, 0.330, 0.670)));
+    c *= c;
+    return c*1.600;
+}
+
+float ornament(vec2 f){
+    float d = abs(f.y) - 0.084;
+    d = min(d, abs(f.x) - 0.017);
+    d = min(d, abs(length(f) - 0.125) - 0.030);
+    return d;
+}
+
+void mainImage(out vec4 O, in vec2 F){
+    vec2 uv = (2.*F - iResolution.xy)/iResolution.y;
+    float t = T*0.616;
+
+    float r = length(uv);
+    float a = atan(uv.y, uv.x);
+
+    vec2 p = vec2(a/TAU, log(r)*2.750 - t);
+
+    float n = 5.000;
+    float u = p.x*n;
+    u = abs(fract(u) - .5)*2.;
+    p.x = u*2. - 1.;
+
+    vec3 col = vec3(0.);
+
+    for(float i = 0.; i < 2.; i++){
+        vec2 q = p*vec2(1.501, 1.475 + i*1.444);
+        q.y += i*1.37 + t*1.889;
+        q += 0.106*vec2(sin(q.y*1.502 + t*2.), cos(q.x*1.502 - t*1.7));
+        vec2 id = floor(q);
+        vec2 f2 = fract(q) - .5;
+        f2 *= rot((id.x + (hash21(id)*2. - 1.)*0.976)*0.000);
+
+        float d     = ornament(f2);
+        float glow  = exp(-abs(d)*4.114);
+        float core  = exp(-abs(d)*41.743);
+        float pulse = .3 + .7*sin(id.y*1.011 - t*0.500 + 5.736*sin(id.x*1.5 + t));
+
+        vec3 tint = pal(id.y*0.130 + t*0.700 + i*.31);
+        col += tint*glow*(.25 + .95*pulse)*(1. - i*0.308);
+        col += vec3(1., .9, .75)*core*(.35 + .65*pulse)*(1. - i*0.277);
+    }
+
+    col += pal(t*.4)*exp(-r*5.000)*0.400;
+    col *= 1. - smoothstep(.1, 2.417, r);
+
+    col *= 2.061;
+    col = col/(1. + col);
+    col = pow(col, vec3(1.008));
+    col += (hash21(F + T) - .5)/255.;
+    O = vec4(col, 1.);
+}

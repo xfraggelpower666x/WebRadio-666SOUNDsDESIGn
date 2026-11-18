@@ -1,0 +1,73 @@
+mat2 rot(float a) {
+    float c = cos(a), s = sin(a);
+    return mat2(c, -s, s, c);
+}
+
+vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d)
+{
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coord
+    vec2 uv = (fragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
+    float t = iTime * 0.25;
+    vec3 col = vec3(0);
+    float z = 0.0;
+    float glow = 0.0;
+
+    for (float i = 0.0; i < 144.0; i++)
+    {
+        // Ray direction and origin
+        vec3 dir = normalize(vec3(uv, -1.1));
+        vec3 p = z * dir;
+        p.z -= t - z + t * 0.27*i*0.0005;
+
+        // Rotate XY per step for swirly effects
+        float angle = i * 0.02 + t * 0.22;
+        p.xy *= rot(angle+t*-0.31);
+
+        // Optional: rotate another plane for extra complexity
+        // p.xz *= rot(angle * 0.007);
+        
+        // Symmetry fold
+        p.xy = abs(p.xy)*0.5;
+        
+        // Fractal-fold structure
+        float dist_plane = abs(0.01 * z - 0.50);
+        vec3 q = cos(p.yzx + sin(p * 0.5 + t*0.01));
+        float d = max(dist_plane, length(max(q, q.zxy)) - dist_plane)*0.8;
+
+        // Glow estimate
+        float br = exp(-6.0 * abs(d));
+        glow += br * -0.009;
+
+        // Advance ray
+        z += d;
+        if(z > 72.0) break;
+
+        // Pseudo-normal from color field
+        vec3 n = normalize(vec3(
+            d - max(q.x - d, 0.0),
+            d - max(q.y - d, 0.0),
+            d - max(q.z - d, 0.0)
+        ));
+
+        // Cosine palette, animated by z, dot(n,dir), t
+        vec3 base = palette(
+            z * 0.04 + dot(n, dir) + t * 0.5,
+            vec3(0.5),              // base color
+            vec3(0.4,0.3,0.25),     // amplitude (colorful spread)
+            vec3(1.0,1.0,1.0),      // frequency
+            vec3(0.0,0.33,0.67)     // phase
+        );
+
+        col += base * br * (0.6 + 0.5 * sin(3.7 * d)); // modulate for extra swirls
+    }
+
+    // Tonemap + glow
+    col = tanh(col * 0.52 + glow * 7.8);
+
+    fragColor = vec4(col, 1.0);
+}

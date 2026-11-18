@@ -1,0 +1,42 @@
+float PI = 3.14159265;
+
+float width = 0.1;
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {			
+    vec2 pos = fragCoord.xy/iResolution.xy - vec2(0.5);
+    
+    vec3 col = vec3(0.0); //Will be filled with twister later on
+    
+    float a = (sin(iTime*1.4+pos.y)*3.0)*pos.y+iTime*1.2; //Rotation value
+    vec4 twister = vec4(sin(a), sin(a+0.5*PI), sin(a+PI), sin(a+1.5*PI))*width; //Contains "vertices"
+    
+    vec4 alpha=vec4( //If here in x should be filled or not. Multiply color with this
+        (1.0-clamp(((pos.x-twister.x)*(pos.x-twister.y))*100000.0, 0.0, 1.0)),
+        (1.0-clamp(((pos.x-twister.y)*(pos.x-twister.z))*100000.0, 0.0, 1.0)),
+        (1.0-clamp(((pos.x-twister.z)*(pos.x-twister.w))*100000.0, 0.0, 1.0)),
+        (1.0-clamp(((pos.x-twister.w)*(pos.x-twister.x))*100000.0, 0.0, 1.0))
+    );
+    
+    alpha *= vec4( //Test if line is facing the way it will be showing
+    	1.0-clamp((twister.x-twister.y)*10000.0, 0.0, 1.0),
+    	1.0-clamp((twister.y-twister.z)*10000.0, 0.0, 1.0),
+    	1.0-clamp((twister.z-twister.w)*10000.0, 0.0, 1.0),
+    	1.0-clamp((twister.w-twister.x)*10000.0, 0.0, 1.0)
+    );
+
+    vec4 shade=vec4(
+    	twister.y-twister.x,
+    	twister.z-twister.y,
+    	twister.w-twister.z,
+    	twister.x-twister.w
+    );
+    
+    shade /= width*1.8;
+
+    col.rgb += texture(iChannel1, vec2(((pos.x-((twister.x+twister.y)/2.0))/(twister.x-twister.y))*width, pos.y)).rgb * alpha.x * shade.x;
+    col.rgb += texture(iChannel2, vec2(((pos.x-((twister.y+twister.z)/2.0))/(twister.y-twister.z))*width, pos.y)).rgb * alpha.y * shade.y;
+    col.rgb += texture(iChannel1, vec2(((pos.x-((twister.z+twister.w)/2.0))/(twister.z-twister.w))*width, pos.y)).rgb * alpha.z * shade.z;
+    col.rgb += texture(iChannel1, vec2(((pos.x-((twister.w+twister.x)/2.0))/(twister.w-twister.x))*width, pos.y)).rgb * alpha.w * shade.w;
+    
+    fragColor = vec4(col, 1.0);
+}

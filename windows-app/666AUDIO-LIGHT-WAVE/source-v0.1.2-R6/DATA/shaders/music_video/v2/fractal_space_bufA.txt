@@ -1,0 +1,59 @@
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define H(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define S3(p) p /= dot(p, p); p = fract(p) - 0.5;
+#define G(p, s) p = floor(p * s) / s;
+#define F(p, a) p = abs(p * r(a)); p.y -= 0.5;
+#define L(p, s) p = mod(p + s/2., s) - s/2.;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+#define T3(p) p *= r(floor(atan(p.x, p.y) * 6.) / 6.); p.x -= clamp(p.x, 0.1, 0.5);
+#define K(p) p = abs(mod(p, 2.) - 1.); if(p.x < p.y) p = p.yx;
+#define D(p) p.xy = vec2(log(length(p.xy)), atan(p.y, p.x));
+#define Q2(p) p = abs(p-1.)-abs(p+1.)+p;
+void mainImage(out vec4 O, vec2 C)
+{
+    O=vec4(0);
+    vec3 p,q,r=iResolution,
+    
+    d=normalize(vec3((C*2.-r.xy)/r.y,1.3));  
+            float fl = 1.5+2.*smoothstep(0.,50.,(iTime))-2.*smoothstep(260.,330.,(iTime));
+            d.z+=fl;
+    for(float i=0.,a,s,e,g=0.;
+        ++i<100.;
+        O.xyz+=mix(vec3(1.1,0.2,2.),H(g*.1),.8)*5./e/8e3
+    )
+    {
+    
+        p=g*d;
+            G(p.xy,15.);  
+            p.yz*=r(iTime*0.21);
+   p.x+=iTime*3.;
+    p.z+=iTime*3.;
+    
+        a=30.;
+        p=mod(p-a,a*2.)-a;
+        
+         Q(p.zy);
+        s=2.;
+        Q(p.xy);
+         G(p.zy,20.);
+         
+       
+        for(int i=0;i++<10;){
+         
+            p=.5-abs(p);
+            
+            p.x<p.z?p=p.zyx:p;
+            p.z<p.y?p=p.xzy:p;
+            s*=e=1.4+sin(iTime*.1)*.1;
+            p=abs(p)*e-
+                vec3(
+                    5.*3.,
+                    120,
+                    8.*5.
+                 );
+         }
+         g+=e=length(p.yz)/s;
+    }
+}

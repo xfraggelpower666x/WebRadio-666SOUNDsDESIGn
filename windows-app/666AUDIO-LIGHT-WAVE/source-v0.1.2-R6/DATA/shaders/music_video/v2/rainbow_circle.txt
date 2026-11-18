@@ -1,0 +1,355 @@
+// Include your custom uniforms (assuming these are passed in from your framework)
+// uniform float iMusicSync0; 
+// uniform float iMusicSync1; 
+
+#define TAU 6.2831852
+#define MOD3 vec3(.1031,.11369,.13787)
+#define BLACK_COL vec3(16,21,25)/255.
+
+// --- Helper Functions from Code 1 ---
+vec3 hash33(vec3 p3) {
+	p3 = fract(p3 * MOD3);
+    p3 += dot(p3, p3.yxz+19.19);
+    return -1.0 + 2.0 * fract(vec3((p3.x + p3.y)*p3.z, (p3.x+p3.z)*p3.y, (p3.y+p3.z)*p3.x));
+}
+
+float simplex_noise(vec3 p) {
+    const float K1 = 0.333333333;
+    const float K2 = 0.166666667;
+    
+    vec3 i = floor(p + (p.x + p.y + p.z) * K1);
+    vec3 d0 = p - (i - (i.x + i.y + i.z) * K2);
+        
+    vec3 e = step(vec3(0.0), d0 - d0.yzx);
+	vec3 i1 = e * (1.0 - e.zxy);
+	vec3 i2 = 1.0 - e.zxy * (1.0 - e);
+    
+    vec3 d1 = d0 - (i1 - 1.0 * K2);
+    vec3 d2 = d0 - (i2 - 2.0 * K2);
+    vec3 d3 = d0 - (1.0 - 3.0 * K2);
+    
+    vec4 h = max(0.6 - vec4(dot(d0, d0), dot(d1, d1), dot(d2, d2), dot(d3, d3)), 0.0);
+    vec4 n = h * h * h * h * vec4(dot(d0, hash33(i)), dot(d1, hash33(i + i1)), dot(d2, hash33(i + i2)), dot(d3, hash33(i + 1.0)));
+    
+    return dot(vec4(31.316), n);
+}
+
+// --- REUSABLE WAVE FUNCTION ---
+// fragCoord : Current pixel coordinates
+// amplitude : Height of the wave
+// yCenter   : The Y axis offset in pixels
+// baseColor : The RGB color of the wave
+// freq      : How tight the sine wave is (0.02 from your original code)
+// phaseShift: Used with time to make the waves scroll horizontally
+
+vec3 drawAudioWave(vec2 fragCoord, float amplitude, float yCenter, vec3 baseColor, float freq, float phaseShift) {
+        
+    // Graceful fallback from your Pygame code: 
+    // If amplitude is tiny, transition smoothly to a white line instead of snapping harshly.
+    vec3 waveColor = mix(vec3(1.0, 1.0, 1.0), baseColor, smoothstep(0.0, 2.0, amplitude));
+
+    // Calculate the mathematical Y position of the sine wave for this X pixel
+    float waveY = yCenter + amplitude * sin(fragCoord.x * freq + phaseShift);
+    
+    // Vertical distance from the current pixel to the wave
+    float dist = abs(fragCoord.y - waveY);
+    
+    // --- COOL FACTOR: THE GLOW ---
+    // Core thickness creates a bright center, exponential falloff creates a soft neon glow
+    float coreThickness = 0.0;
+
+    if (amplitude < 2.0) {
+        coreThickness = 0.1;
+    }
+    else {
+        coreThickness = 0.5;
+    }
+
+    float glowSpread = 3.0;
+    float intensity = (coreThickness / (dist + 1e-4)) + exp(-dist / glowSpread);
+    
+    // --- COOL FACTOR: SMOOTH EDGES ---
+    // Instead of hard cuts at 450 and (Width - 400), we fade the line in and out beautifully
+    float minX = 450.0;
+    float maxX = iResolution.x - 400.0; 
+    float mask = smoothstep(minX - 50.0, minX, fragCoord.x) * 
+                 (1.0 - smoothstep(maxX, maxX + 50.0, fragCoord.x));
+                 
+    return waveColor * intensity * mask;
+}
+
+
+vec3 B2_spline(vec3 x) { // returns 3 B-spline functions of degree 2
+    vec3 t = 3.0 * x;
+    vec3 b0 = step(0.0, t)     * step(0.0, 1.0-t);
+	vec3 b1 = step(0.0, t-1.0) * step(0.0, 2.0-t);
+	vec3 b2 = step(0.0, t-2.0) * step(0.0, 3.0-t);
+	return 0.5 * (
+    	b0 * pow(t, vec3(2.0)) +
+    	b1 * (-2.0*pow(t, vec3(2.0)) + 6.0*t - 3.0) + 
+    	b2 * pow(3.0-t,vec3(2.0))
+    );
+}
+
+float bump(float x) {
+	return abs(x) > 1.0 ? 0.0 : 1.0 - x * x;
+}
+
+
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+// --- Main Rendering ---
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // 1. Get the screen coordinates (Code 1 actually centers them at 0,0 right here!)
+    vec2 uv = (fragCoord.xy - iResolution.xy*0.5)/iResolution.y;
+    
+    // =========================================================================
+    // PART 1: APPLY ZOOM AND ROTATE TO THE UV COORDINATES
+    // =========================================================================
+    
+    float MAX_ZOOM = 0.10;  
+    float MAX_ANGLE = 0.03; 
+    
+    float beatTimer = floor(iTime * 4.0);
+    float rDir = (rand(beatTimer) > 0.5) ? 1.0 : -1.0; 
+    float rMult = 1.0 + (rand(beatTimer + 5.0) * 0.2); 
+    
+    // Calculate current scales based on audio sync
+    float currentScale = 1.0 + (MAX_ZOOM * iMusicSync0);
+    float currentAngle = MAX_ANGLE * iMusicSync1 * rDir * rMult;
+
+    // Because Code 1's formula already centers 'uv' to (0,0), 
+    // we DON'T need to subtract and add 0.5 like we did with the texture!
+    
+    // Apply Scale (Zoom)
+    uv /= currentScale;
+    
+    // Apply Rotation
+    float s = sin(currentAngle);
+    float c = cos(currentAngle);
+    mat2 rotMat = mat2(c, -s, 
+                       s,  c);
+    uv = rotMat * uv; // The canvas is now zoomed and rotated
+    
+    // =========================================================================
+    // PART 2: GENERATE THE PROCEDURAL CIRCLE USING THE TRANSFORMED UV
+    // =========================================================================
+    
+    float a = sin(atan(uv.y, uv.x));
+    float am = abs(a-.5)/4.;
+    float l = length(uv);                         
+    
+    float m1 = clamp(.1/smoothstep(.0, 1.75+iMusicSync2, l), 0., 1.);
+    float m2 = clamp(.1/smoothstep(.42, 0., l), 0., 1.);
+    float s1 = (simplex_noise(vec3(uv*(2.0+(iMusicSync2*2)), 1. + iTime*.525))*(max(1.0 - l*1.75, 0.)) + .9);
+    float s2 = (simplex_noise(vec3(uv*1., 15. + iTime*.525*(iMusicSync2*2)))*(max(.0 + l*1.0*iMusicSync2, .025)) + 1.25);
+    float s3 = (simplex_noise(vec3(vec2(am, am*100. + iTime*3.)*.15, 30. + iTime*.525))*(max(.0 + l*1., .25)) + 1.5);
+    s3 *= smoothstep(0.0, .3345+iMusicSync2, l);    
+    
+    float sh = smoothstep(0.15, .35+iMusicSync2, l);
+    
+    float m = m1*m1*m2 * ((s1*s2*s3) * (1.-l)) * sh + iMusicSync2;
+    
+    // Calculate final color
+    vec3 col = mix(BLACK_COL, (0.5 + 0.5*cos(iTime+uv.xyx*3.+vec3(0,2,4))), m);
+            
+    fragColor = vec4(col, 1.);
+
+    // =========================================================================
+    // PART 2: FLASHING COLORS
+    // =========================================================================
+    
+
+    // MUSIC_VIDEO__MOD
+    float colorTimer = floor(iTime * 2.0); 
+
+    vec3 flashColor = vec3(
+        rand(colorTimer),           
+        rand(colorTimer + 10.0),    
+        rand(colorTimer + 20.0)     
+    );
+
+    // Add the flash to the transformed screen
+    vec3 finalColor = fragColor.rgb + (flashColor * iMusicSync2*1.2);
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a); 
+
+
+    // =========================================================================
+    // PART 4: WAVE FUNCTION
+    // =========================================================================
+
+    // Define your colors (Normalized from 0-255 to 0.0-1.0)
+    vec3 MAGENTA = vec3(250.0, 34.0, 197.0) / 255.0;
+    vec3 GREEN   = vec3(8.0, 240.0, 124.0) / 255.0;
+    vec3 CYAN    = vec3(8.0, 224.0, 240.0) / 255.0;
+    vec3 GOLD    = vec3(240.0, 224.0, 8.0) / 255.0;
+    vec3 PURPLE  = vec3(187.0, 34.0, 250.0) / 255.0;
+    vec3 WHITE   = vec3(1.0, 1.0, 1.0);
+    
+    // Calculate accurate Y offsets accounting for OpenGL's bottom-up coordinate system
+    //float yTop    = iResolution.y - 60.0;   // 60 pixels from the top
+    //float yBottom = iResolution.y - 1000.0; // 1410 pixels from the top (30 from bottom on 1440p)
+    //float yBottom = iResolution.y - 1410.0; // 1410 pixels from the top (30 from bottom on 1440p)
+
+    float yTop    = 1375.0;   // 60 pixels from the top
+    float yBottom = 710.0; // 1410 pixels from the top (30 from bottom on 1440p) 
+
+    finalColor = vec3(0.0);
+    float freq = 0.02; // From your python code
+    
+    // --- COOL FACTOR: TIME SCROLLING ---
+    // Multiplying time creates an offset so the waves visibly "flow" across the screen
+    float speed = iTime * 5.0;
+
+    // Additive blending: Adding the colors together means where they overlap, they blend brightly to white
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.x, yTop, MAGENTA, freq, speed * 1.5);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.y, yTop, GREEN,   freq, speed * 1.2);
+    //finalColor += drawAudioWave(fragCoord, u_amp_top.z, yTop, CYAN,    freq, speed * 1.0);
+    
+    // --- BOTTOM WAVES ---
+    // Use negative speed to make bottom waves flow in the opposite direction for contrast!
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.x*2.0, yBottom, MAGENTA, freq, speed * -3.0);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.y*2.0, yBottom, GREEN, freq, speed * -3.2);
+    finalColor += drawAudioWave(fragCoord, u_amp_bottom.z*2.0, yBottom, CYAN,  freq, speed * -3.5);
+
+    // Optional: Tone-mapping to prevent the glowing hot spots from burning out entirely
+    finalColor = finalColor / (1.0 + finalColor * 0.2); 
+
+    // Add the wave to the screen
+    finalColor = fragColor.rgb + finalColor;
+
+    // Output the final mixed color
+    fragColor = vec4(finalColor, fragColor.a);
+
+
+
+
+
+    // =========================================================================
+    // PART 5: AUDIO SPECTRUM 1
+    // =========================================================================
+
+
+    // Get the standard normalized coordinates (0.0 to 1.0)
+    uv = (fragCoord.xy / iResolution.xy);
+
+    // --- START OF SCALING & POSITIONING ---
+    
+    // Set exactly where you want the CENTER of the visualizer (in pixels).
+    // X = middle of screen. Y = 100 pixels up from the bottom.
+    vec2 TARGET_POS = vec2(iResolution.x * 0.5, 850.0); 
+    
+    // Set exactly how large you want the visualizer to be (in pixels).
+    // X = full width of screen. Y = restricted to 100 pixels tall.
+    vec2 TARGET_SIZE = vec2((iResolution.x), 700.0);
+    
+    // Remap the UVs based on our targets
+    uv = (uv - (TARGET_POS / iResolution.xy)) * (iResolution.xy / TARGET_SIZE) + 0.5;
+
+    // --- END OF SCALING & POSITIONING ---
+    // (The rest of the code is unchanged, but uses our newly squished 'uv')
+
+    float fVBars = 40.0;
+    float fHSpacing = 1.00;
+    
+    float x = floor(uv.x * fVBars)/fVBars;
+    float fSample = texture(iChannel3, vec2(abs(2.0 * x - 1.0), 0.25)).x;
+  
+    float squarewave = sign(mod(uv.x, 1.0/fVBars)-0.004);
+    float fft = squarewave * fSample* 0.5; 
+    
+    float fHBars = 0.0; //100.0;
+    float fVSpacing = 0.0; //0.180;
+    float fVFreq = (uv.y * 3.14);
+    fVFreq = sign(sin(fVFreq * fHBars)+1.0-fVSpacing);
+
+    vec2 centered = vec2(1.0) * uv - vec2(1.0);
+    float t = iTime / 100.0;
+    float polychrome = 1.0;
+    vec3 spline_args = fract(vec3(polychrome*uv.x-t) + vec3(0.0, -1.0/3.0, -2.0/3.0));
+    vec3 spline = B2_spline(spline_args);
+    
+    float f = abs(centered.y);
+    vec3 base_color  = vec3(0.95, 0.95, 0.95) - f*spline;
+    vec3 flame_color = pow(base_color, vec3(3.0));
+    
+    float tt = 0.3 - uv.y;
+    float df = sign(tt);
+    df = 0.0; //(df + 1.0)/0.5;
+    col = flame_color * vec3(1.0 - step(fft, abs(0.3-uv.y))) * vec3(fVFreq);
+    col -= col * df * 0.0180;
+
+    // Add the audio viz to the screen
+    //finalColor = fragColor.rgb + col;
+    //finalColor = mix(fragColor.rgb, col, 0.5);
+    finalColor = 1.0 - (1.0 - fragColor.rgb) * (1.0 - col);
+
+    // Output the final mixed color
+    //fragColor = vec4(finalColor, fragColor.a);
+    fragColor = vec4(finalColor, 0.0);
+
+    // =========================================================================
+    // PART 6: AUDIO SPECTRUM 2
+    // =========================================================================
+
+    // Set exactly where you want the CENTER of the visualizer (in pixels).
+    // X = middle of screen. Y = 100 pixels up from the bottom.
+    TARGET_POS = vec2(iResolution.x * 0.5, 430.0); 
+    
+    // Set exactly how large you want the visualizer to be (in pixels).
+    // X = full width of screen. Y = restricted to 100 pixels tall.
+    TARGET_SIZE = vec2(iResolution.x, 2400.0);
+    
+    // Remap the UVs based on our targets
+    uv = (uv - (TARGET_POS / iResolution.xy)) * (iResolution.xy / TARGET_SIZE) + 0.5;
+    
+    // Because the math in this shader stretches lines to infinity, 
+    // we need to "cut off" the rendering if the pixels are outside our 100px box.
+    //if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+    //    fragColor = vec4(0.0, 0.0, 0.0, 0.0); // Output transparent black
+    //    return;
+    //}
+
+
+    c = 3.0;
+    vec3 color = vec3(1.0);
+    color.z = bump(c * (uv.x - 0.75));
+    color.y = bump(c * (uv.x - 0.5));
+    color.x = bump(c * (uv.x - 0.25));
+	
+    float line = abs(0.02 / abs(0.5-uv.y) );
+    uv.y = abs( uv.y - 0.5 );
+	
+    vec4 soundWave = texture( iChannel3, vec2(abs(0.5-uv.x)+0.005, uv.y) ).rrrr;
+    color *= line * (1.0 - 2.0 * abs( 0.5 - uv.xxx ) + pow( soundWave.y, 10.0 ) * 30.0 );
+	
+    fragColor = fragColor + vec4(color, 0.0); 
+
+    // --- UNIVERSAL FLASH TO WHITE (FIXED TIMING) ---
+    // 1. Define exactly how long this animation should take (e.g., 2.5 seconds)
+    float transitionTime = 1.0; 
+
+    // 2. Create a timer that stays at 0.0 for the whole video, 
+    // but starts counting up exactly 'transitionTime' seconds before the end.
+    float triggerTime = iEndTime - transitionTime;
+    float tFlash = clamp(iTime - triggerTime, 0.0, transitionTime);
+
+    // 3. Run your exact same math, but scale it to 'transitionTime' instead of 'duration'
+    float z_prog = smoothstep(0.0, transitionTime, tFlash);
+    z_prog = pow(z_prog, 1.5); // Easing for accelerating zoom effect
+    
+    float animZ = mix(20.0, -2.0, z_prog);
+    float flashAmt = 1.0 - smoothstep(-1.0, 1.0, animZ);
+    
+    // 4. Mix and output
+    vec3 colFlash = mix(fragColor.rgb, vec3(1.0), flashAmt);
+    fragColor = vec4(colFlash, 1.0);
+}

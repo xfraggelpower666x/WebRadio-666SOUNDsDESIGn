@@ -1,0 +1,51 @@
+/*
+    "Rainbow Road" by @XorDev
+
+    Where does it lead?
+
+    Tweet: twitter.com/XorDev/status/1572623173920882689
+    Twigl: t.co/NYTWiGpRXf
+    
+    -17 Thanks to iq
+    -11 Thanks to FabriceNeyret2
+*/
+
+void mainImage(out vec4 O, vec2 I)
+{
+    //Resolution for scaling
+    vec2 r = iResolution.xy, o;
+    //Clear fragcolor
+    O*=0.;
+    //Render 50 lightbars
+    for(float i=fract(-iTime); i<25.; i+=.5)
+        //Offset coordinates (center of bar)
+        o = (I+I-r)/r.y*i + cos(i*vec2(.8,.5)+iTime),
+        //Light color
+        O += (cos(i+vec4(0,2,4,0))+1.) / max(i*i,5.)*.1 / (i/1e3+
+        //Attenuation using distance to line
+        length(o-vec2(clamp(o.x,-4.,4.),i+o*sin(i)*.1-4.))/i);
+}
+
+///Original [272 Chars]:
+/**
+void mainImage(out vec4 O, vec2 I)
+{
+    //Resolution for scaling
+    vec2 r = iResolution.xy,
+    //Centered and scaled coordinates
+    d,
+    o;
+    //Clear fragcolor
+    O*=0.;
+    
+    //Render 50 lightbars
+    for(float i=fract(-iTime); i<25.; i+=.5)
+        //Offset coordinates (center of bar)
+        o = (I+I-r)/r.y*i+cos(i*vec2(.8,.5)+iTime),
+        o.y += 4.-i,
+        //Color and fade
+        O += (cos(i+vec4(0,2,4,0))+1.) / max(i*i,5.)*.1 /
+        //Light using a segment SDF
+             (length(o-clamp( dot(o, d= vec2(4,sin(i)*.4))/dot(d,d),-1.,1.) *d )/i + i/1e3);
+}
+**/

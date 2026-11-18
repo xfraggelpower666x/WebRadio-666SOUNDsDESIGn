@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Media Feed</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        button {
+            background: #1da1f2;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { background: #0c85d0; }
+
+        #feed {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 100px;
+            padding-bottom: 100vh;
+            display: flex;
+            flex-direction: row; 
+            gap: 1px; 
+            align-items: flex-start; 
+        }
+
+        .feed-column {
+            display: flex;
+            flex-direction: column; 
+            gap: 2px; 
+            flex: 1; 
+            min-width: 0; 
+        }
+
+        .media-container {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+        }
+
+        /* Notice we now style BOTH video and img exactly the same */
+        video, img {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #111; /* Gives a dark placeholder while loading */
+        }
+
+        .media-title {
+            padding: 1px;
+            font-size: 14px;
+            color: #ccc;
+            text-align: center;
+            background: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <button id="toggleScrollBtn">Start Auto-Scroll</button>
+        <button id="rescanBtn" style="background-color: #28a745;">Rescan Folders</button>
+        <label for="speedSlider">Speed: <span id="speedValue">0.30</span>x</label>
+        <input type="range" id="speedSlider" min="0.05" max="10" step="0.05" value="0.3">
+    </div>
+
+    <div id="feed"></div>
+
+<script>
+        // 1. END OF FEED OBSERVER (Infinite Scroll Trigger)
+        const endOfFeedObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !isLoadingChunk) {
+                    observer.unobserve(entry.target);
+                    // Ask server for the next 50 items
+                    loadMediaChunk(50); 
+                }
+            });
+        }, { 
+            root: null,
+            rootMargin: '1500px', // Fetch 1500px BEFORE reaching the bottom
+            threshold: 0 
+        });
+
+        // 2. RAM MANAGEMENT OBSERVER (Violent RAM Flush + Layout Lock)
+        const blankPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px', 
+            threshold: 0.1
+        };
+
+        const mediaObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const media = entry.target;
+                const isVideo = media.tagName.toLowerCase() === 'video';
+                
+                if (entry.isIntersecting) {
+                    // IN VIEW: Load source
+                    if (media.dataset.loaded !== "true") {
+                        media.src = media.dataset.src;
+                        media.dataset.loaded = "true";
+                        
+                        // Unlock height once loaded so it sizes naturally
+                        if (isVideo) {
+                            media.onloadeddata = () => media.style.height = '';
+                        } else {
+                            media.onload = () => media.style.height = '';
+                        }
+                    }
+
+                    if (isVideo) {
+                        media.play().catch(e => console.warn("Autoplay prevented:", e));
+                    }
+
+                } else {
+                    // OUT OF VIEW: Flush RAM
+                    if (media.dataset.loaded === "true") {
+                        if (isVideo) media.pause();
+                        
+                        // LOCK HEIGHT: Keep exact physical height before unloading so columns don't collapse
+                        const rect = media.getBoundingClientRect();
+                        if (rect.height) {
+                            media.style.height = `${rect.height}px`;
+                        }
+                        
+                        // VIOLENT FLUSH
+                        if (isVideo) {
+                            media.removeAttribute('src');
+                            media.load(); 
+                        } else {
+                            media.src = blankPixel;
+                        }
+                        
+                        media.dataset.loaded = "false";
+                        media.onload = null;
+                        media.onloadeddata = null;
+                    }
+                }
+            });
+        }, observerOptions);
+
+
+        // 3. FETCH AND RENDER MEDIA CHUNKS
+        let isLoadingChunk = false;
+        let columns = []; // Keep track of the columns globally
+
+        async function loadMediaChunk(limit = 50) {
+            if (isLoadingChunk) return;
+            isLoadingChunk = true;
+            
+            try {
+                const response = await fetch(`/api/media?limit=${limit}`);
+                const mediaFiles = await response.json();
+                const feed = document.getElementById('feed');
+
+                // If this is the very first load, create the columns
+                if (columns.length === 0) {
+                    let colCount = Math.floor(window.innerWidth / 350);
+                    if (colCount < 1) colCount = 1;
+
+                    for (let i = 0; i < colCount; i++) {
+                        const colDiv = document.createElement('div');
+                        colDiv.className = 'feed-column';
+                        feed.appendChild(colDiv);
+                        columns.push(colDiv);
+                    }
+                }
+
+                if (mediaFiles.length === 0 && columns[0].children.length === 0) {
+                    feed.innerHTML = "<h3 style='text-align:center;'>No media files found.</h3>";
+                    return;
+                }
+
+                const imageRegex = /\.(jpg|jpeg|png|gif|webp)$/i;
+                
+                // Track total items to distribute items evenly across columns (Round-Robin)
+                let globalItemCount = document.querySelectorAll('.media-container').length;
+
+                mediaFiles.forEach((filename, index) => {
+                    const container = document.createElement('div');
+                    container.className = 'media-container';
+                    
+                    const isImage = imageRegex.test(filename);
+                    const mediaElement = document.createElement(isImage ? 'img' : 'video');
+                    
+                    mediaElement.dataset.src = encodeURIComponent(filename); 
+                    mediaElement.dataset.loaded = "false";
+                    
+                    if (!isImage) {
+                        mediaElement.loop = true;
+                        mediaElement.muted = true;
+                        mediaElement.controls = true;
+                        mediaElement.preload = "none"; 
+                    } else {
+                        mediaElement.alt = "media";
+                    }
+
+                    container.appendChild(mediaElement);
+
+                    // Round-robin placement into columns
+                    const targetColumn = columns[globalItemCount % columns.length];
+                    targetColumn.appendChild(container);
+                    globalItemCount++;
+
+                    // 1. Give the media to the Memory Observer
+                    mediaObserver.observe(mediaElement);
+
+                    // 2. Assign the end-of-feed trigger to the LAST item in the requested chunk
+                    if (index === mediaFiles.length - 1) {
+                        endOfFeedObserver.observe(container);
+                    }
+                });
+
+            } catch (err) {
+                console.error("Failed to load chunk:", err);
+            } finally {
+                isLoadingChunk = false;
+            }
+        }
+
+        // Initial Load
+        loadMediaChunk(50);
+
+
+        // 4. RESCAN BUTTON LOGIC
+        const rescanBtn = document.getElementById('rescanBtn');
+        if (rescanBtn) {
+            rescanBtn.addEventListener('click', async () => {
+                rescanBtn.innerText = "Scanning...";
+                rescanBtn.disabled = true;
+                rescanBtn.style.background = "#555";
+
+                try {
+                    const response = await fetch('/api/refresh', {method: 'POST', headers: {'X-LWT-Refresh': '1'}});
+                    const data = await response.json();
+                    console.log(data.status, "Total files:", data.total_files);
+
+                    const feed = document.getElementById('feed');
+                    feed.innerHTML = ""; 
+                    columns = []; // MUST reset columns array on rescan
+
+                    await loadMediaChunk(50);
+                } catch (err) {
+                    console.error("Failed to rescan:", err);
+                    alert("Error reaching the server. Is it running?");
+                } finally {
+                    rescanBtn.innerText = "Rescan Folders";
+                    rescanBtn.disabled = false;
+                    rescanBtn.style.background = "#28a745";
+                }
+            });
+        }
+
+        // 5. AUTO-SCROLL LOGIC (Vertical)
+        let isAutoScrolling = false;
+        let scrollSpeed = 0.3; 
+        let animationFrameId;
+        let scrollAccumulator = 0; 
+
+        const toggleBtn = document.getElementById('toggleScrollBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+
+        if(speedValue) speedValue.innerText = scrollSpeed.toFixed(2);
+
+        if(toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                isAutoScrolling = !isAutoScrolling;
+                if (isAutoScrolling) {
+                    toggleBtn.innerText = "Stop Auto-Scroll";
+                    toggleBtn.style.background = "#e0245e"; 
+                    scrollAccumulator = 0; 
+                    autoScroll();
+                } else {
+                    toggleBtn.innerText = "Start Auto-Scroll";
+                    toggleBtn.style.background = "#1da1f2";
+                    cancelAnimationFrame(animationFrameId);
+                }
+            });
+        }
+
+        if(speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                scrollSpeed = parseFloat(e.target.value);
+                speedValue.innerText = scrollSpeed.toFixed(2); 
+            });
+        }
+
+        function autoScroll() {
+            if (!isAutoScrolling) return;
+
+            scrollAccumulator += scrollSpeed;
+
+            if (scrollAccumulator >= 1) {
+                const pixelsToScroll = Math.floor(scrollAccumulator);
+                window.scrollBy(0, pixelsToScroll);
+                scrollAccumulator -= pixelsToScroll; 
+            }
+            
+            // Check vertical height
+            if (Math.ceil(window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                isAutoScrolling = false;
+                toggleBtn.innerText = "Start Auto-Scroll";
+                toggleBtn.style.background = "#1da1f2";
+                return;
+            }
+            
+            animationFrameId = requestAnimationFrame(autoScroll);
+        }
+    </script>
+
+</body>
+</html>

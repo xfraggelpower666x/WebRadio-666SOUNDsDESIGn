@@ -1,0 +1,56 @@
+#define NUM_BALLS 3
+#define BLENDING 30.0
+#define FALLOFF 20.0
+#define SIZE 100.0
+#define GLOW 200.0
+
+float smin(float a, float b, float k)
+{
+    float res = exp2(-k * a) + exp2(-k * b);
+    return -log2(res) / k;
+}
+
+float glow(float dist)
+{
+    return max(SIZE - dist, 0.0) / FALLOFF;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 center = iResolution.xy / 2.0;
+    
+    // { X freq, X phase, Y freq, Y phase, radius }
+    const float waves[NUM_BALLS * 5] = float[](
+        1.23, 4.56, 3.21, 5.43, 50.0,
+        3.45, 1.26, 3.45, 2.15, 50.0,
+        2.14, 2.52, 1.25, 3.64, 50.0
+    );
+    
+    const vec3 colors[NUM_BALLS] = vec3[](
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.0, 1.0, 0.0),
+        vec3(0.0, 0.0, 1.0)
+    );
+    
+    
+    vec2 balls[NUM_BALLS];
+    for(int i = 0; i < NUM_BALLS; i++)
+    {
+        balls[i] = center + vec2(
+            cos(iTime * waves[i * 5]     + waves[i * 5 + 1]),
+            sin(iTime * waves[i * 5 + 2] + waves[i * 5 + 3])) * waves[i * 5 + 4];
+    }
+    
+    float minDist = distance(fragCoord, balls[0]);
+    vec3 finalColor = colors[0] * clamp(1.0 - minDist / GLOW, 0.0, 1.0);
+    
+       for(int i = 1; i < NUM_BALLS; i++)
+    {
+        float dist = distance(fragCoord, balls[i]);
+        minDist = smin(minDist, dist, 1.0 / BLENDING);
+        
+        finalColor += colors[i] * clamp(1.0 - dist / GLOW, 0.0, 1.0);
+    }
+    
+    fragColor = vec4(finalColor * glow(minDist), 0.0);
+}

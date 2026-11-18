@@ -110,6 +110,25 @@
       "continuity_checkpoint": "projects/666-GOVEE-CONTROL/checkpoints/2026-10-17-initial/PROJECT_CHECKPOINT.md",
       "separate_from": "LIGHT_ORCHESTRA",
       "activation_rule": "EXPLICIT_CHAT_LOCAL_INTENT_AND_CURRENT_READBACK"
+    },
+    {
+      "id": "AUDIO_LIGHT_WAVE",
+      "name": "666AUDIO LIGHT WAVE",
+      "aliases": [
+        "666audio light wave",
+        "666 audio light wave",
+        "audio light wave",
+        "light wave tech"
+      ],
+      "roots": [
+        "windows-app/666AUDIO-LIGHT-WAVE/"
+      ],
+      "scope": "INDEPENDENT_WINDOWS_AUDIO_VISUALIZATION_STUDIO",
+      "current_source": "windows-app/666AUDIO-LIGHT-WAVE/source-v0.1.2-R6/",
+      "current_doc": "windows-app/666AUDIO-LIGHT-WAVE/README.md",
+      "verified": true,
+      "windows_host_acceptance": "READBACK_PENDING",
+      "activation_rule": "EXPLICIT_CHAT_LOCAL_INTENT_AND_CURRENT_READBACK"
     }
   ],
   "systemstart": {

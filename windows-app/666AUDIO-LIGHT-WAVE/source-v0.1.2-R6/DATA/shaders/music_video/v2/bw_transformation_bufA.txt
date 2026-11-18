@@ -1,0 +1,26 @@
+//revised according to FabriceNeyret2's advice
+#define re(a) vec2((a).x, 0.)
+#define im(a) vec2(0., (a).y)
+#define cmul(a,b) ( mat2(a, -(a).y, (a).x ) * (b) )
+#define conj(a)     vec2( (a).x, -(a).y)
+#define cinv(a)   ( conj(a) / dot(a, a) )
+#define cexp(a)   ( exp((a).x)* vec2(cos((a).y), sin((a).y)) )
+#define clog(a)     vec2( log(length(a)), atan((a).y,(a).x) )
+#define cpow(a,n)   cexp( float(n)* clog(a) )
+
+void mainImage( out vec4 O, vec2 u )
+{
+    vec2 res = iResolution.xy,
+          z = ( u* 2. - res) / min(res.x, res.y);
+
+    float t = iTime;
+    float scale = 2.;
+    z *= scale;
+    
+    vec2 f =  cmul(cexp(vec2(0., t)) + vec2(1., 0.), cpow(z, 2))
+                            + cmul(cexp(vec2(0., 1.42* t)), z)  
+                            + cexp(vec2(0., -t));
+
+    f = abs(mod(f + 0.5, 1.) - 0.5);
+    O = vec4( .03/ max(f.x,f.y) );
+}

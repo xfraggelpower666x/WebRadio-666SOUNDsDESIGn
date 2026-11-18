@@ -1,0 +1,45 @@
+// iChannel1: rgbanoise 512x512
+
+vec4 fire(vec3 p) {
+    // FIX: Removed unused 'i' and 'd' variables here.
+    float s, n, T = iTime;
+    vec4 o = vec4(0.0);
+    
+    p += cos(p.z+T+p.yzx*.5)*.6;
+    s = 4.-length(p.xy);
+    p.xy *= mat2(cos(.3*T+vec4(0,33,11,0)));
+    
+    for (n = 1.6; n < 32.; n += n )
+        s -= abs(dot(sin( p.z + T + 4.3*p*n ), vec3(1.2))) / n;
+        
+    s = (.01 + abs(s)*.15);
+    o += 1. / s;
+    return (vec4(7,2,1,1) * o * o );
+}
+
+void mainImage(out vec4 o, vec2 u) {
+    // FIX 1: Explicitly initialized i, s, and l. 
+    // (i=0.0 stops the loop from spiraling out of control)
+    float d = .5 * texelFetch(iChannel1, ivec2(u)%1024, 0).a,
+          i = 0.0, s = 1.0, w, l = 1.0, T = iTime;
+          
+    vec3 q, p = iResolution;
+    u = ( u - p.xy/2. ) / p.y;
+    
+    for(o = vec4(0); i++ < 1e2; o += d / s + 7.*fire(q)) {
+        // Cleaned up the comma operator into a semicolon for safety
+        q = p = vec3( u*d, d + T);
+        p *= .3;
+        w = .75;
+        
+        // FIX 2: Renamed inner uninitialized 'int i' to initialized 'int j = 0'
+        for (int j = 0; j++ < 8; w *= l ) {
+            p *= l = 3./dot( p = sin(p) , p);
+        }
+            
+        d += s = max(.5 - length(q.xy), .002+abs(length(p)/w) * 4.) ;
+    } 
+    
+    o = mix(o, o.zyxw, smoothstep(.2, 1., dot(u, u)));
+    o = tanh(max(o/1.5e5/length(u)/d, .0));
+}

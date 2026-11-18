@@ -1,0 +1,98 @@
+#define T (sin(iTime*.7)*12.+iTime*5e1)
+#define P(z) (vec3(cos((z)*.013)*12.+cos((z)*.03)*6., \
+                   cos((z)*.011)*12., (z)))
+#define R(a) mat2(cos(a+vec4(0,33,11,0)))
+#define N normalize
+
+float boxen(vec3 p) {
+    p = abs(fract(p/1e1)*1e1 - 5.) - 7.;
+    return max(p.x, min(p.y, p.z));
+}
+
+vec4 lights;
+float map(vec3 p) {
+    vec3 q = P(p.z);
+    float m = boxen(p);
+    float g = q.y - p.y + 6.;
+
+    p.xy -= q.xy;
+
+    float rad = 12. + sin(p.z*.4)*3.;
+    vec2 h = vec2(cos(p.z * .007), sin(p.z * .007)) * rad;
+    float a = length(p.xy - h) - .3,
+          b = length(p.xy + h) - .6;
+    
+    lights += a < b ? vec4(1,1e1,2e1,0  ) / (.1 + abs(a)) : vec4(0);
+    lights += b < a ? vec4(1e1,1,1e1,0) / (.1 + abs(b)) : vec4(0);
+    
+    p = abs(p);
+    float tun = min(22.-p.x-p.y + m, 15.-p.y - m);
+
+    float d = max(min(m, g), tun);
+    return min(g, min(min(a, b),max(1. - p.x, d)));
+}
+
+void getCam(float f, out vec3 ro, inout vec3 rd) {
+
+    // Cam A
+    if (f < 15.) {
+        ro = P(T+1e1);
+        rd.yz *= R(-.28);
+        rd.xz *= R(-.18);
+        rd.y -= .3;
+    // Cam B
+    } else if(f < 30.)  {
+        ro = P(T);
+        rd.xz *= R(T/3e1);
+        ro.y -= .25;
+    // Cam C
+    } else {
+        ro = P(-T+2e1) + vec3(0, .15, 0);
+        rd.xz *= R(sin(T*.02) * .35);
+        rd.yz *= R(-.1);
+    }
+    rd = normalize(rd);
+}
+
+void mainImage(out vec4 o, in vec2 u) {
+    float i,s,d;
+    float f = mod(iTime, 45.), fi = mod(f, 15.),
+          fade = smoothstep(0., 1., fi) * smoothstep(15., 14., fi);
+    
+    vec3 r = iResolution;
+    u = (u - r.xy/2.) / r.y;
+    u.y -= .15;
+    o = vec4(0);
+
+    vec3 p = P(T), ro = p,
+         Z = N(P(T+8.) - p),
+         X = N(vec3(Z.z, 0, -Z)),
+         D = N(vec3(R(sin(T*.01)*.4)*u, 1.3)
+            * mat3(-X, cross(X, Z), Z));
+
+    getCam(f, ro, D);
+    for (; i++ < 110.;)
+        p = ro + D*d*.65,
+        d += s = map(p),
+        o += lights + 1./max(s, .01);
+
+    // normal, tetrahedron https://iquilezles.org/articles/normalsSDF/
+    const float h = .005;
+    const vec2 k = vec2(1,-1);
+    vec3 n = N(k.xyy*map(p + k.xyy*h) +
+               k.yyx*map(p + k.yyx*h) +
+               k.yxy*map(p + k.yxy*h) +
+               k.xxx*map(p + k.xxx*h));
+
+    o *= (.1 + max(dot(n, -D), 0.));
+
+    vec4 ref;
+    lights = vec4(0);
+    for (p += n*.05, D = reflect(D, n), s=i=0.; i++<4e1;)
+        p += D*s,
+        s = map(p)*.7,
+        ref += lights + 1./max(s, .01);
+
+    o += o*ref;
+    o = tanh(o / 1e8 )*fade;
+}

@@ -1,0 +1,51 @@
+#define C(u) q = abs(mod(p,4.)-2.); u = abs(min(min(max(q.x,q.y), max(q.x,q.z)), max(q.y,q.z))-.15) + .01;
+#define F(i) min(4.*fract((e+i)/4.),1.)
+
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p, // Ray position
+         q, // Used to store ray position modulo 4 for grid
+         r = vec3((I+I-iResolution.xy)/iResolution.y,1.); // Ray direction
+    float i, // Iterator
+          t, // Distance travelled
+          v, // Random number & Distance to grid
+          w, // Distance to waves on the grid
+          e = iTime;
+    for (O*=i;i++<35.;
+        // March forward based on minimum distance
+        t+=min(v,w)*.5){
+        
+        // Update current ray position
+        // Scale z component ray direction for zoom effect
+        p = t*normalize(vec3(r.xy,r.z/exp(t*.1)));
+        
+        // Rotate xy position based on time
+        p.xy*=mat2(cos(e+sin(e)+vec4(0,11,33,0)));
+        
+        // Get number from -6, -4, -2, 2, 4
+        v = 2.*ceil(4.*fract(ceil(e)*.4))-5.;
+        v += sign(v); 
+        
+        // Move either x,y or z direction this amount, based on time
+        // F is constant on [1,4] mod 4 and linear on [0,1] mod 4, this is how we alternate between directions
+        // We create the illusion of a continuous path because all cells look identical
+        p -= 2.*v*vec3(F(0.),F(2.),F(1.)-F(3.));
+        
+        // Update distance to grid
+        C(v)
+        
+        // Rounding of z value to get funky squares
+        p.z = ceil(p.z*7.)/7.;
+        
+        // Triangle wave distortion
+        p += abs(fract(p.zxy)-.5)-.25;
+        
+        // Update distance to waves
+        C(w)
+        
+        // Color accumulation based on distance
+        // Make grid less bright than waves
+        O += exp(cos(t+vec4(0,2,4,0)))/min(5.*v,w);
+
+    }
+    O=tanh(O/3e2);
+}

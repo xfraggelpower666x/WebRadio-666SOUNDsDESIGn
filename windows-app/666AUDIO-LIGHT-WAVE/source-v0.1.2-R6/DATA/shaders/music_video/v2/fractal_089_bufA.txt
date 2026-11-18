@@ -1,0 +1,55 @@
+// Un-golfed helper macros with explicit floats
+#define R(p,a,r) (mix(a*dot(p,a), p, cos(r)) + sin(r)*cross(p,a))
+#define H(h) (cos((h)*6.3 + vec3(0.0, 23.0, 21.0)) * 0.5 + 0.5)
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Safely cast iResolution to vec3 regardless of whether your 
+    // wrapper provides it as a vec2 or vec3
+    vec3 r = vec3(iResolution.x, iResolution.y, 1.0);
+    vec3 c = vec3(0.0);
+    vec3 p, q;
+    
+    // Normalized pixel coordinates
+    vec3 d = normalize(vec3((fragCoord - 0.5 * r.xy) / r.y, 1.0));
+    
+    float s, e;
+    float g = 0.0;
+    float t = iTime;
+    
+    // Using a standard float loop for the outer iteration
+    for(float i = 1.0; i < 100.0; i++)
+    {
+        if (g > 100.0) break; 
+
+        p = g * d;
+        p.z -= 5.0;
+        p = R(p, vec3(0.577), t * 0.2);      
+        q = p;
+        
+        // 3.1415 is an approximation of PI
+        p = vec3(sin(atan(p.x, p.y) * 3.1415), length(p.xy) - 2.0, asin(cos(p.z)));
+        s = 2.0;
+        
+        // FIX: Replaced uninitialized shadowed `int i` with `int j = 0`
+        for(int j = 0; j < 8; j++)
+        {
+            // FIX: Explicit floats (1.0) instead of integers (1)
+            p = abs(p) - vec3(1.0, 0.3, 1.5);
+            
+            // FIX: Un-chained the math assignments
+            e = 9.0 / clamp(dot(p, p), 0.5 + sin(t) * 0.5, 8.0);
+            s *= e;
+            p = p * e;
+        }
+        
+        // FIX: Un-chained math assignments
+        e = max(length(q) - 3.5, length(p.xy - clamp(p.xy, -0.3, 0.3)) / s);
+        g += e;        
+        
+        c += mix(vec3(1.0), H(log(s) * 0.5), 0.3) * 0.012 * exp(-i * i * e);
+    }
+    
+    c *= c * c * c * c;
+    fragColor = vec4(c, 1.0);
+}

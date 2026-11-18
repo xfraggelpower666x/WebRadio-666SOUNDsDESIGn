@@ -1,0 +1,97 @@
+TO THE START SEQ ?!
+
+    {
+      "name": "phosphor",
+      "shader_effect_file": "DATA/shaders/music_video/v2/phosphor.txt",
+      "material_1": "DATA/shaders/music_video/v2/phosphor_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "effect_start_time": 0.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "space_reactor",
+      "shader_effect_file": "DATA/shaders/music_video/v2/space_reactor.txt",
+      "material_1": "DATA/shaders/music_video/v2/space_reactor_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 20.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "window",
+      "shader_effect_file": "DATA/shaders/music_video/v2/window.txt",
+      "material_1": null,
+      "material_2": "DATA/textures/gray_noise_256x256.png",
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 40.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "living_universe",
+      "shader_effect_file": "DATA/shaders/music_video/v2/living_universe.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 40.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "mindless_drifting",
+      "shader_effect_file": "DATA/shaders/music_video/v2/mindless_drifting.txt",
+      "material_1": null,
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 60.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "normalize_glitchy_fx",
+      "shader_effect_file": "DATA/shaders/music_video/v2/normalize_glitchy_fx.txt",
+      "material_1": "DATA/shaders/music_video/v2/normalize_glitchy_fx_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 80.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "dimethyltryptamin_2",
+      "shader_effect_file": "DATA/shaders/music_video/v2/dimethyltryptamin_2.txt",
+      "material_1": "DATA/shaders/music_video/v2/dimethyltryptamin_2_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 100.0,
+      "effect_duration": 20.0
+    },
+    {
+      "name": "return_to_source",
+      "shader_effect_file": "DATA/shaders/music_video/v2/return_to_source.txt",
+      "material_1": "DATA/shaders/music_video/v2/return_to_source_bufA.txt",
+      "material_2": null,
+      "material_3": null,
+      "material_4": null,
+      "effect_start_time": 120.0,
+      "effect_duration": 20.0
+    },
+
+
+create new: quark_nova >> reverse direction
+
+
+________________COLOR_MOD_________________
+
+
+
+
+
+
+
+
+
+

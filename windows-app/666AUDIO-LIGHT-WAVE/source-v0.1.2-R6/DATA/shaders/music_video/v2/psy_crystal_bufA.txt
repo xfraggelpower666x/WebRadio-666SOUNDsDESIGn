@@ -1,0 +1,289 @@
+#define EXPOSURE 1.0
+#define AMBIENT 0.00001
+#define IOR_AIR 1.0
+#define IOR_GEM 1.5
+#define DISPERSION 0.25
+#define SPECTRAL_SAMPLES 4
+
+#define PHI 1.618033988749895
+#define BASE_RATE 0.1
+
+#define SPIN_XZ (BASE_RATE * PHI)
+#define SPIN_XY (BASE_RATE * PHI * PHI)
+#define SPIN_YZ (BASE_RATE * PHI * PHI * PHI)
+
+#define LIGHT_RATE_A (BASE_RATE * PHI * PHI * PHI * PHI)
+#define LIGHT_RATE_B (BASE_RATE * PHI * PHI * PHI * PHI * PHI)
+
+#define FACE_A vec3(0.5773502692, 0.5773502692, 0.5773502692)
+#define FACE_B vec3(0.0, 0.3568220898, 0.9341723590)
+#define FACE_C vec3(0.3568220898, 0.9341723590, 0.0)
+#define FACE_D vec3(0.9341723590, 0.0, 0.3568220898)
+
+const vec3 GEM_FACES[4] = vec3[4](FACE_A, FACE_B, FACE_C, FACE_D);
+
+// White-balanced XYZ -> linear sRGB. Standard D65 matrix with each row scaled so that
+// an equal-energy (flat) spectrum's XYZ maps exactly to (1,1,1).
+const mat3 XYZ_TO_RGB = mat3(
+     8.09817, -3.05248,  0.18374,
+    -3.84142,  5.90964, -0.67295,
+    -1.24599,  0.13074,  3.48683
+);
+
+float bayerDither(ivec2 pixel) {
+	int value = 0;
+	for (int bit = 0; bit < 4; bit++) {
+		int xBit = (pixel.x >> bit) & 1;
+		int yBit = (pixel.y >> bit) & 1;
+		int cell = ((xBit ^ yBit) << 1) | yBit;
+		value += cell << (2 * (3 - bit));
+	}
+	return (float(value) + 0.5) / 256.0;
+}
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define H(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+// Wyman-Sloan-Shirley (2013) analytic fits to the CIE 1931 color-matching functions.
+float cieG(float l, float mu, float s1, float s2) {
+	float t = (l - mu) * (l < mu ? s1 : s2);
+	return exp(-0.5 * t * t);
+}
+vec3 wavelengthToXYZ(float wl) {
+	float X = 1.056 * cieG(wl, 599.8, 0.0264, 0.0323)
+	        + 0.362 * cieG(wl, 442.0, 0.0624, 0.0374)
+	        - 0.065 * cieG(wl, 501.1, 0.0490, 0.0382);
+	float Y = 0.821 * cieG(wl, 568.8, 0.0213, 0.0247)
+	        + 0.286 * cieG(wl, 530.9, 0.0613, 0.0322);
+	float Z = 1.217 * cieG(wl, 437.0, 0.0845, 0.0278)
+	        + 0.681 * cieG(wl, 459.0, 0.0385, 0.0725);
+	return vec3(X, Y, Z);
+}
+
+vec2 rotate(vec2 v, float angle) {
+	float s = sin(angle), c = cos(angle);
+	return vec2(c * v.x - s * v.y, s * v.x + c * v.y);
+}
+
+vec3 toLocal(vec3 p) {
+    p.xz = rotate(p.xz, iTime * SPIN_XZ);
+	p.xy = rotate(p.xy, iTime * SPIN_XY);
+	p.yz = rotate(p.yz, iTime * SPIN_YZ);
+	return p;
+}
+
+float environment(vec3 localDirection, vec3 localLight) {
+	float key = pow(max(dot(localDirection, localLight), 0.0), 4.0);
+	return AMBIENT + (1.0 - AMBIENT) * key;
+}
+
+float fresnelDielectric(float cosI, float n1, float n2) {
+	cosI = clamp(cosI, 0.0, 1.0);
+	float eta = n1 / n2;
+	float sinT2 = eta * eta * (1.0 - cosI * cosI);
+	if (sinT2 >= 1.0) return 1.0;
+	float cosT = sqrt(1.0 - sinT2);
+	float rs = (n1 * cosI - n2 * cosT) / (n1 * cosI + n2 * cosT);
+	float rp = (n1 * cosT - n2 * cosI) / (n1 * cosT + n2 * cosI);
+	return 0.5 * (rs * rs + rp * rp);
+}
+
+bool hitGem(vec3 ro, vec3 rd, out float tHit, out vec3 nHit) {
+	float tEnter = -1e30, tExit = 1e30;
+	vec3 nEnter = vec3(0.0);
+	for (int f = 0; f < 4; f++) {
+		vec3 base = GEM_FACES[f];
+		for (int s = 0; s < 8; s++) {
+			vec3 flip = vec3(
+                (s & 1) != 0 ? -1.0 : 1.0,
+                (s & 2) != 0 ? -1.0 : 1.0,
+                (s & 4) != 0 ? -1.0 : 1.0
+            );
+			vec3 N = base * flip;
+			float denom = dot(rd, N);
+			float numer = 1.0 - dot(ro, N);
+			if (abs(denom) < 1e-8) {
+				if (numer < 0.0) return false;
+				continue;
+			}
+			float t = numer / denom;
+			if (denom < 0.0) {
+				if (t > tEnter) {
+					tEnter = t;
+					nEnter = N;
+				}
+			} else {
+				tExit = min(tExit, t);
+			}
+		}
+	}
+	if (tEnter > tExit || tExit < 0.0) return false;
+	tHit = tEnter;
+	nHit = nEnter;
+	return true;
+}
+
+bool exitGem(vec3 ro, vec3 rd, out float tHit, out vec3 nHit) {
+	float tExit = 1e30;
+	vec3 nExit = vec3(0.0);
+	for (int f = 0; f < 4; f++) {
+		vec3 base = GEM_FACES[f];
+		for (int s = 0; s < 8; s++) {
+			vec3 flip = vec3(
+                (s & 1) != 0 ? -1.0 : 1.0,
+                (s & 2) != 0 ? -1.0 : 1.0,
+                (s & 4) != 0 ? -1.0 : 1.0
+            );
+			vec3 N = base * flip;
+			float denom = dot(rd, N);
+			if (denom > 1e-8) {
+				float t = (1.0 - dot(ro, N)) / denom;
+				if (t > 1e-4 && t < tExit) {
+					tExit = t;
+					nExit = N;
+				}
+			}
+		}
+	}
+	tHit = tExit;
+	nHit = nExit;
+	return tExit < 1e29;
+}
+
+float traceRefraction(vec3 startPoint, vec3 startDirection, vec3 startNormal, float ior, vec3 localLight) {
+	vec3 dir = refract(startDirection, startNormal, IOR_AIR / ior);
+	vec3 point = startPoint;
+
+	float accumulated = 0.0;
+	float throughput = 1.0;
+
+	for (int bounce = 0; bounce < 16; bounce++) {
+		float t;
+		vec3 n;
+		if (!exitGem(point, dir, t, n)) break;
+		point += dir * t;
+
+		vec3 orientedNormal = -n;
+		vec3 refracted = refract(dir, orientedNormal, ior / IOR_AIR);
+		float cosI = abs(dot(dir, orientedNormal));
+		float reflectance = fresnelDielectric(cosI, ior, IOR_AIR);
+
+		if (dot(refracted, refracted) > 1e-6) {
+			accumulated += throughput * (1.0 - reflectance) * environment(refracted, localLight);
+		}
+		throughput *= reflectance;
+		if (throughput < 0.04) break;
+
+		dir = reflect(dir, orientedNormal);
+	}
+	return accumulated;
+}
+
+vec3 dispersedRefraction(vec3 hitPoint, vec3 rayDirection, vec3 surfaceNormal, float ditherValue, vec3 localLight) {
+	vec3 reflectDir = reflect(rayDirection, surfaceNormal);
+	float reflectBrightness = environment(reflectDir, localLight);
+	float cosI = max(dot(-rayDirection, surfaceNormal), 0.0);
+
+	vec3 accumXYZ = vec3(0.0);
+	vec3 whiteXYZ = vec3(0.0);
+
+	for (int i = 0; i < SPECTRAL_SAMPLES; i++) {
+		float pos = (float(i) + ditherValue) / float(SPECTRAL_SAMPLES);
+		float wavelength = mix(380.0, 700.0, pos);
+		float ior = IOR_GEM + DISPERSION * (0.5 - pos);
+		vec3 xyz = wavelengthToXYZ(wavelength);
+
+		float reflectance = fresnelDielectric(cosI, IOR_AIR, ior);
+		float refractBrightness = traceRefraction(hitPoint, rayDirection, surfaceNormal, ior, localLight);
+		float combined = reflectance * reflectBrightness + (1.0 - reflectance) * refractBrightness;
+
+		accumXYZ += combined * xyz;
+		whiteXYZ += xyz;
+	}
+	#if SPECTRAL_SAMPLES == 1
+		return max(XYZ_TO_RGB * (accumXYZ / float(SPECTRAL_SAMPLES)), 0.0);
+	#else
+		return max(XYZ_TO_RGB * (accumXYZ / max(whiteXYZ, vec3(1e-4))), 0.0);
+	#endif
+}
+
+vec3 renderRay(vec3 rayOrigin, vec3 rayDirection, float ditherValue, vec3 localLight) {
+	float t;
+	vec3 n;
+	if (!hitGem(rayOrigin, rayDirection, t, n)) return vec3(0.0);
+	vec3 hitPoint = rayOrigin + rayDirection * t;
+	return dispersedRefraction(hitPoint, rayDirection, n, ditherValue, localLight);
+}
+
+#define r(a) mat2(cos(a + asin(vec4(0,1,-1,0))))
+#define G(p, s) p = floor(p * s) / s;
+#define Q(p) p *= r(round(atan(p.x, p.y) * 4.) / 4.)
+#define M(p) p = abs(p) - 0.5; p *= r(0.785); p = abs(p) - 0.2;
+float star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    // 1. Масштабируем пиксели (укрупнение в 4 раза)
+    vec2 pix = floor(fragCoord / 4.0) * 4.0 + 2.0;
+   vec4 O= fragColor;
+   vec2 C= fragCoord;
+   
+     vec2 uv = (pix - 0.5 * iResolution.xy) / iResolution.y;
+
+    vec3 worldOrigin = vec3(0.0, 0.0, -24.0);
+    vec3 worldDirection = normalize(vec3(uv, 8.0));
+
+    vec3 rayOrigin = toLocal(worldOrigin);
+    vec3 rayDirection = normalize(toLocal(worldOrigin + worldDirection) - rayOrigin);
+
+    vec3 worldLight = normalize(vec3(
+        cos(iTime * LIGHT_RATE_A),
+        sin(iTime * LIGHT_RATE_B),
+        sin(iTime * LIGHT_RATE_A) * cos(iTime * LIGHT_RATE_B)
+    ));
+    vec3 localLight = toLocal(worldLight);
+
+    float ditherValue = bayerDither(ivec2(fragCoord));
+    vec3 color = renderRay(rayOrigin, rayDirection, ditherValue, localLight);
+    color *= EXPOSURE;
+    color = pow(max(color, 0.0), vec3(1.0 / 2.2));
+    fragColor = vec4(color, 1.0);
+    
+    O=vec4(0);
+    vec3 p,q,r=iResolution,
+    d=normalize(vec3((C*2.-r.xy)/r.y,0.2));  
+    for(float i=0.,a,s,e,g=0.;
+        ++i<100.;
+        O.xyz+=mix(vec3(1),H(g*.1),.8)*3./e/8e3
+    )
+    {
+        p=g*d*color;
+       M(p.xy);
+           M(p.zy);
+        a=30.;
+        p=mod(p-a,a*2.)-a;
+        s=3.;
+        for(int i=0;i++<8;){
+            p=.3-abs(p);
+            p.x<p.z?p=p.zyx:p;
+            p.z<p.y?p=p.xzy:p;
+            s*=e=1.4+sin(iTime*.1)*.1;
+            p=abs(p)*e-
+                vec3(
+                    5.*3.,
+                    120,
+                    8.*5.
+                 );
+         }
+         g+=e=length(p.yzzz)/s;
+    }
+    
+    vec2 uv3 = ( fragCoord - .5*iResolution.xy ) / iResolution.y;
+    uv3 *= 2.0 * ( cos(iTime * 2.0) -2.5); // scale
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0;  // anim between 0.9 - 1.1 
+    fragColor *= vec4(star(uv3, anim) * vec3(0.5,0.5,0.5)*5., 1.0);
+    
+    fragColor*=O*5.;
+}

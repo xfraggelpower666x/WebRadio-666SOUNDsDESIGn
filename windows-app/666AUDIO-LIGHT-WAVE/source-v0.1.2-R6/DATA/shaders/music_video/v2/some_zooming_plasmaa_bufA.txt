@@ -1,0 +1,73 @@
+#define PI 3.14159
+
+float noise(in vec2 position) {
+    return fract(sin(dot(position.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
+}
+
+// Value Noise courtesy of Book of Shaders
+// https://thebookofshaders.com/11/
+float noise2d(vec2 uv) {
+    
+    vec2 pos = floor(uv);
+    vec2 fractional = fract(uv);
+    
+    // four corners
+    float a = noise(pos);					// bottom left
+    float b = noise(pos + vec2(1., 0.));	// bottom right
+    float c = noise(pos + vec2(1., 1.));	// top right
+    float d = noise(pos + vec2(0., 1.));	// top left
+    
+    vec2 intermix = smoothstep(0., 1., fractional);
+    
+    float value = mix(a, b, intermix.x);
+    value += (d - a) * intermix.y * (1.0 - intermix.x);
+    value += (c - b) * intermix.x * intermix.y;
+    
+    return value;
+}
+
+// Fractal noise courtesy of iq
+// https://www.shadertoy.com/view/XdXGW8
+float fractalNoise2d(vec2 uv) {
+    uv *= 3.0;
+    uv.x -= iTime / 5.0;
+    uv.y += sin(iTime / 5.0) * 2.0;
+    
+    mat2 rotate = mat2(1.6 - sin(iTime / 100.0) / 10.0, 1.2, -1.2, 1.6);
+    
+    float value = 0.5 * noise2d(uv);
+    uv *= rotate;
+    value += 0.25 * noise2d(uv);
+    uv *= rotate;
+    value += 0.125 * noise2d(uv);
+    uv *= rotate;
+    value += 0.0625 * noise2d(uv);
+    
+    return value;
+}
+
+vec2 rotate2D(vec2 _st, float _angle){
+    _st -= 0.5;
+    _st =  mat2(cos(_angle),-sin(_angle),
+                sin(_angle),cos(_angle)) * _st;
+    _st += 0.5;
+    return _st;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ){
+	vec2 uv = fragCoord.xy/iResolution.x;
+    
+    float noise = fractalNoise2d(uv);
+    uv = rotate2D(uv, noise*300.);
+    
+    uv = .5*uv;
+    float plasma = noise*(sin(uv.x)+cos(uv.y))*5.;
+    
+    vec3 col = vec3(sin((-plasma)+iTime),
+                    sin((-plasma+.4)+iTime),
+                    sin((-plasma+.5)+iTime));
+
+	fragColor = vec4(col,1.0);
+}

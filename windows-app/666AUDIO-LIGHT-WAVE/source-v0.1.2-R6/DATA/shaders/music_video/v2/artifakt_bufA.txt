@@ -1,0 +1,213 @@
+#define rotation(angle) mat2(cos(angle), -sin(angle), sin(angle), cos(angle))
+
+float PI = 3.14159256;
+float TAU = 2. * 3.14159256;
+
+float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+
+float hash3d(vec3 p) {
+    p = fract(p * vec3(123.34, 456.21, 789.12));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y * p.z);
+}
+
+// Credit: IQ
+float sdLine(vec2 p, vec2 a, vec2 b) {
+    vec2 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h);
+}
+
+// Credit: IQ
+float sdBox(vec2 p, vec2 b) {
+    vec2 d = abs(p) - b;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+// Credit: IQ
+// https://iquilezles.org/articles/intersectors/
+vec2 boxIntersection( in vec3 ro, in vec3 rd, vec3 boxSize ) 
+{
+    vec3 m = 1.0/rd;
+    vec3 n = m*ro;   
+    vec3 k = abs(m)*boxSize;
+    vec3 t1 = -n - k;
+    vec3 t2 = -n + k;
+    float tN = max( max( t1.x, t1.y ), t1.z );
+    float tF = min( min( t2.x, t2.y ), t2.z );
+    if( tN>tF || tF<0.0) return vec2(-1.0);
+    return vec2( tN, tF );
+}
+
+const vec3 GRID_DIM = vec3(6.0, 6.0, 6.0);
+const vec3 BOX_SIZE = vec3(1.0);
+
+bool isBlockSolid(vec3 cellID) {
+  float thresholdVal = 0.45;
+  return hash3d(cellID + vec3(18.1, 23.2, 52.3)) > thresholdVal;
+}
+
+float genGlyph(in vec2 p, in vec2 seed) {
+  // Random glyph attributes
+  float numArms = 2. + floor(3. * hash(seed));
+  float divisor = 1. + floor(4. * hash(seed + vec2(42.2, 942.1)));
+  float maxAng = TAU / divisor;
+  float armLength = clamp(.3 + .35 * hash(seed + vec2(12.8, 352.8)), 0., .35);
+  float boxSize = 0.1 + 0.15 * hash(seed + vec2(493.1, 72.7));
+  float rotAngle = (PI / 2.0) * floor(4.0 * hash(seed + vec2(81.1, 412.81)));
+  float numDot = 1.0 + floor(2.0 * hash(seed + vec2(53.1, 71.63)));
+  bool hasSquare = (hash(seed + vec2(824.2, 244.3)) > 0.5);
+
+  p *= rotation(rotAngle);
+
+  float angDelta = max(maxAng / max(numArms, 1.0), 0.001);
+
+  float minVal = 1E20;
+  for (float i = 0.; i <= maxAng + .001; i += angDelta) {
+    vec2 linePt1 = vec2(armLength * sin(i), armLength * cos(i));
+    minVal = min(minVal, sdLine(p, linePt1, vec2(0.)));
+  }
+
+  float circR = .75 * armLength;
+  for (float i = 0.; i <= numDot; i++) {
+    float circAng = maxAng + (i + 1.) * angDelta;
+    float circSDF = length(p - vec2(circR * sin(circAng), circR * cos(circAng)));
+    minVal = min(circSDF, minVal);
+  }
+
+  if (hasSquare) {
+    minVal = min(minVal, abs(sdBox(p, vec2(boxSize))));
+  }
+
+  return minVal;
+}
+
+vec3 renderScene(vec2 uv, float tt) {
+  vec3 col = vec3(0.);
+
+  float rotY = TAU * tt;
+  float rotX = .6 * sin(TAU * tt);
+
+  vec3 ro = vec3(0., 0., 7.0);
+  ro.yz *= rotation(rotX); 
+  ro.xz *= rotation(rotY); 
+    
+  vec3 target = vec3(0.);
+    
+  // Setup Camera Matrix
+  vec3 ww = normalize(target - ro); 
+  vec3 uu = normalize(cross(vec3(0., 1., 0.), ww)); 
+  vec3 vv = cross(ww, uu); 
+  float FOVfac = 1.8;
+  vec3 rd = normalize(uv.x * uu + uv.y * vv + FOVfac * ww);
+    
+  // Ray Box intersection 
+  vec2 boxHit = boxIntersection(ro, rd, BOX_SIZE);
+
+  // Start 3D DDA
+  if (boxHit.x > 0.) {
+    float tCurrent = max(boxHit.x + 0.0001, 0.0001);
+    vec3 pEntry = ro + tCurrent * rd;
+    vec3 gridP = (pEntry + BOX_SIZE) * 0.5 * GRID_DIM;
+    vec3 cellID = clamp(floor(gridP), vec3(0.), GRID_DIM - vec3(1.0));        
+    vec3 rayStep = sign(rd);
+    vec3 deltaT = abs(1.0 / (rd * 0.5 * GRID_DIM));       
+    vec3 cellBoundary = cellID + max(rayStep, 0.);
+    vec3 sideT = (cellBoundary - gridP) / (rd * 0.5 * GRID_DIM);
+
+    // Initial boundary normal check
+    vec3 absP = abs(pEntry);
+    float maxP = max(absP.x, max(absP.y, absP.z));
+    vec3 hitNormal = -sign(rd) * step(vec3(maxP), absP);
+
+    bool hit = false;
+    float totalT = tCurrent;
+    for (int i = 0; i < 18; i++) {
+      if (isBlockSolid(cellID)) {
+        hit = true;
+        break;
+      }
+
+      if (sideT.x < sideT.y) {
+        if (sideT.x < sideT.z) {
+          totalT = tCurrent + sideT.x;
+          sideT.x += deltaT.x;
+          cellID.x += rayStep.x;
+          hitNormal = vec3(-rayStep.x, 0., 0.);
+        } else {
+          totalT = tCurrent + sideT.z;
+          sideT.z += deltaT.z;
+          cellID.z += rayStep.z;
+          hitNormal = vec3(0., 0., -rayStep.z);
+        }
+      } else {
+        if (sideT.y < sideT.z) {
+          totalT = tCurrent + sideT.y;
+          sideT.y += deltaT.y;
+          cellID.y += rayStep.y;
+          hitNormal = vec3(0., -rayStep.y, 0.);
+        } else {
+          totalT = tCurrent + sideT.z;
+          sideT.z += deltaT.z;
+          cellID.z += rayStep.z;
+          hitNormal = vec3(0., 0., -rayStep.z);
+        }
+      }
+
+      if (any(lessThan(cellID, vec3(0.0))) || any(greaterThanEqual(cellID, GRID_DIM)))
+        break;    
+    }
+
+    if (hit) {
+      vec3 pHit = ro + totalT * rd;
+      vec3 cellSize = (BOX_SIZE * 2.) / GRID_DIM;
+      vec3 cellCenter = -BOX_SIZE + (cellID + .5) * cellSize;
+      vec3 localPos = (pHit - cellCenter) / (.5 * cellSize);
+
+      vec2 side = (abs(hitNormal.x) > .5) ? localPos.yz :
+                  (abs(hitNormal.y) > .5) ? localPos.xz : localPos.xy;
+
+      // Check interior facing status
+      vec3 nCell = cellID + hitNormal;
+      bool nInGrid = all(greaterThanEqual(nCell, vec3(0.))) && all(lessThan(nCell, GRID_DIM));
+      bool isInwardFacing = nInGrid && !isBlockSolid(nCell);
+
+      // Stroke width & box frame
+      float strokeWidth = .03 + .008 * totalT;
+      float frameSDF = abs(sdBox(side, vec2(.88))) - .02;
+      float frameLine = smoothstep(strokeWidth, .0, abs(frameSDF));
+      vec3 frameColor = vec3(1.) * frameLine * 1.2;
+
+      if (isInwardFacing) {
+        vec2 faceSeed = vec2(dot(cellID, vec3(1.12, 19.41, 71.5)), dot(hitNormal, vec3(13., 2., 16.)));
+        float dSign = abs(genGlyph(side * .55, faceSeed));
+        float glyphLine = smoothstep(strokeWidth, 0., dSign);
+        vec3 glyphCol = vec3(glyphLine * (1.8 + 1.5 * sin(6. * TAU * (tt + hash3d(cellID)))));
+        col = glyphCol + frameColor;
+      } else {
+        col = frameColor;
+      }
+    }
+  }
+  return col;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+  vec3 accum = vec3(0.);
+  float tt = fract(0.1 * iTime);
+    
+  #define AA 2.0
+  for (int m = 0; m < int(AA); m++) {
+    for (int n = 0; n < int(AA); n++) {
+      vec2 offset = vec2(float(m), float(n)) / AA - .5;
+      vec2 uv = ((fragCoord + offset) - .5 * iResolution.xy) / iResolution.y;
+      accum += renderScene(uv, tt);
+    }
+  }
+  accum /= (AA * AA);
+  fragColor = vec4(accum, 1.);
+}

@@ -1,0 +1,11 @@
+void mainImage( out vec4 O, vec2 I)
+{
+    float i=0.,z=0.,f=0.,t=iTime;
+    vec3 p=vec3(0);
+    for(O*=i;i++<3e1;
+        z+=f=.003+abs(length(p.xy)-5.+dot(cos(p),sin(p).yzx))/8.,
+        O+=(0.8+sin(i*.3+z+t+vec4(6.+(iMusicSync0*2.),1.+(iMusicSync0*2.),2.+(iMusicSync0*2.),0.)))/f)
+        for(p=z*normalize(vec3(I+I,0)-iResolution.xyy),p.z-=t,f=1.;f++<6.;
+            p+=sin(round(p.yxz*6.0)/3.*f)/f);
+    O=tanh(O/1e3);
+}

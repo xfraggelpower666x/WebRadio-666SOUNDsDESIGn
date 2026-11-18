@@ -1,0 +1,87 @@
+// strict ribbons variant of https://shadertoy.com/view/fdXSz2
+// video-controled line width variant of https://shadertoy.com/view/NdXXRj
+// interpolated variant of https://shadertoy.com/view/sdsXzB
+
+#define hash(p )     ( 2.* fract(sin((p)*mat2(127.1,311.7, 269.5,183.3)) *43758.5453123) - 1. ) \
+                    *  mat2(cos(iTime+vec4(0,11,33,0)))
+//#define draw(v,d,w)  clamp(1. - abs( fract(v-.5) - .5 ) / (d)/(w), 0.,1.)             // method 1: loose
+  #define draw(v,d,w)  clamp(1. - ( abs( fract(v-.5) - .5 ) -.1*(w-1.) ) / (d), 0.,1.)  // method 2: strict
+#define hue(v)       ( .6 + .6 * cos( 6.3*(v)  + vec4(0,23,21,0)  ) )
+#define Mix(c0,c1,v)     mix(c0,c1,v)
+//#define Mix(c0,c1,v)   vec4(c0,c1,0,0) // debug 
+
+// Automatically toggle between perlin and standard noise over time instead of using keyboard
+#define func( P )  ( mod(iTime,4.) > 2. ? perlin( .5*(P) ) : noise( P ) )
+#define grad(x,y)      dot( hash( i+vec2(x,y) ), f-vec2(x,y) )
+
+float noise( vec2 p )
+{
+    vec2 i = floor(p), f = fract(p), // u = f*f*(3.-2.*f);              // = smoothstep
+                                        u = f*f*f*( 10. +f*(6.*f-15.)); // better with derivatives
+    return mix( mix( grad(0,0), grad(1,0), u.x),
+                mix( grad(0,1), grad(1,1), u.x), u.y);
+}
+
+float perlin( vec2 U ) { // inspired from https://www.shadertoy.com/view/XdXGW8
+    float v = 0., s = .5;
+    mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+    for( int i=0; i<3; i++, s/=2., U*=m )
+        v  += s * noise( U ); 
+    return v;
+}
+
+void mainImage( out vec4 O, vec2 u )
+{
+
+    vec2 uv_core = u / iResolution.xy;
+    //uv_core.y = 1.0 - uv_core.y;
+    vec4 coreColor = texture(iChannel0, uv_core);
+
+    vec2 R = iResolution.xy, eps = vec2(1e-3,0),
+         U = u / R.y,
+         P = 4.*u/360. - vec2(0.,.5*iTime);	
+    O-=O;
+	float l, dl, f = func(P), df, v,a;
+#if 0
+    l = exp2(floor(log2(2.*fwidth(P.x)/fwidth(f))));               // subvid amount (relative)
+    dl =     fract(log2(2.*fwidth(P.x)/fwidth(f)));      
+#else
+    l = exp2(floor(log2(.5/22./fwidth(f))));                       // subvid amount (absolute)
+    dl =     fract(log2(.5/22./fwidth(f)));
+#endif
+
+ // f *= U.x;                                                      // draw isolines 
+    df = fwidth(f);
+ // df = length( vec2( ( func(P + eps.xy), func(P + eps.yx) ) -f ) / eps.x )*fwidth(P.x);
+    vec4 T = texture(iChannel0, u/R );
+    l *= 12.;
+# if 1
+    v = 4.*T.x*T.x+.1;
+#    if 0
+     O += Mix( draw(    f*l,    l*df , v ),
+               draw( 2.*f*l, 2.*l*df , v ),
+               dl );
+#    else                                          // AA: replace too thin ribbons by intensity
+     O += Mix( draw(    f*l,    l*df , max(v,1.) ),
+               draw( 2.*f*l, 2.*l*df , max(v,1.) ),
+               dl ) * min(v,1.);
+#    endif
+
+ // O *= T/T.x;                                                    // color variant
+ // O = mix( O, T, smoothstep(.2,.3,length(T-vec4(.14,.5,.1,1)) ));// isolines behind Britney
+ // O = mix( O, T, smoothstep(.2,.4,T.x) );                        // frightening version :-p      
+
+# else                                                             // color on different layers
+#   define Draw(c,ofs)                                    \
+      v = 3.*T.c;                                         \
+      O.c = mix( draw(    f*l-ofs,    l*df, max(v,1.) ),  \
+                 draw( 2.*f*l-ofs, 2.*l*df, max(v,1.) ),  \
+                 dl ) * min(v,1.)
+    float ofs = .33;   // 0. : too subtle to see.
+    Draw(r, 0.);
+    Draw(g, ofs);
+    Draw(b, -ofs);
+# endif
+    
+    O = coreColor + sqrt(O);                                                  // to sRGB
+}

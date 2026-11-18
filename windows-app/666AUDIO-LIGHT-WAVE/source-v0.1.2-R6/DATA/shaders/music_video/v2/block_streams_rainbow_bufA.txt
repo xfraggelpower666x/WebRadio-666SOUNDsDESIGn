@@ -1,0 +1,59 @@
+// Cole Peterson (Rainbow Edit)
+
+#define R iResolution.xy
+#define rot(a) mat2(cos(a), -sin(a), sin(a), cos(a))
+
+float hsh(vec2 p){
+	vec3 p3  = fract(vec3(p.xyx) * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+// Kept untouched to preserve the exact shapes and blur thresholds
+vec3 color(vec2 uv){
+    float m = exp((sin(uv.y*3. - iTime)))+0.8;
+    uv.x *= m * 2.2;
+    uv.x += iTime;
+    
+	vec2 fuv = fract(uv*7.);
+    uv.y += .9*iTime*sin(floor(uv*7.).x*0.4)+0.7;
+    vec2 id = floor(uv*7.);
+   
+    return vec3(smoothstep(.7, .27,fuv.x-0.5)*mod(id.y+id.x,2.0)*(hsh(id*999.)-.2));
+}
+
+// 1. Added a standard cosine-based rainbow palette generator
+vec3 getRainbow(float t) {
+    // Cycles through RGB spectrum smoothly based on an input value 't'
+    return 0.5 + 0.5 * cos(6.28318 * (t + vec3(0.0, 0.33, 0.67)));
+}
+
+void mainImage( out vec4 f, in vec2 u ){
+    vec2 uv = vec2(u.xy - 0.5*R.xy)/R.y;
+    uv*=rot(1.6);
+    
+    vec3 col = color(uv);
+    
+    // 2. Colorize the base black & white streams
+    // We use the screen coordinates and time to shift the rainbow hue diagonally over time
+    col *= getRainbow(uv.x + uv.y - iTime * 0.4) * 1.5;
+    
+	vec3 acc = vec3(0);
+    float m = 0., c = 0.;
+    
+    for(float i = 1.0; i >0.0; i-=0.02){
+        vec2 nc = uv*(i+hsh(u)*0.15);
+        m = step(1.1, length(color(nc)));
+        
+        // 3. Colorize the radial zoom blur trails
+        // Shift the color based on 'nc' (blur position) and 'i' (depth level)
+        vec3 trailColor = getRainbow(nc.x + nc.y - iTime * 0.4 + i * 0.2);
+        
+        // Replaced the hardcoded yellowish tint vec3(0.97, 0.94, 0.9) with trailColor
+        acc += vec3(m) * trailColor;
+        c++;
+    }
+    acc /= c;
+    col += acc*1.3;
+    f = vec4(col * .55, 1.0);
+}

@@ -1,0 +1,49 @@
+
+float sRGBencode(float C_linear) { return C_linear > 0.0031308 ? (1.055 * pow(C_linear, 1./2.4) - 0.055) : (12.92 * C_linear); }
+vec3 sRGBencode(vec3 C_linear) { C_linear = clamp(C_linear, 0., 1.); return vec3(sRGBencode(C_linear.x), sRGBencode(C_linear.y), sRGBencode(C_linear.z)); }
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (2. * fragCoord - iResolution.xy)/iResolution.y;
+    vec3 color = vec3(0);
+    float focal = 2.;
+    vec3 ro = vec3(0,0,5.);
+    vec2 uv2 = uv;
+    uv *= 1.+1./(dot(uv, uv)+1.);
+    vec3 rd = normalize(vec3(uv, -focal));
+    float t = 0.;
+    
+    float angle = 1. + iTime*.1;
+    float c = cos(angle), s = sin(angle);
+    mat2 R = mat2(c,s,-s,c);
+    float A = atan(uv.y, uv.x);
+    float T = 0.;
+    for(float i = 0.;  i < 99.; i++)
+    {
+        vec3 p = rd * t + ro;
+        vec3 q = p;
+        float lq = length(q);
+        p /= lq*lq * .05;
+        
+        float sdf = lq - 4.;
+        sdf = max(sdf, q.z-3.);
+        T = iTime + sdf*4.;
+        for(float j = 1.5; j < 1.5*exp2(4.); j+=j)
+        {
+            float gyroid = dot((sin(p*j)), (cos(j*p.yzx + T/j)))/j;
+            sdf = max(abs(gyroid), sdf);
+            p.xy *= R;
+            p.zx *= R;
+        }
+        vec3 cmap = 0.5 + 0.5*cos(A + lq*3.7 + p.z + sdf*2.1+vec3(.5,1.5,2) + T);
+        float dt = abs(sdf) * .2 + 1e-3;
+        float kernel = .02/(sdf * sdf + 0.05*dt);
+        color += kernel * cmap * dt;
+        t += dt;
+    }
+    
+    color *= dot(uv2,uv2)*.9+.1;
+    color *= 1.05-dot(uv2,uv2)*.125;
+    color = 1.-exp(-color*color);
+    color = sRGBencode(color);
+    fragColor = vec4(color, 1);
+}

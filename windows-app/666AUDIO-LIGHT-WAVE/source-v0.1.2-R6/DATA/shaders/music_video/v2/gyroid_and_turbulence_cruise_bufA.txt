@@ -1,0 +1,23 @@
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3(  3e2 - sin( T*c*4. ) * 12.,        \
+                    sin( T*c*3.) * 6.,  \
+                    T*2e2+Z+7e1+3e1*cos(T*.5) )  ) - c )
+void mainImage(out vec4 o, vec2 u) {
+    float s,i,d,e, T = iTime;
+    vec3  p = iResolution;
+    u = ( u - p.xy/2. ) / p.y
+       + vec2(sin(T*.2)*.3,
+              sin(T*.5)*.1);
+    for(o*=i; i++ < 128.; o +=(1.+cos(.03*p.y+vec4(2,1,0,0)))/s + 2e3*vec4(1,2,3,0)/e ) {
+        p = vec3( u*d, d+T*2e2 ),
+        p.z = p.z+cos(p.z*.7),
+        p.x += 3e2 - cos(T)*1e1,
+        e = max(.01,
+            min( O(2., .6),
+            min( O(13., .7),
+                 O(26., .8) ))),
+        p += cos(p.yzx/16.)*16.,
+        d += s =  .005+.8*abs(min(max(e, 1.), 32.*dot(sin(p/164.), cos(p.yzx/64.))));
+    } 
+    o = tanh(o*o/3e7);
+}

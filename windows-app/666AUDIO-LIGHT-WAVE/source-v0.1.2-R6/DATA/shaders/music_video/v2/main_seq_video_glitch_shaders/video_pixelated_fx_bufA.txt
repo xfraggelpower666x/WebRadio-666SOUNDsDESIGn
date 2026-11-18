@@ -1,0 +1,36 @@
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{ 
+    // 1. Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord / iResolution.xy;
+    uv.y = 1.0 - uv.y;
+
+    // 2. Pixelation scale (from 1 to 201)
+    float count = floor((sin(iTime) + 1.) * 100. + 1.);
+
+    // 3. Snap the UVs to the grid
+    // - Multiply by count to scale up (e.g., 0 to 50)
+    // - floor() to snap to whole numbers (creating the blocks)
+    // - Divide by count to scale back down to 0.0 - 1.0 space
+    // - Add (0.5 / count) to sample the exact center of each block
+    vec2 pixelatedUV = floor(uv * count) / count + (0.5 / count);
+
+    // 4. Sample the texture using the blocky UVs
+    fragColor = texture(iChannel0, pixelatedUV);
+}
+
+/*
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{ 
+    // from 1 to 201
+    float count = floor((sin(iTime) + 1.) * 100. + 1.);
+
+    vec2 tileSize = iResolution.xy / count;
+    fragColor = texture(iChannel0, (floor(fragCoord / tileSize) * tileSize + tileSize / 2.) / iResolution.xy);
+}*/

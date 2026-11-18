@@ -1,0 +1,46 @@
+void mainImage(out vec4 fragColor, in vec2 fragCoord)
+{
+    vec4 o = vec4(0.0);
+    vec3 p = vec3(0.0);
+
+    float z = 0.0;
+    float d = 0.0;
+
+    vec2 r = iResolution.xy;
+
+    for (int i = 0; i < 70; i++)
+    {
+        p = z * normalize(vec3(fragCoord, 0.0) * 2.0 - r.xyy);
+        p.z -= iTime / 0.1;
+
+        vec2 w = p.xy;
+        w += 0.7 * sin(w.yx * 1.3 + p.z * 0.22);
+        w += 0.3 * cos(w.yx * 4.1 - p.z * 0.09);
+
+        float angle = atan(w.y, w.x);
+        float angularTerm = sin(angle * 3.0 + sin(angle * 6.0 + p.z * 0.2) * 1.5);
+
+        float ringA = length(w + vec2(1.2, 0.0)) - 3.6;
+        float ringB = length(w - vec2(1.2, 0.0)) - 3.6;
+        float ringBlend = min(ringA, ringB);
+
+        float ripple = 0.15 * sin(length(w) * 2.5 - p.z * 0.25);
+        float radialTerm = ringBlend + ripple;
+
+        d = 0.01 + 0.44 * length(vec2(angularTerm, radialTerm));
+
+        z += d*1.5;
+
+        vec3 palette = 0.55 + 0.45 * cos(
+            vec3(0.0, 2.0, 4.0)
+            + z * 0.6
+            + sin(p.z * 0.1) * 1.2
+            + length(w) * 0.9
+        );
+
+        o.rgb += 0.12 * palette / d / z;
+        o.a=1.0;// += 0.42 / d / z;
+    }
+
+    fragColor = tanh(o*1.0);
+}

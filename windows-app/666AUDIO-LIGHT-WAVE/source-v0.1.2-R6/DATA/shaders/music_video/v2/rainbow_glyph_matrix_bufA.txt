@@ -1,0 +1,509 @@
+float dot2(vec2 v) {
+    return dot(v, v);
+}
+
+float sdSegment(vec2 p, vec2 a, vec2 b)
+{
+    vec2 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h);
+}
+
+float sdBezier(vec2 pos, vec2 A, vec2 B, vec2 C)
+{
+    vec2 a = B - A;
+    vec2 b = A - 2.0 * B + C;
+    vec2 c = a * 2.0;
+    vec2 d = A - pos;
+    float kk = 1.0 / dot(b, b);
+    float kx = kk * dot(a, b);
+    float ky = kk * (2.0 * dot(a, a) + dot(d, b)) / 3.0;
+    float kz = kk * dot(d, a);
+    float res = 0.0;
+    float p = ky - kx * kx;
+    float p3 = p * p * p;
+    float q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
+    float h = q * q + 4.0 * p3;
+    if (h >= 0.0)
+    {
+        h = sqrt(h);
+        vec2 x = (vec2(h, -h) - q) / 2.0;
+        vec2 uv = sign(x) * pow(abs(x), vec2(1.0 / 3.0));
+        float t = clamp(uv.x + uv.y - kx, 0.0, 1.0);
+        res = dot2(d + (c + b * t) * t);
+    }
+    else
+    {
+        float z = sqrt(-p);
+        float v = acos(q / (p * z * 2.0)) / 3.0;
+        float m = cos(v);
+        float n = sin(v) * 1.732050808;
+        vec3 t = clamp(vec3(m + m, -n - m, n - m) * z - kx, 0.0, 1.0);
+        res = min(dot2(d + (c + b * t.x) * t.x),
+                dot2(d + (c + b * t.y) * t.y));
+        // the third root cannot be the closest
+        // res = min(res,dot2(d+(c+b*t.z)*t.z));
+    }
+    return sqrt(res);
+}
+
+// a — 5 primitives
+float sdf_sga_a(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.76190476, 0.98095238), vec2(-0.45714286, 0.98095238)));
+    d = min(d, sdBezier(p, vec2(-0.45714286, 0.98095238), vec2(-0.19047619, 1.00000000), vec2(-0.15238095, 0.67619048)));
+    d = min(d, sdSegment(p, vec2(-0.15238095, 0.67619048), vec2(-0.15238095, -0.54285714)));
+    d = min(d, sdBezier(p, vec2(-0.15238095, -0.54285714), vec2(-0.09523810, -1.00000000), vec2(0.30476190, -1.00000000)));
+    d = min(d, sdBezier(p, vec2(0.30476190, -1.00000000), vec2(0.70476190, -1.00000000), vec2(0.76190476, -0.54285714)));
+    return d;
+}
+
+// b — 5 primitives
+float sdf_sga_b(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.74285714, 0.91428571), vec2(0.17142857, 0.91428571)));
+    d = min(d, sdBezier(p, vec2(0.17142857, 0.91428571), vec2(0.74285714, 0.80000000), vec2(0.40000000, 0.45714286)));
+    d = min(d, sdSegment(p, vec2(0.40000000, 0.45714286), vec2(-0.05714286, 0.00000000)));
+    d = min(d, sdBezier(p, vec2(-0.05714286, 0.00000000), vec2(-0.15238095, -0.09523810), vec2(-0.13333333, -0.30476190)));
+    d = min(d, sdSegment(p, vec2(-0.13333333, -0.30476190), vec2(-0.13333333, -0.91428571)));
+    return d;
+}
+
+// c — 5 primitives
+float sdf_sga_c(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.30476190, -0.30476190), vec2(-0.30476190, -0.15238095)));
+    d = min(d, sdBezier(p, vec2(-0.30476190, -0.15238095), vec2(-0.26666667, 0.03809524), vec2(0.00000000, 0.00000000)));
+    d = min(d, sdBezier(p, vec2(0.00000000, 0.00000000), vec2(0.26666667, -0.03809524), vec2(0.30476190, 0.15238095)));
+    d = min(d, sdSegment(p, vec2(0.30476190, 0.15238095), vec2(0.30476190, 0.91428571)));
+    d = min(d, length(p - vec2(-0.30476190, -0.91428571)));
+    return d;
+}
+
+// d — 2 primitives
+float sdf_sga_d(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.76190476, -0.51428571), vec2(0.76190476, -0.51428571)));
+    d = min(d, sdSegment(p, vec2(-0.76190476, 0.09523810), vec2(0.72380952, 0.51428571)));
+    return d;
+}
+
+// e — 4 primitives
+float sdf_sga_e(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.60000000, -0.92380952), vec2(-0.60000000, 0.60000000)));
+    d = min(d, sdBezier(p, vec2(-0.60000000, 0.60000000), vec2(-0.61904762, 0.92380952), vec2(-0.29523810, 0.90476190)));
+    d = min(d, sdSegment(p, vec2(-0.29523810, 0.90476190), vec2(0.61904762, 0.90476190)));
+    d = min(d, length(p - vec2(0.54285714, -0.80952381)));
+    return d;
+}
+
+// f — 4 primitives
+float sdf_sga_f(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.76190476, -0.30476190), vec2(0.76190476, -0.30476190)));
+    d = min(d, length(p - vec2(-0.76190476, 0.30476190)));
+    d = min(d, length(p - vec2(0.00000000, 0.30476190)));
+    d = min(d, length(p - vec2(0.76190476, 0.30476190)));
+    return d;
+}
+
+// g — 2 primitives
+float sdf_sga_g(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(0.38095238, -0.91428571), vec2(0.38095238, 0.91428571)));
+    d = min(d, sdSegment(p, vec2(-0.38095238, 0.00000000), vec2(0.38095238, 0.00000000)));
+    return d;
+}
+
+// h — 4 primitives
+float sdf_sga_h(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.76190476, -0.91428571), vec2(0.76190476, -0.91428571)));
+    d = min(d, sdSegment(p, vec2(-0.76190476, -0.30476190), vec2(0.76190476, -0.30476190)));
+    d = min(d, sdSegment(p, vec2(0.76190476, -0.30476190), vec2(-0.76190476, -0.30476190)));
+    d = min(d, sdSegment(p, vec2(0.00000000, -0.30476190), vec2(0.00000000, 0.91428571)));
+    return d;
+}
+
+// i — 2 primitives
+float sdf_sga_i(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(0.00000000, -0.91428571), vec2(0.00000000, -0.30476190)));
+    d = min(d, sdSegment(p, vec2(0.00000000, 0.30476190), vec2(0.00000000, 0.91428571)));
+    return d;
+}
+
+// j — 3 primitives
+float sdf_sga_j(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(0.00000000, -0.91428571), vec2(0.00000000, -0.68571429)));
+    d = min(d, sdSegment(p, vec2(0.00000000, -0.15238095), vec2(0.00000000, 0.15238095)));
+    d = min(d, sdSegment(p, vec2(0.00000000, 0.68571429), vec2(0.00000000, 0.91428571)));
+    return d;
+}
+
+// k — 3 primitives
+float sdf_sga_k(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(0.00000000, -0.91428571), vec2(0.00000000, 0.91428571)));
+    d = min(d, length(p - vec2(-0.76190476, 0.00000000)));
+    d = min(d, length(p - vec2(0.76190476, 0.00000000)));
+    return d;
+}
+
+// l — 3 primitives
+float sdf_sga_l(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.38095238, -0.91428571), vec2(-0.38095238, 0.91428571)));
+    d = min(d, length(p - vec2(0.38095238, -0.38095238)));
+    d = min(d, length(p - vec2(0.38095238, 0.38095238)));
+    return d;
+}
+
+// m — 4 primitives
+float sdf_sga_m(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.60952381, 0.91428571), vec2(0.30476190, 0.91428571)));
+    d = min(d, sdBezier(p, vec2(0.30476190, 0.91428571), vec2(0.57142857, 0.91428571), vec2(0.60952381, 0.68571429)));
+    d = min(d, sdSegment(p, vec2(0.60952381, 0.68571429), vec2(0.60952381, -0.91428571)));
+    d = min(d, length(p - vec2(-0.53333333, -0.80000000)));
+    return d;
+}
+
+// n — 3 primitives
+float sdf_sga_n(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.53333333, -0.95238095), vec2(-0.53333333, -0.34285714)));
+    d = min(d, sdBezier(p, vec2(-0.53333333, 0.87619048), vec2(-0.34285714, 0.95238095), vec2(0.07619048, 0.57142857)));
+    d = min(d, sdBezier(p, vec2(0.07619048, 0.57142857), vec2(0.47619048, 0.20952381), vec2(0.53333333, -0.95238095)));
+    return d;
+}
+
+// o — 4 primitives
+float sdf_sga_o(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.53333333, -0.91428571), vec2(0.30476190, -0.91428571)));
+    d = min(d, sdBezier(p, vec2(0.30476190, -0.91428571), vec2(0.53333333, -0.85714286), vec2(0.53333333, -0.68571429)));
+    d = min(d, sdBezier(p, vec2(0.53333333, -0.68571429), vec2(0.51428571, 0.09523810), vec2(0.15238095, 0.53333333)));
+    d = min(d, sdBezier(p, vec2(0.15238095, 0.53333333), vec2(-0.13333333, 0.89523810), vec2(-0.53333333, 0.91428571)));
+    return d;
+}
+
+// p — 4 primitives
+float sdf_sga_p(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.38095238, -0.91428571), vec2(-0.38095238, 0.30476190)));
+    d = min(d, sdSegment(p, vec2(0.38095238, -0.30476190), vec2(0.38095238, 0.91428571)));
+    d = min(d, length(p - vec2(0.38095238, -0.91428571)));
+    d = min(d, length(p - vec2(-0.38095238, 0.91428571)));
+    return d;
+}
+
+// q — 6 primitives
+float sdf_sga_q(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.60952381, -0.30476190), vec2(0.30476190, -0.30476190)));
+    d = min(d, sdBezier(p, vec2(0.30476190, -0.30476190), vec2(0.57142857, -0.30476190), vec2(0.60952381, -0.07619048)));
+    d = min(d, sdSegment(p, vec2(0.60952381, -0.07619048), vec2(0.60952381, 0.68571429)));
+    d = min(d, sdBezier(p, vec2(0.60952381, 0.68571429), vec2(0.57142857, 0.91428571), vec2(0.30476190, 0.91428571)));
+    d = min(d, sdSegment(p, vec2(0.30476190, 0.91428571), vec2(-0.60952381, 0.91428571)));
+    d = min(d, length(p - vec2(0.00000000, -0.91428571)));
+    return d;
+}
+
+// r — 4 primitives
+float sdf_sga_r(vec2 p) {
+    float d = 1e9;
+    d = min(d, length(p - vec2(-0.45714286, -0.45714286)));
+    d = min(d, length(p - vec2(0.45714286, 0.45714286)));
+    d = min(d, length(p - vec2(-0.45714286, 0.45714286)));
+    d = min(d, length(p - vec2(0.45714286, -0.45714286)));
+    return d;
+}
+
+// s — 5 primitives
+float sdf_sga_s(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.30476190, -0.91428571), vec2(-0.30476190, -0.22857143)));
+    d = min(d, sdBezier(p, vec2(-0.30476190, -0.22857143), vec2(-0.30476190, 0.00000000), vec2(-0.07619048, 0.00000000)));
+    d = min(d, sdSegment(p, vec2(-0.07619048, 0.00000000), vec2(0.07619048, 0.00000000)));
+    d = min(d, sdBezier(p, vec2(0.07619048, 0.00000000), vec2(0.30476190, 0.00000000), vec2(0.30476190, 0.22857143)));
+    d = min(d, sdSegment(p, vec2(0.30476190, 0.22857143), vec2(0.30476190, 0.91428571)));
+    return d;
+}
+
+// t — 4 primitives
+float sdf_sga_t(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.45714286, -0.91428571), vec2(0.15238095, -0.91428571)));
+    d = min(d, sdBezier(p, vec2(0.15238095, -0.91428571), vec2(0.41904762, -0.87619048), vec2(0.45714286, -0.60952381)));
+    d = min(d, sdSegment(p, vec2(0.45714286, -0.60952381), vec2(0.45714286, 0.30476190)));
+    d = min(d, length(p - vec2(0.45714286, 0.91428571)));
+    return d;
+}
+
+// u — 3 primitives
+float sdf_sga_u(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.91428571, 0.30476190), vec2(0.91428571, 0.30476190)));
+    d = min(d, length(p - vec2(-0.41904762, -0.30476190)));
+    d = min(d, length(p - vec2(0.41904762, -0.30476190)));
+    return d;
+}
+
+// v — 3 primitives
+float sdf_sga_v(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.76190476, 0.30476190), vec2(0.76190476, 0.30476190)));
+    d = min(d, sdSegment(p, vec2(0.00000000, -0.91428571), vec2(0.00000000, 0.30476190)));
+    d = min(d, sdSegment(p, vec2(-0.76190476, 0.91428571), vec2(0.76190476, 0.91428571)));
+    return d;
+}
+
+// w — 3 primitives
+float sdf_sga_w(vec2 p) {
+    float d = 1e9;
+    d = min(d, length(p - vec2(0.00000000, -0.45714286)));
+    d = min(d, length(p - vec2(-0.45714286, 0.45714286)));
+    d = min(d, length(p - vec2(0.45714286, 0.45714286)));
+    return d;
+}
+
+// x — 2 primitives
+float sdf_sga_x(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.45714286, 0.91428571), vec2(0.45714286, -0.91428571)));
+    d = min(d, length(p - vec2(-0.45714286, -0.80000000)));
+    return d;
+}
+
+// y — 2 primitives
+float sdf_sga_y(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.38095238, -0.91428571), vec2(-0.38095238, 0.91428571)));
+    d = min(d, sdSegment(p, vec2(0.38095238, -0.91428571), vec2(0.38095238, 0.91428571)));
+    return d;
+}
+
+// z — 5 primitives
+float sdf_sga_z(vec2 p) {
+    float d = 1e9;
+    d = min(d, sdSegment(p, vec2(-0.53333333, 0.91428571), vec2(-0.53333333, -0.60952381)));
+    d = min(d, sdBezier(p, vec2(-0.53333333, -0.60952381), vec2(-0.53333333, -0.87619048), vec2(-0.30476190, -0.91428571)));
+    d = min(d, sdSegment(p, vec2(-0.30476190, -0.91428571), vec2(0.30476190, -0.91428571)));
+    d = min(d, sdBezier(p, vec2(0.30476190, -0.91428571), vec2(0.53333333, -0.87619048), vec2(0.53333333, -0.60952381)));
+    d = min(d, sdSegment(p, vec2(0.53333333, -0.60952381), vec2(0.53333333, 0.91428571)));
+    return d;
+}
+
+float sdf_sga(int idx, vec2 p) {
+    switch (idx) {
+        case  0: return sdf_sga_a(p);
+        case  1: return sdf_sga_b(p);
+        case  2: return sdf_sga_c(p);
+        case  3: return sdf_sga_d(p);
+        case  4: return sdf_sga_e(p);
+        case  5: return sdf_sga_f(p);
+        case  6: return sdf_sga_g(p);
+        case  7: return sdf_sga_h(p);
+        case  8: return sdf_sga_i(p);
+        case  9: return sdf_sga_j(p);
+        case 10: return sdf_sga_k(p);
+        case 11: return sdf_sga_l(p);
+        case 12: return sdf_sga_m(p);
+        case 13: return sdf_sga_n(p);
+        case 14: return sdf_sga_o(p);
+        case 15: return sdf_sga_p(p);
+        case 16: return sdf_sga_q(p);
+        case 17: return sdf_sga_r(p);
+        case 18: return sdf_sga_s(p);
+        case 19: return sdf_sga_t(p);
+        case 20: return sdf_sga_u(p);
+        case 21: return sdf_sga_v(p);
+        case 22: return sdf_sga_w(p);
+        case 23: return sdf_sga_x(p);
+        case 24: return sdf_sga_y(p);
+        case 25: return sdf_sga_z(p);
+        default: return 1e9;
+    }
+}
+
+// Простая функция псевдослучайных чисел для создания хаоса между столбцами
+float hash(int x) {
+    return fract(sin(float(x) * 12.9898) * 43758.5453123);
+}
+
+#define iterations 13
+#define formuparam 0.53
+
+#define volsteps 20
+#define stepsize 0.1
+
+#define zoom   0.800
+#define tile   0.850
+
+
+#define brightness 0.0015
+#define darkmatter 0.300
+#define distfading 0.730
+#define saturation 0.850
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Финальный цвет, куда будут суммироваться все слои
+    vec3 finalColor = vec3(0.0);
+    vec2 u = fragCoord;
+    vec4 o = fragColor;
+    vec2 v_scr = iResolution.xy;
+    u = .2 * (u + u - v_scr) / v_scr.y; 
+     vec2 uv3 = fragCoord/iResolution.xy;
+      vec4 tex = texture (iChannel0, uv3);   
+    vec4 z = o = vec4(1, 2, 3, 0);
+     
+    for (float a = .5, t = iTime*0.1, i = 0.0; 
+         ++i < 19.; 
+         o += (1. + cos(z + t)) 
+            / length((1. + i * dot(v_scr, v_scr)) 
+                   * sin(1.5 * u / (.5 - dot(u, u)) - 9. * u.yx + t))
+         )  
+        v_scr = cos(++t - 7. * u * pow(a += .03, i)) - 1. * u, 
+        u += tanh(100. * dot(u *= mat2(cos(i + 1.02 * t - z.wxzw * 11.))
+                           , u)
+                      * cos(1e2 * u.yx + t)) / 2e2
+           + .2 * a * u
+           + cos(4. / exp(dot(o, o) / 1e2) + t) / 3e2;
+              
+    o = 25.6 / (min(o, 13.) + 164. / o) 
+       - dot(u, u) / 250.;
+       
+    // --- НАСТРОЙКИ БЕСКОНЕЧНОГО ЗУМА ---
+    const int LAYERS = 20;                 
+    float zoomSpeed = 0.053;                
+    
+    float zoomProgress = fract(iTime * zoomSpeed); 
+    int cycleId = int(floor(iTime * zoomSpeed));   
+
+    for (int l = 0; l < LAYERS; l++) {
+        float layerIdx = float(l);
+        
+        float layerProgress = fract(zoomProgress + layerIdx / float(LAYERS));
+        float currentScale = pow(2.0, layerProgress * 5.0 - 2.0);
+        float layerFade = smoothstep(0.0, 0.2, layerProgress) * smoothstep(1.0, 0.8, layerProgress);
+        int waveId = cycleId + int(floor(zoomProgress + layerIdx / float(LAYERS)));
+
+        vec2 parallaxOffset = vec2(sin(iTime * 0.04), cos(iTime * 0.02)) * (layerProgress * 0.2);
+        vec2 currentFragCoord = fragCoord + parallaxOffset * iResolution.y;
+
+        // --- ОРИГИНАЛЬНЫЙ КОД СЛОЯ ---
+        vec2 uv = (vec2(currentFragCoord) - 0.5 * iResolution.xy) / iResolution.y;
+        uv.y = -uv.y;
+        
+        vec2 p = uv * (105.0 / currentScale); 
+
+        vec2 uv5 = currentFragCoord.xy / iResolution.xy - 0.5;
+        uv5.y *= iResolution.y / iResolution.x;
+        vec3 dir = vec3(uv5 * zoom, 1.0);
+        
+        vec3 from = vec3(1.0, 0.5, 0.5);
+        from.xy += parallaxOffset * 1.1; 
+
+        // volumetric rendering
+        float s = 0.1, fade = 1.0;
+        vec3 v = vec3(0.0);
+        for (int r = 0; r < volsteps; r++) {
+            vec3 p_space = from + s * dir * 0.5;
+            p_space = abs(vec3(tile) - mod(p_space, vec3(tile * 2.0))); 
+            float pa, a = pa = 0.0;
+            for (int i = 0; i < iterations; i++) { 
+                p_space = abs(p_space) / dot(p_space, p_space) - formuparam; 
+                p_space.xy *= mat2(cos(iTime * 0.01), sin(iTime * 0.01), -sin(iTime * 0.01), cos(iTime * 0.01)); 
+                a += abs(length(p_space) - pa); 
+                pa = length(p_space);
+            }
+            float dm = max(0.0, darkmatter - a * a * 0.001); 
+            a *= a * a; 
+            if (r > 6) fade *= 1.2 - dm; 
+            v += fade;
+            v += vec3(s, s * s, s * s * s * s) * a * brightness * fade; 
+            fade *= distfading; 
+            s += stepsize;
+        }
+        v = mix(vec3(length(v)), v, saturation); 
+        vec4 fc = vec4(v * 0.031, 1.0);	
+        
+        const float CW = 2.5, CH = 2.8;
+        
+        // --- МНОГОНАПРАВЛЕННОЕ ДВИЖЕНИЕ СЛОЕВ ---
+        float layerDirHash = hash(l + 143);
+        float moveAngle = floor(layerDirHash * 4.0) * (3.14159265 / 2.0);
+        vec2 moveDir = vec2(cos(moveAngle), sin(moveAngle));
+
+        float lineCoord = dot(p, vec2(-moveDir.y, moveDir.x));
+        int lineIdx = int(floor(lineCoord / CW));
+
+        float colHash = hash(lineIdx + l * 73 + waveId * 13); 
+        float speed = 1.5 + colHash * 2.5;                
+        float startOffset = colHash * 100.0;               
+        
+        float headProgress = fract((iTime * speed + startOffset) / 75.0) * 75.0 * 2.5;
+        float cellCoordAlongDir = dot(p, moveDir);
+        int cellIdxAlongDir = int(floor(cellCoordAlongDir / CH));
+        
+        float distanceToHead = headProgress - float(cellIdxAlongDir);
+        float trailIntensity = 0.0;
+        
+        if (distanceToHead >= 0.0) {
+            trailIntensity = exp(-distanceToHead * 0.25); 
+        }
+        
+        ivec2 cell = ivec2(floor(p / vec2(CW, CH)));
+        
+        float changeTime = floor(-iTime * 0.5 + colHash * 100.0);
+        int idx = int(hash(cell.x + cell.y + int(changeTime) + waveId * 37) * 26.0);
+        
+        vec2 frac_ = fract(p / vec2(CW, CH));
+        vec2 cp = (frac_ - 0.5) * 2.0;
+
+        // --- ЛОГИКА СЛУЧАЙНОГО ВРАЩЕНИЯ СИМВОЛОВ ---
+        float rotHash = hash(cell.x * 7 + cell.y * 13 + int(changeTime) + waveId * 53);
+        float angle = floor(rotHash * 4.0) * (3.14159265 / 2.0);
+        
+        mat2 rotMat = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+        cp = rotMat * cp;
+
+        float d = sdf_sga(idx, cp * 1.25);     
+        float fill = d - 0.2;           
+
+        float inner = 1.0 - smoothstep(-0.008, 0.008, fill);
+        float edge  = exp(-abs(fill) * 45.0) * 0.30;
+        
+        // --- ГЕНЕРАЦИЯ РАНДОМНОГО НЕОНОВОГО ЦВЕТА ---
+        float colorHash = hash(cell.x * 31 + cell.y * 17 + int(changeTime) + waveId * 79);
+        
+        vec3 neonColor = 0.5 + 0.5 * cos(colorHash * 6.28318 + vec3(0.0, 2.0, 4.0));
+        neonColor = max(neonColor, vec3(0.3));
+
+        vec3 charColor = neonColor * trailIntensity * fc.xyz * 1.5;
+        vec3 glowColor = neonColor * trailIntensity * 4.0; 
+        
+        if (distanceToHead < 0.5 && distanceToHead >= 0.0) {
+            charColor = mix(charColor, vec3(2.0), 0.7);
+        }
+
+        // Инициализируем базовый цвет ячейки слоя (исправленная ошибка)
+        vec3 col = vec3(0.015, 0.015, 0.035);
+
+        col += charColor * inner;
+        col += glowColor * edge;
+
+        // Приглушенная сетка фона
+        float glx = abs(frac_.x - 0.5) * CW;
+        float gly = abs(frac_.y - 0.5) * CH;
+        float gline = min(glx, gly);
+        col += vec3(0.02, 0.02, 0.05) * (1.0 - smoothstep(0.015, 0.035, gline));
+        
+        finalColor += col * layerFade * o.xyz * 2.0;
+    }
+
+    fragColor = vec4(finalColor, 1.0);
+}

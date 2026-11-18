@@ -1,0 +1,45 @@
+/*
+    I thought @OldEclipse's "Cyber Conduits"
+    was so cool I had to play with triangle
+    waves more.
+    
+    @OldEclipse - "Cyber Conduits"
+        https://www.shadertoy.com/view/tf3fR7
+
+    Can also use them to create cool surfaces:
+        https://www.shadertoy.com/view/tXX3RX
+
+    Which was learned from @Shane's "Abstract Corridor":
+        https://www.shadertoy.com/view/MlXSWX
+
+*/
+
+void mainImage(out vec4 o, vec2 u) {
+
+    float i, // raymarch iterator
+          s, // sample distance
+          d = (10.+8.*sin(iTime*.2)); // total distance, modulate starting point
+          
+    vec3  p,r = iResolution;
+    
+    // 40 iterations
+    for (o *= i; i++ < 4e1; ) {
+        // get position
+        p = vec3((u+u-r.xy)/r.y * d, d );
+        
+        // triangle wave distortion loop
+        // arcsin(sin(x)) makes a triangle wave
+        for(s=0.; s++<3.;)
+            p.xy -= asin(sin(.3*iTime+p.yx*s))/s;
+
+        // accumulate distance to a triangle wave
+        // this one is done using fract
+        d += s =  dot(abs(fract(p)-.5), vec3(.08));
+
+        // accumulate color
+        // can play with palette here
+        o +=(1.+cos(1e1*p.z+vec4(3,2,0,0)))/s;
+    }
+    // tanh tonemap, saturation, brightness
+    o = tanh(o*o/2e6);
+}

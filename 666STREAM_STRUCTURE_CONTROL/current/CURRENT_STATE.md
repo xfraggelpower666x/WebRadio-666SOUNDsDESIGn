@@ -285,3 +285,9 @@ NEXT_STEP=REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_T
 - Export Studio bietet MP4 (H.264/AAC) per mitgeliefertem FFmpeg und WebM an. 1.19.6 erzeugte im Electron-Linux-Test eine 1080p-MP4 mit Ton. Der Windows-Startcheck von 1.19.6 scheiterte laut Nutzerprotokoll in fünf FFmpeg-Testfällen. 1.19.7 korrigiert die Test-Fixtures und den Windows-Launcher. YouTube öffnet den offiziellen Player in einem eigenen Fenster, dessen Ton und Bild außerhalb des Studioexports liegen.
 - Prüfnachweise für 1.19.7: 47 gezielte Tests bestanden, ein FFmpeg-Test übersprungen, 116 statische Prüfungen und 168 Release-Prüfungen bestanden. Quell-ZIP `RADIO_WAVE_v6.66_1.19.7_YouTube_MP4.zip`, SHA-256 `0969a10e21cc7e02f0aac3136179955781cc7cc4e771ae590e75420b51b60ea7`.
 - Nächster Schritt: `RADIO_WAVE.bat check /nopause` auf Windows ausführen und einen lokalen Track aus dem Export Studio als MP4 speichern und mit Ton abspielen. Windows-Installer, portable EXE, YouTube-Wiedergabe und GOV/ASUS-Gerätewirkung sind für diesen Stand offen. Die aktiven WebRadio-Deploy-Pfade sind außerhalb dieses Updates.
+
+## Projekt AUDIO_LIGHT_WAVE · 666AUDIO LIGHT WAVE
+
+- Native Projektwurzel: `windows-app/666AUDIO-LIGHT-WAVE/`.
+- Quellstand: `source-v0.1.2-R6/`, vollständiger R6-Stand mit neuer Produktidentität.
+- Windows-EXE, Setup und GPU-Hostabnahme: READBACK_PENDING.

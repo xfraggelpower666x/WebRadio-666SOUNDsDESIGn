@@ -1,0 +1,43 @@
+// Golf of "Quadicube" by panna_pudi
+// https://shadertoy.com/view/NsByWV
+
+//Square SDF
+#define S length(max(s, 0.)) + min(0., max(s.x, s.y))
+
+void mainImage( out vec4 O, vec2 I)
+{
+    vec2 m = iResolution.xy, //Shortened resolution
+         p = (I+I - m) / m.y, //Signed uv coordinates (-1 to +1)
+         u,q,s;
+    
+    float i = 1.,z = .2,b = i; //Zoom and border
+    
+    //Iterate through quadtree
+    for (m = (2. * m) / m.y; i++ < 15. && clamp(q,m-1./z,m) == q || abs(S)*z < 1.4; s = abs(u)-.35)
+    
+        z += z, //zoom
+        u = floor(p * z) / z, //cell coordinates
+        q = abs( (p - u) * z - .5 ), // distance to center
+        b = min( b, abs( max(q.x, q.y) - .5) / z ), //border
+        q = u, //Back to cell coordinates for mouse
+        u.x += .1, //Offset
+        O = cos(iTime * 1.26 + vec4(0,33,11,0)), //Rotating matrix
+        u += .16*O.wz, //Revolve
+        u *= mat2(O); //Rotate
+        
+    //s = abs(p) - vec2(1.252, .944); //Border square
+    s = abs(p) - (iResolution.xy / iResolution.y); // Dynamically fits ANY screen aspect ratio
+    
+    // --- RAINBOW THEMATIC ---
+    // Create a color palette using the spatial position, time, and fractal depth (i)
+    vec4 rainbow = 0.5 + 0.5 * cos(iTime + length(p) * 3.0 + i * 0.4 + vec4(0, 2, 4, 0));
+    
+    // Apply the rainbow colors with approximate AA to the inner grid
+    O = rainbow * min(b/fwidth(p).xxxx*.7+.1, 1.);
+    
+    // MASK: Multiply by 0.0 outside the square (S > 0) to make the background black
+    O *= step(b=S, 0.0);
+    
+    // Black border on the exact perimeter line
+    O *= ceil(b*b-1e-4); 
+}

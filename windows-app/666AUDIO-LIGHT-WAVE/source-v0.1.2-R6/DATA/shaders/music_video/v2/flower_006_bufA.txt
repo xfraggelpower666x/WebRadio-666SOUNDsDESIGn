@@ -1,0 +1,31 @@
+mat2 rot(float a) {
+    float s = sin(a);
+    float c = cos(a);
+    return mat2(c, -s, s, c);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
+    vec2 p = uv;
+    
+    float time = iTime * 0.3;
+    float r = length(p);
+    float a = atan(p.y, p.x);
+    
+    vec3 color = vec3(0.0);
+    
+    for(float i = 0.0; i < 30.0; i++) {
+        float bloom = sin(a * 9.0 + i + time) * 0.26;
+        float dist = r - (0.4 + bloom);
+        
+        float thickness = 0.005 / abs(dist + 0.41 * sin(time + i * 5.4));
+        
+        vec3 petalColor = 1.0 + 1.0 * cos(vec3(0, 2, 4) + i * 0.8 + time);
+        color += petalColor * thickness * (1.0 - r);
+    }
+    
+    color = pow(color, vec3(0.6400));
+    color *= 1.0 - 0.6 * r;
+    
+    fragColor = vec4(color, 0.0);
+}

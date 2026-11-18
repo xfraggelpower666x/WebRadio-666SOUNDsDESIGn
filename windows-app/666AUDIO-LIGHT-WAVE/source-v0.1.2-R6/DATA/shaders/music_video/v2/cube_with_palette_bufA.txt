@@ -1,0 +1,98 @@
+#define pi 3.141592
+#define tau pi*2.0
+
+#define time iTime
+#define res iResolution
+
+//sweetie-16 palette//
+#define A vec3(0x1a,0x1c,0x2c) / 255.0
+#define B vec3(0x5d,0x27,0x5d) / 255.0
+#define C vec3(0xb1,0x3e,0x53) / 255.0
+#define D vec3(0xef,0x7d,0x57) / 255.0
+#define E vec3(0xff,0xcd,0x75) / 255.0
+#define F vec3(0xa7,0xf0,0x70) / 255.0
+#define G vec3(0x38,0xb7,0x64) / 255.0
+#define H vec3(0x25,0x71,0x79) / 255.0
+#define I vec3(0x29,0x36,0x6f) / 255.0
+#define J vec3(0x3b,0x5d,0xc9) / 255.0
+#define K vec3(0x41,0xa6,0xf6) / 255.0
+#define L vec3(0x73,0xef,0xf7) / 255.0
+#define M vec3(0xf4,0xf4,0xf4) / 255.0
+#define N vec3(0x94,0xb0,0xc2) / 255.0
+#define O vec3(0x56,0x6c,0x86) / 255.0
+#define P vec3(0x33,0x36,0x57) / 255.0
+
+#define p00 0.025 * 0.0
+#define p01 0.025 * 1.0
+#define p02 0.025 * 2.0
+#define p03 0.025 * 3.0
+#define p04 0.025 * 4.0
+#define p05 0.025 * 5.0
+#define p06 0.025 * 6.0
+#define p07 0.025 * 7.0
+#define p08 0.025 * 8.0
+#define p09 0.025 * 9.0
+#define p10 0.025 * 10.0
+#define p11 0.025 * 11.0
+#define p12 0.025 * 12.0
+#define p13 0.025 * 13.0
+#define p14 0.025 * 14.0
+#define p15 0.025 * 15.0
+
+float smin(float a,float b,float k){
+  float h = clamp(0.5 + 0.5*(b-a)/k,0.0,1.0);
+  return mix(b,a,h) - k*h*(1.0-h);
+}
+
+
+void render(inout float col,vec2 uv){
+	vec3 ro = vec3(0.0,0.0,3.0);
+	vec3 rd = normalize(vec3(uv,-2.0));
+	
+	float d = 0.0;
+	for(float i=0.0;i<256.0;i++){
+		vec3 p = ro + rd*d, cp = p;
+		cp.xy *= mat2(cos(time),-sin(time),sin(time),cos(time));
+		cp.yz *= mat2(cos(time),-sin(time),sin(time),cos(time));
+		cp.zx *= mat2(cos(time),-sin(time),sin(time),cos(time));
+		float h = smin(p.y + 0.5,length(max(abs(cp)-0.4,0.0)) - 0.4,0.25);
+		if(h < 0.001 || d > 20.0) break;
+		d += h;
+	}
+  
+  if(d < 20.0){
+  	vec3 p = ro + rd*d;
+  	col += p08*dot(vec3(0.8),p);
+  }
+}
+
+void mainImage(out vec4 fragColor,vec2 fragCoord){
+  vec2 uv = (2.0*fragCoord-res.xy)/res.y;
+  vec3 col = vec3(0.0);
+  float colp = 0.0;
+
+  render(colp,uv);
+  
+  colp = mod(floor(colp * 36.0),16.0);
+  
+  switch(int(colp)){
+  	case 0: col = A; break;
+  	case 1: col = B; break;
+  	case 2: col = C; break;
+  	case 3: col = D; break;
+  	case 4: col = E; break;
+  	case 5: col = F; break;
+  	case 6: col = G; break;
+  	case 7: col = H; break;
+  	case 8: col = I; break;
+  	case 9: col = J; break;
+  	case 10: col = K; break;
+  	case 11: col = L; break;
+  	case 12: col = M; break;
+  	case 13: col = N; break;
+  	case 14: col = O; break;
+  	case 15: col = P; break;
+  }
+
+  fragColor = vec4(col,1.0);
+}

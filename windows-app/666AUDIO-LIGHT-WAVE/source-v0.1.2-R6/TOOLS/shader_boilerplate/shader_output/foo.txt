@@ -1,0 +1,24 @@
+import time
+
+total_frame_count = 0
+
+while True:
+    # Get the current position in the 60-frame cycle (results in 0 to 59)
+    cycle_position = total_frame_count % 60
+
+    # Divide the 60 frames into three 20-frame chunks
+    if cycle_position < 20:
+        zoom_direction = "equal"
+    elif cycle_position < 40:
+        zoom_direction = "vertical"
+    else:
+        zoom_direction = "horizontal"
+
+    # Calculate the current zoom frame (results in 1 to 20)
+    total_frame_count_zoom = (total_frame_count % 20) + 1
+    
+    total_frame_count += 1
+    
+    print(f"Total Frame: {total_frame_count:4} >> Direction: {zoom_direction:10} >> Zoom Frame: {total_frame_count_zoom}")
+    
+    time.sleep(0.1) # Slows down the loop so you can read it

@@ -1,0 +1,53 @@
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p, // Ray position
+         r = normalize(vec3(I+I,0) - iResolution.xyy); // Ray direction
+    float i, // Iterator
+          t, // Ray distance
+          v, // Distance to gyroid
+          m=.01, // Passthrough
+          l, // Plasma
+          e=iTime; // Time
+    for (O*=i;i++<50.;){
+        // Update current ray position
+        p = t*r;
+        
+        // Plasma based on one of diatribes' shaders
+        l = abs(dot(cos(p*.1+e),vec3(1))) + .05 + m*.5;
+        
+        // Rotate camera in xz plane
+        p.xz*=mat2(cos( e/3. + vec4(0,11,33,0)));
+        
+        // Move up & go forwards
+        p.y+=2.;
+        p.z-=e*5.;
+        
+        // Increase passthrough below y plane
+        // Then mirror on y plane for reflection effect
+        p.y<0. ? m=.3 : m;
+        p.y=abs(p.y);
+        
+        // Alternate between stopping and rotating xy position
+        // Adjust y such that you dont intersect the gyroid
+        p.xy*=mat2(cos( floor((e-i*.02)/4.)+min(4.*fract((e-i*.02)/4.),1.) + vec4(0,11,33,0)));
+        p.y+=16.;
+        
+        // Triangle wave distortion to position
+        p+=abs(fract(p/6.)-.5)*6.;
+        
+        // Gyroid density
+        v = abs(dot(sin(p/12.),cos(p.zxy/12.))*12.);
+        
+        // Repetition in all directions
+        p = abs(mod(p,2.)-1.);
+        
+        // Combine gyroid with grid
+        v = max(v, abs(min(min(max(p.x,p.y), max(p.x,p.z)), max(p.y,p.z))-.2)) + m;
+        
+        // March forward based on density
+        t+=v*.3;
+        
+        // Color accumulation based on density & plasma
+        O.rgb += exp(cos(t*.2*vec3(1,1,.5)+vec3(1,0,0)))/v/l;
+    }
+    O=tanh(O/2e2);
+}

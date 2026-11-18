@@ -1,0 +1,29 @@
+{
+  "neural_indices_path": {
+    "neural_indices_json": "DATA/neural_json_batches"
+  },
+  "shader_path": {
+    "shader_path_glsl": "DATA/shaders/music_video/v2"
+  },
+  "image_filepaths": {
+    "mask_layer_folder": "DATA/mask_layer_img"
+  },
+  "video_filepaths": {
+    "video_folder_matrix_code": "DATA/bg_videos",
+    "video_folder_all_vertical_1": "DATA/library/all_vertical_1",
+    "video_folder_all_vertical_2": "DATA/library/all_vertical_2",
+    "video_folder_all_vertical_nsfw": "DATA/library/all_vertical_nsfw",
+    "video_folder_all_horizontal": "DATA/library/all_horizontal",
+    "video_folder_all_horizontal_static": "DATA/library/all_horizontal_static",
+    "video_folder_all_horizontal_static_nsfw": "DATA/library/all_horizontal_static_nsfw",
+    "video_folder_all_segments": "DATA/library/all_segments",
+    "video_folder_all_square_1": "DATA/library/all_square_1",
+    "video_folder_all_square_2": "DATA/library/all_square_2",
+    "video_folder_all_square_3": "DATA/library/all_square_3",
+    "video_folder_all_square_g_video": "DATA/library/all_square_g_video"
+  },
+  "audio_filepaths": {
+    "music_folder": "DATA/SUNO_HIGHEST_QUALITY",
+    "sync_folder": "DATA/audio_sync_data"
+  }
+}

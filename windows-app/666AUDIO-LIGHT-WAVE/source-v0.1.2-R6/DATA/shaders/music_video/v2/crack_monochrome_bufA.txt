@@ -1,0 +1,130 @@
+// ============================================================
+//  "SIGNAL LOST" — chaotic two-tone glitch
+//  Strictly BLACK & WHITE (hard threshold + ordered dither)
+//  Single pass, zero texture fetches, branchless
+// ============================================================
+
+#define R iResolution.xy
+
+// ---- hashes (Hoskins-style, sin-free, precision-safe) ------
+float h11(float p){
+    p = fract(p*0.1031);
+    p *= p + 33.33;
+    p *= p + p;
+    return fract(p);
+}
+float h21(vec2 p){
+    vec3 p3 = fract(vec3(p.xyx)*0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y)*p3.z);
+}
+float noi(vec2 p){                       // value noise (4 taps)
+    vec2 i = floor(p), f = fract(p);
+    f = f*f*(3.0 - 2.0*f);
+    return mix(mix(h21(i),             h21(i + vec2(1,0)), f.x),
+               mix(h21(i + vec2(0,1)), h21(i + vec2(1,1)), f.x), f.y);
+}
+
+// ---- Bayer 8x8 ordered dither (keeps exactly 2 colours) ----
+float B2(vec2 a){ a = floor(a); return fract(a.x*0.5 + a.y*a.y*0.75); }
+#define B4(a) (B2(0.5*(a))*0.25 + B2(a))
+#define B8(a) (B4(0.5*(a))*0.25 + B2(a))
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    float t = iTime;
+
+    // screen space + slight CRT bulge
+    vec2 uv = (fragCoord - 0.5*R)/R.y;
+    uv *= 1.0 + 0.05*dot(uv, uv);
+
+    // SCREEN SHAKE: translation + micro-rotation
+    float q  = noi(vec2(t*7.0, 7.7));  q *= q*q;        // quake envelope (rare spikes)
+    vec2 sh  = (vec2(noi(vec2(t*19.0, 1.0)),
+                     noi(vec2(t*19.0, 2.0))) - 0.5)
+             * (0.008 + 0.17*q);
+    float rs = (noi(vec2(t*15.0, 3.0)) - 0.5)*(0.03 + 0.45*q);
+    vec2 p   = uv + vec2(rs*uv.y, -rs*uv.x) + sh;       // cheap small-angle rotation
+
+    // SCREEN TEARING: rows jump sideways + row shiver
+    float row = floor(p.y*20.0);
+    float tr  = h21(vec2(row, floor(t*9.0)));
+    float thr = 0.90 - 0.15*q;                          // quakes tear more
+    p.x += step(thr, tr)*(tr - thr)*9.0
+         * sign(h21(vec2(row, floor(t*9.0) + 31.0)) - 0.5);
+    p.x += (h21(vec2(floor(p.y*90.0), floor(t*30.0))) - 0.5)*(0.006 + 0.05*q);
+
+    // FIELD ------------------------------------------------------
+    float r   = length(p);
+    float ang = atan(p.y, p.x);
+
+    // domain warp: nothing holds still
+    vec2 w  = vec2(noi(p*2.5 + t*0.7), noi(p*2.5 + 4.7 - t*0.9)) - 0.5;
+    float rw = length(p + w*0.5);
+
+    // warped rings x morphing rotating spokes -> interference web
+    float nSp = 2.0 + 2.0*floor(3.0 + 3.0*sin(t*0.43)); // spoke count jumps over time
+    float web = sin(rw*30.0 - t*6.0 + 0.8*sin(ang*4.0 + t*1.5))
+              * sin(ang*nSp + t*3.5);
+
+    // second off-centre ring family -> moire
+    float r2 = length(p - 0.55*vec2(sin(t*1.3), cos(t*1.7)));
+
+    float v = 0.5 + web*0.30 + sin(r2*46.0 + t*8.0)*0.22;
+
+    // POPPING CIRCLE GRID (loop-free): expanding rings + filled discs
+    vec2 gc   = floor(p*4.0);
+    vec2 gf   = fract(p*4.0) - 0.5;
+    float ts  = mod(floor(t*3.0), 256.0);
+    vec2 ctr  = (vec2(h21(gc + ts*17.0), h21(gc + ts*29.0 + 5.0)) - 0.5)*0.3;
+    float grw = fract(t*3.0 + h21(gc + ts*7.0));        // sawtooth growth
+    float dl  = length(gf - ctr) - grw*0.45;
+    v += smoothstep(0.05, 0.0, abs(dl))*step(0.30, h21(gc + ts*3.0))*0.55;
+    v += step(length(gf - ctr), grw*0.20)*step(0.80, h21(gc + ts*11.0))*0.50;
+
+    // SONAR PULSES: 3 expanding rings on Lissajous paths
+    for(int i = 0; i < 3; i++){
+        float fi = float(i);
+        vec2 c = 0.55*vec2(sin(t*(1.1 + 0.3*fi) + fi*2.1),
+                           cos(t*(1.7 + 0.4*fi)));
+        v += smoothstep(0.012, 0.0,
+             abs(length(p - c) - fract(t*0.8 + fi*0.333)*0.7))*0.55;
+    }
+
+    // SCANLINES / ROLLING DARK BAR / VIGNETTE
+    v += (step(0.5, fract(fragCoord.y*0.5)) - 0.5)*0.08;
+    v -= (1.0 - smoothstep(0.0, 0.22, abs(fract(uv.y - t*0.23) - 0.5)))*0.25;
+    v -= r*0.25;
+
+    // TEAR FLASH LINE
+    v += step(thr + 0.02, tr)*step(fract(p.y*20.0), 0.10)*0.5;
+
+    // STATIC GRAIN with random bursts
+    float ft = mod(floor(t*40.0), 256.0);
+    float st = 0.12 + 0.75*step(0.80, h11(floor(t*2.0) + 50.0));
+    v += (h21(vec2(fragCoord.x, fragCoord.y + 61.0*ft)) - 0.5)*st;
+
+    // GLITCH BLOCK INVERSION + full-frame negative flicker
+    vec2 bq = floor((uv + 0.5*vec2(R.x/R.y, 1.0))*vec2(9.0, 7.0));
+    v = mix(v, 1.0 - v, step(0.94, h21(bq + floor(t*6.0)*13.0)));
+    v = mix(v, 1.0 - v, step(0.93, h11(floor(t*9.0) + 4.0)));
+
+    // FIXED HUD (doesn't shake): frame / crosshair / dashed rotating ring
+    float cr   = length(uv);
+    float ang0 = atan(uv.y, uv.x);
+    float hud  = smoothstep(0.008, 0.0,
+                abs(max(abs(uv.x) - 0.84, abs(uv.y) - 0.44)));
+    hud += (smoothstep(0.0016, 0.0, abs(uv.x))
+          + smoothstep(0.0016, 0.0, abs(uv.y)))
+          * step(0.035, cr)*step(cr, 0.14) + step(cr, 0.007);
+    hud += smoothstep(0.006, 0.0, abs(cr - 0.27))
+         * step(0.1, sin(ang0*8.0 - t*2.5) + 0.6*sin(ang0*3.0 + t));
+    v += hud*0.6;
+
+    // BLACK-FRAME STROBE (occasional broken seconds)
+    v *= mix(1.0, step(0.3, h11(floor(t*24.0) + 9.0)),
+                 step(0.90, h11(floor(t*0.5))));
+
+    // ORDERED DITHER -> PURE BLACK / PURE WHITE, nothing in between
+    float d = B8(fragCoord) - 0.5;
+    fragColor = vec4(vec3(step(0.5 + d*0.3, v)), 1.0);
+}

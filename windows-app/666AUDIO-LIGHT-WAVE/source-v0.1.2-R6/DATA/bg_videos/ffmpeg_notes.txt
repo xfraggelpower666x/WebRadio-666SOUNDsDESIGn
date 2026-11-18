@@ -1,0 +1,23 @@
+___24 fps___
+
+ffmpeg -i input.mkv frame_%05d.png
+
+ffmpeg -i input.mkv -c:v libx264 -crf 15 -vf "scale=2560:1440,fps=24" -an output.mp4
+ffmpeg -framerate 24 -i frame_%05d.jpg -c:v libx264 -crf 15 -pix_fmt yuv420p output.mp4
+ffmpeg -i frame_%05d.jpg -c:v libx264 -crf 15 -vf "scale=1720:720,fps=24" -pix_fmt yuv420p output.mp4
+
+___60 fps___
+
+ffmpeg -i input.mkv frame_%05d.png
+
+ffmpeg -framerate 60 -i frame_%05d.jpg -c:v libx264 -crf 15 -pix_fmt yuv420p matrix_code_1440p.mp4
+ffmpeg -framerate 60 -i frame_%05d.jpg -c:v libx264 -crf 15 -vf "scale=1720:720,fps=60" -pix_fmt yuv420p matrix_code_720p.mp4
+ffmpeg -framerate 60 -i frame_%05d.jpg -c:v libx264 -crf 15 -vf "scale=1376:576,fps=60" -pix_fmt yuv420p matrix_code_576p.mp4
+
+___
+
+ffmpeg -framerate 60 -i frame_%05d.jpg -vf "crop=250:1440:0:0" -c:v libx264 -crf 15 -pix_fmt yuv420p left_mask_1440p.mp4
+ffmpeg -framerate 60 -i frame_%05d.jpg -vf "crop=250:1440:3190:0" -c:v libx264 -crf 15 -pix_fmt yuv420p right_mask_1440p.mp4
+
+ffmpeg -framerate 60 -i frame_%05d.jpg -vf "crop=250:960:0:0" -c:v libx264 -crf 15 -pix_fmt yuv420p left_mask_960p.mp4
+ffmpeg -framerate 60 -i frame_%05d.jpg -vf "crop=250:960:1458:0" -c:v libx264 -crf 15 -pix_fmt yuv420p right_mask_960p.mp4

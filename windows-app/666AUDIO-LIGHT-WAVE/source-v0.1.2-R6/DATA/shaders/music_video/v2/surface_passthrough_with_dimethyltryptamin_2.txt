@@ -1,0 +1,50 @@
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define H(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Divide the screen coordinates by the TEXTURE'S resolution
+    vec2 uv_pass = fragCoord / iResolution.xy;
+    // Flip Y to match Pygame's coordinate system perfectly
+    uv_pass.y = 1.0 - uv_pass.y;
+
+    // Sample the texture
+    vec4 texColor = texture(iChannel0, uv_pass);    
+
+
+
+
+    fragColor=vec4(0);
+    vec3 p,q,r=iResolution,
+    d=normalize(vec3((fragCoord*2.-r.xy)/r.y,1));  
+    for(float i=0.,a,s,e,g=0.;
+        ++i<110.;
+        fragColor.xyz+=mix(vec3(1),H(g*.1),sin(.8))*1./e/8e3
+    )
+    {
+        p=g*d;
+        p.z+=iTime*6.5;
+        a=10.;
+        p=mod(p-a,a*2.)-a;
+        s=6.;
+        for(int i=0;i++<8;){
+            p=.3-abs(p);
+            
+            p.x<p.z?p=p.zyx:p;
+            p.z<p.y?p=p.xzy:p;
+            
+            s*=e=1.4+sin(iTime*.234)*.1;
+            p=abs(p)*e-
+                vec3(
+                    5.+cos(iTime*.3+.5*tan(iTime*.3))*3.,
+                    120,
+                    8.+cos(iTime*.5)*5.
+                 );
+         }
+         g+=e=length(p.yz)/s;
+         g+=e=length(p.yx)/s;
+    }
+
+
+    fragColor = texColor + fragColor;
+}

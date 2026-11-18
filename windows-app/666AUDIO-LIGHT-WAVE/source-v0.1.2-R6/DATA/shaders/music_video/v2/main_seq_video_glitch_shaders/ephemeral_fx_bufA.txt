@@ -1,0 +1,149 @@
+#define saturate(i) clamp(i,0.,1.)
+#define repeat(i,n) for(int i=0;i<n;i++)
+
+const int EPHEMERAL_SAMPLES = 10;
+
+const float EPHEMERAL_AMP = 0.5;
+const float EPHEMERAL_DRIP = 1.0;
+const float EPHEMERAL_BLUR = 0.05;
+const vec3 EPHEMERAL_FREQ = vec3(0.3, 0.3, 0.2);
+
+const float PI = acos(-1.0);
+
+uvec3 hash3u(uvec3 s) {
+    s += 1145141919u * (s.yzx ^ (s.zxy >> 8u));
+    s += 1145141919u * (s.yzx ^ (s.zxy >> 8u));
+    s += 1145141919u * (s.yzx ^ (s.zxy >> 8u));
+    return s;
+}
+
+vec3 hash3f(vec3 s) {
+    uvec3 r = floatBitsToUint(s);
+    return vec3(hash3u(r)) / float(-1u);
+}
+
+uvec3 seed;
+uvec3 random3u() {
+    seed = hash3u(seed);
+    return seed;
+}
+
+vec3 random3f() {
+    return vec3(random3u()) / float(-1u);
+}
+
+mat2 rotate2D(float t) {
+    float c = cos(t);
+    float s = sin(t);
+    return mat2(c, s, -s, c);
+}
+
+mat3 getOrthogonalBasis(vec3 z) {
+    z = normalize(z);
+    vec3 up = abs(z.y) < 0.99 ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, 1.0);
+    vec3 x = normalize(cross(up, z));
+    return mat3(x, cross(z, x), z);
+}
+
+vec3 cyclicNoise(vec3 p, float pump) {
+    vec4 sum = vec4(0.0);
+    mat3 basis = getOrthogonalBasis(vec3(-1.0, 2.0, -3.0));
+
+    repeat(i, 5) {
+        p *= basis;
+        p += sin(p.yzx);
+        sum += vec4(
+            cross(cos(p), sin(p.zxy)),
+            1.0
+        );
+        sum *= pump;
+        p *= 2.0;
+    }
+
+  return sum.xyz / sum.w;
+}
+
+vec3 ephemeralColor(float t) {
+    return saturate(1.0 - abs(3.0 * t - vec3(1.0, 1.5, 2.0)));
+}
+
+// 1. Put this function ABOVE your mainImage function
+float rand(float seed) {
+    // This is the classic GLSL 1D random generator
+    return fract(sin(seed) * 43758.5453123);
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    seed = uvec3(fragCoord, iFrame);
+
+    vec2 uv = fragCoord / iResolution.xy;
+    vec2 p = uv * 2.0 - 1.0;
+    p.x *= iResolution.x / iResolution.y;
+
+    vec3 aa = vec3(0.0);
+
+    float dice = random3f().x;
+
+    repeat(i, EPHEMERAL_SAMPLES) {
+        vec2 pt = p;
+        float ephemeral = (float(i) + dice) / float(EPHEMERAL_SAMPLES);
+        float sqEphemeral = ephemeral * ephemeral;
+
+        // Apply distortion and dripping effect
+        pt.y -= (1.0 - exp(-EPHEMERAL_DRIP * sqEphemeral)) * abs(pt.y) * sign(pt.y);
+        pt += EPHEMERAL_AMP * sqEphemeral * cyclicNoise(EPHEMERAL_FREQ * vec3(p, iTime - sqEphemeral), 1.5).xy;
+        
+        vec3 color = 3.0 / float(EPHEMERAL_SAMPLES) * ephemeralColor(ephemeral);
+
+        // Convert the distorted coordinate back to [0, 1] UV space for texture sampling
+        vec2 uvt = pt;
+        uvt.x *= iResolution.y / iResolution.x;
+        uvt = uvt * 0.5 + 0.5;
+
+        // Emulate the blur from the original linearstep shape logic by utilizing texture mipmaps
+        float lod = log2(1.0 + EPHEMERAL_BLUR * sqEphemeral * iResolution.y);
+
+        // Sample the texture. Note: Ensure iChannel0 has "Mipmaps" enabled in its settings for the blur to work properly.
+        vec3 texColor = textureLod(iChannel0, uvt, lod).rgb;
+
+        aa += color * texColor;
+    }
+    
+    //fragColor = vec4(aa, 1.0);
+
+    //vec2 uv_core = fragCoord / iResolution.xy;
+    //vec4 coreColor = texture(iChannel0, uv_core);
+    //fragColor = mix(coreColor, vec4(aa, 1.0), 0.70);
+
+
+    vec2 R = iResolution.xy;
+    // Normalized coordinates (0.0 to 1.0)
+    vec2 U_uv = fragCoord / R; 
+
+    // 1. Create a timer. (e.g., changes twice a second. Change 2.0 to whatever speed you want)
+    float flipTimer = floor(iTime * 1.0); 
+    
+    // 2. Get a random float between 0.0 and 1.0
+    float rawRandom = rand(flipTimer);
+    
+    // 3. Convert it to exactly 0.0 or 1.0 
+    // step(0.5, x) returns 0.0 if x is less than 0.5, and 1.0 if x is greater.
+    float randomFlip = step(0.5, rawRandom);
+    
+    if (U_uv.x > .498 && U_uv.x < .500) {
+        // Draw white separator
+        fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    } 
+    else if ( (U_uv.x > .5 && randomFlip == 0.0) || (U_uv.x < .498 && randomFlip == 1.0) ) {
+        // Show orig video
+        vec2 final_uv = fragCoord / iResolution.xy;
+        vec4 T = texture(iChannel0, final_uv);
+        fragColor = T;
+    } 
+    else {
+        vec2 uv_core = fragCoord / iResolution.xy;
+        vec4 coreColor = texture(iChannel0, uv_core);
+        fragColor = mix(coreColor, vec4(aa, 1.0), 0.70);
+    }
+}

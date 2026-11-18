@@ -1,0 +1,113 @@
+// Генераторы шума
+float hash(float f){
+    return 1.*(fract(sin(f*.2436245226)));
+}
+vec2 hash2(vec2 n){
+    return vec2(fract(sin(0.565123289*n.x))*2.- 1.,fract(sin(0.56142852*n.y)- 2.));
+}
+vec3 hash3(vec3 p){
+    return vec3(fract(sin(cos(p.x*2.64579))),fract(sin(cos(p.y*9.51235))),fract(sin(cos(p.z*1.51246))));
+}
+
+// 3D Матрицы поворота вокруг осей
+mat3 rotX(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(1, 0, 0, 0, c, -s, 0, s, c);
+}
+mat3 rotY(float a) {
+    float c = cos(a), s = sin(a);
+    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+}
+
+// Перевод макроса M_macro в 3D
+// БАС (iMusicSync0) расширяет пространство фрактала
+#define M_macro3D(p) { \
+    p = abs(p) - (0.5 + iMusicSync0 * 0.2); \
+    p *= rotX(0.785) * rotY(0.785); \
+    p = abs(p) - 0.2; \
+ }
+
+// 3D функция света
+float light3D(vec3 p, float fade){
+    return fade * 0.05 / (abs(p.x) * abs(p.y) * abs(p.z) + 0.0001);
+}
+
+float happy_star(vec2 uv, float anim)
+{
+    uv = abs(uv);
+    vec2 pos = min(uv.xy/uv.yx, anim);
+    float p = (2.0 - pos.x - pos.y);
+    return (2.0+p*(p*p-1.5)) / (uv.x+uv.y);      
+}
+ 
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord * 2.0 - iResolution.xy) / min(iResolution.x, iResolution.y);
+    uv*=dot(uv,uv)*10.;
+    
+    // БАС (iMusicSync0) толкает камеру вперед при ударах
+    vec3 ro = vec3(0.0, 0.0, -3.5 + (iMusicSync0 * 1.5)); 
+    vec3 rd = normalize(vec3(uv, 0.320)); 
+    
+    // Автоматическое вращение
+    mat3 camRot = rotY(iTime * 0.4) * rotX(sin(iTime * 0.25) * 0.8);
+    ro *= camRot;
+    rd *= camRot;
+    
+    vec3 result = vec3(0.0);
+    
+    float interval = 0.03; 
+    float lifetime = 0.30; 
+    int maxSteps = int(floor(lifetime / interval));
+    
+    // Проход Raymarching
+    float t = 0.0; 
+    for(int step = 0; step < 30; step++) {
+        vec3 p = ro + rd * t; 
+        
+        M_macro3D(p);
+        M_macro3D(p);
+        
+        p *= 2.5; 
+        p.y += 1.5; 
+        
+        vec3 stepColor = vec3(0.0);
+        for(int i = 0; i < maxSteps; i++){
+            float seed = floor(iTime / interval) - float(i);
+            float birth = seed * interval;
+            float age = iTime - birth;
+            
+            if(age >= lifetime) break;
+            
+            vec3 lp = p;
+            M_macro3D(lp);
+            
+            vec3 flashPos = (hash3(vec3(seed)) - 0.5) * 2.0; 
+            
+            stepColor += light3D(lp - flashPos, lifetime - age) * hash3(vec3(seed + 42.0));
+        }
+        
+        // СНАР (iMusicSync1) делает вспышки ярче
+        result += stepColor * (0.04 + iMusicSync1 * 0.1);
+        t += 0.1;
+    }
+    
+    result = pow(result, vec3(0.8)); 
+    
+    // ХАЙ-ХЭТ (iMusicSync2) добавляет легкий цветовой сдвиг (синеватый/пурпурный оттенок)
+    vec3 colorPulse = vec3(iMusicSync0 * 0.1, iMusicSync2 * 0.2, iMusicSync1 * 0.2);
+    fragColor = vec4(result * 0.12 + (colorPulse * result), 1.0);
+    
+    vec2 uv3 = ( fragCoord - .5*iResolution.xy ) / iResolution.y;
+    
+    // БАС (iMusicSync0) делает звезду больше (за счет уменьшения скейлинга UV координат)
+    uv3 *= 2.0 * ( cos(iTime * 2.0) - 2.5) / (1.0 + iMusicSync0 * 1.5); 
+    
+    // ХАЙ-ХЭТ (iMusicSync2) заставляет звезду пульсировать/искажаться 
+    float anim = sin(iTime * 12.0) * 0.1 + 1.0 + (iMusicSync2 * 0.4); 
+    
+    // СНАР (iMusicSync1) ярко вспыхивает саму звезду
+    vec3 starColor = vec3(0.5, 0.5, 0.5) * 0.2 * (1.0 + iMusicSync1 * 4.0);
+    
+    fragColor += vec4(happy_star(uv3, anim) * starColor, 1.0);
+}

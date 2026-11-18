@@ -1,0 +1,180 @@
+// iChannel1: rgba_noise 256x256
+// iChannel2: organic1
+
+// HYPERBOLIC CODE FROM http://roy.red/generating-spherical-and-hyperbolic-tilings-in-glsl-.html#generating-spherical-and-hyperbolic-tilings-in-glsl
+// Super interesting read, I am still in the process of understanding all of it, so I copied the UV generation
+// and added some textures on top to make it shiny
+
+
+#define rot(x) mat2(cos(x),-sin(x),sin(x),cos(x))
+
+#define PI acos(-1.)
+
+#define pi acos(-1.)
+#define tau (1.*pi)
+
+// Adjust p, q, r
+const float p = 3.; const float q=4.; const float r=3.;
+float space = float(sign(q*r+p*r+p*q-p*q*r));
+vec3 fold( vec3 p, in vec3 dir, inout int n) {
+// Reflect if we're outside the fundamental region
+    float dt = dot(p,dir);
+    if (dt < 0.) {
+        n = n + 1;
+        return p-2.*dt*dir*vec3(1,1,space);
+    }
+    return p;
+}
+float sdBox(vec2 p, vec2 s){
+	float d = 10e8;
+    p = abs(p) - s;
+    d = max(p.x,p.y);
+    return d;
+}
+float xor(float a, float b){
+	return float(int(a)^ int(b));
+}
+vec4 noise(float t){return texture(iChannel1,vec2(floor(t), floor(t))/256.);}
+
+vec3 get(vec2 fragCoord) {
+    vec2 uv = (fragCoord - 0.5*iResolution.xy)/iResolution.y;
+    
+    vec2 z = uv;
+    z *= 2.5;
+    
+    // - HYPERBOLIC UV - //
+    
+    if(length(z) > 1.)
+    	z /= dot(z,z);
+    
+    // Stereographically project
+    vec3 w=vec3(2.*z,1.-space*dot(z,z))*1./(1.+space*dot(z,z));
+    
+    // Hyperbolic rotation
+    float amt = mod(iTime, 2.45*2.);
+    
+    float envA = smoothstep(0.,1.,amt/2.45)*0.2;
+    float envB = smoothstep(0.,1.,amt/2.45 - 1.)*0.2;
+    
+    if(amt > 2.45)
+        amt -= 2.45*2.;
+    w.yz *= mat2(cosh(amt), sinh(amt), sinh(amt),cosh(amt));
+    //w.yz *= mat2(cosh(amt), sinh(amt), sinh(amt),cosh(amt));
+    // Calculate cutting planes
+    float ab = -cos(PI/p);
+    float bc = -cos(PI/q);
+    float ac = -cos(PI/r);
+    vec3 a = vec3(1.,0.,0);
+    vec3 b = vec3(ab,sin(PI/p),0.);
+    float c0 = ac;
+    float c1 = (bc-b[0]*c0)/b[1];
+    vec3 c = vec3(c0,c1,sqrt(abs(1.-c0*c0-c1*c1)));
+    if (space==0.)
+        c[2] = .5;
+
+    // Fold across the planes a few times
+    int n=0; int m = 0;
+    for (int i=0;i<10;i++){
+        w = fold(w,a,m);
+        w = fold(w,b,m);
+        w = fold(w,c,n);
+    }
+
+    
+    // - COLORING - //
+    //w.x += iTime;
+    
+    float d = 10e7;
+    vec4 no = noise(float(n + m));
+    vec2 p = w.xy;
+    //p = sin(p*7.);
+    #define pmod(p,x) (mod(p,x) - 0.5*x)
+    //vec2 j = pmod(p, 20.);
+    vec2 j = p;
+    j.x -= 2.5;
+    j = sin(j*7.);
+    vec3 col = vec3(0);
+    //col += w*1.;
+    
+    
+    vec3 ff = 1. - vec3(1.)*(dot(w*1.,a*8.));
+    
+    ff = clamp(ff, 0.,1.);
+    //col += ff*0.1;
+	
+    p.x -= 0.5;
+    float db = sdBox(j, vec2(0.2,0.9));
+    #define pal(a,b,c,d,e) (a + b*sin((c)*(d)+(e)))
+    vec3 cc = pal(0., 0.5, vec3(4.7,4.4,3.4), 1.7,.4 + w*2. + iTime*0.);
+    
+    cc = texture(iChannel2,w.xy, 1.3 + dot(uv*0.5,uv*0.5)*5.).xyz;
+    
+    cc = sin(cc*(5.4) + vec3(0.,0. ,.4 - envB + envA));
+    cc = max(cc, 0.);
+    
+    //cc.bg *= 0.2 +  pow(1. - length(w.x), 2.)*0.8;
+    float bb = length(cc) * pow(1. - length(w), 1.)*1.;
+    cc = sin(cc*1.  + bb*20.);
+    cc *= pow(1. - length(w.x)*1.25, 1.)*1.;
+    cc = smoothstep(0.,1.,cc);
+    cc = smoothstep(0.,1.,cc);
+    col += cc;
+    
+    
+    col -= smoothstep(0.,1.*dFdy(uv.x),-db );
+    col = max(col, 0.);
+    vec3 cb = smoothstep(0.,1.*dFdy(uv.x),-db )*pal(0.5, 0.5, vec3(0.7,0.4,0.9), 0.7 ,0.4 + uv.x + iTime);
+    
+    //col += cb;
+    
+    col = clamp(col, 0., 1.);
+    
+    //col = vec3(1);
+    
+    //col *= 1. - exp2(-abs(length(uv) - 0.4)*20.)*1.;
+    //col *= 1. - exp2(-abs(length(uv) - 0.4)*20.)*1.;
+    
+    float edge = exp2(-abs (length(uv) - 0.4)*50.)*1.;
+    
+    edge = smoothstep(0.,1.,edge);
+    edge = smoothstep(0.,1.,edge);
+    //edge = smoothstep(0.,1.,edge);
+    
+    //col = pow(col, vec3(1. + pow(edge, 0.5)));
+    col = max(col, 0.);
+    col.gb = pow(col.gb, vec2(1. + pow(edge, 0.5) ));
+    
+    col *= 1. - edge*1.0;
+    
+    return col;
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord - 0.5*iResolution.xy)/iResolution.y;  
+    vec3 col = vec3(0);
+    
+    float aa = 4.;
+    
+    for(float i =0.; i < aa*aa + min(float(iFrame),0.); i++){
+    	col += get(fragCoord + vec2(mod(i,aa),floor(i/aa))/aa);
+    }
+    col /= aa*aa;
+    
+    col = clamp(col, 0., 1.);
+    //col *= 0.999;
+    //col = 1. - col;
+    
+    
+    
+    //col *= max((1. + 1.*cos(iTime*1.+length(uv)*2.+vec3(4,2.5,1.5)))*1., 0.);
+    //col *= max((1.5 + 1.4*cos(iTime+length(uv)*2.+vec3(1,1.5,1.5)))*1., 0.);
+    col *= 2.;
+    col *= 1. - pow(smoothstep(0.,1.,dot(uv,uv)*0.9),0.9)*1.;
+    //col = 1. - col;
+    col = max(col, 0.);
+    
+    col = pow(col, vec3(0.45454));
+    fragColor = vec4(col,1.0);
+}

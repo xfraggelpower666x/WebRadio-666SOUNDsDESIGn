@@ -1,0 +1,18 @@
+void mainImage(out vec4 O, vec2 C) {
+    O=vec4(0);
+    vec3 p=vec3(C,iTime*9.+C.x*.5),
+    a=vec3(-1,1,0);
+    p.y+=iTime*40.;
+	int n=int(iTime*500.)+abs(int(dot(p,a.yyy))^int(dot(p,a.xyx))^int(dot(p,a.zxy))^int(dot(p,a.zxx)));
+    O.xyz+=(cos(p/80.)*.5+.5)*200./float(n%999);
+}
+
+/*
+#define mainImage(O,C){\
+    vec3 p=vec3((300.*C.xy/iResolution.y),iTime*9.+C.x*.5),\
+    a=vec3(-1,1,0);\
+    p.y+=iTime*40.;\
+	int n=int(iTime*500.)+abs(int(dot(p,a.yyy))^int(dot(p,a.xyx))^int(dot(p,a.zxy))^int(dot(p,a.zxx)));\
+	O.xyz+=(cos(p/80.)*.5+.5)*200./float(n%999);\
+}
+*/

@@ -1,0 +1,50 @@
+#define T iTime 
+#define P(z) vec3(cos((z) * .05) * 16., cos((z) * .1) * .5, z)
+#define R(a) 
+#define N normalize
+#define O(Z,c) ( length(                 /* orb */   \
+          p - vec3( X.x + sin( T*c*4. ) * 4.,        \
+                    X.y + sin( T*c*6. ) * 3.,  \
+                    T*1e1+Z+1e1 )  ) - c )
+
+float tunnel(vec3 p) {
+    return .5 - length((p - P(p.z)).xy);
+}
+
+// https://en.wikipedia.org/wiki/Schwarz_minimal_surface
+float surface(vec3 p) {
+    float d = -9e9, i = 5.;
+    for (; i > .1; i *= .2)
+        d = max(d, (cos(p.x/i) + cos(p.y/i) + cos(p.z/i)) * i);
+    return d;
+}
+
+float map(vec3 p) {
+    return max(surface(p), tunnel(p));
+}
+
+
+void mainImage(out vec4 o, in vec2 u) {
+    float l, s, d, i;
+    vec3 r = iResolution,
+         p = P(T*1e1), ro = p,
+         Z = N(P(T*1e1 + 5.) - p),
+         X = N(vec3(Z.z, 0, -Z.x)),
+         D = N(vec3(mat2(cos((sin(p.z * .04) * 2.)+vec4(0,33,11,0)))
+           * (u + u - r.xy) / r.y, 1)
+           * mat3(-X, cross(X, Z), Z));
+
+    for (o*=i; i++ < 1e2;)
+        p = ro + D * d,
+        X = P(p.z),
+        l = max( min( O( 1., .1),
+                 min( O( 2., .2),
+                      O( 3., .3) )), .01),
+        d += s = min(l, .001+.7*abs(map(p))),
+        o += 1./s/d
+          + 5e2*vec4(6,2,1,0)/l
+          + (1.+cos(.3*i+vec4(2,1,0,0)))/s
+          + 2.*vec4(1,2,3,0)*d;
+
+    o = tanh(o*o/3e9);
+}

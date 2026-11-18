@@ -1,0 +1,110 @@
+// Designed for high-performance WebGL
+
+#define MAX_STEPS 100
+#define MAX_DIST .000001
+#define SURF_DIST 0.001
+
+// Full spectrum, highly saturated neon palette
+vec3 palette(float t) {
+    vec3 a = vec3(0.77);
+    vec3 b = vec3(0.54);
+    vec3 c = vec3(0.9);
+    vec3 d = vec3(1.0, 0.30, 0.64);
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+float map(vec3 p) {
+    // Torus centered around the Y axis
+    float rMajor = 3.3;
+    float rMinor = 1.8; 
+    
+    vec2 q = vec2(length(p.xz) - rMajor, p.y);
+    
+    // a1 = horizontal angle across the screen (left to right)
+    // a2 = vertical angle across the screen (top to bottom)
+    float a1 = atan(p.x, p.z); 
+    float a2 = atan(q.y, q.x); 
+    
+    // AXIS FIX: Apply flow to a2 (vertical)
+    // abs(a2) creates a perfect mirror at the waist (center of screen).
+    // Subtracting iTime forces the rings to push outwards towards the top and bottom.
+    float rings = abs(a2) * -17.0 - iTime * 3.2; 
+    
+    // The zig-zag interference wrapping horizontally around the wall
+    float wave = sin(a1 * 26.0 + iTime * 0.50) * 1.5;
+    
+    float ridges = abs(sin(rings + wave));
+    
+    float d = length(q) - rMinor;
+    d -= ridges * 0.16;
+    
+    return d * 1.70;
+}
+
+vec3 getNormal(vec3 p) {
+    vec2 e = vec2(0.01, 0.0); 
+    return normalize(vec3(
+        map(p + e.xyy) - map(p - e.xyy),
+        map(p + e.yxy) - map(p - e.yxy),
+        map(p + e.yyx) - map(p - e.yyx)
+    ));
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+    vec2 uv = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+    
+    // CAMERA: Inside the torus tube
+    vec3 ro = vec3(0.0, 0.0, 4.0);
+    vec3 rd = normalize(vec3(uv.x, uv.y, 0.25)); 
+    
+    float t = 0.0;
+    vec3 col = vec3(0.0);
+    
+    for(int i = 0; i < MAX_STEPS; i++) {
+        vec3 p = ro + rd * t;
+        float d = map(p);
+        
+        if(abs(d) < SURF_DIST) {
+            vec3 n = getNormal(p);
+            
+            vec2 q = vec2(length(p.xz) - 1.40, p.y);
+            float a1 = atan(p.x, p.z);
+            float a2 = atan(q.y, q.x);
+            
+            // Recalculate for exact texture mapping
+            float rings = abs(a2) * 24.0 - iTime * 2.0;
+            float wave = sin(a1 * 32.0 + iTime * 0.3) * 1.5;
+            float ridges = abs(sin(rings + wave));
+            
+            float phase = a2 * 0.5 - iTime * 0.3 + ridges * 0.4;
+            vec3 baseColor = palette(phase);
+            
+            // Point light positioned to cast micro-shadows into the V-ridges
+            vec3 lightPos = ro + vec3(0.0, 4.5, 5.0);
+            vec3 lightDir = normalize(lightPos - p);
+            vec3 viewDir = normalize(ro - p);
+            
+            float diff = max(dot(n, lightDir), 0.1);
+            vec3 halfVector = normalize(lightDir + viewDir);
+            float spec = pow(max(dot(n, halfVector), 0.0), 32.0);
+            float fresnel = pow(1.0 - max(dot(n, viewDir), 0.0), 5.0);
+            
+            // Fake AO using the ridges to force depth in the valleys
+            float ao = smoothstep(0.0, 1.0, ridges * 1.2 + 0.1);
+            
+            col = baseColor * (diff * 0.6 + 0.4) * ao;
+            col += spec * 0.8 * ao; 
+            col += fresnel * baseColor * 0.5;
+            
+            // Depth shading
+            col *= smoothstep(8.0, 2.0, t);
+            
+            break;
+        }
+        
+        t += d;
+        if(t > MAX_DIST) break;
+    }
+    
+    fragColor = vec4(col, 1.0);
+}

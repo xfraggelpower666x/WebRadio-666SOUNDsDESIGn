@@ -1,0 +1,26 @@
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+void mainImage(out vec4 O, vec2 C)
+{
+    O=vec4(0);
+    vec3 p,r=iResolution,
+    d=normalize(vec3((C-.5*r.xy)/r.y,1));  
+    for(float i=1.,s,e,g=.2,l;
+        ++i<80.;
+        O+=abs(cos(vec4(4,3,24,1)+log(s)*.8))*s*1e-4/i
+    )
+    {
+        p=g*d-vec3(.1,.2,1);
+        p=R(p,normalize(vec3(1,2,3)),iTime*.2);
+        s=2.;
+        l=dot(p,p);
+        p=abs(abs(p)-.7)-.5;
+        p.x<p.y?p=p.yxz:p;
+        p.y<p.z?p=p.xzy:p;
+        for(int i=0;i++<8;){
+            s*=e=2./clamp(dot(p,p),.004+tan(10.*sin(iTime*.2))*.002,1.35);
+            p=abs(p)*e-vec2(.5*l,12.).xxy;
+        }
+        g+=e=length(p-clamp(p,-1.,1.))/s;
+    }
+    O.xyz=pow(O.xyz,vec3(1.1,.6,.5));
+}

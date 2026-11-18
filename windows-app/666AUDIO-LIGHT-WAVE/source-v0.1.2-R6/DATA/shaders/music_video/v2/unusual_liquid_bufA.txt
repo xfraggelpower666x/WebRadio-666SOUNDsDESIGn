@@ -1,0 +1,22 @@
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p,r = normalize(vec3(I+I,1)-iResolution.xyy);
+    float i,t,v;
+    // Raymarching loop
+    for (O*=i; i++<70.;){
+    p=t*normalize(vec3(r.xy,r.z/exp(t*.05)));
+    // Rotation of xy coordinates based on distance travelled
+    p.xy*=mat2(cos(t*.1-vec4(0,11,33,0)));
+    // Move forward
+    p.z-=iTime+t;
+    // Small sine wave distortion
+    p+=sin(p.zxy*12.+t*6.)/8.;
+    // Density from mixing between two sphere sdfs based on iterator
+    v = mix(abs(length(mod(p,12.)-6.)-3.),abs(length(mod(p-6.,12.)-6.)-8.),.5-.5*cos(i*.3))+.02;
+    // Travel forwards based on density
+    t+=v/6.;
+    // Color accumulation based on density and distance travelled
+    O+=vec4(2,1,3,0)*exp(sin(t+vec4(0,2,4,0)))/v;
+    }
+    // Tone mapping
+    O = tanh(O/5e2);
+}

@@ -1,0 +1,170 @@
+#define REFLECTIONS 2
+#define GLOSSY 0.9
+
+#define PI 3.14159265359
+vec3 sunDir;
+
+float opU( float d1, float d2 )
+{
+    return min(d1,d2);
+}
+
+float opS( float d1, float d2 )
+{
+    return max(-d1,d2);
+}
+
+float sdSphere( vec3 p, float s )
+{
+	return length(p)-s;
+}
+
+float terrainFunction(vec3 pos)
+{
+    float d = sin(iTime / 20.0) * 0.5 + 0.75;
+    vec3 c = vec3(d);
+    pos = mod(pos, c) - 0.5 * c;
+        
+    float time = iTime * 1.0;
+    
+    vec3 nPos1 = vec3(pos.x, pos.y - 1.0, pos.z);
+    vec3 nPos2 = vec3(pos.x, pos.y + 1.0, pos.z);
+    vec3 nPos3 = vec3(pos.x, pos.y, pos.z + 1.0);
+    vec3 nPos4 = vec3(pos.x, pos.y, pos.z - 1.0);
+    vec3 nPos5 = vec3(pos.x + 1.0, pos.y, pos.z);
+    vec3 nPos6 = vec3(pos.x - 1.0, pos.y, pos.z);
+    
+    return -
+        opS(sdSphere(nPos6, 0.5),
+        opS(sdSphere(nPos5, 0.5),
+        opS(sdSphere(nPos4, 0.5),
+        opS(sdSphere(nPos3, 0.5),
+        opS(sdSphere(nPos2, 0.5),
+        opS(sdSphere(nPos1, 0.5),
+        sdSphere(pos, 1.0)))))));
+}
+
+vec3 normalAt(vec3 pos)
+{
+    float epsilon = 0.01;
+    
+    float s = terrainFunction(pos);
+    float dx = s - terrainFunction(vec3(pos.x + epsilon, pos.y, pos.z));
+    float dy = s - terrainFunction(vec3(pos.x, pos.y + epsilon, pos.z));
+    float dz = s - terrainFunction(vec3(pos.x, pos.y, pos.z + epsilon));
+                                   
+    return normalize(vec3(dx, dy, dz));
+}
+
+
+float march(vec3 offset, vec3 dir)
+{
+    const float minDist = 3.0;
+    const float maxDist = 20.0;
+    const float delta = 1.0;
+	float amp = 0.001;
+    
+    float lastTer = 0.0;
+    float closest = 0.0;
+    
+    float d = minDist;
+    
+    for (float t = 0.0; t < 256.0; t++)
+    {
+        if (d > maxDist)
+            break;
+        vec3 pos = offset + dir * d;
+        float ter = terrainFunction(pos);
+        
+        if (ter >= amp)
+            return d - delta + delta * ((amp -lastTer) / (ter - lastTer));
+        
+        lastTer = ter;
+        
+        if (ter > closest)
+            closest = ter;
+        
+        d += delta;
+    }
+    
+    return closest - amp;
+}
+
+vec3 rotX(vec3 vec, float r)
+{
+    float c = cos(r);
+    float s = sin(r);
+    float cy = c * vec.y;
+    float sy = s * vec.y;
+    float cz = c * vec.z;
+    float sz = s * vec.z;
+    
+    return normalize(vec3(vec.x, cy - sz, sy + cz));
+}
+
+vec3 rotY(vec3 vec, float r)
+{
+    float c = cos(r);
+    float s = sin(r);
+    float cx = c * vec.x;
+    float sx = s * vec.x;
+    float cz = c * vec.z;
+    float sz = s * vec.z;
+    
+    return normalize(vec3(cx - sz, vec.y, sx + cz));
+}
+
+vec3 shade(vec3 position, vec3 rayDir)
+{
+    vec3 col = vec3(sin(iTime / 13.0) * 0.3 + 0.5, 0.8, sin(iTime / 4.0) * 0.2 + 0.8);
+    
+    float mul = 1.0;
+    
+    for (int i = 0; i < REFLECTIONS + 1; i++)
+    {
+    	vec3 normal = normalAt(position);
+        col = col * (1.0 - mul) + mul * clamp(dot(normal, sunDir), 0.4, 1.0) * col * 1.4;
+        
+        vec3 dir = vec3(1.0, 0.0, 0.0);
+        col += vec3(sin(iTime / 10.0) * 0.5 + 0.5, 0.2, 0.6) * clamp(dot(normal, dir), 0.0, 1.0) * 0.5;
+        col *= sin(iTime / 4.0) / 4.0 + 1.0;
+        
+        rayDir = reflect(rayDir, normal);
+        
+        float dist = march(position, rayDir);
+        if (dist >= 0.0)
+            position = (position + rayDir * dist);
+        else
+            break;
+        
+        mul *= GLOSSY;
+    }
+    
+    return col;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    sunDir = normalize(vec3(0.0, sin(iTime), cos(iTime)));
+    
+    vec3 cameraPos = vec3(sin(iTime / 7.0), sin(iTime / 5.0) * 3.0, sin(iTime / 13.0));
+    float focalLength = sin(iTime / 2.0) * 4.0 + 5.0;
+    float x = fragCoord.x / iResolution.x - 0.5;
+    float y = (fragCoord.y / iResolution.y - 0.5) * (iResolution.y / iResolution.x);
+    
+    float lookX = iTime / 4.0;
+    float lookY = iTime / 5.18513;
+    
+    vec3 rayDir = normalize(vec3(x * focalLength, -1, y * focalLength));
+    rayDir = rotX(rayDir, lookX);
+    rayDir = rotY(rayDir, lookY);
+    
+    float dist = march(cameraPos, rayDir);
+    if (dist < 0.0)
+        return;
+    
+    vec3 pos = (cameraPos + rayDir * dist);
+    
+	vec3 color = shade(pos, rayDir);
+	fragColor = vec4(color, 1.0);
+}

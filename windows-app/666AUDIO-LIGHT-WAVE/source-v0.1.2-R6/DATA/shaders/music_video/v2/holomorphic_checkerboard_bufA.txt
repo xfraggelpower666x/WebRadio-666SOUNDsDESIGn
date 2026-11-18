@@ -1,0 +1,38 @@
+#define HOLOMORPHIC_MAP  
+//#define LINES  
+
+#define SCALE 4.
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    // 1. ZOOM: Make the bass (Sync1) drive the zoom level
+    float dynamicScale = SCALE - (iMusicSync1 * 0.8); 
+    
+    vec2 uv = dynamicScale * (2. * fragCoord - iResolution.xy) / iResolution.y;
+
+    // 2. FOCAL POINT: Shift the center of the math with both audio bands
+    uv += vec2(iMusicSync1, -iMusicSync2) * 0.2;
+
+    #ifdef HOLOMORPHIC_MAP
+    uv = vec2(uv.x * uv.x - uv.y * uv.y, 2. * uv.x * uv.y); 
+    #endif
+
+    // 3. TRANSLATION: Jolt the grid forward on the kick drum
+    uv.x -= .4 * iTime + (iMusicSync2 * 0.3);
+
+    // 4. DENSITY: High frequencies (Sync2) divide the checkerboard into smaller squares
+    float gridDensity = 1.0 + (iMusicSync2 * 0.3);
+    vec2 sine_uv = sin(uv * gridDensity);
+    
+    // The fwidth perfectly anti-aliases the grid based on how dense it gets
+    vec2 jacobian = fwidth(sine_uv);
+
+    #ifdef LINES
+    sine_uv = abs(sine_uv) - jacobian;
+    #endif
+
+    vec2 uv_aa = smoothstep(-1., 1., sine_uv / jacobian); 
+
+    uv_aa = 2. * uv_aa - 1.; 
+    float checkerboard = .5 * uv_aa.x * uv_aa.y + .5; 
+    fragColor.rgb = vec3(checkerboard);
+}

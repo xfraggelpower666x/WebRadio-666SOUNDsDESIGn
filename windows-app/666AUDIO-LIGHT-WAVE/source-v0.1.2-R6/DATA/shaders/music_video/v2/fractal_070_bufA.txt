@@ -1,0 +1,27 @@
+#define R(p,a,r)mix(a*dot(p,a),p,cos(r))+sin(r)*cross(p,a)
+#define H(h)(cos((h)*6.3+vec3(0,23,21))*.5+.5)
+void mainImage(out vec4 O, vec2 C)
+{
+    O=vec4(0);
+    vec3 p,r=iResolution,
+    d=normalize(vec3((C-.5*r.xy)/r.y,1));  
+    for(float i=0.,s,e,g=.3;
+        ++i<90.;
+        O.xyz+=mix(vec3(1),H(log(s)*.3),.8)*.03*exp(-i*i*e)
+    )
+    {
+        p=g*d;
+        p+=R(vec3(1,.8,1.2),vec3(.577),iTime*.03);
+        p=R(p,vec3(.577),iTime*.1);
+        // https://www.shadertoy.com/view/3ttyzB
+        // Based on the idea of jarble
+        p=cos(p*3.+4.*cos(p*.5));
+        vec4 q=vec4(p,sin(iTime)*.2);
+        s=3.;
+        for(int j=0;j++<8;)
+            q=clamp(q,-.5,.5)*2.-q,
+            s*=e=7.*clamp(.3/min(dot(q,q),1.),.0,1.),
+            q*=e;
+        g+=e=length(q)/s;
+    }
+}

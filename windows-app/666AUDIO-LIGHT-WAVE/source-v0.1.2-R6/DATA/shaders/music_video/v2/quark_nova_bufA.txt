@@ -1,0 +1,30 @@
+void mainImage(out vec4 O, vec2 I){
+    vec3 p, // Ray position
+         r = normalize(vec3(I+I,0) - iResolution.xyy), // Ray direction
+         a = normalize(tan(iTime*.2+vec3(0,1,2))); // Rotation axis
+    float i, // Iterator
+          t, // Distance
+          v, // Density
+          l, // Length^2
+          n; // Noise iterator
+    // Raymarching loop
+    for (O*=i; i++<70.;t+=v*.04){
+    p=t*r;
+    // Move camera back
+    p.z+=6.;
+    // Rotate around rotation axis
+    p = a*dot(a,p)*2.-p;
+    // Store length^2
+    l = dot(p,p);
+    // Apply log transform
+    p = log(abs(p)+.01);
+    // Turbulence
+    for (n=.5; n++<7.; p+=2.*sin(p.zxy*n+iTime*n)/n);
+    // Density based on distance to sphere
+    v = abs(length(p)-.5)+.05;
+    // Color accumulation based on iteration and density, blue orb in the center
+    O+=exp(sin(i*.3+vec4(0,2,4,0)))/v + vec4(3,6,9,0)/l;
+    }
+    // Tone mapping
+    O = tanh(O/2e2);
+}

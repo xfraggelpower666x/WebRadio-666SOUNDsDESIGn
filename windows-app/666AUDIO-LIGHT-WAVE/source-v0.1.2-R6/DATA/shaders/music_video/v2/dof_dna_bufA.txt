@@ -1,0 +1,80 @@
+//Shader License: CC BY 3.0
+//Author: Jan Mróz (jaszunio15)
+
+//source: https://iquilezles.org/articles/distfunctions2d
+float sdBox( in vec2 uv, in vec2 boxSize )
+{
+    vec2 d = abs(uv) - boxSize;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+
+float square(vec2 uv, vec2 center, float size, float blur)
+{
+    float pixelSize = fwidth(uv.y);
+	float sdf = sdBox(uv - center, vec2(size - pixelSize * blur * 0.5));
+    return smoothstep(pixelSize * blur, -pixelSize, sdf);
+}
+
+float depthToColor(float depth)
+{
+ 	return mix(0.2, 1.0, depth);   
+}
+
+float depthToBlur(float depth)
+{
+ 	return mix(10.0, 1.0, depth);   
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 baseUV = (fragCoord * 2.0 - iResolution.xy) / iResolution.y;
+    baseUV *= 5.0;
+    float pixelSize = fwidth(baseUV.x);
+    
+    float angle = 0.3;
+    baseUV *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+    
+    float uvPos = floor(baseUV.x) * 0.3;
+    vec2 uv = vec2(fract(baseUV.x) - 0.5, baseUV.y);
+    
+    float sinDNA = sin(uvPos + iTime);
+    float cosDNA = cos(uvPos + iTime);
+    
+    float dnaPos1 = sinDNA * 2.0;
+    float dnaPos2 = -sinDNA * 2.0;
+    
+    float dnaDepth1 = cosDNA * 0.5 + 0.5;
+    float dnaDepth2 = -cosDNA * 0.5 + 0.5;
+    
+    float depthLine = mix(dnaDepth1, dnaDepth2, smoothstep(dnaPos1, dnaPos2, uv.y));
+    
+    float lineBlur = depthToBlur(depthLine);
+    float lineAlpha = smoothstep(2.0 * pixelSize * lineBlur * 0.5, -pixelSize * lineBlur , abs(uv.x));
+    lineAlpha *= 1.0 - step(abs(dnaPos1), abs(uv.y));
+
+    float square1Alpha = square(uv, 
+                                vec2(0.0, dnaPos1), 
+                                dnaDepth1 * 0.2 + 0.2, 
+                                depthToBlur(dnaDepth1));
+    float square2Alpha = square(uv, 
+                                vec2(0.0, dnaPos2), 
+                                dnaDepth2 * 0.2 + 0.2, 
+                                depthToBlur(dnaDepth2));
+    
+    float image = 0.0;
+    
+    if (dnaDepth1 > dnaDepth2)
+    {
+        image = mix(image, depthToColor(dnaDepth2), square2Alpha);
+        image = mix(image, depthToColor(depthLine), lineAlpha);
+        image = mix(image, depthToColor(dnaDepth1), square1Alpha);
+    }
+    else
+    {
+        image = mix(image, depthToColor(dnaDepth1), square1Alpha);
+        image = mix(image, depthToColor(depthLine), lineAlpha);
+        image = mix(image, depthToColor(dnaDepth2), square2Alpha);
+    }
+    
+    fragColor = vec4(image);
+}

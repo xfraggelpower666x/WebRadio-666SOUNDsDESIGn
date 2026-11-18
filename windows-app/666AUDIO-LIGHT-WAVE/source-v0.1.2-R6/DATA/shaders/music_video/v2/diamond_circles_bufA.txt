@@ -1,0 +1,27 @@
+//Ethan Alexander Shulman 2017
+
+
+#define circleSize 0.1
+
+#define draw(dc) c = mix(dc,c,clamp(d/pixelSize, 0., 1.))
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    float pixelSize = length(1.0/iResolution.xy);
+	vec2 uv = (fragCoord*2. - iResolution.xy)/iResolution.x;
+    
+    
+    vec3 c = vec3(1.);//start with white background
+    
+    //deform
+    uv *= 1.+length(uv)*(5.+cos(iTime*0.25)*4.);
+    
+    //scrolling repeating black circles
+	vec2 ruv = mod(abs(uv+vec2(0.,iTime*0.2)),circleSize*2.)-circleSize;    
+    float d = (length(ruv)-circleSize);
+    draw(vec3(0.));
+    
+    //output color
+    fragColor = vec4(c, 1.);
+}

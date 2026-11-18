@@ -1,0 +1,25 @@
+#define PI 3.141592
+#define BALLS 10.
+#define zoom .2
+#define contrast 1.5
+#define ballSize 0.1
+#define radius 5.
+  
+void mainImage( out vec4 O, vec2 u ) {
+  vec2 R = iResolution.xy,
+       U = zoom * abs( 2. * u - R) / R.y;
+
+  U /= dot(U,U);
+  float dist = length(U);
+  O = vec4(0);
+
+  U *= tan( log(U) + iTime );
+  for (float i = 0.; i < BALLS; i++) {
+      U.x -= cos( log( abs( abs(U.x*.1) -i-1. )) -iTime );
+      float t = iTime/10. + i * PI / BALLS;
+      vec2 p =   vec2(tan(t), sin(t)) * radius * tan(i);
+      O.rgb += ( cos( + PI * (iTime/2. + i/5. +vec3(0, 2./2., -2./3.)) ) * .5 + .5)
+              * dist*ballSize / length(U + p);
+  }
+  O = pow(O, vec4(contrast));
+}

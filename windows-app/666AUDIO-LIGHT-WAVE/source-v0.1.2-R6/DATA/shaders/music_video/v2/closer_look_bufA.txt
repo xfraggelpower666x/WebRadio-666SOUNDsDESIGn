@@ -1,0 +1,46 @@
+// Inigo Quilez (MIT) https://www.shadertoy.com/view/ll2GD3
+vec3 c(float t) {
+    vec3 brightness = vec3(0.780, 0.602, 0.401);
+    vec3 contrast = vec3(0.344, 0.470, 0.381);
+    vec3 frequency = vec3(1.000, 1.000, 1.000);
+    vec3 phase = vec3(0.371, 0.311, 0.263);
+
+    vec3 color = brightness + contrast * cos(6.28318 * (frequency * t + phase));
+    return clamp(color, 0.0, 1.0); 
+}
+void mainImage( out vec4 O, vec2 I ){
+    vec3 p,q;
+    float i,j,t,v,s,T=iTime;
+    // Raymarching loop
+    for (O*=i; i++<30.;t+=v*.5){
+    p=t*normalize(vec3(I+I,0)-iResolution.xyy);
+
+    // Sine distortion
+    p+=sin(p*2.)/9.;
+    // Zoom in and out effect
+    p.z+=exp(-3.-3.*sin(T*.3))/2.;
+    // Rotation
+    p.xz *= mat2(cos(T*.5-vec4(5,16,38,5)));
+    // Center on pillar, move down slowly
+    p+=vec3(.1,sin(-T)/3e3,.1);
+    // Repeatedly carve smaller cubes out of space
+    v=0., s=1.;
+    for(j=0.;j++<max(19.-t*20.,10.);){
+    
+        p*=2.;
+        
+        s*=2.;
+        
+        q=abs(mod(p-1.,2.)-1.);
+        p.x=(p.x+T*.1);
+        v=max(v,(.7-max(max(q.x,q.y),q.z))/s); 
+    }
+    // Color accumulation
+    O.rgb+=exp(sin(2.*(log(t+.01)+c(t))))/(sqrt(v)+.005)*exp(t*1.5);
+    O.r*=1.05;//Shift red
+    }
+    // Tone mapping. Color adjust
+    O=tanh(O/3e3);
+    O*=O;
+    O*=2.;
+}

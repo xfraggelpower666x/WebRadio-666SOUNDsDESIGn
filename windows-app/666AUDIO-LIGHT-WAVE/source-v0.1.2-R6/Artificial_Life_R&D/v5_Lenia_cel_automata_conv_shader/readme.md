@@ -1,0 +1,1 @@
+This folder contains v5 of the Artificial Life; this version had 3 versions 5.1, 5.2, and the final v5.3, which transformed it to multidimensional; Lenia format of this project comes with fourier transforms and convolution done directly in pytorch; neural network is feeding Lenia.

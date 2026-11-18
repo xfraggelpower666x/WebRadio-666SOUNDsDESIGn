@@ -1,0 +1,51 @@
+//z0rg's rotation technique
+#define rot(a) mat2(cos(a+vec4(0.,11.,33.,0.)))
+
+float map(vec3 p){
+p.z+=iTime;
+p = fract(p)-0.5;
+
+return length(p)-0.5;
+
+}
+
+float trace(vec3 ro, vec3 rd){
+
+    float aD = 0.;
+    int max = int((cos(iTime*2.))*50.+180.);
+    
+    for (int i = 0; i<max; i++){
+
+    float d = map(ro+rd*aD);
+    aD+=d;
+    if(d<0.001){
+        return float(i)/float(max);
+    }
+
+}
+return float(max);
+
+}
+
+vec3 rdr(vec2 uv){
+uv= rot(length(uv)*cos(iTime*0.1)*5.)*uv;
+
+vec3 ro = vec3(0.,0.,-1.);
+vec3 rd = normalize(vec3(uv.x,uv.y,1.));
+
+float d = trace(ro,rd);
+
+float noise = fract(sin(dot(uv,vec2(127.1,311.7)))*48573.85967);
+
+float n = mix(d,noise,0.45);
+n = smoothstep(0.45,0.55,n);
+
+return vec3(n);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = (fragCoord-.5*iResolution.xy)/iResolution.xx;
+    vec3 col = rdr(uv);
+    fragColor = vec4(col,1.0);
+}

@@ -1,0 +1,36 @@
+// iChannel0: RGBAnoise_extra_large_1024x1024.png
+
+
+/* Aurora by @kishimisu (2024) - https://www.shadertoy.com/view/M3dSzs
+      
+     Looks best in fullscreen!
+
+   This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
+   International License (https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en)
+*/
+
+void mainImage(out vec4 O, vec2 F) {  
+
+    vec3    A              = iResolution, p;
+    float     u            , 
+                R          , 
+                  o        , 
+                    r      , 
+                      a    = iTime;
+
+    for (O *= u; u++ < 44.     ;)
+    
+        p = R * normalize(vec3(F+F-A.xy, A.y)),
+        
+        p.z -= 2., r = length(p), p /= r*.1,
+        
+        p.xz *= mat2(cos(a*.2 + vec4(0,33,11,0))),
+        R += o = min(r - .3, texture(iChannel1, F/1024.).r*.1) + .1,
+        
+        O += .05 / (.4 + o) 
+             * mix( smoothstep(.5,.7,sin(p.x+cos(p.y)*cos(p.z))*sin(p.z+sin(p.y)*cos(p.x+a))), 
+                    1., .15/r/r ) 
+             * smoothstep(5., 0., r)
+             * (1. + cos(R*3. + vec4(0,1,2,0)));
+
+}

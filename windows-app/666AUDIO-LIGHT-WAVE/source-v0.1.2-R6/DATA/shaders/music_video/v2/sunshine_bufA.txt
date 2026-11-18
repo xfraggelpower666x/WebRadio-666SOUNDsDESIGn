@@ -1,0 +1,194 @@
+// reference https://www.shadertoy.com/view/slVXDW
+//           https://www.shadertoy.com/view/Xlc3D2
+#define USE_TEX 1
+
+#define time iTime
+
+const float PI = 3.1415925358;
+
+float safety_sin( in float x ) { return sin( mod( x, PI ) ); }
+
+float saturate( in float x ) { return clamp( x, 0., 1. ); }
+vec3  saturate( in vec3  x ) { return clamp( x, 0., 1. ); }
+
+vec2 rotate( in vec2 p, float r )
+{
+	float s = sin( r );
+	float c = cos( r );
+	return mat2( c, -s, s, c ) * p;
+}
+
+
+float noise( in vec2 x )
+{
+
+    float tex_size = 128.0;
+    float n = texture( iChannel0, x / tex_size ).x;
+    n = saturate( pow( n, 1.5 ) * 1.2 );// modified color
+    return n;
+
+}
+
+float noise( in vec2 x, in float t )
+{
+
+    vec4 seed = vec4( 12.3456, 2.3456, 3.4567, 45.6789 );
+    vec2 t2 = mod( vec2( t ) * vec2( 0.05, 30.0 ), 2.0*PI );
+    t2.x = sin( t2.x );
+    float n0 = noise( x + seed.xy - t2.x );
+    float n1 = noise( x + seed.zw + t2.x );
+    float w  = sin( noise( x ) * 2.0*PI + t2.y ) * 0.5 + 0.5;
+    float n  = mix( n0, n1, w );
+    return n;
+}
+
+float sdCircle( in vec2 p, in float r )
+{
+    return length(p) - r;
+}
+
+float sdHexagon( in vec2 p, in float r )
+{
+    const vec3 k = vec3(-0.866025404,0.5,0.577350269);
+    p = abs(p);
+    p -= 2.0*min(dot(k.xy,p),0.0)*k.xy;
+    p -= vec2(clamp(p.x, -k.z*r, k.z*r), r);
+    return length(p)*sign(p.y);
+}
+
+float star_burst( in vec2 p, in vec2 center )
+{
+    float c0 = 0.5;
+    float c1 = 2.0;
+    float c2 = 6.0;
+    float c3 = 12.0;
+    float c4 = 2.0;
+    float c5 = 6.2;
+    float c6 = 4.0;
+    float c7 = 0.1;
+    float c8 = 6.2;
+    float t  = dot( center, vec2( 0.25 ) );
+    float l  = length( p );
+    float l2 = pow( l, c0 );
+    float n0 = noise( vec2( atan(  p.y,  p.x ) * c1, l2 ) * c2, t );
+    float n1 = noise( vec2( atan( -p.y, -p.x ) * c1, l2 ) * c2, t );
+    float n  = pow( max( n0, n1 ), c3 ) * pow( saturate( 1.0 - l * c4 ), c5 );
+    n += pow( saturate( 1.0 - ( l * c6 - c7 ) ), c8 );// glare
+    return n;
+}
+
+
+float halo( in vec2 p, in vec2 center, in float r, in float offset )
+{
+    float c0 = 0.5;
+    float c1 = 32.0;
+    float c2 = 12.0;
+    float c3 = 2.0;
+    float c4 = 1.0;// 1.0 == blur
+    float c5 = 4.0;// 0.0 == like glare
+    float c6 = 1.2;
+    float c7 = 0.5;
+    float c8 = 1.5;
+    float c9 = 0.25;
+
+    float t  = dot( center, vec2( c9 ) );
+    float l  = length( p );
+    float l1 = abs( l - r );
+    float l2 = pow( l, c0 );
+    float n0 = noise( vec2( atan(  p.y,  p.x ) * c1, l2 ) * c2, t );
+    float n1 = noise( vec2( atan( -p.y, -p.x ) * c1, l2 ) * c2, t );
+    float n  = mix( pow( max( n0, n1 ), c3 ), 1.0, c4 ) * pow( saturate( 1.0 - l1 * c5 ), c6 );
+    return n * 0.2 * saturate( pow(
+        saturate( pow( length( center ), c7 ) ),
+        ( length( p - center ) / r ) * c8
+    ) );
+}
+
+vec3 ghost3( in vec2 p, in vec2 center, float focus, in float r, in float offset )
+{
+    float shape_factor = 0.7;   // 0.0 == Circular aperture(like digital camera)
+                                // 1.0 == Six blades aperture(like old camera)
+    p -= center * offset;
+    vec2 p2 = rotate( p, 0.25 );
+    float d0 = mix( sdCircle( p2 * 0.85, r ), sdHexagon( p2 * 0.85, r ), shape_factor );
+    float d1 = mix( sdCircle( p2,        r ), sdHexagon( p2,        r ), shape_factor );
+    float d2 = mix( sdCircle( p2 * 1.15, r ), sdHexagon( p2 * 1.15, r ), shape_factor );
+    return mix(
+        vec3(
+            halo( p * 1.05, center, r, offset ),
+            halo( p * 1.0,  center, r, offset ),
+            halo( p * 0.95, center, r, offset )
+        ) * vec3( 2.0, 1.5, 1.0 )*2.,
+        pow( saturate( 1.0 - vec3( d0, d1, d2 ) ), vec3( 200. ) ),
+        focus
+    );
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 p = fragCoord / iResolution.xy - 0.5;
+    p.x *= iResolution.x/iResolution.y; // fix aspect ratio
+    
+    // Light position
+    float t0 = mod( time * 1.5, 2.0*PI );
+    float t1 = mod( time * 0.4, 2.0*PI );
+    vec2 center = vec2( cos( t0 ), sin( t0 ) ) * 0.4 * ( sin( t1 ) * 0.5 + 0.5 );
+    //if( iMouse.z >= .5 )
+	//{
+        //vec2 mouse = iMouse.xy / iResolution.xy - 0.5;
+        //mouse.x *= iResolution.x/iResolution.y; // fix aspect ratio
+	//	vec2 center = mouse.xy;
+	//}
+   
+    // Background
+    //vec3 col = texture(iChannel0, fragCoord / iResolution.xy).rgb;
+    vec3 col = vec3(0.);
+    vec3 sun = mix(vec3(0.3, 0.2, 0.02)/0.9, vec3(0.2, 0.5, 0.8), p.y)*3.-0.52*sin(iTime);
+    vec3 circColor = vec3(0.9, 0.2, 0.1);
+    vec3 circColor2 = vec3(0.3, 0.1, 0.9);
+    float a = atan(p.y-center.y, p.x-center.x);
+    float l = max(1.0-length(p-center)-0.84, 0.0);
+    float bright = 0.1;//+0.1/abs(sin(iTime/3.))/3.;//add brightness based on how the sun moves so that it is brightest
+    //when it is lined up with the center
+    
+    //add the sun with the frill things
+    sun += max(0.1/pow(length(p-center)*5., 5.), 0.0)*abs(sin(a*5.+cos(a*9.)))/20.;
+    sun += max(0.1/pow(length(p-center)*10., 1./20.), .0)+abs(sin(a*3.+cos(a*9.)))/8.*(abs(sin(a*9.)))/1.;
+    //add another sun in the middle (to make it brighter)  with the20color I want, and bright as the numerator.
+    sun += (max(bright/pow(length(p-center)*4., 1./2.), 0.0)*4.)*vec3(0.2, 0.21, 0.3)*4.;
+       // * (0.5+.5*sin(vec3(0.4, 0.2, 0.1) + vec3(a*2., 00., a*3.)+1.3));
+    	
+    //multiply by the exponetial e^x ? of 1.0-length which kind of masks the brightness more so that
+    //there is a sharper roll of of the light decay from the sun. 
+     sun*= exp(1.0-length(p-center))/5.;
+    
+    // Flare( glare + star burst )
+	col += sun;
+    
+    // Ghost
+    //col += ghost3( p, center, 0.0,  1.5,   1.2  );// halo
+    col += ghost3( p, center, 0.0,  1.5,   1.2 ) ;// halo
+    col += ghost3( p, center, 0.3,  .105, 0.5 /1.5 ) * vec3( 0.5, 0.1, -0.05 );
+    col += ghost3( p, center, 0.3,  .11,  .8 ) * vec3( 0.1, 0.6, -0.05 );
+    col += ghost3( p, center, 0.3,  .11,  0.3 /1.5 ) * vec3( 0.05, -0.05, 0.45 );
+    col += ghost3( p, center, 0.2,  .13,  -0.8 /3.5 ) * vec3( 0.5, 0.1, -0.05 );
+    col += ghost3( p, center, 0.05, .11,  -1.2 /3.5 ) * vec3( 0.0, 0.5, -0.05 );
+    col += ghost3( p, center, 0.2,  .17,  -2.0 /3.5 ) * vec3( 0.05, -0.05, 0.45 );
+    col += ghost3( p, center, 0.25, .14,  -3.15/3.5 ) * vec3( 0.0, 0.4, 0.2 );
+    col += ghost3( p, center, 0.15, .185, -3.75/3.5 ) * vec3( 0.0, 0.2, 0.05 );
+    col += ghost3( p, center, 0.05, .16,  -4.5 /3.5 ) * vec3( 0.05, -0.05, 0.45 );
+    col += ghost3( p, center, 0.20, .13,  -5.75/3.5 ) * vec3( 0.0, 0.3,  0.5 );
+    col += ghost3( p, center, 0.08, .12,  -5.95/3.5 ) * vec3( 0.05, 0.2, 0.05 );
+    col += ghost3( p, center, 0.04, .11, -6.15/3.5 ) * vec3( 0.1, -0.05, 0.65 );
+
+    // Streak
+    // (nothing)
+    
+    // Lens dust
+    // (nothing)
+
+    // Output to screen
+  //  col = pow( col, vec3( 1.0 / 2.2 ) );
+    fragColor = vec4( col, 1.0 );
+}

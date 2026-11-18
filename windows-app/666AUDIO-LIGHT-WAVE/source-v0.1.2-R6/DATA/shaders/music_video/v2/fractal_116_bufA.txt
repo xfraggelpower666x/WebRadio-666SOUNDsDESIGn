@@ -1,0 +1,29 @@
+// loop trick from https://twitter.com/zozuar/status/1483236063342698503
+
+#define hsv(h,s,v) mix(vec3(1),clamp((abs(fract((h)+vec3(3,2,1)/3.)*6.-3.)-1.),0.,1.),(s))*(v)
+#define r iResolution.xy
+#define t iTime
+
+void mainImage( out vec4 O, in vec2 C )
+{
+    O=vec4(0);
+    // つぶやきGLSL -> https://twitter.com/gaziya5/status/1502581898975268865
+    vec4 p=vec4(0);
+    float e,s=1.,g,j=0.;
+    for(int i=0;i<490;)
+        p=i++%7<1?
+            g+=e=length(p.yz)/s,
+            O.rgb+=hsv(log(s)*.3,.5,.02/exp(.1*j*j*e)),
+            j++,
+            s=1.,
+            asin(cos(vec4((C-r*.5)/r.y*g,g+t,.3)))
+        :
+            (
+            s*=e=2./min(dot(p,p),2.),
+            p=.05-abs(p-.05),
+            abs(p.x<p.y?p.wzxy:p.wzyx)*e-vec4(.8,.5,.4,1)
+            )
+        ;
+    O*=O;
+
+}
