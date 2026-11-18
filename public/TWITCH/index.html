@@ -37,6 +37,7 @@ audio{display:none}
 <div id="ticker"><div id="track">666SOUNDsDESIGn · LYVRA · LIVE 24/7</div></div>
 <div id="source">TWITCH · CONNECTING</div>
 <button id="audio-unlock" type="button" hidden aria-label="Radio-Ton starten">▶ AUDIO STARTEN</button>
+<script src="/js/audio-meter-policy.js?v=signal-r1"></script>
 <audio id="radio" autoplay preload="auto" playsinline crossorigin="anonymous"></audio>
 <script>
 (()=>{
@@ -48,7 +49,33 @@ const first=(...v)=>{for(const x of v){if(typeof x==='string'&&x.trim())return x
 function setTitle(v){const t=String(v||'').replace(/\s+/g,' ').trim()||'666SOUNDsDESIGn · LYVRA · LIVE 24/7';if(t===lastTitle)return;lastTitle=t;track.textContent=t+'   ✦   '+t+'   ✦   ';const sec=Math.max(18,Math.min(42,12+t.length*.22));track.style.setProperty('--ticker-seconds',sec+'s');}
 async function metadata(){try{const r=await fetch(META+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();setTitle(first(d.display_title,d.normalized_title,d.title_display,d.song,d.title,d.songtitle,d.track,d.currentSong,d.current_song,d.nowplaying,d.nowPlaying));}catch(_){if(!lastTitle)setTitle('666SOUNDsDESIGn · LYVRA · LIVE 24/7')}}
 function graph(){if(ctx)return;try{ctx=new (window.AudioContext||window.webkitAudioContext)();analyser=ctx.createAnalyser();analyser.fftSize=512;analyser.smoothingTimeConstant=.82;data=new Uint8Array(analyser.frequencyBinCount);const src=ctx.createMediaElementSource(audio);src.connect(analyser);analyser.connect(ctx.destination);}catch(_){ctx=null;analyser=null}}
-function frame(){if(analyser&&data){analyser.getByteFrequencyData(data);let lo=0,mi=0,hi=0;const n=data.length;for(let i=0;i<n;i++){const v=data[i]/255;if(i<n*.12)lo+=v;else if(i<n*.48)mi+=v;else hi+=v}lo/=Math.max(1,Math.floor(n*.12));mi/=Math.max(1,Math.floor(n*.36));hi/=Math.max(1,n-Math.floor(n*.48));const e=Math.min(1,(lo*1.25+mi*.75+hi*.45)/2.1);const s=document.documentElement.style;s.setProperty('--bass',lo.toFixed(3));s.setProperty('--mid',mi.toFixed(3));s.setProperty('--high',hi.toFixed(3));s.setProperty('--energy',e.toFixed(3));s.setProperty('--hue',((Date.now()/55)%360).toFixed(1)+'deg');}raf=requestAnimationFrame(frame)}
+function frame(){
+  let bass=0,mid=0,high=0,energy=0,signal='unavailable';
+  const policy=window.S666AudioMeterPolicy;
+  const playing=!audio.paused&&!audio.muted&&audio.readyState>=3&&!document.hidden;
+  if(playing&&ctx?.state==='running'&&analyser&&data){
+    analyser.getByteFrequencyData(data);
+    const n=data.length,bassEnd=Math.floor(n*.12),midEnd=Math.floor(n*.48);
+    for(let i=0;i<n;i++){
+      const value=data[i]/255;
+      if(i<bassEnd)bass+=value;
+      else if(i<midEnd)mid+=value;
+      else high+=value;
+    }
+    bass/=Math.max(1,bassEnd);mid/=Math.max(1,midEnd-bassEnd);high/=Math.max(1,n-midEnd);
+    energy=Math.min(1,(bass*1.25+mid*.75+high*.45)/2.1);
+    if(energy>0)signal='real';
+  }
+  if(signal==='unavailable'&&policy?.canSimulate(audio,document)){
+    ({bass,mid,high,energy}=policy.visualBands(audio.currentTime));
+    signal='synthetic';
+  }
+  const root=document.documentElement;
+  root.dataset.audioMeterSource=signal;
+  for(const [name,value] of Object.entries({bass,mid,high,energy}))root.style.setProperty('--'+name,value.toFixed(3));
+  root.style.setProperty('--hue',((Date.now()/55)%360).toFixed(1)+'deg');
+  raf=requestAnimationFrame(frame);
+}
 // Browser-Autoplay-Sperre ist kein Streamfehler: auf echte Benutzeraktion warten.
 let awaitingGesture=false,starting=false;
 const unlock=document.getElementById('audio-unlock');

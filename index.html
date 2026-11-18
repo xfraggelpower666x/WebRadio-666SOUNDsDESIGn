@@ -16,6 +16,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 <!DOCTYPE html>
 <html lang="de">
 <head>
+<script src="/js/audio-meter-policy.js?v=signal-r1"></script>
   <meta name="s666-cache-burst" content="audit-repair-v1-1-0-20260625" />
   <meta name="smfp-version" content="v2026.07.12-veluna16" />
   <!-- ROOT_MIGRATION_REPAIR_v1: external-player wurde als Hauptplayer in Root verlagert. -->
@@ -362,7 +363,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
 
   <audio id="radio" preload="none" playsinline crossorigin="anonymous"></audio>
 
-<script type="module" src="/js/player-core.js?v=2026-09-05-header-panels-led-idle-v1"></script>
+<script type="module" src="/js/player-core.js?v=2026-09-05-header-panels-led-idle-v1-signal-r1"></script>
 
 
 <!-- PC_SIDE_ADDON_FX_PANEL_v140 -->
@@ -2218,6 +2219,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
       <legend>Govee Cloud API</legend>
       <label>Gerätebereich <select data-area><option value="bars">LightBars</option><option value="tv">TV</option></select></label>
       <label><input type="checkbox"> Audio-Reaktivität</label>
+      <label data-govee-ios hidden><input type="checkbox"> Simulierte iOS-Pegel für Govee verwenden</label>
       <label>Modus <select data-mode><option value="auto">Automatisch</option><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
       <label>Testfarbe <input type="color" value="#00b4ff"></label>
       <label>Testfarb-Intensität <input type="range" min="1" max="100" value="65"></label>
@@ -2227,12 +2229,23 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
         <button type="button" data-action="on">Licht an</button>
         <button type="button" data-action="off">Licht aus</button>
       </div>
-      <p>ASUS Aura · Anschluss noch offen</p>
     </fieldset>
+    <details data-asus-aura>
+      <summary>ASUS Aura · Windows</summary>
+      <p>Windows-Starter aus <code>tools/asus-aura-web</code> öffnen und den dort angezeigten Kopplungscode eingeben.</p>
+      <label>Kopplungscode <input type="password" data-aura-code autocomplete="off" maxlength="48"></label>
+      <button type="button" data-aura-acquire>Aura übernehmen</button>
+      <label>Gerät <select data-aura-device></select></label>
+      <label>Farbe <input type="color" data-aura-color value="#00b4ff"></label>
+      <button type="button" data-aura-apply>Farbe anwenden</button>
+      <label><input type="checkbox" data-aura-bass> Bassreaktion · gemessener Pegel</label>
+      <button type="button" data-aura-release>Aura freigeben</button>
+      <p data-aura-status role="status">Lokalen ASUS-Aura-Dienst starten.</p>
+    </details>
     <p role="status" aria-live="polite"></p>
     <button type="button" data-close>Schließen</button>
   </dialog>
-<script type="module" src="/js/system-extra/govee/govee-panel.js?v=cloud-restore-1"></script>
+<script type="module" src="/js/system-extra/govee/govee-panel.js?v=signal-r1"></script>
 
   <!-- FRAGGLE DNA RAIL v1 — LEDs + Fixes + Umbenennung -->
   

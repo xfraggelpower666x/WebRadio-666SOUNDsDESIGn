@@ -28,7 +28,7 @@ test('right-side bands use real calibrated compensation without synthetic motion
   assert.match(eq, /visualHeadroom: 'balanced'/);
   assert.match(eq, /frequencyScale: 'logarithmic'/);
   assert.match(eq, /highFrequencyCompensation: true/);
-  assert.match(eq, /const synthetic = mobileLike\(\) && audio && !audio\.paused && !audio\.muted && audio\.readyState >= 2 && !document\.hidden/);
+  assert.match(eq, /const synthetic = meterPolicy\?\.canSimulate\(audio, document\) === true/);
   assert.match(eq, /"synthetic" is visualization only; never represents measured acoustic data/);
   assert.doesNotMatch(eq, /useHybrid|fallbackValue|const mirrored|localPeak - average/);
 });

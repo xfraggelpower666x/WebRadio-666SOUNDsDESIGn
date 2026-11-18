@@ -295,10 +295,12 @@ export function startVisualizer({ audio, bars, leftMeters = [], rightMeters = []
   const renderFallbackFrame = () => {
   if (!running) return;
   refreshVisualizerTargets();
-  const synthetic = mobileLike() && audio && !audio.paused && !audio.muted && audio.readyState >= 2 && !document.hidden;
-  const phase = performance.now() / 245;
+  const meterPolicy = window.S666AudioMeterPolicy;
+  const synthetic = meterPolicy?.canSimulate(audio, document) === true;
+  const bands = synthetic ? meterPolicy.visualBands(audio.currentTime) : null;
+  const eqBandSplit = bars.length / 3;
   const eq = bars.map((bar, index) => {
-    const value = synthetic ? clamp(0.09 + Math.abs(Math.sin(phase + index * 0.39)) * (0.22 + Math.abs(Math.sin(phase * 0.51)) * 0.24), 0.04, 0.70) : 0.025;
+    const value = synthetic ? bands[index < eqBandSplit ? 'bass' : index < eqBandSplit * 2 ? 'mid' : 'high'] : 0.025;
     setBar(bar, value);
     return value;
   });
@@ -495,7 +497,7 @@ count += 1;
       }
 
       const signalPresent = globalMax >= 3 || rms > 0.004;
-      if (!signalPresent && mobileLike() && audio && !audio.paused && audio.readyState >= 2) {
+      if (!signalPresent && window.S666AudioMeterPolicy?.isAppleMobile && audio && !audio.paused && audio.readyState >= 2) {
         renderFallbackFrame();
         rafId = window.requestAnimationFrame(frame);
         return;
