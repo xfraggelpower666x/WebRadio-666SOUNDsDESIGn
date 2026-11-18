@@ -2215,12 +2215,14 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
   <dialog id="web-govee" class="govee-panel" aria-labelledby="web-govee-title">
     <h2 id="web-govee-title">Govee Lichtsteuerung</h2>
     <fieldset>
-      <legend>Lokale Govee-Bridge</legend>
+      <legend>Govee Cloud API</legend>
+      <label>Gerätebereich <select data-area><option value="bars">LightBars</option><option value="tv">TV</option></select></label>
       <label><input type="checkbox"> Audio-Reaktivität</label>
-      <label>Modus <select><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
+      <label>Modus <select data-mode><option value="auto">Automatisch</option><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
       <label>Testfarbe <input type="color" value="#00b4ff"></label>
-      <label>Helligkeit <input type="range" min="1" max="100" value="65"></label>
+      <label>Testfarb-Intensität <input type="range" min="1" max="100" value="65"></label>
       <div>
+        <button type="button" data-action="devices">Geräte prüfen</button>
         <button type="button" data-action="color">Farbe testen</button>
         <button type="button" data-action="on">Licht an</button>
         <button type="button" data-action="off">Licht aus</button>
@@ -2230,7 +2232,7 @@ HINWEIS: Nur bestehende Worker-Endpunkte verwenden. Keine neuen Metadaten-/Strea
     <p role="status" aria-live="polite"></p>
     <button type="button" data-close>Schließen</button>
   </dialog>
-<script type="module" src="/js/system-extra/govee/govee-panel.js?v=20261116"></script>
+<script type="module" src="/js/system-extra/govee/govee-panel.js?v=cloud-restore-1"></script>
 
   <!-- FRAGGLE DNA RAIL v1 — LEDs + Fixes + Umbenennung -->
   

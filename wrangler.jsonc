@@ -26,6 +26,11 @@
   },
   "services": [
     {
+      "binding": "GOVEE_CONTROL_WORKER",
+      "service": "666-govee-control",
+      "entrypoint": "GoveeRadioService"
+    },
+    {
       "binding": "PW_ADMIN_WORKER",
       "service": "666-system-pw-worker"
     },

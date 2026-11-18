@@ -35,6 +35,6 @@ test('mode changes are stabilized without delaying drops',()=>{
 });
 
 test('Govee fallback does not create a second audio graph',()=>{
-  assert.match(root,/goveeSendAudio\(payload\)/);
+  assert.match(root,/goveeSendAudio\(cloudEvent\)/);
   assert.doesNotMatch(root,/AudioContext|createMediaElementSource|createAnalyser/);
 });
