@@ -277,3 +277,11 @@ NEXT_STEP=REAL_WINDOWS_HOST_ACCEPTANCE_OF_MILKDROP_OFF_VISUALIZER_SWITCH_RADIO_T
 - Der Web-Hauptplayer verwendet GOV als sichtbaren Einstieg, mit Admin-Passwort und explizitem Sync-Opt-in. DSC im oberen LED-Panel ist ausgeblendet, Discord im unteren Bereich bleibt verfügbar.
 - Lokale Quellprüfung: 13 Web-Regressionschecks, 20 Windows-Radio-Regressionschecks und 3 zusätzliche vertragsbasierte GOV-Prüfungen bestanden.
 - Offen: echter Browser- und Windows-Test, Verbindung zur lokalen Bridge und tatsächliche Gerätewirkung. ASUS Aura benötigt einen verifizierten Adapter. Keine neue Windows-Binärdatei und keine Live-Freigabe.
+
+## WINDOWS_APP Current · RADIO WAVE v6.66 / 1.19.7 · 2026-11-18
+
+- Quellrevision: `142d5ea7d60062102b6ed915a957193906e311e0`. Der bestehende Pfad `windows-app/SoundwaveStudio-666-PC/source-v1.19.3/` enthält jetzt Paketversion 1.19.7.
+- LOCAL vereint Medienbibliothek, Audio-Pool mit gespeichertem Ordner, Scan und Playlists. Dazu kommen 9-Band-EQ mit Live-Pegeln, sieben feste und fünf eigene Presets, Hardware-Einstellungen, gemeinsamer Hintergrund unter Wave Design, Presentation & Output, MilkDrop mit integriertem Cyber Studio sowie VJ-CSV und Paritäts-JSON.
+- Export Studio bietet MP4 (H.264/AAC) per mitgeliefertem FFmpeg und WebM an. 1.19.6 erzeugte im Electron-Linux-Test eine 1080p-MP4 mit Ton. Der Windows-Startcheck von 1.19.6 scheiterte laut Nutzerprotokoll in fünf FFmpeg-Testfällen. 1.19.7 korrigiert die Test-Fixtures und den Windows-Launcher. YouTube öffnet den offiziellen Player in einem eigenen Fenster, dessen Ton und Bild außerhalb des Studioexports liegen.
+- Prüfnachweise für 1.19.7: 47 gezielte Tests bestanden, ein FFmpeg-Test übersprungen, 116 statische Prüfungen und 168 Release-Prüfungen bestanden. Quell-ZIP `RADIO_WAVE_v6.66_1.19.7_YouTube_MP4.zip`, SHA-256 `0969a10e21cc7e02f0aac3136179955781cc7cc4e771ae590e75420b51b60ea7`.
+- Nächster Schritt: `RADIO_WAVE.bat check /nopause` auf Windows ausführen und einen lokalen Track aus dem Export Studio als MP4 speichern und mit Ton abspielen. Windows-Installer, portable EXE, YouTube-Wiedergabe und GOV/ASUS-Gerätewirkung sind für diesen Stand offen. Die aktiven WebRadio-Deploy-Pfade sind außerhalb dieses Updates.
