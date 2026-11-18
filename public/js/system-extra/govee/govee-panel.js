@@ -1,6 +1,6 @@
 import { GOVEE_SYNC_CONFIG } from './govee-sync-config.js';
-import { goveeTestOn, goveeTestOff, goveeTestColor } from './govee-bridge-client.js';
-import { bootFromCanonicalMeterBus } from './govee-scene-sync.js';
+import { checkGoveeArea, goveeCloudPower, goveeCloudTestColor } from './govee-cloud-client.js?v=cloud-restore-1';
+import { bootFromCanonicalMeterBus } from './govee-scene-sync.js?v=cloud-restore-1';
 
 const button = document.getElementById('statusGovee');
 const panel = document.getElementById('web-govee');
@@ -8,6 +8,8 @@ const auth = window.S666AdminAuth;
 const { sync } = bootFromCanonicalMeterBus();
 const status = panel.querySelector('[role=status]');
 const checkbox = panel.querySelector('input[type=checkbox]');
+const areaSelect = panel.querySelector('[data-area]');
+let area = areaSelect.value;
 let session;
 let checking = false;
 let pending = Promise.resolve();
@@ -36,7 +38,7 @@ button.addEventListener('click', async () => {
     if (gate.ok !== true || gate.authOk !== true || gate.pwOk !== true || !auth.getToken()) return;
     await pending;
     session = auth.getToken();
-    status.textContent = 'Freigabe aktiv. Die lokale Govee-Bridge muss laufen.';
+    status.textContent = 'Admin-Freigabe aktiv. Geräte können über die Govee-Cloud geprüft werden.';
     panel.showModal();
     expiry = setTimeout(() => panel.close(), 300000);
   } catch (error) {
@@ -65,11 +67,20 @@ function command(work, failed) {
       panel.close();
       return;
     }
-    await work();
-    if (active === session) status.textContent = 'Lokale Bridge hat den Befehl angenommen.';
-  }).catch(() => {
+    const message = await work();
+    if (active === session) status.textContent = typeof message === 'string'
+      ? message : 'Govee-Cloud hat den Befehl bestätigt.';
+  }).catch(error => {
     failed?.();
-    if (active === session) status.textContent = 'Lokale Govee-Bridge nicht erreichbar oder Befehl abgelehnt.';
+    const messages = {
+      govee_service_unconfigured: 'Die Verbindung zum Govee-Worker fehlt.',
+      govee_service_unavailable: 'Der Govee-Worker ist nicht erreichbar.',
+      govee_no_devices: 'Keine Geräte für den gewählten Bereich gefunden.',
+      govee_capability_unavailable: 'Die Geräte im gewählten Bereich unterstützen diese Funktion nicht.',
+      govee_rate_limit: 'Govee begrenzt die Anfragen. Bitte kurz warten.',
+      govee_partial: 'Govee hat den Befehl nur für einen Teil der Geräte bestätigt.'
+    };
+    if (active === session) status.textContent = messages[error?.message] || 'Govee-Cloud-Anfrage fehlgeschlagen.';
   }).finally(() => { checking = false; });
 }
 
@@ -79,17 +90,35 @@ checkbox.addEventListener('change', () => {
     checkbox.checked = GOVEE_SYNC_CONFIG.enabled;
     return;
   }
-  command(() => sync.setEnabled(enable), () => { checkbox.checked = false; });
+  command(async () => {
+    await sync.setEnabled(enable);
+    return enable ? 'Cloud-Audio-Reaktivität aktiv.' : 'Cloud-Audio-Reaktivität aus.';
+  }, () => { checkbox.checked = false; });
 });
-panel.querySelector('select').addEventListener('change', event => {
+panel.querySelector('[data-mode]').addEventListener('change', event => {
+  if (!authorized()) return;
   const mode = event.target.value;
-  command(() => sync.setMode(mode));
+  sync.setMode(mode);
+  status.textContent = 'Modus für die Cloud-Audio-Reaktivität gewählt.';
 });
-panel.querySelector('[data-action=on]').addEventListener('click', () => command(goveeTestOn));
-panel.querySelector('[data-action=off]').addEventListener('click', () => command(goveeTestOff));
+areaSelect.addEventListener('change', () => {
+  const next = areaSelect.value;
+  areaSelect.value = area;
+  command(async () => {
+    await sync.setArea(next);
+    area = next;
+    areaSelect.value = next;
+    return 'Gerätebereich verbunden.';
+  });
+});
+panel.querySelector('[data-action=devices]').addEventListener('click', () => {
+  command(async () => `${await checkGoveeArea(area)} Gerät(e) im gewählten Bereich gefunden.`);
+});
+panel.querySelector('[data-action=on]').addEventListener('click', () => command(() => goveeCloudPower(area, true)));
+panel.querySelector('[data-action=off]').addEventListener('click', () => command(() => goveeCloudPower(area, false)));
 panel.querySelector('[data-action=color]').addEventListener('click', () => {
   const value = panel.querySelector('input[type=color]').value;
   const [r,g,b] = value.slice(1).match(/../g).map(part => parseInt(part, 16));
   const brightness = Number(panel.querySelector('input[type=range]').value);
-  command(() => goveeTestColor({ r,g,b,brightness }));
+  command(() => goveeCloudTestColor(area, { r, g, b, brightness }));
 });

@@ -17,9 +17,9 @@ test('test-color control uses the dedicated bridge endpoint',()=>{
   assert.doesNotMatch(block,/sendPreview|goveeSendAudio|previewColor/);
   assert.match(bridge,/post\("\/api\/test\/color"/);
 });
-test('live audio sync remains on the audio bridge route',()=>{
-  assert.match(scene,/goveeSendAudio\(payload\)/);
-  assert.match(bridge,/post\("\/api\/audio"/);
+test('main player audio uses the authenticated cloud audio route',()=>{
+  assert.match(scene,/goveeSendAudio\(cloudEvent\)/);
+  assert.match(fs.readFileSync('public/js/system-extra/govee/govee-cloud-client.js','utf8'), /call\('\/audio', payload\)/);
   assert.match(scene,/window\.__MeterBus/);
   assert.doesNotMatch(scene,/AudioContext|createMediaElementSource|createAnalyser/);
 });

@@ -1,14 +1,14 @@
 import { GOVEE_SYNC_CONFIG } from "/js/system-extra/govee/govee-sync-config.js";
-import { goveeSendAudio, goveeSetMode, goveeSetEnabled } from "/js/system-extra/govee/govee-bridge-client.js";
+import { checkGoveeArea, goveePreviewAudio, goveeSendAudio } from "./govee-cloud-client.js?v=cloud-restore-1";
 import { applyStatusChip } from "/js/shared-status.js";
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, Number(n) || 0));
 }
 
-function sceneToMode(scene) {
-  return GOVEE_SYNC_CONFIG.sceneModeMap?.[scene] || "cyber";
-}
+const cloudIntervalMs = 2500;
+const cloudReconnectMs = 10000;
+const manualScenes = new Map([["cyber", "build"], ["club", "drop"], ["ambient", "break"]]);
 
 function inferSignalScene(detail = {}) {
   const energy = clamp(detail.energy ?? detail.level, 0, 1);
@@ -51,6 +51,7 @@ function mapAnalyzer(detail, fx) {
     mid: toBridgeLevel(detail.mid ?? detail.lowMid, GOVEE_SYNC_CONFIG.midWeight),
     high: toBridgeLevel(detail.high ?? detail.highMid, GOVEE_SYNC_CONFIG.highWeight),
     energy: toBridgeLevel(detail.energy ?? detail.level, 1),
+    pulse,
     kick: !!detail.kick || !!detail.beat || pulse > 0.24,
     drop: fx.scene === "drop" || fx.scene === "storm",
     breakMode: fx.scene === "break",
@@ -67,9 +68,9 @@ function publishState(state, error = "") {
   const chip = document.getElementById("statusGovee");
   const ledState = state === "connecting" ? "warn" : state === "disabled" ? "off" : state;
   const labels = {
-    online: "GOVEE / FX - lokale Bridge online",
-    connecting: "GOVEE / FX - lokale Bridge wird verbunden",
-    offline: "GOVEE / FX - lokale Bridge offline",
+    online: "GOVEE / FX - Govee-Cloud erreichbar",
+    connecting: "GOVEE / FX - Govee-Cloud wird verbunden",
+    offline: "GOVEE / FX - Govee-Cloud nicht verfügbar",
     disabled: "GOVEE / FX - Synchronisation deaktiviert",
     stopped: "GOVEE / FX - Synchronisation gestoppt"
   };
@@ -94,14 +95,16 @@ export function initGoveeSceneSync(ctx) {
   let destroyed = false;
   let lastError = "";
   let enabling = false;
-  const protectedPanel = document.getElementById("statusGovee")?.dataset.goveeRequiresAdmin === "true";
-  if (protectedPanel) GOVEE_SYNC_CONFIG.enabled = false;
+  let area = "bars";
+  let manualScene;
+  let generation = 0;
+  GOVEE_SYNC_CONFIG.enabled = false;
 
-  const markOffline = (error, now) => {
+  const markOffline = error => {
     connected = false;
-    retryAt = now + Math.max(1000, Number(GOVEE_SYNC_CONFIG.reconnectDelayMs) || 5000);
-    const message = error?.message || String(error || "bridge_unavailable");
-    if (message !== lastError) console.warn("Govee bridge offline:", message);
+    retryAt = Date.now() + Math.max(cloudReconnectMs, error?.retryAfterMs || 0);
+    const message = error?.message || String(error || "cloud_unavailable");
+    if (message !== lastError) console.warn("Govee-Cloud nicht verfügbar:", message);
     lastError = message;
     publishState("offline", message);
   };
@@ -115,22 +118,21 @@ export function initGoveeSceneSync(ctx) {
 
     const detail = event.detail || {};
     const now = Date.now();
-    if (protectedPanel && (
+    if (!window.S666AdminAuth?.getToken() ||
       document.documentElement.getAttribute("data-mff-playing") !== "1" ||
       detail.source !== "real" || !Number.isFinite(detail.ts) || now - detail.ts > 1000
-    )) return;
-    if (inFlight || now < retryAt || now - lastSend < GOVEE_SYNC_CONFIG.sendIntervalMs) return;
+    ) return;
+    if (inFlight || now < retryAt || now - lastSend < cloudIntervalMs) return;
     inFlight = true;
+    const requestGeneration = generation;
 
     try {
-      if (!connected) {
-        publishState("connecting");
-        if (!protectedPanel) await goveeSetEnabled(true);
-        connected = true;
-      }
-
-      if (!GOVEE_SYNC_CONFIG.enabled) return;
+      if (!connected) publishState("connecting");
       const fx = readFxContext(detail);
+      if (manualScene) {
+        fx.scene = manualScene;
+        fx.sceneSource = "manual";
+      }
       const payload = mapAnalyzer(detail, fx);
       document.documentElement.setAttribute("data-govee-scene", fx.scene);
       document.documentElement.setAttribute("data-govee-scene-source", fx.sceneSource);
@@ -140,20 +142,28 @@ export function initGoveeSceneSync(ctx) {
         pendingSceneSince = now;
       }
 
-      const immediateScene = fx.sceneSource === "dataset" || fx.scene === "drop" || fx.scene === "storm";
+      const immediateScene = fx.sceneSource === "dataset" || fx.sceneSource === "manual" || fx.scene === "drop" || fx.scene === "storm";
       const stableScene = now - pendingSceneSince >= 1200;
       if (GOVEE_SYNC_CONFIG.sceneCoupling && fx.scene !== lastScene && (lastScene === null || immediateScene || stableScene)) {
-        await goveeSetMode(sceneToMode(fx.scene));
         lastScene = fx.scene;
       }
 
       if (!GOVEE_SYNC_CONFIG.enabled) return;
-      await goveeSendAudio(payload);
-      lastSend = now;
+      const cloudEvent = {
+        ...payload,
+        area,
+        scene: lastScene ?? fx.scene,
+        theme: fx.theme,
+        energy: payload.energy / 255
+      };
+      await goveeSendAudio(cloudEvent);
+      if (destroyed || requestGeneration !== generation) return;
+      connected = true;
+      lastSend = Date.now();
       lastError = "";
       publishState("online");
     } catch (error) {
-      markOffline(error, now);
+      if (!destroyed && requestGeneration === generation) markOffline(error);
     } finally {
       inFlight = false;
     }
@@ -164,27 +174,38 @@ export function initGoveeSceneSync(ctx) {
   return {
     async setEnabled(enabled) {
       const next = !!enabled;
+      const requestGeneration = ++generation;
       GOVEE_SYNC_CONFIG.enabled = false;
       enabling = true;
       retryAt = 0;
       try {
-        const result = await goveeSetEnabled(next);
+        if (next) await checkGoveeArea(area);
+        if (requestGeneration !== generation || destroyed) return;
         connected = next;
         GOVEE_SYNC_CONFIG.enabled = next;
         publishState(next ? "online" : "disabled");
-        return result;
+        return { ok: true, enabled: next };
+      } catch (error) {
+        if (requestGeneration === generation && !destroyed) markOffline(error);
+        throw error;
       } finally {
-        enabling = false;
+        if (requestGeneration === generation) enabling = false;
       }
     },
     setMode(mode) {
+      manualScene = manualScenes.get(mode);
       lastScene = null;
       pendingScene = null;
       pendingSceneSince = 0;
-      return goveeSetMode(mode);
+    },
+    async setArea(next) {
+      await checkGoveeArea(next);
+      generation++;
+      area = next;
+      retryAt = 0;
     },
     sendPreview(payload) {
-      return goveeSendAudio(payload);
+      return goveePreviewAudio(payload);
     },
     getState() {
       return { enabled: GOVEE_SYNC_CONFIG.enabled, connected, retryAt, lastScene, pendingScene };
@@ -228,7 +249,7 @@ export function bootFromCanonicalMeterBus() {
         ts
       } }));
     }
-    timer = window.setTimeout(pump, Math.max(40, Number(GOVEE_SYNC_CONFIG.sendIntervalMs) || 90));
+    timer = window.setTimeout(pump, Math.max(40, cloudIntervalMs));
   };
 
   const runtime = {

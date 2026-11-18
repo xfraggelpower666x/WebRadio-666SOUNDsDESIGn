@@ -1,3 +1,4 @@
+import { handleGoveeAdmin } from './worker-addons/govee-admin-addon.js';
 import { DurableObject } from 'cloudflare:workers';
 import worker from './worker.js';
 import { handleDiscordNotifyWithGlobalTrackGate } from './worker-addons/discord-global-gate-router.js';
@@ -33,6 +34,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '');
+    if (path.startsWith('/api/admin/govee/')) return handleGoveeAdmin(request, env);
     if (path === '/api/discord/nowplaying' && request.method === 'POST') {
       return handleDiscordNotifyWithGlobalTrackGate(
         request,

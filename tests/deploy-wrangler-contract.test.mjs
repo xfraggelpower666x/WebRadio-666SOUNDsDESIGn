@@ -27,8 +27,10 @@ test("main deploy pins the canonical Player Admin Worker contract without commit
   assert.equal(config.vars.AUTH_AUDIENCE, "666SOUNDsDESIGn-WebRadio-Admin");
   assert.deepEqual(Object.fromEntries(config.services.map(item => [item.binding, item.service])), {
     PW_ADMIN_WORKER: "666-system-pw-worker",
-    AUTH_ADMIN_WORKER: "666-system-auth-worker"
+    AUTH_ADMIN_WORKER: "666-system-auth-worker",
+    GOVEE_CONTROL_WORKER: "666-govee-control"
   });
+  assert.equal(config.services.find(item => item.binding === "GOVEE_CONTROL_WORKER").entrypoint, "GoveeRadioService");
   assert.equal(Object.hasOwn(config, "compatibility_flags"), false);
   assert.equal(Object.hasOwn(config.vars, "ADMIN_SERVICE_TOKEN"), false);
 });
