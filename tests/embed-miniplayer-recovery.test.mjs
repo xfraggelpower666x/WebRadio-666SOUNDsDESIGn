@@ -18,7 +18,7 @@ test('Manual pause and source switch are explicitly fenced from automatic restar
   assert.match(core,/now\(\)-s\.manualStopAt<2500/);
 });
 test('Existing graph and CORS fail-closed safeguards remain in place',()=>{
-  assert.match(html,/if\(visualActive\)\{wanted=false;window\.S666AllPlayerAudioRecovery\?\.markManualStop\(audio\)/);
+  assert.match(html,/if\(visualActive&&sourceIndex>=2\)\{wanted=false;window\.S666AllPlayerAudioRecovery\?\.markManualStop\(audio\)/);
   assert.match(html,/audioContext\?\.state==='running'/);
   assert.match(html,/id="miniMuteBtn"/);
   assert.match(html,/core\.applyEq\(audio,/);
@@ -50,9 +50,9 @@ test('Dashboard STR/M/B LEDs reflect playback, not API health or source selectio
 test('iPhone display-only fallback retains separate non-measured contract and real MTR gating',()=>{
   const bridge=readFileSync(new URL('../public/js/audio-levels.js',import.meta.url),'utf8');
   assert.match(html,/function renderVisualFallback\(/);
-  assert.match(html,/publishVisualFallback\?\./);
+  assert.match(html,/publishVisualFallback\(levels\)/);
   assert.match(bridge,/type:'lyvra:audio:visual-fallback'/);
   assert.match(bridge,/mode:'synthetic'/);
-  assert.match(html,/meterAvailable:!!\(playing&&!audio\.muted&&visualActive/);
-  assert.match(html,/lastFrequencyPeak>0\|\|lastWaveformRms>0\.001/);
+  assert.match(html,/meterAvailable:!!\(playing&&!audio\.muted&&visualMode===\x27real\x27/);
+  assert.match(html,/lastFrequencyPeak>0/);
 });

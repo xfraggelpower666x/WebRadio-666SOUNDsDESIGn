@@ -54,7 +54,8 @@
 <script src="/js/boost-core.js"></script>
 <script src="/js/admin-auth-client.js"></script>
 <script src="/js/skip-control.js"></script>
-<script src="/js/audio-levels.js"></script>
+<script src="/js/audio-meter-policy.js?v=signal-r1"></script>
+<script src="/js/audio-levels.js?v=signal-r1"></script>
 <script src="/js/all-player-audio-recovery.js"></script>
 <script>
 (()=>{'use strict';
@@ -63,26 +64,62 @@ const cover=document.getElementById('cover'),dj=document.getElementById('dj'),li
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
 let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0,silentSince=0,lastFallbackPublish=0,visualMode='idle';
+const meterPolicy=window.S666AudioMeterPolicy;
 function renderVisualFallback(){
-  const active=audio&&!audio.paused&&!audio.muted&&audio.readyState>=2&&!document.hidden&&sourceIndex===0;
+  const active=meterPolicy.canSimulate(audio,document)&&!audioWaiting;
   visualMode=active?'synthetic':'idle';
-  const phase=performance.now()/235;
-  const values=bars.map((bar,i)=>{
-    const value=active ? Math.min(0.74,0.10+Math.abs(Math.sin(phase+i*0.46))*(0.20+0.23*Math.abs(Math.sin(phase*0.49)))) : 0;
-    bar.style.height=(3+value*18)+'px';
-    return value;
+  const levels=active?meterPolicy.visualBands(audio.currentTime):null;
+  bars.forEach((bar,i)=>{
+    const band=i<bars.length/3?'bass':i<bars.length*2/3?'mid':'high';
+    bar.style.height=(3+(levels?.[band]||0)*18)+'px';
   });
-  // Visual-only fallback; distinct type, never the genuine audio-levels contract.
-  if(active&&performance.now()-lastFallbackPublish>=200){
+  if(active&&performance.now()-lastFallbackPublish>=100){
     lastFallbackPublish=performance.now();
-    window.S666AudioLevels?.publishVisualFallback?.({bass:values[1]||0,mid:values[5]||0,high:values[9]||0,energy:(values[1]+values[5]+values[9])/3});
+    window.S666AudioLevels?.publishVisualFallback(levels);
   }
 }
 
 function onVisualContextStateChange(){if(audioContext?.state==='running')startVisualizer();}
-function startVisualizer(){if(!visualFramePending&&visualActive&&!audio.paused&&!document.hidden){visualFramePending=true;requestAnimationFrame(visualizer)}}
-function visualizer(){visualFramePending=false;if(!visualActive||!analyser||audio.paused||document.hidden)return;const running=audioContext?.state==='running';if(running){analyser.getByteFrequencyData(frequencyData);lastFrequencyPeak=frequencyData.reduce((peak,bin)=>Math.max(peak,bin),0);if(timeDomainData){analyser.getByteTimeDomainData(timeDomainData);let power=0;for(let i=0;i<timeDomainData.length;i++){const sample=(timeDomainData[i]-128)/128;power+=sample*sample}lastWaveformRms=Math.sqrt(power/timeDomainData.length)}lastMeterAt=performance.now();const hasRealSignal=lastFrequencyPeak>0||lastWaveformRms>0.001;if(hasRealSignal){silentSince=0;visualMode='real'}else if(!silentSince)silentSince=performance.now();window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);if(!hasRealSignal&&performance.now()-silentSince>1200){renderVisualFallback();startVisualizer();return}for(let i=0;i<bars.length;i++){const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);let peak=0;for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);bars[i].style.height=(3+peak/255*18)+'px'}startVisualizer()}}
-function enableVisualizer(){if(sourceIndex!==0)return;try{const core=window.SMFPBoostCore;if(!core)return;if(!visualActive){const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;analyser.fftSize=1024;frequencyData=new Uint8Array(analyser.frequencyBinCount);timeDomainData=new Uint8Array(analyser.fftSize);visualActive=true;if(visualContextObserved!==audioContext){visualContextObserved?.removeEventListener?.('statechange',onVisualContextStateChange);audioContext.addEventListener('statechange',onVisualContextStateChange);visualContextObserved=audioContext}applySound()}void core.resume(audio).then(ok=>{if(ok)startVisualizer()}).catch(()=>{});startVisualizer()}catch(_){visualActive=false}}
+function startVisualizer(){if(!visualFramePending&&!audio.paused&&!document.hidden){visualFramePending=true;requestAnimationFrame(visualizer)}}
+function visualizer(){
+  visualFramePending=false;
+  if(audio.paused||document.hidden)return;
+  const running=visualActive&&!!analyser&&audioContext?.state==='running'&&sourceIndex<2;
+  let hasRealSignal=false;
+  if(running){
+    analyser.getByteFrequencyData(frequencyData);
+    lastFrequencyPeak=frequencyData.reduce((peak,bin)=>Math.max(peak,bin),0);
+    analyser.getByteTimeDomainData(timeDomainData);
+    let power=0;
+    for(const value of timeDomainData){const sample=(value-128)/128;power+=sample*sample}
+    lastWaveformRms=Math.sqrt(power/timeDomainData.length);
+    hasRealSignal=!audioWaiting&&!audio.muted&&audio.volume>0&&audio.readyState>=3&&lastFrequencyPeak>0;
+  }
+  if(hasRealSignal){
+    lastMeterAt=performance.now();
+    silentSince=0;
+    visualMode='real';
+    window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext.sampleRate,audioContext.state);
+    for(let i=0;i<bars.length;i++){
+      const start=Math.floor(i*frequencyData.length/bars.length),end=Math.floor((i+1)*frequencyData.length/bars.length);
+      let peak=0;
+      for(let k=start;k<end;k++)peak=Math.max(peak,frequencyData[k]);
+      bars[i].style.height=(3+peak/255*18)+'px';
+    }
+  }else{
+    if(!silentSince)silentSince=performance.now();
+    if(performance.now()-silentSince>1200&&meterPolicy.canSimulate(audio,document)&&!audioWaiting){
+      renderVisualFallback();
+    }else{
+      visualMode='idle';
+      window.S666AudioLevels?.publish(audio,analyser,frequencyData,audioContext?.sampleRate,'unavailable');
+      bars.forEach(bar=>{bar.style.height='3px'});
+    }
+  }
+  startVisualizer();
+}
+
+function enableVisualizer(){if(sourceIndex>=2)return;try{const core=window.SMFPBoostCore;if(!core)return;if(!visualActive){const graph=core.ensureGraph(audio);if(!graph?.analyser||!graph?.context)return;audioContext=graph.context;analyser=graph.analyser;analyser.fftSize=1024;frequencyData=new Uint8Array(analyser.frequencyBinCount);timeDomainData=new Uint8Array(analyser.fftSize);visualActive=true;if(visualContextObserved!==audioContext){visualContextObserved?.removeEventListener?.('statechange',onVisualContextStateChange);audioContext.addEventListener('statechange',onVisualContextStateChange);visualContextObserved=audioContext}applySound()}void core.resume(audio).then(ok=>{if(ok)startVisualizer()}).catch(()=>{});startVisualizer()}catch(_){visualActive=false}}
 const soundBtn=document.getElementById('soundBtn'),messageBtn=document.getElementById('messageBtn'),soundPanel=document.getElementById('soundPanel'),messagePanel=document.getElementById('messagePanel'),soundStatus=document.getElementById('soundStatus'),messageStatus=document.getElementById('messageStatus');
 const sliders=[...document.querySelectorAll('[data-eq]')],boost=document.getElementById('boost');
 function applySound(){const core=window.SMFPBoostCore;if(!core)return;const values={};['sub','low','mid','high','air'].forEach((key,i)=>values[key]=Number(sliders[i].value));core.applyEq(audio,values,'embed-shared-core');const stage=core.applyBoost(audio,Number(boost.value),'embed-shared-core');boost.value=String(stage);soundStatus.textContent='Gemeinsamer Audio-Core · EQ aktiv · '+core.getLabel(stage)}
@@ -94,10 +131,10 @@ document.getElementById('send').addEventListener('click',async()=>{const button=
 const sources=[new URL('/stream',location.origin).href,new URL('/fallback-stream',location.origin).href,'https://my.idjstream.com/666soundsdesign/stream','https://my.idjstream.com:8686/stream'];
 let sourceIndex=0,wanted=false,retrying=false,audioWaiting=false,audioFault=false,watchdogStatus='idle',watchdogLastEventAt=0,watchdogProgressAt=0,watchdogAudioTime=0;audio.volume=.75;
 // WebAudio analyser requires a CORS-enabled stream; keep native audio unmodified when unavailable.
-// Visualizer activation is opt-in and must be tested with the production stream.
+// Beide Worker-Streams sind für den vorhandenen Analyser geeignet. Direkte Fremdstreams sind Ausweichpfade.
 function label(message){status.textContent=message}
 function state(){const playing=!audio.paused;toggle.textContent=playing?'Ⅱ':'▶';toggle.setAttribute('aria-label',playing?'Radio pausieren':'Radio abspielen')}
-async function play(){wanted=true;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex===0)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex===0)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
+async function play(){wanted=true;window.S666AllPlayerAudioRecovery?.markWanted(audio);if(!audio.src)audio.src=sources[sourceIndex];label('Verbinde …');if(sourceIndex<2)enableVisualizer();try{await audio.play();label('LIVE · Verbunden');if(sourceIndex<2)enableVisualizer();startVisualizer()}catch(e){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Wiedergabe nicht möglich · erneut Play drücken')}state()}
 toggle.addEventListener('click',()=>{if(!audio.paused){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);audio.pause();label('Pausiert');state()}else play()});
 // Plattformunabhaengiger Mute: nur die bestehende Audioinstanz, kein Eingriff in Pegel, EQ oder Boost.
 function syncMuteButton(){const muted=!!audio.muted;muteButton.setAttribute('aria-pressed',String(muted));const label=muted?'Ton einschalten':'Ton ausschalten';muteButton.setAttribute('aria-label',label);muteButton.title=label;muteButton.querySelector('.mini-mute-icon').textContent=muted?'🔇':'🔊';muteButton.querySelector('.mini-mute-label').textContent=muted?'SOUND':'MUTE'}
@@ -105,10 +142,10 @@ muteButton.addEventListener('click',()=>{audio.muted=!audio.muted;syncMuteButton
 audio.addEventListener('volumechange',syncMuteButton);
 syncMuteButton();
 volume.addEventListener('input',()=>audio.volume=Number(volume.value)/100);
-audio.addEventListener('playing',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();watchdogProgressAt=Date.now();watchdogAudioTime=Number(audio.currentTime)||0;retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex===0){enableVisualizer();startVisualizer()}});
+audio.addEventListener('playing',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();watchdogProgressAt=Date.now();watchdogAudioTime=Number(audio.currentTime)||0;retrying=false;audioWaiting=false;audioFault=false;label('LIVE · Läuft');state();if(sourceIndex<2)enableVisualizer();startVisualizer()});
 audio.addEventListener('waiting',()=>{watchdogStatus='buffering';watchdogLastEventAt=Date.now();audioWaiting=true;if(wanted)label('Puffert …')});
-audio.addEventListener('pause',()=>{watchdogStatus='idle';watchdogLastEventAt=Date.now();state();bars.forEach(b=>b.style.height='3px')});
-audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
+audio.addEventListener('pause',()=>{watchdogStatus='idle';watchdogLastEventAt=Date.now();state();silentSince=0;visualMode='idle';bars.forEach(b=>b.style.height='3px')});
+audio.addEventListener('error',async()=>{watchdogStatus='fault';watchdogLastEventAt=Date.now();audioFault=true;if(!wanted||retrying)return;if(sourceIndex+1>=sources.length){wanted=false;label('Stream nicht erreichbar');state();return}retrying=true;sourceIndex++;if(visualActive&&sourceIndex>=2){wanted=false;window.S666AllPlayerAudioRecovery?.markManualStop(audio);label('Backup-Stream benötigt CORS · Hauptplayer öffnen');state();return}audio.src=sources[sourceIndex];retrying=false;await play()});
 // iOS-Diagnose nur lokal sichtbar im bereits vorhandenen EQ-Panel. Keine Netzwerk-Telemetrie.
 const miniAudioDiag=document.getElementById('miniAudioDiag');
 function refreshAudioDiagnostics(){
@@ -148,7 +185,8 @@ window.S666EmbedControl=Object.freeze({
       source:sourceIndex===0?'main':'backup',
       wanted:!!wanted,readyState:audio.readyState,
       watchdogStatus,watchdogLastEventAt,watchdogProgressAt,watchdogStaleMs:watchdogProgressAt?Math.max(0,Date.now()-watchdogProgressAt):null,
-      meterAvailable:!!(playing&&!audio.muted&&visualActive&&analyser&&audioContext?.state==='running'&&performance.now()-lastMeterAt<2200&&(lastFrequencyPeak>0||lastWaveformRms>0.001)),
+      meterAvailable:!!(playing&&!audio.muted&&visualMode==='real'&&performance.now()-lastMeterAt<1500),
+      meterMode:playing&&!audio.muted?visualMode:'idle',
        audioContextState:audioContext?.state||'unavailable',graphAvailable:!!analyser,lastGenuineMeterAt:lastMeterAt
     };
   },
@@ -215,8 +253,8 @@ async function metadata(){
   finally{clearTimeout(timeout)}
 }
 metadata();setInterval(()=>{if(!document.hidden)metadata();else markMetadataStale()},12000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){metadata();if(!audio.paused&&sourceIndex===0){enableVisualizer();startVisualizer()}}});
-window.addEventListener('pageshow',()=>{if(!audio.paused&&sourceIndex===0){enableVisualizer();startVisualizer()}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){metadata();if(!audio.paused){if(sourceIndex<2)enableVisualizer();startVisualizer()}}});
+window.addEventListener('pageshow',()=>{if(!audio.paused){if(sourceIndex<2)enableVisualizer();startVisualizer()}});
 })();
 </script>
 </body>

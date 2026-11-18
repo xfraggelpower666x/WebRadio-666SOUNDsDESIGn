@@ -108,6 +108,8 @@
   @keyframes pollP{0%,100%{opacity:.2}50%{opacity:1}}
   </style>
   <link rel="stylesheet" href="./audio-neon.css">
+  <link rel="stylesheet" href="/js/system-extra/govee/govee-panel.css?v=20261116">
+  <script src="/js/audio-meter-policy.js?v=signal-r1"></script>
   <style id="dashboard-hud-css">
   .dash-header{gap:14px;flex-wrap:wrap;padding-right:20px}.dash-header .dash-brand{flex:1 1 170px;min-width:0}.dash-header .dash-head-controls{display:flex;align-items:center;gap:14px;flex:0 1 auto;justify-content:flex-end;min-width:0;flex-wrap:wrap}.dash-header .dash-time{min-width:0;text-align:right}.dash-clock{font-size:clamp(17px,3vw,28px);letter-spacing:.045em;white-space:nowrap}.dash-date{text-align:right;white-space:nowrap}.dash-header .lyvra-site-link{position:static!important;flex:0 0 auto;max-width:100%;white-space:nowrap}.dash-grid{grid-template-columns:minmax(0,1fr) minmax(270px,320px)}.dash-grid>div{min-width:0}.card{transition:border-color .2s ease,box-shadow .2s ease}.card:hover,.card:focus-within{border-color:#16fff380;box-shadow:0 0 24px #16fff329,inset 0 0 15px #ff3dbb11}.cyber-frequency{border-color:#ff3dbb66;position:relative;isolation:isolate}.cyber-frequency::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 24px #ff3dbb12}.frequency-heading{font-size:clamp(19px,2.7vw,28px);color:#fff;margin:0 0 8px}.frequency-heading span{color:var(--pink)}.frequency-intro{font-size:12px;line-height:1.55;color:#b5c8da;margin-bottom:16px}.radio-embed{width:100%;max-width:680px;margin:0 auto}.radio-embed iframe{display:block;width:100%;height:390px;min-height:365px;border:0;border-radius:18px}.hud-telemetry{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:15px}.hud-telemetry details{border:1px solid #16fff342;border-radius:12px;padding:10px;min-width:0;background:#050e1cbb;cursor:pointer}.hud-telemetry details:hover,.hud-telemetry details[open]{border-color:var(--pink);box-shadow:0 0 12px #ff3dbb32}.hud-telemetry summary{list-style:none}.hud-telemetry summary::-webkit-details-marker{display:none}.hud-telemetry small{display:block;color:#86b4bb;letter-spacing:.12em;font-size:9px}.hud-telemetry strong{display:block;margin-top:5px;color:var(--cyan);font-size:clamp(13px,1.8vw,19px);overflow-wrap:anywhere}.hud-telemetry details p{font-size:11px;line-height:1.5;color:#d9d5ea;margin-top:10px}.hud-subline{color:#a4afc7;font-size:11px;margin-top:10px}.audio-neon-controls{margin-top:14px}.radio-cyber-hud{position:relative;z-index:2}.dash-footer{position:relative;z-index:2}@media(max-width:860px){.dash-grid{grid-template-columns:1fr}}@media(max-width:600px){.dash-grid{padding:12px;gap:12px}.dash-header{padding:12px;gap:8px}.dash-header .dash-brand{flex:1 1 150px}.dash-header .dash-head-controls{gap:8px}.dash-date{font-size:8px;letter-spacing:0}.dash-header .lyvra-site-link{font-size:10px;padding:5px 8px}.hud-telemetry{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:14px}.radio-embed iframe{height:410px}}@media(max-width:380px){.dash-header .dash-brand{flex-basis:100%}.dash-header .dash-head-controls{flex:1 1 100%;justify-content:space-between}.dash-header .dash-time{text-align:left}.dash-date{text-align:left}}@media(prefers-reduced-motion:reduce){.card{transition:none}}
   </style>
@@ -217,8 +219,6 @@
   .hud-pill[data-health="error"] .hud-led{background:#ff3b64;box-shadow:0 0 9px #ff3b64}
   .hud-pill[data-health="off"] .hud-led{background:#43545d;box-shadow:none}
   .hud-pill[data-health="ok"] .hud-led{background:#0fffe9;box-shadow:0 0 9px #0fffe9}
-  #goveeHudModal .hud-dialog{gap:15px}
-  #goveeResponse{white-space:pre-wrap;word-break:break-word;color:#bffaff;font-size:12px}
   </style>
   <style id="lyvra-site-link-style">.lyvra-site-link{position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));z-index:80;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:1px solid #ff62d5;border-radius:999px;background:rgba(24,6,42,.94);color:#fff;text-decoration:none;font:700 12px/1.2 system-ui,Arial,sans-serif;box-shadow:0 0 14px rgba(255,66,202,.35);max-width:calc(100vw - 20px)}.lyvra-site-link:hover,.lyvra-site-link:focus-visible{background:#48165c;outline:2px solid #52efff;outline-offset:2px}@media(max-width:520px){.lyvra-site-link{font-size:11px;padding:5px 8px;top:auto;bottom:max(8px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right))}}</style>
 </head>
@@ -249,7 +249,7 @@
     <button class="hud-pill" type="button" data-hud-title="Meter · Metadaten / echte Audio-Pegel im Frequenzraum" data-hud-path="/api/nowplaying" aria-pressed="false" title="Metadaten-Monitor · /api/nowplaying"><span class="hud-led" aria-hidden="true"></span><span>MTR</span></button>
     <span class="hud-spacer" aria-hidden="true"></span>
     <button id="statusAdmin" class="hud-pill" type="button" data-hud-title="Geschütztes Admin-Panel" data-hud-action="admin" aria-pressed="false" title="Geschütztes Radio-Admin-Menü öffnen"><span class="hud-led" aria-hidden="true"></span><span>ADM</span></button>
-    <button class="hud-pill" type="button" data-hud-title="GOVEE lokale Bridge" data-hud-action="govee" aria-pressed="false" title="Lokale Govee-Bridge steuern"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
+    <button class="hud-pill" type="button" id="statusGovee" data-hud-title="Govee Cloud API" aria-haspopup="dialog" aria-controls="web-govee" data-govee-requires-admin="true" title="Govee-Cloud steuern"><span class="hud-led" aria-hidden="true"></span><span>GOV</span></button>
     <button class="hud-pill" type="button" data-hud-title="Hauptstream" data-hud-action="main" aria-pressed="false" title="Im MiniPlayer auf Hauptstream umschalten"><span class="hud-led" aria-hidden="true"></span><span>M</span></button>
     <button class="hud-pill" type="button" data-hud-title="Backupstream" data-hud-action="backup" aria-pressed="false" title="Im MiniPlayer auf Backupstream umschalten"><span class="hud-led" aria-hidden="true"></span><span>B</span></button>
   </nav>
@@ -263,12 +263,12 @@
       <section id="radio" class="card cyber-frequency radio-cyber-hud" aria-label="Radio MiniPlayer und audioreaktives Cyber HUD">
         <div class="card-label">CYBER FREQUENCY HUD · LIVE STREAM</div>
         <div class="radio-head-brand"><img class="radio-brand-logo" src="https://weblyvra.666soundsdesign-broadcaster.com/assets/lyvra-frequency-room-original.png" alt="LYVRA — Original Cyber-Logo" loading="eager" decoding="async" width="1254" height="1254"><div><h2 class="frequency-heading">Ein gemeinsamer <span>Frequenzraum.</span></h2><p class="radio-head-subtitle">666SOUNDsDESIGn · LIVE FREQUENCY</p></div></div>
-        <p class="frequency-intro">Klang wird Licht. Der unveränderte MiniPlayer bietet seine vollständigen Audio-, EQ-, Boost-, Stream- und Radiofunktionen. Die äußeren HUD-Effekte reagieren ausschließlich auf echte Audiodaten.</p>
+        <p class="frequency-intro">Klang wird Licht. Der unveränderte MiniPlayer bietet seine vollständigen Audio-, EQ-, Boost-, Stream- und Radiofunktionen. Die HUD-Effekte zeigen gemessene Audiopegel oder den gekennzeichneten iPhone-/iPad-Ersatz.</p>
         <div class="radio-embed"><iframe id="dashboardMiniPlayer" src="https://webradio.666soundsdesign-broadcaster.com/embed/miniplayer.html" title="666SOUNDsDESIGn WebRadio MiniPlayer" width="100%" height="198" loading="eager" allow="autoplay"></iframe></div>
         <aside id="audio-neon-controls" class="audio-neon-controls" aria-labelledby="audio-neon-title">
           <h3 id="audio-neon-title">Klang wird Licht.</h3><button type="button" aria-pressed="false">Neon-Effekte einschalten</button>
           <p data-neon-status role="status">Effekte aus</p>
-          <div class="neon-band-meter" role="img" aria-label="Echte Audiosignal-Pegel: Bass, Mitten und Höhen"><span>BASS<i data-neon-band="bass"></i></span><span>MITTEN<i data-neon-band="mid"></i></span><span>HÖHEN<i data-neon-band="high"></i></span></div>
+          <div class="neon-band-meter" role="img" aria-label="Audiopegel-Anzeige: Bass, Mitten und Höhen"><span>BASS<i data-neon-band="bass"></i></span><span>MITTEN<i data-neon-band="mid"></i></span><span>HÖHEN<i data-neon-band="high"></i></span></div>
           <p data-neon-note>Bass, Mitten und Höhen steuern das Neonlicht. Keine Mikrofonfreigabe, keine Audioaufzeichnung.</p>
         </aside>
       </section>
@@ -348,7 +348,38 @@
       <div class="hud-modal-actions"><button type="button" class="hud-render-toggle" id="hudRender" hidden>HTML-Vorschau anzeigen</button><button type="button" class="hud-render-toggle" id="hudCopy">📋 Antwort kopieren</button><span id="hudCopyStatus" role="status" aria-live="polite"></span></div>
     </section>
   </div>
-  <div id="goveeHudModal" class="hud-modal" hidden role="presentation"><section class="hud-dialog" role="dialog" aria-modal="true" aria-labelledby="goveeHudTitle"><div class="hud-dialog-header"><h2 id="goveeHudTitle">GOVEE · Lokale Licht-Bridge</h2><button id="goveeClose" type="button" aria-label="Schließen">✕</button></div><p>Steuerung der lokalen GOVEE-Bridge auf diesem Gerät. LEDs leuchten erst nach einer echten Bridge-Bestätigung.</p><div class="hud-modal-actions"><button type="button" class="hud-render-toggle" data-govee-command="enable">SYNC EIN</button><button type="button" class="hud-render-toggle" data-govee-command="disable">SYNC AUS</button><button type="button" class="hud-render-toggle" data-govee-command="teston">TEST EIN</button><button type="button" class="hud-render-toggle" data-govee-command="testoff">TEST AUS</button></div><pre id="goveeResponse" role="status">Bridge noch nicht geprüft.</pre></section></div>
+  <dialog id="web-govee" class="govee-panel" aria-labelledby="web-govee-title">
+    <h2 id="web-govee-title">Govee Lichtsteuerung</h2>
+    <fieldset>
+      <legend>Govee Cloud API</legend>
+      <label>Gerätebereich <select data-area><option value="bars">LightBars</option><option value="tv">TV</option></select></label>
+      <label><input type="checkbox"> Audio-Reaktivität</label>
+      <label data-govee-ios hidden><input type="checkbox"> Simulierte iOS-Pegel für Govee verwenden</label>
+      <label>Modus <select data-mode><option value="auto">Automatisch</option><option value="cyber">Cyber</option><option value="club">Club</option><option value="ambient">Ambient</option></select></label>
+      <label>Testfarbe <input type="color" value="#00b4ff"></label>
+      <label>Testfarb-Intensität <input type="range" min="1" max="100" value="65"></label>
+      <div>
+        <button type="button" data-action="devices">Geräte prüfen</button>
+        <button type="button" data-action="color">Farbe testen</button>
+        <button type="button" data-action="on">Licht an</button>
+        <button type="button" data-action="off">Licht aus</button>
+      </div>
+    </fieldset>
+    <details data-asus-aura>
+      <summary>ASUS Aura · Windows</summary>
+      <p>Windows-Starter aus <code>tools/asus-aura-web</code> öffnen und den dort angezeigten Kopplungscode eingeben.</p>
+      <label>Kopplungscode <input type="password" data-aura-code autocomplete="off" maxlength="48"></label>
+      <button type="button" data-aura-acquire>Aura übernehmen</button>
+      <label>Gerät <select data-aura-device></select></label>
+      <label>Farbe <input type="color" data-aura-color value="#00b4ff"></label>
+      <button type="button" data-aura-apply>Farbe anwenden</button>
+      <label><input type="checkbox" data-aura-bass> Bassreaktion · gemessener Pegel</label>
+      <button type="button" data-aura-release>Aura freigeben</button>
+      <p data-aura-status role="status">Lokalen ASUS-Aura-Dienst starten.</p>
+    </details>
+    <p role="status" aria-live="polite"></p>
+    <button type="button" data-close>Schließen</button>
+  </dialog>
   <footer class="dash-footer">
     <span id="pollDot"></span>
     LIVE · nowplaying alle 10s · broadcast alle 15s &nbsp;|&nbsp; 666SOUNDsDESIGn WebRadio
@@ -611,7 +642,7 @@
       mark('SB',state.waiting?'pending':state.playing?'ok':'off',state.waiting?'Stream puffert':state.playing?'Wiedergabe ohne Pufferereignis':'Kein aktiver Stream');
       mark('RCN',state.recovering?'pending':state.error?'error':'off',state.recovering?'Aktive Wiederverbindung':state.error?'Streamfehler':'Keine Recovery aktiv');
       mark('WCH',state.watchdogStatus==='healthy'?'ok':state.watchdogStatus==='buffering'||state.watchdogStatus==='stalled'?'pending':state.watchdogStatus==='fault'?'error':'off',state.watchdogStatus==='healthy'?'Audio-Watchdog: echte Audiozeit schreitet fort':state.watchdogStatus==='stalled'?'Audio-Watchdog: keine Audiozeit-Fortschritte (Recovery-Owner prüft)':state.watchdogStatus==='buffering'?'Audio-Watchdog: Puffern / Audiozeit wird geprüft':state.watchdogStatus==='fault'?'Audio-Watchdog: Audiofehler erkannt':'Audio-Watchdog: inaktiv');
-      mark('MTR',state.meterAvailable?'ok':'off',state.meterAvailable?'Echte FFT-Audioanalyse läuft':'Keine bestätigten aktuellen Audiopegel');
+      mark('MTR',state.meterAvailable?'ok':state.meterMode==='synthetic'?'pending':'off',state.meterAvailable?'Echte FFT-Audioanalyse läuft':state.meterMode==='synthetic'?'iPhone/iPad · simulierte Pegel':'Keine bestätigten aktuellen Audiopegel');
       mark('M',playing&&state.source==='main'?'ok':'off','Hauptstream '+(state.source==='main'?(playing?'aktiv':'ausgewählt, pausiert'):'nicht ausgewählt'));
       mark('B',playing&&state.source==='backup'?'ok':'off','Backupstream '+(state.source==='backup'?(playing?'aktiv':'ausgewählt, pausiert'):'nicht ausgewählt'));
     }
@@ -624,24 +655,12 @@
       });
     }
     mark('ADM','off','Geschützter Admin-Zugang, kein Loginstatus bestätigt');
-    mark('GOV','off','Govee-Bridge noch nicht bestätigt');
-    const gov=document.querySelector('[data-hud-action="govee"'),modal=document.getElementById('goveeHudModal'),response=document.getElementById('goveeResponse');
-    gov?.addEventListener('click',()=>{modal.hidden=false;document.getElementById('goveeClose').focus()});
-    const close=()=>{modal.hidden=true;gov?.focus()};
-    document.getElementById('goveeClose')?.addEventListener('click',close);
-    modal?.addEventListener('click',e=>{if(e.target===modal)close()});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)close()});
-    modal?.querySelectorAll('[data-govee-command]').forEach(button=>button.addEventListener('click',async()=>{
-      const command=button.dataset.goveeCommand;button.disabled=true;mark('GOV','pending','Lokale Bridge wird kontaktiert');response.textContent='Verbinde lokale GOVEE-Bridge …';
-      try{
-        const g=await import('/js/system-extra/govee/govee-bridge-client.js');
-        const result=command==='enable'?await g.goveeSetEnabled(true):command==='disable'?await g.goveeSetEnabled(false):command==='teston'?await g.goveeTestOn():await g.goveeTestOff();
-        if(result?.ok===false)throw Error(result.error||'Bridge meldet Fehler');
-        mark('GOV',command==='enable'||command==='teston'?'ok':'off','GOVEE Bridge: '+command+' bestätigt');
-        response.textContent='Bridge bestätigt: '+JSON.stringify(result||{},null,2);
-      }catch(e){mark('GOV','error','Govee-Bridge nicht erreichbar');response.textContent='Nicht bestätigt: '+String(e?.message||e)}
-      finally{button.disabled=false}
-    }));
+    mark('GOV','off','Govee-Cloud noch nicht bestätigt');
+    window.addEventListener('s666:govee-state', event => {
+      const { state, error } = event.detail;
+      mark('GOV', state==='online'?'ok':state==='connecting'?'pending':state==='offline'?'error':'off',
+        error || (state==='online'?'Govee-Cloud bestätigt':'Govee-Cloud · '+state));
+    });
     async function fetchData(url){
       const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6500);
       try{const r=await fetch(url,{cache:'no-store',signal:controller.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}
@@ -739,6 +758,7 @@
   </script>
   <!-- Globaler Layer direkt unter body: echte Audioreaktivität über postMessage. -->
   <div id="audio-neon-layer" aria-hidden="true"><span class="audio-neon-orbit"></span><span class="audio-neon-orbit"></span><span class="audio-neon-edge"></span><span class="audio-neon-midfield"></span><span class="audio-neon-bass-field"></span><span class="audio-neon-high-field"></span></div>
-  <script type="module" src="./audio-neon.js"></script>
-  </body>
+  <script type="module" src="./audio-neon.js?v=signal-r1"></script>
+    <script type="module" src="/js/system-extra/govee/govee-panel.js?v=signal-r1"></script>
+</body>
   </html>

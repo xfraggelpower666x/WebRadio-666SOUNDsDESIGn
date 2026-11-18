@@ -25,7 +25,7 @@ test('Bestehende Lautstaerke, Pegel und iOS-Kontextlogik bleiben erhalten', () =
   assert.match(player, /volume\.addEventListener\('input',\(\)=>audio\.volume=Number\(volume\.value\)\/100\)/);
   assert.match(player, /window\.S666AudioLevels\?\.publish/);
   assert.match(player, /audioContext\?\.state==='running'/);
-  assert.match(player, /if\(sourceIndex===0\)enableVisualizer\(\)/);
+  assert.match(player, /if\(sourceIndex<2\)enableVisualizer\(\)/);
   assert.match(player, /core\.applyBoost\(audio,/);
   assert.match(player, /core\.applyEq\(audio,/);
 });

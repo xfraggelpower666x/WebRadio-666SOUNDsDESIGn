@@ -124,9 +124,9 @@ test('MiniPlayer visual fallback is opt-in only while playing and silent for 1.2
 });
 test('main mobile visual fallback remains explicitly synthetic and respects actual playback',()=>{
  const main=readFileSync(new URL('../public/js/equalizer.js',import.meta.url),'utf8');
- assert.match(main,/synthetic = mobileLike\(\) && audio && !audio\.paused && !audio\.muted/);
+ assert.match(main,/synthetic = meterPolicy\?\.canSimulate\(audio, document\) === true/);
  assert.match(main,/publish\(level, level, synthetic \? 'synthetic' : 'unavailable'/);
- assert.match(main,/if \(!signalPresent && mobileLike\(\)/);
+ assert.match(main,/if \(!signalPresent && window\.S666AudioMeterPolicy\?\.isAppleMobile/);
  assert.match(main,/if \(!running\) return/);
 });
 

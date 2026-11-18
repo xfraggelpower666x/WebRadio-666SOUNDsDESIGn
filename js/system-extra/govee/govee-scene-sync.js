@@ -97,6 +97,7 @@ export function initGoveeSceneSync(ctx) {
   let enabling = false;
   let area = "bars";
   let manualScene;
+  let syntheticAllowed = false;
   let generation = 0;
   GOVEE_SYNC_CONFIG.enabled = false;
 
@@ -110,17 +111,15 @@ export function initGoveeSceneSync(ctx) {
   };
 
   const onAnalyzer = async (event) => {
-    if (destroyed || enabling) return;
-    if (!GOVEE_SYNC_CONFIG.enabled) {
-      publishState("disabled");
-      return;
-    }
+    if (destroyed || enabling || !GOVEE_SYNC_CONFIG.enabled) return;
 
     const detail = event.detail || {};
+    const sourceAllowed = detail.source === "real" ||
+      (detail.source === "synthetic" && syntheticAllowed && window.S666AudioMeterPolicy?.isAppleMobile);
     const now = Date.now();
     if (!window.S666AdminAuth?.getToken() ||
       document.documentElement.getAttribute("data-mff-playing") !== "1" ||
-      detail.source !== "real" || !Number.isFinite(detail.ts) || now - detail.ts > 1000
+      !sourceAllowed || !Number.isFinite(detail.ts) || now - detail.ts > 1000
     ) return;
     if (inFlight || now < retryAt || now - lastSend < cloudIntervalMs) return;
     inFlight = true;
@@ -159,6 +158,7 @@ export function initGoveeSceneSync(ctx) {
       await goveeSendAudio(cloudEvent);
       if (destroyed || requestGeneration !== generation) return;
       connected = true;
+      document.documentElement.setAttribute("data-govee-meter-source", detail.source);
       lastSend = Date.now();
       lastError = "";
       publishState("online");
@@ -191,6 +191,9 @@ export function initGoveeSceneSync(ctx) {
       } finally {
         if (requestGeneration === generation) enabling = false;
       }
+    },
+    allowSynthetic(allowed) {
+      syntheticAllowed = allowed;
     },
     setMode(mode) {
       manualScene = manualScenes.get(mode);
