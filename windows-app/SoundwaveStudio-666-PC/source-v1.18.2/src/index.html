@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RADIO WAVE v6.66</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https: swmedia: swsc:; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR: Control Studio -->
+    <aside class="control-panel">
+      <header class="studio-header">
+        <div class="rw-brand-banner" aria-hidden="true">
+          <img id="rw-brand-banner-img" alt="">
+        </div>
+        <div class="logo">
+          <div class="rw-brand-logo-wrap">
+            <img id="rw-brand-logo-img" class="rw-brand-logo" alt="RADIO WAVE v6.66">
+            <div class="logo-orb"></div>
+          </div>
+          <div class="rw-brand-title">
+            <h1>RADIO WAVE</h1>
+            <span>v6.66 · SOUNDWAVE CORE</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="panel-sections">
+<div class="source-hub panel-section active" id="source-hub">
+<h2 class="section-title"><span class="icon">⚡</span> Source Hub</h2>
+<div class="source-tabs"><button class="source-btn active" data-source="local">LOCAL</button><button class="source-btn" data-source="radio">666 RADIO</button><button class="source-btn" data-source="soundcloud">SOUNDCLOUD</button></div>
+<div id="radio-controls" class="source-pane hidden">
+<div class="nowplaying-box"><strong id="radio-now-title">666SOUNDsDESIGn</strong><span id="radio-now-artist">RADIO READY</span></div>
+<div class="remote-row"><input id="radio-password" class="custom-input" type="password" placeholder="Admin password"><button id="radio-login" class="btn btn-secondary">LOGIN</button><button id="radio-skip" class="btn btn-secondary">AUTODJ SKIP</button></div>
+<textarea id="player-message" class="custom-input" maxlength="240" placeholder="Player Messenger · 240 chars"></textarea><button id="player-message-send" class="btn btn-secondary">SEND → PLAYERS</button><div id="player-message-receive" class="file-meta-tag">PLAYER MESSENGER · WAITING</div>
+<textarea id="discord-message" class="custom-input" maxlength="1800" placeholder="Discord message"></textarea><div class="remote-row"><button id="discord-send" class="btn btn-secondary">SEND → DISCORD</button><button id="discord-now" class="btn btn-secondary">NOW PLAYING</button></div>
+<div id="radio-action-state" class="file-meta-tag">REMOTE · READY</div><div id="radio-runtime-health" class="file-meta-tag">REMOTE HEALTH · CHECKING</div>
+</div>
+<div id="soundcloud-controls" class="source-pane hidden"><div class="soundcloud-library-head"><strong>666SOUNDsDESIGN · Fraggelpower666</strong><button id="soundcloud-library-refresh" class="btn btn-secondary">REFRESH MY MUSIC</button></div><div id="soundcloud-library" class="soundcloud-library"><div class="file-meta-tag">Library loads from the official SoundCloud API.</div></div><input id="soundcloud-url" class="custom-input" placeholder="Optional: SoundCloud track / playlist URL"><button id="soundcloud-load" class="btn btn-secondary">LOAD URL</button><button id="soundcloud-prev" class="btn btn-secondary">◀ PREV</button><button id="soundcloud-next" class="btn btn-secondary">NEXT ▶</button><button id="soundcloud-open" class="btn btn-secondary">OPEN ON SOUNDCLOUD</button><div id="soundcloud-queue" class="file-meta-tag">Queue · 0 / 0</div><div class="file-meta-tag">Audio source: SoundCloud · creator attribution shown after resolve</div><div id="soundcloud-state" class="file-meta-tag">Secure Main-Process resolver · credentials not stored in renderer</div><div id="soundcloud-runtime-health" class="file-meta-tag">SOUNDCLOUD HEALTH · CHECKING</div></div>
+</div>
+
+        
+        <!-- SECTION 1: Files & Media Selection -->
+        <section class="panel-section active">
+          <h2 class="section-title"><span class="icon">📁</span> Media Library</h2>
+          
+          <div class="control-group">
+            <label>1. Audio Song File</label>
+            <button id="btn-select-audio" class="btn btn-primary select-btn">
+              <span class="btn-icon">🎵</span>
+              <span id="label-audio-file">Add Audio Files</span>
+            </button>
+            <div id="audio-meta" class="file-meta-tag hidden">No audio loaded</div>
+            <div id="local-drop-zone" class="local-drop-zone" tabindex="0">
+              <strong>DROP AUDIO FILES HERE</strong>
+              <span>MP3 · WAV · M4A · FLAC · AAC · OGG</span>
+            </div>
+            <div class="local-queue-toolbar">
+              <button id="local-prev" class="btn btn-secondary" type="button">◀ PREV</button>
+              <button id="local-next" class="btn btn-secondary" type="button">NEXT ▶</button>
+              <button id="local-shuffle" class="btn btn-secondary" type="button">SHUFFLE</button>
+              <button id="local-clear" class="btn btn-secondary" type="button">CLEAR</button>
+            </div>
+            <div class="local-queue-settings">
+              <label class="checkbox-container"><input type="checkbox" id="local-shuffle-mode"><span class="checkmark"></span> Shuffle playback</label>
+              <label for="local-crossfade">Track transition</label>
+              <div class="slider-header"><span>Fade</span><span id="local-crossfade-value">1.5s</span></div>
+              <input type="range" id="local-crossfade" min="0" max="8" step="0.1" value="1.5" class="custom-range">
+            </div>
+            <div id="local-queue-state" class="file-meta-tag">LOCAL QUEUE · 0 TRACKS</div>
+            <div id="local-queue-list" class="local-queue-list" aria-label="Local audio queue"></div>
+          </div>
+
+          <div class="control-group">
+            <label>2. Background Image</label>
+            <button id="btn-select-bg" class="btn btn-secondary select-btn">
+              <span class="btn-icon">🖼️</span>
+              <span id="label-bg-file">Select Background Image</span>
+            </button>
+            <div id="bg-meta" class="file-meta-tag hidden">Default Starfield active</div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: Visualizer Wave Designs -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">🎨</span> Wave Design</h2>
+          
+          <div class="control-group">
+            <label for="visualizer-style">Soundwave Style</label>
+            <select id="visualizer-style" class="custom-select">
+              <option value="linear-bars">Glowing Linear Bars</option>
+              <option value="circular-ring">Circular Ripple Rings</option>
+              <option value="fluid-wave">Fluid Wave Curves</option>
+              <option value="starburst-particles">Radial Starburst Particles</option>
+              <option value="digital-matrix">Digital Matrix HUD</option>
+              <option value="oscilloscope">Neon Oscilloscope</option>
+              <option value="orbit-sphere">3D Wireframe Orbit</option>
+              <option value="mirrored-border">Mirrored Wave Borders</option>
+              <option value="voice-assistant">AI Voice Assistant Wave</option>
+              <option value="water-ripple">Digital Water Ripple</option>
+              <option value="glow-ribbon">Volumetric Glow Ribbon</option>
+              <option value="eq-ribbon">Equalizer Wave Ribbons</option>
+              <option value="voice-blobs">Orbital Voice Blobs</option>
+              <option value="matrix-sphere">Digital Matrix Sphere</option>
+              <option value="neon-fiber">Neon Fiber Wavefront</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Color Theme</label>
+            <div class="color-options-row">
+              <input type="color" id="color-primary" value="#00f2fe" title="Primary Color">
+              <input type="color" id="color-secondary" value="#4facfe" title="Secondary Color">
+              <select id="color-mode" class="custom-select-small">
+                <option value="gradient">Gradient Blend</option>
+                <option value="solid">Solid primary</option>
+                <option value="hsl-shift">Dynamic Rainbow</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-glow">Glow Intensity</label>
+              <span id="val-glow">20px</span>
+            </div>
+            <input type="range" id="slider-glow" min="0" max="60" value="20" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-sensitivity">Audio Sensitivity</label>
+              <span id="val-sensitivity">1.5x</span>
+            </div>
+            <input type="range" id="slider-sensitivity" min="0.5" max="3" step="0.1" value="1.5" class="custom-range">
+          </div>
+        </section>
+
+        <!-- SECTION 3: Custom Layout, Positioning & Resizing -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">📐</span> Position & Size</h2>
+          <p class="section-subtitle">Move and resize the wave animation anywhere in the frame.</p>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-scale">Visualizer Size Scale</label>
+              <span id="val-scale">1.0x</span>
+            </div>
+            <input type="range" id="slider-scale" min="0.2" max="2.5" step="0.05" value="1.0" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-visual-opacity">Visualizer Transparency</label>
+              <span id="val-visual-opacity">100%</span>
+            </div>
+            <input type="range" id="slider-visual-opacity" min="0" max="100" step="1" value="100" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-pos-x">X-Position (Horizontal)</label>
+              <span id="val-pos-x">Center</span>
+            </div>
+            <input type="range" id="slider-pos-x" min="-100" max="100" value="0" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slider-pos-y">Y-Position (Vertical)</label>
+              <span id="val-pos-y">Center</span>
+            </div>
+            <input type="range" id="slider-pos-y" min="-100" max="100" value="0" class="custom-range">
+          </div>
+
+          <!-- Dynamic contextual controls -->
+          <div class="control-group conditional-control" id="control-linear-only">
+            <div class="slider-header">
+              <label for="slider-bar-width">Bar Width</label>
+              <span id="val-bar-width">6px</span>
+            </div>
+            <input type="range" id="slider-bar-width" min="2" max="25" value="6" class="custom-range">
+          </div>
+
+          <div class="control-group conditional-control hidden" id="control-circular-only">
+            <div class="slider-header">
+              <label for="slider-inner-radius">Circle Inner Radius</label>
+              <span id="val-inner-radius">120px</span>
+            </div>
+            <input type="range" id="slider-inner-radius" min="30" max="300" value="120" class="custom-range">
+          </div>
+        </section>
+
+        <!-- SECTION 4: Typography & Overlay -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">✏️</span> Text Overlays</h2>
+          
+          <div class="control-group">
+            <label for="input-title">Song Title</label>
+            <input type="text" id="input-title" placeholder="E.g., Moonlight Sonar" class="custom-input">
+          </div>
+
+          <div class="control-group">
+            <label for="input-artist">Artist / Subtitle</label>
+            <input type="text" id="input-artist" placeholder="E.g., Synthwave Echo" class="custom-input">
+          </div>
+
+          <div class="control-group">
+            <label for="select-font">Typography Style</label>
+            <select id="select-font" class="custom-select">
+              <option value="Syne">Syne (Futuristic Bold)</option>
+              <option value="Outfit">Outfit (Sleek Modern)</option>
+              <option value="Montserrat">Montserrat (Classic Clean)</option>
+              <option value="Playfair Display">Playfair Display (Elegant Serif)</option>
+              <option value="Space Grotesk">Space Grotesk (Tech Monospace)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="checkbox-container">
+              <input type="checkbox" id="check-beat-react" checked>
+              <span class="checkmark"></span>
+              Beat Reactive Text (Pulses to Audio Bass)
+            </label>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">🖥️</span> Presentation & Engines</h2>
+          <div class="control-group"><label>Visual Engine</label><select id="visual-engine" class="custom-select"><option value="soundwave">Soundwave Classic</option><option value="spectrum">CaYatur Spectrum</option><option value="analysis">CaYatur Deep Analyzer</option><option value="shader">CaYatur Shader Engine</option><option value="geometry3d">CaYatur 3D Geometry</option><option value="milkdrop">CaYatur MilkDrop</option></select></div>
+          <div class="control-group"><label>Shader Scene</label><select id="shader-preset" class="custom-select"><option value="neon">Neon Plasma</option><option value="tunnel">Cyber Tunnel</option><option value="grid">Spectrum Grid</option></select></div><div class="control-group"><label>3D Scene</label><select id="geometry-preset" class="custom-select"><option value="surface:torus">Torus</option><option value="surface:sphere">Sphere</option><option value="surface:klein">Klein Bottle</option><option value="attractor:lorenz">Lorenz Attractor</option><option value="attractor:rossler">Rössler Attractor</option><option value="solid:geodesic">Geodesic Sphere</option><option value="solid:icosahedron">Icosahedron</option></select></div><button id="btn-fullscreen" class="btn btn-secondary">FULLSCREEN</button>
+          <div class="control-group"><label>Display 1</label><select id="display-one" class="custom-select"></select><label>Display 2 (optional)</label><select id="display-two" class="custom-select"><option value="">Disabled</option></select></div>
+          <div class="control-group radio-visual-options">
+            <label class="checkbox-container"><input type="checkbox" id="radio-ticker-enabled" checked><span class="checkmark"></span> Radio metadata ticker</label>
+            <label class="checkbox-container"><input type="checkbox" id="radio-status-enabled" checked><span class="checkmark"></span> Radio status panel</label>
+            <label>Second display mode</label>
+            <select id="display-visual-mode" class="custom-select">
+              <option value="visual">Visualizer only</option>
+              <option value="visual+ticker">Visualizer + ticker</option>
+              <option value="visual+ticker+status" selected>Visualizer + ticker + status</option>
+            </select>
+          </div>
+          <div class="file-meta-tag" id="display-state">Display discovery pending</div>
+          <button id="export-diagnostics" class="btn btn-secondary">EXPORT RUNTIME DIAGNOSTICS</button>
+        </section>
+
+        <section class="panel-section" id="milkdrop-studio">
+          <h2 class="section-title"><span class="icon">🌌</span> MilkDrop Studio</h2>
+          <div class="milkdrop-hero">
+            <div class="milkdrop-orb" aria-hidden="true"></div>
+            <div>
+              <strong>MILKDROP GPU</strong>
+              <span id="milkdrop-gpu-status">WEBGL2 · CHECKING GPU</span>
+            </div>
+          </div>
+          <div class="control-group milkdrop-engine-switch">
+            <button id="milkdrop-activate" class="btn btn-primary">ACTIVATE MILKDROP</button>
+            <button id="milkdrop-deactivate" class="btn btn-secondary" type="button">MILKDROP OFF · SOUNDWAVE</button>
+          </div>
+          <div class="control-group">
+            <label for="milkdrop-preset">Preset</label>
+            <select id="milkdrop-preset" class="custom-select">
+              <option value="0">Kutup Işığı</option>
+              <option value="1">Erimiş Altın</option>
+              <option value="2">Dingin Halkalar</option>
+              <option value="3">Sonsuz Tünel</option>
+              <option value="4">Nabız Örgüsü</option>
+            </select>
+          </div>
+          <div class="milkdrop-transport">
+            <button id="milkdrop-prev" class="btn btn-secondary" type="button">◀ PREV</button>
+            <button id="milkdrop-random" class="btn btn-secondary" type="button">⤨ RANDOM</button>
+            <button id="milkdrop-next" class="btn btn-secondary" type="button">NEXT ▶</button>
+          </div>
+          <div class="control-group milkdrop-import-row">
+            <button id="milkdrop-import" class="btn btn-secondary">IMPORT .MILK</button>
+            <button id="milkdrop-import-pack" class="btn btn-secondary">IMPORT PRESET FOLDER</button>
+            <button id="milkdrop-import-personal" class="btn btn-secondary">IMPORT PERSONAL LIBRARY ZIP</button>
+          </div>
+          <div class="milkdrop-personal-library">
+            <div class="file-meta-tag" id="milkdrop-personal-state">PERSONAL LIBRARY · NOT INSTALLED</div>
+            <div class="milkdrop-library-actions">
+              <button id="milkdrop-filter-all" class="btn btn-secondary" type="button">ALL</button>
+              <button id="milkdrop-filter-top100" class="btn btn-secondary" type="button">TOP100</button>
+              <button id="milkdrop-filter-classic" class="btn btn-secondary" type="button">.MILK</button>
+              <button id="milkdrop-filter-double" class="btn btn-secondary" type="button">.MILK2</button>
+              <button id="milkdrop-license" class="btn btn-secondary" type="button">LICENSE</button>
+            </div>
+          </div>
+
+          <div class="milkdrop-control-grid">
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-auto"><span class="checkmark"></span> Auto Cycle</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-lock"><span class="checkmark"></span> Lock Preset</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-never-repeat" checked><span class="checkmark"></span> Never Repeat</label>
+            <label class="checkbox-container"><input type="checkbox" id="milkdrop-on-track"><span class="checkmark"></span> Next on Track Change</label>
+          </div>
+
+          <div class="control-group">
+            <label for="milkdrop-auto-unit">Auto Cycle Mode</label>
+            <select id="milkdrop-auto-unit" class="custom-select">
+              <option value="seconds">SECONDS</option>
+              <option value="bars">BARS · REAL BEAT</option>
+            </select>
+          </div>
+
+          <div class="control-group" id="milkdrop-seconds-group">
+            <div class="slider-header"><label for="milkdrop-auto-seconds">Seconds per Preset</label><span id="milkdrop-auto-seconds-value">30s</span></div>
+            <input type="range" id="milkdrop-auto-seconds" min="5" max="300" step="5" value="30" class="custom-range">
+          </div>
+
+          <div class="control-group" id="milkdrop-bars-group">
+            <div class="slider-header"><label for="milkdrop-auto-bars">Bars per Preset</label><span id="milkdrop-auto-bars-value">8</span></div>
+            <input type="range" id="milkdrop-auto-bars" min="1" max="32" step="1" value="8" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header"><label for="milkdrop-blend-time">Transition</label><span id="milkdrop-blend-time-value">1.5s</span></div>
+            <input type="range" id="milkdrop-blend-time" min="0" max="8" step="0.1" value="1.5" class="custom-range">
+          </div>
+
+          <div class="control-group">
+            <label for="milkdrop-hardcut">Audio Hardcut</label>
+            <select id="milkdrop-hardcut" class="custom-select">
+              <option value="off">OFF</option>
+              <option value="bass">BASS IMPACT</option>
+              <option value="treb">TREBLE IMPACT</option>
+              <option value="smart">SMART · BASS OR TREBLE</option>
+            </select>
+          </div>
+
+          <div class="milkdrop-threshold-grid">
+            <div class="control-group">
+              <div class="slider-header"><label for="milkdrop-hardcut-bass">Bass</label><span id="milkdrop-hardcut-bass-value">1.5</span></div>
+              <input type="range" id="milkdrop-hardcut-bass" min="1.05" max="6" step="0.05" value="1.5" class="custom-range">
+            </div>
+            <div class="control-group">
+              <div class="slider-header"><label for="milkdrop-hardcut-treb">Treble</label><span id="milkdrop-hardcut-treb-value">2.9</span></div>
+              <input type="range" id="milkdrop-hardcut-treb" min="1.05" max="10" step="0.05" value="2.9" class="custom-range">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header"><label for="milkdrop-repeat-window">No-Repeat Memory</label><span id="milkdrop-repeat-window-value">8</span></div>
+            <input type="range" id="milkdrop-repeat-window" min="1" max="50" step="1" value="8" class="custom-range">
+          </div>
+
+          <div class="milkdrop-runtime-row">
+            <span id="milkdrop-live-preset">PRESET · MANUAL</span>
+            <span id="milkdrop-cycle-state">CYCLE · OFF</span>
+          </div>
+          <div class="file-meta-tag" id="milkdrop-state">GPU feedback renderer · real audio analyser</div>
+        </section>
+
+        <section class="panel-section" id="rw-diagnostics">
+          <h2 class="section-title"><span class="icon">🩺</span> Diagnostics</h2>
+          <div class="rw-diag-toolbar">
+            <button id="rw-diag-refresh" class="btn btn-secondary" type="button">REFRESH</button>
+            <button id="rw-host-check" class="btn btn-secondary" type="button">RUN REAL HOST CHECK</button>
+            <button id="rw-diag-export" class="btn btn-secondary" type="button">EXPORT JSON</button>
+          </div>
+          <div class="file-meta-tag" id="rw-diag-state">READY</div>
+          <div id="rw-host-check-state" class="rw-host-check-state">
+            <div class="file-meta-tag">HOST CHECK · NOT RUN</div>
+          </div>
+          <h3 class="section-subtitle">Displays / Monitor</h3>
+          <div id="rw-diag-displays" class="rw-diag-grid"></div>
+          <h3 class="section-subtitle">Visualizer Outputs</h3>
+          <div id="rw-diag-outputs" class="rw-diag-grid"></div>
+          <h3 class="section-subtitle">GPU</h3>
+          <pre id="rw-diag-gpu" class="rw-diag-json">—</pre>
+          <h3 class="section-subtitle">Runtime</h3>
+          <pre id="rw-diag-runtime" class="rw-diag-json">—</pre>
+        </section>
+
+        <!-- SECTION 5: Video Export Engine -->
+        <section class="panel-section">
+          <h2 class="section-title"><span class="icon">📹</span> Export Studio</h2>
+          
+          <div class="control-group">
+            <label for="select-aspect-ratio">Aspect Ratio / Layout</label>
+            <select id="select-aspect-ratio" class="custom-select">
+              <option value="16-9">Widescreen 16:9 (1920x1080) - YouTube</option>
+              <option value="9-16">Vertical 9:16 (1080x1920) - Shorts/TikTok</option>
+              <option value="1-1">Square 1:1 (1080x1080) - Instagram</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="select-fps">Export Framerate</label>
+            <select id="select-fps" class="custom-select">
+              <option value="60">60 FPS (Ultra Smooth)</option>
+              <option value="30">30 FPS (Standard)</option>
+            </select>
+          </div>
+
+          <div class="export-actions">
+            <button id="btn-export" class="btn btn-record" disabled>
+              <span class="record-dot"></span>
+              <span id="label-export">Export Music Video</span>
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT: Live Interactive Preview Studio -->
+    <main class="preview-area">
+      <!-- Top header bar for quick diagnostics -->
+      <div class="preview-top-bar">
+        <button id="toggle-control-panel" class="preview-panel-toggle" type="button" aria-pressed="false">☰ CONTROLS</button>
+        <label class="rw-language-switch" for="app-language">
+          <span>LANGUAGE</span>
+          <select id="app-language" aria-label="Application language">
+            <option value="en-US" selected>🇺🇸 English (USA)</option>
+            <option value="de-DE">🇩🇪 German</option>
+          </select>
+        </label>
+        <div class="diagnostic-tag"><span class="diag-bullet" id="diag-status-color"></span> Status: <span id="diag-status">Idle</span></div>
+        <div class="diagnostic-tag">Bass Peak: <span id="diag-bass">0.00</span></div>
+        <div class="diagnostic-tag bpm-pill">Audio Signal: <span id="diag-bpm">--</span></div>
+        <div class="diagnostic-tag">Active Resolution: <span id="diag-resolution">1920 x 1080</span></div>
+        <div class="rw-led-bank" aria-label="Live audio spectrum levels">
+          <div class="rw-led-meter"><span>LOW</span><i><b id="rw-led-low"></b></i></div>
+          <div class="rw-led-meter"><span>MID</span><i><b id="rw-led-mid"></b></i></div>
+          <div class="rw-led-meter"><span>HIGH</span><i><b id="rw-led-high"></b></i></div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE: Visual Preview Aspect-Ratio Frame Container -->
+      <div class="preview-viewport-container">
+        <!-- Live drag/position helper overlay info -->
+        <div class="interactive-helper">Drag slider coordinates to adjust soundwave location</div>
+        
+        <!-- The actual video aspect ratio container -->
+        <div class="video-frame-container" id="video-frame-outer">
+          <div id="rw-stage-branding" class="rw-stage-branding" aria-hidden="true"><img alt=""></div>
+          <div id="source-artwork-bg" class="source-artwork-bg"></div>
+          <div id="radio-visual-header" class="radio-visual-header hidden"><span class="radio-666">666</span><span>RADIO WAVE v6.66</span><small>666SOUNDsDESIGn · SOUNDWAVE CORE</small></div>
+          <canvas id="visualizer-canvas"></canvas>
+          <aside id="radio-status-panel" class="radio-status-panel hidden" aria-live="polite">
+            <div class="radio-status-art"><img id="radio-status-artwork" alt="Stream artwork"></div>
+            <div class="radio-status-copy">
+              <div class="radio-status-kicker">LIVE STREAM STATUS</div>
+              <strong id="radio-status-title">RADIO WAVE v6.66</strong>
+              <span id="radio-status-artist">666SOUNDsDESIGn</span>
+              <div class="radio-status-grid">
+                <span>DJ</span><b id="radio-status-dj">—</b>
+                <span>ROUTE</span><b id="radio-status-route">MAIN</b>
+                <span>LISTENERS</span><b id="radio-status-listeners">—</b>
+                <span>STREAM</span><b id="radio-status-stream">—</b>
+              </div>
+            </div>
+          </aside>
+          <div id="source-nowplaying-ticker" class="source-nowplaying-ticker hidden"><div id="source-nowplaying-track" class="source-nowplaying-track">666SOUNDsDESIGn</div></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAVIGATION: Studio Audio Controls -->
+      <footer class="player-controls">
+        <div class="control-row">
+          
+          <button id="btn-play-pause" class="player-btn disabled" disabled>
+            <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="pause-icon hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          
+          <div class="track-timeline">
+            <span id="current-time">00:00</span>
+            <div class="waveform-seekbar-container">
+              <!-- SoundCloud style custom seekbar -->
+              <input type="range" id="seek-slider" min="0" value="0" max="100" class="seek-bar" disabled>
+              <div class="seek-progress" id="seek-progress-fill"></div>
+            </div>
+            <span id="total-duration">00:00</span>
+          </div>
+
+          <div class="volume-container">
+            <button id="btn-mute" class="mute-btn" type="button" aria-pressed="false" title="Mute audio">
+              <span class="mute-icon-on">🔊</span><span class="mute-icon-off hidden">🔇</span><small>MUTE</small>
+            </button>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7" class="volume-bar">
+          </div>
+
+        </div>
+      </footer>
+      <div class="radio-wave-copyright">COPYRIGHT 2026 BY FRAGGLEPOWER666 - 666SOUNDsDESIGN</div>
+    </main>
+
+    <!-- Hidden audio element for Web Audio API input -->
+    <audio id="audio-element" crossOrigin="anonymous"></audio>
+
+    <!-- EXPORT MODAL overlay when writing to local disk -->
+    <div id="export-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="export-pulse-ring"></div>
+        <h2>Rendering Music Video</h2>
+        <p>Your audio and soundwaves are being rendered to a file.</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="export-progress"></div>
+        </div>
+        <div class="export-stats">
+          <div>Time Encoded: <span id="export-time">00:00</span></div>
+          <div>Status: <span id="export-status-label">Writing stream...</span></div>
+        </div>
+        <button id="btn-stop-export" class="btn btn-danger">Stop & Save Video</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="assets/radio-wave/banner.asset.js"></script>
+  <script src="assets/radio-wave/appIconSource.asset.js"></script>
+  <script src="assets/radio-wave/inAppLogo.asset.js"></script>
+  <script src="assets/radio-wave/stage.asset.js"></script>
+  <script src="vendor/cayatur/analysis.js"></script>
+  <script src="vendor/cayatur/spectrum.js"></script>
+  <script src="vendor/cayatur/formulas.js"></script>
+  <script src="vendor/cayatur/solids.js"></script>
+  <script>window.SV=window.SV||{};window.SV.hexToRgb01=(h)=>{const x=String(h||'#3aa6ff').replace('#','');const v=parseInt(x.length===3?x.split('').map(c=>c+c).join(''):x.slice(0,6),16);return [(v>>16&255)/255,(v>>8&255)/255,(v&255)/255];};</script>
+  <script src="vendor/cayatur/geometry3d.js"></script>
+  <script src="vendor/cayatur/shaderhost.js"></script>
+  <script src="vendor/cayatur/milkdrop-core.js"></script>
+  <script src="vendor/cayatur/milkdrop-shader.js"></script>
+  <script src="vendor/cayatur/milkdrop-audio.js"></script>
+  <script src="vendor/cayatur/preset-registry.js"></script>
+  <script src="vendor/cayatur/presets-milkdrop.js"></script>
+  <script src="vendor/cayatur/milkdrop-cycle.js"></script>
+  <script src="vendor/cayatur/milkdrop-renderer.js"></script>
+  <script src="workspace.js"></script>
+  <script src="diagnostics.js"></script>
+  <script src="app.js"></script>
+  <script src="integration/666-integration.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "archive": "/mnt/data/Spout2-master.zip",
+      "kind": "spout",
+      "status": "SOURCE_INSPECTED",
+      "sha256": "0cd717c8d14dbf21a8df5c16c0c64317dbfb2f9ee256138d7fbeb8f7ebfc53f7",
+      "files": 467,
+      "notes": [
+        "Native GPU texture transfer requires Windows renderer instrumentation and a verified sender/receiver runtime.",
+        "Do not treat a bundled DLL as an active or trusted bridge."
+      ],
+      "has_c_api_header": true,
+      "has_license": true,
+      "embedded_dlls": [
+        "Spout2-master/SPOUTSDK/SpoutDirectX/SpoutDX/Tutorial04_Lib/bin/SpoutDX.dll",
+        "Spout2-master/SPOUTSDK/SpoutLibrary/Binaries/SpoutLibrary.dll"
+      ],
+      "has_receiver_api": true,
+      "has_sender_api": true
+    },
+    {
+      "archive": "/mnt/data/Java-master.zip",
+      "kind": "syphon",
+      "status": "SOURCE_INSPECTED",
+      "sha256": "d48f7d04cd3dceeab2b7917ff1a30ecff7cf4bdbafc6655188c3a8ac5a4e211b",
+      "files": 84,
+      "notes": [
+        "Syphon JNI library targets macOS; Windows LWJGL binaries do not make Syphon run on Windows."
+      ],
+      "has_xcode_project": true,
+      "has_java_jar": true
+    }
+  ],
+  "gpu_runtime_verified": false,
+  "spout_sender_integrated": false
+}
