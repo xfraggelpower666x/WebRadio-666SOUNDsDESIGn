@@ -1,7 +1,7 @@
 # 666PFS Child 666STREAM Deployment Contract
-## Version 1.0.2
+## Version 1.0.3
 
-> Compatibility note: the established repository path retains `v1.0.0` in its filename to avoid a duplicate documentation route. This document content is authoritative for v1.0.2.
+> Compatibility note: the established repository path retains `v1.0.0` in its filename to avoid a duplicate documentation route. This document content is authoritative for v1.0.3.
 
 SYSTEM_ID=666PFS-666STREAM-DEPLOYMENT-001
 PARENT_SYSTEM=666PFS
@@ -41,7 +41,7 @@ When 666CSM has unambiguously selected this child, the parent lifecycle is exten
 12. Require `DEPLOYMENT_IDENTITY_MATCH=PASS`, `DEPLOYMENT_READBACK=PASS` and `FUNCTIONAL_HTTP_READBACK=PASS`.
 13. Freeze the exact deployed repository tree.
 14. Generate ZIP, SHA-256, repository-tree inventory, CRC receipt and deployment receipt.
-15. Store the verified package as this 666PFS child release.
+15. Store the verified package as this 666PFS child release in the repo-first child path `children/STREAM-5001/` of `xfraggelpower666x/666PFS_CSM`.
 16. Read back the canonical and backup copies and verify size, entries, CRC and SHA-256.
 17. Update Registry and Menu.
 18. Update the CURRENT Pointer last.
@@ -84,7 +84,8 @@ The authoritative post-deploy freeze is triggered by the completed production de
 
 - GitHub repository: technical code source of truth.
 - Successful production deployment plus commit-bound live readback: deployment success authority.
-- 666PFS and 666CSM: child lifecycle, registry and backup authority.
+- 666PFS/CSM GitHub repository `xfraggelpower666x/666PFS_CSM`: child lifecycle, registry, rehydration metadata and backup-control authority.
+- Google Drive: historical backup/recovery evidence only; never CURRENT authority.
 - LYVRA: external and unchanged.
 
 ## Anti-layer rule
