@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
 const html=readFileSync(new URL('../public/embed/miniplayer.html',import.meta.url),'utf8');
 const core=readFileSync(new URL('../public/js/all-player-audio-recovery.js',import.meta.url),'utf8');
 test('MiniPlayer uses existing canonical recovery owner, not a second recovery loop',()=>{
@@ -55,4 +56,39 @@ test('iPhone display-only fallback retains separate non-measured contract and re
   assert.match(bridge,/mode:'synthetic'/);
   assert.match(html,/meterAvailable:!!\(playing&&!audio\.muted&&visualMode===\x27real\x27/);
   assert.match(html,/lastFrequencyPeak>0/);
+});
+
+test('MiniPlayer reads meter state before playback and publishes the first genuine FFT frame',()=>{
+  const declarations=html.match(/^let audioContext,.*$/m)?.[0];
+  const start=html.indexOf('function startVisualizer(){');
+  const end=html.indexOf('function enableVisualizer(){',start);
+  const stateSource=html.match(/  getState\(\)\{[\s\S]*?\n  \},/)?.[0];
+  assert.ok(declarations && start>=0 && end>start && stateSource);
+  let published=0;
+  const audio={paused:true,ended:false,readyState:0,muted:false,volume:.75};
+  const bars=[{style:{}}];
+  const context=vm.createContext({
+    audio,bars,document:{hidden:false},performance:{now:()=>100},
+    window:{S666AudioLevels:{publish(){published++;}}},requestAnimationFrame(){},
+    sourceIndex:0,audioWaiting:false,audioFault:false,wanted:false,retrying:false,
+    watchdogStatus:'idle',watchdogLastEventAt:0,watchdogProgressAt:0
+  });
+  vm.runInContext(declarations+'\n'+html.slice(start,end),context);
+  const state=()=>vm.runInContext('({'+stateSource+'}).getState()',context);
+  assert.equal(state().lastGenuineMeterAt,0);
+  assert.equal(state().meterAvailable,false);
+  vm.runInContext(`
+    audio.paused=false;
+    audio.readyState=4;
+    audioContext={state:'running',sampleRate:48000};
+    visualActive=true;
+    frequencyData=new Uint8Array(4);
+    timeDomainData=new Uint8Array(4);
+    analyser={getByteFrequencyData(out){out.fill(128);},getByteTimeDomainData(out){out.fill(128);}};
+    visualizer();
+  `,context);
+  assert.equal(state().lastGenuineMeterAt,100);
+  assert.equal(state().meterAvailable,true);
+  assert.equal(published,1);
+  assert.ok(parseFloat(bars[0].style.height)>3);
 });
