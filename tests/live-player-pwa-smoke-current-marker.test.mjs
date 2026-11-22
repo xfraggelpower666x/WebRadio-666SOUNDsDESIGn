@@ -9,7 +9,7 @@ test('live PWA smoke resolves the current boot marker from repository source', (
   const marker = boot.match(/const BOOT_MARKER='([^']+)'/)?.[1];
   assert.ok(marker, 'current BOOT_MARKER must exist in repository boot source');
   assert.match(workflow, /expected_boot_marker=.*BOOT_MARKER/);
-  assert.match(workflow, /grep -Fq "\$expected_boot_marker" "\$workdir\/central-boot-screen\.js"/);
+  assert.match(workflow, /grep -Fq "const BOOT_MARKER='\\$expected_boot_marker'" "\\$workdir\/central-boot-screen\.js"/);
 });
 
 test('live PWA smoke does not pin the superseded 20261016 boot marker', () => {
