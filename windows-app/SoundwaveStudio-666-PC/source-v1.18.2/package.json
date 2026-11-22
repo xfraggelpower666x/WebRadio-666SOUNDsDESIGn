@@ -1,0 +1,95 @@
+{
+  "name": "radio-wave-v666",
+  "version": "1.18.2",
+  "description": "RADIO WAVE v6.66 · Soundwave visual music player with 666 WebRadio addon",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "npm run prepare:branding && npm run check:radio-wave-release && electron-builder --win --x64 --publish never",
+    "package": "npm run prepare:branding && npm run check:release && node scripts/build.js",
+    "test": "node tests/deep-integration.test.cjs",
+    "check:syntax": "node scripts/check-syntax.cjs",
+    "check:release": "node scripts/release-integrity.cjs",
+    "prebuild": "npm run prepare:branding && npm run check:radio-wave-release",
+    "prepare:branding": "node scripts/prepare-radio-wave-branding.cjs",
+    "check:radio-wave-release": "node scripts/radio-wave-release-integrity.cjs"
+  },
+  "keywords": [
+    "radio-wave",
+    "soundwave",
+    "visualizer",
+    "music",
+    "radio",
+    "soundcloud",
+    "electron",
+    "desktop"
+  ],
+  "author": "FRAGGLEPOWER666 / 666SOUNDsDESIGN",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.666soundsdesign.radiowave.v666",
+    "productName": "RADIO WAVE v6.66",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/radio-wave-v6.66.ico"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "docs/**/*",
+      "DEEP_AUDIT_STATUS.md",
+      "package.json",
+      "build/windowsIconBase64.cjs",
+      "intro-preload.js",
+      "overlay-preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../milkdrop-cyber-studio/preset-studio",
+        "to": "milkdrop-cyber-studio",
+        "filter": [
+          "src/*.py",
+          "presets/**/*",
+          "scripts/directx_sdk.ps1"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "RADIO WAVE v6.66",
+      "artifactName": "RADIO-WAVE-v6.66-Setup.${ext}",
+      "runAfterFinish": true,
+      "perMachine": false,
+      "allowElevation": false
+    },
+    "portable": {
+      "artifactName": "RADIO-WAVE-v6.66-Portable.${ext}"
+    }
+  },
+  "productName": "RADIO WAVE v6.66"
+}

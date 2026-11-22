@@ -1,0 +1,26 @@
+{
+  "product": "RADIO WAVE v6.66",
+  "status": "BINARY_ASSET_SLOTS_WIRED",
+  "rules": {
+    "image_aspect_ratio": "PRESERVE",
+    "important_motif_cropping": "FORBIDDEN",
+    "branding_fit": "CONTAIN",
+    "stream_artwork_priority": "ABSOLUTE",
+    "stream_artwork_hd_preferred": true,
+    "stream_artwork_branding_override": "FORBIDDEN",
+    "stream_artwork_fallback": "ONLY_IF_ABSENT_OR_UNAVAILABLE"
+  },
+  "targets": {
+    "banner": "assets/radio-wave/radio-wave-banner-ui.webp",
+    "appIconSource": "assets/radio-wave/radio-wave-app-icon-ui.webp",
+    "inAppLogo": "assets/radio-wave/radio-wave-inapp-logo-ui.webp",
+    "stage": "assets/radio-wave/radio-wave-stage-ui.webp",
+    "windowsIcon": "assets/radio-wave/radio-wave-v6.66.ico"
+  },
+  "sourceFiles": [
+    "Neon-Cyberpunk-Radiobühne mit DJ-Avatar.png",
+    "Neon-Cyberpunk-Cyborg-Emblem RW v6.66.png",
+    "Neon-Cyberpunk-Androidin mit RW-Emblem.png",
+    "ChatGPT-Bild 10. Okt. 2026, 03_24_32.png"
+  ]
+}

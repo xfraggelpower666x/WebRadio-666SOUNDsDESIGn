@@ -1,0 +1,2029 @@
+// ==========================================================================
+// Soundwave Studio - Core Logic
+// Handlers: Web Audio API, Canvas Drawing, Custom Settings, Electron IPC Export
+// ==========================================================================
+
+// Global state variables
+let audioContext = null;
+let audioSource = null;
+let analyserNode = null;
+let externalAnalyserFrame = null; // real analyzer snapshot from primary player for visual-only output windows
+let audioDestinationNode = null; // Node for recording audio track
+let dataArray = null;
+let timeDataArray = null;
+let bufferLength = 0;
+let isPlaying = false;
+let animationFrameId = null;
+let recordingInterval = null; // Strict setInterval timer for background-proof rendering
+let visualizerTime = 0; // Synchronized timer for frame-perfect animations
+
+// UI & Customization values
+let activeStyle = 'linear-bars';
+let primaryColor = '#00f2fe';
+let secondaryColor = '#4facfe';
+let colorMode = 'gradient';
+let glowIntensity = 20;
+let sensitivity = 1.5;
+let scaleFactor = 1.0;
+let posXOffset = 0; // percentage (-100 to 100)
+let posYOffset = 0; // percentage (-100 to 100)
+let barWidthSetting = 6;
+let innerRadiusSetting = 120;
+let isBeatReactiveText = true;
+
+// Fonts & Overlays
+let songTitleText = '';
+let artistText = '';
+let activeFont = 'Syne';
+
+// Aspect Ratios & Resolutions
+let activeAspectRatio = '16-9';
+let exportFps = 60;
+let canvasWidth = 1920;
+let canvasHeight = 1080;
+
+// Media Loading state
+let bgImage = null;
+let bgFileName = '';
+let audioFileName = '';
+
+// Particle systems for dynamic backgrounds
+let starfieldParticles = [];
+let visualizerParticles = []; // Particles bursting on circular visualizer beat hits
+
+// Recording State
+let mediaRecorder = null;
+let isRecording = false;
+let recordedChunks = [];
+let exportSavePath = null;
+
+// DOM Elements
+const canvas = document.getElementById('visualizer-canvas');
+const ctx = canvas.getContext('2d');
+const audioElement = document.getElementById('audio-element');
+
+// Sidebar Trigger Elements
+const btnSelectAudio = document.getElementById('btn-select-audio');
+const labelAudioFile = document.getElementById('label-audio-file');
+const audioMeta = document.getElementById('audio-meta');
+
+const btnSelectBg = document.getElementById('btn-select-bg');
+const labelBgFile = document.getElementById('label-bg-file');
+const bgMeta = document.getElementById('bg-meta');
+
+// Wave Design Elements
+const selectVisualizerStyle = document.getElementById('visualizer-style');
+const inputColorPrimary = document.getElementById('color-primary');
+const inputColorSecondary = document.getElementById('color-secondary');
+const selectColorMode = document.getElementById('color-mode');
+const sliderGlow = document.getElementById('slider-glow');
+const valGlow = document.getElementById('val-glow');
+const sliderSensitivity = document.getElementById('slider-sensitivity');
+const valSensitivity = document.getElementById('val-sensitivity');
+
+// Sizing & Positioning Elements
+const sliderScale = document.getElementById('slider-scale');
+const valScale = document.getElementById('val-scale');
+const sliderPosX = document.getElementById('slider-pos-x');
+const valPosX = document.getElementById('val-pos-x');
+const sliderPosY = document.getElementById('slider-pos-y');
+const valPosY = document.getElementById('val-pos-y');
+
+const controlLinearOnly = document.getElementById('control-linear-only');
+const sliderBarWidth = document.getElementById('slider-bar-width');
+const valBarWidth = document.getElementById('val-bar-width');
+
+const controlCircularOnly = document.getElementById('control-circular-only');
+const sliderInnerRadius = document.getElementById('slider-inner-radius');
+const valInnerRadius = document.getElementById('val-inner-radius');
+
+// Typography Elements
+const inputTitle = document.getElementById('input-title');
+const inputArtist = document.getElementById('input-artist');
+const selectFont = document.getElementById('select-font');
+const checkBeatReact = document.getElementById('check-beat-react');
+
+// Export Elements
+const selectAspectRatio = document.getElementById('select-aspect-ratio');
+const selectFps = document.getElementById('select-fps');
+const btnExport = document.getElementById('btn-export');
+
+// Diagnostics HUD
+const diagStatus = document.getElementById('diag-status');
+const diagStatusColor = document.getElementById('diag-status-color');
+const diagBass = document.getElementById('diag-bass');
+const diagBpm = document.getElementById('diag-bpm');
+const diagResolution = document.getElementById('diag-resolution');
+
+// Player Controls
+const btnPlayPause = document.getElementById('btn-play-pause');
+const seekSlider = document.getElementById('seek-slider');
+const seekProgressFill = document.getElementById('seek-progress-fill');
+const currentTimeLabel = document.getElementById('current-time');
+const totalDurationLabel = document.getElementById('total-duration');
+const volumeSlider = document.getElementById('volume-slider');
+const btnMute = document.getElementById('btn-mute');
+const localDropZone = document.getElementById('local-drop-zone');
+const localQueueList = document.getElementById('local-queue-list');
+const localQueueState = document.getElementById('local-queue-state');
+const localPrev = document.getElementById('local-prev');
+const localNext = document.getElementById('local-next');
+const localShuffle = document.getElementById('local-shuffle');
+const localClear = document.getElementById('local-clear');
+const localShuffleMode = document.getElementById('local-shuffle-mode');
+const localCrossfade = document.getElementById('local-crossfade');
+const localCrossfadeValue = document.getElementById('local-crossfade-value');
+
+// Modal Elements
+const exportModal = document.getElementById('export-modal');
+const exportProgressBar = document.getElementById('export-progress');
+const exportTimeLabel = document.getElementById('export-time');
+const exportStatusLabel = document.getElementById('export-status-label');
+const btnStopExport = document.getElementById('btn-stop-export');
+
+// ==========================================================================
+// Setup & Initialization
+// ==========================================================================
+
+let localQueueSnapshot={count:0,index:-1,current:'',items:[],mediaUrl:''};
+let localTransitionBusy=false;
+const localSettings={
+  shuffle:localStorage.getItem('rw666-local-shuffle')==='1',
+  crossfade:Math.max(0,Math.min(8,Number(localStorage.getItem('rw666-local-crossfade')||1.5)))
+};
+if(localShuffleMode)localShuffleMode.checked=localSettings.shuffle;
+if(localCrossfade){localCrossfade.value=String(localSettings.crossfade);if(localCrossfadeValue)localCrossfadeValue.textContent=localSettings.crossfade.toFixed(1)+'s';}
+
+function setPlayerUiPlaying(playing){
+  isPlaying=!!playing;
+  btnPlayPause.querySelector('.play-icon')?.classList.toggle('hidden',isPlaying);
+  btnPlayPause.querySelector('.pause-icon')?.classList.toggle('hidden',!isPlaying);
+}
+function enableLocalPlayer(){
+  btnPlayPause.classList.remove('disabled');
+  btnPlayPause.disabled=false;
+  seekSlider.disabled=false;
+  btnExport.disabled=false;
+}
+function renderLocalQueue(state){
+  localQueueSnapshot=state||{count:0,index:-1,current:'',items:[],mediaUrl:''};
+  if(localQueueState)localQueueState.textContent=`LOCAL QUEUE · ${localQueueSnapshot.count||0} TRACK${localQueueSnapshot.count===1?'':'S'}${localQueueSnapshot.current?' · '+localQueueSnapshot.current:''}`;
+  if(localQueueList){
+    localQueueList.replaceChildren();
+    for(const item of localQueueSnapshot.items||[]){
+      const row=document.createElement('div');row.className='local-queue-row'+(item.active?' active':'');
+      const play=document.createElement('button');play.type='button';play.className='local-queue-track';play.dataset.index=String(item.index);play.textContent=(item.active?'▶ ':'')+item.name;
+      const remove=document.createElement('button');remove.type='button';remove.className='local-queue-remove';remove.dataset.removeIndex=String(item.index);remove.textContent='×';remove.title='Remove from local queue';
+      row.append(play,remove);localQueueList.appendChild(row);
+    }
+  }
+  if(localQueueSnapshot.current){
+    audioFileName=localQueueSnapshot.current;
+    labelAudioFile.textContent=audioFileName;
+    audioMeta.textContent=`Song: ${audioFileName}`;
+    audioMeta.classList.remove('hidden');
+    enableLocalPlayer();
+  }else{
+    labelAudioFile.textContent='Add Audio Files';
+    audioMeta.textContent='No audio loaded';
+    audioMeta.classList.remove('hidden');
+  }
+  return localQueueSnapshot;
+}
+function fadeAudioTo(target,ms){
+  const start=audioElement.volume;
+  const end=Math.max(0,Math.min(1,Number(target)||0));
+  if(!ms||Math.abs(start-end)<.005){audioElement.volume=end;return Promise.resolve();}
+  return new Promise(resolve=>{
+    const t0=performance.now();
+    const step=now=>{
+      const p=Math.min(1,(now-t0)/ms);
+      audioElement.volume=start+(end-start)*p;
+      if(p<1)requestAnimationFrame(step);else resolve();
+    };
+    requestAnimationFrame(step);
+  });
+}
+function waitForLocalCanPlay(timeout=8000){
+  if(audioElement.readyState>=2)return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    let done=false;
+    const finish=(err)=>{if(done)return;done=true;clearTimeout(timer);audioElement.removeEventListener('canplay',ok);audioElement.removeEventListener('error',bad);err?reject(err):resolve();};
+    const ok=()=>finish();const bad=()=>finish(new Error('local_audio_load_failed'));
+    const timer=setTimeout(()=>finish(new Error('local_audio_load_timeout')),timeout);
+    audioElement.addEventListener('canplay',ok,{once:true});audioElement.addEventListener('error',bad,{once:true});
+  });
+}
+async function activateLocalQueueIndex(index,{autoplay=true,fade=true}={}){
+  if(localTransitionBusy)return localQueueSnapshot;
+  localTransitionBusy=true;
+  const volumeRaw=Number(volumeSlider.value);
+  const preferredVolume=Math.max(0,Math.min(1,Number.isFinite(volumeRaw)?volumeRaw:0.7));
+  const fadeMs=Math.round(localSettings.crossfade*1000);
+  try{
+    if(fade&&isPlaying&&fadeMs>0)await fadeAudioTo(0,Math.min(2500,Math.round(fadeMs/2)));
+    audioElement.pause();
+    const state=await window.api.localQueueActivate(index);
+    renderLocalQueue(state);
+    if(!state?.mediaUrl)return state;
+    audioElement.src=state.mediaUrl;
+    audioElement.load();
+    enableLocalPlayer();
+    diagStatus.textContent='Local · '+(state.current||'ready');
+    await waitForLocalCanPlay().catch(()=>{});
+    if(autoplay){
+      ensureAudioContext();
+      audioElement.volume=fade&&fadeMs>0?0:preferredVolume;
+      await audioElement.play();
+      setPlayerUiPlaying(true);
+      if(fade&&fadeMs>0)await fadeAudioTo(preferredVolume,Math.min(2500,Math.round(fadeMs/2)));
+      diagStatus.textContent='Playing · '+(state.current||'LOCAL');
+      diagStatusColor.style.backgroundColor='#2ed573';
+    }else{
+      audioElement.volume=preferredVolume;
+      setPlayerUiPlaying(false);
+    }
+    return state;
+  }finally{localTransitionBusy=false;}
+}
+function nextLocalIndex(direction=1){
+  const count=localQueueSnapshot.count||0;if(!count)return -1;
+  const current=Math.max(0,localQueueSnapshot.index||0);
+  if(localSettings.shuffle&&count>1){
+    let next=current;while(next===current)next=Math.floor(Math.random()*count);return next;
+  }
+  return (current+direction+count)%count;
+}
+async function localQueueNextTrack(){const idx=nextLocalIndex(1);if(idx>=0)return activateLocalQueueIndex(idx,{autoplay:true,fade:true});}
+async function localQueuePrevTrack(){const count=localQueueSnapshot.count||0;if(!count)return;const idx=(Math.max(0,localQueueSnapshot.index||0)-1+count)%count;return activateLocalQueueIndex(idx,{autoplay:true,fade:true});}
+async function restoreLocalQueue(){
+  try{
+    const state=await window.api.localQueueState();
+    renderLocalQueue(state);
+    if(state?.count&&state?.mediaUrl&&!audioElement.src){
+      audioElement.src=state.mediaUrl;audioElement.load();enableLocalPlayer();
+    }
+    return state;
+  }catch(e){console.error('Local queue restore',e);return localQueueSnapshot;}
+}
+async function resumeLocalCurrent({autoplay=true}={}){
+  const state=await window.api.localQueueState();
+  renderLocalQueue(state);
+  if(!state?.count)return state;
+  return activateLocalQueueIndex(Math.max(0,state.index),{autoplay,fade:false});
+}
+window.RWLocalQueue=Object.freeze({
+  state:()=>localQueueSnapshot,
+  restore:restoreLocalQueue,
+  resumeCurrent:resumeLocalCurrent,
+  next:localQueueNextTrack,
+  previous:localQueuePrevTrack
+});
+
+function init() {
+  setupEventListeners();
+  updateAspectSettings();
+  setupProceduralParticles();
+  resizeCanvas();
+  renderLoop();
+}
+
+function setupEventListeners() {
+  // Local multi-file queue selection
+  btnSelectAudio.addEventListener('click', async () => {
+    try {
+      diagStatus.textContent='Opening Local Audio Queue…';
+      const state=await window.api.openAudio();
+      if(state?.count){
+        renderLocalQueue(state);
+        if(!document.body.classList.contains('source-local'))document.querySelector('.source-btn[data-source="local"]')?.click();
+        else await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:true,fade:false});
+      }
+    }catch(err){console.error(err);diagStatus.textContent='Local Audio Load Error';}
+  });
+
+  localQueueList?.addEventListener('click',async e=>{
+    const remove=e.target.closest('[data-remove-index]');
+    if(remove){
+      const removeIndex=Number(remove.dataset.removeIndex);
+      const wasActive=removeIndex===localQueueSnapshot.index;
+      const shouldResume=wasActive&&isPlaying&&document.body.classList.contains('source-local');
+      const state=await window.api.localQueueRemove(removeIndex);
+      renderLocalQueue(state);
+      if(wasActive&&document.body.classList.contains('source-local')){
+        if(state?.count){
+          await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:shouldResume,fade:false});
+        }else{
+          audioElement.pause();
+          audioElement.removeAttribute('src');
+          audioElement.load();
+          setPlayerUiPlaying(false);
+        }
+      }
+      return;
+    }
+    const track=e.target.closest('[data-index]');
+    if(track){
+      const index=Number(track.dataset.index);
+      if(!document.body.classList.contains('source-local')){
+        renderLocalQueue(await window.api.localQueueActivate(index));
+        document.querySelector('.source-btn[data-source="local"]')?.click();
+      }else await activateLocalQueueIndex(index,{autoplay:true,fade:true});
+    }
+  });
+  localPrev?.addEventListener('click',()=>localQueuePrevTrack().catch(console.error));
+  localNext?.addEventListener('click',()=>localQueueNextTrack().catch(console.error));
+  localShuffle?.addEventListener('click',async()=>renderLocalQueue(await window.api.localQueueShuffle()));
+  localClear?.addEventListener('click',async()=>{
+    audioElement.pause();audioElement.removeAttribute('src');audioElement.load();setPlayerUiPlaying(false);
+    renderLocalQueue(await window.api.localQueueClear());
+  });
+  localShuffleMode?.addEventListener('change',()=>{
+    localSettings.shuffle=!!localShuffleMode.checked;
+    localStorage.setItem('rw666-local-shuffle',localSettings.shuffle?'1':'0');
+  });
+  localCrossfade?.addEventListener('input',()=>{
+    localSettings.crossfade=Math.max(0,Math.min(8,Number(localCrossfade.value)||0));
+    localStorage.setItem('rw666-local-crossfade',String(localSettings.crossfade));
+    if(localCrossfadeValue)localCrossfadeValue.textContent=localSettings.crossfade.toFixed(1)+'s';
+  });
+  for(const type of ['dragenter','dragover'])localDropZone?.addEventListener(type,e=>{e.preventDefault();e.stopPropagation();localDropZone.classList.add('drag-active');});
+  for(const type of ['dragleave','drop'])localDropZone?.addEventListener(type,e=>{e.preventDefault();e.stopPropagation();if(type==='dragleave')localDropZone.classList.remove('drag-active');});
+  localDropZone?.addEventListener('drop',async e=>{
+    localDropZone.classList.remove('drag-active');
+    const paths=Array.from(e.dataTransfer?.files||[]).map(file=>window.api.getPathForFile(file)).filter(Boolean);
+    if(!paths.length)return;
+    const before=localQueueSnapshot.count||0;
+    const state=await window.api.localQueueAddPaths(paths);
+    renderLocalQueue(state);
+    if(!document.body.classList.contains('source-local'))document.querySelector('.source-btn[data-source="local"]')?.click();
+    else if(before===0&&state.count)await activateLocalQueueIndex(Math.max(0,state.index),{autoplay:true,fade:false});
+  });
+  restoreLocalQueue();
+
+  // Background selection
+  btnSelectBg.addEventListener('click', async () => {
+    try {
+      const fileData = await window.api.openBackground();
+      if (fileData) {
+        bgFileName = fileData.name;
+        labelBgFile.textContent = bgFileName;
+        bgMeta.textContent = `Background: ${bgFileName}`;
+        bgMeta.classList.remove('hidden');
+
+        bgImage = new Image();
+        bgImage.src = fileData.dataUri;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  // Player functionality
+  btnPlayPause.addEventListener('click', togglePlayback);
+  
+  audioElement.addEventListener('loadedmetadata', () => {
+    totalDurationLabel.textContent = formatTime(audioElement.duration);
+    seekSlider.max = Math.floor(audioElement.duration);
+  });
+
+  audioElement.addEventListener('timeupdate', () => {
+    if (!isRecording) {
+      seekSlider.value = Math.floor(audioElement.currentTime);
+      currentTimeLabel.textContent = formatTime(audioElement.currentTime);
+      const pct = (audioElement.currentTime / audioElement.duration) * 100;
+      seekProgressFill.style.width = `${pct}%`;
+    }
+  });
+
+  audioElement.addEventListener('ended', () => {
+    if (isRecording) {
+      stopRecordingAndSave();
+    } else if(document.body.classList.contains('source-local')&&(localQueueSnapshot.count||0)>1){
+      localQueueNextTrack().catch(err=>{console.error(err);setPlayerUiPlaying(false);});
+    } else {
+      setPlayerUiPlaying(false);
+    }
+  });
+
+  seekSlider.addEventListener('input', () => {
+    audioElement.currentTime = seekSlider.value;
+    currentTimeLabel.textContent = formatTime(audioElement.currentTime);
+    const pct = (audioElement.currentTime / audioElement.duration) * 100;
+    seekProgressFill.style.width = `${pct}%`;
+  });
+
+  const updateMuteUi = () => {
+    if (!btnMute) return;
+    const muted = !!audioElement.muted;
+    btnMute.classList.toggle('is-muted', muted);
+    btnMute.setAttribute('aria-pressed', String(muted));
+    btnMute.title = muted ? 'Unmute audio' : 'Mute audio';
+    btnMute.querySelector('.mute-icon-on')?.classList.toggle('hidden', muted);
+    btnMute.querySelector('.mute-icon-off')?.classList.toggle('hidden', !muted);
+    const label = btnMute.querySelector('small');
+    if (label) label.textContent = muted ? 'MUTED' : 'MUTE';
+  };
+
+  volumeSlider.addEventListener('input', () => {
+    audioElement.volume = volumeSlider.value;
+    if (Number(volumeSlider.value) > 0 && audioElement.muted) audioElement.muted = false;
+    updateMuteUi();
+  });
+
+  btnMute?.addEventListener('click', () => {
+    audioElement.muted = !audioElement.muted;
+    try { localStorage.setItem('rw666-player-muted', audioElement.muted ? '1' : '0'); } catch {}
+    updateMuteUi();
+  });
+
+  audioElement.addEventListener('volumechange', () => {
+    try { localStorage.setItem('rw666-player-muted', audioElement.muted ? '1' : '0'); } catch {}
+    updateMuteUi();
+  });
+
+  try { audioElement.muted = localStorage.getItem('rw666-player-muted') === '1'; } catch {}
+  updateMuteUi();
+
+  // Customization controls
+  selectVisualizerStyle.addEventListener('change', (e) => {
+    activeStyle = e.target.value;
+    const visualEngine=document.getElementById('visual-engine');
+    if(visualEngine&&visualEngine.value==='milkdrop'){
+      visualEngine.value='soundwave';
+      visualEngine.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    
+    // Contextual controls display
+    if (activeStyle === 'linear-bars') {
+      controlLinearOnly.classList.remove('hidden');
+      controlCircularOnly.classList.add('hidden');
+    } else if (['circular-ring', 'water-ripple', 'orbit-sphere', 'matrix-sphere', 'voice-blobs'].includes(activeStyle)) {
+      controlLinearOnly.classList.add('hidden');
+      controlCircularOnly.classList.remove('hidden');
+    } else {
+      controlLinearOnly.classList.add('hidden');
+      controlCircularOnly.classList.add('hidden');
+    }
+  });
+
+  inputColorPrimary.addEventListener('input', (e) => primaryColor = e.target.value);
+  inputColorSecondary.addEventListener('input', (e) => secondaryColor = e.target.value);
+  selectColorMode.addEventListener('change', (e) => colorMode = e.target.value);
+  
+  sliderGlow.addEventListener('input', (e) => {
+    glowIntensity = parseInt(e.target.value);
+    valGlow.textContent = `${glowIntensity}px`;
+  });
+
+  sliderSensitivity.addEventListener('input', (e) => {
+    sensitivity = parseFloat(e.target.value);
+    valSensitivity.textContent = `${sensitivity.toFixed(1)}x`;
+  });
+
+  sliderScale.addEventListener('input', (e) => {
+    scaleFactor = parseFloat(e.target.value);
+    valScale.textContent = `${scaleFactor.toFixed(2)}x`;
+  });
+
+  sliderPosX.addEventListener('input', (e) => {
+    posXOffset = parseInt(e.target.value);
+    valPosX.textContent = posXOffset === 0 ? 'Center' : `${posXOffset > 0 ? '+' : ''}${posXOffset}%`;
+  });
+
+  sliderPosY.addEventListener('input', (e) => {
+    posYOffset = parseInt(e.target.value);
+    valPosY.textContent = posYOffset === 0 ? 'Center' : `${posYOffset > 0 ? '+' : ''}${posYOffset}%`;
+  });
+
+  sliderBarWidth.addEventListener('input', (e) => {
+    barWidthSetting = parseInt(e.target.value);
+    valBarWidth.textContent = `${barWidthSetting}px`;
+  });
+
+  sliderInnerRadius.addEventListener('input', (e) => {
+    innerRadiusSetting = parseInt(e.target.value);
+    valInnerRadius.textContent = `${innerRadiusSetting}px`;
+  });
+
+  // Typography overlay bindings
+  inputTitle.addEventListener('input', (e) => songTitleText = e.target.value);
+  inputArtist.addEventListener('input', (e) => artistText = e.target.value);
+  selectFont.addEventListener('change', (e) => activeFont = e.target.value);
+  checkBeatReact.addEventListener('change', (e) => isBeatReactiveText = e.target.checked);
+
+  // Aspect settings
+  selectAspectRatio.addEventListener('change', updateAspectSettings);
+  selectFps.addEventListener('change', (e) => exportFps = parseInt(e.target.value));
+
+  // Export engine button
+  btnExport.addEventListener('click', startRecordingPipeline);
+  btnStopExport.addEventListener('click', stopRecordingAndSave);
+}
+
+// Format seconds into MM:SS
+function formatTime(seconds) {
+  if (isNaN(seconds)) return '00:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Aspect ratio adjustments
+function updateAspectSettings() {
+  activeAspectRatio = selectAspectRatio.value;
+  const outerFrame = document.getElementById('video-frame-outer');
+  
+  outerFrame.className = 'video-frame-container'; // clear aspect classes
+  
+  if (activeAspectRatio === '16-9') {
+    canvasWidth = 1920;
+    canvasHeight = 1080;
+    outerFrame.classList.add('widescreen');
+  } else if (activeAspectRatio === '9-16') {
+    canvasWidth = 1080;
+    canvasHeight = 1920;
+    outerFrame.classList.add('vertical');
+  } else if (activeAspectRatio === '1-1') {
+    canvasWidth = 1080;
+    canvasHeight = 1080;
+    outerFrame.classList.add('square');
+  }
+  
+  diagResolution.textContent = `${canvasWidth} x ${canvasHeight}`;
+  resizeCanvas();
+  requestAnimationFrame(fitVisualizerToViewport);
+}
+
+function resizeCanvas() {
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+}
+
+function fitVisualizerToViewport() {
+  if(window.RWVisualFrame?.fit){
+    window.RWVisualFrame.fit();
+    return;
+  }
+  const outerFrame=document.getElementById('video-frame-outer');
+  const viewport=document.querySelector('.preview-viewport-container');
+  if(!outerFrame||!viewport)return;
+  const outputOnly=document.body.classList.contains('output-only');
+  const vr=viewport.getBoundingClientRect();
+  const cs=getComputedStyle(viewport);
+  const availW=Math.max(1,vr.width-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0));
+  const availH=Math.max(1,vr.height-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0));
+  if(outputOnly||document.body.classList.contains('fullframe')){
+    outerFrame.style.width=availW+'px';
+    outerFrame.style.height=availH+'px';
+    return;
+  }
+  const ratio=activeAspectRatio==='9-16'?9/16:(activeAspectRatio==='1-1'?1:16/9);
+  let w=availW,h=w/ratio;
+  if(h>availH){h=availH;w=h*ratio;}
+  outerFrame.style.width=Math.max(1,Math.floor(w))+'px';
+  outerFrame.style.height=Math.max(1,Math.floor(h))+'px';
+  outerFrame.style.maxWidth='none';
+  outerFrame.style.maxHeight='none';
+}
+
+
+// Setup audio nodes on initial user interaction
+function ensureAudioContext() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyserNode = audioContext.createAnalyser();
+    
+    // High FFT Size for high definition soundwaves
+    analyserNode.fftSize = 1024;
+    analyserNode.smoothingTimeConstant = 0.85;
+    
+    bufferLength = analyserNode.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+    timeDataArray = new Uint8Array(bufferLength);
+
+    audioSource = audioContext.createMediaElementSource(audioElement);
+    audioSource.connect(analyserNode);
+    analyserNode.connect(audioContext.destination);
+
+    // Create stream destination node for crisp digital recording
+    audioDestinationNode = audioContext.createMediaStreamDestination();
+    analyserNode.connect(audioDestinationNode);
+  }
+  
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+}
+
+async function togglePlayback() {
+  ensureAudioContext();
+  
+  if (isPlaying) {
+    audioElement.pause();
+    setPlayerUiPlaying(false);
+    diagStatus.textContent = 'Paused';
+    diagStatusColor.style.backgroundColor = '#ffa502';
+    return;
+  }
+  try{
+    diagStatus.textContent='Starting…';
+    await audioElement.play();
+    setPlayerUiPlaying(true);
+    diagStatus.textContent = 'Playing';
+    diagStatusColor.style.backgroundColor = '#2ed573';
+  }catch(err){
+    console.error(err);
+    setPlayerUiPlaying(false);
+    diagStatus.textContent='Playback Error · '+String(err?.message||err);
+    diagStatusColor.style.backgroundColor='#ff4757';
+  }
+}
+
+// Setup background dynamic particle array
+function setupProceduralParticles() {
+  starfieldParticles = [];
+  for (let i = 0; i < 200; i++) {
+    starfieldParticles.push({
+      x: Math.random() * 1920,
+      y: Math.random() * 1920,
+      radius: Math.random() * 2 + 0.5,
+      speed: Math.random() * 0.5 + 0.1,
+      angle: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+// ==========================================================================
+// Visualizer Render Loops & Math Core
+// ==========================================================================
+
+function renderLoop() {
+  if (!isRecording) {
+    animationFrameId = requestAnimationFrame(renderLoop);
+    drawFrame();
+  }
+}
+
+function drawFrame() {
+  let bass = 0;
+  let mid = 0;
+  let treble = 0;
+  let volume = 0;
+  const activeAnalyser = analyserNode || (externalAnalyserFrame ? {
+    frequencyBinCount: dataArray?.length || 0,
+    fftSize: timeDataArray?.length || 0,
+    getByteFrequencyData(target) { if (dataArray) target.set(dataArray.subarray(0, target.length)); },
+    getByteTimeDomainData(target) { if (timeDataArray) target.set(timeDataArray.subarray(0, target.length)); }
+  } : null);
+
+  // Advance time: tie to export FPS frame steps during record, else use real time
+  if (isRecording) {
+    visualizerTime += 1000 / exportFps;
+  } else {
+    visualizerTime = Date.now();
+  }
+
+  if (activeAnalyser) {
+    activeAnalyser.getByteFrequencyData(dataArray);
+    activeAnalyser.getByteTimeDomainData(timeDataArray);
+    
+    // Standard diagnostics analysis
+    let bassSum = 0, midSum = 0, trebleSum = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      const val = dataArray[i];
+      if (i < 10) bassSum += val;
+      else if (i < 65) midSum += val;
+      else trebleSum += val;
+      volume += val * val;
+    }
+    
+    bass = (bassSum / 10) / 255;
+    mid = (midSum / 55) / 255;
+    treble = (trebleSum / (bufferLength - 65)) / 255;
+    volume = Math.sqrt(volume / bufferLength) / 255;
+
+    // Real analyzer-driven cyber LED meters. No synthetic/random level animation.
+    const ledLow=document.getElementById('rw-led-low');
+    const ledMid=document.getElementById('rw-led-mid');
+    const ledHigh=document.getElementById('rw-led-high');
+    if(ledLow)ledLow.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,bass))));
+    if(ledMid)ledMid.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,mid))));
+    if(ledHigh)ledHigh.style.setProperty('--rw-level',String(Math.max(0,Math.min(1,treble))));
+    
+    // Dynamic diagnostics tags updates
+    diagBass.textContent = bass.toFixed(2);
+    
+    // Real bass transient indicator from live analyser data
+    if (bass > 0.6) {
+      diagBpm.textContent = 'BASS HIT';
+      document.querySelector('.bpm-pill').style.boxShadow = '0 0 10px var(--color-primary)';
+    } else {
+      diagBpm.textContent = '--';
+      document.querySelector('.bpm-pill').style.boxShadow = 'none';
+    }
+  }
+
+  // Draw background frame
+  drawBackground(bass, mid, treble);
+
+  // Position offset translations
+  const customX = canvasWidth / 2 + (posXOffset / 100) * canvasWidth;
+  const customY = canvasHeight / 2 + (posYOffset / 100) * canvasHeight;
+  
+  // Render active Soundwave style
+  ctx.save();
+  ctx.translate(customX, customY);
+  ctx.scale(scaleFactor, scaleFactor);
+  
+  if (activeAnalyser) {
+    let extensionHandled = false;
+    try {
+      extensionHandled = !!(window.SoundwaveExtensionRenderer && window.SoundwaveExtensionRenderer.draw({ctx,canvas,width:canvasWidth,height:canvasHeight,analyser:activeAnalyser,dataArray,timeDataArray,bass,mid,treble,volume,time:visualizerTime}));
+    } catch (extensionError) {
+      // Additive engines must never take down the Soundwave core render loop.
+      console.error('[SoundwaveExtensionRenderer] fail-soft fallback', extensionError);
+      extensionHandled = false;
+    }
+    if (!extensionHandled) drawVisualizer(activeStyle, dataArray, timeDataArray, bass, mid, treble, volume);
+  } else {
+    // Draw dummy wave if no audio is connected yet
+    drawDummyWave();
+  }
+  ctx.restore();
+
+  // Typography overlay rendering
+  drawTextOverlays(bass);
+
+  // Exporter update loop inside drawing loop
+  if (isRecording) {
+    updateRecordingHUD();
+  }
+}
+
+// Background Drawing
+function drawBackground(bass, mid, treble) {
+  ctx.fillStyle = '#01000f';
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  if (bgImage && bgImage.complete) {
+    // Custom Background Image Fit cover
+    const aspectImg = bgImage.width / bgImage.height;
+    const aspectCanvas = canvasWidth / canvasHeight;
+    let renderW, renderH, renderX, renderY;
+
+    if (aspectImg > aspectCanvas) {
+      renderH = canvasHeight;
+      renderW = canvasHeight * aspectImg;
+      renderX = (canvasWidth - renderW) / 2;
+      renderY = 0;
+    } else {
+      renderW = canvasWidth;
+      renderH = canvasWidth / aspectImg;
+      renderX = 0;
+      renderY = (canvasHeight - renderH) / 2;
+    }
+    
+    ctx.globalAlpha = 0.35; // Overlay opacity mix
+    ctx.drawImage(bgImage, renderX, renderY, renderW, renderH);
+    ctx.globalAlpha = 1.0;
+  } else {
+    // Procedural Starfield moving preset background
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    const centerCX = canvasWidth / 2;
+    const centerCY = canvasHeight / 2;
+    
+    for (let i = 0; i < starfieldParticles.length; i++) {
+      const p = starfieldParticles[i];
+      // Bass boost speed expansion
+      const currentSpeed = p.speed * (1 + bass * 3);
+      
+      // Move from center outwards
+      p.x += Math.cos(p.angle) * currentSpeed;
+      p.y += Math.sin(p.angle) * currentSpeed;
+
+      // Wrapping edges boundary check
+      const dist = Math.hypot(p.x - centerCX, p.y - centerCY);
+      if (dist > Math.hypot(centerCX, centerCY)) {
+        p.x = centerCX;
+        p.y = centerCY;
+        p.angle = Math.random() * Math.PI * 2;
+      }
+
+      ctx.beginPath();
+      // Particles scale size dynamically with treble bands
+      ctx.arc(p.x, p.y, p.radius * (1 + treble), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+// Visualizer Core Draw Selector
+function drawVisualizer(style, data, timeData, bass, mid, treble, volume) {
+  ctx.shadowBlur = glowIntensity;
+  ctx.lineWidth = 3;
+
+  // Setup gradient stroke styles
+  let gradient = ctx.createLinearGradient(-300, 0, 300, 0);
+  if (colorMode === 'gradient') {
+    gradient.addColorStop(0, primaryColor);
+    gradient.addColorStop(1, secondaryColor);
+    ctx.strokeStyle = gradient;
+    ctx.fillStyle = gradient;
+    ctx.shadowColor = primaryColor;
+  } else if (colorMode === 'hsl-shift') {
+    const timeColor = `hsl(${(Date.now() / 30) % 360}, 100%, 60%)`;
+    ctx.strokeStyle = timeColor;
+    ctx.fillStyle = timeColor;
+    ctx.shadowColor = timeColor;
+  } else {
+    ctx.strokeStyle = primaryColor;
+    ctx.fillStyle = primaryColor;
+    ctx.shadowColor = primaryColor;
+  }
+
+  if (style === 'linear-bars') {
+    drawLinearBars(data);
+  } else if (style === 'circular-ring') {
+    drawCircularRing(data, bass);
+  } else if (style === 'fluid-wave') {
+    drawFluidWave(data, bass, mid);
+  } else if (style === 'starburst-particles') {
+    drawStarburstParticles(data, bass);
+  } else if (style === 'digital-matrix') {
+    drawDigitalMatrix(data);
+  } else if (style === 'oscilloscope') {
+    drawOscilloscope(timeData);
+  } else if (style === 'orbit-sphere') {
+    drawOrbitSphere(data, bass);
+  } else if (style === 'mirrored-border') {
+    drawMirroredBorder(data, bass, mid);
+  } else if (style === 'voice-assistant') {
+    drawVoiceAssistant(data, bass, mid, volume);
+  } else if (style === 'water-ripple') {
+    drawWaterRipple(data, bass, mid, treble);
+  } else if (style === 'glow-ribbon') {
+    drawGlowRibbon(data, bass, mid);
+  } else if (style === 'eq-ribbon') {
+    drawEqRibbon(data, bass, mid, treble);
+  } else if (style === 'voice-blobs') {
+    drawVoiceBlobs(data, bass, mid, volume);
+  } else if (style === 'matrix-sphere') {
+    drawMatrixSphere(data, bass, mid);
+  } else if (style === 'neon-fiber') {
+    drawNeonFiber(data, bass, mid, treble);
+  }
+  
+  ctx.shadowBlur = 0; // reset glow
+}
+
+// Idle state is deliberately non-reactive: no audio signal means no fake waveform.
+function drawDummyWave() {
+  ctx.save();
+  ctx.shadowBlur = glowIntensity * 0.45;
+  ctx.strokeStyle = 'rgba(32,232,255,0.48)';
+  ctx.shadowColor = 'rgba(255,43,214,0.55)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-300, 0);
+  ctx.lineTo(300, 0);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(235,242,255,0.72)';
+  ctx.font = '600 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('NO AUDIO SIGNAL', 0, -22);
+  ctx.restore();
+}
+
+// Design style 1: Glowing Linear Bars
+let peakMeters = []; // Falling peaks arrays
+function drawLinearBars(data) {
+  const barCount = 120;
+  const barSpacing = 4;
+  const totalWidth = barCount * (barWidthSetting + barSpacing);
+  const startX = -totalWidth / 2;
+
+  // Initialize peak holds
+  if (peakMeters.length !== barCount) {
+    peakMeters = Array(barCount).fill(0);
+  }
+
+  for (let i = 0; i < barCount; i++) {
+    // Map FFT frequencies cleanly
+    const index = Math.floor((i / barCount) * (bufferLength * 0.7));
+    let val = data[index] * sensitivity;
+    
+    // Scale visual bar heights
+    const barHeight = Math.max(6, (val / 255) * 200);
+
+    const x = startX + i * (barWidthSetting + barSpacing);
+
+    // Draw Double Sided glowing vertical bars
+    ctx.beginPath();
+    ctx.roundRect(x, -barHeight / 2, barWidthSetting, barHeight, barWidthSetting / 2);
+    ctx.fill();
+
+    // Falling peaks indicators dots
+    if (barHeight > peakMeters[i]) {
+      peakMeters[i] = barHeight;
+    } else {
+      peakMeters[i] -= 2; // slow fall rate
+    }
+    
+    ctx.beginPath();
+    ctx.arc(x + barWidthSetting / 2, -peakMeters[i] / 2 - 8, barWidthSetting / 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x + barWidthSetting / 2, peakMeters[i] / 2 + 8, barWidthSetting / 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// Design style 2: Circular Ripple Rings
+function drawCircularRing(data, bass) {
+  // Pulse base circle radius in sync with bass peaks
+  const dynamicRadius = innerRadiusSetting + (bass * 40);
+  const totalPoints = 120;
+  
+  // Radial bars draw
+  ctx.beginPath();
+  for (let i = 0; i < totalPoints; i++) {
+    const angle = (i / totalPoints) * Math.PI * 2;
+    const index = Math.floor((i / totalPoints) * (bufferLength * 0.6));
+    const val = (data[index] * sensitivity) / 255;
+    const barLen = val * 120;
+    
+    const xStart = Math.cos(angle) * dynamicRadius;
+    const yStart = Math.sin(angle) * dynamicRadius;
+    const xEnd = Math.cos(angle) * (dynamicRadius + barLen);
+    const yEnd = Math.sin(angle) * (dynamicRadius + barLen);
+    
+    ctx.moveTo(xStart, yStart);
+    ctx.lineTo(xEnd, yEnd);
+  }
+  ctx.stroke();
+
+  // Bursting particle explosions on bass peaks
+  if (bass > 0.7 && Math.random() < 0.3) {
+    for (let p = 0; p < 8; p++) {
+      const pAngle = Math.random() * Math.PI * 2;
+      visualizerParticles.push({
+        x: Math.cos(pAngle) * dynamicRadius,
+        y: Math.sin(pAngle) * dynamicRadius,
+        vx: Math.cos(pAngle) * (Math.random() * 4 + 2),
+        vy: Math.sin(pAngle) * (Math.random() * 4 + 2),
+        alpha: 1.0,
+        radius: Math.random() * 3 + 1
+      });
+    }
+  }
+
+  // Draw visual particles
+  for (let idx = visualizerParticles.length - 1; idx >= 0; idx--) {
+    const vp = visualizerParticles[idx];
+    vp.x += vp.vx;
+    vp.y += vp.vy;
+    vp.alpha -= 0.02;
+
+    if (vp.alpha <= 0) {
+      visualizerParticles.splice(idx, 1);
+      continue;
+    }
+
+    ctx.save();
+    ctx.globalAlpha = vp.alpha;
+    ctx.beginPath();
+    ctx.arc(vp.x, vp.y, vp.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Draw concentric center ring pulse
+  ctx.beginPath();
+  ctx.arc(0, 0, dynamicRadius, 0, Math.PI * 2);
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  ctx.lineWidth = 3;
+}
+
+// Design style 3: Fluid Wave Flow (sine/bezier curves)
+function drawFluidWave(data, bass, mid) {
+  const points = [];
+  const totalPoints = 30;
+  const width = 800;
+  const time = visualizerTime / 300;
+
+  for (let i = 0; i <= totalPoints; i++) {
+    const pct = i / totalPoints;
+    const x = -width / 2 + pct * width;
+    
+    // Map frequency bands across points
+    const freqIdx = Math.floor(pct * (bufferLength * 0.4));
+    const intensity = (data[freqIdx] * sensitivity) / 255;
+    
+    // Calculate undulating organic flowing sine wave
+    const waveOffset = Math.sin(pct * 6 - time) * 35 * (1 + bass);
+    const y = waveOffset * intensity;
+    
+    points.push({ x, y });
+  }
+
+  // Draw fluid smooth Bezier curve line
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  
+  for (let i = 0; i < points.length - 1; i++) {
+    const xc = (points[i].x + points[i + 1].x) / 2;
+    const yc = (points[i].y + points[i + 1].y) / 2;
+    ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+  }
+  ctx.stroke();
+
+  // Draw secondary flowing mirror shadow wave
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, -points[0].y);
+  for (let i = 0; i < points.length - 1; i++) {
+    const xc = (points[i].x + points[i + 1].x) / 2;
+    const yc = (-points[i].y - points[i + 1].y) / 2;
+    ctx.quadraticCurveTo(points[i].x, -points[i].y, xc, yc);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Design style 4: Radial Starburst Particles
+let starburstStars = [];
+function drawStarburstParticles(data, bass) {
+  const starCount = 150;
+  if (starburstStars.length === 0) {
+    for (let i = 0; i < starCount; i++) {
+      starburstStars.push({
+        angle: Math.random() * Math.PI * 2,
+        distance: Math.random() * 400 + 30,
+        speed: Math.random() * 2 + 0.5,
+        size: Math.random() * 2.5 + 0.5
+      });
+    }
+  }
+
+  ctx.shadowBlur = glowIntensity * 1.5;
+  for (let i = 0; i < starburstStars.length; i++) {
+    const star = starburstStars[i];
+    
+    // Map frequency index based on radial order
+    const fIdx = Math.floor((i / starCount) * (bufferLength * 0.5));
+    const intensity = (data[fIdx] * sensitivity) / 255;
+    
+    // Expand velocity and size based on dynamic audio beats
+    const currentSpeed = star.speed * (1 + bass * 4) + (intensity * 3);
+    star.distance += currentSpeed;
+
+    if (star.distance > 800) {
+      star.distance = Math.random() * 40 + 10;
+      star.angle = Math.random() * Math.PI * 2;
+    }
+
+    const x = Math.cos(star.angle) * star.distance;
+    const y = Math.sin(star.angle) * star.distance;
+    const drawSize = star.size * (1 + intensity * 2);
+
+    ctx.beginPath();
+    ctx.arc(x, y, drawSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// Design style 5: Digital Matrix HUD
+function drawDigitalMatrix(data) {
+  const colCount = 35;
+  const rowCount = 12;
+  const blockW = 12;
+  const blockH = 8;
+  const spacingX = 6;
+  const spacingY = 4;
+  
+  const totalW = colCount * (blockW + spacingX);
+  const startX = -totalW / 2;
+  const startY = -(rowCount * (blockH + spacingY)) / 2;
+
+  for (let c = 0; c < colCount; c++) {
+    const fIdx = Math.floor((c / colCount) * (bufferLength * 0.6));
+    const intensity = (data[fIdx] * sensitivity) / 255;
+    
+    // Calculate active blocks inside vertical grid column
+    const activeBlocks = Math.floor(intensity * rowCount);
+
+    for (let r = 0; r < rowCount; r++) {
+      // Row bottom-up draw order
+      const x = startX + c * (blockW + spacingX);
+      const y = -startY - r * (blockH + spacingY);
+
+      if (r < activeBlocks) {
+        ctx.globalAlpha = 1.0;
+        ctx.fillRect(x, y, blockW, blockH);
+      } else {
+        ctx.globalAlpha = 0.15; // Unactive state grid blocks
+        ctx.strokeRect(x, y, blockW, blockH);
+      }
+    }
+  }
+  ctx.globalAlpha = 1.0;
+}
+
+// Design style 6: Neon Oscilloscope (raw time domain waveforms)
+function drawOscilloscope(timeData) {
+  ctx.beginPath();
+  const width = 800;
+  const sliceWidth = width / bufferLength;
+  let x = -width / 2;
+  ctx.lineWidth = 4;
+  
+  for (let i = 0; i < bufferLength; i++) {
+    const v = timeData[i] / 128.0;
+    const y = (v - 1.0) * 120 * sensitivity;
+
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+    x += sliceWidth;
+  }
+  ctx.stroke();
+  ctx.lineWidth = 3;
+}
+
+// Design style 7: 3D Wireframe Orbit Sphere
+function drawOrbitSphere(data, bass) {
+  const sphereRadius = (innerRadiusSetting * 0.8) + (bass * 35);
+  const rings = 6;
+  const points = 60;
+  const time = visualizerTime / 900;
+
+  for (let r = 0; r < rings; r++) {
+    ctx.save();
+    // Rotate orbits in perspective angles
+    ctx.rotate(time * 0.18 + (r * Math.PI / rings));
+    ctx.beginPath();
+
+    for (let p = 0; p < points; p++) {
+      const angle = (p / points) * Math.PI * 2;
+      const fIdx = Math.floor((p / points) * (bufferLength * 0.4));
+      const intensity = (data[fIdx] * sensitivity) / 255;
+      
+      const radius = sphereRadius + (intensity * 45 * Math.sin(angle * 4 + time * 3.5));
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius * 0.38; // Tilt angle ratio
+
+      if (p === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Draw core volumetric glow orb
+  ctx.beginPath();
+  ctx.arc(0, 0, sphereRadius * 0.35, 0, Math.PI * 2);
+  ctx.fillStyle = primaryColor;
+  ctx.globalAlpha = 0.15 + bass * 0.35;
+  ctx.fill();
+  ctx.globalAlpha = 1.0;
+}
+
+// Design style 8: Mirrored Wave Borders
+function drawMirroredBorder(data, bass, mid) {
+  const points = [];
+  const totalPoints = 40;
+  const width = canvasWidth;
+  const time = visualizerTime / 250;
+
+  for (let i = 0; i <= totalPoints; i++) {
+    const pct = i / totalPoints;
+    const x = -width / 2 + pct * width;
+    const fIdx = Math.floor(pct * (bufferLength * 0.5));
+    const intensity = (data[fIdx] * sensitivity) / 255;
+    const waveY = Math.sin(pct * 8 + time) * 45 * (1 + bass * 0.5) * intensity;
+    points.push({ x, y: waveY });
+  }
+
+  // Top border line
+  ctx.save();
+  ctx.translate(0, -canvasHeight / 2 + 100);
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 0; i < points.length - 1; i++) {
+    const xc = (points[i].x + points[i + 1].x) / 2;
+    const yc = (points[i].y + points[i + 1].y) / 2;
+    ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // Bottom border line
+  ctx.save();
+  ctx.translate(0, canvasHeight / 2 - 100);
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, -points[0].y);
+  for (let i = 0; i < points.length - 1; i++) {
+    const xc = (points[i].x + points[i + 1].x) / 2;
+    const yc = (-points[i].y - points[i + 1].y) / 2;
+    ctx.quadraticCurveTo(points[i].x, -points[i].y, xc, yc);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ==========================================================================
+// Typography Overlay Drawer
+// ==========================================================================
+
+function drawTextOverlays(bass) {
+  if (!songTitleText && !artistText) return;
+
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // Set fonts overlay family
+  const fontFam = activeFont === 'Syne' ? 'Syne, sans-serif' :
+                  activeFont === 'Outfit' ? 'Outfit, sans-serif' :
+                  activeFont === 'Montserrat' ? 'Montserrat, sans-serif' :
+                  activeFont === 'Playfair Display' ? 'Playfair Display, serif' :
+                  'Space Grotesk, monospace';
+
+  // Apply beat reactivity scale and glow changes
+  const pulseMultiplier = isBeatReactiveText ? (1 + bass * 0.12) : 1.0;
+  const pulseGlow = isBeatReactiveText ? (glowIntensity * (1 + bass * 0.6)) : glowIntensity;
+
+  // Title render
+  if (songTitleText) {
+    ctx.font = `800 ${Math.floor(48 * pulseMultiplier)}px ${fontFam}`;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = pulseGlow;
+    ctx.shadowColor = primaryColor;
+    
+    // Standard visual text placement (15% offset from bottom frame)
+    ctx.fillText(songTitleText, canvasWidth / 2, canvasHeight - 200);
+  }
+
+  // Artist subtitle render
+  if (artistText) {
+    ctx.font = `300 ${Math.floor(22 * pulseMultiplier)}px ${fontFam}`;
+    ctx.fillStyle = '#a4b0be';
+    ctx.shadowBlur = pulseGlow / 2;
+    ctx.shadowColor = secondaryColor;
+    
+    ctx.fillText(artistText, canvasWidth / 2, canvasHeight - 145);
+  }
+
+  ctx.restore();
+}
+
+// ==========================================================================
+// Video Recording & Exporter Process (Native Save Dialog Connection)
+// ==========================================================================
+
+async function startRecordingPipeline() {
+  ensureAudioContext();
+  
+  try {
+    // 1. Trigger Native Dialog to locate export file path
+    diagStatus.textContent = 'Opening Save Dialog...';
+    const chosenSavePath = await window.api.getSavePath();
+    if (!chosenSavePath) {
+      diagStatus.textContent = 'Export cancelled';
+      return;
+    }
+    exportSavePath = chosenSavePath;
+
+    // 2. Initialize native file write stream
+    const initRes = await window.api.startFileWrite(exportSavePath);
+    if (!initRes.success) {
+      alert(`Failed to initialize video file: ${initRes.error}`);
+      return;
+    }
+
+    // 3. Reset audio and begin recording configuration
+    isPlaying = false;
+    audioElement.pause();
+    audioElement.currentTime = 0;
+    
+    // Ensure renderer has clean blank frames
+    setupProceduralParticles();
+    
+    // Stop standard requestAnimationFrame preview loop
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+
+    // Set status
+    isRecording = true;
+    recordedChunks = [];
+    diagStatus.textContent = 'Rendering...';
+    diagStatusColor.style.backgroundColor = '#ff4757'; // blinking record HUD
+    diagStatusColor.style.boxShadow = '0 0 10px #ff4757';
+
+    // Show export modal overlay
+    exportModal.classList.remove('hidden');
+    exportProgressBar.style.width = '0%';
+    exportStatusLabel.textContent = 'Preparing video tracks...';
+
+    // Capture Canvas frame track
+    const canvasStream = canvas.captureStream(exportFps);
+    const combinedStream = new MediaStream();
+
+    // Add Canvas Video track
+    canvasStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+
+    // Route direct Audio tracks from WebAudio stream node
+    if (audioDestinationNode) {
+      audioDestinationNode.stream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+    }
+
+    // Setup media recorder configuration with high compatibility MP4 prioritised 
+    let mimeType = 'video/mp4;codecs=avc1,mp4a.40.2';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/mp4;codecs=h264,aac';
+    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/mp4';
+    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/webm;codecs=vp9,opus';
+    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/webm;codecs=vp8,opus';
+    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = ''; // Let browser decide
+    }
+    
+    console.log('Selected recording MIME type:', mimeType);
+
+    let options = { videoBitsPerSecond: 8000000 }; // 8 Mbps for pristine high-bitrate video
+    if (mimeType) {
+      options.mimeType = mimeType;
+    }
+    
+    mediaRecorder = new MediaRecorder(combinedStream, options);
+
+    // Recording buffer chunks event streams
+    mediaRecorder.ondataavailable = async (e) => {
+      if (e.data && e.data.size > 0) {
+        // Stream recorded chunk directly through IPC contextBridge to disk
+        const arrayBuf = await e.data.arrayBuffer();
+        await window.api.writeFileChunk(arrayBuf);
+      }
+    };
+
+    mediaRecorder.onstop = async () => {
+      if (recordingInterval) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+      }
+      
+      exportStatusLabel.textContent = 'Closing file stream...';
+      await window.api.closeFile();
+      
+      // Cleanup states
+      isRecording = false;
+      exportModal.classList.add('hidden');
+      diagStatus.textContent = 'Export Completed';
+      diagStatusColor.style.backgroundColor = '#2ed573';
+      
+      alert(`Success! Your music video has been saved to:\n${exportSavePath}`);
+      
+      // Restart standard interactive preview loop
+      renderLoop();
+    };
+
+    // Begin recording and play audio
+    mediaRecorder.start(1000); // Trigger dataavailable chunks every 1 second
+    audioElement.play();
+    isPlaying = true;
+    btnPlayPause.querySelector('.play-icon').classList.add('hidden');
+    btnPlayPause.querySelector('.pause-icon').classList.remove('hidden');
+
+    // Run drawing loop on high-precision background-resilient timer
+    // This runs drawing frames and updating indicators even if window is blurred/minimized!
+    const frameTime = 1000 / exportFps;
+    recordingInterval = setInterval(() => {
+      drawFrame();
+    }, frameTime);
+    
+  } catch (err) {
+    console.error('Error starting recording:', err);
+    alert(`Export recording failed: ${err.message}`);
+    isRecording = false;
+    exportModal.classList.add('hidden');
+    
+    if (recordingInterval) {
+      clearInterval(recordingInterval);
+      recordingInterval = null;
+    }
+    renderLoop();
+  }
+}
+
+function updateRecordingHUD() {
+  if (!isRecording) return;
+  
+  const curTime = audioElement.currentTime;
+  const totalTime = audioElement.duration || 1;
+  const percentage = (curTime / totalTime) * 100;
+  
+  // Update progress bars
+  exportProgressBar.style.width = `${percentage}%`;
+  exportTimeLabel.textContent = formatTime(curTime);
+  exportStatusLabel.textContent = `Encoding frames at ${exportFps} FPS...`;
+
+  // SoundCloud seek bars tracking
+  seekSlider.value = Math.floor(curTime);
+  currentTimeLabel.textContent = formatTime(curTime);
+  seekProgressFill.style.width = `${percentage}%`;
+}
+
+async function stopRecordingAndSave() {
+  if (recordingInterval) {
+    clearInterval(recordingInterval);
+    recordingInterval = null;
+  }
+  
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+    audioElement.pause();
+    isPlaying = false;
+    btnPlayPause.querySelector('.play-icon').classList.remove('hidden');
+    btnPlayPause.querySelector('.pause-icon').classList.add('hidden');
+  }
+}
+
+// Design style 9: Siri-style AI Voice Assistant Glowing Overlapping Waves
+function drawVoiceAssistant(data, bass, mid, volume) {
+  const waveCount = 7;
+  const width = 800;
+  const time = visualizerTime / 200;
+
+  ctx.save();
+  // Blend glowing additive overlay layers
+  ctx.globalCompositeOperation = 'lighter';
+
+  // 1. Draw a thin, glowing background resting baseline (always active)
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(0, 242, 254, 0.15)';
+  ctx.shadowColor = 'rgba(0, 242, 254, 0.3)';
+  ctx.shadowBlur = glowIntensity * 0.5;
+  ctx.lineWidth = 1;
+  ctx.moveTo(-width / 2, 0);
+  for (let i = -width / 2; i <= width / 2; i += 10) {
+    const waveY = Math.sin(i * 0.01 - time * 0.2) * 3;
+    ctx.lineTo(i, waveY);
+  }
+  ctx.stroke();
+
+  // Bright premium digital gradients and blends
+  const colors = [
+    'rgba(0, 242, 254, 0.8)',   // Cyan/Aqua
+    'rgba(255, 0, 127, 0.7)',   // Neon Pink/Magenta
+    'rgba(127, 0, 255, 0.6)',   // Purple/Violet
+    'rgba(0, 255, 127, 0.55)',  // Emerald Green
+    'rgba(79, 172, 254, 0.75)',  // Electric Blue
+    'rgba(255, 170, 0, 0.6)',   // Bright Gold/Orange
+    'rgba(255, 255, 255, 0.55)'  // White Core Highlight
+  ];
+
+  // Specific frequencies and mathematical wave phases to create a highly complex, premium iOS siri voice design
+  const waveParams = [
+    { freq: 4.2, phaseSpeed: 0.14, ampScale: 1.0, power: 3.2, lineWidth: 3.5 },
+    { freq: 6.5, phaseSpeed: -0.20, ampScale: 0.75, power: 3.5, lineWidth: 2 },
+    { freq: 3.1, phaseSpeed: 0.08, ampScale: 0.6, power: 2.8, lineWidth: 1.5 },
+    { freq: 8.2, phaseSpeed: 0.25, ampScale: 0.45, power: 4.0, lineWidth: 1 },
+    { freq: 5.0, phaseSpeed: -0.11, ampScale: 0.85, power: 3.0, lineWidth: 2.5 },
+    { freq: 2.4, phaseSpeed: 0.06, ampScale: 0.5, power: 2.2, lineWidth: 1.5 },
+    { freq: 9.0, phaseSpeed: 0.32, ampScale: 0.35, power: 4.5, lineWidth: 0.8 }
+  ];
+
+  for (let w = 0; w < waveCount; w++) {
+    const params = waveParams[w];
+    ctx.strokeStyle = colors[w];
+    ctx.shadowColor = colors[w];
+    ctx.shadowBlur = glowIntensity * 0.95;
+    ctx.lineWidth = params.lineWidth;
+
+    ctx.beginPath();
+
+    // Map audio intensity spectrum
+    const fIdx = Math.floor((w / waveCount) * (bufferLength * 0.45));
+    const audioMultiplier = (data[fIdx] * sensitivity) / 255;
+    
+    // RADIO WAVE hardlock: reactive amplitude comes only from the live analyser.
+    // The decorative resting baseline above may move gently, but it never feeds fake audio amplitude.
+    const peakAmplitude = 200 * (volume * 0.35 + audioMultiplier * 0.65 + bass * 0.15);
+
+    const points = 120; // higher density points for smoother lines
+    const phase = time * params.phaseSpeed;
+
+    for (let i = 0; i <= points; i++) {
+      const pct = i / points;
+      const x = -width / 2 + pct * width;
+
+      // Teardrop Gabor-like mathematical envelope: flattens at edges, peaks in middle
+      const envelope = Math.pow(Math.sin(pct * Math.PI), params.power);
+
+      // Undulate glowing overlapping sine waves
+      const y = Math.sin(pct * Math.PI * params.freq + phase) * peakAmplitude * envelope;
+
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    }
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// Design style 10: Digital Water Ripple (Shutterstock 2653154933)
+let rippleParticles = [];
+function drawWaterRipple(data, bass, mid, treble) {
+  const maxRadius = 400;
+  const rippleCount = 5;
+  const baseRadius = innerRadiusSetting + (bass * 35);
+  const time = visualizerTime / 1000;
+
+  ctx.save();
+  
+  // 1. Center pulsing core (liquid droplet)
+  const gradCore = ctx.createRadialGradient(0, 0, baseRadius * 0.1, 0, 0, baseRadius * 0.8);
+  gradCore.addColorStop(0, '#ffffff');
+  gradCore.addColorStop(0.3, primaryColor);
+  gradCore.addColorStop(1, 'rgba(0, 242, 254, 0)');
+  ctx.fillStyle = gradCore;
+  ctx.beginPath();
+  ctx.arc(0, 0, baseRadius * 0.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 2. Concentric ripples
+  ctx.lineWidth = 2.5;
+  for (let i = 0; i < rippleCount; i++) {
+    // Each ripple has its own expanding phase
+    const phase = (time * 0.3 + i / rippleCount) % 1.0;
+    const radius = baseRadius + phase * (maxRadius - baseRadius);
+    const alpha = (1.0 - phase) * (0.15 + mid * 0.5);
+
+    ctx.strokeStyle = primaryColor;
+    ctx.shadowColor = primaryColor;
+    ctx.shadowBlur = glowIntensity * (1 - phase);
+    ctx.globalAlpha = alpha;
+
+    ctx.beginPath();
+    const points = 80;
+    for (let p = 0; p <= points; p++) {
+      const angle = (p / points) * Math.PI * 2;
+      const fIdx = Math.floor((p / points) * (bufferLength * 0.4));
+      const val = (data[fIdx] * sensitivity) / 255;
+      
+      // Liquid wiggle math
+      const wiggle = Math.sin(angle * 12 + time * 8) * 15 * val;
+      const r = radius + wiggle;
+
+      const x = Math.cos(angle) * r;
+      const y = Math.sin(angle) * r;
+
+      if (p === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  // 3. Ripple floating particles
+  if (rippleParticles.length < 100) {
+    rippleParticles.push({
+      angle: Math.random() * Math.PI * 2,
+      dist: baseRadius + Math.random() * 50,
+      speed: Math.random() * 1.5 + 0.8,
+      size: Math.random() * 2 + 1,
+      wiggleSpeed: Math.random() * 4 + 2,
+      phase: Math.random() * Math.PI
+    });
+  }
+
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = secondaryColor;
+  ctx.shadowColor = secondaryColor;
+  ctx.shadowBlur = glowIntensity * 0.5;
+
+  for (let idx = rippleParticles.length - 1; idx >= 0; idx--) {
+    const rp = rippleParticles[idx];
+    const fIdx = Math.floor((rp.angle / (Math.PI * 2)) * (bufferLength * 0.5));
+    const intensity = (data[fIdx] * sensitivity) / 255;
+
+    rp.dist += rp.speed * (1 + bass * 2) + intensity * 2;
+    rp.phase += 0.05 * rp.wiggleSpeed;
+
+    // Organic wavy paths
+    const curAngle = rp.angle + Math.sin(rp.phase) * 0.05;
+    const x = Math.cos(curAngle) * rp.dist;
+    const y = Math.sin(curAngle) * rp.dist;
+
+    // Reset if particle moves beyond boundary
+    if (rp.dist > maxRadius) {
+      rp.dist = baseRadius + Math.random() * 20;
+      rp.angle = Math.random() * Math.PI * 2;
+      continue;
+    }
+
+    ctx.beginPath();
+    ctx.arc(x, y, rp.size * (1 + intensity * 1.5), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+// Design style 11: Volumetric Glow Ribbon (Shutterstock 2770068617)
+function drawGlowRibbon(data, bass, mid) {
+  const ribbonCount = 5;
+  const width = 800;
+  const points = 100;
+  const time = visualizerTime / 250;
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineWidth = 2;
+
+  const ribbonColors = [
+    'rgba(0, 242, 254, 0.45)',  // Cyan
+    'rgba(79, 172, 254, 0.4)',   // Cyan Blue
+    'rgba(127, 0, 255, 0.35)',   // Violet Purple
+    'rgba(255, 0, 127, 0.3)',    // Fuchsia
+    'rgba(255, 255, 255, 0.25)'  // White Core
+  ];
+
+  for (let r = 0; r < ribbonCount; r++) {
+    ctx.strokeStyle = ribbonColors[r];
+    ctx.shadowColor = ribbonColors[r];
+    ctx.shadowBlur = glowIntensity * 0.8;
+
+    // Create unique amplitude and wave characteristics per layer
+    const phaseOffset = r * (Math.PI / ribbonCount);
+    const speed = time * (0.8 + r * 0.15);
+
+    ctx.beginPath();
+    for (let i = 0; i <= points; i++) {
+      const pct = i / points;
+      const x = -width / 2 + pct * width;
+
+      // Audio mapping
+      const fIdx = Math.floor(pct * (bufferLength * 0.4));
+      const val = (data[fIdx] * sensitivity) / 255;
+
+      // Gabor envelope
+      const envelope = Math.pow(Math.sin(pct * Math.PI), 2.5);
+
+      // Math wave logic to form 3D dimensional ribbons
+      const wave = Math.sin(pct * Math.PI * 5 + speed + phaseOffset) * 45 * (1 + bass * 0.6);
+      const noise = Math.cos(pct * Math.PI * 12 - speed) * 12 * mid;
+      const y = (wave + noise) * val * envelope + Math.sin(time * 0.5 + r) * 10 * envelope;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// Design style 12: Equalizer Wave Ribbons (Shutterstock 1925468375)
+function drawEqRibbon(data, bass, mid, treble) {
+  const bands = 4;
+  const width = 800;
+  const points = 60;
+  const time = visualizerTime / 300;
+
+  ctx.save();
+  ctx.globalAlpha = 0.35; // Glass translucent overlap
+  ctx.globalCompositeOperation = 'screen';
+
+  // Bright, premium neon color themes matching Shutterstock 1925468375
+  const gradients = [
+    { start: '#ff007f', end: '#7f00ff' }, // Fuchsia to Violet (Bass)
+    { start: '#00f2fe', end: '#4facfe' }, // Cyan to Blue (Mids)
+    { start: '#00ff7f', end: '#00bfff' }, // Emerald to Ocean (High-Mids)
+    { start: '#ffaa00', end: '#ff007f' }  // Amber to Pink (Treble)
+  ];
+
+  for (let b = 0; b < bands; b++) {
+    const info = gradients[b];
+    const grad = ctx.createLinearGradient(-width / 2, 0, width / 2, 0);
+    grad.addColorStop(0, info.start);
+    grad.addColorStop(1, info.end);
+    ctx.fillStyle = grad;
+    ctx.strokeStyle = info.start;
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.moveTo(-width / 2, 100);
+
+    for (let i = 0; i <= points; i++) {
+      const pct = i / points;
+      const x = -width / 2 + pct * width;
+
+      // Filter frequency range per band
+      const startIdx = Math.floor(b * (bufferLength * 0.15));
+      const endIdx = Math.floor((b + 1) * (bufferLength * 0.15));
+      let sum = 0;
+      for (let j = startIdx; j < endIdx; j++) {
+        sum += data[j];
+      }
+      const val = ((sum / (endIdx - startIdx)) * sensitivity) / 255;
+
+      const envelope = Math.sin(pct * Math.PI);
+      const wavePhase = time * 1.5 + b * 2;
+      const wave = Math.sin(pct * Math.PI * 4 + wavePhase) * 35;
+      
+      // Compute vertical offset (curving upward from baseline)
+      const y = -100 - (val * 160 + wave) * envelope;
+
+      ctx.lineTo(x, y);
+    }
+
+    // Connect to baseline to close filled shape
+    ctx.lineTo(width / 2, 100);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// Design style 13: Orbital Voice Blobs (Shutterstock 2416549429)
+function drawVoiceBlobs(data, bass, mid, volume) {
+  const blobCount = 4;
+  const time = visualizerTime / 400;
+  
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.shadowBlur = glowIntensity * 1.2;
+
+  // Modern Google/Siri assistant pastel-neon hues
+  const colors = [
+    { rgb: '#00f2fe', bandIdx: 2 },   // Aqua / Blue
+    { rgb: '#ff007f', bandIdx: 6 },   // Pink / Red
+    { rgb: '#7f00ff', bandIdx: 15 },  // Purple / Violet
+    { rgb: '#00ff7f', bandIdx: 25 }   // Lime / Green
+  ];
+
+  for (let b = 0; b < blobCount; b++) {
+    const item = colors[b];
+    ctx.fillStyle = item.rgb;
+    ctx.shadowColor = item.rgb;
+
+    // Retrieve specific frequency band for this blob
+    const fVal = (data[item.bandIdx] * sensitivity) / 255;
+
+    // Organic idle drift + audio reaction scale
+    const driftX = Math.sin(time + b * Math.PI / 2) * 50;
+    const driftY = Math.cos(time * 0.7 + b * 1.5) * 20;
+
+    // Compute dimensions of morphed capsule shape
+    const baseW = innerRadiusSetting * 0.7;
+    const baseH = innerRadiusSetting * 0.9;
+    const scaleW = 1.0 + mid * 0.4 + driftX * 0.002;
+    const scaleH = 1.0 + fVal * 1.4 + volume * 0.5;
+
+    const w = baseW * scaleW;
+    const h = baseH * scaleH;
+
+    // Center placement + offset separation
+    const posX = driftX + (b - (blobCount - 1) / 2) * (baseW * 0.45);
+    const posY = driftY;
+
+    // Draw rounded capsule blob
+    ctx.beginPath();
+    ctx.roundRect(posX - w / 2, posY - h / 2, w, h, Math.min(w, h) / 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+// Design style 14: Digital Matrix Sphere (Shutterstock 2419414219)
+function drawMatrixSphere(data, bass, mid) {
+  const radius = innerRadiusSetting * 0.9 + bass * 35;
+  const latitudeLines = 7;
+  const longitudePoints = 20;
+  const time = visualizerTime / 800;
+
+  ctx.save();
+  ctx.strokeStyle = primaryColor;
+  ctx.fillStyle = secondaryColor;
+  ctx.shadowColor = primaryColor;
+  ctx.shadowBlur = glowIntensity * 0.6;
+
+  // Rotate entire system
+  ctx.rotate(time * 0.15);
+
+  const vertices = [];
+
+  // 1. Calculate 3D sphere point projection coordinates
+  for (let lat = 1; lat < latitudeLines; lat++) {
+    const theta = (lat / latitudeLines) * Math.PI; // latitude angle
+    const sinTheta = Math.sin(theta);
+    const cosTheta = Math.cos(theta);
+
+    for (let lon = 0; lon < longitudePoints; lon++) {
+      const phi = (lon / longitudePoints) * Math.PI * 2 + time; // longitude angle
+      
+      const fIdx = Math.floor((lon / longitudePoints) * (bufferLength * 0.4));
+      const val = (data[fIdx] * sensitivity) / 255;
+      
+      // Dynamic radius expansion based on audio frequency
+      const curRadius = radius * (1 + val * 0.35);
+
+      // Spherical coordinate system standard mapping
+      let x3d = curRadius * sinTheta * Math.cos(phi);
+      let y3d = curRadius * sinTheta * Math.sin(phi);
+      let z3d = curRadius * cosTheta;
+
+      // 3D perspective rotation around Y and X axis
+      const cosY = Math.cos(0.5);
+      const sinY = Math.sin(0.5);
+      const xRot = x3d * cosY - z3d * sinY;
+      const zRot = x3d * sinY + z3d * cosY;
+
+      // Perspective projection factor
+      const fov = 500;
+      const scale = fov / (fov + zRot);
+      const projX = xRot * scale;
+      const projY = y3d * scale;
+
+      vertices.push({ x: projX, y: projY, intensity: val });
+    }
+  }
+
+  // 2. Draw matrix grid lines connecting nodes
+  ctx.lineWidth = 0.8;
+  for (let i = 0; i < vertices.length; i++) {
+    const v1 = vertices[i];
+    ctx.globalAlpha = 0.08 + v1.intensity * 0.25;
+
+    // Connect to adjacent node on same latitude ring
+    const nextRingNode = vertices[(i + 1) % longitudePoints + Math.floor(i / longitudePoints) * longitudePoints];
+    ctx.beginPath();
+    ctx.moveTo(v1.x, v1.y);
+    ctx.lineTo(nextRingNode.x, nextRingNode.y);
+    ctx.stroke();
+
+    // Connect to node on next latitude line
+    const nextLatIdx = i + longitudePoints;
+    if (nextLatIdx < vertices.length) {
+      const v2 = vertices[nextLatIdx];
+      ctx.beginPath();
+      ctx.moveTo(v1.x, v1.y);
+      ctx.lineTo(v2.x, v2.y);
+      ctx.stroke();
+    }
+  }
+
+  // 3. Draw nodes (glowing intersections)
+  ctx.globalAlpha = 0.85;
+  for (let i = 0; i < vertices.length; i++) {
+    const v = vertices[i];
+    const nodeSize = (1.5 + v.intensity * 4.5) * scaleFactor;
+    ctx.beginPath();
+    ctx.arc(v.x, v.y, nodeSize, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+// Design style 15: Neon Fiber Wavefront (Shutterstock 2174901063)
+function drawNeonFiber(data, bass, mid, treble) {
+  const lineCount = 45;
+  const width = 800;
+  const points = 80;
+  const time = visualizerTime / 500;
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineWidth = 0.65;
+  ctx.shadowBlur = glowIntensity * 0.45;
+
+  for (let l = 0; l < lineCount; l++) {
+    // Unique phase and fractional frequency scales for cosmic thread visuals
+    const phaseOffset = l * (Math.PI * 2 / lineCount);
+    const waveFreq = 3 + (l * 0.05);
+
+    // Dynamic gradient color fade across threads
+    const alpha = 0.06 + (1 - l / lineCount) * 0.12 + mid * 0.15;
+    ctx.strokeStyle = colorMode === 'hsl-shift' 
+      ? `hsla(${(l * 8 + time * 100) % 360}, 100%, 65%, ${alpha})`
+      : `${primaryColor}${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
+    ctx.shadowColor = primaryColor;
+
+    ctx.beginPath();
+    for (let i = 0; i <= points; i++) {
+      const pct = i / points;
+      const x = -width / 2 + pct * width;
+
+      // Audio data frequency index mapping
+      const fIdx = Math.floor(pct * (bufferLength * 0.5));
+      const val = (data[fIdx] * sensitivity) / 255;
+
+      // Shape envelope (flat edges, dynamic middle)
+      const envelope = Math.pow(Math.sin(pct * Math.PI), 2.2);
+
+      // Thread weave math
+      const wigglePhase = time * 2.5 + phaseOffset;
+      const wave = Math.sin(pct * Math.PI * waveFreq + wigglePhase) * 65 * (1 + treble * 0.8);
+      const noise = Math.cos(pct * Math.PI * 8 - wigglePhase) * 15 * bass;
+      const y = (wave + noise) * val * envelope;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// RADIO WAVE workspace: top button toggles the right-side window dock.
+const controlPanelToggle = document.getElementById('toggle-control-panel');
+if (controlPanelToggle) {
+  controlPanelToggle.textContent='☰ WINDOWS';
+  controlPanelToggle.setAttribute('aria-pressed','true');
+  controlPanelToggle.addEventListener('click', () => {
+    const open=window.RWWorkspace?.toggleDock?.();
+    if(typeof open==='boolean')controlPanelToggle.setAttribute('aria-pressed',open?'true':'false');
+    setTimeout(resizeCanvas,0);
+  });
+}
+
+// RADIO WAVE visualizer opacity: applies to the rendered visual layer without dimming background/artwork/UI.
+const visualOpacitySlider=document.getElementById('slider-visual-opacity');
+const visualOpacityValue=document.getElementById('val-visual-opacity');
+const visualizerCanvas=document.getElementById('visualizer-canvas');
+if(visualOpacitySlider&&visualizerCanvas){
+  const applyVisualizerOpacity=()=>{
+    const pct=Math.max(0,Math.min(100,Number(visualOpacitySlider.value)||0));
+    visualizerCanvas.style.opacity=String(pct/100);
+    if(visualOpacityValue)visualOpacityValue.textContent=pct+'%';
+  };
+  visualOpacitySlider.addEventListener('input',applyVisualizerOpacity);
+  visualOpacitySlider.addEventListener('change',applyVisualizerOpacity);
+  applyVisualizerOpacity();
+}
+
+// Monitor/DPI aware preview fit. The logical render resolution stays stable for export,
+ // while the displayed stage always fits the current Electron viewport.
+ window.addEventListener('resize',()=>requestAnimationFrame(fitVisualizerToViewport));
+ if('ResizeObserver' in window){
+   const previewViewport=document.querySelector('.preview-viewport-container');
+   if(previewViewport)new ResizeObserver(()=>requestAnimationFrame(fitVisualizerToViewport)).observe(previewViewport);
+ }
+ window.api?.onWindowMetrics?.(()=>requestAnimationFrame(()=>requestAnimationFrame(fitVisualizerToViewport)));
+
+ // Run initial configurations
+ init();
+ requestAnimationFrame(()=>requestAnimationFrame(fitVisualizerToViewport));
+
+
+// Additive integration bridge: read-only runtime access for analyzer/render modules.
+window.SoundwaveRuntime = Object.freeze({
+  audio: audioElement,
+  ensureAudioContext,
+  getAnalyser: () => analyserNode,
+  getAudioContext: () => audioContext,
+  getFrequencyData: () => dataArray,
+  getTimeData: () => timeDataArray,
+  setExternalAnalyserFrame: (frame) => {
+    const freq=frame?.frequency, wave=frame?.time;
+    if(!freq || !wave || typeof freq.length!=='number' || typeof wave.length!=='number') return false;
+    if(freq.length<8 || freq.length>4096 || wave.length<16 || wave.length>8192) return false;
+    dataArray=Uint8Array.from(freq, v=>Math.max(0,Math.min(255,Number(v)||0)));
+    timeDataArray=Uint8Array.from(wave, v=>Math.max(0,Math.min(255,Number(v)||0)));
+    bufferLength=dataArray.length;
+    externalAnalyserFrame={receivedAt:Date.now()};
+    return true;
+  },
+  enablePlayback: () => { btnPlayPause.classList.remove('disabled'); btnPlayPause.disabled=false; },
+  setStatus: (text) => { diagStatus.textContent=String(text||''); },
+  localQueue: window.RWLocalQueue,
+  setPlayingUi: setPlayerUiPlaying
+});
