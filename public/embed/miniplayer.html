@@ -63,7 +63,7 @@ const audio=document.getElementById('radio'),toggle=document.getElementById('tog
 const cover=document.getElementById('cover'),dj=document.getElementById('dj'),listeners=document.getElementById('listeners'),quality=document.getElementById('quality'),bars=[...document.querySelectorAll('#eq i')];
 const fallbackCover=new URL('/assets/veluna/covers/veluna-stream-fallback.webp',location.href).href;
 cover.addEventListener('error',()=>{if(cover.src!==fallbackCover)cover.src=fallbackCover});
-let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0,silentSince=0,lastFallbackPublish=0,visualMode='idle';
+let audioContext,analyser,frequencyData,timeDomainData,visualActive=false,visualFramePending=false,visualContextObserved=null,lastFrequencyPeak=0,lastWaveformRms=0,lastMeterAt=0,silentSince=0,lastFallbackPublish=0,visualMode='idle';
 const meterPolicy=window.S666AudioMeterPolicy;
 function renderVisualFallback(){
   const active=meterPolicy.canSimulate(audio,document)&&!audioWaiting;
