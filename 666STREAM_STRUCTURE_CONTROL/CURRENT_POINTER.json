@@ -1074,5 +1074,26 @@
     "production_runtime_mutation_this_update": false,
     "pointer_last": true,
     "return_anchor": "WEBRADIO_HOST_ACCEPTANCE_PC_ANDROID_IPHONE_AND_ASUS_AURA_DEVICE_READBACK"
+  },
+  "staged_webradio_repair_20261122": {
+    "status": "STAGED_NONPRODUCTION_PARTIAL",
+    "project": "WEBRADIO",
+    "source_branch": "WebRadio-666SOUNDsDESIGn",
+    "source_head": "053da5a6cf7f93b7071246535cbefd1d4ec19ddf",
+    "repair_branch": "repair/webradio-led-clic-r08-20261122",
+    "body_head_before_pointer": "06807b39e8df01e30d5749343c62098ba99dfab7",
+    "backup_branch": "backup/pre-webradio-led-clic-r08-20261122",
+    "root_and_public_player_core_blob": "4dc44132e24bcf7eeff776c694fc26a2300a9932",
+    "regression_test_blob": "b8118d3ad7438c2903325358c2bca2ccaf656734",
+    "static_regression": "PASS_9_OF_9",
+    "node_regression": "NOT_EXECUTED",
+    "return_receipt": "666STREAM_STRUCTURE_CONTROL/continuity/CLIC_TO_STREAM_R08_20261122_01_RETURN_RECEIPT.json",
+    "return_receipt_blob": "ae917b96581cd3a9344f7ec2f8cf4e72fc36870f",
+    "clic_handoff_source_blob": "e75616b8c5caf03c71c155cda0aee3dfd5bf029b",
+    "production_deploy": "FORBIDDEN_WITHOUT_SEPARATE_AUTHORIZATION",
+    "production_branch_mutation": false,
+    "pointer_last": true,
+    "no_post_pointer_mutation": true,
+    "next_gate": "EXECUTE_TARGETED_NODE_REGRESSION_AND_REVIEW_BEFORE_PRODUCTION"
   }
 }
