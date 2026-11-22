@@ -4,9 +4,9 @@
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "6980cf435c8cd14203872866175e40487b428d77",
+  "body_head_before_pointer": "76e101ceca56c34c6b041c6df13e66b6fe6393b4",
   "prechange_recovery_branch": "backup/stream-windows-before-1.19.9-c494fe7",
-  "body_readback": "PASS_34_SOURCE_FILES_AND_2_CONTINUITY_DOCS",
+  "body_readback": "PASS_WEBRADIO_CURRENT_SYNC_20261122_R01",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
   "project_map": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
   "session_governor": "666STREAM_STRUCTURE_CONTROL/current/SESSION_GOVERNOR.md",
@@ -74,7 +74,10 @@
     "RADIO_WAVE_1_19_9_WINDOWS_VISUALS_AND_SECOND_MONITOR_ACCEPTANCE",
     "RADIO_WAVE_1_19_9_GOVEE_AND_ASUS_REAL_DEVICE_ACCEPTANCE",
     "RADIO_WAVE_1_19_9_WINDOWS_SETUP_PORTABLE_ACCEPTANCE",
-    "RADIO_WAVE_GOVEE_CLOUD_HANDOFF_INTEGRATION_ACCEPTANCE"
+    "RADIO_WAVE_GOVEE_CLOUD_HANDOFF_INTEGRATION_ACCEPTANCE",
+    "WEBRADIO_PC_ANDROID_IPHONE_HOST_ACCEPTANCE",
+    "WEBRADIO_ASUS_AURA_PHYSICAL_DEVICE_ACCEPTANCE",
+    "WEBRADIO_CLOUDFLARE_ACTIVE_VERSION_READBACK"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -1048,5 +1051,28 @@
     "physical_devices": "PENDING",
     "govee_cloud": "NOT_INTEGRATED",
     "cloudflare_deploy": "NOT_PERFORMED"
+  },
+  "webradio_current_sync_20261122": {
+    "status": "SOURCE_MERGE_AND_STRUCTURE_READBACK_VERIFIED_HOST_PARTIAL",
+    "project": "WEBRADIO",
+    "prechange_head": "b4debd9ec038d3be02103d5e5aea3b89478bf75a",
+    "prechange_recovery_branch": "backup/pre-stream-webradio-current-sync-20261122",
+    "runtime_merge": "db925dd115c889e43c45d96512b581fda2338d05",
+    "pr257_merge": "4f7326d900a71dc6ef64d77ef23ae241600e1a2e",
+    "pr258_merge": "db925dd115c889e43c45d96512b581fda2338d05",
+    "source_tests": [
+      "PR257_604_OF_604_NODE_PASS",
+      "PR258_607_OF_607_NODE_PASS_PLUS_NATIVE_AURA_ADAPTER_TESTS"
+    ],
+    "post_merge_scope_check": "TWO_LATER_COMMITS_WINDOWS_APP_ASUS_TEST_ONLY",
+    "dashboard_govee_host": "USER_REPORTED_OK",
+    "admin_host": "USER_REPORTED_OK",
+    "pc_android_iphone_matrix": "READBACK_PENDING",
+    "asus_aura_device": "READBACK_PENDING",
+    "cloudflare_active_version": "READBACK_PENDING",
+    "receipt": "666STREAM_STRUCTURE_CONTROL/recovery/WEBRADIO_CURRENT_SYNC_20261122_R01.json",
+    "production_runtime_mutation_this_update": false,
+    "pointer_last": true,
+    "return_anchor": "WEBRADIO_HOST_ACCEPTANCE_PC_ANDROID_IPHONE_AND_ASUS_AURA_DEVICE_READBACK"
   }
 }
