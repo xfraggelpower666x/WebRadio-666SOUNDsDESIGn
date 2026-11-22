@@ -164,7 +164,13 @@ jobs:
           NODE
 
           grep -Fq "Central Player Boot + Session Identity v2.2.1" "$workdir/central-boot-screen.js"
-          grep -Fq "20261016-main-iphone-two-phase-cyberintro-r01" "$workdir/central-boot-screen.js"
+          expected_boot_marker="$(grep -o "BOOT_MARKER=\x27[^\x27]*\x27" public/js/central-boot-screen.js | head -n1)"
+          if [[ -z "$expected_boot_marker" ]]; then
+            echo "FAIL repository central boot marker could not be resolved" >&2
+            exit 1
+          fi
+          grep -Fq "$expected_boot_marker" "$workdir/central-boot-screen.js"
+          echo "CENTRAL BOOT MARKER PASS $expected_boot_marker"
           grep -Fq "MAIN_ANIMATION_CYCLE=10000" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_START_PROGRESS=1" "$workdir/central-boot-screen.js"
           grep -Fq "MAIN_COMPLETE_HOLD=0" "$workdir/central-boot-screen.js"
