@@ -34,6 +34,9 @@ test('stopped player keeps STR SRC and selected Main LED neutral', async () => {
   assert.match(html, /id="statusSource" class="status-chip led-state state-empty"/);
   assert.match(html, /id="mainBtn" class="status-chip led-state state-empty source-chip source-mini-chip-v80 is-selected"/);
   assert.match(core, /applyStatusChip\(statusSource, userStopped \? 'empty' : playing \?/);
-  assert.match(core, /applyStatusChip\(statusMain, userStopped \? 'empty' : 'ok'/);
-  assert.match(core, /applyStatusChip\(statusStream, 'empty', 'Stream inactive'\)/);
+  assert.match(core, /const activeState = playing \? 'ok' : panelAudioFault/);
+  assert.match(core, /'selected, playback not confirmed'/);
+  assert.match(core, /audio\.readyState >= 2/);
+  assert.match(core, /updateCanonicalPanelStatus\('status-message'\)/);
+  assert.doesNotMatch(core, /applyStatusChip\(statusStream, 'ok', 'Stream aktiv'\)/);
 });
