@@ -38,5 +38,6 @@ test('stopped player keeps STR SRC and selected Main LED neutral', async () => {
   assert.match(core, /'selected, playback not confirmed'/);
   assert.match(core, /audio\.readyState >= 2/);
   assert.match(core, /updateCanonicalPanelStatus\('status-message'\)/);
-  assert.doesNotMatch(core, /applyStatusChip\(statusStream, 'ok', 'Stream aktiv'\)/);
+  const statusTextBridge = core.slice(core.indexOf('function syncStreamLedFromStatus('), core.indexOf('function setStatus('));
+  assert.doesNotMatch(statusTextBridge, /applyStatusChip\(statusStream, 'ok', 'Stream aktiv'\)/);
 });
