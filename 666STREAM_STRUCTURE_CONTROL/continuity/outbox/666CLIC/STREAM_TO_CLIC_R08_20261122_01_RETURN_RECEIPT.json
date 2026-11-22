@@ -1,0 +1,65 @@
+{
+  "schema": "STREAM_NATIVE_CLIC_R08_RETURN_RECEIPT_V1",
+  "owner": "666STREAM_STRUCTURE_CONTROL",
+  "authority": "666STREAM_ONLY",
+  "receipt_id": "666STREAM-TO-CLIC-R08-20261122-01",
+  "handoff_id": "CLIC-TO-666STREAM-R08-20261122-01",
+  "source_system": "666CLIC",
+  "target_system": "666STREAM",
+  "source_repository": "xfraggelpower666x/666CLICPRO",
+  "source_branch": "clic-migration-rev79-staging",
+  "source_path": "666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-TO-666STREAM-R08-20261122-01.json",
+  "source_published_commit": "c4561aebb169315bc3d5fc7efba189d0cb9f53ee",
+  "source_published_tree": "acb2d78531f7f0c8d5fffaaf463691e374385c1a",
+  "source_blob_sha": "e75616b8c5caf03c71c155cda0aee3dfd5bf029b",
+  "source_current_head": "710b93e3a742efabcd0c1e66e1bddfa65235b0f1",
+  "source_current_tree": "a5cfd42e94dca5646a5742098fb2867f4a56771c",
+  "recipient_repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "recipient_branch": "WebRadio-666SOUNDsDESIGn",
+  "recipient_prechange_head": "883fb3fac0cccd1bdcd6a4a1b8ef0ccf94c3b4ae",
+  "recipient_repair_head": "afd19a5d20d8b5d209af15172cd5658ca6bc2744",
+  "native_decision": "ACCEPT_FINDINGS_AS_EVIDENCE_REPAIR_STREAM_01_ONLY_PRESERVE_STREAM_02_05_GATES",
+  "findings": {
+    "STREAM-01": "VERIFIED_REPAIRED_LIVE_SMOKE_PASS",
+    "STREAM-02": "HOST_PENDING_NO_SOURCE_REPAIR",
+    "STREAM-03": "SOURCE_PRESENT_HOST_PARTIAL_NO_SOURCE_REPAIR",
+    "STREAM-04": "UNVERIFIED_SEPARATE_CHILD_PATH_PRESERVED_NO_DIRECTORY_INVENTION",
+    "STREAM-05": "ZERO_ADDITIONAL_COST_POLICY_PRESENT_PER_ACTION_ENFORCEMENT_REMAINS_CONTEXTUAL"
+  },
+  "repair": {
+    "prs": [
+      260,
+      261
+    ],
+    "merges": [
+      "053da5a6cf7f93b7071246535cbefd1d4ec19ddf",
+      "afd19a5d20d8b5d209af15172cd5658ca6bc2744"
+    ],
+    "recovery_receipt_path": "666STREAM_STRUCTURE_CONTROL/recovery/CLIC_R08_STREAM_UPDATE_20261122_R01.json",
+    "recovery_receipt_blob": "e4fdb7f5b411f49d0f3f2955108f9cdb09798a2d"
+  },
+  "verification": {
+    "source_commit_tree_blob": "PASS",
+    "release_integrity": "PASS",
+    "codeforge": "PASS",
+    "miniplayer_contract": "PASS",
+    "child_freeze": "PASS",
+    "live_pwa_smoke_run": 45000692681,
+    "live_pwa_smoke": "PASS",
+    "live_deployment_identity": "afd19a5d20d8b5d209af15172cd5658ca6bc2744",
+    "live_boot_marker": "20261017-main-iphone-static-first-paint-r03",
+    "cloudflare_deploy_run": 45000692654,
+    "cloudflare_deploy": "PASS",
+    "cloudflare_worker_version": "d230a658-37b7-4227-bcc5-8623b238517c"
+  },
+  "boundaries": {
+    "clic_mutation": false,
+    "foreign_authority_adopted": false,
+    "project_identities_preserved": true,
+    "productive_webradio_functions_preserved": true,
+    "blind_rollback": false,
+    "new_paid_action_started": false
+  },
+  "pointer_status": "PENDING_POINTER_LAST",
+  "return_anchor": "CLIC_R08_STREAM_RETURN_RECEIPT_READY_FOR_CLIC_READBACK"
+}
