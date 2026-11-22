@@ -320,13 +320,18 @@ setBoostStage(0);
 
 function updateStreamPanelLeds(source) {
   const active = source === 'fallback' || source === 'backup' ? 'backup' : 'main';
-  if (active === 'main') {
-    applyStatusChip(statusMain, userStopped ? 'empty' : 'ok', userStopped ? 'Main Stream selected, transport stopped' : 'Main Stream active');
-    applyStatusChip(statusBackup, 'empty', 'Backup Stream inactive');
-  } else {
-    applyStatusChip(statusMain, 'empty', 'Main Stream inactive');
-    applyStatusChip(statusBackup, userStopped ? 'empty' : 'ok', userStopped ? 'Backup Stream selected, transport stopped' : 'Backup Stream active');
-  }
+  // A selected URL is not evidence of a playing transport.
+  const playing = !!(audio && !userStopped && !panelAudioFault && !panelBuffering &&
+    !audio.paused && !audio.ended && audio.readyState >= 2 &&
+    (audio.currentSrc || audio.getAttribute('src')));
+  const activeState = playing ? 'ok' : panelAudioFault && !userStopped ? 'warn' : 'empty';
+  const activeDescription = userStopped ? 'transport stopped' :
+    panelAudioFault ? 'transport error' : panelBuffering ? 'buffering' :
+    playing ? 'playing' : 'selected, playback not confirmed';
+  applyStatusChip(statusMain, active === 'main' ? activeState : 'empty',
+    active === 'main' ? 'Main Stream ' + activeDescription : 'Main Stream inactive');
+  applyStatusChip(statusBackup, active === 'backup' ? activeState : 'empty',
+    active === 'backup' ? 'Backup Stream ' + activeDescription : 'Backup Stream inactive');
 }
 
 function canonicalWatchdogAvailable() {
@@ -394,14 +399,9 @@ function setStoppedPanelLeds() {
 }
 
 function syncStreamLedFromStatus(text) {
-  const value = String(text || '').toLowerCase();
-  if (value.includes('error') || value.includes('fehler') || value.includes('timeout')) {
-    applyStatusChip(statusStream, 'warn', 'Stream Fehler');
-  } else if (value.includes('stopped') || value.includes('stop') || value.includes('pause')) {
-    applyStatusChip(statusStream, 'empty', 'Stream inactive');
-  } else {
-    applyStatusChip(statusStream, 'ok', 'Stream aktiv');
-  }
+  // Informational strings must never create a false-positive transport status.
+  // The canonical panel owner uses audio, buffering and fault state instead.
+  updateCanonicalPanelStatus('status-message');
 }
 
 function setStatus(text) {
