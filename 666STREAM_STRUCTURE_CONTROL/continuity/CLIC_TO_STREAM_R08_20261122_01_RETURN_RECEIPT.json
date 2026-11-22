@@ -1,0 +1,60 @@
+{
+  "schema": "666STREAM_NATIVE_PEER_RETURN_RECEIPT_V1",
+  "receipt_id": "666STREAM-TO-666CLIC-R08-20261122-01",
+  "handoff_id": "CLIC-TO-666STREAM-R08-20261122-01",
+  "source_repo": "xfraggelpower666x/666CLICPRO",
+  "source_branch": "clic-migration-rev79-staging",
+  "source_commit": "710b93e3a742efabcd0c1e66e1bddfa65235b0f1",
+  "source_tree": "a5cfd42e94dca5646a5742098fb2867f4a56771c",
+  "source_path": "666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-TO-666STREAM-R08-20261122-01.json",
+  "source_blob": "e75616b8c5caf03c71c155cda0aee3dfd5bf029b",
+  "recipient_repo": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "recipient_branch": "repair/webradio-led-clic-r08-20261122",
+  "recipient_head": "053da5a6cf7f93b7071246535cbefd1d4ec19ddf",
+  "recipient_production_branch": "WebRadio-666SOUNDsDESIGn",
+  "native_scope": "WEBRADIO",
+  "native_decision": "STAGED_NONPRODUCTION_TARGET_NATIVE_ADOPTION_WITH_HOST_GATES",
+  "findings": {
+    "STREAM-01": {
+      "status": "SOURCE_CONTRADICTION_REPAIRED_ON_NEWER_CURRENT",
+      "evidence": "GitHub workflow on 053da5a6 derives exact BOOT_MARKER from current public/js/central-boot-screen.js; test tests/live-player-pwa-smoke-current-marker.test.mjs; earlier failed run 44998572887 confirmed stale fixed-marker assertion; current live PWA success NOT independently retested"
+    },
+    "STREAM-02": {
+      "status": "READBACK_PENDING",
+      "reason": "iPhone hardware audio analyzer telemetry not available; source visual fallback must not be promoted to real signal"
+    },
+    "STREAM-03": {
+      "status": "READBACK_PENDING",
+      "reason": "visual fresh-host and plugin version/release parity unverified"
+    },
+    "STREAM-04": {
+      "status": "PRESERVED_UNRESOLVED",
+      "reason": "LIGHT_ORCHESTRA distinct native child route with unverified physical path; not activated"
+    },
+    "STREAM-05": {
+      "status": "SOURCE_GOVERNANCE_PRESENT_HOST_ENFORCEMENT_PARTIAL",
+      "reason": "no new paid resources provisioned; external per-action cost enforcement still independently unverified"
+    }
+  },
+  "repair": {
+    "paths": [
+      "js/player-core.js",
+      "public/js/player-core.js",
+      "tests/header-panel-idle-led-contract.test.mjs"
+    ],
+    "source_mirror_blob": "4dc44132e24bcf7eeff776c694fc26a2300a9932",
+    "targeted_test_blob": "b8118d3ad7438c2903325358c2bca2ccaf656734",
+    "confirmed_issue": "Main/Backup LED selected-source state falsely displayed as active; informational status messages could assert STREAM active without transport proof",
+    "implementation": "Use actual current audio transport and buffer/fault states for LED statuses. Return status-string bridge to canonical state owner. Keep independent player/audio/Govee/ASUS components untouched.",
+    "targeted_static_checks": "9/9 PASS",
+    "targeted_node_execution": "NOT_EXECUTED",
+    "production_deployment": "NOT_AUTHORIZED_NOT_PERFORMED",
+    "live_host_acceptance": "READBACK_PENDING"
+  },
+  "recovery_branch": "backup/pre-webradio-led-clic-r08-20261122",
+  "pointer_policy": "STAGED_BRANCH_POINTER_LAST_NO_POST_POINTER_MUTATION",
+  "foreign_authority_adopted": false,
+  "foreign_repository_mutated": false,
+  "target_status": "PARTIAL_SOURCE_VERIFIED_NO_PRODUCTION_DEPLOY",
+  "next": "Execute targeted regression and review staged PR; separately obtain owner approval before any production merge that triggers Cloudflare."
+}
