@@ -1,0 +1,97 @@
+{
+  "schema": "666stream-clic-r08-peer-audit-repair-v1",
+  "native_owner": "666STREAM",
+  "scope": "WEBRADIO",
+  "date": "2026-11-22",
+  "status": "VERIFIED_STREAM_01_REPAIRED_STREAM_02_05_EVIDENCE_GATED",
+  "source_handoff": {
+    "handoff_id": "CLIC-TO-666STREAM-R08-20261122-01",
+    "repository": "xfraggelpower666x/666CLICPRO",
+    "branch": "clic-migration-rev79-staging",
+    "path": "666CLIC_NATIVE_RUNTIME/outbox/666STREAM/CLIC-TO-666STREAM-R08-20261122-01.json",
+    "published_commit": "c4561aebb169315bc3d5fc7efba189d0cb9f53ee",
+    "published_tree": "acb2d78531f7f0c8d5fffaaf463691e374385c1a",
+    "blob": "e75616b8c5caf03c71c155cda0aee3dfd5bf029b",
+    "current_source_head": "710b93e3a742efabcd0c1e66e1bddfa65235b0f1",
+    "current_source_tree": "a5cfd42e94dca5646a5742098fb2867f4a56771c",
+    "verification": "DIRECT_GITHUB_READBACK_COMMIT_TREE_BLOB_MATCH"
+  },
+  "stream": {
+    "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+    "branch": "WebRadio-666SOUNDsDESIGn",
+    "prechange_head": "883fb3fac0cccd1bdcd6a4a1b8ef0ccf94c3b4ae",
+    "prechange_backup_branch": "backup/pre-clic-r08-stream-20261122",
+    "repair_prs": [
+      260,
+      261
+    ],
+    "repair_merge_commits": [
+      "053da5a6cf7f93b7071246535cbefd1d4ec19ddf",
+      "afd19a5d20d8b5d209af15172cd5658ca6bc2744"
+    ],
+    "repaired_files": [
+      ".github/workflows/live-player-pwa-smoke.yml",
+      "tests/live-player-pwa-smoke-current-marker.test.mjs"
+    ],
+    "runtime_player_worker_audio_files_changed": false
+  },
+  "findings": {
+    "STREAM-01": {
+      "source_finding": "PWA_SMOKE_SOURCE_CONTRADICTION",
+      "native_result": "REPAIRED_CONFIRMED_STALE_MARKER_ASSERTION",
+      "cause": "smoke pinned superseded 20261016 boot marker while current native/live boot uses 20261017 marker",
+      "rollback": false,
+      "current_marker": "20261017-main-iphone-static-first-paint-r03",
+      "behavior_guards_preserved": true
+    },
+    "STREAM-02": {
+      "native_result": "HOST_PENDING_NO_SOURCE_REPAIR",
+      "evidence": "iPhone playback audible while analyser samples remained zero in existing native receipt",
+      "source_defect_confirmed": false
+    },
+    "STREAM-03": {
+      "native_result": "SOURCE_PRESENT_HOST_PARTIAL_NO_SOURCE_REPAIR",
+      "source_defect_confirmed": false
+    },
+    "STREAM-04": {
+      "native_result": "IDENTITY_VERIFIED_DIRECTORY_UNRESOLVED_NO_WRITE",
+      "source_defect_confirmed": false,
+      "directory_invented": false
+    },
+    "STREAM-05": {
+      "native_result": "POLICY_PRESENT_PER_ACTION_ENFORCEMENT_CONTEXTUAL_NO_NEW_PAID_ACTION",
+      "source_defect_confirmed": false,
+      "new_paid_action_started": false
+    }
+  },
+  "regression": {
+    "pr_260_release_integrity": 45000112429,
+    "pr_260_codeforge": 45000112396,
+    "pr_261_release_integrity": 45000599604,
+    "pr_261_codeforge": 45000599563,
+    "pr_261_child_freeze": 45000599630,
+    "production_release_integrity": 45000692701,
+    "production_codeforge": 45000692682,
+    "production_miniplayer_contract": 45000692687,
+    "live_pwa_smoke": 45000692681,
+    "live_pwa_smoke_status": "PASS",
+    "live_deployment_identity": "afd19a5d20d8b5d209af15172cd5658ca6bc2744",
+    "live_boot_marker": "20261017-main-iphone-static-first-paint-r03"
+  },
+  "deployment": {
+    "automatic_workflow_run": 45000692654,
+    "status": "PASS",
+    "webradio_worker_version_id": "d230a658-37b7-4227-bcc5-8623b238517c",
+    "autodj_secret_step": "PASS_IN_FINAL_RUN",
+    "prior_intermediate_run_45000172393": "FAILED_AFTER_WORKER_DEPLOY_DURING_SECRET_UPDATE_NOT_USED_AS_FINAL_EVIDENCE"
+  },
+  "boundaries": {
+    "preserve_project_identities": true,
+    "preserve_productive_webradio_functions": true,
+    "no_foreign_authority": true,
+    "clic_read_only": true,
+    "no_blind_rollback": true,
+    "pointer_last_required": true
+  },
+  "return_anchor": "CLIC_R08_STREAM_PEER_AUDIT_REPAIR_COMPLETE"
+}
