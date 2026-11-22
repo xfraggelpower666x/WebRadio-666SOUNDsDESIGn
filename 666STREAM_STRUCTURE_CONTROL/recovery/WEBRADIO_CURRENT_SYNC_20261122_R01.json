@@ -1,0 +1,48 @@
+{
+  "id": "666STREAM-WEBRADIO-CURRENT-SYNC-20261122-R01",
+  "date": "2026-11-22",
+  "system": "666STREAM",
+  "project": "WEBRADIO",
+  "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
+  "branch": "WebRadio-666SOUNDsDESIGn",
+  "prechange_head": "b4debd9ec038d3be02103d5e5aea3b89478bf75a",
+  "prechange_recovery_branch": "backup/pre-stream-webradio-current-sync-20261122",
+  "verified_webradio_runtime_merge": "db925dd115c889e43c45d96512b581fda2338d05",
+  "verified_prs": {
+    "257": {
+      "title": "WEBRADIO: GOVEE-Cloud-Steuerung im Hauptplayer wiederherstellen",
+      "merge_commit": "4f7326d900a71dc6ef64d77ef23ae241600e1a2e",
+      "source_tests": "604/604_NODE_PASS",
+      "device_effect": "PENDING"
+    },
+    "258": {
+      "title": "WEBRADIO: gemeinsamer Audiopegel, Dashboard-GOVEE und ASUS Aura",
+      "merge_commit": "db925dd115c889e43c45d96512b581fda2338d05",
+      "source_tests": "607/607_NODE_PASS_PLUS_NATIVE_AURA_ADAPTER_TESTS",
+      "browser_host": "PENDING",
+      "asus_hardware": "PENDING"
+    }
+  },
+  "post_webradio_head_scope_check": {
+    "repo_head": "b4debd9ec038d3be02103d5e5aea3b89478bf75a",
+    "commits_after_webradio_merge": 2,
+    "changed_scope": "WINDOWS_APP_ASUS_AURA_TEST_ONLY",
+    "webradio_runtime_changed_after_merge": false
+  },
+  "host_evidence": {
+    "govee_dashboard": "USER_REPORTED_OK",
+    "admin": "USER_REPORTED_OK",
+    "full_browser_matrix": "READBACK_PENDING",
+    "physical_asus_aura": "READBACK_PENDING"
+  },
+  "deployment": {
+    "cloudflare_current_version": "READBACK_PENDING",
+    "production_workflow_identity": "NOT_REVALIDATED_IN_THIS_UPDATE"
+  },
+  "mutation_scope": "666STREAM_STRUCTURE_CONTROL_ONLY",
+  "runtime_mutation": false,
+  "foreign_project_mutation": false,
+  "cost_gate": "NO_NEW_PAID_RESOURCE_PROVISIONED",
+  "next_step": "WEBRADIO_HOST_ACCEPTANCE_PC_ANDROID_IPHONE_AND_ASUS_AURA_DEVICE_READBACK",
+  "pointer_last_required": true
+}
