@@ -1,12 +1,12 @@
 {
   "system": "666STREAM_STRUCTURE_CONTROL",
-  "status": "CURRENT_PRODUCTIVE_PROJECT_SCOPED_RUNTIME",
+  "status": "STAGED_NONPRODUCTION_R02_SOURCE_VERIFIED",
   "repository": "xfraggelpower666x/WebRadio-666SOUNDsDESIGn",
   "authority_branch": "WebRadio-666SOUNDsDESIGn",
   "authority": "GITHUB_REPOSITORY",
-  "body_head_before_pointer": "bf023e778e1d4200bb44f4bd80e57d9de432a3fb",
-  "prechange_recovery_branch": "backup/pre-clic-r08-stream-20261122",
-  "body_readback": "PASS_CLIC_R08_STREAM_UPDATE_20261122_R01",
+  "body_head_before_pointer": "cd8f67caf057a7cf6e6a7e4777f30f0d6cbdad70",
+  "prechange_recovery_branch": "backup/pre-stream-r02-cooperation-20261125",
+  "body_readback": "PASS_R02_12_OF_12_SOURCE_BLOBS_AND_REMOTE_CI_654_OF_654",
   "manifest": "666STREAM_STRUCTURE_CONTROL/REHYDRATION_MANIFEST.json",
   "project_map": "666STREAM_STRUCTURE_CONTROL/current/PROJECT_MAP.json",
   "session_governor": "666STREAM_STRUCTURE_CONTROL/current/SESSION_GOVERNOR.md",
@@ -20,7 +20,7 @@
   "codeforge_scope": "ACTIVE_PROJECT_ONLY",
   "pointer_written_last": true,
   "no_post_pointer_mutation": true,
-  "current_state_status": "CURRENT_PRODUCTIVE_PROJECT_SCOPED_RUNTIME",
+  "current_state_status": "R02_SOURCE_STAGED_NONPRODUCTION",
   "open_gates": [
     "FRESH_CHAT_REHYDRATION_RUNTIME_TEST",
     "LIGHT_ORCHESTRA_SEPARATE_CHILD_ROUTE_PRESERVED_UNRESOLVED",
@@ -77,7 +77,9 @@
     "RADIO_WAVE_GOVEE_CLOUD_HANDOFF_INTEGRATION_ACCEPTANCE",
     "WEBRADIO_PC_ANDROID_IPHONE_HOST_ACCEPTANCE",
     "WEBRADIO_ASUS_AURA_PHYSICAL_DEVICE_ACCEPTANCE",
-    "WEBRADIO_CLOUDFLARE_ACTIVE_VERSION_READBACK"
+    "WEBRADIO_CLOUDFLARE_ACTIVE_VERSION_READBACK",
+    "R02_REAL_REMOTE_PEER_HOST_BINDINGS_ACCEPTANCE",
+    "R02_PRODUCTION_ADOPTION_SEPARATE_AUTHORIZATION"
   ],
   "pfs_csm_native_child_registration": "VERIFIED_STREAMCTRL-40001",
   "systemsicherung_path": "666STREAM_STRUCTURE_CONTROL/recovery/666STREAM_STRUCTURE_CONTROL_SYSTEMSICHERUNG_2026-10-06.zip",
@@ -1118,5 +1120,22 @@
     "new_paid_action_started": false,
     "pointer_last": true,
     "return_anchor": "CLIC_R08_STREAM_RETURN_RECEIPT_READY_FOR_CLIC_READBACK"
+  },
+  "codeforge_cooperation_r02": {
+    "project": "WEBRADIO",
+    "status": "STAGED_NONPRODUCTION_SOURCE_VERIFIED",
+    "integration_branch": "integration/stream-r02-native-cooperation-20261125",
+    "body_commit": "cd8f67caf057a7cf6e6a7e4777f30f0d6cbdad70",
+    "source_blobs_verified": "12/12",
+    "github_release_integrity_run": 45512830782,
+    "github_release_integrity": "PASS_654_OF_654",
+    "radio_codeforge_force_run": 45512830944,
+    "radio_codeforge_force": "PASS",
+    "native_contract": "666STREAM_STRUCTURE_CONTROL/integration/CODEFORGE_COOPERATION_R02_CONTRACT.md",
+    "development_executor": "radio-codeforge/cooperation/peer-executor.mjs",
+    "foreign_host_dispatch": "NOT_VERIFIED",
+    "production_merge": false,
+    "cloudflare_deploy": false,
+    "production_pointer_unchanged": true
   }
 }
