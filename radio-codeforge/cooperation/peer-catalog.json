@@ -1,0 +1,14 @@
+{
+  "schema": "666STREAM_CODEFORGE_COOP_R01",
+  "status": "DECLARATIONS_ONLY_NOT_REMOTE_CAPABILITY_VERIFIED",
+  "peers": [
+    {"id":"666-RADIO-CODEFORGE-001","evidence_level":"DECLARED","capabilities":["native_scope_guard","runtime_regression","bridge_reuse","deploy_impact"]},
+    {"id":"LYVRA_CODING_PROFI","evidence_level":"DECLARED","capabilities":["technical_review","cross_language_architecture","repair_hypotheses","evidence_audit"]},
+    {"id":"LYVRA_SUPERCODEFORGE","evidence_level":"DECLARED","capabilities":["readonly_peer_reference","causal_relation_review"]},
+    {"id":"666CLIC","evidence_level":"DECLARED","capabilities":["semantic_visual_review","provenance_audit","handoff_validation"]},
+    {"id":"666DEV","evidence_level":"DECLARED","capabilities":["windows_build_review","regression_parity","recovery_planning"]},
+    {"id":"666MAIN_BRAIN","evidence_level":"DECLARED","capabilities":["shared_capability_advice","evidence_coordination"]},
+    {"id":"CODER","evidence_level":"DECLARED","capabilities":["web_ui_review","frontend_accessibility"]},
+    {"id":"LYVRA","evidence_level":"DECLARED","capabilities":["native_lyvra_source_advice"]}
+  ]
+}

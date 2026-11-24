@@ -172,3 +172,7 @@ Native files:
 Combined development chain:
 
 `666STREAM current -> RADIO-CODEFORGE cause-first audit -> SuperCodeForge peer evidence gates -> smallest safe reversible action -> targeted regression -> independent readback -> evidence classification -> promotion only under native 666STREAM authority`
+
+
+## R02 CodeForge cooperation — development-only
+The additive R02 peer executor is at `radio-codeforge/cooperation/`; it is only loaded after native rehydration and exact project binding for an explicitly requested development/CodeForge task. See `666STREAM_STRUCTURE_CONTROL/integration/CODEFORGE_COOPERATION_R02_CONTRACT.md`. It does not auto-dispatch or grant foreign/production writes.

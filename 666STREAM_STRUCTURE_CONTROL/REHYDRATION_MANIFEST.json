@@ -66,7 +66,8 @@
       "RENDER_CORE_DEVELOPMENT_POSITION",
       "READ_VERIFIED_DEPENDENCY_GRAPH",
       "CHECK_ADAPTER_PARITY_LEDGER",
-      "RESOLVE_MASTER_BRIDGE_VISUAL_PEER_HANDOFF_WHEN_RELEVANT"
+      "RESOLVE_MASTER_BRIDGE_VISUAL_PEER_HANDOFF_WHEN_RELEVANT",
+      "LOAD_PROJECT_SCOPED_CODEFORGE_COOPERATION_IF_REQUESTED"
     ],
     "no_foreign_autoactivation": true,
     "no_new_root_identity": true,
@@ -149,5 +150,18 @@
     "required_rehydration": true,
     "check_before_external_operations": true,
     "missing_policy": "COST_BLOCKED"
+  },
+  "codeforge_cooperation_r02": {
+    "status": "SOURCE_STAGED_PENDING_REMOTE_REGRESSION",
+    "contract": "integration/CODEFORGE_COOPERATION_R02_CONTRACT.md",
+    "executor": "radio-codeforge/cooperation/peer-executor.mjs",
+    "host": "EXPLICIT_BINDINGS_ONLY",
+    "auto_dispatch": false,
+    "foreign_autoactivation": false,
+    "foreign_writes": false,
+    "production_import": false,
+    "production_merge": false,
+    "cost_gate": "ONLY_FOR_NEW_PAID_ARCHITECTURE_OR_CHARGES",
+    "current_pointer_publish": "SEPARATE_NATIVE_UPDATE_POINTER_LAST"
   }
 }

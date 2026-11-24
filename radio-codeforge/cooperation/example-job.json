@@ -1,0 +1,12 @@
+{
+  "current": {"project":"WEBRADIO","authority":"666STREAM_STRUCTURE_CONTROL","commit":"a59be61f7ccf81de61b228ed5853a1089c15ee2f"},
+  "budget": {"zero_additional_eur":true,"paid_credit_spend_allowed":false,"external_operations_authorized":false},
+  "tasks": [
+    {"id":"native_baseline","project":"WEBRADIO","peer":"666-RADIO-CODEFORGE-001","capability":"native_scope_guard","intent":"READ","read":["current_pointer","player_core"]},
+    {"id":"ux_review","project":"WEBRADIO","peer":"CODER","capability":"web_ui_review","intent":"READ","deps":["native_baseline"],"read":["dashboard"]},
+    {"id":"semantic_review","project":"WEBRADIO","peer":"666CLIC","capability":"semantic_visual_review","intent":"READ","deps":["native_baseline"],"read":["visual_contract"]},
+    {"id":"cause_review","project":"WEBRADIO","peer":"LYVRA_CODING_PROFI","capability":"repair_hypotheses","intent":"PROPOSE","deps":["native_baseline"],"read":["player_core"],"proposed_write":["player_core"]},
+    {"id":"native_regression_plan","project":"WEBRADIO","peer":"666-RADIO-CODEFORGE-001","capability":"runtime_regression","intent":"READ","deps":["cause_review","semantic_review","ux_review"],"read":["player_core","tests"]},
+    {"id":"deployment_risk","project":"WEBRADIO","peer":"666-RADIO-CODEFORGE-001","capability":"deploy_impact","intent":"READ","deps":["native_regression_plan"],"read":["deploy_workflow"]}
+  ]
+}
