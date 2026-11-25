@@ -163,5 +163,14 @@
     "production_merge": false,
     "cost_gate": "ONLY_FOR_NEW_PAID_ARCHITECTURE_OR_CHARGES",
     "current_pointer_publish": "SEPARATE_NATIVE_UPDATE_POINTER_LAST"
+  },
+  "codeforge_cooperation_r03": {
+    "status": "SOURCE_STAGED_PENDING_REMOTE_REGRESSION",
+    "contract": "integration/CODEFORGE_COOPERATION_R03_HOST_CONTRACT.md",
+    "module": "radio-codeforge/cooperation/github-readonly-host.mjs",
+    "stage": "AFTER_PROJECT_BOUND_R02_DEV_STAGE_ONLY",
+    "host_handle_required": true,
+    "foreign_peer_execution_verified": false,
+    "production_unchanged": true
   }
 }

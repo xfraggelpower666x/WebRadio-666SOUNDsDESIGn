@@ -343,3 +343,7 @@ R02_REMOTE_HOST=READBACK_PENDING
 R02_PRODUCTION_DEPLOY=FORBIDDEN
 R02_GITHUB_PUBLICATION=SOURCE_STAGED_PENDING_REMOTE_REGRESSION
 PR_262=PRODUCTION_HOLD
+
+
+## R03 — GitHub host-source adapter (2026-11-25)
+R03 builds on the R02 WEBRADIO development-only CodeForge path. The exact-commit `github-readonly-host.mjs` accepts explicitly authorized `fetchFile`/`fetchBlob` host handles and verifies returned source bytes by Git blob SHA against independent readback. Foreign plugins are not autoactivated or host-verified. Native contract: `666STREAM_STRUCTURE_CONTROL/integration/CODEFORGE_COOPERATION_R03_HOST_CONTRACT.md`. Production/Cloudflare remain unchanged. Remote CI and true peer-host acceptance are separate gates.
